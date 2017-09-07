@@ -324,10 +324,10 @@ CREATE TABLE `sys_user` (
 INSERT INTO `sys_user` VALUES ('1', '系统管理员', '5HK/W3IuS8X734A5JMigPg==', 'sysadmin', '2017-09-06 11:03:17', '1', '2017-08-01 22:33:19', '1', '1');
 
 -- ----------------------------
--- Table structure for `ze_exam`
+-- Table structure for `ex_exam`
 -- ----------------------------
-DROP TABLE IF EXISTS `ze_exam`;
-CREATE TABLE `ze_exam` (
+DROP TABLE IF EXISTS `ex_exam`;
+CREATE TABLE `ex_exam` (
   `ID` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `NAME` varchar(32) DEFAULT NULL COMMENT '名称',
   `PASS_SCORE` decimal(5,2) DEFAULT NULL COMMENT '及格分数',
@@ -342,19 +342,19 @@ CREATE TABLE `ze_exam` (
   PRIMARY KEY (`ID`),
   KEY `FK_Reference_19` (`PAPER_ID`),
   KEY `FK_Reference_22` (`EXAM_TYPE_ID`),
-  CONSTRAINT `FK_Reference_19` FOREIGN KEY (`PAPER_ID`) REFERENCES `ze_paper` (`id`),
-  CONSTRAINT `FK_Reference_22` FOREIGN KEY (`EXAM_TYPE_ID`) REFERENCES `ze_exam_type` (`id`)
+  CONSTRAINT `FK_Reference_19` FOREIGN KEY (`PAPER_ID`) REFERENCES `ex_paper` (`id`),
+  CONSTRAINT `FK_Reference_22` FOREIGN KEY (`EXAM_TYPE_ID`) REFERENCES `ex_exam_type` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of ze_exam
+-- Records of ex_exam
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for `ze_exam_type`
+-- Table structure for `ex_exam_type`
 -- ----------------------------
-DROP TABLE IF EXISTS `ze_exam_type`;
-CREATE TABLE `ze_exam_type` (
+DROP TABLE IF EXISTS `ex_exam_type`;
+CREATE TABLE `ex_exam_type` (
   `ID` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `NAME` varchar(32) DEFAULT NULL COMMENT '名称',
   `PARENT_ID` int(11) DEFAULT NULL COMMENT '父ID',
@@ -367,15 +367,15 @@ CREATE TABLE `ze_exam_type` (
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of ze_exam_type
+-- Records of ex_exam_type
 -- ----------------------------
-INSERT INTO `ze_exam_type` VALUES ('1', '考试分类', '0', '_1_', '1', '2017-08-01 22:31:43', '1', '1');
+INSERT INTO `ex_exam_type` VALUES ('1', '考试分类', '0', '_1_', '1', '2017-08-01 22:31:43', '1', '1');
 
 -- ----------------------------
--- Table structure for `ze_exam_user`
+-- Table structure for `ex_exam_user`
 -- ----------------------------
-DROP TABLE IF EXISTS `ze_exam_user`;
-CREATE TABLE `ze_exam_user` (
+DROP TABLE IF EXISTS `ex_exam_user`;
+CREATE TABLE `ex_exam_user` (
   `ID` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `EXAM_ID` int(11) DEFAULT NULL COMMENT '考试ID',
   `USER_ID` int(11) DEFAULT NULL COMMENT '用户ID',
@@ -387,18 +387,18 @@ CREATE TABLE `ze_exam_user` (
   `STATE` int(11) DEFAULT NULL COMMENT '1：未考试；2：考试中；3：已交卷；4：强制交卷；5：判卷中；6：未通过；7：已通过',
   PRIMARY KEY (`ID`),
   KEY `FK_Reference_23` (`EXAM_ID`),
-  CONSTRAINT `FK_Reference_23` FOREIGN KEY (`EXAM_ID`) REFERENCES `ze_exam` (`ID`)
+  CONSTRAINT `FK_Reference_23` FOREIGN KEY (`EXAM_ID`) REFERENCES `ex_exam` (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of ze_exam_user
+-- Records of ex_exam_user
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for `ze_exam_user_question`
+-- Table structure for `ex_exam_user_question`
 -- ----------------------------
-DROP TABLE IF EXISTS `ze_exam_user_question`;
-CREATE TABLE `ze_exam_user_question` (
+DROP TABLE IF EXISTS `ex_exam_user_question`;
+CREATE TABLE `ex_exam_user_question` (
   `ID` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `EXAM_USER_ID` int(11) DEFAULT NULL COMMENT '考试用户ID',
   `EXAM_ID` int(11) DEFAULT NULL COMMENT '考试ID',
@@ -413,36 +413,36 @@ CREATE TABLE `ze_exam_user_question` (
   PRIMARY KEY (`ID`),
   KEY `FK_Reference_24` (`EXAM_USER_ID`),
   KEY `FK_Reference_25` (`QUESTION_ID`),
-  CONSTRAINT `FK_Reference_24` FOREIGN KEY (`EXAM_USER_ID`) REFERENCES `ze_exam_user` (`ID`),
-  CONSTRAINT `FK_Reference_25` FOREIGN KEY (`QUESTION_ID`) REFERENCES `ze_question` (`id`)
+  CONSTRAINT `FK_Reference_24` FOREIGN KEY (`EXAM_USER_ID`) REFERENCES `ex_exam_user` (`ID`),
+  CONSTRAINT `FK_Reference_25` FOREIGN KEY (`QUESTION_ID`) REFERENCES `ex_question` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=99 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of ze_exam_user_question
+-- Records of ex_exam_user_question
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for `ze_mark_user`
+-- Table structure for `ex_mark_user`
 -- ----------------------------
-DROP TABLE IF EXISTS `ze_mark_user`;
-CREATE TABLE `ze_mark_user` (
+DROP TABLE IF EXISTS `ex_mark_user`;
+CREATE TABLE `ex_mark_user` (
   `ID` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `EXAM_ID` int(11) DEFAULT NULL COMMENT '考试ID',
   `USER_ID` int(11) DEFAULT NULL COMMENT '用户ID',
   PRIMARY KEY (`ID`),
   KEY `FK_Reference_37` (`EXAM_ID`),
-  CONSTRAINT `FK_Reference_37` FOREIGN KEY (`EXAM_ID`) REFERENCES `ze_exam` (`ID`)
+  CONSTRAINT `FK_Reference_37` FOREIGN KEY (`EXAM_ID`) REFERENCES `ex_exam` (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of ze_mark_user
+-- Records of ex_mark_user
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for `ze_paper`
+-- Table structure for `ex_paper`
 -- ----------------------------
-DROP TABLE IF EXISTS `ze_paper`;
-CREATE TABLE `ze_paper` (
+DROP TABLE IF EXISTS `ex_paper`;
+CREATE TABLE `ex_paper` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `NAME` varchar(32) DEFAULT NULL COMMENT '名称',
   `DESCRIPTION` varchar(512) DEFAULT NULL COMMENT '描述',
@@ -453,18 +453,18 @@ CREATE TABLE `ze_paper` (
   `PAPER_TYPE_ID` int(11) DEFAULT NULL COMMENT '试卷分类',
   PRIMARY KEY (`ID`),
   KEY `FK_Reference_16` (`PAPER_TYPE_ID`),
-  CONSTRAINT `FK_Reference_16` FOREIGN KEY (`PAPER_TYPE_ID`) REFERENCES `ze_paper_type` (`id`)
+  CONSTRAINT `FK_Reference_16` FOREIGN KEY (`PAPER_TYPE_ID`) REFERENCES `ex_paper_type` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of ze_paper
+-- Records of ex_paper
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for `ze_paper_question`
+-- Table structure for `ex_paper_question`
 -- ----------------------------
-DROP TABLE IF EXISTS `ze_paper_question`;
-CREATE TABLE `ze_paper_question` (
+DROP TABLE IF EXISTS `ex_paper_question`;
+CREATE TABLE `ex_paper_question` (
   `ID` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `NAME` varchar(32) DEFAULT NULL COMMENT '章节名称',
   `DESCRIPTION` varchar(512) DEFAULT NULL COMMENT '章节描述',
@@ -480,19 +480,19 @@ CREATE TABLE `ze_paper_question` (
   PRIMARY KEY (`ID`),
   KEY `FK_Reference_17` (`QUESTION_ID`),
   KEY `FK_Reference_18` (`PAPER_ID`),
-  CONSTRAINT `FK_Reference_17` FOREIGN KEY (`QUESTION_ID`) REFERENCES `ze_question` (`id`),
-  CONSTRAINT `FK_Reference_18` FOREIGN KEY (`PAPER_ID`) REFERENCES `ze_paper` (`ID`)
+  CONSTRAINT `FK_Reference_17` FOREIGN KEY (`QUESTION_ID`) REFERENCES `ex_question` (`id`),
+  CONSTRAINT `FK_Reference_18` FOREIGN KEY (`PAPER_ID`) REFERENCES `ex_paper` (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of ze_paper_question
+-- Records of ex_paper_question
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for `ze_paper_type`
+-- Table structure for `ex_paper_type`
 -- ----------------------------
-DROP TABLE IF EXISTS `ze_paper_type`;
-CREATE TABLE `ze_paper_type` (
+DROP TABLE IF EXISTS `ex_paper_type`;
+CREATE TABLE `ex_paper_type` (
   `ID` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `NAME` varchar(32) DEFAULT NULL COMMENT '名称',
   `PARENT_ID` int(11) DEFAULT NULL COMMENT '父ID',
@@ -505,15 +505,15 @@ CREATE TABLE `ze_paper_type` (
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of ze_paper_type
+-- Records of ex_paper_type
 -- ----------------------------
-INSERT INTO `ze_paper_type` VALUES ('1', '试卷分类', '0', '_1_', '1', '2017-08-01 22:31:43', '1', '1');
+INSERT INTO `ex_paper_type` VALUES ('1', '试卷分类', '0', '_1_', '1', '2017-08-01 22:31:43', '1', '1');
 
 -- ----------------------------
--- Table structure for `ze_question`
+-- Table structure for `ex_question`
 -- ----------------------------
-DROP TABLE IF EXISTS `ze_question`;
-CREATE TABLE `ze_question` (
+DROP TABLE IF EXISTS `ex_question`;
+CREATE TABLE `ex_question` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `TYPE` int(11) DEFAULT NULL COMMENT '1：单选；2：多选；3：填空；4：判断；5：问答',
   `DIFFICULTY` int(11) DEFAULT NULL COMMENT '1：极易；2：简单；3：适中；4：困难；5：极难',
@@ -534,18 +534,18 @@ CREATE TABLE `ze_question` (
   `NO` int(11) DEFAULT NULL COMMENT '排序',
   PRIMARY KEY (`ID`),
   KEY `FK_Reference_15` (`QUESTION_TYPE_ID`),
-  CONSTRAINT `FK_Reference_15` FOREIGN KEY (`QUESTION_TYPE_ID`) REFERENCES `ze_question_type` (`id`)
+  CONSTRAINT `FK_Reference_15` FOREIGN KEY (`QUESTION_TYPE_ID`) REFERENCES `ex_question_type` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of ze_question
+-- Records of ex_question
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for `ze_question_type`
+-- Table structure for `ex_question_type`
 -- ----------------------------
-DROP TABLE IF EXISTS `ze_question_type`;
-CREATE TABLE `ze_question_type` (
+DROP TABLE IF EXISTS `ex_question_type`;
+CREATE TABLE `ex_question_type` (
   `ID` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `NAME` varchar(32) DEFAULT NULL COMMENT '名称',
   `PARENT_ID` int(11) DEFAULT NULL COMMENT '父ID',
@@ -558,6 +558,6 @@ CREATE TABLE `ze_question_type` (
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of ze_question_type
+-- Records of ex_question_type
 -- ----------------------------
-INSERT INTO `ze_question_type` VALUES ('1', '试题分类', '0', '_1_', '1', '2017-08-01 22:31:43', '1', '1');
+INSERT INTO `ex_question_type` VALUES ('1', '试题分类', '0', '_1_', '1', '2017-08-01 22:31:43', '1', '1');
