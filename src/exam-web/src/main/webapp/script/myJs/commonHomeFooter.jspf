@@ -1,0 +1,21 @@
+<%@ page language="java" pageEncoding="utf-8"%>
+<footer id="footer" class="midnight-blue" style="background-color: #151515;position:fixed;bottom:0;width: 100%;">
+	<div class="container">
+		<div class="row">
+			<div class="col-sm-6">
+				Copyright &copy; 2017
+				<a href="#" target="_blank" title="">在线考试</a>
+			</div>
+			<div class="col-sm-6">
+				<ul class="pull-right">
+					<li>
+						<a href="#">首页</a>
+					</li>
+					<li>
+						<a href="login/pubDoIn">管理后台</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</footer>

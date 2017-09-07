@@ -1,0 +1,155 @@
+package com.wcpdoc.exam.exam.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.wcpdoc.exam.core.dao.BaseDao;
+import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
+import com.wcpdoc.exam.core.util.ValidateUtil;
+import com.wcpdoc.exam.exam.dao.QuestionTypeDao;
+import com.wcpdoc.exam.exam.entity.QuestionType;
+import com.wcpdoc.exam.exam.service.QuestionTypeExService;
+import com.wcpdoc.exam.exam.service.QuestionTypeService;
+/**
+ * 试题分类服务层实现
+ * 
+ * v1.0 zhanghc 2016-5-24下午14:54:09
+ */
+@Service
+public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implements QuestionTypeService{
+	@Resource
+	private QuestionTypeDao questionTypeDao;
+	@Resource
+	private QuestionTypeExService questionTypeExService;
+
+	@Override
+	@Resource(name = "questionTypeDaoImpl")
+	public void setDao(BaseDao<QuestionType> dao) {
+		super.dao = dao;
+	}
+
+	@Override
+	public void saveAndUpdate(QuestionType questionType) {
+		//校验数据有效性
+		if(!ValidateUtil.isValid(questionType.getName())){
+			throw new RuntimeException("无法获取参数：questionType.name");
+		}
+		if(existName(questionType)){
+			throw new RuntimeException("名称已存在！");
+		}
+				
+		//保存试题分类
+		if(questionType.getParentId() == null){
+			questionType.setParentId(0);
+		}
+		questionTypeDao.save(questionType);
+		
+		//更新父子关系
+		QuestionType parentQuestionType = questionTypeDao.getEntity(questionType.getParentId());
+		if(parentQuestionType == null){
+			questionType.setParentSub("_" + questionType.getId() + "_");
+		}else {
+			questionType.setParentSub(parentQuestionType.getParentSub() + questionType.getId() + "_");
+		}
+		questionTypeDao.update(questionType);
+	}
+	
+	@Override
+	public void editAndUpdate(QuestionType questionType) {
+		//校验数据有效性
+		if(!ValidateUtil.isValid(questionType.getName())){
+			throw new RuntimeException("无法获取参数：questionType.name");
+		}
+		if(existName(questionType)){
+			throw new RuntimeException("名称已存在！");
+		}
+		
+		//修改试题分类
+		questionTypeDao.update(questionType);
+	}
+
+	@Override
+	public void delAndUpdate(Integer[] ids) {
+		//校验数据有效性
+		if(!ValidateUtil.isValid(ids)){
+			throw new RuntimeException("无法获取参数：ids");
+		}
+		
+		//删除试题分类，不包括根试题分类
+		for(Integer id : ids){
+			if(id == 1){
+				continue;
+			}
+			
+			List<QuestionType> questionTypeList = questionTypeDao.getAllSubQuestionTypeList(id);
+			for(QuestionType questionType : questionTypeList){
+				if(questionType.getState().equals("0")){
+					continue;
+				}
+				
+				questionType.setState(0);
+				questionTypeDao.update(questionType);
+				
+				questionTypeExService.delAndUpdate(questionType);
+			}
+		}
+	}
+
+	@Override
+	public List<Map<String, Object>> getTreeList() {
+		return questionTypeDao.getTreeList();
+	}
+
+	@Override
+	public void doMove(Integer sourceId, Integer targetId) {
+		//校验数据有效性
+		if(sourceId == null){
+			throw new RuntimeException("无法获取参数：sourceId");
+		}
+		if(targetId == null){
+			throw new RuntimeException("无法获取参数：targetId");
+		}
+		
+		//移动试题分类
+		questionTypeDao.doMove(sourceId, targetId);
+	}
+
+	/**
+	 * 名称是否已存在
+	 * v1.0 zhanghc 2016-5-24下午14:54:09
+	 * @param questionType
+	 * @return boolean
+	 */
+	private boolean existName(QuestionType questionType){
+		//校验数据有效性
+		if(questionType == null){
+			throw new RuntimeException("无法获取参数：questionType");
+		}
+		if(!ValidateUtil.isValid(questionType.getName())){
+			throw new RuntimeException("无法获取参数：questionType.name");
+		}
+		
+		//如果是添加
+		QuestionType questionType2 = questionTypeDao.getQuestionTypeByName(questionType.getName());
+		if(questionType2 != null){
+			questionTypeDao.evict(questionType2);
+		}
+		
+		if(questionType.getId() == null){
+			if(questionType2 != null){
+				return true;
+			}
+			return false;
+		}
+		
+		//如果是修改
+		if(questionType2 != null && !questionType.getId().equals(questionType2.getId())){
+			return true;
+		}
+		return false;
+	}
+}
