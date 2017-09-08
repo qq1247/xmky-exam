@@ -18,7 +18,7 @@
 					<td style="width: 30%;">
 					</td>
 					<td style="width: 40%;">
-						<div class="easyui-panel" title="登录"
+						<div class="easyui-panel" title="登录" 
 							style="width: 400px; padding: 30px 70px 20px 70px;">
 							<div style="margin-bottom: 10px">
 								<input name="loginName" class="easyui-textbox"
