@@ -44,7 +44,7 @@ public class DictCache extends CacheManager {
 	 * void
 	 */
 	private static void initCache() {
-		log.debug("数据字典缓存开始初始化");
+		log.info("数据字典缓存开始初始化");
 		Cache cache = getCache(CACHE_NAME);
 		if (cache == null) {
 			String message = "缓存名称：" + CACHE_NAME + "不存在！";
@@ -54,7 +54,7 @@ public class DictCache extends CacheManager {
 		cache.put(DICT_INDEX_DICTLIST_MAP, new HashMap<String, List<Dict>>());
 		cache.put(DICT_INDEXKEY_DICT_MAP, new HashMap<String, Dict>());
 		cache.put(DICT_INDEXKEY_VALUE_MAP, new HashMap<String, String>());
-		log.debug("数据字典缓存成功初始化");
+		log.info("数据字典缓存成功初始化");
 	}
 	
 	/**
@@ -79,11 +79,9 @@ public class DictCache extends CacheManager {
 	 * void
 	 */
 	private static void clearCache() {
-		log.debug("数据字典缓存开始清除");
 		getIndexDictlistMap().clear();
 		getIndexkeyDictMap().clear();
 		getIndexkeyValueMap().clear();
-		log.debug("数据字典缓存完成清除");
 	}
 	
 	/**
@@ -93,12 +91,10 @@ public class DictCache extends CacheManager {
 	 * void
 	 */
 	private static void addCache() {
-		log.debug("数据字典缓存开始添加");
 		List<Dict> dictList = getDictList();
 		for(Dict dict : dictList){
 			addCache(dict);
 		}
-		log.debug("数据字典缓存成功添加");
 	}
 	
 	/**

@@ -24,7 +24,7 @@ public class PrivilegeInterceptor extends HandlerInterceptorAdapter {
 		//如果是公共资源，则不拦截。
 		log.debug("访问链接：{}", request.getRequestURI());
 		String contextPath = request.getContextPath();
-		String uri = request.getRequestURI().replaceAll(contextPath + "/", "");
+		String uri = request.getRequestURI().replaceFirst(contextPath + "/", "");
 		String fun = uri.substring(uri.lastIndexOf("/") + 1, uri.length());
 		if(fun.startsWith("pub")){
 			log.debug("公共资源，不拦截");

@@ -2,6 +2,8 @@ package com.wcpdoc.exam.exam.service.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -215,6 +217,13 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if(currentPaperQuestion.getNo() == no){
 			return;
 		}
+		
+		Collections.sort(paperQuestionList, new Comparator<PaperQuestion>() {
+			@Override
+			public int compare(PaperQuestion o1, PaperQuestion o2) {
+				return o1.getNo() - o2.getNo();
+			}
+		});
 		
 		paperQuestionList.remove(currentPaperQuestion);
 		if(currentPaperQuestion.getNo() < no){
