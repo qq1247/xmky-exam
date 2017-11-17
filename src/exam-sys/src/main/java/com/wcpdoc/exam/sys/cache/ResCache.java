@@ -45,7 +45,7 @@ public class ResCache extends CacheManager {
 	 * void
 	 */
 	private static void initCache() {
-		log.debug("资源缓存开始初始化");
+		log.info("资源缓存开始初始化");
 		Cache cache = getCache(CACHE_NAME);
 		if (cache == null) {
 			String message = "缓存名称：" + CACHE_NAME + "不存在！";
@@ -57,7 +57,7 @@ public class ResCache extends CacheManager {
 		cache.put(RES_MENU_LIST, new ArrayList<Menu>());
 		cache.put(RES_HOME_MENU_LIST, new ArrayList<Menu>());
 		
-		log.debug("资源缓存成功初始化");
+		log.info("资源缓存成功初始化");
 	}
 	
 	/**
@@ -83,12 +83,10 @@ public class ResCache extends CacheManager {
 	 * void
 	 */
 	private static void clearCache() {
-		log.debug("资源缓存开始清除");
 		getUrlResMap().clear();
 		getIdResMap().clear();
 		getMenuList().clear();
 		getHomeMenuList().clear();
-		log.debug("资源缓存完成清除");
 	}
 	
 	/**
@@ -98,12 +96,10 @@ public class ResCache extends CacheManager {
 	 * void
 	 */
 	private static void addCache() {
-		log.debug("资源缓存开始添加");
 		List<Res> resList = getResList();
 		for(Res res : resList){
 			addCache(res);
 		}
-		log.debug("资源缓存成功添加");
 	}
 	
 	/**

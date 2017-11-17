@@ -49,7 +49,7 @@ INSERT INTO `sys_dict` VALUES ('15', 'QUESTION_OPTIONS', '5', 'E', '5');
 INSERT INTO `sys_dict` VALUES ('16', 'QUESTION_OPTIONS', '6', 'F', '6');
 INSERT INTO `sys_dict` VALUES ('17', 'QUESTION_OPTIONS', '7', 'G', '7');
 INSERT INTO `sys_dict` VALUES ('18', 'STATE', '1', '启用', '1');
-INSERT INTO `sys_dict` VALUES ('19', 'STATE', '0', '禁用', '2');
+INSERT INTO `sys_dict` VALUES ('19', 'STATE', '2', '禁用', '2');
 INSERT INTO `sys_dict` VALUES ('20', 'EXAM_USER_STATE', '1', '未考试', '1');
 INSERT INTO `sys_dict` VALUES ('21', 'EXAM_USER_STATE', '2', '考试中', '2');
 INSERT INTO `sys_dict` VALUES ('22', 'EXAM_USER_STATE', '3', '已交卷', '3');
