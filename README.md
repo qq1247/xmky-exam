@@ -1,16 +1,16 @@
 # 在线考试
-[演示地址](http://39.106.131.49:8080/exam/)
+[演示地址](http://exam.wcpdoc.cn)
 
 ## 首页
 
 > ###首页
 > 
-![mashua](http://39.106.131.49:8080/exam/file/doDownload?id=1)
-![mashua](http://39.106.131.49:8080/exam/file/doDownload?id=2)
-![mashua](http://39.106.131.49:8080/exam/file/doDownload?id=3)
-![mashua](http://39.106.131.49:8080/exam/file/doDownload?id=4)
-![mashua](http://39.106.131.49:8080/exam/file/doDownload?id=5)
-![mashua](http://39.106.131.49:8080/exam/file/doDownload?id=6)
+![mashua](http://exam.wcpdoc.cn/file/doDownload?id=1)
+![mashua](http://exam.wcpdoc.cn/file/doDownload?id=2)
+![mashua](http://exam.wcpdoc.cn/file/doDownload?id=3)
+![mashua](http://exam.wcpdoc.cn/file/doDownload?id=4)
+![mashua](http://exam.wcpdoc.cn/file/doDownload?id=5)
+![mashua](http://exam.wcpdoc.cn/file/doDownload?id=6)
 
 ## 技术实现
 
