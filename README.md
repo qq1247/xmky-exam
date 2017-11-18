@@ -5,12 +5,12 @@
 
 > ###首页
 > 
-![mashua](http://exam.wcpdoc.cn/file/doDownload?id=1)
-![mashua](http://exam.wcpdoc.cn/file/doDownload?id=2)
-![mashua](http://exam.wcpdoc.cn/file/doDownload?id=3)
-![mashua](http://exam.wcpdoc.cn/file/doDownload?id=4)
-![mashua](http://exam.wcpdoc.cn/file/doDownload?id=5)
-![mashua](http://exam.wcpdoc.cn/file/doDownload?id=6)
+![mashua](http://exam.wcpdoc.cn/img/1.png)
+![mashua](http://exam.wcpdoc.cn/img/2.png)
+![mashua](http://exam.wcpdoc.cn/img/3.png)
+![mashua](http://exam.wcpdoc.cn/img/4.png)
+![mashua](http://exam.wcpdoc.cn/img/5.png)
+![mashua](http://exam.wcpdoc.cn/img/6.png)
 
 ## 技术实现
 
