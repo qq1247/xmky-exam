@@ -3,10 +3,10 @@
 <html>
 	<head>
 		<title>判卷</title>
-		<%@include file="/script/myJs/commonHome.jspf"%>
+		<%@include file="/script/home/common.jspf"%>
 	</head>
 	<body>
-		<%@include file="/script/myJs/commonHomeHead.jspf"%>
+		<%@include file="/script/home/head.jspf"%>
 		<section class="service-item" style="padding-top: 200px;">
 			<div class="container">
 				<div class="row">
@@ -41,7 +41,7 @@
 				</div>
 			</div>
 		</section>
-		<%@include file="/script/myJs/commonHomeFooter.jspf"%>
+		<%@include file="/script/home/footer.jspf"%>
 	</body>
 	<script type="text/javascript">
 		//定义变量

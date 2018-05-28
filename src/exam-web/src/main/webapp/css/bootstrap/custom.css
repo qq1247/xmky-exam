@@ -1,0 +1,60 @@
+header {
+	background: #4A5767 none repeat scroll 0% 0%;
+	height: 86px;
+	padding-top: 13px;
+	font-size: 16px;
+}
+
+header a {
+	color: #FFF;
+}
+
+header a:focus, a:hover {
+	color: #B7BCC2;
+}
+
+.headerplus {
+	padding-top: 116px;
+}
+
+.query .box {
+	width: 300px;
+	height: 40px;
+	border: 1px solid #F2F4F5;
+	height: 40px;
+	width: 300px;
+}
+
+.btn-primary {
+	height: 40px;
+	width: 150px;
+	color: #FFF;
+	background: #0196E6 none repeat scroll 0% 0%;
+}
+
+.btn-primary:focus {
+	color: #FFF;
+	background-color: #286090;
+	border-color: #122B40;
+}
+
+.examlist {
+	padding-top: 30px;
+}
+
+.examlist th {
+	height: 50px;
+	padding-left: 15px;
+	background-color: #D3DCE6;
+	color: #475669;
+	background-color: #D3DCE6;
+}
+
+.examlist tbody tr {
+	height: 50px;
+	color: #8392A6;
+}
+
+.examlist tbody tr span {
+	color: #0096E7;
+}

@@ -1,6 +1,5 @@
-<%
-String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/"; 
-%>
+<%@ page language="java" pageEncoding="utf-8"%>
+<%String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/";%>
 <base href="<%=basePath%>">
 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -10,15 +9,20 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 <meta http-equiv="Cache-control" content="no-cache">
 <meta http-equiv="Cache" content="no-cache">
 
-<link rel="stylesheet" type="text/css" href="css/uimaker/green/css/base.css">
+<!-- jquery -->
+<script type="text/javascript" src="script/jquery-easyui/jquery.min.js"></script>
+
+<!-- easyui -->
 <link rel="stylesheet" type="text/css" href="script/jquery-easyui/themes/uimaker/green/easyui.css">
 <link rel="stylesheet" type="text/css" href="script/jquery-easyui/themes/uimaker/green/icon.css">
 <link rel="stylesheet" type="text/css" href="script/jquery-easyui/themes/iconEx.css">
-<link rel="stylesheet" type="text/css" href="css/uimaker/green/css/providers1.css">
-
-<script type="text/javascript" src="script/jquery-easyui/jquery.min.js"></script>
 <script type="text/javascript" src="script/jquery-easyui/jquery.easyui.min.js"></script>
 <script type="text/javascript" src="script/jquery-easyui/locale/easyui-lang-zh_CN.js"></script>
 
+<!-- 自定义easyui样式 -->
+<link rel="stylesheet" type="text/css" href="css/easyui/uimaker/green/css/base.css">
+<link rel="stylesheet" type="text/css" href="css/easyui/uimaker/green/css/providers1.css">
+
+<!-- 自定义js -->
 <script type="text/javascript" src="script/myJs/easyuiEx.js"></script>
 <script type="text/javascript" src="script/myJs/myJs.js"></script>

@@ -4,10 +4,10 @@
 <html>
 	<head>
 		<title>在线考试系统</title>
-		<%@include file="/script/myJs/commonHome.jspf"%>
+		<%@include file="/script/home/common.jspf"%>
 	</head>
 	<body class="homepage" style="background-color: #f2f2f2">
-		<%@include file="/script/myJs/commonHomeHead.jspf"%>
+		<%@include file="/script/home/head.jspf"%>
 		<section class="service-item" style="padding-top: 100px;">
 			<div class="container">
 				<div class="center wow fadeInDown">
@@ -15,6 +15,6 @@
 				</div>
 			</div>
 		</section>
-		<%@include file="/script/myJs/commonHomeFooter.jspf"%>
+		<%@include file="/script/home/footer.jspf"%>
 	</body>
 </html>

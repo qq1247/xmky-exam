@@ -6,7 +6,7 @@
 <html>
 	<head>
 		<title>我的考试</title>
-		<%@include file="/script/myJs/commonHome.jspf"%>
+		<%@include file="/script/home/common.jspf"%>
 	</head>
 	<body>
 		<div class="navbar navbar-inverse affix" style="width: 100%;height: 40px; z-index: 999999;padding: 0px;color: white;font-weight: bold;font-size: 14px;" >
