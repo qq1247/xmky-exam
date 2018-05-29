@@ -3,6 +3,8 @@ package com.wcpdoc.exam.exam.service;
 import java.util.List;
 import java.util.Map;
 
+import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.service.BaseService;
 import com.wcpdoc.exam.exam.entity.QuestionType;
 /**
@@ -51,4 +53,21 @@ public interface QuestionTypeService extends BaseService<QuestionType>{
 	 * void
 	 */
 	void doMove(Integer sourceId, Integer targetId);
+
+	/**
+	 * 获取组织机构
+	 * 
+	 * v1.0 zhanghc 2018年5月29日下午11:23:13
+	 * @return List<Map<String,Object>>
+	 */
+	List<Map<String, Object>> getOrgTreeList();
+
+	/**
+	 * 获取权限用户
+	 * 
+	 * v1.0 zhanghc 2018年5月29日下午11:24:14
+	 * @param pageIn
+	 * @return PageOut
+	 */
+	PageOut getAuthUserListpage(PageIn pageIn);
 }

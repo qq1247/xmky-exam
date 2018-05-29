@@ -8,12 +8,15 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.exam.core.dao.BaseDao;
+import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.exam.dao.QuestionTypeDao;
 import com.wcpdoc.exam.exam.entity.QuestionType;
 import com.wcpdoc.exam.exam.service.QuestionTypeExService;
 import com.wcpdoc.exam.exam.service.QuestionTypeService;
+import com.wcpdoc.exam.sys.service.OrgService;
 /**
  * 试题分类服务层实现
  * 
@@ -25,6 +28,8 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	private QuestionTypeDao questionTypeDao;
 	@Resource
 	private QuestionTypeExService questionTypeExService;
+	@Resource
+	private OrgService orgService;
 
 	@Override
 	@Resource(name = "questionTypeDaoImpl")
@@ -151,5 +156,15 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public List<Map<String, Object>> getOrgTreeList() {
+		return orgService.getTreeList();
+	}
+
+	@Override
+	public PageOut getAuthUserListpage(PageIn pageIn) {
+		return questionTypeDao.getAuthUserListpage(pageIn);
 	}
 }

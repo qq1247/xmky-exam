@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.wcpdoc.exam.core.dao.BaseDao;
+import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.exam.entity.QuestionType;
 
 /**
@@ -44,4 +46,13 @@ public interface QuestionTypeDao extends BaseDao<QuestionType>{
 	 * @return QuestionType
 	 */
 	QuestionType getQuestionTypeByName(String name);
+
+	/**
+	 * 获取权限用户
+	 * 
+	 * v1.0 zhanghc 2018年5月29日下午11:26:22
+	 * @param pageIn
+	 * @return PageOut
+	 */
+	PageOut getAuthUserListpage(PageIn pageIn);
 }

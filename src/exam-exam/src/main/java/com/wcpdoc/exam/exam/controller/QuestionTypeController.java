@@ -246,10 +246,45 @@ public class QuestionTypeController extends BaseController{
 	@RequestMapping("/toAuth")
 	public String toAuth(Model model) {
 		try {
-			return "/WEB-INF/jsp/exam/questionType/authList.jsp";
+			return "/WEB-INF/jsp/exam/questionType/questionTypeAuthList.jsp";
 		} catch (Exception e) {
 			log.error("到达权限列表页面错误：", e);
-			return "/WEB-INF/jsp/exam/questionType/authList.jsp";
+			return "/WEB-INF/jsp/exam/questionType/questionTypeAuthList.jsp";
+		}
+	}
+	
+	/**
+	 * 获取组织机构树型列表
+	 * 
+	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * @return List<Map<String,Object>>
+	 */
+	@RequestMapping("/authOrgTreeList")
+	@ResponseBody
+	public List<Map<String, Object>> authOrgTreeList() {
+		try {
+			return questionTypeService.getOrgTreeList();
+		} catch (Exception e) {
+			log.error("获取组织机构树型列表错误：", e);
+			return new ArrayList<Map<String,Object>>();
+		}
+	}
+	
+	/**
+	 * 权限用户列表 
+	 * 
+	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * @param pageIn
+	 * @return PageOut
+	 */
+	@RequestMapping("/authUserList")
+	@ResponseBody
+	public PageOut authUserList(PageIn pageIn) {
+		try {
+			return questionTypeService.getAuthUserListpage(pageIn);
+		} catch (Exception e) {
+			log.error("权限用户列表错误：", e);
+			return new PageOut();
 		}
 	}
 }

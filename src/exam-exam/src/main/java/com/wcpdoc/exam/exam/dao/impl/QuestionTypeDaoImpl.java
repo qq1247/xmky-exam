@@ -74,4 +74,28 @@ public class QuestionTypeDaoImpl extends BaseDaoImpl<QuestionType> implements Qu
 		String sql = "SELECT * FROM EXM_QUESTION_TYPE WHERE NAME = ? AND STATE = 1";
 		return getUnique(sql, new Object[]{name}, QuestionType.class);
 	}
+
+	@Override
+	public PageOut getAuthUserListpage(PageIn pageIn) {
+		String sql = "SELECT USER.ID, USER.NAME AS USER_NAME, USER.LOGIN_NAME, ORG.NAME AS ORG_NAME, POST_USER.POST_NAMES "
+				+ "FROM SYS_USER USER "
+				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
+				+ "LEFT JOIN (SELECT POST_USER.USER_ID, GROUP_CONCAT(POST.NAME) AS POST_NAMES "
+				+ "				FROM SYS_POST_USER POST_USER "
+				+ "				INNER JOIN SYS_POST POST ON POST_USER.POST_ID = POST.ID "
+				+ "				GROUP BY POST_USER.USER_ID ) POST_USER ON USER.ID = POST_USER.USER_ID";
+		SqlUtil sqlUtil = new SqlUtil(sql);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "ORG.ID = ?", pageIn.getOne())
+				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.getTen()), 
+						"EXISTS (SELECT 1 FROM EXM_QUESTION_AUTH Z WHERE Z.QUESTION_TYPE_ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%')", 
+						pageIn.getTen())
+//				.addWhere("USER.STATE = ?", 1)//已添加过的可以显示
+				.addWhere("USER.ID != ?", 1)
+//				.addWhere("ORG.STATE = ?", 1)//已添加过的可以显示
+				.addOrder("USER.NAME", Order.DESC);
+		
+		PageOut pageOut = getListpage(sqlUtil, pageIn);
+		return pageOut;
+	}
 }
