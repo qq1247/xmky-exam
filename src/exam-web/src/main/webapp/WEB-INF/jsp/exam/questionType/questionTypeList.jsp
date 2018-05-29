@@ -40,6 +40,7 @@
 								<my:auth url="questionType/toEdit"><a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" onclick="toQuestionTypeEditForBtn();">修改</a></my:auth>
 								<my:auth url="questionType/doDel"><a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" onclick="doQuestionTypeDelForBtn();">删除</a></my:auth>
 								<my:auth url="questionType/doMove"><a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" onclick="toQuestionTypeMoveForBtn();">移动</a></my:auth>
+								<my:auth url="questionType/toAuth"><a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" onclick="toAuth();">设置权限</a></my:auth>
 							</div>
 						</div>
 						<%-- 试题分类数据表格 --%>
@@ -435,6 +436,71 @@
 		//刷新试题分类
 		function questionTypeTreeFlush(){
 			questionTypeTree.tree("reload");
+		}
+		
+		//到达权限页面
+		function toAuth(){
+			var paperAddListDialog;
+			paperAddListDialog = $("<div/>").dialog({
+				title : "权限列表",
+				href : "questionType/toAuth",
+				maximized : true,
+				buttons : [{
+					text : "添加",
+					iconCls : "icon-add", 
+					selected : true, 
+					handler : function (){
+						//doPaperAdd(paperAddListDialog);
+					}
+				}],
+				onLoad : function() {
+					var paperAddListGrid = $("#paperAddListGrid");
+					paperAddListGrid.datagrid( {
+						toolbar : "#paperAddListToolbar",
+						columns : [[ 
+								{field : "ID", title : "", checkbox : true},
+								{field : "NAME", title : "名称", width : 50, align : "center"},
+								{field : "TOTLE_SCORE", title : "总分数", width : 80, align : "center"},
+								{field : "STATE_NAME", title : "状态", width : 80, align : "center"}
+								]]
+					});
+					
+					var paperAddListTypeTree = $("#paperAddListTypeTree");
+					var paperAddListQueryForm = $("#paperAddListQueryForm");
+					var curSelPaperTypeId = "";
+					var curSelPaperTypeName = "";
+					paperAddListTypeTree.tree({
+						idFiled : "ID",
+						textFiled : "NAME",
+						parentField : "PARENT_ID",
+						iconClsFiled : "ICON",
+						checkedFiled : "CHECKED",
+						lines : true,
+					    url : "exam/paperAddListTypeTreeList",
+						onSelect : function(node){
+							curSelPaperTypeId = node.ID;
+							curSelPaperTypeName = node.NAME;
+							
+							$("#paperAddList_one").val(curSelPaperTypeId);
+							paperAddListGrid.datagrid("uncheckAll");
+							paperAddListGrid.datagrid("reload", $.fn.my.serializeObj(paperAddListQueryForm));
+						},
+						onLoadSuccess : function(node, data){
+							if(!curSelPaperTypeId || !paperAddListGrid.datagrid("options").url){//如果是第一次
+								curSelPaperTypeId = 1;
+								paperAddListGrid.datagrid("options").url = "exam/paperAddList";
+							}
+							
+							var node = paperAddListTypeTree.tree("find", curSelPaperTypeId);
+							if(!node){
+								curSelPaperTypeId = 1;
+								node = paperAddListTypeTree.tree("find", curSelPaperTypeId);
+							}
+							paperAddListTypeTree.tree("select", node.target);
+						}
+					});
+				}
+			});
 		}
 	</script>
 </html>

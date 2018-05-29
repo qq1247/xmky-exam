@@ -60,7 +60,7 @@ public class DictServiceImpl extends BaseServiceImp<Dict> implements DictService
 	@Override
 	public void delAndUpdate(Integer[] ids) {
 		//删除数据字典
-		delete(ids);
+		del(ids);
 		
 		//刷新缓存
 		DictCache.flushCache();

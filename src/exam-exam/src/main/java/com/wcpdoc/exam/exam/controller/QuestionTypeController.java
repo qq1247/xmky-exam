@@ -236,4 +236,20 @@ public class QuestionTypeController extends BaseController{
 			return new PageResult(false, "移动失败：" + e.getMessage());
 		}
 	}
+	
+	/**
+	 * 到达权限列表页面
+	 * 
+	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * @return String
+	 */
+	@RequestMapping("/toAuth")
+	public String toAuth(Model model) {
+		try {
+			return "/WEB-INF/jsp/exam/questionType/authList.jsp";
+		} catch (Exception e) {
+			log.error("到达权限列表页面错误：", e);
+			return "/WEB-INF/jsp/exam/questionType/authList.jsp";
+		}
+	}
 }

@@ -27,8 +27,8 @@ public class QuestionTypeDaoImpl extends BaseDaoImpl<QuestionType> implements Qu
 		String sql = "SELECT QUESTION_TYPE.ID, QUESTION_TYPE.NAME, QUESTION_TYPE.PARENT_ID, "
 				+ "QUESTION_TYPE.PARENT_SUB, PARENT_QUESTION_TYPE.NAME AS PARENT_NAME, "
 				+ "QUESTION_TYPE.NO "
-				+ "FROM EX_QUESTION_TYPE QUESTION_TYPE "
-				+ "LEFT JOIN EX_QUESTION_TYPE PARENT_QUESTION_TYPE ON QUESTION_TYPE.PARENT_ID = PARENT_QUESTION_TYPE.ID";
+				+ "FROM EXM_QUESTION_TYPE QUESTION_TYPE "
+				+ "LEFT JOIN EXM_QUESTION_TYPE PARENT_QUESTION_TYPE ON QUESTION_TYPE.PARENT_ID = PARENT_QUESTION_TYPE.ID";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "QUESTION_TYPE.PARENT_ID = ?", pageIn.getOne())//如果查询的是根目录，则查询所有。否则查询选中机构的子机构
 				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "QUESTION_TYPE.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
@@ -41,7 +41,7 @@ public class QuestionTypeDaoImpl extends BaseDaoImpl<QuestionType> implements Qu
 	@Override
 	public List<Map<String, Object>> getTreeList() {
 		String sql = "SELECT QUESTION_TYPE.ID, QUESTION_TYPE.NAME, QUESTION_TYPE.PARENT_ID, QUESTION_TYPE.PARENT_SUB "
-				+ "FROM EX_QUESTION_TYPE QUESTION_TYPE "
+				+ "FROM EXM_QUESTION_TYPE QUESTION_TYPE "
 				+ "WHERE QUESTION_TYPE.STATE = 1";
 		return getList(sql);
 	}
@@ -53,7 +53,7 @@ public class QuestionTypeDaoImpl extends BaseDaoImpl<QuestionType> implements Qu
 		sourceQuestionType.setParentId(targetId);
 		flush();
 
-		String sql = "UPDATE EX_QUESTION_TYPE QUESTION_TYPE" //
+		String sql = "UPDATE EXM_QUESTION_TYPE QUESTION_TYPE" //
 				+ "	SET QUESTION_TYPE.PARENT_SUB = REPLACE(QUESTION_TYPE.PARENT_SUB, ?, ?)"
 				+ "	WHERE QUESTION_TYPE.PARENT_SUB LIKE ?";
 		Object[] params = new Object[] { 
@@ -65,13 +65,13 @@ public class QuestionTypeDaoImpl extends BaseDaoImpl<QuestionType> implements Qu
 	
 	@Override
 	public List<QuestionType> getAllSubQuestionTypeList(Integer id) {
-		String sql = "SELECT * FROM EX_QUESTION_TYPE WHERE PARENT_SUB LIKE ? AND STATE = 1";
+		String sql = "SELECT * FROM EXM_QUESTION_TYPE WHERE PARENT_SUB LIKE ? AND STATE = 1";
 		return getList(sql, new Object[]{"%\\_"+id+"\\_%"}, QuestionType.class);
 	}
 	
 	@Override
 	public QuestionType getQuestionTypeByName(String name) {
-		String sql = "SELECT * FROM EX_QUESTION_TYPE WHERE NAME = ? AND STATE = 1";
+		String sql = "SELECT * FROM EXM_QUESTION_TYPE WHERE NAME = ? AND STATE = 1";
 		return getUnique(sql, new Object[]{name}, QuestionType.class);
 	}
 }

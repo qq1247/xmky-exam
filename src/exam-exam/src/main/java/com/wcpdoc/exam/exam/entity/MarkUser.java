@@ -14,7 +14,7 @@ import org.hibernate.annotations.GenericGenerator;
  * v1.0 zhanghc 2017-06-19 16:28:29
  */
 @Entity
-@Table(name = "EX_MARK_USER")
+@Table(name = "EXM_MARK_USER")
 public class MarkUser {
 	@Id
 	@GeneratedValue(generator = "generator")

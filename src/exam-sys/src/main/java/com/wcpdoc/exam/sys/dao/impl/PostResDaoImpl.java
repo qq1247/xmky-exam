@@ -22,13 +22,13 @@ public class PostResDaoImpl extends BaseDaoImpl<PostRes> implements PostResDao {
 	}
 
 	@Override
-	public void deleteByPostId(Integer postId) {
+	public void delByPostId(Integer postId) {
 		String sql = "DELETE FROM SYS_POST_RES WHERE POST_ID = ?";
 		update(sql, postId);
 	}
 
 	@Override
-	public void deleteByResId(Integer resId) {
+	public void delByResId(Integer resId) {
 		String sql = "DELETE FROM SYS_POST_RES WHERE RES_ID = ?";
 		update(sql, resId);
 	}

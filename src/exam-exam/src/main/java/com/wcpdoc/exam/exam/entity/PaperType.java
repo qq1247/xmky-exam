@@ -19,7 +19,7 @@ import com.wcpdoc.exam.core.util.DateUtil;
  * v1.0 zhanghc 2017-05-25 16:34:59
  */
 @Entity
-@Table(name = "EX_PAPER_TYPE")
+@Table(name = "EXM_PAPER_TYPE")
 public class PaperType {
 	@Id
 	@GeneratedValue(generator = "generator")

@@ -21,12 +21,12 @@ public abstract class BaseServiceImp<T> implements BaseService<T> {
 	}
 
 	@Override
-	public final void delete(Integer id) {
+	public final void del(Integer id) {
 		dao.del(id);
 	}
 
 	@Override
-	public final void delete(Integer[] ids) {
+	public final void del(Integer[] ids) {
 		dao.del(ids);
 	}
 	

@@ -147,7 +147,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		
 		//完成设置岗位
 		for(Integer id : ids){
-			postUserService.deleteByUserId(id);
+			postUserService.delByUserId(id);
 			for(Integer postId : postIds){
 				PostUser postUser = new PostUser(postId, id);
 				postUserService.save(postUser);
@@ -180,7 +180,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 			user.setOrgId(orgId);
 			userDao.update(user);
 			
-			postUserService.deleteByUserId(id);
+			postUserService.delByUserId(id);
 		}
 	}
 	

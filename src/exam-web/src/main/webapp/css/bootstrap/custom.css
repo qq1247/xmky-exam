@@ -40,6 +40,7 @@ header a:focus, a:hover {
 
 .examlist {
 	padding-top: 30px;
+	background: none repeat scroll 0% 0% #F2F4F5;
 }
 
 .examlist th {
@@ -53,6 +54,7 @@ header a:focus, a:hover {
 .examlist tbody tr {
 	height: 50px;
 	color: #8392A6;
+	background: none repeat scroll 0% 0% #FFF;
 }
 
 .examlist tbody tr span {

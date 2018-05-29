@@ -208,11 +208,11 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					for(ExamUserQuestion examUserQuestion : examUserQuestionList){
 						examUserQuestionIdList.add(examUserQuestion.getId());
 					}
-					examUserQuestionService.delete(examUserQuestionIdList.toArray(examUserQuestionIdArr));
+					examUserQuestionService.del(examUserQuestionIdList.toArray(examUserQuestionIdArr));
 				}
 				
 				//删除考试用户
-				examUserService.delete(examUserId);
+				examUserService.del(examUserId);
 			}
 		}
 	}
@@ -423,7 +423,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	@Override
-	public void deleteAndUpdate(Integer[] ids) {
+	public void delAndUpdate(Integer[] ids) {
 		//校验数据有效性
 		if(!ValidateUtil.isValid(ids)){
 			throw new RuntimeException("无法获取参数：ids");
@@ -488,7 +488,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		}
 		
 		synchronized (DO_MARK_USER_ADD_LOCK) {
-			markUserService.delete(markUserIds);
+			markUserService.del(markUserIds);
 		}
 	}
 

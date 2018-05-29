@@ -204,7 +204,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			doPaperQuestionDel2(paperQuestion.getId());
 		}
 		
-		paperQuestionService.delete(paperQuestionId);
+		paperQuestionService.del(paperQuestionId);
 	}
 
 	@Override
@@ -337,7 +337,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 
 	@Override
-	public void deleteAndUpdate(Integer[] ids) {
+	public void delAndUpdate(Integer[] ids) {
 		//校验数据有效性
 		if(!ValidateUtil.isValid(ids)){
 			throw new RuntimeException("无法获取参数：ids");

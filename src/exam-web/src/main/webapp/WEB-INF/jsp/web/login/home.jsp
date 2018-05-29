@@ -6,14 +6,14 @@
 <head>
 <title>首页</title>
 <%@include file="/script/myJs/common.jspf"%>
-<link rel="stylesheet" type="text/css" href="css/uimaker/green/css/platform.css">
+<link rel="stylesheet" type="text/css" href="css/easyui/uimaker/home/platform.css">
 <script type="text/javascript" src="script/uimaker/main.js"></script>
 </head>
 <body>
 	<div class="container">
 		<div id="pf-hd">
 			<div class="pf-logo">
-				<img src="css/uimaker/green/images/main/main_logo.png" alt="logo">
+				<img src="css/easyui/uimaker/home/images/main_logo.png" alt="logo">
 			</div>
 			<div class="pf-nav-wrap">
 				<!--<div class="pf-nav-ww">-->
@@ -42,7 +42,7 @@
 			<div class="pf-user">
 				<span class="msgts">0</span>
 				<div class="pf-user-photo">
-					<img src="css/uimaker/green/images/main/user.png" alt="">
+					<img src="css/easyui/uimaker/home/images/user.png" alt="">
 				</div>
 				<h4 class="pf-user-name ellipsis">${USER.name }</h4>
 				<i class="iconfont xiala">&#xe607;</i>

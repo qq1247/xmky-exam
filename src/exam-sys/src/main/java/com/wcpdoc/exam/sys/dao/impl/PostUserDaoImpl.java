@@ -22,13 +22,13 @@ public class PostUserDaoImpl extends BaseDaoImpl<PostUser> implements PostUserDa
 	}
 
 	@Override
-	public void deleteByUserId(Integer userId) {
+	public void delByUserId(Integer userId) {
 		String sql = "DELETE FROM SYS_POST_USER WHERE USER_ID = ?";
 		update(sql, userId);
 	}
 
 	@Override
-	public void deleteByPostId(Integer postId) {
+	public void delByPostId(Integer postId) {
 		String sql = "DELETE FROM SYS_POST_USER WHERE POST_ID = ?";
 		update(sql, postId);
 	}

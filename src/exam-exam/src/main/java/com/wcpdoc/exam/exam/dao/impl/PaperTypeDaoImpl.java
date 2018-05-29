@@ -27,8 +27,8 @@ public class PaperTypeDaoImpl extends BaseDaoImpl<PaperType> implements PaperTyp
 		String sql = "SELECT PAPER_TYPE.ID, PAPER_TYPE.NAME, PAPER_TYPE.PARENT_ID, "
 				+ "PARENT_PAPER_TYPE.NAME AS PARENT_NAME, PAPER_TYPE.PARENT_SUB, "
 				+ "PAPER_TYPE.NO "
-				+ "FROM EX_PAPER_TYPE PAPER_TYPE "
-				+ "LEFT JOIN EX_PAPER_TYPE PARENT_PAPER_TYPE ON PAPER_TYPE.PARENT_ID = PARENT_PAPER_TYPE.ID";
+				+ "FROM EXM_PAPER_TYPE PAPER_TYPE "
+				+ "LEFT JOIN EXM_PAPER_TYPE PARENT_PAPER_TYPE ON PAPER_TYPE.PARENT_ID = PARENT_PAPER_TYPE.ID";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "PAPER_TYPE.PARENT_ID = ?", pageIn.getOne())//如果查询的是根目录，则查询所有。否则查询选中机构的子机构
 				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "PAPER_TYPE.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
@@ -41,7 +41,7 @@ public class PaperTypeDaoImpl extends BaseDaoImpl<PaperType> implements PaperTyp
 	@Override
 	public List<Map<String, Object>> getTreeList() {
 		String sql = "SELECT PAPER_TYPE.ID, PAPER_TYPE.NAME, PAPER_TYPE.PARENT_ID, PAPER_TYPE.PARENT_SUB "
-				+ "FROM EX_PAPER_TYPE PAPER_TYPE "
+				+ "FROM EXM_PAPER_TYPE PAPER_TYPE "
 				+ "WHERE PAPER_TYPE.STATE = 1";
 		return getList(sql);
 	}
@@ -53,7 +53,7 @@ public class PaperTypeDaoImpl extends BaseDaoImpl<PaperType> implements PaperTyp
 		sourcePaperType.setParentId(targetId);
 		flush();
 
-		String sql = "UPDATE EX_PAPER_TYPE PAPER_TYPE" //
+		String sql = "UPDATE EXM_PAPER_TYPE PAPER_TYPE" //
 				+ "	SET PAPER_TYPE.PARENT_SUB = REPLACE(PAPER_TYPE.PARENT_SUB, ?, ?)"
 				+ "	WHERE PAPER_TYPE.PARENT_SUB LIKE ?";
 		Object[] params = new Object[] { 
@@ -65,13 +65,13 @@ public class PaperTypeDaoImpl extends BaseDaoImpl<PaperType> implements PaperTyp
 	
 	@Override
 	public List<PaperType> getAllSubPaperTypeList(Integer id) {
-		String sql = "SELECT * FROM EX_PAPER_TYPE WHERE PARENT_SUB LIKE ? AND STATE = 1";
+		String sql = "SELECT * FROM EXM_PAPER_TYPE WHERE PARENT_SUB LIKE ? AND STATE = 1";
 		return getList(sql, new Object[]{"%\\_"+id+"\\_%"}, PaperType.class);
 	}
 	
 	@Override
 	public PaperType getPaperTypeByName(String name) {
-		String sql = "SELECT * FROM EX_PAPER_TYPE WHERE NAME = ? AND STATE = 1";
+		String sql = "SELECT * FROM EXM_PAPER_TYPE WHERE NAME = ? AND STATE = 1";
 		return getUnique(sql, new Object[]{name}, PaperType.class);
 	}
 }

@@ -25,13 +25,13 @@ public class ExamUserQuestionDaoImpl extends BaseDaoImpl<ExamUserQuestion> imple
 
 	@Override
 	public List<ExamUserQuestion> getList(Integer examUserId) {
-		String sql = "SELECT * FROM EX_EXAM_USER_QUESTION WHERE EXAM_USER_ID = ?";
+		String sql = "SELECT * FROM EXM_EXAM_USER_QUESTION WHERE EXAM_USER_ID = ?";
 		return getList(sql, new Object[]{examUserId}, ExamUserQuestion.class);
 	}
 
 	@Override
 	public List<ExamUserQuestion> getList(Integer examId, Integer userId) {
-		String sql = "SELECT * FROM EX_EXAM_USER_QUESTION WHERE EXAM_ID = ? AND USER_ID = ?";
+		String sql = "SELECT * FROM EXM_EXAM_USER_QUESTION WHERE EXAM_ID = ? AND USER_ID = ?";
 		return getList(sql, new Object[]{examId, userId}, ExamUserQuestion.class);
 	}
 }

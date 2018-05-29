@@ -26,8 +26,8 @@ public class ExamTypeDaoImpl extends BaseDaoImpl<ExamType> implements ExamTypeDa
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT EXAM_TYPE.ID, EXAM_TYPE.NAME, EXAM_TYPE.PARENT_SUB, "
 				+ "EXAM_TYPE.PARENT_ID, EXAM_TYPE.NO, PARENT_EXAM_TYPE.NAME AS PARENT_NAME "
-				+ "FROM EX_EXAM_TYPE EXAM_TYPE "
-				+ "LEFT JOIN EX_EXAM_TYPE PARENT_EXAM_TYPE ON EXAM_TYPE.PARENT_ID = PARENT_EXAM_TYPE.ID";
+				+ "FROM EXM_EXAM_TYPE EXAM_TYPE "
+				+ "LEFT JOIN EXM_EXAM_TYPE PARENT_EXAM_TYPE ON EXAM_TYPE.PARENT_ID = PARENT_EXAM_TYPE.ID";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "EXAM_TYPE.PARENT_ID = ?", pageIn.getOne())//如果查询的是根目录，则查询所有。否则查询选中机构的子机构
 				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "EXAM_TYPE.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
@@ -40,7 +40,7 @@ public class ExamTypeDaoImpl extends BaseDaoImpl<ExamType> implements ExamTypeDa
 	@Override
 	public List<Map<String, Object>> getTreeList() {
 		String sql = "SELECT EXAM_TYPE.ID, EXAM_TYPE.NAME, EXAM_TYPE.PARENT_ID, EXAM_TYPE.PARENT_SUB "
-				+ "FROM EX_EXAM_TYPE EXAM_TYPE "
+				+ "FROM EXM_EXAM_TYPE EXAM_TYPE "
 				+ "WHERE EXAM_TYPE.STATE = 1";
 		return getList(sql);
 	}
@@ -52,7 +52,7 @@ public class ExamTypeDaoImpl extends BaseDaoImpl<ExamType> implements ExamTypeDa
 		sourceExamType.setParentId(targetId);
 		flush();
 
-		String sql = "UPDATE EX_EXAM_TYPE EXAM_TYPE" 
+		String sql = "UPDATE EXM_EXAM_TYPE EXAM_TYPE" 
 				+ "	SET EXAM_TYPE.PARENT_SUB = REPLACE(EXAM_TYPE.PARENT_SUB, ?, ?)"
 				+ "	WHERE EXAM_TYPE.PARENT_SUB LIKE ?";
 		Object[] params = new Object[] { 
@@ -64,13 +64,13 @@ public class ExamTypeDaoImpl extends BaseDaoImpl<ExamType> implements ExamTypeDa
 	
 	@Override
 	public List<ExamType> getAllSubExamTypeList(Integer id) {
-		String sql = "SELECT * FROM EX_EXAM_TYPE WHERE PARENT_SUB LIKE ? AND STATE = 1";
+		String sql = "SELECT * FROM EXM_EXAM_TYPE WHERE PARENT_SUB LIKE ? AND STATE = 1";
 		return getList(sql, new Object[]{"%\\_"+id+"\\_%"}, ExamType.class);
 	}
 	
 	@Override
 	public ExamType getExamTypeByName(String name) {
-		String sql = "SELECT * FROM EX_EXAM_TYPE WHERE NAME = ? AND STATE = 1";
+		String sql = "SELECT * FROM EXM_EXAM_TYPE WHERE NAME = ? AND STATE = 1";
 		return getUnique(sql, new Object[]{name}, ExamType.class);
 	}
 }

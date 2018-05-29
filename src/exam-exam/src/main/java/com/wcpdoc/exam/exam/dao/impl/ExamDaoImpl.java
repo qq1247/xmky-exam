@@ -33,9 +33,9 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT EXAM.ID, EXAM.NAME, EXAM.PASS_SCORE, EXAM.START_TIME, EXAM.END_TIME, "
 				+ "EXAM.STATE, PAPER.NAME AS PAPER_NAME, PAPER.TOTLE_SCORE AS PAPER_TOTLE_SCORE "
-				+ "FROM EX_EXAM EXAM "
-				+ "LEFT JOIN EX_EXAM_TYPE EXAM_TYPE ON EXAM.EXAM_TYPE_ID = EXAM_TYPE.ID "
-				+ "LEFT JOIN EX_PAPER PAPER ON EXAM.PAPER_ID = PAPER.ID";
+				+ "FROM EXM_EXAM EXAM "
+				+ "LEFT JOIN EXM_EXAM_TYPE EXAM_TYPE ON EXAM.EXAM_TYPE_ID = EXAM_TYPE.ID "
+				+ "LEFT JOIN EXM_PAPER PAPER ON EXAM.PAPER_ID = PAPER.ID";
 		
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "EXAM.EXAM_TYPE_ID = ?", pageIn.getOne())
@@ -54,7 +54,7 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 	@Override
 	public PageOut getExamUserListpage(PageIn pageIn) {
 		String sql = "SELECT EXAM_USER.ID, USER.NAME AS USER_NAME, USER.LOGIN_NAME, ORG.NAME AS ORG_NAME, POST_USER.POST_NAMES "
-				+ "FROM EX_EXAM_USER EXAM_USER "
+				+ "FROM EXM_EXAM_USER EXAM_USER "
 				+ "INNER JOIN SYS_USER USER ON EXAM_USER.USER_ID = USER.ID "
 				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
 				+ "LEFT JOIN (SELECT POST_USER.USER_ID, GROUP_CONCAT(POST.NAME) AS POST_NAMES "
@@ -86,7 +86,7 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "ORG.ID = ?", pageIn.getOne())
 				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "NOT EXISTS (SELECT 1 FROM EX_EXAM_USER Z WHERE Z.EXAM_ID = ? AND USER.ID = Z.USER_ID)", pageIn.getTen())
+				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "NOT EXISTS (SELECT 1 FROM EXM_EXAM_USER Z WHERE Z.EXAM_ID = ? AND USER.ID = Z.USER_ID)", pageIn.getTen())
 				.addWhere("USER.STATE = ?", 1)
 				.addWhere("USER.ID != ?", 1)
 				.addWhere("ORG.STATE = ?", 1)
@@ -98,15 +98,15 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 
 	@Override
 	public void doUserDel(Integer id, Integer userId) {
-		String sql = "DELETE FROM EX_EXAM_USER_QUESTION WHERE EXAM_ID = ? AND USER_ID = ?";
+		String sql = "DELETE FROM EXM_EXAM_USER_QUESTION WHERE EXAM_ID = ? AND USER_ID = ?";
 		update(sql, id, userId);
 	}
 
 	@Override
 	public List<Map<String, Object>> getUnFinishList(Integer userId) {
 		String sql = "SELECT EXAM.ID AS EXAM_ID, EXAM.NAME AS EXAM_NAME, EXAM.DESCRIPTION AS EXAM_DESCRIPTION, EXAM_USER.ID  AS EXAM_USER_ID "
-				+ "FROM EX_EXAM EXAM "
-				+ "INNER JOIN EX_EXAM_USER EXAM_USER ON EXAM.ID = EXAM_USER.EXAM_ID "
+				+ "FROM EXM_EXAM EXAM "
+				+ "INNER JOIN EXM_EXAM_USER EXAM_USER ON EXAM.ID = EXAM_USER.EXAM_ID "
 				+ "WHERE EXAM.STATE = 1 AND EXAM_USER.USER_ID = ? AND EXAM.END_TIME >= ? ";
 		return getList(sql, new Object[]{userId, new Date()});
 	}
@@ -114,15 +114,15 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 	@Override
 	public ExamType getExamType(Integer id) {
 		String sql = "SELECT EXAM_TYPE.* "
-				+ "FROM EX_EXAM_TYPE EXAM_TYPE "
-				+ "INNER JOIN EX_EXAM EXAM ON EXAM_TYPE.ID = EXAM.EXAM_TYPE_ID "
+				+ "FROM EXM_EXAM_TYPE EXAM_TYPE "
+				+ "INNER JOIN EXM_EXAM EXAM ON EXAM_TYPE.ID = EXAM.EXAM_TYPE_ID "
 				+ "WHERE EXAM.ID = ?";
 		return getUnique(sql, new Object[]{id}, ExamType.class);
 	}
 
 	@Override
 	public List<Exam> getList(Integer examTypeId) {
-		String sql = "SELECT * FROM EX_EXAM EXAM_TYPE WHERE STATE = 1 AND EXAM_TYPE_ID = ?";
+		String sql = "SELECT * FROM EXM_EXAM EXAM_TYPE WHERE STATE = 1 AND EXAM_TYPE_ID = ?";
 		return getList(sql, new Object[]{examTypeId}, Exam.class);
 	}
 
@@ -131,9 +131,9 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 		String sql = "SELECT EXAM_USER.ID, EXAM.NAME AS EXAM_NAME, PAPER.NAME AS PAPER_NAME, EXAM.START_TIME AS EXAM_START_TIME, "
 				+ "		EXAM.END_TIME AS EXAM_END_TIME, PAPER.TOTLE_SCORE AS PAPER_TOTLE_SCORE, EXAM.PASS_SCORE AS EXAM_PASS_SCORE, "
 				+ "		EXAM_USER.STATE AS EXAM_USER_STATE, EXAM_USER.TOTAL_SCORE AS EXAM_USER_TOTAL_SCORE "
-				+ "FROM EX_EXAM_USER EXAM_USER "
-				+ "INNER JOIN EX_EXAM EXAM ON EXAM_USER.EXAM_ID = EXAM.ID "
-				+ "INNER JOIN EX_PAPER PAPER ON EXAM.PAPER_ID = PAPER.ID "
+				+ "FROM EXM_EXAM_USER EXAM_USER "
+				+ "INNER JOIN EXM_EXAM EXAM ON EXAM_USER.EXAM_ID = EXAM.ID "
+				+ "INNER JOIN EXM_PAPER PAPER ON EXAM.PAPER_ID = PAPER.ID "
 				+ "INNER JOIN SYS_USER USER ON EXAM_USER.USER_ID = USER.ID";
 		
 		SqlUtil sqlUtil = new SqlUtil(sql);
@@ -151,7 +151,7 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 	@Override
 	public PageOut getMarkUserListpage(PageIn pageIn) {
 		String sql = "SELECT MARK_USER.ID, USER.NAME AS USER_NAME, USER.LOGIN_NAME, ORG.NAME AS ORG_NAME, POST_USER.POST_NAMES "
-				+ "FROM EX_MARK_USER MARK_USER "
+				+ "FROM EXM_MARK_USER MARK_USER "
 				+ "INNER JOIN SYS_USER USER ON MARK_USER.USER_ID = USER.ID "
 				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
 				+ "LEFT JOIN (SELECT POST_USER.USER_ID, GROUP_CONCAT(POST.NAME) AS POST_NAMES "
@@ -183,7 +183,7 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "ORG.ID = ?", pageIn.getOne())
 				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "NOT EXISTS (SELECT 1 FROM EX_MARK_USER Z WHERE Z.EXAM_ID = ? AND USER.ID = Z.USER_ID)", pageIn.getTen())
+				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "NOT EXISTS (SELECT 1 FROM EXM_MARK_USER Z WHERE Z.EXAM_ID = ? AND USER.ID = Z.USER_ID)", pageIn.getTen())
 				.addWhere("USER.STATE = ?", 1)
 				.addWhere("USER.ID != ?", 1)
 				.addWhere("ORG.STATE = ?", 1)
@@ -199,10 +199,10 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 				+ "		EXAM.START_TIME AS EXAM_START_TIME, EXAM.END_TIME AS EXAM_END_TIME, "
 				+ "		EXAM_USER.TOTAL_SCORE AS EXAM_USER_TOTAL_SCORE, EXAM.PASS_SCORE AS EXAM_PASS_SCORE, "
 				+ "		PAPER.TOTLE_SCORE AS PAPER_TOTLE_SCORE, EXAM_USER.STATE AS EXAM_USER_STATE "
-				+ "FROM EX_MARK_USER MARK_USER "
-				+ "INNER JOIN EX_EXAM EXAM ON MARK_USER.EXAM_ID = EXAM.ID "
-				+ "INNER JOIN EX_PAPER PAPER ON EXAM.PAPER_ID = PAPER.ID "
-				+ "INNER JOIN EX_EXAM_USER EXAM_USER ON EXAM.ID = EXAM_USER.EXAM_ID "
+				+ "FROM EXM_MARK_USER MARK_USER "
+				+ "INNER JOIN EXM_EXAM EXAM ON MARK_USER.EXAM_ID = EXAM.ID "
+				+ "INNER JOIN EXM_PAPER PAPER ON EXAM.PAPER_ID = PAPER.ID "
+				+ "INNER JOIN EXM_EXAM_USER EXAM_USER ON EXAM.ID = EXAM_USER.EXAM_ID "
 				+ "INNER JOIN SYS_USER USER ON EXAM_USER.USER_ID = USER.ID "
 				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
@@ -222,12 +222,12 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 
 	@Override
 	public void doForcePaper(LoginUser user) {
-		String sql = "UPDATE EX_EXAM_USER "
+		String sql = "UPDATE EXM_EXAM_USER "
 				+ "SET STATE = 4, UPDATE_USER_ID = ?, UPDATE_TIME = ? "
 				+ "WHERE STATE <= 2 AND ID IN (SELECT ID FROM("
 				+ "		SELECT Z.ID "
-				+ "		FROM EX_EXAM_USER Z "
-				+ "		INNER JOIN EX_EXAM Z1 ON Z.EXAM_ID = Z1.ID "
+				+ "		FROM EXM_EXAM_USER Z "
+				+ "		INNER JOIN EXM_EXAM Z1 ON Z.EXAM_ID = Z1.ID "
 				+ "		WHERE Z1.END_TIME <= ?) A)";
 		Date curTime = new Date();
 		update(sql, new Object[]{user.getId(), curTime, curTime});
@@ -235,7 +235,7 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 
 	@Override
 	public List<MarkUser> getMarkUserList(Integer id) {
-		String sql = "SELECT * FROM EX_MARK_USER WHERE EXAM_ID = ?";
+		String sql = "SELECT * FROM EXM_MARK_USER WHERE EXAM_ID = ?";
 		return getList(sql, new Object[]{id}, MarkUser.class);
 	}
 
@@ -245,9 +245,9 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 				+ "		EXAM.END_TIME AS EXAM_END_TIME, PAPER.NAME AS PAPER_NAME, USER.NAME AS USER_NAME, "
 				+ "		EXAM_USER.TOTAL_SCORE, EXAM_USER.STATE AS EXAM_USER_STATE, MARK_USER.NAME AS MARK_USER_NAME, "
 				+ "		EXAM_USER.UPDATE_MARK_TIME AS EXAM_USER_UPDATE_MARK_TIME "
-				+ "FROM EX_EXAM_USER EXAM_USER "
-				+ "INNER JOIN EX_EXAM EXAM ON EXAM.ID = EXAM_USER.EXAM_ID "
-				+ "INNER JOIN EX_PAPER PAPER ON EXAM.PAPER_ID = PAPER.ID "
+				+ "FROM EXM_EXAM_USER EXAM_USER "
+				+ "INNER JOIN EXM_EXAM EXAM ON EXAM.ID = EXAM_USER.EXAM_ID "
+				+ "INNER JOIN EXM_PAPER PAPER ON EXAM.PAPER_ID = PAPER.ID "
 				+ "INNER JOIN SYS_USER USER ON EXAM_USER.USER_ID = USER.ID "
 				+ "INNER JOIN SYS_USER MARK_USER ON EXAM_USER.UPDATE_MARK_USER_ID = MARK_USER.ID ";
 		

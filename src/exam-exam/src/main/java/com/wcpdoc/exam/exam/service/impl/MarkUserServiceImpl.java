@@ -27,8 +27,8 @@ public class MarkUserServiceImpl extends BaseServiceImp<MarkUser> implements Mar
 	}
 
 	@Override
-	public void delete(Integer examId, Integer userId) {
-		markUserDao.delete(examId, userId);
+	public void del(Integer examId, Integer userId) {
+		markUserDao.del(examId, userId);
 	}
 
 	@Override

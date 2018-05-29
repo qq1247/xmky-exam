@@ -18,7 +18,7 @@ public interface MarkUserDao extends BaseDao<MarkUser>{
 	 * @param userId
 	 * void
 	 */
-	void delete(Integer examId, Integer userId);
+	void del(Integer examId, Integer userId);
 
 	/**
 	 * 获取判卷用户信息

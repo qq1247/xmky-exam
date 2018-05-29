@@ -18,7 +18,7 @@ public interface ExamUserDao extends BaseDao<ExamUser>{
 	 * @param userId
 	 * void
 	 */
-	void delete(Integer examId, Integer userId);
+	void del(Integer examId, Integer userId);
 
 	/**
 	 * 获取考试用户信息

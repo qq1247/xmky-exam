@@ -15,7 +15,7 @@ public interface PostResService extends BaseService<PostRes>{
 	 * @param postId
 	 * void
 	 */
-	void deleteByPostId(Integer postId);
+	void delByPostId(Integer postId);
 
 	/**
 	 * 根据资源ID删除实体
@@ -23,6 +23,6 @@ public interface PostResService extends BaseService<PostRes>{
 	 * @param resId
 	 * void
 	 */
-	void deleteByResId(Integer resId);
+	void delByResId(Integer resId);
 	
 }

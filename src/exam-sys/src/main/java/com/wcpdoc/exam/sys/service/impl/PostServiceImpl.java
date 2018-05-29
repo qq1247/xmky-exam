@@ -70,7 +70,7 @@ public class PostServiceImpl extends BaseServiceImp<Post> implements PostService
 		}
 		
 		//删除岗位资源关系
-		postResService.deleteByPostId(id);
+		postResService.delByPostId(id);
 		
 		//新建岗位资源关系
 		for(Integer resId : resIds){

@@ -31,8 +31,8 @@ public class PaperDaoImpl extends BaseDaoImpl<Paper> implements PaperDao {
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT PAPER.ID, PAPER.NAME, PAPER.TOTLE_SCORE, "
 				+ "PAPER_TYPE.NAME AS PAPER_TYPE_NAME, PAPER.STATE "
-				+ "FROM EX_PAPER PAPER "
-				+ "LEFT JOIN EX_PAPER_TYPE PAPER_TYPE ON PAPER.PAPER_TYPE_ID = PAPER_TYPE.ID ";
+				+ "FROM EXM_PAPER PAPER "
+				+ "LEFT JOIN EXM_PAPER_TYPE PAPER_TYPE ON PAPER.PAPER_TYPE_ID = PAPER_TYPE.ID ";
 		
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "PAPER.PAPER_TYPE_ID = ?", pageIn.getOne())
@@ -48,8 +48,8 @@ public class PaperDaoImpl extends BaseDaoImpl<Paper> implements PaperDao {
 	@Override
 	public PaperType getPaperType(Integer id) {
 		String sql = "SELECT PAPER_TYPE.* "
-				+ "FROM EX_PAPER_TYPE PAPER_TYPE "
-				+ "INNER JOIN EX_PAPER PAPER ON PAPER_TYPE.ID = PAPER.PAPER_TYPE_ID "
+				+ "FROM EXM_PAPER_TYPE PAPER_TYPE "
+				+ "INNER JOIN EXM_PAPER PAPER ON PAPER_TYPE.ID = PAPER.PAPER_TYPE_ID "
 				+ "WHERE PAPER.ID = ?";
 		return getUnique(sql, new Object[]{id}, PaperType.class);
 	}
@@ -59,8 +59,8 @@ public class PaperDaoImpl extends BaseDaoImpl<Paper> implements PaperDao {
 		String sql = "SELECT PAPER_QUESTION.ID, "
 				+ "CASE PAPER_QUESTION.TYPE WHEN '1' THEN PAPER_QUESTION.NAME ELSE QUESTION.TITLE END AS NAME, "
 				+ "PAPER_QUESTION.PARENT_ID, PAPER_QUESTION.NO "
-				+ "FROM EX_PAPER_QUESTION PAPER_QUESTION "
-				+ "LEFT JOIN EX_QUESTION QUESTION ON PAPER_QUESTION.QUESTION_ID = QUESTION.ID "
+				+ "FROM EXM_PAPER_QUESTION PAPER_QUESTION "
+				+ "LEFT JOIN EXM_QUESTION QUESTION ON PAPER_QUESTION.QUESTION_ID = QUESTION.ID "
 				+ "WHERE PAPER_QUESTION.PAPER_ID = ? "
 				+ "ORDER BY PAPER_QUESTION.NO ASC ";
 		return getList(sql, new Object[]{id});
@@ -69,7 +69,7 @@ public class PaperDaoImpl extends BaseDaoImpl<Paper> implements PaperDao {
 	@Override
 	public PaperQuestion getRootPaperQuestion(Integer id) {
 		String sql = "SELECT * "
-				+ "FROM EX_PAPER_QUESTION PAPER_QUESTION "
+				+ "FROM EXM_PAPER_QUESTION PAPER_QUESTION "
 				+ "WHERE PAPER_QUESTION.PARENT_ID = 0 AND PAPER_ID = ?";
 		return getUnique(sql, new Object[]{id}, PaperQuestion.class);
 	}
@@ -81,8 +81,8 @@ public class PaperDaoImpl extends BaseDaoImpl<Paper> implements PaperDao {
 				+ "QUESTION.OPTION_E, QUESTION.OPTION_F, QUESTION.OPTION_G, QUESTION.ANSWER, "
 				+ "QUESTION.ANALYSIS, QUESTION.STATE, QUESTION.UPDATE_USER_ID, QUESTION.UPDATE_TIME, "
 				+ "QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME "
-				+ "FROM EX_QUESTION QUESTION "
-				+ "LEFT JOIN EX_QUESTION_TYPE QUESTION_TYPE ON QUESTION.QUESTION_TYPE_ID = QUESTION_TYPE.ID ";
+				+ "FROM EXM_QUESTION QUESTION "
+				+ "LEFT JOIN EXM_QUESTION_TYPE QUESTION_TYPE ON QUESTION.QUESTION_TYPE_ID = QUESTION_TYPE.ID ";
 		
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "QUESTION.QUESTION_TYPE_ID = ?", pageIn.getOne())
@@ -90,7 +90,7 @@ public class PaperDaoImpl extends BaseDaoImpl<Paper> implements PaperDao {
 				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "QUESTION.DIFFICULTY = ?", pageIn.getThree())
 				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "QUESTION.STATE = ?", pageIn.getFour())//0：删除；1：启用；2：禁用
 				.addWhere(ValidateUtil.isValid(pageIn.getFive()), "QUESTION_YTPE.NAME LIKE ?", "%" + pageIn.getFive() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "NOT EXISTS (SELECT 1 FROM EX_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.getTen())
+				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "NOT EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.getTen())
 				.addOrder("QUESTION.UPDATE_TIME", Order.DESC);
 		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
@@ -101,22 +101,22 @@ public class PaperDaoImpl extends BaseDaoImpl<Paper> implements PaperDao {
 
 	@Override
 	public List<PaperQuestion> getPaperQuestionList(Integer id) {
-		String sql = "SELECT * FROM EX_PAPER_QUESTION WHERE PAPER_ID = ? ORDER BY NO ASC";
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = ? ORDER BY NO ASC";
 		return getList(sql, new Object[]{id}, PaperQuestion.class);
 	}
 
 	@Override
 	public List<Question> getQuestionList(Integer id) {
 		String sql = "SELECT QUESTION.* "
-				+ "FROM EX_PAPER_QUESTION PAPER_QUESTION "
-				+ "INNER JOIN EX_QUESTION QUESTION ON PAPER_QUESTION.QUESTION_ID = QUESTION.ID "
+				+ "FROM EXM_PAPER_QUESTION PAPER_QUESTION "
+				+ "INNER JOIN EXM_QUESTION QUESTION ON PAPER_QUESTION.QUESTION_ID = QUESTION.ID "
 				+ "WHERE PAPER_QUESTION.PAPER_ID = ? AND PAPER_QUESTION.TYPE = 2";// AND QUESTION.STATE = 1 如果删除试题，试卷关联的试题也能看
 		return getList(sql, new Object[]{id}, Question.class);
 	}
 
 	@Override
 	public List<Paper> getList(Integer paperId) {
-		String sql = "SELECT * FROM EX_PAPER WHERE STATE = 1 AND PAPER_TYPE_ID = ?";
+		String sql = "SELECT * FROM EXM_PAPER WHERE STATE = 1 AND PAPER_TYPE_ID = ?";
 		return getList(sql, new Object[]{paperId}, Paper.class);
 	}
 }

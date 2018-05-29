@@ -238,7 +238,7 @@ public class ExamController extends BaseController{
 	@ResponseBody
 	public PageResult doDel(Integer[] ids) {
 		try {
-			examService.deleteAndUpdate(ids);
+			examService.delAndUpdate(ids);
 			return new PageResult(true, "删除成功");
 		} catch (Exception e) {
 			log.error("完成删除考试错误：", e);

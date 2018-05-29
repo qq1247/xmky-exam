@@ -18,6 +18,5 @@
 <script src="script/bootstrap/js/bootstrap.min.js"></script>
 
 <!-- 自定义 -->
-<link href="script/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 <link href="css/bootstrap/custom.css" rel="stylesheet">
 <script src="script/myJs/myJs.js"></script>

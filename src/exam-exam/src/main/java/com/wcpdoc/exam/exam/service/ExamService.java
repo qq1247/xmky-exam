@@ -230,7 +230,7 @@ public interface ExamService extends BaseService<Exam>{
 	 * @param ids
 	 * void
 	 */
-	void deleteAndUpdate(Integer[] ids);
+	void delAndUpdate(Integer[] ids);
 
 	/**
 	 * 获取我的考试列表

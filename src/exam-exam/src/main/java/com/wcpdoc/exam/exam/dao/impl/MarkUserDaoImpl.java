@@ -22,14 +22,14 @@ public class MarkUserDaoImpl extends BaseDaoImpl<MarkUser> implements MarkUserDa
 	}
 
 	@Override
-	public void delete(Integer roomId, Integer userId) {
-		String sql = "DELETE FROM EX_MARK_USER WHERE EXAM_ID = ? AND USER_ID = ?";
+	public void del(Integer roomId, Integer userId) {
+		String sql = "DELETE FROM EXM_MARK_USER WHERE EXAM_ID = ? AND USER_ID = ?";
 		update(sql, new Object[]{roomId, userId});
 	}
 
 	@Override
 	public MarkUser getEntity(Integer examId, Integer userId) {
-		String sql = "SELECT * FROM EX_MARK_USER WHERE EXAM_ID = ? AND USER_ID = ?";
+		String sql = "SELECT * FROM EXM_MARK_USER WHERE EXAM_ID = ? AND USER_ID = ?";
 		return getUnique(sql, new Object[]{examId, userId}, MarkUser.class);
 	}
 }

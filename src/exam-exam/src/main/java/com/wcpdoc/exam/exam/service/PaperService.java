@@ -194,6 +194,6 @@ public interface PaperService extends BaseService<Paper>{
 	 * v1.0 zhanghc 2017年8月6日下午10:42:19
 	 * @param ids void
 	 */
-	void deleteAndUpdate(Integer[] ids);
+	void delAndUpdate(Integer[] ids);
 	
 }

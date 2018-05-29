@@ -13,15 +13,14 @@
 <script type="text/javascript" src="script/jquery-easyui/jquery.min.js"></script>
 
 <!-- easyui -->
-<link rel="stylesheet" type="text/css" href="script/jquery-easyui/themes/uimaker/green/easyui.css">
-<link rel="stylesheet" type="text/css" href="script/jquery-easyui/themes/uimaker/green/icon.css">
-<link rel="stylesheet" type="text/css" href="script/jquery-easyui/themes/iconEx.css">
 <script type="text/javascript" src="script/jquery-easyui/jquery.easyui.min.js"></script>
 <script type="text/javascript" src="script/jquery-easyui/locale/easyui-lang-zh_CN.js"></script>
 
 <!-- 自定义easyui样式 -->
-<link rel="stylesheet" type="text/css" href="css/easyui/uimaker/green/css/base.css">
-<link rel="stylesheet" type="text/css" href="css/easyui/uimaker/green/css/providers1.css">
+<link rel="stylesheet" type="text/css" href="css/easyui/uimaker/home/base.css">
+<link rel="stylesheet" type="text/css" href="css/easyui/uimaker/green/easyui.css">
+<link rel="stylesheet" type="text/css" href="css/easyui/uimaker/green/icon.css">
+<link rel="stylesheet" type="text/css" href="css/easyui/uimaker/home/providers1.css">
 
 <!-- 自定义js -->
 <script type="text/javascript" src="script/myJs/easyuiEx.js"></script>

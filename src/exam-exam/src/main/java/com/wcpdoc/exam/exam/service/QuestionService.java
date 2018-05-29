@@ -54,6 +54,6 @@ public interface QuestionService extends BaseService<Question>{
 	 * @param ids
 	 * void
 	 */
-	void deleteAndUpdate(Integer[] ids);
+	void delAndUpdate(Integer[] ids);
 	
 }

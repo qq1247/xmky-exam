@@ -27,8 +27,8 @@ public class ExamUserServiceImpl extends BaseServiceImp<ExamUser> implements Exa
 	}
 
 	@Override
-	public void delete(Integer examId, Integer userId) {
-		examUserDao.delete(examId, userId);
+	public void del(Integer examId, Integer userId) {
+		examUserDao.del(examId, userId);
 	}
 
 	@Override

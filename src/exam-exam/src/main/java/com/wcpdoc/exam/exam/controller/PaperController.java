@@ -183,7 +183,7 @@ public class PaperController extends BaseController{
 	@ResponseBody
 	public PageResult doDel(Integer[] ids) {
 		try {
-			paperService.deleteAndUpdate(ids);
+			paperService.delAndUpdate(ids);
 			return new PageResult(true, "删除成功");
 		} catch (Exception e) {
 			log.error("完成删除试卷错误：", e);

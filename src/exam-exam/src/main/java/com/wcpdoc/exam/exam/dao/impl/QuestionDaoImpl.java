@@ -28,8 +28,8 @@ public class QuestionDaoImpl extends BaseDaoImpl<Question> implements QuestionDa
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT QUESTION.ID, QUESTION.ID AS CODE, QUESTION.TITLE, QUESTION.TYPE, QUESTION.DIFFICULTY, "
 				+ "QUESTION.STATE, QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME "
-				+ "FROM EX_QUESTION QUESTION "
-				+ "LEFT JOIN EX_QUESTION_TYPE QUESTION_TYPE ON QUESTION.QUESTION_TYPE_ID = QUESTION_TYPE.ID ";
+				+ "FROM EXM_QUESTION QUESTION "
+				+ "LEFT JOIN EXM_QUESTION_TYPE QUESTION_TYPE ON QUESTION.QUESTION_TYPE_ID = QUESTION_TYPE.ID ";
 		
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "QUESTION.QUESTION_TYPE_ID = ?", pageIn.getOne())
@@ -47,15 +47,15 @@ public class QuestionDaoImpl extends BaseDaoImpl<Question> implements QuestionDa
 	@Override
 	public QuestionType getQuestionType(Integer id) {
 		String sql = "SELECT QUESTION_TYPE.* "
-				+ "FROM EX_QUESTION_TYPE QUESTION_TYPE "
-				+ "INNER JOIN EX_QUESTION QUESTION ON QUESTION_TYPE.ID = QUESTION.QUESTION_TYPE_ID "
+				+ "FROM EXM_QUESTION_TYPE QUESTION_TYPE "
+				+ "INNER JOIN EXM_QUESTION QUESTION ON QUESTION_TYPE.ID = QUESTION.QUESTION_TYPE_ID "
 				+ "WHERE QUESTION.ID = ?";
 		return getUnique(sql, new Object[]{id}, QuestionType.class);
 	}
 
 	@Override
 	public List<Question> getList(Integer questionTypeId) {
-		String sql = "SELECT * FROM EX_QUESTION WHERE STATE = 1 AND QUESTION_TYPE_ID = ?";
+		String sql = "SELECT * FROM EXM_QUESTION WHERE STATE = 1 AND QUESTION_TYPE_ID = ?";
 		return getList(sql, new Object[]{questionTypeId}, Question.class);
 	}
 }
