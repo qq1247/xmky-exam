@@ -244,8 +244,9 @@ public class QuestionTypeController extends BaseController{
 	 * @return String
 	 */
 	@RequestMapping("/toAuth")
-	public String toAuth(Model model) {
+	public String toAuth(Model model, Integer id) {
 		try {
+			model.addAttribute("id", id);
 			return "/WEB-INF/jsp/exam/questionType/questionTypeAuthList.jsp";
 		} catch (Exception e) {
 			log.error("到达权限列表页面错误：", e);
@@ -285,6 +286,82 @@ public class QuestionTypeController extends BaseController{
 		} catch (Exception e) {
 			log.error("权限用户列表错误：", e);
 			return new PageOut();
+		}
+	}
+	
+	/**
+	 * 到达添加权限用户列表页面
+	 * 
+	 * v1.0 zhanghc 2017年6月19日上午7:37:14
+	 * @param id
+	 * @param model
+	 * @return String
+	 */
+	@RequestMapping("/toAuthUserAddList")
+	public String toAuthUserAddList(Model model, Integer id) {
+		try {
+			model.addAttribute("id", id);
+			return "/WEB-INF/jsp/exam/questionType/questionTypeAuthUserAddList.jsp";
+		} catch (Exception e) {
+			log.error("到达添加权限用户列表页面错误：", e);
+			return "/WEB-INF/jsp/exam/questionType/questionTypeAuthUserAddList.jsp";
+		}
+	}
+	
+	/**
+	 * 权限用户添加列表 
+	 * 
+	 * v1.0 zhanghc 2017年6月16日下午5:02:45
+	 * @param pageIn
+	 * @return PageOut
+	 */
+	@RequestMapping("/authUserAddList")
+	@ResponseBody
+	public PageOut authUserAddList(PageIn pageIn) {
+		try {
+			return questionTypeService.getAuthUserAddList(pageIn);
+		} catch (Exception e) {
+			log.error("权限用户添加列表错误：", e);
+			return new PageOut();
+		}
+	}
+	
+	/**
+	 * 完成添加权限用户
+	 * 
+	 * v1.0 zhanghc 2017年6月16日下午5:02:45
+	 * @param id
+	 * @param userids
+	 * @return PageResult
+	 */
+	@RequestMapping("/doAuthUserAdd")
+	@ResponseBody
+	public PageResult doAuthUserAdd(Integer id, Integer[] userIds) {
+		try {
+			questionTypeService.doAuthUserAdd(id, userIds, getCurrentUser());
+			return new PageResult(true, "添加成功");
+		} catch (Exception e) {
+			log.error("完成添加权限用户错误：", e);
+			return new PageResult(false, "添加失败：" + e.getMessage());
+		}
+	}
+	
+	/**
+	 * 完成删除权限用户
+	 * 
+	 * v1.0 zhanghc 2017年6月16日下午5:02:45
+	 * @param examUserIds
+	 * @return PageResult
+	 */
+	@RequestMapping("/doAuthUserDel")
+	@ResponseBody
+	public PageResult doAuthUserDel(Integer id, Integer[] userIds) {
+		try {
+			questionTypeService.doAuthUserDel(id, userIds, getCurrentUser());
+			return new PageResult(true, "删除成功");
+		} catch (Exception e) {
+			log.error("完成删除权限用户错误：", e);
+			return new PageResult(false, "删除失败：" + e.getMessage());
 		}
 	}
 }

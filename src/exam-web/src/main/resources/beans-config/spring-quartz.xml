@@ -35,7 +35,7 @@
 		<property name="triggers">
 			<list>
 				<ref bean="clearFileTrigger" />
-				<ref bean="forcePaperTrigger" />
+				<!-- <ref bean="forcePaperTrigger" /> -->
 			</list>
 		</property>
 	</bean>

@@ -22,8 +22,8 @@
 						</form>
 					</div>
 					<div class="opt-buttons">
-						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" data-options="selected:true" onclick="toExamUserAddList();">添加用户</a>
-						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" onclick="doExamUserDel();">删除用户</a>
+						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" data-options="selected:true" onclick="toQuestionTypeAuthUserAddList();">添加用户</a>
+						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" onclick="doQuestionTypeAuthUserDel();">删除用户</a>
 					</div>
 				</div>
 				<%-- 用户数据表格 --%>
@@ -32,8 +32,8 @@
 			</div>
 		</div>
 	</div>
-	<div title="机构权限" data-options="iconCls:'icon-reload',closable:true">
+	<div title="机构权限" data-options="">
 	</div>
-	<div title="岗位权限" data-options="iconCls:'icon-reload',closable:true">
+	<div title="岗位权限" data-options="">
 	</div>
 </div>

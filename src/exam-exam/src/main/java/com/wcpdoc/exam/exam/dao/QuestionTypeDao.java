@@ -55,4 +55,13 @@ public interface QuestionTypeDao extends BaseDao<QuestionType>{
 	 * @return PageOut
 	 */
 	PageOut getAuthUserListpage(PageIn pageIn);
+
+	/**
+	 * 获取权限用户
+	 * 
+	 * v1.0 zhanghc 2018年5月29日下午11:26:22
+	 * @param pageIn
+	 * @return PageOut
+	 */
+	PageOut getAuthUserAddList(PageIn pageIn);
 }

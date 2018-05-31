@@ -3,6 +3,7 @@ package com.wcpdoc.exam.exam.service;
 import java.util.List;
 import java.util.Map;
 
+import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.service.BaseService;
@@ -70,4 +71,35 @@ public interface QuestionTypeService extends BaseService<QuestionType>{
 	 * @return PageOut
 	 */
 	PageOut getAuthUserListpage(PageIn pageIn);
+
+	/**
+	 * 获取权限用户
+	 * 
+	 * v1.0 zhanghc 2018年5月30日下午6:28:19
+	 * @param pageIn
+	 * @return PageOut
+	 */
+	PageOut getAuthUserAddList(PageIn pageIn);
+	
+	/**
+	 * 完成添加权限用户
+	 * 
+	 * v1.0 zhanghc 2018年5月30日下午7:08:26
+	 * @param id
+	 * @param userIds
+	 * @param user
+	 * void
+	 */
+	void doAuthUserAdd(Integer id, Integer[] userIds, LoginUser user);
+
+	/**
+	 * 完成删除权限用户
+	 * 
+	 * v1.0 zhanghc 2018年5月30日下午7:08:01
+	 * @param id 
+	 * @param userIds 
+	 * @param user 
+	 * void
+	 */
+	void doAuthUserDel(Integer id, Integer[] userIds, LoginUser user);
 }

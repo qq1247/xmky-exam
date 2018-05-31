@@ -440,10 +440,17 @@
 		
 		//到达权限页面
 		function toQuestionTypeAuth(){
+			var questionTypeGridRows = $("#questionTypeGrid").datagrid("getChecked");
+			if (questionTypeGridRows.length != 1) {
+				parent.$.messager.alert("提示消息", "请选择一行数据！", "info");
+				return;
+			}
+			
 			var questionTypeAuthDialog;
 			questionTypeAuthDialog = $("<div/>").dialog({
 				title : "权限列表",
 				href : "questionType/toAuth",
+				queryParams : {id : questionTypeGridRows[0].ID},
 				maximized : true,
 				onLoad : function() {
 					var questionTypeAuthUserGrid = $("#questionTypeAuthUserGrid"); //用户表格对象
@@ -494,6 +501,204 @@
 						}
 					});
 				}
+			});
+		}
+		
+		//权限用户查询
+		function questionTypeAuthUserQuery(){
+			var questionTypeAuthUserGrid = $("#questionTypeAuthUserGrid");
+			var questionTypeAuthUserQueryForm = $("#questionTypeAuthUserQueryForm");
+			questionTypeAuthUserGrid.datagrid("uncheckAll");
+			questionTypeAuthUserGrid.datagrid("load", $.fn.my.serializeObj(questionTypeAuthUserQueryForm));
+		}
+		
+		//权限用户重置
+		function questionTypeAuthUserReset(){
+			var questionTypeAuthUserQueryForm = $("#questionTypeAuthUserQueryForm");
+			questionTypeAuthUserQueryForm.form("reset");
+			questionTypeAuthUserQuery();
+		}
+		
+		//完成添加权限用户
+		function doQuestionTypeAuthUser(questionTypeAuthUserListDialog){
+			var questionTypeAuthUserGridRows = $("#questionTypeAuthUserGrid").datagrid("getChecked");
+			if (questionTypeAuthUserGridRows.length == 0) {
+				parent.$.messager.alert("提示消息", "请选择一行或多行数据！", "info");
+				return;
+			}
+			
+			var params = $.fn.my.serializeField(questionTypeAuthUserGridRows, {attrName : "userIds"});
+			params += "&id=" + $("#questionTypeAuthUser_ten").val();
+			
+			$.messager.confirm("确认消息", "确定要添加？", function(ok) {
+				if (!ok) {
+					return;
+				}
+				
+				$.messager.progress();
+				$.ajax({
+					url : "questionType/doAuthUser",
+					data : params,
+					success : function(obj){
+						$("#questionTypeAuthUserGrid").datagrid("reload");
+						$.messager.progress("close");
+						
+						if(!obj.success){
+							parent.$.messager.alert("提示消息", obj.message, "info");
+							return;
+						}
+						questionTypeAuthUserListDialog.dialog("close");
+					}
+				});
+			});
+		}
+		
+		//到达添加权限用户页面
+		function toQuestionTypeAuthUserAddList(){
+			var questionTypeAuthUserAddListDialog;
+			questionTypeAuthUserAddListDialog = $("<div/>").dialog({
+				title : "用户列表",
+				href : "questionType/toAuthUserAddList",
+				queryParams : {id : $("#questionTypeAuthUser_ten").val()},
+				toolbar : "#questionTypeAuthUserAddToolbar",
+				maximized : true,
+				buttons : [{
+					text : "添加",
+					iconCls : "icon-add", 
+					selected : true, 
+					handler : function (){
+						doQuestionTypeAuthUserAdd(questionTypeAuthUserAddListDialog);
+					}
+				}],
+				onLoad : function() {
+					var questionTypeAuthUserAddGrid = $("#questionTypeAuthUserAddGrid"); //用户表格对象
+					var questionTypeAuthUserAddQueryForm = $("#questionTypeAuthUserAddQueryForm"); //用户查询对象
+					var questionTypeAuthUserAddOrgTree = $("#questionTypeAuthUserAddOrgTree"); //组织机构树对象
+					var questionTypeAuthUserAddCurSelOrgId = ""; //当前选中的组织机构ID
+					var questionTypeAuthUserAddCurSelOrgName = ""; //当前选中的组织机构名称
+					
+					questionTypeAuthUserAddGrid.datagrid({
+						url : "",
+						columns : [[ 
+								{field : "ID", title : "", checkbox : true}, 
+								{field : "USER_NAME", title : "姓名", width : 80, align : "center"}, 
+								{field : "LOGIN_NAME", title : "登录名称", width : 80, align : "center"}, 
+								{field : "ORG_NAME", title : "组织机构", width : 80, align : "center"},
+								{field : "POST_NAMES", title : "岗位", width : 80, align : "center"},
+								]]
+					});
+					
+					questionTypeAuthUserAddOrgTree.tree({
+						idFiled : "ID",
+						textFiled : "NAME",
+						parentField : "PARENT_ID",
+						iconClsFiled : "ICON",
+						checkedFiled : "CHECKED",
+						lines : true,
+					    url : "questionType/authOrgTreeList",
+						onSelect : function(node){
+							questionTypeAuthUserAddCurSelOrgId = node.ID;
+							questionTypeAuthUserAddCurSelOrgName = node.NAME;
+							
+							$("#questionTypeAuthUserAdd_one").val(questionTypeAuthUserAddCurSelOrgId);
+							questionTypeAuthUserAddGrid.datagrid("uncheckAll");
+							questionTypeAuthUserAddGrid.datagrid("reload", $.fn.my.serializeObj(questionTypeAuthUserAddQueryForm));
+						},
+						onLoadSuccess : function(node, data){
+							if(!questionTypeAuthUserAddCurSelOrgId || !questionTypeAuthUserAddGrid.datagrid("options").url){//如果是第一次
+								questionTypeAuthUserAddCurSelOrgId = 1;
+								questionTypeAuthUserAddGrid.datagrid("options").url = "questionType/authUserAddList";
+							}
+							
+							var node = questionTypeAuthUserAddOrgTree.tree("find", questionTypeAuthUserAddCurSelOrgId);
+							if(!node){
+								questionTypeAuthUserAddCurSelOrgId = 1;
+								node = questionTypeAuthUserAddOrgTree.tree("find", questionTypeAuthUserAddCurSelOrgId);
+							}
+							questionTypeAuthUserAddOrgTree.tree("select", node.target);
+						}
+					});
+				}
+			});
+		}
+		
+		//添加权限用户查询
+		function questionTypeAuthUserAddQuery(){
+			var questionTypeAuthUserAddGrid = $("#questionTypeAuthUserAddGrid");
+			var questionTypeAuthUserAddQueryForm = $("#questionTypeAuthUserAddQueryForm");
+			questionTypeAuthUserAddGrid.datagrid("uncheckAll");
+			questionTypeAuthUserAddGrid.datagrid("load", $.fn.my.serializeObj(questionTypeAuthUserAddQueryForm));
+		}
+		
+		//添加权限用户重置
+		function questionTypeAuthUserAddReset(){
+			var questionTypeAuthUserAddQueryForm = $("#questionTypeAuthUserAddQueryForm");
+			questionTypeAuthUserAddQueryForm.form("reset");
+			questionTypeAuthUserAddQuery();
+		}
+		
+		//完成添加权限用户
+		function doQuestionTypeAuthUserAdd(questionTypeAuthUserAddListDialog){
+			var questionTypeAuthUserAddGridRows = $("#questionTypeAuthUserAddGrid").datagrid("getChecked");
+			if (questionTypeAuthUserAddGridRows.length == 0) {
+				parent.$.messager.alert("提示消息", "请选择一行或多行数据！", "info");
+				return;
+			}
+			
+			var params = $.fn.my.serializeField(questionTypeAuthUserAddGridRows, {attrName : "userIds"});
+			params += "&id=" + $("#questionTypeAuthUserAdd_ten").val();
+			
+			$.messager.confirm("确认消息", "确定要添加？", function(ok) {
+				if (!ok) {
+					return;
+				}
+				
+				$.messager.progress();
+				$.ajax({
+					url : "questionType/doAuthUserAdd",
+					data : params,
+					success : function(obj){
+						$("#questionTypeAuthUserGrid").datagrid("reload");
+						$.messager.progress("close");
+						
+						if(!obj.success){
+							parent.$.messager.alert("提示消息", obj.message, "info");
+							return;
+						}
+						questionTypeAuthUserAddListDialog.dialog("close");
+					}
+				});
+			});
+		}
+		
+		//完成删除权限用户
+		function doQuestionTypeAuthUserDel(){
+			var questionTypeAuthUserGridRows = $("#questionTypeAuthUserGrid").datagrid("getChecked");
+			if (questionTypeAuthUserGridRows.length == 0) {
+				parent.$.messager.alert("提示消息", "请选择一行或多行数据！", "info");
+				return;
+			}
+			
+			var params = $.fn.my.serializeField(questionTypeAuthUserGridRows, {attrName : "ID"});
+			$.messager.confirm("确认消息", "确定要删除？", function(ok) {
+				if (!ok) {
+					return;
+				}
+				
+				$.messager.progress();
+				$.ajax({
+					url : "questionType/doAuthUserDel",
+					data : params,
+					success : function(obj){
+						$("#questionTypeAuthUserGrid").datagrid("reload");
+						$.messager.progress("close");
+						
+						if(!obj.success){
+							parent.$.messager.alert("提示消息", obj.message, "info");
+							return;
+						}
+					}
+				});
 			});
 		}
 	</script>

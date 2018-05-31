@@ -1,5 +1,6 @@
 package com.wcpdoc.exam.exam.service.impl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -8,12 +9,15 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.exam.core.dao.BaseDao;
+import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.exam.dao.QuestionTypeDao;
 import com.wcpdoc.exam.exam.entity.QuestionType;
+import com.wcpdoc.exam.exam.entity.QuestionTypeAuth;
+import com.wcpdoc.exam.exam.service.QuestionTypeAuthService;
 import com.wcpdoc.exam.exam.service.QuestionTypeExService;
 import com.wcpdoc.exam.exam.service.QuestionTypeService;
 import com.wcpdoc.exam.sys.service.OrgService;
@@ -30,6 +34,8 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	private QuestionTypeExService questionTypeExService;
 	@Resource
 	private OrgService orgService;
+	@Resource
+	private QuestionTypeAuthService questionTypeAuthService;
 
 	@Override
 	@Resource(name = "questionTypeDaoImpl")
@@ -166,5 +172,76 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	@Override
 	public PageOut getAuthUserListpage(PageIn pageIn) {
 		return questionTypeDao.getAuthUserListpage(pageIn);
+	}
+
+	@Override
+	public PageOut getAuthUserAddList(PageIn pageIn) {
+		return questionTypeDao.getAuthUserAddList(pageIn);
+	}
+
+	@Override
+	public void doAuthUserAdd(Integer id, Integer[] userIds, LoginUser user) {
+		//校验数据有效性
+		if(id == null){
+			throw new RuntimeException("无法获取参数：id");
+		}
+		if(!ValidateUtil.isValid(userIds)){
+			throw new RuntimeException("无法获取参数：userIds");
+		}
+		
+		//添加权限用户
+		QuestionTypeAuth auth = questionTypeAuthService.getQuestionTypeEntity(id);
+		if(auth != null){
+			StringBuilder _userIds = new StringBuilder();
+			if(ValidateUtil.isValid(auth.getUserIds())){
+				_userIds.append(auth.getUserIds());
+			}else{
+				_userIds.append(",");
+			}
+			for(Integer userId : userIds){
+				if(_userIds.toString().contains("," + userId + ",")){
+					continue;
+				}
+				_userIds.append(userId).append(",");
+			}
+			auth.setUserIds(_userIds.toString());
+			auth.setUpdateTime(new Date());
+			auth.setUpdateUserId(user.getId());
+			questionTypeAuthService.update(auth);
+			return;
+		}
+		
+		auth = new QuestionTypeAuth();
+		StringBuilder _userIds = new StringBuilder(",");
+		for(Integer userId : userIds){
+			_userIds.append(userId).append(",");
+		}
+		auth.setUserIds(_userIds.toString());
+		auth.setUpdateTime(new Date());
+		auth.setUpdateUserId(user.getId());
+		questionTypeAuthService.save(auth);
+	}
+
+	@Override
+	public void doAuthUserDel(Integer id, Integer[] userIds, LoginUser user) {
+		//校验数据有效性
+		if(id == null){
+			throw new RuntimeException("无法获取参数：id");
+		}
+		if(!ValidateUtil.isValid(userIds)){
+			throw new RuntimeException("无法获取参数：id");
+		}
+		
+		QuestionTypeAuth questionTypeAuth = questionTypeAuthService.getQuestionTypeEntity(id);
+		String _userIds = questionTypeAuth.getUserIds();
+		for(Integer userId : userIds){
+			_userIds.replaceAll("," + userId + ",", ",");//,2,4,5,55,32,32
+		}
+		if(_userIds.equals(",")){
+			_userIds = "";
+		}
+		
+		questionTypeAuth.setUserIds(_userIds);
+		questionTypeAuthService.update(questionTypeAuth);
 	}
 }

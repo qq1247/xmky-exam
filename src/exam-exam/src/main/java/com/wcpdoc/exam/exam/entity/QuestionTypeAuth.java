@@ -19,8 +19,8 @@ import com.wcpdoc.exam.core.util.DateUtil;
  * v1.0 zhanghc 2018年5月29日下午3:20:16
  */
 @Entity
-@Table(name = "ZE_QUESTION_AUTH")
-public class QuestionAuth {
+@Table(name = "EXM_QUESTION_TYPE_AUTH")
+public class QuestionTypeAuth {
 	@Id
 	@GeneratedValue(generator = "generator")
 	@GenericGenerator(name = "generator", strategy = "identity")
