@@ -37,7 +37,7 @@ public interface PaperTypeService extends BaseService<PaperType>{
 	void delAndUpdate(Integer[] ids);
 	
 	/**
-	 * 获取试题分类树型列表
+	 * 获取试题分类树
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @return List<Map<String,Object>>
 	 */

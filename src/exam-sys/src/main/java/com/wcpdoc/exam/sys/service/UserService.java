@@ -38,7 +38,7 @@ public interface UserService extends BaseService<User>{
 	void delAndUpdate(Integer[] ids);
 	
 	/**
-	 * 获取组织机构树型列表
+	 * 获取组织机构树
 	 * v1.0 zhanghc 2016-6-15下午17:24:19
 	 * @return List<Map<String,Object>>
 	 */
@@ -54,7 +54,7 @@ public interface UserService extends BaseService<User>{
 	void doOrgUpdate(Integer[] ids, Integer orgId);
 
 	/**
-	 * 获取岗位树型列表
+	 * 获取岗位树
 	 * v1.0 zhanghc 2016-6-15下午17:24:19
 	 * @param ids
 	 * @return List<Map<String,Object>>

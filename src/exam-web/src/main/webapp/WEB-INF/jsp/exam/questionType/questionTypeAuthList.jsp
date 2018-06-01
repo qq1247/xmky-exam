@@ -1,6 +1,6 @@
 <%@ page language="java" pageEncoding="utf-8"%>
-<div class="easyui-tabs" data-options="fit:true,tabPosition:'left'">
-	<div title="用户权限" data-options="">
+<div class="easyui-tabs" data-options="fit:true,tabPosition:'left',onSelect:function(title,index){updateTabs(title)}">
+	<div title="用户权限">
 		<div class="easyui-layout" data-options="fit:true">
 			<!-- 左侧组织机构菜单 -->
 			<div data-options="region:'west',border:false" style="width: 240px;padding:5px">
@@ -32,8 +32,28 @@
 			</div>
 		</div>
 	</div>
-	<div title="机构权限" data-options="">
+	<div title="机构权限">
+		<div class="easyui-layout" data-options="fit:true">
+			<div data-options="region:'west',border:false" style="width: 240px;padding:5px">
+				<div class="easyui-panel" data-options="fit:true">
+					<ul id="questionTypeAuthOrgOrgTree"></ul>
+					<div style="padding: 20px;">
+						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-save" data-options="selected:true" onclick="doQuestionTypeAuthOrgUpdate();">保存机构</a>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
-	<div title="岗位权限" data-options="">
+	<div title="岗位权限">
+		<div class="easyui-layout" data-options="fit:true">
+			<div data-options="region:'west',border:false" style="width: 240px;padding:5px">
+				<div class="easyui-panel" data-options="fit:true">
+					<ul id="questionTypeAuthPostOrgTree"></ul>
+					<div style="padding: 20px;">
+						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-save" data-options="selected:true" onclick="doQuestionTypeAuthPostUpdate();">保存机构</a>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>

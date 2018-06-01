@@ -22,13 +22,13 @@ public class QuestionTypeAuthDaoImpl extends BaseDaoImpl<QuestionTypeAuth> imple
 	}
 
 	@Override
-	public void delQuestionType(Integer questionTypeId) {
+	public void delByQuestionTypeId(Integer questionTypeId) {
 		String sql = "DELETE FROM EXM_QUESTION_TYPE_AUTH WHERE QUESTION_TYPE_ID = ?";
 		update(sql, questionTypeId);
 	}
 
 	@Override
-	public QuestionTypeAuth getQuestionTypeEntity(Integer questionTypeId) {
+	public QuestionTypeAuth getEntityByQuestionTypeId(Integer questionTypeId) {
 		String sql = "SELECT * FROM EXM_QUESTION_TYPE_AUTH WHERE QUESTION_TYPE_ID = ?";
 		return getUnique(sql, new Object[]{questionTypeId}, QuestionTypeAuth.class);
 	}

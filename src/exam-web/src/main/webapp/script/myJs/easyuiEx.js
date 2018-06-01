@@ -1,6 +1,15 @@
 /**
  * 重写tree方法
  */
+
+$.fn.tree.defaults.lines = true;
+$.fn.tree.defaults.onSelect = function(node){
+	if(!node.checked){
+		$(this).tree("check", node.target);
+	}else{
+		$(this).tree("uncheck", node.target);
+	}
+};
 $.fn.tree.defaults.loadFilter = function(data, parent) {
 	var opt = $(this).data().tree.options;
 	var idFiled = opt.idFiled || "id";
@@ -33,7 +42,7 @@ $.fn.tree.defaults.loadFilter = function(data, parent) {
 		}
 	}
 	return TreeList;
-}
+};
 
 /**
  * 重写validatebox方法

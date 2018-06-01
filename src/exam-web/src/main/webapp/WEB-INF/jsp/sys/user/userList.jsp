@@ -88,7 +88,6 @@
 				parentField : "PARENT_ID",
 				iconClsFiled : "ICON",
 				checkedFiled : "CHECKED",
-				lines : true,
 			    url : "user/orgTreeList",
 				onContextMenu : function(e, node){
 					e.preventDefault();
@@ -404,16 +403,8 @@
 						parentField : "PARENT_ID",
 						iconClsFiled : "ICON",
 						checkedFiled : "CHECKED",
-						lines : true,
 					    url : "user/postUpdatePostTreeList?" + params,
-						checkbox : true,
-						onSelect : function(node){
-							if(!node.checked){
-								$(this).tree("check", node.target);
-							}else{
-								$(this).tree("uncheck", node.target);
-							}
-						}
+						checkbox : true
 					});
 				}
 			});
@@ -485,7 +476,6 @@
 						parentField : "PARENT_ID",
 						iconClsFiled : "ICON",
 						checkedFiled : "CHECKED",
-						lines : true,
 					    url : "user/orgUpdateOrgTreeList",
 					});
 				}

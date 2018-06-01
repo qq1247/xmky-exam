@@ -52,7 +52,7 @@ public class PaperTypeController extends BaseController{
 	}
 	
 	/**
-	 * 获取试卷分类树型列表
+	 * 获取试卷分类树
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @return List<Map<String,Object>>
@@ -63,7 +63,7 @@ public class PaperTypeController extends BaseController{
 		try {
 			return paperTypeService.getTreeList();
 		} catch (Exception e) {
-			log.error("获取试卷分类树型列表错误：", e);
+			log.error("获取试卷分类树错误：", e);
 			return new ArrayList<Map<String,Object>>();
 		}
 	}
@@ -201,7 +201,7 @@ public class PaperTypeController extends BaseController{
 	}
 	
 	/**
-	 * 获取试卷分类树型列表
+	 * 获取试卷分类树
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @return List<Map<String,Object>>
@@ -212,7 +212,7 @@ public class PaperTypeController extends BaseController{
 		try {
 			return paperTypeService.getTreeList();
 		} catch (Exception e) {
-			log.error("获取试卷分类树型列表错误：", e);
+			log.error("获取试卷分类树错误：", e);
 			return new ArrayList<Map<String,Object>>();
 		}
 	}

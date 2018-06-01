@@ -87,7 +87,6 @@
 				parentField : "PARENT_ID",
 				iconClsFiled : "ICON",
 				checkedFiled : "CHECKED",
-				lines : true,
 			    url : "org/treeList",
 				<my:auth url="org/toMove">dnd : true,
 				onStopDrag : toOrgMoveForMenu,</my:auth>
@@ -375,7 +374,6 @@
 						parentField : "PARENT_ID",
 						iconClsFiled : "ICON",
 						checkedFiled : "CHECKED",
-						lines : true,
 					    url : "org/moveOrgTreeList",
 					});
 				}

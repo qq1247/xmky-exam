@@ -14,7 +14,7 @@ import com.wcpdoc.exam.exam.entity.ExamType;
 public interface ExamTypeDao extends BaseDao<ExamType>{
 
 	/**
-	 * 获取考试分类树型列表
+	 * 获取考试分类树
 	 * v1.0 zhanghc 2017-06-28 21:34:41
 	 * @return List<Map<String,Object>>
 	 */

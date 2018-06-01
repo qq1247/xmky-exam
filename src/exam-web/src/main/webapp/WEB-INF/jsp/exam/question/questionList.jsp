@@ -126,7 +126,6 @@
 				parentField : "PARENT_ID",
 				iconClsFiled : "ICON",
 				checkedFiled : "CHECKED",
-				lines : true,
 			    url : "question/questionTypeTreeList",
 				onContextMenu : function(e, node){
 					e.preventDefault();
@@ -632,7 +631,6 @@
 						parentField : "PARENT_ID",
 						iconClsFiled : "ICON",
 						checkedFiled : "CHECKED",
-						lines : true,
 					    url : "question/questionTypeUpdateQuestionTypeTreeList",
 					});
 				}

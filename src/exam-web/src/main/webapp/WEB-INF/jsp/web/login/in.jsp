@@ -22,12 +22,12 @@
 							style="width: 400px; padding: 30px 70px 20px 70px;">
 							<div style="margin-bottom: 10px">
 								<input name="loginName" class="easyui-textbox"
-									style="width: 100%; height: 40px; padding: 12px" value="" 
+									style="width: 100%; height: 40px; padding: 12px" value="sysadmin" 
 									data-options="prompt:'在此输入用户名',iconCls:'icon-man',iconWidth:38">
 							</div>
 							<div style="margin-bottom: 20px">
 								<input name="pwd" class="easyui-textbox" type="pwd"
-									style="width: 100%; height: 40px; padding: 12px" value=""
+									style="width: 100%; height: 40px; padding: 12px" value="111111"
 									data-options="prompt:'在此输入密码',iconCls:'icon-lock',iconWidth:38">
 							</div>
 							<div>

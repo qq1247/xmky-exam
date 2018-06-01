@@ -21,6 +21,7 @@ import com.wcpdoc.exam.exam.service.QuestionTypeAuthService;
 import com.wcpdoc.exam.exam.service.QuestionTypeExService;
 import com.wcpdoc.exam.exam.service.QuestionTypeService;
 import com.wcpdoc.exam.sys.service.OrgService;
+import com.wcpdoc.exam.sys.service.PostService;
 /**
  * 试题分类服务层实现
  * 
@@ -36,6 +37,8 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	private OrgService orgService;
 	@Resource
 	private QuestionTypeAuthService questionTypeAuthService;
+	@Resource
+	private PostService postService;
 
 	@Override
 	@Resource(name = "questionTypeDaoImpl")
@@ -190,7 +193,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		}
 		
 		//添加权限用户
-		QuestionTypeAuth auth = questionTypeAuthService.getQuestionTypeEntity(id);
+		QuestionTypeAuth auth = questionTypeAuthService.getEntityByQuestionTypeId(id);
 		if(auth != null){
 			StringBuilder _userIds = new StringBuilder();
 			if(ValidateUtil.isValid(auth.getUserIds())){
@@ -229,19 +232,131 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 			throw new RuntimeException("无法获取参数：id");
 		}
 		if(!ValidateUtil.isValid(userIds)){
-			throw new RuntimeException("无法获取参数：id");
+			throw new RuntimeException("无法获取参数：userIds");
 		}
 		
-		QuestionTypeAuth questionTypeAuth = questionTypeAuthService.getQuestionTypeEntity(id);
+		QuestionTypeAuth questionTypeAuth = questionTypeAuthService.getEntityByQuestionTypeId(id);
 		String _userIds = questionTypeAuth.getUserIds();
 		for(Integer userId : userIds){
-			_userIds.replaceAll("," + userId + ",", ",");//,2,4,5,55,32,32
+			_userIds = _userIds.replaceAll("," + userId + ",", ",");//,2,4,5,55,32,32
 		}
 		if(_userIds.equals(",")){
-			_userIds = "";
+			_userIds = null;
 		}
 		
 		questionTypeAuth.setUserIds(_userIds);
 		questionTypeAuthService.update(questionTypeAuth);
+	}
+
+	@Override
+	public void doAuthOrgUpdate(Integer id, Integer[] orgIds, LoginUser user) {
+		//校验数据有效性
+		if(id == null){
+			throw new RuntimeException("无法获取参数：id");
+		}
+//		if(!ValidateUtil.isValid(orgIds)){
+//			throw new RuntimeException("无法获取参数：orgIds");//全不选就是空。
+//		}
+		
+		//添加权限机构
+		QuestionTypeAuth auth = questionTypeAuthService.getEntityByQuestionTypeId(id);
+		if(auth != null){
+			StringBuilder _orgIds = new StringBuilder();
+			if(ValidateUtil.isValid(auth.getOrgIds())){
+				_orgIds.append(auth.getOrgIds());
+			}else{
+				_orgIds.append(",");
+			}
+			for(Integer orgId : orgIds){
+				if(_orgIds.toString().contains("," + orgId + ",")){
+					continue;
+				}
+				_orgIds.append(orgId).append(",");
+			}
+			if(_orgIds.toString().equals(",")){
+				auth.setOrgIds(null);
+			}else{
+				auth.setOrgIds(_orgIds.toString());
+			}
+			auth.setUpdateTime(new Date());
+			auth.setUpdateUserId(user.getId());
+			questionTypeAuthService.update(auth);
+			return;
+		}
+		
+		auth = new QuestionTypeAuth();
+		StringBuilder _orgIds = new StringBuilder(",");
+		for(Integer orgId : orgIds){
+			_orgIds.append(orgId).append(",");
+		}
+		if(_orgIds.toString().equals(",")){
+			auth.setOrgIds(null);
+		}else{
+			auth.setOrgIds(_orgIds.toString());
+		}
+		auth.setUpdateTime(new Date());
+		auth.setUpdateUserId(user.getId());
+		questionTypeAuthService.save(auth);
+	}
+
+	@Override
+	public QuestionTypeAuth getQuestionTypeAuthEntity(Integer questionTypeAuthId) {
+		return questionTypeAuthService.getEntityByQuestionTypeId(questionTypeAuthId);
+	}
+
+	@Override
+	public List<Map<String, Object>> getOrgPostTreeList() {
+		return postService.getOrgPostTreeList();
+	}
+
+	@Override
+	public void doAuthPostUpdate(Integer id, Integer[] postIds, LoginUser user) {
+		//校验数据有效性
+		if(id == null){
+			throw new RuntimeException("无法获取参数：id");
+		}
+//		if(!ValidateUtil.isValid(postIds)){
+//			throw new RuntimeException("无法获取参数：postIds");//全不选就是空。
+//		}
+		
+		//添加权限机构
+		QuestionTypeAuth auth = questionTypeAuthService.getEntityByQuestionTypeId(id);
+		if(auth != null){
+			StringBuilder _postIds = new StringBuilder();
+			if(ValidateUtil.isValid(auth.getPostIds())){
+				_postIds.append(auth.getPostIds());
+			}else{
+				_postIds.append(",");
+			}
+			for(Integer postId : postIds){
+				if(_postIds.toString().contains("," + postId + ",")){
+					continue;
+				}
+				_postIds.append(postId).append(",");
+			}
+			if(_postIds.toString().equals(",")){
+				auth.setPostIds(null);
+			}else{
+				auth.setPostIds(_postIds.toString());
+			}
+			auth.setUpdateTime(new Date());
+			auth.setUpdateUserId(user.getId());
+			questionTypeAuthService.update(auth);
+			return;
+		}
+		
+		auth = new QuestionTypeAuth();
+		StringBuilder _postIds = new StringBuilder(",");
+		for(Integer postId : postIds){
+			_postIds.append(postId).append(",");
+		}
+		if(_postIds.toString().equals(",")){
+			auth.setPostIds(null);
+		}else{
+			auth.setPostIds(_postIds.toString());
+		}
+		auth.setUpdateTime(new Date());
+		auth.setUpdateUserId(user.getId());
+		questionTypeAuthService.save(auth);
 	}
 }

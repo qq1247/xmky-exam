@@ -21,7 +21,7 @@ import com.wcpdoc.exam.exam.entity.Question;
 public interface PaperService extends BaseService<Paper>{
 
 	/**
-	 * 获取试卷分类树型列表
+	 * 获取试卷分类树
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @return List<Map<String,Object>>
@@ -48,7 +48,7 @@ public interface PaperService extends BaseService<Paper>{
 	void doPaperTypeUpdate(Integer[] ids, Integer paperTypeId);
 
 	/**
-	 * 获取配置试卷树型列表
+	 * 获取配置试卷树
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @return List<Map<String,Object>>
@@ -144,7 +144,7 @@ public interface PaperService extends BaseService<Paper>{
 	List<PaperQuestion> getPaperQuestionList(Integer paperQuestionId);
 
 	/**
-	 * 获取试题分类树型列表
+	 * 获取试题分类树
 	 * 
 	 * v1.0 zhanghc 2017年6月4日下午4:36:56
 	 * @return List<Map<String,Object>>

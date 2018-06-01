@@ -73,7 +73,7 @@ public interface ExamService extends BaseService<Exam>{
 	PageOut getExamUserListpage(PageIn pageIn);
 
 	/**
-	 * 获取组织机构树型列表
+	 * 获取组织机构树
 	 * 
 	 * v1.0 zhanghc 2017年6月19日上午6:12:24
 	 * @return List<Map<String,Object>>
@@ -90,7 +90,7 @@ public interface ExamService extends BaseService<Exam>{
 	PageOut getExamUserAddListpage(PageIn pageIn);
 
 	/**
-	 * 获取组织机构树型列表
+	 * 获取组织机构树
 	 * 
 	 * v1.0 zhanghc 2017年6月19日上午6:12:24
 	 * @return List<Map<String,Object>>
@@ -127,7 +127,7 @@ public interface ExamService extends BaseService<Exam>{
 	List<Map<String, Object>> getUnFinishList(Integer userId);
 
 	/**
-	 * 获取考试分类树型列表
+	 * 获取考试分类树
 	 * 
 	 * v1.0 zhanghc 2017年6月29日上午7:24:13
 	 * @return List<Map<String,Object>>

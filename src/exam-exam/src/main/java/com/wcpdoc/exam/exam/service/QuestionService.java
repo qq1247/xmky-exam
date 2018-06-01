@@ -14,7 +14,7 @@ import com.wcpdoc.exam.exam.entity.QuestionType;
 public interface QuestionService extends BaseService<Question>{
 
 	/**
-	 * 获取试题分类树型列表
+	 * 获取试题分类树
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @return List<Map<String,Object>>

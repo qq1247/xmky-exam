@@ -28,7 +28,7 @@ public interface PaperDao extends BaseDao<Paper>{
 	PaperType getPaperType(Integer id);
 
 	/**
-	 * 获取配置试卷树型列表
+	 * 获取配置试卷树
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @param id

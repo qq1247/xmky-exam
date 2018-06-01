@@ -98,7 +98,6 @@
 				parentField : "PARENT_ID",
 				iconClsFiled : "ICON",
 				checkedFiled : "CHECKED",
-				lines : true,
 			    url : "paper/paperTypeTreeList",
 			    onContextMenu : function(e, node){
 					e.preventDefault();
@@ -367,7 +366,6 @@
 						parentField : "PARENT_ID",
 						iconClsFiled : "ICON",
 						checkedFiled : "CHECKED",
-						lines : true,
 					    url : "paper/paperTypeUpdatePaperTypeTreeList",
 					});
 				}
@@ -453,7 +451,6 @@
 				parentField : "PARENT_ID",
 				iconClsFiled : "ICON",
 				checkedFiled : "CHECKED",
-				lines : true,
 			    url : "paper/paperCfgPaperTreeList",
 			    queryParams : {id : id},
 				onContextMenu : function(e, node){
@@ -644,7 +641,6 @@
 						parentField : "PARENT_ID",
 						iconClsFiled : "ICON",
 						checkedFiled : "CHECKED",
-						lines : true,
 					    url : "paper/paperCfgListQuestionTypeTreeList",
 						onSelect : function(node){
 							paperCfgListCurSelQuestionTypeId = node.ID;

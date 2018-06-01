@@ -14,7 +14,7 @@ import com.wcpdoc.exam.sys.entity.Res;
 public interface ResDao extends BaseDao<Res>{
 
 	/**
-	 * 获取资源树型列表
+	 * 获取资源树
 	 * 
 	 * v1.0 zhanghc 2016-6-11下午8:57:40
 	 * @param type

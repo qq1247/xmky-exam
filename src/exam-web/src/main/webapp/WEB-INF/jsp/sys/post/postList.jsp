@@ -87,7 +87,6 @@
 				parentField : "PARENT_ID",
 				iconClsFiled : "ICON",
 				checkedFiled : "CHECKED",
-				lines : true,
 			    url : "post/orgPostTreeList",
 				onContextMenu : function(e, node){
 					e.preventDefault();
@@ -404,17 +403,9 @@
 						parentField : "PARENT_ID",
 						iconClsFiled : "ICON",
 						checkedFiled : "CHECKED",
-						lines : true,
 					    url : "post/resUpdateResTreeList",
 					    queryParams : {id : postGridRows[0].ID},
 						checkbox : true,
-						onSelect : function(node){
-							if(!node.checked){
-								$(this).tree("check", node.target);
-							}else{
-								$(this).tree("uncheck", node.target);
-							}
-						},
 						onLoadSuccess : function(node, data){
 							resUpdateTree.tree("collapseAll");
 						}

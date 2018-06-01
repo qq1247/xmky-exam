@@ -31,7 +31,7 @@ public interface UserDao extends BaseDao<User>{
 	List<Org> getAllOrg(Integer[] ids);
 	
 	/**
-	 * 获取岗位树型列表
+	 * 获取岗位树
 	 * v1.0 zhanghc 2016-6-15下午17:24:19
 	 * @param orgId
 	 * @return List<Map<String,Object>>

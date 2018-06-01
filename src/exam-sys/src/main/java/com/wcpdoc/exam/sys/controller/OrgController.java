@@ -52,7 +52,7 @@ public class OrgController extends BaseController{
 	}
 	
 	/**
-	 * 组织机构树型列表
+	 * 组织机构树
 	 * 
 	 * v1.0 zhanghc 2016-5-8上午11:00:00
 	 * @return List<Map<String,Object>>
@@ -63,7 +63,7 @@ public class OrgController extends BaseController{
 		try {
 			return orgService.getTreeList();
 		} catch (Exception e) {
-			log.error("组织机构树型列表错误：", e);
+			log.error("组织机构树错误：", e);
 			return new ArrayList<Map<String,Object>>();
 		}
 	}
@@ -202,7 +202,7 @@ public class OrgController extends BaseController{
 	}
 	
 	/**
-	 * 获取组织机构树型列表
+	 * 获取组织机构树
 	 * 
 	 * v1.0 zhanghc 2016-5-8上午11:00:00
 	 * @return List<Map<String,Object>>
@@ -213,7 +213,7 @@ public class OrgController extends BaseController{
 		try {
 			return orgService.getTreeList();
 		} catch (Exception e) {
-			log.error("获取组织机构树型列表错误：", e);
+			log.error("获取组织机构树错误：", e);
 			return new ArrayList<Map<String,Object>>();
 		}
 	}

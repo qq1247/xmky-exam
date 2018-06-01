@@ -98,7 +98,6 @@
 				parentField : "PARENT_ID",
 				iconClsFiled : "ICON",
 				checkedFiled : "CHECKED",
-				lines : true,
 			    url : "res/treeList",
 				<my:auth url="res/toMove">dnd : true,
 				onStopDrag : toResMoveForMenu,</my:auth>
@@ -407,7 +406,6 @@
 						parentField : "PARENT_ID",
 						iconClsFiled : "ICON",
 						checkedFiled : "CHECKED",
-						lines : true,
 					    url : "res/moveResTreeList",
 					});
 				}

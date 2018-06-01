@@ -68,7 +68,7 @@ public class QuestionController extends BaseController{
 		try {
 			return questionService.getQuestionTypeTreeList();
 		} catch (Exception e) {
-			log.error("获取试题分类树型列表错误：", e);
+			log.error("获取试题分类树错误：", e);
 			return new ArrayList<Map<String,Object>>();
 		}
 	}
@@ -223,7 +223,7 @@ public class QuestionController extends BaseController{
 	}
 	
 	/**
-	 * 获取试题分类树型列表
+	 * 获取试题分类树
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @return List<Map<String,Object>>
@@ -234,7 +234,7 @@ public class QuestionController extends BaseController{
 		try {
 			return questionService.getQuestionTypeTreeList();
 		} catch (Exception e) {
-			log.error("获取试题分类树型列表错误：", e);
+			log.error("获取试题分类树错误：", e);
 			return new ArrayList<Map<String,Object>>();
 		}
 	}

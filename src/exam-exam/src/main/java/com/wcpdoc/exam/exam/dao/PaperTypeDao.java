@@ -14,7 +14,7 @@ import com.wcpdoc.exam.exam.entity.PaperType;
 public interface PaperTypeDao extends BaseDao<PaperType>{
 
 	/**
-	 * 获取试卷分类树型列表
+	 * 获取试卷分类树
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @return List<Map<String,Object>>
 	 */

@@ -87,7 +87,6 @@
 				parentField : "PARENT_ID",
 				iconClsFiled : "ICON",
 				checkedFiled : "CHECKED",
-				lines : true,
 			    url : "examType/treeList",
 				<my:auth url="examType/toMove">dnd : true,
 				onStopDrag : toExamTypeMoveForMenu,</my:auth>
@@ -375,7 +374,6 @@
 						parentField : "PARENT_ID",
 						iconClsFiled : "ICON",
 						checkedFiled : "CHECKED",
-						lines : true,
 					    url : "examType/moveExamTypeTreeList",
 					});
 				}

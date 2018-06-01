@@ -8,6 +8,7 @@ import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.service.BaseService;
 import com.wcpdoc.exam.exam.entity.QuestionType;
+import com.wcpdoc.exam.exam.entity.QuestionTypeAuth;
 /**
  * 试题分类服务层接口
  * 
@@ -40,7 +41,7 @@ public interface QuestionTypeService extends BaseService<QuestionType>{
 	void delAndUpdate(Integer[] ids);
 	
 	/**
-	 * 获取试题分类树型列表
+	 * 获取试题分类树
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * @return List<Map<String,Object>>
 	 */
@@ -56,7 +57,7 @@ public interface QuestionTypeService extends BaseService<QuestionType>{
 	void doMove(Integer sourceId, Integer targetId);
 
 	/**
-	 * 获取组织机构
+	 * 获取组织机构树
 	 * 
 	 * v1.0 zhanghc 2018年5月29日下午11:23:13
 	 * @return List<Map<String,Object>>
@@ -102,4 +103,42 @@ public interface QuestionTypeService extends BaseService<QuestionType>{
 	 * void
 	 */
 	void doAuthUserDel(Integer id, Integer[] userIds, LoginUser user);
+
+	/**
+	 * 完成保存权限机构
+	 * 
+	 * v1.0 zhanghc 2018年5月31日下午9:45:51
+	 * @param id
+	 * @param orgIds
+	 * @param currentUser void
+	 */
+	void doAuthOrgUpdate(Integer id, Integer[] orgIds, LoginUser user);
+
+	/**
+	 * 获取权限
+	 * 
+	 * v1.0 zhanghc 2018年5月31日下午10:12:54
+	 * @param questionTypeAuthId
+	 * @return QuestionTypeAuth
+	 */
+	QuestionTypeAuth getQuestionTypeAuthEntity(Integer questionTypeAuthId);
+
+	/**
+	 * 获取机构岗位树
+	 * 
+	 * v1.0 zhanghc 2018年6月1日下午12:13:39
+	 * @return List<Map<String,Object>>
+	 */
+	List<Map<String, Object>> getOrgPostTreeList();
+
+	/**
+	 * 完成保存权限岗位
+	 * 
+	 * v1.0 zhanghc 2018年6月1日下午12:20:02
+	 * @param id
+	 * @param postIds
+	 * @param currentUser 
+	 * void
+	 */
+	void doAuthPostUpdate(Integer id, Integer[] postIds, LoginUser currentUser);
 }

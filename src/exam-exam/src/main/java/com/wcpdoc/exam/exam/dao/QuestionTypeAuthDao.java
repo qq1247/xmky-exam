@@ -17,7 +17,7 @@ public interface QuestionTypeAuthDao extends BaseDao<QuestionTypeAuth>{
 	 * @param questionTypeId 
 	 * void
 	 */
-	void delQuestionType(Integer questionTypeId);
+	void delByQuestionTypeId(Integer questionTypeId);
 
 	/**
 	 * 获取试题分类权限
@@ -26,6 +26,6 @@ public interface QuestionTypeAuthDao extends BaseDao<QuestionTypeAuth>{
 	 * @param questionTypeId
 	 * @return QuestionTypeAuth
 	 */
-	QuestionTypeAuth getQuestionTypeEntity(Integer questionTypeId);
+	QuestionTypeAuth getEntityByQuestionTypeId(Integer questionTypeId);
 	
 }

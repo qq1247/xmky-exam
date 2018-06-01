@@ -27,12 +27,12 @@ public class QuestionTypeAuthServiceImpl extends BaseServiceImp<QuestionTypeAuth
 	}
 
 	@Override
-	public void delQuestionType(Integer questionTypeId) {
-		questionTypeAuthDao.delQuestionType(questionTypeId);
+	public void delByQuestionTypeId(Integer questionTypeId) {
+		questionTypeAuthDao.delByQuestionTypeId(questionTypeId);
 	}
 
 	@Override
-	public QuestionTypeAuth getQuestionTypeEntity(Integer questionTypeId) {
-		return questionTypeAuthDao.getQuestionTypeEntity(questionTypeId);
+	public QuestionTypeAuth getEntityByQuestionTypeId(Integer questionTypeId) {
+		return questionTypeAuthDao.getEntityByQuestionTypeId(questionTypeId);
 	}
 }

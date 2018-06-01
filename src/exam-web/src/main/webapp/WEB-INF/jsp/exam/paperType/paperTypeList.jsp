@@ -87,7 +87,6 @@
 				parentField : "PARENT_ID",
 				iconClsFiled : "ICON",
 				checkedFiled : "CHECKED",
-				lines : true,
 			    url : "paperType/treeList",
 				<my:auth url="paperType/doMove">dnd : true,
 				onStopDrag : toPaperTypeMoveForMenu,</my:auth>
@@ -375,7 +374,6 @@
 						parentField : "PARENT_ID",
 						iconClsFiled : "ICON",
 						checkedFiled : "CHECKED",
-						lines : true,
 					    url : "paperType/movePaperTypeTreeList",
 					});
 				}

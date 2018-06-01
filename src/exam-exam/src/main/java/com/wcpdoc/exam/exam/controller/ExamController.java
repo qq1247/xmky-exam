@@ -54,7 +54,7 @@ public class ExamController extends BaseController{
 	}
 	
 	/**
-	 * 获取考试分类树型列表
+	 * 获取考试分类树
 	 * 
 	 * v1.0 zhanghc 2017-06-11 09:13:23
 	 * @return List<Map<String,Object>>
@@ -65,7 +65,7 @@ public class ExamController extends BaseController{
 		try {
 			return examService.getExamTypeTreeList();
 		} catch (Exception e) {
-			log.error("获取考试分类树型列表错误：", e);
+			log.error("获取考试分类树错误：", e);
 			return new ArrayList<Map<String,Object>>();
 		}
 	}
@@ -133,7 +133,7 @@ public class ExamController extends BaseController{
 		try {
 			return examService.getPaperAddListTypeTreeList();
 		} catch (Exception e) {
-			log.error("获取试卷分类树型列表错误：", e);
+			log.error("获取试卷分类树错误：", e);
 			return new ArrayList<Map<String,Object>>();
 		}
 	}
@@ -265,7 +265,7 @@ public class ExamController extends BaseController{
 	}
 	
 	/**
-	 * 获取组织机构树型列表
+	 * 获取组织机构树
 	 * 
 	 * v1.0 zhanghc 2017年6月12日下午11:33:39
 	 * @return List<Map<String,Object>>
@@ -276,7 +276,7 @@ public class ExamController extends BaseController{
 		try {
 			return examService.getOrgTreeList();
 		} catch (Exception e) {
-			log.error("获取组织机构树型列表错误：", e);
+			log.error("获取组织机构树错误：", e);
 			return new ArrayList<Map<String,Object>>();
 		}
 	}
@@ -319,7 +319,7 @@ public class ExamController extends BaseController{
 	}
 	
 	/**
-	 * 获取组织机构树型列表
+	 * 获取组织机构树
 	 * v1.0 zhanghc 2017年6月12日下午11:33:39
 	 * 
 	 * @return List<Map<String,Object>>
@@ -330,7 +330,7 @@ public class ExamController extends BaseController{
 		try {
 			return examService.getExamUserAddOrgTreeList();
 		} catch (Exception e) {
-			log.error("获取组织机构树型列表错误：", e);
+			log.error("获取组织机构树错误：", e);
 			return new ArrayList<Map<String,Object>>();
 		}
 	}
@@ -411,7 +411,7 @@ public class ExamController extends BaseController{
 	}
 	
 	/**
-	 * 获取组织机构树型列表
+	 * 获取组织机构树
 	 * 
 	 * v1.0 zhanghc 2017年6月12日下午11:33:39
 	 * @return List<Map<String,Object>>
@@ -422,7 +422,7 @@ public class ExamController extends BaseController{
 		try {
 			return examService.getOrgTreeList();
 		} catch (Exception e) {
-			log.error("获取组织机构树型列表错误：", e);
+			log.error("获取组织机构树错误：", e);
 			return new ArrayList<Map<String,Object>>();
 		}
 	}
@@ -465,7 +465,7 @@ public class ExamController extends BaseController{
 	}
 	
 	/**
-	 * 获取组织机构树型列表
+	 * 获取组织机构树
 	 * 
 	 * v1.0 zhanghc 2017年6月12日下午11:33:39
 	 * @return List<Map<String,Object>>
@@ -476,7 +476,7 @@ public class ExamController extends BaseController{
 		try {
 			return examService.getOrgTreeList();
 		} catch (Exception e) {
-			log.error("获取组织机构树型列表错误：", e);
+			log.error("获取组织机构树错误：", e);
 			return new ArrayList<Map<String,Object>>();
 		}
 	}

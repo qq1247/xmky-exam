@@ -16,7 +16,7 @@ import com.wcpdoc.exam.exam.entity.QuestionType;
 public interface QuestionTypeDao extends BaseDao<QuestionType>{
 
 	/**
-	 * 获取试题分类树型列表
+	 * 获取试题分类树
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * @return List<Map<String,Object>>
 	 */

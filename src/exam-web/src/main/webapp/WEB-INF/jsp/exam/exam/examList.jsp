@@ -107,7 +107,6 @@
 				parentField : "PARENT_ID",
 				iconClsFiled : "ICON",
 				checkedFiled : "CHECKED",
-				lines : true,
 			    url : "exam/examTypeTreeList",
 				dnd : true,
 				onContextMenu : function(e, node){
@@ -426,7 +425,6 @@
 						parentField : "PARENT_ID",
 						iconClsFiled : "ICON",
 						checkedFiled : "CHECKED",
-						lines : true,
 					    url : "exam/paperAddListTypeTreeList",
 						onSelect : function(node){
 							curSelPaperTypeId = node.ID;
@@ -520,7 +518,6 @@
 						parentField : "PARENT_ID",
 						iconClsFiled : "ICON",
 						checkedFiled : "CHECKED",
-						lines : true,
 					    url : "exam/examUserOrgTreeList",
 						onSelect : function(node){
 							examUserCurSelOrgId = node.ID;
@@ -604,7 +601,6 @@
 						parentField : "PARENT_ID",
 						iconClsFiled : "ICON",
 						checkedFiled : "CHECKED",
-						lines : true,
 					    url : "exam/examUserAddOrgTreeList",
 						onSelect : function(node){
 							examUserAddCurSelOrgId = node.ID;
@@ -750,7 +746,6 @@
 						parentField : "PARENT_ID",
 						iconClsFiled : "ICON",
 						checkedFiled : "CHECKED",
-						lines : true,
 					    url : "exam/markUserOrgTreeList",
 						onSelect : function(node){
 							markUserCurSelOrgId = node.ID;
@@ -834,7 +829,6 @@
 						parentField : "PARENT_ID",
 						iconClsFiled : "ICON",
 						checkedFiled : "CHECKED",
-						lines : true,
 					    url : "exam/markUserAddOrgTreeList",
 						onSelect : function(node){
 							markUserAddCurSelOrgId = node.ID;

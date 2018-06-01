@@ -55,7 +55,7 @@ public class UserController extends BaseController{
 	}
 	
 	/**
-	 * 获取组织机构树型列表
+	 * 获取组织机构树
 	 * 
 	 * v1.0 zhanghc 2016-6-15下午17:24:19
 	 * @return List<Map<String,Object>>
@@ -66,7 +66,7 @@ public class UserController extends BaseController{
 		try {
 			return userService.getOrgTreeList();
 		} catch (Exception e) {
-			log.error("获取组织机构树型列表错误：", e);
+			log.error("获取组织机构树错误：", e);
 			return new ArrayList<Map<String,Object>>();
 		}
 	}
@@ -222,7 +222,7 @@ public class UserController extends BaseController{
 	}
 	
 	/**
-	 * 获取岗位树型列表
+	 * 获取岗位树
 	 * 
 	 * v1.0 zhanghc 2016-6-15下午17:24:19
 	 * @param orgId 
@@ -234,7 +234,7 @@ public class UserController extends BaseController{
 		try {
 			return userService.getPostUpdatePostTreeList(ids);
 		} catch (Exception e) {
-			log.error("获取岗位树型列表错误：", e);
+			log.error("获取岗位树错误：", e);
 			return new ArrayList<Map<String,Object>>();
 		}
 	}
@@ -276,7 +276,7 @@ public class UserController extends BaseController{
 	}
 	
 	/**
-	 * 获取组织机构树型列表
+	 * 获取组织机构树
 	 * 
 	 * v1.0 zhanghc 2016-6-15下午17:24:19
 	 * @return List<Map<String,Object>>
@@ -287,7 +287,7 @@ public class UserController extends BaseController{
 		try {
 			return userService.getOrgTreeList();
 		} catch (Exception e) {
-			log.error("获取组织机构树型列表错误：", e);
+			log.error("获取组织机构树错误：", e);
 			return new ArrayList<Map<String,Object>>();
 		}
 	}
