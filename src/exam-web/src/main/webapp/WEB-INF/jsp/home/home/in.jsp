@@ -4,10 +4,10 @@
 	<head>
 		<title>在线考试系统首页</title>
 		<%@include file="/script/home/common.jspf"%>
+		<script src="script/bootstrapTreeview/bootstrap-treeview.min.js"></script>
 	</head>
 	<body>
 		<%@include file="/script/home/head.jspf"%>
-		
 	</body>
 	<%-- <script type="text/javascript">
 		//页面加载完毕，执行如下方法：

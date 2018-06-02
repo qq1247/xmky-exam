@@ -566,7 +566,52 @@
 					}
 				}],
 				onLoad : function() {
+					var questionTypeAuthUserAddGrid = $("#questionTypeAuthUserAddGrid"); //用户表格对象
+					var questionTypeAuthUserAddQueryForm = $("#questionTypeAuthUserAddQueryForm"); //用户查询对象
+					var questionTypeAuthUserAddOrgTree = $("#questionTypeAuthUserAddOrgTree"); //组织机构树对象
+					var questionTypeAuthUserAddCurSelOrgId = ""; //当前选中的组织机构ID
+					var questionTypeAuthUserAddCurSelOrgName = ""; //当前选中的组织机构名称
 					
+					questionTypeAuthUserAddGrid.datagrid({
+						url : "",
+						columns : [[ 
+								{field : "ID", title : "", checkbox : true}, 
+								{field : "USER_NAME", title : "姓名", width : 80, align : "center"}, 
+								{field : "LOGIN_NAME", title : "登录名称", width : 80, align : "center"}, 
+								{field : "ORG_NAME", title : "组织机构", width : 80, align : "center"},
+								{field : "POST_NAMES", title : "岗位", width : 80, align : "center"},
+								]]
+					});
+					
+					questionTypeAuthUserAddOrgTree.tree({
+						idFiled : "ID",
+						textFiled : "NAME",
+						parentField : "PARENT_ID",
+						iconClsFiled : "ICON",
+						checkedFiled : "CHECKED",
+					    url : "questionType/authUserOrgTreeList",
+						onSelect : function(node){
+							questionTypeAuthUserAddCurSelOrgId = node.ID;
+							questionTypeAuthUserAddCurSelOrgName = node.NAME;
+							
+							$("#questionTypeAuthUserAdd_one").val(questionTypeAuthUserAddCurSelOrgId);
+							questionTypeAuthUserAddGrid.datagrid("uncheckAll");
+							questionTypeAuthUserAddGrid.datagrid("reload", $.fn.my.serializeObj(questionTypeAuthUserAddQueryForm));
+						},
+						onLoadSuccess : function(node, data){
+							if(!questionTypeAuthUserAddCurSelOrgId || !questionTypeAuthUserAddGrid.datagrid("options").url){//如果是第一次
+								questionTypeAuthUserAddCurSelOrgId = 1;
+								questionTypeAuthUserAddGrid.datagrid("options").url = "questionType/authUserAddList";
+							}
+							
+							var node = questionTypeAuthUserAddOrgTree.tree("find", questionTypeAuthUserAddCurSelOrgId);
+							if(!node){
+								questionTypeAuthUserAddCurSelOrgId = 1;
+								node = questionTypeAuthUserAddOrgTree.tree("find", questionTypeAuthUserAddCurSelOrgId);
+							}
+							questionTypeAuthUserAddOrgTree.tree("select", node.target);
+						}
+					});
 				}
 			});
 		}
@@ -665,13 +710,13 @@
 		
 		//更新用户标签
 		function updateUserTab(){
-			var questionTypeAuthUserAddGrid = $("#questionTypeAuthUserAddGrid"); //用户表格对象
-			var questionTypeAuthUserAddQueryForm = $("#questionTypeAuthUserAddQueryForm"); //用户查询对象
-			var questionTypeAuthUserAddOrgTree = $("#questionTypeAuthUserAddOrgTree"); //组织机构树对象
-			var questionTypeAuthUserAddCurSelOrgId = ""; //当前选中的组织机构ID
-			var questionTypeAuthUserAddCurSelOrgName = ""; //当前选中的组织机构名称
+			var questionTypeAuthUserGrid = $("#questionTypeAuthUserGrid"); //用户表格对象
+			var questionTypeAuthUserQueryForm = $("#questionTypeAuthUserQueryForm"); //用户查询对象
+			var questionTypeAuthUserOrgTree = $("#questionTypeAuthUserOrgTree"); //组织机构树对象
+			var questionTypeAuthUserCurSelOrgId = ""; //当前选中的组织机构ID
+			var questionTypeAuthUserCurSelOrgName = ""; //当前选中的组织机构名称
 			
-			questionTypeAuthUserAddGrid.datagrid({
+			questionTypeAuthUserGrid.datagrid({
 				url : "",
 				columns : [[ 
 						{field : "ID", title : "", checkbox : true}, 
@@ -682,7 +727,7 @@
 						]]
 			});
 			
-			questionTypeAuthUserAddOrgTree.tree({
+			questionTypeAuthUserOrgTree.tree({
 				idFiled : "ID",
 				textFiled : "NAME",
 				parentField : "PARENT_ID",
@@ -690,25 +735,25 @@
 				checkedFiled : "CHECKED",
 			    url : "questionType/authUserOrgTreeList",
 				onSelect : function(node){
-					questionTypeAuthUserAddCurSelOrgId = node.ID;
-					questionTypeAuthUserAddCurSelOrgName = node.NAME;
+					questionTypeAuthUserCurSelOrgId = node.ID;
+					questionTypeAuthUserCurSelOrgName = node.NAME;
 					
-					$("#questionTypeAuthUserAdd_one").val(questionTypeAuthUserAddCurSelOrgId);
-					questionTypeAuthUserAddGrid.datagrid("uncheckAll");
-					questionTypeAuthUserAddGrid.datagrid("reload", $.fn.my.serializeObj(questionTypeAuthUserAddQueryForm));
+					$("#questionTypeAuthUser_one").val(questionTypeAuthUserCurSelOrgId);
+					questionTypeAuthUserGrid.datagrid("uncheckAll");
+					questionTypeAuthUserGrid.datagrid("reload", $.fn.my.serializeObj(questionTypeAuthUserQueryForm));
 				},
 				onLoadSuccess : function(node, data){
-					if(!questionTypeAuthUserAddCurSelOrgId || !questionTypeAuthUserAddGrid.datagrid("options").url){//如果是第一次
-						questionTypeAuthUserAddCurSelOrgId = 1;
-						questionTypeAuthUserAddGrid.datagrid("options").url = "questionType/authUserAddList";
+					if(!questionTypeAuthUserCurSelOrgId || !questionTypeAuthUserGrid.datagrid("options").url){//如果是第一次
+						questionTypeAuthUserCurSelOrgId = 1;
+						questionTypeAuthUserGrid.datagrid("options").url = "questionType/authUserList";
 					}
 					
-					var node = questionTypeAuthUserAddOrgTree.tree("find", questionTypeAuthUserAddCurSelOrgId);
+					var node = questionTypeAuthUserOrgTree.tree("find", questionTypeAuthUserCurSelOrgId);
 					if(!node){
-						questionTypeAuthUserAddCurSelOrgId = 1;
-						node = questionTypeAuthUserAddOrgTree.tree("find", questionTypeAuthUserAddCurSelOrgId);
+						questionTypeAuthUserCurSelOrgId = 1;
+						node = questionTypeAuthUserOrgTree.tree("find", questionTypeAuthUserCurSelOrgId);
 					}
-					questionTypeAuthUserAddOrgTree.tree("select", node.target);
+					questionTypeAuthUserOrgTree.tree("select", node.target);
 				}
 			});
 		}

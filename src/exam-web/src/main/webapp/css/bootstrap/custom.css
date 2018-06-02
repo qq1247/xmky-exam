@@ -60,3 +60,11 @@ header a:focus, a:hover {
 .examlist tbody tr span {
 	color: #0096E7;
 }
+.examlist .tree {
+	border-width: 1px;
+	border-color: rgb(221, 221, 221);
+	border-style: solid;	
+}
+.examlist .badge {
+	background-color: #428BCA;	
+}

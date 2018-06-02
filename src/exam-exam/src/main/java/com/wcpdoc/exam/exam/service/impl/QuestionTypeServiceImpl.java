@@ -261,16 +261,8 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		//添加权限机构
 		QuestionTypeAuth auth = questionTypeAuthService.getEntityByQuestionTypeId(id);
 		if(auth != null){
-			StringBuilder _orgIds = new StringBuilder();
-			if(ValidateUtil.isValid(auth.getOrgIds())){
-				_orgIds.append(auth.getOrgIds());
-			}else{
-				_orgIds.append(",");
-			}
+			StringBuilder _orgIds = new StringBuilder(",");
 			for(Integer orgId : orgIds){
-				if(_orgIds.toString().contains("," + orgId + ",")){
-					continue;
-				}
 				_orgIds.append(orgId).append(",");
 			}
 			if(_orgIds.toString().equals(",")){
@@ -322,16 +314,8 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		//添加权限机构
 		QuestionTypeAuth auth = questionTypeAuthService.getEntityByQuestionTypeId(id);
 		if(auth != null){
-			StringBuilder _postIds = new StringBuilder();
-			if(ValidateUtil.isValid(auth.getPostIds())){
-				_postIds.append(auth.getPostIds());
-			}else{
-				_postIds.append(",");
-			}
+			StringBuilder _postIds = new StringBuilder(",");
 			for(Integer postId : postIds){
-				if(_postIds.toString().contains("," + postId + ",")){
-					continue;
-				}
 				_postIds.append(postId).append(",");
 			}
 			if(_postIds.toString().equals(",")){
