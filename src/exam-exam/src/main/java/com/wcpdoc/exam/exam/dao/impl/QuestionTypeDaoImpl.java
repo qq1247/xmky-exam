@@ -88,7 +88,7 @@ public class QuestionTypeDaoImpl extends BaseDaoImpl<QuestionType> implements Qu
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "ORG.ID = ?", pageIn.getOne())
 				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.getTen()), 
-						"EXISTS (SELECT 1 FROM EXM_QUESTION_TYPE_AUTH Z WHERE Z.QUESTION_TYPE_ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", 
+						"EXISTS (SELECT 1 FROM EXM_QUESTION_TYPE_AUTH Z WHERE Z.ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", 
 						pageIn.getTen())
 //				.addWhere("USER.STATE = ?", 1)//已添加过的可以显示
 				.addWhere("USER.ID != ?", 1)//排除管理员
@@ -112,7 +112,7 @@ public class QuestionTypeDaoImpl extends BaseDaoImpl<QuestionType> implements Qu
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "ORG.ID = ?", pageIn.getOne())
 				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.getTen()), 
-						"NOT EXISTS (SELECT 1 FROM EXM_QUESTION_TYPE_AUTH Z WHERE Z.QUESTION_TYPE_ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", 
+						"NOT EXISTS (SELECT 1 FROM EXM_QUESTION_TYPE_AUTH Z WHERE Z.ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", 
 						pageIn.getTen())
 				.addWhere("USER.STATE = ?", 1)//当前正常的用户
 				.addWhere("USER.ID != ?", 1)//排除管理员
@@ -121,5 +121,11 @@ public class QuestionTypeDaoImpl extends BaseDaoImpl<QuestionType> implements Qu
 		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		return pageOut;
+	}
+
+	@Override
+	public List<QuestionType> getList() {
+		String sql = "SELECT * FROM EXM_QUESTION_TYPE WHERE STATE = 1";
+		return getList(sql, QuestionType.class);
 	}
 }

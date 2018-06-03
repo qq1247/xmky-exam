@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.sys.entity.Org;
+import com.wcpdoc.exam.sys.entity.Post;
 import com.wcpdoc.exam.sys.entity.User;
 
 /**
@@ -61,4 +62,13 @@ public interface UserDao extends BaseDao<User>{
 	 * @return List<Map<String, Object>>
 	 */
 	List<Map<String, Object>> getAuthSum(Integer id);
+
+	/**
+	 * 获取岗位列表
+	 * 
+	 * v1.0 zhanghc 2018年6月3日上午11:50:04
+	 * @param id
+	 * @return List<Post>
+	 */
+	List<Post> getPostList(Integer id);
 }

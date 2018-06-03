@@ -21,7 +21,9 @@
 				return param;
 			},
 			/**
-			 * 获取序列化属性对象
+			 * 获取序列化属性
+			 * serializeField([{ID:1,NAME:1},{ID:2,NAME:2},{ID:5,NAME:5}])
+			 * ids=1&ids=2&ids=5
 			 */
 			serializeField : function(arr, options) {
 				var defaluts = {attrName : "ids", fieldName : "ID"};

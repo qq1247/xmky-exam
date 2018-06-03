@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.exam.dao.impl;
 
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.exam.core.dao.impl.BaseDaoImpl;
@@ -22,14 +24,8 @@ public class QuestionTypeAuthDaoImpl extends BaseDaoImpl<QuestionTypeAuth> imple
 	}
 
 	@Override
-	public void delByQuestionTypeId(Integer questionTypeId) {
-		String sql = "DELETE FROM EXM_QUESTION_TYPE_AUTH WHERE QUESTION_TYPE_ID = ?";
-		update(sql, questionTypeId);
-	}
-
-	@Override
-	public QuestionTypeAuth getEntityByQuestionTypeId(Integer questionTypeId) {
-		String sql = "SELECT * FROM EXM_QUESTION_TYPE_AUTH WHERE QUESTION_TYPE_ID = ?";
-		return getUnique(sql, new Object[]{questionTypeId}, QuestionTypeAuth.class);
+	public List<QuestionTypeAuth> getList() {
+		String sql = "SELECT * FROM EXM_QUESTION_TYPE_AUTH";
+		return getList(sql, QuestionTypeAuth.class);
 	}
 }

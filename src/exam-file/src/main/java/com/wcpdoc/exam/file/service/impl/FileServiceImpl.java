@@ -154,7 +154,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 	}
 
 	@Override
-	public FileEx getEntityWithFile(Integer id) {
+	public FileEx getEntityEx(Integer id) {
 		if(id == null){
 			throw new RuntimeException("无法获取参数：id");
 		}

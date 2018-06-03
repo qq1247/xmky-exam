@@ -60,7 +60,7 @@ public class HomeController extends BaseController{
 			//完成登录
 			homeService.doIn(loginName, pwd, request);
 			
-			//跳转到首页
+			//跳转到首页。这里如果直接转向到home.jsp，页面刷新，会重复执行doIn()。
 			return "redirect:/home/pubToHome";
 		} catch (Exception e) {
 			log.error("完成登录错误：", e);
@@ -85,8 +85,8 @@ public class HomeController extends BaseController{
 	@RequestMapping("/pubToHome")
 	public String home(Model model) {
 		try {
-			List<Map<String, Object>> unFinishExamList = homeService.getUnFinishExamList(getCurrentUser().getId());
-			model.addAttribute("unFinishExamList", unFinishExamList);
+//			List<Map<String, Object>> unFinishExamList = homeService.getUnFinishExamList(getCurrentUser().getId());
+//			model.addAttribute("unFinishExamList", unFinishExamList);
 			return "/WEB-INF/jsp/home/home/home.jsp";
 		} catch (Exception e) {
 			log.error("到达首页错误：", e);

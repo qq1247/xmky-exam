@@ -450,51 +450,7 @@
 				queryParams : {id : questionTypeGridRows[0].ID},
 				maximized : true,
 				onLoad : function() {
-					var questionTypeAuthUserGrid = $("#questionTypeAuthUserGrid"); //用户表格对象
-					var questionTypeAuthUserQueryForm = $("#questionTypeAuthUserQueryForm"); //用户查询对象
-					var questionTypeAuthUserOrgTree = $("#questionTypeAuthUserOrgTree");
-					var questionTypeAuthUserCurSelOrgId = "";
-					var questionTypeAuthUserCurSelOrgName = "";
 					
-					questionTypeAuthUserGrid.datagrid({
-						url : "",
-						columns : [[ 
-								{field : "ID", title : "", checkbox : true}, 
-								{field : "USER_NAME", title : "姓名", width : 80, align : "center"}, 
-								{field : "LOGIN_NAME", title : "登录名称", width : 80, align : "center"}, 
-								{field : "ORG_NAME", title : "组织机构", width : 80, align : "center"},
-								{field : "POST_NAMES", title : "岗位", width : 80, align : "center"},
-								]]
-					});
-					
-					questionTypeAuthUserOrgTree.tree({
-						idFiled : "ID",
-						textFiled : "NAME",
-						parentField : "PARENT_ID",
-						iconClsFiled : "ICON",
-						checkedFiled : "CHECKED",
-						onSelect : function(node){
-							questionTypeAuthUserCurSelOrgId = node.ID;
-							questionTypeAuthUserCurSelOrgName = node.NAME;
-							
-							$("#questionTypeAuthUser_one").val(questionTypeAuthUserCurSelOrgId);
-							questionTypeAuthUserGrid.datagrid("uncheckAll");
-							questionTypeAuthUserGrid.datagrid("reload", $.fn.my.serializeObj(questionTypeAuthUserQueryForm));
-						},
-						onLoadSuccess : function(node, data){
-							if(!questionTypeAuthUserCurSelOrgId || !questionTypeAuthUserGrid.datagrid("options").url){//如果是第一次
-								questionTypeAuthUserCurSelOrgId = 1;
-								questionTypeAuthUserGrid.datagrid("options").url = "questionType/authUserList";
-							}
-							
-							var node = questionTypeAuthUserOrgTree.tree("find", questionTypeAuthUserCurSelOrgId);
-							if(!node){
-								questionTypeAuthUserCurSelOrgId = 1;
-								node = orgTree.tree("find", questionTypeAuthUserCurSelOrgId);
-							}
-							questionTypeAuthUserOrgTree.tree("select", node.target);
-						}
-					});
 				}
 			});
 		}

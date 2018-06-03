@@ -23,13 +23,9 @@ import com.wcpdoc.exam.core.util.DateUtil;
 public class QuestionTypeAuth {
 	@Id
 	@GeneratedValue(generator = "generator")
-	@GenericGenerator(name = "generator", strategy = "identity")
+	@GenericGenerator(name = "generator", strategy = "assigned")
 	@Column(name = "ID")
 	private Integer id;
-	@Column(name = "QUESTION_TYPE_ID")
-	private Integer questionTypeId;
-	@Column(name = "TYPE")
-	private Integer type;
 	@Column(name = "USER_IDS")
 	private String userIds;
 	@Column(name = "ORG_IDS")
@@ -47,18 +43,6 @@ public class QuestionTypeAuth {
 	}
 	public void setId(Integer id) {
 		this.id = id;
-	}
-	public Integer getQuestionTypeId() {
-		return questionTypeId;
-	}
-	public void setQuestionTypeId(Integer questionTypeId) {
-		this.questionTypeId = questionTypeId;
-	}
-	public Integer getType() {
-		return type;
-	}
-	public void setType(Integer type) {
-		this.type = type;
 	}
 	public String getUserIds() {
 		return userIds;

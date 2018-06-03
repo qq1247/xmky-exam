@@ -158,7 +158,7 @@ public class FileController extends BaseController{
 		InputStream in = null;
 		OutputStream out = null;
 		try {
-			FileEx fileEx = fileService.getEntityWithFile(id);
+			FileEx fileEx = fileService.getEntityEx(id);
 			String fileName = new String((fileEx.getEntity().getName() + "." + fileEx.getEntity().getExtName()).getBytes("UTF-8"), "ISO-8859-1");
 			response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
 			response.setContentType("application/force-download");

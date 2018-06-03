@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.wcpdoc.exam.core.service.BaseService;
 import com.wcpdoc.exam.sys.entity.Org;
+import com.wcpdoc.exam.sys.entity.Post;
 import com.wcpdoc.exam.sys.entity.User;
 /**
  * 用户服务层接口
@@ -132,4 +133,13 @@ public interface UserService extends BaseService<User>{
 	 * @return String
 	 */
 	String getEncryptPwd(String loginName, String pwd);
+
+	/**
+	 * 获取岗位列表
+	 * 
+	 * v1.0 zhanghc 2018年6月3日上午11:49:04
+	 * @param id
+	 * @return List<Post>
+	 */
+	List<Post> getPostList(Integer id);
 }

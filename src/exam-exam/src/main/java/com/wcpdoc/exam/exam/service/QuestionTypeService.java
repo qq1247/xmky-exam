@@ -121,7 +121,7 @@ public interface QuestionTypeService extends BaseService<QuestionType>{
 	 * @param questionTypeAuthId
 	 * @return QuestionTypeAuth
 	 */
-	QuestionTypeAuth getQuestionTypeAuthEntity(Integer questionTypeAuthId);
+	QuestionTypeAuth getQuestionTypeAuth(Integer questionTypeAuthId);
 
 	/**
 	 * 获取机构岗位树
@@ -141,4 +141,20 @@ public interface QuestionTypeService extends BaseService<QuestionType>{
 	 * void
 	 */
 	void doAuthPostUpdate(Integer id, Integer[] postIds, LoginUser currentUser);
+
+	/**
+	 * 获取试题分类列表
+	 * 
+	 * v1.0 zhanghc 2018年6月3日上午11:19:02
+	 * @return List<QuestionType>
+	 */
+	List<QuestionType> getList();
+
+	/**
+	 * 获取试题分类权限列表
+	 * 
+	 * v1.0 zhanghc 2018年6月3日下午1:58:08
+	 * @return List<QuestionTypeAuth>
+	 */
+	List<QuestionTypeAuth> getQuestionTypeAuthList();
 }

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
-import com.wcpdoc.exam.exam.dao.QuestionTypeAuthDao;
 import com.wcpdoc.exam.exam.entity.QuestionTypeAuth;
 import com.wcpdoc.exam.exam.service.QuestionTypeAuthService;
 
@@ -16,9 +15,10 @@ import com.wcpdoc.exam.exam.service.QuestionTypeAuthService;
  * v1.0 zhanghc 2018年5月29日下午3:20:16
  */
 @Service
+@Deprecated
 public class QuestionTypeAuthServiceImpl extends BaseServiceImp<QuestionTypeAuth> implements QuestionTypeAuthService {
-	@Resource
-	private QuestionTypeAuthDao questionTypeAuthDao;
+//	@Resource
+//	private QuestionTypeAuthDao questionTypeAuthDao;
 
 	@Override
 	@Resource(name = "questionTypeAuthDaoImpl")
@@ -26,13 +26,8 @@ public class QuestionTypeAuthServiceImpl extends BaseServiceImp<QuestionTypeAuth
 		super.dao = dao;
 	}
 
-	@Override
-	public void delByQuestionTypeId(Integer questionTypeId) {
-		questionTypeAuthDao.delByQuestionTypeId(questionTypeId);
-	}
-
-	@Override
-	public QuestionTypeAuth getEntityByQuestionTypeId(Integer questionTypeId) {
-		return questionTypeAuthDao.getEntityByQuestionTypeId(questionTypeId);
-	}
+//	@Override
+//	public List<QuestionTypeAuth> getList() {
+//		return questionTypeAuthDao.getList();
+//	}
 }

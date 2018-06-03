@@ -19,4 +19,5 @@
 
 <!-- 自定义 -->
 <link href="css/bootstrap/custom.css" rel="stylesheet">
+<script src="script/myJs/bootstrapEx.js"></script>
 <script src="script/myJs/myJs.js"></script>

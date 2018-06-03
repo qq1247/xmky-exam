@@ -398,7 +398,11 @@ public class QuestionTypeController extends BaseController{
 	public List<Map<String, Object>> authOrgOrgTreeList(Integer id) {
 		try {
 			List<Map<String, Object>> orgTreeList = questionTypeService.getOrgTreeList();
-			QuestionTypeAuth questionTypeAuth = questionTypeService.getQuestionTypeAuthEntity(id);
+			QuestionTypeAuth questionTypeAuth = questionTypeService.getQuestionTypeAuth(id);
+			if(questionTypeAuth == null){
+				return orgTreeList;
+			}
+			
 			String orgIds = questionTypeAuth.getOrgIds();
 			if(!ValidateUtil.isValid(orgIds)){
 				return orgTreeList;
@@ -428,7 +432,11 @@ public class QuestionTypeController extends BaseController{
 	public List<Map<String, Object>> authPostOrgTreeList(Integer id) {
 		try {
 			List<Map<String, Object>> orgPostTree = questionTypeService.getOrgPostTreeList();
-			QuestionTypeAuth questionTypeAuth = questionTypeService.getQuestionTypeAuthEntity(id);
+			QuestionTypeAuth questionTypeAuth = questionTypeService.getQuestionTypeAuth(id);
+			if(questionTypeAuth == null){
+				return orgPostTree;
+			}
+			
 			String postIds = questionTypeAuth.getPostIds();
 			if(!ValidateUtil.isValid(postIds)){
 				return orgPostTree;

@@ -18,7 +18,7 @@ $.fn.tree.defaults.loadFilter = function(data, parent) {
 	var iconClsFiled = opt.iconClsFiled || "iconCls";
 	var parentField = opt.parentField;
 	var list = data;
-	var TreeList = [];
+	var treeList = [];
 	var treeMap = {};
 
 	for (var i = 0; i < list.length; i++) {
@@ -38,10 +38,10 @@ $.fn.tree.defaults.loadFilter = function(data, parent) {
 			}
 			treeMap[list[i][parentField]]["children"].push(list[i]);
 		} else {
-			TreeList.push(list[i]);
+			treeList.push(list[i]);
 		}
 	}
-	return TreeList;
+	return treeList;
 };
 
 /**

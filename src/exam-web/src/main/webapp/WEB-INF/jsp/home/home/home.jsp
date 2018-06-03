@@ -1,5 +1,4 @@
 <%@ page language="java" pageEncoding="utf-8"%>
-<%@ taglib prefix="my" uri="myTag/core"%>
 <!DOCTYPE html>
 <html>
 	<head>
@@ -11,10 +10,10 @@
 		<section class="service-item" style="padding-top: 100px;">
 			<div class="container">
 				<div class="center wow fadeInDown">
-					<h2>当前考试</h2>
+					<h2>首页</h2>
 					<p class="lead"></p>
 					<div class="row">
-						<c:forEach var="unFinishExam" items="${unFinishExamList }">
+						<%-- <c:forEach var="unFinishExam" items="${unFinishExamList }">
 							<div class="col-sm-6 col-md-4">
 								<div class="media services-wrap wow fadeInDown">
 									<div class="pull-left">
@@ -28,7 +27,7 @@
 									</div>
 								</div>
 							</div>
-						</c:forEach>
+						</c:forEach> --%>
 					</div>
 				</div>
 			</div>

@@ -288,4 +288,9 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		
 		return EncryptUtil.md52Base64(loginName + pwd);
 	}
+
+	@Override
+	public List<Post> getPostList(Integer id) {
+		return userDao.getPostList(id);
+	}
 }

@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.exam.dao;
 
+import java.util.List;
+
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.exam.entity.QuestionTypeAuth;
 
@@ -11,21 +13,10 @@ import com.wcpdoc.exam.exam.entity.QuestionTypeAuth;
 public interface QuestionTypeAuthDao extends BaseDao<QuestionTypeAuth>{
 
 	/**
-	 * 删除试题分类权限
+	 * 获取试题分类权限列表
 	 * 
-	 * v1.0 zhanghc 2018年5月30日下午8:21:23
-	 * @param questionTypeId 
-	 * void
+	 * v1.0 zhanghc 2018年6月3日下午2:02:16
+	 * @return List<QuestionTypeAuth>
 	 */
-	void delByQuestionTypeId(Integer questionTypeId);
-
-	/**
-	 * 获取试题分类权限
-	 * 
-	 * v1.0 zhanghc 2018年5月30日下午8:36:40
-	 * @param questionTypeId
-	 * @return QuestionTypeAuth
-	 */
-	QuestionTypeAuth getEntityByQuestionTypeId(Integer questionTypeId);
-	
+	List<QuestionTypeAuth> getList();
 }

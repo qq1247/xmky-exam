@@ -13,6 +13,7 @@ import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.util.SqlUtil.Order;
 import com.wcpdoc.exam.sys.dao.UserDao;
 import com.wcpdoc.exam.sys.entity.Org;
+import com.wcpdoc.exam.sys.entity.Post;
 import com.wcpdoc.exam.sys.entity.User;
 
 /**
@@ -108,5 +109,14 @@ public class UserDaoImpl extends BaseDaoImpl<User> implements UserDao {
 				+ "	) RESSUM "
 				+ "GROUP BY RESSUM.AUTH_POS";
 		return getList(sql, new Object[]{id});
+	}
+
+	@Override
+	public List<Post> getPostList(Integer id) {
+		String sql = "SELECT POST.* "
+				+ "FROM SYS_POST_USER POST_USER "
+				+ "INNER JOIN SYS_POST POST ON POST_USER.POST_ID = POST.ID "
+				+ "WHERE POST.STATE = 1 AND POST_USER.USER_ID = ?";
+		return getList(sql, new Object[]{id}, Post.class);
 	}
 }

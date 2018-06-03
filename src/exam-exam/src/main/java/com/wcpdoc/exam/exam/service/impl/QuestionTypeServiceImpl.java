@@ -14,10 +14,10 @@ import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.ValidateUtil;
+import com.wcpdoc.exam.exam.dao.QuestionTypeAuthDao;
 import com.wcpdoc.exam.exam.dao.QuestionTypeDao;
 import com.wcpdoc.exam.exam.entity.QuestionType;
 import com.wcpdoc.exam.exam.entity.QuestionTypeAuth;
-import com.wcpdoc.exam.exam.service.QuestionTypeAuthService;
 import com.wcpdoc.exam.exam.service.QuestionTypeExService;
 import com.wcpdoc.exam.exam.service.QuestionTypeService;
 import com.wcpdoc.exam.sys.service.OrgService;
@@ -32,11 +32,11 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	@Resource
 	private QuestionTypeDao questionTypeDao;
 	@Resource
+	private QuestionTypeAuthDao questionTypeAuthDao;
+	@Resource
 	private QuestionTypeExService questionTypeExService;
 	@Resource
 	private OrgService orgService;
-	@Resource
-	private QuestionTypeAuthService questionTypeAuthService;
 	@Resource
 	private PostService postService;
 
@@ -193,7 +193,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		}
 		
 		//添加权限用户
-		QuestionTypeAuth auth = questionTypeAuthService.getEntityByQuestionTypeId(id);
+		QuestionTypeAuth auth = questionTypeAuthDao.getEntity(id);
 		if(auth != null){
 			StringBuilder _userIds = new StringBuilder();
 			if(ValidateUtil.isValid(auth.getUserIds())){
@@ -210,7 +210,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 			auth.setUserIds(_userIds.toString());
 			auth.setUpdateTime(new Date());
 			auth.setUpdateUserId(user.getId());
-			questionTypeAuthService.update(auth);
+			questionTypeAuthDao.update(auth);
 			return;
 		}
 		
@@ -219,10 +219,11 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		for(Integer userId : userIds){
 			_userIds.append(userId).append(",");
 		}
+		auth.setId(id);
 		auth.setUserIds(_userIds.toString());
 		auth.setUpdateTime(new Date());
 		auth.setUpdateUserId(user.getId());
-		questionTypeAuthService.save(auth);
+		questionTypeAuthDao.save(auth);
 	}
 
 	@Override
@@ -235,7 +236,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 			throw new RuntimeException("无法获取参数：userIds");
 		}
 		
-		QuestionTypeAuth questionTypeAuth = questionTypeAuthService.getEntityByQuestionTypeId(id);
+		QuestionTypeAuth questionTypeAuth = questionTypeAuthDao.getEntity(id);
 		String _userIds = questionTypeAuth.getUserIds();
 		for(Integer userId : userIds){
 			_userIds = _userIds.replaceAll("," + userId + ",", ",");//,2,4,5,55,32,32
@@ -245,7 +246,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		}
 		
 		questionTypeAuth.setUserIds(_userIds);
-		questionTypeAuthService.update(questionTypeAuth);
+		questionTypeAuthDao.update(questionTypeAuth);
 	}
 
 	@Override
@@ -259,7 +260,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 //		}
 		
 		//添加权限机构
-		QuestionTypeAuth auth = questionTypeAuthService.getEntityByQuestionTypeId(id);
+		QuestionTypeAuth auth = questionTypeAuthDao.getEntity(id);
 		if(auth != null){
 			StringBuilder _orgIds = new StringBuilder(",");
 			for(Integer orgId : orgIds){
@@ -272,7 +273,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 			}
 			auth.setUpdateTime(new Date());
 			auth.setUpdateUserId(user.getId());
-			questionTypeAuthService.update(auth);
+			questionTypeAuthDao.update(auth);
 			return;
 		}
 		
@@ -286,14 +287,15 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		}else{
 			auth.setOrgIds(_orgIds.toString());
 		}
+		auth.setId(id);
 		auth.setUpdateTime(new Date());
 		auth.setUpdateUserId(user.getId());
-		questionTypeAuthService.save(auth);
+		questionTypeAuthDao.save(auth);
 	}
 
 	@Override
-	public QuestionTypeAuth getQuestionTypeAuthEntity(Integer questionTypeAuthId) {
-		return questionTypeAuthService.getEntityByQuestionTypeId(questionTypeAuthId);
+	public QuestionTypeAuth getQuestionTypeAuth(Integer questionTypeAuthId) {
+		return questionTypeAuthDao.getEntity(questionTypeAuthId);
 	}
 
 	@Override
@@ -312,7 +314,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 //		}
 		
 		//添加权限机构
-		QuestionTypeAuth auth = questionTypeAuthService.getEntityByQuestionTypeId(id);
+		QuestionTypeAuth auth = questionTypeAuthDao.getEntity(id);
 		if(auth != null){
 			StringBuilder _postIds = new StringBuilder(",");
 			for(Integer postId : postIds){
@@ -325,7 +327,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 			}
 			auth.setUpdateTime(new Date());
 			auth.setUpdateUserId(user.getId());
-			questionTypeAuthService.update(auth);
+			questionTypeAuthDao.update(auth);
 			return;
 		}
 		
@@ -339,8 +341,19 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		}else{
 			auth.setPostIds(_postIds.toString());
 		}
+		auth.setId(id);
 		auth.setUpdateTime(new Date());
 		auth.setUpdateUserId(user.getId());
-		questionTypeAuthService.save(auth);
+		questionTypeAuthDao.save(auth);
+	}
+
+	@Override
+	public List<QuestionType> getList() {
+		return questionTypeDao.getList();
+	}
+
+	@Override
+	public List<QuestionTypeAuth> getQuestionTypeAuthList() {
+		return questionTypeAuthDao.getList();
 	}
 }
