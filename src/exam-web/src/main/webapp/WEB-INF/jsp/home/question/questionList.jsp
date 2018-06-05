@@ -80,17 +80,31 @@
 							</table>
 						</div>
 					</div>
+					<form class="form-horizontal" role="form">
+						<div class="row">
+							<div class="col-md-6">
+								<div class="form-group">
+									<label for="firstname" class="col-md-2 control-label">名字</label>
+									<div class="col-md-10">
+										<input type="text" class="form-control" id="firstname"
+											placeholder="请输入名字" style="width: 200px;">
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<label for="lastname" class="col-md-2 control-label">姓</label>
+									<div class="col-md-10">
+										<input type="text" class="form-control" id="lastname"
+											placeholder="请输入姓" style="width: 200px;">
+									</div>
+								</div>
+							</div>
+						</div>
+					</form>
 				</div>
 			</div>
 		</div>
-		<form role="form" class="form-horizontal">
-			<div class="form-group">
-				<div class="row">
-					<div class="form-group"> <label for="name">名称</label> <input type="text" class="form-control" id="name" placeholder="请输入名称"> </div>
-					<div class="form-group"> <label for="name">名称</label> <input type="text" class="form-control" id="name" placeholder="请输入名称"> </div>
-				</div>
-			</div>
-		</form>
 	</body>
 	<script type="text/javascript">
 		//定义变量
@@ -111,7 +125,7 @@
 						expandIcon: "glyphicon glyphicon-chevron-right",
 						collapseIcon: "glyphicon glyphicon-chevron-down",
 						nodeIcon: "glyphicon glyphicon-bookmark",
-						color: "#0196E6",
+						color: "#605F5F",
 						showTags: true, 
 						levels: 3,
 						data: generateTree(arr, {
@@ -121,7 +135,7 @@
 							parentField : "PARENT_ID"
 						}),
 						onNodeSelected : function(event, data) {
-							console.info(data.ID);
+							
 						}
 					});
 				}
