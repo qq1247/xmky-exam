@@ -17,6 +17,12 @@
 <link href="script/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 <script src="script/bootstrap/js/bootstrap.min.js"></script>
 
+<!-- bootstrap treeview -->
+<script src="script/bootstrapTreeview/bootstrap-treeview.min.js"></script>
+
+<!-- bootstrap bootbox -->
+<script src="script/bootstrapBootbox/bootbox.min.js"></script>
+
 <!-- 自定义 -->
 <link href="css/bootstrap/custom.css" rel="stylesheet">
 <script src="script/myJs/bootstrapEx.js"></script>

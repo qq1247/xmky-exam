@@ -4,14 +4,16 @@
 	<head>
 		<title>试题列表</title>
 		<%@include file="/script/home/common.jspf"%>
-		<script src="script/bootstrapTreeview/bootstrap-treeview.min.js"></script>
 	</head>
 	<body>
 		<%@include file="/script/home/head.jspf"%>
-		<div class="headerplus">
+		<div class="examlist">
 			<div class="container">
 				<div class="row">
-					<div class="col-md-12">
+					<div class="col-md-3">
+						<div id="questionTypeTree" class="tree"></div>
+					</div>
+					<div class="col-md-9">
 						<form class="form-inline query" role="form">
 							<div class="form-group">
 								<label class="sr-only" for="name">名称</label>
@@ -25,23 +27,13 @@
 								</button>
 							</div>
 							<div class="form-group pull-right">
-								<button type="button" class="btn btn-primary">
+								<button type="button" class="btn btn-primary" onclick="toQuestionAdd()">
 									<span class="glyphicon glyphicon-plus"></span>
 									&nbsp;添加
 								</button>
 							</div>
 						</form>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="examlist">
-			<div class="container">
-				<div class="row">
-					<div class="col-md-3">
-						<div id="questionTypeTree" class="tree"></div>
-					</div>
-					<div class="col-md-9">
+						<div style="height: 30px;"></div>
 						<div class="table-responsive">
 							<table class="table">
 								<thead>
@@ -80,28 +72,6 @@
 							</table>
 						</div>
 					</div>
-					<form class="form-horizontal" role="form">
-						<div class="row">
-							<div class="col-md-6">
-								<div class="form-group">
-									<label for="firstname" class="col-md-2 control-label">名字</label>
-									<div class="col-md-10">
-										<input type="text" class="form-control" id="firstname"
-											placeholder="请输入名字" style="width: 200px;">
-									</div>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label for="lastname" class="col-md-2 control-label">姓</label>
-									<div class="col-md-10">
-										<input type="text" class="form-control" id="lastname"
-											placeholder="请输入姓" style="width: 200px;">
-									</div>
-								</div>
-							</div>
-						</div>
-					</form>
 				</div>
 			</div>
 		</div>
@@ -131,8 +101,9 @@
 						data: generateTree(arr, {
 							idFiled : "ID",
 							textFiled : "NAME", 
+							parentField : "PARENT_ID",
 							disabledFiled : "DISABLED",
-							parentField : "PARENT_ID"
+							expandedFiled : "EXPANDED"
 						}),
 						onNodeSelected : function(event, data) {
 							
@@ -140,6 +111,20 @@
 					});
 				}
 			});
+		}
+		
+		function toQuestionAdd(){
+			var nodes = questionTypeTree.treeview("getSelected");
+			if(nodes.length == 0){
+				bootbox.alert({ 
+					size: "small",
+					title: "提示消息",
+					message: "请选择左侧试题分类！"
+				})
+				return;
+			}
+			
+			window.location.href = "home/question/toAdd?questionTypeId=" + nodes[0].ID;
 		}
 	</script>
 </html>

@@ -26,9 +26,13 @@ public class QuestionTypeDaoImpl extends BaseDaoImpl<QuestionType> implements Qu
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT QUESTION_TYPE.ID, QUESTION_TYPE.NAME, QUESTION_TYPE.PARENT_ID, "
 				+ "QUESTION_TYPE.PARENT_SUB, PARENT_QUESTION_TYPE.NAME AS PARENT_NAME, "
-				+ "QUESTION_TYPE.NO "
+				+ "QUESTION_TYPE.NO, "
+				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_USER _A WHERE QUESTION_TYPE_AUTH.USER_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS USER_NAMES, "
+				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_ORG _A WHERE QUESTION_TYPE_AUTH.ORG_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS ORG_NAMES, "
+				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_POST _A WHERE QUESTION_TYPE_AUTH.POST_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS POST_NAMES "
 				+ "FROM EXM_QUESTION_TYPE QUESTION_TYPE "
-				+ "LEFT JOIN EXM_QUESTION_TYPE PARENT_QUESTION_TYPE ON QUESTION_TYPE.PARENT_ID = PARENT_QUESTION_TYPE.ID";
+				+ "LEFT JOIN EXM_QUESTION_TYPE PARENT_QUESTION_TYPE ON QUESTION_TYPE.PARENT_ID = PARENT_QUESTION_TYPE.ID "
+				+ "LEFT JOIN EXM_QUESTION_TYPE_AUTH QUESTION_TYPE_AUTH ON QUESTION_TYPE.ID = QUESTION_TYPE_AUTH.ID";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "QUESTION_TYPE.PARENT_ID = ?", pageIn.getOne())//如果查询的是根目录，则查询所有。否则查询选中机构的子机构
 				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "QUESTION_TYPE.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
@@ -127,5 +131,11 @@ public class QuestionTypeDaoImpl extends BaseDaoImpl<QuestionType> implements Qu
 	public List<QuestionType> getList() {
 		String sql = "SELECT * FROM EXM_QUESTION_TYPE WHERE STATE = 1";
 		return getList(sql, QuestionType.class);
+	}
+
+	@Override
+	public List<QuestionType> getList(Integer parentId) {
+		String sql = "SELECT * FROM EXM_QUESTION_TYPE WHERE STATE = 1 AND PARENT_ID = ?";
+		return getList(sql, new Object[]{parentId}, QuestionType.class);
 	}
 }

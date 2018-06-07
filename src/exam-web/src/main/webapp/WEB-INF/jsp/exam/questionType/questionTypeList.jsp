@@ -75,7 +75,10 @@
 						{field : "ID", title : "", checkbox : true}, 
 						{field : "NAME", title : "名称", width : 80, align : "center"},
 						{field : "PARENT_NAME", title : "上级试题分类 ", width : 80, align : "center"},
-						{field : "NO", title : "排序 ", width : 80, align : "center"}
+						{field : "NO", title : "排序 ", width : 80, align : "center"},
+						{field : "USER_NAMES", title : "用户权限 ", width : 80, align : "center"},
+						{field : "ORG_NAMES", title : "机构权限 ", width : 80, align : "center"},
+						{field : "POST_NAMES", title : "岗位权限  ", width : 80, align : "center"}
 						]]
 			});
 		}
@@ -603,20 +606,23 @@
 					return;
 				}
 				
-				$.messager.progress();
-				$.ajax({
-					url : "questionType/doAuthUserAdd",
-					data : params,
-					success : function(obj){
-						$("#questionTypeAuthUserGrid").datagrid("reload");
-						$.messager.progress("close");
-						
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
-							return;
+				$.messager.confirm("确认消息", "同步到子【试题分类】？", function(ok) {
+					params += "&syn2Sub=" + ok;
+					$.messager.progress();
+					$.ajax({
+						url : "questionType/doAuthUserAdd",
+						data : params,
+						success : function(obj){
+							$("#questionTypeAuthUserGrid").datagrid("reload");
+							$.messager.progress("close");
+							
+							if(!obj.success){
+								parent.$.messager.alert("提示消息", obj.message, "info");
+								return;
+							}
+							questionTypeAuthUserAddListDialog.dialog("close");
 						}
-						questionTypeAuthUserAddListDialog.dialog("close");
-					}
+					});
 				});
 			});
 		}
@@ -635,20 +641,22 @@
 				if (!ok) {
 					return;
 				}
-				
-				$.messager.progress();
-				$.ajax({
-					url : "questionType/doAuthUserDel",
-					data : params,
-					success : function(obj){
-						$("#questionTypeAuthUserGrid").datagrid("reload");
-						$.messager.progress("close");
-						
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
-							return;
+				$.messager.confirm("确认消息", "同步到子【试题分类】？", function(ok) {
+					params += "&syn2Sub=" + ok;
+					$.messager.progress();
+					$.ajax({
+						url : "questionType/doAuthUserDel",
+						data : params,
+						success : function(obj){
+							$("#questionTypeAuthUserGrid").datagrid("reload");
+							$.messager.progress("close");
+							
+							if(!obj.success){
+								parent.$.messager.alert("提示消息", obj.message, "info");
+								return;
+							}
 						}
-					}
+					});
 				});
 			});
 		}
@@ -805,19 +813,23 @@
 					return;
 				}
 
-				$.messager.progress();
-				$.ajax({
-					url : "questionType/doAuthOrgUpdate",
-					data : params,
-					success : function(obj){
-						orgTree.tree("reload");
-						$.messager.progress("close");
-						
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
-							return;
+				$.messager.confirm("确认消息", "同步到子【试题分类】？", function(ok) {
+					params += "&syn2Sub=" + ok;
+					
+					$.messager.progress();
+					$.ajax({
+						url : "questionType/doAuthOrgUpdate",
+						data : params,
+						success : function(obj){
+							orgTree.tree("reload");
+							$.messager.progress("close");
+							
+							if(!obj.success){
+								parent.$.messager.alert("提示消息", obj.message, "info");
+								return;
+							}
 						}
-					}
+					});
 				});
 			});
 		}
@@ -840,19 +852,23 @@
 					return;
 				}
 
-				$.messager.progress();
-				$.ajax({
-					url : "questionType/doAuthPostUpdate",
-					data : params,
-					success : function(obj){
-						orgPostTree.tree("reload");
-						$.messager.progress("close");
-						
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
-							return;
+				$.messager.confirm("确认消息", "同步到子【试题分类】？", function(ok) {
+					params += "&syn2Sub=" + ok;
+					
+					$.messager.progress();
+					$.ajax({
+						url : "questionType/doAuthPostUpdate",
+						data : params,
+						success : function(obj){
+							orgPostTree.tree("reload");
+							$.messager.progress("close");
+							
+							if(!obj.success){
+								parent.$.messager.alert("提示消息", obj.message, "info");
+								return;
+							}
 						}
-					}
+					});
 				});
 			});
 		}

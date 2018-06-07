@@ -56,11 +56,11 @@ public class HomeQuestionServiceImpl extends BaseServiceImp<Object> implements H
 			map.put("ID", questionType.getId());
 			map.put("NAME", questionType.getName());
 			map.put("PARENT_ID", questionType.getParentId());
-			map.put("DISABLED", false);
-			questionTypeTreeList.add(map);
+			//map.put("DISABLED", true);
+			//map.put("EXPANDED", true);
 			
 			if(userId == 1){//如果是系统管理员
-				map.put("DISABLED", true);
+				questionTypeTreeList.add(map);
 				continue;
 			}
 			
@@ -71,19 +71,19 @@ public class HomeQuestionServiceImpl extends BaseServiceImp<Object> implements H
 			
 			if(questionTypeAuth.getUserIds() != null 
 					&& questionTypeAuth.getUserIds().contains(userId.toString())){//有用户权限
-				map.put("DISABLED", true);
+				questionTypeTreeList.add(map);
 				continue;
 			}
 			if(questionTypeAuth.getOrgIds() != null 
 					&& questionTypeAuth.getOrgIds().contains(org.getId().toString())){//有机构权限
-				map.put("DISABLED", true);
+				questionTypeTreeList.add(map);
 				continue;
 			}
 			
 			for(Post post : postList){
 				if(questionTypeAuth.getPostIds() != null 
 						&& questionTypeAuth.getPostIds().contains(post.getId().toString())){//有岗位权限
-					map.put("DISABLED", true);
+					questionTypeTreeList.add(map);
 					break;
 				}
 			}

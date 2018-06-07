@@ -183,7 +183,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	}
 
 	@Override
-	public void doAuthUserAdd(Integer id, Integer[] userIds, LoginUser user) {
+	public void doAuthUserAdd(Integer id, Integer[] userIds, boolean syn2Sub, LoginUser user) {
 		//校验数据有效性
 		if(id == null){
 			throw new RuntimeException("无法获取参数：id");
@@ -193,6 +193,13 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		}
 		
 		//添加权限用户
+		if(syn2Sub){
+			List<QuestionType> questionTypeList = getList(id);
+			for(QuestionType questionType : questionTypeList){
+				doAuthUserAdd(questionType.getId(), userIds, syn2Sub, user);
+			}
+		}
+		
 		QuestionTypeAuth auth = questionTypeAuthDao.getEntity(id);
 		if(auth != null){
 			StringBuilder _userIds = new StringBuilder();
@@ -226,8 +233,12 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		questionTypeAuthDao.save(auth);
 	}
 
+	private List<QuestionType> getList(Integer id) {
+		return questionTypeDao.getList(id);
+	}
+
 	@Override
-	public void doAuthUserDel(Integer id, Integer[] userIds, LoginUser user) {
+	public void doAuthUserDel(Integer id, Integer[] userIds, boolean syn2Sub, LoginUser user) {
 		//校验数据有效性
 		if(id == null){
 			throw new RuntimeException("无法获取参数：id");
@@ -236,10 +247,24 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 			throw new RuntimeException("无法获取参数：userIds");
 		}
 		
+		if(syn2Sub){
+			List<QuestionType> questionTypeList = getList(id);
+			for(QuestionType questionType : questionTypeList){
+				doAuthUserDel(questionType.getId(), userIds, syn2Sub, user);
+			}
+		}
+		
 		QuestionTypeAuth questionTypeAuth = questionTypeAuthDao.getEntity(id);
+		if(questionTypeAuth == null){
+			return;
+		}
+		
 		String _userIds = questionTypeAuth.getUserIds();
+		if(!ValidateUtil.isValid(_userIds)){
+			return;
+		}
 		for(Integer userId : userIds){
-			_userIds = _userIds.replaceAll("," + userId + ",", ",");//,2,4,5,55,32,32
+			_userIds = _userIds.replaceAll("," + userId + ",", ",");//,2,4,5,55,32,32,
 		}
 		if(_userIds.equals(",")){
 			_userIds = null;
@@ -250,7 +275,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	}
 
 	@Override
-	public void doAuthOrgUpdate(Integer id, Integer[] orgIds, LoginUser user) {
+	public void doAuthOrgUpdate(Integer id, Integer[] orgIds, boolean syn2Sub, LoginUser user) {
 		//校验数据有效性
 		if(id == null){
 			throw new RuntimeException("无法获取参数：id");
@@ -260,6 +285,13 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 //		}
 		
 		//添加权限机构
+		if(syn2Sub){
+			List<QuestionType> questionTypeList = getList(id);
+			for(QuestionType questionType : questionTypeList){
+				doAuthOrgUpdate(questionType.getId(), orgIds, syn2Sub, user);
+			}
+		}
+		
 		QuestionTypeAuth auth = questionTypeAuthDao.getEntity(id);
 		if(auth != null){
 			StringBuilder _orgIds = new StringBuilder(",");
@@ -304,7 +336,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	}
 
 	@Override
-	public void doAuthPostUpdate(Integer id, Integer[] postIds, LoginUser user) {
+	public void doAuthPostUpdate(Integer id, Integer[] postIds, boolean syn2Sub, LoginUser user) {
 		//校验数据有效性
 		if(id == null){
 			throw new RuntimeException("无法获取参数：id");
@@ -314,6 +346,13 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 //		}
 		
 		//添加权限机构
+		if(syn2Sub){
+			List<QuestionType> questionTypeList = getList(id);
+			for(QuestionType questionType : questionTypeList){
+				doAuthPostUpdate(questionType.getId(), postIds, syn2Sub, user);
+			}
+		}
+		
 		QuestionTypeAuth auth = questionTypeAuthDao.getEntity(id);
 		if(auth != null){
 			StringBuilder _postIds = new StringBuilder(",");

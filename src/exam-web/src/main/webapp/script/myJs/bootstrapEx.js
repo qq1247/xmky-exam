@@ -2,8 +2,9 @@ function generateTree(arr, options) {
 	var defaluts = {
 		idFiled : "id",
 		textFiled : "text", 
+		parentField : "parent",
 		disabledFiled : "disabled",
-		parentField : "parent"
+		expandedFiled : "expanded",
 	};
 	var opts = $.extend({}, defaluts, options);
 	var treeMap = {};
@@ -11,9 +12,9 @@ function generateTree(arr, options) {
 	for (var i = 0; i < arr.length; i++) {
 		arr[i]["id"] = arr[i][opts.idFiled];
 		arr[i]["text"] = arr[i][opts.textFiled];
-		if(!arr[i][opts.disabledFiled]){
-			arr[i]["state"] = {disabled : true};
-		}
+		arr[i]["state"] = {};
+		arr[i]["state"]["disabled"] = arr[i][opts.disabledFiled];
+		arr[i]["state"]["expanded"] = arr[i][opts.expandedFiled];
 		
 		treeMap[arr[i]["id"]] = arr[i];
 	}

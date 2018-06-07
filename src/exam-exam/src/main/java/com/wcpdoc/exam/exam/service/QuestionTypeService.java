@@ -88,10 +88,11 @@ public interface QuestionTypeService extends BaseService<QuestionType>{
 	 * v1.0 zhanghc 2018年5月30日下午7:08:26
 	 * @param id
 	 * @param userIds
+	 * @param syn2Sub 
 	 * @param user
 	 * void
 	 */
-	void doAuthUserAdd(Integer id, Integer[] userIds, LoginUser user);
+	void doAuthUserAdd(Integer id, Integer[] userIds, boolean syn2Sub, LoginUser user);
 
 	/**
 	 * 完成删除权限用户
@@ -99,10 +100,11 @@ public interface QuestionTypeService extends BaseService<QuestionType>{
 	 * v1.0 zhanghc 2018年5月30日下午7:08:01
 	 * @param id 
 	 * @param userIds 
+	 * @param syn2Sub 
 	 * @param user 
 	 * void
 	 */
-	void doAuthUserDel(Integer id, Integer[] userIds, LoginUser user);
+	void doAuthUserDel(Integer id, Integer[] userIds, boolean syn2Sub, LoginUser user);
 
 	/**
 	 * 完成保存权限机构
@@ -110,9 +112,10 @@ public interface QuestionTypeService extends BaseService<QuestionType>{
 	 * v1.0 zhanghc 2018年5月31日下午9:45:51
 	 * @param id
 	 * @param orgIds
+	 * @param syn2Sub 
 	 * @param currentUser void
 	 */
-	void doAuthOrgUpdate(Integer id, Integer[] orgIds, LoginUser user);
+	void doAuthOrgUpdate(Integer id, Integer[] orgIds, boolean syn2Sub, LoginUser user);
 
 	/**
 	 * 获取权限
@@ -137,10 +140,11 @@ public interface QuestionTypeService extends BaseService<QuestionType>{
 	 * v1.0 zhanghc 2018年6月1日下午12:20:02
 	 * @param id
 	 * @param postIds
-	 * @param currentUser 
+	 * @param syn2Sub 
+	 * @param user 
 	 * void
 	 */
-	void doAuthPostUpdate(Integer id, Integer[] postIds, LoginUser currentUser);
+	void doAuthPostUpdate(Integer id, Integer[] postIds, boolean syn2Sub, LoginUser user);
 
 	/**
 	 * 获取试题分类列表

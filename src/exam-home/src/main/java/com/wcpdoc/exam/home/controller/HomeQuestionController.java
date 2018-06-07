@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.home.service.HomeQuestionService;
+import com.wcpdoc.exam.sys.cache.DictCache;
 
 /**
  * 试题控制层
@@ -61,6 +62,27 @@ public class HomeQuestionController extends BaseController{
 		} catch (Exception e) {
 			log.error("获取试题分类树错误：", e);
 			return new ArrayList<Map<String,Object>>();
+		}
+	}
+	
+	/**
+	 * 到达添加试题页面
+	 * 
+	 * v1.0 zhanghc 2018年6月7日下午9:30:03
+	 * @param model
+	 * @return String
+	 */
+	@RequestMapping("/toAdd")
+	public String toAdd(Model model, Integer questionTypeId) {
+		try {
+			model.addAttribute("questionTypeId", questionTypeId);
+			model.addAttribute("QUESTION_TYPE_DICT", DictCache.getIndexDictlistMap().get("QUESTION_TYPE"));
+			model.addAttribute("QUESTION_DIFFICULTY_DICT", DictCache.getIndexDictlistMap().get("QUESTION_DIFFICULTY"));
+			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
+			return "/WEB-INF/jsp/home/question/questionEdit.jsp";
+		} catch (Exception e) {
+			log.error("到达添加试题页面错误：", e);
+			return "/WEB-INF/jsp/home/question/questionEdit.jsp";
 		}
 	}
 }

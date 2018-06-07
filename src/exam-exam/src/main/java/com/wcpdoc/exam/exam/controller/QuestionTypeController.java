@@ -334,13 +334,14 @@ public class QuestionTypeController extends BaseController{
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param id
 	 * @param userids
+	 * @param syn2Sub
 	 * @return PageResult
 	 */
 	@RequestMapping("/doAuthUserAdd")
 	@ResponseBody
-	public PageResult doAuthUserAdd(Integer id, Integer[] userIds) {
+	public PageResult doAuthUserAdd(Integer id, Integer[] userIds, boolean syn2Sub) {
 		try {
-			questionTypeService.doAuthUserAdd(id, userIds, getCurrentUser());
+			questionTypeService.doAuthUserAdd(id, userIds, syn2Sub, getCurrentUser());
 			return new PageResult(true, "添加成功");
 		} catch (Exception e) {
 			log.error("完成添加权限用户错误：", e);
@@ -352,14 +353,16 @@ public class QuestionTypeController extends BaseController{
 	 * 完成删除权限用户
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
-	 * @param examUserIds
+	 * @param id
+	 * @param userIds
+	 * @param syn2Sub
 	 * @return PageResult
 	 */
 	@RequestMapping("/doAuthUserDel")
 	@ResponseBody
-	public PageResult doAuthUserDel(Integer id, Integer[] userIds) {
+	public PageResult doAuthUserDel(Integer id, Integer[] userIds, boolean syn2Sub) {
 		try {
-			questionTypeService.doAuthUserDel(id, userIds, getCurrentUser());
+			questionTypeService.doAuthUserDel(id, userIds, syn2Sub, getCurrentUser());
 			return new PageResult(true, "删除成功");
 		} catch (Exception e) {
 			log.error("完成删除权限用户错误：", e);
@@ -373,13 +376,14 @@ public class QuestionTypeController extends BaseController{
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param id
 	 * @param orgIds
+	 * @param syn2Sub
 	 * @return PageResult
 	 */
 	@RequestMapping("/doAuthOrgUpdate")
 	@ResponseBody
-	public PageResult doAuthOrgUpdate(Integer id, Integer[] orgIds) {
+	public PageResult doAuthOrgUpdate(Integer id, Integer[] orgIds, boolean syn2Sub) {
 		try {
-			questionTypeService.doAuthOrgUpdate(id, orgIds, getCurrentUser());
+			questionTypeService.doAuthOrgUpdate(id, orgIds, syn2Sub, getCurrentUser());
 			return new PageResult(true, "保存成功");
 		} catch (Exception e) {
 			log.error("完成保存权限机构错误：", e);
@@ -467,13 +471,14 @@ public class QuestionTypeController extends BaseController{
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param id
 	 * @param orgIds
+	 * @param syn2Sub
 	 * @return PageResult
 	 */
 	@RequestMapping("/doAuthPostUpdate")
 	@ResponseBody
-	public PageResult doAuthPostUpdate(Integer id, Integer[] postIds) {
+	public PageResult doAuthPostUpdate(Integer id, Integer[] postIds, boolean syn2Sub) {
 		try {
-			questionTypeService.doAuthPostUpdate(id, postIds, getCurrentUser());
+			questionTypeService.doAuthPostUpdate(id, postIds, syn2Sub, getCurrentUser());
 			return new PageResult(true, "保存成功");
 		} catch (Exception e) {
 			log.error("完成保存权限岗位错误：", e);

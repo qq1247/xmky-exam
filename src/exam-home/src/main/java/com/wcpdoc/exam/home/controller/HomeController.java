@@ -2,8 +2,6 @@ package com.wcpdoc.exam.home.controller;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
