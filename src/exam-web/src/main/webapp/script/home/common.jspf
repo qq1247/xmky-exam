@@ -23,6 +23,9 @@
 <!-- bootstrap bootbox -->
 <script src="script/bootstrapBootbox/bootbox.min.js"></script>
 
+<!-- ckeditor -->
+<script type="text/javascript" src="script/ckeditor/ckeditor.js"></script>
+
 <!-- 自定义 -->
 <link href="css/bootstrap/custom.css" rel="stylesheet">
 <script src="script/myJs/bootstrapEx.js"></script>

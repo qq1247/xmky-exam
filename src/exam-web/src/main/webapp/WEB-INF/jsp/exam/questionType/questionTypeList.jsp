@@ -614,6 +614,7 @@
 						data : params,
 						success : function(obj){
 							$("#questionTypeAuthUserGrid").datagrid("reload");
+							questionTypeTree.tree("reload");
 							$.messager.progress("close");
 							
 							if(!obj.success){
@@ -649,6 +650,7 @@
 						data : params,
 						success : function(obj){
 							$("#questionTypeAuthUserGrid").datagrid("reload");
+							questionTypeTree.tree("reload");
 							$.messager.progress("close");
 							
 							if(!obj.success){
@@ -822,6 +824,7 @@
 						data : params,
 						success : function(obj){
 							orgTree.tree("reload");
+							questionTypeTree.tree("reload");
 							$.messager.progress("close");
 							
 							if(!obj.success){
@@ -861,6 +864,7 @@
 						data : params,
 						success : function(obj){
 							orgPostTree.tree("reload");
+							questionTypeTree.tree("reload");
 							$.messager.progress("close");
 							
 							if(!obj.success){
