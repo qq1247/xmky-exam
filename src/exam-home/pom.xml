@@ -30,6 +30,12 @@
 			<artifactId>exam-core</artifactId>
 			<version>1.0</version>
 		</dependency>
+		<!-- 集成exam-file -->
+		<dependency>
+			<groupId>com.wcpdoc.exam</groupId>
+			<artifactId>exam-file</artifactId>
+			<version>1.0</version>
+		</dependency>
 		<!-- 集成exam-exam -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>

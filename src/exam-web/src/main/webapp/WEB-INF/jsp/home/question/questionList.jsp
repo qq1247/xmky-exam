@@ -113,18 +113,15 @@
 			});
 		}
 		
+		//到达添加试题页面
 		function toQuestionAdd(){
+			var questionTypeId = "";
 			var nodes = questionTypeTree.treeview("getSelected");
-			if(nodes.length == 0){
-				bootbox.alert({ 
-					size: "small",
-					title: "提示消息",
-					message: "请选择左侧试题分类！"
-				})
-				return;
+			if(nodes.length == 1){
+				questionTypeId = nodes[0].ID;
 			}
 			
-			window.location.href = "home/question/toAdd?questionTypeId=" + nodes[0].ID;
+			window.location.href = "home/question/toAdd?questionTypeId=" + questionTypeId;
 		}
 	</script>
 </html>

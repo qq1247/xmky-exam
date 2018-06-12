@@ -8,12 +8,16 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.wcpdoc.exam.core.dao.BaseDao;
+import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.exam.entity.QuestionType;
 import com.wcpdoc.exam.exam.entity.QuestionTypeAuth;
 import com.wcpdoc.exam.exam.service.QuestionTypeService;
+import com.wcpdoc.exam.file.entity.FileEx;
+import com.wcpdoc.exam.file.service.FileService;
 import com.wcpdoc.exam.home.service.HomeQuestionService;
 import com.wcpdoc.exam.sys.entity.Org;
 import com.wcpdoc.exam.sys.entity.Post;
@@ -30,6 +34,8 @@ public class HomeQuestionServiceImpl extends BaseServiceImp<Object> implements H
 	private QuestionTypeService questionTypeService;
 	@Resource
 	private UserService userService;
+	@Resource
+	private FileService fileService;
 
 	@Override
 	public void setDao(BaseDao<Object> dao) {
@@ -90,5 +96,20 @@ public class HomeQuestionServiceImpl extends BaseServiceImp<Object> implements H
 		}
 		
 		return questionTypeTreeList;
+	}
+
+	@Override
+	public String doTempUpload(MultipartFile[] files, String[] allowTypes, LoginUser user, String ip) {
+		return fileService.doTempUpload(files, allowTypes, user, ip);
+	}
+
+	@Override
+	public void doUpload(Integer id, LoginUser user, String ip) throws Exception {
+		fileService.doUpload(id, user, ip);
+	}
+
+	@Override
+	public FileEx getFileEx(Integer fileId) {
+		return fileService.getEntityEx(fileId);
 	}
 }

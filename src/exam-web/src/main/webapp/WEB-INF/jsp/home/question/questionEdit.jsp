@@ -97,7 +97,7 @@
 	<script type="text/javascript">
 		//定义变量
 		var questionTypeTree = $("#questionTypeTree");
-		var questionTypeId = ${questionTypeId};
+		var questionTypeId = "${questionTypeId}";
 		var question_questionTypeId = $("#question_questionTypeId");
 		var question_questionTypeName = $("#question_questionTypeName");
 		
@@ -105,6 +105,7 @@
 		$(function() {
 			initQuestionTypeTree();
 			CKEDITOR.replace("question_title", {
+				filebrowserImageUploadUrl: "home/question/doTempUpload",
 				customConfig: "<%=basePath%>/script/myJs/ckeditorEx.js",
 				height: 80
 			});
@@ -136,7 +137,9 @@
 						}
 					});
 
-					questionTypeTree.treeview("selectNode", [ questionTypeId]);
+					if(questionTypeId){
+						questionTypeTree.treeview("selectNode", [ parseInt(questionTypeId)]);
+					}
 				}
 			});
 		}
