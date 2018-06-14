@@ -1,8 +1,8 @@
 package com.wcpdoc.exam.home.controller;
 
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -109,20 +109,21 @@ public class HomeQuestionController extends BaseController {
 	 * @return PageResult
 	 */
 	@RequestMapping("/doTempUpload")
-	public void doTempUpload(@RequestParam("upload") MultipartFile[] files) {
+	@ResponseBody
+	public Map<String, Object> doTempUpload(@RequestParam("files") MultipartFile[] files) {
+		Map<String, Object> data = new HashMap<String, Object>();
 		try {
-			String[] allowTypes = { "JPG", "JPG", "gif", "GIF", "png", "PNG"};
+			String[] allowTypes = { "jpg", "gif", "png", "mp4", "JPG", "GIF", "PNG", "MP4"};
 			String fileIds = homeQuestionService.doTempUpload(files, allowTypes, getCurrentUser(), request.getRemoteAddr());
-			response.setContentType("text/html;charset=UTF-8");
-			PrintWriter out = response.getWriter();
-			String callback = request.getParameter("CKEditorFuncNum");
-			out.println("<script type=\"text/javascript\">");
-			out.println("	window.parent.CKEDITOR.tools.callFunction("+callback+", \"home/question/doDownload?id=" + fileIds + "\")");
-			out.println("</script>");
-			out.flush();
-			out.close();
+			data.put("fileIds", fileIds);
+			data.put("error", 0);
+			data.put("url", "doDownload?fileId=" + fileIds);
+			return data;
 		} catch (Exception e) {
 			log.error("完成临时上传附件失败：", e);
+			data.put("error", 1);
+			data.put("url", e.getMessage());
+			return data;
 		}
 	}
 	
@@ -135,10 +136,10 @@ public class HomeQuestionController extends BaseController {
 	 */
 	@RequestMapping("/doUpload")
 	@ResponseBody
-	public PageResult doUpload(Integer[] ids) {
+	public PageResult doUpload(Integer[] fileIds) {
 		StringBuilder message = new StringBuilder();
 		try {
-			for (Integer id : ids) {
+			for (Integer id : fileIds) {
 				try {
 					if (id == null) {
 						continue;
@@ -165,14 +166,14 @@ public class HomeQuestionController extends BaseController {
 	 * 完成下载附件
 	 * 
 	 * v1.0 zhanghc 2018年6月7日下午9:30:03
-	 * @param id
+	 * @param fileId
 	 * void
 	 */
 	@RequestMapping(value = "/doDownload")
-	public void doDownload(Integer id) {
+	public void doDownload(Integer fileId) {
 		OutputStream output = null;
 		try {
-			FileEx fileEx = homeQuestionService.getFileEx(id);
+			FileEx fileEx = homeQuestionService.getFileEx(fileId);
 			String fileName = new String((fileEx.getEntity().getName() + "." + fileEx.getEntity().getExtName()).getBytes("UTF-8"), "ISO-8859-1");
 			response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
 			response.setContentType("application/force-download");

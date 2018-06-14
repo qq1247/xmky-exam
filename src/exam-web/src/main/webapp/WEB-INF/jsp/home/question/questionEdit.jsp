@@ -98,16 +98,27 @@
 		//定义变量
 		var questionTypeTree = $("#questionTypeTree");
 		var questionTypeId = "${questionTypeId}";
-		var question_questionTypeId = $("#question_questionTypeId");
-		var question_questionTypeName = $("#question_questionTypeName");
+		var questionQuestionTypeId = $("#questionQuestionTypeId");
+		var questionQuestionTypeName = $("#questionQuestionTypeName");
+		var questionTitleEditor = "";
 		
 		//页面加载完毕，执行如下方法：
 		$(function() {
 			initQuestionTypeTree();
-			CKEDITOR.replace("question_title", {
-				filebrowserImageUploadUrl: "home/question/doTempUpload",
-				customConfig: "<%=basePath%>/script/myJs/ckeditorEx.js",
-				height: 80
+			KindEditor.ready(function(K) {
+				questionTitleEditor = K.create("#question_title", {
+					uploadJson : "home/question/doTempUpload",
+					filePostName : "files",
+					width : "100%",
+					minHeight : 50,
+					items : [
+				 		'source', 'wordpaste', '|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist', 'insertunorderedlist', 
+				 		'indent', 'outdent', 'subscript', 'superscript', '|', 'formatblock', 'fontname', 'fontsize', '|', 
+				 		'forecolor', 'hilitecolor', 'bold', 'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', 
+				 		'/', 'image', 'media', 'table', 'hr', 'emoticons', 'baidumap', 'pagebreak', 'anchor', 'link', 
+				 		'unlink', '|', 'fullscreen' 
+				 	]
+				});
 			});
 		});
 		
@@ -132,8 +143,8 @@
 							expandedFiled : "EXPANDED"
 						}),
 						onNodeSelected : function(event, data) {
-							question_questionTypeId.val(data.ID);
-							question_questionTypeName.val(data.NAME);
+							questionQuestionTypeId.val(data.ID);
+							questionQuestionTypeName.val(data.NAME);
 						}
 					});
 

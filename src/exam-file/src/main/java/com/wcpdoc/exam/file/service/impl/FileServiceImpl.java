@@ -20,6 +20,7 @@ import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.PropertiesUtil;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.file.dao.FileDao;
 import com.wcpdoc.exam.file.entity.File;
 import com.wcpdoc.exam.file.entity.FileEx;
@@ -46,7 +47,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 	@Override
 	public String doTempUpload(MultipartFile[] files, String[] allowTypes, LoginUser user, String ip) {
 		//校验数据有效性
-		if(files == null){
+		if(!ValidateUtil.isValid(files)){
 			throw new RuntimeException("无法获取参数：files");
 		}
 		if(allowTypes == null){
