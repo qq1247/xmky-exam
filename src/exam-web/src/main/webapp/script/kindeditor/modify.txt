@@ -1,7 +1,0 @@
-kindeditor/plugins/media/media.js75行
-var html = K.mediaImg(self.themesPath + 'common/blank.gif', {
-var html = K.mediaImg(self.themesPath + 'common/blank.gif', 'zdy', {
-
-kindeditor-all-min.js
-function _mediaImg(a,b){var c=b.width,d=b.height,e=b.type||_mediaType(b.src),f=_mediaEmbed(b),g="";
-function _mediaImg(a,zdy,b){var c=b.width,d=b.height,e=b.type||_mediaType(b.src),f=_mediaEmbed(b),g="";if(zdy=='zdy'){return f}

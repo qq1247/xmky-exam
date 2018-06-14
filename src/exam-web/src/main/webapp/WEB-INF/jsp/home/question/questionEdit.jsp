@@ -81,6 +81,16 @@
 									<div class="row">
 										<div class="col-md-12">
 											<div class="form-group">
+												<label for="question_type" class="col-md-2 control-label">题干：</label>
+												<div class="col-md-10">
+													<textarea id="question_title" name="title">${question.title }</textarea>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-md-12">
+											<div class="form-group">
 												<button type="button" class="btn btn-primary btn-lg btn-block">返回</button>
 												<button type="button" class="btn btn-primary btn-lg btn-block">提交</button>
 											</div>
@@ -93,7 +103,7 @@
 				</div>
 			</div>
 		</div>
-	</body>
+</body>
 	<script type="text/javascript">
 		//定义变量
 		var questionTypeTree = $("#questionTypeTree");

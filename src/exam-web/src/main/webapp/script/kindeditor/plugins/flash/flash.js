@@ -67,8 +67,7 @@ KindEditor.plugin('flash', function(K) {
 							return;
 						}
 						var html = K.mediaImg(self.themesPath + 'common/blank.gif', {
-								flashvars : 'file=' + url,
-								src : 'plugins/jwplayer/player.swf',
+								src : url,
 								type : K.mediaType('.swf'),
 								width : width,
 								height : height,
@@ -145,7 +144,7 @@ KindEditor.plugin('flash', function(K) {
 			var img = self.plugin.getSelectedFlash();
 			if (img) {
 				var attrs = K.mediaAttrs(img.attr('data-ke-tag'));
-				urlBox.val(attrs.flashvars);
+				urlBox.val(attrs.src);
 				widthBox.val(K.removeUnit(img.css('width')) || attrs.width || 0);
 				heightBox.val(K.removeUnit(img.css('height')) || attrs.height || 0);
 			}

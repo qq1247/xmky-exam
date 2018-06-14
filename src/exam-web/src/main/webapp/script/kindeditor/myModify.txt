@@ -1,0 +1,41 @@
+https://www.ecan5.com/webs/rd/136.html
+
+下载ckplayer6.8，不要用新版
+ 
+ 修改kindeditor/kindeditor.js文件，非压缩版本，搜索_mediaType(src)，更改后代码如下
+
+function _mediaType(src) {
+	if (/\.(rm|rmvb)(\?|$)/i.test(src)) {
+		return 'audio/x-pn-realaudio-plugin';
+	}
+	return 'application/x-shockwave-flash';
+}
+
+ 搜索embed : ['id'在文件300行左右，后面增加flashvars参数，修改后如下：
+
+embed : ['id', 'class', 'src', 'width', 'height', 'type', 'loop', 'autostart', 'quality', '.width', '.height', 'align', 'allowscriptaccess', 'wmode', 'flashvars'],
+
+ 再次搜索_mediaEmbed(attrs)函数，修改为如下代码：
+
+function _mediaEmbed(attrs) {
+  var html = '<embed ';
+  _each(attrs, function(key, val) {
+    if (key == 'src') {
+    		var sptype = val.substring(val.length-3,val.length);
+    		sptype = sptype.toLowerCase();
+    		if (sptype == 'swf') {
+    			html += key + '="' + val + '" ';
+    		} else{
+    			html += key + '="ckplayer/ckplayer.swf" ' + 'flashvars="f=' + val
+            + '&p=0" ';
+    		};
+    } else {
+      html += key + '="' + val + '" ';
+    }
+  });
+  html += ' allowFullscreen="true" wmode="transparent" />';
+  return html;
+}
+
+ckplayer.xml，第9个位置改成0（去掉视频下面滚动文字）
+<setup>1,1,1,1,1,2,0,1,0,0,0,
