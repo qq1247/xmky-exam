@@ -41,3 +41,7 @@ create table EXM_EXAM_TYPE_AUTH
    UPDATE_TIME          datetime comment '修改时间',
    primary key (ID)
 );
+
+INSERT INTO `sys_res` VALUES ('103', '设置权限', 'questionType/toAuth|questionType/authUserOrgTreeList|questionType/authUserList|questionType/toAuthUserAddList|questionType/authUserAddList|questionType/doAuthUserAdd|questionType/doAuthUserDel|questionType/doAuthOrgUpdate|questionType/authOrgOrgTreeList|questionType/authPostOrgTreeList|questionType/doAuthPostUpdate', '49', '_1_47_48_49_103_', '1', '2018-09-29 22:42:31', '6', '4', '32', '', '1');
+INSERT INTO `sys_res` VALUES ('104', '设置权限', 'paperType/toAuth|paperType/authUserOrgTreeList|paperType/authUserList|paperType/toAuthUserAddList|paperType/authUserAddList|paperType/doAuthUserAdd|paperType/doAuthUserDel|paperType/doAuthOrgUpdate|paperType/authOrgOrgTreeList|paperType/authPostOrgTreeList|paperType/doAuthPostUpdate', '62', '_1_47_61_62_104_', '1', '2018-09-29 22:44:36', '6', '4', '64', '', '1');
+INSERT INTO `sys_res` VALUES ('105', '设置权限', 'examType/toAuth|examType/authUserOrgTreeList|examType/authUserList|examType/toAuthUserAddList|examType/authUserAddList|examType/doAuthUserAdd|examType/doAuthUserDel|examType/doAuthOrgUpdate|examType/authOrgOrgTreeList|examType/authPostOrgTreeList|examType/doAuthPostUpdate', '76', '_1_47_75_76_105_', '1', '2018-09-29 22:43:30', '6', '4', '128', '', '1');
