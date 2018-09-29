@@ -40,6 +40,7 @@
 								<my:auth url="examType/toEdit"><a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" onclick="toExamTypeEditForBtn();">修改</a></my:auth>
 								<my:auth url="examType/doDel"><a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" onclick="doExamTypeDelForBtn();">删除</a></my:auth>
 								<my:auth url="examType/toMove"><a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" onclick="toExamTypeMoveForBtn();">移动</a></my:auth>
+								<my:auth url="examType/toAuth"><a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" onclick="toExamTypeAuth();">设置权限</a></my:auth>
 							</div>
 						</div>
 						<%-- 考试分类数据表格 --%>
@@ -71,11 +72,14 @@
 				onDblClickRow : <my:auth url="examType/toEdit">toExamTypeEditForDblClick</my:auth>,
 				toolbar : "#examTypeToolbar",
 				columns : [[ 
-						{field : "ID", title : "", checkbox : true}, 
-						{field : "NAME", title : "名称", width : 80, align : "center"},
-						{field : "PARENT_NAME", title : "上级考试分类 ", width : 80, align : "center"},
-						{field : "NO", title : "排序", width : 80, align : "center"}
-						]]
+							{field : "ID", title : "", checkbox : true}, 
+							{field : "NAME", title : "名称", width : 80, align : "center"},
+							{field : "PARENT_NAME", title : "上级试题分类 ", width : 80, align : "center"},
+							{field : "NO", title : "排序 ", width : 80, align : "center"},
+							{field : "USER_NAMES", title : "用户权限 ", width : 80, align : "center"},
+							{field : "ORG_NAMES", title : "机构权限 ", width : 80, align : "center"},
+							{field : "POST_NAMES", title : "岗位权限  ", width : 80, align : "center"}
+							]]
 			});
 		}
 		
@@ -433,6 +437,445 @@
 		//刷新考试分类
 		function examTypeTreeFlush(){
 			examTypeTree.tree("reload");
+		}
+
+		//到达权限页面
+		function toExamTypeAuth(){
+			var examTypeGridRows = $("#examTypeGrid").datagrid("getChecked");
+			if (examTypeGridRows.length != 1) {
+				parent.$.messager.alert("提示消息", "请选择一行数据！", "info");
+				return;
+			}
+			
+			var examTypeAuthDialog;
+			examTypeAuthDialog = $("<div/>").dialog({
+				title : "权限列表",
+				href : "examType/toAuth",
+				queryParams : {id : examTypeGridRows[0].ID},
+				maximized : true,
+				onLoad : function() {
+					
+				}
+			});
+		}
+		
+		//权限用户查询
+		function examTypeAuthUserQuery(){
+			var examTypeAuthUserGrid = $("#examTypeAuthUserGrid");
+			var examTypeAuthUserQueryForm = $("#examTypeAuthUserQueryForm");
+			examTypeAuthUserGrid.datagrid("uncheckAll");
+			examTypeAuthUserGrid.datagrid("load", $.fn.my.serializeObj(examTypeAuthUserQueryForm));
+		}
+		
+		//权限用户重置
+		function examTypeAuthUserReset(){
+			var examTypeAuthUserQueryForm = $("#examTypeAuthUserQueryForm");
+			examTypeAuthUserQueryForm.form("reset");
+			examTypeAuthUserQuery();
+		}
+		
+		//完成添加权限用户
+		function doExamTypeAuthUser(examTypeAuthUserListDialog){
+			var examTypeAuthUserGridRows = $("#examTypeAuthUserGrid").datagrid("getChecked");
+			if (examTypeAuthUserGridRows.length == 0) {
+				parent.$.messager.alert("提示消息", "请选择一行或多行数据！", "info");
+				return;
+			}
+			
+			var params = $.fn.my.serializeField(examTypeAuthUserGridRows, {attrName : "userIds"});
+			params += "&id=" + $("#examTypeAuthUser_ten").val();
+			
+			$.messager.confirm("确认消息", "确定要添加？", function(ok) {
+				if (!ok) {
+					return;
+				}
+				
+				$.messager.progress();
+				$.ajax({
+					url : "examType/doAuthUser",
+					data : params,
+					success : function(obj){
+						$("#examTypeAuthUserGrid").datagrid("reload");
+						$.messager.progress("close");
+						
+						if(!obj.success){
+							parent.$.messager.alert("提示消息", obj.message, "info");
+							return;
+						}
+						examTypeAuthUserListDialog.dialog("close");
+					}
+				});
+			});
+		}
+		
+		//到达添加权限用户页面
+		function toExamTypeAuthUserAddList(){
+			var examTypeAuthUserAddListDialog;
+			examTypeAuthUserAddListDialog = $("<div/>").dialog({
+				title : "用户列表",
+				href : "examType/toAuthUserAddList",
+				queryParams : {id : $("#examTypeAuthUser_ten").val()},
+				toolbar : "#examTypeAuthUserAddToolbar",
+				maximized : true,
+				buttons : [{
+					text : "添加",
+					iconCls : "icon-add", 
+					selected : true, 
+					handler : function (){
+						doExamTypeAuthUserAdd(examTypeAuthUserAddListDialog);
+					}
+				}],
+				onLoad : function() {
+					var examTypeAuthUserAddGrid = $("#examTypeAuthUserAddGrid"); //用户表格对象
+					var examTypeAuthUserAddQueryForm = $("#examTypeAuthUserAddQueryForm"); //用户查询对象
+					var examTypeAuthUserAddOrgTree = $("#examTypeAuthUserAddOrgTree"); //组织机构树对象
+					var examTypeAuthUserAddCurSelOrgId = ""; //当前选中的组织机构ID
+					var examTypeAuthUserAddCurSelOrgName = ""; //当前选中的组织机构名称
+					
+					examTypeAuthUserAddGrid.datagrid({
+						url : "",
+						columns : [[ 
+								{field : "ID", title : "", checkbox : true}, 
+								{field : "USER_NAME", title : "姓名", width : 80, align : "center"}, 
+								{field : "LOGIN_NAME", title : "登录名称", width : 80, align : "center"}, 
+								{field : "ORG_NAME", title : "组织机构", width : 80, align : "center"},
+								{field : "POST_NAMES", title : "岗位", width : 80, align : "center"},
+								]]
+					});
+					
+					examTypeAuthUserAddOrgTree.tree({
+						idFiled : "ID",
+						textFiled : "NAME",
+						parentField : "PARENT_ID",
+						iconClsFiled : "ICON",
+						checkedFiled : "CHECKED",
+					    url : "examType/authUserOrgTreeList",
+						onSelect : function(node){
+							examTypeAuthUserAddCurSelOrgId = node.ID;
+							examTypeAuthUserAddCurSelOrgName = node.NAME;
+							
+							$("#examTypeAuthUserAdd_one").val(examTypeAuthUserAddCurSelOrgId);
+							examTypeAuthUserAddGrid.datagrid("uncheckAll");
+							examTypeAuthUserAddGrid.datagrid("reload", $.fn.my.serializeObj(examTypeAuthUserAddQueryForm));
+						},
+						onLoadSuccess : function(node, data){
+							if(!examTypeAuthUserAddCurSelOrgId || !examTypeAuthUserAddGrid.datagrid("options").url){//如果是第一次
+								examTypeAuthUserAddCurSelOrgId = 1;
+								examTypeAuthUserAddGrid.datagrid("options").url = "examType/authUserAddList";
+							}
+							
+							var node = examTypeAuthUserAddOrgTree.tree("find", examTypeAuthUserAddCurSelOrgId);
+							if(!node){
+								examTypeAuthUserAddCurSelOrgId = 1;
+								node = examTypeAuthUserAddOrgTree.tree("find", examTypeAuthUserAddCurSelOrgId);
+							}
+							examTypeAuthUserAddOrgTree.tree("select", node.target);
+						}
+					});
+				}
+			});
+		}
+		
+		//添加权限用户查询
+		function examTypeAuthUserAddQuery(){
+			var examTypeAuthUserAddGrid = $("#examTypeAuthUserAddGrid");
+			var examTypeAuthUserAddQueryForm = $("#examTypeAuthUserAddQueryForm");
+			examTypeAuthUserAddGrid.datagrid("uncheckAll");
+			examTypeAuthUserAddGrid.datagrid("load", $.fn.my.serializeObj(examTypeAuthUserAddQueryForm));
+		}
+		
+		//添加权限用户重置
+		function examTypeAuthUserAddReset(){
+			var examTypeAuthUserAddQueryForm = $("#examTypeAuthUserAddQueryForm");
+			examTypeAuthUserAddQueryForm.form("reset");
+			examTypeAuthUserAddQuery();
+		}
+		
+		//完成添加权限用户
+		function doExamTypeAuthUserAdd(examTypeAuthUserAddListDialog){
+			var examTypeAuthUserAddGridRows = $("#examTypeAuthUserAddGrid").datagrid("getChecked");
+			if (examTypeAuthUserAddGridRows.length == 0) {
+				parent.$.messager.alert("提示消息", "请选择一行或多行数据！", "info");
+				return;
+			}
+			
+			var params = $.fn.my.serializeField(examTypeAuthUserAddGridRows, {attrName : "userIds"});
+			params += "&id=" + $("#examTypeAuthUserAdd_ten").val();
+			
+			$.messager.confirm("确认消息", "确定要添加？", function(ok) {
+				if (!ok) {
+					return;
+				}
+				
+				$.messager.confirm("确认消息", "同步到子【考试分类】？", function(ok) {
+					params += "&syn2Sub=" + ok;
+					$.messager.progress();
+					$.ajax({
+						url : "examType/doAuthUserAdd",
+						data : params,
+						success : function(obj){
+							$("#examTypeAuthUserGrid").datagrid("reload");
+							examTypeTree.tree("reload");
+							$.messager.progress("close");
+							
+							if(!obj.success){
+								parent.$.messager.alert("提示消息", obj.message, "info");
+								return;
+							}
+							examTypeAuthUserAddListDialog.dialog("close");
+						}
+					});
+				});
+			});
+		}
+		
+		//完成删除权限用户
+		function doExamTypeAuthUserDel(){
+			var examTypeAuthUserGridRows = $("#examTypeAuthUserGrid").datagrid("getChecked");
+			if (examTypeAuthUserGridRows.length == 0) {
+				parent.$.messager.alert("提示消息", "请选择一行或多行数据！", "info");
+				return;
+			}
+			
+			var params = $.fn.my.serializeField(examTypeAuthUserGridRows, {attrName : "userIds"});
+			params += "&id=" + $("#examTypeAuthUser_ten").val();
+			$.messager.confirm("确认消息", "确定要删除？", function(ok) {
+				if (!ok) {
+					return;
+				}
+				$.messager.confirm("确认消息", "同步到子【考试分类】？", function(ok) {
+					params += "&syn2Sub=" + ok;
+					$.messager.progress();
+					$.ajax({
+						url : "examType/doAuthUserDel",
+						data : params,
+						success : function(obj){
+							$("#examTypeAuthUserGrid").datagrid("reload");
+							examTypeTree.tree("reload");
+							$.messager.progress("close");
+							
+							if(!obj.success){
+								parent.$.messager.alert("提示消息", obj.message, "info");
+								return;
+							}
+						}
+					});
+				});
+			});
+		}
+		
+		//更新tabs
+		function updateTabs(title){
+			if(title == "用户权限"){
+				updateUserTab();
+			}else if(title == "机构权限"){
+				updateOrgTab();
+			}else if(title == "岗位权限"){
+				updatePostTab();
+			}
+		}
+		
+		//更新用户标签
+		function updateUserTab(){
+			var examTypeAuthUserGrid = $("#examTypeAuthUserGrid"); //用户表格对象
+			var examTypeAuthUserQueryForm = $("#examTypeAuthUserQueryForm"); //用户查询对象
+			var examTypeAuthUserOrgTree = $("#examTypeAuthUserOrgTree"); //组织机构树对象
+			var examTypeAuthUserCurSelOrgId = ""; //当前选中的组织机构ID
+			var examTypeAuthUserCurSelOrgName = ""; //当前选中的组织机构名称
+			
+			examTypeAuthUserGrid.datagrid({
+				url : "",
+				columns : [[ 
+						{field : "ID", title : "", checkbox : true}, 
+						{field : "USER_NAME", title : "姓名", width : 80, align : "center"}, 
+						{field : "LOGIN_NAME", title : "登录名称", width : 80, align : "center"}, 
+						{field : "ORG_NAME", title : "组织机构", width : 80, align : "center"},
+						{field : "POST_NAMES", title : "岗位", width : 80, align : "center"},
+						]]
+			});
+			
+			examTypeAuthUserOrgTree.tree({
+				idFiled : "ID",
+				textFiled : "NAME",
+				parentField : "PARENT_ID",
+				iconClsFiled : "ICON",
+				checkedFiled : "CHECKED",
+			    url : "examType/authUserOrgTreeList",
+				onSelect : function(node){
+					examTypeAuthUserCurSelOrgId = node.ID;
+					examTypeAuthUserCurSelOrgName = node.NAME;
+					
+					$("#examTypeAuthUser_one").val(examTypeAuthUserCurSelOrgId);
+					examTypeAuthUserGrid.datagrid("uncheckAll");
+					examTypeAuthUserGrid.datagrid("reload", $.fn.my.serializeObj(examTypeAuthUserQueryForm));
+				},
+				onLoadSuccess : function(node, data){
+					if(!examTypeAuthUserCurSelOrgId || !examTypeAuthUserGrid.datagrid("options").url){//如果是第一次
+						examTypeAuthUserCurSelOrgId = 1;
+						examTypeAuthUserGrid.datagrid("options").url = "examType/authUserList";
+					}
+					
+					var node = examTypeAuthUserOrgTree.tree("find", examTypeAuthUserCurSelOrgId);
+					if(!node){
+						examTypeAuthUserCurSelOrgId = 1;
+						node = examTypeAuthUserOrgTree.tree("find", examTypeAuthUserCurSelOrgId);
+					}
+					examTypeAuthUserOrgTree.tree("select", node.target);
+				}
+			});
+		}
+		
+		//更新机构标签
+		function updateOrgTab(){
+			var examTypeAuthOrgOrgTree = $("#examTypeAuthOrgOrgTree"); 
+			examTypeAuthOrgOrgTree.tree({
+			    url : "examType/authOrgOrgTreeList",
+			    queryParams : {
+			    	id : $("#examTypeAuthUser_ten").val()
+			    },
+				idFiled : "ID",
+				textFiled : "NAME",
+				parentField : "PARENT_ID",
+				iconClsFiled : "ICON",
+				checkedFiled : "CHECKED",
+				checkbox : true
+			});
+		}
+		
+		//更新岗位标签
+		function updatePostTab(){
+			var examTypeAuthPostOrgTree = $("#examTypeAuthPostOrgTree"); 
+			examTypeAuthPostOrgTree.tree({
+			    url : "examType/authPostOrgTreeList",
+			    queryParams : {
+			    	id : $("#examTypeAuthUser_ten").val()
+			    },
+				idFiled : "ID",
+				textFiled : "NAME",
+				parentField : "PARENT_ID",
+				iconClsFiled : "ICON",
+				checkedFiled : "CHECKED",
+				checkbox : true,
+				loadFilter : function(data, parent) {
+					var opt = $(this).data().tree.options;
+					var idFiled = opt.idFiled || "id";
+					var textFiled = opt.textFiled || "text";
+					var checkedFiled = opt.checkedFiled || "checked";
+					var iconClsFiled = opt.iconClsFiled || "iconCls";
+					var parentField = opt.parentField;
+					var list = data;
+					var TreeList = [];
+					var treeMap = {};
+
+					for (var i = 0; i < list.length; i++) {
+						list[i]["id"] = list[i][idFiled];
+						if(list[i].TYPE == "POST"){
+							list[i]["id"] = "p" + list[i][idFiled];
+						}
+						list[i]["text"] = list[i][textFiled];
+						if(list[i][checkedFiled]){
+							list[i]["checked"] = true;
+						}
+						list[i]["iconCls"] = list[i][iconClsFiled];
+						treeMap[list[i]["id"]] = list[i];
+						if(list[i].TYPE == "POST"){
+							treeMap[list[i]["id"]] = "p" + list[i];
+						}
+					}
+
+					for (var i = 0; i < list.length; i++) {
+						if (treeMap[list[i][parentField]] && list[i]["id"] != list[i][parentField]) {
+							if (!treeMap[list[i][parentField]]["children"]) {
+								treeMap[list[i][parentField]]["children"] = [];
+							}
+							treeMap[list[i][parentField]]["children"].push(list[i]);
+						} else {
+							TreeList.push(list[i]);
+						}
+					}
+					return TreeList;
+				}
+			});
+		}
+		
+		//保存机构权限
+		function doExamTypeAuthOrgUpdate(){
+			var orgTree = $("#examTypeAuthOrgOrgTree");
+			var orgNodes = orgTree.tree("getChecked", ["checked"]);
+			var params = "&id=" + $("#examTypeAuthUser_ten").val();
+			if(orgNodes.length == 0){
+				params += "&orgIds=";
+			}else{
+				for(index in orgNodes){
+					params += "&orgIds=" + orgNodes[index].ID;
+				}
+			}
+			
+			$.messager.confirm("确认消息", "确定要保存？", function(ok){
+				if (!ok){
+					return;
+				}
+
+				$.messager.confirm("确认消息", "同步到子【考试分类】？", function(ok) {
+					params += "&syn2Sub=" + ok;
+					
+					$.messager.progress();
+					$.ajax({
+						url : "examType/doAuthOrgUpdate",
+						data : params,
+						success : function(obj){
+							orgTree.tree("reload");
+							examTypeTree.tree("reload");
+							$.messager.progress("close");
+							
+							if(!obj.success){
+								parent.$.messager.alert("提示消息", obj.message, "info");
+								return;
+							}
+						}
+					});
+				});
+			});
+		}
+		
+		//保存岗位权限
+		function doExamTypeAuthPostUpdate(){
+			var orgPostTree = $("#examTypeAuthPostOrgTree");
+			var postNodes = orgPostTree.tree("getChecked", ["checked"]);
+			var params = "&id=" + $("#examTypeAuthUser_ten").val();
+			if(postNodes.length == 0){
+				params += "&postIds=";
+			}else{
+				for(index in postNodes){
+					params += "&postIds=" + postNodes[index].ID;
+				}
+			}
+			
+			$.messager.confirm("确认消息", "确定要保存？", function(ok){
+				if (!ok){
+					return;
+				}
+
+				$.messager.confirm("确认消息", "同步到子【考试分类】？", function(ok) {
+					params += "&syn2Sub=" + ok;
+					
+					$.messager.progress();
+					$.ajax({
+						url : "examType/doAuthPostUpdate",
+						data : params,
+						success : function(obj){
+							orgPostTree.tree("reload");
+							examTypeTree.tree("reload");
+							$.messager.progress("close");
+							
+							if(!obj.success){
+								parent.$.messager.alert("提示消息", obj.message, "info");
+								return;
+							}
+						}
+					});
+				});
+			});
 		}
 	</script>
 </html>

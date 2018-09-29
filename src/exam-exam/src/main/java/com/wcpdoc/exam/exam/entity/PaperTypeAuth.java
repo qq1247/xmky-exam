@@ -14,13 +14,13 @@ import org.springframework.format.annotation.DateTimeFormat;
 import com.wcpdoc.exam.core.util.DateUtil;
 
 /**
- * 试题分类权限实体
+ * 试卷分类权限实体
  * 
  * v1.0 zhanghc 2018年5月29日下午3:20:16
  */
 @Entity
-@Table(name = "EXM_QUESTION_TYPE_AUTH")
-public class QuestionTypeAuth {
+@Table(name = "EXM_PAPER_TYPE_AUTH")
+public class PaperTypeAuth {
 	@Id
 	@GeneratedValue(generator = "generator")
 	@GenericGenerator(name = "generator", strategy = "assigned")
