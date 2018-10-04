@@ -53,7 +53,7 @@ public class HomeController extends BaseController{
 	 * @return String
 	 */
 	@RequestMapping("/pubDoIn")
-	public String in(Model model, String loginName, String pwd) {
+	public String doIn(Model model, String loginName, String pwd) {
 		try {
 			//完成登录
 			homeService.doIn(loginName, pwd, request);
@@ -61,7 +61,7 @@ public class HomeController extends BaseController{
 			//跳转到首页。这里如果直接转向到home.jsp，页面刷新，会重复执行doIn()。
 			return "redirect:/home/pubToHome";
 		} catch (Exception e) {
-			log.error("完成登录错误：", e);
+			log.error("完成登录错误：{}", e.getMessage());
 			try {
 				model.addAttribute("message", URLEncoder.encode(e.getMessage(), "UTF-8") );
 			} catch (UnsupportedEncodingException e1) {

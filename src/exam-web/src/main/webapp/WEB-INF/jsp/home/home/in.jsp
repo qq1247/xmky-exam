@@ -7,80 +7,73 @@
 	</head>
 	<body>
 		<%@include file="/script/home/head.jspf"%>
-			<section class="service-item" style="padding-top: 200px;">
-				<div class="container">
+		<div class="exam-login-bg">
+			<div class="container">
 				<div class="row">
-				<div class="col-xs-6 col-md-offset-3">
-				<span style="font-size: 30px;">用户登录</span>
-				<div class="panel panel-default">
-				<div class="panel-body">
-				<form id="loginForm" name="loginForm" action="home/pubDoIn" method="post" class="form-horizontal" role="form">
-				<div class="form-group">
-				<label for="userName" class="col-sm-2 control-label">用户名：</label>
-				<div class="col-sm-10">
-				<input type="text" class="form-control" id="userName" name="loginName"
-				placeholder="请输入用户名" value="sysadmin">
+					<div class="col-md-2"></div>
+					<div class="col-md-8">
+						<form id="loginForm" action="home/pubDoIn" method="post">
+							<div class="exam-login-box">
+								<h1>在线考试账号登录</h1>
+								<div>
+									<span class="glyphicon glyphicon-user"></span>
+									<input type="text" id="loginName" name="loginName" placeholder="请输入账号">
+									<small class="help-block"></small>
+								</div>
+								<div>
+									<span class="glyphicon glyphicon-lock"></span>
+									<input type="password" id="pwd" name="pwd" placeholder="请输入密码">
+									<small class="help-block"></small>
+								</div>
+								<div>
+									<button type="button" class="btn btn-primary" onclick="doLogin();">登录</button>
+								</div>
+							</div>
+						</form>
+					</div>
 				</div>
-				</div>
-				<div class="form-group">
-				<label for="pwd" class="col-sm-2 control-label">密码：</label>
-				<div class="col-sm-10">
-				<input type="pwd" class="form-control" id="pwd" name="pwd"
-				placeholder="请输入密码" value="111111">
-				</div>
-				</div>
-				<div class="form-group">
-				<div class="col-sm-12">
-				<span id="message" style="color: red;"></span>
-				<button type="submit" class="btn btn-primary btn-lg btn-block">登录</button>
-				</div>
-				</div>
-				</form>
-				</div>
-				</div>
-				</div>
-				</div>
-				</div>
-				</section> 
+			</div>
+		</div>
 	</body>
-	<%-- <script type="text/javascript">
+	<script type="text/javascript">
+		//定义变量
+		var $loginName = $("#loginName");
+		var $pwd = $("#pwd");
+		var $examLoginBbox = $(".exam-login-box");
+		var $loginForm = $("#loginForm");
+	
 		//页面加载完毕，执行如下方法：
 		$(function() {
 			var message = "<%= request.getParameter("message") == null ? "" : request.getParameter("message") %>";
 			if(message){
-				$("#message").html(decodeURI(message));
+				$pwd.next().html(decodeURI(message));
 			}
-			
-			initHome();
 		});
 		
-		//初始化
-		function initHome(){
-			$("#loginForm").bootstrapValidator({
-				message : '未校验',
-				trigger : "change",
-				feedbackIcons : {
-					valid : 'glyphicon glyphicon-ok',
-					invalid : 'glyphicon glyphicon-remove',
-					validating : 'glyphicon glyphicon-refresh'
-				},
-				fields : {
-					loginName : {
-						validators : {
-							notEmpty : {
-								message : "必填项"
-							}
-						}
-					},
-					pwd : {
-						validators : {
-							notEmpty : {
-								message : "必填项"
-							}
-						}
-					}
-				}
-			});
+		//完成登录
+		function doLogin(){
+			$examLoginBbox.find(".field-error").removeClass('field-error');
+			$examLoginBbox.find(".help-block").html("");
+			
+			var loginName = $.trim($loginName.val());
+			var pwd = $.trim($pwd.val());
+			if(!loginName){
+				$loginName.addClass("field-error").next().html("必填项");
+				$loginName.focus();
+				return;
+			}
+			if(!(loginName.length >= 2 && loginName.length <= 16)){
+				$loginName.addClass("field-error").next().html("长度介于2-16");
+				$loginName.focus();
+				return;
+			}
+			if(!pwd){
+				$pwd.addClass("field-error").next().html("必填项");
+				$pwd.focus();
+				return;
+			}
+			
+			$loginForm.submit();
 		}
-	</script> --%>
+	</script>
 </html>

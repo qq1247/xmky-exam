@@ -1,62 +1,71 @@
 <%@ page language="java" pageEncoding="utf-8"%>
-<header class="navbar navbar-fixed-top" role="navigation">
+<nav class="navbar navbar-fixed-top exam-header" role="navigation">
 	<div class="container">
 		<div class="navbar-header">
-			<button type="button" class="navbar-toggle" data-toggle="collapse"
-				data-target="#example-navbar-collapse">
-				<span class="sr-only">切换导航</span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-			</button>
 			<a class="navbar-brand" href="#">在线考试</a>
 		</div>
-		<div class="collapse navbar-collapse" id="example-navbar-collapse">
-			<ul class="nav navbar-nav navbar-left">
-				<li class="active">
-					<a href="#">首页</a>
-				</li>
-				<li>
-					<a href="home/question/toList">试题管理</a>
-				</li>
-				<li>
-					<a href="#">阅卷管理</a>
-				</li>
-			</ul>
-			<ul class="nav navbar-nav navbar-right">
-				<li class="active">
-					<a href="#">iOS</a>
-				</li>
-				<li>
-					<a href="#">SVN</a>
-				</li>
+		<div>
+			<ul class="nav navbar-nav">
 				<li class="dropdown">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-						Java
+						考试管理
 						<b class="caret"></b>
 					</a>
 					<ul class="dropdown-menu">
 						<li>
-							<a href="#">jmeter</a>
-						</li>
-						<li>
-							<a href="#">EJB</a>
-						</li>
-						<li>
-							<a href="#">Jasper Report</a>
+							<span class="hand"></span>
+							<a href="#">试题管理</a>
 						</li>
 						<li class="divider"></li>
 						<li>
-							<a href="#">分离的链接</a>
+							<a href="#">试卷管理</a>
 						</li>
 						<li class="divider"></li>
 						<li>
-							<a href="#">另一个分离的链接</a>
+							<a href="#">考试管理</a>
+						</li>
+					</ul>
+				</li>
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+						报表查询
+						<b class="caret"></b>
+					</a>
+					<ul class="dropdown-menu">
+						<li>
+							<span class="hand"></span>
+							<a href="#">成绩查询</a>
+						</li>
+						<li class="divider"></li>
+						<li>
+							<a href="#">错题统计</a>
+						</li>
+						<li class="divider"></li>
+						<li>
+							<a href="#">成绩统计</a>
+						</li>
+					</ul>
+				</li>
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+						欢迎：张虎成
+						<b class="caret"></b>
+					</a>
+					<ul class="dropdown-menu login">
+						<li>
+							<span class="hand"></span>
+							<a href="#">个人信息</a>
+						</li>
+						<li class="divider"></li>
+						<li>
+							<a href="#">退出</a>
 						</li>
 					</ul>
 				</li>
 			</ul>
 		</div>
 	</div>
-</header>
-<div class="headerplus"></div>
+</nav>
+<div class="exam-header-plus"></div>

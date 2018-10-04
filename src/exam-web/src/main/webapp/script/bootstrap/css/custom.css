@@ -1,0 +1,126 @@
+body {
+	background-color: #F2F4F5;
+}
+
+.exam-header {
+	background: #4A5767 none repeat scroll 0% 0%;
+	height: 86px;
+	font-size: 16px;
+	margin-bottom: 0;
+}
+
+.exam-header .nav {
+	margin-left: 80px;
+}
+
+.exam-header a {
+	height: 86px;
+	line-height: 86px !important;
+	padding: 0 27px !important;
+	color: #fff;
+	background-color: inherit !important;
+}
+
+.exam-header a:focus, a:hover {
+	color: #8392A5;
+}
+
+.exam-header .dropdown-menu a {
+	height: 40px;
+	line-height: 40px !important;
+	color: #8392A5;
+}
+
+.exam-header .hand {
+	position: absolute;
+	width: 20px;
+	height: 20px;
+	background: #fff;
+	top: -10px;
+	-webkit-transform: rotate(45deg);
+	-o-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	-ms-transform: rotate(45deg);
+	transform: rotate(45deg);
+	margin-left: 50px;
+}
+
+.exam-header .login {
+	border-radius: 10px !important;
+	top: 70px;
+}
+
+.exam-header-plus {
+	padding-top: 86px;
+}
+
+.exam-login-bg {
+	background-image: url("./../../../img/login-bg.jpg");
+}
+
+.exam-login-box {
+	position: relative;
+	width: 100%;
+	height: auto;
+	padding: 60px 30px;
+	margin: 100px auto;
+	background: #fff;
+	border-radius: 3px;
+	text-align: center;
+}
+
+.exam-login-box h1 {
+	color: #4a5768;
+	font-size: 20px;
+	font-weight: bold;
+	margin: 0 0 30px;
+}
+
+.exam-login-box div{
+	position: relative;
+	width: 450px;
+	height: 50px;
+	max-width: 100%;
+	margin: 0 auto 25px;
+	font-size: 0;
+	white-space: nowrap;
+}
+
+.exam-login-box input {
+	width: 100%;
+	height: 100%;
+	line-height: 50px;
+	border-radius: 5px;
+	border: 1px solid #e5e9f2;
+	padding: 0 55px;
+	font-size: 14px;
+}
+
+.exam-login-box button {
+	width: 100%;
+	height: 100%;
+	line-height: 50px;
+	border-radius: 5px;
+	border: 1px solid #e5e9f2;
+	padding: 0 55px;
+	font-size: 16px;
+}
+
+.exam-login-box span {
+	position: absolute;
+	left: 19px;
+	top: 14px;
+	font-size: 22px;
+	color: #8392a5;
+}
+
+.exam-login-box .field-error {
+	border-color: #a94442 !important;
+}
+
+.exam-login-box .help-block {
+	font-size: 12px;
+	float: left;
+	color: #a94442;
+	margin-bottom: 0px !important;
+}
