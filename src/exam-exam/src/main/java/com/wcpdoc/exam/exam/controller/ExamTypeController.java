@@ -20,7 +20,6 @@ import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.exam.entity.ExamType;
-import com.wcpdoc.exam.exam.entity.ExamTypeAuth;
 import com.wcpdoc.exam.exam.service.ExamTypeService;
 import com.wcpdoc.exam.sys.entity.User;
 
@@ -402,12 +401,12 @@ public class ExamTypeController extends BaseController{
 	public List<Map<String, Object>> authOrgOrgTreeList(Integer id) {
 		try {
 			List<Map<String, Object>> orgTreeList = examTypeService.getOrgTreeList();
-			ExamTypeAuth examTypeAuth = examTypeService.getExamTypeAuth(id);
-			if(examTypeAuth == null){
+			ExamType examType = examTypeService.getEntity(id);
+			if(examType == null){
 				return orgTreeList;
 			}
 			
-			String orgIds = examTypeAuth.getOrgIds();
+			String orgIds = examType.getOrgIds();
 			if(!ValidateUtil.isValid(orgIds)){
 				return orgTreeList;
 			}
@@ -436,7 +435,7 @@ public class ExamTypeController extends BaseController{
 	public List<Map<String, Object>> authPostOrgTreeList(Integer id) {
 		try {
 			List<Map<String, Object>> orgPostTree = examTypeService.getOrgPostTreeList();
-			ExamTypeAuth examTypeAuth = examTypeService.getExamTypeAuth(id);
+			ExamType examTypeAuth = examTypeService.getEntity(id);
 			if(examTypeAuth == null){
 				return orgPostTree;
 			}

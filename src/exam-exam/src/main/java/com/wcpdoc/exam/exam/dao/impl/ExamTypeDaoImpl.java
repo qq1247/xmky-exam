@@ -27,12 +27,11 @@ public class ExamTypeDaoImpl extends BaseDaoImpl<ExamType> implements ExamTypeDa
 		String sql = "SELECT EXAM_TYPE.ID, EXAM_TYPE.NAME, EXAM_TYPE.PARENT_ID, "
 				+ "EXAM_TYPE.PARENT_SUB, PARENT_EXAM_TYPE.NAME AS PARENT_NAME, "
 				+ "EXAM_TYPE.NO, "
-				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_USER _A WHERE EXAM_TYPE_AUTH.USER_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS USER_NAMES, "
-				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_ORG _A WHERE EXAM_TYPE_AUTH.ORG_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS ORG_NAMES, "
-				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_POST _A WHERE EXAM_TYPE_AUTH.POST_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS POST_NAMES "
+				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_USER _A WHERE EXAM_TYPE.USER_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS USER_NAMES, "
+				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_ORG _A WHERE EXAM_TYPE.ORG_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS ORG_NAMES, "
+				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_POST _A WHERE EXAM_TYPE.POST_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS POST_NAMES "
 				+ "FROM EXM_EXAM_TYPE EXAM_TYPE "
-				+ "LEFT JOIN EXM_EXAM_TYPE PARENT_EXAM_TYPE ON EXAM_TYPE.PARENT_ID = PARENT_EXAM_TYPE.ID "
-				+ "LEFT JOIN EXM_EXAM_TYPE_AUTH EXAM_TYPE_AUTH ON EXAM_TYPE.ID = EXAM_TYPE_AUTH.ID";
+				+ "LEFT JOIN EXM_EXAM_TYPE PARENT_EXAM_TYPE ON EXAM_TYPE.PARENT_ID = PARENT_EXAM_TYPE.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "EXAM_TYPE.PARENT_ID = ?", pageIn.getOne())//如果查询的是根目录，则查询所有。否则查询选中机构的子机构
 				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "EXAM_TYPE.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
@@ -92,7 +91,7 @@ public class ExamTypeDaoImpl extends BaseDaoImpl<ExamType> implements ExamTypeDa
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "ORG.ID = ?", pageIn.getOne())
 				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.getTen()), 
-						"EXISTS (SELECT 1 FROM EXM_EXAM_TYPE_AUTH Z WHERE Z.ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", 
+						"EXISTS (SELECT 1 FROM EXM_EXAM_TYPE Z WHERE Z.ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", 
 						pageIn.getTen())
 //				.addWhere("USER.STATE = ?", 1)//已添加过的可以显示
 				.addWhere("USER.ID != ?", 1)//排除管理员
@@ -116,7 +115,7 @@ public class ExamTypeDaoImpl extends BaseDaoImpl<ExamType> implements ExamTypeDa
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "ORG.ID = ?", pageIn.getOne())
 				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.getTen()), 
-						"NOT EXISTS (SELECT 1 FROM EXM_EXAM_TYPE_AUTH Z WHERE Z.ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", 
+						"NOT EXISTS (SELECT 1 FROM EXM_EXAM_TYPE Z WHERE Z.ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", 
 						pageIn.getTen())
 				.addWhere("USER.STATE = ?", 1)//当前正常的用户
 				.addWhere("USER.ID != ?", 1)//排除管理员

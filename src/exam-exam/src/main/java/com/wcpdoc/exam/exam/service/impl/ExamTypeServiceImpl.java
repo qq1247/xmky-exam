@@ -14,10 +14,8 @@ import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.exam.dao.ExamTypeAuthDao;
 import com.wcpdoc.exam.exam.dao.ExamTypeDao;
 import com.wcpdoc.exam.exam.entity.ExamType;
-import com.wcpdoc.exam.exam.entity.ExamTypeAuth;
 import com.wcpdoc.exam.exam.service.ExamTypeExService;
 import com.wcpdoc.exam.exam.service.ExamTypeService;
 import com.wcpdoc.exam.sys.service.OrgService;
@@ -31,8 +29,6 @@ import com.wcpdoc.exam.sys.service.PostService;
 public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements ExamTypeService{
 	@Resource
 	private ExamTypeDao examTypeDao;
-	@Resource
-	private ExamTypeAuthDao examTypeAuthDao;
 	@Resource
 	private ExamTypeExService examTypeExService;
 	@Resource
@@ -200,37 +196,23 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 			}
 		}
 		
-		ExamTypeAuth auth = examTypeAuthDao.getEntity(id);
-		if(auth != null){
-			StringBuilder _userIds = new StringBuilder();
-			if(ValidateUtil.isValid(auth.getUserIds())){
-				_userIds.append(auth.getUserIds());
-			}else{
-				_userIds.append(",");
-			}
-			for(Integer userId : userIds){
-				if(_userIds.toString().contains("," + userId + ",")){
-					continue;
-				}
-				_userIds.append(userId).append(",");
-			}
-			auth.setUserIds(_userIds.toString());
-			auth.setUpdateTime(new Date());
-			auth.setUpdateUserId(user.getId());
-			examTypeAuthDao.update(auth);
-			return;
+		ExamType examType = getEntity(id);
+		StringBuilder _userIds = new StringBuilder();
+		if(ValidateUtil.isValid(examType.getUserIds())){
+			_userIds.append(examType.getUserIds());
+		}else{
+			_userIds.append(",");
 		}
-		
-		auth = new ExamTypeAuth();
-		StringBuilder _userIds = new StringBuilder(",");
 		for(Integer userId : userIds){
+			if(_userIds.toString().contains("," + userId + ",")){
+				continue;
+			}
 			_userIds.append(userId).append(",");
 		}
-		auth.setId(id);
-		auth.setUserIds(_userIds.toString());
-		auth.setUpdateTime(new Date());
-		auth.setUpdateUserId(user.getId());
-		examTypeAuthDao.save(auth);
+		examType.setUserIds(_userIds.toString());
+		examType.setUpdateTime(new Date());
+		examType.setUpdateUserId(user.getId());
+		update(examType);
 	}
 
 	private List<ExamType> getList(Integer id) {
@@ -254,12 +236,12 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 			}
 		}
 		
-		ExamTypeAuth examTypeAuth = examTypeAuthDao.getEntity(id);
-		if(examTypeAuth == null){
+		ExamType examType = getEntity(id);
+		if(examType == null){
 			return;
 		}
 		
-		String _userIds = examTypeAuth.getUserIds();
+		String _userIds = examType.getUserIds();
 		if(!ValidateUtil.isValid(_userIds)){
 			return;
 		}
@@ -270,8 +252,8 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 			_userIds = null;
 		}
 		
-		examTypeAuth.setUserIds(_userIds);
-		examTypeAuthDao.update(examTypeAuth);
+		examType.setUserIds(_userIds);
+		update(examType);
 	}
 
 	@Override
@@ -292,42 +274,19 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 			}
 		}
 		
-		ExamTypeAuth auth = examTypeAuthDao.getEntity(id);
-		if(auth != null){
-			StringBuilder _orgIds = new StringBuilder(",");
-			for(Integer orgId : orgIds){
-				_orgIds.append(orgId).append(",");
-			}
-			if(_orgIds.toString().equals(",")){
-				auth.setOrgIds(null);
-			}else{
-				auth.setOrgIds(_orgIds.toString());
-			}
-			auth.setUpdateTime(new Date());
-			auth.setUpdateUserId(user.getId());
-			examTypeAuthDao.update(auth);
-			return;
-		}
-		
-		auth = new ExamTypeAuth();
+		ExamType examType = getEntity(id);
 		StringBuilder _orgIds = new StringBuilder(",");
 		for(Integer orgId : orgIds){
 			_orgIds.append(orgId).append(",");
 		}
 		if(_orgIds.toString().equals(",")){
-			auth.setOrgIds(null);
+			examType.setOrgIds(null);
 		}else{
-			auth.setOrgIds(_orgIds.toString());
+			examType.setOrgIds(_orgIds.toString());
 		}
-		auth.setId(id);
-		auth.setUpdateTime(new Date());
-		auth.setUpdateUserId(user.getId());
-		examTypeAuthDao.save(auth);
-	}
-
-	@Override
-	public ExamTypeAuth getExamTypeAuth(Integer examTypeAuthId) {
-		return examTypeAuthDao.getEntity(examTypeAuthId);
+		examType.setUpdateTime(new Date());
+		examType.setUpdateUserId(user.getId());
+		update(examType);
 	}
 
 	@Override
@@ -353,46 +312,23 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 			}
 		}
 		
-		ExamTypeAuth auth = examTypeAuthDao.getEntity(id);
-		if(auth != null){
-			StringBuilder _postIds = new StringBuilder(",");
-			for(Integer postId : postIds){
-				_postIds.append(postId).append(",");
-			}
-			if(_postIds.toString().equals(",")){
-				auth.setPostIds(null);
-			}else{
-				auth.setPostIds(_postIds.toString());
-			}
-			auth.setUpdateTime(new Date());
-			auth.setUpdateUserId(user.getId());
-			examTypeAuthDao.update(auth);
-			return;
-		}
-		
-		auth = new ExamTypeAuth();
+		ExamType examType = getEntity(id);
 		StringBuilder _postIds = new StringBuilder(",");
 		for(Integer postId : postIds){
 			_postIds.append(postId).append(",");
 		}
 		if(_postIds.toString().equals(",")){
-			auth.setPostIds(null);
+			examType.setPostIds(null);
 		}else{
-			auth.setPostIds(_postIds.toString());
+			examType.setPostIds(_postIds.toString());
 		}
-		auth.setId(id);
-		auth.setUpdateTime(new Date());
-		auth.setUpdateUserId(user.getId());
-		examTypeAuthDao.save(auth);
+		examType.setUpdateTime(new Date());
+		examType.setUpdateUserId(user.getId());
+		update(examType);
 	}
 
 	@Override
 	public List<ExamType> getList() {
 		return examTypeDao.getList();
-	}
-
-	@Override
-	public List<ExamTypeAuth> getExamTypeAuthList() {
-		return examTypeAuthDao.getList();
 	}
 }

@@ -17,9 +17,10 @@ public interface QuestionService extends BaseService<Question>{
 	 * 获取试题分类树
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * @param userId
 	 * @return List<Map<String,Object>>
 	 */
-	List<Map<String, Object>> getQuestionTypeTreeList();
+	List<Map<String, Object>> getQuestionTypeTreeList(Integer userId);
 
 	/**
 	 * 获取试题分类

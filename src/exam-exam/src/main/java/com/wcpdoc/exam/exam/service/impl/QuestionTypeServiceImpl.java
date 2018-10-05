@@ -14,10 +14,8 @@ import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.exam.dao.QuestionTypeAuthDao;
 import com.wcpdoc.exam.exam.dao.QuestionTypeDao;
 import com.wcpdoc.exam.exam.entity.QuestionType;
-import com.wcpdoc.exam.exam.entity.QuestionTypeAuth;
 import com.wcpdoc.exam.exam.service.QuestionTypeExService;
 import com.wcpdoc.exam.exam.service.QuestionTypeService;
 import com.wcpdoc.exam.sys.service.OrgService;
@@ -31,8 +29,6 @@ import com.wcpdoc.exam.sys.service.PostService;
 public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implements QuestionTypeService{
 	@Resource
 	private QuestionTypeDao questionTypeDao;
-	@Resource
-	private QuestionTypeAuthDao questionTypeAuthDao;
 	@Resource
 	private QuestionTypeExService questionTypeExService;
 	@Resource
@@ -63,7 +59,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		questionTypeDao.save(questionType);
 		
 		//更新父子关系
-		QuestionType parentQuestionType = questionTypeDao.getEntity(questionType.getParentId());
+		QuestionType parentQuestionType = getEntity(questionType.getParentId());
 		if(parentQuestionType == null){
 			questionType.setParentSub("_" + questionType.getId() + "_");
 		}else {
@@ -200,37 +196,23 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 			}
 		}
 		
-		QuestionTypeAuth auth = questionTypeAuthDao.getEntity(id);
-		if(auth != null){
-			StringBuilder _userIds = new StringBuilder();
-			if(ValidateUtil.isValid(auth.getUserIds())){
-				_userIds.append(auth.getUserIds());
-			}else{
-				_userIds.append(",");
-			}
-			for(Integer userId : userIds){
-				if(_userIds.toString().contains("," + userId + ",")){
-					continue;
-				}
-				_userIds.append(userId).append(",");
-			}
-			auth.setUserIds(_userIds.toString());
-			auth.setUpdateTime(new Date());
-			auth.setUpdateUserId(user.getId());
-			questionTypeAuthDao.update(auth);
-			return;
+		QuestionType questionType = getEntity(id);
+		StringBuilder _userIds = new StringBuilder();
+		if(ValidateUtil.isValid(questionType.getUserIds())){
+			_userIds.append(questionType.getUserIds());
+		}else{
+			_userIds.append(",");
 		}
-		
-		auth = new QuestionTypeAuth();
-		StringBuilder _userIds = new StringBuilder(",");
 		for(Integer userId : userIds){
+			if(_userIds.toString().contains("," + userId + ",")){
+				continue;
+			}
 			_userIds.append(userId).append(",");
 		}
-		auth.setId(id);
-		auth.setUserIds(_userIds.toString());
-		auth.setUpdateTime(new Date());
-		auth.setUpdateUserId(user.getId());
-		questionTypeAuthDao.save(auth);
+		questionType.setUserIds(_userIds.toString());
+		questionType.setUpdateTime(new Date());
+		questionType.setUpdateUserId(user.getId());
+		update(questionType);
 	}
 
 	private List<QuestionType> getList(Integer id) {
@@ -254,12 +236,12 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 			}
 		}
 		
-		QuestionTypeAuth questionTypeAuth = questionTypeAuthDao.getEntity(id);
-		if(questionTypeAuth == null){
+		QuestionType questionType = getEntity(id);
+		if(questionType == null){
 			return;
 		}
 		
-		String _userIds = questionTypeAuth.getUserIds();
+		String _userIds = questionType.getUserIds();
 		if(!ValidateUtil.isValid(_userIds)){
 			return;
 		}
@@ -270,8 +252,8 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 			_userIds = null;
 		}
 		
-		questionTypeAuth.setUserIds(_userIds);
-		questionTypeAuthDao.update(questionTypeAuth);
+		questionType.setUserIds(_userIds);
+		update(questionType);
 	}
 
 	@Override
@@ -292,42 +274,19 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 			}
 		}
 		
-		QuestionTypeAuth auth = questionTypeAuthDao.getEntity(id);
-		if(auth != null){
-			StringBuilder _orgIds = new StringBuilder(",");
-			for(Integer orgId : orgIds){
-				_orgIds.append(orgId).append(",");
-			}
-			if(_orgIds.toString().equals(",")){
-				auth.setOrgIds(null);
-			}else{
-				auth.setOrgIds(_orgIds.toString());
-			}
-			auth.setUpdateTime(new Date());
-			auth.setUpdateUserId(user.getId());
-			questionTypeAuthDao.update(auth);
-			return;
-		}
-		
-		auth = new QuestionTypeAuth();
+		QuestionType questionType = getEntity(id);
 		StringBuilder _orgIds = new StringBuilder(",");
 		for(Integer orgId : orgIds){
 			_orgIds.append(orgId).append(",");
 		}
 		if(_orgIds.toString().equals(",")){
-			auth.setOrgIds(null);
+			questionType.setOrgIds(null);
 		}else{
-			auth.setOrgIds(_orgIds.toString());
+			questionType.setOrgIds(_orgIds.toString());
 		}
-		auth.setId(id);
-		auth.setUpdateTime(new Date());
-		auth.setUpdateUserId(user.getId());
-		questionTypeAuthDao.save(auth);
-	}
-
-	@Override
-	public QuestionTypeAuth getQuestionTypeAuth(Integer questionTypeAuthId) {
-		return questionTypeAuthDao.getEntity(questionTypeAuthId);
+		questionType.setUpdateTime(new Date());
+		questionType.setUpdateUserId(user.getId());
+		update(questionType);
 	}
 
 	@Override
@@ -353,46 +312,23 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 			}
 		}
 		
-		QuestionTypeAuth auth = questionTypeAuthDao.getEntity(id);
-		if(auth != null){
-			StringBuilder _postIds = new StringBuilder(",");
-			for(Integer postId : postIds){
-				_postIds.append(postId).append(",");
-			}
-			if(_postIds.toString().equals(",")){
-				auth.setPostIds(null);
-			}else{
-				auth.setPostIds(_postIds.toString());
-			}
-			auth.setUpdateTime(new Date());
-			auth.setUpdateUserId(user.getId());
-			questionTypeAuthDao.update(auth);
-			return;
-		}
-		
-		auth = new QuestionTypeAuth();
+		QuestionType questionType = getEntity(id);
 		StringBuilder _postIds = new StringBuilder(",");
 		for(Integer postId : postIds){
 			_postIds.append(postId).append(",");
 		}
 		if(_postIds.toString().equals(",")){
-			auth.setPostIds(null);
+			questionType.setPostIds(null);
 		}else{
-			auth.setPostIds(_postIds.toString());
+			questionType.setPostIds(_postIds.toString());
 		}
-		auth.setId(id);
-		auth.setUpdateTime(new Date());
-		auth.setUpdateUserId(user.getId());
-		questionTypeAuthDao.save(auth);
+		questionType.setUpdateTime(new Date());
+		questionType.setUpdateUserId(user.getId());
+		update(questionType);
 	}
 
 	@Override
 	public List<QuestionType> getList() {
 		return questionTypeDao.getList();
-	}
-
-	@Override
-	public List<QuestionTypeAuth> getQuestionTypeAuthList() {
-		return questionTypeAuthDao.getList();
 	}
 }

@@ -7,70 +7,48 @@
 	</head>
 	<body>
 		<%@include file="/script/home/head.jspf"%>
-		<div class="examlist">
-			<div class="container">
-				<div class="row">
-					<div class="col-md-3">
-						<div id="questionTypeTree" class="tree"></div>
-					</div>
-					<div class="col-md-9">
-						<form class="form-inline query" role="form">
-							<div class="form-group">
-								<label class="sr-only" for="name">名称</label>
-								<input type="text" class="form-control box" placeholder="请输入名称">
-							</div>
-							<div class="form-group">&nbsp;&nbsp;</div>
-							<div class="form-group">
-								<button type="button" class="btn btn-primary">
-									<span class="glyphicon glyphicon-search"></span>
-									&nbsp;查询
-								</button>
-							</div>
-							<div class="form-group pull-right">
-								<button type="button" class="btn btn-primary" onclick="toQuestionAdd()">
-									<span class="glyphicon glyphicon-plus"></span>
-									&nbsp;添加
-								</button>
-							</div>
-						</form>
-						<div style="height: 30px;"></div>
-						<div class="table-responsive">
-							<table class="table">
-								<thead>
-									<tr>
-										<th>名称</th>
-										<th>开始时间</th>
-										<th>操作</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td>转正考试</td>
-										<td>2018-02-03 11:55:35</td>
-										<td>
-											<span class="glyphicon glyphicon-pencil"></span>
-											&nbsp;修改
-										</td>
-									</tr>
-									<tr>
-										<td>保密考试</td>
-										<td>2018-02-03 11:55:35</td>
-										<td>
-											<span class="glyphicon glyphicon-pencil"></span>
-											&nbsp;修改
-										</td>
-									</tr>
-									<tr>
-										<td>cmmi认证</td>
-										<td>2018-02-03 11:55:35</td>
-										<td>
-											<span class="glyphicon glyphicon-pencil"></span>
-											&nbsp;修改
-										</td>
-									</tr>
-								</tbody>
-							</table>
+		<div class="container">
+			<div class="row">
+				<div class="col-md-3">
+					<div id="questionTypeTree" class="exam-tree"></div>
+				</div>
+				<div class="col-md-9">
+					<div class="panel panel-default exam-query">
+						<div class="panel-heading">查询条件</div>
+						<div class="panel-body">
+							<form class="form-horizontal" role="form">
+								<div class="row">
+									<div class="col-md-4">
+										<div class="form-group">
+											<label for="one" class="col-md-5 control-label">名称：</label>
+											<div class="col-md-7">
+												<input type="text" name="one" class="form-control" placeholder="请输入名称">
+											</div>
+										</div>
+									</div>
+									<div class="col-md-4">
+										
+									</div>
+									<div class="col-md-4">
+										<div class="form-group">
+											<div class="col-md-5">
+											</div>
+											<div class="col-md-7">
+												<button type="button" class="btn btn-primary">
+													<span class="glyphicon glyphicon-search"></span>
+													&nbsp;查询
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</form>
 						</div>
+					</div>
+					
+					<div style="height: 30px;"></div>
+					<div class="table-responsive">
+						<table id="questionTable"></table>
 					</div>
 				</div>
 			</div>
@@ -83,6 +61,7 @@
 		//页面加载完毕，执行如下方法：
 		$(function() {
 			initQuestionTypeTree();
+			initQuestionGrid();
 		});
 		
 		//初始化试题分类树
@@ -95,10 +74,10 @@
 						expandIcon: "glyphicon glyphicon-chevron-right",
 						collapseIcon: "glyphicon glyphicon-chevron-down",
 						nodeIcon: "glyphicon glyphicon-bookmark",
-						color: "#605F5F",
+						color: "#428BCA",
 						showTags: true, 
 						levels: 3,
-						data: generateTree(arr, {
+						data: generateBootstrapTree(arr, {
 							idFiled : "ID",
 							textFiled : "NAME", 
 							parentField : "PARENT_ID",
@@ -110,6 +89,22 @@
 						}
 					});
 				}
+			});
+		}
+		
+		//初始化列表
+		function initQuestionGrid(){
+			$("#questionTable").bootstrapTable({
+				url : "home/question/list",
+				columns : [
+							{field : "ID", title : "", checkbox : true}, 
+							{field : "CODE", title : "编号", width : 50, align : "center"},
+							{field : "TITLE", title : "题干 ", width : 300, align : "center"},
+							{field : "TYPE_NAME", title : "类型", width : 80, align : "center"},
+							{field : "DIFFICULTY_NAME", title : "难度", width : 80, align : "center"},
+							{field : "STATE_NAME", title : "状态 ", width : 80, align : "center"},
+							{field : "QUESTION_TYPE_NAME", title : "分类 ", width : 80, align : "center"}
+							]
 			});
 		}
 		

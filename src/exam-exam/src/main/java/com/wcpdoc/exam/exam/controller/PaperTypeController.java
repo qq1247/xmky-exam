@@ -20,7 +20,6 @@ import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.exam.entity.PaperType;
-import com.wcpdoc.exam.exam.entity.PaperTypeAuth;
 import com.wcpdoc.exam.exam.service.PaperTypeService;
 import com.wcpdoc.exam.sys.entity.User;
 
@@ -402,7 +401,7 @@ public class PaperTypeController extends BaseController{
 	public List<Map<String, Object>> authOrgOrgTreeList(Integer id) {
 		try {
 			List<Map<String, Object>> orgTreeList = paperTypeService.getOrgTreeList();
-			PaperTypeAuth paperTypeAuth = paperTypeService.getPaperTypeAuth(id);
+			PaperType paperTypeAuth = paperTypeService.getEntity(id);
 			if(paperTypeAuth == null){
 				return orgTreeList;
 			}
@@ -436,7 +435,7 @@ public class PaperTypeController extends BaseController{
 	public List<Map<String, Object>> authPostOrgTreeList(Integer id) {
 		try {
 			List<Map<String, Object>> orgPostTree = paperTypeService.getOrgPostTreeList();
-			PaperTypeAuth paperTypeAuth = paperTypeService.getPaperTypeAuth(id);
+			PaperType paperTypeAuth = paperTypeService.getEntity(id);
 			if(paperTypeAuth == null){
 				return orgPostTree;
 			}

@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.exam.service.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +17,9 @@ import com.wcpdoc.exam.exam.entity.Question;
 import com.wcpdoc.exam.exam.entity.QuestionType;
 import com.wcpdoc.exam.exam.service.QuestionService;
 import com.wcpdoc.exam.exam.service.QuestionTypeService;
+import com.wcpdoc.exam.sys.entity.Org;
+import com.wcpdoc.exam.sys.entity.Post;
+import com.wcpdoc.exam.sys.service.UserService;
 
 /**
  * 试题服务层实现
@@ -27,6 +32,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	private QuestionDao questionDao;
 	@Resource
 	private QuestionTypeService questionTypeService;
+	@Resource
+	private UserService userService;
 
 	@Override
 	@Resource(name = "questionDaoImpl")
@@ -35,8 +42,47 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public List<Map<String, Object>> getQuestionTypeTreeList() {
-		return questionTypeService.getTreeList();
+	public List<Map<String, Object>> getQuestionTypeTreeList(Integer  userId) {
+		Org org = userService.getOrg(userId);
+		List<Post> postList = userService.getPostList(userId);
+		List<QuestionType> questionTypeList = questionTypeService.getList();
+		List<Map<String, Object>> questionTypeTreeList = new ArrayList<Map<String,Object>>();
+		
+		for(QuestionType questionType : questionTypeList){
+			if(userId != 1){//如果不是系统管理员
+				if(!(questionType.getUserIds() != null 
+						&& questionType.getUserIds().contains(userId.toString()))){//没有用户权限
+					continue;
+				}
+				if(!(questionType.getOrgIds() != null 
+						&& questionType.getOrgIds().contains(org.getId().toString()))){//没有机构权限
+					continue;
+				}
+				
+				boolean hasPostAuth = false;
+				for(Post post : postList){
+					if(questionType.getPostIds() != null 
+							&& questionType.getPostIds().contains(post.getId().toString())){//没有岗位权限
+						hasPostAuth = true;
+						break;
+					}
+				}
+				
+				if(!hasPostAuth){
+					continue;
+				}
+			}
+			
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("ID", questionType.getId());
+			map.put("NAME", questionType.getName());
+			map.put("PARENT_ID", questionType.getParentId());
+			//map.put("DISABLED", true);
+			//map.put("EXPANDED", true);
+			questionTypeTreeList.add(map);
+		}
+		
+		return questionTypeTreeList;
 	}
 
 	@Override

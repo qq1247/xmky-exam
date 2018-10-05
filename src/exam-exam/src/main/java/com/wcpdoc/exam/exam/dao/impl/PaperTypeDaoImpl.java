@@ -27,12 +27,11 @@ public class PaperTypeDaoImpl extends BaseDaoImpl<PaperType> implements PaperTyp
 		String sql = "SELECT PAPER_TYPE.ID, PAPER_TYPE.NAME, PAPER_TYPE.PARENT_ID, "
 				+ "PAPER_TYPE.PARENT_SUB, PARENT_PAPER_TYPE.NAME AS PARENT_NAME, "
 				+ "PAPER_TYPE.NO, "
-				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_USER _A WHERE PAPER_TYPE_AUTH.USER_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS USER_NAMES, "
-				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_ORG _A WHERE PAPER_TYPE_AUTH.ORG_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS ORG_NAMES, "
-				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_POST _A WHERE PAPER_TYPE_AUTH.POST_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS POST_NAMES "
+				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_USER _A WHERE PAPER_TYPE.USER_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS USER_NAMES, "
+				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_ORG _A WHERE PAPER_TYPE.ORG_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS ORG_NAMES, "
+				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_POST _A WHERE PAPER_TYPE.POST_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS POST_NAMES "
 				+ "FROM EXM_PAPER_TYPE PAPER_TYPE "
-				+ "LEFT JOIN EXM_PAPER_TYPE PARENT_PAPER_TYPE ON PAPER_TYPE.PARENT_ID = PARENT_PAPER_TYPE.ID "
-				+ "LEFT JOIN EXM_PAPER_TYPE_AUTH PAPER_TYPE_AUTH ON PAPER_TYPE.ID = PAPER_TYPE_AUTH.ID";
+				+ "LEFT JOIN EXM_PAPER_TYPE PARENT_PAPER_TYPE ON PAPER_TYPE.PARENT_ID = PARENT_PAPER_TYPE.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "PAPER_TYPE.PARENT_ID = ?", pageIn.getOne())//如果查询的是根目录，则查询所有。否则查询选中机构的子机构
 				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "PAPER_TYPE.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
@@ -92,7 +91,7 @@ public class PaperTypeDaoImpl extends BaseDaoImpl<PaperType> implements PaperTyp
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "ORG.ID = ?", pageIn.getOne())
 				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.getTen()), 
-						"EXISTS (SELECT 1 FROM EXM_PAPER_TYPE_AUTH Z WHERE Z.ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", 
+						"EXISTS (SELECT 1 FROM EXM_PAPER_TYPE Z WHERE Z.ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", 
 						pageIn.getTen())
 //				.addWhere("USER.STATE = ?", 1)//已添加过的可以显示
 				.addWhere("USER.ID != ?", 1)//排除管理员
@@ -116,7 +115,7 @@ public class PaperTypeDaoImpl extends BaseDaoImpl<PaperType> implements PaperTyp
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "ORG.ID = ?", pageIn.getOne())
 				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.getTen()), 
-						"NOT EXISTS (SELECT 1 FROM EXM_PAPER_TYPE_AUTH Z WHERE Z.ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", 
+						"NOT EXISTS (SELECT 1 FROM EXM_PAPER_TYPE Z WHERE Z.ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", 
 						pageIn.getTen())
 				.addWhere("USER.STATE = ?", 1)//当前正常的用户
 				.addWhere("USER.ID != ?", 1)//排除管理员

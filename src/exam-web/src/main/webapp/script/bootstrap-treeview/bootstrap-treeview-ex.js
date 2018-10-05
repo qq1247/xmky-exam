@@ -1,4 +1,4 @@
-function generateTree(arr, options) {
+function generateBootstrapTree(arr, options) {
 	var defaluts = {
 		idFiled : "id",
 		textFiled : "text", 

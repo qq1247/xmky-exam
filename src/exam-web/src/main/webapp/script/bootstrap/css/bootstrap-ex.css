@@ -51,7 +51,7 @@ body {
 }
 
 .exam-header-plus {
-	padding-top: 86px;
+	padding-top: 106px;
 }
 
 .exam-login-bg {
@@ -76,7 +76,7 @@ body {
 	margin: 0 0 30px;
 }
 
-.exam-login-box div{
+.exam-login-box div {
 	position: relative;
 	width: 450px;
 	height: 50px;
@@ -123,4 +123,24 @@ body {
 	float: left;
 	color: #a94442;
 	margin-bottom: 0px !important;
+}
+
+.exam-tree {
+	border-width: 1px;
+	border-color: rgb(221, 221, 221);
+	border-style: solid;
+}
+
+.exam-tree ul {
+	margin-bottom: 0px;
+}
+
+.exam-tree .badge {
+	background-color: #428BCA;
+}
+
+.exam-query button {
+	height: 40px;
+	width: 150px;
+	max-width: 100%;
 }

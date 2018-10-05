@@ -8,7 +8,6 @@ import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.service.BaseService;
 import com.wcpdoc.exam.exam.entity.QuestionType;
-import com.wcpdoc.exam.exam.entity.QuestionTypeAuth;
 /**
  * 试题分类服务层接口
  * 
@@ -118,15 +117,6 @@ public interface QuestionTypeService extends BaseService<QuestionType>{
 	void doAuthOrgUpdate(Integer id, Integer[] orgIds, boolean syn2Sub, LoginUser user);
 
 	/**
-	 * 获取权限
-	 * 
-	 * v1.0 zhanghc 2018年5月31日下午10:12:54
-	 * @param questionTypeAuthId
-	 * @return QuestionTypeAuth
-	 */
-	QuestionTypeAuth getQuestionTypeAuth(Integer questionTypeAuthId);
-
-	/**
 	 * 获取机构岗位树
 	 * 
 	 * v1.0 zhanghc 2018年6月1日下午12:13:39
@@ -153,12 +143,4 @@ public interface QuestionTypeService extends BaseService<QuestionType>{
 	 * @return List<QuestionType>
 	 */
 	List<QuestionType> getList();
-
-	/**
-	 * 获取试题分类权限列表
-	 * 
-	 * v1.0 zhanghc 2018年6月3日下午1:58:08
-	 * @return List<QuestionTypeAuth>
-	 */
-	List<QuestionTypeAuth> getQuestionTypeAuthList();
 }

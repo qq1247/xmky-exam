@@ -8,7 +8,6 @@ import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.service.BaseService;
 import com.wcpdoc.exam.exam.entity.ExamType;
-import com.wcpdoc.exam.exam.entity.ExamTypeAuth;
 /**
  * 考试分类服务层接口
  * 
@@ -118,15 +117,6 @@ public interface ExamTypeService extends BaseService<ExamType>{
 	void doAuthOrgUpdate(Integer id, Integer[] orgIds, boolean syn2Sub, LoginUser user);
 
 	/**
-	 * 获取权限
-	 * 
-	 * v1.0 zhanghc 2018年5月31日下午10:12:54
-	 * @param examTypeAuthId
-	 * @return ExamTypeAuth
-	 */
-	ExamTypeAuth getExamTypeAuth(Integer examTypeAuthId);
-
-	/**
 	 * 获取机构岗位树
 	 * 
 	 * v1.0 zhanghc 2018年6月1日下午12:13:39
@@ -153,12 +143,4 @@ public interface ExamTypeService extends BaseService<ExamType>{
 	 * @return List<ExamType>
 	 */
 	List<ExamType> getList();
-
-	/**
-	 * 获取考试分类权限列表
-	 * 
-	 * v1.0 zhanghc 2018年6月3日下午1:58:08
-	 * @return List<ExamTypeAuth>
-	 */
-	List<ExamTypeAuth> getExamTypeAuthList();
 }

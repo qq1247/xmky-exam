@@ -14,7 +14,7 @@
 					<ul class="dropdown-menu">
 						<li>
 							<span class="hand"></span>
-							<a href="#">试题管理</a>
+							<a href="home/question/toList">试题管理</a>
 						</li>
 						<li class="divider"></li>
 						<li>

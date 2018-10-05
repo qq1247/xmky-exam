@@ -8,7 +8,6 @@ import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.service.BaseService;
 import com.wcpdoc.exam.exam.entity.PaperType;
-import com.wcpdoc.exam.exam.entity.PaperTypeAuth;
 /**
  * 试题分类服务层接口
  * 
@@ -119,15 +118,6 @@ public interface PaperTypeService extends BaseService<PaperType>{
 	void doAuthOrgUpdate(Integer id, Integer[] orgIds, boolean syn2Sub, LoginUser user);
 
 	/**
-	 * 获取权限
-	 * 
-	 * v1.0 zhanghc 2018年5月31日下午10:12:54
-	 * @param paperTypeAuthId
-	 * @return PaperTypeAuth
-	 */
-	PaperTypeAuth getPaperTypeAuth(Integer paperTypeAuthId);
-
-	/**
 	 * 获取机构岗位树
 	 * 
 	 * v1.0 zhanghc 2018年6月1日下午12:13:39
@@ -155,11 +145,4 @@ public interface PaperTypeService extends BaseService<PaperType>{
 	 */
 	List<PaperType> getList();
 
-	/**
-	 * 获取试卷分类权限列表
-	 * 
-	 * v1.0 zhanghc 2018年6月3日下午1:58:08
-	 * @return List<PaperTypeAuth>
-	 */
-	List<PaperTypeAuth> getPaperTypeAuthList();
 }

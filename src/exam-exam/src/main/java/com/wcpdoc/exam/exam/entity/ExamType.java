@@ -41,6 +41,12 @@ public class ExamType {
 	private Integer state;
 	@Column(name = "NO")
 	private Integer no;
+	@Column(name = "USER_IDS")
+	private String userIds;
+	@Column(name = "ORG_IDS")
+	private String orgIds;
+	@Column(name = "POST_IDS")
+	private String postIds;
 
 	public Integer getId() {
 		return id;
@@ -104,5 +110,29 @@ public class ExamType {
 
 	public void setNo(Integer no) {
 		this.no = no;
+	}
+
+	public String getUserIds() {
+		return userIds;
+	}
+
+	public void setUserIds(String userIds) {
+		this.userIds = userIds;
+	}
+
+	public String getOrgIds() {
+		return orgIds;
+	}
+
+	public void setOrgIds(String orgIds) {
+		this.orgIds = orgIds;
+	}
+
+	public String getPostIds() {
+		return postIds;
+	}
+
+	public void setPostIds(String postIds) {
+		this.postIds = postIds;
 	}
 }

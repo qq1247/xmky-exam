@@ -20,7 +20,6 @@ import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.exam.entity.QuestionType;
-import com.wcpdoc.exam.exam.entity.QuestionTypeAuth;
 import com.wcpdoc.exam.exam.service.QuestionTypeService;
 import com.wcpdoc.exam.sys.entity.User;
 
@@ -402,12 +401,12 @@ public class QuestionTypeController extends BaseController{
 	public List<Map<String, Object>> authOrgOrgTreeList(Integer id) {
 		try {
 			List<Map<String, Object>> orgTreeList = questionTypeService.getOrgTreeList();
-			QuestionTypeAuth questionTypeAuth = questionTypeService.getQuestionTypeAuth(id);
-			if(questionTypeAuth == null){
+			QuestionType questionType = questionTypeService.getEntity(id);
+			if(questionType == null){
 				return orgTreeList;
 			}
 			
-			String orgIds = questionTypeAuth.getOrgIds();
+			String orgIds = questionType.getOrgIds();
 			if(!ValidateUtil.isValid(orgIds)){
 				return orgTreeList;
 			}
@@ -436,12 +435,12 @@ public class QuestionTypeController extends BaseController{
 	public List<Map<String, Object>> authPostOrgTreeList(Integer id) {
 		try {
 			List<Map<String, Object>> orgPostTree = questionTypeService.getOrgPostTreeList();
-			QuestionTypeAuth questionTypeAuth = questionTypeService.getQuestionTypeAuth(id);
-			if(questionTypeAuth == null){
+			QuestionType questionType = questionTypeService.getEntity(id);
+			if(questionType == null){
 				return orgPostTree;
 			}
 			
-			String postIds = questionTypeAuth.getPostIds();
+			String postIds = questionType.getPostIds();
 			if(!ValidateUtil.isValid(postIds)){
 				return orgPostTree;
 			}

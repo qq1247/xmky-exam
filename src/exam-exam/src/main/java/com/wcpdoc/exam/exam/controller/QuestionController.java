@@ -1,27 +1,12 @@
 package com.wcpdoc.exam.exam.controller;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wcpdoc.exam.core.controller.BaseController;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
-import com.wcpdoc.exam.core.entity.PageResult;
-import com.wcpdoc.exam.exam.entity.Question;
-import com.wcpdoc.exam.exam.entity.QuestionType;
 import com.wcpdoc.exam.exam.service.QuestionService;
-import com.wcpdoc.exam.sys.cache.DictCache;
 
 /**
  * 试题控制层
@@ -30,8 +15,9 @@ import com.wcpdoc.exam.sys.cache.DictCache;
  */
 @Controller
 @RequestMapping("/question")
+@Deprecated
 public class QuestionController extends BaseController{
-	private static final Logger log = LoggerFactory.getLogger(QuestionController.class);
+//	private static final Logger log = LoggerFactory.getLogger(QuestionController.class);
 	
 	@Resource
 	private QuestionService questionService;
@@ -41,7 +27,7 @@ public class QuestionController extends BaseController{
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @return String
-	 */
+	 *//*
 	@RequestMapping("/toList")
 	public String toList(Model model) {
 		try {
@@ -56,12 +42,12 @@ public class QuestionController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 获取试题分类数据
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @return List<Map<String,Object>>
-	 */
+	 *//*
 	@RequestMapping("/questionTypeTreeList")
 	@ResponseBody
 	public List<Map<String, Object>> questionTypeTreeList() {
@@ -73,12 +59,12 @@ public class QuestionController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 试题列表 
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @return pageOut
-	 */
+	 *//*
 	@RequestMapping("/list")
 	@ResponseBody
 	public PageOut list(PageIn pageIn) {
@@ -90,12 +76,12 @@ public class QuestionController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 到达添加试题页面 
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @return String
-	 */
+	 *//*
 	@RequestMapping("/toAdd")
 	public String toAdd(Model model) {
 		try {
@@ -109,12 +95,12 @@ public class QuestionController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 完成添加试题
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @return pageOut
-	 */
+	 *//*
 	@RequestMapping("/doAdd")
 	@ResponseBody
 	public PageResult doAdd(Question question) {
@@ -129,12 +115,12 @@ public class QuestionController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 到达修改试题页面 
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @return String
-	 */
+	 *//*
 	@RequestMapping("/toEdit")
 	public String toEdit(Model model, Integer id) {
 		try {
@@ -153,12 +139,12 @@ public class QuestionController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 完成修改试题
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @return pageOut
-	 */
+	 *//*
 	@RequestMapping("/doEdit")
 	@ResponseBody
 	public PageResult doEdit(Question question) {
@@ -188,12 +174,12 @@ public class QuestionController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 完成删除试题
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @return pageOut
-	 */
+	 *//*
 	@RequestMapping("/doDel")
 	@ResponseBody
 	public PageResult doDel(Integer[] ids) {
@@ -206,12 +192,12 @@ public class QuestionController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 到达设置试题分类页面
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @return String
-	 */
+	 *//*
 	@RequestMapping("/toQuestionTypeUpdate")
 	public String toQuestionTypeUpdate() {
 		try {
@@ -222,12 +208,12 @@ public class QuestionController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 获取试题分类树
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @return List<Map<String,Object>>
-	 */
+	 *//*
 	@RequestMapping("/questionTypeUpdateQuestionTypeTreeList")
 	@ResponseBody
 	public List<Map<String, Object>> questionTypeUpdateTreeList() {
@@ -239,14 +225,14 @@ public class QuestionController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 完成设置试题分类
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @param ids 用户ID
 	 * @param questionTypeId 试题分类ID
 	 * @return PageResult
-	 */
+	 *//*
 	@RequestMapping("/doQuestionTypeUpdate")
 	@ResponseBody
 	public PageResult doQuestionTypeUpdate(Integer[] ids, Integer questionTypeId) {
@@ -257,5 +243,5 @@ public class QuestionController extends BaseController{
 			log.error("完成设置试题分类错误：", e);
 			return new PageResult(false, "设置失败：" + e.getMessage());
 		}
-	}
+	}*/
 }

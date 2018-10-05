@@ -14,10 +14,8 @@ import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.exam.dao.PaperTypeAuthDao;
 import com.wcpdoc.exam.exam.dao.PaperTypeDao;
 import com.wcpdoc.exam.exam.entity.PaperType;
-import com.wcpdoc.exam.exam.entity.PaperTypeAuth;
 import com.wcpdoc.exam.exam.service.PaperTypeExService;
 import com.wcpdoc.exam.exam.service.PaperTypeService;
 import com.wcpdoc.exam.sys.service.OrgService;
@@ -31,8 +29,6 @@ import com.wcpdoc.exam.sys.service.PostService;
 public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements PaperTypeService{
 	@Resource
 	private PaperTypeDao paperTypeDao;
-	@Resource
-	private PaperTypeAuthDao paperTypeAuthDao;
 	@Resource
 	private PaperTypeExService paperTypeExService;
 	@Resource
@@ -200,37 +196,23 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 			}
 		}
 		
-		PaperTypeAuth auth = paperTypeAuthDao.getEntity(id);
-		if(auth != null){
-			StringBuilder _userIds = new StringBuilder();
-			if(ValidateUtil.isValid(auth.getUserIds())){
-				_userIds.append(auth.getUserIds());
-			}else{
-				_userIds.append(",");
-			}
-			for(Integer userId : userIds){
-				if(_userIds.toString().contains("," + userId + ",")){
-					continue;
-				}
-				_userIds.append(userId).append(",");
-			}
-			auth.setUserIds(_userIds.toString());
-			auth.setUpdateTime(new Date());
-			auth.setUpdateUserId(user.getId());
-			paperTypeAuthDao.update(auth);
-			return;
+		PaperType paperType = getEntity(id);
+		StringBuilder _userIds = new StringBuilder();
+		if(ValidateUtil.isValid(paperType.getUserIds())){
+			_userIds.append(paperType.getUserIds());
+		}else{
+			_userIds.append(",");
 		}
-		
-		auth = new PaperTypeAuth();
-		StringBuilder _userIds = new StringBuilder(",");
 		for(Integer userId : userIds){
+			if(_userIds.toString().contains("," + userId + ",")){
+				continue;
+			}
 			_userIds.append(userId).append(",");
 		}
-		auth.setId(id);
-		auth.setUserIds(_userIds.toString());
-		auth.setUpdateTime(new Date());
-		auth.setUpdateUserId(user.getId());
-		paperTypeAuthDao.save(auth);
+		paperType.setUserIds(_userIds.toString());
+		paperType.setUpdateTime(new Date());
+		paperType.setUpdateUserId(user.getId());
+		update(paperType);
 	}
 
 	private List<PaperType> getList(Integer id) {
@@ -254,12 +236,12 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 			}
 		}
 		
-		PaperTypeAuth paperTypeAuth = paperTypeAuthDao.getEntity(id);
-		if(paperTypeAuth == null){
+		PaperType paperType = getEntity(id);
+		if(paperType == null){
 			return;
 		}
 		
-		String _userIds = paperTypeAuth.getUserIds();
+		String _userIds = paperType.getUserIds();
 		if(!ValidateUtil.isValid(_userIds)){
 			return;
 		}
@@ -270,8 +252,8 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 			_userIds = null;
 		}
 		
-		paperTypeAuth.setUserIds(_userIds);
-		paperTypeAuthDao.update(paperTypeAuth);
+		paperType.setUserIds(_userIds);
+		update(paperType);
 	}
 
 	@Override
@@ -292,42 +274,19 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 			}
 		}
 		
-		PaperTypeAuth auth = paperTypeAuthDao.getEntity(id);
-		if(auth != null){
-			StringBuilder _orgIds = new StringBuilder(",");
-			for(Integer orgId : orgIds){
-				_orgIds.append(orgId).append(",");
-			}
-			if(_orgIds.toString().equals(",")){
-				auth.setOrgIds(null);
-			}else{
-				auth.setOrgIds(_orgIds.toString());
-			}
-			auth.setUpdateTime(new Date());
-			auth.setUpdateUserId(user.getId());
-			paperTypeAuthDao.update(auth);
-			return;
-		}
-		
-		auth = new PaperTypeAuth();
+		PaperType paperType = getEntity(id);
 		StringBuilder _orgIds = new StringBuilder(",");
 		for(Integer orgId : orgIds){
 			_orgIds.append(orgId).append(",");
 		}
 		if(_orgIds.toString().equals(",")){
-			auth.setOrgIds(null);
+			paperType.setOrgIds(null);
 		}else{
-			auth.setOrgIds(_orgIds.toString());
+			paperType.setOrgIds(_orgIds.toString());
 		}
-		auth.setId(id);
-		auth.setUpdateTime(new Date());
-		auth.setUpdateUserId(user.getId());
-		paperTypeAuthDao.save(auth);
-	}
-
-	@Override
-	public PaperTypeAuth getPaperTypeAuth(Integer paperTypeAuthId) {
-		return paperTypeAuthDao.getEntity(paperTypeAuthId);
+		paperType.setUpdateTime(new Date());
+		paperType.setUpdateUserId(user.getId());
+		update(paperType);
 	}
 
 	@Override
@@ -353,46 +312,23 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 			}
 		}
 		
-		PaperTypeAuth auth = paperTypeAuthDao.getEntity(id);
-		if(auth != null){
-			StringBuilder _postIds = new StringBuilder(",");
-			for(Integer postId : postIds){
-				_postIds.append(postId).append(",");
-			}
-			if(_postIds.toString().equals(",")){
-				auth.setPostIds(null);
-			}else{
-				auth.setPostIds(_postIds.toString());
-			}
-			auth.setUpdateTime(new Date());
-			auth.setUpdateUserId(user.getId());
-			paperTypeAuthDao.update(auth);
-			return;
-		}
-		
-		auth = new PaperTypeAuth();
+		PaperType paperType = getEntity(id);
 		StringBuilder _postIds = new StringBuilder(",");
 		for(Integer postId : postIds){
 			_postIds.append(postId).append(",");
 		}
 		if(_postIds.toString().equals(",")){
-			auth.setPostIds(null);
+			paperType.setPostIds(null);
 		}else{
-			auth.setPostIds(_postIds.toString());
+			paperType.setPostIds(_postIds.toString());
 		}
-		auth.setId(id);
-		auth.setUpdateTime(new Date());
-		auth.setUpdateUserId(user.getId());
-		paperTypeAuthDao.save(auth);
+		paperType.setUpdateTime(new Date());
+		paperType.setUpdateUserId(user.getId());
+		update(paperType);
 	}
 
 	@Override
 	public List<PaperType> getList() {
 		return paperTypeDao.getList();
-	}
-
-	@Override
-	public List<PaperTypeAuth> getPaperTypeAuthList() {
-		return paperTypeAuthDao.getList();
 	}
 }
