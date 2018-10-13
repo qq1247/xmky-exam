@@ -114,7 +114,8 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		}
 		File file = fileDao.getEntity(id);
 		if(file.getState().equals("1")){
-			throw new RuntimeException("临时附件【" + file.getName() + "】已经上传成功！");
+			//throw new RuntimeException("临时附件【" + file.getName() + "】已经上传成功！");
+			return;
 		}
 		
 		//数据库更新附件信息（如果先移动附件成功，而后数据库更新失败，恢复移动附件不好处理）

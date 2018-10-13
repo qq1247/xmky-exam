@@ -139,8 +139,47 @@ body {
 	background-color: #428BCA;
 }
 
-.exam-query button {
-	height: 40px;
-	width: 150px;
-	max-width: 100%;
+.exam-query .panel-body {
+	padding-bottom: 0px;
+}
+
+.exam-list th {
+	background-color: #F5F5F5;
+}
+
+.exam-list tbody tr {
+	background: none repeat scroll 0% 0% #FFF;
+}
+
+.exam-list .bs-bars {
+	margin-top: 0px !important;
+}
+
+form .field-error {
+	border: 1px solid #a94442;
+}
+
+form .field-success {
+	border: 1px solid #2b542c;
+}
+
+form .help-block {
+	font-size: 12px;
+	float: left;
+	color: #a94442;
+	margin-bottom: 0px !important;
+}
+
+.note {
+	background-color: #eef7ea;
+	border-color: #bbdba1 !important;
+	color: #3c763d;
+	margin: 0 0 20px 0;
+	padding: 15px 30px 15px 15px;
+	border-left: 5px solid #eee;
+	-webkit-border-radius: 0 4px 4px 0;
+	-moz-border-radius: 0 4px 4px 0;
+	-ms-border-radius: 0 4px 4px 0;
+	-o-border-radius: 0 4px 4px 0;
+	border-radius: 0 4px 4px 0;
 }

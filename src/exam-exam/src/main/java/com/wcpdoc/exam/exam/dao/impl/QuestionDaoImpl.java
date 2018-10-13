@@ -1,7 +1,11 @@
 package com.wcpdoc.exam.exam.dao.impl;
 
 import java.util.List;
+import java.util.Map;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.exam.core.dao.impl.BaseDaoImpl;
@@ -9,8 +13,8 @@ import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.util.HibernateUtil;
 import com.wcpdoc.exam.core.util.SqlUtil;
-import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.util.SqlUtil.Order;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.exam.dao.QuestionDao;
 import com.wcpdoc.exam.exam.entity.Question;
 import com.wcpdoc.exam.exam.entity.QuestionType;
@@ -33,14 +37,31 @@ public class QuestionDaoImpl extends BaseDaoImpl<Question> implements QuestionDa
 		
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "QUESTION.QUESTION_TYPE_ID = ?", pageIn.getOne())
-				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "QUESTION.TYPE = ?", pageIn.getTwo())
-				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "QUESTION.DIFFICULTY = ?", pageIn.getThree())
+				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "QUESTION.ID = ?", pageIn.getTwo())
+				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "QUESTION.TITLE LIKE ?", "%" + pageIn.getThree() + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "QUESTION.STATE = ?", pageIn.getFour())//0：删除；1：启用；2：禁用
-				.addWhere(ValidateUtil.isValid(pageIn.getFive()), "QUESTION_YTPE.NAME LIKE ?", "%" + pageIn.getFive() + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.getFive()), "QUESTION.TYPE = ?", pageIn.getFive())
+				.addWhere(ValidateUtil.isValid(pageIn.getSix()), "QUESTION.DIFFICULTY = ?", pageIn.getSix())
 				.addWhere("QUESTION.STATE != ?", 0)
 				.addOrder("QUESTION.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), "QUESTION_TYPE", "TYPE", "QUESTION_DIFFICULTY", "DIFFICULTY", "STATE", "STATE");
+		for(Map<String, Object> map : pageOut.getRows()){
+			String title = map.get("TITLE").toString();
+			Document document = Jsoup.parse(title);
+			Elements embeds = document.getElementsByTag("embed");
+			embeds.after("【视频】");
+			embeds.remove();
+			Elements imgs = document.getElementsByTag("img");
+			imgs.after("【图片】");
+			imgs.remove();
+			
+			title = document.body().toString();
+			if(title.length() > 30){
+				title = title.substring(0, 30) + "...";
+			}
+			map.put("TITLE", Jsoup.parse(title).text());
+		}
 		return pageOut;
 	}
 

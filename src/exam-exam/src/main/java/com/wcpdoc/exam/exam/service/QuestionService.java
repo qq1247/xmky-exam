@@ -3,9 +3,13 @@ package com.wcpdoc.exam.exam.service;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.web.multipart.MultipartFile;
+
+import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.service.BaseService;
 import com.wcpdoc.exam.exam.entity.Question;
 import com.wcpdoc.exam.exam.entity.QuestionType;
+import com.wcpdoc.exam.file.entity.FileEx;
 /**
  * 试题服务层接口
  * 
@@ -56,5 +60,59 @@ public interface QuestionService extends BaseService<Question>{
 	 * void
 	 */
 	void delAndUpdate(Integer[] ids);
+
+	/**
+	 * 获取试题分类
+	 * 
+	 * v1.0 zhanghc 2018年10月6日下午12:34:27
+	 * @param questionTypeId
+	 * @return Object
+	 */
+	QuestionType getQuestionType2(Integer questionTypeId);
+
+	/**
+	 * 完成临时上传附件
+	 * 
+	 * v1.0 zhanghc 2018年10月11日下午2:41:32
+	 * @param files
+	 * @param allowTypes
+	 * @param user
+	 * @param ip
+	 * @return String
+	 */
+	String doTempUpload(MultipartFile[] files, String[] allowTypes, LoginUser user, String ip);
+
+	/**
+	 * 获取附件
+	 * 
+	 * v1.0 zhanghc 2018年10月11日下午5:45:10
+	 * @param fileId
+	 * @return FileEx
+	 */
+	FileEx getFileEx(Integer fileId);
+
+	/**
+	 * 完成试题添加
+	 * 
+	 * v1.0 zhanghc 2018年10月12日下午1:52:35
+	 * @param question
+	 * @param answer 
+	 * @param user
+	 * @param ip 
+	 * void
+	 */
+	void saveAndUpdate(Question question, String[] answer, LoginUser user, String ip);
+
+	/**
+	 * 完成试题修改
+	 * 
+	 * v1.0 zhanghc 2018年10月12日下午7:30:02
+	 * @param question
+	 * @param answer 
+	 * @param user
+	 * @param ip 
+	 * void
+	 */
+	void updateAndUpdate(Question question, String[] answer, LoginUser user, String ip);
 	
 }

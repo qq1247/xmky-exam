@@ -1,22 +1,33 @@
 package com.wcpdoc.exam.home.controller;
 
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
+import com.wcpdoc.exam.core.entity.PageResult;
+import com.wcpdoc.exam.exam.entity.Question;
+import com.wcpdoc.exam.exam.entity.QuestionType;
 import com.wcpdoc.exam.exam.service.QuestionService;
+import com.wcpdoc.exam.file.entity.FileEx;
 import com.wcpdoc.exam.sys.cache.DictCache;
 
 /**
@@ -42,10 +53,9 @@ public class HomeQuestionController extends BaseController {
 	@RequestMapping("/toList")
 	public String toList(Model model) {
 		try {
-			model.addAttribute("QUESTION_TYPE", DictCache.getIndexDictlistMap().get("QUESTION_TYPE"));
-			model.addAttribute("QUESTION_DIFFICULTY", DictCache.getIndexDictlistMap().get("QUESTION_DIFFICULTY"));
-			model.addAttribute("STATE", DictCache.getIndexDictlistMap().get("STATE"));
-			model.addAttribute("QUESTION_OPTIONS", DictCache.getIndexDictlistMap().get("QUESTION_OPTIONS"));
+			model.addAttribute("QUESTION_TYPE_DICT", DictCache.getIndexDictlistMap().get("QUESTION_TYPE"));
+			model.addAttribute("QUESTION_DIFFICULTY_DICT", DictCache.getIndexDictlistMap().get("QUESTION_DIFFICULTY"));
+			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
 			return "/WEB-INF/jsp/home/question/questionList.jsp";
 		} catch (Exception e) {
 			log.error("到达试题列表页面错误：", e);
@@ -92,13 +102,14 @@ public class HomeQuestionController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @return String
-	 *//*
+	 */
 	@RequestMapping("/toAdd")
-	public String toAdd(Model model) {
+	public String toAdd(Model model, Integer questionTypeId) {
 		try {
-			model.addAttribute("QUESTION_TYPE", DictCache.getIndexDictlistMap().get("QUESTION_TYPE"));
-			model.addAttribute("QUESTION_DIFFICULTY", DictCache.getIndexDictlistMap().get("QUESTION_DIFFICULTY"));
-			model.addAttribute("STATE", DictCache.getIndexDictlistMap().get("STATE"));
+			model.addAttribute("QUESTION_TYPE_DICT", DictCache.getIndexDictlistMap().get("QUESTION_TYPE"));
+			model.addAttribute("QUESTION_DIFFICULTY_DICT", DictCache.getIndexDictlistMap().get("QUESTION_DIFFICULTY"));
+			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
+			model.addAttribute("questionType", questionService.getQuestionType2(questionTypeId));
 			return "/WEB-INF/jsp/home/question/questionEdit.jsp";
 		} catch (Exception e) {
 			log.error("到达添加试题页面错误：", e);
@@ -106,19 +117,19 @@ public class HomeQuestionController extends BaseController {
 		}
 	}
 	
-	*//**
+	/**
 	 * 完成添加试题
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @return pageOut
-	 *//*
+	 */
 	@RequestMapping("/doAdd")
 	@ResponseBody
-	public PageResult doAdd(Question question) {
+	public PageResult doAdd(Question question, String[] answer) {
 		try {
 			question.setUpdateTime(new Date());
 			question.setUpdateUserId(getCurrentUser().getId());
-			questionService.save(question);
+			questionService.saveAndUpdate(question, answer, getCurrentUser(), request.getRemoteAddr());
 			return new PageResult(true, "添加成功");
 		} catch (Exception e) {
 			log.error("完成添加试题错误：", e);
@@ -126,22 +137,24 @@ public class HomeQuestionController extends BaseController {
 		}
 	}
 	
-	*//**
+	/**
 	 * 到达修改试题页面 
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @return String
-	 *//*
+	 */
 	@RequestMapping("/toEdit")
 	public String toEdit(Model model, Integer id) {
 		try {
 			Question question = questionService.getEntity(id);
 			model.addAttribute("question", question);
+			
 			QuestionType questionType = questionService.getQuestionType(id);
 			model.addAttribute("questionType", questionType);
-			model.addAttribute("QUESTION_TYPE", DictCache.getIndexDictlistMap().get("QUESTION_TYPE"));
-			model.addAttribute("QUESTION_DIFFICULTY", DictCache.getIndexDictlistMap().get("QUESTION_DIFFICULTY"));
-			model.addAttribute("STATE", DictCache.getIndexDictlistMap().get("STATE"));
+			
+			model.addAttribute("QUESTION_TYPE_DICT", DictCache.getIndexDictlistMap().get("QUESTION_TYPE"));
+			model.addAttribute("QUESTION_DIFFICULTY_DICT", DictCache.getIndexDictlistMap().get("QUESTION_DIFFICULTY"));
+			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
 			
 			return "/WEB-INF/jsp/home/question/questionEdit.jsp";
 		} catch (Exception e) {
@@ -150,34 +163,19 @@ public class HomeQuestionController extends BaseController {
 		}
 	}
 	
-	*//**
+	/**
 	 * 完成修改试题
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @return pageOut
-	 *//*
+	 */
 	@RequestMapping("/doEdit")
 	@ResponseBody
-	public PageResult doEdit(Question question) {
+	public PageResult doEdit(Question question, String[] answer) {
 		try {
-			Question entity = questionService.getEntity(question.getId());
-			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(getCurrentUser().getId());
-//			entity.setType(question.getType());//不允许修改类型
-			entity.setState(question.getState());
-			entity.setDifficulty(question.getDifficulty());
-			entity.setTitle(question.getTitle());
-			entity.setOptionA(question.getOptionA());
-			entity.setOptionB(question.getOptionB());
-			entity.setOptionC(question.getOptionC());
-			entity.setOptionD(question.getOptionD());
-			entity.setOptionE(question.getOptionE());
-			entity.setOptionF(question.getOptionF());
-			entity.setOptionG(question.getOptionG());
-			entity.setAnswer(question.getAnswer());
-			entity.setAnalysis(question.getAnalysis());
-			
-			questionService.update(entity);
+			question.setUpdateTime(new Date());
+			question.setUpdateUserId(getCurrentUser().getId());
+			questionService.updateAndUpdate(question, answer, getCurrentUser(), request.getRemoteAddr());
 			return new PageResult(true, "修改成功");
 		} catch (Exception e) {
 			log.error("完成修改试题错误：", e);
@@ -185,12 +183,12 @@ public class HomeQuestionController extends BaseController {
 		}
 	}
 	
-	*//**
+	/**
 	 * 完成删除试题
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @return pageOut
-	 *//*
+	 */
 	@RequestMapping("/doDel")
 	@ResponseBody
 	public PageResult doDel(Integer[] ids) {
@@ -203,7 +201,7 @@ public class HomeQuestionController extends BaseController {
 		}
 	}
 	
-	*//**
+	/**
 	 * 到达设置试题分类页面
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
@@ -308,7 +306,7 @@ public class HomeQuestionController extends BaseController {
 	 * v1.0 zhanghc 2018年6月7日下午9:30:03
 	 * @param files
 	 * @return PageResult
-	 *//*
+	 */
 	@RequestMapping("/doTempUpload")
 	@ResponseBody
 	public Map<String, Object> doTempUpload(@RequestParam("files") MultipartFile[] files) {
@@ -316,19 +314,18 @@ public class HomeQuestionController extends BaseController {
 		try {
 			String[] allowTypes = { "jpg", "gif", "png", "mp4", "JPG", "GIF", "PNG", "MP4"};
 			String fileIds = questionService.doTempUpload(files, allowTypes, getCurrentUser(), request.getRemoteAddr());
-			data.put("fileIds", fileIds);
 			data.put("error", 0);
 			data.put("url", "doDownload?fileId=" + fileIds);
 			return data;
 		} catch (Exception e) {
-			log.error("完成临时上传附件失败：", e);
+			log.error("完成临时上传附件失败：{}", e.getMessage());
 			data.put("error", 1);
-			data.put("url", e.getMessage());
+			data.put("message", e.getMessage());
 			return data;
 		}
 	}
 	
-	*//**
+	/**
 	 * 完成上传附件
 	 * 
 	 * v1.0 zhanghc 2018年6月7日下午9:30:03
@@ -369,7 +366,7 @@ public class HomeQuestionController extends BaseController {
 	 * v1.0 zhanghc 2018年6月7日下午9:30:03
 	 * @param fileId
 	 * void
-	 *//*
+	 */
 	@RequestMapping(value = "/doDownload")
 	public void doDownload(Integer fileId) {
 		OutputStream output = null;
@@ -386,5 +383,5 @@ public class HomeQuestionController extends BaseController {
 		} finally {
 			IOUtils.closeQuietly(output);
 		}
-	}*/
+	}
 }
