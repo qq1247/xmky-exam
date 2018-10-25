@@ -113,7 +113,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 			throw new RuntimeException("无法获取参数：id");
 		}
 		File file = fileDao.getEntity(id);
-		if(file.getState().equals("1")){
+		if(file.getState() == 1){
 			//throw new RuntimeException("临时附件【" + file.getName() + "】已经上传成功！");
 			return;
 		}

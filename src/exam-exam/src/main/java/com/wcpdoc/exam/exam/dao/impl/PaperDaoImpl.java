@@ -3,6 +3,9 @@ package com.wcpdoc.exam.exam.dao.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.exam.core.dao.impl.BaseDaoImpl;
@@ -75,27 +78,41 @@ public class PaperDaoImpl extends BaseDaoImpl<Paper> implements PaperDao {
 	}
 
 	@Override
-	public PageOut getPaperCfgListpage(PageIn pageIn) {
-		String sql = "SELECT QUESTION.ID, QUESTION.ID AS CODE, QUESTION.TYPE, QUESTION.DIFFICULTY, QUESTION.TITLE, "
-				+ "QUESTION.OPTION_A, QUESTION.OPTION_B, QUESTION.OPTION_C, QUESTION.OPTION_D, "
-				+ "QUESTION.OPTION_E, QUESTION.OPTION_F, QUESTION.OPTION_G, QUESTION.ANSWER, "
-				+ "QUESTION.ANALYSIS, QUESTION.STATE, QUESTION.UPDATE_USER_ID, QUESTION.UPDATE_TIME, "
-				+ "QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME "
+	public PageOut getQuestionListpage(PageIn pageIn) {
+
+		String sql = "SELECT QUESTION.ID, QUESTION.ID AS CODE, QUESTION.TITLE, QUESTION.TYPE, QUESTION.DIFFICULTY, "
+				+ "QUESTION.STATE, QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME "
 				+ "FROM EXM_QUESTION QUESTION "
 				+ "LEFT JOIN EXM_QUESTION_TYPE QUESTION_TYPE ON QUESTION.QUESTION_TYPE_ID = QUESTION_TYPE.ID ";
 		
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "QUESTION.QUESTION_TYPE_ID = ?", pageIn.getOne())
-				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "QUESTION.TYPE = ?", pageIn.getTwo())
-				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "QUESTION.DIFFICULTY = ?", pageIn.getThree())
+				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "QUESTION.ID = ?", pageIn.getTwo())
+				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "QUESTION.TITLE LIKE ?", "%" + pageIn.getThree() + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "QUESTION.STATE = ?", pageIn.getFour())//0：删除；1：启用；2：禁用
-				.addWhere(ValidateUtil.isValid(pageIn.getFive()), "QUESTION_YTPE.NAME LIKE ?", "%" + pageIn.getFive() + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.getFive()), "QUESTION.TYPE = ?", pageIn.getFive())
+				.addWhere(ValidateUtil.isValid(pageIn.getSix()), "QUESTION.DIFFICULTY = ?", pageIn.getSix())
 				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "NOT EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.getTen())
+				.addWhere("QUESTION.STATE != ?", 0)
 				.addOrder("QUESTION.UPDATE_TIME", Order.DESC);
-		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		List<Map<String, Object>> list = pageOut.getRows();
-		HibernateUtil.formatDict(list, DictCache.getIndexkeyValueMap(), "QUESTION_TYPE", "TYPE", "QUESTION_DIFFICULTY", "DIFFICULTY", "STATE", "STATE");
+		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), "QUESTION_TYPE", "TYPE", "QUESTION_DIFFICULTY", "DIFFICULTY", "STATE", "STATE");
+		for(Map<String, Object> map : pageOut.getRows()){
+			String title = map.get("TITLE").toString();
+			Document document = Jsoup.parse(title);
+			Elements embeds = document.getElementsByTag("embed");
+			embeds.after("【视频】");
+			embeds.remove();
+			Elements imgs = document.getElementsByTag("img");
+			imgs.after("【图片】");
+			imgs.remove();
+			
+			title = document.body().html();
+			/*if(title.length() > 30){
+				title = title.substring(0, 30) + "...";
+			}*/
+			map.put("TITLE", Jsoup.parse(title).text());
+		}
 		return pageOut;
 	}
 

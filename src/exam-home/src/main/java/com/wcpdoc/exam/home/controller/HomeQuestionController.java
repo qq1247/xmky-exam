@@ -2,7 +2,6 @@ package com.wcpdoc.exam.home.controller;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,8 +37,7 @@ import com.wcpdoc.exam.sys.cache.DictCache;
 @Controller
 @RequestMapping("/home/question")
 public class HomeQuestionController extends BaseController {
-	private static final Logger log = LoggerFactory
-			.getLogger(HomeQuestionController.class);
+	private static final Logger log = LoggerFactory.getLogger(HomeQuestionController.class);
 
 	@Resource
 	private QuestionService questionService;
@@ -127,8 +125,6 @@ public class HomeQuestionController extends BaseController {
 	@ResponseBody
 	public PageResult doAdd(Question question, String[] answer) {
 		try {
-			question.setUpdateTime(new Date());
-			question.setUpdateUserId(getCurrentUser().getId());
 			questionService.saveAndUpdate(question, answer, getCurrentUser(), request.getRemoteAddr());
 			return new PageResult(true, "添加成功");
 		} catch (Exception e) {
@@ -173,8 +169,6 @@ public class HomeQuestionController extends BaseController {
 	@ResponseBody
 	public PageResult doEdit(Question question, String[] answer) {
 		try {
-			question.setUpdateTime(new Date());
-			question.setUpdateUserId(getCurrentUser().getId());
 			questionService.updateAndUpdate(question, answer, getCurrentUser(), request.getRemoteAddr());
 			return new PageResult(true, "修改成功");
 		} catch (Exception e) {

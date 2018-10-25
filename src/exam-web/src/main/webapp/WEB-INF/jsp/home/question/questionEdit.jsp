@@ -17,12 +17,12 @@
 				<div class="col-md-9">
 					<div class="panel panel-default">
    						<div class="panel-body">
-   							<form id="questionForm" class="form-horizontal" role="form">
+   							<form id="editForm" class="form-horizontal" role="form">
    								<input type="hidden" id="id" name="id" value="${question.id }" />
 								<div class="row">
 									<div class="col-md-6">
 										<div class="form-group">
-											<label for="questionTypeName" class="col-md-4 control-label">分类：</label>
+											<label for="questionTypeName" class="col-md-4 control-label">试题分类：</label>
 											<div class="col-md-8">
 												<input type="hidden" id="questionTypeId" name="questionTypeId" value="${questionType.id }" />
 												<input type="text" id="questionTypeName" name="questionTypeName" value="${questionType.name }"
@@ -160,18 +160,6 @@
 															<div class="col-md-2 oprate"></div>
 														</div>
 														</c:forEach>
-														<label class="checkbox-inline">
-															<input type="checkbox" name="optionA" value="1" ${question.optionA == "1" ? "checked='checked'" : ""} >
-															答案无顺序
-														</label>
-														<label class="checkbox-inline">
-															<input type="checkbox" name="optionB" value="1" ${question.optionB == "1" ? "checked='checked'" : ""} >
-															忽略大小写
-														</label>
-														<label class="checkbox-inline">
-															<input type="checkbox" name="optionC" value="1" ${question.optionC == "1" ? "checked='checked'" : ""} >
-															半对半分
-														</label>
 														</c:if>
 														<c:if test="${question.type == 4 }">
 														<label class="radio-inline">
@@ -204,12 +192,21 @@
 								</div>
 								<div class="row">
 									<div class="col-md-12" style="text-align: center;">
-										<button type="button" class="btn btn-primary" onclick="javascript:history.back(-1);">返回</button>
+										<button type="button" class="btn btn-primary" onclick="javascript:history.back(-1);">
+											<span class="glyphicon glyphicon-arrow-left"></span>
+											&nbsp;返回
+										</button>
 										<c:if test="${empty question.id }">
-										<button type="button" class="btn btn-primary" onclick="doAdd()">添加</button>
+										<button type="button" class="btn btn-primary" onclick="doAdd()">
+											<span class="glyphicon glyphicon-ok"></span>
+											&nbsp;添加
+										</button>
 										</c:if>
 										<c:if test="${!empty question.id }">
-										<button type="button" class="btn btn-primary" onclick="doEdit()">修改</button>
+										<button type="button" class="btn btn-primary" onclick="doEdit()">
+											<span class="glyphicon glyphicon-ok"></span>
+											&nbsp;修改
+										</button>
 										</c:if>
 									</div>
 								</div>
@@ -233,7 +230,7 @@
 		var optionMinRow = 2;//选择选项最小行数
 		var fillBlanksLabs = ["一", "二", "三", "四", "五", "六", "七"];//选项标签
 		var fillBlanksMinRow = 1;//填空选项最小行数fillBlanksLabs
-		var $questionForm = $("#questionForm");
+		var $editForm = $("#editForm");
 		var $title = $("#title");
 		var $analysis = $("#analysis");
 		var $id = $("#id");
@@ -401,16 +398,6 @@
 					html.push('	</div>');
 					html.push('</div>');
 				}
-				
-				html.push('	<label class="checkbox-inline">');
-				html.push('		<input type="checkbox" name="optionA" value="1">答案无顺序');
-				html.push('	</label>');
-				html.push('	<label class="checkbox-inline">');
-				html.push('		<input type="checkbox" name="optionB" value="1">忽略大小写');
-				html.push('	</label>');
-				html.push('	<label class="checkbox-inline">');
-				html.push('		<input type="checkbox" name="optionC" value="1">半对半分');
-				html.push('	</label>');
 				
 				$answerPanel.append(html.join(""));
 				updateFillBlanksPanel();
@@ -724,21 +711,21 @@
 				$answer.next(".help-block").html("");
 			}
 			
-			$questionForm.bootstrapValidator("addField", "questionTypeName", {//校验分类
+			$editForm.bootstrapValidator("addField", "questionTypeName", {//校验分类
 				validators : {
 					notEmpty : {}
 				}
 			});
 			
 			if($type.val() == "1" || $type.val() == "2" || $type.val() == "3" || $type.val() == "4"){//校验答案
-				$questionForm.bootstrapValidator("addField", "answer", {
+				$editForm.bootstrapValidator("addField", "answer", {
 					validators : {
 						notEmpty : {}
 					}
 				});
 			}
 			
-			var bv = $(questionForm).data('bootstrapValidator');
+			var bv = $editForm.data('bootstrapValidator');
 			bv.validate();
 			return bv.isValid();
 		}
@@ -751,15 +738,16 @@
 			
 			$.ajax({
 				url : "home/question/doAdd",
-				data : $questionForm.serialize(),
+				data : $editForm.serialize(),
 				success : function(obj) {
 					if (!obj.success) {
 						BootstrapDialog.show({
 							title : "提示消息",
 							message : obj.message,
 							buttons : [{
-								label : "确定",
-								cssClass : 'btn-primary',
+								label : "&nbsp;确定",
+								icon : "glyphicon glyphicon-ok",
+								cssClass : "btn-primary",
 								action : function(dialogItself) {
 									dialogItself.close();
 								}
@@ -781,15 +769,16 @@
 			
 			$.ajax({
 				url : "home/question/doEdit",
-				data : $questionForm.serialize(),
+				data : $editForm.serialize(),
 				success : function(obj) {
 					if (!obj.success) {
 						BootstrapDialog.show({
 							title : "提示消息",
 							message : obj.message,
 							buttons : [{
-								label : "确定",
-								cssClass : 'btn-primary',
+								label : "&nbsp;确定",
+								icon : "glyphicon glyphicon-ok",
+								cssClass : "btn-primary",
 								action : function(dialogItself) {
 									dialogItself.close();
 								}

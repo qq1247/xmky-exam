@@ -50,6 +50,8 @@ public class PaperQuestion {
 	private BigDecimal score;
 	@Column(name = "NO")
 	private Integer no;
+	@Column(name = "OPTIONS")
+	private String options;
 
 	public Integer getId() {
 		return id;
@@ -145,5 +147,13 @@ public class PaperQuestion {
 
 	public void setScore(BigDecimal score) {
 		this.score = score;
+	}
+
+	public String getOptions() {
+		return options;
+	}
+
+	public void setOptions(String options) {
+		this.options = options;
 	}
 }

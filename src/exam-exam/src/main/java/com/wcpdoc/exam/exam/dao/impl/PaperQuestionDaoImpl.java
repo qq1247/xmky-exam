@@ -52,4 +52,16 @@ public class PaperQuestionDaoImpl extends BaseDaoImpl<PaperQuestion> implements 
 		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = ? AND QUESTION_ID = ?";
 		return getUnique(sql, new Object[]{paperId, questionId}, PaperQuestion.class);
 	}
+
+	@Override
+	public List<PaperQuestion> getList2(Integer paperId) {
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = ?";
+		return getList(sql, new Object[]{paperId}, PaperQuestion.class);
+	}
+
+	@Override
+	public List<PaperQuestion> getChapterList(Integer paperId) {
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = ? AND TYPE = 1";
+		return getList(sql, new Object[]{paperId}, PaperQuestion.class);
+	}
 }

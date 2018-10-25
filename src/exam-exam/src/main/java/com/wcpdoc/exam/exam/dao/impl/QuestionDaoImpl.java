@@ -56,10 +56,10 @@ public class QuestionDaoImpl extends BaseDaoImpl<Question> implements QuestionDa
 			imgs.after("【图片】");
 			imgs.remove();
 			
-			title = document.body().toString();
-			if(title.length() > 30){
+			title = document.body().html();
+			/*if(title.length() > 30){
 				title = title.substring(0, 30) + "...";
-			}
+			}*/
 			map.put("TITLE", Jsoup.parse(title).text());
 		}
 		return pageOut;

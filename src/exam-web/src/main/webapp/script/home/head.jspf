@@ -16,13 +16,13 @@
 							<span class="hand"></span>
 							<a href="home/question/toList">试题管理</a>
 						</li>
-						<li class="divider"></li>
+						<li class="hand"></li>
 						<li>
-							<a href="#">试卷管理</a>
+							<a href="home/paper/toList">试卷管理</a>
 						</li>
-						<li class="divider"></li>
+						<li class="hand"></li>
 						<li>
-							<a href="#">考试管理</a>
+							<a href="home/exam/toList">考试管理</a>
 						</li>
 					</ul>
 				</li>

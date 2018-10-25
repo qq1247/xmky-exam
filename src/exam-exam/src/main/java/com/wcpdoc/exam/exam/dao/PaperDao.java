@@ -54,7 +54,7 @@ public interface PaperDao extends BaseDao<Paper>{
 	 * @return
 	 * PageOut
 	 */
-	PageOut getPaperCfgListpage(PageIn pageIn);
+	PageOut getQuestionListpage(PageIn pageIn);
 
 	/**
 	 * 获取试卷试题列表

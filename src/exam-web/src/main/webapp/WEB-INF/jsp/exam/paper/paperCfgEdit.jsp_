@@ -13,7 +13,7 @@
 		<tr>
 			<td class="kv-label">描述：</td>
 			<td colspan="3" class="kv-content">
-				<textarea id="paperCfgEdit_description" name="description">${paperQuestion.description }</textarea>
+				<textarea id="description" name="description">${paperQuestion.description }</textarea>
 			</td>
 		</tr>
 	</table>

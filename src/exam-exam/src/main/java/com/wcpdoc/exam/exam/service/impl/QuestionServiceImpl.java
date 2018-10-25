@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.exam.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -171,6 +172,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			}
 			question.setAnswer(answers.toString());
 		}
+		question.setUpdateTime(new Date());
+		question.setUpdateUserId(user.getId());
 		save(question);
 		
 		//保存附件
@@ -290,6 +293,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		entity.setOptionG(question.getOptionG());
 		entity.setAnswer(question.getAnswer());
 		entity.setAnalysis(question.getAnalysis());
+		entity.setUpdateTime(new Date());
+		entity.setUpdateUserId(user.getId());
 		update(entity);
 		
 		//修改附件

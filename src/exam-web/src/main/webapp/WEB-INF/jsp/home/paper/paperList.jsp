@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>试题列表</title>
+		<title>试卷列表</title>
 		<%@include file="/script/home/common.jspf"%>
 	</head>
 	<body>
@@ -11,7 +11,7 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-md-3">
-					<div id="questionTypeTree" class="exam-tree"></div>
+					<div id="paperTypeTree" class="exam-tree"></div>
 				</div>
 				<div class="col-md-9">
 					<div class="panel panel-default exam-query">
@@ -21,56 +21,20 @@
 								<div class="row">
 									<div class="col-md-4">
 										<div class="form-group">
-											<label for="two" class="control-label col-md-4">编号：</label>
+											<label for="two" class="control-label col-md-4">名称：</label>
 											<div class="col-md-8">
-												<input type="text" id="two" name="two" class="form-control" placeholder="请输入编号">
+												<input type="text" id="two" name="two" class="form-control" placeholder="请输入名称">
 											</div>
 										</div>
 									</div>
 									<div class="col-md-4">
 										<div class="form-group">
-											<label for="three" class="control-label col-md-4">题干：</label>
+											<label for="three" class="control-label col-md-4">状态：</label>
 											<div class="col-md-8">
-												<input type="text" id="three" name="three" class="form-control" placeholder="请输入题干">
-											</div>
-										</div>
-									</div>
-									<div class="col-md-4">
-										<div class="form-group">
-											<label for="four" class="control-label col-md-4">状态：</label>
-											<div class="col-md-8">
-												<select id="four" name="four" class="form-control">
+												<select id="three" name="three" class="form-control">
 													<option value=""></option>
 													<c:forEach var="dict" items="${STATE_DICT }">
 													<option value="${dict.dictKey }">${dict.dictValue }</option>
-													</c:forEach>
-												</select>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class="row">
-									<div class="col-md-4">
-										<div class="form-group">
-											<label for="five" class="control-label col-md-4">类型：</label>
-											<div class="col-md-8">
-												<select id="five" name="five" class="form-control">
-													<option value=""></option>
-													<c:forEach var="dict" items="${QUESTION_TYPE_DICT }">
-													<option value="${dict.dictKey }">${dict.dictValue }</option>
-													</c:forEach>
-												</select>
-											</div>
-										</div>
-									</div>
-									<div class="col-md-4">
-										<div class="form-group">
-											<label for="six" class="control-label col-md-4">难度：</label>
-											<div class="col-md-8">
-												<select id="six" name="six" class="form-control">
-													<option value=""></option>
-													<c:forEach var="dict" items="${QUESTION_DIFFICULTY_DICT }">
-														<option value="${dict.dictKey }">${dict.dictValue }</option>
 													</c:forEach>
 												</select>
 											</div>
@@ -105,6 +69,10 @@
 									<span class="glyphicon glyphicon-trash"></span>
 									&nbsp;删除
 								</button>
+								<button type="button" class="btn btn-primary" onclick="toCfg();">
+									<span class="glyphicon glyphicon-pencil"></span>
+									&nbsp;配置试卷
+								</button>
 							</div>
 							<table id="table"></table>
 						</div>
@@ -115,23 +83,23 @@
 	</body>
 	<script type="text/javascript">
 		//定义变量
-		var $questionTypeTree = $("#questionTypeTree");
+		var $paperTypeTree = $("#paperTypeTree");
 		var $table = $("#table");
 		var $queryForm = $("#queryForm");
 		var $one = $("#one");
 		
 		//页面加载完毕，执行如下方法：
 		$(function() {
-			initQuestionTypeTree();
+			initPaperTypeTree();
 			initTable();
 		});
 		
-		//初始化试题分类树
-		function initQuestionTypeTree(){
+		//初始化试卷分类树
+		function initPaperTypeTree(){
 			$.ajax({
-				url : "home/question/questionTypeTreeList",
+				url : "home/paper/paperTypeTreeList",
 				success : function(arr) {
-					$questionTypeTree.treeview({
+					$paperTypeTree.treeview({
 						showBorder: false,
 						expandIcon: "glyphicon glyphicon-chevron-right",
 						collapseIcon: "glyphicon glyphicon-chevron-down",
@@ -162,21 +130,19 @@
 		//初始化列表
 		function initTable(){
 			$table.bootstrapTable({
-				url : "home/question/list",
+				url : "home/paper/list",
 				queryParams : function(params){
 					var customeParams = $.fn.my.serializeObj($queryForm);
 					customeParams.page = this.pageNumber;
 					customeParams.rows = this.pageSize;
 					return customeParams;
 				},
-				columns : [
-							{field : "state", checkbox : true}, 
-							{field : "CODE", title : "编号", width : 50, align : "center"},
-							{field : "TITLE", title : "题干 ", width : 300, align : "center"},
-							{field : "TYPE_NAME", title : "类型", width : 80, align : "center"},
-							{field : "DIFFICULTY_NAME", title : "难度", width : 80, align : "center"},
-							{field : "STATE_NAME", title : "状态 ", width : 80, align : "center"},
-							{field : "QUESTION_TYPE_NAME", title : "分类 ", width : 80, align : "center"}
+				columns : [ 
+							{field : "state", checkbox : true},
+							{field : "NAME", title : "名称", width : 50, align : "center"},
+							{field : "TOTLE_SCORE", title : "总分数", width : 80, align : "center"},
+							{field : "PAPER_TYPE_NAME", title : "试卷分类", width : 50, align : "center"},
+							{field : "STATE_NAME", title : "状态", width : 80, align : "center"}
 							],
 				toolbar : "#toolbar"
 			});
@@ -195,11 +161,11 @@
 		
 		//到达添加页面
 		function toAdd(){
-			var treeNodes = $questionTypeTree.treeview("getSelected");
+			var treeNodes = $paperTypeTree.treeview("getSelected");
 			if(treeNodes.length != 1){
 				BootstrapDialog.show({
 					title : "提示消息",
-					message : "请选择试题分类",
+					message : "请选择试卷分类",
 					buttons : [{
 						label : "&nbsp;确定",
 						icon : "glyphicon glyphicon-ok",
@@ -212,7 +178,7 @@
 				return;
 			}
 			
-			window.location.href = "home/question/toAdd?questionTypeId=" + treeNodes[0].ID;
+			window.location.href = "home/paper/toAdd?paperTypeId=" + treeNodes[0].ID;
 		}
 		
 		//到达修改页面
@@ -234,10 +200,10 @@
 				return;
 			}
 			
-			window.location.href = "home/question/toEdit?id=" + nodes[0].ID;
+			window.location.href = "home/paper/toEdit?id=" + nodes[0].ID;
 		}
 		
-		//完成试题删除
+		//完成试卷删除
 		function doDel(){
 			var nodes = $table.bootstrapTable("getSelections");
 			if(nodes.length == 0){
@@ -265,7 +231,7 @@
 					cssClass : "btn-primary",
 					action : function(dialogItself) {
 						$.ajax({
-							url : "home/question/doDel",
+							url : "home/paper/doDel",
 							data : $.fn.my.serializeField(nodes),
 							success : function(obj) {
 								if (!obj.success) {
@@ -284,7 +250,7 @@
 									return;
 								}
 								
-								window.location.href = "home/question/toList";
+								window.location.href = "home/paper/toList";
 							}
 						});
 					}
@@ -297,7 +263,28 @@
 					}
 				}]
 			});
-			return;
+		}
+		
+		//到达配置试卷页面
+		function toCfg(){
+			var nodes = $table.bootstrapTable("getSelections");
+			if(nodes.length != 1){
+				BootstrapDialog.show({
+					title : "提示消息",
+					message : "请选择一行数据！",
+					buttons : [{
+						label : "&nbsp;确定",
+						icon : "glyphicon glyphicon-ok",
+						cssClass : "btn-primary",
+						action : function(dialogItself) {
+							dialogItself.close();
+						}
+					}]
+				});
+				return;
+			}
+			
+			window.location.href = "home/paper/toCfg?id=" + nodes[0].ID;
 		}
 		
 	</script>
