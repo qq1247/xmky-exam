@@ -6,7 +6,7 @@
 <head>
 <title>首页</title>
 <%@include file="/script/myJs/common.jspf"%>
-<link rel="stylesheet" type="text/css" href="css/easyui/uimaker/home/platform.css">
+<link rel="stylesheet" type="text/css" href="script/jquery-easyui/themes/uimaker/home/platform.css">
 <script type="text/javascript" src="script/jquery-easyui/themes/uimaker/main.js"></script>
 </head>
 <body>

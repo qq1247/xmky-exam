@@ -547,4 +547,9 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	public void doQuestionDel(Integer paperQuestionId) {
 		paperQuestionDao.del(paperQuestionId);
 	}
+
+	@Override
+	public PaperQuestion getPaperQuestion(Integer paperId, Integer questionId) {
+		return paperQuestionDao.getEntity(paperId, questionId);
+	}
 }

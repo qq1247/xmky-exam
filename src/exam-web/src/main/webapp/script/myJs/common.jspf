@@ -16,7 +16,7 @@
 <script type="text/javascript" src="script/jquery-easyui/jquery.easyui.min.js"></script>
 <script type="text/javascript" src="script/jquery-easyui/locale/easyui-lang-zh_CN.js"></script>
 
-<!-- 自定义easyui样式 -->script/jquery-easyui/themes/uimaker/home/base.css
+<!-- 自定义easyui样式 -->
 <link rel="stylesheet" type="text/css" href="script/jquery-easyui/themes/uimaker/home/base.css">
 <link rel="stylesheet" type="text/css" href="script/jquery-easyui/themes/uimaker/green/easyui.css">
 <link rel="stylesheet" type="text/css" href="script/jquery-easyui/themes/uimaker/green/icon.css">

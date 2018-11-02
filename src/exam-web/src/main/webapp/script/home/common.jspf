@@ -38,6 +38,11 @@
 <link href="script/bootstrap-dialog/bootstrap-dialog.min.css" rel="stylesheet">
 <script src="script/bootstrap-dialog/bootstrap-dialog.min.js"></script>
 
+<!-- bootstrap-datetimepicker -->
+<link href="script/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+<script src="script/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js"></script>
+<script src="script/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+
 <!-- kindeditor -->
 <script src="script/kindeditor/kindeditor-all.js"></script>
 <script src="script/kindeditor/plugins/flash/flash.js"></script>

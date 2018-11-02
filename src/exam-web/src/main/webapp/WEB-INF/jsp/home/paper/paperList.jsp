@@ -104,7 +104,7 @@
 						expandIcon: "glyphicon glyphicon-chevron-right",
 						collapseIcon: "glyphicon glyphicon-chevron-down",
 						nodeIcon: "glyphicon glyphicon-bookmark",
-						color: "#428BCA",
+						//color: "#428BCA",
 						showTags: true, 
 						levels: 3,
 						data: generateBootstrapTree(arr, {
@@ -159,7 +159,7 @@
 			query();
 		}
 		
-		//到达添加页面
+		//到达添加试卷页面
 		function toAdd(){
 			var treeNodes = $paperTypeTree.treeview("getSelected");
 			if(treeNodes.length != 1){
@@ -181,7 +181,7 @@
 			window.location.href = "home/paper/toAdd?paperTypeId=" + treeNodes[0].ID;
 		}
 		
-		//到达修改页面
+		//到达修改试卷页面
 		function toEdit(){
 			var nodes = $table.bootstrapTable("getSelections");
 			if(nodes.length != 1){

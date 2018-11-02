@@ -205,11 +205,11 @@ form .help-block {
 }
 
 .paper .field-error {
-	border: 1px solid #a94442;
+	border: 1px solid #a94442 !important;
 }
 
 .paper .field-success {
-	border: 1px solid #2b542c;
+	border: 1px solid #2b542 !important;
 }
 
 .paper .help-block {

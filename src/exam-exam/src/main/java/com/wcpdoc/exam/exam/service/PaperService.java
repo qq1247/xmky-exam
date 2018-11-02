@@ -266,4 +266,14 @@ public interface PaperService extends BaseService<Paper>{
 	 */
 	void doQuestionDel(Integer paperQuestionId);
 
+	/**
+	 * 获取试卷试题
+	 * 
+	 * v1.0 zhanghc 2018年10月27日上午9:28:40
+	 * @param paperId
+	 * @param questionId
+	 * @return PaperQuestion
+	 */
+	PaperQuestion getPaperQuestion(Integer paperId, Integer questionId);
+
 }

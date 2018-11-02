@@ -25,17 +25,19 @@ public interface ExamService extends BaseService<Exam>{
 	 * v1.0 zhanghc 2017-06-11 09:13:23
 	 * @param exam
 	 * void
+	 * @param user 
 	 */
-	void saveAndUpdate(Exam exam);
+	void saveAndUpdate(Exam exam, LoginUser user);
 	
 	/**
 	 * 修改考试
 	 * 
 	 * v1.0 zhanghc 2017年8月14日下午2:08:37
 	 * @param exam
+	 * @param user 
 	 * void
 	 */
-	void updateAndUpdate(Exam exam);
+	void updateAndUpdate(Exam exam, LoginUser user);
 
 	/**
 	 * 获取试卷分类数据
@@ -52,7 +54,7 @@ public interface ExamService extends BaseService<Exam>{
 	 * @param pageIn
 	 * @return PageOut
 	 */
-	PageOut getPaperAddListpage(PageIn pageIn);
+	PageOut getPaperListpage(PageIn pageIn);
 
 	/**
 	 * 获取试卷
@@ -296,4 +298,22 @@ public interface ExamService extends BaseService<Exam>{
 	 * @return PageOut
 	 */
 	PageOut getGradeListpage(PageIn pageIn);
+
+	/**
+	 * 获取考试分类
+	 * 
+	 * v1.0 zhanghc 2018年10月26日下午2:37:02
+	 * @param examTypeId
+	 * @return Object
+	 */
+	ExamType getExamType2(Integer examTypeId);
+
+	/**
+	 * 获取试卷分类树形列表
+	 * 
+	 * v1.0 zhanghc 2018年10月27日上午9:26:18
+	 * @param userId
+	 * @return List<Map<String,Object>>
+	 */
+	List<Map<String, Object>> getPaperTypeTreeList(Integer userId);
 }

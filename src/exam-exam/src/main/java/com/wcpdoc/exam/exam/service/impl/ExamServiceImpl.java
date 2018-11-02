@@ -35,7 +35,6 @@ import com.wcpdoc.exam.exam.service.ExamTypeService;
 import com.wcpdoc.exam.exam.service.ExamUserQuestionService;
 import com.wcpdoc.exam.exam.service.ExamUserService;
 import com.wcpdoc.exam.exam.service.MarkUserService;
-import com.wcpdoc.exam.exam.service.PaperQuestionService;
 import com.wcpdoc.exam.exam.service.PaperService;
 import com.wcpdoc.exam.exam.service.PaperTypeService;
 import com.wcpdoc.exam.exam.service.QuestionService;
@@ -68,8 +67,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	private ExamUserQuestionService examUserQuestionService;
 	@Resource
 	private MarkUserService markUserService;
-	@Resource
-	private PaperQuestionService paperQuestionService;
 	
 	private static final Object DO_EXAM_USER_ADD_LOCK = new Object();
 	private static final Object DO_MARK_USER_ADD_LOCK = new Object();
@@ -82,7 +79,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	
 
 	@Override
-	public void saveAndUpdate(Exam exam) {
+	public void saveAndUpdate(Exam exam, LoginUser user) {
 		//校验数据有效性
 		if(exam.getStartTime().getTime() <= new Date().getTime()){
 			throw new RuntimeException("开始时间必须大于当前时间！");
@@ -92,11 +89,13 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		}
 		
 		//添加考试
+		exam.setUpdateTime(new Date());
+		exam.setUpdateUserId(user.getId());
 		examDao.save(exam);
 	}
 	
 	@Override
-	public void updateAndUpdate(Exam exam) {
+	public void updateAndUpdate(Exam exam, LoginUser user) {
 		//校验数据有效性
 		if(exam.getStartTime().getTime() <= new Date().getTime()){
 			throw new RuntimeException("考试已开始，不允许修改！");
@@ -106,7 +105,18 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		}
 		
 		//添加考试
-		examDao.update(exam);
+		Exam entity = getEntity(exam.getId());
+		entity.setUpdateTime(new Date());
+		entity.setUpdateUserId(user.getId());
+		entity.setName(exam.getName());
+		entity.setPassScore(exam.getPassScore());
+		entity.setState(exam.getState());
+		entity.setStartTime(exam.getStartTime());
+		entity.setEndTime(exam.getEndTime());
+		entity.setDescription(exam.getDescription());
+		entity.setPaperId(exam.getPaperId());
+		entity.setExamTypeId(exam.getExamTypeId());
+		update(entity);
 	}
 
 	@Override
@@ -115,7 +125,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	@Override
-	public PageOut getPaperAddListpage(PageIn pageIn) {
+	public PageOut getPaperListpage(PageIn pageIn) {
 		return paperService.getListpage(pageIn);
 	}
 
@@ -194,7 +204,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		ExamUser examUser = examUserService.getEntity(examUserIds[0]);
 		Exam exam = getEntity(examUser.getExamId());
 		if(exam.getStartTime().getTime() <= new Date().getTime()){
-			throw new RuntimeException("考试已开始，不允许修改！");
+			throw new RuntimeException("考试已开始，不允许删除！");
 		}
 		
 		//删除考试用户试题
@@ -342,8 +352,8 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			throw new RuntimeException("考试未结束！");
 		}
 		
-		PaperQuestion paperQuestion = paperQuestionService.getEntity(exam.getPaperId(), examUserQuestion.getQuestionId());
-		if(BigDecimalUtil.sub(score.doubleValue(), paperQuestion.getScore().doubleValue()) > 0){
+		PaperQuestion paperQuestion = paperService.getPaperQuestion(exam.getPaperId(), examUserQuestion.getQuestionId());
+		if(new BigDecimal(BigDecimalUtil.sub(score.toString(), paperQuestion.getScore().toString())).doubleValue() > 0){
 			throw new RuntimeException("最大分值：" + score);
 		}
 		
@@ -379,7 +389,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		for(ExamUserQuestion examUserQuestion : examUserQuestionList){
 			Question question = questionService.getEntity(examUserQuestion.getQuestionId());
 			if(question.getType() == 1 || question.getType() == 4){
-				PaperQuestion paperQuestion = paperQuestionService.getEntity(exam.getPaperId(), examUserQuestion.getQuestionId());
+				PaperQuestion paperQuestion = paperService.getPaperQuestion(exam.getPaperId(), examUserQuestion.getQuestionId());
 				if(question.getAnswer().equals(examUserQuestion.getAnswer())){
 					examUserQuestion.setScore(paperQuestion.getScore());
 				}else{
@@ -396,7 +406,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			if(examUserQuestion.getScore() == null){
 				num++;
 			}else{
-				totalScore = new BigDecimal(BigDecimalUtil.add(examUserQuestion.getScore().doubleValue(), totalScore.doubleValue()));
+				totalScore = new BigDecimal(BigDecimalUtil.add(examUserQuestion.getScore().toString(), totalScore.toString()));
 			}
 		}
 		
@@ -430,8 +440,14 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		}
 		
 		//删除试题
+		Date curTime = new Date();
 		for(Integer id : ids){
 			Exam exam = getEntity(id);
+			if(exam.getStartTime().getTime() >= curTime.getTime()
+					&& exam.getEndTime().getTime() <= curTime.getTime()){
+				throw new RuntimeException("【"+exam.getName()+"】考试未结束");
+			}
+			
 			exam.setState(0);
 			update(exam);
 		}
@@ -518,5 +534,17 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	@Override
 	public PageOut getGradeListpage(PageIn pageIn) {
 		return examDao.getGradeListpage(pageIn);
+	}
+
+
+	@Override
+	public ExamType getExamType2(Integer examTypeId) {
+		return examTypeService.getEntity(examTypeId);
+	}
+
+
+	@Override
+	public List<Map<String, Object>> getPaperTypeTreeList(Integer userId) {
+		return paperService.getPaperTypeTreeList(userId);
 	}
 }

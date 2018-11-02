@@ -38,11 +38,21 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 				+ "LEFT JOIN EXM_PAPER PAPER ON EXAM.PAPER_ID = PAPER.ID";
 		
 		SqlUtil sqlUtil = new SqlUtil(sql);
+		Date fiveDate = null;
+		if(ValidateUtil.isValid(pageIn.getFive())){
+			fiveDate = DateUtil.getDate(pageIn.getFive(), DateUtil.FORMAT_DATE_TIME);
+		}
+		Date sixDate = null;
+		if(ValidateUtil.isValid(pageIn.getSix())){
+			sixDate = DateUtil.getDate(pageIn.getSix(), DateUtil.FORMAT_DATE_TIME);
+		}
+		
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "EXAM.EXAM_TYPE_ID = ?", pageIn.getOne())
 				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "EXAM.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "PAPER.NAME LIKE ?", "%" + pageIn.getThree() + "%")
-//				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "QUESTION.STATE = ?", pageIn.getFour())//0：删除；1：启用；2：禁用
-//				.addWhere(ValidateUtil.isValid(pageIn.getFive()), "QUESTION_YTPE.NAME LIKE ?", "%" + pageIn.getFive() + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "EXAM.STATE = ?", pageIn.getFour())//0：删除；1：启用；2：禁用
+				.addWhere(ValidateUtil.isValid(pageIn.getFive()), "EXAM.START_TIME > ?", fiveDate)
+				.addWhere(ValidateUtil.isValid(pageIn.getSix()), "EXAM.START_TIME < ?", sixDate)
 				.addWhere("EXAM.STATE != ?", 0)
 				.addOrder("EXAM.START_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
@@ -76,7 +86,7 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 
 	@Override
 	public PageOut getExamUserAddListpage(PageIn pageIn) {
-		String sql = "SELECT USER.ID, USER.NAME, USER.LOGIN_NAME, ORG.NAME AS ORG_NAME, POST_USER.POST_NAMES "
+		String sql = "SELECT USER.ID, USER.NAME AS USER_NAME, USER.LOGIN_NAME, ORG.NAME AS ORG_NAME, POST_USER.POST_NAMES "
 				+ "FROM SYS_USER USER "
 				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
 				+ "LEFT JOIN (SELECT POST_USER.USER_ID, GROUP_CONCAT(POST.NAME) AS POST_NAMES "
@@ -173,7 +183,7 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 
 	@Override
 	public PageOut getMarkUserAddListpage(PageIn pageIn) {
-		String sql = "SELECT USER.ID, USER.NAME, USER.LOGIN_NAME, ORG.NAME AS ORG_NAME, POST_USER.POST_NAMES "
+		String sql = "SELECT USER.ID, USER.NAME AS USER_NAME, USER.LOGIN_NAME, ORG.NAME AS ORG_NAME, POST_USER.POST_NAMES "
 				+ "FROM SYS_USER USER "
 				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
 				+ "LEFT JOIN (SELECT POST_USER.USER_ID, GROUP_CONCAT(POST.NAME) AS POST_NAMES "

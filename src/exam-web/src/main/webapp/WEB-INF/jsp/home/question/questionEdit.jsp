@@ -288,7 +288,7 @@
 						expandIcon: "glyphicon glyphicon-chevron-right",
 						collapseIcon: "glyphicon glyphicon-chevron-down",
 						nodeIcon: "glyphicon glyphicon-bookmark",
-						color: "#428BCA",
+						//color: "#428BCA",
 						showTags: true, 
 						levels: 3,
 						data: generateBootstrapTree(arr, {

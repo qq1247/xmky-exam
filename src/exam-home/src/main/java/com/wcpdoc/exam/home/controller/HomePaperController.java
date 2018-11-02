@@ -57,7 +57,7 @@ public class HomePaperController extends BaseController {
 	}
 	
 	/**
-	 * 获取试卷分类数据
+	 * 获取试卷分类树形列表
 	 * 
 	 * v1.0 zhanghc 2018年10月13日上午10:49:20
 	 * @return List<Map<String,Object>>

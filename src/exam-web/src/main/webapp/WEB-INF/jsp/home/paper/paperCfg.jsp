@@ -136,34 +136,36 @@
 											</div>
 										</td>
 										<td style="width: 10%;vertical-align: top;">
-											<input type="hidden" name="paperQuestionId" value="${subPqEx.id }" >
-											<input type="text" name="score" value="${subPqEx.score }" placeholder="0.00"
-												style="width: 40px;border:0; border-bottom: 1px solid #d8d8d8; text-align: center;">分
-											<small class="help-block"></small>
-											<c:if test="${subPqEx.question.type == 2 }">
-											<div class="checkbox">
-												<label>
-													<input type="checkbox" name="options" value="1" ${fn:contains(subPqEx.options, "1") ? "checked='checked'" : "" }>半对半分
-												</label>
-											</div>
-											</c:if>
-											<c:if test="${subPqEx.question.type == 3 }">
-											<div class="checkbox">
-												<label>
-													<input type="checkbox" name="options" value="1" ${fn:contains(subPqEx.options, "1") ? "checked='checked'" : "" }>半对半分
-												</label>
-											</div>
-											<div class="checkbox">
-												<label>
-													<input type="checkbox" name="options" value="2" ${fn:contains(subPqEx.options, "2") ? "checked='checked'" : "" }>答案无顺序
-												</label>
-											</div>
-											<div class="checkbox">
-												<label>
-													<input type="checkbox" name="options" value="3" ${fn:contains(subPqEx.options, "3") ? "checked='checked'" : "" }>忽略大小写
-												</label>
-											</div>
-											</c:if>
+											<form>
+												<input type="hidden" name="paperQuestionId" value="${subPqEx.id }" >
+												<input type="text" name="score" value="${subPqEx.score }" placeholder="0.00"
+													style="width: 40px;border:0; border-bottom: 1px solid #d8d8d8; text-align: center;">分
+												<small class="help-block"></small>
+												<c:if test="${subPqEx.question.type == 2 }">
+												<div class="checkbox">
+													<label>
+														<input type="checkbox" name="options" value="1" ${fn:contains(subPqEx.options, "1") ? "checked='checked'" : "" }>半对半分
+													</label>
+												</div>
+												</c:if>
+												<c:if test="${subPqEx.question.type == 3 }">
+												<div class="checkbox">
+													<label>
+														<input type="checkbox" name="options" value="1" ${fn:contains(subPqEx.options, "1") ? "checked='checked'" : "" }>半对半分
+													</label>
+												</div>
+												<div class="checkbox">
+													<label>
+														<input type="checkbox" name="options" value="2" ${fn:contains(subPqEx.options, "2") ? "checked='checked'" : "" }>答案无顺序
+													</label>
+												</div>
+												<div class="checkbox">
+													<label>
+														<input type="checkbox" name="options" value="3" ${fn:contains(subPqEx.options, "3") ? "checked='checked'" : "" }>忽略大小写
+													</label>
+												</div>
+												</c:if>
+											</form>
 										</td>
 										<td style="width: 15%;vertical-align: top;text-align: center;">
 											<a data-toggle="tooltip" title="保存得分" class="glyphicon glyphicon-ok" onclick="doScoreUpdate(this);"></a>
@@ -489,7 +491,7 @@
 								expandIcon: "glyphicon glyphicon-chevron-right",
 								collapseIcon: "glyphicon glyphicon-chevron-down",
 								nodeIcon: "glyphicon glyphicon-bookmark",
-								color: "#428BCA",
+								//color: "#428BCA",
 								showTags: true, 
 								levels: 3,
 								data: generateBootstrapTree(arr, {
@@ -726,9 +728,9 @@
 		
 		//完成设置分数
 		function doScoreUpdate(a){
-			var $prevTd = $(a).parent().prev();
-			var $score = $prevTd.find("input[name='score']");
-			var $small = $prevTd.find("small");
+			var $form = $(a).parent().prev().children();
+			var $score = $form.find("input[name='score']");
+			var $small = $form.find("small");
 			$score.removeClass('field-error');
 			$small.html("");
 			
@@ -736,13 +738,13 @@
 			var patt  = /^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/;
 			if(!patt.test(score)){
 				$score.addClass("field-error");
-				$small.next().html("必须为正数，最多保留两位小数");
+				$small.html("必须为正数，最多保留两位小数");
 				return;
 			}
 			
 			$.ajax({
 				url : "home/paper/doScoreUpdate",
-				data : $prevTd.serialize(),
+				data : $form.serialize(),
 				success : function(obj) {
 					BootstrapDialog.show({
 						title : "提示消息",
