@@ -1,133 +1,128 @@
 <%@ page language="java" pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>判卷</title>
+		<title>判卷列表</title>
 		<%@include file="/script/home/common.jspf"%>
 	</head>
 	<body>
 		<%@include file="/script/home/head.jspf"%>
-		<section class="service-item" style="padding-top: 200px;">
-			<div class="container">
-				<div class="row">
-					<div class="col-xs-12">
-						<table class="table table-bordered">
-							<caption>判卷</caption>
-							<thead>
-								<tr>
-									<th>考试</th>
-									<th>试卷</th>
-									<th>用户</th>
-									<th>开始时间</th>
-									<th>结束时间</th>
-									<th>考试得分/及格分数/总分数</th>
-									<th>考试状态</th>
-									<th>操作</th>
-								</tr>
-							</thead>
-							<tbody id="markGrid">
-							</tbody>
-						</table>
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="panel panel-default exam-query">
+						<div class="panel-body">
+							<form id="queryForm" class="form-horizontal" role="form">
+								<div class="row">
+									<div class="col-md-4">
+										<div class="form-group">
+											<label for="two" class="control-label col-md-4">用户：</label>
+											<div class="col-md-8">
+												<input type="text" id="two" name="two" class="form-control" placeholder="请输入名称">
+											</div>
+										</div>
+									</div>
+									<div class="col-md-4">
+										<div class="form-group">
+											<label for="three" class="control-label col-md-4">组织机构：</label>
+											<div class="col-md-8">
+												<input type="text" id="three" name="three" class="form-control" placeholder="请输入试卷">
+											</div>
+										</div>
+									</div>
+									<div class="col-md-4" style="text-align: right;">
+										<button type="button" class="btn btn-primary" onclick="query();">
+											<span class="glyphicon glyphicon-search"></span>
+											&nbsp;查询
+										</button>
+										<button type="button" class="btn btn-primary" onclick="reset();">
+											<span class="glyphicon glyphicon-repeat"></span>
+											&nbsp;重置
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+					<div class="panel panel-default exam-list">
+						<div class="panel-body">
+							<div id="toolbar">
+								<button type="button" class="btn btn-primary" onclick="toMarkList();">
+									<span class="glyphicon glyphicon-search"></span>
+									&nbsp;判卷
+								</button>
+								<button type="button" class="btn btn-primary" onclick="javascript:history.back(-1);">
+									<span class="glyphicon glyphicon-search"></span>
+									&nbsp;返回
+								</button>
+							</div>
+							<table id="table"></table>
+						</div>
 					</div>
 				</div>
 			</div>
-		</section>
-		<section class="service-item" style="padding-top: 200px;">
-			<div class="container">
-				<div class="row">
-					<div class="col-xs-12">
-						<ul id="pagingBar"></ul>
-					</div>
-				</div>
-			</div>
-		</section>
-		<%@include file="/script/home/footer.jspf"%>
+		</div>
 	</body>
 	<script type="text/javascript">
 		//定义变量
-		var pagingBar = $("#pagingBar");//分页工具条
-	
+		var $table = $("#table");
+		var $queryForm = $("#queryForm");
+		
 		//页面加载完毕，执行如下方法：
 		$(function() {
-			pagingBar.bootstrapPaginator({
-				bootstrapMajorVersion : 3,
-				curPage: 1,
-				totalPages: 10,
-				numberofPages : 10,
-				itemTexts : function(type, page, cur) {
-					switch (type) {
-					case "first":
-						return "首页";
-					case "prev":
-						return "上页";
-					case "next":
-						return "下页";
-					case "last":
-						return "末页";
-					case "page":
-						return page;
-					}
-				},
-				tooltipTitles : function(type, page, cur) {
-					switch (type) {
-					case "first":
-						return "首页";
-					case "prev":
-						return "上页";
-					case "next":
-						return "下页";
-					case "last":
-						return "末页";
-					case "page":
-						return (page === cur) ? "当前第" + page + "页" : "跳转到第" + page + "页";
-					}
-				},
-				onPageClicked : function(e, originalEvent, type, page){
-					updateMarkGrid(page);
-	            }
-			});
-			
-			updateMarkGrid(1);
+			initTable();
 		});
 		
-		//更新表格
-		function updateMarkGrid(page){
-			$.ajax({
+		//初始化列表
+		function initTable(){
+			$table.bootstrapTable({
 				url : "home/mark/list",
-				data : {page : page},
-				success : function(obj) {
-					$('#pagingBar').bootstrapPaginator({
-						totalPages: obj.total
-					});
-					
-					var html = [];
-					for(var i in obj.rows){
-						if(i % 2 == 0){
-							html.push("<tr class='success'>");
-						}else{
-							html.push("<tr>");
-						}
-						
-						html.push("	<td>"+obj.rows[i].EXAM_NAME+"</td>");
-						html.push("	<td>"+obj.rows[i].PAPER_NAME+"</td>");
-						html.push("	<td>"+obj.rows[i].USER_NAME+"</td>");
-						html.push("	<td>"+obj.rows[i].EXAM_START_TIME_STR+"</td>");
-						html.push("	<td>"+obj.rows[i].EXAM_END_TIME_STR+"</td>");
-						html.push("	<td>"+obj.rows[i].EXAM_USER_TOTAL_SCORE+"/"+obj.rows[i].EXAM_PASS_SCORE+"/"+obj.rows[i].PAPER_TOTLE_SCORE+"</td>");
-						html.push("	<td>"+obj.rows[i].EXAM_USER_STATE_NAME+"</td>");
-						
-						html.push("	<td>");
-						if(obj.rows[i].START){
-							html.push("<a href='home/mark/toMark?examUserId="+obj.rows[i].ID+"'>判卷</a>");
-						}
-						html.push("	<a href='home/mark/toMarkView?examUserId="+obj.rows[i].ID+"'>预览试卷</a></td>");
-						html.push("</tr>");
-					}
-					
-					$("#markGrid").empty();
-	         		$("#markGrid").append(html.join(""));
-				}
+				queryParams : function(params){
+					var customeParams = $.fn.my.serializeObj($queryForm);
+					customeParams.page = this.pageNumber;
+					customeParams.rows = this.pageSize;
+					return customeParams;
+				},
+				columns : [ 
+							{field : "state", checkbox : true},
+							{field : "USER_NAME", title : "用户", width : 80, align : "center"},
+							{field : "ORG_NAME", title : "组织机构", width : 80, align : "center"},
+							{field : "EXAM_USER_TOTAL_SCORE", title : "得分", width : 80, align : "center"}
+							],
+				toolbar : "#toolbar"
 			});
+		}
+		
+		//查询
+		function query(){
+			$table.bootstrapTable('refresh', {pageNumber : 1});
+		}
+		
+		//重置
+		function reset(){
+			$queryForm[0].reset();
+			query();
+		}
+		
+		//达到判卷页面
+		function toMark(){
+			var nodes = $table.bootstrapTable("getSelections");
+			if(nodes.length != 1){
+				BootstrapDialog.show({
+					title : "提示消息",
+					message : "请选择一行数据！",
+					buttons : [{
+						label : "&nbsp;确定",
+						icon : "glyphicon glyphicon-ok",
+						cssClass : "btn-primary",
+						action : function(dialogItself) {
+							dialogItself.close();
+						}
+					}]
+				});
+				return;
+			}
 		}
 	</script>
 </html>

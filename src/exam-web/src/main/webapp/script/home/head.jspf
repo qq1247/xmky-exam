@@ -24,6 +24,9 @@
 						<li>
 							<a href="home/exam/toList">考试管理</a>
 						</li>
+						<li>
+							<a href="home/mark/toExamList">判卷管理</a>
+						</li>
 					</ul>
 				</li>
 				<li class="dropdown">

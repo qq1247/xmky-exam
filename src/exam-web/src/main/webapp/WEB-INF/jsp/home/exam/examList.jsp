@@ -52,7 +52,7 @@
 								<div class="row">
 									<div class="col-md-4">
 										<div class="form-group">
-											<label for="five" class="control-label col-md-4">开始时间大于：</label>
+											<label for="five" class="control-label col-md-4">考试开始大于：</label>
 											<div class="col-md-8">
 												<input type="text" id="five" name="five" class="form-control" placeholder="请输入开始时间">
 											</div>
@@ -60,7 +60,7 @@
 									</div>
 									<div class="col-md-4">
 										<div class="form-group">
-											<label for="six" class="control-label col-md-4">开始时间小于：</label>
+											<label for="six" class="control-label col-md-4">考试开始小于：</label>
 											<div class="col-md-8">
 												<input type="text" id="six" name="six" class="form-control" placeholder="请输入结束时间">
 											</div>
@@ -189,8 +189,8 @@
 									return row.PASS_SCORE + "/" + row.PAPER_TOTLE_SCORE;
 								}
 							},
-							{field : "START_TIME_STR", title : "开始时间", width : 80, align : "center"},
-							{field : "END_TIME_STR", title : "结束时间", width : 80, align : "center"},
+							{field : "START_TIME_STR", title : "考试开始", width : 160, align : "center"},
+							{field : "END_TIME_STR", title : "考试结束", width : 160, align : "center"},
 							{field : "STATE_NAME", title : "状态", width : 80, align : "center"}
 							],
 				toolbar : "#toolbar"

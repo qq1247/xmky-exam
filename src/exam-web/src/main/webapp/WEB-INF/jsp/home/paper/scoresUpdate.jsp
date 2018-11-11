@@ -16,21 +16,22 @@
 		<div class="row">
 			<div class="col-md-12">
 				<div class="form-group">
-					<div class="checkbox-inline">
-						<label>
-							<input type="checkbox" name="options" value="1">半对半分
-						</label>
-					</div>
-					<div class="checkbox-inline">
-						<label>
-							<input type="checkbox" name="options" value="2">答案无顺序
-						</label>
-					</div>
-					<div class="checkbox-inline">
-						<label>
-							<input type="checkbox" name="options" value="3">忽略大小写
-						</label>
-					</div>
+					<label class="checkbox-inline">
+						<input type="checkbox" name="options" value="1"
+							data-toggle="tooltip" title="默认全对得分">半对半分
+					</label>
+					<label class="checkbox-inline">
+						<input type="checkbox" name="options" value="2"
+							data-toggle="tooltip" title="默认答案有前后顺序">答案无顺序
+					</label>
+					<label class="checkbox-inline">
+						<input type="checkbox" name="options" value="3"
+							data-toggle="tooltip" title="默认大小写敏感">大小写不敏感
+					</label>
+					<label class="checkbox-inline">
+						<input type="checkbox" name="options" value="4"
+							data-toggle="tooltip" title="默认等于答案得分">包含答案得分
+					</label>
 				</div>
 			</div>
 		</div>

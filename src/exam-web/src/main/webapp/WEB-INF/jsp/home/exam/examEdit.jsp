@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>考试修改</title>
+		<title>考试${empty exam.id ? "添加" : "修改"}</title>
 		<%@include file="/script/home/common.jspf"%>
 	</head>
 	<body>
@@ -81,7 +81,7 @@
 								<div class="row">
 									<div class="col-md-6">
 										<div class="form-group">
-											<label for="startTime" class="col-md-4 control-label">开始时间：</label>
+											<label for="startTime" class="col-md-4 control-label">考试开始：</label>
 											<div class="col-md-8">
 												<input type="text" id="startTime" name="startTime" value="${fn:substring(exam.startTime, 0, 19)}"
 													class="form-control" placeholder="请输入开始时间" readonly="readonly">
@@ -90,9 +90,29 @@
 									</div>
 									<div class="col-md-6">
 										<div class="form-group">
-											<label for="endTime" class="col-md-4 control-label">结束时间：</label>
+											<label for="endTime" class="col-md-4 control-label">考试结束：</label>
 											<div class="col-md-8">
 												<input type="text" id="endTime" name="endTime" value="${fn:substring(exam.endTime, 0, 19)}"
+													class="form-control" placeholder="请输入结束时间" readonly="readonly">
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-6">
+										<div class="form-group">
+											<label for="markStartTime" class="col-md-4 control-label">判卷开始：</label>
+											<div class="col-md-8">
+												<input type="text" id="markStartTime" name="markStartTime" value="${fn:substring(exam.markStartTime, 0, 19)}"
+													class="form-control" placeholder="请输入开始时间" readonly="readonly">
+											</div>
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="form-group">
+											<label for="markEndTime" class="col-md-4 control-label">判卷结束：</label>
+											<div class="col-md-8">
+												<input type="text" id="markEndTime" name="markEndTime" value="${fn:substring(exam.markEndTime, 0, 19)}"
 													class="form-control" placeholder="请输入结束时间" readonly="readonly">
 											</div>
 										</div>
@@ -209,9 +229,23 @@
 				todayHighlight : true,
 				format : "yyyy-mm-dd hh:ii:ss"
 			});
-			
-			
 			$("#endTime").datetimepicker({
+				language : "zh-CN",
+				todayHighlight : true,
+				todayBtn : true,
+				autoclose : true,
+				todayHighlight : true,
+				format : "yyyy-mm-dd hh:ii:ss"
+			});
+			$("#markStartTime").datetimepicker({
+				language : "zh-CN",
+				todayHighlight : true,
+				todayBtn : true,
+				autoclose : true,
+				todayHighlight : true,
+				format : "yyyy-mm-dd hh:ii:ss"
+			});
+			$("#markEndTime").datetimepicker({
 				language : "zh-CN",
 				todayHighlight : true,
 				todayBtn : true,
@@ -260,6 +294,16 @@
 							notEmpty : {}
 						}
 					}, endTime : {
+						trigger : "change",
+						validators : {
+							notEmpty : {}
+						}
+					}, markStartTime : {
+						trigger : "change",
+						validators : {
+							notEmpty : {}
+						}
+					}, markEndTime : {
 						trigger : "change",
 						validators : {
 							notEmpty : {}

@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>试卷修改</title>
+		<title>试卷${empty exam.id ? "添加" : "修改"}</title>
 		<%@include file="/script/home/common.jspf"%>
 	</head>
 	<body>

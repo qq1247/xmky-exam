@@ -56,7 +56,7 @@ public class HomeMarkServiceImpl extends BaseServiceImp<Object> implements HomeM
 
 	@Override
 	public PageOut getMarkPaperListpage(PageIn pageIn) {
-		return examService.getMarkPaperListpage(pageIn);
+		return examService.getMarkListpage(pageIn);
 	}
 
 	@Override

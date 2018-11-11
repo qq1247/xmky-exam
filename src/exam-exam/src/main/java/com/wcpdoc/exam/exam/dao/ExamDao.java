@@ -119,7 +119,7 @@ public interface ExamDao extends BaseDao<Exam>{
 	 * @param pageIn
 	 * @return PageOut
 	 */
-	PageOut getMarkPaperListpage(PageIn pageIn);
+	PageOut getMarkListpage(PageIn pageIn);
 
 	/**
 	 * 完成强制交卷

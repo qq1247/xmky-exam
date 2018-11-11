@@ -144,24 +144,39 @@
 												<c:if test="${subPqEx.question.type == 2 }">
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" name="options" value="1" ${fn:contains(subPqEx.options, "1") ? "checked='checked'" : "" }>半对半分
+														<input type="checkbox" name="options" value="1"
+															data-toggle="tooltip" title="默认全对得分"
+															${fn:contains(subPqEx.options, "1") ? "checked='checked'" : "" }>半对半分
 													</label>
 												</div>
 												</c:if>
 												<c:if test="${subPqEx.question.type == 3 }">
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" name="options" value="1" ${fn:contains(subPqEx.options, "1") ? "checked='checked'" : "" }>半对半分
+														<input type="checkbox" name="options" value="1" 
+															data-toggle="tooltip" title="默认全对得分" data-placement="left"
+															${fn:contains(subPqEx.options, "1") ? "checked='checked'" : "" }>半对半分
 													</label>
 												</div>
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" name="options" value="2" ${fn:contains(subPqEx.options, "2") ? "checked='checked'" : "" }>答案无顺序
+														<input type="checkbox" name="options" value="2"
+															data-toggle="tooltip" title="默认答案有前后顺序" data-placement="left"
+															${fn:contains(subPqEx.options, "2") ? "checked='checked'" : "" }>答案无顺序
 													</label>
 												</div>
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" name="options" value="3" ${fn:contains(subPqEx.options, "3") ? "checked='checked'" : "" }>忽略大小写
+														<input type="checkbox" name="options" value="3"
+															data-toggle="tooltip" title="默认大小写敏感" data-placement="left"
+															${fn:contains(subPqEx.options, "3") ? "checked='checked'" : "" }>大小写不敏感
+													</label>
+												</div>
+												<div class="checkbox">
+													<label>
+														<input type="checkbox" name="options" value="4"
+															data-toggle="tooltip" title="默认等于答案得分" data-placement="left"
+															${fn:contains(subPqEx.options, "4") ? "checked='checked'" : "" }>包含答案得分
 													</label>
 												</div>
 												</c:if>
@@ -663,7 +678,9 @@
 						}
 					});
 					
-					$("#editForm").find("input[name='score']").val("1.00").change();
+					var editForm = $("#editForm");
+					editForm.find("input[name='score']").val("1.00").change();
+					editForm.find("[data-toggle='tooltip']").tooltip();
 				}
 			});
 		}

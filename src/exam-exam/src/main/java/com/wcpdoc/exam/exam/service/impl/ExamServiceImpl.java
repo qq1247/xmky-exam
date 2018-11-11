@@ -82,11 +82,18 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	public void saveAndUpdate(Exam exam, LoginUser user) {
 		//校验数据有效性
 		if(exam.getStartTime().getTime() <= new Date().getTime()){
-			throw new RuntimeException("开始时间必须大于当前时间！");
+			throw new RuntimeException("考试开始时间必须大于当前时间！");
 		}
 		if(exam.getStartTime().getTime() >= exam.getEndTime().getTime()){
-			throw new RuntimeException("结束时间必须大于开始时间！");
+			throw new RuntimeException("考试结束时间必须大于考试开始时间！");
 		}
+		if(exam.getMarkStartTime().getTime() <= exam.getEndTime().getTime()){
+			throw new RuntimeException("判卷开始时间必须大于考试结束时间！");
+		}
+		if(exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()){
+			throw new RuntimeException("判卷结束时间必须大于判卷开始时间！");
+		}
+		
 		
 		//添加考试
 		exam.setUpdateTime(new Date());
@@ -98,10 +105,16 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	public void updateAndUpdate(Exam exam, LoginUser user) {
 		//校验数据有效性
 		if(exam.getStartTime().getTime() <= new Date().getTime()){
-			throw new RuntimeException("考试已开始，不允许修改！");
+			throw new RuntimeException("考试开始时间必须大于当前时间！");
 		}
 		if(exam.getStartTime().getTime() >= exam.getEndTime().getTime()){
-			throw new RuntimeException("结束时间必须大于开始时间！");
+			throw new RuntimeException("考试结束时间必须大于考试开始时间！");
+		}
+		if(exam.getMarkStartTime().getTime() <= exam.getEndTime().getTime()){
+			throw new RuntimeException("判卷开始时间必须大于考试结束时间！");
+		}
+		if(exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()){
+			throw new RuntimeException("判卷结束时间必须大于判卷开始时间！");
 		}
 		
 		//添加考试
@@ -113,6 +126,8 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		entity.setState(exam.getState());
 		entity.setStartTime(exam.getStartTime());
 		entity.setEndTime(exam.getEndTime());
+		entity.setMarkStartTime(exam.getMarkStartTime());
+		entity.setMarkEndTime(exam.getMarkEndTime());
 		entity.setDescription(exam.getDescription());
 		entity.setPaperId(exam.getPaperId());
 		entity.setExamTypeId(exam.getExamTypeId());
@@ -509,19 +524,8 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	@Override
-	public PageOut getMarkPaperListpage(PageIn pageIn) {
-		PageOut pageOut = examDao.getMarkPaperListpage(pageIn);
-		List<Map<String, Object>> list = pageOut.getRows();
-		for(Map<String, Object> map : list){
-			Date curDate = new Date();
-			Date endTime = (Date) map.get("EXAM_END_TIME");
-			if(endTime.getTime() <= curDate.getTime()){//START：如果考试时间未结束，则显示预览按钮；否则显示判卷按钮
-				map.put("START", true);
-			}else{
-				map.put("START", false);
-			}
-		}
-		return pageOut;
+	public PageOut getMarkListpage(PageIn pageIn) {
+		return examDao.getMarkListpage(pageIn);
 	}
 
 

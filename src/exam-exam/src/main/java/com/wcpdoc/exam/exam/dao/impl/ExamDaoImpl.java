@@ -53,6 +53,7 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "EXAM.STATE = ?", pageIn.getFour())//0：删除；1：启用；2：禁用
 				.addWhere(ValidateUtil.isValid(pageIn.getFive()), "EXAM.START_TIME > ?", fiveDate)
 				.addWhere(ValidateUtil.isValid(pageIn.getSix()), "EXAM.START_TIME < ?", sixDate)
+				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "EXISTS (SELECT 1 FROM EXM_MARK_USER Z WHERE Z.USER_ID = ? AND Z.EXAM_ID = EXAM.ID)", pageIn.getTen())
 				.addWhere("EXAM.STATE != ?", 0)
 				.addOrder("EXAM.START_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
@@ -204,29 +205,18 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 	}
 
 	@Override
-	public PageOut getMarkPaperListpage(PageIn pageIn) {
-		String sql = "SELECT EXAM_USER.ID, EXAM.NAME AS EXAM_NAME, PAPER.NAME AS PAPER_NAME, USER.NAME AS USER_NAME, ORG.NAME AS ORG_NAME, "
-				+ "		EXAM.START_TIME AS EXAM_START_TIME, EXAM.END_TIME AS EXAM_END_TIME, "
-				+ "		EXAM_USER.TOTAL_SCORE AS EXAM_USER_TOTAL_SCORE, EXAM.PASS_SCORE AS EXAM_PASS_SCORE, "
-				+ "		PAPER.TOTLE_SCORE AS PAPER_TOTLE_SCORE, EXAM_USER.STATE AS EXAM_USER_STATE "
-				+ "FROM EXM_MARK_USER MARK_USER "
-				+ "INNER JOIN EXM_EXAM EXAM ON MARK_USER.EXAM_ID = EXAM.ID "
-				+ "INNER JOIN EXM_PAPER PAPER ON EXAM.PAPER_ID = PAPER.ID "
-				+ "INNER JOIN EXM_EXAM_USER EXAM_USER ON EXAM.ID = EXAM_USER.EXAM_ID "
+	public PageOut getMarkListpage(PageIn pageIn) {
+		String sql = "SELECT EXAM_USER.ID, USER.NAME AS USER_NAME, ORG.NAME AS ORG_NAME, EXAM_USER.TOTAL_SCORE AS EXAM_USER_TOTAL_SCORE "
+				+ "FROM EXM_EXAM_USER EXAM_USER "
+				+ "INNER JOIN EXM_EXAM EXAM ON EXAM_USER.EXAM_ID = EXAM.ID "
 				+ "INNER JOIN SYS_USER USER ON EXAM_USER.USER_ID = USER.ID "
 				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTen()), "MARK_USER.USER_ID = ?", pageIn.getTen())
-				.addWhere("USER.STATE = ?", 1)
-				.addWhere("ORG.STATE = ?", 1)
-				.addWhere("EXAM.STATE = ?", 1)
-//				.addWhere("PAPER.STATE = ?", 1)//这个可以无效
-				.addOrder("EXAM.START_TIME", Order.DESC)
-				.addOrder("USER.ID", Order.ASC);
-		
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "ORG.NAME LIKE ?", "%" + pageIn.getThree() + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "EXISTS (SELECT 1 FROM EXM_MARK_USER Z WHERE Z.USER_ID = ? AND Z.EXAM_ID = EXAM_USER.EXAM_ID)", pageIn.getTen())
+				.addWhere("EXAM.STATE = ?", 1);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDate(pageOut.getRows(), "EXAM_START_TIME", DateUtil.FORMAT_DATE_TIME, "EXAM_END_TIME", DateUtil.FORMAT_DATE_TIME);
-		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), "EXAM_USER_STATE", "EXAM_USER_STATE");
 		return pageOut;
 	}
 

@@ -279,7 +279,7 @@ public interface ExamService extends BaseService<Exam>{
 	 * @param pageIn
 	 * @return PageOut
 	 */
-	PageOut getMarkPaperListpage(PageIn pageIn);
+	PageOut getMarkListpage(PageIn pageIn);
 
 	/**
 	 * 获取判卷用户列表
