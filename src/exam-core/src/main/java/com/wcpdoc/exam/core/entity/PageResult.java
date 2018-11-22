@@ -1,31 +1,31 @@
 package com.wcpdoc.exam.core.entity;
 
 public class PageResult {
-	protected boolean success;
-	protected String message;
+	protected boolean succ;
+	protected String msg;
 
 	public PageResult() {
 	}
 
-	public PageResult(boolean success, String message) {
-		this.success = success;
-		this.message = message;
+	public PageResult(boolean succ, String msg) {
+		this.succ = succ;
+		this.msg = msg;
 	}
 
-	public boolean isSuccess() {
-		return success;
+	public boolean isSucc() {
+		return succ;
 	}
 
-	public void setSuccess(boolean success) {
-		this.success = success;
+	public void setSucc(boolean succ) {
+		this.succ = succ;
 	}
 
-	public String getMessage() {
-		return message;
+	public String getMsg() {
+		return msg;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
+	public void setMsg(String msg) {
+		this.msg = msg;
 	}
 
 }

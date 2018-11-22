@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.ui.Model;
+
 import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
@@ -132,9 +134,10 @@ public interface ExamService extends BaseService<Exam>{
 	 * 获取考试分类树
 	 * 
 	 * v1.0 zhanghc 2017年6月29日上午7:24:13
+	 * @param userId 
 	 * @return List<Map<String,Object>>
 	 */
-	List<Map<String, Object>> getExamTypeTreeList();
+	List<Map<String, Object>> getExamTypeTreeList(Integer userId);
 	
 	/**
 	 * 获取考试分类
@@ -241,6 +244,7 @@ public interface ExamService extends BaseService<Exam>{
 	 * @param pageIn
 	 * @return PageOut
 	 */
+	@Deprecated
 	PageOut getMyExamListpage(PageIn pageIn);
 
 	/**
@@ -316,4 +320,26 @@ public interface ExamService extends BaseService<Exam>{
 	 * @return List<Map<String,Object>>
 	 */
 	List<Map<String, Object>> getPaperTypeTreeList(Integer userId);
+
+	/**
+	 * 到达试卷页面
+	 * 
+	 * v1.0 zhanghc 2017年8月28日上午8:59:40
+	 * @param model
+	 * @param loginUser 
+	 * @param examId
+	 * void
+	 */
+	void toPaper(Model model, LoginUser loginUser, Integer examId);
+
+	/**
+	 * 到达判卷页面
+	 * 
+	 * v1.0 zhanghc 2017年8月28日上午11:04:18
+	 * @param model
+	 * @param user 
+	 * @param examUserId
+	 * void
+	 */
+	void toMark(Model model, LoginUser currentUser, Integer examUserId);
 }

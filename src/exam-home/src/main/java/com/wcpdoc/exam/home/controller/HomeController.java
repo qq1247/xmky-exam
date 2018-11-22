@@ -33,7 +33,7 @@ public class HomeController extends BaseController{
 	 * v1.0 zhanghc 2017-06-23 15:39:11
 	 * @return String
 	 */
-	@RequestMapping("/pubToIn")
+	@RequestMapping("/toIn")
 	public String toIn(Model model) {
 		try {
 			return "/WEB-INF/jsp/home/home/in.jsp";
@@ -52,14 +52,14 @@ public class HomeController extends BaseController{
 	 * @param model
 	 * @return String
 	 */
-	@RequestMapping("/pubDoIn")
+	@RequestMapping("/doIn")
 	public String doIn(Model model, String loginName, String pwd) {
 		try {
 			//完成登录
 			homeService.doIn(loginName, pwd, request);
 			
 			//跳转到首页。这里如果直接转向到home.jsp，页面刷新，会重复执行doIn()。
-			return "redirect:/home/pubToHome";
+			return "redirect:/home/toHome";
 		} catch (Exception e) {
 			log.error("完成登录错误：{}", e.getMessage());
 			try {
@@ -67,7 +67,7 @@ public class HomeController extends BaseController{
 			} catch (UnsupportedEncodingException e1) {
 				e1.printStackTrace();
 			}
-			return "redirect:/home/pubToIn";
+			return "redirect:/home/toIn";
 		}
 	}
 	
@@ -80,8 +80,8 @@ public class HomeController extends BaseController{
 	 * @param model
 	 * @return String
 	 */
-	@RequestMapping("/pubToHome")
-	public String home(Model model) {
+	@RequestMapping("/toHome")
+	public String toHome(Model model) {
 		try {
 //			List<Map<String, Object>> unFinishExamList = homeService.getUnFinishExamList(getCurrentUser().getId());
 //			model.addAttribute("unFinishExamList", unFinishExamList);
@@ -89,7 +89,7 @@ public class HomeController extends BaseController{
 		} catch (Exception e) {
 			log.error("到达首页错误：", e);
 			model.addAttribute("message", e.getMessage());
-			return "redirect:/home/pubToIn";
+			return "redirect:/home/toIn";
 		}
 	}
 	
@@ -99,17 +99,17 @@ public class HomeController extends BaseController{
 	 * @param loginName
 	 * @return String
 	 */
-	@RequestMapping("/pubDoOut")
+	@RequestMapping("/doOut")
 	public String doOut(){
 		try {
 			//完成退出登录
 			homeService.doOut(request);
 			
 			//重定向到登录页
-			return "redirect:/home/pubToIn";
+			return "redirect:/home/toIn";
 		} catch (Exception e) {
 			log.error("完成退出登录错误：", e);
-			return "redirect:/home/pubToIn";
+			return "redirect:/home/toIn";
 		}
 	}
 }

@@ -1,8 +1,6 @@
 package com.wcpdoc.exam.home.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
 
 import javax.annotation.Resource;
 
@@ -16,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
+import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.exam.service.ExamService;
 import com.wcpdoc.exam.sys.cache.DictCache;
 
@@ -47,23 +46,6 @@ public class HomeMarkController extends BaseController{
 		} catch (Exception e) {
 			log.error("到达考试列表页面错误：", e);
 			return "/WEB-INF/jsp/home/mark/examList.jsp";
-		}
-	}
-	
-	/**
-	 * 获取考试分类树
-	 * 
-	 * v1.0 zhanghc 2018年10月25日下午9:23:06
-	 * @return List<Map<String,Object>>
-	 */
-	@RequestMapping("/examTypeTreeList")
-	@ResponseBody
-	public List<Map<String, Object>> examTypeTreeList() {
-		try {
-			return examService.getExamTypeTreeList();
-		} catch (Exception e) {
-			log.error("获取考试分类树错误：", e);
-			return new ArrayList<Map<String,Object>>();
 		}
 	}
 	
@@ -123,64 +105,65 @@ public class HomeMarkController extends BaseController{
 		}
 	}
 	
-//	/**
-//	 * 到达判卷页面
-//	 * 
-//	 * v1.0 zhanghc 2017年7月4日下午1:54:03
-//	 * @param model
-//	 * @return String
-//	 */
-//	@RequestMapping("/toMark")
-//	public String toMark(Model model, Integer examUserId) {
-//		try {
-//			homeMarkService.toMark(model, getCurrentUser(), examUserId);
-//			return "/WEB-INF/jsp/home/mark/markPaper.jsp";
-//		} catch (Exception e) {
-//			log.error("到达试卷页面错误：", e);
-//			model.addAttribute("message", e.getMessage());
-//			return "/WEB-INF/jsp/home/error.jsp";
-//		}
-//	}
-//	
-//	/**
-//	 * 更新判卷分数
-//	 * 
-//	 * v1.0 zhanghc 2017年7月4日下午5:45:56
-//	 * @param examUserQuestionId
-//	 * @param score
-//	 * @return PageResult
-//	 */
-//	@RequestMapping("/updateScore")
-//	@ResponseBody
-//	public PageResult updateScore(Integer examUserQuestionId, BigDecimal score) {
-//		try {
-//			homeMarkService.updateScore(getCurrentUser(), examUserQuestionId, score);
-//			return new PageResult(true, "更新成功");
-//		} catch (Exception e) {
-//			log.error("更新分数错误：", e);
-//			return new PageResult(false, "更新失败：" + e.getMessage());
-//		}
-//	}
-//	
-//	/**
-//	 * 完成判卷
-//	 * 
-//	 * v1.0 zhanghc 2017年7月4日下午9:52:46
-//	 * @param examUserId
-//	 * @return PageResult
-//	 */
-//	@RequestMapping("/doMark")
-//	@ResponseBody
-//	public PageResult doMark(Integer examUserId) {
-//		try {
-//			homeMarkService.doMark(getCurrentUser(), examUserId);
-//			return new PageResult(true, "判卷成功");
-//		} catch (Exception e) {
-//			log.error("完成判卷错误：", e);
-//			return new PageResult(false, "判卷失败：" + e.getMessage());
-//		}
-//	}
-//	
+	/**
+	 * 到达判卷页面
+	 * 
+	 * v1.0 zhanghc 2017年7月4日下午1:54:03
+	 * @param model
+	 * @param examUserId
+	 * @return String
+	 */
+	@RequestMapping("/toMark")
+	public String toMark(Model model, Integer examUserId) {
+		try {
+			examService.toMark(model, getCurrentUser(), examUserId);
+			return "/WEB-INF/jsp/home/mark/markPaper.jsp";
+		} catch (Exception e) {
+			log.error("到达试卷页面错误：", e);
+			model.addAttribute("message", e.getMessage());
+			return "/WEB-INF/jsp/home/error.jsp";
+		}
+	}
+	
+	/**
+	 * 更新判卷分数
+	 * 
+	 * v1.0 zhanghc 2017年7月4日下午5:45:56
+	 * @param examUserQuestionId
+	 * @param score
+	 * @return PageResult
+	 */
+	@RequestMapping("/updateScore")
+	@ResponseBody
+	public PageResult updateScore(Integer examUserQuestionId, BigDecimal score) {
+		try {
+			examService.updateMarkScore(getCurrentUser(), examUserQuestionId, score);
+			return new PageResult(true, "更新成功");
+		} catch (Exception e) {
+			log.error("更新判卷分数错误：", e);
+			return new PageResult(false, "更新失败：" + e.getMessage());
+		}
+	}
+	
+	/**
+	 * 完成判卷
+	 * 
+	 * v1.0 zhanghc 2017年7月4日下午9:52:46
+	 * @param examUserId
+	 * @return PageResult
+	 */
+	@RequestMapping("/doMark")
+	@ResponseBody
+	public PageResult doMark(Integer examUserId) {
+		try {
+			examService.doMark(getCurrentUser(), examUserId);
+			return new PageResult(true, "判卷成功");
+		} catch (Exception e) {
+			log.error("完成判卷错误：", e);
+			return new PageResult(false, "判卷失败：" + e.getMessage());
+		}
+	}
+	
 //	/**
 //	 * 到达判卷预览页面
 //	 * 

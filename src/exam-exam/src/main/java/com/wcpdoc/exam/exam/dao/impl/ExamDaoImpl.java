@@ -53,6 +53,7 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "EXAM.STATE = ?", pageIn.getFour())//0：删除；1：启用；2：禁用
 				.addWhere(ValidateUtil.isValid(pageIn.getFive()), "EXAM.START_TIME > ?", fiveDate)
 				.addWhere(ValidateUtil.isValid(pageIn.getSix()), "EXAM.START_TIME < ?", sixDate)
+				.addWhere(ValidateUtil.isValid(pageIn.getNine()), "EXISTS (SELECT 1 FROM EXM_EXAM_USER Z WHERE Z.USER_ID = ? AND Z.EXAM_ID = EXAM.ID)", pageIn.getNine())
 				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "EXISTS (SELECT 1 FROM EXM_MARK_USER Z WHERE Z.USER_ID = ? AND Z.EXAM_ID = EXAM.ID)", pageIn.getTen())
 				.addWhere("EXAM.STATE != ?", 0)
 				.addOrder("EXAM.START_TIME", Order.DESC);

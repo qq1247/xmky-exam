@@ -63,7 +63,7 @@ public class HomeExamController extends BaseController {
 	@ResponseBody
 	public List<Map<String, Object>> examTypeTreeList() {
 		try {
-			return examService.getExamTypeTreeList();
+			return examService.getExamTypeTreeList(getCurrentUser().getId());
 		} catch (Exception e) {
 			log.error("获取考试分类树错误：", e);
 			return new ArrayList<Map<String,Object>>();
