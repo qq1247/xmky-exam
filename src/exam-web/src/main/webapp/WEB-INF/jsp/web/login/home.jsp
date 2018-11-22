@@ -71,13 +71,13 @@
 							</a>
 						</li>
 						<li class="pf-logout">
-							<a href="home/pubToHome">
+							<a href="home/toHome">
 								<i class="iconfont">&#xe60e;</i>
 								<span class="pf-opt-name">返回前台</span>
 							</a>
 						</li>
 						<li class="pf-logout">
-							<a href="login/pubDoOut">
+							<a href="login/doOut">
 								<i class="iconfont">&#xe60e;</i>
 								<span class="pf-opt-name">退出</span>
 							</a>
@@ -224,7 +224,7 @@
 				title : "修改密码",
 				width : 350,
 				height : 230,
-				href : "login/pubToPwdUpdate",
+				href : "login/toPwdUpdate",
 				buttons : [{
 					text : "确定",
 					iconCls : "icon-ok",
@@ -273,12 +273,12 @@
 				
 				$.messager.progress();
 				updatePwdEditFrom.form("submit", {
-					url : "login/pubDoPwdUpdate",
+					url : "login/doPwdUpdate",
 					success : function(data) {
 						$.messager.progress("close"); 
 						var obj = $.parseJSON(data);
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 							return;
 						}
 						

@@ -10,10 +10,7 @@
 		<%@include file="/script/home/head.jspf"%>
 		<div class="container">
 			<div class="row">
-				<div class="col-md-3">
-					<div id="examTypeTree" class="exam-tree"></div>
-				</div>
-				<div class="col-md-9">
+				<div class="col-md-12">
 					<div class="panel panel-default exam-query">
 						<div class="panel-body">
 							<form id="queryForm" class="form-horizontal" role="form">
@@ -105,7 +102,6 @@
 		//页面加载完毕，执行如下方法：
 		$(function() {
 			initTime();
-			initExamTypeTree();
 			initTable();
 		});
 		
@@ -118,39 +114,6 @@
 			$('#six').datetimepicker({
 				language : "zh-CN",
 				format : "yyyy-mm-dd hh:ii:ss"
-			});
-		}
-		
-		//初始化考试分类树
-		function initExamTypeTree(){
-			$.ajax({
-				url : "home/exam/examTypeTreeList",
-				success : function(arr) {
-					$examTypeTree.treeview({
-						showBorder: false,
-						expandIcon: "glyphicon glyphicon-chevron-right",
-						collapseIcon: "glyphicon glyphicon-chevron-down",
-						nodeIcon: "glyphicon glyphicon-bookmark",
-						//color: "#428BCA",
-						showTags: true, 
-						levels: 3,
-						data: generateBootstrapTree(arr, {
-							idFiled : "ID",
-							textFiled : "NAME", 
-							parentField : "PARENT_ID",
-							disabledFiled : "DISABLED",
-							expandedFiled : "EXPANDED"
-						}),
-						onNodeSelected : function(event, data) {
-							$one.val(data.ID);
-							query();
-						},
-						onNodeUnselected : function(event, data) {
-							$one.val("");
-							query();
-						}
-					});
-				}
 			});
 		}
 		

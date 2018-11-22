@@ -1,233 +1,243 @@
 <%@ page language="java" pageEncoding="utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
-<%@ taglib prefix="my" uri="myTag/core"%>
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>判卷</title>
+		<title>${exam.name }</title>
 		<%@include file="/script/home/common.jspf"%>
+		<style type="text/css">
+			.exam-bar {
+				background: #38f838 none repeat scroll 0% 0%;
+				height: 36px;
+				font-size: 16px;
+				margin-bottom: 0;
+			}
+			.exam-header-plus {
+				padding-top: 66px;
+			}
+			.paper .help-block {
+			    font-size: 12px;
+			    float: none;
+			    color: #a94442;
+			    margin-bottom: 0px !important;
+			    display: inline;
+			}
+		</style>
 	</head>
 	<body>
-		<div class="navbar navbar-inverse affix" style="width: 100%;height: 40px; z-index: 999999;padding: 0px;color: white;font-weight: bold;font-size: 14px;" >
+		<nav class="navbar navbar-fixed-top exam-bar" role="navigation">
 			<table style="width: 100%;height: 100%;">
 				<tr>
-					<td style="width: 30%;text-align: left;">用户名：${user.name } | 判卷人：${USER.name }</td>
-					<td style="width: 40%;text-align: center;">试卷名称：${paper.name }</td>
-					<td id="remainingTd" style="width: 30%;text-align: right;background-color: green;">
-						<button type="button" class="btn btn-info" onclick="doMark()">完成判卷</button>
-						<button type="button" class="btn btn-info" onclick="toMark()">返回</button>
+					<td style="width: 70%;text-align: left;">【${exam.name }】【${user.name }】【${startTime }&nbsp;&nbsp;-&nbsp;&nbsp;${endTime }】</td>
+					<td style="width: 30%;text-align: right;">
+						<button type="button" class="btn btn-info" onclick="doMark(false)">判卷</button>
+						<button type="button" class="btn btn-info" onclick="javascript:history.back(-1);">返回</button>
 						&nbsp;&nbsp;
 					</td>
 				</tr>
 			</table>
-		</div>
-		<form id="paperForm" role="form">
-			<input type="hidden" name="roomId" value="${room.id }">
-			<div class="container" style="padding-top: 70px;">
+		</nav>
+		<div class="exam-header-plus"></div>
+		<form role="form">
+			<div class="container paper">
 				<div class="row">
-					<div class="col-md-10 col-lg-10 col-md-offset-1">
-						<c:forEach var="paperQuestionEx" items="${paperQuestionExList[0].subList }" varStatus="vs">
-						<div class="row">
-							<div class="col-md-12 col-lg-12">
-								<div class="panel panel-primary">
-									<div id="section-${vs.index }" class="panel-heading">
-										${paperQuestionEx.name }
-									</div>
-									<c:if test="${!empty paperQuestionEx.description }">
-									<div class="panel-body">
-										<p>${paperQuestionEx.description }</p>
-									</div>
-									</c:if>
-									<ul class="list-group">
-										<c:forEach var="subPaperQuestionEx" items="${paperQuestionEx.subList }" varStatus="v">
-										<c:set var="examUserQuestion" value="${examUserQuestionMap[subPaperQuestionEx.questionId + 0]}"></c:set>
-										<li class="list-group-item">
-											<%-- 题干 --%>
-											<span style="vertical-align: top; ">${v.count}：</span>
-											<span style="display: inline-block;">${subPaperQuestionEx.question.title }</span>
-											<%-- 如果是单选题 --%>
-											<c:if test="${subPaperQuestionEx.question.type == '1' }">
-											<c:forEach var="dict" items="${questionOptions }">
-											<c:set var="op" value="option${dict.dictValue }"></c:set>
-											<c:if test="${!empty subPaperQuestionEx.question[op] }">
-											<div class="radio">
-												<label>
-													<input type="radio" name="qst_${examUserQuestion.id}" value="${dict.dictValue }" 
-														${examUserQuestion.answer == dict.dictValue ? "checked='checked'" : "" }
-														disabled="disabled">
-													${dict.dictValue }：<span style="display: inline-block;">${subPaperQuestionEx.question[op] }</span>
-												</label>
-											</div>
-											</c:if>
-											</c:forEach>
-											</c:if>
-											<%-- 如果是多选题 --%>
-											<c:if test="${subPaperQuestionEx.question.type == '2' }">
-											<c:forEach var="dict" items="${questionOptions }">
-											<c:set var="op" value="option${dict.dictValue }"></c:set>
-											<c:if test="${!empty subPaperQuestionEx.question[op] }">
-											<div class="checkbox">
-												<label>
-													<c:set var="op1" value=",${examUserQuestion.answer },"></c:set>
-													<c:set var="op2" value=",${dict.dictValue },"></c:set>
-													<input type="checkbox" name="qst_${examUserQuestion.id}" value="${dict.dictValue }"
-														${fn:contains(op1, op2) ? "checked='checked'" : "" }
-														disabled="disabled">
-													${dict.dictValue }：<span style="display: inline-block;">${subPaperQuestionEx.question[op] }</span>
-												</label>
-											</div>
-											</c:if>
-											</c:forEach>
-											</c:if>
-											<%-- 如果是填空题 --%>
-											<c:if test="${subPaperQuestionEx.question.type == '3' }">
-											<div class="form-group">
-												<input type="text" id="qst_${examUserQuestion.id}" name="qst_${examUserQuestion.id}" 
-													value="${examUserQuestion.answer}" class="form-control" placeholder="答案："
-													disabled="disabled">
-											</div>
-											</c:if>
-											<%-- 如果是判断题 --%>
-											<c:if test="${subPaperQuestionEx.question.type == '4' }">
-											<div class="form-group">
-												<label class="checkbox-inline">
-													<input type="radio" name="qst_${examUserQuestion.id}" value="对"
-														${examUserQuestion.answer == "对" ? "checked='checked'" : "" }
-														disabled="disabled">
-													对
-												</label>
-												<label class="checkbox-inline">
-													<input type="radio" name="qst_${examUserQuestion.id}" value="错"
-														${examUserQuestion.answer == "错" ? "checked='checked'" : "" }
-														disabled="disabled">
-													错
-												</label>
-											</div>
-											</c:if>
-											<%-- 如果是问答题 --%>
-											<c:if test="${subPaperQuestionEx.question.type == '5' }">
-											<div class="form-group">
-												<textarea id="qst_${examUserQuestion.id}" name="qst_${examUserQuestion.id}" 
-													class="form-control" rows="3" 
-													disabled="disabled">${examUserQuestion.answer}</textarea>
-											</div>
-											</c:if>
-											
-											<div class="well">
-												<c:set var="right" value="${subPaperQuestionEx.question.answer == examUserQuestion.answer }"></c:set>
-												<c:set var="color" value="${right ? 'green' : 'red'}"></c:set>
-												<div class="row">
-													<label for="firstname" class="col-sm-8 control-label" style="color: ${color};margin-top: 5px">
-														标准答案：${subPaperQuestionEx.question.answer }
-													</label>
-													<div class="col-sm-4 control-label">
-														分值【${subPaperQuestionEx.score }】：
-														<input type="text" id="qst_sc_${examUserQuestion.id}" class="form-control" placeholder="得分：" 
-															style="width: 100px;display: inline-block;" 
-															<c:if test="${subPaperQuestionEx.question.type == '1' || subPaperQuestionEx.question.type == '4'}">
-															readonly="readonly" value="${right ? subPaperQuestionEx.score : 0}"
+					<div class="col-md-12">
+						<div class="panel panel-default">
+							<ul class="list-group">
+								<li class="list-group-item">
+									<input type="hidden" id="id" name="id" value="${paper.id }">
+									<h1>${paper.name }</h1>
+									<h5>${paper.description }</h5>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<c:forEach var="pqEx" items="${paperQuestionExList }" varStatus="v">
+				<div class="row">
+					<div class="col-md-12">
+						<div class="panel panel-default">
+							<div class="panel-body">
+								<table style="width: 100%;">
+									<tr>
+										<td style="width: 100%;vertical-align: top;">
+											<h3>${pqEx.name }</h3>
+											<h5>${pqEx.description }</h5>
+										</td>
+									</tr>
+								</table>
+							</div>
+							<ul class="list-group collapse in">
+								<c:set var="labs" value="${fn:split('A,B,C,D,E,F,G', ',')}"></c:set>
+								<c:forEach var="subPqEx" items="${pqEx.subList }" varStatus="v1">
+								<c:set var="euq" value="${examUserQuestionMap[subPqEx.questionId + 0]}"></c:set>
+								<li class="list-group-item">
+									<table style="width: 100%;" class="${empty euq.score ? 'field-error' : ''}">
+										<tr>
+											<td style="width: 1%;vertical-align: top;">
+												${subPqEx.no }。
+											</td>
+											<td style="width: 99%;vertical-align: top;">
+												<div class="col-md-12">
+													<div class="row">
+														<div class="col-md-12">
+															${subPqEx.question.title }
+														</div>
+													</div>
+													<div class="row">
+														<div class="col-md-12">
+															<%-- 单选题 --%>
+															<c:if test="${subPqEx.question.type == 1 }">
+															<c:forEach var="lab" items="${labs }">
+															<c:set var="ol" value="option${lab }"></c:set>
+															<c:if test="${!empty subPqEx.question[ol] }">
+															<div class="radio">
+																<label>
+																	<input type="radio" name="qst_${euq.id}" value="${lab }" 
+																		${euq.answer == lab ? "checked='checked'" : "" }
+																		disabled="disabled">
+																	${lab }：${subPqEx.question[ol] }
+																</label>
+															</div>
 															</c:if>
-															<c:if test="${subPaperQuestionEx.question.type != '1' && subPaperQuestionEx.question.type != '4'}">
-															value="${examUserQuestion.score }" onblur="updateScore('qst_sc_${examUserQuestion.id }', '${subPaperQuestionEx.score }')"
+															</c:forEach>
 															</c:if>
-															/>
+															<%-- 多选题 --%>
+															<c:if test="${subPqEx.question.type == 2 }">
+															<c:forEach var="lab" items="${labs }">
+															<c:set var="ol" value="option${lab }"></c:set>
+															<c:if test="${!empty subPqEx.question[ol] }">
+															<c:set var="op1" value=",${euq.answer},"></c:set>
+															<div class="checkbox">
+																<label>
+																	<input type="checkbox" name="qst_${euq.id}" value="${lab }"
+																		${fn:contains(op1, lab) ? "checked='checked'" : "" }
+																		disabled="disabled">
+																	${lab }：${subPqEx.question[ol] }
+																</label>
+															</div>
+															</c:if>
+															</c:forEach>
+															</c:if>
+															<%-- 填空题 --%>
+															<c:if test="${subPqEx.question.type == 3 }">
+															<% pageContext.setAttribute("v", "\n"); %>
+															<c:set var="lab1s" value="${fn:split('一,二,三,四,五,六,七', ',')}"></c:set>
+															<c:set var="answers" value="${fn:split(euq.answer, v)}"></c:set>
+															<c:forEach var="answer" items="${fn:split(subPqEx.question.answer, v) }" varStatus="s">
+															<div class="row form-group">
+																<label class="col-md-1 control-label">填空${lab1s[s.index] }：</label>
+																<div class="col-md-5">
+																	<input type="text" name="qst_${euq.id}" 
+																		value="${answers[s.index]}" class="form-control" placeholder="答案："
+																		disabled="disabled">
+																</div>
+																<div class="col-md-6"></div>
+															</div>
+															</c:forEach>
+															</c:if>
+															<%-- 判断题 --%>
+															<c:if test="${subPqEx.question.type == 4 }">
+															<label class="radio-inline">
+																<input type="radio" name="qst_${euq.id}" value="对"
+																	${euq.answer == "对" ? "checked='checked'" : "" }
+																	disabled="disabled">
+																对
+															</label>
+															<label class="radio-inline">
+																<input type="radio" name="qst_${euq.id}" value="错"
+																	${euq.answer == "错" ? "checked='checked'" : "" }
+																	disabled="disabled">
+																错
+															</label>
+															</c:if>
+															<%-- 问答题 --%>
+															<c:if test="${subPqEx.question.type == 5 }">
+															<textarea id="qst_${euq.id}" name="qst_${euq.id}" 
+																class="form-control" rows="6" disabled="disabled"
+																>${euq.answer}</textarea>
+															</c:if>
+														</div>
+													</div>
+													<div class="row">
+														<div class="col-md-12">
+															<label class="control-label">【标准答案-${subPqEx.score }分】：${subPqEx.question.answer }</label>
+														</div>
+													</div>
+													<div class="row">
+														<div class="col-md-12">
+															<label class="control-label">【试题解析】：${subPqEx.question.analysis }</label>
+														</div>
+													</div>
+													<div class="row">
+														<div class="col-md-12">
+															<div class="form-group ${empty euq.score ? 'has-error' : ''}" style="margin-bottom: 0px;">
+																<label for="score_${subPqEx.id }" class="control-label">【得分】：</label>
+																<c:if test="${subPqEx.question.type != 5 }">
+																	${euq.score }
+																</c:if>
+																<c:if test="${subPqEx.question.type == 5 }">
+																<input type="text" id="qst_sc_${euq.id  }" name="score" value="${euq.score }" placeholder="0.00"
+																	style="width: 40px;border:0; border-bottom: 1px solid #d8d8d8; text-align: center;"
+																	onblur="updateScore('qst_sc_${euq.id }', '${subPqEx.score }')"
+																	>分
+																	<small class="help-block"></small>
+																</c:if>
+															</div>
+														</div>
 													</div>
 												</div>
-												<div class="row">
-													<label class="control-label" style="margin-left: 15px;">
-														试题解析：${subPaperQuestionEx.question.analysis }
-													</label>
-												</div>
-											</div>
-										</li>
-										</c:forEach>
-									</ul>
-								</div>
-							</div>
-						</div>
-						</c:forEach>
-						<div class="row">
-							<div class="col-md-12 col-lg-12">
-								<button type="button" class="btn btn-primary btn-lg btn-block" onclick="doMark()">完成判卷</button>
-							</div>
+											</td>
+										</tr>
+									</table>
+								</li>
+								</c:forEach>
+							</ul>
 						</div>
 					</div>
 				</div>
+				</c:forEach>
 			</div>
 		</form>
-		<!-- 模态框（Modal） -->
-		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-			aria-hidden="true" style="margin-top: 120px;">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-						<h4 class="modal-title" id="myModalLabel">提示消息</h4>
-					</div>
-					<div class="modal-body">
-						<span id="modalMessage"></span>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-					</div>
-				</div>
-			</div>
-		</div>
 	</body>
 	<script type="text/javascript">
-		//页面加载完毕，执行如下方法：
-		$(function() {
-			addPaperValid();
+		//定义变量
+	
+		//页面加载完毕，执行如下方法
+		$(function(){
 		});
-		
-		//添加校验
-		function addPaperValid(){
-			$("[role=\"form\"]").bootstrapValidator({
-				message : 'This value is not valid',
-				trigger : "change",
-				feedbackIcons : {
-					valid : 'glyphicon glyphicon-ok',
-					invalid : 'glyphicon glyphicon-remove',
-					validating : 'glyphicon glyphicon-refresh'
-				},
-				fields : {
-					scores : {
-						validators : {
-							notEmpty : {
-								message : "必填项"
-							},
-							regexp : {
-								regexp : /^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/,
-								message : "必须为正数，最多保留两位小数"
-							}
-						}
-					},
-					score : {
-						validators : {
-							notEmpty : {
-								message : "必填项"
-							},
-							regexp : {
-								regexp : /^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/,
-								message : "必须为正数，最多保留两位小数"
-							}
-						}
-					}
-				}
-			});
-		}
 		
 		//更新分数
 		function updateScore(id, maxScore){
-			var obj = $("#" + id);
-			var currScore = obj.val();
+			var $scoreInput = $("#" + id);
+			var currScore = $scoreInput.val();
+			$scoreInput.parent().parent().parent().parent().parent().parent().parent().parent().removeClass("field-error");
+			$scoreInput.parent().removeClass("has-error");
+			$scoreInput.next().html("");
+			
+			if(currScore && currScore != "0"){
+				var patt = /^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/;
+				if(!patt.test(currScore)){
+					$scoreInput.parent().parent().parent().parent().parent().parent().parent().parent().addClass("field-error");
+					$scoreInput.parent().addClass("has-error");
+					$scoreInput.next().html("必须为正数，最多保留两位小数");
+					return;
+				}
+			}
+			
+			if(currScore){
+				$scoreInput.parent().addClass("has-success");
+			}else{
+				$scoreInput.parent().addClass("has-error");
+			}
+			
 			if(currScore < 0){
 				currScore = 0;
-				obj.val(0);
+				$scoreInput.val(0);
 			}else if(currScore > maxScore){
 				currScore = maxScore;
-				obj.val(maxScore);
+				$scoreInput.val(maxScore);
 			}
 			
 			$.ajax({
@@ -235,9 +245,20 @@
 				url : "home/mark/updateScore",
 				async : true, //异步提交
 				success : function(obj) {
-					if(!obj.success){
-						$("#modalMessage").html(obj.message);
-						$('#myModal').modal('show');
+					if(!obj.succ){
+						BootstrapDialog.show({
+							title : "提示消息",
+							message : obj.msg,
+							buttons : [{
+								label : "&nbsp;确定",
+								icon : "glyphicon glyphicon-ok",
+								cssClass : "btn-primary",
+								action : function(dialogItself) {
+									dialogItself.close();
+								}
+							}]
+						});
+						return;
 					}
 				}
 			});
@@ -250,20 +271,26 @@
 				url : "home/mark/doMark",
 				async : true, //异步提交
 				success : function(obj) {
-					$("#modalMessage").html(obj.message);
-					$('#myModal').modal('show');
+					BootstrapDialog.show({
+						title : "提示消息",
+						message : obj.msg,
+						buttons : [{
+							label : "&nbsp;确定",
+							icon : "glyphicon glyphicon-ok",
+							cssClass : "btn-primary",
+							action : function(dialogItself) {
+								dialogItself.close();
+							}
+						}]
+					});
 					
-					if(!obj.success){
+					if(!obj.succ){
 						return;
 					}
-					setTimeout("window.location.href = 'home/mark/toList'", 2000)
+					
+					setTimeout("window.location.href = 'home/mark/toList'", 2000);
 				}
 			});
-		}
-		
-		//返回
-		function toMark(){
-			window.location.href = "home/mark/toList";
 		}
 	</script>
 </html>

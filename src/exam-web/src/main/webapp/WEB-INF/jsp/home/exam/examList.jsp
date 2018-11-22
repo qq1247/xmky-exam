@@ -283,10 +283,10 @@
 							url : "home/exam/doDel",
 							data : $.fn.my.serializeField(nodes),
 							success : function(obj) {
-								if (!obj.success) {
+								if (!obj.succ) {
 									BootstrapDialog.show({
 										title : "提示消息",
-										message : obj.message,
+										message : obj.msg,
 										buttons : [{
 											label : "&nbsp;确定",
 											icon : "glyphicon glyphicon-ok",
@@ -466,10 +466,10 @@
 										url : "home/exam/doExamUserAdd",
 										data : $.fn.my.serializeField(nodes, {attrName : "userIds"}) + "&id=" + $("#examUserAddTen").val(),
 										success : function(obj) {
-											if (!obj.success) {
+											if (!obj.succ) {
 												BootstrapDialog.show({
 													title : "提示消息",
-													message : obj.message,
+													message : obj.msg,
 													buttons : [{
 														label : "&nbsp;确定",
 														icon : "glyphicon glyphicon-ok",
@@ -602,10 +602,10 @@
 							url : "home/exam/doExamUserDel",
 							data : $.fn.my.serializeField(nodes, {attrName : "examUserIds"}),
 							success : function(obj) {
-								if (!obj.success) {
+								if (!obj.succ) {
 									BootstrapDialog.show({
 										title : "提示消息",
-										message : obj.message,
+										message : obj.msg,
 										buttons : [{
 											label : "&nbsp;确定",
 											icon : "glyphicon glyphicon-ok",
@@ -786,10 +786,10 @@
 										url : "home/exam/doMarkUserAdd",
 										data : $.fn.my.serializeField(nodes, {attrName : "userIds"}) + "&id=" + $("#markUserAddTen").val(),
 										success : function(obj) {
-											if (!obj.success) {
+											if (!obj.succ) {
 												BootstrapDialog.show({
 													title : "提示消息",
-													message : obj.message,
+													message : obj.msg,
 													buttons : [{
 														label : "&nbsp;确定",
 														icon : "glyphicon glyphicon-ok",
@@ -922,10 +922,10 @@
 							url : "home/exam/doMarkUserDel",
 							data : $.fn.my.serializeField(nodes, {attrName : "markUserIds"}),
 							success : function(obj) {
-								if (!obj.success) {
+								if (!obj.succ) {
 									BootstrapDialog.show({
 										title : "提示消息",
-										message : obj.message,
+										message : obj.msg,
 										buttons : [{
 											label : "&nbsp;确定",
 											icon : "glyphicon glyphicon-ok",

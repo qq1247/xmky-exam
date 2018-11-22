@@ -2,7 +2,7 @@
 <nav class="navbar navbar-fixed-top exam-header" role="navigation">
 	<div class="container">
 		<div class="navbar-header">
-			<a class="navbar-brand" href="#">在线考试</a>
+			<a class="navbar-brand" href="${empty USER ? 'home/toIn' : 'home/toHome'}">在线考试</a>
 		</div>
 		<div>
 			<ul class="nav navbar-nav">
@@ -24,28 +24,29 @@
 						<li>
 							<a href="home/exam/toList">考试管理</a>
 						</li>
-						<li>
-							<a href="home/mark/toExamList">判卷管理</a>
-						</li>
 					</ul>
 				</li>
 				<li class="dropdown">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-						报表查询
+						判卷管理
 						<b class="caret"></b>
 					</a>
 					<ul class="dropdown-menu">
 						<li>
 							<span class="hand"></span>
-							<a href="#">成绩查询</a>
+							<a href="home/mark/toExamList">我的判卷</a>
 						</li>
-						<li class="divider"></li>
+					</ul>
+				</li>
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+						我的考试
+						<b class="caret"></b>
+					</a>
+					<ul class="dropdown-menu">
 						<li>
-							<a href="#">错题统计</a>
-						</li>
-						<li class="divider"></li>
-						<li>
-							<a href="#">成绩统计</a>
+							<span class="hand"></span>
+							<a href="home/myExam/toList">我的考试</a>
 						</li>
 					</ul>
 				</li>
@@ -53,7 +54,7 @@
 			<ul class="nav navbar-nav navbar-right">
 				<li class="dropdown">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-						欢迎：张虎成
+						欢迎：${USER.name }
 						<b class="caret"></b>
 					</a>
 					<ul class="dropdown-menu login">
@@ -63,7 +64,7 @@
 						</li>
 						<li class="divider"></li>
 						<li>
-							<a href="#">退出</a>
+							<a href="home/doOut">退出</a>
 						</li>
 					</ul>
 				</li>

@@ -48,7 +48,7 @@
 					<div class="panel panel-default exam-list">
 						<div class="panel-body">
 							<div id="toolbar">
-								<button type="button" class="btn btn-primary" onclick="toMarkList();">
+								<button type="button" class="btn btn-primary" onclick="toMark();">
 									<span class="glyphicon glyphicon-search"></span>
 									&nbsp;判卷
 								</button>
@@ -123,6 +123,8 @@
 				});
 				return;
 			}
+			
+			window.location.href = "home/mark/toMark?examUserId=" + nodes[0].ID;
 		}
 	</script>
 </html>

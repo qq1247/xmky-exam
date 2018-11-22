@@ -199,10 +199,10 @@
 				url : "home/paper/doAdd",
 				data : $editForm.serialize(),
 				success : function(obj) {
-					if (!obj.success) {
+					if (!obj.succ) {
 						BootstrapDialog.show({
 							title : "提示消息",
-							message : obj.message,
+							message : obj.msg,
 							buttons : [{
 								label : "&nbsp;确定",
 								icon : "glyphicon glyphicon-ok",
@@ -230,10 +230,10 @@
 				url : "home/paper/doEdit",
 				data : $editForm.serialize(),
 				success : function(obj) {
-					if (!obj.success) {
+					if (!obj.succ) {
 						BootstrapDialog.show({
 							title : "提示消息",
-							message : obj.message,
+							message : obj.msg,
 							buttons : [{
 								label : "&nbsp;确定",
 								icon : "glyphicon glyphicon-ok",

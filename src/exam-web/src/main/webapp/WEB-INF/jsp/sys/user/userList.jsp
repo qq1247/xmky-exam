@@ -186,8 +186,8 @@
 						$.messager.progress("close"); 
 						
 						var obj = $.parseJSON(data);
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 							return;
 						}
 						if(obj.data.initPwd){
@@ -267,8 +267,8 @@
 						$.messager.progress("close"); 
 						
 						var obj = $.parseJSON(data);
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 							return;
 						}
 						if(obj.data.initPwd){
@@ -296,8 +296,8 @@
 						orgTree.tree("reload");
 						$.messager.progress("close");
 						
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 						}
 					}
 				});
@@ -341,8 +341,8 @@
 						orgTree.tree("reload");
 						$.messager.progress("close");
 						
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 							return;
 						}
 						if(obj.data.initPwd){
@@ -437,8 +437,8 @@
 						postDialog.dialog("close");
 						$.messager.progress("close");
 						
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 							return;
 						}
 					}
@@ -508,8 +508,8 @@
 						orgDialog.dialog("close");
 						$.messager.progress("close");
 						
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 							return;
 						}
 					}

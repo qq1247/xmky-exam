@@ -258,10 +258,10 @@
 							url : "home/paper/doChapterAdd",
 							data : $editForm.serialize(),
 							success : function(obj) {
-								if (!obj.success) {
+								if (!obj.succ) {
 									BootstrapDialog.show({
 										title : "提示消息",
-										message : obj.message,
+										message : obj.msg,
 										buttons : [{
 											label : "&nbsp;确定",
 											icon : "glyphicon glyphicon-ok",
@@ -330,10 +330,10 @@
 							url : "home/paper/doChapterEdit",
 							data : $editForm.serialize(),
 							success : function(obj) {
-								if (!obj.success) {
+								if (!obj.succ) {
 									BootstrapDialog.show({
 										title : "提示消息",
-										message : obj.message,
+										message : obj.msg,
 										buttons : [{
 											label : "&nbsp;确定",
 											icon : "glyphicon glyphicon-ok",
@@ -387,10 +387,10 @@
 							url : "home/paper/doChapterDel",
 							data : {chapterId : chapterId},
 							success : function(obj) {
-								if (!obj.success) {
+								if (!obj.succ) {
 									BootstrapDialog.show({
 										title : "提示消息",
-										message : obj.message,
+										message : obj.msg,
 										buttons : [{
 											label : "&nbsp;确定",
 											icon : "glyphicon glyphicon-ok",
@@ -464,10 +464,10 @@
 							url : "home/paper/doQuestionAdd",
 							data : "chapterId=" + chapterId + "&" + $.fn.my.serializeField(nodes, {"attrName" : "questionIds"}),
 							success : function(obj) {
-								if (!obj.success) {
+								if (!obj.succ) {
 									BootstrapDialog.show({
 										title : "提示消息",
-										message : obj.message,
+										message : obj.msg,
 										buttons : [{
 											label : "&nbsp;确定",
 											icon : "glyphicon glyphicon-ok",
@@ -574,10 +574,10 @@
 							url : "home/paper/doQuestionClear",
 							data : {chapterId : chapterId},
 							success : function(obj) {
-								if (!obj.success) {
+								if (!obj.succ) {
 									BootstrapDialog.show({
 										title : "提示消息",
-										message : obj.message,
+										message : obj.msg,
 										buttons : [{
 											label : "&nbsp;确定",
 											icon : "glyphicon glyphicon-ok",
@@ -633,10 +633,10 @@
 							url : "home/paper/doScoresUpdate",
 							data : $editForm.serialize(),
 							success : function(obj) {
-								if (!obj.success) {
+								if (!obj.succ) {
 									BootstrapDialog.show({
 										title : "提示消息",
-										message : obj.message,
+										message : obj.msg,
 										buttons : [{
 											label : "&nbsp;确定",
 											icon : "glyphicon glyphicon-ok",
@@ -693,10 +693,10 @@
 					chapterId : chapterId
 				},
 				success : function(obj) {
-					if (!obj.success) {
+					if (!obj.succ) {
 						BootstrapDialog.show({
 							title : "提示消息",
-							message : obj.message,
+							message : obj.msg,
 							buttons : [{
 								label : "&nbsp;确定",
 								icon : "glyphicon glyphicon-ok",
@@ -722,10 +722,10 @@
 					chapterId : chapterId
 				},
 				success : function(obj) {
-					if (!obj.success) {
+					if (!obj.succ) {
 						BootstrapDialog.show({
 							title : "提示消息",
-							message : obj.message,
+							message : obj.msg,
 							buttons : [{
 								label : "&nbsp;确定",
 								icon : "glyphicon glyphicon-ok",
@@ -765,7 +765,7 @@
 				success : function(obj) {
 					BootstrapDialog.show({
 						title : "提示消息",
-						message : obj.message,
+						message : obj.msg,
 						buttons : [{
 							label : "&nbsp;确定",
 							icon : "glyphicon glyphicon-ok",
@@ -787,10 +787,10 @@
 					paperQuestionId : paperQuestionId
 				},
 				success : function(obj) {
-					if (!obj.success) {
+					if (!obj.succ) {
 						BootstrapDialog.show({
 							title : "提示消息",
-							message : obj.message,
+							message : obj.msg,
 							buttons : [{
 								label : "&nbsp;确定",
 								icon : "glyphicon glyphicon-ok",
@@ -816,10 +816,10 @@
 					paperQuestionId : paperQuestionId
 				},
 				success : function(obj) {
-					if (!obj.success) {
+					if (!obj.succ) {
 						BootstrapDialog.show({
 							title : "提示消息",
-							message : obj.message,
+							message : obj.msg,
 							buttons : [{
 								label : "&nbsp;确定",
 								icon : "glyphicon glyphicon-ok",
@@ -853,10 +853,10 @@
 								paperQuestionId : paperQuestionId
 							},
 							success : function(obj) {
-								if (!obj.success) {
+								if (!obj.succ) {
 									BootstrapDialog.show({
 										title : "提示消息",
-										message : obj.message,
+										message : obj.msg,
 										buttons : [{
 											label : "&nbsp;确定",
 											icon : "glyphicon glyphicon-ok",

@@ -36,7 +36,7 @@ public class LoginController extends BaseController{
 	 * v1.0 zhanghc 2016年9月8日下午8:47:13
 	 * @return String
 	 */
-	@RequestMapping("/pubToIn")
+	@RequestMapping("/toIn")
 	public String pubToIn() {
 		try {
 			return "/WEB-INF/jsp/web/login/in.jsp";
@@ -55,7 +55,7 @@ public class LoginController extends BaseController{
 	 * @param model
 	 * @return String
 	 */
-	@RequestMapping("/pubDoIn")
+	@RequestMapping("/doIn")
 	public String pubDoIn(Model model, String loginName, String pwd) {
 		try {
 			//完成登录
@@ -71,7 +71,7 @@ public class LoginController extends BaseController{
 			} catch (UnsupportedEncodingException e1) {
 				e1.printStackTrace();
 			}
-			return "redirect:/login/pubToIn";
+			return "redirect:/login/toIn";
 		}
 	}
 	
@@ -81,17 +81,17 @@ public class LoginController extends BaseController{
 	 * @param loginName
 	 * @return String
 	 */
-	@RequestMapping("/pubDoOut")
+	@RequestMapping("/doOut")
 	public String pubDoOut(){
 		try {
 			//完成退出登录
 			loginService.doOut(request);
 			
 			//重定向到登录页
-			return "redirect:/login/pubToIn";
+			return "redirect:/login/toIn";
 		} catch (Exception e) {
 			log.error("完成退出登录错误：", e);
-			return "redirect:/login/pubToIn";
+			return "redirect:/login/toIn";
 		}
 	}
 	
@@ -101,7 +101,7 @@ public class LoginController extends BaseController{
 	 * v1.0 zhanghc 2017年7月14日下午4:24:33
 	 * @return String
 	 */
-	@RequestMapping("/pubToPwdUpdate")
+	@RequestMapping("/toPwdUpdate")
 	public String pubToPwdUpdate() {
 		try {
 			return "/WEB-INF/jsp/web/login/updatePwd.jsp";
@@ -119,7 +119,7 @@ public class LoginController extends BaseController{
 	 * @param newPwd
 	 * @return PageResult
 	 */
-	@RequestMapping("/pubDoPwdUpdate")
+	@RequestMapping("/doPwdUpdate")
 	@ResponseBody
 	public PageResult pubDoPwdUpdate(String oldPwd, String newPwd) {
 		try {

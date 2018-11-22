@@ -12,7 +12,7 @@
 						<a href="#">首页</a>
 					</li>
 					<li>
-						<a href="login/pubDoIn">管理后台</a>
+						<a href="login/doIn">管理后台</a>
 					</li>
 				</ul>
 			</div>

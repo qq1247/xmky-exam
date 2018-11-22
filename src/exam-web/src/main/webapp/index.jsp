@@ -1,4 +1,4 @@
 <%@ page language="java" pageEncoding="utf-8"%>
 <%
-	response.sendRedirect(request.getContextPath() + "/home/pubToIn");
+	response.sendRedirect(request.getContextPath() + "/home/toIn");
 %>

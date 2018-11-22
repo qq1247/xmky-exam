@@ -234,10 +234,10 @@
 							url : "home/paper/doDel",
 							data : $.fn.my.serializeField(nodes),
 							success : function(obj) {
-								if (!obj.success) {
+								if (!obj.succ) {
 									BootstrapDialog.show({
 										title : "提示消息",
-										message : obj.message,
+										message : obj.msg,
 										buttons : [{
 											label : "&nbsp;确定",
 											icon : "glyphicon glyphicon-ok",

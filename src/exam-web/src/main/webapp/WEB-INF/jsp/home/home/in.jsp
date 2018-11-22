@@ -12,7 +12,7 @@
 				<div class="row">
 					<div class="col-md-2"></div>
 					<div class="col-md-8">
-						<form id="loginForm" action="home/pubDoIn" method="post">
+						<form id="loginForm" action="home/doIn" method="post">
 							<div class="exam-login-box">
 								<h1>在线考试账号登录</h1>
 								<div>
@@ -44,6 +44,12 @@
 	
 		//页面加载完毕，执行如下方法：
 		$(function() {
+			$(document).keydown(function (event) {
+				if (event.keyCode == 13) {
+					doLogin();
+				}
+			});
+			
 			var message = "<%= request.getParameter("message") == null ? "" : request.getParameter("message") %>";
 			if(message){
 				$pwd.next().html(decodeURI(message));

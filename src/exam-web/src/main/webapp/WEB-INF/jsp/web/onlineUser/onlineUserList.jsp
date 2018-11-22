@@ -79,8 +79,8 @@
 						$.messager.progress("close");
 						
 						onlineUserGrid.datagrid("load", $.fn.my.serializeObj(onlineUserQueryForm));
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 						}
 					}
 				});
