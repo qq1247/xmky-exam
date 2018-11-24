@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.home.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -18,6 +19,7 @@ import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.util.DateUtil;
+import com.wcpdoc.exam.exam.entity.ExamUser;
 import com.wcpdoc.exam.exam.service.ExamService;
 import com.wcpdoc.exam.sys.cache.DictCache;
 
@@ -62,7 +64,13 @@ public class HomeMyExamController extends BaseController{
 	public PageOut list(PageIn pageIn) {
 		try {
 			pageIn.setNine(getCurrentUser().getId() + "");
-			return examService.getListpage(pageIn);
+			PageOut listpage = examService.getListpage(pageIn);
+			List<Map<String, Object>> list = listpage.getRows();
+			for(Map<String, Object> map : list){
+				ExamUser examUser = examService.getExamUser((int)map.get("ID"), getCurrentUser().getId());
+				map.put("TOTAL_SCORE", examUser.getTotalScore());
+			}
+			return listpage;
 		} catch (Exception e) {
 			log.error("我的考试列表错误：", e);
 			return new PageOut();

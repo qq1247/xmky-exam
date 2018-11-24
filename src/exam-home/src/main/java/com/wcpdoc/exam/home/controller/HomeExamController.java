@@ -40,12 +40,15 @@ public class HomeExamController extends BaseController {
 	 * 到达考试列表页面 
 	 * 
 	 * v1.0 zhanghc 2018年10月25日下午9:23:06
+	 * @param model
+	 * @param nav
 	 * @return String
 	 */
 	@RequestMapping("/toList")
-	public String toList(Model model) {
+	public String toList(Model model, boolean nav) {
 		try {
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
+			model.addAttribute("nav", nav);
 			return "/WEB-INF/jsp/home/exam/examList.jsp";
 		} catch (Exception e) {
 			log.error("到达考试列表页面错误：", e);

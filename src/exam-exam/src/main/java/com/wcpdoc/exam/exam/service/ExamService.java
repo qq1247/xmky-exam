@@ -12,6 +12,7 @@ import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.service.BaseService;
 import com.wcpdoc.exam.exam.entity.Exam;
 import com.wcpdoc.exam.exam.entity.ExamType;
+import com.wcpdoc.exam.exam.entity.ExamUser;
 import com.wcpdoc.exam.exam.entity.MarkUser;
 import com.wcpdoc.exam.exam.entity.Paper;
 /**
@@ -342,4 +343,15 @@ public interface ExamService extends BaseService<Exam>{
 	 * void
 	 */
 	void toMark(Model model, LoginUser currentUser, Integer examUserId);
+
+	/**
+	 * 获取考试用户信息
+	 * 
+	 * v1.0 zhanghc 2017年7月3日上午9:41:59
+	 * @param examId
+	 * @param userId
+	 * @return ExamUser
+	 */
+	ExamUser getExamUser(Integer examId, Integer userId);
+
 }

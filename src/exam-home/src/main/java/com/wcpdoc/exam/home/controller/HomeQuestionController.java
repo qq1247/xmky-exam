@@ -46,14 +46,17 @@ public class HomeQuestionController extends BaseController {
 	 * 到达试题列表页面 
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * @param model
+	 * @param nav
 	 * @return String
 	 */
 	@RequestMapping("/toList")
-	public String toList(Model model) {
+	public String toList(Model model, boolean nav) {
 		try {
 			model.addAttribute("QUESTION_TYPE_DICT", DictCache.getIndexDictlistMap().get("QUESTION_TYPE"));
 			model.addAttribute("QUESTION_DIFFICULTY_DICT", DictCache.getIndexDictlistMap().get("QUESTION_DIFFICULTY"));
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
+			model.addAttribute("nav", nav);
 			return "/WEB-INF/jsp/home/question/questionList.jsp";
 		} catch (Exception e) {
 			log.error("到达试题列表页面错误：", e);

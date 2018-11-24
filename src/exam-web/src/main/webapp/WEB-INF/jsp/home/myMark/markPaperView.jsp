@@ -135,7 +135,7 @@
 		
 		//返回
 		function toMark(){
-			window.location.href = "home/mark/toList";
+			window.location.href = "home/myMark/toList";
 		}
 	</script>
 </html>

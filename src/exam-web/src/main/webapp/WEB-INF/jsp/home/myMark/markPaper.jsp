@@ -242,7 +242,7 @@
 			
 			$.ajax({
 				data : {examUserQuestionId : id.substr(7), score : currScore},
-				url : "home/mark/updateScore",
+				url : "home/myMark/updateScore",
 				async : true, //异步提交
 				success : function(obj) {
 					if(!obj.succ){
@@ -268,7 +268,7 @@
 		function doMark(){
 			$.ajax({
 				data : {examUserId : "${examUser.id }"},
-				url : "home/mark/doMark",
+				url : "home/myMark/doMark",
 				async : true, //异步提交
 				success : function(obj) {
 					BootstrapDialog.show({
@@ -288,7 +288,7 @@
 						return;
 					}
 					
-					setTimeout("window.location.href = 'home/mark/toList'", 2000);
+					setTimeout("window.location.href = 'home/myMark/toList'", 2000);
 				}
 			});
 		}

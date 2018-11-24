@@ -77,7 +77,7 @@
 		//初始化列表
 		function initTable(){
 			$table.bootstrapTable({
-				url : "home/mark/list",
+				url : "home/myMark/list",
 				queryParams : function(params){
 					var customeParams = $.fn.my.serializeObj($queryForm);
 					customeParams.page = this.pageNumber;
@@ -124,7 +124,7 @@
 				return;
 			}
 			
-			window.location.href = "home/mark/toMark?examUserId=" + nodes[0].ID;
+			window.location.href = "home/myMark/toMark?examUserId=" + nodes[0].ID;
 		}
 	</script>
 </html>

@@ -19,14 +19,14 @@ import com.wcpdoc.exam.exam.service.ExamService;
 import com.wcpdoc.exam.sys.cache.DictCache;
 
 /**
- * 判卷控制层
+ * 我的判卷控制层
  * 
  * v1.0 zhanghc 2017-05-25 16:34:59
  */
 @Controller
-@RequestMapping("/home/mark")
-public class HomeMarkController extends BaseController{
-	private static final Logger log = LoggerFactory.getLogger(HomeMarkController.class);
+@RequestMapping("/home/myMark")
+public class HomeMyMarkController extends BaseController{
+	private static final Logger log = LoggerFactory.getLogger(HomeMyMarkController.class);
 	
 	@Resource
 	private ExamService examService;
@@ -42,10 +42,10 @@ public class HomeMarkController extends BaseController{
 	public String toExamList(Model model) {
 		try {
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
-			return "/WEB-INF/jsp/home/mark/examList.jsp";
+			return "/WEB-INF/jsp/home/myMark/examList.jsp";
 		} catch (Exception e) {
 			log.error("到达考试列表页面错误：", e);
-			return "/WEB-INF/jsp/home/mark/examList.jsp";
+			return "/WEB-INF/jsp/home/myMark/examList.jsp";
 		}
 	}
 	
@@ -79,10 +79,10 @@ public class HomeMarkController extends BaseController{
 	@RequestMapping("/toList")
 	public String toMarkList(Model model) {
 		try {
-			return "/WEB-INF/jsp/home/mark/markList.jsp";
+			return "/WEB-INF/jsp/home/myMark/markList.jsp";
 		} catch (Exception e) {
 			log.error("到达判卷列表页面错误：", e);
-			return "/WEB-INF/jsp/home/mark/markList.jsp";
+			return "/WEB-INF/jsp/home/myMark/markList.jsp";
 		}
 	}
 	
@@ -117,7 +117,7 @@ public class HomeMarkController extends BaseController{
 	public String toMark(Model model, Integer examUserId) {
 		try {
 			examService.toMark(model, getCurrentUser(), examUserId);
-			return "/WEB-INF/jsp/home/mark/markPaper.jsp";
+			return "/WEB-INF/jsp/home/myMark/markPaper.jsp";
 		} catch (Exception e) {
 			log.error("到达试卷页面错误：", e);
 			model.addAttribute("message", e.getMessage());
@@ -174,7 +174,7 @@ public class HomeMarkController extends BaseController{
 //	public String toMarkView(Model model, Integer examUserId) {
 //		try {
 //			homeMarkService.toMarkView(getCurrentUser(), model, examUserId);
-//			return "/WEB-INF/jsp/home/mark/markPaperView.jsp";
+//			return "/WEB-INF/jsp/home/myMark/markPaperView.jsp";
 //		} catch (Exception e) {
 //			log.error("到达试卷预览页面错误：", e);
 //			model.addAttribute("message", e.getMessage());

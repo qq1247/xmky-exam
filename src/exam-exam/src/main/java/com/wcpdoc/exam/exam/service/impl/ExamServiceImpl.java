@@ -834,4 +834,10 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	private boolean bdbf(String options) {
 		return ValidateUtil.isValid(options) && options.contains("1");
 	}
+
+
+	@Override
+	public ExamUser getExamUser(Integer examId, Integer userId) {
+		return examUserService.getEntity(examId, userId);
+	}
 }

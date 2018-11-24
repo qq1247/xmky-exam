@@ -9,6 +9,39 @@
 	<body>
 		<%@include file="/script/home/head.jspf"%>
 		<div class="container">
+			<c:if test="${nav }">
+			<div class="row">
+				<ul class="process process-plus">
+					<li onclick="window.location.href='home/question/toList?nav=true'">
+						<div class="item passed">
+							<div class="step">
+								<i>1</i>
+								<label>添加试题</label>
+							</div>
+							<span></span>
+						</div>
+					</li>
+					<li onclick="window.location.href='home/paper/toList?nav=true'">
+						<div class="item passed">
+							<div class="step">
+								<i>2</i>
+								<label>添加试卷</label>
+							</div>
+							<span></span>
+						</div>
+					</li>
+					<li onclick="window.location.href='home/exam/toList?nav=true'">
+						<div class="item current">
+							<div class="step">
+								<i>3</i>
+								<label>添加考试</label>
+							</div>
+							<span style="color: red;"></span>
+						</div>
+					</li>
+				</ul>
+			</div>
+			</c:if>
 			<div class="row">
 				<div class="col-md-3">
 					<div id="examTypeTree" class="exam-tree"></div>
