@@ -29,7 +29,7 @@ CREATE TABLE `SYS_DICT` (
 ) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of sys_dict
+-- Records of SYS_DICT
 -- ----------------------------
 INSERT INTO `SYS_DICT` VALUES ('1', 'QUESTION_TYPE', '1', '单选', '1');
 INSERT INTO `SYS_DICT` VALUES ('2', 'QUESTION_TYPE', '2', '多选', '2');
@@ -79,7 +79,7 @@ CREATE TABLE `SYS_FILE` (
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of sys_file
+-- Records of SYS_FILE
 -- ----------------------------
 
 -- ----------------------------
@@ -99,7 +99,7 @@ CREATE TABLE `SYS_ORG` (
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of sys_org
+-- Records of SYS_ORG
 -- ----------------------------
 INSERT INTO `SYS_ORG` VALUES ('1', '组织机构', '0', '_1_', '1', '2017-08-01 22:31:43', '1', '1');
 
@@ -119,7 +119,7 @@ CREATE TABLE `SYS_ORG_POST` (
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of sys_org_post
+-- Records of SYS_ORG_POST
 -- ----------------------------
 
 -- ----------------------------
@@ -136,7 +136,7 @@ CREATE TABLE `SYS_POST` (
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of sys_post
+-- Records of SYS_POST
 -- ----------------------------
 
 -- ----------------------------
@@ -155,7 +155,7 @@ CREATE TABLE `SYS_POST_RES` (
 ) ENGINE=InnoDB AUTO_INCREMENT=382 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of sys_post_res
+-- Records of SYS_POST_RES
 -- ----------------------------
 
 -- ----------------------------
@@ -174,7 +174,7 @@ CREATE TABLE `SYS_POST_USER` (
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of sys_post_user
+-- Records of SYS_POST_USER
 -- ----------------------------
 
 -- ----------------------------
@@ -198,7 +198,7 @@ CREATE TABLE `SYS_RES` (
 ) ENGINE=InnoDB AUTO_INCREMENT=103 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of sys_res
+-- Records of SYS_RES
 -- ----------------------------
 INSERT INTO `SYS_RES` VALUES ('1', '系统资源', 'xtzy', '0', '_1_', '1', '2017-08-15 18:41:02', '1', '1', '1', '', null);
 INSERT INTO `SYS_RES` VALUES ('2', '系统管理', 'xtgl', '1', '_1_2_', '1', '2017-08-01 23:02:52', '1', '1', '2', '', '1');
@@ -319,15 +319,15 @@ CREATE TABLE `SYS_USER` (
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of sys_user
+-- Records of SYS_USER
 -- ----------------------------
 INSERT INTO `SYS_USER` VALUES ('1', '系统管理员', '5HK/W3IuS8X734A5JMigPg==', 'sysadmin', '2017-09-06 11:03:17', '1', '2017-08-01 22:33:19', '1', '1');
 
 -- ----------------------------
--- Table structure for `EXM_EXAM`
+-- Table structure for `EX_EXAM`
 -- ----------------------------
-DROP TABLE IF EXISTS `EXM_EXAM`;
-CREATE TABLE `EXM_EXAM` (
+DROP TABLE IF EXISTS `EX_EXAM`;
+CREATE TABLE `EX_EXAM` (
   `ID` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `NAME` varchar(32) DEFAULT NULL COMMENT '名称',
   `PASS_SCORE` decimal(5,2) DEFAULT NULL COMMENT '及格分数',
@@ -342,19 +342,19 @@ CREATE TABLE `EXM_EXAM` (
   PRIMARY KEY (`ID`),
   KEY `FK_Reference_19` (`PAPER_ID`),
   KEY `FK_Reference_22` (`EXAM_TYPE_ID`),
-  CONSTRAINT `FK_Reference_19` FOREIGN KEY (`PAPER_ID`) REFERENCES `EXM_PAPER` (`ID`),
-  CONSTRAINT `FK_Reference_22` FOREIGN KEY (`EXAM_TYPE_ID`) REFERENCES `EXM_EXAM_TYPE` (`ID`)
+  CONSTRAINT `FK_Reference_19` FOREIGN KEY (`PAPER_ID`) REFERENCES `EX_PAPER` (`ID`),
+  CONSTRAINT `FK_Reference_22` FOREIGN KEY (`EXAM_TYPE_ID`) REFERENCES `EX_EXAM_TYPE` (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of ex_exam
+-- Records of EX_EXAM
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for `EXM_EXAM_TYPE`
+-- Table structure for `EX_EXAM_TYPE`
 -- ----------------------------
-DROP TABLE IF EXISTS `EXM_EXAM_TYPE`;
-CREATE TABLE `EXM_EXAM_TYPE` (
+DROP TABLE IF EXISTS `EX_EXAM_TYPE`;
+CREATE TABLE `EX_EXAM_TYPE` (
   `ID` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `NAME` varchar(32) DEFAULT NULL COMMENT '名称',
   `PARENT_ID` int(11) DEFAULT NULL COMMENT '父ID',
@@ -367,15 +367,15 @@ CREATE TABLE `EXM_EXAM_TYPE` (
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of ex_exam_type
+-- Records of EX_EXAM_TYPE
 -- ----------------------------
-INSERT INTO `EXM_EXAM_TYPE` VALUES ('1', '考试分类', '0', '_1_', '1', '2017-08-01 22:31:43', '1', '1');
+INSERT INTO `EX_EXAM_TYPE` VALUES ('1', '考试分类', '0', '_1_', '1', '2017-08-01 22:31:43', '1', '1');
 
 -- ----------------------------
--- Table structure for `EXM_EXAM_USER`
+-- Table structure for `EX_EXAM_USER`
 -- ----------------------------
-DROP TABLE IF EXISTS `EXM_EXAM_USER`;
-CREATE TABLE `EXM_EXAM_USER` (
+DROP TABLE IF EXISTS `EX_EXAM_USER`;
+CREATE TABLE `EX_EXAM_USER` (
   `ID` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `EXAM_ID` int(11) DEFAULT NULL COMMENT '考试ID',
   `USER_ID` int(11) DEFAULT NULL COMMENT '用户ID',
@@ -387,18 +387,18 @@ CREATE TABLE `EXM_EXAM_USER` (
   `STATE` int(11) DEFAULT NULL COMMENT '1：未考试；2：考试中；3：已交卷；4：强制交卷；5：判卷中；6：未通过；7：已通过',
   PRIMARY KEY (`ID`),
   KEY `FK_Reference_23` (`EXAM_ID`),
-  CONSTRAINT `FK_Reference_23` FOREIGN KEY (`EXAM_ID`) REFERENCES `EXM_EXAM` (`ID`)
+  CONSTRAINT `FK_Reference_23` FOREIGN KEY (`EXAM_ID`) REFERENCES `EX_EXAM` (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of ex_exam_user
+-- Records of EX_EXAM_USER
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for `EXM_EXAM_USER_QUESTION`
+-- Table structure for `EX_EXAM_USER_QUESTION`
 -- ----------------------------
-DROP TABLE IF EXISTS `EXM_EXAM_USER_QUESTION`;
-CREATE TABLE `EXM_EXAM_USER_QUESTION` (
+DROP TABLE IF EXISTS `EX_EXAM_USER_QUESTION`;
+CREATE TABLE `EX_EXAM_USER_QUESTION` (
   `ID` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `EXAM_USER_ID` int(11) DEFAULT NULL COMMENT '考试用户ID',
   `EXAM_ID` int(11) DEFAULT NULL COMMENT '考试ID',
@@ -413,36 +413,36 @@ CREATE TABLE `EXM_EXAM_USER_QUESTION` (
   PRIMARY KEY (`ID`),
   KEY `FK_Reference_24` (`EXAM_USER_ID`),
   KEY `FK_Reference_25` (`QUESTION_ID`),
-  CONSTRAINT `FK_Reference_24` FOREIGN KEY (`EXAM_USER_ID`) REFERENCES `EXM_EXAM_USER` (`ID`),
-  CONSTRAINT `FK_Reference_25` FOREIGN KEY (`QUESTION_ID`) REFERENCES `EXM_QUESTION` (`ID`)
+  CONSTRAINT `FK_Reference_24` FOREIGN KEY (`EXAM_USER_ID`) REFERENCES `EX_EXAM_USER` (`ID`),
+  CONSTRAINT `FK_Reference_25` FOREIGN KEY (`QUESTION_ID`) REFERENCES `EX_QUESTION` (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=99 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of ex_exam_user_question
+-- Records of EX_EXAM_USER_QUESTION
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for `EXM_MARK_USER`
+-- Table structure for `EX_MARK_USER`
 -- ----------------------------
-DROP TABLE IF EXISTS `EXM_MARK_USER`;
-CREATE TABLE `EXM_MARK_USER` (
+DROP TABLE IF EXISTS `EX_MARK_USER`;
+CREATE TABLE `EX_MARK_USER` (
   `ID` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `EXAM_ID` int(11) DEFAULT NULL COMMENT '考试ID',
   `USER_ID` int(11) DEFAULT NULL COMMENT '用户ID',
   PRIMARY KEY (`ID`),
   KEY `FK_Reference_37` (`EXAM_ID`),
-  CONSTRAINT `FK_Reference_37` FOREIGN KEY (`EXAM_ID`) REFERENCES `EXM_EXAM` (`ID`)
+  CONSTRAINT `FK_Reference_37` FOREIGN KEY (`EXAM_ID`) REFERENCES `EX_EXAM` (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of ex_mark_user
+-- Records of EX_MARK_USER
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for `EXM_PAPER`
+-- Table structure for `EX_PAPER`
 -- ----------------------------
-DROP TABLE IF EXISTS `EXM_PAPER`;
-CREATE TABLE `EXM_PAPER` (
+DROP TABLE IF EXISTS `EX_PAPER`;
+CREATE TABLE `EX_PAPER` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `NAME` varchar(32) DEFAULT NULL COMMENT '名称',
   `DESCRIPTION` varchar(512) DEFAULT NULL COMMENT '描述',
@@ -453,18 +453,18 @@ CREATE TABLE `EXM_PAPER` (
   `PAPER_TYPE_ID` int(11) DEFAULT NULL COMMENT '试卷分类',
   PRIMARY KEY (`ID`),
   KEY `FK_Reference_16` (`PAPER_TYPE_ID`),
-  CONSTRAINT `FK_Reference_16` FOREIGN KEY (`PAPER_TYPE_ID`) REFERENCES `EXM_PAPER_TYPE` (`ID`)
+  CONSTRAINT `FK_Reference_16` FOREIGN KEY (`PAPER_TYPE_ID`) REFERENCES `EX_PAPER_TYPE` (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of ex_paper
+-- Records of EX_PAPER
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for `EXM_PAPER_QUESTION`
+-- Table structure for `EX_PAPER_QUESTION`
 -- ----------------------------
-DROP TABLE IF EXISTS `EXM_PAPER_QUESTION`;
-CREATE TABLE `EXM_PAPER_QUESTION` (
+DROP TABLE IF EXISTS `EX_PAPER_QUESTION`;
+CREATE TABLE `EX_PAPER_QUESTION` (
   `ID` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `NAME` varchar(32) DEFAULT NULL COMMENT '章节名称',
   `DESCRIPTION` varchar(512) DEFAULT NULL COMMENT '章节描述',
@@ -480,19 +480,19 @@ CREATE TABLE `EXM_PAPER_QUESTION` (
   PRIMARY KEY (`ID`),
   KEY `FK_Reference_17` (`QUESTION_ID`),
   KEY `FK_Reference_18` (`PAPER_ID`),
-  CONSTRAINT `FK_Reference_17` FOREIGN KEY (`QUESTION_ID`) REFERENCES `EXM_QUESTION` (`ID`),
-  CONSTRAINT `FK_Reference_18` FOREIGN KEY (`PAPER_ID`) REFERENCES `EXM_PAPER` (`ID`)
+  CONSTRAINT `FK_Reference_17` FOREIGN KEY (`QUESTION_ID`) REFERENCES `EX_QUESTION` (`ID`),
+  CONSTRAINT `FK_Reference_18` FOREIGN KEY (`PAPER_ID`) REFERENCES `EX_PAPER` (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of ex_paper_question
+-- Records of EX_PAPER_QUESTION
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for `EXM_PAPER_TYPE`
+-- Table structure for `EX_PAPER_TYPE`
 -- ----------------------------
-DROP TABLE IF EXISTS `EXM_PAPER_TYPE`;
-CREATE TABLE `EXM_PAPER_TYPE` (
+DROP TABLE IF EXISTS `EX_PAPER_TYPE`;
+CREATE TABLE `EX_PAPER_TYPE` (
   `ID` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `NAME` varchar(32) DEFAULT NULL COMMENT '名称',
   `PARENT_ID` int(11) DEFAULT NULL COMMENT '父ID',
@@ -505,15 +505,15 @@ CREATE TABLE `EXM_PAPER_TYPE` (
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of ex_paper_type
+-- Records of EX_PAPER_TYPE
 -- ----------------------------
-INSERT INTO `EXM_PAPER_TYPE` VALUES ('1', '试卷分类', '0', '_1_', '1', '2017-08-01 22:31:43', '1', '1');
+INSERT INTO `EX_PAPER_TYPE` VALUES ('1', '试卷分类', '0', '_1_', '1', '2017-08-01 22:31:43', '1', '1');
 
 -- ----------------------------
--- Table structure for `EXM_QUESTION`
+-- Table structure for `EX_QUESTION`
 -- ----------------------------
-DROP TABLE IF EXISTS `EXM_QUESTION`;
-CREATE TABLE `EXM_QUESTION` (
+DROP TABLE IF EXISTS `EX_QUESTION`;
+CREATE TABLE `EX_QUESTION` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `TYPE` int(11) DEFAULT NULL COMMENT '1：单选；2：多选；3：填空；4：判断；5：问答',
   `DIFFICULTY` int(11) DEFAULT NULL COMMENT '1：极易；2：简单；3：适中；4：困难；5：极难',
@@ -534,18 +534,18 @@ CREATE TABLE `EXM_QUESTION` (
   `NO` int(11) DEFAULT NULL COMMENT '排序',
   PRIMARY KEY (`ID`),
   KEY `FK_Reference_15` (`QUESTION_TYPE_ID`),
-  CONSTRAINT `FK_Reference_15` FOREIGN KEY (`QUESTION_TYPE_ID`) REFERENCES `EXM_QUESTION_TYPE` (`ID`)
+  CONSTRAINT `FK_Reference_15` FOREIGN KEY (`QUESTION_TYPE_ID`) REFERENCES `EX_QUESTION_TYPE` (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of ex_question
+-- Records of EX_QUESTION
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for `EXM_QUESTION_TYPE`
+-- Table structure for `EX_QUESTION_TYPE`
 -- ----------------------------
-DROP TABLE IF EXISTS `EXM_QUESTION_TYPE`;
-CREATE TABLE `EXM_QUESTION_TYPE` (
+DROP TABLE IF EXISTS `EX_QUESTION_TYPE`;
+CREATE TABLE `EX_QUESTION_TYPE` (
   `ID` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `NAME` varchar(32) DEFAULT NULL COMMENT '名称',
   `PARENT_ID` int(11) DEFAULT NULL COMMENT '父ID',
@@ -558,6 +558,6 @@ CREATE TABLE `EXM_QUESTION_TYPE` (
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of ex_question_type
+-- Records of EX_QUESTION_TYPE
 -- ----------------------------
-INSERT INTO `EXM_QUESTION_TYPE` VALUES ('1', '试题分类', '0', '_1_', '1', '2017-08-01 22:31:43', '1', '1');
+INSERT INTO `EX_QUESTION_TYPE` VALUES ('1', '试题分类', '0', '_1_', '1', '2017-08-01 22:31:43', '1', '1');

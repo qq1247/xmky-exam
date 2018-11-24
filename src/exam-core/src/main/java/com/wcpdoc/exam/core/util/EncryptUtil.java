@@ -41,7 +41,6 @@ public class EncryptUtil {
 	}
 	
 	public static void main(String[] args) {
-		String md52Base64 = md52Base64("sysadmin111111");
-		System.err.println(md52Base64);
+		
 	}
 }

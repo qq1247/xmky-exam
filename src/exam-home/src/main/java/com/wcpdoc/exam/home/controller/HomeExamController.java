@@ -244,6 +244,25 @@ public class HomeExamController extends BaseController {
 	}
 	
 	/**
+	 * 完成发布
+	 * 
+	 * v1.0 zhanghc 2018年11月24日上午9:13:22
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/doPublish")
+	@ResponseBody
+	public PageResult doPublish(Integer id) {
+		try {
+			examService.doPublish(id);
+			return new PageResult(true, "发布成功");
+		} catch (Exception e) {
+			log.error("完成发布错误：", e);
+			return new PageResult(false, "发布失败：" + e.getMessage());
+		}
+	}
+	
+	/**
 	 * 到达考试用户列表页面
 	 * 
 	 * v1.0 zhanghc 2018年10月31日上午10:27:22

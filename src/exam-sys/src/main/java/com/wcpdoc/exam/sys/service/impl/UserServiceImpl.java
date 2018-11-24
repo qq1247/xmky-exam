@@ -276,6 +276,11 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		update(user);
 	}
 
+	public static void main(String[] args) {
+		String encryptPwd = new UserServiceImpl().getEncryptPwd("ls", "111111");
+		System.err.println(encryptPwd);
+	}
+	
 	@Override
 	public String getEncryptPwd(String loginName, String pwd) {
 		//校验数据有效性

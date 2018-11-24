@@ -222,7 +222,7 @@
 			}
 			
 			$.ajax({
-				url : "home/myExam/sysTime",
+				url : "home/sysTime",
 				async : true,
 				success : function(obj) {
 					sysTime = new Date(obj.data.sysTime.substring(0, 4),

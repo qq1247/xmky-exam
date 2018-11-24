@@ -26,29 +26,6 @@
 									</div>
 									<div class="col-md-4">
 										<div class="form-group">
-											<label for="three" class="control-label col-md-4">试卷：</label>
-											<div class="col-md-8">
-												<input type="text" id="three" name="three" class="form-control" placeholder="请输入试卷">
-											</div>
-										</div>
-									</div>
-									<div class="col-md-4" style="text-align: right;">
-										<div class="form-group">
-											<label for="four" class="control-label col-md-4">状态：</label>
-											<div class="col-md-8">
-												<select id="four" name="four" class="form-control">
-													<option value=""></option>
-													<c:forEach var="dict" items="${STATE_DICT }">
-													<option value="${dict.dictKey }">${dict.dictValue }</option>
-													</c:forEach>
-												</select>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class="row">
-									<div class="col-md-4">
-										<div class="form-group">
 											<label for="five" class="control-label col-md-4">考试开始大于：</label>
 											<div class="col-md-8">
 												<input type="text" id="five" name="five" class="form-control" placeholder="请输入开始时间">
@@ -62,6 +39,14 @@
 												<input type="text" id="six" name="six" class="form-control" placeholder="请输入结束时间">
 											</div>
 										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-4">
+										
+									</div>
+									<div class="col-md-4">
+										
 									</div>
 									<div class="col-md-4" style="text-align: right;">
 										<button type="button" class="btn btn-primary" onclick="query();">
@@ -126,17 +111,20 @@
 				columns : [ 
 							{field : "state", checkbox : true}, 
 							{field : "NAME", title : "名称", width : 160, align : "center"},
-							{field : "PAPER_NAME", title : "试卷", width : 160, align : "center"},
+							{field : "START_TIME_STR", title : "考试开始", width : 160, align : "center"},
+							{field : "END_TIME_STR", title : "考试结束", width : 160, align : "center"},
 							{field : "PASS_SCORE", title : "及格分数", width : 80, align : "center", 
 								formatter : function(value, row, index){
 									return row.PASS_SCORE + "/" + row.PAPER_TOTLE_SCORE;
 								}
 							},
-							{field : "START_TIME_STR", title : "考试开始", width : 160, align : "center"},
-							{field : "END_TIME_STR", title : "考试结束", width : 160, align : "center"},
-							{field : "STATE_NAME", title : "状态", width : 80, align : "center"},
+							{field : "TOTAL_SCORE", title : "得分", width : 80, align : "center"},
+							{field : "EXAM_USER_STATE_NAME", title : "状态", width : 80, align : "center"},
 							{field : "OPTION", title : "操作", width : 80, align : "center", 
 								formatter : function(value, row, index){
+									if(row.START != 1){
+										return "";
+									}
 									return '<button type="button" class="btn btn-primary" onclick="toPaper('+row.ID+');"><span class="glyphicon glyphicon-play"></span>&nbsp;开始</button>';
 								}
 							}

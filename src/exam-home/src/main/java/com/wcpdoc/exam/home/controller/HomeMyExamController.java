@@ -1,6 +1,6 @@
 package com.wcpdoc.exam.home.controller;
 
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -17,8 +17,7 @@ import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
-import com.wcpdoc.exam.core.entity.PageResultEx;
-import com.wcpdoc.exam.core.util.DateUtil;
+import com.wcpdoc.exam.core.util.HibernateUtil;
 import com.wcpdoc.exam.exam.entity.ExamUser;
 import com.wcpdoc.exam.exam.service.ExamService;
 import com.wcpdoc.exam.sys.cache.DictCache;
@@ -66,10 +65,22 @@ public class HomeMyExamController extends BaseController{
 			pageIn.setNine(getCurrentUser().getId() + "");
 			PageOut listpage = examService.getListpage(pageIn);
 			List<Map<String, Object>> list = listpage.getRows();
+			
+			Date curTime = new Date();
 			for(Map<String, Object> map : list){
 				ExamUser examUser = examService.getExamUser((int)map.get("ID"), getCurrentUser().getId());
 				map.put("TOTAL_SCORE", examUser.getTotalScore());
+				map.put("EXAM_USER_STATE", examUser.getState());
+				
+				Date startEndTime = (Date) map.get("START_TIME");
+				Date examEndTime = (Date) map.get("END_TIME");
+				if(startEndTime.getTime() <= curTime.getTime() && examEndTime.getTime() >= curTime.getTime()){
+					map.put("START", "1");
+				}else{
+					map.put("START", "0");
+				}
 			}
+			HibernateUtil.formatDict(list, DictCache.getIndexkeyValueMap(), "EXAM_USER_STATE", "EXAM_USER_STATE");
 			return listpage;
 		} catch (Exception e) {
 			log.error("我的考试列表错误：", e);
@@ -94,26 +105,6 @@ public class HomeMyExamController extends BaseController{
 			log.error("到达试卷页面错误：", e);
 			model.addAttribute("message", e.getMessage());
 			return "/WEB-INF/jsp/home/error.jsp";
-		}
-	}
-	
-	/**
-	 * 获取服务器时间
-	 * 
-	 * v1.0 zhanghc 2017年6月25日下午4:19:05
-	 * @return
-	 * PageResult
-	 */
-	@RequestMapping("/sysTime")
-	@ResponseBody
-	public PageResult sysTime() {
-		try {
-			Map<String, Object> data = new HashMap<String, Object>();
-			data.put("sysTime", DateUtil.getFormatDateTime());
-			return new PageResultEx(true, "获取成功", data);
-		} catch (Exception e) {
-			log.error("获取服务器时间错误：", e);
-			return new PageResult(false, "获取失败：" + e.getMessage());
 		}
 	}
 	

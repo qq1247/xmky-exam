@@ -3,6 +3,7 @@ package com.wcpdoc.exam.home.controller;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -14,9 +15,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageResult;
+import com.wcpdoc.exam.core.entity.PageResultEx;
+import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.exam.service.ExamService;
 import com.wcpdoc.exam.home.service.HomeService;
 
@@ -174,6 +179,26 @@ public class HomeController extends BaseController{
 		} catch (Exception e) {
 			log.error("完成退出登录错误：", e);
 			return "redirect:/home/toIn";
+		}
+	}
+	
+	/**
+	 * 获取服务器时间
+	 * 
+	 * v1.0 zhanghc 2017年6月25日下午4:19:05
+	 * @return
+	 * PageResult
+	 */
+	@RequestMapping("/sysTime")
+	@ResponseBody
+	public PageResult sysTime() {
+		try {
+			Map<String, Object> data = new HashMap<String, Object>();
+			data.put("sysTime", DateUtil.getFormatDateTime());
+			return new PageResultEx(true, "获取成功", data);
+		} catch (Exception e) {
+			log.error("获取服务器时间错误：", e);
+			return new PageResult(false, "获取失败：" + e.getMessage());
 		}
 	}
 }

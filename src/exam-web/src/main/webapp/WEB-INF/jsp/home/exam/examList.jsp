@@ -128,6 +128,10 @@
 									<span class="glyphicon glyphicon-trash"></span>
 									&nbsp;删除
 								</button>
+								<button type="button" class="btn btn-primary" onclick="doPublish();">
+									<span class="glyphicon glyphicon-ok"></span>
+									&nbsp;发布
+								</button>
 								<button type="button" class="btn btn-primary" onclick="toExamUserList();">
 									<span class="glyphicon glyphicon-user"></span>
 									&nbsp;考试用户
@@ -282,6 +286,22 @@
 				return;
 			}
 			
+			if(nodes[0].STATE == 1){
+				BootstrapDialog.show({
+					title : "提示消息",
+					message : "考试已发布！",
+					buttons : [{
+						label : "&nbsp;确定",
+						icon : "glyphicon glyphicon-ok",
+						cssClass : "btn-primary",
+						action : function(dialogItself) {
+							dialogItself.close();
+						}
+					}]
+				});
+				return;
+			}
+			
 			window.location.href = "home/exam/toEdit?id=" + nodes[0].ID;
 		}
 		
@@ -315,6 +335,86 @@
 						$.ajax({
 							url : "home/exam/doDel",
 							data : $.fn.my.serializeField(nodes),
+							success : function(obj) {
+								if (!obj.succ) {
+									BootstrapDialog.show({
+										title : "提示消息",
+										message : obj.msg,
+										buttons : [{
+											label : "&nbsp;确定",
+											icon : "glyphicon glyphicon-ok",
+											cssClass : "btn-primary",
+											action : function(dialogItself) {
+												dialogItself.close();
+											}
+										}]
+									});
+									return;
+								}
+								
+								window.location.href = "home/exam/toList";
+							}
+						});
+					}
+				}, {
+					label : "&nbsp;取消",
+					icon : "glyphicon glyphicon-remove",
+					cssClass : "btn-primary",
+					action : function(dialogItself) {
+						dialogItself.close();
+					}
+				}]
+			});
+		}
+		
+		//完成考试发布
+		function doPublish(){
+			var nodes = $table.bootstrapTable("getSelections");
+			if(nodes.length != 1){
+				BootstrapDialog.show({
+					title : "提示消息",
+					message : "请选择一行数据！",
+					buttons : [{
+						label : "&nbsp;确定",
+						icon : "glyphicon glyphicon-ok",
+						cssClass : "btn-primary",
+						action : function(dialogItself) {
+							dialogItself.close();
+						}
+					}]
+				});
+				return;
+			}
+			
+			if(nodes[0].STATE == 1){
+				BootstrapDialog.show({
+					title : "提示消息",
+					message : "考试已发布！",
+					buttons : [{
+						label : "&nbsp;确定",
+						icon : "glyphicon glyphicon-ok",
+						cssClass : "btn-primary",
+						action : function(dialogItself) {
+							dialogItself.close();
+						}
+					}]
+				});
+				return;
+			}
+			
+			BootstrapDialog.show({
+				title : "提示消息",
+				message : "确定发布？",
+				buttons : [{
+					label : "&nbsp;确定",
+					icon : "glyphicon glyphicon-ok",
+					cssClass : "btn-primary",
+					action : function(dialogItself) {
+						$.ajax({
+							url : "home/exam/doPublish",
+							data : {
+								id : nodes[0].ID
+							},
 							success : function(obj) {
 								if (!obj.succ) {
 									BootstrapDialog.show({

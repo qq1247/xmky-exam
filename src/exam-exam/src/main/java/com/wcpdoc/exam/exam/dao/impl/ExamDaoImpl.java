@@ -60,7 +60,7 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 				.addOrder("EXAM.START_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getRows(), "START_TIME", DateUtil.FORMAT_DATE_TIME, "END_TIME", DateUtil.FORMAT_DATE_TIME);
-		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), "STATE", "STATE");
+		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), "EXAM_STATE", "STATE");
 		return pageOut;
 	}
 

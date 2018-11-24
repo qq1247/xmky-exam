@@ -111,7 +111,8 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		//添加考试
 		exam.setUpdateTime(new Date());
 		exam.setUpdateUserId(user.getId());
-		examDao.save(exam);
+		exam.setState(2);
+		save(exam);
 	}
 	
 	@Override
@@ -129,14 +130,17 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if(exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()){
 			throw new RuntimeException("判卷结束时间必须大于判卷开始时间！");
 		}
+		Exam entity = getEntity(exam.getId());
+		if(entity.getState() == 1){
+			throw new RuntimeException("考试已发布！");
+		}
 		
 		//添加考试
-		Exam entity = getEntity(exam.getId());
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(user.getId());
 		entity.setName(exam.getName());
 		entity.setPassScore(exam.getPassScore());
-		entity.setState(exam.getState());
+//		entity.setState(exam.getState());
 		entity.setStartTime(exam.getStartTime());
 		entity.setEndTime(exam.getEndTime());
 		entity.setMarkStartTime(exam.getMarkStartTime());
@@ -652,8 +656,12 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			throw new RuntimeException("未参与考试：" + exam.getName());
 		}
 		
-		if(exam.getEndTime().getTime() > new Date().getTime()){
-			throw new RuntimeException("考试未结束！");
+		Date curTime = new Date();
+		if(exam.getMarkStartTime().getTime() > curTime.getTime()){
+			throw new RuntimeException("判卷未开始！");
+		}
+		if(exam.getMarkEndTime().getTime() < curTime.getTime()){
+			throw new RuntimeException("判卷已结束！");
 		}
 		
 		//用户信息
@@ -839,5 +847,20 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	@Override
 	public ExamUser getExamUser(Integer examId, Integer userId) {
 		return examUserService.getEntity(examId, userId);
+	}
+
+
+	@Override
+	public void doPublish(Integer id) {
+		Exam exam = getEntity(id);
+		if(exam.getState() == 0){
+			throw new RuntimeException("考试【"+exam.getName()+"】已删除！");
+		}
+		if(exam.getState() == 1){
+			throw new RuntimeException("考试【"+exam.getName()+"】已发布！");
+		}
+		
+		exam.setState(1);
+		update(exam);
 	}
 }

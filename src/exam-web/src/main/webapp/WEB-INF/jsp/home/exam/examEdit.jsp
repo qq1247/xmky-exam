@@ -31,28 +31,11 @@
 										</div>
 									</div>
 									<div class="col-md-6">
-										
-									</div>
-								</div>
-								<div class="row">
-									<div class="col-md-6">
 										<div class="form-group">
 											<label for="name" class="col-md-4 control-label">名称：</label>
 											<div class="col-md-8">
 												<input type="text" id="name" name="name" value="${exam.name }"
 													class="form-control" placeholder="请输入名称">
-											</div>
-										</div>
-									</div>
-									<div class="col-md-6">
-										<div class="form-group">
-											<label for="state" class="col-md-4 control-label">状态：</label>
-											<div class="col-md-8">
-												<select id="state" name="state" class="form-control">
-													<c:forEach var="dict" items="${STATE_DICT }">
-													<option value="${dict.dictKey }" ${dict.dictKey == exam.state ? "selected" : ""}>${dict.dictValue }</option>
-													</c:forEach>
-												</select>
 											</div>
 										</div>
 									</div>

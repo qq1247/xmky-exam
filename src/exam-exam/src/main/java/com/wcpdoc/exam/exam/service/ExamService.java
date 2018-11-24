@@ -354,4 +354,13 @@ public interface ExamService extends BaseService<Exam>{
 	 */
 	ExamUser getExamUser(Integer examId, Integer userId);
 
+	/**
+	 * 完成发布
+	 * 
+	 * v1.0 zhanghc 2018年11月24日上午9:23:22
+	 * @param id 
+	 * void
+	 */
+	void doPublish(Integer id);
+
 }
