@@ -30,7 +30,7 @@
 					</label>
 					<label class="checkbox-inline">
 						<input type="checkbox" name="options" value="4"
-							data-toggle="tooltip" title="默认等于答案得分">包含答案得分
+							data-toggle="tooltip" title="默认等于答案得分">用户答案包含试题答案
 					</label>
 				</div>
 			</div>

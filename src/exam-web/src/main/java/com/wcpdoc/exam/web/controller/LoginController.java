@@ -37,7 +37,7 @@ public class LoginController extends BaseController{
 	 * @return String
 	 */
 	@RequestMapping("/toIn")
-	public String pubToIn() {
+	public String toIn() {
 		try {
 			return "/WEB-INF/jsp/web/login/in.jsp";
 		} catch (Exception e) {
@@ -56,14 +56,13 @@ public class LoginController extends BaseController{
 	 * @return String
 	 */
 	@RequestMapping("/doIn")
-	public String pubDoIn(Model model, String loginName, String pwd) {
+	public String doIn(Model model, String loginName, String pwd) {
 		try {
 			//完成登录
 			loginService.doIn(loginName, pwd, request);
 			
-			//到达首页
-			model.addAttribute("menuList", ResCache.getMenuList());
-			return "/WEB-INF/jsp/web/login/home.jsp";
+			//重定向到首页
+			return "redirect:/login/toHome";
 		} catch (Exception e) {
 			log.error("完成登录错误：", e);
 			try {
@@ -72,6 +71,28 @@ public class LoginController extends BaseController{
 				e1.printStackTrace();
 			}
 			return "redirect:/login/toIn";
+		}
+	}
+	
+	/**
+	 * 到达首页
+	 * 
+	 * @param model
+	 * v1.0 zhanghc 2018年11月25日下午2:15:38
+	 * @return String
+	 */
+	@RequestMapping("/toHome")
+	public String toHome(Model model) {
+		try {
+			if(getCurrentUser() == null){
+				return "redirect:/login/toIn";
+			}
+			
+			model.addAttribute("menuList", ResCache.getMenuList());
+			return "/WEB-INF/jsp/web/login/home.jsp";
+		} catch (Exception e) {
+			log.error("到达首页错误：", e);
+			return "/WEB-INF/jsp/web/login/home.jsp";
 		}
 	}
 	

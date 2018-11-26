@@ -3,6 +3,11 @@
 <html>
 	<head>
 		<title>在线考试系统首页</title>
+		<script type="text/javascript">
+			if (top != self) {
+			    top.location = self.location;
+			}
+		</script>
 		<%@include file="/script/home/common.jspf"%>
 	</head>
 	<body>

@@ -196,8 +196,15 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			throw new RuntimeException("无法获取参数：userIds");
 		}
 		Exam exam = getEntity(id);
-		if(exam.getStartTime().getTime() <= new Date().getTime()){
-			throw new RuntimeException("考试已开始，不允许修改！");
+		if(exam.getState() == 0){
+			throw new RuntimeException("考试已删除！");
+		}
+		if(exam.getState() == 2){
+			throw new RuntimeException("考试未发布！");
+		}
+		
+		if(exam.getEndTime().getTime() <= new Date().getTime()){
+			throw new RuntimeException("考试已结束，不允许添加！");
 		}
 		
 		//添加考试用户
@@ -235,6 +242,16 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		
 		ExamUser examUser = examUserService.getEntity(examUserIds[0]);
 		Exam exam = getEntity(examUser.getExamId());
+		if(exam.getState() == 0){
+			throw new RuntimeException("考试已删除！");
+		}
+		if(exam.getState() == 2){
+			throw new RuntimeException("考试未发布！");
+		}
+		
+		if(exam.getEndTime().getTime() <= new Date().getTime()){
+			throw new RuntimeException("考试已结束，不允许删除！");
+		}
 		if(exam.getStartTime().getTime() <= new Date().getTime()){
 			throw new RuntimeException("考试已开始，不允许删除！");
 		}
@@ -260,11 +277,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	@Override
-	public List<Map<String, Object>> getUnFinishList(Integer userId) {
-		return examDao.getUnFinishList(userId);
-	}
-
-	@Override
 	public List<Map<String, Object>> getExamTypeTreeList(Integer userId) {
 		Org org = userService.getOrg(userId);
 		List<Post> postList = userService.getPostList(userId);
@@ -272,37 +284,36 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		List<Map<String, Object>> examTypeTreeList = new ArrayList<Map<String,Object>>();
 		
 		for(ExamType examType : examTypeList){
-			if(userId != 1){//如果不是系统管理员
-				if(!(examType.getUserIds() != null 
-						&& examType.getUserIds().contains(userId.toString()))){//没有用户权限
-					continue;
-				}
-				if(!(examType.getOrgIds() != null 
-						&& examType.getOrgIds().contains(org.getId().toString()))){//没有机构权限
-					continue;
-				}
-				
-				boolean hasPostAuth = false;
-				for(Post post : postList){
-					if(examType.getPostIds() != null 
-							&& examType.getPostIds().contains(post.getId().toString())){//没有岗位权限
-						hasPostAuth = true;
-						break;
-					}
-				}
-				
-				if(!hasPostAuth){
-					continue;
-				}
-			}
-			
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("ID", examType.getId());
 			map.put("NAME", examType.getName());
 			map.put("PARENT_ID", examType.getParentId());
 			//map.put("DISABLED", true);
 			//map.put("EXPANDED", true);
-			examTypeTreeList.add(map);
+			
+			if(userId == 1){
+				examTypeTreeList.add(map);
+				continue;
+			}
+			
+			if(examType.getUserIds() != null 
+					&& examType.getUserIds().contains(userId.toString())){//有用户权限
+				examTypeTreeList.add(map);
+				continue;
+			}
+			if(examType.getOrgIds() != null 
+					&& examType.getOrgIds().contains(org.getId().toString())){//有机构权限
+				examTypeTreeList.add(map);
+				continue;
+			}
+			
+			for(Post post : postList){
+				if(examType.getPostIds() != null 
+						&& examType.getPostIds().contains(post.getId().toString())){//有岗位权限
+					examTypeTreeList.add(map);
+					break;
+				}
+			}
 		}
 		
 		return examTypeTreeList;
@@ -326,12 +337,20 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		
 		ExamUserQuestion examUserQuestion = examUserQuestionService.getEntity(examUserQuestionId);
 		if(examUserQuestion.getUserId() != user.getId()){
-			Exam exam = getEntity(examUserQuestion.getExamId());
-			throw new RuntimeException("未参与考试：" + exam.getName());
+			throw new RuntimeException("未参与考试！");
 		}
 		
 		Exam exam = getEntity(examUserQuestion.getExamId());
-		if(exam.getEndTime().getTime() <= (new Date().getTime() - 5000)){
+		if(exam.getState() == 0){
+			throw new RuntimeException("考试已删除！");
+		}
+		if(exam.getState() == 2){
+			throw new RuntimeException("考试未发布！");
+		}
+		if(exam.getStartTime().getTime() > (new Date().getTime())){
+			throw new RuntimeException("考试未开始！");
+		}
+		if(exam.getEndTime().getTime() < (new Date().getTime() - 5000)){
 			throw new RuntimeException("考试已结束！");
 		}
 		
@@ -352,7 +371,16 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		}
 		
 		Exam exam = getEntity(examUser.getExamId());
-		if(exam.getEndTime().getTime() <= (new Date().getTime() - 5000)){
+		if(exam.getState() == 0){
+			throw new RuntimeException("考试已删除！");
+		}
+		if(exam.getState() == 2){
+			throw new RuntimeException("考试未发布！");
+		}
+		if(exam.getStartTime().getTime() > (new Date().getTime())){
+			throw new RuntimeException("考试未开始！");
+		}
+		if(exam.getEndTime().getTime() < (new Date().getTime() - 5000)){
 			throw new RuntimeException("考试已结束！");
 		}
 		
@@ -403,6 +431,19 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		ExamUserQuestion examUserQuestion = examUserQuestionService.getEntity(examUserQuestionId);
 		List<MarkUser> markUserList = getMarkUserList(examUserQuestion.getExamId());
 		Exam exam = getEntity(examUserQuestion.getExamId());
+		if(exam.getState() == 0){
+			throw new RuntimeException("考试已删除！");
+		}
+		if(exam.getState() == 2){
+			throw new RuntimeException("考试未发布！");
+		}
+		if(exam.getMarkStartTime().getTime() > (new Date().getTime())){
+			throw new RuntimeException("判卷未开始！");
+		}
+		if(exam.getMarkEndTime().getTime() < (new Date().getTime() - 5000)){
+			throw new RuntimeException("判卷已结束！");
+		}
+		
 		boolean ok = false;
 		for(MarkUser markUser : markUserList){
 			if(markUser.getUserId() == user.getId()){
@@ -413,10 +454,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		
 		if(!ok){
 			throw new RuntimeException("未参与考试：" + exam.getName());
-		}
-		
-		if(exam.getEndTime().getTime() > new Date().getTime()){
-			throw new RuntimeException("考试未结束！");
 		}
 		
 		if(score != null){
@@ -439,6 +476,19 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		ExamUser examUser = examUserService.getEntity(examUserId);
 		List<MarkUser> markUserList = getMarkUserList(examUser.getExamId());
 		Exam exam = getEntity(examUser.getExamId());
+		if(exam.getState() == 0){
+			throw new RuntimeException("考试已删除！");
+		}
+		if(exam.getState() == 2){
+			throw new RuntimeException("考试未发布！");
+		}
+		if(exam.getMarkStartTime().getTime() > (new Date().getTime())){
+			throw new RuntimeException("判卷未开始！");
+		}
+		if(exam.getMarkEndTime().getTime() < (new Date().getTime() - 5000)){
+			throw new RuntimeException("判卷已结束！");
+		}
+		
 		boolean ok = false;
 		for(MarkUser markUser : markUserList){
 			if(markUser.getUserId() == user.getId()){
@@ -448,10 +498,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		}
 		if(!ok){
 			throw new RuntimeException("未参与判卷：" + exam.getName());
-		}
-		
-		if(exam.getEndTime().getTime() > new Date().getTime()){
-			throw new RuntimeException("考试未结束！");
 		}
 		
 		List<ExamUserQuestion> examUserQuestionList = examUserQuestionService.getList(examUserId);
@@ -495,13 +541,13 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		}
 		
 		//删除试题
-		Date curTime = new Date();
+//		Date curTime = new Date();
 		for(Integer id : ids){
 			Exam exam = getEntity(id);
-			if(exam.getStartTime().getTime() >= curTime.getTime()
-					&& exam.getEndTime().getTime() <= curTime.getTime()){
-				throw new RuntimeException("【"+exam.getName()+"】考试未结束");
-			}
+//			if(exam.getStartTime().getTime() >= curTime.getTime()
+//					&& exam.getEndTime().getTime() <= curTime.getTime()){
+//				throw new RuntimeException("【"+exam.getName()+"】考试未结束");
+//			}
 			
 			exam.setState(0);
 			update(exam);
@@ -540,6 +586,17 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if(!ValidateUtil.isValid(userIds)){
 			throw new RuntimeException("无法获取参数：userIds");
 		}
+		Exam exam = getEntity(id);
+		if(exam.getState() == 0){
+			throw new RuntimeException("考试已删除！");
+		}
+		if(exam.getState() == 2){
+			throw new RuntimeException("考试未发布！");
+		}
+		
+		if(exam.getMarkEndTime().getTime() <= new Date().getTime()){
+			throw new RuntimeException("判卷已结束，不允许添加！");
+		}
 		
 		//添加判卷用户
 		synchronized (DO_MARK_USER_ADD_LOCK) {
@@ -557,6 +614,21 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		//校验数据有效性
 		if(!ValidateUtil.isValid(markUserIds)){
 			throw new RuntimeException("无法获取参数：markUserIds");
+		}
+		MarkUser markUser = markUserService.getEntity(markUserIds[0]);
+		Exam exam = getEntity(markUser.getExamId());
+		if(exam.getState() == 0){
+			throw new RuntimeException("考试已删除！");
+		}
+		if(exam.getState() == 2){
+			throw new RuntimeException("考试未发布！");
+		}
+		
+		if(exam.getMarkEndTime().getTime() <= new Date().getTime()){
+			throw new RuntimeException("判卷已结束，不允许删除！");
+		}
+		if(exam.getMarkStartTime().getTime() <= new Date().getTime()){
+			throw new RuntimeException("判卷已开始，不允许删除！");
 		}
 		
 		synchronized (DO_MARK_USER_ADD_LOCK) {
@@ -603,7 +675,16 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		}
 		
 		Exam exam = getEntity(examId);
-		if(exam.getEndTime().getTime() <= (new Date().getTime() - 5000)){
+		if(exam.getState() == 0){
+			throw new RuntimeException("考试已删除！");
+		}
+		if(exam.getState() == 2){
+			throw new RuntimeException("考试未发布！");
+		}
+		if(exam.getStartTime().getTime() > (new Date().getTime())){
+			throw new RuntimeException("考试未开始！");
+		}
+		if(exam.getEndTime().getTime() < (new Date().getTime() - 5000)){
 			throw new RuntimeException("考试已结束！");
 		}
 		
@@ -657,6 +738,12 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		}
 		
 		Date curTime = new Date();
+		if(exam.getState() == 0){
+			throw new RuntimeException("考试已删除！");
+		}
+		if(exam.getState() == 2){
+			throw new RuntimeException("考试未发布！");
+		}
 		if(exam.getMarkStartTime().getTime() > curTime.getTime()){
 			throw new RuntimeException("判卷未开始！");
 		}
@@ -699,12 +786,17 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					if(sub.getQuestion().getType() >= 5){//1：单选；2：多选；3：填空；4：判断；5：问答
 						continue;
 					}
-					
-					//如果是单选或判断，全对得分
+					//设置默认0分
 					Question question = sub.getQuestion();
 					ExamUserQuestion examUserQuestion = examUserQuestionMap.get(sub.getQuestion().getId() + 0L);
-					examUserQuestion.setScore(BigDecimal.ZERO);//默认0分
+					examUserQuestion.setScore(BigDecimal.ZERO);
+					
+					//如果是单选或判断，全对得分
 					if(question.getType() == 1 || question.getType() == 4){
+						if(!ValidateUtil.isValid(examUserQuestion.getAnswer())){
+							continue;
+						}
+
 						if(question.getAnswer().equals(examUserQuestion.getAnswer())){
 							examUserQuestion.setScore(sub.getScore());
 						}
@@ -714,15 +806,18 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					//如果是多选，1：半对半分（默认全对得分）
 					String options = sub.getOptions();
 					if(question.getType() == 2){
+						if(!ValidateUtil.isValid(examUserQuestion.getAnswer())){
+							continue;
+						}
 						Set<String> questionAnswerSet = new HashSet<String>(Arrays.asList(question.getAnswer().split(",")));
 						Set<String> userAnswerSet = new HashSet<String>(Arrays.asList(examUserQuestion.getAnswer().split(",")));
-						if(questionAnswerSet.containsAll(userAnswerSet)){
+						if(questionAnswerSet.size() == userAnswerSet.size() && questionAnswerSet.containsAll(userAnswerSet)){
 							examUserQuestion.setScore(sub.getScore());
 							continue;
 						}
 						
 						if(bdbf(options)){
-							if(!questionAnswerSet.containsAll(userAnswerSet) && questionAnswerSet.contains(userAnswerSet)){
+							if(questionAnswerSet.containsAll(userAnswerSet)){
 								examUserQuestion.setScore(new BigDecimal(BigDecimalUtil.div(sub.getScore().toString(), "2", 2)));
 							}
 						}
@@ -730,8 +825,12 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					}
 					
 					//如果是填空，1：半对半分（默认全对得分）；2：答案无顺序（默认答案有前后顺序）；
-					//3：大小写不敏感（默认大小写敏感）；4：包含答案得分（默认等于答案得分）
+					//3：大小写不敏感（默认大小写敏感）；4：用户答案包含试题答案（默认等于答案得分）
 					if(question.getType() == 3){
+						if(!ValidateUtil.isValid(examUserQuestion.getAnswer())){
+							continue;
+						}
+
 						String questionAnswerStr = question.getAnswer();
 						String userAnswerStr = examUserQuestion.getAnswer();
 						if(dxxbmg(options)){//处理大小写敏感
@@ -754,13 +853,13 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 								}
 								
 								for(String str : qaArr){//用户答案和试题答案对比
-									if(userAnswerStrArr[j].equals(str)){//默认等于答案得分
+									if(userAnswerStrArr[j].equals(str)){//默认等于答案得分，userAnswerStrArr[j].equals(str)位置不要反
 										userFillBlanksArr[i] = true;
 										break;
 									}
 									
 									if(bhdadf(options)){
-										if(userAnswerStrArr[j].contains(str)){//包含答案得分
+										if(userAnswerStrArr[j].contains(str)){//用户答案包含试题答案
 											userFillBlanksArr[i] = true;
 											break;
 										}
@@ -781,7 +880,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 						}
 						
 						if(bdbf(options)){
-							if(userFillBlanksArr.length < trueNum && trueNum > 0){//半对半分
+							if(trueNum > 0){//半对半分
 								examUserQuestion.setScore(new BigDecimal(BigDecimalUtil.div(sub.getScore().toString(), "2", 2)));
 							}
 						}
@@ -800,7 +899,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 	
 	/**
-	 * 4：包含答案得分（默认等于答案得分）
+	 * 4：用户答案包含试题答案（默认等于答案得分）
 	 * 
 	 * v1.0 zhanghc 2018年11月14日下午11:05:51
 	 * @param options

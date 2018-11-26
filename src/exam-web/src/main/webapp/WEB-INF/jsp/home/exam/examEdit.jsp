@@ -466,5 +466,16 @@
 				}
 			});
 		}
+		
+		//试卷查询
+		function paperQuery(){
+			$("#paperTable").bootstrapTable('refresh', {pageNumber : 1});
+		}
+		
+		//试卷重置
+		function paperReset(){
+			$("#paperQueryForm")[0].reset();
+			paperQuery();
+		}
 	</script>
 </html>

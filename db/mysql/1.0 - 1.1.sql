@@ -30,6 +30,14 @@ ALTER TABLE `EXM_QUESTION_TYPE` ADD COLUMN `USER_IDS` varchar(1024) NULL DEFAULT
 ALTER TABLE `EXM_QUESTION_TYPE` ADD COLUMN `ORG_IDS` varchar(1024) NULL DEFAULT NULL COMMENT '机构权限' AFTER `USER_IDS`;
 ALTER TABLE `EXM_QUESTION_TYPE` ADD COLUMN `POST_IDS` varchar(1024) NULL DEFAULT NULL COMMENT '岗位权限' AFTER `ORG_IDS`;
 
+ALTER TABLE `EXM_EXAM_USER` DROP FOREIGN KEY `FK_Reference_23`;
+ALTER TABLE `EXM_EXAM_USER` ADD CONSTRAINT `FK_Reference_23` FOREIGN KEY (`EXAM_ID`) REFERENCES `EXM_EXAM` (`ID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE `EXM_EXAM_USER_QUESTION` DROP FOREIGN KEY `FK_Reference_24`;
+ALTER TABLE `EXM_EXAM_USER_QUESTION` ADD CONSTRAINT `FK_Reference_24` FOREIGN KEY (`EXAM_USER_ID`) REFERENCES `EXM_EXAM_USER` (`ID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE `EXM_MARK_USER` DROP FOREIGN KEY `FK_Reference_37`;
+ALTER TABLE `EXM_MARK_USER` ADD CONSTRAINT `FK_Reference_37` FOREIGN KEY (`EXAM_ID`) REFERENCES `EXM_EXAM` (`ID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 ALTER TABLE `EXM_PAPER` DROP FOREIGN KEY `FK_Reference_16`;
 ALTER TABLE `EXM_PAPER` ADD CONSTRAINT `FK_Reference_16` FOREIGN KEY (`PAPER_TYPE_ID`) REFERENCES `EXM_PAPER_TYPE` (`ID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
@@ -95,3 +103,6 @@ INSERT INTO `SYS_RES` VALUES ('127', '列表', 'home/myExam/list', '125', '_1_89
 INSERT INTO `SYS_RES` VALUES ('128', '答题', 'home/myExam/toPaper|home/myExam/updateAnswer|home/myExam/doPaper', '125', '_1_89_104_125_128_', '1', '2018-11-24 17:43:27', '2', '4', '268435456', '', '2');
 INSERT INTO `SYS_RES` VALUES ('129', '列表', 'home/myMark/examList|home/myMark/toList|home/myMark/list', '126', '_1_89_105_126_129_', '1', '2018-11-24 17:45:07', '1', '4', '536870912', '', '2');
 INSERT INTO `SYS_RES` VALUES ('130', '判卷', 'home/myMark/toMark|home/myMark/updateScore|home/myMark/doMark', '126', '_1_89_105_126_130_', '1', '2018-11-24 17:45:29', '2', '4', '1073741824', '', '2');
+INSERT INTO `SYS_RES` VALUES ('133', '设置权限', 'questionType/toAuth|questionType/authUserOrgTreeList|questionType/authUserList|questionType/toAuthUserAddList|questionType/authUserAddList|questionType/doAuthUserAdd|questionType/doAuthUserDel|questionType/doAuthOrgUpdate|questionType/authOrgOrgTreeList|questionType/authPostOrgTreeList|questionType/doAuthPostUpdate', '49', '_1_47_48_49_133_', '1', '2018-11-25 20:52:32', '6', '5', '16', '', '1');
+INSERT INTO `SYS_RES` VALUES ('134', '设置权限', 'paperType/toAuth|paperType/authUserOrgTreeList|paperType/authUserList|paperType/toAuthUserAddList|paperType/authUserAddList|paperType/doAuthUserAdd|paperType/doAuthUserDel|paperType/doAuthOrgUpdate|paperType/authOrgOrgTreeList|paperType/authPostOrgTreeList|paperType/doAuthPostUpdate', '62', '_1_47_61_62_134_', '1', '2018-11-25 20:51:23', '6', '5', '32', '', '1');
+INSERT INTO `SYS_RES` VALUES ('135', '设置权限', 'examType/toAuth|examType/authUserOrgTreeList|examType/authUserList|examType/toAuthUserAddList|examType/authUserAddList|examType/doAuthUserAdd|examType/doAuthUserDel|examType/doAuthOrgUpdate|examType/authOrgOrgTreeList|examType/authPostOrgTreeList|examType/doAuthPostUpdate', '76', '_1_47_75_76_135_', '1', '2018-11-25 20:53:04', '6', '5', '64', '', '1');

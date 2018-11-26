@@ -71,37 +71,36 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		List<Map<String, Object>> paperTypeTreeList = new ArrayList<Map<String,Object>>();
 		
 		for(PaperType paperType : paperTypeList){
-			if(userId != 1){//如果不是系统管理员
-				if(!(paperType.getUserIds() != null 
-						&& paperType.getUserIds().contains(userId.toString()))){//没有用户权限
-					continue;
-				}
-				if(!(paperType.getOrgIds() != null 
-						&& paperType.getOrgIds().contains(org.getId().toString()))){//没有机构权限
-					continue;
-				}
-				
-				boolean hasPostAuth = false;
-				for(Post post : postList){
-					if(paperType.getPostIds() != null 
-							&& paperType.getPostIds().contains(post.getId().toString())){//没有岗位权限
-						hasPostAuth = true;
-						break;
-					}
-				}
-				
-				if(!hasPostAuth){
-					continue;
-				}
-			}
-			
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("ID", paperType.getId());
 			map.put("NAME", paperType.getName());
 			map.put("PARENT_ID", paperType.getParentId());
 			//map.put("DISABLED", true);
 			//map.put("EXPANDED", true);
-			paperTypeTreeList.add(map);
+			
+			if(userId == 1){
+				paperTypeTreeList.add(map);
+				continue;
+			}
+			
+			if(paperType.getUserIds() != null 
+					&& paperType.getUserIds().contains(userId.toString())){//有用户权限
+				paperTypeTreeList.add(map);
+				continue;
+			}
+			if(paperType.getOrgIds() != null 
+					&& paperType.getOrgIds().contains(org.getId().toString())){//有机构权限
+				paperTypeTreeList.add(map);
+				continue;
+			}
+			
+			for(Post post : postList){
+				if(paperType.getPostIds() != null 
+						&& paperType.getPostIds().contains(post.getId().toString())){//有岗位权限
+					paperTypeTreeList.add(map);
+					break;
+				}
+			}
 		}
 		
 		return paperTypeTreeList;
@@ -325,12 +324,42 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			pq.setScore(score);
 			paperQuestionDao.update(pq);
 		}
-		paperDao.flush();
 		
 		//更新试卷总分
 		if(pqList.size() > 0){
 			updateTotalScore(pqList.get(0).getPaperId());
 		}
+	}
+	
+	@Override
+	public void doScoreUpdate(Integer paperQuestionId, BigDecimal score, String options) {
+		//校验数据有效性
+		if(paperQuestionId == null){
+			throw new RuntimeException("无法获取参数：paperQuestionId");
+		}
+		if(score == null){
+			throw new RuntimeException("无法获取参数：score");
+		}
+		
+		PaperQuestion pq = paperQuestionDao.getEntity(paperQuestionId);
+		Question question = questionService.getEntity(pq.getQuestionId());
+		if(question.getType() == 2){
+			if(ValidateUtil.isValid(options) && options.contains("1")){
+				pq.setOptions("1");
+			}else{
+				pq.setOptions(null);
+			}
+		}else if(question.getType() == 3){
+			pq.setOptions(options);
+		}else{
+			pq.setOptions(null);
+		}
+		
+		pq.setScore(score);
+		paperQuestionDao.update(pq);
+		
+		//更新试卷总分
+		updateTotalScore(pq.getPaperId());
 	}
 
 	private void updateTotalScore(Integer paperId) {
@@ -453,34 +482,6 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 				break;
 			}
 		}
-	}
-
-	@Override
-	public void doScoreUpdate(Integer paperQuestionId, BigDecimal score, String options) {
-		//校验数据有效性
-		if(paperQuestionId == null){
-			throw new RuntimeException("无法获取参数：paperQuestionId");
-		}
-		if(score == null){
-			throw new RuntimeException("无法获取参数：score");
-		}
-		
-		PaperQuestion pq = paperQuestionDao.getEntity(paperQuestionId);
-		Question question = questionService.getEntity(pq.getQuestionId());
-		if(question.getType() == 2){
-			if(ValidateUtil.isValid(options) && options.contains("1")){
-				pq.setOptions("1");
-			}else{
-				pq.setOptions(null);
-			}
-		}else if(question.getType() == 3){
-			pq.setOptions(options);
-		}else{
-			pq.setOptions(null);
-		}
-		
-		pq.setScore(score);
-		paperQuestionDao.update(pq);
 	}
 
 	@Override

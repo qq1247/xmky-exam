@@ -176,7 +176,7 @@
 													<label>
 														<input type="checkbox" name="options" value="4"
 															data-toggle="tooltip" title="默认等于答案得分" data-placement="left"
-															${fn:contains(subPqEx.options, "4") ? "checked='checked'" : "" }>包含答案得分
+															${fn:contains(subPqEx.options, "4") ? "checked='checked'" : "" }>用户答案包含试题答案
 													</label>
 												</div>
 												</c:if>
@@ -363,12 +363,14 @@
 						excluded : [":disabled"],
 						fields : {
 							name : {
+								trigger : "change",
 								validators : {
 									notEmpty : {}
 								}
 							}
 						}
 					});
+					$("#chapterName").change();
 				}
 			});
 		}

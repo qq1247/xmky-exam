@@ -141,6 +141,9 @@ public class HomeQuestionController extends BaseController {
 	@ResponseBody
 	public PageOut list(PageIn pageIn) {
 		try {
+			if(getCurrentUser().getId() != 1){
+				pageIn.setEight(getCurrentUser().getId().toString());
+			}
 			return questionService.getListpage(pageIn);
 		} catch (Exception e) {
 			log.error("试题列表错误：", e);

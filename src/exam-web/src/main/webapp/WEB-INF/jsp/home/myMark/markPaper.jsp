@@ -180,7 +180,7 @@
 																<c:if test="${subPqEx.question.type == 5 }">
 																<input type="text" id="qst_sc_${euq.id  }" name="score" value="${euq.score }" placeholder="0.00"
 																	style="width: 40px;border:0; border-bottom: 1px solid #d8d8d8; text-align: center;"
-																	onblur="updateScore('qst_sc_${euq.id }', '${subPqEx.score }')"
+																	onblur="updateScore('qst_sc_${euq.id }', ${subPqEx.score })"
 																	>分
 																	<small class="help-block"></small>
 																</c:if>

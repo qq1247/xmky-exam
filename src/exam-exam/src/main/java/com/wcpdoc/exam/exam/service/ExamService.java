@@ -123,15 +123,6 @@ public interface ExamService extends BaseService<Exam>{
 	void doExamUserDel(Integer[] examUserIds);
 
 	/**
-	 * 获取未结束的考试列表
-	 * 
-	 * v1.0 zhanghc 2017年6月22日下午10:30:34
-	 * @param userId
-	 * @return List<Map<String, Object>>
-	 */
-	List<Map<String, Object>> getUnFinishList(Integer userId);
-
-	/**
 	 * 获取考试分类树
 	 * 
 	 * v1.0 zhanghc 2017年6月29日上午7:24:13

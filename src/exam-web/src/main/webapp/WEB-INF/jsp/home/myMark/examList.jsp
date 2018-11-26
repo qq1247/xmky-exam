@@ -136,8 +136,8 @@
 									return row.PASS_SCORE + "/" + row.PAPER_TOTLE_SCORE;
 								}
 							},
-							{field : "START_TIME_STR", title : "考试开始", width : 160, align : "center"},
-							{field : "END_TIME_STR", title : "考试结束", width : 160, align : "center"}
+							{field : "MARK_START_TIME_STR", title : "判卷开始", width : 160, align : "center"},
+							{field : "MARK_END_TIME_STR", title : "判卷结束", width : 160, align : "center"}
 							],
 				toolbar : "#toolbar"
 			});
@@ -173,7 +173,7 @@
 				return;
 			}
 			
-			window.location.href = "home/myMark/toList?one=" + nodes[0].ID;
+			window.location.href = "home/myMark/toList?examId=" + nodes[0].ID;
 		}
 	</script>
 </html>

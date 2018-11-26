@@ -86,6 +86,9 @@ public class HomePaperController extends BaseController {
 	@ResponseBody
 	public PageOut list(PageIn pageIn) {
 		try {
+			if(getCurrentUser().getId() != 1){
+				pageIn.setEight(getCurrentUser().getId().toString());
+			}
 			return paperService.getListpage(pageIn);
 		} catch (Exception e) {
 			log.error("试卷列表错误：", e);
@@ -367,6 +370,9 @@ public class HomePaperController extends BaseController {
 	@ResponseBody
 	public PageOut questionList(PageIn pageIn) {
 		try {
+			if(getCurrentUser().getId() != 1){
+				pageIn.setEight(getCurrentUser().getId().toString());
+			}
 			return paperService.getQuestionListpage(pageIn);
 		} catch (Exception e) {
 			log.error("试题列表错误：", e);

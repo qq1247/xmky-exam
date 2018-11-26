@@ -119,6 +119,10 @@ public class HomeExamController extends BaseController {
 	@ResponseBody
 	public PageOut paperList(PageIn pageIn) {
 		try {
+			if(getCurrentUser().getId() != 1){
+				pageIn.setEight(getCurrentUser().getId() + "");
+			}
+			pageIn.setThree("1");
 			return examService.getPaperListpage(pageIn);
 		} catch (Exception e) {
 			log.error("试卷列表错误：", e);
@@ -136,6 +140,9 @@ public class HomeExamController extends BaseController {
 	@ResponseBody
 	public PageOut list(PageIn pageIn) {
 		try {
+			if(getCurrentUser().getId() != 1){
+				pageIn.setEight(getCurrentUser().getId().toString());
+			}
 			return examService.getListpage(pageIn);
 		} catch (Exception e) {
 			log.error("考试列表错误：", e);

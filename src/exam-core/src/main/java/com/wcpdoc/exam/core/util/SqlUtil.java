@@ -36,6 +36,22 @@ public class SqlUtil {
 	public SqlUtil(String from){
 		this.from = new StringBuilder(from);
 	}
+	
+	/**
+	 * 添加where条件
+	 * 
+	 * v1.0 zhanghc 2018年11月26日上午12:00:41
+	 * @param condition 
+	 * return SqlUtil
+	 */
+	public SqlUtil addWhere(String condition) {
+		if (where.length() == 0) {
+			where.append(" where ").append(condition);
+		} else {
+			where.append(" and ").append(condition);
+		}
+		return this;
+	}
 
 	/**
 	 * 添加where条件
@@ -44,14 +60,10 @@ public class SqlUtil {
 	 * 
 	 * @param condition
 	 * @param params
-	 * @return SqlHelper
+	 * @return SqlUtil
 	 */
 	public SqlUtil addWhere(String condition, Object... params) {
-		if (where.length() == 0) {
-			where.append(" where ").append(condition);
-		} else {
-			where.append(" and ").append(condition);
-		}
+		addWhere(condition);
 
 		if (params != null && params.length > 0) {
 			for (Object param : params) {
@@ -69,7 +81,7 @@ public class SqlUtil {
 	 * @param result
 	 * @param condition
 	 * @param params
-	 * @return SqlHelper
+	 * @return SqlUtil
 	 */
 	public SqlUtil addWhere(boolean result, String condition, Object... params) {
 		if (result) {
@@ -85,7 +97,7 @@ public class SqlUtil {
 	 * 
 	 * @param property
 	 * @param order
-	 * @return SqlHelper
+	 * @return SqlUtil
 	 */
 	public SqlUtil addOrder(String property, Order order) {
 		if (this.order.length() == 0) {
@@ -104,7 +116,7 @@ public class SqlUtil {
 	 * @param result
 	 * @param property
 	 * @param order
-	 * @return SqlHelper
+	 * @return SqlUtil
 	 */
 	public SqlUtil addOrder(boolean result, String property, Order order) {
 		if (result) {

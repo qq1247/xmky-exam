@@ -37,7 +37,7 @@
 					<ul class="dropdown-menu login">
 						<li>
 							<span class="hand"></span>
-							<a href="#">个人信息</a>
+							<a href="login/toHome">进入后台</a>
 						</li>
 						<li class="divider"></li>
 						<li>

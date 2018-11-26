@@ -40,6 +40,12 @@ public class PaperDaoImpl extends BaseDaoImpl<Paper> implements PaperDao {
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "PAPER.PAPER_TYPE_ID = ?", pageIn.getOne())
 				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "PAPER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "PAPER.STATE = ?", pageIn.getThree())
+				.addWhere(ValidateUtil.isValid(pageIn.getEight()), 
+						"(PAPER_TYPE.USER_IDS LIKE ? "
+								+ "OR EXISTS (SELECT 1 FROM SYS_USER Z WHERE Z.ID = ? AND PAPER_TYPE.ORG_IDS LIKE CONCAT('%,', Z.ORG_ID, ',%')) "
+								+ "OR EXISTS (SELECT 1 FROM SYS_POST_USER Z WHERE Z.USER_ID = ? AND PAPER_TYPE.POST_IDS LIKE CONCAT('%,', Z.POST_ID, ',%')))", 
+						"%," + pageIn.getEight() + ",%", pageIn.getEight(), pageIn.getEight())
 				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "PAPER.STATE = ?", pageIn.getTen())
 				.addWhere("PAPER.STATE != ?", 0)
 				.addOrder("PAPER.UPDATE_TIME", Order.DESC);
@@ -92,6 +98,11 @@ public class PaperDaoImpl extends BaseDaoImpl<Paper> implements PaperDao {
 				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "QUESTION.STATE = ?", pageIn.getFour())//0：删除；1：启用；2：禁用
 				.addWhere(ValidateUtil.isValid(pageIn.getFive()), "QUESTION.TYPE = ?", pageIn.getFive())
 				.addWhere(ValidateUtil.isValid(pageIn.getSix()), "QUESTION.DIFFICULTY = ?", pageIn.getSix())
+				.addWhere(ValidateUtil.isValid(pageIn.getEight()), 
+						"(QUESTION_TYPE.USER_IDS LIKE ? "
+								+ "OR EXISTS (SELECT 1 FROM SYS_USER Z WHERE Z.ID = ? AND QUESTION_TYPE.ORG_IDS LIKE CONCAT('%,', Z.ORG_ID, ',%')) "
+								+ "OR EXISTS (SELECT 1 FROM SYS_POST_USER Z WHERE Z.USER_ID = ? AND QUESTION_TYPE.POST_IDS LIKE CONCAT('%,', Z.POST_ID, ',%')))", 
+						"%," + pageIn.getEight() + ",%", pageIn.getEight(), pageIn.getEight())
 				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "NOT EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.getTen())
 				.addWhere("QUESTION.STATE != ?", 0)
 				.addOrder("QUESTION.UPDATE_TIME", Order.DESC);

@@ -77,8 +77,9 @@ public class HomeMyMarkController extends BaseController{
 	 * @return String
 	 */
 	@RequestMapping("/toList")
-	public String toMarkList(Model model) {
+	public String toMarkList(Model model, Integer examId) {
 		try {
+			model.addAttribute("examId", examId);
 			return "/WEB-INF/jsp/home/myMark/markList.jsp";
 		} catch (Exception e) {
 			log.error("到达判卷列表页面错误：", e);

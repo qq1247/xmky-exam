@@ -2,7 +2,6 @@ package com.wcpdoc.exam.exam.dao.impl;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
@@ -13,8 +12,8 @@ import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.HibernateUtil;
 import com.wcpdoc.exam.core.util.SqlUtil;
-import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.util.SqlUtil.Order;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.exam.dao.ExamDao;
 import com.wcpdoc.exam.exam.entity.Exam;
 import com.wcpdoc.exam.exam.entity.ExamType;
@@ -54,12 +53,21 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "EXAM.STATE = ?", pageIn.getFour())//0：删除；1：启用；2：禁用
 				.addWhere(ValidateUtil.isValid(pageIn.getFive()), "EXAM.START_TIME > ?", fiveDate)
 				.addWhere(ValidateUtil.isValid(pageIn.getSix()), "EXAM.START_TIME < ?", sixDate)
+				.addWhere(ValidateUtil.isValid(pageIn.getEight()), 
+						"(EXAM_TYPE.USER_IDS LIKE ? "
+								+ "OR EXISTS (SELECT 1 FROM SYS_USER Z WHERE Z.ID = ? AND EXAM_TYPE.ORG_IDS LIKE CONCAT('%,', Z.ORG_ID, ',%')) "
+								+ "OR EXISTS (SELECT 1 FROM SYS_POST_USER Z WHERE Z.USER_ID = ? AND EXAM_TYPE.POST_IDS LIKE CONCAT('%,', Z.POST_ID, ',%')))", 
+						"%," + pageIn.getEight() + ",%", pageIn.getEight(), pageIn.getEight())
 				.addWhere(ValidateUtil.isValid(pageIn.getNine()), "EXISTS (SELECT 1 FROM EXM_EXAM_USER Z WHERE Z.USER_ID = ? AND Z.EXAM_ID = EXAM.ID)", pageIn.getNine())
 				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "EXISTS (SELECT 1 FROM EXM_MARK_USER Z WHERE Z.USER_ID = ? AND Z.EXAM_ID = EXAM.ID)", pageIn.getTen())
 				.addWhere("EXAM.STATE != ?", 0)
 				.addOrder("EXAM.START_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDate(pageOut.getRows(), "START_TIME", DateUtil.FORMAT_DATE_TIME, "END_TIME", DateUtil.FORMAT_DATE_TIME);
+		HibernateUtil.formatDate(pageOut.getRows(), 
+				"START_TIME", DateUtil.FORMAT_DATE_TIME, 
+				"END_TIME", DateUtil.FORMAT_DATE_TIME, 
+				"MARK_START_TIME", DateUtil.FORMAT_DATE_TIME, 
+				"MARK_END_TIME", DateUtil.FORMAT_DATE_TIME);
 		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), "EXAM_STATE", "STATE");
 		return pageOut;
 	}
@@ -113,15 +121,6 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 	public void doUserDel(Integer id, Integer userId) {
 		String sql = "DELETE FROM EXM_EXAM_USER_QUESTION WHERE EXAM_ID = ? AND USER_ID = ?";
 		update(sql, id, userId);
-	}
-
-	@Override
-	public List<Map<String, Object>> getUnFinishList(Integer userId) {
-		String sql = "SELECT EXAM.ID AS EXAM_ID, EXAM.NAME AS EXAM_NAME, EXAM.DESCRIPTION AS EXAM_DESCRIPTION, EXAM_USER.ID  AS EXAM_USER_ID "
-				+ "FROM EXM_EXAM EXAM "
-				+ "INNER JOIN EXM_EXAM_USER EXAM_USER ON EXAM.ID = EXAM_USER.EXAM_ID "
-				+ "WHERE EXAM.STATE = 1 AND EXAM_USER.USER_ID = ? AND EXAM.END_TIME >= ? ";
-		return getList(sql, new Object[]{userId, new Date()});
 	}
 
 	@Override
@@ -208,17 +207,22 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 
 	@Override
 	public PageOut getMarkListpage(PageIn pageIn) {
-		String sql = "SELECT EXAM_USER.ID, USER.NAME AS USER_NAME, ORG.NAME AS ORG_NAME, EXAM_USER.TOTAL_SCORE AS EXAM_USER_TOTAL_SCORE "
+		String sql = "SELECT EXAM_USER.ID, USER.NAME AS USER_NAME, ORG.NAME AS ORG_NAME, EXAM_USER.TOTAL_SCORE AS EXAM_USER_TOTAL_SCORE, "
+				+ "MARK_USER.NAME AS MARK_USER_NAME, EXAM_USER.UPDATE_MARK_TIME AS EXAM_USER_UPDATE_MARK_TIME "
 				+ "FROM EXM_EXAM_USER EXAM_USER "
 				+ "INNER JOIN EXM_EXAM EXAM ON EXAM_USER.EXAM_ID = EXAM.ID "
 				+ "INNER JOIN SYS_USER USER ON EXAM_USER.USER_ID = USER.ID "
-				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID ";
+				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
+				+ "LEFT JOIN SYS_USER MARK_USER ON EXAM_USER.UPDATE_MARK_USER_ID = MARK_USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()), "EXAM_USER.EXAM_ID = ?", pageIn.getOne())
+				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "ORG.NAME LIKE ?", "%" + pageIn.getThree() + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "EXISTS (SELECT 1 FROM EXM_MARK_USER Z WHERE Z.USER_ID = ? AND Z.EXAM_ID = EXAM_USER.EXAM_ID)", pageIn.getTen())
 				.addWhere("EXAM.STATE = ?", 1);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
+		HibernateUtil.formatDate(pageOut.getRows(), 
+				"EXAM_USER_UPDATE_MARK_TIME", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;
 	}
 

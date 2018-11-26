@@ -14,6 +14,7 @@
 					<div class="panel panel-default exam-query">
 						<div class="panel-body">
 							<form id="queryForm" class="form-horizontal" role="form">
+								<input type="hidden" name="one" value="${examId }">
 								<div class="row">
 									<div class="col-md-4">
 										<div class="form-group">
@@ -49,11 +50,11 @@
 						<div class="panel-body">
 							<div id="toolbar">
 								<button type="button" class="btn btn-primary" onclick="toMark();">
-									<span class="glyphicon glyphicon-search"></span>
+									<span class="glyphicon glyphicon-pencil"></span>
 									&nbsp;判卷
 								</button>
 								<button type="button" class="btn btn-primary" onclick="javascript:history.back(-1);">
-									<span class="glyphicon glyphicon-search"></span>
+									<span class="glyphicon glyphicon-arrow-left"></span>
 									&nbsp;返回
 								</button>
 							</div>
@@ -88,6 +89,8 @@
 							{field : "state", checkbox : true},
 							{field : "USER_NAME", title : "用户", width : 80, align : "center"},
 							{field : "ORG_NAME", title : "组织机构", width : 80, align : "center"},
+							{field : "MARK_USER_NAME", title : "判卷用户", width : 80, align : "center"},
+							{field : "EXAM_USER_UPDATE_MARK_TIME_STR", title : "最后判卷时间", width : 80, align : "center"},
 							{field : "EXAM_USER_TOTAL_SCORE", title : "得分", width : 80, align : "center"}
 							],
 				toolbar : "#toolbar"

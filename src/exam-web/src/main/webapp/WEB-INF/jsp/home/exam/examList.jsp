@@ -466,6 +466,22 @@
 				return;
 			}
 			
+			if(nodes[0].STATE != 1){
+				BootstrapDialog.show({
+					title : "提示消息",
+					message : "考试未发布！",
+					buttons : [{
+						label : "&nbsp;确定",
+						icon : "glyphicon glyphicon-ok",
+						cssClass : "btn-primary",
+						action : function(dialogItself) {
+							dialogItself.close();
+						}
+					}]
+				});
+				return;
+			}
+			
 			BootstrapDialog.show({
 				title : "考试用户列表",
 				cssClass : "exam-list",
@@ -774,6 +790,22 @@
 				BootstrapDialog.show({
 					title : "提示消息",
 					message : "请选择一行数据！",
+					buttons : [{
+						label : "&nbsp;确定",
+						icon : "glyphicon glyphicon-ok",
+						cssClass : "btn-primary",
+						action : function(dialogItself) {
+							dialogItself.close();
+						}
+					}]
+				});
+				return;
+			}
+			
+			if(nodes[0].STATE != 1){
+				BootstrapDialog.show({
+					title : "提示消息",
+					message : "考试未发布！",
 					buttons : [{
 						label : "&nbsp;确定",
 						icon : "glyphicon glyphicon-ok",

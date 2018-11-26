@@ -8,7 +8,7 @@
 				<div class="form-group">
 					<label for="name" class="col-md-2 control-label">名称：</label>
 					<div class="col-md-10">
-						<input type="text" name="name"
+						<input type="text" id="chapterName" name="name"
 							value="${chapter.name }" class="form-control"
 							placeholder="请输入名称">
 					</div>

@@ -1,7 +1,6 @@
 package com.wcpdoc.exam.home.service.impl;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -39,11 +38,6 @@ public class HomeServiceImpl extends BaseServiceImp<Object> implements HomeServi
 	@Override
 	public Map<Integer, Long> getAuthSum(Integer userId) {
 		return userService.getAuthSum(userId);
-	}
-
-	@Override
-	public List<Map<String, Object>> getUnFinishExamList(Integer userId) {
-		return examService.getUnFinishList(userId);
 	}
 
 	@Override

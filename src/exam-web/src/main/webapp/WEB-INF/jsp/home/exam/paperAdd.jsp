@@ -20,17 +20,7 @@
 								</div>
 							</div>
 							<div class="col-md-4">
-								<div class="form-group">
-									<label for="three" class="control-label col-md-4">状态：</label>
-									<div class="col-md-8">
-										<select id="three" name="three" class="form-control">
-											<option value=""></option>
-											<c:forEach var="dict" items="${STATE_DICT }">
-											<option value="${dict.dictKey }">${dict.dictValue }</option>
-											</c:forEach>
-										</select>
-									</div>
-								</div>
+								
 							</div>
 							<div class="col-md-4" style="text-align: right;">
 								<button type="button" class="btn btn-primary" onclick="paperQuery();">
