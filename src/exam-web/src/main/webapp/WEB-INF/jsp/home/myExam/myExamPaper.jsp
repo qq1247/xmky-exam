@@ -117,7 +117,16 @@
 														<c:if test="${subPqEx.question.type == 3 }">
 														<% pageContext.setAttribute("v", "\n"); %>
 														<c:set var="lab1s" value="${fn:split('一,二,三,四,五,六,七', ',')}"></c:set>
-														<c:set var="answers" value="${fn:split(euq.answer, v)}"></c:set>
+														<%-- <c:set var="answers" value="${fn:split(euq.answer, v)}"></c:set> 中间有空值会丢失--%>
+														<c:set var="a" value="${euq.answer }"></c:set>
+														<%
+														Object a = pageContext.getAttribute("a");
+														if(a != null){
+															pageContext.setAttribute("answers", a.toString().split("\n"));
+															System.out.println("字符串：" + a);
+															System.out.println("长度："+a.toString().split("\n").length);
+														}
+														%>
 														<c:forEach var="answer" items="${fn:split(subPqEx.question.answer, v) }" varStatus="s">
 														<div class="row form-group">
 															<label class="col-md-1 control-label">填空${lab1s[s.index] }：</label>
@@ -284,7 +293,7 @@
 				if(index > 0){
 					answer += "\n";
 				}
-				answer += $(domEle).val();console.info(answer)
+				answer += $(domEle).val();
 			});
 			
 			$.ajax({

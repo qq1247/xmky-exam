@@ -226,8 +226,16 @@
 									return row.PASS_SCORE + "/" + row.PAPER_TOTLE_SCORE;
 								}
 							},
-							{field : "START_TIME_STR", title : "考试开始", width : 160, align : "center"},
-							{field : "END_TIME_STR", title : "考试结束", width : 160, align : "center"},
+							{field : "START_TIME_STR", title : "考试时间", width : 160, align : "center", 
+								formatter : function(value, row, index){
+									return row.START_TIME_STR + "<br/>" + row.END_TIME_STR;
+								}
+							},
+							{field : "MARK_START_TIME_STR", title : "判卷时间", width : 160, align : "center", 
+								formatter : function(value, row, index){
+									return row.MARK_START_TIME_STR + "<br/>" + row.MARK_END_TIME_STR;
+								}
+							},
 							{field : "STATE_NAME", title : "状态", width : 80, align : "center"}
 							],
 				toolbar : "#toolbar"

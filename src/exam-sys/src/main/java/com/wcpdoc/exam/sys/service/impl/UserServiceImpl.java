@@ -277,7 +277,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	}
 
 	public static void main(String[] args) {
-		String encryptPwd = new UserServiceImpl().getEncryptPwd("zl", "zl");
+		String encryptPwd = new UserServiceImpl().getEncryptPwd("ws", "ws");
 		System.err.println(encryptPwd);
 	}
 	
