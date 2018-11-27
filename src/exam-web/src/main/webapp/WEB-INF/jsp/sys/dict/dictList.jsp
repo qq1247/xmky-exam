@@ -127,8 +127,8 @@
 						$.messager.progress("close");
 						
 						var obj = $.parseJSON(data);
-						if (!obj.success) {
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if (!obj.succ) {
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 							return;
 						}
 
@@ -211,8 +211,8 @@
 						$.messager.progress("close");
 
 						var obj = $.parseJSON(data);
-						if (!obj.success) {
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if (!obj.succ) {
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 							return;
 						}
 
@@ -237,8 +237,8 @@
 						dictGrid.datagrid("reload");
 						$.messager.progress("close");
 						
-						if (!obj.success) {
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if (!obj.succ) {
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 						}
 					}
 				});

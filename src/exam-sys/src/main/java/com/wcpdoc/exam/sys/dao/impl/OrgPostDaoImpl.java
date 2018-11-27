@@ -22,7 +22,7 @@ public class OrgPostDaoImpl extends BaseDaoImpl<OrgPost> implements OrgPostDao {
 	}
 
 	@Override
-	public void deleteByPostId(Integer postId) {
+	public void delByPostId(Integer postId) {
 		String sql = "DELETE FROM SYS_ORG_POST WHERE POST_ID = ?";
 		update(sql, postId);
 	}

@@ -44,13 +44,13 @@ public interface FileService extends BaseService<File>{
 	void delAndUpdate(Integer[] ids);
 
 	/**
-	 * 获取附件实体，附带附件
+	 * 获取附件实体
 	 * v1.0 zhanghc 2017年4月5日下午11:36:17
 	 * 
 	 * @param id
 	 * @return FileEx
 	 */
-	FileEx getEntityWithFile(Integer id);
+	FileEx getEntityEx(Integer id);
 	
 	/**
 	 * 清理附件

@@ -25,31 +25,43 @@ public class PaperQuestionDaoImpl extends BaseDaoImpl<PaperQuestion> implements 
 
 	@Override
 	public PaperQuestion getPaperQuestionByName(String name) {
-		String sql = "SELECT * FROM EX_PAPER_QUESTION WHERE NAME = ?";
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE NAME = ?";
 		return getUnique(sql, new Object[]{name}, PaperQuestion.class);
 	}
 
 	@Override
 	public List<PaperQuestion> getList(Integer parentId) {
-		String sql = "SELECT * FROM EX_PAPER_QUESTION WHERE PARENT_ID = ?";
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PARENT_ID = ?";
 		return getList(sql, new Object[]{parentId}, PaperQuestion.class);
 	}
 
 	@Override
 	public PaperQuestion getTopPaperQuestion(Integer paperId) {
-		String sql = "SELECT * FROM EX_PAPER_QUESTION WHERE PAPER_ID = ? AND PARENT_ID = 0";
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = ? AND PARENT_ID = 0";
 		return getUnique(sql, new Object[]{paperId}, PaperQuestion.class);
 	}
 
 	@Override
 	public List<PaperQuestion> getPaperQuestionList(Integer paperId) {
-		String sql = "SELECT * FROM EX_PAPER_QUESTION WHERE PAPER_ID = ?";
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = ?";
 		return getList(sql, new Object[]{paperId}, PaperQuestion.class);
 	}
 
 	@Override
 	public PaperQuestion getEntity(Integer paperId, Integer questionId) {
-		String sql = "SELECT * FROM EX_PAPER_QUESTION WHERE PAPER_ID = ? AND QUESTION_ID = ?";
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = ? AND QUESTION_ID = ?";
 		return getUnique(sql, new Object[]{paperId, questionId}, PaperQuestion.class);
+	}
+
+	@Override
+	public List<PaperQuestion> getList2(Integer paperId) {
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = ?";
+		return getList(sql, new Object[]{paperId}, PaperQuestion.class);
+	}
+
+	@Override
+	public List<PaperQuestion> getChapterList(Integer paperId) {
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = ? AND TYPE = 1";
+		return getList(sql, new Object[]{paperId}, PaperQuestion.class);
 	}
 }

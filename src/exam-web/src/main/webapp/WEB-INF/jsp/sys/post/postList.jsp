@@ -87,7 +87,6 @@
 				parentField : "PARENT_ID",
 				iconClsFiled : "ICON",
 				checkedFiled : "CHECKED",
-				lines : true,
 			    url : "post/orgPostTreeList",
 				onContextMenu : function(e, node){
 					e.preventDefault();
@@ -239,8 +238,8 @@
 						$.messager.progress("close"); 
 						
 						var obj = $.parseJSON(data);
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 							return;
 						}
 						
@@ -316,8 +315,8 @@
 						$.messager.progress("close"); 
 						
 						var obj = $.parseJSON(data);
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 							return;
 						}
 						
@@ -342,8 +341,8 @@
 						orgTree.tree("reload");
 						$.messager.progress("close");
 						
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 						}
 					}
 				});
@@ -404,17 +403,9 @@
 						parentField : "PARENT_ID",
 						iconClsFiled : "ICON",
 						checkedFiled : "CHECKED",
-						lines : true,
 					    url : "post/resUpdateResTreeList",
 					    queryParams : {id : postGridRows[0].ID},
 						checkbox : true,
-						onSelect : function(node){
-							if(!node.checked){
-								$(this).tree("check", node.target);
-							}else{
-								$(this).tree("uncheck", node.target);
-							}
-						},
 						onLoadSuccess : function(node, data){
 							resUpdateTree.tree("collapseAll");
 						}
@@ -451,8 +442,8 @@
 					success : function(obj){
 						$.messager.progress("close");
 						
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 							return;
 						}
 						

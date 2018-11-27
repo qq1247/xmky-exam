@@ -20,7 +20,7 @@ import com.wcpdoc.exam.core.util.DateUtil;
  * v1.0 zhanghc 2017-06-11 09:13:23
  */
 @Entity
-@Table(name = "EX_EXAM")
+@Table(name = "EXM_EXAM")
 public class Exam {
 	@Id
 	@GeneratedValue(generator = "generator")
@@ -39,6 +39,12 @@ public class Exam {
 	@Column(name = "END_TIME")
 	@DateTimeFormat(pattern = DateUtil.FORMAT_DATE_TIME)
 	private Date endTime;
+	@Column(name = "MARK_START_TIME")
+	@DateTimeFormat(pattern = DateUtil.FORMAT_DATE_TIME)
+	private Date markStartTime;
+	@Column(name = "MARK_END_TIME")
+	@DateTimeFormat(pattern = DateUtil.FORMAT_DATE_TIME)
+	private Date markEndTime;
 	@Column(name = "UPDATE_USER_ID")
 	private Integer updateUserId;
 	@Column(name = "UPDATE_TIME")
@@ -139,4 +145,19 @@ public class Exam {
 		this.examTypeId = examTypeId;
 	}
 
+	public Date getMarkStartTime() {
+		return markStartTime;
+	}
+
+	public void setMarkStartTime(Date markStartTime) {
+		this.markStartTime = markStartTime;
+	}
+
+	public Date getMarkEndTime() {
+		return markEndTime;
+	}
+
+	public void setMarkEndTime(Date markEndTime) {
+		this.markEndTime = markEndTime;
+	}
 }

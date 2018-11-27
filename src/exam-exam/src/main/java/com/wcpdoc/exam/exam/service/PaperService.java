@@ -21,12 +21,13 @@ import com.wcpdoc.exam.exam.entity.Question;
 public interface PaperService extends BaseService<Paper>{
 
 	/**
-	 * 获取试卷分类树型列表
+	 * 获取试卷分类树
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
+	 * @param userId 
 	 * @return List<Map<String,Object>>
 	 */
-	List<Map<String, Object>> getPaperTypeTreeList();
+	List<Map<String, Object>> getPaperTypeTreeList(Integer userId);
 
 	/**
 	 * 获取试卷分类
@@ -48,7 +49,7 @@ public interface PaperService extends BaseService<Paper>{
 	void doPaperTypeUpdate(Integer[] ids, Integer paperTypeId);
 
 	/**
-	 * 获取配置试卷树型列表
+	 * 获取配置试卷树
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @return List<Map<String,Object>>
@@ -72,67 +73,57 @@ public interface PaperService extends BaseService<Paper>{
 	 * @param user
 	 * void
 	 */
+	@Deprecated
 	void initRootPaperQuestion(Integer id, LoginUser user);
 
 	/**
 	 * 完成添加章节
 	 * 
 	 * v1.0 zhanghc 2017年5月27日上午9:42:57
-	 * @param paperQuestion
+	 * @param chapter
 	 * @param user
 	 * void
 	 */
-	void doPaperCfgAdd(PaperQuestion paperQuestion, LoginUser user);
+	void doChapterAdd(PaperQuestion chapter, LoginUser user);
 
 	/**
 	 * 完成修改章节
 	 * 
 	 * v1.0 zhanghc 2017年5月27日上午11:05:42
-	 * @param paperQuestion
+	 * @param chapter
 	 * @param user
 	 * void
 	 */
-	void doPaperCfgEdit(PaperQuestion paperQuestion, LoginUser user);
+	void doChapterEdit(PaperQuestion chapter, LoginUser user);
+	
+	/**
+	 * 完成删除章节
+	 * 
+	 * v1.0 zhanghc 2017年5月27日下午5:58:58
+	 * @param chapterId
+	 * void
+	 */
+	void doChapterDel(Integer chapterId);
 
 	/**
-	 * 试卷配置列表
+	 * 获取试题列表
 	 * 
 	 * v1.0 zhanghc 2017年5月27日下午2:41:06
 	 * @param pageIn
 	 * @return PageOut
 	 */
-	PageOut getPaperCfgListpage(PageIn pageIn);
+	PageOut getQuestionListpage(PageIn pageIn);
 
 	/**
 	 * 完成添加试题
 	 * 
 	 * v1.0 zhanghc 2017年5月27日下午3:32:43
-	 * @param paperId
-	 * @param parentPaperQuestionId
+	 * @param chapterId
 	 * @param questionIds
 	 * @param user
 	 * void
 	 */
-	void doPaperCfgListAdd(Integer paperId, Integer parentPaperQuestionId, Integer[] questionIds, LoginUser user);
-
-	/**
-	 * 完成删除试题
-	 * 
-	 * v1.0 zhanghc 2017年5月27日下午5:58:58
-	 * @param paperQuestionId
-	 * void
-	 */
-	void doPaperCfgDel(Integer paperQuestionId);
-	
-	/**
-	 * 完成试题排序
-	 * 
-	 * v1.0 zhanghc 2017年5月31日上午8:58:09
-	 * @param paperQuestionId
-	 * @param no
-	 * void
-	 */
-	void doPaperCfgSort(Integer paperQuestionId, Integer no);
+	void doQuestionAdd(Integer chapterId, Integer[] questionIds, LoginUser user);
 
 	/**
 	 * 获取试题列表
@@ -144,7 +135,7 @@ public interface PaperService extends BaseService<Paper>{
 	List<PaperQuestion> getPaperQuestionList(Integer paperQuestionId);
 
 	/**
-	 * 获取试题分类树型列表
+	 * 获取试题分类树
 	 * 
 	 * v1.0 zhanghc 2017年6月4日下午4:36:56
 	 * @return List<Map<String,Object>>
@@ -164,11 +155,12 @@ public interface PaperService extends BaseService<Paper>{
 	 * 完成更新试卷分数
 	 * 
 	 * v1.0 zhanghc 2017年6月9日下午4:21:52
-	 * @param paperQuestionIds
+	 * @param chapterId
 	 * @param scores
+	 * @param options
 	 * void
 	 */
-	void doPaperCfgScoreUpdate(Integer[] paperQuestionIds, BigDecimal[] scores);
+	void doScoresUpdate(Integer chapterId, BigDecimal score, String options);
 
 	/**
 	 * 获取试题列表
@@ -194,6 +186,94 @@ public interface PaperService extends BaseService<Paper>{
 	 * v1.0 zhanghc 2017年8月6日下午10:42:19
 	 * @param ids void
 	 */
-	void deleteAndUpdate(Integer[] ids);
+	void delAndUpdate(Integer[] ids);
+
+	/**
+	 * 获取试卷分类
+	 * 
+	 * v1.0 zhanghc 2018年10月13日上午11:24:11
+	 * @param paperTypeId
+	 * @return Papertype
+	 */
+	PaperType getPaperType2(Integer paperTypeId);
+
+	/**
+	 * 获取试题分类书列表
+	 * 
+	 * v1.0 zhanghc 2018年10月20日下午9:51:21
+	 * @param userId
+	 * @return List<Map<String,Object>>
+	 */
+	List<Map<String, Object>> getQuestionTypeTreeList(Integer userId);
+
+	/**
+	 * 完成清空试题
+	 * 
+	 * v1.0 zhanghc 2018年10月21日上午8:18:04
+	 * @param chapterId
+	 * @param currentUser void
+	 */
+	void doQuestionClear(Integer chapterId, LoginUser currentUser);
+
+	/**
+	 * 完成章节上移
+	 * 
+	 * v1.0 zhanghc 2018年10月21日下午2:51:35
+	 * @param chapterId void
+	 */
+	void doChapterUp(Integer chapterId);
 	
+	/**
+	 * 完成章节下移
+	 * 
+	 * v1.0 zhanghc 2018年10月21日下午2:51:35
+	 * @param chapterId void
+	 */
+	void doChapterDown(Integer chapterId);
+
+	/**
+	 * 完成设置分数
+	 * 
+	 * v1.0 zhanghc 2018年10月21日下午3:10:37
+	 * @param paperQuestionId 
+	 * @param score 
+	 * @param options 
+	 * void
+	 */
+	void doScoreUpdate(Integer paperQuestionId, BigDecimal score, String options);
+
+	/**
+	 * 完成试题上移
+	 * 
+	 * v1.0 zhanghc 2018年10月21日下午4:15:35
+	 * @param paperQuestionId void
+	 */
+	void doQuestionUp(Integer paperQuestionId);
+
+	/**
+	 * 完成试题下移
+	 * 
+	 * v1.0 zhanghc 2018年10月21日下午4:15:43
+	 * @param paperQuestionId void
+	 */
+	void doQuestionDown(Integer paperQuestionId);
+
+	/**
+	 * 完成试题删除
+	 * 
+	 * v1.0 zhanghc 2018年10月21日下午10:43:15
+	 * @param paperQuestionId void
+	 */
+	void doQuestionDel(Integer paperQuestionId);
+
+	/**
+	 * 获取试卷试题
+	 * 
+	 * v1.0 zhanghc 2018年10月27日上午9:28:40
+	 * @param paperId
+	 * @param questionId
+	 * @return PaperQuestion
+	 */
+	PaperQuestion getPaperQuestion(Integer paperId, Integer questionId);
+
 }

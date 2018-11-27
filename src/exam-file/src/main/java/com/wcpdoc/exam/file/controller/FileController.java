@@ -1,15 +1,13 @@
 package com.wcpdoc.exam.file.controller;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -155,38 +153,19 @@ public class FileController extends BaseController{
 	 */
 	@RequestMapping(value = "/doDownload")
 	public void doDownload(Integer id) {
-		InputStream in = null;
-		OutputStream out = null;
+		OutputStream output = null;
 		try {
-			FileEx fileEx = fileService.getEntityWithFile(id);
+			FileEx fileEx = fileService.getEntityEx(id);
 			String fileName = new String((fileEx.getEntity().getName() + "." + fileEx.getEntity().getExtName()).getBytes("UTF-8"), "ISO-8859-1");
 			response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
 			response.setContentType("application/force-download");
 
-			int len = 0;
-			byte[] bytes = new byte[2048];
-			in = new BufferedInputStream(new FileInputStream(fileEx.getFile()));
-			out = new BufferedOutputStream(response.getOutputStream());
-			while ((len = in.read(bytes)) > 0) {
-				out.write(bytes, 0, len);
-			}
+			output = response.getOutputStream();
+			FileUtils.copyFile(fileEx.getFile(), output);
 		} catch (Exception e) {
 			log.error("完成下载附件失败：", e);
 		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (Exception e) {
-					log.error("完成下载附件关闭输入流失败：", e);
-				}
-			}
-			if (out != null) {
-				try {
-					out.close();
-				} catch (Exception e) {
-					log.error("完成下载附件关闭输出流失败：", e);
-				}
-			}
+			IOUtils.closeQuietly(output);
 		}
 	}
 

@@ -88,7 +88,6 @@
 				parentField : "PARENT_ID",
 				iconClsFiled : "ICON",
 				checkedFiled : "CHECKED",
-				lines : true,
 			    url : "user/orgTreeList",
 				onContextMenu : function(e, node){
 					e.preventDefault();
@@ -187,8 +186,8 @@
 						$.messager.progress("close"); 
 						
 						var obj = $.parseJSON(data);
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 							return;
 						}
 						if(obj.data.initPwd){
@@ -268,8 +267,8 @@
 						$.messager.progress("close"); 
 						
 						var obj = $.parseJSON(data);
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 							return;
 						}
 						if(obj.data.initPwd){
@@ -297,8 +296,8 @@
 						orgTree.tree("reload");
 						$.messager.progress("close");
 						
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 						}
 					}
 				});
@@ -342,8 +341,8 @@
 						orgTree.tree("reload");
 						$.messager.progress("close");
 						
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 							return;
 						}
 						if(obj.data.initPwd){
@@ -404,16 +403,8 @@
 						parentField : "PARENT_ID",
 						iconClsFiled : "ICON",
 						checkedFiled : "CHECKED",
-						lines : true,
 					    url : "user/postUpdatePostTreeList?" + params,
-						checkbox : true,
-						onSelect : function(node){
-							if(!node.checked){
-								$(this).tree("check", node.target);
-							}else{
-								$(this).tree("uncheck", node.target);
-							}
-						}
+						checkbox : true
 					});
 				}
 			});
@@ -446,8 +437,8 @@
 						postDialog.dialog("close");
 						$.messager.progress("close");
 						
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 							return;
 						}
 					}
@@ -485,7 +476,6 @@
 						parentField : "PARENT_ID",
 						iconClsFiled : "ICON",
 						checkedFiled : "CHECKED",
-						lines : true,
 					    url : "user/orgUpdateOrgTreeList",
 					});
 				}
@@ -518,8 +508,8 @@
 						orgDialog.dialog("close");
 						$.messager.progress("close");
 						
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 							return;
 						}
 					}

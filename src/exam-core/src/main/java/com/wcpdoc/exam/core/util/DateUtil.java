@@ -11,7 +11,9 @@ import java.util.Date;
  * @author zhanghc 2015-7-21下午10:20:39
  */
 public class DateUtil {
+	/** yyyy-MM-dd */
 	public static final String FORMAT_DATE = "yyyy-MM-dd";
+	/** yyyy-MM-dd HH:mm:ss */
 	public static final String FORMAT_DATE_TIME = "yyyy-MM-dd HH:mm:ss";
 
 	/**

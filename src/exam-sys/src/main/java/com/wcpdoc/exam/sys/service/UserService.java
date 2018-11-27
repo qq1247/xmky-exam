@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.wcpdoc.exam.core.service.BaseService;
 import com.wcpdoc.exam.sys.entity.Org;
+import com.wcpdoc.exam.sys.entity.Post;
 import com.wcpdoc.exam.sys.entity.User;
 /**
  * 用户服务层接口
@@ -38,7 +39,7 @@ public interface UserService extends BaseService<User>{
 	void delAndUpdate(Integer[] ids);
 	
 	/**
-	 * 获取组织机构树型列表
+	 * 获取组织机构树
 	 * v1.0 zhanghc 2016-6-15下午17:24:19
 	 * @return List<Map<String,Object>>
 	 */
@@ -54,7 +55,7 @@ public interface UserService extends BaseService<User>{
 	void doOrgUpdate(Integer[] ids, Integer orgId);
 
 	/**
-	 * 获取岗位树型列表
+	 * 获取岗位树
 	 * v1.0 zhanghc 2016-6-15下午17:24:19
 	 * @param ids
 	 * @return List<Map<String,Object>>
@@ -132,4 +133,13 @@ public interface UserService extends BaseService<User>{
 	 * @return String
 	 */
 	String getEncryptPwd(String loginName, String pwd);
+
+	/**
+	 * 获取岗位列表
+	 * 
+	 * v1.0 zhanghc 2018年6月3日上午11:49:04
+	 * @param id
+	 * @return List<Post>
+	 */
+	List<Post> getPostList(Integer id);
 }

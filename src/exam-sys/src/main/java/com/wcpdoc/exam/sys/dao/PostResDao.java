@@ -16,7 +16,7 @@ public interface PostResDao extends BaseDao<PostRes>{
 	 * @param id
 	 * void
 	 */
-	void deleteByPostId(Integer postId);
+	void delByPostId(Integer postId);
 
 	/**
 	 * 根据资源ID删除实体
@@ -24,6 +24,6 @@ public interface PostResDao extends BaseDao<PostRes>{
 	 * @param resId
 	 * void
 	 */
-	void deleteByResId(Integer resId);
+	void delByResId(Integer resId);
 
 }

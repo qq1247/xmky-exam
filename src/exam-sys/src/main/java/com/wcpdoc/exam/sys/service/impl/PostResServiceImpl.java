@@ -26,12 +26,12 @@ public class PostResServiceImpl extends BaseServiceImp<PostRes> implements PostR
 	}
 
 	@Override
-	public void deleteByPostId(Integer postId) {
-		postResDao.deleteByPostId(postId);
+	public void delByPostId(Integer postId) {
+		postResDao.delByPostId(postId);
 	}
 
 	@Override
-	public void deleteByResId(Integer resId) {
-		postResDao.deleteByResId(resId);
+	public void delByResId(Integer resId) {
+		postResDao.delByResId(resId);
 	}
 }

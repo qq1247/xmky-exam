@@ -24,14 +24,14 @@
 			<version>2.3.1</version>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>jstl</artifactId>
 			<version>1.2</version>
 			<!-- <scope>compile</scope> -->
 		</dependency>
-		
+
 		<!-- 集成apache commons包 -->
 		<dependency>
 			<groupId>commons-codec</groupId>
@@ -73,7 +73,7 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.0.8</version>
 		</dependency>
-		
+
 		<!-- spring集成json -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -90,7 +90,7 @@
 			<artifactId>jackson-annotations</artifactId>
 			<version>2.6.6</version>
 		</dependency>
-		
+
 		<!-- spring集成spring扩展 -->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -118,6 +118,13 @@
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>2.4</version>
+		</dependency>
+		
+		<!-- 集成html解析 -->
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.10.3</version>
 		</dependency>
 	</dependencies>
 	<build>

@@ -10,6 +10,7 @@ import com.wcpdoc.exam.exam.entity.PaperQuestion;
  * 
  * v1.0 zhanghc 2017-05-26 14:23:38
  */
+@Deprecated
 public interface PaperQuestionService extends BaseService<PaperQuestion>{
 
 	/**

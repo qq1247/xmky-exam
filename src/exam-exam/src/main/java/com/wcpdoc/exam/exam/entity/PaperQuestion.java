@@ -20,7 +20,7 @@ import com.wcpdoc.exam.core.util.DateUtil;
  * v1.0 zhanghc 2017-05-26 14:23:38
  */
 @Entity
-@Table(name = "EX_PAPER_QUESTION")
+@Table(name = "EXM_PAPER_QUESTION")
 public class PaperQuestion {
 	@Id
 	@GeneratedValue(generator = "generator")
@@ -50,6 +50,8 @@ public class PaperQuestion {
 	private BigDecimal score;
 	@Column(name = "NO")
 	private Integer no;
+	@Column(name = "OPTIONS")
+	private String options;
 
 	public Integer getId() {
 		return id;
@@ -145,5 +147,13 @@ public class PaperQuestion {
 
 	public void setScore(BigDecimal score) {
 		this.score = score;
+	}
+
+	public String getOptions() {
+		return options;
+	}
+
+	public void setOptions(String options) {
+		this.options = options;
 	}
 }

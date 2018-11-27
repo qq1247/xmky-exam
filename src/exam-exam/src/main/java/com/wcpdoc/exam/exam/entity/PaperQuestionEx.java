@@ -9,14 +9,14 @@ import java.util.List;
  * v1.0 zhanghc 2017-05-26 14:23:38
  */
 public class PaperQuestionEx extends PaperQuestion {
-	private List<PaperQuestion> subList = new ArrayList<PaperQuestion>();
+	private List<PaperQuestionEx> subList = new ArrayList<PaperQuestionEx>();
 	private Question question;
 
-	public List<PaperQuestion> getSubList() {
+	public List<PaperQuestionEx> getSubList() {
 		return subList;
 	}
 
-	public void setSubList(List<PaperQuestion> subList) {
+	public void setSubList(List<PaperQuestionEx> subList) {
 		this.subList = subList;
 	}
 

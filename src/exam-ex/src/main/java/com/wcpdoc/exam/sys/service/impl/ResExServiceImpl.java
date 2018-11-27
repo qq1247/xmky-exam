@@ -21,6 +21,6 @@ public class ResExServiceImpl implements ResExService {
 	
 	@Override
 	public void delAndUpdate(Res res) {
-		postResService.deleteByResId(res.getId());
+		postResService.delByResId(res.getId());
 	}
 }

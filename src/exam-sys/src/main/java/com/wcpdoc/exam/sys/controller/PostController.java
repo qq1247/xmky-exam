@@ -52,7 +52,7 @@ public class PostController extends BaseController{
 	}
 	
 	/**
-	 * 获取机构岗位树型列表
+	 * 获取机构岗位树
 	 * 
 	 * v1.0 zhanghc 2016-5-19下午9:32:43
 	 * @return List<Map<String,Object>>
@@ -63,7 +63,7 @@ public class PostController extends BaseController{
 		try {
 			return postService.getOrgPostTreeList();
 		} catch (Exception e) {
-			log.error("获取机构岗位树型列表错误：", e);
+			log.error("获取机构岗位树错误：", e);
 			return new ArrayList<Map<String,Object>>();
 		}
 	}
@@ -199,7 +199,7 @@ public class PostController extends BaseController{
 	}
 	
 	/**
-	 * 获取设置权限树型列表
+	 * 获取设置权限树
 	 * 
 	 * v1.0 zhanghc 2016-5-19下午9:32:43
 	 * @param id 岗位ID
@@ -211,7 +211,7 @@ public class PostController extends BaseController{
 		try {
 			return postService.getResUpdateResTreeList(id);
 		} catch (Exception e) {
-			log.error("获取设置权限树型列表错误：", e);
+			log.error("获取设置权限树错误：", e);
 			return new ArrayList<Map<String,Object>>();
 		}
 	}

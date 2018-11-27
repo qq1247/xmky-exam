@@ -26,9 +26,12 @@ public class QuestionTypeDaoImpl extends BaseDaoImpl<QuestionType> implements Qu
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT QUESTION_TYPE.ID, QUESTION_TYPE.NAME, QUESTION_TYPE.PARENT_ID, "
 				+ "QUESTION_TYPE.PARENT_SUB, PARENT_QUESTION_TYPE.NAME AS PARENT_NAME, "
-				+ "QUESTION_TYPE.NO "
-				+ "FROM EX_QUESTION_TYPE QUESTION_TYPE "
-				+ "LEFT JOIN EX_QUESTION_TYPE PARENT_QUESTION_TYPE ON QUESTION_TYPE.PARENT_ID = PARENT_QUESTION_TYPE.ID";
+				+ "QUESTION_TYPE.NO, "
+				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_USER _A WHERE QUESTION_TYPE.USER_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS USER_NAMES, "
+				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_ORG _A WHERE QUESTION_TYPE.ORG_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS ORG_NAMES, "
+				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_POST _A WHERE QUESTION_TYPE.POST_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS POST_NAMES "
+				+ "FROM EXM_QUESTION_TYPE QUESTION_TYPE "
+				+ "LEFT JOIN EXM_QUESTION_TYPE PARENT_QUESTION_TYPE ON QUESTION_TYPE.PARENT_ID = PARENT_QUESTION_TYPE.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "QUESTION_TYPE.PARENT_ID = ?", pageIn.getOne())//如果查询的是根目录，则查询所有。否则查询选中机构的子机构
 				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "QUESTION_TYPE.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
@@ -41,7 +44,7 @@ public class QuestionTypeDaoImpl extends BaseDaoImpl<QuestionType> implements Qu
 	@Override
 	public List<Map<String, Object>> getTreeList() {
 		String sql = "SELECT QUESTION_TYPE.ID, QUESTION_TYPE.NAME, QUESTION_TYPE.PARENT_ID, QUESTION_TYPE.PARENT_SUB "
-				+ "FROM EX_QUESTION_TYPE QUESTION_TYPE "
+				+ "FROM EXM_QUESTION_TYPE QUESTION_TYPE "
 				+ "WHERE QUESTION_TYPE.STATE = 1";
 		return getList(sql);
 	}
@@ -53,7 +56,7 @@ public class QuestionTypeDaoImpl extends BaseDaoImpl<QuestionType> implements Qu
 		sourceQuestionType.setParentId(targetId);
 		flush();
 
-		String sql = "UPDATE EX_QUESTION_TYPE QUESTION_TYPE" //
+		String sql = "UPDATE EXM_QUESTION_TYPE QUESTION_TYPE" //
 				+ "	SET QUESTION_TYPE.PARENT_SUB = REPLACE(QUESTION_TYPE.PARENT_SUB, ?, ?)"
 				+ "	WHERE QUESTION_TYPE.PARENT_SUB LIKE ?";
 		Object[] params = new Object[] { 
@@ -65,13 +68,73 @@ public class QuestionTypeDaoImpl extends BaseDaoImpl<QuestionType> implements Qu
 	
 	@Override
 	public List<QuestionType> getAllSubQuestionTypeList(Integer id) {
-		String sql = "SELECT * FROM EX_QUESTION_TYPE WHERE PARENT_SUB LIKE ? AND STATE = 1";
+		String sql = "SELECT * FROM EXM_QUESTION_TYPE WHERE PARENT_SUB LIKE ? AND STATE = 1";
 		return getList(sql, new Object[]{"%\\_"+id+"\\_%"}, QuestionType.class);
 	}
 	
 	@Override
 	public QuestionType getQuestionTypeByName(String name) {
-		String sql = "SELECT * FROM EX_QUESTION_TYPE WHERE NAME = ? AND STATE = 1";
+		String sql = "SELECT * FROM EXM_QUESTION_TYPE WHERE NAME = ? AND STATE = 1";
 		return getUnique(sql, new Object[]{name}, QuestionType.class);
+	}
+
+	@Override
+	public PageOut getAuthUserListpage(PageIn pageIn) {
+		String sql = "SELECT USER.ID, USER.NAME AS USER_NAME, USER.LOGIN_NAME, ORG.NAME AS ORG_NAME, POST_USER.POST_NAMES "
+				+ "FROM SYS_USER USER "
+				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
+				+ "LEFT JOIN (SELECT POST_USER.USER_ID, GROUP_CONCAT(POST.NAME) AS POST_NAMES "
+				+ "				FROM SYS_POST_USER POST_USER "
+				+ "				INNER JOIN SYS_POST POST ON POST_USER.POST_ID = POST.ID "
+				+ "				GROUP BY POST_USER.USER_ID ) POST_USER ON USER.ID = POST_USER.USER_ID";
+		SqlUtil sqlUtil = new SqlUtil(sql);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "ORG.ID = ?", pageIn.getOne())
+				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.getTen()), 
+						"EXISTS (SELECT 1 FROM EXM_QUESTION_TYPE Z WHERE Z.ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", 
+						pageIn.getTen())
+//				.addWhere("USER.STATE = ?", 1)//已添加过的可以显示
+				.addWhere("USER.ID != ?", 1)//排除管理员
+//				.addWhere("ORG.STATE = ?", 1)//已添加过的可以显示
+				.addOrder("USER.NAME", Order.DESC);
+		
+		PageOut pageOut = getListpage(sqlUtil, pageIn);
+		return pageOut;
+	}
+
+	@Override
+	public PageOut getAuthUserAddList(PageIn pageIn) {
+		String sql = "SELECT USER.ID, USER.NAME AS USER_NAME, USER.LOGIN_NAME, ORG.NAME AS ORG_NAME, POST_USER.POST_NAMES "
+				+ "FROM SYS_USER USER "
+				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
+				+ "LEFT JOIN (SELECT POST_USER.USER_ID, GROUP_CONCAT(POST.NAME) AS POST_NAMES "
+				+ "				FROM SYS_POST_USER POST_USER "
+				+ "				INNER JOIN SYS_POST POST ON POST_USER.POST_ID = POST.ID "
+				+ "				GROUP BY POST_USER.USER_ID ) POST_USER ON USER.ID = POST_USER.USER_ID";
+		SqlUtil sqlUtil = new SqlUtil(sql);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "ORG.ID = ?", pageIn.getOne())
+				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.getTen()), 
+						"NOT EXISTS (SELECT 1 FROM EXM_QUESTION_TYPE Z WHERE Z.ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", 
+						pageIn.getTen())
+				.addWhere("USER.STATE = ?", 1)//当前正常的用户
+				.addWhere("USER.ID != ?", 1)//排除管理员
+				.addWhere("ORG.STATE = ?", 1)//当前正常的机构
+				.addOrder("USER.NAME", Order.DESC);
+		
+		PageOut pageOut = getListpage(sqlUtil, pageIn);
+		return pageOut;
+	}
+
+	@Override
+	public List<QuestionType> getList() {
+		String sql = "SELECT * FROM EXM_QUESTION_TYPE WHERE STATE = 1";
+		return getList(sql, QuestionType.class);
+	}
+
+	@Override
+	public List<QuestionType> getList(Integer parentId) {
+		String sql = "SELECT * FROM EXM_QUESTION_TYPE WHERE STATE = 1 AND PARENT_ID = ?";
+		return getList(sql, new Object[]{parentId}, QuestionType.class);
 	}
 }

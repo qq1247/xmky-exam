@@ -19,7 +19,7 @@ import com.wcpdoc.exam.core.util.DateUtil;
  * v1.0 zhanghc 2016-5-24下午14:54:09
  */
 @Entity
-@Table(name = "EX_QUESTION_TYPE")
+@Table(name = "EXM_QUESTION_TYPE")
 public class QuestionType {
 	@Id
 	@GeneratedValue(generator = "generator")
@@ -41,7 +41,13 @@ public class QuestionType {
 	private Integer state;
 	@Column(name = "NO")
 	private Integer no;
-
+	@Column(name = "USER_IDS")
+	private String userIds;
+	@Column(name = "ORG_IDS")
+	private String orgIds;
+	@Column(name = "POST_IDS")
+	private String postIds;
+	
 	public Integer getId() {
 		return id;
 	}
@@ -104,5 +110,29 @@ public class QuestionType {
 
 	public void setNo(Integer no) {
 		this.no = no;
+	}
+
+	public String getUserIds() {
+		return userIds;
+	}
+
+	public void setUserIds(String userIds) {
+		this.userIds = userIds;
+	}
+
+	public String getOrgIds() {
+		return orgIds;
+	}
+
+	public void setOrgIds(String orgIds) {
+		this.orgIds = orgIds;
+	}
+
+	public String getPostIds() {
+		return postIds;
+	}
+
+	public void setPostIds(String postIds) {
+		this.postIds = postIds;
 	}
 }

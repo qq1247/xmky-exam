@@ -1,6 +1,5 @@
 package com.wcpdoc.exam.home.service;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,15 +21,6 @@ public interface HomeService extends BaseService<Object>{
 	 * @return Map<Integer,Long>
 	 */
 	Map<Integer, Long> getAuthSum(Integer userId);
-
-	/**
-	 * 获取未结束的考场列表
-	 * 
-	 * v1.0 zhanghc 2017-06-23 15:39:11
-	 * @param userId
-	 * @return List<Exam>
-	 */
-	List<Map<String, Object>> getUnFinishExamList(Integer userId);
 
 	/**
 	 * 完成登录

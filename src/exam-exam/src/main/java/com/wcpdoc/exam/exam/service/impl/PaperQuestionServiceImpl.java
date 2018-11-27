@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
-import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.exam.dao.PaperQuestionDao;
 import com.wcpdoc.exam.exam.entity.PaperQuestion;
 import com.wcpdoc.exam.exam.service.PaperQuestionService;
@@ -19,6 +18,7 @@ import com.wcpdoc.exam.exam.service.PaperQuestionService;
  * v1.0 zhanghc 2017-05-26 14:23:38
  */
 @Service
+@Deprecated
 public class PaperQuestionServiceImpl extends BaseServiceImp<PaperQuestion> implements PaperQuestionService {
 	@Resource
 	private PaperQuestionDao paperQuestionDao;
@@ -31,41 +31,41 @@ public class PaperQuestionServiceImpl extends BaseServiceImp<PaperQuestion> impl
 	
 	@Override
 	public void saveAndUpdate(PaperQuestion paperQuestion) {
-		//校验数据有效性
-		if(paperQuestion.getType() == null){
-			throw new RuntimeException("无法获取参数：paperQuestion.type");
-		}
-		if(paperQuestion.getType() != 1 && paperQuestion.getType() != 2){//1：章节；2：试题
-			throw new RuntimeException("无法获取参数：paperQuestion.type");
-		}
-		
-		if(paperQuestion.getType() == 1 && !ValidateUtil.isValid(paperQuestion.getName())){
-			throw new RuntimeException("无法获取参数：paperQuestion.name");
-		}
-		if(paperQuestion.getPaperId() == null){
-			throw new RuntimeException("无法获取参数：paperQuestion.paperId");
-		}
-		if(paperQuestion.getType() == 2 && paperQuestion.getQuestionId() == null){
-			throw new RuntimeException("无法获取参数：paperQuestion.questionId");
-		}
-//		if(paperQuestion.getType() == 1 && existName(paperQuestion)){
-//			throw new RuntimeException("名称已存在！");
+//		//校验数据有效性
+//		if(paperQuestion.getType() == null){
+//			throw new RuntimeException("无法获取参数：paperQuestion.type");
 //		}
-				
-		//保存试卷试题
-		if(paperQuestion.getParentId() == null){
-			paperQuestion.setParentId(0);
-		}
-		paperQuestionDao.save(paperQuestion);
-		
-		//更新父子关系
-		PaperQuestion parentPaperQuestion = paperQuestionDao.getEntity(paperQuestion.getParentId());
-		if(parentPaperQuestion == null){
-			paperQuestion.setParentSub("_" + paperQuestion.getId() + "_");
-		}else {
-			paperQuestion.setParentSub(parentPaperQuestion.getParentSub() + paperQuestion.getId() + "_");
-		}
-		paperQuestionDao.update(paperQuestion);
+//		if(paperQuestion.getType() != 1 && paperQuestion.getType() != 2){//1：章节；2：试题
+//			throw new RuntimeException("无法获取参数：paperQuestion.type");
+//		}
+//		
+//		if(paperQuestion.getType() == 1 && !ValidateUtil.isValid(paperQuestion.getName())){
+//			throw new RuntimeException("无法获取参数：paperQuestion.name");
+//		}
+//		if(paperQuestion.getPaperId() == null){
+//			throw new RuntimeException("无法获取参数：paperQuestion.paperId");
+//		}
+//		if(paperQuestion.getType() == 2 && paperQuestion.getQuestionId() == null){
+//			throw new RuntimeException("无法获取参数：paperQuestion.questionId");
+//		}
+////		if(paperQuestion.getType() == 1 && existName(paperQuestion)){
+////			throw new RuntimeException("名称已存在！");
+////		}
+//				
+//		//保存试卷试题
+//		if(paperQuestion.getParentId() == null){
+//			paperQuestion.setParentId(0);
+//		}
+//		paperQuestionDao.save(paperQuestion);
+//		
+//		//更新父子关系
+//		PaperQuestion parentPaperQuestion = paperQuestionDao.getEntity(paperQuestion.getParentId());
+//		if(parentPaperQuestion == null){
+//			paperQuestion.setParentSub("_" + paperQuestion.getId() + "_");
+//		}else {
+//			paperQuestion.setParentSub(parentPaperQuestion.getParentSub() + paperQuestion.getId() + "_");
+//		}
+//		paperQuestionDao.update(paperQuestion);
 	}
 	
 	/**

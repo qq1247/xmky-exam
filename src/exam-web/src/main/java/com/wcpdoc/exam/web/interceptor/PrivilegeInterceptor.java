@@ -12,6 +12,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.wcpdoc.exam.core.constant.ConstantManager;
 import com.wcpdoc.exam.core.entity.LoginUser;
+import com.wcpdoc.exam.core.util.PropertiesUtil;
 import com.wcpdoc.exam.sys.cache.ResCache;
 import com.wcpdoc.exam.sys.entity.Res;
 
@@ -25,8 +26,8 @@ public class PrivilegeInterceptor extends HandlerInterceptorAdapter {
 		log.debug("访问链接：{}", request.getRequestURI());
 		String contextPath = request.getContextPath();
 		String uri = request.getRequestURI().replaceFirst(contextPath + "/", "");
-		String fun = uri.substring(uri.lastIndexOf("/") + 1, uri.length());
-		if(fun.startsWith("pub")){
+		String pubRes = "," + PropertiesUtil.getValue("res.pub") + ",";
+		if(pubRes.contains("," + uri + ",")){
 			log.debug("公共资源，不拦截");
 			return true;
 		}

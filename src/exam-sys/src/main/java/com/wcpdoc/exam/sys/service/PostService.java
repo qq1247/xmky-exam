@@ -55,14 +55,14 @@ public interface PostService extends BaseService<Post>{
 	List<Post> getList(Integer orgId);
 
 	/**
-	 * 获取机构岗位树型列表
+	 * 获取机构岗位树
 	 * v1.0 zhanghc 2016-5-19下午9:32:43
 	 * @return List<Map<String,Object>>
 	 */
 	List<Map<String, Object>> getOrgPostTreeList();
 
 	/**
-	 * 获取设置权限树型列表
+	 * 获取设置权限树
 	 * v1.0 zhanghc 2016-5-19下午9:32:43
 	 * @param id 岗位ID
 	 * @return List<Map<String,Object>>

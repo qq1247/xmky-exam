@@ -1,7 +1,6 @@
 package com.wcpdoc.exam.exam.dao;
 
 import java.util.List;
-import java.util.Map;
 
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.entity.LoginUser;
@@ -58,15 +57,6 @@ public interface ExamDao extends BaseDao<Exam>{
 	void doUserDel(Integer id, Integer userId);
 
 	/**
-	 * 获取未结束的考试列表
-	 * 
-	 * v1.0 zhanghc 2017年6月22日下午10:31:08
-	 * @param userId
-	 * @return List<Map<String, Object>>
-	 */
-	List<Map<String, Object>> getUnFinishList(Integer userId);
-
-	/**
 	 * 获取考试分类
 	 * 
 	 * v1.0 zhanghc 2017年6月29日上午7:37:44
@@ -119,7 +109,7 @@ public interface ExamDao extends BaseDao<Exam>{
 	 * @param pageIn
 	 * @return PageOut
 	 */
-	PageOut getMarkPaperListpage(PageIn pageIn);
+	PageOut getMarkListpage(PageIn pageIn);
 
 	/**
 	 * 完成强制交卷

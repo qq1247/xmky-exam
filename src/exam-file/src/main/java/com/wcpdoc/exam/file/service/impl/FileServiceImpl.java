@@ -20,6 +20,7 @@ import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.PropertiesUtil;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.file.dao.FileDao;
 import com.wcpdoc.exam.file.entity.File;
 import com.wcpdoc.exam.file.entity.FileEx;
@@ -46,7 +47,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 	@Override
 	public String doTempUpload(MultipartFile[] files, String[] allowTypes, LoginUser user, String ip) {
 		//校验数据有效性
-		if(files == null){
+		if(!ValidateUtil.isValid(files)){
 			throw new RuntimeException("无法获取参数：files");
 		}
 		if(allowTypes == null){
@@ -112,8 +113,9 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 			throw new RuntimeException("无法获取参数：id");
 		}
 		File file = fileDao.getEntity(id);
-		if(file.getState().equals("1")){
-			throw new RuntimeException("临时附件【" + file.getName() + "】已经上传成功！");
+		if(file.getState() == 1){
+			//throw new RuntimeException("临时附件【" + file.getName() + "】已经上传成功！");
+			return;
 		}
 		
 		//数据库更新附件信息（如果先移动附件成功，而后数据库更新失败，恢复移动附件不好处理）
@@ -154,7 +156,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 	}
 
 	@Override
-	public FileEx getEntityWithFile(Integer id) {
+	public FileEx getEntityEx(Integer id) {
 		if(id == null){
 			throw new RuntimeException("无法获取参数：id");
 		}

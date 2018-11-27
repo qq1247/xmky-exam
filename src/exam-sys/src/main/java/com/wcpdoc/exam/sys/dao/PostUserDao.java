@@ -16,7 +16,7 @@ public interface PostUserDao extends BaseDao<PostUser>{
 	 * @param userId
 	 * void
 	 */
-	void deleteByUserId(Integer userId);
+	void delByUserId(Integer userId);
 
 	/**
 	 * 根据用户ID删除实体
@@ -24,5 +24,5 @@ public interface PostUserDao extends BaseDao<PostUser>{
 	 * @param postId
 	 * void
 	 */
-	void deleteByPostId(Integer postId);
+	void delByPostId(Integer postId);
 }

@@ -16,5 +16,5 @@ public interface OrgPostDao extends BaseDao<OrgPost>{
 	 * @param postId
 	 * void
 	 */
-	void deleteByPostId(Integer postId);
+	void delByPostId(Integer postId);
 }

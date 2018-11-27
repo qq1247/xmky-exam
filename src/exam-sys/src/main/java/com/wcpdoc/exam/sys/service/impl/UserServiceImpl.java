@@ -147,7 +147,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		
 		//完成设置岗位
 		for(Integer id : ids){
-			postUserService.deleteByUserId(id);
+			postUserService.delByUserId(id);
 			for(Integer postId : postIds){
 				PostUser postUser = new PostUser(postId, id);
 				postUserService.save(postUser);
@@ -180,7 +180,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 			user.setOrgId(orgId);
 			userDao.update(user);
 			
-			postUserService.deleteByUserId(id);
+			postUserService.delByUserId(id);
 		}
 	}
 	
@@ -276,6 +276,11 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		update(user);
 	}
 
+	public static void main(String[] args) {
+		String encryptPwd = new UserServiceImpl().getEncryptPwd("ws", "ws");
+		System.err.println(encryptPwd);
+	}
+	
 	@Override
 	public String getEncryptPwd(String loginName, String pwd) {
 		//校验数据有效性
@@ -287,5 +292,10 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		}
 		
 		return EncryptUtil.md52Base64(loginName + pwd);
+	}
+
+	@Override
+	public List<Post> getPostList(Integer id) {
+		return userDao.getPostList(id);
 	}
 }

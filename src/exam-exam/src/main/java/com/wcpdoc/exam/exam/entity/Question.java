@@ -19,7 +19,7 @@ import com.wcpdoc.exam.core.util.DateUtil;
  * v1.0 zhanghc 2017-05-07 14:56:29
  */
 @Entity
-@Table(name = "EX_QUESTION")
+@Table(name = "EXM_QUESTION")
 public class Question {
 	@Id
 	@GeneratedValue(generator = "generator")

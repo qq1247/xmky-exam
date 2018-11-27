@@ -17,7 +17,7 @@ public interface MarkUserService extends BaseService<MarkUser>{
 	 * @param id
 	 * void
 	 */
-	void delete(Integer examId, Integer id);
+	void del(Integer examId, Integer id);
 
 	/**
 	 * 获取判卷用户信息

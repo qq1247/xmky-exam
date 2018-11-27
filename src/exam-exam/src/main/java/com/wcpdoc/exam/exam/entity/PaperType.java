@@ -19,7 +19,7 @@ import com.wcpdoc.exam.core.util.DateUtil;
  * v1.0 zhanghc 2017-05-25 16:34:59
  */
 @Entity
-@Table(name = "EX_PAPER_TYPE")
+@Table(name = "EXM_PAPER_TYPE")
 public class PaperType {
 	@Id
 	@GeneratedValue(generator = "generator")
@@ -41,6 +41,12 @@ public class PaperType {
 	private Integer state;
 	@Column(name = "NO")
 	private Integer no;
+	@Column(name = "USER_IDS")
+	private String userIds;
+	@Column(name = "ORG_IDS")
+	private String orgIds;
+	@Column(name = "POST_IDS")
+	private String postIds;
 
 	public Integer getId() {
 		return id;
@@ -104,5 +110,29 @@ public class PaperType {
 
 	public void setNo(Integer no) {
 		this.no = no;
+	}
+
+	public String getUserIds() {
+		return userIds;
+	}
+
+	public void setUserIds(String userIds) {
+		this.userIds = userIds;
+	}
+
+	public String getOrgIds() {
+		return orgIds;
+	}
+
+	public void setOrgIds(String orgIds) {
+		this.orgIds = orgIds;
+	}
+
+	public String getPostIds() {
+		return postIds;
+	}
+
+	public void setPostIds(String postIds) {
+		this.postIds = postIds;
 	}
 }

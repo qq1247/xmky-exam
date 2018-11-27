@@ -22,14 +22,14 @@ public class ExamUserDaoImpl extends BaseDaoImpl<ExamUser> implements ExamUserDa
 	}
 
 	@Override
-	public void delete(Integer roomId, Integer userId) {
-		String sql = "DELETE FROM EX_EXAM_USER WHERE EXAM_ID = ? AND USER_ID = ?";
+	public void del(Integer roomId, Integer userId) {
+		String sql = "DELETE FROM EXM_EXAM_USER WHERE EXAM_ID = ? AND USER_ID = ?";
 		update(sql, new Object[]{roomId, userId});
 	}
 
 	@Override
 	public ExamUser getEntity(Integer examId, Integer userId) {
-		String sql = "SELECT * FROM EX_EXAM_USER WHERE EXAM_ID = ? AND USER_ID = ?";
+		String sql = "SELECT * FROM EXM_EXAM_USER WHERE EXAM_ID = ? AND USER_ID = ?";
 		return getUnique(sql, new Object[]{examId, userId}, ExamUser.class);
 	}
 }

@@ -60,5 +60,23 @@ public interface PaperQuestionDao extends BaseDao<PaperQuestion>{
 	 * @return PaperQuestion
 	 */
 	PaperQuestion getEntity(Integer paperId, Integer questionId);
+
+	/**
+	 * 获取试卷试题
+	 * 
+	 * v1.0 zhanghc 2018年10月20日下午2:31:55
+	 * @param paperId
+	 * @return List<PaperQuestion>
+	 */
+	List<PaperQuestion> getList2(Integer paperId);
+
+	/**
+	 * 获取章节列表
+	 * 
+	 * v1.0 zhanghc 2018年10月21日下午2:43:46
+	 * @param paperId
+	 * @return List<PaperQuestion>
+	 */
+	List<PaperQuestion> getChapterList(Integer paperId);
 	
 }

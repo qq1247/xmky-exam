@@ -26,12 +26,12 @@ public class PostUserServiceImpl extends BaseServiceImp<PostUser> implements Pos
 	}
 
 	@Override
-	public void deleteByUserId(Integer userId) {
-		postUserDao.deleteByUserId(userId);
+	public void delByUserId(Integer userId) {
+		postUserDao.delByUserId(userId);
 	}
 
 	@Override
-	public void deleteByPostId(Integer postId) {
-		postUserDao.deleteByPostId(postId);
+	public void delByPostId(Integer postId) {
+		postUserDao.delByPostId(postId);
 	}
 }

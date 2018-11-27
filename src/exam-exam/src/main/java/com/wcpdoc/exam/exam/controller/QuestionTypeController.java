@@ -18,6 +18,7 @@ import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.exam.entity.QuestionType;
 import com.wcpdoc.exam.exam.service.QuestionTypeService;
 import com.wcpdoc.exam.sys.entity.User;
@@ -52,7 +53,7 @@ public class QuestionTypeController extends BaseController{
 	}
 	
 	/**
-	 * 获取试题分类树型列表
+	 * 获取试题分类树
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
 	 * @return List<Map<String,Object>>
@@ -63,7 +64,7 @@ public class QuestionTypeController extends BaseController{
 		try {
 			return questionTypeService.getTreeList();
 		} catch (Exception e) {
-			log.error("获取试题分类树型列表错误：", e);
+			log.error("获取试题分类树错误：", e);
 			return new ArrayList<Map<String,Object>>();
 		}
 	}
@@ -202,7 +203,7 @@ public class QuestionTypeController extends BaseController{
 	}
 	
 	/**
-	 * 获取试题分类树型列表
+	 * 获取试题分类树
 	 * 
 	 * v1.0 zhanghc 2016-5-8上午11:00:00
 	 * @return List<Map<String,Object>>
@@ -213,7 +214,7 @@ public class QuestionTypeController extends BaseController{
 		try {
 			return questionTypeService.getTreeList();
 		} catch (Exception e) {
-			log.error("获取试题分类树型列表错误：", e);
+			log.error("获取试题分类树错误：", e);
 			return new ArrayList<Map<String,Object>>();
 		}
 	}
@@ -234,6 +235,253 @@ public class QuestionTypeController extends BaseController{
 		} catch (Exception e) {
 			log.error("移动试题分类错误：", e);
 			return new PageResult(false, "移动失败：" + e.getMessage());
+		}
+	}
+	
+	/**
+	 * 到达权限列表页面
+	 * 
+	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * @return String
+	 */
+	@RequestMapping("/toAuth")
+	public String toAuth(Model model, Integer id) {
+		try {
+			model.addAttribute("id", id);
+			return "/WEB-INF/jsp/exam/questionType/questionTypeAuthList.jsp";
+		} catch (Exception e) {
+			log.error("到达权限列表页面错误：", e);
+			return "/WEB-INF/jsp/exam/questionType/questionTypeAuthList.jsp";
+		}
+	}
+	
+	/**
+	 * 获取组织机构树
+	 * 
+	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * @return List<Map<String,Object>>
+	 */
+	@RequestMapping("/authUserOrgTreeList")
+	@ResponseBody
+	public List<Map<String, Object>> authUserOrgTreeList() {
+		try {
+			return questionTypeService.getOrgTreeList();
+		} catch (Exception e) {
+			log.error("获取组织机构树错误：", e);
+			return new ArrayList<Map<String,Object>>();
+		}
+	}
+	
+	/**
+	 * 权限用户列表 
+	 * 
+	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * @param pageIn
+	 * @return PageOut
+	 */
+	@RequestMapping("/authUserList")
+	@ResponseBody
+	public PageOut authUserList(PageIn pageIn) {
+		try {
+			return questionTypeService.getAuthUserListpage(pageIn);
+		} catch (Exception e) {
+			log.error("权限用户列表错误：", e);
+			return new PageOut();
+		}
+	}
+	
+	/**
+	 * 到达添加权限用户列表页面
+	 * 
+	 * v1.0 zhanghc 2017年6月19日上午7:37:14
+	 * @param id
+	 * @param model
+	 * @return String
+	 */
+	@RequestMapping("/toAuthUserAddList")
+	public String toAuthUserAddList(Model model, Integer id) {
+		try {
+			model.addAttribute("id", id);
+			return "/WEB-INF/jsp/exam/questionType/questionTypeAuthUserAddList.jsp";
+		} catch (Exception e) {
+			log.error("到达添加权限用户列表页面错误：", e);
+			return "/WEB-INF/jsp/exam/questionType/questionTypeAuthUserAddList.jsp";
+		}
+	}
+	
+	/**
+	 * 权限用户添加列表 
+	 * 
+	 * v1.0 zhanghc 2017年6月16日下午5:02:45
+	 * @param pageIn
+	 * @return PageOut
+	 */
+	@RequestMapping("/authUserAddList")
+	@ResponseBody
+	public PageOut authUserAddList(PageIn pageIn) {
+		try {
+			return questionTypeService.getAuthUserAddList(pageIn);
+		} catch (Exception e) {
+			log.error("权限用户添加列表错误：", e);
+			return new PageOut();
+		}
+	}
+	
+	/**
+	 * 完成添加权限用户
+	 * 
+	 * v1.0 zhanghc 2017年6月16日下午5:02:45
+	 * @param id
+	 * @param userids
+	 * @param syn2Sub
+	 * @return PageResult
+	 */
+	@RequestMapping("/doAuthUserAdd")
+	@ResponseBody
+	public PageResult doAuthUserAdd(Integer id, Integer[] userIds, boolean syn2Sub) {
+		try {
+			questionTypeService.doAuthUserAdd(id, userIds, syn2Sub, getCurrentUser());
+			return new PageResult(true, "添加成功");
+		} catch (Exception e) {
+			log.error("完成添加权限用户错误：", e);
+			return new PageResult(false, "添加失败：" + e.getMessage());
+		}
+	}
+	
+	/**
+	 * 完成删除权限用户
+	 * 
+	 * v1.0 zhanghc 2017年6月16日下午5:02:45
+	 * @param id
+	 * @param userIds
+	 * @param syn2Sub
+	 * @return PageResult
+	 */
+	@RequestMapping("/doAuthUserDel")
+	@ResponseBody
+	public PageResult doAuthUserDel(Integer id, Integer[] userIds, boolean syn2Sub) {
+		try {
+			questionTypeService.doAuthUserDel(id, userIds, syn2Sub, getCurrentUser());
+			return new PageResult(true, "删除成功");
+		} catch (Exception e) {
+			log.error("完成删除权限用户错误：", e);
+			return new PageResult(false, "删除失败：" + e.getMessage());
+		}
+	}
+	
+	/**
+	 * 完成保存权限机构
+	 * 
+	 * v1.0 zhanghc 2017年6月16日下午5:02:45
+	 * @param id
+	 * @param orgIds
+	 * @param syn2Sub
+	 * @return PageResult
+	 */
+	@RequestMapping("/doAuthOrgUpdate")
+	@ResponseBody
+	public PageResult doAuthOrgUpdate(Integer id, Integer[] orgIds, boolean syn2Sub) {
+		try {
+			questionTypeService.doAuthOrgUpdate(id, orgIds, syn2Sub, getCurrentUser());
+			return new PageResult(true, "保存成功");
+		} catch (Exception e) {
+			log.error("完成保存权限机构错误：", e);
+			return new PageResult(false, "保存失败：" + e.getMessage());
+		}
+	}
+	
+	/**
+	 * 获取组织机构树
+	 * 
+	 * v1.0 zhanghc 2018年5月31日下午10:07:39
+	 * @return List<Map<String,Object>>
+	 */
+	@RequestMapping("/authOrgOrgTreeList")
+	@ResponseBody
+	public List<Map<String, Object>> authOrgOrgTreeList(Integer id) {
+		try {
+			List<Map<String, Object>> orgTreeList = questionTypeService.getOrgTreeList();
+			QuestionType questionType = questionTypeService.getEntity(id);
+			if(questionType == null){
+				return orgTreeList;
+			}
+			
+			String orgIds = questionType.getOrgIds();
+			if(!ValidateUtil.isValid(orgIds)){
+				return orgTreeList;
+			}
+			
+			for(Map<String, Object> map : orgTreeList){
+				String orgId = map.get("ID").toString();
+				if(orgIds.contains("," + orgId + ",")){
+					map.put("CHECKED", true);
+				}
+			}
+			return orgTreeList;
+		} catch (Exception e) {
+			log.error("获取组织机构树错误：", e);
+			return new ArrayList<Map<String,Object>>();
+		}
+	}
+	
+	/**
+	 * 获取机构岗位树
+	 * 
+	 * v1.0 zhanghc 2018年5月31日下午10:07:39
+	 * @return List<Map<String,Object>>
+	 */
+	@RequestMapping("/authPostOrgTreeList")
+	@ResponseBody
+	public List<Map<String, Object>> authPostOrgTreeList(Integer id) {
+		try {
+			List<Map<String, Object>> orgPostTree = questionTypeService.getOrgPostTreeList();
+			QuestionType questionType = questionTypeService.getEntity(id);
+			if(questionType == null){
+				return orgPostTree;
+			}
+			
+			String postIds = questionType.getPostIds();
+			if(!ValidateUtil.isValid(postIds)){
+				return orgPostTree;
+			}
+			
+			for(Map<String, Object> map : orgPostTree){
+				String type = map.get("TYPE").toString();
+				if(!"POST".equals(type)){
+					continue;
+				}
+				
+				String postId = map.get("ID").toString();
+				if(postIds.contains("," + postId + ",")){
+					map.put("CHECKED", true);
+				}
+			}
+			
+			return orgPostTree;
+		} catch (Exception e) {
+			log.error("获取机构岗位树错误：", e);
+			return new ArrayList<Map<String,Object>>();
+		}
+	}
+	
+	/**
+	 * 完成保存权限岗位
+	 * 
+	 * v1.0 zhanghc 2017年6月16日下午5:02:45
+	 * @param id
+	 * @param orgIds
+	 * @param syn2Sub
+	 * @return PageResult
+	 */
+	@RequestMapping("/doAuthPostUpdate")
+	@ResponseBody
+	public PageResult doAuthPostUpdate(Integer id, Integer[] postIds, boolean syn2Sub) {
+		try {
+			questionTypeService.doAuthPostUpdate(id, postIds, syn2Sub, getCurrentUser());
+			return new PageResult(true, "保存成功");
+		} catch (Exception e) {
+			log.error("完成保存权限岗位错误：", e);
+			return new PageResult(false, "保存失败：" + e.getMessage());
 		}
 	}
 }

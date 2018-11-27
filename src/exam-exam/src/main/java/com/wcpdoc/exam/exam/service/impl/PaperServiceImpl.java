@@ -23,16 +23,19 @@ import com.wcpdoc.exam.core.util.BigDecimalUtil;
 import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.exam.dao.PaperDao;
+import com.wcpdoc.exam.exam.dao.PaperQuestionDao;
 import com.wcpdoc.exam.exam.entity.Paper;
 import com.wcpdoc.exam.exam.entity.PaperQuestion;
 import com.wcpdoc.exam.exam.entity.PaperQuestionEx;
 import com.wcpdoc.exam.exam.entity.PaperType;
 import com.wcpdoc.exam.exam.entity.Question;
-import com.wcpdoc.exam.exam.service.PaperQuestionService;
 import com.wcpdoc.exam.exam.service.PaperService;
 import com.wcpdoc.exam.exam.service.PaperTypeService;
 import com.wcpdoc.exam.exam.service.QuestionService;
 import com.wcpdoc.exam.exam.service.QuestionTypeService;
+import com.wcpdoc.exam.sys.entity.Org;
+import com.wcpdoc.exam.sys.entity.Post;
+import com.wcpdoc.exam.sys.service.UserService;
 
 /**
  * 试卷服务层实现
@@ -44,13 +47,15 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	@Resource
 	private PaperDao paperDao;
 	@Resource
-	private PaperTypeService paperTypeService;
+	private PaperQuestionDao paperQuestionDao;
 	@Resource
-	private PaperQuestionService paperQuestionService;
+	private PaperTypeService paperTypeService;
 	@Resource
 	private QuestionService questionService;
 	@Resource
 	private QuestionTypeService questionTypeService;
+	@Resource
+	private UserService userService;
 
 	@Override
 	@Resource(name = "paperDaoImpl")
@@ -59,8 +64,46 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 
 	@Override
-	public List<Map<String, Object>> getPaperTypeTreeList() {
-		return paperTypeService.getTreeList();
+	public List<Map<String, Object>> getPaperTypeTreeList(Integer userId) {
+		Org org = userService.getOrg(userId);
+		List<Post> postList = userService.getPostList(userId);
+		List<PaperType> paperTypeList = paperTypeService.getList();
+		List<Map<String, Object>> paperTypeTreeList = new ArrayList<Map<String,Object>>();
+		
+		for(PaperType paperType : paperTypeList){
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("ID", paperType.getId());
+			map.put("NAME", paperType.getName());
+			map.put("PARENT_ID", paperType.getParentId());
+			//map.put("DISABLED", true);
+			//map.put("EXPANDED", true);
+			
+			if(userId == 1){
+				paperTypeTreeList.add(map);
+				continue;
+			}
+			
+			if(paperType.getUserIds() != null 
+					&& paperType.getUserIds().contains(userId.toString())){//有用户权限
+				paperTypeTreeList.add(map);
+				continue;
+			}
+			if(paperType.getOrgIds() != null 
+					&& paperType.getOrgIds().contains(org.getId().toString())){//有机构权限
+				paperTypeTreeList.add(map);
+				continue;
+			}
+			
+			for(Post post : postList){
+				if(paperType.getPostIds() != null 
+						&& paperType.getPostIds().contains(post.getId().toString())){//有岗位权限
+					paperTypeTreeList.add(map);
+					break;
+				}
+			}
+		}
+		
+		return paperTypeTreeList;
 	}
 
 	@Override
@@ -109,139 +152,109 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 
 	@Override
 	public PaperQuestion getPaperQuestion(Integer paperQuestionId) {
-		return paperQuestionService.getEntity(paperQuestionId);
+		return paperQuestionDao.getEntity(paperQuestionId);
 	}
 
 	@Override
 	public void initRootPaperQuestion(Integer id, LoginUser user) {
-		PaperQuestion paperQuestion = paperDao.getRootPaperQuestion(id);
-		if(paperQuestion == null){
-			paperQuestion = new PaperQuestion();
-			paperQuestion.setName("试卷");
-			paperQuestion.setParentId(0);
-			paperQuestion.setParentSub("_1_");
-			paperQuestion.setUpdateTime(new Date());
-			paperQuestion.setUpdateUserId(user.getId());;
-			paperQuestion.setType(1);
-			paperQuestion.setNo(1);
-			paperQuestion.setPaperId(id);
-			paperQuestionService.save(paperQuestion);
-		}
+//		PaperQuestion paperQuestion = paperDao.getRootPaperQuestion(id);
+//		if(paperQuestion == null){
+//			paperQuestion = new PaperQuestion();
+//			paperQuestion.setName("试卷");
+//			paperQuestion.setParentId(0);
+//			paperQuestion.setParentSub("_1_");
+//			paperQuestion.setUpdateTime(new Date());
+//			paperQuestion.setUpdateUserId(user.getId());;
+//			paperQuestion.setType(1);
+//			paperQuestion.setNo(1);
+//			paperQuestion.setPaperId(id);
+//			paperQuestionService.save(paperQuestion);
+//		}
 	}
 
 	@Override
-	public void doPaperCfgAdd(PaperQuestion paperQuestion, LoginUser user) {
-		paperQuestion.setUpdateTime(new Date());
-		paperQuestion.setUpdateUserId(user.getId());
-		paperQuestion.setType(1);
-		
-		List<PaperQuestion> paperQuestionList = paperQuestionService.getList(paperQuestion.getParentId());
-		paperQuestion.setNo(paperQuestionList.size() + 1);
-		paperQuestionService.saveAndUpdate(paperQuestion);
-	}
-
-	@Override
-	public void doPaperCfgEdit(PaperQuestion paperQuestion, LoginUser user) {
-		PaperQuestion entity = paperQuestionService.getEntity(paperQuestion.getId());
-		entity.setName(paperQuestion.getName());
-		entity.setDescription(paperQuestion.getDescription());
-		entity.setUpdateTime(new Date());
-		entity.setUpdateUserId(user.getId());
-		paperQuestionService.update(entity);
-	}
-
-	@Override
-	public PageOut getPaperCfgListpage(PageIn pageIn) {
-		return paperDao.getPaperCfgListpage(pageIn);
-	}
-
-	@Override
-	public void doPaperCfgListAdd(Integer paperId, Integer parentPaperQuestionId, Integer[] questionIds, LoginUser user) {
+	public void doChapterAdd(PaperQuestion chapter, LoginUser user) {
 		//校验数据有效性
-		if(paperId == null){
+		if(chapter.getPaperId() == null){
 			throw new RuntimeException("无法获取参数：paperId");
 		}
-		if(parentPaperQuestionId == null){
-			throw new RuntimeException("无法获取参数：parentPaperQuestionId");
+				
+		//添加章节
+		chapter.setUpdateTime(new Date());
+		chapter.setUpdateUserId(user.getId());
+		chapter.setType(1);
+		chapter.setParentId(0);
+		
+		List<PaperQuestion> paperQuestionList = paperQuestionDao.getList(chapter.getParentId());
+		chapter.setNo(paperQuestionList.size() + 1);
+		
+		paperQuestionDao.save(chapter);
+		
+		//更新父子关系
+		chapter.setParentSub("_" + chapter.getId() + "_");
+		paperQuestionDao.update(chapter);
+	}
+
+	@Override
+	public void doChapterEdit(PaperQuestion chapter, LoginUser user) {
+		PaperQuestion c = paperQuestionDao.getEntity(chapter.getId());
+		c.setName(chapter.getName());
+		c.setDescription(chapter.getDescription());
+		c.setUpdateTime(new Date());
+		c.setUpdateUserId(user.getId());
+		paperQuestionDao.update(c);
+	}
+
+	@Override
+	public PageOut getQuestionListpage(PageIn pageIn) {
+		return paperDao.getQuestionListpage(pageIn);
+	}
+
+	@Override
+	public void doQuestionAdd(Integer chapterId, Integer[] questionIds, LoginUser user){
+		//校验数据有效性
+		if(chapterId == null){
+			throw new RuntimeException("无法获取参数：chapterId");
 		}
 		if(!ValidateUtil.isValid(questionIds)){
 			throw new RuntimeException("无法获取参数：questionIds");
 		}
 		
 		//添加试题
-		List<PaperQuestion> paperQuestionList = paperQuestionService.getList(parentPaperQuestionId);
-		int maxNo = paperQuestionList.size();
+		PaperQuestion chapter = paperQuestionDao.getEntity(chapterId);
+		List<PaperQuestion> questionList = paperQuestionDao.getList(chapterId);
+		int maxNo = questionList.size();
 		for(Integer questionId : questionIds){
-			PaperQuestion paperQuestion = new PaperQuestion();
-			paperQuestion.setUpdateTime(new Date());
-			paperQuestion.setUpdateUserId(user.getId());
-			paperQuestion.setPaperId(paperId);
-			paperQuestion.setParentId(parentPaperQuestionId);
-			paperQuestion.setQuestionId(questionId);
-			paperQuestion.setType(2);
-			paperQuestion.setNo(++maxNo);
-			paperQuestionService.saveAndUpdate(paperQuestion);
+			PaperQuestion pq = new PaperQuestion();
+			pq.setUpdateTime(new Date());
+			pq.setUpdateUserId(user.getId());
+			pq.setPaperId(chapter.getPaperId());
+			pq.setParentId(chapterId);
+			pq.setQuestionId(questionId);
+			pq.setType(2);
+			pq.setNo(++maxNo);
+			pq.setScore(BigDecimal.ZERO);
+			paperQuestionDao.save(pq);
 		}
 	}
 
 	@Override
-	public void doPaperCfgDel(Integer paperQuestionId) {
-		PaperQuestion paperQuestion = paperQuestionService.getEntity(paperQuestionId);
-		if(paperQuestion.getPaperId().equals(0)){
-			return;
+	public void doChapterDel(Integer chapterId) {
+		//删除章节
+		List<PaperQuestion> questionList = paperQuestionDao.getList(chapterId);
+		for(PaperQuestion pq : questionList){
+			paperQuestionDao.del(pq.getId());
 		}
-		
-		//删除试卷试题
-		doPaperQuestionDel2(paperQuestionId);
+		PaperQuestion chapter = paperQuestionDao.getEntity(chapterId);//不要放到下一行，因为第二行执行删除了。
+		paperQuestionDao.del(chapterId);
 		
 		//更新总分数
-		updateTotalScore(paperQuestion.getPaperId());
-	}
-	
-	public void doPaperQuestionDel2(Integer paperQuestionId) {
-		List<PaperQuestion> list = paperQuestionService.getList(paperQuestionId);
-		for(PaperQuestion paperQuestion : list){
-			doPaperQuestionDel2(paperQuestion.getId());
-		}
-		
-		paperQuestionService.delete(paperQuestionId);
-	}
-
-	@Override
-	public void doPaperCfgSort(Integer paperQuestionId, Integer no){
-		PaperQuestion currentPaperQuestion = paperQuestionService.getEntity(paperQuestionId);
-		List<PaperQuestion> paperQuestionList = paperQuestionService.getList(currentPaperQuestion.getParentId());
-		if(no <= 0 || no > paperQuestionList.size()){
-			throw new RuntimeException("参数非法：no");
-		}
-		if(currentPaperQuestion.getNo() == no){
-			return;
-		}
-		
-		Collections.sort(paperQuestionList, new Comparator<PaperQuestion>() {
-			@Override
-			public int compare(PaperQuestion o1, PaperQuestion o2) {
-				return o1.getNo() - o2.getNo();
-			}
-		});
-		
-		paperQuestionList.remove(currentPaperQuestion);
-		if(currentPaperQuestion.getNo() < no){
-			paperQuestionList.add(no - 1, currentPaperQuestion);
-		}else{
-			paperQuestionList.add(no, currentPaperQuestion);
-		}
-		
-		for(int i = 0; i < paperQuestionList.size(); i++){
-			PaperQuestion paperQuestion = paperQuestionList.get(i);
-			paperQuestion.setNo(i + 1);
-			paperQuestionService.update(paperQuestion);
-		}
+		updateTotalScore(chapter.getPaperId());
 	}
 
 	@Override
 	public List<PaperQuestion> getPaperQuestionList(Integer paperQuestionId) {
-		return paperQuestionService.getList(paperQuestionId);
+		return paperQuestionDao.getList(paperQuestionId);
 	}
 
 	@Override
@@ -283,42 +296,81 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 
 	@Override
-	public void doPaperCfgScoreUpdate(Integer[] paperQuestionIds, BigDecimal[] scores) {
+	public void doScoresUpdate(Integer chapterId, BigDecimal score, String options) {
 		//校验数据有效性
-		if(!ValidateUtil.isValid(paperQuestionIds)){
-			throw new RuntimeException("无法获取参数：paperQuestionIds");
+		if(chapterId == null){
+			throw new RuntimeException("无法获取参数：chapterId");
 		}
-		if(!ValidateUtil.isValid(scores)){
-			throw new RuntimeException("无法获取参数：scores");
+		if(score == null){
+			throw new RuntimeException("无法获取参数：score");
 		}
 		
 		//更新试卷分数
-		Integer paperId = null;
-		for(int i = 0; i < paperQuestionIds.length; i++){
-			PaperQuestion paperQuestion = paperQuestionService.getEntity(paperQuestionIds[i]);
-			paperQuestion.setScore(scores[i]);
-			paperQuestionService.update(paperQuestion);
-			
-			if(i == 0){
-				paperId = paperQuestion.getPaperId();
+		List<PaperQuestion> pqList = paperQuestionDao.getList(chapterId);
+		for(PaperQuestion pq : pqList){
+			Question question = questionService.getEntity(pq.getQuestionId());
+			if(question.getType() == 2){
+				if(ValidateUtil.isValid(options) && options.contains("1")){
+					pq.setOptions("1");
+				}else{
+					pq.setOptions(null);
+				}
+			}else if(question.getType() == 3){
+				pq.setOptions(options);
+			}else{
+				pq.setOptions(null);
 			}
+			
+			pq.setScore(score);
+			paperQuestionDao.update(pq);
 		}
-		paperDao.flush();
 		
-
 		//更新试卷总分
-		updateTotalScore(paperId);
+		if(pqList.size() > 0){
+			updateTotalScore(pqList.get(0).getPaperId());
+		}
+	}
+	
+	@Override
+	public void doScoreUpdate(Integer paperQuestionId, BigDecimal score, String options) {
+		//校验数据有效性
+		if(paperQuestionId == null){
+			throw new RuntimeException("无法获取参数：paperQuestionId");
+		}
+		if(score == null){
+			throw new RuntimeException("无法获取参数：score");
+		}
+		
+		PaperQuestion pq = paperQuestionDao.getEntity(paperQuestionId);
+		Question question = questionService.getEntity(pq.getQuestionId());
+		if(question.getType() == 2){
+			if(ValidateUtil.isValid(options) && options.contains("1")){
+				pq.setOptions("1");
+			}else{
+				pq.setOptions(null);
+			}
+		}else if(question.getType() == 3){
+			pq.setOptions(options);
+		}else{
+			pq.setOptions(null);
+		}
+		
+		pq.setScore(score);
+		paperQuestionDao.update(pq);
+		
+		//更新试卷总分
+		updateTotalScore(pq.getPaperId());
 	}
 
 	private void updateTotalScore(Integer paperId) {
 		BigDecimal totalScore = new BigDecimal(0);
-		List<PaperQuestion> paperQuestionList = paperQuestionService.getPaperQuestionList(paperId);
+		List<PaperQuestion> paperQuestionList = paperQuestionDao.getPaperQuestionList(paperId);
 		for(PaperQuestion paperQuestion : paperQuestionList){
 			if(paperQuestion.getType() != 2){
 				continue;
 			}
 			
-			totalScore = new BigDecimal(BigDecimalUtil.add(totalScore.doubleValue(), paperQuestion.getScore().doubleValue()));
+			totalScore = new BigDecimal(BigDecimalUtil.add(totalScore.toString(), paperQuestion.getScore().toString()));
 		}
 		
 		Paper paper = getEntity(paperId);
@@ -337,7 +389,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 
 	@Override
-	public void deleteAndUpdate(Integer[] ids) {
+	public void delAndUpdate(Integer[] ids) {
 		//校验数据有效性
 		if(!ValidateUtil.isValid(ids)){
 			throw new RuntimeException("无法获取参数：ids");
@@ -349,5 +401,156 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			paper.setState(0);
 			update(paper);
 		}
+	}
+
+	@Override
+	public PaperType getPaperType2(Integer paperTypeId) {
+		return paperTypeService.getEntity(paperTypeId);
+	}
+
+	@Override
+	public List<Map<String, Object>> getQuestionTypeTreeList(Integer userId) {
+		return questionService.getQuestionTypeTreeList(userId);
+	}
+
+	@Override
+	public void doQuestionClear(Integer chapterId, LoginUser currentUser) {
+		//校验数据有效性
+		if(chapterId == null){
+			throw new RuntimeException("无法获取参数：chapterId");
+		}
+		
+		List<PaperQuestion> pqList = paperQuestionDao.getList(chapterId);
+		for(PaperQuestion pq : pqList){
+			paperQuestionDao.del(pq.getId());
+		}
+	}
+	
+	@Override
+	public void doChapterUp(Integer chapterId){
+		//校验数据有效性
+		if(chapterId == null){
+			throw new RuntimeException("无法获取参数：chapterId");
+		}
+		
+		//当前章节上移
+		PaperQuestion chapter = paperQuestionDao.getEntity(chapterId);
+		List<PaperQuestion> chapterList = paperQuestionDao.getChapterList(chapter.getPaperId());
+		Collections.sort(chapterList, new Comparator<PaperQuestion>() {
+			@Override
+			public int compare(PaperQuestion o1, PaperQuestion o2) {
+				return o2.getNo() - o1.getNo();
+			}
+		});
+		
+		for(PaperQuestion cur : chapterList){
+			if(chapter.getNo() > cur.getNo()){
+				Integer no = cur.getNo();
+				cur.setNo(chapter.getNo());
+				chapter.setNo(no);
+				paperQuestionDao.update(cur);
+				paperQuestionDao.update(chapter);
+				break;
+			}
+		}
+	}
+
+	@Override
+	public void doChapterDown(Integer chapterId) {
+		//校验数据有效性
+		if(chapterId == null){
+			throw new RuntimeException("无法获取参数：chapterId");
+		}
+		
+		//当前章节下移
+		PaperQuestion chapter = paperQuestionDao.getEntity(chapterId);
+		List<PaperQuestion> chapterList = paperQuestionDao.getChapterList(chapter.getPaperId());
+		Collections.sort(chapterList, new Comparator<PaperQuestion>() {
+			@Override
+			public int compare(PaperQuestion o1, PaperQuestion o2) {
+				return o1.getNo() - o2.getNo();
+			}
+		});
+		
+		for(PaperQuestion cur : chapterList){
+			if(chapter.getNo() < cur.getNo()){
+				Integer no = cur.getNo();
+				cur.setNo(chapter.getNo());
+				chapter.setNo(no);
+				paperQuestionDao.update(cur);
+				paperQuestionDao.update(chapter);
+				break;
+			}
+		}
+	}
+
+	@Override
+	public void doQuestionUp(Integer paperQuestionId) {
+		//校验数据有效性
+		if(paperQuestionId == null){
+			throw new RuntimeException("无法获取参数：paperQuestionId");
+		}
+		
+		//当前试题上移
+		PaperQuestion pq = paperQuestionDao.getEntity(paperQuestionId);
+		List<PaperQuestion> pqList = paperQuestionDao.getList(pq.getParentId());
+		
+		Collections.sort(pqList, new Comparator<PaperQuestion>() {
+			@Override
+			public int compare(PaperQuestion o1, PaperQuestion o2) {
+				return o2.getNo() - o1.getNo();
+			}
+		});
+		
+		for(PaperQuestion cur : pqList){
+			if(pq.getNo() > cur.getNo()){
+				Integer no = cur.getNo();
+				cur.setNo(pq.getNo());
+				pq.setNo(no);
+				paperQuestionDao.update(cur);
+				paperQuestionDao.update(pq);
+				break;
+			}
+		}
+	}
+
+	@Override
+	public void doQuestionDown(Integer paperQuestionId) {
+		//校验数据有效性
+		if(paperQuestionId == null){
+			throw new RuntimeException("无法获取参数：paperQuestionId");
+		}
+		
+		//当前试题下移
+		PaperQuestion pq = paperQuestionDao.getEntity(paperQuestionId);
+		List<PaperQuestion> pqList = paperQuestionDao.getList(pq.getParentId());
+		
+		Collections.sort(pqList, new Comparator<PaperQuestion>() {
+			@Override
+			public int compare(PaperQuestion o1, PaperQuestion o2) {
+				return o1.getNo() - o2.getNo();
+			}
+		});
+		
+		for(PaperQuestion cur : pqList){
+			if(pq.getNo() < cur.getNo()){
+				Integer no = cur.getNo();
+				cur.setNo(pq.getNo());
+				pq.setNo(no);
+				paperQuestionDao.update(cur);
+				paperQuestionDao.update(pq);
+				break;
+			}
+		}
+	}
+
+	@Override
+	public void doQuestionDel(Integer paperQuestionId) {
+		paperQuestionDao.del(paperQuestionId);
+	}
+
+	@Override
+	public PaperQuestion getPaperQuestion(Integer paperId, Integer questionId) {
+		return paperQuestionDao.getEntity(paperId, questionId);
 	}
 }

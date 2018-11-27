@@ -1,5 +1,6 @@
 package com.wcpdoc.exam.exam.service.impl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -8,12 +9,17 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.exam.core.dao.BaseDao;
+import com.wcpdoc.exam.core.entity.LoginUser;
+import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.exam.dao.ExamTypeDao;
 import com.wcpdoc.exam.exam.entity.ExamType;
 import com.wcpdoc.exam.exam.service.ExamTypeExService;
 import com.wcpdoc.exam.exam.service.ExamTypeService;
+import com.wcpdoc.exam.sys.service.OrgService;
+import com.wcpdoc.exam.sys.service.PostService;
 /**
  * 考试分类服务层实现
  * 
@@ -25,6 +31,10 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 	private ExamTypeDao examTypeDao;
 	@Resource
 	private ExamTypeExService examTypeExService;
+	@Resource
+	private OrgService orgService;
+	@Resource
+	private PostService postService;
 
 	@Override
 	@Resource(name = "examTypeDaoImpl")
@@ -120,7 +130,7 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 
 	/**
 	 * 名称是否已存在
-	 * v1.0 zhanghc 2017-06-28 21:34:41
+	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * @param examType
 	 * @return boolean
 	 */
@@ -151,5 +161,174 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public List<Map<String, Object>> getOrgTreeList() {
+		return orgService.getTreeList();
+	}
+
+	@Override
+	public PageOut getAuthUserListpage(PageIn pageIn) {
+		return examTypeDao.getAuthUserListpage(pageIn);
+	}
+
+	@Override
+	public PageOut getAuthUserAddList(PageIn pageIn) {
+		return examTypeDao.getAuthUserAddList(pageIn);
+	}
+
+	@Override
+	public void doAuthUserAdd(Integer id, Integer[] userIds, boolean syn2Sub, LoginUser user) {
+		//校验数据有效性
+		if(id == null){
+			throw new RuntimeException("无法获取参数：id");
+		}
+		if(!ValidateUtil.isValid(userIds)){
+			throw new RuntimeException("无法获取参数：userIds");
+		}
+		
+		//添加权限用户
+		if(syn2Sub){
+			List<ExamType> examTypeList = getList(id);
+			for(ExamType examType : examTypeList){
+				doAuthUserAdd(examType.getId(), userIds, syn2Sub, user);
+			}
+		}
+		
+		ExamType examType = getEntity(id);
+		StringBuilder _userIds = new StringBuilder();
+		if(ValidateUtil.isValid(examType.getUserIds())){
+			_userIds.append(examType.getUserIds());
+		}else{
+			_userIds.append(",");
+		}
+		for(Integer userId : userIds){
+			if(_userIds.toString().contains("," + userId + ",")){
+				continue;
+			}
+			_userIds.append(userId).append(",");
+		}
+		examType.setUserIds(_userIds.toString());
+		examType.setUpdateTime(new Date());
+		examType.setUpdateUserId(user.getId());
+		update(examType);
+	}
+
+	private List<ExamType> getList(Integer id) {
+		return examTypeDao.getList(id);
+	}
+
+	@Override
+	public void doAuthUserDel(Integer id, Integer[] userIds, boolean syn2Sub, LoginUser user) {
+		//校验数据有效性
+		if(id == null){
+			throw new RuntimeException("无法获取参数：id");
+		}
+		if(!ValidateUtil.isValid(userIds)){
+			throw new RuntimeException("无法获取参数：userIds");
+		}
+		
+		if(syn2Sub){
+			List<ExamType> examTypeList = getList(id);
+			for(ExamType examType : examTypeList){
+				doAuthUserDel(examType.getId(), userIds, syn2Sub, user);
+			}
+		}
+		
+		ExamType examType = getEntity(id);
+		if(examType == null){
+			return;
+		}
+		
+		String _userIds = examType.getUserIds();
+		if(!ValidateUtil.isValid(_userIds)){
+			return;
+		}
+		for(Integer userId : userIds){
+			_userIds = _userIds.replaceAll("," + userId + ",", ",");//,2,4,5,55,32,32,
+		}
+		if(_userIds.equals(",")){
+			_userIds = null;
+		}
+		
+		examType.setUserIds(_userIds);
+		update(examType);
+	}
+
+	@Override
+	public void doAuthOrgUpdate(Integer id, Integer[] orgIds, boolean syn2Sub, LoginUser user) {
+		//校验数据有效性
+		if(id == null){
+			throw new RuntimeException("无法获取参数：id");
+		}
+//		if(!ValidateUtil.isValid(orgIds)){
+//			throw new RuntimeException("无法获取参数：orgIds");//全不选就是空。
+//		}
+		
+		//添加权限机构
+		if(syn2Sub){
+			List<ExamType> examTypeList = getList(id);
+			for(ExamType examType : examTypeList){
+				doAuthOrgUpdate(examType.getId(), orgIds, syn2Sub, user);
+			}
+		}
+		
+		ExamType examType = getEntity(id);
+		StringBuilder _orgIds = new StringBuilder(",");
+		for(Integer orgId : orgIds){
+			_orgIds.append(orgId).append(",");
+		}
+		if(_orgIds.toString().equals(",")){
+			examType.setOrgIds(null);
+		}else{
+			examType.setOrgIds(_orgIds.toString());
+		}
+		examType.setUpdateTime(new Date());
+		examType.setUpdateUserId(user.getId());
+		update(examType);
+	}
+
+	@Override
+	public List<Map<String, Object>> getOrgPostTreeList() {
+		return postService.getOrgPostTreeList();
+	}
+
+	@Override
+	public void doAuthPostUpdate(Integer id, Integer[] postIds, boolean syn2Sub, LoginUser user) {
+		//校验数据有效性
+		if(id == null){
+			throw new RuntimeException("无法获取参数：id");
+		}
+//		if(!ValidateUtil.isValid(postIds)){
+//			throw new RuntimeException("无法获取参数：postIds");//全不选就是空。
+//		}
+		
+		//添加权限机构
+		if(syn2Sub){
+			List<ExamType> examTypeList = getList(id);
+			for(ExamType examType : examTypeList){
+				doAuthPostUpdate(examType.getId(), postIds, syn2Sub, user);
+			}
+		}
+		
+		ExamType examType = getEntity(id);
+		StringBuilder _postIds = new StringBuilder(",");
+		for(Integer postId : postIds){
+			_postIds.append(postId).append(",");
+		}
+		if(_postIds.toString().equals(",")){
+			examType.setPostIds(null);
+		}else{
+			examType.setPostIds(_postIds.toString());
+		}
+		examType.setUpdateTime(new Date());
+		examType.setUpdateUserId(user.getId());
+		update(examType);
+	}
+
+	@Override
+	public List<ExamType> getList() {
+		return examTypeDao.getList();
 	}
 }

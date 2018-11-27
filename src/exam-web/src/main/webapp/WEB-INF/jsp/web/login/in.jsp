@@ -12,7 +12,7 @@
 		<%@include file="/script/myJs/common.jspf"%>
 	</head>
 	<body>
-		<form id="form" action="login/pubDoIn" method="post">
+		<form id="form" action="login/doIn" method="post">
 			<table style="width: 100%;height: 100%;text-align: center;">
 				<tr>
 					<td style="width: 30%;">

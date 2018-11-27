@@ -204,7 +204,7 @@ public class ResController extends BaseController{
 	}
 	
 	/**
-	 * 获取资源树型列表
+	 * 获取资源树
 	 * 
 	 * v1.0 zhanghc 2016-6-11下午8:57:40
 	 * @return List<Map<String,Object>>
@@ -215,7 +215,7 @@ public class ResController extends BaseController{
 		try {
 			return resService.getTreeList(1);
 		} catch (Exception e) {
-			log.error("获取资源树型列表错误：", e);
+			log.error("获取资源树错误：", e);
 			return new ArrayList<Map<String,Object>>();
 		}
 	}

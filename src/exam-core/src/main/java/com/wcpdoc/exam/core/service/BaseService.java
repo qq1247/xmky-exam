@@ -15,9 +15,9 @@ public interface BaseService<T>{
 
 	public void update(T entity);
 	
-	public void delete(Integer id);
+	public void del(Integer id);
 	
-	public void delete(Integer[] ids);
+	public void del(Integer[] ids);
 	
 	public T getEntity(Integer id);
 	

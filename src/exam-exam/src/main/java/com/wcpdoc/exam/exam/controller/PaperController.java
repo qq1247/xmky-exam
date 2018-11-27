@@ -1,30 +1,9 @@
 package com.wcpdoc.exam.exam.controller;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wcpdoc.exam.core.controller.BaseController;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
-import com.wcpdoc.exam.core.entity.PageResult;
-import com.wcpdoc.exam.exam.entity.Paper;
-import com.wcpdoc.exam.exam.entity.PaperQuestion;
-import com.wcpdoc.exam.exam.entity.PaperQuestionEx;
-import com.wcpdoc.exam.exam.entity.PaperType;
-import com.wcpdoc.exam.exam.service.PaperService;
-import com.wcpdoc.exam.sys.cache.DictCache;
 
 /**
  * 试卷控制层
@@ -33,18 +12,19 @@ import com.wcpdoc.exam.sys.cache.DictCache;
  */
 @Controller
 @RequestMapping("/paper")
+@Deprecated
 public class PaperController extends BaseController{
-	private static final Logger log = LoggerFactory.getLogger(PaperController.class);
+	/*private static final Logger log = LoggerFactory.getLogger(PaperController.class);
 	
 	@Resource
 	private PaperService paperService;
 	
-	/**
+	*//**
 	 * 到达试卷列表页面 
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @return String
-	 */
+	 *//*
 	@RequestMapping("/toList")
 	public String toList() {
 		try {
@@ -55,29 +35,29 @@ public class PaperController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 获取试卷分类数据
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @return List<Map<String,Object>>
-	 */
+	 *//*
 	@RequestMapping("/paperTypeTreeList")
 	@ResponseBody
 	public List<Map<String, Object>> getPaperTypeTreeList() {
 		try {
 			return paperService.getPaperTypeTreeList();
 		} catch (Exception e) {
-			log.error("获取试卷分类树型列表错误：", e);
+			log.error("获取试卷分类树错误：", e);
 			return new ArrayList<Map<String,Object>>();
 		}
 	}
 	
-	/**
+	*//**
 	 * 试卷列表 
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @return pageOut
-	 */
+	 *//*
 	@RequestMapping("/list")
 	@ResponseBody
 	public PageOut list(PageIn pageIn) {
@@ -89,12 +69,12 @@ public class PaperController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 到达添加试卷页面 
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @return String
-	 */
+	 *//*
 	@RequestMapping("/toAdd")
 	public String toAdd(Model model) {
 		try {
@@ -106,12 +86,12 @@ public class PaperController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 完成添加试卷
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @return pageOut
-	 */
+	 *//*
 	@RequestMapping("/doAdd")
 	@ResponseBody
 	public PageResult doAdd(Paper paper) {
@@ -126,12 +106,12 @@ public class PaperController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 到达修改试卷页面 
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @return String
-	 */
+	 *//*
 	@RequestMapping("/toEdit")
 	public String toEdit(Model model, Integer id) {
 		try {
@@ -148,12 +128,12 @@ public class PaperController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 完成修改试卷
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @return pageOut
-	 */
+	 *//*
 	@RequestMapping("/doEdit")
 	@ResponseBody
 	public PageResult doEdit(Paper paper) {
@@ -173,17 +153,17 @@ public class PaperController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 完成删除试卷
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @return pageOut
-	 */
+	 *//*
 	@RequestMapping("/doDel")
 	@ResponseBody
 	public PageResult doDel(Integer[] ids) {
 		try {
-			paperService.deleteAndUpdate(ids);
+			paperService.delAndUpdate(ids);
 			return new PageResult(true, "删除成功");
 		} catch (Exception e) {
 			log.error("完成删除试卷错误：", e);
@@ -191,12 +171,12 @@ public class PaperController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 到达设置试卷分类页面
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @return String
-	 */
+	 *//*
 	@RequestMapping("/toPaperTypeUpdate")
 	public String toPaperTypeUpdate() {
 		try {
@@ -207,31 +187,31 @@ public class PaperController extends BaseController{
 		}
 	}
 	
-	/**
-	 * 获取试卷分类树型列表
+	*//**
+	 * 获取试卷分类树
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @return List<Map<String,Object>>
-	 */
+	 *//*
 	@RequestMapping("/paperTypeUpdatePaperTypeTreeList")
 	@ResponseBody
 	public List<Map<String, Object>> paperTypeUpdatePaperTypeTreeList() {
 		try {
 			return paperService.getPaperTypeTreeList();
 		} catch (Exception e) {
-			log.error("获取试卷分类树型列表错误：", e);
+			log.error("获取试卷分类树错误：", e);
 			return new ArrayList<Map<String,Object>>();
 		}
 	}
 	
-	/**
+	*//**
 	 * 完成设置试卷分类
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @param ids 用户ID
 	 * @param paperTypeId 试卷分类ID
 	 * @return PageResult
-	 */
+	 *//*
 	@RequestMapping("/doPaperTypeUpdate")
 	@ResponseBody
 	public PageResult doPaperTypeUpdate(Integer[] ids, Integer paperTypeId) {
@@ -244,12 +224,12 @@ public class PaperController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 到达配置试卷页面
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @return String
-	 */
+	 *//*
 	@RequestMapping("/toPaperCfg")
 	public String toPaperCfg(Model model, Integer id) {
 		try {
@@ -262,30 +242,30 @@ public class PaperController extends BaseController{
 		}
 	}
 	
-	/**
-	 * 获取配置试卷树型列表
+	*//**
+	 * 获取配置试卷树
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @return List<Map<String,Object>>
-	 */
+	 *//*
 	@RequestMapping("/paperCfgPaperTreeList")
 	@ResponseBody
 	public List<Map<String, Object>> paperCfgPaperTreeList(Integer id) {
 		try {
 			return paperService.getPaperCfgPaperTreeList(id);
 		} catch (Exception e) {
-			log.error("获取配置试卷树型列表错误：", e);
+			log.error("获取配置试卷树错误：", e);
 			return new ArrayList<Map<String,Object>>();
 		}
 	}
 	
-	/**
+	*//**
 	 * 
 	 * 到达配置试卷添加章节页面 
 	 * 
 	 * v1.0 zhanghc 2017年5月26日下午4:41:34
 	 * @return  String
-	 */
+	 *//*
 	@RequestMapping("/toPaperCfgAdd")
 	public String toPaperCfgAdd() {
 		try {
@@ -296,13 +276,13 @@ public class PaperController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 完成配置试卷添加章节
 	 * 
 	 * v1.0 zhanghc 2017年5月27日上午9:36:57
 	 * @param paper
 	 * @return PageResult
-	 */
+	 *//*
 	@RequestMapping("/doPaperCfgAdd")
 	@ResponseBody
 	public PageResult doPaperCfgAdd(PaperQuestion paperQuestion) {
@@ -315,14 +295,14 @@ public class PaperController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 到达配置试卷修改章节页面 
 	 * 
 	 * v1.0 zhanghc 2017年5月27日上午10:55:21
 	 * @param paperQuestionId
 	 * @param model
 	 * @return String
-	 */
+	 *//*
 	@RequestMapping("/toPaperCfgEdit")
 	public String toPaperCfgEdit(Model model, Integer paperQuestionId) {
 		try {
@@ -335,13 +315,13 @@ public class PaperController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 完成配置试卷修改章节
 	 * 
 	 * v1.0 zhanghc 2017年5月27日上午11:03:59
 	 * @param paperQuestion
 	 * @return PageResult
-	 */
+	 *//*
 	@RequestMapping("/doPaperCfgEdit")
 	@ResponseBody
 	public PageResult doPaperCfgEdit(PaperQuestion paperQuestion) {
@@ -354,12 +334,12 @@ public class PaperController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 到达配置试卷试题列表页面
 	 * 
 	 * v1.0 zhanghc 2017年5月27日下午2:37:00
 	 * @return String
-	 */
+	 *//*
 	@RequestMapping("/toPaperCfgList")
 	public String toPaperCfgList(Model model) {
 		try {
@@ -372,30 +352,30 @@ public class PaperController extends BaseController{
 		}
 	}
 	
-	/**
-	 * 获取配置试卷试题分类树型列表
+	*//**
+	 * 获取配置试卷试题分类树
 	 * 
 	 * v1.0 zhanghc 2017年6月2日下午3:07:43
 	 * @return List<Map<String,Object>>
-	 */
+	 *//*
 	@RequestMapping("/paperCfgListQuestionTypeTreeList")
 	@ResponseBody
 	public List<Map<String, Object>> paperCfgListQuestionTypeTreeList() {
 		try {
 			return paperService.getQuestionTypeTreeList();
 		} catch (Exception e) {
-			log.error("获取配置试卷试题分类树型列表错误：", e);
+			log.error("获取配置试卷试题分类树错误：", e);
 			return new ArrayList<Map<String,Object>>();
 		}
 	}
 	
-	/**
+	*//**
 	 * 配置试卷试题列表
 	 * 
 	 * v1.0 zhanghc 2017年5月27日下午2:39:34
 	 * @param pageIn
 	 * @return PageOut
-	 */
+	 *//*
 	@RequestMapping("/paperCfgList")
 	@ResponseBody
 	public PageOut paperCfgList(PageIn pageIn) {
@@ -407,13 +387,13 @@ public class PaperController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 完成配置试卷添加试题
 	 * 
 	 * v1.0 zhanghc 2017年5月27日下午2:58:39
 	 * @param paperQuestion
 	 * @return PageResult
-	 */
+	 *//*
 	@RequestMapping("/doPaperCfgListAdd")
 	@ResponseBody
 	public PageResult doPaperCfgListAdd(Integer paperId, Integer parentPaperQuestionId, Integer[] questionIds) {
@@ -426,7 +406,7 @@ public class PaperController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 完成配置试卷删除试题
 	 * 
 	 * v1.0 zhanghc 2017年5月27日下午5:47:55
@@ -435,7 +415,7 @@ public class PaperController extends BaseController{
 	 * @param questionIds
 	 * @return
 	 * PageResult
-	 */
+	 *//*
 	@RequestMapping("/doPaperCfgDel")
 	@ResponseBody
 	public PageResult doPaperCfgDel(Integer paperQuestionId) {
@@ -448,12 +428,12 @@ public class PaperController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 到达配置试卷试题排序页面
 	 * 
 	 * v1.0 zhanghc 2017年6月1日下午2:54:00
 	 * @return PageOut
-	 */
+	 *//*
 	@RequestMapping("/toPaperCfgSort")
 	public String toPaperCfgSort(Model model, Integer paperQuestionId) {
 		try {
@@ -468,14 +448,14 @@ public class PaperController extends BaseController{
 	}
 
 	
-	/**
+	*//**
 	 * 完成配置试卷试题排序
 	 * 
 	 * v1.0 zhanghc 2017年5月31日上午8:55:35
 	 * @param sourceQuestionId
 	 * @param targetQuestionId
 	 * @return PageResult
-	 */
+	 *//*
 	@RequestMapping("/doPaperCfgSort")
 	@ResponseBody
 	public PageResult doPaperCfgSort(Integer paperQuestionId, Integer no) {
@@ -488,12 +468,12 @@ public class PaperController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 到达配置试卷预览页面
 	 * 
 	 * v1.0 zhanghc 2017年6月4日下午9:07:02
 	 * @return String
-	 */
+	 *//*
 	@RequestMapping("/toPaperCfgPreview")
 	public String toPaperCfgPreview(Model model, Integer id) {
 		try {
@@ -508,14 +488,14 @@ public class PaperController extends BaseController{
 		}
 	}
 	
-	/**
+	*//**
 	 * 完成配置试卷设置分数
 	 * 
 	 * v1.0 zhanghc 2017年6月9日下午3:48:51
 	 * @param paperQuestionId
 	 * @param no
 	 * @return PageResult
-	 */
+	 *//*
 	@RequestMapping("/doPaperCfgScoreUpdate")
 	@ResponseBody
 	public PageResult doPaperCfgScoreUpdate(Integer[] paperQuestionIds, BigDecimal[] scores) {
@@ -526,5 +506,5 @@ public class PaperController extends BaseController{
 			log.error("完成设置分数错误：", e);
 			return new PageResult(false, "设置失败：" + e.getMessage());
 		}
-	}
+	}*/
 }

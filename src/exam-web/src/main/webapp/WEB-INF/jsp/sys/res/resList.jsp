@@ -98,7 +98,6 @@
 				parentField : "PARENT_ID",
 				iconClsFiled : "ICON",
 				checkedFiled : "CHECKED",
-				lines : true,
 			    url : "res/treeList",
 				<my:auth url="res/toMove">dnd : true,
 				onStopDrag : toResMoveForMenu,</my:auth>
@@ -213,8 +212,8 @@
 						$.messager.progress("close");
 	
 						var obj = $.parseJSON(data);
-						if (!obj.success) {
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if (!obj.succ) {
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 							return;
 						}
 	
@@ -302,8 +301,8 @@
 						$.messager.progress("close");
 	
 						var obj = $.parseJSON(data);
-						if (!obj.success) {
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if (!obj.succ) {
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 							return;
 						}
 	
@@ -328,8 +327,8 @@
 						resTree.tree("reload");
 						$.messager.progress("close");
 
-						if (!obj.success) {
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if (!obj.succ) {
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 						}
 					}
 				});
@@ -407,7 +406,6 @@
 						parentField : "PARENT_ID",
 						iconClsFiled : "ICON",
 						checkedFiled : "CHECKED",
-						lines : true,
 					    url : "res/moveResTreeList",
 					});
 				}
@@ -456,8 +454,8 @@
 						}
 						$.messager.progress("close");
 						
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 						}
 					}
 				});

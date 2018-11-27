@@ -16,7 +16,7 @@ public interface PostUserService extends BaseService<PostUser> {
 	 * @param userId
 	 * void
 	 */
-	void deleteByUserId(Integer userId);
+	void delByUserId(Integer userId);
 
 	/**
 	 * 根据岗位ID删除实体
@@ -24,6 +24,6 @@ public interface PostUserService extends BaseService<PostUser> {
 	 * @param postId
 	 * void
 	 */
-	void deleteByPostId(Integer postId);
+	void delByPostId(Integer postId);
 
 }

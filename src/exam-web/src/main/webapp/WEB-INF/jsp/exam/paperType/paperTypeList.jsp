@@ -40,6 +40,7 @@
 								<my:auth url="paperType/toEdit"><a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" onclick="toPaperTypeEditForBtn();">修改</a></my:auth>
 								<my:auth url="paperType/doDel"><a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" onclick="doPaperTypeDelForBtn();">删除</a></my:auth>
 								<my:auth url="paperType/toMove"><a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" onclick="toPaperTypeMoveForBtn();">移动</a></my:auth>
+								<my:auth url="paperType/toAuth"><a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" onclick="toPaperTypeAuth();">设置权限</a></my:auth>
 							</div>
 						</div>
 						<%-- 试卷分类数据表格 --%>
@@ -71,11 +72,14 @@
 				onDblClickRow : <my:auth url="paperType/toEdit">toPaperTypeEditForDblClick</my:auth>,
 				toolbar : "#paperTypeToolbar",
 				columns : [[ 
-						{field : "ID", title : "", checkbox : true}, 
-						{field : "NAME", title : "名称", width : 80, align : "center"},
-						{field : "PARENT_NAME", title : "上级试卷分类 ", width : 80, align : "center"},
-						{field : "NO", title : "排序", width : 80, align : "center"},
-						]]
+							{field : "ID", title : "", checkbox : true}, 
+							{field : "NAME", title : "名称", width : 80, align : "center"},
+							{field : "PARENT_NAME", title : "上级试题分类 ", width : 80, align : "center"},
+							{field : "NO", title : "排序 ", width : 80, align : "center"},
+							{field : "USER_NAMES", title : "用户权限 ", width : 80, align : "center"},
+							{field : "ORG_NAMES", title : "机构权限 ", width : 80, align : "center"},
+							{field : "POST_NAMES", title : "岗位权限  ", width : 80, align : "center"}
+							]]
 			});
 		}
 		
@@ -87,7 +91,6 @@
 				parentField : "PARENT_ID",
 				iconClsFiled : "ICON",
 				checkedFiled : "CHECKED",
-				lines : true,
 			    url : "paperType/treeList",
 				<my:auth url="paperType/doMove">dnd : true,
 				onStopDrag : toPaperTypeMoveForMenu,</my:auth>
@@ -188,8 +191,8 @@
 						$.messager.progress("close"); 
 						
 						var obj = $.parseJSON(data);
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 							return;
 						}
 						
@@ -270,8 +273,8 @@
 						$.messager.progress("close"); 
 						
 						var obj = $.parseJSON(data);
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 							return;
 						}
 						
@@ -296,8 +299,8 @@
 						paperTypeTree.tree("reload");
 						$.messager.progress("close");
 						
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 						}
 					}
 				});
@@ -375,7 +378,6 @@
 						parentField : "PARENT_ID",
 						iconClsFiled : "ICON",
 						checkedFiled : "CHECKED",
-						lines : true,
 					    url : "paperType/movePaperTypeTreeList",
 					});
 				}
@@ -424,8 +426,8 @@
 						}
 						$.messager.progress("close");
 						
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 						}
 					}
 				});
@@ -435,6 +437,445 @@
 		//刷新试卷分类
 		function paperTypeTreeFlush(){
 			paperTypeTree.tree("reload");
+		}
+
+		//到达权限页面
+		function toPaperTypeAuth(){
+			var paperTypeGridRows = $("#paperTypeGrid").datagrid("getChecked");
+			if (paperTypeGridRows.length != 1) {
+				parent.$.messager.alert("提示消息", "请选择一行数据！", "info");
+				return;
+			}
+			
+			var paperTypeAuthDialog;
+			paperTypeAuthDialog = $("<div/>").dialog({
+				title : "权限列表",
+				href : "paperType/toAuth",
+				queryParams : {id : paperTypeGridRows[0].ID},
+				maximized : true,
+				onLoad : function() {
+					
+				}
+			});
+		}
+		
+		//权限用户查询
+		function paperTypeAuthUserQuery(){
+			var paperTypeAuthUserGrid = $("#paperTypeAuthUserGrid");
+			var paperTypeAuthUserQueryForm = $("#paperTypeAuthUserQueryForm");
+			paperTypeAuthUserGrid.datagrid("uncheckAll");
+			paperTypeAuthUserGrid.datagrid("load", $.fn.my.serializeObj(paperTypeAuthUserQueryForm));
+		}
+		
+		//权限用户重置
+		function paperTypeAuthUserReset(){
+			var paperTypeAuthUserQueryForm = $("#paperTypeAuthUserQueryForm");
+			paperTypeAuthUserQueryForm.form("reset");
+			paperTypeAuthUserQuery();
+		}
+		
+		//完成添加权限用户
+		function doPaperTypeAuthUser(paperTypeAuthUserListDialog){
+			var paperTypeAuthUserGridRows = $("#paperTypeAuthUserGrid").datagrid("getChecked");
+			if (paperTypeAuthUserGridRows.length == 0) {
+				parent.$.messager.alert("提示消息", "请选择一行或多行数据！", "info");
+				return;
+			}
+			
+			var params = $.fn.my.serializeField(paperTypeAuthUserGridRows, {attrName : "userIds"});
+			params += "&id=" + $("#paperTypeAuthUser_ten").val();
+			
+			$.messager.confirm("确认消息", "确定要添加？", function(ok) {
+				if (!ok) {
+					return;
+				}
+				
+				$.messager.progress();
+				$.ajax({
+					url : "paperType/doAuthUser",
+					data : params,
+					success : function(obj){
+						$("#paperTypeAuthUserGrid").datagrid("reload");
+						$.messager.progress("close");
+						
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
+							return;
+						}
+						paperTypeAuthUserListDialog.dialog("close");
+					}
+				});
+			});
+		}
+		
+		//到达添加权限用户页面
+		function toPaperTypeAuthUserAddList(){
+			var paperTypeAuthUserAddListDialog;
+			paperTypeAuthUserAddListDialog = $("<div/>").dialog({
+				title : "用户列表",
+				href : "paperType/toAuthUserAddList",
+				queryParams : {id : $("#paperTypeAuthUser_ten").val()},
+				toolbar : "#paperTypeAuthUserAddToolbar",
+				maximized : true,
+				buttons : [{
+					text : "添加",
+					iconCls : "icon-add", 
+					selected : true, 
+					handler : function (){
+						doPaperTypeAuthUserAdd(paperTypeAuthUserAddListDialog);
+					}
+				}],
+				onLoad : function() {
+					var paperTypeAuthUserAddGrid = $("#paperTypeAuthUserAddGrid"); //用户表格对象
+					var paperTypeAuthUserAddQueryForm = $("#paperTypeAuthUserAddQueryForm"); //用户查询对象
+					var paperTypeAuthUserAddOrgTree = $("#paperTypeAuthUserAddOrgTree"); //组织机构树对象
+					var paperTypeAuthUserAddCurSelOrgId = ""; //当前选中的组织机构ID
+					var paperTypeAuthUserAddCurSelOrgName = ""; //当前选中的组织机构名称
+					
+					paperTypeAuthUserAddGrid.datagrid({
+						url : "",
+						columns : [[ 
+								{field : "ID", title : "", checkbox : true}, 
+								{field : "USER_NAME", title : "姓名", width : 80, align : "center"}, 
+								{field : "LOGIN_NAME", title : "登录名称", width : 80, align : "center"}, 
+								{field : "ORG_NAME", title : "组织机构", width : 80, align : "center"},
+								{field : "POST_NAMES", title : "岗位", width : 80, align : "center"},
+								]]
+					});
+					
+					paperTypeAuthUserAddOrgTree.tree({
+						idFiled : "ID",
+						textFiled : "NAME",
+						parentField : "PARENT_ID",
+						iconClsFiled : "ICON",
+						checkedFiled : "CHECKED",
+					    url : "paperType/authUserOrgTreeList",
+						onSelect : function(node){
+							paperTypeAuthUserAddCurSelOrgId = node.ID;
+							paperTypeAuthUserAddCurSelOrgName = node.NAME;
+							
+							$("#paperTypeAuthUserAdd_one").val(paperTypeAuthUserAddCurSelOrgId);
+							paperTypeAuthUserAddGrid.datagrid("uncheckAll");
+							paperTypeAuthUserAddGrid.datagrid("reload", $.fn.my.serializeObj(paperTypeAuthUserAddQueryForm));
+						},
+						onLoadSuccess : function(node, data){
+							if(!paperTypeAuthUserAddCurSelOrgId || !paperTypeAuthUserAddGrid.datagrid("options").url){//如果是第一次
+								paperTypeAuthUserAddCurSelOrgId = 1;
+								paperTypeAuthUserAddGrid.datagrid("options").url = "paperType/authUserAddList";
+							}
+							
+							var node = paperTypeAuthUserAddOrgTree.tree("find", paperTypeAuthUserAddCurSelOrgId);
+							if(!node){
+								paperTypeAuthUserAddCurSelOrgId = 1;
+								node = paperTypeAuthUserAddOrgTree.tree("find", paperTypeAuthUserAddCurSelOrgId);
+							}
+							paperTypeAuthUserAddOrgTree.tree("select", node.target);
+						}
+					});
+				}
+			});
+		}
+		
+		//添加权限用户查询
+		function paperTypeAuthUserAddQuery(){
+			var paperTypeAuthUserAddGrid = $("#paperTypeAuthUserAddGrid");
+			var paperTypeAuthUserAddQueryForm = $("#paperTypeAuthUserAddQueryForm");
+			paperTypeAuthUserAddGrid.datagrid("uncheckAll");
+			paperTypeAuthUserAddGrid.datagrid("load", $.fn.my.serializeObj(paperTypeAuthUserAddQueryForm));
+		}
+		
+		//添加权限用户重置
+		function paperTypeAuthUserAddReset(){
+			var paperTypeAuthUserAddQueryForm = $("#paperTypeAuthUserAddQueryForm");
+			paperTypeAuthUserAddQueryForm.form("reset");
+			paperTypeAuthUserAddQuery();
+		}
+		
+		//完成添加权限用户
+		function doPaperTypeAuthUserAdd(paperTypeAuthUserAddListDialog){
+			var paperTypeAuthUserAddGridRows = $("#paperTypeAuthUserAddGrid").datagrid("getChecked");
+			if (paperTypeAuthUserAddGridRows.length == 0) {
+				parent.$.messager.alert("提示消息", "请选择一行或多行数据！", "info");
+				return;
+			}
+			
+			var params = $.fn.my.serializeField(paperTypeAuthUserAddGridRows, {attrName : "userIds"});
+			params += "&id=" + $("#paperTypeAuthUserAdd_ten").val();
+			
+			$.messager.confirm("确认消息", "确定要添加？", function(ok) {
+				if (!ok) {
+					return;
+				}
+				
+				$.messager.confirm("确认消息", "同步到子【试卷分类】？", function(ok) {
+					params += "&syn2Sub=" + ok;
+					$.messager.progress();
+					$.ajax({
+						url : "paperType/doAuthUserAdd",
+						data : params,
+						success : function(obj){
+							$("#paperTypeAuthUserGrid").datagrid("reload");
+							paperTypeTree.tree("reload");
+							$.messager.progress("close");
+							
+							if(!obj.succ){
+								parent.$.messager.alert("提示消息", obj.msg, "info");
+								return;
+							}
+							paperTypeAuthUserAddListDialog.dialog("close");
+						}
+					});
+				});
+			});
+		}
+		
+		//完成删除权限用户
+		function doPaperTypeAuthUserDel(){
+			var paperTypeAuthUserGridRows = $("#paperTypeAuthUserGrid").datagrid("getChecked");
+			if (paperTypeAuthUserGridRows.length == 0) {
+				parent.$.messager.alert("提示消息", "请选择一行或多行数据！", "info");
+				return;
+			}
+			
+			var params = $.fn.my.serializeField(paperTypeAuthUserGridRows, {attrName : "userIds"});
+			params += "&id=" + $("#paperTypeAuthUser_ten").val();
+			$.messager.confirm("确认消息", "确定要删除？", function(ok) {
+				if (!ok) {
+					return;
+				}
+				$.messager.confirm("确认消息", "同步到子【试卷分类】？", function(ok) {
+					params += "&syn2Sub=" + ok;
+					$.messager.progress();
+					$.ajax({
+						url : "paperType/doAuthUserDel",
+						data : params,
+						success : function(obj){
+							$("#paperTypeAuthUserGrid").datagrid("reload");
+							paperTypeTree.tree("reload");
+							$.messager.progress("close");
+							
+							if(!obj.succ){
+								parent.$.messager.alert("提示消息", obj.msg, "info");
+								return;
+							}
+						}
+					});
+				});
+			});
+		}
+		
+		//更新tabs
+		function updateTabs(title){
+			if(title == "用户权限"){
+				updateUserTab();
+			}else if(title == "机构权限"){
+				updateOrgTab();
+			}else if(title == "岗位权限"){
+				updatePostTab();
+			}
+		}
+		
+		//更新用户标签
+		function updateUserTab(){
+			var paperTypeAuthUserGrid = $("#paperTypeAuthUserGrid"); //用户表格对象
+			var paperTypeAuthUserQueryForm = $("#paperTypeAuthUserQueryForm"); //用户查询对象
+			var paperTypeAuthUserOrgTree = $("#paperTypeAuthUserOrgTree"); //组织机构树对象
+			var paperTypeAuthUserCurSelOrgId = ""; //当前选中的组织机构ID
+			var paperTypeAuthUserCurSelOrgName = ""; //当前选中的组织机构名称
+			
+			paperTypeAuthUserGrid.datagrid({
+				url : "",
+				columns : [[ 
+						{field : "ID", title : "", checkbox : true}, 
+						{field : "USER_NAME", title : "姓名", width : 80, align : "center"}, 
+						{field : "LOGIN_NAME", title : "登录名称", width : 80, align : "center"}, 
+						{field : "ORG_NAME", title : "组织机构", width : 80, align : "center"},
+						{field : "POST_NAMES", title : "岗位", width : 80, align : "center"},
+						]]
+			});
+			
+			paperTypeAuthUserOrgTree.tree({
+				idFiled : "ID",
+				textFiled : "NAME",
+				parentField : "PARENT_ID",
+				iconClsFiled : "ICON",
+				checkedFiled : "CHECKED",
+			    url : "paperType/authUserOrgTreeList",
+				onSelect : function(node){
+					paperTypeAuthUserCurSelOrgId = node.ID;
+					paperTypeAuthUserCurSelOrgName = node.NAME;
+					
+					$("#paperTypeAuthUser_one").val(paperTypeAuthUserCurSelOrgId);
+					paperTypeAuthUserGrid.datagrid("uncheckAll");
+					paperTypeAuthUserGrid.datagrid("reload", $.fn.my.serializeObj(paperTypeAuthUserQueryForm));
+				},
+				onLoadSuccess : function(node, data){
+					if(!paperTypeAuthUserCurSelOrgId || !paperTypeAuthUserGrid.datagrid("options").url){//如果是第一次
+						paperTypeAuthUserCurSelOrgId = 1;
+						paperTypeAuthUserGrid.datagrid("options").url = "paperType/authUserList";
+					}
+					
+					var node = paperTypeAuthUserOrgTree.tree("find", paperTypeAuthUserCurSelOrgId);
+					if(!node){
+						paperTypeAuthUserCurSelOrgId = 1;
+						node = paperTypeAuthUserOrgTree.tree("find", paperTypeAuthUserCurSelOrgId);
+					}
+					paperTypeAuthUserOrgTree.tree("select", node.target);
+				}
+			});
+		}
+		
+		//更新机构标签
+		function updateOrgTab(){
+			var paperTypeAuthOrgOrgTree = $("#paperTypeAuthOrgOrgTree"); 
+			paperTypeAuthOrgOrgTree.tree({
+			    url : "paperType/authOrgOrgTreeList",
+			    queryParams : {
+			    	id : $("#paperTypeAuthUser_ten").val()
+			    },
+				idFiled : "ID",
+				textFiled : "NAME",
+				parentField : "PARENT_ID",
+				iconClsFiled : "ICON",
+				checkedFiled : "CHECKED",
+				checkbox : true
+			});
+		}
+		
+		//更新岗位标签
+		function updatePostTab(){
+			var paperTypeAuthPostOrgTree = $("#paperTypeAuthPostOrgTree"); 
+			paperTypeAuthPostOrgTree.tree({
+			    url : "paperType/authPostOrgTreeList",
+			    queryParams : {
+			    	id : $("#paperTypeAuthUser_ten").val()
+			    },
+				idFiled : "ID",
+				textFiled : "NAME",
+				parentField : "PARENT_ID",
+				iconClsFiled : "ICON",
+				checkedFiled : "CHECKED",
+				checkbox : true,
+				loadFilter : function(data, parent) {
+					var opt = $(this).data().tree.options;
+					var idFiled = opt.idFiled || "id";
+					var textFiled = opt.textFiled || "text";
+					var checkedFiled = opt.checkedFiled || "checked";
+					var iconClsFiled = opt.iconClsFiled || "iconCls";
+					var parentField = opt.parentField;
+					var list = data;
+					var TreeList = [];
+					var treeMap = {};
+
+					for (var i = 0; i < list.length; i++) {
+						list[i]["id"] = list[i][idFiled];
+						if(list[i].TYPE == "POST"){
+							list[i]["id"] = "p" + list[i][idFiled];
+						}
+						list[i]["text"] = list[i][textFiled];
+						if(list[i][checkedFiled]){
+							list[i]["checked"] = true;
+						}
+						list[i]["iconCls"] = list[i][iconClsFiled];
+						treeMap[list[i]["id"]] = list[i];
+						if(list[i].TYPE == "POST"){
+							treeMap[list[i]["id"]] = "p" + list[i];
+						}
+					}
+
+					for (var i = 0; i < list.length; i++) {
+						if (treeMap[list[i][parentField]] && list[i]["id"] != list[i][parentField]) {
+							if (!treeMap[list[i][parentField]]["children"]) {
+								treeMap[list[i][parentField]]["children"] = [];
+							}
+							treeMap[list[i][parentField]]["children"].push(list[i]);
+						} else {
+							TreeList.push(list[i]);
+						}
+					}
+					return TreeList;
+				}
+			});
+		}
+		
+		//保存机构权限
+		function doPaperTypeAuthOrgUpdate(){
+			var orgTree = $("#paperTypeAuthOrgOrgTree");
+			var orgNodes = orgTree.tree("getChecked", ["checked"]);
+			var params = "&id=" + $("#paperTypeAuthUser_ten").val();
+			if(orgNodes.length == 0){
+				params += "&orgIds=";
+			}else{
+				for(index in orgNodes){
+					params += "&orgIds=" + orgNodes[index].ID;
+				}
+			}
+			
+			$.messager.confirm("确认消息", "确定要保存？", function(ok){
+				if (!ok){
+					return;
+				}
+
+				$.messager.confirm("确认消息", "同步到子【试卷分类】？", function(ok) {
+					params += "&syn2Sub=" + ok;
+					
+					$.messager.progress();
+					$.ajax({
+						url : "paperType/doAuthOrgUpdate",
+						data : params,
+						success : function(obj){
+							orgTree.tree("reload");
+							paperTypeTree.tree("reload");
+							$.messager.progress("close");
+							
+							if(!obj.succ){
+								parent.$.messager.alert("提示消息", obj.msg, "info");
+								return;
+							}
+						}
+					});
+				});
+			});
+		}
+		
+		//保存岗位权限
+		function doPaperTypeAuthPostUpdate(){
+			var orgPostTree = $("#paperTypeAuthPostOrgTree");
+			var postNodes = orgPostTree.tree("getChecked", ["checked"]);
+			var params = "&id=" + $("#paperTypeAuthUser_ten").val();
+			if(postNodes.length == 0){
+				params += "&postIds=";
+			}else{
+				for(index in postNodes){
+					params += "&postIds=" + postNodes[index].ID;
+				}
+			}
+			
+			$.messager.confirm("确认消息", "确定要保存？", function(ok){
+				if (!ok){
+					return;
+				}
+
+				$.messager.confirm("确认消息", "同步到子【试卷分类】？", function(ok) {
+					params += "&syn2Sub=" + ok;
+					
+					$.messager.progress();
+					$.ajax({
+						url : "paperType/doAuthPostUpdate",
+						data : params,
+						success : function(obj){
+							orgPostTree.tree("reload");
+							paperTypeTree.tree("reload");
+							$.messager.progress("close");
+							
+							if(!obj.succ){
+								parent.$.messager.alert("提示消息", obj.msg, "info");
+								return;
+							}
+						}
+					});
+				});
+			});
 		}
 	</script>
 </html>

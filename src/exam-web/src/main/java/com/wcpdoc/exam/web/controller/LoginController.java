@@ -36,8 +36,8 @@ public class LoginController extends BaseController{
 	 * v1.0 zhanghc 2016年9月8日下午8:47:13
 	 * @return String
 	 */
-	@RequestMapping("/pubToIn")
-	public String pubToIn() {
+	@RequestMapping("/toIn")
+	public String toIn() {
 		try {
 			return "/WEB-INF/jsp/web/login/in.jsp";
 		} catch (Exception e) {
@@ -55,15 +55,14 @@ public class LoginController extends BaseController{
 	 * @param model
 	 * @return String
 	 */
-	@RequestMapping("/pubDoIn")
-	public String pubDoIn(Model model, String loginName, String pwd) {
+	@RequestMapping("/doIn")
+	public String doIn(Model model, String loginName, String pwd) {
 		try {
 			//完成登录
 			loginService.doIn(loginName, pwd, request);
 			
-			//到达首页
-			model.addAttribute("menuList", ResCache.getMenuList());
-			return "/WEB-INF/jsp/web/login/home.jsp";
+			//重定向到首页
+			return "redirect:/login/toHome";
 		} catch (Exception e) {
 			log.error("完成登录错误：", e);
 			try {
@@ -71,7 +70,29 @@ public class LoginController extends BaseController{
 			} catch (UnsupportedEncodingException e1) {
 				e1.printStackTrace();
 			}
-			return "redirect:/login/pubToIn";
+			return "redirect:/login/toIn";
+		}
+	}
+	
+	/**
+	 * 到达首页
+	 * 
+	 * @param model
+	 * v1.0 zhanghc 2018年11月25日下午2:15:38
+	 * @return String
+	 */
+	@RequestMapping("/toHome")
+	public String toHome(Model model) {
+		try {
+			if(getCurrentUser() == null){
+				return "redirect:/login/toIn";
+			}
+			
+			model.addAttribute("menuList", ResCache.getMenuList());
+			return "/WEB-INF/jsp/web/login/home.jsp";
+		} catch (Exception e) {
+			log.error("到达首页错误：", e);
+			return "/WEB-INF/jsp/web/login/home.jsp";
 		}
 	}
 	
@@ -81,17 +102,17 @@ public class LoginController extends BaseController{
 	 * @param loginName
 	 * @return String
 	 */
-	@RequestMapping("/pubDoOut")
+	@RequestMapping("/doOut")
 	public String pubDoOut(){
 		try {
 			//完成退出登录
 			loginService.doOut(request);
 			
 			//重定向到登录页
-			return "redirect:/login/pubToIn";
+			return "redirect:/login/toIn";
 		} catch (Exception e) {
 			log.error("完成退出登录错误：", e);
-			return "redirect:/login/pubToIn";
+			return "redirect:/login/toIn";
 		}
 	}
 	
@@ -101,7 +122,7 @@ public class LoginController extends BaseController{
 	 * v1.0 zhanghc 2017年7月14日下午4:24:33
 	 * @return String
 	 */
-	@RequestMapping("/pubToPwdUpdate")
+	@RequestMapping("/toPwdUpdate")
 	public String pubToPwdUpdate() {
 		try {
 			return "/WEB-INF/jsp/web/login/updatePwd.jsp";
@@ -119,7 +140,7 @@ public class LoginController extends BaseController{
 	 * @param newPwd
 	 * @return PageResult
 	 */
-	@RequestMapping("/pubDoPwdUpdate")
+	@RequestMapping("/doPwdUpdate")
 	@ResponseBody
 	public PageResult pubDoPwdUpdate(String oldPwd, String newPwd) {
 		try {

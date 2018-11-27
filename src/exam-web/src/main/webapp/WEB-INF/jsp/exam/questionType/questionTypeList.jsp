@@ -40,6 +40,7 @@
 								<my:auth url="questionType/toEdit"><a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" onclick="toQuestionTypeEditForBtn();">修改</a></my:auth>
 								<my:auth url="questionType/doDel"><a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" onclick="doQuestionTypeDelForBtn();">删除</a></my:auth>
 								<my:auth url="questionType/doMove"><a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" onclick="toQuestionTypeMoveForBtn();">移动</a></my:auth>
+								<my:auth url="questionType/toAuth"><a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" onclick="toQuestionTypeAuth();">设置权限</a></my:auth>
 							</div>
 						</div>
 						<%-- 试题分类数据表格 --%>
@@ -74,7 +75,10 @@
 						{field : "ID", title : "", checkbox : true}, 
 						{field : "NAME", title : "名称", width : 80, align : "center"},
 						{field : "PARENT_NAME", title : "上级试题分类 ", width : 80, align : "center"},
-						{field : "NO", title : "排序 ", width : 80, align : "center"}
+						{field : "NO", title : "排序 ", width : 80, align : "center"},
+						{field : "USER_NAMES", title : "用户权限 ", width : 80, align : "center"},
+						{field : "ORG_NAMES", title : "机构权限 ", width : 80, align : "center"},
+						{field : "POST_NAMES", title : "岗位权限  ", width : 80, align : "center"}
 						]]
 			});
 		}
@@ -87,7 +91,6 @@
 				parentField : "PARENT_ID",
 				iconClsFiled : "ICON",
 				checkedFiled : "CHECKED",
-				lines : true,
 			    url : "questionType/treeList",
 				<my:auth url="questionType/toMove">dnd : true,
 				onStopDrag : toQuestionTypeMoveForMenu,</my:auth>
@@ -188,8 +191,8 @@
 						$.messager.progress("close"); 
 						
 						var obj = $.parseJSON(data);
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 							return;
 						}
 						
@@ -270,8 +273,8 @@
 						$.messager.progress("close"); 
 						
 						var obj = $.parseJSON(data);
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 							return;
 						}
 						
@@ -296,8 +299,8 @@
 						questionTypeTree.tree("reload");
 						$.messager.progress("close");
 						
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 						}
 					}
 				});
@@ -375,8 +378,6 @@
 						parentField : "PARENT_ID",
 						iconClsFiled : "ICON",
 						checkedFiled : "CHECKED",
-						lines : true,
-					    url : "questionType/moveQuestionTypeTreeList",
 					});
 				}
 			});
@@ -424,8 +425,8 @@
 						}
 						$.messager.progress("close");
 						
-						if(!obj.success){
-							parent.$.messager.alert("提示消息", obj.message, "info");
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
 						}
 					}
 				});
@@ -435,6 +436,445 @@
 		//刷新试题分类
 		function questionTypeTreeFlush(){
 			questionTypeTree.tree("reload");
+		}
+		
+		//到达权限页面
+		function toQuestionTypeAuth(){
+			var questionTypeGridRows = $("#questionTypeGrid").datagrid("getChecked");
+			if (questionTypeGridRows.length != 1) {
+				parent.$.messager.alert("提示消息", "请选择一行数据！", "info");
+				return;
+			}
+			
+			var questionTypeAuthDialog;
+			questionTypeAuthDialog = $("<div/>").dialog({
+				title : "权限列表",
+				href : "questionType/toAuth",
+				queryParams : {id : questionTypeGridRows[0].ID},
+				maximized : true,
+				onLoad : function() {
+					
+				}
+			});
+		}
+		
+		//权限用户查询
+		function questionTypeAuthUserQuery(){
+			var questionTypeAuthUserGrid = $("#questionTypeAuthUserGrid");
+			var questionTypeAuthUserQueryForm = $("#questionTypeAuthUserQueryForm");
+			questionTypeAuthUserGrid.datagrid("uncheckAll");
+			questionTypeAuthUserGrid.datagrid("load", $.fn.my.serializeObj(questionTypeAuthUserQueryForm));
+		}
+		
+		//权限用户重置
+		function questionTypeAuthUserReset(){
+			var questionTypeAuthUserQueryForm = $("#questionTypeAuthUserQueryForm");
+			questionTypeAuthUserQueryForm.form("reset");
+			questionTypeAuthUserQuery();
+		}
+		
+		//完成添加权限用户
+		function doQuestionTypeAuthUser(questionTypeAuthUserListDialog){
+			var questionTypeAuthUserGridRows = $("#questionTypeAuthUserGrid").datagrid("getChecked");
+			if (questionTypeAuthUserGridRows.length == 0) {
+				parent.$.messager.alert("提示消息", "请选择一行或多行数据！", "info");
+				return;
+			}
+			
+			var params = $.fn.my.serializeField(questionTypeAuthUserGridRows, {attrName : "userIds"});
+			params += "&id=" + $("#questionTypeAuthUser_ten").val();
+			
+			$.messager.confirm("确认消息", "确定要添加？", function(ok) {
+				if (!ok) {
+					return;
+				}
+				
+				$.messager.progress();
+				$.ajax({
+					url : "questionType/doAuthUser",
+					data : params,
+					success : function(obj){
+						$("#questionTypeAuthUserGrid").datagrid("reload");
+						$.messager.progress("close");
+						
+						if(!obj.succ){
+							parent.$.messager.alert("提示消息", obj.msg, "info");
+							return;
+						}
+						questionTypeAuthUserListDialog.dialog("close");
+					}
+				});
+			});
+		}
+		
+		//到达添加权限用户页面
+		function toQuestionTypeAuthUserAddList(){
+			var questionTypeAuthUserAddListDialog;
+			questionTypeAuthUserAddListDialog = $("<div/>").dialog({
+				title : "用户列表",
+				href : "questionType/toAuthUserAddList",
+				queryParams : {id : $("#questionTypeAuthUser_ten").val()},
+				toolbar : "#questionTypeAuthUserAddToolbar",
+				maximized : true,
+				buttons : [{
+					text : "添加",
+					iconCls : "icon-add", 
+					selected : true, 
+					handler : function (){
+						doQuestionTypeAuthUserAdd(questionTypeAuthUserAddListDialog);
+					}
+				}],
+				onLoad : function() {
+					var questionTypeAuthUserAddGrid = $("#questionTypeAuthUserAddGrid"); //用户表格对象
+					var questionTypeAuthUserAddQueryForm = $("#questionTypeAuthUserAddQueryForm"); //用户查询对象
+					var questionTypeAuthUserAddOrgTree = $("#questionTypeAuthUserAddOrgTree"); //组织机构树对象
+					var questionTypeAuthUserAddCurSelOrgId = ""; //当前选中的组织机构ID
+					var questionTypeAuthUserAddCurSelOrgName = ""; //当前选中的组织机构名称
+					
+					questionTypeAuthUserAddGrid.datagrid({
+						url : "",
+						columns : [[ 
+								{field : "ID", title : "", checkbox : true}, 
+								{field : "USER_NAME", title : "姓名", width : 80, align : "center"}, 
+								{field : "LOGIN_NAME", title : "登录名称", width : 80, align : "center"}, 
+								{field : "ORG_NAME", title : "组织机构", width : 80, align : "center"},
+								{field : "POST_NAMES", title : "岗位", width : 80, align : "center"},
+								]]
+					});
+					
+					questionTypeAuthUserAddOrgTree.tree({
+						idFiled : "ID",
+						textFiled : "NAME",
+						parentField : "PARENT_ID",
+						iconClsFiled : "ICON",
+						checkedFiled : "CHECKED",
+					    url : "questionType/authUserOrgTreeList",
+						onSelect : function(node){
+							questionTypeAuthUserAddCurSelOrgId = node.ID;
+							questionTypeAuthUserAddCurSelOrgName = node.NAME;
+							
+							$("#questionTypeAuthUserAdd_one").val(questionTypeAuthUserAddCurSelOrgId);
+							questionTypeAuthUserAddGrid.datagrid("uncheckAll");
+							questionTypeAuthUserAddGrid.datagrid("reload", $.fn.my.serializeObj(questionTypeAuthUserAddQueryForm));
+						},
+						onLoadSuccess : function(node, data){
+							if(!questionTypeAuthUserAddCurSelOrgId || !questionTypeAuthUserAddGrid.datagrid("options").url){//如果是第一次
+								questionTypeAuthUserAddCurSelOrgId = 1;
+								questionTypeAuthUserAddGrid.datagrid("options").url = "questionType/authUserAddList";
+							}
+							
+							var node = questionTypeAuthUserAddOrgTree.tree("find", questionTypeAuthUserAddCurSelOrgId);
+							if(!node){
+								questionTypeAuthUserAddCurSelOrgId = 1;
+								node = questionTypeAuthUserAddOrgTree.tree("find", questionTypeAuthUserAddCurSelOrgId);
+							}
+							questionTypeAuthUserAddOrgTree.tree("select", node.target);
+						}
+					});
+				}
+			});
+		}
+		
+		//添加权限用户查询
+		function questionTypeAuthUserAddQuery(){
+			var questionTypeAuthUserAddGrid = $("#questionTypeAuthUserAddGrid");
+			var questionTypeAuthUserAddQueryForm = $("#questionTypeAuthUserAddQueryForm");
+			questionTypeAuthUserAddGrid.datagrid("uncheckAll");
+			questionTypeAuthUserAddGrid.datagrid("load", $.fn.my.serializeObj(questionTypeAuthUserAddQueryForm));
+		}
+		
+		//添加权限用户重置
+		function questionTypeAuthUserAddReset(){
+			var questionTypeAuthUserAddQueryForm = $("#questionTypeAuthUserAddQueryForm");
+			questionTypeAuthUserAddQueryForm.form("reset");
+			questionTypeAuthUserAddQuery();
+		}
+		
+		//完成添加权限用户
+		function doQuestionTypeAuthUserAdd(questionTypeAuthUserAddListDialog){
+			var questionTypeAuthUserAddGridRows = $("#questionTypeAuthUserAddGrid").datagrid("getChecked");
+			if (questionTypeAuthUserAddGridRows.length == 0) {
+				parent.$.messager.alert("提示消息", "请选择一行或多行数据！", "info");
+				return;
+			}
+			
+			var params = $.fn.my.serializeField(questionTypeAuthUserAddGridRows, {attrName : "userIds"});
+			params += "&id=" + $("#questionTypeAuthUserAdd_ten").val();
+			
+			$.messager.confirm("确认消息", "确定要添加？", function(ok) {
+				if (!ok) {
+					return;
+				}
+				
+				$.messager.confirm("确认消息", "同步到子【试题分类】？", function(ok) {
+					params += "&syn2Sub=" + ok;
+					$.messager.progress();
+					$.ajax({
+						url : "questionType/doAuthUserAdd",
+						data : params,
+						success : function(obj){
+							$("#questionTypeAuthUserGrid").datagrid("reload");
+							questionTypeTree.tree("reload");
+							$.messager.progress("close");
+							
+							if(!obj.succ){
+								parent.$.messager.alert("提示消息", obj.msg, "info");
+								return;
+							}
+							questionTypeAuthUserAddListDialog.dialog("close");
+						}
+					});
+				});
+			});
+		}
+		
+		//完成删除权限用户
+		function doQuestionTypeAuthUserDel(){
+			var questionTypeAuthUserGridRows = $("#questionTypeAuthUserGrid").datagrid("getChecked");
+			if (questionTypeAuthUserGridRows.length == 0) {
+				parent.$.messager.alert("提示消息", "请选择一行或多行数据！", "info");
+				return;
+			}
+			
+			var params = $.fn.my.serializeField(questionTypeAuthUserGridRows, {attrName : "userIds"});
+			params += "&id=" + $("#questionTypeAuthUser_ten").val();
+			$.messager.confirm("确认消息", "确定要删除？", function(ok) {
+				if (!ok) {
+					return;
+				}
+				$.messager.confirm("确认消息", "同步到子【试题分类】？", function(ok) {
+					params += "&syn2Sub=" + ok;
+					$.messager.progress();
+					$.ajax({
+						url : "questionType/doAuthUserDel",
+						data : params,
+						success : function(obj){
+							$("#questionTypeAuthUserGrid").datagrid("reload");
+							questionTypeTree.tree("reload");
+							$.messager.progress("close");
+							
+							if(!obj.succ){
+								parent.$.messager.alert("提示消息", obj.msg, "info");
+								return;
+							}
+						}
+					});
+				});
+			});
+		}
+		
+		//更新tabs
+		function updateTabs(title){
+			if(title == "用户权限"){
+				updateUserTab();
+			}else if(title == "机构权限"){
+				updateOrgTab();
+			}else if(title == "岗位权限"){
+				updatePostTab();
+			}
+		}
+		
+		//更新用户标签
+		function updateUserTab(){
+			var questionTypeAuthUserGrid = $("#questionTypeAuthUserGrid"); //用户表格对象
+			var questionTypeAuthUserQueryForm = $("#questionTypeAuthUserQueryForm"); //用户查询对象
+			var questionTypeAuthUserOrgTree = $("#questionTypeAuthUserOrgTree"); //组织机构树对象
+			var questionTypeAuthUserCurSelOrgId = ""; //当前选中的组织机构ID
+			var questionTypeAuthUserCurSelOrgName = ""; //当前选中的组织机构名称
+			
+			questionTypeAuthUserGrid.datagrid({
+				url : "",
+				columns : [[ 
+						{field : "ID", title : "", checkbox : true}, 
+						{field : "USER_NAME", title : "姓名", width : 80, align : "center"}, 
+						{field : "LOGIN_NAME", title : "登录名称", width : 80, align : "center"}, 
+						{field : "ORG_NAME", title : "组织机构", width : 80, align : "center"},
+						{field : "POST_NAMES", title : "岗位", width : 80, align : "center"},
+						]]
+			});
+			
+			questionTypeAuthUserOrgTree.tree({
+				idFiled : "ID",
+				textFiled : "NAME",
+				parentField : "PARENT_ID",
+				iconClsFiled : "ICON",
+				checkedFiled : "CHECKED",
+			    url : "questionType/authUserOrgTreeList",
+				onSelect : function(node){
+					questionTypeAuthUserCurSelOrgId = node.ID;
+					questionTypeAuthUserCurSelOrgName = node.NAME;
+					
+					$("#questionTypeAuthUser_one").val(questionTypeAuthUserCurSelOrgId);
+					questionTypeAuthUserGrid.datagrid("uncheckAll");
+					questionTypeAuthUserGrid.datagrid("reload", $.fn.my.serializeObj(questionTypeAuthUserQueryForm));
+				},
+				onLoadSuccess : function(node, data){
+					if(!questionTypeAuthUserCurSelOrgId || !questionTypeAuthUserGrid.datagrid("options").url){//如果是第一次
+						questionTypeAuthUserCurSelOrgId = 1;
+						questionTypeAuthUserGrid.datagrid("options").url = "questionType/authUserList";
+					}
+					
+					var node = questionTypeAuthUserOrgTree.tree("find", questionTypeAuthUserCurSelOrgId);
+					if(!node){
+						questionTypeAuthUserCurSelOrgId = 1;
+						node = questionTypeAuthUserOrgTree.tree("find", questionTypeAuthUserCurSelOrgId);
+					}
+					questionTypeAuthUserOrgTree.tree("select", node.target);
+				}
+			});
+		}
+		
+		//更新机构标签
+		function updateOrgTab(){
+			var questionTypeAuthOrgOrgTree = $("#questionTypeAuthOrgOrgTree"); 
+			questionTypeAuthOrgOrgTree.tree({
+			    url : "questionType/authOrgOrgTreeList",
+			    queryParams : {
+			    	id : $("#questionTypeAuthUser_ten").val()
+			    },
+				idFiled : "ID",
+				textFiled : "NAME",
+				parentField : "PARENT_ID",
+				iconClsFiled : "ICON",
+				checkedFiled : "CHECKED",
+				checkbox : true
+			});
+		}
+		
+		//更新岗位标签
+		function updatePostTab(){
+			var questionTypeAuthPostOrgTree = $("#questionTypeAuthPostOrgTree"); 
+			questionTypeAuthPostOrgTree.tree({
+			    url : "questionType/authPostOrgTreeList",
+			    queryParams : {
+			    	id : $("#questionTypeAuthUser_ten").val()
+			    },
+				idFiled : "ID",
+				textFiled : "NAME",
+				parentField : "PARENT_ID",
+				iconClsFiled : "ICON",
+				checkedFiled : "CHECKED",
+				checkbox : true,
+				loadFilter : function(data, parent) {
+					var opt = $(this).data().tree.options;
+					var idFiled = opt.idFiled || "id";
+					var textFiled = opt.textFiled || "text";
+					var checkedFiled = opt.checkedFiled || "checked";
+					var iconClsFiled = opt.iconClsFiled || "iconCls";
+					var parentField = opt.parentField;
+					var list = data;
+					var TreeList = [];
+					var treeMap = {};
+
+					for (var i = 0; i < list.length; i++) {
+						list[i]["id"] = list[i][idFiled];
+						if(list[i].TYPE == "POST"){
+							list[i]["id"] = "p" + list[i][idFiled];
+						}
+						list[i]["text"] = list[i][textFiled];
+						if(list[i][checkedFiled]){
+							list[i]["checked"] = true;
+						}
+						list[i]["iconCls"] = list[i][iconClsFiled];
+						treeMap[list[i]["id"]] = list[i];
+						if(list[i].TYPE == "POST"){
+							treeMap[list[i]["id"]] = "p" + list[i];
+						}
+					}
+
+					for (var i = 0; i < list.length; i++) {
+						if (treeMap[list[i][parentField]] && list[i]["id"] != list[i][parentField]) {
+							if (!treeMap[list[i][parentField]]["children"]) {
+								treeMap[list[i][parentField]]["children"] = [];
+							}
+							treeMap[list[i][parentField]]["children"].push(list[i]);
+						} else {
+							TreeList.push(list[i]);
+						}
+					}
+					return TreeList;
+				}
+			});
+		}
+		
+		//保存机构权限
+		function doQuestionTypeAuthOrgUpdate(){
+			var orgTree = $("#questionTypeAuthOrgOrgTree");
+			var orgNodes = orgTree.tree("getChecked", ["checked"]);
+			var params = "&id=" + $("#questionTypeAuthUser_ten").val();
+			if(orgNodes.length == 0){
+				params += "&orgIds=";
+			}else{
+				for(index in orgNodes){
+					params += "&orgIds=" + orgNodes[index].ID;
+				}
+			}
+			
+			$.messager.confirm("确认消息", "确定要保存？", function(ok){
+				if (!ok){
+					return;
+				}
+
+				$.messager.confirm("确认消息", "同步到子【试题分类】？", function(ok) {
+					params += "&syn2Sub=" + ok;
+					
+					$.messager.progress();
+					$.ajax({
+						url : "questionType/doAuthOrgUpdate",
+						data : params,
+						success : function(obj){
+							orgTree.tree("reload");
+							questionTypeTree.tree("reload");
+							$.messager.progress("close");
+							
+							if(!obj.succ){
+								parent.$.messager.alert("提示消息", obj.msg, "info");
+								return;
+							}
+						}
+					});
+				});
+			});
+		}
+		
+		//保存岗位权限
+		function doQuestionTypeAuthPostUpdate(){
+			var orgPostTree = $("#questionTypeAuthPostOrgTree");
+			var postNodes = orgPostTree.tree("getChecked", ["checked"]);
+			var params = "&id=" + $("#questionTypeAuthUser_ten").val();
+			if(postNodes.length == 0){
+				params += "&postIds=";
+			}else{
+				for(index in postNodes){
+					params += "&postIds=" + postNodes[index].ID;
+				}
+			}
+			
+			$.messager.confirm("确认消息", "确定要保存？", function(ok){
+				if (!ok){
+					return;
+				}
+
+				$.messager.confirm("确认消息", "同步到子【试题分类】？", function(ok) {
+					params += "&syn2Sub=" + ok;
+					
+					$.messager.progress();
+					$.ajax({
+						url : "questionType/doAuthPostUpdate",
+						data : params,
+						success : function(obj){
+							orgPostTree.tree("reload");
+							questionTypeTree.tree("reload");
+							$.messager.progress("close");
+							
+							if(!obj.succ){
+								parent.$.messager.alert("提示消息", obj.msg, "info");
+								return;
+							}
+						}
+					});
+				});
+			});
 		}
 	</script>
 </html>

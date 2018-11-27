@@ -14,7 +14,7 @@ import com.wcpdoc.exam.sys.entity.Org;
 public interface OrgDao extends BaseDao<Org>{
 
 	/**
-	 * 获取组织机构树型列表
+	 * 获取组织机构树
 	 * v1.0 zhanghc 2016-5-8上午11:00:00
 	 * @return List<Map<String,Object>>
 	 */

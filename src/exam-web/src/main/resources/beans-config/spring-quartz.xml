@@ -29,7 +29,7 @@
 	<bean id="forcePaperTrigger"
 		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="forcePaperJob" />
-		<property name="cronExpression" value="*/2 * * * * ?" />
+		<property name="cronExpression" value="0 30 0 * * ?" />
 	</bean>
 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="triggers">

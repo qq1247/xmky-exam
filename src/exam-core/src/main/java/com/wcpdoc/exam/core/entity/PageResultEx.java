@@ -5,9 +5,9 @@ import java.util.Map;
 public class PageResultEx extends PageResult {
 	private Map<String, Object> data;
 
-	public PageResultEx(boolean success, String message, Map<String, Object> data) {
-		this.success = success;
-		this.message = message;
+	public PageResultEx(boolean succ, String msg, Map<String, Object> data) {
+		this.succ = succ;
+		this.msg = msg;
 		this.data = data;
 	}
 

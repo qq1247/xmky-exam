@@ -4,12 +4,15 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.ui.Model;
+
 import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.service.BaseService;
 import com.wcpdoc.exam.exam.entity.Exam;
 import com.wcpdoc.exam.exam.entity.ExamType;
+import com.wcpdoc.exam.exam.entity.ExamUser;
 import com.wcpdoc.exam.exam.entity.MarkUser;
 import com.wcpdoc.exam.exam.entity.Paper;
 /**
@@ -25,17 +28,19 @@ public interface ExamService extends BaseService<Exam>{
 	 * v1.0 zhanghc 2017-06-11 09:13:23
 	 * @param exam
 	 * void
+	 * @param user 
 	 */
-	void saveAndUpdate(Exam exam);
+	void saveAndUpdate(Exam exam, LoginUser user);
 	
 	/**
 	 * 修改考试
 	 * 
 	 * v1.0 zhanghc 2017年8月14日下午2:08:37
 	 * @param exam
+	 * @param user 
 	 * void
 	 */
-	void updateAndUpdate(Exam exam);
+	void updateAndUpdate(Exam exam, LoginUser user);
 
 	/**
 	 * 获取试卷分类数据
@@ -52,7 +57,7 @@ public interface ExamService extends BaseService<Exam>{
 	 * @param pageIn
 	 * @return PageOut
 	 */
-	PageOut getPaperAddListpage(PageIn pageIn);
+	PageOut getPaperListpage(PageIn pageIn);
 
 	/**
 	 * 获取试卷
@@ -73,7 +78,7 @@ public interface ExamService extends BaseService<Exam>{
 	PageOut getExamUserListpage(PageIn pageIn);
 
 	/**
-	 * 获取组织机构树型列表
+	 * 获取组织机构树
 	 * 
 	 * v1.0 zhanghc 2017年6月19日上午6:12:24
 	 * @return List<Map<String,Object>>
@@ -90,7 +95,7 @@ public interface ExamService extends BaseService<Exam>{
 	PageOut getExamUserAddListpage(PageIn pageIn);
 
 	/**
-	 * 获取组织机构树型列表
+	 * 获取组织机构树
 	 * 
 	 * v1.0 zhanghc 2017年6月19日上午6:12:24
 	 * @return List<Map<String,Object>>
@@ -118,21 +123,13 @@ public interface ExamService extends BaseService<Exam>{
 	void doExamUserDel(Integer[] examUserIds);
 
 	/**
-	 * 获取未结束的考试列表
-	 * 
-	 * v1.0 zhanghc 2017年6月22日下午10:30:34
-	 * @param userId
-	 * @return List<Map<String, Object>>
-	 */
-	List<Map<String, Object>> getUnFinishList(Integer userId);
-
-	/**
-	 * 获取考试分类树型列表
+	 * 获取考试分类树
 	 * 
 	 * v1.0 zhanghc 2017年6月29日上午7:24:13
+	 * @param userId 
 	 * @return List<Map<String,Object>>
 	 */
-	List<Map<String, Object>> getExamTypeTreeList();
+	List<Map<String, Object>> getExamTypeTreeList(Integer userId);
 	
 	/**
 	 * 获取考试分类
@@ -230,7 +227,7 @@ public interface ExamService extends BaseService<Exam>{
 	 * @param ids
 	 * void
 	 */
-	void deleteAndUpdate(Integer[] ids);
+	void delAndUpdate(Integer[] ids);
 
 	/**
 	 * 获取我的考试列表
@@ -239,6 +236,7 @@ public interface ExamService extends BaseService<Exam>{
 	 * @param pageIn
 	 * @return PageOut
 	 */
+	@Deprecated
 	PageOut getMyExamListpage(PageIn pageIn);
 
 	/**
@@ -277,7 +275,7 @@ public interface ExamService extends BaseService<Exam>{
 	 * @param pageIn
 	 * @return PageOut
 	 */
-	PageOut getMarkPaperListpage(PageIn pageIn);
+	PageOut getMarkListpage(PageIn pageIn);
 
 	/**
 	 * 获取判卷用户列表
@@ -296,4 +294,64 @@ public interface ExamService extends BaseService<Exam>{
 	 * @return PageOut
 	 */
 	PageOut getGradeListpage(PageIn pageIn);
+
+	/**
+	 * 获取考试分类
+	 * 
+	 * v1.0 zhanghc 2018年10月26日下午2:37:02
+	 * @param examTypeId
+	 * @return Object
+	 */
+	ExamType getExamType2(Integer examTypeId);
+
+	/**
+	 * 获取试卷分类树形列表
+	 * 
+	 * v1.0 zhanghc 2018年10月27日上午9:26:18
+	 * @param userId
+	 * @return List<Map<String,Object>>
+	 */
+	List<Map<String, Object>> getPaperTypeTreeList(Integer userId);
+
+	/**
+	 * 到达试卷页面
+	 * 
+	 * v1.0 zhanghc 2017年8月28日上午8:59:40
+	 * @param model
+	 * @param loginUser 
+	 * @param examId
+	 * void
+	 */
+	void toPaper(Model model, LoginUser loginUser, Integer examId);
+
+	/**
+	 * 到达判卷页面
+	 * 
+	 * v1.0 zhanghc 2017年8月28日上午11:04:18
+	 * @param model
+	 * @param user 
+	 * @param examUserId
+	 * void
+	 */
+	void toMark(Model model, LoginUser currentUser, Integer examUserId);
+
+	/**
+	 * 获取考试用户信息
+	 * 
+	 * v1.0 zhanghc 2017年7月3日上午9:41:59
+	 * @param examId
+	 * @param userId
+	 * @return ExamUser
+	 */
+	ExamUser getExamUser(Integer examId, Integer userId);
+
+	/**
+	 * 完成发布
+	 * 
+	 * v1.0 zhanghc 2018年11月24日上午9:23:22
+	 * @param id 
+	 * void
+	 */
+	void doPublish(Integer id);
+
 }
