@@ -147,22 +147,6 @@ public class HomeController extends BaseController{
 	}
 	
 	/**
-	 * 到达考试导航页
-	 * 
-	 * v1.0 zhanghc 2018年11月23日下午4:25:29
-	 * @return String
-	 */
-	@RequestMapping("/toExamNav")
-	public String toNav() {
-		try {
-			return "/WEB-INF/jsp/home/home/examNav.jsp";
-		} catch (Exception e) {
-			log.error("到达导航页错误：", e);
-			return "redirect:/home/toIn";
-		}
-	}
-	
-	/**
 	 * 完成退出登录
 	 * v1.0 zhanghc 2017-06-23 15:39:11
 	 * @param loginName

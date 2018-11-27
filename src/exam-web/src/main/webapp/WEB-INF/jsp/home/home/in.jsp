@@ -22,12 +22,12 @@
 								<h1>在线考试账号登录</h1>
 								<div>
 									<span class="glyphicon glyphicon-user"></span>
-									<input type="text" id="loginName" name="loginName" value="" placeholder="请输入账号">
+									<input type="text" id="loginName" name="loginName" value="sysadmin" placeholder="请输入账号">
 									<small class="help-block"></small>
 								</div>
 								<div>
 									<span class="glyphicon glyphicon-lock"></span>
-									<input type="password" id="pwd" name="pwd" value="" placeholder="请输入密码">
+									<input type="password" id="pwd" name="pwd" value="111111" placeholder="请输入密码">
 									<small class="help-block"></small>
 								</div>
 								<div>
