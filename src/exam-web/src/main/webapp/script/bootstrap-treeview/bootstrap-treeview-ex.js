@@ -3,6 +3,7 @@ function generateBootstrapTree(arr, options) {
 		idFiled : "id",
 		textFiled : "text", 
 		parentField : "parent",
+		checkedFiled : "checked",
 		disabledFiled : "disabled",
 		expandedFiled : "expanded",
 	};
@@ -13,6 +14,7 @@ function generateBootstrapTree(arr, options) {
 		arr[i]["id"] = arr[i][opts.idFiled];
 		arr[i]["text"] = arr[i][opts.textFiled];
 		arr[i]["state"] = {};
+		arr[i]["state"]["checked"] = arr[i][opts.checkedFiled];
 		arr[i]["state"]["disabled"] = arr[i][opts.disabledFiled];
 		arr[i]["state"]["expanded"] = arr[i][opts.expandedFiled];
 		

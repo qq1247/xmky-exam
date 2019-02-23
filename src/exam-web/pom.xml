@@ -4,7 +4,7 @@
 	<groupId>com.wcpdoc.exam</groupId>
 	<artifactId>exam-web</artifactId>
 	<packaging>war</packaging>
-	<version>1.0</version>
+	<version>1.1.1</version>
 	<name>exam-web</name>
 	<url>http://maven.apache.org</url>
 	<properties>
@@ -29,55 +29,55 @@
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
 			<artifactId>exam-sys</artifactId>
-			<version>1.0</version>
+			<version>${project.version}</version>
 		</dependency>
 		<!-- 集成exam-ex -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
 			<artifactId>exam-ex</artifactId>
-			<version>1.0</version>
+			<version>${project.version}</version>
 		</dependency>
 		<!-- 集成exam-tag -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
 			<artifactId>exam-tag</artifactId>
-			<version>1.0</version>
+			<version>${project.version}</version>
 		</dependency>
 		<!-- 集成exam-quartz -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
 			<artifactId>exam-quartz</artifactId>
-			<version>1.0</version>
+			<version>${project.version}</version>
 		</dependency>
 		<!-- 集成exam-file -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
 			<artifactId>exam-file</artifactId>
-			<version>1.0</version>
+			<version>${project.version}</version>
 		</dependency>
 		<!-- 集成exam-log -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
 			<artifactId>exam-viewlog</artifactId>
-			<version>1.0</version>
+			<version>${project.version}</version>
 		</dependency>
 		<!-- 集成exam-exam -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
 			<artifactId>exam-exam</artifactId>
-			<version>1.0</version>
+			<version>${project.version}</version>
 		</dependency>
 		<!-- 集成exam-home -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
 			<artifactId>exam-home</artifactId>
-			<version>1.0</version>
+			<version>${project.version}</version>
 		</dependency>
 		<!-- 集成exam-report -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
 			<artifactId>exam-report</artifactId>
-			<version>1.0</version>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 	<build>

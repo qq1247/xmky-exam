@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>试卷${empty exam.id ? "添加" : "修改"}</title>
+		<title>考试分类${empty examType.id ? "添加" : "修改"}</title>
 		<%@include file="/script/home/common.jspf"%>
 	</head>
 	<body>
@@ -12,21 +12,21 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-md-3">
-					<div id="paperTypeTree" class="exam-tree"></div>
+					<div id="tree" class="exam-tree"></div>
 				</div>
 				<div class="col-md-9">
 					<div class="panel panel-default">
    						<div class="panel-body">
    							<form id="editForm" class="form-horizontal" role="form">
-   								<input type="hidden" id="id" name="id" value="${paper.id }" />
+   								<input type="hidden" id="id" name="id" value="${examType.id }" />
 								<div class="row">
 									<div class="col-md-6">
 										<div class="form-group">
-											<label for="paperTypeName" class="col-md-4 control-label">试卷分类：</label>
+											<label for="parentName" class="col-md-4 control-label">上级分类：</label>
 											<div class="col-md-8">
-												<input type="hidden" id="paperTypeId" name="paperTypeId" value="${paperType.id }" />
-												<input type="text" id="paperTypeName" name="paperTypeName" value="${paperType.name }"
-													class="form-control" readonly="readonly" placeholder="请选择左侧试卷分类">
+												<input type="hidden" id="parentId" name="parentId" value="${parent.id }" />
+												<input type="text" id="parentName" name="parentName" value="${parent.name }"
+													class="form-control" readonly="readonly" placeholder="请选择左侧考试分类">
 											</div>
 										</div>
 									</div>
@@ -39,31 +39,17 @@
 										<div class="form-group">
 											<label for="name" class="col-md-4 control-label">名称：</label>
 											<div class="col-md-8">
-												<input type="text" id="name" name="name" value="${paper.name }"
+												<input type="text" id="name" name="name" value="${examType.name }"
 													class="form-control" placeholder="请输入名称">
 											</div>
 										</div>
 									</div>
 									<div class="col-md-6">
 										<div class="form-group">
-											<label for="state" class="col-md-4 control-label">状态：</label>
+											<label for="no" class="col-md-4 control-label">排序：</label>
 											<div class="col-md-8">
-												<select id="state" name="state" class="form-control">
-													<c:forEach var="dict" items="${STATE_DICT }">
-													<option value="${dict.dictKey }" ${dict.dictKey == paper.state ? "selected" : ""}>${dict.dictValue }</option>
-													</c:forEach>
-												</select>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class="row">
-									<div class="col-md-12">
-										<div class="form-group">
-											<label for="description" class="col-md-2 control-label">描述：</label>
-											<div class="col-md-10">
-												<textarea id="description" name="description">${paper.description }</textarea>
-												<small class="help-block"></small>
+												<input type="text" id="no" name="no" value="${examType.no }"
+													class="form-control" placeholder="请输入排序">
 											</div>
 										</div>
 									</div>
@@ -74,13 +60,13 @@
 											<span class="glyphicon glyphicon-arrow-left"></span>
 											&nbsp;返回
 										</button>
-										<c:if test="${empty paper.id }">
+										<c:if test="${empty examType.id }">
 										<button type="button" class="btn btn-primary" onclick="doAdd()">
 											<span class="glyphicon glyphicon-ok"></span>
 											&nbsp;添加
 										</button>
 										</c:if>
-										<c:if test="${!empty paper.id }">
+										<c:if test="${!empty examType.id }">
 										<button type="button" class="btn btn-primary" onclick="doEdit()">
 											<span class="glyphicon glyphicon-ok"></span>
 											&nbsp;修改
@@ -97,39 +83,24 @@
 	</body>
 	<script type="text/javascript">
 		//定义变量
-		var $paperTypeTree = $("#paperTypeTree");
-		var $paperTypeId = $("#paperTypeId");
-		var $paperTypeName = $("#paperTypeName");
+		var $tree = $("#tree");
+		var $parentId = $("#parentId");
+		var $parentName = $("#parentName");
 		var $editForm = $("#editForm");
-		var $description = $("#description");
 		var $id = $("#id");
-		
-		var $minKOption = {
-			uploadJson : "home/paper/doTempUpload",
-			filePostName : "files",
-			width : "100%",
-			minHeight : 50,
-			items : ['justifyleft', 'justifycenter', 'justifyright', 'formatblock', 'fontname', 'fontsize', 
-			        '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat',  
-			        '|', 'preview', 'fullscreen', 'code', 
-					'|', 'image', 'flash', 'table', 'anchor', 'link', 'unlink'
-				],
-			afterBlur : function(){this.sync();}
-		}
 		
 		//页面加载完毕，执行如下方法：
 		$(function() {
-			initPaperTypeTree();
+			initTree();
 			initValid();
-			initEditor();
 		});
 		
-		//初始化试卷分类树
-		function initPaperTypeTree(){
+		//初始化考试分类树
+		function initTree(){
 			$.ajax({
-				url : "home/paper/paperTypeTreeList",
+				url : "home/examType/treeList",
 				success : function(arr) {
-					$paperTypeTree.treeview({
+					$tree.treeview({
 						showBorder: false,
 						expandIcon: "glyphicon glyphicon-chevron-right",
 						collapseIcon: "glyphicon glyphicon-chevron-down",
@@ -145,21 +116,16 @@
 							expandedFiled : "EXPANDED"
 						}),
 						onNodeSelected : function(event, data) {
-							$paperTypeId.val(data.ID);
-							$paperTypeName.val(data.NAME).change();
+							$parentId.val(data.ID);
+							$parentName.val(data.NAME).change();
 						},
 						onNodeUnselected : function(event, data) {
-							$paperTypeId.val("");
-							$paperTypeName.val("").change();
+							$parentId.val("");
+							$parentName.val("").change();
 						}
 					});
 				}
 			});
-		}
-		
-		//初始化编辑器
-		function initEditor(){
-			KindEditor.create("#description", $minKOption);
 		}
 		
 		//初始化校验
@@ -170,8 +136,13 @@
 					name : {
 						validators : {
 							notEmpty : {}
-						}
-					}, paperTypeName : {
+						}}, 
+					no : {
+						validators : {
+							notEmpty : {},
+							integer : {}
+						}}, 
+					parentName : {
 						trigger : "change",
 						validators : {
 							notEmpty : {}
@@ -188,14 +159,14 @@
 			return bv.isValid();
 		}
 		
-		//完成试卷添加
+		//完成考试添加
 		function doAdd(){
 			if(!valid()){
 				return;
 			}
 			
 			$.ajax({
-				url : "home/paper/doAdd",
+				url : "home/examType/doAdd",
 				data : $editForm.serialize(),
 				success : function(obj) {
 					if (!obj.succ) {
@@ -214,19 +185,19 @@
 						return;
 					}
 					
-					window.location.href = "home/paper/toList";
+					window.location.href = "home/examType/toList";
 				}
 			});
 		}
 		
-		//完成试卷修改
+		//完成考试修改
 		function doEdit(){
 			if(!valid()){
 				return;
 			}
 			
 			$.ajax({
-				url : "home/paper/doEdit",
+				url : "home/examType/doEdit",
 				data : $editForm.serialize(),
 				success : function(obj) {
 					if (!obj.succ) {
@@ -245,7 +216,7 @@
 						return;
 					}
 					
-					window.location.href = "home/paper/toList";
+					window.location.href = "home/examType/toList";
 				}
 			});
 		}

@@ -30,6 +30,7 @@ import com.wcpdoc.exam.sys.entity.User;
  */
 @Controller
 @RequestMapping("/questionType")
+@Deprecated
 public class QuestionTypeController extends BaseController{
 	private static final Logger log = LoggerFactory.getLogger(QuestionTypeController.class);
 	

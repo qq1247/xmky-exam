@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.wcpdoc.exam</groupId>
 	<artifactId>exam-home</artifactId>
-	<version>1.0</version>
+	<version>1.1.1</version>
 	<packaging>jar</packaging>
 	<name>exam-home</name>
 	<url>http://maven.apache.org</url>
@@ -28,19 +28,19 @@
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
 			<artifactId>exam-core</artifactId>
-			<version>1.0</version>
+			<version>${project.version}</version>
 		</dependency>
 		<!-- 集成exam-file -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
 			<artifactId>exam-file</artifactId>
-			<version>1.0</version>
+			<version>${project.version}</version>
 		</dependency>
 		<!-- 集成exam-exam -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
 			<artifactId>exam-exam</artifactId>
-			<version>1.0</version>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 	<build>
