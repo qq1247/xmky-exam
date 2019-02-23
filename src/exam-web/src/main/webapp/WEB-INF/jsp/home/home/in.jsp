@@ -1,3 +1,8 @@
+<%@page import="java.util.List"%>
+<%@page import="org.apache.commons.io.FileUtils"%>
+<%@page import="com.wcpdoc.exam.core.util.ValidateUtil"%>
+<%@page import="java.io.File"%>
+<%@page import="com.wcpdoc.exam.core.util.StringUtil"%>
 <%@ page language="java" pageEncoding="utf-8"%>
 <!DOCTYPE html>
 <html>
@@ -33,11 +38,39 @@
 								<div>
 									<button type="button" class="btn btn-primary" onclick="doLogin();">登录</button>
 								</div>
+								<!-- 系统管理员 sysadmin 111111<br/>
+								张三 zs zs 判卷用户<br/>
+								李四 ls ls 判卷用户<br/>
+								王五 ww ww 考试用户<br/>
+								赵六 zl zl 考试用户<br/>
+								钱七 qq qq 考试用户<br/>
+								孙八 sb sb 考试用户<br/>
+								杨九 yj yj 考试用户<br/> -->
 							</div>
 						</form>
 					</div>
 				</div>
 			</div>
+			<%-- <%
+			int count=0;
+			String webPath = request.getSession().getServletContext().getRealPath(File.separator);
+			File file = new File(webPath + "count.txt");
+			if(!file.exists()){
+				file.createNewFile();
+			}
+			String countStr = "0";
+			List<String> lines = StringUtil.getLastLine(file, 1);
+			if(lines.size() > 0){
+				String line1 = lines.get(0);
+				if(ValidateUtil.isValid(line1)){
+					countStr = line1;
+				}
+			}
+			
+			count = Integer.parseInt(countStr) + 1;
+			FileUtils.write(file, count + "");
+			%>
+			第&nbsp;<%=count %>&nbsp;位访客 --%>
 		</div>
 	</body>
 	<script type="text/javascript">

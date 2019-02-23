@@ -30,6 +30,7 @@ import com.wcpdoc.exam.sys.entity.User;
  */
 @Controller
 @RequestMapping("/paperType")
+@Deprecated
 public class PaperTypeController extends BaseController{
 	private static final Logger log = LoggerFactory.getLogger(PaperTypeController.class);
 	

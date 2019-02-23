@@ -3,48 +3,15 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>试题列表</title>
+		<title>考试分类列表</title>
 		<%@include file="/script/home/common.jspf"%>
 	</head>
 	<body>
 		<%@include file="/script/home/head.jspf"%>
 		<div class="container">
-			<c:if test="${nav }">
-			<div class="row">
-				<ul class="process process-plus">
-					<li onclick="window.location.href='home/question/toList?nav=true'">
-						<div class="item current">
-							<div class="step">
-								<i>1</i>
-								<label>添加试题</label>
-							</div>
-							<span></span>
-						</div>
-					</li>
-					<li onclick="window.location.href='home/paper/toList?nav=true'">
-						<div class="item laters">
-							<div class="step">
-								<i>2</i>
-								<label>添加试卷</label>
-							</div>
-							<span></span>
-						</div>
-					</li>
-					<li onclick="window.location.href='home/exam/toList?nav=true'">
-						<div class="item last">
-							<div class="step">
-								<i>3</i>
-								<label>添加考试</label>
-							</div>
-							<span></span>
-						</div>
-					</li>
-				</ul>
-			</div>
-			</c:if>
 			<div class="row">
 				<div class="col-md-3">
-					<div id="questionTypeTree" class="exam-tree"></div>
+					<div id="tree" class="exam-tree"></div>
 				</div>
 				<div class="col-md-9">
 					<div class="panel panel-default exam-query">
@@ -54,60 +21,15 @@
 								<div class="row">
 									<div class="col-md-4">
 										<div class="form-group">
-											<label for="two" class="control-label col-md-4">编号：</label>
+											<div class="form-group">
+											<label for="two" class="control-label col-md-4">名称：</label>
 											<div class="col-md-8">
-												<input type="text" id="two" name="two" class="form-control" placeholder="请输入编号">
+												<input type="text" id="two" name="two" class="form-control" placeholder="请输入名称">
 											</div>
+										</div>
 										</div>
 									</div>
 									<div class="col-md-4">
-										<div class="form-group">
-											<label for="three" class="control-label col-md-4">题干：</label>
-											<div class="col-md-8">
-												<input type="text" id="three" name="three" class="form-control" placeholder="请输入题干">
-											</div>
-										</div>
-									</div>
-									<div class="col-md-4">
-										<div class="form-group">
-											<label for="four" class="control-label col-md-4">状态：</label>
-											<div class="col-md-8">
-												<select id="four" name="four" class="form-control">
-													<option value=""></option>
-													<c:forEach var="dict" items="${STATE_DICT }">
-													<option value="${dict.dictKey }">${dict.dictValue }</option>
-													</c:forEach>
-												</select>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class="row">
-									<div class="col-md-4">
-										<div class="form-group">
-											<label for="five" class="control-label col-md-4">类型：</label>
-											<div class="col-md-8">
-												<select id="five" name="five" class="form-control">
-													<option value=""></option>
-													<c:forEach var="dict" items="${QUESTION_TYPE_DICT }">
-													<option value="${dict.dictKey }">${dict.dictValue }</option>
-													</c:forEach>
-												</select>
-											</div>
-										</div>
-									</div>
-									<div class="col-md-4">
-										<div class="form-group">
-											<label for="six" class="control-label col-md-4">难度：</label>
-											<div class="col-md-8">
-												<select id="six" name="six" class="form-control">
-													<option value=""></option>
-													<c:forEach var="dict" items="${QUESTION_DIFFICULTY_DICT }">
-														<option value="${dict.dictKey }">${dict.dictValue }</option>
-													</c:forEach>
-												</select>
-											</div>
-										</div>
 									</div>
 									<div class="col-md-4" style="text-align: right;">
 										<button type="button" class="btn btn-primary" onclick="query();">
@@ -138,6 +60,10 @@
 									<span class="glyphicon glyphicon-trash"></span>
 									&nbsp;删除
 								</button>
+								<button type="button" class="btn btn-primary" onclick="toAuth();">
+									<span class="glyphicon glyphicon-pencil"></span>
+									&nbsp;授权
+								</button>
 							</div>
 							<table id="table"></table>
 						</div>
@@ -148,23 +74,23 @@
 	</body>
 	<script type="text/javascript">
 		//定义变量
-		var $questionTypeTree = $("#questionTypeTree");
+		var $tree = $("#tree");
 		var $table = $("#table");
 		var $queryForm = $("#queryForm");
 		var $one = $("#one");
 		
 		//页面加载完毕，执行如下方法：
 		$(function() {
-			initQuestionTypeTree();
+			initTree();
 			initTable();
 		});
 		
-		//初始化试题分类树
-		function initQuestionTypeTree(){
+		//初始化考试分类树
+		function initTree(){
 			$.ajax({
-				url : "home/question/questionTypeTreeList",
+				url : "home/examType/treeList",
 				success : function(arr) {
-					$questionTypeTree.treeview({
+					$tree.treeview({
 						showBorder: false,
 						expandIcon: "glyphicon glyphicon-chevron-right",
 						collapseIcon: "glyphicon glyphicon-chevron-down",
@@ -195,21 +121,21 @@
 		//初始化列表
 		function initTable(){
 			$table.bootstrapTable({
-				url : "home/question/list",
+				url : "home/examType/list",
 				queryParams : function(params){
 					var customeParams = $.fn.my.serializeObj($queryForm);
 					customeParams.page = this.pageNumber;
 					customeParams.rows = this.pageSize;
 					return customeParams;
 				},
-				columns : [
+				columns : [ 
 							{field : "state", checkbox : true},
-							{field : "CODE", title : "编号", width : 50, align : "center"},
-							{field : "TITLE", title : "题干 ", width : 300, align : "center"},
-							{field : "TYPE_NAME", title : "类型", width : 80, align : "center"},
-							{field : "DIFFICULTY_NAME", title : "难度", width : 80, align : "center"},
-							{field : "STATE_NAME", title : "状态 ", width : 80, align : "center"},
-							{field : "QUESTION_TYPE_NAME", title : "分类 ", width : 80, align : "center"}
+							{field : "NAME", title : "名称", width : 80, align : "center"},
+							{field : "PARENT_NAME", title : "上级考试分类 ", width : 80, align : "center"},
+							{field : "NO", title : "排序 ", width : 80, align : "center"},
+							{field : "USER_NAMES", title : "用户权限 ", width : 80, align : "center"},
+							{field : "ORG_NAMES", title : "机构权限 ", width : 80, align : "center"},
+							{field : "POST_NAMES", title : "岗位权限  ", width : 80, align : "center"}
 							],
 				toolbar : "#toolbar"
 			});
@@ -226,13 +152,13 @@
 			query();
 		}
 		
-		//到达添加试题页面
+		//到达添加考试分类页面
 		function toAdd(){
-			var treeNodes = $questionTypeTree.treeview("getSelected");
+			var treeNodes = $tree.treeview("getSelected");
 			if(treeNodes.length != 1){
 				BootstrapDialog.show({
 					title : "提示消息",
-					message : "请选择试题分类",
+					message : "请选择考试分类",
 					buttons : [{
 						label : "&nbsp;确定",
 						icon : "glyphicon glyphicon-ok",
@@ -245,10 +171,10 @@
 				return;
 			}
 			
-			window.location.href = "home/question/toAdd?questionTypeId=" + treeNodes[0].ID;
+			window.location.href = "home/examType/toAdd?parentId=" + treeNodes[0].ID;
 		}
 		
-		//到达修改试题页面
+		//到达修改考试分类页面
 		function toEdit(){
 			var nodes = $table.bootstrapTable("getSelections");
 			if(nodes.length != 1){
@@ -267,10 +193,10 @@
 				return;
 			}
 			
-			window.location.href = "home/question/toEdit?id=" + nodes[0].ID;
+			window.location.href = "home/examType/toEdit?id=" + nodes[0].ID;
 		}
 		
-		//完成试题删除
+		//完成考试分类删除
 		function doDel(){
 			var nodes = $table.bootstrapTable("getSelections");
 			if(nodes.length == 0){
@@ -298,7 +224,7 @@
 					cssClass : "btn-primary",
 					action : function(dialogItself) {
 						$.ajax({
-							url : "home/question/doDel",
+							url : "home/examType/doDel",
 							data : $.fn.my.serializeField(nodes),
 							success : function(obj) {
 								if (!obj.succ) {
@@ -317,7 +243,7 @@
 									return;
 								}
 								
-								window.location.href = "home/question/toList";
+								window.location.href = "home/examType/toList";
 							}
 						});
 					}
@@ -333,5 +259,26 @@
 			return;
 		}
 		
+		//到达授权页面
+		function toAuth(){
+			var nodes = $table.bootstrapTable("getSelections");
+			if(nodes.length != 1){
+				BootstrapDialog.show({
+					title : "提示消息",
+					message : "请选择一行数据！",
+					buttons : [{
+						label : "&nbsp;确定",
+						icon : "glyphicon glyphicon-ok",
+						cssClass : "btn-primary",
+						action : function(dialogItself) {
+							dialogItself.close();
+						}
+					}]
+				});
+				return;
+			}
+			
+			window.location.href = "home/examType/toAuth?id=" + nodes[0].ID;
+		}
 	</script>
 </html>
