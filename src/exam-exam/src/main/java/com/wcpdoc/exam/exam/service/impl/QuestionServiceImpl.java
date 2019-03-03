@@ -13,6 +13,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -173,7 +174,11 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 		question.setUpdateTime(new Date());
 		question.setUpdateUserId(user.getId());
+		question.setVer(1);
 		save(question);
+		
+		question.setSrcId(question.getId());
+		update(question);
 		
 		//保存附件
 		try {
@@ -265,9 +270,17 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void updateAndUpdate(Question question, String[] answer, LoginUser user, String ip) {
+	public void updateAndUpdate(Question question, String[] answer, boolean newVer) {
 		//修改试题
 		Question entity = getEntity(question.getId());
+		if(newVer){
+			Question entity1 = new Question();
+			BeanUtils.copyProperties(entity, entity1);
+			
+			entity.setState(0);
+			update(entity);
+			entity = entity1;
+		}
 		if(entity.getType() == 3){//如果是填空，特殊处理一下
 			StringBuilder answers = new StringBuilder();
 			for(String an : answer){
@@ -293,12 +306,17 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		entity.setAnswer(question.getAnswer());
 		entity.setAnalysis(question.getAnalysis());
 		entity.setUpdateTime(new Date());
-		entity.setUpdateUserId(user.getId());
-		update(entity);
+		entity.setUpdateUserId(getCurrentUser().getId());
+		if(newVer){
+			entity.setVer(entity.getVer() + 1);
+			save(entity);
+		}else{
+			update(entity);
+		}
 		
 		//修改附件
 		try {
-			saveFile(entity, user, ip);
+			saveFile(entity, getCurrentUser(), request.getRemoteAddr());
 		} catch (Exception e) {
 			try {
 				throw e;

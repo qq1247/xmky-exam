@@ -59,6 +59,10 @@ public class Question {
 	private Date updateTime;
 	@Column(name = "QUESTION_TYPE_ID")
 	private Integer questionTypeId;
+	@Column(name = "VER")
+	private Integer ver;
+	@Column(name = "SRC_ID")
+	private Integer srcId;
 
 	public Integer getId() {
 		return id;
@@ -194,5 +198,21 @@ public class Question {
 
 	public void setQuestionTypeId(Integer questionTypeId) {
 		this.questionTypeId = questionTypeId;
+	}
+
+	public Integer getVer() {
+		return ver;
+	}
+
+	public void setVer(Integer ver) {
+		this.ver = ver;
+	}
+
+	public Integer getSrcId() {
+		return srcId;
+	}
+
+	public void setSrcId(Integer srcId) {
+		this.srcId = srcId;
 	}
 }

@@ -767,28 +767,68 @@
 				return;
 			}
 			
-			$.ajax({
-				url : "home/question/doEdit",
-				data : $editForm.serialize(),
-				success : function(obj) {
-					if (!obj.succ) {
-						BootstrapDialog.show({
-							title : "提示消息",
-							message : obj.msg,
-							buttons : [{
-								label : "&nbsp;确定",
-								icon : "glyphicon glyphicon-ok",
-								cssClass : "btn-primary",
-								action : function(dialogItself) {
-									dialogItself.close();
+			BootstrapDialog.show({
+				title : "提示消息",
+				message : "保存为新版本？<br/>【确定】：当前修改另存为新版本<br/>【取消】：当前修改同步到引用的试卷",
+				buttons : [{
+					label : "&nbsp;确定",
+					icon : "glyphicon glyphicon-ok",
+					cssClass : "btn-primary",
+					action : function(dialogItself) {
+						$.ajax({
+							url : "home/question/doEdit",
+							data : $editForm.serialize() + "&newVer=true",
+							success : function(obj) {
+								if (!obj.succ) {
+									BootstrapDialog.show({
+										title : "提示消息",
+										message : obj.msg,
+										buttons : [{
+											label : "&nbsp;确定",
+											icon : "glyphicon glyphicon-ok",
+											cssClass : "btn-primary",
+											action : function(dialogItself) {
+												dialogItself.close();
+											}
+										}]
+									});
+									return;
 								}
-							}]
+								
+								window.location.href = "home/question/toList";
+							}
 						});
-						return;
 					}
-					
-					window.location.href = "home/question/toList";
-				}
+				}, {
+					label : "&nbsp;取消",
+					icon : "glyphicon glyphicon-remove",
+					cssClass : "btn-primary",
+					action : function(dialogItself) {
+						$.ajax({
+							url : "home/question/doEdit",
+							data : $editForm.serialize() + "&newVer=false",
+							success : function(obj) {
+								if (!obj.succ) {
+									BootstrapDialog.show({
+										title : "提示消息",
+										message : obj.msg,
+										buttons : [{
+											label : "&nbsp;确定",
+											icon : "glyphicon glyphicon-ok",
+											cssClass : "btn-primary",
+											action : function(dialogItself) {
+												dialogItself.close();
+											}
+										}]
+									});
+									return;
+								}
+								
+								window.location.href = "home/question/toList";
+							}
+						});
+					}
+				}]
 			});
 		}
 	</script>

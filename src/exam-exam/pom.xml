@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.wcpdoc.exam</groupId>
 	<artifactId>exam-exam</artifactId>
-	<version>1.1.1</version>
+	<version>1.1.2</version>
 	<packaging>jar</packaging>
 	<name>exam-exam</name>
 	<url>http://maven.apache.org</url>
@@ -11,6 +11,13 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencies>
+		<!-- 集成javaee相关jar包，作用范围为编译 -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
+			<scope>provided</scope>
+		</dependency>
 		<!-- 集成exam-sys -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>

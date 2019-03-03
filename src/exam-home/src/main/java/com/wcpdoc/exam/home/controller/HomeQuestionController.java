@@ -219,13 +219,16 @@ public class HomeQuestionController extends BaseController {
 	 * 完成修改试题
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
-	 * @return pageOut
+	 * @param question 试题
+	 * @param answer 答案
+	 * @param newVer 新版本
+	 * @return PageResult
 	 */
 	@RequestMapping("/doEdit")
 	@ResponseBody
-	public PageResult doEdit(Question question, String[] answer) {
+	public PageResult doEdit(Question question, String[] answer, boolean newVer) {
 		try {
-			questionService.updateAndUpdate(question, answer, getCurrentUser(), request.getRemoteAddr());
+			questionService.updateAndUpdate(question, answer, newVer);
 			return new PageResult(true, "修改成功");
 		} catch (Exception e) {
 			log.error("完成修改试题错误：", e);

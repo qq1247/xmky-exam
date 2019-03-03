@@ -108,11 +108,10 @@ public interface QuestionService extends BaseService<Question>{
 	 * 
 	 * v1.0 zhanghc 2018年10月12日下午7:30:02
 	 * @param question
-	 * @param answer 
-	 * @param user
-	 * @param ip 
-	 * void
+	 * @param answer 答案
+	 * @param newVer 新版本
+	 * void 
 	 */
-	void updateAndUpdate(Question question, String[] answer, LoginUser user, String ip);
+	void updateAndUpdate(Question question, String[] answer, boolean newVer);
 	
 }
