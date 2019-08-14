@@ -5,6 +5,8 @@
 	<head>
 		<title>试题列表</title>
 		<%@include file="/script/home/common.jspf"%>
+		<script type="text/javascript" src="script/plupload/plupload.full.min.js"></script>
+		<script type="text/javascript" src="script/plupload/i18n/zh_CN.js"></script>
 	</head>
 	<body>
 		<%@include file="/script/home/head.jspf"%>
@@ -138,6 +140,14 @@
 									<span class="glyphicon glyphicon-trash"></span>
 									&nbsp;删除
 								</button>
+								<button id="file_browse" type="button" class="btn btn-primary">
+									<span class="glyphicon glyphicon-open"></span>
+									&nbsp;导入试题
+								</button>
+								<button type="button" class="btn btn-primary" onclick="doTemplateExport();">
+									<span class="glyphicon glyphicon-save"></span>
+									&nbsp;下载模板
+								</button>
 							</div>
 							<table id="table"></table>
 						</div>
@@ -152,11 +162,16 @@
 		var $table = $("#table");
 		var $queryForm = $("#queryForm");
 		var $one = $("#one");
+		var uploader; //附件上传对象
+		var $progressBar;
+		var $progress;
+		var $progressMsg;
 		
 		//页面加载完毕，执行如下方法：
 		$(function() {
 			initQuestionTypeTree();
 			initTable();
+			initFileUpload();
 		});
 		
 		//初始化试题分类树
@@ -333,5 +348,106 @@
 			return;
 		}
 		
+		//初始化附件上传组件
+		function initFileUpload(){
+			uploader = new plupload.Uploader({
+				browse_button : "file_browse",
+				file_data_name : "files",
+				url : "${pageContext.request.contextPath}/home/question/doWordImp?questionTypeId=" + $one.val(),
+				multipart_params : {
+					//questionTypeId : $one.val()
+				},
+				flash_swf_url : "script/plupload/Moxie.swf",
+				filters : {
+					mime_types : [{ title : "文档", extensions : "doc" }
+					              ],
+					max_file_size : "10mb"
+				},
+				init : {
+					FilesAdded : function(up, files) {
+						var treeNodes = $questionTypeTree.treeview("getSelected");
+						if(treeNodes.length != 1){
+							BootstrapDialog.show({
+								title : "提示消息",
+								message : "请选择试题分类",
+								buttons : [{
+									label : "&nbsp;确定",
+									icon : "glyphicon glyphicon-ok",
+									cssClass : "btn-primary",
+									action : function(dialogItself) {
+										dialogItself.close();
+									}
+								}]
+							});
+							return;
+						}
+						
+						var progressHtml = [];
+						progressHtml.push('<div class="progress">');
+						progressHtml.push('    <div id="progressBar" class="progress-bar" role="progressbar" aria-valuenow="60" ');
+						progressHtml.push('        aria-valuemin="0" aria-valuemax="100" style="width: 0%;">');
+						progressHtml.push('        <span id="progress">0%</span>');
+						progressHtml.push('    </div>');
+						progressHtml.push('</div>');
+						progressHtml.push('<span id="progressMsg"></span>');
+						BootstrapDialog.show({
+							title : "提示消息",
+							message : progressHtml.join(""),
+							closable : false,
+							buttons : [{
+								label : "&nbsp;确定",
+								icon : "glyphicon glyphicon-ok",
+								cssClass : "btn-primary",
+								action : function(dialogItself) {
+									dialogItself.close();
+								}
+							}],
+							onshown : function(){
+								$progressBar = $("#progressBar");
+								$progress = $("#progress");
+								$progressMsg = $("#progressMsg");
+								uploader.start();
+							}
+						});
+					},
+					BeforeUpload : function (uploader, files) {
+		                uploader.settings.url = "${pageContext.request.contextPath}/home/question/doWordImp?questionTypeId=" + $one.val();
+					},
+					UploadProgress : function(up, file) {
+						$progressBar.attr("style", "width: "+file.percent+"%;");
+						$progress.html(file.percent+"%");
+					},
+					FileUploaded : function(up, file, responseObj) { //每个附件上传后，服务端返回的响应消息。
+						var response = $.parseJSON(responseObj.response);
+						$progressMsg.html(response.msg);
+					},
+					UploadComplete : function(up, files){//所有附件上传完成后
+						
+					},
+					Error : function(up, err) { //客户端的错误消息。如附件大小错误，附件不存在， http错误等。
+						BootstrapDialog.show({
+							title : "提示消息",
+							message : err.message,
+							buttons : [{
+								label : "&nbsp;确定",
+								icon : "glyphicon glyphicon-ok",
+								cssClass : "btn-primary",
+								action : function(dialogItself) {
+									dialogItself.close();
+								}
+							}]
+						});
+					}
+				}
+			});
+			
+			uploader.init();
+		}
+		
+
+		//完成word模板导出
+		function doTemplateExport(){
+			window.location.href = "home/question/doWordTemplateExport";
+		}
 	</script>
 </html>

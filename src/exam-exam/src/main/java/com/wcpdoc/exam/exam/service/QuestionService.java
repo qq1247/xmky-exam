@@ -113,5 +113,14 @@ public interface QuestionService extends BaseService<Question>{
 	 * void 
 	 */
 	void updateAndUpdate(Question question, String[] answer, boolean newVer);
-	
+
+	/**
+	 * 完成导入试题
+	 * 
+	 * v1.0 zhanghc 2019年8月10日下午5:12:53
+	 * @param file
+	 * @param questionTypeId
+	 * @return PageResult
+	 */
+	void doWordImp(MultipartFile file, Integer questionTypeId);
 }

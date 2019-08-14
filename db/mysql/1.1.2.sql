@@ -576,3 +576,22 @@ CREATE TABLE `SYS_USER` (
 -- Records of SYS_USER
 -- ----------------------------
 INSERT INTO `SYS_USER` VALUES ('1', '系统管理员', '5HK/W3IuS8X734A5JMigPg==', 'sysadmin', '2017-09-06 11:03:17', '1', '2017-08-01 22:33:19', '1', '1');
+
+drop table if exists SYS_VER;
+
+/*==============================================================*/
+/* Table: SYS_VER                                               */
+/*==============================================================*/
+create table SYS_VER
+(
+   ID                   int not null auto_increment comment 'id',
+   VER                  varchar(16) comment '版本',
+   UPDATE_TIME          datetime comment '修改时间',
+   AUTHOR               varchar(16) comment '作者',
+   REMARK               text comment '备注',
+   primary key (ID)
+);
+
+alter table SYS_VER comment '版本';
+
+INSERT INTO `SYS_VER` VALUES ('1.1.2', 'ZHC', '2019-03-03 13:20:00');
