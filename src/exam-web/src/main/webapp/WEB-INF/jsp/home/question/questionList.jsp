@@ -399,6 +399,7 @@
 								icon : "glyphicon glyphicon-ok",
 								cssClass : "btn-primary",
 								action : function(dialogItself) {
+									query();
 									dialogItself.close();
 								}
 							}],
