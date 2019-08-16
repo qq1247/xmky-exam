@@ -591,3 +591,5 @@ create table SYS_VER
 );
 
 alter table SYS_VER comment '版本';
+
+INSERT INTO `SYS_VER` VALUES (1, '1.1.1', '2019-02-23 15:35:21', 'ZHC', '');

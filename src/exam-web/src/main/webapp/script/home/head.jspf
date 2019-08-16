@@ -27,6 +27,11 @@
 				</li>
 				</my:auth>
 				</c:forEach>
+				<li class="dropdown">
+					<a href="https://gitee.com/zhanghucheng/exam" target="_blank" class="dropdown-toggle">
+						源码地址
+					</a>
+				</li>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
 				<li class="dropdown">

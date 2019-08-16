@@ -24,10 +24,21 @@ INSERT INTO `SYS_RES` VALUES ('146', '修改', 'examType/toEdit|examType/doEdit'
 INSERT INTO `SYS_RES` VALUES ('147', '删除', 'examType/doDel', '143', '_1_89_103_143_147_', '1', '2019-02-22 23:54:55', '4', '5', '8388608', '', '2');
 INSERT INTO `SYS_RES` VALUES ('148', '授权', 'examType/toAuth|examType/authUserOrgTreeList|examType/authUserList|examType/toAuthUserAddList|examType/authUserAddList|examType/doAuthUserAdd|examType/doAuthUserDel|examType/doAuthOrgUpdate|examType/authOrgOrgTreeList|examType/authPostOrgTreeList|examType/doAuthPostUpdate', '143', '_1_89_103_143_148_', '1', '2019-02-22 23:55:09', '5', '5', '16777216', '', '2');
 
-DROP TABLE IF EXISTS `SYS_VER`;
-CREATE TABLE `SYS_VER` (
-  `VER` varchar(32) DEFAULT NULL COMMENT '前缀',
-  `UPDATE_USER` varchar(32) DEFAULT NULL COMMENT '后缀',
-  `UPDATE_TIME` datetime DEFAULT NULL COMMENT '更新时间'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-INSERT INTO `SYS_VER` VALUES ('1.1.1', 'ZHC', '2019-02-23 15:35:21');
+drop table if exists SYS_VER;
+
+/*==============================================================*/
+/* Table: SYS_VER                                               */
+/*==============================================================*/
+create table SYS_VER
+(
+   ID                   int not null auto_increment comment 'id',
+   VER                  varchar(16) comment '版本',
+   UPDATE_TIME          datetime comment '修改时间',
+   AUTHOR               varchar(16) comment '作者',
+   REMARK               text comment '备注',
+   primary key (ID)
+);
+
+alter table SYS_VER comment '版本';
+
+INSERT INTO `SYS_VER` VALUES (1, '1.1.1', '2019-02-23 15:35:21', 'ZHC', '');
