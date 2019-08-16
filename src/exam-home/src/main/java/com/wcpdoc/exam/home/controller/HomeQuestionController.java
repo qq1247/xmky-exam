@@ -253,4 +253,49 @@ public class HomeQuestionController extends BaseController {
 			return new PageResult(false, "删除失败：" + e.getMessage());
 		}
 	}
+	
+	/**
+	 * 完成word导入试题
+	 * 
+	 * v1.0 zhanghc 2019年8月10日下午5:12:53
+	 * @param file
+	 * @param questionTypeId
+	 * @return PageResult
+	 */
+	@RequestMapping("/doWordImp")
+	@ResponseBody
+	public PageResult doWordImp(@RequestParam("files") MultipartFile file, Integer questionTypeId) {
+		try {
+			questionService.doWordImp(file, questionTypeId);
+			return new PageResult(true, "导入成功");
+		} catch (Exception e) {
+			log.error("完成导入试题错误：", e);
+			return new PageResult(false, "导入失败：" + e.getMessage());
+		}
+	}
+	
+	/**
+	 * 完成word模板导出
+	 * 
+	 * v1.0 zhanghc 2019年8月14日下午5:33:20 
+	 * void
+	 */
+	@RequestMapping(value = "/doWordTemplateExport")
+	public void doWordTemplateExport() {
+		OutputStream output = null;
+		try {
+			java.io.File file = new java.io.File(this.getClass().getResource("/").getPath() + "res/试题模板.doc");
+			
+			String fileName = new String((file.getName()).getBytes("UTF-8"), "ISO-8859-1");
+			response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
+			response.setContentType("application/force-download");
+
+			output = response.getOutputStream();
+			FileUtils.copyFile(file, output);
+		} catch (Exception e) {
+			log.error("完成下载模板失败：", e);
+		} finally {
+			IOUtils.closeQuietly(output);
+		}
+	}
 }

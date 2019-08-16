@@ -1,5 +1,5 @@
 # 在线考试
-[演示地址](http://exam.wcpdoc.cn)
+[演示地址](http://39.106.131.49)
 
 ## 前台
 
@@ -17,34 +17,20 @@
 ![mashua](https://images.gitee.com/uploads/images/2019/0303/211724_d8ca9533_393390.png)
 ![mashua](https://images.gitee.com/uploads/images/2019/0303/211724_55497637_393390.png)
 ![mashua](https://images.gitee.com/uploads/images/2019/0303/211724_7f25b308_393390.png)
+> ###试题维护
+>
+![mashua](https://images.gitee.com/uploads/images/2019/0816/100128_6a0e1152_393390.png)
+![mashua](https://images.gitee.com/uploads/images/2019/0816/095158_81637199_393390.png)
 
 ## 后台
 
-> ###试题分类管理-权限
+> ###基础信息维护
 > 
-![mashua](https://images.gitee.com/uploads/images/2019/0303/211725_fc17e18f_393390.png)
+![mashua](https://images.gitee.com/uploads/images/2019/0816/095447_6c4d357c_393390.png)
 
 
 ## 测试
 系统管理员	sysadmin	111111	系统管理员
-
-张三		zs		zs	判卷用户
-
-李四		ls		ls	判卷用户
-
-王五		ww		ww	考试用户
-
-赵六		zl		zl	考试用户
-
-钱七		qq		qq	考试用户
-
-孙八		sb		sb	考试用户
-
-杨九		yj		yj	考试用户
-
-吴十		ws		ws	考试用户
-
-
 
 ## 技术实现
 

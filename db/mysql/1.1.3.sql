@@ -233,6 +233,8 @@ CREATE TABLE `EXM_QUESTION` (
   `UPDATE_TIME` datetime DEFAULT NULL COMMENT '更新时间',
   `QUESTION_TYPE_ID` int(11) DEFAULT NULL COMMENT '试题分类',
   `NO` int(11) DEFAULT NULL COMMENT '排序',
+  `VER` int(11) DEFAULT NULL COMMENT '版本',
+  `SRC_ID` int(11) DEFAULT NULL COMMENT '第一版本ID',
   PRIMARY KEY (`ID`),
   KEY `FK_Reference_15` (`QUESTION_TYPE_ID`),
   CONSTRAINT `FK_Reference_15` FOREIGN KEY (`QUESTION_TYPE_ID`) REFERENCES `EXM_QUESTION_TYPE` (`ID`)
@@ -550,6 +552,8 @@ INSERT INTO `SYS_RES` VALUES ('145', '添加', 'examType/toAdd|examType/doAdd', 
 INSERT INTO `SYS_RES` VALUES ('146', '修改', 'examType/toEdit|examType/doEdit', '143', '_1_89_103_143_146_', '1', '2019-02-22 23:54:44', '3', '5', '4194304', '', '2');
 INSERT INTO `SYS_RES` VALUES ('147', '删除', 'examType/doDel', '143', '_1_89_103_143_147_', '1', '2019-02-22 23:54:55', '4', '5', '8388608', '', '2');
 INSERT INTO `SYS_RES` VALUES ('148', '授权', 'examType/toAuth|examType/authUserOrgTreeList|examType/authUserList|examType/toAuthUserAddList|examType/authUserAddList|examType/doAuthUserAdd|examType/doAuthUserDel|examType/doAuthOrgUpdate|examType/authOrgOrgTreeList|examType/authPostOrgTreeList|examType/doAuthPostUpdate', '143', '_1_89_103_143_148_', '1', '2019-02-22 23:55:09', '5', '5', '16777216', '', '2');
+INSERT INTO `SYS_RES` VALUES ('149', '导入试题', 'home/question/doWordImp', '106', '_1_89_103_106_149_', '1', '2019-08-14 18:44:22', '5', '5', '33554432', '', '2');
+INSERT INTO `SYS_RES` VALUES ('150', '下载模板', 'home/question/doWordTemplateExport', '106', '_1_89_103_106_150_', '1', '2019-08-14 18:44:49', '6', '5', '67108864', '', '2');
 
 -- ----------------------------
 -- Table structure for SYS_USER
@@ -593,3 +597,5 @@ create table SYS_VER
 alter table SYS_VER comment '版本';
 
 INSERT INTO `SYS_VER` VALUES (1, '1.1.1', '2019-02-23 15:35:21', 'ZHC', '');
+INSERT INTO `SYS_VER` VALUES (2, '1.1.2', '2019-03-03 13:20:00', 'ZHC', '');
+INSERT INTO `SYS_VER` VALUES (3, '1.1.3', '2019-08-14 18:49:00', 'ZHC', '');

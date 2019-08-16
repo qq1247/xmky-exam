@@ -6,9 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.io.FilenameUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,12 +22,15 @@ import org.springframework.web.multipart.MultipartFile;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
+import com.wcpdoc.exam.core.util.DateUtil;
+import com.wcpdoc.exam.core.util.PropertiesUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.exam.dao.QuestionDao;
 import com.wcpdoc.exam.exam.entity.Question;
 import com.wcpdoc.exam.exam.entity.QuestionType;
 import com.wcpdoc.exam.exam.service.QuestionService;
 import com.wcpdoc.exam.exam.service.QuestionTypeService;
+import com.wcpdoc.exam.exam.service.WordServer;
 import com.wcpdoc.exam.file.entity.FileEx;
 import com.wcpdoc.exam.file.service.FileService;
 import com.wcpdoc.exam.sys.entity.Org;
@@ -237,7 +242,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		Document document = Jsoup.parse(html);
 		Elements embeds = document.getElementsByTag("embed");
 		ListIterator<Element> listIterator = embeds.listIterator();
-		while(listIterator.hasNext()){
+		while(listIterator.hasNext()) {
 			Element next = listIterator.next();
 			String url = next.attr("flashvars");
 			String[] params = url.split("\\?")[1].split("&");;
@@ -322,6 +327,58 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				throw e;
 			} catch (Exception e1) {
 				e1.printStackTrace();
+			}
+		}
+	}
+
+	@Override
+	public void doWordImp(MultipartFile file, Integer questionTypeId) {
+		//校验数据有效性
+		String extName = FilenameUtils.getExtension(file.getOriginalFilename());
+		if(!"doc".equals(extName)){
+			throw new RuntimeException("允许的上传类型为：doc");
+		}
+		
+		//保存文档到临时目录
+		String baseDir = PropertiesUtil.getValue("file.upload.dir");
+		String tempPath = java.io.File.separator + "temp";
+		String timeStr = DateUtil.getFormatDateTime();
+		String ymdPath = java.io.File.separator + timeStr.substring(0,4)
+				+ java.io.File.separator + timeStr.substring(5,7)
+				+ java.io.File.separator + timeStr.substring(8,10);
+		java.io.File tempUploadDir = new java.io.File(baseDir + tempPath + ymdPath);
+		if (!tempUploadDir.exists()) {
+			tempUploadDir.mkdirs();
+		}
+		String fileId = UUID.randomUUID().toString();
+		java.io.File destFile = new java.io.File(tempUploadDir.getAbsolutePath() + java.io.File.separator + fileId);
+		try {
+			file.transferTo(destFile);
+		} catch (Exception e) {
+			throw new RuntimeException("保存临时上传附件时失败：", e);
+		}
+		
+		//解析文件
+		WordServer wordServer = new WordServerImpl();
+		List<Question> questionList = wordServer.handle(destFile);
+		
+		//保存试题
+		for(Question question : questionList){
+			question.setUpdateTime(new Date());
+			question.setUpdateUserId(getCurrentUser().getId());
+			question.setVer(1);
+			question.setState(1);
+			question.setQuestionTypeId(questionTypeId);
+			save(question);
+			
+			question.setSrcId(question.getId());
+			update(question);
+			
+			//保存附件
+			try {
+				saveFile(question, getCurrentUser(), request.getRemoteAddr());
+			} catch (Exception e) {
+				throw new RuntimeException(e.getMessage());
 			}
 		}
 	}

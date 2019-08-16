@@ -27,25 +27,20 @@
 								<h1>在线考试账号登录</h1>
 								<div>
 									<span class="glyphicon glyphicon-user"></span>
-									<input type="text" id="loginName" name="loginName" value="" placeholder="请输入账号">
+									<input type="text" id="loginName" name="loginName" value="zs" placeholder="请输入账号">
 									<small class="help-block"></small>
 								</div>
 								<div>
 									<span class="glyphicon glyphicon-lock"></span>
-									<input type="password" id="pwd" name="pwd" value="" placeholder="请输入密码">
+									<input type="password" id="pwd" name="pwd" value="111111" placeholder="请输入密码">
 									<small class="help-block"></small>
 								</div>
 								<div>
 									<button type="button" class="btn btn-primary" onclick="doLogin();">登录</button>
 								</div>
 								<!-- 系统管理员 sysadmin 111111<br/>
-								张三 zs zs 判卷用户<br/>
-								李四 ls ls 判卷用户<br/>
-								王五 ww ww 考试用户<br/>
-								赵六 zl zl 考试用户<br/>
-								钱七 qq qq 考试用户<br/>
-								孙八 sb sb 考试用户<br/>
-								杨九 yj yj 考试用户<br/> -->
+								张三 zs 111111 考试用户<br/>
+								李四 ls 111111 考试用户<br/> -->
 							</div>
 						</form>
 					</div>

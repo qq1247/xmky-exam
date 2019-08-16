@@ -99,8 +99,7 @@
 							              { title : "压缩文件", extensions : "zip,rar" },
 							              { title : "文档", extensions : "doc,docx,xls,xlsx" }
 							              ],
-							max_file_size : "99mb",
-							prevent_duplicates : true
+							max_file_size : "99mb"
 						},
 						init : {
 							FilesAdded : function(up, files) {
