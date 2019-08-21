@@ -6,173 +6,148 @@
 	<head>
 		<title>${exam.name }</title>
 		<%@include file="/script/home/common.jspf"%>
-		<style type="text/css">
-			.exam-bar {
-				background: #38f838 none repeat scroll 0% 0%;
-				height: 36px;
-				font-size: 16px;
-				margin-bottom: 0;
-			}
-			.exam-header-plus {
-				padding-top: 66px;
-			}
-		</style>
+		<link href="css/paper.css" rel="stylesheet">
 	</head>
 	<body>
-		<nav class="navbar navbar-fixed-top exam-bar" role="navigation">
-			<table style="width: 100%;height: 100%;">
-				<tr>
-					<td style="width: 50%;text-align: left;">【${exam.name }】【${USER.name }】【${startTime }&nbsp;&nbsp;-&nbsp;&nbsp;${endTime }】</td>
-					<td style="width: 20%;text-align: center;">剩余时间：<span id="remainingTime"></span>&nbsp;&nbsp;</td>
-					<td style="width: 30%;text-align: right;">
-						<button type="button" class="btn btn-info" onclick="doPaper(false)">交卷</button>
-						<button type="button" class="btn btn-info" onclick="javascript:history.back(-1);">返回</button>
-						&nbsp;&nbsp;
-					</td>
-				</tr>
-			</table>
-		</nav>
 		<div class="exam-header-plus"></div>
 		<div class="container paper">
 			<div class="row">
-				<div class="col-md-12">
-					<div class="panel panel-default">
-						<ul class="list-group">
-							<li class="list-group-item">
-								<input type="hidden" id="id" name="id" value="${paper.id }">
-								<h1>${paper.name }</h1>
-								<h5>${paper.description }</h5>
-							</li>
-						</ul>
-					</div>
-				</div>
-			</div>
-			<c:forEach var="pqEx" items="${paperQuestionExList }" varStatus="v">
-			<div class="row">
-				<div class="col-md-12">
-					<div class="panel panel-default">
-						<div class="panel-body">
-							<table style="width: 100%;">
-								<tr>
-									<td style="width: 100%;vertical-align: top;">
-										<h3>${pqEx.name }</h3>
-										<h5>${pqEx.description }</h5>
-									</td>
-								</tr>
-							</table>
+				<div class="col-md-10">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="panel panel-default">
+								<ul class="list-group">
+									<li class="list-group-item">
+										<h1>${paper.name }</h1>
+										<h5>${paper.description }</h5>
+									</li>
+								</ul>
+							</div>
 						</div>
-						<ul class="list-group collapse in">
-							<c:set var="labs" value="${fn:split('A,B,C,D,E,F,G', ',')}"></c:set>
-							<c:forEach var="subPqEx" items="${pqEx.subList }" varStatus="v1">
-							<c:set var="euq" value="${examUserQuestionMap[subPqEx.questionId + 0]}"></c:set>
-							<li class="list-group-item">
-								<table style="width: 100%;">
-									<tr>
-										<td style="width: 1%;vertical-align: top;">
-											${subPqEx.no }。
-										</td>
-										<td style="width: 99%;vertical-align: top;">
-											<div class="col-md-12">
-												<div class="row">
-													<div class="col-md-12">
-														${subPqEx.question.title }
-													</div>
-												</div>
-												<div class="row">
-													<div class="col-md-12">
-														<%-- 单选题 --%>
-														<c:if test="${subPqEx.question.type == 1 }">
-														<c:forEach var="lab" items="${labs }">
-														<c:set var="ol" value="option${lab }"></c:set>
-														<c:if test="${!empty subPqEx.question[ol] }">
-														<div class="radio">
-															<label>
-																<input type="radio" name="qst_${euq.id}" value="${lab }" 
-																	${euq.answer == lab ? "checked='checked'" : "" }
-																	onclick="updateChoiceAnswer('qst_${euq.id }')">
-																${lab }：${subPqEx.question[ol] }
-															</label>
-														</div>
-														</c:if>
-														</c:forEach>
-														</c:if>
-														<%-- 多选题 --%>
-														<c:if test="${subPqEx.question.type == 2 }">
-														<c:forEach var="lab" items="${labs }">
-														<c:set var="ol" value="option${lab }"></c:set>
-														<c:if test="${!empty subPqEx.question[ol] }">
-														<c:set var="op1" value=",${euq.answer},"></c:set>
-														<div class="checkbox">
-															<label>
-																<input type="checkbox" name="qst_${euq.id}" value="${lab }"
-																	${fn:contains(op1, lab) ? "checked='checked'" : "" }
-																	onclick="updateChoiceAnswer('qst_${euq.id }')">
-																${lab }：${subPqEx.question[ol] }
-															</label>
-														</div>
-														</c:if>
-														</c:forEach>
-														</c:if>
-														<%-- 填空题 --%>
-														<c:if test="${subPqEx.question.type == 3 }">
-														<% pageContext.setAttribute("v", "\n"); %>
-														<c:set var="lab1s" value="${fn:split('一,二,三,四,五,六,七', ',')}"></c:set>
-														<%-- <c:set var="answers" value="${fn:split(euq.answer, v)}"></c:set> 中间有空值会丢失--%>
-														<c:set var="a" value="${euq.answer }"></c:set>
-														<%
-														Object a = pageContext.getAttribute("a");
-														if(a != null){
-															pageContext.setAttribute("answers", a.toString().split("\n"));
-															System.out.println("字符串：" + a);
-															System.out.println("长度："+a.toString().split("\n").length);
-														}
-														%>
-														<c:forEach var="answer" items="${fn:split(subPqEx.question.answer, v) }" varStatus="s">
-														<div class="row form-group">
-															<label class="col-md-1 control-label">填空${lab1s[s.index] }：</label>
-															<div class="col-md-5">
-																<input type="text" name="qst_${euq.id}" 
-																	value="${answers[s.index]}" class="form-control" placeholder="答案："
-																	onblur="updateTextAnswer('qst_${euq.id }')">
-															</div>
-															<div class="col-md-6"></div>
-														</div>
-														</c:forEach>
-														</c:if>
-														<%-- 判断题 --%>
-														<c:if test="${subPqEx.question.type == 4 }">
-														<label class="radio-inline">
-															<input type="radio" name="qst_${euq.id}" value="对"
-																${euq.answer == "对" ? "checked='checked'" : "" }
-																onclick="updateChoiceAnswer('qst_${euq.id }')">
-															对
-														</label>
-														<label class="radio-inline">
-															<input type="radio" name="qst_${euq.id}" value="错"
-																${euq.answer == "错" ? "checked='checked'" : "" }
-																onclick="updateChoiceAnswer('qst_${euq.id }')">
-															错
-														</label>
-														</c:if>
-														<%-- 问答题 --%>
-														<c:if test="${subPqEx.question.type == 5 }">
-														<textarea id="qst_${euq.id}" name="qst_${euq.id}" 
-															class="form-control" rows="6" onblur="updateTextAnswer('qst_${euq.id }')"
-															>${euq.answer}</textarea>
-														</c:if>
-													</div>
-												</div>
-											</div>
-										</td>
-									</tr>
-								</table>
-							</li>
-							</c:forEach>
-						</ul>
+					</div>
+					<c:forEach var="paperQuestionEx" items="${paperQuestionExList }" varStatus="v">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="panel panel-default">
+								<div class="panel-body">
+									<h3>${paperQuestionEx.name }</h3><%-- 试题标题 --%>
+									<h5 style="margin-bottom: 0px;">${paperQuestionEx.description }</h5><%-- 试题描述 --%>
+								</div>
+								<ul class="list-group collapse in">
+									<c:set var="labs" value="${fn:split('A,B,C,D,E,F,G', ',')}"></c:set>
+									<c:forEach var="subPaperQuestionEx" items="${paperQuestionEx.subList }" varStatus="v1">
+									<c:set var="examUserQuestion" value="${examUserQuestionMap[subPaperQuestionEx.questionId + 0]}"></c:set>
+									<li class="list-group-item">
+										<ul class="list-group collapse in">
+											<li id="title_${examUserQuestion.id }" class="list-group-item question-title">
+											<strong>${subPaperQuestionEx.no }、</strong>${subPaperQuestionEx.question.title }
+											</li>
+											<%-- 单选题 --%>
+											<c:if test="${subPaperQuestionEx.question.type == 1 }">
+											<c:forEach var="lab" items="${labs }">
+											<c:set var="ol" value="option${lab }"></c:set>
+											<c:if test="${!empty subPaperQuestionEx.question[ol] }">
+											<li class="question-option ${examUserQuestion.answer == lab ? 'question-option-select' : '' }" 
+													examUserQuestionId="${examUserQuestion.id}" onclick="radioSubmit(this)">
+												<input type="radio" name="option_${examUserQuestion.id}" value="${lab }" 
+														${examUserQuestion.answer == lab ? 'checked="checked"' : '' }>
+												${lab }：${subPaperQuestionEx.question[ol] }
+											</li>
+											</c:if>
+											</c:forEach>
+											</c:if>
+											<%-- 多选题 --%>
+											<c:if test="${subPaperQuestionEx.question.type == 2 }">
+											<c:forEach var="lab" items="${labs }">
+											<c:set var="ol" value="option${lab }"></c:set>
+											<c:if test="${!empty subPaperQuestionEx.question[ol] }">
+											<c:set var="op1" value=",${examUserQuestion.answer},"></c:set>
+											<li class="question-option ${fn:contains(op1, lab) ? 'question-option-select' : '' }" 
+													examUserQuestionId="${examUserQuestion.id}" onclick="checkboxSubmit(this)">
+												<input type="checkbox" name="option_${examUserQuestion.id}" value="${lab }"
+														${fn:contains(op1, lab) ?'checked="checked"' : '' }>
+												${lab }：${subPaperQuestionEx.question[ol] }
+											</li>
+											</c:if>
+											</c:forEach>
+											</c:if>
+											<%-- 填空题 --%>
+											<c:if test="${subPaperQuestionEx.question.type == 3 }">
+											<% pageContext.setAttribute("v", "\n"); %>
+											<c:set var="lab1s" value="${fn:split('一,二,三,四,五,六,七', ',')}"></c:set>
+											<c:set var="answers" value="${fn:split(examUserQuestion.answer, v)}"></c:set>
+											<c:set var="a" value="${examUserQuestion.answer }"></c:set>
+											<%
+											Object a = pageContext.getAttribute("a");
+											if(a != null){
+												pageContext.setAttribute("answers", a.toString().split("\n"));
+											}
+											%>
+											<c:forEach var="answer" items="${fn:split(subPaperQuestionEx.question.answer, v) }" varStatus="s">
+												<input type="text" name="option_${examUserQuestion.id}" value="${answers[s.index]}" 
+														class="fillblanks" style="width: 200px;height: 45px;" placeholder="填空${lab1s[s.index] }" 
+														examUserQuestionId="${examUserQuestion.id}" onblur="txtSubmit(this)">
+											</c:forEach>
+											</c:if>
+											<%-- 判断题 --%>
+											<c:if test="${subPaperQuestionEx.question.type == 4 }">
+											<li class="question-option ${examUserQuestion.answer == '对' ? 'question-option-select' : '' }" 
+													examUserQuestionId="${examUserQuestion.id}" onclick="radioSubmit(this)">
+												<input type="radio" name="option_${examUserQuestion.id}" value="对"
+													${examUserQuestion.answer == "对" ? "checked='checked'" : "" }>对
+											</li>
+											<li class="question-option ${examUserQuestion.answer == '错' ? 'question-option-select' : '' }" 
+													examUserQuestionId="${examUserQuestion.id}" onclick="radioSubmit(this)">
+												<input type="radio" name="option_${examUserQuestion.id}" value="错"
+													${examUserQuestion.answer == "错" ? "checked='checked'" : "" }>错
+											</li>
+											</c:if>
+											<%-- 问答题 --%>
+											<c:if test="${subPaperQuestionEx.question.type == 5 }">
+											<textarea name="option_${examUserQuestion.id}" style="width: 100%;height: 150px" 
+												class="fillblanks" examUserQuestionId="${examUserQuestion.id}" onblur="txtSubmit(this)"+
+												>${examUserQuestion.answer}</textarea>
+											</c:if>
+										</ul>
+									</li>
+									</c:forEach>
+								</ul>
+							</div>
+						</div>
+					</div>
+					</c:forEach>
+				</div>
+				<div class="col-md-2">
+					<div class="answer-card">
+						<div class="answer-card-title">
+							<h1>答题卡</h1>
+							<p id="remainingTime"></p>
+						</div>
+						<c:forEach var="paperQuestionEx" items="${paperQuestionExList }" varStatus="v">
+							<div class="answer-card-content">
+							<div class="answer-card-content-tittle">
+								<div style="width: 150px;float: left;text-align: center;font-weight: bold;padding-top: 10px;">${paperQuestionEx.name }</div>
+								<div style="width: 100px;float: right;text-align: center;padding-top: 10px;">共${fn:length(paperQuestionEx.subList)}题</div>
+							</div>
+							<ul>
+								<c:forEach var="subPaperQuestionEx" items="${paperQuestionEx.subList }" varStatus="v1">
+								<c:set var="examUserQuestion" value="${examUserQuestionMap[subPaperQuestionEx.questionId + 0]}"></c:set>
+								<li><a id="an_card_${examUserQuestion.id }" href="${basePath }home/myExam/toPaper?examId=${examId }#title_${examUserQuestion.id }" 
+										${!empty examUserQuestion.answer ? 'class="answer-card-yes"' : 'class="answer-card-no"' }
+										>${subPaperQuestionEx.no }</a></li>
+								</c:forEach>
+							</ul>
+						</div>
+						</c:forEach>
+						<div class="answer-card-content">
+							<div class="answer-card-content-tittle">
+								<button type="button" class="btn btn-info" onclick="doPaper(false)">交卷</button>
+								<button type="button" class="btn btn-info" onclick="javascript:history.back(-1);">返回</button>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
-			</c:forEach>
 		</div>
 	</body>
 	<script type="text/javascript">
@@ -226,7 +201,7 @@
 				if(s < 10){
 					s = "0" + s;
 				}
-				$("#remainingTime").html(h + "：" + m + "：" + s)
+				$("#remainingTime").html(h + "：" + m + "：" + s + "")
 				return;
 			}
 			
@@ -244,78 +219,6 @@
 					
 					diffTime = (endTime.getTime() - sysTime.getTime() - 1500) / 1000;//获取用时500，下一次循环用时995，以后精确时间
 					num = 60;
-				}
-			});
-		}
-		
-		//更新选择答案
-		function updateChoiceAnswer(name){console.info(name);
-			var id = name.substr(4);
-			var answer = "";
-			$("input[name='" + name + "']:checked").each(function(index, domEle){
-				if(index > 0){
-					answer += ",";
-				}
-				
-				answer += domEle.value;
-			});
-			
-			$.ajax({
-				data : {examUserQuestionId : id, answer : answer },
-				url : "home/myExam/updateAnswer",
-				async : true, //异步提交
-				success : function(obj) {
-					if(!obj.succ){
-						BootstrapDialog.show({
-							title : "提示消息",
-							message : obj.msg,
-							buttons : [{
-								label : "&nbsp;确定",
-								icon : "glyphicon glyphicon-ok",
-								cssClass : "btn-primary",
-								action : function(dialogItself) {
-									dialogItself.close();
-								}
-							}]
-						});
-						return;
-					}
-				}
-			});
-		}
-		
-		//更新文本答案
-		function updateTextAnswer(name){
-			var id = name.substr(4);
-			var answers = $("[name='" + name + "']");
-			var answer = "";
-			answers.each(function (index, domEle) {
-				if(index > 0){
-					answer += "\n";
-				}
-				answer += $(domEle).val();
-			});
-			
-			$.ajax({
-				data : {examUserQuestionId : id, answer : answer },
-				url : "home/myExam/updateAnswer",
-				async : true, //异步提交
-				success : function(obj) {
-					if(!obj.succ){
-						BootstrapDialog.show({
-							title : "提示消息",
-							message : obj.msg,
-							buttons : [{
-								label : "&nbsp;确定",
-								icon : "glyphicon glyphicon-ok",
-								cssClass : "btn-primary",
-								action : function(dialogItself) {
-									dialogItself.close();
-								}
-							}]
-						});
-						return;
-					}
 				}
 			});
 		}
@@ -363,6 +266,161 @@
 					});
 					
 					setTimeout("window.location.href = 'home/toHome'", 2000)
+				}
+			});
+		}
+		
+		//单选提交
+		function radioSubmit(li){
+			//选中当前行
+			var $li = $(li);
+			var examUserQuestionId = $li.attr("examUserQuestionId")
+			var $curInput = $li.find("input[name='option_"+examUserQuestionId+"']");
+			$curInput.prop("checked", true);
+			$li.addClass("question-option-select");
+			
+			//其他行设为未选择
+			var $ul = $li.parent();
+			var $otherInputs = $ul.find("input").not($curInput[0]);
+			$otherInputs.prop("checked", false);
+			$ul.find("li").not($li[0]).removeClass("question-option-select");
+			
+			//答题卡标记为已做
+			var anCardOption = $("#an_card_" + examUserQuestionId);
+			anCardOption.removeClass("answer-card-no");
+			anCardOption.addClass("answer-card-yes");
+			
+			//异步提交答案
+			var answer = $curInput.val();
+			$.ajax({
+				data : {examUserQuestionId : examUserQuestionId, answer : answer },
+				url : "home/myExam/updateAnswer",
+				async : true,
+				success : function(obj) {
+					if(obj.succ){
+						return;
+					}
+						
+					BootstrapDialog.show({
+						title : "提示消息",
+						message : obj.msg,
+						buttons : [{
+							label : "&nbsp;确定",
+							icon : "glyphicon glyphicon-ok",
+							cssClass : "btn-primary",
+							action : function(dialogItself) {
+								dialogItself.close();
+							}
+						}]
+					});
+				}
+			});
+		}
+		
+		//多选提交
+		function checkboxSubmit(li){
+			//选中当前行
+			var $li = $(li);
+			var examUserQuestionId = $li.attr("examUserQuestionId");
+			var $curInput = $li.find("input[name='option_"+examUserQuestionId+"']");
+			var checked = $curInput.prop("checked");
+			if (checked) {
+				$li.removeClass("question-option-select");
+				$curInput.prop("checked", false);
+			} else {
+				$li.addClass("question-option-select");
+				$curInput.prop("checked", true);
+			}
+			
+			//答题卡标记为已做
+			var answer = "";
+			$li.parent().find("input[name='option_"+examUserQuestionId+"']:checked").each(function(index, domEle){
+				if(index > 0){
+					answer += ",";
+				}
+				
+				answer += domEle.value;
+			});
+			
+			var anCardOption = $("#an_card_" + examUserQuestionId);
+			if (answer) {
+				anCardOption.removeClass("answer-card-no");
+				anCardOption.addClass("answer-card-yes");
+			} else {
+				anCardOption.removeClass("answer-card-yes");
+				anCardOption.addClass("answer-card-no");
+			}
+			
+			//异步提交答案
+			$.ajax({
+				data : {examUserQuestionId : examUserQuestionId, answer : answer },
+				url : "home/myExam/updateAnswer",
+				async : true,
+				success : function(obj) {
+					if(obj.succ){
+						return;
+					}
+						
+					BootstrapDialog.show({
+						title : "提示消息",
+						message : obj.msg,
+						buttons : [{
+							label : "&nbsp;确定",
+							icon : "glyphicon glyphicon-ok",
+							cssClass : "btn-primary",
+							action : function(dialogItself) {
+								dialogItself.close();
+							}
+						}]
+					});
+				}
+			});
+		}
+		
+		//文本提交
+		function txtSubmit(input){
+			//答题卡标记为已做
+			var $input = $(input);
+			var examUserQuestionId = $input.attr("examUserQuestionId");
+			var $inputs = $input.parent().find("[name='option_"+examUserQuestionId+"']");
+			var answer = "";
+			$inputs.each(function (index, domEle) {
+				if(index > 0){
+					answer += "\n";
+				}
+				answer += $(domEle).val();
+			});
+			
+			var anCardOption = $("#an_card_" + examUserQuestionId);
+			if (answer.replace(/\n/g, "")) {
+				anCardOption.removeClass("answer-card-no");
+				anCardOption.addClass("answer-card-yes");
+			} else {
+				anCardOption.removeClass("answer-card-yes");
+				anCardOption.addClass("answer-card-no");
+			}
+			
+			//异步提交答案
+			$.ajax({
+				data : {examUserQuestionId : examUserQuestionId, answer : answer },
+				url : "home/myExam/updateAnswer",
+				async : true, //异步提交
+				success : function(obj) {
+					if(!obj.succ){
+						BootstrapDialog.show({
+							title : "提示消息",
+							message : obj.msg,
+							buttons : [{
+								label : "&nbsp;确定",
+								icon : "glyphicon glyphicon-ok",
+								cssClass : "btn-primary",
+								action : function(dialogItself) {
+									dialogItself.close();
+								}
+							}]
+						});
+						return;
+					}
 				}
 			});
 		}

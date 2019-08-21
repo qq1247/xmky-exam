@@ -99,6 +99,7 @@ public class HomeMyExamController extends BaseController{
 	@RequestMapping("/toPaper")
 	public String toPaper(Model model, Integer examId) {
 		try {
+			model.addAttribute("examId", examId);
 			examService.toPaper(model, getCurrentUser(), examId);
 			return "/WEB-INF/jsp/home/myExam/myExamPaper.jsp";
 		} catch (Exception e) {
