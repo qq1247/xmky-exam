@@ -18,6 +18,7 @@ import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.util.HibernateUtil;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.exam.entity.ExamUser;
 import com.wcpdoc.exam.exam.service.ExamService;
 import com.wcpdoc.exam.sys.cache.DictCache;
@@ -42,9 +43,37 @@ public class HomeMyExamController extends BaseController{
 	 * @return String
 	 */
 	@RequestMapping("/toList")
-	public String toList(Model model) {
+	public String toList(Model model, PageIn pageIn) {
 		try {
+			if(ValidateUtil.isValid(pageIn.getTwo())){
+				pageIn.setTwo(new String(pageIn.getTwo().getBytes("iso8859-1"), "utf-8"));
+			}
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
+			
+			pageIn.setNine(getCurrentUser().getId() + "");
+			PageOut pageOut = examService.getListpage(pageIn);
+			List<Map<String, Object>> list = pageOut.getRows();
+			
+			Date curTime = new Date();
+			for(Map<String, Object> map : list){
+				ExamUser examUser = examService.getExamUser((int)map.get("ID"), getCurrentUser().getId());
+				map.put("TOTAL_SCORE", examUser.getTotalScore());
+				map.put("EXAM_USER_STATE", examUser.getState());
+				
+				Date startEndTime = (Date) map.get("START_TIME");
+				Date examEndTime = (Date) map.get("END_TIME");
+				if(startEndTime.getTime() <= curTime.getTime() && examEndTime.getTime() >= curTime.getTime()){
+					map.put("START", "1");
+				}else{
+					map.put("START", "0");
+				}
+			}
+			HibernateUtil.formatDict(list, DictCache.getIndexkeyValueMap(), "EXAM_USER_STATE", "EXAM_USER_STATE");
+			
+			model.addAttribute("pageOut", pageOut);
+			model.addAttribute("pageIn", pageIn);
+			model.addAttribute("pageNum", (pageOut.getTotal() - 1) / pageIn.getRows() + 1);
+			
 			return "/WEB-INF/jsp/home/myExam/myExamList.jsp";
 		} catch (Exception e) {
 			log.error("到达我的考试列表页面错误：", e);
