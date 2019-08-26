@@ -15,6 +15,7 @@ import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.exam.service.ExamService;
 import com.wcpdoc.exam.sys.cache.DictCache;
 
@@ -39,9 +40,21 @@ public class HomeMyMarkController extends BaseController{
 	 * @return String
 	 */
 	@RequestMapping("/toExamList")
-	public String toExamList(Model model) {
+	public String toExamList(Model model, PageIn pageIn) {
 		try {
+			if(ValidateUtil.isValid(pageIn.getTwo())){
+				pageIn.setTwo(new String(pageIn.getTwo().getBytes("iso8859-1"), "utf-8"));
+			}
+			
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
+			
+			pageIn.setTen(getCurrentUser().getId().toString());
+			pageIn.setFour("1");
+			PageOut pageOut = examService.getListpage(pageIn);
+			model.addAttribute("pageOut", pageOut);
+			
+			model.addAttribute("pageIn", pageIn);
+			model.addAttribute("pageNum", (pageOut.getTotal() - 1) / pageIn.getRows() + 1);
 			return "/WEB-INF/jsp/home/myMark/examList.jsp";
 		} catch (Exception e) {
 			log.error("到达考试列表页面错误：", e);
@@ -77,9 +90,20 @@ public class HomeMyMarkController extends BaseController{
 	 * @return String
 	 */
 	@RequestMapping("/toList")
-	public String toMarkList(Model model, Integer examId) {
+	public String toMarkList(Model model, PageIn pageIn, Integer examId) {
 		try {
+			if(ValidateUtil.isValid(pageIn.getThree())){
+				pageIn.setThree(new String(pageIn.getThree().getBytes("iso8859-1"), "utf-8"));
+			}
+			
 			model.addAttribute("examId", examId);
+			
+			pageIn.setTen(getCurrentUser().getId().toString());
+			PageOut pageOut = examService.getMarkListpage(pageIn);
+			model.addAttribute("pageOut", pageOut);
+			
+			model.addAttribute("pageIn", pageIn);
+			model.addAttribute("pageNum", (pageOut.getTotal() - 1) / pageIn.getRows() + 1);
 			return "/WEB-INF/jsp/home/myMark/markList.jsp";
 		} catch (Exception e) {
 			log.error("到达判卷列表页面错误：", e);

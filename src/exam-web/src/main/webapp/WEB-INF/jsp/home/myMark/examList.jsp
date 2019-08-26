@@ -5,183 +5,71 @@
 	<head>
 		<title>考试列表</title>
 		<%@include file="/script/home/common.jspf"%>
+		<link href="css/exam.css" rel="stylesheet">
 	</head>
 	<body>
 		<%@include file="/script/home/head.jspf"%>
 		<div class="container">
+			<div class="row" style="padding-bottom: 25px;">
+				<div class="col-md-3">
+					<input id="two" type="text" name="two" value="${pageIn.two }" class="form-control query" placeholder="请输入考试名称进行搜索" >
+				</div>
+				<div class="col-md-3">
+					<button type="submit" class="btn btn-primary" style="height: 40px;width: 150px;max-width: 100%;" onclick="query()">
+						<i class="glyphicon glyphicon-search"></i> 搜索
+					</button>
+				</div>
+			</div>
 			<div class="row">
-				<div class="col-md-12">
-					<div class="panel panel-default exam-query">
-						<div class="panel-body">
-							<form id="queryForm" class="form-horizontal" role="form">
-								<input type="hidden" id="one" name="one"/>
-								<div class="row">
-									<div class="col-md-4">
-										<div class="form-group">
-											<label for="two" class="control-label col-md-4">名称：</label>
-											<div class="col-md-8">
-												<input type="text" id="two" name="two" class="form-control" placeholder="请输入名称">
-											</div>
-										</div>
-									</div>
-									<div class="col-md-4">
-										<div class="form-group">
-											<label for="three" class="control-label col-md-4">试卷：</label>
-											<div class="col-md-8">
-												<input type="text" id="three" name="three" class="form-control" placeholder="请输入试卷">
-											</div>
-										</div>
-									</div>
-									<div class="col-md-4" style="text-align: right;">
-										<div class="form-group">
-											<label for="four" class="control-label col-md-4">状态：</label>
-											<div class="col-md-8">
-												<select id="four" name="four" class="form-control">
-													<option value=""></option>
-													<c:forEach var="dict" items="${STATE_DICT }">
-													<option value="${dict.dictKey }">${dict.dictValue }</option>
-													</c:forEach>
-												</select>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class="row">
-									<div class="col-md-4">
-										<div class="form-group">
-											<label for="five" class="control-label col-md-4">考试开始大于：</label>
-											<div class="col-md-8">
-												<input type="text" id="five" name="five" class="form-control" placeholder="请输入开始时间">
-											</div>
-										</div>
-									</div>
-									<div class="col-md-4">
-										<div class="form-group">
-											<label for="six" class="control-label col-md-4">考试开始小于：</label>
-											<div class="col-md-8">
-												<input type="text" id="six" name="six" class="form-control" placeholder="请输入结束时间">
-											</div>
-										</div>
-									</div>
-									<div class="col-md-4" style="text-align: right;">
-										<button type="button" class="btn btn-primary" onclick="query();">
-											<span class="glyphicon glyphicon-search"></span>
-											&nbsp;查询
-										</button>
-										<button type="button" class="btn btn-primary" onclick="reset();">
-											<span class="glyphicon glyphicon-repeat"></span>
-											&nbsp;重置
-										</button>
-									</div>
-								</div>
-							</form>
+				<c:forEach var="row" items="${pageOut.rows }">
+				<div class="col-md-4">
+					<div class="exam">
+						<h3>${row.NAME }</h3>
+						<p><span class="time">${row.MARK_START_TIME_STR }</span></p>
+						<div>
+							<button>
+								<i class="warn"><small></small></i>
+								<span>进入</span>
+							</button>
 						</div>
-					</div>
-					<div class="panel panel-default exam-list">
-						<div class="panel-body">
-							<div id="toolbar">
-								<button type="button" class="btn btn-primary" onclick="toMarkList();">
-									<span class="glyphicon glyphicon-search"></span>
-									&nbsp;考试详情
-								</button>
-							</div>
-							<table id="table"></table>
+						<div class="handle">
+							<a>
+								<i class="glyphicon glyphicon-user"></i>
+								<span><small></small>50人</span>
+							</a>
+							<a onclick="toMarkList('${row.ID }')" >
+								<i class="glyphicon glyphicon-play"></i>
+								<span><small></small>进入</span>
+							</a>
 						</div>
 					</div>
 				</div>
+				</c:forEach>
+			</div>
+			
+			<div class="row" style="padding-left: 15px;">
+				<c:if test="${pageNum > 1 }">
+				<ul class="pagination">
+					<li><a href="home/myMark/toExamList?page=1&rows=${pageIn.rows }&two=${pageIn.two }">&laquo;</a></li>
+					<c:forEach var="curPage" begin="1" end="${pageNum }">
+					<c:set var="clazz" value="${pageIn.page == curPage ? 'active' : '' }"></c:set>
+					<li class="${clazz }"><a href="home/myMark/toExamList?page=${curPage }&rows=${pageIn.rows }&two=${pageIn.two }">${curPage }</a></li>
+					</c:forEach>
+					<li><a href="home/myMark/toExamList?page=${pageNum }&rows=${pageIn.rows }&two=${pageIn.two }">&raquo;</a></li>
+				</ul>
+				</c:if>
 			</div>
 		</div>
 	</body>
 	<script type="text/javascript">
-		//定义变量
-		var $examTypeTree = $("#examTypeTree");
-		var $table = $("#table");
-		var $queryForm = $("#queryForm");
-		var $one = $("#one");
-		
-		//页面加载完毕，执行如下方法：
-		$(function() {
-			initTime();
-			initTable();
-		});
-		
-		//初始化时间控件
-		function initTime(){
-			$('#five').datetimepicker({
-				language : "zh-CN",
-				format : "yyyy-mm-dd hh:ii:ss"
-			});
-			$('#six').datetimepicker({
-				language : "zh-CN",
-				format : "yyyy-mm-dd hh:ii:ss"
-			});
-		}
-		
-		//初始化列表
-		function initTable(){
-			$table.bootstrapTable({
-				url : "home/myMark/examList",
-				queryParams : function(params){
-					var customeParams = $.fn.my.serializeObj($queryForm);
-					customeParams.page = this.pageNumber;
-					customeParams.rows = this.pageSize;
-					return customeParams;
-				},
-				columns : [ 
-							{field : "state", checkbox : true},
-							{field : "NAME", title : "名称", width : 160, align : "center"},
-							{field : "PAPER_NAME", title : "试卷", width : 160, align : "center"},
-							{field : "PASS_SCORE", title : "及格分数", width : 80, align : "center", 
-								formatter : function(value, row, index){
-									return row.PASS_SCORE + "/" + row.PAPER_TOTLE_SCORE;
-								}
-							},
-							{field : "START_TIME_STR", title : "考试时间", width : 160, align : "center",
-								formatter : function(value, row, index){
-									return row.START_TIME_STR + "<br/>" + row.END_TIME_STR;
-								}
-							},
-							{field : "MARK_START_TIME_STR", title : "判卷时间", width : 160, align : "center",
-								formatter : function(value, row, index){
-									return row.MARK_START_TIME_STR + "<br/>" + row.MARK_END_TIME_STR;
-								}
-							}
-							],
-				toolbar : "#toolbar"
-			});
-		}
-		
 		//查询
 		function query(){
-			$table.bootstrapTable('refresh', {pageNumber : 1});
-		}
-		
-		//重置
-		function reset(){
-			$queryForm[0].reset();
-			query();
+			window.location.href = "home/myMark/toExamList?two=" + encodeURI($("#two").val());
 		}
 		
 		//达到判卷列表
-		function toMarkList(){
-			var nodes = $table.bootstrapTable("getSelections");
-			if(nodes.length != 1){
-				BootstrapDialog.show({
-					title : "提示消息",
-					message : "请选择一行数据！",
-					buttons : [{
-						label : "&nbsp;确定",
-						icon : "glyphicon glyphicon-ok",
-						cssClass : "btn-primary",
-						action : function(dialogItself) {
-							dialogItself.close();
-						}
-					}]
-				});
-				return;
-			}
-			
-			window.location.href = "home/myMark/toList?examId=" + nodes[0].ID;
+		function toMarkList(examId){
+			window.location.href = "home/myMark/toList?examId=" + examId;
 		}
 	</script>
 </html>
