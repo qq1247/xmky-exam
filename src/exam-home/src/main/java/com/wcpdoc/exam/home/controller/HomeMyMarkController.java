@@ -1,6 +1,9 @@
 package com.wcpdoc.exam.home.controller;
 
 import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -62,7 +65,23 @@ public class HomeMyMarkController extends BaseController{
 		try {
 			pageIn.setTen(getCurrentUser().getId().toString());
 			pageIn.setFour("1");
-			return examService.getListpage(pageIn);
+			PageOut pageOut = examService.getListpage(pageIn);
+			List<Map<String, Object>> list = pageOut.getRows();
+			
+			Date curTime = new Date();
+			for(Map<String, Object> map : list){
+				Date startTime = (Date) map.get("MARK_START_TIME");
+				Date endTime = (Date) map.get("MARK_END_TIME");
+				if (startTime.getTime() > curTime.getTime()) {
+					map.put("EXAM_HAND", "AWAIT");
+				} else if (startTime.getTime() <= curTime.getTime() && endTime.getTime() >= curTime.getTime()){
+					map.put("EXAM_HAND", "START");
+				} else {
+					map.put("EXAM_HAND", "END");
+				}
+			}
+			
+			return pageOut;
 		} catch (Exception e) {
 			log.error("考试列表错误：", e);
 			return new PageOut();

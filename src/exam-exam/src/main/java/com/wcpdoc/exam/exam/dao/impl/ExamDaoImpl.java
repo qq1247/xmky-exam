@@ -208,16 +208,17 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 	@Override
 	public PageOut getMarkListpage(PageIn pageIn) {
 		String sql = "SELECT EXAM_USER.ID, USER.NAME AS USER_NAME, ORG.NAME AS ORG_NAME, EXAM_USER.TOTAL_SCORE AS EXAM_USER_TOTAL_SCORE, "
-				+ "MARK_USER.NAME AS MARK_USER_NAME, EXAM_USER.UPDATE_MARK_TIME AS EXAM_USER_UPDATE_MARK_TIME "
+				+ "MARK_USER.NAME AS MARK_USER_NAME, EXAM_USER.UPDATE_MARK_TIME AS EXAM_USER_UPDATE_MARK_TIME, PAPER.TOTLE_SCORE AS PAPER_TOTLE_SCORE "
 				+ "FROM EXM_EXAM_USER EXAM_USER "
 				+ "INNER JOIN EXM_EXAM EXAM ON EXAM_USER.EXAM_ID = EXAM.ID "
+				+ "INNER JOIN EXM_PAPER PAPER ON EXAM.PAPER_ID = PAPER.ID "
 				+ "INNER JOIN SYS_USER USER ON EXAM_USER.USER_ID = USER.ID "
 				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
 				+ "LEFT JOIN SYS_USER MARK_USER ON EXAM_USER.UPDATE_MARK_USER_ID = MARK_USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()), "EXAM_USER.EXAM_ID = ?", pageIn.getOne())
 				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "ORG.NAME LIKE ?", "%" + pageIn.getThree() + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "ORG.NAME LIKE ? OR USER.NAME LIKE ?", "%" + pageIn.getThree() + "%", "%" + pageIn.getThree() + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "EXISTS (SELECT 1 FROM EXM_MARK_USER Z WHERE Z.USER_ID = ? AND Z.EXAM_ID = EXAM_USER.EXAM_ID)", pageIn.getTen())
 				.addWhere("EXAM.STATE = ?", 1);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);

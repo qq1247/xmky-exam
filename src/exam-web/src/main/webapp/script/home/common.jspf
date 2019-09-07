@@ -18,6 +18,9 @@
 <link href="script/bootstrap/css/bootstrap-ex.css" rel="stylesheet">
 <script src="script/bootstrap/js/bootstrap.min.js"></script>
 
+<!-- bootstrap-paginator -->
+<script src="script/bootstrap-paginator/bootstrap-paginator.min.js"></script>
+
 <!-- bootstrap-validator -->
 <link href="script/bootstrap-validator/css/bootstrapValidator.min.css" rel="stylesheet">
 <script src="script/bootstrap-validator/js/bootstrapValidator.min.js"></script>
@@ -50,3 +53,12 @@
 <!-- myJs -->
 <script src="script/myJs/myJs.js"></script>
 
+<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "https://hm.baidu.com/hm.js?ece9bda44d7a52a22e3669d5bfd21ec8";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+</script>

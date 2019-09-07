@@ -1,0 +1,101 @@
+.mark {
+	width: 100%;
+	border-radius: 3px;
+	background: #fff;
+	/* height: 200px; */
+	padding: 30px 15px 20px;
+	text-align: center;
+	margin-bottom: 30px;
+	border: 1px solid #ddd;
+	color: #8392a5;
+}
+
+.mark:hover {
+	box-shadow: -2px 4px 29px #e5e5e5;
+	-moz-box-shadow: -2px 4px 29px #e5e5e5;
+	-webkit-box-shadow: -2px 4px 29px #e5e5e5;
+	-o-box-shadow: -2px 4px 29px #e5e5e5;
+	-ms-box-shadow: -2px 4px 29px #e5e5e5;
+}
+
+.mark .title {
+	height: 100px;
+}
+
+.mark .title-left {
+	float: left;
+	width: 40%;
+	word-wrap: break-word;
+}
+
+.mark .title-right {
+	float: right;
+	position: relative;
+	width: 60%;
+}
+
+.mark .handle {
+	width: 100%;
+	font-size: 0;
+	margin-top: 15px;
+}
+
+.mark .handle i {
+	font-size: 16px;
+	line-height: 30px;
+}
+
+.mark .handle>a {
+	display: inline-block;
+	margin-right: 10px;
+	text-align: center;
+	width: 35px;
+	height: 35px;
+	color: #8392a5;
+	border-radius: 50%;
+	border: 1px solid #eff3f7;
+	line-height: 30px;
+	position: relative;
+	cursor: pointer;
+}
+
+.mark .handle>a:hover {
+	background: #0096e7;
+	border-color: transparent;
+	color: #fff;
+}
+
+.mark .handle>a:hover span {
+	display: block;
+}
+
+.mark .handle>a span {
+	padding: 0 10px;
+	background: #0096e7;
+	border-radius: 3px;
+	position: absolute;
+	color: #fff;
+	font-size: 12px;
+	min-width: 70px;
+	text-align: center;
+	left: 50%;
+	bottom: -42px;
+	margin-left: -22px;
+	display: none;
+}
+
+.mark .handle>a span small {
+	color: #0096e7;
+	-webkit-transform: rotate(15deg);
+	-o-transform: rotate(15deg);
+	-moz-transform: rotate(15deg);
+	-ms-transform: rotate(15deg);
+	transform: rotate(45deg);
+	position: absolute;
+	top: -6px;
+	left: 24px;
+	margin-left: 8px;
+	background: #0096e7;
+	width: 12px;
+	height: 12px;
+}

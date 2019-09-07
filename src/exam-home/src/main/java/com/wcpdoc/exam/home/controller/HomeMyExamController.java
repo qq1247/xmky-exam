@@ -44,7 +44,6 @@ public class HomeMyExamController extends BaseController{
 	@RequestMapping("/toList")
 	public String toList(Model model) {
 		try {
-			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
 			return "/WEB-INF/jsp/home/myExam/myExamList.jsp";
 		} catch (Exception e) {
 			log.error("到达我的考试列表页面错误：", e);
@@ -72,12 +71,14 @@ public class HomeMyExamController extends BaseController{
 				map.put("TOTAL_SCORE", examUser.getTotalScore());
 				map.put("EXAM_USER_STATE", examUser.getState());
 				
-				Date startEndTime = (Date) map.get("START_TIME");
-				Date examEndTime = (Date) map.get("END_TIME");
-				if(startEndTime.getTime() <= curTime.getTime() && examEndTime.getTime() >= curTime.getTime()){
-					map.put("START", "1");
-				}else{
-					map.put("START", "0");
+				Date startTime = (Date) map.get("START_TIME");
+				Date endTime = (Date) map.get("END_TIME");
+				if (startTime.getTime() > curTime.getTime()) {
+					map.put("EXAM_HAND", "AWAIT");
+				} else if (startTime.getTime() <= curTime.getTime() && endTime.getTime() >= curTime.getTime()){
+					map.put("EXAM_HAND", "START");
+				} else {
+					map.put("EXAM_HAND", "END");
 				}
 			}
 			HibernateUtil.formatDict(list, DictCache.getIndexkeyValueMap(), "EXAM_USER_STATE", "EXAM_USER_STATE");
@@ -99,6 +100,7 @@ public class HomeMyExamController extends BaseController{
 	@RequestMapping("/toPaper")
 	public String toPaper(Model model, Integer examId) {
 		try {
+			model.addAttribute("examId", examId);
 			examService.toPaper(model, getCurrentUser(), examId);
 			return "/WEB-INF/jsp/home/myExam/myExamPaper.jsp";
 		} catch (Exception e) {

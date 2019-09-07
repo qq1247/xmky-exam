@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +16,7 @@ import org.jsoup.nodes.TextNode;
 import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 
+import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.exam.entity.Question;
 import com.wcpdoc.exam.exam.service.WordServer;
@@ -182,13 +184,14 @@ public class WordServerImpl extends WordServer {
 		String answer = Jsoup.clean(getTxt(singleQuestion, answerIndex, analysisIndex), Whitelist.none())
 				.replaceAll(" ", "").replaceAll("\r", "").replaceAll("\n", "").substring(4);
 		if (type == 1 || type == 2) {
-			Set<String> set = new HashSet<>(Arrays.asList(answer.split("")));
+			Set<String> set = new LinkedHashSet<>(Arrays.asList(answer.split("")));
 			set.remove("");
 			Set<String> set2 = new HashSet<>(optionList);
 			
 			if (!set2.containsAll(set)) {
 				throw new RuntimeException("选项和答案不匹配：【"+singleQuestion.toString()+"】");
 			}
+			answer = StringUtil.join(set, ",");
 		} else if (type == 3) {
 			answer = "";
 			List<Node> subList = singleQuestion.subList(answerIndex, analysisIndex);
@@ -225,6 +228,10 @@ public class WordServerImpl extends WordServer {
 		Elements analysisElement = ((Element) singleQuestion.get(analysisIndex)).getElementsByTag("span");
 		analysisElement.html(analysisElement.html().substring(4));
 		String analysis = getTxt(singleQuestion, analysisIndex, singleQuestion.size());;
+		String analysis2 = Jsoup.clean(analysis, Whitelist.none());//不填写回只返回样式，特殊处理一下
+		if (!ValidateUtil.isValid(analysis2)) { 
+			analysis = null;
+		}
 
 		question.setTitle(title);
 		question.setType(type);

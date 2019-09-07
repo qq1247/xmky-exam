@@ -6,12 +6,13 @@
 	<head>
 		<title>配置试卷</title>
 		<%@include file="/script/home/common.jspf"%>
+		<link href="css/paper.css" rel="stylesheet">
 	</head>
 	<body>
 		<%@include file="/script/home/head.jspf"%>
 		<div class="container paper">
 			<div class="row">
-				<div class="col-md-12">
+				<div class="col-md-10">
 					<div class="panel panel-default">
 						<ul class="list-group">
 							<li class="list-group-item">
@@ -24,7 +25,7 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-md-12">
+				<div class="col-md-10">
 					<button type="button" class="btn btn-primary" onclick="toChapterAdd();">
 						<span class="glyphicon glyphicon-plus"></span>
 						&nbsp;添加章节
@@ -33,34 +34,34 @@
 						<span class="glyphicon glyphicon-zoom-in"></span>
 						&nbsp;预览试卷
 					</button> -->
-					<button type="button" class="btn btn-primary" onclick="javascript:history.back(-1);">
+					<button type="button" class="btn btn-primary" onclick="window.location.href='home/paper/toList'">
 						<span class="glyphicon glyphicon-arrow-left"></span>
 						&nbsp;返回
 					</button>
 				</div>
 			</div>
-			<c:forEach var="pqEx" items="${paperQuestionExList }" varStatus="v">
+			<c:forEach var="paperQuestionEx" items="${paperQuestionExList }" varStatus="v">
 			<div class="row">
-				<div class="col-md-12">
+				<div class="col-md-10">
 					<div class="panel panel-default">
 						<div class="panel-body">
 							<table style="width: 100%;">
 								<tr>
 									<td style="width: 80%;vertical-align: top;">
-										<h3>${pqEx.name }</h3>
-										<h5>${pqEx.description }</h5>
+										<h3>${paperQuestionEx.name }</h3>
+										<h5>${paperQuestionEx.description }</h5>
 									</td>
 									<td style="width: 20%;vertical-align: top;text-align: center;">
-										<a data-toggle="tooltip" title="修改章节" class="glyphicon glyphicon-pencil" onclick="toChapterEdit('${pqEx.id }');"></a>
-										<a data-toggle="tooltip" title="删除章节" class="glyphicon glyphicon-trash" onclick="doChapterDel('${pqEx.id }');"></a>
-										<a data-toggle="tooltip" title="添加试题" class="glyphicon glyphicon-plus" onclick="toQuestionAdd('${paper.id }', '${pqEx.id }');"></a>
-										<a data-toggle="tooltip" title="清空试题" class="glyphicon glyphicon-trash" onclick="doQuestionClear('${pqEx.id }');"></a>
-										<a data-toggle="tooltip" title="设置分数" class="glyphicon glyphicon-pencil" onclick="toScoresUpdate('${pqEx.id }');"></a>
+										<a data-toggle="tooltip" title="修改章节" class="glyphicon glyphicon-pencil" onclick="toChapterEdit('${paperQuestionEx.id }');"></a>
+										<a data-toggle="tooltip" title="删除章节" class="glyphicon glyphicon-trash" onclick="doChapterDel('${paperQuestionEx.id }');"></a>
+										<a data-toggle="tooltip" title="添加试题" class="glyphicon glyphicon-plus" onclick="toQuestionAdd('${paper.id }', '${paperQuestionEx.id }');"></a>
+										<a data-toggle="tooltip" title="清空试题" class="glyphicon glyphicon-trash" onclick="doQuestionClear('${paperQuestionEx.id }');"></a>
+										<a data-toggle="tooltip" title="设置分数" class="glyphicon glyphicon-pencil" onclick="toScoresUpdate('${paperQuestionEx.id }');"></a>
 										<c:if test="${!v.first }">
-										<a data-toggle="tooltip" title="章节上移" class="glyphicon glyphicon-arrow-up" onclick="doChapterUp('${pqEx.id }');"></a>
+										<a data-toggle="tooltip" title="章节上移" class="glyphicon glyphicon-arrow-up" onclick="doChapterUp('${paperQuestionEx.id }');"></a>
 										</c:if>
 										<c:if test="${!v.last }">
-										<a data-toggle="tooltip" title="章节下移" class="glyphicon glyphicon-arrow-down" onclick="doChapterDown('${pqEx.id }');"></a>
+										<a data-toggle="tooltip" title="章节下移" class="glyphicon glyphicon-arrow-down" onclick="doChapterDown('${paperQuestionEx.id }');"></a>
 										</c:if>
 										<a data-toggle="tooltip" title="章节展开" class="glyphicon glyphicon-triangle-bottom" onclick="doChapterCollapse(this);"></a>
 									</td>
@@ -69,114 +70,145 @@
 						</div>
 						<ul class="list-group collapse in">
 							<c:set var="labs" value="${fn:split('A,B,C,D,E,F,G', ',')}"></c:set>
-							<c:forEach var="subPqEx" items="${pqEx.subList }" varStatus="v1">
-							<li class="list-group-item">
+							<c:forEach var="subPaperQuestionEx" items="${paperQuestionEx.subList }" varStatus="v1">
+							<li id="title_${subPaperQuestionEx.question.id }" class="list-group-item">
 								<table style="width: 100%;">
 									<tr>
 										<td style="width: 1%;vertical-align: top;">
-											${subPqEx.no }。
+											${subPaperQuestionEx.no }。
 										</td>
 										<td style="width: 74%;vertical-align: top;">
 											<div class="col-md-12">
 												<div class="row">
 													<div class="col-md-12">
-														${subPqEx.question.title }
+														${subPaperQuestionEx.question.title }
 													</div>
 												</div>
 												<div class="row">
 													<div class="col-md-12">
 														<%-- 单选题 --%>
-														<c:if test="${subPqEx.question.type == 1 }">
+														<c:if test="${subPaperQuestionEx.question.type == 1 }">
 														<c:forEach var="lab" items="${labs }">
 														<c:set var="ol" value="option${lab }"></c:set>
-														<c:if test="${!empty subPqEx.question[ol] }">
-														<div class="radio">
-															<label>
-																<input type="radio" name="qst${subPqEx.question.id }">${lab }：${subPqEx.question[ol] }
-															</label>
-														</div>
+														<c:if test="${!empty subPaperQuestionEx.question[ol] }">
+														<li class="question-option ${subPaperQuestionEx.question.answer == lab ? 'question-option-select' : '' }" 
+																examUserQuestionId="${examUserQuestion.id}">
+															<input type="radio" name="option_${subPaperQuestionEx.question.id}" value="${lab }" 
+																	${subPaperQuestionEx.question.answer == lab ? 'checked="checked"' : '' }
+																	disabled="disabled"/>
+															${lab }：${subPaperQuestionEx.question[ol] }
+														</li>
 														</c:if>
 														</c:forEach>
 														</c:if>
 														<%-- 多选题 --%>
-														<c:if test="${subPqEx.question.type == 2 }">
+														<c:if test="${subPaperQuestionEx.question.type == 2 }">
 														<c:forEach var="lab" items="${labs }">
 														<c:set var="ol" value="option${lab }"></c:set>
-														<c:if test="${!empty subPqEx.question[ol] }">
-														<div class="checkbox">
-															<label>
-																<input type="checkbox" >${lab }：${subPqEx.question[ol] }
-															</label>
-														</div>
+														<c:if test="${!empty subPaperQuestionEx.question[ol] }">
+														<c:set var="op1" value=",${subPaperQuestionEx.question.answer},"></c:set>
+														<li class="question-option ${fn:contains(op1, lab) ? 'question-option-select' : '' }" 
+																examUserQuestionId="${examUserQuestion.id}" onclick="checkboxSubmit(this)">
+															<input type="checkbox" name="option_${examUserQuestion.id}" value="${lab }"
+																	${fn:contains(op1, lab) ?'checked="checked"' : '' }
+																	disabled="disabled">
+															${lab }：${subPaperQuestionEx.question[ol] }
+														</li>
 														</c:if>
 														</c:forEach>
 														</c:if>
-													</div>
-												</div>
-												<div class="row">
-													<div class="col-md-12">
-														【答案】：
-														<% pageContext.setAttribute("sep", "\n"); %>
-														<c:if test="${subPqEx.question.type != 3 }">
-														${subPqEx.question.answer }
-														</c:if>
-														<c:if test="${subPqEx.question.type == 3 }">
-														<c:forEach var="answer" items="${fn:split(subPqEx.question.answer, sep) }" varStatus="s3">
-														<c:if test="${s3.index > 0 }">；</c:if>
-														${answer }
+														<%-- 填空题 --%>
+														<c:if test="${subPaperQuestionEx.question.type == 3 }">
+														<% pageContext.setAttribute("v", "\n"); %>
+														<c:set var="lab1s" value="${fn:split('一,二,三,四,五,六,七', ',')}"></c:set>
+														<c:set var="answers" value="${fn:split(subPaperQuestionEx.question.answer, v)}"></c:set>
+														<c:set var="a" value="${examUserQuestion.answer }"></c:set>
+														<%
+														Object a = pageContext.getAttribute("a");
+														if(a != null){
+															pageContext.setAttribute("answers", a.toString().split("\n"));
+														}
+														%>
+														<c:forEach var="answer" items="${fn:split(subPaperQuestionEx.question.answer, v) }" varStatus="s">
+															<input type="text" name="option_${examUserQuestion.id}" value="${answers[s.index]}" 
+																	class="fillblanks" style="width: 200px;height: 45px;" placeholder="填空${lab1s[s.index] }" 
+																	examUserQuestionId="${examUserQuestion.id}" onblur="txtSubmit(this)" disabled="disabled">
 														</c:forEach>
 														</c:if>
+														<%-- 判断题 --%>
+														<c:if test="${subPaperQuestionEx.question.type == 4 }">
+														<li class="question-option ${subPaperQuestionEx.question.answer == '对' ? 'question-option-select' : '' }" 
+																examUserQuestionId="${examUserQuestion.id}" onclick="radioSubmit(this)">
+															<input type="radio" name="option_${subPaperQuestionEx.question.id}" value="对"
+																${subPaperQuestionEx.question.answer == "对" ? "checked='checked'" : "" }
+																disabled="disabled">对
+														</li>
+														<li class="question-option ${subPaperQuestionEx.question.answer == '错' ? 'question-option-select' : '' }" 
+																examUserQuestionId="${examUserQuestion.id}" onclick="radioSubmit(this)">
+															<input type="radio" name="option_${subPaperQuestionEx.question.id}" value="错"
+																${subPaperQuestionEx.question.answer == "错" ? "checked='checked'" : "" }
+																disabled="disabled">错
+														</li>
+														</c:if>
+														<%-- 问答题 --%>
+														<c:if test="${subPaperQuestionEx.question.type == 5 }">
+														<textarea name="option_${examUserQuestion.id}" style="width: 100%;height: 150px" 
+															class="fillblanks" examUserQuestionId="${examUserQuestion.id}" onblur="txtSubmit(this)"+
+															disabled="disabled">${subPaperQuestionEx.question.answer}</textarea>
+														</c:if>
 													</div>
 												</div>
+												<c:if test="${!empty subPaperQuestionEx.question.analysis }">
 												<div class="row">
 													<div class="col-md-12">
-														【解析】：${subPqEx.question.analysis }
+														【解析】：${subPaperQuestionEx.question.analysis }
 													</div>
 												</div>
+												</c:if>
 											</div>
 										</td>
 										<td style="width: 10%;vertical-align: top;">
 											<form>
-												<input type="hidden" name="paperQuestionId" value="${subPqEx.id }" >
-												<input type="text" name="score" value="${subPqEx.score }" placeholder="0.00"
+												<input type="hidden" name="paperQuestionId" value="${subPaperQuestionEx.id }" >
+												<input type="text" name="score" value="${subPaperQuestionEx.score }" placeholder="0.00"
 													style="width: 40px;border:0; border-bottom: 1px solid #d8d8d8; text-align: center;">分
 												<small class="help-block"></small>
-												<c:if test="${subPqEx.question.type == 2 }">
+												<c:if test="${subPaperQuestionEx.question.type == 2 }">
 												<div class="checkbox">
 													<label>
 														<input type="checkbox" name="options" value="1"
 															data-toggle="tooltip" title="默认全对得分"
-															${fn:contains(subPqEx.options, "1") ? "checked='checked'" : "" }>半对半分
+															${fn:contains(subPaperQuestionEx.options, "1") ? "checked='checked'" : "" }>半对半分
 													</label>
 												</div>
 												</c:if>
-												<c:if test="${subPqEx.question.type == 3 }">
+												<c:if test="${subPaperQuestionEx.question.type == 3 }">
 												<div class="checkbox">
 													<label>
 														<input type="checkbox" name="options" value="1" 
 															data-toggle="tooltip" title="默认全对得分" data-placement="left"
-															${fn:contains(subPqEx.options, "1") ? "checked='checked'" : "" }>半对半分
+															${fn:contains(subPaperQuestionEx.options, "1") ? "checked='checked'" : "" }>半对半分
 													</label>
 												</div>
 												<div class="checkbox">
 													<label>
 														<input type="checkbox" name="options" value="2"
 															data-toggle="tooltip" title="默认答案有前后顺序" data-placement="left"
-															${fn:contains(subPqEx.options, "2") ? "checked='checked'" : "" }>答案无顺序
+															${fn:contains(subPaperQuestionEx.options, "2") ? "checked='checked'" : "" }>答案无顺序
 													</label>
 												</div>
 												<div class="checkbox">
 													<label>
 														<input type="checkbox" name="options" value="3"
 															data-toggle="tooltip" title="默认大小写敏感" data-placement="left"
-															${fn:contains(subPqEx.options, "3") ? "checked='checked'" : "" }>大小写不敏感
+															${fn:contains(subPaperQuestionEx.options, "3") ? "checked='checked'" : "" }>大小写不敏感
 													</label>
 												</div>
 												<div class="checkbox">
 													<label>
 														<input type="checkbox" name="options" value="4"
 															data-toggle="tooltip" title="默认等于答案得分" data-placement="left"
-															${fn:contains(subPqEx.options, "4") ? "checked='checked'" : "" }>用户答案包含试题答案
+															${fn:contains(subPaperQuestionEx.options, "4") ? "checked='checked'" : "" }>用户答案包含试题答案
 													</label>
 												</div>
 												</c:if>
@@ -185,19 +217,48 @@
 										<td style="width: 15%;vertical-align: top;text-align: center;">
 											<a data-toggle="tooltip" title="保存得分" class="glyphicon glyphicon-ok" onclick="doScoreUpdate(this);"></a>
 											<c:if test="${!v1.first }">
-											<a data-toggle="tooltip" title="上移" class="glyphicon glyphicon-arrow-up" onclick="doQuestionUp('${subPqEx.id }')"></a>
+											<a data-toggle="tooltip" title="上移" class="glyphicon glyphicon-arrow-up" onclick="doQuestionUp('${subPaperQuestionEx.id }')"></a>
 											</c:if>
 											<c:if test="${!v1.last }">
-											<a data-toggle="tooltip" title="下移" class="glyphicon glyphicon-arrow-down" onclick="doQuestionDown('${subPqEx.id }')"></a>
+											<a data-toggle="tooltip" title="下移" class="glyphicon glyphicon-arrow-down" onclick="doQuestionDown('${subPaperQuestionEx.id }')"></a>
 											</c:if>
 											<!-- <a data-toggle="tooltip" title="展开" class="glyphicon glyphicon-triangle-bottom"></a> -->
-											<a data-toggle="tooltip" title="删除" class="glyphicon glyphicon-trash" onclick="doQuestionDel('${subPqEx.id }')"></a>
+											<a data-toggle="tooltip" title="删除" class="glyphicon glyphicon-trash" onclick="doQuestionDel('${subPaperQuestionEx.id }')"></a>
 										</td>
 									</tr>
 								</table>
 							</li>
 							</c:forEach>
 						</ul>
+					</div>
+				</div>
+				<div class="col-md-2">
+					<div class="answer-card">
+						<div class="answer-card-title">
+							<h1>答题卡</h1>
+							<p id="remainingTime"></p>
+						</div>
+						<c:forEach var="paperQuestionEx" items="${paperQuestionExList }" varStatus="v">
+							<div class="answer-card-content">
+							<div class="answer-card-content-tittle">
+								<div style="width: 150px;float: left;text-align: center;font-weight: bold;padding-top: 10px;">${paperQuestionEx.name }</div>
+								<div style="width: 100px;float: right;text-align: center;padding-top: 10px;">共${fn:length(paperQuestionEx.subList)}题</div>
+							</div>
+							<ul>
+								<c:forEach var="subPaperQuestionEx" items="${paperQuestionEx.subList }" varStatus="v1">
+								<c:set var="examUserQuestion" value="${examUserQuestionMap[subPaperQuestionEx.questionId + 0]}"></c:set>
+								<li><a id="an_card_${subPaperQuestionEx.question.id }" href="${basePath }home/paper/toCfg?id=${id }#title_${subPaperQuestionEx.question.id }" 
+										class="answer-card-yes"
+										>${subPaperQuestionEx.no }</a></li>
+								</c:forEach>
+							</ul>
+						</div>
+						</c:forEach>
+						<div class="answer-card-content">
+							<div class="answer-card-content-tittle">
+								
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
