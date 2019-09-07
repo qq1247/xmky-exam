@@ -142,7 +142,7 @@
 						<div class="answer-card-content">
 							<div class="answer-card-content-tittle">
 								<button type="button" class="btn btn-info" onclick="doPaper(false)">交卷</button>
-								<button type="button" class="btn btn-info" onclick="javascript:history.back(-1);">返回</button>
+								<button type="button" class="btn btn-info" onclick="window.location.href='home/toHome'">返回</button>
 							</div>
 						</div>
 					</div>

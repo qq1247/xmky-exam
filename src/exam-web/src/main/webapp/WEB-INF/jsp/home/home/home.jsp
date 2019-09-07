@@ -99,7 +99,7 @@
 						html.push('		<div class="handle">');
 						html.push('			<a onclick="alert(\'开发中\')">');
 						html.push('				<i class="glyphicon glyphicon-user"></i>');
-						html.push('				<span><small></small>个人信息</span>');
+						html.push('				<span><small></small>'+obj.rows[i].TOTAL_SCORE+' / '+obj.rows[i].PAPER_TOTLE_SCORE+'</span>');
 						html.push('			</a>');
 						html.push('			<a onclick="alert(\'开发中\')">');
 						html.push('				<i class="glyphicon glyphicon-list"></i>');
@@ -122,7 +122,7 @@
 						} else if (obj.rows[i].EXAM_HAND == "END") {
 							html.push('			<a>');
 							html.push('				<i class="glyphicon glyphicon-play"></i>');
-							html.push('				<span><small></small>'+obj.rows[i].PAPER_TOTLE_SCORE+'</span>');
+							html.push('				<span><small></small>已结束</span>');
 							html.push('			</a>');
 						}
 						html.push('		</div>');

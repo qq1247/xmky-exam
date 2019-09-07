@@ -27,45 +27,22 @@
 								<h1>在线考试账号登录</h1>
 								<div>
 									<span class="glyphicon glyphicon-user"></span>
-									<input type="text" id="loginName" name="loginName" value="zs" placeholder="请输入账号">
+									<input type="text" id="loginName" name="loginName" value="" placeholder="请输入账号">
 									<small class="help-block"></small>
 								</div>
 								<div>
 									<span class="glyphicon glyphicon-lock"></span>
-									<input type="password" id="pwd" name="pwd" value="111111" placeholder="请输入密码">
+									<input type="password" id="pwd" name="pwd" value="" placeholder="请输入密码">
 									<small class="help-block"></small>
 								</div>
 								<div>
 									<button type="button" class="btn btn-primary" onclick="doLogin();">登录</button>
 								</div>
-								<!-- 系统管理员 sysadmin 111111<br/>
-								张三 zs 111111 考试用户<br/>
-								李四 ls 111111 考试用户<br/> -->
 							</div>
 						</form>
 					</div>
 				</div>
 			</div>
-			<%-- <%
-			int count=0;
-			String webPath = request.getSession().getServletContext().getRealPath(File.separator);
-			File file = new File(webPath + "count.txt");
-			if(!file.exists()){
-				file.createNewFile();
-			}
-			String countStr = "0";
-			List<String> lines = StringUtil.getLastLine(file, 1);
-			if(lines.size() > 0){
-				String line1 = lines.get(0);
-				if(ValidateUtil.isValid(line1)){
-					countStr = line1;
-				}
-			}
-			
-			count = Integer.parseInt(countStr) + 1;
-			FileUtils.write(file, count + "");
-			%>
-			第&nbsp;<%=count %>&nbsp;位访客 --%>
 		</div>
 	</body>
 	<script type="text/javascript">

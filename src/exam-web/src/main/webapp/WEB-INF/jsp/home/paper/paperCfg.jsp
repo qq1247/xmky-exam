@@ -34,7 +34,7 @@
 						<span class="glyphicon glyphicon-zoom-in"></span>
 						&nbsp;预览试卷
 					</button> -->
-					<button type="button" class="btn btn-primary" onclick="javascript:history.back(-1);">
+					<button type="button" class="btn btn-primary" onclick="window.location.href='home/paper/toList'">
 						<span class="glyphicon glyphicon-arrow-left"></span>
 						&nbsp;返回
 					</button>
@@ -161,7 +161,7 @@
 												<c:if test="${!empty subPaperQuestionEx.question.analysis }">
 												<div class="row">
 													<div class="col-md-12">
-														【解析】：${subPaperQuestionEx.question.analysis }【${subPaperQuestionEx.question.analysis }】
+														【解析】：${subPaperQuestionEx.question.analysis }
 													</div>
 												</div>
 												</c:if>
