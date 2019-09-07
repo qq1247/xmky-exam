@@ -18,8 +18,8 @@
 							<div class="panel panel-default">
 								<ul class="list-group">
 									<li class="list-group-item">
-										<h1>${paper.name }</h1>
-										<h5>${paper.description }</h5>
+										<h1>${exam.name }</h1>
+										<h5>${exam.description }</h5>
 									</li>
 								</ul>
 							</div>

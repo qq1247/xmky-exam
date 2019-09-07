@@ -218,7 +218,7 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()), "EXAM_USER.EXAM_ID = ?", pageIn.getOne())
 				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "ORG.NAME LIKE ?", "%" + pageIn.getThree() + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "ORG.NAME LIKE ? OR USER.NAME LIKE ?", "%" + pageIn.getThree() + "%", "%" + pageIn.getThree() + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "EXISTS (SELECT 1 FROM EXM_MARK_USER Z WHERE Z.USER_ID = ? AND Z.EXAM_ID = EXAM_USER.EXAM_ID)", pageIn.getTen())
 				.addWhere("EXAM.STATE = ?", 1);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);

@@ -1,6 +1,9 @@
 package com.wcpdoc.exam.home.controller;
 
 import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -15,7 +18,6 @@ import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
-import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.exam.service.ExamService;
 import com.wcpdoc.exam.sys.cache.DictCache;
 
@@ -40,21 +42,9 @@ public class HomeMyMarkController extends BaseController{
 	 * @return String
 	 */
 	@RequestMapping("/toExamList")
-	public String toExamList(Model model, PageIn pageIn) {
+	public String toExamList(Model model) {
 		try {
-			if(ValidateUtil.isValid(pageIn.getTwo())){
-				pageIn.setTwo(new String(pageIn.getTwo().getBytes("iso8859-1"), "utf-8"));
-			}
-			
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
-			
-			pageIn.setTen(getCurrentUser().getId().toString());
-			pageIn.setFour("1");
-			PageOut pageOut = examService.getListpage(pageIn);
-			model.addAttribute("pageOut", pageOut);
-			
-			model.addAttribute("pageIn", pageIn);
-			model.addAttribute("pageNum", (pageOut.getTotal() - 1) / pageIn.getRows() + 1);
 			return "/WEB-INF/jsp/home/myMark/examList.jsp";
 		} catch (Exception e) {
 			log.error("到达考试列表页面错误：", e);
@@ -75,7 +65,23 @@ public class HomeMyMarkController extends BaseController{
 		try {
 			pageIn.setTen(getCurrentUser().getId().toString());
 			pageIn.setFour("1");
-			return examService.getListpage(pageIn);
+			PageOut pageOut = examService.getListpage(pageIn);
+			List<Map<String, Object>> list = pageOut.getRows();
+			
+			Date curTime = new Date();
+			for(Map<String, Object> map : list){
+				Date startTime = (Date) map.get("MARK_START_TIME");
+				Date endTime = (Date) map.get("MARK_END_TIME");
+				if (startTime.getTime() > curTime.getTime()) {
+					map.put("EXAM_HAND", "AWAIT");
+				} else if (startTime.getTime() <= curTime.getTime() && endTime.getTime() >= curTime.getTime()){
+					map.put("EXAM_HAND", "START");
+				} else {
+					map.put("EXAM_HAND", "END");
+				}
+			}
+			
+			return pageOut;
 		} catch (Exception e) {
 			log.error("考试列表错误：", e);
 			return new PageOut();
@@ -90,20 +96,9 @@ public class HomeMyMarkController extends BaseController{
 	 * @return String
 	 */
 	@RequestMapping("/toList")
-	public String toMarkList(Model model, PageIn pageIn, Integer examId) {
+	public String toMarkList(Model model, Integer examId) {
 		try {
-			if(ValidateUtil.isValid(pageIn.getThree())){
-				pageIn.setThree(new String(pageIn.getThree().getBytes("iso8859-1"), "utf-8"));
-			}
-			
 			model.addAttribute("examId", examId);
-			
-			pageIn.setTen(getCurrentUser().getId().toString());
-			PageOut pageOut = examService.getMarkListpage(pageIn);
-			model.addAttribute("pageOut", pageOut);
-			
-			model.addAttribute("pageIn", pageIn);
-			model.addAttribute("pageNum", (pageOut.getTotal() - 1) / pageIn.getRows() + 1);
 			return "/WEB-INF/jsp/home/myMark/markList.jsp";
 		} catch (Exception e) {
 			log.error("到达判卷列表页面错误：", e);

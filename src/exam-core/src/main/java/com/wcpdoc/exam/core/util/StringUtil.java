@@ -3,6 +3,7 @@ package com.wcpdoc.exam.core.util;
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -127,6 +128,29 @@ public class StringUtil {
 		
 		StringBuilder sb = new StringBuilder();
 		for(String str : strArr){
+			if(sb.length() > 0){
+				sb.append(separator);
+			}
+			sb.append(str);
+		}
+		return sb.toString();
+	}
+	
+	/**
+	 * 字符串连接
+	 * 
+	 * v1.0 zhanghc 2019年9月7日上午10:32:40
+	 * @param list
+	 * @param separator
+	 * @return String
+	 */
+	public static String join(Collection<String> collection, String separator) {
+		if(!ValidateUtil.isValid(collection)){
+			throw new RuntimeException("无法获取参数：collection");
+		}
+		
+		StringBuilder sb = new StringBuilder();
+		for (String str : collection) {
 			if(sb.length() > 0){
 				sb.append(separator);
 			}

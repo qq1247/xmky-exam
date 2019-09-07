@@ -214,6 +214,7 @@ public class HomePaperController extends BaseController {
 			model.addAttribute("paper", paper);
 			List<PaperQuestionEx> paperQuestionExList = paperService.getPaperList(id);
 			model.addAttribute("paperQuestionExList", paperQuestionExList);
+			model.addAttribute("id", id);
 			return "/WEB-INF/jsp/home/paper/paperCfg.jsp";
 		} catch (Exception e) {
 			log.error("到达配置试卷页面错误：", e);

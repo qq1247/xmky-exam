@@ -752,12 +752,14 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		}
 		
 		//用户信息
+		model.addAttribute("examUserId", examUserId);
 		model.addAttribute("user", userService.getEntity(examUser.getUserId()));
 		
 		//考试信息
 		model.addAttribute("exam", exam);
 		model.addAttribute("startTime", DateUtil.getFormatDateTime(exam.getStartTime()));
 		model.addAttribute("endTime", DateUtil.getFormatDateTime(exam.getEndTime()));
+		model.addAttribute("markEndTime", DateUtil.getFormatDateTime(exam.getMarkEndTime()));
 		model.addAttribute("sysTime", DateUtil.getFormatDateTime());
 		
 		//试卷信息

@@ -33,7 +33,8 @@
 	padding: 0 15px;
 	line-height: 30px;
 	background-color: #ffffff;
-	border: 1px solid #eff2f7;
+	border: 0px solid #eff2f7;
+	border-bottom-width: 2px;
 	font-size: 14px;
 	width: 100px;
 	height: 30px;

@@ -49,6 +49,11 @@ public class PrivilegeInterceptor extends HandlerInterceptorAdapter {
 			return false;
 		}
 		
+		if(uri.startsWith("home/myExam/") || uri.startsWith("home/myMark/")){
+			log.debug("前端特定资源，不拦截");
+			return true;
+		}
+		
 		//如果当前用户访问的资源未知，则拦截。
 		Map<String, Res> authMap = ResCache.getUrlResMap();
 		Res res = authMap.get(uri);
