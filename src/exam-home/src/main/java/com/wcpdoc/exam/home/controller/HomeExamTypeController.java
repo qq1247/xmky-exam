@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wcpdoc.exam.core.controller.BaseController;
+import com.wcpdoc.exam.core.entity.ExamType;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
+import com.wcpdoc.exam.core.service.ExamTypeService;
 import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.exam.entity.ExamType;
-import com.wcpdoc.exam.exam.service.ExamTypeService;
 import com.wcpdoc.exam.sys.entity.User;
 
 /**
@@ -45,10 +45,10 @@ public class HomeExamTypeController extends BaseController{
 	@RequestMapping("/toList")
 	public String toList() {
 		try {
-			return "/WEB-INF/jsp/home/examType/examTypeList.jsp";
+			return "/home/examType/examTypeList";
 		} catch (Exception e) {
 			log.error("到达考试分类列表页面错误：", e);
-			return "/WEB-INF/jsp/home/examType/examTypeList.jsp";
+			return "/home/examType/examTypeList";
 		}
 	}
 	
@@ -98,10 +98,10 @@ public class HomeExamTypeController extends BaseController{
 	public String toAdd(Model model, Integer parentId) {
 		try {
 			model.addAttribute("parent", examTypeService.getEntity(parentId));
-			return "/WEB-INF/jsp/home/examType/examTypeEdit.jsp";
+			return "/home/examType/examTypeEdit";
 		} catch (Exception e) {
 			log.error("到达添加考试分类页面错误", e);
-			return "/WEB-INF/jsp/home/examType/examTypeEdit.jsp";
+			return "/home/examType/examTypeEdit";
 		}
 	}
 	
@@ -115,10 +115,10 @@ public class HomeExamTypeController extends BaseController{
 	@ResponseBody
 	public PageResult doAdd(ExamType examType) {
 		try {
-			examType.setUpdateUserId(getCurrentUser().getId());
+			examType.setUpdateUserId(getCurUser().getId());
 			examType.setUpdateTime(new Date());
 			examType.setState(1);
-			examTypeService.saveAndUpdate(examType);
+			examTypeService.addAndUpdate(examType);
 			return new PageResult(true, "添加成功");
 		} catch (Exception e) {
 			log.error("完成添加考试分类错误：", e);
@@ -141,10 +141,10 @@ public class HomeExamTypeController extends BaseController{
 			if(parent != null){
 				model.addAttribute("parent", examTypeService.getEntity(examType.getParentId()));
 			}
-			return "/WEB-INF/jsp/home/examType/examTypeEdit.jsp";
+			return "/home/examType/examTypeEdit";
 		} catch (Exception e) {
 			log.error("到达修改考试分类页面错误", e);
-			return "/WEB-INF/jsp/home/examType/examTypeEdit.jsp";
+			return "/home/examType/examTypeEdit";
 		}
 	}
 	
@@ -161,7 +161,7 @@ public class HomeExamTypeController extends BaseController{
 			ExamType entity = examTypeService.getEntity(examType.getId());
 			entity.setName(examType.getName());
 			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(((User)getCurrentUser()).getId());
+			entity.setUpdateUserId(((User)getCurUser()).getId());
 			entity.setNo(examType.getNo());
 			examTypeService.editAndUpdate(entity);
 			return new PageResult(true, "修改成功");
@@ -198,10 +198,10 @@ public class HomeExamTypeController extends BaseController{
 	@RequestMapping("/toMove")
 	public String toMove() {
 		try {
-			return "/WEB-INF/jsp/home/examType/examTypeMove.jsp";
+			return "/home/examType/examTypeMove";
 		} catch (Exception e) {
 			log.error("到达移动考试分类页面错误", e);
-			return "/WEB-INF/jsp/home/examType/examTypeMove.jsp";
+			return "/home/examType/examTypeMove";
 		}
 	}
 	
@@ -251,10 +251,10 @@ public class HomeExamTypeController extends BaseController{
 	public String toAuth(Model model, Integer id) {
 		try {
 			model.addAttribute("id", id);
-			return "/WEB-INF/jsp/home/examType/examTypeAuthList.jsp";
+			return "/home/examType/examTypeAuthList";
 		} catch (Exception e) {
 			log.error("到达权限列表页面错误：", e);
-			return "/WEB-INF/jsp/home/examType/examTypeAuthList.jsp";
+			return "/home/examType/examTypeAuthList";
 		}
 	}
 	
@@ -305,10 +305,10 @@ public class HomeExamTypeController extends BaseController{
 	public String toAuthUserAddList(Model model, Integer id) {
 		try {
 			model.addAttribute("id", id);
-			return "/WEB-INF/jsp/home/examType/examTypeAuthUserAddList.jsp";
+			return "/home/examType/examTypeAuthUserAddList";
 		} catch (Exception e) {
 			log.error("到达添加权限用户列表页面错误：", e);
-			return "/WEB-INF/jsp/home/examType/examTypeAuthUserAddList.jsp";
+			return "/home/examType/examTypeAuthUserAddList";
 		}
 	}
 	
@@ -343,7 +343,7 @@ public class HomeExamTypeController extends BaseController{
 	@ResponseBody
 	public PageResult doAuthUserAdd(Integer id, Integer[] userIds, boolean syn2Sub) {
 		try {
-			examTypeService.doAuthUserAdd(id, userIds, syn2Sub, getCurrentUser());
+			examTypeService.doAuthUserAdd(id, userIds, syn2Sub, getCurUser());
 			return new PageResult(true, "添加成功");
 		} catch (Exception e) {
 			log.error("完成添加权限用户错误：", e);
@@ -364,7 +364,7 @@ public class HomeExamTypeController extends BaseController{
 	@ResponseBody
 	public PageResult doAuthUserDel(Integer id, Integer[] userIds, boolean syn2Sub) {
 		try {
-			examTypeService.doAuthUserDel(id, userIds, syn2Sub, getCurrentUser());
+			examTypeService.doAuthUserDel(id, userIds, syn2Sub, getCurUser());
 			return new PageResult(true, "删除成功");
 		} catch (Exception e) {
 			log.error("完成删除权限用户错误：", e);
@@ -373,7 +373,7 @@ public class HomeExamTypeController extends BaseController{
 	}
 	
 	/**
-	 * 完成保存权限机构
+	 * 完成添加权限机构
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param id
@@ -385,11 +385,11 @@ public class HomeExamTypeController extends BaseController{
 	@ResponseBody
 	public PageResult doAuthOrgUpdate(Integer id, Integer[] orgIds, boolean syn2Sub) {
 		try {
-			examTypeService.doAuthOrgUpdate(id, orgIds, syn2Sub, getCurrentUser());
-			return new PageResult(true, "保存成功");
+			examTypeService.doAuthOrgUpdate(id, orgIds, syn2Sub, getCurUser());
+			return new PageResult(true, "添加成功");
 		} catch (Exception e) {
-			log.error("完成保存权限机构错误：", e);
-			return new PageResult(false, "保存失败：" + e.getMessage());
+			log.error("完成添加权限机构错误：", e);
+			return new PageResult(false, "添加成功：" + e.getMessage());
 		}
 	}
 	
@@ -468,7 +468,7 @@ public class HomeExamTypeController extends BaseController{
 	}
 	
 	/**
-	 * 完成保存权限岗位
+	 * 完成添加权限岗位
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param id
@@ -480,11 +480,11 @@ public class HomeExamTypeController extends BaseController{
 	@ResponseBody
 	public PageResult doAuthPostUpdate(Integer id, Integer[] postIds, boolean syn2Sub) {
 		try {
-			examTypeService.doAuthPostUpdate(id, postIds, syn2Sub, getCurrentUser());
-			return new PageResult(true, "保存成功");
+			examTypeService.doAuthPostUpdate(id, postIds, syn2Sub, getCurUser());
+			return new PageResult(true, "添加成功");
 		} catch (Exception e) {
-			log.error("完成保存权限岗位错误：", e);
-			return new PageResult(false, "保存失败：" + e.getMessage());
+			log.error("完成添加权限岗位错误：", e);
+			return new PageResult(false, "添加成功：" + e.getMessage());
 		}
 	}
 }

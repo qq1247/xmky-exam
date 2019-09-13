@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
-import com.wcpdoc.exam.exam.service.ExamService;
+import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.report.service.GradeService;
 
 /**
