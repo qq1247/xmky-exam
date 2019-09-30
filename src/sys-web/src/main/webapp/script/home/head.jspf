@@ -1,0 +1,57 @@
+<%@ page language="java" pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="my" uri="myTag/core"%>
+<nav class="navbar navbar-fixed-top exam-header" role="navigation">
+	<div class="container">
+		<div class="navbar-header">
+			<a class="navbar-brand" href="${empty USER ? 'home/toIn' : 'home/toHome'}">在线考试</a>
+		</div>
+		<div>
+			<ul class="nav navbar-nav">
+				<c:forEach var="menu" items="${HOME_MENU_LIST[0].children[0].children }">
+				<my:auth url="${menu.url }">
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+						${menu.name }
+						<b class="caret"></b>
+					</a>
+					<ul class="dropdown-menu">
+						<c:forEach var="subMenu" items="${menu.children }">
+						<li>
+							<span class="hand"></span>
+							<a href="${subMenu.url }">${subMenu.name }</a>
+						</li>
+						<li class="hand"></li>
+						</c:forEach>
+					</ul>
+				</li>
+				</my:auth>
+				</c:forEach>
+				<li class="dropdown">
+					<a href="https://gitee.com/zhanghucheng/exam" target="_blank" class="dropdown-toggle">
+						源码地址
+					</a>
+				</li>
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+						欢迎：${USER.name }
+						<b class="caret"></b>
+					</a>
+					<ul class="dropdown-menu login">
+						<li>
+							<span class="hand"></span>
+							<a href="login/toHome">进入后台</a>
+						</li>
+						<li class="divider"></li>
+						<li>
+							<a href="home/doOut">退出</a>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</div>
+</nav>
+<div class="exam-header-plus"></div>

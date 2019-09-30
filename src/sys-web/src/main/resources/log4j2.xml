@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="error" monitorInterval="6">
+	<appenders>
+		<Console name="console" target="SYSTEM_OUT">
+			<ThresholdFilter level="trace" onMatch="ACCEPT" onMismatch="DENY" />
+			<PatternLayout pattern="%m {%d{yyyy-MM-dd HH:mm:ss,SSS} %F.%M()%L行}%n" />
+		</Console>
+		<RollingFile name="rollingFile" fileName="d:/bak/log/exam/exam.log" filePattern="d:/bak/log/exam/exam-%d{yyyy-MM-dd}.log">
+			<PatternLayout pattern="%m {%d{yyyy-MM-dd HH:mm:ss,SSS} %F.%M()%L行}%n" />
+			<TimeBasedTriggeringPolicy modulate="true" interval="1" />
+			<DefaultRolloverStrategy max="31" />
+		</RollingFile>
+	</appenders>
+	<loggers>
+		<root level="debug">
+			<appender-ref ref="rollingFile" />
+			<appender-ref ref="console" />
+		</root>
+	</loggers>
+</configuration> 

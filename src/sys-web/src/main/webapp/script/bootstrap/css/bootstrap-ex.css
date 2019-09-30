@@ -1,0 +1,481 @@
+body {
+	background-color: #F2F4F5;
+}
+
+.exam-header {
+	background: #4A5767 none repeat scroll 0% 0%;
+	height: 56px;
+	font-size: 16px;
+	margin-bottom: 0;
+}
+
+.exam-header .nav {
+	margin-left: 80px;
+}
+
+.exam-header a {
+	height: 56px;
+	line-height: 56px !important;
+	padding: 0 27px !important;
+	color: #fff;
+	background-color: inherit !important;
+}
+
+.exam-header a:focus, a:hover {
+	color: #8392A5;
+}
+
+.exam-header .dropdown-menu a {
+	height: 40px;
+	line-height: 40px !important;
+	color: #8392A5;
+}
+
+.exam-header .hand {
+	position: absolute;
+	width: 20px;
+	height: 20px;
+	background: #fff;
+	top: -10px;
+	-webkit-transform: rotate(45deg);
+	-o-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	-ms-transform: rotate(45deg);
+	transform: rotate(45deg);
+	margin-left: 50px;
+}
+
+.exam-header .login {
+	border-radius: 10px !important;
+	top: 50px;
+}
+
+.exam-header-plus {
+	padding-top: 86px;
+}
+
+.exam-login-bg {
+	/*background-image: url("./../../../img/login-bg.jpg");*/
+	
+}
+
+.exam-login-box {
+	position: relative;
+	width: 100%;
+	height: auto;
+	padding: 60px 30px;
+	margin: 100px auto;
+	background: #fff;
+	border-radius: 3px;
+	text-align: center;
+}
+
+.exam-login-box h1 {
+	color: #4a5768;
+	font-size: 20px;
+	font-weight: bold;
+	margin: 0 0 30px;
+}
+
+.exam-login-box div {
+	position: relative;
+	width: 450px;
+	height: 50px;
+	max-width: 100%;
+	margin: 0 auto 25px;
+	font-size: 0;
+	white-space: nowrap;
+}
+
+.exam-login-box input {
+	width: 100%;
+	height: 100%;
+	line-height: 50px;
+	border-radius: 5px;
+	border: 1px solid #e5e9f2;
+	padding: 0 55px;
+	font-size: 14px;
+}
+
+.exam-login-box button {
+	width: 100%;
+	height: 100%;
+	line-height: 50px;
+	border-radius: 5px;
+	border: 1px solid #e5e9f2;
+	padding: 0 55px;
+	font-size: 16px;
+}
+
+.exam-login-box span {
+	position: absolute;
+	left: 19px;
+	top: 14px;
+	font-size: 22px;
+	color: #8392a5;
+}
+
+.exam-login-box .field-error {
+	border-color: #a94442 !important;
+}
+
+.exam-login-box .help-block {
+	font-size: 12px;
+	float: left;
+	color: #a94442;
+	margin-bottom: 0px !important;
+}
+
+.exam-tree {
+	border-width: 1px;
+	border-color: rgb(221, 221, 221);
+	border-style: solid;
+}
+
+.exam-tree ul {
+	margin-bottom: 0px;
+}
+
+.exam-tree .badge {
+	background-color: #428BCA;
+}
+
+.exam-query .panel-body {
+	padding-bottom: 0px;
+}
+
+.exam-list th {
+	background-color: #F5F5F5;
+}
+
+.exam-list tbody tr {
+	background: none repeat scroll 0% 0% #FFF;
+}
+
+.exam-list .bs-bars {
+	margin-top: 0px !important;
+}
+
+.exam-list .modal-dialog {
+	width: 1100px;
+}
+/* .exam-list .modal-content {
+	height: 600px; 
+} */
+form .field-error {
+	border: 1px solid #a94442;
+}
+
+form .field-success {
+	border: 1px solid #2b542c;
+}
+
+form .help-block {
+	font-size: 12px;
+	float: left;
+	color: #a94442;
+	margin-bottom: 0px !important;
+}
+
+.note {
+	background-color: #eef7ea;
+	border-color: #bbdba1 !important;
+	color: #3c763d;
+	margin: 0 0 20px 0;
+	padding: 15px 30px 15px 15px;
+	border-left: 5px solid #eee;
+	-webkit-border-radius: 0 4px 4px 0;
+	-moz-border-radius: 0 4px 4px 0;
+	-ms-border-radius: 0 4px 4px 0;
+	-o-border-radius: 0 4px 4px 0;
+	border-radius: 0 4px 4px 0;
+}
+
+.paper a {
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.paper h1 {
+	margin-top: 0px;
+	text-align: center;
+}
+
+.paper h3, h5 {
+	margin-top: 0px;
+}
+
+.paper .field-error {
+	border: 1px solid #a94442 !important;
+}
+
+.paper .field-success {
+	border: 1px solid #2b542 !important;
+}
+
+.paper .help-block {
+	font-size: 12px;
+	float: left;
+	color: #a94442;
+	margin-bottom: 0px !important;
+}
+
+.bg-white {
+	background-color: #fff;
+}
+
+.home-nav {
+	height: 55px;
+	padding-left: 90px;
+}
+
+.home-nav span {
+	float: left;
+	font-size: 20px;
+	color: #726f70;
+	font-weight: bold;
+}
+
+.home-nav2 {
+	padding-left: 50px;
+}
+
+.home-nav2 .stats {
+	padding-left: 50px;
+}
+
+.home-nav2 .stats span {
+	font-size: 30px;
+	color: #2fc0af;
+	font-weight: 100;
+}
+
+.home-nav2 .detail {
+	border-right: 1px solid #d5d5d5;
+}
+
+.home-nav2 .detail li {
+	position: relative;
+	height: 30px;
+	margin-top: 10px;
+	list-style-type: none;
+}
+
+.home-nav2 .detail .head {
+	position: absolute;
+	left: 0;
+	padding-right: 3px;
+	background-color: #fff;
+	color: #726f70;
+}
+
+.home-nav2 .detail .mid {
+	float: left;
+	width: 97%;
+	height: 5px;
+	margin-top: 5px;
+	border-bottom: #9C9C9C 2px dotted;
+	border-bottom-left-radius: 3px;
+}
+
+.home-nav2 .detail .tail {
+	position: absolute;
+	width: 52px;
+	right: 1px;
+	padding-left: 5px;
+	background-color: #fff;
+	color: #000;
+}
+
+.home-nav3 {
+	/*margin-top: 50px;*/
+	margin-bottom: 30px;
+	padding-left: 50px;
+	overflow: hidden;
+}
+
+.home-nav3 p {
+	font-size: 16px;
+	color: #000;
+}
+
+.home-nav3 a {
+	text-align: center;
+	display: block;
+	position: relative;
+	float: left;
+	width: 58px;
+	height: 85px;
+	margin-top: 10px;
+	margin-right: 10%;
+	text-decoration: none;
+}
+
+.home-nav3 a .exam-nav {
+	display: block;
+	width: 32px;
+	height: 32px;
+	background: url('../../../img/home/icon1.png');
+	margin: 0 auto;
+}
+
+.home-nav3 a span {
+	display: block;
+	line-height: 30px;
+	font-size: 14px;
+	color: #726F70;
+}
+
+.home-nav3 a:hover .exam-nav {
+	background: url('../../../img/home/icon1-1.png');
+}
+
+.home-nav3 a:hover span {
+	color: #2FC0AF;
+}
+
+.process {
+	height: 50px;
+	margin-bottom: 10px;
+	padding-left: 15px;
+}
+
+.process-plus:after {
+	content: "";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+	display: inline-block;
+	height: 1%;
+	display: block;
+	overflow: hidden;
+}
+
+.process li {
+	list-style: none;
+	float: left;
+	width: 33%;
+	float: left;
+	cursor: pointer;
+}
+
+.process li .item {
+	position: relative;
+	padding-right: 27px;
+}
+
+.process li .item .step {
+	height: 50px;
+	text-align: center;
+	line-height: 50px;
+}
+
+.process li .item .step i {
+	width: 30px;
+	height: 30px;
+	display: inline-block;
+	border-radius: 50px;
+	text-align: center;
+	line-height: 30px;
+}
+
+.process li .item .step label {
+	font-size: 18px;
+	cursor: pointer;
+}
+
+.process li .item span {
+	position: absolute;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	width: 27px;
+	display: inline-block;
+	background: url(../../../img/home/arrow.png);
+}
+
+.process li .item.passed .step {
+	background-color: #1da02b
+}
+
+.process li .item.passed .step i {
+	background-color: #fff;
+	color: #1da02b
+}
+
+.process li .item.passed .step label {
+	color: #fff
+}
+
+.process li .item.passed span {
+	background-position: 0 -150px
+}
+
+.process li .item.curr-pre .step {
+	background-color: #1da02b
+}
+
+.process li .item.curr-pre .step i {
+	background-color: #fff;
+	color: #1da02b
+}
+
+.process li .item.curr-pre .step label {
+	color: #fff
+}
+
+.process li .item.curr-pre span {
+	background-position: 0 -100px
+}
+
+.process li .item.current .step {
+	background-color: #f45438
+}
+
+.process li .item.current .step i {
+	background-color: #fff;
+	color: #f45438
+}
+
+.process li .item.current .step label {
+	color: #fff
+}
+
+.process li .item.current span {
+	background-position: 0 -50px
+}
+
+.process li .item.laters .step {
+	background-color: #e3e3e3
+}
+
+.process li .item.laters .step i {
+	background-color: #272636;
+	color: #e3e3e3
+}
+
+.process li .item.laters .step label {
+	color: #000
+}
+
+.process li .item.laters span {
+	background-position: 0 0
+}
+
+.process li .item.last .step {
+	background-color: #e3e3e3
+}
+
+.process li .item.last .step i {
+	background-color: #272636;
+	color: #e3e3e3
+}
+
+.process li .item.last .step label {
+	color: #000
+}
+
+.process li .item.last span {
+	background: #e3e3e3
+}
