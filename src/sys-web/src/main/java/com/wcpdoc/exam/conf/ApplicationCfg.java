@@ -7,8 +7,6 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.wcpdoc.exam.web.interceptor.AuthInterceptor;
-
 /**
  * 应用配置
  * 
@@ -26,6 +24,9 @@ public class ApplicationCfg implements WebMvcConfigurer {
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(authInterceptor);
+		registry.addInterceptor(authInterceptor)
+				.excludePathPatterns("/css/**")
+				.excludePathPatterns("/script/**")
+				.excludePathPatterns("/img/**");
 	}
 }

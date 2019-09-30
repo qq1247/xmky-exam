@@ -7,7 +7,7 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 /**
- * springboot启动入口
+ * 应用启动入口
  * 
  * v1.0 zhanghc 2019年9月29日下午1:35:28
  */

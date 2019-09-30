@@ -1,9 +1,10 @@
-package com.wcpdoc.exam.web.listener;
+package com.wcpdoc.exam.conf;
 
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionBindingEvent;
@@ -15,6 +16,7 @@ import com.wcpdoc.exam.sys.entity.User;
  * 在线用户监听 <br/>
  * v1.0 zhanghc 2016年7月20日下午4:50:17
  */
+@WebListener
 public class OnlineUserListener implements HttpSessionAttributeListener {
 //	private static final Logger log = LoggerFactory.getLogger(OnlineUserListener.class);
 	

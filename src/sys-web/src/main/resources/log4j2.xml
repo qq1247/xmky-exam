@@ -12,9 +12,9 @@
 		</RollingFile>
 	</appenders>
 	<loggers>
-		<root level="debug">
+		<root level="info">
 			<appender-ref ref="rollingFile" />
 			<appender-ref ref="console" />
 		</root>
 	</loggers>
-</configuration> 
+</configuration>

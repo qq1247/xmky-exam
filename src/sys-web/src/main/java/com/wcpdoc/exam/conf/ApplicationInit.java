@@ -1,4 +1,4 @@
-package com.wcpdoc.exam.runner;
+package com.wcpdoc.exam.conf;
 
 import java.util.HashMap;
 
