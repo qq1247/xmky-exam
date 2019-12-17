@@ -14,7 +14,7 @@ spring:
   datasource:
     url: jdbc:mysql://127.0.0.1:3306/exam?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
     username: root
-    password: 123456
+    password: 2015.com
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     show-sql: false
@@ -27,7 +27,7 @@ file:
     name: exam.log
       
 sys:
-  ver: 1.1.4
+  ver: 1.1.5
 
 res:
   pub: login/toIn,login/doIn,login/toHome,login/doOut,login/toPwdUpdate,login/doPwdUpdate,home/toIn,home/doIn,home/toHome,home/doOut,home/sysTime
