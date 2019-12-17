@@ -18,7 +18,7 @@ import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
-import com.wcpdoc.exam.exam.service.ExamService;
+import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.sys.cache.DictCache;
 
 /**
@@ -45,10 +45,10 @@ public class HomeMyMarkController extends BaseController{
 	public String toExamList(Model model) {
 		try {
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
-			return "/WEB-INF/jsp/home/myMark/examList.jsp";
+			return "home/myMark/examList";
 		} catch (Exception e) {
 			log.error("到达考试列表页面错误：", e);
-			return "/WEB-INF/jsp/home/myMark/examList.jsp";
+			return "home/myMark/examList";
 		}
 	}
 	
@@ -63,7 +63,7 @@ public class HomeMyMarkController extends BaseController{
 	@ResponseBody
 	public PageOut examList(PageIn pageIn) {
 		try {
-			pageIn.setTen(getCurrentUser().getId().toString());
+			pageIn.setTen(getCurUser().getId().toString());
 			pageIn.setFour("1");
 			PageOut pageOut = examService.getListpage(pageIn);
 			List<Map<String, Object>> list = pageOut.getRows();
@@ -99,10 +99,10 @@ public class HomeMyMarkController extends BaseController{
 	public String toMarkList(Model model, Integer examId) {
 		try {
 			model.addAttribute("examId", examId);
-			return "/WEB-INF/jsp/home/myMark/markList.jsp";
+			return "home/myMark/markList";
 		} catch (Exception e) {
 			log.error("到达判卷列表页面错误：", e);
-			return "/WEB-INF/jsp/home/myMark/markList.jsp";
+			return "home/myMark/markList";
 		}
 	}
 	
@@ -117,7 +117,7 @@ public class HomeMyMarkController extends BaseController{
 	@ResponseBody
 	public PageOut list(PageIn pageIn) {
 		try {
-			pageIn.setTen(getCurrentUser().getId().toString());
+			pageIn.setTen(getCurUser().getId().toString());
 			return examService.getMarkListpage(pageIn);
 		} catch (Exception e) {
 			log.error("判卷列表错误：", e);
@@ -136,12 +136,12 @@ public class HomeMyMarkController extends BaseController{
 	@RequestMapping("/toMark")
 	public String toMark(Model model, Integer examUserId) {
 		try {
-			examService.toMark(model, getCurrentUser(), examUserId);
-			return "/WEB-INF/jsp/home/myMark/markPaper.jsp";
+			examService.toMark(model, getCurUser(), examUserId);
+			return "home/myMark/markPaper";
 		} catch (Exception e) {
 			log.error("到达试卷页面错误：", e);
 			model.addAttribute("message", e.getMessage());
-			return "/WEB-INF/jsp/home/error.jsp";
+			return "home/error";
 		}
 	}
 	
@@ -157,7 +157,7 @@ public class HomeMyMarkController extends BaseController{
 	@ResponseBody
 	public PageResult updateScore(Integer examUserQuestionId, BigDecimal score) {
 		try {
-			examService.updateMarkScore(getCurrentUser(), examUserQuestionId, score);
+			examService.updateMarkScore(getCurUser(), examUserQuestionId, score);
 			return new PageResult(true, "更新成功");
 		} catch (Exception e) {
 			log.error("更新判卷分数错误：", e);
@@ -176,7 +176,7 @@ public class HomeMyMarkController extends BaseController{
 	@ResponseBody
 	public PageResult doMark(Integer examUserId) {
 		try {
-			examService.doMark(getCurrentUser(), examUserId);
+			examService.doMark(getCurUser(), examUserId);
 			return new PageResult(true, "判卷成功");
 		} catch (Exception e) {
 			log.error("完成判卷错误：", e);
@@ -193,12 +193,12 @@ public class HomeMyMarkController extends BaseController{
 //	@RequestMapping("/toMarkView")
 //	public String toMarkView(Model model, Integer examUserId) {
 //		try {
-//			homeMarkService.toMarkView(getCurrentUser(), model, examUserId);
-//			return "/WEB-INF/jsp/home/myMark/markPaperView.jsp";
+//			homeMarkService.toMarkView(getCurUser(), model, examUserId);
+//			return "home/myMark/markPaperView";
 //		} catch (Exception e) {
 //			log.error("到达试卷预览页面错误：", e);
 //			model.addAttribute("message", e.getMessage());
-//			return "/WEB-INF/jsp/home/error.jsp";
+//			return "home/error";
 //		}
 //	}
 }

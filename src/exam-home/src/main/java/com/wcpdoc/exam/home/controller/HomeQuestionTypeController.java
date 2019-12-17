@@ -18,9 +18,9 @@ import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
+import com.wcpdoc.exam.core.entity.QuestionType;
+import com.wcpdoc.exam.core.service.QuestionTypeService;
 import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.exam.entity.QuestionType;
-import com.wcpdoc.exam.exam.service.QuestionTypeService;
 import com.wcpdoc.exam.sys.entity.User;
 
 /**
@@ -45,10 +45,10 @@ public class HomeQuestionTypeController extends BaseController{
 	@RequestMapping("/toList")
 	public String toList() {
 		try {
-			return "/WEB-INF/jsp/home/questionType/questionTypeList.jsp";
+			return "home/questionType/questionTypeList";
 		} catch (Exception e) {
 			log.error("到达试题分类列表页面错误：", e);
-			return "/WEB-INF/jsp/home/questionType/questionTypeList.jsp";
+			return "home/questionType/questionTypeList";
 		}
 	}
 	
@@ -98,10 +98,10 @@ public class HomeQuestionTypeController extends BaseController{
 	public String toAdd(Model model, Integer parentId) {
 		try {
 			model.addAttribute("parent", questionTypeService.getEntity(parentId));
-			return "/WEB-INF/jsp/home/questionType/questionTypeEdit.jsp";
+			return "home/questionType/questionTypeEdit";
 		} catch (Exception e) {
 			log.error("到达添加试题分类页面错误", e);
-			return "/WEB-INF/jsp/home/questionType/questionTypeEdit.jsp";
+			return "home/questionType/questionTypeEdit";
 		}
 	}
 	
@@ -115,10 +115,10 @@ public class HomeQuestionTypeController extends BaseController{
 	@ResponseBody
 	public PageResult doAdd(QuestionType questionType) {
 		try {
-			questionType.setUpdateUserId(getCurrentUser().getId());
+			questionType.setUpdateUserId(getCurUser().getId());
 			questionType.setUpdateTime(new Date());
 			questionType.setState(1);
-			questionTypeService.saveAndUpdate(questionType);
+			questionTypeService.addAndUpdate(questionType);
 			return new PageResult(true, "添加成功");
 		} catch (Exception e) {
 			log.error("完成添加试题分类错误：", e);
@@ -141,10 +141,10 @@ public class HomeQuestionTypeController extends BaseController{
 			if(parent != null){
 				model.addAttribute("parent", questionTypeService.getEntity(questionType.getParentId()));
 			}
-			return "/WEB-INF/jsp/home/questionType/questionTypeEdit.jsp";
+			return "home/questionType/questionTypeEdit";
 		} catch (Exception e) {
 			log.error("到达修改试题分类页面错误", e);
-			return "/WEB-INF/jsp/home/questionType/questionTypeEdit.jsp";
+			return "home/questionType/questionTypeEdit";
 		}
 	}
 	
@@ -161,7 +161,7 @@ public class HomeQuestionTypeController extends BaseController{
 			QuestionType entity = questionTypeService.getEntity(questionType.getId());
 			entity.setName(questionType.getName());
 			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(((User)getCurrentUser()).getId());
+			entity.setUpdateUserId(((User)getCurUser()).getId());
 			entity.setNo(questionType.getNo());
 			questionTypeService.editAndUpdate(entity);
 			return new PageResult(true, "修改成功");
@@ -198,10 +198,10 @@ public class HomeQuestionTypeController extends BaseController{
 	@RequestMapping("/toMove")
 	public String toMove() {
 		try {
-			return "/WEB-INF/jsp/home/questionType/questionTypeMove.jsp";
+			return "home/questionType/questionTypeMove";
 		} catch (Exception e) {
 			log.error("到达移动试题分类页面错误", e);
-			return "/WEB-INF/jsp/home/questionType/questionTypeMove.jsp";
+			return "home/questionType/questionTypeMove";
 		}
 	}
 	
@@ -251,10 +251,10 @@ public class HomeQuestionTypeController extends BaseController{
 	public String toAuth(Model model, Integer id) {
 		try {
 			model.addAttribute("id", id);
-			return "/WEB-INF/jsp/home/questionType/questionTypeAuthList.jsp";
+			return "home/questionType/questionTypeAuthList";
 		} catch (Exception e) {
 			log.error("到达权限列表页面错误：", e);
-			return "/WEB-INF/jsp/home/questionType/questionTypeAuthList.jsp";
+			return "home/questionType/questionTypeAuthList";
 		}
 	}
 	
@@ -305,10 +305,10 @@ public class HomeQuestionTypeController extends BaseController{
 	public String toAuthUserAddList(Model model, Integer id) {
 		try {
 			model.addAttribute("id", id);
-			return "/WEB-INF/jsp/home/questionType/questionTypeAuthUserAddList.jsp";
+			return "home/questionType/questionTypeAuthUserAddList";
 		} catch (Exception e) {
 			log.error("到达添加权限用户列表页面错误：", e);
-			return "/WEB-INF/jsp/home/questionType/questionTypeAuthUserAddList.jsp";
+			return "home/questionType/questionTypeAuthUserAddList";
 		}
 	}
 	
@@ -343,7 +343,7 @@ public class HomeQuestionTypeController extends BaseController{
 	@ResponseBody
 	public PageResult doAuthUserAdd(Integer id, Integer[] userIds, boolean syn2Sub) {
 		try {
-			questionTypeService.doAuthUserAdd(id, userIds, syn2Sub, getCurrentUser());
+			questionTypeService.doAuthUserAdd(id, userIds, syn2Sub, getCurUser());
 			return new PageResult(true, "添加成功");
 		} catch (Exception e) {
 			log.error("完成添加权限用户错误：", e);
@@ -364,7 +364,7 @@ public class HomeQuestionTypeController extends BaseController{
 	@ResponseBody
 	public PageResult doAuthUserDel(Integer id, Integer[] userIds, boolean syn2Sub) {
 		try {
-			questionTypeService.doAuthUserDel(id, userIds, syn2Sub, getCurrentUser());
+			questionTypeService.doAuthUserDel(id, userIds, syn2Sub, getCurUser());
 			return new PageResult(true, "删除成功");
 		} catch (Exception e) {
 			log.error("完成删除权限用户错误：", e);
@@ -373,7 +373,7 @@ public class HomeQuestionTypeController extends BaseController{
 	}
 	
 	/**
-	 * 完成保存权限机构
+	 * 完成添加权限机构
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param id
@@ -385,11 +385,11 @@ public class HomeQuestionTypeController extends BaseController{
 	@ResponseBody
 	public PageResult doAuthOrgUpdate(Integer id, Integer[] orgIds, boolean syn2Sub) {
 		try {
-			questionTypeService.doAuthOrgUpdate(id, orgIds, syn2Sub, getCurrentUser());
-			return new PageResult(true, "保存成功");
+			questionTypeService.doAuthOrgUpdate(id, orgIds, syn2Sub, getCurUser());
+			return new PageResult(true, "添加成功");
 		} catch (Exception e) {
-			log.error("完成保存权限机构错误：", e);
-			return new PageResult(false, "保存失败：" + e.getMessage());
+			log.error("完成添加权限机构错误：", e);
+			return new PageResult(false, "添加成功：" + e.getMessage());
 		}
 	}
 	
@@ -468,7 +468,7 @@ public class HomeQuestionTypeController extends BaseController{
 	}
 	
 	/**
-	 * 完成保存权限岗位
+	 * 完成添加权限岗位
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param id
@@ -480,11 +480,11 @@ public class HomeQuestionTypeController extends BaseController{
 	@ResponseBody
 	public PageResult doAuthPostUpdate(Integer id, Integer[] postIds, boolean syn2Sub) {
 		try {
-			questionTypeService.doAuthPostUpdate(id, postIds, syn2Sub, getCurrentUser());
-			return new PageResult(true, "保存成功");
+			questionTypeService.doAuthPostUpdate(id, postIds, syn2Sub, getCurUser());
+			return new PageResult(true, "添加成功");
 		} catch (Exception e) {
-			log.error("完成保存权限岗位错误：", e);
-			return new PageResult(false, "保存失败：" + e.getMessage());
+			log.error("完成添加权限岗位错误：", e);
+			return new PageResult(false, "添加成功：" + e.getMessage());
 		}
 	}
 }

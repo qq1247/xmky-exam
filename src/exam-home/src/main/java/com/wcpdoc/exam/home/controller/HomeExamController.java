@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wcpdoc.exam.core.controller.BaseController;
+import com.wcpdoc.exam.core.entity.Exam;
+import com.wcpdoc.exam.core.entity.ExamType;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
-import com.wcpdoc.exam.exam.entity.Exam;
-import com.wcpdoc.exam.exam.entity.ExamType;
-import com.wcpdoc.exam.exam.entity.Paper;
-import com.wcpdoc.exam.exam.service.ExamService;
+import com.wcpdoc.exam.core.entity.Paper;
+import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.sys.cache.DictCache;
 
 /**
@@ -49,10 +49,10 @@ public class HomeExamController extends BaseController {
 		try {
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
 			model.addAttribute("nav", nav);
-			return "/WEB-INF/jsp/home/exam/examList.jsp";
+			return "home/exam/examList";
 		} catch (Exception e) {
 			log.error("到达考试列表页面错误：", e);
-			return "/WEB-INF/jsp/home/exam/examList.jsp";
+			return "home/exam/examList";
 		}
 	}
 	
@@ -66,7 +66,7 @@ public class HomeExamController extends BaseController {
 	@ResponseBody
 	public List<Map<String, Object>> examTypeTreeList() {
 		try {
-			return examService.getExamTypeTreeList(getCurrentUser().getId());
+			return examService.getExamTypeTreeList(getCurUser().getId());
 		} catch (Exception e) {
 			log.error("获取考试分类树错误：", e);
 			return new ArrayList<Map<String,Object>>();
@@ -84,10 +84,10 @@ public class HomeExamController extends BaseController {
 	public String toPaperAdd(Model model) {
 		try {
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
-			return "/WEB-INF/jsp/home/exam/paperAdd.jsp";
+			return "home/exam/paperAdd";
 		} catch (Exception e) {
 			log.error("到达添加试卷页面错误：", e);
-			return "/WEB-INF/jsp/home/exam/paperAdd.jsp";
+			return "home/exam/paperAdd";
 		}
 	}
 	
@@ -101,7 +101,7 @@ public class HomeExamController extends BaseController {
 	@ResponseBody
 	public List<Map<String, Object>> getPaperTypeTreeList() {
 		try {
-			return examService.getPaperTypeTreeList(getCurrentUser().getId());
+			return examService.getPaperTypeTreeList(getCurUser().getId());
 		} catch (Exception e) {
 			log.error("获取试卷分类树错误：", e);
 			return new ArrayList<Map<String,Object>>();
@@ -119,8 +119,8 @@ public class HomeExamController extends BaseController {
 	@ResponseBody
 	public PageOut paperList(PageIn pageIn) {
 		try {
-			if(getCurrentUser().getId() != 1){
-				pageIn.setEight(getCurrentUser().getId() + "");
+			if(getCurUser().getId() != 1){
+				pageIn.setEight(getCurUser().getId() + "");
 			}
 			pageIn.setThree("1");
 			return examService.getPaperListpage(pageIn);
@@ -140,8 +140,8 @@ public class HomeExamController extends BaseController {
 	@ResponseBody
 	public PageOut list(PageIn pageIn) {
 		try {
-			if(getCurrentUser().getId() != 1){
-				pageIn.setEight(getCurrentUser().getId().toString());
+			if(getCurUser().getId() != 1){
+				pageIn.setEight(getCurUser().getId().toString());
 			}
 			return examService.getListpage(pageIn);
 		} catch (Exception e) {
@@ -163,10 +163,10 @@ public class HomeExamController extends BaseController {
 		try {
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
 			model.addAttribute("examType", examService.getExamType2(examTypeId));
-			return "/WEB-INF/jsp/home/exam/examEdit.jsp";
+			return "home/exam/examEdit";
 		} catch (Exception e) {
 			log.error("到达添加考试页面错误：", e);
-			return "/WEB-INF/jsp/home/exam/examEdit.jsp";
+			return "home/exam/examEdit";
 		}
 	}
 	
@@ -180,7 +180,7 @@ public class HomeExamController extends BaseController {
 	@ResponseBody
 	public PageResult doAdd(Exam exam) {
 		try {
-			examService.saveAndUpdate(exam, getCurrentUser());
+			examService.addAndUpdate(exam, getCurUser());
 			return new PageResult(true, "添加成功");
 		} catch (Exception e) {
 			log.error("完成添加考试错误：", e);
@@ -207,10 +207,10 @@ public class HomeExamController extends BaseController {
 			
 			ExamType examType = examService.getExamType(id);
 			model.addAttribute("examType", examType);
-			return "/WEB-INF/jsp/home/exam/examEdit.jsp";
+			return "home/exam/examEdit";
 		} catch (Exception e) {
 			log.error("到达修改考试页面错误：", e);
-			return "/WEB-INF/jsp/home/exam/examEdit.jsp";
+			return "home/exam/examEdit";
 		}
 	}
 	
@@ -224,7 +224,7 @@ public class HomeExamController extends BaseController {
 	@ResponseBody
 	public PageResult doEdit(Exam exam) {
 		try {
-			examService.updateAndUpdate(exam, getCurrentUser());
+			examService.updateAndUpdate(exam, getCurUser());
 			return new PageResult(true, "修改成功");
 		} catch (Exception e) {
 			log.error("完成修改考试错误：", e);
@@ -281,10 +281,10 @@ public class HomeExamController extends BaseController {
 	public String toExamUserList(Model model, Integer id) {
 		try {
 			model.addAttribute("id", id);
-			return "/WEB-INF/jsp/home/exam/examUserList.jsp";
+			return "home/exam/examUserList";
 		} catch (Exception e) {
 			log.error("到达考试用户列表页面错误：", e);
-			return "/WEB-INF/jsp/home/exam/examUserList.jsp";
+			return "home/exam/examUserList";
 		}
 	}
 	
@@ -335,10 +335,10 @@ public class HomeExamController extends BaseController {
 	public String toExamUserAdd(Model model, Integer id) {
 		try {
 			model.addAttribute("id", id);
-			return "/WEB-INF/jsp/home/exam/examUserAdd.jsp";
+			return "home/exam/examUserAdd";
 		} catch (Exception e) {
 			log.error("到达添加考试用户列表页面错误：", e);
-			return "/WEB-INF/jsp/home/exam/examUserAdd.jsp";
+			return "home/exam/examUserAdd";
 		}
 	}
 	
@@ -372,7 +372,7 @@ public class HomeExamController extends BaseController {
 	@ResponseBody
 	public PageResult doExamUserAdd(Integer id, Integer[] userIds) {
 		try {
-			examService.doExamUserAdd(getCurrentUser(), id, userIds);
+			examService.doExamUserAdd(getCurUser(), id, userIds);
 			return new PageResult(true, "添加成功");
 		} catch (Exception e) {
 			log.error("完成添加考试用户错误：", e);
@@ -411,10 +411,10 @@ public class HomeExamController extends BaseController {
 	public String toMarkUserList(Model model, Integer id) {
 		try {
 			model.addAttribute("id", id);
-			return "/WEB-INF/jsp/home/exam/markUserList.jsp";
+			return "home/exam/markUserList";
 		} catch (Exception e) {
 			log.error("到达判卷用户列表页面错误：", e);
-			return "/WEB-INF/jsp/home/exam/markUserList.jsp";
+			return "home/exam/markUserList";
 		}
 	}
 	
@@ -465,10 +465,10 @@ public class HomeExamController extends BaseController {
 	public String toMarkUserAdd(Model model, Integer id) {
 		try {
 			model.addAttribute("id", id);
-			return "/WEB-INF/jsp/home/exam/markUserAdd.jsp";
+			return "home/exam/markUserAdd";
 		} catch (Exception e) {
 			log.error("到达添加判卷用户列表页面错误：", e);
-			return "/WEB-INF/jsp/home/exam/markUserAdd.jsp";
+			return "home/exam/markUserAdd";
 		}
 	}
 	

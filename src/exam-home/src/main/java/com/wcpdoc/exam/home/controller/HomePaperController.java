@@ -19,11 +19,11 @@ import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
-import com.wcpdoc.exam.exam.entity.Paper;
-import com.wcpdoc.exam.exam.entity.PaperQuestion;
-import com.wcpdoc.exam.exam.entity.PaperQuestionEx;
-import com.wcpdoc.exam.exam.entity.PaperType;
-import com.wcpdoc.exam.exam.service.PaperService;
+import com.wcpdoc.exam.core.entity.Paper;
+import com.wcpdoc.exam.core.entity.PaperQuestion;
+import com.wcpdoc.exam.core.entity.PaperQuestionEx;
+import com.wcpdoc.exam.core.entity.PaperType;
+import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.sys.cache.DictCache;
 
 /**
@@ -52,10 +52,10 @@ public class HomePaperController extends BaseController {
 		try {
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
 			model.addAttribute("nav", nav);
-			return "/WEB-INF/jsp/home/paper/paperList.jsp";
+			return "home/paper/paperList";
 		} catch (Exception e) {
 			log.error("到达试卷列表页面错误：", e);
-			return "/WEB-INF/jsp/home/paper/paperList.jsp";
+			return "home/paper/paperList";
 		}
 	}
 	
@@ -69,7 +69,7 @@ public class HomePaperController extends BaseController {
 	@ResponseBody
 	public List<Map<String, Object>> getPaperTypeTreeList() {
 		try {
-			return paperService.getPaperTypeTreeList(getCurrentUser().getId());
+			return paperService.getPaperTypeTreeList(getCurUser().getId());
 		} catch (Exception e) {
 			log.error("获取试卷分类树错误：", e);
 			return new ArrayList<Map<String,Object>>();
@@ -86,8 +86,8 @@ public class HomePaperController extends BaseController {
 	@ResponseBody
 	public PageOut list(PageIn pageIn) {
 		try {
-			if(getCurrentUser().getId() != 1){
-				pageIn.setEight(getCurrentUser().getId().toString());
+			if(getCurUser().getId() != 1){
+				pageIn.setEight(getCurUser().getId().toString());
 			}
 			return paperService.getListpage(pageIn);
 		} catch (Exception e) {
@@ -107,10 +107,10 @@ public class HomePaperController extends BaseController {
 		try {
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
 			model.addAttribute("paperType", paperService.getPaperType2(paperTypeId));
-			return "/WEB-INF/jsp/home/paper/paperEdit.jsp";
+			return "home/paper/paperEdit";
 		} catch (Exception e) {
 			log.error("到达添加试卷页面错误：", e);
-			return "/WEB-INF/jsp/home/paper/paperEdit.jsp";
+			return "home/paper/paperEdit";
 		}
 	}
 	
@@ -125,8 +125,8 @@ public class HomePaperController extends BaseController {
 	public PageResult doAdd(Paper paper) {
 		try {
 			paper.setUpdateTime(new Date());
-			paper.setUpdateUserId(getCurrentUser().getId());
-			paperService.save(paper);
+			paper.setUpdateUserId(getCurUser().getId());
+			paperService.add(paper);
 			return new PageResult(true, "添加成功");
 		} catch (Exception e) {
 			log.error("完成添加试卷错误：", e);
@@ -149,10 +149,10 @@ public class HomePaperController extends BaseController {
 			
 			PaperType paperType = paperService.getPaperType(id);
 			model.addAttribute("paperType", paperType);
-			return "/WEB-INF/jsp/home/paper/paperEdit.jsp";
+			return "home/paper/paperEdit";
 		} catch (Exception e) {
 			log.error("到达修改试卷页面错误：", e);
-			return "/WEB-INF/jsp/home/paper/paperEdit.jsp";
+			return "home/paper/paperEdit";
 		}
 	}
 	
@@ -168,7 +168,7 @@ public class HomePaperController extends BaseController {
 		try {
 			Paper entity = paperService.getEntity(paper.getId());
 			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(getCurrentUser().getId());
+			entity.setUpdateUserId(getCurUser().getId());
 			entity.setName(paper.getName());
 			entity.setDescription(paper.getDescription());
 			entity.setState(paper.getState());
@@ -215,10 +215,10 @@ public class HomePaperController extends BaseController {
 			List<PaperQuestionEx> paperQuestionExList = paperService.getPaperList(id);
 			model.addAttribute("paperQuestionExList", paperQuestionExList);
 			model.addAttribute("id", id);
-			return "/WEB-INF/jsp/home/paper/paperCfg.jsp";
+			return "home/paper/paperCfg";
 		} catch (Exception e) {
 			log.error("到达配置试卷页面错误：", e);
-			return "/WEB-INF/jsp/home/paper/paperCfg.jsp";
+			return "home/paper/paperCfg";
 		}
 	}
 	
@@ -236,10 +236,10 @@ public class HomePaperController extends BaseController {
 			PaperQuestion chapter = new PaperQuestion();
 			chapter.setPaperId(id);
 			model.addAttribute("chapter", chapter);
-			return "/WEB-INF/jsp/home/paper/chapterEdit.jsp";
+			return "home/paper/chapterEdit";
 		} catch (Exception e) {
 			log.error("到达添加章节页面错误：", e);
-			return "/WEB-INF/jsp/home/paper/chapterEdit.jsp";
+			return "home/paper/chapterEdit";
 		}
 	}
 	
@@ -254,7 +254,7 @@ public class HomePaperController extends BaseController {
 	@ResponseBody
 	public PageResult doChapterAdd(PaperQuestion chapter) {
 		try {
-			paperService.doChapterAdd(chapter, getCurrentUser());
+			paperService.doChapterAdd(chapter, getCurUser());
 			return new PageResult(true, "添加成功");
 		} catch (Exception e) {
 			log.error("完成添加章节错误：", e);
@@ -275,10 +275,10 @@ public class HomePaperController extends BaseController {
 		try {
 			PaperQuestion chapter = paperService.getPaperQuestion(chapterId);
 			model.addAttribute("chapter", chapter);
-			return "/WEB-INF/jsp/home/paper/chapterEdit.jsp";
+			return "home/paper/chapterEdit";
 		} catch (Exception e) {
 			log.error("到达修改章节页面错误：", e);
-			return "/WEB-INF/jsp/home/paper/chapterEdit.jsp";
+			return "home/paper/chapterEdit";
 		}
 	}
 	
@@ -293,7 +293,7 @@ public class HomePaperController extends BaseController {
 	@ResponseBody
 	public PageResult doChapterEdit(PaperQuestion chapter) {
 		try {
-			paperService.doChapterEdit(chapter, getCurrentUser());
+			paperService.doChapterEdit(chapter, getCurUser());
 			return new PageResult(true, "修改成功");
 		} catch (Exception e) {
 			log.error("完成修改章节错误：", e);
@@ -336,10 +336,10 @@ public class HomePaperController extends BaseController {
 			model.addAttribute("QUESTION_TYPE_DICT", DictCache.getIndexDictlistMap().get("QUESTION_TYPE"));
 			model.addAttribute("QUESTION_DIFFICULTY_DICT", DictCache.getIndexDictlistMap().get("QUESTION_DIFFICULTY"));
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
-			return "/WEB-INF/jsp/home/paper/questionAdd.jsp";
+			return "home/paper/questionAdd";
 		} catch (Exception e) {
 			log.error("到达添加试题页面错误：", e);
-			return "/WEB-INF/jsp/home/paper/questionAdd.jsp";
+			return "home/paper/questionAdd";
 		}
 	}
 	
@@ -353,7 +353,7 @@ public class HomePaperController extends BaseController {
 	@ResponseBody
 	public List<Map<String, Object>> questionTypeTreeList() {
 		try {
-			return paperService.getQuestionTypeTreeList(getCurrentUser().getId());
+			return paperService.getQuestionTypeTreeList(getCurUser().getId());
 		} catch (Exception e) {
 			log.error("获取试题分类树错误：", e);
 			return new ArrayList<Map<String,Object>>();
@@ -371,8 +371,8 @@ public class HomePaperController extends BaseController {
 	@ResponseBody
 	public PageOut questionList(PageIn pageIn) {
 		try {
-			if(getCurrentUser().getId() != 1){
-				pageIn.setEight(getCurrentUser().getId().toString());
+			if(getCurUser().getId() != 1){
+				pageIn.setEight(getCurUser().getId().toString());
 			}
 			return paperService.getQuestionListpage(pageIn);
 		} catch (Exception e) {
@@ -393,7 +393,7 @@ public class HomePaperController extends BaseController {
 	@ResponseBody
 	public PageResult doQuestionAdd(Integer chapterId, Integer[] questionIds) {
 		try {
-			paperService.doQuestionAdd(chapterId, questionIds, getCurrentUser());
+			paperService.doQuestionAdd(chapterId, questionIds, getCurUser());
 			return new PageResult(true, "添加成功");
 		} catch (Exception e) {
 			log.error("完成添加试题错误：", e);
@@ -412,7 +412,7 @@ public class HomePaperController extends BaseController {
 	@ResponseBody
 	public PageResult doQuestionClear(Integer chapterId) {
 		try {
-			paperService.doQuestionClear(chapterId, getCurrentUser());
+			paperService.doQuestionClear(chapterId, getCurUser());
 			return new PageResult(true, "添加成功");
 		} catch (Exception e) {
 			log.error("完成添加试题错误：", e);
@@ -432,10 +432,10 @@ public class HomePaperController extends BaseController {
 	public String toScoresUpdate(Model model, Integer chapterId) {
 		try {
 			model.addAttribute("chapterId", chapterId);
-			return "/WEB-INF/jsp/home/paper/scoresUpdate.jsp";
+			return "home/paper/scoresUpdate";
 		} catch (Exception e) {
 			log.error("到达设置分数页面错误：", e);
-			return "/WEB-INF/jsp/home/paper/scoresUpdate.jsp";
+			return "home/paper/scoresUpdate";
 		}
 	}
 	

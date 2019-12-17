@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wcpdoc.exam.core.controller.BaseController;
+import com.wcpdoc.exam.core.entity.ExamUser;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
+import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.util.HibernateUtil;
-import com.wcpdoc.exam.exam.entity.ExamUser;
-import com.wcpdoc.exam.exam.service.ExamService;
 import com.wcpdoc.exam.sys.cache.DictCache;
 
 /**
@@ -44,10 +44,10 @@ public class HomeMyExamController extends BaseController{
 	@RequestMapping("/toList")
 	public String toList(Model model) {
 		try {
-			return "/WEB-INF/jsp/home/myExam/myExamList.jsp";
+			return "home/myExam/myExamList";
 		} catch (Exception e) {
 			log.error("到达我的考试列表页面错误：", e);
-			return "/WEB-INF/jsp/home/myExam/myExamList.jsp";
+			return "home/myExam/myExamList";
 		}
 	}
 	
@@ -61,13 +61,13 @@ public class HomeMyExamController extends BaseController{
 	@ResponseBody
 	public PageOut list(PageIn pageIn) {
 		try {
-			pageIn.setNine(getCurrentUser().getId() + "");
+			pageIn.setNine(getCurUser().getId() + "");
 			PageOut listpage = examService.getListpage(pageIn);
 			List<Map<String, Object>> list = listpage.getRows();
 			
 			Date curTime = new Date();
 			for(Map<String, Object> map : list){
-				ExamUser examUser = examService.getExamUser((int)map.get("ID"), getCurrentUser().getId());
+				ExamUser examUser = examService.getExamUser((int)map.get("ID"), getCurUser().getId());
 				map.put("TOTAL_SCORE", examUser.getTotalScore());
 				map.put("EXAM_USER_STATE", examUser.getState());
 				
@@ -101,12 +101,12 @@ public class HomeMyExamController extends BaseController{
 	public String toPaper(Model model, Integer examId) {
 		try {
 			model.addAttribute("examId", examId);
-			examService.toPaper(model, getCurrentUser(), examId);
-			return "/WEB-INF/jsp/home/myExam/myExamPaper.jsp";
+			examService.toPaper(model, getCurUser(), examId);
+			return "home/myExam/myExamPaper";
 		} catch (Exception e) {
 			log.error("到达试卷页面错误：", e);
 			model.addAttribute("message", e.getMessage());
-			return "/WEB-INF/jsp/home/error.jsp";
+			return "home/error";
 		}
 	}
 	
@@ -122,7 +122,7 @@ public class HomeMyExamController extends BaseController{
 	@ResponseBody
 	public PageResult updateAnswer(Integer examUserQuestionId, String answer) {
 		try {
-			examService.updateAnswer(getCurrentUser(), examUserQuestionId, answer);
+			examService.updateAnswer(getCurUser(), examUserQuestionId, answer);
 			return new PageResult(true, "更新成功");
 		} catch (Exception e) {
 			log.error("更新答案错误：", e);
@@ -141,7 +141,7 @@ public class HomeMyExamController extends BaseController{
 	@ResponseBody
 	public PageResult doPaper(Integer examUserId) {
 		try {
-			examService.doPaper(getCurrentUser(), examUserId);
+			examService.doPaper(getCurUser(), examUserId);
 			return new PageResult(true, "完成成功");
 		} catch (Exception e) {
 			log.error("完成试卷错误：", e);
@@ -160,7 +160,7 @@ public class HomeMyExamController extends BaseController{
 //		try {
 //			//校验数据有效性
 //			ExamUser examUser = homeMyExamService.getExamUser(examUserId);
-//			LoginUser user = getCurrentUser();
+//			LoginUser user = getCurUser();
 //			Exam exam = homeMyExamService.getExam(examUser.getExamId());
 //			if(examUser.getUserId() != user.getId()){
 //				throw new RuntimeException("未参与考试：" + exam.getName());
@@ -192,11 +192,11 @@ public class HomeMyExamController extends BaseController{
 //			//考试用户信息
 //			model.addAttribute("examUser", examUser);
 //			
-//			return "/WEB-INF/jsp/home/myExam/myExamPaperView.jsp";
+//			return "home/myExam/myExamPaperView";
 //		} catch (Exception e) {
 //			log.error("到达试卷预览页面错误：", e);
 //			model.addAttribute("message", e.getMessage());
-//			return "/WEB-INF/jsp/home/error.jsp";
+//			return "home/error";
 //		}
 //	}
 }

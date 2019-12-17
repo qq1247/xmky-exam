@@ -1,60 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.wcpdoc.exam</groupId>
+	<parent>
+		<groupId>com.wcpdoc.exam</groupId>
+		<artifactId>sys-parent</artifactId>
+		<version>1.0.0</version>
+	</parent>
 	<artifactId>exam-home</artifactId>
-	<version>1.1.2</version>
-	<packaging>jar</packaging>
 	<name>exam-home</name>
-	<url>http://maven.apache.org</url>
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
+	<description>考试首页</description>
+
 	<dependencies>
-		<!-- 集成javaee相关jar包，作用范围为编译 -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>3.1.0</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet.jsp</groupId>
-			<artifactId>javax.servlet.jsp-api</artifactId>
-			<version>2.3.1</version>
-			<scope>provided</scope>
-		</dependency>
-		<!-- 集成exam-core -->
+		<!-- 集成考试核心 -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
 			<artifactId>exam-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- 集成exam-file -->
-		<dependency>
-			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>exam-file</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<!-- 集成exam-exam -->
-		<dependency>
-			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>exam-exam</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 	</dependencies>
-	<build>
-		<finalName>exam-home</finalName>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 </project>

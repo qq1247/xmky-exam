@@ -23,9 +23,9 @@ import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
-import com.wcpdoc.exam.exam.entity.Question;
-import com.wcpdoc.exam.exam.entity.QuestionType;
-import com.wcpdoc.exam.exam.service.QuestionService;
+import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.entity.QuestionType;
+import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.file.entity.FileEx;
 import com.wcpdoc.exam.sys.cache.DictCache;
 
@@ -57,10 +57,10 @@ public class HomeQuestionController extends BaseController {
 			model.addAttribute("QUESTION_DIFFICULTY_DICT", DictCache.getIndexDictlistMap().get("QUESTION_DIFFICULTY"));
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
 			model.addAttribute("nav", nav);
-			return "/WEB-INF/jsp/home/question/questionList.jsp";
+			return "home/question/questionList";
 		} catch (Exception e) {
 			log.error("到达试题列表页面错误：", e);
-			return "/WEB-INF/jsp/home/question/questionList.jsp";
+			return "home/question/questionList";
 		}
 	}
 	
@@ -74,7 +74,7 @@ public class HomeQuestionController extends BaseController {
 	@ResponseBody
 	public List<Map<String, Object>> questionTypeTreeList() {
 		try {
-			return questionService.getQuestionTypeTreeList(getCurrentUser().getId());
+			return questionService.getQuestionTypeTreeList(getCurUser().getId());
 		} catch (Exception e) {
 			log.error("获取试题分类树错误：", e);
 			return new ArrayList<Map<String,Object>>();
@@ -94,7 +94,7 @@ public class HomeQuestionController extends BaseController {
 		Map<String, Object> data = new HashMap<String, Object>();
 		try {
 			String[] allowTypes = { "jpg", "gif", "png", "mp4", "JPG", "GIF", "PNG", "MP4"};
-			String fileIds = questionService.doTempUpload(files, allowTypes, getCurrentUser(), request.getRemoteAddr());
+			String fileIds = questionService.doTempUpload(files, allowTypes, getCurUser(), request.getRemoteAddr());
 			data.put("error", 0);
 			data.put("url", "doDownload?fileId=" + fileIds);
 			return data;
@@ -141,8 +141,8 @@ public class HomeQuestionController extends BaseController {
 	@ResponseBody
 	public PageOut list(PageIn pageIn) {
 		try {
-			if(getCurrentUser().getId() != 1){
-				pageIn.setEight(getCurrentUser().getId().toString());
+			if(getCurUser().getId() != 1){
+				pageIn.setEight(getCurUser().getId().toString());
 			}
 			return questionService.getListpage(pageIn);
 		} catch (Exception e) {
@@ -164,10 +164,10 @@ public class HomeQuestionController extends BaseController {
 			model.addAttribute("QUESTION_DIFFICULTY_DICT", DictCache.getIndexDictlistMap().get("QUESTION_DIFFICULTY"));
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
 			model.addAttribute("questionType", questionService.getQuestionType2(questionTypeId));
-			return "/WEB-INF/jsp/home/question/questionEdit.jsp";
+			return "home/question/questionEdit";
 		} catch (Exception e) {
 			log.error("到达添加试题页面错误：", e);
-			return "/WEB-INF/jsp/home/question/questionEdit.jsp";
+			return "home/question/questionEdit";
 		}
 	}
 	
@@ -181,7 +181,7 @@ public class HomeQuestionController extends BaseController {
 	@ResponseBody
 	public PageResult doAdd(Question question, String[] answer) {
 		try {
-			questionService.saveAndUpdate(question, answer, getCurrentUser(), request.getRemoteAddr());
+			questionService.addAndUpdate(question, answer, getCurUser(), request.getRemoteAddr());
 			return new PageResult(true, "添加成功");
 		} catch (Exception e) {
 			log.error("完成添加试题错误：", e);
@@ -208,10 +208,10 @@ public class HomeQuestionController extends BaseController {
 			model.addAttribute("QUESTION_DIFFICULTY_DICT", DictCache.getIndexDictlistMap().get("QUESTION_DIFFICULTY"));
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
 			
-			return "/WEB-INF/jsp/home/question/questionEdit.jsp";
+			return "home/question/questionEdit";
 		} catch (Exception e) {
 			log.error("到达修改试题页面错误：", e);
-			return "/WEB-INF/jsp/home/question/questionEdit.jsp";
+			return "home/question/questionEdit";
 		}
 	}
 	

@@ -18,9 +18,9 @@ import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
+import com.wcpdoc.exam.core.entity.PaperType;
+import com.wcpdoc.exam.core.service.PaperTypeService;
 import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.exam.entity.PaperType;
-import com.wcpdoc.exam.exam.service.PaperTypeService;
 import com.wcpdoc.exam.sys.entity.User;
 
 /**
@@ -45,10 +45,10 @@ public class HomePaperTypeController extends BaseController{
 	@RequestMapping("/toList")
 	public String toList() {
 		try {
-			return "/WEB-INF/jsp/home/paperType/paperTypeList.jsp";
+			return "home/paperType/paperTypeList";
 		} catch (Exception e) {
 			log.error("到达试卷分类列表页面错误：", e);
-			return "/WEB-INF/jsp/home/paperType/paperTypeList.jsp";
+			return "home/paperType/paperTypeList";
 		}
 	}
 	
@@ -98,10 +98,10 @@ public class HomePaperTypeController extends BaseController{
 	public String toAdd(Model model, Integer parentId) {
 		try {
 			model.addAttribute("parent", paperTypeService.getEntity(parentId));
-			return "/WEB-INF/jsp/home/paperType/paperTypeEdit.jsp";
+			return "home/paperType/paperTypeEdit";
 		} catch (Exception e) {
 			log.error("到达添加试卷分类页面错误", e);
-			return "/WEB-INF/jsp/home/paperType/paperTypeEdit.jsp";
+			return "home/paperType/paperTypeEdit";
 		}
 	}
 	
@@ -115,10 +115,10 @@ public class HomePaperTypeController extends BaseController{
 	@ResponseBody
 	public PageResult doAdd(PaperType paperType) {
 		try {
-			paperType.setUpdateUserId(getCurrentUser().getId());
+			paperType.setUpdateUserId(getCurUser().getId());
 			paperType.setUpdateTime(new Date());
 			paperType.setState(1);
-			paperTypeService.saveAndUpdate(paperType);
+			paperTypeService.addAndUpdate(paperType);
 			return new PageResult(true, "添加成功");
 		} catch (Exception e) {
 			log.error("完成添加试卷分类错误：", e);
@@ -141,10 +141,10 @@ public class HomePaperTypeController extends BaseController{
 			if(parent != null){
 				model.addAttribute("parent", paperTypeService.getEntity(paperType.getParentId()));
 			}
-			return "/WEB-INF/jsp/home/paperType/paperTypeEdit.jsp";
+			return "home/paperType/paperTypeEdit";
 		} catch (Exception e) {
 			log.error("到达修改试卷分类页面错误", e);
-			return "/WEB-INF/jsp/home/paperType/paperTypeEdit.jsp";
+			return "home/paperType/paperTypeEdit";
 		}
 	}
 	
@@ -161,7 +161,7 @@ public class HomePaperTypeController extends BaseController{
 			PaperType entity = paperTypeService.getEntity(paperType.getId());
 			entity.setName(paperType.getName());
 			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(((User)getCurrentUser()).getId());
+			entity.setUpdateUserId(((User)getCurUser()).getId());
 			entity.setNo(paperType.getNo());
 			paperTypeService.editAndUpdate(entity);
 			return new PageResult(true, "修改成功");
@@ -198,10 +198,10 @@ public class HomePaperTypeController extends BaseController{
 	@RequestMapping("/toMove")
 	public String toMove() {
 		try {
-			return "/WEB-INF/jsp/home/paperType/paperTypeMove.jsp";
+			return "home/paperType/paperTypeMove";
 		} catch (Exception e) {
 			log.error("到达移动试卷分类页面错误", e);
-			return "/WEB-INF/jsp/home/paperType/paperTypeMove.jsp";
+			return "home/paperType/paperTypeMove";
 		}
 	}
 	
@@ -251,10 +251,10 @@ public class HomePaperTypeController extends BaseController{
 	public String toAuth(Model model, Integer id) {
 		try {
 			model.addAttribute("id", id);
-			return "/WEB-INF/jsp/home/paperType/paperTypeAuthList.jsp";
+			return "home/paperType/paperTypeAuthList";
 		} catch (Exception e) {
 			log.error("到达权限列表页面错误：", e);
-			return "/WEB-INF/jsp/home/paperType/paperTypeAuthList.jsp";
+			return "home/paperType/paperTypeAuthList";
 		}
 	}
 	
@@ -305,10 +305,10 @@ public class HomePaperTypeController extends BaseController{
 	public String toAuthUserAddList(Model model, Integer id) {
 		try {
 			model.addAttribute("id", id);
-			return "/WEB-INF/jsp/home/paperType/paperTypeAuthUserAddList.jsp";
+			return "home/paperType/paperTypeAuthUserAddList";
 		} catch (Exception e) {
 			log.error("到达添加权限用户列表页面错误：", e);
-			return "/WEB-INF/jsp/home/paperType/paperTypeAuthUserAddList.jsp";
+			return "home/paperType/paperTypeAuthUserAddList";
 		}
 	}
 	
@@ -343,7 +343,7 @@ public class HomePaperTypeController extends BaseController{
 	@ResponseBody
 	public PageResult doAuthUserAdd(Integer id, Integer[] userIds, boolean syn2Sub) {
 		try {
-			paperTypeService.doAuthUserAdd(id, userIds, syn2Sub, getCurrentUser());
+			paperTypeService.doAuthUserAdd(id, userIds, syn2Sub, getCurUser());
 			return new PageResult(true, "添加成功");
 		} catch (Exception e) {
 			log.error("完成添加权限用户错误：", e);
@@ -364,7 +364,7 @@ public class HomePaperTypeController extends BaseController{
 	@ResponseBody
 	public PageResult doAuthUserDel(Integer id, Integer[] userIds, boolean syn2Sub) {
 		try {
-			paperTypeService.doAuthUserDel(id, userIds, syn2Sub, getCurrentUser());
+			paperTypeService.doAuthUserDel(id, userIds, syn2Sub, getCurUser());
 			return new PageResult(true, "删除成功");
 		} catch (Exception e) {
 			log.error("完成删除权限用户错误：", e);
@@ -373,7 +373,7 @@ public class HomePaperTypeController extends BaseController{
 	}
 	
 	/**
-	 * 完成保存权限机构
+	 * 完成添加权限机构
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param id
@@ -385,11 +385,11 @@ public class HomePaperTypeController extends BaseController{
 	@ResponseBody
 	public PageResult doAuthOrgUpdate(Integer id, Integer[] orgIds, boolean syn2Sub) {
 		try {
-			paperTypeService.doAuthOrgUpdate(id, orgIds, syn2Sub, getCurrentUser());
-			return new PageResult(true, "保存成功");
+			paperTypeService.doAuthOrgUpdate(id, orgIds, syn2Sub, getCurUser());
+			return new PageResult(true, "添加成功");
 		} catch (Exception e) {
-			log.error("完成保存权限机构错误：", e);
-			return new PageResult(false, "保存失败：" + e.getMessage());
+			log.error("完成添加权限机构错误：", e);
+			return new PageResult(false, "添加成功：" + e.getMessage());
 		}
 	}
 	
@@ -468,7 +468,7 @@ public class HomePaperTypeController extends BaseController{
 	}
 	
 	/**
-	 * 完成保存权限岗位
+	 * 完成添加权限岗位
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param id
@@ -480,11 +480,11 @@ public class HomePaperTypeController extends BaseController{
 	@ResponseBody
 	public PageResult doAuthPostUpdate(Integer id, Integer[] postIds, boolean syn2Sub) {
 		try {
-			paperTypeService.doAuthPostUpdate(id, postIds, syn2Sub, getCurrentUser());
-			return new PageResult(true, "保存成功");
+			paperTypeService.doAuthPostUpdate(id, postIds, syn2Sub, getCurUser());
+			return new PageResult(true, "添加成功");
 		} catch (Exception e) {
-			log.error("完成保存权限岗位错误：", e);
-			return new PageResult(false, "保存失败：" + e.getMessage());
+			log.error("完成添加权限岗位错误：", e);
+			return new PageResult(false, "添加成功：" + e.getMessage());
 		}
 	}
 }
