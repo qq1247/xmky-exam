@@ -52,10 +52,10 @@ public class HomePaperController extends BaseController {
 		try {
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
 			model.addAttribute("nav", nav);
-			return "/home/paper/paperList";
+			return "home/paper/paperList";
 		} catch (Exception e) {
 			log.error("到达试卷列表页面错误：", e);
-			return "/home/paper/paperList";
+			return "home/paper/paperList";
 		}
 	}
 	
@@ -107,10 +107,10 @@ public class HomePaperController extends BaseController {
 		try {
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
 			model.addAttribute("paperType", paperService.getPaperType2(paperTypeId));
-			return "/home/paper/paperEdit";
+			return "home/paper/paperEdit";
 		} catch (Exception e) {
 			log.error("到达添加试卷页面错误：", e);
-			return "/home/paper/paperEdit";
+			return "home/paper/paperEdit";
 		}
 	}
 	
@@ -149,10 +149,10 @@ public class HomePaperController extends BaseController {
 			
 			PaperType paperType = paperService.getPaperType(id);
 			model.addAttribute("paperType", paperType);
-			return "/home/paper/paperEdit";
+			return "home/paper/paperEdit";
 		} catch (Exception e) {
 			log.error("到达修改试卷页面错误：", e);
-			return "/home/paper/paperEdit";
+			return "home/paper/paperEdit";
 		}
 	}
 	
@@ -215,10 +215,10 @@ public class HomePaperController extends BaseController {
 			List<PaperQuestionEx> paperQuestionExList = paperService.getPaperList(id);
 			model.addAttribute("paperQuestionExList", paperQuestionExList);
 			model.addAttribute("id", id);
-			return "/home/paper/paperCfg";
+			return "home/paper/paperCfg";
 		} catch (Exception e) {
 			log.error("到达配置试卷页面错误：", e);
-			return "/home/paper/paperCfg";
+			return "home/paper/paperCfg";
 		}
 	}
 	
@@ -236,10 +236,10 @@ public class HomePaperController extends BaseController {
 			PaperQuestion chapter = new PaperQuestion();
 			chapter.setPaperId(id);
 			model.addAttribute("chapter", chapter);
-			return "/home/paper/chapterEdit";
+			return "home/paper/chapterEdit";
 		} catch (Exception e) {
 			log.error("到达添加章节页面错误：", e);
-			return "/home/paper/chapterEdit";
+			return "home/paper/chapterEdit";
 		}
 	}
 	
@@ -275,10 +275,10 @@ public class HomePaperController extends BaseController {
 		try {
 			PaperQuestion chapter = paperService.getPaperQuestion(chapterId);
 			model.addAttribute("chapter", chapter);
-			return "/home/paper/chapterEdit";
+			return "home/paper/chapterEdit";
 		} catch (Exception e) {
 			log.error("到达修改章节页面错误：", e);
-			return "/home/paper/chapterEdit";
+			return "home/paper/chapterEdit";
 		}
 	}
 	
@@ -336,10 +336,10 @@ public class HomePaperController extends BaseController {
 			model.addAttribute("QUESTION_TYPE_DICT", DictCache.getIndexDictlistMap().get("QUESTION_TYPE"));
 			model.addAttribute("QUESTION_DIFFICULTY_DICT", DictCache.getIndexDictlistMap().get("QUESTION_DIFFICULTY"));
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
-			return "/home/paper/questionAdd";
+			return "home/paper/questionAdd";
 		} catch (Exception e) {
 			log.error("到达添加试题页面错误：", e);
-			return "/home/paper/questionAdd";
+			return "home/paper/questionAdd";
 		}
 	}
 	
@@ -432,10 +432,10 @@ public class HomePaperController extends BaseController {
 	public String toScoresUpdate(Model model, Integer chapterId) {
 		try {
 			model.addAttribute("chapterId", chapterId);
-			return "/home/paper/scoresUpdate";
+			return "home/paper/scoresUpdate";
 		} catch (Exception e) {
 			log.error("到达设置分数页面错误：", e);
-			return "/home/paper/scoresUpdate";
+			return "home/paper/scoresUpdate";
 		}
 	}
 	

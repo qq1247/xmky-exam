@@ -45,10 +45,10 @@ public class HomeMyMarkController extends BaseController{
 	public String toExamList(Model model) {
 		try {
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
-			return "/home/myMark/examList";
+			return "home/myMark/examList";
 		} catch (Exception e) {
 			log.error("到达考试列表页面错误：", e);
-			return "/home/myMark/examList";
+			return "home/myMark/examList";
 		}
 	}
 	
@@ -99,10 +99,10 @@ public class HomeMyMarkController extends BaseController{
 	public String toMarkList(Model model, Integer examId) {
 		try {
 			model.addAttribute("examId", examId);
-			return "/home/myMark/markList";
+			return "home/myMark/markList";
 		} catch (Exception e) {
 			log.error("到达判卷列表页面错误：", e);
-			return "/home/myMark/markList";
+			return "home/myMark/markList";
 		}
 	}
 	
@@ -137,11 +137,11 @@ public class HomeMyMarkController extends BaseController{
 	public String toMark(Model model, Integer examUserId) {
 		try {
 			examService.toMark(model, getCurUser(), examUserId);
-			return "/home/myMark/markPaper";
+			return "home/myMark/markPaper";
 		} catch (Exception e) {
 			log.error("到达试卷页面错误：", e);
 			model.addAttribute("message", e.getMessage());
-			return "/home/error";
+			return "home/error";
 		}
 	}
 	
@@ -194,11 +194,11 @@ public class HomeMyMarkController extends BaseController{
 //	public String toMarkView(Model model, Integer examUserId) {
 //		try {
 //			homeMarkService.toMarkView(getCurUser(), model, examUserId);
-//			return "/home/myMark/markPaperView";
+//			return "home/myMark/markPaperView";
 //		} catch (Exception e) {
 //			log.error("到达试卷预览页面错误：", e);
 //			model.addAttribute("message", e.getMessage());
-//			return "/home/error";
+//			return "home/error";
 //		}
 //	}
 }

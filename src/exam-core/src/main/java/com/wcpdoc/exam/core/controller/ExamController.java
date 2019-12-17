@@ -28,10 +28,10 @@ public class ExamController extends BaseController{
 //	@RequestMapping("/toList")
 //	public String toList() {
 //		try {
-//			return "/exam/exam/examList";
+//			return "exam/exam/examList";
 //		} catch (Exception e) {
 //			log.error("到达考试列表页面错误：", e);
-//			return "/exam/exam/examList";
+//			return "exam/exam/examList";
 //		}
 //	}
 //	
@@ -79,10 +79,10 @@ public class ExamController extends BaseController{
 //	public String toAdd(Model model) {
 //		try {
 //			model.addAttribute("STATE", DictCache.getIndexDictlistMap().get("STATE"));
-//			return "/exam/exam/examEdit";
+//			return "exam/exam/examEdit";
 //		} catch (Exception e) {
 //			log.error("到达添加考试页面错误：", e);
-//			return "/exam/exam/examEdit";
+//			return "exam/exam/examEdit";
 //		}
 //	}
 //	
@@ -96,10 +96,10 @@ public class ExamController extends BaseController{
 //	@RequestMapping("/toPaperAddList")
 //	public String toPaperAddList(Integer id) {
 //		try {
-//			return "/exam/exam/examPaperAddList";
+//			return "exam/exam/examPaperAddList";
 //		} catch (Exception e) {
 //			log.error("到达添加试卷页面错误：", e);
-//			return "/exam/exam/examPaperAddList";
+//			return "exam/exam/examPaperAddList";
 //		}
 //	}
 //	
@@ -175,10 +175,10 @@ public class ExamController extends BaseController{
 //			
 //			ExamType examType = examService.getExamType(id);
 //			model.addAttribute("examType", examType);
-//			return "/exam/exam/examEdit";
+//			return "exam/exam/examEdit";
 //		} catch (Exception e) {
 //			log.error("到达修改考试页面错误：", e);
-//			return "/exam/exam/examEdit";
+//			return "exam/exam/examEdit";
 //		}
 //	}
 //	
@@ -239,10 +239,10 @@ public class ExamController extends BaseController{
 //	public String toExamUserList(Model model, Integer id) {
 //		try {
 //			model.addAttribute("id", id);
-//			return "/exam/exam/examUserList";
+//			return "exam/exam/examUserList";
 //		} catch (Exception e) {
 //			log.error("到达考试用户列表页面错误：", e);
-//			return "/exam/exam/examUserList";
+//			return "exam/exam/examUserList";
 //		}
 //	}
 //	
@@ -293,10 +293,10 @@ public class ExamController extends BaseController{
 //	public String toExamUserAddList(Model model, Integer id) {
 //		try {
 //			model.addAttribute("id", id);
-//			return "/exam/exam/examUserAddList";
+//			return "exam/exam/examUserAddList";
 //		} catch (Exception e) {
 //			log.error("到达添加考试用户列表页面错误：", e);
-//			return "/exam/exam/examUserAddList";
+//			return "exam/exam/examUserAddList";
 //		}
 //	}
 //	
@@ -385,10 +385,10 @@ public class ExamController extends BaseController{
 //	public String toMarkUserList(Model model, Integer id) {
 //		try {
 //			model.addAttribute("id", id);
-//			return "/exam/exam/examMarkUserList";
+//			return "exam/exam/examMarkUserList";
 //		} catch (Exception e) {
 //			log.error("到达判卷用户列表页面错误：", e);
-//			return "/exam/exam/examMarkUserList";
+//			return "exam/exam/examMarkUserList";
 //		}
 //	}
 //	
@@ -439,10 +439,10 @@ public class ExamController extends BaseController{
 //	public String toMarkUserAddList(Model model, Integer id) {
 //		try {
 //			model.addAttribute("id", id);
-//			return "/exam/exam/examMarkUserAddList";
+//			return "exam/exam/examMarkUserAddList";
 //		} catch (Exception e) {
 //			log.error("到达添加判卷用户列表页面错误：", e);
-//			return "/exam/exam/examMarkUserAddList";
+//			return "exam/exam/examMarkUserAddList";
 //		}
 //	}
 //	

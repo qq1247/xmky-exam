@@ -47,10 +47,10 @@ public class ResController extends BaseController {
 	public String toList(Model model) {
 		try {
 			model.addAttribute("RES_TYPE", DictCache.getIndexDictlistMap().get("RES_TYPE"));
-			return "/sys/res/resList";
+			return "sys/res/resList";
 		} catch (Exception e) {
 			log.error("到达资源列表页面错误：", e);
-			return "/sys/res/resList";
+			return "sys/res/resList";
 		}
 	}
 
@@ -102,10 +102,10 @@ public class ResController extends BaseController {
 	@RequestMapping("/toAdd")
 	public String toAdd() {
 		try {
-			return "/sys/res/resEdit";
+			return "sys/res/resEdit";
 		} catch (Exception e) {
 			log.error("到达添加资源页面错误：", e);
-			return "/sys/res/resEdit";
+			return "sys/res/resEdit";
 		}
 	}
 
@@ -149,10 +149,10 @@ public class ResController extends BaseController {
 			if (pRes != null) {
 				model.addAttribute("pRes", resService.getEntity(res.getParentId()));
 			}
-			return "/sys/res/resEdit";
+			return "sys/res/resEdit";
 		} catch (Exception e) {
 			log.error("到达修改资源页面错误：", e);
-			return "/sys/res/resEdit";
+			return "sys/res/resEdit";
 		}
 	}
 
@@ -213,10 +213,10 @@ public class ResController extends BaseController {
 	@RequestMapping("/toMove")
 	public String toMove() {
 		try {
-			return "/sys/res/resMove";
+			return "sys/res/resMove";
 		} catch (Exception e) {
 			log.error("到达移动资源页面错误", e);
-			return "/sys/res/resMove";
+			return "sys/res/resMove";
 		}
 	}
 

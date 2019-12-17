@@ -45,10 +45,10 @@ public class HomePaperTypeController extends BaseController{
 	@RequestMapping("/toList")
 	public String toList() {
 		try {
-			return "/home/paperType/paperTypeList";
+			return "home/paperType/paperTypeList";
 		} catch (Exception e) {
 			log.error("到达试卷分类列表页面错误：", e);
-			return "/home/paperType/paperTypeList";
+			return "home/paperType/paperTypeList";
 		}
 	}
 	
@@ -98,10 +98,10 @@ public class HomePaperTypeController extends BaseController{
 	public String toAdd(Model model, Integer parentId) {
 		try {
 			model.addAttribute("parent", paperTypeService.getEntity(parentId));
-			return "/home/paperType/paperTypeEdit";
+			return "home/paperType/paperTypeEdit";
 		} catch (Exception e) {
 			log.error("到达添加试卷分类页面错误", e);
-			return "/home/paperType/paperTypeEdit";
+			return "home/paperType/paperTypeEdit";
 		}
 	}
 	
@@ -141,10 +141,10 @@ public class HomePaperTypeController extends BaseController{
 			if(parent != null){
 				model.addAttribute("parent", paperTypeService.getEntity(paperType.getParentId()));
 			}
-			return "/home/paperType/paperTypeEdit";
+			return "home/paperType/paperTypeEdit";
 		} catch (Exception e) {
 			log.error("到达修改试卷分类页面错误", e);
-			return "/home/paperType/paperTypeEdit";
+			return "home/paperType/paperTypeEdit";
 		}
 	}
 	
@@ -198,10 +198,10 @@ public class HomePaperTypeController extends BaseController{
 	@RequestMapping("/toMove")
 	public String toMove() {
 		try {
-			return "/home/paperType/paperTypeMove";
+			return "home/paperType/paperTypeMove";
 		} catch (Exception e) {
 			log.error("到达移动试卷分类页面错误", e);
-			return "/home/paperType/paperTypeMove";
+			return "home/paperType/paperTypeMove";
 		}
 	}
 	
@@ -251,10 +251,10 @@ public class HomePaperTypeController extends BaseController{
 	public String toAuth(Model model, Integer id) {
 		try {
 			model.addAttribute("id", id);
-			return "/home/paperType/paperTypeAuthList";
+			return "home/paperType/paperTypeAuthList";
 		} catch (Exception e) {
 			log.error("到达权限列表页面错误：", e);
-			return "/home/paperType/paperTypeAuthList";
+			return "home/paperType/paperTypeAuthList";
 		}
 	}
 	
@@ -305,10 +305,10 @@ public class HomePaperTypeController extends BaseController{
 	public String toAuthUserAddList(Model model, Integer id) {
 		try {
 			model.addAttribute("id", id);
-			return "/home/paperType/paperTypeAuthUserAddList";
+			return "home/paperType/paperTypeAuthUserAddList";
 		} catch (Exception e) {
 			log.error("到达添加权限用户列表页面错误：", e);
-			return "/home/paperType/paperTypeAuthUserAddList";
+			return "home/paperType/paperTypeAuthUserAddList";
 		}
 	}
 	

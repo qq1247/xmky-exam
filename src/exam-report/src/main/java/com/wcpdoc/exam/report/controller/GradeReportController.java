@@ -38,10 +38,10 @@ public class GradeReportController extends BaseController{
 	public String toList(Model model) {
 		try {
 			model.addAttribute("EXAM_USER_STATE", DictCache.getIndexDictlistMap().get("EXAM_USER_STATE"));
-			return "/report/gradeReport/gradeReportList";
+			return "report/gradeReport/gradeReportList";
 		} catch (Exception e) {
 			log.error("到达成绩列表页面错误：", e);
-			return "/report/gradeReport/gradeReportList";
+			return "report/gradeReport/gradeReportList";
 		}
 	}
 	

@@ -47,10 +47,10 @@ public class FileController extends BaseController {
 	@RequestMapping("/toList")
 	public String toList() {
 		try {
-			return "/file/file/fileList";
+			return "file/file/fileList";
 		} catch (Exception e) {
 			log.error("到达附件列表页面错误：", e);
-			return "/file/file/fileList";
+			return "file/file/fileList";
 		}
 	}
 
@@ -82,10 +82,10 @@ public class FileController extends BaseController {
 	@RequestMapping("/toUpload")
 	public String toUpload() {
 		try {
-			return "/file/file/fileUpload";
+			return "file/file/fileUpload";
 		} catch (Exception e) {
 			log.error("到达上传附件页面错误：", e);
-			return "/file/file/fileUpload";
+			return "file/file/fileUpload";
 		}
 	}
 

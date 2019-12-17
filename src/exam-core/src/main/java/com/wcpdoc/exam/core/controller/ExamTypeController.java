@@ -45,10 +45,10 @@ public class ExamTypeController extends BaseController{
 	@RequestMapping("/toList")
 	public String toList() {
 		try {
-			return "/exam/examType/examTypeList";
+			return "exam/examType/examTypeList";
 		} catch (Exception e) {
 			log.error("到达考试分类列表页面错误：", e);
-			return "/exam/examType/examTypeList";
+			return "exam/examType/examTypeList";
 		}
 	}
 	
@@ -95,10 +95,10 @@ public class ExamTypeController extends BaseController{
 	@RequestMapping("/toAdd")
 	public String toAdd() {
 		try {
-			return "/exam/examType/examTypeEdit";
+			return "exam/examType/examTypeEdit";
 		} catch (Exception e) {
 			log.error("到达添加考试分类页面错误", e);
-			return "/exam/examType/examTypeEdit";
+			return "exam/examType/examTypeEdit";
 		}
 	}
 	
@@ -137,10 +137,10 @@ public class ExamTypeController extends BaseController{
 			
 			ExamType pExamType = examTypeService.getEntity(examType.getParentId());
 			model.addAttribute("pExamType", pExamType);
-			return "/exam/examType/examTypeEdit";
+			return "exam/examType/examTypeEdit";
 		} catch (Exception e) {
 			log.error("到达修改考试分类页面错误", e);
-			return "/exam/examType/examTypeEdit";
+			return "exam/examType/examTypeEdit";
 		}
 	}
 	
@@ -194,10 +194,10 @@ public class ExamTypeController extends BaseController{
 	@RequestMapping("/toMove")
 	public String toMove() {
 		try {
-			return "/exam/examType/examTypeMove";
+			return "exam/examType/examTypeMove";
 		} catch (Exception e) {
 			log.error("到达移动考试分类页面错误", e);
-			return "/exam/examType/examTypeMove";
+			return "exam/examType/examTypeMove";
 		}
 	}
 	
@@ -248,10 +248,10 @@ public class ExamTypeController extends BaseController{
 	public String toAuth(Model model, Integer id) {
 		try {
 			model.addAttribute("id", id);
-			return "/exam/examType/examTypeAuthList";
+			return "exam/examType/examTypeAuthList";
 		} catch (Exception e) {
 			log.error("到达权限列表页面错误：", e);
-			return "/exam/examType/examTypeAuthList";
+			return "exam/examType/examTypeAuthList";
 		}
 	}
 	
@@ -302,10 +302,10 @@ public class ExamTypeController extends BaseController{
 	public String toAuthUserAddList(Model model, Integer id) {
 		try {
 			model.addAttribute("id", id);
-			return "/exam/examType/examTypeAuthUserAddList";
+			return "exam/examType/examTypeAuthUserAddList";
 		} catch (Exception e) {
 			log.error("到达添加权限用户列表页面错误：", e);
-			return "/exam/examType/examTypeAuthUserAddList";
+			return "exam/examType/examTypeAuthUserAddList";
 		}
 	}
 	

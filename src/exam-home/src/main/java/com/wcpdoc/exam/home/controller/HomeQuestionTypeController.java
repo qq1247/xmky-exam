@@ -45,10 +45,10 @@ public class HomeQuestionTypeController extends BaseController{
 	@RequestMapping("/toList")
 	public String toList() {
 		try {
-			return "/home/questionType/questionTypeList";
+			return "home/questionType/questionTypeList";
 		} catch (Exception e) {
 			log.error("到达试题分类列表页面错误：", e);
-			return "/home/questionType/questionTypeList";
+			return "home/questionType/questionTypeList";
 		}
 	}
 	
@@ -98,10 +98,10 @@ public class HomeQuestionTypeController extends BaseController{
 	public String toAdd(Model model, Integer parentId) {
 		try {
 			model.addAttribute("parent", questionTypeService.getEntity(parentId));
-			return "/home/questionType/questionTypeEdit";
+			return "home/questionType/questionTypeEdit";
 		} catch (Exception e) {
 			log.error("到达添加试题分类页面错误", e);
-			return "/home/questionType/questionTypeEdit";
+			return "home/questionType/questionTypeEdit";
 		}
 	}
 	
@@ -141,10 +141,10 @@ public class HomeQuestionTypeController extends BaseController{
 			if(parent != null){
 				model.addAttribute("parent", questionTypeService.getEntity(questionType.getParentId()));
 			}
-			return "/home/questionType/questionTypeEdit";
+			return "home/questionType/questionTypeEdit";
 		} catch (Exception e) {
 			log.error("到达修改试题分类页面错误", e);
-			return "/home/questionType/questionTypeEdit";
+			return "home/questionType/questionTypeEdit";
 		}
 	}
 	
@@ -198,10 +198,10 @@ public class HomeQuestionTypeController extends BaseController{
 	@RequestMapping("/toMove")
 	public String toMove() {
 		try {
-			return "/home/questionType/questionTypeMove";
+			return "home/questionType/questionTypeMove";
 		} catch (Exception e) {
 			log.error("到达移动试题分类页面错误", e);
-			return "/home/questionType/questionTypeMove";
+			return "home/questionType/questionTypeMove";
 		}
 	}
 	
@@ -251,10 +251,10 @@ public class HomeQuestionTypeController extends BaseController{
 	public String toAuth(Model model, Integer id) {
 		try {
 			model.addAttribute("id", id);
-			return "/home/questionType/questionTypeAuthList";
+			return "home/questionType/questionTypeAuthList";
 		} catch (Exception e) {
 			log.error("到达权限列表页面错误：", e);
-			return "/home/questionType/questionTypeAuthList";
+			return "home/questionType/questionTypeAuthList";
 		}
 	}
 	
@@ -305,10 +305,10 @@ public class HomeQuestionTypeController extends BaseController{
 	public String toAuthUserAddList(Model model, Integer id) {
 		try {
 			model.addAttribute("id", id);
-			return "/home/questionType/questionTypeAuthUserAddList";
+			return "home/questionType/questionTypeAuthUserAddList";
 		} catch (Exception e) {
 			log.error("到达添加权限用户列表页面错误：", e);
-			return "/home/questionType/questionTypeAuthUserAddList";
+			return "home/questionType/questionTypeAuthUserAddList";
 		}
 	}
 	

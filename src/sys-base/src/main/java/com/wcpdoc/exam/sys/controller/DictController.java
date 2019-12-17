@@ -39,10 +39,10 @@ public class DictController extends BaseController {
 	@RequestMapping("/toList")
 	public String toList() {
 		try {
-			return "/sys/dict/dictList";
+			return "sys/dict/dictList";
 		} catch (Exception e) {
 			log.error("到达数据字典列表页面错误：", e);
-			return "/sys/dict/dictList";
+			return "sys/dict/dictList";
 		}
 	}
 
@@ -75,10 +75,10 @@ public class DictController extends BaseController {
 	@RequestMapping("/toAdd")
 	public String toAdd() {
 		try {
-			return "/sys/dict/dictEdit";
+			return "sys/dict/dictEdit";
 		} catch (Exception e) {
 			log.error("到达添加数据字典页面错误：", e);
-			return "/sys/dict/dictEdit";
+			return "sys/dict/dictEdit";
 		}
 	}
 
@@ -116,10 +116,10 @@ public class DictController extends BaseController {
 		try {
 			Dict dict = dictService.getEntity(id);
 			model.addAttribute("dict", dict);
-			return "/sys/dict/dictEdit";
+			return "sys/dict/dictEdit";
 		} catch (Exception e) {
 			log.error("到达修改数据字典页面错误：", e);
-			return "/sys/dict/dictEdit";
+			return "sys/dict/dictEdit";
 		}
 	}
 

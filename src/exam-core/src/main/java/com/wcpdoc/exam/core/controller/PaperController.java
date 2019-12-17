@@ -28,10 +28,10 @@ public class PaperController extends BaseController{
 	@RequestMapping("/toList")
 	public String toList() {
 		try {
-			return "/exam/paper/paperList";
+			return "exam/paper/paperList";
 		} catch (Exception e) {
 			log.error("到达试卷列表页面错误：", e);
-			return "/exam/paper/paperList";
+			return "exam/paper/paperList";
 		}
 	}
 	
@@ -79,10 +79,10 @@ public class PaperController extends BaseController{
 	public String toAdd(Model model) {
 		try {
 			model.addAttribute("STATE", DictCache.getIndexDictlistMap().get("STATE"));
-			return "/exam/paper/paperEdit";
+			return "exam/paper/paperEdit";
 		} catch (Exception e) {
 			log.error("到达添加试卷页面错误：", e);
-			return "/exam/paper/paperEdit";
+			return "exam/paper/paperEdit";
 		}
 	}
 	
@@ -121,10 +121,10 @@ public class PaperController extends BaseController{
 			
 			PaperType paperType = paperService.getPaperType(id);
 			model.addAttribute("paperType", paperType);
-			return "/exam/paper/paperEdit";
+			return "exam/paper/paperEdit";
 		} catch (Exception e) {
 			log.error("到达修改试卷页面错误：", e);
-			return "/exam/paper/paperEdit";
+			return "exam/paper/paperEdit";
 		}
 	}
 	
@@ -180,10 +180,10 @@ public class PaperController extends BaseController{
 	@RequestMapping("/toPaperTypeUpdate")
 	public String toPaperTypeUpdate() {
 		try {
-			return "/exam/paper/paperPaperTypeUpdate";
+			return "exam/paper/paperPaperTypeUpdate";
 		} catch (Exception e) {
 			log.error("到达设置试卷分类页面错误：", e);
-			return "/exam/paper/paperPaperTypeUpdate";
+			return "exam/paper/paperPaperTypeUpdate";
 		}
 	}
 	
@@ -235,10 +235,10 @@ public class PaperController extends BaseController{
 		try {
 			paperService.initRootPaperQuestion(id, getCurUser());
 			model.addAttribute("id", id);
-			return "/exam/paper/paperCfg";
+			return "exam/paper/paperCfg";
 		} catch (Exception e) {
 			log.error("到达配置试卷页面错误：", e);
-			return "/exam/paper/paperCfg";
+			return "exam/paper/paperCfg";
 		}
 	}
 	
@@ -269,10 +269,10 @@ public class PaperController extends BaseController{
 	@RequestMapping("/toPaperCfgAdd")
 	public String toPaperCfgAdd() {
 		try {
-			return "/exam/paper/paperCfgEdit";
+			return "exam/paper/paperCfgEdit";
 		} catch (Exception e) {
 			log.error("到达配置试卷添加章节页面 错误：", e);
-			return "/exam/paper/paperCfgEdit";
+			return "exam/paper/paperCfgEdit";
 		}
 	}
 	
@@ -308,10 +308,10 @@ public class PaperController extends BaseController{
 		try {
 			PaperQuestion paperQuestion = paperService.getPaperQuestion(paperQuestionId);
 			model.addAttribute("paperQuestion", paperQuestion);
-			return "/exam/paper/paperCfgEdit";
+			return "exam/paper/paperCfgEdit";
 		} catch (Exception e) {
 			log.error("到达配置试卷修改章节页面 错误：", e);
-			return "/exam/paper/paperCfgEdit";
+			return "exam/paper/paperCfgEdit";
 		}
 	}
 	
@@ -345,10 +345,10 @@ public class PaperController extends BaseController{
 		try {
 			model.addAttribute("QUESTION_DIFFICULTY", DictCache.getIndexDictlistMap().get("QUESTION_DIFFICULTY"));
 			model.addAttribute("QUESTION_TYPE", DictCache.getIndexDictlistMap().get("QUESTION_TYPE"));
-			return "/exam/paper/paperCfgList";
+			return "exam/paper/paperCfgList";
 		} catch (Exception e) {
 			log.error("到达配置试卷试题列表页面错误：", e);
-			return "/exam/paper/paperCfgList";
+			return "exam/paper/paperCfgList";
 		}
 	}
 	
@@ -440,10 +440,10 @@ public class PaperController extends BaseController{
 			PaperQuestion paperQuestion = paperService.getPaperQuestion(paperQuestionId);
 			List<PaperQuestion> paperQuestionList = paperService.getPaperQuestionList(paperQuestion.getParentId());
 			model.addAttribute("maxNo", paperQuestionList.size());
-			return "/exam/paper/paperCfgSort";
+			return "exam/paper/paperCfgSort";
 		} catch (Exception e) {
 			log.error("到达配置试卷试题排序页面错误：", e);
-			return "/exam/paper/paperCfgSort";
+			return "exam/paper/paperCfgSort";
 		}
 	}
 
@@ -481,10 +481,10 @@ public class PaperController extends BaseController{
 			model.addAttribute("id", id);
 			model.addAttribute("paperQuestionExList", paperQuestionExList);
 			model.addAttribute("questionOptions", DictCache.getIndexDictlistMap().get("QUESTION_OPTIONS"));
-			return "/exam/paper/paperCfgPreview";
+			return "exam/paper/paperCfgPreview";
 		} catch (Exception e) {
 			log.error("到达配置试卷预览页面错误：", e);
-			return "/exam/paper/paperCfgPreview";
+			return "exam/paper/paperCfgPreview";
 		}
 	}
 	

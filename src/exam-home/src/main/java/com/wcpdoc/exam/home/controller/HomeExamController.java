@@ -49,10 +49,10 @@ public class HomeExamController extends BaseController {
 		try {
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
 			model.addAttribute("nav", nav);
-			return "/home/exam/examList";
+			return "home/exam/examList";
 		} catch (Exception e) {
 			log.error("到达考试列表页面错误：", e);
-			return "/home/exam/examList";
+			return "home/exam/examList";
 		}
 	}
 	
@@ -84,10 +84,10 @@ public class HomeExamController extends BaseController {
 	public String toPaperAdd(Model model) {
 		try {
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
-			return "/home/exam/paperAdd";
+			return "home/exam/paperAdd";
 		} catch (Exception e) {
 			log.error("到达添加试卷页面错误：", e);
-			return "/home/exam/paperAdd";
+			return "home/exam/paperAdd";
 		}
 	}
 	
@@ -163,10 +163,10 @@ public class HomeExamController extends BaseController {
 		try {
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
 			model.addAttribute("examType", examService.getExamType2(examTypeId));
-			return "/home/exam/examEdit";
+			return "home/exam/examEdit";
 		} catch (Exception e) {
 			log.error("到达添加考试页面错误：", e);
-			return "/home/exam/examEdit";
+			return "home/exam/examEdit";
 		}
 	}
 	
@@ -207,10 +207,10 @@ public class HomeExamController extends BaseController {
 			
 			ExamType examType = examService.getExamType(id);
 			model.addAttribute("examType", examType);
-			return "/home/exam/examEdit";
+			return "home/exam/examEdit";
 		} catch (Exception e) {
 			log.error("到达修改考试页面错误：", e);
-			return "/home/exam/examEdit";
+			return "home/exam/examEdit";
 		}
 	}
 	
@@ -281,10 +281,10 @@ public class HomeExamController extends BaseController {
 	public String toExamUserList(Model model, Integer id) {
 		try {
 			model.addAttribute("id", id);
-			return "/home/exam/examUserList";
+			return "home/exam/examUserList";
 		} catch (Exception e) {
 			log.error("到达考试用户列表页面错误：", e);
-			return "/home/exam/examUserList";
+			return "home/exam/examUserList";
 		}
 	}
 	
@@ -335,10 +335,10 @@ public class HomeExamController extends BaseController {
 	public String toExamUserAdd(Model model, Integer id) {
 		try {
 			model.addAttribute("id", id);
-			return "/home/exam/examUserAdd";
+			return "home/exam/examUserAdd";
 		} catch (Exception e) {
 			log.error("到达添加考试用户列表页面错误：", e);
-			return "/home/exam/examUserAdd";
+			return "home/exam/examUserAdd";
 		}
 	}
 	
@@ -411,10 +411,10 @@ public class HomeExamController extends BaseController {
 	public String toMarkUserList(Model model, Integer id) {
 		try {
 			model.addAttribute("id", id);
-			return "/home/exam/markUserList";
+			return "home/exam/markUserList";
 		} catch (Exception e) {
 			log.error("到达判卷用户列表页面错误：", e);
-			return "/home/exam/markUserList";
+			return "home/exam/markUserList";
 		}
 	}
 	
@@ -465,10 +465,10 @@ public class HomeExamController extends BaseController {
 	public String toMarkUserAdd(Model model, Integer id) {
 		try {
 			model.addAttribute("id", id);
-			return "/home/exam/markUserAdd";
+			return "home/exam/markUserAdd";
 		} catch (Exception e) {
 			log.error("到达添加判卷用户列表页面错误：", e);
-			return "/home/exam/markUserAdd";
+			return "home/exam/markUserAdd";
 		}
 	}
 	

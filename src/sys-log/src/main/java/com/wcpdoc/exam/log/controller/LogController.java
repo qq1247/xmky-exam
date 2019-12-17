@@ -56,10 +56,10 @@ public class LogController extends BaseController {
 			});
 
 			model.addAttribute("fileList", fileList);
-			return "/log/log/logList";
+			return "log/log/logList";
 		} catch (Exception e) {
 			log.error("到达日志列表页面错误：", e);
-			return "/log/log/logList";
+			return "log/log/logList";
 		}
 	}
 

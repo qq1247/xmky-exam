@@ -39,10 +39,10 @@ public class LoginController extends BaseController{
 	@RequestMapping("/toIn")
 	public String toIn() {
 		try {
-			return "/WEB-INF/jsp/web/login/in.jsp";
+			return "web/login/in";
 		} catch (Exception e) {
 			log.error("到达登录页面错误：", e);
-			return "/WEB-INF/jsp/web/login/in.jsp";
+			return "web/login/in";
 		}
 	}
 	
@@ -89,10 +89,10 @@ public class LoginController extends BaseController{
 			}
 			
 			model.addAttribute("menuList", ResCache.getMenuList());
-			return "/WEB-INF/jsp/web/login/home.jsp";
+			return "web/login/home";
 		} catch (Exception e) {
 			log.error("到达首页错误：", e);
-			return "/WEB-INF/jsp/web/login/home.jsp";
+			return "web/login/home";
 		}
 	}
 	
@@ -125,10 +125,10 @@ public class LoginController extends BaseController{
 	@RequestMapping("/toPwdUpdate")
 	public String pubToPwdUpdate() {
 		try {
-			return "/WEB-INF/jsp/web/login/updatePwd.jsp";
+			return "web/login/updatePwd";
 		} catch (Exception e) {
 			log.error("到达修改密码页面错误：", e);
-			return "/WEB-INF/jsp/web/login/updatePwd.jsp";
+			return "web/login/updatePwd";
 		}
 	}
 	

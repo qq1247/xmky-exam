@@ -44,10 +44,10 @@ public class HomeMyExamController extends BaseController{
 	@RequestMapping("/toList")
 	public String toList(Model model) {
 		try {
-			return "/home/myExam/myExamList";
+			return "home/myExam/myExamList";
 		} catch (Exception e) {
 			log.error("到达我的考试列表页面错误：", e);
-			return "/home/myExam/myExamList";
+			return "home/myExam/myExamList";
 		}
 	}
 	
@@ -102,11 +102,11 @@ public class HomeMyExamController extends BaseController{
 		try {
 			model.addAttribute("examId", examId);
 			examService.toPaper(model, getCurUser(), examId);
-			return "/home/myExam/myExamPaper";
+			return "home/myExam/myExamPaper";
 		} catch (Exception e) {
 			log.error("到达试卷页面错误：", e);
 			model.addAttribute("message", e.getMessage());
-			return "/home/error";
+			return "home/error";
 		}
 	}
 	
@@ -192,11 +192,11 @@ public class HomeMyExamController extends BaseController{
 //			//考试用户信息
 //			model.addAttribute("examUser", examUser);
 //			
-//			return "/home/myExam/myExamPaperView";
+//			return "home/myExam/myExamPaperView";
 //		} catch (Exception e) {
 //			log.error("到达试卷预览页面错误：", e);
 //			model.addAttribute("message", e.getMessage());
-//			return "/home/error";
+//			return "home/error";
 //		}
 //	}
 }

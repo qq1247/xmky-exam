@@ -40,10 +40,10 @@ public class OnlineUserController extends BaseController{
 	@RequestMapping("/toList")
 	public String toList() {
 		try {
-			return "/WEB-INF/jsp/web/onlineUser/onlineUserList.jsp";
+			return "web/onlineUser/onlineUserList";
 		} catch (Exception e) {
 			log.error("到达在线用户列表页面错误：", e);
-			return "/WEB-INF/jsp/web/onlineUserList.jsp";
+			return "web/onlineUserList";
 		}
 	}
 	

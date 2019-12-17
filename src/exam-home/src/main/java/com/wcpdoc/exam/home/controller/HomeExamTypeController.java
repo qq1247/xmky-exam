@@ -45,10 +45,10 @@ public class HomeExamTypeController extends BaseController{
 	@RequestMapping("/toList")
 	public String toList() {
 		try {
-			return "/home/examType/examTypeList";
+			return "home/examType/examTypeList";
 		} catch (Exception e) {
 			log.error("到达考试分类列表页面错误：", e);
-			return "/home/examType/examTypeList";
+			return "home/examType/examTypeList";
 		}
 	}
 	
@@ -98,10 +98,10 @@ public class HomeExamTypeController extends BaseController{
 	public String toAdd(Model model, Integer parentId) {
 		try {
 			model.addAttribute("parent", examTypeService.getEntity(parentId));
-			return "/home/examType/examTypeEdit";
+			return "home/examType/examTypeEdit";
 		} catch (Exception e) {
 			log.error("到达添加考试分类页面错误", e);
-			return "/home/examType/examTypeEdit";
+			return "home/examType/examTypeEdit";
 		}
 	}
 	
@@ -141,10 +141,10 @@ public class HomeExamTypeController extends BaseController{
 			if(parent != null){
 				model.addAttribute("parent", examTypeService.getEntity(examType.getParentId()));
 			}
-			return "/home/examType/examTypeEdit";
+			return "home/examType/examTypeEdit";
 		} catch (Exception e) {
 			log.error("到达修改考试分类页面错误", e);
-			return "/home/examType/examTypeEdit";
+			return "home/examType/examTypeEdit";
 		}
 	}
 	
@@ -198,10 +198,10 @@ public class HomeExamTypeController extends BaseController{
 	@RequestMapping("/toMove")
 	public String toMove() {
 		try {
-			return "/home/examType/examTypeMove";
+			return "home/examType/examTypeMove";
 		} catch (Exception e) {
 			log.error("到达移动考试分类页面错误", e);
-			return "/home/examType/examTypeMove";
+			return "home/examType/examTypeMove";
 		}
 	}
 	
@@ -251,10 +251,10 @@ public class HomeExamTypeController extends BaseController{
 	public String toAuth(Model model, Integer id) {
 		try {
 			model.addAttribute("id", id);
-			return "/home/examType/examTypeAuthList";
+			return "home/examType/examTypeAuthList";
 		} catch (Exception e) {
 			log.error("到达权限列表页面错误：", e);
-			return "/home/examType/examTypeAuthList";
+			return "home/examType/examTypeAuthList";
 		}
 	}
 	
@@ -305,10 +305,10 @@ public class HomeExamTypeController extends BaseController{
 	public String toAuthUserAddList(Model model, Integer id) {
 		try {
 			model.addAttribute("id", id);
-			return "/home/examType/examTypeAuthUserAddList";
+			return "home/examType/examTypeAuthUserAddList";
 		} catch (Exception e) {
 			log.error("到达添加权限用户列表页面错误：", e);
-			return "/home/examType/examTypeAuthUserAddList";
+			return "home/examType/examTypeAuthUserAddList";
 		}
 	}
 	

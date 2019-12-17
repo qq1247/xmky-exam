@@ -46,10 +46,10 @@ public class PaperTypeController extends BaseController{
 	@RequestMapping("/toList")
 	public String toList() {
 		try {
-			return "/exam/paperType/paperTypeList";
+			return "exam/paperType/paperTypeList";
 		} catch (Exception e) {
 			log.error("到达试卷分类列表页面错误：", e);
-			return "/exam/paperType/paperTypeList";
+			return "exam/paperType/paperTypeList";
 		}
 	}
 	
@@ -96,10 +96,10 @@ public class PaperTypeController extends BaseController{
 	@RequestMapping("/toAdd")
 	public String toAdd() {
 		try {
-			return "/exam/paperType/paperTypeEdit";
+			return "exam/paperType/paperTypeEdit";
 		} catch (Exception e) {
 			log.error("到达添加试卷分类页面错误", e);
-			return "/exam/paperType/paperTypeEdit";
+			return "exam/paperType/paperTypeEdit";
 		}
 	}
 	
@@ -138,10 +138,10 @@ public class PaperTypeController extends BaseController{
 			
 			PaperType pPaperType = paperTypeService.getEntity(paperType.getParentId());
 			model.addAttribute("pPaperType", pPaperType);
-			return "/exam/paperType/paperTypeEdit";
+			return "exam/paperType/paperTypeEdit";
 		} catch (Exception e) {
 			log.error("到达修改试卷分类页面错误", e);
-			return "/exam/paperType/paperTypeEdit";
+			return "exam/paperType/paperTypeEdit";
 		}
 	}
 	
@@ -195,10 +195,10 @@ public class PaperTypeController extends BaseController{
 	@RequestMapping("/toMove")
 	public String toMove() {
 		try {
-			return "/exam/paperType/paperTypeMove";
+			return "exam/paperType/paperTypeMove";
 		} catch (Exception e) {
 			log.error("到达移动试卷分类页面错误", e);
-			return "/exam/paperType/paperTypeMove";
+			return "exam/paperType/paperTypeMove";
 		}
 	}
 	
@@ -249,10 +249,10 @@ public class PaperTypeController extends BaseController{
 	public String toAuth(Model model, Integer id) {
 		try {
 			model.addAttribute("id", id);
-			return "/exam/paperType/paperTypeAuthList";
+			return "exam/paperType/paperTypeAuthList";
 		} catch (Exception e) {
 			log.error("到达权限列表页面错误：", e);
-			return "/exam/paperType/paperTypeAuthList";
+			return "exam/paperType/paperTypeAuthList";
 		}
 	}
 	
@@ -303,10 +303,10 @@ public class PaperTypeController extends BaseController{
 	public String toAuthUserAddList(Model model, Integer id) {
 		try {
 			model.addAttribute("id", id);
-			return "/exam/paperType/paperTypeAuthUserAddList";
+			return "exam/paperType/paperTypeAuthUserAddList";
 		} catch (Exception e) {
 			log.error("到达添加权限用户列表页面错误：", e);
-			return "/exam/paperType/paperTypeAuthUserAddList";
+			return "exam/paperType/paperTypeAuthUserAddList";
 		}
 	}
 	

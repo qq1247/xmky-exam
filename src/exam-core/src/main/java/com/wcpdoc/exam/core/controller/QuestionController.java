@@ -35,10 +35,10 @@ public class QuestionController extends BaseController{
 			model.addAttribute("QUESTION_DIFFICULTY", DictCache.getIndexDictlistMap().get("QUESTION_DIFFICULTY"));
 			model.addAttribute("STATE", DictCache.getIndexDictlistMap().get("STATE"));
 			model.addAttribute("QUESTION_OPTIONS", DictCache.getIndexDictlistMap().get("QUESTION_OPTIONS"));
-			return "/exam/question/questionList";
+			return "exam/question/questionList";
 		} catch (Exception e) {
 			log.error("到达试题列表页面错误：", e);
-			return "/exam/question/questionList";
+			return "exam/question/questionList";
 		}
 	}
 	
@@ -88,10 +88,10 @@ public class QuestionController extends BaseController{
 			model.addAttribute("QUESTION_TYPE", DictCache.getIndexDictlistMap().get("QUESTION_TYPE"));
 			model.addAttribute("QUESTION_DIFFICULTY", DictCache.getIndexDictlistMap().get("QUESTION_DIFFICULTY"));
 			model.addAttribute("STATE", DictCache.getIndexDictlistMap().get("STATE"));
-			return "/exam/question/questionEdit";
+			return "exam/question/questionEdit";
 		} catch (Exception e) {
 			log.error("到达添加试题页面错误：", e);
-			return "/exam/question/questionEdit";
+			return "exam/question/questionEdit";
 		}
 	}
 	
@@ -132,10 +132,10 @@ public class QuestionController extends BaseController{
 			model.addAttribute("QUESTION_DIFFICULTY", DictCache.getIndexDictlistMap().get("QUESTION_DIFFICULTY"));
 			model.addAttribute("STATE", DictCache.getIndexDictlistMap().get("STATE"));
 			
-			return "/exam/question/questionEdit";
+			return "exam/question/questionEdit";
 		} catch (Exception e) {
 			log.error("到达修改试题页面错误：", e);
-			return "/exam/question/questionEdit";
+			return "exam/question/questionEdit";
 		}
 	}
 	
@@ -201,10 +201,10 @@ public class QuestionController extends BaseController{
 	@RequestMapping("/toQuestionTypeUpdate")
 	public String toQuestionTypeUpdate() {
 		try {
-			return "/exam/question/questionQuestionTypeUpdate";
+			return "exam/question/questionQuestionTypeUpdate";
 		} catch (Exception e) {
 			log.error("到达设置试题分类页面错误：", e);
-			return "/exam/question/questionQuestionTypeUpdate";
+			return "exam/question/questionQuestionTypeUpdate";
 		}
 	}
 	

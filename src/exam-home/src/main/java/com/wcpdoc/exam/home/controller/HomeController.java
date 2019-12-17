@@ -42,10 +42,10 @@ public class HomeController extends BaseController{
 	@RequestMapping("/toIn")
 	public String toIn(Model model) {
 		try {
-			return "/home/home/in";
+			return "home/home/in";
 		} catch (Exception e) {
 			log.error("到达登录页面错误：", e);
-			return "/home/home/in";
+			return "home/home/in";
 		}
 	}
 	
@@ -89,7 +89,7 @@ public class HomeController extends BaseController{
 	@RequestMapping("/toHome")
 	public String toHome(Model model) {
 		try {
-			return "/home/home/home";
+			return "home/home/home";
 		} catch (Exception e) {
 			log.error("到达首页错误：", e);
 			model.addAttribute("message", e.getMessage());

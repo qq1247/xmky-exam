@@ -57,10 +57,10 @@ public class HomeQuestionController extends BaseController {
 			model.addAttribute("QUESTION_DIFFICULTY_DICT", DictCache.getIndexDictlistMap().get("QUESTION_DIFFICULTY"));
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
 			model.addAttribute("nav", nav);
-			return "/home/question/questionList";
+			return "home/question/questionList";
 		} catch (Exception e) {
 			log.error("到达试题列表页面错误：", e);
-			return "/home/question/questionList";
+			return "home/question/questionList";
 		}
 	}
 	
@@ -164,10 +164,10 @@ public class HomeQuestionController extends BaseController {
 			model.addAttribute("QUESTION_DIFFICULTY_DICT", DictCache.getIndexDictlistMap().get("QUESTION_DIFFICULTY"));
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
 			model.addAttribute("questionType", questionService.getQuestionType2(questionTypeId));
-			return "/home/question/questionEdit";
+			return "home/question/questionEdit";
 		} catch (Exception e) {
 			log.error("到达添加试题页面错误：", e);
-			return "/home/question/questionEdit";
+			return "home/question/questionEdit";
 		}
 	}
 	
@@ -208,10 +208,10 @@ public class HomeQuestionController extends BaseController {
 			model.addAttribute("QUESTION_DIFFICULTY_DICT", DictCache.getIndexDictlistMap().get("QUESTION_DIFFICULTY"));
 			model.addAttribute("STATE_DICT", DictCache.getIndexDictlistMap().get("STATE"));
 			
-			return "/home/question/questionEdit";
+			return "home/question/questionEdit";
 		} catch (Exception e) {
 			log.error("到达修改试题页面错误：", e);
-			return "/home/question/questionEdit";
+			return "home/question/questionEdit";
 		}
 	}
 	

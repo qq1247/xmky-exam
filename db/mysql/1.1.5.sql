@@ -586,8 +586,8 @@ create table SYS_CRON
 
 alter table SYS_CRON comment '定时任务';
 
-INSERT INTO `SYS_CRON` VALUES ('1', '清除临时附件', 'com.wcpdoc.exam.file.job.ClearFileJob', '0/5 * * * * ? *', '1', '1', '2019-09-13 19:31:07');
-INSERT INTO `SYS_CRON` VALUES ('2', '强制交卷', 'com.wcpdoc.exam.core.job.ForcePaperJob', '0/5 * * * * ? *', '1', '1', '2019-09-13 19:31:07');
+INSERT INTO `SYS_CRON` VALUES ('1', '清除临时附件', 'com.wcpdoc.exam.file.job.ClearFileJob', '0 0 1 * * ?', '1', '1', '2019-09-13 19:31:07');
+INSERT INTO `SYS_CRON` VALUES ('2', '强制交卷', 'com.wcpdoc.exam.core.job.ForcePaperJob', '0 0 1 * * ?', '1', '1', '2019-09-13 19:31:07');
 
 drop table if exists SYS_VER;
 
@@ -610,4 +610,4 @@ INSERT INTO `SYS_VER` VALUES (1, '1.1.1', '2019-02-23 15:35:21', 'ZHC', '');
 INSERT INTO `SYS_VER` VALUES (2, '1.1.2', '2019-03-03 13:20:00', 'ZHC', '');
 INSERT INTO `SYS_VER` VALUES (3, '1.1.3', '2019-08-14 18:49:00', 'ZHC', '');
 INSERT INTO `SYS_VER` VALUES (4, '1.1.4', '2019-09-05 09:58:00', 'ZHC', '');
-INSERT INTO `SYS_VER` VALUES (5, '1.1.5', '2019-09-10 18:53:00', 'ZHC', '');
+INSERT INTO `SYS_VER` VALUES (5, '1.1.5', '2019-12-16 23:16:00', 'ZHC', '');
