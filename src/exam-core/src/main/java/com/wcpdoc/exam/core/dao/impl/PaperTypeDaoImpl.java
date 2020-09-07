@@ -6,7 +6,7 @@ import java.util.Map;
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.exam.core.dao.PaperTypeDao;
-import com.wcpdoc.exam.core.dao.impl.BaseDaoImpl;
+import com.wcpdoc.exam.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PaperType;
@@ -20,7 +20,7 @@ import com.wcpdoc.exam.core.util.ValidateUtil;
  * v1.0 zhanghc 2017-05-25 16:34:59
  */
 @Repository
-public class PaperTypeDaoImpl extends BaseDaoImpl<PaperType> implements PaperTypeDao {
+public class PaperTypeDaoImpl extends RBaseDaoImpl<PaperType> implements PaperTypeDao {
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
@@ -46,7 +46,7 @@ public class PaperTypeDaoImpl extends BaseDaoImpl<PaperType> implements PaperTyp
 		String sql = "SELECT PAPER_TYPE.ID, PAPER_TYPE.NAME, PAPER_TYPE.PARENT_ID, PAPER_TYPE.PARENT_SUB "
 				+ "FROM EXM_PAPER_TYPE PAPER_TYPE "
 				+ "WHERE PAPER_TYPE.STATE = 1";
-		return getList(sql);
+		return getMapList(sql);
 	}
 
 	@Override
@@ -75,7 +75,7 @@ public class PaperTypeDaoImpl extends BaseDaoImpl<PaperType> implements PaperTyp
 	@Override
 	public PaperType getPaperTypeByName(String name) {
 		String sql = "SELECT * FROM EXM_PAPER_TYPE WHERE NAME = ? AND STATE = 1";
-		return getUnique(sql, new Object[]{name}, PaperType.class);
+		return getEntity(sql, new Object[]{name}, PaperType.class);
 	}
 
 	@Override

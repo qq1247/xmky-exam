@@ -18,6 +18,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.util.HtmlUtils;
 
+import com.wcpdoc.exam.base.cache.DictCache;
+import com.wcpdoc.exam.base.entity.Org;
+import com.wcpdoc.exam.base.entity.Post;
+import com.wcpdoc.exam.base.service.OrgService;
+import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.ExamDao;
 import com.wcpdoc.exam.core.entity.Exam;
@@ -45,11 +50,6 @@ import com.wcpdoc.exam.core.util.BigDecimalUtil;
 import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.sys.cache.DictCache;
-import com.wcpdoc.exam.sys.entity.Org;
-import com.wcpdoc.exam.sys.entity.Post;
-import com.wcpdoc.exam.sys.service.OrgService;
-import com.wcpdoc.exam.sys.service.UserService;
 
 /**
  * 考试服务层实现

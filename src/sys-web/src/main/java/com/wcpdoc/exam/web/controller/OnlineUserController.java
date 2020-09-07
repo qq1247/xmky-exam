@@ -14,13 +14,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.core.constant.ConstantManager;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
+import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.sys.entity.User;
 
 /**
  * 在线用户控制层
@@ -55,7 +56,7 @@ public class OnlineUserController extends BaseController{
 	 */
 	@RequestMapping("/list")
 	@ResponseBody
-	public PageOut list(PageIn pageIn) {
+	public PageResult list(PageIn pageIn) {
 		try {
 			@SuppressWarnings("unchecked")
 			Map<String, HttpSession> sessionMap = (Map<String, HttpSession>) request
@@ -77,10 +78,10 @@ public class OnlineUserController extends BaseController{
 				list.add(map);
 			}
 			
-			return new PageOut(list, list.size());
+			return new PageResultEx(true, "查询成功", new PageOut(list, list.size()));
 		} catch (Exception e) {
 			log.error("在线用户列表错误：", e);
-			return new PageOut();
+			return new PageResult(false, "查询失败");
 		}
 	}
 	
@@ -92,19 +93,13 @@ public class OnlineUserController extends BaseController{
 	 */
 	@RequestMapping("/doDel")
 	@ResponseBody
-	public PageResult doDel(String[] ids) {
+	public PageResult doDel(String id) {
 		try {
-			for(String id : ids){
-				try {
-					@SuppressWarnings("unchecked")
-					Map<String, HttpSession> sessionMap = (Map<String, HttpSession>) request
-							.getServletContext().getAttribute(ConstantManager.SESSION_USER_LIST);
-					HttpSession session = sessionMap.get(id);
-					session.invalidate();//可能已失效
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
+			@SuppressWarnings("unchecked")
+			Map<String, HttpSession> sessionMap = (Map<String, HttpSession>) request
+					.getServletContext().getAttribute(ConstantManager.SESSION_USER_LIST);
+			HttpSession session = sessionMap.get(id);
+			session.invalidate();//可能已失效
 			
 			return new PageResult(true, "强制退出成功");
 		} catch (Exception e) {

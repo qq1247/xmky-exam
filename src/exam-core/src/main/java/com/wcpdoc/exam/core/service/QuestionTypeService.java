@@ -13,7 +13,7 @@ import com.wcpdoc.exam.core.service.BaseService;
  * 
  * v1.0 zhanghc 2016-5-24下午14:54:09
  */
-public interface QuestionTypeService extends BaseService<QuestionType>{
+public interface QuestionTypeService extends BaseService<QuestionType> {
 	
 	/**
 	 * 添加试题分类
@@ -24,20 +24,12 @@ public interface QuestionTypeService extends BaseService<QuestionType>{
 	void addAndUpdate(QuestionType questionType);
 
 	/**
-	 * 修改试题分类
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * @param questionType
-	 * void
-	 */
-	void editAndUpdate(QuestionType questionType);
-
-	/**
 	 * 删除试题分类
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * @param ids 
+	 * @param id
 	 * void
 	 */
-	void delAndUpdate(Integer[] ids);
+	void delAndUpdate(Integer id);
 	
 	/**
 	 * 获取试题分类树
@@ -54,14 +46,15 @@ public interface QuestionTypeService extends BaseService<QuestionType>{
 	 * void
 	 */
 	void doMove(Integer sourceId, Integer targetId);
-
+	
 	/**
-	 * 获取组织机构树
+	 * 名称是否重复
 	 * 
-	 * v1.0 zhanghc 2018年5月29日下午11:23:13
-	 * @return List<Map<String,Object>>
+	 * v1.0 zhanghc 2020-09-05 10:12:16
+	 * @param questionType
+	 * @return boolean
 	 */
-	List<Map<String, Object>> getOrgTreeList();
+	boolean existName(QuestionType questionType);
 
 	/**
 	 * 获取权限用户

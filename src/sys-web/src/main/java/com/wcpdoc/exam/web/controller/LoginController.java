@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import javax.annotation.Resource;
+import javax.security.auth.login.LoginException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,9 +13,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageResult;
-import com.wcpdoc.exam.sys.cache.ResCache;
+import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.web.service.LoginService;
 
 /**
@@ -24,12 +26,14 @@ import com.wcpdoc.exam.web.service.LoginService;
  */
 @Controller
 @RequestMapping("/login")
-public class LoginController extends BaseController{
+public class LoginController extends BaseController {
 	private static final Logger log = LoggerFactory.getLogger(LoginController.class);
 	
 	@Resource
 	private LoginService loginService;
-
+	@Resource
+	private UserService userService;
+	
 	/**
 	 * 到达登录页面
 	 * 
@@ -37,7 +41,7 @@ public class LoginController extends BaseController{
 	 * @return String
 	 */
 	@RequestMapping("/toIn")
-	public String toIn() {
+	public String toIn(Model model) {
 		try {
 			return "web/login/in";
 		} catch (Exception e) {
@@ -60,17 +64,22 @@ public class LoginController extends BaseController{
 		try {
 			//完成登录
 			loginService.doIn(loginName, pwd, request);
-			
 			//重定向到首页
 			return "redirect:/login/toHome";
+		} catch (LoginException e) {
+			log.error("完成登录错误：{}", e.getMessage());
+			try {
+				return "redirect:/login/toIn?message=" + URLEncoder.encode(e.getMessage(), "UTF-8");
+			} catch (UnsupportedEncodingException e1) {
+				return "redirect:/login/toIn";
+			}
 		} catch (Exception e) {
 			log.error("完成登录错误：", e);
 			try {
-				model.addAttribute("message", URLEncoder.encode(e.getMessage(), "UTF-8") );
-			} catch (UnsupportedEncodingException e1) {
-				e1.printStackTrace();
+				return "redirect:/login/toIn?message=" + URLEncoder.encode("未知异常！", "UTF-8");
+			} catch (Exception e1) {
+				return "redirect:/login/toIn";
 			}
-			return "redirect:/login/toIn";
 		}
 	}
 	
@@ -88,7 +97,6 @@ public class LoginController extends BaseController{
 				return "redirect:/login/toIn";
 			}
 			
-			model.addAttribute("menuList", ResCache.getMenuList());
 			return "web/login/home";
 		} catch (Exception e) {
 			log.error("到达首页错误：", e);
@@ -99,11 +107,10 @@ public class LoginController extends BaseController{
 	/**
 	 * 完成退出登录
 	 * v1.0 zhanghc 2016年9月8日下午8:50:37
-	 * @param loginName
 	 * @return String
 	 */
 	@RequestMapping("/doOut")
-	public String pubDoOut(){
+	public String doOut(){
 		try {
 			//完成退出登录
 			loginService.doOut(request);
@@ -123,12 +130,12 @@ public class LoginController extends BaseController{
 	 * @return String
 	 */
 	@RequestMapping("/toPwdUpdate")
-	public String pubToPwdUpdate() {
+	public String toPwdUpdate() {
 		try {
-			return "web/login/updatePwd";
+			return "web/login/pwdUpdate";
 		} catch (Exception e) {
 			log.error("到达修改密码页面错误：", e);
-			return "web/login/updatePwd";
+			return "web/login/pwdUpdate";
 		}
 	}
 	
@@ -142,13 +149,16 @@ public class LoginController extends BaseController{
 	 */
 	@RequestMapping("/doPwdUpdate")
 	@ResponseBody
-	public PageResult pubDoPwdUpdate(String oldPwd, String newPwd) {
+	public PageResult doPwdUpdate(String oldPwd, String newPwd) {
 		try {
-			loginService.doPwdUpdate(getCurUser().getId(), oldPwd, newPwd);
+			loginService.doPwdUpdate(oldPwd, newPwd);
 			return new PageResult(true, "修改成功");
+		} catch (MyException e) {
+			log.error("修改密码错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("修改密码错误：", e);
-			return new PageResult(false, "修改失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 }

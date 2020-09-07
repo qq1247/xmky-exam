@@ -6,11 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.log.service.LogService;
 
@@ -21,23 +18,43 @@ import com.wcpdoc.exam.log.service.LogService;
  */
 @Service
 public class LogServiceImpl implements LogService {
-	@Value("${file.log.dir}")
-	private String logDir;
-	@Value("${file.log.name}")
-	private String logName;
+	private File logDir;
+	
+	@Override
+	public Map<String, Object> getList(String logName, Long curReadLen) {
+		// 如果第一次访问，获取前一万个字节的字符串
+		File logFile = new File(String.format("%s%s%s", logDir.getAbsolutePath(), File.separator, logName));
+		Long fileLen = logFile.length();
+		if (curReadLen == null) {
+			curReadLen = fileLen - 10000;
+			curReadLen = curReadLen < 0 ? 0 : curReadLen;
+			
+			List<String> strList = StringUtil.getString(logFile, curReadLen, fileLen);
+			Map<String, Object> result = new HashMap<>();
+			result.put("CUR_READ_LEN", fileLen);
+			result.put("STR_LIST", strList);
+			return result;
+		}
+		
+		// 如果没有新数据，则直接返回
+		if (curReadLen >= fileLen) {
+			curReadLen = fileLen;
+			Map<String, Object> result = new HashMap<>();
+			result.put("CUR_READ_LEN", fileLen);
+			result.put("STR_LIST", new ArrayList<>());
+			return result;
+		}
+			
+		// 读取参数字节长度到日志末尾字节长度的字符串
+		List<String> strList = StringUtil.getString(logFile, curReadLen, fileLen);
+		Map<String, Object> result = new HashMap<>();
+		result.put("CUR_READ_LEN", fileLen);
+		result.put("STR_LIST", strList);
+		return result;
+	}
 
 	@Override
-	public PageOut getListpage(PageIn pageIn) {
-		File logFile = new File(logDir + logName);
-		List<String> readLastLine = StringUtil.getLastLine(logFile, 200);
-
-		List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
-		for (String lineStr : readLastLine) {
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("LINE_STR", lineStr);
-			resultList.add(map);
-		}
-
-		return new PageOut(resultList, resultList.size());
+	public void setLogDir(File logDir) {
+		this.logDir = logDir;
 	}
 }

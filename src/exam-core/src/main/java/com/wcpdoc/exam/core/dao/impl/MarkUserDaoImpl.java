@@ -3,7 +3,7 @@ package com.wcpdoc.exam.core.dao.impl;
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.exam.core.dao.MarkUserDao;
-import com.wcpdoc.exam.core.dao.impl.BaseDaoImpl;
+import com.wcpdoc.exam.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.exam.core.entity.MarkUser;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
@@ -14,7 +14,7 @@ import com.wcpdoc.exam.core.entity.PageOut;
  * v1.0 zhanghc 2017-06-19 16:28:29
  */
 @Repository
-public class MarkUserDaoImpl extends BaseDaoImpl<MarkUser> implements MarkUserDao {
+public class MarkUserDaoImpl extends RBaseDaoImpl<MarkUser> implements MarkUserDao {
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
@@ -30,6 +30,6 @@ public class MarkUserDaoImpl extends BaseDaoImpl<MarkUser> implements MarkUserDa
 	@Override
 	public MarkUser getEntity(Integer examId, Integer userId) {
 		String sql = "SELECT * FROM EXM_MARK_USER WHERE EXAM_ID = ? AND USER_ID = ?";
-		return getUnique(sql, new Object[]{examId, userId}, MarkUser.class);
+		return getEntity(sql, new Object[]{examId, userId}, MarkUser.class);
 	}
 }

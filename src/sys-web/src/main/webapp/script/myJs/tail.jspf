@@ -1,0 +1,10 @@
+<%@ page language="java" pageEncoding="utf-8"%>		
+		<script src="script/layuiadmin/layui/layui.all.js"></script>
+		<script type="text/javascript">
+			layui.config({
+				base : "script/layuiadmin/"
+			}).extend({
+				index : "lib/index"
+			}).use(["index"]);
+			
+		</script>

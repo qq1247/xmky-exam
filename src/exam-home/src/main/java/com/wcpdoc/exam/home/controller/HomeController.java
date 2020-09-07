@@ -2,6 +2,7 @@ package com.wcpdoc.exam.home.controller;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -129,7 +130,7 @@ public class HomeController extends BaseController{
 	public PageResult sysTime() {
 		try {
 			Map<String, Object> data = new HashMap<String, Object>();
-			data.put("sysTime", DateUtil.getFormatDateTime());
+			data.put("sysTime", DateUtil.formatDateTime(new Date()));
 			return new PageResultEx(true, "获取成功", data);
 		} catch (Exception e) {
 			log.error("获取服务器时间错误：", e);

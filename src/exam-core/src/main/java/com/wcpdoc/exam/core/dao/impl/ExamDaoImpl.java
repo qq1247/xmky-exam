@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
+import com.wcpdoc.exam.base.cache.DictCache;
 import com.wcpdoc.exam.core.dao.ExamDao;
-import com.wcpdoc.exam.core.dao.impl.BaseDaoImpl;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamType;
 import com.wcpdoc.exam.core.entity.LoginUser;
@@ -18,7 +18,6 @@ import com.wcpdoc.exam.core.util.HibernateUtil;
 import com.wcpdoc.exam.core.util.SqlUtil;
 import com.wcpdoc.exam.core.util.SqlUtil.Order;
 import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.sys.cache.DictCache;
 
 /**
  * 考试数据访问层实现
@@ -26,7 +25,7 @@ import com.wcpdoc.exam.sys.cache.DictCache;
  * v1.0 zhanghc 2017-06-11 09:13:23
  */
 @Repository
-public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
+public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
@@ -40,11 +39,11 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		Date fiveDate = null;
 		if(ValidateUtil.isValid(pageIn.getFive())){
-			fiveDate = DateUtil.getDate(pageIn.getFive(), DateUtil.FORMAT_DATE_TIME);
+			fiveDate = DateUtil.getDateTime(pageIn.getFive());
 		}
 		Date sixDate = null;
 		if(ValidateUtil.isValid(pageIn.getSix())){
-			sixDate = DateUtil.getDate(pageIn.getSix(), DateUtil.FORMAT_DATE_TIME);
+			sixDate = DateUtil.getDateTime(pageIn.getSix());
 		}
 		
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "EXAM.EXAM_TYPE_ID = ?", pageIn.getOne())
@@ -129,7 +128,7 @@ public class ExamDaoImpl extends BaseDaoImpl<Exam> implements ExamDao {
 				+ "FROM EXM_EXAM_TYPE EXAM_TYPE "
 				+ "INNER JOIN EXM_EXAM EXAM ON EXAM_TYPE.ID = EXAM.EXAM_TYPE_ID "
 				+ "WHERE EXAM.ID = ?";
-		return getUnique(sql, new Object[]{id}, ExamType.class);
+		return getEntity(sql, new Object[]{id}, ExamType.class);
 	}
 
 	@Override

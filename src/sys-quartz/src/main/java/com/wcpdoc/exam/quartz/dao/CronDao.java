@@ -2,7 +2,7 @@ package com.wcpdoc.exam.quartz.dao;
 
 import java.util.List;
 
-import com.wcpdoc.exam.core.dao.BaseDao;
+import com.wcpdoc.exam.core.dao.RBaseDao;
 import com.wcpdoc.exam.quartz.entity.Cron;
 
 /**
@@ -10,7 +10,7 @@ import com.wcpdoc.exam.quartz.entity.Cron;
  * 
  * v1.0 zhanghc 2019-07-29 10:38:17
  */
-public interface CronDao extends BaseDao<Cron> {
+public interface CronDao extends RBaseDao<Cron> {
 	/**
 	 * 获取定时任务列表
 	 * 

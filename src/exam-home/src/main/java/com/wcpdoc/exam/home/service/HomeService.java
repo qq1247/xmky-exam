@@ -4,8 +4,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.core.service.BaseService;
-import com.wcpdoc.exam.sys.entity.User;
 /**
  * 首页服务层接口
  * 

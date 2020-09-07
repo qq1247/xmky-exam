@@ -32,17 +32,18 @@ public class QuartzRunner implements ApplicationRunner {
 		List<Cron> cronList = cronService.getList();
 		for (Cron cron : cronList) {
 			if (cron.getState() != 1) {
+				log.info("定时任务【{}】：默认关闭", cron.getName());
 				continue;
 			}
 			
 			try {
-				log.info("启动定时任务【{}】开始：", cron.getName());
+				log.info("定时任务【{}】启动开始：", cron.getName());
 				@SuppressWarnings("unchecked")
 				Class<Job> jobClass = (Class<Job>) Class.forName(cron.getJobClass());
 				QuartzUtil.addJob(jobClass, cron.getId(), cron.getCron());
-				log.info("启动定时任务【{}】完成：", cron.getName());
+				log.info("定时任务【{}】启动完成：", cron.getName());
 			} catch (Exception e) {
-				log.error("启动任务失败：", e);
+				log.error(String.format("定时任务【{}】启动失败：", cron.getName()), e);
 			}
 		}
 	}

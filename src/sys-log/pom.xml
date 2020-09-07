@@ -18,5 +18,11 @@
 			<artifactId>sys-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- 集成html解析 -->
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.11.3</version>
+		</dependency>
 	</dependencies>
 </project>

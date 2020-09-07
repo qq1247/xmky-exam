@@ -20,6 +20,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.wcpdoc.exam.base.entity.Org;
+import com.wcpdoc.exam.base.entity.Post;
+import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.QuestionDao;
 import com.wcpdoc.exam.core.entity.LoginUser;
@@ -32,9 +35,6 @@ import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.file.entity.FileEx;
 import com.wcpdoc.exam.file.service.FileService;
-import com.wcpdoc.exam.sys.entity.Org;
-import com.wcpdoc.exam.sys.entity.Post;
-import com.wcpdoc.exam.sys.service.UserService;
 
 /**
  * 试题服务层实现

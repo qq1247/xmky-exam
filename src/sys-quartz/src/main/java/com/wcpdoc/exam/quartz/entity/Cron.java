@@ -1,17 +1,14 @@
 package com.wcpdoc.exam.quartz.entity;
 
 import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
 import org.springframework.format.annotation.DateTimeFormat;
-
-import com.wcpdoc.exam.core.util.DateUtil;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * 定时任务实体
@@ -35,8 +32,9 @@ public class Cron {
 	private Integer state;
 	@Column(name = "UPDATE_USER_ID")
 	private Integer updateUserId;
-	@DateTimeFormat(pattern = DateUtil.FORMAT_DATE_TIME)
 	@Column(name = "UPDATE_TIME")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private Date updateTime;
 
 	public Integer getId() {

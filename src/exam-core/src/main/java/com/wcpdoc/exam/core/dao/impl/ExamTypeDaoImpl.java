@@ -6,7 +6,6 @@ import java.util.Map;
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.exam.core.dao.ExamTypeDao;
-import com.wcpdoc.exam.core.dao.impl.BaseDaoImpl;
 import com.wcpdoc.exam.core.entity.ExamType;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
@@ -20,7 +19,7 @@ import com.wcpdoc.exam.core.util.ValidateUtil;
  * v1.0 zhanghc 2017-06-28 21:34:41
  */
 @Repository
-public class ExamTypeDaoImpl extends BaseDaoImpl<ExamType> implements ExamTypeDao {
+public class ExamTypeDaoImpl extends RBaseDaoImpl<ExamType> implements ExamTypeDao {
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
@@ -46,7 +45,7 @@ public class ExamTypeDaoImpl extends BaseDaoImpl<ExamType> implements ExamTypeDa
 		String sql = "SELECT EXAM_TYPE.ID, EXAM_TYPE.NAME, EXAM_TYPE.PARENT_ID, EXAM_TYPE.PARENT_SUB "
 				+ "FROM EXM_EXAM_TYPE EXAM_TYPE "
 				+ "WHERE EXAM_TYPE.STATE = 1";
-		return getList(sql);
+		return getMapList(sql);
 	}
 
 	@Override
@@ -75,7 +74,7 @@ public class ExamTypeDaoImpl extends BaseDaoImpl<ExamType> implements ExamTypeDa
 	@Override
 	public ExamType getExamTypeByName(String name) {
 		String sql = "SELECT * FROM EXM_EXAM_TYPE WHERE NAME = ? AND STATE = 1";
-		return getUnique(sql, new Object[]{name}, ExamType.class);
+		return getEntity(sql, new Object[]{name}, ExamType.class);
 	}
 
 	@Override

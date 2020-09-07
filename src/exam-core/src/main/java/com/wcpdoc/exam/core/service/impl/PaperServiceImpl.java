@@ -14,6 +14,9 @@ import javax.annotation.Resource;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.exam.base.entity.Org;
+import com.wcpdoc.exam.base.entity.Post;
+import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.PaperDao;
 import com.wcpdoc.exam.core.dao.PaperQuestionDao;
@@ -33,9 +36,6 @@ import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.BigDecimalUtil;
 import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.sys.entity.Org;
-import com.wcpdoc.exam.sys.entity.Post;
-import com.wcpdoc.exam.sys.service.UserService;
 
 /**
  * 试卷服务层实现

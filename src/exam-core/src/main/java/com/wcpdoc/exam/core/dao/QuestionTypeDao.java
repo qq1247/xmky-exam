@@ -21,32 +21,7 @@ public interface QuestionTypeDao extends BaseDao<QuestionType>{
 	 * @return List<Map<String,Object>>
 	 */
 	List<Map<String, Object>> getTreeList();
-
-	/**
-	 * 移动试题分类
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * @param sourceId
-	 * @param targetId
-	 * void
-	 */
-	void doMove(Integer sourceId, Integer targetId);
-
-	/**
-	 * 获取所有子试题分类列表，包括自己
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * @param id 
-	 * void
-	 */
-	List<QuestionType> getAllSubQuestionTypeList(Integer id);
 	
-	/**
-	 * 获取试题分类
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * @param name
-	 * @return QuestionType
-	 */
-	QuestionType getQuestionTypeByName(String name);
-
 	/**
 	 * 获取权限用户
 	 * 
@@ -81,4 +56,15 @@ public interface QuestionTypeDao extends BaseDao<QuestionType>{
 	 * @return List<QuestionType>
 	 */
 	List<QuestionType> getList(Integer parentId);
+	
+	/**
+	 * 名称是否存在
+	 * 
+	 * v1.0 zhanghc 2020-09-05 10:12:16
+	 * 
+	 * @param name
+	 * @param excludeId
+	 * @return boolean
+	 */
+	boolean existName(String name, Integer excludeId);
 }

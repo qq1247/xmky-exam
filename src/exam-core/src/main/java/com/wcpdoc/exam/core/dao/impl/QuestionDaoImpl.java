@@ -8,8 +8,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Repository;
 
+import com.wcpdoc.exam.base.cache.DictCache;
 import com.wcpdoc.exam.core.dao.QuestionDao;
-import com.wcpdoc.exam.core.dao.impl.BaseDaoImpl;
+import com.wcpdoc.exam.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.Question;
@@ -18,7 +19,6 @@ import com.wcpdoc.exam.core.util.HibernateUtil;
 import com.wcpdoc.exam.core.util.SqlUtil;
 import com.wcpdoc.exam.core.util.SqlUtil.Order;
 import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.sys.cache.DictCache;
 
 /**
  * 试题数据访问层实现
@@ -26,7 +26,7 @@ import com.wcpdoc.exam.sys.cache.DictCache;
  * v1.0 zhanghc 2017-05-07 14:56:29
  */
 @Repository
-public class QuestionDaoImpl extends BaseDaoImpl<Question> implements QuestionDao {
+public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionDao {
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
@@ -77,7 +77,7 @@ public class QuestionDaoImpl extends BaseDaoImpl<Question> implements QuestionDa
 				+ "FROM EXM_QUESTION_TYPE QUESTION_TYPE "
 				+ "INNER JOIN EXM_QUESTION QUESTION ON QUESTION_TYPE.ID = QUESTION.QUESTION_TYPE_ID "
 				+ "WHERE QUESTION.ID = ?";
-		return getUnique(sql, new Object[]{id}, QuestionType.class);
+		return getEntity(sql, new Object[]{id}, QuestionType.class);
 	}
 
 	@Override

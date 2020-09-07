@@ -8,6 +8,8 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.exam.base.service.OrgService;
+import com.wcpdoc.exam.base.service.PostService;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.ExamTypeDao;
 import com.wcpdoc.exam.core.entity.ExamType;
@@ -18,8 +20,6 @@ import com.wcpdoc.exam.core.service.ExamTypeExService;
 import com.wcpdoc.exam.core.service.ExamTypeService;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.sys.service.OrgService;
-import com.wcpdoc.exam.sys.service.PostService;
 /**
  * 考试分类服务层实现
  * 

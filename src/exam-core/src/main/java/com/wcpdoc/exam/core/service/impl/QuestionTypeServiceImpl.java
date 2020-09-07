@@ -8,25 +8,25 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.exam.base.service.OrgService;
+import com.wcpdoc.exam.base.service.PostService;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.QuestionTypeDao;
 import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.QuestionType;
+import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.QuestionTypeExService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
-import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.sys.service.OrgService;
-import com.wcpdoc.exam.sys.service.PostService;
 /**
  * 试题分类服务层实现
  * 
  * v1.0 zhanghc 2016-5-24下午14:54:09
  */
 @Service
-public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implements QuestionTypeService{
+public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implements QuestionTypeService {
 	@Resource
 	private QuestionTypeDao questionTypeDao;
 	@Resource
@@ -45,127 +45,100 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	@Override
 	public void addAndUpdate(QuestionType questionType) {
 		//校验数据有效性
-		if(!ValidateUtil.isValid(questionType.getName())){
-			throw new RuntimeException("无法获取参数：questionType.name");
+		if (!ValidateUtil.isValid(questionType.getName())) {
+			throw new MyException("参数错误：name");
 		}
-		if(existName(questionType)){
-			throw new RuntimeException("名称已存在！");
+		if (questionType.getParentId() == null || questionType.getParentId() == 0) {
+			throw new MyException("参数错误：parentId");
+		}
+		
+		if (existName(questionType)) {
+			throw new MyException("名称已存在！");
 		}
 				
-		//添加试题分类
-		if(questionType.getParentId() == null){
-			questionType.setParentId(0);
-		}
-		questionTypeDao.add(questionType);
+		// 添加试题分类
+		questionType.setUpdateUserId(getCurUser().getId());
+		questionType.setUpdateTime(new Date());
+		questionType.setState(1);
+		add(questionType);
 		
-		//更新父子关系
-		QuestionType parentQuestionType = getEntity(questionType.getParentId());
-		if(parentQuestionType == null){
-			questionType.setParentSub("_" + questionType.getId() + "_");
-		}else {
-			questionType.setParentSub(parentQuestionType.getParentSub() + questionType.getId() + "_");
-		}
-		questionTypeDao.update(questionType);
-	}
-	
-	@Override
-	public void editAndUpdate(QuestionType questionType) {
-		//校验数据有效性
-		if(!ValidateUtil.isValid(questionType.getName())){
-			throw new RuntimeException("无法获取参数：questionType.name");
-		}
-		if(existName(questionType)){
-			throw new RuntimeException("名称已存在！");
-		}
-		
-		//修改试题分类
-		questionTypeDao.update(questionType);
+		// 更新父子关系
+		QuestionType parentQuestionType = questionTypeDao.getEntity(questionType.getParentId());
+		questionType.setParentSub(parentQuestionType.getParentSub() + questionType.getId() + "_");
+		questionType.setLevel(questionType.getParentSub().split("_").length - 1);
+		update(questionType);
 	}
 
 	@Override
-	public void delAndUpdate(Integer[] ids) {
-		//校验数据有效性
-		if(!ValidateUtil.isValid(ids)){
-			throw new RuntimeException("无法获取参数：ids");
+	public void delAndUpdate(Integer id) {
+		// 校验数据有效性
+		if (id == 1) { //不包括根试题分类
+			return;
+		}
+		List<QuestionType> questionTypeList = questionTypeDao.getList(id);
+		if (ValidateUtil.isValid(questionTypeList)) {
+			throw new MyException("请先删除子试题分类！");
 		}
 		
-		//删除试题分类，不包括根试题分类
-		for(Integer id : ids){
-			if(id == 1){
-				continue;
-			}
-			
-			List<QuestionType> questionTypeList = questionTypeDao.getAllSubQuestionTypeList(id);
-			for(QuestionType questionType : questionTypeList){
-				if(questionType.getState().equals("0")){
-					continue;
-				}
-				
-				questionType.setState(0);
-				questionTypeDao.update(questionType);
-				
-				questionTypeExService.delAndUpdate(questionType);
-			}
-		}
+		// 删除试题分类
+		QuestionType questionType = getEntity(id);
+		questionType.setState(0);
+		questionType.setUpdateTime(new Date());
+		questionType.setUpdateUserId(getCurUser().getId());
+		update(questionType);
 	}
 
 	@Override
 	public List<Map<String, Object>> getTreeList() {
 		return questionTypeDao.getTreeList();
 	}
-
+	
 	@Override
 	public void doMove(Integer sourceId, Integer targetId) {
-		//校验数据有效性
-		if(sourceId == null){
-			throw new RuntimeException("无法获取参数：sourceId");
+		// 校验数据有效性
+		if (sourceId == null) {
+			throw new MyException("无法获取参数：sourceId");
 		}
-		if(targetId == null){
-			throw new RuntimeException("无法获取参数：targetId");
+		if (targetId == null) {
+			throw new MyException("无法获取参数：targetId");
 		}
-		
-		//移动试题分类
-		questionTypeDao.doMove(sourceId, targetId);
-	}
+		if (sourceId == targetId) {
+			throw new MyException("源试题分类和目标试题分类一致！");
+		}
 
-	/**
-	 * 名称是否已存在
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * @param questionType
-	 * @return boolean
-	 */
-	private boolean existName(QuestionType questionType){
-		//校验数据有效性
-		if(questionType == null){
-			throw new RuntimeException("无法获取参数：questionType");
+		QuestionType source = getEntity(sourceId);
+		QuestionType target = getEntity(targetId);
+		if (target.getParentSub().contains(source.getParentSub())) {
+			throw new MyException("父试题分类不能移动到子试题分类下！");
 		}
-		if(!ValidateUtil.isValid(questionType.getName())){
-			throw new RuntimeException("无法获取参数：questionType.name");
-		}
+
+		// 移动试题分类
+		source.setParentId(target.getId());
+		source.setParentSub(String.format("%s%s_", target.getParentSub(), source.getId()));
+		source.setLevel(source.getParentSub().split("_").length - 1);
+		update(source);
 		
-		//如果是添加
-		QuestionType questionType2 = questionTypeDao.getQuestionTypeByName(questionType.getName());
-		if(questionType2 != null){
-			questionTypeDao.evict(questionType2);
-		}
+		List<QuestionType> subSourceList = questionTypeDao.getList(source.getId());
+		doMove(source, subSourceList);
+	}
 		
-		if(questionType.getId() == null){
-			if(questionType2 != null){
-				return true;
+	private void doMove(QuestionType target, List<QuestionType> subTargetList) {
+		for (QuestionType subTarget : subTargetList) {
+			subTarget.setParentId(target.getId());
+			subTarget.setParentSub(String.format("%s%s_", target.getParentSub(), subTarget.getId()));
+			subTarget.setLevel(subTarget.getParentSub().split("_").length - 1);
+			update(subTarget);
+			
+			List<QuestionType> subSubTargetList = questionTypeDao.getList(subTarget.getId());
+			if (ValidateUtil.isValid(subSubTargetList)) {
+				doMove(subTarget, subSubTargetList);
 			}
-			return false;
 		}
-		
-		//如果是修改
-		if(questionType2 != null && !questionType.getId().equals(questionType2.getId())){
-			return true;
-		}
-		return false;
 	}
 
 	@Override
-	public List<Map<String, Object>> getOrgTreeList() {
-		return orgService.getTreeList();
+	public boolean existName(QuestionType questionType) {
+		return questionTypeDao.existName(questionType.getName(), questionType.getId());
 	}
 
 	@Override
@@ -182,10 +155,10 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	public void doAuthUserAdd(Integer id, Integer[] userIds, boolean syn2Sub, LoginUser user) {
 		//校验数据有效性
 		if(id == null){
-			throw new RuntimeException("无法获取参数：id");
+			throw new MyException("无法获取参数：id");
 		}
 		if(!ValidateUtil.isValid(userIds)){
-			throw new RuntimeException("无法获取参数：userIds");
+			throw new MyException("无法获取参数：userIds");
 		}
 		
 		//添加权限用户
@@ -223,10 +196,10 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	public void doAuthUserDel(Integer id, Integer[] userIds, boolean syn2Sub, LoginUser user) {
 		//校验数据有效性
 		if(id == null){
-			throw new RuntimeException("无法获取参数：id");
+			throw new MyException("无法获取参数：id");
 		}
 		if(!ValidateUtil.isValid(userIds)){
-			throw new RuntimeException("无法获取参数：userIds");
+			throw new MyException("无法获取参数：userIds");
 		}
 		
 		if(syn2Sub){
@@ -260,10 +233,10 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	public void doAuthOrgUpdate(Integer id, Integer[] orgIds, boolean syn2Sub, LoginUser user) {
 		//校验数据有效性
 		if(id == null){
-			throw new RuntimeException("无法获取参数：id");
+			throw new MyException("无法获取参数：id");
 		}
 //		if(!ValidateUtil.isValid(orgIds)){
-//			throw new RuntimeException("无法获取参数：orgIds");//全不选就是空。
+//			throw new MyException("无法获取参数：orgIds");//全不选就是空。
 //		}
 		
 		//添加权限机构
@@ -291,17 +264,17 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 
 	@Override
 	public List<Map<String, Object>> getOrgPostTreeList() {
-		return postService.getOrgPostTreeList();
+		return null;//postService.getOrgPostTreeList();
 	}
 
 	@Override
 	public void doAuthPostUpdate(Integer id, Integer[] postIds, boolean syn2Sub, LoginUser user) {
 		//校验数据有效性
 		if(id == null){
-			throw new RuntimeException("无法获取参数：id");
+			throw new MyException("无法获取参数：id");
 		}
 //		if(!ValidateUtil.isValid(postIds)){
-//			throw new RuntimeException("无法获取参数：postIds");//全不选就是空。
+//			throw new MyException("无法获取参数：postIds");//全不选就是空。
 //		}
 		
 		//添加权限机构

@@ -18,7 +18,10 @@ import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
+import com.wcpdoc.exam.core.entity.PageResultEx;
+import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.util.DateUtil;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.quartz.entity.Cron;
 import com.wcpdoc.exam.quartz.service.CronService;
 import com.wcpdoc.exam.quartz.util.QuartzUtil;
@@ -46,10 +49,10 @@ public class CronController extends BaseController {
 	@RequestMapping("/toList")
 	public String toList() {
 		try {
-			return "quartz/cron/cronList";
+			return "/quartz/cron/cronList";
 		} catch (Exception e) {
 			log.error("到达定时任务列表页面错误：", e);
-			return "quartz/cron/cronList";
+			return "/quartz/cron/cronList";
 		}
 	}
 
@@ -63,7 +66,7 @@ public class CronController extends BaseController {
 	 */
 	@RequestMapping("/list")
 	@ResponseBody
-	public PageOut list(PageIn pageIn) {
+	public PageResult list(PageIn pageIn) {
 		try {
 			PageOut pageOut = cronService.getListpage(pageIn);
 			List<Map<String, Object>> list = pageOut.getRows();
@@ -78,14 +81,14 @@ public class CronController extends BaseController {
 				List<Date> timeList = QuartzUtil.getRecentTriggerTime(cron, 3);
 				StringBuilder timeStr = new StringBuilder();
 				for (Date date : timeList) {
-					timeStr.append(DateUtil.getFormatDate(date, DateUtil.FORMAT_DATE_TIME)).append("；");
+					timeStr.append(DateUtil.formatDateCustom(date, DateUtil.FORMAT_DATE_TIME)).append("；");
 				}
 				map.put("RECENT_TRIGGER_TIME", timeStr.toString());
 			}
-			return pageOut;
+			return new PageResultEx(true, "查询成功", pageOut);
 		} catch (Exception e) {
 			log.error("定时任务列表错误：", e);
-			return new PageOut();
+			return new PageResult(false, "查询失败");
 		}
 	}
 
@@ -99,10 +102,10 @@ public class CronController extends BaseController {
 	@RequestMapping("/toAdd")
 	public String toAdd() {
 		try {
-			return "quartz/cron/cronEdit";
+			return "/quartz/cron/cronEdit";
 		} catch (Exception e) {
 			log.error("到达添加定时任务页面错误：", e);
-			return "quartz/cron/cronEdit";
+			return "/quartz/cron/cronEdit";
 		}
 	}
 
@@ -114,17 +117,44 @@ public class CronController extends BaseController {
 	 * @param cron
 	 * @return PageResult
 	 */
+	@SuppressWarnings("unchecked")
 	@RequestMapping("/doAdd")
 	@ResponseBody
 	public PageResult doAdd(Cron cron) {
 		try {
 			cron.setUpdateUserId(getCurUser().getId());
 			cron.setUpdateTime(new Date());
-			cronService.addAndUpdate(cron);
+			// 校验数据有效性
+			if (!ValidateUtil.isValid(cron.getJobClass())) {
+				throw new MyException("参数错误：jobClass");
+			}
+			if (!ValidateUtil.isValid(cron.getCron())) {
+				throw new MyException("参数错误：cron");
+			}
+
+			Class<Job> jobClass = null;
+			try {
+				jobClass = (Class<Job>) Class.forName(cron.getJobClass());
+			} catch (ClassNotFoundException e) {
+				throw new MyException("无法实例化：" + cron.getJobClass());
+			}
+			if (!Job.class.isAssignableFrom(jobClass)) {
+				throw new MyException("未实现Job接口：" + cron.getJobClass());
+			}
+			if (!QuartzUtil.validExpression(cron.getCron())) {
+				throw new MyException("cron表达式错误：" + cron.getCron());
+			}
+
+			// 添加定时任务，默认不启动
+			cron.setState(2);
+			cronService.add(cron);
 			return new PageResult(true, "添加成功");
+		} catch (MyException e) {
+			log.error("完成添加定时任务错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加定时任务错误：", e);
-			return new PageResult(false, "添加失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 
@@ -142,10 +172,10 @@ public class CronController extends BaseController {
 		try {
 			Cron cron = cronService.getEntity(id);
 			model.addAttribute("cron", cron);
-			return "quartz/cron/cronEdit";
+			return "/quartz/cron/cronEdit";
 		} catch (Exception e) {
 			log.error("到达修改定时任务页面错误：", e);
-			return "quartz/cron/cronEdit";
+			return "/quartz/cron/cronEdit";
 		}
 	}
 
@@ -161,13 +191,14 @@ public class CronController extends BaseController {
 	@ResponseBody
 	public PageResult doEdit(Cron cron) {
 		try {
-			cron.setUpdateUserId(getCurUser().getId());
-			cron.setUpdateTime(new Date());
 			cronService.updateAndUpdate(cron);
 			return new PageResult(true, "修改成功");
+		} catch (MyException e) {
+			log.error("完成修改定时任务错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("完成修改定时任务错误：", e);
-			return new PageResult(false, "修改失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 
@@ -181,13 +212,16 @@ public class CronController extends BaseController {
 	 */
 	@RequestMapping("/doDel")
 	@ResponseBody
-	public PageResult doDel(Integer[] ids) {
+	public PageResult doDel(Integer id) {
 		try {
-			cronService.delAndUpdate(ids);
+			cronService.delAndUpdate(id);
 			return new PageResult(true, "删除成功");
+		} catch (MyException e) {
+			log.error("完成删除定时任务错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("完成删除定时任务错误：", e);
-			return new PageResult(false, "删除失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 	
@@ -200,36 +234,16 @@ public class CronController extends BaseController {
 	 */
 	@RequestMapping("/startTask")
 	@ResponseBody
-	public PageResult startTask(Integer[] ids) {
+	public PageResult startTask(Integer id) {
 		try {
-			StringBuilder msg = new StringBuilder();
-			
-			for (Integer id : ids) {
-				Cron cron = cronService.getEntity(id);
-				if (cron.getState() == 1) {
-					continue;
-				}
-				
-				try {
-					@SuppressWarnings("unchecked")
-					Class<Job> jobClass = (Class<Job>) Class.forName(cron.getJobClass());
-					QuartzUtil.addJob(jobClass, cron.getId(), cron.getCron());
-					
-					cron.setState(1);
-					cronService.update(cron);
-				} catch (Exception e) {
-					log.info("启动任务失败：", e);
-					msg.append("【" + cron.getName()).append("】");
-				}
-			}
-			
-			if (msg.length() != 0) {
-				throw new RuntimeException(msg.toString());
-			}
+			cronService.startTask(id);
 			return new PageResult(true, "启动成功");
+		} catch (MyException e) {
+			log.error("启动任务错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("启动任务错误：", e);
-			return new PageResult(false, "启动失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 	
@@ -242,34 +256,16 @@ public class CronController extends BaseController {
 	 */
 	@RequestMapping("/stopTask")
 	@ResponseBody
-	public PageResult stopTask(Integer[] ids) {
+	public PageResult stopTask(Integer id) {
 		try {
-			StringBuilder msg = new StringBuilder();
-			
-			for (Integer id : ids) {
-				Cron cron = cronService.getEntity(id);
-				if (cron.getState() == 2) {
-					continue;
-				}
-				
-				try {
-					QuartzUtil.deleteJob(cron.getId());
-					
-					cron.setState(2);
-					cronService.update(cron);
-				} catch (Exception e) {
-					log.info("停止任务失败：", e);
-					msg.append("【" + cron.getName()).append("】");
-				}
-			}
-			
-			if (msg.length() != 0) {
-				throw new RuntimeException(msg.toString());
-			}
+			cronService.stopTask(id);
 			return new PageResult(true, "停止成功");
+		} catch (MyException e) {
+			log.error("停止任务错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("停止任务错误：", e);
-			return new PageResult(false, "停止失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 	
@@ -282,29 +278,16 @@ public class CronController extends BaseController {
 	 */
 	@RequestMapping("/runOnceTask")
 	@ResponseBody
-	public PageResult runOnceTask(Integer[] ids) {
+	public PageResult runOnceTask(Integer id) {
 		try {
-			StringBuilder msg = new StringBuilder();
-			
-			for (Integer id : ids) {
-				Cron cron = cronService.getEntity(id);
-				try {
-					@SuppressWarnings("unchecked")
-					Class<Job> jobClass = (Class<Job>) Class.forName(cron.getJobClass());
-					jobClass.newInstance().execute(null);
-				} catch (Exception e) {
-					log.info("执行一次失败：", e);
-					msg.append("【" + cron.getName()).append("】");
-				}
-			}
-			
-			if (msg.length() != 0) {
-				throw new RuntimeException(msg.toString());
-			}
+			cronService.runOnceTask(id);
 			return new PageResult(true, "执行成功");
+		} catch (MyException e) {
+			log.error("执行一次错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("执行一次错误：", e);
-			return new PageResult(false, "执行失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 }

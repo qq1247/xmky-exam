@@ -28,10 +28,6 @@ public abstract class BaseController {
 	 */
 	public LoginUser getCurUser() {
 		HttpSession session = request.getSession(false);
-		if (session == null) {
-			return null;
-		}
-
-		return (LoginUser) session.getAttribute(ConstantManager.USER);
+		return session == null ? null : (LoginUser) session.getAttribute(ConstantManager.USER);
 	}
 }

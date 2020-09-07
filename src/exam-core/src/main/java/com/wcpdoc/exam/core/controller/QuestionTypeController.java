@@ -14,14 +14,16 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wcpdoc.exam.core.controller.BaseController;
+import com.wcpdoc.exam.base.entity.User;
+import com.wcpdoc.exam.base.service.OrgService;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
+import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.entity.QuestionType;
+import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.sys.entity.User;
 
 /**
  * 试题分类控制层
@@ -30,12 +32,13 @@ import com.wcpdoc.exam.sys.entity.User;
  */
 @Controller
 @RequestMapping("/questionType")
-@Deprecated
 public class QuestionTypeController extends BaseController{
 	private static final Logger log = LoggerFactory.getLogger(QuestionTypeController.class);
 	
 	@Resource
 	private QuestionTypeService questionTypeService;
+	@Resource
+	private OrgService orgService;
 	
 	/**
 	 * 到达试题分类列表页面 
@@ -54,19 +57,53 @@ public class QuestionTypeController extends BaseController{
 	}
 	
 	/**
-	 * 获取试题分类树
+	 * 试题分类树
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
 	 * @return List<Map<String,Object>>
 	 */
 	@RequestMapping("/treeList")
 	@ResponseBody
-	public List<Map<String, Object>> treeList() {
+	public PageResult treeList() {
 		try {
-			return questionTypeService.getTreeList();
+			return new PageResultEx(true, "查询成功", questionTypeService.getTreeList());
 		} catch (Exception e) {
-			log.error("获取试题分类树错误：", e);
-			return new ArrayList<Map<String,Object>>();
+			log.error("试题分类树错误：", e);
+			return new PageResult(false, "查询失败");
+		}
+	}
+	
+	/**
+	 * 组织机构树
+	 * 
+	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * @param id
+	 * @return List<Map<String,Object>>
+	 */
+	@RequestMapping("/orgTreeList")
+	@ResponseBody
+	public PageResult orgTreeList(Integer id) {
+		try {
+			List<Map<String, Object>> orgTreeList = orgService.getTreeList();
+			if(id == null){
+				return new PageResultEx(true, "查询成功", orgTreeList);
+			}
+			
+			QuestionType questionType = questionTypeService.getEntity(id);
+			if(!ValidateUtil.isValid(questionType.getOrgIds())){
+				return new PageResultEx(true, "查询成功", orgTreeList);
+			}
+			
+			for(Map<String, Object> map : orgTreeList){
+				String orgId = map.get("ID").toString();
+				if(questionType.getOrgIds().contains("," + orgId + ",")){
+					map.put("CHECKED", true);
+				}
+			}
+			return new PageResultEx(true, "查询成功", orgTreeList);
+		} catch (Exception e) {
+			log.error("组织机构树错误：", e);
+			return new PageResult(false, "查询失败");
 		}
 	}
 	
@@ -78,12 +115,12 @@ public class QuestionTypeController extends BaseController{
 	 */
 	@RequestMapping("/list")
 	@ResponseBody
-	public PageOut list(PageIn pageIn) {
+	public PageResult list(PageIn pageIn) {
 		try {
-			return questionTypeService.getListpage(pageIn);
+			return new PageResultEx(true, "查询成功", questionTypeService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("试题分类列表错误：", e);
-			return new PageOut();
+			return new PageResult(false, "查询失败");
 		}
 	}
 	
@@ -113,14 +150,14 @@ public class QuestionTypeController extends BaseController{
 	@ResponseBody
 	public PageResult doAdd(QuestionType questionType) {
 		try {
-			questionType.setUpdateUserId(getCurUser().getId());
-			questionType.setUpdateTime(new Date());
-			questionType.setState(1);
 			questionTypeService.addAndUpdate(questionType);
 			return new PageResult(true, "添加成功");
+		} catch (MyException e) {
+			log.error("完成添加试题分类错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加试题分类错误：", e);
-			return new PageResult(false, "添加失败：" + e.getMessage());
+			return new PageResult(false, "未知异常");
 		}
 	}
 	
@@ -135,10 +172,6 @@ public class QuestionTypeController extends BaseController{
 		try {
 			QuestionType questionType = questionTypeService.getEntity(id);
 			model.addAttribute("questionType", questionType);
-			QuestionType pQuestionType = questionTypeService.getEntity(questionType.getParentId());
-			if(pQuestionType != null){
-				model.addAttribute("pQuestionType", questionTypeService.getEntity(questionType.getParentId()));
-			}
 			return "exam/questionType/questionTypeEdit";
 		} catch (Exception e) {
 			log.error("到达修改试题分类页面错误", e);
@@ -156,16 +189,28 @@ public class QuestionTypeController extends BaseController{
 	@ResponseBody
 	public PageResult doEdit(QuestionType questionType) {
 		try {
+			//校验数据有效性
+			if(!ValidateUtil.isValid(questionType.getName())){
+				throw new MyException("参数错误：name");
+			}
+			if(questionTypeService.existName(questionType)){
+				throw new MyException("名称已存在！");
+			}
+			
+			//修改试题分类
 			QuestionType entity = questionTypeService.getEntity(questionType.getId());
 			entity.setName(questionType.getName());
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(((User)getCurUser()).getId());
 			entity.setNo(questionType.getNo());
-			questionTypeService.editAndUpdate(entity);
+			questionTypeService.update(entity);
 			return new PageResult(true, "修改成功");
+		} catch (MyException e) {
+			log.error("完成修改试题分类错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("完成修改试题分类错误：", e);
-			return new PageResult(false, "修改失败：" + e.getMessage());
+			return new PageResult(false, "未知异常");
 		}
 	}
 	
@@ -177,13 +222,16 @@ public class QuestionTypeController extends BaseController{
 	 */
 	@RequestMapping("/doDel")
 	@ResponseBody
-	public PageResult doDel(Integer[] ids) {
+	public PageResult doDel(Integer id) {
 		try {
-			questionTypeService.delAndUpdate(ids);
+			questionTypeService.delAndUpdate(id);
 			return new PageResult(true, "删除成功");
+		} catch (MyException e) {
+			log.error("完成删除试题分类错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("完成删除试题分类错误：", e);
-			return new PageResult(false, "删除失败：" + e.getMessage());
+			return new PageResult(false, "未知异常");
 		}
 	}
 	
@@ -204,23 +252,6 @@ public class QuestionTypeController extends BaseController{
 	}
 	
 	/**
-	 * 获取试题分类树
-	 * 
-	 * v1.0 zhanghc 2016-5-8上午11:00:00
-	 * @return List<Map<String,Object>>
-	 */
-	@RequestMapping("/moveQuestionTypeTreeList")
-	@ResponseBody
-	public List<Map<String, Object>> moveQuestionTypeTreeList() {
-		try {
-			return questionTypeService.getTreeList();
-		} catch (Exception e) {
-			log.error("获取试题分类树错误：", e);
-			return new ArrayList<Map<String,Object>>();
-		}
-	}
-	
-	/**
 	 * 移动试题分类
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * @param sourceId
@@ -233,9 +264,12 @@ public class QuestionTypeController extends BaseController{
 		try {
 			questionTypeService.doMove(sourceId, targetId);
 			return new PageResult(true, "移动成功");
+		} catch (MyException e) {
+			log.error("完成移动试题分类错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
-			log.error("移动试题分类错误：", e);
-			return new PageResult(false, "移动失败：" + e.getMessage());
+			log.error("完成移动试题分类错误：", e);
+			return new PageResult(false, "未知异常");
 		}
 	}
 	
@@ -253,23 +287,6 @@ public class QuestionTypeController extends BaseController{
 		} catch (Exception e) {
 			log.error("到达权限列表页面错误：", e);
 			return "exam/questionType/questionTypeAuthList";
-		}
-	}
-	
-	/**
-	 * 获取组织机构树
-	 * 
-	 * v1.0 zhanghc 2017-05-07 14:56:29
-	 * @return List<Map<String,Object>>
-	 */
-	@RequestMapping("/authUserOrgTreeList")
-	@ResponseBody
-	public List<Map<String, Object>> authUserOrgTreeList() {
-		try {
-			return questionTypeService.getOrgTreeList();
-		} catch (Exception e) {
-			log.error("获取组织机构树错误：", e);
-			return new ArrayList<Map<String,Object>>();
 		}
 	}
 	
@@ -388,40 +405,6 @@ public class QuestionTypeController extends BaseController{
 		} catch (Exception e) {
 			log.error("完成添加权限机构错误：", e);
 			return new PageResult(false, "添加成功：" + e.getMessage());
-		}
-	}
-	
-	/**
-	 * 获取组织机构树
-	 * 
-	 * v1.0 zhanghc 2018年5月31日下午10:07:39
-	 * @return List<Map<String,Object>>
-	 */
-	@RequestMapping("/authOrgOrgTreeList")
-	@ResponseBody
-	public List<Map<String, Object>> authOrgOrgTreeList(Integer id) {
-		try {
-			List<Map<String, Object>> orgTreeList = questionTypeService.getOrgTreeList();
-			QuestionType questionType = questionTypeService.getEntity(id);
-			if(questionType == null){
-				return orgTreeList;
-			}
-			
-			String orgIds = questionType.getOrgIds();
-			if(!ValidateUtil.isValid(orgIds)){
-				return orgTreeList;
-			}
-			
-			for(Map<String, Object> map : orgTreeList){
-				String orgId = map.get("ID").toString();
-				if(orgIds.contains("," + orgId + ",")){
-					map.put("CHECKED", true);
-				}
-			}
-			return orgTreeList;
-		} catch (Exception e) {
-			log.error("获取组织机构树错误：", e);
-			return new ArrayList<Map<String,Object>>();
 		}
 	}
 	

@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.exam.core.dao.ExamUserQuestionDao;
-import com.wcpdoc.exam.core.dao.impl.BaseDaoImpl;
+import com.wcpdoc.exam.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.exam.core.entity.ExamUserQuestion;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
@@ -16,7 +16,7 @@ import com.wcpdoc.exam.core.entity.PageOut;
  * v1.0 zhanghc 2017-06-19 16:28:29
  */
 @Repository
-public class ExamUserQuestionDaoImpl extends BaseDaoImpl<ExamUserQuestion> implements ExamUserQuestionDao {
+public class ExamUserQuestionDaoImpl extends RBaseDaoImpl<ExamUserQuestion> implements ExamUserQuestionDao {
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {

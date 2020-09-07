@@ -9,14 +9,14 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.exam.base.entity.User;
+import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.constant.ConstantManager;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.home.service.HomeService;
-import com.wcpdoc.exam.sys.entity.User;
-import com.wcpdoc.exam.sys.service.UserService;
 
 /**
  * 首页服务层实现
@@ -37,7 +37,7 @@ public class HomeServiceImpl extends BaseServiceImp<Object> implements HomeServi
 
 	@Override
 	public Map<Integer, Long> getAuthSum(Integer userId) {
-		return userService.getAuthSum(userId);
+		return userService.getAuth(userId);
 	}
 
 	@Override
@@ -59,7 +59,7 @@ public class HomeServiceImpl extends BaseServiceImp<Object> implements HomeServi
 		HttpSession session = request.getSession(true);//参数为false，第一次在页面直接访问login/doIn，session为null
 		session.setAttribute(ConstantManager.USER, user);
 		
-		Map<Integer, Long> userAuthMap = userService.getAuthSum(user.getId());
+		Map<Integer, Long> userAuthMap = userService.getAuth(user.getId());
 		session.setAttribute(ConstantManager.USER_AUTH_MAP, userAuthMap);
 		
 		//更新用户登录时间

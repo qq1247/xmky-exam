@@ -1,5 +1,6 @@
 <%@ page language="java" pageEncoding="utf-8"%>
-<%@ taglib prefix="my" uri="myTag/core"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE html>
 <html>
 	<head>
 		<title>登录</title>
@@ -8,48 +9,39 @@
 			    top.location = self.location;
 			}
 		</script>
-		
 		<%@include file="/script/myJs/common.jspf"%>
+		<link rel="stylesheet" href="script/layuiadmin/style/login.css" media="all">
 	</head>
 	<body>
-		<form id="form" action="login/doIn" method="post">
-			<table style="width: 100%;height: 100%;text-align: center;">
-				<tr>
-					<td style="width: 30%;">
-					</td>
-					<td style="width: 40%;">
-						<div class="easyui-panel" title="登录" 
-							style="width: 400px; padding: 30px 70px 20px 70px;">
-							<div style="margin-bottom: 10px">
-								<input name="loginName" class="easyui-textbox"
-									style="width: 100%; height: 40px; padding: 12px" value="" 
-									data-options="prompt:'在此输入用户名',iconCls:'icon-man',iconWidth:38">
-							</div>
-							<div style="margin-bottom: 20px">
-								<input name="pwd" class="easyui-textbox" type="pwd"
-									style="width: 100%; height: 40px; padding: 12px" value=""
-									data-options="prompt:'在此输入密码',iconCls:'icon-lock',iconWidth:38">
-							</div>
-							<div>
-								<a href="#" class="easyui-linkbutton"
-									data-options="iconCls:'icon-ok'"
-									style="padding: 5px 0px; width: 100%;" onclick="document.getElementById('form').submit();return false">
-									<span style="font-size: 14px;">登录</span> </a>
-								<span id="message" style="color: red;"></span>
-							</div>
+		<div class="layadmin-user-login layadmin-user-display-show">
+			<div class="layadmin-user-login-main">
+				<div class="layadmin-user-login-box layadmin-user-login-header">
+					<h2>智云</h2>
+					<p>登录入口</p>
+				</div>
+				<div class="layadmin-user-login-box layadmin-user-login-body layui-form">
+					<form class="layui-form" action="${orgCode}/login/doIn" method="post">
+						<div class="layui-form-item">
+							<label class="layadmin-user-login-icon layui-icon layui-icon-username" for="loginName"></label>
+							<input type="text" name="loginName" lay-verify="required" placeholder="在此输入用户名" class="layui-input">
 						</div>
-					</td>
-					<td style="width: 30%;">
-						
-					</td>
-				</tr>
-			</table>
-		</form>
+						<div class="layui-form-item">
+							<label class="layadmin-user-login-icon layui-icon layui-icon-password" for="pwd"></label>
+							<input type="password" name="pwd" id="pwd" lay-verify="required" placeholder="在此输入密码" class="layui-input">
+						</div>
+						<div class="layui-form-item">
+							<button class="layui-btn layui-btn-fluid" lay-submit lay-filter="submitBtn">登 入</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
 	</body>
-	<script type="text/javascript">
+	<script type="text/javascript" src="script/layuiadmin/layui/layui.all.js"></script>
+	<script>
 		var message = "<%= request.getParameter("message") == null ? "" : request.getParameter("message") %>";
 		if(message){
-			$("#message").html(decodeURI(message));
+			layer.msg(decodeURI(message));
 		}
 	</script>
 </html>

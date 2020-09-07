@@ -6,7 +6,7 @@ import java.util.Map;
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.exam.core.dao.QuestionTypeDao;
-import com.wcpdoc.exam.core.dao.impl.BaseDaoImpl;
+import com.wcpdoc.exam.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.QuestionType;
@@ -20,7 +20,7 @@ import com.wcpdoc.exam.core.util.SqlUtil.Order;
  * v1.0 zhanghc 2016-5-24下午14:54:09
  */
 @Repository
-public class QuestionTypeDaoImpl extends BaseDaoImpl<QuestionType> implements QuestionTypeDao {
+public class QuestionTypeDaoImpl extends RBaseDaoImpl<QuestionType> implements QuestionTypeDao {
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
@@ -43,41 +43,33 @@ public class QuestionTypeDaoImpl extends BaseDaoImpl<QuestionType> implements Qu
 
 	@Override
 	public List<Map<String, Object>> getTreeList() {
-		String sql = "SELECT QUESTION_TYPE.ID, QUESTION_TYPE.NAME, QUESTION_TYPE.PARENT_ID, QUESTION_TYPE.PARENT_SUB "
-				+ "FROM EXM_QUESTION_TYPE QUESTION_TYPE "
-				+ "WHERE QUESTION_TYPE.STATE = 1";
+		String sql = "SELECT ID, NAME, PARENT_ID, PARENT_SUB FROM EXM_QUESTION_TYPE WHERE STATE = 1 ORDER BY NO ASC";
+		return getMapList(sql);
+	}
+
+	@Override
+	public List<QuestionType> getList() {
+		String sql = "SELECT * FROM EXM_QUESTION_TYPE WHERE STATE = 1";
 		return getList(sql);
 	}
 
 	@Override
-	public void doMove(Integer sourceId, Integer targetId) {
-		QuestionType sourceQuestionType = getEntity(sourceId);
-		QuestionType targetQuestionType = getEntity(targetId);
-		sourceQuestionType.setParentId(targetId);
-		flush();
-
-		String sql = "UPDATE EXM_QUESTION_TYPE QUESTION_TYPE" //
-				+ "	SET QUESTION_TYPE.PARENT_SUB = REPLACE(QUESTION_TYPE.PARENT_SUB, ?, ?)"
-				+ "	WHERE QUESTION_TYPE.PARENT_SUB LIKE ?";
-		Object[] params = new Object[] { 
-					sourceQuestionType.getParentSub(), 
-					targetQuestionType.getParentSub() + sourceQuestionType.getId() + "_",
-					sourceQuestionType.getParentSub() + "%" };
-		update(sql, params);
+	public List<QuestionType> getList(Integer parentId) {
+		String sql = "SELECT * FROM EXM_QUESTION_TYPE WHERE STATE = 1 AND PARENT_ID = ?";
+		return getList(sql, new Object[] { parentId });
 	}
 	
 	@Override
-	public List<QuestionType> getAllSubQuestionTypeList(Integer id) {
-		String sql = "SELECT * FROM EXM_QUESTION_TYPE WHERE PARENT_SUB LIKE ? AND STATE = 1";
-		return getList(sql, new Object[]{"%\\_"+id+"\\_%"}, QuestionType.class);
+	public boolean existName(String name, Integer excludeId) {
+		if (excludeId == null) {
+			String sql = "SELECT COUNT(*) AS NUM FROM EXM_QUESTION_TYPE WHERE NAME = ? AND STATE = 1";
+			return getCount(sql, new Object[] { name }) > 0;
+		}
+
+		String sql = "SELECT COUNT(*) AS NUM FROM EXM_QUESTION_TYPE WHERE NAME = ? AND STATE = 1 AND ID != ?";
+		return getCount(sql, new Object[] { name, excludeId }) > 0;
 	}
 	
-	@Override
-	public QuestionType getQuestionTypeByName(String name) {
-		String sql = "SELECT * FROM EXM_QUESTION_TYPE WHERE NAME = ? AND STATE = 1";
-		return getUnique(sql, new Object[]{name}, QuestionType.class);
-	}
-
 	@Override
 	public PageOut getAuthUserListpage(PageIn pageIn) {
 		String sql = "SELECT USER.ID, USER.NAME AS USER_NAME, USER.LOGIN_NAME, ORG.NAME AS ORG_NAME, POST_USER.POST_NAMES "
@@ -124,17 +116,5 @@ public class QuestionTypeDaoImpl extends BaseDaoImpl<QuestionType> implements Qu
 		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		return pageOut;
-	}
-
-	@Override
-	public List<QuestionType> getList() {
-		String sql = "SELECT * FROM EXM_QUESTION_TYPE WHERE STATE = 1";
-		return getList(sql, QuestionType.class);
-	}
-
-	@Override
-	public List<QuestionType> getList(Integer parentId) {
-		String sql = "SELECT * FROM EXM_QUESTION_TYPE WHERE STATE = 1 AND PARENT_ID = ?";
-		return getList(sql, new Object[]{parentId}, QuestionType.class);
 	}
 }

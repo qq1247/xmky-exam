@@ -7,6 +7,7 @@ import java.util.Map;
  * 页面输出
  * 
  * v1.0 zhanghc 2015-6-19下午08:30:16
+ * @param <T>
  */
 public class PageOut {
 	private int total;// 总记录条数

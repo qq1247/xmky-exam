@@ -6,10 +6,10 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.util.SpringUtil;
 import com.wcpdoc.exam.file.job.ClearFileJob;
-import com.wcpdoc.exam.sys.entity.User;
 
 /**
  * 强制交卷任务
