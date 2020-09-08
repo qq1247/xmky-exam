@@ -59,10 +59,10 @@ public class UserController extends BaseController {
 	@RequestMapping("/toList")
 	public String toList() {
 		try {
-			return "/base/user/userList";
+			return "base/user/userList";
 		} catch (Exception e) {
 			log.error("到达用户列表页面错误：", e);
-			return "/base/user/userList";
+			return "base/user/userList";
 		}
 	}
 
@@ -146,10 +146,10 @@ public class UserController extends BaseController {
 	@RequestMapping("/toAdd")
 	public String toAdd() {
 		try {
-			return "/base/user/userEdit";
+			return "base/user/userEdit";
 		} catch (Exception e) {
 			log.error("到达添加用户页面 错误：", e);
-			return "/base/user/userEdit";
+			return "base/user/userEdit";
 		}
 	}
 
@@ -212,10 +212,10 @@ public class UserController extends BaseController {
 			Org org = orgService.getEntity(user.getOrgId());
 			model.addAttribute("user", user);
 			model.addAttribute("org", org);
-			return "/base/user/userEdit";
+			return "base/user/userEdit";
 		} catch (Exception e) {
 			log.error("到达修改用户页面 错误：", e);
-			return "/base/user/userEdit";
+			return "base/user/userEdit";
 		}
 	}
 
@@ -310,10 +310,10 @@ public class UserController extends BaseController {
 	@RequestMapping("/toPostUpdate")
 	public String toPostUpdate() {
 		try {
-			return "/base/user/userPostUpdate";
+			return "base/user/userPostUpdate";
 		} catch (Exception e) {
 			log.error("到达设置岗位页面错误：", e);
-			return "/base/user/userPostUpdate";
+			return "base/user/userPostUpdate";
 		}
 	}
 
@@ -373,10 +373,10 @@ public class UserController extends BaseController {
 	@RequestMapping("/toOrgUpdate")
 	public String toOrgUpdate() {
 		try {
-			return "/base/user/userOrgUpdate";
+			return "base/user/userOrgUpdate";
 		} catch (Exception e) {
 			log.error("到达设置组织机构页面错误：", e);
-			return "/base/user/userOrgUpdate";
+			return "base/user/userOrgUpdate";
 		}
 	}
 

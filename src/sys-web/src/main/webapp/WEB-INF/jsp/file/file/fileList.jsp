@@ -139,7 +139,7 @@
 									FilesAdded : function(up, files) {
 										$("#file_console").html("");
 										
-										var fileListObj = $("#file_list");
+										var fileListObj = $("#fileList");
 										$.each(files, function(index, domEle){
 											var html = [];
 											html.push("<tr id='file_row_" + domEle.id + "'>");
@@ -197,7 +197,7 @@
 			
 			layui.form.on("submit(fileUploadBtn)", function(data) {
 				var ids = [];
-				$("#file_list [name='ids']").each(function (index, domEle) {
+				$("#fileList [name='ids']").each(function (index, domEle) {
 					ids.push(domEle.value);
 				});
 				data.field.ids = ids;

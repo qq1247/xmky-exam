@@ -43,10 +43,10 @@ public class ResController extends BaseController {
 	public String toList(Model model) {
 		try {
 			model.addAttribute("RES_TYPE", DictCache.getIndexDictlistMap().get("RES_TYPE"));
-			return "/base/res/resList";
+			return "base/res/resList";
 		}catch (Exception e) {
 			log.error("到达资源列表页面错误：", e);
-			return "/base/res/resList";
+			return "base/res/resList";
 		}
 	}
 
@@ -98,10 +98,10 @@ public class ResController extends BaseController {
 	@RequestMapping("/toAdd")
 	public String toAdd() {
 		try {
-			return "/base/res/resEdit";
+			return "base/res/resEdit";
 		} catch (Exception e) {
 			log.error("到达添加资源页面错误：", e);
-			return "/base/res/resEdit";
+			return "base/res/resEdit";
 		}
 	}
 
@@ -142,14 +142,13 @@ public class ResController extends BaseController {
 		try {
 			Res res = resService.getEntity(id);
 			model.addAttribute("res", res);
-			Res pRes = resService.getEntity(res.getParentId());
-			if (pRes != null) {
-				model.addAttribute("pRes", resService.getEntity(res.getParentId()));
+			if (res.getParentId() != null) {
+				model.addAttribute("parentRes", resService.getEntity(res.getParentId()));
 			}
-			return "/base/res/resEdit";
+			return "base/res/resEdit";
 		} catch (Exception e) {
 			log.error("到达修改资源页面错误：", e);
-			return "/base/res/resEdit";
+			return "base/res/resEdit";
 		}
 	}
 
@@ -209,10 +208,10 @@ public class ResController extends BaseController {
 	@RequestMapping("/toMove")
 	public String toMove() {
 		try {
-			return "/base/res/resMove";
+			return "base/res/resMove";
 		} catch (Exception e) {
 			log.error("到达移动资源页面错误", e);
-			return "/base/res/resMove";
+			return "base/res/resMove";
 		}
 	}
 

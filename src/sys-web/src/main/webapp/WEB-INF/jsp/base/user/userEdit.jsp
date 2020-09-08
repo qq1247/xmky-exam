@@ -1,6 +1,6 @@
 <%@ page language="java" pageEncoding="utf-8"%>
 <div lay-filter="userEditFrom" class="layui-form" style="padding: 20px 0 0 0;">
-	<input type="hidden" id="user_id" name="id" value="${user.id }" />
+	<input type="hidden" name="id" value="${user.id }" />
 	<div class="layui-row layui-form-item">
 		<div class="layui-col-md11">
 			<label class="layui-form-label">上级组织机构：</label>

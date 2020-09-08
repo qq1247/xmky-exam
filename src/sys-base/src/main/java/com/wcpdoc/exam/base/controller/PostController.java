@@ -53,10 +53,10 @@ public class PostController extends BaseController {
 	@RequestMapping("/toList")
 	public String toList() {
 		try {
-			return "/base/post/postList";
+			return "base/post/postList";
 		} catch (Exception e) {
 			log.error("到达岗位列表页面错误：", e);
-			return "/base/post/postList";
+			return "base/post/postList";
 		}
 	}
 
@@ -134,10 +134,10 @@ public class PostController extends BaseController {
 	@RequestMapping("/toAdd")
 	public String toAdd() {
 		try {
-			return "/base/post/postEdit";
+			return "base/post/postEdit";
 		} catch (Exception e) {
 			log.error("到达添加岗位页面错误：", e);
-			return "/base/post/postEdit";
+			return "base/post/postEdit";
 		}
 	}
 
@@ -200,10 +200,10 @@ public class PostController extends BaseController {
 			Org org = orgService.getEntity(id);
 			model.addAttribute("post", post);
 			model.addAttribute("org", org);
-			return "/base/post/postEdit";
+			return "base/post/postEdit";
 		} catch (Exception e) {
 			log.error("到达修改岗位页面错误：", e);
-			return "/base/post/postEdit";
+			return "base/post/postEdit";
 		}
 	}
 
@@ -284,10 +284,10 @@ public class PostController extends BaseController {
 	@RequestMapping("/toResUpdate")
 	public String toResUpdate() {
 		try {
-			return "/base/post/postResUpdate";
+			return "base/post/postResUpdate";
 		} catch (Exception e) {
 			log.error("到达设置权限页面错误：", e);
-			return "/base/post/postResUpdate";
+			return "base/post/postResUpdate";
 		}
 	}
 

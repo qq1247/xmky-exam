@@ -49,10 +49,10 @@ public class CronController extends BaseController {
 	@RequestMapping("/toList")
 	public String toList() {
 		try {
-			return "/quartz/cron/cronList";
+			return "quartz/cron/cronList";
 		} catch (Exception e) {
 			log.error("到达定时任务列表页面错误：", e);
-			return "/quartz/cron/cronList";
+			return "quartz/cron/cronList";
 		}
 	}
 
@@ -102,10 +102,10 @@ public class CronController extends BaseController {
 	@RequestMapping("/toAdd")
 	public String toAdd() {
 		try {
-			return "/quartz/cron/cronEdit";
+			return "quartz/cron/cronEdit";
 		} catch (Exception e) {
 			log.error("到达添加定时任务页面错误：", e);
-			return "/quartz/cron/cronEdit";
+			return "quartz/cron/cronEdit";
 		}
 	}
 
@@ -172,10 +172,10 @@ public class CronController extends BaseController {
 		try {
 			Cron cron = cronService.getEntity(id);
 			model.addAttribute("cron", cron);
-			return "/quartz/cron/cronEdit";
+			return "quartz/cron/cronEdit";
 		} catch (Exception e) {
 			log.error("到达修改定时任务页面错误：", e);
-			return "/quartz/cron/cronEdit";
+			return "quartz/cron/cronEdit";
 		}
 	}
 

@@ -1,6 +1,6 @@
 <%@ page language="java" pageEncoding="utf-8"%>
 <div lay-filter="cronEditFrom" class="layui-form" style="padding: 20px 0 0 0;">
-	<input type="hidden" id="cron_id" name="id" value="${cron.id}" />
+	<input type="hidden" name="id" value="${cron.id}" />
 	<div class="layui-row layui-form-item">
 		<div class="layui-col-md11">
 			<label class="layui-form-label">名称：</label>

@@ -159,26 +159,26 @@ public class ResCache extends BaseEhCache {
 			}
 		}
 
-		List<Menu> homeMenuList = getHomeMenuList();
-		for (Menu menu : homeIdMenuMap.values()) {
-			if (menu.getParentId() == 0) {
-				homeMenuList.add(menu);
-			} else {
-				Menu parentMenu = homeIdMenuMap.get(menu.getParentId());
-				List<Menu> children = parentMenu.getChildren();
-				if (children == null) {
-					children = new ArrayList<Menu>();
-					parentMenu.setChildren(children);
-				}
-				children.add(menu);
-				Collections.sort(children, new Comparator<Menu>() {
-					@Override
-					public int compare(Menu o1, Menu o2) {
-						return o1.getNo() - o2.getNo();
-					}
-				});
-			}
-		}
+//		List<Menu> homeMenuList = getHomeMenuList();
+//		for (Menu menu : homeIdMenuMap.values()) {
+//			if (menu.getParentId() == 0) {
+//				homeMenuList.add(menu);
+//			} else {
+//				Menu parentMenu = homeIdMenuMap.get(menu.getParentId());
+//				List<Menu> children = parentMenu.getChildren();
+//				if (children == null) {
+//					children = new ArrayList<Menu>();
+//					parentMenu.setChildren(children);
+//				}
+//				children.add(menu);
+//				Collections.sort(children, new Comparator<Menu>() {
+//					@Override
+//					public int compare(Menu o1, Menu o2) {
+//						return o1.getNo() - o2.getNo();
+//					}
+//				});
+//			}
+//		}
 	}
 
 	/**

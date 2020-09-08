@@ -3,11 +3,9 @@ package com.wcpdoc.exam.core.service;
 import java.util.List;
 import java.util.Map;
 
-import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.QuestionType;
-import com.wcpdoc.exam.core.service.BaseService;
 /**
  * 试题分类服务层接口
  * 
@@ -57,83 +55,51 @@ public interface QuestionTypeService extends BaseService<QuestionType> {
 	boolean existName(QuestionType questionType);
 
 	/**
-	 * 获取权限用户
-	 * 
-	 * v1.0 zhanghc 2018年5月29日下午11:24:14
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	PageOut getAuthUserListpage(PageIn pageIn);
-
-	/**
-	 * 获取权限用户
-	 * 
-	 * v1.0 zhanghc 2018年5月30日下午6:28:19
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	PageOut getAuthUserAddList(PageIn pageIn);
-	
-	/**
-	 * 完成添加权限用户
-	 * 
-	 * v1.0 zhanghc 2018年5月30日下午7:08:26
-	 * @param id
-	 * @param userIds
-	 * @param syn2Sub 
-	 * @param user
-	 * void
-	 */
-	void doAuthUserAdd(Integer id, Integer[] userIds, boolean syn2Sub, LoginUser user);
-
-	/**
-	 * 完成删除权限用户
-	 * 
-	 * v1.0 zhanghc 2018年5月30日下午7:08:01
-	 * @param id 
-	 * @param userIds 
-	 * @param syn2Sub 
-	 * @param user 
-	 * void
-	 */
-	void doAuthUserDel(Integer id, Integer[] userIds, boolean syn2Sub, LoginUser user);
-
-	/**
-	 * 完成添加权限机构
-	 * 
-	 * v1.0 zhanghc 2018年5月31日下午9:45:51
-	 * @param id
-	 * @param orgIds
-	 * @param syn2Sub 
-	 * @param currentUser void
-	 */
-	void doAuthOrgUpdate(Integer id, Integer[] orgIds, boolean syn2Sub, LoginUser user);
-
-	/**
-	 * 获取机构岗位树
-	 * 
-	 * v1.0 zhanghc 2018年6月1日下午12:13:39
-	 * @return List<Map<String,Object>>
-	 */
-	List<Map<String, Object>> getOrgPostTreeList();
-
-	/**
-	 * 完成添加权限岗位
-	 * 
-	 * v1.0 zhanghc 2018年6月1日下午12:20:02
-	 * @param id
-	 * @param postIds
-	 * @param syn2Sub 
-	 * @param user 
-	 * void
-	 */
-	void doAuthPostUpdate(Integer id, Integer[] postIds, boolean syn2Sub, LoginUser user);
-
-	/**
 	 * 获取试题分类列表
 	 * 
 	 * v1.0 zhanghc 2018年6月3日上午11:19:02
 	 * @return List<QuestionType>
 	 */
 	List<QuestionType> getList();
+
+	/**
+	 * 完成授权
+	 * 
+	 * v1.0 zhanghc 2020年9月8日上午10:06:53
+	 * @param id
+	 * @param userIds
+	 * @param postIds
+	 * @param orgIds
+	 * @param syn2Sub true ： 同步授权到子分类
+	 * void
+	 */
+	void doAuth(Integer id, Integer[] userIds, Integer[] postIds, Integer[] orgIds, boolean syn2Sub);
+
+	/**
+	 * 获取权限用户列表
+	 * 
+	 * v1.0 zhanghc 2018年5月30日下午6:28:19
+	 * @param pageIn
+	 * @return PageOut
+	 */
+	PageOut getAuthUserListpage(PageIn pageIn);
+
+	/**
+	 * 获取权限岗位列表
+	 * 
+	 * v1.0 zhanghc 2018年5月30日下午6:28:19
+	 * @param pageIn
+	 * @return PageOut
+	 */
+	PageOut getAuthPostListpage(PageIn pageIn);
+
+	/**
+	 * 获取权限机构列表
+	 * 
+	 * v1.0 zhanghc 2018年5月30日下午6:28:19
+	 * @param pageIn
+	 * @return PageOut
+	 */
+	PageOut getAuthOrgListpage(PageIn pageIn);
+
 }

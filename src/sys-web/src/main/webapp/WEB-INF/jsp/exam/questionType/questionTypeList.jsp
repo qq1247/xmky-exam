@@ -21,10 +21,10 @@
 					<div class="layui-card">
 						<%-- 试题分类查询条件 --%>
 						<form id="questionTypeQueryForm" class="layui-form layui-card-header layuiadmin-card-header-auto">
-							<input type="hidden" id="questionType_one" name="one">
+							<input type="hidden" id="questionTypeOne" name="one">
 							<div class="layui-form-item">
 								<div class="layui-inline">
-									<input type="text" name="one" placeholder="请输入ID" class="layui-input">
+									<input type="text" name="two" placeholder="请输入名称" class="layui-input">
 								</div>
 								<div class="layui-inline">
 									<button type="button" class="layui-btn layuiadmin-btn-useradmin" onclick="questionTypeQuery();">
@@ -43,6 +43,7 @@
 							<script type="text/html" id="questionTypeToolbar">
 								<my:auth url="questionType/toEdit"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="questionTypeEdit"><i class="layui-icon layui-icon-edit"></i>修改</a></my:auth>
 								<my:auth url="questionType/toMove"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="questionTypeMove"><i class="layui-icon layui-icon-edit"></i>移动</a></my:auth>
+								<my:auth url="questionType/toAuth"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="questionTypeAuth"><i class="layui-icon layui-icon-edit"></i>操作权限</a></my:auth>
 								<my:auth url="questionType/doDel"><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="questionTypeDel"><i class="layui-icon layui-icon-delete"></i>删除</a></my:auth>
 							</script>
 							<%-- 试题分类数据表格 --%>
@@ -75,11 +76,14 @@
 				cols : [[
 						{field : "NAME", title : "名称", align : "center"},
 						{field : "NO", title : "排序", align : "center"},
-						{fixed: 'right', title : "操作 ", toolbar : "#questionTypeToolbar", align : "center"}
+						{field : "USER_NAMES", title : "用户权限", align : "center"},
+						{field : "ORG_NAMES", title : "机构权限", align : "center"},
+						{field : "POST_NAMES", title : "岗位权限", align : "center"},
+						{fixed: 'right', title : "操作 ", toolbar : "#questionTypeToolbar", align : "center", width : 300}
 						]],
 				page : true,
 				height : "full-180",
-				method : "post",
+				method : "org",
 				defaultToolbar : [],
 				parseData: function(questionType){
 					return {
@@ -108,6 +112,8 @@
 					toQuestionTypeMove(obj.data);
 				} else if(obj.event === "questionTypeDel") {
 					doQuestionTypeDel(obj.data.ID);
+				} else if(obj.event === "questionTypeAuth") {
+					toQuestionTypeAuth(obj.data.ID);
 				}
 			});
 		}
@@ -124,7 +130,7 @@
 					onClick : function(event, treeId, treeNode) {
 						curSelQuestionTypeId = treeNode.ID;
 						curSelQuestionTypeName = treeNode.NAME;
-						$("#questionType_one").val(curSelQuestionTypeId);
+						$("#questionTypeOne").val(curSelQuestionTypeId);
 						questionTypeQuery();
 					},
 					onAsyncSuccess : function(event, treeId, msg, treeNode) {
@@ -137,7 +143,7 @@
 							
 							curSelQuestionTypeId = rootNode.ID;
 							curSelQuestionTypeName = rootNode.NAME;
-							$("#questionType_one").val(curSelQuestionTypeId);
+							$("#questionTypeOne").val(curSelQuestionTypeId);
 							return;
 						}
 						
@@ -154,7 +160,7 @@
 		
 		//试题分类查询
 		function questionTypeQuery() {
-			layui.table.reload(questionTypeTable, {"where" : $.fn.my.serializeObj(questionTypeQueryForm)});
+			layui.table.reload("questionTypeTable", {"where" : $.fn.my.serializeObj(questionTypeQueryForm)});
 		}
 	
 		//试题分类重置
@@ -184,8 +190,8 @@
 							doQuestionTypeAdd(index);
 						},
 						success: function(layero, index){
-							$("#questionType_parentId").val(curSelQuestionTypeId);
-							$("#questionType_parentName").val(curSelQuestionTypeName);
+							$("#parentQuestionTypeId").val(curSelQuestionTypeId);
+							$("#parentQuestionTypeName").val(curSelQuestionTypeName);
 							layui.form.render(null, "questionTypeEditFrom");
 						}
 					});
@@ -201,7 +207,7 @@
 						url : "questionType/doAdd",
 						data : data.field,
 						success : function(obj) {
-							questionTypeQuery();
+							questionTypeTreeFlush();
 							
 							if (!obj.succ) {
 								layer.alert(obj.msg, {"title" : "提示消息"});
@@ -214,7 +220,7 @@
 					});
 				});
 			});
-			$("#questionTypeEditBtn").click();
+			$("[lay-filter='questionTypeEditBtn']").click();
 		}
 		
 		//到达修改试题分类页面
@@ -240,7 +246,7 @@
 				}
 			});
 		}
-
+		
 		//完成修改试题分类
 		function doQuestionTypeEdit(questionTypeEditDialogIndex) {
 			layui.form.on("submit(questionTypeEditBtn)", function(data) {
@@ -249,7 +255,7 @@
 						url : "questionType/doEdit",
 						data : data.field,
 						success : function(obj) {
-							questionTypeQuery();
+							questionTypeTreeFlush();
 							
 							if (!obj.succ) {
 								layer.alert(obj.msg, {"title" : "提示消息"});
@@ -262,7 +268,7 @@
 					});
 				});
 			});
-			$("#questionTypeEditBtn").click();;
+			$("[lay-filter='questionTypeEditBtn']").click();
 		}
 
 		//完成删除试题分类
@@ -371,5 +377,198 @@
 			questionTypeTree.reAsyncChildNodes(null, "refresh");
 		}
 		
+		//到达授权试题分类页面
+		function toQuestionTypeAuth(id) {
+			$.ajax({
+				url : "questionType/toAuth",
+				data : {"id" : id},
+				dataType : "html",
+				success : function(obj) {
+					layer.open({
+						title : "授权试题分类",
+						area : ["800px", "500px"],
+						content : obj,
+						btn : ["授权", "授权并同步到子分类", "取消"],
+						type : 1,
+						yes : function(index, layero){
+							doQuestionTypeAuth(index, false);
+						},
+						btn2: function(index, layero){
+							doQuestionTypeAuth(index, true);
+							return false;
+						},
+						success: function(layero, index){
+							var userIdSelect = xmSelect.render({
+								el : "#userIds",
+								name : "userIds",
+								autoRow : true,
+								toolbar : { show: true },
+								filterable : true,
+								remoteSearch : true,
+								remoteMethod : function(val, cb, show){
+									if(!val){
+										return cb([]);
+									}
+									
+									$.ajax({
+										url : "questionType/authUserList",
+										data : {
+											two : val
+										},
+										async : true,
+										success : function(obj) {
+											var users = [];
+											for (var i in obj.data.rows) {
+												users.push({"name" : obj.data.rows[i].NAME+"-"+obj.data.rows[i].ORG_NAME, value : obj.data.rows[i].ID});
+											}
+											cb(users);
+										}
+									});
+								},
+							});
+							
+							$.ajax({
+								url : "questionType/authUserList",
+								data : {
+									ten : id
+								},
+								async : true,
+								success : function(obj) {
+									var users = [];
+									for (var i in obj.data.rows) {
+										users.push({"name" : obj.data.rows[i].NAME+"-"+obj.data.rows[i].ORG_NAME, value : obj.data.rows[i].ID, selected : true});
+									}
+									
+									userIdSelect.update({
+										data: users
+									})
+								}
+							});
+							
+							var postIdSelect = xmSelect.render({
+								el : "#postIds",
+								name : "postIds",
+								autoRow : true,
+								toolbar : { show: true },
+								filterable : true,
+								remoteSearch : true,
+								remoteMethod : function(val, cb, show){
+									if(!val){
+										return cb([]);
+									}
+									
+									$.ajax({
+										url : "questionType/authPostList",
+										data : {
+											two : val
+										},
+										async : true,
+										success : function(obj) {
+											var posts = [];
+											for (var i in obj.data.rows) {
+												posts.push({"name" : obj.data.rows[i].NAME+"-"+obj.data.rows[i].ORG_NAME, value : obj.data.rows[i].ID});
+											}
+											cb(posts);
+										}
+									});
+								},
+							});
+							
+							$.ajax({
+								url : "questionType/authPostList",
+								data : {
+									ten : id
+								},
+								async : true,
+								success : function(obj) {
+									var posts = [];
+									for (var i in obj.data.rows) {
+										posts.push({"name" : obj.data.rows[i].NAME+"-"+obj.data.rows[i].ORG_NAME, value : obj.data.rows[i].ID, selected : true});
+									}
+									
+									postIdSelect.update({
+										data: posts
+									})
+								}
+							});
+							
+							var orgIdSelect = xmSelect.render({
+								el : "#orgIds",
+								name : "orgIds",
+								autoRow : true,
+								toolbar : { show: true },
+								filterable : true,
+								remoteSearch : true,
+								remoteMethod : function(val, cb, show){
+									if(!val){
+										return cb([]);
+									}
+									
+									$.ajax({
+										url : "questionType/authOrgList",
+										data : {
+											two : val
+										},
+										async : true,
+										success : function(obj) {
+											var orgs = [];
+											for (var i in obj.data.rows) {
+												orgs.push({"name" : obj.data.rows[i].NAME+"-"+obj.data.rows[i].PARENT_ORG_NAME, value : obj.data.rows[i].ID});
+											}
+											cb(orgs);
+										}
+									});
+								},
+							});
+							
+							$.ajax({
+								url : "questionType/authOrgList",
+								data : {
+									ten : id
+								},
+								async : true,
+								success : function(obj) {
+									var orgs = [];
+									for (var i in obj.data.rows) {
+										orgs.push({"name" : obj.data.rows[i].NAME+"-"+obj.data.rows[i].PARENT_ORG_NAME, value : obj.data.rows[i].ID, selected : true});
+									}
+									
+									orgIdSelect.update({
+										data: orgs
+									})
+								}
+							});
+							
+							layui.form.render(null, "authUserQueryForm");
+						}
+					});
+				}
+			});
+		}
+		
+		// 完成授权试题分类
+		function doQuestionTypeAuth(questionTypeAuthDialogIndex, syn2Sub) {
+			layui.form.on("submit(questionTypeAuthBtn)", function(data) {
+				layer.confirm("确定要授权？", function(index) {
+					data.field.syn2Sub = syn2Sub;
+					$.ajax({
+						url : "questionType/doAuth",
+						data : data.field,
+						success : function(obj) {
+							questionTypeTreeFlush();
+							
+							if(!obj.succ){
+								layer.alert(obj.msg, {"title" : "提示消息"});
+								return;
+							}
+							
+							layer.close(index);
+							layer.close(questionTypeAuthDialogIndex);
+						}
+					});
+				});
+			});
+			$("[lay-filter='questionTypeAuthBtn']").click();
+		}
 	</script>
 </html>

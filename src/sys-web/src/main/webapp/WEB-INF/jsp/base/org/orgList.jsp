@@ -20,7 +20,7 @@
 					<div class="layui-card">
 						<%-- 组织机构查询条件 --%>
 						<form id="orgQueryForm" class="layui-form layui-card-header layuiadmin-card-header-auto">
-							<input type="hidden" id="org_one" name="one">
+							<input type="hidden" id="orgOne" name="one">
 							<div class="layui-form-item">
 								<div class="layui-inline">
 									<input type="text" name="two" placeholder="请输入名称" class="layui-input">
@@ -125,7 +125,7 @@
 					onClick : function(event, treeId, treeNode) {
 						curSelOrgId = treeNode.ID;
 						curSelOrgName = treeNode.NAME;
-						$("#org_one").val(curSelOrgId);
+						$("#orgOne").val(curSelOrgId);
 						orgQuery();
 					},
 					onAsyncSuccess : function(event, treeId, msg, treeNode) {
@@ -138,7 +138,7 @@
 							
 							curSelOrgId = rootNode.ID;
 							curSelOrgName = rootNode.NAME;
-							$("#org_one").val(curSelOrgId);
+							$("#orgOne").val(curSelOrgId);
 							return;
 						}
 						
@@ -185,8 +185,8 @@
 							doOrgAdd(index);
 						},
 						success: function(layero, index){
-							$("#org_parentId").val(curSelOrgId);
-							$("#org_parentName").val(curSelOrgName);
+							$("#parentOrgId").val(curSelOrgId);
+							$("#parentOrgName").val(curSelOrgName);
 							layui.form.render(null, "orgEditFrom");
 						}
 					});

@@ -12,7 +12,7 @@
 				<div class="layui-col-md2">
 					<div class="layui-card">
 						<div class="layui-form">
-							<select lay-filter="treeTypeBtn">
+							<select lay-filter="resTreeBtn">
 			     				<option value="1">后台</option>
 								<option value="2">前台</option>
 			      			</select>
@@ -24,8 +24,8 @@
 					<div class="layui-card">
 						<%-- 资源查询条件 --%>
 						<form id="resQueryForm" class="layui-form layui-card-header layuiadmin-card-header-auto">
-							<input type="hidden" id="res_one" name="one">
-							<input type="hidden" id="res_four" name="four">
+							<input type="hidden" id="resOne" name="one">
+							<input type="hidden" id="resTwo" name="two">
 							<div class="layui-form-item ">
 								<div class="layui-inline">
 									<input type="text" name="two" placeholder="请输入名称" class="layui-input">
@@ -130,7 +130,7 @@
 					url : "res/treeList",
 					otherParam : {
 						type : function() {
-							return $("[lay-filter='treeTypeBtn']").parent().find("dd[class='layui-this']").attr("lay-value");
+							return $("[lay-filter='resTreeBtn']").parent().find("dd[class='layui-this']").attr("lay-value");
 						}
 					},
 					enable : true,
@@ -140,7 +140,7 @@
 					onClick : function(event, treeId, treeNode) {
 						curSelResId = treeNode.ID;
 						curSelResName = treeNode.NAME;
-						$("#res_one").val(curSelResId);
+						$("#resOne").val(curSelResId);
 						resQuery();
 					},
 					onAsyncSuccess : function(event, treeId, msg, treeNode) {
@@ -153,7 +153,7 @@
 							
 							curSelResId = rootNode.ID;
 							curSelResName = rootNode.NAME;
-							$("#res_one").val(curSelResId);
+							$("#resOne").val(curSelResId);
 							return;
 						}
 						
@@ -165,8 +165,8 @@
 				}
 			});
 			
-			layui.form.on("select(treeTypeBtn)", function(data){
-				$("#res_ten").val(data.value);
+			layui.form.on("select(resTreeBtn)", function(data){
+				$("#resTwo").val(data.value);
 				resTreeFlush();
 			});
 			
@@ -204,10 +204,10 @@
 						yes : function(index, layero){
 							doResAdd(index);
 						},
-						success: function(layero, index){
-							$("#res_parentId").val(curSelResId);
-							$("#res_parentName").val(curSelResName);
-							$("#res_type").val($("[lay-filter='treeTypeBtn']").parent().find("dd[class='layui-this']").attr("lay-value"));
+						success : function(layero, index){
+							$("#parentResId").val(curSelResId);
+							$("#parentResName").val(curSelResName);
+							$("#resType").val($("[lay-filter='resTreeBtn']").parent().find("dd[class='layui-this']").attr("lay-value"));
 							layui.form.render(null, "resEditFrom");
 						}
 					});

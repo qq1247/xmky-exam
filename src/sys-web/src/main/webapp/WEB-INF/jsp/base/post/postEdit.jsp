@@ -1,12 +1,12 @@
 <%@ page language="java" pageEncoding="utf-8"%>
 <div lay-filter="postEditFrom" class="layui-form" style="padding: 20px 0 0 0;">
-	<input type="hidden" id="post_id" name="id" value="${post.id }" />
+	<input type="hidden" name="id" value="${post.id }" />
 	<div class="layui-row layui-form-item">
 		<div class="layui-col-md11">
 			<label class="layui-form-label">上级组织机构：</label>
 			<div class="layui-input-block">
-				<input type="hidden" id="post_orgId" name="orgId" value="${org.id }"/>
-				<input id="post_orgName" name="orgName" value="${org.name }" 
+				<input type="hidden" id="orgId" name="orgId" value="${org.id }"/>
+				<input id="orgName" name="orgName" value="${org.name }" 
 					class="layui-input layui-disabled" lay-verify="required" readonly="readonly">
 			</div>
 		</div>

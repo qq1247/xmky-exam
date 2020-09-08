@@ -7,7 +7,7 @@
 					<button type="button" class="layui-btn layui-btn-normal" id="file_browse">选择多文件</button>
 					<div id="file_console"></div>
 					<div class="layui-upload-list">
-						<table id="file_list" class="layui-table">
+						<table class="layui-table">
 							<thead>
 								<tr>
 									<th>文件名</th>
@@ -16,7 +16,7 @@
 									<th>操作</th>
 								</tr>
 							</thead>
-							<tbody id="test-upload-demoList"></tbody>
+							<tbody id="fileList"></tbody>
 						</table>
 					</div>
 				</div>

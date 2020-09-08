@@ -24,12 +24,12 @@ public class AuthInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		//如果是公共资源，则不拦截。
- 		log.debug("访问链接：{}", request.getRequestURI());
+ 		log.debug("权限拦截：访问链接：{}", request.getRequestURI());
 		String contextPath = request.getContextPath();
 		String uri = request.getRequestURI().replaceFirst(contextPath + "/", "");
 		String pubRes = ",login/toIn,login/doIn,login/toHome,login/doOut,login/toPwdUpdate,login/doPwdUpdate,";
 		if(pubRes.contains("," + uri + ",")){
-			log.debug("公共资源，不拦截");
+			log.debug("权限拦截：公共资源，不拦截");
 			return true;
 		}
 		
@@ -38,7 +38,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 		if(session != null){
 			LoginUser user = (LoginUser) session.getAttribute(ConstantManager.USER);
 			if (user != null && ConstantManager.ADMIN_NAME.equals(user.getLoginName())) {
-				log.debug("系统管理员登陆，不拦截");
+				log.debug("权限拦截：系统管理员登陆，不拦截");
 				return true;
 			}
 		}
@@ -47,7 +47,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 		String redirectUrl = String.format("%s/login/toIn", contextPath);
 		if(session == null || session.getAttribute(ConstantManager.USER) == null){
 			response.sendRedirect(redirectUrl);
-			log.info("当前用户未登陆，拦截");
+			log.info("权限拦截：当前用户未登陆，拦截");
 			return false;
 		}
 		
@@ -56,7 +56,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 		Res res = authMap.get(uri);
 		if(res == null){
 			response.sendRedirect(redirectUrl);
-			log.info("当前用户访问的资源未知，拦截");
+			log.info("权限拦截：当前用户访问的资源【{}】未知，拦截", uri);
 			return false;
 		}
 		
@@ -66,12 +66,12 @@ public class AuthInterceptor implements HandlerInterceptor {
 		if(userAuthMap.get(res.getAuthPos()) == null 
 				|| (userAuthMap.get(res.getAuthPos()) & res.getAuthCode()) == 0){
 			response.sendRedirect(redirectUrl);
-			log.info("当前用户的权限不包含当前的资源，拦截");
+			log.info("权限拦截：当前用户的权限不包含当前的资源【{}】，拦截", uri);
 			return false;
 		}
 		
 		//放行。
-		log.debug("不拦截");
+		log.debug("权限拦截：通过");
 		return true;
 	}
 }

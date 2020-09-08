@@ -21,7 +21,7 @@
 					<div class="layui-card">
 						<%-- 岗位查询条件 --%>
 						<form id="postQueryForm" class="layui-form layui-card-header layuiadmin-card-header-auto">
-							<input type="hidden" id="post_one" name="one">
+							<input type="hidden" id="postOne" name="one">
 							<div class="layui-form-item">
 								<div class="layui-inline">
 									<input type="text" name="two" placeholder="请输入名称" class="layui-input">
@@ -128,7 +128,7 @@
 					onClick : function(event, treeId, treeNode) {
 						curSelOrgId = treeNode.ID;
 						curSelOrgName = treeNode.NAME;
-						$("#post_one").val(curSelOrgId);
+						$("#postOne").val(curSelOrgId);
 						postQuery();
 					},
 					onAsyncSuccess : function(event, treeId, msg, treeNode) {
@@ -141,7 +141,7 @@
 							
 							curSelOrgId = rootNode.ID;
 							curSelOrgName = rootNode.NAME;
-							$("#post_one").val(curSelOrgId);
+							$("#postOne").val(curSelOrgId);
 							return;
 						}
 						
@@ -188,8 +188,8 @@
 							doPostAdd(index);
 						},
 						success: function(layero, index){
-							$("#post_orgId").val(curSelOrgId);
-							$("#post_orgName").val(curSelOrgName);
+							$("#orgId").val(curSelOrgId);
+							$("#orgName").val(curSelOrgName);
 							layui.form.render(null, "postEditFrom");
 						}
 					});

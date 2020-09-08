@@ -46,10 +46,10 @@ public class OrgController extends BaseController {
 	@RequestMapping("/toList")
 	public String toList() {
 		try {
-			return "/base/org/orgList";
+			return "base/org/orgList";
 		} catch (Exception e) {
 			log.error("到达组织机构列表页面错误：", e);
-			return "/base/org/orgList";
+			return "base/org/orgList";
 		}
 	}
 
@@ -100,10 +100,10 @@ public class OrgController extends BaseController {
 	@RequestMapping("/toAdd")
 	public String toAdd() {
 		try {
-			return "/base/org/orgEdit";
+			return "base/org/orgEdit";
 		} catch (Exception e) {
 			log.error("到达添加组织机构页面错误", e);
-			return "/base/org/orgEdit";
+			return "base/org/orgEdit";
 		}
 	}
 
@@ -145,14 +145,13 @@ public class OrgController extends BaseController {
 		try {
 			Org org = orgService.getEntity(id);
 			model.addAttribute("org", org);
-			Org pOrg = orgService.getEntity(org.getParentId());
-			if (pOrg != null) {
-				model.addAttribute("pOrg", orgService.getEntity(org.getParentId()));
+			if (org.getParentId() != null) {
+				model.addAttribute("parentOrg", orgService.getEntity(org.getParentId()));
 			}
-			return "/base/org/orgEdit";
+			return "base/org/orgEdit";
 		} catch (Exception e) {
 			log.error("到达修改组织机构页面错误", e);
-			return "/base/org/orgEdit";
+			return "base/org/orgEdit";
 		}
 	}
 
@@ -230,10 +229,10 @@ public class OrgController extends BaseController {
 	@RequestMapping("/toMove")
 	public String toMove() {
 		try {
-			return "/base/org/orgMove";
+			return "base/org/orgMove";
 		} catch (Exception e) {
 			log.error("到达移动组织机构页面错误", e);
-			return "/base/org/orgMove";
+			return "base/org/orgMove";
 		}
 	}
 

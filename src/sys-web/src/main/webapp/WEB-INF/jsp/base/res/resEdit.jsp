@@ -1,13 +1,13 @@
 <%@ page language="java" pageEncoding="utf-8"%>
 <div lay-filter="resEditFrom" class="layui-form" style="padding: 20px 0 0 0;">
-	<input type="hidden" id="res_id" name="id" value="${res.id }" />
-	<input type="hidden" id="res_type" name="type" value="${res.type }" />
+	<input type="hidden" name="id" value="${res.id }" />
+	<input type="hidden" id="resType" name="type" value="${res.type }" />
 	<div class="layui-row layui-form-item">
 		<div class="layui-col-md11">
 			<label class="layui-form-label">上级资源：</label>
 			<div class="layui-input-block">
-				<input type="hidden" id="res_parentId" name="parentId" value="${pRes.id }" />
-				<input id="res_parentName" name="parentName" value="${pRes.name }" 
+				<input type="hidden" id="parentResId" name="parentId" value="${parentRes.id }" />
+				<input id="parentResName" name="parentName" value="${parentRes.name }" 
 					class="layui-input layui-disabled" lay-verify="required" readonly="readonly">
 			</div>
 		</div>

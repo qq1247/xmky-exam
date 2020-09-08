@@ -5,8 +5,8 @@
 		<div class="layui-col-md11">
 			<label class="layui-form-label">上级组织机构：</label>
 			<div class="layui-input-block">
-				<input type="hidden" id="org_parentId" name="parentId" value="${pOrg.id }"/>
-				<input id="org_parentName" name="parentName" value="${pOrg.name }" 
+				<input type="hidden" id="parentOrgId" name="parentId" value="${parentOrg.id }"/>
+				<input id="parentOrgName" name="parentName" value="${parentOrg.name }" 
 					class="layui-input layui-disabled" lay-verify="required" readonly="readonly">
 			</div>
 		</div>

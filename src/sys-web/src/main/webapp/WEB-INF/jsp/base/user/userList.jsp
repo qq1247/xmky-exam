@@ -20,10 +20,10 @@
 					<div class="layui-card">
 						<%-- 用户查询条件 --%>
 						<form id="userQueryForm" class="layui-form layui-card-header layuiadmin-card-header-auto">
-							<input type="hidden" id="user_one" name="one">
+							<input type="hidden" id="userOne" name="one">
 							<div class="layui-form-item">
 								<div class="layui-inline">
-									<input type="text" name="two" placeholder="请输入名称" class="layui-input">
+									<input type="text" name="two" placeholder="请输入昵称" class="layui-input">
 								</div>
 								<div class="layui-inline">
 									<input type="text" name="three" placeholder="请输入组织机构" class="layui-input">
@@ -46,12 +46,12 @@
 								<my:auth url="user/toAdd"><button class="layui-btn layuiadmin-btn-useradmin" onclick="toUserAdd();">添加</button></my:auth>
 							</div>
 							<script type="text/html" id="userToolbar">
-							<my:auth url="user/toEdit"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="userEdit"><i class="layui-icon layui-icon-edit"></i>修改</a></my:auth>
-							<my:auth url="user/toOrgUpdate"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="orgUpdate"><i class="layui-icon layui-icon-edit"></i>设置机构</a></my:auth>
-							<my:auth url="user/toPostUpdate"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="postUpdate"><i class="layui-icon layui-icon-edit"></i>设置岗位</a></my:auth>
-							<my:auth url="user/initPwd"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="initPwd"><i class="layui-icon layui-icon-edit"></i>初始密码</a></my:auth>
-							<my:auth url="user/doDel"><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="userDel"><i class="layui-icon layui-icon-delete"></i>删除</a></my:auth>
-						</script>
+								<my:auth url="user/toEdit"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="userEdit"><i class="layui-icon layui-icon-edit"></i>修改</a></my:auth>
+								<my:auth url="user/toOrgUpdate"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="orgUpdate"><i class="layui-icon layui-icon-edit"></i>设置机构</a></my:auth>
+								<my:auth url="user/toPostUpdate"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="postUpdate"><i class="layui-icon layui-icon-edit"></i>设置岗位</a></my:auth>
+								<my:auth url="user/initPwd"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="initPwd"><i class="layui-icon layui-icon-edit"></i>初始密码</a></my:auth>
+								<my:auth url="user/doDel"><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="userDel"><i class="layui-icon layui-icon-delete"></i>删除</a></my:auth>
+							</script>
 							<%-- 用户数据表格 --%>
 							<table id="userTable" lay-filter="userTable"></table>
 						</div>
@@ -80,7 +80,7 @@
 				elem : "#userTable",
 				url : "user/list",
 				cols :  [[ 
-						{field : "NAME", title : "姓名", align : "center"}, 
+						{field : "NAME", title : "昵称", align : "center"}, 
 						{field : "LOGIN_NAME", title : "登录名称", align : "center"}, 
 						{field : "ORG_NAME", title : "组织机构", align : "center"},
 						{field : "POST_NAMES", title : "岗位", align : "center"},
@@ -137,7 +137,7 @@
 					onClick : function(event, treeId, treeNode) {
 						curSelOrgId = treeNode.ID;
 						curSelOrgName = treeNode.NAME;
-						$("#user_one").val(curSelOrgId);
+						$("#userOne").val(curSelOrgId);
 						userQuery();
 					},
 					onAsyncSuccess : function(event, treeId, msg, treeNode) {
@@ -150,7 +150,7 @@
 							
 							curSelOrgId = rootNode.ID;
 							curSelOrgName = rootNode.NAME;
-							$("#user_one").val(curSelOrgId);
+							$("#userOne").val(curSelOrgId);
 							return;
 						}
 						
