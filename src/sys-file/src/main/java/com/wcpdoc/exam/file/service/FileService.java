@@ -33,7 +33,7 @@ public interface FileService extends BaseService<File> {
 	 * @param id
 	 * void
 	 */
-	void doUpload(Integer id) throws Exception;
+	void doUpload(Integer id);
 
 	/**
 	 * 获取附件实体 v1.0 zhanghc 2017年4月5日下午11:36:17

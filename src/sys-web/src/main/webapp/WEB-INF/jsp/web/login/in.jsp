@@ -16,7 +16,7 @@
 		<div class="layadmin-user-login layadmin-user-display-show">
 			<div class="layadmin-user-login-main">
 				<div class="layadmin-user-login-box layadmin-user-login-header">
-					<h2>智云</h2>
+					<h2></h2>
 					<p>登录入口</p>
 				</div>
 				<div class="layadmin-user-login-box layadmin-user-login-body layui-form">

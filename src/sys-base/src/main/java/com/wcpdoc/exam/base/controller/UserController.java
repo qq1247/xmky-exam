@@ -334,11 +334,15 @@ public class UserController extends BaseController {
 			if (id == null) {
 				throw new MyException("参数错误：id");
 			}
+			User user = userService.getEntity(id);
 			if (!ValidateUtil.isValid(postIds)) {
-				throw new MyException("参数错误：postIds");
+				user.setPostIds(null);
+				user.setUpdateTime(new Date());
+				user.setUpdateUserId(getCurUser().getId());
+				userService.update(user);
+				return new PageResult(true, "设置成功");
 			}
 			
-			User user = userService.getEntity(id);
 			List<Post> postList = postService.getOrgPostList(user.getOrgId());
 			Set<Integer> postIdSet = new HashSet<Integer>();
 			for (Post post : postList) {

@@ -9,7 +9,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wcpdoc.exam.base.cache.DictCache;
 import com.wcpdoc.exam.base.entity.Res;
 import com.wcpdoc.exam.base.service.ResService;
 import com.wcpdoc.exam.core.controller.BaseController;
@@ -42,7 +41,6 @@ public class ResController extends BaseController {
 	@RequestMapping("/toList")
 	public String toList(Model model) {
 		try {
-			model.addAttribute("RES_TYPE", DictCache.getIndexDictlistMap().get("RES_TYPE"));
 			return "base/res/resList";
 		}catch (Exception e) {
 			log.error("到达资源列表页面错误：", e);

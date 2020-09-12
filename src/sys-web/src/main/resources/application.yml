@@ -20,7 +20,7 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
-    show-sql: false
+    show-sql: true
                     
 file: 
   upload:
@@ -28,7 +28,4 @@ file:
       
 sys:
   ver: 2.0.0
-
-res:
-  pub: login/toIn,login/doIn,login/toHome,login/doOut,login/toPwdUpdate,login/doPwdUpdate,home/toIn,home/doIn,home/toHome,home/doOut,home/sysTime
     

@@ -21,7 +21,7 @@ public class AuthTag extends TagSupport {
 		HttpSession session = pageContext.getSession();
 		if (session != null) {
 			LoginUser user = (LoginUser) session.getAttribute(ConstantManager.USER);
-			if (user != null && ConstantManager.ADMIN_NAME.equals(user.getLoginName())) {
+			if (user != null && ConstantManager.ADMIN_LOGIN_NAME.equals(user.getLoginName())) {
 				return EVAL_BODY_INCLUDE;
 			}
 		}

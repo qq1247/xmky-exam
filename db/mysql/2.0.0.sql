@@ -276,6 +276,20 @@ INSERT INTO `SYS_RES` VALUES ('51', '删除', 'cron/doDel', '47', '_1_2_3_47_51_
 INSERT INTO `SYS_RES` VALUES ('52', '启动', 'cron/startTask', '47', '_1_2_3_47_52_', '5', '1', '2020-08-25 14:31:29', '5', '2', '1048576', '', '1');
 INSERT INTO `SYS_RES` VALUES ('53', '停止', 'cron/stopTask', '47', '_1_2_3_47_53_', '5', '1', '2020-08-25 14:31:51', '6', '2', '2097152', '', '1');
 INSERT INTO `SYS_RES` VALUES ('54', '执行一次', 'cron/runOnceTask', '47', '_1_2_3_47_54_', '5', '1', '2020-08-25 14:32:13', '7', '2', '4194304', '', '1');
+INSERT INTO `SYS_RES` VALUES ('55', '考试管理', 'ksgl', '2', '_1_2_55_', '3', '1', '2020-09-07 09:48:58', '5', '2', '8388608', '', '1');
+INSERT INTO `SYS_RES` VALUES ('56', '试题分类', 'questionType/toList', '55', '_1_2_55_56_', '4', '1', '2020-09-07 09:50:33', '1', '2', '16777216', '', '1');
+INSERT INTO `SYS_RES` VALUES ('59', '列表', 'questionType/treeList|questionType/list', '56', '_1_2_55_56_59_', '5', '2', '2020-09-07 13:22:45', '1', '2', '33554432', '', '1');
+INSERT INTO `SYS_RES` VALUES ('60', '添加', 'questionType/toAdd|questionType/doAdd', '56', '_1_2_55_56_60_', '5', '2', '2020-09-07 13:25:32', '2', '2', '67108864', '', '1');
+INSERT INTO `SYS_RES` VALUES ('61', '修改', 'questionType/toEdit|questionType/doEdit', '56', '_1_2_55_56_61_', '5', '2', '2020-09-07 13:25:43', '3', '2', '134217728', '', '1');
+INSERT INTO `SYS_RES` VALUES ('62', '删除', 'questionType/doDel', '56', '_1_2_55_56_62_', '5', '2', '2020-09-07 13:25:59', '4', '2', '268435456', '', '1');
+INSERT INTO `SYS_RES` VALUES ('63', '授权', 'questionType/toAuth|questionType/authUserList|questionType/authPostList|questionType/authOrgList|questionType/doAuth', '56', '_1_2_55_56_63_', '5', '1', '2020-09-08 12:02:17', '5', '2', '536870912', '', '1');
+INSERT INTO `SYS_RES` VALUES ('64', '试题管理', 'question/toList', '55', '_1_2_55_64_', '4', '2', '2020-09-07 13:58:08', '3', '2', '1073741824', '', '1');
+INSERT INTO `SYS_RES` VALUES ('65', '列表', 'question/questionTypeTreeList|question/list', '64', '_1_2_55_64_65_', '5', '1', '2020-09-08 13:26:15', '1', '3', '1', '', '1');
+INSERT INTO `SYS_RES` VALUES ('66', '添加', 'question/toAdd|question/doAdd', '64', '_1_2_55_64_66_', '5', '1', '2020-09-08 13:26:37', '2', '3', '2', '', '1');
+INSERT INTO `SYS_RES` VALUES ('67', '修改', 'question/toEdit|question/doEdit', '64', '_1_2_55_64_67_', '5', '1', '2020-09-08 13:26:57', '3', '3', '4', '', '1');
+INSERT INTO `SYS_RES` VALUES ('68', '删除', 'question/doDel', '64', '_1_2_55_64_68_', '5', '1', '2020-09-08 13:27:16', '4', '3', '8', '', '1');
+INSERT INTO `SYS_RES` VALUES ('69', '导入试题', 'question/wordImp', '64', '_1_2_55_64_69_', '5', '1', '2020-09-12 14:19:08', '5', '3', '16', '', '1');
+INSERT INTO `SYS_RES` VALUES ('70', '下载模板', 'question/wordTemplateExport', '64', '_1_2_55_64_70_', '5', '1', '2020-09-12 14:19:27', '6', '3', '32', '', '1');
 
 INSERT INTO `SYS_DICT` VALUES ('1', 'STATE', '0', '删除', '1');
 INSERT INTO `SYS_DICT` VALUES ('2', 'STATE', '1', '正常', '2');
@@ -283,6 +297,25 @@ INSERT INTO `SYS_DICT` VALUES ('3', 'RES_TYPE', '1', '后台', '1');
 INSERT INTO `SYS_DICT` VALUES ('4', 'RES_TYPE', '2', '前台', '2');
 INSERT INTO `SYS_DICT` VALUES ('5', 'CRON_TYPE', '1', '启动', '1');
 INSERT INTO `SYS_DICT` VALUES ('6', 'CRON_TYPE', '2', '停止', '2');
+INSERT INTO `SYS_DICT` VALUES ('7', 'QUESTION_TYPE', '1', '单选', '1');
+INSERT INTO `SYS_DICT` VALUES ('8', 'QUESTION_TYPE', '2', '多选', '2');
+INSERT INTO `SYS_DICT` VALUES ('9', 'QUESTION_TYPE', '3', '填空', '3');
+INSERT INTO `SYS_DICT` VALUES ('10', 'QUESTION_TYPE', '4', '判断', '4');
+INSERT INTO `SYS_DICT` VALUES ('11', 'QUESTION_TYPE', '5', '问答', '5');
+INSERT INTO `SYS_DICT` VALUES ('12', 'QUESTION_DIFFICULTY', '1', '极易', '1');
+INSERT INTO `SYS_DICT` VALUES ('13', 'QUESTION_DIFFICULTY', '2', '简单', '2');
+INSERT INTO `SYS_DICT` VALUES ('14', 'QUESTION_DIFFICULTY', '3', '适中', '3');
+INSERT INTO `SYS_DICT` VALUES ('15', 'QUESTION_DIFFICULTY', '4', '困难', '4');
+INSERT INTO `SYS_DICT` VALUES ('16', 'QUESTION_DIFFICULTY', '5', '极难', '5');
+INSERT INTO `SYS_DICT` VALUES ('17', 'QUESTION_OPTIONS', '1', 'A', '1');
+INSERT INTO `SYS_DICT` VALUES ('18', 'QUESTION_OPTIONS', '2', 'B', '2');
+INSERT INTO `SYS_DICT` VALUES ('19', 'QUESTION_OPTIONS', '3', 'C', '3');
+INSERT INTO `SYS_DICT` VALUES ('20', 'QUESTION_OPTIONS', '4', 'D', '4');
+INSERT INTO `SYS_DICT` VALUES ('21', 'QUESTION_OPTIONS', '5', 'E', '5');
+INSERT INTO `SYS_DICT` VALUES ('22', 'QUESTION_OPTIONS', '6', 'F', '6');
+INSERT INTO `SYS_DICT` VALUES ('23', 'QUESTION_OPTIONS', '7', 'G', '7');
+INSERT INTO `SYS_DICT` VALUES ('24', 'STATE2', '1', '启用', '1');
+INSERT INTO `SYS_DICT` VALUES ('25', 'STATE2', '2', '禁用', '2');
 
 INSERT INTO `SYS_CRON` VALUES ('1', '清理临时附件', 'com.wcpdoc.exam.file.job.ClearFileJob', '0 0 0 1/1 * ? ', '1', '1', '2020-08-26 18:42:08');
 

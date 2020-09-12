@@ -7,7 +7,7 @@ package com.wcpdoc.exam.core.constant;
  */
 public class ConstantManager {
 	/** 超级管理员名称 */
-	public static final String ADMIN_NAME = "admin";
+	public static final String ADMIN_LOGIN_NAME = "admin";
 	/** 当前登录用户，存放在session */
 	public static final String USER = "USER";
 	/** 权限合计，存放在session */

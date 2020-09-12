@@ -1,8 +1,6 @@
 package com.wcpdoc.exam.core.controller;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -67,40 +65,6 @@ public class QuestionTypeController extends BaseController{
 			return new PageResultEx(true, "查询成功", questionTypeService.getTreeList());
 		} catch (Exception e) {
 			log.error("试题分类树错误：", e);
-			return new PageResult(false, "查询失败");
-		}
-	}
-	
-	/**
-	 * 组织机构树
-	 * 
-	 * v1.0 zhanghc 2017-05-07 14:56:29
-	 * @param id
-	 * @return List<Map<String,Object>>
-	 */
-	@RequestMapping("/orgTreeList")
-	@ResponseBody
-	public PageResult orgTreeList(Integer id) {
-		try {
-			List<Map<String, Object>> orgTreeList = orgService.getTreeList();
-			if(id == null){
-				return new PageResultEx(true, "查询成功", orgTreeList);
-			}
-			
-			QuestionType questionType = questionTypeService.getEntity(id);
-			if(!ValidateUtil.isValid(questionType.getOrgIds())){
-				return new PageResultEx(true, "查询成功", orgTreeList);
-			}
-			
-			for(Map<String, Object> map : orgTreeList){
-				String orgId = map.get("ID").toString();
-				if(questionType.getOrgIds().contains("," + orgId + ",")){
-					map.put("CHECKED", true);
-				}
-			}
-			return new PageResultEx(true, "查询成功", orgTreeList);
-		} catch (Exception e) {
-			log.error("组织机构树错误：", e);
 			return new PageResult(false, "查询失败");
 		}
 	}

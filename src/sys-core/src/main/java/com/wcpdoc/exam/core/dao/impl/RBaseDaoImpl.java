@@ -128,6 +128,7 @@ public abstract class RBaseDaoImpl<T> implements RBaseDao<T> {
 	@Override
 	public /*final*/ PageOut getListpage(SqlUtil sqlUtil, PageIn pageIn) {
 		// 查询列表
+		log.debug("Hibernate：{}", sqlUtil.getWhereParams());
 		String sql = toHibernateSql(sqlUtil.getSql());
 		Query<Map<String, Object>> query = getCurSession().createSQLQuery(sql);
 		for (int i = 0; i < sqlUtil.getWhereParams().size(); i++) {

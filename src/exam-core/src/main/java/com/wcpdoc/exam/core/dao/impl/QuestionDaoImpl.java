@@ -1,7 +1,10 @@
 package com.wcpdoc.exam.core.dao.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import javax.annotation.Resource;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -9,6 +12,8 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.exam.base.cache.DictCache;
+import com.wcpdoc.exam.base.dao.UserDao;
+import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.core.dao.QuestionDao;
 import com.wcpdoc.exam.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.exam.core.entity.PageIn;
@@ -27,11 +32,13 @@ import com.wcpdoc.exam.core.util.ValidateUtil;
  */
 @Repository
 public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionDao {
+	@Resource
+	private UserDao userDao;
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT QUESTION.ID, QUESTION.ID AS CODE, QUESTION.TITLE, QUESTION.TYPE, QUESTION.DIFFICULTY, "
-				+ "QUESTION.STATE, QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME "
+				+ "QUESTION.STATE, QUESTION.SCORE, QUESTION.NO, QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME "
 				+ "FROM EXM_QUESTION QUESTION "
 				+ "LEFT JOIN EXM_QUESTION_TYPE QUESTION_TYPE ON QUESTION.QUESTION_TYPE_ID = QUESTION_TYPE.ID ";
 		
@@ -42,20 +49,38 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "QUESTION.STATE = ?", pageIn.getFour())//0：删除；1：启用；2：禁用
 				.addWhere(ValidateUtil.isValid(pageIn.getFive()), "QUESTION.TYPE = ?", pageIn.getFive())
 				.addWhere(ValidateUtil.isValid(pageIn.getSix()), "QUESTION.DIFFICULTY = ?", pageIn.getSix())
-				.addWhere(ValidateUtil.isValid(pageIn.getEight()), 
-						"(QUESTION_TYPE.USER_IDS LIKE ? "
-								+ "OR EXISTS (SELECT 1 FROM SYS_USER Z WHERE Z.ID = ? AND QUESTION_TYPE.ORG_IDS LIKE CONCAT('%,', Z.ORG_ID, ',%')) "
-								+ "OR EXISTS (SELECT 1 FROM SYS_POST_USER Z WHERE Z.USER_ID = ? AND QUESTION_TYPE.POST_IDS LIKE CONCAT('%,', Z.POST_ID, ',%')))", 
-						"%," + pageIn.getEight() + ",%", pageIn.getEight(), pageIn.getEight())
 				.addWhere("QUESTION.STATE != ?", 0)
-				.addOrder("QUESTION.UPDATE_TIME", Order.DESC);
+				.addOrder("QUESTION.NO", Order.DESC);
+		
+		if (ValidateUtil.isValid(pageIn.getTen())) {
+			User user = userDao.getEntity(Integer.parseInt(pageIn.getTen()));
+			StringBuilder partSql = new StringBuilder();
+			List<Object> params = new ArrayList<>();
+			partSql.append("(");
+			partSql.append("QUESTION_TYPE.USER_IDS LIKE ? ");
+			params.add("%" + user.getId() + "%");
+			
+			partSql.append("OR QUESTION_TYPE.ORG_IDS LIKE ? ");
+			params.add("%" + user.getOrgId() + "%");
+			
+			if (ValidateUtil.isValid(user.getPostIds())) {
+				String[] postIds = user.getPostIds().substring(1, user.getPostIds().length() - 1).split(",");
+				for (String postId : postIds) {
+					partSql.append("OR QUESTION_TYPE.POST_IDS LIKE ? ");
+					params.add("%" + postId + "%");
+				}
+			}
+			partSql.append(")");
+			
+			sqlUtil.addWhere(partSql.toString(), params.toArray(new Object[params.size()]));
+		}
 		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), "QUESTION_TYPE", "TYPE", "QUESTION_DIFFICULTY", "DIFFICULTY", "STATE", "STATE");
+		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), "QUESTION_TYPE", "TYPE", "QUESTION_DIFFICULTY", "DIFFICULTY", "STATE2", "STATE");
 		for(Map<String, Object> map : pageOut.getRows()){
 			String title = map.get("TITLE").toString();
 			Document document = Jsoup.parse(title);
-			Elements embeds = document.getElementsByTag("embed");
+			Elements embeds = document.getElementsByTag("video");
 			embeds.after("【视频】");
 			embeds.remove();
 			Elements imgs = document.getElementsByTag("img");

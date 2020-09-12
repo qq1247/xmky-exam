@@ -27,7 +27,7 @@ public class AuthInterceptor implements HandlerInterceptor {
  		log.debug("权限拦截：访问链接：{}", request.getRequestURI());
 		String contextPath = request.getContextPath();
 		String uri = request.getRequestURI().replaceFirst(contextPath + "/", "");
-		String pubRes = ",login/toIn,login/doIn,login/toHome,login/doOut,login/toPwdUpdate,login/doPwdUpdate,";
+		String pubRes = ",login/toIn,login/doIn,login/toHome,login/doOut,login/toPwdUpdate,login/doPwdUpdate,file/doTempUpload,file/doDownload,";
 		if(pubRes.contains("," + uri + ",")){
 			log.debug("权限拦截：公共资源，不拦截");
 			return true;
@@ -37,7 +37,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 		HttpSession session = request.getSession(false);//直接访问jsp会创建session，看work目录反编译后的对应jsp（第一次访问request.getSession()会创建session）
 		if(session != null){
 			LoginUser user = (LoginUser) session.getAttribute(ConstantManager.USER);
-			if (user != null && ConstantManager.ADMIN_NAME.equals(user.getLoginName())) {
+			if (user != null && ConstantManager.ADMIN_LOGIN_NAME.equals(user.getLoginName())) {
 				log.debug("权限拦截：系统管理员登陆，不拦截");
 				return true;
 			}

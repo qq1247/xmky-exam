@@ -45,105 +45,96 @@
         //工具栏上的所有的功能按钮和下拉框，可以在new编辑器的实例时选择自己需要的重新定义
         toolbars: [
                 [
-                    "fullscreen",
-                    "source",
-                    "|",
-                    "undo",
-                    "redo",
-                    "|",
-                    "bold",
-                    "italic",
-                    "underline",
-                    "fontborder",
-                    "strikethrough",
-                    "superscript",
-                    "subscript",
-                    "removeformat",
-                    "formatmatch",
-                    "autotypeset",
-                    "blockquote",
-                    "pasteplain",
-                    "|",
-                    "forecolor",
-                    "backcolor",
-                    "insertorderedlist",
-                    "insertunorderedlist",
-                    "selectall",
-                    "cleardoc",
-                    "|",
-                    "rowspacingtop",
-                    "rowspacingbottom",
-                    "lineheight",
-                    "|",
-                    "customstyle",
-                    "paragraph",
-                    "fontfamily",
-                    "fontsize",
-                    "|",
-                    "directionalityltr",
-                    "directionalityrtl",
-                    "indent",
-                    "|",
-                    "justifyleft",
-                    "justifycenter",
-                    "justifyright",
-                    "justifyjustify",
-                    "|",
-                    "touppercase",
-                    "tolowercase",
-                    "|",
-                    "link",
-                    "unlink",
-                    "anchor",
-                    "|",
-                    "imagenone",
-                    "imageleft",
-                    "imageright",
-                    "imagecenter",
-                    "|",
-                    // "simpleupload",
-                    "insertimage",
-                    "emotion",
-                    "scrawl",
-                    "insertvideo",
-                    "music",
-                    "attachment",
-                    "map",
-                    "gmap",
-                    "insertframe",
-                    // "webapp",
-                    "pagebreak",
-                    "template",
-                    "background",
-                    "|",
-                    "insertcode",
-                    "horizontal",
-                    "date",
-                    "time",
-                    "spechars",
-                    "snapscreen",
-                    "wordimage",
-                    "|",
-                    "inserttable",
-                    "deletetable",
-                    "insertparagraphbeforetable",
-                    "insertrow",
-                    "deleterow",
-                    "insertcol",
-                    "deletecol",
-                    "mergecells",
-                    "mergeright",
-                    "mergedown",
-                    "splittocells",
-                    "splittorows",
-                    "splittocols",
-                    "charts",
-                    "|",
-                    "print",
-                    "preview",
-                    "searchreplace",
-                    "drafts",
-                    "help"
+					'fontfamily', //字体
+					'fontsize', //字号
+					'forecolor', //字体颜色
+					'backcolor', //背景色
+					'bold', //加粗
+					'italic', //斜体
+					'underline', //下划线
+					'strikethrough', //删除线
+					'justifyleft', //居左对齐
+					'justifycenter', //居中对齐
+					'lineheight', //行间距
+					'insertimage', //多图上传
+					'insertvideo', //视频
+//					'anchor', //锚点
+//					'undo', //撤销
+//					'redo', //重做
+//					'indent', //首行缩进
+//					'snapscreen', //截图
+//					'subscript', //下标
+//					'fontborder', //字符边框
+//					'superscript', //上标
+//					'formatmatch', //格式刷
+//					'source', //源代码
+//					'blockquote', //引用
+//					'pasteplain', //纯文本粘贴模式
+//					'selectall', //全选
+//					'print', //打印
+//					'preview', //预览
+//					'horizontal', //分隔线
+//					'removeformat', //清除格式
+//					'time', //时间
+//					'date', //日期
+//					'unlink', //取消链接
+//					'insertrow', //前插入行
+//					'insertcol', //前插入列
+//					'mergeright', //右合并单元格
+//					'mergedown', //下合并单元格
+//					'deleterow', //删除行
+//					'deletecol', //删除列
+//					'splittorows', //拆分成行
+//					'splittocols', //拆分成列
+//					'splittocells', //完全拆分单元格
+//					'deletecaption', //删除表格标题
+//					'inserttitle', //插入标题
+//					'mergecells', //合并多个单元格
+//					'deletetable', //删除表格
+//					'cleardoc', //清空文档
+//					'insertparagraphbeforetable', //"表格前插入行"
+//					'insertcode', //代码语言
+//					'paragraph', //段落格式
+//					'simpleupload', //单图上传
+//					'edittable', //表格属性
+//					'edittd', //单元格属性
+//					'link', //超链接
+//					'emotion', //表情
+//					'spechars', //特殊字符
+//					'searchreplace', //查询替换
+//					'map', //Baidu地图
+//					'gmap', //Google地图
+//					'help', //帮助
+//					'justifyright', //居右对齐
+//					'justifyjustify', //两端对齐
+//					'insertorderedlist', //有序列表
+//					'insertunorderedlist', //无序列表
+//					'fullscreen', //全屏
+//					'directionalityltr', //从左向右输入
+//					'directionalityrtl', //从右向左输入
+//					'rowspacingtop', //段前距
+//					'rowspacingbottom', //段后距
+//					'pagebreak', //分页
+//					'insertframe', //插入Iframe
+//					'imagenone', //默认
+//					'imageleft', //左浮动
+//					'imageright', //右浮动
+//					'attachment', //附件
+//					'imagecenter', //居中
+//					'wordimage', //图片转存
+//					'edittip ', //编辑提示
+//					'customstyle', //自定义标题
+//					'autotypeset', //自动排版
+//					'webapp', //百度应用
+//					'touppercase', //字母大写
+//					'tolowercase', //字母小写
+//					'background', //背景
+//					'template', //模板
+//					'scrawl', //涂鸦
+//					'music', //音乐
+//					'inserttable', //插入表格
+//					'drafts', // 从草稿箱加载
+//					'charts', // 图表
                 ]
             ]
             //当鼠标放在工具栏上时显示的tooltip提示,留空支持自动多语言配置，否则以配置值为准
@@ -163,7 +154,7 @@
             //,themePath:URL +"themes/"
 
             ,
-        zIndex: 1100 //编辑器层级的基数,默认是900
+        zIndex: 20000000 //编辑器层级的基数,默认是900
 
             //针对getAllHtml方法，会在对应的head标签中增加该编码设置。
             //,charset:"utf-8"
@@ -193,7 +184,7 @@
             //,indentValue:'2em'
 
             //,initialFrameWidth:1000  //初始化编辑器宽度,默认1000
-            //,initialFrameHeight:320  //初始化编辑器高度,默认320
+        	//,initialFrameHeight:80  //初始化编辑器高度,默认320
 
             //,readonly : false //编辑器初始化结束后,编辑区域是否是只读的，默认是false
 
@@ -358,10 +349,10 @@
 
             //elementPathEnabled
             //是否启用元素路径，默认是显示
-            //,elementPathEnabled : true
+            ,elementPathEnabled : false
 
             //wordCount
-            //,wordCount:true          //是否开启字数统计
+            ,wordCount:false          //是否开启字数统计
             //,maximumWords:10000       //允许的最大字符数
             //字数统计提示，{#count}代表当前字数，{#leave}代表还可以输入多少字符数,留空支持多语言自动切换，否则按此配置显示
             //,wordCountMsg:''   //当前已输入 {#count} 个字符，您还可以输入{#leave} 个字符
@@ -389,7 +380,7 @@
             //autoHeightEnabled
             // 是否自动长高,默认true
             ,
-        autoHeightEnabled: false
+            autoHeightEnabled: true
 
             //scaleEnabled
             //是否可以拉伸长高,默认true(当开启时，自动长高失效)

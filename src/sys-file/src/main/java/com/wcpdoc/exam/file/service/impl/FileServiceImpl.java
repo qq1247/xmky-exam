@@ -3,7 +3,6 @@ package com.wcpdoc.exam.file.service.impl;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import javax.annotation.Resource;
 
@@ -17,6 +16,7 @@ import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.DateUtil;
+import com.wcpdoc.exam.core.util.IdUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.file.dao.FileDao;
 import com.wcpdoc.exam.file.entity.File;
@@ -76,7 +76,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		// 保存临时上传附件（如果中间有失败，数据库事务会回滚，部分已上传的临时文件会采用定时任务清除）
 		StringBuilder fileIds = new StringBuilder();
 		for (MultipartFile multipartFile : files) {
-			String fileId = UUID.randomUUID().toString();
+			String fileId = IdUtil.getInstance().nextId() + "";
 			java.io.File destFile = new java.io.File(tempUploadDir.getAbsolutePath() + java.io.File.separator + fileId);
 			try {
 				multipartFile.transferTo(destFile);
@@ -105,7 +105,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 	}
 
 	@Override
-	public void doUpload(Integer id) throws Exception {
+	public void doUpload(Integer id) {
 		// 校验数据有效性
 		if (id == null) {
 			throw new MyException("参数错误：id");

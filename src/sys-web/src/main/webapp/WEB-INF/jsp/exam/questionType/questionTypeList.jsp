@@ -75,10 +75,10 @@
 				url : "questionType/list",
 				cols : [[
 						{field : "NAME", title : "名称", align : "center"},
-						{field : "NO", title : "排序", align : "center"},
 						{field : "USER_NAMES", title : "用户权限", align : "center"},
 						{field : "ORG_NAMES", title : "机构权限", align : "center"},
 						{field : "POST_NAMES", title : "岗位权限", align : "center"},
+						{field : "NO", title : "排序", align : "center"},
 						{fixed: 'right', title : "操作 ", toolbar : "#questionTypeToolbar", align : "center", width : 300}
 						]],
 				page : true,
@@ -102,7 +102,7 @@
 				}
 			});
 			layui.table.on("rowDouble(questionTypeTable)", function(obj){
-				<my:auth url="questionType/toEdit">toQuestionTypeEditForDblClick(obj.data.ID);</my:auth>
+				<my:auth url="questionType/toEdit">toQuestionTypeEdit(obj.data.ID);</my:auth>
 			});
 			layui.table.on("tool(questionTypeTable)", function(obj){
 				var data = obj.data;
@@ -405,6 +405,8 @@
 								toolbar : { show: true },
 								filterable : true,
 								remoteSearch : true,
+								tips : "请输入",
+								searchTips : "请输入",
 								remoteMethod : function(val, cb, show){
 									if(!val){
 										return cb([]);
@@ -452,6 +454,8 @@
 								toolbar : { show: true },
 								filterable : true,
 								remoteSearch : true,
+								tips : "请输入",
+								searchTips : "请输入",
 								remoteMethod : function(val, cb, show){
 									if(!val){
 										return cb([]);
@@ -499,6 +503,8 @@
 								toolbar : { show: true },
 								filterable : true,
 								remoteSearch : true,
+								tips : "请输入",
+								searchTips : "请输入",
 								remoteMethod : function(val, cb, show){
 									if(!val){
 										return cb([]);
