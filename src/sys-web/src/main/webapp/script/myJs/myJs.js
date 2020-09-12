@@ -92,7 +92,7 @@ $.ajaxSetup({
 	async : false,
 	cache : false,
 	dataType : "json",
-	traditional : true,
+	//traditional : true,
 	error : function (XMLHttpRequest, textStatus, errorThrown) {
 	    if(XMLHttpRequest.readyState != 4){
 	    	alert("未收到服务器响应，请刷新页面后重试！");

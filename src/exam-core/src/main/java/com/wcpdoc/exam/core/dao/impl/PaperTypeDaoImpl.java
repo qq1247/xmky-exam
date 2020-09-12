@@ -6,7 +6,6 @@ import java.util.Map;
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.exam.core.dao.PaperTypeDao;
-import com.wcpdoc.exam.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PaperType;
@@ -43,98 +42,73 @@ public class PaperTypeDaoImpl extends RBaseDaoImpl<PaperType> implements PaperTy
 
 	@Override
 	public List<Map<String, Object>> getTreeList() {
-		String sql = "SELECT PAPER_TYPE.ID, PAPER_TYPE.NAME, PAPER_TYPE.PARENT_ID, PAPER_TYPE.PARENT_SUB "
-				+ "FROM EXM_PAPER_TYPE PAPER_TYPE "
-				+ "WHERE PAPER_TYPE.STATE = 1";
+		String sql = "SELECT ID, NAME, PARENT_ID, PARENT_SUB FROM EXM_PAPER_TYPE WHERE STATE = 1 ORDER BY NO ASC";
 		return getMapList(sql);
-	}
-
-	@Override
-	public void doMove(Integer sourceId, Integer targetId) {
-		PaperType sourcePaperType = getEntity(sourceId);
-		PaperType targetPaperType = getEntity(targetId);
-		sourcePaperType.setParentId(targetId);
-		flush();
-
-		String sql = "UPDATE EXM_PAPER_TYPE PAPER_TYPE" //
-				+ "	SET PAPER_TYPE.PARENT_SUB = REPLACE(PAPER_TYPE.PARENT_SUB, ?, ?)"
-				+ "	WHERE PAPER_TYPE.PARENT_SUB LIKE ?";
-		Object[] params = new Object[] { 
-					sourcePaperType.getParentSub(), 
-					targetPaperType.getParentSub() + sourcePaperType.getId() + "_",
-					sourcePaperType.getParentSub() + "%" };
-		update(sql, params);
-	}
-	
-	@Override
-	public List<PaperType> getAllSubPaperTypeList(Integer id) {
-		String sql = "SELECT * FROM EXM_PAPER_TYPE WHERE PARENT_SUB LIKE ? AND STATE = 1";
-		return getList(sql, new Object[]{"%\\_"+id+"\\_%"}, PaperType.class);
-	}
-	
-	@Override
-	public PaperType getPaperTypeByName(String name) {
-		String sql = "SELECT * FROM EXM_PAPER_TYPE WHERE NAME = ? AND STATE = 1";
-		return getEntity(sql, new Object[]{name}, PaperType.class);
-	}
-
-	@Override
-	public PageOut getAuthUserListpage(PageIn pageIn) {
-		String sql = "SELECT USER.ID, USER.NAME AS USER_NAME, USER.LOGIN_NAME, ORG.NAME AS ORG_NAME, POST_USER.POST_NAMES "
-				+ "FROM SYS_USER USER "
-				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
-				+ "LEFT JOIN (SELECT POST_USER.USER_ID, GROUP_CONCAT(POST.NAME) AS POST_NAMES "
-				+ "				FROM SYS_POST_USER POST_USER "
-				+ "				INNER JOIN SYS_POST POST ON POST_USER.POST_ID = POST.ID "
-				+ "				GROUP BY POST_USER.USER_ID ) POST_USER ON USER.ID = POST_USER.USER_ID";
-		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "ORG.ID = ?", pageIn.getOne())
-				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getTen()), 
-						"EXISTS (SELECT 1 FROM EXM_PAPER_TYPE Z WHERE Z.ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", 
-						pageIn.getTen())
-//				.addWhere("USER.STATE = ?", 1)//已添加过的可以显示
-				.addWhere("USER.ID != ?", 1)//排除管理员
-//				.addWhere("ORG.STATE = ?", 1)//已添加过的可以显示
-				.addOrder("USER.NAME", Order.DESC);
-		
-		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		return pageOut;
-	}
-
-	@Override
-	public PageOut getAuthUserAddList(PageIn pageIn) {
-		String sql = "SELECT USER.ID, USER.NAME AS USER_NAME, USER.LOGIN_NAME, ORG.NAME AS ORG_NAME, POST_USER.POST_NAMES "
-				+ "FROM SYS_USER USER "
-				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
-				+ "LEFT JOIN (SELECT POST_USER.USER_ID, GROUP_CONCAT(POST.NAME) AS POST_NAMES "
-				+ "				FROM SYS_POST_USER POST_USER "
-				+ "				INNER JOIN SYS_POST POST ON POST_USER.POST_ID = POST.ID "
-				+ "				GROUP BY POST_USER.USER_ID ) POST_USER ON USER.ID = POST_USER.USER_ID";
-		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "ORG.ID = ?", pageIn.getOne())
-				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getTen()), 
-						"NOT EXISTS (SELECT 1 FROM EXM_PAPER_TYPE Z WHERE Z.ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", 
-						pageIn.getTen())
-				.addWhere("USER.STATE = ?", 1)//当前正常的用户
-				.addWhere("USER.ID != ?", 1)//排除管理员
-				.addWhere("ORG.STATE = ?", 1)//当前正常的机构
-				.addOrder("USER.NAME", Order.DESC);
-		
-		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		return pageOut;
 	}
 
 	@Override
 	public List<PaperType> getList() {
 		String sql = "SELECT * FROM EXM_PAPER_TYPE WHERE STATE = 1";
-		return getList(sql, PaperType.class);
+		return getList(sql);
 	}
 
 	@Override
 	public List<PaperType> getList(Integer parentId) {
 		String sql = "SELECT * FROM EXM_PAPER_TYPE WHERE STATE = 1 AND PARENT_ID = ?";
-		return getList(sql, new Object[]{parentId}, PaperType.class);
+		return getList(sql, new Object[] { parentId });
 	}
+	
+	@Override
+	public boolean existName(String name, Integer excludeId) {
+		if (excludeId == null) {
+			String sql = "SELECT COUNT(*) AS NUM FROM EXM_PAPER_TYPE WHERE NAME = ? AND STATE = 1";
+			return getCount(sql, new Object[] { name }) > 0;
+		}
+
+		String sql = "SELECT COUNT(*) AS NUM FROM EXM_PAPER_TYPE WHERE NAME = ? AND STATE = 1 AND ID != ?";
+		return getCount(sql, new Object[] { name, excludeId }) > 0;
+	}
+
+	@Override
+	public PageOut getAuthUserListpage(PageIn pageIn) {
+		String sql = "SELECT USER.ID, USER.NAME AS NAME, ORG.NAME AS ORG_NAME "
+				+ "FROM SYS_USER USER "
+				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID ";
+		SqlUtil sqlUtil = new SqlUtil(sql);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "(USER.NAME LIKE ? OR ORG.NAME LIKE ?)", "%" + pageIn.getTwo() + "%", "%" + pageIn.getTwo() + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "EXISTS (SELECT 1 FROM EXM_PAPER_TYPE Z WHERE Z.ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.getTen())
+				.addWhere("USER.STATE = 1")
+				.addOrder("USER.UPDATE_TIME", Order.DESC);
+		PageOut pageOut = getListpage(sqlUtil, pageIn);
+		return pageOut;
+	}
+
+	@Override
+	public PageOut getAuthPostListpage(PageIn pageIn) {
+		String sql = "SELECT POST.ID, POST.NAME, ORG.NAME AS ORG_NAME "
+				+ "FROM SYS_POST POST "
+				+ "INNER JOIN SYS_ORG ORG ON POST.ORG_ID = ORG.ID";
+		SqlUtil sqlUtil = new SqlUtil(sql);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "(POST.NAME LIKE ? OR ORG.NAME LIKE ?)", "%" + pageIn.getTwo() + "%", "%" + pageIn.getTwo() + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "EXISTS (SELECT 1 FROM EXM_PAPER_TYPE Z WHERE Z.ID = ? AND Z.POST_IDS LIKE CONCAT('%,', POST.ID, ',%'))", pageIn.getTen())
+				.addWhere("POST.STATE = 1")
+				.addOrder("POST.UPDATE_TIME", Order.DESC);
+		PageOut pageOut = getListpage(sqlUtil, pageIn);
+		return pageOut;
+	}
+
+	@Override
+	public PageOut getAuthOrgListpage(PageIn pageIn) {
+		String sql = "SELECT ORG.ID, ORG.NAME, PARENT_ORG.NAME AS PARENT_ORG_NAME " 
+				+ "FROM SYS_ORG ORG "
+				+ "LEFT JOIN SYS_ORG PARENT_ORG ON ORG.PARENT_ID = PARENT_ORG.ID";
+		SqlUtil sqlUtil = new SqlUtil(sql);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "ORG.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "EXISTS (SELECT 1 FROM EXM_PAPER_TYPE Z WHERE Z.ID = ? AND Z.ORG_IDS LIKE CONCAT('%,', ORG.ID, ',%'))", pageIn.getTen())
+				.addWhere("ORG.STATE = 1")
+				.addOrder("ORG.UPDATE_TIME", Order.DESC);
+		PageOut pageOut = getListpage(sqlUtil, pageIn);
+		return pageOut;
+	}
+	
 }

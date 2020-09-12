@@ -315,7 +315,7 @@ INSERT INTO `SYS_RES` VALUES ('67', '修改', 'question/toEdit|question/doEdit',
 INSERT INTO `SYS_RES` VALUES ('68', '删除', 'question/doDel', '64', '_1_2_55_64_68_', '5', '1', '2020-09-08 13:27:16', '4', '3', '8', '', '1');
 INSERT INTO `SYS_RES` VALUES ('69', '导入试题', 'question/wordImp', '64', '_1_2_55_64_69_', '5', '1', '2020-09-12 14:19:08', '5', '3', '16', '', '1');
 INSERT INTO `SYS_RES` VALUES ('70', '下载模板', 'question/wordTemplateExport', '64', '_1_2_55_64_70_', '5', '1', '2020-09-12 14:19:27', '6', '3', '32', '', '1');
-INSERT INTO `SYS_RES` VALUES ('71', '试卷分类', 'paperType/toList', '55', '_1_2_55_71_', '4', '1', '2020-09-12 14:44:38', '5', '3', '64', '', '1');
+INSERT INTO `SYS_RES` VALUES ('71', '试卷分类', 'paper/toList', '55', '_1_2_55_71_', '4', '1', '2020-09-12 14:44:38', '5', '3', '64', '', '1');
 INSERT INTO `SYS_RES` VALUES ('72', '列表', 'paperType/treeList|paperType/list', '71', '_1_2_55_71_72_', '5', '1', '2020-09-12 14:45:10', '1', '3', '128', '', '1');
 INSERT INTO `SYS_RES` VALUES ('73', '添加', 'paperType/toAdd|paperType/doAdd', '71', '_1_2_55_71_73_', '5', '1', '2020-09-12 14:45:29', '2', '3', '256', '', '1');
 INSERT INTO `SYS_RES` VALUES ('74', '修改', 'paperType/toEdit|paperType/doEdit', '71', '_1_2_55_71_74_', '5', '1', '2020-09-12 14:45:45', '3', '3', '512', '', '1');

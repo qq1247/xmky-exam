@@ -28,7 +28,7 @@ import com.wcpdoc.exam.core.util.ValidateUtil;
  */
 @Controller
 @RequestMapping("/questionType")
-public class QuestionTypeController extends BaseController{
+public class QuestionTypeController extends BaseController {
 	private static final Logger log = LoggerFactory.getLogger(QuestionTypeController.class);
 	
 	@Resource

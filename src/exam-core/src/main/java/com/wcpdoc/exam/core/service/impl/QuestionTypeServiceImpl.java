@@ -82,6 +82,8 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		
 		// 删除试题分类
 		QuestionType questionType = getEntity(id);
+		questionTypeExService.delAndUpdate(questionType);
+		
 		questionType.setState(0);
 		questionType.setUpdateTime(new Date());
 		questionType.setUpdateUserId(getCurUser().getId());

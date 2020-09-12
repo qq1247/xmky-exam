@@ -12,7 +12,7 @@ import com.wcpdoc.exam.core.entity.QuestionType;
  * 
  * v1.0 zhanghc 2016-5-24下午14:54:09
  */
-public interface QuestionTypeDao extends BaseDao<QuestionType>{
+public interface QuestionTypeDao extends BaseDao<QuestionType> {
 
 	/**
 	 * 获取试题分类树
