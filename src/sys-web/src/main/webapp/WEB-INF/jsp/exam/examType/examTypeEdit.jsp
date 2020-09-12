@@ -1,26 +1,35 @@
 <%@ page language="java" pageEncoding="utf-8"%>
-<form id="examTypeEditFrom" method="post">
-	<input type="hidden" id="examType_id" name="id" value="${examType.id }" />
-	<table class="kv-table">
-		<tr>
-			<td class="kv-label">上级考试分类：</td>
-			<td class="kv-content">
-				<input type="hidden" id="examType_parentId" name="parentId" value="${pExamType.id }"/>
-				<input id="examType_parentName" name="parentName" value="${pExamType.name }" readonly="readonly" style="width:180px;height:30px;"/>
-			</td>
-			<td class="kv-label"></td>
-			<td class="kv-content">
-			</td>
-		</tr>
-		<tr>
-			<td class="kv-label">考试分类名称：</td>
-			<td class="kv-content">
-				<input id="examType_name" name="name" value="${examType.name }" style="width:185px;height:35px;"/>
-			</td>
-			<td class="kv-label">排序：</td>
-			<td class="kv-content">
-				<input id="examType_no" name="no" value="${examType.no }" style="width:185px;height:35px;"/>
-			</td>
-		</tr>
-	</table>
-</form>
+<div lay-filter="examTypeEditFrom" class="layui-form" style="padding: 20px 0 0 0;">
+	<input type="hidden" name="id" value="${examType.id }" />
+	<div class="layui-row layui-form-item">
+		<div class="layui-col-md11">
+			<label class="layui-form-label">上级分类：</label>
+			<div class="layui-input-block">
+				<input type="hidden" id="parentExamTypeId" name="parentId" value="${parentExamType.id }" />
+				<input id="parentExamTypeName" name="parentName" value="${parentExamType.name }" 
+					class="layui-input layui-disabled" lay-verify="required" readonly="readonly">
+			</div>
+		</div>
+	</div>
+	<div class="layui-row layui-form-item">
+		<div class="layui-col-md11">
+			<label class="layui-form-label">名称：</label>
+			<div class="layui-input-block">
+				<input name="name" value="${examType.name }" 
+					class="layui-input" lay-verify="required" placeholder="请输入名称">
+			</div>
+		</div>
+	</div>
+	<div class="layui-row layui-form-item">
+		<div class="layui-col-md11">
+			<label class="layui-form-label">排序：</label>
+			<div class="layui-input-block">
+				<input name="no" value="${examType.no }" 
+					class="layui-input" lay-verify="required|number" placeholder="请输入排序">
+			</div>
+		</div>
+	</div>
+	<div class="layui-form-item layui-hide">
+		<input type="button" lay-submit lay-filter="examTypeEditBtn" value="确认">
+	</div>
+</div>

@@ -1,415 +1,196 @@
 package com.wcpdoc.exam.core.service.impl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.exam.base.service.OrgService;
+import com.wcpdoc.exam.base.service.PostService;
 import com.wcpdoc.exam.core.dao.BaseDao;
+import com.wcpdoc.exam.core.dao.ExamTypeDao;
 import com.wcpdoc.exam.core.entity.ExamType;
-import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
+import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.service.ExamTypeExService;
 import com.wcpdoc.exam.core.service.ExamTypeService;
+import com.wcpdoc.exam.core.util.StringUtil;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 /**
  * 考试分类服务层实现
  * 
  * v1.0 zhanghc 2017-06-28 21:34:41
  */
 @Service
-public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements ExamTypeService{
+public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements ExamTypeService {
+	@Resource
+	private ExamTypeDao examTypeDao;
+	@Resource
+	private ExamTypeExService examTypeExService;
+	@Resource
+	private OrgService orgService;
+	@Resource
+	private PostService postService;
+
+	@Override
+	@Resource(name = "examTypeDaoImpl")
+	public void setDao(BaseDao<ExamType> dao) {
+		super.dao = dao;
+	}
 
 	@Override
 	public void addAndUpdate(ExamType examType) {
-		// TODO Auto-generated method stub
+		//校验数据有效性
+		if (!ValidateUtil.isValid(examType.getName())) {
+			throw new MyException("参数错误：name");
+		}
+		if (examType.getParentId() == null || examType.getParentId() == 0) {
+			throw new MyException("参数错误：parentId");
+		}
 		
+		if (existName(examType)) {
+			throw new MyException("名称已存在！");
+		}
+				
+		// 添加试题分类
+		examType.setUpdateUserId(getCurUser().getId());
+		examType.setUpdateTime(new Date());
+		examType.setState(1);
+		add(examType);
+		
+		// 更新父子关系
+		ExamType parentExamType = examTypeDao.getEntity(examType.getParentId());
+		examType.setParentSub(parentExamType.getParentSub() + examType.getId() + "_");
+		examType.setLevel(examType.getParentSub().split("_").length - 1);
+		update(examType);
 	}
 
 	@Override
-	public void editAndUpdate(ExamType examType) {
-		// TODO Auto-generated method stub
+	public void delAndUpdate(Integer id) {
+		// 校验数据有效性
+		if (id == 1) { //不包括根试题分类
+			return;
+		}
+		List<ExamType> examTypeList = examTypeDao.getList(id);
+		if (ValidateUtil.isValid(examTypeList)) {
+			throw new MyException("请先删除子试题分类！");
+		}
 		
-	}
-
-	@Override
-	public void delAndUpdate(Integer[] ids) {
-		// TODO Auto-generated method stub
+		// 删除试题分类
+		ExamType examType = getEntity(id);
+		examTypeExService.delAndUpdate(examType);
 		
+		examType.setState(0);
+		examType.setUpdateTime(new Date());
+		examType.setUpdateUserId(getCurUser().getId());
+		update(examType);
 	}
 
 	@Override
 	public List<Map<String, Object>> getTreeList() {
-		// TODO Auto-generated method stub
-		return null;
+		return examTypeDao.getTreeList();
 	}
-
+	
 	@Override
 	public void doMove(Integer sourceId, Integer targetId) {
-		// TODO Auto-generated method stub
+		// 校验数据有效性
+		if (sourceId == null) {
+			throw new MyException("无法获取参数：sourceId");
+		}
+		if (targetId == null) {
+			throw new MyException("无法获取参数：targetId");
+		}
+		if (sourceId == targetId) {
+			throw new MyException("源试题分类和目标试题分类一致！");
+		}
+
+		ExamType source = getEntity(sourceId);
+		ExamType target = getEntity(targetId);
+		if (target.getParentSub().contains(source.getParentSub())) {
+			throw new MyException("父试题分类不能移动到子试题分类下！");
+		}
+
+		// 移动试题分类
+		source.setParentId(target.getId());
+		source.setParentSub(String.format("%s%s_", target.getParentSub(), source.getId()));
+		source.setLevel(source.getParentSub().split("_").length - 1);
+		update(source);
 		
+		List<ExamType> subSourceList = examTypeDao.getList(source.getId());
+		doMove(source, subSourceList);
 	}
-
-	@Override
-	public List<Map<String, Object>> getOrgTreeList() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public PageOut getAuthUserListpage(PageIn pageIn) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public PageOut getAuthUserAddList(PageIn pageIn) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void doAuthUserAdd(Integer id, Integer[] userIds, boolean syn2Sub, LoginUser user) {
-		// TODO Auto-generated method stub
 		
+	private void doMove(ExamType target, List<ExamType> subTargetList) {
+		for (ExamType subTarget : subTargetList) {
+			subTarget.setParentId(target.getId());
+			subTarget.setParentSub(String.format("%s%s_", target.getParentSub(), subTarget.getId()));
+			subTarget.setLevel(subTarget.getParentSub().split("_").length - 1);
+			update(subTarget);
+			
+			List<ExamType> subSubTargetList = examTypeDao.getList(subTarget.getId());
+			if (ValidateUtil.isValid(subSubTargetList)) {
+				doMove(subTarget, subSubTargetList);
+			}
+		}
 	}
 
 	@Override
-	public void doAuthUserDel(Integer id, Integer[] userIds, boolean syn2Sub, LoginUser user) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void doAuthOrgUpdate(Integer id, Integer[] orgIds, boolean syn2Sub, LoginUser user) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public List<Map<String, Object>> getOrgPostTreeList() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void doAuthPostUpdate(Integer id, Integer[] postIds, boolean syn2Sub, LoginUser user) {
-		// TODO Auto-generated method stub
-		
+	public boolean existName(ExamType examType) {
+		return examTypeDao.existName(examType.getName(), examType.getId());
 	}
 
 	@Override
 	public List<ExamType> getList() {
-		// TODO Auto-generated method stub
-		return null;
+		return examTypeDao.getList();
 	}
 
 	@Override
-	public void setDao(BaseDao<ExamType> dao) {
-		// TODO Auto-generated method stub
+	public void doAuth(Integer id, Integer[] userIds, Integer[] postIds, Integer[] orgIds, boolean syn2Sub) {
+		if(syn2Sub){
+			List<ExamType> examTypeList = examTypeDao.getList(id);
+			for(ExamType examType : examTypeList){
+				doAuth(examType.getId(), userIds, postIds, orgIds, syn2Sub);
+			}
+		}
 		
+		ExamType entity = getEntity(id);
+		if (!ValidateUtil.isValid(userIds)) {
+			entity.setUserIds(null);
+		} else {
+			entity.setUserIds(String.format(",%s,", StringUtil.join(userIds)));
+		}
+		if (!ValidateUtil.isValid(postIds)) {
+			entity.setPostIds(null);
+		} else {
+			entity.setPostIds(String.format(",%s,", StringUtil.join(postIds)));
+		}
+		if (!ValidateUtil.isValid(orgIds)) {
+			entity.setOrgIds(null);
+		} else {
+			entity.setOrgIds(String.format(",%s,", StringUtil.join(orgIds)));
+		}
+		
+		entity.setUpdateTime(new Date());
+		entity.setUpdateUserId(getCurUser().getId());
+		update(entity);
 	}
-//	@Resource
-//	private ExamTypeDao examTypeDao;
-//	@Resource
-//	private ExamTypeExService examTypeExService;
-//	@Resource
-//	private OrgService orgService;
-//	@Resource
-//	private PostService postService;
-//
-//	@Override
-//	@Resource(name = "examTypeDaoImpl")
-//	public void setDao(BaseDao<ExamType> dao) {
-//		super.dao = dao;
-//	}
-//
-//	@Override
-//	public void addAndUpdate(ExamType examType) {
-//		//校验数据有效性
-//		if(!ValidateUtil.isValid(examType.getName())){
-//			throw new RuntimeException("无法获取参数：examType.name");
-//		}
-//		if(existName(examType)){
-//			throw new RuntimeException("名称已存在！");
-//		}
-//				
-//		//添加考试分类
-//		if(examType.getParentId() == null){
-//			examType.setParentId(0);
-//		}
-//		examTypeDao.add(examType);
-//		
-//		//更新父子关系
-//		ExamType parentExamType = examTypeDao.getEntity(examType.getParentId());
-//		if(parentExamType == null){
-//			examType.setParentSub("_" + examType.getId() + "_");
-//		}else {
-//			examType.setParentSub(parentExamType.getParentSub() + examType.getId() + "_");
-//		}
-//		examTypeDao.update(examType);
-//	}
-//	
-//	@Override
-//	public void editAndUpdate(ExamType examType) {
-//		//校验数据有效性
-//		if(!ValidateUtil.isValid(examType.getName())){
-//			throw new RuntimeException("无法获取参数：examType.name");
-//		}
-//		if(existName(examType)){
-//			throw new RuntimeException("名称已存在！");
-//		}
-//		
-//		//修改考试分类
-//		examTypeDao.update(examType);
-//	}
-//
-//	@Override
-//	public void delAndUpdate(Integer[] ids) {
-//		//校验数据有效性
-//		if(!ValidateUtil.isValid(ids)){
-//			throw new RuntimeException("无法获取参数：ids");
-//		}
-//		
-//		//删除考试分类，不包括根考试分类
-//		for(Integer id : ids){
-//			if(id == 1){
-//				continue;
-//			}
-//			
-//			List<ExamType> examTypeList = examTypeDao.getAllSubExamTypeList(id);
-//			for(ExamType examType : examTypeList){
-//				if(examType.getState().equals("0")){
-//					continue;
-//				}
-//				
-//				examType.setState(0);
-//				examTypeDao.update(examType);
-//				
-//				examTypeExService.delAndUpdate(examType);
-//			}
-//		}
-//	}
-//
-//	@Override
-//	public List<Map<String, Object>> getTreeList() {
-//		return examTypeDao.getTreeList();
-//	}
-//
-//	@Override
-//	public void doMove(Integer sourceId, Integer targetId) {
-//		//校验数据有效性
-//		if(sourceId == null){
-//			throw new RuntimeException("无法获取参数：sourceId");
-//		}
-//		if(targetId == null){
-//			throw new RuntimeException("无法获取参数：targetId");
-//		}
-//		
-//		//移动考试分类
-//		examTypeDao.doMove(sourceId, targetId);
-//	}
-//
-//	/**
-//	 * 名称是否已存在
-//	 * v1.0 zhanghc 2016-5-24下午14:54:09
-//	 * @param examType
-//	 * @return boolean
-//	 */
-//	private boolean existName(ExamType examType){
-//		//校验数据有效性
-//		if(examType == null){
-//			throw new RuntimeException("无法获取参数：examType");
-//		}
-//		if(!ValidateUtil.isValid(examType.getName())){
-//			throw new RuntimeException("无法获取参数：examType.name");
-//		}
-//		
-//		//如果是添加
-//		ExamType examType2 = examTypeDao.getExamTypeByName(examType.getName());
-//		if(examType2 != null){
-//			examTypeDao.evict(examType2);
-//		}
-//		
-//		if(examType.getId() == null){
-//			if(examType2 != null){
-//				return true;
-//			}
-//			return false;
-//		}
-//		
-//		//如果是修改
-//		if(examType2 != null && !examType.getId().equals(examType2.getId())){
-//			return true;
-//		}
-//		return false;
-//	}
-//
-//	@Override
-//	public List<Map<String, Object>> getOrgTreeList() {
-//		return orgService.getTreeList();
-//	}
-//
-//	@Override
-//	public PageOut getAuthUserListpage(PageIn pageIn) {
-//		return examTypeDao.getAuthUserListpage(pageIn);
-//	}
-//
-//	@Override
-//	public PageOut getAuthUserAddList(PageIn pageIn) {
-//		return examTypeDao.getAuthUserAddList(pageIn);
-//	}
-//
-//	@Override
-//	public void doAuthUserAdd(Integer id, Integer[] userIds, boolean syn2Sub, LoginUser user) {
-//		//校验数据有效性
-//		if(id == null){
-//			throw new RuntimeException("无法获取参数：id");
-//		}
-//		if(!ValidateUtil.isValid(userIds)){
-//			throw new RuntimeException("无法获取参数：userIds");
-//		}
-//		
-//		//添加权限用户
-//		if(syn2Sub){
-//			List<ExamType> examTypeList = getList(id);
-//			for(ExamType examType : examTypeList){
-//				doAuthUserAdd(examType.getId(), userIds, syn2Sub, user);
-//			}
-//		}
-//		
-//		ExamType examType = getEntity(id);
-//		StringBuilder _userIds = new StringBuilder();
-//		if(ValidateUtil.isValid(examType.getUserIds())){
-//			_userIds.append(examType.getUserIds());
-//		}else{
-//			_userIds.append(",");
-//		}
-//		for(Integer userId : userIds){
-//			if(_userIds.toString().contains("," + userId + ",")){
-//				continue;
-//			}
-//			_userIds.append(userId).append(",");
-//		}
-//		examType.setUserIds(_userIds.toString());
-//		examType.setUpdateTime(new Date());
-//		examType.setUpdateUserId(user.getId());
-//		update(examType);
-//	}
-//
-//	private List<ExamType> getList(Integer id) {
-//		return examTypeDao.getList(id);
-//	}
-//
-//	@Override
-//	public void doAuthUserDel(Integer id, Integer[] userIds, boolean syn2Sub, LoginUser user) {
-//		//校验数据有效性
-//		if(id == null){
-//			throw new RuntimeException("无法获取参数：id");
-//		}
-//		if(!ValidateUtil.isValid(userIds)){
-//			throw new RuntimeException("无法获取参数：userIds");
-//		}
-//		
-//		if(syn2Sub){
-//			List<ExamType> examTypeList = getList(id);
-//			for(ExamType examType : examTypeList){
-//				doAuthUserDel(examType.getId(), userIds, syn2Sub, user);
-//			}
-//		}
-//		
-//		ExamType examType = getEntity(id);
-//		if(examType == null){
-//			return;
-//		}
-//		
-//		String _userIds = examType.getUserIds();
-//		if(!ValidateUtil.isValid(_userIds)){
-//			return;
-//		}
-//		for(Integer userId : userIds){
-//			_userIds = _userIds.replaceAll("," + userId + ",", ",");//,2,4,5,55,32,32,
-//		}
-//		if(_userIds.equals(",")){
-//			_userIds = null;
-//		}
-//		
-//		examType.setUserIds(_userIds);
-//		update(examType);
-//	}
-//
-//	@Override
-//	public void doAuthOrgUpdate(Integer id, Integer[] orgIds, boolean syn2Sub, LoginUser user) {
-//		//校验数据有效性
-//		if(id == null){
-//			throw new RuntimeException("无法获取参数：id");
-//		}
-////		if(!ValidateUtil.isValid(orgIds)){
-////			throw new RuntimeException("无法获取参数：orgIds");//全不选就是空。
-////		}
-//		
-//		//添加权限机构
-//		if(syn2Sub){
-//			List<ExamType> examTypeList = getList(id);
-//			for(ExamType examType : examTypeList){
-//				doAuthOrgUpdate(examType.getId(), orgIds, syn2Sub, user);
-//			}
-//		}
-//		
-//		ExamType examType = getEntity(id);
-//		StringBuilder _orgIds = new StringBuilder(",");
-//		for(Integer orgId : orgIds){
-//			_orgIds.append(orgId).append(",");
-//		}
-//		if(_orgIds.toString().equals(",")){
-//			examType.setOrgIds(null);
-//		}else{
-//			examType.setOrgIds(_orgIds.toString());
-//		}
-//		examType.setUpdateTime(new Date());
-//		examType.setUpdateUserId(user.getId());
-//		update(examType);
-//	}
-//
-//	@Override
-//	public List<Map<String, Object>> getOrgPostTreeList() {
-//		return postService.getOrgPostTreeList();
-//	}
-//
-//	@Override
-//	public void doAuthPostUpdate(Integer id, Integer[] postIds, boolean syn2Sub, LoginUser user) {
-//		//校验数据有效性
-//		if(id == null){
-//			throw new RuntimeException("无法获取参数：id");
-//		}
-////		if(!ValidateUtil.isValid(postIds)){
-////			throw new RuntimeException("无法获取参数：postIds");//全不选就是空。
-////		}
-//		
-//		//添加权限机构
-//		if(syn2Sub){
-//			List<ExamType> examTypeList = getList(id);
-//			for(ExamType examType : examTypeList){
-//				doAuthPostUpdate(examType.getId(), postIds, syn2Sub, user);
-//			}
-//		}
-//		
-//		ExamType examType = getEntity(id);
-//		StringBuilder _postIds = new StringBuilder(",");
-//		for(Integer postId : postIds){
-//			_postIds.append(postId).append(",");
-//		}
-//		if(_postIds.toString().equals(",")){
-//			examType.setPostIds(null);
-//		}else{
-//			examType.setPostIds(_postIds.toString());
-//		}
-//		examType.setUpdateTime(new Date());
-//		examType.setUpdateUserId(user.getId());
-//		update(examType);
-//	}
-//
-//	@Override
-//	public List<ExamType> getList() {
-//		return examTypeDao.getList();
-//	}
+
+	@Override
+	public PageOut getAuthUserListpage(PageIn pageIn) {
+		return examTypeDao.getAuthUserListpage(pageIn);
+	}
+
+	@Override
+	public PageOut getAuthPostListpage(PageIn pageIn) {
+		return examTypeDao.getAuthPostListpage(pageIn);
+	}
+
+	@Override
+	public PageOut getAuthOrgListpage(PageIn pageIn) {
+		return examTypeDao.getAuthOrgListpage(pageIn);
+	}
 }
