@@ -24,9 +24,9 @@ public class PaperTypeExServiceImpl implements PaperTypeExService {
 
 	@Override
 	public void delAndUpdate(PaperType paperType) {
-		List<Paper> paperList = paperService.getList(paperType.getId());
-		for (Paper paper : paperList) {
-			paper.setPaperTypeId(1);
-		}
+//		List<Paper> paperList = paperService.getList(paperType.getId());
+//		for (Paper paper : paperList) {
+//			paper.setPaperTypeId(1);
+//		}
 	}
 }

@@ -47,10 +47,10 @@ public class PaperQuestion {
 	private Integer type;
 	@Column(name = "SCORE")
 	private BigDecimal score;
+	@Column(name = "SCORE_OPTIONS")
+	private String scoreOptions;
 	@Column(name = "NO")
 	private Integer no;
-	@Column(name = "OPTIONS")
-	private String options;
 
 	public Integer getId() {
 		return id;
@@ -148,11 +148,11 @@ public class PaperQuestion {
 		this.score = score;
 	}
 
-	public String getOptions() {
-		return options;
+	public String getScoreOptions() {
+		return scoreOptions;
 	}
 
-	public void setOptions(String options) {
-		this.options = options;
+	public void setScoreOptions(String scoreOptions) {
+		this.scoreOptions = scoreOptions;
 	}
 }

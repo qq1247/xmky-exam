@@ -225,7 +225,7 @@
 		function toPostEdit(id) {
 			$.ajax({
 				url : "post/toEdit",
-				data : {"id" : id},
+				data : {id : id},
 				dataType : "html",
 				success : function(obj) {
 					layer.open({

@@ -163,6 +163,21 @@
 			</div>
 		</div>
 	</div>
+	<div id="scoreOptionsRow" class="layui-row layui-form-item" ${(question.type != 2 && question.type != 3) ? "style='display: none;'" : "" }>
+		<div class="layui-col-md11">
+			<label class="layui-form-label">默认选项：</label>
+			<div id="scoreOptionsPanel" class="layui-input-block">
+				<c:if test="${question.type == 2 || question.type == 3}">
+				<input type="checkbox" lay-filter="scoreOptions" name="scoreOptions" value="1" lay-skin="switch" lay-text="半对半分|全对得分" ${fn:contains(question.scoreOptions, "1") ? "checked" : "" }>
+				</c:if>
+				<c:if test="${question.type == 3}">
+				<input type="checkbox" lay-filter="scoreOptions" name="scoreOptions" value="2" lay-skin="switch" lay-text="答案无顺序|答案有顺序" ${fn:contains(question.scoreOptions, "2") ? "checked" : "" }>
+				<input type="checkbox" lay-filter="scoreOptions" name="scoreOptions" value="3" lay-skin="switch" lay-text="大小写不敏感|大小写敏感" ${fn:contains(question.scoreOptions, "3") ? "checked" : "" }>
+				<input type="checkbox" lay-filter="scoreOptions" name="scoreOptions" value="4" lay-skin="switch" lay-text="包含答案得分|等于答案得分" ${fn:contains(question.scoreOptions, "4") ? "checked" : "" }>
+				</c:if>
+			</div>
+		</div>
+	</div>
 	<div class="layui-row layui-form-item">
 		<div class="layui-col-md11">
 			<label class="layui-form-label">排序：</label>

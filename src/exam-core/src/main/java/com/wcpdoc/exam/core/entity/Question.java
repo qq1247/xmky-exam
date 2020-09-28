@@ -62,6 +62,8 @@ public class Question {
 	private Integer questionTypeId;
 	@Column(name = "SCORE")
 	private BigDecimal score;
+	@Column(name = "SCORE_OPTIONS")
+	private String scoreOptions;
 	@Column(name = "VER")
 	private Integer ver;
 	@Column(name = "SRC_ID")
@@ -235,5 +237,13 @@ public class Question {
 
 	public void setScore(BigDecimal score) {
 		this.score = score;
+	}
+
+	public String getScoreOptions() {
+		return scoreOptions;
+	}
+
+	public void setScoreOptions(String scoreOptions) {
+		this.scoreOptions = scoreOptions;
 	}
 }

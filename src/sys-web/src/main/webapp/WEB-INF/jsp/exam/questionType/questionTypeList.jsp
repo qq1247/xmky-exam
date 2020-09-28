@@ -228,7 +228,7 @@
 		function toQuestionTypeEdit(id) {
 			$.ajax({
 				url : "questionType/toEdit",
-				data : {"id" : id},
+				data : {id : id},
 				dataType : "html",
 				success : function(obj) {
 					layer.open({
@@ -382,7 +382,7 @@
 		function toQuestionTypeAuth(id) {
 			$.ajax({
 				url : "questionType/toAuth",
-				data : {"id" : id},
+				data : {id : id},
 				dataType : "html",
 				success : function(obj) {
 					layer.open({

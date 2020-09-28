@@ -23,6 +23,7 @@
 		<!-- 自定义js -->
 		<script src="script/myJs/visits.js"></script>
 		<script src="script/myJs/myJs.js"></script>
+		<link rel="stylesheet" href="css/iconfont/iconfont.css">
 		
 		<!-- 树控件 -->
 		<link rel="stylesheet" href="script/ztree/css/metroStyle/metroStyle.css">

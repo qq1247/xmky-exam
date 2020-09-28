@@ -168,7 +168,7 @@
 		function toCronEdit(id) {
 			$.ajax({
 				url : "cron/toEdit",
-				data : {"id" : id},
+				data : {id : id},
 				dataType : "html",
 				success : function(obj) {
 					layer.open({

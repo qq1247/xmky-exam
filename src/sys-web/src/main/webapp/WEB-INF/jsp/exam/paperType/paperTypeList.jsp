@@ -228,7 +228,7 @@
 		function toPaperTypeEdit(id) {
 			$.ajax({
 				url : "paperType/toEdit",
-				data : {"id" : id},
+				data : {id : id},
 				dataType : "html",
 				success : function(obj) {
 					layer.open({
@@ -382,7 +382,7 @@
 		function toPaperTypeAuth(id) {
 			$.ajax({
 				url : "paperType/toAuth",
-				data : {"id" : id},
+				data : {id : id},
 				dataType : "html",
 				success : function(obj) {
 					layer.open({

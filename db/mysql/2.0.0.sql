@@ -212,6 +212,43 @@ create table EXM_QUESTION_TYPE
 
 alter table EXM_QUESTION_TYPE comment '试题分类';
 
+drop table if exists EXM_QUESTION;
+
+/*==============================================================*/
+/* Table: EXM_QUESTION                                          */
+/*==============================================================*/
+create table EXM_QUESTION
+(
+   ID                   int not null auto_increment,
+   TYPE                 int comment '1：单选；2：多选；3：填空；4：判断；5：问答',
+   DIFFICULTY           int comment '1：极易；2：简单；3：适中；4：困难；5：极难',
+   TITLE                text comment '题干',
+   OPTION_A             text comment '选项A',
+   OPTION_B             text comment '选项B',
+   OPTION_C             text comment '选项C',
+   OPTION_D             text comment '选项D',
+   OPTION_E             text comment '选项E',
+   OPTION_F             text comment '选项F',
+   OPTION_G             text comment '选项G',
+   ANSWER               text comment '答案',
+   ANALYSIS             text comment '解析',
+   STATE                int comment '0：删除；1：启用；2：禁用',
+   UPDATE_USER_ID       int comment '更新人',
+   UPDATE_TIME          datetime comment '更新时间',
+   QUESTION_TYPE_ID     int comment '试题分类',
+   SCORE                decimal(5,2) comment '默认分值',
+   SCORE_OPTIONS        varchar(8) comment '1：半对半分（默认全对得分）；2：答案无顺序（默认答案有前后顺序）；3：大小写不敏感（默认大小写敏感）；4：包含答案得分（默认等于答案得分）',
+   VER                  int comment '版本',
+   SRC_ID               int comment '源ID',
+   NO                   int comment '排序',
+   primary key (ID)
+);
+
+alter table EXM_QUESTION comment '试题';
+
+alter table EXM_QUESTION add constraint FK_Reference_15 foreign key (QUESTION_TYPE_ID)
+      references EXM_QUESTION_TYPE (ID) on delete restrict on update restrict;
+
 drop table if exists EXM_PAPER_TYPE;
 
 /*==============================================================*/
@@ -236,7 +273,70 @@ create table EXM_PAPER_TYPE
 
 alter table EXM_PAPER_TYPE comment '试卷分类';
 
+drop table if exists EXM_PAPER;
 
+/*==============================================================*/
+/* Table: EXM_PAPER                                             */
+/*==============================================================*/
+create table EXM_PAPER
+(
+   ID                   int not null auto_increment comment '主键',
+   NAME                 varchar(32) comment '名称',
+   PREVIEW_TYPE         int comment '1：整卷展示；2：单题展示；数据字典：PAPER_PREVIEW_TYPE',
+   TOTAL_SCORE          decimal(5,2) comment '总分数',
+   SCORE_A              decimal(5,2) comment '分数A',
+   SCORE_A_REMARK       varchar(32) comment '分数A评语',
+   SCORE_B              decimal(5,2) comment '分数B',
+   SCORE_B_REMARK       varchar(32) comment '分数B评语',
+   SCORE_C              decimal(5,2) comment '分数C',
+   SCORE_C_REMARK       varchar(32) comment '分数C评语',
+   SCORE_D              decimal(5,2) comment '分数D',
+   SCORE_D_REMARK       varchar(32) comment '分数D评语',
+   SCORE_E              decimal(5,2) comment '分数E',
+   SCORE_E_REMARK       varchar(32) comment '分数E评语',
+   DESCRIPTION          text comment '描述',
+   PAPER_TYPE_ID        int comment '试卷分类',
+   STATE                int comment '0：删除；1：启用；2：禁用',
+   UPDATE_USER_ID       int comment '更新人',
+   UPDATE_TIME          datetime comment '更新时间',
+   primary key (ID)
+);
+
+alter table EXM_PAPER comment '试卷';
+
+alter table EXM_PAPER add constraint FK_Reference_16 foreign key (PAPER_TYPE_ID)
+      references EXM_PAPER_TYPE (ID) on delete restrict on update restrict;
+
+drop table if exists EXM_PAPER_QUESTION;
+
+/*==============================================================*/
+/* Table: EXM_PAPER_QUESTION                                    */
+/*==============================================================*/
+create table EXM_PAPER_QUESTION
+(
+   ID                   int not null auto_increment comment 'id',
+   NAME                 varchar(32) comment '章节名称',
+   DESCRIPTION          varchar(512) comment '章节描述',
+   PARENT_ID            int comment '父ID',
+   PARENT_SUB           varchar(512) comment '父子关系（格式：_父ID_子ID_子子ID_... ...）',
+   UPDATE_USER_ID       int comment '修改人',
+   UPDATE_TIME          datetime comment '修改时间',
+   PAPER_ID             int comment '试卷ID',
+   QUESTION_ID          int comment '试题ID',
+   TYPE                 int comment '1：章节；2：固定试题；3：随机试题',
+   SCORE                decimal(5,2) comment '分数',
+   SCORE_OPTIONS        varchar(8) comment '1：半对半分（默认全对得分）；2：答案无顺序（默认答案有前后顺序）；3：大小写不敏感（默认大小写敏感）；4：包含答案得分（默认等于答案得分）',
+   NO                   int comment '排序',
+   primary key (ID)
+);
+
+alter table EXM_PAPER_QUESTION comment '试卷试题';
+
+alter table EXM_PAPER_QUESTION add constraint FK_Reference_17 foreign key (QUESTION_ID)
+      references EXM_QUESTION (ID) on delete restrict on update restrict;
+
+alter table EXM_PAPER_QUESTION add constraint FK_Reference_18 foreign key (PAPER_ID)
+      references EXM_PAPER (ID) on delete restrict on update restrict;
 
 
 /*==============================================================*/
@@ -350,12 +450,14 @@ INSERT INTO `SYS_DICT` VALUES ('25', 'STATE2', '2', '禁用', '2');
 
 INSERT INTO `SYS_CRON` VALUES ('1', '清理临时附件', 'com.wcpdoc.exam.file.job.ClearFileJob', '0 0 0 1/1 * ? ', '1', '1', '2020-08-26 18:42:08');
 
-INSERT INTO `SYS_VER` VALUES (1, '1.1.1', '2019-02-23 15:35:21', 'zhanghc', '初始版本');
-INSERT INTO `SYS_VER` VALUES (2, '1.1.2', '2019-03-03 13:20:00', 'zhanghc', '');
-INSERT INTO `SYS_VER` VALUES (3, '1.1.3', '2019-08-14 18:49:00', 'zhanghc', '');
-INSERT INTO `SYS_VER` VALUES (4, '1.1.4', '2019-09-05 09:58:00', 'zhanghc', '');
-INSERT INTO `SYS_VER` VALUES (5, '1.1.5', '2019-12-16 23:16:00', 'zhanghc', '');
-INSERT INTO `SYS_VER` VALUES (6, '2.0.0', '2020-09-04 16:37:00', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (1, '1.0.0', '2017-09-07 15:06:00', 'zhanghc', '初始版本');
+INSERT INTO `SYS_VER` VALUES (2, '1.1.0', '2018-11-27 22:47:00', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (3, '1.1.1', '2019-02-23 15:35:21', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (4, '1.1.2', '2019-03-03 13:20:00', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (5, '1.1.3', '2019-08-14 18:49:00', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (6, '1.1.4', '2019-09-05 09:58:00', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (7, '1.1.5', '2019-12-16 23:16:00', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (8, '2.0.0', '2020-09-04 16:37:00', 'zhanghc', '');
 
 INSERT INTO `EXM_QUESTION_TYPE` VALUES ('1', '试题分类', '0', '_1_', '1', '1', '2017-08-01 22:31:43', '1', '1', null, null, null);
 INSERT INTO `EXM_PAPER_TYPE` VALUES ('1', '试卷分类', '0', '_1_', '1', '1', '2017-08-01 22:31:43', '1', '1', null, null, null);

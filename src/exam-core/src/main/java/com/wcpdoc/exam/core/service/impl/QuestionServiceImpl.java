@@ -104,6 +104,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			newQuestion.setUpdateTime(new Date());
 			newQuestion.setUpdateUserId(getCurUser().getId());
 			newQuestion.setScore(question.getScore());
+			newQuestion.setScoreOptions(question.getScoreOptions());
 			newQuestion.setNo(question.getNo());
 			newQuestion.setVer(entity.getVer() + 1);
 			add(newQuestion);
@@ -128,6 +129,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
 		entity.setScore(question.getScore());
+		entity.setScoreOptions(question.getScoreOptions());
 		entity.setNo(question.getNo());
 		update(entity);
 

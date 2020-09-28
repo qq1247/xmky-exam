@@ -55,9 +55,9 @@
 			$.ajax({
 				url : "log/list",
 				async : true,
-				data: {
-	                "curReadLen": curReadLen,
-	                "logName" : function() {
+				data : {
+	                curReadLen : curReadLen,
+	                logName : function() {
 						return $("[lay-filter='logName']").parent().find("dd[class='layui-this']").attr("lay-value");
 					}
 	            },

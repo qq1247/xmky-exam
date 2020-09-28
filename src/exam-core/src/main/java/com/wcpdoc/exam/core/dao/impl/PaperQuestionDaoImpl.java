@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.exam.core.dao.PaperQuestionDao;
-import com.wcpdoc.exam.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
@@ -24,41 +23,17 @@ public class PaperQuestionDaoImpl extends RBaseDaoImpl<PaperQuestion> implements
 	}
 
 	@Override
-	public PaperQuestion getPaperQuestionByName(String name) {
-		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE NAME = ?";
-		return getEntity(sql, new Object[]{name}, PaperQuestion.class);
-	}
-
-	@Override
-	public List<PaperQuestion> getList(Integer parentId) {
+	public List<PaperQuestion> getQuestionList(Integer parentId) {
 		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PARENT_ID = ?";
 		return getList(sql, new Object[]{parentId}, PaperQuestion.class);
 	}
 
 	@Override
-	public PaperQuestion getTopPaperQuestion(Integer paperId) {
-		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = ? AND PARENT_ID = 0";
-		return getEntity(sql, new Object[]{paperId}, PaperQuestion.class);
-	}
-
-	@Override
-	public List<PaperQuestion> getPaperQuestionList(Integer paperId) {
+	public List<PaperQuestion> getList(Integer paperId) {
 		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = ?";
 		return getList(sql, new Object[]{paperId}, PaperQuestion.class);
 	}
-
-	@Override
-	public PaperQuestion getEntity(Integer paperId, Integer questionId) {
-		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = ? AND QUESTION_ID = ?";
-		return getEntity(sql, new Object[]{paperId, questionId}, PaperQuestion.class);
-	}
-
-	@Override
-	public List<PaperQuestion> getList2(Integer paperId) {
-		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = ?";
-		return getList(sql, new Object[]{paperId}, PaperQuestion.class);
-	}
-
+	
 	@Override
 	public List<PaperQuestion> getChapterList(Integer paperId) {
 		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = ? AND TYPE = 1";

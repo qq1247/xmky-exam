@@ -97,10 +97,10 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 	public void doMove(Integer sourceId, Integer targetId) {
 		// 校验数据有效性
 		if (sourceId == null) {
-			throw new MyException("无法获取参数：sourceId");
+			throw new MyException("参数错误：sourceId");
 		}
 		if (targetId == null) {
-			throw new MyException("无法获取参数：targetId");
+			throw new MyException("参数错误：targetId");
 		}
 		if (sourceId == targetId) {
 			throw new MyException("源试卷分类和目标试卷分类一致！");

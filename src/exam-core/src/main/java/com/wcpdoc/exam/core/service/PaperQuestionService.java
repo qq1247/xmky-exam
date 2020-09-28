@@ -3,60 +3,40 @@ package com.wcpdoc.exam.core.service;
 import java.util.List;
 
 import com.wcpdoc.exam.core.entity.PaperQuestion;
-import com.wcpdoc.exam.core.service.BaseService;
 
 /**
  * 试卷试题服务层接口
  * 
  * v1.0 zhanghc 2017-05-26 14:23:38
  */
-@Deprecated
 public interface PaperQuestionService extends BaseService<PaperQuestion>{
 
 	/**
-	 * 添加试卷试题
-	 * 
-	 * v1.0 zhanghc 2017年5月27日上午9:45:59
-	 * @param paperQuestion
-	 * void
-	 */
-	void addAndUpdate(PaperQuestion paperQuestion);
-
-	/**
 	 * 获取试卷试题列表
 	 * 
-	 * v1.0 zhanghc 2017年5月27日上午10:50:04
+	 * v1.0 zhanghc 2017年5月27日上午10:51:44
 	 * @param parentId
 	 * @return List<PaperQuestion>
 	 */
-	List<PaperQuestion> getList(Integer parentId);
+	List<PaperQuestion> getQuestionList(Integer parentId);
 
 	/**
 	 * 获取试卷试题列表
 	 * 
-	 * v1.0 zhanghc 2017年6月5日下午6:30:24
+	 * v1.0 zhanghc 2017年6月29日下午2:50:46
 	 * @param paperId
-	 * @return PaperQuestion
+	 * @return
+	 * List<PaperQuestion>
 	 */
-	PaperQuestion getTopPaperQuestion(Integer paperId);
+	List<PaperQuestion> getList(Integer paperId);
 
 	/**
-	 * 获取试卷试题列表
+	 * 获取章节列表
 	 * 
-	 * v1.0 zhanghc 2017年6月29日下午2:49:32
+	 * v1.0 zhanghc 2018年10月21日下午2:43:46
 	 * @param paperId
 	 * @return List<PaperQuestion>
 	 */
-	List<PaperQuestion> getPaperQuestionList(Integer paperId);
+	List<PaperQuestion> getChapterList(Integer paperId);
 
-	/**
-	 * 获取试卷试题
-	 * 
-	 * v1.0 zhanghc 2017年8月24日上午8:57:31
-	 * @param paperId
-	 * @param questionId
-	 * @return PaperQuestion
-	 */
-	PaperQuestion getEntity(Integer paperId, Integer questionId);
-	
 }

@@ -226,7 +226,7 @@
 		function toOrgEdit(id) {
 			$.ajax({
 				url : "org/toEdit",
-				data : {"id" : id},
+				data : {id : id},
 				dataType : "html",
 				success : function(obj) {
 					layer.open({

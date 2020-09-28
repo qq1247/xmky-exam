@@ -8,7 +8,7 @@
 			<div class="layui-input-block">
 				<input type="hidden" id="parentResId" name="parentId" value="${parentRes.id }" />
 				<input id="parentResName" name="parentName" value="${parentRes.name }" 
-					class="layui-input layui-disabled" lay-verify="required" readonly="readonly">
+					class="layui-input layui-disabled" lay-verify="required" readonly>
 			</div>
 		</div>
 	</div>

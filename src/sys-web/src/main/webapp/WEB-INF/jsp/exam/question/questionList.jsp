@@ -119,7 +119,7 @@
 				height : "full-180",
 				method : "post",
 				defaultToolbar : [],
-				parseData: function(question){
+				parseData: function(question) {
 					return {
 						"code" : question.succ,
 						"msg" : question.msg,
@@ -135,10 +135,10 @@
 					statusCode : true
 				}
 			});
-			layui.table.on("rowDouble(questionTable)", function(obj){
+			layui.table.on("rowDouble(questionTable)", function(obj) {
 				<my:auth url="question/toEdit">toQuestionEdit(obj.data.ID);</my:auth>
 			});
-			layui.table.on("tool(questionTable)", function(obj){
+			layui.table.on("tool(questionTable)", function(obj) {
 				var data = obj.data;
 				if(obj.event === "questionEdit") {
 					toQuestionEdit(obj.data.ID);
@@ -201,7 +201,7 @@
 		
 		//到达添加试题页面
 		function toQuestionAdd() {
-			if(!curSelQuestionTypeId){
+			if(!curSelQuestionTypeId) {
 				layer.alert("请选择试题分类！", {"title" : "提示消息"});
 				return;
 			}
@@ -216,10 +216,10 @@
 						content : obj,
 						btn : ["添加", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doQuestionAdd(index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							layui.layer.full(index);
 							
 							$("#questionTypeId").val(curSelQuestionTypeId);
@@ -229,7 +229,7 @@
 							UE.delEditor("analysis");
 							UE.getEditor("analysis");
 							
-							layui.form.on("radio(type)", function(data){
+							layui.form.on("radio(type)", function(data) {
 								initType();
 							});
 							
@@ -244,6 +244,7 @@
 		//完成试题添加
 		function doQuestionAdd(questionAddDialogIndex) {
 			layui.form.on("submit(questionEditBtn)", function(data) {
+				// 校验数据有效性
 				var titleUE = UE.getEditor("title");
 				if (!titleUE.hasContents()) {
 					layer.alert("题干不允许为空！", {"title" : "提示消息"});
@@ -252,7 +253,7 @@
 				data.field["title"] = titleUE.getContent();
 				
 				var typeValue = $("input[name='type']:checked").val();
-				if(typeValue == "1" || typeValue == "2"){//校验选项
+				if(typeValue == "1" || typeValue == "2") {//校验选项
 					var optionRows = $("#optionPanel").children();
 					for (var i = 0; i < optionRows.length - 1; i++) {
 						var optionUE = UE.getEditor("option" + optionLabs[i]);
@@ -282,7 +283,7 @@
 						layer.alert("请至少选择一个答案！", {"title" : "提示消息"});
 						return;
 					}
-					data.field["answer"] = answers.join(",");
+					data.field.answer = answers.join(",");
 				} else if (typeValue == "3") {
 					var answers = xmSelect.get("#answer", true).getValue("value");
 					if (answers.length == 0) {
@@ -290,26 +291,34 @@
 						return;
 					}
 					
-					data.field["answer"] = answers.join('\n');
-				} else if(typeValue == "5"){
+					data.field.answer = answers.join('\n');
+				} else if(typeValue == "5") {
 					var answerUE = UE.getEditor("answer");
 					if (!answerUE.hasContents()) {
 						layer.alert("答案不允许为空！", {"title" : "提示消息"});
 						return;
 					}
-					data.field["answer"] = answerUE.getContent();
+					data.field.answer = answerUE.getContent();
 				}
 				
 				var analysisUE = UE.getEditor("analysis");
 				if (analysisUE.hasContents()) {
-					data.field["analysis"] = analysisUE.getContent();
+					data.field.analysis = analysisUE.getContent();
 				}
 				
+				// 完成试题添加
 				layer.confirm("确定要添加？", function(index) {
 					var state = $("input[name='state']:checked").val();
 					if (!state) {
 						data.field.state = 2;
 					}
+					
+					var scoreOption = $("input[name='scoreOptions']:checked");
+					var scoreOptions = [];
+					scoreOption.each(function (index, domEle) { 
+						scoreOptions.push(domEle.value);
+					});
+					data.field.scoreOptions = scoreOptions;
 					
 					$.ajax({
 						url : "question/doAdd",
@@ -335,7 +344,7 @@
 		function toQuestionEdit(id) {
 			$.ajax({
 				url : "question/toEdit",
-				data : {"id" : id},
+				data : {id : id},
 				dataType : "html",
 				success : function(obj) {
 					layer.open({
@@ -344,14 +353,14 @@
 						content : obj,
 						btn : ["修改", "生成新版本", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doQuestionEdit(index, false);
 						},
-						btn2 : function(index, layero){
+						btn2 : function(index, layero) {
 							doQuestionEdit(index, true);
 							return false;
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							layui.layer.full(index);
 							
 							UE.delEditor("title");
@@ -377,7 +386,7 @@
 				data.field["title"] = titleUE.getContent();
 				
 				var typeValue = $("input[name='type']:checked").val();
-				if(typeValue == "1" || typeValue == "2"){//校验选项
+				if(typeValue == "1" || typeValue == "2") {//校验选项
 					var optionRows = $("#optionPanel").children();
 					for (var i = 0; i < optionRows.length - 1; i++) {
 						var optionUE = UE.getEditor("option" + optionLabs[i]);
@@ -407,7 +416,7 @@
 						layer.alert("请至少选择一个答案！", {"title" : "提示消息"});
 						return;
 					}
-					data.field["answer"] = answers.join(",");
+					data.field.answer = answers.join(",");
 				} else if (typeValue == "3") {
 					var answers = xmSelect.get("#answer", true).getValue("value");
 					if (answers.length == 0) {
@@ -415,19 +424,19 @@
 						return;
 					}
 					
-					data.field["answer"] = answers.join('\n');
-				} else if(typeValue == "5"){
+					data.field.answer = answers.join('\n');
+				} else if(typeValue == "5") {
 					var answerUE = UE.getEditor("answer");
 					if (!answerUE.hasContents()) {
 						layer.alert("答案不允许为空！", {"title" : "提示消息"});
 						return;
 					}
-					data.field["answer"] = answerUE.getContent();
+					data.field.answer = answerUE.getContent();
 				}
 				
 				var analysisUE = UE.getEditor("analysis");
 				if (analysisUE.hasContents()) {
-					data.field["analysis"] = analysisUE.getContent();
+					data.field.analysis = analysisUE.getContent();
 				}
 				
 				var msg = newVer ? "确定要生成新版本？" : "当前修改会同步到引用的试卷<br/>确定要修改？";
@@ -437,6 +446,13 @@
 					if (!state) {
 						data.field.state = 2;
 					}
+					
+					var scoreOption = $("input[name='scoreOptions']:checked");
+					var scoreOptions = [];
+					scoreOption.each(function (index, domEle) { 
+						scoreOptions.push(domEle.value);
+					});
+					data.field.scoreOptions = scoreOptions;
 					
 					$.ajax({
 						url : "question/doEdit",
@@ -479,13 +495,14 @@
 		}
 		
 		//初始化类型
-		function initType(){
+		function initType() {
 			updateOptionPanel();
 			updateAnswerPanel();
+			updateScoreOptions();
 		}
 		
 		//更新选项面板
-		function updateOptionPanel(){
+		function updateOptionPanel() {
 			//恢复初始状态
 			var optionPanel = $("#optionPanel");
 			var optionRow = $("#optionRow");
@@ -495,17 +512,17 @@
 			
 			//如果不是单选、多选则不处理。
 			var typeValue = $("input[name='type']:checked").val();
-			if(typeValue != "1" && typeValue != "2"){
+			if(typeValue != "1" && typeValue != "2") {
 				return;
 			}
 			
 			//初始化选项面板
-			if(optionMinRow > optionLabs.length){
+			if(optionMinRow > optionLabs.length) {
 				return;
 			}
 			
 			optionRow.show();//后显示会有问题，js加载不到
-			for(var i = 0; i < optionMinRow; i++){
+			for(var i = 0; i < optionMinRow; i++) {
 				var optionLabVal = optionLabs[i];
 				var html = [];
 				html.push('<div class="layui-row layui-col-space10">');
@@ -572,7 +589,7 @@
 					empty : "",
 					layVerify: "required",
 					layVerType: "msg",
-					create : function(val, arr){
+					create : function(val, arr) {
 						return {
 							name: val,
 							value: val
@@ -603,7 +620,7 @@
 			var addBtnRow = $(curObj).parent().parent();
 			var optionRows = addBtnRow.parent().children();
 			
-			if(optionRows.length - 1 >= optionLabs.length){// 如果已加到最大添加行，则不处理
+			if(optionRows.length - 1 >= optionLabs.length) {// 如果已加到最大添加行，则不处理
 				return;
 			}
 			
@@ -630,7 +647,7 @@
 			var delBtnRow = $(curObj).parent().parent();
 			var optionRows = delBtnRow.parent().children();
 			
-			if(optionRows.length - 1 <= optionMinRow){// 如果已删到最小保留行，则不处理
+			if(optionRows.length - 1 <= optionMinRow) {// 如果已删到最小保留行，则不处理
 				return;
 			}
 			
@@ -639,9 +656,38 @@
 			updateAnswerPanel();
 		}
 		
+		// 更新分值选项
+		function updateScoreOptions() {
+			//恢复初始状态
+			var scoreOptionsPanel = $("#scoreOptionsPanel");
+			var scoreOptionsRow = $("#scoreOptionsRow");
+			
+			scoreOptionsPanel.empty();
+			scoreOptionsRow.hide();
+			
+			//如果不是多选、填空则不处理。
+			var typeValue = $("input[name='type']:checked").val();
+			if(typeValue != "2" && typeValue != "3") {
+				return;
+			}
+			
+			scoreOptionsRow.show();
+			var html = [];
+			if(typeValue == "2" || typeValue == "3") {
+				html.push('<input type="checkbox" lay-filter="scoreOptions" name="scoreOptions" value="1" lay-skin="switch" lay-text="半对半分|全对得分" >');
+			}
+			if (typeValue == "3") {
+				html.push('<input type="checkbox" lay-filter="scoreOptions" name="scoreOptions" value="2" lay-skin="switch" lay-text="答案无顺序|答案有顺序" >');
+				html.push('<input type="checkbox" lay-filter="scoreOptions" name="scoreOptions" value="3" lay-skin="switch" lay-text="大小写不敏感|大小写敏感" >');
+				html.push('<input type="checkbox" lay-filter="scoreOptions" name="scoreOptions" value="4" lay-skin="switch" lay-text="包含答案得分|等于答案得分" >');
+			}
+			scoreOptionsPanel.append(html.join(""));
+			layui.form.render(null, "questionEditFrom");
+		}
+		
 		// word模板导出
 		function wordTemplateExport() {
-			window.location.href = "home/question/wordTemplateExport";
+			window.location.href = "question/wordTemplateExport";
 		}
 		
 		// word试题导出
@@ -661,7 +707,7 @@
 				},
 				init : {
 					FilesAdded : function(up, files) {
-						if(!curSelQuestionTypeId){
+						if(!curSelQuestionTypeId) {
 							layer.alert("请选择试题分类！", {"title" : "提示消息"});
 							return;
 						}
@@ -679,7 +725,7 @@
 						var response = $.parseJSON(responseObj.response);
 						layer.alert(response.msg, {"title" : "提示消息"});
 					},
-					UploadComplete : function(up, files){//所有附件上传完成后
+					UploadComplete : function(up, files) {//所有附件上传完成后
 						
 					},
 					Error : function(up, err) { //客户端的错误消息。如附件大小错误，附件不存在， http错误等。

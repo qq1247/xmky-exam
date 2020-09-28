@@ -162,7 +162,7 @@
 		function toDictEdit(id) {
 			$.ajax({
 				url : "dict/toEdit",
-				data : {"id" : id},
+				data : {id : id},
 				dataType : "html",
 				success : function(obj) {
 					layer.open({

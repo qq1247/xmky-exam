@@ -367,10 +367,10 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 //	public void doExamUserAdd(LoginUser user, Integer id, Integer[] userIds) {
 //		//校验数据有效性
 //		if(id == null){
-//			throw new RuntimeException("无法获取参数：id");
+//			throw new RuntimeException("参数错误：id");
 //		}
 //		if(!ValidateUtil.isValid(userIds)){
-//			throw new RuntimeException("无法获取参数：userIds");
+//			throw new RuntimeException("参数错误：userIds");
 //		}
 //		Exam exam = getEntity(id);
 //		if(exam.getState() == 0){
@@ -414,7 +414,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 //	public void doExamUserDel(Integer[] examUserIds) {
 //		//校验数据有效性
 //		if(!ValidateUtil.isValid(examUserIds)){
-//			throw new RuntimeException("无法获取参数：examUserIds");
+//			throw new RuntimeException("参数错误：examUserIds");
 //		}
 //		
 //		ExamUser examUser = examUserService.getEntity(examUserIds[0]);
@@ -505,11 +505,11 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 //	public void updateAnswer(LoginUser user, Integer examUserQuestionId, String answer) {
 //		//校验数据有效性
 //		if(examUserQuestionId == null){
-//			throw new RuntimeException("无法获取参数：examUserQuestionId");
+//			throw new RuntimeException("参数错误：examUserQuestionId");
 //		}
 //		
 ////		if(!ValidateUtil.isValid(answer)){
-////			throw new RuntimeException("无法获取参数：answer");
+////			throw new RuntimeException("参数错误：answer");
 ////		}//如取消勾选则为空
 //		
 //		ExamUserQuestion examUserQuestion = examUserQuestionService.getEntity(examUserQuestionId);
@@ -693,7 +693,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 //	public void delAndUpdate(Integer[] ids) {
 //		//校验数据有效性
 //		if(!ValidateUtil.isValid(ids)){
-//			throw new RuntimeException("无法获取参数：ids");
+//			throw new RuntimeException("参数错误：ids");
 //		}
 //		
 //		//删除试题
@@ -737,10 +737,10 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 //	public void doMarkUserAdd(Integer id, Integer[] userIds) {
 //		//校验数据有效性
 //		if(id == null){
-//			throw new RuntimeException("无法获取参数：id");
+//			throw new RuntimeException("参数错误：id");
 //		}
 //		if(!ValidateUtil.isValid(userIds)){
-//			throw new RuntimeException("无法获取参数：userIds");
+//			throw new RuntimeException("参数错误：userIds");
 //		}
 //		Exam exam = getEntity(id);
 //		if(exam.getState() == 0){
@@ -769,7 +769,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 //	public void doMarkUserDel(Integer[] markUserIds) {
 //		//校验数据有效性
 //		if(!ValidateUtil.isValid(markUserIds)){
-//			throw new RuntimeException("无法获取参数：markUserIds");
+//			throw new RuntimeException("参数错误：markUserIds");
 //		}
 //		MarkUser markUser = markUserService.getEntity(markUserIds[0]);
 //		Exam exam = getEntity(markUser.getExamId());

@@ -1,11 +1,14 @@
 package com.wcpdoc.exam.core.util;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
@@ -22,6 +25,15 @@ import com.wcpdoc.exam.core.exception.MyException;
  */
 public class StringUtil {
 	private static final Random random = new Random();
+	
+	private static FileWriter fw = null;
+	static {
+		try {
+			fw = new FileWriter(new File("d:/123.txt"), true);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	/**
 	 * 获取字符串
@@ -302,8 +314,23 @@ public class StringUtil {
 		return value.toString();
 	}
 	
-	public static void main(String[] args) {
-		int maxValue = Integer.MAX_VALUE;
-		System.err.println(maxValue);
+	public static void log(String str) {
+		try {
+			fw.write(str);
+			fw.write(String.format("	%s		%s", DateUtil.formatDateTime(new Date()), Thread.currentThread().getName()));
+			fw.write('\n');
+			fw.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	} 
+	
+	public static void main(String[] args) throws IOException {
+		StringUtil.log("123");
+		StringUtil.log("456");
+		StringUtil.log("321");
+		
+		
 	}
 }

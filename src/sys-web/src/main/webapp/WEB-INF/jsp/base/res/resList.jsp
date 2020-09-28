@@ -243,7 +243,7 @@
 		function toResEdit(id) {
 			$.ajax({
 				url : "res/toEdit",
-				data : {"id" : id},
+				data : {id : id},
 				dataType : "html",
 				success : function(obj) {
 					layer.open({
@@ -371,8 +371,8 @@
 				$.ajax({
 					url : "res/doMove",
 					data : {
-						"sourceId" : sourceId, 
-						"targetId" : targetId
+						sourceId : sourceId, 
+						targetId : targetId
 					},
 					success : function(obj){
 						resTreeFlush();

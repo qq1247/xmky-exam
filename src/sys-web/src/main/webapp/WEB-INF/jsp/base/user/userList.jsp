@@ -237,7 +237,7 @@
 		function toUserEdit(id) {
 			$.ajax({
 				url : "user/toEdit",
-				data : {"id" : id},
+				data : {id : id},
 				dataType : "html",
 				success : function(obj) {
 					layer.open({

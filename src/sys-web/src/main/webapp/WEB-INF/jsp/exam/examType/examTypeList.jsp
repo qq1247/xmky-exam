@@ -228,7 +228,7 @@
 		function toExamTypeEdit(id) {
 			$.ajax({
 				url : "examType/toEdit",
-				data : {"id" : id},
+				data : {id : id},
 				dataType : "html",
 				success : function(obj) {
 					layer.open({
@@ -382,7 +382,7 @@
 		function toExamTypeAuth(id) {
 			$.ajax({
 				url : "examType/toAuth",
-				data : {"id" : id},
+				data : {id : id},
 				dataType : "html",
 				success : function(obj) {
 					layer.open({
