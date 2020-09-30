@@ -42,7 +42,7 @@
 						</div>
 						<script type="text/html" id="paperToolbar">
 						<my:auth url="paper/toEdit"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="paperEdit"><i class="layui-icon layui-icon-edit"></i>修改</a></my:auth>
-						<my:auth url="paper/toCfg"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="paperCfg"><i class="layui-icon layui-icon-edit"></i>配置</a></my:auth>
+						<my:auth url="paper/toCfg"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="paperCfg"><i class="layui-icon layui-icon-edit"></i>配置试卷</a></my:auth>
 						<my:auth url="paper/doDel"><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="paperDel"><i class="layui-icon layui-icon-delete"></i>删除</a></my:auth>
 					</script>
 						<%-- 试卷数据表格 --%>
@@ -76,6 +76,7 @@
 				url : "paper/list",
 				cols : [[
 						{field : "NAME", title : "名称", align : "center"},
+						{field : "PASS_SCORE", title : "及格分数", align : "center"},
 						{field : "TOTAL_SCORE", title : "总分数", align : "center"},
 						{field : "PAPER_TYPE_NAME", title : "试卷分类", align : "center"},
 						{fixed: 'right', title : "操作 ", toolbar : "#paperToolbar", align : "center", width : 280}

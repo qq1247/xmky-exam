@@ -5,6 +5,8 @@ import java.security.MessageDigest;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 
+import com.wcpdoc.exam.core.exception.MyException;
+
 /**
  * 加密工具类
  * 
@@ -27,7 +29,7 @@ public class EncryptUtil {
 			byte[] digest = md5.digest(key.getBytes(charset));
 			return Base64.encodeBase64String(digest);
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new MyException(e);
 		}
 	}
 
@@ -57,7 +59,7 @@ public class EncryptUtil {
 			byte[] digest = md5.digest(key.getBytes(charset));
 			return new String(Hex.encodeHex(digest));
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new MyException(e);
 		}
 	}
 	

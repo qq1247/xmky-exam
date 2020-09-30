@@ -12,7 +12,7 @@ import javax.persistence.Table;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import com.wcpdoc.exam.core.util.DateUtil;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * 考试用户实体
@@ -30,21 +30,24 @@ public class ExamUser {
 	private Integer examId;
 	@Column(name = "USER_ID")
 	private Integer userId;
-	@Column(name = "UPDATE_USER_ID")
-	private Integer updateUserId;
-	@Column(name = "UPDATE_TIME")
-	@DateTimeFormat(pattern = DateUtil.FORMAT_DATE_TIME)
-	private Date updateTime;
-	@Column(name = "UPDATE_MARK_USER_ID")
-	private Integer updateMarkUserId;
-	@Column(name = "UPDATE_MARK_TIME")
-	@DateTimeFormat(pattern = DateUtil.FORMAT_DATE_TIME)
-	private Date updateMarkTime;
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@Column(name = "ANSWER_TIME")
+	private Date answerTime;
+	@Column(name = "MARK_USER_ID")
+	private Integer markUserId;
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@Column(name = "MARK_USER_TIME")
+	private Date markUserTime;
 	@Column(name = "TOTAL_SCORE")
 	private BigDecimal totalScore;
 	@Column(name = "STATE")
 	private Integer state;
-	
+	@Column(name = "MARK_STATE")
+	private Integer markState;
+	@Column(name = "ANSWER_STATE")
+	private Integer answerState;
 	public Integer getId() {
 		return id;
 	}
@@ -63,29 +66,23 @@ public class ExamUser {
 	public void setUserId(Integer userId) {
 		this.userId = userId;
 	}
-	public Integer getUpdateUserId() {
-		return updateUserId;
+	public Date getAnswerTime() {
+		return answerTime;
 	}
-	public void setUpdateUserId(Integer updateUserId) {
-		this.updateUserId = updateUserId;
+	public void setAnswerTime(Date answerTime) {
+		this.answerTime = answerTime;
 	}
-	public Date getUpdateTime() {
-		return updateTime;
+	public Integer getMarkUserId() {
+		return markUserId;
 	}
-	public void setUpdateTime(Date updateTime) {
-		this.updateTime = updateTime;
+	public void setMarkUserId(Integer markUserId) {
+		this.markUserId = markUserId;
 	}
-	public Integer getUpdateMarkUserId() {
-		return updateMarkUserId;
+	public Date getMarkUserTime() {
+		return markUserTime;
 	}
-	public void setUpdateMarkUserId(Integer updateMarkUserId) {
-		this.updateMarkUserId = updateMarkUserId;
-	}
-	public Date getUpdateMarkTime() {
-		return updateMarkTime;
-	}
-	public void setUpdateMarkTime(Date updateMarkTime) {
-		this.updateMarkTime = updateMarkTime;
+	public void setMarkUserTime(Date markUserTime) {
+		this.markUserTime = markUserTime;
 	}
 	public BigDecimal getTotalScore() {
 		return totalScore;
@@ -98,5 +95,17 @@ public class ExamUser {
 	}
 	public void setState(Integer state) {
 		this.state = state;
+	}
+	public Integer getMarkState() {
+		return markState;
+	}
+	public void setMarkState(Integer markState) {
+		this.markState = markState;
+	}
+	public Integer getAnswerState() {
+		return answerState;
+	}
+	public void setAnswerState(Integer answerState) {
+		this.answerState = answerState;
 	}
 }

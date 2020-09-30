@@ -406,8 +406,8 @@
 								toolbar : { show: true },
 								filterable : true,
 								remoteSearch : true,
-								tips : "请输入",
-								searchTips : "请输入",
+								tips : "请输入用户昵称",
+								searchTips : "请输入用户昵称",
 								remoteMethod : function(val, cb, show){
 									if(!val){
 										return cb([]);
@@ -455,8 +455,8 @@
 								toolbar : { show: true },
 								filterable : true,
 								remoteSearch : true,
-								tips : "请输入",
-								searchTips : "请输入",
+								tips : "请输入岗位名称",
+								searchTips : "请输入岗位名称",
 								remoteMethod : function(val, cb, show){
 									if(!val){
 										return cb([]);
@@ -504,8 +504,8 @@
 								toolbar : { show: true },
 								filterable : true,
 								remoteSearch : true,
-								tips : "请输入",
-								searchTips : "请输入",
+								tips : "请输入组织机构名称",
+								searchTips : "请输入组织机构名称",
 								remoteMethod : function(val, cb, show){
 									if(!val){
 										return cb([]);

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wcpdoc.exam.base.cache.DictCache;
+import com.wcpdoc.exam.core.constant.ConstantManager;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
@@ -26,6 +27,7 @@ import com.wcpdoc.exam.core.service.PaperQuestionService;
 import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.PaperTypeService;
 import com.wcpdoc.exam.core.service.QuestionService;
+import com.wcpdoc.exam.core.service.QuestionTypeService;
 /**
  * 试卷控制层
  * 
@@ -42,6 +44,8 @@ public class PaperController extends BaseController {
 	private PaperTypeService paperTypeService;
 	@Resource
 	private PaperQuestionService paperQuestionService;
+	@Resource
+	private QuestionTypeService questionTypeService;
 	@Resource
 	private QuestionService questionService;
 	
@@ -71,7 +75,7 @@ public class PaperController extends BaseController {
 	@ResponseBody
 	public PageResult paperTypeTreeList() {
 		try {
-			return new PageResultEx(true, "查询成功", paperTypeService.getTreeList());
+			return new PageResultEx(true, "查询成功", paperTypeService.getAuthTreeList());
 		} catch (Exception e) {
 			log.error("试卷分类树错误：", e);
 			return new PageResult(false, "查询失败");
@@ -88,6 +92,9 @@ public class PaperController extends BaseController {
 	@ResponseBody
 	public PageResult list(PageIn pageIn) {
 		try {
+			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())){
+				pageIn.setTen(getCurUser().getId().toString());
+			}
 			return new PageResultEx(true, "查询成功", paperService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("试卷列表错误：", e);
@@ -128,6 +135,7 @@ public class PaperController extends BaseController {
 		try {
 			paper.setUpdateUserId(getCurUser().getId());
 			paper.setUpdateTime(new Date());
+			paper.setTotalScore(BigDecimal.ZERO);
 			paperService.add(paper);
 			return new PageResult(true, "添加成功");
 		} catch (MyException e) {
@@ -174,10 +182,19 @@ public class PaperController extends BaseController {
 //			entity.setPaperTypeId(paper.getPaperTypeId());//不需要修改
 			entity.setName(paper.getName());
 			entity.setPreviewType(paper.getPreviewType());
+			entity.setPassScore(paper.getPassScore());
 			entity.setScoreA(paper.getScoreA());
 			entity.setScoreARemark(paper.getScoreARemark());
-			
+			entity.setScoreB(paper.getScoreB());
+			entity.setScoreBRemark(paper.getScoreBRemark());
+			entity.setScoreC(paper.getScoreC());
+			entity.setScoreCRemark(paper.getScoreCRemark());
+			entity.setScoreD(paper.getScoreD());
+			entity.setScoreDRemark(paper.getScoreDRemark());
+			entity.setScoreE(paper.getScoreE());
+			entity.setScoreERemark(paper.getScoreERemark());
 			entity.setDescription(paper.getDescription());
+			entity.setState(paper.getState());
 			entity.setUpdateUserId(getCurUser().getId());
 			entity.setUpdateTime(new Date());
 			paperService.update(entity);
@@ -269,9 +286,12 @@ public class PaperController extends BaseController {
 		try {
 			paperService.doChapterAdd(chapter);
 			return new PageResult(true, "添加成功");
+		} catch (MyException e) {
+			log.error("完成添加章节错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加章节错误：", e);
-			return new PageResult(false, "添加失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 	
@@ -310,7 +330,7 @@ public class PaperController extends BaseController {
 			return new PageResult(true, "修改成功");
 		} catch (Exception e) {
 			log.error("完成修改章节错误：", e);
-			return new PageResult(false, "修改失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 	
@@ -328,9 +348,12 @@ public class PaperController extends BaseController {
 		try {
 			paperService.doChapterDel(chapterId);
 			return new PageResult(true, "删除成功");
+		} catch (MyException e) {
+			log.error("完成删除章节错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("完成删除章节错误：", e);
-			return new PageResult(false, "删除失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 	
@@ -347,9 +370,12 @@ public class PaperController extends BaseController {
 		try {
 			paperService.doChapterUp(chapterId);
 			return new PageResult(true, "移动成功");
+		} catch (MyException e) {
+			log.error("完成章节上移错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("完成章节上移错误：", e);
-			return new PageResult(false, "移动失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 	
@@ -366,9 +392,12 @@ public class PaperController extends BaseController {
 		try {
 			paperService.doChapterDown(chapterId);
 			return new PageResult(true, "移动成功");
+		} catch (MyException e) {
+			log.error("完成章节下移错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("完成章节下移错误：", e);
-			return new PageResult(false, "移动失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 	
@@ -404,7 +433,7 @@ public class PaperController extends BaseController {
 	@ResponseBody
 	public PageResult questionTypeTreeList() {
 		try {
-			return new PageResultEx(true, "查询成功", questionService.getQuestionTypeTreeList());
+			return new PageResultEx(true, "查询成功", questionTypeService.getAuthTreeList());
 		} catch (Exception e) {
 			log.error("获取试题分类树错误：", e);
 			return new PageResult(false, "查询失败");
@@ -448,9 +477,12 @@ public class PaperController extends BaseController {
 		try {
 			paperService.doQuestionAdd(chapterId, questionIds);
 			return new PageResult(true, "添加成功");
+		} catch (MyException e) {
+			log.error("完成添加试题错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加试题错误：", e);
-			return new PageResult(false, "添加失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 	
@@ -469,9 +501,12 @@ public class PaperController extends BaseController {
 		try {
 			paperService.doScoreUpdate(paperQuestionId, score);
 			return new PageResult(true, "设置成功");
+		} catch (MyException e) {
+			log.error("完成设置分数错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("完成设置分数错误：", e);
-			return new PageResult(false, "设置失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 	
@@ -489,9 +524,12 @@ public class PaperController extends BaseController {
 		try {
 			paperService.doOptionsUpdate(paperQuestionId, options);
 			return new PageResult(true, "设置成功");
+		} catch (MyException e) {
+			log.error("完成设置分数错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("完成设置分数错误：", e);
-			return new PageResult(false, "设置失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 	
@@ -508,9 +546,12 @@ public class PaperController extends BaseController {
 		try {
 			paperService.doQuestionUp(paperQuestionId);
 			return new PageResult(true, "移动成功");
+		} catch (MyException e) {
+			log.error("完成试题上移错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("完成试题上移错误：", e);
-			return new PageResult(false, "移动失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 	
@@ -527,9 +568,12 @@ public class PaperController extends BaseController {
 		try {
 			paperService.doQuestionDown(paperQuestionId);
 			return new PageResult(true, "移动成功");
+		} catch (MyException e) {
+			log.error("完成试题下移错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("完成试题下移错误：", e);
-			return new PageResult(false, "移动失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 	
@@ -546,9 +590,12 @@ public class PaperController extends BaseController {
 		try {
 			paperService.doQuestionDel(paperQuestionId);
 			return new PageResult(true, "删除成功");
+		} catch (MyException e) {
+			log.error("完成试题删除错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("完成试题删除错误：", e);
-			return new PageResult(false, "删除失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 	
@@ -565,9 +612,12 @@ public class PaperController extends BaseController {
 		try {
 			paperService.doQuestionClear(chapterId);
 			return new PageResult(true, "添加成功");
+		} catch (MyException e) {
+			log.error("完成添加试题错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加试题错误：", e);
-			return new PageResult(false, "添加失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 }

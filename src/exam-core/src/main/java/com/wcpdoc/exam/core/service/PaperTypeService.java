@@ -35,6 +35,14 @@ public interface PaperTypeService extends BaseService<PaperType> {
 	 * @return List<Map<String,Object>>
 	 */
 	List<Map<String, Object>> getTreeList();
+	
+	/**
+	 * 获取试卷分类树
+	 * 
+	 * v1.0 zhanghc 2020年9月28日下午5:24:52
+	 * @return Object
+	 */
+	List<Map<String, Object>> getAuthTreeList();
 
 	/**
 	 * 移动试卷分类

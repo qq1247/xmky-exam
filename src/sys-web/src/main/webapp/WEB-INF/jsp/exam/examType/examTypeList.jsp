@@ -406,10 +406,10 @@
 								toolbar : { show: true },
 								filterable : true,
 								remoteSearch : true,
-								tips : "请输入",
-								searchTips : "请输入",
+								tips : "请输入用户昵称",
+								searchTips : "请输入用户昵称",
 								remoteMethod : function(val, cb, show){
-									if(!val){
+									if(!val) {
 										return cb([]);
 									}
 									
@@ -429,11 +429,11 @@
 									});
 								},
 							});
-							
 							$.ajax({
 								url : "examType/authUserList",
 								data : {
-									ten : id
+									ten : id,
+									pageSize : 100
 								},
 								async : true,
 								success : function(obj) {
@@ -455,8 +455,8 @@
 								toolbar : { show: true },
 								filterable : true,
 								remoteSearch : true,
-								tips : "请输入",
-								searchTips : "请输入",
+								tips : "请输入岗位名称",
+								searchTips : "请输入岗位名称",
 								remoteMethod : function(val, cb, show){
 									if(!val){
 										return cb([]);
@@ -478,11 +478,11 @@
 									});
 								},
 							});
-							
 							$.ajax({
 								url : "examType/authPostList",
 								data : {
-									ten : id
+									ten : id,
+									pageSize : 100
 								},
 								async : true,
 								success : function(obj) {
@@ -504,8 +504,8 @@
 								toolbar : { show: true },
 								filterable : true,
 								remoteSearch : true,
-								tips : "请输入",
-								searchTips : "请输入",
+								tips : "请输入组织机构名称",
+								searchTips : "请输入组织机构名称",
 								remoteMethod : function(val, cb, show){
 									if(!val){
 										return cb([]);
@@ -531,7 +531,8 @@
 							$.ajax({
 								url : "examType/authOrgList",
 								data : {
-									ten : id
+									ten : id,
+									pageSize : 100
 								},
 								async : true,
 								success : function(obj) {

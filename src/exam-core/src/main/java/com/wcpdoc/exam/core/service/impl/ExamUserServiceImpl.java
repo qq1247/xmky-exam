@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.core.service.impl;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
@@ -34,5 +36,10 @@ public class ExamUserServiceImpl extends BaseServiceImp<ExamUser> implements Exa
 	@Override
 	public ExamUser getEntity(Integer examId, Integer userId) {
 		return examUserDao.getEntity(examId, userId);
+	}
+
+	@Override
+	public List<ExamUser> getList(Integer examId) {
+		return examUserDao.getList(examId);
 	}
 }

@@ -52,7 +52,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	public void doChapterAdd(PaperQuestion chapter) {
 		//校验数据有效性
 		if(chapter.getPaperId() == null){
-			throw new RuntimeException("参数错误：paperId");
+			throw new MyException("参数错误：paperId");
 		}
 				
 		//添加章节
@@ -99,7 +99,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	public void doChapterUp(Integer chapterId){
 		//校验数据有效性
 		if(chapterId == null){
-			throw new RuntimeException("无法获取参数：chapterId");
+			throw new MyException("无法获取参数：chapterId");
 		}
 		
 		//当前章节上移
@@ -128,7 +128,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	public void doChapterDown(Integer chapterId) {
 		//校验数据有效性
 		if(chapterId == null){
-			throw new RuntimeException("无法获取参数：chapterId");
+			throw new MyException("无法获取参数：chapterId");
 		}
 		
 		//当前章节下移
@@ -210,10 +210,10 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	public void doQuestionAdd(Integer chapterId, Integer[] questionIds) {
 		// 校验数据有效性
 		if (chapterId == null) {
-			throw new RuntimeException("无法获取参数：chapterId");
+			throw new MyException("无法获取参数：chapterId");
 		}
 		if (!ValidateUtil.isValid(questionIds)) {
-			throw new RuntimeException("无法获取参数：questionIds");
+			throw new MyException("无法获取参数：questionIds");
 		}
 
 		// 添加试题
@@ -244,10 +244,10 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	public void doScoreUpdate(Integer paperQuestionId, BigDecimal score) {
 		//校验数据有效性
 		if(paperQuestionId == null){
-			throw new RuntimeException("无法获取参数：paperQuestionId");
+			throw new MyException("无法获取参数：paperQuestionId");
 		}
 		if(score == null){
-			throw new RuntimeException("无法获取参数：score");
+			throw new MyException("无法获取参数：score");
 		}
 		
 		PaperQuestion pq = paperQuestionService.getEntity(paperQuestionId);
@@ -262,7 +262,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	public void doOptionsUpdate(Integer paperQuestionId, Integer[] options) {
 		// 校验数据有效性
 		if (paperQuestionId == null) {
-			throw new RuntimeException("无法获取参数：paperQuestionId");
+			throw new MyException("无法获取参数：paperQuestionId");
 		}
 
 		// 更新试卷选项
@@ -287,7 +287,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	public void doQuestionUp(Integer paperQuestionId) {
 		//校验数据有效性
 		if(paperQuestionId == null){
-			throw new RuntimeException("无法获取参数：paperQuestionId");
+			throw new MyException("无法获取参数：paperQuestionId");
 		}
 		
 		//当前试题上移
@@ -317,7 +317,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	public void doQuestionDown(Integer paperQuestionId) {
 		//校验数据有效性
 		if(paperQuestionId == null){
-			throw new RuntimeException("无法获取参数：paperQuestionId");
+			throw new MyException("无法获取参数：paperQuestionId");
 		}
 		
 		//当前试题下移
@@ -372,7 +372,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	public void doQuestionClear(Integer chapterId) {
 		// 校验数据有效性
 		if (chapterId == null) {
-			throw new RuntimeException("无法获取参数：chapterId");
+			throw new MyException("无法获取参数：chapterId");
 		}
 
 		// 清空试题

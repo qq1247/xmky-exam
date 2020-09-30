@@ -328,9 +328,12 @@ public class PaperTypeController extends BaseController {
 		try {
 			paperTypeService.doAuth(id, userIds, postIds, orgIds, syn2Sub);
 			return new PageResult(true, "添加成功");
+		} catch (MyException e) {
+			log.error("完成添加权限用户错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加权限用户错误：", e);
-			return new PageResult(false, "添加失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 }

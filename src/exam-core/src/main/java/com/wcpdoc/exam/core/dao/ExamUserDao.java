@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.core.dao;
 
+import java.util.List;
+
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.entity.ExamUser;
 
@@ -29,5 +31,14 @@ public interface ExamUserDao extends BaseDao<ExamUser>{
 	 * @return ExamUser
 	 */
 	ExamUser getEntity(Integer examId, Integer userId);
+
+	/**
+	 * 获取考试用户
+	 * 
+	 * v1.0 zhanghc 2020年9月30日上午11:00:50
+	 * @param examId
+	 * @return List<ExamUser>
+	 */
+	List<ExamUser> getList(Integer examId);
 	
 }

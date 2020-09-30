@@ -5,6 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.wcpdoc.exam.core.exception.MyException;
+
 /**
  * 日期工具类
  * 
@@ -64,7 +66,7 @@ public class DateUtil {
 		try {
 			return format.parse(dateStr);
 		} catch (ParseException e) {
-			throw new RuntimeException(String.format("时间格式化异常：%s,%s", dateStr, pattern));
+			throw new MyException(String.format("时间格式化异常：%s,%s", dateStr, pattern));
 		}
 	}
 	

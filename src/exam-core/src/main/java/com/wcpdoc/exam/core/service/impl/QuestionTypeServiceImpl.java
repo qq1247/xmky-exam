@@ -1,15 +1,23 @@
 package com.wcpdoc.exam.core.service.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.base.service.OrgService;
 import com.wcpdoc.exam.base.service.PostService;
+import com.wcpdoc.exam.base.service.UserService;
+import com.wcpdoc.exam.core.constant.ConstantManager;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.QuestionTypeDao;
 import com.wcpdoc.exam.core.entity.PageIn;
@@ -35,6 +43,8 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	private OrgService orgService;
 	@Resource
 	private PostService postService;
+	@Resource
+	private UserService userService;
 
 	@Override
 	@Resource(name = "questionTypeDaoImpl")
@@ -93,6 +103,48 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	@Override
 	public List<Map<String, Object>> getTreeList() {
 		return questionTypeDao.getTreeList();
+	}
+	
+	@Override
+	public List<Map<String, Object>> getAuthTreeList() {
+		User user = userService.getEntity(getCurUser().getId());
+		List<QuestionType> questionTypeList = getList();
+		
+		List<Map<String, Object>> questionTypeTreeList = new ArrayList<Map<String,Object>>();
+		for(QuestionType questionType : questionTypeList){
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("ID", questionType.getId());
+			map.put("NAME", questionType.getName());
+			map.put("PARENT_ID", questionType.getParentId());
+			
+			if(ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())){// 系统管理员，拥有所有权限
+				questionTypeTreeList.add(map);
+				continue;
+			}
+			if(ValidateUtil.isValid(questionType.getUserIds()) 
+					&& questionType.getUserIds().contains(String.format(",%s,", user.getId()))){//有用户权限
+				questionTypeTreeList.add(map);
+				continue;
+			}
+			if(ValidateUtil.isValid(questionType.getOrgIds())
+					&& questionType.getOrgIds().contains(String.format(",%s,", user.getOrgId()))){//有机构权限
+				questionTypeTreeList.add(map);
+				continue;
+			}
+			if (ValidateUtil.isValid(questionType.getPostIds())
+					&& ValidateUtil.isValid(user.getPostIds())) {
+				Set<String> postList = new HashSet<>(Arrays.asList(user.getPostIds().substring(1, user.getPostIds().length() - 1).split(",")));
+				for(String postId : postList){
+					if (postService.getEntity(Integer.parseInt(postId)).getState() == 1
+							&& questionType.getPostIds().contains(String.format(",%s,", postId))) {//有岗位权限
+						questionTypeTreeList.add(map);
+						continue;
+					}
+				}
+			}
+		}
+		
+		return questionTypeTreeList;
 	}
 	
 	@Override

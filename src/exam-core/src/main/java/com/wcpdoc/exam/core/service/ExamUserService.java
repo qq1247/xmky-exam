@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.core.service;
 
+import java.util.List;
+
 import com.wcpdoc.exam.core.entity.ExamUser;
 import com.wcpdoc.exam.core.service.BaseService;
 /**
@@ -28,5 +30,14 @@ public interface ExamUserService extends BaseService<ExamUser>{
 	 * @return ExamUser
 	 */
 	ExamUser getEntity(Integer examId, Integer userId);
+
+	/**
+	 * 获取考试用户列表
+	 * 
+	 * v1.0 zhanghc 2020年9月29日下午5:09:50
+	 * @param examId
+	 * @return List<ExamUser>
+	 */
+	List<ExamUser> getList(Integer examId);
 
 }

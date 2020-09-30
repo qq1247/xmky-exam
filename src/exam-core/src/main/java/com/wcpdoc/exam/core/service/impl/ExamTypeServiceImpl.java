@@ -1,20 +1,29 @@
 package com.wcpdoc.exam.core.service.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.base.service.OrgService;
 import com.wcpdoc.exam.base.service.PostService;
+import com.wcpdoc.exam.base.service.UserService;
+import com.wcpdoc.exam.core.constant.ConstantManager;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.ExamTypeDao;
 import com.wcpdoc.exam.core.entity.ExamType;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
+import com.wcpdoc.exam.core.entity.PaperType;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.ExamTypeExService;
 import com.wcpdoc.exam.core.service.ExamTypeService;
@@ -35,6 +44,8 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 	private OrgService orgService;
 	@Resource
 	private PostService postService;
+	@Resource
+	private UserService userService;
 
 	@Override
 	@Resource(name = "examTypeDaoImpl")
@@ -93,6 +104,48 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 	@Override
 	public List<Map<String, Object>> getTreeList() {
 		return examTypeDao.getTreeList();
+	}
+	
+	@Override
+	public List<Map<String, Object>> getAuthTreeList() {
+		User user = userService.getEntity(getCurUser().getId());
+		List<ExamType> examTypeList = getList();
+		
+		List<Map<String, Object>> examTypeTreeList = new ArrayList<Map<String,Object>>();
+		for(ExamType examType : examTypeList){
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("ID", examType.getId());
+			map.put("NAME", examType.getName());
+			map.put("PARENT_ID", examType.getParentId());
+			
+			if(ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())){// 系统管理员，拥有所有权限
+				examTypeTreeList.add(map);
+				continue;
+			}
+			if(ValidateUtil.isValid(examType.getUserIds()) 
+					&& examType.getUserIds().contains(String.format(",%s,", user.getId()))){//有用户权限
+				examTypeTreeList.add(map);
+				continue;
+			}
+			if(ValidateUtil.isValid(examType.getOrgIds())
+					&& examType.getOrgIds().contains(String.format(",%s,", user.getOrgId()))){//有机构权限
+				examTypeTreeList.add(map);
+				continue;
+			}
+			if (ValidateUtil.isValid(examType.getPostIds())
+					&& ValidateUtil.isValid(user.getPostIds())) {
+				Set<String> postList = new HashSet<>(Arrays.asList(user.getPostIds().substring(1, user.getPostIds().length() - 1).split(",")));
+				for(String postId : postList){
+					if (postService.getEntity(Integer.parseInt(postId)).getState() == 1
+							&& examType.getPostIds().contains(String.format(",%s,", postId))) {//有岗位权限
+						examTypeTreeList.add(map);
+						continue;
+					}
+				}
+			}
+		}
+		
+		return examTypeTreeList;
 	}
 	
 	@Override

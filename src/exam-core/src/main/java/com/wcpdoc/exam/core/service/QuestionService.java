@@ -1,7 +1,6 @@
 package com.wcpdoc.exam.core.service;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,14 +11,6 @@ import com.wcpdoc.exam.core.entity.Question;
  * v1.0 zhanghc 2017-05-07 14:56:29
  */
 public interface QuestionService extends BaseService<Question>{
-
-	/**
-	 * 获取试题分类树
-	 * 
-	 * v1.0 zhanghc 2017-05-07 14:56:29
-	 * @return List<Map<String,Object>>
-	 */
-	List<Map<String, Object>> getQuestionTypeTreeList();
 
 	/**
 	 * 获取试题列表

@@ -71,7 +71,7 @@ public class QuestionController extends BaseController {
 	@ResponseBody
 	public PageResult questionTypeTreeList() {
 		try {
-			return new PageResultEx(true, "查询成功", questionService.getQuestionTypeTreeList());
+			return new PageResultEx(true, "查询成功", questionTypeService.getAuthTreeList());
 		} catch (Exception e) {
 			log.error("获取试题分类树错误：", e);
 			return new PageResult(false, "查询失败");
@@ -231,9 +231,12 @@ public class QuestionController extends BaseController {
 		try {
 			questionService.wordImp(file, questionTypeId);
 			return new PageResult(true, "导入成功");
+		} catch (MyException e) {
+			log.error("导入试题错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("导入试题错误：", e);
-			return new PageResult(false, "导入失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 	
@@ -255,6 +258,8 @@ public class QuestionController extends BaseController {
 
 			output = response.getOutputStream();
 			FileUtils.copyFile(file, output);
+		} catch (MyException e) {
+			log.error("完成下载模板失败：{}", e.getMessage());
 		} catch (Exception e) {
 			log.error("完成下载模板失败：", e);
 		} finally {

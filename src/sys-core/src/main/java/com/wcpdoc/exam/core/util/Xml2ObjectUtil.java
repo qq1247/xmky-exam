@@ -7,6 +7,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import com.wcpdoc.exam.core.exception.MyException;
+
 /**
  * xml转对象工具类
  * 
@@ -20,7 +22,7 @@ public class Xml2ObjectUtil {
 			Unmarshaller unmarshaller = context.createUnmarshaller();
 			return (T) unmarshaller.unmarshal(new StringReader(xml));
 		} catch (Exception e) {
-			throw new RuntimeException("解析xml异常");
+			throw new MyException("解析xml异常");
 		}
 	}
 
@@ -33,7 +35,7 @@ public class Xml2ObjectUtil {
 			marshaller.marshal(object, xml);
 			return xml.toString();
 		} catch (Exception e) {
-			throw new RuntimeException("生成xml异常");
+			throw new MyException("生成xml异常");
 		}
 	}
 }

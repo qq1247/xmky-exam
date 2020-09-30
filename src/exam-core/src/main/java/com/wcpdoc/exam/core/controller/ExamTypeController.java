@@ -250,10 +250,10 @@ public class ExamTypeController extends BaseController {
 		try {
 			ExamType examType = examTypeService.getEntity(id);
 			model.addAttribute("examType", examType);
-			return "exam/examType/examTypeAuthList";
+			return "exam/examType/examTypeAuth";
 		} catch (Exception e) {
 			log.error("到达权限列表页面错误：", e);
-			return "exam/examType/examTypeAuthList";
+			return "exam/examType/examTypeAuth";
 		}
 	}
 	
@@ -328,9 +328,12 @@ public class ExamTypeController extends BaseController {
 		try {
 			examTypeService.doAuth(id, userIds, postIds, orgIds, syn2Sub);
 			return new PageResult(true, "添加成功");
+		} catch (MyException e) {
+			log.error("完成添加权限用户错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加权限用户错误：", e);
-			return new PageResult(false, "添加失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 }

@@ -23,8 +23,8 @@ import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
  * 试题分类控制层
- * v1.0 zhanghc 2016-5-24下午14:54:09
  * 
+ * v1.0 zhanghc 2016-5-24下午14:54:09
  */
 @Controller
 @RequestMapping("/questionType")
@@ -328,9 +328,12 @@ public class QuestionTypeController extends BaseController {
 		try {
 			questionTypeService.doAuth(id, userIds, postIds, orgIds, syn2Sub);
 			return new PageResult(true, "添加成功");
+		} catch (MyException e) {
+			log.error("完成添加权限用户错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加权限用户错误：", e);
-			return new PageResult(false, "添加失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 }

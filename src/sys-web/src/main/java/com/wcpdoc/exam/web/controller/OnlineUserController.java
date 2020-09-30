@@ -104,7 +104,7 @@ public class OnlineUserController extends BaseController{
 			return new PageResult(true, "强制退出成功");
 		} catch (Exception e) {
 			log.error("完成强制退出在线用户错误：", e);
-			return new PageResult(false, "强制退出失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 }

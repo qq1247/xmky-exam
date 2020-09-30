@@ -283,6 +283,7 @@ create table EXM_PAPER
    ID                   int not null auto_increment comment '主键',
    NAME                 varchar(32) comment '名称',
    PREVIEW_TYPE         int comment '1：整卷展示；2：单题展示；数据字典：PAPER_PREVIEW_TYPE',
+   PASS_SCORE           decimal(5,2) comment '及格分数',
    TOTAL_SCORE          decimal(5,2) comment '总分数',
    SCORE_A              decimal(5,2) comment '分数A',
    SCORE_A_REMARK       varchar(32) comment '分数A评语',
@@ -337,6 +338,144 @@ alter table EXM_PAPER_QUESTION add constraint FK_Reference_17 foreign key (QUEST
 
 alter table EXM_PAPER_QUESTION add constraint FK_Reference_18 foreign key (PAPER_ID)
       references EXM_PAPER (ID) on delete restrict on update restrict;
+
+drop table if exists EXM_EXAM_TYPE;
+
+/*==============================================================*/
+/* Table: EXM_EXAM_TYPE                                         */
+/*==============================================================*/
+create table EXM_EXAM_TYPE
+(
+   ID                   int not null auto_increment comment 'id',
+   NAME                 varchar(32) comment '名称',
+   PARENT_ID            int comment '父ID',
+   PARENT_SUB           varchar(512) comment '父子关系（格式：_父ID_子ID_子子ID_... ...）',
+   LEVEL                int comment '级别',
+   UPDATE_USER_ID       int comment '修改人',
+   UPDATE_TIME          datetime comment '修改时间',
+   STATE                int comment '0：删除；1：正常',
+   NO                   int comment '排序',
+   USER_IDS             varchar(1024) comment '用户权限。多用户用逗号分隔，如：,2,45,66,57,',
+   ORG_IDS              varchar(1024) comment '机构权限',
+   POST_IDS             varchar(1024) comment '岗位权限',
+   primary key (ID)
+);
+
+alter table EXM_EXAM_TYPE comment '考试分类';
+
+drop table if exists EXM_EXAM;
+
+/*==============================================================*/
+/* Table: EXM_EXAM                                              */
+/*==============================================================*/
+create table EXM_EXAM
+(
+   ID                   int not null auto_increment comment 'id',
+   NAME                 varchar(32) comment '名称',
+   PASS_SCORE           decimal(5,2) comment '及格分数',
+   START_TIME           datetime comment '考试开始',
+   END_TIME             datetime comment '考试结束',
+   MARK_START_TIME      datetime comment '判卷开始',
+   MARK_END_TIME        datetime comment '判卷结束',
+   GRADE_TYPE           int comment '1：展示；2：不展示',
+   SCORE_A              decimal(5,2) comment '分数A',
+   SCORE_A_REMARK       varchar(32) comment '分数A评语',
+   SCORE_B              decimal(5,2) comment '分数B',
+   SCORE_B_REMARK       varchar(32) comment '分数B评语',
+   SCORE_C              decimal(5,2) comment '分数C',
+   SCORE_C_REMARK       varchar(32) comment '分数C评语',
+   SCORE_D              decimal(5,2) comment '分数D',
+   SCORE_D_REMARK       varchar(32) comment '分数D评语',
+   SCORE_E              decimal(5,2) comment '分数E',
+   SCORE_E_REMARK       varchar(32) comment '分数E评语',
+   DESCRIPTION          varchar(512) comment '描述',
+   UPDATE_USER_ID       int comment '修改人',
+   UPDATE_TIME          datetime comment '修改时间',
+   STATE                int comment '0：删除；1：发布；2：草稿',
+   PAPER_ID             int comment '试卷ID',
+   EXAM_TYPE_ID         int comment '考试分类',
+   primary key (ID)
+);
+
+alter table EXM_EXAM comment '考试';
+
+alter table EXM_EXAM add constraint FK_Reference_19 foreign key (PAPER_ID)
+      references EXM_PAPER (ID) on delete restrict on update restrict;
+
+alter table EXM_EXAM add constraint FK_Reference_22 foreign key (EXAM_TYPE_ID)
+      references EXM_EXAM_TYPE (ID) on delete restrict on update restrict;
+
+drop table if exists EXM_MARK_USER;
+
+/*==============================================================*/
+/* Table: EXM_MARK_USER                                         */
+/*==============================================================*/
+create table EXM_MARK_USER
+(
+   ID                   int not null auto_increment comment 'id',
+   EXAM_ID              int comment '考试ID',
+   USER_ID              int comment '用户ID',
+   primary key (ID)
+);
+
+alter table EXM_MARK_USER comment '判卷用户';
+
+alter table EXM_MARK_USER add constraint FK_Reference_37 foreign key (EXAM_ID)
+      references EXM_EXAM (ID) on delete restrict on update restrict;
+
+drop table if exists EXM_EXAM_USER;
+
+/*==============================================================*/
+/* Table: EXM_EXAM_USER                                         */
+/*==============================================================*/
+create table EXM_EXAM_USER
+(
+   ID                   int not null auto_increment comment 'id',
+   EXAM_ID              int comment '考试ID',
+   USER_ID              int comment '用户ID',
+   ANSWER_TIME          datetime comment '答题时间',
+   MARK_USER_ID         int comment '判卷人',
+   MARK_USER_TIME       datetime comment '判卷时间',
+   TOTAL_SCORE          decimal(5,2) comment '总分数',
+   STATE                int comment '1：未考试；2：考试中；3：已交卷；4：强制交卷；',
+   MARK_STATE           int comment '1：未判卷；2：判卷中；3：已判卷；',
+   ANSWER_STATE         int comment '1：及格；2：不及格',
+   primary key (ID)
+);
+
+alter table EXM_EXAM_USER comment '考试用户';
+
+alter table EXM_EXAM_USER add constraint FK_Reference_23 foreign key (EXAM_ID)
+      references EXM_EXAM (ID) on delete restrict on update restrict;
+
+drop table if exists ZE_EXAM_USER_QUESTION;
+
+/*==============================================================*/
+/* Table: ZE_EXAM_USER_QUESTION                                 */
+/*==============================================================*/
+create table ZE_EXAM_USER_QUESTION
+(
+   ID                   int not null auto_increment comment 'id',
+   EXAM_USER_ID         int comment '考试用户ID',
+   EXAM_ID              int comment '考试ID',
+   USER_ID              int comment '用户ID',
+   QUESTION_ID          int comment '试题ID',
+   UPDATE_USER_ID       int comment '答题修改人',
+   UPDATE_TIME          datetime comment '答题修改时间',
+   UPDATE_MARK_USER_ID  int comment '判卷修改人',
+   UPDATE_MARK_TIME     datetime comment '判卷修改时间',
+   ANSWER               text comment '答案',
+   SCORE                decimal(5,2) comment '得分',
+   primary key (ID)
+);
+
+alter table ZE_EXAM_USER_QUESTION comment '考试用户试题';
+
+alter table ZE_EXAM_USER_QUESTION add constraint FK_Reference_24 foreign key (EXAM_USER_ID)
+      references EXM_EXAM_USER (ID) on delete restrict on update restrict;
+
+alter table ZE_EXAM_USER_QUESTION add constraint FK_Reference_25 foreign key (QUESTION_ID)
+      references EXM_QUESTION (ID) on delete restrict on update restrict;
 
 
 /*==============================================================*/
@@ -421,6 +560,12 @@ INSERT INTO `SYS_RES` VALUES ('73', '添加', 'paperType/toAdd|paperType/doAdd',
 INSERT INTO `SYS_RES` VALUES ('74', '修改', 'paperType/toEdit|paperType/doEdit', '71', '_1_2_55_71_74_', '5', '1', '2020-09-12 14:45:45', '3', '3', '512', '', '1');
 INSERT INTO `SYS_RES` VALUES ('75', '删除', 'paperType/doDel', '71', '_1_2_55_71_75_', '5', '1', '2020-09-12 14:45:57', '4', '3', '1024', '', '1');
 INSERT INTO `SYS_RES` VALUES ('76', '操作权限', 'paperType/toAuth|paperType/authUserList|paperType/authPostList|paperType/authOrgList|paperType/doAuth', '71', '_1_2_55_71_76_', '5', '1', '2020-09-12 14:47:46', '5', '3', '2048', '', '1');
+INSERT INTO `SYS_RES` VALUES ('77', '试卷管理', 'paper/toList', '55', '_1_2_55_77_', '4', '1', '2020-09-14 10:55:01', '7', '3', '4096', '', '1');
+INSERT INTO `SYS_RES` VALUES ('78', '列表', 'paper/paperTypeTreeList|paper/list', '77', '_1_2_55_77_78_', '5', '1', '2020-09-14 10:55:39', '1', '3', '8192', '', '1');
+INSERT INTO `SYS_RES` VALUES ('79', '添加', 'paper/toAdd|paper/doAdd', '77', '_1_2_55_77_79_', '5', '1', '2020-09-14 10:55:54', '2', '3', '16384', '', '1');
+INSERT INTO `SYS_RES` VALUES ('80', '修改', 'paper/toEdit|paper/doEdit', '77', '_1_2_55_77_80_', '5', '1', '2020-09-14 11:00:19', '3', '3', '32768', '', '1');
+INSERT INTO `SYS_RES` VALUES ('81', '删除', 'paper/doDel', '77', '_1_2_55_77_81_', '5', '1', '2020-09-14 11:00:33', '4', '3', '65536', '', '1');
+INSERT INTO `SYS_RES` VALUES ('82', '配置试卷', 'paper/toCfg|paper/toChapterAdd|paper/doChapterAdd|paper/toChapterEdit|paper/doChapterEdit|paper/doChapterDel|paper/doChapterUp|paper/doChapterDown|paper/toQuestionAdd|paper/questionTypeTreeList|paper/questionList|paper/doQuestionAdd|paper/doScoreUpdate|paper/doOptionsUpdate|paper/doQuestionUp|paper/doQuestionDown|paper/doQuestionDel|paper/doQuestionClear', '77', '_1_2_55_77_82_', '5', '1', '2020-09-28 13:30:06', '5', '3', '131072', '', '1');
 
 INSERT INTO `SYS_DICT` VALUES ('1', 'STATE', '0', '删除', '1');
 INSERT INTO `SYS_DICT` VALUES ('2', 'STATE', '1', '正常', '2');
@@ -457,7 +602,8 @@ INSERT INTO `SYS_VER` VALUES (4, '1.1.2', '2019-03-03 13:20:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (5, '1.1.3', '2019-08-14 18:49:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (6, '1.1.4', '2019-09-05 09:58:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (7, '1.1.5', '2019-12-16 23:16:00', 'zhanghc', '');
-INSERT INTO `SYS_VER` VALUES (8, '2.0.0', '2020-09-04 16:37:00', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (8, '2.0.0', '2020-10-15 00:00:00', 'zhanghc', '');
 
 INSERT INTO `EXM_QUESTION_TYPE` VALUES ('1', '试题分类', '0', '_1_', '1', '1', '2017-08-01 22:31:43', '1', '1', null, null, null);
 INSERT INTO `EXM_PAPER_TYPE` VALUES ('1', '试卷分类', '0', '_1_', '1', '1', '2017-08-01 22:31:43', '1', '1', null, null, null);
+INSERT INTO `EXM_EXAM_TYPE` VALUES ('1', '考试分类', '0', '_1_', '1', '1', '2017-08-01 22:31:43', '1', '1', null, null, null);

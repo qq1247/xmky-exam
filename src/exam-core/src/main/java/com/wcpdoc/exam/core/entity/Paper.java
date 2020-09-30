@@ -30,6 +30,8 @@ public class Paper {
 	private String name;
 	@Column(name = "PREVIEW_TYPE")
 	private Integer previewType;
+	@Column(name = "PASS_SCORE")
+	private BigDecimal passScore;
 	@Column(name = "TOTAL_SCORE")
 	private BigDecimal totalScore;
 	@Column(name = "SCORE_A")
@@ -87,6 +89,14 @@ public class Paper {
 
 	public void setTotalScore(BigDecimal totalScore) {
 		this.totalScore = totalScore;
+	}
+
+	public BigDecimal getPassScore() {
+		return passScore;
+	}
+
+	public void setPassScore(BigDecimal passScore) {
+		this.passScore = passScore;
 	}
 
 	public String getDescription() {

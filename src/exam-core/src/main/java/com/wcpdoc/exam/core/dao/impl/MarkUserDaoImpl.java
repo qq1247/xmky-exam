@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.core.dao.impl;
 
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.exam.core.dao.MarkUserDao;
@@ -31,5 +33,11 @@ public class MarkUserDaoImpl extends RBaseDaoImpl<MarkUser> implements MarkUserD
 	public MarkUser getEntity(Integer examId, Integer userId) {
 		String sql = "SELECT * FROM EXM_MARK_USER WHERE EXAM_ID = ? AND USER_ID = ?";
 		return getEntity(sql, new Object[]{examId, userId}, MarkUser.class);
+	}
+
+	@Override
+	public List<MarkUser> getList(Integer examId) {
+		String sql = "SELECT * FROM EXM_MARK_USER WHERE EXAM_ID = ?";
+		return getList(sql, new Object[] { examId }, MarkUser.class);
 	}
 }

@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import com.wcpdoc.exam.core.dao.RBaseDao;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
+import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.util.SqlUtil;
 
 /**
@@ -94,7 +95,7 @@ public abstract class RBaseDaoImpl<T> implements RBaseDao<T> {
 			return (T) getCurSession().get(clazz, (String) id);
 		}
 
-		throw new RuntimeException("ID只支持Integer、Long、String类型");
+		throw new MyException("ID只支持Integer、Long、String类型");
 	}
 	
 	@Override

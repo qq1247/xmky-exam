@@ -35,6 +35,14 @@ public interface QuestionTypeService extends BaseService<QuestionType> {
 	 * @return List<Map<String,Object>>
 	 */
 	List<Map<String, Object>> getTreeList();
+	
+	/**
+	 * 获取试题分类树
+	 * 
+	 * v1.0 zhanghc 2020年9月28日下午5:19:24
+	 * @return Object
+	 */
+	List<Map<String, Object>> getAuthTreeList();
 
 	/**
 	 * 移动试题分类

@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.core.dao;
 
+import java.util.List;
+
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.entity.MarkUser;
 
@@ -29,5 +31,14 @@ public interface MarkUserDao extends BaseDao<MarkUser>{
 	 * @return ExamUser
 	 */
 	MarkUser getEntity(Integer examId, Integer userId);
+
+	/**
+	 * 获取判卷用户列表
+	 * 
+	 * v1.0 zhanghc 2020年9月30日上午11:03:04
+	 * @param examId
+	 * @return List<MarkUser>
+	 */
+	List<MarkUser> getList(Integer examId);
 	
 }

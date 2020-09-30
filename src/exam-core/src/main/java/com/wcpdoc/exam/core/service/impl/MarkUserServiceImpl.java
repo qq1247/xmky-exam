@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.core.service.impl;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
@@ -34,5 +36,10 @@ public class MarkUserServiceImpl extends BaseServiceImp<MarkUser> implements Mar
 	@Override
 	public MarkUser getEntity(Integer examId, Integer userId) {
 		return markUserDao.getEntity(examId, userId);
+	}
+
+	@Override
+	public List<MarkUser> getList(Integer examId) {
+		return markUserDao.getList(examId);
 	}
 }

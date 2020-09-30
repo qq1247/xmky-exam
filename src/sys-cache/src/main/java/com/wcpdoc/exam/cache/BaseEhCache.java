@@ -3,6 +3,7 @@ package com.wcpdoc.exam.cache;
 import org.springframework.cache.Cache;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
 
+import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.util.SpringUtil;
 
 /**
@@ -13,12 +14,12 @@ import com.wcpdoc.exam.core.util.SpringUtil;
 public class BaseEhCache {
 	protected static Cache getCache(String cacheName) {
 		if (cacheName == null || cacheName.isEmpty()) {
-			throw new RuntimeException("参数错误：cacheName");
+			throw new MyException("参数错误：cacheName");
 		}
 
 		Cache cache = SpringUtil.getBean(EhCacheCacheManager.class).getCache(cacheName);
 		if (cache == null) {
-			throw new RuntimeException("缓存【" + cacheName + "】不存在");
+			throw new MyException("缓存【" + cacheName + "】不存在");
 		}
 
 		return cache;

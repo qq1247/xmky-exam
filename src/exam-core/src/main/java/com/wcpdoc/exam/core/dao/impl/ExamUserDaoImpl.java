@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.core.dao.impl;
 
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.exam.core.dao.ExamUserDao;
@@ -31,5 +33,11 @@ public class ExamUserDaoImpl extends RBaseDaoImpl<ExamUser> implements ExamUserD
 	public ExamUser getEntity(Integer examId, Integer userId) {
 		String sql = "SELECT * FROM EXM_EXAM_USER WHERE EXAM_ID = ? AND USER_ID = ?";
 		return getEntity(sql, new Object[]{examId, userId}, ExamUser.class);
+	}
+
+	@Override
+	public List<ExamUser> getList(Integer examId) {
+		String sql = "SELECT * FROM EXM_EXAM_USER WHERE EXAM_ID = ?";
+		return getList(sql, new Object[] { examId }, ExamUser.class);
 	}
 }

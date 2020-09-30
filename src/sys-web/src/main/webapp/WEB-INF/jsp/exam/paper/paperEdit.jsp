@@ -21,6 +21,15 @@
 			</div>
 		</div>
 	</div>
+	<div class="layui-form-item">
+		<div class="layui-col-md11">
+			<label class="layui-form-label">及格分数：</label>
+			<div class="layui-input-block">
+				<input name="passScore" value="${paper.passScore}" 
+					class="layui-input" lay-verify="required|number" placeholder="请输入及格分数">
+			</div>
+		</div>
+	</div>
 	<%-- <div class="layui-form-item">
 		<div class="layui-col-md11">
 			<label class="layui-form-label">展示方式：</label>
@@ -83,7 +92,7 @@
 					class="layui-input" lay-verify="required" placeholder="请输入评语">
 			</div>
 			<div class="layui-input-inline" style="width: 55px;margin-right: 0px;">
-				<button type="button" class="layui-btn layui-btn-primary" onclick="addScoreRemark(this);">
+				<button type="button" class="layui-btn layui-btn-primary" onclick="delScoreRemark(this);">
 					<i class="layui-icon layui-icon-subtraction"></i>
 				</button>
 			</div>
