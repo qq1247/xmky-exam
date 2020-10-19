@@ -22,16 +22,6 @@ public interface ExamUserService extends BaseService<ExamUser>{
 	void del(Integer examId, Integer id);
 
 	/**
-	 * 获取考试用户信息
-	 * 
-	 * v1.0 zhanghc 2017年7月3日上午9:41:59
-	 * @param examId
-	 * @param userId
-	 * @return ExamUser
-	 */
-	ExamUser getEntity(Integer examId, Integer userId);
-
-	/**
 	 * 获取考试用户列表
 	 * 
 	 * v1.0 zhanghc 2020年9月29日下午5:09:50

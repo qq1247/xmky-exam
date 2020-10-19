@@ -14,11 +14,14 @@
 	<div class="layui-colla-item">
 		<!-- 章节标题 -->
 		<h2 class="layui-colla-title">${paperQuestionEx.name }</h2>
+		<c:if test="${design }">
 		<span class="layui-icon layui-icon-add-1 exam-qst-add" title="添加试题" onclick="toQuestionAdd('${paper.id }', '${paperQuestionEx.id }')"></span>
 		<span class="layui-icon layui-icon-delete exam-qst-add" title="清空试题" onclick="doQuestionClear('${paperQuestionEx.id }');"></span>
+		</c:if>
 		<h5 class="layui-colla-title">${paperQuestionEx.description }</h5>
 		<c:set var="labs" value="${fn:split('A,B,C,D,E,F,G', ',')}"></c:set>
 		<c:forEach var="subPaperQuestionEx" items="${paperQuestionEx.subList }" varStatus="v1">
+		<c:set var="examUserQuestion" value="${examUserQuestionMap[subPaperQuestionEx.questionId + 0]}"></c:set>
 		<div id="title${subPaperQuestionEx.question.id }" class="layui-colla-content layui-show">
 			<!-- 试题标题 -->
 			<span class="qst-no">${subPaperQuestionEx.no }。</span>
@@ -28,12 +31,11 @@
 			<c:if test="${subPaperQuestionEx.question.type == 1 }">
 			<ul>
 			<c:forEach var="lab" items="${labs }">
-			<c:set var="examUserQuestion" value="${examUserQuestionMap[subPaperQuestionEx.questionId + 0]}"></c:set>
 			<c:set var="ol" value="option${lab }"></c:set>
 			<c:if test="${!empty subPaperQuestionEx.question[ol] }">
-			<li class="exam-qst-op ${subPaperQuestionEx.question.answer == lab ? 'exam-qst-op-check' : '' }" onclick="rdoCbxSubmit('${examUserQuestion.id}')">
-				<input type="radio" name="option_${subPaperQuestionEx.question.id}" value="${lab }" title="" 
-					<%-- ${subPaperQuestionEx.question.answer == lab ? 'checked="checked"' : '' } --%> disabled>${lab }、${subPaperQuestionEx.question[ol] }
+			<li class="exam-qst-op ${subPaperQuestionEx.question.answer == lab ? 'exam-qst-op-check exam-qst-op-select' : '' }" onclick="rdoCbxSubmit(this, '${examUserQuestion.id}')">
+				<input type="radio" name="option_${subPaperQuestionEx.question.id}" value="${lab }" title='<p>${lab }、</p>${subPaperQuestionEx.question[ol] }' 
+					${subPaperQuestionEx.question.answer == lab ? 'checked' : '' } ${answer ? "" : "disabled" }>
 			</li>
 			</c:if>
 			</c:forEach>
@@ -46,9 +48,9 @@
 			<c:set var="ol" value="option${lab }"></c:set>
 			<c:if test="${!empty subPaperQuestionEx.question[ol] }">
 			<c:set var="op1" value=",${subPaperQuestionEx.question.answer},"></c:set>
-			<li class="exam-qst-op exam-qst-op-checkbox ${subPaperQuestionEx.question.answer == lab ? 'exam-qst-op-check' : '' } " onclick="rdoCbxSubmit('${examUserQuestion.id}')">
-				<input type="checkbox" name="option_${examUserQuestion.id}" value="${lab }" title=" " lay-skin="primary"
-					<%-- ${fn:contains(op1, lab) ?'checked="checked"' : '' } --%> disabled>${lab }、${subPaperQuestionEx.question[ol] }
+			<li class="exam-qst-op exam-qst-op-checkbox ${fn:contains(op1, lab) ? 'exam-qst-op-select' : '' } " onclick="rdoCbxSubmit(this, '${examUserQuestion.id}')">
+				<input type="checkbox" name="option_${examUserQuestion.id}" value="${lab }" title='<p>${lab }、</p>${subPaperQuestionEx.question[ol] }' lay-skin="primary"
+					${fn:contains(op1, lab) ?'checked' : '' } ${answer ? "" : "disabled" }>
 			</li>
 			</c:if>
 			</c:forEach>
@@ -68,28 +70,31 @@
 			%>
 			<span class="qst-no"></span>
 			<c:forEach var="answer" items="${fn:split(subPaperQuestionEx.question.answer, v) }" varStatus="s">
-				<input name="option_${examUserQuestion.id}" value="" 
-					class="layui-input btn txt" readonly placeholder="填空${lab1s[s.index] }">
+			<input name="option_${examUserQuestion.id}" value="${answers[s.index]}" 
+				class="layui-input btn txt" ${answer ? "" : "disabled" } placeholder="填空${lab1s[s.index] }" onblur="txtSubmit(this, '${examUserQuestion.id}')">
 			</c:forEach>
 			</c:if>
 			<%-- 判断题 --%>
 			<c:if test="${subPaperQuestionEx.question.type == 4 }">
 			<ul>
-				<li class="exam-qst-op">
-					<input type="radio" name="option_${subPaperQuestionEx.question.id}" value="对" title=""
-						${subPaperQuestionEx.question.answer == '对' ? 'question-option-select' : '' } disabled>对
+				<li class="exam-qst-op ${subPaperQuestionEx.question.answer == '对' ? 'exam-qst-op-check exam-qst-op-select' : '' }" onclick="rdoCbxSubmit(this, '${examUserQuestion.id}')">
+					<input type="radio" name="option_${subPaperQuestionEx.question.id}" value="对" title='对' 
+						${subPaperQuestionEx.question.answer == '对' ? 'checked' : '' } ${answer ? "" : "disabled" }>
 				</li>
-				<li class="exam-qst-op">
-					<input type="radio" name="option_${subPaperQuestionEx.question.id}" value="错" title="" disabled>错
+				<li class="exam-qst-op ${subPaperQuestionEx.question.answer == '错' ? 'exam-qst-op-check exam-qst-op-select' : '' }" onclick="rdoCbxSubmit(this, '${examUserQuestion.id}')">
+					<input type="radio" name="option_${subPaperQuestionEx.question.id}" value="错" title='错' 
+						${subPaperQuestionEx.question.answer == '错' ? 'checked' : '' } ${answer ? "" : "disabled" }>
 				</li>
 			</ul>
 			</c:if>
 			<%-- 问答题 --%>
 			<c:if test="${subPaperQuestionEx.question.type == 5 }">
 			<textarea name="option_${examUserQuestion.id}"
-				class="layui-textarea txt" placeholder="请输入答案" disabled onblur="txtSubmit(this)"></textarea>
+				class="layui-textarea txt" placeholder="请输入答案" ${answer ? "" : "disabled" } onblur="txtSubmit(this, '${examUserQuestion.id}')"
+				>${examUserQuestion.answer}</textarea>
 			</c:if>
 			<!-- 试题答案 -->
+			<c:if test="${design || mark}">
 			<span class="span">
 				【${subPaperQuestionEx.score }分】：
 				<c:if test="${subPaperQuestionEx.question.type == 3 }">
@@ -111,13 +116,17 @@
 				${subPaperQuestionEx.question.answer }
 				</c:if>
 			</span>
+			</c:if>
 			<!-- 试题解析 -->
+			<c:if test="${design || mark }">
 			<span class="span">
 			【解析】：${subPaperQuestionEx.question.analysis }
 			</span>
+			</c:if>
+			<c:if test="${design }">
 			<span class="span">
 			【操作】：
-				本题 <input name="score" value="${subPaperQuestionEx.score }" class="layui-input btn btn3 txt" onblur="doScoreUpdate('${subPaperQuestionEx.id}')" placeholder="分值">分
+				本题 <input name="score" value="${subPaperQuestionEx.score }" class="layui-input btn btn3 txt" onblur="scoreUpdate('${subPaperQuestionEx.id}')" placeholder="分值">分
 				<c:if test="${!v1.first }">
 				<span class="layui-icon layui-icon-return btn2" style="transform:rotate(90deg)" title="上移试题" onclick="doQuestionUp('${subPaperQuestionEx.id }');"></span>
 				</c:if>
@@ -134,19 +143,20 @@
 				<input type="checkbox" lay-filter="options" name="options" value="4" pqid="${subPaperQuestionEx.id}" lay-skin="switch" lay-text="包含答案得分|等于答案得分" ${fn:contains(subPaperQuestionEx.scoreOptions, "4") ? "checked" : "" }>
 				</c:if>
 			</span>
+			</c:if>
+			<c:if test="${mark }">
+			<span class="span">
+			【操作】：
+			<c:if test="${subPaperQuestionEx.question.type != 5 }">
+			本题得<input name="score" value="${examUserQuestion.score }" class="layui-input btn btn3 txt" placeholder="分值" disabled>分
+			</c:if>
+			<c:if test="${subPaperQuestionEx.question.type == 5 }">
+			本题得 <input name="score" value="${examUserQuestion.score }" class="layui-input btn btn3 txt" style="border-color: #5FB878;" onblur="scoreUpdate(this, '${examUserQuestion.id}', ${subPaperQuestionEx.score })" placeholder="分值">分
+			</c:if>
+			</span>
+			</c:if>
 		</div>
 		</c:forEach>
 	</div>
 </div>
 </c:forEach>
-
-
-
-
-
-
-
-
-
-
-

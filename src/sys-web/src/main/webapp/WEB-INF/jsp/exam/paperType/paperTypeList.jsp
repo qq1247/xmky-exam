@@ -80,7 +80,7 @@
 						{field : "POST_NAMES", title : "岗位权限", align : "center"},
 						{field : "PARENT_NAME", title : "上级试卷分类 ", align : "center"},
 						{field : "NO", title : "排序", align : "center"},
-						{fixed: 'right', title : "操作 ", toolbar : "#paperTypeToolbar", align : "center", width : 300}
+						{fixed : "right", title : "操作 ", toolbar : "#paperTypeToolbar", align : "center", width : 300}
 						]],
 				page : true,
 				height : "full-180",

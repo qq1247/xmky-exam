@@ -84,7 +84,7 @@
 						{field : "LOGIN_NAME", title : "登录名称", align : "center"}, 
 						{field : "ORG_NAME", title : "组织机构", align : "center"},
 						{field : "POST_NAMES", title : "岗位", align : "center"},
-						{fixed: 'right', title : "操作 ", toolbar : "#userToolbar", align : "center", width : 500}
+						{fixed : "right", title : "操作 ", toolbar : "#userToolbar", align : "center", width : 500}
 						]],
 				page : true,
 				height : "full-180",

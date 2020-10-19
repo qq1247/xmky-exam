@@ -65,7 +65,7 @@
 						{field : "DICT_KEY", title : "键", align : "center"},
 						{field : "DICT_VALUE", title : "值", align : "center"},
 						{field : "NO", title : "排序 ", align : "center"},
-						{fixed: 'right', title : "操作 ", toolbar : "#dictToolbar", align : "center"}
+						{fixed : "right", title : "操作 ", toolbar : "#dictToolbar", align : "center"}
 						]],
 				page : true,
 				height : "full-180",

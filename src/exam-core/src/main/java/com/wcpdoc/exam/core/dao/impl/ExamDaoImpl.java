@@ -35,8 +35,9 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT EXAM.ID, EXAM.NAME, EXAM.PASS_SCORE, EXAM.START_TIME, EXAM.END_TIME, "
-				+ "EXAM.STATE, PAPER.NAME AS PAPER_NAME, PAPER.TOTAL_SCORE AS PAPER_TOTLE_SCORE, "
-				+ "EXAM.MARK_START_TIME, EXAM.MARK_END_TIME "
+				+ "		EXAM.STATE, PAPER.NAME AS PAPER_NAME, PAPER.TOTAL_SCORE AS PAPER_TOTLE_SCORE, "
+				+ "		EXAM.MARK_START_TIME, EXAM.MARK_END_TIME, "
+				+ "		( SELECT COUNT( * ) FROM EXM_EXAM_USER A WHERE A.EXAM_ID = EXAM.ID ) AS USER_NUM "
 				+ "FROM EXM_EXAM EXAM "
 				+ "LEFT JOIN EXM_EXAM_TYPE EXAM_TYPE ON EXAM.EXAM_TYPE_ID = EXAM_TYPE.ID "
 				+ "LEFT JOIN EXM_PAPER PAPER ON EXAM.PAPER_ID = PAPER.ID";
@@ -48,17 +49,11 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "EXAM.STATE = ?", pageIn.getFour())//0：删除；1：启用；2：禁用
 				.addWhere(ValidateUtil.isValid(pageIn.getFive()), "EXAM.START_TIME > ?", ValidateUtil.isValid(pageIn.getFive()) ? DateUtil.getDateTime(pageIn.getFive()) : null)
 				.addWhere(ValidateUtil.isValid(pageIn.getSix()), "EXAM.START_TIME < ?", ValidateUtil.isValid(pageIn.getSix()) ? DateUtil.getDateTime(pageIn.getSix()) : null)
-				.addWhere(ValidateUtil.isValid(pageIn.getEight()), 
-						"(EXAM_TYPE.USER_IDS LIKE ? "
-								+ "OR EXISTS (SELECT 1 FROM SYS_USER Z WHERE Z.ID = ? AND EXAM_TYPE.ORG_IDS LIKE CONCAT('%,', Z.ORG_ID, ',%')) "
-								+ "OR EXISTS (SELECT 1 FROM SYS_POST_USER Z WHERE Z.USER_ID = ? AND EXAM_TYPE.POST_IDS LIKE CONCAT('%,', Z.POST_ID, ',%')))", 
-						"%," + pageIn.getEight() + ",%", pageIn.getEight(), pageIn.getEight())
-				.addWhere(ValidateUtil.isValid(pageIn.getNine()), "EXISTS (SELECT 1 FROM EXM_EXAM_USER Z WHERE Z.USER_ID = ? AND Z.EXAM_ID = EXAM.ID)", pageIn.getNine())
-				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "EXISTS (SELECT 1 FROM EXM_MARK_USER Z WHERE Z.USER_ID = ? AND Z.EXAM_ID = EXAM.ID)", pageIn.getTen())
+				.addWhere(ValidateUtil.isValid(pageIn.getEight()), "EXISTS (SELECT 1 FROM EXM_MARK_USER Z WHERE Z.USER_ID = ? AND Z.EXAM_ID = EXAM.ID)", pageIn.getEight())
 				.addWhere("EXAM.STATE != ?", 0)
 				.addOrder("EXAM.START_TIME", Order.DESC);
 		
-		if (ValidateUtil.isValid(pageIn.getTen())) {
+		if (ValidateUtil.isValid(pageIn.getTen())) {//查看权限相关
 			User user = userDao.getEntity(Integer.parseInt(pageIn.getTen()));
 			StringBuilder partSql = new StringBuilder();
 			List<Object> params = new ArrayList<>();

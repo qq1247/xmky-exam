@@ -124,10 +124,12 @@ public class PaperQuestion {
 		this.questionId = questionId;
 	}
 
+	/** 1：章节；2：固定试题；3：随机试题 */
 	public Integer getType() {
 		return type;
 	}
 
+	/** 1：章节；2：固定试题；3：随机试题 */
 	public void setType(Integer type) {
 		this.type = type;
 	}

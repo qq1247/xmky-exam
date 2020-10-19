@@ -34,11 +34,6 @@ public class ExamUserServiceImpl extends BaseServiceImp<ExamUser> implements Exa
 	}
 
 	@Override
-	public ExamUser getEntity(Integer examId, Integer userId) {
-		return examUserDao.getEntity(examId, userId);
-	}
-
-	@Override
 	public List<ExamUser> getList(Integer examId) {
 		return examUserDao.getList(examId);
 	}

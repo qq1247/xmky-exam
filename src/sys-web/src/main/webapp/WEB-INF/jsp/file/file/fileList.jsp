@@ -64,7 +64,7 @@
 						{field : "IP", title : "上传ip", align : "center"},
 						{field : "USERNAME", title : "上传用户", align : "center"},
 						{field : "UPDATE_TIME_STR", title : "上传时间", align : "center"},
-						{fixed: 'right', title : "操作 ", toolbar : "#fileToolbar", align : "center"}
+						{fixed : "right", title : "操作 ", toolbar : "#fileToolbar", align : "center"}
 						]],
 				page : true,
 				height : "full-180",

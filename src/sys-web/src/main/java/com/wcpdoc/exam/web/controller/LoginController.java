@@ -2,6 +2,7 @@ package com.wcpdoc.exam.web.controller;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Date;
 
 import javax.annotation.Resource;
 import javax.security.auth.login.LoginException;
@@ -16,7 +17,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageResult;
+import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.web.service.LoginService;
 
 /**
@@ -159,6 +162,24 @@ public class LoginController extends BaseController {
 		} catch (Exception e) {
 			log.error("修改密码错误：", e);
 			return new PageResult(false, "未知异常！");
+		}
+	}
+	
+	/**
+	 * 获取服务器时间
+	 * 
+	 * v1.0 zhanghc 2017年6月25日下午4:19:05
+	 * @return
+	 * PageResult
+	 */
+	@RequestMapping("/curTime")
+	@ResponseBody
+	public PageResult sysTime() {
+		try {
+			return new PageResultEx(true, "获取成功", DateUtil.formatDateTime(new Date()));
+		} catch (Exception e) {
+			log.error("获取服务器时间错误：", e);
+			return new PageResult(false, e.getMessage());
 		}
 	}
 }

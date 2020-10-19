@@ -11,7 +11,7 @@
 			
 			layui.form.verify({
 				zhengshu : function(value, item) { //value：表单的值、item：表单的DOM对象
-					if (!new RegExp("(^[1-9](\d+)?(\.\d{1,2})?$)|(^\d\.\d{1,2}$)").test(value)) {
+					if (!new RegExp("^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$").test(value)) {
 						return "必须为正数，最多保留两位小数";
 					}
 				}

@@ -34,12 +34,20 @@ public class ExamUser {
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "ANSWER_TIME")
 	private Date answerTime;
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@Column(name = "ANSWER_FINISH_TIME")
+	private Date answerFinishTime;
 	@Column(name = "MARK_USER_ID")
 	private Integer markUserId;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	@Column(name = "MARK_USER_TIME")
-	private Date markUserTime;
+	@Column(name = "MARK_TIME")
+	private Date markTime;
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@Column(name = "MARK_FINISH_TIME")
+	private Date markFinishTime;
 	@Column(name = "TOTAL_SCORE")
 	private BigDecimal totalScore;
 	@Column(name = "STATE")
@@ -48,64 +56,128 @@ public class ExamUser {
 	private Integer markState;
 	@Column(name = "ANSWER_STATE")
 	private Integer answerState;
+	@Column(name = "UPDATE_USER_ID")
+	private Integer updateUserId;
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@Column(name = "UPDATE_TIME")
+	private Date updateTime;
+
 	public Integer getId() {
 		return id;
 	}
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
+
 	public Integer getExamId() {
 		return examId;
 	}
+
 	public void setExamId(Integer examId) {
 		this.examId = examId;
 	}
+
 	public Integer getUserId() {
 		return userId;
 	}
+
 	public void setUserId(Integer userId) {
 		this.userId = userId;
 	}
+
 	public Date getAnswerTime() {
 		return answerTime;
 	}
+
 	public void setAnswerTime(Date answerTime) {
 		this.answerTime = answerTime;
 	}
+
 	public Integer getMarkUserId() {
 		return markUserId;
 	}
+
 	public void setMarkUserId(Integer markUserId) {
 		this.markUserId = markUserId;
 	}
-	public Date getMarkUserTime() {
-		return markUserTime;
-	}
-	public void setMarkUserTime(Date markUserTime) {
-		this.markUserTime = markUserTime;
-	}
+
 	public BigDecimal getTotalScore() {
 		return totalScore;
 	}
+
 	public void setTotalScore(BigDecimal totalScore) {
 		this.totalScore = totalScore;
 	}
+
+	/** 1：未考试；2：考试中；3：已交卷；4：强制交卷； */
 	public Integer getState() {
 		return state;
 	}
+
+	/** 1：未考试；2：考试中；3：已交卷；4：强制交卷； */
 	public void setState(Integer state) {
 		this.state = state;
 	}
+
+	/** 1：未阅卷；2：阅卷中；3：已阅卷； */
 	public Integer getMarkState() {
 		return markState;
 	}
+
+	/** 1：未阅卷；2：阅卷中；3：已阅卷； */
 	public void setMarkState(Integer markState) {
 		this.markState = markState;
 	}
+
+	/** 1：及格；2：不及格 */
 	public Integer getAnswerState() {
 		return answerState;
 	}
+
+	/** 1：及格；2：不及格 */
 	public void setAnswerState(Integer answerState) {
 		this.answerState = answerState;
+	}
+
+	public Integer getUpdateUserId() {
+		return updateUserId;
+	}
+
+	public void setUpdateUserId(Integer updateUserId) {
+		this.updateUserId = updateUserId;
+	}
+
+	public Date getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
+	}
+
+	public Date getAnswerFinishTime() {
+		return answerFinishTime;
+	}
+
+	public void setAnswerFinishTime(Date answerFinishTime) {
+		this.answerFinishTime = answerFinishTime;
+	}
+
+	public Date getMarkTime() {
+		return markTime;
+	}
+
+	public void setMarkTime(Date markTime) {
+		this.markTime = markTime;
+	}
+
+	public Date getMarkFinishTime() {
+		return markFinishTime;
+	}
+
+	public void setMarkFinishTime(Date markFinishTime) {
+		this.markFinishTime = markFinishTime;
 	}
 }

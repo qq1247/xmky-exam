@@ -79,10 +79,12 @@ public class Question {
 		this.id = id;
 	}
 
+	/** 1：单选；2：多选；3：填空；4：判断；5：问答 */
 	public Integer getType() {
 		return type;
 	}
 
+	/** 1：单选；2：多选；3：填空；4：判断；5：问答 */
 	public void setType(Integer type) {
 		this.type = type;
 	}

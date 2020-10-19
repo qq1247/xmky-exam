@@ -13,7 +13,7 @@
 	color: #fff;
 }
 
-.exam-card .layui-colla-title:HOVER {
+.exam-card .layui-colla-title:hover {
 	background: #1E9FFF;
 	color: #fff;
 }
@@ -81,6 +81,11 @@
 	margin-bottom: 10px;
 }
 
+.exam .exam-qst-op-select {
+	color: #5FB878;
+	border: 1px solid #5FB878;
+}
+
 .exam ul {
 	padding-left: 30px;
 }
@@ -142,7 +147,7 @@
 	border: 1px solid #5FB878;
 }
 
-.exma .exam-qst-op:hover i {
+.exam .exam-qst-op:hover i {
 	color: #5FB878;
 }
 
@@ -162,8 +167,16 @@
 	vertical-align: top;
 }
 
+.exam .txt {
+	
+}
+
 .exam .txt:HOVER {
 	border-color: #5FB878 !important;
+}
+
+.exam .txt-select {
+	border-color: #5FB878;
 }
 
 .exam .btn2 {
@@ -184,5 +197,13 @@
 	text-align: center;
 	border-width: 0px 0px 1px 0px;
 	height: 18px;
+}
+
+.exam-card .countdown-info {
+	color: #01AAED;
+}
+
+.exam-card .countdown-warn {
+	color: #FF5722;
 }
 </style>

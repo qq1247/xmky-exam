@@ -41,10 +41,10 @@
 							<my:auth url="exam/toAdd"><button class="layui-btn layuiadmin-btn-useradmin" onclick="toExamAdd();">添加</button></my:auth>
 						</div>
 						<script type="text/html" id="examToolbar">
-						<my:auth url="exam/toEdit"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="examEdit"><i class="layui-icon layui-icon-edit"></i>修改</a></my:auth>
-						<my:auth url="exam/toCfg"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="examCfg"><i class="layui-icon layui-icon-edit"></i>考试配置</a></my:auth>
-						<my:auth url="exam/doDel"><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="examDel"><i class="layui-icon layui-icon-delete"></i>删除</a></my:auth>
-					</script>
+							<my:auth url="exam/toEdit"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="examEdit"><i class="layui-icon layui-icon-edit"></i>修改</a></my:auth>
+							<my:auth url="exam/toCfg"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="examCfg"><i class="layui-icon layui-icon-edit"></i>考试配置</a></my:auth>
+							<my:auth url="exam/doDel"><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="examDel"><i class="layui-icon layui-icon-delete"></i>删除</a></my:auth>
+						</script>
 						<%-- 考试数据表格 --%>
 						<table id="examTable" lay-filter="examTable"></table>
 					</div>
@@ -76,12 +76,15 @@
 				url : "exam/list",
 				cols : [[
 						{field : "NAME", title : "名称", align : "center"},
-						{field : "PAPER_NAME", title : "试卷", align : "center"},
+						{field : "PAPER_NAME", title : "试卷名称", align : "center"},
 						{field : "PASS_SCORE", title : "及格分数", align : "center"},
 						{field : "START_TIME_STR", title : "考试时间", align : "center"},
-						{field : "MARK_START_TIME_STR", title : "判卷时间", align : "center"},
-						{field : "STATE_NAME", title : "状态", align : "center"},
-						{fixed: 'right', title : "操作 ", toolbar : "#examToolbar", align : "center", width : 280}
+						{field : "MARK_START_TIME_STR", title : "阅卷时间", align : "center"},
+						{field : "STATE_NAME", title : "状态", align : "center", templet : function(d) {
+							return '<input type="checkbox" name="state" value="'+d.ID+'" '
+								+ 'lay-skin="switch" lay-text="已发布|未发布" lay-filter="examPublish"' + (d.STATE == 1 ? 'checked' : '') + '>'
+						}},
+						{fixed : "right", title : "操作 ", toolbar : "#examToolbar", align : "center", width : 280}
 						]],
 				page : true,
 				height : "full-180",
@@ -115,6 +118,9 @@
 				} else if(obj.event === "examCfg") {
 					toExamCfg(obj.data.ID);
 				}
+			});
+			layui.form.on("switch(examPublish)", function(obj) {
+				doExamPublish(obj.value);
 			});
 		}
 		
@@ -592,6 +598,7 @@
 								filterable : true,
 								paging : true,
 								pageRemote : true,
+								autoRow : true,
 								//radio: true,
 								//clickClose: true,
 								//tips : "可模糊搜索用户昵称、组织机构名称",
@@ -647,6 +654,7 @@
 								filterable : true,
 								paging : true,
 								pageRemote : true,
+								autoRow : true,
 								//radio: true,
 								//clickClose: true,
 								//tips : "可模糊搜索用户昵称、组织机构名称",
@@ -761,6 +769,26 @@
 		// 删除分值评语
 		function delScoreRemark(curObj) {
 			$(curObj).parent().parent().remove();
+		}
+		
+		// 考试发布
+		function doExamPublish(id) {
+			$.ajax({
+				url : "exam/doPublish",
+				data : {
+					id : id
+				},
+				success : function(obj) {
+					examQuery();
+					
+					if(!obj.succ){
+						layer.alert(obj.msg, {"title" : "提示消息"});
+						return;
+					}
+					
+					layer.close(index);
+				}
+			});
 		}
 	</script>
 </html>

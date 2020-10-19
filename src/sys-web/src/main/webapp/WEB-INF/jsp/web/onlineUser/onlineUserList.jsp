@@ -55,7 +55,7 @@
 				cols : [[ 
 						{field : "SESSIONID", title : "SESSIONID", align : "center"}, 
 						{field : "LOGINNAME", title : "登录名称", align : "center"},
-						{fixed: 'right', title : "操作 ", toolbar : "#onlineUserToolbar", align : "center"}
+						{fixed : "right", title : "操作 ", toolbar : "#onlineUserToolbar", align : "center"}
 						]],
 				page : true,
 				height : "full-180",

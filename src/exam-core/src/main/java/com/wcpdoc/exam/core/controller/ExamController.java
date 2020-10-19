@@ -176,10 +176,10 @@ public class ExamController extends BaseController{
 				throw new MyException("考试结束时间必须大于考试开始时间！");
 			}
 			if(exam.getMarkStartTime().getTime() <= exam.getEndTime().getTime()){
-				throw new MyException("判卷开始时间必须大于考试结束时间！");
+				throw new MyException("阅卷开始时间必须大于考试结束时间！");
 			}
 			if(exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()){
-				throw new MyException("判卷结束时间必须大于判卷开始时间！");
+				throw new MyException("阅卷结束时间必须大于阅卷开始时间！");
 			}
 			
 			//添加考试
@@ -242,10 +242,10 @@ public class ExamController extends BaseController{
 				throw new MyException("考试结束时间必须大于考试开始时间！");
 			}
 			if(exam.getMarkStartTime().getTime() <= exam.getEndTime().getTime()){
-				throw new MyException("判卷开始时间必须大于考试结束时间！");
+				throw new MyException("阅卷开始时间必须大于考试结束时间！");
 			}
 			if(exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()){
-				throw new MyException("判卷结束时间必须大于判卷开始时间！");
+				throw new MyException("阅卷结束时间必须大于阅卷开始时间！");
 			}
 			Exam entity = examService.getEntity(exam.getId());
 			if(entity.getState() == 1){

@@ -79,7 +79,11 @@
 						{field : "PASS_SCORE", title : "及格分数", align : "center"},
 						{field : "TOTAL_SCORE", title : "总分数", align : "center"},
 						{field : "PAPER_TYPE_NAME", title : "试卷分类", align : "center"},
-						{fixed: 'right', title : "操作 ", toolbar : "#paperToolbar", align : "center", width : 280}
+						{field : "STATE_NAME", title : "状态", align : "center", templet : function(d) {
+							return '<input type="checkbox" name="state" value="'+d.ID+'" '
+								+ 'lay-skin="switch" lay-text="已发布|未发布" lay-filter="paperPublish"' + (d.STATE == 1 ? 'checked' : '') + '>'
+						}},
+						{fixed : "right", title : "操作 ", toolbar : "#paperToolbar", align : "center", width : 280}
 						]],
 				page : true,
 				height : "full-180",
@@ -111,8 +115,11 @@
 				} else if(obj.event === "paperDel") {
 					doPaperDel(obj.data.ID);
 				} else if(obj.event === "paperCfg") {
-					toPaperCfg(obj.data.ID);
+					toPaperCfg(obj.data.ID, obj.data.NAME);
 				}
+			});
+			layui.form.on("switch(paperPublish)", function(obj) {
+				doPaperPublish(obj.value);
 			});
 		}
 		
@@ -304,7 +311,7 @@
 		}
 
 		//到达配置试卷页面
-		function toPaperCfg(id) {
+		function toPaperCfg(id, name) {
 			$.ajax({
 				url : "paper/toCfg",
 				data : {id : id},
@@ -312,7 +319,7 @@
 				success : function(obj) {
 					layer.open({
 						id : "paperContent",
-						title : "配置试卷",
+						title : "配置【" + name + "】",
 						area : ["800px", "500px"],
 						content : obj,
 						btn : [],
@@ -367,6 +374,28 @@
 		// 删除分值评语
 		function delScoreRemark(curObj) {
 			$(curObj).parent().parent().remove();
+		}
+		
+		// 试卷发布
+		function doPaperPublish(id) {
+			layer.confirm("发布后不能配置试卷，确定？", function(index) {
+				$.ajax({
+					url : "paper/doPublish",
+					data : {
+						id : id
+					},
+					success : function(obj) {
+						paperQuery();
+						
+						if(!obj.succ){
+							layer.alert(obj.msg, {"title" : "提示消息"});
+							return;
+						}
+						
+						layer.close(index);
+					}
+				});
+			});
 		}
 	</script>
 </html>

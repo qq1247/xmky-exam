@@ -54,6 +54,13 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if(chapter.getPaperId() == null){
 			throw new MyException("参数错误：paperId");
 		}
+		Paper paper = getEntity(chapter.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
+		}
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
+		}
 				
 		//添加章节
 		chapter.setUpdateTime(new Date());
@@ -73,16 +80,36 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 
 	@Override
 	public void doChapterEdit(PaperQuestion chapter) {
-		PaperQuestion c = paperQuestionService.getEntity(chapter.getId());
-		c.setName(chapter.getName());
-		c.setDescription(chapter.getDescription());
-		c.setUpdateTime(new Date());
-		c.setUpdateUserId(getCurUser().getId());
-		paperQuestionService.update(c);
+		//校验数据有效性
+		PaperQuestion entity = paperQuestionService.getEntity(chapter.getId());
+		Paper paper = getEntity(entity.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
+		}
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
+		}
+		
+		// 修改章节
+		entity.setName(chapter.getName());
+		entity.setDescription(chapter.getDescription());
+		entity.setUpdateTime(new Date());
+		entity.setUpdateUserId(getCurUser().getId());
+		paperQuestionService.update(entity);
 	}
 	
 	@Override
 	public void doChapterDel(Integer chapterId) {
+		//校验数据有效性
+		PaperQuestion entity = paperQuestionService.getEntity(chapterId);
+		Paper paper = getEntity(entity.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
+		}
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
+		}
+				
 		//删除章节
 		List<PaperQuestion> questionList = paperQuestionService.getQuestionList(chapterId);
 		for(PaperQuestion pq : questionList){
@@ -98,8 +125,13 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	@Override
 	public void doChapterUp(Integer chapterId){
 		//校验数据有效性
-		if(chapterId == null){
-			throw new MyException("无法获取参数：chapterId");
+		PaperQuestion entity = paperQuestionService.getEntity(chapterId);
+		Paper paper = getEntity(entity.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
+		}
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
 		}
 		
 		//当前章节上移
@@ -127,8 +159,13 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	@Override
 	public void doChapterDown(Integer chapterId) {
 		//校验数据有效性
-		if(chapterId == null){
-			throw new MyException("无法获取参数：chapterId");
+		PaperQuestion entity = paperQuestionService.getEntity(chapterId);
+		Paper paper = getEntity(entity.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
+		}
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
 		}
 		
 		//当前章节下移
@@ -215,6 +252,14 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if (!ValidateUtil.isValid(questionIds)) {
 			throw new MyException("无法获取参数：questionIds");
 		}
+		PaperQuestion entity = paperQuestionService.getEntity(chapterId);
+		Paper paper = getEntity(entity.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
+		}
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
+		}
 
 		// 添加试题
 		PaperQuestion chapter = paperQuestionService.getEntity(chapterId);
@@ -241,7 +286,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 	
 	@Override
-	public void doScoreUpdate(Integer paperQuestionId, BigDecimal score) {
+	public void scoreUpdate(Integer paperQuestionId, BigDecimal score) {
 		//校验数据有效性
 		if(paperQuestionId == null){
 			throw new MyException("无法获取参数：paperQuestionId");
@@ -249,7 +294,16 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if(score == null){
 			throw new MyException("无法获取参数：score");
 		}
+		PaperQuestion entity = paperQuestionService.getEntity(paperQuestionId);
+		Paper paper = getEntity(entity.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
+		}
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
+		}
 		
+		// 设置分数
 		PaperQuestion pq = paperQuestionService.getEntity(paperQuestionId);
 		pq.setScore(score);
 		paperQuestionService.update(pq);
@@ -263,6 +317,14 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		// 校验数据有效性
 		if (paperQuestionId == null) {
 			throw new MyException("无法获取参数：paperQuestionId");
+		}
+		PaperQuestion entity = paperQuestionService.getEntity(paperQuestionId);
+		Paper paper = getEntity(entity.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
+		}
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
 		}
 
 		// 更新试卷选项
@@ -288,6 +350,14 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		//校验数据有效性
 		if(paperQuestionId == null){
 			throw new MyException("无法获取参数：paperQuestionId");
+		}
+		PaperQuestion entity = paperQuestionService.getEntity(paperQuestionId);
+		Paper paper = getEntity(entity.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
+		}
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
 		}
 		
 		//当前试题上移
@@ -319,6 +389,14 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if(paperQuestionId == null){
 			throw new MyException("无法获取参数：paperQuestionId");
 		}
+		PaperQuestion entity = paperQuestionService.getEntity(paperQuestionId);
+		Paper paper = getEntity(entity.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
+		}
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
+		}
 		
 		//当前试题下移
 		PaperQuestion pq = paperQuestionService.getEntity(paperQuestionId);
@@ -345,6 +423,16 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 
 	@Override
 	public void doQuestionDel(Integer paperQuestionId) {
+		// 校验数据有效性
+		PaperQuestion entity = paperQuestionService.getEntity(paperQuestionId);
+		Paper paper = getEntity(entity.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
+		}
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
+		}
+		
 		// 删除试题
 		PaperQuestion pq = paperQuestionService.getEntity(paperQuestionId);
 		paperQuestionService.del(paperQuestionId);
@@ -374,6 +462,14 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if (chapterId == null) {
 			throw new MyException("无法获取参数：chapterId");
 		}
+		PaperQuestion entity = paperQuestionService.getEntity(chapterId);
+		Paper paper = getEntity(entity.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
+		}
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
+		}
 
 		// 清空试题
 		PaperQuestion chapter = paperQuestionService.getEntity(chapterId);
@@ -384,5 +480,10 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 
 		// 更新总分数
 		updateTotalScore(chapter.getPaperId());
+	}
+
+	@Override
+	public List<Question> getQuestionList(Integer paperId) {
+		return paperDao.getQuestionList(paperId);
 	}
 }

@@ -58,7 +58,7 @@
 	</div>
 	<div class="layui-form-item">
 		<div class="layui-col-md11">
-			<label class="layui-form-label">判卷时间：</label>
+			<label class="layui-form-label">阅卷时间：</label>
 			<div class="layui-input-inline">
 				<input id="markStartTime" name="markStartTime" value="${fn:substring(exam.markStartTime, 0, 19) }"
 					class="layui-input" lay-verify="required" placeholder="请输入开始日期">

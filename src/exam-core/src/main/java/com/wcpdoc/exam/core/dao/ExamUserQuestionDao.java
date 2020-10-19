@@ -22,13 +22,11 @@ public interface ExamUserQuestionDao extends BaseDao<ExamUserQuestion>{
 	List<ExamUserQuestion> getList(Integer examUserId);
 
 	/**
-	 * 获取考试用户试题列表
+	 * 删除考试用户试题
 	 * 
-	 * v1.0 zhanghc 2017年8月14日下午3:51:55
-	 * @param examId
-	 * @param userId
-	 * @return List<ExamUserQuestion>
+	 * v1.0 zhanghc 2020年10月12日下午4:04:24
+	 * @param examUserId void
 	 */
-	List<ExamUserQuestion> getList(Integer examId, Integer userId);
-	
+	void delByExamUserId(Integer examUserId);
+
 }

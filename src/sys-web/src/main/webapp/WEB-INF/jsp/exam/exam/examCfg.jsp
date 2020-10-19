@@ -4,7 +4,7 @@
 	<div class="layui-tab layui-tab-brief">
 		<ul class="layui-tab-title">
 			<li class="layui-this">考试用户</li>
-			<li>判卷用户</li>
+			<li>阅卷用户</li>
 		</ul>
 		<div class="layui-tab-content" style="padding: 10px 0px;">
 			<div class="layui-tab-item layui-show">

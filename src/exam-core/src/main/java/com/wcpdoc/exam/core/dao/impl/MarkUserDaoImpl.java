@@ -11,7 +11,7 @@ import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 
 /**
- * 判卷用户数据访问层实现
+ * 阅卷用户数据访问层实现
  * 
  * v1.0 zhanghc 2017-06-19 16:28:29
  */

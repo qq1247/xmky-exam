@@ -113,7 +113,7 @@
 						{field : "QUESTION_TYPE_NAME", title : "分类", align : "center"},
 						{field : "SCORE", title : "默认分值", align : "center"},
 						{field : "NO", title : "排序", align : "center"},
-						{fixed: 'right', title : "操作 ", toolbar : "#questionToolbar", align : "center", width : 200},
+						{fixed : "right", title : "操作 ", toolbar : "#questionToolbar", align : "center", width : 200},
 						]],
 				page : true,
 				height : "full-180",

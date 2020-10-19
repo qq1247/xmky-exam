@@ -26,12 +26,12 @@ public class ExamUserQuestionDaoImpl extends RBaseDaoImpl<ExamUserQuestion> impl
 	@Override
 	public List<ExamUserQuestion> getList(Integer examUserId) {
 		String sql = "SELECT * FROM EXM_EXAM_USER_QUESTION WHERE EXAM_USER_ID = ?";
-		return getList(sql, new Object[]{examUserId}, ExamUserQuestion.class);
+		return getList(sql, new Object[] { examUserId }, ExamUserQuestion.class);
 	}
 
 	@Override
-	public List<ExamUserQuestion> getList(Integer examId, Integer userId) {
-		String sql = "SELECT * FROM EXM_EXAM_USER_QUESTION WHERE EXAM_ID = ? AND USER_ID = ?";
-		return getList(sql, new Object[]{examId, userId}, ExamUserQuestion.class);
+	public void delByExamUserId(Integer examUserId) {
+		String sql = "DELETE FROM EXM_EXAM_USER_QUESTION WHERE EXAM_USER_ID = ?";
+		update(sql, new Object[] { examUserId });
 	}
 }

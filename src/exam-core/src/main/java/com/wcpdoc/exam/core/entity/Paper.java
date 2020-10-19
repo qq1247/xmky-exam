@@ -123,10 +123,12 @@ public class Paper {
 		this.previewType = previewType;
 	}
 
+	/** 0：删除；1：发布；2：草稿 */
 	public Integer getState() {
 		return state;
 	}
 
+	/** 0：删除；1：发布；2：草稿 */
 	public void setState(Integer state) {
 		this.state = state;
 	}

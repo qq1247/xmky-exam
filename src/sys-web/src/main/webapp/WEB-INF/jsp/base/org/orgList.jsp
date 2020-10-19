@@ -76,7 +76,7 @@
 						{field : "NAME", title : "名称", align : "center"},
 						{field : "PARENT_NAME", title : "上级组织机构 ", align : "center"},
 						{field : "NO", title : "排序 ", align : "center"},
-						{fixed: 'right', title : "操作 ", toolbar : "#orgToolbar", align : "center"}
+						{fixed : "right", title : "操作 ", toolbar : "#orgToolbar", align : "center"}
 						]],
 				page : true,
 				height : "full-180",

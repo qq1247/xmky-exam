@@ -41,4 +41,9 @@ public class PaperQuestionServiceImpl extends BaseServiceImp<PaperQuestion> impl
 	public List<PaperQuestion> getChapterList(Integer paperId) {
 		return paperQuestionDao.getChapterList(paperId);
 	}
+
+	@Override
+	public PaperQuestion getEntity(Integer paperId, Integer questionId) {
+		return paperQuestionDao.getEntity(paperId, questionId);
+	}
 }

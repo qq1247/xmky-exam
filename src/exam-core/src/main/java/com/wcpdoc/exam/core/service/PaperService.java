@@ -6,6 +6,7 @@ import java.util.List;
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.PaperQuestionEx;
+import com.wcpdoc.exam.core.entity.Question;
 
 /**
  * 试卷服务层接口
@@ -50,6 +51,15 @@ public interface PaperService extends BaseService<Paper> {
 	 * @return List<PaperQuestionEx>
 	 */
 	List<PaperQuestionEx> getPaperList(Integer id);
+	
+	/**
+	 * 获取试题列表
+	 * 
+	 * v1.0 zhanghc 2017年6月19日下午4:53:21
+	 * @param paperId
+	 * @return List<Question>
+	 */
+	List<Question> getQuestionList(Integer paperId);
 
 	/**
 	 * 完成添加试题
@@ -62,14 +72,14 @@ public interface PaperService extends BaseService<Paper> {
 	void doQuestionAdd(Integer chapterId, Integer[] questionIds);
 	
 	/**
-	 * 完成设置分数
+	 * 设置分数
 	 * 
 	 * v1.0 zhanghc 2018年10月21日下午3:10:37
 	 * @param paperQuestionId 
 	 * @param score 
 	 * void
 	 */
-	void doScoreUpdate(Integer paperQuestionId, BigDecimal score);
+	void scoreUpdate(Integer paperQuestionId, BigDecimal score);
 	
 	/**
 	 * 完成设置选项

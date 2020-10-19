@@ -30,17 +30,6 @@
 			</div>
 		</div>
 	</div>
-	<%-- <div class="layui-form-item">
-		<div class="layui-col-md11">
-			<label class="layui-form-label">展示方式：</label>
-			<div class="layui-input-block">
-				<c:forEach var="dict" items="${QUESTION_TYPE_DICT_LIST }">
-					<input type="radio" name="previewType" value="${dict.dictKey }" title="${dict.dictValue }"
-						${paper.previewType == dict.dictKey ? "checked" : "" }>
-				</c:forEach>
-			</div>
-		</div>
-	</div> --%>
 	<div class="layui-form-item">
 		<div class="layui-col-md11">
 			<label class="layui-form-label">成绩评语：</label>
@@ -99,16 +88,6 @@
 		</div>
 		</c:if>
 		</c:forEach>
-	</div>
-	<div class="layui-row layui-form-item">
-		<div class="layui-col-md11">
-			<label class="layui-form-label">状态：</label>
-			<div class="layui-input-block">
-				<input type="checkbox" name="state" value="1"
-					lay-skin="switch"  lay-text="启用|禁用" ${paper.state == 1 ? "checked" : "" }>
-				
-			</div>
-		</div>
 	</div>
 	<div class="layui-form-item">
 		<div class="layui-col-md11">

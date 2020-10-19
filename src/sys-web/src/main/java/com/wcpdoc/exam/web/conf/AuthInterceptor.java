@@ -27,7 +27,7 @@ public class AuthInterceptor implements HandlerInterceptor {
  		log.debug("权限拦截：访问链接：{}", request.getRequestURI());
 		String contextPath = request.getContextPath();
 		String uri = request.getRequestURI().replaceFirst(contextPath + "/", "");
-		String pubRes = ",login/toIn,login/doIn,login/toHome,login/doOut,login/toPwdUpdate,login/doPwdUpdate,file/doTempUpload,file/doDownload,";
+		String pubRes = ",login/toIn,login/doIn,login/toHome,login/doOut,login/toPwdUpdate,login/doPwdUpdate,login/curTime,file/doTempUpload,file/doDownload,progressBar/get,";
 		if(pubRes.contains("," + uri + ",")){
 			log.debug("权限拦截：公共资源，不拦截");
 			return true;

@@ -13,7 +13,7 @@ import com.wcpdoc.exam.core.service.MarkUserService;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 
 /**
- * 判卷用户服务层实现
+ * 阅卷用户服务层实现
  * 
  * v1.0 zhanghc 2017-06-19 16:28:29
  */

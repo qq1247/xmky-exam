@@ -39,4 +39,14 @@ public interface PaperQuestionService extends BaseService<PaperQuestion>{
 	 */
 	List<PaperQuestion> getChapterList(Integer paperId);
 
+	/**
+	 * 获取试卷试题
+	 * 
+	 * v1.0 zhanghc 2020年10月15日下午4:38:39
+	 * @param paperId
+	 * @param questionId
+	 * @return PaperQuestion
+	 */
+	PaperQuestion getEntity(Integer paperId, Integer questionId);
+
 }

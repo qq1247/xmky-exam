@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
- * 判卷用户实体
+ * 阅卷用户实体
  * 
  * v1.0 zhanghc 2017-06-19 16:28:29
  */

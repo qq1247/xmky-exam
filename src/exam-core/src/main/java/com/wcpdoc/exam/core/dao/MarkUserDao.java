@@ -6,7 +6,7 @@ import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.entity.MarkUser;
 
 /**
- * 判卷用户数据访问层接口
+ * 阅卷用户数据访问层接口
  * 
  * v1.0 zhanghc 2017-06-19 16:28:29
  */
@@ -23,7 +23,7 @@ public interface MarkUserDao extends BaseDao<MarkUser>{
 	void del(Integer examId, Integer userId);
 
 	/**
-	 * 获取判卷用户信息
+	 * 获取阅卷用户信息
 	 * 
 	 * v1.0 zhanghc 2017年7月3日上午9:42:55
 	 * @param examId
@@ -33,7 +33,7 @@ public interface MarkUserDao extends BaseDao<MarkUser>{
 	MarkUser getEntity(Integer examId, Integer userId);
 
 	/**
-	 * 获取判卷用户列表
+	 * 获取阅卷用户列表
 	 * 
 	 * v1.0 zhanghc 2020年9月30日上午11:03:04
 	 * @param examId

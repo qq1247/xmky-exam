@@ -112,8 +112,6 @@ public class PaperController extends BaseController {
 	public String toAdd(Model model) {
 		try {
 			Paper paper = new Paper();
-			paper.setPreviewType(1);
-			paper.setState(1);
 			model.addAttribute("paper", paper);
 			model.addAttribute("QUESTION_TYPE_DICT_LIST", DictCache.getIndexDictlistMap().get("PAPER_PREVIEW_TYPE"));
 			return "exam/paper/paperEdit";
@@ -136,6 +134,7 @@ public class PaperController extends BaseController {
 			paper.setUpdateUserId(getCurUser().getId());
 			paper.setUpdateTime(new Date());
 			paper.setTotalScore(BigDecimal.ZERO);
+			paper.setState(2);
 			paperService.add(paper);
 			return new PageResult(true, "添加成功");
 		} catch (MyException e) {
@@ -194,7 +193,7 @@ public class PaperController extends BaseController {
 			entity.setScoreE(paper.getScoreE());
 			entity.setScoreERemark(paper.getScoreERemark());
 			entity.setDescription(paper.getDescription());
-			entity.setState(paper.getState());
+			//entity.setState(paper.getState());//单独控制
 			entity.setUpdateUserId(getCurUser().getId());
 			entity.setUpdateTime(new Date());
 			paperService.update(entity);
@@ -245,6 +244,8 @@ public class PaperController extends BaseController {
 			List<PaperQuestionEx> paperQuestionExList = paperService.getPaperList(id);
 			model.addAttribute("paperQuestionExList", paperQuestionExList);
 			model.addAttribute("id", id);
+			model.addAttribute("design", true);// 控制页面展示那部分
+			model.addAttribute("answer", false);// 控制页面展示那部分
 			return "exam/paper/paperCfg";
 		} catch (Exception e) {
 			log.error("到达配置试卷页面错误：", e);
@@ -338,13 +339,12 @@ public class PaperController extends BaseController {
 	 * 完成删除章节
 	 * 
 	 * v1.0 zhanghc 2018年10月21日上午8:16:46
-	 * @param model
 	 * @param chapterId
 	 * @return PageResult
 	 */
 	@RequestMapping("/doChapterDel")
 	@ResponseBody
-	public PageResult doChapterDel(Model model, Integer chapterId) {
+	public PageResult doChapterDel(Integer chapterId) {
 		try {
 			paperService.doChapterDel(chapterId);
 			return new PageResult(true, "删除成功");
@@ -451,12 +451,12 @@ public class PaperController extends BaseController {
 	@ResponseBody
 	public PageResult questionList(PageIn pageIn) {
 		try {
-			if(getCurUser().getId() != 1){
+			if (getCurUser().getId() != 1) {
 				pageIn.setFour("1");
 				pageIn.setTen(getCurUser().getId().toString());
 			}
-			
-			return new PageResultEx(true, "查询成功",  questionService.getListpage(pageIn));
+
+			return new PageResultEx(true, "查询成功", questionService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("试题列表错误：", e);
 			return new PageResult(false, "查询失败");
@@ -487,7 +487,7 @@ public class PaperController extends BaseController {
 	}
 	
 	/**
-	 * 完成设置分数
+	 * 设置分数
 	 * 
 	 * v1.0 zhanghc 2018年10月21日上午10:46:54
 	 * @param paperQuestionId
@@ -495,11 +495,11 @@ public class PaperController extends BaseController {
 	 * @param options
 	 * @return PageResult
 	 */
-	@RequestMapping("/doScoreUpdate")
+	@RequestMapping("/scoreUpdate")
 	@ResponseBody
-	public PageResult doScoreUpdate(Integer paperQuestionId, BigDecimal score) {
+	public PageResult scoreUpdate(Integer paperQuestionId, BigDecimal score) {
 		try {
-			paperService.doScoreUpdate(paperQuestionId, score);
+			paperService.scoreUpdate(paperQuestionId, score);
 			return new PageResult(true, "设置成功");
 		} catch (MyException e) {
 			log.error("完成设置分数错误：{}", e.getMessage());
@@ -617,6 +617,37 @@ public class PaperController extends BaseController {
 			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加试题错误：", e);
+			return new PageResult(false, "未知异常！");
+		}
+	}
+	
+	/**
+	 * 完成发布
+	 * 
+	 * v1.0 zhanghc 2018年11月24日上午9:13:22
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/doPublish")
+	@ResponseBody
+	public PageResult doPublish(Integer id) {
+		try {
+			Paper paper = paperService.getEntity(id);
+			if(paper.getState() == 0){
+				throw new MyException("试卷【"+paper.getName()+"】已删除！");
+			}
+			if(paper.getState() == 1){
+				throw new MyException("试卷【"+paper.getName()+"】已发布！");
+			}
+			
+			paper.setState(1);
+			paperService.update(paper);
+			return new PageResult(true, "发布成功");
+		} catch (MyException e) {
+			log.error("完成发布错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
+		} catch (Exception e) {
+			log.error("完成发布错误：", e);
 			return new PageResult(false, "未知异常！");
 		}
 	}

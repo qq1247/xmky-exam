@@ -3,8 +3,6 @@ package com.wcpdoc.exam.core.service;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.springframework.ui.Model;
-
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.entity.PageIn;
@@ -37,17 +35,6 @@ public interface ExamService extends BaseService<Exam>{
 	void doCfg(Integer id, Integer[] userIds, Integer[] markUserIds);
 
 	/**
-	 * 更新答案
-	 * 
-	 * v1.0 zhanghc 2017年7月3日下午1:44:12
-	 * @param user
-	 * @param examUserQuestionId
-	 * @param answer
-	 * void
-	 */
-	void updateAnswer(LoginUser user, Integer examUserQuestionId, String answer);
-
-	/**
 	 * 完成试卷
 	 * 
 	 * v1.0 zhanghc 2017年7月3日下午11:17:50
@@ -68,7 +55,7 @@ public interface ExamService extends BaseService<Exam>{
 	void doForcePaper(LoginUser user);
 
 	/**
-	 * 更新判卷分数
+	 * 更新阅卷分数
 	 * 
 	 * v1.0 zhanghc 2017年7月4日下午5:47:22
 	 * @param user
@@ -79,7 +66,7 @@ public interface ExamService extends BaseService<Exam>{
 	void updateMarkScore(LoginUser user, Integer examUserQuestionId, BigDecimal score);
 
 	/**
-	 * 完成判卷
+	 * 完成阅卷
 	 * 
 	 * v1.0 zhanghc 2017年7月4日下午9:53:24
 	 * @param user 
@@ -105,27 +92,5 @@ public interface ExamService extends BaseService<Exam>{
 	 * @return PageOut
 	 */
 	PageOut getGradeListpage(PageIn pageIn);
-
-	/**
-	 * 到达试卷页面
-	 * 
-	 * v1.0 zhanghc 2017年8月28日上午8:59:40
-	 * @param model
-	 * @param loginUser 
-	 * @param examId
-	 * void
-	 */
-	void toPaper(Model model, LoginUser loginUser, Integer examId);
-
-	/**
-	 * 到达判卷页面
-	 * 
-	 * v1.0 zhanghc 2017年8月28日上午11:04:18
-	 * @param model
-	 * @param user 
-	 * @param examUserId
-	 * void
-	 */
-	void toMark(Model model, LoginUser currentUser, Integer examUserId);
 
 }

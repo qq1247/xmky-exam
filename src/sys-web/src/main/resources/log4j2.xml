@@ -15,6 +15,8 @@
 	<loggers>
 		<!-- 打印sql参数 -->
 		<Logger name="com.wcpdoc.exam.core.dao.impl.RBaseDaoImpl" level="debug"></Logger>
+		<!-- 打印进度条 -->
+		<Logger name="com.wcpdoc.exam.base.cache.ProgressBarCache" level="debug"></Logger>
 		<!-- 屏蔽动态代理警告 -->
 		<Logger name="org.springframework.aop.framework.CglibAopProxy" level="warn"></Logger>
 		<root level="info">

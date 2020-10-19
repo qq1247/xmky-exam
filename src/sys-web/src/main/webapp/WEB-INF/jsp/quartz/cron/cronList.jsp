@@ -64,7 +64,7 @@
 						{field : "CRON", title : "cron表达式", align : "center"},
 						{field : "STATE_NAME", title : "状态", align : "center"},
 						{field : "RECENT_TRIGGER_TIME", title : "最近三次运行时间 ", align : "center", width : 500},
-						{fixed: 'right', title : "操作 ", toolbar : "#cronToolbar", align : "center", width : 400},
+						{fixed : "right", title : "操作 ", toolbar : "#cronToolbar", align : "center", width : 400},
 						]],
 				page : true,
 				method : "post",

@@ -86,7 +86,7 @@
 						{field : "ICON", title : "图标", align : "center"},
 						{field : "NO", title : "排序", align : "center"},
 						{field : "PARENT_NAME", title : "上级资源 ", align : "center"},
-						{fixed: 'right', title : "操作 ", toolbar : "#resToolbar", align : "center", width : 220}
+						{fixed : "right", title : "操作 ", toolbar : "#resToolbar", align : "center", width : 220}
 						]],
 				page : true,
 				height : "full-180",
