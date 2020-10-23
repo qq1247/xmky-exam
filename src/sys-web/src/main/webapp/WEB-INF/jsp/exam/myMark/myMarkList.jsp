@@ -29,12 +29,12 @@
 				</form>
 				<div class="layui-card-body">
 					<script type="text/html" id="myMarkToolbar">
-						{{#  if(d.EXAM_HAND == "AWAIT"){ }}
+						{{#  if (d.EXAM_HAND == "AWAIT") { }}
 						{{#  } }}
-						{{#  if(d.EXAM_HAND == "START"){ }}
+						{{#  if (d.EXAM_HAND == "START") { }}
 						<my:auth url="myMark/doAutoMark"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="myMarkAutoMark"><i class="layui-icon layui-icon-edit"></i>自动阅卷</a></my:auth>
 						{{#  } }}
-						{{#  if(d.EXAM_HAND == "START" || d.EXAM_HAND == "END"){ }}
+						{{#  if (d.EXAM_HAND == "START" || d.EXAM_HAND == "END") { }}
 						<my:auth url="myMark/toDetailList"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="myMarkPaperList"><i class="layui-icon layui-icon-edit"></i>试卷列表</a></my:auth>
 						{{#  } }}
 					</script>
@@ -60,14 +60,14 @@
 				elem : "#myMarkTable",
 				url : "myMark/list",
 				cols : [[
-						{field : "NAME", title : "试卷名称", align : "center"},
+						{field : "NAME", title : "考试名称", align : "center"},
 						{field : "START_TIME", title : "考试时间", align : "center", templet : function(d) {
 							var startTime = new Date(d.START_TIME_STR);
 							var endTime = new Date(d.END_TIME_STR);
 							return d.START_TIME_STR + "（"+Math.round((endTime.getTime() - startTime.getTime()) / 60000)+"分钟）";
 						}},
-						{field : "PASS_SCORE", title : "分数", align : "center", templet : function(d) {
-							return d.PASS_SCORE + "/" + d.PAPER_TOTAL_SCORE;
+						{field : "PASS_SCORE", title : "及格分数/总分数", align : "center", templet : function(d) {
+							return d.PASS_SCORE + "/" + d.PAPER_TOTLE_SCORE;
 						}},
 						{field : "USER_NUM", title : "参考人数", align : "center"},
 						{fixed : "right", title : "操作 ", toolbar : "#myMarkToolbar", align : "center", width : 280}
@@ -76,7 +76,7 @@
 				height : "full-180",
 				method : "post",
 				defaultToolbar : [],
-				parseData: function(myMark){
+				parseData : function(myMark) {
 					return {
 						"code" : myMark.succ,
 						"msg" : myMark.msg,
@@ -84,19 +84,19 @@
 						"data" : myMark.data.rows
 					};
 				},
-				request: {
+				request : {
 					pageName: "curPage",
 					limitName: "pageSize"
 				}, 
-				response: {
+				response : {
 					statusCode : true
 				}
 			});
-			layui.table.on("rowDouble(myMarkTable)", function(obj){
+			layui.table.on("rowDouble(myMarkTable)", function(obj) {
 			});
-			layui.table.on("tool(myMarkTable)", function(obj){
+			layui.table.on("tool(myMarkTable)", function(obj) {
 				var data = obj.data;
-				if(obj.event === "myMarkAutoMark") {
+				if (obj.event === "myMarkAutoMark") {
 					doMyMarkAutoMark(obj.data.ID);
 				} else if (obj.event === "myMarkPaperList") {
 					toMyMarkPaperList(obj.data.ID);
@@ -128,10 +128,10 @@
 						content : obj,
 						btn : [],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							layui.layer.full(index);
 							setTimeout("initMyExamTable()", 200);
 						}
@@ -159,7 +159,7 @@
 			    	    content: '<div lay-filter="progress" class="layui-progress layui-progress-big" lay-showPercent="true"><div class="layui-progress-bar" lay-percent="0%"><span class="layui-progress-text">0%</span></div></div>'
 			    	});
 					
-					var timer = setInterval(function(){
+					var timer = setInterval(function() {
 						$.ajax({
 							url : "progressBar/get",
 							data : {id : obj.data},
@@ -171,7 +171,7 @@
 								}
 								
 								layui.element.progress("progress", obj.data.percent + "%");
-								if(obj.data.curNum  == obj.data.totalNum){
+								if (obj.data.curNum  == obj.data.totalNum) {
 		    						clearInterval(timer);
 		    						layer.close(progressIndex);
 		    						layer.alert(obj.data.msg, {"title" : "提示消息"});
@@ -190,24 +190,21 @@
 				elem : "#myMarkDetailTable",
 				url : "myMark/detailList",
 				cols : [[
-						{field : "EXAM_NAME", title : "试卷名称", align : "center"},
-						{field : "EXAM_START_TIME", title : "考试时间", align : "center", templet : function(d) {
-							var startTime = new Date(d.EXAM_START_TIME_STR);
-							var endTime = new Date(d.EXAM_END_TIME_STR);
-							return d.EXAM_START_TIME_STR + "（"+Math.round((endTime.getTime() - startTime.getTime()) / 60000)+"分钟）";
-						}},
-						{field : "EXAM_PASS_SCORE", title : "分数", align : "center", templet : function(d) {
-							return d.EXAM_PASS_SCORE + "/" + d.PAPER_TOTAL_SCORE;
-						}},
-						/* {field : "USER_NUM", title : "参考人数", align : "center"}, */
 						{field : "USER_NAME", title : "用户", align : "center"},
+						{field : "MY_EXAM_TOTAL_SCORE", title : "分数", align : "center", templet : function(d) {
+							if (d.MY_EXAM_TOTAL_SCORE < d.EXAM_PASS_SCORE) {
+								return '<span style="color: red;">'+d.MY_EXAM_TOTAL_SCORE+'</span>';
+							}
+							return d.MY_EXAM_TOTAL_SCORE;
+						}},
+						{field : "USER_REMARK", title : "评语", align : "center"},
 						{fixed : "right", title : "操作 ", toolbar : "#myMarkDetailToolbar", align : "center"}
 						]],
 				page : true,
 				height : "full-180",
 				method : "post",
 				defaultToolbar : [],
-				parseData: function(myMarkDetail){
+				parseData : function(myMarkDetail) {
 					return {
 						"code" : myMarkDetail.succ,
 						"msg" : myMarkDetail.msg,
@@ -215,17 +212,17 @@
 						"data" : myMarkDetail.data.rows
 					};
 				},
-				request: {
+				request : {
 					pageName: "curPage",
 					limitName: "pageSize"
 				}, 
-				response: {
+				response : {
 					statusCode : true
 				}
 			});
-			layui.table.on("tool(myMarkDetailTable)", function(obj){
+			layui.table.on("tool(myMarkDetailTable)", function(obj) {
 				var data = obj.data;
-				if(obj.event === "myMarkToMark") {
+				if (obj.event === "myMarkToMark") {
 					toMyMarkMark(obj.data.ID);
 				}
 			});
@@ -245,8 +242,8 @@
 		}
 		
 		// 到达我的阅卷页面
-		function toMyMarkMark(examUserId) {
-			window.open("myMark/toMark?examUserId=" + examUserId);
+		function toMyMarkMark(myExamId) {
+			window.open("myMark/toMark?myExamId=" + myExamId);
 		}
 	</script>
 </html>

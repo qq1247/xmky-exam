@@ -111,30 +111,30 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		List<QuestionType> questionTypeList = getList();
 		
 		List<Map<String, Object>> questionTypeTreeList = new ArrayList<Map<String,Object>>();
-		for(QuestionType questionType : questionTypeList){
+		for(QuestionType questionType : questionTypeList) {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("ID", questionType.getId());
 			map.put("NAME", questionType.getName());
 			map.put("PARENT_ID", questionType.getParentId());
 			
-			if(ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())){// 系统管理员，拥有所有权限
+			if(ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {// 系统管理员，拥有所有权限
 				questionTypeTreeList.add(map);
 				continue;
 			}
 			if(ValidateUtil.isValid(questionType.getUserIds()) 
-					&& questionType.getUserIds().contains(String.format(",%s,", user.getId()))){//有用户权限
+					&& questionType.getUserIds().contains(String.format(",%s,", user.getId()))) {//有用户权限
 				questionTypeTreeList.add(map);
 				continue;
 			}
 			if(ValidateUtil.isValid(questionType.getOrgIds())
-					&& questionType.getOrgIds().contains(String.format(",%s,", user.getOrgId()))){//有机构权限
+					&& questionType.getOrgIds().contains(String.format(",%s,", user.getOrgId()))) {//有机构权限
 				questionTypeTreeList.add(map);
 				continue;
 			}
 			if (ValidateUtil.isValid(questionType.getPostIds())
 					&& ValidateUtil.isValid(user.getPostIds())) {
 				Set<String> postList = new HashSet<>(Arrays.asList(user.getPostIds().substring(1, user.getPostIds().length() - 1).split(",")));
-				for(String postId : postList){
+				for(String postId : postList) {
 					if (postService.getEntity(Integer.parseInt(postId)).getState() == 1
 							&& questionType.getPostIds().contains(String.format(",%s,", postId))) {//有岗位权限
 						questionTypeTreeList.add(map);
@@ -202,9 +202,9 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 
 	@Override
 	public void doAuth(Integer id, Integer[] userIds, Integer[] postIds, Integer[] orgIds, boolean syn2Sub) {
-		if(syn2Sub){
+		if(syn2Sub) {
 			List<QuestionType> questionTypeList = questionTypeDao.getList(id);
-			for(QuestionType questionType : questionTypeList){
+			for(QuestionType questionType : questionTypeList) {
 				doAuth(questionType.getId(), userIds, postIds, orgIds, syn2Sub);
 			}
 		}

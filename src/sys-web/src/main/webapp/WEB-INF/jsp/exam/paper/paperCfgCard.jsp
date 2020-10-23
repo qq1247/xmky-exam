@@ -30,13 +30,29 @@
 		</h2>
 		<div class="layui-colla-content layui-show">
 			<c:forEach var="subPaperQuestionEx" items="${paperQuestionEx.subList }" varStatus="v1">
-			<c:set var="examUserQuestion" value="${examUserQuestionMap[subPaperQuestionEx.questionId + 0]}"></c:set>
-			<a id="examCard_${examUserQuestion.id }" href="${requestScope['javax.servlet.forward.request_uri']}?${!empty param.id ? 'id=': 'examUserId=' }${!empty param.id ? param.id : param.examUserId}#title${subPaperQuestionEx.question.id }">${subPaperQuestionEx.no }</a>
+			<c:set var="myExamDetail" value="${myExamDetailMap[subPaperQuestionEx.questionId + 0]}"></c:set>
+			<c:if test="${design || answer }">
+			<a id="examCard_${myExamDetail.id }" 
+				href="${requestScope['javax.servlet.forward.request_uri']}?${!empty param.id ? 'id=': 'myExamId=' }${!empty param.id ? param.id : param.myExamId}#title${subPaperQuestionEx.question.id }"
+				${!empty myExamDetail.answer ? 'class="select"' : '' }
+				>${subPaperQuestionEx.no }</a>
+			</c:if>
+			<c:if test="${mark }">
+			<c:if test="${subPaperQuestionEx.question.type == 5 }">
+			<a id="examCard_${myExamDetail.id }" 
+				href="${requestScope['javax.servlet.forward.request_uri']}?${!empty param.id ? 'id=': 'myExamId=' }${!empty param.id ? param.id : param.myExamId}#title${subPaperQuestionEx.question.id }"
+				${!empty myExamDetail.score ? 'class="select"' : '' }
+				>${subPaperQuestionEx.no }</a>
+			</c:if>
+			</c:if>
 			</c:forEach>
 		</div>
 	</div>
 	</c:forEach>
 	<div class="layui-colla-item">
+		<c:if test="${design }">
+		<h2 class="exam-head" onclick="colseDesignWin(false)">关闭</h2>
+		</c:if>
 		<c:if test="${answer }">
 		<h2 class="exam-head" onclick="doPaper(false)">交卷</h2>
 		</c:if>

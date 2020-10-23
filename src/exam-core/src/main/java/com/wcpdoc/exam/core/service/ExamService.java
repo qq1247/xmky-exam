@@ -1,6 +1,5 @@
 package com.wcpdoc.exam.core.service;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import com.wcpdoc.exam.core.entity.Exam;
@@ -15,7 +14,7 @@ import com.wcpdoc.exam.core.entity.PageOut;
 public interface ExamService extends BaseService<Exam>{
 	
 	/**
-	 * 获取考试用户列表 
+	 * 获取我的考试列表 
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param pageIn
@@ -29,51 +28,30 @@ public interface ExamService extends BaseService<Exam>{
 	 * v1.0 zhanghc 2017年6月19日下午3:10:24
 	 * @param id 
 	 * @param userIds
-	 * @param markUserIds
+	 * @param myMarkIds
 	 * void
 	 */
-	void doCfg(Integer id, Integer[] userIds, Integer[] markUserIds);
+	void doCfg(Integer id, Integer[] userIds, Integer[] myMarkIds);
 
 	/**
 	 * 完成试卷
 	 * 
 	 * v1.0 zhanghc 2017年7月3日下午11:17:50
 	 * @param user
-	 * @param examUserId
+	 * @param myExamId
 	 * void
 	 */
-	void doPaper(LoginUser user, Integer examUserId);
+	void doPaper(LoginUser user, Integer myExamId);
 	
 	/**
 	 * 完成强制交卷
 	 * 
 	 * v1.0 zhanghc 2017年8月28日上午10:37:27
 	 * @param user
-	 * @param examUserId
+	 * @param myExamId
 	 * void
 	 */
 	void doForcePaper(LoginUser user);
-
-	/**
-	 * 更新阅卷分数
-	 * 
-	 * v1.0 zhanghc 2017年7月4日下午5:47:22
-	 * @param user
-	 * @param examUserQuestionId
-	 * @param score
-	 * void
-	 */
-	void updateMarkScore(LoginUser user, Integer examUserQuestionId, BigDecimal score);
-
-	/**
-	 * 完成阅卷
-	 * 
-	 * v1.0 zhanghc 2017年7月4日下午9:53:24
-	 * @param user 
-	 * @param examUserId
-	 * void
-	 */
-	void doMark(LoginUser user, Integer examUserId);
 
 	/**
 	 * 获取考试列表

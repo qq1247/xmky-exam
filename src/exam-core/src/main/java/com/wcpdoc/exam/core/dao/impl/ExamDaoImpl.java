@@ -37,7 +37,7 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 		String sql = "SELECT EXAM.ID, EXAM.NAME, EXAM.PASS_SCORE, EXAM.START_TIME, EXAM.END_TIME, "
 				+ "		EXAM.STATE, PAPER.NAME AS PAPER_NAME, PAPER.TOTAL_SCORE AS PAPER_TOTLE_SCORE, "
 				+ "		EXAM.MARK_START_TIME, EXAM.MARK_END_TIME, "
-				+ "		( SELECT COUNT( * ) FROM EXM_EXAM_USER A WHERE A.EXAM_ID = EXAM.ID ) AS USER_NUM "
+				+ "		(SELECT COUNT(*) FROM EXM_MY_EXAM A WHERE A.EXAM_ID = EXAM.ID) AS USER_NUM "
 				+ "FROM EXM_EXAM EXAM "
 				+ "LEFT JOIN EXM_EXAM_TYPE EXAM_TYPE ON EXAM.EXAM_TYPE_ID = EXAM_TYPE.ID "
 				+ "LEFT JOIN EXM_PAPER PAPER ON EXAM.PAPER_ID = PAPER.ID";
@@ -49,7 +49,7 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "EXAM.STATE = ?", pageIn.getFour())//0：删除；1：启用；2：禁用
 				.addWhere(ValidateUtil.isValid(pageIn.getFive()), "EXAM.START_TIME > ?", ValidateUtil.isValid(pageIn.getFive()) ? DateUtil.getDateTime(pageIn.getFive()) : null)
 				.addWhere(ValidateUtil.isValid(pageIn.getSix()), "EXAM.START_TIME < ?", ValidateUtil.isValid(pageIn.getSix()) ? DateUtil.getDateTime(pageIn.getSix()) : null)
-				.addWhere(ValidateUtil.isValid(pageIn.getEight()), "EXISTS (SELECT 1 FROM EXM_MARK_USER Z WHERE Z.USER_ID = ? AND Z.EXAM_ID = EXAM.ID)", pageIn.getEight())
+				.addWhere(ValidateUtil.isValid(pageIn.getEight()), "EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.USER_ID = ? AND Z.EXAM_ID = EXAM.ID)", pageIn.getEight())
 				.addWhere("EXAM.STATE != ?", 0)
 				.addOrder("EXAM.START_TIME", Order.DESC);
 		
@@ -93,8 +93,8 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "(USER.NAME LIKE ? OR ORG.NAME LIKE ?)", "%" + pageIn.getTwo() + "%", "%" + pageIn.getTwo() + "%")
-		.addWhere(ValidateUtil.isValid(pageIn.getNine()), "EXISTS (SELECT 1 FROM EXM_MARK_USER Z WHERE Z.EXAM_ID = ? AND USER.ID = Z.USER_ID)", pageIn.getNine())
-				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "EXISTS (SELECT 1 FROM EXM_EXAM_USER Z WHERE Z.EXAM_ID = ? AND USER.ID = Z.USER_ID)", pageIn.getTen())
+		.addWhere(ValidateUtil.isValid(pageIn.getNine()), "EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.EXAM_ID = ? AND USER.ID = Z.USER_ID)", pageIn.getNine())
+				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "EXISTS (SELECT 1 FROM EXM_MY_EXAM Z WHERE Z.EXAM_ID = ? AND USER.ID = Z.USER_ID)", pageIn.getTen())
 				.addWhere("USER.STATE = 1")
 				.addOrder("USER.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
@@ -109,11 +109,11 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 
 	@Override
 	public void doForcePaper(LoginUser user) {
-		String sql = "UPDATE EXM_EXAM_USER "
+		String sql = "UPDATE EXM_MY_EXAM "
 				+ "SET STATE = 4, UPDATE_USER_ID = ?, UPDATE_TIME = ? "
 				+ "WHERE STATE <= 2 AND ID IN (SELECT ID FROM("
 				+ "		SELECT Z.ID "
-				+ "		FROM EXM_EXAM_USER Z "
+				+ "		FROM EXM_MY_EXAM Z "
 				+ "		INNER JOIN EXM_EXAM Z1 ON Z.EXAM_ID = Z1.ID "
 				+ "		WHERE Z1.END_TIME <= ?) A)";
 		Date curTime = new Date();
@@ -122,28 +122,29 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 
 	@Override
 	public PageOut getGradeListpage(PageIn pageIn) {
-		String sql = "SELECT EXAM.NAME AS EXAM_NAME, EXAM.START_TIME AS EXAM_START_TIME, "
-				+ "		EXAM.END_TIME AS EXAM_END_TIME, PAPER.NAME AS PAPER_NAME, USER.NAME AS USER_NAME, "
-				+ "		EXAM_USER.TOTAL_SCORE, EXAM_USER.STATE AS EXAM_USER_STATE, MARK_USER.NAME AS MARK_USER_NAME, "
-				+ "		EXAM_USER.UPDATE_MARK_TIME AS EXAM_USER_UPDATE_MARK_TIME "
-				+ "FROM EXM_EXAM_USER EXAM_USER "
-				+ "INNER JOIN EXM_EXAM EXAM ON EXAM.ID = EXAM_USER.EXAM_ID "
-				+ "INNER JOIN EXM_PAPER PAPER ON EXAM.PAPER_ID = PAPER.ID "
-				+ "INNER JOIN SYS_USER USER ON EXAM_USER.USER_ID = USER.ID "
-				+ "INNER JOIN SYS_USER MARK_USER ON EXAM_USER.UPDATE_MARK_USER_ID = MARK_USER.ID ";
-		
-		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil//.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "EXAM.EXAM_TYPE_ID = ?", pageIn.getOne())
-				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "EXAM.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "PAPER.NAME LIKE ?", "%" + pageIn.getThree() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "USER.NAME LIKE ?", "%" + pageIn.getFour() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getFive()), "MARK.USER.NAME LIKE ?", "%" + pageIn.getFive() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getSix()), "EXAM_USER.STATE = ?", pageIn.getSix())
-				.addOrder("EXAM.START_TIME", Order.DESC);
-		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDate(pageOut.getRows(), "EXAM_START_TIME", DateUtil.FORMAT_DATE_TIME, 
-				"EXAM_END_TIME", DateUtil.FORMAT_DATE_TIME, "EXAM_USER_UPDATE_MARK_TIME", DateUtil.FORMAT_DATE_TIME);
-		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), "EXAM_USER_STATE", "EXAM_USER_STATE");
-		return pageOut;
+		return null;
+//		String sql = "SELECT EXAM.NAME AS EXAM_NAME, EXAM.START_TIME AS EXAM_START_TIME, "
+//				+ "		EXAM.END_TIME AS EXAM_END_TIME, PAPER.NAME AS PAPER_NAME, USER.NAME AS USER_NAME, "
+//				+ "		MY_EXAM.TOTAL_SCORE, MY_EXAM.STATE AS MY_EXAM_STATE, MY_MARK.NAME AS MY_MARK_NAME, "
+//				+ "		MY_EXAM.UPDATE_MARK_TIME AS MY_EXAM_UPDATE_MARK_TIME "
+//				+ "FROM EXM_MY_EXAM MY_EXAM "
+//				+ "INNER JOIN EXM_EXAM EXAM ON EXAM.ID = MY_EXAM.EXAM_ID "
+//				+ "INNER JOIN EXM_PAPER PAPER ON EXAM.PAPER_ID = PAPER.ID "
+//				+ "INNER JOIN SYS_USER USER ON MY_EXAM.USER_ID = USER.ID "
+//				+ "INNER JOIN SYS_USER MY_MARK ON MY_EXAM.UPDATE_MARK_USER_ID = MY_MARK.ID ";
+//		
+//		SqlUtil sqlUtil = new SqlUtil(sql);
+//		sqlUtil//.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "EXAM.EXAM_TYPE_ID = ?", pageIn.getOne())
+//				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "EXAM.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
+//				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "PAPER.NAME LIKE ?", "%" + pageIn.getThree() + "%")
+//				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "USER.NAME LIKE ?", "%" + pageIn.getFour() + "%")
+//				.addWhere(ValidateUtil.isValid(pageIn.getFive()), "MARK.USER.NAME LIKE ?", "%" + pageIn.getFive() + "%")
+//				.addWhere(ValidateUtil.isValid(pageIn.getSix()), "MY_EXAM.STATE = ?", pageIn.getSix())
+//				.addOrder("EXAM.START_TIME", Order.DESC);
+//		PageOut pageOut = getListpage(sqlUtil, pageIn);
+//		HibernateUtil.formatDate(pageOut.getRows(), "EXAM_START_TIME", DateUtil.FORMAT_DATE_TIME, 
+//				"EXAM_END_TIME", DateUtil.FORMAT_DATE_TIME, "MY_EXAM_UPDATE_MARK_TIME", DateUtil.FORMAT_DATE_TIME);
+//		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), "MY_EXAM_STATE", "MY_EXAM_STATE");
+//		return pageOut;
 	}
 }

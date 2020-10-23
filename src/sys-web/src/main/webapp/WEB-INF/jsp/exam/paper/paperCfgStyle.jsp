@@ -4,7 +4,7 @@
 	position: fixed;
 	right: 50px;
 	top: 65px;
-	width: 300px;
+	width: 212px;
 	font-family: "Microsoft YaHei";
 }
 
@@ -81,6 +81,10 @@
 	margin-bottom: 10px;
 }
 
+.exam .layui-colla-icon {
+	display: none;
+}
+
 .exam .exam-qst-op-select {
 	color: #5FB878;
 	border: 1px solid #5FB878;
@@ -111,7 +115,7 @@
 	background-color: #fff !important;
 	padding-left: 15px !important;
 	font-size: 22px !important;
-	width: calc(100% - 90px);
+	width: calc(100% - 116px);
 	display: inline-block;
 }
 

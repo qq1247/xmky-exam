@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperType;
+import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.PaperTypeExService;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
  * 试卷分类扩展服务层实现
@@ -24,9 +26,9 @@ public class PaperTypeExServiceImpl implements PaperTypeExService {
 
 	@Override
 	public void delAndUpdate(PaperType paperType) {
-//		List<Paper> paperList = paperService.getList(paperType.getId());
-//		for (Paper paper : paperList) {
-//			paper.setPaperTypeId(1);
-//		}
+		List<Paper> paperList = paperService.getList(paperType.getId());
+		if (ValidateUtil.isValid(paperList)) {
+			throw new MyException("该试卷分类下有试卷，不允许删除！");
+		}
 	}
 }

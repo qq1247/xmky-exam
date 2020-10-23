@@ -96,7 +96,7 @@ public class LoginController extends BaseController {
 	@RequestMapping("/toHome")
 	public String toHome(Model model) {
 		try {
-			if(getCurUser() == null){
+			if(getCurUser() == null) {
 				return "redirect:/login/toIn";
 			}
 			
@@ -113,7 +113,7 @@ public class LoginController extends BaseController {
 	 * @return String
 	 */
 	@RequestMapping("/doOut")
-	public String doOut(){
+	public String doOut() {
 		try {
 			//完成退出登录
 			loginService.doOut(request);

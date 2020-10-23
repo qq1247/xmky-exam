@@ -170,7 +170,7 @@
 	<%@include file="/script/myJs/tail.jspf"%>
 	<script type="text/javascript">
 		// 到达修改密码页面
-		function topwdUpdate(){
+		function topwdUpdate() {
 			$.ajax({
 				url : "login/toPwdUpdate",
 				dataType : "html",
@@ -181,10 +181,10 @@
 						content : obj,
 						btn : ["修改", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doPwdUpdate(index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							
 						}
 					});

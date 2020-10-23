@@ -28,14 +28,14 @@ public class AuthInterceptor implements HandlerInterceptor {
 		String contextPath = request.getContextPath();
 		String uri = request.getRequestURI().replaceFirst(contextPath + "/", "");
 		String pubRes = ",login/toIn,login/doIn,login/toHome,login/doOut,login/toPwdUpdate,login/doPwdUpdate,login/curTime,file/doTempUpload,file/doDownload,progressBar/get,";
-		if(pubRes.contains("," + uri + ",")){
+		if(pubRes.contains("," + uri + ",")) {
 			log.debug("权限拦截：公共资源，不拦截");
 			return true;
 		}
 		
 		//如果是系统管理员登陆，则不拦截。
 		HttpSession session = request.getSession(false);//直接访问jsp会创建session，看work目录反编译后的对应jsp（第一次访问request.getSession()会创建session）
-		if(session != null){
+		if(session != null) {
 			LoginUser user = (LoginUser) session.getAttribute(ConstantManager.USER);
 			if (user != null && ConstantManager.ADMIN_LOGIN_NAME.equals(user.getLoginName())) {
 				log.debug("权限拦截：系统管理员登陆，不拦截");
@@ -45,7 +45,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 		
 		//如果当前用户未登陆，则拦截。
 		String redirectUrl = String.format("%s/login/toIn", contextPath);
-		if(session == null || session.getAttribute(ConstantManager.USER) == null){
+		if(session == null || session.getAttribute(ConstantManager.USER) == null) {
 			response.sendRedirect(redirectUrl);
 			log.info("权限拦截：当前用户未登陆，拦截");
 			return false;
@@ -54,7 +54,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 		//如果当前用户访问的资源未知，则拦截。
 		Map<String, Res> authMap = ResCache.getUrlResMap();
 		Res res = authMap.get(uri);
-		if(res == null){
+		if(res == null) {
 			response.sendRedirect(redirectUrl);
 			log.info("权限拦截：当前用户访问的资源【{}】未知，拦截", uri);
 			return false;
@@ -64,7 +64,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 		@SuppressWarnings("unchecked")
 		Map<Integer, Long> userAuthMap = (Map<Integer, Long>) session.getAttribute(ConstantManager.USER_AUTH_MAP);
 		if(userAuthMap.get(res.getAuthPos()) == null 
-				|| (userAuthMap.get(res.getAuthPos()) & res.getAuthCode()) == 0){
+				|| (userAuthMap.get(res.getAuthPos()) & res.getAuthCode()) == 0) {
 			response.sendRedirect(redirectUrl);
 			log.info("权限拦截：当前用户的权限不包含当前的资源【{}】，拦截", uri);
 			return false;

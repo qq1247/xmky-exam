@@ -79,7 +79,7 @@ public interface PaperService extends BaseService<Paper> {
 	 * @param score 
 	 * void
 	 */
-	void scoreUpdate(Integer paperQuestionId, BigDecimal score);
+	void doScoreUpdate(Integer paperQuestionId, BigDecimal score);
 	
 	/**
 	 * 完成设置选项
@@ -139,5 +139,25 @@ public interface PaperService extends BaseService<Paper> {
 	 * @param chapterId void
 	 */
 	void doChapterDown(Integer chapterId);
+
+	/**
+	 * 获取试卷列表
+	 * 
+	 * v1.0 zhanghc 2017年8月6日下午9:43:55
+	 * @param paperTypeId
+	 * @return List<Paper>
+	 */
+	List<Paper> getList(Integer paperTypeId);
+
+	/**
+	 * 完成批量更新分数
+	 * 
+	 * v1.0 zhanghc 2017年6月9日下午4:21:52
+	 * @param chapterId
+	 * @param scores
+	 * @param options
+	 * void
+	 */
+	void doBatchScoreUpdate(Integer chapterId, BigDecimal score, String options);
 	
 }

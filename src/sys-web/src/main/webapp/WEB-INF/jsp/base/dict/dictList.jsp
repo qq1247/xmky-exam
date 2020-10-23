@@ -71,7 +71,7 @@
 				height : "full-180",
 				method : "post",
 				defaultToolbar : [],
-				parseData: function(dict){
+				parseData : function(dict) {
 					return {
 						"code" : dict.succ,
 						"msg" : dict.msg,
@@ -79,22 +79,22 @@
 						"data" : dict.data.rows
 					};
 				},
-				request: {
+				request : {
 					pageName: "curPage",
 					limitName: "pageSize"
 				}, 
-				response: {
+				response : {
 					statusCode : true
 				}
 			});
-			layui.table.on("rowDouble(dictTable)", function(obj){
+			layui.table.on("rowDouble(dictTable)", function(obj) {
 				<my:auth url="dict/toEdit">toDictEdit(obj.data.ID);</my:auth>
 			});
-			layui.table.on("tool(dictTable)", function(obj){
+			layui.table.on("tool(dictTable)", function(obj) {
 				var data = obj.data;
-				if(obj.event === "dictEdit") {
+				if (obj.event === "dictEdit") {
 					toDictEdit(obj.data.ID);
-				} else if(obj.event === "dictDel") {
+				} else if (obj.event === "dictDel") {
 					doDictDel(obj.data.ID);
 				}
 			});
@@ -123,10 +123,10 @@
 						content : obj,
 						btn : ["添加", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doDictAdd(index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							layui.form.render(null, "dictEditFrom");
 						}
 					});
@@ -171,10 +171,10 @@
 						content : obj,
 						btn : ["修改", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doDictEdit(index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							layui.form.render(null, "dictEditFrom");
 						}
 					});

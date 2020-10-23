@@ -41,10 +41,14 @@
 							<my:auth url="paper/toAdd"><button class="layui-btn layuiadmin-btn-useradmin" onclick="toPaperAdd();">添加</button></my:auth>
 						</div>
 						<script type="text/html" id="paperToolbar">
-						<my:auth url="paper/toEdit"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="paperEdit"><i class="layui-icon layui-icon-edit"></i>修改</a></my:auth>
-						<my:auth url="paper/toCfg"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="paperCfg"><i class="layui-icon layui-icon-edit"></i>配置试卷</a></my:auth>
-						<my:auth url="paper/doDel"><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="paperDel"><i class="layui-icon layui-icon-delete"></i>删除</a></my:auth>
-					</script>
+							<my:auth url="paper/toEdit"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="paperEdit"><i class="layui-icon layui-icon-edit"></i>修改</a></my:auth>
+							<my:auth url="paper/toCfg"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="paperCfg"><i class="layui-icon layui-icon-edit"></i>配置试卷</a></my:auth>
+							<my:auth url="paper/doDel"><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="paperDel"><i class="layui-icon layui-icon-delete"></i>删除</a></my:auth>
+						</script>
+						<script type="text/html" id="stateToolbar">
+							<input type="checkbox" name="state" value="{{d.ID}}" lay-filter="paperPublish" data-json="{{ encodeURIComponent(JSON.stringify(d)) }}"
+								lay-skin="switch" lay-text="发布|草稿" {{d.STATE == 1 ? 'checked' : ''}}>
+						</script>
 						<%-- 试卷数据表格 --%>
 						<table id="paperTable" lay-filter="paperTable"></table>
 					</div>
@@ -79,17 +83,14 @@
 						{field : "PASS_SCORE", title : "及格分数", align : "center"},
 						{field : "TOTAL_SCORE", title : "总分数", align : "center"},
 						{field : "PAPER_TYPE_NAME", title : "试卷分类", align : "center"},
-						{field : "STATE_NAME", title : "状态", align : "center", templet : function(d) {
-							return '<input type="checkbox" name="state" value="'+d.ID+'" '
-								+ 'lay-skin="switch" lay-text="已发布|未发布" lay-filter="paperPublish"' + (d.STATE == 1 ? 'checked' : '') + '>'
-						}},
+						{field : "STATE_NAME", title : "状态", align : "center", templet : "#stateToolbar", unresize: true},
 						{fixed : "right", title : "操作 ", toolbar : "#paperToolbar", align : "center", width : 280}
 						]],
 				page : true,
 				height : "full-180",
 				method : "post",
 				defaultToolbar : [],
-				parseData: function(paper){
+				parseData : function(paper) {
 					return {
 						"code" : paper.succ,
 						"msg" : paper.msg,
@@ -97,29 +98,30 @@
 						"data" : paper.data.rows
 					};
 				},
-				request: {
+				request : {
 					pageName: "curPage",
 					limitName: "pageSize"
 				}, 
-				response: {
+				response : {
 					statusCode : true
 				}
 			});
-			layui.table.on("rowDouble(paperTable)", function(obj){
+			layui.table.on("rowDouble(paperTable)", function(obj) {
 				<my:auth url="paper/toEdit">toPaperEdit(obj.data.ID);</my:auth>
 			});
-			layui.table.on("tool(paperTable)", function(obj){
+			layui.table.on("tool(paperTable)", function(obj) {
 				var data = obj.data;
-				if(obj.event === "paperEdit") {
+				if (obj.event === "paperEdit") {
 					toPaperEdit(obj.data.ID);
-				} else if(obj.event === "paperDel") {
+				} else if (obj.event === "paperDel") {
 					doPaperDel(obj.data.ID);
-				} else if(obj.event === "paperCfg") {
+				} else if (obj.event === "paperCfg") {
 					toPaperCfg(obj.data.ID, obj.data.NAME);
 				}
 			});
 			layui.form.on("switch(paperPublish)", function(obj) {
-				doPaperPublish(obj.value);
+				var json = JSON.parse(decodeURIComponent($(this).data('json')));
+				doPaperPublish(obj.value, json.NAME, json.STATE);
 			});
 		}
 		
@@ -176,7 +178,7 @@
 		
 		//到达添加试卷页面
 		function toPaperAdd() {
-			if(!curSelPaperTypeId){
+			if (!curSelPaperTypeId) {
 				layer.alert("请选择试卷分类！", {"title" : "提示消息"});
 				return;
 			}
@@ -191,10 +193,10 @@
 						content : obj,
 						btn : ["添加", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doPaperAdd(index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							$("#paperTypeId").val(curSelPaperTypeId);
 							$("#paperTypeName").val(curSelPaperTypeName);
 							UE.delEditor("description");
@@ -248,10 +250,10 @@
 						content : obj,
 						btn : ["修改", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doPaperEdit(index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							UE.delEditor("description");
 							UE.getEditor("description");
 							layui.form.render(null, "paperEditFrom");
@@ -291,7 +293,7 @@
 		}
 
 		//完成删除试卷
-		function doPaperDelForBtn() {
+		function doPaperDel(id) {
 			layer.confirm("确定要删除？", function(index) {
 				$.ajax({
 					url : "paper/doDel",
@@ -312,7 +314,9 @@
 
 		//到达配置试卷页面
 		function toPaperCfg(id, name) {
-			$.ajax({
+			toCfgWin = window.open("paper/toCfg?id=" + id);
+			
+			/* $.ajax({
 				url : "paper/toCfg",
 				data : {id : id},
 				dataType : "html",
@@ -324,10 +328,10 @@
 						content : obj,
 						btn : [],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							layui.layer.full(index);
 							layui.element.render("collapse", "exam-card");
 							layui.form.on("switch(options)", function(data) {
@@ -337,13 +341,13 @@
 						}
 					});
 				}
-			});
+			}); */
 		}
 		
 		// 添加分值评语
 		function addScoreRemark(curObj) {
 			var optionRows = $("input[name$='Remark']");
-			if(optionRows.length >= remarkOptionLabs.length){// 如果已加到最大添加行，则不处理
+			if (optionRows.length >= remarkOptionLabs.length) {// 如果已加到最大添加行，则不处理
 				return;
 			}
 			
@@ -377,7 +381,13 @@
 		}
 		
 		// 试卷发布
-		function doPaperPublish(id) {
+		function doPaperPublish(id, name, state) {
+			if (state == "1") { // 状态无效的时候恢复
+				paperQuery();
+				layer.alert("试卷【"+name+"】已发布！", {"title" : "提示消息"});
+				return;
+			}
+			
 			layer.confirm("发布后不能配置试卷，确定？", function(index) {
 				$.ajax({
 					url : "paper/doPublish",
@@ -387,7 +397,7 @@
 					success : function(obj) {
 						paperQuery();
 						
-						if(!obj.succ){
+						if (!obj.succ) {
 							layer.alert(obj.msg, {"title" : "提示消息"});
 							return;
 						}
@@ -395,6 +405,8 @@
 						layer.close(index);
 					}
 				});
+			}, function(index) { // 点取消的时候恢复
+				paperQuery();
 			});
 		}
 	</script>

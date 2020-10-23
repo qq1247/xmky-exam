@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wcpdoc.exam.core.entity.Exam;
-import com.wcpdoc.exam.core.entity.ExamUser;
-import com.wcpdoc.exam.core.entity.ExamUserQuestion;
+import com.wcpdoc.exam.core.entity.MyExam;
+import com.wcpdoc.exam.core.entity.MyExamDetail;
 import com.wcpdoc.exam.core.entity.LoginUser;
-import com.wcpdoc.exam.core.entity.MarkUser;
+import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
@@ -30,9 +30,9 @@ import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.PaperQuestionEx;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.ExamService;
-import com.wcpdoc.exam.core.service.ExamUserQuestionService;
-import com.wcpdoc.exam.core.service.ExamUserService;
-import com.wcpdoc.exam.core.service.MarkUserService;
+import com.wcpdoc.exam.core.service.MyExamDetailService;
+import com.wcpdoc.exam.core.service.MyExamService;
+import com.wcpdoc.exam.core.service.MyMarkService;
 import com.wcpdoc.exam.core.service.PaperQuestionService;
 import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.util.BigDecimalUtil;
@@ -45,19 +45,19 @@ import com.wcpdoc.exam.core.util.SpringUtil;
  */
 @Controller
 @RequestMapping("/myMark")
-public class MyMarkController extends BaseController{
+public class MyMarkController extends BaseController {
 	private static final Logger log = LoggerFactory.getLogger(MyMarkController.class);
 	
 	@Resource
-	private ExamUserService examUserService;
+	private MyExamService myExamService;
 	@Resource
 	private ExamService examService;
 	@Resource
 	private PaperService paperService;
 	@Resource
-	private ExamUserQuestionService examUserQuestionService;
+	private MyExamDetailService myExamDetailService;
 	@Resource
-	private MarkUserService markUserService;
+	private MyMarkService myMarkService;
 	@Resource
 	private PaperQuestionService paperQuestionService;
 	
@@ -94,7 +94,7 @@ public class MyMarkController extends BaseController{
 			List<Map<String, Object>> list = pageOut.getRows();
 			
 			Date curTime = new Date();
-			for(Map<String, Object> map : list){
+			for(Map<String, Object> map : list) {
 				Date startTime = (Date) map.get("MARK_START_TIME");
 				Date endTime = (Date) map.get("MARK_END_TIME");
 				if (startTime.getTime() > curTime.getTime()) {
@@ -142,11 +142,11 @@ public class MyMarkController extends BaseController{
 	public PageResult detailList(PageIn pageIn) {
 		try {
 			pageIn.setEight(getCurUser().getId().toString());
-			PageOut pageOut = examUserService.getListpage(pageIn);
+			PageOut pageOut = myExamService.getListpage(pageIn);
 			List<Map<String, Object>> list = pageOut.getRows();
 			
 			Date curTime = new Date();
-			for(Map<String, Object> map : list){
+			for(Map<String, Object> map : list) {
 				Date startTime = (Date) map.get("EXAM_MARK_START_TIME");
 				Date endTime = (Date) map.get("EXAM_MARK_END_TIME");
 				if (startTime.getTime() > curTime.getTime()) {
@@ -155,6 +155,40 @@ public class MyMarkController extends BaseController{
 					map.put("EXAM_HAND", "START");
 				} else {
 					map.put("EXAM_HAND", "END");
+				}
+				
+				BigDecimal userScore = (BigDecimal) map.get("MY_EXAM_TOTAL_SCORE");
+				BigDecimal scoreA = (BigDecimal) map.get("EXAM_SCORE_A");
+				String scoreARemark = (String) map.get("EXAM_SCORE_A_REMARK");
+				if (scoreA != null && userScore != null && userScore.doubleValue() >= scoreA.doubleValue()) {
+					map.put("USER_REMARK", scoreARemark);
+					continue;
+				}
+				BigDecimal scoreB = (BigDecimal) map.get("EXAM_SCORE_B");
+				String scoreBRemark = (String) map.get("EXAM_SCORE_B_REMARK");
+				if (scoreB != null && userScore != null && userScore.doubleValue() >= scoreB.doubleValue()) {
+					map.put("USER_REMARK", scoreBRemark);
+					continue;
+				}
+				BigDecimal scoreC = (BigDecimal) map.get("EXAM_SCORE_C");
+				String scoreCRemark = (String) map.get("EXAM_SCORE_C_REMARK");
+				if (scoreC != null && userScore != null && userScore.doubleValue() >= scoreC.doubleValue()) {
+					map.put("USER_REMARK", scoreCRemark);
+					continue;
+				}
+				
+				BigDecimal scoreD = (BigDecimal) map.get("EXAM_SCORE_D");
+				String scoreDRemark = (String) map.get("EXAM_SCORE_D_REMARK");
+				if (scoreD != null && userScore != null && userScore.doubleValue() >= scoreD.doubleValue()) {
+					map.put("USER_REMARK", scoreDRemark);
+					continue;
+				}
+				
+				BigDecimal scoreE = (BigDecimal) map.get("EXAM_SCORE_E");
+				String scoreERemark = (String) map.get("EXAM_SCORE_E_REMARK");
+				if (scoreE != null && userScore != null && userScore.doubleValue() >= scoreE.doubleValue()) {
+					map.put("USER_REMARK", scoreERemark);
+					continue;
 				}
 			}
 			
@@ -170,39 +204,41 @@ public class MyMarkController extends BaseController{
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @param model
-	 * @param examUserId
+	 * @param myExamId
 	 * @return String
 	 */
 	@RequestMapping("/toMark")
-	public String toMark(Model model, Integer examUserId) {
+	public String toMark(Model model, Integer myExamId) {
 		try {
 			// 校验数据有效性
-			ExamUser examUser = examUserService.getEntity(examUserId);
-			Exam exam = examService.getEntity(examUser.getExamId());
-			List<MarkUser> markUserList = markUserService.getList(examUser.getExamId());
+			MyExam myExam = myExamService.getEntity(myExamId);
+			if(myExam == null) {
+				throw new MyException("参数错误：myExamId");
+			}
+			Exam exam = examService.getEntity(myExam.getExamId());
+			List<MyMark> myMarkList = myMarkService.getList(myExam.getExamId());
 			boolean ok = false;
-			for (MarkUser markUser : markUserList) {
-				if (markUser.getUserId() == getCurUser().getId()) {
+			for (MyMark myMark : myMarkList) {
+				if (myMark.getUserId() == getCurUser().getId()) {
 					ok = true;
 					break;
 				}
 			}
 			if (!ok) {
-				throw new RuntimeException("未参与阅卷：" + exam.getName());
+				throw new MyException("未参与阅卷：" + exam.getName());
 			}
 
-			Date curTime = new Date();
 			if (exam.getState() == 0) {
-				throw new RuntimeException("考试已删除！");
+				throw new MyException("考试已删除！");
 			}
 			if (exam.getState() == 2) {
-				throw new RuntimeException("考试未发布！");
+				throw new MyException("考试未发布！");
 			}
-			if (exam.getMarkStartTime().getTime() > curTime.getTime()) {
-				throw new RuntimeException("阅卷未开始！");
+			if (exam.getMarkStartTime().getTime() > (new Date().getTime() - 30000)){//预留30秒网络延时
+				throw new MyException("阅卷未开始！");
 			}
-			if (exam.getMarkEndTime().getTime() < curTime.getTime()) {
-				throw new RuntimeException("阅卷已结束！");
+			if (exam.getMarkEndTime().getTime() < (new Date().getTime() - 30000)){//预留30秒网络延时
+				throw new MyException("阅卷已结束！");
 			}
 
 			// 试卷信息
@@ -214,26 +250,25 @@ public class MyMarkController extends BaseController{
 			List<PaperQuestionEx> paperQuestionExList = paperService.getPaperList(exam.getPaperId());//试题信息
 			model.addAttribute("paperQuestionExList", paperQuestionExList);
 			
-			model.addAttribute("examUser", examUser);// 考试用户信息
+			model.addAttribute("myExam", myExam);// 我的考试信息
 			
-			List<ExamUserQuestion> examUserQuestionList = examUserQuestionService.getList(examUserId);//用户已做答案信息
-			Map<Long, ExamUserQuestion> examUserQuestionMap = new HashMap<Long, ExamUserQuestion>();
-			for(ExamUserQuestion examUserQuestion : examUserQuestionList){
-				examUserQuestionMap.put(examUserQuestion.getQuestionId().longValue(), examUserQuestion);
+			List<MyExamDetail> myExamDetailList = myExamDetailService.getList(myExamId);//用户已做答案信息
+			Map<Long, MyExamDetail> myExamDetailMap = new HashMap<Long, MyExamDetail>();
+			for(MyExamDetail myExamDetail : myExamDetailList) {
+				myExamDetailMap.put(myExamDetail.getQuestionId().longValue(), myExamDetail);
 			}
-			model.addAttribute("examUserQuestionMap", examUserQuestionMap);
+			model.addAttribute("myExamDetailMap", myExamDetailMap);
 			
-			model.addAttribute("answer", false);// 控制页面展示那部分
 			model.addAttribute("mark", true);// 控制页面展示那部分
 			
 			// 标记为阅卷中
-			if (examUser.getMarkState() == 1) {
-				examUser.setMarkState(2);
+			if (myExam.getMarkState() == 1) {
+				myExam.setMarkState(2);
 			}
-			if (examUser.getMarkTime() == null) {// 第二次进入就处理
-				examUser.setMarkTime(new Date());
+			if (myExam.getMarkTime() == null) {// 第一次进入标记为阅卷时间
+				myExam.setMarkTime(new Date());
 			}
-			examUserService.update(examUser);
+			myExamService.update(myExam);
 			return "exam/myMark/myMarkPaper";
 		} catch (Exception e) {
 			log.error("到达阅卷页面错误：", e);
@@ -246,55 +281,55 @@ public class MyMarkController extends BaseController{
 	 * 更新阅卷分数
 	 * 
 	 * v1.0 zhanghc 2017年6月26日下午12:30:20
-	 * @param examUserQuestionId
+	 * @param myExamDetailId
 	 * @param score
 	 * @return PageResult
 	 */
-	@RequestMapping("/updateScore")
+	@RequestMapping("/doScoreUpdate")
 	@ResponseBody
-	public PageResult updateScore(Integer examUserQuestionId, BigDecimal score) {
+	public PageResult doScoreUpdate(Integer myExamDetailId, BigDecimal score) {
 		try {
 			// 校验数据有效性
-			ExamUserQuestion examUserQuestion = examUserQuestionService.getEntity(examUserQuestionId);
-			List<MarkUser> markUserList = markUserService.getList(examUserQuestion.getExamId());
-			Exam exam = examService.getEntity(examUserQuestion.getExamId());
+			MyExamDetail myExamDetail = myExamDetailService.getEntity(myExamDetailId);
+			List<MyMark> myMarkList = myMarkService.getList(myExamDetail.getExamId());
+			Exam exam = examService.getEntity(myExamDetail.getExamId());
 			if (exam.getState() == 0) {
-				throw new RuntimeException("考试已删除！");
+				throw new MyException("考试已删除！");
 			}
 			if (exam.getState() == 2) {
-				throw new RuntimeException("考试未发布！");
+				throw new MyException("考试未发布！");
 			}
 			if (exam.getMarkStartTime().getTime() > (new Date().getTime())) {
-				throw new RuntimeException("阅卷未开始！");
+				throw new MyException("阅卷未开始！");
 			}
-			if (exam.getMarkEndTime().getTime() < (new Date().getTime() - 5000)) {
-				throw new RuntimeException("阅卷已结束！");
+			if (exam.getMarkEndTime().getTime() < (new Date().getTime() - 30000)){//预留30秒网络延时
+				throw new MyException("阅卷已结束！");
 			}
 
 			boolean ok = false;
-			for (MarkUser markUser : markUserList) {
-				if (markUser.getUserId() == getCurUser().getId()) {
+			for (MyMark myMark : myMarkList) {
+				if (myMark.getUserId() == getCurUser().getId()) {
 					ok = true;
 					break;
 				}
 			}
 
 			if (!ok) {
-				throw new RuntimeException("未参与考试：" + exam.getName());
+				throw new MyException("未参与考试：" + exam.getName());
 			}
 
 			if (score != null) {
-				PaperQuestion paperQuestion = paperQuestionService.getEntity(exam.getPaperId(), examUserQuestion.getQuestionId());
+				PaperQuestion paperQuestion = paperQuestionService.getEntity(exam.getPaperId(), myExamDetail.getQuestionId());
 				if (BigDecimalUtil.newInstance(score).sub(paperQuestion.getScore()).getResult().doubleValue() > 0) {
 					throw new MyException("最大分值：" + paperQuestion.getScore());
 				}
 			}
 
 			// 更新阅卷分数
-			examUserQuestion.setScore(score);
-			examUserQuestion.setMarkUserId(getCurUser().getId());
-			examUserQuestion.setMarkTime(new Date());
-			examUserQuestionService.update(examUserQuestion);
+			myExamDetail.setScore(score);
+			myExamDetail.setMyMarkId(getCurUser().getId());
+			myExamDetail.setMarkTime(new Date());
+			myExamDetailService.update(myExamDetail);
 			return new PageResult(true, "更新成功！");
 		} catch (MyException e) {
 			log.error("更新分数错误：", e);
@@ -314,66 +349,71 @@ public class MyMarkController extends BaseController{
 	 */
 	@RequestMapping("/doMark")
 	@ResponseBody
-	public PageResult doMark(Integer examUserId) {
+	public PageResult doMark(Integer myExamId) {
 		try {
-			//校验数据有效性
-			ExamUser examUser = examUserService.getEntity(examUserId);
-			List<MarkUser> markUserList = markUserService.getList(examUser.getExamId());
-			Exam exam = examService.getEntity(examUser.getExamId());
-			if(exam.getState() == 0){
-				throw new RuntimeException("考试已删除！");
+			// 校验数据有效性
+			MyExam myExam = myExamService.getEntity(myExamId);
+			List<MyMark> myMarkList = myMarkService.getList(myExam.getExamId());
+			Exam exam = examService.getEntity(myExam.getExamId());
+			if (exam.getState() == 0) {
+				throw new MyException("考试已删除！");
 			}
-			if(exam.getState() == 2){
-				throw new RuntimeException("考试未发布！");
+			if (exam.getState() == 2) {
+				throw new MyException("考试未发布！");
 			}
-			if(exam.getMarkStartTime().getTime() > (new Date().getTime())){
-				throw new RuntimeException("阅卷未开始！");
+			if (exam.getMarkStartTime().getTime() > (new Date().getTime())) {
+				throw new MyException("阅卷未开始！");
 			}
-			if(exam.getMarkEndTime().getTime() < (new Date().getTime() - 5000)){
-				throw new RuntimeException("阅卷已结束！");
+			if (exam.getMarkEndTime().getTime() < (new Date().getTime() - 30000)){//预留30秒网络延时
+				throw new MyException("阅卷已结束！");
 			}
-			
+
 			boolean ok = false;
-			for(MarkUser markUser : markUserList){
-				if(markUser.getUserId() == getCurUser().getId()){
+			for (MyMark myMark : myMarkList) {
+				if (myMark.getUserId() == getCurUser().getId()) {
 					ok = true;
 					break;
 				}
 			}
-			if(!ok){
-				throw new RuntimeException("未参与阅卷：" + exam.getName());
+			if (!ok) {
+				throw new MyException("未参与阅卷：" + exam.getName());
 			}
-			
-			List<ExamUserQuestion> examUserQuestionList = examUserQuestionService.getList(examUserId);
+
+			List<MyExamDetail> myExamDetailList = myExamDetailService.getList(myExamId);
 			int num = 0;
 			BigDecimal totalScore = new BigDecimal(0);
-			for(ExamUserQuestion examUserQuestion : examUserQuestionList){
-				if(examUserQuestion.getScore() == null){
+			for (MyExamDetail myExamDetail : myExamDetailList) {
+				if (myExamDetail.getScore() == null) {
 					num++;
-				}else{
-					totalScore = BigDecimalUtil.newInstance(examUserQuestion.getScore()).add(totalScore).getResult();
+				} else {
+					totalScore = BigDecimalUtil.newInstance(myExamDetail.getScore()).add(totalScore).getResult();
 				}
 			}
-			
-			if(num > 0){
-				throw new RuntimeException("还有" + num + "道题未阅！");
+
+			if (num > 0) {
+				throw new MyException("还有" + num + "道题未阅！");
 			}
-			
-			//考试用户标记为及格或不及格
-			examUser.setMarkUserId(getCurUser().getId());
-			examUser.setMarkTime(new Date());
-			examUser.setTotalScore(totalScore);
-			if(exam.getPassScore().doubleValue() >= totalScore.doubleValue()){
-				examUser.setMarkState(7);
-			}else{
-				examUser.setState(8);
+
+			// 标记为已阅
+			myExam.setMarkState(3);
+			myExam.setMyMarkId(getCurUser().getId());
+			myExam.setMarkFinishTime(new Date());
+			myExam.setTotalScore(totalScore);
+			if (totalScore.doubleValue() >= exam.getPassScore().doubleValue() ) {
+				myExam.setAnswerState(1);
+			} else {
+				myExam.setAnswerState(2);
 			}
-			
-			examUserService.update(examUser);
-			return new PageResultEx(true, "阅卷成功", null);
+			myExam.setUpdateTime(new Date());
+			myExam.setUpdateUserId(getCurUser().getId());
+			myExamService.update(myExam);
+			return new PageResultEx(true, "阅卷成功！", null);
+		} catch (MyException e) {
+			log.error("完成阅卷错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("完成阅卷错误：", e);
-			return new PageResult(false, "阅卷失败：" + e.getMessage());
+			return new PageResult(false, "未知异常！");
 		}
 	}
 	
@@ -392,7 +432,7 @@ public class MyMarkController extends BaseController{
 			LoginUser curUser = getCurUser();
 			new Thread(new Runnable() {
 				public void run() {
-					SpringUtil.getBean(ExamUserQuestionService.class).doAutoMark(examId, curUser, processBarId);
+					SpringUtil.getBean(MyExamDetailService.class).doAutoMark(examId, curUser, processBarId);
 				}
 			}).start();
 			

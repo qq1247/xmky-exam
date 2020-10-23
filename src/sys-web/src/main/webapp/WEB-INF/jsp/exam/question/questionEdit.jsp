@@ -120,7 +120,7 @@
 						empty : "",
 						layVerify: "required",
 						layVerType: "msg",
-						create : function(val, arr){
+						create : function(val, arr) {
 							return {
 								name: val,
 								value: val
@@ -184,16 +184,6 @@
 			<div class="layui-input-block">
 				<input name="no" value="${question.no }" 
 					class="layui-input" lay-verify="required|number" placeholder="请输入排序">
-			</div>
-		</div>
-	</div>
-	<div class="layui-row layui-form-item">
-		<div class="layui-col-md11">
-			<label class="layui-form-label">状态：</label>
-			<div class="layui-input-block">
-				<input type="checkbox" name="state" value="1"
-					lay-skin="switch"  lay-text="启用|禁用" ${question.state == 1 ? "checked" : "" }>
-				
 			</div>
 		</div>
 	</div>

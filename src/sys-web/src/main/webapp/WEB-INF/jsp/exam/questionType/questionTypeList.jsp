@@ -86,7 +86,7 @@
 				height : "full-180",
 				method : "post",
 				defaultToolbar : [],
-				parseData: function(questionType){
+				parseData : function(questionType) {
 					return {
 						"code" : questionType.succ,
 						"msg" : questionType.msg,
@@ -94,26 +94,26 @@
 						"data" : questionType.data.rows
 					};
 				},
-				request: {
+				request : {
 					pageName: "curPage",
 					limitName: "pageSize"
 				}, 
-				response: {
+				response : {
 					statusCode : true
 				}
 			});
-			layui.table.on("rowDouble(questionTypeTable)", function(obj){
+			layui.table.on("rowDouble(questionTypeTable)", function(obj) {
 				<my:auth url="questionType/toEdit">toQuestionTypeEdit(obj.data.ID);</my:auth>
 			});
-			layui.table.on("tool(questionTypeTable)", function(obj){
+			layui.table.on("tool(questionTypeTable)", function(obj) {
 				var data = obj.data;
-				if(obj.event === "questionTypeEdit") {
+				if (obj.event === "questionTypeEdit") {
 					toQuestionTypeEdit(obj.data.ID);
-				} else if(obj.event === "questionTypeMove") {
+				} else if (obj.event === "questionTypeMove") {
 					toQuestionTypeMove(obj.data);
-				} else if(obj.event === "questionTypeDel") {
+				} else if (obj.event === "questionTypeDel") {
 					doQuestionTypeDel(obj.data.ID);
-				} else if(obj.event === "questionTypeAuth") {
+				} else if (obj.event === "questionTypeAuth") {
 					toQuestionTypeAuth(obj.data.ID);
 				}
 			});
@@ -172,7 +172,7 @@
 		
 		//到达添加试题分类页面
 		function toQuestionTypeAdd() {
-			if(!curSelQuestionTypeId){
+			if (!curSelQuestionTypeId) {
 				layer.alert("请选择上级试题分类！", {"title" : "提示消息"});
 				return;
 			}
@@ -187,10 +187,10 @@
 						content : obj,
 						btn : ["添加", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doQuestionTypeAdd(index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							$("#parentQuestionTypeId").val(curSelQuestionTypeId);
 							$("#parentQuestionTypeName").val(curSelQuestionTypeName);
 							layui.form.render(null, "questionTypeEditFrom");
@@ -237,10 +237,10 @@
 						content : obj,
 						btn : ["修改", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doQuestionTypeEdit(index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							layui.form.render(null, "questionTypeEditFrom");
 						}
 					});
@@ -293,7 +293,7 @@
 		}
 		
 		//到达移动试题分类页面
-		function toQuestionTypeMove(questionTypeObj){
+		function toQuestionTypeMove(questionTypeObj) {
 			$.ajax({
 				url : "questionType/toMove",
 				dataType : "html",
@@ -304,7 +304,7 @@
 						content : obj,
 						btn : ["移动", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							var questionTypeMoveTreeObj = $.fn.zTree.getZTreeObj("questionTypeMoveTree");
 							var questionTypeMoveNodes = questionTypeMoveTreeObj.getSelectedNodes();
 							if (questionTypeMoveNodes.length != 1) {
@@ -316,11 +316,11 @@
 							var sourceName = questionTypeObj.NAME;
 							var targetId = questionTypeMoveNodes[0].ID;
 							var targetName = questionTypeMoveNodes[0].NAME;
-							if(sourceId == targetId){
+							if (sourceId == targetId) {
 								layer.alert("源试题分类和目标试题分类一致！", {"title" : "提示消息"});
 								return;
 							}
-							if(questionTypeMoveNodes[0].PARENT_SUB.indexOf(questionTypeObj.PARENT_SUB) >= 0){
+							if (questionTypeMoveNodes[0].PARENT_SUB.indexOf(questionTypeObj.PARENT_SUB) >= 0) {
 								layer.alert("父试题分类不能移动到子试题分类下！", {"title" : "提示消息"});
 								return;
 							}
@@ -351,16 +351,16 @@
 		}
 		
 		//完成移动试题分类
-		function doQuestionTypeMove(sourceId, sourceName, targetId, targetName, questionTypeDialogIndex){
-			layer.confirm("确定要移动【"+sourceName+"】到【"+targetName+"】？", {title : "确认消息"}, function(index){
+		function doQuestionTypeMove(sourceId, sourceName, targetId, targetName, questionTypeDialogIndex) {
+			layer.confirm("确定要移动【"+sourceName+"】到【"+targetName+"】？", {title : "确认消息"}, function(index) {
 				var params = {"sourceId" : sourceId, "targetId" : targetId};
 				$.ajax({
 					url : "questionType/doMove",
 					data : params,
-					success : function(obj){
+					success : function(obj) {
 						questionTypeTreeFlush();
 						
-						if(!obj.succ){
+						if (!obj.succ) {
 							layer.alert(obj.msg, {"title" : "提示消息"});
 							return;
 						}
@@ -373,12 +373,12 @@
 			$("[lay-filter='questionTypeMoveBtn']").click();
 		}
 		
-		//刷新试题分类
+		// 刷新试题分类
 		function questionTypeTreeFlush() {
 			questionTypeTree.reAsyncChildNodes(null, "refresh");
 		}
 		
-		//到达授权试题分类页面
+		// 到达授权试题分类页面
 		function toQuestionTypeAuth(id) {
 			$.ajax({
 				url : "questionType/toAuth",
@@ -391,32 +391,33 @@
 						content : obj,
 						btn : ["授权", "授权并同步到子分类", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doQuestionTypeAuth(index, false);
 						},
-						btn2: function(index, layero){
+						btn2: function(index, layero) {
 							doQuestionTypeAuth(index, true);
 							return false;
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							var userIdSelect = xmSelect.render({
 								el : "#userIds",
 								name : "userIds",
-								autoRow : true,
-								toolbar : { show: true },
 								filterable : true,
-								remoteSearch : true,
-								tips : "请输入用户昵称",
-								searchTips : "请输入用户昵称",
-								remoteMethod : function(val, cb, show){
-									if(!val){
-										return cb([]);
+								paging : true,
+								pageRemote : true,
+								searchTips : "可模糊搜索用户昵称，组织机构名称",
+								model : {label: {
+										text: {left: "", right: "", separator: "，", },
 									}
-									
+								},
+								autoRow : true,
+								remoteMethod : function(val, cb, show, pageIndex) {
 									$.ajax({
 										url : "questionType/authUserList",
 										data : {
-											two : val
+											two : val,
+											curPage : pageIndex,
+											pageSize : 5
 										},
 										async : true,
 										success : function(obj) {
@@ -424,10 +425,10 @@
 											for (var i in obj.data.rows) {
 												users.push({"name" : obj.data.rows[i].NAME+"-"+obj.data.rows[i].ORG_NAME, value : obj.data.rows[i].ID});
 											}
-											cb(users);
+											cb(users, Math.ceil(obj.data.total / 5));
 										}
 									});
-								},
+								}
 							});
 							
 							$.ajax({
@@ -451,21 +452,22 @@
 							var postIdSelect = xmSelect.render({
 								el : "#postIds",
 								name : "postIds",
-								autoRow : true,
-								toolbar : { show: true },
 								filterable : true,
-								remoteSearch : true,
-								tips : "请输入岗位名称",
-								searchTips : "请输入岗位名称",
-								remoteMethod : function(val, cb, show){
-									if(!val){
-										return cb([]);
+								paging : true,
+								pageRemote : true,
+								searchTips : "可模糊搜索岗位名称，组织机构名称",
+								model : {label: {
+										text: {left: "", right: "", separator: "，", },
 									}
-									
+								},
+								autoRow : true,
+								remoteMethod : function(val, cb, show, pageIndex) {
 									$.ajax({
 										url : "questionType/authPostList",
 										data : {
-											two : val
+											two : val,
+											curPage : pageIndex,
+											pageSize : 5
 										},
 										async : true,
 										success : function(obj) {
@@ -473,7 +475,7 @@
 											for (var i in obj.data.rows) {
 												posts.push({"name" : obj.data.rows[i].NAME+"-"+obj.data.rows[i].ORG_NAME, value : obj.data.rows[i].ID});
 											}
-											cb(posts);
+											cb(posts, Math.ceil(obj.data.total / 5));
 										}
 									});
 								},
@@ -500,21 +502,22 @@
 							var orgIdSelect = xmSelect.render({
 								el : "#orgIds",
 								name : "orgIds",
-								autoRow : true,
-								toolbar : { show: true },
 								filterable : true,
-								remoteSearch : true,
-								tips : "请输入组织机构名称",
+								paging : true,
+								pageRemote : true,
 								searchTips : "请输入组织机构名称",
-								remoteMethod : function(val, cb, show){
-									if(!val){
-										return cb([]);
+								model : {label: {
+										text: {left: "", right: "", separator: "，", },
 									}
-									
+								},
+								autoRow : true,
+								remoteMethod : function(val, cb, show, pageIndex) {
 									$.ajax({
 										url : "questionType/authOrgList",
 										data : {
-											two : val
+											two : val,
+											curPage : pageIndex,
+											pageSize : 5
 										},
 										async : true,
 										success : function(obj) {
@@ -522,7 +525,7 @@
 											for (var i in obj.data.rows) {
 												orgs.push({"name" : obj.data.rows[i].NAME+"-"+obj.data.rows[i].PARENT_ORG_NAME, value : obj.data.rows[i].ID});
 											}
-											cb(orgs);
+											cb(orgs, Math.ceil(obj.data.total / 5));
 										}
 									});
 								},
@@ -564,7 +567,7 @@
 						success : function(obj) {
 							questionTypeTreeFlush();
 							
-							if(!obj.succ){
+							if (!obj.succ) {
 								layer.alert(obj.msg, {"title" : "提示消息"});
 								return;
 							}

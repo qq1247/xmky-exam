@@ -74,14 +74,39 @@ public class XssFilter implements Filter {
  */
 class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 //	private final Logger log = LoggerFactory.getLogger(XssHttpServletRequestWrapper.class);
-	private static String key = "and|exec|insert|select|delete|update|count|*|%|chr|mid|master|truncate|char|declare|;|or|-|+";
-	private static Set<String> notAllowedKeyWords = new HashSet<String>(0);
+	private static Set<String> sqlKeyWords = new HashSet<String>();
+	private static Set<String> pageKeyWords = new HashSet<String>(0);
 //	private static String replacedString = "INVALID";
 	static {
-		String keyStr[] = key.split("\\|");
-		for (String str : keyStr) {
-			notAllowedKeyWords.add(str);
-		}
+		sqlKeyWords.add("and");
+		sqlKeyWords.add("exec");
+		sqlKeyWords.add("insert");
+		sqlKeyWords.add("select");
+		sqlKeyWords.add("delete");
+		sqlKeyWords.add("update");
+		sqlKeyWords.add("count");
+		sqlKeyWords.add("*");
+		sqlKeyWords.add("%");
+		sqlKeyWords.add("chr");
+		sqlKeyWords.add("mid");
+		sqlKeyWords.add("master");
+		sqlKeyWords.add("truncate");
+		sqlKeyWords.add("char");
+		sqlKeyWords.add("declare");
+		sqlKeyWords.add(";");
+		sqlKeyWords.add("or");
+		sqlKeyWords.add("-");
+		sqlKeyWords.add("+");
+		
+		pageKeyWords.add("title");//定制非过滤的，通过富文本框处理的
+		pageKeyWords.add("optionA");
+		pageKeyWords.add("optionB");
+		pageKeyWords.add("optionC");
+		pageKeyWords.add("optionD");
+		pageKeyWords.add("optionE");
+		pageKeyWords.add("answer");
+		pageKeyWords.add("analysis");
+		pageKeyWords.add("description");
 	}
 
 //	private String currentUrl;
@@ -102,6 +127,10 @@ class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 		if (value == null) {
 			return null;
 		}
+		if (pageKeyWords.contains(parameter)) {
+			return value;
+		}
+		
 		return cleanXSS(value);
 	}
 
@@ -111,6 +140,10 @@ class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 		if (values == null) {
 			return null;
 		}
+		if (pageKeyWords.contains(parameter)) {
+			return values;
+		}
+		
 		int count = values.length;
 		String[] encodedValues = new String[count];
 		for (int i = 0; i < count; i++) {
@@ -127,6 +160,10 @@ class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 		}
 		Map<String, String[]> result = new HashMap<>();
 		for (String key : values.keySet()) {
+			if (pageKeyWords.contains(key)) {
+				continue;
+			}
+			
 			String encodedKey = cleanXSS(key);
 			int count = values.get(key).length;
 			String[] encodedValues = new String[count];

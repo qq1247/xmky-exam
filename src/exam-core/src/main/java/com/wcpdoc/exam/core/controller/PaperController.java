@@ -92,7 +92,7 @@ public class PaperController extends BaseController {
 	@ResponseBody
 	public PageResult list(PageIn pageIn) {
 		try {
-			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())){
+			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
 				pageIn.setTen(getCurUser().getId().toString());
 			}
 			return new PageResultEx(true, "查询成功", paperService.getListpage(pageIn));
@@ -217,7 +217,11 @@ public class PaperController extends BaseController {
 	@ResponseBody
 	public PageResult doDel(Integer id) {
 		try {
-			paperService.del(id);
+			Paper paper = paperService.getEntity(id);
+			paper.setState(0);
+			paper.setUpdateTime(new Date());
+			paper.setUpdateUserId(getCurUser().getId());
+			paperService.update(paper);
 			return new PageResult(true, "删除成功");
 		} catch (MyException e) {
 			log.error("完成删除试卷错误：{}", e.getMessage());
@@ -415,7 +419,7 @@ public class PaperController extends BaseController {
 			model.addAttribute("id", id);
 			model.addAttribute("QUESTION_TYPE_DICT_LIST", DictCache.getIndexDictlistMap().get("QUESTION_TYPE"));
 			model.addAttribute("QUESTION_DIFFICULTY_DICT_LIST", DictCache.getIndexDictlistMap().get("QUESTION_DIFFICULTY"));
-			model.addAttribute("STATE2_DICT_LIST", DictCache.getIndexDictlistMap().get("STATE2"));
+			model.addAttribute("STATE_DICT_LIST", DictCache.getIndexDictlistMap().get("STATE"));
 			return "exam/paper/questionAdd";
 		} catch (Exception e) {
 			log.error("到达添加试题页面错误：", e);
@@ -495,11 +499,11 @@ public class PaperController extends BaseController {
 	 * @param options
 	 * @return PageResult
 	 */
-	@RequestMapping("/scoreUpdate")
+	@RequestMapping("/doScoreUpdate")
 	@ResponseBody
-	public PageResult scoreUpdate(Integer paperQuestionId, BigDecimal score) {
+	public PageResult doScoreUpdate(Integer paperQuestionId, BigDecimal score) {
 		try {
-			paperService.scoreUpdate(paperQuestionId, score);
+			paperService.doScoreUpdate(paperQuestionId, score);
 			return new PageResult(true, "设置成功");
 		} catch (MyException e) {
 			log.error("完成设置分数错误：{}", e.getMessage());
@@ -523,6 +527,49 @@ public class PaperController extends BaseController {
 	public PageResult doOptionsUpdate(Integer paperQuestionId, Integer[] options) {
 		try {
 			paperService.doOptionsUpdate(paperQuestionId, options);
+			return new PageResult(true, "设置成功");
+		} catch (MyException e) {
+			log.error("完成设置分数错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
+		} catch (Exception e) {
+			log.error("完成设置分数错误：", e);
+			return new PageResult(false, "未知异常！");
+		}
+	}
+	
+	/**
+	 * 到达批量设置分数页面
+	 * 
+	 * v1.0 zhanghc 2018年10月21日上午8:16:53
+	 * @param model
+	 * @param chapterId
+	 * @return String
+	 */
+	@RequestMapping("/toBatchScoreUpdate")
+	public String toBatchScoreUpdate(Model model, Integer chapterId) {
+		try {
+			model.addAttribute("chapterId", chapterId);
+			return "exam/paper/batchScoreUpdate";
+		} catch (Exception e) {
+			log.error("到达批量设置分数页面错误：", e);
+			return "exam/paper/batchScoreUpdate";
+		}
+	}
+	
+	/**
+	 * 完成批量设置分数
+	 * 
+	 * v1.0 zhanghc 2018年10月21日上午10:46:54
+	 * @param chapterId
+	 * @param score
+	 * @param options
+	 * @return PageResult
+	 */
+	@RequestMapping("/doBatchScoreUpdate")
+	@ResponseBody
+	public PageResult doBatchScoreUpdate(Integer chapterId, BigDecimal score, String options) {
+		try {
+			paperService.doBatchScoreUpdate(chapterId, score, options);
 			return new PageResult(true, "设置成功");
 		} catch (MyException e) {
 			log.error("完成设置分数错误：{}", e.getMessage());
@@ -633,10 +680,10 @@ public class PaperController extends BaseController {
 	public PageResult doPublish(Integer id) {
 		try {
 			Paper paper = paperService.getEntity(id);
-			if(paper.getState() == 0){
+			if(paper.getState() == 0) {
 				throw new MyException("试卷【"+paper.getName()+"】已删除！");
 			}
-			if(paper.getState() == 1){
+			if(paper.getState() == 1) {
 				throw new MyException("试卷【"+paper.getName()+"】已发布！");
 			}
 			

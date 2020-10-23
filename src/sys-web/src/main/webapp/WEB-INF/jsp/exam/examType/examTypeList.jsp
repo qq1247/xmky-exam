@@ -86,7 +86,7 @@
 				height : "full-180",
 				method : "post",
 				defaultToolbar : [],
-				parseData: function(examType){
+				parseData : function(examType) {
 					return {
 						"code" : examType.succ,
 						"msg" : examType.msg,
@@ -94,26 +94,26 @@
 						"data" : examType.data.rows
 					};
 				},
-				request: {
+				request : {
 					pageName: "curPage",
 					limitName: "pageSize"
 				}, 
-				response: {
+				response : {
 					statusCode : true
 				}
 			});
-			layui.table.on("rowDouble(examTypeTable)", function(obj){
+			layui.table.on("rowDouble(examTypeTable)", function(obj) {
 				<my:auth url="examType/toEdit">toExamTypeEdit(obj.data.ID);</my:auth>
 			});
-			layui.table.on("tool(examTypeTable)", function(obj){
+			layui.table.on("tool(examTypeTable)", function(obj) {
 				var data = obj.data;
-				if(obj.event === "examTypeEdit") {
+				if (obj.event === "examTypeEdit") {
 					toExamTypeEdit(obj.data.ID);
-				} else if(obj.event === "examTypeMove") {
+				} else if (obj.event === "examTypeMove") {
 					toExamTypeMove(obj.data);
-				} else if(obj.event === "examTypeDel") {
+				} else if (obj.event === "examTypeDel") {
 					doExamTypeDel(obj.data.ID);
-				} else if(obj.event === "examTypeAuth") {
+				} else if (obj.event === "examTypeAuth") {
 					toExamTypeAuth(obj.data.ID);
 				}
 			});
@@ -172,7 +172,7 @@
 		
 		//到达添加试题分类页面
 		function toExamTypeAdd() {
-			if(!curSelExamTypeId){
+			if (!curSelExamTypeId) {
 				layer.alert("请选择上级试题分类！", {"title" : "提示消息"});
 				return;
 			}
@@ -187,10 +187,10 @@
 						content : obj,
 						btn : ["添加", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doExamTypeAdd(index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							$("#parentExamTypeId").val(curSelExamTypeId);
 							$("#parentExamTypeName").val(curSelExamTypeName);
 							layui.form.render(null, "examTypeEditFrom");
@@ -237,10 +237,10 @@
 						content : obj,
 						btn : ["修改", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doExamTypeEdit(index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							layui.form.render(null, "examTypeEditFrom");
 						}
 					});
@@ -293,7 +293,7 @@
 		}
 		
 		//到达移动试题分类页面
-		function toExamTypeMove(examTypeObj){
+		function toExamTypeMove(examTypeObj) {
 			$.ajax({
 				url : "examType/toMove",
 				dataType : "html",
@@ -304,7 +304,7 @@
 						content : obj,
 						btn : ["移动", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							var examTypeMoveTreeObj = $.fn.zTree.getZTreeObj("examTypeMoveTree");
 							var examTypeMoveNodes = examTypeMoveTreeObj.getSelectedNodes();
 							if (examTypeMoveNodes.length != 1) {
@@ -316,11 +316,11 @@
 							var sourceName = examTypeObj.NAME;
 							var targetId = examTypeMoveNodes[0].ID;
 							var targetName = examTypeMoveNodes[0].NAME;
-							if(sourceId == targetId){
+							if (sourceId == targetId) {
 								layer.alert("源试题分类和目标试题分类一致！", {"title" : "提示消息"});
 								return;
 							}
-							if(examTypeMoveNodes[0].PARENT_SUB.indexOf(examTypeObj.PARENT_SUB) >= 0){
+							if (examTypeMoveNodes[0].PARENT_SUB.indexOf(examTypeObj.PARENT_SUB) >= 0) {
 								layer.alert("父试题分类不能移动到子试题分类下！", {"title" : "提示消息"});
 								return;
 							}
@@ -351,16 +351,16 @@
 		}
 		
 		//完成移动试题分类
-		function doExamTypeMove(sourceId, sourceName, targetId, targetName, examTypeDialogIndex){
-			layer.confirm("确定要移动【"+sourceName+"】到【"+targetName+"】？", {title : "确认消息"}, function(index){
+		function doExamTypeMove(sourceId, sourceName, targetId, targetName, examTypeDialogIndex) {
+			layer.confirm("确定要移动【"+sourceName+"】到【"+targetName+"】？", {title : "确认消息"}, function(index) {
 				var params = {"sourceId" : sourceId, "targetId" : targetId};
 				$.ajax({
 					url : "examType/doMove",
 					data : params,
-					success : function(obj){
+					success : function(obj) {
 						examTypeTreeFlush();
 						
-						if(!obj.succ){
+						if (!obj.succ) {
 							layer.alert(obj.msg, {"title" : "提示消息"});
 							return;
 						}
@@ -391,32 +391,33 @@
 						content : obj,
 						btn : ["授权", "授权并同步到子分类", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doExamTypeAuth(index, false);
 						},
-						btn2: function(index, layero){
+						btn2: function(index, layero) {
 							doExamTypeAuth(index, true);
 							return false;
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							var userIdSelect = xmSelect.render({
 								el : "#userIds",
 								name : "userIds",
-								autoRow : true,
-								toolbar : { show: true },
 								filterable : true,
-								remoteSearch : true,
-								tips : "请输入用户昵称",
-								searchTips : "请输入用户昵称",
-								remoteMethod : function(val, cb, show){
-									if(!val) {
-										return cb([]);
+								paging : true,
+								pageRemote : true,
+								searchTips : "可模糊搜索用户昵称，组织机构名称",
+								model : {label: {
+										text: {left: "", right: "", separator: "，", },
 									}
-									
+								},
+								autoRow : true,
+								remoteMethod : function(val, cb, show, pageIndex) {
 									$.ajax({
 										url : "examType/authUserList",
 										data : {
-											two : val
+											two : val,
+											curPage : pageIndex,
+											pageSize : 5
 										},
 										async : true,
 										success : function(obj) {
@@ -424,16 +425,16 @@
 											for (var i in obj.data.rows) {
 												users.push({"name" : obj.data.rows[i].NAME+"-"+obj.data.rows[i].ORG_NAME, value : obj.data.rows[i].ID});
 											}
-											cb(users);
+											cb(users, Math.ceil(obj.data.total / 5));
 										}
 									});
-								},
+								}
 							});
+							
 							$.ajax({
 								url : "examType/authUserList",
 								data : {
-									ten : id,
-									pageSize : 100
+									ten : id
 								},
 								async : true,
 								success : function(obj) {
@@ -451,21 +452,22 @@
 							var postIdSelect = xmSelect.render({
 								el : "#postIds",
 								name : "postIds",
-								autoRow : true,
-								toolbar : { show: true },
 								filterable : true,
-								remoteSearch : true,
-								tips : "请输入岗位名称",
-								searchTips : "请输入岗位名称",
-								remoteMethod : function(val, cb, show){
-									if(!val){
-										return cb([]);
+								paging : true,
+								pageRemote : true,
+								searchTips : "可模糊搜索岗位名称，组织机构名称",
+								model : {label: {
+										text: {left: "", right: "", separator: "，", },
 									}
-									
+								},
+								autoRow : true,
+								remoteMethod : function(val, cb, show, pageIndex) {
 									$.ajax({
 										url : "examType/authPostList",
 										data : {
-											two : val
+											two : val,
+											curPage : pageIndex,
+											pageSize : 5
 										},
 										async : true,
 										success : function(obj) {
@@ -473,16 +475,16 @@
 											for (var i in obj.data.rows) {
 												posts.push({"name" : obj.data.rows[i].NAME+"-"+obj.data.rows[i].ORG_NAME, value : obj.data.rows[i].ID});
 											}
-											cb(posts);
+											cb(posts, Math.ceil(obj.data.total / 5));
 										}
 									});
 								},
 							});
+							
 							$.ajax({
 								url : "examType/authPostList",
 								data : {
-									ten : id,
-									pageSize : 100
+									ten : id
 								},
 								async : true,
 								success : function(obj) {
@@ -500,21 +502,22 @@
 							var orgIdSelect = xmSelect.render({
 								el : "#orgIds",
 								name : "orgIds",
-								autoRow : true,
-								toolbar : { show: true },
 								filterable : true,
-								remoteSearch : true,
-								tips : "请输入组织机构名称",
+								paging : true,
+								pageRemote : true,
 								searchTips : "请输入组织机构名称",
-								remoteMethod : function(val, cb, show){
-									if(!val){
-										return cb([]);
+								model : {label: {
+										text: {left: "", right: "", separator: "，", },
 									}
-									
+								},
+								autoRow : true,
+								remoteMethod : function(val, cb, show, pageIndex) {
 									$.ajax({
 										url : "examType/authOrgList",
 										data : {
-											two : val
+											two : val,
+											curPage : pageIndex,
+											pageSize : 5
 										},
 										async : true,
 										success : function(obj) {
@@ -522,7 +525,7 @@
 											for (var i in obj.data.rows) {
 												orgs.push({"name" : obj.data.rows[i].NAME+"-"+obj.data.rows[i].PARENT_ORG_NAME, value : obj.data.rows[i].ID});
 											}
-											cb(orgs);
+											cb(orgs, Math.ceil(obj.data.total / 5));
 										}
 									});
 								},
@@ -531,8 +534,7 @@
 							$.ajax({
 								url : "examType/authOrgList",
 								data : {
-									ten : id,
-									pageSize : 100
+									ten : id
 								},
 								async : true,
 								success : function(obj) {
@@ -565,7 +567,7 @@
 						success : function(obj) {
 							examTypeTreeFlush();
 							
-							if(!obj.succ){
+							if (!obj.succ) {
 								layer.alert(obj.msg, {"title" : "提示消息"});
 								return;
 							}

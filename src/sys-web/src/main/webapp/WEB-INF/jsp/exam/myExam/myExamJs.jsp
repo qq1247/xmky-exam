@@ -33,8 +33,7 @@
 					obj.data.substring(14, 16),
 					obj.data.substring(17, 19)
 				);
-				/* console.info(endTime.format("yyyy-MM-dd hh:mm:ss"));
-				console.info(serverTime.format("yyyy-MM-dd hh:mm:ss")); */
+				
 				layui.util.countdown(endTime, serverTime, function(date, serverTime, timer) {
 					if (curTimer) {
 						clearTimeout(curTimer);
@@ -63,55 +62,66 @@
 			}
 		});
 	}
-
+	
 
 	// 单选多选提交
-	function rdoCbxSubmit(curObj, examUserQuestionId) {
-		// 选中当前行
+	function rdoCbxSubmit(curObj, myExamDetailId) {
 		var li = $(curObj);
-		li.children("div:first").click(function(e) {
-			return false;
-		}).trigger("click");
+		var rdoCbxBtn = li.find("input");
+		var elmName = event.target.tagName;//当前点击的元素名称
+		if (elmName == "LI") {// 如果点击的是li元素，直接反选；// 如果点击的是li里面美化后的选择框，它的事件已经选择，冒泡到LI元素时，忽略就可以
+			if (rdoCbxBtn.prop("checked")) {
+				rdoCbxBtn.prop("checked", false);
+			} else {
+				rdoCbxBtn.prop("checked", true);
+			}
+		}
 		
-		var lis = li.parent().children();
-		var vals = [];
-		lis.each(function() {
+		if (rdoCbxBtn.attr("type") == "radio") {
+			layui.form.render("radio", "paperCfgFrom");
+		} else {
+			layui.form.render("checkbox", "paperCfgFrom");
+		}
+		
+		var answers = [];
+		li.parent().children().each(function() {
 			var _li = $(this);
-			_li.removeClass("exam-qst-op-select");
-			
-			_li.find(":checked").each(function() {
-		    	vals.push($(this).val());
-		    	_li.addClass("exam-qst-op-select");
-		    });
+			var rdoCbxBtn = _li.find("input");
+			if (rdoCbxBtn.prop("checked")) {
+				answers.push(rdoCbxBtn.val());
+				_li.addClass("exam-qst-op-select");
+			} else {
+				_li.removeClass("exam-qst-op-select");
+			}
 		});
 		
-		
 		//答题卡标记为已做
-		var anCardOption = $("#examCard_" + examUserQuestionId);
-		if (vals.length == 0) {
+		var anCardOption = $("#examCard_" + myExamDetailId);
+		if (answers.length == 0) {
 			anCardOption.removeClass("select");
 		} else {
 			anCardOption.addClass("select");
 		}
-		
+		 
 		//异步提交答案
 		$.ajax({
 			data : {
-				examUserQuestionId : examUserQuestionId, 
-				answer : vals 
+				myExamDetailId : myExamDetailId, 
+				answer : answers 
 			},
 			url : "myExam/updateAnswer",
 			async : true,
 			success : function(obj) {
-				if(!obj.succ){
+				if (!obj.succ) {
 					layer.alert(obj.msg, {"title" : "提示消息"});
+					
 				}
 			}
 		});
 	}
 	
 	//文本提交
-	function txtSubmit(curObj, examUserQuestionId){
+	function txtSubmit(curObj, myExamDetailId) {
 		//答题卡标记为已做
 		var input = $(curObj);
 		var nameAttrVal = input.attr("name");
@@ -119,13 +129,13 @@
 		var inputs = row.find("[name='"+nameAttrVal+"']");
 		var answer = "";
 		inputs.each(function (index, domEle) {
-			if(index > 0){
+			if (index > 0) {
 				answer += "\n";
 			}
 			answer += $(domEle).val();
 		});
 		
-		var anCardOption = $("#examCard_" + examUserQuestionId);
+		var anCardOption = $("#examCard_" + myExamDetailId);
 		if (answer.replace(/\n/g, "")) {
 			anCardOption.addClass("select");
 		} else {
@@ -135,13 +145,13 @@
 		//异步提交答案
 		$.ajax({
 			data : {
-				examUserQuestionId : examUserQuestionId, 
+				myExamDetailId : myExamDetailId, 
 				answer : answer 
 			},
 			url : "myExam/updateAnswer",
 			async : true, //异步提交
 			success : function(obj) {
-				if(!obj.succ){
+				if (!obj.succ) {
 					layer.alert(obj.msg, {"title" : "提示消息"});
 				}
 			}
@@ -149,19 +159,20 @@
 	}
 	
 	// 完成考试
-	function doPaper(auto){
+	function doPaper(auto) {
 		$.ajax({
 			url : "myExam/doExam",
-			data : {examUserId : "${examUser.id }"},
+			data : {myExamId : "${myExam.id }"},
 			async : true, 
 			success : function(obj) {
-				if(!obj.succ) {
+				if (!obj.succ) {
 					layer.alert(obj.msg, {"title" : "提示消息"});
+					return;
 				}
 				
-				var message = auto ? "考试时间到！" : "交卷成功！";
+				var message = auto ? "考试时间到！" : obj.msg;
 				layer.alert(message, {"title" : "提示消息"});
-				setTimeout("window.location.href = 'login/toHome'", 2000)
+				setTimeout("window.close();", 2000)
 			}
 		});
 	}

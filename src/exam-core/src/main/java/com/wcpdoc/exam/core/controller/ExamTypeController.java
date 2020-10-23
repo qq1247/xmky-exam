@@ -156,10 +156,10 @@ public class ExamTypeController extends BaseController {
 	public PageResult doEdit(ExamType examType) {
 		try {
 			//校验数据有效性
-			if(!ValidateUtil.isValid(examType.getName())){
+			if(!ValidateUtil.isValid(examType.getName())) {
 				throw new MyException("参数错误：name");
 			}
-			if(examTypeService.existName(examType)){
+			if(examTypeService.existName(examType)) {
 				throw new MyException("名称已存在！");
 			}
 			

@@ -90,7 +90,7 @@
 				height : "full-180",
 				method : "post",
 				defaultToolbar : [],
-				parseData: function(obj){
+				parseData : function(obj) {
 					return {
 						"code" : obj.succ,
 						"msg" : obj.msg,
@@ -98,28 +98,28 @@
 						"data" : obj.data.rows
 					};
 				},
-				request: {
+				request : {
 					pageName: "curPage",
 					limitName: "pageSize"
 				}, 
-				response: {
+				response : {
 					statusCode : true
 				}
 			});
-			layui.table.on("rowDouble(userTable)", function(obj){
+			layui.table.on("rowDouble(userTable)", function(obj) {
 				<my:auth url="user/toEdit">toUserEdit(obj.data.ID);</my:auth>
 			});
-			layui.table.on("tool(userTable)", function(obj){
+			layui.table.on("tool(userTable)", function(obj) {
 				var data = obj.data;
-				if(obj.event === "userEdit") {
+				if (obj.event === "userEdit") {
 					toUserEdit(obj.data.ID);
-				} else if(obj.event === "orgUpdate") {
+				} else if (obj.event === "orgUpdate") {
 					toOrgUpdate(obj.data.ID);
-				} else if(obj.event === "postUpdate") {
+				} else if (obj.event === "postUpdate") {
 					toPostUpdate(obj.data.ID);
-				} else if(obj.event === "initPwd") {
+				} else if (obj.event === "initPwd") {
 					initPwd(obj.data.ID);
-				} else if(obj.event === "userDel") {
+				} else if (obj.event === "userDel") {
 					doUserDel(obj.data.ID);
 				}
 			});
@@ -177,7 +177,7 @@
 		
 		//到达添加用户页面
 		function toUserAdd() {
-			if(!curSelOrgId){
+			if (!curSelOrgId) {
 				layer.alert("请选择组织机构！", {"title" : "提示消息"});
 				return;
 			}
@@ -192,10 +192,10 @@
 						content : obj,
 						btn : ["添加", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doUserAdd(index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							$("#user_orgId").val(curSelOrgId);
 							$("#user_orgName").val(curSelOrgName);
 							layui.form.render(null, "userEditFrom");
@@ -220,7 +220,7 @@
 								return;
 							}
 							
-							if(obj.data.initPwd){
+							if (obj.data.initPwd) {
 								layer.alert("初始密码：【" + obj.data.initPwd + "】", {"title" : "提示消息"});
 							}
 							
@@ -246,10 +246,10 @@
 						content : obj,
 						btn : ["修改", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doUserEdit(index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							layui.form.render(null, "userEditFrom");
 						}
 					});
@@ -272,7 +272,7 @@
 								return;
 							}
 							
-							if(obj.data.initPwd){
+							if (obj.data.initPwd) {
 								layer.alert("初始密码：【" + obj.data.initPwd + "】", {"title" : "提示消息"});
 							}
 							
@@ -308,18 +308,18 @@
 		//完成初始化密码
 		function initPwd(id) {
 			//初始化密码
-			layer.confirm("确定要初始密码？", {title : "提示消息"}, function(index){
+			layer.confirm("确定要初始密码？", {title : "提示消息"}, function(index) {
 				var params = {id : id};
 				$.ajax({
 					url : "user/initPwd",
 					data : {id : id},
-					success : function(obj){
-						if(!obj.succ){
+					success : function(obj) {
+						if (!obj.succ) {
 							layer.alert(obj.msg, {"title" : "提示消息"});
 							return;
 						}
 						
-						if(obj.data.initPwd){
+						if (obj.data.initPwd) {
 							layer.alert("初始密码：【" + obj.data.initPwd + "】", {"title" : "提示消息"});
 						}
 						
@@ -330,7 +330,7 @@
 		}
 		
 		//到达设置岗位页面
-		function toPostUpdate(id){
+		function toPostUpdate(id) {
 			$.ajax({
 				url : "user/toPostUpdate",
 				data : {},
@@ -342,10 +342,10 @@
 						content : obj,
 						type : 1,
 						btn : ["确定", "取消"],
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doPostUpdate(id, index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							$.fn.zTree.init($("#postUpdateTree"), {
 								async : {
 									url : "user/postTreeList",
@@ -366,8 +366,8 @@
 		}
 		
 		//完成设置岗位
-		function doPostUpdate(id, postDialogIndex){
-			layer.confirm("确定要设置？", {title : "提示消息"}, function(index){
+		function doPostUpdate(id, postDialogIndex) {
+			layer.confirm("确定要设置？", {title : "提示消息"}, function(index) {
 				var postNodes = $.fn.zTree.getZTreeObj("postUpdateTree").getCheckedNodes();
 				var postIds = [];
 				for (var i in postNodes) {
@@ -383,7 +383,7 @@
 					success : function(obj) {
 						orgTreeFlush();
 						
-						if(!obj.succ){
+						if (!obj.succ) {
 							layer.alert(obj.msg, {"title" : "提示消息"});
 							return;
 						}
@@ -397,7 +397,7 @@
 		}
 		
 		//到达设置组织机构页面
-		function toOrgUpdate(id){
+		function toOrgUpdate(id) {
 			$.ajax({
 				url : "user/toOrgUpdate",
 				dataType : "html",
@@ -408,7 +408,7 @@
 						content : obj,
 						btn : ["确定", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doOrgUpdate(id, index);
 						},
 						success: function(layero, index) {
@@ -434,8 +434,8 @@
 		}
 		
 		//完成设置组织机构
-		function doOrgUpdate(id, orgDialogIndex){
-			layer.confirm("确定要设置？", {title : "提示消息"}, function(index){
+		function doOrgUpdate(id, orgDialogIndex) {
+			layer.confirm("确定要设置？", {title : "提示消息"}, function(index) {
 				var orgNodes = $.fn.zTree.getZTreeObj("orgUpdateTree").getSelectedNodes();
 				var orgId = orgNodes[0].ID;
 				
@@ -448,7 +448,7 @@
 					success : function(obj) {
 						orgTreeFlush();
 						
-						if(!obj.succ){
+						if (!obj.succ) {
 							layer.alert(obj.msg, {"title" : "提示消息"});
 							return;
 						}

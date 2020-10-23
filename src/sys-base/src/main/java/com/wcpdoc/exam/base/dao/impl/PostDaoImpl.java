@@ -59,11 +59,11 @@ public class PostDaoImpl extends RBaseDaoImpl<Post> implements PostDao {
 	@Override
 	public boolean existCode(String code, Integer excludeId) {
 		if (excludeId == null) {
-			String sql = "SELECT COUNT(*) AS NUM FROM SYS_POST WHERE CODE = ? AND STATE = 1";
+			String sql = "SELECT COUNT(*) AS NUM FROM SYS_POST WHERE CODE = ? AND CODE != '' AND CODE IS NOT NULL AND STATE = 1";
 			return getCount(sql, new Object[] { code }) > 0;
 		}
 
-		String sql = "SELECT COUNT(*) AS NUM FROM SYS_POST WHERE CODE = ? AND STATE = 1 AND ID != ?";
+		String sql = "SELECT COUNT(*) AS NUM FROM SYS_POST WHERE CODE = ? AND CODE != '' AND CODE IS NOT NULL AND STATE = 1 AND ID != ?";
 		return getCount(sql, new Object[] { code, excludeId }) > 0;
 	}
 

@@ -63,11 +63,11 @@ public class OnlineUserController extends BaseController{
 					.getServletContext().getAttribute(ConstantManager.SESSION_USER_LIST);
 			Collection<HttpSession> sessionList = sessionMap.values();
 			List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
-			for(HttpSession session : sessionList){
+			for(HttpSession session : sessionList) {
 				User user = (User) session.getAttribute(ConstantManager.USER);
 				
-				if(ValidateUtil.isValid(pageIn.getTwo())){
-					if(!user.getLoginName().contains(pageIn.getTwo())){
+				if(ValidateUtil.isValid(pageIn.getTwo())) {
+					if(!user.getLoginName().contains(pageIn.getTwo())) {
 						continue;
 					}
 				}

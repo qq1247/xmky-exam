@@ -4,6 +4,13 @@
 	var curSelQuestionTypeId; //当前选中的试题分类ID
 	var curSelQuestionTypeName; //当前选中的试题分类名称
 
+	// 页面加载完毕，执行如下方法
+	$(function() {
+		layui.form.on("switch(options)", function(data) {
+			doOptionsUpdate($(data.elem));
+		});
+	});
+	
 	//到达添加章节页面
 	function toChapterAdd(id) {
 		$.ajax({
@@ -48,8 +55,8 @@
 						}
 						
 						reloadPaperCfg();
-						layer.close(index);
-						layer.close(chapterAddDialogIndex);
+						//layer.close(index);
+						//layer.close(chapterAddDialogIndex);
 					}
 				});
 			});
@@ -102,8 +109,8 @@
 						}
 						
 						reloadPaperCfg();
-						layer.close(index);
-						layer.close(chapterEditDialogIndex);
+						//layer.close(index);
+						//layer.close(chapterEditDialogIndex);
 					}
 				});
 			});
@@ -124,7 +131,7 @@
 						return;
 					}
 					
-					layer.close(index);
+					//layer.close(index);
 					reloadPaperCfg();
 				}
 			});
@@ -140,8 +147,8 @@
 				chapterId : chapterId
 			},
 			success : function(obj) {
-				reloadPaperCfg();
 				layer.msg(obj.msg);
+				reloadPaperCfg();
 			}
 		});
 	}
@@ -155,13 +162,13 @@
 				chapterId : chapterId
 			},
 			success : function(obj) {
-				reloadPaperCfg();
 				layer.msg(obj.msg);
+				reloadPaperCfg();
 			}
 		});
 	}
 	
-	//到达添加试题页面
+	// 到达添加试题页面
 	function toQuestionAdd(id, chapterId) {
 		$.ajax({
 			url : "paper/toQuestionAdd",
@@ -170,13 +177,16 @@
 			success : function(obj) {
 				layer.open({
 					title : "添加试题",
-					area : ["1200px", "600px"],
+					area : ["800px", "500px"],
 					content : obj,
 					btn : ["关闭"],
 					type : 1,
-					/* yes : function(index, layero) {
-						
-					}, */
+					yes : function(index, layero) {
+						reloadPaperCfg();
+					},
+					cancel: function() {
+						reloadPaperCfg();
+					},
 					success: function(layero, index) {
 						/* layui.layer.full(index); */
 						layui.table.render({
@@ -184,21 +194,21 @@
 							url : "paper/questionList",
 							where : {nine : id},
 							cols : [[
-									{field : "CODE", title : "编号", align : "center"},
-									{field : "TITLE", title : "题干", align : "center", width : 400},
-									{field : "TYPE_NAME", title : "类型", align : "center"},
-									{field : "DIFFICULTY_NAME", title : "难度", align : "center"},
-									{field : "STATE_NAME", title : "状态", align : "center"},
-									{field : "QUESTION_TYPE_NAME", title : "分类", align : "center"},
-									{field : "SCORE", title : "默认分值", align : "center"},
-									{field : "NO", title : "排序", align : "center"},
-									{fixed : "right", title : "操作 ", toolbar : "#questionToolbar", align : "center", width : 200}
+									{field : "CODE", title : "编号", align : "center", width : 70},
+									{field : "TITLE", title : "题干", align : "center"},
+									{field : "TYPE_NAME", title : "类型", align : "center", width : 70},
+									{field : "DIFFICULTY_NAME", title : "难度", align : "center", width : 70},
+									/* {field : "STATE_NAME", title : "状态", align : "center"}, */
+									{field : "QUESTION_TYPE_NAME", title : "试题分类", align : "center", width : 120},
+									{field : "SCORE", title : "默认分值", align : "center", width : 90},
+									/* {field : "NO", title : "排序", align : "center"}, */
+									{fixed : "right", title : "操作 ", toolbar : "#questionToolbar", align : "center", width : 80}
 									]],
 							page : true,
-							height : "full-180",
+							height : "full-360",
 							method : "post",
 							defaultToolbar : [],
-							parseData: function(question) {
+							parseData : function(question) {
 								return {
 									"code" : question.succ,
 									"msg" : question.msg,
@@ -206,11 +216,11 @@
 									"data" : question.data.rows
 								};
 							},
-							request: {
+							request : {
 								pageName: "curPage",
 								limitName: "pageSize"
 							}, 
-							response: {
+							response : {
 								statusCode : true
 							}
 						});
@@ -221,7 +231,7 @@
 							}
 						});
 						
-						questionTypeTree = $.fn.zTree.init($("#questionTypeTree"), {
+						/* questionTypeTree = $.fn.zTree.init($("#questionTypeTree"), {
 							async : {
 								url : "paper/questionTypeTreeList",
 								enable : true,
@@ -256,7 +266,7 @@
 							}
 						});
 						
-						$("#questionTypeTree").height($(window).height() - 45);
+						$("#questionTypeTree").height($(window).height() - 45); */
 						
 						layui.form.render(null, "questionQueryForm");
 					}
@@ -265,7 +275,7 @@
 		});
 	}
 	
-	//完成试题添加
+	// 完成试题添加
 	function doQuestionAdd(questionId, chapterId) {
 		$.ajax({
 			url : "paper/doQuestionAdd",
@@ -274,9 +284,10 @@
 				questionIds : questionId,
 			},
 			success : function(obj) {
-				questionQuery();
-				reloadPaperCfg();
+				// questionQuery();
 				layer.msg(obj.msg);
+				questionQuery();
+				//reloadPaperCfg();
 			}
 		});
 	}
@@ -295,7 +306,7 @@
 						return;
 					}
 					
-					layer.close(index);
+					//layer.close(index);
 					reloadPaperCfg();
 				}
 			});
@@ -316,7 +327,7 @@
 						return;
 					}
 					
-					layer.close(index);
+					//layer.close(index);
 					reloadPaperCfg();
 				}
 			});
@@ -334,7 +345,7 @@
 		}
 		
 		$.ajax({
-			url : "paper/scoreUpdate",
+			url : "paper/doScoreUpdate",
 			data : {
 				paperQuestionId : paperQuestionId,
 				score : score
@@ -376,8 +387,8 @@
 				paperQuestionId : paperQuestionId
 			},
 			success : function(obj) {
-				reloadPaperCfg();
 				layer.msg(obj.msg);
+				reloadPaperCfg();
 			}
 		});
 	}
@@ -390,8 +401,8 @@
 				paperQuestionId : paperQuestionId
 			},
 			success : function(obj) {
-				reloadPaperCfg();
 				layer.msg(obj.msg);
+				reloadPaperCfg();
 			}
 		});
 	}
@@ -409,7 +420,8 @@
 	
 	// 重新加载页面
 	function reloadPaperCfg() {
-		$.ajax({
+		window.location.reload();
+		/* $.ajax({
 			url : "paper/toCfg",
 			data : {id : "${paper.id }"},
 			dataType : "html",
@@ -420,6 +432,61 @@
 				layui.element.render("collapse", "exam-card");
 				layui.form.render(null, "paperCfgFrom");
 			}
+		}); */
+	}
+	
+	// 到达批量设置分数页面
+	function toBatchScoresUpdate(chapterId) {
+		$.ajax({
+			url : "paper/toBatchScoreUpdate",
+			data : {chapterId : chapterId},
+			dataType : "html",
+			success : function(obj) {
+				layer.open({
+					title : "设置分数",
+					area : ["800px", "500px"],
+					content : obj,
+					btn : ["设置", "取消"],
+					type : 1,
+					yes : function(index, layero) {
+						doBatchScoreUpdate(index);
+					},
+					success: function(layero, index) {
+						layui.form.render(null, "batchScoresUpdateFrom");
+					}
+				});
+			}
 		});
+	}
+	
+	// 完成批量设置分数
+	function doBatchScoreUpdate(batchScoresUpdateDialogIndex) {
+		layui.form.on("submit(batchScoresUpdateBtn)", function(data) {
+			layer.confirm("确定要设置？", function(index) {
+				var options = [];
+				$("[name='batchScoresOptions']:checked").each(function() {
+					options.push($(this).val());
+				});
+				data.field.options = options;
+				
+				$.ajax({
+					url : "paper/doBatchScoreUpdate",
+					data : data.field,
+					success : function(obj) {
+						layer.msg(obj.msg);
+						reloadPaperCfg();
+						
+						//layer.close(index);
+						//layer.close(resEditDialogIndex);
+					}
+				});
+			});
+		});
+		$("[lay-filter='batchScoresUpdateBtn']").click();
+	}
+	
+	// 关闭窗口
+	function colseDesignWin() {
+		window.close();
 	}
 </script>

@@ -85,7 +85,7 @@
 				height : "full-180",
 				method : "post",
 				defaultToolbar : [],
-				parseData: function(obj){
+				parseData : function(obj) {
 					return {
 						"code" : obj.succ,
 						"msg" : obj.msg,
@@ -93,24 +93,24 @@
 						"data" : obj.data.rows
 					};
 				},
-				request: {
+				request : {
 					pageName: "curPage",
 					limitName: "pageSize"
 				}, 
-				response: {
+				response : {
 					statusCode : true
 				}
 			});
-			layui.table.on("rowDouble(postTable)", function(obj){
+			layui.table.on("rowDouble(postTable)", function(obj) {
 				<my:auth url="post/toEdit">toPostEdit(obj.data.ID);</my:auth>
 			});
-			layui.table.on("tool(postTable)", function(obj){
+			layui.table.on("tool(postTable)", function(obj) {
 				var data = obj.data;
-				if(obj.event === "postEdit") {
+				if (obj.event === "postEdit") {
 					toPostEdit(obj.data.ID);
-				} else if(obj.event === "resUpdate") {
+				} else if (obj.event === "resUpdate") {
 					toResUpdate(obj.data.ID);
-				} else if(obj.event === "postDel") {
+				} else if (obj.event === "postDel") {
 					doPostDel(obj.data.ID);
 				}
 			});
@@ -169,7 +169,7 @@
 		
 		//到达添加岗位页面
 		function toPostAdd() {
-			if(!curSelOrgId){
+			if (!curSelOrgId) {
 				layer.alert("请选择组织机构！", {"title" : "提示消息"});
 				return;
 			}
@@ -184,10 +184,10 @@
 						content : obj,
 						btn : ["添加", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doPostAdd(index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							$("#orgId").val(curSelOrgId);
 							$("#orgName").val(curSelOrgName);
 							layui.form.render(null, "postEditFrom");
@@ -234,10 +234,10 @@
 						content : obj,
 						btn : ["修改", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doPostEdit(index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							layui.form.render(null, "postEditFrom");
 						}
 					});
@@ -301,10 +301,10 @@
 						content : obj,
 						btn : ["确定", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doResUpdate(id, index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							$.fn.zTree.init($("#resUpdateTree"), {
 								async : {
 									url : "post/resTreeList",
@@ -330,12 +330,12 @@
 			var resIds = $.fn.my.serializeField(resNodes, {attrName : "resIds"});
 			var params = "id=" + id + "&" + resIds;
 			
-			layer.confirm("确定要设置？", {title : "提示消息"}, function(index){
+			layer.confirm("确定要设置？", {title : "提示消息"}, function(index) {
 				$.ajax({
 					url : "post/doResUpdate",
 					data : params,
 					success : function(obj) {
-						if(!obj.succ){
+						if (!obj.succ) {
 							layer.alert(obj.msg, {"title" : "提示消息"});
 							return;
 						}

@@ -90,7 +90,7 @@
 				height : "full-180",
 				method : "post",
 				defaultToolbar : [],
-				parseData: function(exam){
+				parseData : function(exam) {
 					return {
 						"code" : exam.succ,
 						"msg" : exam.msg,
@@ -98,24 +98,24 @@
 						"data" : exam.data.rows
 					};
 				},
-				request: {
+				request : {
 					pageName: "curPage",
 					limitName: "pageSize"
 				}, 
-				response: {
+				response : {
 					statusCode : true
 				}
 			});
-			layui.table.on("rowDouble(examTable)", function(obj){
+			layui.table.on("rowDouble(examTable)", function(obj) {
 				<my:auth url="exam/toEdit">toExamEdit(obj.data.ID);</my:auth>
 			});
-			layui.table.on("tool(examTable)", function(obj){
+			layui.table.on("tool(examTable)", function(obj) {
 				var data = obj.data;
-				if(obj.event === "examEdit") {
+				if (obj.event === "examEdit") {
 					toExamEdit(obj.data.ID);
-				} else if(obj.event === "examDel") {
+				} else if (obj.event === "examDel") {
 					doExamDel(obj.data.ID);
-				} else if(obj.event === "examCfg") {
+				} else if (obj.event === "examCfg") {
 					toExamCfg(obj.data.ID);
 				}
 			});
@@ -177,7 +177,7 @@
 		
 		//到达添加考试页面
 		function toExamAdd() {
-			if(!curSelExamTypeId){
+			if (!curSelExamTypeId) {
 				layer.alert("请选择考试分类！", {"title" : "提示消息"});
 				return;
 			}
@@ -192,10 +192,10 @@
 						content : obj,
 						btn : ["添加", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doExamAdd(index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							var startTime = layui.laydate.render({
 								elem : "#startTime",
 								type : "datetime",
@@ -238,18 +238,18 @@
 								filterable : true,
 								paging : true,
 								pageRemote : true,
-								radio: true,
-								clickClose: true,
+								radio : true,
+								clickClose : true,
 								//tips : "请输入试卷名称",
 								searchTips : "可模糊搜索试卷名称、试卷分类名称",
 								layVerify : "required",
-								model: {label: {
+								model : {label: {
 											type: "text",
 											text: {left: "", right: "", separator: "", },
 										}
 								},
 								// pageSize : 5,
-								on : function(data){
+								on : function(data) {
 									if (first) {
 										first = false;
 										return;
@@ -282,7 +282,7 @@
 									}
 									
 								},
-								remoteMethod : function(val, cb, show, pageIndex){
+								remoteMethod : function(val, cb, show, pageIndex) {
 									$.ajax({
 										url : "exam/paperList",
 										data : {
@@ -294,7 +294,7 @@
 										success : function(obj) {
 											var papers = [];
 											for (var i in obj.data.rows) {
-												var p = {
+												papers.push({
 													name :  obj.data.rows[i].NAME+"-"+obj.data.rows[i].PAPER_TYPE_NAME,
 													value : obj.data.rows[i].ID,
 													passScore : obj.data.rows[i].PASS_SCORE,
@@ -308,14 +308,13 @@
 													scoreDRemark : obj.data.rows[i].SCORE_D_REMARK,
 													scoreE : obj.data.rows[i].SCORE_E,
 													scoreERemark : obj.data.rows[i].SCORE_E_REMARK
-												};
-												papers.push(p);
+												});
 											}
 											cb(papers, Math.ceil(obj.data.total / 5));
 										}
 									});
 								}
-							})
+							});
 							
 							$("#examTypeId").val(curSelExamTypeId);
 							$("#examTypeName").val(curSelExamTypeName);
@@ -435,7 +434,7 @@
 									}
 								},
 								// pageSize : 5,
-								on : function(data){
+								on : function(data) {
 									if (first) {
 										first = false;
 										return;
@@ -549,7 +548,7 @@
 		}
 
 		//完成删除考试
-		function doExamDelForBtn() {
+		function doExamDel(id) {
 			layer.confirm("确定要删除？", function(index) {
 				$.ajax({
 					url : "exam/doDel",
@@ -588,7 +587,7 @@
 						content : obj,
 						btn : ["确定", "关闭"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doExamCfg(index);
 						},
 						success : function(layero, index) {
@@ -648,9 +647,9 @@
 								}
 							});
 							
-							var markUserIdSelect = xmSelect.render({
-								el : "#markUserIds",
-								name : "markUserIds",
+							var myMarkIdSelect = xmSelect.render({
+								el : "#myMarkIds",
+								name : "myMarkIds",
 								filterable : true,
 								paging : true,
 								pageRemote : true,
@@ -693,13 +692,13 @@
 								},
 								async : true,
 								success : function(obj) {
-									var markUsers = [];
+									var myMarks = [];
 									for (var i in obj.data.rows) {
-										markUsers.push({"name" : obj.data.rows[i].NAME+"-"+obj.data.rows[i].ORG_NAME, value : obj.data.rows[i].ID, selected : true});
+										myMarks.push({"name" : obj.data.rows[i].NAME+"-"+obj.data.rows[i].ORG_NAME, value : obj.data.rows[i].ID, selected : true});
 									}
 									
-									markUserIdSelect.update({
-										data: markUsers
+									myMarkIdSelect.update({
+										data: myMarks
 									})
 								}
 							});
@@ -721,7 +720,7 @@
 						success : function(obj) {
 							examQuery();
 							
-							if(!obj.succ){
+							if (!obj.succ) {
 								layer.alert(obj.msg, {"title" : "提示消息"});
 								return;
 							}
@@ -781,7 +780,7 @@
 				success : function(obj) {
 					examQuery();
 					
-					if(!obj.succ){
+					if (!obj.succ) {
 						layer.alert(obj.msg, {"title" : "提示消息"});
 						return;
 					}

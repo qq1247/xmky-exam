@@ -92,6 +92,8 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 		
 		// 删除试卷分类
 		PaperType paperType = getEntity(id);
+		paperTypeExService.delAndUpdate(paperType);
+		
 		paperType.setState(0);
 		paperType.setUpdateTime(new Date());
 		paperType.setUpdateUserId(getCurUser().getId());
@@ -109,30 +111,30 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 		List<PaperType> paperTypeList = getList();
 		
 		List<Map<String, Object>> paperTypeTreeList = new ArrayList<Map<String,Object>>();
-		for(PaperType paperType : paperTypeList){
+		for(PaperType paperType : paperTypeList) {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("ID", paperType.getId());
 			map.put("NAME", paperType.getName());
 			map.put("PARENT_ID", paperType.getParentId());
 			
-			if(ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())){// 系统管理员，拥有所有权限
+			if(ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {// 系统管理员，拥有所有权限
 				paperTypeTreeList.add(map);
 				continue;
 			}
 			if(ValidateUtil.isValid(paperType.getUserIds()) 
-					&& paperType.getUserIds().contains(String.format(",%s,", user.getId()))){//有用户权限
+					&& paperType.getUserIds().contains(String.format(",%s,", user.getId()))) {//有用户权限
 				paperTypeTreeList.add(map);
 				continue;
 			}
 			if(ValidateUtil.isValid(paperType.getOrgIds())
-					&& paperType.getOrgIds().contains(String.format(",%s,", user.getOrgId()))){//有机构权限
+					&& paperType.getOrgIds().contains(String.format(",%s,", user.getOrgId()))) {//有机构权限
 				paperTypeTreeList.add(map);
 				continue;
 			}
 			if (ValidateUtil.isValid(paperType.getPostIds())
 					&& ValidateUtil.isValid(user.getPostIds())) {
 				Set<String> postList = new HashSet<>(Arrays.asList(user.getPostIds().substring(1, user.getPostIds().length() - 1).split(",")));
-				for(String postId : postList){
+				for(String postId : postList) {
 					if (postService.getEntity(Integer.parseInt(postId)).getState() == 1
 							&& paperType.getPostIds().contains(String.format(",%s,", postId))) {//有岗位权限
 						paperTypeTreeList.add(map);
@@ -200,9 +202,9 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 
 	@Override
 	public void doAuth(Integer id, Integer[] userIds, Integer[] postIds, Integer[] orgIds, boolean syn2Sub) {
-		if(syn2Sub){
+		if(syn2Sub) {
 			List<PaperType> paperTypeList = paperTypeDao.getList(id);
-			for(PaperType paperType : paperTypeList){
+			for(PaperType paperType : paperTypeList) {
 				doAuth(paperType.getId(), userIds, postIds, orgIds, syn2Sub);
 			}
 		}

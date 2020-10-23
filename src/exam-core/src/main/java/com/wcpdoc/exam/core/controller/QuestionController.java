@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.core.controller;
 
 import java.io.OutputStream;
+import java.util.Date;
 
 import javax.annotation.Resource;
 
@@ -53,7 +54,7 @@ public class QuestionController extends BaseController {
 		try {
 			model.addAttribute("QUESTION_TYPE_DICT_LIST", DictCache.getIndexDictlistMap().get("QUESTION_TYPE"));
 			model.addAttribute("QUESTION_DIFFICULTY_DICT_LIST", DictCache.getIndexDictlistMap().get("QUESTION_DIFFICULTY"));
-			model.addAttribute("STATE2_DICT_LIST", DictCache.getIndexDictlistMap().get("STATE2"));
+			model.addAttribute("STATE_DICT_LIST", DictCache.getIndexDictlistMap().get("STATE"));
 			return "exam/question/questionList";
 		} catch (Exception e) {
 			log.error("到达试题列表页面错误：", e);
@@ -88,7 +89,7 @@ public class QuestionController extends BaseController {
 	@ResponseBody
 	public PageResult list(PageIn pageIn) {
 		try {
-			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())){
+			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
 				pageIn.setTen(getCurUser().getId().toString());
 			}
 			return new PageResultEx(true, "查询成功",  questionService.getListpage(pageIn));
@@ -109,7 +110,7 @@ public class QuestionController extends BaseController {
 		try {
 			model.addAttribute("QUESTION_TYPE_DICT_LIST", DictCache.getIndexDictlistMap().get("QUESTION_TYPE"));
 			model.addAttribute("QUESTION_DIFFICULTY_DICT_LIST", DictCache.getIndexDictlistMap().get("QUESTION_DIFFICULTY"));
-			model.addAttribute("STATE2_DICT_LIST", DictCache.getIndexDictlistMap().get("STATE2"));
+			model.addAttribute("STATE_DICT_LIST", DictCache.getIndexDictlistMap().get("STATE"));
 			
 			Question question = new Question();
 			question.setType(1);
@@ -161,7 +162,7 @@ public class QuestionController extends BaseController {
 			
 			model.addAttribute("QUESTION_TYPE_DICT_LIST", DictCache.getIndexDictlistMap().get("QUESTION_TYPE"));
 			model.addAttribute("QUESTION_DIFFICULTY_DICT_LIST", DictCache.getIndexDictlistMap().get("QUESTION_DIFFICULTY"));
-			model.addAttribute("STATE2_DICT_LIST", DictCache.getIndexDictlistMap().get("STATE2"));
+			model.addAttribute("STATE_DICT_LIST", DictCache.getIndexDictlistMap().get("STATE"));
 			
 			return "exam/question/questionEdit";
 		} catch (Exception e) {
@@ -206,6 +207,8 @@ public class QuestionController extends BaseController {
 		try {
 			Question question = questionService.getEntity(id);
 			question.setState(0);
+			question.setUpdateTime(new Date());
+			question.setUpdateUserId(getCurUser().getId());
 			questionService.update(question);
 			return new PageResult(true, "删除成功");
 		} catch (MyException e) {
@@ -264,6 +267,40 @@ public class QuestionController extends BaseController {
 			log.error("完成下载模板失败：", e);
 		} finally {
 			IOUtils.closeQuietly(output);
+		}
+	}
+	
+	/**
+	 * 完成发布
+	 * 
+	 * v1.0 zhanghc 2018年11月24日上午9:13:22
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/doPublish")
+	@ResponseBody
+	public PageResult doPublish(Integer id) {
+		try {
+			Question question = questionService.getEntity(id);
+			if (question.getState() == 0) {
+				throw new MyException("试题已删除！");
+			}
+			if (question.getState() == 1) {
+				question.setState(2);
+			} else if (question.getState() == 2) {
+				question.setState(1);
+			}
+
+			question.setUpdateTime(new Date());
+			question.setUpdateUserId(getCurUser().getId());
+			questionService.update(question);
+			return new PageResult(true, "发布成功");
+		} catch (MyException e) {
+			log.error("完成发布错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
+		} catch (Exception e) {
+			log.error("完成发布错误：", e);
+			return new PageResult(false, "未知异常！");
 		}
 	}
 }

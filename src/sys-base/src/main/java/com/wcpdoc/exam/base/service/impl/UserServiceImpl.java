@@ -58,7 +58,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	public Map<Integer, Long> getAuth(Integer id) {
 		User user = getEntity(id);
 		Map<Integer, Long> authMap = new HashMap<>();
-		if (!ValidateUtil.isValid(user.getPostIds())){
+		if (!ValidateUtil.isValid(user.getPostIds())) {
 			return authMap;
 		}
 		

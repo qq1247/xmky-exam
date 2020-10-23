@@ -111,30 +111,30 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 		List<ExamType> examTypeList = getList();
 		
 		List<Map<String, Object>> examTypeTreeList = new ArrayList<Map<String,Object>>();
-		for(ExamType examType : examTypeList){
+		for(ExamType examType : examTypeList) {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("ID", examType.getId());
 			map.put("NAME", examType.getName());
 			map.put("PARENT_ID", examType.getParentId());
 			
-			if(ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())){// 系统管理员，拥有所有权限
+			if(ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {// 系统管理员，拥有所有权限
 				examTypeTreeList.add(map);
 				continue;
 			}
 			if(ValidateUtil.isValid(examType.getUserIds()) 
-					&& examType.getUserIds().contains(String.format(",%s,", user.getId()))){//有用户权限
+					&& examType.getUserIds().contains(String.format(",%s,", user.getId()))) {//有用户权限
 				examTypeTreeList.add(map);
 				continue;
 			}
 			if(ValidateUtil.isValid(examType.getOrgIds())
-					&& examType.getOrgIds().contains(String.format(",%s,", user.getOrgId()))){//有机构权限
+					&& examType.getOrgIds().contains(String.format(",%s,", user.getOrgId()))) {//有机构权限
 				examTypeTreeList.add(map);
 				continue;
 			}
 			if (ValidateUtil.isValid(examType.getPostIds())
 					&& ValidateUtil.isValid(user.getPostIds())) {
 				Set<String> postList = new HashSet<>(Arrays.asList(user.getPostIds().substring(1, user.getPostIds().length() - 1).split(",")));
-				for(String postId : postList){
+				for(String postId : postList) {
 					if (postService.getEntity(Integer.parseInt(postId)).getState() == 1
 							&& examType.getPostIds().contains(String.format(",%s,", postId))) {//有岗位权限
 						examTypeTreeList.add(map);
@@ -202,9 +202,9 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 
 	@Override
 	public void doAuth(Integer id, Integer[] userIds, Integer[] postIds, Integer[] orgIds, boolean syn2Sub) {
-		if(syn2Sub){
+		if(syn2Sub) {
 			List<ExamType> examTypeList = examTypeDao.getList(id);
-			for(ExamType examType : examTypeList){
+			for(ExamType examType : examTypeList) {
 				doAuth(examType.getId(), userIds, postIds, orgIds, syn2Sub);
 			}
 		}

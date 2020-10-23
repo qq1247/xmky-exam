@@ -49,6 +49,8 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "QUESTION.STATE = ?", pageIn.getFour())//0：删除；1：启用；2：禁用
 				.addWhere(ValidateUtil.isValid(pageIn.getFive()), "QUESTION.TYPE = ?", pageIn.getFive())
 				.addWhere(ValidateUtil.isValid(pageIn.getSix()), "QUESTION.DIFFICULTY = ?", pageIn.getSix())
+				.addWhere(ValidateUtil.isValid(pageIn.getSeven()), "QUESTION_TYPE.NAME LIKE ?", "%" + pageIn.getSeven() + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.getEight()), "QUESTION.SCORE = ?", pageIn.getEight())
 				.addWhere(ValidateUtil.isValid(pageIn.getNine()), "NOT EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.getNine())
 				.addWhere("QUESTION.STATE != ?", 0)
 				.addOrder("QUESTION.NO", Order.DESC);
@@ -77,8 +79,8 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 		}
 		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), "QUESTION_TYPE", "TYPE", "QUESTION_DIFFICULTY", "DIFFICULTY", "STATE2", "STATE");
-		for(Map<String, Object> map : pageOut.getRows()){
+		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), "QUESTION_TYPE", "TYPE", "QUESTION_DIFFICULTY", "DIFFICULTY", "STATE", "STATE");
+		for(Map<String, Object> map : pageOut.getRows()) {
 			String title = map.get("TITLE").toString();
 			Document document = Jsoup.parse(title);
 			Elements embeds = document.getElementsByTag("video");
@@ -89,7 +91,7 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 			imgs.remove();
 			
 			title = document.body().html();
-			if(title.length() > 500){
+			if(title.length() > 500) {
 				title = title.substring(0, 500) + "...";
 			}
 			map.put("TITLE", Jsoup.parse(title).text());
@@ -109,6 +111,6 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 	@Override
 	public List<Question> getList(Integer questionTypeId) {
 		String sql = "SELECT * FROM EXM_QUESTION WHERE STATE = 1 AND QUESTION_TYPE_ID = ?";
-		return getList(sql, new Object[]{questionTypeId}, Question.class);
+		return getList(sql, new Object[] { questionTypeId }, Question.class);
 	}
 }

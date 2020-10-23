@@ -73,7 +73,7 @@ public abstract class WordServer {
 		Map<String, String> cssAttr = new HashMap<>();
 		for (String style : styleArr) {
 			String[] split2 = style.split("\\{|\\}");
-			if(split2[0].startsWith(".p")){
+			if(split2[0].startsWith(".p")) {
 				cssAttr.put(split2[0], split2[1] + "display: inline;");
 			} else {
 				cssAttr.put(split2[0], split2[1]);

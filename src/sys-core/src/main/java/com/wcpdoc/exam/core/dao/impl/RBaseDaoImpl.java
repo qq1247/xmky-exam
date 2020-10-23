@@ -102,7 +102,7 @@ public abstract class RBaseDaoImpl<T> implements RBaseDao<T> {
 	public /*final*/ int update(String sql, Object... params) {
 		@SuppressWarnings("unchecked")
 		Query<T> query = getCurSession().createSQLQuery(toHibernateSql(sql));
-		for(int i = 0; i < params.length; i++){
+		for(int i = 0; i < params.length; i++) {
 			query.setParameter(i, params[i]);
 		}
 		

@@ -41,7 +41,7 @@
 			loadLog();
 			var loadLogInterval = setInterval("loadLog()", 3000);
 			
-			layui.form.on("select(logName)", function(data){
+			layui.form.on("select(logName)", function(data) {
 				clearInterval(loadLogInterval);
 				logText.html("");
 				curReadLen = null;
@@ -61,9 +61,9 @@
 						return $("[lay-filter='logName']").parent().find("dd[class='layui-this']").attr("lay-value");
 					}
 	            },
-				success : function(obj){
+				success : function(obj) {
 					curReadLen = obj.data.CUR_READ_LEN;
-					for(var index in obj.data.STR_LIST){
+					for(var index in obj.data.STR_LIST) {
 						logText.append(obj.data.STR_LIST[index] + "<br/>" );
 					}
 				}

@@ -182,7 +182,7 @@ public class UserController extends BaseController {
 			userService.add(user);
 			
 			// 设置密码
-			String initPwd = StringUtil.getRandomStr(8);
+			String initPwd = "111111";//StringUtil.getRandomStr(8);
 			userService.doPwdUpdate(user.getId(), initPwd);
 			Map<String, Object> data = new HashMap<String, Object>();
 			data.put("initPwd", initPwd);
@@ -256,7 +256,7 @@ public class UserController extends BaseController {
 			String initPwd = null;
 			Map<String, Object> data = new HashMap<String, Object>();
 			if (changeLoginName) {
-				initPwd = StringUtil.getRandomStr(8);
+				initPwd = "111111";//StringUtil.getRandomStr(8);
 				userService.doPwdUpdate(user.getId(), initPwd);
 				data.put("initPwd", initPwd);
 			}
@@ -436,7 +436,7 @@ public class UserController extends BaseController {
 	@ResponseBody
 	public PageResult initPwd(Integer id) {
 		try {
-			String initPwd = StringUtil.getRandomStr(8);
+			String initPwd = "111111";//StringUtil.getRandomStr(8);
 			userService.doPwdUpdate(id, initPwd);
 			Map<String, Object> data = new HashMap<String, Object>();
 			data.put("initPwd", initPwd);

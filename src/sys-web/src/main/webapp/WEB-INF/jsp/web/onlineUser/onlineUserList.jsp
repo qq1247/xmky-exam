@@ -61,7 +61,7 @@
 				height : "full-180",
 				method : "post",
 				defaultToolbar : [],
-				parseData: function(onlineUser){
+				parseData : function(onlineUser) {
 					return {
 						"code" : onlineUser.succ,
 						"msg" : onlineUser.msg,
@@ -69,17 +69,17 @@
 						"data" : onlineUser.data.rows
 					};
 				},
-				request: {
+				request : {
 					pageName: "curPage",
 					limitName: "pageSize"
 				}, 
-				response: {
+				response : {
 					statusCode : true
 				}
 			});
-			layui.table.on("tool(onlineUserTable)", function(obj){
+			layui.table.on("tool(onlineUserTable)", function(obj) {
 				var data = obj.data;
-				if(obj.event === "onlineUserDel") {
+				if (obj.event === "onlineUserDel") {
 					doOnlineUserDel(obj.data.ID);
 				}
 			});

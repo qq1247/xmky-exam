@@ -177,10 +177,12 @@ public class Question {
 		this.analysis = analysis;
 	}
 
+	/** 0：删除；1：启用；2：禁用 */
 	public Integer getState() {
 		return state;
 	}
 
+	/** 0：删除；1：启用；2：禁用 */
 	public void setState(Integer state) {
 		this.state = state;
 	}

@@ -19,10 +19,10 @@
 	</form>
 	<div class="layui-card-body">
 		<script type="text/html" id="myMarkDetailToolbar">
-			{{#  if(d.EXAM_HAND == "AWAIT"){ }}
-			{{#  } else if(d.EXAM_HAND == "START"){ }}
+			{{#  if (d.EXAM_HAND == "AWAIT") { }}
+			{{#  } else if (d.EXAM_HAND == "START") { }}
 			<my:auth url="myMarkDetail/toPaper"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="myMarkToMark"><i class="layui-icon layui-icon-edit"></i>阅卷</a></my:auth>
-			{{#  } else if(d.EXAM_HAND == "AWAIT"){ }}
+			{{#  } else if (d.EXAM_HAND == "AWAIT") { }}
 			<my:auth url="myMarkDetail/toPaper"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="myMarkDetailReview"><i class="layui-icon layui-icon-edit"></i>预览</a></my:auth>
 			{{#  } }}
 		</script>

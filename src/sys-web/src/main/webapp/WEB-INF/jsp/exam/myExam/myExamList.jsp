@@ -29,10 +29,10 @@
 				</form>
 				<div class="layui-card-body">
 					<script type="text/html" id="myExamToolbar">
-						{{#  if(d.EXAM_HAND == "AWAIT"){ }}
-						{{#  } else if(d.EXAM_HAND == "START"){ }}
+						{{#  if (d.EXAM_HAND == "AWAIT") { }}
+						{{#  } else if (d.EXAM_HAND == "START") { }}
 						<my:auth url="myExam/toExam"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="myExamStart"><i class="layui-icon layui-icon-edit"></i>开始考试</a></my:auth>
-						{{#  } else if(d.EXAM_HAND == "AWAIT"){ }}
+						{{#  } else if (d.EXAM_HAND == "AWAIT") { }}
 						<my:auth url="myExam/toExam"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="myExamReview"><i class="layui-icon layui-icon-edit"></i>预览</a></my:auth>
 						{{#  } }}
 					</script>
@@ -64,9 +64,13 @@
 							var endTime = new Date(d.EXAM_END_TIME_STR);
 							return d.EXAM_START_TIME_STR + "（"+Math.round((endTime.getTime() - startTime.getTime()) / 60000)+"分钟）";
 						}},
-						{field : "EXAM_PASS_SCORE", title : "分数", align : "center", templet : function(d) {
-							return d.EXAM_PASS_SCORE + "/" + d.PAPER_TOTAL_SCORE;
+						{field : "MY_EXAM_TOTAL_SCORE", title : "分数/总分数", align : "center", templet : function(d) {
+							if (d.MY_EXAM_TOTAL_SCORE < d.EXAM_PASS_SCORE) {
+								return '<span style="color: red;">'+d.MY_EXAM_TOTAL_SCORE+'/'+d.PAPER_TOTAL_SCORE+'</span>';
+							}
+							return d.MY_EXAM_TOTAL_SCORE+'/'+d.PAPER_TOTAL_SCORE;
 						}},
+						{field : "USER_REMARK", title : "评语", align : "center"},
 						{field : "USER_NUM", title : "参考人数", align : "center"},
 						{fixed : "right", title : "操作 ", toolbar : "#myExamToolbar", align : "center", width : 280}
 						]],
@@ -74,7 +78,7 @@
 				height : "full-180",
 				method : "post",
 				defaultToolbar : [],
-				parseData: function(myExam){
+				parseData : function(myExam) {
 					return {
 						"code" : myExam.succ,
 						"msg" : myExam.msg,
@@ -82,19 +86,19 @@
 						"data" : myExam.data.rows
 					};
 				},
-				request: {
+				request : {
 					pageName: "curPage",
 					limitName: "pageSize"
 				}, 
-				response: {
+				response : {
 					statusCode : true
 				}
 			});
-			layui.table.on("rowDouble(myExamTable)", function(obj){
+			layui.table.on("rowDouble(myExamTable)", function(obj) {
 			});
-			layui.table.on("tool(myExamTable)", function(obj){
+			layui.table.on("tool(myExamTable)", function(obj) {
 				var data = obj.data;
-				if(obj.event === "myExamStart") {
+				if (obj.event === "myExamStart") {
 					toMyExamPaper(obj.data.ID);
 				}
 			});
@@ -112,8 +116,8 @@
 		}
 		
 		// 到达我的试卷页面
-		function toMyExamPaper(examUserId) {
-			window.open("myExam/toExam?examUserId=" + examUserId);
+		function toMyExamPaper(myExamId) {
+			window.open("myExam/toExam?myExamId=" + myExamId);
 		}
 		
 		// 完成配置我的考试
@@ -126,7 +130,7 @@
 						success : function(obj) {
 							myExamQuery();
 							
-							if(!obj.succ){
+							if (!obj.succ) {
 								layer.alert(obj.msg, {"title" : "提示消息"});
 								return;
 							}

@@ -51,7 +51,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	@Override
 	public void doChapterAdd(PaperQuestion chapter) {
 		//校验数据有效性
-		if(chapter.getPaperId() == null){
+		if(chapter.getPaperId() == null) {
 			throw new MyException("参数错误：paperId");
 		}
 		Paper paper = getEntity(chapter.getPaperId());
@@ -112,7 +112,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 				
 		//删除章节
 		List<PaperQuestion> questionList = paperQuestionService.getQuestionList(chapterId);
-		for(PaperQuestion pq : questionList){
+		for(PaperQuestion pq : questionList) {
 			paperQuestionService.del(pq.getId());
 		}
 		PaperQuestion chapter = paperQuestionService.getEntity(chapterId);//不要放到下一行，因为第二行执行删除了。
@@ -123,7 +123,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 	
 	@Override
-	public void doChapterUp(Integer chapterId){
+	public void doChapterUp(Integer chapterId) {
 		//校验数据有效性
 		PaperQuestion entity = paperQuestionService.getEntity(chapterId);
 		Paper paper = getEntity(entity.getPaperId());
@@ -144,8 +144,8 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			}
 		});
 		
-		for(PaperQuestion cur : chapterList){
-			if(chapter.getNo() > cur.getNo()){
+		for(PaperQuestion cur : chapterList) {
+			if(chapter.getNo() > cur.getNo()) {
 				Integer no = cur.getNo();
 				cur.setNo(chapter.getNo());
 				chapter.setNo(no);
@@ -178,8 +178,8 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			}
 		});
 		
-		for(PaperQuestion cur : chapterList){
-			if(chapter.getNo() < cur.getNo()){
+		for(PaperQuestion cur : chapterList) {
+			if(chapter.getNo() < cur.getNo()) {
 				Integer no = cur.getNo();
 				cur.setNo(chapter.getNo());
 				chapter.setNo(no);
@@ -214,11 +214,11 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		
 		Map<Integer, PaperQuestionEx> paperQuestionExMap = new HashMap<Integer, PaperQuestionEx>();
 		Map<Integer, Question> questionMap = new HashMap<Integer, Question>();
-		for(Question question : questionList){
+		for(Question question : questionList) {
 			questionMap.put(question.getId(), question);
 		}
 		
-		for(PaperQuestion paperQuestion : paperQuestionList){
+		for(PaperQuestion paperQuestion : paperQuestionList) {
 			PaperQuestionEx paperQuestionEx = new PaperQuestionEx();
 			try {
 				BeanUtils.copyProperties(paperQuestionEx, paperQuestion);
@@ -231,8 +231,8 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		}
 		
 		List<PaperQuestionEx> treeList = new ArrayList<PaperQuestionEx>();
-		for(PaperQuestionEx paperQuestionEx : paperQuestionExList){
-			if(paperQuestionEx.getParentId() == 0){
+		for(PaperQuestionEx paperQuestionEx : paperQuestionExList) {
+			if(paperQuestionEx.getParentId() == 0) {
 				treeList.add(paperQuestionEx);
 			}else{
 				PaperQuestionEx parentPaperQuestionEx = paperQuestionExMap.get(paperQuestionEx.getParentId());
@@ -286,12 +286,12 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 	
 	@Override
-	public void scoreUpdate(Integer paperQuestionId, BigDecimal score) {
+	public void doScoreUpdate(Integer paperQuestionId, BigDecimal score) {
 		//校验数据有效性
-		if(paperQuestionId == null){
+		if(paperQuestionId == null) {
 			throw new MyException("无法获取参数：paperQuestionId");
 		}
-		if(score == null){
+		if(score == null) {
 			throw new MyException("无法获取参数：score");
 		}
 		PaperQuestion entity = paperQuestionService.getEntity(paperQuestionId);
@@ -348,7 +348,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	@Override
 	public void doQuestionUp(Integer paperQuestionId) {
 		//校验数据有效性
-		if(paperQuestionId == null){
+		if(paperQuestionId == null) {
 			throw new MyException("无法获取参数：paperQuestionId");
 		}
 		PaperQuestion entity = paperQuestionService.getEntity(paperQuestionId);
@@ -371,8 +371,8 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			}
 		});
 		
-		for(PaperQuestion cur : pqList){
-			if(pq.getNo() > cur.getNo()){
+		for(PaperQuestion cur : pqList) {
+			if(pq.getNo() > cur.getNo()) {
 				Integer no = cur.getNo();
 				cur.setNo(pq.getNo());
 				pq.setNo(no);
@@ -386,7 +386,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	@Override
 	public void doQuestionDown(Integer paperQuestionId) {
 		//校验数据有效性
-		if(paperQuestionId == null){
+		if(paperQuestionId == null) {
 			throw new MyException("无法获取参数：paperQuestionId");
 		}
 		PaperQuestion entity = paperQuestionService.getEntity(paperQuestionId);
@@ -409,8 +409,8 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			}
 		});
 		
-		for(PaperQuestion cur : pqList){
-			if(pq.getNo() < cur.getNo()){
+		for(PaperQuestion cur : pqList) {
+			if(pq.getNo() < cur.getNo()) {
 				Integer no = cur.getNo();
 				cur.setNo(pq.getNo());
 				pq.setNo(no);
@@ -485,5 +485,51 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	@Override
 	public List<Question> getQuestionList(Integer paperId) {
 		return paperDao.getQuestionList(paperId);
+	}
+
+	@Override
+	public List<Paper> getList(Integer paperTypeId) {
+		return paperDao.getList(paperTypeId);
+	}
+
+	@Override
+	public void doBatchScoreUpdate(Integer chapterId, BigDecimal score, String options) {
+		// 校验数据有效性
+		if (chapterId == null) {
+			throw new MyException("参数错误：chapterId");
+		}
+		if (score == null) {
+			throw new MyException("参数错误：score");
+		}
+		PaperQuestion entity = paperQuestionService.getEntity(chapterId);
+		Paper paper = getEntity(entity.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
+		}
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
+		}
+
+		// 更新试卷分数
+		List<PaperQuestion> pqList = paperQuestionService.getQuestionList(chapterId);
+		for (PaperQuestion pq : pqList) {
+			pq.setScoreOptions(null);
+			Question question = questionService.getEntity(pq.getQuestionId());
+			if (question.getType() == 2) {
+				if (ValidateUtil.isValid(options) && options.contains("1")) {
+					pq.setScoreOptions("1");
+				}
+			} else if (question.getType() == 3) {
+				pq.setScoreOptions(options);
+			}
+
+			pq.setScore(score);
+			paperQuestionService.update(pq);
+		}
+
+		// 更新试卷总分
+		if (pqList.size() > 0) {
+			updateTotalScore(pqList.get(0).getPaperId());
+		}
 	}
 }

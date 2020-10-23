@@ -152,25 +152,25 @@ public class WordServerImpl extends WordServer {
 				}
 			}
 			
-			if(optionList.size() >= 1){
+			if(optionList.size() >= 1) {
 				question.setOptionA(optionMap.get("A"));
 			}
-			if(optionList.size() >= 2){
+			if(optionList.size() >= 2) {
 				question.setOptionB(optionMap.get("B"));
 			}
-			if(optionList.size() >= 3){
+			if(optionList.size() >= 3) {
 				question.setOptionC(optionMap.get("C"));
 			}
-			if(optionList.size() >= 4){
+			if(optionList.size() >= 4) {
 				question.setOptionD(optionMap.get("D"));
 			}
-			if(optionList.size() >= 5){
+			if(optionList.size() >= 5) {
 				question.setOptionE(optionMap.get("E"));
 			}
-			if(optionList.size() >= 6){
+			if(optionList.size() >= 6) {
 				question.setOptionF(optionMap.get("F"));
 			}
-			if(optionList.size() >= 7){
+			if(optionList.size() >= 7) {
 				question.setOptionG(optionMap.get("G"));
 			}
 		}
@@ -199,7 +199,7 @@ public class WordServerImpl extends WordServer {
 			for (Node node : subList) {
 				String an = Jsoup.clean(node.outerHtml(), Whitelist.none())
 						.replaceAll(" ", "").replaceAll("\r", "").replaceAll("\n", "");
-				if(an.startsWith("【答案】")){
+				if(an.startsWith("【答案】")) {
 					an = an.substring(4);
 				}
 				if (!ValidateUtil.isValid(an)) {

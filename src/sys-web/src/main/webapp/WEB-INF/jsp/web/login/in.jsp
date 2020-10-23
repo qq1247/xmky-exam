@@ -40,7 +40,7 @@
 	<script type="text/javascript" src="script/layuiadmin/layui/layui.all.js"></script>
 	<script>
 		var message = "<%= request.getParameter("message") == null ? "" : request.getParameter("message") %>";
-		if(message){
+		if (message) {
 			layer.msg(decodeURI(message));
 		}
 	</script>

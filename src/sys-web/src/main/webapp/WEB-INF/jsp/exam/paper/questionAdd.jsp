@@ -3,17 +3,17 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <!-- <div lay-filter="questionEditFrom" class="layui-form" style="padding: 20px 0 0 0;"> -->
 	<div class="layui-row layui-col-space10">
-		<div class="layui-col-md2">
+		<!-- <div class="layui-col-md2">
 			<div class="layui-card">
 				<div class="layui-form">
 	      			<ul id="questionTypeTree" class="ztree"></ul>
 	 			</div>
 			</div>
 		</div>
-		<div class="layui-col-md10">
+		<div class="layui-col-md10"> -->
 			<div class="layui-card">
 				<%-- 试题查询条件 --%>
-				<form id="questionQueryForm" class="layui-form layui-card-header layuiadmin-card-header-auto">
+				<form id="questionQueryForm" lay-filter="questionQueryForm" class="layui-form layui-card-header layuiadmin-card-header-auto">
 					<input type="hidden" id="questionOne" name="one">
 					<div class="layui-form-item ">
 						<div class="layui-inline">
@@ -23,6 +23,12 @@
 							<input type="text" name="three" placeholder="请输入题干" class="layui-input">
 						</div>
 						<div class="layui-inline">
+							<input type="text" name="seven" placeholder="请输入试题分类" class="layui-input">
+						</div>
+						<div class="layui-inline">
+							<input type="text" name="eight" placeholder="请输入默认分值" class="layui-input">
+						</div>
+						<div class="layui-inline" style="width: 156px;">
 							<select name="five">
 								<option value="">请选择类型</option>
 								<c:forEach var="questionTypeDict" items="${QUESTION_TYPE_DICT_LIST }">
@@ -30,7 +36,7 @@
 								</c:forEach>
 			      			</select>
 						</div>
-						<div class="layui-inline">
+						<div class="layui-inline" style="width: 156px;">
 							<select name="six">
 								<option value="">请选择难度</option>
 								<c:forEach var="questionDifficultyDict" items="${QUESTION_DIFFICULTY_DICT_LIST }">
@@ -38,14 +44,7 @@
 								</c:forEach>
 			      			</select>
 						</div>
-						<div class="layui-inline">
-							<select name="four">
-								<option value="">请选择状态</option>
-								<c:forEach var="stateDict" items="${STATE2_DICT_LIST }">
-								<option value="${stateDict.dictKey }">${stateDict.dictValue }</option>
-								</c:forEach>
-			      			</select>
-						</div>
+						
 						<div class="layui-inline">
 							<button type="button" class="layui-btn layuiadmin-btn-useradmin" onclick="questionQuery();">
 								<i class="layui-icon layuiadmin-button-btn"></i>查询
@@ -66,6 +65,6 @@
 					<table id="questionTable" lay-filter="questionTable"></table>
 				</div>
 			</div>
-		</div>
+		<!-- </div> -->
 	</div>
 <!-- </div> -->

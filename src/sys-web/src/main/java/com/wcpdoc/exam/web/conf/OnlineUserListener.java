@@ -36,7 +36,7 @@ public class OnlineUserListener implements HttpSessionAttributeListener {
 	 */
 	@Override
 	public void attributeAdded(HttpSessionBindingEvent se) {
-		if(!ConstantManager.USER.equals(se.getName())){
+		if(!ConstantManager.USER.equals(se.getName())) {
 			return;
 		}
 		
@@ -46,7 +46,7 @@ public class OnlineUserListener implements HttpSessionAttributeListener {
 		Map<String, HttpSession> sessionMap = (Map<String, HttpSession>) newSession
 				.getServletContext().getAttribute(ConstantManager.SESSION_USER_LIST);
 		HttpSession oldSession = sessionMap.get(newUser.getLoginName());
-		if(oldSession != null){
+		if(oldSession != null) {
 			try {
 				oldSession.invalidate();//可能已失效。
 			} catch (Exception e) {
@@ -58,7 +58,7 @@ public class OnlineUserListener implements HttpSessionAttributeListener {
 
 	@Override
 	public void attributeRemoved(HttpSessionBindingEvent se) {
-		if(!ConstantManager.USER.equals(se.getName())){
+		if(!ConstantManager.USER.equals(se.getName())) {
 			return;
 		}
 		
@@ -84,7 +84,7 @@ public class OnlineUserListener implements HttpSessionAttributeListener {
 		HttpSession newSession = se.getSession();
 		User newUser = (User) newSession.getAttribute(ConstantManager.USER);
 		HttpSession oldSession = sessionMap.get(newUser.getLoginName());
-		if(oldSession != null && newSession != oldSession){
+		if(oldSession != null && newSession != oldSession) {
 			try {
 				oldSession.invalidate();//可能已失效。
 			} catch (Exception e) {
@@ -93,10 +93,10 @@ public class OnlineUserListener implements HttpSessionAttributeListener {
 		}
 		
 		Iterator<Entry<String, HttpSession>> iterator = sessionMap.entrySet().iterator();
-		while(iterator.hasNext()){
+		while(iterator.hasNext()) {
 			Entry<String, HttpSession> entry = iterator.next();
 			HttpSession session = entry.getValue();
-			if(session == newSession){
+			if(session == newSession) {
 				iterator.remove();
 			}
 		}

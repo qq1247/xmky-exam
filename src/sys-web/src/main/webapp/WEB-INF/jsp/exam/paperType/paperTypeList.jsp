@@ -86,7 +86,7 @@
 				height : "full-180",
 				method : "post",
 				defaultToolbar : [],
-				parseData: function(paperType){
+				parseData : function(paperType) {
 					return {
 						"code" : paperType.succ,
 						"msg" : paperType.msg,
@@ -94,26 +94,26 @@
 						"data" : paperType.data.rows
 					};
 				},
-				request: {
+				request : {
 					pageName: "curPage",
 					limitName: "pageSize"
 				}, 
-				response: {
+				response : {
 					statusCode : true
 				}
 			});
-			layui.table.on("rowDouble(paperTypeTable)", function(obj){
+			layui.table.on("rowDouble(paperTypeTable)", function(obj) {
 				<my:auth url="paperType/toEdit">toPaperTypeEdit(obj.data.ID);</my:auth>
 			});
-			layui.table.on("tool(paperTypeTable)", function(obj){
+			layui.table.on("tool(paperTypeTable)", function(obj) {
 				var data = obj.data;
-				if(obj.event === "paperTypeEdit") {
+				if (obj.event === "paperTypeEdit") {
 					toPaperTypeEdit(obj.data.ID);
-				} else if(obj.event === "paperTypeMove") {
+				} else if (obj.event === "paperTypeMove") {
 					toPaperTypeMove(obj.data);
-				} else if(obj.event === "paperTypeDel") {
+				} else if (obj.event === "paperTypeDel") {
 					doPaperTypeDel(obj.data.ID);
-				} else if(obj.event === "paperTypeAuth") {
+				} else if (obj.event === "paperTypeAuth") {
 					toPaperTypeAuth(obj.data.ID);
 				}
 			});
@@ -172,7 +172,7 @@
 		
 		//到达添加试卷分类页面
 		function toPaperTypeAdd() {
-			if(!curSelPaperTypeId){
+			if (!curSelPaperTypeId) {
 				layer.alert("请选择上级试卷分类！", {"title" : "提示消息"});
 				return;
 			}
@@ -187,10 +187,10 @@
 						content : obj,
 						btn : ["添加", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doPaperTypeAdd(index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							$("#parentPaperTypeId").val(curSelPaperTypeId);
 							$("#parentPaperTypeName").val(curSelPaperTypeName);
 							layui.form.render(null, "paperTypeEditFrom");
@@ -237,10 +237,10 @@
 						content : obj,
 						btn : ["修改", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doPaperTypeEdit(index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							layui.form.render(null, "paperTypeEditFrom");
 						}
 					});
@@ -293,7 +293,7 @@
 		}
 		
 		//到达移动试卷分类页面
-		function toPaperTypeMove(paperTypeObj){
+		function toPaperTypeMove(paperTypeObj) {
 			$.ajax({
 				url : "paperType/toMove",
 				dataType : "html",
@@ -304,7 +304,7 @@
 						content : obj,
 						btn : ["移动", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							var paperTypeMoveTreeObj = $.fn.zTree.getZTreeObj("paperTypeMoveTree");
 							var paperTypeMoveNodes = paperTypeMoveTreeObj.getSelectedNodes();
 							if (paperTypeMoveNodes.length != 1) {
@@ -316,11 +316,11 @@
 							var sourceName = paperTypeObj.NAME;
 							var targetId = paperTypeMoveNodes[0].ID;
 							var targetName = paperTypeMoveNodes[0].NAME;
-							if(sourceId == targetId){
+							if (sourceId == targetId) {
 								layer.alert("源试卷分类和目标试卷分类一致！", {"title" : "提示消息"});
 								return;
 							}
-							if(paperTypeMoveNodes[0].PARENT_SUB.indexOf(paperTypeObj.PARENT_SUB) >= 0){
+							if (paperTypeMoveNodes[0].PARENT_SUB.indexOf(paperTypeObj.PARENT_SUB) >= 0) {
 								layer.alert("父试卷分类不能移动到子试卷分类下！", {"title" : "提示消息"});
 								return;
 							}
@@ -351,16 +351,16 @@
 		}
 		
 		//完成移动试卷分类
-		function doPaperTypeMove(sourceId, sourceName, targetId, targetName, paperTypeDialogIndex){
-			layer.confirm("确定要移动【"+sourceName+"】到【"+targetName+"】？", {title : "确认消息"}, function(index){
+		function doPaperTypeMove(sourceId, sourceName, targetId, targetName, paperTypeDialogIndex) {
+			layer.confirm("确定要移动【"+sourceName+"】到【"+targetName+"】？", {title : "确认消息"}, function(index) {
 				var params = {"sourceId" : sourceId, "targetId" : targetId};
 				$.ajax({
 					url : "paperType/doMove",
 					data : params,
-					success : function(obj){
+					success : function(obj) {
 						paperTypeTreeFlush();
 						
-						if(!obj.succ){
+						if (!obj.succ) {
 							layer.alert(obj.msg, {"title" : "提示消息"});
 							return;
 						}
@@ -391,32 +391,33 @@
 						content : obj,
 						btn : ["授权", "授权并同步到子分类", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doPaperTypeAuth(index, false);
 						},
-						btn2: function(index, layero){
+						btn2: function(index, layero) {
 							doPaperTypeAuth(index, true);
 							return false;
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							var userIdSelect = xmSelect.render({
 								el : "#userIds",
 								name : "userIds",
-								autoRow : true,
-								toolbar : { show: true },
 								filterable : true,
-								remoteSearch : true,
-								tips : "请输入用户昵称",
-								searchTips : "请输入用户昵称",
-								remoteMethod : function(val, cb, show){
-									if(!val){
-										return cb([]);
+								paging : true,
+								pageRemote : true,
+								searchTips : "可模糊搜索用户昵称，组织机构名称",
+								model : {label: {
+										text: {left: "", right: "", separator: "，", },
 									}
-									
+								},
+								autoRow : true,
+								remoteMethod : function(val, cb, show, pageIndex) {
 									$.ajax({
 										url : "paperType/authUserList",
 										data : {
-											two : val
+											two : val,
+											curPage : pageIndex,
+											pageSize : 5
 										},
 										async : true,
 										success : function(obj) {
@@ -424,10 +425,10 @@
 											for (var i in obj.data.rows) {
 												users.push({"name" : obj.data.rows[i].NAME+"-"+obj.data.rows[i].ORG_NAME, value : obj.data.rows[i].ID});
 											}
-											cb(users);
+											cb(users, Math.ceil(obj.data.total / 5));
 										}
 									});
-								},
+								}
 							});
 							
 							$.ajax({
@@ -451,21 +452,22 @@
 							var postIdSelect = xmSelect.render({
 								el : "#postIds",
 								name : "postIds",
-								autoRow : true,
-								toolbar : { show: true },
 								filterable : true,
-								remoteSearch : true,
-								tips : "请输入岗位名称",
-								searchTips : "请输入岗位名称",
-								remoteMethod : function(val, cb, show){
-									if(!val){
-										return cb([]);
+								paging : true,
+								pageRemote : true,
+								searchTips : "可模糊搜索岗位名称，组织机构名称",
+								model : {label: {
+										text: {left: "", right: "", separator: "，", },
 									}
-									
+								},
+								autoRow : true,
+								remoteMethod : function(val, cb, show, pageIndex) {
 									$.ajax({
 										url : "paperType/authPostList",
 										data : {
-											two : val
+											two : val,
+											curPage : pageIndex,
+											pageSize : 5
 										},
 										async : true,
 										success : function(obj) {
@@ -473,7 +475,7 @@
 											for (var i in obj.data.rows) {
 												posts.push({"name" : obj.data.rows[i].NAME+"-"+obj.data.rows[i].ORG_NAME, value : obj.data.rows[i].ID});
 											}
-											cb(posts);
+											cb(posts, Math.ceil(obj.data.total / 5));
 										}
 									});
 								},
@@ -500,21 +502,22 @@
 							var orgIdSelect = xmSelect.render({
 								el : "#orgIds",
 								name : "orgIds",
-								autoRow : true,
-								toolbar : { show: true },
 								filterable : true,
-								remoteSearch : true,
-								tips : "请输入组织机构名称",
+								paging : true,
+								pageRemote : true,
 								searchTips : "请输入组织机构名称",
-								remoteMethod : function(val, cb, show){
-									if(!val){
-										return cb([]);
+								model : {label: {
+										text: {left: "", right: "", separator: "，", },
 									}
-									
+								},
+								autoRow : true,
+								remoteMethod : function(val, cb, show, pageIndex) {
 									$.ajax({
 										url : "paperType/authOrgList",
 										data : {
-											two : val
+											two : val,
+											curPage : pageIndex,
+											pageSize : 5
 										},
 										async : true,
 										success : function(obj) {
@@ -522,7 +525,7 @@
 											for (var i in obj.data.rows) {
 												orgs.push({"name" : obj.data.rows[i].NAME+"-"+obj.data.rows[i].PARENT_ORG_NAME, value : obj.data.rows[i].ID});
 											}
-											cb(orgs);
+											cb(orgs, Math.ceil(obj.data.total / 5));
 										}
 									});
 								},
@@ -564,7 +567,7 @@
 						success : function(obj) {
 							paperTypeTreeFlush();
 							
-							if(!obj.succ){
+							if (!obj.succ) {
 								layer.alert(obj.msg, {"title" : "提示消息"});
 								return;
 							}

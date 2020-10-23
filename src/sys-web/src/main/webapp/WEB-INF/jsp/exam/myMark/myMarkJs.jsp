@@ -65,44 +65,47 @@
 	}
 	
 	// 更新分数
-	function scoreUpdate(curObj, examUserQuestionId, maxScore) {
+	function scoreUpdate(curObj, myExamDetailId, maxScore) {
 		var curInput = $(curObj);
 		var curScore = curInput.val();
+		var anCardOption = $("#examCard_" + myExamDetailId);
+		anCardOption.removeClass("select");
 		if (curScore == null || curScore == "") {
 			layer.tips("必填项不能为空", curInput);
 			curInput.val(null);
-			setTimeout(function(){curInput.focus();});
+			setTimeout(function() {curInput.focus();});
 			return;
 		}
 		
 		var patt = /^(([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/;
-		if(!patt.test(curScore)){
+		if (!patt.test(curScore)) {
 			layer.tips("必须为正数，最多保留两位小数", curInput);
 			curInput.val(null);
-			setTimeout(function(){curInput.focus();});
+			setTimeout(function() {curInput.focus();});
 			return;
 		}
 		
-		if(curScore < 0) {
+		anCardOption.addClass("select");
+		if (curScore < 0) {
 			curScore = 0;
 			curInput.val(0);
-		}else if(curScore > maxScore) {
+		}else if (curScore > maxScore) {
 			curScore = maxScore;
 			curInput.val(maxScore);
 		}
 		
 		$.ajax({
-			url : "myMark/updateScore",
+			url : "myMark/doScoreUpdate",
 			data : {
-				examUserQuestionId : examUserQuestionId, 
+				myExamDetailId : myExamDetailId, 
 				score : curScore
 			},
 			async : true, //异步提交
 			success : function(obj) {
-				if(!obj.succ){
+				if (!obj.succ) {
 					layer.tips(obj.msg, curInput);
 					curInput.val(null);
-					setTimeout(function(){curInput.focus();});
+					setTimeout(function() {curInput.focus();});
 				}
 			}
 		});
@@ -112,16 +115,17 @@
 	function doMark(auto) {
 		$.ajax({
 			url : "myMark/doMark",
-			data : {examUserId : "${examUser.id }"},
+			data : {myExamId : "${myExam.id }"},
 			async : true, 
 			success : function(obj) {
-				if(!obj.succ) {
+				if (!obj.succ) {
 					layer.alert(obj.msg, {"title" : "提示消息"});
+					return;
 				}
 				
-				var message = auto ? "阅卷时间到！" : "阅卷成功！";
+				var message = auto ? "阅卷时间到！" : obj.msg;
 				layer.alert(message, {"title" : "提示消息"});
-				setTimeout("window.location.href = 'login/toHome'", 2000)
+				setTimeout("window.close();", 2000)
 			}
 		});
 	}

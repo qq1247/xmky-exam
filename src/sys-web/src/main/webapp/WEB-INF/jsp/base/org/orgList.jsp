@@ -82,7 +82,7 @@
 				height : "full-180",
 				method : "post",
 				defaultToolbar : [],
-				parseData: function(obj){
+				parseData : function(obj) {
 					return {
 						"code" : obj.succ,
 						"msg" : obj.msg,
@@ -90,24 +90,24 @@
 						"data" : obj.data.rows
 					};
 				},
-				request: {
+				request : {
 					pageName: "curPage",
 					limitName: "pageSize"
 				}, 
-				response: {
+				response : {
 					statusCode : true
 				}
 			});
-			layui.table.on("rowDouble(orgTable)", function(obj){
+			layui.table.on("rowDouble(orgTable)", function(obj) {
 				<my:auth url="org/toEdit">toOrgEdit(obj.data.ID);</my:auth>
 			});
-			layui.table.on("tool(orgTable)", function(obj){
+			layui.table.on("tool(orgTable)", function(obj) {
 				var data = obj.data;
-				if(obj.event === "orgEdit") {
+				if (obj.event === "orgEdit") {
 					toOrgEdit(obj.data.ID);
-				} else if(obj.event === "orgMove") {
+				} else if (obj.event === "orgMove") {
 					toOrgMove(obj.data);
-				} else if(obj.event === "orgDel") {
+				} else if (obj.event === "orgDel") {
 					doOrgDel(obj.data.ID);
 				}
 			});
@@ -166,7 +166,7 @@
 		
 		//到达添加组织机构页面
 		function toOrgAdd() {
-			if(!curSelOrgId){
+			if (!curSelOrgId) {
 				layer.alert("请选择上级组织机构！", {"title" : "提示消息"});
 				return;
 			}
@@ -181,10 +181,10 @@
 						content : obj,
 						btn : ["添加", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doOrgAdd(index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							$("#parentOrgId").val(curSelOrgId);
 							$("#parentOrgName").val(curSelOrgName);
 							layui.form.render(null, "orgEditFrom");
@@ -209,7 +209,7 @@
 								return;
 							}
 							
-							if(obj.data.initPwd){
+							if (obj.data.initPwd) {
 								layer.alert("初始账号密码：【" + obj.data.loginName + "，" + obj.data.initPwd + "】", {"title" : "提示消息"});
 							}
 							
@@ -235,10 +235,10 @@
 						content : obj,
 						btn : ["修改", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doOrgEdit(index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							layui.form.render(null, "orgEditFrom");
 						}
 					});
@@ -291,7 +291,7 @@
 		}
 
 		//到达移动组织机构页面
-		function toOrgMove(orgObj){
+		function toOrgMove(orgObj) {
 			$.ajax({
 				url : "org/toMove",
 				dataType : "html",
@@ -302,7 +302,7 @@
 						content : obj,
 						btn : ["移动", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							var orgMoveTreeObj = $.fn.zTree.getZTreeObj("orgMoveTree");
 							var orgMoveNodes = orgMoveTreeObj.getSelectedNodes();
 							if (orgMoveNodes.length != 1) {
@@ -314,11 +314,11 @@
 							var sourceName = orgObj.NAME;
 							var targetId = orgMoveNodes[0].ID;
 							var targetName = orgMoveNodes[0].NAME;
-							if(sourceId == targetId){
+							if (sourceId == targetId) {
 								layer.alert("源组织机构和目标组织机构一致！", {"title" : "提示消息"});
 								return;
 							}
-							if(orgMoveNodes[0].PARENT_SUB.indexOf(orgObj.PARENT_SUB) >= 0){
+							if (orgMoveNodes[0].PARENT_SUB.indexOf(orgObj.PARENT_SUB) >= 0) {
 								layer.alert("父组织机构不能移动到子组织机构下！", {"title" : "提示消息"});
 								return;
 							}
@@ -349,16 +349,16 @@
 		}
 		
 		//完成移动组织机构
-		function doOrgMove(sourceId, sourceName, targetId, targetName, orgDialogIndex){
-			layer.confirm("确定要移动【"+sourceName+"】到【"+targetName+"】？", {title : "提示消息"}, function(index){
+		function doOrgMove(sourceId, sourceName, targetId, targetName, orgDialogIndex) {
+			layer.confirm("确定要移动【"+sourceName+"】到【"+targetName+"】？", {title : "提示消息"}, function(index) {
 				var params = {"sourceId" : sourceId, "targetId" : targetId};
 				$.ajax({
 					url : "org/doMove",
 					data : params,
-					success : function(obj){
+					success : function(obj) {
 						orgTreeFlush();
 						
-						if(!obj.succ){
+						if (!obj.succ) {
 							layer.alert(obj.msg, {"title" : "提示消息"});
 							return;
 						}

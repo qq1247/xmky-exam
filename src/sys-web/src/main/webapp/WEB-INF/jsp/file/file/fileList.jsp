@@ -70,7 +70,7 @@
 				height : "full-180",
 				method : "post",
 				defaultToolbar : [],
-				parseData: function(file){
+				parseData : function(file) {
 					return {
 						"code" : file.succ,
 						"msg" : file.msg,
@@ -78,19 +78,19 @@
 						"data" : file.data.rows
 					};
 				},
-				request: {
+				request : {
 					pageName: "curPage",
 					limitName: "pageSize"
 				}, 
-				response: {
+				response : {
 					statusCode : true
 				}
 			});
-			layui.table.on("tool(fileTable)", function(obj){
+			layui.table.on("tool(fileTable)", function(obj) {
 				var data = obj.data;
-				if(obj.event === "fileDownload") {
+				if (obj.event === "fileDownload") {
 					doFileDownload(obj.data.ID);
-				} else if(obj.event === "fileDel") {
+				} else if (obj.event === "fileDel") {
 					doFileDel(obj.data.ID);
 				}
 			});
@@ -119,10 +119,10 @@
 						content : obj,
 						btn : ["上传", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doFileUpload(index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							uploader = new plupload.Uploader({
 								browse_button : "file_browse",
 								file_data_name : "files",
@@ -140,7 +140,7 @@
 										$("#file_console").html("");
 										
 										var fileListObj = $("#fileList");
-										$.each(files, function(index, domEle){
+										$.each(files, function(index, domEle) {
 											var html = [];
 											html.push("<tr id='file_row_" + domEle.id + "'>");
 											html.push("	<td>"+domEle.name+"<input type='hidden' id='ids_" + domEle.id + "' name='ids'></td>");
@@ -157,20 +157,20 @@
 									},
 									FileUploaded : function(up, file, responseObj) { //每个附件上传后，服务端返回的响应消息。
 										var response = $.parseJSON(responseObj.response);
-										if(!response.succ){
+										if (!response.succ) {
 											$("#upload_progress_" + file.id).html(response.msg);
 											return;
 										}
 										$("#ids_" + file.id).val(response.data.fileIds);
 									},
-									UploadComplete : function(up, files){//所有附件上传完成后
+									UploadComplete : function(up, files) {//所有附件上传完成后
 										
 									},
 									Error : function(up, err) { //客户端的错误消息。如附件大小错误，附件不存在， http错误等。
 										$("#file_console").html("");
 										
 										var uploadProgressObj = $("#upload_progress_" + err.file.id);
-										if(uploadProgressObj[0]){
+										if (uploadProgressObj[0]) {
 											uploadProgressObj.html(err.message);
 										}else{
 											$("#file_console").html(err.message);
@@ -188,9 +188,9 @@
 		}
 		
 		//完成上传附件
-		function doFileUpload(fileUploadDialogIndex){
+		function doFileUpload(fileUploadDialogIndex) {
 			var queued = uploader.total.queued; 
-			if(queued != 0){
+			if (queued != 0) {
 				layer.alert(obj.msg, {"title" : "正在上传中。。。"});
 				return;
 			}

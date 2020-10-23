@@ -91,7 +91,7 @@ public class ExamController extends BaseController{
 	@ResponseBody
 	public PageResult paperList(PageIn pageIn) {
 		try {
-			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())){
+			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
 				pageIn.setTen(getCurUser().getId().toString());
 			}
 			pageIn.setThree("1");
@@ -130,7 +130,7 @@ public class ExamController extends BaseController{
 	@ResponseBody
 	public PageResult list(PageIn pageIn) {
 		try {
-			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())){
+			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
 				pageIn.setTen(getCurUser().getId().toString());
 			}
 			return new PageResultEx(true, "查询成功", examService.getListpage(pageIn));
@@ -169,16 +169,16 @@ public class ExamController extends BaseController{
 	public PageResult doAdd(Exam exam) {
 		try {
 			//校验数据有效性
-			if(exam.getStartTime().getTime() <= new Date().getTime()){
+			if(exam.getStartTime().getTime() <= new Date().getTime()) {
 				throw new MyException("考试开始时间必须大于当前时间！");
 			}
-			if(exam.getStartTime().getTime() >= exam.getEndTime().getTime()){
+			if(exam.getStartTime().getTime() >= exam.getEndTime().getTime()) {
 				throw new MyException("考试结束时间必须大于考试开始时间！");
 			}
-			if(exam.getMarkStartTime().getTime() <= exam.getEndTime().getTime()){
+			if(exam.getMarkStartTime().getTime() <= exam.getEndTime().getTime()) {
 				throw new MyException("阅卷开始时间必须大于考试结束时间！");
 			}
-			if(exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()){
+			if(exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()) {
 				throw new MyException("阅卷结束时间必须大于阅卷开始时间！");
 			}
 			
@@ -235,20 +235,20 @@ public class ExamController extends BaseController{
 	public PageResult doEdit(Exam exam) {
 		try {
 			//校验数据有效性
-			if(exam.getStartTime().getTime() <= new Date().getTime()){
+			if(exam.getStartTime().getTime() <= new Date().getTime()) {
 				throw new MyException("考试开始时间必须大于当前时间！");
 			}
-			if(exam.getStartTime().getTime() >= exam.getEndTime().getTime()){
+			if(exam.getStartTime().getTime() >= exam.getEndTime().getTime()) {
 				throw new MyException("考试结束时间必须大于考试开始时间！");
 			}
-			if(exam.getMarkStartTime().getTime() <= exam.getEndTime().getTime()){
+			if(exam.getMarkStartTime().getTime() <= exam.getEndTime().getTime()) {
 				throw new MyException("阅卷开始时间必须大于考试结束时间！");
 			}
-			if(exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()){
+			if(exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()) {
 				throw new MyException("阅卷结束时间必须大于阅卷开始时间！");
 			}
 			Exam entity = examService.getEntity(exam.getId());
-			if(entity.getState() == 1){
+			if(entity.getState() == 1) {
 				throw new MyException("考试已发布！");
 			}
 			
@@ -299,7 +299,7 @@ public class ExamController extends BaseController{
 			Date curTime = new Date();
 			Exam exam = examService.getEntity(id);
 			if(exam.getStartTime().getTime() >= curTime.getTime()
-					&& exam.getEndTime().getTime() <= curTime.getTime()){
+					&& exam.getEndTime().getTime() <= curTime.getTime()) {
 				throw new MyException("【"+exam.getName()+"】考试未结束");
 			}
 			
@@ -345,9 +345,9 @@ public class ExamController extends BaseController{
 	 */
 	@RequestMapping("/doCfg")
 	@ResponseBody
-	public PageResult doCfg(Integer id, Integer[] userIds, Integer[] markUserIds) {
+	public PageResult doCfg(Integer id, Integer[] userIds, Integer[] myMarkIds) {
 		try {
-			examService.doCfg(id, userIds, markUserIds);
+			examService.doCfg(id, userIds, myMarkIds);
 			return new PageResult(true, "添加成功");
 		} catch (MyException e) {
 			log.error("完成考试配置错误：{}", e.getMessage());
@@ -370,10 +370,10 @@ public class ExamController extends BaseController{
 	public PageResult doPublish(Integer id) {
 		try {
 			Exam exam = examService.getEntity(id);
-			if(exam.getState() == 0){
+			if(exam.getState() == 0) {
 				throw new MyException("考试【"+exam.getName()+"】已删除！");
 			}
-			if(exam.getState() == 1){
+			if(exam.getState() == 1) {
 				throw new MyException("考试【"+exam.getName()+"】已发布！");
 			}
 			

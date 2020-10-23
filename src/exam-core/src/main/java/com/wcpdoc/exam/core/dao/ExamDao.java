@@ -15,7 +15,7 @@ import com.wcpdoc.exam.core.entity.PageOut;
 public interface ExamDao extends BaseDao<Exam>{
 	
 	/**
-	 * 获取考试用户列表 
+	 * 获取我的考试列表 
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param pageIn

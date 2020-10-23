@@ -156,10 +156,10 @@ public class PaperTypeController extends BaseController {
 	public PageResult doEdit(PaperType paperType) {
 		try {
 			//校验数据有效性
-			if(!ValidateUtil.isValid(paperType.getName())){
+			if(!ValidateUtil.isValid(paperType.getName())) {
 				throw new MyException("参数错误：name");
 			}
-			if(paperTypeService.existName(paperType)){
+			if(paperTypeService.existName(paperType)) {
 				throw new MyException("名称已存在！");
 			}
 			

@@ -156,10 +156,10 @@ public class QuestionTypeController extends BaseController {
 	public PageResult doEdit(QuestionType questionType) {
 		try {
 			//校验数据有效性
-			if(!ValidateUtil.isValid(questionType.getName())){
+			if(!ValidateUtil.isValid(questionType.getName())) {
 				throw new MyException("参数错误：name");
 			}
-			if(questionTypeService.existName(questionType)){
+			if(questionTypeService.existName(questionType)) {
 				throw new MyException("名称已存在！");
 			}
 			

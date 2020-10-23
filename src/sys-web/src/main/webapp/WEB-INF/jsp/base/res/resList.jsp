@@ -92,7 +92,7 @@
 				height : "full-180",
 				method : "post",
 				defaultToolbar : [],
-				parseData: function(obj){
+				parseData : function(obj) {
 					return {
 						"code" : obj.succ,
 						"msg" : obj.msg,
@@ -100,24 +100,24 @@
 						"data" : obj.data.rows
 					};
 				},
-				request: {
+				request : {
 					pageName: "curPage",
 					limitName: "pageSize"
 				}, 
-				response: {
+				response : {
 					statusCode : true
 				}
 			});
-			layui.table.on("rowDouble(resTable)", function(obj){
+			layui.table.on("rowDouble(resTable)", function(obj) {
 				<my:auth url="res/toEdit">toResEdit(obj.data.ID);</my:auth>
 			});
-			layui.table.on("tool(resTable)", function(obj){
+			layui.table.on("tool(resTable)", function(obj) {
 				var data = obj.data;
-				if(obj.event === "resEdit") {
+				if (obj.event === "resEdit") {
 					toResEdit(obj.data.ID);
-				} else if(obj.event === "resMove") {
+				} else if (obj.event === "resMove") {
 					toResMove(obj.data);
-				} else if(obj.event === "resDel") {
+				} else if (obj.event === "resDel") {
 					doResDel(obj.data.ID);
 				}
 			});
@@ -165,7 +165,7 @@
 				}
 			});
 			
-			layui.form.on("select(resTreeBtn)", function(data){
+			layui.form.on("select(resTreeBtn)", function(data) {
 				$("#resTwo").val(data.value);
 				resTreeFlush();
 			});
@@ -186,7 +186,7 @@
 		
 		//到达添加资源页面
 		function toResAdd() {
-			if(!curSelResId){
+			if (!curSelResId) {
 				layer.alert("请选择上级资源！", {"title" : "提示消息"});
 				return;
 			}
@@ -201,10 +201,10 @@
 						content : obj,
 						btn : ["添加", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doResAdd(index);
 						},
-						success : function(layero, index){
+						success : function(layero, index) {
 							$("#parentResId").val(curSelResId);
 							$("#parentResName").val(curSelResName);
 							$("#resType").val($("[lay-filter='resTreeBtn']").parent().find("dd[class='layui-this']").attr("lay-value"));
@@ -252,10 +252,10 @@
 						content : obj,
 						btn : ["修改", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doResEdit(index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							layui.form.render(null, "resEditFrom");
 						}
 					});
@@ -308,7 +308,7 @@
 		}
 		
 		//到达移动资源页面
-		function toResMove(resObj){
+		function toResMove(resObj) {
 			$.ajax({
 				url : "res/toMove",
 				dataType : "html",
@@ -319,7 +319,7 @@
 						content : obj,
 						btn : ["移动", "取消"],
 						type : 1,
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							var resMoveTreeObj = $.fn.zTree.getZTreeObj("resMoveTree");
 							var resMoveNodes = resMoveTreeObj.getSelectedNodes();
 							if (resMoveNodes.length != 1) {
@@ -331,11 +331,11 @@
 							var sourceName = resObj.NAME;
 							var targetId = resMoveNodes[0].ID;
 							var targetName = resMoveNodes[0].NAME;
-							if(sourceId == targetId){
+							if (sourceId == targetId) {
 								layer.alert("源资源和目标资源一致！", {"title" : "提示消息"});
 								return;
 							}
-							if(resMoveNodes[0].PARENT_SUB.indexOf(resObj.PARENT_SUB) >= 0){
+							if (resMoveNodes[0].PARENT_SUB.indexOf(resObj.PARENT_SUB) >= 0) {
 								layer.alert("父资源不能移动到子资源下！", {"title" : "提示消息"});
 								return;
 							}
@@ -366,18 +366,18 @@
 		}
 		
 		//完成移动资源
-		function doResMove(sourceId, sourceName, targetId, targetName, resDialogIndex){
-			layer.confirm("确定要移动【"+sourceName+"】到【"+targetName+"】？", {title : "提示消息"}, function(index){
+		function doResMove(sourceId, sourceName, targetId, targetName, resDialogIndex) {
+			layer.confirm("确定要移动【"+sourceName+"】到【"+targetName+"】？", {title : "提示消息"}, function(index) {
 				$.ajax({
 					url : "res/doMove",
 					data : {
 						sourceId : sourceId, 
 						targetId : targetId
 					},
-					success : function(obj){
+					success : function(obj) {
 						resTreeFlush();
 						
-						if(!obj.succ){
+						if (!obj.succ) {
 							layer.alert(obj.msg, {"title" : "提示消息"});
 							return;
 						}

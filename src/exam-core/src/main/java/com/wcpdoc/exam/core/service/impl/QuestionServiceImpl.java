@@ -61,6 +61,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		question.setUpdateTime(new Date());
 		question.setUpdateUserId(getCurUser().getId());
 		question.setVer(1);// 默认版本为1
+		question.setState(2);//默认禁用
 		add(question);
 
 		question.setSrcId(question.getId());
@@ -81,7 +82,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			update(entity);
 			
 			// entity.setType(question.getType());//不允许修改类型
-			newQuestion.setState(question.getState());
+			// newQuestion.setState(question.getState());
 			newQuestion.setDifficulty(question.getDifficulty());
 			newQuestion.setTitle(question.getTitle());
 			newQuestion.setOptionA(question.getOptionA());
@@ -106,7 +107,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 
 		// 修改试题
-		entity.setState(question.getState());
+		// entity.setState(question.getState());
 		entity.setDifficulty(question.getDifficulty());
 		entity.setTitle(question.getTitle());
 		entity.setOptionA(question.getOptionA());
@@ -172,7 +173,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 
 	private List<Integer> html2FileIds(String html) {
 		List<Integer> fileIdList = new ArrayList<>();
-		if(!ValidateUtil.isValid(html)){
+		if(!ValidateUtil.isValid(html)) {
 			return fileIdList;
 		}
 		
@@ -183,26 +184,26 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			String url = next.attr("src");
 			
 			String[] params = url.split("\\?")[1].split("&");;
-			for(String param : params){
+			for(String param : params) {
 				String[] kv = param.split("=");
-				if(kv[0].equals("id")){
+				if(kv[0].equals("id")) {
 					fileIdList.add(Integer.parseInt(kv[1]));
 				}
 			}
 		}
 		
 		ListIterator<Element> imgListIterator = document.getElementsByTag("img").listIterator();
-		while(imgListIterator.hasNext()){
+		while(imgListIterator.hasNext()) {
 			Element next = imgListIterator.next();
 			String url = next.attr("src");
-			if(url.startsWith("data")){
+			if(url.startsWith("data")) {
 				continue;//字符串式的图片
 			}
 			
 			String[] params = url.split("\\?")[1].split("&");;
-			for(String param : params){
+			for(String param : params) {
 				String[] kv = param.split("=");
-				if(kv[0].equals("id")){
+				if(kv[0].equals("id")) {
 					fileIdList.add(Integer.parseInt(kv[1]));
 				}
 			}
@@ -214,7 +215,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	public void wordImp(MultipartFile file, Integer questionTypeId) {
 		//校验数据有效性
 		String extName = FilenameUtils.getExtension(file.getOriginalFilename());
-		if(!"doc".equals(extName)){
+		if(!"doc".equals(extName)) {
 			throw new MyException("允许的上传类型为：doc");
 		}
 		
@@ -232,11 +233,11 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		IOUtils.closeQuietly(inputStream);
 		
 		//添加试题
-		for(Question question : questionList){
+		for(Question question : questionList) {
 			question.setUpdateTime(new Date());
 			question.setUpdateUserId(getCurUser().getId());
 			question.setVer(1);
-			question.setState(1);
+			question.setState(2);//默认禁用
 			question.setQuestionTypeId(questionTypeId);
 			question.setScore(BigDecimal.ONE);
 			question.setNo(1);

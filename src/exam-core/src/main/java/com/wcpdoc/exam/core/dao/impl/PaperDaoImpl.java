@@ -90,4 +90,10 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 				+ "WHERE PAPER_QUESTION.PAPER_ID = ? AND PAPER_QUESTION.TYPE = 2";// AND QUESTION.STATE = 1 如果删除试题，试卷关联的试题也能看
 		return getList(sql, new Object[]{id}, Question.class);
 	}
+
+	@Override
+	public List<Paper> getList(Integer paperTypeId) {
+		String sql = "SELECT * FROM EXM_PAPER WHERE STATE = 1 AND PAPER_TYPE_ID = ?";
+		return getList(sql, new Object[] { paperTypeId }, Paper.class);
+	}
 }

@@ -11,7 +11,7 @@
 				<div id="userIds"></div>
 			</div>
 			<div class="layui-tab-item">
-				<div id="markUserIds"></div>
+				<div id="myMarkIds"></div>
 			</div>
 		</div>
 	</div>

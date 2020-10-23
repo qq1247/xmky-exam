@@ -272,7 +272,7 @@ create table EXM_PAPER
    SCORE_E_REMARK       varchar(32) comment '分数E评语',
    DESCRIPTION          text comment '描述',
    PAPER_TYPE_ID        int comment '试卷分类',
-   STATE                int comment '0：删除；1：发布；2：草稿',
+   STATE                int comment '0：删除；1：启用；2：禁用',
    UPDATE_USER_ID       int comment '更新人',
    UPDATE_TIME          datetime comment '更新时间',
    primary key (ID)
@@ -380,12 +380,12 @@ alter table EXM_EXAM add constraint FK_Reference_19 foreign key (PAPER_ID)
 alter table EXM_EXAM add constraint FK_Reference_22 foreign key (EXAM_TYPE_ID)
       references EXM_EXAM_TYPE (ID) on delete restrict on update restrict;
 
-drop table if exists EXM_MARK_USER;
+drop table if exists EXM_MY_MARK;
 
 /*==============================================================*/
-/* Table: EXM_MARK_USER                                         */
+/* Table: EXM_MY_MARK                                           */
 /*==============================================================*/
-create table EXM_MARK_USER
+create table EXM_MY_MARK
 (
    ID                   int not null auto_increment comment 'id',
    EXAM_ID              int comment '考试ID',
@@ -393,17 +393,20 @@ create table EXM_MARK_USER
    primary key (ID)
 );
 
-alter table EXM_MARK_USER comment '判卷用户';
+alter table EXM_MY_MARK comment '我的阅卷';
+
+alter table EXM_MY_MARK add constraint FK_Reference_37 foreign key (EXAM_ID)
+      references EXM_EXAM (ID) on delete restrict on update restrict;
 
 alter table EXM_MARK_USER add constraint FK_Reference_37 foreign key (EXAM_ID)
       references EXM_EXAM (ID) on delete restrict on update restrict;
 
-drop table if exists EXM_EXAM_USER;
+drop table if exists EXM_MY_EXAM;
 
 /*==============================================================*/
-/* Table: EXM_EXAM_USER                                         */
+/* Table: EXM_MY_EXAM                                           */
 /*==============================================================*/
-create table EXM_EXAM_USER
+create table EXM_MY_EXAM
 (
    ID                   int not null auto_increment comment 'id',
    EXAM_ID              int comment '考试ID',
@@ -422,38 +425,37 @@ create table EXM_EXAM_USER
    primary key (ID)
 );
 
-alter table EXM_EXAM_USER comment '考试用户';
+alter table EXM_MY_EXAM comment '我的考试';
 
-alter table EXM_EXAM_USER add constraint FK_Reference_23 foreign key (EXAM_ID)
+alter table EXM_MY_EXAM add constraint FK_Reference_23 foreign key (EXAM_ID)
       references EXM_EXAM (ID) on delete restrict on update restrict;
 
-drop table if exists EXM_EXAM_USER_QUESTION;
-
 /*==============================================================*/
-/* Table: EXM_EXAM_USER_QUESTION                                */
+/* Table: EXM_MY_EXAM_DETAIL                                    */
 /*==============================================================*/
-create table EXM_EXAM_USER_QUESTION
+create table EXM_MY_EXAM_DETAIL
 (
    ID                   int not null auto_increment comment 'id',
-   EXAM_USER_ID         int comment '考试用户ID',
+   MY_EXAM_ID           int comment '考试用户ID',
    EXAM_ID              int comment '考试ID',
    USER_ID              int comment '用户ID',
    QUESTION_ID          int comment '试题ID',
    ANSWER_TIME          datetime comment '答题时间',
-   MARK_USER_ID         int comment '判卷人ID',
-   MARK_TIME            datetime comment '判卷时间',
+   MARK_USER_ID         int comment '阅卷人ID',
+   MARK_TIME            datetime comment '阅卷时间',
    ANSWER               text comment '答案',
    SCORE                decimal(5,2) comment '得分',
    primary key (ID)
 );
 
-alter table EXM_EXAM_USER_QUESTION comment '考试用户试题';
+alter table EXM_MY_EXAM_DETAIL comment '我的考试详细';
 
-alter table EXM_EXAM_USER_QUESTION add constraint FK_Reference_24 foreign key (EXAM_USER_ID)
-      references EXM_EXAM_USER (ID) on delete restrict on update restrict;
+alter table EXM_MY_EXAM_DETAIL add constraint FK_Reference_24 foreign key (MY_EXAM_ID)
+      references EXM_MY_EXAM (ID) on delete restrict on update restrict;
 
-alter table EXM_EXAM_USER_QUESTION add constraint FK_Reference_25 foreign key (QUESTION_ID)
+alter table EXM_MY_EXAM_DETAIL add constraint FK_Reference_25 foreign key (QUESTION_ID)
       references EXM_QUESTION (ID) on delete restrict on update restrict;
+
 
 /*==============================================================*/
 /* 数据								*/
@@ -529,8 +531,8 @@ INSERT INTO `SYS_RES` VALUES (65, '列表', 'question/questionTypeTreeList|quest
 INSERT INTO `SYS_RES` VALUES (66, '添加', 'question/toAdd|question/doAdd', 64, '_1_2_55_64_66_', 5, 1, '2020-09-08 13:26:37', 2, 3, 2, '', 1);
 INSERT INTO `SYS_RES` VALUES (67, '修改', 'question/toEdit|question/doEdit', 64, '_1_2_55_64_67_', 5, 1, '2020-09-08 13:26:57', 3, 3, 4, '', 1);
 INSERT INTO `SYS_RES` VALUES (68, '删除', 'question/doDel', 64, '_1_2_55_64_68_', 5, 1, '2020-09-08 13:27:16', 4, 3, 8, '', 1);
-INSERT INTO `SYS_RES` VALUES (69, '导入试题', 'question/wordImp', 64, '_1_2_55_64_69_', 5, 1, '2020-09-12 14:19:08', 5, 3, 16, '', 1);
-INSERT INTO `SYS_RES` VALUES (70, '下载模板', 'question/wordTemplateExport', 64, '_1_2_55_64_70_', 5, 1, '2020-09-12 14:19:27', 6, 3, 32, '', 1);
+INSERT INTO `SYS_RES` VALUES (69, '导入试题', 'question/wordImp', 64, '_1_2_55_64_69_', 5, 2, '2020-10-19 15:24:18', 6, 3, 16, '', 1);
+INSERT INTO `SYS_RES` VALUES (70, '下载模板', 'question/wordTemplateExport', 64, '_1_2_55_64_70_', 5, 2, '2020-10-19 15:24:13', 7, 3, 32, '', 1);
 INSERT INTO `SYS_RES` VALUES (71, '试卷分类', 'paperType/toList', 55, '_1_2_55_71_', 4, 1, '2020-09-12 14:54:19', 5, 3, 64, '', 1);
 INSERT INTO `SYS_RES` VALUES (72, '列表', 'paperType/treeList|paperType/list', 71, '_1_2_55_71_72_', 5, 1, '2020-09-12 14:45:10', 1, 3, 128, '', 1);
 INSERT INTO `SYS_RES` VALUES (73, '添加', 'paperType/toAdd|paperType/doAdd', 71, '_1_2_55_71_73_', 5, 1, '2020-09-12 14:45:29', 2, 3, 256, '', 1);
@@ -562,7 +564,9 @@ INSERT INTO `SYS_RES` VALUES (98, '列表', 'myExam/list', 97, '_1_2_96_97_98_',
 INSERT INTO `SYS_RES` VALUES (99, '考试', 'myExam/toExam|myExam/updateAnswer|myExam/doExam', 97, '_1_2_96_97_99_', 5, 2, '2020-10-15 15:55:24', 2, 4, 8, '', 1);
 INSERT INTO `SYS_RES` VALUES (100, '在线阅卷', 'myMark/toList', 96, '_1_2_96_100_', 4, 2, '2020-10-12 15:43:08', 3, 4, 16, '', 1);
 INSERT INTO `SYS_RES` VALUES (101, '列表', 'myMark/list|myMark/toDetailList|myMark/detailList', 100, '_1_2_96_100_101_', 5, 2, '2020-10-12 17:14:17', 1, 4, 32, '', 1);
-INSERT INTO `SYS_RES` VALUES (102, '阅卷', 'myMark/toMark|myMark/updateScore|myMark/doMark|myMark/doAutoMark', 100, '_1_2_96_100_102_', 5, 2, '2020-10-15 14:59:14', 2, 4, 64, '', 1);
+INSERT INTO `SYS_RES` VALUES (102, '阅卷', 'myMark/toMark|myMark/doScoreUpdate|myMark/doMark', 100, '_1_2_96_100_102_', 5, 1, '2020-10-22 13:43:28', 2, 4, 64, '', 1);
+INSERT INTO `SYS_RES` VALUES (103, '发布', 'question/doPublish', 64, '_1_2_55_64_103_', 5, 2, '2020-10-19 15:24:03', 5, 4, 128, '', 1);
+INSERT INTO `SYS_RES` VALUES (104, '自动阅卷', 'myMark/doAutoMark', 100, '_1_2_96_100_104_', 5, 1, '2020-10-22 13:43:41', 3, 4, 256, '', 1);
 
 INSERT INTO `SYS_DICT` VALUES ('1', 'STATE', '0', '删除', '1');
 INSERT INTO `SYS_DICT` VALUES ('2', 'STATE', '1', '启用', '2');

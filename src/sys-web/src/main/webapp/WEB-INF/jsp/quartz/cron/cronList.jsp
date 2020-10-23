@@ -70,7 +70,7 @@
 				method : "post",
 				height : "full-180",
 				defaultToolbar : [],
-				parseData: function(cron){
+				parseData : function(cron) {
 					return {
 						"code" : cron.succ,
 						"msg" : cron.msg,
@@ -78,28 +78,28 @@
 						"data" : cron.data.rows
 					};
 				},
-				request: {
+				request : {
 					pageName: "curPage",
 					limitName: "pageSize"
 				}, 
-				response: {
+				response : {
 					statusCode : true
 				}
 			});
-			layui.table.on("rowDouble(cronTable)", function(obj){
+			layui.table.on("rowDouble(cronTable)", function(obj) {
 				<my:auth url="cron/toEdit">toCronEdit(obj.data.ID);</my:auth>
 			});
-			layui.table.on("tool(cronTable)", function(obj){
+			layui.table.on("tool(cronTable)", function(obj) {
 				var data = obj.data;
-				if(obj.event === "cronEdit") {
+				if (obj.event === "cronEdit") {
 					toCronEdit(obj.data.ID);
-				} else if(obj.event === "cronStartTask") {
+				} else if (obj.event === "cronStartTask") {
 					startTask(obj.data.ID);
-				} else if(obj.event === "cronStopTask") {
+				} else if (obj.event === "cronStopTask") {
 					stopTask(obj.data.ID);
-				} else if(obj.event === "cronRunOnceTask") {
+				} else if (obj.event === "cronRunOnceTask") {
 					runOnceTask(obj.data.ID);
-				} else if(obj.event === "cronDel") {
+				} else if (obj.event === "cronDel") {
 					doCronDel(obj.data.ID);
 				}
 			});
@@ -129,10 +129,10 @@
 						content : obj,
 						
 						btn : ["添加", "取消"],
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doCronAdd(index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							layui.form.render(null, "cronEditFrom");
 						}
 					});
@@ -178,10 +178,10 @@
 						content : obj,
 						
 						btn : ["修改", "取消"],
-						yes : function(index, layero){
+						yes : function(index, layero) {
 							doCronEdit(index);
 						},
-						success: function(layero, index){
+						success: function(layero, index) {
 							layui.form.render(null, "cronEditFrom");
 						}
 					});

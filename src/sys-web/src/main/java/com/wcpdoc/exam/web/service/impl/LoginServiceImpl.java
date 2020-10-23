@@ -39,15 +39,15 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 	@Override
 	public User doIn(String loginName, String pwd, HttpServletRequest request) throws LoginException{
 		//校验数据有效性
-		if(!ValidateUtil.isValid(loginName)){
+		if(!ValidateUtil.isValid(loginName)) {
 			throw new LoginException("参数错误：loginName");
 		}
-		if(!ValidateUtil.isValid(pwd)){
+		if(!ValidateUtil.isValid(pwd)) {
 			throw new LoginException("参数错误：pwd");
 		}
 		
 		User user = userService.getUser(loginName);
-		if(user == null || !user.getPwd().equals(userService.getEncryptPwd(loginName, pwd))){
+		if(user == null || !user.getPwd().equals(userService.getEncryptPwd(loginName, pwd))) {
 			throw new LoginException("用户名或密码错误！");
 		}
 		
@@ -67,7 +67,7 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 	@Override
 	public void doOut(HttpServletRequest request) {
 		HttpSession session = request.getSession(false);
-		if(session == null){
+		if(session == null) {
 			return;
 		}
 		
