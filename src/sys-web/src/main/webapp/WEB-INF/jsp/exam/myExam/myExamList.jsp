@@ -59,16 +59,19 @@
 				url : "myExam/list",
 				cols : [[
 						{field : "EXAM_NAME", title : "试卷名称", align : "center"},
-						{field : "EXAM_START_TIME", title : "考试时间", align : "center", templet : function(d) {
+						{field : "EXAM_START_TIME", title : "考试时间", align : "center", width : 300, templet : function(d) {
 							var startTime = new Date(d.EXAM_START_TIME_STR);
 							var endTime = new Date(d.EXAM_END_TIME_STR);
 							return d.EXAM_START_TIME_STR + "（"+Math.round((endTime.getTime() - startTime.getTime()) / 60000)+"分钟）";
 						}},
 						{field : "MY_EXAM_TOTAL_SCORE", title : "分数/总分数", align : "center", templet : function(d) {
-							if (d.MY_EXAM_TOTAL_SCORE < d.EXAM_PASS_SCORE) {
-								return '<span style="color: red;">'+d.MY_EXAM_TOTAL_SCORE+'/'+d.PAPER_TOTAL_SCORE+'</span>';
+							if (d.MY_EXAM_ANSWER_STATE == 2) {
+								return '<span style="color: red;">'+d.MY_EXAM_TOTAL_SCORE+'/'+d.PAPER_TOTAL_SCORE+'（'+d.MY_EXAM_ANSWER_STATE_NAME+'）</span>';
 							}
-							return d.MY_EXAM_TOTAL_SCORE+'/'+d.PAPER_TOTAL_SCORE;
+							d.MY_EXAM_TOTAL_SCORE+'/'+d.PAPER_TOTAL_SCORE;
+						}},
+						{field : "MY_EXAM_STATE_NAME", title : "状态", align : "center", templet : function(d) {
+							return d.MY_EXAM_STATE_NAME + "/" + d.MY_EXAM_MARK_STATE_NAME;
 						}},
 						{field : "USER_REMARK", title : "评语", align : "center"},
 						{field : "USER_NUM", title : "参考人数", align : "center"},

@@ -398,9 +398,6 @@ alter table EXM_MY_MARK comment '我的阅卷';
 alter table EXM_MY_MARK add constraint FK_Reference_37 foreign key (EXAM_ID)
       references EXM_EXAM (ID) on delete restrict on update restrict;
 
-alter table EXM_MARK_USER add constraint FK_Reference_37 foreign key (EXAM_ID)
-      references EXM_EXAM (ID) on delete restrict on update restrict;
-
 drop table if exists EXM_MY_EXAM;
 
 /*==============================================================*/
@@ -429,6 +426,8 @@ alter table EXM_MY_EXAM comment '我的考试';
 
 alter table EXM_MY_EXAM add constraint FK_Reference_23 foreign key (EXAM_ID)
       references EXM_EXAM (ID) on delete restrict on update restrict;
+
+drop table if exists EXM_MY_EXAM_DETAIL;
 
 /*==============================================================*/
 /* Table: EXM_MY_EXAM_DETAIL                                    */
@@ -568,30 +567,39 @@ INSERT INTO `SYS_RES` VALUES (102, '阅卷', 'myMark/toMark|myMark/doScoreUpdate
 INSERT INTO `SYS_RES` VALUES (103, '发布', 'question/doPublish', 64, '_1_2_55_64_103_', 5, 2, '2020-10-19 15:24:03', 5, 4, 128, '', 1);
 INSERT INTO `SYS_RES` VALUES (104, '自动阅卷', 'myMark/doAutoMark', 100, '_1_2_96_100_104_', 5, 1, '2020-10-22 13:43:41', 3, 4, 256, '', 1);
 
-INSERT INTO `SYS_DICT` VALUES ('1', 'STATE', '0', '删除', '1');
-INSERT INTO `SYS_DICT` VALUES ('2', 'STATE', '1', '启用', '2');
-INSERT INTO `SYS_DICT` VALUES ('3', 'STATE', '2', '禁用', '3');
-INSERT INTO `SYS_DICT` VALUES ('4', 'RES_TYPE', '1', '后台', '1');
-INSERT INTO `SYS_DICT` VALUES ('5', 'RES_TYPE', '2', '前台', '2');
-INSERT INTO `SYS_DICT` VALUES ('6', 'CRON_TYPE', '1', '启动', '1');
-INSERT INTO `SYS_DICT` VALUES ('7', 'CRON_TYPE', '2', '停止', '2');
-INSERT INTO `SYS_DICT` VALUES ('8', 'QUESTION_TYPE', '1', '单选', '1');
-INSERT INTO `SYS_DICT` VALUES ('9', 'QUESTION_TYPE', '2', '多选', '2');
-INSERT INTO `SYS_DICT` VALUES ('10', 'QUESTION_TYPE', '3', '填空', '3');
-INSERT INTO `SYS_DICT` VALUES ('11', 'QUESTION_TYPE', '4', '判断', '4');
-INSERT INTO `SYS_DICT` VALUES ('12', 'QUESTION_TYPE', '5', '问答', '5');
-INSERT INTO `SYS_DICT` VALUES ('13', 'QUESTION_DIFFICULTY', '1', '极易', '1');
-INSERT INTO `SYS_DICT` VALUES ('14', 'QUESTION_DIFFICULTY', '2', '简单', '2');
-INSERT INTO `SYS_DICT` VALUES ('15', 'QUESTION_DIFFICULTY', '3', '适中', '3');
-INSERT INTO `SYS_DICT` VALUES ('16', 'QUESTION_DIFFICULTY', '4', '困难', '4');
-INSERT INTO `SYS_DICT` VALUES ('17', 'QUESTION_DIFFICULTY', '5', '极难', '5');
-INSERT INTO `SYS_DICT` VALUES ('18', 'QUESTION_OPTIONS', '1', 'A', '1');
-INSERT INTO `SYS_DICT` VALUES ('19', 'QUESTION_OPTIONS', '2', 'B', '2');
-INSERT INTO `SYS_DICT` VALUES ('20', 'QUESTION_OPTIONS', '3', 'C', '3');
-INSERT INTO `SYS_DICT` VALUES ('21', 'QUESTION_OPTIONS', '4', 'D', '4');
-INSERT INTO `SYS_DICT` VALUES ('22', 'QUESTION_OPTIONS', '5', 'E', '5');
-INSERT INTO `SYS_DICT` VALUES ('23', 'QUESTION_OPTIONS', '6', 'F', '6');
-INSERT INTO `SYS_DICT` VALUES ('24', 'QUESTION_OPTIONS', '7', 'G', '7');
+INSERT INTO `SYS_DICT` VALUES (1, 'STATE', '0', '删除', 1);
+INSERT INTO `SYS_DICT` VALUES (2, 'STATE', '1', '启用', 2);
+INSERT INTO `SYS_DICT` VALUES (3, 'STATE', '2', '禁用', 3);
+INSERT INTO `SYS_DICT` VALUES (4, 'RES_TYPE', '1', '后台', 1);
+INSERT INTO `SYS_DICT` VALUES (5, 'RES_TYPE', '2', '前台', 2);
+INSERT INTO `SYS_DICT` VALUES (6, 'CRON_TYPE', '1', '启动', 1);
+INSERT INTO `SYS_DICT` VALUES (7, 'CRON_TYPE', '2', '停止', 2);
+INSERT INTO `SYS_DICT` VALUES (8, 'QUESTION_TYPE', '1', '单选', 1);
+INSERT INTO `SYS_DICT` VALUES (9, 'QUESTION_TYPE', '2', '多选', 2);
+INSERT INTO `SYS_DICT` VALUES (10, 'QUESTION_TYPE', '3', '填空', 3);
+INSERT INTO `SYS_DICT` VALUES (11, 'QUESTION_TYPE', '4', '判断', 4);
+INSERT INTO `SYS_DICT` VALUES (12, 'QUESTION_TYPE', '5', '问答', 5);
+INSERT INTO `SYS_DICT` VALUES (13, 'QUESTION_DIFFICULTY', '1', '极易', 1);
+INSERT INTO `SYS_DICT` VALUES (14, 'QUESTION_DIFFICULTY', '2', '简单', 2);
+INSERT INTO `SYS_DICT` VALUES (15, 'QUESTION_DIFFICULTY', '3', '适中', 3);
+INSERT INTO `SYS_DICT` VALUES (16, 'QUESTION_DIFFICULTY', '4', '困难', 4);
+INSERT INTO `SYS_DICT` VALUES (17, 'QUESTION_DIFFICULTY', '5', '极难', 5);
+INSERT INTO `SYS_DICT` VALUES (18, 'QUESTION_OPTIONS', '1', 'A', 1);
+INSERT INTO `SYS_DICT` VALUES (19, 'QUESTION_OPTIONS', '2', 'B', 2);
+INSERT INTO `SYS_DICT` VALUES (20, 'QUESTION_OPTIONS', '3', 'C', 3);
+INSERT INTO `SYS_DICT` VALUES (21, 'QUESTION_OPTIONS', '4', 'D', 4);
+INSERT INTO `SYS_DICT` VALUES (22, 'QUESTION_OPTIONS', '5', 'E', 5);
+INSERT INTO `SYS_DICT` VALUES (23, 'QUESTION_OPTIONS', '6', 'F', 6);
+INSERT INTO `SYS_DICT` VALUES (24, 'QUESTION_OPTIONS', '7', 'G', 7);
+INSERT INTO `SYS_DICT` VALUES (25, 'MY_EXAM_STATE', '1', '未考试', 1);
+INSERT INTO `SYS_DICT` VALUES (26, 'MY_EXAM_STATE', '2', '考试中', 2);
+INSERT INTO `SYS_DICT` VALUES (27, 'MY_EXAM_STATE', '3', '已交卷', 3);
+INSERT INTO `SYS_DICT` VALUES (28, 'MY_EXAM_STATE', '4', '强制交卷', 4);
+INSERT INTO `SYS_DICT` VALUES (29, 'MY_EXAM_MARK_STATE', '1', '未阅卷', 1);
+INSERT INTO `SYS_DICT` VALUES (30, 'MY_EXAM_MARK_STATE', '2', '阅卷中', 2);
+INSERT INTO `SYS_DICT` VALUES (31, 'MY_EXAM_MARK_STATE', '3', '已阅卷', 3);
+INSERT INTO `SYS_DICT` VALUES (32, 'MY_EXAM_ANSWER_STATE', '1', '及格', 1);
+INSERT INTO `SYS_DICT` VALUES (33, 'MY_EXAM_ANSWER_STATE', '2', '不及格', 2);
 
 INSERT INTO `SYS_CRON` VALUES ('1', '清理临时附件', 'com.wcpdoc.exam.file.job.ClearFileJob', '0 0 0 1/1 * ? ', '1', '1', '2020-08-26 18:42:08');
 

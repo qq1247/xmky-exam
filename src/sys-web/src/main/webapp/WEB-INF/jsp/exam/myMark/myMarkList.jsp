@@ -192,10 +192,13 @@
 				cols : [[
 						{field : "USER_NAME", title : "用户", align : "center"},
 						{field : "MY_EXAM_TOTAL_SCORE", title : "分数", align : "center", templet : function(d) {
-							if (d.MY_EXAM_TOTAL_SCORE < d.EXAM_PASS_SCORE) {
-								return '<span style="color: red;">'+d.MY_EXAM_TOTAL_SCORE+'</span>';
+							if (d.MY_EXAM_ANSWER_STATE == 2) {
+								return '<span style="color: red;">'+d.MY_EXAM_TOTAL_SCORE+'（'+d.MY_EXAM_ANSWER_STATE_NAME+'）</span>';
 							}
 							return d.MY_EXAM_TOTAL_SCORE;
+						}},
+						{field : "MY_EXAM_STATE_NAME", title : "状态", align : "center", templet : function(d) {
+							return d.MY_EXAM_STATE_NAME + "/" + d.MY_EXAM_MARK_STATE_NAME;
 						}},
 						{field : "USER_REMARK", title : "评语", align : "center"},
 						{fixed : "right", title : "操作 ", toolbar : "#myMarkDetailToolbar", align : "center"}

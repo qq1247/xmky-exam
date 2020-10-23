@@ -29,6 +29,7 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 				+ "		EXAM.END_TIME AS EXAM_END_TIME, PAPER.TOTAL_SCORE AS PAPER_TOTAL_SCORE, EXAM.PASS_SCORE AS EXAM_PASS_SCORE, "
 				+ "		MY_EXAM.STATE AS MY_EXAM_STATE, MY_EXAM.TOTAL_SCORE AS MY_EXAM_TOTAL_SCORE, "
 				+ "		EXAM.MARK_START_TIME AS EXAM_MARK_START_TIME, EXAM.MARK_END_TIME AS EXAM_MARK_END_TIME, USER.NAME AS USER_NAME, "
+				+ "		MY_EXAM.MARK_STATE AS MY_EXAM_MARK_STATE, MY_EXAM.ANSWER_STATE AS MY_EXAM_ANSWER_STATE, "
 				+ "		(SELECT COUNT(*) FROM EXM_MY_EXAM A WHERE A.EXAM_ID = MY_EXAM.EXAM_ID) AS USER_NUM, "
 				+ "		EXAM.SCORE_A AS EXAM_SCORE_A, EXAM.SCORE_A_REMARK as EXAM_SCORE_A_REMARK, "
 				+ "		EXAM.SCORE_B AS EXAM_SCORE_B, EXAM.SCORE_B_REMARK as EXAM_SCORE_B_REMARK, "
@@ -51,7 +52,11 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 				.addOrder("EXAM.START_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getRows(), "EXAM_START_TIME", DateUtil.FORMAT_DATE_TIME, "EXAM_END_TIME", DateUtil.FORMAT_DATE_TIME);
-		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), "MY_EXAM_STATE", "MY_EXAM_STATE");
+		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), 
+				"MY_EXAM_STATE", "MY_EXAM_STATE",
+				"MY_EXAM_ANSWER_STATE", "MY_EXAM_ANSWER_STATE",
+				"MY_EXAM_MARK_STATE", "MY_EXAM_MARK_STATE"
+				);
 		return pageOut;
 	}
 
