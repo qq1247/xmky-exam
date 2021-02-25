@@ -235,6 +235,10 @@ public class ExamController extends BaseController{
 	public PageResult doEdit(Exam exam) {
 		try {
 			//校验数据有效性
+			Exam entity = examService.getEntity(exam.getId());
+			if(entity.getState() == 1) {
+				throw new MyException("考试已发布！");
+			}
 			if(exam.getStartTime().getTime() <= new Date().getTime()) {
 				throw new MyException("考试开始时间必须大于当前时间！");
 			}
@@ -246,10 +250,6 @@ public class ExamController extends BaseController{
 			}
 			if(exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()) {
 				throw new MyException("阅卷结束时间必须大于阅卷开始时间！");
-			}
-			Exam entity = examService.getEntity(exam.getId());
-			if(entity.getState() == 1) {
-				throw new MyException("考试已发布！");
 			}
 			
 			//添加考试

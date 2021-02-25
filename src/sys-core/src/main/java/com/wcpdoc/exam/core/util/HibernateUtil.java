@@ -49,9 +49,13 @@ public class HibernateUtil {
 	public static void formatDict(List<Map<String, Object>> list, Map<String, String> dictMap, String... params) {
 		for (Map<String, Object> map : list) {
 			for (int i = 0; i < params.length; i++) {
-				String index = params[i];
-				String key = map.get(params[++i]).toString();
-				String indexKey = index + "_" + key;
+				String paramIndex = params[i];
+				String paramValue = params[++i];
+				if (map.get(paramValue) == null) {
+					continue;
+				}
+				String key = map.get(paramValue).toString();
+				String indexKey = paramIndex + "_" + key;
 				String value = dictMap.get(indexKey);
 				map.put(params[i] + "_NAME", value);
 			}

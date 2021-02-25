@@ -2,7 +2,7 @@
 <div class="layui-card">
 	<%-- 我的阅卷详细查询条件 --%>
 	<form id="myMarkDetailQueryForm" class="layui-form layui-card-header layuiadmin-card-header-auto">
-		<input type="hidden" id="myMarkDetailOne" name="one">
+		<input type="hidden" id="myMarkDetailOne" name="one" value="${examId }">
 		<div class="layui-form-item ">
 			<div class="layui-inline">
 				<input type="text" name="three" placeholder="请输入名称" class="layui-input">

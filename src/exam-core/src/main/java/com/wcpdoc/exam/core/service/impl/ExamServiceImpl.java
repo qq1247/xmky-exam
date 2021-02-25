@@ -86,44 +86,35 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if (exam.getState() == 0) {
 			throw new MyException("考试已删除！");
 		}
-//		if (exam.getState() == 2) {
-//			throw new MyException("考试未发布！");
-//		}
+		if (exam.getState() == 2) {
+			throw new MyException("考试未发布！");// 必须已发布，否则在考试结束前添加或删除考试用户，试题有可能会变更，每个人的考试详细可能不一样（也能处理，比较费事）。
+		}
 
 		if (exam.getEndTime().getTime() <= new Date().getTime()) {
 			throw new MyException("考试已结束，不允许添加！");
 		}
 
-		// 添加我的考试
-		List<MyExam> myExamList = myExamService.getList(id);
-		List<Question> questionList = paperService.getQuestionList(exam.getPaperId());
-		Set<Integer> userIdsSet = new HashSet<>(Arrays.asList(userIds));
+		// 添加我的考试（不能整个重新添加，因为有可能是已开始考试途中添加人员，部分人员已作答）
+		List<MyExam> myExamList = myExamService.getList(id);// 当前考试的人员
+		List<Question> questionList = paperService.getQuestionList(exam.getPaperId());// 试卷的问题
+		Set<Integer> curUserIdSet = new HashSet<>(Arrays.asList(userIds));//当前页面选中的考试的人员
 		ListIterator<MyExam> myExamListIterator = myExamList.listIterator();
-		while (myExamListIterator.hasNext()) {//共同的剔除
+		while (myExamListIterator.hasNext()) {// 如果页面有选择该用户，数据库也有，则不处理
 			MyExam next = myExamListIterator.next();
-			if (userIdsSet.contains(next.getUserId())) {
+			if (curUserIdSet.contains(next.getUserId())) {
 				myExamListIterator.remove();
-				userIdsSet.remove(next.getUserId());
-				
-				for (Question question : questionList) {// 添加我的考试详细
-					MyExamDetail myExamDetail = new MyExamDetail();
-					myExamDetail.setMyExamId(next.getId());
-					myExamDetail.setExamId(next.getExamId());
-					myExamDetail.setUserId(next.getUserId());
-					myExamDetail.setQuestionId(question.getId());
-					myExamDetailService.add(myExamDetail);
-				}
+				curUserIdSet.remove(next.getUserId());
 			}
 		}
 		myExamListIterator = myExamList.listIterator();
-		while (myExamListIterator.hasNext()) {//多余的删除
+		while (myExamListIterator.hasNext()) {// 如果页面没有选择该用户，数据库有，则数据库记录删除该用户的考试记录和考试详细记录
 			MyExam next = myExamListIterator.next();
 			myExamDetailService.delByMyExamId(next.getId());
 			
 			myExamService.del(next.getId());
 		}
 		Date curTime = new Date();
-		for (Integer userId : userIdsSet) {//没有的添加
+		for (Integer userId : curUserIdSet) {//如果页面有选择该用户，数据库没有，则数据库添加该用户的考试记录和考试详细记录
 			MyExam myExam = new MyExam();
 			myExam.setExamId(id);
 			myExam.setUserId(userId);
@@ -132,15 +123,16 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			myExam.setMarkState(1);
 			myExam.setUpdateTime(curTime);
 			myExam.setUpdateUserId(getCurUser().getId());
-			myExamService.add(myExam);
+			myExamService.add(myExam);// 添加我的考试
 			
-			for (Question question : questionList) {// 添加我的考试详细
+			for (Question question : questionList) {
 				MyExamDetail myExamDetail = new MyExamDetail();
 				myExamDetail.setMyExamId(myExam.getId());
 				myExamDetail.setExamId(myExam.getExamId());
 				myExamDetail.setUserId(myExam.getUserId());
 				myExamDetail.setQuestionId(question.getId());
-				myExamDetailService.add(myExamDetail);
+				myExamDetail.setQuestionScore(question.getScore());
+				myExamDetailService.add(myExamDetail);// 添加我的考试详细
 			}
 		}
 		

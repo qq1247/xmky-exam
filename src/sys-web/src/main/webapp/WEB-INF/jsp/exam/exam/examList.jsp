@@ -58,6 +58,7 @@
 		//定义变量
 		var examQueryForm = $("#examQueryForm"); //考试查询对象
 		var examTypeTree; //考试分类树对象
+		var rootNodeId = ""; // 根节点ID
 		var curSelExamTypeId = ""; //当前选中的考试分类ID
 		var curSelExamTypeName = ""; //当前选中的考试分类名称
 		
@@ -82,7 +83,7 @@
 						{field : "MARK_START_TIME_STR", title : "阅卷时间", align : "center"},
 						{field : "STATE_NAME", title : "状态", align : "center", templet : function(d) {
 							return '<input type="checkbox" name="state" value="'+d.ID+'" '
-								+ 'lay-skin="switch" lay-text="已发布|未发布" lay-filter="examPublish"' + (d.STATE == 1 ? 'checked' : '') + '>'
+								+ 'lay-skin="switch" lay-text="发布|未发布" lay-filter="examPublish"' + (d.STATE == 1 ? 'checked' : '') + '>'
 						}},
 						{fixed : "right", title : "操作 ", toolbar : "#examToolbar", align : "center", width : 280}
 						]],
@@ -136,7 +137,11 @@
 					onClick : function(event, treeId, treeNode) {
 						curSelExamTypeId = treeNode.ID;
 						curSelExamTypeName = treeNode.NAME;
-						$("#examOne").val(curSelExamTypeId);
+						if (rootNodeId == curSelExamTypeId) {
+							$("#examOne").val(null);
+						} else {
+							$("#examOne").val(curSelExamTypeId);
+						}
 						examQuery();
 					},
 					onAsyncSuccess : function(event, treeId, msg, treeNode) {
@@ -149,7 +154,8 @@
 							
 							curSelExamTypeId = rootNode.ID;
 							curSelExamTypeName = rootNode.NAME;
-							$("#examOne").val(curSelExamTypeId);
+							rootNodeId = rootNode.ID;
+							// $("#examOne").val(curSelExamTypeId);
 							return;
 						}
 						
@@ -751,7 +757,7 @@
 			html.push('			class="layui-input" lay-verify="required|number" placeholder="分值">');
 			html.push('	</div>');
 			html.push('	<div class="layui-form-mid">评语</div>');
-			html.push('	<div class="layui-input-inline" style="width: 368px;">');
+			html.push('	<div class="layui-input-inline" style="width: 366px;">');
 			html.push('		<input name="score' + remarkOptionLabs[index] + 'Remark" value="" ');
 			html.push('			class="layui-input" lay-verify="required" placeholder="请输入评语">');
 			html.push('	</div>');

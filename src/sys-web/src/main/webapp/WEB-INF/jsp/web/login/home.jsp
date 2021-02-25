@@ -157,7 +157,7 @@
 				<!-- 主体内容 -->
 				<div class="layui-body" id="LAY_app_body">
 					<div class="layadmin-tabsbody-item layui-show">
-						<iframe src="res/toList" frameborder="0" class="layadmin-iframe"></iframe>
+						<iframe src="" frameborder="0" class="layadmin-iframe"></iframe>
 					</div>
 				</div>
 	

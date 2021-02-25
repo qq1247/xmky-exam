@@ -54,7 +54,7 @@
 					class="layui-input" lay-verify="required|number" placeholder="分值">
 			</div>
 			<div class="layui-form-mid">评语</div>
-			<div class="layui-input-inline" style="width: 368px;">
+			<div class="layui-input-inline" style="width: 366px;">
 				<input name="scoreBRemark" value="${paper.scoreBRemark}" 
 					class="layui-input" lay-verify="required" placeholder="请输入评语">
 			</div>

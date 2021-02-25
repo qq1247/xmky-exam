@@ -125,6 +125,7 @@
 				
 				var message = auto ? "阅卷时间到！" : obj.msg;
 				layer.alert(message, {"title" : "提示消息"});
+				window.opener.myMarkDetailQuery();
 				setTimeout("window.close();", 2000)
 			}
 		});

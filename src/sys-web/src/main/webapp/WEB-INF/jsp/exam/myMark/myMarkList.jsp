@@ -99,7 +99,7 @@
 				if (obj.event === "myMarkAutoMark") {
 					doMyMarkAutoMark(obj.data.ID);
 				} else if (obj.event === "myMarkPaperList") {
-					toMyMarkPaperList(obj.data.ID);
+					toMyMarkPaperList(obj.data.ID, obj.data.NAME);
 				}
 			});
 		}
@@ -133,7 +133,7 @@
 						},
 						success: function(layero, index) {
 							layui.layer.full(index);
-							setTimeout("initMyExamTable()", 200);
+							setTimeout("initMyExamTable("+examId+")", 200);
 						}
 					});
 				}
@@ -185,17 +185,18 @@
 		}
 		
 		//初始化我的阅卷详细表格
-		function initMyExamTable() {
+		function initMyExamTable(examId) {
 			layui.table.render({
 				elem : "#myMarkDetailTable",
 				url : "myMark/detailList",
+				where : {one : examId},
 				cols : [[
 						{field : "USER_NAME", title : "用户", align : "center"},
 						{field : "MY_EXAM_TOTAL_SCORE", title : "分数", align : "center", templet : function(d) {
 							if (d.MY_EXAM_ANSWER_STATE == 2) {
 								return '<span style="color: red;">'+d.MY_EXAM_TOTAL_SCORE+'（'+d.MY_EXAM_ANSWER_STATE_NAME+'）</span>';
 							}
-							return d.MY_EXAM_TOTAL_SCORE;
+							return d.MY_EXAM_TOTAL_SCORE == null ? "" : d.MY_EXAM_TOTAL_SCORE;
 						}},
 						{field : "MY_EXAM_STATE_NAME", title : "状态", align : "center", templet : function(d) {
 							return d.MY_EXAM_STATE_NAME + "/" + d.MY_EXAM_MARK_STATE_NAME;
@@ -233,13 +234,13 @@
 		
 		//我的阅卷详细查询
 		function myMarkDetailQuery() {
-			var myMarkDetailQueryForm = $("#myMarkQueryForm");
+			var myMarkDetailQueryForm = $("#myMarkDetailQueryForm");
 			layui.table.reload("myMarkDetailTable", {"where" : $.fn.my.serializeObj(myMarkDetailQueryForm)});
 		}
 	
 		//我的阅卷详细重置
 		function myMarkDetailReset() {
-			var myMarkDetailQueryForm = $("#myMarkQueryForm");
+			var myMarkDetailQueryForm = $("#myMarkDetailQueryForm");
 			myMarkDetailQueryForm[0].reset();
 			myMarkDetailQuery();
 		}

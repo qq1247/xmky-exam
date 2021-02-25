@@ -62,6 +62,7 @@
 		//定义变量
 		var paperQueryForm = $("#paperQueryForm"); //试卷查询对象
 		var paperTypeTree; //试卷分类树对象
+		var rootNodeId = ""; // 根节点ID
 		var curSelPaperTypeId = ""; //当前选中的试卷分类ID
 		var curSelPaperTypeName = ""; //当前选中的试卷分类名称
 		
@@ -137,7 +138,11 @@
 					onClick : function(event, treeId, treeNode) {
 						curSelPaperTypeId = treeNode.ID;
 						curSelPaperTypeName = treeNode.NAME;
-						$("#paperOne").val(curSelPaperTypeId);
+						if (rootNodeId == curSelPaperTypeId) {
+							$("#paperOne").val(null);
+						} else {
+							$("#paperOne").val(curSelPaperTypeId);
+						}
 						paperQuery();
 					},
 					onAsyncSuccess : function(event, treeId, msg, treeNode) {
@@ -150,7 +155,8 @@
 							
 							curSelPaperTypeId = rootNode.ID;
 							curSelPaperTypeName = rootNode.NAME;
-							$("#paperOne").val(curSelPaperTypeId);
+							rootNodeId = rootNode.ID;
+							// $("#paperOne").val(curSelPaperTypeId);
 							return;
 						}
 						
@@ -361,7 +367,7 @@
 			html.push('			class="layui-input" lay-verify="required|number" placeholder="分值">');
 			html.push('	</div>');
 			html.push('	<div class="layui-form-mid">评语</div>');
-			html.push('	<div class="layui-input-inline" style="width: 368px;">');
+			html.push('	<div class="layui-input-inline" style="width: 366px;">');
 			html.push('		<input name="score'+remarkOptionLabs[index]+'Remark" value="" ');
 			html.push('			class="layui-input" lay-verify="required" placeholder="请输入评语">');
 			html.push('	</div>');

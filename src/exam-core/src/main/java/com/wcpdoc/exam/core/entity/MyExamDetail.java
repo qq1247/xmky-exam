@@ -48,6 +48,8 @@ public class MyExamDetail {
 	private String answer;
 	@Column(name = "SCORE")
 	private BigDecimal score;
+	@Column(name = "QUESTION_SCORE")
+	private BigDecimal questionScore;
 
 	public Integer getId() {
 		return id;
@@ -129,4 +131,11 @@ public class MyExamDetail {
 		this.score = score;
 	}
 
+	public BigDecimal getQuestionScore() {
+		return questionScore;
+	}
+
+	public void setQuestionScore(BigDecimal questionScore) {
+		this.questionScore = questionScore;
+	}
 }

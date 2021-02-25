@@ -82,6 +82,7 @@
 		//定义变量
 		var questionQueryForm = $("#questionQueryForm"); //试题查询对象
 		var questionTypeTree; //试题分类树对象
+		var rootNodeId = ""; // 根节点ID
 		var curSelQuestionTypeId = ""; //当前选中的试题分类ID
 		var curSelQuestionTypeName = ""; //当前选中的试题分类名称
 		
@@ -159,7 +160,11 @@
 					onClick : function(event, treeId, treeNode) {
 						curSelQuestionTypeId = treeNode.ID;
 						curSelQuestionTypeName = treeNode.NAME;
-						$("#questionOne").val(curSelQuestionTypeId);
+						if (rootNodeId == curSelQuestionTypeId) {
+							$("#questionOne").val(null);
+						} else {
+							$("#questionOne").val(curSelQuestionTypeId);
+						}
 						questionQuery();
 					},
 					onAsyncSuccess : function(event, treeId, msg, treeNode) {
@@ -172,7 +177,8 @@
 							
 							curSelQuestionTypeId = rootNode.ID;
 							curSelQuestionTypeName = rootNode.NAME;
-							$("#questionOne").val(curSelQuestionTypeId);
+							rootNodeId = rootNode.ID;
+							// $("#questionOne").val(curSelQuestionTypeId);
 							return;
 						}
 						

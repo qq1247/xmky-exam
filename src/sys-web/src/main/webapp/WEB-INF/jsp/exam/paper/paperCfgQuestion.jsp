@@ -58,7 +58,7 @@
 			</ul>
 			</c:if>
 			<%-- 填空题 --%>
-			<c:if test="${subPaperQuestionEx.question.type == 3 }">
+			<c:if test="${answer && subPaperQuestionEx.question.type == 3 }">
 			<% pageContext.setAttribute("v", "\n"); %>
 			<c:set var="lab1s" value="${fn:split('一,二,三,四,五,六,七', ',')}"></c:set>
 			<c:set var="a" value="${myExamDetail.answer }"></c:set>
@@ -69,7 +69,7 @@
 			}
 			%>
 			<span class="qst-no"></span>
-			<c:forEach items="${answers }" varStatus="s">
+			<c:forEach items="${fn:split(subPaperQuestionEx.question.answer, v) }" varStatus="s">
 			<input name="option_${myExamDetail.id}" value="${answers[s.index]}" 
 				class="layui-input btn txt" ${answer ? "" : "disabled" } placeholder="填空${lab1s[s.index] }" onblur="txtSubmit(this, '${myExamDetail.id}')">
 			</c:forEach>

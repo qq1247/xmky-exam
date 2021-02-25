@@ -42,10 +42,11 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 				+ "INNER JOIN SYS_USER USER ON MY_EXAM.USER_ID = USER.ID";
 		
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getThree()), "EXAM.NAME LIKE ?", "%" + pageIn.getThree() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "MY_EXAM.USER_ID =  ?", pageIn.getTen())
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()), "EXAM.ID = ?", pageIn.getOne())
+				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "EXAM.NAME LIKE ?", "%" + pageIn.getThree() + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.getEight()), "EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE USER_ID = ? AND Z.EXAM_ID = MY_EXAM.EXAM_ID)", pageIn.getEight())
 				.addWhere(ValidateUtil.isValid(pageIn.getNine()), "MY_EXAM.MARK_USER_ID =  ?", pageIn.getNine())
+				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "MY_EXAM.USER_ID =  ?", pageIn.getTen())
 				.addWhere("EXAM.STATE = ?", 1)
 //				.addWhere("PAPER.STATE = ?", 1)//删除了试卷也能查看
 //				.addWhere("USER.STATE = ?", 1)

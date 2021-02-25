@@ -420,7 +420,8 @@
 	
 	// 重新加载页面
 	function reloadPaperCfg() {
-		window.location.reload();
+		setTimeout(function(){window.location.reload(); }, 500);
+		
 		/* $.ajax({
 			url : "paper/toCfg",
 			data : {id : "${paper.id }"},

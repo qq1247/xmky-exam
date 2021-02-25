@@ -122,7 +122,7 @@ public class MyMarkController extends BaseController {
 	@RequestMapping("/toDetailList")
 	public String toDetailList(Model model, Integer examId) {
 		try {
-			model.addAttribute(examId);
+			model.addAttribute("examId", examId);
 			return "exam/myMark/myMarkDetailList";
 		} catch (Exception e) {
 			log.error("到达我的阅卷详细列表页面错误：", e);
