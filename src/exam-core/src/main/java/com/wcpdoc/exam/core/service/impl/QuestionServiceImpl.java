@@ -19,7 +19,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.wcpdoc.exam.base.service.PostService;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.QuestionDao;
@@ -46,8 +45,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	private FileService fileService;
 	@Resource
 	private UserService userService;
-	@Resource
-	private PostService postService;
 
 	@Override
 	@Resource(name = "questionDaoImpl")
@@ -248,6 +245,15 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			
 			//保存附件
 			saveFile(question);
+		}
+	}
+
+	@Override
+	public void merge(Integer oldQuestionTypeId, Integer newQuestionTypeId) {
+		List<Question> list = questionDao.getList(oldQuestionTypeId);
+		for(Question question : list){
+			question.setQuestionTypeId(newQuestionTypeId);
+			update(question);
 		}
 	}
 }

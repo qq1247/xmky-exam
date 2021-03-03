@@ -29,5 +29,4 @@ public interface QuestionDao extends BaseDao<Question>{
 	 * @return List<Question>
 	 */
 	List<Question> getList(Integer questionTypeId);
-	
 }

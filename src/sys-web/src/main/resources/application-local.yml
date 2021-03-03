@@ -10,3 +10,5 @@ spring:
 file: 
   upload:
     dir: d:/bak/file
+sys:
+  env: local

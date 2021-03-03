@@ -1,7 +1,6 @@
 package com.wcpdoc.exam.core.dao;
 
 import java.util.List;
-import java.util.Map;
 
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
@@ -13,14 +12,6 @@ import com.wcpdoc.exam.core.entity.QuestionType;
  * v1.0 zhanghc 2016-5-24下午14:54:09
  */
 public interface QuestionTypeDao extends BaseDao<QuestionType> {
-
-	/**
-	 * 获取试题分类树
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * @return List<Map<String,Object>>
-	 */
-	List<Map<String, Object>> getTreeList();
-	
 	/**
 	 * 获取试题分类列表
 	 * 
@@ -50,29 +41,11 @@ public interface QuestionTypeDao extends BaseDao<QuestionType> {
 	boolean existName(String name, Integer excludeId);
 
 	/**
-	 * 获取权限用户列表
+	 * 获取人员列表
 	 * 
 	 * v1.0 zhanghc 2018年5月30日下午6:28:19
 	 * @param pageIn
 	 * @return PageOut
 	 */
-	PageOut getAuthUserListpage(PageIn pageIn);
-
-	/**
-	 * 获取权限岗位列表
-	 * 
-	 * v1.0 zhanghc 2018年5月30日下午6:28:19
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	PageOut getAuthPostListpage(PageIn pageIn);
-
-	/**
-	 * 获取权限机构列表
-	 * 
-	 * v1.0 zhanghc 2018年5月30日下午6:28:19
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	PageOut getAuthOrgListpage(PageIn pageIn);
+	PageOut getUserListpage(PageIn pageIn);
 }

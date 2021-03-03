@@ -21,4 +21,8 @@ spring:
       
 sys:
   ver: 2.0.0
-    
+  env: dev
+token:
+  active:
+    access: 525600
+    refresh: 525600

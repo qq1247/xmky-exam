@@ -437,7 +437,7 @@ public class PaperController extends BaseController {
 	@ResponseBody
 	public PageResult questionTypeTreeList() {
 		try {
-			return new PageResultEx(true, "查询成功", questionTypeService.getAuthTreeList());
+			return null; //new PageResultEx(true, "查询成功", questionTypeService.getAuthTreeList())
 		} catch (Exception e) {
 			log.error("获取试题分类树错误：", e);
 			return new PageResult(false, "查询失败");

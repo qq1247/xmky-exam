@@ -74,6 +74,18 @@
 			<artifactId>exam-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- 集成考试API -->
+		<dependency>
+			<groupId>com.wcpdoc.exam</groupId>
+			<artifactId>exam-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<!-- 集成基础API -->
+		<dependency>
+			<groupId>com.wcpdoc.exam</groupId>
+			<artifactId>sys-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 	
 	<build>

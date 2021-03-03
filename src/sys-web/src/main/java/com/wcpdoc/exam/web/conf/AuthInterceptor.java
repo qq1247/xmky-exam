@@ -24,7 +24,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		//如果是公共资源，则不拦截。
- 		log.debug("权限拦截：访问链接：{}", request.getRequestURI());
+ 	/*	log.debug("权限拦截：访问链接：{}", request.getRequestURI());
 		String contextPath = request.getContextPath();
 		String uri = request.getRequestURI().replaceFirst(contextPath + "/", "");
 		String pubRes = ",login/toIn,login/doIn,login/toHome,login/doOut,login/toPwdUpdate,login/doPwdUpdate,login/curTime,file/doTempUpload,file/doDownload,progressBar/get,";
@@ -69,7 +69,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 			log.info("权限拦截：当前用户的权限不包含当前的资源【{}】，拦截", uri);
 			return false;
 		}
-		
+		*/
 		//放行。
 		log.debug("权限拦截：通过");
 		return true;
