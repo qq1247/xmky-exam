@@ -1,21 +1,23 @@
 package com.wcpdoc.exam.web.service.impl;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.security.auth.login.LoginException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
+import org.apache.shiro.SecurityUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.base.service.OrgService;
 import com.wcpdoc.exam.base.service.UserService;
-import com.wcpdoc.exam.core.constant.ConstantManager;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
+import com.wcpdoc.exam.core.util.DateUtil;
+import com.wcpdoc.exam.core.util.JwtUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.web.service.LoginService;
 
@@ -26,6 +28,8 @@ import com.wcpdoc.exam.web.service.LoginService;
  */
 @Service
 public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginService {
+	@Value("${spring.profiles.active")
+	private String active;
 	@Resource
 	private UserService userService;
 	@Resource
@@ -37,7 +41,7 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 	}
 
 	@Override
-	public User doIn(String loginName, String pwd, HttpServletRequest request) throws LoginException{
+	public String in(String loginName, String pwd) throws LoginException{
 		//校验数据有效性
 		if(!ValidateUtil.isValid(loginName)) {
 			throw new LoginException("参数错误：loginName");
@@ -51,31 +55,25 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 			throw new LoginException("用户名或密码错误！");
 		}
 		
-		//用户信息、权限信息写入session
-		HttpSession session = request.getSession(true);//参数为false，第一次在页面直接访问login/doIn，session为null
-		session.setAttribute(ConstantManager.USER, user);
-		
-		Map<Integer, Long> userAuthMap = userService.getAuth(user.getId());
-		session.setAttribute(ConstantManager.USER_AUTH_MAP, userAuthMap);
+		// 
+		long tokenId = new Date().getTime();
+		Map<String, Object> params = new HashMap<>();
+		params.put("loginName", loginName);
+		String accessToken = JwtUtil.createToken(tokenId + "", active, DateUtil.getNextMinute(new Date(), 60), params);
 		
 		//更新用户登录时间
 		user.setLastLoginTime(new Date());
 		userService.update(user);
-		return user;
+		return accessToken;
 	}
 
 	@Override
-	public void doOut(HttpServletRequest request) {
-		HttpSession session = request.getSession(false);
-		if(session == null) {
-			return;
-		}
-		
-		session.invalidate();
+	public void out() {
+		SecurityUtils.getSubject().logout();
 	}
 	
 	@Override
-	public void doPwdUpdate(String oldPwd, String newPwd) {
+	public void pwdUpdate(String oldPwd, String newPwd) {
 		userService.doPwdUpdate(oldPwd, newPwd);
 	}
 }

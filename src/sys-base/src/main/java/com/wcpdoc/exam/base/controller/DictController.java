@@ -2,6 +2,7 @@ package com.wcpdoc.exam.base.controller;
 
 import javax.annotation.Resource;
 
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -93,9 +94,10 @@ public class DictController extends BaseController {
 	 */
 	@RequestMapping("/doAdd")
 	@ResponseBody
+	@RequiresRoles("laoshi")
 	public PageResult doAdd(Dict dict) {
 		try {
-			dictService.addAndUpdate(dict);
+			//dictService.addAndUpdate(dict);
 			return new PageResult(true, "添加成功");
 		} catch (MyException e) {
 			log.error("完成添加数据字典错误：{}", e.getMessage());
@@ -137,9 +139,10 @@ public class DictController extends BaseController {
 	 */
 	@RequestMapping("/doEdit")
 	@ResponseBody
+	@RequiresRoles("xueyuan")
 	public PageResult doEdit(Dict dict) {
 		try {
-			dictService.updateAndUpdate(dict);
+			//dictService.updateAndUpdate(dict);
 			return new PageResult(true, "修改成功");
 		} catch (MyException e) {
 			log.error("完成修改数据字典错误：{}", e.getMessage());

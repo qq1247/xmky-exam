@@ -3,6 +3,7 @@ package com.wcpdoc.exam.base.service;
 import java.util.List;
 import java.util.Map;
 
+import com.wcpdoc.exam.base.entity.Post;
 import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.core.service.BaseService;
 
@@ -85,4 +86,13 @@ public interface UserService extends BaseService<User> {
 	 * @return List<User>
 	 */
 	List<User> getList(Integer orgId);
+
+	/**
+	 * 获取岗位列表
+	 * 
+	 * v1.0 zhanghc 2021年3月3日下午2:00:19
+	 * @param id
+	 * @return List<Post>
+	 */
+	List<Post> getPostList(Integer id);
 }

@@ -1,9 +1,7 @@
 package com.wcpdoc.exam.web.service;
 
 import javax.security.auth.login.LoginException;
-import javax.servlet.http.HttpServletRequest;
 
-import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.core.service.BaseService;
 /**
  * 登陆服务层接口
@@ -13,24 +11,22 @@ import com.wcpdoc.exam.core.service.BaseService;
 public interface LoginService extends BaseService<Object>{
 	
 	/**
-	 * 完成登录
+	 * 登录
 	 * 
 	 * v1.0 zhanghc 2017年7月17日下午4:20:21
 	 * @param loginName
 	 * @param pwd
-	 * @param request
-	 * @return user
+	 * @return String 令牌
 	 */
-	User doIn(String loginName, String pwd, HttpServletRequest request) throws LoginException;
+	String in(String loginName, String pwd) throws LoginException;
 	
 	/**
-	 * 完成退出
+	 * 退出登录
 	 * 
 	 * v1.0 zhanghc 2017年7月17日下午4:25:41
-	 * @param request
 	 * void
 	 */
-	void doOut(HttpServletRequest request);
+	void out();
 
 	/**
 	 * 完成修改密码
@@ -40,5 +36,6 @@ public interface LoginService extends BaseService<Object>{
 	 * @param newPwd
 	 * void
 	 */
-	void doPwdUpdate(String oldPwd, String newPwd);
+	void pwdUpdate(String oldPwd, String newPwd);
+
 }

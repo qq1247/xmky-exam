@@ -136,4 +136,9 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	public List<User> getList(Integer orgId) {
 		return userDao.getList(orgId);
 	}
+
+	@Override
+	public List<Post> getPostList(Integer id) {
+		return userDao.getPostList(id);
+	}
 }

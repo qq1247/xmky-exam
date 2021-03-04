@@ -1,7 +1,5 @@
 package com.wcpdoc.exam.web.controller;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Date;
 
 import javax.annotation.Resource;
@@ -38,22 +36,6 @@ public class LoginController extends BaseController {
 	private UserService userService;
 	
 	/**
-	 * 到达登录页面
-	 * 
-	 * v1.0 zhanghc 2016年9月8日下午8:47:13
-	 * @return String
-	 */
-	@RequestMapping("/toIn")
-	public String toIn(Model model) {
-		try {
-			return "web/login/in";
-		} catch (Exception e) {
-			log.error("到达登录页面错误：", e);
-			return "web/login/in";
-		}
-	}
-	
-	/**
 	 * 完成登录
 	 * 
 	 * v1.0 zhanghc 2016年7月18日下午3:23:00
@@ -62,99 +44,54 @@ public class LoginController extends BaseController {
 	 * @param model
 	 * @return String
 	 */
-	@RequestMapping("/doIn")
-	public String doIn(Model model, String loginName, String pwd) {
+	@RequestMapping("/in")
+	@ResponseBody
+	public PageResult in(Model model, String loginName, String pwd) {
 		try {
 			//完成登录
-			loginService.doIn(loginName, pwd, request);
-			//重定向到首页
-			return "redirect:/login/toHome";
+			String token = loginService.in(loginName, pwd);
+			model.addAttribute("token", token);
+			return new PageResultEx(true, "登陆成功", token);
 		} catch (LoginException e) {
 			log.error("完成登录错误：{}", e.getMessage());
-			try {
-				return "redirect:/login/toIn?message=" + URLEncoder.encode(e.getMessage(), "UTF-8");
-			} catch (UnsupportedEncodingException e1) {
-				return "redirect:/login/toIn";
-			}
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
 			log.error("完成登录错误：", e);
-			try {
-				return "redirect:/login/toIn?message=" + URLEncoder.encode("未知异常！", "UTF-8");
-			} catch (Exception e1) {
-				return "redirect:/login/toIn";
-			}
+			return new PageResult(false, "未知错误");
 		}
 	}
 	
 	/**
-	 * 到达首页
-	 * 
-	 * @param model
-	 * v1.0 zhanghc 2018年11月25日下午2:15:38
-	 * @return String
-	 */
-	@RequestMapping("/toHome")
-	public String toHome(Model model) {
-		try {
-			if(getCurUser() == null) {
-				return "redirect:/login/toIn";
-			}
-			
-			return "web/login/home";
-		} catch (Exception e) {
-			log.error("到达首页错误：", e);
-			return "web/login/home";
-		}
-	}
-	
-	/**
-	 * 完成退出登录
+	 * 退出登录
 	 * v1.0 zhanghc 2016年9月8日下午8:50:37
 	 * @return String
 	 */
-	@RequestMapping("/doOut")
-	public String doOut() {
+	@RequestMapping("/out")
+	@ResponseBody
+	public PageResult out() {
 		try {
 			//完成退出登录
-			loginService.doOut(request);
-			
-			//重定向到登录页
-			return "redirect:/login/toIn";
+			loginService.out();
+			return new PageResult(true, "退出登录成功");
 		} catch (Exception e) {
-			log.error("完成退出登录错误：", e);
-			return "redirect:/login/toIn";
+			log.error("退出登录错误：", e);
+			return new PageResult(false, "未知错误");
 		}
 	}
 	
 	/**
-	 * 到达修改密码页面
-	 * 
-	 * v1.0 zhanghc 2017年7月14日下午4:24:33
-	 * @return String
-	 */
-	@RequestMapping("/toPwdUpdate")
-	public String toPwdUpdate() {
-		try {
-			return "web/login/pwdUpdate";
-		} catch (Exception e) {
-			log.error("到达修改密码页面错误：", e);
-			return "web/login/pwdUpdate";
-		}
-	}
-	
-	/**
-	 * 完成修改密码
+	 * 修改密码
 	 * 
 	 * v1.0 zhanghc 2017年7月14日下午3:05:21
 	 * @param oldPwd
 	 * @param newPwd
 	 * @return PageResult
 	 */
-	@RequestMapping("/doPwdUpdate")
+	@RequestMapping("/pwdUpdate")
 	@ResponseBody
-	public PageResult doPwdUpdate(String oldPwd, String newPwd) {
+	public PageResult pwdUpdate(String oldPwd, String newPwd) {
 		try {
-			loginService.doPwdUpdate(oldPwd, newPwd);
+			loginService.pwdUpdate(oldPwd, newPwd);
 			return new PageResult(true, "修改成功");
 		} catch (MyException e) {
 			log.error("修改密码错误：{}", e.getMessage());

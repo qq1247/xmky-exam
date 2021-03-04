@@ -50,12 +50,6 @@
 			<artifactId>sys-quartz</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- 集成系统自定义标签 -->
-		<dependency>
-			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>sys-tag</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		<!-- 集成系统附件 -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
