@@ -51,7 +51,7 @@ public class LoginController extends BaseController {
 			//完成登录
 			String token = loginService.in(loginName, pwd);
 			model.addAttribute("token", token);
-			return new PageResultEx(true, "登陆成功", token);
+			return PageResultEx.ok().data(token);
 		} catch (LoginException e) {
 			log.error("完成登录错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -72,7 +72,7 @@ public class LoginController extends BaseController {
 		try {
 			//完成退出登录
 			loginService.out();
-			return new PageResult(true, "退出登录成功");
+			return PageResult.ok();
 		} catch (Exception e) {
 			log.error("退出登录错误：", e);
 			return PageResult.err();
@@ -113,7 +113,7 @@ public class LoginController extends BaseController {
 	@ResponseBody
 	public PageResult sysTime() {
 		try {
-			return new PageResultEx(true, "获取成功", DateUtil.formatDateTime(new Date()));
+			return PageResultEx.ok().data(DateUtil.formatDateTime(new Date()));
 		} catch (Exception e) {
 			log.error("获取服务器时间错误：", e);
 			return PageResult.err().msg(e.getMessage());

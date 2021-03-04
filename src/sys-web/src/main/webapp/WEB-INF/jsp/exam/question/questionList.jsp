@@ -10,13 +10,13 @@
 	<body>
 		<div class="layui-fluid">
 			<div class="layui-row layui-col-space10">
-				<div class="layui-col-md2">
+				<!-- <div class="layui-col-md2">
 					<div class="layui-card">
 						<div class="layui-form">
 			      			<ul id="questionTypeTree" class="ztree"></ul>
 			 			</div>
 					</div>
-				</div>
+				</div> -->
 				<div class="layui-col-md10">
 					<div class="layui-card">
 						<%-- 试题查询条件 --%>
@@ -149,7 +149,7 @@
 		}
 		
 		//初始化试题分类树
-		function initQuestionTypeTree() {
+		function initQuestionTypeTree() {/* 
 			questionTypeTree = $.fn.zTree.init($("#questionTypeTree"), {
 				async : {
 					url : "question/questionTypeTreeList",
@@ -191,7 +191,7 @@
 			});
 			
 			$("#questionTypeTree").height($(window).height() - 45);
-		}
+		 */}
 		
 		//试题查询
 		function questionQuery() {
@@ -712,15 +712,15 @@
 				},
 				init : {
 					FilesAdded : function(up, files) {
-						if (!curSelQuestionTypeId) {
+						/* if (!curSelQuestionTypeId) {
 							layer.alert("请选择试题分类！", {"title" : "提示消息"});
 							return;
-						}
+						} */
 						
 						uploader.start();
 					},
 					BeforeUpload : function (uploader, files) {
-		                uploader.settings.url = "${pageContext.request.contextPath}/question/wordImp?questionTypeId=" + curSelQuestionTypeId;
+		                uploader.settings.url = "${pageContext.request.contextPath}/question/wordImp?questionTypeId=1";
 					},
 					UploadProgress : function(up, file) {
 					},

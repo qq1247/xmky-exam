@@ -45,10 +45,10 @@ public class ApiQuestionTypeController extends BaseController {
 	@ResponseBody
 	public PageResult list(PageIn pageIn) {
 		try {
-			return new PageResultEx(true, "查询成功", questionTypeService.getListpage(pageIn));
+			return PageResultEx.ok().data(questionTypeService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("试题分类列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 
@@ -63,13 +63,13 @@ public class ApiQuestionTypeController extends BaseController {
 	public PageResult add(String name, @RequestParam("file") MultipartFile file) {
 		try {
 			questionTypeService.addAndUpdate(name, file);
-			return new PageResult(true, "添加成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加试题分类错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("添加试题分类错误：", e);
-			return new PageResult(false, "未知异常");
+			return PageResult.err();
 		}
 	}
 
@@ -100,13 +100,13 @@ public class ApiQuestionTypeController extends BaseController {
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(((User)getCurUser()).getId());
 			questionTypeService.update(entity);
-			return new PageResult(true, "修改成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改试题分类错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("修改试题分类错误：", e);
-			return new PageResult(false, "未知异常");
+			return PageResult.err();
 		}
 	}
 	
@@ -121,13 +121,13 @@ public class ApiQuestionTypeController extends BaseController {
 	public PageResult del(Integer id) {
 		try {
 			questionTypeService.delAndUpdate(id);
-			return new PageResult(true, "删除成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("删除试题分类错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("删除试题分类错误：", e);
-			return new PageResult(false, "未知异常");
+			return PageResult.err();
 		}
 	}
 	
@@ -142,10 +142,10 @@ public class ApiQuestionTypeController extends BaseController {
 	@ResponseBody
 	public PageResult userList(PageIn pageIn) {  //Two - name (userName || orgName)  Ten - id
 		try {
-			return new PageResultEx(true, "查询成功", questionTypeService.getUserListpage(pageIn));
+			return PageResultEx.ok().data(questionTypeService.getUserListpage(pageIn));
 		} catch (Exception e) {
 			log.error("权限用户列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 	
@@ -164,13 +164,13 @@ public class ApiQuestionTypeController extends BaseController {
 	public PageResult auth(Integer id, Integer[] readUserIds, Integer[] writeUserIds, boolean rwState) {
 		try {
 			questionTypeService.doAuth(id, readUserIds, writeUserIds, rwState);
-			return new PageResult(true, "添加成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加权限用户错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("添加权限用户错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 }

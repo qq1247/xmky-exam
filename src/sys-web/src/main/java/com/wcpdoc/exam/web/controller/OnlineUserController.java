@@ -18,9 +18,7 @@ import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.core.constant.ConstantManager;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
-import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
@@ -78,7 +76,7 @@ public class OnlineUserController extends BaseController{
 				list.add(map);
 			}
 			
-			return PageResultEx.ok().data();new PageOut(list, list.size()));
+			return null; //PageOut(list, list.size()));
 		} catch (Exception e) {
 			log.error("在线用户列表错误：", e);
 			return PageResult.err();
@@ -101,7 +99,7 @@ public class OnlineUserController extends BaseController{
 			HttpSession session = sessionMap.get(id);
 			session.invalidate();//可能已失效
 			
-			return new PageResult(true, "强制退出成功");
+			return PageResult.ok();
 		} catch (Exception e) {
 			log.error("完成强制退出在线用户错误：", e);
 			return PageResult.err();

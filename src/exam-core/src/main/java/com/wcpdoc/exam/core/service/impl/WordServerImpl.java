@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.core.service.impl;
 
+import java.io.File;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,12 +11,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
 
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.exception.MyException;
@@ -62,6 +70,8 @@ public class WordServerImpl extends WordServer {
 
 	private Question parseQuestion(List<Node> singleQuestion) {
 		int answerIndex = 0;
+		int scoreIndex = 0;
+		int scoreOptionsIndex = 0;
 		int analysisIndex = 0;
 		int curIndex = 0;
 		Question question = new Question();
@@ -69,7 +79,16 @@ public class WordServerImpl extends WordServer {
 			String rowTxt = Jsoup.clean(node.outerHtml(), Whitelist.none()).trim();
 			if (rowTxt.startsWith("【答案】")) {
 				answerIndex = curIndex;
-			} else if (rowTxt.startsWith("【解析】")) {
+			}
+			
+			 else if (rowTxt.startsWith("【分值】")) {
+				 scoreIndex = curIndex;
+				}
+			 else if (rowTxt.startsWith("【分值选项】")) {
+				 scoreOptionsIndex = curIndex;
+				}
+			
+			else if (rowTxt.startsWith("【解析】")) {
 				analysisIndex = curIndex;
 			}
 
@@ -79,11 +98,17 @@ public class WordServerImpl extends WordServer {
 		if (answerIndex == 0) {
 			throw new MyException("不能从试题找到【答案】：【" + singleQuestion.toString() + "】");
 		}
+		if(scoreIndex == 0){
+			throw new MyException("不能从试题找到【分值】：【" + singleQuestion.toString() + "】");
+		}
+		if(scoreOptionsIndex == 0){
+			throw new MyException("不能从试题找到【分值选项】：【" + singleQuestion.toString() + "】");
+		}
 		if (analysisIndex == 0) {
 			throw new MyException("不能从试题找到【解析】：【" + singleQuestion.toString() + "】");
 		}
-		if (answerIndex >= analysisIndex) {
-			throw new MyException("【答案】必须在【解析】之前：【" + singleQuestion.toString() + "】");
+		if (answerIndex >= scoreIndex) {
+			throw new MyException("【答案】必须在【分值】之前：【" + singleQuestion.toString() + "】");
 		}
 
 		String titleTxt = Jsoup.clean(singleQuestion.get(0).outerHtml(), Whitelist.none()).trim();
@@ -182,7 +207,7 @@ public class WordServerImpl extends WordServer {
 			title = getTxt(singleQuestion, 0, answerIndex);
 		}
 		
-		String answer = Jsoup.clean(getTxt(singleQuestion, answerIndex, analysisIndex), Whitelist.none())
+		String answer = Jsoup.clean(getTxt(singleQuestion, answerIndex, scoreIndex), Whitelist.none())
 				.replaceAll(" ", "").replaceAll("\r", "").replaceAll("\n", "").substring(4);
 		if (type == 1 || type == 2) {
 			Set<String> set = new LinkedHashSet<>(Arrays.asList(answer.split("")));
@@ -195,7 +220,7 @@ public class WordServerImpl extends WordServer {
 			answer = StringUtil.join(set, ",");
 		} else if (type == 3) {
 			answer = "";
-			List<Node> subList = singleQuestion.subList(answerIndex, analysisIndex);
+			List<Node> subList = singleQuestion.subList(answerIndex, scoreIndex);
 			for (Node node : subList) {
 				String an = Jsoup.clean(node.outerHtml(), Whitelist.none())
 						.replaceAll(" ", "").replaceAll("\r", "").replaceAll("\n", "");
@@ -225,10 +250,47 @@ public class WordServerImpl extends WordServer {
 				throw new MyException("答案只能填：对错是否√×【"+singleQuestion.toString()+"】");
 			}
 		}
-
+		
+		//分值
+		Elements scoreElement = ((Element) singleQuestion.get(scoreIndex)).getElementsByTag("span");
+		scoreElement.html(scoreElement.html().substring(4));
+		String score = getTxt(singleQuestion, scoreIndex, scoreOptionsIndex);
+		String score2 = Jsoup.clean(score, Whitelist.none());//不填写回只返回样式，特殊处理一下
+		if (!ValidateUtil.isValid(score2)) { 
+			score = null;
+		}
+		
+		//分值选项
+		Elements scoreOptionsElement = ((Element) singleQuestion.get(scoreOptionsIndex)).getElementsByTag("span");
+		//1：半对半分；2：答案无顺序；3：大小写不敏感；4：包含答案得分
+		String substring = scoreOptionsElement.html().substring(6);
+		String scoreOptionsElementString = "";
+		if(substring.contains("半对半分")){
+			scoreOptionsElementString = scoreOptionsElementString + "1,";
+		}
+		if(substring.contains("答案无顺序")){
+			scoreOptionsElementString = scoreOptionsElementString + "2,";
+		}
+		if(substring.contains("大小写不敏感")){
+			scoreOptionsElementString = scoreOptionsElementString + "3,";
+		}
+		if(substring.contains("包含答案得分")){
+			scoreOptionsElementString = scoreOptionsElementString + "4,";
+		}
+		if (!scoreOptionsElementString.isEmpty()) {
+			CharSequence subSequence = scoreOptionsElementString.subSequence(0, scoreOptionsElementString.length()-1);
+			scoreOptionsElement.html(subSequence.toString());
+		}
+		
+		String scoreOptions = getTxt(singleQuestion, scoreOptionsIndex, analysisIndex);
+		String scoreOptions2 = Jsoup.clean(scoreOptions, Whitelist.none());//不填写回只返回样式，特殊处理一下
+		if (!ValidateUtil.isValid(scoreOptions2)) { 
+			scoreOptions = null;
+		}
+		//解析
 		Elements analysisElement = ((Element) singleQuestion.get(analysisIndex)).getElementsByTag("span");
 		analysisElement.html(analysisElement.html().substring(4));
-		String analysis = getTxt(singleQuestion, analysisIndex, singleQuestion.size());;
+		String analysis = getTxt(singleQuestion, analysisIndex, singleQuestion.size());
 		String analysis2 = Jsoup.clean(analysis, Whitelist.none());//不填写回只返回样式，特殊处理一下
 		if (!ValidateUtil.isValid(analysis2)) { 
 			analysis = null;
@@ -238,6 +300,8 @@ public class WordServerImpl extends WordServer {
 		question.setType(type);
 		question.setDifficulty(getDifficulty(difficultyName));
 		question.setAnswer(answer);
+		question.setScore(new BigDecimal(score2));
+		question.setScoreOptions(scoreOptions2);
 		question.setAnalysis(analysis);
 		return question;
 	}

@@ -2,7 +2,6 @@ package com.wcpdoc.exam.core.service.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -236,7 +235,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			question.setVer(1);
 			question.setState(2);//默认禁用
 			question.setQuestionTypeId(questionTypeId);
-			question.setScore(BigDecimal.ONE);
+			//question.setScore(BigDecimal.ONE);
 			question.setNo(1);
 			add(question);
 			

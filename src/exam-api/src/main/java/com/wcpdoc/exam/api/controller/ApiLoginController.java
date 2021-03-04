@@ -64,13 +64,13 @@ public class ApiLoginController extends BaseController {
 			data.put("saasId", personToken.getSaasId());
 			data.put("accessToken", personToken.getAccessToken());
 			data.put("refreshToken", personToken.getRefreshToken());
-			return new PageResultEx(true, "登录成功", data);
+			return PageResultEx.ok().data(data);
 		} catch (LoginException e) {
 			log.error("登录失败：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("登录失败：", e);
-			return new PageResult(false, "未知错误");
+			return PageResult.err();
 		}
 	}
 
@@ -109,13 +109,13 @@ public class ApiLoginController extends BaseController {
 			Map<String, Object> data = new HashMap<>();
 			data.put("accessToken", accessToken);
 			data.put("refreshToken", refreshToken);
-			return new PageResultEx(true, "刷新成功", data);
+			return PageResultEx.ok().data(data);
 		} catch (LoginException e) {
 			log.error("刷新令牌失败：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("刷新令牌失败：", e);
-			return new PageResult(false, "未知异常");
+			return PageResult.err();
 		}
 	}
 }
