@@ -62,7 +62,7 @@ public class QuestionTypeController extends BaseController {
 	@ResponseBody
 	public PageResult treeList() {
 		try {
-			return new PageResultEx(true, "查询成功", questionTypeService.getTreeList());
+			return null; // new PageResultEx(true, "查询成功", questionTypeService.getTreeList())
 		} catch (Exception e) {
 			log.error("试题分类树错误：", e);
 			return new PageResult(false, "查询失败");
@@ -112,7 +112,7 @@ public class QuestionTypeController extends BaseController {
 	@ResponseBody
 	public PageResult doAdd(QuestionType questionType) {
 		try {
-			questionTypeService.addAndUpdate(questionType);
+			//questionTypeService.addAndUpdate(questionType);
 			return new PageResult(true, "添加成功");
 		} catch (MyException e) {
 			log.error("完成添加试题分类错误：{}", e.getMessage());
@@ -132,12 +132,12 @@ public class QuestionTypeController extends BaseController {
 	@RequestMapping("/toEdit")
 	public String toEdit(Model model, Integer id) {
 		try {
-			QuestionType questionType = questionTypeService.getEntity(id);
+			/*QuestionType questionType = questionTypeService.getEntity(id);
 			model.addAttribute("questionType", questionType);
 			QuestionType parentQuestionType = questionTypeService.getEntity(questionType.getParentId());
 			if (parentQuestionType != null) {
 				model.addAttribute("parentQuestionType", questionTypeService.getEntity(questionType.getParentId()));
-			}
+			}*/
 			return "exam/questionType/questionTypeEdit";
 		} catch (Exception e) {
 			log.error("到达修改试题分类页面错误", e);
@@ -168,7 +168,7 @@ public class QuestionTypeController extends BaseController {
 			entity.setName(questionType.getName());
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(((User)getCurUser()).getId());
-			entity.setNo(questionType.getNo());
+			//entity.setNo(questionType.getNo());
 			questionTypeService.update(entity);
 			return new PageResult(true, "修改成功");
 		} catch (MyException e) {
@@ -228,7 +228,7 @@ public class QuestionTypeController extends BaseController {
 	@ResponseBody
 	public PageResult doMove(Integer sourceId, Integer targetId) {
 		try {
-			questionTypeService.doMove(sourceId, targetId);
+			//questionTypeService.doMove(sourceId, targetId);
 			return new PageResult(true, "移动成功");
 		} catch (MyException e) {
 			log.error("完成移动试题分类错误：{}", e.getMessage());
@@ -268,7 +268,7 @@ public class QuestionTypeController extends BaseController {
 	@ResponseBody
 	public PageResult authUserList(PageIn pageIn) {
 		try {
-			return new PageResultEx(true, "查询成功", questionTypeService.getAuthUserListpage(pageIn));
+			return null; // new PageResultEx(true, "查询成功", questionTypeService.getAuthUserListpage(pageIn))
 		} catch (Exception e) {
 			log.error("权限用户列表错误：", e);
 			return new PageResult(false, "查询失败");
@@ -286,7 +286,7 @@ public class QuestionTypeController extends BaseController {
 	@ResponseBody
 	public PageResult authPostList(PageIn pageIn) {
 		try {
-			return new PageResultEx(true, "查询成功", questionTypeService.getAuthPostListpage(pageIn));
+			return null;//  new PageResultEx(true, "查询成功", questionTypeService.getAuthPostListpage(pageIn))
 		} catch (Exception e) {
 			log.error("权限岗位列表错误：", e);
 			return new PageResult(false, "查询失败");
@@ -304,7 +304,7 @@ public class QuestionTypeController extends BaseController {
 	@ResponseBody
 	public PageResult authOrgList(PageIn pageIn) {
 		try {
-			return new PageResultEx(true, "查询成功", questionTypeService.getAuthOrgListpage(pageIn));
+			return null; // new PageResultEx(true, "查询成功", questionTypeService.getAuthOrgListpage(pageIn))
 		} catch (Exception e) {
 			log.error("权限机构列表错误：", e);
 			return new PageResult(false, "查询失败");
@@ -326,7 +326,7 @@ public class QuestionTypeController extends BaseController {
 	@ResponseBody
 	public PageResult doAuth(Integer id, Integer[] userIds, Integer[] postIds, Integer[] orgIds, boolean syn2Sub) {
 		try {
-			questionTypeService.doAuth(id, userIds, postIds, orgIds, syn2Sub);
+			//questionTypeService.doAuth(id, userIds, postIds, orgIds, syn2Sub);
 			return new PageResult(true, "添加成功");
 		} catch (MyException e) {
 			log.error("完成添加权限用户错误：{}", e.getMessage());

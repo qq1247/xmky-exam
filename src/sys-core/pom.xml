@@ -74,14 +74,18 @@
 			<artifactId>commons-beanutils</artifactId>
 			<version>1.9.3</version>
 		</dependency>
-
+		<!-- 集成第三方授权 令牌 -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>0.9.1</version>
+		</dependency>
 		<!-- 集成json解析 -->
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
 			<version>1.2.62</version>
 		</dependency>
-
 		<!-- 集成第三方授权 -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>

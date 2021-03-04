@@ -40,7 +40,7 @@ public interface QuestionService extends BaseService<Question>{
 	 * void 
 	 */
 	void updateAndUpdate(Question question, boolean newVer);
-
+	
 	/**
 	 * 完成导入试题
 	 * 
@@ -50,4 +50,13 @@ public interface QuestionService extends BaseService<Question>{
 	 * @return PageResult
 	 */
 	void wordImp(MultipartFile file, Integer questionTypeId);
+	
+	/**
+	 * 合并
+	 * 
+	 * v1.0 chenyun 2021年3月2日下午1:25:51
+	 * @param oldQuestionTypeId
+	 * @param newQuestionTypeId void
+	 */
+	void merge(Integer oldQuestionTypeId, Integer newQuestionTypeId);
 }

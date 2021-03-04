@@ -10,14 +10,14 @@
 	<body>
 		<div class="layui-fluid">
 			<div class="layui-row layui-col-space10">
-				<div class="layui-col-md2">
+<!-- 				<div class="layui-col-md2">
 					<div class="layui-card">
 						<div class="layui-form">
 			      			<ul id="questionTypeTree" class="ztree"></ul>
 			 			</div>
 					</div>
-				</div>
-				<div class="layui-col-md10">
+				</div> -->
+				<!-- <div class="layui-col-md10"> -->
 					<div class="layui-card">
 						<%-- 试题分类查询条件 --%>
 						<form id="questionTypeQueryForm" class="layui-form layui-card-header layuiadmin-card-header-auto">
@@ -50,7 +50,7 @@
 							<table id="questionTypeTable" lay-filter="questionTypeTable"></table>
 						</div>
 					</div>
-				</div>
+				<!-- </div> -->
 			</div>
 		</div>
 	</body>
@@ -172,11 +172,6 @@
 		
 		//到达添加试题分类页面
 		function toQuestionTypeAdd() {
-			if (!curSelQuestionTypeId) {
-				layer.alert("请选择上级试题分类！", {"title" : "提示消息"});
-				return;
-			}
-			
 			$.ajax({
 				url : "questionType/toAdd",
 				dataType : "html",
@@ -191,8 +186,6 @@
 							doQuestionTypeAdd(index);
 						},
 						success: function(layero, index) {
-							$("#parentQuestionTypeId").val(curSelQuestionTypeId);
-							$("#parentQuestionTypeName").val(curSelQuestionTypeName);
 							layui.form.render(null, "questionTypeEditFrom");
 						}
 					});

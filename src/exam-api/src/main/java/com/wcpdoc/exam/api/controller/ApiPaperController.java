@@ -1,0 +1,543 @@
+package com.wcpdoc.exam.api.controller;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.wcpdoc.exam.core.constant.ConstantManager;
+import com.wcpdoc.exam.core.controller.BaseController;
+import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageResult;
+import com.wcpdoc.exam.core.entity.PageResultEx;
+import com.wcpdoc.exam.core.entity.Paper;
+import com.wcpdoc.exam.core.entity.PaperQuestion;
+import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.service.PaperService;
+import com.wcpdoc.exam.core.service.PaperTypeService;
+import com.wcpdoc.exam.core.service.QuestionService;
+/**
+ * 试卷控制层
+ * 
+ * zhanghc 2018年10月21日上午8:16:06
+ */
+@Controller
+@RequestMapping("/api/paper")
+public class ApiPaperController extends BaseController {
+	private static final Logger log = LoggerFactory.getLogger(ApiPaperController.class);
+	
+	@Resource
+	private PaperService paperService;
+	@Resource
+	private PaperTypeService paperTypeService;
+	@Resource
+	private QuestionService questionService;
+	
+	/**
+	 * 试卷分类树
+	 * v1.0 zhanghc 2016-5-24下午14:54:09
+	 * 
+	 * @return List<Map<String,Object>>
+	 */
+	@RequestMapping("/paperTypeTreeList")
+	@ResponseBody
+	public PageResult paperTypeTreeList() {
+		try {
+			return new PageResultEx(true, "查询成功", paperTypeService.getAuthTreeList());
+		} catch (Exception e) {
+			log.error("试卷分类树错误：", e);
+			return new PageResult(false, "查询失败");
+		}
+	}
+	
+	/**
+	 * 试卷列表
+	 * 
+	 * zhanghc 2018年10月21日上午8:16:06
+	 * @return pageOut
+	 */
+	@RequestMapping("/list")
+	@ResponseBody
+	public PageResult list(PageIn pageIn) {
+		// one paperTypeId(试卷分类ID)
+		// two name(试卷名称)
+		// three state(试卷状态)
+		// four id(试卷ID)
+		try {
+			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
+				pageIn.setTen(getCurUser().getId().toString());
+			}
+			return new PageResultEx(true, "查询成功", paperService.getListpage(pageIn));
+		} catch (Exception e) {
+			log.error("试卷列表错误：", e);
+			return new PageResult(false, "查询失败");
+		}
+	}
+	
+	/**
+	 * 添加试卷
+	 * 
+	 * zhanghc 2018年10月21日上午8:16:06
+	 * @return pageOut
+	 */
+	@RequestMapping("/add")
+	@ResponseBody
+	public PageResult add(Paper paper) {
+		try {
+			paper.setUpdateUserId(getCurUser().getId());
+			paper.setUpdateTime(new Date());
+			paper.setTotalScore(BigDecimal.ZERO);
+			paper.setState(2);
+			paperService.add(paper);
+			return new PageResult(true, "添加成功");
+		} catch (MyException e) {
+			log.error("添加试卷错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
+		} catch (Exception e) {
+			log.error("添加试卷错误：", e);
+			return new PageResult(false, "未知异常");
+		}
+	}
+	
+	/**
+	 * 修改试卷
+	 * 
+	 * zhanghc 2018年10月21日上午8:16:06
+	 * @return pageOut
+	 */
+	@RequestMapping("/edit")
+	@ResponseBody
+	public PageResult edit(Paper paper) {
+		try {
+			Paper entity = paperService.getEntity(paper.getId());
+//			entity.setPaperTypeId(paper.getPaperTypeId());//不需要修改
+			entity.setName(paper.getName());
+			entity.setPreviewType(paper.getPreviewType());
+			entity.setPassScore(paper.getPassScore());
+			entity.setScoreA(paper.getScoreA());
+			entity.setScoreARemark(paper.getScoreARemark());
+			entity.setScoreB(paper.getScoreB());
+			entity.setScoreBRemark(paper.getScoreBRemark());
+			entity.setScoreC(paper.getScoreC());
+			entity.setScoreCRemark(paper.getScoreCRemark());
+			entity.setScoreD(paper.getScoreD());
+			entity.setScoreDRemark(paper.getScoreDRemark());
+			entity.setScoreE(paper.getScoreE());
+			entity.setScoreERemark(paper.getScoreERemark());
+			entity.setDescription(paper.getDescription());
+			//entity.setState(paper.getState());//单独控制
+			entity.setUpdateUserId(getCurUser().getId());
+			entity.setUpdateTime(new Date());
+			paperService.update(entity);
+			return new PageResult(true, "修改成功");
+		} catch (MyException e) {
+			log.error("修改试卷错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
+		} catch (Exception e) {
+			log.error("修改试卷错误：", e);
+			return new PageResult(false, "未知异常");
+		}
+	}
+	
+	/**
+	 * 删除试卷
+	 * 
+	 * zhanghc 2018年10月21日上午8:16:06
+	 * @return pageOut
+	 */
+	@RequestMapping("/del")
+	@ResponseBody
+	public PageResult del(Integer id) {
+		try {
+			Paper paper = paperService.getEntity(id);
+			paper.setState(0);
+			paper.setUpdateTime(new Date());
+			paper.setUpdateUserId(getCurUser().getId());
+			paperService.update(paper);
+			return new PageResult(true, "删除成功");
+		} catch (MyException e) {
+			log.error("删除试卷错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
+		} catch (Exception e) {
+			log.error("删除试卷错误：", e);
+			return new PageResult(false, "未知异常");
+		}
+	}
+	
+	/**
+	 * 拷贝试卷
+	 * 
+	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * @param id
+	 * @return pageOut
+	 */
+	@RequestMapping("/copy")
+	@ResponseBody
+	public PageResult copy(Integer id) {
+		try {
+			Paper paper = paperService.getEntity(id);
+			Paper entity = new Paper();
+			BeanUtils.copyProperties(entity, paper);
+			entity.setUpdateTime(new Date());
+			entity.setUpdateUserId(getCurUser().getId());
+			paperService.add(entity);
+			return new PageResult(true, "拷贝成功");
+		} catch (MyException e) {
+			log.error("拷贝试题错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
+		}  catch (Exception e) {
+			log.error("拷贝试题错误：", e);
+			return new PageResult(false, "未知异常");
+		}
+	}
+	
+	/**
+	 * 添加章节
+	 * 
+	 * v1.0 zhanghc 2018年10月21日上午8:16:22
+	 * @param chapter
+	 * @return PageResult
+	 */
+	@RequestMapping("/chapterAdd")
+	@ResponseBody
+	public PageResult chapterAdd(PaperQuestion chapter) {
+		try {
+			paperService.doChapterAdd(chapter);
+			return new PageResult(true, "添加成功");
+		} catch (MyException e) {
+			log.error("添加章节错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
+		} catch (Exception e) {
+			log.error("添加章节错误：", e);
+			return new PageResult(false, "未知异常！");
+		}
+	}
+	
+	/**
+	 * 修改章节
+	 * 
+	 * v1.0 zhanghc 2018年10月21日上午8:16:35
+	 * @param chapter
+	 * @return PageResult
+	 */
+	@RequestMapping("/chapterEdit")
+	@ResponseBody
+	public PageResult chapterEdit(PaperQuestion chapter) {
+		try {
+			paperService.doChapterEdit(chapter);
+			return new PageResult(true, "修改成功");
+		} catch (Exception e) {
+			log.error("修改章节错误：", e);
+			return new PageResult(false, "未知异常！");
+		}
+	}
+	
+	/**
+	 * 删除章节
+	 * 
+	 * v1.0 zhanghc 2018年10月21日上午8:16:46
+	 * @param chapterId
+	 * @return PageResult
+	 */
+	@RequestMapping("/chapterDel")
+	@ResponseBody
+	public PageResult chapterDel(Integer chapterId) {
+		try {
+			paperService.doChapterDel(chapterId);
+			return new PageResult(true, "删除成功");
+		} catch (MyException e) {
+			log.error("删除章节错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
+		} catch (Exception e) {
+			log.error("删除章节错误：", e);
+			return new PageResult(false, "未知异常！");
+		}
+	}
+	
+	/**
+	 * 章节上移
+	 * 
+	 * v1.0 zhanghc 2018年10月21日上午10:46:54
+	 * @param chapterId
+	 * @return PageResult
+	 */
+	@RequestMapping("/chapterUp")
+	@ResponseBody
+	public PageResult chapterUp(Integer chapterId) {
+		try {
+			paperService.doChapterUp(chapterId);
+			return new PageResult(true, "移动成功");
+		} catch (MyException e) {
+			log.error("章节上移错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
+		} catch (Exception e) {
+			log.error("章节上移错误：", e);
+			return new PageResult(false, "未知异常！");
+		}
+	}
+	
+	/**
+	 * 章节下移
+	 * 
+	 * v1.0 zhanghc 2018年10月21日上午10:46:54
+	 * @param chapterId
+	 * @return PageResult
+	 */
+	@RequestMapping("/chapterDown")
+	@ResponseBody
+	public PageResult chapterDown(Integer chapterId) {
+		try {
+			paperService.doChapterDown(chapterId);
+			return new PageResult(true, "移动成功");
+		} catch (MyException e) {
+			log.error("章节下移错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
+		} catch (Exception e) {
+			log.error("章节下移错误：", e);
+			return new PageResult(false, "未知异常！");
+		}
+	}
+	
+	/**
+	 * 试题列表
+	 * 
+	 * v1.0 zhanghc 2018年10月21日上午8:17:09
+	 * @param pageIn
+	 * @return PageOut
+	 */
+	@RequestMapping("/questionList")
+	@ResponseBody
+	public PageResult questionList(PageIn pageIn) {
+		try {
+			if (getCurUser().getId() != 1) {
+				pageIn.setFour("1");
+				pageIn.setTen(getCurUser().getId().toString());
+			}
+
+			return new PageResultEx(true, "查询成功", questionService.getListpage(pageIn));
+		} catch (Exception e) {
+			log.error("试题列表错误：", e);
+			return new PageResult(false, "查询失败");
+		}
+	}
+	
+	/**
+	 * 添加试题
+	 * 
+	 * v1.0 zhanghc 2018年10月21日上午8:17:26
+	 * @param chapterId
+	 * @param questionIds
+	 * @return PageResult
+	 */
+	@RequestMapping("/questionAdd")
+	@ResponseBody
+	public PageResult questionAdd(Integer chapterId, Integer[] questionIds) {
+		try {
+			paperService.doQuestionAdd(chapterId, questionIds);
+			return new PageResult(true, "添加成功");
+		} catch (MyException e) {
+			log.error("添加试题错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
+		} catch (Exception e) {
+			log.error("添加试题错误：", e);
+			return new PageResult(false, "未知异常！");
+		}
+	}
+	
+	/**
+	 * 设置分数
+	 * 
+	 * v1.0 zhanghc 2018年10月21日上午10:46:54
+	 * @param paperQuestionId
+	 * @param score
+	 * @param options
+	 * @return PageResult
+	 */
+	@RequestMapping("/scoreUpdate")
+	@ResponseBody
+	public PageResult scoreUpdate(Integer paperQuestionId, BigDecimal score) {
+		try {
+			paperService.doScoreUpdate(paperQuestionId, score);
+			return new PageResult(true, "设置成功");
+		} catch (MyException e) {
+			log.error("设置分数错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
+		} catch (Exception e) {
+			log.error("设置分数错误：", e);
+			return new PageResult(false, "未知异常！");
+		}
+	}
+	
+	/**
+	 * 设置选项
+	 * 
+	 * v1.0 zhanghc 2018年10月21日上午10:46:54
+	 * @param paperQuestionId
+	 * @param options
+	 * @return PageResult
+	 */
+	@RequestMapping("/optionsUpdate")
+	@ResponseBody
+	public PageResult optionsUpdate(Integer paperQuestionId, Integer[] options) {
+		try {
+			paperService.doOptionsUpdate(paperQuestionId, options);
+			return new PageResult(true, "设置成功");
+		} catch (MyException e) {
+			log.error("设置分数错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
+		} catch (Exception e) {
+			log.error("设置分数错误：", e);
+			return new PageResult(false, "未知异常！");
+		}
+	}
+	
+	/**
+	 * 批量设置分数
+	 * 
+	 * v1.0 zhanghc 2018年10月21日上午10:46:54
+	 * @param chapterId
+	 * @param score
+	 * @param options
+	 * @return PageResult
+	 */
+	@RequestMapping("/batchScoreUpdate")
+	@ResponseBody
+	public PageResult batchScoreUpdate(Integer chapterId, BigDecimal score, String options) {
+		try {
+			paperService.doBatchScoreUpdate(chapterId, score, options);
+			return new PageResult(true, "设置成功");
+		} catch (MyException e) {
+			log.error("设置分数错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
+		} catch (Exception e) {
+			log.error("设置分数错误：", e);
+			return new PageResult(false, "未知异常！");
+		}
+	}
+	
+	/**
+	 * 试题上移
+	 * 
+	 * v1.0 zhanghc 2018年10月21日上午10:46:54
+	 * @param paperQuestionId
+	 * @return PageResult
+	 */
+	@RequestMapping("/questionUp")
+	@ResponseBody
+	public PageResult questionUp(Integer paperQuestionId) {
+		try {
+			paperService.doQuestionUp(paperQuestionId);
+			return new PageResult(true, "移动成功");
+		} catch (MyException e) {
+			log.error("试题上移错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
+		} catch (Exception e) {
+			log.error("试题上移错误：", e);
+			return new PageResult(false, "未知异常！");
+		}
+	}
+	
+	/**
+	 * 试题下移
+	 * 
+	 * v1.0 zhanghc 2018年10月21日上午10:46:54
+	 * @param paperQuestionId
+	 * @return PageResult
+	 */
+	@RequestMapping("/questionDown")
+	@ResponseBody
+	public PageResult questionDown(Integer paperQuestionId) {
+		try {
+			paperService.doQuestionDown(paperQuestionId);
+			return new PageResult(true, "移动成功");
+		} catch (MyException e) {
+			log.error("试题下移错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
+		} catch (Exception e) {
+			log.error("试题下移错误：", e);
+			return new PageResult(false, "未知异常！");
+		}
+	}
+	
+	/**
+	 * 试题删除
+	 * 
+	 * v1.0 zhanghc 2018年10月21日下午10:41:34
+	 * @param paperQuestionId
+	 * @return PageResult
+	 */
+	@RequestMapping("/questionDel")
+	@ResponseBody
+	public PageResult questionDel(Integer paperQuestionId) {
+		try {
+			paperService.doQuestionDel(paperQuestionId);
+			return new PageResult(true, "删除成功");
+		} catch (MyException e) {
+			log.error("试题删除错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
+		} catch (Exception e) {
+			log.error("试题删除错误：", e);
+			return new PageResult(false, "未知异常！");
+		}
+	}
+	
+	/**
+	 * 清空试题
+	 * 
+	 * v1.0 zhanghc 2018年10月21日上午8:17:32
+	 * @param chapterId
+	 * @return PageResult
+	 */
+	@RequestMapping("/questionClear")
+	@ResponseBody
+	public PageResult questionClear(Integer chapterId) {
+		try {
+			paperService.doQuestionClear(chapterId);
+			return new PageResult(true, "添加成功");
+		} catch (MyException e) {
+			log.error("添加试题错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
+		} catch (Exception e) {
+			log.error("添加试题错误：", e);
+			return new PageResult(false, "未知异常！");
+		}
+	}
+	
+	/**
+	 * 发布
+	 * 
+	 * v1.0 zhanghc 2018年11月24日上午9:13:22
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/publish")
+	@ResponseBody
+	public PageResult publish(Integer id) {
+		try {
+			Paper paper = paperService.getEntity(id);
+			if(paper.getState() == 0) {
+				throw new MyException("试卷【"+paper.getName()+"】已删除！");
+			}
+			if(paper.getState() == 1) {
+				throw new MyException("试卷【"+paper.getName()+"】已发布！");
+			}
+			
+			paper.setState(1);
+			paperService.update(paper);
+			return new PageResult(true, "发布成功");
+		} catch (MyException e) {
+			log.error("发布错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
+		} catch (Exception e) {
+			log.error("发布错误：", e);
+			return new PageResult(false, "未知异常！");
+		}
+	}
+}

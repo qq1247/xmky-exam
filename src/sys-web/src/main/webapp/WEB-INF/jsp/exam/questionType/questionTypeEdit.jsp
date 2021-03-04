@@ -1,7 +1,7 @@
 <%@ page language="java" pageEncoding="utf-8"%>
 <div lay-filter="questionTypeEditFrom" class="layui-form" style="padding: 20px 0 0 0;">
 	<input type="hidden" name="id" value="${questionType.id }" />
-	<div class="layui-row layui-form-item">
+	<%-- <div class="layui-row layui-form-item">
 		<div class="layui-col-md11">
 			<label class="layui-form-label">上级分类：</label>
 			<div class="layui-input-block">
@@ -10,10 +10,10 @@
 					class="layui-input layui-disabled" lay-verify="required" readonly="readonly">
 			</div>
 		</div>
-	</div>
+	</div> --%>
 	<div class="layui-row layui-form-item">
 		<div class="layui-col-md11">
-			<label class="layui-form-label">名称：</label>
+			<label class="layui-form-label">题库名称：</label>
 			<div class="layui-input-block">
 				<input name="name" value="${questionType.name }" 
 					class="layui-input" lay-verify="required" placeholder="请输入名称">
