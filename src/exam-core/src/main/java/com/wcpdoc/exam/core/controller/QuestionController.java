@@ -75,7 +75,7 @@ public class QuestionController extends BaseController {
 			return null; // new PageResultEx(true, "查询成功", questionTypeService.getAuthTreeList())
 		} catch (Exception e) {
 			log.error("获取试题分类树错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 	
@@ -92,10 +92,10 @@ public class QuestionController extends BaseController {
 			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
 				pageIn.setTen(getCurUser().getId().toString());
 			}
-			return new PageResultEx(true, "查询成功",  questionService.getListpage(pageIn));
+			return PageResultEx.ok().data( questionService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("试题列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 	
@@ -135,13 +135,13 @@ public class QuestionController extends BaseController {
 	public PageResult doAdd(Question question) {
 		try {
 			questionService.addAndUpdate(question);
-			return new PageResult(true, "添加成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成添加试题错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		}  catch (Exception e) {
 			log.error("完成添加试题错误：", e);
-			return new PageResult(false, "未知异常");
+			return PageResult.err();
 		}
 	}
 	
@@ -184,13 +184,13 @@ public class QuestionController extends BaseController {
 	public PageResult doEdit(Question question, boolean newVer) {
 		try {
 			questionService.updateAndUpdate(question, newVer);
-			return new PageResult(true, "修改成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成修改试题错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		}  catch (Exception e) {
 			log.error("完成修改试题错误：", e);
-			return new PageResult(false, "未知异常");
+			return PageResult.err();
 		}
 	}
 	
@@ -210,13 +210,13 @@ public class QuestionController extends BaseController {
 			question.setUpdateTime(new Date());
 			question.setUpdateUserId(getCurUser().getId());
 			questionService.update(question);
-			return new PageResult(true, "删除成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成删除试题错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		}  catch (Exception e) {
 			log.error("完成删除试题错误：", e);
-			return new PageResult(false, "未知异常");
+			return PageResult.err();
 		}
 	}
 	
@@ -233,13 +233,13 @@ public class QuestionController extends BaseController {
 	public PageResult wordImp(@RequestParam("file") MultipartFile file, Integer questionTypeId) {
 		try {
 			questionService.wordImp(file, questionTypeId);
-			return new PageResult(true, "导入成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("导入试题错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("导入试题错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 	
@@ -294,13 +294,13 @@ public class QuestionController extends BaseController {
 			question.setUpdateTime(new Date());
 			question.setUpdateUserId(getCurUser().getId());
 			questionService.update(question);
-			return new PageResult(true, "发布成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成发布错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成发布错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 }

@@ -66,10 +66,10 @@ public class FileController extends BaseController {
 	@ResponseBody
 	public PageResult list(PageIn pageIn) {
 		try {
-			return new PageResultEx(true, "查询成功", fileService.getListpage(pageIn));
+			return PageResultEx.ok().data(fileService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("附件列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 
@@ -106,13 +106,13 @@ public class FileController extends BaseController {
 			String fileIds = fileService.doTempUpload(files, allowTypes);
 			Map<String, Object> data = new HashMap<String, Object>();
 			data.put("fileIds", fileIds);
-			return new PageResultEx(true, "完成临时上传附件成功", data);
+			return PageResultEx.ok().data(data);
 		} catch (MyException e) {
 			log.error("完成临时上传附件失败：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成临时上传附件失败：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 
@@ -145,13 +145,13 @@ public class FileController extends BaseController {
 				throw new MyException(message.toString());
 			}
 
-			return new PageResult(true, "完成上传附件成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成上传附件失败：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成上传附件失败：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 
@@ -200,13 +200,13 @@ public class FileController extends BaseController {
 			File file = fileService.getEntity(id);
 			file.setState(0);
 			fileService.update(file);
-			return new PageResult(true, "删除成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成删除附件错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成删除附件错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 }

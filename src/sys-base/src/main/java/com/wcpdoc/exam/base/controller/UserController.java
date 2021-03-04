@@ -77,10 +77,10 @@ public class UserController extends BaseController {
 	@ResponseBody
 	public PageResult orgTreeList() {
 		try {
-			return new PageResultEx(true, "查询成功", orgService.getTreeList());
+			return PageResultEx.ok().data(orgService.getTreeList());
 		} catch (Exception e) {
 			log.error("获取组织机构树错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 	
@@ -110,10 +110,10 @@ public class UserController extends BaseController {
 				postMapList.add(map);
 			}
 			
-			return new PageResultEx(true, "查询成功", postMapList);
+			return PageResultEx.ok().data(postMapList);
 		} catch (Exception e) {
 			log.error("获取岗位树错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 
@@ -129,10 +129,10 @@ public class UserController extends BaseController {
 	@ResponseBody
 	public PageResult list(PageIn pageIn) {
 		try {
-			return new PageResultEx(true, "查询成功", userService.getListpage(pageIn));
+			return PageResultEx.ok().data(userService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("用户列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 
@@ -186,13 +186,13 @@ public class UserController extends BaseController {
 			userService.doPwdUpdate(user.getId(), initPwd);
 			Map<String, Object> data = new HashMap<String, Object>();
 			data.put("initPwd", initPwd);
-			return new PageResultEx(true, "添加成功", data);
+			return PageResultEx.ok().data(data);
 		} catch (MyException e) {
 			log.error("完成添加用户错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加用户错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 
@@ -261,13 +261,13 @@ public class UserController extends BaseController {
 				data.put("initPwd", initPwd);
 			}
 
-			return new PageResultEx(true, "修改成功", data);
+			return PageResultEx.ok().data(data);
 		} catch (MyException e) {
 			log.error("完成修改用户错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成修改用户错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 
@@ -290,13 +290,13 @@ public class UserController extends BaseController {
 				user.setUpdateUserId(getCurUser().getId());
 				userService.update(user);
 			}
-			return new PageResult(true, "删除成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成删除用户错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成删除用户错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 
@@ -340,7 +340,7 @@ public class UserController extends BaseController {
 				user.setUpdateTime(new Date());
 				user.setUpdateUserId(getCurUser().getId());
 				userService.update(user);
-				return new PageResult(true, "设置成功");
+				return PageResult.ok();
 			}
 			
 			List<Post> postList = postService.getOrgPostList(user.getOrgId());
@@ -357,13 +357,13 @@ public class UserController extends BaseController {
 			user.setUpdateTime(new Date());
 			user.setUpdateUserId(getCurUser().getId());
 			userService.update(user);
-			return new PageResult(true, "设置成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成设置岗位错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成设置岗位错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 
@@ -414,13 +414,13 @@ public class UserController extends BaseController {
 				user.setPostIds(null);//清空岗位，因为机构变更了
 				userService.update(user);
 			}
-			return new PageResult(true, "设置成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成设置组织机构错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成设置组织机构错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 
@@ -440,13 +440,13 @@ public class UserController extends BaseController {
 			userService.doPwdUpdate(id, initPwd);
 			Map<String, Object> data = new HashMap<String, Object>();
 			data.put("initPwd", initPwd);
-			return new PageResultEx(true, "初始化成功", data);
+			return PageResultEx.ok().data(data);
 		} catch (MyException e) {
 			log.error("完成初始化密码错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成初始化密码错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 }

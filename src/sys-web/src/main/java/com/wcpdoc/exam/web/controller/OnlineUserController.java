@@ -78,10 +78,10 @@ public class OnlineUserController extends BaseController{
 				list.add(map);
 			}
 			
-			return new PageResultEx(true, "查询成功", new PageOut(list, list.size()));
+			return PageResultEx.ok().data();new PageOut(list, list.size()));
 		} catch (Exception e) {
 			log.error("在线用户列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 	
@@ -104,7 +104,7 @@ public class OnlineUserController extends BaseController{
 			return new PageResult(true, "强制退出成功");
 		} catch (Exception e) {
 			log.error("完成强制退出在线用户错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 }

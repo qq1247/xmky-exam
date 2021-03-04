@@ -38,13 +38,13 @@ public class ProgressBarController extends BaseController {
 			if (progressBar == null) {
 				throw new MyException("参数错误：id");
 			}
-			return new PageResultEx(true, "查询成功", progressBar);
+			return PageResultEx.ok().data(progressBar);
 		} catch (MyException e) {
 			log.error("获取进度条错误：", e);
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("获取进度条错误：", e);
-			return new PageResult(false, "未知错误");
+			return PageResult.err();
 		}
 	}
 }

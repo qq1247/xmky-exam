@@ -62,10 +62,10 @@ public class ExamTypeController extends BaseController {
 	@ResponseBody
 	public PageResult treeList() {
 		try {
-			return new PageResultEx(true, "查询成功", examTypeService.getTreeList());
+			return PageResultEx.ok().data(examTypeService.getTreeList());
 		} catch (Exception e) {
 			log.error("试题分类树错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 	
@@ -79,10 +79,10 @@ public class ExamTypeController extends BaseController {
 	@ResponseBody
 	public PageResult list(PageIn pageIn) {
 		try {
-			return new PageResultEx(true, "查询成功", examTypeService.getListpage(pageIn));
+			return PageResultEx.ok().data(examTypeService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("试题分类列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 	
@@ -113,13 +113,13 @@ public class ExamTypeController extends BaseController {
 	public PageResult doAdd(ExamType examType) {
 		try {
 			examTypeService.addAndUpdate(examType);
-			return new PageResult(true, "添加成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成添加试题分类错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加试题分类错误：", e);
-			return new PageResult(false, "未知异常");
+			return PageResult.err();
 		}
 	}
 	
@@ -170,13 +170,13 @@ public class ExamTypeController extends BaseController {
 			entity.setUpdateUserId(((User)getCurUser()).getId());
 			entity.setNo(examType.getNo());
 			examTypeService.update(entity);
-			return new PageResult(true, "修改成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成修改试题分类错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成修改试题分类错误：", e);
-			return new PageResult(false, "未知异常");
+			return PageResult.err();
 		}
 	}
 	
@@ -191,13 +191,13 @@ public class ExamTypeController extends BaseController {
 	public PageResult doDel(Integer id) {
 		try {
 			examTypeService.delAndUpdate(id);
-			return new PageResult(true, "删除成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成删除试题分类错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成删除试题分类错误：", e);
-			return new PageResult(false, "未知异常");
+			return PageResult.err();
 		}
 	}
 	
@@ -229,13 +229,13 @@ public class ExamTypeController extends BaseController {
 	public PageResult doMove(Integer sourceId, Integer targetId) {
 		try {
 			examTypeService.doMove(sourceId, targetId);
-			return new PageResult(true, "移动成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成移动试题分类错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成移动试题分类错误：", e);
-			return new PageResult(false, "未知异常");
+			return PageResult.err();
 		}
 	}
 	
@@ -268,10 +268,10 @@ public class ExamTypeController extends BaseController {
 	@ResponseBody
 	public PageResult authUserList(PageIn pageIn) {
 		try {
-			return new PageResultEx(true, "查询成功", examTypeService.getAuthUserListpage(pageIn));
+			return PageResultEx.ok().data(examTypeService.getAuthUserListpage(pageIn));
 		} catch (Exception e) {
 			log.error("权限用户列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 	
@@ -286,10 +286,10 @@ public class ExamTypeController extends BaseController {
 	@ResponseBody
 	public PageResult authPostList(PageIn pageIn) {
 		try {
-			return new PageResultEx(true, "查询成功", examTypeService.getAuthPostListpage(pageIn));
+			return PageResultEx.ok().data(examTypeService.getAuthPostListpage(pageIn));
 		} catch (Exception e) {
 			log.error("权限岗位列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 	
@@ -304,10 +304,10 @@ public class ExamTypeController extends BaseController {
 	@ResponseBody
 	public PageResult authOrgList(PageIn pageIn) {
 		try {
-			return new PageResultEx(true, "查询成功", examTypeService.getAuthOrgListpage(pageIn));
+			return PageResultEx.ok().data(examTypeService.getAuthOrgListpage(pageIn));
 		} catch (Exception e) {
 			log.error("权限机构列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 	
@@ -327,13 +327,13 @@ public class ExamTypeController extends BaseController {
 	public PageResult doAuth(Integer id, Integer[] userIds, Integer[] postIds, Integer[] orgIds, boolean syn2Sub) {
 		try {
 			examTypeService.doAuth(id, userIds, postIds, orgIds, syn2Sub);
-			return new PageResult(true, "添加成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成添加权限用户错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加权限用户错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 }

@@ -6,23 +6,31 @@ package com.wcpdoc.exam.core.entity;
  * v1.0 zhanghc 2015-6-19下午08:30:16
  */
 public class PageResultEx extends PageResult {
-	private Object data;
+	protected Object data;
 
-	public PageResultEx() {
+	protected PageResultEx() {
 
 	}
 
-	public PageResultEx(boolean succ, String msg, Object data) {
-		this.succ = succ;
+	protected PageResultEx(Integer code, String msg) {
+		this.code = code;
 		this.msg = msg;
+	}
+
+	public PageResultEx data(Object data) {
 		this.data = data;
+		return this;
 	}
 
-	public Object getData() {
-		return data;
+	public static PageResultEx custom() {
+		return new PageResultEx();
 	}
 
-	public void setData(Object curData) {
-		this.data = curData;
+	public static PageResultEx ok() {
+		return new PageResultEx(PageResult.HTTP_200, PageResult.HTTP_200_MSG);
+	}
+
+	public static PageResultEx err() {
+		return new PageResultEx(HTTP_500, HTTP_500_MSG);
 	}
 }

@@ -60,10 +60,10 @@ public class ResController extends BaseController {
 	@ResponseBody
 	public PageResult treeList(Integer type) {
 		try {
-			return new PageResultEx(true, "查询成功", resService.getTreeList(type));
+			return PageResultEx.ok().data(resService.getTreeList(type));
 		}catch (Exception e) {
 			log.error("获取资源树列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 
@@ -79,10 +79,10 @@ public class ResController extends BaseController {
 	@ResponseBody
 	public PageResult list(PageIn pageIn) {
 		try {
-			return new PageResultEx(true, "查询成功", resService.getListpage(pageIn));
+			return PageResultEx.ok().data(resService.getListpage(pageIn));
 		}catch (Exception e) {
 			log.error("资源列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 
@@ -116,13 +116,13 @@ public class ResController extends BaseController {
 	public PageResult doAdd(Res res) {
 		try {
 			resService.addAndUpdate(res);
-			return new PageResult(true, "添加成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成添加资源错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加资源错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 
@@ -163,13 +163,13 @@ public class ResController extends BaseController {
 	public PageResult doEdit(Res res) {
 		try {
 			resService.editAndUpdate(res);
-			return new PageResult(true, "修改成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成修改资源错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成修改资源错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 
@@ -186,13 +186,13 @@ public class ResController extends BaseController {
 	public PageResult doDel(Integer id) {
 		try {
 			resService.delAndUpdate(id);
-			return new PageResult(true, "删除成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成删除资源错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成删除资源错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 
@@ -227,13 +227,13 @@ public class ResController extends BaseController {
 	public PageResult doMove(Integer sourceId, Integer targetId) {
 		try {
 			resService.doMove(sourceId, targetId);
-			return new PageResult(true, "移动成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成移动资源错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成移动资源错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 }

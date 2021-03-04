@@ -71,10 +71,10 @@ public class PostController extends BaseController {
 	@ResponseBody
 	public PageResult orgTreeList() {
 		try {
-			return new PageResultEx(true, "查询成功", orgService.getTreeList());
+			return PageResultEx.ok().data(orgService.getTreeList());
 		} catch (Exception e) {
 			log.error("组织机构树错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 	
@@ -98,10 +98,10 @@ public class PostController extends BaseController {
 				}
 			}
 			
-			return new PageResultEx(true, "查询成功", resTreeList);
+			return PageResultEx.ok().data(resTreeList);
 		} catch (Exception e) {
 			log.error("权限树错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 
@@ -117,10 +117,10 @@ public class PostController extends BaseController {
 	@ResponseBody
 	public PageResult list(PageIn pageIn) {
 		try {
-			return new PageResultEx(true, "查询成功", postService.getListpage(pageIn));
+			return PageResultEx.ok().data(postService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("岗位列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 
@@ -174,13 +174,13 @@ public class PostController extends BaseController {
 			post.setState(1);
 			post.setResIds(null);
 			postService.add(post);
-			return new PageResult(true, "添加成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成添加岗位错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加岗位错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 
@@ -237,13 +237,13 @@ public class PostController extends BaseController {
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
 			postService.update(entity);
-			return new PageResult(true, "修改成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成修改岗位错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成修改岗位错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 
@@ -264,13 +264,13 @@ public class PostController extends BaseController {
 			post.setUpdateTime(new Date());
 			post.setUpdateUserId(getCurUser().getId());
 			postService.update(post);
-			return new PageResult(true, "删除成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成删除岗位错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成删除岗位错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 
@@ -317,13 +317,13 @@ public class PostController extends BaseController {
 				post.setResIds(String.format(",%s,", StringUtil.join(resIds)));
 			}
 			postService.update(post);
-			return new PageResult(true, "设置成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成设置权限错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成设置权限错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 }

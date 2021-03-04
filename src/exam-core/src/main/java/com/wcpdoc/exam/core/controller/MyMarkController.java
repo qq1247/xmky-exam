@@ -106,10 +106,10 @@ public class MyMarkController extends BaseController {
 				}
 			}
 
-			return new PageResultEx(true, "查询成功", pageOut);
+			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("我的阅卷列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 	
@@ -192,10 +192,10 @@ public class MyMarkController extends BaseController {
 				}
 			}
 			
-			return new PageResultEx(true, "查询成功", pageOut);
+			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("我的阅卷详细列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 	
@@ -330,13 +330,13 @@ public class MyMarkController extends BaseController {
 			myExamDetail.setMyMarkId(getCurUser().getId());
 			myExamDetail.setMarkTime(new Date());
 			myExamDetailService.update(myExamDetail);
-			return new PageResult(true, "更新成功！");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("更新分数错误：", e);
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("更新分数错误：", e);
-			return new PageResult(false, "未知错误！");
+			return PageResult.err();
 		}
 	}
 	
@@ -407,13 +407,13 @@ public class MyMarkController extends BaseController {
 			myExam.setUpdateTime(new Date());
 			myExam.setUpdateUserId(getCurUser().getId());
 			myExamService.update(myExam);
-			return new PageResultEx(true, "阅卷成功！", null);
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成阅卷错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成阅卷错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 	
@@ -436,10 +436,10 @@ public class MyMarkController extends BaseController {
 				}
 			}).start();
 			
-			return new PageResultEx(true, "完成成功", processBarId);
+			return PageResultEx.ok().data(processBarId);
 		} catch (Exception e) {
 			log.error("完成试卷错误：", e);
-			return new PageResult(false, "完成失败：" + e.getMessage());
+			return PageResult.err();
 		}
 	}
 }

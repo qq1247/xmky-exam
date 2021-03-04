@@ -56,10 +56,10 @@ public class QuestionTypeOpenController extends BaseController {
 	@ResponseBody
 	public PageResult list(PageIn pageIn) {
 		try {
-			return new PageResultEx(true, "查询成功", questionTypeOpenService.getListpage(pageIn));
+			return PageResultEx.ok().data(questionTypeOpenService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("试题分类列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 	
@@ -92,13 +92,13 @@ public class QuestionTypeOpenController extends BaseController {
 			questionTypeOpen.setUpdateUserId(getCurUser().getId());
 			questionTypeOpen.setUpdateTime(new Date());
 			questionTypeOpenService.add(questionTypeOpen);
-			return new PageResult(true, "添加成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成添加试题分类错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加试题分类错误：", e);
-			return new PageResult(false, "未知异常");
+			return PageResult.err();
 		}
 	}
 	
@@ -140,13 +140,13 @@ public class QuestionTypeOpenController extends BaseController {
 			entity.setState(questionTypeOpen.getState());
 			entity.setQuestionTypeId(questionTypeOpen.getQuestionTypeId());
 			questionTypeOpenService.update(entity);
-			return new PageResult(true, "修改成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成修改试题分类错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成修改试题分类错误：", e);
-			return new PageResult(false, "未知异常");
+			return PageResult.err();
 		}
 	}
 	
@@ -161,13 +161,13 @@ public class QuestionTypeOpenController extends BaseController {
 	public PageResult doDel(Integer id) {
 		try {
 			questionTypeOpenService.delAndUpdate(id);
-			return new PageResult(true, "删除成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成删除试题分类错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成删除试题分类错误：", e);
-			return new PageResult(false, "未知异常");
+			return PageResult.err();
 		}
 	}
 

@@ -64,10 +64,10 @@ public class OrgController extends BaseController {
 	@ResponseBody
 	public PageResult treeList() {
 		try {
-			return new PageResultEx(true, "查询成功", orgService.getTreeList());
+			return PageResultEx.ok().data(orgService.getTreeList());
 		} catch (Exception e) {
 			log.error("组织机构树错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 
@@ -83,10 +83,10 @@ public class OrgController extends BaseController {
 	@ResponseBody
 	public PageResult list(PageIn pageIn) {
 		try {
-			return new PageResultEx(true, "查询成功", orgService.getListpage(pageIn));
+			return PageResultEx.ok().data(orgService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("组织机构列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 
@@ -121,13 +121,13 @@ public class OrgController extends BaseController {
 		try {
 			orgService.addAndUpdate(org);
 			Map<String, Object> data = new HashMap<String, Object>();
-			return new PageResultEx(true, "添加成功", data);
+			return PageResultEx.ok().data(data);
 		} catch (MyException e) {
 			log.error("完成添加组织机构错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加组织机构错误：", e);
-			return new PageResult(false, "未知异常");
+			return PageResult.err();
 		}
 	}
 
@@ -186,13 +186,13 @@ public class OrgController extends BaseController {
 			entity.setNo(org.getNo());
 			entity.setCode(org.getCode());
 			orgService.update(entity);
-			return new PageResult(true, "修改成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成修改组织机构错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成修改组织机构错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 
@@ -209,13 +209,13 @@ public class OrgController extends BaseController {
 	public PageResult doDel(Integer id) {
 		try {
 			orgService.delAndUpdate(id);
-			return new PageResult(true, "删除成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成删除组织机构错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成删除组织机构错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 
@@ -250,13 +250,13 @@ public class OrgController extends BaseController {
 	public PageResult doMove(Integer sourceId, Integer targetId) {
 		try {
 			orgService.doMove(sourceId, targetId);
-			return new PageResult(true, "移动成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成移动组织机构错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成移动组织机构错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 }

@@ -33,14 +33,14 @@ public class GlobalExceptionHandler {
 	@ResponseBody
 	public PageResult exceptionHandler(ShiroException se) {
 		if (se instanceof IncorrectCredentialsException || se instanceof UnknownAccountException) {
-			return new PageResult(false, se.getMessage());
+			return PageResult.err().msg(se.getMessage());
 		}
 		
 		if (se instanceof UnauthorizedException) {
-			return new PageResult(false, "未授权");
+			return PageResult.err().msg("未授权");
 		}
 
 		log.error("shiro未捕获异常：{}", se.getMessage());
-		return new PageResult(false, "未知错误");
+		return PageResult.err();
 	}
 }

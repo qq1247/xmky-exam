@@ -73,10 +73,10 @@ public class ExamController extends BaseController{
 	@ResponseBody
 	public PageResult examTypeTreeList() {
 		try {
-			return new PageResultEx(true, "查询成功", examTypeService.getAuthTreeList());
+			return PageResultEx.ok().data(examTypeService.getAuthTreeList());
 		} catch (Exception e) {
 			log.error("获取考试分类树错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 	
@@ -95,10 +95,10 @@ public class ExamController extends BaseController{
 				pageIn.setTen(getCurUser().getId().toString());
 			}
 			pageIn.setThree("1");
-			return new PageResultEx(true, "查询成功", paperService.getListpage(pageIn));
+			return PageResultEx.ok().data(paperService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("试卷列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 	
@@ -113,10 +113,10 @@ public class ExamController extends BaseController{
 	@ResponseBody
 	public PageResult userList(PageIn pageIn) {
 		try {
-			return new PageResultEx(true, "查询成功", examService.getUserListpage(pageIn));
+			return PageResultEx.ok().data(examService.getUserListpage(pageIn));
 		} catch (Exception e) {
 			log.error("用户列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 	
@@ -133,10 +133,10 @@ public class ExamController extends BaseController{
 			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
 				pageIn.setTen(getCurUser().getId().toString());
 			}
-			return new PageResultEx(true, "查询成功", examService.getListpage(pageIn));
+			return PageResultEx.ok().data(examService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("考试列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 	
@@ -187,13 +187,13 @@ public class ExamController extends BaseController{
 			exam.setUpdateUserId(getCurUser().getId());
 			exam.setState(2);
 			examService.add(exam);
-			return new PageResult(true, "添加成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成添加考试错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加考试错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 	
@@ -276,13 +276,13 @@ public class ExamController extends BaseController{
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
 			examService.update(entity);
-			return new PageResult(true, "修改成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成修改考试错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成修改考试错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 	
@@ -305,13 +305,13 @@ public class ExamController extends BaseController{
 			
 			exam.setState(0);
 			examService.update(exam);
-			return new PageResult(true, "删除成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成删除考试错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成删除考试错误：", e);
-			return new PageResult(false, "未知异常");
+			return PageResult.err();
 		}
 	}
 	
@@ -348,13 +348,13 @@ public class ExamController extends BaseController{
 	public PageResult doCfg(Integer id, Integer[] userIds, Integer[] myMarkIds) {
 		try {
 			examService.doCfg(id, userIds, myMarkIds);
-			return new PageResult(true, "添加成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成考试配置错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成考试配置错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 	
@@ -379,13 +379,13 @@ public class ExamController extends BaseController{
 			
 			exam.setState(1);
 			examService.update(exam);
-			return new PageResult(true, "发布成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成发布错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成发布错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 }

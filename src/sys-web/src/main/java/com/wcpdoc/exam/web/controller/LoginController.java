@@ -54,10 +54,10 @@ public class LoginController extends BaseController {
 			return new PageResultEx(true, "登陆成功", token);
 		} catch (LoginException e) {
 			log.error("完成登录错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成登录错误：", e);
-			return new PageResult(false, "未知错误");
+			return PageResult.err();
 		}
 	}
 	
@@ -75,7 +75,7 @@ public class LoginController extends BaseController {
 			return new PageResult(true, "退出登录成功");
 		} catch (Exception e) {
 			log.error("退出登录错误：", e);
-			return new PageResult(false, "未知错误");
+			return PageResult.err();
 		}
 	}
 	
@@ -92,13 +92,13 @@ public class LoginController extends BaseController {
 	public PageResult pwdUpdate(String oldPwd, String newPwd) {
 		try {
 			loginService.pwdUpdate(oldPwd, newPwd);
-			return new PageResult(true, "修改成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改密码错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("修改密码错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 	
@@ -116,7 +116,7 @@ public class LoginController extends BaseController {
 			return new PageResultEx(true, "获取成功", DateUtil.formatDateTime(new Date()));
 		} catch (Exception e) {
 			log.error("获取服务器时间错误：", e);
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		}
 	}
 }

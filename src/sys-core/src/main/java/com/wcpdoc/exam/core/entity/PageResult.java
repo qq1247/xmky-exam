@@ -6,31 +6,42 @@ package com.wcpdoc.exam.core.entity;
  * v1.0 zhanghc 2015-6-19下午08:30:16
  */
 public class PageResult {
-	protected boolean succ;
+	protected static final Integer HTTP_200 = 200;
+	protected static final Integer HTTP_500 = 500;
+
+	protected static final String HTTP_200_MSG = "请求成功";
+	protected static final String HTTP_500_MSG = "未知错误";
+
+	protected Integer code;
 	protected String msg;
 
-	public PageResult() {
+	protected PageResult() {
 	}
 
-	public PageResult(boolean succ, String msg) {
-		this.succ = succ;
+	protected PageResult(Integer code, String msg) {
+		this.code = code;
 		this.msg = msg;
 	}
 
-	public boolean isSucc() {
-		return succ;
+	public static PageResult custom() {
+		return new PageResult();
 	}
 
-	public void setSucc(boolean succ) {
-		this.succ = succ;
+	public static PageResult ok() {
+		return new PageResult(HTTP_200, HTTP_200_MSG);
 	}
 
-	public String getMsg() {
-		return msg;
+	public static PageResult err() {
+		return new PageResult(HTTP_500, HTTP_500_MSG);
 	}
 
-	public void setMsg(String msg) {
+	public PageResult code(Integer code) {
+		this.code = code;
+		return this;
+	}
+
+	public PageResult msg(String msg) {
 		this.msg = msg;
+		return this;
 	}
-
 }

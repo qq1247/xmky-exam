@@ -60,10 +60,10 @@ public class DictController extends BaseController {
 	@ResponseBody
 	public PageResult list(PageIn pageIn) {
 		try {
-			return new PageResultEx(true, "查询成功", dictService.getListpage(pageIn));
+			return PageResultEx.ok().data(dictService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("数据字典列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 
@@ -98,13 +98,13 @@ public class DictController extends BaseController {
 	public PageResult doAdd(Dict dict) {
 		try {
 			//dictService.addAndUpdate(dict);
-			return new PageResult(true, "添加成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成添加数据字典错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加数据字典错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 
@@ -143,13 +143,13 @@ public class DictController extends BaseController {
 	public PageResult doEdit(Dict dict) {
 		try {
 			//dictService.updateAndUpdate(dict);
-			return new PageResult(true, "修改成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成修改数据字典错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成修改数据字典错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 
@@ -166,13 +166,13 @@ public class DictController extends BaseController {
 	public PageResult doDel(Integer id) {
 		try {
 			dictService.delAndUpdate(id);
-			return new PageResult(true, "删除成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成删除数据字典错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成删除数据字典错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 }

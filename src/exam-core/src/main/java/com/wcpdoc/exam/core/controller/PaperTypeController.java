@@ -62,10 +62,10 @@ public class PaperTypeController extends BaseController {
 	@ResponseBody
 	public PageResult treeList() {
 		try {
-			return new PageResultEx(true, "查询成功", paperTypeService.getTreeList());
+			return PageResultEx.ok().data(paperTypeService.getTreeList());
 		} catch (Exception e) {
 			log.error("试卷分类树错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 	
@@ -79,10 +79,10 @@ public class PaperTypeController extends BaseController {
 	@ResponseBody
 	public PageResult list(PageIn pageIn) {
 		try {
-			return new PageResultEx(true, "查询成功", paperTypeService.getListpage(pageIn));
+			return PageResultEx.ok().data(paperTypeService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("试卷分类列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 	
@@ -113,13 +113,13 @@ public class PaperTypeController extends BaseController {
 	public PageResult doAdd(PaperType paperType) {
 		try {
 			paperTypeService.addAndUpdate(paperType);
-			return new PageResult(true, "添加成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成添加试卷分类错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加试卷分类错误：", e);
-			return new PageResult(false, "未知异常");
+			return PageResult.err();
 		}
 	}
 	
@@ -170,13 +170,13 @@ public class PaperTypeController extends BaseController {
 			entity.setUpdateUserId(((User)getCurUser()).getId());
 			entity.setNo(paperType.getNo());
 			paperTypeService.update(entity);
-			return new PageResult(true, "修改成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成修改试卷分类错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成修改试卷分类错误：", e);
-			return new PageResult(false, "未知异常");
+			return PageResult.err();
 		}
 	}
 	
@@ -191,13 +191,13 @@ public class PaperTypeController extends BaseController {
 	public PageResult doDel(Integer id) {
 		try {
 			paperTypeService.delAndUpdate(id);
-			return new PageResult(true, "删除成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成删除试卷分类错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成删除试卷分类错误：", e);
-			return new PageResult(false, "未知异常");
+			return PageResult.err();
 		}
 	}
 	
@@ -229,13 +229,13 @@ public class PaperTypeController extends BaseController {
 	public PageResult doMove(Integer sourceId, Integer targetId) {
 		try {
 			paperTypeService.doMove(sourceId, targetId);
-			return new PageResult(true, "移动成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成移动试卷分类错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成移动试卷分类错误：", e);
-			return new PageResult(false, "未知异常");
+			return PageResult.err();
 		}
 	}
 	
@@ -268,10 +268,10 @@ public class PaperTypeController extends BaseController {
 	@ResponseBody
 	public PageResult authUserList(PageIn pageIn) {
 		try {
-			return new PageResultEx(true, "查询成功", paperTypeService.getAuthUserListpage(pageIn));
+			return PageResultEx.ok().data(paperTypeService.getAuthUserListpage(pageIn));
 		} catch (Exception e) {
 			log.error("权限用户列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 	
@@ -286,10 +286,10 @@ public class PaperTypeController extends BaseController {
 	@ResponseBody
 	public PageResult authPostList(PageIn pageIn) {
 		try {
-			return new PageResultEx(true, "查询成功", paperTypeService.getAuthPostListpage(pageIn));
+			return PageResultEx.ok().data(paperTypeService.getAuthPostListpage(pageIn));
 		} catch (Exception e) {
 			log.error("权限岗位列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 	
@@ -304,10 +304,10 @@ public class PaperTypeController extends BaseController {
 	@ResponseBody
 	public PageResult authOrgList(PageIn pageIn) {
 		try {
-			return new PageResultEx(true, "查询成功", paperTypeService.getAuthOrgListpage(pageIn));
+			return PageResultEx.ok().data(paperTypeService.getAuthOrgListpage(pageIn));
 		} catch (Exception e) {
 			log.error("权限机构列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 	
@@ -327,13 +327,13 @@ public class PaperTypeController extends BaseController {
 	public PageResult doAuth(Integer id, Integer[] userIds, Integer[] postIds, Integer[] orgIds, boolean syn2Sub) {
 		try {
 			paperTypeService.doAuth(id, userIds, postIds, orgIds, syn2Sub);
-			return new PageResult(true, "添加成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成添加权限用户错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加权限用户错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 }
