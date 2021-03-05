@@ -44,4 +44,12 @@ public class PageResult {
 		this.msg = msg;
 		return this;
 	}
+
+	public Integer getCode() {
+		return code;
+	}
+
+	public String getMsg() {
+		return msg;
+	}
 }

@@ -35,17 +35,5 @@
 			<artifactId>shiro-ehcache</artifactId>
 			<version>1.6.0</version>
 		</dependency>
-		
-		<!-- 集成邮件 -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-mail</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-logging</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>	
 	</dependencies>
 </project>

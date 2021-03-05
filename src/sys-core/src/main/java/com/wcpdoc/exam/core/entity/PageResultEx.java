@@ -33,4 +33,8 @@ public class PageResultEx extends PageResult {
 	public static PageResultEx err() {
 		return new PageResultEx(HTTP_500, HTTP_500_MSG);
 	}
+
+	public Object getData() {
+		return data;
+	}
 }
