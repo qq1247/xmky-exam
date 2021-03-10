@@ -36,6 +36,7 @@ import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 
 import freemarker.cache.FileTemplateLoader;
 import freemarker.template.Configuration;
@@ -66,7 +67,7 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/list")
 	@ResponseBody
-	public PageResult list(PageIn pageIn) {
+	public PageResult list(PageIn pageIn, Integer id, String title, Integer type, Integer difficulty, double scoreStart, double scoreEnd) {
 		// one     questionTypeId(试题分类id) 
 		// two     id(试卷id) 
 		// three   title(标题)
@@ -77,6 +78,25 @@ public class ApiQuestionController extends BaseController {
 		// eight   score(默认分值)
 		// nine    paperId(试卷ID)
 		try {
+			if(id != null){
+				pageIn.setTwo(id.toString());
+			}
+			if(!ValidateUtil.isValid(title)){
+				pageIn.setThree(title);
+			}
+			if(type != null){
+				pageIn.setFive(type.toString());
+			}
+			if(difficulty != null){
+				pageIn.setSix(difficulty.toString());
+			}
+			if(scoreStart != 0){
+				pageIn.setSortOne(String.valueOf(scoreStart));
+			}
+			if(scoreStart != 0){
+			pageIn.setSortTwo(String.valueOf(scoreEnd));
+			}
+			
 			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
 				pageIn.setTen(getCurUser().getId().toString());
 			}
@@ -202,28 +222,6 @@ public class ApiQuestionController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		}  catch (Exception e) {
 			log.error("预览试题错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 合并试题
-	 * 
-	 * v1.0 zhanghc 2017-05-07 14:56:29
-	 * @param id
-	 * @return pageOut
-	 */
-	@RequestMapping("/merge")
-	@ResponseBody
-	public PageResult merge(Integer oldQuestionTypeId, Integer newQuestionTypeId) {
-		try {
-			questionService.merge(oldQuestionTypeId, newQuestionTypeId);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("合并试题错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		}  catch (Exception e) {
-			log.error("合并试题错误：", e);
 			return PageResult.err();
 		}
 	}

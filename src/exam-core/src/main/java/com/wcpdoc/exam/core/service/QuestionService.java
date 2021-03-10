@@ -55,8 +55,9 @@ public interface QuestionService extends BaseService<Question>{
 	 * 合并
 	 * 
 	 * v1.0 chenyun 2021年3月2日下午1:25:51
-	 * @param oldQuestionTypeId
-	 * @param newQuestionTypeId void
+	 * @param id
+	 * @param sourceId
+	 * @param targetId void
 	 */
-	void merge(Integer oldQuestionTypeId, Integer newQuestionTypeId);
+	void move(Integer id, Integer sourceId, Integer targetId);
 }

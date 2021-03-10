@@ -71,4 +71,13 @@ public interface PostDao extends RBaseDao<Post> {
 	 * @return List<Post>
 	 */
 	List<Post> getList(Integer orgId);
+	
+	/**
+	 * 获取岗位
+	 * 
+	 * v1.0 chenyun 2021年3月8日下午2:51:53
+	 * @param name
+	 * @return Post
+	 */
+	Post getPost(String name);
 }

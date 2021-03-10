@@ -8,9 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.core.controller.BaseController;
@@ -19,6 +17,7 @@ import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 
@@ -34,6 +33,8 @@ public class ApiQuestionTypeController extends BaseController {
 	
 	@Resource
 	private QuestionTypeService questionTypeService;
+	@Resource
+	private QuestionService questionService;
 	
 	/**
 	 * 试题分类列表 
@@ -43,8 +44,11 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/list")
 	@ResponseBody
-	public PageResult list(PageIn pageIn) {
+	public PageResult list(PageIn pageIn, String name) {
 		try {
+			if (!ValidateUtil.isValid(name)) {
+				pageIn.setTwo(name);
+			}
 			return PageResultEx.ok().data(questionTypeService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("试题分类列表错误：", e);
@@ -60,9 +64,9 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	public PageResult add(String name, @RequestParam("file") MultipartFile file) {
+	public PageResult add(String name, Integer imgId) {
 		try {
-			questionTypeService.addAndUpdate(name, file);
+			questionTypeService.addAndUpdate(name, imgId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加试题分类错误：{}", e.getMessage());
@@ -81,7 +85,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	public PageResult edit(Integer id, String name, @RequestParam("file") MultipartFile file) {
+	public PageResult edit(Integer id, String name, Integer imgId) {
 		try {
 			//校验数据有效性
 			if(id != null) {
@@ -90,13 +94,13 @@ public class ApiQuestionTypeController extends BaseController {
 			if(!ValidateUtil.isValid(name)) {
 				throw new MyException("参数错误：name");
 			}
+			
 			QuestionType entity = questionTypeService.getEntity(id);
 			entity.setName(name);
-			if(questionTypeService.existName(entity)) {
+			/*if(questionTypeService.existName(entity)) {
 				throw new MyException("名称已存在！");
-			}
-			
-			//修改试题分类
+			}*/
+			entity.setImg(imgId);
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(((User)getCurUser()).getId());
 			questionTypeService.update(entity);
@@ -161,7 +165,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/auth")
 	@ResponseBody
-	public PageResult auth(Integer id, Integer[] readUserIds, Integer[] writeUserIds, boolean rwState) {
+	public PageResult auth(Integer id, String readUserIds, String writeUserIds, boolean rwState) {
 		try {
 			questionTypeService.doAuth(id, readUserIds, writeUserIds, rwState);
 			return PageResult.ok();
@@ -170,6 +174,28 @@ public class ApiQuestionTypeController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("添加权限用户错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 试题分类合并
+	 * 
+	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * @param id
+	 * @return pageOut
+	 */
+	@RequestMapping("/move")
+	@ResponseBody
+	public PageResult move(Integer id, Integer sourceId, Integer targetId) {
+		try {
+			questionService.move(id, sourceId, targetId);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("合并试题错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		}  catch (Exception e) {
+			log.error("合并试题错误：", e);
 			return PageResult.err();
 		}
 	}

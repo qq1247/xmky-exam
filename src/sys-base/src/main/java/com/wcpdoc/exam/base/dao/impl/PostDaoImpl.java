@@ -86,4 +86,10 @@ public class PostDaoImpl extends RBaseDaoImpl<Post> implements PostDao {
 		String sql = "SELECT * FROM SYS_POST WHERE STATE = 1 AND ORG_ID = ?";
 		return getList(sql, new Object[] { orgId });
 	}
+
+	@Override
+	public Post getPost(String name) {
+		String sql = "SELECT * FROM SYS_POST WHERE STATE = 1 AND NAME = ?";
+		return getEntity(sql, new Object[] { name });
+	}
 }

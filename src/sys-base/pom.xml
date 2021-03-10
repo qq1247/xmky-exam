@@ -35,5 +35,48 @@
 			<artifactId>shiro-ehcache</artifactId>
 			<version>1.6.0</version>
 		</dependency>
+		<!-- 表格导入导出 https://mvnrepository.com/artifact/org.jxls/jxls -->
+		<!-- <dependency>
+		    <groupId>org.jxls</groupId>
+		    <artifactId>jxls</artifactId>
+		    <version>2.9.0</version>
+				<exclusions>
+				<exclusion>
+				   <groupId>ch.qos.logback</groupId>
+				   <artifactId>logback-classic</artifactId>	
+				</exclusion>
+				<exclusion>
+				   <groupId>ch.qos.logback</groupId>
+				   <artifactId>logback-core</artifactId>
+				</exclusion>
+				</exclusions>
+		</dependency> -->
+		<!-- https://mvnrepository.com/artifact/org.jxls/jxls-poi -->
+		<!-- <dependency>
+		    <groupId>org.jxls</groupId>
+		    <artifactId>jxls-poi</artifactId>
+		    <version>2.9.0</version>
+		</dependency> -->
+	    <dependency>
+		    <groupId>org.jxls</groupId>
+		    <artifactId>jxls</artifactId>
+		    <version>2.4.6</version>
+		    	<exclusions>
+				<exclusion>
+				   <groupId>ch.qos.logback</groupId>
+				   <artifactId>logback-classic</artifactId>	
+				</exclusion>
+				<exclusion>
+				   <groupId>ch.qos.logback</groupId>
+				   <artifactId>logback-core</artifactId>
+				</exclusion>
+				</exclusions>
+		</dependency>
+		 
+		<dependency>
+		    <groupId>org.jxls</groupId>
+		    <artifactId>jxls-poi</artifactId>
+		    <version>1.0.15</version>
+		</dependency> 
 	</dependencies>
 </project>

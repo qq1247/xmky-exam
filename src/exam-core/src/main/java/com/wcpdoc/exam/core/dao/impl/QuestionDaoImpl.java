@@ -51,6 +51,8 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 				.addWhere(ValidateUtil.isValid(pageIn.getSix()), "QUESTION.DIFFICULTY = ?", pageIn.getSix())
 				.addWhere(ValidateUtil.isValid(pageIn.getSeven()), "QUESTION_TYPE.NAME LIKE ?", "%" + pageIn.getSeven() + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.getEight()), "QUESTION.SCORE = ?", pageIn.getEight())
+				.addWhere(ValidateUtil.isValid(pageIn.getSortOne()), "QUESTION.SCORE >= ?", pageIn.getSortOne())
+				.addWhere(ValidateUtil.isValid(pageIn.getSortTwo()), "QUESTION.SCORE <= ?", pageIn.getSortTwo())
 				.addWhere(ValidateUtil.isValid(pageIn.getNine()), "NOT EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.getNine())
 				.addWhere("QUESTION.STATE != ?", 0)
 				.addOrder("QUESTION.NO", Order.DESC);

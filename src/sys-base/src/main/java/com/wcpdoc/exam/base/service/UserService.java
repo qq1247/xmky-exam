@@ -95,4 +95,13 @@ public interface UserService extends BaseService<User> {
 	 * @return List<Post>
 	 */
 	List<Post> getPostList(Integer id);
+	
+	/**
+	 * 获取用户
+	 * 
+	 * v1.0 chenyun 2021年3月8日下午1:33:23
+	 * @param id
+	 * @return Map<Integer,Long>
+	 */
+	Map<String, Object> getUser(Integer id);
 }

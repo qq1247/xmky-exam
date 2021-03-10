@@ -73,4 +73,32 @@ public interface OrgService extends BaseService<Org> {
 	 * @return boolean
 	 */
 	boolean existCode(Org org);
+	
+	/**
+	 * 获取组织机构列表
+	 * 
+	 * v1.0 chenyun 2021年3月5日上午10:41:51
+	 * @return Org
+	 */
+	Org getOrg(String name);
+	
+	/**
+	 * 获取组织机构列表
+	 * 
+	 * v1.0 zhanghc 2020-06-10 12:40:00
+	 * 
+	 * @param name
+	 * @param excludeId
+	 * @return boolean
+	 */
+	List<Org> getList(Integer parentId);
+	
+	/**
+	 * 获取住址机构
+	 * 
+	 * v1.0 chenyun 2021年3月8日下午1:24:31
+	 * @param id
+	 * @return Map<String,Object>
+	 */
+	Map<String, Object> getOrg(Integer id);
 }

@@ -4,7 +4,6 @@ public class PersonToken {
 	private String accessToken;
 	private String refreshToken;
 	private Integer id;
-	private Integer saasId;
 	
 	public String getAccessToken() {
 		return accessToken;
@@ -23,11 +22,5 @@ public class PersonToken {
 	}
 	public void setId(Integer id) {
 		this.id = id;
-	}
-	public Integer getSaasId() {
-		return saasId;
-	}
-	public void setSaasId(Integer saasId) {
-		this.saasId = saasId;
 	}
 }

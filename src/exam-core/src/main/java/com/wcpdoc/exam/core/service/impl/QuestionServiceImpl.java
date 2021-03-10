@@ -248,10 +248,10 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void merge(Integer oldQuestionTypeId, Integer newQuestionTypeId) {
-		List<Question> list = questionDao.getList(oldQuestionTypeId);
+	public void move(Integer id, Integer sourceId, Integer targetId) {
+		List<Question> list = questionDao.getList(sourceId);
 		for(Question question : list){
-			question.setQuestionTypeId(newQuestionTypeId);
+			question.setQuestionTypeId(targetId);
 			update(question);
 		}
 	}

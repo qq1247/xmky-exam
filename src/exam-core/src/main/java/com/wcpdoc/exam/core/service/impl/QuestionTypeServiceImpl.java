@@ -6,7 +6,6 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
@@ -17,7 +16,6 @@ import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.QuestionTypeExService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
-import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.file.service.FileService;
 /**
@@ -44,7 +42,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	}
 
 	@Override
-	public void addAndUpdate(String name, MultipartFile file) {
+	public void addAndUpdate(String name, Integer imgId) {
 		//校验数据有效性
 		if (!ValidateUtil.isValid(name)) {
 			throw new MyException("参数错误：name");
@@ -53,18 +51,10 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		// 添加试题分类
 		QuestionType questionType = new QuestionType();
 		questionType.setName(name);
-		if (existName(questionType)) {
+		questionType.setImg(imgId);
+		/*if (existName(questionType)) {
 			throw new MyException("名称已存在！");
-		}
-		
-		String[] allowTypes = { "jpg", "gif", "png" };
-		MultipartFile[] files = {file};
-		String doTempUpload = fileService.doTempUpload(files, allowTypes);
-		
-		//永久保存
-		fileService.doUpload(Integer.valueOf(doTempUpload));
-
-		questionType.setImg(Integer.valueOf(doTempUpload));
+		}*/
 		questionType.setCreateUserId(getCurUser().getId());
 		questionType.setCreateTime(new Date());
 		questionType.setState(1);
@@ -103,17 +93,17 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	}
 
 	@Override
-	public void doAuth(Integer id, Integer[] readUserIds, Integer[] writeUserIds, boolean rwState) {		
+	public void doAuth(Integer id, String readUserIds, String writeUserIds, boolean rwState) {		
 		QuestionType entity = getEntity(id);
 		if (!ValidateUtil.isValid(readUserIds)) {
 			entity.setReadUserIds(null);
 		} else {
-			entity.setReadUserIds(String.format(",%s,", StringUtil.join(readUserIds)));
+			entity.setReadUserIds(readUserIds);
 		}
 		if (!ValidateUtil.isValid(writeUserIds)) {
 			entity.setWriteUserIds(null);
 		} else {
-			entity.setWriteUserIds(String.format(",%s,", StringUtil.join(writeUserIds)));
+			entity.setWriteUserIds(writeUserIds);
 		}
 		if(rwState){
 			entity.setRwState(1);

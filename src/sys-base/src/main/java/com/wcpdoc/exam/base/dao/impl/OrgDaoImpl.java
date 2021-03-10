@@ -76,4 +76,10 @@ public class OrgDaoImpl extends RBaseDaoImpl<Org> implements OrgDao {
 		String sql = "SELECT COUNT(*) AS NUM FROM SYS_ORG WHERE CODE = ? AND CODE != '' AND CODE IS NOT NULL AND STATE = 1 AND ID != ?";
 		return getCount(sql, new Object[] { code, excludeId }) > 0;
 	}
+
+	@Override
+	public Org getOrg(String name) {
+		String sql = "SELECT * FROM SYS_ORG WHERE NAME = ? AND STATE = 1";
+		return getEntity(sql, new Object[] { name });
+	}
 }

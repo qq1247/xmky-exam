@@ -47,14 +47,14 @@ public class ApiLoginServiceImpl extends BaseServiceImp<Object> implements ApiLo
 	public PersonToken in(String loginName, String pwd, String code) throws LoginException {
 		// 生成授权令牌
 		try {
-		Integer saasId = null; // = OrgCache.getSaasId(code);
+		//Integer saasId = OrgCache.getSaasId(code);
 
-		User user = null; // = userService.getUser(loginName,saasId);
+		User user = userService.getUser(loginName);
 		if(user == null || !user.getPwd().equals(userService.getEncryptPwd(loginName, pwd))) {
 			throw new LoginException("用户名或密码错误！");
 		}
-		log.info("登录生成授权令牌：{}-{}-{}-{}", user.getId());
-		PersonToken personToken = generateToken(user.getId(), saasId);
+		log.info("登录生成授权令牌：{}", user.getId());
+		PersonToken personToken = generateToken(user.getId());
 		return personToken;
 		} catch (Exception e) {
 			log.error("登录失败：{}", e.getMessage());
@@ -62,17 +62,15 @@ public class ApiLoginServiceImpl extends BaseServiceImp<Object> implements ApiLo
 		}
 	}
 
-	private PersonToken generateToken(Integer id, Integer saasId) {
+	private PersonToken generateToken(Integer id) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("id", id);
-		params.put("saasId", saasId);
 		String accessToken = JwtUtil.createToken(id+"", sysEnv, DateUtil.getNextMinute(new Date(), tokenActiveAccess), params);
 		params.put("refreshToken", true);
 		String refreshToken = JwtUtil.createToken(id+"", sysEnv, DateUtil.getNextMinute(new Date(), tokenActiveRefresh), params);
 
 		PersonToken personToken = new PersonToken();
 		personToken.setId(id);
-		personToken.setSaasId(saasId);
 		personToken.setAccessToken(accessToken);
 		personToken.setRefreshToken(refreshToken);
 		return personToken;

@@ -56,12 +56,11 @@ public class ApiLoginController extends BaseController {
 	@RequestMapping("/in")
 	@ResponseBody
 	public PageResult in(String loginName, String pwd, String code) throws LoginException {
-		try {//TODO 
+		try {
 			// 登录
 			PersonToken personToken = apiLoginService.in(loginName, pwd, code);
 			Map<String, Object> data = new HashMap<>();
 			data.put("id", personToken.getId());
-			data.put("saasId", personToken.getSaasId());
 			data.put("accessToken", personToken.getAccessToken());
 			data.put("refreshToken", personToken.getRefreshToken());
 			return PageResultEx.ok().data(data);
@@ -115,6 +114,24 @@ public class ApiLoginController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("刷新令牌失败：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 系统时间
+	 * 
+	 * v1.0 chenyun 2021年3月8日上午9:33:43
+	 * @return
+	 * @throws PageResult
+	 */
+	@RequestMapping("/sysTime")
+	@ResponseBody
+	public PageResult sysTime() throws LoginException {
+		try {
+			return PageResultEx.ok().data(DateUtil.formatDateTime(new Date()));
+		}catch (Exception e) {
+			log.error("系统时间失败：", e);
 			return PageResult.err();
 		}
 	}
