@@ -19,12 +19,16 @@ public class PaperOptionDaoImpl extends RBaseDaoImpl<PaperOption> implements Pap
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT * "
-				+ "FROM EXM_PAPER_OPTION PAPER_OPTION ";
+		String sql = "SELECT * FROM EXM_PAPER_OPTION PAPER_OPTION ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "PAPER_OPTION.ID = ?", pageIn.getTwo())
-				;
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "PAPER_OPTION.ID = ?", pageIn.getTwo());
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		return pageOut;
+	}
+
+	@Override
+	public PaperOption getPaperOption(Integer paperId) {
+		String sql = "SELECT * FROM EXM_PAPER_OPTION WHERE PAPER_ID = ? ";
+		return getEntity(sql, new Object[]{ paperId });
 	}
 }

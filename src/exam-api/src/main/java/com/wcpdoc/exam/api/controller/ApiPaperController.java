@@ -20,8 +20,9 @@ import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.service.PaperOptionService;
+import com.wcpdoc.exam.core.service.PaperRemarkService;
 import com.wcpdoc.exam.core.service.PaperService;
-import com.wcpdoc.exam.core.service.PaperTypeService;
 import com.wcpdoc.exam.core.service.QuestionService;
 /**
  * 试卷控制层
@@ -36,26 +37,11 @@ public class ApiPaperController extends BaseController {
 	@Resource
 	private PaperService paperService;
 	@Resource
-	private PaperTypeService paperTypeService;
-	@Resource
 	private QuestionService questionService;
-	
-	/**
-	 * 试卷分类树
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * 
-	 * @return List<Map<String,Object>>
-	 */
-	@RequestMapping("/paperTypeTreeList")
-	@ResponseBody
-	public PageResult paperTypeTreeList() {
-		try {
-			return PageResultEx.ok().data(paperTypeService.getAuthTreeList());
-		} catch (Exception e) {
-			log.error("试卷分类树错误：", e);
-			return PageResult.err();
-		}
-	}
+	@Resource
+	private PaperOptionService paperOptionService;
+	@Resource
+	private PaperRemarkService paperRemarkService;
 	
 	/**
 	 * 试卷列表
@@ -121,15 +107,6 @@ public class ApiPaperController extends BaseController {
 			entity.setName(paper.getName());
 			entity.setPreviewType(paper.getPreviewType());
 			entity.setPassScore(paper.getPassScore());
-			entity.setScoreA(paper.getScoreA());
-			entity.setScoreARemark(paper.getScoreARemark());
-			entity.setScoreB(paper.getScoreB());
-			entity.setScoreBRemark(paper.getScoreBRemark());
-			entity.setScoreC(paper.getScoreC());
-			entity.setScoreCRemark(paper.getScoreCRemark());
-			entity.setScoreD(paper.getScoreD());
-			entity.setScoreDRemark(paper.getScoreDRemark());
-			entity.setScoreE(paper.getScoreE());
 			entity.setScoreERemark(paper.getScoreERemark());
 			entity.setDescription(paper.getDescription());
 			//entity.setState(paper.getState());//单独控制
@@ -161,6 +138,9 @@ public class ApiPaperController extends BaseController {
 			paper.setUpdateTime(new Date());
 			paper.setUpdateUserId(getCurUser().getId());
 			paperService.update(paper);
+			// 删除防作弊、成绩评语
+			paperOptionService.del(paperOptionService.getPaperOption(paper.getId()).getId());
+			paperRemarkService.del(paperRemarkService.getPaperRemark(paper.getId()).getId());
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("删除试卷错误：{}", e.getMessage());

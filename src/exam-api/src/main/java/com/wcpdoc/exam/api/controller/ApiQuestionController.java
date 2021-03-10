@@ -333,7 +333,7 @@ public class ApiQuestionController extends BaseController {
 		map.put("difficultyName", "简单");
 		map.put("title", entity.getTitle());
 		
-		map.put("optionA", entity.getOptionA());
+		map.put("optionA", "AAAAAAAAA");
 		map.put("optionB", "BBBBBBBBB");
 		map.put("optionC", "CCCCCCCCC");
 		map.put("optionD", "DDDDDDDDD");

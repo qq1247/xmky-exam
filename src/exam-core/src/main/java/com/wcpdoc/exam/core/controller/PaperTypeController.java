@@ -37,39 +37,6 @@ public class PaperTypeController extends BaseController {
 	private OrgService orgService;
 	
 	/**
-	 * 到达试卷分类列表页面 
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * 
-	 * @return String
-	 */
-	@RequestMapping("/toList")
-	public String toList() {
-		try {
-			return "exam/paperType/paperTypeList";
-		} catch (Exception e) {
-			log.error("到达试卷分类列表页面错误：", e);
-			return "exam/paperType/paperTypeList";
-		}
-	}
-	
-	/**
-	 * 试卷分类树
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * 
-	 * @return List<Map<String,Object>>
-	 */
-	@RequestMapping("/treeList")
-	@ResponseBody
-	public PageResult treeList() {
-		try {
-			return PageResultEx.ok().data(paperTypeService.getTreeList());
-		} catch (Exception e) {
-			log.error("试卷分类树错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
 	 * 试卷分类列表 
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
@@ -124,28 +91,6 @@ public class PaperTypeController extends BaseController {
 	}
 	
 	/**
-	 * 到达修改试卷分类页面 
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * 
-	 * @return String
-	 */
-	@RequestMapping("/toEdit")
-	public String toEdit(Model model, Integer id) {
-		try {
-			PaperType paperType = paperTypeService.getEntity(id);
-			model.addAttribute("paperType", paperType);
-			PaperType parentPaperType = paperTypeService.getEntity(paperType.getParentId());
-			if (parentPaperType != null) {
-				model.addAttribute("parentPaperType", paperTypeService.getEntity(paperType.getParentId()));
-			}
-			return "exam/paperType/paperTypeEdit";
-		} catch (Exception e) {
-			log.error("到达修改试卷分类页面错误", e);
-			return "exam/paperType/paperTypeEdit";
-		}
-	}
-	
-	/**
 	 * 完成修改试卷分类
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
@@ -168,7 +113,6 @@ public class PaperTypeController extends BaseController {
 			entity.setName(paperType.getName());
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(((User)getCurUser()).getId());
-			entity.setNo(paperType.getNo());
 			paperTypeService.update(entity);
 			return PageResult.ok();
 		} catch (MyException e) {
@@ -218,28 +162,6 @@ public class PaperTypeController extends BaseController {
 	}
 	
 	/**
-	 * 移动试卷分类
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * @param sourceId
-	 * @param targetId
-	 * @return PageResult
-	 */
-	@RequestMapping("/doMove")
-	@ResponseBody
-	public PageResult doMove(Integer sourceId, Integer targetId) {
-		try {
-			paperTypeService.doMove(sourceId, targetId);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("完成移动试卷分类错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("完成移动试卷分类错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
 	 * 到达权限列表页面
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
@@ -258,60 +180,6 @@ public class PaperTypeController extends BaseController {
 	}
 	
 	/**
-	 * 权限用户列表 
-	 * 
-	 * v1.0 zhanghc 2017年6月16日下午5:02:45
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	@RequestMapping("/authUserList")
-	@ResponseBody
-	public PageResult authUserList(PageIn pageIn) {
-		try {
-			return PageResultEx.ok().data(paperTypeService.getAuthUserListpage(pageIn));
-		} catch (Exception e) {
-			log.error("权限用户列表错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 权限岗位列表 
-	 * 
-	 * v1.0 zhanghc 2017年6月16日下午5:02:45
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	@RequestMapping("/authPostList")
-	@ResponseBody
-	public PageResult authPostList(PageIn pageIn) {
-		try {
-			return PageResultEx.ok().data(paperTypeService.getAuthPostListpage(pageIn));
-		} catch (Exception e) {
-			log.error("权限岗位列表错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 权限机构列表 
-	 * 
-	 * v1.0 zhanghc 2017年6月16日下午5:02:45
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	@RequestMapping("/authOrgList")
-	@ResponseBody
-	public PageResult authOrgList(PageIn pageIn) {
-		try {
-			return PageResultEx.ok().data(paperTypeService.getAuthOrgListpage(pageIn));
-		} catch (Exception e) {
-			log.error("权限机构列表错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
 	 * 完成添加权限
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
@@ -324,9 +192,9 @@ public class PaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/doAuth")
 	@ResponseBody
-	public PageResult doAuth(Integer id, Integer[] userIds, Integer[] postIds, Integer[] orgIds, boolean syn2Sub) {
+	public PageResult doAuth(Integer id, String readUserIds, String writeUserIds, boolean rwState) {
 		try {
-			paperTypeService.doAuth(id, userIds, postIds, orgIds, syn2Sub);
+			paperTypeService.doAuth(id, readUserIds, writeUserIds, rwState);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成添加权限用户错误：{}", e.getMessage());

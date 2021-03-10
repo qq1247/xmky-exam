@@ -5,7 +5,6 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.exam.core.dao.BaseDao;
-import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.dao.PaperOptionDao;
 import com.wcpdoc.exam.core.entity.PaperOption;
 import com.wcpdoc.exam.core.service.PaperOptionService;
@@ -31,5 +30,10 @@ public class PaperOptionServiceImpl extends BaseServiceImp<PaperOption> implemen
 		// 校验数据有效性
 		PaperOption entity = getEntity(id);
 		update(entity);
+	}
+
+	@Override
+	public PaperOption getPaperOption(Integer paperId) {
+		return paperOptionDao.getPaperOption(paperId);
 	}
 }

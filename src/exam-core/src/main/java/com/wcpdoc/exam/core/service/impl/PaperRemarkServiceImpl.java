@@ -31,4 +31,9 @@ public class PaperRemarkServiceImpl extends BaseServiceImp<PaperRemark> implemen
 		PaperRemark entity = getEntity(id);
 		update(entity);
 	}
+
+	@Override
+	public PaperRemark getPaperRemark(Integer paperId) {
+		return paperRemarkDao.getPaperRemark(paperId);
+	}
 }

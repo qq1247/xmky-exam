@@ -10,4 +10,12 @@ import com.wcpdoc.exam.core.entity.PaperOption;
  */
 public interface PaperOptionDao extends RBaseDao<PaperOption> {
 	
+	/**
+	 * 获取实体
+	 * 
+	 * v1.0 chenyun 2021年3月10日下午3:31:55
+	 * @param paperId
+	 * @return PaperOption
+	 */
+	PaperOption getPaperOption(Integer paperId);
 }

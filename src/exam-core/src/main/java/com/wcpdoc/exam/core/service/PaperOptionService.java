@@ -19,4 +19,13 @@ public interface PaperOptionService extends BaseService<PaperOption> {
 	 * void
 	 */
 	void delAndUpdate(Integer id);
+	
+	/**
+	 * 获取实体
+	 * 
+	 * v1.0 chenyun 2021年3月10日下午3:28:44
+	 * @param paperId
+	 * @return PaperOption
+	 */
+	PaperOption getPaperOption(Integer paperId);
 }

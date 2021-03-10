@@ -21,7 +21,7 @@ import com.wcpdoc.exam.core.service.PaperOptionService;
  * v1.0 chenyun 2021-03-10 13:47:35
  */
 @Controller
-@RequestMapping("/paperOption")
+@RequestMapping("/api/paperOption")
 public class ApiPaperOptionController extends BaseController {
 	private static final Logger log = LoggerFactory.getLogger(ApiPaperOptionController.class);
 	
@@ -105,7 +105,7 @@ public class ApiPaperOptionController extends BaseController {
 	@ResponseBody
 	public PageResult del(Integer id) {
 		try {
-			paperOptionService.delAndUpdate(id);
+			paperOptionService.del(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成删除试卷错误：{}", e.getMessage());

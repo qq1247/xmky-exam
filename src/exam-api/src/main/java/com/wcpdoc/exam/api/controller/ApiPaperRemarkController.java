@@ -21,7 +21,7 @@ import com.wcpdoc.exam.core.service.PaperRemarkService;
  * v1.0 chenyun 2021-03-10 13:48:34
  */
 @Controller
-@RequestMapping("/paperRemark")
+@RequestMapping("/api/paperRemark")
 public class ApiPaperRemarkController extends BaseController {
 	private static final Logger log = LoggerFactory.getLogger(ApiPaperRemarkController.class);
 	
@@ -109,7 +109,7 @@ public class ApiPaperRemarkController extends BaseController {
 	@ResponseBody
 	public PageResult del(Integer id) {
 		try {
-			paperRemarkService.delAndUpdate(id);
+			paperRemarkService.del(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成删除试卷评语错误：{}", e.getMessage());
@@ -119,5 +119,4 @@ public class ApiPaperRemarkController extends BaseController {
 			return PageResult.err();
 		}
 	}
-
 }

@@ -10,4 +10,12 @@ import com.wcpdoc.exam.core.entity.PaperRemark;
  */
 public interface PaperRemarkDao extends RBaseDao<PaperRemark> {
 	
+	/**
+	 * 获取试卷评语
+	 * 
+	 * v1.0 chenyun 2021年3月10日下午3:31:22
+	 * @param paperId
+	 * @return PaperRemark
+	 */
+	PaperRemark getPaperRemark(Integer paperId);
 }

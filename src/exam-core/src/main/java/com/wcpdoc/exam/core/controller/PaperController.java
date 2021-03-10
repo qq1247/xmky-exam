@@ -66,23 +66,6 @@ public class PaperController extends BaseController {
 	}
 	
 	/**
-	 * 试卷分类树
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * 
-	 * @return List<Map<String,Object>>
-	 */
-	@RequestMapping("/paperTypeTreeList")
-	@ResponseBody
-	public PageResult paperTypeTreeList() {
-		try {
-			return PageResultEx.ok().data(paperTypeService.getAuthTreeList());
-		} catch (Exception e) {
-			log.error("试卷分类树错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
 	 * 试卷列表
 	 * 
 	 * zhanghc 2018年10月21日上午8:16:06
@@ -182,15 +165,6 @@ public class PaperController extends BaseController {
 			entity.setName(paper.getName());
 			entity.setPreviewType(paper.getPreviewType());
 			entity.setPassScore(paper.getPassScore());
-			entity.setScoreA(paper.getScoreA());
-			entity.setScoreARemark(paper.getScoreARemark());
-			entity.setScoreB(paper.getScoreB());
-			entity.setScoreBRemark(paper.getScoreBRemark());
-			entity.setScoreC(paper.getScoreC());
-			entity.setScoreCRemark(paper.getScoreCRemark());
-			entity.setScoreD(paper.getScoreD());
-			entity.setScoreDRemark(paper.getScoreDRemark());
-			entity.setScoreE(paper.getScoreE());
 			entity.setScoreERemark(paper.getScoreERemark());
 			entity.setDescription(paper.getDescription());
 			//entity.setState(paper.getState());//单独控制
