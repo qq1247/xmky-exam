@@ -30,6 +30,8 @@ public class User implements LoginUser {
 	private String name;
 	@Column(name = "LOGIN_NAME")
 	private String loginName;
+	@Column(name = "EMAIL")
+	private String email;
 	@Column(name = "PHONE")
 	private String phone;
 	@Column(name = "PWD")
@@ -149,5 +151,13 @@ public class User implements LoginUser {
 
 	public void setPostIds(String postIds) {
 		this.postIds = postIds;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 }

@@ -15,6 +15,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.exam.base.entity.Parm;
+import com.wcpdoc.exam.base.entity.User;
+import com.wcpdoc.exam.base.service.ParmService;
+import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
@@ -30,6 +34,9 @@ import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.PaperService;
+import com.wcpdoc.exam.core.util.ValidateUtil;
+import com.wcpdoc.exam.notify.exception.NotifyException;
+import com.wcpdoc.exam.notify.service.NotifyService;
 
 /**
  * 我的考试控制层
@@ -49,6 +56,12 @@ public class ApiMyExamController extends BaseController{
 	private PaperService paperService;
 	@Resource
 	private MyExamDetailService myExamDetailService;
+	@Resource
+	private UserService userService;
+	@Resource
+	private NotifyService notifyService;
+	@Resource
+	private ParmService parmService;
 	
 	/**
 	 * 我的考试列表
@@ -285,6 +298,39 @@ public class ApiMyExamController extends BaseController{
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成交卷错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 邮件通知
+	 * 
+	 * v1.0 zhanghc 2018年11月24日上午9:13:22
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/email")
+	@ResponseBody
+	public PageResult email(Integer examId) {
+		try {
+			Parm parm = parmService.getEntity(1);
+			List<MyExam> list = myExamService.getList(examId);
+			for(MyExam myExam : list){
+				User user = userService.getEntity(myExam.getUserId());
+				if (!ValidateUtil.isValid(user.getEmail())) {
+					continue;
+				}
+				notifyService.pushEmail(parm.getEmailUserName(), user.getEmail(), "考试邮箱通知！", user.getName()+"-昵称。");
+			}
+			return PageResult.ok();
+		} catch (NotifyException e) {
+			log.error("邮件通知错误：", e);
+			return PageResult.err().msg(e.getMessage());
+		} catch (MyException e) {
+			log.error("邮件通知错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("邮件通知错误：", e);
 			return PageResult.err();
 		}
 	}

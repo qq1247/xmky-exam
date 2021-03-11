@@ -23,6 +23,10 @@ public class MyMark {
 	private Integer examId;
 	@Column(name = "USER_ID")
 	private Integer userId;
+	@Column(name = "QUESTION_ID")
+	private Integer questionId;
+	@Column(name = "PAPER_ID")
+	private Integer paperId;
 
 	public Integer getId() {
 		return id;
@@ -46,5 +50,21 @@ public class MyMark {
 
 	public void setUserId(Integer userId) {
 		this.userId = userId;
+	}
+
+	public Integer getQuestionId() {
+		return questionId;
+	}
+
+	public void setQuestionId(Integer questionId) {
+		this.questionId = questionId;
+	}
+
+	public Integer getPaperId() {
+		return paperId;
+	}
+
+	public void setPaperId(Integer paperId) {
+		this.paperId = paperId;
 	}
 }
