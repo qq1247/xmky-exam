@@ -99,6 +99,32 @@ public class ApiMyMarkController extends BaseController {
 	}
 	
 	/**
+	 * 添加阅卷
+	 * 
+	 * v1.0 zhanghc 2017年6月26日下午12:30:20
+	 * @param examId
+	 * @return PageResult
+	 */
+	@RequestMapping("/add")
+	@ResponseBody
+	public PageResult add(Integer examId) {
+		try {
+			String processBarId = UUID.randomUUID().toString();
+			LoginUser curUser = getCurUser();
+			new Thread(new Runnable() {
+				public void run() {
+					SpringUtil.getBean(MyExamDetailService.class).doAutoMark(examId, curUser, processBarId);
+				}
+			}).start();
+			
+			return PageResultEx.ok().data(processBarId);
+		} catch (Exception e) {
+			log.error("完成试卷错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
 	 * 我的阅卷详细列表
 	 * 
 	 * v1.0 zhanghc 2018年11月11日下午2:26:56
