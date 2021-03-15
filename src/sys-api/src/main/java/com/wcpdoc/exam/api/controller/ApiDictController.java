@@ -42,13 +42,13 @@ public class ApiDictController extends BaseController {
 	@ResponseBody
 	public PageResult list(PageIn pageIn, String dictIndex, String dictKey, String dictValue) {
 		try {
-			if (!ValidateUtil.isValid(dictIndex)) {
+			if (ValidateUtil.isValid(dictIndex)) {
 				pageIn.setTwo(dictIndex);
 			}
-			if (!ValidateUtil.isValid(dictKey)) {
+			if (ValidateUtil.isValid(dictKey)) {
 				pageIn.setThree(dictKey);
 			}
-			if (!ValidateUtil.isValid(dictValue)) {
+			if (ValidateUtil.isValid(dictValue)) {
 				pageIn.setFour(dictValue);
 			}
 			return PageResultEx.ok().data(dictService.getListpage(pageIn));

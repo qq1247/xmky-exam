@@ -50,7 +50,7 @@ public class ApiCronController extends BaseController {
 	@ResponseBody
 	public PageResult list(PageIn pageIn, String name) {
 		try {
-			if (!ValidateUtil.isValid(name)) {
+			if (ValidateUtil.isValid(name)) {
 				pageIn.setTwo(name);
 			}
 			

@@ -72,6 +72,7 @@ public class ApiLoginServiceImpl extends BaseServiceImp<Object> implements ApiLo
 
 		PersonToken personToken = new PersonToken();
 		personToken.setId(id);
+		personToken.setName(name);
 		personToken.setAccessToken(accessToken);
 		personToken.setRefreshToken(refreshToken);
 		return personToken;
