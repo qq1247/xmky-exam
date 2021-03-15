@@ -61,6 +61,7 @@ public class ApiLoginController extends BaseController {
 			PersonToken personToken = apiLoginService.in(loginName, pwd, code);
 			Map<String, Object> data = new HashMap<>();
 			data.put("id", personToken.getId());
+			data.put("name", personToken.getName());
 			data.put("accessToken", personToken.getAccessToken());
 			data.put("refreshToken", personToken.getRefreshToken());
 			return PageResultEx.ok().data(data);

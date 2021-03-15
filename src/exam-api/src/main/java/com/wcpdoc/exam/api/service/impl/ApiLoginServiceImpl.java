@@ -54,7 +54,7 @@ public class ApiLoginServiceImpl extends BaseServiceImp<Object> implements ApiLo
 			throw new LoginException("用户名或密码错误！");
 		}
 		log.info("登录生成授权令牌：{}", user.getId());
-		PersonToken personToken = generateToken(user.getId());
+		PersonToken personToken = generateToken(user.getId(), user.getName());
 		return personToken;
 		} catch (Exception e) {
 			log.error("登录失败：{}", e.getMessage());
@@ -62,9 +62,10 @@ public class ApiLoginServiceImpl extends BaseServiceImp<Object> implements ApiLo
 		}
 	}
 
-	private PersonToken generateToken(Integer id) {
+	private PersonToken generateToken(Integer id, String name) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("id", id);
+		params.put("name", name);
 		String accessToken = JwtUtil.createToken(id+"", sysEnv, DateUtil.getNextMinute(new Date(), tokenActiveAccess), params);
 		params.put("refreshToken", true);
 		String refreshToken = JwtUtil.createToken(id+"", sysEnv, DateUtil.getNextMinute(new Date(), tokenActiveRefresh), params);

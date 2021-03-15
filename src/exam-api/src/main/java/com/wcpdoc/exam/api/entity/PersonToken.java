@@ -4,6 +4,7 @@ public class PersonToken {
 	private String accessToken;
 	private String refreshToken;
 	private Integer id;
+	private String name;
 	
 	public String getAccessToken() {
 		return accessToken;
@@ -22,5 +23,11 @@ public class PersonToken {
 	}
 	public void setId(Integer id) {
 		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
 	}
 }
