@@ -22,6 +22,7 @@ import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.QuestionDao;
 import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
@@ -81,13 +82,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			// newQuestion.setState(question.getState());
 			newQuestion.setDifficulty(question.getDifficulty());
 			newQuestion.setTitle(question.getTitle());
-			newQuestion.setOptionA(question.getOptionA());
-			newQuestion.setOptionB(question.getOptionB());
-			newQuestion.setOptionC(question.getOptionC());
-			newQuestion.setOptionD(question.getOptionD());
-			newQuestion.setOptionE(question.getOptionE());
-			newQuestion.setOptionF(question.getOptionF());
-			newQuestion.setOptionG(question.getOptionG());
+
+			//修改选项  TODO
+			
 			newQuestion.setAnswer(question.getAnswer());
 			newQuestion.setAnalysis(question.getAnalysis());
 			newQuestion.setUpdateTime(new Date());
@@ -106,13 +103,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		// entity.setState(question.getState());
 		entity.setDifficulty(question.getDifficulty());
 		entity.setTitle(question.getTitle());
-		entity.setOptionA(question.getOptionA());
-		entity.setOptionB(question.getOptionB());
-		entity.setOptionC(question.getOptionC());
-		entity.setOptionD(question.getOptionD());
-		entity.setOptionE(question.getOptionE());
-		entity.setOptionF(question.getOptionF());
-		entity.setOptionG(question.getOptionG());
+
+		//修改选项  TODO
+		
 		entity.setAnswer(question.getAnswer());
 		entity.setAnalysis(question.getAnalysis());
 		entity.setUpdateTime(new Date());
@@ -135,7 +128,11 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		List<Integer> fileIdList = html2FileIds(question.getTitle());// 标题
 
 		if (question.getType() == 1 || question.getType() == 2) {// 单选或多选
-			if (ValidateUtil.isValid(question.getOptionA())) {
+			//修改选项  TODO
+			QuestionOption entity = new QuestionOption();
+			entity.setQuestionId(question.getId());
+			
+			/*if (ValidateUtil.isValid(question.getOptionA())) {
 				fileIdList.addAll(html2FileIds(question.getOptionA()));
 			}
 			if (ValidateUtil.isValid(question.getOptionB())) {
@@ -155,7 +152,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			}
 			if (ValidateUtil.isValid(question.getOptionG())) {
 				fileIdList.addAll(html2FileIds(question.getOptionG()));
-			}
+			}*/
+			
 		} else if (question.getType() == 5) {// 问答
 			fileIdList.addAll(html2FileIds(question.getAnswer()));
 		}
@@ -248,10 +246,10 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void merge(Integer oldQuestionTypeId, Integer newQuestionTypeId) {
-		List<Question> list = questionDao.getList(oldQuestionTypeId);
+	public void move(Integer id, Integer sourceId, Integer targetId) {
+		List<Question> list = questionDao.getList(sourceId);
 		for(Question question : list){
-			question.setQuestionTypeId(newQuestionTypeId);
+			question.setQuestionTypeId(targetId);
 			update(question);
 		}
 	}

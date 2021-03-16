@@ -2,8 +2,6 @@ package com.wcpdoc.exam.core.service;
 
 import java.util.List;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.QuestionType;
@@ -20,7 +18,7 @@ public interface QuestionTypeService extends BaseService<QuestionType> {
 	 * @param questionType
 	 * void
 	 */
-	void addAndUpdate(String name, MultipartFile file);
+	void addAndUpdate(String name, Integer imgId);
 
 	/**
 	 * 删除试题分类
@@ -56,7 +54,7 @@ public interface QuestionTypeService extends BaseService<QuestionType> {
 	 * @param writeUserIds
 	 * void
 	 */
-	void doAuth(Integer id, Integer[] readUserIds, Integer[] writeUserIds, boolean rwState);
+	void doAuth(Integer id, String readUserIds, String writeUserIds, boolean rwState);
 
 	/**
 	 * 获取人员列表

@@ -89,5 +89,6 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
+		<finalName>examServer-1.0.0</finalName><!-- 打包后文件名称: 项目名-版本 -->
 	</build>
 </project>

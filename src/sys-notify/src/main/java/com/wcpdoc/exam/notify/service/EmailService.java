@@ -17,7 +17,7 @@ public interface EmailService {
 	 * v1.0 zhanghc 2019年10月15日下午15:51:27
 	 * void
 	 */
-	public void init() throws EmailException;
+	public JavaMailSender init() throws EmailException;
 	
 	/**
 	 * 获取邮件服务

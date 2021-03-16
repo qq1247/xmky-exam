@@ -61,4 +61,9 @@ public class PostServiceImpl extends BaseServiceImp<Post> implements PostService
 	public List<Post> getList(Integer orgId) {
 		return postDao.getList(orgId);
 	}
+
+	@Override
+	public Post getPost(String name) {
+		return postDao.getPost(name);
+	}
 }

@@ -171,25 +171,25 @@ public class WordServerImpl extends WordServer {
 			}
 			
 			if(optionList.size() >= 1) {
-				question.setOptionA(optionMap.get("A"));
+				//question.setOptionA(optionMap.get("A"));
 			}
 			if(optionList.size() >= 2) {
-				question.setOptionB(optionMap.get("B"));
+				//question.setOptionB(optionMap.get("B"));
 			}
 			if(optionList.size() >= 3) {
-				question.setOptionC(optionMap.get("C"));
+				//question.setOptionC(optionMap.get("C"));
 			}
 			if(optionList.size() >= 4) {
-				question.setOptionD(optionMap.get("D"));
+				//question.setOptionD(optionMap.get("D"));
 			}
 			if(optionList.size() >= 5) {
-				question.setOptionE(optionMap.get("E"));
+				//question.setOptionE(optionMap.get("E"));
 			}
 			if(optionList.size() >= 6) {
-				question.setOptionF(optionMap.get("F"));
+				//question.setOptionF(optionMap.get("F"));
 			}
 			if(optionList.size() >= 7) {
-				question.setOptionG(optionMap.get("G"));
+				//question.setOptionG(optionMap.get("G"));
 			}
 		}
 

@@ -63,5 +63,12 @@ public interface OrgDao extends RBaseDao<Org> {
 	 * @return boolean
 	 */
 	boolean existCode(String code, Integer excludeId);
-
+	
+	/**
+	 * 获取组织机构列表
+	 * 
+	 * v1.0 chenyun 2021年3月5日上午10:41:51
+	 * @return Org
+	 */
+	Org getOrg(String name);
 }

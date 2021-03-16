@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.base.service.impl;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -159,5 +160,27 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 	@Override
 	public boolean existCode(Org org) {
 		return orgDao.existCode(org.getCode(), org.getId());
+	}
+
+	@Override
+	public Org getOrg(String name) {
+		return orgDao.getOrg(name);
+	}
+
+	@Override
+	public List<Org> getList(Integer parentId) {
+		return orgDao.getList(parentId);
+	}
+
+	@Override
+	public Map<String, Object> getOrg(Integer id) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		Org entity = orgDao.getEntity(id);
+		Org parentEntity = orgDao.getEntity(entity.getParentId());
+		map.put("name", entity.getName());
+		map.put("parentId", entity.getParentId());
+		map.put("parentName", parentEntity.getName());
+		map.put("sort", entity.getNo());
+		return map;
 	}
 }

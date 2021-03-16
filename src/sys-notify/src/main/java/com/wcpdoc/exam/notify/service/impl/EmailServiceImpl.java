@@ -28,7 +28,7 @@ public class EmailServiceImpl implements EmailService {
 	private EmailExService emailExService;
 
 	@Override
-	public void init() throws EmailException {
+	public JavaMailSender init() throws EmailException {
 		log.info("初始化邮件服务开始");
 		Email email = emailExService.getEmail();
 		JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
@@ -38,6 +38,7 @@ public class EmailServiceImpl implements EmailService {
 		javaMailSender.setProtocol(email.getProtocol());
 		javaMailSender.setDefaultEncoding(email.getEncode());
 		log.info("初始化邮件服务成功：{},{},{},{}", email.getHost(), email.getUserName(), email.getProtocol(), email.getEncode());
+		return javaMailSender;
 	}
 
 	@Override
@@ -45,7 +46,7 @@ public class EmailServiceImpl implements EmailService {
 		if (javaMailSender == null) {
 			synchronized (EmailServiceImpl.class) {
 				if (javaMailSender == null) {
-					init();
+					javaMailSender = init();
 				}
 			}
 		}
