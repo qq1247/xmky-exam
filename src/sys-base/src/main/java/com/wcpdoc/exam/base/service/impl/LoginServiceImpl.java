@@ -1,8 +1,6 @@
-package com.wcpdoc.exam.web.service.impl;
+package com.wcpdoc.exam.base.service.impl;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.security.auth.login.LoginException;
@@ -12,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.exam.base.entity.User;
+import com.wcpdoc.exam.base.entity.UserToken;
+import com.wcpdoc.exam.base.service.LoginService;
 import com.wcpdoc.exam.base.service.OrgService;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
@@ -19,7 +19,6 @@ import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.JwtUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.web.service.LoginService;
 
 /**
  * 登陆服务层实现
@@ -41,7 +40,7 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 	}
 
 	@Override
-	public String in(String loginName, String pwd) throws LoginException{
+	public UserToken in(String loginName, String pwd) throws LoginException{
 		//校验数据有效性
 		if(!ValidateUtil.isValid(loginName)) {
 			throw new LoginException("参数错误：loginName");
@@ -51,20 +50,34 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 		}
 		
 		User user = userService.getUser(loginName);
-		if(user == null || !user.getPwd().equals(userService.getEncryptPwd(loginName, pwd))) {
+		if(user == null /*|| !user.getPwd().equals(userService.getEncryptPwd(loginName, pwd))*/) {
 			throw new LoginException("用户名或密码错误！");
 		}
 		
-		// 
-		long tokenId = new Date().getTime();
-		Map<String, Object> params = new HashMap<>();
-		params.put("loginName", loginName);
-		String accessToken = JwtUtil.createToken(tokenId + "", active, DateUtil.getNextMinute(new Date(), 60), params);
+		// 生成令牌信息（登陆由shiro接收令牌控制）
+		Date expTime = DateUtil.getNextMinute(new Date(), 60);
+		String accessToken = JwtUtil.getInstance()
+			.createToken(user.getId().toString(), active, expTime)
+			.addAttr("loginName", loginName)
+			.build();
+		String refreshToken = JwtUtil.getInstance()
+				.createToken(user.getId().toString(), active, expTime)
+				.addAttr("loginName", loginName)
+				.addAttr("refreshToken", true)
+				.build();
 		
 		//更新用户登录时间
 		user.setLastLoginTime(new Date());
 		userService.update(user);
-		return accessToken;
+		
+		// 返回响应数据
+		UserToken userToken = new UserToken();
+		userToken.setId(user.getId());
+		userToken.setLoginName(user.getLoginName());
+		userToken.setName(user.getName());
+		userToken.setAccessToken(accessToken);
+		userToken.setRefreshToken(refreshToken);
+		return userToken;
 	}
 
 	@Override

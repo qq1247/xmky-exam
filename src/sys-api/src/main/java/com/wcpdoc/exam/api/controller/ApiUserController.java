@@ -431,7 +431,7 @@ public class ApiUserController extends BaseController {
 	@RequestMapping("/updatePost")
 	@ResponseBody
 	public PageResult updatePost(Integer id, String postName) {
-		try {//TODO
+		try {
 			// 校验数据有效性
 			if (id == null) {
 				throw new MyException("参数错误：id");

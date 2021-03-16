@@ -17,6 +17,7 @@ import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UnknownAccountException;
+import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
@@ -97,7 +98,7 @@ public class ShiroCfg {
 				executeLogin(request, response);
 				return true;
 			} catch (Exception e) {
-				return true;
+				return false;
 			}
 		}
 
@@ -124,7 +125,7 @@ public class ShiroCfg {
 		}
 
 		/**
-		 * 拒绝访问返回信息
+		 * 拒绝访问处理
 		 */
 		@Override
 		protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
@@ -136,6 +137,9 @@ public class ShiroCfg {
 			return false;
 		}
 
+		/**
+		 * 支持跨域
+		 */
 		@Override
 		protected boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
 			HttpServletRequest httpRequest = (HttpServletRequest) request;
@@ -161,18 +165,22 @@ public class ShiroCfg {
 		@Resource
 		private UserService userService;
 
+		public JWTRealm(CredentialsMatcher credentialsMatcher) {
+			setCredentialsMatcher(credentialsMatcher);
+		}
+		
 		@Override
 		public boolean supports(AuthenticationToken token) {
 			return token instanceof JWTToken;
 		}
-
+		
 		/**
-		 * 授权
+		 * 授予角色权限
 		 */
 		@Override
 		protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
 			String jwt = (String) principals.getPrimaryPrincipal();
-			JwtResult jwtResult = JwtUtil.parse(jwt);
+			JwtResult jwtResult = JwtUtil.getInstance().parse(jwt);
 			String loginName = jwtResult.getClaims().get("loginName", String.class);
 			User user = userService.getUser(loginName);
 			if (user == null) {
@@ -182,28 +190,34 @@ public class ShiroCfg {
 			List<Post> postList = userService.getPostList(user.getId());
 			SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
 			for (Post post : postList) {
-				simpleAuthorizationInfo.addRole(post.getName());
+				simpleAuthorizationInfo.addRole(post.getCode());
 			}
 			
 			return simpleAuthorizationInfo;
 		}
 
 		/**
-		 * 认证
+		 * 登陆认证
 		 */
 		@Override
 		protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
 			String jwtToken = (String) token.getPrincipal();
-			if (!ValidateUtil.isValid(jwtToken)) {
-				throw new UnknownAccountException("token为空");
-			}
-
-			JwtResult result = JwtUtil.parse(jwtToken);
-			if (!result.isSucc()) {
-				throw new UnknownAccountException(result.getMsg());
-			}
-
-			return new SimpleAuthenticationInfo(jwtToken, jwtToken, getName());
+			return new SimpleAuthenticationInfo(jwtToken, null, getName());
+		}
+	}
+	
+	/**
+	 * jwt凭证匹配器
+	 * 
+	 * v1.0 zhanghc 2021年3月16日上午11:07:18
+	 */
+	@Component
+	class JWTCredentialsMatcher implements CredentialsMatcher {
+		@Override
+		public boolean doCredentialsMatch(AuthenticationToken token, AuthenticationInfo info) {
+			String jwtToken = (String) info.getPrincipals().getPrimaryPrincipal();
+			JwtResult jwtResult = JwtUtil.getInstance().parse(jwtToken);
+			return jwtResult.isSucc();
 		}
 	}
 	
@@ -218,8 +232,8 @@ public class ShiroCfg {
 	@Bean
 	public SecurityManager securityManager(JWTRealm jwtRealm, EhCacheManager ehCacheManager) {
 		DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
-		securityManager.setRealm(jwtRealm);//自定义realm
-		securityManager.setCacheManager(ehCacheManager);// 使用ehcache
+		securityManager.setRealm(jwtRealm);
+		securityManager.setCacheManager(ehCacheManager);
 		return securityManager;
 	}
 
@@ -238,7 +252,7 @@ public class ShiroCfg {
 	}
 
 	/**
-	 * 授权第二次使用缓存查询
+	 * 开启缓存支持
 	 * 
 	 * v1.0 zhanghc 2021年3月3日下午1:55:19
 	 * 
@@ -253,7 +267,7 @@ public class ShiroCfg {
 	}
 
 	/**
-	 * 注解支持
+	 * 开启注解支持
 	 * 
 	 * v1.0 zhanghc 2021年3月2日上午11:29:58
 	 * 

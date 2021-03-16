@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.annotation.Resource;
 
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -49,6 +50,7 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/examTypeTreeList")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult examTypeTreeList() {
 		try {
 			return PageResultEx.ok().data(examTypeService.getAuthTreeList());

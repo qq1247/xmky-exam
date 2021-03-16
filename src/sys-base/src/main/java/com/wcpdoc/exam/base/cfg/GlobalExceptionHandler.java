@@ -3,6 +3,7 @@ package com.wcpdoc.exam.base.cfg;
 import org.apache.shiro.ShiroException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
+import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,9 @@ public class GlobalExceptionHandler {
 		
 		if (se instanceof UnauthorizedException) {
 			return PageResult.err().msg("未授权");
+		}
+		if (se instanceof UnauthenticatedException) {
+			return PageResult.err().msg("未登陆");
 		}
 
 		log.error("shiro未捕获异常：{}", se.getMessage());

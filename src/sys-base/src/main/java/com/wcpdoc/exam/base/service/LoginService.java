@@ -1,7 +1,8 @@
-package com.wcpdoc.exam.web.service;
+package com.wcpdoc.exam.base.service;
 
 import javax.security.auth.login.LoginException;
 
+import com.wcpdoc.exam.base.entity.UserToken;
 import com.wcpdoc.exam.core.service.BaseService;
 /**
  * 登陆服务层接口
@@ -16,9 +17,9 @@ public interface LoginService extends BaseService<Object>{
 	 * v1.0 zhanghc 2017年7月17日下午4:20:21
 	 * @param loginName
 	 * @param pwd
-	 * @return String 令牌
+	 * @return UserToken
 	 */
-	String in(String loginName, String pwd) throws LoginException;
+	UserToken in(String loginName, String pwd) throws LoginException;
 	
 	/**
 	 * 退出登录

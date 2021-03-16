@@ -1,13 +1,12 @@
 package com.wcpdoc.exam.core.util;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.wcpdoc.exam.core.entity.JwtResult;
+import com.wcpdoc.exam.core.exception.MyException;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -22,8 +21,23 @@ import io.jsonwebtoken.SignatureAlgorithm;
  */
 public class JwtUtil {
 	private static final Logger log = LoggerFactory.getLogger(JwtUtil.class);
-	public static final String SECRET_KEY = "9xzR4+K7XpvbCpoIMocXVxS655xxb9S0Qxd5RDU4b7PeSIhYfYdjg9aOMrhjPjwNpjo3XjbthxGduNzWzzw2yw==";
+	private static final String SECRET_KEY = "9xzR4+K7XpvbCpoIMocXVxS655xxb9S0Qxd5RDU4b7PeSIhYfYdjg9aOMrhjPjwNpjo3XjbthxGduNzWzzw2yw==";
+	private static JwtBuilder builder = null; 
 
+	private JwtUtil() {
+		
+	}
+	
+	/**
+	 * 获取实例
+	 * 
+	 * v1.0 zhanghc 2021年3月16日下午12:16:40
+	 * @return JwtUtil
+	 */
+	public static JwtUtil getInstance() {
+		return new JwtUtil();
+	}
+	
 	/**
 	 * 生成令牌
 	 * 
@@ -35,31 +49,62 @@ public class JwtUtil {
 	 * @param params 自定义参数。
 	 * @return String
 	 */
-	public static String createToken(String id, String subject, Date expTime, Map<String, Object> params) {
+	public JwtUtil createToken(String id, String subject, Date expTime) {
 		// 校验数据有效性
-		if (params != null) {
-			if (params.get(Claims.ID) != null) {
-				throw new RuntimeException(String.format("params[%s]为jwt关键字，不能使用", Claims.ID));
-			}
-			if (params.get(Claims.SUBJECT) != null) {
-				throw new RuntimeException(String.format("params[%s]为jwt关键字，不能使用", Claims.SUBJECT));
-			}
-			if (params.get(Claims.EXPIRATION) != null) {
-				throw new RuntimeException(String.format("params[%s]为jwt关键字，不能使用", Claims.EXPIRATION));
-			}
+		if (!ValidateUtil.isValid(id)) {
+			throw new MyException("参数错误：id");
+		}
+		if (!ValidateUtil.isValid(subject)) {
+			throw new MyException("参数错误：subject");
+		}
+		if (expTime == null) {
+			throw new MyException("参数错误：expTime");
+		}
+		if (expTime.getTime() <= new Date().getTime()) {
+			throw new MyException("参数错误：expTime必须大于当前时间");
 		}
 
 		// 创建令牌
-		JwtBuilder builder = Jwts.builder();
-		if (params != null) {
-			Map<String, Object> _params = new HashMap<>();
-			_params.putAll(params);
-			builder.setClaims(_params);
-		}
+		builder = Jwts.builder();
 		builder.setId(id);
 		builder.setSubject(subject);
 		builder.setExpiration(expTime);
 		builder.signWith(SignatureAlgorithm.HS512, SECRET_KEY);
+		return this;
+	}
+	
+	/**
+	 * 添加属性
+	 * 
+	 * v1.0 zhanghc 2021年3月16日下午12:25:22
+	 * @param key
+	 * @param value
+	 * @return JwtUtil
+	 */
+	public JwtUtil addAttr(String key, Object value) {
+		// 校验数据有效性
+		if (Claims.ID.equals(key)) {
+			throw new MyException(String.format("key[%s]为jwt关键字", Claims.ID));
+		}
+		if (Claims.SUBJECT.equals(key)) {
+			throw new MyException(String.format("key[%s]为jwt关键字", Claims.SUBJECT));
+		}
+		if (Claims.EXPIRATION.equals(key)) {
+			throw new MyException(String.format("key[%s]为jwt关键字", Claims.EXPIRATION));
+		}
+		
+		// 添加属性
+		builder.claim(key, value);
+		return this;
+	}
+	
+	/**
+	 * 构建字符串
+	 * 
+	 * v1.0 zhanghc 2021年3月16日下午12:26:17
+	 * @return String
+	 */
+	public String build() {
 		return builder.compact();
 	}
 	
@@ -70,7 +115,7 @@ public class JwtUtil {
 	 * @param token
 	 * @return JwtResult
 	 */
-	public static JwtResult parse(String token) {
+	public JwtResult parse(String token) {
 		try {
 			if (!ValidateUtil.isValid(token)) {
 				return new JwtResult(false, "令牌为空", null);
@@ -79,6 +124,7 @@ public class JwtUtil {
 			Claims claims = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
 			return new JwtResult(true, "令牌有效", claims);
 		} catch (ExpiredJwtException e) {
+			log.info("解析令牌错误：{}", "令牌过期");
 			return new JwtResult(false, "令牌过期", null);
 		} catch (Exception e) {
 			log.error("解析令牌错误：{}", e.getMessage());
@@ -87,16 +133,6 @@ public class JwtUtil {
 	}
 	
 	public static void main(String[] args) {
-		Map<String, Object> claims = new HashMap<>();
-		claims.put("personId", 10000001);
-		claims.put("personName","张虎成");
-		claims.put("improve", true);
-		String accessToken = JwtUtil.createToken("1585020716000", "dev", DateUtil.getNextDay(new Date(), 15), claims);
-		System.err.println(accessToken);
 		
-		JwtResult parse = parse(accessToken);
-		String id = parse.getClaims().getId();
-		System.err.println(id);
-		System.err.println(parse.getClaims().get("id"));
 	}
 }

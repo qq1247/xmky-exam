@@ -1,4 +1,4 @@
-package com.wcpdoc.exam.web.controller;
+package com.wcpdoc.exam.api.controller;
 
 import java.util.Date;
 
@@ -11,13 +11,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.exam.base.entity.UserToken;
+import com.wcpdoc.exam.base.service.LoginService;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.util.DateUtil;
-import com.wcpdoc.exam.web.service.LoginService;
 
 /**
  * 登录控制层
@@ -25,9 +26,9 @@ import com.wcpdoc.exam.web.service.LoginService;
  * v1.0 zhanghc 2016年7月10日下午11:44:41
  */
 @Controller
-@RequestMapping("/login")
-public class LoginController extends BaseController {
-	private static final Logger log = LoggerFactory.getLogger(LoginController.class);
+@RequestMapping("/api/login")
+public class ApiLoginController extends BaseController {
+	private static final Logger log = LoggerFactory.getLogger(ApiLoginController.class);
 	
 	@Resource
 	private LoginService loginService;
@@ -48,8 +49,8 @@ public class LoginController extends BaseController {
 	public PageResult in(String loginName, String pwd) {
 		try {
 			//完成登录
-			String token = loginService.in(loginName, pwd);
-			return PageResultEx.ok().data(token);
+			UserToken userToken = loginService.in(loginName, pwd);
+			return PageResultEx.ok().data(userToken);
 		} catch (LoginException e) {
 			log.error("完成登录错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
