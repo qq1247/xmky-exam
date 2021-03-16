@@ -8,7 +8,6 @@ import javax.security.auth.login.LoginException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -46,11 +45,10 @@ public class LoginController extends BaseController {
 	 */
 	@RequestMapping("/in")
 	@ResponseBody
-	public PageResult in(Model model, String loginName, String pwd) {
+	public PageResult in(String loginName, String pwd) {
 		try {
 			//完成登录
 			String token = loginService.in(loginName, pwd);
-			model.addAttribute("token", token);
 			return PageResultEx.ok().data(token);
 		} catch (LoginException e) {
 			log.error("完成登录错误：{}", e.getMessage());
@@ -109,7 +107,7 @@ public class LoginController extends BaseController {
 	 * @return
 	 * PageResult
 	 */
-	@RequestMapping("/curTime")
+	@RequestMapping("/sysTime")
 	@ResponseBody
 	public PageResult sysTime() {
 		try {

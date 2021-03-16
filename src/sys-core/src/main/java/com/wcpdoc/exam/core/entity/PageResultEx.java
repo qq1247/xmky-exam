@@ -1,5 +1,8 @@
 package com.wcpdoc.exam.core.entity;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 页面结果扩展
  * 
@@ -36,5 +39,14 @@ public class PageResultEx extends PageResult {
 
 	public Object getData() {
 		return data;
+	}
+
+	@SuppressWarnings("unchecked")
+	public PageResultEx addAttr(String key, Object value) {
+		if (this.data == null) {
+			this.data = new HashMap<>();
+		}
+		((Map<String, Object>)this.data).put(key, value);
+		return this;
 	}
 }

@@ -1,8 +1,6 @@
 package com.wcpdoc.exam.file.controller;
 
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -104,9 +102,7 @@ public class FileController extends BaseController {
 		try {
 			String[] allowTypes = { "jpg", "gif", "png", "zip", "rar", "doc", "xls", "docx", "xlsx", "mp4" };
 			String fileIds = fileService.doTempUpload(files, allowTypes);
-			Map<String, Object> data = new HashMap<String, Object>();
-			data.put("fileIds", fileIds);
-			return PageResultEx.ok().data(data);
+			return PageResultEx.ok().data(fileIds);
 		} catch (MyException e) {
 			log.error("完成临时上传附件失败：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
