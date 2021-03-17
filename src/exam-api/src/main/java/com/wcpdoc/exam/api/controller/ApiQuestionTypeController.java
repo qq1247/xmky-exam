@@ -45,7 +45,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/list")
 	@ResponseBody
-	@RequiresRoles("OP")
+	//@RequiresRoles("OP")
 	public PageResult list(PageIn pageIn, String name) {
 		try {
 			if (ValidateUtil.isValid(name)) {
@@ -66,6 +66,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
+	//@RequiresRoles("OP")
 	public PageResult add(String name, Integer imgId) {
 		try {
 			//校验数据有效性
@@ -104,7 +105,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles("OP")
+	//@RequiresRoles("OP")
 	public PageResult edit(Integer id, String name, Integer imgId) {
 		try {
 			//校验数据有效性
@@ -142,7 +143,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles("OP")
+	//@RequiresRoles("OP")
 	public PageResult del(Integer id) {
 		try {
 			questionTypeService.delAndUpdate(id);
@@ -165,7 +166,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/userList")
 	@ResponseBody
-	@RequiresRoles("OP")
+	//@RequiresRoles("OP")
 	public PageResult userList(PageIn pageIn) {  //Two - name (userName || orgName)  Ten - id
 		try {
 			return PageResultEx.ok().data(questionTypeService.getUserListpage(pageIn));
@@ -187,7 +188,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/auth")
 	@ResponseBody
-	@RequiresRoles("OP")
+	//@RequiresRoles("OP")
 	public PageResult auth(Integer id, String readUserIds, String writeUserIds, boolean rwState) {
 		try {
 			questionTypeService.doAuth(id, readUserIds, writeUserIds, rwState);
@@ -210,7 +211,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/move")
 	@ResponseBody
-	@RequiresRoles("OP")
+	//@RequiresRoles("OP")
 	public PageResult move(Integer id, Integer sourceId, Integer targetId) {
 		try {
 			questionService.move(id, sourceId, targetId);
