@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.annotation.Resource;
 
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -44,6 +45,7 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/list")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult list(PageIn pageIn) {
 		try {
 			return PageResultEx.ok().data(paperTypeService.getListpage(pageIn));
@@ -61,6 +63,7 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult add(PaperType paperType) {
 		try {
 			paperTypeService.addAndUpdate(paperType);
@@ -82,6 +85,7 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult edit(PaperType paperType) {
 		try {
 			//校验数据有效性
@@ -116,6 +120,7 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult del(Integer id) {
 		try {
 			paperTypeService.delAndUpdate(id);
@@ -142,6 +147,7 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/auth")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult auth(Integer id, String readUserIds, String writeUserIds, boolean rwState) {
 		try {
 			paperTypeService.doAuth(id, readUserIds, writeUserIds, rwState);

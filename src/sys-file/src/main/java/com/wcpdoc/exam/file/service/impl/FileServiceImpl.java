@@ -92,7 +92,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 			file.setPath(tempPath + ymdPath + java.io.File.separator + fileId);
 			file.setIp(request.getRemoteHost());
 			file.setState(0);
-			file.setUpdateUserId(1);//getCurUser().getId()
+			file.setUpdateUserId(getCurUser().getId());
 			file.setUpdateTime(new Date());
 			fileDao.add(file);
 
@@ -126,7 +126,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		file.setState(1);
 		file.setPath(ymdPath + java.io.File.separator + tempFile.getName());
 		file.setIp(request.getRemoteHost());
-		file.setUpdateUserId(1);//getCurUser().getId()
+		file.setUpdateUserId(getCurUser().getId());
 		file.setUpdateTime(new Date());
 
 		// 移动临时附件到附件目录

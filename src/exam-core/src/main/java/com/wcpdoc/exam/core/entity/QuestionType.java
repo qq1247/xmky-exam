@@ -27,8 +27,8 @@ public class QuestionType {
 	private Integer id;
 	@Column(name = "NAME")
 	private String name;
-	@Column(name = "IMG")
-	private Integer img;
+	@Column(name = "IMG_ID")
+	private Integer imgId;
 	@Column(name = "CREATE_USER_ID")
 	private Integer createUserId;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -62,11 +62,11 @@ public class QuestionType {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public Integer getImg() {
-		return img;
+	public Integer getImgId() {
+		return imgId;
 	}
-	public void setImg(Integer img) {
-		this.img = img;
+	public void setImgId(Integer imgId) {
+		this.imgId = imgId;
 	}
 	public Integer getCreateUserId() {
 		return createUserId;

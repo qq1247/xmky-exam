@@ -182,4 +182,9 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	public PageOut getGradeListpage(PageIn pageIn) {
 		return examDao.getGradeListpage(pageIn);
 	}
+
+	@Override
+	public List<Exam> getExamList(Integer paperId) {
+		return examDao.getExamList(paperId);
+	}
 }

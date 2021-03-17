@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.api.controller;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -11,17 +12,26 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.exam.base.entity.Parm;
+import com.wcpdoc.exam.base.entity.User;
+import com.wcpdoc.exam.base.service.ParmService;
+import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.constant.ConstantManager;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.Exam;
+import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.ExamTypeService;
+import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.PaperTypeService;
+import com.wcpdoc.exam.core.util.ValidateUtil;
+import com.wcpdoc.exam.notify.exception.NotifyException;
+import com.wcpdoc.exam.notify.service.NotifyService;
 
 /**
  * 考试控制层
@@ -41,24 +51,14 @@ public class ApiExamController extends BaseController{
 	private PaperTypeService paperTypeService;
 	@Resource
 	private ExamTypeService examTypeService;
-	
-	/**
-	 * 考试分类树
-	 * 
-	 * v1.0 zhanghc 2018年10月25日下午9:23:06
-	 * @return List<Map<String,Object>>
-	 */
-	@RequestMapping("/examTypeTreeList")
-	@ResponseBody
-	@RequiresRoles("OP")
-	public PageResult examTypeTreeList() {
-		try {
-			return PageResultEx.ok().data(examTypeService.getAuthTreeList());
-		} catch (Exception e) {
-			log.error("获取考试分类树错误：", e);
-			return PageResult.err();
-		}
-	}
+	@Resource
+	private UserService userService;
+	@Resource
+	private NotifyService notifyService;
+	@Resource
+	private ParmService parmService;
+	@Resource
+	private MyExamService myExamService;
 	
 	/**
 	 * 试卷列表
@@ -69,6 +69,7 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/paperList")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult paperList(PageIn pageIn) {
 		try {
 			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
@@ -91,6 +92,7 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/userList")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult userList(PageIn pageIn) {
 		try {
 			return PageResultEx.ok().data(examService.getUserListpage(pageIn));
@@ -108,6 +110,7 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/list")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult list(PageIn pageIn) {
 		try {
 			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
@@ -128,6 +131,7 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult add(Exam exam) {
 		try {
 			//校验数据有效性
@@ -167,6 +171,7 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult edit(Exam exam) {
 		try {
 			//校验数据有效性
@@ -190,24 +195,15 @@ public class ApiExamController extends BaseController{
 			//添加考试
 			entity.setName(exam.getName());
 			entity.setPaperId(exam.getPaperId());
-			entity.setPassScore(exam.getPassScore());
-//			entity.setState(exam.getState());
 			entity.setStartTime(exam.getStartTime());
 			entity.setEndTime(exam.getEndTime());
 			entity.setMarkStartTime(exam.getMarkStartTime());
 			entity.setMarkEndTime(exam.getMarkEndTime());
+			entity.setScoreState(exam.getScoreState());
+			entity.setRankState(exam.getRankState());
+			entity.setLoginType(exam.getLoginType());
 			entity.setDescription(exam.getDescription());
-			entity.setScoreA(exam.getScoreA());
-			entity.setScoreARemark(exam.getScoreARemark());
-			entity.setScoreB(exam.getScoreB());
-			entity.setScoreBRemark(exam.getScoreBRemark());
-			entity.setScoreC(exam.getScoreC());
-			entity.setScoreCRemark(exam.getScoreCRemark());
-			entity.setScoreD(exam.getScoreD());
-			entity.setScoreDRemark(exam.getScoreDRemark());
-			entity.setScoreE(exam.getScoreE());
 			entity.setScoreERemark(exam.getScoreERemark());
-//			entity.setExamTypeId(exam.getExamTypeId());
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
 			examService.update(entity);
@@ -229,6 +225,7 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult del(Integer id) {
 		try {
 			Date curTime = new Date();
@@ -261,6 +258,7 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/cfg")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult cfg(Integer id, Integer[] userIds, Integer[] myMarkIds) {
 		try {
 			examService.doCfg(id, userIds, myMarkIds);
@@ -283,6 +281,7 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/publish")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult publish(Integer id) {
 		try {
 			Exam exam = examService.getEntity(id);
@@ -301,6 +300,62 @@ public class ApiExamController extends BaseController{
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成发布错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 邮件通知
+	 * 
+	 * v1.0 zhanghc 2018年11月24日上午9:13:22
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/email")
+	@ResponseBody
+	@RequiresRoles("OP")
+	public PageResult email(Integer examId) {
+		try {
+			Parm parm = parmService.getEntity(1);
+			List<MyExam> list = myExamService.getList(examId);
+			for(MyExam myExam : list){
+				User user = userService.getEntity(myExam.getUserId());
+				if (!ValidateUtil.isValid(user.getEmail())) {
+					continue;
+				}
+				notifyService.pushEmail(parm.getEmailUserName(), user.getEmail(), "考试邮箱通知！", user.getName()+"-昵称。");
+			}
+			return PageResult.ok();
+		} catch (NotifyException e) {
+			log.error("邮件通知错误：", e);
+			return PageResult.err().msg(e.getMessage());
+		} catch (MyException e) {
+			log.error("邮件通知错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("邮件通知错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 归档
+	 * 
+	 * v1.0 zhanghc 2018年11月24日上午9:13:22
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/archive")
+	@ResponseBody
+	@RequiresRoles("OP")
+	public PageResult archive(Integer id) {
+		try {
+			Exam exam = examService.getEntity(id);
+			exam.setState(3);
+			examService.update(exam);
+			return PageResult.ok();
+		}catch (Exception e) {
+			log.error("归档错误：", e);
 			return PageResult.err();
 		}
 	}

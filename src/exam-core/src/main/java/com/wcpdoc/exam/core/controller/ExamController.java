@@ -255,14 +255,14 @@ public class ExamController extends BaseController{
 			//添加考试
 			entity.setName(exam.getName());
 			entity.setPaperId(exam.getPaperId());
-			entity.setPassScore(exam.getPassScore());
+//			entity.setPassScore(exam.getPassScore());
 //			entity.setState(exam.getState());
 			entity.setStartTime(exam.getStartTime());
 			entity.setEndTime(exam.getEndTime());
 			entity.setMarkStartTime(exam.getMarkStartTime());
 			entity.setMarkEndTime(exam.getMarkEndTime());
 			entity.setDescription(exam.getDescription());
-			entity.setScoreA(exam.getScoreA());
+			/*entity.setScoreA(exam.getScoreA());
 			entity.setScoreARemark(exam.getScoreARemark());
 			entity.setScoreB(exam.getScoreB());
 			entity.setScoreBRemark(exam.getScoreBRemark());
@@ -270,7 +270,7 @@ public class ExamController extends BaseController{
 			entity.setScoreCRemark(exam.getScoreCRemark());
 			entity.setScoreD(exam.getScoreD());
 			entity.setScoreDRemark(exam.getScoreDRemark());
-			entity.setScoreE(exam.getScoreE());
+			entity.setScoreE(exam.getScoreE());*/
 			entity.setScoreERemark(exam.getScoreERemark());
 //			entity.setExamTypeId(exam.getExamTypeId());
 			entity.setUpdateTime(new Date());

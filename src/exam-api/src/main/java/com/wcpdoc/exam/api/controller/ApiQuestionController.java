@@ -81,7 +81,7 @@ public class ApiQuestionController extends BaseController {
 			if(id != null){
 				pageIn.setTwo(id.toString());
 			}
-			if(!ValidateUtil.isValid(title)){
+			if(ValidateUtil.isValid(title)){
 				pageIn.setThree(title);
 			}
 			if(type != null){

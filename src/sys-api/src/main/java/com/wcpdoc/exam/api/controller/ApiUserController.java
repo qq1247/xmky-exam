@@ -1,13 +1,10 @@
 package com.wcpdoc.exam.api.controller;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -30,7 +27,6 @@ import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.exception.MyException;
-import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
@@ -260,35 +256,9 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/postUpdate")
 	@ResponseBody
-	public PageResult postUpdate(Integer id, Integer[] postIds) {
+	public PageResult postUpdate(Integer id, Integer[] postId) {
 		try {
-			// 校验数据有效性
-			if (id == null) {
-				throw new MyException("参数错误：id");
-			}
-			User user = userService.getEntity(id);
-			if (!ValidateUtil.isValid(postIds)) {
-				user.setPostIds(null);
-				user.setUpdateTime(new Date());
-				user.setUpdateUserId(getCurUser().getId());
-				userService.update(user);
-				return PageResult.ok();
-			}
-			
-			List<Post> postList = postService.getOrgPostList(user.getOrgId());
-			Set<Integer> postIdSet = new HashSet<Integer>();
-			for (Post post : postList) {
-				postIdSet.add(post.getId());
-			}
-			if (!postIdSet.containsAll(Arrays.asList(postIds))) {
-				throw new MyException("参数错误：postIds");
-			}
-			
-			// 更新岗位
-			user.setPostIds(String.format(",%s,", StringUtil.join(postIds, ",")));
-			user.setUpdateTime(new Date());
-			user.setUpdateUserId(getCurUser().getId());
-			userService.update(user);
+			userService.postUpdate(id, postId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("设置岗位错误：{}", e.getMessage());
@@ -415,61 +385,6 @@ public class ApiUserController extends BaseController {
 			return PageResultEx.ok();
 		} catch (Exception e) {
 			log.error("组织机构列表错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 设置岗位
-	 * 
-	 * v1.0 zhanghc 2016-6-15下午17:24:19
-	 * 
-	 * @param id
-	 * @param postIds
-	 * @return PageResult
-	 */
-	@RequestMapping("/updatePost")
-	@ResponseBody
-	public PageResult updatePost(Integer id, String postName) {
-		try {
-			// 校验数据有效性
-			if (id == null) {
-				throw new MyException("参数错误：id");
-			}
-			User user = userService.getEntity(id);
-			if (!ValidateUtil.isValid(postName)) {
-				user.setPostIds(null);
-				user.setUpdateTime(new Date());
-				user.setUpdateUserId(getCurUser().getId());
-				userService.update(user);
-				return PageResult.ok();
-			}
-			
-			//查找岗位名称
-			Post entity = postService.getPost(postName);
-			
-			//对比
-			List<Post> postList = postService.getOrgPostList(user.getOrgId());
-			Set<Integer> postIdSet = new HashSet<Integer>();
-			for (Post post : postList) {
-				postIdSet.add(post.getId());
-			}
-			
-			if (!postIdSet.containsAll(Arrays.asList(entity.getId()))) {
-				throw new MyException("参数错误：postName");
-			}
-			
-			// 更新岗位
-			user.setPostIds(entity.getId().toString());//TODO
-			user.setUpdateTime(new Date());
-			user.setUpdateUserId(getCurUser().getId());
-			userService.update(user);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("设置岗位错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("设置岗位错误：", e);
 			return PageResult.err();
 		}
 	}

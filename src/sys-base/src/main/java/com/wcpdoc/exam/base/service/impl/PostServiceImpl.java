@@ -63,7 +63,7 @@ public class PostServiceImpl extends BaseServiceImp<Post> implements PostService
 	}
 
 	@Override
-	public Post getPost(String name) {
-		return postDao.getPost(name);
+	public List<Post> getList() {
+		return postDao.getList();
 	}
 }

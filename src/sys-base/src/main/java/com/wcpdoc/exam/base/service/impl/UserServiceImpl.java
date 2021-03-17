@@ -1,13 +1,29 @@
 package com.wcpdoc.exam.base.service.impl;
 
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.credential.CredentialsMatcher;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.cache.ehcache.EhCacheManager;
+import org.apache.shiro.mgt.RealmSecurityManager;
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.exam.base.cfg.JWTToken;
+import com.wcpdoc.exam.base.cfg.ShiroCfg;
+import com.wcpdoc.exam.base.cfg.ShiroCfg.JWTRealm;
 import com.wcpdoc.exam.base.dao.UserDao;
 import com.wcpdoc.exam.base.entity.Org;
 import com.wcpdoc.exam.base.entity.Post;
@@ -18,10 +34,13 @@ import com.wcpdoc.exam.base.service.PostService;
 import com.wcpdoc.exam.base.service.ResService;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
+import com.wcpdoc.exam.core.entity.JwtResult;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.EncryptUtil;
+import com.wcpdoc.exam.core.util.JwtUtil;
+import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
@@ -166,5 +185,41 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		map.put("state", entity.getState());
 		//map.put("sort", entity.getNo());
 		return map;
+	}
+
+	@Override
+	public void postUpdate(Integer id, Integer[] postId) {
+		// 校验数据有效性
+		if (id == null) {
+			throw new MyException("参数错误：id");
+		}
+		User user = userDao.getEntity(id);
+		if(user == null){
+			throw new MyException("参数错误：id");
+		}
+		
+		List<Post> postList = postService.getList();
+		Set<Integer> postIdSet = new HashSet<Integer>();
+		for (Post post : postList) {
+			postIdSet.add(post.getId());
+		}
+		if (!postIdSet.containsAll(Arrays.asList(postId))) {
+			throw new MyException("参数错误：postId");
+		}
+		
+		// 更新岗位
+		user.setPostIds(String.format(",%s,", StringUtil.join(postId, ",")));
+		user.setUpdateTime(new Date());
+		user.setUpdateUserId(getCurUser().getId());
+		userDao.update(user);
+		
+		/*user.getId();
+		
+		HttpServletRequest httpRequest = (HttpServletRequest) request;
+		String jwt = httpRequest.getHeader("Authorization");
+		JWTToken jwtToken = new JWTToken(jwt);
+		getCachedAuthenticationInfo();
+		
+		jwtRealm.getAuthorizationCache().clear();*/
 	}
 }

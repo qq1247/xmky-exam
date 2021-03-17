@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.annotation.Resource;
 
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -39,6 +40,7 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	 */
 	@RequestMapping("/list")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult list(PageIn pageIn) {
 		try {
 			return PageResultEx.ok().data(questionTypeOpenService.getListpage(pageIn));
@@ -56,6 +58,7 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult add(QuestionTypeOpen questionTypeOpen) {
 		try {
 			questionTypeOpen.setUpdateUserId(getCurUser().getId());
@@ -79,6 +82,7 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult edit(QuestionTypeOpen questionTypeOpen) {
 		try {
 			QuestionTypeOpen entity = questionTypeOpenService.getEntity(questionTypeOpen.getId());
@@ -109,6 +113,7 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult del(Integer id) {
 		try {
 			questionTypeOpenService.delAndUpdate(id);

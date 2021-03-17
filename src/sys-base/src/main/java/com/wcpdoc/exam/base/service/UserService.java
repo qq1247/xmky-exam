@@ -104,4 +104,13 @@ public interface UserService extends BaseService<User> {
 	 * @return Map<Integer,Long>
 	 */
 	Map<String, Object> getUser(Integer id);
+
+	/**
+	 * 修改岗位
+	 * 
+	 * v1.0 chenyun 2021年3月16日下午5:22:45
+	 * @param id
+	 * @param postId void
+	 */
+	void postUpdate(Integer id, Integer[] postId);
 }

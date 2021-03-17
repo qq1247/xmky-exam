@@ -71,4 +71,12 @@ public interface ExamService extends BaseService<Exam>{
 	 */
 	PageOut getGradeListpage(PageIn pageIn);
 
+	/**
+	 * 获取考试列表
+	 * 
+	 * v1.0 zhanghc 2017年8月6日下午10:03:09
+	 * @param paperId
+	 * @return List<Exam>
+	 */
+	List<Exam> getExamList(Integer paperId);
 }

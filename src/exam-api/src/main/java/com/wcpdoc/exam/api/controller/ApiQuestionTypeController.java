@@ -66,27 +66,10 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	//@RequiresRoles("OP")
+	@RequiresRoles("OP")
 	public PageResult add(String name, Integer imgId) {
 		try {
-			//校验数据有效性
-			if (!ValidateUtil.isValid(name)) {
-				throw new MyException("参数错误：name");
-			}
-			
-			// 添加试题分类
-			QuestionType questionType = new QuestionType();
-			questionType.setName(name);
-			questionType.setImg(imgId);
-			/*if (existName(questionType)) {
-				throw new MyException("名称已存在！");
-			}*/
-			questionType.setCreateUserId(getCurUser().getId());
-			questionType.setCreateTime(new Date());
-			questionType.setState(1);
-			questionTypeService.add(questionType);
-			
-			//questionTypeService.addAndUpdate(name, imgId);
+			questionTypeService.addAndUpdate(name, imgId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加试题分类错误：{}", e.getMessage());
@@ -121,7 +104,7 @@ public class ApiQuestionTypeController extends BaseController {
 			/*if(questionTypeService.existName(entity)) {
 				throw new MyException("名称已存在！");
 			}*/
-			entity.setImg(imgId);
+			entity.setImgId(imgId);
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(((User)getCurUser()).getId());
 			questionTypeService.update(entity);

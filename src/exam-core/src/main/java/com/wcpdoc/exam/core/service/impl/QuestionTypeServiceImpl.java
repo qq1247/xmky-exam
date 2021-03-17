@@ -51,14 +51,14 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		// 添加试题分类
 		QuestionType questionType = new QuestionType();
 		questionType.setName(name);
-		questionType.setImg(imgId);
+		questionType.setImgId(imgId);
 		/*if (existName(questionType)) {
 			throw new MyException("名称已存在！");
 		}*/
-		questionType.setCreateUserId(getCurUser().getId());
+		questionType.setCreateUserId(1);//getCurUser().getId()
 		questionType.setCreateTime(new Date());
 		questionType.setState(1);
-		add(questionType);
+		questionTypeDao.add(questionType);
 	}
 
 	@Override
