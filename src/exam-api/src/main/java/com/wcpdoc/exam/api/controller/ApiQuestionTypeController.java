@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.annotation.Resource;
 
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -44,9 +45,10 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/list")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult list(PageIn pageIn, String name) {
 		try {
-			if (!ValidateUtil.isValid(name)) {
+			if (ValidateUtil.isValid(name)) {
 				pageIn.setTwo(name);
 			}
 			return PageResultEx.ok().data(questionTypeService.getListpage(pageIn));
@@ -66,7 +68,24 @@ public class ApiQuestionTypeController extends BaseController {
 	@ResponseBody
 	public PageResult add(String name, Integer imgId) {
 		try {
-			questionTypeService.addAndUpdate(name, imgId);
+			//校验数据有效性
+			if (!ValidateUtil.isValid(name)) {
+				throw new MyException("参数错误：name");
+			}
+			
+			// 添加试题分类
+			QuestionType questionType = new QuestionType();
+			questionType.setName(name);
+			questionType.setImg(imgId);
+			/*if (existName(questionType)) {
+				throw new MyException("名称已存在！");
+			}*/
+			questionType.setCreateUserId(getCurUser().getId());
+			questionType.setCreateTime(new Date());
+			questionType.setState(1);
+			questionTypeService.add(questionType);
+			
+			//questionTypeService.addAndUpdate(name, imgId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加试题分类错误：{}", e.getMessage());
@@ -85,6 +104,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult edit(Integer id, String name, Integer imgId) {
 		try {
 			//校验数据有效性
@@ -122,6 +142,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult del(Integer id) {
 		try {
 			questionTypeService.delAndUpdate(id);
@@ -144,6 +165,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/userList")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult userList(PageIn pageIn) {  //Two - name (userName || orgName)  Ten - id
 		try {
 			return PageResultEx.ok().data(questionTypeService.getUserListpage(pageIn));
@@ -165,6 +187,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/auth")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult auth(Integer id, String readUserIds, String writeUserIds, boolean rwState) {
 		try {
 			questionTypeService.doAuth(id, readUserIds, writeUserIds, rwState);
@@ -187,6 +210,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/move")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult move(Integer id, Integer sourceId, Integer targetId) {
 		try {
 			questionService.move(id, sourceId, targetId);
