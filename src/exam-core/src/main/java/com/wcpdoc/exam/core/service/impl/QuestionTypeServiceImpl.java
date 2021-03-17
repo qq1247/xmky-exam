@@ -55,7 +55,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		/*if (existName(questionType)) {
 			throw new MyException("名称已存在！");
 		}*/
-		questionType.setCreateUserId(1);//getCurUser().getId()
+		questionType.setCreateUserId(getCurUser().getId());
 		questionType.setCreateTime(new Date());
 		questionType.setState(1);
 		questionTypeDao.add(questionType);

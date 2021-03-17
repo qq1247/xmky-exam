@@ -182,7 +182,7 @@ public class OrgXlsxServiceImpl extends BaseServiceImp<Object> implements OrgXls
 				//获取父id
 				org.setParentId(parentOrg.getId());
 				
-				org.setUpdateUserId(1); //getCurUser().getId()
+				org.setUpdateUserId(getCurUser().getId());
 				org.setUpdateTime(new Date());
 				org.setState(1);
 				org.setNo((int)Math.ceil(Double.valueOf(map.get("no").toString())));
@@ -199,7 +199,7 @@ public class OrgXlsxServiceImpl extends BaseServiceImp<Object> implements OrgXls
 			if(parentOrg != null && orgOld != null){
 				if (orgOld.getParentId().intValue() == parentOrg.getId().intValue()) {
 					orgOld.setNo(Integer.parseInt(map.get("no").toString()));
-					orgOld.setUpdateUserId(1); //getCurUser().getId()
+					orgOld.setUpdateUserId(getCurUser().getId());
 					orgOld.setUpdateTime(new Date());
 					orgService.update(orgOld);
 					return;
@@ -218,7 +218,7 @@ public class OrgXlsxServiceImpl extends BaseServiceImp<Object> implements OrgXls
 				orgOld.setParentSub(parentOrg.getParentSub() + orgOld.getId() + "_");
 				orgOld.setLevel(orgOld.getParentSub().split("_").length - 1);
 				orgOld.setNo(Integer.parseInt(map.get("no").toString()));
-				orgOld.setUpdateUserId(1); //getCurUser().getId()
+				orgOld.setUpdateUserId(getCurUser().getId());
 				orgOld.setUpdateTime(new Date());
 				orgService.update(orgOld);
 				return;

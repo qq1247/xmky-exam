@@ -1,9 +1,11 @@
 package com.wcpdoc.exam.base.service.impl;
 
 import java.util.Date;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.security.auth.login.LoginException;
+import javax.servlet.http.HttpSession;
 
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +16,7 @@ import com.wcpdoc.exam.base.entity.UserToken;
 import com.wcpdoc.exam.base.service.LoginService;
 import com.wcpdoc.exam.base.service.OrgService;
 import com.wcpdoc.exam.base.service.UserService;
+import com.wcpdoc.exam.core.constant.ConstantManager;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.DateUtil;
@@ -65,6 +68,13 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 				.addAttr("loginName", loginName)
 				.addAttr("refreshToken", true)
 				.build();
+		
+		//用户信息、权限信息写入session
+		HttpSession session = request.getSession(true);//参数为false，第一次在页面直接访问login/doIn，session为null
+		session.setAttribute(ConstantManager.USER, user);
+		
+		Map<Integer, Long> userAuthMap = userService.getAuth(user.getId());
+		session.setAttribute(ConstantManager.USER_AUTH_MAP, userAuthMap);
 		
 		//更新用户登录时间
 		user.setLastLoginTime(new Date());
