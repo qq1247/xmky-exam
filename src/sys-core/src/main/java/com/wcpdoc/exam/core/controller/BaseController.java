@@ -3,10 +3,12 @@ package com.wcpdoc.exam.core.controller;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-import com.wcpdoc.exam.core.constant.ConstantManager;
+import com.wcpdoc.exam.core.entity.JwtResult;
 import com.wcpdoc.exam.core.entity.LoginUser;
+import com.wcpdoc.exam.core.util.JwtUtil;
+
+import io.jsonwebtoken.Claims;
 
 /**
  * 控制层
@@ -27,7 +29,20 @@ public abstract class BaseController {
 	 * @return
 	 */
 	public LoginUser getCurUser() {
-		HttpSession session = request.getSession(false);
-		return session == null ? null : (LoginUser) session.getAttribute(ConstantManager.USER);
+		String jwt = request.getHeader("Authorization");
+		JwtResult parse = JwtUtil.getInstance().parse(jwt);
+		Claims claims = parse.getClaims();
+		LoginUser LoginUser = new LoginUser() {
+			@Override
+			public String getLoginName() {
+				return (String) claims.get("loginName");
+			}
+			
+			@Override
+			public Integer getId() {
+				return Integer.valueOf(claims.getId());
+			}
+		};
+		return parse == null ? null : LoginUser;
 	}
 }
