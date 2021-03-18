@@ -1,7 +1,9 @@
 package com.wcpdoc.exam.api.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -15,8 +17,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.base.service.OrgService;
+import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.entity.PaperType;
@@ -41,6 +45,8 @@ public class ApiPaperTypeController extends BaseController {
 	@Resource
 	private OrgService orgService;
 	@Resource
+	private UserService userService;
+	@Resource
 	private FileService fileService;
 	
 	/**
@@ -54,7 +60,19 @@ public class ApiPaperTypeController extends BaseController {
 	@RequiresRoles("OP")
 	public PageResult list(PageIn pageIn) {
 		try {
-			return PageResultEx.ok().data(paperTypeService.getListpage(pageIn));
+			PageOut listpage = paperTypeService.getListpage(pageIn);
+			List<Map<String, Object>> rows = listpage.getRows();
+			List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+			for(Map<String, Object> mapList : rows){
+				if ("0".equals(mapList.get("CREATE_USER_ID").toString())) {
+					continue;
+				}
+				
+				User user = userService.getEntity(Integer.parseInt(mapList.get("CREATE_USER_ID").toString()));
+				mapList.put("CREATE_USER_NAME", user.getName());
+				list.add(mapList);
+			}
+			return PageResultEx.ok().data(list);
 		} catch (Exception e) {
 			log.error("试卷分类列表错误：", e);
 			return PageResult.err();
