@@ -692,3 +692,71 @@
 | --------   | -----   | -----  |
 |code     | int  | 响应码 |
 |msg     | String  | 响应消息 |
+
+####试题选项获取：questionOption/get
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|questionId    | int     | 试题id |   是   |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+|data.id   | int  | 主键 |
+|data.optionA   | String  | 选项A |
+|data.optionB   | String | 选项B |
+|data.optionC   | String  | 选项C |
+|data.optionD   | String  | 选项D |
+|data.optionE   | String  | 选项E |
+|data.optionF	| String  | 选项F |
+|data.optionG   | String  | 选项G |
+|data.questionId   | int  | 主键 |
+
+####试卷选项添加：questionOption/add
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|optionA   | String  | 选项A |   否   |
+|optionB   | String | 选项B |  否   |
+|optionC   | String  | 选项C |   否   |
+|optionD   | String  | 选项D |   否   |
+|optionE   | String  | 选项E |   否   |
+|optionF	| String  | 选项F |   否   |
+|optionG   | String  | 选项G |   否   |
+|questionId   | int  | 试题主键 |   是   |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+
+####试卷选项修改：questionOption/edit
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|id   | int  | 主键 |   是   |
+|optionA   | String  | 选项A |   否   |
+|optionB   | String | 选项B |  否   |
+|optionC   | String  | 选项C |   否   |
+|optionD   | String  | 选项D |   否   |
+|optionE   | String  | 选项E |   否   |
+|optionF	| String  | 选项F |   否   |
+|optionG   | String  | 选项G |   否   |
+|questionId   | int  | 试题主键 |   是   |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+
+####试卷选项删除：questionOption/del
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|id   | int  | 主键 |   是   |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |

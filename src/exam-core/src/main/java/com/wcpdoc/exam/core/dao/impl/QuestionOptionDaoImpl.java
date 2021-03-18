@@ -26,4 +26,10 @@ public class QuestionOptionDaoImpl extends RBaseDaoImpl<QuestionOption> implemen
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		return pageOut;
 	}
+
+	@Override
+	public QuestionOption getQuestionOption(Integer questionId) {
+		String sql = "SELECT * FROM EXM_QUESTION_OPTION WHERE QUESTION_ID = ? ";
+		return getEntity(sql, new Object[]{questionId});
+	}
 }

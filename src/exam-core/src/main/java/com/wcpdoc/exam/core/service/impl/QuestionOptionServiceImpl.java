@@ -31,4 +31,9 @@ public class QuestionOptionServiceImpl extends BaseServiceImp<QuestionOption> im
 		QuestionOption entity = getEntity(id);
 		update(entity);
 	}
+
+	@Override
+	public QuestionOption getQuestionOption(Integer questionId) {
+		return questionOptionDao.getQuestionOption(questionId);
+	}
 }

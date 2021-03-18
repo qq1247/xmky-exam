@@ -2,6 +2,7 @@ package com.wcpdoc.exam.api.controller;
 
 import javax.annotation.Resource;
 
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -36,9 +37,28 @@ public class ApiQuestionOptionController extends BaseController {
 	 */
 	@RequestMapping("/list")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult list(PageIn pageIn) {
 		try {
 			return PageResultEx.ok().data(questionOptionService.getListpage(pageIn));
+		} catch (Exception e) {
+			log.error("试题选项列表错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 获取试题选项
+	 * 
+	 * v1.0 chenyun 2021-03-10 16:11:06
+	 * @return pageOut
+	 */
+	@RequestMapping("/get")
+	@ResponseBody
+	@RequiresRoles("OP")
+	public PageResult get(Integer questionId) {
+		try {
+			return PageResultEx.ok().data(questionOptionService.getQuestionOption(questionId));
 		} catch (Exception e) {
 			log.error("试题选项列表错误：", e);
 			return PageResult.err();
@@ -53,6 +73,7 @@ public class ApiQuestionOptionController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult add(QuestionOption questionOption) {
 		try {
 			questionOptionService.add(questionOption);
@@ -74,6 +95,7 @@ public class ApiQuestionOptionController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult edit(QuestionOption questionOption) {
 		try {
 			QuestionOption entity = questionOptionService.getEntity(questionOption.getId());
@@ -104,6 +126,7 @@ public class ApiQuestionOptionController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult del(Integer id) {
 		try {
 			questionOptionService.del(id);
