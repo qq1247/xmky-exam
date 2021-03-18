@@ -72,7 +72,8 @@ public class ApiPaperTypeController extends BaseController {
 				mapList.put("CREATE_USER_NAME", user.getName());
 				list.add(mapList);
 			}
-			return PageResultEx.ok().data(list);
+			listpage.setRows(list);
+			return PageResultEx.ok().data(listpage);
 		} catch (Exception e) {
 			log.error("试卷分类列表错误：", e);
 			return PageResult.err();
