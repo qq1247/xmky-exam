@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.QuestionTypeDao;
@@ -59,8 +60,35 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		questionType.setCreateTime(new Date());
 		questionType.setState(1);
 		questionTypeDao.add(questionType);
+		
+		//保存图片
+		fileService.doUpload(imgId);
 	}
 
+	@Override
+	public void editAndUpdate(Integer id, String name, Integer imgId) {
+		//校验数据有效性
+		if(id != null) {
+			throw new MyException("参数错误：id");
+		}
+		if(!ValidateUtil.isValid(name)) {
+			throw new MyException("参数错误：name");
+		}
+		
+		QuestionType entity = questionTypeDao.getEntity(id);
+		entity.setName(name);
+		/*if(questionTypeService.existName(entity)) {
+			throw new MyException("名称已存在！");
+		}*/
+		entity.setImgId(imgId);
+		entity.setUpdateTime(new Date());
+		entity.setUpdateUserId(((User)getCurUser()).getId());
+		questionTypeDao.update(entity);
+		
+		//保存图片
+		fileService.doUpload(imgId);
+	}
+	
 	@Override
 	public void delAndUpdate(Integer id) {
 		// 校验数据有效性

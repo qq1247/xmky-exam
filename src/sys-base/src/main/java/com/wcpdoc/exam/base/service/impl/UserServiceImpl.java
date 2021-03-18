@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import com.wcpdoc.exam.base.cfg.ShiroCfg.JWTRealm;
 import com.wcpdoc.exam.base.dao.UserDao;
-import com.wcpdoc.exam.base.entity.Org;
 import com.wcpdoc.exam.base.entity.Post;
 import com.wcpdoc.exam.base.entity.Res;
 import com.wcpdoc.exam.base.entity.User;
@@ -25,7 +24,6 @@ import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
-import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.EncryptUtil;
 import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
@@ -150,30 +148,6 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	@Override
 	public List<Post> getPostList(Integer id) {
 		return userDao.getPostList(id);
-	}
-
-	@Override
-	public Map<String, Object> getUser(Integer id) {
-		/*	data.name 	String 	名称
-		data.loginName 	String 	登陆账号
-		data.registTime 	Date 	注册时间
-		data.lastLoginTime 	Date 	最后登陆时间
-		data.orgId 	int 	组织机构ID
-		data.orgName 	String 	组织机构名称
-		data.state 	int 	0：删除；1：正常；2：冻结；
-		data.sort 	int 	排序*/
-		User entity = userDao.getEntity(id);
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("name", entity.getName());
-		map.put("loginName", entity.getLoginName());
-		map.put("registTime", DateUtil.formatDateTime(entity.getRegistTime()));
-		map.put("lastLoginTime", DateUtil.formatDateTime(entity.getLastLoginTime()));
-		map.put("orgId", entity.getOrgId());
-		Org org = orgService.getEntity(entity.getOrgId());
-		map.put("orgName", org.getName());
-		map.put("state", entity.getState());
-		//map.put("sort", entity.getNo());
-		return map;
 	}
 
 	@Override

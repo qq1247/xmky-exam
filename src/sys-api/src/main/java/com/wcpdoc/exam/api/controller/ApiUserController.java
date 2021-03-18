@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.wcpdoc.exam.base.entity.Org;
 import com.wcpdoc.exam.base.entity.Post;
 import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.base.service.OrgService;
@@ -27,6 +28,7 @@ import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
@@ -401,7 +403,20 @@ public class ApiUserController extends BaseController {
 	@ResponseBody
 	public PageResult get(Integer id) {
 		try {
-			return PageResultEx.ok().data(userService.getUser(id));
+			User entity = userService.getEntity(id);
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("name", entity.getName());
+			map.put("loginName", entity.getLoginName());
+			map.put("registTime", DateUtil.formatDateTime(entity.getRegistTime()));
+			map.put("lastLoginTime", DateUtil.formatDateTime(entity.getLastLoginTime()));
+			map.put("orgId", entity.getOrgId());
+			map.put("state", entity.getState());
+			map.put("orgName", "");
+			if(entity.getOrgId() != null){
+				Org org = orgService.getEntity(entity.getOrgId());
+				map.put("orgName", org.getName());
+			}
+			return PageResultEx.ok().data(map);
 		} catch (MyException e) {
 			log.error("获取用户错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

@@ -21,6 +21,16 @@ public interface QuestionTypeService extends BaseService<QuestionType> {
 	void addAndUpdate(String name, Integer imgId);
 
 	/**
+	 * 修改试题
+	 * 
+	 * v1.0 chenyun 2021年3月18日上午10:20:28
+	 * @param id
+	 * @param name
+	 * @param imgId void
+	 */
+	void editAndUpdate(Integer id, String name, Integer imgId);
+	
+	/**
 	 * 删除试题分类
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * @param id

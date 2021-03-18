@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.api.controller;
 
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageResult;
@@ -20,7 +20,9 @@ import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
+import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
+import com.wcpdoc.exam.file.service.FileService;
 
 /**
  * 试题分类控制层
@@ -36,6 +38,8 @@ public class ApiQuestionTypeController extends BaseController {
 	private QuestionTypeService questionTypeService;
 	@Resource
 	private QuestionService questionService;
+	@Resource
+	private FileService fileService;
 	
 	/**
 	 * 试题分类列表 
@@ -81,6 +85,37 @@ public class ApiQuestionTypeController extends BaseController {
 	}
 
 	/**
+	 * 获取试题分类
+	 * v1.0 zhanghc 2016-5-24下午14:54:09
+	 * 
+	 * @return pageOut
+	 */
+	@RequestMapping("/get")
+	@ResponseBody
+	@RequiresRoles("OP")
+	public PageResult get(Integer id) {
+		try {
+			QuestionType entity = questionTypeService.getEntity(id);
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("id", entity.getId());
+			map.put("name", entity.getName());
+			map.put("img", fileService.getFileEx(entity.getImgId()));
+			map.put("createUserId", entity.getCreateUserId());
+			map.put("createTime", DateUtil.formatDateTime(entity.getCreateTime()));
+			map.put("rwState", entity.getRwState());
+			map.put("readUserIds", entity.getReadUserIds());
+			map.put("writeUserIds", entity.getWriteUserIds());
+			return PageResultEx.ok().data(map);
+		} catch (MyException e) {
+			log.error("获取试题分类错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("获取试题分类错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
 	 * 修改试题分类
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
@@ -91,23 +126,7 @@ public class ApiQuestionTypeController extends BaseController {
 	@RequiresRoles("OP")
 	public PageResult edit(Integer id, String name, Integer imgId) {
 		try {
-			//校验数据有效性
-			if(id != null) {
-				throw new MyException("参数错误：id");
-			}
-			if(!ValidateUtil.isValid(name)) {
-				throw new MyException("参数错误：name");
-			}
-			
-			QuestionType entity = questionTypeService.getEntity(id);
-			entity.setName(name);
-			/*if(questionTypeService.existName(entity)) {
-				throw new MyException("名称已存在！");
-			}*/
-			entity.setImgId(imgId);
-			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(((User)getCurUser()).getId());
-			questionTypeService.update(entity);
+			questionTypeService.editAndUpdate(id, name, imgId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改试题分类错误：{}", e.getMessage());

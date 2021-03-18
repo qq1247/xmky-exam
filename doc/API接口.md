@@ -440,6 +440,25 @@
 |data.list[].READ_USER_NAME | String  | 读权限 |
 |data.list[].WRITE_USER_NAME | String  | 写权限 |
 
+####试题分类详情：questionType/get
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|id      | int  | 主键 |   是     |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+|data.id     | int  | 分类id |
+|data.name      | String  | 分类名称 |
+|data.img   | int  | 图片 |
+|data.createUserId   | int  | 创建人 |
+|data.createTime   | String  | 创建时间 |
+|data.rwState   | int  | 读写状态【1：开启；2：禁用'】 |
+|data.readUserIds   | int  | 读权限 |
+|data.writeUserIds   | int  | 写权限 |
+
 ####试题分类添加：questionType/add
 ######请求参数
 | 参数     |  数据类型   |  描述  |  是否必填 |
