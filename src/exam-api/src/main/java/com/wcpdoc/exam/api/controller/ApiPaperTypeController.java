@@ -1,6 +1,8 @@
 package com.wcpdoc.exam.api.controller;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -20,7 +22,9 @@ import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.entity.PaperType;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.PaperTypeService;
+import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
+import com.wcpdoc.exam.file.service.FileService;
 
 /**
  * 试卷分类控制层
@@ -36,6 +40,8 @@ public class ApiPaperTypeController extends BaseController {
 	private PaperTypeService paperTypeService;
 	@Resource
 	private OrgService orgService;
+	@Resource
+	private FileService fileService;
 	
 	/**
 	 * 试卷分类列表 
@@ -73,6 +79,37 @@ public class ApiPaperTypeController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加试卷分类错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 获取试卷分类
+	 * v1.0 zhanghc 2016-5-24下午14:54:09
+	 * 
+	 * @return pageOut
+	 */
+	@RequestMapping("/get")
+	@ResponseBody
+	@RequiresRoles("OP")
+	public PageResult get(Integer id) {
+		try {
+			PaperType entity = paperTypeService.getEntity(id);
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("id", entity.getId());
+			map.put("name", entity.getName());
+			map.put("img", fileService.getFileEx(entity.getImgId()));
+			map.put("createUserId", entity.getCreateUserId());
+			map.put("createTime", DateUtil.formatDateTime(entity.getCreateTime()));
+			map.put("rwState", entity.getRwState());
+			map.put("readUserIds", entity.getReadUserIds());
+			map.put("writeUserIds", entity.getWriteUserIds());
+			return PageResultEx.ok().data(map);
+		} catch (MyException e) {
+			log.error("获取试卷分类错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("获取试卷分类错误：", e);
 			return PageResult.err();
 		}
 	}

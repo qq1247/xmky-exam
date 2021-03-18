@@ -23,17 +23,11 @@ public class QuestionTypeDaoImpl extends RBaseDaoImpl<QuestionType> implements Q
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT QUESTION_TYPE.*, PARENT_QUESTION_TYPE.NAME AS PARENT_NAME, "
-				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_USER _A WHERE QUESTION_TYPE.USER_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS USER_NAMES, "
-				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_ORG _A WHERE QUESTION_TYPE.ORG_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS ORG_NAMES, "
-				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_POST _A WHERE QUESTION_TYPE.POST_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS POST_NAMES "
-				+ "FROM EXM_QUESTION_TYPE QUESTION_TYPE "
-				+ "LEFT JOIN EXM_QUESTION_TYPE PARENT_QUESTION_TYPE ON QUESTION_TYPE.PARENT_ID = PARENT_QUESTION_TYPE.ID ";
+		String sql = "SELECT QUESTION_TYPE.* "
+				+ "FROM EXM_QUESTION_TYPE QUESTION_TYPE ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "QUESTION_TYPE.PARENT_ID = ?", pageIn.getOne())//如果查询的是根目录，则查询所有。否则查询选中机构的子机构
-				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "QUESTION_TYPE.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
-				.addWhere("QUESTION_TYPE.STATE = ?", 1)
-				.addOrder("QUESTION_TYPE.NO", Order.ASC);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "QUESTION_TYPE.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
+				.addWhere("QUESTION_TYPE.STATE = ?", 1);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		return pageOut;
 	}
