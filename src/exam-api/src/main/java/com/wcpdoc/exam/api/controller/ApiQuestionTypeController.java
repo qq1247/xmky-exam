@@ -27,7 +27,6 @@ import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.file.service.FileService;
 
 /**
  * 试题分类控制层
@@ -43,8 +42,6 @@ public class ApiQuestionTypeController extends BaseController {
 	private QuestionTypeService questionTypeService;
 	@Resource
 	private QuestionService questionService;
-	@Resource
-	private FileService fileService;
 	@Resource
 	private UserService userService;
 	
@@ -119,7 +116,7 @@ public class ApiQuestionTypeController extends BaseController {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("id", entity.getId());
 			map.put("name", entity.getName());
-			map.put("img", fileService.getFileEx(entity.getImgId()));
+			map.put("imgId", entity.getImgId());
 			map.put("createUserId", entity.getCreateUserId());
 			map.put("createTime", DateUtil.formatDateTime(entity.getCreateTime()));
 			map.put("rwState", entity.getRwState());

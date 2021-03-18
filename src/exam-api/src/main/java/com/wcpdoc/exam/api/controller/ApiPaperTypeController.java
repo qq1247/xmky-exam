@@ -28,7 +28,6 @@ import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.PaperTypeService;
 import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.file.service.FileService;
 
 /**
  * 试卷分类控制层
@@ -46,8 +45,6 @@ public class ApiPaperTypeController extends BaseController {
 	private OrgService orgService;
 	@Resource
 	private UserService userService;
-	@Resource
-	private FileService fileService;
 	
 	/**
 	 * 试卷分类列表 
@@ -117,7 +114,7 @@ public class ApiPaperTypeController extends BaseController {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("id", entity.getId());
 			map.put("name", entity.getName());
-			map.put("img", fileService.getFileEx(entity.getImgId()));
+			map.put("imgId", entity.getImgId());
 			map.put("createUserId", entity.getCreateUserId());
 			map.put("createTime", DateUtil.formatDateTime(entity.getCreateTime()));
 			map.put("rwState", entity.getRwState());
