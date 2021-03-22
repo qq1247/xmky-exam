@@ -7,7 +7,6 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.QuestionTypeDao;
@@ -82,7 +81,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		}*/
 		entity.setImgId(imgId);
 		entity.setUpdateTime(new Date());
-		entity.setUpdateUserId(((User)getCurUser()).getId());
+		entity.setUpdateUserId(getCurUser().getId());
 		questionTypeDao.update(entity);
 		
 		//保存图片
