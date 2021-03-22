@@ -645,7 +645,7 @@
 |state    | int  |   1：启用；2：禁用   |   是   |
 |questionTypeId    | int  |   试题分类ID   |   是   |
 |score    | double  | 默认分值  |  否   |
-|scoreOptions    | String(8)  | 1：半对半分；2：答案无顺序；3：大小写不敏感；4：包含答案得分 |  否   |
+|scoreOptions    | String(8)  | 1：半对半分；2：全对得分 3：答案无顺序；4：大小写不敏感；5：包含答案得分 |  否   |
 |no    | int  | 排序 | 是 |
 ######响应数据
 | 参数  |  数据类型   |  描述  |
