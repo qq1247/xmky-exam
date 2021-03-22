@@ -132,9 +132,9 @@ public class QuestionController extends BaseController {
 	 */
 	@RequestMapping("/doAdd")
 	@ResponseBody
-	public PageResult doAdd(Question question) {
+	public PageResult doAdd(Question question, String[] options) {
 		try {
-			questionService.addAndUpdate(question);
+			questionService.addAndUpdate(question, options);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成添加试题错误：{}", e.getMessage());

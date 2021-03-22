@@ -28,7 +28,7 @@ public interface QuestionService extends BaseService<Question>{
 	 * @param question
 	 * void
 	 */
-	void addAndUpdate(Question question);
+	void addAndUpdate(Question question, String[] options);
 
 	/**
 	 * 完成试题修改

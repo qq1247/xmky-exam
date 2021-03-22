@@ -118,9 +118,9 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	public PageResult add(Question question) {
+	public PageResult add(Question question, String[] options) {
 		try {
-			questionService.addAndUpdate(question);
+			questionService.addAndUpdate(question, options);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加试题错误：{}", e.getMessage());

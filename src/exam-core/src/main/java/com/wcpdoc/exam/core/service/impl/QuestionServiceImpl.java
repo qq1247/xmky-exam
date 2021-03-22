@@ -24,6 +24,7 @@ import com.wcpdoc.exam.core.dao.QuestionDao;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 import com.wcpdoc.exam.core.service.WordServer;
@@ -45,7 +46,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	private FileService fileService;
 	@Resource
 	private UserService userService;
-
+	@Resource
+	private QuestionOptionService questionOptionService;
+	
 	@Override
 	@Resource(name = "questionDaoImpl")
 	public void setDao(BaseDao<Question> dao) {
@@ -53,7 +56,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 	
 	@Override
-	public void addAndUpdate(Question question) {
+	public void addAndUpdate(Question question, String[] options) {
 		// 添加试题
 		question.setUpdateTime(new Date());
 		question.setUpdateUserId(getCurUser().getId());
@@ -64,8 +67,40 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		question.setSrcId(question.getId());
 		update(question);
 
+		System.err.println("options__"+options);
+		
+		QuestionOption questionOption = new QuestionOption();
+		questionOption.setQuestionId(question.getId());
+		for (int i = 0; i < options.length; i++) {
+			switch(i){
+			    case 0 :
+			    	questionOption.setOptionA(options[0]);
+			    	break;
+			    case 1 :
+			    	questionOption.setOptionB(options[1]);
+			    	break;
+			    case 2 :
+			    	questionOption.setOptionC(options[2]);
+			    	break;
+			    case 3 :
+			    	questionOption.setOptionD(options[3]);
+			    	break;
+			    case 4 :
+			    	questionOption.setOptionE(options[4]);
+			    	break;
+			    case 5 :
+			    	questionOption.setOptionF(options[5]);
+			    	break;
+			    case 6 :
+			    	questionOption.setOptionG(options[6]);
+			    	break;
+			}
+		}
+		//保存选项
+		questionOptionService.add(questionOption);
+		
 		// 保存附件
-		saveFile(question);
+		// saveFile(question);
 	}
 	
 	@Override
