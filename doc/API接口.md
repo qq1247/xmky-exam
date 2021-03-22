@@ -551,7 +551,8 @@
 ######请求参数
 | 参数     |  数据类型   |  描述  |  是否必填 |
 | --------   | -----   | -----  | ---- |
-|id| int | 编号   |   否     |
+|questionTypeId| int | 题库id（试题分类id）   |   否     |
+|id| int | 试卷id   |   否     |
 |title      | String  | 题干 |   否     |
 |type      | int | 类型 |   否     |
 |difficulty    | int | 难度 |   否     |
