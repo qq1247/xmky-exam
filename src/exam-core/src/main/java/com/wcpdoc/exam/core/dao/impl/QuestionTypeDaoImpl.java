@@ -57,11 +57,10 @@ public class QuestionTypeDaoImpl extends RBaseDaoImpl<QuestionType> implements Q
 
 	@Override
 	public PageOut getUserListpage(PageIn pageIn) {//TODO   查询语句错误
-		String sql = "SELECT USER.ID, USER.NAME AS NAME, ORG.NAME AS ORG_NAME "
-				+ "FROM SYS_USER USER "
-				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID ";
+		String sql = "SELECT USER.ID, USER.NAME AS NAME "
+				+ "FROM SYS_USER USER ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "(USER.NAME LIKE ? OR ORG.NAME LIKE ?)", "%" + pageIn.getTwo() + "%", "%" + pageIn.getTwo() + "%")
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "(USER.NAME LIKE ? )", "%" + pageIn.getTwo() + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "EXISTS (SELECT 1 FROM EXM_QUESTION_TYPE Z WHERE Z.ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.getTen())
 				.addWhere("USER.STATE = 1")
 				.addOrder("USER.UPDATE_TIME", Order.DESC);

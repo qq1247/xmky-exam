@@ -67,7 +67,7 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/list")
 	@ResponseBody
-	public PageResult list(PageIn pageIn, Integer id, String title, Integer type, Integer difficulty, double scoreStart, double scoreEnd) {
+	public PageResult list(PageIn pageIn, Integer questionTypeId, Integer id, String title, Integer type, Integer difficulty, double scoreStart, double scoreEnd) {
 		// one     questionTypeId(试题分类id) 
 		// two     id(试卷id) 
 		// three   title(标题)
@@ -78,6 +78,9 @@ public class ApiQuestionController extends BaseController {
 		// eight   score(默认分值)
 		// nine    paperId(试卷ID)
 		try {
+			if(questionTypeId != null){
+				pageIn.setOne(questionTypeId.toString());
+			}
 			if(id != null){
 				pageIn.setTwo(id.toString());
 			}

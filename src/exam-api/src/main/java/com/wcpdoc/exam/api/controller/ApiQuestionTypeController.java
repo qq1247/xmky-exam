@@ -183,11 +183,17 @@ public class ApiQuestionTypeController extends BaseController {
 	 * @param pageIn
 	 * @return PageOut
 	 */
-	@RequestMapping("/userList")
+	@RequestMapping("/authUserList")
 	@ResponseBody
 	@RequiresRoles("OP")
-	public PageResult userList(PageIn pageIn) {  //Two - name (userName || orgName)  Ten - id
+	public PageResult userList(PageIn pageIn, String name, Integer id) {  //Two - name (userName)  Ten - id
 		try {
+			if(ValidateUtil.isValid(name)){
+				pageIn.setTwo(name);
+			}
+			if(id != null){
+				pageIn.setTen(id.toString());
+			}
 			return PageResultEx.ok().data(questionTypeService.getUserListpage(pageIn));
 		} catch (Exception e) {
 			log.error("权限用户列表错误：", e);
