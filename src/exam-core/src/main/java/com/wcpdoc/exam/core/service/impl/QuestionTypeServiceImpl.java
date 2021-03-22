@@ -68,7 +68,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	@Override
 	public void editAndUpdate(Integer id, String name, Integer imgId) {
 		//校验数据有效性
-		if(id != null) {
+		if(id == null) {
 			throw new MyException("参数错误：id");
 		}
 		if(!ValidateUtil.isValid(name)) {
