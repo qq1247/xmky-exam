@@ -27,9 +27,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.wcpdoc.exam.base.cache.DictCache;
 import com.wcpdoc.exam.core.constant.ConstantManager;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.entity.Question;
@@ -103,7 +105,16 @@ public class ApiQuestionController extends BaseController {
 			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
 				pageIn.setTen(getCurUser().getId().toString());
 			}
-			return PageResultEx.ok().data(questionService.getListpage(pageIn));
+			
+			PageOut listpage = questionService.getListpage(pageIn);
+			List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+			for(Map<String, Object> map : listpage.getRows()){
+				map.put("TYPE_NAME", DictCache.getDictValue("QUESTION_TYPE", map.get("TYPE").toString()));
+				map.put("DIFFICULTY_NAME", DictCache.getDictValue("QUESTION_DIFFICULTY", map.get("DIFFICULTY").toString()));
+				list.add(map);
+			}
+			listpage.setRows(list);
+			return PageResultEx.ok().data(listpage);
 		} catch (Exception e) {
 			log.error("试题列表错误：", e);
 			return PageResult.err();
