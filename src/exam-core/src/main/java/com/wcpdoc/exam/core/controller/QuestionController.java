@@ -181,9 +181,9 @@ public class QuestionController extends BaseController {
 	 */
 	@RequestMapping("/doEdit")
 	@ResponseBody
-	public PageResult doEdit(Question question, boolean newVer) {
+	public PageResult doEdit(Question question, boolean newVer, String[] options) {
 		try {
-			questionService.updateAndUpdate(question, newVer);
+			questionService.updateAndUpdate(question, newVer, options);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成修改试题错误：{}", e.getMessage());

@@ -156,9 +156,9 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	public PageResult edit(Question question, boolean newVer) {
+	public PageResult edit(Question question, boolean newVer, String[] options) {
 		try {
-			questionService.updateAndUpdate(question, newVer);
+			questionService.updateAndUpdate(question, newVer, options);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改试题错误：{}", e.getMessage());
@@ -448,5 +448,28 @@ public class ApiQuestionController extends BaseController {
 			e1.printStackTrace();
 		}
 			return null;
+	}
+	
+	/**
+	 * 试题统计
+	 * 
+	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * @param id
+	 * @return pageOut
+	 */
+	@RequestMapping("/count")
+	@ResponseBody
+	public PageResult count(Integer id) {
+		try {
+			//questionService.count();
+			
+			return PageResultEx.ok().data("");
+		} catch (MyException e) {
+			log.error("试题统计错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		}  catch (Exception e) {
+			log.error("试题统计错误：", e);
+			return PageResult.err();
+		}
 	}
 }

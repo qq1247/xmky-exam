@@ -39,7 +39,7 @@ public interface QuestionService extends BaseService<Question>{
 	 * @param newVer 新版本
 	 * void 
 	 */
-	void updateAndUpdate(Question question, boolean newVer);
+	void updateAndUpdate(Question question, boolean newVer, String[] options);
 	
 	/**
 	 * 完成导入试题

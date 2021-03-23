@@ -105,7 +105,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 	
 	@Override
-	public void updateAndUpdate(Question question, boolean newVer) {
+	public void updateAndUpdate(Question question, boolean newVer, String[] options) {
 		// // 如果有新版本标识，删除旧版本，生成新版本
 		Question entity = getEntity(question.getId());
 		if (newVer) {
@@ -119,8 +119,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			newQuestion.setDifficulty(question.getDifficulty());
 			newQuestion.setTitle(question.getTitle());
 
-			//修改选项  TODO
-			
+			//修改选项
 			newQuestion.setAnswer(question.getAnswer());
 			newQuestion.setAnalysis(question.getAnalysis());
 			newQuestion.setUpdateTime(new Date());
@@ -131,6 +130,39 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			newQuestion.setVer(entity.getVer() + 1);
 			add(newQuestion);
 			
+			if(options != null){
+				QuestionOption questionOption = new QuestionOption();
+				questionOption.setQuestionId(question.getId());
+				for (int i = 0; i < options.length; i++) {
+					switch(i){
+					case 0 :
+						questionOption.setOptionA(options[0]);
+						break;
+					case 1 :
+						questionOption.setOptionB(options[1]);
+						break;
+					case 2 :
+						questionOption.setOptionC(options[2]);
+						break;
+					case 3 :
+						questionOption.setOptionD(options[3]);
+						break; 
+					case 4 :
+						questionOption.setOptionE(options[4]);
+						break;
+					case 5 :
+						questionOption.setOptionF(options[5]);
+						break;
+					case 6 :
+						questionOption.setOptionG(options[6]);
+						break;
+					}
+				}
+				
+				//保存选项
+				questionOptionService.add(questionOption);
+			}
+			
 			saveFile(newQuestion);// 保存附件
 			return;
 		}
@@ -140,8 +172,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		entity.setDifficulty(question.getDifficulty());
 		entity.setTitle(question.getTitle());
 
-		//修改选项  TODO
-		
+		//修改选项
 		entity.setAnswer(question.getAnswer());
 		entity.setAnalysis(question.getAnalysis());
 		entity.setUpdateTime(new Date());
@@ -151,6 +182,38 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		entity.setNo(question.getNo());
 		update(entity);
 
+		//选择
+		if(entity.getType() == 1 || entity.getType() == 2 ){
+			QuestionOption questionOption = questionOptionService.getQuestionOption(entity.getId());
+			for (int i = 0; i < options.length; i++) {
+				switch(i){
+				case 0 :
+					questionOption.setOptionA(options[0]);
+					break;
+				case 1 :
+					questionOption.setOptionB(options[1]);
+					break;
+				case 2 :
+					questionOption.setOptionC(options[2]);
+					break;
+				case 3 :
+					questionOption.setOptionD(options[3]);
+					break; 
+				case 4 :
+					questionOption.setOptionE(options[4]);
+					break;
+				case 5 :
+					questionOption.setOptionF(options[5]);
+					break;
+				case 6 :
+					questionOption.setOptionG(options[6]);
+					break;
+				}
+			}
+			//保存选项
+			questionOptionService.update(questionOption);
+		}
+		
 		// 保存附件
 		saveFile(entity);
 	}
