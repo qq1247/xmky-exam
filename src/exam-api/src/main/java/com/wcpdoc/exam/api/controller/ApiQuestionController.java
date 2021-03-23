@@ -35,7 +35,9 @@ import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 import com.wcpdoc.exam.core.util.ValidateUtil;
@@ -60,6 +62,8 @@ public class ApiQuestionController extends BaseController {
 	private QuestionService questionService;
 	@Resource
 	private QuestionTypeService questionTypeService;
+	@Resource
+	private QuestionOptionService questionOptionService;
 	
 	/**
 	 * 试题列表 
@@ -229,8 +233,52 @@ public class ApiQuestionController extends BaseController {
 	@ResponseBody
 	public PageResult get(Integer id) {
 		try {
+			Map<String, Object> map = new HashMap<>();
 			Question question = questionService.getEntity(id);
-			return PageResultEx.ok().data(question);
+			map.put("id", question.getId());
+			map.put("type", question.getType());
+			map.put("difficulty", question.getDifficulty());
+			map.put("title", question.getTitle());
+			map.put("answer", question.getAnswer());
+			map.put("analysis", question.getAnalysis());
+			map.put("state", question.getState());
+			map.put("updateUserId", question.getUpdateUserId());
+			map.put("updateTime", question.getUpdateTime());
+			map.put("questionTypeId", question.getQuestionTypeId());
+			map.put("score", question.getScore());
+			map.put("scoreOptions", question.getScoreOptions());
+			map.put("ver", question.getVer());
+			map.put("srcId", question.getSrcId());
+			map.put("no", question.getNo());
+			map.put("options", "");
+			
+			if (question.getType() == 1 || question.getType() == 2) {
+				QuestionOption questionOption = questionOptionService.getQuestionOption(question.getId());
+				List<String> list = new ArrayList<String>();
+				if(ValidateUtil.isValid(questionOption.getOptionA())){
+					list.add(questionOption.getOptionA());
+				}
+				if(ValidateUtil.isValid(questionOption.getOptionB())){
+					list.add(questionOption.getOptionB());
+				}
+				if(ValidateUtil.isValid(questionOption.getOptionC())){
+					list.add(questionOption.getOptionC());
+				}
+				if(ValidateUtil.isValid(questionOption.getOptionD())){
+					list.add(questionOption.getOptionD());
+				}
+				if(ValidateUtil.isValid(questionOption.getOptionE())){
+					list.add(questionOption.getOptionE());
+				}
+				if(ValidateUtil.isValid(questionOption.getOptionF())){
+					list.add(questionOption.getOptionF());
+				}
+				if(ValidateUtil.isValid(questionOption.getOptionG())){
+					list.add(questionOption.getOptionG());
+				}
+				map.put("options", list);
+			}
+			return PageResultEx.ok().data(map);
 		} catch (MyException e) {
 			log.error("预览试题错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -395,10 +443,10 @@ public class ApiQuestionController extends BaseController {
 			e.printStackTrace();
 		}
 		
-		return null;
-	} catch (Exception e1) {
-		e1.printStackTrace();
+			return null;
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+			return null;
 	}
-		return null;
-}
 }
