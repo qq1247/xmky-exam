@@ -87,6 +87,8 @@ public class ApiParmController extends BaseController {
 			entity.setEmailPwd(parm.getEmailPwd());
 			entity.setEmailProtocol(parm.getEmailProtocol());
 			entity.setEmailEncode(parm.getEmailEncode());
+			entity.setOrgLogo(parm.getOrgLogo());
+			entity.setOrgName(parm.getOrgName());
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
 			parmService.updateAndUpdate(entity);

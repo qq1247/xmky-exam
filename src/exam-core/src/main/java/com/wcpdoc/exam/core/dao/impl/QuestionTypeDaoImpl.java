@@ -56,7 +56,7 @@ public class QuestionTypeDaoImpl extends RBaseDaoImpl<QuestionType> implements Q
 	}
 
 	@Override
-	public PageOut getUserListpage(PageIn pageIn) {//TODO   查询语句错误
+	public PageOut getUserListpage(PageIn pageIn) {
 		String sql = "SELECT USER.ID, USER.NAME AS NAME "
 				+ "FROM SYS_USER USER ";
 		SqlUtil sqlUtil = new SqlUtil(sql);

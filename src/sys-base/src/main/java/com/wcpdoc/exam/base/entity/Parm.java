@@ -35,6 +35,10 @@ public class Parm {
 	private String emailPwd;
 	@Column(name = "EMAIL_PROTOCOL")
 	private String emailProtocol;
+	@Column(name = "ORG_LOGO")
+	private Integer orgLogo;
+	@Column(name = "ORG_NAME")
+	private String orgName;
 	@Column(name = "UPDATE_USER_ID")
 	private Integer updateUserId;
 	@Column(name = "UPDATE_TIME")
@@ -104,5 +108,21 @@ public class Parm {
 
 	public void setEmailProtocol(String emailProtocol) {
 		this.emailProtocol = emailProtocol;
+	}
+
+	public Integer getOrgLogo() {
+		return orgLogo;
+	}
+
+	public void setOrgLogo(Integer orgLogo) {
+		this.orgLogo = orgLogo;
+	}
+
+	public String getOrgName() {
+		return orgName;
+	}
+
+	public void setOrgName(String orgName) {
+		this.orgName = orgName;
 	}
 }

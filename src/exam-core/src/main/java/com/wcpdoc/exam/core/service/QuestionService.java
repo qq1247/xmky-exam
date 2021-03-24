@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.core.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -60,4 +61,22 @@ public interface QuestionService extends BaseService<Question>{
 	 * @param targetId void
 	 */
 	void move(Integer id, Integer sourceId, Integer targetId);
+	
+	/**
+	 * 试题统计
+	 * 
+	 * v1.0 chenyun 2021年3月23日下午2:53:07
+	 * @param questionTypeId
+	 * @return Map<String,Object>
+	 */
+	Map<String, Object> count(Integer questionTypeId);
+	
+	/**
+	 * 试题统计
+	 * 
+	 * v1.0 chenyun 2021年3月23日下午2:53:07
+	 * @param examId
+	 * @return List<Map<String, Object>>
+	 */
+	List<Map<String, Object>> accuracy(Integer examId);
 }

@@ -19,6 +19,7 @@ import javax.annotation.Resource;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -459,11 +460,32 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/count")
 	@ResponseBody
-	public PageResult count(Integer id) {
+	@RequiresRoles("OP")
+	public PageResult count(Integer questionTypeId) {
 		try {
-			//questionService.count();
-			
-			return PageResultEx.ok().data("");
+			return PageResultEx.ok().data(questionService.count(questionTypeId));
+		} catch (MyException e) {
+			log.error("试题统计错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		}  catch (Exception e) {
+			log.error("试题统计错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 试题准确率
+	 * 
+	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * @param id
+	 * @return pageOut
+	 */
+	@RequestMapping("/accuracy")
+	@ResponseBody
+	@RequiresRoles("OP")
+	public PageResult accuracy(Integer examId) {
+		try {
+			return PageResultEx.ok().data(questionService.accuracy(examId));
 		} catch (MyException e) {
 			log.error("试题统计错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

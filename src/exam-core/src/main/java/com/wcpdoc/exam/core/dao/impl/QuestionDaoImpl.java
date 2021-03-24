@@ -15,7 +15,6 @@ import com.wcpdoc.exam.base.cache.DictCache;
 import com.wcpdoc.exam.base.dao.UserDao;
 import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.core.dao.QuestionDao;
-import com.wcpdoc.exam.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.Question;
@@ -113,5 +112,19 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 	public List<Question> getList(Integer questionTypeId) {
 		String sql = "SELECT * FROM EXM_QUESTION WHERE STATE = 1 AND QUESTION_TYPE_ID = ?";
 		return getList(sql, new Object[] { questionTypeId }, Question.class);
+	}
+
+	@Override
+	public List<Map<String, Object>> count(Integer questionTypeId) {
+		String sql = "SELECT COUNT(*) AS TOTAL, SUM(TYPE = 1) AS T1, SUM(TYPE = 2) AS T2, SUM(TYPE = 3) AS T3, SUM(TYPE = 4) AS T4, SUM(TYPE = 5) AS T5, "
+				+ "SUM(DIFFICULTY = 1) AS D1, SUM(DIFFICULTY = 2) AS D2, SUM(DIFFICULTY = 3) AS D3, SUM(DIFFICULTY = 4) AS D4, SUM(DIFFICULTY = 5) AS D5 "
+				+ "FROM EXM_QUESTION WHERE STATE = 1 AND QUESTION_TYPE_ID = ?";
+		return getMapList(sql, new Object[] { questionTypeId });
+	}
+
+	@Override
+	public List<Map<String, Object>> accuracy(Integer examId) {
+		String sql = "SELECT COUNT(ID) AS TOTAL, SUM( SCORE = QUESTION_SCORE ) AS CORRECT, QUESTION_ID FROM EXM_MY_EXAM_DETAIL WHERE EXAM_ID = ? GROUP BY QUESTION_ID ";
+		return getMapList(sql, new Object[] { examId });
 	}
 }

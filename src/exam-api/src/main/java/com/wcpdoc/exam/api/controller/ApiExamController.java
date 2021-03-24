@@ -359,4 +359,80 @@ public class ApiExamController extends BaseController{
 			return PageResult.err();
 		}
 	}
+	
+	/**
+	 * 考试时间表
+	 * 
+	 * v1.0 chenyun 2021年3月23日上午11:00:08
+	 * @return PageResult
+	 */
+	@RequestMapping("/kalendar")
+	@ResponseBody
+	public PageResult kalendar(Integer year, Integer month) {
+		try {
+			// 校验数据有效性
+			if(year == null){
+				throw new MyException("参数错误：year");
+			}
+			if(month == null){
+				throw new MyException("参数错误：month");
+			}
+			
+			return PageResultEx.ok().data(myExamService.kalendar(year, month));
+		} catch (MyException e) {
+			log.error("考试时间表错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("考试时间表错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 考试排行
+	 * 
+	 * v1.0 chenyun 2021年3月23日下午4:07:48
+	 * @param year
+	 * @param month
+	 * @return PageResult
+	 */
+	@RequestMapping("/rankingPage")
+	@ResponseBody
+	public PageResult rankingPage(PageIn pageIn, Integer id) {
+		try {
+			if (id == null) {
+				throw new MyException("参数错误：id");
+			}
+			pageIn.setOne(id.toString());
+			return PageResultEx.ok().data(myExamService.getRankingPage(pageIn));
+		} catch (MyException e) {
+			log.error("考试时间表错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("考试时间表错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 分数统计
+	 * 
+	 * v1.0 zhanghc 2018年11月24日上午9:13:22
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/count")
+	@ResponseBody
+	@RequiresRoles("OP")
+	public PageResult count(Integer id) {
+		try {
+			return PageResultEx.ok().data(myExamService.count(id));
+		} catch (MyException e) {
+			log.error("分数统计错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("分数统计错误：", e);
+			return PageResult.err();
+		}
+	}
 }
