@@ -12,7 +12,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.exam.base.cfg.ShiroCfg.JWTRealm;
+import com.wcpdoc.exam.auth.realm.JWTRealm;
 import com.wcpdoc.exam.base.dao.UserDao;
 import com.wcpdoc.exam.base.entity.Post;
 import com.wcpdoc.exam.base.entity.Res;
