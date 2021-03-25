@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.wcpdoc.exam.base.entity.Post;
 import com.wcpdoc.exam.base.entity.User;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.service.BaseService;
 
 /**
@@ -104,4 +105,12 @@ public interface UserService extends BaseService<User> {
 	 * @param postId void
 	 */
 	void postUpdate(Integer id, Integer[] postId);
+	
+	/**
+	 * 在线用户
+	 * 
+	 * v1.0 chenyun 2021年3月25日上午10:29:51
+	 * @return PageOut
+	 */
+	PageOut onList();
 }

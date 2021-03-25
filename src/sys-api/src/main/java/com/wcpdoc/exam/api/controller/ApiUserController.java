@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.wcpdoc.exam.auth.cache.TokenCache;
 import com.wcpdoc.exam.base.entity.Org;
 import com.wcpdoc.exam.base.entity.Post;
 import com.wcpdoc.exam.base.entity.User;
@@ -422,6 +423,46 @@ public class ApiUserController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("获取用户错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 获取在线用户
+	 * 
+	 * v1.0 zhanghc 2016-6-15下午17:24:19
+	 * 
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/onList")
+	@ResponseBody
+	public PageResult onList() {
+		try {
+			return PageResultEx.ok().data(userService.onList());
+		} catch (MyException e) {
+			log.error("获取在线用户错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("获取在线用户错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 强制退出在线用户
+	 * v1.0 zhanghc 2016年8月27日上午11:36:55
+	 * 
+	 * @return pageOut
+	 */
+	@RequestMapping("/exit")
+	@ResponseBody
+	public PageResult exit(Integer id) {
+		try {
+			TokenCache.del(id);
+			return PageResult.ok();
+		} catch (Exception e) {
+			log.error("强制退出在线用户错误：", e);
 			return PageResult.err();
 		}
 	}

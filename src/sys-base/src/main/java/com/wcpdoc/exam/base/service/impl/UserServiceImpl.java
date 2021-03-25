@@ -1,5 +1,6 @@
 package com.wcpdoc.exam.base.service.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.exam.auth.cache.TokenCache;
 import com.wcpdoc.exam.auth.realm.JWTRealm;
 import com.wcpdoc.exam.base.dao.UserDao;
 import com.wcpdoc.exam.base.entity.Post;
@@ -22,6 +24,7 @@ import com.wcpdoc.exam.base.service.PostService;
 import com.wcpdoc.exam.base.service.ResService;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.EncryptUtil;
@@ -176,11 +179,30 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		user.setUpdateUserId(getCurUser().getId());
 		userDao.update(user);
 		
-		jwtRealm.getAuthorizationCache().clear();
+		jwtRealm.getAuthorizationCache().clear(); //TODO jwtRealm.getAuthorizationCache().remove(user.getId())
 	}
 	
 	public static void main(String[] args) {
 		String encryptPwd = new UserServiceImpl().getEncryptPwd("ww", "111111");
 		System.err.println(encryptPwd);
+	}
+
+	@Override
+	public PageOut onList() {
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		List<Integer> tokenCacheList = TokenCache.getList();
+		for(Integer id : tokenCacheList){
+			User entity = userDao.getEntity(id);
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("id", entity.getId());
+			map.put("name", entity.getName());
+			map.put("loginName", entity.getLoginName());
+			list.add(map);
+		}
+		
+		PageOut pageOut = new PageOut();
+		pageOut.setRows(list);
+		pageOut.setTotal(tokenCacheList.size());
+		return pageOut;
 	}
 }

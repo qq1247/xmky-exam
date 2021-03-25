@@ -1,5 +1,8 @@
 package com.wcpdoc.exam.auth.cache;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.cache.Cache;
 
 import com.wcpdoc.exam.cache.BaseEhCache;
@@ -38,4 +41,36 @@ public class TokenCache extends BaseEhCache {
 		return cache.get(key, Long.class);
 	}
 
+	/**
+	 * 缓存列表
+	 * 
+	 * v1.0 zhanghc 2021年3月18日下午3:34:11
+	 * @param key
+	 * @param value void
+	 */
+	@SuppressWarnings("unchecked")
+	public static List<Integer> getList() {
+		Cache cache = getCache(CACHE_NAME);
+		net.sf.ehcache.Cache nativeCache = (net.sf.ehcache.Cache) cache.getNativeCache();
+		List<String> keys = nativeCache.getKeys();
+		List<Integer> list = new ArrayList<Integer>();
+		for(String idString : keys){
+			String[] split = idString.split("_");
+			list.add(Integer.parseInt(split[1]));
+		}
+		return list;
+	}
+	
+	/**
+	 * 删除缓存
+	 * 
+	 * v1.0 zhanghc 2021年3月18日下午3:34:11
+	 * @param key
+	 * @param value void
+	 */
+	public static void del(Integer id) {
+		Cache cache = getCache(CACHE_NAME);
+		net.sf.ehcache.Cache nativeCache = (net.sf.ehcache.Cache) cache.getNativeCache();
+		nativeCache.remove("TOKEN_"+id);
+	}
 }
