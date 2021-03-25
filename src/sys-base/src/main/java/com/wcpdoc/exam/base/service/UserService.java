@@ -55,7 +55,7 @@ public interface UserService extends BaseService<User> {
 	 * @param newPwd
 	 * void
 	 */
-	void doPwdUpdate(String oldPwd, String newPwd);
+	void pwdUpdate(String oldPwd, String newPwd);
 
 	/**
 	 * 获取加密后的密码

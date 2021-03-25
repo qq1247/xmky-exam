@@ -1,7 +1,12 @@
-package com.wcpdoc.exam.base.cfg;
+package com.wcpdoc.exam.auth.entity;
 
 import org.apache.shiro.authc.AuthenticationToken;
 
+/**
+ * jwt令牌
+ * 
+ * v1.0 zhanghc 2021年3月19日下午5:13:51
+ */
 public class JWTToken implements AuthenticationToken {
 	private static final long serialVersionUID = 1L;
 	private String jwt;

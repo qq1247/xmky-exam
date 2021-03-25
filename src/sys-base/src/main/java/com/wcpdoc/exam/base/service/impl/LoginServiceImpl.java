@@ -9,6 +9,7 @@ import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.exam.auth.cache.TokenCache;
 import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.base.entity.UserToken;
 import com.wcpdoc.exam.base.service.LoginService;
@@ -33,7 +34,9 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 	private UserService userService;
 	@Resource
 	private OrgService orgService;
-
+	@Value("${token.expireMinute}")
+	private Integer tokenExpireMinute;
+	
 	@Override
 	public void setDao(BaseDao<Object> dao) {
 		
@@ -50,21 +53,21 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 		}
 		
 		User user = userService.getUser(loginName);
-		if(user == null /*|| !user.getPwd().equals(userService.getEncryptPwd(loginName, pwd))*/) {
+		if(user == null || !user.getPwd().equals(userService.getEncryptPwd(loginName, pwd))) {
 			throw new LoginException("用户名或密码错误！");
 		}
 		
 		// 生成令牌信息（登陆由shiro接收令牌控制）
-		Date expTime = DateUtil.getNextMinute(new Date(), 60);
+		Date curTime = new Date();
+		Date expTime = DateUtil.getNextMinute(new Date(), tokenExpireMinute);
 		String accessToken = JwtUtil.getInstance()
-			.createToken(user.getId().toString(), active, expTime)
+			.createToken(curTime.getTime() + "", active, expTime)
+			.addAttr("id", user.getId())
 			.addAttr("loginName", loginName)
 			.build();
-		String refreshToken = JwtUtil.getInstance()
-				.createToken(user.getId().toString(), active, expTime)
-				.addAttr("loginName", loginName)
-				.addAttr("refreshToken", true)
-				.build();
+		
+		// 缓存刷新令牌（用于续租登陆）
+		TokenCache.add(String.format("TOKEN_%s", user.getId()), curTime.getTime());
 		
 		//更新用户登录时间
 		user.setLastLoginTime(new Date());
@@ -76,7 +79,6 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 		userToken.setLoginName(user.getLoginName());
 		userToken.setName(user.getName());
 		userToken.setAccessToken(accessToken);
-		userToken.setRefreshToken(refreshToken);
 		return userToken;
 	}
 
@@ -87,6 +89,6 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 	
 	@Override
 	public void pwdUpdate(String oldPwd, String newPwd) {
-		userService.doPwdUpdate(oldPwd, newPwd);
+		userService.pwdUpdate(oldPwd, newPwd);
 	}
 }

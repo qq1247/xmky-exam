@@ -9,22 +9,22 @@ import io.jsonwebtoken.Claims;
  */
 
 public class JwtResult {
-	protected boolean succ;
+	protected Integer code;
 	protected String msg;
 	protected Claims claims;
 
-	public JwtResult(boolean succ, String msg, Claims claims) {
-		this.succ = succ;
+	public JwtResult(Integer code, String msg, Claims claims) {
+		this.code = code;
 		this.msg = msg;
 		this.claims = claims;
 	}
 
-	public boolean isSucc() {
-		return succ;
+	public Integer getCode() {
+		return code;
 	}
 
-	public void setSucc(boolean succ) {
-		this.succ = succ;
+	public void setCode(Integer code) {
+		this.code = code;
 	}
 
 	public String getMsg() {

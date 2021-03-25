@@ -95,7 +95,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	}
 
 	@Override
-	public void doPwdUpdate(String oldPwd, String newPwd) {
+	public void pwdUpdate(String oldPwd, String newPwd) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(oldPwd)) {
 			throw new MyException("参数错误：oldPwd");
@@ -166,5 +166,10 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		map.put("state", entity.getState());
 		//map.put("sort", entity.getNo());
 		return map;
+	}
+	
+	public static void main(String[] args) {
+		String encryptPwd = new UserServiceImpl().getEncryptPwd("ww", "111111");
+		System.err.println(encryptPwd);
 	}
 }

@@ -7,7 +7,6 @@ package com.wcpdoc.exam.base.entity;
  */
 public class UserToken {
 	private String accessToken;
-	private String refreshToken;
 	private Integer id;
 	private String loginName;
 	private String name;
@@ -18,14 +17,6 @@ public class UserToken {
 
 	public void setAccessToken(String accessToken) {
 		this.accessToken = accessToken;
-	}
-
-	public String getRefreshToken() {
-		return refreshToken;
-	}
-
-	public void setRefreshToken(String refreshToken) {
-		this.refreshToken = refreshToken;
 	}
 
 	public Integer getId() {

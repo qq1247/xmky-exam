@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
 
 import com.wcpdoc.exam.core.entity.JwtResult;
 import com.wcpdoc.exam.core.exception.MyException;
@@ -21,7 +22,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
  */
 public class JwtUtil {
 	private static final Logger log = LoggerFactory.getLogger(JwtUtil.class);
-	private static final String SECRET_KEY = "9xzR4+K7XpvbCpoIMocXVxS655xxb9S0Qxd5RDU4b7PeSIhYfYdjg9aOMrhjPjwNpjo3XjbthxGduNzWzzw2yw==";
+	private static final String SECRET = SpringUtil.getBean(Environment.class).getProperty("token.secret");
 	private static JwtBuilder builder = null; 
 
 	private JwtUtil() {
@@ -69,7 +70,7 @@ public class JwtUtil {
 		builder.setId(id);
 		builder.setSubject(subject);
 		builder.setExpiration(expTime);
-		builder.signWith(SignatureAlgorithm.HS512, SECRET_KEY);
+		builder.signWith(SignatureAlgorithm.HS512, SECRET);
 		return this;
 	}
 	
@@ -118,17 +119,17 @@ public class JwtUtil {
 	public JwtResult parse(String token) {
 		try {
 			if (!ValidateUtil.isValid(token)) {
-				return new JwtResult(false, "令牌为空", null);
+				return new JwtResult(400, "令牌为空", null);
 			}
 
-			Claims claims = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
-			return new JwtResult(true, "令牌有效", claims);
+			Claims claims = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody();
+			return new JwtResult(200, "令牌有效", claims);
 		} catch (ExpiredJwtException e) {
 			log.info("解析令牌错误：{}", "令牌过期");
-			return new JwtResult(false, "令牌过期", null);
+			return new JwtResult(401, "令牌过期", e.getClaims());
 		} catch (Exception e) {
 			log.error("解析令牌错误：{}", e.getMessage());
-			return new JwtResult(false, "未知错误", null);
+			return new JwtResult(500, "未知错误", null);
 		}
 	}
 	
