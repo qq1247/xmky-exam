@@ -19,6 +19,7 @@ import javax.annotation.Resource;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -27,13 +28,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.wcpdoc.exam.base.cache.DictCache;
 import com.wcpdoc.exam.core.constant.ConstantManager;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 import com.wcpdoc.exam.core.util.ValidateUtil;
@@ -58,6 +63,8 @@ public class ApiQuestionController extends BaseController {
 	private QuestionService questionService;
 	@Resource
 	private QuestionTypeService questionTypeService;
+	@Resource
+	private QuestionOptionService questionOptionService;
 	
 	/**
 	 * 试题列表 
@@ -67,7 +74,7 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/list")
 	@ResponseBody
-	public PageResult list(PageIn pageIn, Integer id, String title, Integer type, Integer difficulty, double scoreStart, double scoreEnd) {
+	public PageResult list(PageIn pageIn, Integer questionTypeId, Integer id, String title, Integer type, Integer difficulty, Double scoreStart, Double scoreEnd) {
 		// one     questionTypeId(试题分类id) 
 		// two     id(试卷id) 
 		// three   title(标题)
@@ -78,10 +85,13 @@ public class ApiQuestionController extends BaseController {
 		// eight   score(默认分值)
 		// nine    paperId(试卷ID)
 		try {
+			if(questionTypeId != null){
+				pageIn.setOne(questionTypeId.toString());
+			}
 			if(id != null){
 				pageIn.setTwo(id.toString());
 			}
-			if(!ValidateUtil.isValid(title)){
+			if(ValidateUtil.isValid(title)){
 				pageIn.setThree(title);
 			}
 			if(type != null){
@@ -90,17 +100,26 @@ public class ApiQuestionController extends BaseController {
 			if(difficulty != null){
 				pageIn.setSix(difficulty.toString());
 			}
-			if(scoreStart != 0){
+			if(scoreStart != null){
 				pageIn.setSortOne(String.valueOf(scoreStart));
 			}
-			if(scoreStart != 0){
+			if(scoreStart != null){
 			pageIn.setSortTwo(String.valueOf(scoreEnd));
 			}
 			
 			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
 				pageIn.setTen(getCurUser().getId().toString());
 			}
-			return PageResultEx.ok().data(questionService.getListpage(pageIn));
+			
+			PageOut listpage = questionService.getListpage(pageIn);
+			List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+			for(Map<String, Object> map : listpage.getRows()){
+				map.put("TYPE_NAME", DictCache.getDictValue("QUESTION_TYPE", map.get("TYPE").toString()));
+				map.put("DIFFICULTY_NAME", DictCache.getDictValue("QUESTION_DIFFICULTY", map.get("DIFFICULTY").toString()));
+				list.add(map);
+			}
+			listpage.setRows(list);
+			return PageResultEx.ok().data(listpage);
 		} catch (Exception e) {
 			log.error("试题列表错误：", e);
 			return PageResult.err();
@@ -115,9 +134,9 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	public PageResult add(Question question) {
+	public PageResult add(Question question, String[] options) {
 		try {
-			questionService.addAndUpdate(question);
+			questionService.addAndUpdate(question, options);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加试题错误：{}", e.getMessage());
@@ -138,9 +157,9 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	public PageResult edit(Question question, boolean newVer) {
+	public PageResult edit(Question question, boolean newVer, String[] options) {
 		try {
-			questionService.updateAndUpdate(question, newVer);
+			questionService.updateAndUpdate(question, newVer, options);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改试题错误：{}", e.getMessage());
@@ -215,8 +234,52 @@ public class ApiQuestionController extends BaseController {
 	@ResponseBody
 	public PageResult get(Integer id) {
 		try {
+			Map<String, Object> map = new HashMap<>();
 			Question question = questionService.getEntity(id);
-			return PageResultEx.ok().data(question);
+			map.put("id", question.getId());
+			map.put("type", question.getType());
+			map.put("difficulty", question.getDifficulty());
+			map.put("title", question.getTitle());
+			map.put("answer", question.getAnswer());
+			map.put("analysis", question.getAnalysis());
+			map.put("state", question.getState());
+			map.put("updateUserId", question.getUpdateUserId());
+			map.put("updateTime", question.getUpdateTime());
+			map.put("questionTypeId", question.getQuestionTypeId());
+			map.put("score", question.getScore());
+			map.put("scoreOptions", question.getScoreOptions());
+			map.put("ver", question.getVer());
+			map.put("srcId", question.getSrcId());
+			map.put("no", question.getNo());
+			map.put("options", "");
+			
+			if (question.getType() == 1 || question.getType() == 2) {
+				QuestionOption questionOption = questionOptionService.getQuestionOption(question.getId());
+				List<String> list = new ArrayList<String>();
+				if(ValidateUtil.isValid(questionOption.getOptionA())){
+					list.add(questionOption.getOptionA());
+				}
+				if(ValidateUtil.isValid(questionOption.getOptionB())){
+					list.add(questionOption.getOptionB());
+				}
+				if(ValidateUtil.isValid(questionOption.getOptionC())){
+					list.add(questionOption.getOptionC());
+				}
+				if(ValidateUtil.isValid(questionOption.getOptionD())){
+					list.add(questionOption.getOptionD());
+				}
+				if(ValidateUtil.isValid(questionOption.getOptionE())){
+					list.add(questionOption.getOptionE());
+				}
+				if(ValidateUtil.isValid(questionOption.getOptionF())){
+					list.add(questionOption.getOptionF());
+				}
+				if(ValidateUtil.isValid(questionOption.getOptionG())){
+					list.add(questionOption.getOptionG());
+				}
+				map.put("options", list);
+			}
+			return PageResultEx.ok().data(map);
 		} catch (MyException e) {
 			log.error("预览试题错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -381,10 +444,54 @@ public class ApiQuestionController extends BaseController {
 			e.printStackTrace();
 		}
 		
-		return null;
-	} catch (Exception e1) {
-		e1.printStackTrace();
+			return null;
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+			return null;
 	}
-		return null;
-}
+	
+	/**
+	 * 试题统计
+	 * 
+	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * @param id
+	 * @return pageOut
+	 */
+	@RequestMapping("/count")
+	@ResponseBody
+	@RequiresRoles("OP")
+	public PageResult count(Integer questionTypeId) {
+		try {
+			return PageResultEx.ok().data(questionService.count(questionTypeId));
+		} catch (MyException e) {
+			log.error("试题统计错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		}  catch (Exception e) {
+			log.error("试题统计错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 试题准确率
+	 * 
+	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * @param id
+	 * @return pageOut
+	 */
+	@RequestMapping("/accuracy")
+	@ResponseBody
+	@RequiresRoles("OP")
+	public PageResult accuracy(Integer examId) {
+		try {
+			return PageResultEx.ok().data(questionService.accuracy(examId));
+		} catch (MyException e) {
+			log.error("试题统计错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		}  catch (Exception e) {
+			log.error("试题统计错误：", e);
+			return PageResult.err();
+		}
+	}
 }

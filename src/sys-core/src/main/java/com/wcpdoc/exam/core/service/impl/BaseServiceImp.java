@@ -3,14 +3,16 @@ package com.wcpdoc.exam.core.service.impl;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-import com.wcpdoc.exam.core.constant.ConstantManager;
 import com.wcpdoc.exam.core.dao.BaseDao;
+import com.wcpdoc.exam.core.entity.JwtResult;
 import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.service.BaseService;
+import com.wcpdoc.exam.core.util.JwtUtil;
+
+import io.jsonwebtoken.Claims;
 
 /**
  * 基础服务层实现
@@ -30,8 +32,21 @@ public abstract class BaseServiceImp<T> implements BaseService<T> {
 	
 	@Override
 	public LoginUser getCurUser() {
-		HttpSession session = request.getSession(false);
-		return session == null ? null : (LoginUser) session.getAttribute(ConstantManager.USER);
+		String jwt = request.getHeader("Authorization");
+		JwtResult parse = JwtUtil.getInstance().parse(jwt);
+		Claims claims = parse.getClaims();
+		LoginUser LoginUser = new LoginUser() {
+			@Override
+			public String getLoginName() {
+				return (String) claims.get("loginName");
+			}
+			
+			@Override
+			public Integer getId() {
+				return Integer.valueOf(claims.getId());
+			}
+		};
+		return parse == null ? null : LoginUser;
 	}
 
 	@Override

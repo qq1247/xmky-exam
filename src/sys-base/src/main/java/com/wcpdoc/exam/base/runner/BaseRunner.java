@@ -4,6 +4,8 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
+import com.wcpdoc.exam.base.cache.DictCache;
+
 /**
  * 基础服务启动
  * 
@@ -14,8 +16,8 @@ public class BaseRunner implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		/*ResCache.flushCache();
 		DictCache.flushCache();
+		/*ResCache.flushCache();
 
 		ServletContext servletContext = SpringUtil.getBean(ServletContext.class);
 		servletContext.setAttribute(ConstantManager.SESSION_USER_LIST, new HashMap<String, HttpSession>());

@@ -63,10 +63,7 @@ public class UserDaoImpl extends RBaseDaoImpl<User> implements UserDao {
 
 	@Override
 	public List<Post> getPostList(Integer id) {
-		String sql = "SELECT POST.* "
-				+ "FROM SYS_POST POST "
-				+ "WHERE POST.STATE = 1 "
-				+ "		AND EXISTS (SELECT 1 FROM SYS_USER Z WHERE Z.ID = ? AND Z.POST_IDS LIKE CONCAT('%,' , POST.ID, ',%'))";
+		String sql = "SELECT * FROM SYS_POST POST WHERE POST.STATE = 1 AND UPDATE_USER_ID = ? ";
 		return getList(sql, new Object[] {id}, Post.class);
 	}
 

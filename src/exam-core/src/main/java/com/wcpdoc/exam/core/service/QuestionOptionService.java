@@ -19,4 +19,13 @@ public interface QuestionOptionService extends BaseService<QuestionOption> {
 	 * void
 	 */
 	void delAndUpdate(Integer id);
+	
+	/**
+	 * 获取试题
+	 * 
+	 * v1.0 chenyun 2021年3月18日下午2:25:45
+	 * @param questionId
+	 * @return QuestionOption
+	 */
+	QuestionOption getQuestionOption(Integer questionId);
 }

@@ -12,8 +12,10 @@ import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.QuestionTypeDao;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
+import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeExService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 import com.wcpdoc.exam.core.util.ValidateUtil;
@@ -27,6 +29,8 @@ import com.wcpdoc.exam.file.service.FileService;
 public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implements QuestionTypeService {
 	@Resource
 	private QuestionTypeDao questionTypeDao;
+	@Resource
+	private QuestionService questionService;
 	@Resource
 	private QuestionTypeExService questionTypeExService;
 	@Resource
@@ -51,35 +55,61 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		// 添加试题分类
 		QuestionType questionType = new QuestionType();
 		questionType.setName(name);
-		questionType.setImg(imgId);
+		questionType.setImgId(imgId);
 		/*if (existName(questionType)) {
 			throw new MyException("名称已存在！");
 		}*/
 		questionType.setCreateUserId(getCurUser().getId());
 		questionType.setCreateTime(new Date());
 		questionType.setState(1);
-		add(questionType);
+		questionTypeDao.add(questionType);
+		
+		//保存图片
+		fileService.doUpload(imgId);
 	}
 
+	@Override
+	public void editAndUpdate(Integer id, String name, Integer imgId) {
+		//校验数据有效性
+		if(id == null) {
+			throw new MyException("参数错误：id");
+		}
+		if(!ValidateUtil.isValid(name)) {
+			throw new MyException("参数错误：name");
+		}
+		
+		QuestionType entity = questionTypeDao.getEntity(id);
+		entity.setName(name);
+		/*if(questionTypeService.existName(entity)) {
+			throw new MyException("名称已存在！");
+		}*/
+		entity.setImgId(imgId);
+		entity.setUpdateTime(new Date());
+		entity.setUpdateUserId(getCurUser().getId());
+		questionTypeDao.update(entity);
+		
+		//保存图片
+		fileService.doUpload(imgId);
+	}
+	
 	@Override
 	public void delAndUpdate(Integer id) {
 		// 校验数据有效性
 		if (id == 1) { //不包括根试题分类
 			return;
 		}
-		List<QuestionType> questionTypeList = questionTypeDao.getList(id);
-		if (ValidateUtil.isValid(questionTypeList)) {
-			throw new MyException("请先删除子试题分类！");
+		
+		List<Question> list = questionService.getList(id);
+		if (ValidateUtil.isValid(list)) {
+			throw new MyException("请先删除试题分类下所有的试题！");
 		}
 		
 		// 删除试题分类
 		QuestionType questionType = getEntity(id);
-		questionTypeExService.delAndUpdate(questionType);
-		
 		questionType.setState(0);
 		questionType.setUpdateTime(new Date());
 		questionType.setUpdateUserId(getCurUser().getId());
-		update(questionType);
+		questionTypeDao.update(questionType);
 	}
 
 	@Override

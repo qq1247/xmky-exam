@@ -2,10 +2,13 @@ package com.wcpdoc.exam.core.service.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -24,6 +27,7 @@ import com.wcpdoc.exam.core.dao.QuestionDao;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 import com.wcpdoc.exam.core.service.WordServer;
@@ -45,7 +49,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	private FileService fileService;
 	@Resource
 	private UserService userService;
-
+	@Resource
+	private QuestionOptionService questionOptionService;
+	
 	@Override
 	@Resource(name = "questionDaoImpl")
 	public void setDao(BaseDao<Question> dao) {
@@ -53,7 +59,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 	
 	@Override
-	public void addAndUpdate(Question question) {
+	public void addAndUpdate(Question question, String[] options) {
 		// 添加试题
 		question.setUpdateTime(new Date());
 		question.setUpdateUserId(getCurUser().getId());
@@ -64,12 +70,45 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		question.setSrcId(question.getId());
 		update(question);
 
+		if(options != null){
+			QuestionOption questionOption = new QuestionOption();
+			questionOption.setQuestionId(question.getId());
+			for (int i = 0; i < options.length; i++) {
+				switch(i){
+				case 0 :
+					questionOption.setOptionA(options[0]);
+					break;
+				case 1 :
+					questionOption.setOptionB(options[1]);
+					break;
+				case 2 :
+					questionOption.setOptionC(options[2]);
+					break;
+				case 3 :
+					questionOption.setOptionD(options[3]);
+					break;
+				case 4 :
+					questionOption.setOptionE(options[4]);
+					break;
+				case 5 :
+					questionOption.setOptionF(options[5]);
+					break;
+				case 6 :
+					questionOption.setOptionG(options[6]);
+					break;
+				}
+			}
+			
+			//保存选项
+			questionOptionService.add(questionOption);
+		}
+		
 		// 保存附件
-		saveFile(question);
+		// saveFile(question);
 	}
 	
 	@Override
-	public void updateAndUpdate(Question question, boolean newVer) {
+	public void updateAndUpdate(Question question, boolean newVer, String[] options) {
 		// // 如果有新版本标识，删除旧版本，生成新版本
 		Question entity = getEntity(question.getId());
 		if (newVer) {
@@ -83,8 +122,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			newQuestion.setDifficulty(question.getDifficulty());
 			newQuestion.setTitle(question.getTitle());
 
-			//修改选项  TODO
-			
+			//修改选项
 			newQuestion.setAnswer(question.getAnswer());
 			newQuestion.setAnalysis(question.getAnalysis());
 			newQuestion.setUpdateTime(new Date());
@@ -95,6 +133,39 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			newQuestion.setVer(entity.getVer() + 1);
 			add(newQuestion);
 			
+			if(options != null){
+				QuestionOption questionOption = new QuestionOption();
+				questionOption.setQuestionId(question.getId());
+				for (int i = 0; i < options.length; i++) {
+					switch(i){
+					case 0 :
+						questionOption.setOptionA(options[0]);
+						break;
+					case 1 :
+						questionOption.setOptionB(options[1]);
+						break;
+					case 2 :
+						questionOption.setOptionC(options[2]);
+						break;
+					case 3 :
+						questionOption.setOptionD(options[3]);
+						break; 
+					case 4 :
+						questionOption.setOptionE(options[4]);
+						break;
+					case 5 :
+						questionOption.setOptionF(options[5]);
+						break;
+					case 6 :
+						questionOption.setOptionG(options[6]);
+						break;
+					}
+				}
+				
+				//保存选项
+				questionOptionService.add(questionOption);
+			}
+			
 			saveFile(newQuestion);// 保存附件
 			return;
 		}
@@ -104,8 +175,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		entity.setDifficulty(question.getDifficulty());
 		entity.setTitle(question.getTitle());
 
-		//修改选项  TODO
-		
+		//修改选项
 		entity.setAnswer(question.getAnswer());
 		entity.setAnalysis(question.getAnalysis());
 		entity.setUpdateTime(new Date());
@@ -115,6 +185,38 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		entity.setNo(question.getNo());
 		update(entity);
 
+		//选择
+		if(entity.getType() == 1 || entity.getType() == 2 ){
+			QuestionOption questionOption = questionOptionService.getQuestionOption(entity.getId());
+			for (int i = 0; i < options.length; i++) {
+				switch(i){
+				case 0 :
+					questionOption.setOptionA(options[0]);
+					break;
+				case 1 :
+					questionOption.setOptionB(options[1]);
+					break;
+				case 2 :
+					questionOption.setOptionC(options[2]);
+					break;
+				case 3 :
+					questionOption.setOptionD(options[3]);
+					break; 
+				case 4 :
+					questionOption.setOptionE(options[4]);
+					break;
+				case 5 :
+					questionOption.setOptionF(options[5]);
+					break;
+				case 6 :
+					questionOption.setOptionG(options[6]);
+					break;
+				}
+			}
+			//保存选项
+			questionOptionService.update(questionOption);
+		}
+		
 		// 保存附件
 		saveFile(entity);
 	}
@@ -252,5 +354,49 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			question.setQuestionTypeId(targetId);
 			update(question);
 		}
+	}
+
+	@Override
+	public Map<String, Object> count(Integer questionTypeId) {
+		List<Map<String, Object>> list = questionDao.count(questionTypeId);
+		Map<String, Object> map = new HashMap<String, Object>();
+		DecimalFormat df = new DecimalFormat("0.0");
+		for (Map<String, Object> mapList : list) {
+			double T1 = Double.parseDouble(mapList.get("T1").toString()) / Double.parseDouble(mapList.get("TOTAL").toString());
+			map.put("T1", df.format(T1*100));
+			double T2 = Double.parseDouble(mapList.get("T2").toString()) / Double.parseDouble(mapList.get("TOTAL").toString());
+			map.put("T2", df.format(T2*100));
+			double T3 = Double.parseDouble(mapList.get("T3").toString()) / Double.parseDouble(mapList.get("TOTAL").toString());
+			map.put("T3", df.format(T3*100));
+			double T4 = Double.parseDouble(mapList.get("T4").toString()) / Double.parseDouble(mapList.get("TOTAL").toString());
+			map.put("T4", df.format(T4*100));
+			double T5 = Double.parseDouble(mapList.get("T5").toString()) / Double.parseDouble(mapList.get("TOTAL").toString());
+			map.put("T5", df.format(T5*100));
+			double D1 = Double.parseDouble(mapList.get("D1").toString()) / Double.parseDouble(mapList.get("TOTAL").toString());
+			map.put("D1", df.format(D1*100));
+			double D2 = Double.parseDouble(mapList.get("D2").toString()) / Double.parseDouble(mapList.get("TOTAL").toString());
+			map.put("D2", df.format(D2*100));
+			double D3 = Double.parseDouble(mapList.get("D3").toString()) / Double.parseDouble(mapList.get("TOTAL").toString());
+			map.put("D3", df.format(D3*100));
+			double D4 = Double.parseDouble(mapList.get("D4").toString()) / Double.parseDouble(mapList.get("TOTAL").toString());
+			map.put("D4", df.format(D4*100));
+			double D5 = Double.parseDouble(mapList.get("D5").toString()) / Double.parseDouble(mapList.get("TOTAL").toString());
+			map.put("D5", df.format(D5*100));
+		}
+		return map;
+	}
+
+	@Override
+	public List<Map<String, Object>> accuracy(Integer examId) {
+		DecimalFormat df = new DecimalFormat("0.0");
+		List<Map<String, Object>> accuracyList = questionDao.accuracy(examId);
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		for(Map<String, Object> mapList : accuracyList){
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("questionId", mapList.get("QUESTION_ID").toString());
+			map.put("accuracy", df.format((Double.parseDouble(mapList.get("CORRECT").toString()) / Double.parseDouble(mapList.get("TOTAL").toString()) * 100)));
+			list.add(map);
+		}
+		return list;
 	}
 }

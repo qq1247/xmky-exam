@@ -399,11 +399,11 @@ public class MyMarkController extends BaseController {
 			myExam.setMyMarkId(getCurUser().getId());
 			myExam.setMarkFinishTime(new Date());
 			myExam.setTotalScore(totalScore);
-			if (totalScore.doubleValue() >= exam.getPassScore().doubleValue() ) {
-				myExam.setAnswerState(1);
-			} else {
-				myExam.setAnswerState(2);
-			}
+//			if (totalScore.doubleValue() >= exam.getPassScore().doubleValue() ) {
+//				myExam.setAnswerState(1);
+//			} else {
+//				myExam.setAnswerState(2);
+//			}
 			myExam.setUpdateTime(new Date());
 			myExam.setUpdateUserId(getCurUser().getId());
 			myExamService.update(myExam);

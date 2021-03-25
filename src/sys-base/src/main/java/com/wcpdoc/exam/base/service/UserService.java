@@ -95,13 +95,13 @@ public interface UserService extends BaseService<User> {
 	 * @return List<Post>
 	 */
 	List<Post> getPostList(Integer id);
-	
+
 	/**
-	 * 获取用户
+	 * 修改岗位
 	 * 
-	 * v1.0 chenyun 2021年3月8日下午1:33:23
+	 * v1.0 chenyun 2021年3月16日下午5:22:45
 	 * @param id
-	 * @return Map<Integer,Long>
+	 * @param postId void
 	 */
-	Map<String, Object> getUser(Integer id);
+	void postUpdate(Integer id, Integer[] postId);
 }

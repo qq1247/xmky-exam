@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.annotation.Resource;
 
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -44,6 +45,7 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/treeList")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult treeList() {
 		try {
 			return PageResultEx.ok().data(examTypeService.getTreeList());
@@ -61,6 +63,7 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/list")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult list(PageIn pageIn) {
 		try {
 			return PageResultEx.ok().data(examTypeService.getListpage(pageIn));
@@ -78,6 +81,7 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult add(ExamType examType) {
 		try {
 			examTypeService.addAndUpdate(examType);
@@ -99,6 +103,7 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult edit(ExamType examType) {
 		try {
 			//校验数据有效性
@@ -134,6 +139,7 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult del(Integer id) {
 		try {
 			examTypeService.delAndUpdate(id);
@@ -156,6 +162,7 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/move")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult move(Integer sourceId, Integer targetId) {
 		try {
 			examTypeService.doMove(sourceId, targetId);
@@ -178,6 +185,7 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/authUserList")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult authUserList(PageIn pageIn) {
 		try {
 			return PageResultEx.ok().data(examTypeService.getAuthUserListpage(pageIn));
@@ -196,6 +204,7 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/authPostList")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult authPostList(PageIn pageIn) {
 		try {
 			return PageResultEx.ok().data(examTypeService.getAuthPostListpage(pageIn));
@@ -214,6 +223,7 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/authOrgList")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult authOrgList(PageIn pageIn) {
 		try {
 			return PageResultEx.ok().data(examTypeService.getAuthOrgListpage(pageIn));
@@ -236,6 +246,7 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/auth")
 	@ResponseBody
+	@RequiresRoles("OP")
 	public PageResult auth(Integer id, Integer[] userIds, Integer[] postIds, Integer[] orgIds, boolean syn2Sub) {
 		try {
 			examTypeService.doAuth(id, userIds, postIds, orgIds, syn2Sub);

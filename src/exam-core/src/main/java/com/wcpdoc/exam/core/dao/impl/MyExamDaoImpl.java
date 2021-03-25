@@ -1,6 +1,8 @@
 package com.wcpdoc.exam.core.dao.impl;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
@@ -71,5 +73,35 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 	public List<MyExam> getList(Integer examId) {
 		String sql = "SELECT * FROM EXM_MY_EXAM WHERE EXAM_ID = ?";
 		return getList(sql, new Object[] { examId }, MyExam.class);
+	}
+
+	@Override
+	public List<MyExam> kalendar(Integer userId, Date startTime, Date endTime) {
+		String sql = "SELECT * FROM EXM_MY_EXAM WHERE USER_ID = ? AND ANSWER_TIME >= ? AND ANSWER_TIME <= ? ";
+ 		return getList(sql, new Object[] { userId, startTime, endTime });
+	}
+
+	@Override
+	public PageOut getRankingPage(PageIn pageIn) {
+		String sql = "SELECT MY_EXAM.ID, MY_EXAM.TOTAL_SCORE, MY_EXAM.EXAM_ID, MY_EXAM.USER_ID, EXAM.NAME AS EXAM_NAME, USER.NAME AS USER_NAME "
+				+ "FROM EXM_MY_EXAM MY_EXAM "
+				+ "INNER JOIN EXM_EXAM EXAM ON MY_EXAM.EXAM_ID = EXAM.ID "
+				+ "INNER JOIN SYS_USER USER ON MY_EXAM.USER_ID = USER.ID";
+		SqlUtil sqlUtil = new SqlUtil(sql);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()), "EXAM.ID = ?", pageIn.getOne())
+				.addOrder("MY_EXAM.TOTAL_SCORE", Order.DESC);
+		PageOut pageOut = getListpage(sqlUtil, pageIn);
+		return pageOut;
+	}
+
+	@Override
+	public List<Map<String, Object>> count(Integer examId) {
+		String sql = "SELECT MAX( MY_EXAM.TOTAL_SCORE ) AS MAX, MIN( MY_EXAM.TOTAL_SCORE ) AS MIN, AVG( MY_EXAM.TOTAL_SCORE ) AS AVG, "
+				+ "SUM( MY_EXAM.ANSWER_STATE = 1 ) AS ANSWER, EXM_EXAM.START_TIME AS START_TIME, EXM_EXAM.END_TIME AS END_TIME, "
+				+ "EXM_PAPER.TOTAL_SCORE AS TOTAL_SCORE FROM EXM_MY_EXAM MY_EXAM "
+				+ "INNER JOIN EXM_EXAM ON EXM_EXAM.ID =  MY_EXAM.EXAM_ID "
+				+ "INNER JOIN EXM_PAPER ON EXM_PAPER.ID = EXM_EXAM.PAPER_ID "
+				+ "WHERE MY_EXAM.EXAM_ID = ?";
+ 		return getMapList(sql, new Object[] { examId });
 	}
 }

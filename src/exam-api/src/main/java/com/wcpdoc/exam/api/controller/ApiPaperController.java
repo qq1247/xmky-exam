@@ -24,6 +24,7 @@ import com.wcpdoc.exam.core.service.PaperOptionService;
 import com.wcpdoc.exam.core.service.PaperRemarkService;
 import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.QuestionService;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 /**
  * 试卷控制层
  * 
@@ -51,12 +52,16 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/list")
 	@ResponseBody
-	public PageResult list(PageIn pageIn) {
+	public PageResult list(PageIn pageIn, String name) {
 		// one paperTypeId(试卷分类ID)
 		// two name(试卷名称)
 		// three state(试卷状态)
 		// four id(试卷ID)
 		try {
+			if (ValidateUtil.isValid(name)) {
+				pageIn.setTwo(name);
+			}
+			
 			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
 				pageIn.setTen(getCurUser().getId().toString());
 			}

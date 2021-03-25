@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.api.controller;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +17,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.exam.base.entity.User;
+import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.LoginUser;
@@ -61,6 +64,8 @@ public class ApiMyMarkController extends BaseController {
 	private MyMarkService myMarkService;
 	@Resource
 	private PaperQuestionService paperQuestionService;
+	@Resource
+	private UserService userService;
 	
 	/**
 	 * 我的阅卷列表
@@ -107,19 +112,62 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	public PageResult add(Integer examId) {
+	public PageResult add(MyMark myMark) {
 		try {
-			String processBarId = UUID.randomUUID().toString();
-			LoginUser curUser = getCurUser();
-			new Thread(new Runnable() {
-				public void run() {
-					SpringUtil.getBean(MyExamDetailService.class).doAutoMark(examId, curUser, processBarId);
-				}
-			}).start();
-			
-			return PageResultEx.ok().data(processBarId);
+			myMarkService.add(myMark);
+			return PageResultEx.ok();
 		} catch (Exception e) {
-			log.error("完成试卷错误：", e);
+			log.error("添加错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 按题阅卷
+	 * 
+	 * v1.0 zhanghc 2017年6月26日下午12:30:20
+	 * @param examId
+	 * @return PageResult
+	 */
+	@RequestMapping("/subject")
+	@ResponseBody
+	public PageResult subject(Integer paperId) {
+		try {
+			List<Integer> questionIdList = new ArrayList<Integer>();
+			List<PaperQuestion> list = paperQuestionService.getList(paperId);
+			for(PaperQuestion paperQuestion : list){
+				questionIdList.add(paperQuestion.getQuestionId());
+			}
+			return PageResultEx.ok().data(questionIdList);
+		} catch (Exception e) {
+			log.error("添加错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 按卷阅卷
+	 * 
+	 * v1.0 zhanghc 2017年6月26日下午12:30:20
+	 * @param examId
+	 * @return PageResult
+	 */
+	@RequestMapping("/exam")
+	@ResponseBody
+	public PageResult exam(Integer paperId) {
+		try {
+			List<Map<String, Object>> mapList = new ArrayList<Map<String, Object>>();
+			List<Exam> examList = examService.getExamList(paperId);
+			for(Exam exam : examList){
+				Map<String, Object> map = new HashMap<String, Object>();
+				User entity = userService.getEntity(exam.getUpdateUserId());
+				map.put("userId", entity.getId());
+				map.put("userName", entity.getName());
+				mapList.add(map);
+			}
+			return PageResultEx.ok().data(mapList);
+		} catch (Exception e) {
+			log.error("添加错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -393,11 +441,11 @@ public class ApiMyMarkController extends BaseController {
 			myExam.setMyMarkId(getCurUser().getId());
 			myExam.setMarkFinishTime(new Date());
 			myExam.setTotalScore(totalScore);
-			if (totalScore.doubleValue() >= exam.getPassScore().doubleValue() ) {
-				myExam.setAnswerState(1);
-			} else {
-				myExam.setAnswerState(2);
-			}
+//			if (totalScore.doubleValue() >= exam.getPassScore().doubleValue() ) {
+//				myExam.setAnswerState(1);
+//			} else {
+//				myExam.setAnswerState(2);
+//			}
 			myExam.setUpdateTime(new Date());
 			myExam.setUpdateUserId(getCurUser().getId());
 			myExamService.update(myExam);

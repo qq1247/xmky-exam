@@ -147,4 +147,10 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 //		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), "MY_EXAM_STATE", "MY_EXAM_STATE");
 //		return pageOut;
 	}
+
+	@Override
+	public List<Exam> getExamList(Integer paperId) {
+		String sql = "SELECT * FROM EXM_EXAM EXAM_TYPE WHERE STATE = 1 AND PAPER_ID = ?";
+		return getList(sql, new Object[]{paperId}, Exam.class);
+	}
 }

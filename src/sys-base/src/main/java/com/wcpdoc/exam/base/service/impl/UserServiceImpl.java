@@ -1,15 +1,19 @@
 package com.wcpdoc.exam.base.service.impl;
 
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.exam.base.cfg.ShiroCfg.JWTRealm;
 import com.wcpdoc.exam.base.dao.UserDao;
-import com.wcpdoc.exam.base.entity.Org;
 import com.wcpdoc.exam.base.entity.Post;
 import com.wcpdoc.exam.base.entity.Res;
 import com.wcpdoc.exam.base.entity.User;
@@ -20,8 +24,8 @@ import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
-import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.EncryptUtil;
+import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
@@ -39,6 +43,8 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	private PostService postService;
 	@Resource
 	private ResService resService;
+	@Resource
+	private JWTRealm jwtRealm;
 
 	@Override
 	@Resource(name = "userDaoImpl")
@@ -145,27 +151,32 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	}
 
 	@Override
-	public Map<String, Object> getUser(Integer id) {
-		/*	data.name 	String 	名称
-		data.loginName 	String 	登陆账号
-		data.registTime 	Date 	注册时间
-		data.lastLoginTime 	Date 	最后登陆时间
-		data.orgId 	int 	组织机构ID
-		data.orgName 	String 	组织机构名称
-		data.state 	int 	0：删除；1：正常；2：冻结；
-		data.sort 	int 	排序*/
-		User entity = userDao.getEntity(id);
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("name", entity.getName());
-		map.put("loginName", entity.getLoginName());
-		map.put("registTime", DateUtil.formatDateTime(entity.getRegistTime()));
-		map.put("lastLoginTime", DateUtil.formatDateTime(entity.getLastLoginTime()));
-		map.put("orgId", entity.getOrgId());
-		Org org = orgService.getEntity(entity.getOrgId());
-		map.put("orgName", org.getName());
-		map.put("state", entity.getState());
-		//map.put("sort", entity.getNo());
-		return map;
+	public void postUpdate(Integer id, Integer[] postId) {
+		// 校验数据有效性
+		if (id == null) {
+			throw new MyException("参数错误：id");
+		}
+		User user = userDao.getEntity(id);
+		if(user == null){
+			throw new MyException("参数错误：id");
+		}
+		
+		List<Post> postList = postService.getList();
+		Set<Integer> postIdSet = new HashSet<Integer>();
+		for (Post post : postList) {
+			postIdSet.add(post.getId());
+		}
+		if (!postIdSet.containsAll(Arrays.asList(postId))) {
+			throw new MyException("参数错误：postId");
+		}
+		
+		// 更新岗位
+		user.setPostIds(String.format(",%s,", StringUtil.join(postId, ",")));
+		user.setUpdateTime(new Date());
+		user.setUpdateUserId(getCurUser().getId());
+		userDao.update(user);
+		
+		jwtRealm.getAuthorizationCache().clear();
 	}
 	
 	public static void main(String[] args) {

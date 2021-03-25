@@ -188,7 +188,7 @@ public class UserXlsxServiceImpl extends BaseServiceImp<Object> implements UserX
 			entity.setRegistTime(date);
 			entity.setOrgId(org.getId());
 			entity.setUpdateTime(date);
-			entity.setUpdateUserId(1); //getCurUser().getId()	
+			entity.setUpdateUserId(getCurUser().getId());	
 			entity.setState(1);
 			userService.add(entity);
 			return;
@@ -202,7 +202,7 @@ public class UserXlsxServiceImpl extends BaseServiceImp<Object> implements UserX
 			entity.setRegistTime(date);
 			entity.setOrgId(org.getId());
 			entity.setUpdateTime(date);
-			entity.setUpdateUserId(1); //getCurUser().getId()	
+			entity.setUpdateUserId(getCurUser().getId());	
 			entity.setState(1);
 			userService.add(entity);
 			return;
@@ -213,7 +213,7 @@ public class UserXlsxServiceImpl extends BaseServiceImp<Object> implements UserX
 			}
 			user.setName(map.get("name").toString());
 			user.setUpdateTime(new Date());
-			user.setUpdateUserId(1); //getCurUser().getId()
+			user.setUpdateUserId(getCurUser().getId());
 			userService.update(user);
 			return;
 		}

@@ -188,7 +188,7 @@
 | 参数     |  数据类型   |  描述  |  是否必填 |
 | --------   | -----   | -----  | ---- |
 |id    | int     |   主键   |   是   |
-|postName    | String     |   角色名称   |   是   |
+|postId    | Integer[]     |   角色id   |   是   |
 ######响应数据
 | 参数  |  数据类型   |  描述  |
 | --------   | -----   | -----  |
@@ -425,6 +425,8 @@
 | 参数     |  数据类型   |  描述  |  是否必填 |
 | --------   | -----   | -----  | ---- |
 |name      | String (16)  | 名称   |   否     |
+|curPage      | int | 当前第几页  |   否     |
+|pageSize      | int  | 每页多少条，最大100条   |   否     |
 ######响应数据
 | 参数  |  数据类型   |  描述  |
 | --------   | -----   | -----  |
@@ -437,6 +439,25 @@
 |data.list[].PW_STATE | int  | 1：开启；2：禁用 |
 |data.list[].READ_USER_NAME | String  | 读权限 |
 |data.list[].WRITE_USER_NAME | String  | 写权限 |
+
+####试题分类详情：questionType/get
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|id      | int  | 主键 |   是     |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+|data.id     | int  | 分类id |
+|data.name      | String  | 分类名称 |
+|data.img   | int  | 图片 |
+|data.createUserId   | int  | 创建人 |
+|data.createTime   | String  | 创建时间 |
+|data.rwState   | int  | 读写状态【1：开启；2：禁用'】 |
+|data.readUserIds   | int  | 读权限 |
+|data.writeUserIds   | int  | 写权限 |
 
 ####试题分类添加：questionType/add
 ######请求参数
@@ -530,12 +551,15 @@
 ######请求参数
 | 参数     |  数据类型   |  描述  |  是否必填 |
 | --------   | -----   | -----  | ---- |
-|id| int | 编号   |   否     |
+|questionTypeId| int | 题库id（试题分类id）   |   否     |
+|id| int | 试卷id   |   否     |
 |title      | String  | 题干 |   否     |
 |type      | int | 类型 |   否     |
 |difficulty    | int | 难度 |   否     |
 |scoreStart    | double | 分值大于等于 |   否     |
 |scoreEnd    | double | 分值小于等于 |   否     |
+|curPage      | int | 当前第几页  |   否     |
+|pageSize      | int  | 每页多少条，最大100条   |   否     |
 ######响应数据
 | 参数  |  数据类型   |  描述  |
 | --------   | -----   | -----  |
@@ -621,7 +645,7 @@
 |state    | int  |   1：启用；2：禁用   |   是   |
 |questionTypeId    | int  |   试题分类ID   |   是   |
 |score    | double  | 默认分值  |  否   |
-|scoreOptions    | String(8)  | 1：半对半分；2：答案无顺序；3：大小写不敏感；4：包含答案得分 |  否   |
+|scoreOptions    | String(8)  | 1：半对半分；2：全对得分 3：答案无顺序；4：大小写不敏感；5：包含答案得分 |  否   |
 |no    | int  | 排序 | 是 |
 ######响应数据
 | 参数  |  数据类型   |  描述  |
@@ -664,6 +688,74 @@
 |questionOption    | double     | 及格分数（百分比） |   是   |
 |rightClick    | int     | 1：整卷展示；2：章节展示；3：单题展示； |   是   |
 |rightCopy    | String(65535)     | 备注 |   是   |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+
+####试题选项获取：questionOption/get
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|questionId    | int     | 试题id |   是   |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+|data.id   | int  | 主键 |
+|data.optionA   | String  | 选项A |
+|data.optionB   | String | 选项B |
+|data.optionC   | String  | 选项C |
+|data.optionD   | String  | 选项D |
+|data.optionE   | String  | 选项E |
+|data.optionF	| String  | 选项F |
+|data.optionG   | String  | 选项G |
+|data.questionId   | int  | 主键 |
+
+####试卷选项添加：questionOption/add
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|optionA   | String  | 选项A |   否   |
+|optionB   | String | 选项B |  否   |
+|optionC   | String  | 选项C |   否   |
+|optionD   | String  | 选项D |   否   |
+|optionE   | String  | 选项E |   否   |
+|optionF	| String  | 选项F |   否   |
+|optionG   | String  | 选项G |   否   |
+|questionId   | int  | 试题主键 |   是   |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+
+####试卷选项修改：questionOption/edit
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|id   | int  | 主键 |   是   |
+|optionA   | String  | 选项A |   否   |
+|optionB   | String | 选项B |  否   |
+|optionC   | String  | 选项C |   否   |
+|optionD   | String  | 选项D |   否   |
+|optionE   | String  | 选项E |   否   |
+|optionF	| String  | 选项F |   否   |
+|optionG   | String  | 选项G |   否   |
+|questionId   | int  | 试题主键 |   是   |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+
+####试卷选项删除：questionOption/del
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|id   | int  | 主键 |   是   |
 ######响应数据
 | 参数  |  数据类型   |  描述  |
 | --------   | -----   | -----  |
