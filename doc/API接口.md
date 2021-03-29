@@ -700,13 +700,14 @@
 | genType | int  | 1：人工组卷；2：随机组卷 |   是   |
 |name    | String(32)     | 名称 |   是   |
 |passScore    | double     | 及格分数（百分比） |   是   |
-|description    | String(65535)     | 备注 |   是   |
+|readRemark    | String(65535)  | 考前阅读 |   是   |
+|readNum    | int  | 阅读时长【分钟】 |   是   |
 |showType    | int | 1：整卷展示；2：章节显示；3：单题展示；数据字典：PAPER_SHOW_TYPE |   否   |
-|question    | int | 试题乱序 |   否   |
-|questionOption    | int | 选项乱序 |   否   |
-|rightClick    | int | 禁用右键 |   否  |
-|rightCopy    | int | 禁止复制 |   否   |
-|minimize    | int | 最小化 |  否   |
+|question    | int | 试题乱序 【1：正常；2：乱序】|   否   |
+|questionOption    | int | 选项乱序 【1：正常；2：乱序】|   否   |
+|rightClick    | int | 禁用右键 【1：正常；2：禁用】|   否  |
+|rightCopy    | int | 禁止复制 【1：正常；2：禁用】|   否   |
+|minimize    | int | 最小化 【1：正常；2：禁用】|  否   |
 |minimizeNum    | int | 次数 |   否   |
 |scoreA    | double | 占分比 |   否   |
 |scoreARemark    | String(32) | 评语 |  否   |
@@ -763,10 +764,11 @@
 |code     | int  | 响应码 |
 |msg     | String  | 响应消息 |
 |data.id     | int  | 主键 |
-|data.name     | int  | 名称 |
+|data.name     | String  | 名称 |
 |data.state     | int  | 状态 |
 |data.paperTypeId     | int  | 试卷分类id |
-|data.description     | int  | 描述 |
+|data.readRemark     | String  | 靠前阅读 |
+|data.readNum     | int  | 阅读时间【分钟】 |
 |data.passScore     | int  | 及格分数（百分比） |
 |data.totalScore     | int  | 总分 |
 
