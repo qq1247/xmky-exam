@@ -26,6 +26,7 @@ public class PaperTypeDaoImpl extends RBaseDaoImpl<PaperType> implements PaperTy
 		String sql = "SELECT PAPER_TYPE.* FROM EXM_PAPER_TYPE PAPER_TYPE ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "PAPER_TYPE.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "PAPER_TYPE.CREATE_USER_ID = ?", "%" + pageIn.getThree() + "%")
 				.addWhere("PAPER_TYPE.STATE = ?", 1);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		return pageOut;

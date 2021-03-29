@@ -55,8 +55,14 @@ public class ApiPaperTypeController extends BaseController {
 	@RequestMapping("/list")
 	@ResponseBody
 	@RequiresRoles("OP")
-	public PageResult list(PageIn pageIn) {
+	public PageResult list(PageIn pageIn, String name, Integer userId) {
 		try {
+			if (ValidateUtil.isValid(name)) {
+				pageIn.setTwo(name);
+			}
+			if (userId != null) {
+				pageIn.setThree(userId.toString());
+			}
 			PageOut listpage = paperTypeService.getListpage(pageIn);
 			List<Map<String, Object>> rows = listpage.getRows();
 			List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
