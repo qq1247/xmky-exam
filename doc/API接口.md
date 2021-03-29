@@ -761,3 +761,91 @@
 | --------   | -----   | -----  |
 |code     | int  | 响应码 |
 |msg     | String  | 响应消息 |
+
+####试卷分类列表：paperType/list
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|name      | String (16)  | 名称   |   否     |
+|curPage      | int | 当前第几页  |   否     |
+|pageSize      | int  | 每页多少条，最大100条   |   否     |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+|data.total     | int  | 总行数 |
+|data.list[]      | arr[]  | 分页列表 |
+|data.list[].ID   | int  | 主键 |
+|data.list[].NAME | String  | 名称 |
+|data.list[].PW_STATE | int  | 1：开启；2：禁用 |
+|data.list[].READ_USER_NAME | String  | 读权限 |
+|data.list[].WRITE_USER_NAME | String  | 写权限 |
+
+####试卷分类详情：paperType/get
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|id      | int  | 主键 |   是     |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+|data.id     | int  | 分类id |
+|data.name      | String  | 分类名称 |
+|data.img   | int  | 图片 |
+|data.createUserId   | int  | 创建人 |
+|data.createTime   | String  | 创建时间 |
+|data.rwState   | int  | 读写状态【1：开启；2：禁用'】 |
+|data.readUserIds   | int  | 读权限 |
+|data.writeUserIds   | int  | 写权限 |
+
+####试卷分类添加：paperType/add
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|name      | String (16)  | 名称   |   是     |
+|imgId      | int  | 图片ID |   是     |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+
+####试卷分类修改：paperType/edit
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|id      | int | 主键 |   是     |
+|name      | String (16)  | 名称   |   是     |
+|imgId      | int  | 图片ID   |   是     |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+
+####试卷分类删除：paperType/del
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|id    | int     |   主键   |   是   |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+
+####试卷分类权限：paperType/auth
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|id    | int     |   主键   |   是   |
+|readUserIds    | String     |   读权限   |   否   |
+|writeUserIds    | String |  写权限 |  否  |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
