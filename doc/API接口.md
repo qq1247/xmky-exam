@@ -701,16 +701,13 @@
 |name    | String(32)     | 名称 |   是   |
 |passScore    | double     | 及格分数（百分比） |   是   |
 |description    | String(65535)     | 备注 |   是   |
-
 |showType    | int | 1：整卷展示；2：章节显示；3：单题展示；数据字典：PAPER_SHOW_TYPE |   否   |
-
 |question    | int | 试题乱序 |   否   |
 |questionOption    | int | 选项乱序 |   否   |
 |rightClick    | int | 禁用右键 |   否  |
 |rightCopy    | int | 禁止复制 |   否   |
 |minimize    | int | 最小化 |  否   |
 |minimizeNum    | int | 次数 |   否   |
-
 |scoreA    | double | 占分比 |   否   |
 |scoreARemark    | String(32) | 评语 |  否   |
 |scoreB    | double | 占分比 |   否   |
@@ -721,7 +718,6 @@
 |scoreDRemark    | String(32) | 评语 |  否   |
 |scoreE    | double | 备注 |   否   |
 |scoreERemark    | String(32) | 评语 |   否   |
-
 
 ######响应数据
 | 参数  |  数据类型   |  描述  |
