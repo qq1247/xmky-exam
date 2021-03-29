@@ -12,8 +12,6 @@ import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.service.BaseService;
 import com.wcpdoc.exam.core.util.JwtUtil;
 
-import io.jsonwebtoken.Claims;
-
 /**
  * 基础服务层实现
  * 
@@ -33,20 +31,20 @@ public abstract class BaseServiceImp<T> implements BaseService<T> {
 	@Override
 	public LoginUser getCurUser() {
 		String jwt = request.getHeader("Authorization");
-		JwtResult parse = JwtUtil.getInstance().parse(jwt);
-		Claims claims = parse.getClaims();
+		JwtResult jwtResult = JwtUtil.getInstance().parse(jwt);
+
 		LoginUser LoginUser = new LoginUser() {
 			@Override
 			public String getLoginName() {
-				return (String) claims.get("loginName");
+				return jwtResult.getClaims().get("loginName", String.class);
 			}
 			
 			@Override
 			public Integer getId() {
-				return Integer.valueOf(claims.getId());
+				return jwtResult.getClaims().get("id", Integer.class);
 			}
 		};
-		return parse == null ? null : LoginUser;
+		return jwtResult == null ? null : LoginUser;
 	}
 
 	@Override

@@ -8,8 +8,6 @@ import com.wcpdoc.exam.core.entity.JwtResult;
 import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.util.JwtUtil;
 
-import io.jsonwebtoken.Claims;
-
 /**
  * 控制层
  * 
@@ -30,19 +28,19 @@ public abstract class BaseController {
 	 */
 	public LoginUser getCurUser() {
 		String jwt = request.getHeader("Authorization");
-		JwtResult parse = JwtUtil.getInstance().parse(jwt);
-		Claims claims = parse.getClaims();
+		JwtResult jwtResult = JwtUtil.getInstance().parse(jwt);
+
 		LoginUser LoginUser = new LoginUser() {
 			@Override
 			public String getLoginName() {
-				return (String) claims.get("loginName");
+				return jwtResult.getClaims().get("loginName", String.class);
 			}
 			
 			@Override
 			public Integer getId() {
-				return Integer.valueOf(claims.getId());
+				return jwtResult.getClaims().get("id", Integer.class);
 			}
 		};
-		return parse == null ? null : LoginUser;
+		return jwtResult == null ? null : LoginUser;
 	}
 }
