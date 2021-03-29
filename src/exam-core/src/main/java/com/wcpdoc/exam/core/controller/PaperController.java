@@ -163,9 +163,7 @@ public class PaperController extends BaseController {
 			Paper entity = paperService.getEntity(paper.getId());
 //			entity.setPaperTypeId(paper.getPaperTypeId());//不需要修改
 			entity.setName(paper.getName());
-			entity.setPreviewType(paper.getPreviewType());
 			entity.setPassScore(paper.getPassScore());
-			entity.setScoreERemark(paper.getScoreERemark());
 			entity.setDescription(paper.getDescription());
 			//entity.setState(paper.getState());//单独控制
 			entity.setUpdateUserId(getCurUser().getId());

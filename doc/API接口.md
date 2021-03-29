@@ -664,6 +664,35 @@
 |code     | int  | 响应码 |
 |msg     | String  | 响应消息 |
 
+####试卷列表：paper/list
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|paperTypeId| int | 试卷分类ID   |   否     |
+|name| String | 试卷名称   |   否     |
+|curPage      | int | 当前第几页  |   否     |
+|pageSize      | int  | 每页多少条，最大100条   |   否     |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+|data.total     | int  | 总行数 |
+|data.list[]      | arr[]  | 分页列表 |
+|data.list[].ID   | int  | 主键 |
+|data.list[].NAME   | String  | 名称 |
+|data.list[].STATE   | int  | 状态 |
+|data.list[].STATE_NAME   | String  | 状态名称 |
+|data.list[].UPDATE_USER_ID   | int  | 修改人 |
+|data.list[].UPDATE_TIME   | DateTime  | 修改时间 |
+|data.list[].PASS_SCORE   | double  | 及格分数（百分比） |
+|data.list[].TOTAL_SCORE   | double  | 总分数 |
+|data.list[].PAPER_TYPE_ID   | int  | 试卷分类id |
+|data.list[].PAPER_TYPE_NAME   | String  | 试卷分类名称 |
+|data.list[].DESCRIPTION   | String  | 描述 |
+|data.list[].SHOW_TYPE   | int  | 1：整卷展示；2：章节显示；3：单题展示；数据字典：PAPER_SHOW_TYPE |
+|data.list[].GEN_TYPE   | int  | 1：人工组卷；2：随机组卷 |
+
 ####试卷获取：paper/add
 ######请求参数
 | 参数     |  数据类型   |  描述  |  是否必填 |
@@ -671,23 +700,64 @@
 |id    | int     | 主键 |   是   |
 |name    | String(32)     | 名称 |   是   |
 |passScore    | double     | 及格分数（百分比） |   是   |
-|showType    | int     | 1：整卷展示；2：章节展示；3：单题展示； |   是   |
-|remark    | String(65535)     | 备注 |   是   |
+|showType    | int     | 1：整卷展示；2：章节显示；3：单题展示；数据字典：PAPER_SHOW_TYPE |   是   |
+|description    | String(65535)     | 备注 |   是   |
 ######响应数据
 | 参数  |  数据类型   |  描述  |
 | --------   | -----   | -----  |
 |code     | int  | 响应码 |
 |msg     | String  | 响应消息 |
 
-####试卷获取：paperOption/edit
+####试卷获取：paper/edit
 ######请求参数
 | 参数     |  数据类型   |  描述  |  是否必填 |
 | --------   | -----   | -----  | ---- |
 |id    | int     | 主键 |   是   |
-|question    | String(32)     | 名称 |   是   |
-|questionOption    | double     | 及格分数（百分比） |   是   |
-|rightClick    | int     | 1：整卷展示；2：章节展示；3：单题展示； |   是   |
-|rightCopy    | String(65535)     | 备注 |   是   |
+|name    | String(32)     | 名称 |   是   |
+|passScore    | double     | 及格分数（百分比） |   是   |
+|showType    | int     |1：整卷展示；2：章节显示；3：单题展示；数据字典：PAPER_SHOW_TYPE |   是   |
+|description    | String(65535)     | 备注 |   是   |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+
+####试卷删除：paper/del
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|id    | int     | 主键 |   是   |
+
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+
+####试卷获取：paper/get
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|id    | int     | 主键 |   是   |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+|data.id     | int  | 主键 |
+|data.name     | int  | 名称 |
+|data.state     | int  | 状态 |
+|data.paperTypeId     | int  | 试卷分类id |
+|data.description     | int  | 描述 |
+|data.passScore     | int  | 及格分数（百分比） |
+|data.totalScore     | int  | 总分 |
+
+####试卷拷贝：paper/copy
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|id    | int     | 主键 |   是   |
 ######响应数据
 | 参数  |  数据类型   |  描述  |
 | --------   | -----   | -----  |

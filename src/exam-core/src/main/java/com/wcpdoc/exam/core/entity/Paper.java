@@ -28,18 +28,14 @@ public class Paper {
 	private Integer id;
 	@Column(name = "NAME")
 	private String name;
-	@Column(name = "PREVIEW_TYPE")
-	private Integer previewType;
 	@Column(name = "PASS_SCORE")
 	private BigDecimal passScore;
 	@Column(name = "TOTAL_SCORE")
 	private BigDecimal totalScore;
-	@Column(name = "SCORE_E_REMARK")
-	private String scoreERemark;
+	@Column(name = "SHOW_TYPE")
+	private BigDecimal showType;
 	@Column(name = "DESCRIPTION")
 	private String description;
-	@Column(name = "PAPER_TYPE_ID")
-	private Integer paperTypeId;
 	@Column(name = "STATE")
 	private Integer state;
 	@Column(name = "UPDATE_USER_ID")
@@ -48,6 +44,26 @@ public class Paper {
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "UPDATE_TIME")
 	private Date updateTime;
+	@Column(name = "PAPER_TYPE_ID")
+	private Integer paperTypeId;
+	@Column(name = "GEN_TYPE")
+	private Integer genType;	
+
+	public BigDecimal getShowType() {
+		return showType;
+	}
+
+	public void setShowType(BigDecimal showType) {
+		this.showType = showType;
+	}
+
+	public Integer getGenType() {
+		return genType;
+	}
+
+	public void setGenType(Integer genType) {
+		this.genType = genType;
+	}
 
 	public Integer getId() {
 		return id;
@@ -97,14 +113,6 @@ public class Paper {
 		this.paperTypeId = paperTypeId;
 	}
 
-	public Integer getPreviewType() {
-		return previewType;
-	}
-
-	public void setPreviewType(Integer previewType) {
-		this.previewType = previewType;
-	}
-
 	/** 0：删除；1：启用；2：禁用 */
 	public Integer getState() {
 		return state;
@@ -129,13 +137,5 @@ public class Paper {
 
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
-	}
-
-	public String getScoreERemark() {
-		return scoreERemark;
-	}
-
-	public void setScoreERemark(String scoreERemark) {
-		this.scoreERemark = scoreERemark;
 	}
 }

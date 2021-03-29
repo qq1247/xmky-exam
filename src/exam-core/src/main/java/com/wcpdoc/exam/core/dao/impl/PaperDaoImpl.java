@@ -33,12 +33,9 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 	
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT PAPER.ID, PAPER.NAME, PAPER_TYPE.NAME AS PAPER_TYPE_NAME, PAPER.STATE, PAPER.PASS_SCORE, PAPER.TOTAL_SCORE, "
-				+ "	PAPER.SCORE_A, PAPER.SCORE_A_REMARK, PAPER.SCORE_B, PAPER.SCORE_B_REMARK, PAPER.SCORE_C, PAPER.SCORE_C_REMARK, "
-				+ "	PAPER.SCORE_D, PAPER.SCORE_D_REMARK, PAPER.SCORE_E, PAPER.SCORE_E_REMARK "
+		String sql = "SELECT PAPER.*, PAPER_TYPE.NAME AS PAPER_TYPE_NAME "
 				+ "FROM EXM_PAPER PAPER "
 				+ "LEFT JOIN EXM_PAPER_TYPE PAPER_TYPE ON PAPER.PAPER_TYPE_ID = PAPER_TYPE.ID ";
-		
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "PAPER.PAPER_TYPE_ID = ?", pageIn.getOne())
 				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "PAPER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")

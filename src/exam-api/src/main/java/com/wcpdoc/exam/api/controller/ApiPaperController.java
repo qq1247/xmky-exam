@@ -2,6 +2,8 @@ package com.wcpdoc.exam.api.controller;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -52,12 +54,15 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/list")
 	@ResponseBody
-	public PageResult list(PageIn pageIn, String name) {
+	public PageResult list(PageIn pageIn, Integer paperTypeId, String name) {
 		// one paperTypeId(试卷分类ID)
 		// two name(试卷名称)
 		// three state(试卷状态)
 		// four id(试卷ID)
 		try {
+			if(paperTypeId != null){
+				pageIn.setOne(paperTypeId.toString());
+			}
 			if (ValidateUtil.isValid(name)) {
 				pageIn.setTwo(name);
 			}
@@ -110,10 +115,9 @@ public class ApiPaperController extends BaseController {
 			Paper entity = paperService.getEntity(paper.getId());
 //			entity.setPaperTypeId(paper.getPaperTypeId());//不需要修改
 			entity.setName(paper.getName());
-			entity.setPreviewType(paper.getPreviewType());
 			entity.setPassScore(paper.getPassScore());
-			entity.setScoreERemark(paper.getScoreERemark());
 			entity.setDescription(paper.getDescription());
+			entity.setShowType(paper.getShowType());
 			//entity.setState(paper.getState());//单独控制
 			entity.setUpdateUserId(getCurUser().getId());
 			entity.setUpdateTime(new Date());
@@ -522,6 +526,36 @@ public class ApiPaperController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("发布错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 预览试卷
+	 * 
+	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * @param id
+	 * @return pageOut
+	 */
+	@RequestMapping("/get")
+	@ResponseBody
+	public PageResult get(Integer id) {
+		try {
+			Map<String, Object> map = new HashMap<>();
+			Paper entity = paperService.getEntity(id);
+			map.put("id", entity.getId());
+			map.put("name", entity.getName());
+			map.put("passScore", entity.getPassScore());
+			map.put("totalScore", entity.getTotalScore());
+			map.put("description", entity.getDescription());
+			map.put("paperTypeId", entity.getPaperTypeId());
+			map.put("state", entity.getState());
+			return PageResultEx.ok().data(map);
+		} catch (MyException e) {
+			log.error("预览试卷错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		}  catch (Exception e) {
+			log.error("预览试卷错误：", e);
 			return PageResult.err();
 		}
 	}
