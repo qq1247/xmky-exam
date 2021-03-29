@@ -12,8 +12,10 @@ import com.wcpdoc.exam.base.service.PostService;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.PaperTypeDao;
+import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperType;
 import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.PaperTypeExService;
 import com.wcpdoc.exam.core.service.PaperTypeService;
 import com.wcpdoc.exam.core.util.ValidateUtil;
@@ -34,6 +36,8 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 	private PostService postService;
 	@Resource
 	private UserService userService;
+	@Resource
+	private PaperService paperService;
 
 	@Override
 	@Resource(name = "paperTypeDaoImpl")
@@ -67,15 +71,13 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 		if (id == 1) { //不包括根试卷分类
 			return;
 		}
-		List<PaperType> paperTypeList = paperTypeDao.getList(id);
-		if (ValidateUtil.isValid(paperTypeList)) {
-			throw new MyException("请先删除子试卷分类！");
+		List<Paper> paperList = paperService.getList(id);
+		if (ValidateUtil.isValid(paperList)) {
+			throw new MyException("请先删除试卷分类下所有的试卷！");
 		}
 		
 		// 删除试卷分类
 		PaperType paperType = getEntity(id);
-		paperTypeExService.delAndUpdate(paperType);
-		
 		paperType.setState(0);
 		paperType.setUpdateTime(new Date());
 		paperType.setUpdateUserId(getCurUser().getId());
