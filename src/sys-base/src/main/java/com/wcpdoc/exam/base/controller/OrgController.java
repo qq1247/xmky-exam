@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wcpdoc.exam.base.entity.Org;
-import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.base.service.OrgService;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
@@ -182,7 +181,7 @@ public class OrgController extends BaseController {
 			Org entity = orgService.getEntity(org.getId());
 			entity.setName(org.getName());
 			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(((User) getCurUser()).getId());
+			entity.setUpdateUserId(getCurUser().getId());
 			entity.setNo(org.getNo());
 			entity.setCode(org.getCode());
 			orgService.update(entity);

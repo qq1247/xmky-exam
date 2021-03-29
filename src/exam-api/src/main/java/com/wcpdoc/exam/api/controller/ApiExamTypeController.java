@@ -11,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.base.service.OrgService;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.ExamType;
@@ -118,7 +117,7 @@ public class ApiExamTypeController extends BaseController {
 			ExamType entity = examTypeService.getEntity(examType.getId());
 			entity.setName(examType.getName());
 			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(((User)getCurUser()).getId());
+			entity.setUpdateUserId(getCurUser().getId());
 			entity.setNo(examType.getNo());
 			examTypeService.update(entity);
 			return PageResult.ok();

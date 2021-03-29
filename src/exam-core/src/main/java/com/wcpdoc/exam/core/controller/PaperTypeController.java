@@ -11,7 +11,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.base.service.OrgService;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageResult;
@@ -112,7 +111,7 @@ public class PaperTypeController extends BaseController {
 			PaperType entity = paperTypeService.getEntity(paperType.getId());
 			entity.setName(paperType.getName());
 			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(((User)getCurUser()).getId());
+			entity.setUpdateUserId(getCurUser().getId());
 			paperTypeService.update(entity);
 			return PageResult.ok();
 		} catch (MyException e) {

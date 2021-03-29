@@ -159,7 +159,7 @@ public class ApiPaperTypeController extends BaseController {
 			PaperType entity = paperTypeService.getEntity(paperType.getId());
 			entity.setName(paperType.getName());
 			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(((User)getCurUser()).getId());
+			entity.setUpdateUserId(getCurUser().getId());
 			paperTypeService.update(entity);
 			return PageResult.ok();
 		} catch (MyException e) {

@@ -11,7 +11,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.base.service.OrgService;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageResult;
@@ -167,7 +166,7 @@ public class QuestionTypeController extends BaseController {
 			QuestionType entity = questionTypeService.getEntity(questionType.getId());
 			entity.setName(questionType.getName());
 			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(((User)getCurUser()).getId());
+			entity.setUpdateUserId(getCurUser().getId());
 			//entity.setNo(questionType.getNo());
 			questionTypeService.update(entity);
 			return PageResult.ok();
