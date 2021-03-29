@@ -693,7 +693,7 @@
 |data.list[].SHOW_TYPE   | int  | 1：整卷展示；2：章节显示；3：单题展示；数据字典：PAPER_SHOW_TYPE |
 |data.list[].GEN_TYPE   | int  | 1：人工组卷；2：随机组卷 |
 
-####试卷获取：paper/add
+####试卷添加：paper/add
 ######请求参数
 | 参数     |  数据类型   |  描述  |  是否必填 |
 | --------   | -----   | -----  | ---- |
