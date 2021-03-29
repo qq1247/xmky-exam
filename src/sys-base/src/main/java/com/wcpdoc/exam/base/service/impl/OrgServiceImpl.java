@@ -183,4 +183,38 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 		map.put("sort", entity.getNo());
 		return map;
 	}
+
+	@Override
+	public Integer syncOrg(String orgName, String orgCode) {
+		// 校验数据有效性
+		if (!ValidateUtil.isValid(orgName)) {
+			throw new MyException("参数错误：orgName");
+		}
+		if (!ValidateUtil.isValid(orgCode)) {
+			throw new MyException("参数错误：orgCode");
+		}
+		
+		Org org = orgDao.getOrg(orgName, orgCode);
+		if(org != null){
+			return org.getId();
+		}
+		
+		org = new Org();
+		org.setName(orgName);
+		org.setCode(orgCode);
+		org.setParentId(1);
+		org.setUpdateUserId(getCurUser().getId());
+		org.setUpdateTime(new Date());
+		org.setState(1);
+		org.setNo(1);
+		orgDao.add(org);
+		
+		// 更新父子关系
+		Org parentOrg = orgDao.getEntity(org.getParentId());
+		org.setParentSub(parentOrg.getParentSub() + org.getId() + "_");
+		org.setLevel(org.getParentSub().split("_").length - 1);
+		update(org);
+		
+		return org.getId();
+	}
 }

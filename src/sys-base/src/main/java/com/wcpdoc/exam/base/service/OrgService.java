@@ -101,4 +101,14 @@ public interface OrgService extends BaseService<Org> {
 	 * @return Map<String,Object>
 	 */
 	Map<String, Object> getOrg(Integer id);
+	
+	/**
+	 * 同步组织机构
+	 * 
+	 * v1.0 chenyun 2021年3月26日下午3:49:33
+	 * @param orgName
+	 * @param orgCode
+	 * @return Integer
+	 */
+	Integer syncOrg(String orgName, String orgCode);
 }

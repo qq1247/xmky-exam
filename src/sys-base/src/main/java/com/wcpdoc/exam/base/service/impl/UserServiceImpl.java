@@ -205,4 +205,18 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		pageOut.setTotal(tokenCacheList.size());
 		return pageOut;
 	}
+
+	@Override
+	public void syncUser(List<User> user, Integer orgId) {
+		Date date = new Date();
+		for(User entity : user){
+			entity.setPwd(getEncryptPwd(entity.getLoginName(), entity.getPwd()));
+			entity.setRegistTime(date);
+			entity.setOrgId(orgId);
+			entity.setUpdateUserId(getCurUser().getId());
+			entity.setUpdateTime(date);
+			entity.setState(1);
+			userDao.add(entity);
+		}
+	}
 }

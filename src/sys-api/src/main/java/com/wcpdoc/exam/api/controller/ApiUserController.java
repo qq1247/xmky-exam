@@ -466,4 +466,25 @@ public class ApiUserController extends BaseController {
 			return PageResult.err();
 		}
 	}
+	
+	/**
+	 * 组织机构用户同步
+	 * v1.0 zhanghc 2016年8月27日上午11:36:55
+	 * 
+	 * @return pageOut
+	 */
+	@RequestMapping("/syncUser")
+	@ResponseBody
+	public PageResult syncUser(String orgName, String orgCode, List<User> user) {
+		// org  [name, code]
+		// user [name, loginname, email, phone, pwd ]
+		try {
+			Integer orgId = orgService.syncOrg(orgName, orgCode);
+			userService.syncUser(user, orgId);
+			return PageResult.ok();
+		} catch (Exception e) {
+			log.error("组织机构用户同步错误：", e);
+			return PageResult.err();
+		}
+	}
 }

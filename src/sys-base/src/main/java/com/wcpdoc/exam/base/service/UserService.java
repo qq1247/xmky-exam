@@ -113,4 +113,13 @@ public interface UserService extends BaseService<User> {
 	 * @return PageOut
 	 */
 	PageOut onList();
+	
+	/**
+	 * 同步用户
+	 * 
+	 * v1.0 chenyun 2021年3月26日下午3:50:32
+	 * @param user
+	 * @param orgId
+	 */
+	void syncUser(List<User> user, Integer orgId);
 }
