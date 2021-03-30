@@ -211,8 +211,14 @@ public class ApiPaperController extends BaseController {
 			paper.setUpdateUserId(getCurUser().getId());
 			paperService.update(paper);
 			// 删除防作弊、成绩评语
-			paperOptionService.del(paperOptionService.getPaperOption(paper.getId()).getId());
-			paperRemarkService.del(paperRemarkService.getPaperRemark(paper.getId()).getId());
+			PaperOption paperOption = paperOptionService.getPaperOption(paper.getId());
+			if (paperOption != null) {
+				paperOptionService.del(paperOption.getId());
+			}
+			PaperRemark paperRemark = paperRemarkService.getPaperRemark(paper.getId());
+			if(paperRemark != null){				
+				paperRemarkService.del(paperRemark.getId());
+			}
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("删除试卷错误：{}", e.getMessage());
@@ -244,14 +250,14 @@ public class ApiPaperController extends BaseController {
 			PaperOption paperOption = paperOptionService.getPaperOption(paper.getId());
 			PaperOption paperOptionEntity = new PaperOption();
 			if(paperOption != null){				
-				BeanUtils.copyProperties(entity, paperOption);
+				BeanUtils.copyProperties(paperOptionEntity, paperOption);
 			}
 			paperOptionEntity.setPaperId(entity.getId());
 			paperOptionService.add(paperOptionEntity);
 
 			PaperRemark paperRemark = paperRemarkService.getPaperRemark(paper.getId());
 			PaperRemark paperRemarkEntity = new PaperRemark();
-			if (paperRemark != null) {				
+			if (paperRemark != null) {
 				BeanUtils.copyProperties(paperRemarkEntity, paperRemark);
 			}
 			paperRemarkEntity.setPaperId(entity.getId());
