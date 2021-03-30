@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -257,6 +258,28 @@ public class ApiPaperController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		}  catch (Exception e) {
 			log.error("拷贝试题错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 试卷归档
+	 * 
+	 * v1.0 zhanghc 2018年11月24日上午9:13:22
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/archive")
+	@ResponseBody
+	@RequiresRoles("OP")
+	public PageResult archive(Integer id) {
+		try {
+			Paper entity = paperService.getEntity(id);
+			entity.setState(3);
+			paperService.update(entity);
+			return PageResult.ok();
+		}catch (Exception e) {
+			log.error("归档错误：", e);
 			return PageResult.err();
 		}
 	}
