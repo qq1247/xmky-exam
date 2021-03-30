@@ -243,13 +243,17 @@ public class ApiPaperController extends BaseController {
 			
 			PaperOption paperOption = paperOptionService.getPaperOption(paper.getId());
 			PaperOption paperOptionEntity = new PaperOption();
-			BeanUtils.copyProperties(entity, paperOption);
+			if(paperOption != null){				
+				BeanUtils.copyProperties(entity, paperOption);
+			}
 			paperOptionEntity.setPaperId(entity.getId());
 			paperOptionService.add(paperOptionEntity);
 
 			PaperRemark paperRemark = paperRemarkService.getPaperRemark(paper.getId());
 			PaperRemark paperRemarkEntity = new PaperRemark();
-			BeanUtils.copyProperties(paperRemarkEntity, paperRemark);
+			if (paperRemark != null) {				
+				BeanUtils.copyProperties(paperRemarkEntity, paperRemark);
+			}
 			paperRemarkEntity.setPaperId(entity.getId());
 			paperRemarkService.add(paperRemarkEntity);
 			return PageResult.ok();
