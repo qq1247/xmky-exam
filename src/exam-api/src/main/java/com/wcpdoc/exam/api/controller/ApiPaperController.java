@@ -175,14 +175,14 @@ public class ApiPaperController extends BaseController {
 			PaperRemark paperRemarkEntity = paperRemarkService.getPaperRemark(entity.getId());
 			paperRemarkEntity.setScoreA(paperRemark.getScoreA());
 			paperRemarkEntity.setScoreARemark(paperRemark.getScoreARemark());
-			paperRemarkEntity.setScoreA(paperRemark.getScoreB());
-			paperRemarkEntity.setScoreARemark(paperRemark.getScoreBRemark());
-			paperRemarkEntity.setScoreA(paperRemark.getScoreC());
-			paperRemarkEntity.setScoreARemark(paperRemark.getScoreCRemark());
-			paperRemarkEntity.setScoreA(paperRemark.getScoreD());
-			paperRemarkEntity.setScoreARemark(paperRemark.getScoreDRemark());
-			paperRemarkEntity.setScoreA(paperRemark.getScoreE());
-			paperRemarkEntity.setScoreARemark(paperRemark.getScoreERemark());
+			paperRemarkEntity.setScoreB(paperRemark.getScoreB());
+			paperRemarkEntity.setScoreBRemark(paperRemark.getScoreBRemark());
+			paperRemarkEntity.setScoreC(paperRemark.getScoreC());
+			paperRemarkEntity.setScoreCRemark(paperRemark.getScoreCRemark());
+			paperRemarkEntity.setScoreD(paperRemark.getScoreD());
+			paperRemarkEntity.setScoreDRemark(paperRemark.getScoreDRemark());
+			paperRemarkEntity.setScoreE(paperRemark.getScoreE());
+			paperRemarkEntity.setScoreERemark(paperRemark.getScoreERemark());
 			paperRemarkService.update(paperRemarkEntity);
 			return PageResult.ok();
 		} catch (MyException e) {
