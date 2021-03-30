@@ -4,11 +4,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
@@ -60,6 +66,60 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	
 	@Override
 	public void addAndUpdate(Question question, String[] options) {
+		//校验数据有效性
+		if (question.getType() == null) {
+			throw new MyException("参数错误：type");
+		}
+		if (question.getDifficulty() == null) {
+			throw new MyException("参数错误：difficulty");
+		}
+		if (!ValidateUtil.isValid(question.getTitle())) {
+			throw new MyException("参数错误：title");
+		}
+		if (!ValidateUtil.isValid(question.getAnswer())) {
+			throw new MyException("答案不能为空！");
+		}
+		
+		if (question.getType() == 1 || question.getType() == 2) {
+			if(options.length < 2){
+				throw new MyException("至少需要两个选项！");
+			}
+			
+			//智能判卷
+			if(question.getType() == 2 && question.getScoreOptions() ==null){
+				throw new MyException("智能判卷不能为空！");
+			}
+			
+			Set<String> set = new LinkedHashSet<>(Arrays.asList(question.getAnswer().split("")));
+			set.remove("");
+			Set<String> set2 = new HashSet<>(Arrays.asList(options));
+			if (!set2.containsAll(set)) {
+				throw new MyException("选项和答案不匹配！");
+			}
+		} else if (question.getType() == 3) {
+			String pattern = "(___)+";//正则表达式
+			Pattern r = Pattern.compile(pattern);
+			Matcher m = r.matcher(question.getTitle());
+			int titleNumber = 0;
+			while(m.find()) {
+				titleNumber++;
+			}
+			String[] split = question.getAnswer().split("/n");
+			Integer answerNumber = split.length + 1;
+			
+			if (titleNumber != answerNumber) {
+				throw new MyException("填空和答案个数不匹配！");
+			}
+		} else if (question.getType() == 4) {
+			if (question.getAnswer().length() != 1) {
+				throw new MyException("答案只能是一个！");
+			}
+			
+			if (!"对是√".contains(question.getAnswer()) || !"否错×".contains(question.getAnswer())) {
+				throw new MyException("答案只能填：对错是否√×");
+			}
+		}
+
 		// 添加试题
 		question.setUpdateTime(new Date());
 		question.setUpdateUserId(getCurUser().getId());
@@ -104,7 +164,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 		
 		// 保存附件
-		// saveFile(question);
+		saveFile(question);
 	}
 	
 	@Override
