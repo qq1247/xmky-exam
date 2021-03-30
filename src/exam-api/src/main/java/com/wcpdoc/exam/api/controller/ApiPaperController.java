@@ -239,6 +239,18 @@ public class ApiPaperController extends BaseController {
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
 			paperService.add(entity);
+			
+			PaperOption paperOption = paperOptionService.getPaperOption(paper.getId());
+			PaperOption paperOptionEntity = new PaperOption();
+			BeanUtils.copyProperties(entity, paperOption);
+			paperOptionEntity.setPaperId(entity.getId());
+			paperOptionService.add(paperOptionEntity);
+
+			PaperRemark paperRemark = paperRemarkService.getPaperRemark(paper.getId());
+			PaperRemark paperRemarkEntity = new PaperRemark();
+			BeanUtils.copyProperties(paperRemarkEntity, paperRemark);
+			paperRemarkEntity.setPaperId(entity.getId());
+			paperRemarkService.add(paperRemarkEntity);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("拷贝试题错误：{}", e.getMessage());
