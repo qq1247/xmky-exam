@@ -34,8 +34,10 @@ public class Paper {
 	private BigDecimal totalScore;
 	@Column(name = "SHOW_TYPE")
 	private BigDecimal showType;
-	@Column(name = "DESCRIPTION")
-	private String description;
+	@Column(name = "READ_REMARK")
+	private String readRemark;
+	@Column(name = "READ_NUM")
+	private Integer readNum;
 	@Column(name = "STATE")
 	private Integer state;
 	@Column(name = "UPDATE_USER_ID")
@@ -97,12 +99,12 @@ public class Paper {
 		this.passScore = passScore;
 	}
 
-	public String getDescription() {
-		return description;
+	public String getReadRemark() {
+		return readRemark;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setReadRemark(String readRemark) {
+		this.readRemark = readRemark;
 	}
 
 	public Integer getPaperTypeId() {
@@ -137,5 +139,13 @@ public class Paper {
 
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
+	}
+
+	public Integer getReadNum() {
+		return readNum;
+	}
+
+	public void setReadNum(Integer readNum) {
+		this.readNum = readNum;
 	}
 }

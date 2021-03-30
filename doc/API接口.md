@@ -726,15 +726,75 @@
 |code     | int  | 响应码 |
 |msg     | String  | 响应消息 |
 
+####试卷修改回显：paper/echo
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|paperId| int | 试卷ID   |   是     |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+|data.paperRemark.id     | int  | 试卷评语主键 |
+|data.paperRemark.scoreA     | double  | 分数A（%） |
+|data.paperRemark.scoreARemark     | int  | 分数A评语 |
+|data.paperRemark.scoreB     | int  | 分数B（%）|
+|data.paperRemark.scoreBRemark     | int  | 分数B评语 |
+|data.paperRemark.scoreC     | int  | 分数C（%）|
+|data.paperRemark.scoreCRemark     | int  | 分数C评语 |
+|data.paperRemark.scoreD     | int  | 分数D（%） |
+|data.paperRemark.scoreDRemark     | int  | 分数D评语|
+|data.paperRemark.scoreE     | int  | 分数E（%） |
+|data.paperRemark.scoreERemark     | int  | 分数E评语 |
+|data.paperRemark.paperId     | int  | 试卷id |
+|data.paper.id | int  | 试卷主键 |
+|data.paper.name | String  | 试卷名称 |
+|data.paper.passScore | double  | 试卷及格分数（%） |
+|data.paper.totalScore | double  | 试卷总分 |
+|data.paper.showType | int  | 展示方式 |
+|data.paper.readRemark | String  | 考前阅读 |
+|data.paper.readNum | int  | 阅读时长 |
+|data.paper.state | int  | 试卷状态 |
+|data.paper.paperTypeId | int  | 试卷分类id |
+|data.paper.genType | int  | 组卷方式 |
+|data.paperOption.id | int  | 防作弊主键 |
+|data.paperOption.question | int  | 试题乱序 |
+|data.paperOption.questionOption | int  | 试题选项乱序 |
+|data.paperOption.rightClick | int  | 禁用右键 |
+|data.paperOption.rightCopy | int  | 禁用复制 |
+|data.paperOption.minimize | int  | 最小化警告 |
+|data.paperOption.minimizeNum | int  | 最小化警告次数 |
+|data.paperOption.paperId | int  | 试卷id |
+
 ####试卷修改：paper/edit
 ######请求参数
 | 参数     |  数据类型   |  描述  |  是否必填 |
 | --------   | -----   | -----  | ---- |
-|id    | int     | 主键 |   是   |
+|paperId    | int     | 试卷id |   是   |
+|genType | int  | 1：人工组卷；2：随机组卷 |   是   |
 |name    | String(32)     | 名称 |   是   |
 |passScore    | double     | 及格分数（百分比） |   是   |
-|showType    | int     |1：整卷展示；2：章节显示；3：单题展示；数据字典：PAPER_SHOW_TYPE |   是   |
-|description    | String(65535)     | 备注 |   是   |
+|readRemark    | String(65535)  | 考前阅读 |   是   |
+|readNum    | int  | 阅读时长【分钟】 |   是   |
+|showType    | int | 1：整卷展示；2：章节显示；3：单题展示；数据字典：PAPER_SHOW_TYPE |   否   |
+|question    | int | 试题乱序 【1：正常；2：乱序】|   否   |
+|questionOption    | int | 选项乱序 【1：正常；2：乱序】|   否   |
+|rightClick    | int | 禁用右键 【1：正常；2：禁用】|   否  |
+|rightCopy    | int | 禁止复制 【1：正常；2：禁用】|   否   |
+|minimize    | int | 最小化 【1：正常；2：禁用】|  否   |
+|minimizeNum    | int | 次数 |   否   |
+|scoreA    | double | 占分比 |   否   |
+|scoreARemark    | String(32) | 评语 |  否   |
+|scoreB    | double | 占分比 |   否   |
+|scoreBRemark    | String(32) | 评语 |   否   |
+|scoreC    | double | 占分比 |   否  |
+|scoreCRemark    | String(32) | 评语 |   否   |
+|scoreD    | double | 占分比 |   否   |
+|scoreDRemark    | String(32) | 评语 |  否   |
+|scoreE    | double | 备注 |   否   |
+|scoreERemark    | String(32) | 评语 |   否   |
+
 ######响应数据
 | 参数  |  数据类型   |  描述  |
 | --------   | -----   | -----  |
