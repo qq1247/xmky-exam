@@ -1026,7 +1026,7 @@
 |code     | int  | 响应码 |
 |msg     | String  | 响应消息 |
 
-####章节添加：paper/chapterEdit
+####章节修改：paper/chapterEdit
 ######请求参数
 | 参数     |  数据类型   |  描述  |  是否必填 |
 | --------   | -----   | -----  | ---- |
@@ -1039,7 +1039,7 @@
 |code     | int  | 响应码 |
 |msg     | String  | 响应消息 |
 
-####章节添加：paper/chapterDel
+####章节删除：paper/chapterDel
 ######请求参数
 | 参数     |  数据类型   |  描述  |  是否必填 |
 | --------   | -----   | -----  | ---- |
@@ -1050,17 +1050,31 @@
 |code     | int  | 响应码 |
 |msg     | String  | 响应消息 |
 
-####试卷试题列表：paper/questionList
+####试卷试题列表：paper/paperQuestionList
 ######请求参数
 | 参数     |  数据类型   |  描述  |  是否必填 |
 | --------   | -----   | -----  | ---- |
-|curPage 	|int 	|当前第几页 	|否|
-|pageSize 	|int 	|每页多少条，最大100条 	|否|
+|id 	|int 	| 试卷id 	|否|
 ######响应数据
 | 参数  |  数据类型   |  描述  |
 | --------   | -----   | -----  |
 |code     | int  | 响应码 |
 |msg     | String  | 响应消息 |
+|data.list[].chapter.id  | int  | 章节id |
+|data.list[].chapter.name  | String  | 章节名称 |
+|data.list[].chapter.description  | String  | 章节描述 |
+|data.list[].chapter.score  | double  | 分数 |
+|data.list[].chapter.scoreOptions  | String  | 1：半对半分（默认全对得分）；2：答案无顺序（默认答案有前后顺序）；3：大小写不敏感（默认大小写敏感）；4：包含答案得分（默认等于答案得分） |
+|data.list[].questionsList[].id  | int  | 试题id |
+|data.list[].questionsList[].type  | int  | 试题类型 |
+|data.list[].questionsList[].difficulty  | int  | 试题难易程度 |
+|data.list[].questionsList[].title  | String  | 题干 |
+|data.list[].questionsList[].answer  | String  | 答案 |
+|data.list[].questionsList[].analysis  | String  | 解析 |
+|data.list[].questionsList[].state  | int  | 状态 |
+|data.list[].questionsList[].updateUserId  | int  | 修改人id |
+|data.list[].questionsList[].score  | double  | 响应消息 |
+|data.list[].questionsList[].scoreOptions  | String  | 1：半对半分；2：答案无顺序；3：大小写不敏感；4：包含答案得分 |
 
 ####试卷试题添加：paper/questionAdd
 ######请求参数
@@ -1085,3 +1099,4 @@
 | --------   | -----   | -----  |
 |code     | int  | 响应码 |
 |msg     | String  | 响应消息 |
+

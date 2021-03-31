@@ -1,8 +1,10 @@
 package com.wcpdoc.exam.api.controller;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -24,8 +26,10 @@ import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperOption;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.PaperRemark;
+import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.PaperOptionService;
+import com.wcpdoc.exam.core.service.PaperQuestionService;
 import com.wcpdoc.exam.core.service.PaperRemarkService;
 import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.QuestionService;
@@ -48,6 +52,8 @@ public class ApiPaperController extends BaseController {
 	private PaperOptionService paperOptionService;
 	@Resource
 	private PaperRemarkService paperRemarkService;
+	@Resource
+	private PaperQuestionService paperQuestionService;
 	
 	/**
 	 * 试卷列表
@@ -418,6 +424,41 @@ public class ApiPaperController extends BaseController {
 			}
 
 			return PageResultEx.ok().data(questionService.getListpage(pageIn));
+		} catch (Exception e) {
+			log.error("试题列表错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 章节列表
+	 * 
+	 * v1.0 chenyun 2021年3月31日下午4:21:20
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/paperQuestionList")
+	@ResponseBody
+	@RequiresRoles("OP")
+	public PageResult PaperQuestionList(Integer id) {
+		try {
+			List<PaperQuestion> chapterList = paperQuestionService.getChapterList(id);
+			List<Map<String, Object>> mapList = new ArrayList<Map<String, Object>>();
+			for(PaperQuestion paperQuestion : chapterList){
+				//章节
+				Map<String, Object> map = new HashMap<String, Object>();
+				map.put("chapter",  paperQuestion);
+				//试题
+				List<PaperQuestion> questionList = paperQuestionService.getQuestionList(paperQuestion.getId());
+				List<Question> questionsListMap = new ArrayList<Question>();
+				for(PaperQuestion questionId : questionList){
+					Question entity = questionService.getEntity(questionId.getQuestionId());
+					questionsListMap.add(entity);
+				}
+				map.put("questionsList",  questionsListMap);
+				mapList.add(map);
+			}
+			return PageResultEx.ok().data(mapList);
 		} catch (Exception e) {
 			log.error("试题列表错误：", e);
 			return PageResult.err();
