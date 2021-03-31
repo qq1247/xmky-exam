@@ -39,7 +39,7 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 				+ "LEFT JOIN SYS_USER USER ON PAPER.UPDATE_USER_ID = USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "PAPER.PAPER_TYPE_ID = ?", pageIn.getOne())
-				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "PAPER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "PAPER.STATE = ?", pageIn.getThree())
 				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "PAPER.ID = ?", pageIn.getFour())
 				.addWhere("PAPER.STATE != ?", 0)
