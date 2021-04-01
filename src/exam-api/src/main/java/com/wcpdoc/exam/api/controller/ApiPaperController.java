@@ -27,11 +27,13 @@ import com.wcpdoc.exam.core.entity.PaperOption;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.PaperRemark;
 import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.PaperOptionService;
 import com.wcpdoc.exam.core.service.PaperQuestionService;
 import com.wcpdoc.exam.core.service.PaperRemarkService;
 import com.wcpdoc.exam.core.service.PaperService;
+import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 /**
@@ -54,6 +56,8 @@ public class ApiPaperController extends BaseController {
 	private PaperRemarkService paperRemarkService;
 	@Resource
 	private PaperQuestionService paperQuestionService;
+	@Resource
+	private QuestionOptionService questionOptionService;
 	
 	/**
 	 * 试卷列表
@@ -450,10 +454,17 @@ public class ApiPaperController extends BaseController {
 				map.put("chapter",  paperQuestion);
 				//试题
 				List<PaperQuestion> questionList = paperQuestionService.getQuestionList(paperQuestion.getId());
-				List<Question> questionsListMap = new ArrayList<Question>();
+				List<Map<String, Object>> questionsListMap = new ArrayList<Map<String, Object>>();
 				for(PaperQuestion questionId : questionList){
+					Map<String, Object> questionMap = new HashMap<String, Object>();
 					Question entity = questionService.getEntity(questionId.getQuestionId());
-					questionsListMap.add(entity);
+					questionMap.put("question", entity);
+					if(entity.getType() == 1 || entity.getType() == 2 ){
+						QuestionOption questionOption = questionOptionService.getQuestionOption(questionId.getQuestionId());
+						questionMap.put("option", questionOption);
+					}
+
+					questionsListMap.add(questionMap);
 				}
 				map.put("questionsList",  questionsListMap);
 				mapList.add(map);
