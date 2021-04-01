@@ -467,26 +467,28 @@ public class ApiPaperController extends BaseController {
 					if(entity.getType() == 1 || entity.getType() == 2 ){
 						QuestionOption questionOption = questionOptionService.getQuestionOption(questionId.getQuestionId());
 						List<String> list = new ArrayList<String>();
-						if (questionOption.getOptionA() != null ) {
-							list.add(questionOption.getOptionA());
-						}
-						if (questionOption.getOptionB() != null ) {
-							list.add(questionOption.getOptionB());
-						}
-						if (questionOption.getOptionC() != null ) {
-							list.add(questionOption.getOptionC());
-						}
-						if (questionOption.getOptionD() != null ) {
-							list.add(questionOption.getOptionD());
-						}
-						if (questionOption.getOptionE() != null ) {
-							list.add(questionOption.getOptionE());
-						}
-						if (questionOption.getOptionF() != null ) {
-							list.add(questionOption.getOptionF());
-						}
-						if (questionOption.getOptionG() != null ) {
-							list.add(questionOption.getOptionG());
+						if(questionOption != null){							
+							if (questionOption.getOptionA() != null ) {
+								list.add(questionOption.getOptionA());
+							}
+							if (questionOption.getOptionB() != null ) {
+								list.add(questionOption.getOptionB());
+							}
+							if (questionOption.getOptionC() != null ) {
+								list.add(questionOption.getOptionC());
+							}
+							if (questionOption.getOptionD() != null ) {
+								list.add(questionOption.getOptionD());
+							}
+							if (questionOption.getOptionE() != null ) {
+								list.add(questionOption.getOptionE());
+							}
+							if (questionOption.getOptionF() != null ) {
+								list.add(questionOption.getOptionF());
+							}
+							if (questionOption.getOptionG() != null ) {
+								list.add(questionOption.getOptionG());
+							}
 						}
 						questionMap.put("option", list);
 					}

@@ -120,8 +120,8 @@ public class ApiQuestionController extends BaseController {
 				//选择
 				if (map.get("TYPE").toString().equals("1") || map.get("TYPE").toString().equals("2")) {
 					QuestionOption questionOption = questionOptionService.getQuestionOption(Integer.valueOf(map.get("ID").toString()));
+					List<String> optionList = new ArrayList<String>();
 					if(questionOption != null){						
-						List<String> optionList = new ArrayList<String>();
 						if (questionOption.getOptionA() != null ) {
 							optionList.add(questionOption.getOptionA());
 						}
@@ -143,8 +143,8 @@ public class ApiQuestionController extends BaseController {
 						if (questionOption.getOptionG() != null ) {
 							optionList.add(questionOption.getOptionG());
 						}
-						map.put("OPTION", optionList);
 					}
+					map.put("OPTION", optionList);
 				}
 				list.add(map);
 			}
