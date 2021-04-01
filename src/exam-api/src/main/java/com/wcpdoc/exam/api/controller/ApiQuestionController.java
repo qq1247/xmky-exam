@@ -116,6 +116,36 @@ public class ApiQuestionController extends BaseController {
 			for(Map<String, Object> map : listpage.getRows()){
 				map.put("TYPE_NAME", DictCache.getDictValue("QUESTION_TYPE", map.get("TYPE").toString()));
 				map.put("DIFFICULTY_NAME", DictCache.getDictValue("QUESTION_DIFFICULTY", map.get("DIFFICULTY").toString()));
+				
+				//选择
+				if (map.get("TYPE").toString().equals("1") || map.get("TYPE").toString().equals("2")) {
+					QuestionOption questionOption = questionOptionService.getQuestionOption(Integer.valueOf(map.get("ID").toString()));
+					if(questionOption != null){						
+						List<String> optionList = new ArrayList<String>();
+						if (questionOption.getOptionA() != null ) {
+							optionList.add(questionOption.getOptionA());
+						}
+						if (questionOption.getOptionB() != null ) {
+							optionList.add(questionOption.getOptionB());
+						}
+						if (questionOption.getOptionC() != null ) {
+							optionList.add(questionOption.getOptionC());
+						}
+						if (questionOption.getOptionD() != null ) {
+							optionList.add(questionOption.getOptionD());
+						}
+						if (questionOption.getOptionE() != null ) {
+							optionList.add(questionOption.getOptionE());
+						}
+						if (questionOption.getOptionF() != null ) {
+							optionList.add(questionOption.getOptionF());
+						}
+						if (questionOption.getOptionG() != null ) {
+							optionList.add(questionOption.getOptionG());
+						}
+						map.put("OPTION", optionList);
+					}
+				}
 				list.add(map);
 			}
 			listpage.setRows(list);

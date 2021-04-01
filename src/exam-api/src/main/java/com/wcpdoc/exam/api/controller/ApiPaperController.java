@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.wcpdoc.exam.core.constant.ConstantManager;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.entity.Paper;
@@ -83,7 +84,10 @@ public class ApiPaperController extends BaseController {
 			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
 				pageIn.setTen(getCurUser().getId().toString());
 			}
-			return PageResultEx.ok().data(paperService.getListpage(pageIn));
+			
+			PageOut listpage = paperService.getListpage(pageIn);
+			
+			return PageResultEx.ok().data(listpage);
 		} catch (Exception e) {
 			log.error("试卷列表错误：", e);
 			return PageResult.err();
@@ -458,10 +462,33 @@ public class ApiPaperController extends BaseController {
 				for(PaperQuestion questionId : questionList){
 					Map<String, Object> questionMap = new HashMap<String, Object>();
 					Question entity = questionService.getEntity(questionId.getQuestionId());
+					questionId.getScoreOptions();
 					questionMap.put("question", entity);
 					if(entity.getType() == 1 || entity.getType() == 2 ){
 						QuestionOption questionOption = questionOptionService.getQuestionOption(questionId.getQuestionId());
-						questionMap.put("option", questionOption);
+						List<String> list = new ArrayList<String>();
+						if (questionOption.getOptionA() != null ) {
+							list.add(questionOption.getOptionA());
+						}
+						if (questionOption.getOptionB() != null ) {
+							list.add(questionOption.getOptionB());
+						}
+						if (questionOption.getOptionC() != null ) {
+							list.add(questionOption.getOptionC());
+						}
+						if (questionOption.getOptionD() != null ) {
+							list.add(questionOption.getOptionD());
+						}
+						if (questionOption.getOptionE() != null ) {
+							list.add(questionOption.getOptionE());
+						}
+						if (questionOption.getOptionF() != null ) {
+							list.add(questionOption.getOptionF());
+						}
+						if (questionOption.getOptionG() != null ) {
+							list.add(questionOption.getOptionG());
+						}
+						questionMap.put("option", list);
 					}
 
 					questionsListMap.add(questionMap);
