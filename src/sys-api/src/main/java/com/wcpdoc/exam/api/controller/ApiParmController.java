@@ -87,8 +87,6 @@ public class ApiParmController extends BaseController {
 			entity.setEmailPwd(parm.getEmailPwd());
 			entity.setEmailProtocol(parm.getEmailProtocol());
 			entity.setEmailEncode(parm.getEmailEncode());
-			entity.setOrgLogo(parm.getOrgLogo());
-			entity.setOrgName(parm.getOrgName());
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
 			parmService.updateAndUpdate(entity);
@@ -119,6 +117,30 @@ public class ApiParmController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("获取参数错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 自定义logo、单位名称
+	 * 
+	 * v1.0 chenyun 2021-03-04 15:02:18
+	 * @return pageOut
+	 */
+	@RequestMapping("/editLogo")
+	@ResponseBody
+	public PageResult editLogo(Parm parm) {
+		try {
+			Parm entity = parmService.getEntity(parm.getId());
+			entity.setOrgLogo(parm.getOrgLogo());
+			entity.setOrgName(parm.getOrgName());
+			parmService.updateAndUpdate(entity);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("修改参数错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("修改参数错误：", e);
 			return PageResult.err();
 		}
 	}

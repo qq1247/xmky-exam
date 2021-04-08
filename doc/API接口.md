@@ -552,6 +552,7 @@
 | 参数     |  数据类型   |  描述  |  是否必填 |
 | --------   | -----   | -----  | ---- |
 |questionTypeId| int | 题库id（试题分类id）   |   否     |
+|name| String | 试题分类名称   |   否     |
 |id| int | 试卷id   |   否     |
 |title      | String  | 题干 |   否     |
 |type      | int | 类型 |   否     |
@@ -1054,27 +1055,42 @@
 ######请求参数
 | 参数     |  数据类型   |  描述  |  是否必填 |
 | --------   | -----   | -----  | ---- |
-|id 	|int 	| 试卷id 	|否|
+| id | int | 试卷id   |   否     |
 ######响应数据
 | 参数  |  数据类型   |  描述  |
 | --------   | -----   | -----  |
 |code     | int  | 响应码 |
 |msg     | String  | 响应消息 |
+|data.total     | int  | 总行数 |
+|data.list[]      | arr[]  | 分页列表 |
 |data.list[].chapter.id  | int  | 章节id |
 |data.list[].chapter.name  | String  | 章节名称 |
 |data.list[].chapter.description  | String  | 章节描述 |
-|data.list[].chapter.score  | double  | 分数 |
-|data.list[].chapter.scoreOptions  | String  | 1：半对半分（默认全对得分）；2：答案无顺序（默认答案有前后顺序）；3：大小写不敏感（默认大小写敏感）；4：包含答案得分（默认等于答案得分） |
-|data.list[].questionsList[].id  | int  | 试题id |
-|data.list[].questionsList[].type  | int  | 试题类型 |
-|data.list[].questionsList[].difficulty  | int  | 试题难易程度 |
-|data.list[].questionsList[].title  | String  | 题干 |
-|data.list[].questionsList[].answer  | String  | 答案 |
-|data.list[].questionsList[].analysis  | String  | 解析 |
-|data.list[].questionsList[].state  | int  | 状态 |
-|data.list[].questionsList[].updateUserId  | int  | 修改人id |
-|data.list[].questionsList[].score  | double  | 响应消息 |
-|data.list[].questionsList[].scoreOptions  | String  | 1：半对半分；2：答案无顺序；3：大小写不敏感；4：包含答案得分 |
+|data.list[].chapter.parentId  | int  | 父id |
+|data.list[].chapter.paperId  | int  | 试卷id |
+|data.list[].chapter.questionId  | int  | 试题id |
+|data.list[].chapter.type  | int  | 类型 |
+|data.list[].chapter.score  | double  | 总分 |
+|data.list[].chapter.scoreOptions  | String  | 选项【1：半对半分（默认全对得分）；2：答案无顺序（默认答案有前后顺序）；3：大小写不敏感（默认大小写敏感）；4：包含答案得分（默认等于答案得分）】 |
+|data.list[].questionsList[].question.id  | int  | 试题id |
+|data.list[].questionsList[].question.type  | int  | 试题类型【1：单选；2：多选；3：填空；4：判断；5：问答】 |
+|data.list[].questionsList[].question.difficulty  | int  | 试题难易度【1：极易；2：简单；3：适中；4：困难；5：极难】|
+|data.list[].questionsList[].question.title  | String  | 试题标题 |
+|data.list[].questionsList[].question.answer  | String  | 试题答案 |
+|data.list[].questionsList[].question.analysis  | String  | 试题解析 |
+|data.list[].questionsList[].question.state  | int  | 试题状态 |
+|data.list[].questionsList[].question.questionTypeId  | int  | 试题分类 |
+|data.list[].questionsList[].question.score  | double  | 试题分数 |
+|data.list[].questionsList[].question.scoreOptions  | String  |  选项【1：半对半分（默认全对得分）；2：答案无顺序（默认答案有前后顺序）；3：大小写不敏感（默认大小写敏感）；4：包含答案得分（默认等于答案得分）】 |
+|data.list[].questionsList[].questionOption.id  | int  | 选择题id |
+|data.list[].questionsList[].questionOption.optionA  | String  | 选项A |
+|data.list[].questionsList[].questionOption.optionB  | String  | 选项B |
+|data.list[].questionsList[].questionOption.optionC  | String  | 选项C |
+|data.list[].questionsList[].questionOption.optionD  | String  | 选项D |
+|data.list[].questionsList[].questionOption.optionE  | String  | 选项E |
+|data.list[].questionsList[].questionOption.optionF  | String  | 选项F |
+|data.list[].questionsList[].questionOption.optionG  | String  | 选项G |
+|data.list[].questionsList[].questionOption.questionId  | int  | 试题id |
 
 ####试卷试题添加：paper/questionAdd
 ######请求参数
@@ -1092,7 +1108,7 @@
 ######请求参数
 | 参数     |  数据类型   |  描述  |  是否必填 |
 | --------   | -----   | -----  | ---- |
-|paperQuestionId | int | 章节id  | 是 |
+|paperQuestionId | int | 试题试卷id  | 是 |
 |score | double | 分值 | 是 |
 ######响应数据
 | 参数  |  数据类型   |  描述  |
@@ -1100,3 +1116,157 @@
 |code     | int  | 响应码 |
 |msg     | String  | 响应消息 |
 
+####试卷试题设置选项：paper/optionsUpdate
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|paperQuestionId | int | 试题试卷id  | 是 |
+|options | Integer[] | 选项 | 是 |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+
+####试卷试题批量设置分数：paper/batchScoreUpdate
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|chapterId | int | 章节id  | 是 |
+|score | double | 分数 | 是 |
+|options | String | 选项 | 是 |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+
+####试卷试题上移：paper/questionUp
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|paperQuestionId | int | 试卷试题id  | 是 |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+
+####试卷试题下移：paper/questionDown
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|paperQuestionId | int | 试卷试题id  | 是 |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+
+####试卷试题删除：paper/questionDel
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|paperQuestionId | int | 试卷试题id  | 是 |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+
+####试卷试题清空：paper/questionClear
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|chapterId | int | 章节id  | 是 |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+
+####试卷试题发布：paper/publish
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+| id | int | 试卷id  | 是 |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+
+####考试归档：exam/archive
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|id    | int     | 主键 |   是   |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+
+####修改 logo名称：parm/editLogo
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+| id | int | id  | 是 |
+| orgLogo | int | 图片id  | 是 |
+| orgName | String | 单位名称  | 是 |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+
+####我的考试时间日历：myExam/kalendar
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+| year | int | 年份 | 是 |
+| month | int | 月份 | 是 |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+|date.list[].id     | int  | 我的考试id |
+|date.list[].examId     | int  | 考试id |
+|date.list[].time     | dateTime  | 时间 |
+
+####我的考试排行：myExam/kalendar
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|curPage      | int | 当前第几页  |   否     |
+|pageSize      | int  | 每页多少条，最大100条   |   否     |
+| examId | int | 考试id | 是 |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+|date.list[].ID     | int  | 我的考试id |
+|date.list[].TOTAL_SCORE | double  | 总分数 |
+|date.list[].EXAM_ID     | int  | 考试id |
+|date.list[].USER_ID     | int  | 用户id |
+|date.list[].EXAM_NAME     | String  | 考试名称 |
+|date.list[].USER_NAME     | String  | 用户名称 |
+
+####考试统计：myExam/count
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|examId      | int | 考试id  |   是     |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+|date.max     | double  | 最高分 |
+|date.min | double  | 最低分 |
+|date.avg     | double  | 平均分 |
+|date.pass     | double  | 及格数 |
+|date.mins     | String  | 分钟数 |
+|date.totalScore     | double  | 总分数 |
