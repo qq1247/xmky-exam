@@ -1291,3 +1291,16 @@
 | --------   | -----   | -----  |
 |code     | int  | 响应码 |
 |msg     | String  | 响应消息 |
+
+####机构用户同步：user/syncUser
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|orgName      | String | 机构名称  |   是     |
+|orgCode      | String | 机构唯一编码  |   是     |
+|user      | list[] | 用户【name, loginName, email, phone, pwd】 |   是     |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |

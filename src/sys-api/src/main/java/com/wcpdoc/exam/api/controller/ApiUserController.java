@@ -477,7 +477,7 @@ public class ApiUserController extends BaseController {
 	@ResponseBody
 	public PageResult syncUser(String orgName, String orgCode, List<User> user) {
 		// org  [name, code]
-		// user [name, loginname, email, phone, pwd ]
+		// user [name, loginName, email, phone, pwd ]
 		try {
 			Integer orgId = orgService.syncOrg(orgName, orgCode);
 			userService.syncUser(user, orgId);
