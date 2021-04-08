@@ -1270,3 +1270,24 @@
 |date.pass     | double  | 及格数 |
 |date.mins     | String  | 分钟数 |
 |date.totalScore     | double  | 总分数 |
+
+####用户在线列表：user/onList
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
+|date.id     | int  | 用户id |
+|date.name | String  | 用户名称 |
+|date.loginName     | String  | 登录账号 |
+
+####考试统计：user/exit
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|id      | int | 用户id  |   是     |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | int  | 响应码 |
+|msg     | String  | 响应消息 |
