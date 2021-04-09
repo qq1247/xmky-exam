@@ -104,7 +104,7 @@ public class ApiQuestionController extends BaseController {
 				pageIn.setSeven(name);
 			}
 			if(score != null){
-				pageIn.setEight(String.valueOf(scoreStart));
+				pageIn.setEight(String.valueOf(score));
 			}
 			if(scoreStart != null){
 				pageIn.setSortOne(String.valueOf(scoreStart));
