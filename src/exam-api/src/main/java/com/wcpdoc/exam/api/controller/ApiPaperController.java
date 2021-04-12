@@ -68,13 +68,13 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/list")
 	@ResponseBody
-	public PageResult list(PageIn pageIn, String paperTypeName, String userName) {
+	public PageResult list(PageIn pageIn, String name, String userName) {
 		try {
 			if (ValidateUtil.isValid(userName)) {
 				pageIn.setTwo(userName);
 			}
-			if (ValidateUtil.isValid(paperTypeName)) {
-				pageIn.setFive(paperTypeName);
+			if (ValidateUtil.isValid(name)) {
+				pageIn.setFive(name);
 			}
 			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
 				pageIn.setTen(getCurUser().getId().toString());
