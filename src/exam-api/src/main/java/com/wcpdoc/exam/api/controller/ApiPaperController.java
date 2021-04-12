@@ -68,19 +68,14 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/list")
 	@ResponseBody
-	public PageResult list(PageIn pageIn, Integer paperTypeId, String name) {
-		// one paperTypeId(试卷分类ID)
-		// two name(试卷名称)
-		// three state(试卷状态)
-		// four id(试卷ID)
+	public PageResult list(PageIn pageIn, String paperTypeName, String userName) {
 		try {
-			if(paperTypeId != null){
-				pageIn.setOne(paperTypeId.toString());
+			if (ValidateUtil.isValid(userName)) {
+				pageIn.setTwo(userName);
 			}
-			if (ValidateUtil.isValid(name)) {
-				pageIn.setTwo(name);
+			if (ValidateUtil.isValid(paperTypeName)) {
+				pageIn.setFive(paperTypeName);
 			}
-			
 			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
 				pageIn.setTen(getCurUser().getId().toString());
 			}

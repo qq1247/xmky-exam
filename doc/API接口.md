@@ -669,8 +669,8 @@
 ######请求参数
 | 参数     |  数据类型   |  描述  |  是否必填 |
 | --------   | -----   | -----  | ---- |
-|paperTypeId| int | 试卷分类ID   |   否     |
-|name| String | 试卷名称   |   否     |
+|paperTypeName| String(16) | 试卷名称   |   否     |
+|userName| String(16) | 用户名称   |   否     |
 |curPage      | int | 当前第几页  |   否     |
 |pageSize      | int  | 每页多少条，最大100条   |   否     |
 ######响应数据

@@ -75,15 +75,6 @@ public class ApiQuestionController extends BaseController {
 	@RequestMapping("/list")
 	@ResponseBody
 	public PageResult list(PageIn pageIn, Integer questionTypeId, Integer id, String title, Integer type, Integer difficulty, Double score, Double scoreStart, Double scoreEnd, String name) {
-		// one     questionTypeId(试题分类id) 
-		// two     id(试卷id) 
-		// three   title(标题)
-		// four    state(0：删除；1：启用；2：禁用)
-		// five    type(1：单选；2：多选；3：填空；4：判断；5：问答)
-		// six     difficulty(1：极易；2：简单；3：适中；4：困难；5：极难)
-		// seven   name(试题分类名称)
-		// eight   score(默认分值)
-		// nine    paperId(试卷ID)
 		try {
 			if(questionTypeId != null){
 				pageIn.setOne(questionTypeId.toString());
