@@ -19,6 +19,7 @@ import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.PaperTypeExService;
 import com.wcpdoc.exam.core.service.PaperTypeService;
 import com.wcpdoc.exam.core.util.ValidateUtil;
+import com.wcpdoc.exam.file.service.FileService;
 /**
  * 试卷分类服务层实现
  * 
@@ -38,6 +39,8 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 	private UserService userService;
 	@Resource
 	private PaperService paperService;
+	@Resource
+	private FileService fileService;
 
 	@Override
 	@Resource(name = "paperTypeDaoImpl")
@@ -63,6 +66,9 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 		paperType.setUpdateTime(new Date());
 		paperType.setState(1);
 		add(paperType);
+		
+		//保存图片
+		fileService.doUpload(paperType.getImgId());
 	}
 
 	@Override

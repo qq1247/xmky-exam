@@ -28,6 +28,7 @@ import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.PaperTypeService;
 import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
+import com.wcpdoc.exam.file.service.FileService;
 
 /**
  * 试卷分类控制层
@@ -45,6 +46,8 @@ public class ApiPaperTypeController extends BaseController {
 	private OrgService orgService;
 	@Resource
 	private UserService userService;
+	@Resource
+	private FileService fileService;
 	
 	/**
 	 * 试卷分类列表 
@@ -55,14 +58,15 @@ public class ApiPaperTypeController extends BaseController {
 	@RequestMapping("/list")
 	@ResponseBody
 	@RequiresRoles("OP")
-	public PageResult list(PageIn pageIn, String name, Integer userId) {
+	public PageResult list(PageIn pageIn, String name, String userName) {
 		try {
 			if (ValidateUtil.isValid(name)) {
 				pageIn.setTwo(name);
 			}
-			if (userId != null) {
-				pageIn.setThree(userId.toString());
+			if (ValidateUtil.isValid(userName)) {
+				pageIn.setThree(userName);
 			}
+			
 			PageOut listpage = paperTypeService.getListpage(pageIn);
 			List<Map<String, Object>> rows = listpage.getRows();
 			List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
@@ -158,9 +162,13 @@ public class ApiPaperTypeController extends BaseController {
 			//修改试卷分类
 			PaperType entity = paperTypeService.getEntity(paperType.getId());
 			entity.setName(paperType.getName());
+			entity.setImgId(paperType.getImgId());
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
 			paperTypeService.update(entity);
+			
+			//保存图片
+			fileService.doUpload(paperType.getImgId());
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成修改试卷分类错误：{}", e.getMessage());
