@@ -3,6 +3,7 @@ package com.wcpdoc.exam.web.conf;
 import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.util.WebUtils;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
@@ -50,15 +51,20 @@ public class XssFilter implements Filter {
 		}
 		
 		// sql,xss过滤
-		HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-		if (log.isDebugEnabled()) {
-			log.debug("Xss过滤前：【{}】【{}】", httpServletRequest.getRequestURI(), JSONObject.toJSONString(httpServletRequest.getParameterMap()));
-		}
-		XssHttpServletRequestWrapper xssHttpServletRequestWrapper = new XssHttpServletRequestWrapper(httpServletRequest);
-		chain.doFilter(xssHttpServletRequestWrapper, response);
-		if (log.isDebugEnabled()) {
-			log.debug("Xss过滤后：【{}】【{}】", xssHttpServletRequestWrapper.getRequestURI(), JSONObject.toJSONString(xssHttpServletRequestWrapper.getParameterMap()));
-		}
+ 		HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+ 		if (!(httpServletRequest.getRequestURI().equals("/api/question/add") || httpServletRequest.getRequestURI().equals("/api/question/edit"))) {
+ 			if (log.isDebugEnabled()) {
+ 				log.debug("Xss过滤前：【{}】【{}】", httpServletRequest.getRequestURI(), JSONObject.toJSONString(httpServletRequest.getParameterMap()));
+ 			}
+ 			XssHttpServletRequestWrapper xssHttpServletRequestWrapper = new XssHttpServletRequestWrapper(httpServletRequest);
+ 			chain.doFilter(xssHttpServletRequestWrapper, response);
+ 			if (log.isDebugEnabled()) {
+ 				log.debug("Xss过滤后：【{}】【{}】", xssHttpServletRequestWrapper.getRequestURI(), JSONObject.toJSONString(xssHttpServletRequestWrapper.getParameterMap()));
+ 			}
+ 			return;
+ 		}
+ 		
+ 		chain.doFilter(httpServletRequest, response);
 	}
 
 	@Override

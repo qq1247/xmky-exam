@@ -36,7 +36,7 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT QUESTION.*, QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME, USER.NAME AS QUESTION_USER_NAME "
+		String sql = "SELECT QUESTION.*, QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME, USER.NAME AS UPDATE_USER_NAME "
 				+ "FROM EXM_QUESTION QUESTION "
 				+ "LEFT JOIN EXM_QUESTION_TYPE QUESTION_TYPE ON QUESTION.QUESTION_TYPE_ID = QUESTION_TYPE.ID "
 				+ "LEFT JOIN SYS_USER USER ON QUESTION.UPDATE_USER_ID = USER.ID ";
@@ -61,16 +61,16 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 			List<Object> params = new ArrayList<>();
 			partSql.append("(");
 			partSql.append("QUESTION_TYPE.USER_IDS LIKE ? ");
-			params.add("%" + user.getId() + "%");
+			params.add("%," + user.getId() + ",%");
 			
 			partSql.append("OR QUESTION_TYPE.ORG_IDS LIKE ? ");
-			params.add("%" + user.getOrgId() + "%");
+			params.add("%," + user.getOrgId() + ",%");
 			
 			if (ValidateUtil.isValid(user.getPostIds())) {
 				String[] postIds = user.getPostIds().substring(1, user.getPostIds().length() - 1).split(",");
 				for (String postId : postIds) {
 					partSql.append("OR QUESTION_TYPE.POST_IDS LIKE ? ");
-					params.add("%" + postId + "%");
+					params.add("%," + postId + ",%");
 				}
 			}
 			partSql.append(")");

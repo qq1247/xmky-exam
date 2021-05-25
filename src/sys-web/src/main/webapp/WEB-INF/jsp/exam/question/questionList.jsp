@@ -444,7 +444,7 @@
 					data.field.analysis = analysisUE.getContent();
 				}
 				
-				var msg = newVer ? "确定要生成新版本？" : "当前修改会同步到引用的试卷<br/>确定要修改？";
+				var msg = newVer ? "确定要生成新版本？" : "当前修改会同步到引用的试卷，确定要修改？";
 				layer.confirm(msg, function(index) {
 					data.field.newVer = newVer;
 					var state = $("input[name='state']:checked").val();

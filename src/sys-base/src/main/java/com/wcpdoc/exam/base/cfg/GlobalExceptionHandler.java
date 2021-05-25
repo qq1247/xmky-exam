@@ -38,13 +38,13 @@ public class GlobalExceptionHandler {
 		}
 		
 		if (se instanceof UnauthorizedException) {
-			return PageResult.err().msg("未授权");
+			return PageResult.err().code(401).msg("未授权");
 		}
 		if (se instanceof UnauthenticatedException) {
-			return PageResult.err().msg("未登陆");
+			return PageResult.err().code(401).msg("未登陆");
 		}
 
 		log.error("shiro未捕获异常：{}", se.getMessage());
-		return PageResult.err();
+		return PageResult.err().code(401);
 	}
 }

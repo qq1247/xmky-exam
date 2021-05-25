@@ -79,7 +79,7 @@ public class JWTRealm extends AuthorizingRealm {
 	@Override
 	public boolean hasRole(PrincipalCollection principal, String roleIdentifier) {
 		AuthorizationInfo info = this.getAuthorizationInfo(principal);
-        return info.getRoles().contains("admin") || super.hasRole(principal, roleIdentifier);
+        return (info.getRoles() != null && info.getRoles().contains("admin")) || super.hasRole(principal, roleIdentifier);
 	}
 	
 	/**
