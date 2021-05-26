@@ -102,9 +102,9 @@ public interface UserService extends BaseService<User> {
 	 * 
 	 * v1.0 chenyun 2021年3月16日下午5:22:45
 	 * @param id
-	 * @param postId void
+	 * @param postIds void
 	 */
-	void postUpdate(Integer id, Integer[] postId);
+	void postUpdate(Integer id, Integer[] postIds);
 	
 	/**
 	 * 在线用户

@@ -75,8 +75,6 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 		
 		// 返回响应数据
 		UserToken userToken = new UserToken();
-		userToken.setId(user.getId());
-		userToken.setLoginName(user.getLoginName());
 		userToken.setName(user.getName());
 		userToken.setAccessToken(accessToken);
 		return userToken;

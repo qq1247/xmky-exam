@@ -259,9 +259,9 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/postUpdate")
 	@ResponseBody
-	public PageResult postUpdate(Integer id, Integer[] postId) {
+	public PageResult postUpdate(Integer id, Integer[] postIds) {
 		try {
-			userService.postUpdate(id, postId);
+			userService.postUpdate(id, postIds);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("设置岗位错误：{}", e.getMessage());
