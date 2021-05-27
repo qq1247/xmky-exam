@@ -1,73 +1,71 @@
 <template>
   <div class="container">
+    <!-- 导航 -->
     <div class="head">
-      <div class="head1">
-        <div class="left">
-          <el-link class="back" href icon="el-icon-back">返回</el-link>
-        </div>
-        <div class="right">
-          <el-link class="back" href icon>
-            返回
-            <i class="el-icon-right el-icon--right"></i>
-          </el-link>
-        </div>
+      <div class="left">
+        <el-link class="back" href icon="el-icon-back">返回</el-link>
+      </div>
+      <div class="right">
+        <el-link class="back" href icon>
+          返回
+          <i class="el-icon-right el-icon--right"></i>
+        </el-link>
       </div>
     </div>
+    <!-- 搜索 -->
+    <div class="search">
+      <el-form :inline="true" :model="queryForm" class="form-inline">
+        <el-form-item label>
+          <el-input placeholder="请输入编号" v-model="queryForm.id"></el-input>
+        </el-form-item>
+        <el-form-item label>
+          <el-input
+            placeholder="请输入题干"
+            v-model="queryForm.title"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label>
+          <el-select placeholder="请输入类型" v-model="queryForm.type">
+            <el-option
+              :key="parseInt(dict.DICT_KEY)"
+              :label="dict.DICT_VALUE"
+              :value="parseInt(dict.DICT_KEY)"
+              v-for="dict in queryForm.typeDictList"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label>
+          <el-select placeholder="请输入难度" v-model="queryForm.difficulty">
+            <el-option
+              :key="parseInt(dict.DICT_KEY)"
+              :label="dict.DICT_VALUE"
+              :value="parseInt(dict.DICT_KEY)"
+              v-for="dict in queryForm.difficultyDictList"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label>
+          <el-input
+            placeholder="分值大于"
+            v-model="queryForm.startScore"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label>
+          <el-input
+            placeholder="分值小于"
+            v-model="queryForm.endScore"
+          ></el-input>
+        </el-form-item>
+        <el-form-item style="width: 200px">
+          <el-button @click="query" icon="el-icon-search" type="primary"
+            >查询</el-button
+          >
+        </el-form-item>
+        <el-form-item></el-form-item>
+      </el-form>
+    </div>
+    <!-- 内容 -->
     <div class="content">
-      <div class="search">
-        <el-form :inline="true" :model="queryForm" class="form-inline">
-          <el-form-item label>
-            <el-input
-              placeholder="请输入编号"
-              v-model="queryForm.id"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label>
-            <el-input
-              placeholder="请输入题干"
-              v-model="queryForm.title"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label>
-            <el-select placeholder="请输入类型" v-model="queryForm.type">
-              <el-option
-                :key="parseInt(dict.DICT_KEY)"
-                :label="dict.DICT_VALUE"
-                :value="parseInt(dict.DICT_KEY)"
-                v-for="dict in queryForm.typeDictList"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label>
-            <el-select placeholder="请输入难度" v-model="queryForm.difficulty">
-              <el-option
-                :key="parseInt(dict.DICT_KEY)"
-                :label="dict.DICT_VALUE"
-                :value="parseInt(dict.DICT_KEY)"
-                v-for="dict in queryForm.difficultyDictList"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label>
-            <el-input
-              placeholder="分值大于"
-              v-model="queryForm.startScore"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label>
-            <el-input
-              placeholder="分值小于"
-              v-model="queryForm.endScore"
-            ></el-input>
-          </el-form-item>
-          <el-form-item style="width: 200px">
-            <el-button @click="query" icon="el-icon-search" type="primary"
-              >查询</el-button
-            >
-          </el-form-item>
-          <el-form-item></el-form-item>
-        </el-form>
-      </div>
       <div class="opt">
         <div class="left">
           <div class="left_inner_top">添加题型</div>
@@ -920,43 +918,36 @@ export default {
 </script>
 <style lang="scss" scoped>
 .container {
-  height: 100%;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   background-color: #f2f4f5;
 }
+
 .head {
+  width: 100%;
+  height: 50px;
   background: url("../assets/img/head.png");
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  box-sizing: border-box;
+  .back {
+    color: #fff;
+  }
 }
 
-.head1 {
-  width: 98%;
-  height: 50px;
-}
-.head .left {
-  float: left;
-}
-.head .right {
-  float: right;
-}
-.head .logo {
-  float: left;
-}
-.head .logo h1 {
-  margin: 0px;
-  font-size: 0px;
-}
-.head .logo a {
-  width: 100px;
-  height: 50px;
-  display: inline-block;
-  font-size: 0px;
-  background: url("../assets/logo.png") no-repeat;
-  background-size: 100px 60px;
-  cursor: pointer;
+.search {
+  height: 60px;
+  padding-top: 20px;
+  .opt {
+    flex-grow: 1;
+    display: flex;
+  }
+  .left {
+    width: 145px;
+    background-color: #fff;
+  }
 }
 
 .content {
@@ -966,19 +957,7 @@ export default {
   width: 98%;
   margin: 0 auto;
 }
-.content .search {
-  height: 60px;
-  padding-top: 20px;
-}
-.content .opt {
-  flex-grow: 1;
-  display: flex;
-}
-.content .opt .left {
-  width: 145px;
-  background-color: #fff;
-}
-.content .opt .center {
+.content .opt .content .opt .center {
   flex-grow: 1;
   background-color: #fff;
   margin: 0 4px;

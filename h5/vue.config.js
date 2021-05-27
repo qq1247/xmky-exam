@@ -1,4 +1,19 @@
 const path = require("path")
+const os = require('os')
+
+// 获取本机电脑IP
+const getIPAddress = () => {
+  const interfaces = os.networkInterfaces();
+  for (let devName in interfaces) {
+    let iface = interfaces[devName];
+    for (let i = 0; i < iface.length; i++) {
+      let alias = iface[i];
+      if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
+        return alias.address
+      }
+    }
+  }
+}
 
 module.exports = {
   publicPath: "/",
@@ -12,7 +27,7 @@ module.exports = {
   configureWebpack: () => {},
   devServer: {
     open: true,
-    host: "192.168.110.231", //192.168.110.231
+    host: getIPAddress(),
     port: 8080,
     https: false,
     hotOnly: false,
@@ -23,7 +38,7 @@ module.exports = {
         //ws: true, // proxy websockets
         //pathRewrite方法重写url
         pathRewrite: {
-          "^/api": "/"
+          "^/api": ""
         }
       }
     }
