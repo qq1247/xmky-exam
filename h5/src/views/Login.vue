@@ -64,7 +64,7 @@ export default {
             loginName: this.ruleForm.account,
             pwd: this.ruleForm.password
           })
-          res?.accessToken && this.setToken(res.accessToken)
+          res.data?.accessToken && this.setToken(res.data?.accessToken)
           !this.$route.query.redirect
             ? this.$router.push({
                 path: "/"

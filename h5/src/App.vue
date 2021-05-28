@@ -17,7 +17,7 @@
     </header>
     <router-view />
     <footer class="footer" v-if="show">
-      Copyright© 2018 All Rights Reserved 版权所有 乐调查 沪ICP备16024976号-7
+      Copyright© 2018 All Rights Reserved 版权所有 在线考试
     </footer>
   </div>
 </template>
