@@ -38,6 +38,8 @@ const errorHandle = (status, msg) => {
   // 状态码判断
   switch (status) {
     case 500:
+      message(`${msg}`)
+      break
     case 401:
     case 403:
       message(`${msg}请重新登录`)
@@ -90,7 +92,6 @@ instance.interceptors.response.use(
   },
   // 请求失败
   error => {
-    console.log(error.config)
     const { response, config } = error
     if (
       error.code === "ECONNABORTED" &&
