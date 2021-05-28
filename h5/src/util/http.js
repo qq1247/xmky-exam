@@ -42,9 +42,7 @@ const errorHandle = (status, msg) => {
     case 403:
       message(`${msg}请重新登录`)
       localStorage.removeItem("token")
-      setTimeout(() => {
-        toLogin()
-      }, 1000)
+      toLogin()
       break
     case 404:
       message("请求的资源不存在")
@@ -92,8 +90,16 @@ instance.interceptors.response.use(
   },
   // 请求失败
   error => {
-    console.log(error.config);
-    const { response } = error
+    console.log(error.config)
+    const { response, config } = error
+    if (
+      error.code === "ECONNABORTED" &&
+      error.message.indexOf("timeout") !== -1 &&
+      !config._retry
+    ) {
+      Message.error("请求超时")
+      return Promise.reject(error)
+    }
     if (response) {
       errorHandle(response.status, response.data.message)
       return Promise.reject(response)

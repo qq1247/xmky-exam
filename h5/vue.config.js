@@ -1,14 +1,18 @@
 const path = require("path")
-const os = require('os')
+const os = require("os")
 
 // 获取本机电脑IP
 const getIPAddress = () => {
-  const interfaces = os.networkInterfaces();
+  const interfaces = os.networkInterfaces()
   for (let devName in interfaces) {
-    let iface = interfaces[devName];
+    let iface = interfaces[devName]
     for (let i = 0; i < iface.length; i++) {
-      let alias = iface[i];
-      if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
+      let alias = iface[i]
+      if (
+        alias.family === "IPv4" &&
+        alias.address !== "127.0.0.1" &&
+        !alias.internal
+      ) {
         return alias.address
       }
     }
@@ -28,7 +32,7 @@ module.exports = {
   devServer: {
     open: true,
     host: getIPAddress(),
-    port: 8080,
+    port: 8088,
     https: false,
     hotOnly: false,
     proxy: {

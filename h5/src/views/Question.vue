@@ -2,19 +2,11 @@
   <div class="container">
     <!-- 导航 -->
     <div class="head">
-      <div class="left">
-        <el-link class="back" href icon="el-icon-back">返回</el-link>
-      </div>
-      <div class="right">
-        <el-link class="back" href icon>
-          返回
-          <i class="el-icon-right el-icon--right"></i>
-        </el-link>
-      </div>
+      <el-link class="back" @click="goBack" icon="el-icon-back">返回</el-link>
     </div>
     <!-- 搜索 -->
-    <div class="search">
-      <el-form :inline="true" :model="queryForm" class="form-inline">
+    <el-form :inline="true" :model="queryForm" class="form-inline search">
+      <div>
         <el-form-item label>
           <el-input placeholder="请输入编号" v-model="queryForm.id"></el-input>
         </el-form-item>
@@ -56,98 +48,96 @@
             v-model="queryForm.endScore"
           ></el-input>
         </el-form-item>
-        <el-form-item style="width: 200px">
-          <el-button @click="query" icon="el-icon-search" type="primary"
-            >查询</el-button
-          >
-        </el-form-item>
-        <el-form-item></el-form-item>
-      </el-form>
-    </div>
+      </div>
+      <el-form-item>
+        <el-button @click="query" icon="el-icon-search" type="primary"
+          >查询</el-button
+        >
+      </el-form-item>
+    </el-form>
     <!-- 内容 -->
     <div class="content">
-      <div class="opt">
-        <div class="left">
-          <div class="left_inner_top">添加题型</div>
+      <div class="left">
+        <div class="left-top">添加题型</div>
+        <el-scrollbar style="height: calc(100% - 45px)">
           <div
             :class="[
               editForm.type === btn.type
-                ? 'left_inner_center left_inner_center1'
-                : 'left_inner_center'
+                ? 'left-center left-center-active'
+                : 'left-center'
             ]"
             :key="btn.type"
             @click="updateType(btn.type)"
             v-for="btn in btnGroup1"
           >
             <img :src="btn.img" />
-            <span>{{ btn.name }}</span>
+            {{ btn.name }}
             <img src="@/assets/img/icon/icon6.png" />
           </div>
-          <hr class="splitLine" />
-          <div
-            :key="btn.type"
-            class="left_inner_bottom"
-            v-for="btn in btnGroup2"
-          >
+          <div class="splitLine"></div>
+          <div :key="btn.type" class="left-bottom" v-for="btn in btnGroup2">
             <img :src="btn.img" />
-            <span>{{ btn.name }}</span>
+            {{ btn.name }}
           </div>
-        </div>
-        <div class="center">
+        </el-scrollbar>
+      </div>
+      <div class="center">
+        <el-scrollbar style="height: 100%">
           <el-card
             :key="quesiton.ID"
-            class="center_inner_card"
+            class="center-card"
             shadow="hover"
             v-for="quesiton in list.questionList"
           >
-            <div class="center_inner_card1">
-              <span>{{ quesiton.ID }}、</span>
-              {{ quesiton.TITLE }}
+            <div class="center-card-top">
+              {{ quesiton.ID }}、{{ quesiton.TITLE }}
             </div>
-            <div class="center_inner_card2">
-              <el-tag class="center_inner_card21" size="mini" type="danger">{{
-                quesiton.TYPE_NAME
-              }}</el-tag>
-              <el-tag class="center_inner_card22" effect="plain" size="mini">{{
-                quesiton.DIFFICULTY_NAME
-              }}</el-tag>
-              <el-tag effect="plain" size="mini" type="danger"
-                >{{ quesiton.SCORE }}分</el-tag
-              >
-              <el-tag effect="plain" size="mini">{{
-                quesiton.UPDATE_USER_NAME
-              }}</el-tag>
-            </div>
-            <div class="center_inner_card3">
-              <el-button
-                @click="get(quesiton.ID)"
-                class="btn"
-                icon="el-icon-edit"
-                plain
-                round
-                size="mini"
-                type="primary"
-                >详细</el-button
-              >
-              <el-button
-                class="btn"
-                icon="el-icon-edit"
-                plain
-                round
-                size="mini"
-                type="primary"
-                >复制</el-button
-              >
-              <el-button
-                @click="del(quesiton.ID)"
-                class="btn"
-                icon="el-icon-edit"
-                plain
-                round
-                size="mini"
-                type="primary"
-                >删除</el-button
-              >
+            <div class="center-card-bottom">
+              <div class="card-bottom-left">
+                <el-tag class="center-tag-danger" size="mini" type="danger">{{
+                  quesiton.TYPE_NAME
+                }}</el-tag>
+                <el-tag class="center-tag-purple" effect="plain" size="mini">{{
+                  quesiton.DIFFICULTY_NAME
+                }}</el-tag>
+                <el-tag effect="plain" size="mini" type="danger"
+                  >{{ quesiton.SCORE }}分</el-tag
+                >
+                <el-tag effect="plain" size="mini">{{
+                  quesiton.UPDATE_USER_NAME
+                }}</el-tag>
+              </div>
+              <div class="card-bottom-right">
+                <el-button
+                  @click="get(quesiton.ID)"
+                  class="btn"
+                  icon="el-icon-document"
+                  plain
+                  round
+                  size="mini"
+                  type="primary"
+                  >详细</el-button
+                >
+                <el-button
+                  class="btn"
+                  icon="el-icon-document-copy"
+                  plain
+                  round
+                  size="mini"
+                  type="primary"
+                  >复制</el-button
+                >
+                <el-button
+                  @click="del(quesiton.ID)"
+                  class="btn"
+                  icon="el-icon-delete"
+                  plain
+                  round
+                  size="mini"
+                  type="primary"
+                  >删除</el-button
+                >
+              </div>
             </div>
           </el-card>
           <!-- <el-pagination
@@ -158,18 +148,21 @@
             layout="prev, pager, next"
             page-size="5"
             small="false"
-          ></el-pagination>-->
-        </div>
-        <div class="right">
+          ></el-pagination> -->
+        </el-scrollbar>
+      </div>
+      <div class="right">
+        <el-scrollbar style="height: 100%">
           <el-form
             :model="editForm"
             :rules="editForm.rules"
             label-width="70px"
             ref="editForm"
             size="mini"
+            v-model="labelPosition"
           >
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="类型" prop="type">
                   <el-select
                     @change="updateOptionAndAnswer"
@@ -186,7 +179,7 @@
                   </el-select>
                 </el-form-item>
               </el-col>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="难度" prop="difficulty">
                   <el-select
                     placeholder="请选择难度"
@@ -202,9 +195,9 @@
                 </el-form-item>
               </el-col>
             </el-row>
+
             <el-form-item label="题干" prop="title">
               <Editor
-                :height="70"
                 :value="editForm.title"
                 @editorListener="editorListener"
                 id="title"
@@ -224,10 +217,7 @@
                 ></Editor>
               </el-form-item>
             </div>
-            <el-form-item
-              label
-              v-if="editForm.type === 1 || editForm.type === 2"
-            >
+            <el-form-item v-if="editForm.type === 1 || editForm.type === 2">
               <el-button
                 :disabled="editForm.options.length >= 7"
                 @click="addOption()"
@@ -315,7 +305,7 @@
               ></Editor>
             </el-form-item>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="分值" prop="score">
                   <el-input-number
                     :max="100"
@@ -325,7 +315,7 @@
                   ></el-input-number>
                 </el-form-item>
               </el-col>
-              <el-col :span="12">
+              <el-col :span="11">
                 <el-form-item label="排序" prop="no">
                   <el-input-number
                     :max="100000"
@@ -384,7 +374,7 @@
                 </el-tooltip>
               </el-checkbox-group>
             </el-form-item>
-            <el-form-item label>
+            <el-form-item>
               <el-button
                 @click="add()"
                 style="width: 164px; height: 40px"
@@ -409,15 +399,20 @@
               >
             </el-form-item>
           </el-form>
-        </div>
+        </el-scrollbar>
       </div>
     </div>
   </div>
 </template>
 <script>
+import Editor from "@/components/Editor.vue"
 export default {
+  components: {
+    Editor
+  },
   data() {
     return {
+      labelPosition: "left",
       value: "",
       list: {
         //列表数据
@@ -451,7 +446,16 @@ export default {
         no: null, //排序
         scoreOptions: [],
         rules: {
-          //校验
+          type: [{ required: true, message: "请选择类型", trigger: "change" }],
+          difficulty: [
+            { required: true, message: "请选择难度", trigger: "change" }
+          ],
+          title: [{ required: true, message: "请输入题干", trigger: "change" }],
+          answer: [
+            { required: true, message: "请选择答案", trigger: "change" }
+          ],
+          score: [{ required: true, message: "请输入分值", trigger: "change" }],
+          no: [{ required: true, message: "请输入排序", trigger: "change" }]
         }
       },
       btnGroup1: [
@@ -507,6 +511,9 @@ export default {
     this.init()
   },
   methods: {
+    goBack() {
+      this.$router.push("/404")
+    },
     //初始化默认值
     async init() {
       this.query() //查询列表
@@ -530,18 +537,6 @@ export default {
 
       for (let i = 0; i < 2; i++) {
         this._addOption(i, "") //默认添加两个选项
-      }
-
-      // 初始化校验
-      this.editForm.rules = {
-        type: [{ required: true, message: "请选择类型", trigger: "change" }],
-        difficulty: [
-          { required: true, message: "请选择难度", trigger: "change" }
-        ],
-        title: [{ required: true, message: "请输入题干", trigger: "change" }],
-        answer: [{ required: true, message: "请选择答案", trigger: "change" }],
-        score: [{ required: true, message: "请输入分值", trigger: "change" }],
-        no: [{ required: true, message: "请输入排序", trigger: "change" }]
       }
     },
     // 查询
@@ -651,26 +646,11 @@ export default {
     },
     // 删除选项
     delOption() {
-      if (this.editForm.options.length <= 2) {
-        alert("最少2个选项")
-        return
-      }
-
       this.editForm.options.pop()
       this.editForm.answers.pop()
-
-      let index = this.editForm.options.length
-      this.editForm.rules["options." + index + ".value"] = [
-        { required: false, message: "请输入选项" + lab, trigger: "change" }
-      ]
     },
     //添加填空
     addFillBlanks() {
-      if (this.editForm.answers.length >= 7) {
-        alert("最多7个填空")
-        return
-      }
-
       let index = this.editForm.answers.length
       this._addFillBlanks(index, "")
     },
@@ -854,7 +834,8 @@ export default {
     },
     // 获取试题
     async get(id) {
-      let res = await this.$https.questionGet({ id: id })
+      let res = await this.$https.questionGet({ id })
+      console.log(res)
       if (res.code != 200) {
         alert(res.msg)
         return
@@ -920,6 +901,7 @@ export default {
 .container {
   display: flex;
   flex-direction: column;
+  padding-top: 0;
   background-color: #f2f4f5;
 }
 
@@ -931,196 +913,176 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
-  box-sizing: border-box;
   .back {
     color: #fff;
+    &:hover {
+      text-decoration: none;
+    }
   }
 }
 
 .search {
-  height: 60px;
-  padding-top: 20px;
-  .opt {
-    flex-grow: 1;
-    display: flex;
-  }
-  .left {
-    width: 145px;
-    background-color: #fff;
-  }
+  height: 80px;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .content {
-  flex-grow: 1;
+  height: calc(100vh - 140px);
   display: flex;
-  flex-direction: column;
-  width: 98%;
+  width: 100%;
+  padding: 0 20px;
   margin: 0 auto;
 }
-.content .opt .content .opt .center {
-  flex-grow: 1;
-  background-color: #fff;
-  margin: 0 4px;
-  padding: 10px;
-  border-color: #f2f3f5;
-  width: 0px;
-}
-.content .opt .right {
-  width: 460px;
-  background-color: #fff;
-  padding: 10px;
-  height: calc(100% - 60px);
-  overflow-y: scroll;
-}
 
-.content .opt .left_inner_top {
-  background-color: #1e9fff;
+.left {
   width: 145px;
-  height: 45px;
-  line-height: 45px;
-  text-align: center;
-  font-size: 16px;
-  color: #fff;
+  height: 100%;
+  background: #fff;
+  border-radius: 5px;
+  box-shadow: 0 0 13px 3px rgba(30, 159, 255, 0.15);
+  .left-top {
+    background-color: rgb(30, 159, 255);
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    width: 145px;
+    height: 45px;
+    line-height: 45px;
+    text-align: center;
+    font-size: 16px;
+    color: #fff;
+  }
+  .left-center {
+    width: 110px;
+    height: 40px;
+    border: 1px solid #eeeeeeff;
+    margin: 7px auto;
+    line-height: 40px;
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    &:hover {
+      border: 1px solid #1e9fff;
+      img:last-child {
+        display: block;
+      }
+    }
+    img {
+      &:first-child {
+        width: 22px;
+        height: 22px;
+        margin: 0 10px;
+      }
+      &:last-child {
+        width: 28px;
+        height: 22px;
+        position: absolute;
+        bottom: -1px;
+        right: 0px;
+        display: none;
+      }
+    }
+  }
+  .left-center-active {
+    border: 1px solid #1e9fff;
+    img:last-child {
+      display: block;
+    }
+  }
+  .splitLine {
+    background: #eee;
+    width: 100%;
+    height: 1px;
+    margin: 16px auto;
+  }
+  .left-bottom {
+    width: 110px;
+    height: 40px;
+    background: #eee;
+    margin: 7px auto;
+    text-align: center;
+    line-height: 40px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    img {
+      width: 16px;
+      height: 16px;
+      margin-right: 10px;
+    }
+  }
 }
 
-.content .opt .left_inner_center {
-  box-sizing: border-box;
-  width: 110px;
-  height: 38px;
-  border: 1px solid #eeeeeeff;
-  margin: 7px auto;
-  text-align: center;
-  line-height: 38px;
-  position: relative;
-  cursor: pointer;
-}
-.content .opt .left_inner_center:hover {
-  border: 1px solid #1e9fff;
+.center {
+  flex: 1;
+  .center-card {
+    height: 70px;
+    cursor: pointer;
+    margin: 0 10px 10px 10px;
+    padding: 0 5px;
+    display: flex;
+    flex-direction: column;
+    &:hover {
+      border: 1px solid rgb(30, 159, 255);
+      box-shadow: 0 0 7px 2px rgba(30, 159, 255, 0.15);
+      .card-bottom-right {
+        display: block;
+      }
+    }
+  }
+  .center-card-top {
+    height: 20px;
+    font-size: 14px;
+    text-align: left;
+  }
+  .center-card-bottom {
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .el-tag {
+      margin-right: 8px;
+    }
+    .center-tag-danger {
+      background-color: #feeddc;
+      border-color: #fddbb9;
+      color: #fa8718;
+      height: 20px;
+      line-height: 18px;
+    }
+    .center-tag-purple {
+      border-color: #daddf9;
+      color: #838eea;
+      height: 20px;
+      line-height: 18px;
+    }
+    .card-bottom-right {
+      display: none;
+    }
+    .btn {
+      padding: 5px 10px;
+    }
+  }
 }
 
-.content .left_inner_center img:first-child {
-  width: 22px;
-  height: 22px;
-  position: absolute;
-  left: 10px;
-  top: 8px;
-}
-.content .left_inner_center img:last-child {
-  width: 28px;
-  height: 22px;
-  position: absolute;
-  bottom: 0px;
-  right: 0px;
-  display: none;
-}
-.content .left_inner_center:hover img:last-child {
-  display: block;
-}
-.content .left_inner_center span {
-  position: absolute;
-  top: 0px;
-  left: 40px;
-  font-size: 14px;
-}
-.content .left_inner_center1 {
-  border: 1px solid #1e9fff !important;
-}
-.content .left_inner_center1 img {
-  display: inline-block !important;
+.right {
+  width: 460px;
+  background: #fff;
+  border-radius: 5px;
+  padding: 10px 0 0 0;
+  box-shadow: 0 0 13px 3px rgba(191, 198, 204, 0.15);
 }
 
-.splitLine {
-  border-color: #eee;
-  border-top: 0px;
-  margin: 18px 0px;
-}
-.content .left_inner_bottom {
-  box-sizing: border-box;
-  width: 110px;
-  height: 38px;
-  border: 1px solid #eeeeeeff;
-  background-color: #eee;
-  margin: 7px auto;
-  text-align: center;
-  line-height: 38px;
-  position: relative;
-  cursor: pointer;
-}
-.content .left_inner_bottom img {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-}
-.content .left_inner_bottom span {
-  position: absolute;
-  top: 0px;
-  left: 35px;
-  font-size: 12px;
-}
-.content .center_inner_card {
-  height: 70px;
-  position: relative;
-  cursor: pointer;
-  margin-bottom: 10px;
-}
-.content .center_inner_card:hover {
-  border: 1px solid #1e9fff;
-}
-.content .center_inner_card .center_inner_card1 {
-  height: 20px;
-  width: 90%;
-  font-size: 14px;
-  overflow: hidden;
-}
-.content .center_inner_card .center_inner_card1 span {
-  margin-right: 10px;
-}
-.content .center_inner_card .center_inner_card2 {
-  position: absolute;
-  bottom: 8px;
-  left: 20px;
-}
-.content .center_inner_card .center_inner_card21 {
-  background-color: #feeddc;
-  border-color: #fddbb9;
-  color: #fa8718;
-  height: 20px;
-  line-height: 18px;
-}
-.content .center_inner_card .center_inner_card22 {
-  border-color: #daddf9;
-  color: #838eea;
-  height: 20px;
-  line-height: 18px;
-}
-.content .center_inner_card .center_inner_card3 {
-  position: absolute;
-  right: 20px;
-  bottom: 8px;
-  display: none;
-}
-.content .center_inner_card:hover .center_inner_card3 {
-  display: block;
-}
-.btn {
-  padding: 2px 4px;
-  color: #c2c2c2;
-  background: transparent;
-  border-color: #c2c2c2;
-  border: 0px;
-}
 .btn2 {
   width: 65px;
   height: 25px;
   padding: 0px;
-}
-
-.back {
-  /* width: 100px; */
-  height: 50px;
-  display: inline-block;
-  line-height: 50px;
-  color: #fff;
 }
 
 .form-inline .el-form-item {
@@ -1132,18 +1094,12 @@ export default {
   text-align: center;
 }
 
-// .el-form-item {
-//   margin-bottom: 7px;
-// }
-
+.el-radio,
 .el-checkbox {
   margin-right: 10px;
 }
-.el-radio {
-  margin-right: 10px;
-}
 .box-card-no-border {
-  border: 0px solid #ebeef5;
+  border: none;
 }
 
 /deep/ .el-card__body {
@@ -1165,5 +1121,13 @@ export default {
   background-color: #fff;
   border: 0px;
   width: 38px;
+}
+/deep/ .el-form-item--mini.el-form-item,
+.el-form-item--small.el-form-item {
+  margin-bottom: 24px;
+}
+
+/deep/ .el-form-item__error {
+  line-height: 20px;
 }
 </style>

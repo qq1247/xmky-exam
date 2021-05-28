@@ -1,10 +1,16 @@
 <template>
-  <div>
-    <div :id="id"></div>
+  <div class="editor">
+    <ckeditor
+      :editor="editor"
+      v-model="value"
+      :config="editorConfig"
+      style="border: 1px solid #ececec"
+    ></ckeditor>
   </div>
 </template>
 <script>
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic"
+import InlineEditor from "@ckeditor/ckeditor5-build-inline"
+import "@ckeditor/ckeditor5-build-inline/build/translations/zh-cn"
 export default {
   name: "Editor",
   props: {
@@ -12,18 +18,13 @@ export default {
     value: {
       type: String,
       default: ""
-    },
-    height: {
-      type: Number,
-      default: 40
     }
   },
   data() {
     return {
-      cfg: {
-        toolbar: [["Styles", "Format", "Font", "FontSize"]],
-        removePlugins: "elementspath",
-        height: 0
+      editor: InlineEditor,
+      editorConfig: {
+        language: "zh-cn"
       }
     }
   },
@@ -31,20 +32,13 @@ export default {
     value: function () {
       this.$emit("editorListener", this.id, this.value)
     }
-  },
-  created() {
-    this.cfg.height = this.height
-    ClassicEditor.create(document.querySelector(`#${this.id}`))
-      .then(editor => {
-        console.log(editor)
-      })
-      .catch(error => {
-        console.error(error)
-      })
   }
 }
 </script>
 <style lang="scss" scoped>
+.editor {
+  margin-right: 15px;
+}
 /deep/ .cke_bottom {
   user-select: none;
   margin: 0px;

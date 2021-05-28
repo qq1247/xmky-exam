@@ -28,6 +28,7 @@
           placeholder="请输入密码"
           v-model="ruleForm.password"
           autocomplete="off"
+          @change="login('ruleForm')"
         ></el-input>
       </el-form-item>
       <el-form-item>
@@ -98,8 +99,8 @@ export default {
   width: 35%;
   height: auto;
   padding: 60px;
+  margin: 0 auto;
   box-sizing: border-box;
-  margin: 160px auto;
   background: #fff;
   border-radius: 3px;
   box-shadow: 0 0 16px 3px rgba(0, 0, 0, 0.15);

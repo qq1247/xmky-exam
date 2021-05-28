@@ -7,8 +7,10 @@ import "@/assets/css/normalize.css"
 import ElementUI from "element-ui"
 import "element-ui/lib/theme-chalk/index.css"
 import "@/assets/css/element-ui-ex.scss"
+import CKEditor from "@ckeditor/ckeditor5-vue2"
 import api from "@/api"
 Vue.use(ElementUI)
+Vue.use(CKEditor)
 
 Vue.prototype.$https = api
 Vue.config.productionTip = false
