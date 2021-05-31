@@ -126,4 +126,31 @@ public class ApiDictController extends BaseController {
 			return PageResult.err();
 		}
 	}
+	
+	/**
+	 * 获取数据字典
+	 * 
+	 * v1.0 zhanghc 2021年5月27日下午4:27:54
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/get")
+	@ResponseBody
+	public PageResult get(Integer id) {
+		try {
+			Dict dict = dictService.getEntity(id);
+			return PageResultEx.ok()
+					.addAttr("id", dict.getId())
+					.addAttr("dictIndex", dict.getDictIndex())
+					.addAttr("dictKey", dict.getDictKey())
+					.addAttr("dictValue", dict.getDictValue())
+					.addAttr("no", dict.getNo());
+		} catch (MyException e) {
+			log.error("删除数据字典错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("删除数据字典错误：", e);
+			return PageResult.err();
+		}
+	}
 }
