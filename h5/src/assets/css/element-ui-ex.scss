@@ -2,11 +2,6 @@
   box-sizing: border-box;
 }
 
-html,
-body {
-  height: 100%;
-}
-
 .el-scrollbar__wrap {
   overflow-x: hidden;
 }
@@ -63,8 +58,8 @@ body {
   width: 100%;
   flex: 1;
   display: flex;
-  flex-direction: column;
   padding-top: 60px;
+  flex-direction: column;
 }
 
 .footer {

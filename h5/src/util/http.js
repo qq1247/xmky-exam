@@ -56,11 +56,8 @@ const errorHandle = (status, msg) => {
 
 // 创建axios实例
 var instance = axios.create({
-  baseURL:
-    process.env.NODE_ENV == "development"
-      ? "http://192.168.110.86:8080/api/"
-      : "http://192.168.110.86:8080/api/",
-  timeout: 1000 * 3
+  baseURL: "http://192.168.110.85:8080/api/",
+  timeout: 1000 * 1
 })
 
 /**

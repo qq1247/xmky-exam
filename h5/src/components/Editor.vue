@@ -2,9 +2,8 @@
   <div class="editor">
     <ckeditor
       :editor="editor"
-      :value="value"
+      v-model="value"
       :config="editorConfig"
-      @input="editData($event)"
       style="border: 1px solid #ececec"
     ></ckeditor>
   </div>
@@ -29,9 +28,9 @@ export default {
       }
     }
   },
-  methods: {
-    editData($event) {
-      this.$emit("editorListener", this.id, $event)
+  watch: {
+    value: function () {
+      this.$emit("editorListener", this.id, this.value)
     }
   }
 }

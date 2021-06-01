@@ -1,30 +1,15 @@
 import Vue from "vue"
 import VueRouter from "vue-router"
 import { Message } from "element-ui"
-import Home from "../views/Home"
+import Question from "../views/Question"
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: "/",
-    name: "Home",
-    component: Home
-  },
-  {
-    path: "/login",
-    name: "Login",
-    component: () => import("../views/Login.vue")
-  },
-  {
-    path: "/question",
     name: "Question",
-    component: () => import("../views/Question.vue")
-  },
-  {
-    path: "/exam",
-    name: "Exam",
-    component: () => import("../views/Exam.vue")
+    component: Question
   },
   {
     path: "/dict",
@@ -35,6 +20,11 @@ const routes = [
     path: "/org",
     name: "Org",
     component: () => import("../views/Org.vue")
+  },
+  {
+    path: "/login",
+    name: "Login",
+    component: () => import("../views/Login.vue")
   },
   { path: "*", component: () => import("../views/404.vue") }
 ]
