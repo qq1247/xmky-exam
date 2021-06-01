@@ -67,10 +67,13 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/list")
 	@ResponseBody
-	public PageResult list(PageIn pageIn, String name) {
+	public PageResult list(PageIn pageIn, Integer parentId, String name) {
 		try {
 			if(ValidateUtil.isValid(name)){
 				pageIn.setTwo(name);
+			}
+			if(parentId != null){
+				pageIn.setOne(parentId.toString());
 			}
 			return PageResultEx.ok().data(orgService.getListpage(pageIn));
 		} catch (Exception e) {
@@ -257,7 +260,17 @@ public class ApiOrgController extends BaseController {
 	@ResponseBody
 	public PageResult get(Integer id) {
 		try {
-			return PageResultEx.ok().data(orgService.getOrg(id));
+			Org org = orgService.getEntity(id);
+			Org parentOrg = null;
+			if (org.getParentId() != null) {
+				parentOrg = orgService.getEntity(org.getParentId());
+			}
+			return PageResultEx.ok()
+					.addAttr("id", org.getId())
+					.addAttr("name", org.getName())
+					.addAttr("no", org.getNo())
+					.addAttr("parentId", org.getParentId())
+					.addAttr("parentName", parentOrg == null ? null : parentOrg.getName());
 		} catch (MyException e) {
 			log.error("获取组织机构错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
