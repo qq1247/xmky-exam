@@ -2,7 +2,13 @@
   <div class="container">
     <!-- 导航 -->
     <div class="head">
-      <el-link class="back" @click="goBack" icon="el-icon-back">返回</el-link>
+      <el-link
+        class="head-left"
+        :underline="false"
+        @click="goBack"
+        icon="el-icon-back"
+        >返回</el-link
+      >
     </div>
     <!-- 搜索 -->
     <el-form :inline="true" :model="queryForm" class="form-inline search">
@@ -57,7 +63,7 @@
     </el-form>
     <!-- 内容 -->
     <div class="content">
-      <div class="left">
+      <div class="content-left">
         <div class="left-top">添加题型</div>
         <el-scrollbar style="height: calc(100% - 45px)">
           <div
@@ -81,7 +87,7 @@
           </div>
         </el-scrollbar>
       </div>
-      <div class="center">
+      <div class="content-center">
         <el-scrollbar style="height: 100%">
           <el-card
             :key="quesiton.ID"
@@ -151,7 +157,7 @@
           ></el-pagination> -->
         </el-scrollbar>
       </div>
-      <div class="right">
+      <div class="content-right">
         <el-scrollbar style="height: 100%">
           <el-form
             :model="editForm"
@@ -521,12 +527,12 @@ export default {
       let typeDictData = await this.$https.dictList({
         dictIndex: "QUESTION_TYPE"
       })
-      this.queryForm.typeDictList = typeDictData.rows // 初始化类型下拉框
+      this.queryForm.typeDictList = typeDictData.data.rows // 初始化类型下拉框
 
       let difficultyDictData = await this.$https.dictList({
         dictIndex: "QUESTION_DIFFICULTY"
       })
-      this.queryForm.difficultyDictList = difficultyDictData.rows // 初始化难度下拉框
+      this.queryForm.difficultyDictList = difficultyDictData.data.rows // 初始化难度下拉框
 
       this.btnGroup1[0].checked = true //默认选中类型按钮
       this.editForm.type = 1 //默认选中类型
@@ -541,7 +547,9 @@ export default {
     },
     // 查询
     async query() {
-      let { rows, total } = await this.$https.questionList({
+      let {
+        data: { rows, total }
+      } = await this.$https.questionList({
         id: this.id,
         title: this.title,
         type: this.type,
@@ -754,7 +762,7 @@ export default {
           params.answer = _answer.join("\n")
         }
 
-        let res = await questionAdd(params)
+        let res = await this.$https.questionAdd(params)
         if (res.code != 200) {
           alert(res.msg)
         }
@@ -820,7 +828,7 @@ export default {
           type: "warning"
         })
           .then(async () => {
-            let res = await questionEdit(params)
+            let res = await this.$https.questionEdit(params)
             if (res.code != 200) {
               this.$message({
                 type: "error",
@@ -841,14 +849,14 @@ export default {
         return
       }
 
-      this.editForm.id = res.id
-      this.editForm.type = res.type
-      this.editForm.difficulty = res.difficulty
-      this.editForm.title = res.title
-      this.editForm.answer = res.answer
-      this.editForm.analysis = res.analysis
-      this.editForm.score = res.score
-      this.editForm.no = res.no
+      this.editForm.id = res.data.id
+      this.editForm.type = res.data.type
+      this.editForm.difficulty = res.data.difficulty
+      this.editForm.title = res.data.title
+      this.editForm.answer = res.data.answer
+      this.editForm.analysis = res.data.analysis
+      this.editForm.score = res.data.score
+      this.editForm.no = res.data.no
 
       if (this.editForm.type === 1) {
         this.editForm.options = [] // 重置选项
@@ -877,20 +885,13 @@ export default {
           res.data.scoreOptions == null ? [] : res.data.scoreOptions.split(",")
       }
     },
-    async del(id) {
+    del(id) {
       this.$confirm("确定要删除？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       }).then(async () => {
-        let res = await questionDel({ id })
-        if (res.code != 200) {
-          this.$message({
-            type: "error",
-            message: res.msg
-          })
-        }
-
+        await this.$https.questionDel({ id })
         this.query()
       })
     }
@@ -908,16 +909,13 @@ export default {
 .head {
   width: 100%;
   height: 50px;
-  background: url("../assets/img/head.png");
+  background: rgba(0, 0, 0, 0.8);
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
-  .back {
+  .head-left {
     color: #fff;
-    &:hover {
-      text-decoration: none;
-    }
   }
 }
 
@@ -930,14 +928,13 @@ export default {
 }
 
 .content {
-  height: calc(100vh - 140px);
   display: flex;
   width: 100%;
   padding: 0 20px;
   margin: 0 auto;
 }
 
-.left {
+.content-left {
   width: 145px;
   height: 100%;
   background: #fff;
@@ -1019,7 +1016,7 @@ export default {
   }
 }
 
-.center {
+.content-center {
   flex: 1;
   .center-card {
     height: 70px;
@@ -1071,7 +1068,7 @@ export default {
   }
 }
 
-.right {
+.content-right {
   width: 460px;
   background: #fff;
   border-radius: 5px;

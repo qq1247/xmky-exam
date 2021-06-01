@@ -27,12 +27,12 @@ export default {
   data() {
     return {
       show: true,
-      menuList: ["Question"]
+      menuList: ["Question", "Exam"]
     }
   },
   watch: {
     $route: {
-      handler(to, from) {
+      handler(to) {
         if (to && this.menuList.includes(to.name)) {
           this.show = false
         }
@@ -45,20 +45,18 @@ export default {
 </script>
 
 <style lang="scss">
-@import url(//at.alicdn.com/t/font_840312_jzw7mi5gwe.css);
+@import url(//at.alicdn.com/t/font_840312_mn3tmtkdwg.css);
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  box-sizing: border-box;
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: auto;
-  min-height: 100vh;
+  min-height: 100%;
   background: #fff;
+  color: #2c3e50;
   text-align: left;
 }
 </style>
