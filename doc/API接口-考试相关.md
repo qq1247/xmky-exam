@@ -185,21 +185,28 @@ code == 401 无权限或登录超时
 |data.list[].typeName | String  | 类型名称 |
 |data.list[].difficulty | Integer | 难度 |
 |data.list[].difficultyName | String  | 难度名称 |
-|data.list[].rwState | Integer  | 1：开启；2：禁用 |
-|data.list[].readUserName | String  | 读权限 |
-|data.list[].writeUserName | String  | 写权限 |
+|data.list[].title | String  | 题干 |
+|data.list[].options[] | String  | 选项 |
+|data.list[].answer | String  | 答案 |
+|data.list[].analysis | String  | 解析 |
+|data.list[].state | Integer  | 状态 |
+|data.list[].questionTypeId | Integer  | 试题分类ID |
+|data.list[].questionTypeName | Integer  | 试题分类名称 |
+|data.list[].score | Double  | 分值 |
+|data.list[].scoreOptions | String  | 分值选项 |
+|data.list[].no | Integer  | 排序 |
 
 ####试题添加：question/add
 ######请求参数
 | 参数     |  数据类型   |  描述  |  是否必填 |
 | --------   | -----   | -----  | ---- |
-|type    | Integer     | 1：单选；2：多选；3：填空；4：判断；5：问答 |   是   |
-|difficulty    | Integer     |   难度   |   是   |
+|type    | Integer     | 类型（1：单选；2：多选；3：填空；4：判断；5：问答 |   是   |
+|difficulty    | Integer     |   难度（1：极易；2：简单；3：适中；4：困难；5：极难 ）|   是   |
 |title    | String（65535）     | 题干 |   是   |
 |options[]    | String[]     |   选项，type为1,2时有效，len <= 7  |   否   |
 |answer    | String(65535)     |   答案   |   是   |
 |analysis    | String(65535)     |   解析   |   是   |
-|state    | Integer  |   1：启用；2：禁用   |   是   |
+|state    | Integer  |   状态（1：启用；2：禁用 ）  |   是   |
 |questionTypeId    | Integer  |   试题分类ID   |   是   |
 |score    | double  | 分值  |  否   |
 |scoreOptions    | String(8)  | 分值选项，type为2时1有效，type为3时1,2,3,4有效，多选用英文逗号分隔。1：半对半分；2：答案无顺序；3：大小写不敏感；4：包含答案得分 |  否   |
@@ -215,6 +222,8 @@ code == 401 无权限或登录超时
 | 参数     |  数据类型   |  描述  |  是否必填 |
 | --------   | -----   | -----  | ---- |
 |id    | Integer     | 主键 |   是   |
+|type    | Integer     | 类型 |  无效   |
+|state    | Integer     | 状态 |   无效   |
 |其他字段同question/add   |      |  |      |   |
 ######响应数据
 | 参数  |  数据类型   |  描述  |
@@ -223,6 +232,18 @@ code == 401 无权限或登录超时
 |msg     | String  | 响应消息 |
 
 ####试题删除：question/del
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|id    | Integer     | 主键 |   是   |
+
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | Integer  | 响应码 |
+|msg     | String  | 响应消息 |
+
+####试题状态：question/state
 ######请求参数
 | 参数     |  数据类型   |  描述  |  是否必填 |
 | --------   | -----   | -----  | ---- |
