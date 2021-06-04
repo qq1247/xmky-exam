@@ -13,7 +13,6 @@ import com.wcpdoc.exam.auth.cache.TokenCache;
 import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.base.entity.UserToken;
 import com.wcpdoc.exam.base.service.LoginService;
-import com.wcpdoc.exam.base.service.OrgService;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
@@ -32,8 +31,6 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 	private String active;
 	@Resource
 	private UserService userService;
-	@Resource
-	private OrgService orgService;
 	@Value("${token.expireMinute}")
 	private Integer tokenExpireMinute;
 	

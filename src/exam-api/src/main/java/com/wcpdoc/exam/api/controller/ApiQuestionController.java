@@ -72,9 +72,9 @@ public class ApiQuestionController extends BaseController {
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @return pageOut
 	 */
-	@RequestMapping("/list")
+	@RequestMapping("/listpage")
 	@ResponseBody
-	public PageResult list(PageIn pageIn, Integer questionTypeId, Integer id, String title, Integer type, Integer difficulty, Double score, Double scoreStart, Double scoreEnd, String name) {
+	public PageResult listpage(PageIn pageIn, Integer questionTypeId, Integer id, String title, Integer type, Integer difficulty, Double score, Double scoreStart, Double scoreEnd, String name) {
 		try {
 			if(questionTypeId != null){
 				pageIn.setOne(questionTypeId.toString());

@@ -38,9 +38,9 @@ public class ApiDictController extends BaseController {
 	 * @param pageIn
 	 * @return PageOut
 	 */
-	@RequestMapping("/list")
+	@RequestMapping("/listpage")
 	@ResponseBody
-	public PageResult list(PageIn pageIn, String dictIndex, String dictKey, String dictValue) {
+	public PageResult listpage(PageIn pageIn, String dictIndex, String dictKey, String dictValue) {
 		try {
 			if (ValidateUtil.isValid(dictIndex)) {
 				pageIn.setTwo(dictIndex);

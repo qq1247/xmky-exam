@@ -1,6 +1,5 @@
-package com.wcpdoc.exam.base.cfg;
+package com.wcpdoc.exam.auth.cfg;
 
-import org.apache.shiro.ShiroException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authz.UnauthenticatedException;
@@ -30,9 +29,9 @@ public class GlobalExceptionHandler {
 	 * @param e
 	 * @return PageOut
 	 */
-	@ExceptionHandler(ShiroException.class)
+	@ExceptionHandler(Exception.class)
 	@ResponseBody
-	public PageResult exceptionHandler(ShiroException se) {
+	public PageResult exceptionHandler(Exception se) {
 		if (se instanceof IncorrectCredentialsException || se instanceof UnknownAccountException) {
 			return PageResult.err().msg(se.getMessage());
 		}

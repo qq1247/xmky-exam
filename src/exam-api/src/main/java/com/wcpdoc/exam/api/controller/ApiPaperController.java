@@ -65,9 +65,9 @@ public class ApiPaperController extends BaseController {
 	 * zhanghc 2018年10月21日上午8:16:06
 	 * @return pageOut
 	 */
-	@RequestMapping("/list")
+	@RequestMapping("/listpage")
 	@ResponseBody
-	public PageResult list(PageIn pageIn, String name, String userName) {
+	public PageResult listpage(PageIn pageIn, String name, String userName) {
 		try {
 			if (ValidateUtil.isValid(userName)) {
 				pageIn.setTwo(userName);

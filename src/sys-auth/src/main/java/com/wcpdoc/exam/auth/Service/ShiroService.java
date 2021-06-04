@@ -24,8 +24,8 @@ public interface ShiroService {
 	 * 获取角色列表
 	 * 
 	 * v1.0 zhanghc 2021年3月19日下午4:51:38
-	 * @param userId
+	 * @param roles
 	 * @return List<String>
 	 */
-	List<String> getRoleList(Integer userId);
+	List<String> getRoleList(String roles);
 }

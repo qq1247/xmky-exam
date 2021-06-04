@@ -66,13 +66,13 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 			partSql.append("OR QUESTION_TYPE.ORG_IDS LIKE ? ");
 			params.add("%," + user.getOrgId() + ",%");
 			
-			if (ValidateUtil.isValid(user.getPostIds())) {
+			/*if (ValidateUtil.isValid(user.getPostIds())) {
 				String[] postIds = user.getPostIds().substring(1, user.getPostIds().length() - 1).split(",");
 				for (String postId : postIds) {
 					partSql.append("OR QUESTION_TYPE.POST_IDS LIKE ? ");
 					params.add("%," + postId + ",%");
 				}
-			}
+			}*/
 			partSql.append(")");
 			
 			sqlUtil.addWhere(partSql.toString(), params.toArray(new Object[params.size()]));

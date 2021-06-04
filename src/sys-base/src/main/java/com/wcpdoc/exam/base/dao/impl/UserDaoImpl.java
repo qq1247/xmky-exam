@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.exam.base.dao.UserDao;
-import com.wcpdoc.exam.base.entity.Post;
 import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.exam.core.entity.PageIn;
@@ -27,8 +26,7 @@ public class UserDaoImpl extends RBaseDaoImpl<User> implements UserDao {
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT USER.ID, USER.NAME, USER.LOGIN_NAME, ORG.NAME AS ORG_NAME, "
-				+ "USER.PHONE AS PHONE, USER.REGIST_TIME, USER.LAST_LOGIN_TIME, "
-				+ "(SELECT GROUP_CONCAT(A.NAME) FROM SYS_POST A WHERE USER.POST_IDS LIKE CONCAT('%,' , A.ID, ',%')) AS POST_NAMES "
+				+ "USER.PHONE AS PHONE, USER.REGIST_TIME, USER.LAST_LOGIN_TIME, ROLES "
 				+ "FROM SYS_USER USER " 
 				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID ";
 				
@@ -36,7 +34,6 @@ public class UserDaoImpl extends RBaseDaoImpl<User> implements UserDao {
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !("1".equals(pageIn.getOne()) || pageIn.getOne().equals(pageIn.getTen())), "ORG.ID = ?", pageIn.getOne())
 				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "ORG.NAME LIKE ?", "%" + pageIn.getThree() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "(SELECT GROUP_CONCAT(A.NAME) FROM SYS_POST A WHERE USER.POST_IDS LIKE CONCAT('%,' , A.ID, ',%')) LIKE ?", "%" + pageIn.getFour() + "%")
 				.addWhere("USER.STATE != ?", 0)
 				.addOrder("USER.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
@@ -59,12 +56,6 @@ public class UserDaoImpl extends RBaseDaoImpl<User> implements UserDao {
 		
 		String sql = "SELECT COUNT(*) AS NUM FROM SYS_USER WHERE LOGIN_NAME = ? AND STATE = 1 AND ID != ?";
 		return getCount(sql, new Object[] { loginName, excludeId }) > 0;
-	}
-
-	@Override
-	public List<Post> getPostList(Integer id) {
-		String sql = "SELECT * FROM SYS_POST POST WHERE POST.STATE = 1 AND UPDATE_USER_ID = ? ";
-		return getList(sql, new Object[] {id}, Post.class);
 	}
 
 	@Override
