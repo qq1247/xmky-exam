@@ -30,4 +30,12 @@ public interface AuthUser {
 	 * @return String
 	 */
 	public String getLoginName();
+	
+	/**
+	 * 获取登录角色
+	 * 
+	 * v1.0 zhanghc 2021年3月19日下午4:49:54
+	 * @return String
+	 */
+	public String getRoles();
 }

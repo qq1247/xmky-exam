@@ -14,7 +14,7 @@ create table SYS_USER
    REGIST_TIME          datetime comment '注册时间',
    LAST_LOGIN_TIME      datetime comment '最后登陆时间',
    ORG_ID               int comment '组织机构ID',
-   POST_IDS             varchar(64) comment '岗位',
+   ROLES             	varchar(128) comment '角色',
    UPDATE_USER_ID       int comment '修改人',
    UPDATE_TIME          datetime comment '修改时间',
    STATE                int comment '0：删除；1：正常；2：冻结；',
@@ -44,26 +44,6 @@ create table SYS_ORG
 );
 
 alter table SYS_ORG comment '组织机构';
-
-drop table if exists SYS_POST;
-
-/*==============================================================*/
-/* Table: SYS_POST                                              */
-/*==============================================================*/
-create table SYS_POST
-(
-   ID                   int not null auto_increment,
-   NAME                 varchar(32) comment '岗位名称',
-   CODE                 varchar(32) comment '编码唯一',
-   ORG_ID               int comment '组织机构ID',
-   RES_IDS              varchar(1024) comment '资源IDS',
-   UPDATE_USER_ID       int comment '修改人',
-   UPDATE_TIME          datetime comment '修改时间',
-   STATE                int comment '0：删除；1：正常',
-   primary key (ID)
-);
-
-alter table SYS_POST comment '岗位';
 
 drop table if exists SYS_PARM;
 
@@ -552,6 +532,8 @@ INSERT INTO `SYS_DICT` VALUES (30, 'MY_EXAM_MARK_STATE', '2', '阅卷中', 2);
 INSERT INTO `SYS_DICT` VALUES (31, 'MY_EXAM_MARK_STATE', '3', '已阅卷', 3);
 INSERT INTO `SYS_DICT` VALUES (32, 'MY_EXAM_ANSWER_STATE', '1', '及格', 1);
 INSERT INTO `SYS_DICT` VALUES (33, 'MY_EXAM_ANSWER_STATE', '2', '不及格', 2);
+INSERT INTO `SYS_DICT` VALUES (34, 'USER_ROLES', '1', 'OP', 1);
+INSERT INTO `SYS_DICT` VALUES (35, 'USER_ROLES', '2', 'AA', 2);
 
 INSERT INTO `SYS_CRON` VALUES ('1', '清理临时附件', 'com.wcpdoc.exam.file.job.ClearFileJob', '0 0 0 1/1 * ? ', '1', '1', '2020-08-26 18:42:08');
 

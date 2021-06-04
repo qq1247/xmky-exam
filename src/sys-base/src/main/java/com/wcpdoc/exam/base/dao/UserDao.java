@@ -2,7 +2,6 @@ package com.wcpdoc.exam.base.dao;
 
 import java.util.List;
 
-import com.wcpdoc.exam.base.entity.Post;
 import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.core.dao.RBaseDao;
 
@@ -32,15 +31,6 @@ public interface UserDao extends RBaseDao<User> {
 	 * @return boolean
 	 */
 	boolean existLoginName(String loginName, Integer excludeId);
-
-	/**
-	 * 获取岗位列表
-	 * 
-	 * v1.0 zhanghc 2020年8月26日下午2:13:04
-	 * @param id
-	 * @return List<Post>
-	 */
-	List<Post> getPostList(Integer id);
 
 	/**
 	 * 获取用户列表

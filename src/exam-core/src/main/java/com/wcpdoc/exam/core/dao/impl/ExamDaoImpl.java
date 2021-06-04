@@ -64,13 +64,13 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 			partSql.append("OR EXAM_TYPE.ORG_IDS LIKE ? ");
 			params.add("%" + user.getOrgId() + "%");
 			
-			if (ValidateUtil.isValid(user.getPostIds())) {
+			/*if (ValidateUtil.isValid(user.getPostIds())) {
 				String[] postIds = user.getPostIds().substring(1, user.getPostIds().length() - 1).split(",");
 				for (String postId : postIds) {
 					partSql.append("OR EXAM_TYPE.POST_IDS LIKE ? ");
 					params.add("%" + postId + "%");
 				}
-			}
+			}*/
 			partSql.append(")");
 			
 			sqlUtil.addWhere(partSql.toString(), params.toArray(new Object[params.size()]));

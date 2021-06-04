@@ -1,9 +1,7 @@
 package com.wcpdoc.exam.base.service;
 
 import java.util.List;
-import java.util.Map;
 
-import com.wcpdoc.exam.base.entity.Post;
 import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.service.BaseService;
@@ -24,16 +22,6 @@ public interface UserService extends BaseService<User> {
 	 * void
 	 */
 	User getUser(String loginName);
-
-	/**
-	 * 获取权限
-	 * 
-	 * v1.0 zhanghc 2016年8月12日上午10:57:35
-	 * 
-	 * @param id
-	 * @return Map<Integer, Long>
-	 */
-	Map<Integer, Long> getAuth(Integer id);
 
 	/**
 	 * 完成修改密码
@@ -89,22 +77,13 @@ public interface UserService extends BaseService<User> {
 	List<User> getList(Integer orgId);
 
 	/**
-	 * 获取岗位列表
-	 * 
-	 * v1.0 zhanghc 2021年3月3日下午2:00:19
-	 * @param id
-	 * @return List<Post>
-	 */
-	List<Post> getPostList(Integer id);
-
-	/**
-	 * 修改岗位
+	 * 修改角色
 	 * 
 	 * v1.0 chenyun 2021年3月16日下午5:22:45
 	 * @param id
-	 * @param postIds void
+	 * @param roles void
 	 */
-	void postUpdate(Integer id, Integer[] postIds);
+	void roleUpdate(Integer id, Integer[] roles);
 	
 	/**
 	 * 在线用户

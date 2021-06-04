@@ -8,7 +8,6 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.exam.base.service.OrgService;
-import com.wcpdoc.exam.base.service.PostService;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.PaperTypeDao;
@@ -33,8 +32,6 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 	private PaperTypeExService paperTypeExService;
 	@Resource
 	private OrgService orgService;
-	@Resource
-	private PostService postService;
 	@Resource
 	private UserService userService;
 	@Resource
