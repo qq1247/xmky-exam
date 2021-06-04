@@ -54,7 +54,7 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 		}
 		
 		// 添加组织机构
-		org.setUpdateUserId(getCurUser().getId());
+		org.setUpdateUserId(1);//getCurUser().getId()
 		org.setUpdateTime(new Date());
 		org.setState(1);
 		add(org);
