@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <img src="../assets/img/404.png" />
+    <img src="../../assets/img/404.png" />
     <router-link to="/" class="go-home">返回首页</router-link>
   </div>
 </template>

@@ -3,19 +3,21 @@
     <header class="header" v-if="show">
       <div class="header-content">
         <div class="header-left">
-          <router-link class="header-link" to="/">
-            <img src="../src/assets/logo.png" alt="" class="header-logo" />
+          <router-link
+            :class="[nav.img ? 'header-logo' : 'header-link', 'active']"
+            v-for="nav in navList"
+            :key="nav.title"
+            :to="nav.to"
+            >{{ nav.content }}
+            <el-image v-if="nav.img" :src="nav.img" class="logo-img"></el-image>
           </router-link>
-          <router-link class="header-link" to="/">a</router-link>
-          <router-link class="header-link" to="/">a</router-link>
-          <router-link class="header-link" to="/">a</router-link>
-          <router-link class="header-link" to="/">a</router-link>
-          <router-link class="header-link" to="/">a</router-link>
         </div>
         <router-link class="header-login" to="/login">登录</router-link>
       </div>
     </header>
-    <router-view />
+    <main class="main">
+      <router-view />
+    </main>
     <footer class="footer" v-if="show">
       Copyright© 2018 All Rights Reserved 版权所有 在线考试
     </footer>
@@ -27,15 +29,35 @@ export default {
   data() {
     return {
       show: true,
-      menuList: ["Question", "Exam"]
+      menuList: ["PaperAdd", "PaperEdit", "LibraryAdd", "LibraryEdit"],
+      navList: [
+        {
+          to: "/",
+          img: require("../src/assets/logo.png")
+        },
+        {
+          content: "试题管理",
+          to: "/examLibrary/classify"
+        },
+        {
+          content: "试卷管理",
+          to: "/examPaper/classify"
+        },
+        {
+          content: "考试管理",
+          to: "/examLibrary/classify"
+        }
+      ]
     }
   },
   watch: {
     $route: {
       handler(to) {
-        if (to && this.menuList.includes(to.name)) {
+        if (to.name && this.menuList.includes(to.name)) {
           this.show = false
+          return
         }
+        this.show = true
       },
       deep: true,
       immediate: true
@@ -45,7 +67,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import url(//at.alicdn.com/t/font_840312_mn3tmtkdwg.css);
+@import url(//at.alicdn.com/t/font_840312_oxzb360a4b9.css);
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

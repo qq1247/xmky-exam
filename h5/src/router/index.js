@@ -14,29 +14,44 @@ const routes = [
   {
     path: "/login",
     name: "Login",
-    component: () => import("../views/Login.vue")
+    component: () => import("../views/base/Login.vue")
   },
   {
-    path: "/question",
-    name: "Question",
-    component: () => import("../views/Question.vue")
+    path: "/examPaper/classify",
+    name: "PaperClassify",
+    component: () => import("../views/examPaper/Classify.vue")
   },
   {
-    path: "/exam",
-    name: "Exam",
-    component: () => import("../views/Exam.vue")
+    path: "/examPaper/add",
+    name: "PaperAdd",
+    component: () => import("../views/examPaper/Add.vue")
   },
   {
-    path: "/dict",
+    path: "/examPaper/edit",
+    name: "PaperEdit",
+    component: () => import("../views/examPaper/Edit.vue")
+  },
+  {
+    path: "/organization/dict",
     name: "Dict",
-    component: () => import("../views/Dict.vue")
+    component: () => import("../views/organization/Dict.vue")
   },
   {
-    path: "/org",
+    path: "/organization/org",
     name: "Org",
-    component: () => import("../views/Org.vue")
+    component: () => import("../views/organization/Org.vue")
   },
-  { path: "*", component: () => import("../views/404.vue") }
+  {
+    path: "/examLibrary/classify",
+    name: "LibraryClassify",
+    component: () => import("../views/examLibrary/Classify.vue")
+  },
+  {
+    path: "/examLibrary/edit",
+    name: "LibraryEdit",
+    component: () => import("../views/examLibrary/Edit.vue")
+  },
+  { path: "*", component: () => import("../views/base/404.vue") }
 ]
 
 const router = new VueRouter({
@@ -46,7 +61,7 @@ const router = new VueRouter({
 })
 
 // 使用 router.beforeEach 注册一个全局前置守卫，判断用户是否登陆
-router.beforeEach((to, from, next) => {
+/* router.beforeEach((to, from, next) => {
   if (to.path == "/login") {
     next()
   } else {
@@ -67,6 +82,6 @@ router.beforeEach((to, from, next) => {
       next()
     }
   }
-})
+}) */
 
 export default router
