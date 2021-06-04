@@ -179,7 +179,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		user.setUpdateUserId(getCurUser().getId());
 		userDao.update(user);
 		
-		jwtRealm.getAuthorizationCache().clear(); //TODO jwtRealm.getAuthorizationCache().remove(user.getId())
+		jwtRealm.getAuthorizationCache().remove(user.getId());
 	}
 	
 	public static void main(String[] args) {

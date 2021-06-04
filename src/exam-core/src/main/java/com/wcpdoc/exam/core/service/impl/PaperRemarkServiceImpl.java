@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.core.service.impl;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
@@ -29,11 +31,22 @@ public class PaperRemarkServiceImpl extends BaseServiceImp<PaperRemark> implemen
 	public void delAndUpdate(Integer id) {
 		// 校验数据有效性
 		PaperRemark entity = getEntity(id);
-		update(entity);
+		del(entity);
 	}
 
 	@Override
-	public PaperRemark getPaperRemark(Integer paperId) {
-		return paperRemarkDao.getPaperRemark(paperId);
+	public List<PaperRemark> getPaperRemarkList(Integer paperId) {
+		return paperRemarkDao.getPaperRemarkList(paperId);
+	}
+
+	@Override
+	public void removePaperRemark(Integer paperId) {
+		List<PaperRemark> paperRemark = paperRemarkDao.getPaperRemarkList(paperId);
+		if(paperRemark == null || paperRemark.size() == 0 ){
+			return;
+		}
+		for(PaperRemark  paperRemarkId :  paperRemark){
+			del(paperRemarkId.getId());
+		}
 	}
 }

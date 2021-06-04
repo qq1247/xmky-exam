@@ -43,29 +43,6 @@ public class ApiExamController extends BaseController{
 	private ExamTypeService examTypeService;
 	
 	/**
-	 * 试卷列表
-	 * 
-	 * v1.0 zhanghc 2018年10月27日上午9:22:15
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	@RequestMapping("/paperList")
-	@ResponseBody
-	@RequiresRoles("OP")
-	public PageResult paperList(PageIn pageIn) {
-		try {
-			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
-				pageIn.setTen(getCurUser().getId().toString());
-			}
-			pageIn.setThree("1");
-			return PageResultEx.ok().data(paperService.getListpage(pageIn));
-		} catch (Exception e) {
-			log.error("试卷列表错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
 	 * 用户列表 
 	 * 
 	 * v1.0 zhanghc 2018年10月31日上午10:27:22

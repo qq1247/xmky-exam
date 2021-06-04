@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.core.dao;
 
+import java.util.List;
+
 import com.wcpdoc.exam.core.dao.RBaseDao;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 
@@ -11,11 +13,11 @@ import com.wcpdoc.exam.core.entity.QuestionOption;
 public interface QuestionOptionDao extends RBaseDao<QuestionOption> {
 	
 	/**
-	 * 获取试题
+	 * 获取试题列表
 	 * 
 	 * v1.0 chenyun 2021年3月18日下午2:25:45
 	 * @param questionId
-	 * @return QuestionOption
+	 * @return List<QuestionOption>
 	 */
-	QuestionOption getQuestionOption(Integer questionId);
+	List<QuestionOption> getQuestionOptionList(Integer questionId);
 }

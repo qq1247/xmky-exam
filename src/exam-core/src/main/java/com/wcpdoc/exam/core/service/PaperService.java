@@ -89,7 +89,7 @@ public interface PaperService extends BaseService<Paper> {
 	 * @param score 
 	 * void
 	 */
-	void doOptionsUpdate(Integer paperQuestionId, Integer[] options);
+	void doOptionsUpdate(Integer paperQuestionId, Integer[] scoreOptions);
 
 	/**
 	 * 完成试题上移

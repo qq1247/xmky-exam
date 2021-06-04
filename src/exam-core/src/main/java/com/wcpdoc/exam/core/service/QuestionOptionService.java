@@ -1,6 +1,9 @@
 package com.wcpdoc.exam.core.service;
 
 import com.wcpdoc.exam.core.service.BaseService;
+
+import java.util.List;
+
 import com.wcpdoc.exam.core.entity.QuestionOption;
 
 /**
@@ -25,7 +28,15 @@ public interface QuestionOptionService extends BaseService<QuestionOption> {
 	 * 
 	 * v1.0 chenyun 2021年3月18日下午2:25:45
 	 * @param questionId
-	 * @return QuestionOption
+	 * @return List<QuestionOption>
 	 */
-	QuestionOption getQuestionOption(Integer questionId);
+	List<QuestionOption> getQuestionOptionList(Integer questionId);
+	
+	/**
+	 * 删除全部试题选项
+	 * 
+	 * v1.0 cY 2021年6月2日下午4:38:07
+	 * @param questionId void
+	 */
+	void removeQuestionOption(Integer questionId);
 }

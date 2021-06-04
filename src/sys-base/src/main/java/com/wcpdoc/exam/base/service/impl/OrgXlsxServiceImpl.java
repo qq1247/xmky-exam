@@ -190,8 +190,8 @@ public class OrgXlsxServiceImpl extends BaseServiceImp<Object> implements OrgXls
 				
 				// 更新父子关系
 				//Org parentOrg = orgService.getEntity(org.getParentId());
-				org.setParentSub(parentOrg.getParentSub() + org.getId() + "_");
-				org.setLevel(org.getParentSub().split("_").length - 1);
+				org.setParentIds(parentOrg.getParentIds() + org.getId() + "_");
+				org.setLevel(org.getParentIds().split("_").length - 1);
 				update(org);
 				return;
 			}
@@ -210,13 +210,13 @@ public class OrgXlsxServiceImpl extends BaseServiceImp<Object> implements OrgXls
 					throw new MyException("此组织机构下有附属机构不能被移动！");
 				}
 
-				if (orgOld.getParentSub().contains(parentOrg.getParentSub())) {
+				if (orgOld.getParentIds().contains(parentOrg.getParentIds())) {
 					throw new MyException("父组织机构不能移动到子组织机构下！");
 				}
 				
 				orgOld.setParentId(parentOrg.getId());
-				orgOld.setParentSub(parentOrg.getParentSub() + orgOld.getId() + "_");
-				orgOld.setLevel(orgOld.getParentSub().split("_").length - 1);
+				orgOld.setParentIds(parentOrg.getParentIds() + orgOld.getId() + "_");
+				orgOld.setLevel(orgOld.getParentIds().split("_").length - 1);
 				orgOld.setNo(Integer.parseInt(map.get("no").toString()));
 				orgOld.setUpdateUserId(getCurUser().getId());
 				orgOld.setUpdateTime(new Date());

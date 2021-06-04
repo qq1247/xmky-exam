@@ -28,7 +28,6 @@ import com.wcpdoc.exam.core.entity.PaperOption;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.PaperRemark;
 import com.wcpdoc.exam.core.entity.Question;
-import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.PaperOptionService;
 import com.wcpdoc.exam.core.service.PaperQuestionService;
@@ -126,24 +125,23 @@ public class ApiPaperController extends BaseController {
 	}
 	
 	/**
-	 * 试卷修改回显
+	 * 试卷浏览
 	 * 
 	 * v1.0 chenyun 2021年3月29日下午5:40:20
 	 * @param paperId
 	 * @return PageResult
 	 */
-	@RequestMapping("/echo")
+	@RequestMapping("/get")
 	@ResponseBody
 	public PageResult echo(Integer paperId) {
 		try {
-			Map<String, Object> map = new HashMap<String, Object>();
 			Paper paper = paperService.getEntity(paperId);
-			map.put("paper", paper);
 			PaperOption paperOption = paperOptionService.getPaperOption(paper.getId());
-			map.put("paperOption", paperOption);
-			PaperRemark paperRemark = paperRemarkService.getPaperRemark(paper.getId());
-			map.put("paperRemark", paperRemark);
-			return PageResultEx.ok().data(map);
+			List<PaperRemark> paperRemarkList = paperRemarkService.getPaperRemarkList(paper.getId());
+			return PageResultEx.ok()
+					.addAttr("paper", paper)
+					.addAttr("paperOption", paperOption)
+					.addAttr("paperRemarkList", paperRemarkList);
 		} catch (MyException e) {
 			log.error("添加试卷错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -161,7 +159,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	public PageResult edit(Integer paperId, Paper paper, PaperOption paperOption, PaperRemark paperRemark) {
+	public PageResult edit(Integer paperId, Paper paper, PaperOption paperOption, List<PaperRemark> paperRemark) {
 		try {
 			Paper entity = paperService.getEntity(paperId);
 			entity.setName(paper.getName());
@@ -182,18 +180,12 @@ public class ApiPaperController extends BaseController {
 			paperOptionEntity.setMinimizeNum(paperOption.getMinimizeNum());
 			paperOptionService.update(paperOptionEntity);
 
-			PaperRemark paperRemarkEntity = paperRemarkService.getPaperRemark(entity.getId());
-			paperRemarkEntity.setScoreA(paperRemark.getScoreA());
-			paperRemarkEntity.setScoreARemark(paperRemark.getScoreARemark());
-			paperRemarkEntity.setScoreB(paperRemark.getScoreB());
-			paperRemarkEntity.setScoreBRemark(paperRemark.getScoreBRemark());
-			paperRemarkEntity.setScoreC(paperRemark.getScoreC());
-			paperRemarkEntity.setScoreCRemark(paperRemark.getScoreCRemark());
-			paperRemarkEntity.setScoreD(paperRemark.getScoreD());
-			paperRemarkEntity.setScoreDRemark(paperRemark.getScoreDRemark());
-			paperRemarkEntity.setScoreE(paperRemark.getScoreE());
-			paperRemarkEntity.setScoreERemark(paperRemark.getScoreERemark());
-			paperRemarkService.update(paperRemarkEntity);
+			paperRemarkService.removePaperRemark(entity.getId());//重新添加评语
+			for (int i = 0; i < paperRemark.size(); i++) {
+				paperRemark.get(i).setNo(i+1);
+				paperRemark.get(i).setPaperId(entity.getId());
+				paperRemarkService.add(paperRemark.get(i));
+			}
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改试卷错误：{}", e.getMessage());
@@ -224,10 +216,7 @@ public class ApiPaperController extends BaseController {
 			if (paperOption != null) {
 				paperOptionService.del(paperOption.getId());
 			}
-			PaperRemark paperRemark = paperRemarkService.getPaperRemark(paper.getId());
-			if(paperRemark != null){				
-				paperRemarkService.del(paperRemark.getId());
-			}
+			paperRemarkService.removePaperRemark(paper.getId());
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("删除试卷错误：{}", e.getMessage());
@@ -264,13 +253,15 @@ public class ApiPaperController extends BaseController {
 			paperOptionEntity.setPaperId(entity.getId());
 			paperOptionService.add(paperOptionEntity);
 
-			PaperRemark paperRemark = paperRemarkService.getPaperRemark(paper.getId());
-			PaperRemark paperRemarkEntity = new PaperRemark();
-			if (paperRemark != null) {
-				BeanUtils.copyProperties(paperRemarkEntity, paperRemark);
+			List<PaperRemark> paperRemarkList = paperRemarkService.getPaperRemarkList(paper.getId());
+			if (paperRemarkList != null && paperRemarkList.size() != 0) {
+				for(PaperRemark paperRemark : paperRemarkList){
+					PaperRemark paperRemarkEntity = new PaperRemark();
+					BeanUtils.copyProperties(paperRemarkEntity, paperRemark);
+					paperRemarkEntity.setPaperId(entity.getId());
+					paperRemarkService.add(paperRemarkEntity);
+				}
 			}
-			paperRemarkEntity.setPaperId(entity.getId());
-			paperRemarkService.add(paperRemarkEntity);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("拷贝试题错误：{}", e.getMessage());
@@ -450,42 +441,28 @@ public class ApiPaperController extends BaseController {
 			for(PaperQuestion paperQuestion : chapterList){
 				//章节
 				Map<String, Object> map = new HashMap<String, Object>();
-				map.put("chapter",  paperQuestion);
+				Map<String, Object> chapterMap = new HashMap<String, Object>();
+				chapterMap.put("id", paperQuestion.getId());
+				chapterMap.put("name", paperQuestion.getName());
+				chapterMap.put("description", paperQuestion.getDescription());
+				chapterMap.put("parentId", paperQuestion.getPaperId());
+				map.put("chapter",  chapterMap);
 				//试题
 				List<PaperQuestion> questionList = paperQuestionService.getQuestionList(paperQuestion.getId());
 				List<Map<String, Object>> questionsListMap = new ArrayList<Map<String, Object>>();
 				for(PaperQuestion questionId : questionList){
 					Map<String, Object> questionMap = new HashMap<String, Object>();
 					Question entity = questionService.getEntity(questionId.getQuestionId());
-					questionId.getScoreOptions();
-					questionMap.put("question", entity);
+					questionMap.put("id", entity.getId());
+					questionMap.put("type", entity.getType());
+					questionMap.put("difficulty", entity.getDifficulty());
+					questionMap.put("title", entity.getTitle());
+					questionMap.put("answer", entity.getAnswer());
+					questionMap.put("analysis", entity.getAnalysis());
+					questionMap.put("score", entity.getScore());
+					questionMap.put("scoreOptions", questionId.getScoreOptions());
 					if(entity.getType() == 1 || entity.getType() == 2 ){
-						QuestionOption questionOption = questionOptionService.getQuestionOption(questionId.getQuestionId());
-						List<String> list = new ArrayList<String>();
-						if(questionOption != null){							
-							if (questionOption.getOptionA() != null ) {
-								list.add(questionOption.getOptionA());
-							}
-							if (questionOption.getOptionB() != null ) {
-								list.add(questionOption.getOptionB());
-							}
-							if (questionOption.getOptionC() != null ) {
-								list.add(questionOption.getOptionC());
-							}
-							if (questionOption.getOptionD() != null ) {
-								list.add(questionOption.getOptionD());
-							}
-							if (questionOption.getOptionE() != null ) {
-								list.add(questionOption.getOptionE());
-							}
-							if (questionOption.getOptionF() != null ) {
-								list.add(questionOption.getOptionF());
-							}
-							if (questionOption.getOptionG() != null ) {
-								list.add(questionOption.getOptionG());
-							}
-						}
-						questionMap.put("option", list);
+						questionMap.put("options", questionOptionService.getQuestionOptionList(questionId.getQuestionId()));
 					}
 
 					questionsListMap.add(questionMap);
@@ -555,11 +532,11 @@ public class ApiPaperController extends BaseController {
 	 * @param options
 	 * @return PageResult
 	 */
-	@RequestMapping("/optionsUpdate")
+	@RequestMapping("/scoreOptionsUpdate")
 	@ResponseBody
-	public PageResult optionsUpdate(Integer paperQuestionId, Integer[] options) {
+	public PageResult scoreOptionsUpdate(Integer paperQuestionId, Integer[] scoreOptions) {
 		try {
-			paperService.doOptionsUpdate(paperQuestionId, options);
+			paperService.doOptionsUpdate(paperQuestionId, scoreOptions);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("设置分数错误：{}", e.getMessage());
@@ -709,37 +686,6 @@ public class ApiPaperController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("发布错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 预览试卷
-	 * 
-	 * v1.0 zhanghc 2017-05-07 14:56:29
-	 * @param id
-	 * @return pageOut
-	 */
-	@RequestMapping("/get")
-	@ResponseBody
-	public PageResult get(Integer id) {
-		try {
-			Map<String, Object> map = new HashMap<>();
-			Paper entity = paperService.getEntity(id);
-			map.put("id", entity.getId());
-			map.put("name", entity.getName());
-			map.put("passScore", entity.getPassScore());
-			map.put("totalScore", entity.getTotalScore());
-			map.put("readRemark", entity.getReadRemark());
-			map.put("readNum", entity.getReadNum());
-			map.put("paperTypeId", entity.getPaperTypeId());
-			map.put("state", entity.getState());
-			return PageResultEx.ok().data(map);
-		} catch (MyException e) {
-			log.error("预览试卷错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		}  catch (Exception e) {
-			log.error("预览试卷错误：", e);
 			return PageResult.err();
 		}
 	}

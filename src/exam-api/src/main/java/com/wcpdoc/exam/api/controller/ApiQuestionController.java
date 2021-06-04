@@ -111,37 +111,13 @@ public class ApiQuestionController extends BaseController {
 			PageOut listpage = questionService.getListpage(pageIn);
 			List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 			for(Map<String, Object> map : listpage.getRows()){
-				map.put("TYPE_NAME", DictCache.getDictValue("QUESTION_TYPE", map.get("TYPE").toString()));
-				map.put("DIFFICULTY_NAME", DictCache.getDictValue("QUESTION_DIFFICULTY", map.get("DIFFICULTY").toString()));
+				map.put("typeName", DictCache.getDictValue("questionType", map.get("type").toString()));
+				map.put("difficultyName", DictCache.getDictValue("questionDifficulty", map.get("difficulty").toString()));
 				
 				//选择
-				if (map.get("TYPE").toString().equals("1") || map.get("TYPE").toString().equals("2")) {
-					QuestionOption questionOption = questionOptionService.getQuestionOption(Integer.valueOf(map.get("ID").toString()));
-					List<String> optionList = new ArrayList<String>();
-					if(questionOption != null){						
-						if (questionOption.getOptionA() != null ) {
-							optionList.add(questionOption.getOptionA());
-						}
-						if (questionOption.getOptionB() != null ) {
-							optionList.add(questionOption.getOptionB());
-						}
-						if (questionOption.getOptionC() != null ) {
-							optionList.add(questionOption.getOptionC());
-						}
-						if (questionOption.getOptionD() != null ) {
-							optionList.add(questionOption.getOptionD());
-						}
-						if (questionOption.getOptionE() != null ) {
-							optionList.add(questionOption.getOptionE());
-						}
-						if (questionOption.getOptionF() != null ) {
-							optionList.add(questionOption.getOptionF());
-						}
-						if (questionOption.getOptionG() != null ) {
-							optionList.add(questionOption.getOptionG());
-						}
-					}
-					map.put("OPTION", optionList);
+				if (map.get("type").toString().equals("1") || map.get("type").toString().equals("2")) {
+					List<QuestionOption> optionList = questionOptionService.getQuestionOptionList(Integer.valueOf(map.get("id").toString()));
+					map.put("option", optionList);
 				}
 				list.add(map);
 			}
@@ -261,52 +237,28 @@ public class ApiQuestionController extends BaseController {
 	@ResponseBody
 	public PageResult get(Integer id) {
 		try {
-			Map<String, Object> map = new HashMap<>();
 			Question question = questionService.getEntity(id);
-			map.put("id", question.getId());
-			map.put("type", question.getType());
-			map.put("difficulty", question.getDifficulty());
-			map.put("title", question.getTitle());
-			map.put("answer", question.getAnswer());
-			map.put("analysis", question.getAnalysis());
-			map.put("state", question.getState());
-			map.put("updateUserId", question.getUpdateUserId());
-			map.put("updateTime", question.getUpdateTime());
-			map.put("questionTypeId", question.getQuestionTypeId());
-			map.put("score", question.getScore());
-			map.put("scoreOptions", question.getScoreOptions());
-			map.put("ver", question.getVer());
-			map.put("srcId", question.getSrcId());
-			map.put("no", question.getNo());
-			map.put("options", "");
-			
+			List<QuestionOption> questionOptionList = null;
 			if (question.getType() == 1 || question.getType() == 2) {
-				QuestionOption questionOption = questionOptionService.getQuestionOption(question.getId());
-				List<String> list = new ArrayList<String>();
-				if(ValidateUtil.isValid(questionOption.getOptionA())){
-					list.add(questionOption.getOptionA());
-				}
-				if(ValidateUtil.isValid(questionOption.getOptionB())){
-					list.add(questionOption.getOptionB());
-				}
-				if(ValidateUtil.isValid(questionOption.getOptionC())){
-					list.add(questionOption.getOptionC());
-				}
-				if(ValidateUtil.isValid(questionOption.getOptionD())){
-					list.add(questionOption.getOptionD());
-				}
-				if(ValidateUtil.isValid(questionOption.getOptionE())){
-					list.add(questionOption.getOptionE());
-				}
-				if(ValidateUtil.isValid(questionOption.getOptionF())){
-					list.add(questionOption.getOptionF());
-				}
-				if(ValidateUtil.isValid(questionOption.getOptionG())){
-					list.add(questionOption.getOptionG());
-				}
-				map.put("options", list);
+				questionOptionList = questionOptionService.getQuestionOptionList(question.getId());
 			}
-			return PageResultEx.ok().data(map);
+			return PageResultEx.ok()
+					.addAttr("id", question.getId())
+					.addAttr("type", question.getType())
+					.addAttr("difficulty", question.getDifficulty())
+					.addAttr("title", question.getTitle())
+					.addAttr("answer", question.getAnswer())
+					.addAttr("analysis", question.getAnalysis())
+					.addAttr("state", question.getState())
+					.addAttr("updateUserId", question.getUpdateUserId())
+					.addAttr("updateTime", question.getUpdateTime())
+					.addAttr("questionTypeId", question.getQuestionTypeId())
+					.addAttr("score", question.getScore())
+					.addAttr("scoreOptions", question.getScoreOptions())
+					.addAttr("ver", question.getVer())
+					.addAttr("srcId", question.getSrcId())
+					.addAttr("no", question.getNo())
+					.addAttr("options", questionOptionList == null ? null : questionOptionList);
 		} catch (MyException e) {
 			log.error("预览试题错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

@@ -405,19 +405,18 @@ public class ApiUserController extends BaseController {
 	public PageResult get(Integer id) {
 		try {
 			User entity = userService.getEntity(id);
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("name", entity.getName());
-			map.put("loginName", entity.getLoginName());
-			map.put("registTime", DateUtil.formatDateTime(entity.getRegistTime()));
-			map.put("lastLoginTime", DateUtil.formatDateTime(entity.getLastLoginTime()));
-			map.put("orgId", entity.getOrgId());
-			map.put("state", entity.getState());
-			map.put("orgName", "");
+			Org org = null;
 			if(entity.getOrgId() != null){
-				Org org = orgService.getEntity(entity.getOrgId());
-				map.put("orgName", org.getName());
+				org = orgService.getEntity(entity.getOrgId());
 			}
-			return PageResultEx.ok().data(map);
+			return PageResultEx.ok()
+					.addAttr("name", entity.getName())
+					.addAttr("loginName", entity.getLoginName())
+					.addAttr("registTime", DateUtil.formatDateTime(entity.getRegistTime()))
+					.addAttr("lastLoginTime", DateUtil.formatDateTime(entity.getLastLoginTime()))
+					.addAttr("orgId", entity.getOrgId())
+					.addAttr("state", entity.getState())
+					.addAttr("orgName", org == null ? null : org.getName());
 		} catch (MyException e) {
 			log.error("获取用户错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

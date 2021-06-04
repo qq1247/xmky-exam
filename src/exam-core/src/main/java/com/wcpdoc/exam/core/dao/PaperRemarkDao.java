@@ -1,7 +1,10 @@
 package com.wcpdoc.exam.core.dao;
 
+import java.util.List;
+
 import com.wcpdoc.exam.core.dao.RBaseDao;
 import com.wcpdoc.exam.core.entity.PaperRemark;
+
 
 /**
  * 试卷评语数据访问层接口
@@ -17,5 +20,5 @@ public interface PaperRemarkDao extends RBaseDao<PaperRemark> {
 	 * @param paperId
 	 * @return PaperRemark
 	 */
-	PaperRemark getPaperRemark(Integer paperId);
+	List<PaperRemark> getPaperRemarkList(Integer paperId);
 }

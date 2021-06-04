@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.core.service.impl;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
@@ -29,11 +31,22 @@ public class QuestionOptionServiceImpl extends BaseServiceImp<QuestionOption> im
 	public void delAndUpdate(Integer id) {
 		// 校验数据有效性
 		QuestionOption entity = getEntity(id);
-		update(entity);
+		del(entity);
 	}
 
 	@Override
-	public QuestionOption getQuestionOption(Integer questionId) {
-		return questionOptionDao.getQuestionOption(questionId);
+	public List<QuestionOption> getQuestionOptionList(Integer questionId) {
+		return questionOptionDao.getQuestionOptionList(questionId);
+	}
+	
+	@Override
+	public void removeQuestionOption(Integer questionId) {
+		List<QuestionOption> questionOption = questionOptionDao.getQuestionOptionList(questionId);
+		if(questionOption == null || questionOption.size() == 0 ){
+			return;
+		}
+		for(QuestionOption  questionOptionId :  questionOption){
+			del(questionOptionId.getId());
+		}
 	}
 }

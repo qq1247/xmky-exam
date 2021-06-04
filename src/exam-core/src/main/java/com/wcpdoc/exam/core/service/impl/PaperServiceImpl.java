@@ -313,7 +313,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 	
 	@Override
-	public void doOptionsUpdate(Integer paperQuestionId, Integer[] options) {
+	public void doOptionsUpdate(Integer paperQuestionId, Integer[] scoreOptions) {
 		// 校验数据有效性
 		if (paperQuestionId == null) {
 			throw new MyException("无法获取参数：paperQuestionId");
@@ -331,13 +331,13 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		PaperQuestion pq = paperQuestionService.getEntity(paperQuestionId);
 		Question question = questionService.getEntity(pq.getQuestionId());
 		if (question.getType() == 2) {
-			if (ValidateUtil.isValid(options) && StringUtil.join(options).contains("1")) {
+			if (ValidateUtil.isValid(scoreOptions) && StringUtil.join(scoreOptions).contains("1")) {
 				pq.setScoreOptions("1");
 			} else {
 				pq.setScoreOptions(null);
 			}
 		} else if (question.getType() == 3) {
-			pq.setScoreOptions(StringUtil.join(options));
+			pq.setScoreOptions(StringUtil.join(scoreOptions));
 		} else {
 			pq.setScoreOptions(null);
 		}
