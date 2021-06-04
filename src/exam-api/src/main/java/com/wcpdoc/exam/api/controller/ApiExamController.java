@@ -52,7 +52,7 @@ public class ApiExamController extends BaseController{
 	@RequestMapping("/userList")
 	@ResponseBody
 	@RequiresRoles("OP")
-	public PageResult userList(PageIn pageIn) {
+	public PageResult userListpage(PageIn pageIn) {
 		try {
 			return PageResultEx.ok().data(examService.getUserListpage(pageIn));
 		} catch (Exception e) {
@@ -70,7 +70,7 @@ public class ApiExamController extends BaseController{
 	@RequestMapping("/list")
 	@ResponseBody
 	@RequiresRoles("OP")
-	public PageResult list(PageIn pageIn) {
+	public PageResult listpage(PageIn pageIn) {
 		try {
 			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
 				pageIn.setTen(getCurUser().getId().toString());

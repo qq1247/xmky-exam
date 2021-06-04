@@ -46,9 +46,9 @@ public class ApiCronController extends BaseController {
 	 * @param pageIn
 	 * @return PageOut
 	 */
-	@RequestMapping("/list")
+	@RequestMapping("/listpage")
 	@ResponseBody
-	public PageResult list(PageIn pageIn, String name) {
+	public PageResult listpage(PageIn pageIn, String name) {
 		try {
 			if (ValidateUtil.isValid(name)) {
 				pageIn.setTwo(name);

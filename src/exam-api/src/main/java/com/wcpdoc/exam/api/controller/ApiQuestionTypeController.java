@@ -50,10 +50,10 @@ public class ApiQuestionTypeController extends BaseController {
 	 * 
 	 * @return pageOut
 	 */
-	@RequestMapping("/list")
+	@RequestMapping("/listpage")
 	@ResponseBody
 	@RequiresRoles("OP")
-	public PageResult list(PageIn pageIn, String name) {
+	public PageResult listpage(PageIn pageIn, String name) {
 		try {
 			if (ValidateUtil.isValid(name)) {
 				pageIn.setTwo(name);

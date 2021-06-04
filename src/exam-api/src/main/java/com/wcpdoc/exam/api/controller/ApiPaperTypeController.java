@@ -54,10 +54,10 @@ public class ApiPaperTypeController extends BaseController {
 	 * 
 	 * @return pageOut
 	 */
-	@RequestMapping("/list")
+	@RequestMapping("/listpage")
 	@ResponseBody
 	@RequiresRoles("OP")
-	public PageResult list(PageIn pageIn, String name, String userName) {
+	public PageResult listpage(PageIn pageIn, String name, String userName) {
 		try {
 			if (ValidateUtil.isValid(name)) {
 				pageIn.setTwo(name);

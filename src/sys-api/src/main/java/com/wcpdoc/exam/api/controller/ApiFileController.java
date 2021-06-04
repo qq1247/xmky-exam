@@ -45,9 +45,9 @@ public class ApiFileController extends BaseController {
 	 * 
 	 * @return pageOut
 	 */
-	@RequestMapping("/list")
+	@RequestMapping("/listpage")
 	@ResponseBody
-	public PageResult list(PageIn pageIn) {
+	public PageResult listpage(PageIn pageIn) {
 		try {
 			return PageResultEx.ok().data(fileService.getListpage(pageIn));
 		} catch (Exception e) {
