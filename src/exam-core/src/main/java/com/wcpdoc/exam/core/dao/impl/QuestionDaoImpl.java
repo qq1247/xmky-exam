@@ -66,13 +66,13 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 			partSql.append("OR QUESTION_TYPE.ORG_IDS LIKE ? ");
 			params.add("%," + user.getOrgId() + ",%");
 			
-			if (ValidateUtil.isValid(user.getPostIds())) {
+			/*if (ValidateUtil.isValid(user.getPostIds())) {
 				String[] postIds = user.getPostIds().substring(1, user.getPostIds().length() - 1).split(",");
 				for (String postId : postIds) {
 					partSql.append("OR QUESTION_TYPE.POST_IDS LIKE ? ");
 					params.add("%," + postId + ",%");
 				}
-			}
+			}*/
 			partSql.append(")");
 			
 			sqlUtil.addWhere(partSql.toString(), params.toArray(new Object[params.size()]));
@@ -81,7 +81,7 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), "QUESTION_TYPE", "TYPE", "QUESTION_DIFFICULTY", "DIFFICULTY", "STATE", "STATE");
 		for(Map<String, Object> map : pageOut.getRows()) {
-			String title = map.get("TITLE").toString();
+			String title = map.get("title").toString();
 			Document document = Jsoup.parse(title);
 			Elements embeds = document.getElementsByTag("video");
 			embeds.after("【视频】");
@@ -94,7 +94,7 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 			if(title.length() > 500) {
 				title = title.substring(0, 500) + "...";
 			}
-			map.put("TITLE", Jsoup.parse(title).text());
+			map.put("title", Jsoup.parse(title).text());
 		}
 		return pageOut;
 	}
