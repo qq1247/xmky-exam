@@ -72,7 +72,7 @@ public class ApiUserController extends BaseController {
 	 * @param pageIn
 	 * @return PageOut
 	 */
-	@RequestMapping("/list")
+	@RequestMapping("/listpage")
 	@ResponseBody
 	public PageResult listpage(PageIn pageIn, String name) {
 		try {

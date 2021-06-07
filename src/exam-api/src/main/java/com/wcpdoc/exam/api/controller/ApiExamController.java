@@ -67,7 +67,7 @@ public class ApiExamController extends BaseController{
 	 * v1.0 zhanghc 2018年10月25日下午9:23:06
 	 * @return pageOut
 	 */
-	@RequestMapping("/list")
+	@RequestMapping("/listpage")
 	@ResponseBody
 	@RequiresRoles("OP")
 	public PageResult listpage(PageIn pageIn) {

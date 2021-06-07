@@ -46,10 +46,10 @@ public class ApiExamTypeController extends BaseController {
 	 * 
 	 * @return pageOut
 	 */
-	@RequestMapping("/list")
+	@RequestMapping("/listpage")
 	@ResponseBody
 	@RequiresRoles("OP")
-	public PageResult list(PageIn pageIn) {
+	public PageResult listpage(PageIn pageIn) {
 		try {
 			return PageResultEx.ok().data(examTypeService.getListpage(pageIn));
 		} catch (Exception e) {
