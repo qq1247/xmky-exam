@@ -43,8 +43,13 @@
               <span data-title="权限" @click="paperRole">
                 <i class="common common-role"></i>
               </span>
-              <span data-title="更多" @click="paperMore">
+              <span>
                 <i class="common common-more-row"></i>
+                <div class="handler-more">
+                  <div>更多</div>
+                  <div>更多</div>
+                  <div>更多</div>
+                </div>
               </span>
             </div>
           </div>
@@ -459,6 +464,38 @@ export default {
       margin: 20px 10px 0 0;
       position: relative;
       transition: all 0.3s ease-in-out;
+      .handler-more {
+        background: #1e9fff;
+        width: 70px;
+        line-height: 30px;
+        color: #fff;
+        border-radius: 5px;
+        font-size: 12px;
+        position: absolute;
+        left: 60px;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0;
+        transition: all 0.3s ease-in-out;
+        &::before {
+          content: "";
+          display: block;
+          position: absolute;
+          z-index: 100;
+          left: -10px;
+          top: 50%;
+          transform: translateY(-50%);
+          border-width: 5px;
+          border-style: solid;
+          border-color: transparent #1e9fff transparent transparent;
+        }
+      }
+      &:last-child:hover {
+        .handler-more {
+          left: 50px;
+          opacity: 1;
+        }
+      }
       &:not(:last-child)::after {
         content: attr(data-title);
         display: block;
