@@ -185,6 +185,7 @@
                       class="children-content"
                       v-for="(child, index) in item.children"
                       :key="child.questionTypeId"
+                      :id="`p-${item.id}${index}`"
                     >
                       <p>{{ index + 1 }}、{{ child.title }}</p>
                       <div
@@ -253,7 +254,7 @@
               v-for="(child, index) in item.children"
               :key="child.questionTypeId"
             >
-              <span>{{ index }}</span>
+              <span @click="toHerf(item.id, index)">{{ index + 1 }}</span>
             </div>
           </div>
         </div>
@@ -444,10 +445,10 @@ export default {
   },
   methods: {
     goBack() {
-      this.$router.push("/")
+      this.$router.back()
     },
-    toHerf(index) {
-      document.querySelector(`#anchor-${index}`).scrollIntoView({
+    toHerf(id, index) {
+      document.querySelector(`#p-${id}${index}`).scrollIntoView({
         behavior: "smooth"
       })
     }

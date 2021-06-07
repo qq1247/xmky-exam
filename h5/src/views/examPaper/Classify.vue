@@ -50,7 +50,12 @@
           </div>
         </div>
       </div>
-      <el-pagination background layout="prev, pager, next" :total="1000">
+      <el-pagination
+        background
+        layout="prev, pager, next"
+        :total="1000"
+        class="exam-pagination"
+      >
       </el-pagination>
     </div>
     <el-dialog
@@ -385,11 +390,10 @@ export default {
 
 <style lang="scss" scoped>
 .search {
-  height: 80px;
-  padding: 0 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 20px 10px 0;
 }
 
 .content {
@@ -397,7 +401,6 @@ export default {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  padding: 0 20px;
   margin: 0 auto;
 }
 
@@ -412,7 +415,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .exam-content {
@@ -420,16 +423,15 @@ export default {
   flex-direction: column;
   align-items: center;
   width: 95%;
-  padding: 20px 50px;
-  border: 1px solid transparent;
+  padding: 20px 0;
   background: #fff;
   height: 200px;
   cursor: pointer;
-  transition: all 0.3s ease-in-out;
+  border-radius: 8px;
+  transition: all 0.3s ease;
   &:hover {
-    border-radius: 5px;
-    border: 1px solid #1e9fff;
-    box-shadow: 0 6px 10px 0 rgba(95, 101, 105, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 16px -10px rgba(95, 101, 105, 0.15);
   }
   .title {
     font-size: 16px;
@@ -439,7 +441,7 @@ export default {
   }
   .no-date {
     font-size: 14px;
-    color: #999;
+    color: #9199a1;
     margin-top: 10px;
     span:first-child {
       margin-right: 30px;
@@ -452,39 +454,54 @@ export default {
       height: 40px;
       line-height: 40px;
       border-radius: 50%;
-      border: 1px solid #d8d8d8;
+      border: 1px solid #9199a1;
       text-align: center;
       margin: 20px 10px 0 0;
       position: relative;
+      transition: all 0.3s ease-in-out;
+      &:not(:last-child)::after {
+        content: attr(data-title);
+        display: block;
+        position: absolute;
+        z-index: 100;
+        bottom: -30px;
+        transform: translateX(-50%);
+        left: 50%;
+        width: 70px;
+        height: 30px;
+        line-height: 30px;
+        background: #1e9fff;
+        color: #fff;
+        border-radius: 5px;
+        font-size: 13px;
+        opacity: 0;
+        transition: all 0.3s ease-in-out;
+      }
+      &:not(:last-child)::before {
+        content: "";
+        display: block;
+        position: absolute;
+        z-index: 100;
+        bottom: 0;
+        transform: translateX(-50%);
+        left: 50%;
+        border-width: 5px;
+        border-style: solid;
+        border-color: transparent transparent #1e9fff transparent;
+        opacity: 0;
+        transition: all 0.3s ease-in-out;
+      }
       &:hover {
         border: 1px solid #1e9fff;
         background: #1e9fff;
         color: #fff;
-        &::after {
-          content: attr(data-title);
-          display: block;
-          position: absolute;
-          z-index: 100;
-          top: -38px;
-          left: -15px;
-          width: 70px;
-          height: 30px;
-          line-height: 30px;
-          background: #1e9fff;
-          color: #fff;
-          border-radius: 5px;
-          font-size: 13px;
+        &:not(:last-child)::after {
+          bottom: -37px;
+          opacity: 1;
         }
-        &::before {
-          content: "";
-          display: block;
-          position: absolute;
-          z-index: 100;
-          top: -8px;
-          left: 15px;
-          border-width: 5px;
-          border-style: solid;
-          border-color: #1e9fff transparent transparent transparent;
+        &:not(:last-child)::before {
+          bottom: -8px;
+          opacity: 1;
         }
       }
     }
@@ -496,7 +513,7 @@ export default {
   justify-content: center;
   align-items: center;
   font-size: 14px;
-  color: #c8c8c8;
+  color: #9199a1;
   .common-exam-add {
     display: inline-block;
     width: 100px;
@@ -504,9 +521,9 @@ export default {
     line-height: 100px;
     text-align: center;
     border-radius: 50%;
-    border: 1px solid #c8c8c8;
+    border: 1px solid #9199a1;
     font-size: 45px;
-    color: #c8c8c8;
+    color: #9199a1;
     margin-bottom: 10px;
     transition: all 0.3s ease-in-out;
   }
@@ -518,6 +535,10 @@ export default {
       color: #fff;
     }
   }
+}
+
+.exam-pagination {
+  margin: 50px auto;
 }
 
 /deep/ .el-dialog__header {
@@ -535,7 +556,7 @@ export default {
   justify-content: center;
   align-items: center;
   position: relative;
-  border: 1px solid #d8d8d8;
+  border: 1px solid #9199a1;
   font-size: 14px;
   margin-right: 10px;
   cursor: pointer;

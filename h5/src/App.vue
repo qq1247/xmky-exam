@@ -4,7 +4,8 @@
       <div class="header-content">
         <div class="header-left">
           <router-link
-            :class="[nav.img ? 'header-logo' : 'header-link', 'active']"
+            exact
+            :class="[nav.img ? 'header-logo' : 'header-link']"
             v-for="nav in navList"
             :key="nav.title"
             :to="nav.to"
@@ -36,6 +37,10 @@ export default {
           img: require("../src/assets/logo.png")
         },
         {
+          content: "首页",
+          to: "/"
+        },
+        {
           content: "试题管理",
           to: "/examLibrary/classify"
         },
@@ -45,7 +50,7 @@ export default {
         },
         {
           content: "考试管理",
-          to: "/examLibrary/classify"
+          to: "/404"
         }
       ]
     }
@@ -69,7 +74,6 @@ export default {
 <style lang="scss">
 @import url(//at.alicdn.com/t/font_840312_oxzb360a4b9.css);
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   position: relative;
@@ -77,7 +81,7 @@ export default {
   flex-direction: column;
   width: 100%;
   min-height: 100%;
-  background: #fff;
+  background: #f4f5f7;
   color: #2c3e50;
   text-align: left;
 }

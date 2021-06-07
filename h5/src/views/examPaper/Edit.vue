@@ -512,18 +512,18 @@ export default {
   },
   methods: {
     goBack() {
-      this.$router.push("/404")
+      this.$router.back()
     },
     //初始化默认值
     async init() {
       this.query() //查询列表
 
-      let typeDictData = await this.$https.dictList({
+      let typeDictData = await this.$https.dictListpage({
         dictIndex: "QUESTION_TYPE"
       })
       this.queryForm.typeDictList = typeDictData.data.rows // 初始化类型下拉框
 
-      let difficultyDictData = await this.$https.dictList({
+      let difficultyDictData = await this.$https.dictListpage({
         dictIndex: "QUESTION_DIFFICULTY"
       })
       this.queryForm.difficultyDictList = difficultyDictData.data.rows // 初始化难度下拉框
@@ -543,7 +543,7 @@ export default {
     async query() {
       let {
         data: { rows, total }
-      } = await this.$https.questionList({
+      } = await this.$https.questionListPage({
         id: this.id,
         title: this.title,
         type: this.type,

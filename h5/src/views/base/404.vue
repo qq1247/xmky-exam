@@ -9,6 +9,7 @@
 .container {
   justify-content: center;
   align-items: center;
+  padding: 120px 0 70px;
   img {
     width: 350px;
     height: 250px;

@@ -2,19 +2,26 @@
   box-sizing: border-box;
 }
 
+::-webkit-scrollbar {
+  display: none;
+}
+
 html,
 body {
   height: 100%;
+  font: 14px/1.5 "PingFang SC", "微软雅黑", "Microsoft YaHei", Helvetica,
+    "Helvetica Neue", Tahoma, Arial, sans-serif;
 }
 
 .header {
   position: fixed;
   top: 0;
   width: 100%;
-  height: 60px;
+  height: 70px;
   z-index: 1000;
-  background: #fff;
-  box-shadow: 0 0 12px 2px rgba(0, 0, 0, 0.13);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  // box-shadow: 0 0 13px 3px rgba(0, 0, 0, 0.03);
 }
 
 .header-content {
@@ -32,43 +39,47 @@ body {
   .header-logo {
     width: 60px;
     text-decoration: none;
-    transition: all 0.3s ease;
     .logo-img {
       width: 30px;
       height: 30px;
     }
-    &:hover {
-      .logo-img {
-        transform: scale(1.2);
-      }
-    }
   }
   .header-link {
     width: 100px;
-    height: 60px;
-    line-height: 60px;
-    color: #6985ff;
+    line-height: 70px;
+    font-size: 16px;
+    color: #545c63;
     text-decoration: none;
     position: relative;
     text-align: center;
-    transition: all 0.3s ease;
     &::after {
       content: "";
       display: block;
       position: absolute;
-      width: 0;
-      height: 2px;
-      left: 25px;
-      background: #6985ff;
-      border-radius: 3px;
+      width: 20px;
+      height: 3px;
+      left: 50%;
+      bottom: 0;
       opacity: 0;
+      transform: translateX(-50%);
+      background: #1e9fff;
+      border-radius: 2px;
+      transition: all 0.3s ease-in-out;
     }
-    &:hover,
-    .active {
+    &:hover {
+      color: #07111b;
       &::after {
-        width: 50px;
+        bottom: 10px;
         opacity: 1;
       }
+    }
+  }
+
+  .router-link-active {
+    color: #07111b;
+    &::after {
+      bottom: 10px;
+      opacity: 1;
     }
   }
 }
@@ -78,7 +89,7 @@ body {
   line-height: 30px;
   color: #fff;
   font-size: 14px;
-  background: #6985ff;
+  background: #1e9fff;
   border-radius: 3px;
   text-align: center;
   text-decoration: none;
@@ -87,14 +98,15 @@ body {
 .main {
   width: 100%;
   flex: 1;
-  background: #f7f7f7;
+  height: 100%;
 }
 
 .container {
   width: 1200px;
   display: flex;
   flex-direction: column;
-  padding-top: 60px;
+  padding-top: 70px;
+  padding-bottom: 70px;
   margin: 0 auto;
 }
 
@@ -104,7 +116,7 @@ body {
   text-align: center;
   color: #fff;
   font-size: 12px;
-  background: #6985ff;
+  background: #2a2a44;
 }
 
 /* 清除浮动 */

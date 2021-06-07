@@ -90,21 +90,21 @@ export default {
 <style lang="scss" scoped>
 .container {
   width: 100%;
-  background: url(../../assets/img/login_bgs.jpg) no-repeat;
+  background: url(../../assets/img/login_bg.jpg) no-repeat;
   background-size: cover;
   justify-content: center;
   align-items: center;
+  padding-top: 120px;
 }
 .login-wrap {
   position: relative;
   width: 35%;
   height: auto;
   padding: 60px;
-  margin: 0 auto;
   box-sizing: border-box;
   background: #fff;
   border-radius: 3px;
-  box-shadow: 0 0 16px 3px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0 16px 3px rgba(0, 0, 0, 0.05);
   .login-title {
     color: #4a5768;
     font-size: 20px;
