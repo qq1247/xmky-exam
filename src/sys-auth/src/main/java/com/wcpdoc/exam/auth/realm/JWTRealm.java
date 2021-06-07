@@ -49,7 +49,8 @@ public class JWTRealm extends AuthorizingRealm {
 			throw new UnknownAccountException("账号密码错误");
 		}
 
-		List<String> roleList = shiroService.getRoleList(user.getId());
+		//获取角色
+		List<String> roleList = shiroService.getRoleList(user.getRoles());
 		SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
 		for (String role : roleList) {
 			simpleAuthorizationInfo.addRole(role);

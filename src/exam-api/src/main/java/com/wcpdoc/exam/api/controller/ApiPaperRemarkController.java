@@ -34,9 +34,9 @@ public class ApiPaperRemarkController extends BaseController {
 	 * v1.0 chenyun 2021-03-10 13:48:34
 	 * @return pageOut
 	 */
-	@RequestMapping("/list")
+	@RequestMapping("/listpage")
 	@ResponseBody
-	public PageResult list(PageIn pageIn) {
+	public PageResult listpage(PageIn pageIn) {
 		try {
 			return PageResultEx.ok().data(paperRemarkService.getListpage(pageIn));
 		} catch (Exception e) {
@@ -77,17 +77,9 @@ public class ApiPaperRemarkController extends BaseController {
 	public PageResult edit(PaperRemark paperRemark) {
 		try {
 			PaperRemark entity = paperRemarkService.getEntity(paperRemark.getId());
-			entity.setScoreA(paperRemark.getScoreA());
-			entity.setScoreARemark(paperRemark.getScoreARemark());
-			entity.setScoreB(paperRemark.getScoreB());
-			entity.setScoreBRemark(paperRemark.getScoreBRemark());
-			entity.setScoreC(paperRemark.getScoreC());
-			entity.setScoreCRemark(paperRemark.getScoreCRemark());
-			entity.setScoreD(paperRemark.getScoreD());
-			entity.setScoreDRemark(paperRemark.getScoreDRemark());
-			entity.setScoreE(paperRemark.getScoreE());
-			entity.setScoreERemark(paperRemark.getScoreERemark());
-			entity.setPaperId(paperRemark.getPaperId());
+			entity.setNo(paperRemark.getNo());
+			entity.setScore(paperRemark.getScore());
+			entity.setRemark(paperRemark.getRemark());
 			paperRemarkService.update(entity);
 			return PageResult.ok();
 		} catch (MyException e) {

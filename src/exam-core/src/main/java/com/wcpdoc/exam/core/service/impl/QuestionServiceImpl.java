@@ -143,34 +143,13 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 
 		// 添加选项
 		if (question.getType() == 1 || question.getType() == 2) {
+			for (int i = 0; i < options.length; i++) {
 			QuestionOption questionOption = new QuestionOption();
 			questionOption.setQuestionId(question.getId());
-			for (int i = 0; i < options.length; i++) {
-				switch (i) {
-				case 0:
-					questionOption.setOptionA(options[0]);
-					break;
-				case 1:
-					questionOption.setOptionB(options[1]);
-					break;
-				case 2:
-					questionOption.setOptionC(options[2]);
-					break;
-				case 3:
-					questionOption.setOptionD(options[3]);
-					break;
-				case 4:
-					questionOption.setOptionE(options[4]);
-					break;
-				case 5:
-					questionOption.setOptionF(options[5]);
-					break;
-				case 6:
-					questionOption.setOptionG(options[6]);
-					break;
-				}
-			}
+			questionOption.setOptions(options[i]);
+			questionOption.setNo(i+1);
 			questionOptionService.add(questionOption);
+			}
 		}
 
 		// 保存附件
@@ -203,37 +182,17 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			newQuestion.setVer(entity.getVer() + 1);
 			add(newQuestion);
 
-			if (options != null) {
-				QuestionOption questionOption = new QuestionOption();
-				questionOption.setQuestionId(question.getId());
-				for (int i = 0; i < options.length; i++) {
-					switch (i) {
-					case 0:
-						questionOption.setOptionA(options[0]);
-						break;
-					case 1:
-						questionOption.setOptionB(options[1]);
-						break;
-					case 2:
-						questionOption.setOptionC(options[2]);
-						break;
-					case 3:
-						questionOption.setOptionD(options[3]);
-						break;
-					case 4:
-						questionOption.setOptionE(options[4]);
-						break;
-					case 5:
-						questionOption.setOptionF(options[5]);
-						break;
-					case 6:
-						questionOption.setOptionG(options[6]);
-						break;
+			if (question.getType() == 1 || question.getType() == 2) {
+				questionOptionService.removeQuestionOption(entity.getId());
+					if (options != null) {
+						for (int i = 0; i < options.length; i++) {
+						QuestionOption questionOption = new QuestionOption();
+						questionOption.setQuestionId(entity.getId());
+						questionOption.setOptions(options[i]);
+						questionOption.setNo(i+1);
+						questionOptionService.add(questionOption);
+						}
 					}
-				}
-
-				// 保存选项
-				questionOptionService.add(questionOption);
 			}
 
 			saveFile(newQuestion);// 保存附件
@@ -256,35 +215,17 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		update(entity);
 
 		// 选择
-		if (entity.getType() == 1 || entity.getType() == 2) {
-			QuestionOption questionOption = questionOptionService.getQuestionOption(entity.getId());
-			for (int i = 0; i < options.length; i++) {
-				switch (i) {
-				case 0:
-					questionOption.setOptionA(options[0]);
-					break;
-				case 1:
-					questionOption.setOptionB(options[1]);
-					break;
-				case 2:
-					questionOption.setOptionC(options[2]);
-					break;
-				case 3:
-					questionOption.setOptionD(options[3]);
-					break;
-				case 4:
-					questionOption.setOptionE(options[4]);
-					break;
-				case 5:
-					questionOption.setOptionF(options[5]);
-					break;
-				case 6:
-					questionOption.setOptionG(options[6]);
-					break;
+		if (question.getType() == 1 || question.getType() == 2) {
+			questionOptionService.removeQuestionOption(entity.getId());
+				if (options != null) {
+					for (int i = 0; i < options.length; i++) {
+					QuestionOption questionOption = new QuestionOption();
+					questionOption.setQuestionId(entity.getId());
+					questionOption.setOptions(options[i]);
+					questionOption.setNo(i+1);
+					questionOptionService.add(questionOption);
+					}
 				}
-			}
-			// 保存选项
-			questionOptionService.update(questionOption);
 		}
 
 		// 保存附件

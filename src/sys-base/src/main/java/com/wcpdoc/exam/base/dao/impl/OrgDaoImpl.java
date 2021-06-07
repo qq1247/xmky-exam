@@ -25,7 +25,7 @@ public class OrgDaoImpl extends RBaseDaoImpl<Org> implements OrgDao {
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT ORG.ID, ORG.NAME, ORG.PARENT_ID, PARENT_ORG.NAME AS PARENT_NAME, "
-				+ "ORG.PARENT_SUB, ORG.NO " 
+				+ "ORG.PARENT_IDS, ORG.NO " 
 				+ "FROM SYS_ORG ORG "
 				+ "LEFT JOIN SYS_ORG PARENT_ORG ON ORG.PARENT_ID = PARENT_ORG.ID";
 		SqlUtil sqlUtil = new SqlUtil(sql);
@@ -39,7 +39,7 @@ public class OrgDaoImpl extends RBaseDaoImpl<Org> implements OrgDao {
 
 	@Override
 	public List<Map<String, Object>> getTreeList() {
-		String sql = "SELECT T.ID, T.NAME, T.PARENT_ID, T.PARENT_SUB FROM SYS_ORG T WHERE T.STATE = 1 ORDER BY T.NO ASC";
+		String sql = "SELECT T.ID, T.NAME, T.PARENT_ID, T.PARENT_IDS FROM SYS_ORG T WHERE T.STATE = 1 ORDER BY T.NO ASC";
 		return getMapList(sql);
 	}
 

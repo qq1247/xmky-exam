@@ -34,9 +34,9 @@ public class ApiPaperOptionController extends BaseController {
 	 * v1.0 chenyun 2021-03-10 13:47:35
 	 * @return pageOut
 	 */
-	@RequestMapping("/list")
+	@RequestMapping("/listpage")
 	@ResponseBody
-	public PageResult list(PageIn pageIn) {
+	public PageResult listpage(PageIn pageIn) {
 		try {
 			return PageResultEx.ok().data(paperOptionService.getListpage(pageIn));
 		} catch (Exception e) {

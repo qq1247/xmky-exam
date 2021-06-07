@@ -15,13 +15,10 @@ import org.springframework.stereotype.Service;
 
 import com.wcpdoc.exam.auth.cache.TokenCache;
 import com.wcpdoc.exam.auth.realm.JWTRealm;
+import com.wcpdoc.exam.base.cache.DictCache;
 import com.wcpdoc.exam.base.dao.UserDao;
-import com.wcpdoc.exam.base.entity.Post;
-import com.wcpdoc.exam.base.entity.Res;
+import com.wcpdoc.exam.base.entity.Dict;
 import com.wcpdoc.exam.base.entity.User;
-import com.wcpdoc.exam.base.service.OrgService;
-import com.wcpdoc.exam.base.service.PostService;
-import com.wcpdoc.exam.base.service.ResService;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.entity.PageOut;
@@ -41,12 +38,6 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	@Resource
 	private UserDao userDao;
 	@Resource
-	private OrgService orgService;
-	@Resource
-	private PostService postService;
-	@Resource
-	private ResService resService;
-	@Resource
 	private JWTRealm jwtRealm;
 
 	@Override
@@ -63,28 +54,6 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	@Override
 	public User getUser(String loginName) {
 		return userDao.getUser(loginName);
-	}
-
-	@Override
-	public Map<Integer, Long> getAuth(Integer id) {
-		User user = getEntity(id);
-		Map<Integer, Long> authMap = new HashMap<>();
-		if (!ValidateUtil.isValid(user.getPostIds())) {
-			return authMap;
-		}
-		
-		List<Post> postList = userDao.getPostList(id);
-		for (Post post : postList) {
-			List<Res> resList = postService.getResList(post.getId());
-			for (Res res : resList) {
-				if (authMap.get(res.getAuthPos()) == null) {
-					authMap.put(res.getAuthPos(), 0L);
-				}
-				
-				authMap.put(res.getAuthPos(), authMap.get(res.getAuthPos()) | res.getAuthCode());//或运算
-			}
-		}
-		return authMap;
 	}
 
 	@Override
@@ -149,12 +118,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	}
 
 	@Override
-	public List<Post> getPostList(Integer id) {
-		return userDao.getPostList(id);
-	}
-
-	@Override
-	public void postUpdate(Integer id, Integer[] postId) {
+	public void roleUpdate(Integer id, Integer[] roles) {
 		// 校验数据有效性
 		if (id == null) {
 			throw new MyException("参数错误：id");
@@ -164,22 +128,23 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 			throw new MyException("参数错误：id");
 		}
 		
-		List<Post> postList = postService.getList();
-		Set<Integer> postIdSet = new HashSet<Integer>();
-		for (Post post : postList) {
-			postIdSet.add(post.getId());
+		//数据字典查询
+		List<Dict> dictList = DictCache.getDictList("USER_ROLES");
+		Set<Integer> roleSet = new HashSet<Integer>();
+		for (Dict dict : dictList) {
+			roleSet.add(Integer.parseInt(dict.getDictKey()));
 		}
-		if (!postIdSet.containsAll(Arrays.asList(postId))) {
-			throw new MyException("参数错误：postId");
+		if (!roleSet.containsAll(Arrays.asList(roles))) {
+			throw new MyException("参数错误：role");
 		}
 		
 		// 更新岗位
-		user.setPostIds(String.format(",%s,", StringUtil.join(postId, ",")));
+		user.setRoles(String.format(",%s,", StringUtil.join(roles, ",")));
 		user.setUpdateTime(new Date());
 		user.setUpdateUserId(getCurUser().getId());
 		userDao.update(user);
-		
-		jwtRealm.getAuthorizationCache().clear(); //TODO jwtRealm.getAuthorizationCache().remove(user.getId())
+
+		jwtRealm.getAuthorizationCache().clear(); //jwtRealm.getAuthorizationCache().clear();  jwtRealm.getAuthorizationCache().remove(user.getId());
 	}
 	
 	public static void main(String[] args) {

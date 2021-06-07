@@ -38,9 +38,9 @@ public class ApiBulletinBoardController extends BaseController {
 	 * v1.0 chenyun 2021-03-24 13:39:37
 	 * @return pageOut
 	 */
-	@RequestMapping("/list")
+	@RequestMapping("/listpage")
 	@ResponseBody
-	public PageResult list(PageIn pageIn) {
+	public PageResult listpage(PageIn pageIn) {
 		try {
 			return PageResultEx.ok().data(bulletinBoardService.getListpage(pageIn));
 		} catch (Exception e) {

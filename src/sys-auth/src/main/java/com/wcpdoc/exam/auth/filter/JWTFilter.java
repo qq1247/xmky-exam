@@ -35,7 +35,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 	@Override
 	protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
 		if (!isLoginAttempt(request, response)) {
-			return true;
+			return false;
 		}
 
 		try {
@@ -144,7 +144,15 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 			httpResponse.setStatus(HttpStatus.OK.value());
 			return false;
 		}
-		return super.preHandle(request, response);
+		try {
+			return super.preHandle(request, response);
+		} catch (Exception e) {
+			httpResponse.setCharacterEncoding("UTF-8");
+			httpResponse.setContentType("application/json;charset=UTF-8");
+			httpResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
+			httpResponse.getWriter().write("{\"code\": 401, \"msg\": \""+e.getMessage()+"\"}");
+			return false;
+		}
 	}
 	
 }

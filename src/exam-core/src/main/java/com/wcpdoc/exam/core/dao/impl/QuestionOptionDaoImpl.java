@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.core.dao.impl;
 
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.exam.core.dao.QuestionOptionDao;
@@ -28,8 +30,8 @@ public class QuestionOptionDaoImpl extends RBaseDaoImpl<QuestionOption> implemen
 	}
 
 	@Override
-	public QuestionOption getQuestionOption(Integer questionId) {
-		String sql = "SELECT * FROM EXM_QUESTION_OPTION WHERE QUESTION_ID = ? ";
-		return getEntity(sql, new Object[]{questionId});
+	public List<QuestionOption> getQuestionOptionList(Integer questionId) {
+		String sql = "SELECT * FROM EXM_QUESTION_OPTION WHERE QUESTION_ID = ? ORDER BY NO ASC";
+		return getList(sql, new Object[]{questionId});
 	}
 }

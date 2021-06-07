@@ -2,12 +2,15 @@ package com.wcpdoc.exam.core.dao.impl;
 
 import java.lang.reflect.ParameterizedType;
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 
+import org.apache.commons.text.CaseUtils;
 import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
@@ -139,7 +142,13 @@ public abstract class RBaseDaoImpl<T> implements RBaseDao<T> {
 		query.setMaxResults(pageIn.getPageSize());
 		query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
 		List<Map<String, Object>> result = query.list();
-
+		for(Map<String, Object> map : result){
+			Set<String> keySet = new HashSet<>(map.keySet()); 
+			for (String key : keySet) {
+				map.put(CaseUtils.toCamelCase(key, false, new char[]{'_'}), map.remove(key)); 
+			}
+		}
+		
 		// 查询总记录数
 		sql = toHibernateSql(sqlUtil.getCountSql());
 		query = getCurSession().createSQLQuery(sql);

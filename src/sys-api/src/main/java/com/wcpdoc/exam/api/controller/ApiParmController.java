@@ -36,9 +36,9 @@ public class ApiParmController extends BaseController {
 	 * v1.0 chenyun 2021-03-04 15:02:18
 	 * @return pageOut
 	 */
-	@RequestMapping("/list")
+	@RequestMapping("/listpage")
 	@ResponseBody
-	public PageResult list(PageIn pageIn) {
+	public PageResult listpage(PageIn pageIn) {
 		try {
 			return PageResultEx.ok().data(parmService.getListpage(pageIn));
 		} catch (Exception e) {

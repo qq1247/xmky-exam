@@ -19,7 +19,9 @@ import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.ExamTypeService;
+import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
+import com.wcpdoc.exam.file.service.FileService;
 
 /**
  * 考试分类控制层
@@ -35,24 +37,8 @@ public class ApiExamTypeController extends BaseController {
 	private ExamTypeService examTypeService;
 	@Resource
 	private OrgService orgService;
-	
-	/**
-	 * 试题分类树
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * 
-	 * @return List<Map<String,Object>>
-	 */
-	@RequestMapping("/treeList")
-	@ResponseBody
-	@RequiresRoles("OP")
-	public PageResult treeList() {
-		try {
-			return PageResultEx.ok().data(examTypeService.getTreeList());
-		} catch (Exception e) {
-			log.error("试题分类树错误：", e);
-			return PageResult.err();
-		}
-	}
+	@Resource
+	private FileService fileService;
 	
 	/**
 	 * 试题分类列表 
@@ -60,10 +46,10 @@ public class ApiExamTypeController extends BaseController {
 	 * 
 	 * @return pageOut
 	 */
-	@RequestMapping("/list")
+	@RequestMapping("/listpage")
 	@ResponseBody
 	@RequiresRoles("OP")
-	public PageResult list(PageIn pageIn) {
+	public PageResult listpage(PageIn pageIn) {
 		try {
 			return PageResultEx.ok().data(examTypeService.getListpage(pageIn));
 		} catch (Exception e) {
@@ -95,6 +81,36 @@ public class ApiExamTypeController extends BaseController {
 	}
 	
 	/**
+	 * 获取试题分类
+	 * v1.0 zhanghc 2016-5-24下午14:54:09
+	 * 
+	 * @return pageOut
+	 */
+	@RequestMapping("/get")
+	@ResponseBody
+	@RequiresRoles("OP")
+	public PageResult get(Integer id) {
+		try {
+			ExamType entity = examTypeService.getEntity(id);
+			return PageResultEx.ok()
+					.addAttr("id", entity.getId())
+					.addAttr("name", entity.getName())
+					.addAttr("imgId", entity.getImgId())
+					.addAttr("createUserId", entity.getCreateUserId())
+					.addAttr("createTime", DateUtil.formatDateTime(entity.getCreateTime()))
+					.addAttr("rwState", entity.getRwState())
+					.addAttr("readUserIds", entity.getReadUserIds())
+					.addAttr("writeUserIds", entity.getWriteUserIds());
+		} catch (MyException e) {
+			log.error("获取试题分类错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("获取试题分类错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
 	 * 完成修改试题分类
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
@@ -116,10 +132,13 @@ public class ApiExamTypeController extends BaseController {
 			//修改试题分类
 			ExamType entity = examTypeService.getEntity(examType.getId());
 			entity.setName(examType.getName());
+			entity.setImgId(examType.getImgId());
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
-			entity.setNo(examType.getNo());
 			examTypeService.update(entity);
+			
+			//保存图片
+			fileService.doUpload(examType.getImgId());
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成修改试题分类错误：{}", e.getMessage());
@@ -153,86 +172,6 @@ public class ApiExamTypeController extends BaseController {
 	}
 	
 	/**
-	 * 移动试题分类
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * @param sourceId
-	 * @param targetId
-	 * @return PageResult
-	 */
-	@RequestMapping("/move")
-	@ResponseBody
-	@RequiresRoles("OP")
-	public PageResult move(Integer sourceId, Integer targetId) {
-		try {
-			examTypeService.doMove(sourceId, targetId);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("完成移动试题分类错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("完成移动试题分类错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 权限用户列表 
-	 * 
-	 * v1.0 zhanghc 2017年6月16日下午5:02:45
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	@RequestMapping("/authUserList")
-	@ResponseBody
-	@RequiresRoles("OP")
-	public PageResult authUserList(PageIn pageIn) {
-		try {
-			return PageResultEx.ok().data(examTypeService.getAuthUserListpage(pageIn));
-		} catch (Exception e) {
-			log.error("权限用户列表错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 权限岗位列表 
-	 * 
-	 * v1.0 zhanghc 2017年6月16日下午5:02:45
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	@RequestMapping("/authPostList")
-	@ResponseBody
-	@RequiresRoles("OP")
-	public PageResult authPostList(PageIn pageIn) {
-		try {
-			return PageResultEx.ok().data(examTypeService.getAuthPostListpage(pageIn));
-		} catch (Exception e) {
-			log.error("权限岗位列表错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 权限机构列表 
-	 * 
-	 * v1.0 zhanghc 2017年6月16日下午5:02:45
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	@RequestMapping("/authOrgList")
-	@ResponseBody
-	@RequiresRoles("OP")
-	public PageResult authOrgList(PageIn pageIn) {
-		try {
-			return PageResultEx.ok().data(examTypeService.getAuthOrgListpage(pageIn));
-		} catch (Exception e) {
-			log.error("权限机构列表错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
 	 * 完成添加权限
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
@@ -246,9 +185,9 @@ public class ApiExamTypeController extends BaseController {
 	@RequestMapping("/auth")
 	@ResponseBody
 	@RequiresRoles("OP")
-	public PageResult auth(Integer id, Integer[] userIds, Integer[] postIds, Integer[] orgIds, boolean syn2Sub) {
+	public PageResult auth(Integer id, String readUserIds, String writeUserIds, boolean rwState) {
 		try {
-			examTypeService.doAuth(id, userIds, postIds, orgIds, syn2Sub);
+			examTypeService.doAuth(id, readUserIds, writeUserIds, rwState);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成添加权限用户错误：{}", e.getMessage());

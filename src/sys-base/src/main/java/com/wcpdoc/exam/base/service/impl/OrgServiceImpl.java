@@ -61,8 +61,8 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 		
 		// 更新父子关系
 		Org parentOrg = orgDao.getEntity(org.getParentId());
-		org.setParentSub(parentOrg.getParentSub() + org.getId() + "_");
-		org.setLevel(org.getParentSub().split("_").length - 1);
+		org.setParentIds(parentOrg.getParentIds() + org.getId() + "_");
+		org.setLevel(org.getParentIds().split("_").length - 1);
 		update(org);
 	}
 
@@ -108,14 +108,14 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 		Org source = getEntity(sourceId);
 		Org target = getEntity(targetId);
 		
-		if (target.getParentSub().contains(source.getParentSub())) {
+		if (target.getParentIds().contains(source.getParentIds())) {
 			throw new MyException("父组织机构不能移动到子组织机构下！");
 		}
 
 		// 移动组织机构
 		source.setParentId(target.getId());
-		source.setParentSub(String.format("%s%s_", target.getParentSub(), source.getId()));
-		source.setLevel(source.getParentSub().split("_").length - 1);
+		source.setParentIds(String.format("%s%s_", target.getParentIds(), source.getId()));
+		source.setLevel(source.getParentIds().split("_").length - 1);
 		update(source);
 		
 		List<Org> subSourceList = orgDao.getList(source.getId());
@@ -125,8 +125,8 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 	private void doMove(Org target, List<Org> subTargetList) {
 		for (Org subTarget : subTargetList) {
 			subTarget.setParentId(target.getId());
-			subTarget.setParentSub(String.format("%s%s_", target.getParentSub(), subTarget.getId()));
-			subTarget.setLevel(subTarget.getParentSub().split("_").length - 1);
+			subTarget.setParentIds(String.format("%s%s_", target.getParentIds(), subTarget.getId()));
+			subTarget.setLevel(subTarget.getParentIds().split("_").length - 1);
 			update(subTarget);
 			
 			List<Org> subSubTargetList = orgDao.getList(subTarget.getId());
@@ -211,8 +211,8 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 		
 		// 更新父子关系
 		Org parentOrg = orgDao.getEntity(org.getParentId());
-		org.setParentSub(parentOrg.getParentSub() + org.getId() + "_");
-		org.setLevel(org.getParentSub().split("_").length - 1);
+		org.setParentIds(parentOrg.getParentIds() + org.getId() + "_");
+		org.setLevel(org.getParentIds().split("_").length - 1);
 		update(org);
 		
 		return org.getId();

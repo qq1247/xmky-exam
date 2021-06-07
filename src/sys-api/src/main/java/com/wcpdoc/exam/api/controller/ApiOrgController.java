@@ -65,9 +65,9 @@ public class ApiOrgController extends BaseController {
 	 * @param pageIn
 	 * @return PageOut
 	 */
-	@RequestMapping("/list")
+	@RequestMapping("/listpage")
 	@ResponseBody
-	public PageResult list(PageIn pageIn, Integer parentId, String name) {
+	public PageResult listpage(PageIn pageIn, Integer parentId, String name) {
 		try {
 			if(ValidateUtil.isValid(name)){
 				pageIn.setTwo(name);

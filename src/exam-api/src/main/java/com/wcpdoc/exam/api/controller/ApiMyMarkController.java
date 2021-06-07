@@ -73,9 +73,9 @@ public class ApiMyMarkController extends BaseController {
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @return pageOut
 	 */
-	@RequestMapping("/list")
+	@RequestMapping("/listpage")
 	@ResponseBody
-	public PageResult list(PageIn pageIn) {
+	public PageResult listpage(PageIn pageIn) {
 		try {
 			pageIn.setTen(getCurUser().getId().toString());
 			pageIn.setFour("1");

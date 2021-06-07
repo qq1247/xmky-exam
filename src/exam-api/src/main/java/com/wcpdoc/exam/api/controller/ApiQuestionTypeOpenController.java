@@ -38,10 +38,10 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	 * v1.0 chenyun 2021-03-02 13:43:21
 	 * @return pageOut
 	 */
-	@RequestMapping("/list")
+	@RequestMapping("/listpage")
 	@ResponseBody
 	@RequiresRoles("OP")
-	public PageResult list(PageIn pageIn) {
+	public PageResult listpage(PageIn pageIn) {
 		try {
 			return PageResultEx.ok().data(questionTypeOpenService.getListpage(pageIn));
 		} catch (Exception e) {

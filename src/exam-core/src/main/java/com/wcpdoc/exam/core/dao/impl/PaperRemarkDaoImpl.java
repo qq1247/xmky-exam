@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.core.dao.impl;
 
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.exam.core.dao.PaperRemarkDao;
@@ -8,6 +10,7 @@ import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PaperRemark;
 import com.wcpdoc.exam.core.util.SqlUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
+
 
 /**
  * 试卷评语数据访问层实现
@@ -27,8 +30,8 @@ public class PaperRemarkDaoImpl extends RBaseDaoImpl<PaperRemark> implements Pap
 	}
 
 	@Override
-	public PaperRemark getPaperRemark(Integer paperId) {
-		String sql = "SELECT * FROM EXM_PAPER_REMARK WHERE PAPER_ID = ? ";
-		return getEntity(sql, new Object[]{ paperId });
+	public List<PaperRemark> getPaperRemarkList(Integer paperId) {
+		String sql = "SELECT * FROM EXM_PAPER_REMARK WHERE PAPER_ID = ? AND ORDER BY NO ACS";
+		return getList(sql, new Object[]{ paperId });
 	}
 }

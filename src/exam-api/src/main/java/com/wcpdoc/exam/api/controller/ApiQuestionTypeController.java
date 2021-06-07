@@ -1,7 +1,6 @@
 package com.wcpdoc.exam.api.controller;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,10 +50,10 @@ public class ApiQuestionTypeController extends BaseController {
 	 * 
 	 * @return pageOut
 	 */
-	@RequestMapping("/list")
+	@RequestMapping("/listpage")
 	@ResponseBody
 	@RequiresRoles("OP")
-	public PageResult list(PageIn pageIn, String name) {
+	public PageResult listpage(PageIn pageIn, String name) {
 		try {
 			if (ValidateUtil.isValid(name)) {
 				pageIn.setTwo(name);
@@ -113,16 +112,15 @@ public class ApiQuestionTypeController extends BaseController {
 	public PageResult get(Integer id) {
 		try {
 			QuestionType entity = questionTypeService.getEntity(id);
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("id", entity.getId());
-			map.put("name", entity.getName());
-			map.put("imgId", entity.getImgId());
-			map.put("createUserId", entity.getCreateUserId());
-			map.put("createTime", DateUtil.formatDateTime(entity.getCreateTime()));
-			map.put("rwState", entity.getRwState());
-			map.put("readUserIds", entity.getReadUserIds());
-			map.put("writeUserIds", entity.getWriteUserIds());
-			return PageResultEx.ok().data(map);
+			return PageResultEx.ok()
+					.addAttr("id", entity.getId())
+					.addAttr("name", entity.getName())
+					.addAttr("imgId", entity.getImgId())
+					.addAttr("createUserId", entity.getCreateUserId())
+					.addAttr("createTime", DateUtil.formatDateTime(entity.getCreateTime()))
+					.addAttr("rwState", entity.getRwState())
+					.addAttr("readUserIds", entity.getReadUserIds())
+					.addAttr("writeUserIds", entity.getWriteUserIds());
 		} catch (MyException e) {
 			log.error("获取试题分类错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
