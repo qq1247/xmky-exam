@@ -221,7 +221,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/roleUpdate")
 	@ResponseBody
-	public PageResult postUpdate(Integer id, Integer[] roles) {
+	public PageResult roleUpdate(Integer id, Integer[] roles) {
 		try {
 			userService.roleUpdate(id, roles);
 			return PageResult.ok();

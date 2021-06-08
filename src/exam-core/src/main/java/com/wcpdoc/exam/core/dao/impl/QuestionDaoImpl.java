@@ -1,6 +1,5 @@
 package com.wcpdoc.exam.core.dao.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.exam.base.cache.DictCache;
 import com.wcpdoc.exam.base.dao.UserDao;
-import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.core.dao.QuestionDao;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
@@ -55,28 +53,28 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 				.addWhere("QUESTION.STATE != ?", 0)
 				.addOrder("QUESTION.NO", Order.DESC);
 		
-		if (ValidateUtil.isValid(pageIn.getTen())) {
-			User user = userDao.getEntity(Integer.parseInt(pageIn.getTen()));
-			StringBuilder partSql = new StringBuilder();
-			List<Object> params = new ArrayList<>();
-			partSql.append("(");
-			partSql.append("QUESTION_TYPE.USER_IDS LIKE ? ");
-			params.add("%," + user.getId() + ",%");
-			
-			partSql.append("OR QUESTION_TYPE.ORG_IDS LIKE ? ");
-			params.add("%," + user.getOrgId() + ",%");
-			
-			/*if (ValidateUtil.isValid(user.getPostIds())) {
-				String[] postIds = user.getPostIds().substring(1, user.getPostIds().length() - 1).split(",");
-				for (String postId : postIds) {
-					partSql.append("OR QUESTION_TYPE.POST_IDS LIKE ? ");
-					params.add("%," + postId + ",%");
-				}
-			}*/
-			partSql.append(")");
-			
-			sqlUtil.addWhere(partSql.toString(), params.toArray(new Object[params.size()]));
-		}
+//		if (ValidateUtil.isValid(pageIn.getTen())) {
+//			User user = userDao.getEntity(Integer.parseInt(pageIn.getTen()));
+//			StringBuilder partSql = new StringBuilder();
+//			List<Object> params = new ArrayList<>();
+//			partSql.append("(");
+//			partSql.append("QUESTION_TYPE.USER_IDS LIKE ? ");
+//			params.add("%," + user.getId() + ",%");
+//			
+//			partSql.append("OR QUESTION_TYPE.ORG_IDS LIKE ? ");
+//			params.add("%," + user.getOrgId() + ",%");
+//			
+//			/*if (ValidateUtil.isValid(user.getPostIds())) {
+//				String[] postIds = user.getPostIds().substring(1, user.getPostIds().length() - 1).split(",");
+//				for (String postId : postIds) {
+//					partSql.append("OR QUESTION_TYPE.POST_IDS LIKE ? ");
+//					params.add("%," + postId + ",%");
+//				}
+//			}*/
+//			partSql.append(")");
+//			
+//			sqlUtil.addWhere(partSql.toString(), params.toArray(new Object[params.size()]));
+//		}
 		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), "QUESTION_TYPE", "TYPE", "QUESTION_DIFFICULTY", "DIFFICULTY", "STATE", "STATE");

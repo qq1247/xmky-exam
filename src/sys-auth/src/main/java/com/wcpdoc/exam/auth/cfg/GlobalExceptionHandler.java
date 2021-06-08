@@ -43,7 +43,7 @@ public class GlobalExceptionHandler {
 			return PageResult.err().code(401).msg("未登陆");
 		}
 
-		log.error("shiro未捕获异常：{}", se.getMessage());
+		log.error("未捕获异常：{}", se.getMessage());
 		return PageResult.err().code(401);
 	}
 }

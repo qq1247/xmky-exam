@@ -26,7 +26,7 @@ public class TokenCache extends BaseEhCache {
 		Cache cache = getCache(CACHE_NAME);
 		cache.put(key, value);
 //		net.sf.ehcache.Cache nativeCache = (net.sf.ehcache.Cache) cache.getNativeCache();
-//		nativeCache.flush();
+//		nativeCache.flush(); //spring包装后，实现了flush
 	}
 	
 	/**
