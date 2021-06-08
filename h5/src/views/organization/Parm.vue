@@ -8,22 +8,10 @@
           class="form-inline"
           ref="queryForm"
         >
-          <el-form-item label prop="dictIndex">
+          <el-form-item label prop="orgName">
             <el-input
-              placeholder="请输入索引"
-              v-model="queryForm.dictIndex"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label prop="dictKey">
-            <el-input
-              placeholder="请输入键"
-              v-model="queryForm.dictKey"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label prop="dictValue">
-            <el-input
-              placeholder="请输入值"
-              v-model="queryForm.dictValue"
+              placeholder="请输入单位名称"
+              v-model="queryForm.orgName"
             ></el-input>
           </el-form-item>
           <el-form-item style="width: 200px">
@@ -44,24 +32,39 @@
       </div>
       <div class="table">
         <el-table :data="listpage.list" style="width: 100%">
-          <el-table-column label="索引">
+          <el-table-column label="邮件主机">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.dictIndex }}</span>
+              <span style="margin-left: 10px">{{ scope.row.emailHost }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="键">
+          <el-table-column label="邮件用户名">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.dictKey }}</span>
+              <span style="margin-left: 10px">{{ scope.row.emailUserName }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="值">
+          <el-table-column label="邮件密码">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.dictValue }}</span>
+              <span style="margin-left: 10px">{{ scope.row.emailPwd }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="排序">
+          <el-table-column label="邮件协议">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.no }}</span>
+              <span style="margin-left: 10px">{{ scope.row.emailProtocol }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="邮件编码">
+            <template slot-scope="scope">
+              <span style="margin-left: 10px">{{ scope.row.emailEncode }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="单位商标">
+            <template slot-scope="scope">
+              <span style="margin-left: 10px">{{ scope.row.orgLogo }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="单位名称">
+            <template slot-scope="scope">
+              <span style="margin-left: 10px">{{ scope.row.orgName }}</span>
             </template>
           </el-table-column>
           <el-table-column label="操作">
@@ -84,32 +87,49 @@
         layout="total, sizes, prev, pager, next, jumper"
       ></el-pagination>
     </div>
-    <el-dialog :visible.sync="editForm.show" title="数据字典">
+    <el-dialog :visible.sync="editForm.show" title="参数">
       <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
-        <el-form-item label="索引" label-width="120px" prop="dictIndex">
+        <el-form-item label="邮件主机" label-width="120px" prop="emailHost">
           <el-input
-            placeholder="请输入索引"
-            v-model="editForm.dictIndex"
+            placeholder="请输入邮件主机"
+            v-model="editForm.emailHost"
           ></el-input>
         </el-form-item>
-        <el-form-item label="键" label-width="120px" prop="dictKey">
+        <el-form-item label="邮件用户名" label-width="120px" prop="emailUserName">
           <el-input
-            placeholder="请输入键"
-            v-model="editForm.dictKey"
+            placeholder="请输入邮件用户名"
+            v-model="editForm.emailUserName"
           ></el-input>
         </el-form-item>
-        <el-form-item label="值" label-width="120px" prop="dictValue">
+        <el-form-item label="邮件密码" label-width="120px" prop="emailPwd">
           <el-input
-            placeholder="请输入值"
-            v-model="editForm.dictValue"
+            placeholder="请输入邮件密码"
+            v-model="editForm.emailPwd"
           ></el-input>
         </el-form-item>
-        <el-form-item label="排序" label-width="120px" prop="no">
-          <el-input-number
-            :max="100"
-            :min="1"
-            v-model.number="editForm.no"
-          ></el-input-number>
+        <el-form-item label="邮件协议" label-width="120px" prop="emailProtocol">
+          <el-input
+            placeholder="请输入邮件协议"
+            v-model="editForm.emailProtocol"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="邮件编码" label-width="120px" prop="emailEncode">
+          <el-input
+            placeholder="请输入邮件编码"
+            v-model="editForm.emailEncode"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="单位商标" label-width="120px" prop="orgLogo">
+          <el-input
+            placeholder="请输入单位商标"
+            v-model="editForm.orgLogo"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="单位名称" label-width="120px" prop="orgName">
+          <el-input
+            placeholder="请输入单位名称"
+            v-model="editForm.orgName"
+          ></el-input>
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
@@ -139,30 +159,28 @@ export default {
       },
       queryForm: {
         //查询表单
-        dictIndex: null,
-        dictKey: null,
-        dictValue: null
+        emailHost: null,
+				emailEncode: null,
+				emailUserName: null,
+				emailPwd: null,
+				emailProtocol: null,
+				orgLogo: null,
+				orgName: null
       },
       editForm: {
         //修改表单
         id: null, //主键
-        dictIndex: null, //索引
-        dictKey: null, //key
-        dictValue: null, //值
-        no: null, //排序
+        emailHost: null,
+				emailEncode: null,
+				emailUserName: null,
+				emailPwd: null,
+				emailProtocol: null,
+				orgLogo: null,
+				orgName: null,
         show: false, // 是否显示页面
         rules: {
           //校验
-          dictIndex: [
-            { required: true, message: "请输入排序", trigger: "change" }
-          ],
-          dictKey: [
-            { required: true, message: "请输入排序", trigger: "change" }
-          ],
-          dictValue: [
-            { required: true, message: "请输入排序", trigger: "change" }
-          ],
-          no: [{ required: true, message: "请输入排序", trigger: "change" }]
+          orgName: [{ required: true, message: "请输入排序", trigger: "change" }]
         }
       }
     }
@@ -175,10 +193,8 @@ export default {
     async query() {
       let {
         data: { rows, total }
-      } = await this.$https.dictListpage({
-        dictIndex: this.queryForm.dictIndex,
-        dictKey: this.queryForm.dictKey,
-        dictValue: this.queryForm.dictValue,
+      } = await this.$https.parmListpage({
+        orgName: this.queryForm.orgName,
         curPage: this.listpage.curPage,
         pageSize: this.listpage.pageSize
       })
@@ -209,11 +225,14 @@ export default {
           return false
         }
 
-        let { code, msg } = await this.$https.dictAdd({
-          dictIndex: this.editForm.dictIndex,
-          dictKey: this.editForm.dictKey,
-          dictValue: this.editForm.dictValue,
-          no: this.editForm.no
+        let { code, msg } = await this.$https.parmAdd({
+          emailHost: this.editForm.emailHost,
+          emailEncode: this.editForm.emailEncode,
+          emailUserName: this.editForm.emailUserName,
+          emailPwd: this.editForm.emailPwd,
+          emailProtocol: this.editForm.emailProtocol,
+          orgLogo: this.editForm.orgLogo,
+          orgName: this.editForm.orgName
         })
         if (code != 200) {
           alert(msg)
@@ -230,12 +249,15 @@ export default {
           return false
         }
 
-        let { code, msg } = await this.$https.dictEdit({
+        let { code, msg } = await this.$https.parmEdit({
           id: this.editForm.id,
-          dictIndex: this.editForm.dictIndex,
-          dictKey: this.editForm.dictKey,
-          dictValue: this.editForm.dictValue,
-          no: this.editForm.no
+          emailHost: this.editForm.emailHost,
+          emailEncode: this.editForm.emailEncode,
+          emailUserName: this.editForm.emailUserName,
+          emailPwd: this.editForm.emailPwd,
+          emailProtocol: this.editForm.emailProtocol,
+          orgLogo: this.editForm.orgLogo,
+          orgName: this.editForm.orgName
         })
         if (code != 200) {
           alert(msg)
@@ -246,9 +268,9 @@ export default {
         this.query()
       })
     },
-    // 获取试题
+    // 获取参数
     async get(id) {
-      let res = await this.$https.dictGet({ id: id })
+      let res = await this.$https.parmGet({ id: id })
       if (res.code != 200) {
         alert(res.msg)
         return
@@ -256,10 +278,13 @@ export default {
 
       this.editForm.show = true
       this.editForm.id = res.data.id
-      this.editForm.dictIndex = res.data.dictIndex
-      this.editForm.dictKey = res.data.dictKey
-      this.editForm.dictValue = res.data.dictValue
-      this.editForm.no = res.data.no
+      this.editForm.emailHost = res.data.emailHost
+      this.editForm.emailEncode = res.data.emailEncode
+      this.editForm.emailUserName = res.data.emailUserName
+      this.editForm.emailPwd = res.data.emailPwd
+      this.editForm.emailProtocol = res.data.emailProtocol
+      this.editForm.orgLogo = res.data.orgLogo
+      this.editForm.orgName = res.data.orgName
     },
     // 删除
     async del(id) {
@@ -268,7 +293,7 @@ export default {
         cancelButtonText: "取消",
         type: "warning"
       }).then(async () => {
-        let res = await this.$https.dictDel({ id })
+        let res = await this.$https.parmDel({ id })
         if (res.code != 200) {
           this.$message({
             type: "error",

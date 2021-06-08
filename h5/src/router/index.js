@@ -37,9 +37,24 @@ const routes = [
     component: () => import("../views/organization/Dict.vue")
   },
   {
+    path: "/organization/cron",
+    name: "Cron",
+    component: () => import("../views/organization/Cron.vue")
+  },
+  {
+    path: "/organization/user",
+    name: "User",
+    component: () => import("../views/organization/User.vue")
+  },
+  {
     path: "/organization/org",
     name: "Org",
     component: () => import("../views/organization/Org.vue")
+  },
+  {
+    path: "/organization/parm",
+    name: "Parm",
+    component: () => import("../views/organization/Parm.vue")
   },
   {
     path: "/examLibrary/classify",
