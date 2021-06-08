@@ -7,7 +7,11 @@ import com.wcpdoc.exam.base.entity.Parm;
 import com.wcpdoc.exam.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
+import com.wcpdoc.exam.core.util.DateUtil;
+import com.wcpdoc.exam.core.util.HibernateUtil;
 import com.wcpdoc.exam.core.util.SqlUtil;
+import com.wcpdoc.exam.core.util.ValidateUtil;
+import com.wcpdoc.exam.core.util.SqlUtil.Order;
 
 /**
  * 参数数据访问层实现
@@ -22,7 +26,10 @@ public class ParmDaoImpl extends RBaseDaoImpl<Parm> implements ParmDao {
 		String sql = "SELECT * "
 				+ "FROM SYS_PARM PARM";
 		SqlUtil sqlUtil = new SqlUtil(sql);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "PARM.ORG_NAME LIKE ?", "%" + pageIn.getTwo() + "%")
+			   .addOrder("PARM.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
+		HibernateUtil.formatDate(pageOut.getRows(), "UPDATE_TIME", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;
 	}
 

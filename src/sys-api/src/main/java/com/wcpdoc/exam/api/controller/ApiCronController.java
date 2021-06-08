@@ -57,19 +57,19 @@ public class ApiCronController extends BaseController {
 			PageOut pageOut = cronService.getListpage(pageIn);
 			List<Map<String, Object>> list = pageOut.getRows();
 			for (Map<String, Object> map : list) {
-				if ("1".equals(map.get("STATE").toString())) {
-					map.put("STATE_NAME", "启动");
-				} else if ("2".equals(map.get("STATE").toString())) {
-					map.put("STATE_NAME", "停止");
+				if ("1".equals(map.get("state").toString())) {
+					map.put("stateName", "启动");
+				} else if ("2".equals(map.get("state").toString())) {
+					map.put("stateName", "停止");
 				}
 				
-				String cron = map.get("CRON").toString();
+				String cron = map.get("cron").toString();
 				List<Date> timeList = QuartzUtil.getRecentTriggerTime(cron, 3);
 				StringBuilder timeStr = new StringBuilder();
 				for (Date date : timeList) {
 					timeStr.append(DateUtil.formatDateCustom(date, DateUtil.FORMAT_DATE_TIME)).append("；");
 				}
-				map.put("RECENT_TRIGGER_TIME", timeStr.toString());
+				map.put("recentTriggerTime", timeStr.toString());
 			}
 			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
@@ -235,6 +235,32 @@ public class ApiCronController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("执行一次错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 获取定时任务
+	 * 
+	 * v1.0 zhanghc 2021年5月27日下午4:27:54
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/get")
+	@ResponseBody
+	public PageResult get(Integer id) {
+		try {
+			Cron cron = cronService.getEntity(id);
+			return PageResultEx.ok()
+					.addAttr("id", cron.getId())
+					.addAttr("name", cron.getName())
+					.addAttr("jobClass", cron.getJobClass())
+					.addAttr("cron", cron.getCron());
+		} catch (MyException e) {
+			log.error("删除数据字典错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("删除数据字典错误：", e);
 			return PageResult.err();
 		}
 	}

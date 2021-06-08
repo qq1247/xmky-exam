@@ -1,11 +1,14 @@
 package com.wcpdoc.exam.api.controller;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -238,13 +241,19 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/template")
 	@ResponseBody
-	public PageResult template() {
+	public void template() {
+		OutputStream output = null;
 		try {
-			orgXlsxService.templateOrgXlsx();
-			return PageResultEx.ok();
+			InputStream inputStream = this.getClass().getResourceAsStream("/res/orgExamole.xlsx");
+			String fileName = new String(("log4j2.xml").getBytes("UTF-8"),"ISO-8859-1");
+			response.addHeader("Content-Disposition", "attachment;filename" + fileName);
+			response.setContentType("application/fprce-download");
+			output = response.getOutputStream();
+			IOUtils.copy(inputStream, output);
 		} catch (Exception e) {
-			log.error("组织机构列表错误：", e);
-			return PageResult.err();
+			log.error("组织机构导出模板下载附件失败：", e);
+		} finally {
+			IOUtils.closeQuietly(output);
 		}
 	}
 	
