@@ -1,70 +1,83 @@
 import http from "@/util/http" // 导入http中创建的axios实例
 import qs from "qs" // 根据需求是否导入qs模块
 
-async function post(url, params = {}) {
-  return await http.post(url, qs.stringify(params, { arrayFormat: "repeat" }))
-}
+const post = async (url, params = {}) =>
+  await http.post(url, qs.stringify(params, { arrayFormat: "repeat" }))
 
 export default {
   // 数据字典
-  dictListpage(params) {
-    return post("dict/list", params)
-  },
-  dictList(params) {
-    return post("dict/list", params)
-  },
-  dictGet(params) {
-    return post("dict/get", params)
-  },
-  dictAdd(params) {
-    return post("dict/add", params)
-  },
-  dictEdit(params) {
-    return post("dict/edit", params)
-  },
-  dictDel(params) {
-    return post("dict/del", params)
-  },
+  dictListpage: params => post("dict/listpage", params),
+  dictGet: params => post("dict/get", params),
+  dictAdd: params => post("dict/add", params),
+  dictEdit: params => post("dict/edit", params),
+  dictDel: params => post("dict/del", params),
 
   // 组织机构相关
-  orgListpage(params) {
-    return post("org/list", params)
-  },
-  orgTreeList(params) {
-    return post("org/treeList", params)
-  },
-  orgGet(params) {
-    return post("org/get", params)
-  },
-  orgAdd(params) {
-    return post("org/add", params)
-  },
-  orgEdit(params) {
-    return post("org/edit", params)
-  },
-  orgDel(params) {
-    return post("org/del", params)
-  },
+  orgListpage: params => post("org/list", params),
+  orgTreeList: params => post("org/treeList", params),
+  orgGet: params => post("org/get", params),
+  orgAdd: params => post("org/add", params),
+  orgEdit: params => post("org/edit", params),
+  orgDel: params => post("org/del", params),
+
+  // 考试相关
+  examListPage: params => post("exam/listpage", params),
+  examAdd: params => post("exam/add", params),
+  examEdit: params => post("exam/edit", params),
+  examDel: params => post("exam/del", params),
+  examUpdateExamUser: params => post("exam/updateExamUser", params),
+  examUpdateMarkUser: params => post("exam/updateMarkUser", params),
+  examUserList: params => post("exam/userList", params),
+  examQuestionList: params => post("exam/questionList", params),
+
+  // 试卷相关
+  paperListPage: params => post("paper/listpage", params),
+  paperAdd: params => post("paper/add", params),
+  paperEdit: params => post("paper/edit", params),
+  paperDel: params => post("paper/del", params),
+  paperGet: params => post("paper/get", params),
+  paperCopy: params => post("paper/copy", params),
+  paperArchive: params => post("paper/archive", params),
+  paperChapterAdd: params => post("paper/chapterAdd", params),
+  paperChapterEdit: params => post("paper/chapterEdit", params),
+  paperChapterDel: params => post("paper/chapterDel", params),
+
+  // 试卷试题相关
+  paperQuestionList: params => post("paper/paperQuestionList", params),
+  paperQuestionAdd: params => post("paper/questionAdd", params),
+  paperQuestionClear: params => post("paper/questionClear", params),
+  paperScoreUpdate: params => post("paper/scoreUpdate", params),
+  paperScoreOptionsUpdate: params => post("paper/scoreOptionsUpdate", params),
+  paperBatchScoreUpdate: params => post("paper/batchScoreUpdate", params),
+  paperQuestionUp: params => post("paper/questionUp", params),
+  paperQuestionDown: params => post("paper/questionDown", params),
+  paperQuestionPublish: params => post("paper/publish", params),
 
   // 试题相关
-  questionList(params) {
-    return post("question/list", params)
-  },
-  questionGet(params) {
-    return post("question/get", params)
-  },
-  questionAdd(params) {
-    return post("question/add", params)
-  },
-  questionEdit(params) {
-    return post("question/edit", params)
-  },
-  questionDel(params) {
-    return post("question/del", params)
-  },
+  questionListPage: params => post("question/listpage", params),
+  questionGet: params => post("question/get", params),
+  questionAdd: params => post("question/add", params),
+  questionEdit: params => post("question/edit", params),
+  questionDel: params => post("question/del", params),
+  questionCopy: params => post("question/copy", params),
+
+  // 试题分类相关
+  questionTypeListPage: params => post("questionType/listpage", params),
+  questionTypeAdd: params => post("questionType/add", params),
+  questionTypeEdit: params => post("questionType/edit", params),
+  questionTypeDel: params => post("questionType/del", params),
+  questionTypeGet: params => post("questionType/get", params),
+  questionTypeMove: params => post("questionType/move", params),
+
+  // 试题分类开放相关
+  questionTypeOpenListPage: params => post("questionTypeOpen/listpage", params),
+  questionTypeOpenAdd: params => post("questionTypeOpen/add", params),
+  questionTypeOpenDel: params => post("questionTypeOpen/del", params),
+  questionTypeOpen: params => post("questionTypeOpen/list", params),
+  questionTypeOpen: params => post("questionTypeOpen/list", params),
+  questionTypeOpen: params => post("questionTypeOpen/list", params),
+  questionTypeOpen: params => post("questionTypeOpen/list", params),
 
   // 登陆相关
-  login(params) {
-    return post("login/in", params)
-  }
+  login: params => post("login/in", params)
 }

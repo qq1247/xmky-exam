@@ -9,6 +9,7 @@ import "element-ui/lib/theme-chalk/index.css"
 import "@/assets/css/element-ui-ex.scss"
 import CKEditor from "@ckeditor/ckeditor5-vue2"
 import api from "@/api"
+import "animate.css"
 Vue.use(ElementUI)
 Vue.use(CKEditor)
 

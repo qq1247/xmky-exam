@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <img src="../assets/img/404.png" />
+    <img src="../../assets/img/404.png" />
     <router-link to="/" class="go-home">返回首页</router-link>
   </div>
 </template>
@@ -9,6 +9,7 @@
 .container {
   justify-content: center;
   align-items: center;
+  padding: 120px 0 70px;
   img {
     width: 350px;
     height: 250px;
