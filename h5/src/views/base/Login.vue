@@ -90,6 +90,7 @@ export default {
 <style lang="scss" scoped>
 .container {
   width: 100%;
+  height: 100%;
   background: url(../../assets/img/login_bgs.jpg) no-repeat;
   background-size: cover;
   justify-content: center;

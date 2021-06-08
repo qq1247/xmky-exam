@@ -114,6 +114,6 @@ export default {
   questionTypeOpenAdd: params => post("questionTypeOpen/add", params),
   questionTypeOpenDel: params => post("questionTypeOpen/del", params),
 
-  // 用户相关
+  // 基础功能相关
   login: params => post("login/in", params)
 }
