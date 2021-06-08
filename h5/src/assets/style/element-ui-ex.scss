@@ -21,7 +21,6 @@ body {
   z-index: 1000;
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(8px);
-  // box-shadow: 0 0 13px 3px rgba(0, 0, 0, 0.03);
 }
 
 .header-content {
@@ -62,7 +61,7 @@ body {
       bottom: 0;
       opacity: 0;
       transform: translateX(-50%);
-      background: #1e9fff;
+      background: #0095e5;
       border-radius: 2px;
       transition: all 0.3s ease-in-out;
     }
@@ -83,16 +82,18 @@ body {
     }
   }
 }
+
 .header-login {
   width: 100px;
   height: 30px;
   line-height: 30px;
   color: #fff;
   font-size: 14px;
-  background: #1e9fff;
   border-radius: 3px;
   text-align: center;
   text-decoration: none;
+  background: #0095e5;
+  border-radius: 15px;
 }
 
 .main {
@@ -119,48 +120,21 @@ body {
   background: #2a2a44;
 }
 
-/* 清除浮动 */
-.clearfix:after {
-  visibility: hidden;
-  clear: both;
-  display: block;
-  content: ".";
-  height: 0;
-}
-
-.clearfix {
-  *zoom: 1;
-}
-
-/* 更改按钮样式 */
-.el-button--primary {
-  color: #fff;
-  background-color: #1e9fff;
-  border-color: #1e9fff;
-}
-
-/* 更改单选框样式 */
-.el-radio__input.is-checked .el-radio__inner {
-  background: #fff;
-}
-
-.el-radio__input.is-checked .el-radio__inner::after {
-  -webkit-transform: translate(-50%, -50%) scale(2);
-  transform: translate(-50%, -50%) scale(2);
-  background-color: #1e9fff;
-}
-
-/* 更改分页样式 */
-.el-pagination.is-background .el-pager li:not(.disabled).active {
-  background-color: #1e9fff;
-  color: #fff;
-}
-
-.el-pagination.is-background.el-pagination--small .btn-next,
-.el-pagination.is-background.el-pagination--small .btn-prev,
-.el-pagination.is-background.el-pagination--small .el-pager li {
-  margin: 0 3px;
-  min-width: 34px;
-  border: 1px solid #d4dfd9;
-  background-color: transparent;
+.data-null {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 120px;
+  .data-img {
+    width: 150px;
+    height: 150px;
+  }
+  .data-tip {
+    font-size: 14px;
+    color: #999;
+    margin-top: 20px;
+    line-height: 20px;
+  }
 }

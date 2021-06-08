@@ -114,12 +114,12 @@ export default {
         total: 0, // 总条数
         curPage: 1, //当前第几页
         pageSize: 10, //每页多少条
-        list: [] //列表数据
+        list: [], //列表数据
       },
       queryForm: {
         //查询表单
         name: null,
-        parentId: null
+        parentId: null,
       },
       editForm: {
         //修改表单
@@ -132,69 +132,69 @@ export default {
         rules: {
           //校验
           name: [{ required: true, message: "请输入名称", trigger: "change" }],
-          no: [{ required: true, message: "请输入排序", trigger: "change" }]
-        }
+          no: [{ required: true, message: "请输入排序", trigger: "change" }],
+        },
       },
       tree: {
         curNode: null, // 当前选中节点
-        treeList: [] //树结构的列表
-      }
-    }
+        treeList: [], //树结构的列表
+      },
+    };
   },
   created() {
-    this.init()
+    this.init();
   },
   methods: {
     // 查询
     async query() {
       let {
-        data: { rows, total }
+        data: { rows, total },
       } = await this.$https.orgListpage({
         parentId: this.queryForm.parentId,
         name: this.queryForm.name,
         curPage: this.listpage.curPage,
-        pageSize: this.listpage.pageSize
-      })
-      this.listpage.total = total
-      this.listpage.list = rows
+        pageSize: this.listpage.pageSize,
+      });
+      this.listpage.total = total;
+      this.listpage.list = rows;
     },
     // 重置
     async reset() {
-      this.$refs["queryForm"].resetFields()
-      this.listpage.curPage = 1
-      this.query()
+      this.$refs["queryForm"].resetFields();
+      this.listpage.curPage = 1;
+      this.query();
     },
     // 初始化树
     async initTree() {
-      let { code, msg, data } = await this.$https.orgTreeList()
+      let { code, msg, data } = await this.$https.orgTreeList();
       if (code != 200) {
-        alert(msg)
-        return
+        alert(msg);
+        return;
       }
 
-      let list = data
-      let treeList = []
-      let treeMap = {}
-      let idFiled = "ID"
-      let textFiled = "NAME"
-      let checkedFiled = "CHECKED"
-      let parentField = "PARENT_ID"
-      let iconClsFiled = "ICON"
-      let openClsFiled = "OPEN"
+      let list = data;
+      let treeList = [];
+      let treeMap = {};
+      let idFiled = "ID";
+      let textFiled = "NAME";
+      let checkedFiled = "CHECKED";
+      let parentField = "PARENT_ID";
+      let iconClsFiled = "ICON";
+      let openClsFiled = "OPEN";
 
       for (let i = 0; i < list.length; i++) {
-        list[i]["id"] = list[i][idFiled]
-        list[i]["label"] = list[i][textFiled]
+        list[i]["id"] = list[i][idFiled];
+        list[i]["label"] = list[i][textFiled];
         if (list[i][checkedFiled]) {
-          list[i]["checked"] = true
+          list[i]["checked"] = true;
         }
         if (list[i][openClsFiled]) {
-          list[i]["open"] = true
+          list[i]["open"] = true;
         }
         if (list[i][iconClsFiled]) {
-          list[i]["iconCls"] = list[i][iconClsFiled]
+          list[i]["iconCls"] = list[i][iconClsFiled];
         }
-        treeMap[list[i]["id"]] = list[i]
+        treeMap[list[i]["id"]] = list[i];
       }
 
       for (let i = 0; i < list.length; i++) {
@@ -203,126 +203,126 @@ export default {
           list[i]["id"] != list[i][parentField]
         ) {
           if (!treeMap[list[i][parentField]]["children"]) {
-            treeMap[list[i][parentField]]["children"] = []
+            treeMap[list[i][parentField]]["children"] = [];
           }
-          treeMap[list[i][parentField]]["children"].push(list[i])
+          treeMap[list[i][parentField]]["children"].push(list[i]);
         } else {
-          treeList.push(list[i])
+          treeList.push(list[i]);
         }
       }
 
-      this.tree.treeList = treeList
+      this.tree.treeList = treeList;
 
       this.$nextTick(() => {
         if (!this.tree.curNode) {
-          let node = this.$refs.tree.getNode(1) // 如果是第一次初始化，选择跟节点
-          this.$refs.tree.setCurrentNode(node)
-          this.tree.curNode = node
-          this.queryForm.parentId = node.id // 查询表单parentId设置为根节点
+          let node = this.$refs.tree.getNode(1); // 如果是第一次初始化，选择跟节点
+          this.$refs.tree.setCurrentNode(node);
+          this.tree.curNode = node;
+          this.queryForm.parentId = node.id; // 查询表单parentId设置为根节点
         } else {
-          this.$refs.tree.setCurrentKey(this.tree.curNode.id) //否则选中刷新前节点
-          this.queryForm.parentId = this.tree.curNode.id // 查询表单parentId设置为当前选中节点
+          this.$refs.tree.setCurrentKey(this.tree.curNode.id); //否则选中刷新前节点
+          this.queryForm.parentId = this.tree.curNode.id; // 查询表单parentId设置为当前选中节点
         }
-      })
+      });
     },
     // 初始化
     async init() {
-      await this.initTree()
-      await this.query()
+      await this.initTree();
+      await this.query();
     },
     // 选择树节点
     async selTreeNode(data) {
-      this.tree.curNode = data
-      this.queryForm.parentId = data.id
-      this.query()
+      this.tree.curNode = data;
+      this.queryForm.parentId = data.id;
+      this.query();
     },
     // 添加组织机构
     toAdd() {
-      this.editForm.show = true
-      this.editForm.parentId = this.tree.curNode.id
-      this.editForm.parentName = this.tree.curNode.label
+      this.editForm.show = true;
+      this.editForm.parentId = this.tree.curNode.id;
+      this.editForm.parentName = this.tree.curNode.label;
     },
     // 添加组织机构
     doAdd() {
-      this.$refs["editForm"].validate(async valid => {
+      this.$refs["editForm"].validate(async (valid) => {
         if (!valid) {
-          return false
+          return false;
         }
 
         let { code, msg } = await this.$https.orgAdd({
           name: this.editForm.name,
           parentId: this.editForm.parentId,
-          no: this.editForm.no
-        })
+          no: this.editForm.no,
+        });
 
         if (code != 200) {
-          alert(msg)
-          return
+          alert(msg);
+          return;
         }
 
-        this.editForm.show = false
-        this.initTree()
-        this.query()
-      })
+        this.editForm.show = false;
+        this.initTree();
+        this.query();
+      });
     },
     // 修改组织机构
     async toEdit(id) {
-      let res = await this.$https.orgGet({ id: id })
+      let res = await this.$https.orgGet({ id: id });
       if (res.code != 200) {
-        alert(res.msg)
-        return
+        alert(res.msg);
+        return;
       }
 
-      this.editForm.show = true
-      this.editForm.id = res.data.id
-      this.editForm.name = res.data.name
-      this.editForm.parentId = res.data.parentId
-      this.editForm.parentName = res.data.parentName
-      this.editForm.no = res.data.no
+      this.editForm.show = true;
+      this.editForm.id = res.data.id;
+      this.editForm.name = res.data.name;
+      this.editForm.parentId = res.data.parentId;
+      this.editForm.parentName = res.data.parentName;
+      this.editForm.no = res.data.no;
     },
     // 修改组织机构
     doEdit() {
-      this.$refs["editForm"].validate(async valid => {
+      this.$refs["editForm"].validate(async (valid) => {
         if (!valid) {
-          return false
+          return false;
         }
 
         let { code, msg } = await this.$https.orgEdit({
           id: this.editForm.id,
           name: this.editForm.name,
-          no: this.editForm.no
-        })
+          no: this.editForm.no,
+        });
 
         if (code != 200) {
-          alert(msg)
-          return
+          alert(msg);
+          return;
         }
 
-        this.editForm.show = false
-        this.initTree() //初始化树
-        this.query()
-      })
+        this.editForm.show = false;
+        this.initTree(); //初始化树
+        this.query();
+      });
     },
     // 删除
     async del(id) {
       this.$confirm("确定要删除？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       }).then(async () => {
-        let res = await this.$https.orgDel({ id })
+        let res = await this.$https.orgDel({ id });
         if (res.code != 200) {
           this.$message({
             type: "error",
-            message: res.msg
-          })
+            message: res.msg,
+          });
         }
 
-        this.query()
-      })
-    }
-  }
-}
+        this.query();
+      });
+    },
+  },
+};
 </script>
 <style lang="scss" scoped>
 .container {

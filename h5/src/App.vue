@@ -42,15 +42,15 @@ export default {
         },
         {
           content: "试题管理",
-          to: "/examLibrary/classify"
+          to: "/examLibrary"
         },
         {
           content: "试卷管理",
-          to: "/examPaper/classify"
+          to: "/examPaper"
         },
         {
           content: "考试管理",
-          to: "/404"
+          to: "/examSetting"
         }
       ]
     }

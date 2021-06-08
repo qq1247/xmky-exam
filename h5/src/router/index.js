@@ -16,20 +16,43 @@ const routes = [
     name: "Login",
     component: () => import("../views/base/Login.vue")
   },
+  // 试卷相关
   {
-    path: "/examPaper/classify",
-    name: "PaperClassify",
-    component: () => import("../views/examPaper/Classify.vue")
+    path: "/examPaper",
+    name: "ExamPaper",
+    component: () => import("../views/examPaper/Index.vue")
   },
   {
-    path: "/examPaper/add",
-    name: "PaperAdd",
-    component: () => import("../views/examPaper/Add.vue")
+    path: "/examPaper/classify",
+    name: "ExamPaperClassify",
+    component: () => import("../views/examPaper/Classify.vue")
   },
   {
     path: "/examPaper/edit",
     name: "PaperEdit",
     component: () => import("../views/examPaper/Edit.vue")
+  },
+  // 考试相关
+  {
+    path: "/examSetting",
+    name: "ExamSetting",
+    component: () => import("../views/examSetting/Index.vue")
+  },
+  {
+    path: "/examSetting/classify",
+    name: "SettingClassify",
+    component: () => import("../views/examSetting/Classify.vue")
+  },
+  // 试题相关
+  {
+    path: "/examLibrary",
+    name: "ExamLibrary",
+    component: () => import("../views/examLibrary/Index.vue")
+  },
+  {
+    path: "/examLibrary/edit",
+    name: "LibraryEdit",
+    component: () => import("../views/examLibrary/Edit.vue")
   },
   {
     path: "/organization/dict",
@@ -40,16 +63,6 @@ const routes = [
     path: "/organization/org",
     name: "Org",
     component: () => import("../views/organization/Org.vue")
-  },
-  {
-    path: "/examLibrary/classify",
-    name: "LibraryClassify",
-    component: () => import("../views/examLibrary/Classify.vue")
-  },
-  {
-    path: "/examLibrary/edit",
-    name: "LibraryEdit",
-    component: () => import("../views/examLibrary/Edit.vue")
   },
   { path: "*", component: () => import("../views/base/404.vue") }
 ]

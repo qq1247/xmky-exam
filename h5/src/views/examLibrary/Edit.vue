@@ -1,279 +1,1129 @@
 <template>
-  <div class="agreements">
-    <div id="contents">
-      <div id="one" class="one" ref="agree1" index="2" v-show="show1 !== '2'">
-        <p class="title">上海银行个人信用报告查询授权书</p>
-        <p class="no">上海银行股份有限公司：</p>
-        <p>
-          本人（下称授权人）授权在贵行（下称被授权人）办理下列业务或下列情况时：
-        </p>
-        <p>
-          <b>1、</b
-          >授权人办理授信业务（包括个人贷款、贷记卡、准贷记卡等，涵盖贷前、贷中、贷后各阶段，下同）
-        </p>
-        <p><b>2、</b>授权人办理担保业务</p>
-        <p>
-          <b>3、</b
-          >法人或其他组织办理授信业务或担保业务，被授权人需要查询授权人作为法定代表人或出资人的信用状况
-        </p>
-        <p><b>4、</b>授权人申请征信异议处理</p>
-        <p>
-          被授权人可以通过中国人民银行金融信用信息基础数据库查询和使用本人的个人信用报告，并向中国人民银行金融信用信息基础数据库提供本人及配偶个人基本信息和信用情况。
-        </p>
-        <p>
-          上述授权期限为授权人签署本授权书之日起，至授权人在被授权人（包括其作为法定代表人或出资人的法人或其他组织）所有授信、担保等相关业务到期且履行完毕全部义务之日止。被授权人超出授权查询的一切后果及法律责任由被授权人承担。
-        </p>
-        <p class="big">授权人已经完全知晓并理解上述授权条款。</p>
-        <p>特此授权。</p>
-        <p>授权人本人（签字）*：{{ personName }}</p>
-        <p>身份证件号*：{{ personCertNo }}</p>
-        <p class="tr">授权日期：{{ year }}年{{ month }}月 {{ day }}日</p>
+  <div class="container">
+    <!-- 导航 -->
+    <div class="head">
+      <el-link
+        class="head-left"
+        :underline="false"
+        @click="goBack"
+        icon="el-icon-back"
+        >返回</el-link
+      >
+    </div>
+    <!-- 搜索 -->
+    <el-form :inline="true" :model="queryForm" class="form-inline search">
+      <div>
+        <el-form-item label>
+          <el-input placeholder="请输入编号" v-model="queryForm.id"></el-input>
+        </el-form-item>
+        <el-form-item label>
+          <el-input
+            placeholder="请输入题干"
+            v-model="queryForm.title"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label>
+          <el-select placeholder="请输入类型" v-model="queryForm.type">
+            <el-option
+              :key="parseInt(dict.dictKey)"
+              :label="dict.dictValue"
+              :value="parseInt(dict.dictKey)"
+              v-for="dict in queryForm.typeDictList"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label>
+          <el-select placeholder="请输入难度" v-model="queryForm.difficulty">
+            <el-option
+              :key="parseInt(dict.dictKey)"
+              :label="dict.dictValue"
+              :value="parseInt(dict.dictKey)"
+              v-for="dict in queryForm.difficultyDictList"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label>
+          <el-input
+            placeholder="分值大于"
+            v-model="queryForm.startScore"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label>
+          <el-input
+            placeholder="分值小于"
+            v-model="queryForm.endScore"
+          ></el-input>
+        </el-form-item>
       </div>
-      <div id="two" class="one" ref="agree2" index="3" v-show="show2 !== '3'">
-        <p class="title">上海银行个人外部信用信息查询授权书</p>
-        <p class="title">（小企业授信专用）</p>
-        <p>上海银行股份有限公司：</p>
+      <el-form-item>
+        <el-button @click="query" icon="el-icon-search" type="primary"
+          >查询</el-button
+        >
+      </el-form-item>
+    </el-form>
+    <!-- 内容 -->
+    <div class="content">
+      <div class="content-left">
+        <div class="left-top">添加题型</div>
+        <div
+          :class="[
+            editForm.type === btn.type
+              ? 'left-center left-center-active'
+              : 'left-center'
+          ]"
+          :key="btn.type"
+          @click="updateType(btn.type)"
+          v-for="btn in btnGroup1"
+        >
+          <img :src="btn.img" />
+          {{ btn.name }}
+          <img src="@/assets/img/icon/icon6.png" />
+        </div>
+        <div class="splitLine"></div>
+        <div :key="btn.type" class="left-bottom" v-for="btn in btnGroup2">
+          <img :src="btn.img" />
+          {{ btn.name }}
+        </div>
+      </div>
+      <div class="content-center" v-if="list.questionList.length == 0">
+        <div class="data-null">
+          <img class="data-img" src="../../assets/img/data-null.png" alt="" />
+          <span class="data-tip">抱歉！暂无信息</span>
+        </div>
+      </div>
+      <div class="content-center" v-if="list.questionList.length > 0">
+        <el-card
+          :key="quesiton.ID"
+          class="center-card"
+          shadow="hover"
+          v-for="quesiton in list.questionList"
+        >
+          <div class="center-card-top">
+            {{ quesiton.ID }}、{{ quesiton.TITLE }}
+          </div>
+          <div class="center-card-bottom">
+            <div class="card-bottom-left">
+              <el-tag class="center-tag-danger" size="mini" type="danger">{{
+                quesiton.TYPE_NAME
+              }}</el-tag>
+              <el-tag class="center-tag-purple" effect="plain" size="mini">{{
+                quesiton.DIFFICULTY_NAME
+              }}</el-tag>
+              <el-tag effect="plain" size="mini" type="danger"
+                >{{ quesiton.SCORE }}分</el-tag
+              >
+              <el-tag effect="plain" size="mini">{{
+                quesiton.UPDATE_USER_NAME
+              }}</el-tag>
+            </div>
+            <div class="card-bottom-right">
+              <el-button
+                @click="get(quesiton.ID)"
+                class="btn"
+                icon="el-icon-document"
+                plain
+                round
+                size="mini"
+                type="primary"
+                >详细</el-button
+              >
+              <el-button
+                class="btn"
+                icon="el-icon-document-copy"
+                plain
+                round
+                size="mini"
+                type="primary"
+                >复制</el-button
+              >
+              <el-button
+                @click="del(quesiton.ID)"
+                class="btn"
+                icon="el-icon-delete"
+                plain
+                round
+                size="mini"
+                type="primary"
+                >删除</el-button
+              >
+            </div>
+          </div>
+        </el-card>
+        <!-- <el-pagination
+            :total="1000"
+            background
+            class="pagination"
+            hide-on-single-page="true"
+            layout="prev, pager, next"
+            page-size="5"
+            small="false"
+          ></el-pagination> -->
+      </div>
+      <div class="content-right">
+        <el-form
+          :model="editForm"
+          :rules="editForm.rules"
+          label-width="70px"
+          ref="editForm"
+          size="mini"
+          v-model="labelPosition"
+        >
+          <el-row>
+            <el-col :span="11">
+              <el-form-item label="类型" prop="type">
+                <el-select
+                  @change="updateOptionAndAnswer"
+                  disabled
+                  placeholder="请选择类型"
+                  v-model="editForm.type"
+                >
+                  <el-option
+                    :key="parseInt(dict.dictKey)"
+                    :label="dict.dictValue"
+                    :value="parseInt(dict.dictKey)"
+                    v-for="dict in queryForm.typeDictList"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="11">
+              <el-form-item label="难度" prop="difficulty">
+                <el-select
+                  placeholder="请选择难度"
+                  v-model="editForm.difficulty"
+                >
+                  <el-option
+                    :key="parseInt(dict.dictKey)"
+                    :label="dict.dictValue"
+                    :value="parseInt(dict.dictKey)"
+                    v-for="dict in queryForm.difficultyDictList"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
 
-        <p>
-          本人（下称授权人）授权在贵行（下称被授权人）办理下列业务或下列情况时：
-        </p>
-        <p>
-          <b>1、</b
-          >授权人办理授信业务（包括个人贷款、贷记卡、准贷记卡等，涵盖贷前、贷中、贷后各阶段，下同）
-        </p>
-        <p><b>2、</b>授权人办理担保业务</p>
-        <p>
-          <b>3、</b
-          >法人或其他组织办理授信业务或担保业务，被授权人需要查询授权人作为法定代表人或出资人的信用状况
-        </p>
-        <p>
-          被授权人可以通过工商、公安、法院、中国人民银行批准设立的征信机构查询和使用授权人本人的身份、信用、涉税、社会保险、住房公积金、涉诉、执行、违法违规信息。
-          上述授权期限为授权人签署本授权书之日起，至授权人在被授权人所有授信、担保等相关业务到期且履行完毕全部义务之日止。
-          授权人已经完全知晓并理解上述授权条款。
-        </p>
-        <p>特此授权。</p>
-        <p>授权人本人（签字）*：{{ personName }}</p>
-        <p>身份证件号*：{{ personCertNo }}</p>
-        <p class="tr">授权日期：{{ year }}年{{ month }}月 {{ day }}日</p>
-      </div>
-      <div id="three" class="one" ref="agree3" index="4" v-show="show3 !== '4'">
-        <p class="title">企业授权委托书</p>
-        <p class="no">上海银行股份有限公司：</p>
-        <p>
-          本人是【{{
-            companyName
-          }}】公司（“本企业”）法定代表人（如本企业类型为个体工商户，则为负责人），并在此确认有权以自身名义直接代表本企业签署本文件并确认本委托书下述所列事项；
-        </p>
-        <p>兹代表本企业向贵行确认如下委托授权事项：</p>
-        <p>
-          1、授权贵行向与贵行合作的中金金融认证中心有限公司（简称为“CFCA”）申请本企业数字证书、注册本企业签约用户；
-        </p>
-        <p>
-          2、确认本人有权通过在贵行平台（包括但不限于微信小程序）上以点击签署及实名手机号动态密码验证方式以调用CFCA数字证书完成包括《上海银行企业信用报告查询授权书》《上海银行企业外部信用信息查询授权书》等电子文件的线上电子签署，线上电子签约的相应电子签名均为本企业认可的可靠电子签名；
-        </p>
-        <p>
-          3、确认可通过本人实名手机号接收邀请码、动态密码及相关平台（包括但不限于微信小程序）业务通知及信息；
-        </p>
-        <p>
-          4、除非经贵行另行同意终止，上述授权在本人及/或本企业在贵行有授信或业务存续期内持续有效。
-        </p>
-        <p>
-          5、本人作为本企业法定代表人（或如本企业类型为个体工商户的，则为负责人），再次确认有权代表本企业签署和确认本文件，本人已取得所有所需授权（如有）；本人承诺后续（如贵行要求）向贵行另行以线下纸质方式补充出具经本企业加盖公章的如下文件：(a)本《企业授权委托书》；以及(b)根据本《企业授权委托书》本企业调用CFCA数字证书所签署全部或部分电子文件；如因授权不足或瑕疵或因违反前述承诺而发生争议的，本人同意承担由此产生的一切后果与责任。
-        </p>
-        <p>特此确认。</p>
-        <p>授权人本人姓名：{{ authPerson }}</p>
-        <p>身份证件类型：{{ idCardType }}</p>
-        <p>身份证件号*：{{ personCertNo }}</p>
-        <p>授权日期：{{ year }}年{{ month }}月 {{ day }}日</p>
+          <el-form-item label="题干" prop="title">
+            <Editor
+              :value="editForm.title"
+              @editorListener="editorListener"
+              id="title"
+            ></Editor>
+          </el-form-item>
+          <div v-if="editForm.type === 1 || editForm.type === 2">
+            <el-form-item
+              :key="'option' + option.lab"
+              :label="'选项' + option.lab"
+              :prop="'options.' + index + '.value'"
+              v-for="(option, index) in editForm.options"
+            >
+              <Editor
+                :id="'option' + option.lab"
+                :value="option.value"
+                @editorListener="editorListener"
+              ></Editor>
+            </el-form-item>
+          </div>
+          <el-form-item v-if="editForm.type === 1 || editForm.type === 2">
+            <el-button
+              :disabled="editForm.options.length >= 7"
+              @click="addOption()"
+              class="btn2"
+              type="primary"
+              >+添加选项</el-button
+            >
+            <el-button
+              :disabled="editForm.options.length <= 2"
+              @click="delOption()"
+              class="btn2"
+              type="primary"
+              >-删除选项</el-button
+            >
+          </el-form-item>
+          <el-form-item
+            label="答案"
+            prop="answer"
+            v-if="editForm.type === 1 || editForm.type === 4"
+          >
+            <el-radio-group v-model="editForm.answer">
+              <el-radio
+                :key="answer.lab"
+                :label="answer.lab"
+                v-for="answer in editForm.answers"
+                >{{ answer.lab }}</el-radio
+              >
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="答案" prop="answer" v-if="editForm.type === 2">
+            <el-checkbox-group v-model="editForm.answer">
+              <el-checkbox
+                :key="answer.lab"
+                :label="answer.lab"
+                v-for="answer in editForm.answers"
+                >{{ answer.lab }}</el-checkbox
+              >
+            </el-checkbox-group>
+          </el-form-item>
+          <el-form-item label="答案" v-if="editForm.type === 3">
+            <el-card class="el-card" shadow="never">
+              <el-alert
+                :closable="false"
+                title="单空有多个同义词，用三竖线分开。如：一般|||通常|||普遍"
+                type="success"
+              ></el-alert>
+              <el-form-item
+                :key="'answers' + index"
+                :prop="'answers.' + index + '.value'"
+                v-for="(answer, index) in editForm.answers"
+              >
+                <el-input v-model="answer.value">
+                  <template slot="prepend">填空{{ answer.lab }}</template>
+                </el-input>
+              </el-form-item>
+              <el-button
+                :disabled="editForm.answers.length >= 7"
+                @click="addFillBlanks()"
+                class="btn2"
+                style="margin-left: 78px"
+                type="primary"
+                >+添加填空</el-button
+              >
+              <el-button
+                :disabled="editForm.answers.length <= 1"
+                @click="delFillBlanks()"
+                class="btn2"
+                type="primary"
+                >-删除填空</el-button
+              >
+            </el-card>
+          </el-form-item>
+          <el-form-item label="答案" prop="answer" v-if="editForm.type === 5">
+            <Editor
+              :value="editForm.answer"
+              @editorListener="editorListener"
+              id="answer"
+            ></Editor>
+          </el-form-item>
+          <el-form-item label="解析">
+            <Editor
+              :value="editForm.analysis"
+              @editorListener="editorListener"
+              id="analysis"
+            ></Editor>
+          </el-form-item>
+          <el-row>
+            <el-col :span="11">
+              <el-form-item label="分值" prop="score">
+                <el-input-number
+                  :max="100"
+                  :min="1"
+                  controls-position="right"
+                  v-model.number="editForm.score"
+                ></el-input-number>
+              </el-form-item>
+            </el-col>
+            <el-col :span="11">
+              <el-form-item label="排序" prop="no">
+                <el-input-number
+                  :max="100000"
+                  :min="1"
+                  controls-position="right"
+                  v-model.number="editForm.no"
+                ></el-input-number>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-form-item label="分值选项" v-if="editForm.type === 2">
+            <el-checkbox-group v-model="editForm.scoreOptions">
+              <el-tooltip
+                class="item"
+                content="默认全对得分"
+                effect="dark"
+                placement="top"
+              >
+                <el-checkbox label="1">半对半分</el-checkbox>
+              </el-tooltip>
+            </el-checkbox-group>
+          </el-form-item>
+          <el-form-item label="分值选项" v-if="editForm.type === 3">
+            <el-checkbox-group v-model="editForm.scoreOptions">
+              <el-tooltip
+                class="item"
+                content="默认全对得分"
+                effect="dark"
+                placement="top"
+              >
+                <el-checkbox label="1">半对半分</el-checkbox>
+              </el-tooltip>
+              <el-tooltip
+                class="item"
+                content="默认答案有顺序"
+                effect="dark"
+                placement="top"
+              >
+                <el-checkbox label="2">答案无顺序</el-checkbox>
+              </el-tooltip>
+              <el-tooltip
+                class="item"
+                content="默认大小写敏感"
+                effect="dark"
+                placement="top"
+              >
+                <el-checkbox label="3">大小写不敏感</el-checkbox>
+              </el-tooltip>
+              <el-tooltip
+                class="item"
+                content="默认等于答案得分"
+                effect="dark"
+                placement="top"
+              >
+                <el-checkbox label="4">包含答案得分</el-checkbox>
+              </el-tooltip>
+            </el-checkbox-group>
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              @click="add()"
+              style="width: 164px; height: 40px"
+              type="primary"
+              v-if="editForm.id === null"
+              >添加</el-button
+            >
+            <el-button
+              @click="edit(false)"
+              style="width: 164px; height: 40px"
+              type="primary"
+              v-if="editForm.id != null"
+              >修改</el-button
+            >
+            <el-button
+              @click="edit(true)"
+              plain
+              style="width: 164px; height: 40px; border-color: #fff"
+              type="primary"
+              v-if="editForm.id != null"
+              >生成新版本</el-button
+            >
+          </el-form-item>
+        </el-form>
       </div>
     </div>
-    <button class="btn color-fff" :disabled="disabled">
-      {{ disabled ? "我已阅读并同意(" + time + "s)" : "我已阅读并同意" }}
-    </button>
-    <ul>
-      <li
-        v-for="item in agreementList"
-        :key="item.id"
-        :class="{
-          active: current === item.id ? true : false
-        }"
-      >
-        <a
-          href="javascript:;"
-          :id="item.id"
-          @click.prevent="goToAnchor(item)"
-          >{{ item.abbreviationName }}</a
-        >
-      </li>
-    </ul>
   </div>
 </template>
-
 <script>
+import Editor from "@/components/Editor.vue"
 export default {
+  components: {
+    Editor
+  },
   data() {
     return {
-      type: "02",
-      operationType: "1",
-      authStatus: "S",
-      serialNo: "",
-      userId: "",
-      modalShow: false,
-      phoneNo: "",
-      key: Math.random(),
-      code: "",
-      timer: null,
-      time: 15,
-      disabled: true,
-      agreementList: [],
-
-      personName: "",
-      personCertNo: "",
-      validaDate: "",
-      year: "",
-      month: "",
-      day: "",
-      active1: true,
-      active2: false,
-      active3: false,
-      // title: "上海银行企业信用报告查询授权书",
-      topHeight: 0,
-      id: "",
-      ids: [],
-      flag1: true,
-      flag2: true,
-      companyName: "",
-      idCardType: "",
-      authPerson: "",
-      datas: {},
-      current: "2",
-      show1: "",
-      show2: "",
-      show3: ""
+      labelPosition: "left",
+      value: "",
+      list: {
+        //列表数据
+        total: 0, // 总条数
+        curPage: 1, //当前第几页
+        pageSize: 6, //每页多少条
+        questionList: [] //列表数据
+      },
+      queryForm: {
+        //查询表单
+        id: null, //主键
+        title: null, //标题
+        type: null, //类型
+        difficulty: null, //难度
+        startScore: null, //得分大于
+        endScore: null, //得分小于
+        difficultyDictList: [], //难度列表
+        typeDictList: [] //类型列表
+      },
+      editForm: {
+        //修改表单
+        id: null, //主键
+        type: null, //类型
+        difficulty: null, //难度
+        title: null, //标题
+        options: [], //选项
+        answer: null, //答案
+        answers: [], //答案
+        analysis: null, //解析
+        score: null, //分值
+        no: null, //排序
+        scoreOptions: [],
+        rules: {
+          type: [{ required: true, message: "请选择类型", trigger: "change" }],
+          difficulty: [
+            { required: true, message: "请选择难度", trigger: "change" }
+          ],
+          title: [{ required: true, message: "请输入题干", trigger: "change" }],
+          answer: [
+            { required: true, message: "请选择答案", trigger: "change" }
+          ],
+          score: [{ required: true, message: "请输入分值", trigger: "change" }],
+          no: [{ required: true, message: "请输入排序", trigger: "change" }]
+        }
+      },
+      btnGroup1: [
+        // 左侧按钮组1
+        {
+          type: 1,
+          name: "单选题",
+          img: require("@/assets/img/icon/icon1.png")
+        },
+        {
+          type: 2,
+          name: "多选题",
+          img: require("@/assets/img/icon/icon2.png")
+        },
+        {
+          type: 3,
+          name: "填空题",
+          img: require("@/assets/img/icon/icon3.png")
+        },
+        {
+          type: 4,
+          name: "判断题",
+          img: require("@/assets/img/icon/icon4.png")
+        },
+        {
+          type: 5,
+          name: "问答题",
+          img: require("@/assets/img/icon/icon5.png")
+        }
+      ],
+      btnGroup2: [
+        // 左侧按钮组2
+        {
+          name: "试题模板",
+          img: require("@/assets/img/icon/icon7.png")
+        },
+        {
+          name: "试题导入",
+          img: require("@/assets/img/icon/icon8.png")
+        },
+        {
+          name: "试题导出",
+          img: require("@/assets/img/icon/icon9.png")
+        },
+        {
+          name: "清空试题",
+          img: require("@/assets/img/icon/icon10.png")
+        }
+      ]
     }
   },
-  mounted() {
-    this.agreementList = [
-      { id: "2", abbreviationName: "a22" },
-      { id: "3", abbreviationName: "a33" },
-      { id: "4", abbreviationName: "a44" },
-      { id: "5", abbreviationName: "55" }
-    ]
-    window.addEventListener("scroll", this.handleScroll)
+  created() {
+    this.init()
   },
   methods: {
-    goToAnchor(item) {
-      this.current = item.id
-      if (item.id === "2") {
-        this.$refs.agree1.scrollIntoView({})
-      } else if (item.id === "3") {
-        this.$refs.agree2.scrollIntoView({})
-      } else if (item.id === "4") {
-        this.$refs.agree3.scrollIntoView({})
+    goBack() {
+      this.$router.push("/examPaper/classify")
+    },
+    //初始化默认值
+    async init() {
+      this.query() //查询列表
+
+      let typeDictData = await this.$https.dictListpage({
+        dictIndex: "QUESTION_TYPE"
+      })
+      this.queryForm.typeDictList = typeDictData.data.rows // 初始化类型下拉框
+
+      let difficultyDictData = await this.$https.dictListpage({
+        dictIndex: "QUESTION_DIFFICULTY"
+      })
+      this.queryForm.difficultyDictList = difficultyDictData.data.rows // 初始化难度下拉框
+
+      this.btnGroup1[0].checked = true //默认选中类型按钮
+      this.editForm.type = 1 //默认选中类型
+      this.editForm.difficulty = 1 //默认选中简单
+      this.editForm.score = 1 //默认得分为1
+      this.editForm.no = 1 //默认排序为1
+      this.editForm.answer = "" //默认答案为空
+
+      for (let i = 0; i < 2; i++) {
+        this._addOption(i, "") //默认添加两个选项
       }
     },
-    handleScroll() {
-      let scrollTop =
-        document.documentElement.scrollTop || document.body.scrollTop
-      let headerHeight = 0
-      let scrollTopHeight = Math.ceil(scrollTop + headerHeight)
+    // 查询
+    async query() {
+      let {
+        data: { rows, total }
+      } = await this.$https.questionListPage({
+        id: this.id,
+        title: this.title,
+        type: this.type,
+        difficulty: this.difficulty,
+        scoreStart: this.scoreStart,
+        scoreEnd: this.scoreEnd,
+        curPage: this.curPage,
+        pageSize: this.pageSize
+      })
+      this.list.total = total
+      this.list.questionList = rows
+    },
+    //更新选项和答案
+    updateOptionAndAnswer(value) {
+      this.$refs.editForm.clearValidate(["answer"]) // 清理校验
 
-      let offsetTop1 = this.$refs.agree1.offsetTop
-      let offsetTop2 = this.$refs.agree2.offsetTop
-      let offsetTop3 = this.$refs.agree3.offsetTop
-      console.log(scrollTopHeight, offsetTop1, offsetTop2, offsetTop3)
-
-      if (scrollTopHeight >= offsetTop1 && scrollTopHeight < offsetTop2) {
-        this.current = this.$refs.agree1.getAttribute("index")
+      this.editForm.options = [] // 重置选项
+      this.editForm.answers = [] //重置答案列表
+      this.editForm.answer = "" //重置答案
+      this.editForm.rules.answer = [
+        { required: false, message: "请选择答案", trigger: "change" }
+      ] //取消答案校验
+      //如果是单选
+      if (value === 1) {
+        for (let i = 0; i < 2; i++) {
+          this._addOption(i, "") //初始化两个选项
+        }
+        this.editForm.rules.answer = [
+          { required: true, message: "请选择答案", trigger: "change" }
+        ] //添加答案校验
         return
       }
 
-      if (scrollTopHeight >= offsetTop2 && scrollTopHeight < offsetTop3) {
-        this.current = this.$refs.agree2.getAttribute("index")
-        if (this.flag1) {
-          this.id = this.ids[1]
-          this.flag1 = false
+      //如果是多选
+      if (value === 2) {
+        this.editForm.answer = []
+        for (let i = 0; i < 2; i++) {
+          this._addOption(i, "") //初始化两个选项
+        }
+        this.editForm.rules.answer = [
+          {
+            type: "array",
+            required: true,
+            message: "请选择答案",
+            trigger: "change"
+          }
+        ] //添加答案校验
+        return
+      }
+
+      //如果是填空
+      if (value === 3) {
+        for (let i = 0; i < 1; i++) {
+          let lab = String.fromCharCode(65 + i)
+          this.editForm.answers.push({ lab: lab, value: "" }) //初始化一个填空
+
+          this.editForm.rules["answers." + i + ".value"] = [
+            { required: true, message: "请输入填空" + lab, trigger: "change" }
+          ] //添加答案校验
         }
         return
       }
 
-      if (scrollTopHeight >= offsetTop3) {
-        this.current = this.$refs.agree3.getAttribute("index")
-        if (this.flag2) {
-          this.id = this.ids[2]
-          this.flag2 = false
-        }
+      //如果是对错
+      if (value === 4) {
+        this.editForm.answers.push({ lab: "对", value: "" }) //初始化两个选项
+        this.editForm.answers.push({ lab: "错", value: "" })
+        this.editForm.rules.answer = [
+          { required: true, message: "请选择答案", trigger: "change" }
+        ] //添加答案校验
         return
       }
+
+      //如果是问答
+      if (value === 5) {
+        this.editForm.answer = ""
+        this.editForm.rules.answer = [
+          { required: true, message: "请输入答案", trigger: "change" }
+        ] //添加答案校验
+      }
+    },
+    //添加选项
+    addOption() {
+      if (this.editForm.options.length >= 7) {
+        alert("最多7个选项")
+        return
+      }
+
+      let index = this.editForm.options.length
+      this._addOption(index, "")
+    },
+    // 添加选项
+    _addOption(index, value) {
+      let lab = String.fromCharCode(65 + index)
+      this.editForm.options.push({ lab: lab, value: value })
+      this.editForm.answers.push({ lab: lab, value: value })
+
+      this.editForm.rules["options." + index + ".value"] = [
+        { required: true, message: "请输入选项" + lab, trigger: "change" }
+      ]
+    },
+    // 删除选项
+    delOption() {
+      this.editForm.options.pop()
+      this.editForm.answers.pop()
+    },
+    //添加填空
+    addFillBlanks() {
+      let index = this.editForm.answers.length
+      this._addFillBlanks(index, "")
+    },
+    //添加填空
+    _addFillBlanks(index, value) {
+      let lab = String.fromCharCode(65 + index)
+      this.editForm.answers.push({ lab: lab, value: value })
+
+      this.editForm.rules["answers." + index + ".value"] = [
+        { required: true, message: "请输入填空" + lab, trigger: "change" }
+      ]
+    },
+    //删除填空
+    delFillBlanks() {
+      if (this.editForm.answers.length <= 1) {
+        alert("最少1个填空")
+        return
+      }
+
+      this.editForm.answers.pop()
+      let index = this.editForm.answers.length
+      this.editForm.rules["answers." + index + ".value"] = [
+        { required: false, message: "请输入填空" + lab, trigger: "change" }
+      ]
+    },
+    //编辑器监听事件
+    editorListener(id, value) {
+      if (id.startsWith("option")) {
+        let index = parseInt(id.substr(6).charCodeAt() - 65) // 选项赋值，特殊处理一下
+        this.editForm.options[index].value = value
+        return
+      }
+
+      this.editForm[id] = value
+    },
+    //更新类型
+    updateType(value) {
+      this.editForm = {
+        //修改表单
+        id: null, //主键
+        type: value, //类型
+        difficulty: null, //难度
+        title: "", //标题
+        options: [], //选项
+        answer: null, //答案
+        answers: [], //答案
+        analysis: null, //解析
+        score: null, //分值
+        no: null, //排序
+        scoreOptions: [],
+        rules: {
+          //校验
+        }
+      }
+      // this.updateOptionAndAnswer(value)
+    },
+    //添加试题
+    async add() {
+      this.$refs["editForm"].validate(async valid => {
+        if (!valid) {
+          return false
+        }
+
+        let params = {
+          type: this.editForm.type,
+          difficulty: this.editForm.difficulty,
+          title: this.editForm.title,
+          analysis: this.editForm.analysis,
+          score: this.editForm.score,
+          no: this.editForm.no
+        }
+
+        if (params.type === 1 || params.type === 2) {
+          //如果是单选、多选，提取选项值
+          let _options = []
+          for (let i in this.editForm.options) {
+            _options[i] = this.editForm.options[i].value
+          }
+          params.options = _options
+        }
+        if (params.type === 2 || params.type === 3) {
+          //如果是多选、填空，提取分值选项
+          let _scoreOptions = []
+          for (let i in this.editForm.scoreOptions) {
+            _scoreOptions[i] = this.editForm.scoreOptions[i]
+          }
+          params.scoreOptions = _scoreOptions
+        }
+
+        if (params.type === 1 || params.type === 4 || params.type === 5) {
+          params.answer = this.editForm.answer
+        } else if (params.type === 2) {
+          //如果是多选，答案按逗号分隔
+          params.answer = this.editForm.answer.join(",")
+        } else if (params.type === 3) {
+          //如果是填空，答案之间按不可见字符回车分隔
+          let _answer = []
+          for (let i in this.editForm.answers) {
+            _answer[i] = this.editForm.answers[i].value
+          }
+          params.answer = _answer.join("\n")
+        }
+
+        let res = await this.$https.questionAdd(params)
+        if (res.code != 200) {
+          alert(res.msg)
+        }
+
+        this.query()
+      })
+    },
+    //修改试题
+    edit(newVer) {
+      this.$refs["editForm"].validate(valid => {
+        if (!valid) {
+          return false
+        }
+
+        let params = {
+          id: this.editForm.id,
+          type: this.editForm.type,
+          difficulty: this.editForm.difficulty,
+          title: this.editForm.title,
+          analysis: this.editForm.analysis,
+          score: this.editForm.score,
+          no: this.editForm.no
+        }
+
+        if (params.type === 1 || params.type === 2) {
+          //如果是单选、多选，提取选项值
+          let _options = []
+          for (let i in this.editForm.options) {
+            _options[i] = this.editForm.options[i].value
+          }
+          params.options = _options
+        }
+
+        if (params.type === 2 || params.type === 3) {
+          //如果是多选、填空，提取分值选项
+          let _scoreOptions = []
+          this.editForm.scoreOptions.forEach(element => {
+            _scoreOptions.push(element)
+          })
+          params.scoreOptions = _scoreOptions
+        }
+
+        if (params.type === 1 || params.type === 4 || params.type === 5) {
+          params.answer = this.editForm.answer
+        } else if (params.type === 2) {
+          //如果是多选，答案按逗号分隔
+          params.answer = this.editForm.answer.join(",")
+        } else if (params.type === 3) {
+          //如果是填空，答案之间按不可见字符回车分隔
+          let _answer = []
+          for (let i in this.editForm.answers) {
+            _answer[i] = this.editForm.answers[i].value
+          }
+          params.answer = _answer.join("\n")
+        }
+
+        var msg = newVer
+          ? "确定要生成新版本？"
+          : "当前修改会同步到引用的试卷，确定要修改？"
+        this.$confirm(msg, "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        })
+          .then(async () => {
+            let res = await this.$https.questionEdit(params)
+            if (res.code != 200) {
+              this.$message({
+                type: "error",
+                message: res.msg
+              })
+            }
+            this.query()
+          })
+          .catch(() => {})
+      })
+    },
+    // 获取试题
+    async get(id) {
+      let res = await this.$https.questionGet({ id })
+      console.log(res)
+      if (res.code != 200) {
+        alert(res.msg)
+        return
+      }
+
+      this.editForm.id = res.data.id
+      this.editForm.type = res.data.type
+      this.editForm.difficulty = res.data.difficulty
+      this.editForm.title = res.data.title
+      this.editForm.answer = res.data.answer
+      this.editForm.analysis = res.data.analysis
+      this.editForm.score = res.data.score
+      this.editForm.no = res.data.no
+
+      if (this.editForm.type === 1) {
+        this.editForm.options = [] // 重置选项
+        this.editForm.answers = [] //重置答案列表
+        for (let i = 0; i < res.data.options.length; i++) {
+          this._addOption(i, res.data.options[i])
+        }
+      } else if (this.editForm.type === 2) {
+        this.editForm.options = [] // 重置选项
+        this.editForm.answers = [] //重置答案列表
+        for (let i = 0; i < res.data.options.length; i++) {
+          this._addOption(i, res.data.options[i])
+        }
+
+        this.editForm.answer = res.data.answer.split(",")
+        this.editForm.scoreOptions =
+          res.data.scoreOptions == null ? [] : res.data.scoreOptions.split(",")
+      } else if (this.editForm.type === 3) {
+        this.editForm.answers = [] //重置答案列表
+        let answers = res.data.answer.split("\n")
+        for (let i = 0; i < answers.length; i++) {
+          this._addFillBlanks(i, answers[i])
+        }
+
+        this.editForm.scoreOptions =
+          res.data.scoreOptions == null ? [] : res.data.scoreOptions.split(",")
+      }
+    },
+    del(id) {
+      this.$confirm("确定要删除？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(async () => {
+        await this.$https.questionDel({ id })
+        this.query()
+      })
     }
   }
 }
 </script>
-
-<style lang="scss">
-.one {
-  margin-bottom: 30px;
-}
-#one,
-#two,
-#three {
-  p {
-    font-size: 16;
-    color: #333;
-    line-height: 32px;
-    text-indent: 2em;
-  }
-  p.no {
-    text-indent: 0;
-  }
-  p.title {
-    text-align: center;
-    font-weight: bold;
-    text-indent: 0;
-  }
-  p.big {
-    font-weight: bold;
-  }
-}
-.agreements {
+<style lang="scss" scoped>
+.container {
   width: 100%;
-  padding: 0 5%;
-  .title {
-    width: 60%;
-    margin: auto;
-  }
-  .txt {
-    margin-bottom: 20px;
-    text-indent: 2em;
+  display: flex;
+  flex-direction: column;
+  padding-top: 0;
+}
+
+.head {
+  width: 100%;
+  height: 50px;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  .head-left {
+    color: #fff;
   }
 }
-ul {
-  position: fixed;
-  top: 200px;
-  left: 5%;
-  li {
-    margin-bottom: 2px;
-    width: 94px;
-    height: 48px;
-    line-height: 28px;
-    text-align: center;
-    a {
+
+.search {
+  height: 80px;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.content {
+  display: flex;
+  width: 100%;
+  padding: 0 20px;
+  margin: 0 auto;
+}
+
+.content-left {
+  width: 145px;
+  background: #fff;
+  border-radius: 5px;
+  box-shadow: 0 0 13px 3px rgba(30, 159, 255, 0.15);
+  .left-top {
+    background-color: #0095e5;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    text-align: left;
+    padding-left: 10px;
+    font-size: 14px;
+    color: #fff;
+  }
+  .left-center {
+    width: 110px;
+    height: 40px;
+    border: 1px solid #eeeeeeff;
+    margin: 7px auto;
+    line-height: 40px;
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    &:hover {
+      border: 1px solid #0095e5;
+      img:last-child {
+        display: block;
+      }
+    }
+    img {
+      &:first-child {
+        width: 22px;
+        height: 22px;
+        margin: 0 10px;
+      }
+      &:last-child {
+        width: 28px;
+        height: 22px;
+        position: absolute;
+        bottom: -1px;
+        right: 0px;
+        display: none;
+      }
+    }
+  }
+  .left-center-active {
+    border: 1px solid #0095e5;
+    img:last-child {
       display: block;
-      width: 100%;
-      height: 100%;
-      background: RGBA(69, 132, 213, 0.6);
-      color: #fff;
-      font-size: 15;
     }
   }
-  li.active {
-    a {
-      background: RGBA(69, 132, 213, 0.95);
-      filter: Alpha(opacity=95);
+  .splitLine {
+    background: #eee;
+    width: 100%;
+    height: 1px;
+    margin: 16px auto;
+  }
+  .left-bottom {
+    width: 110px;
+    height: 40px;
+    background: #eee;
+    margin: 7px auto;
+    text-align: center;
+    line-height: 40px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    img {
+      width: 16px;
+      height: 16px;
+      margin-right: 10px;
     }
   }
 }
-button {
-  margin: 300px auto 20px;
+
+.content-center {
+  flex: 1;
+  .center-card {
+    height: 70px;
+    cursor: pointer;
+    margin: 0 10px 10px 10px;
+    padding: 0 5px;
+    display: flex;
+    flex-direction: column;
+    &:hover {
+      border: 1px solid rgb(30, 159, 255);
+      box-shadow: 0 0 7px 2px rgba(30, 159, 255, 0.15);
+      .card-bottom-right {
+        display: block;
+      }
+    }
+  }
+  .center-card-top {
+    height: 20px;
+    font-size: 14px;
+    text-align: left;
+  }
+  .center-card-bottom {
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .el-tag {
+      margin-right: 8px;
+    }
+    .center-tag-danger {
+      background-color: #feeddc;
+      border-color: #fddbb9;
+      color: #fa8718;
+      height: 20px;
+      line-height: 18px;
+    }
+    .center-tag-purple {
+      border-color: #daddf9;
+      color: #838eea;
+      height: 20px;
+      line-height: 18px;
+    }
+    .card-bottom-right {
+      display: none;
+    }
+    .btn {
+      padding: 5px 10px;
+    }
+  }
+}
+
+.content-right {
+  width: 460px;
+  background: #fff;
+  border-radius: 5px;
+  padding: 10px 0 0 0;
+  box-shadow: 0 0 13px 3px rgba(191, 198, 204, 0.15);
+}
+
+.btn2 {
+  width: 65px;
+  height: 25px;
+  padding: 0px;
+}
+
+.form-inline .el-form-item {
+  width: 140px;
+}
+
+.pagination {
+  font-weight: 400;
+  text-align: center;
+}
+
+.el-radio,
+.el-checkbox {
+  margin-right: 10px;
+}
+.box-card-no-border {
+  border: none;
+}
+
+/deep/ .el-card__body {
+  padding: 5px;
+}
+.el-alert--success.is-light {
+  background-color: #ecf7fd;
+  color: #409eff;
+  margin-bottom: 10px;
+}
+.el-alert {
+  padding: 0px;
+}
+/deep/ .el-alert__title {
+  font-size: 12px;
+  color: #409eff;
+}
+.el-input /deep/.el-input-group__prepend {
+  background-color: #fff;
+  border: 0px;
+  width: 38px;
+}
+/deep/ .el-form-item--mini.el-form-item,
+.el-form-item--small.el-form-item {
+  margin-bottom: 24px;
+}
+
+/deep/ .el-form-item__error {
+  line-height: 20px;
 }
 </style>

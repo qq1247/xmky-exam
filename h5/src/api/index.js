@@ -5,7 +5,7 @@ const post = async (url, params = {}) =>
   await http.post(url, qs.stringify(params, { arrayFormat: "repeat" }))
 
 export default {
-  // 数据字典
+  // 数据字典(基础信息)
   dictListpage: params => post("dict/listpage", params),
   dictGet: params => post("dict/get", params),
   dictAdd: params => post("dict/add", params),
@@ -30,6 +30,14 @@ export default {
   examUserList: params => post("exam/userList", params),
   examQuestionList: params => post("exam/questionList", params),
 
+  // 考试分类相关
+  examTypeListPage: params => post("examType/listpage", params),
+  examTypeAdd: params => post("examType/add", params),
+  examTypeEdit: params => post("examType/edit", params),
+  examTypeDel: params => post("examType/del", params),
+  examTypeGet: params => post("examType/get", params),
+  examTypeMove: params => post("examType/move", params),
+
   // 试卷相关
   paperListPage: params => post("paper/listpage", params),
   paperAdd: params => post("paper/add", params),
@@ -53,6 +61,14 @@ export default {
   paperQuestionDown: params => post("paper/questionDown", params),
   paperQuestionPublish: params => post("paper/publish", params),
 
+  // 试卷分类相关
+  paperTypeListPage: params => post("paperType/listpage", params),
+  paperTypeAdd: params => post("paperType/add", params),
+  paperTypeEdit: params => post("paperType/edit", params),
+  paperTypeDel: params => post("paperType/del", params),
+  paperTypeGet: params => post("paperType/get", params),
+  paperTypeMove: params => post("paperType/move", params),
+
   // 试题相关
   questionListPage: params => post("question/listpage", params),
   questionGet: params => post("question/get", params),
@@ -73,11 +89,7 @@ export default {
   questionTypeOpenListPage: params => post("questionTypeOpen/listpage", params),
   questionTypeOpenAdd: params => post("questionTypeOpen/add", params),
   questionTypeOpenDel: params => post("questionTypeOpen/del", params),
-  questionTypeOpen: params => post("questionTypeOpen/list", params),
-  questionTypeOpen: params => post("questionTypeOpen/list", params),
-  questionTypeOpen: params => post("questionTypeOpen/list", params),
-  questionTypeOpen: params => post("questionTypeOpen/list", params),
 
-  // 登陆相关
+  // 用户相关
   login: params => post("login/in", params)
 }

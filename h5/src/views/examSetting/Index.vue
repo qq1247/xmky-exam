@@ -2,12 +2,20 @@
   <div class="container">
     <!-- 搜索 -->
     <el-form :inline="true" :model="queryForm" class="form-inline search">
-      <el-form-item>
-        <el-input
-          placeholder="请输入名称"
-          v-model="queryForm.examName"
-        ></el-input>
-      </el-form-item>
+      <div>
+        <el-form-item>
+          <el-input
+            placeholder="请输入名称"
+            v-model="queryForm.examName"
+          ></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-input
+            placeholder="请输入发布人"
+            v-model="queryForm.examPerson"
+          ></el-input>
+        </el-form-item>
+      </div>
       <el-form-item>
         <el-button @click="query" icon="el-icon-search" type="primary"
           >查询</el-button
@@ -19,8 +27,8 @@
       <div class="exam-list">
         <div class="exam-item">
           <div class="exam-content exam-add" @click="examForm.show = true">
-            <i class="common common-exam-add"></i>
-            <span>添加试卷</span>
+            <i class="common common-knowledge"></i>
+            <span>添加考试库</span>
           </div>
         </div>
         <div v-for="(item, index) in examList" :key="index" class="exam-item">
@@ -31,19 +39,19 @@
               <span>{{ item.date }}</span>
             </div>
             <div class="handler">
-              <span data-title="编辑" @click="paperEdit">
+              <span data-title="编辑">
                 <i class="common common-edit"></i>
               </span>
-              <span data-title="详情" @click="paperDetail">
+              <span data-title="详情">
                 <i class="common common-dingdan"></i>
               </span>
-              <span data-title="删除" @click="paperDelete">
+              <span data-title="删除">
                 <i class="common common-delete"></i>
               </span>
-              <span data-title="权限" @click="paperRole">
+              <span data-title="权限">
                 <i class="common common-role"></i>
               </span>
-              <span>
+              <span data-title="更多">
                 <i class="common common-more-row"></i>
                 <div class="handler-more">
                   <div>更多</div>
@@ -55,12 +63,7 @@
           </div>
         </div>
       </div>
-      <el-pagination
-        background
-        layout="prev, pager, next"
-        :total="1000"
-        class="exam-pagination"
-      >
+      <el-pagination background layout="prev, pager, next" :total="1000">
       </el-pagination>
     </div>
     <el-dialog
@@ -84,58 +87,34 @@
           >
           </el-tab-pane>
           <div v-if="tabActive == '0'">
-            <el-form-item>
-              <div class="exam-type">
-                <div
-                  :class="
-                    typeIndex == index
-                      ? 'type-item type-item-active'
-                      : 'type-item '
-                  "
-                  v-for="(item, index) in examType"
-                  :key="item.content"
-                  @click="setExamType(index)"
-                >
-                  <i :class="['common', `${item.icon}`]"></i>
-                  <i
-                    class="common common-selected"
-                    v-if="typeIndex == index"
-                  ></i>
-                  {{ item.content }}
-                </div>
-              </div>
-            </el-form-item>
             <el-form-item label="试卷名称" prop="examName">
               <el-input
                 placeholder="请输入试卷名称"
                 v-model="examForm.examName"
               ></el-input>
             </el-form-item>
-            <el-form-item label="及格分数(%)" prop="examPercentage">
-              <el-input
-                type="number"
-                min="1"
-                max="100"
-                placeholder="请输入及格分数占总分百分比"
-                v-model="examForm.examPercentage"
-              ></el-input>
+            <el-form-item label="选择试卷">
+              <el-select placeholder="请选择试卷" v-model="examForm.examType">
+                <el-option
+                  :key="parseInt(type.DICT_KEY)"
+                  :label="type.DICT_VALUE"
+                  :value="parseInt(type.DICT_KEY)"
+                  v-for="type in examForm.examTypes"
+                ></el-option>
+              </el-select>
             </el-form-item>
-            <el-form-item label="考前阅读"
-              ><Editor
-                :value="examForm.examTip"
-                @editorListener="examTip"
-                id="examTip"
-              ></Editor>
+            <el-form-item label="成绩公开">
+              <el-checkbox v-model="examForm.examScore">是</el-checkbox>
             </el-form-item>
-            <el-form-item label="阅读时长">
-              <el-input
-                placeholder="请输入阅读时长"
-                v-model="examForm.examTipTime"
-              ></el-input>
+            <el-form-item label="排名公开">
+              <el-checkbox v-model="examForm.examRanking">是</el-checkbox>
+            </el-form-item>
+            <el-form-item label="考试方式">
+              <el-checkbox v-model="examForm.examLogin">免登录</el-checkbox>
             </el-form-item>
           </div>
           <div v-if="tabActive == '1'">
-            <el-form-item label="展示方式">
+            <el-form-item label="阅卷方式">
               <el-radio
                 v-for="item in examForm.examRadios"
                 :key="item.value"
@@ -144,47 +123,55 @@
                 >{{ item.name }}</el-radio
               >
             </el-form-item>
-          </div>
-          <div v-if="tabActive == '2'">
-            <el-form-item label="防作弊">
-              <el-checkbox-group v-model="examForm.examChecked">
-                <el-checkbox
-                  v-for="item in examForm.examAntiCheat"
-                  :label="item"
-                  :key="item"
-                  >{{ item }}</el-checkbox
-                >
-              </el-checkbox-group>
-              <el-input
-                v-model="examForm.examMiniNum"
-                placeholder="最小化次数"
-                v-if="examForm.examChecked.includes('最小化')"
+            <div>
+              <div
+                v-for="(item, index) in examForm.examRemarks"
+                :key="item.id"
+                class="exam-remark"
               >
-                <span slot="append">后交卷</span></el-input
-              >
-            </el-form-item>
-          </div>
-          <div v-if="tabActive == '3'">
-            <el-form-item label="成绩评语">
-              <el-checkbox v-model="examForm.examRemark">备选项</el-checkbox>
-              <div v-if="examForm.examRemark">
-                <div
-                  v-for="item in examForm.examRemarks"
-                  :key="item.id"
-                  class="exam-remark"
-                >
-                  大于等于<el-input
-                    v-model="item.percentage"
-                    placeholder="占总分百分比"
-                    class="remark-percentage"
-                  ></el-input
-                  >%，<el-input
-                    v-model="item.content"
-                    class="remark-content"
-                    placeholder="请输入评语"
-                  ></el-input>
-                </div>
-                <div class="remark-buttons">
+                <el-form-item label="阅卷人">
+                  <el-select
+                    placeholder="请选择"
+                    v-model="examForm.examRemarks[index].examCheckPerson"
+                  >
+                    <el-option
+                      :key="parseInt(type.DICT_KEY)"
+                      :label="type.DICT_VALUE"
+                      :value="parseInt(type.DICT_KEY)"
+                      v-for="type in examForm.examCheckPersons"
+                    ></el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="题号" v-if="examForm.examRadio == 0">
+                  <el-select
+                    placeholder="请选择"
+                    v-model="examForm.examRemarks[index].examPaperNum"
+                  >
+                    <el-option
+                      :key="parseInt(type.DICT_KEY)"
+                      :label="type.DICT_VALUE"
+                      :value="parseInt(type.DICT_KEY)"
+                      v-for="type in examForm.examPaperNums"
+                    ></el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="试卷" v-if="examForm.examRadio == 1">
+                  <el-select
+                    multiple
+                    placeholder="请选择"
+                    v-model="examForm.examRemarks[index].examPaper"
+                  >
+                    <el-option
+                      :key="parseInt(type.DICT_KEY)"
+                      :label="type.DICT_VALUE"
+                      :value="parseInt(type.DICT_KEY)"
+                      v-for="type in examForm.examPapers"
+                    ></el-option>
+                  </el-select>
+                </el-form-item>
+              </div>
+              <div class="remark-buttons">
+                <el-form-item>
                   <el-button
                     @click="remarkAdd"
                     type="primary"
@@ -199,14 +186,30 @@
                     icon="el-icon-minus"
                     >添加评语</el-button
                   >
-                </div>
+                </el-form-item>
               </div>
+            </div>
+          </div>
+          <div v-if="tabActive == '2'">
+            <el-form-item label="考试用户">
+              <el-select
+                multiple
+                placeholder="请选择用户"
+                v-model="examForm.examUser"
+              >
+                <el-option
+                  :key="parseInt(type.DICT_KEY)"
+                  :label="type.DICT_VALUE"
+                  :value="parseInt(type.DICT_KEY)"
+                  v-for="type in examForm.examUsers"
+                ></el-option>
+              </el-select>
             </el-form-item>
           </div>
         </el-tabs>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button v-if="!(tabActive == '3')" @click="examNext" type="primary"
+        <el-button v-if="!(tabActive == '2')" @click="examNext" type="primary"
           >下一步</el-button
         >
         <el-button @click="examAdd">添加</el-button>
@@ -217,192 +220,130 @@
 </template>
 
 <script>
-import Editor from "@/components/Editor.vue"
+import Editor from "@/components/Editor.vue";
 export default {
   components: {
-    Editor
+    Editor,
   },
   data() {
     return {
-      curPage: 1,
-      pageSize: 5,
       queryForm: {
-        examName: ""
+        examName: "",
       },
       examForm: {
         show: false,
         examName: "",
-        examPercentage: "",
-        examTip: "",
-        examTipTime: "",
-        examRadio: "0",
+        examPerson: "",
+        examType: "",
+        examTypes: [],
+        examScore: false,
+        examRanking: false,
+        examLogin: false,
+        examRadio: 0,
         examRadios: [
           {
-            name: "整张",
-            value: "0"
+            name: "按题阅卷",
+            value: 0,
           },
           {
-            name: "章节",
-            value: "1"
+            name: "按卷阅卷",
+            value: 1,
           },
-          {
-            name: "单题",
-            value: "2"
-          }
         ],
-        examAntiCheat: [
-          "试题乱序",
-          "选项乱序",
-          "禁用右键",
-          "禁用复制",
-          "最小化"
-        ],
-        examChecked: [],
-        examMiniNum: "",
-        examRemark: false,
+        examCheckPersons: [],
+        examPaperNums: [],
+        examPapers: [],
         examRemarks: [
           {
             id: 1,
-            percentage: "",
-            content: ""
-          }
+            examCheckPerson: "",
+            examPaperNum: "",
+            examPaper: [],
+          },
         ],
+        examUser: [],
+        examUsers: [],
         rules: {
           examName: [
-            { required: true, message: "请填写试卷名称", trigger: "blur" }
+            { required: true, message: "请填写试卷名称", trigger: "blur" },
           ],
-          examPercentage: [
-            {
-              required: true,
-              message: "请填写及格分数占总分的百分比",
-              trigger: "blur"
-            }
-          ]
-        }
+        },
       },
       tabActive: "0",
       examTabs: [
         {
           title: "基础信息",
-          name: "0"
+          name: "0",
         },
         {
-          title: "组卷方式",
-          name: "1"
+          title: "阅卷用户",
+          name: "1",
         },
         {
-          title: "防作弊",
-          name: "2"
+          title: "考试用户",
+          name: "2",
         },
-        {
-          title: "成绩评语",
-          name: "3"
-        }
-      ],
-      typeIndex: 0,
-      examType: [
-        {
-          icon: "common-person",
-          content: "人工组卷"
-        },
-        {
-          icon: "common-exchange",
-          content: "随机组卷"
-        }
       ],
       examList: [
         {
           name: "测试考试",
           no: "2021-01-01",
-          date: "2019-02-02"
+          date: "2019-02-02",
         },
         {
           name: "测试考试",
           no: "2021-01-01",
-          date: "2019-02-02"
+          date: "2019-02-02",
         },
         {
           name: "测试考试",
           no: "2021-01-01",
-          date: "2019-02-02"
+          date: "2019-02-02",
         },
         {
           name: "测试考试",
           no: "2021-01-01",
-          date: "2019-02-02"
+          date: "2019-02-02",
         },
         {
           name: "测试考试",
           no: "2021-01-01",
-          date: "2019-02-02"
-        }
-      ]
-    }
-  },
-  mounted() {
-    this.query()
+          date: "2019-02-02",
+        },
+      ],
+    };
   },
   methods: {
     // 查询
-    async paperListPage() {
-      const res = await this.$https.paperListPage({
-        name: this.queryForm.name,
-        userName: this.userName,
-        curPage: this.curPage,
-        pageSize: this.pageSize
-      })
-    },
-    paperEdit() {
-      this.$router.push("/examPaper/edit")
-    },
-    paperDetail() {
-      this.$router.push("/examPaper/add")
-    },
-    paperDelete() {
-      this.$router.push("/examPaper/edit")
-    },
-    paperRole() {
-      this.$router.push("/examPaper/edit")
-    },
-    paperMore() {
-      this.$router.push("/examPaper/edit")
-    },
+    query() {},
     // tab切换
     examNext() {
-      this.tabActive = Number(this.tabActive) + 1 + ""
-    },
-    // 考试阅读富文本
-    examTip(id, value) {
-      this.examForm[id] = value
-    },
-    // 组卷方式
-    setExamType(index) {
-      this.typeIndex = index
+      this.tabActive = Number(this.tabActive) + 1 + "";
     },
     // 添加评语
     remarkAdd() {
       this.examForm.examRemarks.push({
         id: this.examForm.examRemarks.length + 1,
-        percentage: "",
-        content: ""
-      })
+        examCheckPerson: "",
+        examPaperNum: "",
+        examPaper: [],
+      });
     },
     // 删除评语
     remarkDel() {
-      this.examForm.examRemarks.pop()
+      this.examForm.examRemarks.pop();
     },
     // 添加试卷信息
     examAdd() {
-      this.$refs["examForm"].validate(valid => {
-        /* if (!valid) {
-          console.log("error")
-          return
-        } */
-        this.$router.push("/examPaper/add")
-      })
-    }
-  }
-}
+      this.$refs["examForm"].validate((valid) => {
+        if (!valid) {
+          console.log("error");
+          return;
+        }
+      });
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -532,8 +473,8 @@ export default {
         position: absolute;
         z-index: 100;
         bottom: -16px;
-        transform: translateX(-50%);
         left: 50%;
+        transform: translateX(-50%);
         border-width: 5px;
         border-style: solid;
         border-color: transparent transparent #1e9fff transparent;
@@ -563,7 +504,7 @@ export default {
   align-items: center;
   font-size: 14px;
   color: #9199a1;
-  .common-exam-add {
+  .common-knowledge {
     display: inline-block;
     width: 100px;
     height: 100px;
@@ -578,16 +519,12 @@ export default {
   }
   &:hover {
     color: #1e9fff;
-    .common-exam-add {
+    .common-knowledge {
       border: 1px solid #1e9fff;
       background: #1e9fff;
       color: #fff;
     }
   }
-}
-
-.exam-pagination {
-  margin: 50px auto;
 }
 
 /deep/ .el-dialog__header {
@@ -605,7 +542,7 @@ export default {
   justify-content: center;
   align-items: center;
   position: relative;
-  border: 1px solid #9199a1;
+  border: 1px solid #d8d8d8;
   font-size: 14px;
   margin-right: 10px;
   cursor: pointer;

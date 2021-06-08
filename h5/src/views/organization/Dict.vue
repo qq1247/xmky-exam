@@ -135,13 +135,13 @@ export default {
         curPage: 1, //当前第几页
         pageSize: 10, //每页多少条
         pageSizes: [10, 20, 50, 100], //每页多少条
-        list: [] //列表数据
+        list: [], //列表数据
       },
       queryForm: {
         //查询表单
         dictIndex: null,
         dictKey: null,
-        dictValue: null
+        dictValue: null,
       },
       editForm: {
         //修改表单
@@ -154,80 +154,80 @@ export default {
         rules: {
           //校验
           dictIndex: [
-            { required: true, message: "请输入排序", trigger: "change" }
+            { required: true, message: "请输入排序", trigger: "change" },
           ],
           dictKey: [
-            { required: true, message: "请输入排序", trigger: "change" }
+            { required: true, message: "请输入排序", trigger: "change" },
           ],
           dictValue: [
-            { required: true, message: "请输入排序", trigger: "change" }
+            { required: true, message: "请输入排序", trigger: "change" },
           ],
-          no: [{ required: true, message: "请输入排序", trigger: "change" }]
-        }
-      }
-    }
+          no: [{ required: true, message: "请输入排序", trigger: "change" }],
+        },
+      },
+    };
   },
   created() {
-    this.init()
+    this.init();
   },
   methods: {
     // 查询
     async query() {
       let {
-        data: { rows, total }
+        data: { rows, total },
       } = await this.$https.dictListpage({
         dictIndex: this.queryForm.dictIndex,
         dictKey: this.queryForm.dictKey,
         dictValue: this.queryForm.dictValue,
         curPage: this.listpage.curPage,
-        pageSize: this.listpage.pageSize
-      })
-      this.listpage.total = total
-      this.listpage.list = rows
+        pageSize: this.listpage.pageSize,
+      });
+      this.listpage.total = total;
+      this.listpage.list = rows;
     },
     // 重置
     async reset() {
-      this.listpage.curPage = 1
-      this.$refs["queryForm"].resetFields()
-      this.query()
+      this.listpage.curPage = 1;
+      this.$refs["queryForm"].resetFields();
+      this.query();
     },
     handleSizeChange(val) {
-      this.listpage.pageSize = val
-      this.query()
+      this.listpage.pageSize = val;
+      this.query();
     },
     handleCurrentChange(val) {
-      this.listpage.curPage = val
-      this.query()
+      this.listpage.curPage = val;
+      this.query();
     },
     // 初始化
     async init() {
-      this.query()
+      this.query();
     },
     add() {
-      this.$refs["editForm"].validate(async valid => {
+      this.$refs["editForm"].validate(async (valid) => {
         if (!valid) {
-          return false
+          return false;
         }
 
         let { code, msg } = await this.$https.dictAdd({
           dictIndex: this.editForm.dictIndex,
           dictKey: this.editForm.dictKey,
           dictValue: this.editForm.dictValue,
-          no: this.editForm.no
-        })
+          no: this.editForm.no,
+        });
         if (code != 200) {
-          alert(msg)
-          return
+          alert(msg);
+          return;
         }
 
-        this.editForm.show = false
-        this.query()
-      })
+        this.editForm.show = false;
+        this.query();
+      });
     },
     edit() {
-      this.$refs["editForm"].validate(async valid => {
+      this.$refs["editForm"].validate(async (valid) => {
         if (!valid) {
-          return false
+          return false;
         }
 
         let { code, msg } = await this.$https.dictEdit({
@@ -235,52 +235,52 @@ export default {
           dictIndex: this.editForm.dictIndex,
           dictKey: this.editForm.dictKey,
           dictValue: this.editForm.dictValue,
-          no: this.editForm.no
-        })
+          no: this.editForm.no,
+        });
         if (code != 200) {
-          alert(msg)
-          return
+          alert(msg);
+          return;
         }
 
-        this.editForm.show = false
-        this.query()
-      })
+        this.editForm.show = false;
+        this.query();
+      });
     },
     // 获取试题
     async get(id) {
-      let res = await this.$https.dictGet({ id: id })
+      let res = await this.$https.dictGet({ id: id });
       if (res.code != 200) {
-        alert(res.msg)
-        return
+        alert(res.msg);
+        return;
       }
 
-      this.editForm.show = true
-      this.editForm.id = res.data.id
-      this.editForm.dictIndex = res.data.dictIndex
-      this.editForm.dictKey = res.data.dictKey
-      this.editForm.dictValue = res.data.dictValue
-      this.editForm.no = res.data.no
+      this.editForm.show = true;
+      this.editForm.id = res.data.id;
+      this.editForm.dictIndex = res.data.dictIndex;
+      this.editForm.dictKey = res.data.dictKey;
+      this.editForm.dictValue = res.data.dictValue;
+      this.editForm.no = res.data.no;
     },
     // 删除
     async del(id) {
       this.$confirm("确定要删除？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       }).then(async () => {
-        let res = await this.$https.dictDel({ id })
+        let res = await this.$https.dictDel({ id });
         if (res.code != 200) {
           this.$message({
             type: "error",
-            message: res.msg
-          })
+            message: res.msg,
+          });
         }
 
-        this.query()
-      })
-    }
-  }
-}
+        this.query();
+      });
+    },
+  },
+};
 </script>
 <style lang="scss" scoped>
 .container {
