@@ -89,11 +89,11 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 		
 		Long cacheTokenId = TokenCache.get(String.format("TOKEN_%s", userId));
 		if (cacheTokenId == null) {//缓存中没有令牌（过期清理或人工清理）
-			throw new AuthenticationException(String.format("用户【%s】令牌未找到", loginName));
+			throw new AuthenticationException(String.format("用户【%s】令牌不存在", loginName));
 		}
 		
 		if (cacheTokenId != tokenId) {
-			throw new AuthenticationException(String.format("用户【%s】令牌不匹配", loginName));
+			throw new AuthenticationException(String.format("用户【%s】令牌过期", loginName));
 		}
 		
 		Date curTime = new Date();
@@ -149,7 +149,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 		} catch (Exception e) {
 			httpResponse.setCharacterEncoding("UTF-8");
 			httpResponse.setContentType("application/json;charset=UTF-8");
-			httpResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
+			httpResponse.setStatus(HttpStatus.OK.value());
 			httpResponse.getWriter().write("{\"code\": 401, \"msg\": \""+e.getMessage()+"\"}");
 			return false;
 		}

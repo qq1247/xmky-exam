@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.api.controller;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -7,6 +9,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -74,10 +77,13 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	public PageResult listpage(PageIn pageIn, String name) {
+	public PageResult listpage(PageIn pageIn, String name, Integer orgId) {
 		try {
 			if(ValidateUtil.isValid(name)){
 				pageIn.setTwo(name);
+			}
+			if(orgId != null){
+				pageIn.setFour(orgId.toString());
 			}
 			return PageResultEx.ok().data(userService.getListpage(pageIn));
 		} catch (Exception e) {
@@ -137,7 +143,7 @@ public class ApiUserController extends BaseController {
 	 * @param user
 	 * @return PageResult
 	 */
-	@RequestMapping("edit")
+	@RequestMapping("/edit")
 	@ResponseBody
 	public PageResult edit(User user) {
 		try {
@@ -221,7 +227,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/roleUpdate")
 	@ResponseBody
-	public PageResult postUpdate(Integer id, Integer[] roles) {
+	public PageResult roleUpdate(Integer id, Integer[] roles) {
 		try {
 			userService.roleUpdate(id, roles);
 			return PageResult.ok();
@@ -344,13 +350,20 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/template")
 	@ResponseBody
-	public PageResult template() {
+	public void template() {
+		OutputStream output = null;
 		try {
-			userXlsxService.templateUserXlsx();
-			return PageResultEx.ok();
+			//userXlsxService.templateUserXlsx();
+			InputStream inputStream = this.getClass().getResourceAsStream("/res/orgExamole.xlsx");
+			String fileName = new String(("log4j2.xml").getBytes("UTF-8"),"ISO-8859-1");
+			response.addHeader("Content-Disposition", "attachment;filename" + fileName);
+			response.setContentType("application/fprce-download");
+			output = response.getOutputStream();
+			IOUtils.copy(inputStream, output);
 		} catch (Exception e) {
-			log.error("组织机构列表错误：", e);
-			return PageResult.err();
+			log.error("用户导出模板下载附件失败：", e);
+		} finally {
+			IOUtils.closeQuietly(output);
 		}
 	}
 	
@@ -372,10 +385,11 @@ public class ApiUserController extends BaseController {
 				org = orgService.getEntity(entity.getOrgId());
 			}
 			return PageResultEx.ok()
+					.addAttr("id", entity.getId())
 					.addAttr("name", entity.getName())
 					.addAttr("loginName", entity.getLoginName())
 					.addAttr("registTime", DateUtil.formatDateTime(entity.getRegistTime()))
-					.addAttr("lastLoginTime", DateUtil.formatDateTime(entity.getLastLoginTime()))
+					.addAttr("lastLoginTime", entity.getLastLoginTime() == null ? null : DateUtil.formatDateTime(entity.getLastLoginTime()))
 					.addAttr("orgId", entity.getOrgId())
 					.addAttr("state", entity.getState())
 					.addAttr("orgName", org == null ? null : org.getName());

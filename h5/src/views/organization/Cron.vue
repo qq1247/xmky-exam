@@ -8,22 +8,10 @@
           class="form-inline"
           ref="queryForm"
         >
-          <el-form-item label prop="dictIndex">
+          <el-form-item label prop="name">
             <el-input
-              placeholder="请输入索引"
-              v-model="queryForm.dictIndex"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label prop="dictKey">
-            <el-input
-              placeholder="请输入键"
-              v-model="queryForm.dictKey"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label prop="dictValue">
-            <el-input
-              placeholder="请输入值"
-              v-model="queryForm.dictValue"
+              placeholder="请输入名称"
+              v-model="queryForm.name"
             ></el-input>
           </el-form-item>
           <el-form-item style="width: 200px">
@@ -44,24 +32,36 @@
       </div>
       <div class="table">
         <el-table :data="listpage.list" style="width: 100%">
-          <el-table-column label="索引">
+          <el-table-column label="名称" width="120px">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.dictIndex }}</span>
+              <span style="margin-left: 10px">{{ scope.row.name }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="键">
+          <el-table-column label="实现类">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.dictKey }}</span>
+              <span style="margin-left: 10px">{{ scope.row.jobClass }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="值">
+          <el-table-column label="表达式" width="120px">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.dictValue }}</span>
+              <span style="margin-left: 10px">{{ scope.row.cron }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="排序">
+          <el-table-column label="状态" width="70px">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.no }}</span>
+              <span style="margin-left: 10px">{{ scope.row.stateName }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="最近三次运行时间">
+            <template slot-scope="scope">
+              <span
+                v-for="item in scope.row.recentTriggerTime.split('；')"
+                :key="item"
+              >
+                <el-tag effect="plain" v-if="item" style="margin-bottom: 3px">
+                  {{ item }}
+                </el-tag>
+              </span>
             </template>
           </el-table-column>
           <el-table-column label="操作">
@@ -69,6 +69,24 @@
               <el-button @click="get(scope.row.id)" size="mini">修改</el-button>
               <el-button @click="del(scope.row.id)" size="mini" type="danger"
                 >删除</el-button
+              >
+              <el-button
+                @click="startTask(scope.row.id)"
+                size="mini"
+                type="primary"
+                >启动任务</el-button
+              >
+              <el-button
+                @click="stopTask(scope.row.id)"
+                size="mini"
+                type="danger"
+                >停止任务</el-button
+              >
+              <el-button
+                @click="onceTask(scope.row.id)"
+                size="mini"
+                type="primary"
+                >执行一次</el-button
               >
             </template>
           </el-table-column>
@@ -84,32 +102,22 @@
         layout="total, sizes, prev, pager, next, jumper"
       ></el-pagination>
     </div>
-    <el-dialog :visible.sync="editForm.show" title="数据字典">
+    <el-dialog :visible.sync="editForm.show" title="定时任务">
       <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
-        <el-form-item label="索引" label-width="120px" prop="dictIndex">
+        <el-form-item label="名称" label-width="120px" prop="name">
+          <el-input placeholder="请输入名称" v-model="editForm.name"></el-input>
+        </el-form-item>
+        <el-form-item label="实现类" label-width="120px" prop="jobClass">
           <el-input
-            placeholder="请输入索引"
-            v-model="editForm.dictIndex"
+            placeholder="请输入实现类"
+            v-model="editForm.jobClass"
           ></el-input>
         </el-form-item>
-        <el-form-item label="键" label-width="120px" prop="dictKey">
+        <el-form-item label="cron表达式" label-width="120px" prop="cron">
           <el-input
-            placeholder="请输入键"
-            v-model="editForm.dictKey"
+            placeholder="请输入cron表达式"
+            v-model="editForm.cron"
           ></el-input>
-        </el-form-item>
-        <el-form-item label="值" label-width="120px" prop="dictValue">
-          <el-input
-            placeholder="请输入值"
-            v-model="editForm.dictValue"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="排序" label-width="120px" prop="no">
-          <el-input-number
-            :max="100"
-            :min="1"
-            v-model.number="editForm.no"
-          ></el-input-number>
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
@@ -139,30 +147,24 @@ export default {
       },
       queryForm: {
         //查询表单
-        dictIndex: null,
-        dictKey: null,
-        dictValue: null,
+        name: null,
       },
       editForm: {
         //修改表单
         id: null, //主键
-        dictIndex: null, //索引
-        dictKey: null, //key
-        dictValue: null, //值
-        no: null, //排序
+        name: null, //名称
+        jobClass: null, //实现类
+        cron: null, //表达式
         show: false, // 是否显示页面
         rules: {
           //校验
-          dictIndex: [
-            { required: true, message: "请输入排序", trigger: "change" },
+          name: [{ required: true, message: "请输入名称", trigger: "change" }],
+          jobClass: [
+            { required: true, message: "请输入实现类", trigger: "change" },
           ],
-          dictKey: [
-            { required: true, message: "请输入排序", trigger: "change" },
+          cron: [
+            { required: true, message: "请输入表达式", trigger: "change" },
           ],
-          dictValue: [
-            { required: true, message: "请输入排序", trigger: "change" },
-          ],
-          no: [{ required: true, message: "请输入排序", trigger: "change" }],
         },
       },
     };
@@ -175,10 +177,8 @@ export default {
     async query() {
       let {
         data: { rows, total },
-      } = await this.$https.dictListpage({
-        dictIndex: this.queryForm.dictIndex,
-        dictKey: this.queryForm.dictKey,
-        dictValue: this.queryForm.dictValue,
+      } = await this.$https.cronListpage({
+        name: this.queryForm.name,
         curPage: this.listpage.curPage,
         pageSize: this.listpage.pageSize,
       });
@@ -209,11 +209,10 @@ export default {
           return false;
         }
 
-        let { code, msg } = await this.$https.dictAdd({
-          dictIndex: this.editForm.dictIndex,
-          dictKey: this.editForm.dictKey,
-          dictValue: this.editForm.dictValue,
-          no: this.editForm.no,
+        let { code, msg } = await this.$https.cronAdd({
+          name: this.editForm.name,
+          jobClass: this.editForm.jobClass,
+          cron: this.editForm.cron,
         });
         if (code != 200) {
           alert(msg);
@@ -230,12 +229,11 @@ export default {
           return false;
         }
 
-        let { code, msg } = await this.$https.dictEdit({
+        let { code, msg } = await this.$https.cronEdit({
           id: this.editForm.id,
-          dictIndex: this.editForm.dictIndex,
-          dictKey: this.editForm.dictKey,
-          dictValue: this.editForm.dictValue,
-          no: this.editForm.no,
+          name: this.editForm.name,
+          jobClass: this.editForm.jobClass,
+          cron: this.editForm.cron,
         });
         if (code != 200) {
           alert(msg);
@@ -248,7 +246,7 @@ export default {
     },
     // 获取试题
     async get(id) {
-      let res = await this.$https.dictGet({ id: id });
+      let res = await this.$https.cronGet({ id: id });
       if (res.code != 200) {
         alert(res.msg);
         return;
@@ -256,10 +254,9 @@ export default {
 
       this.editForm.show = true;
       this.editForm.id = res.data.id;
-      this.editForm.dictIndex = res.data.dictIndex;
-      this.editForm.dictKey = res.data.dictKey;
-      this.editForm.dictValue = res.data.dictValue;
-      this.editForm.no = res.data.no;
+      this.editForm.name = res.data.name;
+      this.editForm.jobClass = res.data.jobClass;
+      this.editForm.cron = res.data.cron;
     },
     // 删除
     async del(id) {
@@ -268,7 +265,61 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       }).then(async () => {
-        let res = await this.$https.dictDel({ id });
+        let res = await this.$https.cronDel({ id });
+        if (res.code != 200) {
+          this.$message({
+            type: "error",
+            message: res.msg,
+          });
+        }
+
+        this.query();
+      });
+    },
+    // 启动任务
+    async startTask(id) {
+      this.$confirm("确定要启动任务？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(async () => {
+        let res = await this.$https.cronStartTask({ id });
+        if (res.code != 200) {
+          this.$message({
+            type: "error",
+            message: res.msg,
+          });
+        }
+
+        this.query();
+      });
+    },
+    // 停止任务
+    async stopTask(id) {
+      this.$confirm("确定要停止任务？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(async () => {
+        let res = await this.$https.cronStopTask({ id });
+        if (res.code != 200) {
+          this.$message({
+            type: "error",
+            message: res.msg,
+          });
+        }
+
+        this.query();
+      });
+    },
+    // 执行一次
+    async onceTask(id) {
+      this.$confirm("确定要执行一次？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(async () => {
+        let res = await this.$https.cronrunOnceTask({ id });
         if (res.code != 200) {
           this.$message({
             type: "error",
@@ -288,7 +339,7 @@ export default {
   align-items: center;
   padding-top: 120px;
   .content {
-    width: 1170px;
+    width: 1200px;
     .search {
       display: flex;
       flex-direction: row;

@@ -46,19 +46,27 @@
                 <span style="margin-left: 10px">{{ scope.row.name }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="上级组织机构">
+            <el-table-column label="登录名称">
               <template slot-scope="scope">
-                <span style="margin-left: 10px">{{
-                  scope.row.parentName
-                }}</span>
+                <span style="margin-left: 10px">{{ scope.row.loginName }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="排序">
+            <el-table-column label="手机号">
               <template slot-scope="scope">
-                <span style="margin-left: 10px">{{ scope.row.no }}</span>
+                <span style="margin-left: 10px">{{ scope.row.phone }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="操作">
+            <el-table-column label="角色">
+              <template slot-scope="scope">
+                <span style="margin-left: 10px">{{ scope.row.roles }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="组织机构名称">
+              <template slot-scope="scope">
+                <span style="margin-left: 10px">{{ scope.row.orgName }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="150px">
               <template slot-scope="scope">
                 <el-button @click="toEdit(scope.row.id)" size="mini"
                   >修改</el-button
@@ -72,24 +80,23 @@
         </div>
       </div>
     </div>
-    <el-dialog :visible.sync="editForm.show" title="组织机构">
+    <el-dialog :visible.sync="editForm.show" title="用户">
       <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
-        <el-form-item label="上级组织机构" label-width="120px">
+        <el-form-item label="组织机构名称" label-width="120px">
           <el-input
             disabled
             placeholder
-            v-model="editForm.parentName"
+            v-model="editForm.orgName"
           ></el-input>
+        </el-form-item>
+        <el-form-item label="登录名称" label-width="120px" prop="loginName">
+          <el-input placeholder="请输入登录名称" v-model="editForm.loginName"></el-input>
         </el-form-item>
         <el-form-item label="名称" label-width="120px" prop="name">
           <el-input placeholder="请输入名称" v-model="editForm.name"></el-input>
         </el-form-item>
-        <el-form-item label="排序" label-width="120px" prop="no">
-          <el-input-number
-            :max="100"
-            :min="1"
-            v-model.number="editForm.no"
-          ></el-input-number>
+        <el-form-item label="手机号" label-width="120px" prop="phone">
+          <el-input placeholder="请输入手机号" v-model="editForm.phone"></el-input>
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
@@ -114,87 +121,89 @@ export default {
         total: 0, // 总条数
         curPage: 1, //当前第几页
         pageSize: 10, //每页多少条
-        list: [], //列表数据
+        list: [] //列表数据
       },
       queryForm: {
         //查询表单
         name: null,
-        parentId: null,
+        orgId: null
       },
       editForm: {
         //修改表单
         id: null, //主键
         name: null, //名称
-        no: null, //排序
+        loginName: null, //登录名称
+        phone: null, //手机号
+        orgId: null, //组织机构ID
+        orgName: null, //组织机构名称
+        roles: null, //角色
         show: false, // 是否显示页面
-        parentId: null, //父ID
-        parentName: null, //父名称
         rules: {
           //校验
-          name: [{ required: true, message: "请输入名称", trigger: "change" }],
-          no: [{ required: true, message: "请输入排序", trigger: "change" }],
-        },
+          loginName: [{ required: true, message: "请输入登录名称", trigger: "change" }],
+          name: [{ required: true, message: "请输入名称", trigger: "change" }]
+        }
       },
       tree: {
         curNode: null, // 当前选中节点
-        treeList: [], //树结构的列表
-      },
-    };
+        treeList: [] //树结构的列表
+      }
+    }
   },
   created() {
-    this.init();
+    this.init()
   },
   methods: {
     // 查询
     async query() {
       let {
-        data: { rows, total },
-      } = await this.$https.orgListpage({
-        parentId: this.queryForm.parentId,
+        data: { rows, total }
+      } = await this.$https.userListpage({
+        orgId: this.queryForm.orgId,
         name: this.queryForm.name,
         curPage: this.listpage.curPage,
-        pageSize: this.listpage.pageSize,
-      });
-      this.listpage.total = total;
-      this.listpage.list = rows;
+        pageSize: this.listpage.pageSize
+      })
+      this.listpage.total = total
+      this.listpage.list = rows
     },
     // 重置
     async reset() {
-      this.$refs["queryForm"].resetFields();
-      this.listpage.curPage = 1;
-      this.query();
+      this.$refs["queryForm"].resetFields()
+      this.listpage.curPage = 1
+      this.query()
     },
     // 初始化树
     async initTree() {
-      let { code, msg, data } = await this.$https.orgTreeList();
+      let { code, msg, data } = await this.$https.orgTreeList()
       if (code != 200) {
-        alert(msg);
-        return;
+        alert(msg)
+        return
       }
 
-      let list = data;
-      let treeList = [];
-      let treeMap = {};
-      let idFiled = "ID";
-      let textFiled = "NAME";
-      let checkedFiled = "CHECKED";
-      let parentField = "PARENT_ID";
-      let iconClsFiled = "ICON";
-      let openClsFiled = "OPEN";
+      let list = data
+      let treeList = []
+      let treeMap = {}
+      let idFiled = "ID"
+      let textFiled = "NAME"
+      let checkedFiled = "CHECKED"
+      let parentField = "PARENT_ID"
+      let iconClsFiled = "ICON"
+      let openClsFiled = "OPEN"
 
       for (let i = 0; i < list.length; i++) {
-        list[i]["id"] = list[i][idFiled];
-        list[i]["label"] = list[i][textFiled];
+        list[i]["id"] = list[i][idFiled]
+        list[i]["label"] = list[i][textFiled]
         if (list[i][checkedFiled]) {
-          list[i]["checked"] = true;
+          list[i]["checked"] = true
         }
         if (list[i][openClsFiled]) {
-          list[i]["open"] = true;
+          list[i]["open"] = true
         }
         if (list[i][iconClsFiled]) {
-          list[i]["iconCls"] = list[i][iconClsFiled];
+          list[i]["iconCls"] = list[i][iconClsFiled]
         }
-        treeMap[list[i]["id"]] = list[i];
+        treeMap[list[i]["id"]] = list[i]
       }
 
       for (let i = 0; i < list.length; i++) {
@@ -203,126 +212,138 @@ export default {
           list[i]["id"] != list[i][parentField]
         ) {
           if (!treeMap[list[i][parentField]]["children"]) {
-            treeMap[list[i][parentField]]["children"] = [];
+            treeMap[list[i][parentField]]["children"] = []
           }
-          treeMap[list[i][parentField]]["children"].push(list[i]);
+          treeMap[list[i][parentField]]["children"].push(list[i])
         } else {
-          treeList.push(list[i]);
+          treeList.push(list[i])
         }
       }
 
-      this.tree.treeList = treeList;
+      this.tree.treeList = treeList
 
       this.$nextTick(() => {
         if (!this.tree.curNode) {
-          let node = this.$refs.tree.getNode(1); // 如果是第一次初始化，选择跟节点
-          this.$refs.tree.setCurrentNode(node);
-          this.tree.curNode = node;
-          this.queryForm.parentId = node.id; // 查询表单parentId设置为根节点
+          let node = this.$refs.tree.getNode(1) // 如果是第一次初始化，选择跟节点
+          this.$refs.tree.setCurrentNode(node)
+          this.tree.curNode = node
+          this.queryForm.orgId = '' // 查询表单orgId设置为根节点   node.id
         } else {
-          this.$refs.tree.setCurrentKey(this.tree.curNode.id); //否则选中刷新前节点
-          this.queryForm.parentId = this.tree.curNode.id; // 查询表单parentId设置为当前选中节点
+          this.$refs.tree.setCurrentKey(this.tree.curNode.id) //否则选中刷新前节点
+          this.queryForm.orgId = this.tree.curNode.id // 查询表单orgId设置为当前选中节点
         }
-      });
+      })
     },
     // 初始化
     async init() {
-      await this.initTree();
-      await this.query();
+      await this.initTree()
+      await this.query()
     },
     // 选择树节点
     async selTreeNode(data) {
-      this.tree.curNode = data;
-      this.queryForm.parentId = data.id;
-      this.query();
+      this.tree.curNode = data
+      this.queryForm.orgId = data.id
+      this.query()
     },
     // 添加组织机构
     toAdd() {
-      this.editForm.show = true;
-      this.editForm.parentId = this.tree.curNode.id;
-      this.editForm.parentName = this.tree.curNode.label;
+      this.editForm.show = true
+      this.editForm.orgId = this.tree.curNode.id
+      this.editForm.orgName = this.tree.curNode.label
     },
     // 添加组织机构
     doAdd() {
-      this.$refs["editForm"].validate(async (valid) => {
+      this.$refs["editForm"].validate(async valid => {
         if (!valid) {
-          return false;
+          return false
         }
 
-        let { code, msg } = await this.$https.orgAdd({
+        let res = await this.$https.userAdd({
           name: this.editForm.name,
-          parentId: this.editForm.parentId,
-          no: this.editForm.no,
-        });
+          loginName: this.editForm.loginName,
+          orgId: this.editForm.orgId,
+          phone: this.editForm.phone
+        })
 
-        if (code != 200) {
-          alert(msg);
-          return;
+        if (res.code != 200) {
+          alert(res.msg)
+          return
         }
 
-        this.editForm.show = false;
-        this.initTree();
-        this.query();
-      });
+        this.$alert(res.data.initPwd, '初始化密码', {
+          confirmButtonText: '确定'
+        })
+
+        this.editForm.show = false
+        this.initTree()
+        this.query()
+      })
     },
-    // 修改组织机构
+    // 修改
     async toEdit(id) {
-      let res = await this.$https.orgGet({ id: id });
+      let res = await this.$https.userGet({ id: id })
       if (res.code != 200) {
-        alert(res.msg);
-        return;
+        alert(res.msg)
+        return
       }
 
-      this.editForm.show = true;
-      this.editForm.id = res.data.id;
-      this.editForm.name = res.data.name;
-      this.editForm.parentId = res.data.parentId;
-      this.editForm.parentName = res.data.parentName;
-      this.editForm.no = res.data.no;
+      this.editForm.show = true
+      this.editForm.id = res.data.id
+      this.editForm.name = res.data.name
+      this.editForm.loginName = res.data.loginName
+      this.editForm.orgId = res.data.orgId
+      this.editForm.orgName = res.data.orgName
+      this.editForm.phone = res.data.phone
     },
-    // 修改组织机构
+    // 修改
     doEdit() {
-      this.$refs["editForm"].validate(async (valid) => {
+      this.$refs["editForm"].validate(async valid => {
         if (!valid) {
-          return false;
+          return false
         }
 
-        let { code, msg } = await this.$https.orgEdit({
+        let res = await this.$https.userEdit({
           id: this.editForm.id,
           name: this.editForm.name,
-          no: this.editForm.no,
-        });
+          loginName: this.editForm.loginName,
+          orgId: this.editForm.orgId,
+          phone: this.editForm.phone
+        })
 
-        if (code != 200) {
-          alert(msg);
-          return;
+        if (res.code != 200) {
+          alert(res.msg)
+          return
         }
 
-        this.editForm.show = false;
-        this.initTree(); //初始化树
-        this.query();
-      });
+        this.$alert(res.data.initPwd, '初始化密码', {
+          confirmButtonText: '确定'
+        })
+
+        this.editForm.show = false
+        this.initTree() //初始化树
+        this.query()
+      })
     },
     // 删除
     async del(id) {
       this.$confirm("确定要删除？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning",
+        type: "warning"
       }).then(async () => {
-        let res = await this.$https.orgDel({ id });
+        let res = await this.$https.userDel({ id })
         if (res.code != 200) {
           this.$message({
             type: "error",
-            message: res.msg,
-          });
+            message: res.msg
+          })
         }
 
-        this.query();
-      });
-    },
-  },
-};
+        this.query()
+      })
+    }
+  }
+}
 </script>
 <style lang="scss" scoped>
 .container {
@@ -337,7 +358,7 @@ export default {
   .right {
     margin-left: 300px;
     .content {
-      width: 1170px;
+      width: 1200px;
       .search {
         display: flex;
         flex-direction: row;

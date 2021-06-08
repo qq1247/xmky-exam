@@ -17,6 +17,7 @@ import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 /**
  * 参数控制层
  * 
@@ -38,8 +39,11 @@ public class ApiParmController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	public PageResult listpage(PageIn pageIn) {
+	public PageResult listpage(PageIn pageIn, String orgName) {
 		try {
+			if (ValidateUtil.isValid(orgName)) {
+				pageIn.setTwo(orgName);
+			}
 			return PageResultEx.ok().data(parmService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("参数列表错误：", e);
@@ -111,12 +115,43 @@ public class ApiParmController extends BaseController {
 	public PageResult get(Integer id) {
 		try {
 			Parm entity = parmService.getEntity(id);
-			return PageResultEx.ok().data(entity);
+			return PageResultEx.ok()
+					.addAttr("id", entity.getId())
+					.addAttr("emailHost", entity.getEmailHost())
+					.addAttr("emailEncode", entity.getEmailEncode())
+					.addAttr("emailUserName", entity.getEmailUserName())
+					.addAttr("emailPwd", entity.getEmailPwd())
+					.addAttr("emailProtocol", entity.getEmailProtocol())
+					.addAttr("orgLogo", entity.getOrgLogo())
+					.addAttr("orgName", entity.getOrgName());
 		} catch (MyException e) {
 			log.error("获取参数错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("获取参数错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 删除参数
+	 * 
+	 * v1.0 zhanghc 2016-6-15下午17:24:19
+	 * 
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/del")
+	@ResponseBody
+	public PageResult del(Integer id) {
+		try {
+			parmService.del(id);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("删除参数错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("删除参数错误：", e);
 			return PageResult.err();
 		}
 	}

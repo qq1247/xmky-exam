@@ -5,20 +5,44 @@ const post = async (url, params = {}) =>
   await http.post(url, qs.stringify(params, { arrayFormat: "repeat" }))
 
 export default {
-  // 数据字典(基础信息)
+  // 用户相关
+  userListpage: params => post("user/listpage", params),
+  userGet: params => post("user/get", params),
+  userAdd: params => post("user/add", params),
+  userEdit: params => post("user/edit", params),
+  userDel: params => post("user/del", params),
+
+  // 数据字典
   dictListpage: params => post("dict/listpage", params),
   dictGet: params => post("dict/get", params),
   dictAdd: params => post("dict/add", params),
   dictEdit: params => post("dict/edit", params),
   dictDel: params => post("dict/del", params),
 
+  // 定时任务
+  cronListpage: params => post("cron/listpage", params),
+  cronGet: params => post("cron/get", params),
+  cronAdd: params => post("cron/add", params),
+  cronEdit: params => post("cron/edit", params),
+  cronDel: params => post("cron/del", params),
+  cronStartTask: params => post("cron/startTask", params),
+  cronStopTask: params => post("cron/stopTask", params),
+  cronrunOnceTask: params => post("cron/runOnceTask", params),
+
   // 组织机构相关
-  orgListpage: params => post("org/list", params),
+  orgListpage: params => post("org/listpage", params),
   orgTreeList: params => post("org/treeList", params),
   orgGet: params => post("org/get", params),
   orgAdd: params => post("org/add", params),
   orgEdit: params => post("org/edit", params),
   orgDel: params => post("org/del", params),
+
+  // 参数相关
+  parmListpage: params => post("parm/listpage", params),
+  parmGet: params => post("parm/get", params),
+  parmAdd: params => post("parm/add", params),
+  parmEdit: params => post("parm/edit", params),
+  parmDel: params => post("parm/del", params),
 
   // 考试相关
   examListPage: params => post("exam/listpage", params),
