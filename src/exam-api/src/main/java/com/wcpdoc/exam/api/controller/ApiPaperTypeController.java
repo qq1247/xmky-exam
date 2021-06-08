@@ -166,7 +166,7 @@ public class ApiPaperTypeController extends BaseController {
 			paperTypeService.update(entity);
 			
 			//保存图片
-			fileService.doUpload(paperType.getImgId());
+			//fileService.doUpload(paperType.getImgId());
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成修改试卷分类错误：{}", e.getMessage());

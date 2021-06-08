@@ -65,7 +65,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		questionTypeDao.add(questionType);
 		
 		//保存图片
-		fileService.doUpload(imgId);
+		//fileService.doUpload(imgId);
 	}
 
 	@Override
@@ -89,7 +89,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		questionTypeDao.update(entity);
 		
 		//保存图片
-		fileService.doUpload(imgId);
+		//fileService.doUpload(imgId);
 	}
 	
 	@Override

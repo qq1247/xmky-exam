@@ -138,7 +138,7 @@ public class ApiExamTypeController extends BaseController {
 			examTypeService.update(entity);
 			
 			//保存图片
-			fileService.doUpload(examType.getImgId());
+			//fileService.doUpload(examType.getImgId());
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成修改试题分类错误：{}", e.getMessage());

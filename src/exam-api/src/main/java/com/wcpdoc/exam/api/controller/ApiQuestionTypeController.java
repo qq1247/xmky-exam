@@ -52,7 +52,6 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles("OP")
 	public PageResult listpage(PageIn pageIn, String name) {
 		try {
 			if (ValidateUtil.isValid(name)) {
@@ -108,7 +107,6 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
-	@RequiresRoles("OP")
 	public PageResult get(Integer id) {
 		try {
 			QuestionType entity = questionTypeService.getEntity(id);
@@ -138,7 +136,6 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles("OP")
 	public PageResult edit(Integer id, String name, Integer imgId) {
 		try {
 			questionTypeService.editAndUpdate(id, name, imgId);
@@ -160,7 +157,6 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles("OP")
 	public PageResult del(Integer id) {
 		try {
 			questionTypeService.delAndUpdate(id);
@@ -183,7 +179,6 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/authUserList")
 	@ResponseBody
-	@RequiresRoles("OP")
 	public PageResult userList(PageIn pageIn, String name, Integer id) {  //Two - name (userName)  Ten - id
 		try {
 			if(ValidateUtil.isValid(name)){
@@ -211,7 +206,6 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/auth")
 	@ResponseBody
-	@RequiresRoles("OP")
 	public PageResult auth(Integer id, String readUserIds, String writeUserIds, boolean rwState) {
 		try {
 			questionTypeService.doAuth(id, readUserIds, writeUserIds, rwState);
@@ -234,7 +228,6 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/move")
 	@ResponseBody
-	@RequiresRoles("OP")
 	public PageResult move(Integer id, Integer sourceId, Integer targetId) {
 		try {
 			questionService.move(id, sourceId, targetId);

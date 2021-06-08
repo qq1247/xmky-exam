@@ -33,7 +33,6 @@ code == 401 无权限或登录超时
 | 参数     |  数据类型   |  描述  |  是否必填 |
 | --------   | -----   | -----  | ---- |
 |name      | String (16)  | 名称   |   是     |
-|imgId      | Integer  | 图片ID |   是     |
 ######响应数据
 | 参数  |  数据类型   |  描述  |
 | --------   | -----   | -----  |
@@ -46,7 +45,6 @@ code == 401 无权限或登录超时
 | --------   | -----   | -----  | ---- |
 |id      | Integer | 主键 |   是     |
 |name      | String (16)  | 名称   |   是     |
-|imgId      | Integer  | 图片ID   |   是     |
 ######响应数据
 | 参数  |  数据类型   |  描述  |
 | --------   | -----   | -----  |
@@ -89,7 +87,6 @@ code == 401 无权限或登录超时
 |msg     | String  | 响应消息 |
 |data.id     | Integer  | 分类id |
 |data.name      | String  | 分类名称 |
-|data.imgId   | Integer  | 图片 |
 |data.createUserId   | Integer  | 创建人ID |
 |data.createUserName   | String  | 创建人名称 |
 |data.createTime   | Date  | 创建时间 |
