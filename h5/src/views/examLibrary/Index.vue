@@ -9,12 +9,6 @@
             v-model="queryForm.examName"
           ></el-input>
         </el-form-item>
-        <el-form-item>
-          <el-input
-            placeholder="请输入发布人"
-            v-model="queryForm.examPerson"
-          ></el-input>
-        </el-form-item>
       </div>
       <el-form-item>
         <el-button @click="query" icon="el-icon-search" type="primary"
@@ -26,39 +20,52 @@
     <div class="content">
       <div class="exam-list">
         <div class="exam-item">
-          <div class="exam-content exam-add" @click="examForm.show = true">
-            <i class="common common-knowledge"></i>
-            <span>添加考试库</span>
+          <div
+            class="exam-content exam-add"
+            @click="
+              examForm.show = true
+              examForm.edit = false
+            "
+          >
+            <i class="common common-plus"></i>
+            <span>添加试题</span>
           </div>
         </div>
         <div v-for="(item, index) in examList" :key="index" class="exam-item">
           <div class="exam-content">
             <div class="title">{{ item.name }}</div>
-            <div class="no-date">
+            <!-- <div class="no-date">
               <span>{{ item.no }}</span>
               <span>{{ item.date }}</span>
+            </div> -->
+            <div class="no-date">
+              <span>读取权限：张三</span>
+            </div>
+            <div class="no-date">
+              <span>使用权限：张三、张三、张三</span>
             </div>
             <div class="handler">
-              <span data-title="编辑">
+              <span data-title="编辑" @click="edit">
                 <i class="common common-edit"></i>
               </span>
-              <span data-title="详情">
-                <i class="common common-dingdan"></i>
-              </span>
-              <span data-title="删除">
+              <span data-title="删除" @click="del">
                 <i class="common common-delete"></i>
               </span>
-              <span data-title="权限">
+              <span data-title="权限" @click="role">
                 <i class="common common-role"></i>
               </span>
-              <span data-title="更多">
+              <span data-title="开放" @click="role">
+                <i class="common common-share"></i>
+              </span>
+              <span data-title="试题列表" @click="role">
+                <i class="common common-list-row"></i>
+              </span>
+              <!-- <span>
                 <i class="common common-more-row"></i>
                 <div class="handler-more">
-                  <div>更多</div>
-                  <div>更多</div>
-                  <div>更多</div>
+                  <div class="more-item" @click="goDetail">试题详情</div>
                 </div>
-              </span>
+              </span> -->
             </div>
           </div>
         </div>
@@ -70,161 +77,34 @@
       :visible.sync="examForm.show"
       :show-close="false"
       center
-      width="40%"
+      width="30%"
+      title="试题分类"
     >
       <el-form
         :model="examForm"
         :rules="examForm.rules"
         ref="examForm"
-        label-width="100px"
+        label-width="60px"
       >
-        <el-tabs v-model="tabActive">
-          <el-tab-pane
-            v-for="item in examTabs"
-            :key="item.name"
-            :label="item.title"
-            :name="item.name"
-          >
-          </el-tab-pane>
-          <div v-if="tabActive == '0'">
-            <el-form-item label="试卷名称" prop="examName">
-              <el-input
-                placeholder="请输入试卷名称"
-                v-model="examForm.examName"
-              ></el-input>
-            </el-form-item>
-            <el-form-item label="选择试卷">
-              <el-select placeholder="请选择试卷" v-model="examForm.examType">
-                <el-option
-                  :key="parseInt(type.DICT_KEY)"
-                  :label="type.DICT_VALUE"
-                  :value="parseInt(type.DICT_KEY)"
-                  v-for="type in examForm.examTypes"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="成绩公开">
-              <el-checkbox v-model="examForm.examScore">是</el-checkbox>
-            </el-form-item>
-            <el-form-item label="排名公开">
-              <el-checkbox v-model="examForm.examRanking">是</el-checkbox>
-            </el-form-item>
-            <el-form-item label="考试方式">
-              <el-checkbox v-model="examForm.examLogin">免登录</el-checkbox>
-            </el-form-item>
-          </div>
-          <div v-if="tabActive == '1'">
-            <el-form-item label="阅卷方式">
-              <el-radio
-                v-for="item in examForm.examRadios"
-                :key="item.value"
-                v-model="examForm.examRadio"
-                :label="item.value"
-                >{{ item.name }}</el-radio
-              >
-            </el-form-item>
-            <div>
-              <div
-                v-for="(item, index) in examForm.examRemarks"
-                :key="item.id"
-                class="exam-remark"
-              >
-                <el-form-item label="阅卷人">
-                  <el-select
-                    placeholder="请选择"
-                    v-model="examForm.examRemarks[index].examCheckPerson"
-                  >
-                    <el-option
-                      :key="parseInt(type.DICT_KEY)"
-                      :label="type.DICT_VALUE"
-                      :value="parseInt(type.DICT_KEY)"
-                      v-for="type in examForm.examCheckPersons"
-                    ></el-option>
-                  </el-select>
-                </el-form-item>
-                <el-form-item label="题号" v-if="examForm.examRadio == 0">
-                  <el-select
-                    placeholder="请选择"
-                    v-model="examForm.examRemarks[index].examPaperNum"
-                  >
-                    <el-option
-                      :key="parseInt(type.DICT_KEY)"
-                      :label="type.DICT_VALUE"
-                      :value="parseInt(type.DICT_KEY)"
-                      v-for="type in examForm.examPaperNums"
-                    ></el-option>
-                  </el-select>
-                </el-form-item>
-                <el-form-item label="试卷" v-if="examForm.examRadio == 1">
-                  <el-select
-                    multiple
-                    placeholder="请选择"
-                    v-model="examForm.examRemarks[index].examPaper"
-                  >
-                    <el-option
-                      :key="parseInt(type.DICT_KEY)"
-                      :label="type.DICT_VALUE"
-                      :value="parseInt(type.DICT_KEY)"
-                      v-for="type in examForm.examPapers"
-                    ></el-option>
-                  </el-select>
-                </el-form-item>
-              </div>
-              <div class="remark-buttons">
-                <el-form-item>
-                  <el-button
-                    @click="remarkAdd"
-                    type="primary"
-                    size="mini"
-                    icon="el-icon-plus"
-                    >添加评语</el-button
-                  >
-                  <el-button
-                    v-if="examForm.examRemarks.length > 1"
-                    @click="remarkDel"
-                    size="mini"
-                    icon="el-icon-minus"
-                    >添加评语</el-button
-                  >
-                </el-form-item>
-              </div>
-            </div>
-          </div>
-          <div v-if="tabActive == '2'">
-            <el-form-item label="考试用户">
-              <el-select
-                multiple
-                placeholder="请选择用户"
-                v-model="examForm.examUser"
-              >
-                <el-option
-                  :key="parseInt(type.DICT_KEY)"
-                  :label="type.DICT_VALUE"
-                  :value="parseInt(type.DICT_KEY)"
-                  v-for="type in examForm.examUsers"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </div>
-        </el-tabs>
+        <el-form-item label="名称" prop="examName">
+          <el-input
+            placeholder="请输入试题名称"
+            v-model="examForm.examName"
+          ></el-input>
+        </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button v-if="!(tabActive == '2')" @click="examNext" type="primary"
-          >下一步</el-button
-        >
-        <el-button @click="examAdd">添加</el-button>
-        <el-button @click="examForm.show = false">取 消</el-button>
+        <el-button @click="examAdd" type="primary">{{
+          examForm.edit ? "修改" : "添加"
+        }}</el-button>
+        <el-button @click="examForm.show = false">取消</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import Editor from "@/components/Editor.vue"
 export default {
-  components: {
-    Editor
-  },
   data() {
     return {
       queryForm: {
@@ -232,58 +112,15 @@ export default {
       },
       examForm: {
         show: false,
+        edit: false,
         examName: "",
-        examPerson: "",
-        examType: "",
-        examTypes: [],
-        examScore: false,
-        examRanking: false,
-        examLogin: false,
-        examRadio: 0,
-        examRadios: [
-          {
-            name: "按题阅卷",
-            value: 0
-          },
-          {
-            name: "按卷阅卷",
-            value: 1
-          }
-        ],
-        examCheckPersons: [],
-        examPaperNums: [],
-        examPapers: [],
-        examRemarks: [
-          {
-            id: 1,
-            examCheckPerson: "",
-            examPaperNum: "",
-            examPaper: []
-          }
-        ],
-        examUser: [],
-        examUsers: [],
+        examThumbnail: "",
         rules: {
           examName: [
-            { required: true, message: "请填写试卷名称", trigger: "blur" }
+            { required: true, message: "请输入试题名称", trigger: "blur" }
           ]
         }
       },
-      tabActive: "0",
-      examTabs: [
-        {
-          title: "基础信息",
-          name: "0"
-        },
-        {
-          title: "阅卷用户",
-          name: "1"
-        },
-        {
-          title: "考试用户",
-          name: "2"
-        }
-      ],
       examList: [
         {
           name: "测试考试",
@@ -316,22 +153,20 @@ export default {
   methods: {
     // 查询
     query() {},
-    // tab切换
-    examNext() {
-      this.tabActive = Number(this.tabActive) + 1 + ""
+    handleAvatarSuccess(res, file) {
+      this.examThumbnail = URL.createObjectURL(file.raw)
     },
-    // 添加评语
-    remarkAdd() {
-      this.examForm.examRemarks.push({
-        id: this.examForm.examRemarks.length + 1,
-        examCheckPerson: "",
-        examPaperNum: "",
-        examPaper: []
-      })
-    },
-    // 删除评语
-    remarkDel() {
-      this.examForm.examRemarks.pop()
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === "image/jpeg"
+      const isLt2M = file.size / 1024 / 1024 < 2
+
+      if (!isJPG) {
+        this.$message.error("上传头像图片只能是 JPG 格式!")
+      }
+      if (!isLt2M) {
+        this.$message.error("上传头像图片大小不能超过 2MB!")
+      }
+      return isJPG && isLt2M
     },
     // 添加试卷信息
     examAdd() {
@@ -341,7 +176,17 @@ export default {
           return
         }
       })
-    }
+    },
+    // 试题详情
+    goDetail() {
+      this.$router.push("/examLibrary/edit")
+    },
+    edit() {
+      this.examForm.edit = true
+      this.examForm.show = true
+    },
+    del() {},
+    role() {}
   }
 }
 </script>
@@ -379,13 +224,12 @@ export default {
 .exam-content {
   display: flex;
   flex-direction: column;
-  align-items: center;
   width: 95%;
-  padding: 20px 0;
+  padding: 30px 15px 20px;
   background: #fff;
   height: 200px;
   cursor: pointer;
-  border-radius: 8px;
+  text-align: center;
   transition: all 0.3s ease;
   &:hover {
     transform: translateY(-3px);
@@ -393,36 +237,41 @@ export default {
   }
   .title {
     font-size: 16px;
-    color: #000;
-    font-weight: bold;
-    margin-top: 20px;
+    margin: 0 0 10px;
+    word-break: keep-all;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
   .no-date {
-    font-size: 14px;
+    font-size: 12px;
     color: #9199a1;
-    margin-top: 10px;
-    span:first-child {
+    margin-bottom: 10px;
+    /* span:first-child {
+      color: #f60;
+      font-weight: 700;
       margin-right: 30px;
-    }
+    } */
   }
   .handler {
     span {
       display: inline-block;
-      width: 40px;
-      height: 40px;
-      line-height: 40px;
-      border-radius: 50%;
-      border: 1px solid #9199a1;
+      margin-right: 10px;
       text-align: center;
-      margin: 20px 10px 0 0;
+      width: 35px;
+      height: 35px;
+      color: #8392a5;
+      border-radius: 50%;
+      border: 1px solid #eff3f7;
+      margin-top: 25px;
+      line-height: 35px;
       position: relative;
       transition: all 0.3s ease-in-out;
       .handler-more {
-        background: #1e9fff;
-        width: 70px;
-        line-height: 30px;
+        background: #4a5766;
+        width: 120px;
         color: #fff;
-        border-radius: 5px;
+        border-radius: 3px;
         font-size: 12px;
         position: absolute;
         left: 60px;
@@ -430,6 +279,18 @@ export default {
         transform: translateY(-50%);
         opacity: 0;
         transition: all 0.3s ease-in-out;
+        .more-item {
+          padding: 12px 0;
+          border-bottom: 1px solid #65707d;
+          line-height: 1.45;
+          &:last-child {
+            border-bottom: none;
+          }
+          &:hover {
+            background: #0095e5;
+            color: #fff;
+          }
+        }
         &::before {
           content: "";
           display: block;
@@ -438,9 +299,9 @@ export default {
           left: -10px;
           top: 50%;
           transform: translateY(-50%);
-          border-width: 5px;
+          border-width: 5px 10px 5px 0;
           border-style: solid;
-          border-color: transparent #1e9fff transparent transparent;
+          border-color: transparent #4a5766 transparent transparent;
         }
       }
       &:last-child:hover {
@@ -449,7 +310,7 @@ export default {
           opacity: 1;
         }
       }
-      &:not(:last-child)::after {
+      &::after {
         content: attr(data-title);
         display: block;
         position: absolute;
@@ -460,37 +321,33 @@ export default {
         width: 70px;
         height: 30px;
         line-height: 30px;
-        background: #1e9fff;
+        background: #0095e5;
         color: #fff;
-        border-radius: 5px;
+        border-radius: 3px;
         font-size: 13px;
         opacity: 0;
-        transition: all 0.3s ease-in-out;
       }
-      &:not(:last-child)::before {
+      &::before {
         content: "";
         display: block;
         position: absolute;
         z-index: 100;
-        bottom: -16px;
+        bottom: -18px;
         left: 50%;
         transform: translateX(-50%);
-        border-width: 5px;
+        border-width: 0 5px 10px 5px;
         border-style: solid;
-        border-color: transparent transparent #1e9fff transparent;
+        border-color: transparent transparent #0095e5;
         opacity: 0;
-        transition: all 0.3s ease-in-out;
       }
       &:hover {
-        border: 1px solid #1e9fff;
-        background: #1e9fff;
+        border: 1px solid #0095e5;
+        background: #0095e5;
         color: #fff;
-        &:not(:last-child)::after {
-          bottom: -37px;
+        &::after {
           opacity: 1;
         }
-        &:not(:last-child)::before {
-          bottom: -8px;
+        &::before {
           opacity: 1;
         }
       }
@@ -504,7 +361,7 @@ export default {
   align-items: center;
   font-size: 14px;
   color: #9199a1;
-  .common-knowledge {
+  .common-plus {
     display: inline-block;
     width: 100px;
     height: 100px;
@@ -518,86 +375,53 @@ export default {
     transition: all 0.3s ease-in-out;
   }
   &:hover {
-    color: #1e9fff;
-    .common-knowledge {
-      border: 1px solid #1e9fff;
-      background: #1e9fff;
+    color: #0095e5;
+    .common-plus {
+      border: 1px solid #0095e5;
+      background: #0095e5;
       color: #fff;
     }
   }
 }
 
-/deep/ .el-dialog__header {
-  padding: 0;
-}
-
-.exam-type {
-  display: flex;
-}
-
-.type-item {
-  width: 150px;
-  height: 50px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  border: 1px solid #d8d8d8;
-  font-size: 14px;
-  margin-right: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-  i {
-    font-size: 24px;
-    margin-right: 10px;
-  }
-  .common-selected {
-    position: absolute;
-    right: 5px;
-    bottom: 8px;
-    font-size: 12px;
-    margin-right: 0;
-    line-height: 0;
-    color: #fff;
-    &::after {
-      content: "";
-      display: block;
-      position: absolute;
-      z-index: 10;
-      right: -6px;
-      bottom: -9px;
-      border-bottom: 25px solid #1e9fff;
-      border-left: 25px solid transparent;
+.thumbnail-uploader {
+  /deep/ .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    &:hover {
+      border-color: #409eff;
     }
-    &::before {
-      position: absolute;
-      z-index: 50;
-      right: -3px;
-      bottom: -3px;
+    .thumbnail-uploader-icon {
+      font-size: 28px;
+      color: #8c939d;
+      width: 178px;
+      height: 178px;
+      line-height: 178px;
+      text-align: center;
     }
   }
 }
 
-.type-item-active {
-  border: 1px solid #1e9fff;
-  color: #1e9fff;
+.thumbnail {
+  width: 178px;
+  height: 178px;
+  display: block;
 }
 
-.exam-remark {
-  display: flex;
-  margin-top: 15px;
+/deep/ .el-pagination.is-background .el-pager li:not(.disabled).active {
+  background-color: #1e9fff;
+  color: #fff;
 }
 
-.remark-percentage {
-  width: 120px;
-  margin: 0 5px;
-}
-
-.remark-content {
-  width: 230px;
-}
-
-.remark-buttons {
-  margin: 15px 0;
+/deep/.el-pagination.is-background .btn-next,
+/deep/.el-pagination.is-background .btn-prev,
+/deep/.el-pagination.is-background .el-pager li {
+  margin: 0 3px;
+  min-width: 34px;
+  border: 1px solid #d4dfd9;
+  background-color: #fff;
 }
 </style>

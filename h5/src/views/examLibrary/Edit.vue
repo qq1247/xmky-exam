@@ -518,7 +518,7 @@ export default {
   },
   methods: {
     goBack() {
-      this.$router.push("/examPaper/classify")
+      this.$router.push("/examLibrary")
     },
     //初始化默认值
     async init() {

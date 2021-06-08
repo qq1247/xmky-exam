@@ -9,7 +9,7 @@
         ></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="query" icon="el-icon-search" type="primary"
+        <el-button @click="paperListPage" icon="el-icon-search" type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -34,9 +34,6 @@
               <span data-title="编辑" @click="paperEdit">
                 <i class="common common-edit"></i>
               </span>
-              <span data-title="详情" @click="paperDetail">
-                <i class="common common-dingdan"></i>
-              </span>
               <span data-title="删除" @click="paperDelete">
                 <i class="common common-delete"></i>
               </span>
@@ -46,9 +43,7 @@
               <span>
                 <i class="common common-more-row"></i>
                 <div class="handler-more">
-                  <div>更多</div>
-                  <div>更多</div>
-                  <div>更多</div>
+                  <div class="more-item" @click="goDetail">试卷详情</div>
                 </div>
               </span>
             </div>
@@ -111,14 +106,15 @@
                 v-model="examForm.examName"
               ></el-input>
             </el-form-item>
-            <el-form-item label="及格分数(%)" prop="examPercentage">
+            <el-form-item label="及格分数" prop="examPercentage">
               <el-input
                 type="number"
                 min="1"
                 max="100"
                 placeholder="请输入及格分数占总分百分比"
                 v-model="examForm.examPercentage"
-              ></el-input>
+                ><span slot="append">%</span></el-input
+              >
             </el-form-item>
             <el-form-item label="考前阅读"
               ><Editor
@@ -340,7 +336,7 @@ export default {
     }
   },
   mounted() {
-    this.query()
+    this.paperListPage()
   },
   methods: {
     // 查询
@@ -364,8 +360,8 @@ export default {
     paperRole() {
       this.$router.push("/examPaper/edit")
     },
-    paperMore() {
-      this.$router.push("/examPaper/edit")
+    goDetail() {
+      this.$router.push("/examPaper/classify")
     },
     // tab切换
     examNext() {
@@ -398,7 +394,6 @@ export default {
           console.log("error")
           return
         } */
-        this.$router.push("/examPaper/add")
       })
     }
   }
@@ -477,18 +472,26 @@ export default {
       position: relative;
       transition: all 0.3s ease-in-out;
       .handler-more {
-        background: #1e9fff;
+        background: #0095e5;
         width: 70px;
-        line-height: 30px;
         color: #fff;
         border-radius: 5px;
         font-size: 12px;
         position: absolute;
         left: 60px;
         top: 50%;
+        padding: 5px;
         transform: translateY(-50%);
         opacity: 0;
         transition: all 0.3s ease-in-out;
+        .more-item {
+          line-height: 30px;
+          &:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: #fff;
+            border-radius: 3px;
+          }
+        }
         &::before {
           content: "";
           display: block;
@@ -499,7 +502,7 @@ export default {
           transform: translateY(-50%);
           border-width: 5px;
           border-style: solid;
-          border-color: transparent #1e9fff transparent transparent;
+          border-color: transparent #0095e5 transparent transparent;
         }
       }
       &:last-child:hover {
@@ -519,7 +522,7 @@ export default {
         width: 70px;
         height: 30px;
         line-height: 30px;
-        background: #1e9fff;
+        background: #0095e5;
         color: #fff;
         border-radius: 5px;
         font-size: 13px;
@@ -536,13 +539,13 @@ export default {
         left: 50%;
         border-width: 5px;
         border-style: solid;
-        border-color: transparent transparent #1e9fff transparent;
+        border-color: transparent transparent #0095e5 transparent;
         opacity: 0;
         transition: all 0.3s ease-in-out;
       }
       &:hover {
-        border: 1px solid #1e9fff;
-        background: #1e9fff;
+        border: 1px solid #0095e5;
+        background: #0095e5;
         color: #fff;
         &:not(:last-child)::after {
           bottom: -37px;
@@ -577,10 +580,10 @@ export default {
     transition: all 0.3s ease-in-out;
   }
   &:hover {
-    color: #1e9fff;
+    color: #0095e5;
     .common-exam-add {
-      border: 1px solid #1e9fff;
-      background: #1e9fff;
+      border: 1px solid #0095e5;
+      background: #0095e5;
       color: #fff;
     }
   }
@@ -629,7 +632,7 @@ export default {
       z-index: 10;
       right: -6px;
       bottom: -9px;
-      border-bottom: 25px solid #1e9fff;
+      border-bottom: 25px solid #0095e5;
       border-left: 25px solid transparent;
     }
     &::before {
@@ -642,8 +645,8 @@ export default {
 }
 
 .type-item-active {
-  border: 1px solid #1e9fff;
-  color: #1e9fff;
+  border: 1px solid #0095e5;
+  color: #0095e5;
 }
 
 .exam-remark {
