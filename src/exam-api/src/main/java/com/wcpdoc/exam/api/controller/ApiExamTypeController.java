@@ -48,7 +48,7 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult listpage(PageIn pageIn) {
 		try {
 			return PageResultEx.ok().data(examTypeService.getListpage(pageIn));
@@ -66,7 +66,7 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult add(ExamType examType) {
 		try {
 			examTypeService.addAndUpdate(examType);
@@ -88,7 +88,7 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult get(Integer id) {
 		try {
 			ExamType entity = examTypeService.getEntity(id);
@@ -118,7 +118,7 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult edit(ExamType examType) {
 		try {
 			//校验数据有效性
@@ -157,7 +157,7 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult del(Integer id) {
 		try {
 			examTypeService.delAndUpdate(id);
@@ -184,7 +184,7 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/auth")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult auth(Integer id, String readUserIds, String writeUserIds, boolean rwState) {
 		try {
 			examTypeService.doAuth(id, readUserIds, writeUserIds, rwState);
