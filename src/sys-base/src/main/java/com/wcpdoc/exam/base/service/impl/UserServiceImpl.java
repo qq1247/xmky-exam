@@ -1,13 +1,10 @@
 package com.wcpdoc.exam.base.service.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -15,9 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.wcpdoc.exam.auth.cache.TokenCache;
 import com.wcpdoc.exam.auth.realm.JWTRealm;
-import com.wcpdoc.exam.base.cache.DictCache;
 import com.wcpdoc.exam.base.dao.UserDao;
-import com.wcpdoc.exam.base.entity.Dict;
 import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
@@ -25,7 +20,6 @@ import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.EncryptUtil;
-import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
@@ -118,7 +112,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	}
 
 	@Override
-	public void roleUpdate(Integer id, Integer[] roles) {
+	public void roleUpdate(Integer id, String roles) {
 		// 校验数据有效性
 		if (id == null) {
 			throw new MyException("参数错误：id");
@@ -128,18 +122,12 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 			throw new MyException("参数错误：id");
 		}
 		
-		//数据字典查询
-		List<Dict> dictList = DictCache.getDictList("USER_ROLES");
-		Set<Integer> roleSet = new HashSet<Integer>();
-		for (Dict dict : dictList) {
-			roleSet.add(Integer.parseInt(dict.getDictKey()));
-		}
-		if (!roleSet.containsAll(Arrays.asList(roles))) {
+		if (!ValidateUtil.isValid(roles)) {
 			throw new MyException("参数错误：role");
 		}
 		
 		// 更新岗位
-		user.setRoles(String.format(",%s,", StringUtil.join(roles, ",")));
+		user.setRoles(String.format("user,%s", roles));
 		user.setUpdateTime(new Date());
 		user.setUpdateUserId(getCurUser().getId());
 		userDao.update(user);

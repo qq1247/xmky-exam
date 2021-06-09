@@ -34,7 +34,7 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT EXAM.ID, EXAM.NAME, EXAM.PASS_SCORE, EXAM.START_TIME, EXAM.END_TIME, "
+		String sql = "SELECT EXAM.ID, EXAM.NAME, EXAM.START_TIME, EXAM.END_TIME, "
 				+ "		EXAM.STATE, PAPER.NAME AS PAPER_NAME, PAPER.TOTAL_SCORE AS PAPER_TOTLE_SCORE, "
 				+ "		EXAM.MARK_START_TIME, EXAM.MARK_END_TIME, "
 				+ "		(SELECT COUNT(*) FROM EXM_MY_EXAM A WHERE A.EXAM_ID = EXAM.ID) AS USER_NUM "
@@ -58,10 +58,10 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 			StringBuilder partSql = new StringBuilder();
 			List<Object> params = new ArrayList<>();
 			partSql.append("(");
-			partSql.append("EXAM_TYPE.USER_IDS LIKE ? ");
+			partSql.append("EXAM_TYPE.READ_USER_IDS LIKE ? ");
 			params.add("%" + user.getId() + "%");
 			
-			partSql.append("OR EXAM_TYPE.ORG_IDS LIKE ? ");
+			partSql.append("OR EXAM_TYPE.WRITE_USER_IDS LIKE ? ");
 			params.add("%" + user.getOrgId() + "%");
 			
 			/*if (ValidateUtil.isValid(user.getPostIds())) {

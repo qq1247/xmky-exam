@@ -72,6 +72,7 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
+	@RequiresRoles("user")
 	public PageResult listpage(PageIn pageIn) {
 		try {
 			pageIn.setTen(getCurUser().getId().toString());
@@ -140,6 +141,7 @@ public class ApiMyExamController extends BaseController{
 	 * @return String
 	 */
 	@RequestMapping("/toExam")
+	@RequiresRoles("user")
 	public String toExam(Model model, Integer myExamId) { //TODO
 		try {
 			//校验数据有效性
@@ -211,6 +213,7 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/updateAnswer")
 	@ResponseBody
+	@RequiresRoles("user")
 	public PageResult updateAnswer(Integer myExamDetailId, String answer) {
 		try {
 			//校验数据有效性
@@ -264,6 +267,7 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/exam")
 	@ResponseBody
+	@RequiresRoles("user")
 	public PageResult exam(Integer myExamId) {
 		try {
 			// 校验数据有效性
@@ -311,6 +315,7 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/kalendar")
 	@ResponseBody
+	@RequiresRoles("user")
 	public PageResult kalendar(Integer year, Integer month) {
 		try {
 			// 校验数据有效性
@@ -341,6 +346,7 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/rankingPage")
 	@ResponseBody
+	@RequiresRoles("user")
 	public PageResult rankingPage(PageIn pageIn, Integer examId) {
 		try {
 			if (examId == null) {
@@ -366,7 +372,7 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/count")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("user")
 	public PageResult count(Integer examId) {
 		try {
 			return PageResultEx.ok().data(myExamService.count(examId));
@@ -388,7 +394,7 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/email")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("user")
 	public PageResult email(Integer examId) {
 		try {
 			Parm parm = parmService.getEntity(1);

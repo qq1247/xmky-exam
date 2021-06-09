@@ -51,7 +51,7 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/userList")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult userListpage(PageIn pageIn) {
 		try {
 			return PageResultEx.ok().data(examService.getUserListpage(pageIn));
@@ -69,7 +69,7 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult listpage(PageIn pageIn) {
 		try {
 			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
@@ -90,7 +90,7 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult add(Exam exam) {
 		try {
 			//校验数据有效性
@@ -130,7 +130,7 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult edit(Exam exam) {
 		try {
 			//校验数据有效性
@@ -184,7 +184,7 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult del(Integer id) {
 		try {
 			Date curTime = new Date();
@@ -217,7 +217,7 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/cfg")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult cfg(Integer id, Integer[] userIds, Integer[] myMarkIds) {
 		try {
 			examService.doCfg(id, userIds, myMarkIds);
@@ -240,7 +240,7 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/publish")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult publish(Integer id) {
 		try {
 			Exam exam = examService.getEntity(id);
@@ -272,7 +272,7 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/archive")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult archive(Integer id) {
 		try {
 			Exam exam = examService.getEntity(id);

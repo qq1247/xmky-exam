@@ -65,7 +65,7 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 		add(paperType);
 		
 		//保存图片
-		fileService.doUpload(paperType.getImgId());
+		//fileService.doUpload(paperType.getImgId());
 	}
 
 	@Override

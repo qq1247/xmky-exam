@@ -114,6 +114,7 @@ public class ApiUserController extends BaseController {
 			
 			// 添加用户
 			Date date = new Date();
+			user.setRoles("user");
 			user.setRegistTime(date);
 			user.setUpdateTime(date);
 			user.setUpdateUserId(getCurUser().getId());
@@ -162,6 +163,7 @@ public class ApiUserController extends BaseController {
 				changeLoginName = true;
 			}
 
+			entity.setRoles("user");
 			entity.setName(user.getName());
 			entity.setLoginName(user.getLoginName());
 			entity.setUpdateTime(new Date());
@@ -227,7 +229,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/roleUpdate")
 	@ResponseBody
-	public PageResult roleUpdate(Integer id, Integer[] roles) {
+	public PageResult roleUpdate(Integer id, String roles) {
 		try {
 			userService.roleUpdate(id, roles);
 			return PageResult.ok();

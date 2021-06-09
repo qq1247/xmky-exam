@@ -2,6 +2,7 @@ package com.wcpdoc.exam.api.controller;
 
 import javax.annotation.Resource;
 
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -36,6 +37,7 @@ public class ApiPaperOptionController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult listpage(PageIn pageIn) {
 		try {
 			return PageResultEx.ok().data(paperOptionService.getListpage(pageIn));
@@ -53,6 +55,7 @@ public class ApiPaperOptionController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult add(PaperOption paperOption) {
 		try {
 			paperOptionService.add(paperOption);
@@ -74,6 +77,7 @@ public class ApiPaperOptionController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult edit(PaperOption paperOption) {
 		try {
 			PaperOption entity = paperOptionService.getEntity(paperOption.getId());
@@ -103,6 +107,7 @@ public class ApiPaperOptionController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult del(Integer id) {
 		try {
 			paperOptionService.del(id);
