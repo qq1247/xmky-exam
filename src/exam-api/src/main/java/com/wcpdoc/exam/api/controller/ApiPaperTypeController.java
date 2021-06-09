@@ -56,7 +56,7 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult listpage(PageIn pageIn, String name, String userName) {
 		try {
 			if (ValidateUtil.isValid(name)) {
@@ -94,7 +94,7 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult add(PaperType paperType) {
 		try {
 			paperTypeService.addAndUpdate(paperType);
@@ -116,7 +116,7 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult get(Integer id) {
 		try {
 			PaperType entity = paperTypeService.getEntity(id);
@@ -146,7 +146,7 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult edit(PaperType paperType) {
 		try {
 			//校验数据有效性
@@ -185,7 +185,7 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult del(Integer id) {
 		try {
 			paperTypeService.delAndUpdate(id);
@@ -212,7 +212,7 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/auth")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult auth(Integer id, String readUserIds, String writeUserIds, boolean rwState) {
 		try {
 			paperTypeService.doAuth(id, readUserIds, writeUserIds, rwState);

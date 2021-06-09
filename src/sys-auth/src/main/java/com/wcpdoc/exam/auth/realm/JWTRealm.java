@@ -1,7 +1,5 @@
 package com.wcpdoc.exam.auth.realm;
 
-import java.util.List;
-
 import javax.annotation.Resource;
 
 import org.apache.shiro.authc.AuthenticationException;
@@ -50,9 +48,9 @@ public class JWTRealm extends AuthorizingRealm {
 		}
 
 		//获取角色
-		List<String> roleList = shiroService.getRoleList(user.getRoles());
+		String[] splitRoles = user.getRoles().split(",");
 		SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
-		for (String role : roleList) {
+		for (String role : splitRoles) {
 			simpleAuthorizationInfo.addRole(role);
 		}
 		

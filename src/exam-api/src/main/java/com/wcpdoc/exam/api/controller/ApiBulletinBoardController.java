@@ -40,6 +40,7 @@ public class ApiBulletinBoardController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult listpage(PageIn pageIn) {
 		try {
 			return PageResultEx.ok().data(bulletinBoardService.getListpage(pageIn));
@@ -57,6 +58,7 @@ public class ApiBulletinBoardController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult add(BulletinBoard bulletinBoard) {
 		try {
 			bulletinBoard.setUpdateTime(new Date());
@@ -80,6 +82,7 @@ public class ApiBulletinBoardController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult edit(BulletinBoard bulletinBoard) {
 		try {
 			BulletinBoard entity = bulletinBoardService.getEntity(bulletinBoard.getId());
@@ -115,6 +118,7 @@ public class ApiBulletinBoardController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult del(Integer id) {
 		try {
 			bulletinBoardService.delAndUpdate(id);
@@ -140,7 +144,7 @@ public class ApiBulletinBoardController extends BaseController {
 	 */
 	@RequestMapping("/auth")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult auth(Integer id, String readUserIds, String readOrgIds) {
 		try {
 			bulletinBoardService.auth(id, readUserIds, readOrgIds);
@@ -163,7 +167,7 @@ public class ApiBulletinBoardController extends BaseController {
 	 */
 	@RequestMapping("/authUserList")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult userList(PageIn pageIn, String name, Integer id) {
 		try {
 			if(ValidateUtil.isValid(name)){
@@ -188,7 +192,7 @@ public class ApiBulletinBoardController extends BaseController {
 	 */
 	@RequestMapping("/authOrgList")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult authOrgList(PageIn pageIn, String name, Integer id) {
 		try {
 			if(ValidateUtil.isValid(name)){

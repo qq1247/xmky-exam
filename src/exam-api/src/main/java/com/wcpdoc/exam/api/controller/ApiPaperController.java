@@ -67,6 +67,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult listpage(PageIn pageIn, String name, String userName) {
 		try {
 			if (ValidateUtil.isValid(userName)) {
@@ -96,6 +97,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult add(Paper paper, PaperOption paperOption, PaperRemark paperRemark) {
 		try {
 			if (paper.getShowType() == null) {
@@ -133,6 +135,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult echo(Integer paperId) {
 		try {
 			Paper paper = paperService.getEntity(paperId);
@@ -159,6 +162,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult edit(Integer paperId, Paper paper, PaperOption paperOption, List<PaperRemark> paperRemark) {
 		try {
 			Paper entity = paperService.getEntity(paperId);
@@ -204,6 +208,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult del(Integer id) {
 		try {
 			Paper paper = paperService.getEntity(id);
@@ -236,6 +241,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/copy")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult copy(Integer id) {
 		try {
 			Paper paper = paperService.getEntity(id);
@@ -281,7 +287,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/archive")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult archive(Integer id) {
 		try {
 			Paper entity = paperService.getEntity(id);
@@ -303,6 +309,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/chapterAdd")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult chapterAdd(PaperQuestion chapter) {
 		try {
 			paperService.doChapterAdd(chapter);
@@ -325,6 +332,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/chapterEdit")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult chapterEdit(PaperQuestion chapter) {
 		try {
 			paperService.doChapterEdit(chapter);
@@ -344,6 +352,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/chapterDel")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult chapterDel(Integer chapterId) {
 		try {
 			paperService.doChapterDel(chapterId);
@@ -366,6 +375,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/chapterUp")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult chapterUp(Integer chapterId) {
 		try {
 			paperService.doChapterUp(chapterId);
@@ -388,6 +398,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/chapterDown")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult chapterDown(Integer chapterId) {
 		try {
 			paperService.doChapterDown(chapterId);
@@ -410,6 +421,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/questionList")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult questionList(PageIn pageIn) {
 		try {
 			if (getCurUser().getId() != 1) {
@@ -433,7 +445,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/paperQuestionList")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult PaperQuestionList(Integer id) {
 		try {
 			List<PaperQuestion> chapterList = paperQuestionService.getChapterList(id);
@@ -487,6 +499,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/questionAdd")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult questionAdd(Integer chapterId, Integer[] questionIds) {
 		try {
 			paperService.doQuestionAdd(chapterId, questionIds);
@@ -511,6 +524,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/scoreUpdate")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult scoreUpdate(Integer paperQuestionId, BigDecimal score) {
 		try {
 			paperService.doScoreUpdate(paperQuestionId, score);
@@ -534,6 +548,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/scoreOptionsUpdate")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult scoreOptionsUpdate(Integer paperQuestionId, Integer[] scoreOptions) {
 		try {
 			paperService.doOptionsUpdate(paperQuestionId, scoreOptions);
@@ -558,6 +573,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/batchScoreUpdate")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult batchScoreUpdate(Integer chapterId, BigDecimal score, String options) {
 		try {
 			paperService.doBatchScoreUpdate(chapterId, score, options);
@@ -580,6 +596,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/questionUp")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult questionUp(Integer paperQuestionId) {
 		try {
 			paperService.doQuestionUp(paperQuestionId);
@@ -602,6 +619,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/questionDown")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult questionDown(Integer paperQuestionId) {
 		try {
 			paperService.doQuestionDown(paperQuestionId);
@@ -624,6 +642,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/questionDel")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult questionDel(Integer paperQuestionId) {
 		try {
 			paperService.doQuestionDel(paperQuestionId);
@@ -646,6 +665,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/questionClear")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult questionClear(Integer chapterId) {
 		try {
 			paperService.doQuestionClear(chapterId);
@@ -668,6 +688,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/publish")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult publish(Integer id) {
 		try {
 			Paper paper = paperService.getEntity(id);

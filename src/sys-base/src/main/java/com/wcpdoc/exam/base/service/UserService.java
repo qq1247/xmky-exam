@@ -83,7 +83,7 @@ public interface UserService extends BaseService<User> {
 	 * @param id
 	 * @param roles void
 	 */
-	void roleUpdate(Integer id, Integer[] roles);
+	void roleUpdate(Integer id, String roles);
 	
 	/**
 	 * 在线用户

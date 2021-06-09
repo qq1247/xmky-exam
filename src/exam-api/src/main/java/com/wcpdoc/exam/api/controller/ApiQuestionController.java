@@ -74,6 +74,7 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult listpage(PageIn pageIn, Integer questionTypeId, Integer id, String title, Integer type, Integer difficulty, Double score, Double scoreStart, Double scoreEnd, String name) {
 		try {
 			if(questionTypeId != null){
@@ -137,6 +138,7 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult add(Question question, String[] options) {
 		try {
 			questionService.addAndUpdate(question, options);
@@ -160,6 +162,7 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult edit(Question question, boolean newVer, String[] options) {
 		try {
 			questionService.updateAndUpdate(question, newVer, options);
@@ -182,6 +185,7 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult del(Integer id) {
 		try {
 			Question question = questionService.getEntity(id);
@@ -208,6 +212,7 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/copy")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult copy(Integer id) {
 		try {
 			Question question = questionService.getEntity(id);
@@ -235,6 +240,7 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult get(Integer id) {
 		try {
 			Question question = questionService.getEntity(id);
@@ -278,6 +284,7 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/wordImp")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult wordImp(@RequestParam("file") MultipartFile file, Integer questionTypeId) {
 		try {
 			questionService.wordImp(file, questionTypeId);
@@ -298,6 +305,7 @@ public class ApiQuestionController extends BaseController {
 	 * void
 	 */
 	@RequestMapping(value = "/wordTemplateExport")
+	@RequiresRoles("subAdmin")
 	public void wordTemplateExport() {
 		OutputStream output = null;
 		try {
@@ -327,6 +335,7 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/publish")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult publish(Integer id) {
 		try {
 			Question question = questionService.getEntity(id);
@@ -359,6 +368,7 @@ public class ApiQuestionController extends BaseController {
 	 * void
 	 */
 	@RequestMapping(value = "/wordQuestionExport")
+	@RequiresRoles("subAdmin")
 	public Map<String, String> wordQuestionExport(String ids) {
 		try {
 		/*if (ids != null) {
@@ -439,7 +449,7 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/count")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult count(Integer questionTypeId) {
 		try {
 			return PageResultEx.ok().data(questionService.count(questionTypeId));
@@ -461,7 +471,7 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/accuracy")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult accuracy(Integer examId) {
 		try {
 			return PageResultEx.ok().data(questionService.accuracy(examId));

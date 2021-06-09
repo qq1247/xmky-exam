@@ -244,7 +244,7 @@ public class ApiOrgController extends BaseController {
 	public void template() {
 		OutputStream output = null;
 		try {
-			InputStream inputStream = this.getClass().getResourceAsStream("/res/orgExamole.xlsx");
+			InputStream inputStream = this.getClass().getResourceAsStream("/res/orgExample.xlsx");
 			String fileName = new String(("log4j2.xml").getBytes("UTF-8"),"ISO-8859-1");
 			response.addHeader("Content-Disposition", "attachment;filename" + fileName);
 			response.setContentType("application/fprce-download");

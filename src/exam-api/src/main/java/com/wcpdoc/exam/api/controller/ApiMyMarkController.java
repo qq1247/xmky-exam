@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -75,6 +76,7 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult listpage(PageIn pageIn) {
 		try {
 			pageIn.setTen(getCurUser().getId().toString());
@@ -112,6 +114,7 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult add(MyMark myMark) {
 		try {
 			myMarkService.add(myMark);
@@ -131,6 +134,7 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/subject")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult subject(Integer paperId) {
 		try {
 			List<Integer> questionIdList = new ArrayList<Integer>();
@@ -154,6 +158,7 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/exam")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult exam(Integer paperId) {
 		try {
 			List<Map<String, Object>> mapList = new ArrayList<Map<String, Object>>();
@@ -181,6 +186,7 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/detailList")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult detailList(PageIn pageIn) {
 		try {
 			pageIn.setEight(getCurUser().getId().toString());
@@ -250,6 +256,7 @@ public class ApiMyMarkController extends BaseController {
 	 * @return String
 	 */
 	@RequestMapping("/toMark")
+	@RequiresRoles("subAdmin")
 	public String toMark(Model model, Integer myExamId) {//TODO
 		try {
 			// 校验数据有效性
@@ -329,6 +336,7 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/scoreUpdate")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult scoreUpdate(Integer myExamDetailId, BigDecimal score) {
 		try {
 			// 校验数据有效性
@@ -391,6 +399,7 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/mark")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult mark(Integer myExamId) {
 		try {
 			// 校验数据有效性
@@ -468,6 +477,7 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/autoMark")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult autoMark(Integer examId) {
 		try {
 			String processBarId = UUID.randomUUID().toString();

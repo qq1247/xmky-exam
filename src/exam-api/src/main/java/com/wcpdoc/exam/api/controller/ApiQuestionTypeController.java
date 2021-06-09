@@ -52,6 +52,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult listpage(PageIn pageIn, String name) {
 		try {
 			if (ValidateUtil.isValid(name)) {
@@ -85,7 +86,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles("OP")
+	@RequiresRoles("subAdmin")
 	public PageResult add(String name, Integer imgId) {
 		try {
 			questionTypeService.addAndUpdate(name, imgId);
@@ -107,6 +108,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult get(Integer id) {
 		try {
 			QuestionType entity = questionTypeService.getEntity(id);
@@ -136,6 +138,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult edit(Integer id, String name, Integer imgId) {
 		try {
 			questionTypeService.editAndUpdate(id, name, imgId);
@@ -157,6 +160,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult del(Integer id) {
 		try {
 			questionTypeService.delAndUpdate(id);
@@ -179,6 +183,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/authUserList")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult userList(PageIn pageIn, String name, Integer id) {  //Two - name (userName)  Ten - id
 		try {
 			if(ValidateUtil.isValid(name)){
@@ -206,6 +211,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/auth")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult auth(Integer id, String readUserIds, String writeUserIds, boolean rwState) {
 		try {
 			questionTypeService.doAuth(id, readUserIds, writeUserIds, rwState);
@@ -228,6 +234,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/move")
 	@ResponseBody
+	@RequiresRoles("subAdmin")
 	public PageResult move(Integer id, Integer sourceId, Integer targetId) {
 		try {
 			questionService.move(id, sourceId, targetId);
