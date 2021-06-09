@@ -24,4 +24,4 @@ sys:
 token:
     expireMinute: 1440
     refreshMinute: 60
-    secret: 9xzR4+K7XpvbCpoIMocXVxS655xxb9S0Qxd5RDU4b7PeSIhYfYdjg9aOMrhjPjwNpjo3XjbthxGduNzWzzw2yw==
+    secret: 9xzR4+K7XpvbCpoIMocXVxS655xxb9S0Qxd5RDU4b7PeSIhYfYdjg9aOMrhjPjwN

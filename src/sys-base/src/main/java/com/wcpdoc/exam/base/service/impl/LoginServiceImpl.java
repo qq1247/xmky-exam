@@ -27,7 +27,7 @@ import com.wcpdoc.exam.core.util.ValidateUtil;
  */
 @Service
 public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginService {
-	@Value("${spring.profiles.active")
+	@Value("${spring.profiles.active}")
 	private String active;
 	@Resource
 	private UserService userService;

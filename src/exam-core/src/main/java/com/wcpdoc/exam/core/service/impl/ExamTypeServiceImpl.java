@@ -66,7 +66,7 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 		add(examType);
 		
 		//保存图片
-		fileService.doUpload(examType.getImgId());
+		//fileService.doUpload(examType.getImgId());
 	}
 
 	@Override
