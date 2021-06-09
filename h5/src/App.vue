@@ -80,7 +80,7 @@ export default {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   background: #f4f5f7;
   color: #2c3e50;
   text-align: left;

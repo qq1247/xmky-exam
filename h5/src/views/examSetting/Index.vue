@@ -27,37 +27,43 @@
       <div class="exam-list">
         <div class="exam-item">
           <div class="exam-content exam-add" @click="examForm.show = true">
-            <i class="common common-knowledge"></i>
+            <i class="common common-plus"></i>
             <span>添加考试库</span>
           </div>
         </div>
         <div v-for="(item, index) in examList" :key="index" class="exam-item">
           <div class="exam-content">
             <div class="title">{{ item.name }}</div>
-            <div class="no-date">
-              <span>{{ item.no }}</span>
-              <span>{{ item.date }}</span>
+            <div class="content-info ellipsis">
+              <span>发布人：张三</span>
             </div>
+            <div class="content-info">
+              <span class="space">成绩公开：是</span>
+              <span>排名公开：是</span>
+            </div>
+            <div class="content-info">
+              <span class="space">考试人数：50</span>
+              <span>阅卷人数：5</span>
+            </div>
+            <div class="content-info">
+              <span style="color: #ff9900">已发布</span>
+            </div>
+            <div class="content-info"></div>
             <div class="handler">
-              <span data-title="编辑">
+              <span data-title="编辑" @click="examEdit">
                 <i class="common common-edit"></i>
               </span>
-              <span data-title="详情">
-                <i class="common common-dingdan"></i>
-              </span>
-              <span data-title="删除">
+              <span data-title="删除" @click="examDel">
                 <i class="common common-delete"></i>
               </span>
-              <span data-title="权限">
+              <span data-title="权限" @click="examRole">
                 <i class="common common-role"></i>
               </span>
-              <span data-title="更多">
-                <i class="common common-more-row"></i>
-                <div class="handler-more">
-                  <div>更多</div>
-                  <div>更多</div>
-                  <div>更多</div>
-                </div>
+              <span data-title="开放" @click="examOpen">
+                <i class="common common-share"></i>
+              </span>
+              <span data-title="试题列表" @click="goDetail">
+                <i class="common common-list-row"></i>
               </span>
             </div>
           </div>
@@ -220,15 +226,15 @@
 </template>
 
 <script>
-import Editor from "@/components/Editor.vue";
+import Editor from "@/components/Editor.vue"
 export default {
   components: {
-    Editor,
+    Editor
   },
   data() {
     return {
       queryForm: {
-        examName: "",
+        examName: ""
       },
       examForm: {
         show: false,
@@ -243,12 +249,12 @@ export default {
         examRadios: [
           {
             name: "按题阅卷",
-            value: 0,
+            value: 0
           },
           {
             name: "按卷阅卷",
-            value: 1,
-          },
+            value: 1
+          }
         ],
         examCheckPersons: [],
         examPaperNums: [],
@@ -258,67 +264,78 @@ export default {
             id: 1,
             examCheckPerson: "",
             examPaperNum: "",
-            examPaper: [],
-          },
+            examPaper: []
+          }
         ],
         examUser: [],
         examUsers: [],
         rules: {
           examName: [
-            { required: true, message: "请填写试卷名称", trigger: "blur" },
-          ],
-        },
+            { required: true, message: "请填写试卷名称", trigger: "blur" }
+          ]
+        }
       },
       tabActive: "0",
       examTabs: [
         {
           title: "基础信息",
-          name: "0",
+          name: "0"
         },
         {
           title: "阅卷用户",
-          name: "1",
+          name: "1"
         },
         {
           title: "考试用户",
-          name: "2",
-        },
+          name: "2"
+        }
       ],
       examList: [
         {
           name: "测试考试",
           no: "2021-01-01",
-          date: "2019-02-02",
+          date: "2019-02-02"
         },
         {
           name: "测试考试",
           no: "2021-01-01",
-          date: "2019-02-02",
+          date: "2019-02-02"
         },
         {
           name: "测试考试",
           no: "2021-01-01",
-          date: "2019-02-02",
+          date: "2019-02-02"
         },
         {
           name: "测试考试",
           no: "2021-01-01",
-          date: "2019-02-02",
+          date: "2019-02-02"
         },
         {
           name: "测试考试",
           no: "2021-01-01",
-          date: "2019-02-02",
-        },
-      ],
-    };
+          date: "2019-02-02"
+        }
+      ]
+    }
   },
   methods: {
     // 查询
     query() {},
     // tab切换
     examNext() {
-      this.tabActive = Number(this.tabActive) + 1 + "";
+      this.tabActive = Number(this.tabActive) + 1 + ""
+    },
+    examEdit() {
+      this.examForm.edit = true
+      this.examForm.show = true
+    },
+    examDel() {},
+    examRole() {},
+    examOpen() {},
+    // 试题详情
+    goDetail() {
+      this.$router.push("/examSetting/classify")
     },
     // 添加评语
     remarkAdd() {
@@ -326,278 +343,26 @@ export default {
         id: this.examForm.examRemarks.length + 1,
         examCheckPerson: "",
         examPaperNum: "",
-        examPaper: [],
-      });
+        examPaper: []
+      })
     },
     // 删除评语
     remarkDel() {
-      this.examForm.examRemarks.pop();
+      this.examForm.examRemarks.pop()
     },
     // 添加试卷信息
     examAdd() {
-      this.$refs["examForm"].validate((valid) => {
+      this.$refs["examForm"].validate(valid => {
         if (!valid) {
-          console.log("error");
-          return;
+          console.log("error")
+          return
         }
-      });
-    },
-  },
-};
+      })
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
-.search {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 10px 0;
-}
-
-.content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  margin: 0 auto;
-}
-
-.exam-list {
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.exam-item {
-  width: calc(100% / 3);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.exam-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 95%;
-  padding: 20px 0;
-  background: #fff;
-  height: 200px;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 16px -10px rgba(95, 101, 105, 0.15);
-  }
-  .title {
-    font-size: 16px;
-    color: #000;
-    font-weight: bold;
-    margin-top: 20px;
-  }
-  .no-date {
-    font-size: 14px;
-    color: #9199a1;
-    margin-top: 10px;
-    span:first-child {
-      margin-right: 30px;
-    }
-  }
-  .handler {
-    span {
-      display: inline-block;
-      width: 40px;
-      height: 40px;
-      line-height: 40px;
-      border-radius: 50%;
-      border: 1px solid #9199a1;
-      text-align: center;
-      margin: 20px 10px 0 0;
-      position: relative;
-      transition: all 0.3s ease-in-out;
-      .handler-more {
-        background: #1e9fff;
-        width: 70px;
-        line-height: 30px;
-        color: #fff;
-        border-radius: 5px;
-        font-size: 12px;
-        position: absolute;
-        left: 60px;
-        top: 50%;
-        transform: translateY(-50%);
-        opacity: 0;
-        transition: all 0.3s ease-in-out;
-        &::before {
-          content: "";
-          display: block;
-          position: absolute;
-          z-index: 100;
-          left: -10px;
-          top: 50%;
-          transform: translateY(-50%);
-          border-width: 5px;
-          border-style: solid;
-          border-color: transparent #1e9fff transparent transparent;
-        }
-      }
-      &:last-child:hover {
-        .handler-more {
-          left: 50px;
-          opacity: 1;
-        }
-      }
-      &:not(:last-child)::after {
-        content: attr(data-title);
-        display: block;
-        position: absolute;
-        z-index: 100;
-        bottom: -45px;
-        transform: translateX(-50%);
-        left: 50%;
-        width: 70px;
-        height: 30px;
-        line-height: 30px;
-        background: #1e9fff;
-        color: #fff;
-        border-radius: 5px;
-        font-size: 13px;
-        opacity: 0;
-        transition: all 0.3s ease-in-out;
-      }
-      &:not(:last-child)::before {
-        content: "";
-        display: block;
-        position: absolute;
-        z-index: 100;
-        bottom: -16px;
-        left: 50%;
-        transform: translateX(-50%);
-        border-width: 5px;
-        border-style: solid;
-        border-color: transparent transparent #1e9fff transparent;
-        opacity: 0;
-        transition: all 0.3s ease-in-out;
-      }
-      &:hover {
-        border: 1px solid #1e9fff;
-        background: #1e9fff;
-        color: #fff;
-        &:not(:last-child)::after {
-          bottom: -37px;
-          opacity: 1;
-        }
-        &:not(:last-child)::before {
-          bottom: -8px;
-          opacity: 1;
-        }
-      }
-    }
-  }
-}
-
-.exam-add {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 14px;
-  color: #9199a1;
-  .common-knowledge {
-    display: inline-block;
-    width: 100px;
-    height: 100px;
-    line-height: 100px;
-    text-align: center;
-    border-radius: 50%;
-    border: 1px solid #9199a1;
-    font-size: 45px;
-    color: #9199a1;
-    margin-bottom: 10px;
-    transition: all 0.3s ease-in-out;
-  }
-  &:hover {
-    color: #1e9fff;
-    .common-knowledge {
-      border: 1px solid #1e9fff;
-      background: #1e9fff;
-      color: #fff;
-    }
-  }
-}
-
-/deep/ .el-dialog__header {
-  padding: 0;
-}
-
-.exam-type {
-  display: flex;
-}
-
-.type-item {
-  width: 150px;
-  height: 50px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  border: 1px solid #d8d8d8;
-  font-size: 14px;
-  margin-right: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-  i {
-    font-size: 24px;
-    margin-right: 10px;
-  }
-  .common-selected {
-    position: absolute;
-    right: 5px;
-    bottom: 8px;
-    font-size: 12px;
-    margin-right: 0;
-    line-height: 0;
-    color: #fff;
-    &::after {
-      content: "";
-      display: block;
-      position: absolute;
-      z-index: 10;
-      right: -6px;
-      bottom: -9px;
-      border-bottom: 25px solid #1e9fff;
-      border-left: 25px solid transparent;
-    }
-    &::before {
-      position: absolute;
-      z-index: 50;
-      right: -3px;
-      bottom: -3px;
-    }
-  }
-}
-
-.type-item-active {
-  border: 1px solid #1e9fff;
-  color: #1e9fff;
-}
-
-.exam-remark {
-  display: flex;
-  margin-top: 15px;
-}
-
-.remark-percentage {
-  width: 120px;
-  margin: 0 5px;
-}
-
-.remark-content {
-  width: 230px;
-}
-
-.remark-buttons {
-  margin: 15px 0;
-}
+@import "../../assets/style/index.scss";
 </style>
