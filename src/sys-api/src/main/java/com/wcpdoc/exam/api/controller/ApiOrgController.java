@@ -1,14 +1,22 @@
 package com.wcpdoc.exam.api.controller;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.jxls.common.Context;
+import org.jxls.expression.JexlExpressionEvaluator;
+import org.jxls.transform.Transformer;
+import org.jxls.util.JxlsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -18,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.wcpdoc.exam.base.entity.Org;
+import com.wcpdoc.exam.base.entity.OrgXlsx;
 import com.wcpdoc.exam.base.service.OrgService;
 import com.wcpdoc.exam.base.service.OrgXlsxService;
 import com.wcpdoc.exam.core.controller.BaseController;
@@ -223,13 +232,37 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/export")
 	@ResponseBody
-	public PageResult export(String ids) {
+	public void export(String ids) {
+		ServletOutputStream outputStream = null;
 		try {
-			orgXlsxService.exportOrgXlsx(ids);
-			return PageResultEx.ok();
+			List<OrgXlsx> orgXlsx = orgXlsxService.exportOrgXlsx(ids);
+			try {
+				FileOutputStream os = new FileOutputStream("D:/aorg.xlsx");
+				Context context = new Context();
+		        //将列表参数放入context中
+		        context.putVar("orgXlsxList", orgXlsx);
+				InputStream inputStream = this.getClass().getResourceAsStream("/res/orgTemplate.xlsx");
+				JxlsHelper jxlsHelper = JxlsHelper.getInstance();
+				Transformer transformer = jxlsHelper.createTransformer(inputStream, os);
+				JexlExpressionEvaluator evaluator = (JexlExpressionEvaluator) transformer.getTransformationConfig().getExpressionEvaluator();
+				Map<String, Object> funcs = new HashMap<String, Object>();
+				evaluator.getJexlEngine().setFunctions(funcs);
+				jxlsHelper.processTemplate(context, transformer);
+				os.close();
+
+				FileInputStream fileInputStream = new FileInputStream("D:/aorg.xlsx");
+				String fileName = new String(("orgExample.xlsx").getBytes("UTF-8"),"ISO-8859-1");
+				response.addHeader("Content-Disposition", "attachment;filename" + fileName);
+				response.setContentType("application/fprce-download");
+				outputStream = response.getOutputStream();
+				IOUtils.copy(fileInputStream, outputStream);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		} catch (Exception e) {
 			log.error("组织机构列表错误：", e);
-			return PageResult.err();
+		} finally {
+			IOUtils.closeQuietly(outputStream);
 		}
 	}
 	
@@ -245,7 +278,7 @@ public class ApiOrgController extends BaseController {
 		OutputStream output = null;
 		try {
 			InputStream inputStream = this.getClass().getResourceAsStream("/res/orgExample.xlsx");
-			String fileName = new String(("log4j2.xml").getBytes("UTF-8"),"ISO-8859-1");
+			String fileName = new String(("orgExample.xlsx").getBytes("UTF-8"),"ISO-8859-1");
 			response.addHeader("Content-Disposition", "attachment;filename" + fileName);
 			response.setContentType("application/fprce-download");
 			output = response.getOutputStream();

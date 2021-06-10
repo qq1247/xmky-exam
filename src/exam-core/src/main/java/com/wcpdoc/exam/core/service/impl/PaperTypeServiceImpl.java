@@ -72,7 +72,7 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 	public void delAndUpdate(Integer id) {
 		// 校验数据有效性
 		if (id == 1) { //不包括根试卷分类
-			return;
+			throw new MyException("此试卷分类不能被删除！");
 		}
 		List<Paper> paperList = paperService.getList(id);
 		if (ValidateUtil.isValid(paperList)) {

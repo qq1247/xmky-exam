@@ -96,7 +96,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	public void delAndUpdate(Integer id) {
 		// 校验数据有效性
 		if (id == 1) { //不包括根试题分类
-			return;
+			throw new MyException("此试题分类不能被删除！");
 		}
 		
 		List<Question> list = questionService.getList(id);

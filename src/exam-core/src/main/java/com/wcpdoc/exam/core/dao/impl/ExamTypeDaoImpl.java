@@ -23,19 +23,13 @@ public class ExamTypeDaoImpl extends RBaseDaoImpl<ExamType> implements ExamTypeD
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT EXAM_TYPE.ID, EXAM_TYPE.NAME, EXAM_TYPE.PARENT_ID, "
-				+ "EXAM_TYPE.PARENT_SUB, PARENT_EXAM_TYPE.NAME AS PARENT_NAME, "
-				+ "EXAM_TYPE.NO, "
-				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_USER _A WHERE EXAM_TYPE.USER_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS USER_NAMES, "
-				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_ORG _A WHERE EXAM_TYPE.ORG_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS ORG_NAMES, "
-				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_POST _A WHERE EXAM_TYPE.POST_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS POST_NAMES "
+		String sql = "SELECT EXAM_TYPE.*, USER.NAME AS USER_NAME "
 				+ "FROM EXM_EXAM_TYPE EXAM_TYPE "
-				+ "LEFT JOIN EXM_EXAM_TYPE PARENT_EXAM_TYPE ON EXAM_TYPE.PARENT_ID = PARENT_EXAM_TYPE.ID ";
+				+ "LEFT JOIN SYS_USER USER ON EXAM_TYPE.CREATE_USER_ID = USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "EXAM_TYPE.PARENT_ID = ?", pageIn.getOne())//如果查询的是根目录，则查询所有。否则查询选中机构的子机构
-				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "EXAM_TYPE.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
-				.addWhere("EXAM_TYPE.STATE = ?", 1)
-				.addOrder("EXAM_TYPE.NO", Order.ASC);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "EXAM_TYPE.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "USER.NAME LIKE ?", "%" + pageIn.getThree() + "%")
+				.addWhere("EXAM_TYPE.STATE = ?", 1);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		return pageOut;
 	}
