@@ -1,7 +1,6 @@
 package com.wcpdoc.exam.base.service.impl;
 
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
@@ -22,10 +21,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.jxls.common.Context;
-import org.jxls.expression.JexlExpressionEvaluator;
-import org.jxls.transform.Transformer;
-import org.jxls.util.JxlsHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -230,7 +225,7 @@ public class OrgXlsxServiceImpl extends BaseServiceImp<Object> implements OrgXls
 	}
 	
 	@Override
-	public void exportOrgXlsx(String ids) {
+	public List<OrgXlsx> exportOrgXlsx(String ids) {
 		List<OrgXlsx> orgXlsx = new ArrayList<OrgXlsx>();
 		
 		String[] split = ids.split(",");
@@ -243,39 +238,7 @@ public class OrgXlsxServiceImpl extends BaseServiceImp<Object> implements OrgXls
 				orgXlsx.add( new OrgXlsx(org.getName(), entity.getName(), org.getNo()));
 			}
 		}
-		
-		try {
-			FileOutputStream os = new FileOutputStream("target/classes/res/aaaa.xlsx");
-			Context context = new Context();
-	        //将列表参数放入context中
-	        context.putVar("orgXlsxList", orgXlsx);
-			InputStream inputStream = this.getClass().getResourceAsStream("/res/orgTemplate.xlsx");
-			JxlsHelper jxlsHelper = JxlsHelper.getInstance();
-			Transformer transformer = jxlsHelper.createTransformer(inputStream, os);
-			JexlExpressionEvaluator evaluator = (JexlExpressionEvaluator) transformer.getTransformationConfig().getExpressionEvaluator();
-			Map<String, Object> funcs = new HashMap<String, Object>();
-			evaluator.getJexlEngine().setFunctions(funcs);
-			jxlsHelper.processTemplate(context, transformer);
-			os.close();
-
-           //浏览器下载
-           //指定数据生成后的文件输入流（将上述out的路径作为文件的输入流）
-           @SuppressWarnings("resource")
-           FileInputStream fileInputStream = new FileInputStream("target/classes/res/aaaa.xlsx");
-           //导出excel文件，设置文件名
-           String filename = URLEncoder.encode("组织机构信息表.xlsx", "UTF-8");
-           //设置下载头
-           response.setHeader("Content-Disposition", "attachment;filename=" + filename);
-           ServletOutputStream outputStream = response.getOutputStream();
-           //将文件写入浏览器
-           byte[] bys = new byte[fileInputStream.available()];
-           fileInputStream.read(bys);
-           outputStream.write(bys);
-           outputStream.flush();
-           outputStream.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		return orgXlsx;
 	}
 
 	@Override

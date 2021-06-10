@@ -27,7 +27,8 @@ public class QuestionTypeDaoImpl extends RBaseDaoImpl<QuestionType> implements Q
 				+ "FROM EXM_QUESTION_TYPE QUESTION_TYPE ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "QUESTION_TYPE.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
-				.addWhere("QUESTION_TYPE.STATE = ?", 1);
+				.addWhere("QUESTION_TYPE.STATE = ?", 1)
+				.addOrder("QUESTION_TYPE.ID", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		return pageOut;
 	}

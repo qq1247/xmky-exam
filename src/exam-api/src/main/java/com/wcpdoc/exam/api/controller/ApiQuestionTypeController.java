@@ -62,12 +62,12 @@ public class ApiQuestionTypeController extends BaseController {
 			List<Map<String, Object>> rows = listpage.getRows();
 			List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 			for(Map<String, Object> mapList : rows){
-				if ("0".equals(mapList.get("CREATE_USER_ID").toString())) {
+				if ("0".equals(mapList.get("createUserId").toString())) {
 					continue;
 				}
 				
-				User user = userService.getEntity(Integer.parseInt(mapList.get("CREATE_USER_ID").toString()));
-				mapList.put("CREATE_USER_NAME", user.getName());
+				User user = userService.getEntity(Integer.parseInt(mapList.get("createUserId").toString()));
+				mapList.put("createUserName", user.getName());
 				list.add(mapList);
 			}
 			listpage.setRows(list);

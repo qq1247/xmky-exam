@@ -73,7 +73,7 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 	public void delAndUpdate(Integer id) {
 		// 校验数据有效性
 		if (id == 1) { //不包括根试题分类
-			return;
+			throw new MyException("此考试分类不能被删除！");
 		}
 		List<Exam> examList = examService.getList(id);
 		if (ValidateUtil.isValid(examList)) {
