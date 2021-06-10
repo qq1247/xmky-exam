@@ -9,10 +9,12 @@ import "@/assets/style/theme/index.css"
 import "@/assets/style/element-ui-ex.scss"
 import CKEditor from "@ckeditor/ckeditor5-vue2"
 import api from "@/api"
+import * as tools from "@/util/tools.js"
 Vue.use(ElementUI)
 Vue.use(CKEditor)
 
 Vue.prototype.$https = api
+Vue.prototype.$tools = tools
 Vue.config.productionTip = false
 
 new Vue({

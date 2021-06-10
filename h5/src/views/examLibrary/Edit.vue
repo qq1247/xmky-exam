@@ -435,6 +435,8 @@ export default {
         difficulty: null, //难度
         startScore: null, //得分大于
         endScore: null, //得分小于
+        name: "", //试题分类name
+        questionTypeId: null, //试题分类id
         difficultyDictList: [], //难度列表
         typeDictList: [] //类型列表
       },
@@ -514,11 +516,14 @@ export default {
     }
   },
   created() {
+    const { id, name } = this.$route.query
+    this.queryForm.questionTypeId = id
+    this.queryForm.name = name
     this.init()
   },
   methods: {
     goBack() {
-      this.$router.push("/examPaper/classify")
+      this.$router.push("/examLibrary")
     },
     //初始化默认值
     async init() {
@@ -550,14 +555,16 @@ export default {
       let {
         data: { rows, total }
       } = await this.$https.questionListPage({
-        id: this.id,
-        title: this.title,
-        type: this.type,
-        difficulty: this.difficulty,
-        scoreStart: this.scoreStart,
-        scoreEnd: this.scoreEnd,
-        curPage: this.curPage,
-        pageSize: this.pageSize
+        id: this.queryForm.id,
+        questionTypeId: this.queryForm.questionTypeId,
+        title: this.queryForm.title,
+        name: this.queryForm.name,
+        type: this.queryForm.type,
+        difficulty: this.queryForm.difficulty,
+        scoreStart: this.queryForm.scoreStart,
+        scoreEnd: this.queryForm.scoreEnd,
+        curPage: this.queryForm.curPage,
+        pageSize: this.queryForm.pageSize
       })
       this.list.total = total
       this.list.questionList = rows
