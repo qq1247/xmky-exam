@@ -124,10 +124,10 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 	public void doAuth(Integer id, String readUserIds, String writeUserIds) {		
 		PaperType entity = getEntity(id);
 		if (ValidateUtil.isValid(readUserIds)) {
-			entity.setReadUserIds(entity.getReadUserIds() + readUserIds +",");
+			entity.setReadUserIds(","+readUserIds+",");
 		}
-		if (ValidateUtil.isValid(entity.getReadUserIds() + writeUserIds +",")) {
-			entity.setWriteUserIds(writeUserIds);
+		if (ValidateUtil.isValid(writeUserIds)) {
+			entity.setWriteUserIds(","+writeUserIds+",");
 		}
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());

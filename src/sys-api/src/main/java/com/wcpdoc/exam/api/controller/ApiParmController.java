@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.annotation.Resource;
 
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -39,6 +40,7 @@ public class ApiParmController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult listpage(PageIn pageIn, String orgName) {
 		try {
 			if (ValidateUtil.isValid(orgName)) {
@@ -59,6 +61,7 @@ public class ApiParmController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult add(Parm email) {
 		try {
 			email.setUpdateTime(new Date());
@@ -83,6 +86,7 @@ public class ApiParmController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult edit(Parm parm) {
 		try {
 			Parm entity = parmService.getEntity(parm.getId());
@@ -112,6 +116,7 @@ public class ApiParmController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult get(Integer id) {
 		try {
 			Parm entity = parmService.getEntity(id);
@@ -143,6 +148,7 @@ public class ApiParmController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult del(Integer id) {
 		try {
 			parmService.del(id);
@@ -164,6 +170,7 @@ public class ApiParmController extends BaseController {
 	 */
 	@RequestMapping("/editLogo")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult editLogo(Parm parm) {
 		try {
 			Parm entity = parmService.getEntity(parm.getId());

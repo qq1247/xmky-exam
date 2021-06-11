@@ -13,6 +13,7 @@ import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.jxls.common.Context;
 import org.jxls.expression.JexlExpressionEvaluator;
 import org.jxls.transform.Transformer;
@@ -60,6 +61,7 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/treeList")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult treeList() {
 		try {
 			return PageResultEx.ok().data(orgService.getTreeList());
@@ -79,6 +81,7 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult listpage(PageIn pageIn, Integer parentId, String name) {
 		try {
 			if(ValidateUtil.isValid(name)){
@@ -104,6 +107,7 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult add(Org org, String phone) {
 		try {
 			orgService.addAndUpdate(org);
@@ -128,6 +132,7 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult edit(Org org) {
 		try {
 			// 校验数据有效性
@@ -169,6 +174,7 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult del(Integer id) {
 		try {
 			orgService.delAndUpdate(id);
@@ -193,6 +199,7 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/move")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult move(Integer sourceId, Integer targetId) {
 		try {
 			orgService.doMove(sourceId, targetId);
@@ -214,6 +221,7 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/input")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult input(@RequestParam("file") MultipartFile file) {
 		try {
 			orgXlsxService.inputOrgXlsx(file);
@@ -232,6 +240,7 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/export")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public void export(String ids) {
 		ServletOutputStream outputStream = null;
 		try {
@@ -274,6 +283,7 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/template")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public void template() {
 		OutputStream output = null;
 		try {
@@ -300,6 +310,7 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult get(Integer id) {
 		try {
 			Org org = orgService.getEntity(id);

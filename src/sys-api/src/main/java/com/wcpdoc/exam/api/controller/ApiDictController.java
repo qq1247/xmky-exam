@@ -2,6 +2,7 @@ package com.wcpdoc.exam.api.controller;
 
 import javax.annotation.Resource;
 
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -40,6 +41,7 @@ public class ApiDictController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult listpage(PageIn pageIn, String dictIndex, String dictKey, String dictValue) {
 		try {
 			if (ValidateUtil.isValid(dictIndex)) {
@@ -68,6 +70,7 @@ public class ApiDictController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult add(Dict dict) {
 		try {
 			dictService.addAndUpdate(dict);
@@ -91,6 +94,7 @@ public class ApiDictController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult edit(Dict dict) {
 		try {
 			dictService.updateAndUpdate(dict);
@@ -114,6 +118,7 @@ public class ApiDictController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult del(Integer id) {
 		try {
 			dictService.delAndUpdate(id);
@@ -136,6 +141,7 @@ public class ApiDictController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult get(Integer id) {
 		try {
 			Dict dict = dictService.getEntity(id);

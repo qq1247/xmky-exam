@@ -128,10 +128,10 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	public void auth(Integer id, String readUserIds, String writeUserIds) {
 		QuestionType entity = getEntity(id);
 		if (ValidateUtil.isValid(readUserIds)) {
-			entity.setReadUserIds(entity.getReadUserIds() + readUserIds +",");
+			entity.setReadUserIds(","+readUserIds+",");
 		}
-		if (ValidateUtil.isValid(entity.getReadUserIds() + writeUserIds +",")) {
-			entity.setWriteUserIds(writeUserIds);
+		if (ValidateUtil.isValid(writeUserIds)) {
+			entity.setWriteUserIds(","+writeUserIds+",");
 		}
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());

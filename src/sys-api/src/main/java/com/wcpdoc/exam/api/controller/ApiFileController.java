@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -47,6 +48,7 @@ public class ApiFileController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult listpage(PageIn pageIn) {
 		try {
 			return PageResultEx.ok().data(fileService.getListpage(pageIn));
@@ -66,6 +68,7 @@ public class ApiFileController extends BaseController {
 	 */
 	@RequestMapping("/upload")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult upload(@RequestParam("files") MultipartFile[] files) {
 		try {
 			String[] allowTypes = { "jpg", "gif", "png", "zip", "rar", "doc", "xls", "docx", "xlsx", "mp4" };
@@ -92,6 +95,7 @@ public class ApiFileController extends BaseController {
 	 */
 	@RequestMapping("/uploadAdd")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult uploadAdd(Integer[] ids) {
 		StringBuilder message = new StringBuilder();
 		try {
@@ -132,6 +136,7 @@ public class ApiFileController extends BaseController {
 	 */
 	@RequestMapping(value = "/download")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public void download(Integer id) {
 		OutputStream output = null;
 		try {
@@ -161,6 +166,7 @@ public class ApiFileController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult del(Integer id) {
 		try {
 			File file = fileService.getEntity(id);

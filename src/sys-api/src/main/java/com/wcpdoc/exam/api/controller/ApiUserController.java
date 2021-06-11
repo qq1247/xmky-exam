@@ -13,6 +13,7 @@ import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.jxls.common.Context;
 import org.jxls.expression.JexlExpressionEvaluator;
 import org.jxls.transform.Transformer;
@@ -66,6 +67,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/orgTreeList")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult orgTreeList() {
 		try {
 			return PageResultEx.ok().data(orgService.getTreeList());
@@ -85,6 +87,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult listpage(PageIn pageIn, String name, Integer orgId) {
 		try {
 			if(ValidateUtil.isValid(name)){
@@ -110,6 +113,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult add(User user) {
 		try {
 			// 校验数据有效性
@@ -154,6 +158,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult edit(User user) {
 		try {
 			// 校验数据有效性
@@ -207,6 +212,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult del(Integer id) {
 		try {
 			User user = userService.getEntity(id);
@@ -237,6 +243,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/roleUpdate")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult roleUpdate(Integer id, String roles) {
 		try {
 			userService.roleUpdate(id, roles);
@@ -261,6 +268,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/orgUpdate")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult orgUpdate(Integer id, Integer orgId) {
 		try {
 			// 校验数据有效性
@@ -300,6 +308,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/initPwd")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult initPwd(Integer id) {
 		try {
 			String initPwd = "111111";//StringUtil.getRandomStr(8);
@@ -324,6 +333,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/input")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult input(@RequestParam("file") MultipartFile file) {
 		try {
 			userXlsxService.inputUserXlsx(file);
@@ -342,6 +352,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/export")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public void export(String ids) {
 		ServletOutputStream outputStream = null;
 		try {
@@ -384,6 +395,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/template")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public void template() {
 		OutputStream output = null;
 		try {
@@ -411,6 +423,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult get(Integer id) {
 		try {
 			User entity = userService.getEntity(id);
@@ -446,6 +459,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/onList")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult onList() {
 		try {
 			return PageResultEx.ok().data(userService.onList());
@@ -466,6 +480,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/exit")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult exit(Integer id) {
 		try {
 			TokenCache.del(id);
@@ -484,6 +499,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/syncUser")
 	@ResponseBody
+	@RequiresRoles("admin")
 	public PageResult syncUser(String orgName, String orgCode, List<User> user) {
 		// org  [name, code]
 		// user [name, loginName, email, phone, pwd ]

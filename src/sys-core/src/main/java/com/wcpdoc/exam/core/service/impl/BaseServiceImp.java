@@ -41,7 +41,7 @@ public abstract class BaseServiceImp<T> implements BaseService<T> {
 			
 			@Override
 			public Integer getId() {
-				return jwtResult.getClaims().get("id", Integer.class);
+				return jwtResult.getClaims().get("userId", Integer.class);
 			}
 		};
 		return jwtResult == null ? null : LoginUser;
