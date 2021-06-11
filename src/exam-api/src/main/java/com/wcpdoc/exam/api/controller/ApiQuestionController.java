@@ -110,19 +110,15 @@ public class ApiQuestionController extends BaseController {
 			}
 			
 			PageOut listpage = questionService.getListpage(pageIn);
-			List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 			for(Map<String, Object> map : listpage.getRows()){
-				map.put("typeName", DictCache.getDictValue("questionType", map.get("type").toString()));
-				map.put("difficultyName", DictCache.getDictValue("questionDifficulty", map.get("difficulty").toString()));
+				map.put("typeName", DictCache.getDictValue("QUESTION_TYPE", map.get("type").toString()));
+				map.put("difficultyName", DictCache.getDictValue("QUESTION_DIFFICULTY", map.get("difficulty").toString()));
 				
-				//选择
 				if (map.get("type").toString().equals("1") || map.get("type").toString().equals("2")) {
 					List<QuestionOption> optionList = questionOptionService.getQuestionOptionList(Integer.valueOf(map.get("id").toString()));
 					map.put("option", optionList);
 				}
-				list.add(map);
 			}
-			listpage.setRows(list);
 			return PageResultEx.ok().data(listpage);
 		} catch (Exception e) {
 			log.error("试题列表错误：", e);
@@ -204,34 +200,6 @@ public class ApiQuestionController extends BaseController {
 	}
 	
 	/**
-	 * 拷贝试题
-	 * 
-	 * v1.0 zhanghc 2017-05-07 14:56:29
-	 * @param id
-	 * @return pageOut
-	 */
-	@RequestMapping("/copy")
-	@ResponseBody
-	@RequiresRoles("subAdmin")
-	public PageResult copy(Integer id) {
-		try {
-			Question question = questionService.getEntity(id);
-			Question entity = new Question();
-			BeanUtils.copyProperties(entity, question);
-			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(getCurUser().getId());
-			questionService.add(entity);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("拷贝试题错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		}  catch (Exception e) {
-			log.error("拷贝试题错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
 	 * 预览试题
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
@@ -270,6 +238,34 @@ public class ApiQuestionController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		}  catch (Exception e) {
 			log.error("预览试题错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 拷贝试题
+	 * 
+	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * @param id
+	 * @return pageOut
+	 */
+	@RequestMapping("/copy")
+	@ResponseBody
+	@RequiresRoles("subAdmin")
+	public PageResult copy(Integer id) {
+		try {
+			Question question = questionService.getEntity(id);
+			Question entity = new Question();
+			BeanUtils.copyProperties(entity, question);
+			entity.setUpdateTime(new Date());
+			entity.setUpdateUserId(getCurUser().getId());
+			questionService.add(entity);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("复制试题错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		}  catch (Exception e) {
+			log.error("复制试题错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -441,18 +437,18 @@ public class ApiQuestionController extends BaseController {
 	}
 	
 	/**
-	 * 试题统计
+	 * 试题统计（类型，难易程度）
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @param id
 	 * @return pageOut
 	 */
-	@RequestMapping("/count")
+	@RequestMapping("/statistics")
 	@ResponseBody
 	@RequiresRoles("subAdmin")
-	public PageResult count(Integer questionTypeId) {
+	public PageResult statistics(Integer questionTypeId) {
 		try {
-			return PageResultEx.ok().data(questionService.count(questionTypeId));
+			return PageResultEx.ok().data(questionService.statisticsTypeDifficulty(questionTypeId));
 		} catch (MyException e) {
 			log.error("试题统计错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

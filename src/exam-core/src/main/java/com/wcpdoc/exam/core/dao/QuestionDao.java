@@ -31,13 +31,13 @@ public interface QuestionDao extends BaseDao<Question>{
 	List<Question> getList(Integer questionTypeId);
 	
 	/**
-	 * 试题统计
+	 * 试题统计(类型和难易程度)
 	 * 
 	 * v1.0 chenyun 2021年3月23日下午2:53:07
 	 * @param questionTypeId
 	 * @return List<Map<String, Object>>
 	 */
-	List<Map<String, Object>> count(Integer questionTypeId);
+	List<Map<String, Object>> statisticsTypeDifficulty(Integer questionTypeId);
 	
 	/**
 	 * 试题统计

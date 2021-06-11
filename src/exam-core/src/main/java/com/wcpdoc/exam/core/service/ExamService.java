@@ -31,7 +31,7 @@ public interface ExamService extends BaseService<Exam>{
 	 * @param myMarkIds
 	 * void
 	 */
-	void doCfg(Integer id, Integer[] userIds, Integer[] myMarkIds);
+	void cfg(Integer id, Integer[] userIds, Integer[] myMarkIds);
 
 	/**
 	 * 完成试卷
@@ -41,7 +41,7 @@ public interface ExamService extends BaseService<Exam>{
 	 * @param myExamId
 	 * void
 	 */
-	void doPaper(LoginUser user, Integer myExamId);
+	void paper(LoginUser user, Integer myExamId);
 	
 	/**
 	 * 完成强制交卷
@@ -51,7 +51,7 @@ public interface ExamService extends BaseService<Exam>{
 	 * @param myExamId
 	 * void
 	 */
-	void doForcePaper(LoginUser user);
+	void forcePaper(LoginUser user);
 
 	/**
 	 * 获取考试列表

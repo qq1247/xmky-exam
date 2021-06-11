@@ -74,7 +74,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	}
 
 	@Override
-	public void doAutoMark(Integer examId, LoginUser curUser, String processBarId) {
+	public void autoMark(Integer examId, LoginUser curUser, String processBarId) {
 		// 校验数据有效性
 		Exam exam = examService.getEntity(examId);
 		log.info("自动阅卷校验：{}", exam.getName());

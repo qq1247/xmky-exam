@@ -43,8 +43,6 @@ public class PaperType {
 	private Date updateTime;
 	@Column(name = "STATE")
 	private Integer state;
-	@Column(name = "RW_STATE")
-	private Integer rwState;
 	@Column(name = "READ_USER_IDS")
 	private String readUserIds;
 	@Column(name = "WRITE_USER_IDS")
@@ -97,12 +95,6 @@ public class PaperType {
 	}
 	public void setState(Integer state) {
 		this.state = state;
-	}
-	public Integer getRwState() {
-		return rwState;
-	}
-	public void setRwState(Integer rwState) {
-		this.rwState = rwState;
 	}
 	public String getReadUserIds() {
 		return readUserIds;

@@ -2,6 +2,8 @@ package com.wcpdoc.exam.core.service;
 
 import java.util.List;
 
+import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PaperType;
 /**
  * 试卷分类服务层接口
@@ -18,6 +20,14 @@ public interface PaperTypeService extends BaseService<PaperType> {
 	 */
 	void addAndUpdate(PaperType paperType);
 
+	/**
+	 * 修改试卷分类
+	 * 
+	 * v1.0 cY 2021年6月11日下午2:43:48
+	 * @param paperType void
+	 */
+	void editAndUpdate(PaperType paperType);
+	
 	/**
 	 * 删除试卷分类
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
@@ -52,6 +62,14 @@ public interface PaperTypeService extends BaseService<PaperType> {
 	 * @param writeUserIds
 	 * void
 	 */
-	void doAuth(Integer id, String readUserIds, String writeUserIds, boolean rwState);
+	void doAuth(Integer id, String readUserIds, String writeUserIds);
 
+	/**
+	 * 获取人员列表
+	 * 
+	 * v1.0 zhanghc 2018年5月30日下午6:28:19
+	 * @param pageIn
+	 * @return PageOut
+	 */
+	PageOut authUserListpage(PageIn pageIn);
 }

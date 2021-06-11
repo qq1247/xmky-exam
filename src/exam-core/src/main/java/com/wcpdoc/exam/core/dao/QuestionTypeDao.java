@@ -47,5 +47,5 @@ public interface QuestionTypeDao extends BaseDao<QuestionType> {
 	 * @param pageIn
 	 * @return PageOut
 	 */
-	PageOut getUserListpage(PageIn pageIn);
+	PageOut authUserListpage(PageIn pageIn);
 }

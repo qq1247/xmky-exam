@@ -24,7 +24,6 @@ code == 401 无权限或登录超时
 |data.list[]      | arr[]  | 分页列表 |
 |data.list[].id   | Integer  | 主键 |
 |data.list[].name | String  | 名称 |
-|data.list[].rwState | Integer  | 1：开启；2：禁用 |
 |data.list[].readUserNames | String  | 读权限 |
 |data.list[].writeUserNames | String  | 写权限 |
 
@@ -90,7 +89,6 @@ code == 401 无权限或登录超时
 |data.createUserId   | Integer  | 创建人ID |
 |data.createUserName   | String  | 创建人名称 |
 |data.createTime   | Date  | 创建时间 |
-|data.rwState   | Integer  | 读写状态【1：开启；2：禁用'】 |
 |data.readUserIds   | Integer  | 读权限 |
 |data.writeUserIds   | Integer  | 写权限 |
 
@@ -106,6 +104,24 @@ code == 401 无权限或登录超时
 | --------   | -----   | -----  |
 |code     | Integer  | 响应码 |
 |msg     | String  | 响应消息 |
+
+####试题分类权限用户：questionType/authUserListpage
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|curPage      | Integer | 当前第几页  |   否     |
+|pageSize      | Integer  | 每页多少条   |   否     |
+|id      | Integer  | 主键 |   是     |
+|rw      | String  | 权限【r:使用权限；w：编辑权限;】 |   是     |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | Integer  | 响应码 |
+|msg     | String  | 响应消息 |
+|data.total     | Integer  | 总行数 |
+|data.list[]      | arr[]  | 分页列表 |
+|data.list[].id   | Integer  | 用户id |
+|data.list[].name | String  | 名称 |
 
 ####试题分类开放列表：questionTypeOpen/listpage
 ######请求参数

@@ -9,6 +9,8 @@ import com.wcpdoc.exam.core.dao.ExamTypeDao;
 import com.wcpdoc.exam.core.entity.ExamType;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
+import com.wcpdoc.exam.core.util.DateUtil;
+import com.wcpdoc.exam.core.util.HibernateUtil;
 import com.wcpdoc.exam.core.util.SqlUtil;
 import com.wcpdoc.exam.core.util.SqlUtil.Order;
 import com.wcpdoc.exam.core.util.ValidateUtil;
@@ -31,6 +33,9 @@ public class ExamTypeDaoImpl extends RBaseDaoImpl<ExamType> implements ExamTypeD
 				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "USER.NAME LIKE ?", "%" + pageIn.getThree() + "%")
 				.addWhere("EXAM_TYPE.STATE = ?", 1);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
+		HibernateUtil.formatDate(pageOut.getRows(), 
+				"UPDATE_TIME", DateUtil.FORMAT_DATE_TIME, 
+				"CREATE_TIME", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;
 	}
 
@@ -105,4 +110,16 @@ public class ExamTypeDaoImpl extends RBaseDaoImpl<ExamType> implements ExamTypeD
 		return pageOut;
 	}
 	
+	@Override
+	public PageOut authUserListpage(PageIn pageIn) {
+		String sql = "SELECT USER.ID, USER.NAME AS NAME "
+				+ "FROM SYS_USER USER ";
+		SqlUtil sqlUtil = new SqlUtil(sql);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()), "EXISTS (SELECT 1 FROM EXM_EXAM_TYPE Z WHERE Z.ID = ? AND Z.WRITE_USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.getOne())
+				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "EXISTS (SELECT 1 FROM EXM_EXAM_TYPE Z WHERE Z.ID = ? AND Z.READ_USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.getTwo())
+				.addWhere("USER.STATE = 1")
+				.addOrder("USER.UPDATE_TIME", Order.DESC);
+		PageOut pageOut = getListpage(sqlUtil, pageIn);
+		return pageOut;
+	}
 }

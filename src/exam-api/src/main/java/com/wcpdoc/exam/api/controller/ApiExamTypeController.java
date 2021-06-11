@@ -1,6 +1,6 @@
 package com.wcpdoc.exam.api.controller;
 
-import java.util.Date;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -11,10 +11,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.base.service.OrgService;
+import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.ExamType;
 import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.exception.MyException;
@@ -39,6 +42,8 @@ public class ApiExamTypeController extends BaseController {
 	private OrgService orgService;
 	@Resource
 	private FileService fileService;
+	@Resource
+	private UserService userService;
 	
 	/**
 	 * 试题分类列表 
@@ -49,9 +54,45 @@ public class ApiExamTypeController extends BaseController {
 	@RequestMapping("/listpage")
 	@ResponseBody
 	@RequiresRoles("subAdmin")
-	public PageResult listpage(PageIn pageIn) {
+	public PageResult listpage(PageIn pageIn, String name) {
 		try {
-			return PageResultEx.ok().data(examTypeService.getListpage(pageIn));
+			if (ValidateUtil.isValid(name)) {
+				pageIn.setTwo(name);
+			}
+			PageOut listpage = examTypeService.getListpage(pageIn);
+			for(Map<String, Object> mapList : listpage.getRows()){
+				if(mapList.get("readUserIds")!= null){
+					String[] readUserSplit = mapList.get("readUserIds").toString().subSequence(1, mapList.get("readUserIds").toString().length()).toString().split(",");
+					for(String id : readUserSplit){
+						User user = userService.getEntity(Integer.parseInt(id));
+						if(mapList.get("readUserNames") == null){
+							mapList.put("readUserNames", user.getName());
+						}else{
+							mapList.put("readUserNames", mapList.get("readUserNames")+","+user.getName());
+						}
+					}
+				}
+				
+				if (mapList.get("writeUserIds")!= null) {
+					String[] writeUserSplit = mapList.get("writeUserIds").toString().subSequence(1, mapList.get("writeUserIds").toString().length()).toString().split(",");
+					for(String id :writeUserSplit){
+						User user = userService.getEntity(Integer.parseInt(id));
+						if(mapList.get("writeUserNames") == null){
+							mapList.put("writeUserNames", user.getName());
+						}else{
+							mapList.put("writeUserNames", mapList.get("readUserNames")+","+user.getName());
+						}
+					}
+				}
+				
+				if ("0".equals(mapList.get("createUserId").toString())) {
+					continue;
+				}
+				
+				User user = userService.getEntity(Integer.parseInt(mapList.get("createUserId").toString()));
+				mapList.put("createUserName", user.getName());				
+			}
+			return PageResultEx.ok().data(listpage);
 		} catch (Exception e) {
 			log.error("试题分类列表错误：", e);
 			return PageResult.err();
@@ -81,36 +122,6 @@ public class ApiExamTypeController extends BaseController {
 	}
 	
 	/**
-	 * 获取试题分类
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * 
-	 * @return pageOut
-	 */
-	@RequestMapping("/get")
-	@ResponseBody
-	@RequiresRoles("subAdmin")
-	public PageResult get(Integer id) {
-		try {
-			ExamType entity = examTypeService.getEntity(id);
-			return PageResultEx.ok()
-					.addAttr("id", entity.getId())
-					.addAttr("name", entity.getName())
-					.addAttr("imgId", entity.getImgId())
-					.addAttr("createUserId", entity.getCreateUserId())
-					.addAttr("createTime", DateUtil.formatDateTime(entity.getCreateTime()))
-					.addAttr("rwState", entity.getRwState())
-					.addAttr("readUserIds", entity.getReadUserIds())
-					.addAttr("writeUserIds", entity.getWriteUserIds());
-		} catch (MyException e) {
-			log.error("获取试题分类错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("获取试题分类错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
 	 * 完成修改试题分类
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
@@ -121,24 +132,7 @@ public class ApiExamTypeController extends BaseController {
 	@RequiresRoles("subAdmin")
 	public PageResult edit(ExamType examType) {
 		try {
-			//校验数据有效性
-			if(!ValidateUtil.isValid(examType.getName())) {
-				throw new MyException("参数错误：name");
-			}
-			if(examTypeService.existName(examType)) {
-				throw new MyException("名称已存在！");
-			}
-			
-			//修改试题分类
-			ExamType entity = examTypeService.getEntity(examType.getId());
-			entity.setName(examType.getName());
-			entity.setImgId(examType.getImgId());
-			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(getCurUser().getId());
-			examTypeService.update(entity);
-			
-			//保存图片
-			//fileService.doUpload(examType.getImgId());
+			examTypeService.editAndUpdate(examType);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成修改试题分类错误：{}", e.getMessage());
@@ -172,6 +166,35 @@ public class ApiExamTypeController extends BaseController {
 	}
 	
 	/**
+	 * 获取试题分类
+	 * v1.0 zhanghc 2016-5-24下午14:54:09
+	 * 
+	 * @return pageOut
+	 */
+	@RequestMapping("/get")
+	@ResponseBody
+	@RequiresRoles("subAdmin")
+	public PageResult get(Integer id) {
+		try {
+			ExamType entity = examTypeService.getEntity(id);
+			return PageResultEx.ok()
+					.addAttr("id", entity.getId())
+					.addAttr("name", entity.getName())
+					.addAttr("imgId", entity.getImgId())
+					.addAttr("createUserId", entity.getCreateUserId())
+					.addAttr("createTime", DateUtil.formatDateTime(entity.getCreateTime()))
+					.addAttr("readUserIds", entity.getReadUserIds())
+					.addAttr("writeUserIds", entity.getWriteUserIds());
+		} catch (MyException e) {
+			log.error("获取试题分类错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("获取试题分类错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
 	 * 完成添加权限
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
@@ -185,15 +208,43 @@ public class ApiExamTypeController extends BaseController {
 	@RequestMapping("/auth")
 	@ResponseBody
 	@RequiresRoles("subAdmin")
-	public PageResult auth(Integer id, String readUserIds, String writeUserIds, boolean rwState) {
+	public PageResult auth(Integer id, String readUserIds, String writeUserIds) {
 		try {
-			examTypeService.doAuth(id, readUserIds, writeUserIds, rwState);
+			examTypeService.doAuth(id, readUserIds, writeUserIds);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成添加权限用户错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加权限用户错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 获取人员列表 
+	 * 
+	 * v1.0 zhanghc 2017年6月16日下午5:02:45
+	 * @param pageIn
+	 * @return PageOut
+	 */
+	@RequestMapping("/authUserListpage")
+	@ResponseBody
+	@RequiresRoles("subAdmin")
+	public PageResult authUserListpage(PageIn pageIn, String rw, Integer id) {
+		try {
+			if(id != null && ValidateUtil.isValid(rw) && "w".equals(rw)){
+				pageIn.setOne(id.toString());
+			}
+			if(id != null && ValidateUtil.isValid(rw) && "r".equals(rw)){
+				pageIn.setTwo(id.toString());
+			}
+			return PageResultEx.ok().data(examTypeService.authUserListpage(pageIn));
+		} catch (MyException e) {
+			log.error("权限用户列表错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("权限用户列表错误：", e);
 			return PageResult.err();
 		}
 	}

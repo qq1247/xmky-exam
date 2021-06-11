@@ -83,18 +83,17 @@ public class ApiMyMarkController extends BaseController {
 			pageIn.setFour("1");
 			pageIn.setEight(getCurUser().getId().toString());
 			PageOut pageOut = examService.getListpage(pageIn);
-			List<Map<String, Object>> list = pageOut.getRows();
 			
 			Date curTime = new Date();
-			for(Map<String, Object> map : list) {
-				Date startTime = (Date) map.get("MARK_START_TIME");
-				Date endTime = (Date) map.get("MARK_END_TIME");
+			for(Map<String, Object> map : pageOut.getRows()) {
+				Date startTime = (Date) map.get("markStartTime");
+				Date endTime = (Date) map.get("markEndTime");
 				if (startTime.getTime() > curTime.getTime()) {
-					map.put("EXAM_HAND", "AWAIT");
+					map.put("examHand", "AWAIT");
 				} else if (startTime.getTime() <= curTime.getTime() && endTime.getTime() >= curTime.getTime()) {
-					map.put("EXAM_HAND", "START");
+					map.put("examHand", "START");
 				} else {
-					map.put("EXAM_HAND", "END");
+					map.put("examHand", "END");
 				}
 			}
 
@@ -484,7 +483,7 @@ public class ApiMyMarkController extends BaseController {
 			LoginUser curUser = getCurUser();
 			new Thread(new Runnable() {
 				public void run() {
-					SpringUtil.getBean(MyExamDetailService.class).doAutoMark(examId, curUser, processBarId);
+					SpringUtil.getBean(MyExamDetailService.class).autoMark(examId, curUser, processBarId);
 				}
 			}).start();
 			

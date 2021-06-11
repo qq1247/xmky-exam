@@ -35,16 +35,17 @@ public class PaperRemarkServiceImpl extends BaseServiceImp<PaperRemark> implemen
 	}
 
 	@Override
-	public List<PaperRemark> getPaperRemarkList(Integer paperId) {
-		return paperRemarkDao.getPaperRemarkList(paperId);
+	public List<PaperRemark> getList(Integer paperId) {
+		return paperRemarkDao.getList(paperId);
 	}
 
 	@Override
-	public void removePaperRemark(Integer paperId) {
-		List<PaperRemark> paperRemark = paperRemarkDao.getPaperRemarkList(paperId);
+	public void remove(Integer paperId) {
+		List<PaperRemark> paperRemark = paperRemarkDao.getList(paperId);
 		if(paperRemark == null || paperRemark.size() == 0 ){
 			return;
 		}
+		
 		for(PaperRemark  paperRemarkId :  paperRemark){
 			del(paperRemarkId.getId());
 		}

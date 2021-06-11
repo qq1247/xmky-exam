@@ -64,7 +64,7 @@ public interface QuestionTypeService extends BaseService<QuestionType> {
 	 * @param writeUserIds
 	 * void
 	 */
-	void doAuth(Integer id, String readUserIds, String writeUserIds, boolean rwState);
+	void auth(Integer id, String readUserIds, String writeUserIds);
 
 	/**
 	 * 获取人员列表
@@ -73,6 +73,5 @@ public interface QuestionTypeService extends BaseService<QuestionType> {
 	 * @param pageIn
 	 * @return PageOut
 	 */
-	PageOut getUserListpage(PageIn pageIn);
-
+	PageOut authUserListpage(PageIn pageIn);
 }
