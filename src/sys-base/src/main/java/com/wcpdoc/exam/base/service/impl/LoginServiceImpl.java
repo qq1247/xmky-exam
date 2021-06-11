@@ -44,7 +44,7 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 	}
 
 	@Override
-	public UserToken in(String loginName, String pwd) throws LoginException{
+	public UserToken in(String loginName, String pwd) throws LoginException {
 		//校验数据有效性
 		if(!ValidateUtil.isValid(loginName)) {
 			throw new LoginException("参数错误：loginName");
@@ -64,7 +64,7 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 		Date expTime = DateUtil.getNextMinute(new Date(), tokenExpireMinute);
 		String accessToken = JwtUtil.getInstance()
 			.createToken(tokenId.toString(), active, expTime)
-			.addAttr("id", user.getId())
+			.addAttr("userId", user.getId())
 			.addAttr("loginName", loginName)
 			.build();
 		if (log.isDebugEnabled()) {
@@ -72,7 +72,7 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 		}
 		
 		// 缓存刷新令牌（用于续租登陆）
-		TokenCache.add(String.format("TOKEN_%s", user.getId()), tokenId);
+		TokenCache.put(String.format("TOKEN_%s", user.getId()), accessToken);
 		
 		//更新用户登录时间
 		user.setLastLoginTime(new Date());

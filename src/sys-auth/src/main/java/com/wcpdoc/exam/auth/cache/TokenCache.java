@@ -16,13 +16,13 @@ public class TokenCache extends BaseEhCache {
 	private static final String CACHE_NAME = "TOKEN_CACHE";
 
 	/**
-	 * 添加缓存
+	 * 放入缓存
 	 * 
 	 * v1.0 zhanghc 2021年3月18日下午3:34:11
 	 * @param key
 	 * @param value void
 	 */
-	public static void add(String key, Long value) {
+	public static void put(String key, String value) {
 		Cache cache = getCache(CACHE_NAME);
 		cache.put(key, value);
 //		net.sf.ehcache.Cache nativeCache = (net.sf.ehcache.Cache) cache.getNativeCache();
@@ -30,17 +30,30 @@ public class TokenCache extends BaseEhCache {
 	}
 	
 	/**
-	 * 添加缓存
+	 * 获取缓存
 	 * 
 	 * v1.0 zhanghc 2021年3月18日下午3:34:11
 	 * @param key
 	 * @param value void
 	 */
-	public static Long get(String key) {
+	public static String get(String key) {
 		Cache cache = getCache(CACHE_NAME);
-		return cache.get(key, Long.class);
+		return cache.get(key, String.class);
 	}
 
+	/**
+	 * 删除缓存
+	 * 
+	 * v1.0 zhanghc 2021年3月18日下午3:34:11
+	 * @param key
+	 * @param value void
+	 */
+	public static void del(Integer id) {
+		Cache cache = getCache(CACHE_NAME);
+		net.sf.ehcache.Cache nativeCache = (net.sf.ehcache.Cache) cache.getNativeCache();
+		nativeCache.remove("TOKEN_"+id);
+	}
+	
 	/**
 	 * 缓存列表
 	 * 
@@ -59,18 +72,5 @@ public class TokenCache extends BaseEhCache {
 			list.add(Integer.parseInt(split[1]));
 		}
 		return list;
-	}
-	
-	/**
-	 * 删除缓存
-	 * 
-	 * v1.0 zhanghc 2021年3月18日下午3:34:11
-	 * @param key
-	 * @param value void
-	 */
-	public static void del(Integer id) {
-		Cache cache = getCache(CACHE_NAME);
-		net.sf.ehcache.Cache nativeCache = (net.sf.ehcache.Cache) cache.getNativeCache();
-		nativeCache.remove("TOKEN_"+id);
 	}
 }

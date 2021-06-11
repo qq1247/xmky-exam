@@ -84,22 +84,23 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 		// 校验数据有效性
 		Integer tokenExpireMinute = SpringUtil.getBean(Environment.class).getProperty("token.expireMinute", Integer.class);
 		Integer tokenRefreshMinute = SpringUtil.getBean(Environment.class).getProperty("token.refreshMinute", Integer.class);
-		String jwtToken = WebUtils.toHttp(request).getHeader("Authorization");
-		JwtResult jwtResult = JwtUtil.getInstance().parse(jwtToken);//能到这一步，肯定是登陆成功的，不需要校验空或校验错误。
-		long oldTokenId = Long.parseLong(jwtResult.getClaims().getId());
-		int userId = jwtResult.getClaims().get("id", Integer.class);
-		String loginName = jwtResult.getClaims().get("loginName", String.class);
+		String oldJwtToken = WebUtils.toHttp(request).getHeader("Authorization");
+		JwtResult oldJwtResult = JwtUtil.getInstance().parse(oldJwtToken);//能到这一步，肯定是登陆成功的，不需要校验空或校验错误。
+		long oldTokenId = Long.parseLong(oldJwtResult.getClaims().getId());
+		int oldUserId = oldJwtResult.getClaims().get("userId", Integer.class);
+		String oldLoginName = oldJwtResult.getClaims().get("loginName", String.class);
 		
-		Long curTokenId = TokenCache.get(String.format("TOKEN_%s", userId));
-		if (curTokenId == null) {//缓存中没有令牌（过期清理或人工清理）
-			throw new AuthenticationException(String.format("用户【%s】令牌不存在", loginName));
+		String curToken = TokenCache.get(String.format("TOKEN_%s", oldUserId));
+		if (curToken == null) {//缓存中没有令牌（过期清理或人工清理）
+			throw new AuthenticationException(String.format("用户【%s】令牌不存在", oldLoginName));
 		}
 		
+		Long curTokenId = Long.parseLong(JwtUtil.getInstance().parse(curToken).getClaims().getId());
 		if (curTokenId != oldTokenId) {
 			if (log.isDebugEnabled()) {
-				log.debug("shiro权限：用户【{}】令牌过期，旧令牌创建时间【{}】，当前令牌创建时间【{}】", loginName, DateUtil.formatDateTime(new Date(oldTokenId)), DateUtil.formatDateTime(new Date(curTokenId)));
+				log.debug("shiro权限：用户【{}】令牌过期，旧令牌创建时间【{}】，当前令牌创建时间【{}】", oldLoginName, DateUtil.formatDateTime(new Date(oldTokenId)), DateUtil.formatDateTime(new Date(curTokenId)));
 			}
-			throw new AuthenticationException(String.format("用户【%s】令牌过期", loginName));
+			throw new AuthenticationException(String.format("用户【%s】令牌过期", oldLoginName));
 		}
 		
 		Date curTime = new Date();
@@ -111,18 +112,18 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 		// 生成令牌信息（登陆由shiro接收令牌控制）
 		if (log.isDebugEnabled()) {
 			log.debug("shiro权限：用户【{}】刷新令牌，旧令牌创建时间【{}】，当前令牌创建时间【{}】，默认过期分钟【{}】，默认刷新分钟【{}】", 
-					loginName, DateUtil.formatDateTime(new Date(oldTokenId)), DateUtil.formatDateTime(new Date(curTokenId)), tokenExpireMinute, tokenRefreshMinute);
+					oldLoginName, DateUtil.formatDateTime(new Date(oldTokenId)), DateUtil.formatDateTime(new Date(curTokenId)), tokenExpireMinute, tokenRefreshMinute);
 		}
-		Date expTime = DateUtil.getNextMinute(curTime, tokenExpireMinute);
+		Date newExpTime = DateUtil.getNextMinute(curTime, tokenExpireMinute);
 		Long newTokenId = curTime.getTime();
 		String newToken = JwtUtil.getInstance()
-			.createToken(newTokenId.toString(), jwtResult.getClaims().getSubject(), expTime)
-			.addAttr("id", jwtResult.getClaims().get("id"))
-			.addAttr("loginName", jwtResult.getClaims().get("loginName"))
+			.createToken(newTokenId.toString(), oldJwtResult.getClaims().getSubject(), newExpTime)
+			.addAttr("userId", oldJwtResult.getClaims().get("userId"))
+			.addAttr("loginName", oldJwtResult.getClaims().get("loginName"))
 			.build();
 		
 		// 缓存刷新令牌（用于续租登陆）
-		TokenCache.add(String.format("TOKEN_%s", userId), newTokenId);
+		TokenCache.put(String.format("TOKEN_%s", oldUserId), newToken);
 		
 		// 放入http响应头，供前端替换使用
 		WebUtils.toHttp(response).setHeader("Authorization", newToken);

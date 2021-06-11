@@ -126,18 +126,14 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 			throw new MyException("参数错误：role");
 		}
 		
-		// 更新岗位
+		// 更新角色
 		user.setRoles(String.format("user,%s", roles));
 		user.setUpdateTime(new Date());
 		user.setUpdateUserId(getCurUser().getId());
 		userDao.update(user);
 
-		jwtRealm.getAuthorizationCache().clear(); //jwtRealm.getAuthorizationCache().clear();  jwtRealm.getAuthorizationCache().remove(user.getId());
-	}
-	
-	public static void main(String[] args) {
-		String encryptPwd = new UserServiceImpl().getEncryptPwd("admin2", "111111");
-		System.err.println(encryptPwd);
+		// 授权立即生效
+		jwtRealm.clearAuth(user.getId());
 	}
 
 	@Override

@@ -38,7 +38,7 @@ public abstract class BaseController {
 			
 			@Override
 			public Integer getId() {
-				return jwtResult.getClaims().get("id", Integer.class);
+				return jwtResult.getClaims().get("userId", Integer.class);
 			}
 		};
 		return jwtResult == null ? null : LoginUser;
