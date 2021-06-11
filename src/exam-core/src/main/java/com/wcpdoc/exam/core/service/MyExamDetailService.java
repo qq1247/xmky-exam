@@ -37,5 +37,5 @@ public interface MyExamDetailService extends BaseService<MyExamDetail>{
 	 * @param processBarId 
 	 * void
 	 */
-	void doAutoMark(Integer examId, LoginUser curUser, String processBarId);
+	void autoMark(Integer examId, LoginUser curUser, String processBarId);
 }

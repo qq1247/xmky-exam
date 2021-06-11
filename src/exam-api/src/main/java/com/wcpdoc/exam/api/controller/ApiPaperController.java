@@ -20,16 +20,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.wcpdoc.exam.core.constant.ConstantManager;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.entity.Paper;
-import com.wcpdoc.exam.core.entity.PaperOption;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.PaperRemark;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.exception.MyException;
-import com.wcpdoc.exam.core.service.PaperOptionService;
 import com.wcpdoc.exam.core.service.PaperQuestionService;
 import com.wcpdoc.exam.core.service.PaperRemarkService;
 import com.wcpdoc.exam.core.service.PaperService;
@@ -50,8 +47,6 @@ public class ApiPaperController extends BaseController {
 	private PaperService paperService;
 	@Resource
 	private QuestionService questionService;
-	@Resource
-	private PaperOptionService paperOptionService;
 	@Resource
 	private PaperRemarkService paperRemarkService;
 	@Resource
@@ -79,10 +74,8 @@ public class ApiPaperController extends BaseController {
 			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
 				pageIn.setTen(getCurUser().getId().toString());
 			}
-			
-			PageOut listpage = paperService.getListpage(pageIn);
-			
-			return PageResultEx.ok().data(listpage);
+
+			return PageResultEx.ok().data(paperService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("试卷列表错误：", e);
 			return PageResult.err();
@@ -98,7 +91,7 @@ public class ApiPaperController extends BaseController {
 	@RequestMapping("/add")
 	@ResponseBody
 	@RequiresRoles("subAdmin")
-	public PageResult add(Paper paper, PaperOption paperOption, PaperRemark paperRemark) {
+	public PageResult add(Paper paper, PaperRemark paperRemark) {
 		try {
 			if (paper.getShowType() == null) {
 				paper.setShowType(new BigDecimal(1));
@@ -110,41 +103,9 @@ public class ApiPaperController extends BaseController {
 			paper.setState(2);
 			paperService.add(paper);
 			
-			paperOption.setPaperId(paper.getId());
-			paperOptionService.add(paperOption);
-			
 			paperRemark.setPaperId(paper.getId());
 			paperRemarkService.add(paperRemark);
-			
 			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("添加试卷错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("添加试卷错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 试卷浏览
-	 * 
-	 * v1.0 chenyun 2021年3月29日下午5:40:20
-	 * @param paperId
-	 * @return PageResult
-	 */
-	@RequestMapping("/get")
-	@ResponseBody
-	@RequiresRoles("subAdmin")
-	public PageResult echo(Integer paperId) {
-		try {
-			Paper paper = paperService.getEntity(paperId);
-			PaperOption paperOption = paperOptionService.getPaperOption(paper.getId());
-			List<PaperRemark> paperRemarkList = paperRemarkService.getPaperRemarkList(paper.getId());
-			return PageResultEx.ok()
-					.addAttr("paper", paper)
-					.addAttr("paperOption", paperOption)
-					.addAttr("paperRemarkList", paperRemarkList);
 		} catch (MyException e) {
 			log.error("添加试卷错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -163,7 +124,7 @@ public class ApiPaperController extends BaseController {
 	@RequestMapping("/edit")
 	@ResponseBody
 	@RequiresRoles("subAdmin")
-	public PageResult edit(Integer paperId, Paper paper, PaperOption paperOption, List<PaperRemark> paperRemark) {
+	public PageResult edit(Integer paperId, Paper paper, List<PaperRemark> paperRemark) {
 		try {
 			Paper entity = paperService.getEntity(paperId);
 			entity.setName(paper.getName());
@@ -171,20 +132,13 @@ public class ApiPaperController extends BaseController {
 			entity.setReadRemark(paper.getReadRemark());
 			entity.setReadNum(paper.getReadNum());
 			entity.setShowType(paper.getShowType());
+			entity.setQuestion(paper.getQuestion());
+			entity.setMinimizeNum(paper.getMinimizeNum());
 			entity.setUpdateUserId(getCurUser().getId());
 			entity.setUpdateTime(new Date());
 			paperService.update(entity);
-			
-			PaperOption paperOptionEntity = paperOptionService.getPaperOption(entity.getId());
-			paperOptionEntity.setQuestion(paperOption.getQuestion());
-			paperOptionEntity.setQuestionOption(paperOption.getQuestionOption());
-			paperOptionEntity.setRightClick(paperOption.getRightClick());
-			paperOptionEntity.setRightCopy(paperOption.getRightCopy());
-			paperOptionEntity.setMinimize(paperOption.getMinimize());
-			paperOptionEntity.setMinimizeNum(paperOption.getMinimizeNum());
-			paperOptionService.update(paperOptionEntity);
 
-			paperRemarkService.removePaperRemark(entity.getId());//重新添加评语
+			paperRemarkService.remove(entity.getId());//重新添加评语
 			for (int i = 0; i < paperRemark.size(); i++) {
 				paperRemark.get(i).setNo(i+1);
 				paperRemark.get(i).setPaperId(entity.getId());
@@ -216,18 +170,38 @@ public class ApiPaperController extends BaseController {
 			paper.setUpdateTime(new Date());
 			paper.setUpdateUserId(getCurUser().getId());
 			paperService.update(paper);
-			// 删除防作弊、成绩评语
-			PaperOption paperOption = paperOptionService.getPaperOption(paper.getId());
-			if (paperOption != null) {
-				paperOptionService.del(paperOption.getId());
-			}
-			paperRemarkService.removePaperRemark(paper.getId());
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("删除试卷错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("删除试卷错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 试卷浏览
+	 * 
+	 * v1.0 chenyun 2021年3月29日下午5:40:20
+	 * @param paperId
+	 * @return PageResult
+	 */
+	@RequestMapping("/get")
+	@ResponseBody
+	@RequiresRoles("subAdmin")
+	public PageResult get(Integer paperId) {
+		try {
+			Paper paper = paperService.getEntity(paperId);
+			List<PaperRemark> paperRemarkList = paperRemarkService.getList(paper.getId());
+			return PageResultEx.ok()
+					.addAttr("paper", paper)
+					.addAttr("paperRemarkList", paperRemarkList);
+		} catch (MyException e) {
+			log.error("添加试卷错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("添加试卷错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -250,16 +224,8 @@ public class ApiPaperController extends BaseController {
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
 			paperService.add(entity);
-			
-			PaperOption paperOption = paperOptionService.getPaperOption(paper.getId());
-			PaperOption paperOptionEntity = new PaperOption();
-			if(paperOption != null){				
-				BeanUtils.copyProperties(paperOptionEntity, paperOption);
-			}
-			paperOptionEntity.setPaperId(entity.getId());
-			paperOptionService.add(paperOptionEntity);
 
-			List<PaperRemark> paperRemarkList = paperRemarkService.getPaperRemarkList(paper.getId());
+			List<PaperRemark> paperRemarkList = paperRemarkService.getList(paper.getId());
 			if (paperRemarkList != null && paperRemarkList.size() != 0) {
 				for(PaperRemark paperRemark : paperRemarkList){
 					PaperRemark paperRemarkEntity = new PaperRemark();
@@ -270,10 +236,10 @@ public class ApiPaperController extends BaseController {
 			}
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("拷贝试题错误：{}", e.getMessage());
+			log.error("复制试题错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		}  catch (Exception e) {
-			log.error("拷贝试题错误：", e);
+			log.error("复制试题错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -312,7 +278,7 @@ public class ApiPaperController extends BaseController {
 	@RequiresRoles("subAdmin")
 	public PageResult chapterAdd(PaperQuestion chapter) {
 		try {
-			paperService.doChapterAdd(chapter);
+			paperService.chapterAdd(chapter);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加章节错误：{}", e.getMessage());
@@ -335,7 +301,7 @@ public class ApiPaperController extends BaseController {
 	@RequiresRoles("subAdmin")
 	public PageResult chapterEdit(PaperQuestion chapter) {
 		try {
-			paperService.doChapterEdit(chapter);
+			paperService.chapterEdit(chapter);
 			return PageResult.ok();
 		} catch (Exception e) {
 			log.error("修改章节错误：", e);
@@ -355,7 +321,7 @@ public class ApiPaperController extends BaseController {
 	@RequiresRoles("subAdmin")
 	public PageResult chapterDel(Integer chapterId) {
 		try {
-			paperService.doChapterDel(chapterId);
+			paperService.chapterDel(chapterId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("删除章节错误：{}", e.getMessage());
@@ -378,7 +344,7 @@ public class ApiPaperController extends BaseController {
 	@RequiresRoles("subAdmin")
 	public PageResult chapterUp(Integer chapterId) {
 		try {
-			paperService.doChapterUp(chapterId);
+			paperService.chapterUp(chapterId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("章节上移错误：{}", e.getMessage());
@@ -401,7 +367,7 @@ public class ApiPaperController extends BaseController {
 	@RequiresRoles("subAdmin")
 	public PageResult chapterDown(Integer chapterId) {
 		try {
-			paperService.doChapterDown(chapterId);
+			paperService.chapterDown(chapterId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("章节下移错误：{}", e.getMessage());
@@ -502,7 +468,7 @@ public class ApiPaperController extends BaseController {
 	@RequiresRoles("subAdmin")
 	public PageResult questionAdd(Integer chapterId, Integer[] questionIds) {
 		try {
-			paperService.doQuestionAdd(chapterId, questionIds);
+			paperService.questionAdd(chapterId, questionIds);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加试题错误：{}", e.getMessage());
@@ -527,7 +493,7 @@ public class ApiPaperController extends BaseController {
 	@RequiresRoles("subAdmin")
 	public PageResult scoreUpdate(Integer paperQuestionId, BigDecimal score) {
 		try {
-			paperService.doScoreUpdate(paperQuestionId, score);
+			paperService.scoreUpdate(paperQuestionId, score);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("设置分数错误：{}", e.getMessage());
@@ -551,7 +517,7 @@ public class ApiPaperController extends BaseController {
 	@RequiresRoles("subAdmin")
 	public PageResult scoreOptionsUpdate(Integer paperQuestionId, Integer[] scoreOptions) {
 		try {
-			paperService.doOptionsUpdate(paperQuestionId, scoreOptions);
+			paperService.optionsUpdate(paperQuestionId, scoreOptions);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("设置分数错误：{}", e.getMessage());
@@ -576,7 +542,7 @@ public class ApiPaperController extends BaseController {
 	@RequiresRoles("subAdmin")
 	public PageResult batchScoreUpdate(Integer chapterId, BigDecimal score, String options) {
 		try {
-			paperService.doBatchScoreUpdate(chapterId, score, options);
+			paperService.batchScoreUpdate(chapterId, score, options);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("设置分数错误：{}", e.getMessage());
@@ -599,7 +565,7 @@ public class ApiPaperController extends BaseController {
 	@RequiresRoles("subAdmin")
 	public PageResult questionUp(Integer paperQuestionId) {
 		try {
-			paperService.doQuestionUp(paperQuestionId);
+			paperService.questionUp(paperQuestionId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("试题上移错误：{}", e.getMessage());
@@ -622,7 +588,7 @@ public class ApiPaperController extends BaseController {
 	@RequiresRoles("subAdmin")
 	public PageResult questionDown(Integer paperQuestionId) {
 		try {
-			paperService.doQuestionDown(paperQuestionId);
+			paperService.questionDown(paperQuestionId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("试题下移错误：{}", e.getMessage());
@@ -645,7 +611,7 @@ public class ApiPaperController extends BaseController {
 	@RequiresRoles("subAdmin")
 	public PageResult questionDel(Integer paperQuestionId) {
 		try {
-			paperService.doQuestionDel(paperQuestionId);
+			paperService.questionDel(paperQuestionId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("试题删除错误：{}", e.getMessage());
@@ -668,7 +634,7 @@ public class ApiPaperController extends BaseController {
 	@RequiresRoles("subAdmin")
 	public PageResult questionClear(Integer chapterId) {
 		try {
-			paperService.doQuestionClear(chapterId);
+			paperService.questionClear(chapterId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加试题错误：{}", e.getMessage());

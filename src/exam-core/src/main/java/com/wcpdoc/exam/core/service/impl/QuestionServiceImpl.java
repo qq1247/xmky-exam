@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -204,7 +203,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		entity.setDifficulty(question.getDifficulty());
 		entity.setTitle(question.getTitle());
 
-		// 修改选项
 		entity.setAnswer(question.getAnswer());
 		entity.setAnalysis(question.getAnalysis());
 		entity.setUpdateTime(new Date());
@@ -214,7 +212,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		entity.setNo(question.getNo());
 		update(entity);
 
-		// 选择
+		// 修改选项
 		if (question.getType() == 1 || question.getType() == 2) {
 			questionOptionService.removeQuestionOption(entity.getId());
 				if (options != null) {
@@ -365,57 +363,30 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public Map<String, Object> count(Integer questionTypeId) {
-		List<Map<String, Object>> list = questionDao.count(questionTypeId);
-		Map<String, Object> map = new HashMap<String, Object>();
+	public Map<String, Object> statisticsTypeDifficulty(Integer questionTypeId) {
+		List<Map<String, Object>> list = questionDao.statisticsTypeDifficulty(questionTypeId);
 		DecimalFormat df = new DecimalFormat("0.0");
-		for (Map<String, Object> mapList : list) {
-			double T1 = Double.parseDouble(mapList.get("T1").toString())
-					/ Double.parseDouble(mapList.get("TOTAL").toString());
-			map.put("T1", df.format(T1 * 100));
-			double T2 = Double.parseDouble(mapList.get("T2").toString())
-					/ Double.parseDouble(mapList.get("TOTAL").toString());
-			map.put("T2", df.format(T2 * 100));
-			double T3 = Double.parseDouble(mapList.get("T3").toString())
-					/ Double.parseDouble(mapList.get("TOTAL").toString());
-			map.put("T3", df.format(T3 * 100));
-			double T4 = Double.parseDouble(mapList.get("T4").toString())
-					/ Double.parseDouble(mapList.get("TOTAL").toString());
-			map.put("T4", df.format(T4 * 100));
-			double T5 = Double.parseDouble(mapList.get("T5").toString())
-					/ Double.parseDouble(mapList.get("TOTAL").toString());
-			map.put("T5", df.format(T5 * 100));
-			double D1 = Double.parseDouble(mapList.get("D1").toString())
-					/ Double.parseDouble(mapList.get("TOTAL").toString());
-			map.put("D1", df.format(D1 * 100));
-			double D2 = Double.parseDouble(mapList.get("D2").toString())
-					/ Double.parseDouble(mapList.get("TOTAL").toString());
-			map.put("D2", df.format(D2 * 100));
-			double D3 = Double.parseDouble(mapList.get("D3").toString())
-					/ Double.parseDouble(mapList.get("TOTAL").toString());
-			map.put("D3", df.format(D3 * 100));
-			double D4 = Double.parseDouble(mapList.get("D4").toString())
-					/ Double.parseDouble(mapList.get("TOTAL").toString());
-			map.put("D4", df.format(D4 * 100));
-			double D5 = Double.parseDouble(mapList.get("D5").toString())
-					/ Double.parseDouble(mapList.get("TOTAL").toString());
-			map.put("D5", df.format(D5 * 100));
+		for (Map<String, Object> map : list) {
+			for (int i = 1; i <= 5; i++) {
+				double T1 = Double.parseDouble(map.remove("TYPE"+i).toString()) / Double.parseDouble(map.get("TOTAL").toString());
+				map.put("type"+i, df.format(T1 * 100));
+				
+				double D1 = Double.parseDouble(map.remove("DIFFICULTY"+i).toString()) / Double.parseDouble(map.get("TOTAL").toString());
+				map.put("difficulty"+i, df.format(D1 * 100));
+			}
+			return map;
 		}
-		return map;
+		return null;
 	}
 
 	@Override
 	public List<Map<String, Object>> accuracy(Integer examId) {
 		DecimalFormat df = new DecimalFormat("0.0");
 		List<Map<String, Object>> accuracyList = questionDao.accuracy(examId);
-		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		for (Map<String, Object> mapList : accuracyList) {
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("questionId", mapList.get("QUESTION_ID").toString());
-			map.put("accuracy", df.format((Double.parseDouble(mapList.get("CORRECT").toString())
-					/ Double.parseDouble(mapList.get("TOTAL").toString()) * 100)));
-			list.add(map);
+			mapList.put("questionId", mapList.remove("QUESTION_ID").toString());
+			mapList.put("accuracy", df.format((Double.parseDouble(mapList.remove("CORRECT").toString())/ Double.parseDouble(mapList.get("TOTAL").toString()) * 100)));
 		}
-		return list;
+		return accuracyList;
 	}
 }

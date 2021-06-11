@@ -156,7 +156,6 @@ create table EXM_QUESTION_TYPE
    UPDATE_USER_ID       int comment '修改人',
    UPDATE_TIME          datetime comment '修改时间',
    STATE                int comment '0：删除；1：正常',
-   RW_STATE             int comment '1：开启；2：禁用',
    READ_USER_IDS        varchar(1024) comment '读权限',
    WRITE_USER_IDS       varchar(1024) comment '写权限',
    primary key (ID)
@@ -230,7 +229,6 @@ create table EXM_PAPER_TYPE
    UPDATE_USER_ID       int comment '修改人',
    UPDATE_TIME          datetime comment '修改时间',
    STATE                int comment '0：删除；1：正常',
-   RW_STATE             int comment '1：开启；2：禁用',
    WRITE_USER_IDS       varchar(1024) comment '写权限',
    READ_USER_IDS        varchar(1024) comment '读权限',
    primary key (ID)
@@ -346,7 +344,6 @@ create table EXM_EXAM_TYPE
    UPDATE_USER_ID       int comment '修改人',
    UPDATE_TIME          datetime comment '修改时间',
    STATE                int comment '0：删除；1：正常',
-   RW_STATE             int comment '1：开启；2：禁用',
    READ_USER_IDS        varchar(1024) comment '读权限',
    WRITE_USER_IDS       varchar(1024) comment '写权限',
    primary key (ID)

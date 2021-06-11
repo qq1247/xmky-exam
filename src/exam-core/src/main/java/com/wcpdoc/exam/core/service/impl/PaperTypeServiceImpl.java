@@ -11,6 +11,8 @@ import com.wcpdoc.exam.base.service.OrgService;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.PaperTypeDao;
+import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperType;
 import com.wcpdoc.exam.core.exception.MyException;
@@ -57,6 +59,8 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 		}
 				
 		// 添加试卷分类
+		paperType.setReadUserIds(","+getCurUser().getId()+",");
+		paperType.setWriteUserIds(","+getCurUser().getId()+",");
 		paperType.setCreateUserId(getCurUser().getId());
 		paperType.setCreateTime(new Date());
 		paperType.setUpdateUserId(getCurUser().getId());
@@ -68,6 +72,25 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 		//fileService.doUpload(paperType.getImgId());
 	}
 
+	@Override
+	public void editAndUpdate(PaperType paperType) {
+		//校验数据有效性
+		if(!ValidateUtil.isValid(paperType.getName())) {
+			throw new MyException("参数错误：name");
+		}
+		if(existName(paperType)) {
+			throw new MyException("名称已存在！");
+		}
+		
+		//修改试卷分类
+		PaperType entity = paperTypeDao.getEntity(paperType.getId());
+		entity.setName(paperType.getName());
+		entity.setImgId(paperType.getImgId());
+		entity.setUpdateTime(new Date());
+		entity.setUpdateUserId(getCurUser().getId());
+		paperTypeDao.update(entity);
+	}
+	
 	@Override
 	public void delAndUpdate(Integer id) {
 		// 校验数据有效性
@@ -98,25 +121,21 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 	}
 
 	@Override
-	public void doAuth(Integer id, String readUserIds, String writeUserIds, boolean rwState) {		
+	public void doAuth(Integer id, String readUserIds, String writeUserIds) {		
 		PaperType entity = getEntity(id);
-		if (!ValidateUtil.isValid(readUserIds)) {
-			entity.setReadUserIds(null);
-		} else {
-			entity.setReadUserIds(readUserIds);
+		if (ValidateUtil.isValid(readUserIds)) {
+			entity.setReadUserIds(entity.getReadUserIds() + readUserIds +",");
 		}
-		if (!ValidateUtil.isValid(writeUserIds)) {
-			entity.setWriteUserIds(null);
-		} else {
+		if (ValidateUtil.isValid(entity.getReadUserIds() + writeUserIds +",")) {
 			entity.setWriteUserIds(writeUserIds);
-		}
-		if(rwState){
-			entity.setRwState(1);
-		}else{
-			entity.setRwState(0);
 		}
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
 		update(entity);
+	}
+	
+	@Override
+	public PageOut authUserListpage(PageIn pageIn) {
+		return paperTypeDao.authUserListpage(pageIn);
 	}
 }

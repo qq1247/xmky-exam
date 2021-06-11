@@ -13,6 +13,8 @@ import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.ExamTypeDao;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamType;
+import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.ExamTypeExService;
@@ -58,6 +60,8 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 		}
 				
 		// 添加试题分类
+		examType.setReadUserIds(","+getCurUser().getId()+",");
+		examType.setWriteUserIds(","+getCurUser().getId()+",");
 		examType.setCreateUserId(getCurUser().getId());
 		examType.setCreateTime(new Date());
 		examType.setUpdateUserId(getCurUser().getId());
@@ -69,6 +73,28 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 		//fileService.doUpload(examType.getImgId());
 	}
 
+	@Override
+	public void editAndUpdate(ExamType examType) {
+		//校验数据有效性
+		if(!ValidateUtil.isValid(examType.getName())) {
+			throw new MyException("参数错误：name");
+		}
+		if(existName(examType)) {
+			throw new MyException("名称已存在！");
+		}
+		
+		//修改试题分类
+		ExamType entity = examTypeDao.getEntity(examType.getId());
+		entity.setName(examType.getName());
+		entity.setImgId(examType.getImgId());
+		entity.setUpdateTime(new Date());
+		entity.setUpdateUserId(getCurUser().getId());
+		examTypeDao.update(entity);
+		
+		//保存图片
+		//fileService.doUpload(examType.getImgId());
+	}
+	
 	@Override
 	public void delAndUpdate(Integer id) {
 		// 校验数据有效性
@@ -99,26 +125,21 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 	}
 
 	@Override
-	public void doAuth(Integer id, String readUserIds, String writeUserIds, boolean rwState) {
+	public void doAuth(Integer id, String readUserIds, String writeUserIds) {
 		ExamType entity = getEntity(id);
-		if (!ValidateUtil.isValid(readUserIds)) {
-			entity.setReadUserIds(null);
-		} else {
-			entity.setReadUserIds(readUserIds);
+		if (ValidateUtil.isValid(readUserIds)) {
+			entity.setReadUserIds(entity.getReadUserIds() + readUserIds +",");
 		}
-		if (!ValidateUtil.isValid(writeUserIds)) {
-			entity.setWriteUserIds(null);
-		} else {
+		if (ValidateUtil.isValid(entity.getReadUserIds() + writeUserIds +",")) {
 			entity.setWriteUserIds(writeUserIds);
 		}
-		if(rwState){
-			entity.setRwState(1);
-		}else{
-			entity.setRwState(0);
-		}
-		
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
 		update(entity);
+	}
+	
+	@Override
+	public PageOut authUserListpage(PageIn pageIn) {
+		return examTypeDao.authUserListpage(pageIn);
 	}
 }

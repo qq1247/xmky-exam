@@ -3,6 +3,8 @@ package com.wcpdoc.exam.core.service;
 import java.util.List;
 
 import com.wcpdoc.exam.core.entity.ExamType;
+import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageOut;
 /**
  * 考试分类服务层接口
  * 
@@ -11,15 +13,23 @@ import com.wcpdoc.exam.core.entity.ExamType;
 public interface ExamTypeService extends BaseService<ExamType> {
 	
 	/**
-	 * 添加试题分类
+	 * 添加考试分类
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * @param examType
 	 * void
 	 */
 	void addAndUpdate(ExamType examType);
-
+	
 	/**
-	 * 删除试题分类
+	 * 修改考试分类
+	 * 
+	 * v1.0 cY 2021年6月11日下午2:44:38
+	 * @param examType void
+	 */
+	void editAndUpdate(ExamType examType);
+	
+	/**
+	 * 删除考试分类
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * @param id
 	 * void
@@ -36,7 +46,7 @@ public interface ExamTypeService extends BaseService<ExamType> {
 	boolean existName(ExamType examType);
 
 	/**
-	 * 获取试题分类列表
+	 * 获取考试分类列表
 	 * 
 	 * v1.0 zhanghc 2018年6月3日上午11:19:02
 	 * @return List<ExamType>
@@ -52,5 +62,14 @@ public interface ExamTypeService extends BaseService<ExamType> {
 	 * @param writeUserIds
 	 * void
 	 */
-	void doAuth(Integer id, String readUserIds, String writeUserIds, boolean rwState);
+	void doAuth(Integer id, String readUserIds, String writeUserIds);
+	
+	/**
+	 * 获取人员列表
+	 * 
+	 * v1.0 zhanghc 2018年5月30日下午6:28:19
+	 * @param pageIn
+	 * @return PageOut
+	 */
+	PageOut authUserListpage(PageIn pageIn);
 }

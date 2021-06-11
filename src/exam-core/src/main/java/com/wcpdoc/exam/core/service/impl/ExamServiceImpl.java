@@ -77,7 +77,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	@Override
-	public void doCfg(Integer id, Integer[] userIds, Integer[] myMarkIds) {
+	public void cfg(Integer id, Integer[] userIds, Integer[] myMarkIds) {
 		// 校验数据有效性
 		if (id == null) {
 			throw new MyException("参数错误：id");
@@ -161,12 +161,12 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	@Override
-	public void doPaper(LoginUser user, Integer myExamId) {
+	public void paper(LoginUser user, Integer myExamId) {
 		
 	}
 	
 	@Override
-	public void doForcePaper(LoginUser user) {
+	public void forcePaper(LoginUser user) {
 		//标记为强制交卷
 		log.debug("开始强制交卷");
 		examDao.doForcePaper(user);

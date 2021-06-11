@@ -40,16 +40,20 @@ public class Paper {
 	private Integer readNum;
 	@Column(name = "STATE")
 	private Integer state;
+	@Column(name = "PAPER_TYPE_ID")
+	private Integer paperTypeId;
+	@Column(name = "GEN_TYPE")
+	private Integer genType;	
+	@Column(name = "QUESTION")
+	private Integer question;
+	@Column(name = "MINIMIZE_NUM")
+	private Integer minimizeNum;
 	@Column(name = "UPDATE_USER_ID")
 	private Integer updateUserId;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "UPDATE_TIME")
 	private Date updateTime;
-	@Column(name = "PAPER_TYPE_ID")
-	private Integer paperTypeId;
-	@Column(name = "GEN_TYPE")
-	private Integer genType;	
 
 	public BigDecimal getShowType() {
 		return showType;
@@ -148,4 +152,21 @@ public class Paper {
 	public void setReadNum(Integer readNum) {
 		this.readNum = readNum;
 	}
+
+	public Integer getQuestion() {
+		return question;
+	}
+
+	public void setQuestion(Integer question) {
+		this.question = question;
+	}
+
+	public Integer getMinimizeNum() {
+		return minimizeNum;
+	}
+
+	public void setMinimizeNum(Integer minimizeNum) {
+		this.minimizeNum = minimizeNum;
+	}
+	
 }

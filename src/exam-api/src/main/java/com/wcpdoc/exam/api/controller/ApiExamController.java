@@ -220,7 +220,7 @@ public class ApiExamController extends BaseController{
 	@RequiresRoles("subAdmin")
 	public PageResult cfg(Integer id, Integer[] userIds, Integer[] myMarkIds) {
 		try {
-			examService.doCfg(id, userIds, myMarkIds);
+			examService.cfg(id, userIds, myMarkIds);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成考试配置错误：{}", e.getMessage());

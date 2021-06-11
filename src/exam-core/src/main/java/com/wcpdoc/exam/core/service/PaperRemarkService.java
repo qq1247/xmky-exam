@@ -27,7 +27,7 @@ public interface PaperRemarkService extends BaseService<PaperRemark> {
 	 * v1.0 cY 2021年6月2日下午4:03:36
 	 * @param paperId void
 	 */
-	void removePaperRemark(Integer paperId);
+	void remove(Integer paperId);
 	
 	/**
 	 * 获取试卷评语
@@ -35,5 +35,5 @@ public interface PaperRemarkService extends BaseService<PaperRemark> {
 	 * v1.0 chenyun 2021年3月10日下午3:29:31
 	 * @return List<PaperRemark>
 	 */
-	List<PaperRemark> getPaperRemarkList(Integer paperId);
+	List<PaperRemark> getList(Integer paperId);
 }

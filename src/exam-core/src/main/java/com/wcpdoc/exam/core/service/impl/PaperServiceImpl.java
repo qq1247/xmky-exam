@@ -49,7 +49,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 
 	@Override
-	public void doChapterAdd(PaperQuestion chapter) {
+	public void chapterAdd(PaperQuestion chapter) {
 		//校验数据有效性
 		if(chapter.getPaperId() == null) {
 			throw new MyException("参数错误：paperId");
@@ -79,7 +79,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 
 	@Override
-	public void doChapterEdit(PaperQuestion chapter) {
+	public void chapterEdit(PaperQuestion chapter) {
 		//校验数据有效性
 		PaperQuestion entity = paperQuestionService.getEntity(chapter.getId());
 		Paper paper = getEntity(entity.getPaperId());
@@ -99,7 +99,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 	
 	@Override
-	public void doChapterDel(Integer chapterId) {
+	public void chapterDel(Integer chapterId) {
 		//校验数据有效性
 		PaperQuestion entity = paperQuestionService.getEntity(chapterId);
 		Paper paper = getEntity(entity.getPaperId());
@@ -123,7 +123,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 	
 	@Override
-	public void doChapterUp(Integer chapterId) {
+	public void chapterUp(Integer chapterId) {
 		//校验数据有效性
 		PaperQuestion entity = paperQuestionService.getEntity(chapterId);
 		Paper paper = getEntity(entity.getPaperId());
@@ -157,7 +157,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 
 	@Override
-	public void doChapterDown(Integer chapterId) {
+	public void chapterDown(Integer chapterId) {
 		//校验数据有效性
 		PaperQuestion entity = paperQuestionService.getEntity(chapterId);
 		Paper paper = getEntity(entity.getPaperId());
@@ -244,7 +244,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 
 	@Override
-	public void doQuestionAdd(Integer chapterId, Integer[] questionIds) {
+	public void questionAdd(Integer chapterId, Integer[] questionIds) {
 		// 校验数据有效性
 		if (chapterId == null) {
 			throw new MyException("无法获取参数：chapterId");
@@ -286,7 +286,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 	
 	@Override
-	public void doScoreUpdate(Integer paperQuestionId, BigDecimal score) {
+	public void scoreUpdate(Integer paperQuestionId, BigDecimal score) {
 		//校验数据有效性
 		if(paperQuestionId == null) {
 			throw new MyException("无法获取参数：paperQuestionId");
@@ -313,7 +313,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 	
 	@Override
-	public void doOptionsUpdate(Integer paperQuestionId, Integer[] scoreOptions) {
+	public void optionsUpdate(Integer paperQuestionId, Integer[] scoreOptions) {
 		// 校验数据有效性
 		if (paperQuestionId == null) {
 			throw new MyException("无法获取参数：paperQuestionId");
@@ -346,7 +346,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 	
 	@Override
-	public void doQuestionUp(Integer paperQuestionId) {
+	public void questionUp(Integer paperQuestionId) {
 		//校验数据有效性
 		if(paperQuestionId == null) {
 			throw new MyException("无法获取参数：paperQuestionId");
@@ -384,7 +384,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 
 	@Override
-	public void doQuestionDown(Integer paperQuestionId) {
+	public void questionDown(Integer paperQuestionId) {
 		//校验数据有效性
 		if(paperQuestionId == null) {
 			throw new MyException("无法获取参数：paperQuestionId");
@@ -422,7 +422,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 
 	@Override
-	public void doQuestionDel(Integer paperQuestionId) {
+	public void questionDel(Integer paperQuestionId) {
 		// 校验数据有效性
 		PaperQuestion entity = paperQuestionService.getEntity(paperQuestionId);
 		Paper paper = getEntity(entity.getPaperId());
@@ -457,7 +457,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 
 	@Override
-	public void doQuestionClear(Integer chapterId) {
+	public void questionClear(Integer chapterId) {
 		// 校验数据有效性
 		if (chapterId == null) {
 			throw new MyException("无法获取参数：chapterId");
@@ -493,7 +493,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 
 	@Override
-	public void doBatchScoreUpdate(Integer chapterId, BigDecimal score, String options) {
+	public void batchScoreUpdate(Integer chapterId, BigDecimal score, String options) {
 		// 校验数据有效性
 		if (chapterId == null) {
 			throw new MyException("参数错误：chapterId");

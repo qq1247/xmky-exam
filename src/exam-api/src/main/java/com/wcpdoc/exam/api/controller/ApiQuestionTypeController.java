@@ -1,7 +1,5 @@
 package com.wcpdoc.exam.api.controller;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -59,18 +57,38 @@ public class ApiQuestionTypeController extends BaseController {
 				pageIn.setTwo(name);
 			}
 			PageOut listpage = questionTypeService.getListpage(pageIn);
-			List<Map<String, Object>> rows = listpage.getRows();
-			List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-			for(Map<String, Object> mapList : rows){
+			for(Map<String, Object> mapList : listpage.getRows()){
+				if(mapList.get("readUserIds")!= null){
+					String[] readUserSplit = mapList.get("readUserIds").toString().subSequence(1, mapList.get("readUserIds").toString().length()).toString().split(",");
+					for(String id : readUserSplit){
+						User user = userService.getEntity(Integer.parseInt(id));
+						if(mapList.get("readUserNames") == null){
+							mapList.put("readUserNames", user.getName());
+						}else{
+							mapList.put("readUserNames", mapList.get("readUserNames")+","+user.getName());
+						}
+					}
+				}
+				
+				if (mapList.get("writeUserIds")!= null) {
+					String[] writeUserSplit = mapList.get("writeUserIds").toString().subSequence(1, mapList.get("writeUserIds").toString().length()).toString().split(",");
+					for(String id :writeUserSplit){
+						User user = userService.getEntity(Integer.parseInt(id));
+						if(mapList.get("writeUserNames") == null){
+							mapList.put("writeUserNames", user.getName());
+						}else{
+							mapList.put("writeUserNames", mapList.get("readUserNames")+","+user.getName());
+						}
+					}
+				}
+				
 				if ("0".equals(mapList.get("createUserId").toString())) {
 					continue;
 				}
 				
 				User user = userService.getEntity(Integer.parseInt(mapList.get("createUserId").toString()));
-				mapList.put("createUserName", user.getName());
-				list.add(mapList);
+				mapList.put("createUserName", user.getName());				
 			}
-			listpage.setRows(list);
 			return PageResultEx.ok().data(listpage);
 		} catch (Exception e) {
 			log.error("试题分类列表错误：", e);
@@ -100,36 +118,6 @@ public class ApiQuestionTypeController extends BaseController {
 		}
 	}
 
-	/**
-	 * 获取试题分类
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * 
-	 * @return pageOut
-	 */
-	@RequestMapping("/get")
-	@ResponseBody
-	@RequiresRoles("subAdmin")
-	public PageResult get(Integer id) {
-		try {
-			QuestionType entity = questionTypeService.getEntity(id);
-			return PageResultEx.ok()
-					.addAttr("id", entity.getId())
-					.addAttr("name", entity.getName())
-					.addAttr("imgId", entity.getImgId())
-					.addAttr("createUserId", entity.getCreateUserId())
-					.addAttr("createTime", DateUtil.formatDateTime(entity.getCreateTime()))
-					.addAttr("rwState", entity.getRwState())
-					.addAttr("readUserIds", entity.getReadUserIds())
-					.addAttr("writeUserIds", entity.getWriteUserIds());
-		} catch (MyException e) {
-			log.error("获取试题分类错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("获取试题分类错误：", e);
-			return PageResult.err();
-		}
-	}
-	
 	/**
 	 * 修改试题分类
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
@@ -175,24 +163,56 @@ public class ApiQuestionTypeController extends BaseController {
 	}
 	
 	/**
+	 * 获取试题分类
+	 * v1.0 zhanghc 2016-5-24下午14:54:09
+	 * 
+	 * @return pageOut
+	 */
+	@RequestMapping("/get")
+	@ResponseBody
+	@RequiresRoles("subAdmin")
+	public PageResult get(Integer id) {
+		try {
+			QuestionType entity = questionTypeService.getEntity(id);
+			return PageResultEx.ok()
+					.addAttr("id", entity.getId())
+					.addAttr("name", entity.getName())
+					.addAttr("imgId", entity.getImgId())
+					.addAttr("createUserId", entity.getCreateUserId())
+					.addAttr("createTime", DateUtil.formatDateTime(entity.getCreateTime()))
+					.addAttr("readUserIds", entity.getReadUserIds())
+					.addAttr("writeUserIds", entity.getWriteUserIds());
+		} catch (MyException e) {
+			log.error("获取试题分类错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("获取试题分类错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
 	 * 获取人员列表 
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param pageIn
 	 * @return PageOut
 	 */
-	@RequestMapping("/authUserList")
+	@RequestMapping("/authUserListpage")
 	@ResponseBody
 	@RequiresRoles("subAdmin")
-	public PageResult userList(PageIn pageIn, String name, Integer id) {  //Two - name (userName)  Ten - id
+	public PageResult authUserListpage(PageIn pageIn, String rw, Integer id) {
 		try {
-			if(ValidateUtil.isValid(name)){
-				pageIn.setTwo(name);
+			if(id != null && ValidateUtil.isValid(rw) && "w".equals(rw)){
+				pageIn.setOne(id.toString());
 			}
-			if(id != null){
-				pageIn.setTen(id.toString());
+			if(id != null && ValidateUtil.isValid(rw) && "r".equals(rw)){
+				pageIn.setTwo(id.toString());
 			}
-			return PageResultEx.ok().data(questionTypeService.getUserListpage(pageIn));
+			return PageResultEx.ok().data(questionTypeService.authUserListpage(pageIn));
+		} catch (MyException e) {
+			log.error("权限用户列表错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("权限用户列表错误：", e);
 			return PageResult.err();
@@ -212,9 +232,9 @@ public class ApiQuestionTypeController extends BaseController {
 	@RequestMapping("/auth")
 	@ResponseBody
 	@RequiresRoles("subAdmin")
-	public PageResult auth(Integer id, String readUserIds, String writeUserIds, boolean rwState) {
+	public PageResult auth(Integer id, String readUserIds, String writeUserIds) {
 		try {
-			questionTypeService.doAuth(id, readUserIds, writeUserIds, rwState);
+			questionTypeService.auth(id, readUserIds, writeUserIds);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加权限用户错误：{}", e.getMessage());

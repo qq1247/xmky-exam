@@ -20,5 +20,5 @@ public interface PaperRemarkDao extends RBaseDao<PaperRemark> {
 	 * @param paperId
 	 * @return PaperRemark
 	 */
-	List<PaperRemark> getPaperRemarkList(Integer paperId);
+	List<PaperRemark> getList(Integer paperId);
 }

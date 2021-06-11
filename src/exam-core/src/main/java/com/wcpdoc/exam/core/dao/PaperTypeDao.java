@@ -75,4 +75,13 @@ public interface PaperTypeDao extends BaseDao<PaperType> {
 	 * @return PageOut
 	 */
 	PageOut getAuthOrgListpage(PageIn pageIn);
+	
+	/**
+	 * 获取人员列表
+	 * 
+	 * v1.0 zhanghc 2018年5月30日下午6:28:19
+	 * @param pageIn
+	 * @return PageOut
+	 */
+	PageOut authUserListpage(PageIn pageIn);
 }

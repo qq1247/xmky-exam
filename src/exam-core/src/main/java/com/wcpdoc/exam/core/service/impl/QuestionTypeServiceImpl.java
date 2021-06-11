@@ -59,6 +59,8 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		/*if (existName(questionType)) {
 			throw new MyException("名称已存在！");
 		}*/
+		questionType.setReadUserIds(","+getCurUser().getId()+",");
+		questionType.setWriteUserIds(","+getCurUser().getId()+",");
 		questionType.setCreateUserId(getCurUser().getId());
 		questionType.setCreateTime(new Date());
 		questionType.setState(1);
@@ -123,22 +125,13 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	}
 
 	@Override
-	public void doAuth(Integer id, String readUserIds, String writeUserIds, boolean rwState) {		
+	public void auth(Integer id, String readUserIds, String writeUserIds) {
 		QuestionType entity = getEntity(id);
-		if (!ValidateUtil.isValid(readUserIds)) {
-			entity.setReadUserIds(null);
-		} else {
-			entity.setReadUserIds(readUserIds);
+		if (ValidateUtil.isValid(readUserIds)) {
+			entity.setReadUserIds(entity.getReadUserIds() + readUserIds +",");
 		}
-		if (!ValidateUtil.isValid(writeUserIds)) {
-			entity.setWriteUserIds(null);
-		} else {
+		if (ValidateUtil.isValid(entity.getReadUserIds() + writeUserIds +",")) {
 			entity.setWriteUserIds(writeUserIds);
-		}
-		if(rwState){
-			entity.setRwState(1);
-		}else{
-			entity.setRwState(0);
 		}
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
@@ -146,7 +139,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	}
 
 	@Override
-	public PageOut getUserListpage(PageIn pageIn) {
-		return questionTypeDao.getUserListpage(pageIn);
+	public PageOut authUserListpage(PageIn pageIn) {
+		return questionTypeDao.authUserListpage(pageIn);
 	}
 }
