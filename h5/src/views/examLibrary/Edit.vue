@@ -96,29 +96,29 @@
           :key="quesiton.ID"
           class="center-card"
           shadow="hover"
-          v-for="quesiton in list.questionList"
+          v-for="(quesiton, index) in list.questionList"
         >
           <div class="center-card-top">
-            {{ quesiton.ID }}、{{ quesiton.TITLE }}
+            {{ index + 1 }}、{{ quesiton.title }}
           </div>
           <div class="center-card-bottom">
             <div class="card-bottom-left">
               <el-tag class="center-tag-danger" size="mini" type="danger">{{
-                quesiton.TYPE_NAME
+                quesiton.typeName
               }}</el-tag>
               <el-tag class="center-tag-purple" effect="plain" size="mini">{{
-                quesiton.DIFFICULTY_NAME
+                quesiton.difficultyName
               }}</el-tag>
               <el-tag effect="plain" size="mini" type="danger"
-                >{{ quesiton.SCORE }}分</el-tag
+                >{{ quesiton.score }}分</el-tag
               >
               <el-tag effect="plain" size="mini">{{
-                quesiton.UPDATE_USER_NAME
+                quesiton.updateUserName
               }}</el-tag>
             </div>
             <div class="card-bottom-right">
               <el-button
-                @click="get(quesiton.ID)"
+                @click="get(quesiton.id)"
                 class="btn"
                 icon="el-icon-document"
                 plain
@@ -137,7 +137,7 @@
                 >复制</el-button
               >
               <el-button
-                @click="del(quesiton.ID)"
+                @click="del(quesiton.id)"
                 class="btn"
                 icon="el-icon-delete"
                 plain
@@ -172,7 +172,6 @@
             <el-col :span="11">
               <el-form-item label="类型" prop="type">
                 <el-select
-                  @change="updateOptionAndAnswer"
                   disabled
                   placeholder="请选择类型"
                   v-model="editForm.type"
@@ -255,7 +254,7 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item label="答案" prop="answer" v-if="editForm.type === 2">
-            <el-checkbox-group v-model="editForm.answer">
+            <el-checkbox-group v-model="editForm.answerMultip">
               <el-checkbox
                 :key="answer.lab"
                 :label="answer.lab"
@@ -446,9 +445,28 @@ export default {
         type: null, //类型
         difficulty: null, //难度
         title: null, //标题
-        options: [], //选项
+        options: [
+          {
+            lab: "A",
+            value: ""
+          },
+          {
+            lab: "B",
+            value: ""
+          }
+        ], //选项
         answer: null, //答案
-        answers: [], //答案
+        answerMultip: [],
+        answers: [
+          {
+            lab: "A",
+            value: ""
+          },
+          {
+            lab: "B",
+            value: ""
+          }
+        ], //答案
         analysis: null, //解析
         score: null, //分值
         no: null, //排序
@@ -545,10 +563,6 @@ export default {
       this.editForm.score = 1 //默认得分为1
       this.editForm.no = 1 //默认排序为1
       this.editForm.answer = "" //默认答案为空
-
-      for (let i = 0; i < 2; i++) {
-        this._addOption(i, "") //默认添加两个选项
-      }
     },
     // 查询
     async query() {
@@ -702,24 +716,8 @@ export default {
     },
     //更新类型
     updateType(value) {
-      this.editForm = {
-        //修改表单
-        id: null, //主键
-        type: value, //类型
-        difficulty: null, //难度
-        title: "", //标题
-        options: [], //选项
-        answer: null, //答案
-        answers: [], //答案
-        analysis: null, //解析
-        score: null, //分值
-        no: null, //排序
-        scoreOptions: [],
-        rules: {
-          //校验
-        }
-      }
-      // this.updateOptionAndAnswer(value)
+      Object.assign(this.$data.editForm, this.$options.data().editForm)
+      this.editForm.type = value
     },
     //添加试题
     async add() {
@@ -734,7 +732,8 @@ export default {
           title: this.editForm.title,
           analysis: this.editForm.analysis,
           score: this.editForm.score,
-          no: this.editForm.no
+          no: this.editForm.no,
+          questionTypeId: this.queryForm.questionTypeId
         }
 
         if (params.type === 1 || params.type === 2) {
@@ -868,13 +867,13 @@ export default {
         this.editForm.options = [] // 重置选项
         this.editForm.answers = [] //重置答案列表
         for (let i = 0; i < res.data.options.length; i++) {
-          this._addOption(i, res.data.options[i])
+          this._addOption(i, res.data.options[i].options)
         }
       } else if (this.editForm.type === 2) {
         this.editForm.options = [] // 重置选项
         this.editForm.answers = [] //重置答案列表
         for (let i = 0; i < res.data.options.length; i++) {
-          this._addOption(i, res.data.options[i])
+          this._addOption(i, res.data.options[i].options)
         }
 
         this.editForm.answer = res.data.answer.split(",")

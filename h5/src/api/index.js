@@ -108,6 +108,7 @@ export default {
   questionTypeDel: params => post("questionType/del", params),
   questionTypeGet: params => post("questionType/get", params),
   questionTypeMove: params => post("questionType/move", params),
+  questionTypeAuth: params => post("questionType/auth", params),
 
   // 试题分类开放相关
   questionTypeOpenListPage: params => post("questionTypeOpen/listpage", params),

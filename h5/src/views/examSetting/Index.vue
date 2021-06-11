@@ -7,11 +7,12 @@
           <el-input
             placeholder="请输入名称"
             v-model="queryForm.queryName"
+            class="query-input"
           ></el-input>
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query(1)" icon="el-icon-search" type="primary"
+        <el-button @click="query()" icon="el-icon-search" type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -125,7 +126,7 @@ export default {
   },
   methods: {
     // 查询
-    async query(curPage) {
+    async query(curPage = 1) {
       const typeList = await this.$https.examTypeListPage({
         name: this.queryForm.queryName,
         curPage,
@@ -192,7 +193,7 @@ export default {
       this.query(val)
     },
     goDetail() {
-      this.$router.push("/examPaper/classify")
+      this.$router.push("/examSetting/list")
     }
   }
 }

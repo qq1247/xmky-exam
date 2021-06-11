@@ -190,7 +190,13 @@
   }
 }
 
-/deep/ .el-pagination.is-background .el-pager li:not(.disabled).active {
+.query-input {
+  /deep/.el-input__inner {
+    border: none;
+  }
+}
+
+/deep/.el-pagination.is-background .el-pager li:not(.disabled).active {
   background-color: #0095e5;
   color: #fff;
 }

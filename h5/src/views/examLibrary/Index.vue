@@ -7,11 +7,12 @@
           <el-input
             placeholder="请输入名称"
             v-model="queryForm.queryName"
+            class="query-input"
           ></el-input>
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query(1)" icon="el-icon-search" type="primary"
+        <el-button @click="query()" icon="el-icon-search" type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -31,35 +32,19 @@
             <span>添加试题</span>
           </div>
         </div>
-        <div v-for="(item, index) in typeList" :key="index" class="exam-item">
-          <div class="exam-content">
-            <div class="title">{{ item.name }}</div>
-            <div class="content-info">
-              <span>读取权限：张三</span>
-            </div>
-            <div class="content-info">
-              <span>使用权限：张三、张三、张三</span>
-            </div>
-            <div class="handler">
-              <span data-title="编辑" @click="examEdit(item)">
-                <i class="common common-edit"></i>
-              </span>
-              <span data-title="删除" @click="examDel(item.id)">
-                <i class="common common-delete"></i>
-              </span>
-              <span data-title="权限" @click="examRole">
-                <i class="common common-role"></i>
-              </span>
-              <span data-title="开放" @click="examOpen">
-                <i class="common common-share"></i>
-              </span>
-              <span data-title="试题列表" @click="goDetail(item)">
-                <i class="common common-list-row"></i>
-              </span>
-            </div>
-          </div>
-        </div>
+        <ListCard
+          v-for="(item, index) in typeList"
+          :key="index"
+          :data="item"
+          name="question"
+          @edit="edit"
+          @del="del"
+          @role="role"
+          @open="open"
+          @detail="goDetail"
+        ></ListCard>
       </div>
+      <!-- 分页 -->
       <el-pagination
         background
         layout="prev, pager, next"
@@ -69,10 +54,11 @@
         :total="total"
         :page-size="pageSize"
         :current-page="1"
-        @current-change="handleCurrentChange"
+        @current-change="pageChange"
       >
       </el-pagination>
     </div>
+    <!-- 添加 | 编辑 试题分类 -->
     <el-dialog
       :visible.sync="examForm.show"
       :show-close="false"
@@ -94,17 +80,69 @@
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="examHandler" type="primary">{{
+        <el-button @click="addOrEdit" type="primary">{{
           examForm.edit ? "修改" : "添加"
         }}</el-button>
         <el-button @click="examForm.show = false">取消</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 编辑读写权限 -->
+    <el-dialog
+      :visible.sync="roleForm.show"
+      :show-close="false"
+      width="33%"
+      title="权限编辑"
+      :close-on-click-modal="false"
+    >
+      <el-form :model="roleForm" ref="examForm" label-width="100px">
+        <el-form-item label="读取权限">
+          <el-select
+            multiple
+            collapse-tags
+            v-loadmore="loadMore"
+            placeholder="请选择授权人员"
+            v-model="roleForm.readRoleUser"
+          >
+            <el-option
+              :key="roleUser.id"
+              :label="roleUser.name"
+              :value="String(roleUser.id)"
+              v-for="roleUser in roleForm.roleUserList"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="使用权限">
+          <el-select
+            multiple
+            collapse-tags
+            v-loadmore="loadMore"
+            placeholder="请选择授权人员"
+            v-model="roleForm.writeRoleUser"
+          >
+            <el-option
+              :key="roleUser.id"
+              :label="roleUser.name"
+              :value="String(roleUser.id)"
+              v-for="roleUser in roleForm.roleUserList"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div class="dialog-footer" slot="footer">
+        <el-button @click="editRoleUsers" type="primary">编辑</el-button>
+        <el-button @click="roleForm.show = false">取消</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
+import ListCard from "@/components/ListCard.vue"
 export default {
+  components: {
+    ListCard
+  },
   data() {
     return {
       pageSize: 5,
@@ -123,15 +161,39 @@ export default {
           ]
         }
       },
+      roleForm: {
+        show: false,
+        curPage: 1,
+        pageSize: 10,
+        readRoleUser: [],
+        writeRoleUser: [],
+        roleUserList: []
+      },
       typeList: []
     }
   },
+  directives: {
+    loadmore: {
+      bind(el, binding) {
+        // 获取element-ui定义好的scroll盒子
+        const selectWrapDom = el.querySelector(
+          ".el-select-dropdown .el-select-dropdown__wrap"
+        )
+        selectWrapDom.addEventListener("scroll", function () {
+          const condition =
+            this.scrollHeight - this.scrollTop <= this.clientHeight
+          if (condition) {
+            binding.value()
+          }
+        })
+      }
+    }
+  },
   mounted() {
-    this.query(1)
+    this.query()
   },
   methods: {
-    // 查询
-    async query(curPage) {
+    async query(curPage = 1) {
       const typeList = await this.$https.questionTypeListPage({
         name: this.queryForm.queryName,
         curPage,
@@ -140,8 +202,7 @@ export default {
       this.typeList = typeList.data.rows
       this.total = typeList.data.total
     },
-    // 添加试卷信息
-    examHandler() {
+    addOrEdit() {
       this.$refs["examForm"].validate(async valid => {
         if (!valid) {
           return
@@ -161,10 +222,10 @@ export default {
         }
 
         if (res.code == 200) {
-          this.examForm.show = false
-          this.examForm.edit = false
-          this.examForm.examName = ""
           this.$tools.message(!this.examForm.edit ? "添加成功！" : "修改成功！")
+          this.examForm.show = false
+          this.examForm.examName = ""
+          this.examForm.edit = false
           this.query()
         } else {
           this.$tools.message(
@@ -174,35 +235,76 @@ export default {
         }
       })
     },
-    examEdit({ id, name }) {
+    edit({ id, name }) {
       this.examForm.edit = true
       this.examForm.id = id
       this.examForm.examName = name
       this.examForm.show = true
     },
-    async examDel(id) {
-      const res = await this.$https.questionTypeDel({
-        id
+    del({ id }) {
+      this.$https
+        .questionTypeDel({
+          id
+        })
+        .then(res => {
+          if (res.code == 200) {
+            this.$tools.message("删除成功！")
+            this.query()
+          } else {
+            this.$tools.message("删除成功！", "error")
+          }
+        })
+        .catch(error => {})
+    },
+    async role({ readUserIds, writeUserIds, id }) {
+      this.examForm.id = id
+      this.roleForm.readRoleUser = readUserIds
+        .split(",")
+        .filter(item => item != "")
+      this.roleForm.writeRoleUser = writeUserIds
+        .split(",")
+        .filter(item => item != "")
+      const roleUserList = await this.$https.userListpage({
+        curPage: this.roleForm.curPage,
+        pageSize: this.roleForm.pageSize
       })
-
+      this.roleForm.roleUserList = roleUserList.data.rows
+      this.roleForm.show = true
+    },
+    async loadMore() {
+      const roleUserList = await this.$https.userListpage({
+        curPage: this.roleForm.curPage++,
+        pageSize: this.roleForm.pageSize
+      })
+      this.roleForm.roleUserList = [
+        ...this.roleForm.roleUserList,
+        ...roleUserList.data.rows
+      ]
+    },
+    async editRoleUsers() {
+      const res = await this.$https.questionTypeAuth({
+        id: this.examForm.id,
+        readUserIds: this.roleForm.readRoleUser.join(","),
+        writeUserIds: this.roleForm.writeRoleUser.join(",")
+      })
       if (res.code == 200) {
-        this.$tools.message("删除成功！")
-        this.query()
+        this.$tools.message("权限编辑成功！", "error")
+        this.roleForm.show = false
       } else {
-        this.$tools.message("删除成功！", "error")
+        this.$tools.message("权限编辑失败成功！", "error")
       }
     },
-    examRole() {},
-    examOpen() {},
-    handleCurrentChange(val) {
-      this.query(val)
+    async open() {
+      this.$tools.message("此功能开发中...", "info")
     },
-    // 试题详情
     goDetail({ id, name }) {
       this.$router.push({
         path: "/examLibrary/Edit",
         query: { id, name }
       })
+    },
+    pageChange(val) {
+      this.query(val)
     }
   }
 }

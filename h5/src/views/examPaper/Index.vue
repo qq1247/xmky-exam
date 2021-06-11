@@ -7,11 +7,12 @@
           <el-input
             placeholder="请输入名称"
             v-model="queryForm.queryName"
+            class="query-input"
           ></el-input>
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query(1)" icon="el-icon-search" type="primary"
+        <el-button @click="query()" icon="el-icon-search" type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -31,7 +32,7 @@
             <span>添加试卷分类</span>
           </div>
         </div>
-        <div v-for="(item, index) in typeList" :key="index" class="exam-item">
+        <!-- <div v-for="(item, index) in typeList" :key="index" class="exam-item">
           <div class="exam-content">
             <div class="title">{{ item.name }}</div>
             <div class="content-info">
@@ -52,7 +53,17 @@
               </span>
             </div>
           </div>
-        </div>
+        </div> -->
+        <ListCard
+          v-for="(item, index) in typeList"
+          :key="index"
+          :data="item"
+          name="paper"
+          @edit="examEdit"
+          @del="examDel"
+          @role="examRole"
+          @detail="goDetail"
+        ></ListCard>
       </div>
       <el-pagination
         background
@@ -98,7 +109,11 @@
 </template>
 
 <script>
+import ListCard from "@/components/ListCard.vue"
 export default {
+  components: {
+    ListCard
+  },
   data() {
     return {
       pageSize: 5,
@@ -121,11 +136,11 @@ export default {
     }
   },
   mounted() {
-    this.query(1)
+    this.query()
   },
   methods: {
     // 查询
-    async query(curPage) {
+    async query(curPage = 1) {
       const typeList = await this.$https.paperTypeListPage({
         name: this.queryForm.queryName,
         curPage,
@@ -174,17 +189,20 @@ export default {
       this.examForm.examName = name
       this.examForm.show = true
     },
-    async examDel(id) {
-      const res = await this.$https.paperTypeDel({
-        id
-      })
-
-      if (res.code == 200) {
-        this.$tools.message("删除成功！")
-        this.query()
-      } else {
-        this.$tools.message("删除成功！", "error")
-      }
+    examDel({ id }) {
+      this.$https
+        .paperTypeDel({
+          id
+        })
+        .then(res => {
+          if (res.code == 200) {
+            this.$tools.message("删除成功！")
+            this.query()
+          } else {
+            this.$tools.message("删除成功！", "error")
+          }
+        })
+        .catch(error => {})
     },
     examRole() {},
     examOpen() {},
@@ -193,7 +211,7 @@ export default {
     },
     // 试题详情
     goDetail() {
-      this.$router.push("/examPaper/classify")
+      this.$router.push("/examPaper/list")
     }
   }
 }
