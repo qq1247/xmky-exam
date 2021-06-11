@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
 	private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 	
 	/**
-	 * shiro异常处理
+	 * 异常处理
 	 * 
 	 * v1.0 zhanghc 2021年3月3日下午3:00:03
 	 * 

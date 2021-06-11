@@ -6,6 +6,8 @@ import javax.annotation.Resource;
 import javax.security.auth.login.LoginException;
 
 import org.apache.shiro.SecurityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,8 @@ import com.wcpdoc.exam.core.util.ValidateUtil;
  */
 @Service
 public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginService {
+	private static final Logger log = LoggerFactory.getLogger(LoginServiceImpl.class);
+	
 	@Value("${spring.profiles.active}")
 	private String active;
 	@Resource
@@ -56,15 +60,19 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 		
 		// 生成令牌信息（登陆由shiro接收令牌控制）
 		Date curTime = new Date();
+		Long tokenId = curTime.getTime();
 		Date expTime = DateUtil.getNextMinute(new Date(), tokenExpireMinute);
 		String accessToken = JwtUtil.getInstance()
-			.createToken(curTime.getTime() + "", active, expTime)
+			.createToken(tokenId.toString(), active, expTime)
 			.addAttr("id", user.getId())
 			.addAttr("loginName", loginName)
 			.build();
+		if (log.isDebugEnabled()) {
+			log.debug("shiro权限：用户【{}】登陆，旧令牌创建时间【{}】，当前令牌创建时间【{}】", loginName, null, DateUtil.formatDateTime(new Date(tokenId)));
+		}
 		
 		// 缓存刷新令牌（用于续租登陆）
-		TokenCache.add(String.format("TOKEN_%s", user.getId()), curTime.getTime());
+		TokenCache.add(String.format("TOKEN_%s", user.getId()), tokenId);
 		
 		//更新用户登录时间
 		user.setLastLoginTime(new Date());

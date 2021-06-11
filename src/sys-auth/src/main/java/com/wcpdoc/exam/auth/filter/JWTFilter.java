@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,6 +30,7 @@ import com.wcpdoc.exam.core.util.ValidateUtil;
  * v1.0 zhanghc 2021年3月2日上午9:52:04
  */
 public class JWTFilter extends BasicHttpAuthenticationFilter {
+	private static final Logger log = LoggerFactory.getLogger(JWTFilter.class);
 	
 	/**
 	 * 是否允许访问
@@ -83,35 +86,43 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 		Integer tokenRefreshMinute = SpringUtil.getBean(Environment.class).getProperty("token.refreshMinute", Integer.class);
 		String jwtToken = WebUtils.toHttp(request).getHeader("Authorization");
 		JwtResult jwtResult = JwtUtil.getInstance().parse(jwtToken);//能到这一步，肯定是登陆成功的，不需要校验空或校验错误。
-		long tokenId = Long.parseLong(jwtResult.getClaims().getId());
+		long oldTokenId = Long.parseLong(jwtResult.getClaims().getId());
 		int userId = jwtResult.getClaims().get("id", Integer.class);
 		String loginName = jwtResult.getClaims().get("loginName", String.class);
 		
-		Long cacheTokenId = TokenCache.get(String.format("TOKEN_%s", userId));
-		if (cacheTokenId == null) {//缓存中没有令牌（过期清理或人工清理）
+		Long curTokenId = TokenCache.get(String.format("TOKEN_%s", userId));
+		if (curTokenId == null) {//缓存中没有令牌（过期清理或人工清理）
 			throw new AuthenticationException(String.format("用户【%s】令牌不存在", loginName));
 		}
 		
-		if (cacheTokenId != tokenId) {
+		if (curTokenId != oldTokenId) {
+			if (log.isDebugEnabled()) {
+				log.debug("shiro权限：用户【{}】令牌过期，旧令牌创建时间【{}】，当前令牌创建时间【{}】", loginName, DateUtil.formatDateTime(new Date(oldTokenId)), DateUtil.formatDateTime(new Date(curTokenId)));
+			}
 			throw new AuthenticationException(String.format("用户【%s】令牌过期", loginName));
 		}
 		
 		Date curTime = new Date();
-		long tokenTime = tokenId;
-		if (curTime.getTime() - tokenTime <= tokenRefreshMinute * 60 * 1000) {// 如果距离上次刷新不超过指定分钟，不处理
+		long oldTokenTimestamp = oldTokenId;
+		if (curTime.getTime() - oldTokenTimestamp <= tokenRefreshMinute * 60 * 1000) {// 如果距离上次刷新不超过指定分钟，不处理
 			return;
 		}
 		
 		// 生成令牌信息（登陆由shiro接收令牌控制）
+		if (log.isDebugEnabled()) {
+			log.debug("shiro权限：用户【{}】刷新令牌，旧令牌创建时间【{}】，当前令牌创建时间【{}】，默认过期分钟【{}】，默认刷新分钟【{}】", 
+					loginName, DateUtil.formatDateTime(new Date(oldTokenId)), DateUtil.formatDateTime(new Date(curTokenId)), tokenExpireMinute, tokenRefreshMinute);
+		}
 		Date expTime = DateUtil.getNextMinute(curTime, tokenExpireMinute);
+		Long newTokenId = curTime.getTime();
 		String newToken = JwtUtil.getInstance()
-			.createToken(curTime.getTime() + "", jwtResult.getClaims().getSubject(), expTime)
+			.createToken(newTokenId.toString(), jwtResult.getClaims().getSubject(), expTime)
 			.addAttr("id", jwtResult.getClaims().get("id"))
 			.addAttr("loginName", jwtResult.getClaims().get("loginName"))
 			.build();
 		
 		// 缓存刷新令牌（用于续租登陆）
-		TokenCache.add(String.format("TOKEN_%s", userId), curTime.getTime());
+		TokenCache.add(String.format("TOKEN_%s", userId), newTokenId);
 		
 		// 放入http响应头，供前端替换使用
 		WebUtils.toHttp(response).setHeader("Authorization", newToken);

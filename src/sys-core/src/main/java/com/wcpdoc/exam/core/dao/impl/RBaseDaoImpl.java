@@ -16,8 +16,6 @@ import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.Transformers;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.wcpdoc.exam.core.dao.RBaseDao;
 import com.wcpdoc.exam.core.entity.PageIn;
@@ -45,7 +43,6 @@ import com.wcpdoc.exam.core.util.SqlUtil;
  * @param <T>
  */
 public abstract class RBaseDaoImpl<T> implements RBaseDao<T> {
-	private static final Logger log = LoggerFactory.getLogger(RBaseDaoImpl.class);
 	@Resource
 	private EntityManager entityManager;
 	protected Class<T> clazz;
@@ -132,7 +129,6 @@ public abstract class RBaseDaoImpl<T> implements RBaseDao<T> {
 	@Override
 	public /*final*/ PageOut getListpage(SqlUtil sqlUtil, PageIn pageIn) {
 		// 查询列表
-		log.debug("Hibernate：{}", sqlUtil.getWhereParams());
 		String sql = toHibernateSql(sqlUtil.getSql());
 		Query<Map<String, Object>> query = getCurSession().createSQLQuery(sql);
 		for (int i = 0; i < sqlUtil.getWhereParams().size(); i++) {
@@ -175,7 +171,6 @@ public abstract class RBaseDaoImpl<T> implements RBaseDao<T> {
 		for (int i = 0; i < params.length; i++) {
 			query.setParameter(i, params[i]);
 		}
-		log.debug("Hibernate：{}", params);
 		return query.list();
 	}
 	
