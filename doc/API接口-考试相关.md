@@ -291,6 +291,24 @@ code == 401 无权限或登录超时
 |code     | Integer  | 响应码 |
 |msg     | String  | 响应消息 |
 
+####试题导入：question/wordImp
+######请求参数
+| 参数     |  数据类型   |  描述  |  是否必填 |
+| --------   | -----   | -----  | ---- |
+|file    | file     | 附件 |   是   |
+|questionTypeId    | Integer     | 试题分类ID |   是   |
+######响应数据
+| 参数  |  数据类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | Integer  | 响应码 |
+|msg     | String  | 响应消息 |
+
+####试题模板导出：question/wordTemplateExport
+######请求参数
+无
+######响应数据
+字节流
+
 ####试卷列表：paper/listpage
 ######请求参数
 | 参数     |  数据类型   |  描述  |  是否必填 |
