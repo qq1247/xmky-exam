@@ -69,7 +69,7 @@ public class CronController extends BaseController {
 	public PageResult list(PageIn pageIn) {
 		try {
 			PageOut pageOut = cronService.getListpage(pageIn);
-			List<Map<String, Object>> list = pageOut.getRows();
+			List<Map<String, Object>> list = pageOut.getList();
 			for (Map<String, Object> map : list) {
 				if ("1".equals(map.get("STATE").toString())) {
 					map.put("STATE_NAME", "启动");

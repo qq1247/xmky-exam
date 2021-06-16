@@ -85,7 +85,7 @@ public class ApiMyMarkController extends BaseController {
 			PageOut pageOut = examService.getListpage(pageIn);
 			
 			Date curTime = new Date();
-			for(Map<String, Object> map : pageOut.getRows()) {
+			for(Map<String, Object> map : pageOut.getList()) {
 				Date startTime = (Date) map.get("markStartTime");
 				Date endTime = (Date) map.get("markEndTime");
 				if (startTime.getTime() > curTime.getTime()) {
@@ -190,7 +190,7 @@ public class ApiMyMarkController extends BaseController {
 		try {
 			pageIn.setEight(getCurUser().getId().toString());
 			PageOut pageOut = myExamService.getListpage(pageIn);
-			List<Map<String, Object>> list = pageOut.getRows();
+			List<Map<String, Object>> list = pageOut.getList();
 			
 			Date curTime = new Date();
 			for(Map<String, Object> map : list) {

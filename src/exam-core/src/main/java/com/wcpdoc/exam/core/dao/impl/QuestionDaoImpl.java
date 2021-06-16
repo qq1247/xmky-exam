@@ -77,8 +77,8 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 //		}
 		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), "QUESTION_TYPE", "TYPE", "QUESTION_DIFFICULTY", "DIFFICULTY", "STATE", "STATE");
-		for(Map<String, Object> map : pageOut.getRows()) {
+		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), "QUESTION_TYPE", "TYPE", "QUESTION_DIFFICULTY", "DIFFICULTY", "STATE", "STATE");
+		for(Map<String, Object> map : pageOut.getList()) {
 			String title = map.get("title").toString();
 			Document document = Jsoup.parse(title);
 			Elements embeds = document.getElementsByTag("video");

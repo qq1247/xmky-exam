@@ -49,8 +49,8 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 //				.addWhere("USER.STATE = ?", 1)
 				.addOrder("EXAM.START_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDate(pageOut.getRows(), "EXAM_START_TIME", DateUtil.FORMAT_DATE_TIME, "EXAM_END_TIME", DateUtil.FORMAT_DATE_TIME);
-		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), 
+		HibernateUtil.formatDate(pageOut.getList(), "EXAM_START_TIME", DateUtil.FORMAT_DATE_TIME, "EXAM_END_TIME", DateUtil.FORMAT_DATE_TIME);
+		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), 
 				"MY_EXAM_STATE", "MY_EXAM_STATE",
 				"MY_EXAM_ANSWER_STATE", "MY_EXAM_ANSWER_STATE",
 				"MY_EXAM_MARK_STATE", "MY_EXAM_MARK_STATE"

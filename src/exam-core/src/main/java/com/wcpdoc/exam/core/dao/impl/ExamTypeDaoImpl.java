@@ -33,7 +33,7 @@ public class ExamTypeDaoImpl extends RBaseDaoImpl<ExamType> implements ExamTypeD
 				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "USER.NAME LIKE ?", "%" + pageIn.getThree() + "%")
 				.addWhere("EXAM_TYPE.STATE = ?", 1);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDate(pageOut.getRows(), 
+		HibernateUtil.formatDate(pageOut.getList(), 
 				"UPDATE_TIME", DateUtil.FORMAT_DATE_TIME, 
 				"CREATE_TIME", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;

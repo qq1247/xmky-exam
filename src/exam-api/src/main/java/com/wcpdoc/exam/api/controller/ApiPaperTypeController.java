@@ -64,7 +64,7 @@ public class ApiPaperTypeController extends BaseController {
 			}
 			
 			PageOut listpage = paperTypeService.getListpage(pageIn);
-			for(Map<String, Object> mapList : listpage.getRows()){
+			for(Map<String, Object> mapList : listpage.getList()){
 				if(mapList.get("readUserIds")!= null){
 					String[] readUserSplit = mapList.get("readUserIds").toString().subSequence(1, mapList.get("readUserIds").toString().length()).toString().split(",");
 					for(String id : readUserSplit){

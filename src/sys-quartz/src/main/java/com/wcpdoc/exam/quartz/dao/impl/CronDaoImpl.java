@@ -32,7 +32,7 @@ public class CronDaoImpl extends RBaseDaoImpl<Cron> implements CronDao {
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "CRON.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
 				.addOrder("CRON.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDate(pageOut.getRows(), "UPDATE_TIME", DateUtil.FORMAT_DATE_TIME);
+		HibernateUtil.formatDate(pageOut.getList(), "UPDATE_TIME", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;
 	}
 

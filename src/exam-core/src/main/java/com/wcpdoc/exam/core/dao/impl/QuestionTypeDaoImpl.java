@@ -32,7 +32,7 @@ public class QuestionTypeDaoImpl extends RBaseDaoImpl<QuestionType> implements Q
 				.addWhere("QUESTION_TYPE.STATE = ?", 1)
 				.addOrder("QUESTION_TYPE.ID", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDate(pageOut.getRows(), 
+		HibernateUtil.formatDate(pageOut.getList(), 
 				"updateTime", DateUtil.FORMAT_DATE_TIME, 
 				"createTime", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;

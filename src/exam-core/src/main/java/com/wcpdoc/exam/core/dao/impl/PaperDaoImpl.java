@@ -70,7 +70,7 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 		}
 		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), "STATE", "STATE");
+		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), "STATE", "STATE");
 		return pageOut;
 	}
 
