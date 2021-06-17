@@ -4,6 +4,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,14 +54,11 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
-	public PageResult listpage(PageIn pageIn, String name) {
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	public PageResult listpage() {
 		try {
-			if (ValidateUtil.isValid(name)) {
-				pageIn.setTwo(name);
-			}
-			PageOut listpage = examTypeService.getListpage(pageIn);
-			for(Map<String, Object> mapList : listpage.getRows()){
+			PageOut listpage = examTypeService.getListpage(new PageIn(request));
+			for(Map<String, Object> mapList : listpage.getList()){
 				if(mapList.get("readUserIds")!= null){
 					String[] readUserSplit = mapList.get("readUserIds").toString().subSequence(1, mapList.get("readUserIds").toString().length()).toString().split(",");
 					for(String id : readUserSplit){
@@ -107,7 +105,7 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult add(ExamType examType) {
 		try {
 			examTypeService.addAndUpdate(examType);
@@ -129,7 +127,7 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult edit(ExamType examType) {
 		try {
 			examTypeService.editAndUpdate(examType);
@@ -151,7 +149,7 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			examTypeService.delAndUpdate(id);
@@ -173,7 +171,7 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult get(Integer id) {
 		try {
 			ExamType entity = examTypeService.getEntity(id);
@@ -207,7 +205,7 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/auth")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult auth(Integer id, String readUserIds, String writeUserIds) {
 		try {
 			examTypeService.doAuth(id, readUserIds, writeUserIds);
@@ -230,14 +228,15 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/authUserListpage")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
-	public PageResult authUserListpage(PageIn pageIn, String rw, Integer id) {
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	public PageResult authUserListpage() {
 		try {
-			if(id != null && ValidateUtil.isValid(rw) && "w".equals(rw)){
-				pageIn.setOne(id.toString());
+			PageIn pageIn = new PageIn(request);
+			if(pageIn.get("id", Integer.class) != null && ValidateUtil.isValid(pageIn.get("rw")) && "w".equals(pageIn.get("rw"))){
+				pageIn.addAttr("idw", pageIn.get("id", Integer.class).toString());
 			}
-			if(id != null && ValidateUtil.isValid(rw) && "r".equals(rw)){
-				pageIn.setTwo(id.toString());
+			if(pageIn.get("id", Integer.class) != null && ValidateUtil.isValid(pageIn.get("rw")) && "r".equals(pageIn.get("rw"))){
+				pageIn.addAttr("idr", pageIn.get("id", Integer.class).toString());
 			}
 			return PageResultEx.ok().data(examTypeService.authUserListpage(pageIn));
 		} catch (MyException e) {

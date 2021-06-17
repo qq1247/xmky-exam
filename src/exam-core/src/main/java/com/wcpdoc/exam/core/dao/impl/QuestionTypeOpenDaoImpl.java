@@ -24,12 +24,12 @@ public class QuestionTypeOpenDaoImpl extends RBaseDaoImpl<QuestionTypeOpen> impl
 		String sql = "SELECT * "
 				+ "FROM EXM_QUESTION_TYPE_OPEN QUESTION_TYPE_OPEN ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "QUESTION_TYPE_OPEN.ID = ?", pageIn.getTwo())
-			   .addWhere(ValidateUtil.isValid(pageIn.getThree()), "QUESTION_TYPE_OPEN.STATE = ?", pageIn.getThree())
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("id").toString()), "QUESTION_TYPE_OPEN.ID = ?", pageIn.get("id").toString())
+			   .addWhere(ValidateUtil.isValid(pageIn.get("state").toString()), "QUESTION_TYPE_OPEN.STATE = ?", pageIn.get("state").toString())
 				;
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-				HibernateUtil.formatDate(pageOut.getRows(), "START_TIME", DateUtil.FORMAT_DATE_TIME);
-				HibernateUtil.formatDate(pageOut.getRows(), "END_TIME", DateUtil.FORMAT_DATE_TIME);
+				HibernateUtil.formatDate(pageOut.getList(), "START_TIME", DateUtil.FORMAT_DATE_TIME);
+				HibernateUtil.formatDate(pageOut.getList(), "END_TIME", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;
 	}
 }

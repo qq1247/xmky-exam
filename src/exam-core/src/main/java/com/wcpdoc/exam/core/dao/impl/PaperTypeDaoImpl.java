@@ -28,11 +28,11 @@ public class PaperTypeDaoImpl extends RBaseDaoImpl<PaperType> implements PaperTy
 		String sql = "SELECT PAPER_TYPE.*, USER.NAME AS USER_NAME FROM EXM_PAPER_TYPE PAPER_TYPE "
 				+ "LEFT JOIN SYS_USER USER ON PAPER_TYPE.CREATE_USER_ID = USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "PAPER_TYPE.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "USER.NAME LIKE ?", "%" + pageIn.getThree() + "%")
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "PAPER_TYPE.NAME LIKE ?", "%" + pageIn.get("name") + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.get("userName" )), "USER.NAME LIKE ?", "%" + pageIn.get("userName") + "%")
 				.addWhere("PAPER_TYPE.STATE = ?", 1);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDate(pageOut.getRows(), 
+		HibernateUtil.formatDate(pageOut.getList(), 
 				"updateTime", DateUtil.FORMAT_DATE_TIME, 
 				"createTime", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;
@@ -73,8 +73,8 @@ public class PaperTypeDaoImpl extends RBaseDaoImpl<PaperType> implements PaperTy
 				+ "FROM SYS_USER USER "
 				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "(USER.NAME LIKE ? OR ORG.NAME LIKE ?)", "%" + pageIn.getTwo() + "%", "%" + pageIn.getTwo() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "EXISTS (SELECT 1 FROM EXM_PAPER_TYPE Z WHERE Z.ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.getTen())
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("Two")), "(USER.NAME LIKE ? OR ORG.NAME LIKE ?)", "%" + pageIn.get("Two") + "%", "%" + pageIn.get("Two") + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.get("Ten")), "EXISTS (SELECT 1 FROM EXM_PAPER_TYPE Z WHERE Z.ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.get("Ten"))
 				.addWhere("USER.STATE = 1")
 				.addOrder("USER.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
@@ -87,8 +87,8 @@ public class PaperTypeDaoImpl extends RBaseDaoImpl<PaperType> implements PaperTy
 				+ "FROM SYS_POST POST "
 				+ "INNER JOIN SYS_ORG ORG ON POST.ORG_ID = ORG.ID";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "(POST.NAME LIKE ? OR ORG.NAME LIKE ?)", "%" + pageIn.getTwo() + "%", "%" + pageIn.getTwo() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "EXISTS (SELECT 1 FROM EXM_PAPER_TYPE Z WHERE Z.ID = ? AND Z.POST_IDS LIKE CONCAT('%,', POST.ID, ',%'))", pageIn.getTen())
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("Two")), "(POST.NAME LIKE ? OR ORG.NAME LIKE ?)", "%" + pageIn.get("Two") + "%", "%" + pageIn.get("Two") + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.get("Ten")), "EXISTS (SELECT 1 FROM EXM_PAPER_TYPE Z WHERE Z.ID = ? AND Z.POST_IDS LIKE CONCAT('%,', POST.ID, ',%'))", pageIn.get("Ten"))
 				.addWhere("POST.STATE = 1")
 				.addOrder("POST.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
@@ -101,8 +101,8 @@ public class PaperTypeDaoImpl extends RBaseDaoImpl<PaperType> implements PaperTy
 				+ "FROM SYS_ORG ORG "
 				+ "LEFT JOIN SYS_ORG PARENT_ORG ON ORG.PARENT_ID = PARENT_ORG.ID";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "ORG.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "EXISTS (SELECT 1 FROM EXM_PAPER_TYPE Z WHERE Z.ID = ? AND Z.ORG_IDS LIKE CONCAT('%,', ORG.ID, ',%'))", pageIn.getTen())
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("Two")), "ORG.NAME LIKE ?", "%" + pageIn.get("Two") + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.get("Ten")), "EXISTS (SELECT 1 FROM EXM_PAPER_TYPE Z WHERE Z.ID = ? AND Z.ORG_IDS LIKE CONCAT('%,', ORG.ID, ',%'))", pageIn.get("Ten"))
 				.addWhere("ORG.STATE = 1")
 				.addOrder("ORG.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
@@ -114,8 +114,8 @@ public class PaperTypeDaoImpl extends RBaseDaoImpl<PaperType> implements PaperTy
 		String sql = "SELECT USER.ID, USER.NAME AS NAME "
 				+ "FROM SYS_USER USER ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()), "EXISTS (SELECT 1 FROM EXM_PAPER_TYPE Z WHERE Z.ID = ? AND Z.WRITE_USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.getOne())
-				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "EXISTS (SELECT 1 FROM EXM_PAPER_TYPE Z WHERE Z.ID = ? AND Z.READ_USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.getTwo())
+		sqlUtil.addWhere(pageIn.get("idw", Integer.class) != null, "EXISTS (SELECT 1 FROM EXM_PAPER_TYPE Z WHERE Z.ID = ? AND Z.WRITE_USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.get("idw", Integer.class))
+				.addWhere(pageIn.get("idr", Integer.class) != null, "EXISTS (SELECT 1 FROM EXM_PAPER_TYPE Z WHERE Z.ID = ? AND Z.READ_USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.get("idr", Integer.class))
 				.addWhere("USER.STATE = 1")
 				.addOrder("USER.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);

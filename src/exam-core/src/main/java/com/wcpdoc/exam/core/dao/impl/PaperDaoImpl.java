@@ -38,16 +38,16 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 				+ "LEFT JOIN EXM_PAPER_TYPE PAPER_TYPE ON PAPER.PAPER_TYPE_ID = PAPER_TYPE.ID "
 				+ "LEFT JOIN SYS_USER USER ON PAPER.UPDATE_USER_ID = USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "PAPER.PAPER_TYPE_ID = ?", pageIn.getOne())
-				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "PAPER.STATE = ?", pageIn.getThree())
-				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "PAPER.ID = ?", pageIn.getFour())
-				.addWhere(ValidateUtil.isValid(pageIn.getFive()), "PAPER.NAME LIKE ?", "%" + pageIn.getFive() + "%")
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("paperTypeId")) && !"1".equals(pageIn.get("paperTypeId")), "PAPER.PAPER_TYPE_ID = ?", pageIn.get("paperTypeId"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("userName")), "USER.NAME LIKE ?", "%" + pageIn.get("userName") + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.get("state")), "PAPER.STATE = ?", pageIn.get("state"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("PaperId")), "PAPER.ID = ?", pageIn.get("PaperId"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "PAPER.NAME LIKE ?", "%" + pageIn.get("name") + "%")
 				.addWhere("PAPER.STATE != ?", 0)
 				.addOrder("PAPER.UPDATE_TIME", Order.DESC);
 		
-		if (ValidateUtil.isValid(pageIn.getTen())) {
-			User user = userDao.getEntity(Integer.parseInt(pageIn.getTen()));
+		if (pageIn.get("CurUserId", Integer.class) != null) {
+			User user = userDao.getEntity(pageIn.get("CurUserId", Integer.class));
 			StringBuilder partSql = new StringBuilder();
 			List<Object> params = new ArrayList<>();
 			partSql.append("(");
@@ -70,7 +70,7 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 		}
 		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), "STATE", "STATE");
+		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), "STATE", "STATE");
 		return pageOut;
 	}
 

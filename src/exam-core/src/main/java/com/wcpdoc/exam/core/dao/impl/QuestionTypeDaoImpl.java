@@ -28,11 +28,11 @@ public class QuestionTypeDaoImpl extends RBaseDaoImpl<QuestionType> implements Q
 		String sql = "SELECT QUESTION_TYPE.* "
 				+ "FROM EXM_QUESTION_TYPE QUESTION_TYPE ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "QUESTION_TYPE.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "QUESTION_TYPE.NAME LIKE ?", "%" + pageIn.get("name") + "%")
 				.addWhere("QUESTION_TYPE.STATE = ?", 1)
 				.addOrder("QUESTION_TYPE.ID", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDate(pageOut.getRows(), 
+		HibernateUtil.formatDate(pageOut.getList(), 
 				"updateTime", DateUtil.FORMAT_DATE_TIME, 
 				"createTime", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;
@@ -66,8 +66,8 @@ public class QuestionTypeDaoImpl extends RBaseDaoImpl<QuestionType> implements Q
 		String sql = "SELECT USER.ID, USER.NAME AS NAME "
 				+ "FROM SYS_USER USER ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()), "EXISTS (SELECT 1 FROM EXM_QUESTION_TYPE Z WHERE Z.ID = ? AND Z.WRITE_USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.getOne())
-				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "EXISTS (SELECT 1 FROM EXM_QUESTION_TYPE Z WHERE Z.ID = ? AND Z.READ_USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.getTwo())
+		sqlUtil.addWhere(pageIn.get("idw", Integer.class) != null, "EXISTS (SELECT 1 FROM EXM_QUESTION_TYPE Z WHERE Z.ID = ? AND Z.WRITE_USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.get("idw", Integer.class))
+				.addWhere(pageIn.get("idr",  Integer.class) != null, "EXISTS (SELECT 1 FROM EXM_QUESTION_TYPE Z WHERE Z.ID = ? AND Z.READ_USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.get("idr", Integer.class))
 				.addWhere("USER.STATE = 1")
 				.addOrder("USER.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);

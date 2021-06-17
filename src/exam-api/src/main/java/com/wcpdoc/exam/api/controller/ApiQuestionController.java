@@ -19,6 +19,7 @@ import javax.annotation.Resource;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,6 @@ import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
-import com.wcpdoc.exam.core.util.ValidateUtil;
 
 import freemarker.cache.FileTemplateLoader;
 import freemarker.template.Configuration;
@@ -74,43 +74,16 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
-	public PageResult listpage(PageIn pageIn, Integer questionTypeId, Integer id, String title, Integer type, Integer difficulty, Double score, Double scoreStart, Double scoreEnd, String name) {
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	public PageResult listpage() {
 		try {
-			if(questionTypeId != null){
-				pageIn.setOne(questionTypeId.toString());
-			}
-			if(id != null){
-				pageIn.setTwo(id.toString());
-			}
-			if(ValidateUtil.isValid(title)){
-				pageIn.setThree(title);
-			}
-			if(type != null){
-				pageIn.setFive(type.toString());
-			}
-			if(difficulty != null){
-				pageIn.setSix(difficulty.toString());
-			}
-			if(ValidateUtil.isValid(name)){
-				pageIn.setSeven(name);
-			}
-			if(score != null){
-				pageIn.setEight(String.valueOf(score));
-			}
-			if(scoreStart != null){
-				pageIn.setSortOne(String.valueOf(scoreStart));
-			}
-			if(scoreEnd != null){
-				pageIn.setSortTwo(String.valueOf(scoreEnd));
-			}
-			
+			PageIn pageIn = new PageIn(request);
 			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
-				pageIn.setTen(getCurUser().getId().toString());
+				pageIn.addAttr("CurUserId", getCurUser().getId());
 			}
 			
 			PageOut listpage = questionService.getListpage(pageIn);
-			for(Map<String, Object> map : listpage.getRows()){
+			for(Map<String, Object> map : listpage.getList()){
 				map.put("typeName", DictCache.getDictValue("QUESTION_TYPE", map.get("type").toString()));
 				map.put("difficultyName", DictCache.getDictValue("QUESTION_DIFFICULTY", map.get("difficulty").toString()));
 				
@@ -134,7 +107,7 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult add(Question question, String[] options) {
 		try {
 			questionService.addAndUpdate(question, options);
@@ -158,7 +131,7 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult edit(Question question, boolean newVer, String[] options) {
 		try {
 			questionService.updateAndUpdate(question, newVer, options);
@@ -181,7 +154,7 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			Question question = questionService.getEntity(id);
@@ -208,7 +181,7 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult get(Integer id) {
 		try {
 			Question question = questionService.getEntity(id);
@@ -251,7 +224,7 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/copy")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult copy(Integer id) {
 		try {
 			Question question = questionService.getEntity(id);
@@ -280,7 +253,7 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/wordImp")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult wordImp(@RequestParam("file") MultipartFile file, Integer questionTypeId) {
 		try {
 			questionService.wordImp(file, questionTypeId);
@@ -301,7 +274,7 @@ public class ApiQuestionController extends BaseController {
 	 * void
 	 */
 	@RequestMapping(value = "/wordTemplateExport")
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public void wordTemplateExport() {
 		OutputStream output = null;
 		try {
@@ -331,7 +304,7 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/publish")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult publish(Integer id) {
 		try {
 			Question question = questionService.getEntity(id);
@@ -364,7 +337,7 @@ public class ApiQuestionController extends BaseController {
 	 * void
 	 */
 	@RequestMapping(value = "/wordQuestionExport")
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public Map<String, String> wordQuestionExport(String ids) {
 		try {
 		/*if (ids != null) {
@@ -445,7 +418,7 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/statistics")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult statistics(Integer questionTypeId) {
 		try {
 			return PageResultEx.ok().data(questionService.statisticsTypeDifficulty(questionTypeId));
@@ -467,7 +440,7 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/accuracy")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult accuracy(Integer examId) {
 		try {
 			return PageResultEx.ok().data(questionService.accuracy(examId));

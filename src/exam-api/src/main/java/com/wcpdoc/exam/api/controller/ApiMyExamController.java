@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,14 +73,15 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles("user")
-	public PageResult listpage(PageIn pageIn) {
+	@RequiresRoles(value={"user"},logical = Logical.OR)
+	public PageResult listpage() {
 		try {
-			pageIn.setTen(getCurUser().getId().toString());
+			PageIn pageIn = new PageIn(request);
+			pageIn.addAttr("CurUserId", getCurUser().getId());
 			PageOut pageOut = myExamService.getListpage(pageIn);
 
 			Date curTime = new Date();
-			for (Map<String, Object> map : pageOut.getRows()) {
+			for (Map<String, Object> map : pageOut.getList()) {
 				Date examStartTime = (Date) map.get("EXAM_START_TIME");
 				Date examEndTime = (Date) map.get("EXAM_END_TIME");
 				if (examStartTime.getTime() > curTime.getTime()) {
@@ -141,7 +143,7 @@ public class ApiMyExamController extends BaseController{
 	 * @return String
 	 */
 	@RequestMapping("/toExam")
-	@RequiresRoles("user")
+	@RequiresRoles(value={"user"},logical = Logical.OR)
 	public String toExam(Model model, Integer myExamId) { //TODO
 		try {
 			//校验数据有效性
@@ -213,7 +215,7 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/updateAnswer")
 	@ResponseBody
-	@RequiresRoles("user")
+	@RequiresRoles(value={"user"},logical = Logical.OR)
 	public PageResult updateAnswer(Integer myExamDetailId, String answer) {
 		try {
 			//校验数据有效性
@@ -267,7 +269,7 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/exam")
 	@ResponseBody
-	@RequiresRoles("user")
+	@RequiresRoles(value={"user"},logical = Logical.OR)
 	public PageResult exam(Integer myExamId) {
 		try {
 			// 校验数据有效性
@@ -315,7 +317,7 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/kalendar")
 	@ResponseBody
-	@RequiresRoles("user")
+	@RequiresRoles(value={"user"},logical = Logical.OR)
 	public PageResult kalendar(Integer year, Integer month) {
 		try {
 			// 校验数据有效性
@@ -346,14 +348,10 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/rankingPage")
 	@ResponseBody
-	@RequiresRoles("user")
-	public PageResult rankingPage(PageIn pageIn, Integer examId) {
+	@RequiresRoles(value={"user"},logical = Logical.OR)
+	public PageResult rankingPage() {
 		try {
-			if (examId == null) {
-				throw new MyException("参数错误：id");
-			}
-			pageIn.setOne(examId.toString());
-			return PageResultEx.ok().data(myExamService.getRankingPage(pageIn));
+			return PageResultEx.ok().data(myExamService.getRankingPage(new PageIn(request)));
 		} catch (MyException e) {
 			log.error("考试时间表错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -372,7 +370,7 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/count")
 	@ResponseBody
-	@RequiresRoles("user")
+	@RequiresRoles(value={"user"},logical = Logical.OR)
 	public PageResult count(Integer examId) {
 		try {
 			return PageResultEx.ok().data(myExamService.count(examId));
@@ -394,7 +392,7 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/email")
 	@ResponseBody
-	@RequiresRoles("user")
+	@RequiresRoles(value={"user"},logical = Logical.OR)
 	public PageResult email(Integer examId) {
 		try {
 			Parm parm = parmService.getEntity(1);
