@@ -193,15 +193,17 @@ export default {
     this.query()
   },
   methods: {
+    // 查询分类数据
     async query(curPage = 1) {
       const typeList = await this.$https.questionTypeListPage({
         name: this.queryForm.queryName,
         curPage,
         pageSize: this.pageSize
       })
-      this.typeList = typeList.data.rows
+      this.typeList = typeList.data.list
       this.total = typeList.data.total
     },
+    // 添加 || 修改分类名称
     addOrEdit() {
       this.$refs["examForm"].validate(async valid => {
         if (!valid) {
@@ -235,12 +237,14 @@ export default {
         }
       })
     },
+    // 编辑分类
     edit({ id, name }) {
       this.examForm.edit = true
       this.examForm.id = id
       this.examForm.examName = name
       this.examForm.show = true
     },
+    // 删除分类
     del({ id }) {
       this.$https
         .questionTypeDel({
@@ -256,6 +260,7 @@ export default {
         })
         .catch(error => {})
     },
+    // 权限人员信息
     async role({ readUserIds, writeUserIds, id }) {
       this.examForm.id = id
       this.roleForm.readRoleUser = readUserIds
@@ -271,6 +276,7 @@ export default {
       this.roleForm.roleUserList = roleUserList.data.rows
       this.roleForm.show = true
     },
+    // 加载更多
     async loadMore() {
       const roleUserList = await this.$https.userListpage({
         curPage: this.roleForm.curPage++,
@@ -281,6 +287,7 @@ export default {
         ...roleUserList.data.rows
       ]
     },
+    // 编辑权限
     async editRoleUsers() {
       const res = await this.$https.questionTypeAuth({
         id: this.examForm.id,
@@ -294,15 +301,18 @@ export default {
         this.$tools.message("权限编辑失败成功！", "error")
       }
     },
+    // 试题开放
     async open() {
       this.$tools.message("此功能开发中...", "info")
     },
+    // 试题详情
     goDetail({ id, name }) {
       this.$router.push({
         path: "/examLibrary/Edit",
         query: { id, name }
       })
     },
+    // 分页切换
     pageChange(val) {
       this.query(val)
     }

@@ -32,36 +32,13 @@
             <span>添加试卷分类</span>
           </div>
         </div>
-        <!-- <div v-for="(item, index) in typeList" :key="index" class="exam-item">
-          <div class="exam-content">
-            <div class="title">{{ item.name }}</div>
-            <div class="content-info">
-              <span>读取权限：张三</span>
-            </div>
-            <div class="content-info">
-              <span>使用权限：张三、张三、张三</span>
-            </div>
-            <div class="handler">
-              <span data-title="编辑" @click="examEdit(item)">
-                <i class="common common-edit"></i>
-              </span>
-              <span data-title="删除" @click="examDel(item.id)">
-                <i class="common common-delete"></i>
-              </span>
-              <span data-title="试卷列表" @click="goDetail">
-                <i class="common common-list-row"></i>
-              </span>
-            </div>
-          </div>
-        </div> -->
         <ListCard
           v-for="(item, index) in typeList"
           :key="index"
           :data="item"
           name="paper"
-          @edit="examEdit"
-          @del="examDel"
-          @role="examRole"
+          @edit="edit"
+          @del="del"
           @detail="goDetail"
         ></ListCard>
       </div>
@@ -74,7 +51,7 @@
         :total="total"
         :page-size="pageSize"
         :current-page="1"
-        @current-change="handleCurrentChange"
+        @current-change="pageChange"
       >
       </el-pagination>
     </div>
@@ -99,7 +76,7 @@
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="examHandler" type="primary">{{
+        <el-button @click="addOrEdit" type="primary">{{
           examForm.edit ? "修改" : "添加"
         }}</el-button>
         <el-button @click="examForm.show = false">取消</el-button>
@@ -139,18 +116,18 @@ export default {
     this.query()
   },
   methods: {
-    // 查询
+    // 查询分类信息
     async query(curPage = 1) {
       const typeList = await this.$https.paperTypeListPage({
         name: this.queryForm.queryName,
         curPage,
         pageSize: this.pageSize
       })
-      this.typeList = typeList.data.rows
+      this.typeList = typeList.data.list
       this.total = typeList.data.total
     },
-    // 添加试卷信息
-    examHandler() {
+    // 添加 || 修改试卷名称
+    addOrEdit() {
       this.$refs["examForm"].validate(async valid => {
         if (!valid) {
           return
@@ -183,13 +160,15 @@ export default {
         }
       })
     },
-    examEdit({ id, name }) {
+    // 编辑分类
+    edit({ id, name }) {
       this.examForm.edit = true
       this.examForm.id = id
       this.examForm.examName = name
       this.examForm.show = true
     },
-    examDel({ id }) {
+    // 删除分类
+    del({ id }) {
       this.$https
         .paperTypeDel({
           id
@@ -204,14 +183,16 @@ export default {
         })
         .catch(error => {})
     },
-    examRole() {},
-    examOpen() {},
-    handleCurrentChange(val) {
-      this.query(val)
+    // 试卷子分类
+    goDetail({ id, name }) {
+      this.$router.push({
+        path: "/examPaper/list",
+        query: { id, name }
+      })
     },
-    // 试题详情
-    goDetail() {
-      this.$router.push("/examPaper/list")
+    // 分页切换
+    pageChange(val) {
+      this.query(val)
     }
   }
 }
