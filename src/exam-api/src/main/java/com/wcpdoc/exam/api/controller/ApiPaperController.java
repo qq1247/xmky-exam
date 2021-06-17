@@ -124,15 +124,14 @@ public class ApiPaperController extends BaseController {
 	@RequestMapping("/edit")
 	@ResponseBody
 	@RequiresRoles("subAdmin")
-	public PageResult edit(Integer paperId, Paper paper, List<PaperRemark> paperRemark) {
+	public PageResult edit(Paper paper, List<PaperRemark> paperRemark) {
 		try {
-			Paper entity = paperService.getEntity(paperId);
+			Paper entity = paperService.getEntity(paper.getId());
 			entity.setName(paper.getName());
 			entity.setPassScore(paper.getPassScore());
 			entity.setReadRemark(paper.getReadRemark());
 			entity.setReadNum(paper.getReadNum());
 			entity.setShowType(paper.getShowType());
-			entity.setQuestion(paper.getQuestion());
 			entity.setMinimizeNum(paper.getMinimizeNum());
 			entity.setUpdateUserId(getCurUser().getId());
 			entity.setUpdateTime(new Date());
