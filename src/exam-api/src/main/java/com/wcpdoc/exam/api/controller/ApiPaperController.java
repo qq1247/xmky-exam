@@ -435,7 +435,7 @@ public class ApiPaperController extends BaseController {
 
 					questionsListMap.add(questionMap);
 				}
-				map.put("questionsList",  questionsListMap);
+				map.put("questionList",  questionsListMap);
 				mapList.add(map);
 			}
 			return PageResultEx.ok().data(mapList);

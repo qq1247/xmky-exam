@@ -372,15 +372,15 @@ code == 401 无权限或登录超时
 |data.list[].chapter.name  | String  | 章节名称 |
 |data.list[].chapter.description  | String  | 章节描述 |
 |data.list[].chapter.parentId  | Integer  | 父id（树形结构的ID） |
-|data.list[].questionsList[].id  | Integer  | 试题id |
-|data.list[].questionsList[].type  | Integer  | 试题类型，参考question/add |
-|data.list[].questionsList[].difficulty  | Integer  | 试题难度，难易度参考question/add|
-|data.list[].questionsList[].title  | String  | 试题标题 |
-|data.list[].questionsList[].answer  | String  | 试题答案 |
-|data.list[].questionsList[].analysis  | String  | 试题解析 |
-|data.list[].questionsList[].score  | double  | 试题分数 |
-|data.list[].questionsList[].scoreOptions  | String  | 试题分数选项，参考question/add |
-|data.list[].questionsList[].options[]  | Integer  | 试题选项，参考question/add |
+|data.list[].questionList[].id  | Integer  | 试题id |
+|data.list[].questionList[].type  | Integer  | 试题类型，参考question/add |
+|data.list[].questionList[].difficulty  | Integer  | 试题难度，难易度参考question/add|
+|data.list[].questionList[].title  | String  | 试题标题 |
+|data.list[].questionList[].answer  | String  | 试题答案 |
+|data.list[].questionList[].analysis  | String  | 试题解析 |
+|data.list[].questionList[].score  | double  | 试题分数 |
+|data.list[].questionList[].scoreOptions  | String  | 试题分数选项，参考question/add |
+|data.list[].questionList[].options[]  | Integer  | 试题选项，参考question/add |
 
 ####试卷试题添加：paper/questionAdd
 ######请求参数
