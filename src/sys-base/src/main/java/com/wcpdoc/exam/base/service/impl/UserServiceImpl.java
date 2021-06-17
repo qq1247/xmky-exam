@@ -150,7 +150,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		}
 		
 		PageOut pageOut = new PageOut();
-		pageOut.setRows(list);
+		pageOut.setList(list);
 		pageOut.setTotal(tokenCacheList.size());
 		return pageOut;
 	}

@@ -38,7 +38,7 @@ public class UserDaoImpl extends RBaseDaoImpl<User> implements UserDao {
 				.addWhere("USER.STATE != ?", 0)
 				.addOrder("USER.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDate(pageOut.getRows(), "REGIST_TIME", DateUtil.FORMAT_DATE, "LAST_LOGIN_TIME", DateUtil.FORMAT_DATE);
+		HibernateUtil.formatDate(pageOut.getList(), "REGIST_TIME", DateUtil.FORMAT_DATE, "LAST_LOGIN_TIME", DateUtil.FORMAT_DATE);
 		return pageOut;
 	}
 

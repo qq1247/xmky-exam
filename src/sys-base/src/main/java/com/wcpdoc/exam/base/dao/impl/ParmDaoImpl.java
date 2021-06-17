@@ -29,7 +29,7 @@ public class ParmDaoImpl extends RBaseDaoImpl<Parm> implements ParmDao {
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "PARM.ORG_NAME LIKE ?", "%" + pageIn.getTwo() + "%")
 			   .addOrder("PARM.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDate(pageOut.getRows(), "UPDATE_TIME", DateUtil.FORMAT_DATE_TIME);
+		HibernateUtil.formatDate(pageOut.getList(), "UPDATE_TIME", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;
 	}
 

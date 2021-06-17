@@ -77,12 +77,12 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 		}
 		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDate(pageOut.getRows(), 
+		HibernateUtil.formatDate(pageOut.getList(), 
 				"START_TIME", DateUtil.FORMAT_DATE_TIME, 
 				"END_TIME", DateUtil.FORMAT_DATE_TIME, 
 				"MARK_START_TIME", DateUtil.FORMAT_DATE_TIME, 
 				"MARK_END_TIME", DateUtil.FORMAT_DATE_TIME);
-		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), "EXAM_STATE", "STATE");
+		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), "EXAM_STATE", "STATE");
 		return pageOut;
 	}
 

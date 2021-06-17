@@ -57,7 +57,7 @@ public class ApiCronController extends BaseController {
 			}
 			
 			PageOut pageOut = cronService.getListpage(pageIn);
-			List<Map<String, Object>> list = pageOut.getRows();
+			List<Map<String, Object>> list = pageOut.getList();
 			for (Map<String, Object> map : list) {
 				if ("1".equals(map.get("state").toString())) {
 					map.put("stateName", "启动");

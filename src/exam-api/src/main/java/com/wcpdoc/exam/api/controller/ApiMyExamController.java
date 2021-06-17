@@ -79,7 +79,7 @@ public class ApiMyExamController extends BaseController{
 			PageOut pageOut = myExamService.getListpage(pageIn);
 
 			Date curTime = new Date();
-			for (Map<String, Object> map : pageOut.getRows()) {
+			for (Map<String, Object> map : pageOut.getList()) {
 				Date examStartTime = (Date) map.get("EXAM_START_TIME");
 				Date examEndTime = (Date) map.get("EXAM_END_TIME");
 				if (examStartTime.getTime() > curTime.getTime()) {

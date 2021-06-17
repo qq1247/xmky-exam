@@ -34,7 +34,7 @@ public class FileDaoImpl extends RBaseDaoImpl<File> implements FileDao {
 		sqlUtil.addWhere("FILE.STATE = 1");
 		sqlUtil.addOrder("FILE.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDate(pageOut.getRows(), "UPDATE_TIME", DateUtil.FORMAT_DATE_TIME);
+		HibernateUtil.formatDate(pageOut.getList(), "UPDATE_TIME", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;
 	}
 

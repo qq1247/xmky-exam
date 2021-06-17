@@ -28,7 +28,7 @@ public class BulletinBoardDaoImpl extends RBaseDaoImpl<BulletinBoard> implements
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "BULLETIN_BOARD.ID = ?", pageIn.getTwo())
 				;
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-				HibernateUtil.formatDate(pageOut.getRows(), "UPDATE_TIME", DateUtil.FORMAT_DATE_TIME);
+				HibernateUtil.formatDate(pageOut.getList(), "UPDATE_TIME", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;
 	}
 

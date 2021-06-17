@@ -28,8 +28,8 @@ public class QuestionTypeOpenDaoImpl extends RBaseDaoImpl<QuestionTypeOpen> impl
 			   .addWhere(ValidateUtil.isValid(pageIn.getThree()), "QUESTION_TYPE_OPEN.STATE = ?", pageIn.getThree())
 				;
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-				HibernateUtil.formatDate(pageOut.getRows(), "START_TIME", DateUtil.FORMAT_DATE_TIME);
-				HibernateUtil.formatDate(pageOut.getRows(), "END_TIME", DateUtil.FORMAT_DATE_TIME);
+				HibernateUtil.formatDate(pageOut.getList(), "START_TIME", DateUtil.FORMAT_DATE_TIME);
+				HibernateUtil.formatDate(pageOut.getList(), "END_TIME", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;
 	}
 }

@@ -110,7 +110,7 @@ public class ApiQuestionController extends BaseController {
 			}
 			
 			PageOut listpage = questionService.getListpage(pageIn);
-			for(Map<String, Object> map : listpage.getRows()){
+			for(Map<String, Object> map : listpage.getList()){
 				map.put("typeName", DictCache.getDictValue("QUESTION_TYPE", map.get("type").toString()));
 				map.put("difficultyName", DictCache.getDictValue("QUESTION_DIFFICULTY", map.get("difficulty").toString()));
 				
