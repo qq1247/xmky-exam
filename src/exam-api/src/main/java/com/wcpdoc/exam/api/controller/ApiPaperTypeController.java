@@ -4,6 +4,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,17 +54,10 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
-	public PageResult listpage(PageIn pageIn, String name, String userName) {
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	public PageResult listpage() {
 		try {
-			if (ValidateUtil.isValid(name)) {
-				pageIn.setTwo(name);
-			}
-			if (ValidateUtil.isValid(userName)) {
-				pageIn.setThree(userName);
-			}
-			
-			PageOut listpage = paperTypeService.getListpage(pageIn);
+			PageOut listpage = paperTypeService.getListpage(new PageIn(request));
 			for(Map<String, Object> mapList : listpage.getList()){
 				if(mapList.get("readUserIds")!= null){
 					String[] readUserSplit = mapList.get("readUserIds").toString().subSequence(1, mapList.get("readUserIds").toString().length()).toString().split(",");
@@ -111,7 +105,7 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult add(PaperType paperType) {
 		try {
 			paperTypeService.addAndUpdate(paperType);
@@ -133,7 +127,7 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult edit(PaperType paperType) {
 		try {
 			paperTypeService.editAndUpdate(paperType);
@@ -155,7 +149,7 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			paperTypeService.delAndUpdate(id);
@@ -177,7 +171,7 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult get(Integer id) {
 		try {
 			PaperType entity = paperTypeService.getEntity(id);
@@ -207,15 +201,16 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/authUserListpage")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
-	public PageResult authUserListpage(PageIn pageIn, String rw, Integer id) {
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	public PageResult authUserListpage() {
 		try {
-			if(id != null && ValidateUtil.isValid(rw) && "w".equals(rw)){
-				pageIn.setOne(id.toString());
-			}
-			if(id != null && ValidateUtil.isValid(rw) && "r".equals(rw)){
-				pageIn.setTwo(id.toString());
-			}
+			PageIn pageIn = new PageIn(request);
+		    if(pageIn.get("id", Integer.class) != null && ValidateUtil.isValid(pageIn.get("rw")) && "w".equals(pageIn.get("rw"))){
+		     pageIn.addAttr("idw", pageIn.get("id", Integer.class).toString());
+		    }
+		    if(pageIn.get("id", Integer.class) != null && ValidateUtil.isValid(pageIn.get("rw")) && "r".equals(pageIn.get("rw"))){
+		     pageIn.addAttr("idr", pageIn.get("id", Integer.class).toString());
+		    }
 			return PageResultEx.ok().data(paperTypeService.authUserListpage(pageIn));
 		} catch (MyException e) {
 			log.error("权限用户列表错误：{}", e.getMessage());
@@ -239,7 +234,7 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/auth")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult auth(Integer id, String readUserIds, String writeUserIds) {
 		try {
 			paperTypeService.doAuth(id, readUserIds, writeUserIds);

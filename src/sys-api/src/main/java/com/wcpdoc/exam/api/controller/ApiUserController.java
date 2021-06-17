@@ -13,6 +13,7 @@ import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.jxls.common.Context;
 import org.jxls.expression.JexlExpressionEvaluator;
@@ -67,7 +68,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/orgTreeList")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult orgTreeList() {
 		try {
 			return PageResultEx.ok().data(orgService.getTreeList());
@@ -87,16 +88,10 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles("admin")
-	public PageResult listpage(PageIn pageIn, String name, Integer orgId) {
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
+	public PageResult listpage() {
 		try {
-			if(ValidateUtil.isValid(name)){
-				pageIn.setTwo(name);
-			}
-			if(orgId != null){
-				pageIn.setFour(orgId.toString());
-			}
-			return PageResultEx.ok().data(userService.getListpage(pageIn));
+			return PageResultEx.ok().data(userService.getListpage(new PageIn(request)));
 		} catch (Exception e) {
 			log.error("用户列表错误：", e);
 			return PageResult.err();
@@ -113,7 +108,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult add(User user) {
 		try {
 			// 校验数据有效性
@@ -158,7 +153,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult edit(User user) {
 		try {
 			// 校验数据有效性
@@ -212,7 +207,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			User user = userService.getEntity(id);
@@ -243,7 +238,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/roleUpdate")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult roleUpdate(Integer id, String roles) {
 		try {
 			userService.roleUpdate(id, roles);
@@ -268,7 +263,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/orgUpdate")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult orgUpdate(Integer id, Integer orgId) {
 		try {
 			// 校验数据有效性
@@ -308,7 +303,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/initPwd")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult initPwd(Integer id) {
 		try {
 			String initPwd = "111111";//StringUtil.getRandomStr(8);
@@ -333,7 +328,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/input")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult input(@RequestParam("file") MultipartFile file) {
 		try {
 			userXlsxService.inputUserXlsx(file);
@@ -352,7 +347,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/export")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public void export(String ids) {
 		ServletOutputStream outputStream = null;
 		try {
@@ -395,7 +390,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/template")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public void template() {
 		OutputStream output = null;
 		try {
@@ -423,7 +418,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult get(Integer id) {
 		try {
 			User entity = userService.getEntity(id);
@@ -459,7 +454,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/onList")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult onList() {
 		try {
 			return PageResultEx.ok().data(userService.onList());
@@ -480,7 +475,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/exit")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult exit(Integer id) {
 		try {
 			TokenCache.del(id);
@@ -499,7 +494,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/syncUser")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult syncUser(String orgName, String orgCode, List<User> user) {
 		// org  [name, code]
 		// user [name, loginName, email, phone, pwd ]

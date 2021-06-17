@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.annotation.Resource;
 
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,6 @@ import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.exception.MyException;
-import com.wcpdoc.exam.core.util.ValidateUtil;
 /**
  * 参数控制层
  * 
@@ -40,13 +40,10 @@ public class ApiParmController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles("admin")
-	public PageResult listpage(PageIn pageIn, String orgName) {
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
+	public PageResult listpage() {
 		try {
-			if (ValidateUtil.isValid(orgName)) {
-				pageIn.setTwo(orgName);
-			}
-			return PageResultEx.ok().data(parmService.getListpage(pageIn));
+			return PageResultEx.ok().data(parmService.getListpage(new PageIn(request)));
 		} catch (Exception e) {
 			log.error("参数列表错误：", e);
 			return PageResult.err();
@@ -61,7 +58,7 @@ public class ApiParmController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult add(Parm email) {
 		try {
 			email.setUpdateTime(new Date());
@@ -86,7 +83,7 @@ public class ApiParmController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult edit(Parm parm) {
 		try {
 			Parm entity = parmService.getEntity(parm.getId());
@@ -116,7 +113,7 @@ public class ApiParmController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult get(Integer id) {
 		try {
 			Parm entity = parmService.getEntity(id);
@@ -148,7 +145,7 @@ public class ApiParmController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			parmService.del(id);
@@ -170,7 +167,7 @@ public class ApiParmController extends BaseController {
 	 */
 	@RequestMapping("/editLogo")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult editLogo(Parm parm) {
 		try {
 			Parm entity = parmService.getEntity(parm.getId());

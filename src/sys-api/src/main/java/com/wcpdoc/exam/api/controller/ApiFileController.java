@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,10 +49,10 @@ public class ApiFileController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles("admin")
-	public PageResult listpage(PageIn pageIn) {
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
+	public PageResult listpage() {
 		try {
-			return PageResultEx.ok().data(fileService.getListpage(pageIn));
+			return PageResultEx.ok().data(fileService.getListpage(new PageIn(request)));
 		} catch (Exception e) {
 			log.error("附件列表错误：", e);
 			return PageResult.err();
@@ -68,7 +69,7 @@ public class ApiFileController extends BaseController {
 	 */
 	@RequestMapping("/upload")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult upload(@RequestParam("files") MultipartFile[] files) {
 		try {
 			String[] allowTypes = { "jpg", "gif", "png", "zip", "rar", "doc", "xls", "docx", "xlsx", "mp4" };
@@ -95,7 +96,7 @@ public class ApiFileController extends BaseController {
 	 */
 	@RequestMapping("/uploadAdd")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult uploadAdd(Integer[] ids) {
 		StringBuilder message = new StringBuilder();
 		try {
@@ -136,7 +137,7 @@ public class ApiFileController extends BaseController {
 	 */
 	@RequestMapping(value = "/download")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public void download(Integer id) {
 		OutputStream output = null;
 		try {
@@ -166,7 +167,7 @@ public class ApiFileController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			File file = fileService.getEntity(id);

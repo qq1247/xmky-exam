@@ -10,8 +10,8 @@ import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.HibernateUtil;
 import com.wcpdoc.exam.core.util.SqlUtil;
-import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.util.SqlUtil.Order;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.quartz.dao.CronDao;
 import com.wcpdoc.exam.quartz.entity.Cron;
 
@@ -29,7 +29,7 @@ public class CronDaoImpl extends RBaseDaoImpl<Cron> implements CronDao {
 				+ "FROM SYS_CRON CRON "
 				+ "LEFT JOIN SYS_USER USER ON CRON.UPDATE_USER_ID = USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "CRON.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "CRON.NAME LIKE ?", "%" + pageIn.get("name") + "%")
 				.addOrder("CRON.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(), "UPDATE_TIME", DateUtil.FORMAT_DATE_TIME);

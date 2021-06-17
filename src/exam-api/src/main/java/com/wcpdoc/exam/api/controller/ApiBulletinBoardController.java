@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.annotation.Resource;
 
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,6 @@ import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.BulletinBoardService;
-import com.wcpdoc.exam.core.util.ValidateUtil;
 /**
  * 公告栏控制层
  * 
@@ -40,10 +40,10 @@ public class ApiBulletinBoardController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
-	public PageResult listpage(PageIn pageIn) {
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	public PageResult listpage() {
 		try {
-			return PageResultEx.ok().data(bulletinBoardService.getListpage(pageIn));
+			return PageResultEx.ok().data(bulletinBoardService.getListpage(new PageIn(request)));
 		} catch (Exception e) {
 			log.error("公告栏列表错误：", e);
 			return PageResult.err();
@@ -58,7 +58,7 @@ public class ApiBulletinBoardController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult add(BulletinBoard bulletinBoard) {
 		try {
 			bulletinBoard.setUpdateTime(new Date());
@@ -82,7 +82,7 @@ public class ApiBulletinBoardController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult edit(BulletinBoard bulletinBoard) {
 		try {
 			BulletinBoard entity = bulletinBoardService.getEntity(bulletinBoard.getId());
@@ -118,7 +118,7 @@ public class ApiBulletinBoardController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			bulletinBoardService.delAndUpdate(id);
@@ -144,7 +144,7 @@ public class ApiBulletinBoardController extends BaseController {
 	 */
 	@RequestMapping("/auth")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult auth(Integer id, String readUserIds, String readOrgIds) {
 		try {
 			bulletinBoardService.auth(id, readUserIds, readOrgIds);
@@ -167,16 +167,10 @@ public class ApiBulletinBoardController extends BaseController {
 	 */
 	@RequestMapping("/authUserList")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
-	public PageResult userList(PageIn pageIn, String name, Integer id) {
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	public PageResult userList() {
 		try {
-			if(ValidateUtil.isValid(name)){
-				pageIn.setTwo(name);
-			}
-			if(id != null){
-				pageIn.setTen(id.toString());
-			}
-			return PageResultEx.ok().data(bulletinBoardService.getUserListpage(pageIn));
+			return PageResultEx.ok().data(bulletinBoardService.getUserListpage(new PageIn(request)));
 		} catch (Exception e) {
 			log.error("权限用户列表错误：", e);
 			return PageResult.err();
@@ -192,16 +186,10 @@ public class ApiBulletinBoardController extends BaseController {
 	 */
 	@RequestMapping("/authOrgList")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult authOrgList(PageIn pageIn, String name, Integer id) {
 		try {
-			if(ValidateUtil.isValid(name)){
-				pageIn.setTwo(name);
-			}
-			if(id != null){
-				pageIn.setTen(id.toString());
-			}
-			return PageResultEx.ok().data(bulletinBoardService.getOrgListpage(pageIn));
+			return PageResultEx.ok().data(bulletinBoardService.getOrgListpage(new PageIn(request)));
 		} catch (Exception e) {
 			log.error("权限用户列表错误：", e);
 			return PageResult.err();

@@ -2,6 +2,7 @@ package com.wcpdoc.exam.api.controller;
 
 import javax.annotation.Resource;
 
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +17,6 @@ import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.exception.MyException;
-import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
  * 数据字典控制层
@@ -41,19 +41,10 @@ public class ApiDictController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles("admin")
-	public PageResult listpage(PageIn pageIn, String dictIndex, String dictKey, String dictValue) {
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
+	public PageResult listpage() {
 		try {
-			if (ValidateUtil.isValid(dictIndex)) {
-				pageIn.setTwo(dictIndex);
-			}
-			if (ValidateUtil.isValid(dictKey)) {
-				pageIn.setThree(dictKey);
-			}
-			if (ValidateUtil.isValid(dictValue)) {
-				pageIn.setFour(dictValue);
-			}
-			return PageResultEx.ok().data(dictService.getListpage(pageIn));
+			return PageResultEx.ok().data(dictService.getListpage(new PageIn(request)));
 		} catch (Exception e) {
 			log.error("数据字典列表错误：", e);
 			return PageResult.err();
@@ -70,7 +61,7 @@ public class ApiDictController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult add(Dict dict) {
 		try {
 			dictService.addAndUpdate(dict);
@@ -94,7 +85,7 @@ public class ApiDictController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult edit(Dict dict) {
 		try {
 			dictService.updateAndUpdate(dict);
@@ -118,7 +109,7 @@ public class ApiDictController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			dictService.delAndUpdate(id);
@@ -141,7 +132,7 @@ public class ApiDictController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult get(Integer id) {
 		try {
 			Dict dict = dictService.getEntity(id);
