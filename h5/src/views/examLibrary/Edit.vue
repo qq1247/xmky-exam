@@ -448,7 +448,6 @@ export default {
   data() {
     return {
       labelPosition: "left",
-      value: "",
       list: {
         //列表数据
         total: 0, // 总条数
@@ -932,10 +931,12 @@ export default {
           res.data.scoreOptions == null ? [] : res.data.scoreOptions.split(",")
       }
     },
+    // 复制试题
     async copy(id) {
       await this.$https.questionCopy({ id })
       this.query()
     },
+    // 删除试题
     del(id) {
       this.$confirm("确定要删除？", "提示", {
         confirmButtonText: "确定",
@@ -946,6 +947,7 @@ export default {
         this.query()
       })
     },
+    // 下载试题模板
     async questionTemplate() {
       const template = await this.$https.questionTemplate({}, "blob")
       let blob = new Blob([template], { type: "application/msword" })
@@ -956,14 +958,23 @@ export default {
       a.click()
       window.URL.revokeObjectURL(url)
     },
-    questionImport() {
+    // 上传试题
+    async questionImport() {
       let formData = new FormData()
       formData.append("file", document.querySelector("#docId").files[0])
       formData.append("questionTypeId", this.queryForm.questionTypeId)
-      console.log(formData.get("file"))
-      this.$https.questionImport(formData, "json", {
-        "Content-Type": "multipart/form-data"
-      })
+      const res = await this.$https.questionImport(
+        formData,
+        undefined,
+        "multipart/form-data"
+      )
+      if (res.code == 200) {
+        this.$tools.message("上传成功！")
+        this.fileForm.show = false
+        this.query()
+      } else {
+        this.$tools.message("上传失败！", error)
+      }
     }
   }
 }

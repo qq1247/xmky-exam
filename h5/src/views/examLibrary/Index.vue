@@ -308,11 +308,10 @@ export default {
     // 试题详情
     goDetail({ id, name }) {
       this.$router.push({
-        path: "/examLibrary/Edit",
+        path: "/examLibrary/edit",
         query: { id, name }
       })
     },
-    // 分页切换
     pageChange(val) {
       this.query(val)
     }

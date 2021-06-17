@@ -4,14 +4,20 @@ import qs from "qs" // 根据需求是否导入qs模块
 const post = async (
   url,
   params = {},
-  type = "json",
-  headers = {
-    "Content-Type": "application/x-www-form-urlencoded"
-  }
+  responseType = "json",
+  headers = "application/x-www-form-urlencoded"
 ) =>
-  await http.post(url, qs.stringify(params, { arrayFormat: "repeat" }), {
-    responseType: type,
-    headers: headers
+  await http({
+    url: url,
+    method: "post",
+    data:
+      headers == "application/x-www-form-urlencoded"
+        ? qs.stringify(params, { arrayFormat: "repeat" })
+        : params,
+    responseType: responseType,
+    headers: {
+      "Content-Type": headers
+    }
   })
 
 export default {
