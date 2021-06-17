@@ -56,6 +56,25 @@ code == 401 无权限或登录超时
 |data.list[].answerState | Integer  | 答题状态（1：及格；2：不及格） |
 |data.list[].answerStateName | String  | 答题状态 |
 
+####我的考试答案列表：myExam/answerList
+######请求参数
+| 参数     |  类型   |  描述  |  必填 |
+| --------   | -----   | -----  | ---- |
+|myExamId      | Integer  | 我的考试ID   |   否     |
+######响应数据
+| 参数  |  类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | Integer  | 响应码 |
+|msg     | String  | 响应消息 |
+|data[].questionId | Integer  | 试题ID |
+|data[].answerTime | Date | 答题时间 |
+|data[].answer | Text | 答案 |
+|data[].markUserId | Integer | 阅卷人ID |
+|data[].markUserName | String | 阅卷人名称 |
+|data[].markTime | Date | 阅卷时间 |
+|data[].score | Double | 得分 |
+|data[].questionScore | Double | 试卷分数 |
+
 ####我的考试更新答案：myExam/updateAnswer
 ######请求参数
 | 参数     |  类型   |  描述  |  必填 |

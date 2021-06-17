@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,12 +77,12 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
-	public PageResult listpage(PageIn pageIn) {
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	public PageResult listpage() {
 		try {
-			pageIn.setTen(getCurUser().getId().toString());
-			pageIn.setFour("1");
-			pageIn.setEight(getCurUser().getId().toString());
+			PageIn pageIn = new PageIn(request);
+			pageIn.addAttr("CurUserId", getCurUser().getId());
+			pageIn.addAttr("state", "1");
 			PageOut pageOut = examService.getListpage(pageIn);
 			
 			Date curTime = new Date();
@@ -113,7 +114,7 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult add(MyMark myMark) {
 		try {
 			myMarkService.add(myMark);
@@ -133,7 +134,7 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/subject")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult subject(Integer paperId) {
 		try {
 			List<Integer> questionIdList = new ArrayList<Integer>();
@@ -157,7 +158,7 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/exam")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult exam(Integer paperId) {
 		try {
 			List<Map<String, Object>> mapList = new ArrayList<Map<String, Object>>();
@@ -185,10 +186,11 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/detailList")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
-	public PageResult detailList(PageIn pageIn) {
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	public PageResult detailList() {
 		try {
-			pageIn.setEight(getCurUser().getId().toString());
+			PageIn pageIn = new PageIn(request);
+			pageIn.addAttr("CurUserId", getCurUser().getId());
 			PageOut pageOut = myExamService.getListpage(pageIn);
 			List<Map<String, Object>> list = pageOut.getList();
 			
@@ -255,7 +257,7 @@ public class ApiMyMarkController extends BaseController {
 	 * @return String
 	 */
 	@RequestMapping("/toMark")
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public String toMark(Model model, Integer myExamId) {//TODO
 		try {
 			// 校验数据有效性
@@ -335,7 +337,7 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/scoreUpdate")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult scoreUpdate(Integer myExamDetailId, BigDecimal score) {
 		try {
 			// 校验数据有效性
@@ -398,7 +400,7 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/mark")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult mark(Integer myExamId) {
 		try {
 			// 校验数据有效性
@@ -476,7 +478,7 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/autoMark")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult autoMark(Integer examId) {
 		try {
 			String processBarId = UUID.randomUUID().toString();

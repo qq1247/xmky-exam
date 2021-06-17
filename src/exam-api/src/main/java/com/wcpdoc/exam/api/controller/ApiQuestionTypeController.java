@@ -4,6 +4,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,13 +51,10 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
-	public PageResult listpage(PageIn pageIn, String name) {
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	public PageResult listpage() {
 		try {
-			if (ValidateUtil.isValid(name)) {
-				pageIn.setTwo(name);
-			}
-			PageOut listpage = questionTypeService.getListpage(pageIn);
+			PageOut listpage = questionTypeService.getListpage(new PageIn(request));
 			for(Map<String, Object> mapList : listpage.getList()){
 				if(mapList.get("readUserIds")!= null){
 					String[] readUserSplit = mapList.get("readUserIds").toString().subSequence(1, mapList.get("readUserIds").toString().length()).toString().split(",");
@@ -104,7 +102,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult add(String name, Integer imgId) {
 		try {
 			questionTypeService.addAndUpdate(name, imgId);
@@ -126,7 +124,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult edit(Integer id, String name, Integer imgId) {
 		try {
 			questionTypeService.editAndUpdate(id, name, imgId);
@@ -148,7 +146,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			questionTypeService.delAndUpdate(id);
@@ -170,7 +168,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult get(Integer id) {
 		try {
 			QuestionType entity = questionTypeService.getEntity(id);
@@ -200,15 +198,16 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/authUserListpage")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
-	public PageResult authUserListpage(PageIn pageIn, String rw, Integer id) {
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	public PageResult authUserListpage() {
 		try {
-			if(id != null && ValidateUtil.isValid(rw) && "w".equals(rw)){
-				pageIn.setOne(id.toString());
-			}
-			if(id != null && ValidateUtil.isValid(rw) && "r".equals(rw)){
-				pageIn.setTwo(id.toString());
-			}
+			PageIn pageIn = new PageIn(request);
+		    if(pageIn.get("id", Integer.class) != null && ValidateUtil.isValid(pageIn.get("rw")) && "w".equals(pageIn.get("rw"))){
+		     pageIn.addAttr("idw", pageIn.get("id", Integer.class).toString());
+		    }
+		    if(pageIn.get("id", Integer.class) != null && ValidateUtil.isValid(pageIn.get("rw")) && "r".equals(pageIn.get("rw"))){
+		     pageIn.addAttr("idr", pageIn.get("id", Integer.class).toString());
+		    }
 			return PageResultEx.ok().data(questionTypeService.authUserListpage(pageIn));
 		} catch (MyException e) {
 			log.error("权限用户列表错误：{}", e.getMessage());
@@ -231,7 +230,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/auth")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult auth(Integer id, String readUserIds, String writeUserIds) {
 		try {
 			questionTypeService.auth(id, readUserIds, writeUserIds);
@@ -254,7 +253,7 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/move")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult move(Integer id, Integer sourceId, Integer targetId) {
 		try {
 			questionService.move(id, sourceId, targetId);

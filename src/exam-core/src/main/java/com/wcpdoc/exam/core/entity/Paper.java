@@ -44,8 +44,6 @@ public class Paper {
 	private Integer paperTypeId;
 	@Column(name = "GEN_TYPE")
 	private Integer genType;	
-	@Column(name = "QUESTION")
-	private Integer question;
 	@Column(name = "MINIMIZE_NUM")
 	private Integer minimizeNum;
 	@Column(name = "UPDATE_USER_ID")
@@ -151,14 +149,6 @@ public class Paper {
 
 	public void setReadNum(Integer readNum) {
 		this.readNum = readNum;
-	}
-
-	public Integer getQuestion() {
-		return question;
-	}
-
-	public void setQuestion(Integer question) {
-		this.question = question;
 	}
 
 	public Integer getMinimizeNum() {

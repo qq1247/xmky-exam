@@ -39,17 +39,17 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 				+ "LEFT JOIN EXM_QUESTION_TYPE QUESTION_TYPE ON QUESTION.QUESTION_TYPE_ID = QUESTION_TYPE.ID "
 				+ "LEFT JOIN SYS_USER USER ON QUESTION.UPDATE_USER_ID = USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "QUESTION.QUESTION_TYPE_ID = ?", pageIn.getOne())
-				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "QUESTION.ID = ?", pageIn.getTwo())
-				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "QUESTION.TITLE LIKE ?", "%" + pageIn.getThree() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "QUESTION.STATE = ?", pageIn.getFour())//0：删除；1：启用；2：禁用
-				.addWhere(ValidateUtil.isValid(pageIn.getFive()), "QUESTION.TYPE = ?", pageIn.getFive())
-				.addWhere(ValidateUtil.isValid(pageIn.getSix()), "QUESTION.DIFFICULTY = ?", pageIn.getSix())
-				.addWhere(ValidateUtil.isValid(pageIn.getSeven()), "QUESTION_TYPE.NAME LIKE ?", "%" + pageIn.getSeven() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getEight()), "QUESTION.SCORE = ?", pageIn.getEight())
-				.addWhere(ValidateUtil.isValid(pageIn.getSortOne()), "QUESTION.SCORE >= ?", pageIn.getSortOne())
-				.addWhere(ValidateUtil.isValid(pageIn.getSortTwo()), "QUESTION.SCORE <= ?", pageIn.getSortTwo())
-				.addWhere(ValidateUtil.isValid(pageIn.getNine()), "NOT EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.getNine())
+		sqlUtil.addWhere(pageIn.get("questionTypeId", Integer.class) != null && !"1".equals(pageIn.get("questionTypeId", Integer.class)), "QUESTION.QUESTION_TYPE_ID = ?", pageIn.get("questionTypeId", Integer.class))
+				.addWhere(pageIn.get("id", Integer.class)!= null, "QUESTION.ID = ?", pageIn.get("id", Integer.class))
+				.addWhere(ValidateUtil.isValid(pageIn.get("title")), "QUESTION.TITLE LIKE ?", "%" + pageIn.get("title") + "%")
+				.addWhere(pageIn.get("state", Integer.class)!= null, "QUESTION.STATE = ?", pageIn.get("state", Integer.class))//0：删除；1：启用；2：禁用
+				.addWhere(pageIn.get("type", Integer.class)!= null, "QUESTION.TYPE = ?", pageIn.get("type", Integer.class))
+				.addWhere(ValidateUtil.isValid(pageIn.get("difficulty")), "QUESTION.DIFFICULTY = ?", pageIn.get("difficulty"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "QUESTION_TYPE.NAME LIKE ?", "%" + pageIn.get("name") + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.get("score")), "QUESTION.SCORE = ?", pageIn.get("score"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("scoreStart")), "QUESTION.SCORE >= ?", pageIn.get("scoreStart"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("scoreEnd")), "QUESTION.SCORE <= ?", pageIn.get("scoreEnd"))
+				.addWhere(pageIn.get("PaperId", Integer.class)!= null, "NOT EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.get("PaperId", Integer.class))
 				.addWhere("QUESTION.STATE != ?", 0)
 				.addOrder("QUESTION.NO", Order.DESC);
 		

@@ -29,8 +29,8 @@ public class OrgDaoImpl extends RBaseDaoImpl<Org> implements OrgDao {
 				+ "FROM SYS_ORG ORG "
 				+ "LEFT JOIN SYS_ORG PARENT_ORG ON ORG.PARENT_ID = PARENT_ORG.ID";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !("1".equals(pageIn.getOne()) || pageIn.getOne().equals(pageIn.getTen())), "ORG.PARENT_ID = ?", pageIn.getOne())
-				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "ORG.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("parentId")) && !("1".equals(pageIn.get("parentId")) || pageIn.get("parentId").equals(pageIn.get("Ten"))), "ORG.PARENT_ID = ?", pageIn.get("parentId"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("naem")), "ORG.NAME LIKE ?", "%" + pageIn.get("naem") + "%")
 				.addWhere("ORG.STATE = 1")
 				.addOrder("ORG.NO", Order.ASC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);

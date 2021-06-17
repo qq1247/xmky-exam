@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.annotation.Resource;
 
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,10 +52,10 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/userList")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
-	public PageResult userListpage(PageIn pageIn) {
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	public PageResult userListpage() {
 		try {
-			return PageResultEx.ok().data(examService.getUserListpage(pageIn));
+			return PageResultEx.ok().data(examService.getUserListpage(new PageIn(request)));
 		} catch (Exception e) {
 			log.error("用户列表错误：", e);
 			return PageResult.err();
@@ -69,11 +70,12 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
-	public PageResult listpage(PageIn pageIn) {
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	public PageResult listpage() {
 		try {
+			PageIn pageIn = new PageIn(request);
 			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
-				pageIn.setTen(getCurUser().getId().toString());
+				pageIn.addAttr("CurUserId", getCurUser().getId());
 			}
 			return PageResultEx.ok().data(examService.getListpage(pageIn));
 		} catch (Exception e) {
@@ -90,7 +92,7 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult add(Exam exam) {
 		try {
 			//校验数据有效性
@@ -130,7 +132,7 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult edit(Exam exam) {
 		try {
 			//校验数据有效性
@@ -184,7 +186,7 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			Date curTime = new Date();
@@ -217,7 +219,7 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/cfg")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult cfg(Integer id, Integer[] userIds, Integer[] myMarkIds) {
 		try {
 			examService.cfg(id, userIds, myMarkIds);
@@ -240,7 +242,7 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/publish")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult publish(Integer id) {
 		try {
 			Exam exam = examService.getEntity(id);
@@ -272,7 +274,7 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/archive")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult archive(Integer id) {
 		try {
 			Exam exam = examService.getEntity(id);

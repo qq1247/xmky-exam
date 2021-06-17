@@ -39,6 +39,8 @@ public class BulletinBoard {
 	private Integer imgsWidth;
 	@Column(name = "URL")
 	private String url;
+	@Column(name = "TOP_STATE")
+	private Integer topState;
 	@Column(name = "NO")
 	private Integer no;
 	@Column(name = "STATE")
@@ -164,5 +166,13 @@ public class BulletinBoard {
  
 	public void setReadOrgIds(String readOrgIds) {
 		this.readOrgIds = readOrgIds;
+	}
+
+	public Integer getTopState() {
+		return topState;
+	}
+
+	public void setTopState(Integer topState) {
+		this.topState = topState;
 	}
 }

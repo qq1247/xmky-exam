@@ -39,11 +39,11 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 				+ "INNER JOIN SYS_USER USER ON MY_EXAM.USER_ID = USER.ID";
 		
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()), "EXAM.ID = ?", pageIn.getOne())
-				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "EXAM.NAME LIKE ?", "%" + pageIn.getThree() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getEight()), "EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE USER_ID = ? AND Z.EXAM_ID = MY_EXAM.EXAM_ID)", pageIn.getEight())
-				.addWhere(ValidateUtil.isValid(pageIn.getNine()), "MY_EXAM.MARK_USER_ID =  ?", pageIn.getNine())
-				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "MY_EXAM.USER_ID =  ?", pageIn.getTen())
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("id")), "EXAM.ID = ?", pageIn.get("id"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "EXAM.NAME LIKE ?", "%" + pageIn.get("name") + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.get("userId")), "EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE USER_ID = ? AND Z.EXAM_ID = MY_EXAM.EXAM_ID)", pageIn.get("userId"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("markUserId")), "MY_EXAM.MARK_USER_ID =  ?", pageIn.get("markUserId"))
+				.addWhere(pageIn.get("CurUserId", Integer.class) != null, "MY_EXAM.USER_ID =  ?", pageIn.get("CurUserId", Integer.class))
 				.addWhere("EXAM.STATE = ?", 1)
 //				.addWhere("PAPER.STATE = ?", 1)//删除了试卷也能查看
 //				.addWhere("USER.STATE = ?", 1)
@@ -83,7 +83,7 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 				+ "INNER JOIN EXM_EXAM EXAM ON MY_EXAM.EXAM_ID = EXAM.ID "
 				+ "INNER JOIN SYS_USER USER ON MY_EXAM.USER_ID = USER.ID";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()), "EXAM.ID = ?", pageIn.getOne())
+		sqlUtil.addWhere(pageIn.get("examId", Integer.class) != null, "EXAM.ID = ?", pageIn.get("examId", Integer.class))
 				.addOrder("MY_EXAM.TOTAL_SCORE", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		return pageOut;

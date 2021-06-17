@@ -13,7 +13,6 @@ import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.HibernateUtil;
 import com.wcpdoc.exam.core.util.SqlUtil;
 import com.wcpdoc.exam.core.util.SqlUtil.Order;
-import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
  * 用户数据访问层实现
@@ -31,10 +30,10 @@ public class UserDaoImpl extends RBaseDaoImpl<User> implements UserDao {
 				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID ";
 				
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !("1".equals(pageIn.getOne()) || pageIn.getOne().equals(pageIn.getTen())), "ORG.ID = ?", pageIn.getOne())
-				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "ORG.NAME LIKE ?", "%" + pageIn.getThree() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "USER.ORG_ID = ?", pageIn.getFour())
+		sqlUtil.addWhere(pageIn. get("One") != null && !("1".equals(pageIn.get("One")) || pageIn.get("One").equals(pageIn.get("Ten"))), "ORG.ID = ?", pageIn.get("One"))
+				.addWhere(pageIn.get("name") != null, "USER.NAME LIKE ?", "%" + pageIn.get("name") + "%")
+				.addWhere(pageIn.get("Three") != null, "ORG.NAME LIKE ?", "%" + pageIn.get("Three") + "%")
+				.addWhere(pageIn.get("orgId") != null, "USER.ORG_ID = ?", pageIn.get("orgId"))
 				.addWhere("USER.STATE != ?", 0)
 				.addOrder("USER.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
