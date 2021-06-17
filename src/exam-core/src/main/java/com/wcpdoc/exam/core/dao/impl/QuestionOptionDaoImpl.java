@@ -24,7 +24,7 @@ public class QuestionOptionDaoImpl extends RBaseDaoImpl<QuestionOption> implemen
 		String sql = "SELECT * "
 				+ "FROM EXM_QUESTION_OPTION QUESTION_OPTION ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "QUESTION_OPTION.ID = ?", pageIn.getTwo());
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("id").toString()), "QUESTION_OPTION.ID = ?", pageIn.get("id").toString());
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		return pageOut;
 	}

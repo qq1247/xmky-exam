@@ -6,10 +6,11 @@
         <el-input
           placeholder="请输入名称"
           v-model="queryForm.examName"
+          class="query-input"
         ></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="paperListPage" icon="el-icon-search" type="primary"
+        <el-button @click="query()" icon="el-icon-search" type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -347,11 +348,11 @@ export default {
     }
   },
   mounted() {
-    this.paperListPage()
+    this.query()
   },
   methods: {
     // 查询
-    async paperListPage() {
+    async query() {
       const res = await this.$https.paperListPage({
         name: this.queryForm.name,
         userName: this.userName,

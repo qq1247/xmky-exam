@@ -7,7 +7,7 @@ package com.wcpdoc.exam.base.entity;
  */
 public class UserToken {
 	private String accessToken;
-	private String name;
+	private String userName;
 
 	public String getAccessToken() {
 		return accessToken;
@@ -17,12 +17,12 @@ public class UserToken {
 		this.accessToken = accessToken;
 	}
 
-	public String getName() {
-		return name;
+	public String getUserName() {
+		return userName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 
 }

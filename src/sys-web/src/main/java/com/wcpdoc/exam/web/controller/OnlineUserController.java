@@ -64,8 +64,8 @@ public class OnlineUserController extends BaseController{
 			for(HttpSession session : sessionList) {
 				User user = (User) session.getAttribute(ConstantManager.USER);
 				
-				if(ValidateUtil.isValid(pageIn.getTwo())) {
-					if(!user.getLoginName().contains(pageIn.getTwo())) {
+				if(ValidateUtil.isValid(pageIn.get("loginName").toString())) {
+					if(!user.getLoginName().contains(pageIn.get("loginName").toString())) {
 						continue;
 					}
 				}

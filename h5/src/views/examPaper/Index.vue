@@ -7,11 +7,12 @@
           <el-input
             placeholder="请输入名称"
             v-model="queryForm.queryName"
+            class="query-input"
           ></el-input>
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query(1)" icon="el-icon-search" type="primary"
+        <el-button @click="query()" icon="el-icon-search" type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -31,28 +32,15 @@
             <span>添加试卷分类</span>
           </div>
         </div>
-        <div v-for="(item, index) in typeList" :key="index" class="exam-item">
-          <div class="exam-content">
-            <div class="title">{{ item.name }}</div>
-            <div class="content-info">
-              <span>读取权限：张三</span>
-            </div>
-            <div class="content-info">
-              <span>使用权限：张三、张三、张三</span>
-            </div>
-            <div class="handler">
-              <span data-title="编辑" @click="examEdit(item)">
-                <i class="common common-edit"></i>
-              </span>
-              <span data-title="删除" @click="examDel(item.id)">
-                <i class="common common-delete"></i>
-              </span>
-              <span data-title="试卷列表" @click="goDetail">
-                <i class="common common-list-row"></i>
-              </span>
-            </div>
-          </div>
-        </div>
+        <ListCard
+          v-for="(item, index) in typeList"
+          :key="index"
+          :data="item"
+          name="paper"
+          @edit="edit"
+          @del="del"
+          @detail="goDetail"
+        ></ListCard>
       </div>
       <el-pagination
         background
@@ -63,7 +51,7 @@
         :total="total"
         :page-size="pageSize"
         :current-page="1"
-        @current-change="handleCurrentChange"
+        @current-change="pageChange"
       >
       </el-pagination>
     </div>
@@ -88,7 +76,7 @@
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="examHandler" type="primary">{{
+        <el-button @click="addOrEdit" type="primary">{{
           examForm.edit ? "修改" : "添加"
         }}</el-button>
         <el-button @click="examForm.show = false">取消</el-button>
@@ -98,7 +86,11 @@
 </template>
 
 <script>
+import ListCard from "@/components/ListCard.vue"
 export default {
+  components: {
+    ListCard
+  },
   data() {
     return {
       pageSize: 5,
@@ -121,21 +113,21 @@ export default {
     }
   },
   mounted() {
-    this.query(1)
+    this.query()
   },
   methods: {
-    // 查询
-    async query(curPage) {
+    // 查询分类信息
+    async query(curPage = 1) {
       const typeList = await this.$https.paperTypeListPage({
         name: this.queryForm.queryName,
         curPage,
         pageSize: this.pageSize
       })
-      this.typeList = typeList.data.rows
+      this.typeList = typeList.data.list
       this.total = typeList.data.total
     },
-    // 添加试卷信息
-    examHandler() {
+    // 添加 || 修改试卷名称
+    addOrEdit() {
       this.$refs["examForm"].validate(async valid => {
         if (!valid) {
           return
@@ -168,32 +160,39 @@ export default {
         }
       })
     },
-    examEdit({ id, name }) {
+    // 编辑分类
+    edit({ id, name }) {
       this.examForm.edit = true
       this.examForm.id = id
       this.examForm.examName = name
       this.examForm.show = true
     },
-    async examDel(id) {
-      const res = await this.$https.paperTypeDel({
-        id
+    // 删除分类
+    del({ id }) {
+      this.$https
+        .paperTypeDel({
+          id
+        })
+        .then(res => {
+          if (res.code == 200) {
+            this.$tools.message("删除成功！")
+            this.query()
+          } else {
+            this.$tools.message("删除成功！", "error")
+          }
+        })
+        .catch(error => {})
+    },
+    // 试卷子分类
+    goDetail({ id, name }) {
+      this.$router.push({
+        path: "/examPaper/list",
+        query: { id, name }
       })
-
-      if (res.code == 200) {
-        this.$tools.message("删除成功！")
-        this.query()
-      } else {
-        this.$tools.message("删除成功！", "error")
-      }
     },
-    examRole() {},
-    examOpen() {},
-    handleCurrentChange(val) {
+    // 分页切换
+    pageChange(val) {
       this.query(val)
-    },
-    // 试题详情
-    goDetail() {
-      this.$router.push("/examPaper/classify")
     }
   }
 }

@@ -73,16 +73,20 @@
           ]"
           :key="btn.type"
           @click="updateType(btn.type)"
-          v-for="btn in btnGroup1"
+          v-for="btn in typeButtonGroup"
         >
           <img :src="btn.img" />
           {{ btn.name }}
-          <img src="@/assets/img/icon/icon6.png" />
+          <img src="@/assets/img/icon/active-icon.png" />
         </div>
         <div class="splitLine"></div>
-        <div :key="btn.type" class="left-bottom" v-for="btn in btnGroup2">
-          <img :src="btn.img" />
-          {{ btn.name }}
+        <div class="left-bottom" @click="questionTemplate">
+          <img src="../../assets/img/icon/template-icon.png" />
+          试题模板
+        </div>
+        <div class="left-bottom" @click="fileForm.show = true">
+          <img src="../../assets/img/icon/import-icon.png" />
+          试题导入
         </div>
       </div>
       <div class="content-center" v-if="list.questionList.length == 0">
@@ -93,32 +97,32 @@
       </div>
       <div class="content-center" v-if="list.questionList.length > 0">
         <el-card
-          :key="quesiton.ID"
+          :key="quesiton.id"
           class="center-card"
           shadow="hover"
-          v-for="quesiton in list.questionList"
+          v-for="(quesiton, index) in list.questionList"
         >
           <div class="center-card-top">
-            {{ quesiton.ID }}、{{ quesiton.TITLE }}
+            {{ index + 1 }}、{{ quesiton.title }}
           </div>
           <div class="center-card-bottom">
             <div class="card-bottom-left">
               <el-tag class="center-tag-danger" size="mini" type="danger">{{
-                quesiton.TYPE_NAME
+                quesiton.typeName
               }}</el-tag>
               <el-tag class="center-tag-purple" effect="plain" size="mini">{{
-                quesiton.DIFFICULTY_NAME
+                quesiton.difficultyName
               }}</el-tag>
               <el-tag effect="plain" size="mini" type="danger"
-                >{{ quesiton.SCORE }}分</el-tag
+                >{{ quesiton.score }}分</el-tag
               >
               <el-tag effect="plain" size="mini">{{
-                quesiton.UPDATE_USER_NAME
+                quesiton.updateUserName
               }}</el-tag>
             </div>
             <div class="card-bottom-right">
               <el-button
-                @click="get(quesiton.ID)"
+                @click="get(quesiton.id)"
                 class="btn"
                 icon="el-icon-document"
                 plain
@@ -128,6 +132,7 @@
                 >详细</el-button
               >
               <el-button
+                @click="copy(quesiton.id)"
                 class="btn"
                 icon="el-icon-document-copy"
                 plain
@@ -137,7 +142,7 @@
                 >复制</el-button
               >
               <el-button
-                @click="del(quesiton.ID)"
+                @click="del(quesiton.id)"
                 class="btn"
                 icon="el-icon-delete"
                 plain
@@ -172,7 +177,6 @@
             <el-col :span="11">
               <el-form-item label="类型" prop="type">
                 <el-select
-                  @change="updateOptionAndAnswer"
                   disabled
                   placeholder="请选择类型"
                   v-model="editForm.type"
@@ -240,11 +244,7 @@
               >-删除选项</el-button
             >
           </el-form-item>
-          <el-form-item
-            label="答案"
-            prop="answer"
-            v-if="editForm.type === 1 || editForm.type === 4"
-          >
+          <el-form-item label="答案" prop="answer" v-if="editForm.type === 1">
             <el-radio-group v-model="editForm.answer">
               <el-radio
                 :key="answer.lab"
@@ -255,7 +255,7 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item label="答案" prop="answer" v-if="editForm.type === 2">
-            <el-checkbox-group v-model="editForm.answer">
+            <el-checkbox-group v-model="editForm.answerMultip">
               <el-checkbox
                 :key="answer.lab"
                 :label="answer.lab"
@@ -296,6 +296,16 @@
                 >-删除填空</el-button
               >
             </el-card>
+          </el-form-item>
+          <el-form-item label="答案" v-if="editForm.type === 4">
+            <el-radio-group v-model="editForm.answer">
+              <el-radio
+                :key="answer.lab"
+                :label="answer.lab"
+                v-for="answer in editForm.judgeAnswers"
+                >{{ answer.lab }}</el-radio
+              >
+            </el-radio-group>
           </el-form-item>
           <el-form-item label="答案" prop="answer" v-if="editForm.type === 5">
             <Editor
@@ -386,14 +396,14 @@
               @click="add()"
               style="width: 164px; height: 40px"
               type="primary"
-              v-if="editForm.id === null"
+              v-if="!editForm.id"
               >添加</el-button
             >
             <el-button
               @click="edit(false)"
               style="width: 164px; height: 40px"
               type="primary"
-              v-if="editForm.id != null"
+              v-if="editForm.id"
               >修改</el-button
             >
             <el-button
@@ -408,6 +418,25 @@
         </el-form>
       </div>
     </div>
+    <el-dialog
+      :visible.sync="fileForm.show"
+      :show-close="false"
+      width="30%"
+      title="上传试题模板"
+      :close-on-click-modal="false"
+    >
+      <el-form :model="fileForm" ref="fileForm">
+        <input
+          type="file"
+          id="docId"
+          accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        />
+      </el-form>
+      <div class="dialog-footer" slot="footer">
+        <el-button @click="questionImport" type="primary">上传</el-button>
+        <el-button @click="fileForm.show = false">取消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -429,29 +458,58 @@ export default {
       },
       queryForm: {
         //查询表单
-        id: null, //主键
-        title: null, //标题
+        id: "", //主键
+        title: "", //标题
         type: null, //类型
         difficulty: null, //难度
-        startScore: null, //得分大于
-        endScore: null, //得分小于
+        startScore: "", //得分大于
+        endScore: "", //得分小于
         name: "", //试题分类name
-        questionTypeId: null, //试题分类id
+        questionTypeId: 1, //试题分类id
         difficultyDictList: [], //难度列表
         typeDictList: [] //类型列表
       },
       editForm: {
         //修改表单
-        id: null, //主键
-        type: null, //类型
-        difficulty: null, //难度
-        title: null, //标题
-        options: [], //选项
-        answer: null, //答案
-        answers: [], //答案
-        analysis: null, //解析
-        score: null, //分值
-        no: null, //排序
+        id: 0, //主键
+        type: 1, //类型
+        difficulty: 1, //难度
+        title: "", //标题
+        options: [
+          {
+            lab: "A",
+            value: ""
+          },
+          {
+            lab: "B",
+            value: ""
+          }
+        ], //选项
+        answer: "", //答案
+        answerMultip: [],
+        answers: [
+          {
+            lab: "A",
+            value: ""
+          },
+          {
+            lab: "B",
+            value: ""
+          }
+        ], //答案
+        judgeAnswers: [
+          {
+            lab: "对",
+            value: ""
+          },
+          {
+            lab: "错",
+            value: ""
+          }
+        ],
+        analysis: "", //解析
+        score: 1, //分值
+        no: 1, //排序
         scoreOptions: [],
         rules: {
           type: [{ required: true, message: "请选择类型", trigger: "change" }],
@@ -466,53 +524,56 @@ export default {
           no: [{ required: true, message: "请输入排序", trigger: "change" }]
         }
       },
-      btnGroup1: [
+      typeButtonGroup: [
         // 左侧按钮组1
         {
           type: 1,
           name: "单选题",
-          img: require("@/assets/img/icon/icon1.png")
+          img: require("@/assets/img/icon/radio-icon.png")
         },
         {
           type: 2,
           name: "多选题",
-          img: require("@/assets/img/icon/icon2.png")
+          img: require("@/assets/img/icon/checkbox-icon.png")
         },
         {
           type: 3,
           name: "填空题",
-          img: require("@/assets/img/icon/icon3.png")
+          img: require("@/assets/img/icon/blanks-icon.png")
         },
         {
           type: 4,
           name: "判断题",
-          img: require("@/assets/img/icon/icon4.png")
+          img: require("@/assets/img/icon/judge-icon.png")
         },
         {
           type: 5,
           name: "问答题",
-          img: require("@/assets/img/icon/icon5.png")
+          img: require("@/assets/img/icon/ask-icon.png")
         }
       ],
-      btnGroup2: [
+      handlerButtonGroup: [
         // 左侧按钮组2
         {
           name: "试题模板",
-          img: require("@/assets/img/icon/icon7.png")
+          img: require("@/assets/img/icon/template-icon.png")
         },
         {
           name: "试题导入",
-          img: require("@/assets/img/icon/icon8.png")
-        },
-        {
+          img: require("@/assets/img/icon/import-icon.png")
+        }
+        /* {
           name: "试题导出",
-          img: require("@/assets/img/icon/icon9.png")
+          img: require("@/assets/img/icon/export-icon.png")
         },
         {
           name: "清空试题",
-          img: require("@/assets/img/icon/icon10.png")
-        }
-      ]
+          img: require("@/assets/img/icon/clear-icon.png")
+        } */
+      ],
+      fileForm: {
+        show: false
+      }
     }
   },
   created() {
@@ -532,28 +593,24 @@ export default {
       let typeDictData = await this.$https.dictListpage({
         dictIndex: "QUESTION_TYPE"
       })
-      this.queryForm.typeDictList = typeDictData.data.rows // 初始化类型下拉框
+      this.queryForm.typeDictList = typeDictData.data.list // 初始化类型下拉框
 
       let difficultyDictData = await this.$https.dictListpage({
         dictIndex: "QUESTION_DIFFICULTY"
       })
-      this.queryForm.difficultyDictList = difficultyDictData.data.rows // 初始化难度下拉框
+      this.queryForm.difficultyDictList = difficultyDictData.data.list // 初始化难度下拉框
 
-      this.btnGroup1[0].checked = true //默认选中类型按钮
+      this.typeButtonGroup[0].checked = true //默认选中类型按钮
       this.editForm.type = 1 //默认选中类型
       this.editForm.difficulty = 1 //默认选中简单
       this.editForm.score = 1 //默认得分为1
       this.editForm.no = 1 //默认排序为1
       this.editForm.answer = "" //默认答案为空
-
-      for (let i = 0; i < 2; i++) {
-        this._addOption(i, "") //默认添加两个选项
-      }
     },
     // 查询
     async query() {
       let {
-        data: { rows, total }
+        data: { list, total }
       } = await this.$https.questionListPage({
         id: this.queryForm.id,
         questionTypeId: this.queryForm.questionTypeId,
@@ -567,7 +624,7 @@ export default {
         pageSize: this.queryForm.pageSize
       })
       this.list.total = total
-      this.list.questionList = rows
+      this.list.questionList = list
     },
     //更新选项和答案
     updateOptionAndAnswer(value) {
@@ -702,24 +759,8 @@ export default {
     },
     //更新类型
     updateType(value) {
-      this.editForm = {
-        //修改表单
-        id: null, //主键
-        type: value, //类型
-        difficulty: null, //难度
-        title: "", //标题
-        options: [], //选项
-        answer: null, //答案
-        answers: [], //答案
-        analysis: null, //解析
-        score: null, //分值
-        no: null, //排序
-        scoreOptions: [],
-        rules: {
-          //校验
-        }
-      }
-      // this.updateOptionAndAnswer(value)
+      Object.assign(this.$data.editForm, this.$options.data().editForm)
+      this.editForm.type = value
     },
     //添加试题
     async add() {
@@ -734,7 +775,8 @@ export default {
           title: this.editForm.title,
           analysis: this.editForm.analysis,
           score: this.editForm.score,
-          no: this.editForm.no
+          no: this.editForm.no,
+          questionTypeId: this.queryForm.questionTypeId
         }
 
         if (params.type === 1 || params.type === 2) {
@@ -849,7 +891,6 @@ export default {
     // 获取试题
     async get(id) {
       let res = await this.$https.questionGet({ id })
-      console.log(res)
       if (res.code != 200) {
         alert(res.msg)
         return
@@ -868,13 +909,13 @@ export default {
         this.editForm.options = [] // 重置选项
         this.editForm.answers = [] //重置答案列表
         for (let i = 0; i < res.data.options.length; i++) {
-          this._addOption(i, res.data.options[i])
+          this._addOption(i, res.data.options[i].options)
         }
       } else if (this.editForm.type === 2) {
         this.editForm.options = [] // 重置选项
         this.editForm.answers = [] //重置答案列表
         for (let i = 0; i < res.data.options.length; i++) {
-          this._addOption(i, res.data.options[i])
+          this._addOption(i, res.data.options[i].options)
         }
 
         this.editForm.answer = res.data.answer.split(",")
@@ -891,6 +932,10 @@ export default {
           res.data.scoreOptions == null ? [] : res.data.scoreOptions.split(",")
       }
     },
+    async copy(id) {
+      await this.$https.questionCopy({ id })
+      this.query()
+    },
     del(id) {
       this.$confirm("确定要删除？", "提示", {
         confirmButtonText: "确定",
@@ -899,6 +944,25 @@ export default {
       }).then(async () => {
         await this.$https.questionDel({ id })
         this.query()
+      })
+    },
+    async questionTemplate() {
+      const template = await this.$https.questionTemplate({}, "blob")
+      let blob = new Blob([template], { type: "application/msword" })
+      let url = window.URL.createObjectURL(blob)
+      let a = document.createElement("a")
+      a.href = url
+      a.download = "试题模板.doc"
+      a.click()
+      window.URL.revokeObjectURL(url)
+    },
+    questionImport() {
+      let formData = new FormData()
+      formData.append("file", document.querySelector("#docId").files[0])
+      formData.append("questionTypeId", this.queryForm.questionTypeId)
+      console.log(formData.get("file"))
+      this.$https.questionImport(formData, "json", {
+        "Content-Type": "multipart/form-data"
       })
     }
   }
@@ -909,6 +973,7 @@ export default {
   width: 100%;
   display: flex;
   flex-direction: column;
+  padding-bottom: 10px;
   padding-top: 0;
 }
 
@@ -960,7 +1025,7 @@ export default {
   .left-center {
     width: 110px;
     height: 40px;
-    border: 1px solid #eeeeeeff;
+    border: 1px solid #eeeeff;
     margin: 7px auto;
     line-height: 40px;
     position: relative;
@@ -1014,6 +1079,10 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    &:hover {
+      border: 1px solid #0095e5;
+      color: #0095e5;
+    }
     img {
       width: 16px;
       height: 16px;
@@ -1032,8 +1101,8 @@ export default {
     display: flex;
     flex-direction: column;
     &:hover {
-      border: 1px solid rgb(30, 159, 255);
-      box-shadow: 0 0 7px 2px rgba(30, 159, 255, 0.15);
+      border: 1px solid #0095e5;
+      box-shadow: 0 0 7px 2px rgba(0, 149, 229, 0.15);
       .card-bottom-right {
         display: block;
       }
@@ -1110,7 +1179,7 @@ export default {
 }
 .el-alert--success.is-light {
   background-color: #ecf7fd;
-  color: #409eff;
+  color: #0095e5;
   margin-bottom: 10px;
 }
 .el-alert {
@@ -1118,7 +1187,7 @@ export default {
 }
 /deep/ .el-alert__title {
   font-size: 12px;
-  color: #409eff;
+  color: #0095e5;
 }
 .el-input /deep/.el-input-group__prepend {
   background-color: #fff;

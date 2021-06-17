@@ -56,7 +56,7 @@ const errorHandle = (status, msg) => {
 
 // 创建axios实例
 var instance = axios.create({
-  baseURL: "http://192.168.110.198:8080/api/",
+  baseURL: "http://192.168.110.86:8080/api/",
   timeout: 1000 * 10
 })
 
@@ -79,15 +79,20 @@ instance.interceptors.response.use(
   res => {
     const {
       data: { code, msg },
-      headers
+      headers,
+      config
     } = res
-    if (code == 200) {
-      headers?.Authorization &&
-        localStorage.setItem("token", headers.Authorization)
+    headers?.Authorization &&
+      localStorage.setItem("token", headers.Authorization)
+    if (config.responseType == "blob") {
       return Promise.resolve(res.data)
     } else {
-      errorHandle(code, msg)
-      return Promise.reject(res)
+      if (code == 200) {
+        return Promise.resolve(res.data)
+      } else {
+        errorHandle(code, msg)
+        return Promise.reject(res)
+      }
     }
   },
   // 请求失败

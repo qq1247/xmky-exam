@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.annotation.Resource;
 
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,7 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult listpage(PageIn pageIn) {
 		try {
 			return PageResultEx.ok().data(questionTypeOpenService.getListpage(pageIn));
@@ -58,7 +59,7 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult add(QuestionTypeOpen questionTypeOpen) {
 		try {
 			questionTypeOpen.setUpdateUserId(getCurUser().getId());
@@ -82,7 +83,7 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult edit(QuestionTypeOpen questionTypeOpen) {
 		try {
 			QuestionTypeOpen entity = questionTypeOpenService.getEntity(questionTypeOpen.getId());
@@ -113,7 +114,7 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles("subAdmin")
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			questionTypeOpenService.delAndUpdate(id);

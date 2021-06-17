@@ -465,9 +465,9 @@ alter table EXM_MY_EXAM_DETAIL add constraint FK_Reference_25 foreign key (QUEST
 drop table if exists JM_BULLETIN_BOARD;
 
 /*==============================================================*/
-/* Table: JM_BULLETIN_BOARD                                     */
+/* Table: EXM_BULLETIN_BOARD                                     */
 /*==============================================================*/
-create table JM_BULLETIN_BOARD
+create table EXM_BULLETIN_BOARD
 (
    ID                   int not null auto_increment comment '主键',
    TITLE                varchar(32) comment '标题',
@@ -477,6 +477,7 @@ create table JM_BULLETIN_BOARD
    IMGS_HEIGHT          int comment '图片高',
    IMGS_WIDTH           int comment '图片宽',
    URL                  varchar(128) comment '跳转链接',
+   TOP_STATE            int comment '1：是；2：否',
    NO                   int comment '排序',
    STATE                int comment '0：删除；1：正常',
    UPDATE_TIME          datetime comment '修改时间',
@@ -486,7 +487,7 @@ create table JM_BULLETIN_BOARD
    primary key (ID)
 );
 
-alter table JM_BULLETIN_BOARD comment '公告栏';
+alter table EXM_BULLETIN_BOARD comment '公告栏';
 
 /*==============================================================*/
 /* 数据								*/

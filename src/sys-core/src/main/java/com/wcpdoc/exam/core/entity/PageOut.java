@@ -11,30 +11,32 @@ import java.util.Map;
  */
 public class PageOut {
 	private int total;// 总记录条数
-	private List<Map<String, Object>> rows;// 结果集
+	private List<Map<String, Object>> list;// 结果列表
 
 	public PageOut() {
 
 	}
 
-	public PageOut(List<Map<String, Object>> rows, int total) {
+	public PageOut(List<Map<String, Object>> list, int total) {
 		this.total = total;
-		this.rows = rows;
+		this.list = list;
 	}
 
 	public int getTotal() {
 		return total;
 	}
 
-	public void setTotal(int total) {
+	public PageOut setTotal(int total) {
 		this.total = total;
+		return this;
 	}
 
-	public List<Map<String, Object>> getRows() {
-		return rows;
+	public List<Map<String, Object>> getList() {
+		return list;
 	}
 
-	public void setRows(List<Map<String, Object>> rows) {
-		this.rows = rows;
+	public PageOut setList(List<Map<String, Object>> list) {
+		this.list = list;
+		return this;
 	}
 }

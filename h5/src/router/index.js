@@ -23,9 +23,9 @@ const routes = [
     component: () => import("../views/examPaper/Index.vue")
   },
   {
-    path: "/examPaper/classify",
-    name: "ExamPaperClassify",
-    component: () => import("../views/examPaper/Classify.vue")
+    path: "/examPaper/list",
+    name: "ExamPaperList",
+    component: () => import("../views/examPaper/List.vue")
   },
   {
     path: "/examPaper/edit",
@@ -39,9 +39,9 @@ const routes = [
     component: () => import("../views/examSetting/Index.vue")
   },
   {
-    path: "/examSetting/classify",
-    name: "SettingClassify",
-    component: () => import("../views/examSetting/Classify.vue")
+    path: "/examSetting/list",
+    name: "SettingList",
+    component: () => import("../views/examSetting/List.vue")
   },
   // 试题相关
   {

@@ -192,7 +192,7 @@ public class ApiMyMarkController extends BaseController {
 			PageIn pageIn = new PageIn(request);
 			pageIn.addAttr("CurUserId", getCurUser().getId());
 			PageOut pageOut = myExamService.getListpage(pageIn);
-			List<Map<String, Object>> list = pageOut.getRows();
+			List<Map<String, Object>> list = pageOut.getList();
 			
 			Date curTime = new Date();
 			for(Map<String, Object> map : list) {

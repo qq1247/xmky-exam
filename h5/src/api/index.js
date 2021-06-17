@@ -1,8 +1,18 @@
 import http from "@/util/http" // 导入http中创建的axios实例
 import qs from "qs" // 根据需求是否导入qs模块
 
-const post = async (url, params = {}) =>
-  await http.post(url, qs.stringify(params, { arrayFormat: "repeat" }))
+const post = async (
+  url,
+  params = {},
+  type = "json",
+  headers = {
+    "Content-Type": "application/x-www-form-urlencoded"
+  }
+) =>
+  await http.post(url, qs.stringify(params, { arrayFormat: "repeat" }), {
+    responseType: type,
+    headers: headers
+  })
 
 export default {
   // 用户相关
@@ -100,6 +110,10 @@ export default {
   questionEdit: params => post("question/edit", params),
   questionDel: params => post("question/del", params),
   questionCopy: params => post("question/copy", params),
+  questionTemplate: (params, type) =>
+    post("question/wordTemplateExport", params, type),
+  questionImport: (params, type, headers) =>
+    post("question/wordImp", params, type, headers),
 
   // 试题分类相关
   questionTypeListPage: params => post("questionType/listpage", params),
@@ -108,6 +122,7 @@ export default {
   questionTypeDel: params => post("questionType/del", params),
   questionTypeGet: params => post("questionType/get", params),
   questionTypeMove: params => post("questionType/move", params),
+  questionTypeAuth: params => post("questionType/auth", params),
 
   // 试题分类开放相关
   questionTypeOpenListPage: params => post("questionTypeOpen/listpage", params),

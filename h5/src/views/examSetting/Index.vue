@@ -7,11 +7,12 @@
           <el-input
             placeholder="请输入名称"
             v-model="queryForm.queryName"
+            class="query-input"
           ></el-input>
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query(1)" icon="el-icon-search" type="primary"
+        <el-button @click="query()" icon="el-icon-search" type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -31,28 +32,15 @@
             <span>添加考试分类</span>
           </div>
         </div>
-        <div v-for="(item, index) in typeList" :key="index" class="exam-item">
-          <div class="exam-content">
-            <div class="title">{{ item.name }}</div>
-            <div class="content-info">
-              <span>读取权限：张三</span>
-            </div>
-            <div class="content-info">
-              <span>使用权限：张三、张三、张三</span>
-            </div>
-            <div class="handler">
-              <span data-title="编辑" @click="examEdit(item)">
-                <i class="common common-edit"></i>
-              </span>
-              <span data-title="删除" @click="examDel(item.id)">
-                <i class="common common-delete"></i>
-              </span>
-              <span data-title="考试列表" @click="goDetail">
-                <i class="common common-list-row"></i>
-              </span>
-            </div>
-          </div>
-        </div>
+        <ListCard
+          v-for="(item, index) in typeList"
+          :key="index"
+          :data="item"
+          name="exam"
+          @edit="edit"
+          @del="del"
+          @detail="goDetail"
+        ></ListCard>
       </div>
       <el-pagination
         background
@@ -63,7 +51,7 @@
         :total="total"
         :page-size="pageSize"
         :current-page="1"
-        @current-change="handleCurrentChange"
+        @current-change="pageChange"
       >
       </el-pagination>
     </div>
@@ -98,7 +86,11 @@
 </template>
 
 <script>
+import ListCard from "@/components/ListCard.vue"
 export default {
+  components: {
+    ListCard
+  },
   data() {
     return {
       pageSize: 5,
@@ -124,17 +116,17 @@ export default {
     this.query(1)
   },
   methods: {
-    // 查询
-    async query(curPage) {
+    // 查询分类信息
+    async query(curPage = 1) {
       const typeList = await this.$https.examTypeListPage({
         name: this.queryForm.queryName,
         curPage,
         pageSize: this.pageSize
       })
-      this.typeList = typeList.data.rows
+      this.typeList = typeList.data.list
       this.total = typeList.data.total
     },
-    // 添加考试信息
+    // 添加 || 修改考试名称
     examHandler() {
       this.$refs["examForm"].validate(async valid => {
         if (!valid) {
@@ -168,13 +160,15 @@ export default {
         }
       })
     },
-    examEdit({ id, name }) {
+    // 编辑分类
+    edit({ id, name }) {
       this.examForm.edit = true
       this.examForm.id = id
       this.examForm.examName = name
       this.examForm.show = true
     },
-    async examDel(id) {
+    // 删除分类
+    async del(id) {
       const res = await this.$https.examTypeDel({
         id
       })
@@ -186,13 +180,16 @@ export default {
         this.$tools.message("删除成功！", "error")
       }
     },
-    examRole() {},
-    examOpen() {},
-    handleCurrentChange(val) {
-      this.query(val)
+    // 考试子分类
+    goDetail({ id, name }) {
+      this.$router.push({
+        path: "/examSetting/list",
+        query: { id, name }
+      })
     },
-    goDetail() {
-      this.$router.push("/examPaper/classify")
+    // 分页切换
+    pageChange(val) {
+      this.query(val)
     }
   }
 }

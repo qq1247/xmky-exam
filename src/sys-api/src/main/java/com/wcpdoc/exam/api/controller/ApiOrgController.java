@@ -13,6 +13,7 @@ import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.jxls.common.Context;
 import org.jxls.expression.JexlExpressionEvaluator;
@@ -61,7 +62,7 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/treeList")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult treeList() {
 		try {
 			return PageResultEx.ok().data(orgService.getTreeList());
@@ -81,16 +82,10 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult listpage(PageIn pageIn, Integer parentId, String name) {
 		try {
-			if(ValidateUtil.isValid(name)){
-				pageIn.setTwo(name);
-			}
-			if(parentId != null){
-				pageIn.setOne(parentId.toString());
-			}
-			return PageResultEx.ok().data(orgService.getListpage(pageIn));
+			return PageResultEx.ok().data(orgService.getListpage(new PageIn(request)));
 		} catch (Exception e) {
 			log.error("组织机构列表错误：", e);
 			return PageResult.err();
@@ -107,7 +102,7 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult add(Org org, String phone) {
 		try {
 			orgService.addAndUpdate(org);
@@ -132,7 +127,7 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult edit(Org org) {
 		try {
 			// 校验数据有效性
@@ -174,7 +169,7 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			orgService.delAndUpdate(id);
@@ -199,7 +194,7 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/move")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult move(Integer sourceId, Integer targetId) {
 		try {
 			orgService.doMove(sourceId, targetId);
@@ -221,7 +216,7 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/input")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult input(@RequestParam("file") MultipartFile file) {
 		try {
 			orgXlsxService.inputOrgXlsx(file);
@@ -240,7 +235,7 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/export")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public void export(String ids) {
 		ServletOutputStream outputStream = null;
 		try {
@@ -283,7 +278,7 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/template")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public void template() {
 		OutputStream output = null;
 		try {
@@ -310,7 +305,7 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
-	@RequiresRoles("admin")
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult get(Integer id) {
 		try {
 			Org org = orgService.getEntity(id);
