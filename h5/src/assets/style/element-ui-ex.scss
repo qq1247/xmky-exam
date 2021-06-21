@@ -9,8 +9,9 @@
 html,
 body {
   height: 100%;
-  font: 14px/1.5 "PingFang SC", "微软雅黑", "Microsoft YaHei", Helvetica,
-    "Helvetica Neue", Tahoma, Arial, sans-serif;
+  font: 14px/1.5 Open Sans, -apple-system, BlinkMacSystemFont, Helvetica Neue,
+    Helvetica, Segoe UI, Arial, Roboto, PingFang SC, miui, Hiragino Sans GB,
+    Microsoft Yahei, sans-serif;
 }
 
 .header {
@@ -130,9 +131,12 @@ body {
   .data-img {
     width: 150px;
     height: 150px;
+    color: #999;
+    font-size: 30px;
+    text-align: center;
   }
   .data-tip {
-    font-size: 14px;
+    font-size: 12px;
     color: #999;
     margin-top: 20px;
     line-height: 20px;

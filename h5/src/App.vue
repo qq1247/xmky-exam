@@ -34,45 +34,45 @@ export default {
       navList: [
         {
           to: "/",
-          img: require("../src/assets/logo.png")
+          img: require("../src/assets/logo.png"),
         },
         {
           content: "首页",
-          to: "/"
+          to: "/",
         },
         {
           content: "试题管理",
-          to: "/examLibrary"
+          to: "/examLibrary",
         },
         {
           content: "试卷管理",
-          to: "/examPaper"
+          to: "/examPaper",
         },
         {
           content: "考试管理",
-          to: "/examSetting"
-        }
-      ]
-    }
+          to: "/examSetting",
+        },
+      ],
+    };
   },
   watch: {
     $route: {
       handler(to) {
         if (to.name && this.menuList.includes(to.name)) {
-          this.show = false
-          return
+          this.show = false;
+          return;
         }
-        this.show = true
+        this.show = true;
       },
       deep: true,
-      immediate: true
-    }
-  }
-}
+      immediate: true,
+    },
+  },
+};
 </script>
 
 <style lang="scss">
-@import url(//at.alicdn.com/t/font_840312_oxzb360a4b9.css);
+@import url(//at.alicdn.com/t/font_840312_han9qkt7f9.css);
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
