@@ -463,7 +463,7 @@ export default {
         difficulty: null, //难度
         startScore: "", //得分大于
         endScore: "", //得分小于
-        name: "", //试题分类name
+        questionTypeName: "", //试题分类name
         questionTypeId: 1, //试题分类id
         difficultyDictList: [], //难度列表
         typeDictList: [] //类型列表
@@ -614,7 +614,7 @@ export default {
         id: this.queryForm.id,
         questionTypeId: this.queryForm.questionTypeId,
         title: this.queryForm.title,
-        name: this.queryForm.name,
+        questionTypeName: this.queryForm.questionTypeName,
         type: this.queryForm.type,
         difficulty: this.queryForm.difficulty,
         scoreStart: this.queryForm.scoreStart,
@@ -799,7 +799,7 @@ export default {
           params.answer = this.editForm.answer
         } else if (params.type === 2) {
           //如果是多选，答案按逗号分隔
-          params.answer = this.editForm.answer.join(",")
+          params.answer = this.editForm.answerMultip.join(",")
         } else if (params.type === 3) {
           //如果是填空，答案之间按不可见字符回车分隔
           let _answer = []
@@ -900,6 +900,7 @@ export default {
       this.editForm.difficulty = res.data.difficulty
       this.editForm.title = res.data.title
       this.editForm.answer = res.data.answer
+      this.editForm.answerMultip = res.data.answer.split(",")
       this.editForm.analysis = res.data.analysis
       this.editForm.score = res.data.score
       this.editForm.no = res.data.no

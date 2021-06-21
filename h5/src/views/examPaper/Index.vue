@@ -184,10 +184,10 @@ export default {
         .catch(error => {})
     },
     // 试卷子分类
-    goDetail({ id, name }) {
+    goDetail({ id }) {
       this.$router.push({
         path: "/examPaper/list",
-        query: { id, name }
+        query: { id }
       })
     },
     // 分页切换

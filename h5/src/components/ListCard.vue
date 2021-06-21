@@ -2,12 +2,45 @@
   <div class="exam-item">
     <div class="exam-content">
       <div class="title">{{ data.name }}</div>
-      <div class="content-info">
-        <span>读取权限：{{ data.readUserNames || "暂无" }}</span>
-      </div>
-      <div class="content-info">
-        <span>使用权限：{{ data.writeUserNames || "暂无" }}</span>
-      </div>
+      <template v-if="['question', 'paper', 'exam'].includes(name)">
+        <div class="content-info">
+          <span>读取权限：{{ data.readUserNames || "暂无" }}</span>
+        </div>
+        <div class="content-info">
+          <span>使用权限：{{ data.writeUserNames || "暂无" }}</span>
+        </div>
+      </template>
+      <template v-if="name == 'paperList'">
+        <div class="content-info ellipsis">
+          <span>发布人：{{ data.userName }}</span>
+        </div>
+        <div class="content-info">
+          <span class="space">及格：{{ data.passScore }}</span>
+          <span>满分：{{ data.totalScore }}</span>
+        </div>
+        <div class="content-info">
+          <span class="space"
+            >组卷方式：{{ ["人工组卷", "自动组卷"][data.genType] }}</span
+          >
+          <span>展示方式：{{}}</span>
+        </div>
+      </template>
+      <template v-if="name == 'examList'">
+        <div class="content-info ellipsis">
+          <span>发布人：张三</span>
+        </div>
+        <div class="content-info">
+          <span class="space">成绩公开：是</span>
+          <span>排名公开：是</span>
+        </div>
+        <div class="content-info">
+          <span class="space">考试人数：50</span>
+          <span>阅卷人数：5</span>
+        </div>
+        <div class="content-info">
+          <span style="color: #ff9900">已发布</span>
+        </div>
+      </template>
       <div class="handler">
         <span data-title="编辑" @click="edit(data)">
           <i class="common common-edit"></i>
@@ -22,35 +55,35 @@
           <i class="common common-share"></i>
         </span>
         <span v-if="name == 'paperList'" data-title="复制" @click="copy(data)">
-          <i class="common common-share"></i>
-        </span>
-        <span
-          v-if="name == 'paperList'"
-          data-title="组卷"
-          @click="composition(data)"
-        >
-          <i class="common common-share"></i>
+          <i class="common common-copy"></i>
         </span>
         <span
           v-if="name == 'examList'"
           data-title="通知"
           @click="message(data)"
         >
-          <i class="common common-share"></i>
+          <i class="common common-message"></i>
         </span>
         <span
-          v-if="name == 'paperList' || name == 'examList'"
+          v-if="['paperList', 'examList'].includes(name)"
           data-title="统计"
           @click="statistics(data)"
         >
-          <i class="common common-share"></i>
+          <i class="common common-statistics"></i>
         </span>
         <span
-          v-if="name == 'paperList' || name == 'examList'"
+          v-if="['paperList', 'examList'].includes(name)"
           data-title="归档"
           @click="archive(data)"
         >
-          <i class="common common-share"></i>
+          <i class="common common-archive"></i>
+        </span>
+        <span
+          v-if="name == 'paperList'"
+          data-title="生成试卷"
+          @click="composition(data)"
+        >
+          <i class="common common-composition"></i>
         </span>
         <span
           v-if="detailTitles[name]"
@@ -79,7 +112,7 @@ export default {
   data() {
     return {
       detailTitles: {
-        question: "考试列表",
+        question: "考题详情",
         paper: "试卷列表",
         exam: "考试列表"
       }
