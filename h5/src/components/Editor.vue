@@ -32,7 +32,7 @@ export default {
   methods: {
     editData($event) {
       this.$emit("editorListener", this.id, $event);
-    },
+    }
   },
 };
 </script>

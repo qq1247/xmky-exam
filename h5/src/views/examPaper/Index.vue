@@ -12,7 +12,8 @@
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query()" icon="el-icon-search" type="primary"
+        <el-button @click="query()" icon="el-icon-search"
+type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -24,8 +25,8 @@
           <div
             class="exam-content exam-add"
             @click="
-              examForm.show = true
-              examForm.edit = false
+              examForm.show = true;
+              examForm.edit = false;
             "
           >
             <i class="common common-plus"></i>
@@ -86,7 +87,7 @@
 </template>
 
 <script>
-import ListCard from "@/components/ListCard.vue"
+import ListCard from "@/components/ListCard.vue";
 export default {
   components: {
     ListCard
@@ -96,7 +97,7 @@ export default {
       pageSize: 5,
       total: 1,
       queryForm: {
-        queryName: ""
+        queryName: "",
       },
       examForm: {
         show: false,
@@ -128,7 +129,7 @@ export default {
     },
     // 添加 || 修改试卷名称
     addOrEdit() {
-      this.$refs["examForm"].validate(async valid => {
+      this.$refs["examForm"].validate(async(valid) => {
         if (!valid) {
           return
         }
@@ -149,8 +150,10 @@ export default {
         if (res.code == 200) {
           this.examForm.show = false
           this.examForm.edit = false
-          this.examForm.examName = ""
-          this.$tools.message(!this.examForm.edit ? "添加成功！" : "修改成功！")
+          this.examForm.examName = "";
+          this.$tools.message(
+            !this.examForm.edit ? '添加成功！' : '修改成功！'
+          )
           this.query()
         } else {
           this.$tools.message(
@@ -173,15 +176,15 @@ export default {
         .paperTypeDel({
           id
         })
-        .then(res => {
+        .then((res) => {
           if (res.code == 200) {
-            this.$tools.message("删除成功！")
+            this.$tools.message("删除成功！");
             this.query()
           } else {
-            this.$tools.message("删除成功！", "error")
+            this.$tools.message("删除成功！", "error");
           }
         })
-        .catch(error => {})
+        .catch((error) => {})
     },
     // 试卷子分类
     goDetail({ id }) {
@@ -193,7 +196,7 @@ export default {
     // 分页切换
     pageChange(val) {
       this.query(val)
-    }
+    },
   }
 }
 </script>

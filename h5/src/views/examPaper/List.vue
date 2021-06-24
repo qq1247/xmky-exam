@@ -3,16 +3,10 @@
     <!-- 搜索 -->
     <el-form :inline="true" :model="queryForm" class="form-inline search">
       <el-form-item>
-        <el-input
-          placeholder="请输入名称"
-          v-model="queryForm.name"
-          class="query-input"
-        ></el-input>
+        <el-input placeholder="请输入名称" v-model="queryForm.name" class="query-input"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="query()" icon="el-icon-search" type="primary"
-          >查询</el-button
-        >
+        <el-button @click="query()" icon="el-icon-search" type="primary">查询</el-button>
       </el-form-item>
     </el-form>
     <!-- 内容 -->
@@ -48,29 +42,18 @@
         :page-size="pageSize"
         :current-page="1"
         @current-change="pageChange"
-      >
-      </el-pagination>
+      ></el-pagination>
     </div>
-    <el-dialog
-      :visible.sync="paperForm.show"
-      :show-close="false"
-      center
-      width="40%"
-    >
-      <el-form
-        :model="paperForm"
-        :rules="paperForm.rules"
-        ref="paperForm"
-        label-width="100px"
-      >
+
+    <el-dialog :visible.sync="paperForm.show" :show-close="false" center width="40%">
+      <el-form :model="paperForm" :rules="paperForm.rules" ref="paperForm" label-width="100px">
         <el-tabs v-model="paperForm.tabActive">
           <el-tab-pane
             v-for="item in paperForm.paperTabs"
             :key="item.name"
             :label="item.title"
             :name="item.name"
-          >
-          </el-tab-pane>
+          ></el-tab-pane>
           <div v-if="paperForm.tabActive == '0'">
             <el-form-item>
               <div class="exam-type">
@@ -85,19 +68,13 @@
                   @click="setPaperType(index)"
                 >
                   <i :class="['common', `${item.icon}`]"></i>
-                  <i
-                    class="common common-selected"
-                    v-if="paperForm.genType == index"
-                  ></i>
+                  <i class="common common-selected" v-if="paperForm.genType == index"></i>
                   {{ item.content }}
                 </div>
               </div>
             </el-form-item>
             <el-form-item label="试卷名称" prop="name">
-              <el-input
-                placeholder="请输入试卷名称"
-                v-model="paperForm.name"
-              ></el-input>
+              <el-input placeholder="请输入试卷名称" v-model="paperForm.name"></el-input>
             </el-form-item>
             <el-form-item label="及格分数" prop="passScore">
               <el-input
@@ -106,22 +83,15 @@
                 max="100"
                 placeholder="请输入及格分数占总分百分比"
                 v-model="paperForm.passScore"
-                ><span slot="append">%</span></el-input
               >
+                <span slot="append">%</span>
+              </el-input>
             </el-form-item>
-            <el-form-item label="考前阅读"
-              ><Editor
-                :value="paperForm.readRemark"
-                @editorListener="readRemark"
-                id="readRemark"
-              ></Editor>
+            <el-form-item label="考前阅读">
+              <Editor :value="paperForm.readRemark" @editorListener="readRemark" id="readRemark"></Editor>
             </el-form-item>
             <el-form-item label="阅读时长">
-              <el-input
-                type="number"
-                placeholder="请输入阅读时长"
-                v-model="paperForm.readNum"
-              ></el-input>
+              <el-input type="number" placeholder="请输入阅读时长" v-model="paperForm.readNum"></el-input>
             </el-form-item>
           </div>
           <div v-if="paperForm.tabActive == '1'">
@@ -131,8 +101,7 @@
                 :key="item.value"
                 v-model="paperForm.showType"
                 :label="item.value"
-                >{{ item.name }}</el-radio
-              >
+              >{{ item.name }}</el-radio>
             </el-form-item>
           </div>
           <div v-if="paperForm.tabActive == '2'">
@@ -142,8 +111,7 @@
                   v-for="(item, index) in paperForm.paperAntiCheat"
                   :label="index"
                   :key="index"
-                  >{{ item }}</el-checkbox
-                >
+                >{{ item }}</el-checkbox>
               </el-checkbox-group>
               <!-- <el-input
                 v-model="paperForm.paperMiniNum"
@@ -151,46 +119,26 @@
                 v-if="paperForm.options.includes('最小化')"
               >
                 <span slot="append">后交卷</span>
-              </el-input> -->
+              </el-input>-->
             </el-form-item>
           </div>
           <div v-if="paperForm.tabActive == '3'">
             <el-form-item label="成绩评语">
-              <el-checkbox v-model="paperForm.paperRemarkShow"
-                >开启</el-checkbox
-              >
+              <el-checkbox v-model="paperForm.paperRemarkShow">开启</el-checkbox>
               <div v-if="paperForm.paperRemarkShow">
-                <div
-                  v-for="item in paperForm.paperRemark"
-                  :key="item.id"
-                  class="exam-remark"
-                >
-                  大于等于<el-input
-                    v-model="item.score"
-                    placeholder="占总分百分比"
-                    class="remark-percentage"
-                  ></el-input
-                  >%，<el-input
-                    v-model="item.remark"
-                    class="remark-content"
-                    placeholder="请输入评语"
-                  ></el-input>
+                <div v-for="item in paperForm.paperRemark" :key="item.id" class="exam-remark">
+                  大于等于
+                  <el-input v-model="item.score" placeholder="占总分百分比" class="remark-percentage"></el-input>%，
+                  <el-input v-model="item.remark" class="remark-content" placeholder="请输入评语"></el-input>
                 </div>
                 <div class="remark-buttons">
-                  <el-button
-                    @click="remarkAdd"
-                    type="primary"
-                    size="mini"
-                    icon="el-icon-plus"
-                    >添加评语</el-button
-                  >
+                  <el-button @click="remarkAdd" type="primary" size="mini" icon="el-icon-plus">添加评语</el-button>
                   <el-button
                     v-if="paperForm.paperRemark.length > 1"
                     @click="remarkDel"
                     size="mini"
                     icon="el-icon-minus"
-                    >添加评语</el-button
-                  >
+                  >添加评语</el-button>
                 </div>
               </div>
             </el-form-item>
@@ -198,15 +146,12 @@
         </el-tabs>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button
-          v-if="!(paperForm.tabActive == '3')"
-          @click="paperNext"
-          type="primary"
-          >下一步</el-button
-        >
-        <el-button @click="addOrEdit">{{
-          paperForm.edit ? "修改" : "添加"
-        }}</el-button>
+        <el-button v-if="!(paperForm.tabActive == '3')" @click="paperNext" type="primary">下一步</el-button>
+        <el-button @click="addOrEdit">
+          {{
+            paperForm.edit ? "修改" : "添加"
+          }}
+        </el-button>
         <el-button @click="paperForm.show = false">取 消</el-button>
       </div>
     </el-dialog>
@@ -214,8 +159,8 @@
 </template>
 
 <script>
-import Editor from "@/components/Editor.vue"
-import ListCard from "@/components/ListCard.vue"
+import Editor from "@/components/Editor.vue";
+import ListCard from "@/components/ListCard.vue";
 export default {
   components: {
     Editor,
@@ -240,20 +185,20 @@ export default {
         showTypes: [
           {
             name: "整张",
-            value: "1"
+            value: "1",
           },
           {
             name: "章节",
-            value: "2"
+            value: "2",
           },
           {
             name: "单题",
-            value: "3"
+            value: "3",
           }
         ],
         paperAntiCheat: [
           "试题乱序",
-          "选项乱序"
+          "选项乱序",
           /* "禁用右键",
           "禁用复制",
           "最小化" */
@@ -264,37 +209,37 @@ export default {
         paperRemark: [
           {
             score: "",
-            remark: ""
+            remark: "",
           }
         ],
         tabActive: "0",
         paperTabs: [
           {
             title: "基础信息",
-            name: "0"
+            name: "0",
           },
           {
             title: "组卷方式",
-            name: "1"
+            name: "1",
           },
           {
             title: "防作弊",
-            name: "2"
+            name: "2",
           },
           {
             title: "成绩评语",
-            name: "3"
+            name: "3",
           }
         ],
         genType: 0,
         genTypes: [
           {
             icon: "common-person",
-            content: "人工组卷"
+            content: "人工组卷",
           },
           {
             icon: "common-exchange",
-            content: "随机组卷"
+            content: "随机组卷",
           }
         ],
         rules: {
@@ -305,7 +250,7 @@ export default {
             {
               required: true,
               message: "请填写及格分数占总分的百分比",
-              trigger: "blur"
+              trigger: "blur",
             }
           ]
         }
@@ -331,7 +276,7 @@ export default {
     },
     // 添加试卷信息
     addOrEdit() {
-      this.$refs["paperForm"].validate(async valid => {
+      this.$refs["paperForm"].validate(async (valid) => {
         if (!valid) {
           return
         }
@@ -369,7 +314,7 @@ export default {
             !this.paperForm.edit ? "添加成功！" : "修改成功！"
           )
           this.paperForm.show = false
-          this.paperForm.name = ""
+          this.paperForm.name = "";
           this.paperForm.edit = false
           this.query()
         } else {
@@ -401,8 +346,8 @@ export default {
         })
         res.code == 200
           ? (this.$tools.message("删除成功！"), this.query())
-          : this.$tools.message("删除失败！", "error")
-      } catch (error) {}
+          : this.$tools.message("删除失败！", "error");
+      } catch (error) { }
     },
     // 复制分类
     async copy({ id }) {
@@ -412,8 +357,8 @@ export default {
         })
         res.code == 200
           ? (this.$tools.message("复制成功！"), this.query())
-          : this.$tools.message("复制失败！", "error")
-      } catch (error) {}
+          : this.$tools.message("复制失败！", "error");
+      } catch (error) { }
     },
     // 生成试卷
     composition({ id, name }) {
@@ -423,16 +368,16 @@ export default {
       })
     },
     // 统计分类
-    statistics() {},
+    statistics() { },
     // 归档分类
-    archive() {},
+    archive() { },
     // 切换分页
     pageChange(val) {
       this.query(val)
     },
     // tab切换
     paperNext() {
-      this.paperForm.tabActive = Number(this.paperForm.tabActive) + 1 + ""
+      this.paperForm.tabActive = Number(this.paperForm.tabActive) + 1 + "";
     },
     // 考试阅读富文本
     readRemark(id, value) {
@@ -446,13 +391,13 @@ export default {
     remarkAdd() {
       this.paperForm.paperRemark.push({
         score: "",
-        remark: ""
+        remark: "",
       })
     },
     // 删除评语
     remarkDel() {
       this.paperForm.paperRemark.pop()
-    }
+    },
   }
 }
 </script>
