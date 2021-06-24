@@ -1,106 +1,106 @@
-import Vue from "vue"
-import VueRouter from "vue-router"
-import { Message } from "element-ui"
-import Home from "../views/Home"
+import Vue from 'vue'
+import VueRouter from 'vue-router'
+import { Message } from 'element-ui'
+import Home from '../views/Home'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
-    path: "/",
-    name: "Home",
+    path: '/',
+    name: 'Home',
     component: Home
   },
   {
-    path: "/login",
-    name: "Login",
-    component: () => import("../views/base/Login.vue")
+    path: '/login',
+    name: 'Login',
+    component: () => import('../views/base/Login.vue')
   },
   // 试卷相关
   {
-    path: "/examPaper",
-    name: "ExamPaper",
-    component: () => import("../views/examPaper/Index.vue")
+    path: '/examPaper',
+    name: 'ExamPaper',
+    component: () => import('../views/examPaper/Index.vue')
   },
   {
-    path: "/examPaper/list",
-    name: "ExamPaperList",
-    component: () => import("../views/examPaper/List.vue")
+    path: '/examPaper/list',
+    name: 'ExamPaperList',
+    component: () => import('../views/examPaper/List.vue')
   },
   {
-    path: "/examPaper/edit",
-    name: "PaperEdit",
-    component: () => import("../views/examPaper/Edit.vue")
+    path: '/examPaper/edit',
+    name: 'PaperEdit',
+    component: () => import('../views/examPaper/Edit.vue')
   },
   // 考试相关
   {
-    path: "/examSetting",
-    name: "ExamSetting",
-    component: () => import("../views/examSetting/Index.vue")
+    path: '/examSetting',
+    name: 'ExamSetting',
+    component: () => import('../views/examSetting/Index.vue')
   },
   {
-    path: "/examSetting/list",
-    name: "SettingList",
-    component: () => import("../views/examSetting/List.vue")
+    path: '/examSetting/list',
+    name: 'SettingList',
+    component: () => import('../views/examSetting/List.vue')
   },
   // 试题相关
   {
-    path: "/examLibrary",
-    name: "ExamLibrary",
-    component: () => import("../views/examLibrary/Index.vue")
+    path: '/examLibrary',
+    name: 'ExamLibrary',
+    component: () => import('../views/examLibrary/Index.vue')
   },
   {
-    path: "/examLibrary/edit",
-    name: "LibraryEdit",
-    component: () => import("../views/examLibrary/Edit.vue")
+    path: '/examLibrary/edit',
+    name: 'LibraryEdit',
+    component: () => import('../views/examLibrary/Edit.vue')
   },
   // 组织机构
   {
-    path: "/organization/cron",
-    name: "Cron",
-    component: () => import("../views/organization/Cron.vue")
+    path: '/organization/cron',
+    name: 'Cron',
+    component: () => import('../views/organization/Cron.vue')
   },
   {
-    path: "/organization/user",
-    name: "User",
-    component: () => import("../views/organization/User.vue")
+    path: '/organization/user',
+    name: 'User',
+    component: () => import('../views/organization/User.vue')
   },
   {
-    path: "/organization/org",
-    name: "Org",
-    component: () => import("../views/organization/Org.vue")
+    path: '/organization/org',
+    name: 'Org',
+    component: () => import('../views/organization/Org.vue')
   },
   {
-    path: "/organization/parm",
-    name: "Parm",
-    component: () => import("../views/organization/Parm.vue")
+    path: '/organization/parm',
+    name: 'Parm',
+    component: () => import('../views/organization/Parm.vue')
   },
   {
-    path: "/organization/dict",
-    name: "Dict",
-    component: () => import("../views/organization/Dict.vue")
+    path: '/organization/dict',
+    name: 'Dict',
+    component: () => import('../views/organization/Dict.vue')
   },
-  { path: "*", component: () => import("../views/base/404.vue") }
+  { path: '*', component: () => import('../views/base/404.vue') }
 ]
 
 const router = new VueRouter({
-  mode: "history",
+  mode: 'history',
   base: process.env.BASE_URL,
   routes
 })
 
 // 使用 router.beforeEach 注册一个全局前置守卫，判断用户是否登陆
 router.beforeEach((to, from, next) => {
-  if (to.path != "/login") {
-    const token = localStorage.getItem("token")
+  if (to.path != '/login') {
+    const token = localStorage.getItem('token')
     if (!token) {
       Message({
-        message: "请您重新登录",
+        message: '请您重新登录',
         duration: 2000,
-        type: "warning"
+        type: 'warning'
       })
       next({
-        path: "/login",
+        path: '/login',
         query: {
           redirect: to.fullPath
         }

@@ -9,7 +9,8 @@
             v-for="nav in navList"
             :key="nav.title"
             :to="nav.to"
-            >{{ nav.content }}
+          >
+            {{ nav.content }}
             <el-image v-if="nav.img" :src="nav.img" class="logo-img"></el-image>
           </router-link>
         </div>
@@ -19,9 +20,7 @@
     <main class="main">
       <router-view />
     </main>
-    <footer class="footer" v-if="show">
-      Copyright© 2018 All Rights Reserved 版权所有 在线考试
-    </footer>
+    <footer class="footer" v-if="show">Copyright© 2018 All Rights Reserved 版权所有 在线考试</footer>
   </div>
 </template>
 
@@ -60,7 +59,7 @@ export default {
       handler(to) {
         if (to.name && this.menuList.includes(to.name)) {
           this.show = false;
-          return;
+          return
         }
         this.show = true;
       },
@@ -72,7 +71,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import url(//at.alicdn.com/t/font_840312_han9qkt7f9.css);
+@import url(//at.alicdn.com/t/font_840312_ijgzc4lm19.css);
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
