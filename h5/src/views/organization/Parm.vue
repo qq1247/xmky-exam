@@ -15,7 +15,8 @@
             ></el-input>
           </el-form-item>
           <el-form-item style="width: 200px">
-            <el-button @click="query" icon="el-icon-search" type="primary"
+            <el-button @click="query" icon="el-icon-search"
+type="primary"
               >查询</el-button
             >
             <el-button @click="reset">重置</el-button>
@@ -39,7 +40,9 @@
           </el-table-column>
           <el-table-column label="邮件用户名">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.emailUserName }}</span>
+              <span style="margin-left: 10px">{{
+                scope.row.emailUserName
+              }}</span>
             </template>
           </el-table-column>
           <el-table-column label="邮件密码">
@@ -49,7 +52,9 @@
           </el-table-column>
           <el-table-column label="邮件协议">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.emailProtocol }}</span>
+              <span style="margin-left: 10px">{{
+                scope.row.emailProtocol
+              }}</span>
             </template>
           </el-table-column>
           <el-table-column label="邮件编码">
@@ -70,7 +75,8 @@
           <el-table-column label="操作">
             <template slot-scope="scope">
               <el-button @click="get(scope.row.id)" size="mini">修改</el-button>
-              <el-button @click="del(scope.row.id)" size="mini" type="danger"
+              <el-button @click="del(scope.row.id)" size="mini"
+type="danger"
                 >删除</el-button
               >
             </template>
@@ -95,7 +101,11 @@
             v-model="editForm.emailHost"
           ></el-input>
         </el-form-item>
-        <el-form-item label="邮件用户名" label-width="120px" prop="emailUserName">
+        <el-form-item
+          label="邮件用户名"
+          label-width="120px"
+          prop="emailUserName"
+        >
           <el-input
             placeholder="请输入邮件用户名"
             v-model="editForm.emailUserName"
@@ -133,10 +143,12 @@
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="add" type="primary" v-if="editForm.id == null"
+        <el-button @click="add" type="primary"
+v-if="editForm.id == null"
           >添加</el-button
         >
-        <el-button @click="edit" type="primary" v-if="editForm.id != null"
+        <el-button @click="edit" type="primary"
+v-if="editForm.id != null"
           >修改</el-button
         >
         <el-button @click="editForm.show = false">取 消</el-button>
@@ -150,37 +162,39 @@ export default {
   data() {
     return {
       listpage: {
-        //列表数据
+        // 列表数据
         total: 0, // 总条数
-        curPage: 1, //当前第几页
-        pageSize: 10, //每页多少条
-        pageSizes: [10, 20, 50, 100], //每页多少条
-        list: [] //列表数据
+        curPage: 1, // 当前第几页
+        pageSize: 10, // 每页多少条
+        pageSizes: [10, 20, 50, 100], // 每页多少条
+        list: [] // 列表数据
       },
       queryForm: {
-        //查询表单
+        // 查询表单
         emailHost: null,
-				emailEncode: null,
-				emailUserName: null,
-				emailPwd: null,
-				emailProtocol: null,
-				orgLogo: null,
-				orgName: null
+        emailEncode: null,
+        emailUserName: null,
+        emailPwd: null,
+        emailProtocol: null,
+        orgLogo: null,
+        orgName: null,
       },
       editForm: {
-        //修改表单
-        id: null, //主键
+        // 修改表单
+        id: null, // 主键
         emailHost: null,
-				emailEncode: null,
-				emailUserName: null,
-				emailPwd: null,
-				emailProtocol: null,
-				orgLogo: null,
-				orgName: null,
+        emailEncode: null,
+        emailUserName: null,
+        emailPwd: null,
+        emailProtocol: null,
+        orgLogo: null,
+        orgName: null,
         show: false, // 是否显示页面
         rules: {
-          //校验
-          orgName: [{ required: true, message: "请输入排序", trigger: "change" }]
+          // 校验
+          orgName: [
+            { required: true, message: '请输入排序', trigger: 'change' }
+          ]
         }
       }
     }
@@ -191,7 +205,7 @@ export default {
   methods: {
     // 查询
     async query() {
-      let {
+      const {
         data: { rows, total }
       } = await this.$https.parmListpage({
         orgName: this.queryForm.orgName,
@@ -220,12 +234,12 @@ export default {
       this.query()
     },
     add() {
-      this.$refs["editForm"].validate(async valid => {
+      this.$refs["editForm"].validate(async(valid) => {
         if (!valid) {
           return false
         }
 
-        let { code, msg } = await this.$https.parmAdd({
+        const { code, msg } = await this.$https.parmAdd({
           emailHost: this.editForm.emailHost,
           emailEncode: this.editForm.emailEncode,
           emailUserName: this.editForm.emailUserName,
@@ -236,20 +250,20 @@ export default {
         })
         if (code != 200) {
           alert(msg)
-          return
+          return;
         }
 
         this.editForm.show = false
         this.query()
-      })
+      });
     },
     edit() {
-      this.$refs["editForm"].validate(async valid => {
+      this.$refs["editForm"].validate(async(valid) => {
         if (!valid) {
           return false
         }
 
-        let { code, msg } = await this.$https.parmEdit({
+        const { code, msg } = await this.$https.parmEdit({
           id: this.editForm.id,
           emailHost: this.editForm.emailHost,
           emailEncode: this.editForm.emailEncode,
@@ -261,19 +275,19 @@ export default {
         })
         if (code != 200) {
           alert(msg)
-          return
+          return;
         }
 
         this.editForm.show = false
         this.query()
-      })
+      });
     },
     // 获取参数
     async get(id) {
-      let res = await this.$https.parmGet({ id: id })
+      const res = await this.$https.parmGet({ id: id })
       if (res.code != 200) {
         alert(res.msg)
-        return
+        return;
       }
 
       this.editForm.show = true
@@ -291,9 +305,9 @@ export default {
       this.$confirm("确定要删除？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "warning"
+        type: "warning",
       }).then(async () => {
-        let res = await this.$https.parmDel({ id })
+        const res = await this.$https.parmDel({ id })
         if (res.code != 200) {
           this.$message({
             type: "error",
@@ -302,7 +316,7 @@ export default {
         }
 
         this.query()
-      })
+      });
     }
   }
 }

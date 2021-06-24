@@ -21,7 +21,7 @@ export default {
   methods: {
     emitter(value) {
       this.$emit("input", value);
-    },
+    }
   },
   components: {
     draggable,
@@ -39,7 +39,7 @@ export default {
     // this.list  when input != v-model
     realValue() {
       return this.value ? this.value : this.list;
-    },
+    }
   },
   props: {
     value: {

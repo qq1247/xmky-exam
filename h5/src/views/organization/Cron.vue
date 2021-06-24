@@ -15,7 +15,8 @@
             ></el-input>
           </el-form-item>
           <el-form-item style="width: 200px">
-            <el-button @click="query" icon="el-icon-search" type="primary"
+            <el-button @click="query" icon="el-icon-search"
+type="primary"
               >查询</el-button
             >
             <el-button @click="reset">重置</el-button>
@@ -67,7 +68,8 @@
           <el-table-column label="操作">
             <template slot-scope="scope">
               <el-button @click="get(scope.row.id)" size="mini">修改</el-button>
-              <el-button @click="del(scope.row.id)" size="mini" type="danger"
+              <el-button @click="del(scope.row.id)" size="mini"
+type="danger"
                 >删除</el-button
               >
               <el-button
@@ -121,10 +123,12 @@
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="add" type="primary" v-if="editForm.id == null"
+        <el-button @click="add" type="primary"
+v-if="editForm.id == null"
           >添加</el-button
         >
-        <el-button @click="edit" type="primary" v-if="editForm.id != null"
+        <el-button @click="edit" type="primary"
+v-if="editForm.id != null"
           >修改</el-button
         >
         <el-button @click="editForm.show = false">取 消</el-button>
@@ -138,26 +142,26 @@ export default {
   data() {
     return {
       listpage: {
-        //列表数据
+        // 列表数据
         total: 0, // 总条数
-        curPage: 1, //当前第几页
-        pageSize: 10, //每页多少条
-        pageSizes: [10, 20, 50, 100], //每页多少条
-        list: [], //列表数据
+        curPage: 1, // 当前第几页
+        pageSize: 10, // 每页多少条
+        pageSizes: [10, 20, 50, 100], // 每页多少条
+        list: [], // 列表数据
       },
       queryForm: {
-        //查询表单
+        // 查询表单
         name: null,
       },
       editForm: {
-        //修改表单
-        id: null, //主键
-        name: null, //名称
-        jobClass: null, //实现类
-        cron: null, //表达式
+        // 修改表单
+        id: null, // 主键
+        name: null, // 名称
+        jobClass: null, // 实现类
+        cron: null, // 表达式
         show: false, // 是否显示页面
         rules: {
-          //校验
+          // 校验
           name: [{ required: true, message: "请输入名称", trigger: "change" }],
           jobClass: [
             { required: true, message: "请输入实现类", trigger: "change" },
@@ -175,7 +179,7 @@ export default {
   methods: {
     // 查询
     async query() {
-      let {
+      const {
         data: { rows, total },
       } = await this.$https.cronListpage({
         name: this.queryForm.name,
@@ -209,19 +213,19 @@ export default {
           return false;
         }
 
-        let { code, msg } = await this.$https.cronAdd({
+        const { code, msg } = await this.$https.cronAdd({
           name: this.editForm.name,
           jobClass: this.editForm.jobClass,
           cron: this.editForm.cron,
         });
         if (code != 200) {
           alert(msg);
-          return;
+          return
         }
 
         this.editForm.show = false;
         this.query();
-      });
+      })
     },
     edit() {
       this.$refs["editForm"].validate(async (valid) => {
@@ -229,7 +233,7 @@ export default {
           return false;
         }
 
-        let { code, msg } = await this.$https.cronEdit({
+        const { code, msg } = await this.$https.cronEdit({
           id: this.editForm.id,
           name: this.editForm.name,
           jobClass: this.editForm.jobClass,
@@ -237,19 +241,19 @@ export default {
         });
         if (code != 200) {
           alert(msg);
-          return;
+          return
         }
 
         this.editForm.show = false;
         this.query();
-      });
+      })
     },
     // 获取试题
     async get(id) {
-      let res = await this.$https.cronGet({ id: id });
+      const res = await this.$https.cronGet({ id: id });
       if (res.code != 200) {
         alert(res.msg);
-        return;
+        return
       }
 
       this.editForm.show = true;
@@ -265,7 +269,7 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       }).then(async () => {
-        let res = await this.$https.cronDel({ id });
+        const res = await this.$https.cronDel({ id });
         if (res.code != 200) {
           this.$message({
             type: "error",
@@ -274,7 +278,7 @@ export default {
         }
 
         this.query();
-      });
+      })
     },
     // 启动任务
     async startTask(id) {
@@ -283,7 +287,7 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       }).then(async () => {
-        let res = await this.$https.cronStartTask({ id });
+        const res = await this.$https.cronStartTask({ id });
         if (res.code != 200) {
           this.$message({
             type: "error",
@@ -292,7 +296,7 @@ export default {
         }
 
         this.query();
-      });
+      })
     },
     // 停止任务
     async stopTask(id) {
@@ -301,7 +305,7 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       }).then(async () => {
-        let res = await this.$https.cronStopTask({ id });
+        const res = await this.$https.cronStopTask({ id });
         if (res.code != 200) {
           this.$message({
             type: "error",
@@ -310,7 +314,7 @@ export default {
         }
 
         this.query();
-      });
+      })
     },
     // 执行一次
     async onceTask(id) {
@@ -319,7 +323,7 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       }).then(async () => {
-        let res = await this.$https.cronrunOnceTask({ id });
+        const res = await this.$https.cronrunOnceTask({ id });
         if (res.code != 200) {
           this.$message({
             type: "error",
@@ -328,8 +332,8 @@ export default {
         }
 
         this.query();
-      });
-    },
+      })
+    }
   },
 };
 </script>

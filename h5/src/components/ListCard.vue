@@ -106,7 +106,7 @@ export default {
     },
     name: {
       type: String,
-      default: ""
+      default: "",
     }
   },
   data() {
@@ -114,7 +114,7 @@ export default {
       detailTitles: {
         question: "考题详情",
         paper: "试卷列表",
-        exam: "考试列表"
+        exam: "考试列表",
       }
     }
   },
@@ -158,7 +158,7 @@ export default {
     // 归档
     archive(data) {
       this.$emit("archive", data)
-    }
+    },
   }
 }
 </script>

@@ -32,7 +32,8 @@
         ></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" class="login-btn" @click="login('ruleForm')"
+        <el-button type="primary" class="login-btn"
+@click="login('ruleForm')"
           >登录</el-button
         >
       </el-form-item>
@@ -41,17 +42,19 @@
 </template>
 
 <script>
-import { mapMutations } from "vuex"
+import { mapMutations } from "vuex";
 export default {
   data() {
     return {
       ruleForm: {
         account: "",
-        password: ""
+        password: "",
       },
       rules: {
         account: [{ required: true, message: "账号不能为空", trigger: "blur" }],
-        password: [{ required: true, message: "密码不能为空", trigger: "blur" }]
+        password: [
+          { required: true, message: '密码不能为空', trigger: 'blur' }
+        ]
       }
     }
   },
@@ -59,7 +62,7 @@ export default {
     ...mapMutations(["setToken"]),
     // 登录
     login(formName) {
-      this.$refs[formName].validate(async valid => {
+      this.$refs[formName].validate(async(valid) => {
         if (valid) {
           const res = await this.$https.login({
             loginName: this.ruleForm.account,
@@ -68,7 +71,7 @@ export default {
           res.data?.accessToken && this.setToken(res.data?.accessToken)
           !this.$route.query.redirect
             ? this.$router.push({
-                path: "/"
+                path: "/",
               })
             : this.$router.push({
                 path: this.$route.query.redirect
@@ -77,12 +80,12 @@ export default {
           this.$message({
             message: "请核对登录信息",
             duration: 2000,
-            type: "warning"
+            type: "warning",
           })
           return false
         }
       })
-    }
+    },
   }
 }
 </script>
