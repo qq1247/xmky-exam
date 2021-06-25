@@ -1,23 +1,12 @@
 <template>
   <div class="container">
-    <el-form
-      :model="ruleForm"
-      status-icon
-      :rules="rules"
-      ref="ruleForm"
-      class="login-wrap"
-    >
+    <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" class="login-wrap">
       <div class="login-title">欢迎登录</div>
       <el-form-item prop="account">
         <template slot="label">
           <i class="common common-wo"></i>
         </template>
-        <el-input
-          type="text"
-          placeholder="请输入账号"
-          v-model="ruleForm.account"
-          autocomplete="off"
-        ></el-input>
+        <el-input type="text" placeholder="请输入账号" v-model="ruleForm.account" autocomplete="off"></el-input>
       </el-form-item>
       <el-form-item prop="password">
         <template slot="label">
@@ -32,10 +21,7 @@
         ></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" class="login-btn"
-@click="login('ruleForm')"
-          >登录</el-button
-        >
+        <el-button type="primary" class="login-btn" @click="login('ruleForm')">登录</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -62,7 +48,7 @@ export default {
     ...mapMutations(["setToken"]),
     // 登录
     login(formName) {
-      this.$refs[formName].validate(async(valid) => {
+      this.$refs[formName].validate(async (valid) => {
         if (valid) {
           const res = await this.$https.login({
             loginName: this.ruleForm.account,
@@ -70,12 +56,12 @@ export default {
           })
           res.data?.accessToken && this.setToken(res.data?.accessToken)
           !this.$route.query.redirect
-            ? this.$router.push({
-                path: "/",
-              })
-            : this.$router.push({
-                path: this.$route.query.redirect
-              })
+            ? this.$router.replace({
+              path: "/",
+            })
+            : this.$router.replace({
+              path: this.$route.query.redirect
+            })
         } else {
           this.$message({
             message: "请核对登录信息",
