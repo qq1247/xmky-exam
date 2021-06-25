@@ -61,6 +61,7 @@ public class ApiBulletinBoardController extends BaseController {
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult add(BulletinBoard bulletinBoard) {
 		try {
+			bulletinBoard.setState(1);
 			bulletinBoard.setUpdateTime(new Date());
 			bulletinBoard.setUpdateUserId(getCurUser().getId());
 			bulletinBoardService.add(bulletinBoard);
@@ -93,6 +94,7 @@ public class ApiBulletinBoardController extends BaseController {
 			entity.setImgsHeight(bulletinBoard.getImgsHeight());
 			entity.setImgsWidth(bulletinBoard.getImgsWidth());
 			entity.setUrl(bulletinBoard.getUrl());
+			entity.setTopState(bulletinBoard.getTopState());
 			entity.setNo(bulletinBoard.getNo());
 			entity.setState(bulletinBoard.getState());
 			entity.setUpdateTime(new Date());
@@ -132,6 +134,40 @@ public class ApiBulletinBoardController extends BaseController {
 		}
 	}
 
+	/**
+	 * 获取参数
+	 * 
+	 * v1.0 chenyun 2021-03-04 15:02:18
+	 * @return pageOut
+	 */
+	@RequestMapping("/get")
+	@ResponseBody
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
+	public PageResult get(Integer id) {
+		try {
+			BulletinBoard entity = bulletinBoardService.getEntity(id);
+			return PageResultEx.ok()
+					.addAttr("id", entity.getId())
+					.addAttr("title", entity.getTitle())
+					.addAttr("imgs", entity.getImgs())
+					.addAttr("video", entity.getVideo())
+					.addAttr("content", entity.getContent())
+					.addAttr("imgsHeight", entity.getImgsHeight())
+					.addAttr("imgsWidth", entity.getImgsWidth())
+					.addAttr("url", entity.getUrl())
+					.addAttr("topState", entity.getTopState())
+					.addAttr("no", entity.getNo())
+					.addAttr("readUserIds", entity.getReadUserIds())
+					.addAttr("readOrgIds", entity.getReadOrgIds());
+		} catch (MyException e) {
+			log.error("获取参数错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("获取参数错误：", e);
+			return PageResult.err();
+		}
+	}
+	
 	/**
 	 * 添加权限
 	 * 

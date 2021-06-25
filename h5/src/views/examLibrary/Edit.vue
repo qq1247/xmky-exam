@@ -372,6 +372,7 @@ export default {
   data() {
     return {
       labelPosition: "left",
+      value: "",
       list: {
         // 列表数据
         total: 0, // 总条数
@@ -856,12 +857,10 @@ export default {
           res.data.scoreOptions == null ? [] : res.data.scoreOptions.split(",");
       }
     },
-    // 复制试题
     async copy(id) {
       await this.$https.questionCopy({ id })
       this.query()
     },
-    // 删除试题
     del(id) {
       this.$confirm("确定要删除？", "提示", {
         confirmButtonText: "确定",
@@ -872,7 +871,6 @@ export default {
         this.query()
       });
     },
-    // 下载试题模板
     async questionTemplate() {
       const template = await this.$https.questionTemplate({}, "blob");
       const blob = new Blob([template], { type: "application/msword" })

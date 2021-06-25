@@ -81,6 +81,42 @@ public class ApiMyMarkController extends BaseController {
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
+			pageIn.addAttr("curUserId", getCurUser().getId())
+			  	  .addAttr("state", "1");
+			PageOut pageOut = myMarkService.getListpage(pageIn);
+			
+			Date curTime = new Date();
+			for(Map<String, Object> map : pageOut.getList()) {
+				Date startTime = (Date) map.get("markStartTime");
+				Date endTime = (Date) map.get("markEndTime");
+				if (startTime.getTime() > curTime.getTime()) {
+					map.put("examHand", "AWAIT");
+				} else if (startTime.getTime() <= curTime.getTime() && endTime.getTime() >= curTime.getTime()) {
+					map.put("examHand", "START");
+				} else {
+					map.put("examHand", "END");
+				}
+			}
+
+			return PageResultEx.ok().data(pageOut);
+		} catch (Exception e) {
+			log.error("我的阅卷列表错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 我的阅卷列表
+	 * 
+	 * v1.0 zhanghc 2017-05-25 16:34:59
+	 * @return pageOut
+	 */
+	@RequestMapping("/examListpage")
+	@ResponseBody
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	public PageResult examListpage() {
+		try {
+			PageIn pageIn = new PageIn(request);
 			pageIn.addAttr("CurUserId", getCurUser().getId());
 			pageIn.addAttr("state", "1");
 			PageOut pageOut = examService.getListpage(pageIn);
@@ -97,7 +133,6 @@ public class ApiMyMarkController extends BaseController {
 					map.put("examHand", "END");
 				}
 			}
-
 			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("我的阅卷列表错误：", e);
@@ -190,7 +225,7 @@ public class ApiMyMarkController extends BaseController {
 	public PageResult detailList() {
 		try {
 			PageIn pageIn = new PageIn(request);
-			pageIn.addAttr("CurUserId", getCurUser().getId());
+			pageIn.addAttr("curUserId", getCurUser().getId());
 			PageOut pageOut = myExamService.getListpage(pageIn);
 			List<Map<String, Object>> list = pageOut.getList();
 			
@@ -269,7 +304,7 @@ public class ApiMyMarkController extends BaseController {
 			List<MyMark> myMarkList = myMarkService.getList(myExam.getExamId());
 			boolean ok = false;
 			for (MyMark myMark : myMarkList) {
-				if (myMark.getUserId() == getCurUser().getId()) {
+				if (myMark.getMarkUserId() == getCurUser().getId()) {
 					ok = true;
 					break;
 				}
@@ -315,8 +350,8 @@ public class ApiMyMarkController extends BaseController {
 			if (myExam.getMarkState() == 1) {
 				myExam.setMarkState(2);
 			}
-			if (myExam.getMarkTime() == null) {// 第一次进入标记为阅卷时间
-				myExam.setMarkTime(new Date());
+			if (myExam.getMarkStartTime() == null) {// 第一次进入标记为阅卷时间
+				myExam.setMarkStartTime(new Date());
 			}
 			myExamService.update(myExam);
 			return "exam/myMark/myMarkPaper";
@@ -335,10 +370,10 @@ public class ApiMyMarkController extends BaseController {
 	 * @param score
 	 * @return PageResult
 	 */
-	@RequestMapping("/scoreUpdate")
+	@RequestMapping("/updateScore")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult scoreUpdate(Integer myExamDetailId, BigDecimal score) {
+	public PageResult updateScore(Integer myExamDetailId, BigDecimal score) {
 		try {
 			// 校验数据有效性
 			MyExamDetail myExamDetail = myExamDetailService.getEntity(myExamDetailId);
@@ -359,7 +394,7 @@ public class ApiMyMarkController extends BaseController {
 
 			boolean ok = false;
 			for (MyMark myMark : myMarkList) {
-				if (myMark.getUserId() == getCurUser().getId()) {
+				if (myMark.getMarkUserId() == getCurUser().getId()) {
 					ok = true;
 					break;
 				}
@@ -398,10 +433,10 @@ public class ApiMyMarkController extends BaseController {
 	 * @param examId
 	 * @return PageResult
 	 */
-	@RequestMapping("/mark")
+	@RequestMapping("/doScore")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult mark(Integer myExamId) {
+	public PageResult doScore(Integer myExamId) {
 		try {
 			// 校验数据有效性
 			MyExam myExam = myExamService.getEntity(myExamId);
@@ -422,7 +457,7 @@ public class ApiMyMarkController extends BaseController {
 
 			boolean ok = false;
 			for (MyMark myMark : myMarkList) {
-				if (myMark.getUserId() == getCurUser().getId()) {
+				if (myMark.getMarkUserId() == getCurUser().getId()) {
 					ok = true;
 					break;
 				}
@@ -449,7 +484,7 @@ public class ApiMyMarkController extends BaseController {
 			// 标记为已阅
 			myExam.setMarkState(3);
 			myExam.setMyMarkId(getCurUser().getId());
-			myExam.setMarkFinishTime(new Date());
+			myExam.setMarkEndTime(new Date());
 			myExam.setTotalScore(totalScore);
 //			if (totalScore.doubleValue() >= exam.getPassScore().doubleValue() ) {
 //				myExam.setAnswerState(1);
@@ -476,10 +511,10 @@ public class ApiMyMarkController extends BaseController {
 	 * @param examId
 	 * @return PageResult
 	 */
-	@RequestMapping("/autoMark")
+	@RequestMapping("/autoScore")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult autoMark(Integer examId) {
+	public PageResult autoScore(Integer examId) {
 		try {
 			String processBarId = UUID.randomUUID().toString();
 			LoginUser curUser = getCurUser();

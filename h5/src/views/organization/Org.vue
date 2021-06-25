@@ -14,30 +14,16 @@
       </div>
       <div class="right">
         <div class="search">
-          <el-form
-            :inline="true"
-            :model="queryForm"
-            class="form-inline"
-            ref="queryForm"
-          >
+          <el-form :inline="true" :model="queryForm" class="form-inline" ref="queryForm">
             <el-form-item label prop="name">
-              <el-input
-                placeholder="请输入名称"
-                v-model="queryForm.name"
-              ></el-input>
+              <el-input placeholder="请输入名称" v-model="queryForm.name"></el-input>
             </el-form-item>
             <el-form-item style="width: 200px">
-              <el-button @click="query" icon="el-icon-search"
-type="primary"
-                >查询</el-button
-              >
+              <el-button @click="query" icon="el-icon-search" type="primary">查询</el-button>
               <el-button @click="reset">重置</el-button>
             </el-form-item>
             <el-form-item>
-              <el-button @click="toAdd" icon="el-icon-search"
-type="primary"
-                >添加</el-button
-              >
+              <el-button @click="toAdd" icon="el-icon-search" type="primary">添加</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -50,9 +36,11 @@ type="primary"
             </el-table-column>
             <el-table-column label="上级组织机构">
               <template slot-scope="scope">
-                <span style="margin-left: 10px">{{
-                  scope.row.parentName
-                }}</span>
+                <span style="margin-left: 10px">
+                  {{
+                    scope.row.parentName
+                  }}
+                </span>
               </template>
             </el-table-column>
             <el-table-column label="排序">
@@ -62,13 +50,8 @@ type="primary"
             </el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
-                <el-button @click="toEdit(scope.row.id)" size="mini"
-                  >修改</el-button
-                >
-                <el-button @click="del(scope.row.id)" size="mini"
-type="danger"
-                  >删除</el-button
-                >
+                <el-button @click="toEdit(scope.row.id)" size="mini">修改</el-button>
+                <el-button @click="del(scope.row.id)" size="mini" type="danger">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -78,32 +61,18 @@ type="danger"
     <el-dialog :visible.sync="editForm.show" title="组织机构">
       <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
         <el-form-item label="上级组织机构" label-width="120px">
-          <el-input
-            disabled
-            placeholder
-            v-model="editForm.parentName"
-          ></el-input>
+          <el-input disabled placeholder v-model="editForm.parentName"></el-input>
         </el-form-item>
         <el-form-item label="名称" label-width="120px" prop="name">
           <el-input placeholder="请输入名称" v-model="editForm.name"></el-input>
         </el-form-item>
         <el-form-item label="排序" label-width="120px" prop="no">
-          <el-input-number
-            :max="100"
-            :min="1"
-            v-model.number="editForm.no"
-          ></el-input-number>
+          <el-input-number :max="100" :min="1" v-model.number="editForm.no"></el-input-number>
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="doAdd" type="primary"
-v-if="editForm.id == null"
-          >添加</el-button
-        >
-        <el-button @click="doEdit" type="primary"
-v-if="editForm.id != null"
-          >修改</el-button
-        >
+        <el-button @click="doAdd" type="primary" v-if="editForm.id == null">添加</el-button>
+        <el-button @click="doEdit" type="primary" v-if="editForm.id != null">修改</el-button>
         <el-button @click="editForm.show = false">取 消</el-button>
       </div>
     </el-dialog>
@@ -152,8 +121,8 @@ export default {
   methods: {
     // 查询
     async query() {
-      const {
-        data: { rows, total },
+      let {
+        data: { list, total },
       } = await this.$https.orgListpage({
         parentId: this.queryForm.parentId,
         name: this.queryForm.name,
@@ -161,7 +130,7 @@ export default {
         pageSize: this.listpage.pageSize,
       });
       this.listpage.total = total;
-      this.listpage.list = rows;
+      this.listpage.list = list;
     },
     // 重置
     async reset() {

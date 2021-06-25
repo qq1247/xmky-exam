@@ -49,7 +49,6 @@ public class Exam {
 	private Integer rankState;
 	@Column(name = "LOGIN_TYPE")
 	private Integer loginType;
-	private String scoreERemark;
 	@Column(name = "DESCRIPTION")
 	private String description;
 	@Column(name = "UPDATE_USER_ID")
@@ -118,12 +117,6 @@ public class Exam {
 	}
 	public void setLoginType(Integer loginType) {
 		this.loginType = loginType;
-	}
-	public String getScoreERemark() {
-		return scoreERemark;
-	}
-	public void setScoreERemark(String scoreERemark) {
-		this.scoreERemark = scoreERemark;
 	}
 	public String getDescription() {
 		return description;

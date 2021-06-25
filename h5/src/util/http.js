@@ -2,19 +2,19 @@
  * axios封装
  * 请求拦截、响应拦截、错误统一处理
  */
-import axios from "axios";
-import router from "@/router";
-import { Message } from "element-ui";
+import axios from 'axios'
+import router from '@/router'
+import { Message } from 'element-ui'
 /**
  * 提示函数
  */
-const message = (msg) => {
+const message = msg => {
   Message({
     message: msg,
     duration: 2000,
-    type: "warning",
+    type: 'warning'
   })
-};
+}
 
 /**
  * 跳转登录页
@@ -22,12 +22,12 @@ const message = (msg) => {
  */
 const toLogin = () => {
   router.replace({
-    path: "/login",
+    path: '/login',
     query: {
       redirect: router.currentRoute.fullPath
     }
   })
-};
+}
 
 /**
  * 请求失败后的错误统一处理
@@ -39,15 +39,15 @@ const errorHandle = (status, msg) => {
   switch (status) {
     case 500:
       message(`${msg}`)
-      break;
+      break
     case 401:
     case 403:
       message(`${msg}请重新登录`)
-      localStorage.removeItem("token");
+      localStorage.removeItem('token')
       toLogin()
-      break;
+      break
     case 404:
-      message("请求的资源不存在");
+      message('请求的资源不存在')
       break
     default:
       message(`${msg}`)
@@ -56,7 +56,7 @@ const errorHandle = (status, msg) => {
 
 // 创建axios实例
 var instance = axios.create({
-  baseURL: "http://192.168.110.198:8080/api/",
+  baseURL: 'http://192.168.110.198:8080/api/',
   timeout: 1000 * 10
 })
 
@@ -65,26 +65,26 @@ var instance = axios.create({
  * 每次请求前，如果存在token则在请求头中携带token
  */
 instance.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
+  config => {
+    const token = localStorage.getItem('token')
     token && (config.headers.Authorization = token)
     return config
   },
-  (error) => Promise.error(error)
+  error => Promise.error(error)
 )
 
 // 响应拦截器
 instance.interceptors.response.use(
   // 请求成功
-  (res) => {
+  res => {
     const {
       data: { code, msg },
       headers,
       config
     } = res
     headers?.Authorization &&
-      localStorage.setItem("token", headers.Authorization)
-    if (config.responseType == "blob") {
+      localStorage.setItem('token', headers.Authorization)
+    if (config.responseType == 'blob') {
       return Promise.resolve(res.data)
     } else {
       if (code == 200) {
@@ -96,14 +96,14 @@ instance.interceptors.response.use(
     }
   },
   // 请求失败
-  (error) => {
+  error => {
     const { response, config } = error
     if (
-      error.code === "ECONNABORTED" &&
-      error.message.indexOf("timeout") !== -1 &&
+      error.code === 'ECONNABORTED' &&
+      error.message.indexOf('timeout') !== -1 &&
       !config._retry
     ) {
-      Message.error("请求超时");
+      Message.error('请求超时')
       return Promise.reject(error)
     }
     if (response) {

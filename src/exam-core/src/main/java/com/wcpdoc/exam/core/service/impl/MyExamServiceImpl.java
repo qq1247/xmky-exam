@@ -65,7 +65,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("id", myExam.getId());
 			map.put("examId", myExam.getExamId());
-			map.put("time", DateUtil.formatDateTime(myExam.getAnswerTime()));
+			map.put("time", DateUtil.formatDateTime(myExam.getAnswerStartTime()));
 			list.add(map);
 		}
 		return list;

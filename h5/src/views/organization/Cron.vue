@@ -2,32 +2,16 @@
   <div class="container">
     <div class="content">
       <div class="search">
-        <el-form
-          :inline="true"
-          :model="queryForm"
-          class="form-inline"
-          ref="queryForm"
-        >
+        <el-form :inline="true" :model="queryForm" class="form-inline" ref="queryForm">
           <el-form-item label prop="name">
-            <el-input
-              placeholder="请输入名称"
-              v-model="queryForm.name"
-            ></el-input>
+            <el-input placeholder="请输入名称" v-model="queryForm.name"></el-input>
           </el-form-item>
           <el-form-item style="width: 200px">
-            <el-button @click="query" icon="el-icon-search"
-type="primary"
-              >查询</el-button
-            >
+            <el-button @click="query" icon="el-icon-search" type="primary">查询</el-button>
             <el-button @click="reset">重置</el-button>
           </el-form-item>
           <el-form-item>
-            <el-button
-              @click="editForm.show = true"
-              icon="el-icon-search"
-              type="primary"
-              >添加</el-button
-            >
+            <el-button @click="editForm.show = true" icon="el-icon-search" type="primary">添加</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -55,41 +39,18 @@ type="primary"
           </el-table-column>
           <el-table-column label="最近三次运行时间">
             <template slot-scope="scope">
-              <span
-                v-for="item in scope.row.recentTriggerTime.split('；')"
-                :key="item"
-              >
-                <el-tag effect="plain" v-if="item" style="margin-bottom: 3px">
-                  {{ item }}
-                </el-tag>
+              <span v-for="item in scope.row.recentTriggerTime.split('；')" :key="item">
+                <el-tag effect="plain" v-if="item" style="margin-bottom: 3px">{{ item }}</el-tag>
               </span>
             </template>
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
               <el-button @click="get(scope.row.id)" size="mini">修改</el-button>
-              <el-button @click="del(scope.row.id)" size="mini"
-type="danger"
-                >删除</el-button
-              >
-              <el-button
-                @click="startTask(scope.row.id)"
-                size="mini"
-                type="primary"
-                >启动任务</el-button
-              >
-              <el-button
-                @click="stopTask(scope.row.id)"
-                size="mini"
-                type="danger"
-                >停止任务</el-button
-              >
-              <el-button
-                @click="onceTask(scope.row.id)"
-                size="mini"
-                type="primary"
-                >执行一次</el-button
-              >
+              <el-button @click="del(scope.row.id)" size="mini" type="danger">删除</el-button>
+              <el-button @click="startTask(scope.row.id)" size="mini" type="primary">启动任务</el-button>
+              <el-button @click="stopTask(scope.row.id)" size="mini" type="danger">停止任务</el-button>
+              <el-button @click="onceTask(scope.row.id)" size="mini" type="primary">执行一次</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -110,27 +71,15 @@ type="danger"
           <el-input placeholder="请输入名称" v-model="editForm.name"></el-input>
         </el-form-item>
         <el-form-item label="实现类" label-width="120px" prop="jobClass">
-          <el-input
-            placeholder="请输入实现类"
-            v-model="editForm.jobClass"
-          ></el-input>
+          <el-input placeholder="请输入实现类" v-model="editForm.jobClass"></el-input>
         </el-form-item>
         <el-form-item label="cron表达式" label-width="120px" prop="cron">
-          <el-input
-            placeholder="请输入cron表达式"
-            v-model="editForm.cron"
-          ></el-input>
+          <el-input placeholder="请输入cron表达式" v-model="editForm.cron"></el-input>
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="add" type="primary"
-v-if="editForm.id == null"
-          >添加</el-button
-        >
-        <el-button @click="edit" type="primary"
-v-if="editForm.id != null"
-          >修改</el-button
-        >
+        <el-button @click="add" type="primary" v-if="editForm.id == null">添加</el-button>
+        <el-button @click="edit" type="primary" v-if="editForm.id != null">修改</el-button>
         <el-button @click="editForm.show = false">取 消</el-button>
       </div>
     </el-dialog>
@@ -179,15 +128,15 @@ export default {
   methods: {
     // 查询
     async query() {
-      const {
-        data: { rows, total },
+      let {
+        data: { list, total },
       } = await this.$https.cronListpage({
         name: this.queryForm.name,
         curPage: this.listpage.curPage,
         pageSize: this.listpage.pageSize,
       });
       this.listpage.total = total;
-      this.listpage.list = rows;
+      this.listpage.list = list;
     },
     // 重置
     async reset() {

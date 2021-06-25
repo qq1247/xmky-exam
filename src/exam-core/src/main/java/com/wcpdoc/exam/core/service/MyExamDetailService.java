@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.core.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.wcpdoc.exam.core.entity.MyExamDetail;
 import com.wcpdoc.exam.core.entity.LoginUser;
@@ -20,6 +21,15 @@ public interface MyExamDetailService extends BaseService<MyExamDetail>{
 	 */
 	List<MyExamDetail> getList(Integer myExamId);
 
+	/**
+	 * 获取我的考试详细列表
+	 * 
+	 * v1.0 zhanghc 2017年7月3日上午9:44:45
+	 * @param myExamId
+	 * @return List<Map<String, Object>>
+	 */
+	List<Map<String, Object>> getAnswerList(Integer myExamId);
+	
 	/**
 	 * 删除我的考试详细
 	 * 

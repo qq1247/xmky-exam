@@ -2,32 +2,16 @@
   <div class="container">
     <div class="content">
       <div class="search">
-        <el-form
-          :inline="true"
-          :model="queryForm"
-          class="form-inline"
-          ref="queryForm"
-        >
+        <el-form :inline="true" :model="queryForm" class="form-inline" ref="queryForm">
           <el-form-item label prop="orgName">
-            <el-input
-              placeholder="请输入单位名称"
-              v-model="queryForm.orgName"
-            ></el-input>
+            <el-input placeholder="请输入单位名称" v-model="queryForm.orgName"></el-input>
           </el-form-item>
           <el-form-item style="width: 200px">
-            <el-button @click="query" icon="el-icon-search"
-type="primary"
-              >查询</el-button
-            >
+            <el-button @click="query" icon="el-icon-search" type="primary">查询</el-button>
             <el-button @click="reset">重置</el-button>
           </el-form-item>
           <el-form-item>
-            <el-button
-              @click="editForm.show = true"
-              icon="el-icon-search"
-              type="primary"
-              >添加</el-button
-            >
+            <el-button @click="editForm.show = true" icon="el-icon-search" type="primary">添加</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -40,9 +24,11 @@ type="primary"
           </el-table-column>
           <el-table-column label="邮件用户名">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{
-                scope.row.emailUserName
-              }}</span>
+              <span style="margin-left: 10px">
+                {{
+                  scope.row.emailUserName
+                }}
+              </span>
             </template>
           </el-table-column>
           <el-table-column label="邮件密码">
@@ -52,9 +38,11 @@ type="primary"
           </el-table-column>
           <el-table-column label="邮件协议">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{
-                scope.row.emailProtocol
-              }}</span>
+              <span style="margin-left: 10px">
+                {{
+                  scope.row.emailProtocol
+                }}
+              </span>
             </template>
           </el-table-column>
           <el-table-column label="邮件编码">
@@ -75,10 +63,7 @@ type="primary"
           <el-table-column label="操作">
             <template slot-scope="scope">
               <el-button @click="get(scope.row.id)" size="mini">修改</el-button>
-              <el-button @click="del(scope.row.id)" size="mini"
-type="danger"
-                >删除</el-button
-              >
+              <el-button @click="del(scope.row.id)" size="mini" type="danger">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -96,61 +81,30 @@ type="danger"
     <el-dialog :visible.sync="editForm.show" title="参数">
       <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
         <el-form-item label="邮件主机" label-width="120px" prop="emailHost">
-          <el-input
-            placeholder="请输入邮件主机"
-            v-model="editForm.emailHost"
-          ></el-input>
+          <el-input placeholder="请输入邮件主机" v-model="editForm.emailHost"></el-input>
         </el-form-item>
-        <el-form-item
-          label="邮件用户名"
-          label-width="120px"
-          prop="emailUserName"
-        >
-          <el-input
-            placeholder="请输入邮件用户名"
-            v-model="editForm.emailUserName"
-          ></el-input>
+        <el-form-item label="邮件用户名" label-width="120px" prop="emailUserName">
+          <el-input placeholder="请输入邮件用户名" v-model="editForm.emailUserName"></el-input>
         </el-form-item>
         <el-form-item label="邮件密码" label-width="120px" prop="emailPwd">
-          <el-input
-            placeholder="请输入邮件密码"
-            v-model="editForm.emailPwd"
-          ></el-input>
+          <el-input placeholder="请输入邮件密码" v-model="editForm.emailPwd"></el-input>
         </el-form-item>
         <el-form-item label="邮件协议" label-width="120px" prop="emailProtocol">
-          <el-input
-            placeholder="请输入邮件协议"
-            v-model="editForm.emailProtocol"
-          ></el-input>
+          <el-input placeholder="请输入邮件协议" v-model="editForm.emailProtocol"></el-input>
         </el-form-item>
         <el-form-item label="邮件编码" label-width="120px" prop="emailEncode">
-          <el-input
-            placeholder="请输入邮件编码"
-            v-model="editForm.emailEncode"
-          ></el-input>
+          <el-input placeholder="请输入邮件编码" v-model="editForm.emailEncode"></el-input>
         </el-form-item>
         <el-form-item label="单位商标" label-width="120px" prop="orgLogo">
-          <el-input
-            placeholder="请输入单位商标"
-            v-model="editForm.orgLogo"
-          ></el-input>
+          <el-input placeholder="请输入单位商标" v-model="editForm.orgLogo"></el-input>
         </el-form-item>
         <el-form-item label="单位名称" label-width="120px" prop="orgName">
-          <el-input
-            placeholder="请输入单位名称"
-            v-model="editForm.orgName"
-          ></el-input>
+          <el-input placeholder="请输入单位名称" v-model="editForm.orgName"></el-input>
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="add" type="primary"
-v-if="editForm.id == null"
-          >添加</el-button
-        >
-        <el-button @click="edit" type="primary"
-v-if="editForm.id != null"
-          >修改</el-button
-        >
+        <el-button @click="add" type="primary" v-if="editForm.id == null">添加</el-button>
+        <el-button @click="edit" type="primary" v-if="editForm.id != null">修改</el-button>
         <el-button @click="editForm.show = false">取 消</el-button>
       </div>
     </el-dialog>
@@ -205,15 +159,15 @@ export default {
   methods: {
     // 查询
     async query() {
-      const {
-        data: { rows, total }
+      let {
+        data: { list, total }
       } = await this.$https.parmListpage({
         orgName: this.queryForm.orgName,
         curPage: this.listpage.curPage,
         pageSize: this.listpage.pageSize
       })
       this.listpage.total = total
-      this.listpage.list = rows
+      this.listpage.list = list
     },
     // 重置
     async reset() {
@@ -234,7 +188,7 @@ export default {
       this.query()
     },
     add() {
-      this.$refs["editForm"].validate(async(valid) => {
+      this.$refs["editForm"].validate(async (valid) => {
         if (!valid) {
           return false
         }
@@ -258,7 +212,7 @@ export default {
       });
     },
     edit() {
-      this.$refs["editForm"].validate(async(valid) => {
+      this.$refs["editForm"].validate(async (valid) => {
         if (!valid) {
           return false
         }

@@ -38,7 +38,7 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 				+ "LEFT JOIN EXM_PAPER_TYPE PAPER_TYPE ON PAPER.PAPER_TYPE_ID = PAPER_TYPE.ID "
 				+ "LEFT JOIN SYS_USER USER ON PAPER.UPDATE_USER_ID = USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("paperTypeId")) && !"1".equals(pageIn.get("paperTypeId")), "PAPER.PAPER_TYPE_ID = ?", pageIn.get("paperTypeId"))
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("paperTypeId")), "PAPER.PAPER_TYPE_ID = ?", pageIn.get("paperTypeId"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("userName")), "USER.NAME LIKE ?", "%" + pageIn.get("userName") + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")), "PAPER.STATE = ?", pageIn.get("state"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("PaperId")), "PAPER.ID = ?", pageIn.get("PaperId"))
@@ -46,15 +46,15 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 				.addWhere("PAPER.STATE != ?", 0)
 				.addOrder("PAPER.UPDATE_TIME", Order.DESC);
 		
-		if (pageIn.get("CurUserId", Integer.class) != null) {
-			User user = userDao.getEntity(pageIn.get("CurUserId", Integer.class));
+		if (pageIn.get("curUserId", Integer.class) != null && pageIn.get("curUserId", Integer.class) != 1) {
+			User user = userDao.getEntity(pageIn.get("curUserId", Integer.class));
 			StringBuilder partSql = new StringBuilder();
 			List<Object> params = new ArrayList<>();
 			partSql.append("(");
-			partSql.append("PAPER_TYPE.USER_IDS LIKE ? ");
+			partSql.append("PAPER_TYPE.WRITE_USER_IDS LIKE ? ");
 			params.add("%" + user.getId() + "%");
 			
-			partSql.append("OR PAPER_TYPE.ORG_IDS LIKE ? ");
+			partSql.append("OR PAPER_TYPE.READ_USER_IDS LIKE ? ");
 			params.add("%" + user.getOrgId() + "%");
 			
 			/*if (ValidateUtil.isValid(user.getPostIds())) {

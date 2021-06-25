@@ -31,7 +31,7 @@ public class PaperRemarkDaoImpl extends RBaseDaoImpl<PaperRemark> implements Pap
 
 	@Override
 	public List<PaperRemark> getList(Integer paperId) {
-		String sql = "SELECT * FROM EXM_PAPER_REMARK WHERE PAPER_ID = ? AND ORDER BY NO ACS";
+		String sql = "SELECT * FROM EXM_PAPER_REMARK WHERE PAPER_ID = ? ";
 		return getList(sql, new Object[]{ paperId });
 	}
 }

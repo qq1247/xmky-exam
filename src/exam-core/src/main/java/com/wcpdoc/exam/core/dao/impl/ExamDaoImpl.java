@@ -3,6 +3,7 @@ package com.wcpdoc.exam.core.dao.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -34,27 +35,29 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT EXAM.ID, EXAM.NAME, EXAM.START_TIME, EXAM.END_TIME, "
-				+ "		EXAM.STATE, PAPER.NAME AS PAPER_NAME, PAPER.TOTAL_SCORE AS PAPER_TOTLE_SCORE, "
-				+ "		EXAM.MARK_START_TIME, EXAM.MARK_END_TIME, "
-				+ "		(SELECT COUNT(*) FROM EXM_MY_EXAM A WHERE A.EXAM_ID = EXAM.ID) AS USER_NUM "
+		String sql = "SELECT EXAM.ID, EXAM.NAME, EXAM.START_TIME, EXAM.END_TIME, EXAM.SCORE_STATE, EXAM.RANK_STATE, EXAM.LOGIN_TYPE, "
+				+ "		EXAM.STATE, EXAM.PAPER_ID AS PAPER_ID, PAPER.NAME AS PAPER_NAME, PAPER.TOTAL_SCORE AS PAPER_TOTLE_SCORE, PAPER.PASS_SCORE AS PAPER_PASS_SCORE, " 
+				+ "		EXAM.MARK_START_TIME, EXAM.MARK_END_TIME, USER.NAME AS USER_NAME, USER.ID AS USER_ID,"
+				+ "		(SELECT COUNT(*) FROM EXM_MY_EXAM A WHERE A.EXAM_ID = EXAM.ID) AS USER_NUM ," //考试人数
+				+ "		(SELECT COUNT(*) FROM EXM_MY_MARK B WHERE B.EXAM_ID = EXAM.ID) AS MARK_NUM " //阅卷人数
 				+ "FROM EXM_EXAM EXAM "
 				+ "LEFT JOIN EXM_EXAM_TYPE EXAM_TYPE ON EXAM.EXAM_TYPE_ID = EXAM_TYPE.ID "
+				+ "LEFT JOIN SYS_USER USER ON EXAM.UPDATE_USER_ID = USER.ID "
 				+ "LEFT JOIN EXM_PAPER PAPER ON EXAM.PAPER_ID = PAPER.ID";
 		
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("id")) && !"1".equals(pageIn.get("id")), "EXAM.EXAM_TYPE_ID = ?", pageIn.get("id"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("eName")), "EXAM.NAME LIKE ?", "%" + pageIn.get("eName") + "%")
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examTypeId")), "EXAM.EXAM_TYPE_ID = ?", pageIn.get("examTypeId", Integer.class))
+				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "EXAM.NAME LIKE ?", "%" + pageIn.get("name") + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.get("pName")), "PAPER.NAME LIKE ?", "%" + pageIn.get("pName") + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")), "EXAM.STATE = ?", pageIn.get("state"))//0：删除；1：启用；2：禁用
 				.addWhere(ValidateUtil.isValid(pageIn.get("START_TIME")), "EXAM.START_TIME > ?", ValidateUtil.isValid(pageIn.get("START_TIME")) ? DateUtil.getDateTime(pageIn.get("START_TIME")) : null)
 				.addWhere(ValidateUtil.isValid(pageIn.get("START_TIME")), "EXAM.START_TIME < ?", ValidateUtil.isValid(pageIn.get("START_TIME")) ? DateUtil.getDateTime(pageIn.get("START_TIME")) : null)
-				.addWhere(pageIn.get("CurUserId", Integer.class) != null, "EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.USER_ID = ? AND Z.EXAM_ID = EXAM.ID)", pageIn.get("CurUserId", Integer.class))
+				.addWhere(pageIn.get("curUserId", Integer.class) != null, "EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.MARK_USER_ID = ? AND Z.EXAM_ID = EXAM.ID)", pageIn.get("curUserId", Integer.class))
 				.addWhere("EXAM.STATE != ?", 0)
 				.addOrder("EXAM.START_TIME", Order.DESC);
 		
-		if (pageIn.get("CurUserId", Integer.class) != null) {//查看权限相关
-			User user = userDao.getEntity(pageIn.get("CurUserId", Integer.class));
+		if (pageIn.get("curUserId", Integer.class) != null) {//查看权限相关
+			User user = userDao.getEntity(pageIn.get("curUserId", Integer.class));
 			StringBuilder partSql = new StringBuilder();
 			List<Object> params = new ArrayList<>();
 			partSql.append("(");
@@ -78,29 +81,14 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(), 
-				"START_TIME", DateUtil.FORMAT_DATE_TIME, 
-				"END_TIME", DateUtil.FORMAT_DATE_TIME, 
-				"MARK_START_TIME", DateUtil.FORMAT_DATE_TIME, 
-				"MARK_END_TIME", DateUtil.FORMAT_DATE_TIME);
-		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), "EXAM_STATE", "STATE");
+				"startTime", DateUtil.FORMAT_DATE_TIME, 
+				"endTime", DateUtil.FORMAT_DATE_TIME, 
+				"markStartTime", DateUtil.FORMAT_DATE_TIME, 
+				"markEndTime", DateUtil.FORMAT_DATE_TIME);
+		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), "EXAM_STATE", "state");
 		return pageOut;
 	}
-
-	@Override
-	public PageOut getUserListpage(PageIn pageIn) {
-		String sql = "SELECT USER.ID, USER.NAME AS NAME, ORG.NAME AS ORG_NAME "
-				+ "FROM SYS_USER USER "
-				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID ";
-		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name").toString()), "(USER.NAME LIKE ? OR ORG.NAME LIKE ?)", "%" + pageIn.get("name") + "%", "%" + pageIn.get("name").toString() + "%")
-		.addWhere(ValidateUtil.isValid(pageIn.get("examId").toString()), "EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.EXAM_ID = ? AND USER.ID = Z.USER_ID)", pageIn.get("examId").toString())
-				.addWhere(ValidateUtil.isValid(pageIn.get("CurUserId").toString()), "EXISTS (SELECT 1 FROM EXM_MY_EXAM Z WHERE Z.EXAM_ID = ? AND USER.ID = Z.USER_ID)", pageIn.get("CurUserId").toString())
-				.addWhere("USER.STATE = 1")
-				.addOrder("USER.UPDATE_TIME", Order.DESC);
-		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		return pageOut;
-	}
-
+	
 	@Override
 	public List<Exam> getList(Integer examTypeId) {
 		String sql = "SELECT * FROM EXM_EXAM EXAM_TYPE WHERE STATE = 1 AND EXAM_TYPE_ID = ?";
@@ -153,4 +141,34 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 		String sql = "SELECT * FROM EXM_EXAM EXAM_TYPE WHERE STATE = 1 AND PAPER_ID = ?";
 		return getList(sql, new Object[]{paperId}, Exam.class);
 	}
+	
+	@Override
+	public List<Map<String, Object>> getExamUserList(Integer id) {
+		String sql = "SELECT USER.ID, USER.NAME AS NAME, ORG.NAME AS ORG_NAME "
+				+ "FROM SYS_USER USER "
+				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
+				+ "WHERE USER.STATE = 1 AND EXISTS (SELECT 1 FROM EXM_MY_EXAM Z WHERE Z.EXAM_ID = ? AND USER.ID = Z.USER_ID) "
+				+ "ORDER BY USER.UPDATE_TIME DESC ";
+		return getMapList(sql, new Object[]{id});
+	}
+
+	@Override
+	public List<Map<String, Object>> getMarkExamUserList(Integer id) {
+		String sql = "SELECT USER.ID, USER.NAME AS NAME, ORG.NAME AS ORG_NAME "
+				+ "FROM SYS_USER USER "
+				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
+				+ "WHERE EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.EXAM_ID = ? AND USER.ID = Z.USER_ID) "//回显的情况下，用户状态!=1的也查询
+				+ "ORDER BY USER.UPDATE_TIME DESC ";
+		return getMapList(sql, new Object[]{id});
+	}
+
+	@Override
+	public List<Map<String, Object>> getMarkQuestionList(Integer id) {
+		String sql = "SELECT QUESTION.ID, QUESTION.TITLE "
+				+ "FROM EXM_QUESTION QUESTION "
+				+ "WHERE EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.EXAM_ID = ? AND QUESTION.ID = Z.QUESTION_ID) "//回显的情况下，试题状态!=1的也查询
+				+ "ORDER BY QUESTION.UPDATE_TIME DESC ";
+		return getMapList(sql, new Object[]{id});
+	}
+
 }

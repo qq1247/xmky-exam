@@ -25,8 +25,10 @@ public class BulletinBoardDaoImpl extends RBaseDaoImpl<BulletinBoard> implements
 		String sql = "SELECT * "
 				+ "FROM EXM_BULLETIN_BOARD BULLETIN_BOARD ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "BULLETIN_BOARD.ID = ?", pageIn.get("name"))
-			   .addWhere(ValidateUtil.isValid(pageIn.get("topState")), "BULLETIN_BOARD.TOP_STATE = ?", pageIn.get("topState", Integer.class));
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("id")), "BULLETIN_BOARD.ID = ?", pageIn.get("id"))
+			   .addWhere(ValidateUtil.isValid(pageIn.get("title")), "BULLETIN_BOARD.TITLE LIKE ?", "%" + pageIn.get("title") + "%")
+			   .addWhere(ValidateUtil.isValid(pageIn.get("topState")), "BULLETIN_BOARD.TOP_STATE = ?", pageIn.get("topState", Integer.class))
+			   .addWhere("BULLETIN_BOARD.STATE != ?", 0);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 				HibernateUtil.formatDate(pageOut.getList(), "UPDATE_TIME", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;

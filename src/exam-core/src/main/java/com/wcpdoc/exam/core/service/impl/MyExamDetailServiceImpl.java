@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.core.service.impl;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -21,9 +22,9 @@ import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.MyExamDetailDao;
 import com.wcpdoc.exam.core.entity.Exam;
+import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyExamDetail;
-import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.PaperQuestionEx;
 import com.wcpdoc.exam.core.entity.Question;
@@ -34,6 +35,7 @@ import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
 import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.util.BigDecimalUtil;
+import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
@@ -69,6 +71,25 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	}
 
 	@Override
+	public List<Map<String, Object>> getAnswerList(Integer myExamId) {
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		for(Map<String, Object> mapList : myExamDetailDao.getAnswerList(myExamId, getCurUser().getId())){
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("id", mapList.get("ID"));
+			map.put("questionId", mapList.get("QUESTION_ID"));
+			map.put("answerTime", mapList.get("ANSWER_TIME") == null ? null : DateUtil.formatDateTime(DateUtil.getDateTime(mapList.get("ANSWER_TIME").toString())));
+			map.put("answer", mapList.get("ANSWER"));
+			map.put("markUserId", mapList.get("MARK_USER_ID"));
+			map.put("markUserName", mapList.get("MARK_USER_NAME"));
+			map.put("markTime", mapList.get("MARK_TIME") == null ? null : DateUtil.formatDateTime(DateUtil.getDateTime(mapList.get("MARK_TIME").toString())));
+			map.put("score", mapList.get("SCORE"));
+			map.put("questionScore", mapList.get("QUESTION_SCORE"));
+			list.add(map);
+		}
+		return list;
+	}
+	
+	@Override
 	public void delByMyExamId(Integer myExamId) {
 		myExamDetailDao.delByMyExamId(myExamId);
 	}
@@ -97,7 +118,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		List<MyMark> myMarkList = myMarkService.getList(examId);
 		boolean hasMyMark = false;
 		for (MyMark myMark : myMarkList) {
-			if (myMark.getUserId().intValue() == curUser.getId().intValue()) {
+			if (myMark.getMarkUserId().intValue() == curUser.getId().intValue()) {
 				hasMyMark = true;
 				break;
 			}
@@ -161,10 +182,10 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			myExam.setMyMarkId(curUser.getId());
 			String msg = null;
 			Date curTime = new Date();
-			myExam.setMarkTime(curTime);
+			myExam.setMarkStartTime(curTime);
 			if (!hasQA) {//如果没有问答题，表示阅卷完成
 				myExam.setMarkState(3);
-				myExam.setAnswerFinishTime(curTime);
+				myExam.setAnswerEndTime(curTime);
 				myExam.setTotalScore(totalScore.getResult());
 				msg = "自动阅卷完成";
 			} else {//否则表示阅卷中，等待人工阅卷

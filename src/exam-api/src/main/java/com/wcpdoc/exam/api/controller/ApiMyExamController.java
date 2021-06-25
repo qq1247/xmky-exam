@@ -1,6 +1,5 @@
 package com.wcpdoc.exam.api.controller;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -77,59 +76,47 @@ public class ApiMyExamController extends BaseController{
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
-			pageIn.addAttr("CurUserId", getCurUser().getId());
+			pageIn.addAttr("curUserId", getCurUser().getId());
 			PageOut pageOut = myExamService.getListpage(pageIn);
 
 			Date curTime = new Date();
 			for (Map<String, Object> map : pageOut.getList()) {
-				Date examStartTime = (Date) map.get("EXAM_START_TIME");
-				Date examEndTime = (Date) map.get("EXAM_END_TIME");
+				Date examStartTime = (Date) map.get("examStartTime");
+				Date examEndTime = (Date) map.get("examEndTime");
 				if (examStartTime.getTime() > curTime.getTime()) {
-					map.put("EXAM_HAND", "AWAIT");
+					map.put("examHand", "AWAIT");
 				} else if (examEndTime.getTime() < curTime.getTime()) {
-					map.put("EXAM_HAND", "END");
+					map.put("examHand", "END");
 				} else {
-					map.put("EXAM_HAND", "START");
-				}
-				
-				BigDecimal userScore = (BigDecimal) map.get("MY_EXAM_TOTAL_SCORE");
-				BigDecimal scoreA = (BigDecimal) map.get("EXAM_SCORE_A");
-				String scoreARemark = (String) map.get("EXAM_SCORE_A_REMARK");
-				if (scoreA != null && userScore != null && userScore.doubleValue() >= scoreA.doubleValue()) {
-					map.put("USER_REMARK", scoreARemark);
-					continue;
-				}
-				BigDecimal scoreB = (BigDecimal) map.get("EXAM_SCORE_B");
-				String scoreBRemark = (String) map.get("EXAM_SCORE_B_REMARK");
-				if (scoreB != null && userScore != null && userScore.doubleValue() >= scoreB.doubleValue()) {
-					map.put("USER_REMARK", scoreBRemark);
-					continue;
-				}
-				BigDecimal scoreC = (BigDecimal) map.get("EXAM_SCORE_C");
-				String scoreCRemark = (String) map.get("EXAM_SCORE_C_REMARK");
-				if (scoreC != null && userScore != null && userScore.doubleValue() >= scoreC.doubleValue()) {
-					map.put("USER_REMARK", scoreCRemark);
-					continue;
-				}
-				
-				BigDecimal scoreD = (BigDecimal) map.get("EXAM_SCORE_D");
-				String scoreDRemark = (String) map.get("EXAM_SCORE_D_REMARK");
-				if (scoreD != null && userScore != null && userScore.doubleValue() >= scoreD.doubleValue()) {
-					map.put("USER_REMARK", scoreDRemark);
-					continue;
-				}
-				
-				BigDecimal scoreE = (BigDecimal) map.get("EXAM_SCORE_E");
-				String scoreERemark = (String) map.get("EXAM_SCORE_E_REMARK");
-				if (scoreE != null && userScore != null && userScore.doubleValue() >= scoreE.doubleValue()) {
-					map.put("USER_REMARK", scoreERemark);
-					continue;
+					map.put("examHand", "START");
 				}
 			}
 
 			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("我的考试列表错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 考试答案列表
+	 * 
+	 * v1.0 zhanghc 2018年11月24日上午9:13:22
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/answerList")
+	@ResponseBody
+	@RequiresRoles(value={"user"},logical = Logical.OR)
+	public PageResult answerList(Integer myExamId) {
+		try {
+			return PageResultEx.ok().data(myExamDetailService.getAnswerList(myExamId));
+		} catch (MyException e) {
+			log.error("考试答案列表错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("考试答案列表错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -193,8 +180,8 @@ public class ApiMyExamController extends BaseController{
 			if (myExam.getState() == 1) {
 				myExam.setState(2);
 			}
-			if (myExam.getAnswerTime() == null) {
-				myExam.setAnswerTime(new Date());
+			if (myExam.getAnswerStartTime() == null) {
+				myExam.setAnswerStartTime(new Date());
 			}
 			myExamService.update(myExam);
 			return "exam/myExam/myExamPaper";
@@ -267,10 +254,10 @@ public class ApiMyExamController extends BaseController{
 	 * @param myExamId
 	 * @return PageResult
 	 */
-	@RequestMapping("/exam")
+	@RequestMapping("/doAnswer")
 	@ResponseBody
 	@RequiresRoles(value={"user"},logical = Logical.OR)
-	public PageResult exam(Integer myExamId) {
+	public PageResult doAnswer(Integer myExamId) {
 		try {
 			// 校验数据有效性
 			MyExam myExam = myExamService.getEntity(myExamId);
@@ -297,7 +284,7 @@ public class ApiMyExamController extends BaseController{
 
 			// 标记为已交卷
 			myExam.setState(3);
-			myExam.setAnswerFinishTime(new Date());
+			myExam.setAnswerEndTime(new Date());
 			myExamService.update(myExam);
 			return PageResult.ok();
 		} catch (MyException e) {

@@ -14,30 +14,16 @@
       </div>
       <div class="right">
         <div class="search">
-          <el-form
-            :inline="true"
-            :model="queryForm"
-            class="form-inline"
-            ref="queryForm"
-          >
+          <el-form :inline="true" :model="queryForm" class="form-inline" ref="queryForm">
             <el-form-item label prop="name">
-              <el-input
-                placeholder="请输入名称"
-                v-model="queryForm.name"
-              ></el-input>
+              <el-input placeholder="请输入名称" v-model="queryForm.name"></el-input>
             </el-form-item>
             <el-form-item style="width: 200px">
-              <el-button @click="query" icon="el-icon-search"
-type="primary"
-                >查询</el-button
-              >
+              <el-button @click="query" icon="el-icon-search" type="primary">查询</el-button>
               <el-button @click="reset">重置</el-button>
             </el-form-item>
             <el-form-item>
-              <el-button @click="toAdd" icon="el-icon-search"
-type="primary"
-                >添加</el-button
-              >
+              <el-button @click="toAdd" icon="el-icon-search" type="primary">添加</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -70,13 +56,8 @@ type="primary"
             </el-table-column>
             <el-table-column label="操作" width="150px">
               <template slot-scope="scope">
-                <el-button @click="toEdit(scope.row.id)" size="mini"
-                  >修改</el-button
-                >
-                <el-button @click="del(scope.row.id)" size="mini"
-type="danger"
-                  >删除</el-button
-                >
+                <el-button @click="toEdit(scope.row.id)" size="mini">修改</el-button>
+                <el-button @click="del(scope.row.id)" size="mini" type="danger">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -89,30 +70,18 @@ type="danger"
           <el-input disabled placeholder v-model="editForm.orgName"></el-input>
         </el-form-item>
         <el-form-item label="登录名称" label-width="120px" prop="loginName">
-          <el-input
-            placeholder="请输入登录名称"
-            v-model="editForm.loginName"
-          ></el-input>
+          <el-input placeholder="请输入登录名称" v-model="editForm.loginName"></el-input>
         </el-form-item>
         <el-form-item label="名称" label-width="120px" prop="name">
           <el-input placeholder="请输入名称" v-model="editForm.name"></el-input>
         </el-form-item>
         <el-form-item label="手机号" label-width="120px" prop="phone">
-          <el-input
-            placeholder="请输入手机号"
-            v-model="editForm.phone"
-          ></el-input>
+          <el-input placeholder="请输入手机号" v-model="editForm.phone"></el-input>
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="doAdd" type="primary"
-v-if="editForm.id == null"
-          >添加</el-button
-        >
-        <el-button @click="doEdit" type="primary"
-v-if="editForm.id != null"
-          >修改</el-button
-        >
+        <el-button @click="doAdd" type="primary" v-if="editForm.id == null">添加</el-button>
+        <el-button @click="doEdit" type="primary" v-if="editForm.id != null">修改</el-button>
         <el-button @click="editForm.show = false">取 消</el-button>
       </div>
     </el-dialog>
@@ -165,8 +134,8 @@ export default {
   methods: {
     // 查询
     async query() {
-      const {
-        data: { rows, total }
+      let {
+        data: { list, total }
       } = await this.$https.userListpage({
         orgId: this.queryForm.orgId,
         name: this.queryForm.name,
@@ -174,7 +143,7 @@ export default {
         pageSize: this.listpage.pageSize
       })
       this.listpage.total = total
-      this.listpage.list = rows
+      this.listpage.list = list
     },
     // 重置
     async reset() {
@@ -262,7 +231,7 @@ export default {
     },
     // 添加组织机构
     doAdd() {
-      this.$refs["editForm"].validate(async(valid) => {
+      this.$refs["editForm"].validate(async (valid) => {
         if (!valid) {
           return false
         }
@@ -306,7 +275,7 @@ export default {
     },
     // 修改
     doEdit() {
-      this.$refs["editForm"].validate(async(valid) => {
+      this.$refs["editForm"].validate(async (valid) => {
         if (!valid) {
           return false
         }

@@ -383,7 +383,7 @@ alter table EXM_EXAM add constraint FK_Reference_19 foreign key (PAPER_ID)
 
 alter table EXM_EXAM add constraint FK_Reference_22 foreign key (EXAM_TYPE_ID)
       references EXM_EXAM_TYPE (ID) on delete restrict on update restrict;
-
+	  
 drop table if exists EXM_MY_MARK;
 
 /*==============================================================*/
@@ -392,10 +392,12 @@ drop table if exists EXM_MY_MARK;
 create table EXM_MY_MARK
 (
    ID                   int not null auto_increment comment 'id',
+   MARK_USER_ID         int comment '阅卷用户ID',
+   EXAM_USER_IDS        varchar(1024) comment '考试用户IDS',
+   QUESTION_IDS         varchar(1024) comment '试题IDS',
    EXAM_ID              int comment '考试ID',
-   USER_ID              int comment '用户ID',
-   QUESTION_IDS         varchar(128) comment '试题IDS',
-   PAPER_IDS            varchar(128) comment '试卷IDS',
+   UPDATE_USER_ID       int comment '修改人',
+   UPDATE_TIME          datetime comment '修改时间',
    primary key (ID)
 );
 
@@ -414,11 +416,11 @@ create table EXM_MY_EXAM
    ID                   int not null auto_increment comment 'id',
    EXAM_ID              int comment '考试ID',
    USER_ID              int comment '用户ID',
-   ANSWER_TIME          datetime comment '答题时间',
-   ANSWER_FINISH_TIME   datetime comment '答题完成时间',
+   ANSWER_START_TIME    datetime comment '答题时间',
+   ANSWER_END_TIME      datetime comment '答题完成时间',
    MARK_USER_ID         int comment '阅卷人',
-   MARK_TIME            datetime comment '阅卷时间',
-   MARK_FINISH_TIME     datetime comment '阅卷完成时间',
+   MARK_START_TIME      datetime comment '阅卷时间',
+   MARK_END_TIME        datetime comment '阅卷完成时间',
    TOTAL_SCORE          decimal(5,2) comment '总分数',
    STATE                int comment '1：未考试；2：考试中；3：已交卷；4：强制交卷；',
    MARK_STATE           int comment '1：未阅卷；2：阅卷中；3：已阅卷；',
@@ -532,6 +534,15 @@ INSERT INTO `SYS_DICT` VALUES (32, 'MY_EXAM_ANSWER_STATE', '1', '及格', 1);
 INSERT INTO `SYS_DICT` VALUES (33, 'MY_EXAM_ANSWER_STATE', '2', '不及格', 2);
 INSERT INTO `SYS_DICT` VALUES (34, 'USER_ROLES', '1', 'OP', 1);
 INSERT INTO `SYS_DICT` VALUES (35, 'USER_ROLES', '2', 'AA', 2);
+INSERT INTO `SYS_DICT` VALUES (36, 'EXAM_STATE', '0', '删除', 1);
+INSERT INTO `SYS_DICT` VALUES (37, 'EXAM_STATE', '1', '发布', 2);
+INSERT INTO `SYS_DICT` VALUES (38, 'EXAM_STATE', '2', '草稿', 3);
+INSERT INTO `SYS_DICT` VALUES (39, 'EXAM_SCORE_STATE', '1', '公开', 1);
+INSERT INTO `SYS_DICT` VALUES (40, 'EXAM_SCORE_STATE', '2', '不公开', 2);
+INSERT INTO `SYS_DICT` VALUES (41, 'EXAM_RANK_STATE', '1', '公开', 1);
+INSERT INTO `SYS_DICT` VALUES (42, 'EXAM_RANK_STATE', '2', '不公开', 2);
+INSERT INTO `SYS_DICT` VALUES (43, 'EXAM_LOGIN_TYPE', '1', '安排考试', 1);
+INSERT INTO `SYS_DICT` VALUES (44, 'EXAM_LOGIN_TYPE', '2', '免登陆考试', 2);
 
 INSERT INTO `SYS_CRON` VALUES ('1', '清理临时附件', 'com.wcpdoc.exam.file.job.ClearFileJob', '0 0 0 1/1 * ? ', '1', '1', '2020-08-26 18:42:08');
 

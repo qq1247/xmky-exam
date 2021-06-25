@@ -127,7 +127,7 @@ public abstract class RBaseDaoImpl<T> implements RBaseDao<T> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public /*final*/ PageOut getListpage(SqlUtil sqlUtil, PageIn pageIn) {
+	public /* final */ PageOut getListpage(SqlUtil sqlUtil, PageIn pageIn) {
 		// 查询列表
 		String sql = toHibernateSql(sqlUtil.getSql());
 		Query<Map<String, Object>> query = getCurSession().createSQLQuery(sql);
@@ -138,13 +138,13 @@ public abstract class RBaseDaoImpl<T> implements RBaseDao<T> {
 		query.setMaxResults(pageIn.getPageSize());
 		query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
 		List<Map<String, Object>> result = query.list();
-		for(Map<String, Object> map : result){
-			Set<String> keySet = new HashSet<>(map.keySet()); 
+		for (Map<String, Object> map : result) {// 大写转小写，下划线后一位转大写。
+			Set<String> keySet = new HashSet<>(map.keySet());
 			for (String key : keySet) {
-				map.put(CaseUtils.toCamelCase(key, false, new char[]{'_'}), map.remove(key)); 
+				map.put(CaseUtils.toCamelCase(key, false, new char[] { '_' }), map.remove(key));
 			}
 		}
-		
+
 		// 查询总记录数
 		sql = toHibernateSql(sqlUtil.getCountSql());
 		query = getCurSession().createSQLQuery(sql);
@@ -171,7 +171,15 @@ public abstract class RBaseDaoImpl<T> implements RBaseDao<T> {
 		for (int i = 0; i < params.length; i++) {
 			query.setParameter(i, params[i]);
 		}
-		return query.list();
+		
+		List<Map<String, Object>> result = query.list();
+		for (Map<String, Object> map : result) {// 大写转小写，下划线后一位转大写。
+			Set<String> keySet = new HashSet<>(map.keySet());
+			for (String key : keySet) {
+				map.put(CaseUtils.toCamelCase(key, false, new char[] { '_' }), map.remove(key));
+			}
+		}
+		return result;
 	}
 	
 	@Override

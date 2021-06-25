@@ -158,10 +158,13 @@ code == 401 无权限或登录超时
 | name           | String  | 试题分类名称 | 否   |
 | title          | String  | 题干         | 否   |
 | type           | Integer | 类型         | 否   |
+| exPaperId      | Integer | 排除试卷id   | 否   |
+| paperId      | Integer | 试卷id   | 否   |
 | difficulty     | Integer | 难度         | 否   |
 | scoreStart     | double  | 分值大于     | 否   |
 | scoreEnd       | double  | 分值小于     | 否   |
 | questionTypeId | Integer | 试题分类id   | 否   |
+| exAi		 | Integer | 排除智能阅卷试题(exAi=1)   | 否   |
 | curPage        | Integer | 当前第几页   | 否   |
 | pageSize       | Integer | 每页多少条   | 否   |
 ######响应数据
@@ -362,25 +365,25 @@ code == 401 无权限或登录超时
 | ---- | ------- | ------ | ---- |
 | id   | Integer | 试卷id | 否   |
 ######响应数据
-| 参数                                     | 类型    | 描述                             |
-| ---------------------------------------- | ------- | -------------------------------- |
-| code                                     | Integer | 响应码                           |
-| msg                                      | String  | 响应消息                         |
-| data.total                               | Integer | 总行数                           |
-| data.list[]                              | arr[]   | 分页列表                         |
-| data.list[].chapter.id                   | Integer | 章节id                           |
-| data.list[].chapter.name                 | String  | 章节名称                         |
-| data.list[].chapter.description          | String  | 章节描述                         |
-| data.list[].chapter.parentId             | Integer | 父id（树形结构的ID）             |
-| data.list[].questionsList[].id           | Integer | 试题id                           |
-| data.list[].questionsList[].type         | Integer | 试题类型，参考question/add       |
-| data.list[].questionsList[].difficulty   | Integer | 试题难度，难易度参考question/add |
-| data.list[].questionsList[].title        | String  | 试题标题                         |
-| data.list[].questionsList[].answer       | String  | 试题答案                         |
-| data.list[].questionsList[].analysis     | String  | 试题解析                         |
-| data.list[].questionsList[].score        | double  | 试题分数                         |
-| data.list[].questionsList[].scoreOptions | String  | 试题分数选项，参考question/add   |
-| data.list[].questionsList[].options[]    | Integer | 试题选项，参考question/add       |
+| 参数  |  类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | Integer  | 响应码 |
+|msg     | String  | 响应消息 |
+|data.total     | Integer  | 总行数 |
+|data.list[]      | arr[]  | 分页列表 |
+|data.list[].chapter.id  | Integer  | 章节id |
+|data.list[].chapter.name  | String  | 章节名称 |
+|data.list[].chapter.description  | String  | 章节描述 |
+|data.list[].chapter.parentId  | Integer  | 父id（树形结构的ID） |
+|data.list[].questionList[].id  | Integer  | 试题id |
+|data.list[].questionList[].type  | Integer  | 试题类型，参考question/add |
+|data.list[].questionList[].difficulty  | Integer  | 试题难度，难易度参考question/add|
+|data.list[].questionList[].title  | String  | 试题标题 |
+|data.list[].questionList[].answer  | String  | 试题答案 |
+|data.list[].questionList[].analysis  | String  | 试题解析 |
+|data.list[].questionList[].score  | double  | 试题分数 |
+|data.list[].questionList[].scoreOptions  | String  | 试题分数选项，参考question/add |
+|data.list[].questionList[].options[]  | Integer  | 试题选项，参考question/add |
 
 ####试卷试题添加：paper/questionAdd
 ######请求参数
@@ -460,26 +463,34 @@ code == 401 无权限或登录超时
 
 ####考试添加：exam/add
 ######请求参数
-| 参数          | 类型        | 描述                         | 必填 |
-| ------------- | ----------- | ---------------------------- | ---- |
-| name          | String (16) | 名称                         | 是   |
-| startTime     | Date        | 考试开始时间                 | 是   |
-| endTime       | Date        | 考试结束时间                 | 是   |
-| markStartTime | Date        | 阅卷开始时间                 | 是   |
-| markEndTime   | Date        | 阅卷结束时间                 | 是   |
-| scoreState    | Integer     | 成绩状态：1：公开；2：不公开 | 是   |
-| rankState     | Integer     | 排名状态：1：公开；2：不公开 | 是   |
-| paperId       | Integer     | 试卷ID                       | 是   |
-| examTypeId    | Integer     | 考试分类ID                   | 是   |
+| 参数          | 类型        | 描述                         		| 必填 |
+| ------------- | ----------- | ------------------------------------| ---- |
+| name          | String (16) | 名称                         		| 是   |
+| startTime     | Date        | 考试开始时间                		| 是   |
+| endTime       | Date        | 考试结束时间                 		| 是   |
+| markStartTime | Date        | 阅卷开始时间               		    | 是   |
+| markEndTime   | Date        | 阅卷结束时间                		| 是   |
+| scoreState    | Integer     | 成绩状态：1：公开；2：不公开        | 是   |
+| rankState     | Integer     | 排名状态：1：公开；2：不公开 		| 是   |
+| loginType     | Integer     | 登录方式：1：安排考试；2：免登陆考试| 是   |
+| description   | String      | 描述						        | 是   |
+| paperId       | Integer     | 试卷ID                              | 是   |
+| examTypeId    | Integer     | 考试分类ID                          | 是   |
 
 ####考试修改：exam/edit
 ######请求参数
 | 参数                 | 类型    | 描述 | 必填 |
 | -------------------- | ------- | ---- | ---- |
 | id                   | Integer | 主键 | 是   |
-| 其他字段参考exam/add |         |      |      |  |
+| 其他字段参考exam/add |         |      |      | 
 
 ####考试删除：exam/del
+######请求参数
+| 参数 | 类型    | 描述 | 必填 |
+| ---- | ------- | ---- | ---- |
+| id   | Integer | 主键 | 是   |
+
+####考试发布：exam/publish
 ######请求参数
 | 参数 | 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
@@ -490,6 +501,7 @@ code == 401 无权限或登录超时
 | 参数    | 类型      | 描述        | 必填 |
 | ------- | --------- | ----------- | ---- |
 | id      | Integer   | 主键        | 是   |
+| examId      | Integer   | 考试id      | 是   |
 | userIds | Integer[] | 考试用户IDS | 是   |
 
 ####考试更新判卷用户：exam/updateMarkUser
@@ -497,11 +509,12 @@ code == 401 无权限或登录超时
 | 参数        | 类型      | 描述        | 必填 |
 | ----------- | --------- | ----------- | ---- |
 | id          | Integer   | 主键        | 是   |
+| examId      | Integer   | 考试id      | 是   |
 | markUserIds | Integer[] | 阅卷用户IDS | 是   |
 | examUserIds | Integer[] | 考试用户IDS | 否   |
 | questionIds | Integer[] | 试题IDS     | 否   |
 
-####考试用户列表：exam/userList
+####考试用户列表：exam/examUserList
 ######请求参数
 | 参数 | 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
@@ -513,8 +526,9 @@ code == 401 无权限或登录超时
 | msg       | String  | 响应消息 |
 | data.id   | Integer | 主键     |
 | data.name | String  | 名称     |
+| data.orgName | String  | 组织机构名称     |
 
-####考试试题列表：exam/questionList
+####考试试题列表：exam/markUserList
 ######请求参数
 | 参数 | 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
@@ -524,5 +538,10 @@ code == 401 无权限或登录超时
 | --------- | ------- | -------- |
 | code      | Integer | 响应码   |
 | msg       | String  | 响应消息 |
-| data.id   | Integer | 主键     |
-| data.name | String  | 名称     |
+| data.id   | Integer | 阅卷用户ID     |
+| data.name | String  | 阅卷用户名称 |
+| data.examUserList[].id | Integer  | 考试用户ID |
+| data.examUserList[].name | String  | 考试用户名称 |
+| data.examUserList[].orgName | String  | 考试用户组织机构 |
+| data.questionList[].id | Integer  | 试题ID |
+| data.questionList[].title | Integer  | 试题题干 |

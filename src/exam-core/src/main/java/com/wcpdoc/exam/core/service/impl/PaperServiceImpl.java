@@ -99,9 +99,9 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 	
 	@Override
-	public void chapterDel(Integer chapterId) {
+	public void chapterDel(Integer id) {
 		//校验数据有效性
-		PaperQuestion entity = paperQuestionService.getEntity(chapterId);
+		PaperQuestion entity = paperQuestionService.getEntity(id);
 		Paper paper = getEntity(entity.getPaperId());
 		if (paper.getState() == 0) {
 			throw new MyException("试卷已删除");
@@ -111,12 +111,12 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		}
 				
 		//删除章节
-		List<PaperQuestion> questionList = paperQuestionService.getQuestionList(chapterId);
+		List<PaperQuestion> questionList = paperQuestionService.getQuestionList(id);
 		for(PaperQuestion pq : questionList) {
 			paperQuestionService.del(pq.getId());
 		}
-		PaperQuestion chapter = paperQuestionService.getEntity(chapterId);//不要放到下一行，因为第二行执行删除了。
-		paperQuestionService.del(chapterId);
+		PaperQuestion chapter = paperQuestionService.getEntity(id);//不要放到下一行，因为第二行执行删除了。
+		paperQuestionService.del(id);
 		
 		//更新总分数
 		updateTotalScore(chapter.getPaperId());

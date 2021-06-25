@@ -1,6 +1,10 @@
 package com.wcpdoc.exam.api.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -9,20 +13,25 @@ import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.constant.ConstantManager;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.Exam;
+import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
+import com.wcpdoc.exam.core.entity.UpdateMarkUserJson;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.ExamTypeService;
-import com.wcpdoc.exam.core.service.PaperService;
+import com.wcpdoc.exam.core.service.MyMarkService;
 import com.wcpdoc.exam.core.service.PaperTypeService;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
  * 考试控制层
@@ -37,30 +46,13 @@ public class ApiExamController extends BaseController{
 	@Resource
 	private ExamService examService;
 	@Resource
-	private PaperService paperService;
-	@Resource
 	private PaperTypeService paperTypeService;
 	@Resource
 	private ExamTypeService examTypeService;
-	
-	/**
-	 * 用户列表 
-	 * 
-	 * v1.0 zhanghc 2018年10月31日上午10:27:22
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	@RequestMapping("/userList")
-	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult userListpage() {
-		try {
-			return PageResultEx.ok().data(examService.getUserListpage(new PageIn(request)));
-		} catch (Exception e) {
-			log.error("用户列表错误：", e);
-			return PageResult.err();
-		}
-	}
+	@Resource
+	private MyMarkService myMarkService;
+	@Resource
+	private UserService userService;
 	
 	/**
 	 * 考试列表 
@@ -75,7 +67,7 @@ public class ApiExamController extends BaseController{
 		try {
 			PageIn pageIn = new PageIn(request);
 			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
-				pageIn.addAttr("CurUserId", getCurUser().getId());
+				pageIn.addAttr("curUserId", getCurUser().getId());
 			}
 			return PageResultEx.ok().data(examService.getListpage(pageIn));
 		} catch (Exception e) {
@@ -164,7 +156,6 @@ public class ApiExamController extends BaseController{
 			entity.setRankState(exam.getRankState());
 			entity.setLoginType(exam.getLoginType());
 			entity.setDescription(exam.getDescription());
-			entity.setScoreERemark(exam.getScoreERemark());
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
 			examService.update(entity);
@@ -209,7 +200,60 @@ public class ApiExamController extends BaseController{
 	}
 	
 	/**
-	 * 完成考试配置
+	 * 考试用户列表 
+	 * 
+	 * v1.0 zhanghc 2018年10月31日上午10:27:22
+	 * @param pageIn
+	 * @return PageOut
+	 */
+	@RequestMapping("/examUserList")
+	@ResponseBody
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	public PageResult examUserList(Integer id) {
+		try {
+			return PageResultEx.ok().data(examService.getExamUserList(id));
+		} catch (Exception e) {
+			log.error("用户列表错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 阅卷用户列表
+	 * 
+	 * v1.0 zhanghc 2018年11月24日上午9:13:22
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/markUserList")
+	@ResponseBody
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	public PageResult markUserList(Integer id) {
+		try {
+			List<MyMark> myMarkList = myMarkService.getList(id);
+			List<Map<String, Object>> result = new ArrayList<>();
+			for (MyMark myMark : myMarkList) {
+				Map<String, Object> map = new HashMap<>();
+				map.put("id", userService.getEntity(myMark.getMarkUserId()).getName());
+				map.put("name", userService.getEntity(myMark.getMarkUserId()).getName());
+				if (ValidateUtil.isValid(myMark.getExamUserIds())) {
+					map.put("examUserList", examService.getMarkExamUserList(myMark.getExamId()));
+				}
+				if (ValidateUtil.isValid(myMark.getQuestionIds())) {
+					map.put("questionList", examService.getMarkQuestionList(myMark.getExamId()));
+				}
+				result.add(map);
+			}
+			
+			return PageResultEx.ok().data(result);
+		}catch (Exception e) {
+			log.error("阅卷用户列表错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 考试更新考试用户
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param id
@@ -217,12 +261,38 @@ public class ApiExamController extends BaseController{
 	 * @param markIds
 	 * @return PageResult
 	 */
-	@RequestMapping("/cfg")
+	@RequestMapping("/updateExamUser")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult cfg(Integer id, Integer[] userIds, Integer[] myMarkIds) {
+	public PageResult updateExamUser(Integer id, Integer[] userIds) {
 		try {
-			examService.cfg(id, userIds, myMarkIds);
+			examService.updateExamUser(id, userIds);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("完成更新考试用户错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("完成更新考试用户错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 完成考试更新判卷用户
+	 * 
+	 * v1.0 zhanghc 2017年6月16日下午5:02:45
+	 * @param id
+	 * @param markUserIds
+	 * @param examUserIds
+	 * @param questionIds
+	 * @return PageResult
+	 */
+	@RequestMapping("/updateMarkUser")
+	@ResponseBody
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	public PageResult updateMarkUser(@RequestBody UpdateMarkUserJson updateMarkUserJson) {
+		try {
+			examService.updateMarkUser(updateMarkUserJson);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成考试配置错误：{}", e.getMessage());
@@ -286,5 +356,4 @@ public class ApiExamController extends BaseController{
 			return PageResult.err();
 		}
 	}
-
 }

@@ -2,44 +2,22 @@
   <div class="container">
     <div class="content">
       <div class="search">
-        <el-form
-          :inline="true"
-          :model="queryForm"
-          class="form-inline"
-          ref="queryForm"
-        >
+        <el-form :inline="true" :model="queryForm" class="form-inline" ref="queryForm">
           <el-form-item label prop="dictIndex">
-            <el-input
-              placeholder="请输入索引"
-              v-model="queryForm.dictIndex"
-            ></el-input>
+            <el-input placeholder="请输入索引" v-model="queryForm.dictIndex"></el-input>
           </el-form-item>
           <el-form-item label prop="dictKey">
-            <el-input
-              placeholder="请输入键"
-              v-model="queryForm.dictKey"
-            ></el-input>
+            <el-input placeholder="请输入键" v-model="queryForm.dictKey"></el-input>
           </el-form-item>
           <el-form-item label prop="dictValue">
-            <el-input
-              placeholder="请输入值"
-              v-model="queryForm.dictValue"
-            ></el-input>
+            <el-input placeholder="请输入值" v-model="queryForm.dictValue"></el-input>
           </el-form-item>
           <el-form-item style="width: 200px">
-            <el-button @click="query" icon="el-icon-search"
-type="primary"
-              >查询</el-button
-            >
+            <el-button @click="query" icon="el-icon-search" type="primary">查询</el-button>
             <el-button @click="reset">重置</el-button>
           </el-form-item>
           <el-form-item>
-            <el-button
-              @click="editForm.show = true"
-              icon="el-icon-search"
-              type="primary"
-              >添加</el-button
-            >
+            <el-button @click="editForm.show = true" icon="el-icon-search" type="primary">添加</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -68,10 +46,7 @@ type="primary"
           <el-table-column label="操作">
             <template slot-scope="scope">
               <el-button @click="get(scope.row.id)" size="mini">修改</el-button>
-              <el-button @click="del(scope.row.id)" size="mini"
-type="danger"
-                >删除</el-button
-              >
+              <el-button @click="del(scope.row.id)" size="mini" type="danger">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -89,40 +64,21 @@ type="danger"
     <el-dialog :visible.sync="editForm.show" title="数据字典">
       <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
         <el-form-item label="索引" label-width="120px" prop="dictIndex">
-          <el-input
-            placeholder="请输入索引"
-            v-model="editForm.dictIndex"
-          ></el-input>
+          <el-input placeholder="请输入索引" v-model="editForm.dictIndex"></el-input>
         </el-form-item>
         <el-form-item label="键" label-width="120px" prop="dictKey">
-          <el-input
-            placeholder="请输入键"
-            v-model="editForm.dictKey"
-          ></el-input>
+          <el-input placeholder="请输入键" v-model="editForm.dictKey"></el-input>
         </el-form-item>
         <el-form-item label="值" label-width="120px" prop="dictValue">
-          <el-input
-            placeholder="请输入值"
-            v-model="editForm.dictValue"
-          ></el-input>
+          <el-input placeholder="请输入值" v-model="editForm.dictValue"></el-input>
         </el-form-item>
         <el-form-item label="排序" label-width="120px" prop="no">
-          <el-input-number
-            :max="100"
-            :min="1"
-            v-model.number="editForm.no"
-          ></el-input-number>
+          <el-input-number :max="100" :min="1" v-model.number="editForm.no"></el-input-number>
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="add" type="primary"
-v-if="editForm.id == null"
-          >添加</el-button
-        >
-        <el-button @click="edit" type="primary"
-v-if="editForm.id != null"
-          >修改</el-button
-        >
+        <el-button @click="add" type="primary" v-if="editForm.id == null">添加</el-button>
+        <el-button @click="edit" type="primary" v-if="editForm.id != null">修改</el-button>
         <el-button @click="editForm.show = false">取 消</el-button>
       </div>
     </el-dialog>
@@ -177,8 +133,8 @@ export default {
   methods: {
     // 查询
     async query() {
-      const {
-        data: { rows, total },
+      let {
+        data: { list, total },
       } = await this.$https.dictListpage({
         dictIndex: this.queryForm.dictIndex,
         dictKey: this.queryForm.dictKey,
@@ -187,7 +143,7 @@ export default {
         pageSize: this.listpage.pageSize,
       });
       this.listpage.total = total;
-      this.listpage.list = rows;
+      this.listpage.list = list;
     },
     // 重置
     async reset() {

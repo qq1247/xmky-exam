@@ -118,6 +118,111 @@ export default {
   questionEdit: params => post('question/edit', params),
   questionDel: params => post('question/del', params),
   questionCopy: params => post('question/copy', params),
+  userListpage: params => post('user/listpage', params),
+  userGet: params => post('user/get', params),
+  userAdd: params => post('user/add', params),
+  userEdit: params => post('user/edit', params),
+  userDel: params => post('user/del', params),
+
+  // 数据字典
+  dictListpage: params => post('dict/listpage', params),
+  dictGet: params => post('dict/get', params),
+  dictAdd: params => post('dict/add', params),
+  dictEdit: params => post('dict/edit', params),
+  dictDel: params => post('dict/del', params),
+
+  // 定时任务
+  cronListpage: params => post('cron/listpage', params),
+  cronGet: params => post('cron/get', params),
+  cronAdd: params => post('cron/add', params),
+  cronEdit: params => post('cron/edit', params),
+  cronDel: params => post('cron/del', params),
+  cronStartTask: params => post('cron/startTask', params),
+  cronStopTask: params => post('cron/stopTask', params),
+  cronrunOnceTask: params => post('cron/runOnceTask', params),
+
+  // 组织机构相关
+  orgListpage: params => post('org/listpage', params),
+  orgTreeList: params => post('org/treeList', params),
+  orgGet: params => post('org/get', params),
+  orgAdd: params => post('org/add', params),
+  orgEdit: params => post('org/edit', params),
+  orgDel: params => post('org/del', params),
+
+  // 参数相关
+  parmListpage: params => post('parm/listpage', params),
+  parmGet: params => post('parm/get', params),
+  parmAdd: params => post('parm/add', params),
+  parmEdit: params => post('parm/edit', params),
+  parmDel: params => post('parm/del', params), // 公告相关
+
+  bulletinBoardListpage: params => post('bulletinBoard/listpage', params),
+  bulletinBoardGet: params => post('bulletinBoard/get', params),
+  bulletinBoardAdd: params => post('bulletinBoard/add', params),
+  bulletinBoardEdit: params => post('bulletinBoard/edit', params),
+  bulletinBoardDel: params => post('bulletinBoard/del', params), // 我的考试相关
+
+  myExamListpage: params => post('myExam/listpage', params), // 我的阅读相关
+
+  myMarkListpage: params => post('myMark/listpage', params), // 我的阅卷考试列表相关
+  myMarkExamListpage: params => post('myMark/examListpage', params),
+
+  // 考试相关
+  examListPage: params => post('exam/listpage', params),
+  examAdd: params => post('exam/add', params),
+  examEdit: params => post('exam/edit', params),
+  examDel: params => post('exam/del', params),
+  examUpdateExamUser: params => post('exam/updateExamUser', params),
+  examUpdateMarkUser: params => post('exam/updateMarkUser', params),
+  examUserList: params => post('exam/userList', params),
+  examQuestionList: params => post('exam/questionList', params),
+
+  // 考试分类相关
+  examTypeListPage: params => post('examType/listpage', params),
+  examTypeAdd: params => post('examType/add', params),
+  examTypeEdit: params => post('examType/edit', params),
+  examTypeDel: params => post('examType/del', params),
+  examTypeGet: params => post('examType/get', params),
+  examTypeMove: params => post('examType/move', params),
+
+  // 试卷相关
+  paperListPage: params => post('paper/listpage', params),
+  paperAdd: params => post('paper/add', params),
+  paperEdit: params => post('paper/edit', params),
+  paperDel: params => post('paper/del', params),
+  paperGet: params => post('paper/get', params),
+  paperCopy: params => post('paper/copy', params),
+  paperArchive: params => post('paper/archive', params),
+  paperChapterAdd: params => post('paper/chapterAdd', params),
+  paperChapterEdit: params => post('paper/chapterEdit', params),
+  paperChapterDel: params => post('paper/chapterDel', params),
+
+  // 试卷试题相关
+  paperQuestionList: params => post('paper/paperQuestionList', params),
+  paperQuestionAdd: params => post('paper/questionAdd', params),
+  paperQuestionClear: params => post('paper/questionClear', params),
+  paperScoreUpdate: params => post('paper/scoreUpdate', params),
+  paperScoreOptionsUpdate: params => post('paper/scoreOptionsUpdate', params),
+  paperBatchScoreUpdate: params => post('paper/batchScoreUpdate', params),
+  paperQuestionUp: params => post('paper/questionUp', params),
+  paperQuestionDown: params => post('paper/questionDown', params),
+  paperQuestionPublish: params => post('paper/publish', params),
+
+  // 试卷分类相关
+  paperTypeListPage: params => post('paperType/listpage', params),
+  paperTypeAdd: params => post('paperType/add', params),
+  paperTypeEdit: params => post('paperType/edit', params),
+  paperTypeDel: params => post('paperType/del', params),
+  paperTypeGet: params => post('paperType/get', params),
+  paperTypeMove: params => post('paperType/move', params),
+
+  // 试题相关
+  questionListPage: params => post('question/listpage', params),
+  questionGet: params => post('question/get', params),
+  questionAdd: params => post('question/add', params),
+  questionEdit: params => post('question/edit', params),
+  questionDel: params => post('question/del', params),
+  questionCopy: params => post('question/copy', params),
   questionTemplate: (params, type) =>
     post('question/wordTemplateExport', params, type),
   questionImport: (params, type, headers) =>

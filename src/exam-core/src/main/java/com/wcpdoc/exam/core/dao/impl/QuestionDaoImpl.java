@@ -5,9 +5,6 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.exam.base.cache.DictCache;
@@ -40,16 +37,18 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 				+ "LEFT JOIN SYS_USER USER ON QUESTION.UPDATE_USER_ID = USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(pageIn.get("questionTypeId", Integer.class) != null && !"1".equals(pageIn.get("questionTypeId", Integer.class)), "QUESTION.QUESTION_TYPE_ID = ?", pageIn.get("questionTypeId", Integer.class))
-				.addWhere(pageIn.get("id", Integer.class)!= null, "QUESTION.ID = ?", pageIn.get("id", Integer.class))
+				.addWhere(ValidateUtil.isValid(pageIn.get("id")), "QUESTION.ID = ?", pageIn.get("id", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("title")), "QUESTION.TITLE LIKE ?", "%" + pageIn.get("title") + "%")
-				.addWhere(pageIn.get("state", Integer.class)!= null, "QUESTION.STATE = ?", pageIn.get("state", Integer.class))//0：删除；1：启用；2：禁用
-				.addWhere(pageIn.get("type", Integer.class)!= null, "QUESTION.TYPE = ?", pageIn.get("type", Integer.class))
+				.addWhere(ValidateUtil.isValid(pageIn.get("state")), "QUESTION.STATE = ?", pageIn.get("state", Integer.class))//0：删除；1：启用；2：禁用
+				.addWhere(ValidateUtil.isValid(pageIn.get("type")), "QUESTION.TYPE = ?", pageIn.get("type", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("difficulty")), "QUESTION.DIFFICULTY = ?", pageIn.get("difficulty"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "QUESTION_TYPE.NAME LIKE ?", "%" + pageIn.get("name") + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.get("score")), "QUESTION.SCORE = ?", pageIn.get("score"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("scoreStart")), "QUESTION.SCORE >= ?", pageIn.get("scoreStart"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("scoreEnd")), "QUESTION.SCORE <= ?", pageIn.get("scoreEnd"))
-				.addWhere(pageIn.get("PaperId", Integer.class)!= null, "NOT EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.get("PaperId", Integer.class))
+				.addWhere(ValidateUtil.isValid(pageIn.get("exPaperId")), "NOT EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.get("exPaperId", Integer.class))
+				.addWhere(ValidateUtil.isValid(pageIn.get("paperId")), "EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.get("exPaperId", Integer.class))
+				.addWhere(ValidateUtil.isValid(pageIn.get("exAi")) && pageIn.get("exAi").equals("1"), "QUESTION.SCORE_OPTIONS IS NULL")
 				.addWhere("QUESTION.STATE != ?", 0)
 				.addOrder("QUESTION.NO", Order.DESC);
 		
@@ -78,22 +77,37 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), "QUESTION_TYPE", "TYPE", "QUESTION_DIFFICULTY", "DIFFICULTY", "STATE", "STATE");
-		for(Map<String, Object> map : pageOut.getList()) {
-			String title = map.get("title").toString();
-			Document document = Jsoup.parse(title);
-			Elements embeds = document.getElementsByTag("video");
-			embeds.after("【视频】");
-			embeds.remove();
-			Elements imgs = document.getElementsByTag("img");
-			imgs.after("【图片】");
-			imgs.remove();
-			
-			title = document.body().html();
-			if(title.length() > 500) {
-				title = title.substring(0, 500) + "...";
-			}
-			map.put("title", Jsoup.parse(title).text());
-		}
+//		for(Map<String, Object> map : pageOut.getList()) {
+//			String title = map.get("title").toString();
+//			Document document = Jsoup.parse(title);
+//			Elements embeds = document.getElementsByTag("video");
+//			embeds.after("【视频】");
+//			embeds.remove();
+//			Elements imgs = document.getElementsByTag("img");
+//			imgs.after("【图片】");
+//			imgs.remove();
+//			
+//			title = document.body().html();
+//			if(title.length() > 500) {
+//				title = title.substring(0, 500) + "...";
+//			}
+//			map.put("title", Jsoup.parse(title).text());
+//			
+//			String analysis = map.get("analysis").toString();
+//			Document documentAnalysis = Jsoup.parse(analysis);
+//			Elements embedsAnalysis = documentAnalysis.getElementsByTag("video");
+//			embedsAnalysis.after("【视频】");
+//			embedsAnalysis.remove();
+//			Elements imgsAnalysis = documentAnalysis.getElementsByTag("img");
+//			imgsAnalysis.after("【图片】");
+//			imgsAnalysis.remove();
+//			
+//			title = documentAnalysis.body().html();
+//			if(analysis.length() > 500) {
+//				analysis = analysis.substring(0, 500) + "...";
+//			}
+//			map.put("analysis", Jsoup.parse(analysis).text());
+//		}
 		return pageOut;
 	}
 
