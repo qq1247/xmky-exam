@@ -159,6 +159,7 @@ code == 401 无权限或登录超时
 | title          | String  | 题干         | 否   |
 | type           | Integer | 类型         | 否   |
 | exPaperId      | Integer | 排除试卷id   | 否   |
+| paperId      | Integer | 试卷id   | 否   |
 | difficulty     | Integer | 难度         | 否   |
 | scoreStart     | double  | 分值大于     | 否   |
 | scoreEnd       | double  | 分值小于     | 否   |
