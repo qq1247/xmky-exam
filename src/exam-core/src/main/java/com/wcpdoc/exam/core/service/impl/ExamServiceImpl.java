@@ -10,8 +10,6 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -76,8 +74,8 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	@Override
-	public PageOut getUserListpage(PageIn pageIn) {
-		return examDao.getUserListpage(pageIn);
+	public List<Map<String, Object>> getExamUserList(Integer id) {
+		return examDao.getExamUserList(id);
 	}
 
 	@Override
@@ -190,14 +188,12 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	@Override
-	public List<Map<String, Object>> questionList(Integer id) {
-		List<Map<String, Object>> questionList = examDao.questionList(id);
-		for(Map<String, Object> map : questionList){
-			String parameter = map.get("title").toString();
-			Document document = Jsoup.parse(parameter);
-			parameter = document.body().html();
-			map.put("title", Jsoup.parse(parameter).text());
-		}
-		return questionList;
+	public List<Map<String, Object>> getMarkExamUserList(Integer id) {
+		return examDao.getMarkExamUserList(id);
+	}
+
+	@Override
+	public List<Map<String, Object>> getMarkQuestionList(Integer id) {
+		return examDao.getMarkQuestionList(id);
 	}
 }

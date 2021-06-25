@@ -5,9 +5,6 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.exam.base.cache.DictCache;
@@ -50,6 +47,8 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 				.addWhere(ValidateUtil.isValid(pageIn.get("scoreStart")), "QUESTION.SCORE >= ?", pageIn.get("scoreStart"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("scoreEnd")), "QUESTION.SCORE <= ?", pageIn.get("scoreEnd"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("exPaperId")), "NOT EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.get("exPaperId", Integer.class))
+				.addWhere(ValidateUtil.isValid(pageIn.get("paperId")), "EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.get("exPaperId", Integer.class))
+				.addWhere(ValidateUtil.isValid(pageIn.get("exAi")) && pageIn.get("exAi").equals("1"), "QUESTION.SCORE_OPTIONS IS NULL")
 				.addWhere("QUESTION.STATE != ?", 0)
 				.addOrder("QUESTION.NO", Order.DESC);
 		
@@ -78,37 +77,37 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), "QUESTION_TYPE", "TYPE", "QUESTION_DIFFICULTY", "DIFFICULTY", "STATE", "STATE");
-		for(Map<String, Object> map : pageOut.getList()) {
-			String title = map.get("title").toString();
-			Document document = Jsoup.parse(title);
-			Elements embeds = document.getElementsByTag("video");
-			embeds.after("【视频】");
-			embeds.remove();
-			Elements imgs = document.getElementsByTag("img");
-			imgs.after("【图片】");
-			imgs.remove();
-			
-			title = document.body().html();
-			if(title.length() > 500) {
-				title = title.substring(0, 500) + "...";
-			}
-			map.put("title", Jsoup.parse(title).text());
-			
-			String analysis = map.get("analysis").toString();
-			Document documentAnalysis = Jsoup.parse(analysis);
-			Elements embedsAnalysis = documentAnalysis.getElementsByTag("video");
-			embedsAnalysis.after("【视频】");
-			embedsAnalysis.remove();
-			Elements imgsAnalysis = documentAnalysis.getElementsByTag("img");
-			imgsAnalysis.after("【图片】");
-			imgsAnalysis.remove();
-			
-			title = documentAnalysis.body().html();
-			if(analysis.length() > 500) {
-				analysis = analysis.substring(0, 500) + "...";
-			}
-			map.put("analysis", Jsoup.parse(analysis).text());
-		}
+//		for(Map<String, Object> map : pageOut.getList()) {
+//			String title = map.get("title").toString();
+//			Document document = Jsoup.parse(title);
+//			Elements embeds = document.getElementsByTag("video");
+//			embeds.after("【视频】");
+//			embeds.remove();
+//			Elements imgs = document.getElementsByTag("img");
+//			imgs.after("【图片】");
+//			imgs.remove();
+//			
+//			title = document.body().html();
+//			if(title.length() > 500) {
+//				title = title.substring(0, 500) + "...";
+//			}
+//			map.put("title", Jsoup.parse(title).text());
+//			
+//			String analysis = map.get("analysis").toString();
+//			Document documentAnalysis = Jsoup.parse(analysis);
+//			Elements embedsAnalysis = documentAnalysis.getElementsByTag("video");
+//			embedsAnalysis.after("【视频】");
+//			embedsAnalysis.remove();
+//			Elements imgsAnalysis = documentAnalysis.getElementsByTag("img");
+//			imgsAnalysis.after("【图片】");
+//			imgsAnalysis.remove();
+//			
+//			title = documentAnalysis.body().html();
+//			if(analysis.length() > 500) {
+//				analysis = analysis.substring(0, 500) + "...";
+//			}
+//			map.put("analysis", Jsoup.parse(analysis).text());
+//		}
 		return pageOut;
 	}
 

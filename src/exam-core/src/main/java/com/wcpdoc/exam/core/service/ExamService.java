@@ -16,13 +16,13 @@ import com.wcpdoc.exam.core.entity.UpdateMarkUserJson;
 public interface ExamService extends BaseService<Exam>{
 	
 	/**
-	 * 获取我的考试列表 
+	 * 获取考试用户列表 
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
-	 * @param pageIn
+	 * @param id
 	 * @return PageOut
 	 */
-	PageOut getUserListpage(PageIn pageIn);
+	List<Map<String, Object>> getExamUserList(Integer id);
 
 	/**
 	 * 考试更新考试用户
@@ -81,11 +81,20 @@ public interface ExamService extends BaseService<Exam>{
 	List<Exam> getExamList(Integer paperId);
 	
 	/**
-	 * 考试试题列表
+	 * 获取阅卷考试用户列表
 	 * 
-	 * v1.0 zhanghc 2017年8月6日下午10:03:09
+	 * v1.0 zhanghc 2021年6月25日下午2:49:33
 	 * @param id
 	 * @return List<Map<String,Object>>
 	 */
-	List<Map<String, Object>> questionList(Integer id); 
+	List<Map<String, Object>> getMarkExamUserList(Integer id);
+
+	/**
+	 * 获取阅卷试题列表
+	 * 
+	 * v1.0 zhanghc 2021年6月25日下午2:50:02
+	 * @param id
+	 * @return List<Map<String,Object>>
+	 */
+	List<Map<String, Object>> getMarkQuestionList(Integer id); 
 }

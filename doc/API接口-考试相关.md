@@ -163,6 +163,7 @@ code == 401 无权限或登录超时
 | scoreStart     | double  | 分值大于     | 否   |
 | scoreEnd       | double  | 分值小于     | 否   |
 | questionTypeId | Integer | 试题分类id   | 否   |
+| exAi		 | Integer | 排除智能阅卷试题(exAi=1)   | 否   |
 | curPage        | Integer | 当前第几页   | 否   |
 | pageSize       | Integer | 每页多少条   | 否   |
 ######响应数据
@@ -512,7 +513,7 @@ code == 401 无权限或登录超时
 | examUserIds | Integer[] | 考试用户IDS | 否   |
 | questionIds | Integer[] | 试题IDS     | 否   |
 
-####考试用户列表：exam/userList
+####考试用户列表：exam/examUserList
 ######请求参数
 | 参数 | 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
@@ -524,8 +525,9 @@ code == 401 无权限或登录超时
 | msg       | String  | 响应消息 |
 | data.id   | Integer | 主键     |
 | data.name | String  | 名称     |
+| data.orgName | String  | 组织机构名称     |
 
-####考试试题列表：exam/questionList
+####考试试题列表：exam/markUserList
 ######请求参数
 | 参数 | 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
@@ -535,5 +537,10 @@ code == 401 无权限或登录超时
 | --------- | ------- | -------- |
 | code      | Integer | 响应码   |
 | msg       | String  | 响应消息 |
-| data.id   | Integer | 主键     |
-| data.name | String  | 名称     |
+| data.id   | Integer | 阅卷用户ID     |
+| data.name | String  | 阅卷用户名称 |
+| data.examUserList[].id | Integer  | 考试用户ID |
+| data.examUserList[].name | String  | 考试用户名称 |
+| data.examUserList[].orgName | String  | 考试用户组织机构 |
+| data.questionList[].id | Integer  | 试题ID |
+| data.questionList[].title | Integer  | 试题题干 |

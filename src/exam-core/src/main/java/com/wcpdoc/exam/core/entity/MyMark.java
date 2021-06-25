@@ -30,9 +30,9 @@ public class MyMark {
 	@Column(name = "MARK_USER_ID")
 	private Integer markUserId;
 	@Column(name = "QUESTION_IDS")
-	private Integer questionIds;
+	private String questionIds;
 	@Column(name = "EXAM_USER_IDS")
-	private Integer examUserIds;
+	private String examUserIds;
 	@Column(name = "UPDATE_USER_ID")
 	private Integer updateUserId;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -56,11 +56,11 @@ public class MyMark {
 		this.examId = examId;
 	}
 
-	public Integer getQuestionIds() {
+	public String getQuestionIds() {
 		return questionIds;
 	}
 
-	public void setQuestionIds(Integer questionIds) {
+	public void setQuestionIds(String questionIds) {
 		this.questionIds = questionIds;
 	}
 
@@ -72,11 +72,11 @@ public class MyMark {
 		this.markUserId = markUserId;
 	}
 
-	public Integer getExamUserIds() {
+	public String getExamUserIds() {
 		return examUserIds;
 	}
 
-	public void setExamUserIds(Integer examUserIds) {
+	public void setExamUserIds(String examUserIds) {
 		this.examUserIds = examUserIds;
 	}
 

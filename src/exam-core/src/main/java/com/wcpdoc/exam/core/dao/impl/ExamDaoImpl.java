@@ -88,22 +88,7 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), "EXAM_STATE", "state");
 		return pageOut;
 	}
-
-	@Override
-	public PageOut getUserListpage(PageIn pageIn) {
-		String sql = "SELECT USER.ID, USER.NAME AS NAME, ORG.NAME AS ORG_NAME "
-				+ "FROM SYS_USER USER "
-				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID ";
-		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "(USER.NAME LIKE ? OR ORG.NAME LIKE ?)", "%" + pageIn.get("name") + "%", "%" + pageIn.get("name", Integer.class) + "%")
-		.addWhere(ValidateUtil.isValid(pageIn.get("examId")), "EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.EXAM_ID = ? AND USER.ID = Z.USER_ID)", pageIn.get("examId", Integer.class))
-				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId")), "EXISTS (SELECT 1 FROM EXM_MY_EXAM Z WHERE Z.EXAM_ID = ? AND USER.ID = Z.USER_ID)", pageIn.get("curUserId", Integer.class))
-				.addWhere("USER.STATE = 1")
-				.addOrder("USER.UPDATE_TIME", Order.DESC);
-		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		return pageOut;
-	}
-
+	
 	@Override
 	public List<Exam> getList(Integer examTypeId) {
 		String sql = "SELECT * FROM EXM_EXAM EXAM_TYPE WHERE STATE = 1 AND EXAM_TYPE_ID = ?";
@@ -156,13 +141,34 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 		String sql = "SELECT * FROM EXM_EXAM EXAM_TYPE WHERE STATE = 1 AND PAPER_ID = ?";
 		return getList(sql, new Object[]{paperId}, Exam.class);
 	}
-
+	
 	@Override
-	public List<Map<String, Object>> questionList(Integer id) {
-		String sql = " SELECT QUESTION.ID AS id, QUESTION.TITLE AS title FROM EXM_QUESTION QUESTION "
-				   + " LEFT JOIN EXM_PAPER_QUESTION PAPER_QUESTION ON PAPER_QUESTION.QUESTION_ID = QUESTION.ID "
-				   + " WHERE PAPER_QUESTION.PAPER_ID = (SELECT EXAM.PAPER_ID FROM EXM_EXAM EXAM WHERE EXAM.ID = ?) "
-				   + " AND PAPER_QUESTION.TYPE = 2 AND QUESTION.TYPE = 5 ";
+	public List<Map<String, Object>> getExamUserList(Integer id) {
+		String sql = "SELECT USER.ID, USER.NAME AS NAME, ORG.NAME AS ORG_NAME "
+				+ "FROM SYS_USER USER "
+				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
+				+ "WHERE USER.STATE = 1 AND EXISTS (SELECT 1 FROM EXM_MY_EXAM Z WHERE Z.EXAM_ID = ? AND USER.ID = Z.USER_ID) "
+				+ "ORDER BY USER.UPDATE_TIME DESC ";
 		return getMapList(sql, new Object[]{id});
 	}
+
+	@Override
+	public List<Map<String, Object>> getMarkExamUserList(Integer id) {
+		String sql = "SELECT USER.ID, USER.NAME AS NAME, ORG.NAME AS ORG_NAME "
+				+ "FROM SYS_USER USER "
+				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
+				+ "WHERE EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.EXAM_ID = ? AND USER.ID = Z.USER_ID) "//回显的情况下，用户状态!=1的也查询
+				+ "ORDER BY USER.UPDATE_TIME DESC ";
+		return getMapList(sql, new Object[]{id});
+	}
+
+	@Override
+	public List<Map<String, Object>> getMarkQuestionList(Integer id) {
+		String sql = "SELECT QUESTION.ID, QUESTION.TITLE "
+				+ "FROM EXM_QUESTION QUESTION "
+				+ "WHERE EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.EXAM_ID = ? AND QUESTION.ID = Z.QUESTION_ID) "//回显的情况下，试题状态!=1的也查询
+				+ "ORDER BY QUESTION.UPDATE_TIME DESC ";
+		return getMapList(sql, new Object[]{id});
+	}
+
 }
