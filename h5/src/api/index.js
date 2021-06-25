@@ -69,6 +69,7 @@ export default {
   examUpdateMarkUser: params => post('exam/updateMarkUser', params),
   examUserList: params => post('exam/userList', params),
   examQuestionList: params => post('exam/questionList', params),
+  examPublish: params => post('exam/publish', params),
 
   // 考试分类相关
   examTypeListPage: params => post('examType/listpage', params),
