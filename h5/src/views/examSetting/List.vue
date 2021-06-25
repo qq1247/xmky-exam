@@ -54,28 +54,23 @@
           <el-input placeholder="请输入试卷名称" v-model="examForm.name"></el-input>
         </el-form-item>
         <el-form-item label="选择试卷">
-          <el-select
+          <CustomSelect
             placeholder="请选择试卷"
-            v-model="examForm.paperId"
-            v-loadmore="getMorePaper"
-            @focus="getPaperList"
+            :value="examForm.paperId"
+            :total="examForm.total"
+            :showPage="true"
+            :pageSize="examForm.pageSize"
+            @change="selectPaper"
+            @focus="getPaperList()"
+            @currentChange="getMorePaper"
           >
             <el-option
-              :key="paper.id"
-              :label="paper.name"
-              :value="paper.id"
-              v-for="paper in examForm.paperList"
+              v-for="item in examForm.paperList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
             ></el-option>
-            <div style="bottom: -10px">
-              <el-pagination
-                small
-                :current-page="1"
-                :page-size="pageSize"
-                layout="prev, pager,next,total"
-                :total="examForm.paperList.length"
-              ></el-pagination>
-            </div>
-          </el-select>
+          </CustomSelect>
         </el-form-item>
         <el-form-item label="考试时间">
           <el-date-picker
@@ -180,20 +175,24 @@
     <el-dialog :visible.sync="examForm.userShow" :show-close="false" center width="40%">
       <el-form :model="examForm" :rules="examForm.rules" ref="examForm" label-width="100px">
         <el-form-item label="考试用户">
-          <el-select
-            multiple
-            placeholder="请选择用户"
-            v-model="examForm.examUser"
-            v-loadmore="getMoreUser"
-            @focus="getUserList"
+          <CustomSelect
+            placeholder="请选择试卷"
+            :multiple="true"
+            :value="examForm.examUser"
+            :total="examForm.total"
+            :showPage="true"
+            :pageSize="examForm.pageSize"
+            @change="selectUser"
+            @focus="getUserList()"
+            @currentChange="getMoreUser"
           >
             <el-option
-              :key="user.id"
-              :label="user.name"
-              :value="user.id"
-              v-for="user in examForm.examUsers"
+              v-for="item in examForm.examUsers"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
             ></el-option>
-          </el-select>
+          </CustomSelect>
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
@@ -206,10 +205,12 @@
 
 <script>
 import ListCard from "@/components/ListCard.vue";
+import CustomSelect from '@/components/CustomSelect.vue';
 import * as dayjs from "dayjs";
 export default {
   components: {
-    ListCard
+    ListCard,
+    CustomSelect
   },
   data() {
     return {
@@ -270,26 +271,6 @@ export default {
       examList: []
     }
   },
-  directives: {
-    loadmore: {
-      bind(el, binding) {
-        // 获取element-ui定义好的scroll盒子
-        const selectWrapDom = el.querySelector(
-          ".el-select-dropdown .el-select-dropdown__wrap"
-        );
-        selectWrapDom.addEventListener("scroll", function() {
-          const condition =
-            this.scrollHeight - Math.ceil(this.scrollTop) <= this.clientHeight;
-          console.log('scrollHeight', this.scrollHeight);
-          console.log('scrollTop', Math.ceil(this.scrollTop));
-          console.log('clientHeight', this.clientHeight);
-          if (condition) {
-            binding.value();
-          }
-        });
-      }
-    }
-  },
   mounted() {
     const { id } = this.$route.query
     this.queryForm.examTypeId = id
@@ -324,23 +305,21 @@ export default {
       this.examForm.examRemarks.pop()
     },
     // 获取试卷列表
-    async getPaperList() {
+    async getPaperList(curPage = 1) {
       const paperList = await this.$https.paperListPage({
-        curPage: this.examForm.curPage,
+        curPage,
         pageSize: this.examForm.pageSize
       })
       this.examForm.paperList = paperList.data.list
+      this.examForm.total = paperList.data.total
     },
     // 获取更多试卷列表
-    async getMorePaper() {
-      const paperList = await this.$https.paperListPage({
-        curPage: this.examForm.curPage++,
-        pageSize: this.examForm.pageSize,
-      });
-      this.examForm.paperList = [
-        ...this.examForm.paperList,
-        ...paperList.data.list,
-      ];
+    getMorePaper(curPage) {
+      this.getPaperList(curPage)
+    },
+    // 选择试卷
+    selectPaper(e) {
+      this.examForm.paperId = e
     },
     // 添加试卷信息
     addOrEdit() {
@@ -432,19 +411,23 @@ export default {
         : this.$tools.message("请重新发布考试！", "error");
     },
     // 获取考试用户
-    async getUserList() {
-      this.examForm.curPage = 1
+    async getUserList(curPage = 1) {
       const examUsers = await this.$https.examUserList({
         id: this.examForm.id,
-        curPage: this.examForm.curPage,
+        curPage,
         pageSize: this.examForm.pageSize
       })
 
       this.examForm.examUsers = examUsers.data.list
+      this.examForm.total = examUsers.data.total
     },
     // 获取更多用户
-    async getMoreUser() {
-
+    async getMoreUser(curPage) {
+      this.getUserList(curPage)
+    },
+    // 选择考试用户
+    selectUser(e) {
+      this.examForm.examUser = e
     },
     // 编辑考试用户
     async editExamUser() {
