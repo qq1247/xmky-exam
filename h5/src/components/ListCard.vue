@@ -10,6 +10,7 @@
           <span>使用权限：{{ data.writeUserNames || "暂无" }}</span>
         </div>
       </template>
+      <!-- 试卷列表 -->
       <template v-if="name == 'paperList'">
         <div class="content-info ellipsis">
           <span>发布人：{{ data.userName }}</span>
@@ -19,26 +20,25 @@
           <span>满分：{{ data.totalScore }}</span>
         </div>
         <div class="content-info">
-          <span class="space"
-            >组卷方式：{{ ["人工组卷", "自动组卷"][data.genType] }}</span
-          >
-          <span>展示方式：{{}}</span>
+          <span class="space">组卷方式：{{ ["人工组卷", "自动组卷"][data.genType] }}</span>
+          <span>展示方式：{{ }}</span>
         </div>
       </template>
+      <!-- 考试列表 -->
       <template v-if="name == 'examList'">
         <div class="content-info ellipsis">
-          <span>发布人：张三</span>
+          <span>发布人：{{ data.userName }}</span>
         </div>
         <div class="content-info">
-          <span class="space">成绩公开：是</span>
-          <span>排名公开：是</span>
+          <span class="space">成绩公开：{{ data.scoreState == 1 ? '是' : '否' }}</span>
+          <span>排名公开：{{ data.rankState == 1 ? '是' : '否' }}</span>
         </div>
         <div class="content-info">
-          <span class="space">考试人数：50</span>
-          <span>阅卷人数：5</span>
+          <span class="space">考试人数：{{ data.userNum }}</span>
+          <span>阅卷人数：{{ data.markNum }}</span>
         </div>
         <div class="content-info">
-          <span style="color: #ff9900">已发布</span>
+          <span style="color: #ff9900">{{ data.state == 1 ? '已发布' : '草稿' }}</span>
         </div>
       </template>
       <div class="handler">
@@ -48,48 +48,40 @@
         <span data-title="删除" @click="del(data)">
           <i class="common common-delete"></i>
         </span>
+        <!-- 试题 -->
         <span v-if="name == 'question'" data-title="权限" @click="role(data)">
           <i class="common common-role"></i>
         </span>
         <span v-if="name == 'question'" data-title="开放" @click="open(data)">
           <i class="common common-share"></i>
         </span>
+        <!-- 试卷 -->
         <span v-if="name == 'paperList'" data-title="复制" @click="copy(data)">
           <i class="common common-copy"></i>
         </span>
-        <span
-          v-if="name == 'examList'"
-          data-title="通知"
-          @click="message(data)"
-        >
-          <i class="common common-message"></i>
-        </span>
-        <span
-          v-if="['paperList', 'examList'].includes(name)"
-          data-title="统计"
-          @click="statistics(data)"
-        >
+        <span v-if="name == 'paperList'" data-title="统计" @click="statistics(data)">
           <i class="common common-statistics"></i>
         </span>
-        <span
-          v-if="['paperList', 'examList'].includes(name)"
-          data-title="归档"
-          @click="archive(data)"
-        >
+        <span v-if="name == 'paperList'" data-title="归档" @click="archive(data)">
           <i class="common common-archive"></i>
         </span>
-        <span
-          v-if="name == 'paperList'"
-          data-title="生成试卷"
-          @click="composition(data)"
-        >
+        <span v-if="name == 'paperList'" data-title="生成试卷" @click="composition(data)">
           <i class="common common-composition"></i>
         </span>
-        <span
-          v-if="detailTitles[name]"
-          :data-title="detailTitles[name]"
-          @click="detail(data)"
-        >
+        <!-- 考试 -->
+        <span v-if="name == 'examList'" data-title="发布" @click="publish(data)">
+          <i class="common common-publish"></i>
+        </span>
+        <span v-if="name == 'examList'" data-title="通知" @click="message(data)">
+          <i class="common common-messages"></i>
+        </span>
+        <span v-if="name == 'examList'" data-title="阅卷设置" @click="read(data)">
+          <i class="common common-readPaper"></i>
+        </span>
+        <span v-if="name == 'examList'" data-title="考试用户" @click="user(data)">
+          <i class="common common-wode"></i>
+        </span>
+        <span v-if="detailTitles[name]" :data-title="detailTitles[name]" @click="detail(data)">
           <i class="common common-list-row"></i>
         </span>
       </div>
@@ -159,6 +151,18 @@ export default {
     archive(data) {
       this.$emit("archive", data)
     },
+    // 阅卷设置
+    read(data) {
+      this.$emit("read", data)
+    },
+    // 考试用户
+    user(data) {
+      this.$emit("user", data)
+    },
+    // 发布考试
+    publish(data) {
+      this.$emit('publish', data)
+    }
   }
 }
 </script>
