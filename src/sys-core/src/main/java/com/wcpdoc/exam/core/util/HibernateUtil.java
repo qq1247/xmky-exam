@@ -57,7 +57,7 @@ public class HibernateUtil {
 				String key = map.get(paramValue).toString();
 				String indexKey = paramIndex + "_" + key;
 				String value = dictMap.get(indexKey);
-				map.put(params[i] + "_NAME", value);
+				map.put(params[i] + "Name", value);
 			}
 		}
 	}

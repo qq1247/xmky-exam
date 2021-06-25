@@ -54,6 +54,21 @@ export default {
   parmEdit: params => post("parm/edit", params),
   parmDel: params => post("parm/del", params),
 
+  // 公告相关
+  bulletinBoardListpage: params => post("bulletinBoard/listpage", params),
+  bulletinBoardGet: params => post("bulletinBoard/get", params),
+  bulletinBoardAdd: params => post("bulletinBoard/add", params),
+  bulletinBoardEdit: params => post("bulletinBoard/edit", params),
+  bulletinBoardDel: params => post("bulletinBoard/del", params),
+
+  // 我的考试相关
+  myExamListpage: params => post("myExam/listpage", params),
+
+  // 我的阅读相关
+  myMarkListpage: params => post("myMark/listpage", params),
+  // 我的阅卷考试列表相关
+  myMarkExamListpage: params => post("myMark/examListpage", params),
+
   // 考试相关
   examListPage: params => post("exam/listpage", params),
   examAdd: params => post("exam/add", params),

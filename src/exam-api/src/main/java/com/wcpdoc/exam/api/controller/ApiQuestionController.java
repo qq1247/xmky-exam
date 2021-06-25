@@ -79,7 +79,7 @@ public class ApiQuestionController extends BaseController {
 		try {
 			PageIn pageIn = new PageIn(request);
 			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
-				pageIn.addAttr("CurUserId", getCurUser().getId());
+				pageIn.addAttr("curUserId", getCurUser().getId());
 			}
 			
 			PageOut listpage = questionService.getListpage(pageIn);

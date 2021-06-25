@@ -192,14 +192,14 @@ export default {
     // 查询
     async query() {
       let {
-        data: { rows, total }
+        data: { list, total }
       } = await this.$https.parmListpage({
         orgName: this.queryForm.orgName,
         curPage: this.listpage.curPage,
         pageSize: this.listpage.pageSize
       })
       this.listpage.total = total
-      this.listpage.list = rows
+      this.listpage.list = list
     },
     // 重置
     async reset() {

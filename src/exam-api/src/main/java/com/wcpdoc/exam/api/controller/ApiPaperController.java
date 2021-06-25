@@ -12,12 +12,16 @@ import javax.annotation.Resource;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.exam.base.cache.DictCache;
+import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageResult;
@@ -26,6 +30,7 @@ import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.PaperRemark;
 import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.PaperQuestionService;
 import com.wcpdoc.exam.core.service.PaperRemarkService;
@@ -52,6 +57,9 @@ public class ApiPaperController extends BaseController {
 	private PaperQuestionService paperQuestionService;
 	@Resource
 	private QuestionOptionService questionOptionService;
+	@Resource
+	private UserService userService;
+	
 	
 	/**
 	 * 试卷列表
@@ -65,7 +73,7 @@ public class ApiPaperController extends BaseController {
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
-			pageIn.addAttr("CurUserId", getCurUser().getId());
+			pageIn.addAttr("curUserId", getCurUser().getId());
 			return PageResultEx.ok().data(paperService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("试卷列表错误：", e);
@@ -309,9 +317,9 @@ public class ApiPaperController extends BaseController {
 	@RequestMapping("/chapterDel")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult chapterDel(Integer chapterId) {
+	public PageResult chapterDel(Integer id) {
 		try {
-			paperService.chapterDel(chapterId);
+			paperService.chapterDel(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("删除章节错误：{}", e.getMessage());
@@ -382,8 +390,8 @@ public class ApiPaperController extends BaseController {
 		try {
 			PageIn pageIn = new PageIn(request);
 			if (getCurUser().getId() != 1) {
-				pageIn.addAttr("PaperId", "1");
-				pageIn.addAttr("CurUserId", getCurUser().getId());
+				pageIn.addAttr("PaperId", "1")
+					  .addAttr("curUserId", getCurUser().getId());
 			}
 			return PageResultEx.ok().data(questionService.getListpage(pageIn));
 		} catch (Exception e) {
@@ -423,14 +431,24 @@ public class ApiPaperController extends BaseController {
 					Question entity = questionService.getEntity(questionId.getQuestionId());
 					questionMap.put("id", entity.getId());
 					questionMap.put("type", entity.getType());
+					questionMap.put("typeName", DictCache.getDictValue("QUESTION_TYPE", entity.getType().toString()));
 					questionMap.put("difficulty", entity.getDifficulty());
-					questionMap.put("title", entity.getTitle());
-					questionMap.put("answer", entity.getAnswer());
-					questionMap.put("analysis", entity.getAnalysis());
+					questionMap.put("difficultyName", DictCache.getDictValue("QUESTION_DIFFICULTY", entity.getDifficulty().toString()));
+					questionMap.put("updateUserName", userService.getEntity(entity.getUpdateUserId()).getName());
+					questionMap.put("paperquestionId", questionId.getId());
+					
+					questionMap.put("title", takeOutHtml(entity.getTitle()));
+					questionMap.put("answer", takeOutHtml(entity.getAnswer()));
+					questionMap.put("analysis", takeOutHtml(entity.getAnalysis()));
+					
 					questionMap.put("score", entity.getScore());
 					questionMap.put("scoreOptions", questionId.getScoreOptions());
 					if(entity.getType() == 1 || entity.getType() == 2 ){
-						questionMap.put("options", questionOptionService.getQuestionOptionList(questionId.getQuestionId()));
+						List<QuestionOption> questionOptionList = questionOptionService.getQuestionOptionList(questionId.getQuestionId());
+						for (QuestionOption questionOption : questionOptionList) {
+							questionOption.setOptions(takeOutHtml(questionOption.getOptions()));
+						}
+						questionMap.put("options", questionOptionList);
 					}
 
 					questionsListMap.add(questionMap);
@@ -443,6 +461,12 @@ public class ApiPaperController extends BaseController {
 			log.error("试题列表错误：", e);
 			return PageResult.err();
 		}
+	}
+	
+	public String takeOutHtml(String parameter) {
+		Document document = Jsoup.parse(parameter);
+		parameter = document.body().html();
+		return Jsoup.parse(parameter).text();
 	}
 	
 	/**
@@ -478,10 +502,10 @@ public class ApiPaperController extends BaseController {
 	 * @param options
 	 * @return PageResult
 	 */
-	@RequestMapping("/scoreUpdate")
+	@RequestMapping("/updateScore")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult scoreUpdate(Integer paperQuestionId, BigDecimal score) {
+	public PageResult updateScore(Integer paperQuestionId, BigDecimal score) {
 		try {
 			paperService.scoreUpdate(paperQuestionId, score);
 			return PageResult.ok();
@@ -502,10 +526,10 @@ public class ApiPaperController extends BaseController {
 	 * @param options
 	 * @return PageResult
 	 */
-	@RequestMapping("/scoreOptionsUpdate")
+	@RequestMapping("/updateScoreOptions")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult scoreOptionsUpdate(Integer paperQuestionId, Integer[] scoreOptions) {
+	public PageResult updateScoreOptions(Integer paperQuestionId, Integer[] scoreOptions) {
 		try {
 			paperService.optionsUpdate(paperQuestionId, scoreOptions);
 			return PageResult.ok();
@@ -527,10 +551,10 @@ public class ApiPaperController extends BaseController {
 	 * @param options
 	 * @return PageResult
 	 */
-	@RequestMapping("/batchScoreUpdate")
+	@RequestMapping("/updateBatchScore")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult batchScoreUpdate(Integer chapterId, BigDecimal score, String options) {
+	public PageResult updateBatchScore(Integer chapterId, BigDecimal score, String options) {
 		try {
 			paperService.batchScoreUpdate(chapterId, score, options);
 			return PageResult.ok();

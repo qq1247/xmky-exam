@@ -158,6 +158,7 @@ code == 401 无权限或登录超时
 | name           | String  | 试题分类名称 | 否   |
 | title          | String  | 题干         | 否   |
 | type           | Integer | 类型         | 否   |
+| exPaperId      | Integer | 排除试卷id   | 否   |
 | difficulty     | Integer | 难度         | 否   |
 | scoreStart     | double  | 分值大于     | 否   |
 | scoreEnd       | double  | 分值小于     | 否   |
@@ -460,26 +461,34 @@ code == 401 无权限或登录超时
 
 ####考试添加：exam/add
 ######请求参数
-| 参数          | 类型        | 描述                         | 必填 |
-| ------------- | ----------- | ---------------------------- | ---- |
-| name          | String (16) | 名称                         | 是   |
-| startTime     | Date        | 考试开始时间                 | 是   |
-| endTime       | Date        | 考试结束时间                 | 是   |
-| markStartTime | Date        | 阅卷开始时间                 | 是   |
-| markEndTime   | Date        | 阅卷结束时间                 | 是   |
-| scoreState    | Integer     | 成绩状态：1：公开；2：不公开 | 是   |
-| rankState     | Integer     | 排名状态：1：公开；2：不公开 | 是   |
-| paperId       | Integer     | 试卷ID                       | 是   |
-| examTypeId    | Integer     | 考试分类ID                   | 是   |
+| 参数          | 类型        | 描述                         		| 必填 |
+| ------------- | ----------- | ------------------------------------| ---- |
+| name          | String (16) | 名称                         		| 是   |
+| startTime     | Date        | 考试开始时间                		| 是   |
+| endTime       | Date        | 考试结束时间                 		| 是   |
+| markStartTime | Date        | 阅卷开始时间               		    | 是   |
+| markEndTime   | Date        | 阅卷结束时间                		| 是   |
+| scoreState    | Integer     | 成绩状态：1：公开；2：不公开        | 是   |
+| rankState     | Integer     | 排名状态：1：公开；2：不公开 		| 是   |
+| loginType     | Integer     | 登录方式：1：安排考试；2：免登陆考试| 是   |
+| description   | String      | 描述						        | 是   |
+| paperId       | Integer     | 试卷ID                              | 是   |
+| examTypeId    | Integer     | 考试分类ID                          | 是   |
 
 ####考试修改：exam/edit
 ######请求参数
 | 参数                 | 类型    | 描述 | 必填 |
 | -------------------- | ------- | ---- | ---- |
 | id                   | Integer | 主键 | 是   |
-| 其他字段参考exam/add |         |      |      |  |
+| 其他字段参考exam/add |         |      |      | 
 
 ####考试删除：exam/del
+######请求参数
+| 参数 | 类型    | 描述 | 必填 |
+| ---- | ------- | ---- | ---- |
+| id   | Integer | 主键 | 是   |
+
+####考试发布：exam/publish
 ######请求参数
 | 参数 | 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
@@ -490,6 +499,7 @@ code == 401 无权限或登录超时
 | 参数    | 类型      | 描述        | 必填 |
 | ------- | --------- | ----------- | ---- |
 | id      | Integer   | 主键        | 是   |
+| examId      | Integer   | 考试id      | 是   |
 | userIds | Integer[] | 考试用户IDS | 是   |
 
 ####考试更新判卷用户：exam/updateMarkUser
@@ -497,6 +507,7 @@ code == 401 无权限或登录超时
 | 参数        | 类型      | 描述        | 必填 |
 | ----------- | --------- | ----------- | ---- |
 | id          | Integer   | 主键        | 是   |
+| examId      | Integer   | 考试id      | 是   |
 | markUserIds | Integer[] | 阅卷用户IDS | 是   |
 | examUserIds | Integer[] | 考试用户IDS | 否   |
 | questionIds | Integer[] | 试题IDS     | 否   |

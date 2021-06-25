@@ -157,7 +157,7 @@ export default {
     // 查询
     async query() {
       let {
-        data: { rows, total }
+        data: { list, total }
       } = await this.$https.userListpage({
         orgId: this.queryForm.orgId,
         name: this.queryForm.name,
@@ -165,7 +165,7 @@ export default {
         pageSize: this.listpage.pageSize
       })
       this.listpage.total = total
-      this.listpage.list = rows
+      this.listpage.list = list
     },
     // 重置
     async reset() {

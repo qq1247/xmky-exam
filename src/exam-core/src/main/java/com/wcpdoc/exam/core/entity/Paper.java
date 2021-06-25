@@ -43,7 +43,9 @@ public class Paper {
 	@Column(name = "PAPER_TYPE_ID")
 	private Integer paperTypeId;
 	@Column(name = "GEN_TYPE")
-	private Integer genType;	
+	private Integer genType;
+	@Column(name = "OPTIONS")
+	private String options;
 	@Column(name = "MINIMIZE_NUM")
 	private Integer minimizeNum;
 	@Column(name = "UPDATE_USER_ID")
@@ -158,5 +160,13 @@ public class Paper {
 	public void setMinimizeNum(Integer minimizeNum) {
 		this.minimizeNum = minimizeNum;
 	}
-	
+
+	public String getOptions() {
+		return options;
+	}
+
+	public void setOptions(String options) {
+		this.options = options;
+	}
+
 }

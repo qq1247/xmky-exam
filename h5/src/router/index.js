@@ -80,6 +80,26 @@ const routes = [
     name: "Dict",
     component: () => import("../views/organization/Dict.vue")
   },
+  {
+    path: "/organization/bulletinBoard",
+    name: "BulletinBoard",
+    component: () => import("../views/organization/BulletinBoard.vue")
+  },
+  {
+    path: "/organization/myExam",
+    name: "MyExam",
+    component: () => import("../views/organization/MyExam.vue")
+  },
+  {
+    path: "/organization/myMark",
+    name: "MyMark",
+    component: () => import("../views/organization/MyMark.vue")
+  },
+  {
+    path: "/organization/myMarkExam",
+    name: "MyMarkExam",
+    component: () => import("../views/organization/MyMarkExam.vue")
+  },
   { path: "*", component: () => import("../views/base/404.vue") }
 ]
 

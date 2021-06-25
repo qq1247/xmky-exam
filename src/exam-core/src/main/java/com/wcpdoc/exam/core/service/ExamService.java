@@ -1,11 +1,13 @@
 package com.wcpdoc.exam.core.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
+import com.wcpdoc.exam.core.entity.UpdateMarkUserJson;
 /**
  * 考试服务层接口
  * 
@@ -23,25 +25,23 @@ public interface ExamService extends BaseService<Exam>{
 	PageOut getUserListpage(PageIn pageIn);
 
 	/**
-	 * 完成考试配置
+	 * 考试更新考试用户
 	 * 
 	 * v1.0 zhanghc 2017年6月19日下午3:10:24
-	 * @param id 
+	 * @param id
 	 * @param userIds
-	 * @param myMarkIds
 	 * void
 	 */
-	void cfg(Integer id, Integer[] userIds, Integer[] myMarkIds);
-
+	void updateExamUser(Integer id, Integer[] userIds);
+	
 	/**
-	 * 完成试卷
+	 * 考试更新判卷用户
 	 * 
-	 * v1.0 zhanghc 2017年7月3日下午11:17:50
-	 * @param user
-	 * @param myExamId
+	 * v1.0 zhanghc 2017年6月19日下午3:10:24
+	 * @param updateMarkUserJson
 	 * void
 	 */
-	void paper(LoginUser user, Integer myExamId);
+	void updateMarkUser(UpdateMarkUserJson updateMarkUserJson);
 	
 	/**
 	 * 完成强制交卷
@@ -79,4 +79,13 @@ public interface ExamService extends BaseService<Exam>{
 	 * @return List<Exam>
 	 */
 	List<Exam> getExamList(Integer paperId);
+	
+	/**
+	 * 考试试题列表
+	 * 
+	 * v1.0 zhanghc 2017年8月6日下午10:03:09
+	 * @param id
+	 * @return List<Map<String,Object>>
+	 */
+	List<Map<String, Object>> questionList(Integer id); 
 }

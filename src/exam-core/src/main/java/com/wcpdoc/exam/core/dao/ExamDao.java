@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.core.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.LoginUser;
@@ -58,4 +59,14 @@ public interface ExamDao extends BaseDao<Exam>{
 	 * @return List<Exam>
 	 */
 	List<Exam> getExamList(Integer paperId);
+	
+	
+	/**
+	 * 考试试题列表
+	 * 
+	 * v1.0 zhanghc 2017年8月6日下午10:03:09
+	 * @param id
+	 * @return List<Map<String,Object>>
+	 */
+	List<Map<String, Object>> questionList(Integer id); 
 }

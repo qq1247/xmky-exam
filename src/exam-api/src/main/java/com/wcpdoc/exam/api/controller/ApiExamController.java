@@ -9,6 +9,7 @@ import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -18,10 +19,10 @@ import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
+import com.wcpdoc.exam.core.entity.UpdateMarkUserJson;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.ExamTypeService;
-import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.PaperTypeService;
 
 /**
@@ -36,8 +37,6 @@ public class ApiExamController extends BaseController{
 	
 	@Resource
 	private ExamService examService;
-	@Resource
-	private PaperService paperService;
 	@Resource
 	private PaperTypeService paperTypeService;
 	@Resource
@@ -75,7 +74,7 @@ public class ApiExamController extends BaseController{
 		try {
 			PageIn pageIn = new PageIn(request);
 			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
-				pageIn.addAttr("CurUserId", getCurUser().getId());
+				pageIn.addAttr("curUserId", getCurUser().getId());
 			}
 			return PageResultEx.ok().data(examService.getListpage(pageIn));
 		} catch (Exception e) {
@@ -164,7 +163,6 @@ public class ApiExamController extends BaseController{
 			entity.setRankState(exam.getRankState());
 			entity.setLoginType(exam.getLoginType());
 			entity.setDescription(exam.getDescription());
-			entity.setScoreERemark(exam.getScoreERemark());
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
 			examService.update(entity);
@@ -209,7 +207,7 @@ public class ApiExamController extends BaseController{
 	}
 	
 	/**
-	 * 完成考试配置
+	 * 考试更新考试用户
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param id
@@ -217,12 +215,38 @@ public class ApiExamController extends BaseController{
 	 * @param markIds
 	 * @return PageResult
 	 */
-	@RequestMapping("/cfg")
+	@RequestMapping("/updateExamUser")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult cfg(Integer id, Integer[] userIds, Integer[] myMarkIds) {
+	public PageResult updateExamUser(Integer id, Integer[] userIds) {
 		try {
-			examService.cfg(id, userIds, myMarkIds);
+			examService.updateExamUser(id, userIds);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("完成更新考试用户错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("完成更新考试用户错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 完成考试更新判卷用户
+	 * 
+	 * v1.0 zhanghc 2017年6月16日下午5:02:45
+	 * @param id
+	 * @param markUserIds
+	 * @param examUserIds
+	 * @param questionIds
+	 * @return PageResult
+	 */
+	@RequestMapping("/updateMarkUser")
+	@ResponseBody
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	public PageResult updateMarkUser(@RequestBody UpdateMarkUserJson updateMarkUserJson) {
+		try {
+			examService.updateMarkUser(updateMarkUserJson);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成考试配置错误：{}", e.getMessage());
@@ -287,4 +311,23 @@ public class ApiExamController extends BaseController{
 		}
 	}
 
+	/**
+	 * 考试试题列表
+	 * 
+	 * v1.0 zhanghc 2018年11月24日上午9:13:22
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/questionList")
+	@ResponseBody
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	public PageResult questionList(Integer id) {
+		try {
+			return PageResultEx.ok().data(examService.questionList(id));
+		}catch (Exception e) {
+			log.error("归档错误：", e);
+			return PageResult.err();
+		}
+	}
+	
 }

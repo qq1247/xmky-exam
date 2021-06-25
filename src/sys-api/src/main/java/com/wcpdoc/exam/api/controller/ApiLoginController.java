@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.api.controller;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Resource;
 import javax.security.auth.login.LoginException;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.base.entity.UserToken;
 import com.wcpdoc.exam.base.service.LoginService;
 import com.wcpdoc.exam.base.service.UserService;
@@ -19,6 +21,7 @@ import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.util.DateUtil;
+import com.wcpdoc.exam.core.util.Param;
 
 /**
  * 登录控制层
@@ -58,6 +61,21 @@ public class ApiLoginController extends BaseController {
 			log.error("完成登录错误：", e);
 			return PageResult.err();
 		}
+	}
+	
+	/**
+	 * 完成登录
+	 * 
+	 * v1.0 zhanghc 2016年7月18日下午3:23:00
+	 * @param loginName
+	 * @param pwd
+	 * @param model
+	 * @return String
+	 */
+	@RequestMapping("/aa")
+	@ResponseBody
+	public void aa(@Param List<User> user) {
+		System.err.println(user);
 	}
 	
 	/**

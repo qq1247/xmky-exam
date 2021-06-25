@@ -1,11 +1,17 @@
 package com.wcpdoc.exam.core.entity;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * 我的阅卷实体
@@ -21,12 +27,18 @@ public class MyMark {
 	private Integer id;
 	@Column(name = "EXAM_ID")
 	private Integer examId;
-	@Column(name = "USER_ID")
-	private Integer userId;
-	@Column(name = "QUESTION_ID")
-	private Integer questionId;
-	@Column(name = "PAPER_ID")
-	private Integer paperId;
+	@Column(name = "MARK_USER_ID")
+	private Integer markUserId;
+	@Column(name = "QUESTION_IDS")
+	private Integer questionIds;
+	@Column(name = "EXAM_USER_IDS")
+	private Integer examUserIds;
+	@Column(name = "UPDATE_USER_ID")
+	private Integer updateUserId;
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@Column(name = "UPDATE_TIME")
+	private Date updateTime;
 
 	public Integer getId() {
 		return id;
@@ -44,27 +56,43 @@ public class MyMark {
 		this.examId = examId;
 	}
 
-	public Integer getUserId() {
-		return userId;
+	public Integer getQuestionIds() {
+		return questionIds;
 	}
 
-	public void setUserId(Integer userId) {
-		this.userId = userId;
+	public void setQuestionIds(Integer questionIds) {
+		this.questionIds = questionIds;
 	}
 
-	public Integer getQuestionId() {
-		return questionId;
+	public Integer getMarkUserId() {
+		return markUserId;
 	}
 
-	public void setQuestionId(Integer questionId) {
-		this.questionId = questionId;
+	public void setMarkUserId(Integer markUserId) {
+		this.markUserId = markUserId;
 	}
 
-	public Integer getPaperId() {
-		return paperId;
+	public Integer getExamUserIds() {
+		return examUserIds;
 	}
 
-	public void setPaperId(Integer paperId) {
-		this.paperId = paperId;
+	public void setExamUserIds(Integer examUserIds) {
+		this.examUserIds = examUserIds;
+	}
+
+	public Integer getUpdateUserId() {
+		return updateUserId;
+	}
+
+	public void setUpdateUserId(Integer updateUserId) {
+		this.updateUserId = updateUserId;
+	}
+
+	public Date getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
 	}
 }
