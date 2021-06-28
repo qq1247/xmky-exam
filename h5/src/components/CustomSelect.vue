@@ -58,8 +58,7 @@ export default {
       default: false
     },
     remoteMethod: {
-      type: Function,
-      default: () => { }
+      type: Function
     },
     remote: {
       type: Boolean,
