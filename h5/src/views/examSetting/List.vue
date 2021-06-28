@@ -122,34 +122,67 @@
         <div>
           <div v-for="(item, index) in examForm.examRemarks" :key="item.id" class="exam-remark">
             <el-form-item label="阅卷人">
-              <el-select placeholder="请选择" v-model="examForm.examRemarks[index].examCheckPerson">
+              <CustomSelect
+                placeholder="请选择阅卷人"
+                :multiple="true"
+                :value="examForm.examRemarks[index].examCheckPerson"
+                :total="examForm.total"
+                :showPage="true"
+                :remote="true"
+                :reserveKeyword="true"
+                :filterable="true"
+                :pageSize="examForm.pageSize"
+                :remoteMethod="searchPerson"
+                @change="selectPerson($event, index)"
+                @currentChange="getMorePerson"
+              >
                 <el-option
-                  :key="parseInt(type.DICT_KEY)"
-                  :label="type.DICT_VALUE"
-                  :value="parseInt(type.DICT_KEY)"
-                  v-for="type in examForm.examCheckPersons"
+                  v-for="item in examForm.examCheckPersons"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
                 ></el-option>
-              </el-select>
+              </CustomSelect>
             </el-form-item>
             <el-form-item label="题号" v-if="examForm.examRadio == 0">
-              <el-select placeholder="请选择" v-model="examForm.examRemarks[index].examPaperNum">
+              <!-- <CustomSelect
+                placeholder="请选择题号"
+                :multiple="true"
+                :value="examForm.examRemarks[index].examPaperNum"
+                :total="examForm.total"
+                :showPage="true"
+                :pageSize="examForm.pageSize"
+                @change="selectPerson($event, index)"
+                @focus="getPersonList()"
+                @currentChange="getMorePerson"
+              >
                 <el-option
-                  :key="parseInt(type.DICT_KEY)"
-                  :label="type.DICT_VALUE"
-                  :value="parseInt(type.DICT_KEY)"
-                  v-for="type in examForm.examPaperNums"
+                  v-for="item in examForm.examPaperNums"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
                 ></el-option>
-              </el-select>
+              </CustomSelect>-->
             </el-form-item>
             <el-form-item label="试卷" v-if="examForm.examRadio == 1">
-              <el-select multiple placeholder="请选择" v-model="examForm.examRemarks[index].examPaper">
+              <!-- <CustomSelect
+                placeholder="请选择试卷"
+                :multiple="true"
+                :value="examForm.examRemarks[index].examPaper"
+                :total="examForm.total"
+                :showPage="true"
+                :pageSize="examForm.pageSize"
+                @change="selectPaper"
+                @focus="getPaperList()"
+                @currentChange="getMorePaper"
+              >
                 <el-option
-                  :key="parseInt(type.DICT_KEY)"
-                  :label="type.DICT_VALUE"
-                  :value="parseInt(type.DICT_KEY)"
-                  v-for="type in examForm.examPapers"
+                  v-for="item in examForm.examPapers"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
                 ></el-option>
-              </el-select>
+              </CustomSelect>-->
             </el-form-item>
           </div>
           <div class="remark-buttons">
@@ -255,8 +288,8 @@ export default {
         examRemarks: [
           {
             id: 1,
-            examCheckPerson: "",
-            examPaperNum: "",
+            examCheckPerson: [],
+            examPaperNum: [],
             examPaper: []
           }
         ],
@@ -428,6 +461,23 @@ export default {
     // 选择考试用户
     selectUser(e) {
       this.examForm.examUser = e
+    },
+    // 获取阅卷人员
+    async getPersonList(name = '', curPage = 1) {
+      const examUsers = await this.$https.userListpage({
+        name,
+        curPage,
+        pageSize: this.examForm.pageSize
+      })
+
+      this.examForm.examCheckPersons = examUsers.data.list
+      this.examForm.total = examUsers.data.total
+    },
+    selectPerson(e, index) {
+      this.examForm.examRemarks[index].examCheckPerson = e
+    },
+    searchPerson(e, index) {
+      console.log(e, index);
     },
     // 编辑考试用户
     async editExamUser() {
