@@ -174,7 +174,8 @@ export default {
   examDel: params => post('exam/del', params),
   examUpdateExamUser: params => post('exam/updateExamUser', params),
   examUpdateMarkUser: params => post('exam/updateMarkUser', params),
-  examUserList: params => post('exam/userList', params),
+  examUserList: params => post('exam/examUserList', params),
+  examMarkUserList: params => post('exam/markUserList', params),
   examQuestionList: params => post('exam/questionList', params),
 
   // 考试分类相关
