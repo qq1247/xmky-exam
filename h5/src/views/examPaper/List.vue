@@ -45,7 +45,14 @@
       ></el-pagination>
     </div>
 
-    <el-dialog :visible.sync="paperForm.show" :show-close="false" center width="40%">
+    <el-dialog
+      :visible.sync="paperForm.show"
+      :show-close="false"
+      center
+      width="50%"
+      :close-on-click-modal="false"
+      @close="resetData('paperForm')"
+    >
       <el-form :model="paperForm" :rules="paperForm.rules" ref="paperForm" label-width="100px">
         <el-tabs v-model="paperForm.tabActive">
           <el-tab-pane
@@ -109,7 +116,7 @@
               <el-checkbox-group v-model="paperForm.options">
                 <el-checkbox
                   v-for="(item, index) in paperForm.paperAntiCheat"
-                  :label="index"
+                  :label="String(index)"
                   :key="index"
                 >{{ item }}</el-checkbox>
               </el-checkbox-group>
@@ -125,10 +132,17 @@
           <div v-if="paperForm.tabActive == '3'">
             <el-form-item label="成绩评语">
               <el-checkbox v-model="paperForm.paperRemarkShow">开启</el-checkbox>
-              <div v-if="paperForm.paperRemarkShow">
+              <template v-if="paperForm.paperRemarkShow">
                 <div v-for="item in paperForm.paperRemark" :key="item.id" class="exam-remark">
                   大于等于
-                  <el-input v-model="item.score" placeholder="占总分百分比" class="remark-percentage"></el-input>%，
+                  <el-input
+                    v-model="item.score"
+                    type="number"
+                    min="1"
+                    max="100"
+                    placeholder="百分比"
+                    class="remark-percentage"
+                  ></el-input>%，
                   <el-input v-model="item.remark" class="remark-content" placeholder="请输入评语"></el-input>
                 </div>
                 <div class="remark-buttons">
@@ -140,7 +154,7 @@
                     icon="el-icon-minus"
                   >添加评语</el-button>
                 </div>
-              </div>
+              </template>
             </el-form-item>
           </div>
         </el-tabs>
@@ -167,6 +181,15 @@ export default {
     ListCard
   },
   data() {
+    let validatePercentage = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error("请输入及格分占总百分比"));
+      } else if (value > 100 || value <= 0) {
+        return callback(new Error(`请输入0-100范围的值`));
+      } else {
+        return callback();
+      }
+    };
     return {
       pageSize: 5,
       total: 1,
@@ -226,10 +249,10 @@ export default {
             title: "防作弊",
             name: "2",
           },
-          {
+          /* {
             title: "成绩评语",
             name: "3",
-          }
+          } */
         ],
         genType: 0,
         genTypes: [
@@ -246,13 +269,9 @@ export default {
           name: [
             { required: true, message: "请填写试卷名称", trigger: "blur" }
           ],
-          passScore: [
-            {
-              required: true,
-              message: "请填写及格分数占总分的百分比",
-              trigger: "blur",
-            }
-          ]
+          passScore: [{
+            validator: validatePercentage
+          }]
         }
       },
       paperList: []
@@ -281,48 +300,27 @@ export default {
           return
         }
 
-        let res
-
-        if (this.paperForm.edit) {
-          res = await this.$https.paperEdit({
-            paperTypeId: this.queryForm.paperTypeId,
-            genType: this.paperForm.genType,
-            name: this.paperForm.name,
-            passScore: this.paperForm.passScore,
-            readRemark: this.paperForm.readRemark,
-            readNum: this.paperForm.readNum,
-            showType: Number(this.paperForm.showType),
-            options: this.paperForm.options.join(","),
-            paperRemark: this.paperForm.paperRemark
-          })
-        } else {
-          res = await this.$https.paperAdd({
-            paperTypeId: this.queryForm.paperTypeId,
-            genType: this.paperForm.genType,
-            name: this.paperForm.name,
-            passScore: this.paperForm.passScore,
-            readRemark: this.paperForm.readRemark,
-            readNum: this.paperForm.readNum,
-            showType: Number(this.paperForm.showType),
-            options: this.paperForm.options.join(","),
-            paperRemark: this.paperForm.paperRemark
-          })
+        const params = {
+          paperTypeId: this.queryForm.paperTypeId,
+          genType: this.paperForm.genType,
+          name: this.paperForm.name,
+          passScore: this.paperForm.passScore,
+          readRemark: this.paperForm.readRemark,
+          readNum: this.paperForm.readNum,
+          showType: Number(this.paperForm.showType),
+          options: this.paperForm.options.join(","),
+          paperRemark: this.paperForm.paperRemarkShow ? this.paperForm.paperRemark : ''
         }
 
-        if (res.code == 200) {
-          this.$tools.message(
-            !this.paperForm.edit ? "添加成功！" : "修改成功！"
+        let res = this.paperForm.edit ? await this.$https.paperEdit(params) : await this.$https.paperAdd(params)
+        res.code === 200
+          ? (
+            this.$tools.message(!this.paperForm.edit ? "添加成功！" : "修改成功！"),
+            this.paperForm.show = false,
+            this.query()
           )
-          this.paperForm.show = false
-          this.paperForm.name = "";
-          this.paperForm.edit = false
-          this.query()
-        } else {
-          this.$tools.message(
-            !this.paperForm.edit ? "添加失败！" : "修改失败！",
-            "error"
-          )
-        }
+          : this.$tools.message(!this.paperForm.edit ? "添加失败！" : "修改失败！", "error")
+
       })
     },
     // 编辑分类
@@ -334,8 +332,14 @@ export default {
       this.paperForm.readRemark = item.readRemark
       this.paperForm.readNum = item.readNum
       this.paperForm.showType = String(item.showType)
-      this.paperForm.options = item.options
-      this.paperForm.paperRemark = item.paperRemark
+      this.paperForm.options = item.options == '' ? [] : item.options.split(',')
+      this.paperForm.paperRemarkShow = !item.paperRemark ? false : true
+      this.paperForm.paperRemark = !item.paperRemark ? [
+        {
+          score: "",
+          remark: "",
+        }
+      ] : item.paperRemark
       this.paperForm.show = true
     },
     // 删除分类
@@ -398,6 +402,10 @@ export default {
     remarkDel() {
       this.paperForm.paperRemark.pop()
     },
+    // 清空还原数据
+    resetData(name) {
+      this.$tools.resetData(this, name)
+    }
   }
 }
 </script>

@@ -48,12 +48,14 @@
         @current-change="pageChange"
       ></el-pagination>
     </div>
+    <!-- 添加 | 修改考试分类 -->
     <el-dialog
       :visible.sync="examForm.show"
       :show-close="false"
       width="30%"
       title="考试分类"
       :close-on-click-modal="false"
+      @close="resetData('examForm')"
     >
       <el-form :model="examForm" :rules="examForm.rules" ref="examForm" label-width="60px">
         <el-form-item label="名称" prop="examName">
@@ -135,8 +137,6 @@ export default {
 
         if (res.code == 200) {
           this.examForm.show = false
-          this.examForm.edit = false
-          this.examForm.examName = "";
           this.$tools.message(
             !this.examForm.edit ? '添加成功！' : '修改成功！'
           )
@@ -180,6 +180,10 @@ export default {
     pageChange(val) {
       this.query(val)
     },
+    // 清空还原数据
+    resetData(name) {
+      this.$tools.resetData(this, name)
+    }
   }
 }
 </script>
