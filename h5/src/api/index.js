@@ -162,8 +162,8 @@ export default {
   bulletinBoardEdit: params => post('bulletinBoard/edit', params),
   bulletinBoardDel: params => post('bulletinBoard/del', params), // 我的考试相关
 
-  myExamListpage: params => post('myExam/listpage', params), // 我的阅读相关
-
+  // 我的相关
+  myExamListpage: params => post('myExam/listpage', params), // 我的考试相关
   myMarkListpage: params => post('myMark/listpage', params), // 我的阅卷考试列表相关
   myMarkExamListpage: params => post('myMark/examListpage', params),
 
