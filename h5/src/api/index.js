@@ -67,7 +67,6 @@ export default {
   examDel: params => post('exam/del', params),
   examUpdateExamUser: params => post('exam/updateExamUser', params),
   examUpdateMarkUser: params => post('exam/updateMarkUser', params),
-  examUserList: params => post('exam/userList', params),
   examQuestionList: params => post('exam/questionList', params),
   examPublish: params => post('exam/publish', params),
 
@@ -162,8 +161,6 @@ export default {
   bulletinBoardEdit: params => post('bulletinBoard/edit', params),
   bulletinBoardDel: params => post('bulletinBoard/del', params), // 我的考试相关
 
-  myExamListpage: params => post('myExam/listpage', params), // 我的阅读相关
-
   myMarkListpage: params => post('myMark/listpage', params), // 我的阅卷考试列表相关
   myMarkExamListpage: params => post('myMark/examListpage', params),
 
@@ -174,7 +171,6 @@ export default {
   examDel: params => post('exam/del', params),
   examUpdateExamUser: params => post('exam/updateExamUser', params),
   examUpdateMarkUser: params => post('exam/updateMarkUser', params),
-  examUserList: params => post('exam/userList', params),
   examQuestionList: params => post('exam/questionList', params),
 
   // 考试分类相关
@@ -242,6 +238,13 @@ export default {
   questionTypeOpenAdd: params => post('questionTypeOpen/add', params),
   questionTypeOpenDel: params => post('questionTypeOpen/del', params),
 
+
+  // 我的考试相关
+  myExamListPage: params => post('myExam/listpage', params),
+  myExamAnswerList: params => post('myExam/answerList', params),
+  myExamUpdateAnswer: params => post('myExam/updateAnswer', params),
+
   // 基础功能相关
-  login: params => post('login/in', params)
+  login: params => post('login/in', params),
+  loginSysTime: params => post('login/sysTime', params)
 }

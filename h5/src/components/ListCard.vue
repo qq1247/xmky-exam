@@ -1,7 +1,7 @@
 <template>
   <div class="exam-item">
     <div class="exam-content">
-      <div class="title">{{ data.name }}</div>
+      <div class="title">{{ data.name || data.examName}}</div>
       <template v-if="['question', 'paper', 'exam'].includes(name)">
         <div class="content-info">
           <span>读取权限：{{ data.readUserNames || "暂无" }}</span>
@@ -12,6 +12,9 @@
       </template>
       <!-- 试卷列表 -->
       <template v-if="name == 'paperList'">
+        <div class="content-info ellipsis">
+          <span>发布人：{{ data.userName }}</span>
+        </div>
         <div class="content-info ellipsis">
           <span>发布人：{{ data.userName }}</span>
         </div>
@@ -41,11 +44,28 @@
           <span style="color: #ff9900">{{ data.state == 1 ? '已发布' : '草稿' }}</span>
         </div>
       </template>
+      <!-- 我的考试列表 -->
+      <template v-if="name == 'myExamList'">
+        <div class="content-info ellipsis">
+          <span>{{ data.examStartTime }}</span>
+        </div>
+        <div class="content-info">
+          <span class="space">及格：{{data.totalScore  }}/{{data.paperTotalScore  }}</span>
+        </div>
+      </template>
+      <template v-if="name == 'myExamList'">
+        <div class="tagGroup">
+          <el-tag size="mini" effect="dark" v-if="data.state == 3">{{data.stateName }}</el-tag>&nbsp;&nbsp;
+          <el-tag size="mini" effect="danger" v-if="data.state != 3">{{data.stateName }}</el-tag>&nbsp;&nbsp;
+          <el-tag size="mini" effect="dark" v-if="data.markState == 3">{{data.markStateName }}</el-tag>&nbsp;&nbsp;
+          <el-tag size="mini" effect="danger" v-if="data.markState != 3">{{data.markStateName }}</el-tag>&nbsp;&nbsp;
+        </div>
+      </template>
       <div class="handler">
-        <span data-title="编辑" @click="edit(data)">
+        <span v-if="['question', 'paper', 'exam'].includes(name)" data-title="编辑" @click="edit(data)">
           <i class="common common-edit"></i>
         </span>
-        <span data-title="删除" @click="del(data)">
+        <span v-if="['question', 'paper', 'exam'].includes(name)" data-title="删除" @click="del(data)">
           <i class="common common-delete"></i>
         </span>
         <!-- 试题 -->
@@ -79,6 +99,15 @@
           <i class="common common-readPaper"></i>
         </span>
         <span v-if="name == 'examList'" data-title="考试用户" @click="user(data)">
+          <i class="common common-wode"></i>
+        </span>
+        <span v-if="name == 'myExamList' && data.btn == 'unStart'" data-title="未开始">
+          <i class="common common-wode"></i>
+        </span>
+        <span v-if="name == 'myExamList' && data.btn == 'start'" data-title="开始考试" @click="startExam(data)">
+          <i class="common common-wode"></i>
+        </span>
+        <span v-if="name == 'myExamList' && data.btn == 'end'" data-title="预览考试" @click="viewExam(data)">
           <i class="common common-wode"></i>
         </span>
         <span v-if="detailTitles[name]" :data-title="detailTitles[name]" @click="detail(data)">
@@ -162,6 +191,10 @@ export default {
     // 发布考试
     publish(data) {
       this.$emit('publish', data)
+    },
+    // 开始考试
+    startExam(data) {
+      this.$emit('startExam', data)
     }
   }
 }
@@ -185,9 +218,15 @@ export default {
   cursor: pointer;
   text-align: center;
   transition: all 0.3s ease;
+  position: relative;
   &:hover {
     transform: translateY(-3px);
     box-shadow: 0 10px 16px -10px rgba(95, 101, 105, 0.15);
+  }
+  .tagGroup {
+    position: absolute;
+    right: 10px;
+    top: 10px;
   }
   .title {
     font-size: 16px;

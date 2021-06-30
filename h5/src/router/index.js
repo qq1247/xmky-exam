@@ -100,6 +100,17 @@ const routes = [
     name: 'MyMarkExam',
     component: () => import('../views/organization/MyMarkExam.vue')
   },
+  // 我的
+  {
+    path: '/my',
+    name: 'My',
+    component: () => import('../views/my/index.vue')
+  },
+  {
+    path: '/my/exam',
+    name: 'MyExam',
+    component: () => import('../views/my/MyExam.vue')
+  },
   { path: '*', component: () => import('../views/base/404.vue') }
 ]
 
