@@ -65,16 +65,18 @@ public interface ExamDao extends BaseDao<Exam>{
 	 * 
 	 * v1.0 zhanghc 2021年6月25日下午2:51:40
 	 * @param id
+	 * @param markUserId
 	 * @return List<Map<String,Object>>
 	 */
-	List<Map<String, Object>> getMarkExamUserList(Integer id);
+	List<Map<String, Object>> getMarkExamUserList(Integer id, Integer markUserId);
 
 	/**
 	 * 阅卷试题列表
 	 * 
 	 * v1.0 zhanghc 2021年6月25日下午2:51:50
 	 * @param id
+	 * @param markUserId
 	 * @return List<Map<String,Object>>
 	 */
-	List<Map<String, Object>> getMarkQuestionList(Integer id); 
+	List<Map<String, Object>> getMarkQuestionList(Integer id, Integer markUserId); 
 }

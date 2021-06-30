@@ -36,7 +36,7 @@ code == 401 无权限或登录超时
 |data.total     | Integer  | 总行数 |
 |data.list[]      | arr[]  | 分页列表 |
 |data.list[].id   | Integer  | 主键 |
-|data.list[].examName | String  | 考试名次 |
+|data.list[].examName | String  | 考试名称 |
 |data.list[].examStartTime | Date  | 考试开始时间 |
 |data.list[].examEndTime | Date  | 考试结束时间 |
 |data.list[].userId | Date  | 考试用户ID |
@@ -46,7 +46,8 @@ code == 401 无权限或登录超时
 |data.list[].markUserId | Integer  | 阅卷人ID |
 |data.list[].markUserName | String  | 阅卷人名称 |
 |data.list[].markStartTime | Date  | 阅卷开始时间 |
-|data.list[].markEndTime | Date  | 阅卷结束时间 |
+|data.list[].markEndTime | Date  | 阅卷结束时间 
+|data.list[].paperId | Double  | 试卷ID |
 |data.list[].paperTotalScore | Double  | 试卷总分 |
 |data.list[].totalScore | Double  | 我的得分 |
 |data.list[].state | Integer  | 考试状态（1：未考试；2：考试中；3：已交卷；4：强制交卷；） |
@@ -55,20 +56,22 @@ code == 401 无权限或登录超时
 |data.list[].markStateName | String  | 阅卷状态 |
 |data.list[].answerState | Integer  | 答题状态（1：及格；2：不及格） |
 |data.list[].answerStateName | String  | 答题状态 |
+|data.list[].userNum | String  | 考试人数 |
 
 ####我的考试答案列表：myExam/answerList
 ######请求参数
 | 参数     |  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
-|myExamId      | Integer  | 我的考试ID   |   否     |
+|id      | Integer  | 我的考试ID   |   否     |
 ######响应数据
 | 参数  |  类型   |  描述  |
 | --------   | -----   | -----  |
 |code     | Integer  | 响应码 |
 |msg     | String  | 响应消息 |
+|data[].myExamDetailId | Integer  | 我的考试详细ID |
 |data[].questionId | Integer  | 试题ID |
 |data[].answerTime | Date | 答题时间 |
-|data[].answer | Text | 答案 |
+|data[].answers | Text | 我的答案，参考question/add |
 |data[].markUserId | Integer | 阅卷人ID |
 |data[].markUserName | String | 阅卷人名称 |
 |data[].markTime | Date | 阅卷时间 |

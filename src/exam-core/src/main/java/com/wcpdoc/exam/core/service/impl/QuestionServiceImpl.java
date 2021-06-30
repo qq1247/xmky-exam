@@ -24,12 +24,14 @@ import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.QuestionDao;
 import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.entity.QuestionEx;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 import com.wcpdoc.exam.core.service.WordServer;
+import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.file.service.FileService;
 
@@ -58,7 +60,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void addAndUpdate(Question question, String[] options) {
+	public void addAndUpdate(Question question, String[] answers, String[] options) {
 		// 校验数据有效性
 		if (question.getType() == null) {
 			throw new MyException("参数错误：type");
@@ -69,21 +71,21 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (!ValidateUtil.isValid(question.getTitle())) {
 			throw new MyException("参数错误：title");
 		}
-		if (!ValidateUtil.isValid(question.getAnswer())) {
-			throw new MyException("参数错误：answer");
+		if (!ValidateUtil.isValid(answers)) {
+			throw new MyException("参数错误：answers");
 		}
 
 		if (question.getType() == 1) {
 			if (options.length < 2) {
 				throw new MyException("参数错误：options长度小于2");
 			}
-			if (question.getAnswer().length() != 1) {
+			if (answers.length != 1) {
+				throw new MyException("参数错误：answers");
+			}
+			if (!"ABCDEFG".contains(answers[0])) {
 				throw new MyException("参数错误：answer");
 			}
-			if (!"ABCDEFG".contains(question.getAnswer())) {
-				throw new MyException("参数错误：answer");
-			}
-			int answerIndex = question.getAnswer().getBytes()[0] - 65;
+			int answerIndex = answers[0].getBytes()[0] - 65;
 			if (options.length < answerIndex + 1) {
 				throw new MyException("选项和答案不匹配！");
 			}
@@ -92,13 +94,12 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			if (options.length < 2) {
 				throw new MyException("参数错误：options长度小于2");
 			}
-			if (question.getAnswer().length() < 1) {
-				throw new MyException("参数错误：answer");
+			if (answers.length < 1) {
+				throw new MyException("参数错误：answers");
 			}
-			String[] answers = question.getAnswer().split(",");
 			for (int i = 0; i < answers.length; i++) {
 				if (!"ABCDEFG".contains(answers[i])) {
-					throw new MyException("参数错误：answer");
+					throw new MyException("参数错误：answers");
 				}
 				int answerIndex = answers[i].getBytes()[0] - 65;
 				if (options.length < answerIndex + 1) {
@@ -121,33 +122,38 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			// }
 		}
 		if (question.getType() == 4) {
-			if (question.getAnswer().length() != 1) {
-				throw new MyException("参数错误：answer");
+			if (answers.length != 1) {
+				throw new MyException("参数错误：answers");
 			}
 
-			if (!"对是√否错×".contains(question.getAnswer())) {
-				throw new MyException("参数错误：answer");
+			if (!"对是√否错×".contains(answers[0])) {
+				throw new MyException("参数错误：answers");
 			}
 		}
 
 		// 添加试题
+		if (question.getType() == 1 || question.getType() == 4 || question.getType() == 5) {
+			question.setAnswer(answers[0]);
+		} else if (question.getType() == 2) {
+			question.setAnswer(StringUtil.join(answers));
+		} else if (question.getQuestionTypeId() == 3) {
+			question.setAnswer(StringUtil.join(answers, "\n"));
+		}
 		question.setUpdateTime(new Date());
 		question.setUpdateUserId(getCurUser().getId());
 		question.setVer(1);// 默认版本为1
 		question.setState(2);// 默认禁用
-		add(question);
-
 		question.setSrcId(question.getId());
 		update(question);
 
 		// 添加选项
 		if (question.getType() == 1 || question.getType() == 2) {
 			for (int i = 0; i < options.length; i++) {
-			QuestionOption questionOption = new QuestionOption();
-			questionOption.setQuestionId(question.getId());
-			questionOption.setOptions(options[i]);
-			questionOption.setNo(i+1);
-			questionOptionService.add(questionOption);
+				QuestionOption questionOption = new QuestionOption();
+				questionOption.setQuestionId(question.getId());
+				questionOption.setOptions(options[i]);
+				questionOption.setNo(i + 1);
+				questionOptionService.add(questionOption);
 			}
 		}
 
@@ -156,21 +162,98 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void updateAndUpdate(Question question, boolean newVer, String[] options) {
-		// // 如果有新版本标识，删除旧版本，生成新版本
+	public void updateAndUpdate(Question question, String[] answers, String[] options, boolean newVer) {
+		// 校验数据有效性
+		if (question.getType() == null) {
+			throw new MyException("参数错误：type");
+		}
+		if (question.getDifficulty() == null) {
+			throw new MyException("参数错误：difficulty");
+		}
+		if (!ValidateUtil.isValid(question.getTitle())) {
+			throw new MyException("参数错误：title");
+		}
+		if (!ValidateUtil.isValid(answers)) {
+			throw new MyException("参数错误：answers");
+		}
+
+		if (question.getType() == 1) {
+			if (options.length < 2) {
+				throw new MyException("参数错误：options长度小于2");
+			}
+			if (answers.length != 1) {
+				throw new MyException("参数错误：answers");
+			}
+			if (!"ABCDEFG".contains(answers[0])) {
+				throw new MyException("参数错误：answer");
+			}
+			int answerIndex = answers[0].getBytes()[0] - 65;
+			if (options.length < answerIndex + 1) {
+				throw new MyException("选项和答案不匹配！");
+			}
+		}
+		if (question.getType() == 2) {
+			if (options.length < 2) {
+				throw new MyException("参数错误：options长度小于2");
+			}
+			if (answers.length < 1) {
+				throw new MyException("参数错误：answers");
+			}
+			for (int i = 0; i < answers.length; i++) {
+				if (!"ABCDEFG".contains(answers[i])) {
+					throw new MyException("参数错误：answers");
+				}
+				int answerIndex = answers[i].getBytes()[0] - 65;
+				if (options.length < answerIndex + 1) {
+					throw new MyException("选项和答案不匹配！");
+				}
+			}
+			// if (question.getType() == 3) {
+			// String pattern = "(___)+";// 正则表达式
+			// Pattern r = Pattern.compile(pattern);
+			// Matcher m = r.matcher(question.getTitle());
+			// int titleNumber = 0;
+			// while (m.find()) {
+			// titleNumber++;
+			// }
+			// String[] split = question.getAnswer().split("/n");
+			// Integer answerNumber = split.length + 1;
+			//
+			// if (titleNumber != answerNumber) {
+			// // throw new MyException("填空和答案个数不匹配！");
+			// }
+		}
+		if (question.getType() == 4) {
+			if (answers.length != 1) {
+				throw new MyException("参数错误：answers");
+			}
+
+			if (!"对是√否错×".contains(answers[0])) {
+				throw new MyException("参数错误：answers");
+			}
+		}
+		
+		// 如果有新版本标识，删除旧版本，生成新版本
+		if (question.getType() == 1 || question.getType() == 4 || question.getType() == 5) {
+			question.setAnswer(answers[0]);
+		} else if (question.getType() == 2) {
+			question.setAnswer(StringUtil.join(answers));
+		} else if (question.getQuestionTypeId() == 3) {
+			question.setAnswer(StringUtil.join(answers, "\n"));
+		}
+		
 		Question entity = getEntity(question.getId());
 		if (newVer) {
+			// 删除旧版本
 			Question newQuestion = new Question();
 			BeanUtils.copyProperties(entity, newQuestion);
 			entity.setState(0);
 			update(entity);
 
-			// entity.setType(question.getType());//不允许修改类型
+			// 生成新版本
 			// newQuestion.setState(question.getState());
 			newQuestion.setDifficulty(question.getDifficulty());
 			newQuestion.setTitle(question.getTitle());
-
-			// 修改选项
 			newQuestion.setAnswer(question.getAnswer());
 			newQuestion.setAnalysis(question.getAnalysis());
 			newQuestion.setUpdateTime(new Date());
@@ -182,19 +265,22 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			add(newQuestion);
 
 			if (question.getType() == 1 || question.getType() == 2) {
-				questionOptionService.removeQuestionOption(entity.getId());
-					if (options != null) {
-						for (int i = 0; i < options.length; i++) {
-						QuestionOption questionOption = new QuestionOption();
-						questionOption.setQuestionId(entity.getId());
-						questionOption.setOptions(options[i]);
-						questionOption.setNo(i+1);
-						questionOptionService.add(questionOption);
-						}
-					}
+				List<QuestionOption> questionOptionList = questionOptionService.getList(entity.getId());
+				for (QuestionOption questionOption : questionOptionList) {
+					questionOptionService.del(questionOption.getId());
+				}
+
+				for (int i = 0; i < options.length; i++) {
+					QuestionOption questionOption = new QuestionOption();
+					questionOption.setQuestionId(entity.getId());
+					questionOption.setOptions(options[i]);
+					questionOption.setNo(i + 1);
+					questionOptionService.add(questionOption);
+				}
 			}
 
-			saveFile(newQuestion);// 保存附件
+			// 保存附件
+			saveFile(newQuestion);
 			return;
 		}
 
@@ -214,16 +300,18 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 
 		// 修改选项
 		if (question.getType() == 1 || question.getType() == 2) {
-			questionOptionService.removeQuestionOption(entity.getId());
-				if (options != null) {
-					for (int i = 0; i < options.length; i++) {
-					QuestionOption questionOption = new QuestionOption();
-					questionOption.setQuestionId(entity.getId());
-					questionOption.setOptions(options[i]);
-					questionOption.setNo(i+1);
-					questionOptionService.add(questionOption);
-					}
-				}
+			List<QuestionOption> questionOptionList = questionOptionService.getList(entity.getId());
+			for (QuestionOption questionOption : questionOptionList) {
+				questionOptionService.del(questionOption.getId());
+			}
+
+			for (int i = 0; i < options.length; i++) {
+				QuestionOption questionOption = new QuestionOption();
+				questionOption.setQuestionId(entity.getId());
+				questionOption.setOptions(options[i]);
+				questionOption.setNo(i + 1);
+				questionOptionService.add(questionOption);
+			}
 		}
 
 		// 保存附件
@@ -239,27 +327,15 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		List<Integer> fileIdList = html2FileIds(question.getTitle());// 标题
 
 		if (question.getType() == 1 || question.getType() == 2) {// 单选或多选
-			// 修改选项 TODO
 			QuestionOption entity = new QuestionOption();
 			entity.setQuestionId(question.getId());
 
-			/*
-			 * if (ValidateUtil.isValid(question.getOptionA())) {
-			 * fileIdList.addAll(html2FileIds(question.getOptionA())); } if
-			 * (ValidateUtil.isValid(question.getOptionB())) {
-			 * fileIdList.addAll(html2FileIds(question.getOptionB())); } if
-			 * (ValidateUtil.isValid(question.getOptionC())) {
-			 * fileIdList.addAll(html2FileIds(question.getOptionC())); } if
-			 * (ValidateUtil.isValid(question.getOptionD())) {
-			 * fileIdList.addAll(html2FileIds(question.getOptionD())); } if
-			 * (ValidateUtil.isValid(question.getOptionE())) {
-			 * fileIdList.addAll(html2FileIds(question.getOptionE())); } if
-			 * (ValidateUtil.isValid(question.getOptionF())) {
-			 * fileIdList.addAll(html2FileIds(question.getOptionF())); } if
-			 * (ValidateUtil.isValid(question.getOptionG())) {
-			 * fileIdList.addAll(html2FileIds(question.getOptionG())); }
-			 */
-
+			if (question instanceof QuestionEx) {
+				QuestionEx questionEx = (QuestionEx) question;
+				for (QuestionOption questionOption : questionEx.getQuestionOptionList()) {
+					fileIdList.addAll(html2FileIds(questionOption.getOptions()));
+				}
+			}
 		} else if (question.getType() == 5) {// 问答
 			fileIdList.addAll(html2FileIds(question.getAnswer()));
 		}
@@ -331,22 +407,31 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			throw new MyException("读取文件流异常！");
 		}
 
-		List<Question> questionList = wordServer.handle(inputStream);
+		List<QuestionEx> questionExList = wordServer.handle(inputStream);
 		IOUtils.closeQuietly(inputStream);
 
 		// 添加试题
-		for (Question question : questionList) {
+		for (QuestionEx questionEx : questionExList) {
+			Question question = new Question();
+			BeanUtils.copyProperties(questionEx, question);
 			question.setUpdateTime(new Date());
 			question.setUpdateUserId(getCurUser().getId());
 			question.setVer(1);
 			question.setState(2);// 默认禁用
 			question.setQuestionTypeId(questionTypeId);
-			// question.setScore(BigDecimal.ONE);
 			question.setNo(1);
 			add(question);
 
 			question.setSrcId(question.getId());
 			update(question);
+			
+			// 添加试题选项
+			if (questionEx.getType() == 1 || questionEx.getType() == 2) {
+				for (QuestionOption questionOption : questionEx.getQuestionOptionList()) {
+					questionOption.setQuestionId(question.getId());
+					questionOptionService.add(questionOption);
+				}
+			}
 
 			// 保存附件
 			saveFile(question);

@@ -17,7 +17,8 @@ import org.jsoup.nodes.TextNode;
 import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 
-import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.entity.QuestionEx;
+import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.WordServer;
 import com.wcpdoc.exam.core.util.StringUtil;
@@ -34,7 +35,7 @@ public class WordServerImpl extends WordServer {
 	@Override
 	public <T> T doDecoder(List<Node> rowNodes) {
 		List<Node> singleQuestion = new ArrayList<>();
-		List<Question> questionList = new ArrayList<>();
+		List<QuestionEx> questionList = new ArrayList<>();
 		for (Node node : rowNodes) {
 			if (node instanceof TextNode) {
 				continue;
@@ -61,26 +62,25 @@ public class WordServerImpl extends WordServer {
 		return (T) questionList;
 	}
 
-	private Question parseQuestion(List<Node> singleQuestion) {
+	private QuestionEx parseQuestion(List<Node> singleQuestion) {
 		int answerIndex = 0;
 		int scoreIndex = 0;
 		int scoreOptionsIndex = 0;
 		int analysisIndex = 0;
 		int curIndex = 0;
-		Question question = new Question();
+		QuestionEx questionEx = new QuestionEx();
 		for (Node node : singleQuestion) {
 			String rowTxt = Jsoup.clean(node.outerHtml(), Whitelist.none()).trim();
 			if (rowTxt.startsWith("【答案】")) {
 				answerIndex = curIndex;
 			}
-			
-			 else if (rowTxt.startsWith("【分值】")) {
-				 scoreIndex = curIndex;
-				}
-			 else if (rowTxt.startsWith("【分值选项】")) {
-				 scoreOptionsIndex = curIndex;
-				}
-			
+
+			else if (rowTxt.startsWith("【分值】")) {
+				scoreIndex = curIndex;
+			} else if (rowTxt.startsWith("【分值选项】")) {
+				scoreOptionsIndex = curIndex;
+			}
+
 			else if (rowTxt.startsWith("【解析】")) {
 				analysisIndex = curIndex;
 			}
@@ -163,7 +163,9 @@ public class WordServerImpl extends WordServer {
 			optionList.add("E");
 			optionList.add("F");
 			optionList.add("G");
-			optionList = optionList.subList(0, optionIndexs.size() - 1);
+			
+			questionEx.setQuestionOptionList(new ArrayList<>());
+			optionList = optionList.subList(0, optionIndexs.size() - 1); //初始化一个最大的选项，截取到当前最大的选项
 			for (String option : optionList) {
 				if (optionMap.get(option) == null) {
 					throw new MyException("不能从" + titleNodeList + "发现【" + option + "】选项");
@@ -171,25 +173,46 @@ public class WordServerImpl extends WordServer {
 			}
 			
 			if(optionList.size() >= 1) {
-				//question.setOptionA(optionMap.get("A"));
+				QuestionOption questionOption = new QuestionOption();
+				questionOption.setOptions(optionMap.get("A"));
+				questionOption.setNo(1);
+				questionEx.getQuestionOptionList().add(questionOption);
 			}
 			if(optionList.size() >= 2) {
-				//question.setOptionB(optionMap.get("B"));
+				QuestionOption questionOption = new QuestionOption();
+				questionOption.setOptions(optionMap.get("B"));
+				questionOption.setNo(2);
+				questionEx.getQuestionOptionList().add(questionOption);
 			}
 			if(optionList.size() >= 3) {
-				//question.setOptionC(optionMap.get("C"));
+				QuestionOption questionOption = new QuestionOption();
+				questionOption.setOptions(optionMap.get("C"));
+				questionOption.setNo(3);
+				questionEx.getQuestionOptionList().add(questionOption);
 			}
 			if(optionList.size() >= 4) {
-				//question.setOptionD(optionMap.get("D"));
+				QuestionOption questionOption = new QuestionOption();
+				questionOption.setOptions(optionMap.get("D"));
+				questionOption.setNo(4);
+				questionEx.getQuestionOptionList().add(questionOption);
 			}
 			if(optionList.size() >= 5) {
-				//question.setOptionE(optionMap.get("E"));
+				QuestionOption questionOption = new QuestionOption();
+				questionOption.setOptions(optionMap.get("E"));
+				questionOption.setNo(5);
+				questionEx.getQuestionOptionList().add(questionOption);
 			}
 			if(optionList.size() >= 6) {
-				//question.setOptionF(optionMap.get("F"));
+				QuestionOption questionOption = new QuestionOption();
+				questionOption.setOptions(optionMap.get("F"));
+				questionOption.setNo(6);
+				questionEx.getQuestionOptionList().add(questionOption);
 			}
 			if(optionList.size() >= 7) {
-				//question.setOptionG(optionMap.get("G"));
+				QuestionOption questionOption = new QuestionOption();
+				questionOption.setOptions(optionMap.get("G"));
+				questionOption.setNo(7);
+				questionEx.getQuestionOptionList().add(questionOption);
 			}
 		}
 
@@ -289,14 +312,14 @@ public class WordServerImpl extends WordServer {
 			analysis = null;
 		}
 
-		question.setTitle(title);
-		question.setType(type);
-		question.setDifficulty(getDifficulty(difficultyName));
-		question.setAnswer(answer);
-		question.setScore(new BigDecimal(score2));
-		question.setScoreOptions(scoreOptions2);
-		question.setAnalysis(analysis);
-		return question;
+		questionEx.setTitle(title);
+		questionEx.setType(type);
+		questionEx.setDifficulty(getDifficulty(difficultyName));
+		questionEx.setAnswer(answer);
+		questionEx.setScore(new BigDecimal(score2));
+		questionEx.setScoreOptions(scoreOptions2);
+		questionEx.setAnalysis(analysis);
+		return questionEx;
 	}
 
 	private String getTxt(List<Node> nodeList, int startIdx, int endIdx) {

@@ -88,7 +88,7 @@ public class ApiQuestionController extends BaseController {
 				map.put("difficultyName", DictCache.getDictValue("QUESTION_DIFFICULTY", map.get("difficulty").toString()));
 				
 				if (map.get("type").toString().equals("1") || map.get("type").toString().equals("2")) {
-					List<QuestionOption> optionList = questionOptionService.getQuestionOptionList(Integer.valueOf(map.get("id").toString()));
+					List<QuestionOption> optionList = questionOptionService.getList(Integer.valueOf(map.get("id").toString()));
 					map.put("option", optionList);
 				}
 			}
@@ -108,9 +108,9 @@ public class ApiQuestionController extends BaseController {
 	@RequestMapping("/add")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult add(Question question, String[] options) {
+	public PageResult add(Question question, String[] answers, String[] options) {
 		try {
-			questionService.addAndUpdate(question, options);
+			questionService.addAndUpdate(question, answers, options);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加试题错误：{}", e.getMessage());
@@ -125,16 +125,18 @@ public class ApiQuestionController extends BaseController {
 	 * 修改试题
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
-	 * @param question 试题
-	 * @param newVer 新版本
+	 * @param question
+	 * @param answers
+	 * @param options
+	 * @param newVer
 	 * @return PageResult
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult edit(Question question, boolean newVer, String[] options) {
+	public PageResult edit(Question question, String[] answers, String[] options, boolean newVer) {
 		try {
-			questionService.updateAndUpdate(question, newVer, options);
+			questionService.updateAndUpdate(question, answers, options, newVer);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改试题错误：{}", e.getMessage());
@@ -187,7 +189,7 @@ public class ApiQuestionController extends BaseController {
 			Question question = questionService.getEntity(id);
 			List<QuestionOption> questionOptionList = null;
 			if (question.getType() == 1 || question.getType() == 2) {
-				questionOptionList = questionOptionService.getQuestionOptionList(question.getId());
+				questionOptionList = questionOptionService.getList(question.getId());
 			}
 			return PageResultEx.ok()
 					.addAttr("id", question.getId())

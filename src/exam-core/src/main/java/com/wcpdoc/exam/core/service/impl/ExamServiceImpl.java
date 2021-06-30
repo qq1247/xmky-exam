@@ -26,7 +26,6 @@ import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.Question;
-import com.wcpdoc.exam.core.entity.UpdateMarkUserJson;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.ExamTypeService;
@@ -36,6 +35,7 @@ import com.wcpdoc.exam.core.service.MyMarkService;
 import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.PaperTypeService;
 import com.wcpdoc.exam.core.service.QuestionService;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
  * 考试服务层实现
@@ -145,21 +145,35 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	@Override
-	public void updateMarkUser(UpdateMarkUserJson updateMarkUserJson) {
+	public void updateMarkUser(Integer id, Integer[] markUserIds, String[] examUserIds, String[] questionIds) {
 		// 校验数据有效性
-		if (updateMarkUserJson.getId() == null) {
+		if (id == null) {
 			throw new MyException("参数错误：id");
 		}
+		if (markUserIds == null) {
+			throw new MyException("参数错误：markUserIds");
+		}
+		if (!ValidateUtil.isValid(examUserIds) && !ValidateUtil.isValid(questionIds)) {// 两个不能都无效
+			throw new MyException("参数错误：examUserIds,questionIds");
+		}
+		if (ValidateUtil.isValid(examUserIds) && ValidateUtil.isValid(questionIds)) {// 两个不能都有效
+			throw new MyException("参数错误：examUserIds,questionIds");
+		}
 		
-		for(MyMark myMark : updateMarkUserJson.getMarkUserIds()){
-			myMarkService.del(updateMarkUserJson.getId(), myMark.getMarkUserId());
-			
-			myMark.setExamId(updateMarkUserJson.getId());
-			//myMark.setMarkUserId(myMark.getMarkUserId());
-			//myMark.setQuestionIds(questionIds);
-			//myMark.setExamUserIds(examUserIds);
-			myMark.setUpdateTime(new Date());
+		// 更新阅卷用户
+		List<MyMark> myMarkList = myMarkService.getList(id);
+		for (MyMark myMark : myMarkList) {
+			myMarkService.del(myMark.getId());
+		}
+		
+		for(int i = 0; i < markUserIds.length; i++) {
+			MyMark myMark = new MyMark();
+			myMark.setMarkUserId(markUserIds[i]);
+			myMark.setExamUserIds(examUserIds != null ? String.format(",%s,", examUserIds[i]) : null);
+			myMark.setQuestionIds(questionIds != null ? String.format(",%s,", questionIds[i]) : null);
 			myMark.setUpdateUserId(getCurUser().getId());
+			myMark.setUpdateTime(new Date());
+			myMark.setExamId(id);
 			myMarkService.add(myMark);
 		}
 	}
@@ -188,12 +202,12 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	@Override
-	public List<Map<String, Object>> getMarkExamUserList(Integer id) {
-		return examDao.getMarkExamUserList(id);
+	public List<Map<String, Object>> getMarkExamUserList(Integer id, Integer markUserId) {
+		return examDao.getMarkExamUserList(id, markUserId);
 	}
 
 	@Override
-	public List<Map<String, Object>> getMarkQuestionList(Integer id) {
-		return examDao.getMarkQuestionList(id);
+	public List<Map<String, Object>> getMarkQuestionList(Integer id, Integer markUserId) {
+		return examDao.getMarkQuestionList(id, markUserId);
 	}
 }

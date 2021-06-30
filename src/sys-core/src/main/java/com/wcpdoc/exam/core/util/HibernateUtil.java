@@ -31,7 +31,7 @@ public class HibernateUtil {
 				Date value = (Date) map.get(key);
 				if (value != null) {
 					format.applyPattern(pattern);
-					map.put(key + "Str", format.format(value));
+					map.put(key, format.format(value));
 				}
 			}
 		}

@@ -27,20 +27,23 @@ public interface QuestionService extends BaseService<Question>{
 	 * 
 	 * v1.0 zhanghc 2018年10月12日下午1:52:35
 	 * @param question
+	 * @param answers
+	 * @param options
 	 * void
 	 */
-	void addAndUpdate(Question question, String[] options);
+	void addAndUpdate(Question question, String[] answers, String[] options);
 
 	/**
 	 * 完成试题修改
 	 * 
 	 * v1.0 zhanghc 2018年10月12日下午7:30:02
 	 * @param question
-	 * @param answer 答案
-	 * @param newVer 新版本
+	 * @param answer
+	 * @param options
+	 * @param newVer
 	 * void 
 	 */
-	void updateAndUpdate(Question question, boolean newVer, String[] options);
+	void updateAndUpdate(Question question, String[] answers, String[] options, boolean newVer);
 	
 	/**
 	 * 完成导入试题
