@@ -7,7 +7,6 @@ import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
-import com.wcpdoc.exam.core.entity.UpdateMarkUserJson;
 /**
  * 考试服务层接口
  * 
@@ -38,10 +37,13 @@ public interface ExamService extends BaseService<Exam>{
 	 * 考试更新判卷用户
 	 * 
 	 * v1.0 zhanghc 2017年6月19日下午3:10:24
-	 * @param updateMarkUserJson
+	 * @param id
+	 * @param markUserIds
+	 * @param examUserIds
+	 * @param questionIds
 	 * void
 	 */
-	void updateMarkUser(UpdateMarkUserJson updateMarkUserJson);
+	void updateMarkUser(Integer id, Integer[] markUserIds, String[] examUserIds, String[] questionIds);
 	
 	/**
 	 * 完成强制交卷
@@ -85,16 +87,18 @@ public interface ExamService extends BaseService<Exam>{
 	 * 
 	 * v1.0 zhanghc 2021年6月25日下午2:49:33
 	 * @param id
+	 * @param markUserId
 	 * @return List<Map<String,Object>>
 	 */
-	List<Map<String, Object>> getMarkExamUserList(Integer id);
+	List<Map<String, Object>> getMarkExamUserList(Integer id, Integer markUserId);
 
 	/**
 	 * 获取阅卷试题列表
 	 * 
 	 * v1.0 zhanghc 2021年6月25日下午2:50:02
 	 * @param id
+	 * @param markUserId
 	 * @return List<Map<String,Object>>
 	 */
-	List<Map<String, Object>> getMarkQuestionList(Integer id); 
+	List<Map<String, Object>> getMarkQuestionList(Integer id, Integer markUserId); 
 }

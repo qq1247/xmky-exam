@@ -48,11 +48,10 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examTypeId")), "EXAM.EXAM_TYPE_ID = ?", pageIn.get("examTypeId", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "EXAM.NAME LIKE ?", "%" + pageIn.get("name") + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.get("pName")), "PAPER.NAME LIKE ?", "%" + pageIn.get("pName") + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")), "EXAM.STATE = ?", pageIn.get("state"))//0：删除；1：启用；2：禁用
-				.addWhere(ValidateUtil.isValid(pageIn.get("START_TIME")), "EXAM.START_TIME > ?", ValidateUtil.isValid(pageIn.get("START_TIME")) ? DateUtil.getDateTime(pageIn.get("START_TIME")) : null)
-				.addWhere(ValidateUtil.isValid(pageIn.get("START_TIME")), "EXAM.START_TIME < ?", ValidateUtil.isValid(pageIn.get("START_TIME")) ? DateUtil.getDateTime(pageIn.get("START_TIME")) : null)
-				.addWhere(pageIn.get("curUserId", Integer.class) != null, "EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.MARK_USER_ID = ? AND Z.EXAM_ID = EXAM.ID)", pageIn.get("curUserId", Integer.class))
+				.addWhere(ValidateUtil.isValid(pageIn.get("startTime")), "EXAM.START_TIME > ?", ValidateUtil.isValid(pageIn.get("START_TIME")) ? DateUtil.getDateTime(pageIn.get("START_TIME")) : null)
+				.addWhere(ValidateUtil.isValid(pageIn.get("startTime")), "EXAM.START_TIME < ?", ValidateUtil.isValid(pageIn.get("START_TIME")) ? DateUtil.getDateTime(pageIn.get("START_TIME")) : null)
+				//.addWhere(pageIn.get("curUserId", Integer.class) != null, "EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.MARK_USER_ID = ? AND Z.EXAM_ID = EXAM.ID)", pageIn.get("curUserId", Integer.class))
 				.addWhere("EXAM.STATE != ?", 0)
 				.addOrder("EXAM.START_TIME", Order.DESC);
 		
@@ -153,22 +152,22 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 	}
 
 	@Override
-	public List<Map<String, Object>> getMarkExamUserList(Integer id) {
+	public List<Map<String, Object>> getMarkExamUserList(Integer id, Integer markUserId) {
 		String sql = "SELECT USER.ID, USER.NAME AS NAME, ORG.NAME AS ORG_NAME "
 				+ "FROM SYS_USER USER "
 				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
-				+ "WHERE EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.EXAM_ID = ? AND USER.ID = Z.USER_ID) "//回显的情况下，用户状态!=1的也查询
+				+ "WHERE EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.EXAM_ID = ? AND Z.MARK_USER_ID = ? AND Z.EXAM_USER_IDS LIKE CONCAT( '%,' , USER.ID , ',%' )) "//回显的情况下，用户状态!=1的也查询
 				+ "ORDER BY USER.UPDATE_TIME DESC ";
-		return getMapList(sql, new Object[]{id});
+		return getMapList(sql, new Object[]{id, markUserId});
 	}
 
 	@Override
-	public List<Map<String, Object>> getMarkQuestionList(Integer id) {
+	public List<Map<String, Object>> getMarkQuestionList(Integer id, Integer markUserId) {
 		String sql = "SELECT QUESTION.ID, QUESTION.TITLE "
 				+ "FROM EXM_QUESTION QUESTION "
-				+ "WHERE EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.EXAM_ID = ? AND QUESTION.ID = Z.QUESTION_ID) "//回显的情况下，试题状态!=1的也查询
+				+ "WHERE EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.EXAM_ID = ? AND Z.MARK_USER_ID = ? AND Z.QUESTION_IDS LIKE CONCAT( '%,' , QUESTION.ID , ',%' )) "//回显的情况下，试题状态!=1的也查询
 				+ "ORDER BY QUESTION.UPDATE_TIME DESC ";
-		return getMapList(sql, new Object[]{id});
+		return getMapList(sql, new Object[]{id, markUserId});
 	}
 
 }

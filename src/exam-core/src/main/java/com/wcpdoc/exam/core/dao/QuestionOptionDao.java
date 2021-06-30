@@ -19,5 +19,5 @@ public interface QuestionOptionDao extends RBaseDao<QuestionOption> {
 	 * @param questionId
 	 * @return List<QuestionOption>
 	 */
-	List<QuestionOption> getQuestionOptionList(Integer questionId);
+	List<QuestionOption> getList(Integer questionId);
 }

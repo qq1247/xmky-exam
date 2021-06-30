@@ -24,7 +24,7 @@ public class PaperQuestionDaoImpl extends RBaseDaoImpl<PaperQuestion> implements
 
 	@Override
 	public List<PaperQuestion> getQuestionList(Integer parentId) {
-		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PARENT_ID = ?";
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PARENT_ID = ? AND TYPE != 1";
 		return getList(sql, new Object[]{parentId}, PaperQuestion.class);
 	}
 

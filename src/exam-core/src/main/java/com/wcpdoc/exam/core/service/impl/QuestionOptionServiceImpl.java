@@ -35,18 +35,7 @@ public class QuestionOptionServiceImpl extends BaseServiceImp<QuestionOption> im
 	}
 
 	@Override
-	public List<QuestionOption> getQuestionOptionList(Integer questionId) {
-		return questionOptionDao.getQuestionOptionList(questionId);
-	}
-	
-	@Override
-	public void removeQuestionOption(Integer questionId) {
-		List<QuestionOption> questionOption = questionOptionDao.getQuestionOptionList(questionId);
-		if(questionOption == null || questionOption.size() == 0 ){
-			return;
-		}
-		for(QuestionOption  questionOptionId :  questionOption){
-			del(questionOptionId.getId());
-		}
+	public List<QuestionOption> getList(Integer questionId) {
+		return questionOptionDao.getList(questionId);
 	}
 }

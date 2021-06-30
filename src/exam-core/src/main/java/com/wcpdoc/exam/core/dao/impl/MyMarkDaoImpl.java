@@ -53,18 +53,6 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 	}
 
 	@Override
-	public void del(Integer roomId, Integer userId) {
-		String sql = "DELETE FROM EXM_MY_MARK WHERE EXAM_ID = ? AND MARK_USER_ID = ?";
-		update(sql, new Object[]{roomId, userId});
-	}
-
-	@Override
-	public MyMark getEntity(Integer examId, Integer userId) {
-		String sql = "SELECT * FROM EXM_MY_MARK WHERE EXAM_ID = ? AND MARK_USER_ID = ?";
-		return getEntity(sql, new Object[]{examId, userId}, MyMark.class);
-	}
-
-	@Override
 	public List<MyMark> getList(Integer examId) {
 		String sql = "SELECT * FROM EXM_MY_MARK WHERE EXAM_ID = ?";
 		return getList(sql, new Object[] { examId }, MyMark.class);

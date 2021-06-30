@@ -67,7 +67,6 @@ export default {
   examDel: params => post('exam/del', params),
   examUpdateExamUser: params => post('exam/updateExamUser', params),
   examUpdateMarkUser: params => post('exam/updateMarkUser', params),
-  examUserList: params => post('exam/userList', params),
   examQuestionList: params => post('exam/questionList', params),
   examPublish: params => post('exam/publish', params),
 
@@ -243,6 +242,12 @@ export default {
   questionTypeOpenAdd: params => post('questionTypeOpen/add', params),
   questionTypeOpenDel: params => post('questionTypeOpen/del', params),
 
+  // 我的考试相关
+  myExamListPage: params => post('myExam/listpage', params),
+  myExamAnswerList: params => post('myExam/answerList', params),
+  myExamUpdateAnswer: params => post('myExam/updateAnswer', params),
+
   // 基础功能相关
-  login: params => post('login/in', params)
+  login: params => post('login/in', params),
+  loginSysTime: params => post('login/sysTime', params)
 }

@@ -85,7 +85,7 @@
           shadow="hover"
           v-for="(quesiton, index) in list.questionList"
         >
-          <div class="center-card-top">{{ index + 1 }}、{{ quesiton.title }}</div>
+          <div class="center-card-top" v-html="quesiton.title"></div>
           <div class="center-card-bottom">
             <div class="card-bottom-left">
               <el-tag class="center-tag-danger" size="mini" type="danger">
@@ -1028,7 +1028,6 @@ export default {
 .content-center {
   flex: 1;
   .center-card {
-    height: 70px;
     cursor: pointer;
     margin: 0 10px 10px 10px;
     padding: 0 5px;
@@ -1043,15 +1042,14 @@ export default {
     }
   }
   .center-card-top {
-    height: 20px;
     font-size: 14px;
     text-align: left;
   }
   .center-card-bottom {
-    height: 50px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin: 10px 0 5px;
     .el-tag {
       margin-right: 8px;
     }

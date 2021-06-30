@@ -1,7 +1,6 @@
 package com.wcpdoc.exam.core.service.impl;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,7 +34,6 @@ import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
 import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.util.BigDecimalUtil;
-import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
@@ -72,21 +70,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 
 	@Override
 	public List<Map<String, Object>> getAnswerList(Integer myExamId) {
-		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-		for(Map<String, Object> mapList : myExamDetailDao.getAnswerList(myExamId, getCurUser().getId())){
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("id", mapList.get("ID"));
-			map.put("questionId", mapList.get("QUESTION_ID"));
-			map.put("answerTime", mapList.get("ANSWER_TIME") == null ? null : DateUtil.formatDateTime(DateUtil.getDateTime(mapList.get("ANSWER_TIME").toString())));
-			map.put("answer", mapList.get("ANSWER"));
-			map.put("markUserId", mapList.get("MARK_USER_ID"));
-			map.put("markUserName", mapList.get("MARK_USER_NAME"));
-			map.put("markTime", mapList.get("MARK_TIME") == null ? null : DateUtil.formatDateTime(DateUtil.getDateTime(mapList.get("MARK_TIME").toString())));
-			map.put("score", mapList.get("SCORE"));
-			map.put("questionScore", mapList.get("QUESTION_SCORE"));
-			list.add(map);
-		}
-		return list;
+		return myExamDetailDao.getAnswerList(myExamId, getCurUser().getId());
 	}
 	
 	@Override

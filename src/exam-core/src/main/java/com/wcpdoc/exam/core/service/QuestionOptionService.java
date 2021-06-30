@@ -30,13 +30,6 @@ public interface QuestionOptionService extends BaseService<QuestionOption> {
 	 * @param questionId
 	 * @return List<QuestionOption>
 	 */
-	List<QuestionOption> getQuestionOptionList(Integer questionId);
+	List<QuestionOption> getList(Integer questionId);
 	
-	/**
-	 * 删除全部试题选项
-	 * 
-	 * v1.0 cY 2021年6月2日下午4:38:07
-	 * @param questionId void
-	 */
-	void removeQuestionOption(Integer questionId);
 }

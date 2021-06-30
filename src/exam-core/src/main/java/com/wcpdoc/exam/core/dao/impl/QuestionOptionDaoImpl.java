@@ -30,8 +30,8 @@ public class QuestionOptionDaoImpl extends RBaseDaoImpl<QuestionOption> implemen
 	}
 
 	@Override
-	public List<QuestionOption> getQuestionOptionList(Integer questionId) {
+	public List<QuestionOption> getList(Integer questionId) {
 		String sql = "SELECT * FROM EXM_QUESTION_OPTION WHERE QUESTION_ID = ? ORDER BY NO ASC";
-		return getList(sql, new Object[]{questionId});
+		return getList(sql, new Object[] { questionId });
 	}
 }

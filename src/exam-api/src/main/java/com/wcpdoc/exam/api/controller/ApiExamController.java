@@ -13,7 +13,6 @@ import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -25,7 +24,6 @@ import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
-import com.wcpdoc.exam.core.entity.UpdateMarkUserJson;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.ExamTypeService;
@@ -234,13 +232,13 @@ public class ApiExamController extends BaseController{
 			List<Map<String, Object>> result = new ArrayList<>();
 			for (MyMark myMark : myMarkList) {
 				Map<String, Object> map = new HashMap<>();
-				map.put("id", userService.getEntity(myMark.getMarkUserId()).getName());
-				map.put("name", userService.getEntity(myMark.getMarkUserId()).getName());
+				map.put("markUserId", userService.getEntity(myMark.getMarkUserId()).getId());
+				map.put("markUserName", userService.getEntity(myMark.getMarkUserId()).getName());
 				if (ValidateUtil.isValid(myMark.getExamUserIds())) {
-					map.put("examUserList", examService.getMarkExamUserList(myMark.getExamId()));
+					map.put("examUserList", examService.getMarkExamUserList(myMark.getExamId(), myMark.getMarkUserId()));
 				}
 				if (ValidateUtil.isValid(myMark.getQuestionIds())) {
-					map.put("questionList", examService.getMarkQuestionList(myMark.getExamId()));
+					map.put("questionList", examService.getMarkQuestionList(myMark.getExamId(), myMark.getMarkUserId()));
 				}
 				result.add(map);
 			}
@@ -290,9 +288,9 @@ public class ApiExamController extends BaseController{
 	@RequestMapping("/updateMarkUser")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult updateMarkUser(@RequestBody UpdateMarkUserJson updateMarkUserJson) {
+	public PageResult updateMarkUser(Integer id, Integer[] markUserIds, String[] examUserIds, String[] questionIds) {
 		try {
-			examService.updateMarkUser(updateMarkUserJson);
+			examService.updateMarkUser(id, markUserIds, examUserIds, questionIds);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成考试配置错误：{}", e.getMessage());

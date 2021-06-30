@@ -13,26 +13,6 @@ import com.wcpdoc.exam.core.entity.MyMark;
 public interface MyMarkDao extends BaseDao<MyMark>{
 
 	/**
-	 * 删除实体
-	 * 
-	 * v1.0 zhanghc 2017年6月26日下午2:11:44
-	 * @param examId
-	 * @param userId
-	 * void
-	 */
-	void del(Integer examId, Integer userId);
-
-	/**
-	 * 获取我的阅卷信息
-	 * 
-	 * v1.0 zhanghc 2017年7月3日上午9:42:55
-	 * @param examId
-	 * @param userId
-	 * @return MyExam
-	 */
-	MyMark getEntity(Integer examId, Integer userId);
-
-	/**
 	 * 获取我的阅卷列表
 	 * 
 	 * v1.0 zhanghc 2020年9月30日上午11:03:04

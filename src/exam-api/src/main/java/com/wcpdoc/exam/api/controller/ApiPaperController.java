@@ -12,8 +12,6 @@ import javax.annotation.Resource;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -188,13 +186,9 @@ public class ApiPaperController extends BaseController {
 	@RequestMapping("/get")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult get(Integer paperId) {
+	public PageResult get(Integer id) {
 		try {
-			Paper paper = paperService.getEntity(paperId);
-			List<PaperRemark> paperRemarkList = paperRemarkService.getList(paper.getId());
-			return PageResultEx.ok()
-					.addAttr("paper", paper)
-					.addAttr("paperRemarkList", paperRemarkList);
+			return PageResultEx.ok().data(paperService.getEntity(id));
 		} catch (MyException e) {
 			log.error("添加试卷错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -401,7 +395,7 @@ public class ApiPaperController extends BaseController {
 	}
 	
 	/**
-	 * 章节列表
+	 * 试卷试题列表
 	 * 
 	 * v1.0 chenyun 2021年3月31日下午4:21:20
 	 * @param id
@@ -410,45 +404,50 @@ public class ApiPaperController extends BaseController {
 	@RequestMapping("/paperQuestionList")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult PaperQuestionList(Integer id) {
+	public PageResult paperQuestionList(Integer id) {
 		try {
 			List<PaperQuestion> chapterList = paperQuestionService.getChapterList(id);
-			List<Map<String, Object>> mapList = new ArrayList<Map<String, Object>>();
-			for(PaperQuestion paperQuestion : chapterList){
+			List<Map<String, Object>> mapList = new ArrayList<>();
+			for(PaperQuestion chapter : chapterList){
 				//章节
 				Map<String, Object> map = new HashMap<String, Object>();
 				Map<String, Object> chapterMap = new HashMap<String, Object>();
-				chapterMap.put("id", paperQuestion.getId());
-				chapterMap.put("name", paperQuestion.getName());
-				chapterMap.put("description", paperQuestion.getDescription());
-				chapterMap.put("parentId", paperQuestion.getPaperId());
+				chapterMap.put("id", chapter.getId());
+				chapterMap.put("name", chapter.getName());
+				chapterMap.put("description", chapter.getDescription());
+				chapterMap.put("parentId", chapter.getPaperId());
 				map.put("chapter",  chapterMap);
 				//试题
-				List<PaperQuestion> questionList = paperQuestionService.getQuestionList(paperQuestion.getId());
-				List<Map<String, Object>> questionsListMap = new ArrayList<Map<String, Object>>();
-				for(PaperQuestion questionId : questionList){
-					Map<String, Object> questionMap = new HashMap<String, Object>();
-					Question entity = questionService.getEntity(questionId.getQuestionId());
+				List<PaperQuestion> paperQuestionList = paperQuestionService.getQuestionList(chapter.getId());
+				List<Map<String, Object>> questionsListMap = new ArrayList<>();
+				for(PaperQuestion paperQuestion : paperQuestionList){
+					Map<String, Object> questionMap = new HashMap<>();
+					Question entity = questionService.getEntity(paperQuestion.getQuestionId());
 					questionMap.put("id", entity.getId());
 					questionMap.put("type", entity.getType());
 					questionMap.put("typeName", DictCache.getDictValue("QUESTION_TYPE", entity.getType().toString()));
 					questionMap.put("difficulty", entity.getDifficulty());
 					questionMap.put("difficultyName", DictCache.getDictValue("QUESTION_DIFFICULTY", entity.getDifficulty().toString()));
 					questionMap.put("updateUserName", userService.getEntity(entity.getUpdateUserId()).getName());
-					questionMap.put("paperquestionId", questionId.getId());
-					
-					questionMap.put("title", takeOutHtml(entity.getTitle()));
-					questionMap.put("answer", takeOutHtml(entity.getAnswer()));
-					questionMap.put("analysis", takeOutHtml(entity.getAnalysis()));
-					
+					questionMap.put("paperQuestionId", paperQuestion.getId());
+					questionMap.put("title", entity.getTitle());
+					if (entity.getType() == 1 || entity.getType() == 4 || entity.getType() == 5) {
+						questionMap.put("answers", new String[] { entity.getAnswer() });
+					} else if (entity.getType() == 2) {
+						questionMap.put("answers", entity.getAnswer().split(","));
+					} else if (entity.getType() == 3) {
+						questionMap.put("answers", entity.getAnswer().split("\n"));
+					}
+					questionMap.put("analysis", entity.getAnalysis());
 					questionMap.put("score", entity.getScore());
-					questionMap.put("scoreOptions", questionId.getScoreOptions());
+					questionMap.put("scoreOptions", paperQuestion.getScoreOptions());
 					if(entity.getType() == 1 || entity.getType() == 2 ){
-						List<QuestionOption> questionOptionList = questionOptionService.getQuestionOptionList(questionId.getQuestionId());
-						for (QuestionOption questionOption : questionOptionList) {
-							questionOption.setOptions(takeOutHtml(questionOption.getOptions()));
+						List<QuestionOption> questionOptionList = questionOptionService.getList(paperQuestion.getQuestionId());
+						String[] options = new String[questionOptionList.size()];
+						for (int i = 0; i < questionOptionList.size(); i++) {
+							options[i] = questionOptionList.get(i).getOptions();
 						}
-						questionMap.put("options", questionOptionList);
+						questionMap.put("options", options);
 					}
 
 					questionsListMap.add(questionMap);
@@ -461,12 +460,6 @@ public class ApiPaperController extends BaseController {
 			log.error("试题列表错误：", e);
 			return PageResult.err();
 		}
-	}
-	
-	public String takeOutHtml(String parameter) {
-		Document document = Jsoup.parse(parameter);
-		parameter = document.body().html();
-		return Jsoup.parse(parameter).text();
 	}
 	
 	/**

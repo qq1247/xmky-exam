@@ -34,7 +34,7 @@ code == 401 无权限或登录超时
 | code                       | Integer | 响应码   |
 | msg                        | String  | 响应消息 |
 | data.total                 | Integer | 总行数   |
-| data.list[]                | arr[]   | 分页列表 |
+| data.list[]                | Object[]   | 分页列表 |
 | data.list[].id             | Integer | 主键     |
 | data.list[].name           | String  | 名称     |
 | data.list[].readUserNames  | String  | 读权限   |
@@ -107,7 +107,7 @@ code == 401 无权限或登录超时
 | code             | Integer | 响应码   |
 | msg              | String  | 响应消息 |
 | data.total       | Integer | 总行数   |
-| data.list[]      | arr[]   | 分页列表 |
+| data.list[]      | Object[]   | 分页列表 |
 | data.list[].id   | Integer | 用户id   |
 | data.list[].name | String  | 名称     |
 
@@ -125,7 +125,7 @@ code == 401 无权限或登录超时
 | code                  | Integer | 响应码       |
 | msg                   | String  | 响应消息     |
 | data.total            | Integer | 总行数       |
-| data.list[]           | arr[]   | 分页列表     |
+| data.list[]           | Object[]   | 分页列表     |
 | data.list[].id        | Integer | 主键         |
 | data.list[].startTime | Date    | 类型         |
 | data.list[].endTime   | Date    | 类型名称     |
@@ -161,8 +161,8 @@ code == 401 无权限或登录超时
 | exPaperId      | Integer | 排除试卷id   | 否   |
 | paperId      | Integer | 试卷id   | 否   |
 | difficulty     | Integer | 难度         | 否   |
-| scoreStart     | double  | 分值大于     | 否   |
-| scoreEnd       | double  | 分值小于     | 否   |
+| scoreStart     | Double  | 分值大于     | 否   |
+| scoreEnd       | Double  | 分值小于     | 否   |
 | questionTypeId | Integer | 试题分类id   | 否   |
 | exAi		 | Integer | 排除智能阅卷试题(exAi=1)   | 否   |
 | curPage        | Integer | 当前第几页   | 否   |
@@ -173,7 +173,7 @@ code == 401 无权限或登录超时
 | code                         | Integer | 响应码       |
 | msg                          | String  | 响应消息     |
 | data.total                   | Integer | 总行数       |
-| data.list[]                  | arr[]   | 分页列表     |
+| data.list[]                  | Object[]   | 分页列表     |
 | data.list[].id               | Integer | 主键         |
 | data.list[].type             | Integer | 类型         |
 | data.list[].typeName         | String  | 类型名称     |
@@ -198,11 +198,11 @@ code == 401 无权限或登录超时
 | difficulty     | Integer         | 难度（1：极易；2：简单；3：适中；4：困难；5：极难 ）                                                                             | 是   |
 | title          | String（65535） | 题干                                                                                                                             | 是   |
 | options[]      | String[]        | 选项，type为1,2时有效，len <= 7                                                                                                  | 否   |
-| answer         | String(65535)   | 答案                                                                                                                             | 是   |
+| answers[]      | String[]	   | 答案（类型为1,4,5，answers.len==1，类型为2,3，answers.len>=1）                                                                       | 是   |
 | analysis       | String(65535)   | 解析                                                                                                                             | 是   |
 | state          | Integer         | 状态（1：启用；2：禁用 ）                                                                                                        | 是   |
 | questionTypeId | Integer         | 试题分类ID                                                                                                                       | 是   |
-| score          | double          | 分值                                                                                                                             | 否   |
+| score          | Double          | 分值                                                                                                                             | 否   |
 | scoreOptions   | String(8)       | 分值选项，type为2时1有效，type为3时1,2,3,4有效，多选用英文逗号分隔。1：半对半分；2：答案无顺序；3：大小写不敏感；4：包含答案得分 | 否   |
 | no             | Integer         | 排序                                                                                                                             | 是   |
 
@@ -267,15 +267,15 @@ code == 401 无权限或登录超时
 | code                      | Integer | 响应码                                                           |
 | msg                       | String  | 响应消息                                                         |
 | data.total                | Integer | 总行数                                                           |
-| data.list[]               | arr[]   | 分页列表                                                         |
+| data.list[]               | Object[]   | 分页列表                                                         |
 | data.list[].id            | Integer | 主键                                                             |
 | data.list[].name          | String  | 名称                                                             |
 | data.list[].state         | Integer | 状态                                                             |
 | data.list[].stateName     | String  | 状态名称                                                         |
 | data.list[].updateUserId  | Integer | 修改人                                                           |
 | data.list[].updateTime    | Date    | 修改时间                                                         |
-| data.list[].passScore     | double  | 及格分数（百分比）                                               |
-| data.list[].totalScore    | double  | 总分数                                                           |
+| data.list[].passScore     | Double  | 及格分数（百分比）                                               |
+| data.list[].totalScore    | Double  | 总分数                                                           |
 | data.list[].paperTypeId   | Integer | 试卷分类id                                                       |
 | data.list[].paperTypeName | String  | 试卷分类名称                                                     |
 | data.list[].description   | String  | 描述                                                             |
@@ -288,14 +288,14 @@ code == 401 无权限或登录超时
 | -------------------- | ------------- | ------------------------------------------------------------------------------------------ | ---- |
 | genType              | Integer       | 1：人工组卷；2：随机组卷                                                                   | 是   |
 | name                 | String(32)    | 名称                                                                                       | 是   |
-| passScore            | double        | 及格分数（百分比）                                                                         | 是   |
+| passScore            | Double        | 及格分数（百分比）                                                                         | 是   |
 | readRemark           | String(65535) | 考前阅读                                                                                   | 是   |
 | readNum              | Integer       | 阅读时长【分钟】                                                                           | 是   |
 | showType             | Integer       | 1：整卷展示；2：章节显示；3：单题展示；数据字典：PAPER_SHOW_TYPE                           | 否   |
 | options              | String(32)    | 1：试题乱序；2：选项乱序；3：禁用右键；4：禁止复制；5：最小化警告；数据字典：PAPER_OPTIONS | 否   |
 | minimizeNum          | Integer       | 最小化警告次数                                                                             | 否   |
 | scoreRemark[]        | String[]      | 分数评语                                                                                   | 否   |
-| scoreRemark[].score  | double        | 分数（%）                                                                                  | 否   |
+| scoreRemark[].score  | Double        | 分数（%）                                                                                  | 否   |
 | scoreRemark[].remark | String(32)    | 评语                                                                                       | 否   |
 
 ####试卷修改：paper/edit
@@ -370,7 +370,7 @@ code == 401 无权限或登录超时
 |code     | Integer  | 响应码 |
 |msg     | String  | 响应消息 |
 |data.total     | Integer  | 总行数 |
-|data.list[]      | arr[]  | 分页列表 |
+|data.list[]      | Object[]  | 分页列表 |
 |data.list[].chapter.id  | Integer  | 章节id |
 |data.list[].chapter.name  | String  | 章节名称 |
 |data.list[].chapter.description  | String  | 章节描述 |
@@ -379,11 +379,11 @@ code == 401 无权限或登录超时
 |data.list[].questionList[].type  | Integer  | 试题类型，参考question/add |
 |data.list[].questionList[].difficulty  | Integer  | 试题难度，难易度参考question/add|
 |data.list[].questionList[].title  | String  | 试题标题 |
-|data.list[].questionList[].answer  | String  | 试题答案 |
+|data.list[].questionList[].answers[]  | String  | 试题答案，参考question/add |
 |data.list[].questionList[].analysis  | String  | 试题解析 |
-|data.list[].questionList[].score  | double  | 试题分数 |
+|data.list[].questionList[].score  | Double  | 试题分数 |
 |data.list[].questionList[].scoreOptions  | String  | 试题分数选项，参考question/add |
-|data.list[].questionList[].options[]  | Integer  | 试题选项，参考question/add |
+|data.list[].questionList[].options[]  | String[]  | 试题选项，参考question/add |
 
 ####试卷试题添加：paper/questionAdd
 ######请求参数
@@ -409,7 +409,7 @@ code == 401 无权限或登录超时
 | 参数            | 类型    | 描述       | 必填 |
 | --------------- | ------- | ---------- | ---- |
 | paperQuestionId | Integer | 试题试卷id | 是   |
-| score           | double  | 分值       | 是   |
+| score           | Double  | 分值       | 是   |
 
 ####试卷试题设置分数选项：paper/updateScoreOptions
 ######请求参数
@@ -423,7 +423,7 @@ code == 401 无权限或登录超时
 | 参数      | 类型    | 描述   | 必填 |
 | --------- | ------- | ------ | ---- |
 | chapterId | Integer | 章节id | 是   |
-| score     | double  | 分数   | 是   |
+| score     | Double  | 分数   | 是   |
 | options   | String  | 选项   | 是   |
 
 ####试卷试题上移：paper/questionUp
@@ -457,7 +457,7 @@ code == 401 无权限或登录超时
 | code             | Integer | 响应码   |
 | msg              | String  | 响应消息 |
 | data.total       | Integer | 总行数   |
-| data.list[]      | arr[]   | 分页列表 |
+| data.list[]      | Object[]   | 分页列表 |
 | data.list[].id   | Integer | 主键     |
 | data.list[].name | String  | 名称     |
 
@@ -501,7 +501,6 @@ code == 401 无权限或登录超时
 | 参数    | 类型      | 描述        | 必填 |
 | ------- | --------- | ----------- | ---- |
 | id      | Integer   | 主键        | 是   |
-| examId      | Integer   | 考试id      | 是   |
 | userIds | Integer[] | 考试用户IDS | 是   |
 
 ####考试更新判卷用户：exam/updateMarkUser
@@ -509,7 +508,6 @@ code == 401 无权限或登录超时
 | 参数        | 类型      | 描述        | 必填 |
 | ----------- | --------- | ----------- | ---- |
 | id          | Integer   | 主键        | 是   |
-| examId      | Integer   | 考试id      | 是   |
 | markUserIds | Integer[] | 阅卷用户IDS | 是   |
 | examUserIds | Integer[] | 考试用户IDS | 否   |
 | questionIds | Integer[] | 试题IDS     | 否   |
@@ -538,8 +536,8 @@ code == 401 无权限或登录超时
 | --------- | ------- | -------- |
 | code      | Integer | 响应码   |
 | msg       | String  | 响应消息 |
-| data.id   | Integer | 阅卷用户ID     |
-| data.name | String  | 阅卷用户名称 |
+| data.markUserId   | Integer | 阅卷用户ID     |
+| data.markUserName | String  | 阅卷用户名称 |
 | data.examUserList[].id | Integer  | 考试用户ID |
 | data.examUserList[].name | String  | 考试用户名称 |
 | data.examUserList[].orgName | String  | 考试用户组织机构 |

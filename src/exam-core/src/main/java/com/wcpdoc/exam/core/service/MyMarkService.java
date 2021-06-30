@@ -11,26 +11,6 @@ import com.wcpdoc.exam.core.entity.MyMark;
 public interface MyMarkService extends BaseService<MyMark>{
 
 	/**
-	 * 删除实体
-	 * 
-	 * v1.0 zhanghc 2017年6月26日下午2:09:55
-	 * @param examId
-	 * @param id
-	 * void
-	 */
-	void del(Integer examId, Integer id);
-
-	/**
-	 * 获取我的阅卷信息
-	 * 
-	 * v1.0 zhanghc 2017年7月3日上午9:41:59
-	 * @param examId
-	 * @param userId
-	 * @return MyExam
-	 */
-	MyMark getEntity(Integer examId, Integer userId);
-	
-	/**
 	 * 获取我的考试列表
 	 * 
 	 * v1.0 zhanghc 2020年9月29日下午5:09:50
