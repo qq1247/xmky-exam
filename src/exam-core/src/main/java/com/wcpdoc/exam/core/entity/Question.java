@@ -199,4 +199,21 @@ public class Question {
 		}
 		throw new MyException("getAnswers方法解析错误");
 	}
+	
+	public String[] getAnswers(Integer type, String answer) {
+		if (!ValidateUtil.isValid(answer)) {
+			return new String[0];
+		}
+		
+		if (type == 1 || type == 4 || type == 5) {
+			return new String[] { answer };
+		}
+		if (type == 2) {
+			return answer.split(",");
+		}
+		if (type == 3) {
+			return answer.split("\n");
+		}
+		throw new MyException("getAnswers方法解析错误");
+	}
 }

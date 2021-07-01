@@ -74,4 +74,24 @@ public interface QuestionTypeService extends BaseService<QuestionType> {
 	 * @return PageOut
 	 */
 	PageOut authUserListpage(PageIn pageIn);
+
+	/**
+	 * 拥有写权限
+	 * 
+	 * v1.0 zhanghc 2021年7月1日下午2:13:57
+	 * @param questionType
+	 * @param id
+	 * @return boolean
+	 */
+	boolean hasWriteAuth(QuestionType questionType, Integer id);
+
+	/**
+	 * 拥有读权限
+	 * 
+	 * v1.0 zhanghc 2021年7月1日下午2:14:10
+	 * @param questionType
+	 * @param userId
+	 * @return boolean
+	 */
+	boolean hasReadAuth(QuestionType questionType, Integer userId);
 }

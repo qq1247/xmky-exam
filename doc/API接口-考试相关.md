@@ -198,7 +198,7 @@ code == 401 无权限或登录超时
 | difficulty     | Integer         | 难度（1：极易；2：简单；3：适中；4：困难；5：极难 ）                                                                             | 是   |
 | title          | String（65535） | 题干                                                                                                                             | 是   |
 | options[]      | String[]        | 选项，type为1,2时有效，len <= 7                                                                                                  | 否   |
-| answers[]      | String[]	   | 答案（类型为1,4,5，answers.len==1，类型为2,3，answers.len>=1）                                                                       | 是   |
+| answers[]      | String[]	   | 答案（类型为1,4,5，answers.len==1，类型为2,3，answers.len>=1）                                                                   | 是   |
 | analysis       | String(65535)   | 解析                                                                                                                             | 是   |
 | state          | Integer         | 状态（1：启用；2：禁用 ）                                                                                                        | 是   |
 | questionTypeId | Integer         | 试题分类ID                                                                                                                       | 是   |
@@ -232,6 +232,7 @@ code == 401 无权限或登录超时
 | 参数                   | 类型    | 描述 | 必填 |
 | ---------------------- | ------- | ---- | ---- |
 | id                     | Integer | 主键 | 是   |
+| answers[]		| String[] | 如果当前用户没有读写权限，则数组长度保留，值为空。其他参考question/add | 是   |
 | 其他字段同question/add |         |      |      |  |
 
 ####试题获取：question/copy
@@ -377,11 +378,14 @@ code == 401 无权限或登录超时
 |data.list[].chapter.parentId  | Integer  | 父id（树形结构的ID） |
 |data.list[].questionList[].id  | Integer  | 试题id |
 |data.list[].questionList[].type  | Integer  | 试题类型，参考question/add |
+|data.list[].questionList[].typeName  | String  | 试题类型名称 |
 |data.list[].questionList[].difficulty  | Integer  | 试题难度，难易度参考question/add|
+|data.list[].questionList[].difficultyName  | String  | 试题难度名称 |
 |data.list[].questionList[].title  | String  | 试题标题 |
 |data.list[].questionList[].answers[]  | String  | 试题答案，参考question/add |
 |data.list[].questionList[].analysis  | String  | 试题解析 |
 |data.list[].questionList[].score  | Double  | 试题分数 |
+|data.list[].questionList[].updateUserName  | String  | 更新用户 |
 |data.list[].questionList[].scoreOptions  | String  | 试题分数选项，参考question/add |
 |data.list[].questionList[].options[]  | String[]  | 试题选项，参考question/add |
 

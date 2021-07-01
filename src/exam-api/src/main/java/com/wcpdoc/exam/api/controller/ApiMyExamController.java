@@ -98,18 +98,8 @@ public class ApiMyExamController extends BaseController{
 		try {
 			List<Map<String, Object>> list = myExamDetailService.getAnswerList(id);
 			for (Map<String, Object> map : list) {
-				map.put("myExamDetailId", map.remove("id"));// 前缀为myExam，默认为id有歧义。
-				map.put("answers", map.remove("answer"));// 如果没有值，页面也返回字段
-				
-				if (map.get("answers") != null) {
-					if (map.get("questionType").equals(1) || map.get("questionType").equals(4) || map.get("questionType").equals(5)) {
-						map.put("answers", new String[] { map.remove("answers").toString() });
-					} else if (map.get("questionType").equals(2)) {
-						map.put("answers", map.remove("answers").toString().split(","));
-					} else if (map.get("questionType").equals(3)) {
-						map.put("answers", map.remove("answers").toString().split("\n"));
-					}
-				}
+				map.put("myExamDetailId", map.remove("id"));// 前缀为myExamDetail，默认为id有歧义。
+				map.put("answers", new Question().getAnswers((Integer)map.get("questionType"), (String)map.remove("answer")));// 如果没有值，页面也返回字段
 			}
 			
 			return PageResultEx.ok().data(list);
