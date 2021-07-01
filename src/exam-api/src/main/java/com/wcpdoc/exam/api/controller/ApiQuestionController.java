@@ -196,7 +196,7 @@ public class ApiQuestionController extends BaseController {
 					.addAttr("type", question.getType())
 					.addAttr("difficulty", question.getDifficulty())
 					.addAttr("title", question.getTitle())
-					.addAttr("answer", question.getAnswer())
+					.addAttr("answers", question.getAnswers())
 					.addAttr("analysis", question.getAnalysis())
 					.addAttr("state", question.getState())
 					.addAttr("updateUserId", question.getUpdateUserId())

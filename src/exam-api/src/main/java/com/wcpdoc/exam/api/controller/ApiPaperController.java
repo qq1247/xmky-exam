@@ -431,13 +431,7 @@ public class ApiPaperController extends BaseController {
 					questionMap.put("updateUserName", userService.getEntity(entity.getUpdateUserId()).getName());
 					questionMap.put("paperQuestionId", paperQuestion.getId());
 					questionMap.put("title", entity.getTitle());
-					if (entity.getType() == 1 || entity.getType() == 4 || entity.getType() == 5) {
-						questionMap.put("answers", new String[] { entity.getAnswer() });
-					} else if (entity.getType() == 2) {
-						questionMap.put("answers", entity.getAnswer().split(","));
-					} else if (entity.getType() == 3) {
-						questionMap.put("answers", entity.getAnswer().split("\n"));
-					}
+					questionMap.put("answers", entity.getAnswers());
 					questionMap.put("analysis", entity.getAnalysis());
 					questionMap.put("score", entity.getScore());
 					questionMap.put("scoreOptions", paperQuestion.getScoreOptions());
