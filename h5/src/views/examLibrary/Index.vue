@@ -58,6 +58,7 @@
       width="30%"
       title="试题分类"
       :close-on-click-modal="false"
+      @close="resetData('examForm')"
     >
       <el-form :model="examForm" :rules="examForm.rules" ref="examForm" label-width="60px">
         <el-form-item label="名称" prop="examName">
@@ -81,39 +82,60 @@
       width="33%"
       title="权限编辑"
       :close-on-click-modal="false"
+      @close="resetData('roleForm')"
     >
       <el-form :model="roleForm" ref="examForm" label-width="100px">
         <el-form-item label="读取权限">
-          <el-select
-            multiple
-            collapse-tags
-            v-loadmore="loadMore"
+          <CustomSelect
             placeholder="请选择授权人员"
-            v-model="roleForm.readRoleUser"
+            :multiple="true"
+            :value="roleForm.readRoleUser"
+            :total="roleForm.total"
+            :showPage="true"
+            :tags="true"
+            :currentPage="roleForm.curPage"
+            :pageSize="roleForm.pageSize"
+            :remote="true"
+            :reserveKeyword="true"
+            :filterable="true"
+            :remoteMethod="searchUser"
+            @change="selectReadUser"
+            @focus="getUserList()"
+            @currentChange="getMoreUser"
           >
             <el-option
-              :key="roleUser.id"
-              :label="roleUser.name"
-              :value="String(roleUser.id)"
-              v-for="roleUser in roleForm.roleUserList"
+              v-for="item in roleForm.roleUserList"
+              :key="item.id"
+              :label="item.name"
+              :value="String(item.id)"
             ></el-option>
-          </el-select>
+          </CustomSelect>
         </el-form-item>
         <el-form-item label="使用权限">
-          <el-select
-            multiple
-            collapse-tags
-            v-loadmore="loadMore"
+          <CustomSelect
             placeholder="请选择授权人员"
-            v-model="roleForm.writeRoleUser"
+            :multiple="true"
+            :value="roleForm.writeRoleUser"
+            :total="roleForm.total"
+            :showPage="true"
+            :tags="true"
+            :currentPage="roleForm.curPage"
+            :pageSize="roleForm.pageSize"
+            :remote="true"
+            :reserveKeyword="true"
+            :filterable="true"
+            :remoteMethod="searchUser"
+            @change="selectWriteUser"
+            @focus="getUserList()"
+            @currentChange="getMoreUser"
           >
             <el-option
-              :key="roleUser.id"
-              :label="roleUser.name"
-              :value="String(roleUser.id)"
-              v-for="roleUser in roleForm.roleUserList"
+              v-for="item in roleForm.roleUserList"
+              :key="item.id"
+              :label="item.name"
+              :value="String(item.id)"
             ></el-option>
-          </el-select>
+          </CustomSelect>
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
@@ -126,9 +148,11 @@
 
 <script>
 import ListCard from "@/components/ListCard.vue"
+import CustomSelect from '@/components/CustomSelect.vue';
 export default {
   components: {
-    ListCard
+    ListCard,
+    CustomSelect
   },
   data() {
     return {
@@ -151,29 +175,13 @@ export default {
       roleForm: {
         show: false,
         curPage: 1,
-        pageSize: 10,
+        pageSize: 5,
+        total: 0,
         readRoleUser: [],
         writeRoleUser: [],
         roleUserList: []
       },
       typeList: []
-    }
-  },
-  directives: {
-    loadmore: {
-      bind(el, binding) {
-        // 获取element-ui定义好的scroll盒子
-        const selectWrapDom = el.querySelector(
-          ".el-select-dropdown .el-select-dropdown__wrap"
-        )
-        selectWrapDom.addEventListener("scroll", function() {
-          const condition =
-            this.scrollHeight - this.scrollTop <= this.clientHeight
-          if (condition) {
-            binding.value()
-          }
-        })
-      }
     }
   },
   mounted() {
@@ -213,8 +221,6 @@ export default {
         if (res.code == 200) {
           this.$tools.message(!this.examForm.edit ? "添加成功！" : "修改成功！")
           this.examForm.show = false
-          this.examForm.examName = ""
-          this.examForm.edit = false
           this.query()
         } else {
           this.$tools.message(
@@ -232,20 +238,41 @@ export default {
       this.examForm.show = true
     },
     // 删除分类
-    del({ id }) {
-      this.$https
-        .questionTypeDel({
-          id
-        })
-        .then(res => {
-          if (res.code == 200) {
-            this.$tools.message("删除成功！")
-            this.query()
-          } else {
-            this.$tools.message("删除成功！", "error")
-          }
-        })
-        .catch(error => { })
+    async del({ id }) {
+      const res = await this.$https.questionTypeDel({ id }).catch(err => { })
+      res.code == 200
+        ? (
+          this.$tools.message("删除成功！"),
+          this.query()
+        )
+        : this.$tools.message("删除成功！", "error");
+    },
+    // 获取用户
+    async getUserList(name = '', curPage = 1) {
+      this.roleForm.curPage = curPage
+      const roleUserList = await this.$https.userListpage({
+        name,
+        curPage,
+        pageSize: this.roleForm.pageSize
+      })
+      this.roleForm.roleUserList = roleUserList.data.list
+      this.roleForm.total = roleUserList.data.total
+    },
+    // 获取更多用户
+    getMoreUser(curPage) {
+      this.getUserList(curPage)
+    },
+    // 根据name 查询人员
+    searchUser(name) {
+      this.getUserList(name)
+    },
+    // 选择考试用户
+    selectReadUser(e) {
+      this.roleForm.readRoleUser = e
+    },
+    // 选择考试用户
+    selectWriteUser(e) {
+      this.roleForm.writeRoleUser = e
     },
     // 权限人员信息
     async role({ readUserIds, writeUserIds, id }) {
@@ -256,23 +283,8 @@ export default {
       this.roleForm.writeRoleUser = writeUserIds
         .split(",")
         .filter(item => item != "")
-      const roleUserList = await this.$https.userListpage({
-        curPage: this.roleForm.curPage,
-        pageSize: this.roleForm.pageSize
-      })
-      this.roleForm.roleUserList = roleUserList.data.rows
+      await this.getUserList()
       this.roleForm.show = true
-    },
-    // 加载更多
-    async loadMore() {
-      const roleUserList = await this.$https.userListpage({
-        curPage: this.roleForm.curPage++,
-        pageSize: this.roleForm.pageSize
-      })
-      this.roleForm.roleUserList = [
-        ...this.roleForm.roleUserList,
-        ...roleUserList.data.rows
-      ]
     },
     // 编辑权限
     async editRoleUsers() {
@@ -282,7 +294,7 @@ export default {
         writeUserIds: this.roleForm.writeRoleUser.join(",")
       })
       if (res.code == 200) {
-        this.$tools.message("权限编辑成功！", "error")
+        this.$tools.message("权限编辑成功！")
         this.roleForm.show = false
       } else {
         this.$tools.message("权限编辑失败成功！", "error")
@@ -302,6 +314,10 @@ export default {
     // 分页切换
     pageChange(val) {
       this.query(val)
+    },
+    // 清空还原数据
+    resetData(name) {
+      this.$tools.resetData(this, name)
     }
   }
 }

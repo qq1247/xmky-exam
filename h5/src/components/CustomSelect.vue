@@ -1,6 +1,7 @@
 <template>
   <el-select
     :value="value"
+    :popper-class="popperClass"
     :multiple="multiple"
     :collapse-tags="tags"
     :placeholder="placeholder"
@@ -19,8 +20,9 @@
       v-if="showPage"
       class="custom-pager"
       @current-change="currentChange"
+      :current-page="currentPage"
       :page-size="pageSize"
-      layout="prev, pager, next, total"
+      layout="prev, pager, next"
       :total="total"
     ></el-pagination>
   </el-select>
@@ -40,6 +42,10 @@ export default {
     tags: {
       type: Boolean,
       default: false
+    },
+    popperClass: {
+      type: String,
+      default: ''
     },
     placeholder: {
       type: String,
@@ -67,6 +73,10 @@ export default {
     loading: {
       type: Boolean,
       default: false
+    },
+    currentPage: {
+      type: Number,
+      default: 1
     },
     pageSize: {
       type: Number,
