@@ -8,103 +8,144 @@
         <i class="common common-explain"></i>
       </el-link>
     </div>
+
     <!-- 内容 -->
     <div class="content">
       <div class="content-center">
-        <div class="center-top">
-          <div class="paper-title">{{ paper.name }}</div>
-          <div class="paper-intro">{{paper.id}}</div>
-        </div>
+        <div class="paper-title">{{ paper.name }}</div>
+        <div class="paper-intro">{{ paper.id }}</div>
 
-        <div class="center-drag">
-          <div v-if="paperQuestion.length > 0">
-            <div :key="index" class="drag-item drag-content drag-parent" v-for="(item, index) in paperQuestion">
-              <div class="chapter">
-                <div class="chapter-item">
-                  <div class="item-title">{{ item.chapter.name }}</div>
-                  <div></div>
+        <template v-if="paperQuestion.length > 0">
+          <div :key="index" class="drag-item drag-content" v-for="(item, index) in paperQuestion">
+            <div class="chapter">
+              <div class="chapter-item">
+                <div class="item-title">{{ item.chapter.name }}</div>
+                <div></div>
+              </div>
+              <div class="chapter-description">{{ item.chapter.description }}</div>
+            </div>
+
+            <div
+              :class="[
+                'drag-content',
+                item.questionList.length != 0 ? 'drag-children' : '',
+              ]"
+              v-if="item.chapter.show"
+            >
+              <template v-if="item.questionList.length > 0">
+                <div
+                  :id="`p-${item.chapter.id}-${index}`"
+                  :key="child.id"
+                  class="children-content"
+                  v-for="(child, index) in item.questionList"
+                >
+                  <p v-html="(index + 1) + '、' + child.title"></p>
+
+                  <!-- 单选 -->
+                  <template v-if="child.type === 1">
+                    <el-radio-group
+                      @change="((val) => { updateAnswer(child.id, val) })"
+                      class="children-option"
+                      v-model="myExamDetailCache[child.id].answers[0]"
+                    >
+                      <el-radio
+                        :key="index"
+                        :label="String.fromCharCode(65 + index)"
+                        class="option-item"
+                        v-for="(option, index) in child.options"
+                      >
+                        <span v-html="`${String.fromCharCode(65 + index)}、${option}`"></span>
+                      </el-radio>
+                    </el-radio-group>
+                  </template>
+
+                  <!-- 多选 -->
+                  <template v-if="child.type === 2">
+                    <el-checkbox-group
+                      @change="((val) => { updateAnswer(child.id, val) })"
+                      class="children-option"
+                      v-model="myExamDetailCache[child.id].answers"
+                    >
+                      <el-checkbox
+                        :key="index"
+                        :label="String.fromCharCode(65 + index)"
+                        class="option-item"
+                        v-for="(option, index) in child.options"
+                      >
+                        <span v-html="`${String.fromCharCode(65 + index)}、${option}`"></span>
+                      </el-checkbox>
+                    </el-checkbox-group>
+                  </template>
+
+                  <!-- 填空 -->
+                  <template v-if="child.type === 3">
+                    <el-input
+                      class="question-text"
+                      @change="((val) => { updateFillBlanksAnswer(child.id, val, child.answers, index) })"
+                      placeholder="请输入内容"
+                      :key="index"
+                      v-for="(answer, index) in myExamDetailCache[child.id].answers"
+                      v-model="myExamDetailCache[child.id].answers[index]"
+                    >
+                      <template slot="prepend">第{{ index + 1 }}空</template>
+                    </el-input>
+                  </template>
+
+                  <!-- 判断 -->
+                  <template v-if="child.type === 4">
+                    <el-radio-group
+                      @change="((val) => { updateAnswer(child.id, val) })"
+                      class="children-option"
+                      v-model="myExamDetailCache[child.id].answers[0]"
+                    >
+                      <el-radio
+                        :key="index"
+                        :label="option"
+                        class="option-item"
+                        v-for="(option, index) in ['对','错']"
+                      >{{ option }}</el-radio>
+                    </el-radio-group>
+                  </template>
+
+                  <!-- 问答 -->
+                  <template v-if="child.type === 5">
+                    <el-input
+                      :rows="2"
+                      class="question-text"
+                      @change="((val) => { updateAnswer(child.id, val) })"
+                      placeholder="请输入内容"
+                      type="textarea"
+                      v-model="myExamDetailCache[child.id].answers[0]"
+                    ></el-input>
+                  </template>
                 </div>
-                <div class="chapter-description">{{ item.chapter.description }}</div>
-              </div>
-
-              <div :class="[
-                  'drag-content',
-                  item.questionList.length != 0 ? 'drag-children' : '',
-                ]" v-if="item.chapter.show">
-                <template v-if="item.questionList.length > 0">
-                  <div :id="`p-${item.chapter.id}-${index}`" :key="child.id" class="children-content" v-for="(child, index) in item.questionList">
-                    <p v-html="(index + 1) + '、' + child.title"></p>
-
-                    <!-- 单选 -->
-                    <template v-if="child.type === 1">
-                      <el-radio-group @change="((val)=>{updateAnswer(child.id, val)})" class="children-option" v-model="myExamDetailCache[child.id].answers[0]">
-                        <el-radio :key="index" :label="String.fromCharCode(65 + index)" class="option-item" v-for="(option, index) in child.options">
-                          <span v-html="`${String.fromCharCode(65 + index)}、${option}`"></span>
-                        </el-radio>
-                      </el-radio-group>
-                    </template>
-
-                    <!-- 多选 -->
-                    <template v-if="child.type === 2">
-                      <el-checkbox-group @change="((val)=>{updateAnswer(child.id, val)})" class="children-option" v-model="myExamDetailCache[child.id].answers">
-                        <el-checkbox :key="index" :label="String.fromCharCode(65 + index)" class="option-item" v-for="(option, index) in child.options">
-                          <span v-html="`${String.fromCharCode(65 + index)}、${option}`"></span>
-                        </el-checkbox>
-                      </el-checkbox-group>
-                    </template>
-
-                    <!-- 填空 -->
-                    <template v-if="child.type === 3">
-                      <el-input @change="((val)=>{updateFillBlanksAnswer(child.id, val, child.answers, index)})" placeholder="请输入内容" v-for="(answer, index) in myExamDetailCache[child.id].answers" v-model="myExamDetailCache[child.id].answers[index]">
-                        <template slot="prepend">第{{index + 1}}空</template>
-                      </el-input>
-                    </template>
-
-                    <!-- 判断 -->
-                    <template v-if="child.type === 4">
-                      <el-radio-group @change="((val)=>{updateAnswer(child.id, val)})" class="children-option" v-model="myExamDetailCache[child.id].answers[0]">
-                        <el-radio :key="index" :label="option" class="option-item" v-for="(option, index) in ['对','错']">{{ option }}</el-radio>
-                      </el-radio-group>
-                    </template>
-
-                    <!-- 问答 -->
-                    <template v-if="child.type === 5">
-                      <el-input :rows="2" @change="((val)=>{updateAnswer(child.id, val)})" placeholder="请输入内容" type="textarea" v-model="myExamDetailCache[child.id].answers[0]"></el-input>
-                    </template>
-
-                    <div class="children-footer">
-                      <div class="children-buts"></div>
-                    </div>
-                  </div>
-                </template>
-              </div>
+              </template>
             </div>
           </div>
-          <div class="data-null" v-if="paperQuestion.length == 0">
-            <img alt class="data-img" src="../../assets/img/data-null.png" />
-            <span class="data-tip">暂无试卷信息</span>
-          </div>
+        </template>
+        <div class="data-null" v-if="paperQuestion.length == 0">
+          <img alt class="data-img" src="../../assets/img/data-null.png" />
+          <span class="data-tip">暂无试卷信息</span>
         </div>
       </div>
 
-          <el-collapse class="exam-card" v-if="paperQuestion.length > 0" v-model="collapseShow">
-            <div class="exam-head">答题卡</div>
-            <div id="countdown"></div>
-            <el-collapse-item :key="item.id" :name="index" :title="item.chapter.name" v-for="(item,index) in paperQuestion">
-              <a @click="toHref(item.chapter.id, index )" v-for="(child, index) in item.questionList">{{ index+ 1 }}</a>
-            </el-collapse-item>
-            <div class="exam-footer">提交</div>
-          </el-collapse>
-
-          <!-- <el-collapse v-if="paperQuestion.length > 0" v-model="collapseShow">
-            <el-collapse-item :key="item.id" :name="index" :title="item.chapter.name" v-for="(item,index) in paperQuestion">
-              <div class="route-href">
-                <div :class="['href-item', hrefPointer === `#p-${item.chapter.id}-${index}` ? 'href-item-active' : '']" :key="child.id" v-for="(child, index) in item.questionList">
-                  <span @click="toHref(item.chapter.id, index )">{{ index+ 1 }}</span>
-                </div>
-              </div>
-            </el-collapse-item>
-          </el-collapse>-->
+      <el-collapse class="exam-card" v-if="paperQuestion.length > 0" v-model="collapseShow">
+        <div class="exam-head">答题卡</div>
+        <div class="exam-time">倒计时：{{ `${hr}小时${min}分钟${sec}秒` }}</div>
+        <el-collapse-item
+          :key="item.id"
+          :name="index"
+          :title="item.chapter.name"
+          v-for="(item,index) in paperQuestion"
+        >
+          <a
+            @click="toHref(item.chapter.id, index)"
+            v-for="(child, index) in item.questionList"
+            :key="child.id"
+          >{{ index + 1 }}</a>
+        </el-collapse-item>
+        <div class="exam-footer">提交</div>
+      </el-collapse>
     </div>
   </div>
 </template>
@@ -126,6 +167,11 @@ export default {
       myExamDetailCache: {},
       selectOption: '',
       paper: {},
+      examEndTime: '2020-08-08 00:00:00',
+      day: 0,
+      hr: 0,
+      min: 0,
+      sec: 0,
     };
   },
   created() {
@@ -133,11 +179,31 @@ export default {
     this.id = id;
     this.paperId = paperId;
     this.init();
+    this._interval = setInterval(() => {
+      this.countdown();
+    }, 1000)
+  },
+  destroyed() {
+    clearInterval(this._interval)
   },
   methods: {
+    // 倒计时
+    countdown() {
+      const end = Date.parse(new Date(this.examEndTime));
+      const now = Date.parse(new Date());
+      const msec = Math.abs(end - now);
+      let day = parseInt(msec / 1000 / 60 / 60 / 24);
+      let hr = parseInt(msec / 1000 / 60 / 60 % 24);
+      let min = parseInt(msec / 1000 / 60 % 60);
+      let sec = parseInt(msec / 1000 % 60);
+      this.day = day;
+      this.hr = String(hr).padStart(2, '0');
+      this.min = String(min).padStart(2, '0');
+      this.sec = String(sec).padStart(2, '0');
+    },
     // 返回
     goBack() {
-      this.$router.push('/examPaper/list');
+      this.$router.push('/my');
     },
     // 初始化
     async init() {
@@ -153,7 +219,7 @@ export default {
         });
         console.info(res);
         this.paper = { ...res.data };
-      } catch (error) {}
+      } catch (error) { }
     },
     // 查询试卷信息
     async queryPaperInfo() {
@@ -164,8 +230,8 @@ export default {
         res.data.map((item) => {
           item.chapter.show = true;
         });
-        this.paperQuestion = [...res.data];
-      } catch (error) {}
+        this.paperQuestion = res.data;
+      } catch (error) { }
     },
     // 查询我的答案信息
     async queryMyExamAnswerInfo() {
@@ -174,18 +240,27 @@ export default {
           id: this.id,
         });
 
-        this.myExamDetailCache = res.data.reduce((acc, cur) => {
+        let paperQuestion = this.paperQuestion.reduce((acc, cur) => {
+          acc.push(...cur.questionList)
+          return acc
+        }, [])
+
+        this.myExamDetailCache = res.data.reduce((acc, cur, index) => {
+          if (cur.questionType === 3 && paperQuestion[index].id === cur.questionId) {
+            cur.answers.length = paperQuestion[index].answers.length
+          }
+
           acc[cur.questionId] = cur;
           return acc;
         }, {});
       } catch (error) {
-        alert(error);
+        this.$tools.message(error, 'error')
       }
     },
     // 更新答案
     async updateAnswer(questionId, answers) {
       if (!this.myExamDetailCache[questionId]) {
-        alert('更新答案失败，请联系管理员');
+        this.$tools.message('更新答案失败，请联系管理员', 'error')
         return;
       }
 
@@ -197,7 +272,7 @@ export default {
     // 更新填空答案
     async updateFillBlanksAnswer(questionId, val, answers, index) {
       if (!this.myExamDetailCache[questionId]) {
-        alert('更新答案失败，请联系管理员');
+        this.$tools.message('更新答案失败，请联系管理员', 'error')
         return;
       }
 
@@ -210,11 +285,9 @@ export default {
     // 定位锚点
     toHref(id, index) {
       this.hrefPointer = `#p-${id}-${index}`;
-      document.querySelector(`#p-${id}-${index}`).scrollIntoView({
-        behavior: 'smooth',
-      });
-    },
-  },
+      document.documentElement.scrollTop = (document.querySelector(this.hrefPointer).offsetTop - 50)
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>
@@ -254,95 +327,13 @@ export default {
 
 .content {
   width: 100%;
-  padding: 0 20px 10px;
-  margin: 70px auto 0;
-}
-
-.drag-content {
-  width: 100%;
-  border: 1px solid #d8d8d8;
-}
-
-.drag-active {
-  transform: scale(0.98);
-  border: 1px solid #0094e5;
-  border-radius: 5px;
-  border-bottom: 1px solid #0094e5 !important;
-  transition: all 0.15s ease-in-out;
-}
-
-.drag-question-active {
-  border: 1px solid #0094e5 !important;
-  box-shadow: 0 0 16px 2px rgba(0, 148, 229, 0.15);
-  transition: all 0.15s ease-in-out;
-}
-
-.content-left {
-  width: 300px;
-  background: #fff;
-  position: fixed;
-  top: 70px;
-  left: 20px;
-  bottom: 10px;
-  z-index: 100;
-  .left-top {
-    width: 100%;
-    height: 45px;
-    line-height: 45px;
-    text-align: left;
-    padding-left: 10px;
-    font-size: 14px;
-    color: #333;
-    position: relative;
-    border-bottom: 1px solid #d8d8d8;
-    &::before {
-      content: '';
-      display: block;
-      position: absolute;
-      top: 15px;
-      left: 0;
-      width: 2px;
-      height: 15px;
-      background: rgb(30, 159, 255);
-    }
-  }
-  .chapter-form {
-    padding: 15px 10px 0 10px;
-    border-bottom: 10px solid #f2f4f5;
-    .el-form-item {
-      margin-bottom: 15px;
-    }
-  }
-  .paper-form {
-    padding: 15px 0 0 10px;
-    .el-form-item,
-    .el-button {
-      width: 135px;
-    }
-    .el-form-item {
-      margin-bottom: 15px;
-    }
-  }
-  .drags {
-    padding: 10px;
-    .drag-item {
-      border-bottom: 1px solid #e8e8e8;
-      padding: 15px;
-      font-size: 14px;
-    }
-    .item-title {
-      margin-bottom: 10px;
-    }
-    .el-tag {
-      margin-left: 10px;
-    }
-  }
+  margin-top: 50px;
 }
 
 .content-center {
   background: #fff;
-  margin-left: 310px;
-  width: calc(100% - 560px);
+  margin: 0 auto;
+  width: 960px;
   .center-drag {
     width: 100%;
     padding: 10px;
@@ -381,12 +372,6 @@ export default {
       margin-top: -5px;
     }
   }
-  .drag-parent {
-    padding: 10px;
-  }
-  .drag-children {
-    border: none;
-  }
   .paper-title {
     font-size: 16px;
     color: #333;
@@ -405,13 +390,11 @@ export default {
     border: 1px solid #d8d8d8;
     font-size: 14px;
     box-sizing: border-box;
-    &:not(:last-child) {
-      border-bottom: none;
-    }
+    margin-bottom: 5px;
     p {
       margin: 0;
       line-height: 40px;
-      padding-left: 10px;
+      padding: 0 10px;
       background: #e5f4fc;
     }
   }
@@ -427,6 +410,10 @@ export default {
     padding: 20px 10px 5px;
     color: #333;
     margin: 0 25px 0;
+  }
+  .question-text {
+    margin: 4px 1%;
+    width: 98%;
   }
   .children-analysis {
     line-height: 25px;
@@ -453,70 +440,6 @@ export default {
   }
 }
 
-.content-right {
-  width: 240px;
-  height: calc(100% - 80px);
-  background: #fff;
-  position: fixed;
-  top: 70px;
-  right: 20px;
-  z-index: 100;
-  .time-title {
-    background-color: rgb(30, 159, 255);
-    width: 100%;
-    height: 40px;
-    line-height: 40px;
-    text-align: center;
-    padding-left: 10px;
-    font-size: 14px;
-    color: #fff;
-  }
-  .time-residue {
-    font-size: 12px;
-    font-weight: bold;
-    line-height: 50px;
-    text-align: center;
-  }
-  .route-title {
-    background: #0094e5;
-    color: #fff;
-    line-height: 14px;
-    line-height: 40px;
-    padding: 0 10px;
-  }
-}
-
-.route-href {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  width: 100%;
-  padding: 10px 15px 0;
-  .href-item {
-    width: 20%;
-    height: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    span {
-      display: inline-block;
-      width: 30px;
-      height: 30px;
-      line-height: 30px;
-      text-align: center;
-      font-size: 14px;
-      border: 1px solid #d8d8d8;
-    }
-  }
-  .href-item-active {
-    span {
-      border: 1px solid #0094e5;
-      color: #0094e5;
-    }
-  }
-}
-
 .data-null {
   padding-top: 30px;
   .data-img {
@@ -526,11 +449,6 @@ export default {
   .data-tip {
     margin: 0 auto 20px;
   }
-}
-
-.pagination {
-  font-weight: 400;
-  text-align: center;
 }
 
 .el-radio,
@@ -571,11 +489,16 @@ export default {
 }
 .exam-card {
   width: 214px;
-  font-family: 'Microsoft YaHei';
+  font-family: "Microsoft YaHei";
   border: 1px solid #e6e6e6;
   position: fixed;
   right: 50px;
   top: 70px;
+}
+.exam-time {
+  line-height: 40px;
+  text-align: center;
+  color: #0094e5;
 }
 .exam-card .exam-head,
 .exam-footer {

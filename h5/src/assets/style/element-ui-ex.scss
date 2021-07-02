@@ -12,6 +12,7 @@ body {
   font: 14px/1.5 Open Sans, -apple-system, BlinkMacSystemFont, Helvetica Neue,
     Helvetica, Segoe UI, Arial, Roboto, PingFang SC, miui, Hiragino Sans GB,
     Microsoft Yahei, sans-serif;
+  scroll-behavior: smooth;
 }
 
 .header {
@@ -53,7 +54,7 @@ body {
     position: relative;
     text-align: center;
     &::after {
-      content: "";
+      content: '';
       display: block;
       position: absolute;
       width: 20px;
