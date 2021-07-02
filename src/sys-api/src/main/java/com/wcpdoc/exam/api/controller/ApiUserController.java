@@ -118,6 +118,9 @@ public class ApiUserController extends BaseController {
 			if (userService.existLoginName(user)) {
 				throw new MyException("登录名称已存在");
 			}
+			if (user.getOrgId() == null) {
+				throw new MyException("参数错误：orgId");
+			}
 			
 			// 添加用户
 			Date date = new Date();

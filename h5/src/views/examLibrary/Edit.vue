@@ -721,17 +721,17 @@ export default {
         }
 
         if (params.type === 1 || params.type === 4 || params.type === 5) {
-          params.answer = this.editForm.answer
+          params.answers = this.editForm.answer
         } else if (params.type === 2) {
           // 如果是多选，答案按逗号分隔
-          params.answer = this.editForm.answerMultip.join(",");
+          params.answers = this.editForm.answerMultip;
         } else if (params.type === 3) {
           // 如果是填空，答案之间按不可见字符回车分隔
           const _answer = []
           for (const i in this.editForm.answers) {
             _answer[i] = this.editForm.answers[i].value
           }
-          params.answer = _answer.join("\n");
+          params.answers = _answer;
         }
 
         const res = await this.$https.questionAdd(params)
@@ -778,17 +778,17 @@ export default {
         }
 
         if (params.type === 1 || params.type === 4 || params.type === 5) {
-          params.answer = this.editForm.answer
+          params.answers = this.editForm.answer
         } else if (params.type === 2) {
           // 如果是多选，答案按逗号分隔
-          params.answer = this.editForm.answer.join(",");
+          params.answers = this.editForm.answer;
         } else if (params.type === 3) {
           // 如果是填空，答案之间按不可见字符回车分隔
           const _answer = []
           for (const i in this.editForm.answers) {
             _answer[i] = this.editForm.answers[i].value
           }
-          params.answer = _answer.join("\n");
+          params.answers = _answer;
         }
 
         var msg = newVer

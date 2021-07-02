@@ -143,6 +143,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		question.setUpdateUserId(getCurUser().getId());
 		question.setVer(1);// 默认版本为1
 		question.setState(2);// 默认禁用
+		add(question);
+		
 		question.setSrcId(question.getId());
 		update(question);
 
