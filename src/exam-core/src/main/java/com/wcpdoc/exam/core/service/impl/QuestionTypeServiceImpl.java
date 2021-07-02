@@ -142,4 +142,14 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	public PageOut authUserListpage(PageIn pageIn) {
 		return questionTypeDao.authUserListpage(pageIn);
 	}
+
+	@Override
+	public boolean hasWriteAuth(QuestionType questionType, Integer userId) {
+		return questionType.getWriteUserIds().contains(String.format(",%s,", userId));
+	}
+
+	@Override
+	public boolean hasReadAuth(QuestionType questionType, Integer userId) {
+		return questionType.getReadUserIds().contains(String.format(",%s,", userId));
+	}
 }

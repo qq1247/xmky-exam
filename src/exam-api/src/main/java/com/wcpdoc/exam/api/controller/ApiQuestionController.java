@@ -38,6 +38,7 @@ import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionOption;
+import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
@@ -175,11 +176,12 @@ public class ApiQuestionController extends BaseController {
 	}
 	
 	/**
-	 * 预览试题
+	 * 获取试题
+	 * 拥有读写权限才显示答案字段
 	 * 
-	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * v1.0 zhanghc 2021年7月1日下午2:18:05
 	 * @param id
-	 * @return pageOut
+	 * @return PageResult
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
@@ -187,32 +189,35 @@ public class ApiQuestionController extends BaseController {
 	public PageResult get(Integer id) {
 		try {
 			Question question = questionService.getEntity(id);
-			List<QuestionOption> questionOptionList = null;
+			List<String> optionList = new ArrayList<>();
 			if (question.getType() == 1 || question.getType() == 2) {
-				questionOptionList = questionOptionService.getList(question.getId());
+				List<QuestionOption> questionOptionList = questionOptionService.getList(question.getId());
+				for (QuestionOption questionOption : questionOptionList) {
+					optionList.add(questionOption.getOptions());
+				}
 			}
-			return PageResultEx.ok()
+			QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
+			boolean writeAuth = questionTypeService.hasWriteAuth(questionType, getCurUser().getId());		
+			boolean readAuth = questionTypeService.hasReadAuth(questionType, getCurUser().getId());		
+			PageResultEx pageResult = PageResultEx.ok()
 					.addAttr("id", question.getId())
 					.addAttr("type", question.getType())
 					.addAttr("difficulty", question.getDifficulty())
 					.addAttr("title", question.getTitle())
-					.addAttr("answer", question.getAnswer())
 					.addAttr("analysis", question.getAnalysis())
 					.addAttr("state", question.getState())
-					.addAttr("updateUserId", question.getUpdateUserId())
-					.addAttr("updateTime", question.getUpdateTime())
 					.addAttr("questionTypeId", question.getQuestionTypeId())
 					.addAttr("score", question.getScore())
 					.addAttr("scoreOptions", question.getScoreOptions())
-					.addAttr("ver", question.getVer())
-					.addAttr("srcId", question.getSrcId())
 					.addAttr("no", question.getNo())
-					.addAttr("options", questionOptionList == null ? null : questionOptionList);
+					.addAttr("options", optionList.toArray(new String[optionList.size()]))
+					.addAttr("answers", (writeAuth || readAuth) ? question.getAnswers() : new String[0]);
+			return pageResult;
 		} catch (MyException e) {
-			log.error("预览试题错误：{}", e.getMessage());
+			log.error("获取试题错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		}  catch (Exception e) {
-			log.error("预览试题错误：", e);
+			log.error("获取试题错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -222,7 +227,7 @@ public class ApiQuestionController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @param id
-	 * @return pageOut
+	 * @return PageResult
 	 */
 	@RequestMapping("/copy")
 	@ResponseBody

@@ -29,12 +29,14 @@ import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.PaperRemark;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionOption;
+import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.PaperQuestionService;
 import com.wcpdoc.exam.core.service.PaperRemarkService;
 import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
+import com.wcpdoc.exam.core.service.QuestionTypeService;
 /**
  * 试卷控制层
  * 
@@ -57,6 +59,8 @@ public class ApiPaperController extends BaseController {
 	private QuestionOptionService questionOptionService;
 	@Resource
 	private UserService userService;
+	@Resource
+	private QuestionTypeService questionTypeService;
 	
 	
 	/**
@@ -396,6 +400,7 @@ public class ApiPaperController extends BaseController {
 	
 	/**
 	 * 试卷试题列表
+	 * 拥有读写权限才显示答案字段
 	 * 
 	 * v1.0 chenyun 2021年3月31日下午4:21:20
 	 * @param id
@@ -422,33 +427,37 @@ public class ApiPaperController extends BaseController {
 				List<Map<String, Object>> questionsListMap = new ArrayList<>();
 				for(PaperQuestion paperQuestion : paperQuestionList){
 					Map<String, Object> questionMap = new HashMap<>();
-					Question entity = questionService.getEntity(paperQuestion.getQuestionId());
-					questionMap.put("id", entity.getId());
-					questionMap.put("type", entity.getType());
-					questionMap.put("typeName", DictCache.getDictValue("QUESTION_TYPE", entity.getType().toString()));
-					questionMap.put("difficulty", entity.getDifficulty());
-					questionMap.put("difficultyName", DictCache.getDictValue("QUESTION_DIFFICULTY", entity.getDifficulty().toString()));
-					questionMap.put("updateUserName", userService.getEntity(entity.getUpdateUserId()).getName());
-					questionMap.put("paperQuestionId", paperQuestion.getId());
-					questionMap.put("title", entity.getTitle());
-					if (entity.getType() == 1 || entity.getType() == 4 || entity.getType() == 5) {
-						questionMap.put("answers", new String[] { entity.getAnswer() });
-					} else if (entity.getType() == 2) {
-						questionMap.put("answers", entity.getAnswer().split(","));
-					} else if (entity.getType() == 3) {
-						questionMap.put("answers", entity.getAnswer().split("\n"));
-					}
-					questionMap.put("analysis", entity.getAnalysis());
-					questionMap.put("score", entity.getScore());
+					Question question = questionService.getEntity(paperQuestion.getQuestionId());
+					questionMap.put("id", question.getId());
+					questionMap.put("type", question.getType());
+					questionMap.put("typeName", DictCache.getDictValue("QUESTION_TYPE", question.getType().toString()));
+					questionMap.put("difficulty", question.getDifficulty());
+					questionMap.put("difficultyName", DictCache.getDictValue("QUESTION_DIFFICULTY", question.getDifficulty().toString()));
+					questionMap.put("updateUserName", userService.getEntity(question.getUpdateUserId()).getName());
+					questionMap.put("title", question.getTitle());
+					questionMap.put("analysis", question.getAnalysis());
+					questionMap.put("score", question.getScore());
 					questionMap.put("scoreOptions", paperQuestion.getScoreOptions());
-					if(entity.getType() == 1 || entity.getType() == 2 ){
+					questionMap.put("options", new String[0]);// 默认为长度为0的数组
+					if(question.getType() == 1 || question.getType() == 2 ){//
 						List<QuestionOption> questionOptionList = questionOptionService.getList(paperQuestion.getQuestionId());
 						String[] options = new String[questionOptionList.size()];
 						for (int i = 0; i < questionOptionList.size(); i++) {
-							options[i] = questionOptionList.get(i).getOptions();
+							options[i] = questionOptionList.get(i).getOptions();// 按选项顺序添加试题
 						}
 						questionMap.put("options", options);
 					}
+					
+					QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
+					boolean writeAuth = questionTypeService.hasWriteAuth(questionType, getCurUser().getId());		
+					boolean readAuth = questionTypeService.hasReadAuth(questionType, getCurUser().getId());		
+					String[] answers = question.getAnswers();
+					if (!writeAuth & !readAuth) {
+						for (int i = 0; i < answers.length; i++) {
+							answers[i] = null;
+						}
+					}
+					questionMap.put("answers", answers);
 
 					questionsListMap.add(questionMap);
 				}

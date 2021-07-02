@@ -13,6 +13,8 @@ import javax.persistence.Table;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
  * 试题实体
@@ -179,5 +181,39 @@ public class Question {
 
 	public void setScoreOptions(String scoreOptions) {
 		this.scoreOptions = scoreOptions;
+	}
+
+	public String[] getAnswers() {
+		if (!ValidateUtil.isValid(answer)) {
+			return new String[0];
+		}
+		
+		if (type == 1 || type == 4 || type == 5) {
+			return new String[] { answer };
+		}
+		if (type == 2) {
+			return answer.split(",");
+		}
+		if (type == 3) {
+			return answer.split("\n");
+		}
+		throw new MyException("getAnswers方法解析错误");
+	}
+	
+	public String[] getAnswers(Integer type, String answer) {
+		if (!ValidateUtil.isValid(answer)) {
+			return new String[0];
+		}
+		
+		if (type == 1 || type == 4 || type == 5) {
+			return new String[] { answer };
+		}
+		if (type == 2) {
+			return answer.split(",");
+		}
+		if (type == 3) {
+			return answer.split("\n");
+		}
+		throw new MyException("getAnswers方法解析错误");
 	}
 }
