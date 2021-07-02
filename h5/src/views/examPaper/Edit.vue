@@ -208,7 +208,7 @@
 
                     <!-- 单选 -->
                     <template v-if="child.type === 1">
-                      <el-radio-group class="children-option" v-model="child.answer">
+                      <el-radio-group class="children-option" v-model="child.answers">
                         <el-radio
                           class="option-item"
                           disabled
@@ -223,7 +223,7 @@
 
                     <!-- 多选 -->
                     <template v-if="child.type === 2">
-                      <el-checkbox-group class="children-option" v-model="child.answer">
+                      <el-checkbox-group class="children-option" v-model="child.answers">
                         <el-checkbox
                           class="option-item"
                           disabled
@@ -241,7 +241,7 @@
                       <div
                         class="option-item-text"
                         :key="index"
-                        v-for="(option, index) in child.answer.split(' ')"
+                        v-for="(option, index) in child.answers"
                       >{{ option }}</div>
                     </template>
 
@@ -264,7 +264,7 @@
                     </template>
 
                     <div class="children-analysis">
-                      <div>【答案】：{{ child.answers[0] || child.answers.split(',') }}</div>
+                      <div>【答案】：{{ child.answers[0] }}</div>
                       <div v-html="`【解析】：${child.analysis}`"></div>
                     </div>
                     <div class="children-footer">
@@ -295,7 +295,7 @@
                           size="mini"
                         >设置</el-button>
                         <el-button
-                          @click="del(child.paperquestionId)"
+                          @click="del(child.paperQuestionId)"
                           class="btn"
                           icon="el-icon-delete"
                           round
@@ -425,13 +425,11 @@ export default {
         res.data.map((item) => {
           item.chapter.show = true
           item.questionList.map((question) => {
-            if (question.type === 2) {
-              question.answer = question.answer.split(',')
-            }
+            
           })
         })
         this.paperQuestion = [...res.data]
-      } catch (error) { }
+      } catch (error) {alert(error) }
     },
     // 查询试题
     async queryQuestion(curPage) {
