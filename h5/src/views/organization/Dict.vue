@@ -135,7 +135,7 @@ export default {
     async query() {
       let {
         data: { list, total },
-      } = await this.$https.dictListpage({
+      } = await this.$https.dictListPage({
         dictIndex: this.queryForm.dictIndex,
         dictKey: this.queryForm.dictKey,
         dictValue: this.queryForm.dictValue,

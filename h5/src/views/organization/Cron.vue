@@ -130,7 +130,7 @@ export default {
     async query() {
       let {
         data: { list, total },
-      } = await this.$https.cronListpage({
+      } = await this.$https.cronListPage({
         name: this.queryForm.name,
         curPage: this.listpage.curPage,
         pageSize: this.listpage.pageSize,

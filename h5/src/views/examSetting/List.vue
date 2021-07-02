@@ -545,7 +545,7 @@ export default {
     // 获取用户
     async getUserList(name = '', curPage = 1) {
       this.examForm.curPage = curPage
-      const examUsers = await this.$https.userListpage({
+      const examUsers = await this.$https.userListPage({
         name,
         curPage,
         pageSize: this.examForm.pageSize

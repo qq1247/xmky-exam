@@ -29,7 +29,7 @@ const routes = [
   },
   {
     path: '/examPaper/edit',
-    name: 'PaperEdit',
+    name: 'ExamPaperEdit',
     component: () => import('../views/examPaper/Edit.vue')
   },
   // 考试相关
@@ -40,29 +40,29 @@ const routes = [
   },
   {
     path: '/examSetting/list',
-    name: 'SettingList',
+    name: 'ExamSettingList',
     component: () => import('../views/examSetting/List.vue')
   },
   // 试题相关
   {
-    path: '/examLibrary',
-    name: 'ExamLibrary',
-    component: () => import('../views/examLibrary/Index.vue')
+    path: '/examQuestion',
+    name: 'ExamQuestion',
+    component: () => import('../views/examQuestion/Index.vue')
   },
   {
-    path: '/examLibrary/edit',
-    name: 'LibraryEdit',
-    component: () => import('../views/examLibrary/Edit.vue')
+    path: '/examQuestion/edit',
+    name: 'ExamQuestionEdit',
+    component: () => import('../views/examQuestion/Edit.vue')
   },
   // 组织机构
   {
     path: '/organization/cron',
-    name: 'Cron',
+    name: 'OrgCron',
     component: () => import('../views/organization/Cron.vue')
   },
   {
     path: '/organization/user',
-    name: 'User',
+    name: 'OrgUser',
     component: () => import('../views/organization/User.vue')
   },
   {
@@ -72,17 +72,17 @@ const routes = [
   },
   {
     path: '/organization/parm',
-    name: 'Parm',
+    name: 'OrgParm',
     component: () => import('../views/organization/Parm.vue')
   },
   {
     path: '/organization/dict',
-    name: 'Dict',
+    name: 'OrgDict',
     component: () => import('../views/organization/Dict.vue')
   },
   {
     path: '/organization/bulletinBoard',
-    name: 'BulletinBoard',
+    name: 'OrgBulletinBoard',
     component: () => import('../views/organization/BulletinBoard.vue')
   },
   {
@@ -92,12 +92,12 @@ const routes = [
   },
   {
     path: '/organization/myMark',
-    name: 'MyMark',
+    name: 'OrgMyMark',
     component: () => import('../views/organization/MyMark.vue')
   },
   {
     path: '/organization/myMarkExam',
-    name: 'MyMarkExam',
+    name: 'OrgMyMarkExam',
     component: () => import('../views/organization/MyMarkExam.vue')
   },
   // 我的
@@ -112,9 +112,9 @@ const routes = [
     component: () => import('../views/my/MyExam.vue')
   },
   {
-    path: '/my/checkPaper',
-    name: 'MyCheckPaper',
-    component: () => import('../views/my/MyCheckPaper.vue')
+    path: '/my/markExam',
+    name: 'MyMarkExam',
+    component: () => import('../views/my/MyMarkExam.vue')
   },
   { path: '*', component: () => import('../views/base/404.vue') }
 ]

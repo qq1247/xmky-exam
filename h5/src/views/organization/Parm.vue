@@ -161,7 +161,7 @@ export default {
     async query() {
       let {
         data: { list, total }
-      } = await this.$https.parmListpage({
+      } = await this.$https.parmListPage({
         orgName: this.queryForm.orgName,
         curPage: this.listpage.curPage,
         pageSize: this.listpage.pageSize

@@ -406,12 +406,12 @@ export default {
       await this.query()
       await this.queryQuestion()
       // 初始化类型下拉框
-      const typeDictData = await this.$https.dictListpage({
+      const typeDictData = await this.$https.dictListPage({
         dictIndex: 'QUESTION_TYPE',
       })
       this.queryForm.typeDictList = typeDictData.data.list
       // 初始化难度下拉框
-      const difficultyDictData = await this.$https.dictListpage({
+      const difficultyDictData = await this.$https.dictListPage({
         dictIndex: 'QUESTION_DIFFICULTY',
       })
       this.queryForm.difficultyDictList = difficultyDictData.data.list

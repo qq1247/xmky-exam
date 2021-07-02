@@ -29,7 +29,7 @@ export default {
   data() {
     return {
       show: true,
-      menuList: ["PaperAdd", "PaperEdit", "LibraryAdd", "LibraryEdit", 'MyExam', 'MyCheckPaper'],
+      menuList: ["PaperAdd", "ExamPaperEdit", "LibraryAdd", "ExamQuestionEdit", 'MyExam', 'MyMarkExam'],
       navList: [
         {
           to: "/",
@@ -41,7 +41,7 @@ export default {
         },
         {
           content: "试题管理",
-          to: "/examLibrary",
+          to: "/examQuestion",
         },
         {
           content: "试卷管理",

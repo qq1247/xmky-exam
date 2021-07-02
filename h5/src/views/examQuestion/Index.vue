@@ -250,7 +250,7 @@ export default {
     // 获取用户
     async getUserList(name = '', curPage = 1) {
       this.roleForm.curPage = curPage
-      const roleUserList = await this.$https.userListpage({
+      const roleUserList = await this.$https.userListPage({
         name,
         curPage,
         pageSize: this.roleForm.pageSize
@@ -307,7 +307,7 @@ export default {
     // 试题详情
     goDetail({ id, name }) {
       this.$router.push({
-        path: "/examLibrary/Edit",
+        path: "/examQuestion/Edit",
         query: { id, name }
       })
     },

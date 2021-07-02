@@ -136,7 +136,7 @@ export default {
     async query() {
       let {
         data: { list, total }
-      } = await this.$https.userListpage({
+      } = await this.$https.userListPage({
         orgId: this.queryForm.orgId,
         name: this.queryForm.name,
         curPage: this.listpage.curPage,

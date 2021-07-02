@@ -2,22 +2,12 @@
   <div class="container">
     <div class="content">
       <div class="search">
-        <el-form
-          :inline="true"
-          :model="queryForm"
-          class="form-inline"
-          ref="queryForm"
-        >
+        <el-form :inline="true" :model="queryForm" class="form-inline" ref="queryForm">
           <el-form-item label prop="examName">
-            <el-input
-              placeholder="请输入考试名称"
-              v-model="queryForm.examName"
-            ></el-input>
+            <el-input placeholder="请输入考试名称" v-model="queryForm.examName"></el-input>
           </el-form-item>
           <el-form-item style="width: 200px">
-            <el-button @click="query" icon="el-icon-search" type="primary"
-              >查询</el-button
-            >
+            <el-button @click="query" icon="el-icon-search" type="primary">查询</el-button>
             <el-button @click="reset">重置</el-button>
           </el-form-item>
           <!-- <el-form-item>
@@ -27,7 +17,7 @@
               type="primary"
               >添加</el-button
             >
-          </el-form-item> -->
+          </el-form-item>-->
         </el-form>
       </div>
       <div class="table">
@@ -89,7 +79,7 @@
                 >删除</el-button
               >
             </template>
-          </el-table-column> -->
+          </el-table-column>-->
         </el-table>
       </div>
       <el-pagination
@@ -105,19 +95,12 @@
     <el-dialog :visible.sync="editForm.show" title="更新答案">
       <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
         <el-form-item label="答案" label-width="120px" prop="answer">
-          <el-input
-            placeholder="请输入答案"
-            v-model="editForm.answer"
-          ></el-input>
+          <el-input placeholder="请输入答案" v-model="editForm.answer"></el-input>
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="add" type="primary" v-if="editForm.id == null"
-          >添加</el-button
-        >
-        <el-button @click="edit" type="primary" v-if="editForm.id != null"
-          >修改</el-button
-        >
+        <el-button @click="add" type="primary" v-if="editForm.id == null">添加</el-button>
+        <el-button @click="edit" type="primary" v-if="editForm.id != null">修改</el-button>
         <el-button @click="editForm.show = false">取 消</el-button>
       </div>
     </el-dialog>
@@ -160,7 +143,7 @@ export default {
     async query() {
       let {
         data: { list, total },
-      } = await this.$https.myMarkListpage({
+      } = await this.$https.myMarkListPage({
         examName: this.queryForm.examName,
         curPage: this.listpage.curPage,
         pageSize: this.listpage.pageSize,
