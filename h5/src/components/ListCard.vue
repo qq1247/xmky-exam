@@ -1,7 +1,7 @@
 <template>
   <div class="exam-item">
     <div class="exam-content">
-      <div class="title">{{ data.name || data.examName}}</div>
+      <div class="title">{{ data.name || data.examName }}</div>
       <template v-if="['question', 'paper', 'exam'].includes(name)">
         <div class="content-info">
           <span>读取权限：{{ data.readUserNames || "暂无" }}</span>
@@ -50,22 +50,28 @@
           <span>{{ data.examStartTime }}</span>
         </div>
         <div class="content-info">
-          <span class="space">及格：{{data.totalScore  }}/{{data.paperTotalScore  }}</span>
+          <span class="space">及格：{{ data.totalScore }}/{{ data.paperTotalScore }}</span>
         </div>
       </template>
       <template v-if="name == 'myExamList'">
         <div class="tagGroup">
-          <el-tag size="mini" effect="dark" v-if="data.state == 3">{{data.stateName }}</el-tag>&nbsp;&nbsp;
-          <el-tag size="mini" effect="danger" v-if="data.state != 3">{{data.stateName }}</el-tag>&nbsp;&nbsp;
-          <el-tag size="mini" effect="dark" v-if="data.markState == 3">{{data.markStateName }}</el-tag>&nbsp;&nbsp;
-          <el-tag size="mini" effect="danger" v-if="data.markState != 3">{{data.markStateName }}</el-tag>&nbsp;&nbsp;
+          <el-tag size="mini" :type="data.state == 3 ? '' : 'danger'">{{ data.stateName }}</el-tag>&nbsp;&nbsp;
+          <el-tag size="mini" :type="data.markState == 3 ? '' : 'danger'">{{ data.markStateName }}</el-tag>&nbsp;&nbsp;
         </div>
       </template>
       <div class="handler">
-        <span v-if="['question', 'paper', 'exam'].includes(name)" data-title="编辑" @click="edit(data)">
+        <span
+          v-if="['question', 'paper', 'exam'].includes(name)"
+          data-title="编辑"
+          @click="edit(data)"
+        >
           <i class="common common-edit"></i>
         </span>
-        <span v-if="['question', 'paper', 'exam'].includes(name)" data-title="删除" @click="del(data)">
+        <span
+          v-if="['question', 'paper', 'exam'].includes(name)"
+          data-title="删除"
+          @click="del(data)"
+        >
           <i class="common common-delete"></i>
         </span>
         <!-- 试题 -->
@@ -104,10 +110,18 @@
         <span v-if="name == 'myExamList' && data.btn == 'unStart'" data-title="未开始">
           <i class="common common-wode"></i>
         </span>
-        <span v-if="name == 'myExamList' && data.btn == 'start'" data-title="开始考试" @click="startExam(data)">
+        <span
+          v-if="name == 'myExamList' && data.btn == 'start'"
+          data-title="开始考试"
+          @click="startExam(data)"
+        >
           <i class="common common-wode"></i>
         </span>
-        <span v-if="name == 'myExamList' && data.btn == 'end'" data-title="预览考试" @click="viewExam(data)">
+        <span
+          v-if="name == 'myExamList' && data.btn == 'end'"
+          data-title="预览考试"
+          @click="viewExam(data)"
+        >
           <i class="common common-wode"></i>
         </span>
         <span v-if="detailTitles[name]" :data-title="detailTitles[name]" @click="detail(data)">

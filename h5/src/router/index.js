@@ -87,7 +87,7 @@ const routes = [
   },
   {
     path: '/organization/myExam',
-    name: 'MyExam',
+    name: 'OrgMyExam',
     component: () => import('../views/organization/MyExam.vue')
   },
   {
@@ -110,6 +110,11 @@ const routes = [
     path: '/my/exam',
     name: 'MyExam',
     component: () => import('../views/my/MyExam.vue')
+  },
+  {
+    path: '/my/checkPaper',
+    name: 'MyCheckPaper',
+    component: () => import('../views/my/MyCheckPaper.vue')
   },
   { path: '*', component: () => import('../views/base/404.vue') }
 ]

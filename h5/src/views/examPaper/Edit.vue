@@ -100,7 +100,7 @@
                   :key="item.id"
                   :id="item.id"
                 >
-                  <div class="item-title">{{ index + 1 }}、{{ item.title }}</div>
+                  <div class="item-title" v-html="(index + 1) + '、' + item.title"></div>
                   <el-tag effect="dark" size="mini" type="warning">
                     {{
                       item.typeName
@@ -129,10 +129,8 @@
       </div>
 
       <div class="content-center">
-        <div class="center-top">
-          <div class="paper-title">{{ paperName }}</div>
-          <!-- <div class="paper-intro">{{}}</div> -->
-        </div>
+        <div class="paper-title">{{ paperName }}</div>
+        <!-- <div class="paper-intro">{{}}</div> -->
 
         <div class="center-drag">
           <Draggable
@@ -206,7 +204,7 @@
                     :key="child.id"
                     :id="`p-${item.chapter.id}-${index}`"
                   >
-                    <p>{{ index + 1 }}、{{ child.title }}</p>
+                    <p v-html="(index + 1) + '、' + child.title"></p>
 
                     <!-- 单选 -->
                     <template v-if="child.type === 1">
@@ -217,7 +215,9 @@
                           :key="index"
                           :label="String.fromCharCode(65 + index)"
                           v-for="(option, index) in child.options"
-                        >{{ String.fromCharCode(65 + index) }}、{{ option.options }}</el-radio>
+                        >
+                          <span v-html="`${String.fromCharCode(65 + index)}、${option}`"></span>
+                        </el-radio>
                       </el-radio-group>
                     </template>
 
@@ -230,7 +230,9 @@
                           :key="index"
                           :label="String.fromCharCode(65 + index)"
                           v-for="(option, index) in child.options"
-                        >{{ String.fromCharCode(65 + index) }}、{{ option.options }}</el-checkbox>
+                        >
+                          <span v-html="`${String.fromCharCode(65 + index)}、${option}`"></span>
+                        </el-checkbox>
                       </el-checkbox-group>
                     </template>
 
@@ -262,8 +264,8 @@
                     </template>
 
                     <div class="children-analysis">
-                      <div>【答案】：{{ child.answer }}</div>
-                      <div>【解析】：{{ child.analysis }}</div>
+                      <div>【答案】：{{ child.answers[0] || child.answers.split(',') }}</div>
+                      <div v-html="`【解析】：${child.analysis}`"></div>
                     </div>
                     <div class="children-footer">
                       <div class="children-tags">
@@ -547,10 +549,8 @@ export default {
     },
     // 定位锚点
     toHref(id, index) {
-      this.hrefPointer = `#p-${id}-${index}`
-      document.querySelector(`#p-${id}-${index}`).scrollIntoView({
-        behavior: 'smooth'
-      })
+      this.hrefPointer = `#p-${id}-${index}`;
+      document.documentElement.scrollTop = (document.querySelector(this.hrefPointer).offsetTop - 50)
     }
   }
 }

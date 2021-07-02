@@ -171,7 +171,7 @@ export default {
       this.examList = examList
     },
     getNoticeList() {
-      for (let index = 0; index < 6; index++) {
+      for (let index = 0; index < 11; index++) {
         this.noticeList.push({
           id: index + 1,
           title: '这是一条最新通知',
