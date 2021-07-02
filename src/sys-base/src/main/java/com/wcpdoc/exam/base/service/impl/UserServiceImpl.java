@@ -105,7 +105,9 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 
 		return EncryptUtil.md52Base64(loginName + pwd);
 	}
-
+public static void main(String[] args) {
+	System.err.println(new UserServiceImpl().getEncryptPwd("cy", "111111"));
+}
 	@Override
 	public List<User> getList(Integer orgId) {
 		return userDao.getList(orgId);

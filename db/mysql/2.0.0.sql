@@ -1,28 +1,3 @@
-drop table if exists SYS_USER;
-
-/*==============================================================*/
-/* Table: SYS_USER                                              */
-/*==============================================================*/
-create table SYS_USER
-(
-   ID                   int not null auto_increment comment '主键',
-   NAME                 varchar(16) comment '名称',
-   LOGIN_NAME           varchar(16) comment '登陆账号',
-   EMAIL                varchar(64) comment '邮箱',
-   PHONE                varchar(11) comment '手机号',
-   PWD                  varchar(32) comment '密码',
-   REGIST_TIME          datetime comment '注册时间',
-   LAST_LOGIN_TIME      datetime comment '最后登陆时间',
-   ORG_ID               int comment '组织机构ID',
-   ROLES             	varchar(128) comment '角色',
-   UPDATE_USER_ID       int comment '修改人',
-   UPDATE_TIME          datetime comment '修改时间',
-   STATE                int comment '0：删除；1：正常；2：冻结；',
-   primary key (ID)
-);
-
-alter table SYS_USER comment '用户';
-
 drop table if exists SYS_ORG;
 
 /*==============================================================*/
@@ -44,6 +19,88 @@ create table SYS_ORG
 );
 
 alter table SYS_ORG comment '组织机构';
+
+drop table if exists SYS_USER;
+
+/*==============================================================*/
+/* Table: SYS_USER                                              */
+/*==============================================================*/
+create table SYS_USER
+(
+   ID                   int not null auto_increment comment '主键',
+   NAME                 varchar(16) comment '名称',
+   LOGIN_NAME           varchar(16) comment '登陆账号',
+   EMAIL                varchar(64) comment '邮箱',
+   PHONE                varchar(11) comment '手机号',
+   PWD                  varchar(32) comment '密码',
+   REGIST_TIME          datetime comment '注册时间',
+   LAST_LOGIN_TIME      datetime comment '最后登陆时间',
+   ORG_ID               int comment '组织机构ID',
+   ROLES                varchar(64) comment '角色',
+   UPDATE_USER_ID       int comment '修改人',
+   UPDATE_TIME          datetime comment '修改时间',
+   STATE                int comment '0：删除；1：正常；2：冻结；',
+   primary key (ID)
+);
+
+alter table SYS_USER comment '用户';
+
+drop table if exists SYS_FILE;
+
+/*==============================================================*/
+/* Table: SYS_FILE                                              */
+/*==============================================================*/
+create table SYS_FILE
+(
+   ID                   int not null auto_increment,
+   NAME                 varchar(64) comment '前缀',
+   EXT_NAME             varchar(32) comment '后缀',
+   FILE_TYPE            varchar(128) comment '类型',
+   PATH                 varchar(64) comment '路径',
+   IP                   varchar(16) comment '上传IP',
+   STATE                int comment '0：删除；1：正常',
+   UPDATE_USER_ID       int comment '更新人',
+   UPDATE_TIME          datetime comment '更新时间',
+   primary key (ID)
+);
+
+alter table SYS_FILE comment '附件';
+
+drop table if exists SYS_DICT;
+
+/*==============================================================*/
+/* Table: SYS_DICT                                              */
+/*==============================================================*/
+create table SYS_DICT
+(
+   ID                   int not null auto_increment,
+   DICT_INDEX           varchar(32) comment '索引',
+   DICT_KEY             varchar(32) comment '键',
+   DICT_VALUE           varchar(32) comment '值',
+   NO                   int comment '排序',
+   primary key (ID)
+);
+
+alter table SYS_DICT comment '数据字典';
+
+drop table if exists SYS_CRON;
+
+/*==============================================================*/
+/* Table: SYS_CRON                                              */
+/*==============================================================*/
+create table SYS_CRON
+(
+   ID                   int not null auto_increment comment '主键',
+   NAME                 varchar(32) comment '名称',
+   JOB_CLASS            varchar(64) comment '实现类',
+   CRON                 varchar(64) comment 'cron表达式',
+   STATE                int comment '1：启动；2：停止；',
+   UPDATE_USER_ID       int comment '修改人',
+   UPDATE_TIME          datetime comment '修改时间',
+   primary key (ID)
+);
+
+alter table SYS_CRON comment '定时任务';
 
 drop table if exists SYS_PARM;
 
@@ -84,63 +141,6 @@ create table SYS_VER
 
 alter table SYS_VER comment '版本';
 
-drop table if exists SYS_DICT;
-
-/*==============================================================*/
-/* Table: SYS_DICT                                              */
-/*==============================================================*/
-create table SYS_DICT
-(
-   ID                   int not null auto_increment,
-   DICT_INDEX           varchar(32) comment '索引',
-   DICT_KEY             varchar(32) comment '键',
-   DICT_VALUE           varchar(32) comment '值',
-   NO                   int comment '排序',
-   primary key (ID)
-);
-
-alter table SYS_DICT comment '数据字典';
-
-drop table if exists SYS_FILE;
-
-/*==============================================================*/
-/* Table: SYS_FILE                                              */
-/*==============================================================*/
-create table SYS_FILE
-(
-   ID                   int not null auto_increment,
-   NAME                 varchar(64) comment '前缀',
-   EXT_NAME             varchar(32) comment '后缀',
-   FILE_TYPE            varchar(128) comment '类型',
-   PATH                 varchar(64) comment '路径',
-   IP                   varchar(16) comment '上传IP',
-   STATE                int comment '0：删除；1：正常',
-   UPDATE_USER_ID       int comment '更新人',
-   UPDATE_TIME          datetime comment '更新时间',
-   primary key (ID)
-);
-
-alter table SYS_FILE comment '附件';
-
-drop table if exists SYS_CRON;
-
-/*==============================================================*/
-/* Table: SYS_CRON                                              */
-/*==============================================================*/
-create table SYS_CRON
-(
-   ID                   int not null auto_increment comment '主键',
-   NAME                 varchar(32) comment '名称',
-   JOB_CLASS            varchar(64) comment '实现类',
-   CRON                 varchar(64) comment 'cron表达式',
-   STATE                int comment '1：启动；2：停止；',
-   UPDATE_USER_ID       int comment '修改人',
-   UPDATE_TIME          datetime comment '修改时间',
-   primary key (ID)
-);
-
-alter table SYS_CRON comment '定时任务';
-
 drop table if exists EXM_QUESTION_TYPE;
 
 /*==============================================================*/
@@ -156,6 +156,7 @@ create table EXM_QUESTION_TYPE
    UPDATE_USER_ID       int comment '修改人',
    UPDATE_TIME          datetime comment '修改时间',
    STATE                int comment '0：删除；1：正常',
+   RW_STATE             int comment '1：开启；2：禁用',
    READ_USER_IDS        varchar(1024) comment '读权限',
    WRITE_USER_IDS       varchar(1024) comment '写权限',
    primary key (ID)
@@ -211,8 +212,21 @@ create table EXM_QUESTION
 
 alter table EXM_QUESTION comment '试题';
 
-alter table EXM_QUESTION add constraint FK_Reference_15 foreign key (QUESTION_TYPE_ID)
-      references EXM_QUESTION_TYPE (ID) on delete restrict on update restrict;
+drop table if exists EXM_QUESTION_OPTION;
+
+/*==============================================================*/
+/* Table: EXM_QUESTION_OPTION                                   */
+/*==============================================================*/
+create table EXM_QUESTION_OPTION
+(
+   ID                   int not null auto_increment,
+   OPTIONS              text comment '选项（option是关键字）',
+   NO                   int comment '排序',
+   QUESTION_ID          int not null comment '试题ID',
+   primary key (ID)
+);
+
+alter table EXM_QUESTION_OPTION comment '试题选项';
 
 drop table if exists EXM_PAPER_TYPE;
 
@@ -229,6 +243,7 @@ create table EXM_PAPER_TYPE
    UPDATE_USER_ID       int comment '修改人',
    UPDATE_TIME          datetime comment '修改时间',
    STATE                int comment '0：删除；1：正常',
+   RW_STATE             int comment '1：开启；2：禁用',
    WRITE_USER_IDS       varchar(1024) comment '写权限',
    READ_USER_IDS        varchar(1024) comment '读权限',
    primary key (ID)
@@ -262,8 +277,22 @@ create table EXM_PAPER
 
 alter table EXM_PAPER comment '试卷';
 
-alter table EXM_PAPER add constraint FK_Reference_16 foreign key (PAPER_TYPE_ID)
-      references EXM_PAPER_TYPE (ID) on delete restrict on update restrict;
+drop table if exists EXM_PAPER_REMARK;
+
+/*==============================================================*/
+/* Table: EXM_PAPER_REMARK                                      */
+/*==============================================================*/
+create table EXM_PAPER_REMARK
+(
+   ID                   int not null auto_increment comment '主键',
+   SCORE                decimal(5,2) comment '分数（百分比）',
+   REMARK               varchar(32) comment '评语',
+   NO                   int comment '排序',
+   PAPER_ID             int not null comment '试卷ID',
+   primary key (ID)
+);
+
+alter table EXM_PAPER_REMARK comment '试卷评语';
 
 drop table if exists EXM_PAPER_QUESTION;
 
@@ -290,45 +319,6 @@ create table EXM_PAPER_QUESTION
 
 alter table EXM_PAPER_QUESTION comment '试卷试题';
 
-alter table EXM_PAPER_QUESTION add constraint FK_Reference_17 foreign key (QUESTION_ID)
-      references EXM_QUESTION (ID) on delete restrict on update restrict;
-
-alter table EXM_PAPER_QUESTION add constraint FK_Reference_18 foreign key (PAPER_ID)
-      references EXM_PAPER (ID) on delete restrict on update restrict;
-
-drop table if exists EXM_QUESTION_OPTION;
-
-/*==============================================================*/
-/* Table: EXM_QUESTION_OPTION                                   */
-/*==============================================================*/
-create table EXM_QUESTION_OPTION
-(
-   ID                   int not null auto_increment,
-   OPTIONS             text comment '选项',
-   NO                   int comment '排序',
-   QUESTION_ID          int not null comment '试题ID',
-   primary key (ID)
-);
-
-alter table EXM_QUESTION_OPTION comment '试题选项';
-
-drop table if exists EXM_PAPER_REMARK;
-
-/*==============================================================*/
-/* Table: EXM_PAPER_REMARK                                      */
-/*==============================================================*/
-create table EXM_PAPER_REMARK
-(
-   ID                   int not null auto_increment comment '主键',
-   SCORE                decimal(5,2) comment '分数（百分比）',
-   REMARK               varchar(32) comment '评语',
-   NO                   int comment '排序',
-   PAPER_ID             int not null comment '试卷ID',
-   primary key (ID)
-);
-
-alter table EXM_PAPER_REMARK comment '试卷评语';
-
 drop table if exists EXM_EXAM_TYPE;
 
 /*==============================================================*/
@@ -344,6 +334,7 @@ create table EXM_EXAM_TYPE
    UPDATE_USER_ID       int comment '修改人',
    UPDATE_TIME          datetime comment '修改时间',
    STATE                int comment '0：删除；1：正常',
+   RW_STATE             int comment '1：开启；2：禁用',
    READ_USER_IDS        varchar(1024) comment '读权限',
    WRITE_USER_IDS       varchar(1024) comment '写权限',
    primary key (ID)
@@ -378,12 +369,6 @@ create table EXM_EXAM
 
 alter table EXM_EXAM comment '考试';
 
-alter table EXM_EXAM add constraint FK_Reference_19 foreign key (PAPER_ID)
-      references EXM_PAPER (ID) on delete restrict on update restrict;
-
-alter table EXM_EXAM add constraint FK_Reference_22 foreign key (EXAM_TYPE_ID)
-      references EXM_EXAM_TYPE (ID) on delete restrict on update restrict;
-	  
 drop table if exists EXM_MY_MARK;
 
 /*==============================================================*/
@@ -395,16 +380,13 @@ create table EXM_MY_MARK
    MARK_USER_ID         int comment '阅卷用户ID',
    EXAM_USER_IDS        varchar(1024) comment '考试用户IDS',
    QUESTION_IDS         varchar(1024) comment '试题IDS',
-   EXAM_ID              int comment '考试ID',
    UPDATE_USER_ID       int comment '修改人',
    UPDATE_TIME          datetime comment '修改时间',
+   EXAM_ID              int comment '考试ID',
    primary key (ID)
 );
 
 alter table EXM_MY_MARK comment '我的阅卷';
-
-alter table EXM_MY_MARK add constraint FK_Reference_37 foreign key (EXAM_ID)
-      references EXM_EXAM (ID) on delete restrict on update restrict;
 
 drop table if exists EXM_MY_EXAM;
 
@@ -432,9 +414,6 @@ create table EXM_MY_EXAM
 
 alter table EXM_MY_EXAM comment '我的考试';
 
-alter table EXM_MY_EXAM add constraint FK_Reference_23 foreign key (EXAM_ID)
-      references EXM_EXAM (ID) on delete restrict on update restrict;
-
 drop table if exists EXM_MY_EXAM_DETAIL;
 
 /*==============================================================*/
@@ -458,38 +437,6 @@ create table EXM_MY_EXAM_DETAIL
 
 alter table EXM_MY_EXAM_DETAIL comment '我的考试详细';
 
-alter table EXM_MY_EXAM_DETAIL add constraint FK_Reference_24 foreign key (MY_EXAM_ID)
-      references EXM_MY_EXAM (ID) on delete restrict on update restrict;
-
-alter table EXM_MY_EXAM_DETAIL add constraint FK_Reference_25 foreign key (QUESTION_ID)
-      references EXM_QUESTION (ID) on delete restrict on update restrict;
-
-drop table if exists JM_BULLETIN_BOARD;
-
-/*==============================================================*/
-/* Table: EXM_BULLETIN_BOARD                                     */
-/*==============================================================*/
-create table EXM_BULLETIN_BOARD
-(
-   ID                   int not null auto_increment comment '主键',
-   TITLE                varchar(32) comment '标题',
-   IMGS                 varchar(256) comment '图片',
-   VIDEO                varchar(256) comment '视频',
-   CONTENT              text comment '内容',
-   IMGS_HEIGHT          int comment '图片高',
-   IMGS_WIDTH           int comment '图片宽',
-   URL                  varchar(128) comment '跳转链接',
-   TOP_STATE            int comment '1：是；2：否',
-   NO                   int comment '排序',
-   STATE                int comment '0：删除；1：正常',
-   UPDATE_TIME          datetime comment '修改时间',
-   UPDATE_USER_ID       int comment '修改人',
-   READ_USER_IDS        varchar(256) comment '用户读权限',
-   READ_ORG_IDS         varchar(64) comment '机构读权限',
-   primary key (ID)
-);
-
-alter table EXM_BULLETIN_BOARD comment '公告栏';
 
 /*==============================================================*/
 /* 数据								*/
@@ -555,6 +502,6 @@ INSERT INTO `SYS_VER` VALUES (6, '1.1.4', '2019-09-05 09:58:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (7, '1.1.5', '2019-12-16 23:16:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (8, '2.0.0', '2020-10-15 00:00:00', 'zhanghc', '');
 
-INSERT INTO `EXM_QUESTION_TYPE` VALUES ('1', '试题分类', null, '1', '2017-08-01 22:31:43', '1', '2017-08-01 22:31:43', '1', '2', null, null);
-INSERT INTO `EXM_PAPER_TYPE` VALUES ('1', '试卷分类', null, '1', '2017-08-01 22:31:43', '1', '2017-08-01 22:31:43', '1', '2', null, null);
-INSERT INTO `EXM_EXAM_TYPE` VALUES ('1', '考试分类', null, '1', '2017-08-01 22:31:43', '1', '2017-08-01 22:31:43', '1', '2', null, null);
+INSERT INTO `EXM_QUESTION_TYPE` VALUES ('1', '试题分类', null, '1', '2017-08-01 22:31:43', '1', '2017-08-01 22:31:43', '1', '1', null, null);
+INSERT INTO `EXM_PAPER_TYPE` VALUES ('1', '试卷分类', null, '1', '2017-08-01 22:31:43', '1', '2017-08-01 22:31:43', '1', '1', null, null);
+INSERT INTO `EXM_EXAM_TYPE` VALUES ('1', '考试分类', null, '1', '2017-08-01 22:31:43', '1', '2017-08-01 22:31:43', '1', '1', null, null);

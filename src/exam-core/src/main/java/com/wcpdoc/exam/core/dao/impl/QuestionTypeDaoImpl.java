@@ -21,16 +21,17 @@ import com.wcpdoc.exam.core.util.SqlUtil.Order;
  * v1.0 zhanghc 2016-5-24下午14:54:09
  */
 @Repository
-public class QuestionTypeDaoImpl extends RBaseDaoImpl<QuestionType> implements QuestionTypeDao {//TODO   
+public class QuestionTypeDaoImpl extends RBaseDaoImpl<QuestionType> implements QuestionTypeDao { 
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT QUESTION_TYPE.* "
 				+ "FROM EXM_QUESTION_TYPE QUESTION_TYPE ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "QUESTION_TYPE.NAME LIKE ?", "%" + pageIn.get("name") + "%")
-				.addWhere("QUESTION_TYPE.STATE = ?", 1)
-				.addOrder("QUESTION_TYPE.ID", Order.DESC);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "QUESTION_TYPE.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
+				.addWhere("QUESTION_TYPE.STATE = 1")
+				.addWhere("QUESTION_TYPE.ID != 1")
+				.addOrder("QUESTION_TYPE.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(), 
 				"updateTime", DateUtil.FORMAT_DATE_TIME, 

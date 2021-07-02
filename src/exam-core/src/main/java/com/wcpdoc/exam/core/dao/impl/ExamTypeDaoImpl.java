@@ -25,17 +25,17 @@ public class ExamTypeDaoImpl extends RBaseDaoImpl<ExamType> implements ExamTypeD
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT EXAM_TYPE.*, USER.NAME AS USER_NAME "
-				+ "FROM EXM_EXAM_TYPE EXAM_TYPE "
-				+ "LEFT JOIN SYS_USER USER ON EXAM_TYPE.CREATE_USER_ID = USER.ID ";
+		String sql = "SELECT EXAM_TYPE.* "
+				+ "FROM EXM_EXAM_TYPE EXAM_TYPE ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "EXAM_TYPE.NAME LIKE ?", "%" + pageIn.get("name") + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.get("Three")), "USER.NAME LIKE ?", "%" + pageIn.get("Three") + "%")
-				.addWhere("EXAM_TYPE.STATE = ?", 1);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "EXAM_TYPE.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
+				.addWhere("EXAM_TYPE.STATE = 1")
+				.addWhere("EXAM_TYPE.ID != 1")
+				.addOrder("EXAM_TYPE.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(), 
-				"UPDATE_TIME", DateUtil.FORMAT_DATE_TIME, 
-				"CREATE_TIME", DateUtil.FORMAT_DATE_TIME);
+				"updateTime", DateUtil.FORMAT_DATE_TIME, 
+				"createTime", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;
 	}
 

@@ -438,6 +438,7 @@ public class ApiPaperController extends BaseController {
 					questionMap.put("analysis", question.getAnalysis());
 					questionMap.put("score", question.getScore());
 					questionMap.put("scoreOptions", paperQuestion.getScoreOptions());
+					questionMap.put("paperQuestionId", paperQuestion.getId());
 					questionMap.put("options", new String[0]);// 默认为长度为0的数组
 					if(question.getType() == 1 || question.getType() == 2 ){//
 						List<QuestionOption> questionOptionList = questionOptionService.getList(paperQuestion.getQuestionId());

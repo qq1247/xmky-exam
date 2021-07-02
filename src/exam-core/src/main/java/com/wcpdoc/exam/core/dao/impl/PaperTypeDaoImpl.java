@@ -25,12 +25,13 @@ public class PaperTypeDaoImpl extends RBaseDaoImpl<PaperType> implements PaperTy
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT PAPER_TYPE.*, USER.NAME AS USER_NAME FROM EXM_PAPER_TYPE PAPER_TYPE "
-				+ "LEFT JOIN SYS_USER USER ON PAPER_TYPE.CREATE_USER_ID = USER.ID ";
+		String sql = "SELECT PAPER_TYPE.* "
+				+ "FROM EXM_PAPER_TYPE PAPER_TYPE ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "PAPER_TYPE.NAME LIKE ?", "%" + pageIn.get("name") + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.get("userName" )), "USER.NAME LIKE ?", "%" + pageIn.get("userName") + "%")
-				.addWhere("PAPER_TYPE.STATE = ?", 1);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "PAPER_TYPE.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
+				.addWhere("PAPER_TYPE.STATE = 1")
+				.addWhere("PAPER_TYPE.ID != 1")
+				.addOrder("PAPER_TYPE.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(), 
 				"updateTime", DateUtil.FORMAT_DATE_TIME, 
