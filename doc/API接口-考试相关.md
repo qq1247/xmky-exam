@@ -386,6 +386,7 @@ code == 401 无权限或登录超时
 |data.list[].questionList[].analysis  | String  | 试题解析 |
 |data.list[].questionList[].score  | Double  | 试题分数 |
 |data.list[].questionList[].updateUserName  | String  | 更新用户 |
+|data.list[].questionList[].paperQuestionId  | String  | 试卷试题ID |
 |data.list[].questionList[].scoreOptions  | String  | 试题分数选项，参考question/add |
 |data.list[].questionList[].options[]  | String[]  | 试题选项，参考question/add |
 

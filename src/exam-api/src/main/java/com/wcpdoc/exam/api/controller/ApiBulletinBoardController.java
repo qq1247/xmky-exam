@@ -135,7 +135,7 @@ public class ApiBulletinBoardController extends BaseController {
 	}
 
 	/**
-	 * 获取参数
+	 * 获取公告栏
 	 * 
 	 * v1.0 chenyun 2021-03-04 15:02:18
 	 * @return pageOut
