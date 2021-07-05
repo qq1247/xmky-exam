@@ -246,244 +246,214 @@ const paperList = {
   data: [
     {
       chapter: {
-        name: '判断题',
-        description: '',
-        id: 25,
-        parentId: 24
+        name: '单选题',
+        description: '每题2分，一共1道，总2分',
+        id: 1,
+        parentId: 1
       },
       questionList: [
         {
-          difficulty: 1,
-          score: 1,
-          answer: 'C',
-          updateUserName: '管理员',
+          updateUserName: '张虎成',
           typeName: '单选',
+          answers: ['D'],
+          scoreOptions: null,
+          type: 1,
+          title: '<p><strong>下列哪一种叙述是正确的</strong></p>',
+          analysis:
+            '<p>abstract（抽象）修饰符，可以修饰类和方法<br>abstract修饰符在修饰类时必须放在类名前。<br>public abstract void method();</p>',
+          difficultyName: '极易',
+          difficulty: 1,
+          paperQuestionId: 6,
+          score: 1,
           options: [
-            {
-              id: 12,
-              options: '0',
-              no: 1,
-              questionId: 4
-            },
-            {
-              id: 13,
-              options: '1',
-              no: 2,
-              questionId: 4
-            },
-            {
-              id: 14,
-              options: '2',
-              no: 3,
-              questionId: 4
-            }
+            '<p>abstract修饰符可修饰字段、方法和类</p>',
+            '<p>抽象方法的body部分必须用一对大括号{ }包住</p>',
+            '<p>声明抽象方法，大括号可有可无</p>',
+            '<p>声明抽象方法不可写出大括号</p>'
           ],
-          scoreOptions: null,
-          id: 4,
-          type: 1,
-          title: '1+1=?',
-          analysis: '2',
-          difficultyName: '极易'
-        },
-        {
-          difficulty: 1,
-          score: 1,
-          answer: 'C',
-          updateUserName: '管理员',
-          typeName: '单选',
-          options: [
-            {
-              id: 12,
-              options: '0',
-              no: 1,
-              questionId: 4
-            },
-            {
-              id: 13,
-              options: '1',
-              no: 2,
-              questionId: 4
-            },
-            {
-              id: 14,
-              options: '2',
-              no: 3,
-              questionId: 4
-            }
-          ],
-          scoreOptions: null,
-          id: 4,
-          type: 1,
-          title: '1+1=?',
-          analysis: '2',
-          difficultyName: '极易'
-        },
-        {
-          difficulty: 3,
-          score: 1,
-          answer: 'B',
-          updateUserName: '管理员',
-          typeName: '单选',
-          options: [
-            {
-              id: 15,
-              options: '777',
-              no: 1,
-              questionId: 6
-            },
-            {
-              id: 16,
-              options: '77',
-              no: 2,
-              questionId: 6
-            },
-            {
-              id: 17,
-              options: '77',
-              no: 3,
-              questionId: 6
-            }
-          ],
-          scoreOptions: null,
-          id: 6,
-          type: 1,
-          title: '12345678977777',
-          analysis: '77777',
-          difficultyName: '适中'
-        },
-        {
-          difficulty: 1,
-          score: 1,
-          answer: 'C',
-          updateUserName: '管理员',
-          typeName: '单选',
-          options: [
-            {
-              id: 12,
-              options: '0',
-              no: 1,
-              questionId: 4
-            },
-            {
-              id: 13,
-              options: '1',
-              no: 2,
-              questionId: 4
-            },
-            {
-              id: 14,
-              options: '2',
-              no: 3,
-              questionId: 4
-            }
-          ],
-          scoreOptions: null,
-          id: 4,
-          type: 1,
-          title: '1+1=?',
-          analysis: '2',
-          difficultyName: '极易'
-        },
-        {
-          difficulty: 1,
-          score: 1,
-          answer: 'C',
-          updateUserName: '管理员',
-          typeName: '单选',
-          options: [
-            {
-              id: 12,
-              options: '0',
-              no: 1,
-              questionId: 4
-            },
-            {
-              id: 13,
-              options: '1',
-              no: 2,
-              questionId: 4
-            },
-            {
-              id: 14,
-              options: '2',
-              no: 3,
-              questionId: 4
-            }
-          ],
-          scoreOptions: null,
-          id: 4,
-          type: 1,
-          title: '1+1=?',
-          analysis: '2',
-          difficultyName: '极易'
-        },
-        {
-          difficulty: 1,
-          score: 1,
-          answer: 'C',
-          updateUserName: '管理员',
-          typeName: '单选',
-          options: [],
-          scoreOptions: null,
-          id: 5,
-          type: 1,
-          title: '1+1=?',
-          analysis: '2',
-          difficultyName: '极易'
-        },
-        {
-          difficulty: 1,
-          score: 1,
-          answer: 'C',
-          updateUserName: '管理员',
-          typeName: '单选',
-          options: [],
-          scoreOptions: null,
-          id: 5,
-          type: 1,
-          title: '1+1=?',
-          analysis: '2',
-          difficultyName: '极易'
+          id: 1
         }
       ]
     },
     {
       chapter: {
-        name: '单选题',
-        description: '',
-        id: 26,
-        parentId: 24
+        name: '多选题',
+        description: '每题2分，一共1道，总2分',
+        id: 2,
+        parentId: 1
       },
       questionList: [
         {
-          difficulty: 1,
-          score: 1,
-          answer: '对',
-          updateUserName: '管理员',
-          typeName: '判断',
+          updateUserName: '张虎成',
+          typeName: '多选',
+          answers: ['A', 'D'],
           scoreOptions: null,
-          id: 9,
-          type: 4,
-          title: '9999',
-          analysis: '999',
-          difficultyName: '极易'
-        },
-        {
+          type: 2,
+          title: '<p><strong>下列属于jsp中注释的有</strong></p>',
+          analysis: '<p>无</p>',
+          difficultyName: '极易',
           difficulty: 1,
+          paperQuestionId: 7,
           score: 1,
-          answer: '反对法 fa方大',
-          updateUserName: '管理员',
-          typeName: '填空',
-          scoreOptions: '1,4',
-          id: 8,
-          type: 3,
-          title: '1111',
-          analysis: '嘎嘎嘎',
-          difficultyName: '极易'
+          options: [
+            '<p>&lt;%-- &nbsp;与 --%&gt;</p>',
+            '<p>/</p>',
+            '<p>/** 与 **/</p>',
+            '<p>&lt;!-- 与 --&gt;</p>'
+          ],
+          id: 2
         }
       ]
+    },
+    {
+      chapter: {
+        name: '填空题',
+        description: '每题2分，一共1道，总2分',
+        id: 3,
+        parentId: 1
+      },
+      questionList: [
+        {
+          updateUserName: '张虎成',
+          typeName: '填空',
+          answers: ['临时态', '持久态', '游离态'],
+          scoreOptions: null,
+          type: 3,
+          title:
+            '<p><i>hibernate的三种状态分别是_____</i>__、<i>_____</i>__、<i>_____</i>__</p>',
+          analysis: '',
+          difficultyName: '极易',
+          difficulty: 1,
+          paperQuestionId: 8,
+          score: 1,
+          options: [],
+          id: 3
+        }
+      ]
+    },
+    {
+      chapter: {
+        name: '选择题',
+        description: '每题2分，一共1道，总2分',
+        id: 4,
+        parentId: 1
+      },
+      questionList: [
+        {
+          updateUserName: '张虎成',
+          typeName: '判断',
+          answers: ['错'],
+          scoreOptions: null,
+          type: 4,
+          title: '<p>在Java的方法中定义一个常量要用const关键字。</p>',
+          analysis: '<p>在java中定义常量用final。</p>',
+          difficultyName: '困难',
+          difficulty: 4,
+          paperQuestionId: 9,
+          score: 1,
+          options: [],
+          id: 4
+        }
+      ]
+    },
+    {
+      chapter: {
+        name: '问答题',
+        description: '每题2分，一共1道，总2分',
+        id: 5,
+        parentId: 1
+      },
+      questionList: []
     }
   ]
 }
 
-export { questionList, cardList, paperList }
+const paperIntro = {
+  code: 200,
+  msg: '请求成功',
+  data: {
+    id: 1,
+    name: 'java内部测试',
+    passScore: 60,
+    totalScore: 4,
+    showType: 1,
+    readRemark: '&lt;p&gt;注意事项：&lt;/p&gt;',
+    readNum: 3,
+    state: 2,
+    paperTypeId: 2,
+    genType: 0,
+    options: '',
+    minimizeNum: null,
+    updateUserId: 2,
+    updateTime: '2021-07-02 11:12:03'
+  }
+}
+
+const answerList = {
+  code: 200,
+  msg: '请求成功',
+  data: [
+    {
+      questionId: 1,
+      answerTime: '2021-07-02T03:22:16.000+0000',
+      answers: ['A'],
+      questionScore: 1,
+      markTime: null,
+      markUserName: null,
+      userId: 2,
+      score: null,
+      markUserId: null,
+      examId: 1,
+      questionType: 1,
+      myExamDetailId: 1,
+      myExamId: 1
+    },
+    {
+      questionId: 2,
+      answerTime: '2021-07-02T03:22:28.000+0000',
+      answers: ['A', 'D'],
+      questionScore: 1,
+      markTime: null,
+      markUserName: null,
+      userId: 2,
+      score: null,
+      markUserId: null,
+      examId: 1,
+      questionType: 2,
+      myExamDetailId: 2,
+      myExamId: 1
+    },
+    {
+      questionId: 3,
+      answerTime: '2021-07-02T03:25:00.000+0000',
+      answers: ['请求', '问问', '嗯嗯'],
+      questionScore: 1,
+      markTime: null,
+      markUserName: null,
+      userId: 2,
+      score: null,
+      markUserId: null,
+      examId: 1,
+      questionType: 3,
+      myExamDetailId: 3,
+      myExamId: 1
+    },
+    {
+      questionId: 4,
+      answerTime: '2021-07-02T03:22:33.000+0000',
+      answers: ['对'],
+      questionScore: 1,
+      markTime: null,
+      markUserName: null,
+      userId: 2,
+      score: null,
+      markUserId: null,
+      examId: 1,
+      questionType: 4,
+      myExamDetailId: 4,
+      myExamId: 1
+    }
+  ]
+}
+
+export { questionList, cardList, paperList, paperIntro, answerList }

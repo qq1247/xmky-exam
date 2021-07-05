@@ -110,7 +110,7 @@
                   </template>
 
                   <div class="children-analysis">
-                    <div>【答案】：{{ child.answers[0] || child.answers.split(',') }}</div>
+                    <div>【答案】：{{ child.answers.join(',') }}</div>
                     <div v-html="`【解析】：${child.analysis || '暂无解析'}`"></div>
                     <div>【分数】：{{ child.score }}分</div>
                     <div>
@@ -196,7 +196,7 @@ export default {
           id: this.paperId,
         });
         console.info(res);
-        this.paper = { ...res.data };
+        this.paper = res.data;
       } catch (error) { }
     },
     // 查询试卷信息
@@ -220,19 +220,20 @@ export default {
           id: this.id,
         });
 
-        let paperQuestion = this.paperQuestion.reduce((acc, cur) => {
-          acc.push(...cur.questionList)
-          return acc
-        }, [])
+        this.paperQuestion.map(cur => {
+          cur.questionList.map(item => {
+            const [{ myExamDetailId, myExamId }] = res.data.filter(itemr => itemr.questionId == item.id)
+          })
+        })
 
-        this.myExamDetailCache = res.data.reduce((acc, cur, index) => {
+        /* this.myExamDetailCache = res.data.reduce((acc, cur, index) => {
           if (cur.questionType === 3 && paperQuestion[index].id === cur.questionId) {
             cur.answers.length = paperQuestion[index].answers.length
           }
 
           acc[cur.questionId] = cur;
           return acc;
-        }, {});
+        }, {}); */
       } catch (error) {
         this.$tools.message(error, 'error')
       }
@@ -281,6 +282,12 @@ export default {
     // 点击打分板分值
     selectScore(e, idx, idxc) {
       this.setScore(e, idx, idxc)
+    },
+    async myExamUpdateScore() {
+      const res = await this.$https.myExamUpdateScore({
+        myExamDetailId,
+        score,
+      })
     },
     // 上一题
     prevQuestion() {

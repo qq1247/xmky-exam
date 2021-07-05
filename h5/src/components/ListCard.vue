@@ -50,7 +50,7 @@
           <span>{{ data.examStartTime }}</span>
         </div>
         <div class="content-info">
-          <span class="space">及格：{{ data.totalScore }}/{{ data.paperTotalScore }}</span>
+          <span class="space">及格：{{ data.totalScore || 0 }}/{{ data.paperTotalScore }}</span>
         </div>
       </template>
       <template v-if="name == 'myExamList'">
@@ -111,16 +111,9 @@
           <i class="common common-wode"></i>
         </span>
         <span
-          v-if="name == 'myExamList' && data.btn == 'start'"
-          data-title="开始考试"
+          v-if="name == 'myExamList'"
+          :data-title="data.btn == 'start' ? '开始考试' : '预览考试'"
           @click="startExam(data)"
-        >
-          <i class="common common-wode"></i>
-        </span>
-        <span
-          v-if="name == 'myExamList' && data.btn == 'end'"
-          data-title="预览考试"
-          @click="viewExam(data)"
         >
           <i class="common common-wode"></i>
         </span>
@@ -209,6 +202,10 @@ export default {
     // 开始考试
     startExam(data) {
       this.$emit('startExam', data)
+    },
+    // 预览考试
+    viewExam(data) {
+      this.$emit('viewExam', data)
     }
   }
 }

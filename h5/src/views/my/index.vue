@@ -96,11 +96,11 @@ export default {
         this.$tools.message("删除成功！", "error");
       }
     },
-    // 开始考试
+    // 开始|预览考试 
     startExam(data) {
       this.$router.push({
         path: "/my/exam",
-        query: { id: data.id, paperId: data.paperId }
+        query: { id: data.id, paperId: data.paperId, view: data.btn == 'start' ? false : true }
       })
     },
     // 分页切换
