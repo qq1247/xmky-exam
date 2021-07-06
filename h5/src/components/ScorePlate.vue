@@ -46,7 +46,7 @@
           size="small"
           icon="el-icon-document-checked"
           @click="checkEnd"
-        >结束阅卷</el-button>
+        >完成阅卷</el-button>
       </el-button-group>
     </div>
     <el-input
@@ -56,6 +56,7 @@
       placeholder="请点击 | 输入分数"
       :value="value"
       @input="input"
+      @blur="blur"
     ></el-input>
   </el-popover>
 </template>
@@ -71,6 +72,10 @@ export default {
       type: Number,
       default: 0
     },
+    position: {
+      type: String,
+      default: ''
+    }
   },
   data() {
     return {
@@ -86,6 +91,9 @@ export default {
   methods: {
     input(e) {
       this.$emit('input', e)
+    },
+    blur(e) {
+      this.$emit('blur', e)
     },
     createScores(step) {
       this.scores = []
@@ -112,10 +120,10 @@ export default {
       Object.assign(this.$data, this.$options.data())
     },
     prevQuestion() {
-      this.$emit('prevQuestion')
+      this.$emit('prevQuestion', this.position)
     },
     nextQuestion() {
-      this.$emit('nextQuestion')
+      this.$emit('nextQuestion', this.position)
     },
     prevPaper() {
       this.$emit('prevPaper')

@@ -130,13 +130,16 @@
       </div>
 
       <el-collapse class="exam-card" v-if="paperQuestion.length > 0" v-model="collapseShow">
-        <div class="exam-head">答题卡</div>
-        <div class="exam-time">倒计时：{{ `${hr}小时${min}分钟${sec}秒` }}</div>
+        <template v-if="view == 'false'">
+          <div class="exam-head">答题卡</div>
+          <div class="exam-time">倒计时：{{ `${hr}小时${min}分钟${sec}秒` }}</div>
+        </template>
         <el-collapse-item
           :key="item.id"
           :name="index"
           :title="item.chapter.name"
           v-for="(item,index) in paperQuestion"
+          v-model="questionRouter"
         >
           <a
             @click="toHref(item.chapter.id, index)"
@@ -144,7 +147,7 @@
             :key="child.id"
           >{{ index + 1 }}</a>
         </el-collapse-item>
-        <div class="exam-footer">提交</div>
+        <div v-if="view == 'false'" class="exam-footer">提交</div>
       </el-collapse>
     </div>
   </div>
@@ -154,6 +157,7 @@ export default {
   data() {
     return {
       id: 0,
+      view: false,
       labelPosition: 'left',
       paperName: '',
       hrefPointer: '',
@@ -167,6 +171,7 @@ export default {
       myExamDetailCache: {},
       selectOption: '',
       paper: {},
+      questionRouter: [],
       examEndTime: '2020-08-08 00:00:00',
       day: 0,
       hr: 0,
@@ -175,9 +180,10 @@ export default {
     };
   },
   created() {
-    const { id, paperId } = this.$route.query;
+    const { id, paperId, view } = this.$route.query;
     this.id = id;
     this.paperId = paperId;
+    this.view = view;
     this.init();
     this._interval = setInterval(() => {
       this.countdown();
@@ -217,7 +223,6 @@ export default {
         const res = await this.$https.paperGet({
           id: this.paperId,
         });
-        console.info(res);
         this.paper = { ...res.data };
       } catch (error) { }
     },
@@ -231,6 +236,7 @@ export default {
           item.chapter.show = true;
         });
         this.paperQuestion = res.data;
+        this.questionRouter = Array.from(res.data.keys())
       } catch (error) { }
     },
     // 查询我的答案信息

@@ -217,7 +217,7 @@
           </div>
           <div class="remark-buttons">
             <el-form-item>
-              <el-button @click="remarkAdd" type="primary" size="mini" icon="el-icon-plus">添加评语</el-button>
+              <el-button @click="remarkAdd" type="primary" size="mini" icon="el-icon-plus">添加阅卷人</el-button>
               <el-button
                 v-if="examForm.examRemarks.length > 1"
                 @click="remarkDel"

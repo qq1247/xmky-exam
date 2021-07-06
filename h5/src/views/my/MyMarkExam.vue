@@ -33,7 +33,7 @@
             >
               <template v-if="item.questionList.length > 0">
                 <div
-                  :id="`p-${item.chapter.id}-${index}`"
+                  :id="`p-${index}-${indexc}`"
                   :key="child.id"
                   class="children-content"
                   v-for="(child, indexc) in item.questionList"
@@ -42,7 +42,7 @@
 
                   <!-- 单选 -->
                   <template v-if="child.type === 1">
-                    <el-radio-group class="children-option" v-model="child.answers[0]">
+                    <el-radio-group class="children-option" v-model="child.examAnswers[0]">
                       <el-radio
                         disabled
                         :key="index"
@@ -57,7 +57,7 @@
 
                   <!-- 多选 -->
                   <template v-if="child.type === 2">
-                    <el-checkbox-group class="children-option" v-model="child.answers">
+                    <el-checkbox-group class="children-option" v-model="child.examAnswers">
                       <el-checkbox
                         disabled
                         :key="index"
@@ -77,7 +77,7 @@
                       class="question-text"
                       placeholder="请输入内容"
                       :key="index"
-                      v-for="(answer, index) in child.answers"
+                      v-for="(answer, index) in child.examAnswers"
                       :value="answer"
                     >
                       <template slot="prepend">第{{ index + 1 }}空</template>
@@ -86,7 +86,7 @@
 
                   <!-- 判断 -->
                   <template v-if="child.type === 4">
-                    <el-radio-group class="children-option" v-model="child.answers[0]">
+                    <el-radio-group class="children-option" v-model="child.examAnswers[0]">
                       <el-radio
                         disabled
                         :key="index"
@@ -105,7 +105,7 @@
                       class="question-text"
                       placeholder="请输入内容"
                       type="textarea"
-                      v-model="child.answers[0]"
+                      v-model="child.examAnswers[0]"
                     ></el-input>
                   </template>
 
@@ -117,11 +117,11 @@
                       【得分】：
                       <ScorePlate
                         :key="child.id"
-                        :ref="`p-${item.chapter.id}-${index}`"
+                        :position="`p-${index}-${indexc}`"
                         :value="child.scorePlate"
                         :maxScore="child.score"
                         @input="scoreInput($event, index, indexc)"
-                        @blur="scoreBlur($event)"
+                        @blur="scoreBlur($event, index, indexc)"
                         @selectScore="selectScore($event, index, indexc)"
                         @prevQuestion="prevQuestion"
                         @nextQuestion="nextQuestion"
@@ -147,7 +147,7 @@
 </template>
 <script>
 import ScorePlate from '@/components/ScorePlate.vue'
-import { paperList } from '@/mock/questionList.js'
+import { paperIntro, paperList, answerList } from '@/mock/questionList.js'
 export default {
   components: {
     ScorePlate
@@ -171,12 +171,21 @@ export default {
     };
   },
   created() {
-    const { id, paperId } = this.$route.query;
+    /* const { id, paperId } = this.$route.query;
     this.id = id;
     this.paperId = paperId;
-    this.init();
-    /* const paperQuestion = paperList.data
-    this.paperQuestion = paperQuestion */
+    this.init(); */
+    this.paper = paperIntro.data
+    this.paperQuestion = paperList.data
+
+    this.paperQuestion.map((cur, index) => {
+      cur.questionList.map((item, indexi) => {
+        const [{ myExamDetailId, myExamId, answers }] = answerList.data.filter(itemr => itemr.questionId == item.id)
+        this.$set(this.paperQuestion[index].questionList[indexi], 'myExamDetailId', myExamDetailId)
+        this.$set(this.paperQuestion[index].questionList[indexi], 'myExamId', myExamId)
+        this.$set(this.paperQuestion[index].questionList[indexi], 'examAnswers', answers)
+      })
+    })
   },
   methods: {
     // 返回
@@ -220,48 +229,17 @@ export default {
           id: this.id,
         });
 
-        this.paperQuestion.map(cur => {
-          cur.questionList.map(item => {
-            const [{ myExamDetailId, myExamId }] = res.data.filter(itemr => itemr.questionId == item.id)
+        this.paperQuestion.map((cur, index) => {
+          cur.questionList.map((item, indexi) => {
+            const [{ myExamDetailId, myExamId, answers }] = res.data.filter(itemr => itemr.questionId == item.id)
+            this.$set(this.paperQuestion[index].questionList[indexi], 'myExamDetailId', myExamDetailId)
+            this.$set(this.paperQuestion[index].questionList[indexi], 'myExamId', myExamId)
+            this.$set(this.paperQuestion[index].questionList[indexi], 'examAnswers', answers)
           })
         })
-
-        /* this.myExamDetailCache = res.data.reduce((acc, cur, index) => {
-          if (cur.questionType === 3 && paperQuestion[index].id === cur.questionId) {
-            cur.answers.length = paperQuestion[index].answers.length
-          }
-
-          acc[cur.questionId] = cur;
-          return acc;
-        }, {}); */
       } catch (error) {
         this.$tools.message(error, 'error')
       }
-    },
-    // 更新答案
-    async updateAnswer(questionId, answers) {
-      if (!this.myExamDetailCache[questionId]) {
-        this.$tools.message('更新答案失败，请联系管理员', 'error')
-        return;
-      }
-
-      const res = await this.$https.myExamUpdateAnswer({
-        myExamDetailId: this.myExamDetailCache[questionId].myExamDetailId,
-        answers: answers,
-      });
-    },
-    // 更新填空答案
-    async updateFillBlanksAnswer(questionId, val, answers, index) {
-      if (!this.myExamDetailCache[questionId]) {
-        this.$tools.message('更新答案失败，请联系管理员', 'error')
-        return;
-      }
-
-      answers[index] = val;
-      const res = await this.$https.myExamUpdateAnswer({
-        myExamDetailId: this.myExamDetailCache[questionId].myExamDetailId,
-        answers: answers,
-      });
     },
     // 定位锚点
     toHref(id, index) {
@@ -269,7 +247,7 @@ export default {
       document.documentElement.scrollTop = (document.querySelector(this.hrefPointer).offsetTop - 50)
     },
     // 设置分数
-    setScore(e, idx, idxc) {
+    async setScore(e, idx, idxc) {
       let source = this.paperQuestion[idx].questionList[idxc]
       this.$set(source, 'scorePlate', e)
       if (e < 0) this.$set(source, 'scorePlate', 0)
@@ -279,23 +257,66 @@ export default {
     scoreInput(e, idx, idxc) {
       this.setScore(e, idx, idxc)
     },
+    // 失去焦点提交打分
+    scoreBlur(e, idx, idxc) {
+      this.myExamUpdateScore(e, idx, idxc)
+    },
     // 点击打分板分值
     selectScore(e, idx, idxc) {
       this.setScore(e, idx, idxc)
+      this.myExamUpdateScore(e, idx, idxc)
     },
-    async myExamUpdateScore() {
+    // 打分
+    async myExamUpdateScore(e, idx, idxc) {
+      const source = this.paperQuestion[idx].questionList[idxc]
+      if (!source.scorePlate) {
+        this.$tools.message('请进行打分', 'warning')
+        return;
+      }
       const res = await this.$https.myExamUpdateScore({
-        myExamDetailId,
-        score,
-      })
+        myExamDetailId: source.myExamDetailId,
+        score: source.scorePlate,
+      }).catch(err => { })
+      console.log(res);
+      res.code === 200
+        ? this.$tools.message('打分成功！')
+        : this.$tools.message('打分失败！', 'error')
+    },
+    // 上下题定位
+    toHref(position, status) {
+      let [, index, indexc] = position.split('-')
+      let paperQuestion = this.paperQuestion
+      let indexs = paperQuestion.length //章节length
+      let indexcs = paperQuestion[indexs - 1].questionList.length //章节下question的length
+      let toHref = ''
+
+      if (status == 'prev') {
+        if (paperQuestion[index].questionList.length > 0 && indexc != paperQuestion[index].questionList.length - 1) {
+          toHref = ``
+        }
+      }
+
+      if (status == 'next') {
+
+      }
+
+      if (index == 0 && indexc == 0) {
+        this.$tools.message('已经是第一道题啦', 'warning')
+        return;
+      }
+      if (index == indexs - 1 && indexc == indexcs - 1) {
+        this.$tools.message('已经是最一道题啦', 'warning')
+        return;
+      }
+      document.documentElement.scrollTop = (document.querySelector(`#${position}`).offsetTop - 50)
     },
     // 上一题
-    prevQuestion() {
-
+    prevQuestion(position) {
+      this.toHref(position, 'prev')
     },
     // 下一题
-    nextQuestion() {
-
+    nextQuestion(position) {
+      this.toHref(position, 'next')
     },
     // 上一卷
     prevPaper() {
@@ -305,7 +326,7 @@ export default {
     nextPaper() {
 
     },
-    // 结束阅卷
+    // 完成阅卷
     checkEnd() {
 
     },
