@@ -1,22 +1,13 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import state from './state'
+import mutations from './mutations'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
-  state: {
-    token: localStorage.getItem('token')
-  },
-  mutations: {
-    setToken(state, token) {
-      state.token = token
-      localStorage.setItem('token', token)
-    },
-    delToken(state) {
-      state.token = ''
-      localStorage.removeItem('token')
-    }
-  },
+  state,
+  mutations,
   actions: {},
   modules: {}
 })
