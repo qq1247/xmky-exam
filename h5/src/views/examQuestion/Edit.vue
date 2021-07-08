@@ -72,79 +72,72 @@
           试题导入
         </div>
       </div>
-      <div class="content-center" v-if="list.questionList.length == 0">
-        <div class="data-null">
-          <img class="data-img" src="../../assets/img/data-null.png" alt />
-          <span class="data-tip">抱歉！暂无信息</span>
-        </div>
-      </div>
-      <div class="content-center" v-if="list.questionList.length > 0">
-        <el-card
-          :key="quesiton.id"
-          class="center-card"
-          shadow="hover"
-          v-for="(quesiton, index) in list.questionList"
-        >
-          <div class="center-card-top" v-html="quesiton.title"></div>
-          <div class="center-card-bottom">
-            <div class="card-bottom-left">
-              <el-tag class="center-tag-danger" size="mini" type="danger">
-                {{
-                  quesiton.typeName
-                }}
-              </el-tag>
-              <el-tag class="center-tag-purple" effect="plain" size="mini">
-                {{
-                  quesiton.difficultyName
-                }}
-              </el-tag>
-              <el-tag effect="plain" size="mini" type="danger">{{ quesiton.score }}分</el-tag>
-              <el-tag effect="plain" size="mini">
-                {{
-                  quesiton.updateUserName
-                }}
-              </el-tag>
+      <div class="content-center">
+        <template v-if="list.questionList.length > 0">
+          <el-card
+            :key="quesiton.id"
+            class="center-card"
+            shadow="hover"
+            v-for="quesiton in list.questionList"
+          >
+            <div class="center-card-top" v-html="quesiton.title"></div>
+            <div class="center-card-bottom">
+              <div class="card-bottom-left">
+                <el-tag class="center-tag-danger" size="mini" type="danger">
+                  {{
+                    quesiton.typeName
+                  }}
+                </el-tag>
+                <el-tag class="center-tag-purple" effect="plain" size="mini">
+                  {{
+                    quesiton.difficultyName
+                  }}
+                </el-tag>
+                <el-tag effect="plain" size="mini" type="danger">{{ quesiton.score }}分</el-tag>
+                <el-tag effect="plain" size="mini">
+                  {{
+                    quesiton.updateUserName
+                  }}
+                </el-tag>
+              </div>
+              <div class="card-bottom-right">
+                <el-button
+                  @click="get(quesiton.id)"
+                  class="btn"
+                  icon="el-icon-document"
+                  plain
+                  round
+                  size="mini"
+                  type="primary"
+                >详细</el-button>
+                <el-button
+                  @click="copy(quesiton.id)"
+                  class="btn"
+                  icon="el-icon-document-copy"
+                  plain
+                  round
+                  size="mini"
+                  type="primary"
+                >复制</el-button>
+                <el-button
+                  @click="del(quesiton.id)"
+                  class="btn"
+                  icon="el-icon-delete"
+                  plain
+                  round
+                  size="mini"
+                  type="primary"
+                >删除</el-button>
+              </div>
             </div>
-            <div class="card-bottom-right">
-              <el-button
-                @click="get(quesiton.id)"
-                class="btn"
-                icon="el-icon-document"
-                plain
-                round
-                size="mini"
-                type="primary"
-              >详细</el-button>
-              <el-button
-                @click="copy(quesiton.id)"
-                class="btn"
-                icon="el-icon-document-copy"
-                plain
-                round
-                size="mini"
-                type="primary"
-              >复制</el-button>
-              <el-button
-                @click="del(quesiton.id)"
-                class="btn"
-                icon="el-icon-delete"
-                plain
-                round
-                size="mini"
-                type="primary"
-              >删除</el-button>
-            </div>
+          </el-card>
+        </template>
+        <template v-if="list.questionList.length == 0">
+          <div class="data-null">
+            <img class="data-img" src="../../assets/img/data-null.png" alt />
+            <span class="data-tip">抱歉！暂无信息</span>
           </div>
-        </el-card>
-        <!-- <el-pagination
-            :total="1000"
-            background
-            class="pagination"
-            hide-on-single-page="true"
-            layout="prev, pager, next"
-            page-size="5"
-            small="false"
-        ></el-pagination>-->
+        </template>
       </div>
       <div class="content-right">
         <el-form
@@ -185,7 +178,8 @@
           <el-form-item label="题干" prop="title">
             <Editor :value="editForm.title" @editorListener="editorListener" id="title"></Editor>
           </el-form-item>
-          <div v-if="editForm.type === 1 || editForm.type === 2">
+
+          <template v-if="editForm.type === 1 || editForm.type === 2">
             <el-form-item
               :key="'option' + option.lab"
               :label="'选项' + option.lab"
@@ -198,21 +192,23 @@
                 @editorListener="editorListener"
               ></Editor>
             </el-form-item>
-          </div>
-          <el-form-item v-if="editForm.type === 1 || editForm.type === 2">
-            <el-button
-              :disabled="editForm.options.length >= 7"
-              @click="addOption()"
-              class="btn2"
-              type="primary"
-            >+添加选项</el-button>
-            <el-button
-              :disabled="editForm.options.length <= 2"
-              @click="delOption()"
-              class="btn2"
-              type="primary"
-            >-删除选项</el-button>
-          </el-form-item>
+            <!-- 选项按钮 -->
+            <el-form-item>
+              <el-button
+                :disabled="editForm.options.length >= 7"
+                @click="addOption()"
+                class="btn2"
+                type="primary"
+              >+添加选项</el-button>
+              <el-button
+                :disabled="editForm.options.length <= 2"
+                @click="delOption()"
+                class="btn2"
+                type="primary"
+              >-删除选项</el-button>
+            </el-form-item>
+          </template>
+
           <el-form-item label="答案" prop="answer" v-if="editForm.type === 1">
             <el-radio-group v-model="editForm.answer">
               <el-radio
@@ -279,6 +275,7 @@
                 <el-input-number
                   :max="100"
                   :min="1"
+                  :step="1"
                   controls-position="right"
                   v-model.number="editForm.score"
                 ></el-input-number>
@@ -759,6 +756,7 @@ export default {
           no: this.editForm.no
         }
 
+        // 选项
         if (params.type === 1 || params.type === 2) {
           // 如果是单选、多选，提取选项值
           const _options = []
@@ -768,9 +766,11 @@ export default {
           params.options = _options
         }
 
+        // 分值选项
         if (params.type === 2 || params.type === 3) {
           // 如果是多选、填空，提取分值选项
           const _scoreOptions = []
+
           this.editForm.scoreOptions.forEach((element) => {
             _scoreOptions.push(element)
           });
@@ -801,13 +801,9 @@ export default {
         })
           .then(async () => {
             const res = await this.$https.questionEdit(params)
-            if (res.code != 200) {
-              this.$message({
-                type: "error",
-                message: res.msg
-              })
-            }
-            this.query()
+            res.code === 200
+              ? (this.$tools.message('修改成功！'), this.query())
+              : this.$tools.message('修改失败！')
           })
           .catch(() => { })
       });
@@ -816,7 +812,7 @@ export default {
     async get(id) {
       const res = await this.$https.questionGet({ id })
       if (res.code != 200) {
-        alert(res.msg)
+        this.$tools.message('查询失败！', 'error')
         return;
       }
 
@@ -824,8 +820,8 @@ export default {
       this.editForm.type = res.data.type
       this.editForm.difficulty = res.data.difficulty
       this.editForm.title = res.data.title
-      this.editForm.answer = res.data.answer
-      this.editForm.answerMultip = res.data.answer.split(",");
+      this.editForm.answer = res.data.answers[0]
+      this.editForm.answerMultip = res.data.answers;
       this.editForm.analysis = res.data.analysis
       this.editForm.score = res.data.score
       this.editForm.no = res.data.no
@@ -834,21 +830,19 @@ export default {
         this.editForm.options = [] // 重置选项
         this.editForm.answers = [] // 重置答案列表
         for (let i = 0; i < res.data.options.length; i++) {
-          this._addOption(i, res.data.options[i].options)
+          this._addOption(i, res.data.options[i])
         }
       } else if (this.editForm.type === 2) {
         this.editForm.options = [] // 重置选项
         this.editForm.answers = [] // 重置答案列表
         for (let i = 0; i < res.data.options.length; i++) {
-          this._addOption(i, res.data.options[i].options)
+          this._addOption(i, res.data.options[i])
         }
-
-        this.editForm.answer = res.data.answer.split(",");
         this.editForm.scoreOptions =
           res.data.scoreOptions == null ? [] : res.data.scoreOptions.split(",");
       } else if (this.editForm.type === 3) {
         this.editForm.answers = [] // 重置答案列表
-        const answers = res.data.answer.split("\n");
+        const answers = res.data.answers
         for (let i = 0; i < answers.length; i++) {
           this._addFillBlanks(i, answers[i])
         }
