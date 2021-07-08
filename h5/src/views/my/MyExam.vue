@@ -34,7 +34,7 @@
             >
               <template v-if="item.questionList.length > 0">
                 <div
-                  :id="`p-${item.chapter.id}-${index}`"
+                  :id="`p-${child.id}`"
                   :key="child.id"
                   class="children-content"
                   v-for="(child, index) in item.questionList"
@@ -142,7 +142,7 @@
           v-model="questionRouter"
         >
           <a
-            @click="toHref(item.chapter.id, index)"
+            @click="toHref(child.id)"
             v-for="(child, index) in item.questionList"
             :key="child.id"
           >{{ index + 1 }}</a>
@@ -153,6 +153,7 @@
   </div>
 </template>
 <script>
+import * as dayjs from 'dayjs'
 export default {
   data() {
     return {
@@ -172,7 +173,8 @@ export default {
       selectOption: '',
       paper: {},
       questionRouter: [],
-      examEndTime: '2020-08-08 00:00:00',
+      examEndTime: '',
+      timeDiff: 0,
       day: 0,
       hr: 0,
       min: 0,
@@ -180,10 +182,11 @@ export default {
     };
   },
   created() {
-    const { id, paperId, view } = this.$route.query;
+    const { id, paperId, view, examEndTime } = this.$route.query;
     this.id = id;
     this.paperId = paperId;
     this.view = view;
+    this.examEndTime = examEndTime
     this.init();
     this._interval = setInterval(() => {
       this.countdown();
@@ -197,7 +200,7 @@ export default {
     countdown() {
       const end = Date.parse(new Date(this.examEndTime));
       const now = Date.parse(new Date());
-      const msec = Math.abs(end - now);
+      const msec = Math.abs(end - (now + this.timeDiff));
       let day = parseInt(msec / 1000 / 60 / 60 / 24);
       let hr = parseInt(msec / 1000 / 60 / 60 % 24);
       let min = parseInt(msec / 1000 / 60 % 60);
@@ -213,9 +216,14 @@ export default {
     },
     // 初始化
     async init() {
+      await this.setTime()
       await this.queryPaper();
       await this.queryPaperInfo();
       await this.queryMyExamAnswerInfo();
+    },
+    async setTime() {
+      const systemTime = await this.$https.loginSysTime({})
+      this.timeDiff = new Date(systemTime.data) - new Date()
     },
     // 查询试卷
     async queryPaper() {
@@ -289,8 +297,8 @@ export default {
       });
     },
     // 定位锚点
-    toHref(id, index) {
-      this.hrefPointer = `#p-${id}-${index}`;
+    toHref(id) {
+      this.hrefPointer = `#p-${id}`;
       document.documentElement.scrollTop = (document.querySelector(this.hrefPointer).offsetTop - 50)
     }
   }

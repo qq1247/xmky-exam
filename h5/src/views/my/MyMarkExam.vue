@@ -33,7 +33,7 @@
             >
               <template v-if="item.questionList.length > 0">
                 <div
-                  :id="`p-${index}-${indexc}`"
+                  :id="`p-${child.id}`"
                   :key="child.id"
                   class="children-content"
                   v-for="(child, indexc) in item.questionList"
@@ -117,9 +117,7 @@
                       【得分】：
                       <ScorePlate
                         :key="child.id"
-                        :position="`p-${index}-${indexc}`"
-                        :value="child.scorePlate"
-                        :maxScore="child.score"
+                        :data="child"
                         @input="scoreInput($event, index, indexc)"
                         @blur="scoreBlur($event, index, indexc)"
                         @selectScore="selectScore($event, index, indexc)"
@@ -168,6 +166,7 @@ export default {
       myExamDetailCache: {},
       selectOption: '',
       paper: {},
+      answerList: []
     };
   },
   created() {
@@ -186,6 +185,8 @@ export default {
         this.$set(this.paperQuestion[index].questionList[indexi], 'examAnswers', answers)
       })
     })
+
+    this.answerList = answerList.data
   },
   methods: {
     // 返回
@@ -214,7 +215,7 @@ export default {
         const res = await this.$https.paperQuestionList({
           id: this.paperId,
         });
-        res.data.map((item, index) => {
+        res.data.map((item) => {
           item.questionList.map(question => {
             question.scorePlate = ''
           })
@@ -237,6 +238,8 @@ export default {
             this.$set(this.paperQuestion[index].questionList[indexi], 'examAnswers', answers)
           })
         })
+
+        this.answerList = res.data
       } catch (error) {
         this.$tools.message(error, 'error')
       }
@@ -277,38 +280,32 @@ export default {
         myExamDetailId: source.myExamDetailId,
         score: source.scorePlate,
       }).catch(err => { })
-      console.log(res);
       res.code === 200
         ? this.$tools.message('打分成功！')
         : this.$tools.message('打分失败！', 'error')
     },
     // 上下题定位
     toHref(position, status) {
-      let [, index, indexc] = position.split('-')
-      let paperQuestion = this.paperQuestion
-      let indexs = paperQuestion.length //章节length
-      let indexcs = paperQuestion[indexs - 1].questionList.length //章节下question的length
       let toHref = ''
+      let index = this.answerList.findIndex(item => item.questionId == position)
 
       if (status == 'prev') {
-        if (paperQuestion[index].questionList.length > 0 && indexc != paperQuestion[index].questionList.length - 1) {
-          toHref = ``
+        if (index == 0) {
+          this.$tools.message('已经是第一题了哦！', 'warning')
+          return
         }
+        toHref = this.answerList[index - 1].questionId
       }
 
       if (status == 'next') {
-
+        if (index == this.answerList.length - 1) {
+          this.$tools.message('已经是最后一题了哦！', 'warning')
+          return
+        }
+        toHref = this.answerList[index + 1].questionId
       }
-
-      if (index == 0 && indexc == 0) {
-        this.$tools.message('已经是第一道题啦', 'warning')
-        return;
-      }
-      if (index == indexs - 1 && indexc == indexcs - 1) {
-        this.$tools.message('已经是最一道题啦', 'warning')
-        return;
-      }
-      document.documentElement.scrollTop = (document.querySelector(`#${position}`).offsetTop - 50)
+      document.documentElement.scrollTop = (document.querySelector(`#p-${toHref}`).offsetTop - 50)
+      document.querySelector(`#i-${toHref}`).focus()
     },
     // 上一题
     prevQuestion(position) {
