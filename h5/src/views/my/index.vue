@@ -100,7 +100,7 @@ export default {
     startExam(data) {
       this.$router.push({
         path: "/my/exam",
-        query: { id: data.id, paperId: data.paperId, view: data.btn == 'start' ? false : true }
+        query: { id: data.id, paperId: data.paperId, view: data.btn == 'start' ? false : true, examEndTime: data.btn == 'start' ? data.examEndTime : '' }
       })
     },
     // 分页切换
