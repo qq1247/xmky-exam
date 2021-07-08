@@ -61,7 +61,7 @@
             :label="item.title"
             :name="item.name"
           ></el-tab-pane>
-          <div v-if="paperForm.tabActive == '0'">
+          <template v-if="paperForm.tabActive == '0'">
             <el-form-item>
               <div class="exam-type">
                 <div
@@ -83,7 +83,7 @@
             <el-form-item label="试卷名称" prop="name">
               <el-input placeholder="请输入试卷名称" v-model="paperForm.name"></el-input>
             </el-form-item>
-            <el-form-item label="及格分数" prop="passScore">
+            <el-form-item label="及格分数" prop="passScore" required>
               <el-input
                 type="number"
                 min="1"
@@ -100,8 +100,8 @@
             <el-form-item label="阅读时长">
               <el-input type="number" placeholder="请输入阅读时长" v-model="paperForm.readNum"></el-input>
             </el-form-item>
-          </div>
-          <div v-if="paperForm.tabActive == '1'">
+          </template>
+          <template v-if="paperForm.tabActive == '1'">
             <el-form-item label="展示方式">
               <el-radio
                 v-for="item in paperForm.showTypes"
@@ -110,8 +110,8 @@
                 :label="item.value"
               >{{ item.name }}</el-radio>
             </el-form-item>
-          </div>
-          <div v-if="paperForm.tabActive == '2'">
+          </template>
+          <template v-if="paperForm.tabActive == '2'">
             <el-form-item label="防作弊">
               <el-checkbox-group v-model="paperForm.options">
                 <el-checkbox
@@ -128,8 +128,8 @@
                 <span slot="append">后交卷</span>
               </el-input>-->
             </el-form-item>
-          </div>
-          <div v-if="paperForm.tabActive == '3'">
+          </template>
+          <!-- <div v-if="paperForm.tabActive == '3'">
             <el-form-item label="成绩评语">
               <el-checkbox v-model="paperForm.paperRemarkShow">开启</el-checkbox>
               <template v-if="paperForm.paperRemarkShow">
@@ -156,11 +156,11 @@
                 </div>
               </template>
             </el-form-item>
-          </div>
+          </div>-->
         </el-tabs>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button v-if="!(paperForm.tabActive == '3')" @click="paperNext" type="primary">下一步</el-button>
+        <el-button v-if="!(paperForm.tabActive == '2')" @click="paperNext" type="primary">下一步</el-button>
         <el-button @click="addOrEdit">
           {{
             paperForm.edit ? "修改" : "添加"
@@ -296,8 +296,9 @@ export default {
     // 添加试卷信息
     addOrEdit() {
       this.$refs["paperForm"].validate(async (valid) => {
+        console.log(valid);
         if (!valid) {
-          return
+          return;
         }
 
         const params = {
@@ -381,7 +382,12 @@ export default {
     },
     // tab切换
     paperNext() {
-      this.paperForm.tabActive = Number(this.paperForm.tabActive) + 1 + "";
+      this.$refs["paperForm"].validate(async (valid) => {
+        if (!valid) {
+          return;
+        }
+        this.paperForm.tabActive = Number(this.paperForm.tabActive) + 1 + "";
+      })
     },
     // 考试阅读富文本
     readRemark(id, value) {
