@@ -240,7 +240,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			question.setAnswer(answers[0]);
 		} else if (question.getType() == 2) {
 			question.setAnswer(StringUtil.join(answers));
-		} else if (question.getQuestionTypeId() == 3) {
+		} else if (question.getType() == 3) {
 			question.setAnswer(StringUtil.join(answers, "\n"));
 		}
 		

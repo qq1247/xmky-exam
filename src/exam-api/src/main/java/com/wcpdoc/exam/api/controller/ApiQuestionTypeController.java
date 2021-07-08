@@ -75,7 +75,7 @@ public class ApiQuestionTypeController extends BaseController {
 						if(mapList.get("writeUserNames") == null){
 							mapList.put("writeUserNames", user.getName());
 						}else{
-							mapList.put("writeUserNames", mapList.get("readUserNames")+","+user.getName());
+							mapList.put("writeUserNames", mapList.get("writeUserNames")+","+user.getName());
 						}
 					}
 				}
