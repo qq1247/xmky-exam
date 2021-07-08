@@ -2,16 +2,6 @@
   box-sizing: border-box;
 }
 
-// 隐藏滚动条
-::-webkit-scrollbar {
-  display: none;
-}
-
-// ckeditor inline模式toolbar的z-index
-:root {
-  --ck-z-default: 2000 !important;
-}
-
 html,
 body {
   height: 100%;
@@ -21,6 +11,30 @@ body {
   scroll-behavior: smooth;
 }
 
+// scrollbar
+::-webkit-scrollbar {
+  display: none;
+}
+
+// ckeditor inline z-index
+:root {
+  --ck-z-default: 2000 !important;
+}
+
+// mask
+.v-modal {
+  opacity: 1;
+  background: rgba(18, 52, 86, 0.5);
+  backdrop-filter: blur(13px);
+}
+
+// dialog
+.el-dialog {
+  border-radius: 8px;
+  box-shadow: 0 0 13px rgba(255, 255, 255, 0.15);
+}
+
+// header
 .header {
   position: fixed;
   top: 0;
@@ -91,19 +105,32 @@ body {
   }
 }
 
-.header-login {
-  width: 100px;
-  height: 30px;
-  line-height: 30px;
-  color: #fff;
-  font-size: 14px;
-  border-radius: 3px;
-  text-align: center;
-  text-decoration: none;
-  background: #0095e5;
-  border-radius: 15px;
+.header-userInfo {
+  display: flex;
+  align-items: center;
+  .user-name {
+    color: #0095e5;
+    margin-right: 10px;
+  }
+  .common-loginOut {
+    color: #ea6a77;
+    cursor: pointer;
+  }
+  .header-login {
+    width: 100px;
+    height: 30px;
+    line-height: 30px;
+    color: #fff;
+    font-size: 14px;
+    border-radius: 3px;
+    text-align: center;
+    text-decoration: none;
+    background: #0095e5;
+    border-radius: 15px;
+  }
 }
 
+// main
 .main {
   width: 100%;
   flex: 1;
@@ -119,6 +146,7 @@ body {
   margin: 0 auto;
 }
 
+// footer
 .footer {
   height: 50px;
   line-height: 50px;
@@ -128,6 +156,7 @@ body {
   background: #2a2a44;
 }
 
+// data-null
 .data-null {
   width: 100%;
   height: 100%;

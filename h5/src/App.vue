@@ -14,17 +14,27 @@
             <el-image v-if="nav.img" :src="nav.img" class="logo-img"></el-image>
           </router-link>
         </div>
-        <router-link class="header-login" to="/login">登录</router-link>
+        <div class="header-userInfo">
+          <template v-if="userInfo">
+            欢迎您！
+            <span class="user-name">{{ JSON.parse(userInfo).userName }}</span>
+            <el-tooltip effect="dark" content="退出" placement="right">
+              <i class="common common-loginOut" @click="loginOut"></i>
+            </el-tooltip>
+          </template>
+          <router-link v-else class="header-login" to="/login">登录</router-link>
+        </div>
       </div>
     </header>
     <main class="main">
       <router-view />
     </main>
-    <footer class="footer" v-if="show">Copyright© 2018 All Rights Reserved 版权所有 在线考试</footer>
+    <footer v-if="show" class="footer">Copyright© 2018 All Rights Reserved 版权所有 在线考试</footer>
   </div>
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex'
 export default {
   data() {
     return {
@@ -56,7 +66,7 @@ export default {
           to: '/my'
         }
       ],
-    };
+    }
   },
   watch: {
     $route: {
@@ -71,11 +81,19 @@ export default {
       immediate: true,
     },
   },
+  computed: mapState(['userInfo']),
+  methods: {
+    ...mapMutations(['DEL_USER_INFO']),
+    loginOut() {
+      this.DEL_USER_INFO()
+      this.$tools.message('退出成功！', 'info')
+    }
+  },
 };
 </script>
 
 <style lang="scss">
-@import url(//at.alicdn.com/t/font_840312_th8meklu86o.css);
+@import url(//at.alicdn.com/t/font_840312_muzyz91khzi.css);
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

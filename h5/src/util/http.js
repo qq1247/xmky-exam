@@ -4,6 +4,7 @@
  */
 import axios from 'axios'
 import router from '@/router'
+import store from '@/store'
 import { Message } from 'element-ui'
 /**
  * 提示函数
@@ -42,8 +43,8 @@ const errorHandle = (status, msg) => {
       break
     case 401:
     case 403:
-      message(`${msg}请重新登录`)
-      localStorage.removeItem('token')
+      message(`请重新登录`)
+      store.commit('DEL_USER_INFO')
       toLogin()
       break
     case 404:
@@ -66,8 +67,11 @@ var instance = axios.create({
  */
 instance.interceptors.request.use(
   config => {
-    const token = localStorage.getItem('token')
-    token && (config.headers.Authorization = token)
+    const userInfo = localStorage.getItem('userInfo')
+      ? JSON.parse(localStorage.getItem('userInfo'))
+      : ''
+    userInfo?.accessToken &&
+      (config.headers.Authorization = userInfo.accessToken)
     return config
   },
   error => Promise.error(error)

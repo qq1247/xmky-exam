@@ -128,7 +128,9 @@ const router = new VueRouter({
 // 使用 router.beforeEach 注册一个全局前置守卫，判断用户是否登陆
 router.beforeEach((to, from, next) => {
   if (to.path != '/login') {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('userInfo')
+      ? JSON.parse(localStorage.getItem('userInfo')).accessToken
+      : ''
     if (!token) {
       Message({
         message: '请您重新登录',

@@ -45,7 +45,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(["setToken"]),
+    ...mapMutations(["SET_USER_INFO"]),
     // 登录
     login(formName) {
       this.$refs[formName].validate(async (valid) => {
@@ -54,8 +54,7 @@ export default {
             loginName: this.ruleForm.account,
             pwd: this.ruleForm.password
           })
-          console.log(res);
-          res.data?.accessToken && this.setToken(res.data.accessToken)
+          res.data?.accessToken && this.SET_USER_INFO(JSON.stringify(res.data))
           !this.$route.query.redirect
             ? this.$router.replace({
               path: "/",
@@ -63,6 +62,7 @@ export default {
             : this.$router.replace({
               path: this.$route.query.redirect
             })
+          this.$tools.message('登录成功！', 'info')
         } else {
           this.$message({
             message: "请核对登录信息",
