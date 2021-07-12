@@ -45,7 +45,7 @@ export default {
   cronStopTask: params => post('cron/stopTask', params),
   cronrunOnceTask: params => post('cron/runOnceTask', params),
 
-  // 组织机构相关
+  // 机构相关
   orgListPage: params => post('org/listpage', params),
   orgTreeList: params => post('org/treeList', params),
   orgGet: params => post('org/get', params),

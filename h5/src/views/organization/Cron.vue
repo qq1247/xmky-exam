@@ -4,8 +4,8 @@
       <el-form :inline="true" :model="queryForm" ref="queryForm">
         <el-row>
           <el-col :span="17">
-            <el-form-item label prop="dictIndex">
-              <el-input @focus="queryForm.name = true" placeholder="请输入名称" v-model="queryForm.dictIndex"></el-input>
+            <el-form-item label prop="name">
+              <el-input @focus="queryForm.name = true" placeholder="请输入名称" v-model="queryForm.name"></el-input>
             </el-form-item>
             <el-button @click="query" class="query-search" icon="el-icon-search" type="primary">查询</el-button>
           </el-col>

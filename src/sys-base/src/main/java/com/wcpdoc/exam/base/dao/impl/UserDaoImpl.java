@@ -12,6 +12,7 @@ import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.HibernateUtil;
 import com.wcpdoc.exam.core.util.SqlUtil;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.util.SqlUtil.Order;
 
 /**
@@ -30,14 +31,12 @@ public class UserDaoImpl extends RBaseDaoImpl<User> implements UserDao {
 				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID ";
 				
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(pageIn. get("One") != null && !("1".equals(pageIn.get("One")) || pageIn.get("One").equals(pageIn.get("Ten"))), "ORG.ID = ?", pageIn.get("One"))
-				.addWhere(pageIn.get("name") != null, "USER.NAME LIKE ?", "%" + pageIn.get("name") + "%")
-				.addWhere(pageIn.get("Three") != null, "ORG.NAME LIKE ?", "%" + pageIn.get("Three") + "%")
-				.addWhere(pageIn.get("orgId") != null, "USER.ORG_ID = ?", pageIn.get("orgId"))
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "USER.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
+				.addWhere(ValidateUtil.isValid(pageIn.get("orgName")), "ORG.NAME LIKE ?", String.format("%%%s%%", pageIn.get("orgName")))
 				.addWhere("USER.STATE != ?", 0)
 				.addOrder("USER.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDate(pageOut.getList(), "REGIST_TIME", DateUtil.FORMAT_DATE, "LAST_LOGIN_TIME", DateUtil.FORMAT_DATE);
+		HibernateUtil.formatDate(pageOut.getList(), "registTime", DateUtil.FORMAT_DATE_TIME, "lastLoginTime", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;
 	}
 

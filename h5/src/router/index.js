@@ -55,7 +55,7 @@ const routes = [
     name: 'ExamQuestionEdit',
     component: () => import('../views/examQuestion/Edit.vue')
   },
-  // 组织机构
+  // 机构
   {
     path: '/organization/cron',
     name: 'OrgCron',

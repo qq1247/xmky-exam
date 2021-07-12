@@ -4,7 +4,7 @@
       <el-form :inline="true" :model="queryForm" ref="queryForm">
         <el-row>
           <el-col :span="17">
-            <el-form-item label prop="dictIndex">
+            <el-form-item label prop="name">
               <el-input @focus="queryForm.queryShow = true" placeholder="请输入名称" v-model="queryForm.name"></el-input>
             </el-form-item>
             <el-button @click="query" class="query-search" icon="el-icon-search" type="primary">查询</el-button>
@@ -20,7 +20,7 @@
               <span style="margin-left: 10px">{{ scope.row.name }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="上级组织机构">
+          <el-table-column label="上级机构">
             <template slot-scope="scope">
               <span style="margin-left: 10px">{{ scope.row.parentName }}</span>
             </template>
@@ -40,9 +40,9 @@
         </el-table>
       </div>
     </div>
-    <el-dialog :visible.sync="editForm.show" title="组织机构">
+    <el-dialog :visible.sync="editForm.show" title="机构">
       <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
-        <el-form-item label="上级组织机构" label-width="120px">
+        <el-form-item label="上级机构" label-width="120px">
           <el-input disabled placeholder v-model="editForm.parentName"></el-input>
         </el-form-item>
         <el-form-item label="名称" label-width="120px" prop="name">
@@ -141,7 +141,7 @@ export default {
     async init() {
       await this.query();
     },
-    // 添加组织机构
+    // 添加机构
     add() {
       this.$refs['editForm'].validate(async (valid) => {
         if (!valid) {
@@ -163,7 +163,7 @@ export default {
         this.query();
       });
     },
-    // 修改组织机构
+    // 修改机构
     edit() {
       this.$refs['editForm'].validate(async (valid) => {
         if (!valid) {
@@ -185,7 +185,7 @@ export default {
         this.query();
       });
     },
-    // 获取组织机构
+    // 获取机构
     async get(id, parentId, parentName) {
       this.$nextTick(() => {
         this.$refs['editForm'].resetFields();
