@@ -10,7 +10,7 @@
             <el-button @click="query" class="query-search" icon="el-icon-search" type="primary">查询</el-button>
           </el-col>
           <el-col :span="7">
-            <el-form-item  style="float:right;">
+            <el-form-item style="float:right;">
               <el-button @click="editForm.show = true" icon="el-icon-circle-plus-outline" size="mini" type="primary">添加</el-button>
             </el-form-item>
           </el-col>
@@ -25,8 +25,7 @@
         </div>
       </el-form>
       <div class="table">
-        <el-table :data="listpage.list" style="width: 100%"  default-expand-all row-key="id"
-    :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
+        <el-table :data="listpage.list" style="width: 100%">
           <el-table-column label="索引">
             <template slot-scope="scope">
               <span style="margin-left: 10px">{{ scope.row.dictIndex }}</span>
@@ -49,23 +48,13 @@
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-link :underline="false" @click="get(scope.row.id)" icon="common common-edit">编辑</el-link>
+              <el-link :underline="false" @click="get(scope.row.id)" icon="common common-edit">修改</el-link>
               <el-link :underline="false" @click="del(scope.row.id)" icon="common common-delete">删除</el-link>
             </template>
           </el-table-column>
         </el-table>
       </div>
-      <el-pagination 
-        background 
-        layout="prev, pager, next"
-        prev-text="上一页"
-        next-text="下一页"
-        hide-on-single-page 
-        :total="listpage.total" 
-        :page-size="listpage.pageSize" 
-        :current-page="listpage.curPage" 
-        @current-change="pageChange" 
-        ></el-pagination>
+      <el-pagination :current-page="listpage.curPage" :page-size="listpage.pageSize" :total="listpage.total" @current-change="pageChange" background hide-on-single-page layout="prev, pager, next" next-text="下一页" prev-text="上一页"></el-pagination>
     </div>
     <el-dialog :visible.sync="editForm.show" title="数据字典">
       <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
@@ -100,7 +89,7 @@ export default {
         total: 0, // 总条数
         curPage: 1, // 当前第几页
         pageSize: 10, // 每页多少条
-        pageSizes: [10, 20, 50, 100], // 每页多少条
+        pageSizes: [10, 20, 50], // 每页多少条
         list: [], // 列表数据
       },
       queryForm: {

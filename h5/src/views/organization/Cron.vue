@@ -1,20 +1,22 @@
 <template>
   <div class="container">
     <div class="content">
-      <div class="search">
-        <el-form :inline="true" :model="queryForm" class="form-inline" ref="queryForm">
-          <el-form-item label prop="name">
-            <el-input placeholder="请输入名称" v-model="queryForm.name"></el-input>
-          </el-form-item>
-          <el-form-item style="width: 200px">
-            <el-button @click="query" icon="el-icon-search" type="primary">查询</el-button>
-            <el-button @click="reset">重置</el-button>
-          </el-form-item>
-          <el-form-item>
-            <el-button @click="editForm.show = true" icon="el-icon-search" type="primary">添加</el-button>
-          </el-form-item>
-        </el-form>
-      </div>
+      <el-form :inline="true" :model="queryForm" ref="queryForm">
+        <el-row>
+          <el-col :span="17">
+            <el-form-item label prop="dictIndex">
+              <el-input @focus="queryForm.name = true" placeholder="请输入名称" v-model="queryForm.dictIndex"></el-input>
+            </el-form-item>
+            <el-button @click="query" class="query-search" icon="el-icon-search" type="primary">查询</el-button>
+          </el-col>
+          <el-col :span="7">
+            <el-form-item style="float:right;">
+              <el-button @click="editForm.show = true" icon="el-icon-circle-plus-outline" size="mini" type="primary">添加</el-button>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <div v-if="queryForm.queryShow"></div>
+      </el-form>
       <div class="table">
         <el-table :data="listpage.list" style="width: 100%">
           <el-table-column label="名称" width="120px">
@@ -39,31 +41,23 @@
           </el-table-column>
           <el-table-column label="最近三次运行时间">
             <template slot-scope="scope">
-              <span v-for="item in scope.row.recentTriggerTime.split('；')" :key="item">
-                <el-tag effect="plain" v-if="item" style="margin-bottom: 3px">{{ item }}</el-tag>
+              <span :key="item" v-for="item in scope.row.recentTriggerTime.split('；')">
+                <el-tag effect="plain" style="margin-bottom: 3px" v-if="item">{{ item }}</el-tag>
               </span>
             </template>
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-button @click="get(scope.row.id)" size="mini">修改</el-button>
-              <el-button @click="del(scope.row.id)" size="mini" type="danger">删除</el-button>
-              <el-button @click="startTask(scope.row.id)" size="mini" type="primary">启动任务</el-button>
-              <el-button @click="stopTask(scope.row.id)" size="mini" type="danger">停止任务</el-button>
-              <el-button @click="onceTask(scope.row.id)" size="mini" type="primary">执行一次</el-button>
+              <el-link :underline="false" @click="get(scope.row.id)" icon="common common-edit">修改</el-link>
+              <el-link :underline="false" @click="del(scope.row.id)" icon="common common-delete">删除</el-link>
+              <el-link :underline="false" @click="startTask(scope.row.id)" icon="common common-edit">启动任务</el-link>
+              <el-link :underline="false" @click="stopTask(scope.row.id)" icon="common common-edit">停止任务</el-link>
+              <el-link :underline="false" @click="onceTask(scope.row.id)" icon="common common-edit">执行一次</el-link>
             </template>
           </el-table-column>
         </el-table>
       </div>
-      <el-pagination
-        :current-page="listpage.curPage"
-        :page-size="listpage.pageSize"
-        :page-sizes="listpage.pageSizes"
-        :total="listpage.total"
-        @current-change="handleCurrentChange"
-        @size-change="handleSizeChange"
-        layout="total, sizes, prev, pager, next, jumper"
-      ></el-pagination>
+      <el-pagination :current-page="listpage.curPage" :page-size="listpage.pageSize" :total="listpage.total" @current-change="pageChange" background hide-on-single-page layout="prev, pager, next" next-text="下一页" prev-text="上一页"></el-pagination>
     </div>
     <el-dialog :visible.sync="editForm.show" title="定时任务">
       <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
@@ -95,7 +89,7 @@ export default {
         total: 0, // 总条数
         curPage: 1, // 当前第几页
         pageSize: 10, // 每页多少条
-        pageSizes: [10, 20, 50, 100], // 每页多少条
+        pageSizes: [10, 20, 50], // 每页多少条
         list: [], // 列表数据
       },
       queryForm: {
@@ -111,13 +105,9 @@ export default {
         show: false, // 是否显示页面
         rules: {
           // 校验
-          name: [{ required: true, message: "请输入名称", trigger: "change" }],
-          jobClass: [
-            { required: true, message: "请输入实现类", trigger: "change" },
-          ],
-          cron: [
-            { required: true, message: "请输入表达式", trigger: "change" },
-          ],
+          name: [{ required: true, message: '请输入名称', trigger: 'change' }],
+          jobClass: [{ required: true, message: '请输入实现类', trigger: 'change' }],
+          cron: [{ required: true, message: '请输入表达式', trigger: 'change' }],
         },
       },
     };
@@ -141,7 +131,7 @@ export default {
     // 重置
     async reset() {
       this.listpage.curPage = 1;
-      this.$refs["queryForm"].resetFields();
+      this.$refs['queryForm'].resetFields();
       this.query();
     },
     handleSizeChange(val) {
@@ -157,7 +147,7 @@ export default {
       this.query();
     },
     add() {
-      this.$refs["editForm"].validate(async (valid) => {
+      this.$refs['editForm'].validate(async (valid) => {
         if (!valid) {
           return false;
         }
@@ -169,15 +159,15 @@ export default {
         });
         if (code != 200) {
           alert(msg);
-          return
+          return;
         }
 
         this.editForm.show = false;
         this.query();
-      })
+      });
     },
     edit() {
-      this.$refs["editForm"].validate(async (valid) => {
+      this.$refs['editForm'].validate(async (valid) => {
         if (!valid) {
           return false;
         }
@@ -190,19 +180,19 @@ export default {
         });
         if (code != 200) {
           alert(msg);
-          return
+          return;
         }
 
         this.editForm.show = false;
         this.query();
-      })
+      });
     },
     // 获取试题
     async get(id) {
       const res = await this.$https.cronGet({ id: id });
       if (res.code != 200) {
         alert(res.msg);
-        return
+        return;
       }
 
       this.editForm.show = true;
@@ -213,76 +203,76 @@ export default {
     },
     // 删除
     async del(id) {
-      this.$confirm("确定要删除？", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
+      this.$confirm('确定要删除？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
       }).then(async () => {
         const res = await this.$https.cronDel({ id });
         if (res.code != 200) {
           this.$message({
-            type: "error",
+            type: 'error',
             message: res.msg,
           });
         }
 
         this.query();
-      })
+      });
     },
     // 启动任务
     async startTask(id) {
-      this.$confirm("确定要启动任务？", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
+      this.$confirm('确定要启动任务？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
       }).then(async () => {
         const res = await this.$https.cronStartTask({ id });
         if (res.code != 200) {
           this.$message({
-            type: "error",
+            type: 'error',
             message: res.msg,
           });
         }
 
         this.query();
-      })
+      });
     },
     // 停止任务
     async stopTask(id) {
-      this.$confirm("确定要停止任务？", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
+      this.$confirm('确定要停止任务？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
       }).then(async () => {
         const res = await this.$https.cronStopTask({ id });
         if (res.code != 200) {
           this.$message({
-            type: "error",
+            type: 'error',
             message: res.msg,
           });
         }
 
         this.query();
-      })
+      });
     },
     // 执行一次
     async onceTask(id) {
-      this.$confirm("确定要执行一次？", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
+      this.$confirm('确定要执行一次？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
       }).then(async () => {
         const res = await this.$https.cronrunOnceTask({ id });
         if (res.code != 200) {
           this.$message({
-            type: "error",
+            type: 'error',
             message: res.msg,
           });
         }
 
         this.query();
-      })
-    }
+      });
+    },
   },
 };
 </script>
@@ -292,13 +282,13 @@ export default {
   align-items: center;
   padding-top: 120px;
   .content {
-    width: 1200px;
-    .search {
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-start;
-    }
+    width: 1170px;
   }
+}
+.query-search {
+  width: 150px;
+  height: 40px;
+  border-radius: 5px;
 }
 .el-input {
   width: 300px;
@@ -310,5 +300,52 @@ export default {
 
 .el-dialog__title {
   float: left;
+}
+/deep/ .el-table th {
+  background-color: #d3dce6;
+  color: #475669;
+  text-align: center;
+  height: 55px;
+}
+/deep/ .el-table td {
+  color: #8392a6;
+  font-size: 12px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+/deep/ .common {
+  padding-right: 10px;
+  color: #0096e7;
+  font-style: inherit;
+  font-weight: bold;
+}
+.el-link {
+  padding-right: 20px;
+  color: #8392a6;
+  font-size: 12px;
+}
+/deep/ .el-input__inner:focus {
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+  border: 1px solid #f2f4f5;
+}
+.common-arrow-down {
+  margin-left: 10px;
+  color: #999;
+  font-size: 12px;
+}
+
+/deep/.el-pagination.is-background .el-pager li:not(.disabled).active {
+  background-color: #0095e5;
+  color: #fff;
+}
+
+/deep/.el-pagination.is-background .btn-next,
+/deep/.el-pagination.is-background .btn-prev,
+/deep/.el-pagination.is-background .el-pager li {
+  margin: 0 3px;
+  min-width: 35px;
+  border: 1px solid #d4dfd9;
+  background-color: #fff;
+  padding: 0 10px;
 }
 </style>
