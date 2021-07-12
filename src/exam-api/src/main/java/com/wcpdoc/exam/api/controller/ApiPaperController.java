@@ -338,9 +338,9 @@ public class ApiPaperController extends BaseController {
 	@RequestMapping("/chapterUp")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult chapterUp(Integer chapterId) {
+	public PageResult chapterUp(Integer oldId, Integer newId) {
 		try {
-			paperService.chapterUp(chapterId);
+			paperService.chapterUp(oldId, newId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("章节上移错误：{}", e.getMessage());
@@ -440,6 +440,7 @@ public class ApiPaperController extends BaseController {
 					questionMap.put("scoreOptions", paperQuestion.getScoreOptions());
 					questionMap.put("paperQuestionId", paperQuestion.getId());
 					questionMap.put("options", new String[0]);// 默认为长度为0的数组
+					
 					if(question.getType() == 1 || question.getType() == 2 ){//
 						List<QuestionOption> questionOptionList = questionOptionService.getList(paperQuestion.getQuestionId());
 						String[] options = new String[questionOptionList.size()];
@@ -450,8 +451,8 @@ public class ApiPaperController extends BaseController {
 					}
 					
 					QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-					boolean writeAuth = questionTypeService.hasWriteAuth(questionType, getCurUser().getId());		
-					boolean readAuth = questionTypeService.hasReadAuth(questionType, getCurUser().getId());		
+					boolean writeAuth = questionTypeService.hasWriteAuth(questionType, getCurUser().getId());
+					boolean readAuth = questionTypeService.hasReadAuth(questionType, getCurUser().getId());
 					String[] answers = question.getAnswers();
 					if (!writeAuth & !readAuth) {
 						for (int i = 0; i < answers.length; i++) {

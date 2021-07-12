@@ -123,10 +123,18 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 	
 	@Override
-	public void chapterUp(Integer chapterId) {
+	public void chapterUp(Integer oldId, Integer newId) {
 		//校验数据有效性
-		PaperQuestion entity = paperQuestionService.getEntity(chapterId);
-		Paper paper = getEntity(entity.getPaperId());
+		if(oldId == null || newId == null ){
+			throw new MyException("参数错误！");
+		}
+		PaperQuestion oldEntity = paperQuestionService.getEntity(oldId);
+		PaperQuestion newEntity = paperQuestionService.getEntity(newId);
+		if (oldEntity.getType() != newEntity.getType()) {
+			throw new MyException("章节和试题之间不能移动！");
+		}
+		
+		Paper paper = getEntity(oldEntity.getPaperId());
 		if (paper.getState() == 0) {
 			throw new MyException("试卷已删除");
 		}
@@ -134,8 +142,24 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			throw new MyException("试卷已发布");
 		}
 		
+		if(oldEntity.getParentId() != newEntity.getParentId()){
+			PaperQuestion oldParent = paperQuestionService.getEntity(oldEntity.getParentId());
+			PaperQuestion newParent = paperQuestionService.getEntity(newEntity.getParentId());
+			
+			oldEntity.setParentId(newParent.getId());
+			oldEntity.setParentSub(newParent.getParentSub()+oldEntity.getId()+"_");
+			
+			newEntity.setParentId(oldParent.getId());
+			newEntity.setParentSub(newParent.getParentSub()+newEntity.getId()+"_");
+		}
+		
+		Integer no = oldEntity.getNo();
+		oldEntity.setNo(newEntity.getNo());
+		newEntity.setNo(no);
+		paperQuestionService.update(oldEntity);
+		paperQuestionService.update(newEntity);
 		//当前章节上移
-		PaperQuestion chapter = paperQuestionService.getEntity(chapterId);
+		/*PaperQuestion chapter = paperQuestionService.getEntity(chapterId);
 		List<PaperQuestion> chapterList = paperQuestionService.getChapterList(chapter.getPaperId());
 		Collections.sort(chapterList, new Comparator<PaperQuestion>() {
 			@Override
@@ -153,7 +177,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 				paperQuestionService.update(chapter);
 				break;
 			}
-		}
+		}*/
 	}
 
 	@Override
@@ -279,6 +303,9 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			pq.setScore(question.getScore());
 			pq.setScoreOptions(question.getScoreOptions());
 			paperQuestionService.add(pq);
+			
+			pq.setParentSub(chapter.getParentSub()+pq.getId()+"_");
+			paperQuestionService.update(pq);
 		}
 		
 		//更新总分数

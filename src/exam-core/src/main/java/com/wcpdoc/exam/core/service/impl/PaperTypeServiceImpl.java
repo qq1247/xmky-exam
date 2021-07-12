@@ -81,9 +81,12 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 		if(existName(paperType)) {
 			throw new MyException("名称已存在！");
 		}
+		PaperType entity = paperTypeDao.getEntity(paperType.getId());
+		if (!entity.getWriteUserIds().contains(","+getCurUser().getId()+",")) {
+			throw new MyException("权限不足！");
+		}
 		
 		//修改试卷分类
-		PaperType entity = paperTypeDao.getEntity(paperType.getId());
 		entity.setName(paperType.getName());
 		entity.setImgId(paperType.getImgId());
 		entity.setUpdateTime(new Date());
@@ -101,9 +104,12 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 		if (ValidateUtil.isValid(paperList)) {
 			throw new MyException("请先删除试卷分类下所有的试卷！");
 		}
+		PaperType paperType = getEntity(id);
+		if (!paperType.getWriteUserIds().contains(","+getCurUser().getId()+",")) {
+			throw new MyException("权限不足！");
+		}
 		
 		// 删除试卷分类
-		PaperType paperType = getEntity(id);
 		paperType.setState(0);
 		paperType.setUpdateTime(new Date());
 		paperType.setUpdateUserId(getCurUser().getId());

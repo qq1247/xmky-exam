@@ -125,12 +125,13 @@ public interface PaperService extends BaseService<Paper> {
 	void questionClear(Integer chapterId);
 
 	/**
-	 * 完成章节上移
+	 * 完成章节上下移
 	 * 
-	 * v1.0 zhanghc 2018年10月21日下午2:51:35
-	 * @param chapterId void
+	 * v1.0 chenyun 2021年7月9日下午3:22:49
+	 * @param oldId
+	 * @param newId void
 	 */
-	void chapterUp(Integer chapterId);
+	void chapterUp(Integer oldId, Integer newId);
 	
 	/**
 	 * 完成章节下移
