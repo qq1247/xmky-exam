@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { mapMutations } from "vuex";
+import { mapActions } from "vuex";
 export default {
   data() {
     return {
@@ -45,7 +45,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(["SET_USER_INFO"]),
+    ...mapActions(['setUserInfo']),
     // 登录
     login(formName) {
       this.$refs[formName].validate(async (valid) => {
@@ -54,7 +54,7 @@ export default {
             loginName: this.ruleForm.account,
             pwd: this.ruleForm.password
           })
-          res.data?.accessToken && this.SET_USER_INFO(JSON.stringify(res.data))
+          res.data?.accessToken && this.setUserInfo(JSON.stringify(res.data))
           !this.$route.query.redirect
             ? this.$router.replace({
               path: "/",

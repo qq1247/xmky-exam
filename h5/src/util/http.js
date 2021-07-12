@@ -12,7 +12,7 @@ import { Message } from 'element-ui'
 const message = msg => {
   Message({
     message: msg,
-    duration: 2000,
+    duration: 3000,
     type: 'warning'
   })
 }
@@ -31,6 +31,16 @@ const toLogin = () => {
 }
 
 /**
+ * 根据刷新的token(headers?.Authorization)替换vuex中userInfo的accessToken
+ *
+ */
+const replaceToken = async token => {
+  let userInfo = JSON.parse(store.state.userInfo)
+  userInfo.accessToken = token
+  return JSON.stringify(userInfo)
+}
+
+/**
  * 请求失败后的错误统一处理
  * @param {Number} status 请求失败的状态码
  * @param {Number} msg 请求失败返回的message
@@ -44,7 +54,7 @@ const errorHandle = (status, msg) => {
     case 401:
     case 403:
       message(`请重新登录`)
-      store.commit('DEL_USER_INFO')
+      store.dispatch('delUserInfo')
       toLogin()
       break
     case 404:
@@ -58,7 +68,7 @@ const errorHandle = (status, msg) => {
 // 创建axios实例
 var instance = axios.create({
   baseURL: 'http://192.168.110.198:8080/api/',
-  timeout: 1000 * 10
+  timeout: 1000 * 1000
 })
 
 /**
@@ -67,8 +77,8 @@ var instance = axios.create({
  */
 instance.interceptors.request.use(
   config => {
-    const userInfo = localStorage.getItem('userInfo')
-      ? JSON.parse(localStorage.getItem('userInfo'))
+    const userInfo = store.state.userInfo
+      ? JSON.parse(store.state.userInfo)
       : ''
     userInfo?.accessToken &&
       (config.headers.Authorization = userInfo.accessToken)
@@ -80,14 +90,14 @@ instance.interceptors.request.use(
 // 响应拦截器
 instance.interceptors.response.use(
   // 请求成功
-  res => {
+  async res => {
     const {
       data: { code, msg },
       headers,
       config
     } = res
-    headers?.Authorization &&
-      localStorage.setItem('token', headers.Authorization)
+    headers?.authorization &&
+      store.dispatch('setUserInfo', await replaceToken(headers.authorization))
     if (config.responseType == 'blob') {
       return Promise.resolve(res.data)
     } else {
@@ -114,6 +124,7 @@ instance.interceptors.response.use(
       errorHandle(response.status, response.data.message)
       return Promise.reject(response)
     } else {
+      message('请求错误或网站服务器异常！请联系管理员')
       return Promise.reject(error)
     }
   }

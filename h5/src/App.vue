@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 export default {
   data() {
     return {
@@ -83,9 +83,9 @@ export default {
   },
   computed: mapState(['userInfo']),
   methods: {
-    ...mapMutations(['DEL_USER_INFO']),
+    ...mapActions(['delUserInfo']),
     loginOut() {
-      this.DEL_USER_INFO()
+      this.delUserInfo()
       this.$tools.message('退出成功！', 'info')
     }
   },
