@@ -197,7 +197,6 @@ export default {
         this.query();
       });
     },
-    // 获取试题
     async get(id) {
       const res = await this.$https.dictGet({ id: id });
       if (res.code != 200) {

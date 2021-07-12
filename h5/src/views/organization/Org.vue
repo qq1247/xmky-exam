@@ -1,61 +1,43 @@
 <template>
   <div class="container">
     <div class="content">
-      <div class="left">
-        <el-tree
-          :data="tree.treeList"
-          @node-click="selTreeNode"
-          accordion
-          default-expand-all
-          highlight-current
-          node-key="id"
-          ref="tree"
-        ></el-tree>
-      </div>
-      <div class="right">
-        <div class="search">
-          <el-form :inline="true" :model="queryForm" class="form-inline" ref="queryForm">
-            <el-form-item label prop="name">
-              <el-input placeholder="请输入名称" v-model="queryForm.name"></el-input>
+      <el-form :inline="true" :model="queryForm" ref="queryForm">
+        <el-row>
+          <el-col :span="17">
+            <el-form-item label prop="dictIndex">
+              <el-input @focus="queryForm.queryShow = true" placeholder="请输入名称" v-model="queryForm.name"></el-input>
             </el-form-item>
-            <el-form-item style="width: 200px">
-              <el-button @click="query" icon="el-icon-search" type="primary">查询</el-button>
-              <el-button @click="reset">重置</el-button>
-            </el-form-item>
-            <el-form-item>
-              <el-button @click="toAdd" icon="el-icon-search" type="primary">添加</el-button>
-            </el-form-item>
-          </el-form>
-        </div>
-        <div class="table">
-          <el-table :data="listpage.list" style="width: 100%">
-            <el-table-column label="名称">
-              <template slot-scope="scope">
-                <span style="margin-left: 10px">{{ scope.row.name }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="上级组织机构">
-              <template slot-scope="scope">
-                <span style="margin-left: 10px">
-                  {{
-                    scope.row.parentName
-                  }}
-                </span>
-              </template>
-            </el-table-column>
-            <el-table-column label="排序">
-              <template slot-scope="scope">
-                <span style="margin-left: 10px">{{ scope.row.no }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="操作">
-              <template slot-scope="scope">
-                <el-button @click="toEdit(scope.row.id)" size="mini">修改</el-button>
-                <el-button @click="del(scope.row.id)" size="mini" type="danger">删除</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
+            <el-button @click="query" class="query-search" icon="el-icon-search" type="primary">查询</el-button>
+          </el-col>
+          <el-col :span="7"></el-col>
+        </el-row>
+        <div v-if="queryForm.queryShow"></div>
+      </el-form>
+      <div class="table">
+        <el-table :data="listpage.list" :tree-props="{children: 'children', hasChildren: 'hasChildren'}" default-expand-all row-key="id" style="width: 100%">
+          <el-table-column label="名称">
+            <template slot-scope="scope">
+              <span style="margin-left: 10px">{{ scope.row.name }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="上级组织机构">
+            <template slot-scope="scope">
+              <span style="margin-left: 10px">{{ scope.row.parentName }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="排序">
+            <template slot-scope="scope">
+              <span style="margin-left: 10px">{{ scope.row.no }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作">
+            <template slot-scope="scope">
+              <el-link :underline="false" @click="get(null, scope.row.id, scope.row.name)" icon="common el-icon-circle-plus-outline">添加</el-link>
+              <el-link :underline="false" @click="get(scope.row.id)" icon="common common-edit" v-if="scope.row.id != 1">修改</el-link>
+              <el-link :underline="false" @click="del(scope.row.id)" icon="common common-delete" v-if="scope.row.id != 1">删除</el-link>
+            </template>
+          </el-table-column>
+        </el-table>
       </div>
     </div>
     <el-dialog :visible.sync="editForm.show" title="组织机构">
@@ -71,8 +53,8 @@
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="doAdd" type="primary" v-if="editForm.id == null">添加</el-button>
-        <el-button @click="doEdit" type="primary" v-if="editForm.id != null">修改</el-button>
+        <el-button @click="add" type="primary" v-if="editForm.id == null">添加</el-button>
+        <el-button @click="edit" type="primary" v-if="editForm.id != null">修改</el-button>
         <el-button @click="editForm.show = false">取 消</el-button>
       </div>
     </el-dialog>
@@ -83,20 +65,20 @@
 export default {
   data() {
     return {
+      // 列表数据
       listpage: {
-        // 列表数据
         total: 0, // 总条数
         curPage: 1, // 当前第几页
-        pageSize: 10, // 每页多少条
+        pageSize: 100, // 每页多少条
         list: [], // 列表数据
       },
+      // 查询表单
       queryForm: {
-        // 查询表单
         name: null,
         parentId: null,
       },
+      // 修改表单
       editForm: {
-        // 修改表单
         id: null, // 主键
         name: null, // 名称
         no: null, // 排序
@@ -105,13 +87,9 @@ export default {
         parentName: null, // 父名称
         rules: {
           // 校验
-          name: [{ required: true, message: "请输入名称", trigger: "change" }],
-          no: [{ required: true, message: "请输入排序", trigger: "change" }],
+          name: [{ required: true, message: '请输入名称', trigger: 'change' }],
+          no: [{ required: true, message: '请输入排序', trigger: 'change' }],
         },
-      },
-      tree: {
-        curNode: null, // 当前选中节点
-        treeList: [], // 树结构的列表
       },
     };
   },
@@ -129,96 +107,43 @@ export default {
         curPage: this.listpage.curPage,
         pageSize: this.listpage.pageSize,
       });
-      this.listpage.total = total;
-      this.listpage.list = list;
-    },
-    // 重置
-    async reset() {
-      this.$refs["queryForm"].resetFields();
-      this.listpage.curPage = 1;
-      this.query();
-    },
-    // 初始化树
-    async initTree() {
-      const { code, msg, data } = await this.$https.orgTreeList();
-      if (code != 200) {
-        alert(msg);
-        return
-      }
 
-      const list = data;
       const treeList = [];
       const treeMap = {};
-      const idFiled = "ID";
-      const textFiled = "NAME";
-      const checkedFiled = "CHECKED";
-      const parentField = "PARENT_ID";
-      const iconClsFiled = "ICON";
-      const openClsFiled = "OPEN";
+      const idFiled = 'id';
+      const parentField = 'parentId';
 
       for (let i = 0; i < list.length; i++) {
-        list[i]["id"] = list[i][idFiled];
-        list[i]["label"] = list[i][textFiled];
-        if (list[i][checkedFiled]) {
-          list[i]["checked"] = true;
-        }
-        if (list[i][openClsFiled]) {
-          list[i]["open"] = true;
-        }
-        if (list[i][iconClsFiled]) {
-          list[i]["iconCls"] = list[i][iconClsFiled];
-        }
-        treeMap[list[i]["id"]] = list[i];
+        list[i]['id'] = list[i][idFiled];
+        treeMap[list[i]['id']] = list[i];
       }
 
       for (let i = 0; i < list.length; i++) {
-        if (
-          treeMap[list[i][parentField]] &&
-          list[i]["id"] != list[i][parentField]
-        ) {
-          if (!treeMap[list[i][parentField]]["children"]) {
-            treeMap[list[i][parentField]]["children"] = [];
+        if (treeMap[list[i][parentField]] && list[i]['id'] != list[i][parentField]) {
+          if (!treeMap[list[i][parentField]]['children']) {
+            treeMap[list[i][parentField]]['children'] = [];
           }
-          treeMap[list[i][parentField]]["children"].push(list[i]);
+          treeMap[list[i][parentField]]['children'].push(list[i]);
         } else {
           treeList.push(list[i]);
         }
       }
 
-      this.tree.treeList = treeList;
-
-      this.$nextTick(() => {
-        if (!this.tree.curNode) {
-          const node = this.$refs.tree.getNode(1); // 如果是第一次初始化，选择跟节点
-          this.$refs.tree.setCurrentNode(node);
-          this.tree.curNode = node;
-          this.queryForm.parentId = node.id; // 查询表单parentId设置为根节点
-        } else {
-          this.$refs.tree.setCurrentKey(this.tree.curNode.id); // 否则选中刷新前节点
-          this.queryForm.parentId = this.tree.curNode.id; // 查询表单parentId设置为当前选中节点
-        }
-      });
+      this.listpage.list = treeList;
+    },
+    // 重置
+    async reset() {
+      this.$refs['queryForm'].resetFields();
+      this.listpage.curPage = 1;
+      this.query();
     },
     // 初始化
     async init() {
-      await this.initTree();
       await this.query();
     },
-    // 选择树节点
-    async selTreeNode(data) {
-      this.tree.curNode = data;
-      this.queryForm.parentId = data.id;
-      this.query();
-    },
     // 添加组织机构
-    toAdd() {
-      this.editForm.show = true;
-      this.editForm.parentId = this.tree.curNode.id;
-      this.editForm.parentName = this.tree.curNode.label;
-    },
-    // 添加组织机构
-    doAdd() {
-      this.$refs["editForm"].validate(async (valid) => {
+    add() {
+      this.$refs['editForm'].validate(async (valid) => {
         if (!valid) {
           return false;
         }
@@ -231,32 +156,16 @@ export default {
 
         if (code != 200) {
           alert(msg);
-          return
+          return;
         }
 
         this.editForm.show = false;
-        this.initTree();
         this.query();
-      })
+      });
     },
     // 修改组织机构
-    async toEdit(id) {
-      const res = await this.$https.orgGet({ id: id });
-      if (res.code != 200) {
-        alert(res.msg);
-        return
-      }
-
-      this.editForm.show = true;
-      this.editForm.id = res.data.id;
-      this.editForm.name = res.data.name;
-      this.editForm.parentId = res.data.parentId;
-      this.editForm.parentName = res.data.parentName;
-      this.editForm.no = res.data.no;
-    },
-    // 修改组织机构
-    doEdit() {
-      this.$refs["editForm"].validate(async (valid) => {
+    edit() {
+      this.$refs['editForm'].validate(async (valid) => {
         if (!valid) {
           return false;
         }
@@ -269,32 +178,57 @@ export default {
 
         if (code != 200) {
           alert(msg);
-          return
+          return;
         }
 
         this.editForm.show = false;
-        this.initTree(); // 初始化树
         this.query();
-      })
+      });
+    },
+    // 获取组织机构
+    async get(id, parentId, parentName) {
+      this.$nextTick(() => {
+        this.$refs['editForm'].resetFields();
+      });
+
+      if (!id) {
+        this.editForm.show = true;
+        this.editForm.parentId = parentId;
+        this.editForm.parentName = parentName;
+        return;
+      }
+
+      const res = await this.$https.orgGet({ id: id });
+      if (res.code != 200) {
+        alert(res.msg);
+        return;
+      }
+
+      this.editForm.show = true;
+      this.editForm.id = res.data.id;
+      this.editForm.name = res.data.name;
+      this.editForm.parentId = res.data.parentId;
+      this.editForm.parentName = res.data.parentName;
+      this.editForm.no = res.data.no;
     },
     // 删除
     async del(id) {
-      this.$confirm("确定要删除？", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
+      this.$confirm('确定要删除？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
       }).then(async () => {
         const res = await this.$https.orgDel({ id });
         if (res.code != 200) {
           this.$message({
-            type: "error",
+            type: 'error',
             message: res.msg,
           });
         }
 
         this.query();
-      })
-    }
+      });
+    },
   },
 };
 </script>
@@ -303,22 +237,14 @@ export default {
   display: flex;
   align-items: center;
   padding-top: 120px;
-  .left {
-    float: left;
-    width: 300px;
-    height: 100%;
+  .content {
+    width: 1170px;
   }
-  .right {
-    margin-left: 300px;
-    .content {
-      width: 1170px;
-      .search {
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-start;
-      }
-    }
-  }
+}
+.query-search {
+  width: 150px;
+  height: 40px;
+  border-radius: 5px;
 }
 .el-input {
   width: 300px;
@@ -330,5 +256,52 @@ export default {
 
 .el-dialog__title {
   float: left;
+}
+/deep/ .el-table th {
+  background-color: #d3dce6;
+  color: #475669;
+  text-align: center;
+  height: 55px;
+}
+/deep/ .el-table td {
+  color: #8392a6;
+  font-size: 12px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+/deep/ .common {
+  padding-right: 10px;
+  color: #0096e7;
+  font-style: inherit;
+  font-weight: bold;
+}
+.el-link {
+  padding-right: 20px;
+  color: #8392a6;
+  font-size: 12px;
+}
+/deep/ .el-input__inner:focus {
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+  border: 1px solid #f2f4f5;
+}
+.common-arrow-down {
+  margin-left: 10px;
+  color: #999;
+  font-size: 12px;
+}
+
+/deep/.el-pagination.is-background .el-pager li:not(.disabled).active {
+  background-color: #0095e5;
+  color: #fff;
+}
+
+/deep/.el-pagination.is-background .btn-next,
+/deep/.el-pagination.is-background .btn-prev,
+/deep/.el-pagination.is-background .el-pager li {
+  margin: 0 3px;
+  min-width: 35px;
+  border: 1px solid #d4dfd9;
+  background-color: #fff;
+  padding: 0 10px;
 }
 </style>
