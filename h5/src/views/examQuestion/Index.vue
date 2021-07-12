@@ -295,9 +295,10 @@ export default {
       })
       if (res.code == 200) {
         this.$tools.message("权限编辑成功！")
+        this.query()
         this.roleForm.show = false
       } else {
-        this.$tools.message("权限编辑失败成功！", "error")
+        this.$tools.message("权限编辑失败！", "error")
       }
     },
     // 试题开放

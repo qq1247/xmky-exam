@@ -202,7 +202,7 @@
                     class="children-content"
                     v-for="(child, index) in item.questionList"
                     :key="child.id"
-                    :id="`p-${item.chapter.id}-${index}`"
+                    :id="`p-${child.id}`"
                   >
                     <p v-html="(index + 1) + '、' + child.title"></p>
 
@@ -330,11 +330,11 @@
             >
               <div class="route-href">
                 <div
-                  :class="['href-item', hrefPointer === `#p-${item.chapter.id}-${index}` ? 'href-item-active' : '']"
+                  :class="['href-item', hrefPointer === `#p-${child.id}` ? 'href-item-active' : '']"
                   v-for="(child, index) in item.questionList"
                   :key="child.id"
                 >
-                  <span @click="toHref(item.chapter.id, index)">{{ index + 1 }}</span>
+                  <span @click="toHref(child.id)">{{ index + 1 }}</span>
                 </div>
               </div>
             </el-collapse-item>
@@ -425,11 +425,11 @@ export default {
         res.data.map((item) => {
           item.chapter.show = true
           item.questionList.map((question) => {
-            
+
           })
         })
         this.paperQuestion = [...res.data]
-      } catch (error) {alert(error) }
+      } catch (error) { alert(error) }
     },
     // 查询试题
     async queryQuestion(curPage) {
@@ -546,8 +546,8 @@ export default {
       console.log(e);
     },
     // 定位锚点
-    toHref(id, index) {
-      this.hrefPointer = `#p-${id}-${index}`;
+    toHref(id) {
+      this.hrefPointer = `#p-${id}`;
       document.documentElement.scrollTop = (document.querySelector(this.hrefPointer).offsetTop - 50)
     }
   }

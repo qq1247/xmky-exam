@@ -80,20 +80,22 @@
             ></el-option>
           </CustomSelect>
         </el-form-item>
-        <el-form-item label="考试时间" prop="examTime">
+        <el-form-item label="考试时间" prop="examTime" required>
           <el-date-picker
             v-model="examForm.examTime"
             type="datetimerange"
             start-placeholder="开始日期"
             end-placeholder="结束日期"
+            value-format="yyyy-MM-dd HH:mm:ss"
           ></el-date-picker>
         </el-form-item>
-        <el-form-item label="阅卷时间" prop="readPaperTime">
+        <el-form-item label="阅卷时间" prop="markTime" required>
           <el-date-picker
-            v-model="examForm.readPaperTime"
+            v-model="examForm.markTime"
             type="datetimerange"
             start-placeholder="开始日期"
             end-placeholder="结束日期"
+            value-format="yyyy-MM-dd HH:mm:ss"
           ></el-date-picker>
         </el-form-item>
         <el-form-item label="成绩公开">
@@ -282,12 +284,33 @@
 import ListCard from "@/components/ListCard.vue";
 import CustomSelect from '@/components/CustomSelect.vue';
 import * as dayjs from "dayjs";
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
+dayjs.extend(isSameOrBefore)
 export default {
   components: {
     ListCard,
     CustomSelect
   },
   data() {
+    let validateExamTime = (rule, value, callback) => {
+      if (value.length == 0) {
+        return callback(new Error("请选择考试时间"));
+      }
+      if (dayjs(value[0]).isSameOrBefore(dayjs()) || dayjs(value[0]).isSameOrBefore(dayjs())) {
+        return callback(new Error(`时间应为${dayjs().format('YYYY年MM月DD日')}后的时间`))
+      }
+      return callback();
+    };
+
+    let validateMarkTime = (rule, value, callback) => {
+      if (value.length == 0) {
+        return callback(new Error("请选择阅卷时间"));
+      }
+      if (dayjs(value[0]).isSameOrBefore(dayjs(this.examForm.examTime[1])) || dayjs(value[0]).isSameOrBefore(dayjs(this.examForm.examTime[1]))) {
+        return callback(new Error(`时间应为${dayjs(this.examForm.examTime[1]).format('YYYY年MM月DD日')}后的时间`))
+      }
+      return callback();
+    };
     return {
       pageSize: 5,
       total: 1,
@@ -312,7 +335,7 @@ export default {
         pageSize: 5,
         total: 0,
         examTime: [],
-        readPaperTime: [],
+        markTime: [],
         scoreState: false,
         rankState: false,
         loginType: false,
@@ -346,10 +369,10 @@ export default {
             { required: true, message: "请选择试卷", trigger: "blur" }
           ],
           examTime: [
-            { required: true, message: "请选择考试时间", trigger: "blur" }
+            { validator: validateExamTime }
           ],
-          readPaperTime: [
-            { required: true, message: "请选择阅卷时间", trigger: "blur" }
+          markTime: [
+            { validator: validateMarkTime }
           ]
         }
       },
@@ -411,10 +434,10 @@ export default {
 
         let params = {
           name: this.examForm.name,
-          startTime: dayjs(this.examForm.examTime[0]).format('YYYY-MM-DD HH:mm:ss'),
-          endTime: dayjs(this.examForm.examTime[1]).format('YYYY-MM-DD HH:mm:ss'),
-          markStartTime: dayjs(this.examForm.readPaperTime[0]).format('YYYY-MM-DD HH:mm:ss'),
-          markEndTime: dayjs(this.examForm.readPaperTime[1]).format('YYYY-MM-DD HH:mm:ss'),
+          startTime: this.examForm.examTime[0],
+          endTime: this.examForm.examTime[1],
+          markStartTime: this.examForm.markTime[0],
+          markEndTime: this.examForm.markTime[1],
           scoreState: this.examForm.scoreState ? 1 : 2,
           rankState: this.examForm.rankState ? 1 : 2,
           loginType: this.examForm.loginType ? 2 : 1,
@@ -450,8 +473,8 @@ export default {
       this.examForm.scoreState = scoreState == 1 ? true : false
       this.examForm.rankState = rankState == 1 ? true : false
       this.examForm.loginType = loginType == 2 ? true : false
-      this.examForm.examTime = [new Date(startTime), new Date(endTime)]
-      this.examForm.readPaperTime = [new Date(markStartTime), new Date(markEndTime)]
+      this.examForm.examTime = [startTime, endTime]
+      this.examForm.markTime = [markStartTime, markEndTime]
     },
     // 删除分类
     async del({ id }) {

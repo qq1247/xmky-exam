@@ -216,6 +216,66 @@ const questionList = {
   }
 }
 
+// 难度
+const difficulty = [
+  {
+    dictValue: '极易',
+    no: 1,
+    id: 13,
+    dictKey: '1',
+    dictIndex: 'QUESTION_DIFFICULTY'
+  },
+  {
+    dictValue: '简单',
+    no: 2,
+    id: 14,
+    dictKey: '2',
+    dictIndex: 'QUESTION_DIFFICULTY'
+  },
+  {
+    dictValue: '适中',
+    no: 3,
+    id: 15,
+    dictKey: '3',
+    dictIndex: 'QUESTION_DIFFICULTY'
+  },
+  {
+    dictValue: '困难',
+    no: 4,
+    id: 16,
+    dictKey: '4',
+    dictIndex: 'QUESTION_DIFFICULTY'
+  },
+  {
+    dictValue: '极难',
+    no: 5,
+    id: 17,
+    dictKey: '5',
+    dictIndex: 'QUESTION_DIFFICULTY'
+  }
+]
+
+// 类型
+const questionType = [
+  { dictValue: '单选', no: 1, id: 8, dictKey: '1', dictIndex: 'QUESTION_TYPE' },
+  { dictValue: '多选', no: 2, id: 9, dictKey: '2', dictIndex: 'QUESTION_TYPE' },
+  {
+    dictValue: '填空',
+    no: 3,
+    id: 10,
+    dictKey: '3',
+    dictIndex: 'QUESTION_TYPE'
+  },
+  {
+    dictValue: '判断',
+    no: 4,
+    id: 11,
+    dictKey: '4',
+    dictIndex: 'QUESTION_TYPE'
+  },
+  { dictValue: '问答', no: 5, id: 12, dictKey: '5', dictIndex: 'QUESTION_TYPE' }
+]
+
 const cardList = {
   code: 200,
   msg: '请求成功',
@@ -240,6 +300,7 @@ const cardList = {
   }
 }
 
+// 试卷试题
 const paperList = {
   code: 200,
   msg: '请求成功',
@@ -307,6 +368,15 @@ const paperList = {
     },
     {
       chapter: {
+        name: '选答题',
+        description: '每题2分，一共1道，总2分',
+        id: 20,
+        parentId: 1
+      },
+      questionList: []
+    },
+    {
+      chapter: {
         name: '填空题',
         description: '每题2分，一共1道，总2分',
         id: 3,
@@ -330,6 +400,15 @@ const paperList = {
           id: 3
         }
       ]
+    },
+    {
+      chapter: {
+        name: '组合题',
+        description: '每题2分，一共1道，总2分',
+        id: 10,
+        parentId: 1
+      },
+      questionList: []
     },
     {
       chapter: {
@@ -368,6 +447,7 @@ const paperList = {
   ]
 }
 
+// 试卷信息
 const paperIntro = {
   code: 200,
   msg: '请求成功',
@@ -389,6 +469,7 @@ const paperIntro = {
   }
 }
 
+// 试卷答案
 const answerList = {
   code: 200,
   msg: '请求成功',
@@ -456,4 +537,101 @@ const answerList = {
   ]
 }
 
-export { questionList, cardList, paperList, paperIntro, answerList }
+// 编辑试题
+const editQuestionList = [
+  {
+    difficulty: 1,
+    score: 1,
+    no: 1,
+    options: [
+      '<p>abstract修饰符可修饰字段、方法和类</p>',
+      '<p>抽象方法的body部分必须用一对大括号{ }包住</p>',
+      '<p>声明抽象方法，大括号可有可无</p>',
+      '<p>声明抽象方法不可写出大括号</p>'
+    ],
+    answers: ['D'],
+    scoreOptions: null,
+    id: 1,
+    state: 2,
+    type: 1,
+    title: '<p><strong>下列哪一种叙述是正确的</strong></p>',
+    analysis:
+      '<p>abstract（抽象）修饰符，可以修饰类和方法<br>abstract修饰符在修饰类时必须放在类名前。<br>public abstract void method();</p>',
+    questionTypeId: 3
+  },
+  {
+    difficulty: 1,
+    score: 1,
+    no: 1,
+    options: [
+      '<p>&lt;%-- &nbsp;与 --%&gt;</p>',
+      '<p>/</p>',
+      '<p>/** 与 **/</p>',
+      '<p>&lt;!-- 与 --&gt;</p>'
+    ],
+    answers: ['A', 'D'],
+    scoreOptions: null,
+    id: 2,
+    state: 2,
+    type: 2,
+    title: '<p><strong>下列属于jsp中注释的有</strong></p>',
+    analysis: '<p>无</p>',
+    questionTypeId: 3
+  },
+  {
+    difficulty: 1,
+    score: 2,
+    no: 1,
+    options: [],
+    answers: ['封装', '多态', '继承'],
+    scoreOptions: '1',
+    id: 3,
+    state: 2,
+    type: 3,
+    title: '<p><i>Java的特性分别是_____</i>、<i>_____</i>、<i>_____</i></p>',
+    analysis: '',
+    questionTypeId: 3
+  },
+  {
+    difficulty: 4,
+    score: 1,
+    no: 1,
+    options: [],
+    answers: ['错'],
+    scoreOptions: null,
+    id: 4,
+    state: 2,
+    type: 4,
+    title: '<p>在Java的方法中定义一个常量要用const关键字。</p>',
+    analysis: '<p>在java中定义常量用final。</p>',
+    questionTypeId: 3
+  },
+  {
+    difficulty: 5,
+    score: 1,
+    no: 1,
+    options: [],
+    answers: [
+      '<p>string是final的，内部用一个final类型的char数组存储数据，它的拼接效率比较低，实际上是通过建立一个StringBuffer'
+    ],
+    scoreOptions: null,
+    id: 5,
+    state: 2,
+    type: 5,
+    title: '<p>简述string对象，StringBuffer、StringBuilder区分</p>',
+    analysis:
+      '<p>StringBuffer也是final,线程安全的，中采用一个char数组来保存需要append的字符串，char数组有一个初始大小，当append的字符串长度超过当前char数组容量时，则对char数组进行动态扩展，也即重新申请一段更大的内存空间，然后将当前char数组拷贝到新的位置，因为重新分配内存并拷贝的开销比较大，所以每次重新申请内存空间都是采用申请大于当前需要的内存空间的方式，这里是2倍。</p>',
+    questionTypeId: 3
+  }
+]
+
+export {
+  questionList,
+  cardList,
+  paperList,
+  paperIntro,
+  answerList,
+  difficulty,
+  questionType,
+  editQuestionList
+}

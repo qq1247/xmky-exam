@@ -2,8 +2,14 @@
   box-sizing: border-box;
 }
 
+// 隐藏滚动条
 ::-webkit-scrollbar {
   display: none;
+}
+
+// ckeditor inline模式toolbar的z-index
+:root {
+  --ck-z-default: 2000 !important;
 }
 
 html,

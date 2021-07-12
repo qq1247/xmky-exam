@@ -1,5 +1,5 @@
 <template>
-  <el-popover placement="right" v-model="visible" @hide="hideHandler">
+  <el-popover placement="right" v-model="visible" @hide="hideHandler" trigger="focus">
     <!-- 打分间隔和分值 -->
     <div class="score-body">
       <div class="score-step">
@@ -50,11 +50,12 @@
       </el-button-group>
     </div>
     <el-input
+      :id="`i-${data.id}`"
       type="number"
       slot="reference"
       class="score-input"
       placeholder="请点击 | 输入分数"
-      :value="value"
+      :value="data.scorePlate"
       @input="input"
       @blur="blur"
     ></el-input>
@@ -64,17 +65,9 @@
 <script>
 export default {
   props: {
-    value: {
-      type: Number | String,
-      default: ''
-    },
-    maxScore: {
-      type: Number,
-      default: 0
-    },
-    position: {
-      type: String,
-      default: ''
+    data: {
+      type: Object,
+      default: {}
     }
   },
   data() {
@@ -113,17 +106,19 @@ export default {
     stepInput(e) {
       this.step = e
       if (e < 0) this.step = 0
-      if (Number(e) > this.maxScore) this.step = this.maxScore
+      if (Number(e) > this.data.score) this.step = this.data.score
       this.createScores(this.step)
     },
     hideHandler() {
       Object.assign(this.$data, this.$options.data())
     },
     prevQuestion() {
-      this.$emit('prevQuestion', this.position)
+      this.$emit('prevQuestion', this.data.id)
+      this.hideHandler()
     },
     nextQuestion() {
-      this.$emit('nextQuestion', this.position)
+      this.$emit('nextQuestion', this.data.id)
+      this.hideHandler()
     },
     prevPaper() {
       this.$emit('prevPaper')
