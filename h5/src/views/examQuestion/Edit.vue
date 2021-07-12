@@ -3,6 +3,8 @@
     <!-- 导航 -->
     <div class="head">
       <el-link class="head-left" :underline="false" @click="goBack" icon="el-icon-back">返回</el-link>
+      <span>{{ queryForm.name }}</span>
+      <div class="head-right"></div>
     </div>
     <!-- 搜索 -->
     <el-form :inline="true" :model="queryForm" class="form-inline search">
@@ -380,6 +382,8 @@ export default {
       queryForm: {
         // 查询表单
         id: "", // 主键
+        name: '', //导航栏名称
+        edit: false, //编辑权限
         title: "", // 标题
         type: null, // 类型
         difficulty: null, // 难度
@@ -498,9 +502,10 @@ export default {
     }
   },
   created() {
-    const { id, name } = this.$route.query
+    const { id, name, edit } = this.$route.query
     this.queryForm.questionTypeId = id
     this.queryForm.name = name
+    this.queryForm.edit = edit
     this.init()
   },
   methods: {
@@ -685,6 +690,10 @@ export default {
     },
     // 添加试题
     async add() {
+      if (this.queryForm.edit == 'false') {
+        this.$tools.message('暂无此项权限', 'warning')
+        return;
+      }
       this.$refs["editForm"].validate(async (valid) => {
         if (!valid) {
           return false
@@ -741,6 +750,10 @@ export default {
     },
     // 修改试题
     edit(newVer) {
+      if (this.queryForm.edit == 'false') {
+        this.$tools.message('暂无此项权限', 'warning')
+        return;
+      }
       this.$refs["editForm"].validate((valid) => {
         if (!valid) {
           return false
@@ -852,10 +865,18 @@ export default {
       }
     },
     async copy(id) {
+      if (this.queryForm.edit == 'false') {
+        this.$tools.message('暂无此项权限', 'warning')
+        return;
+      }
       await this.$https.questionCopy({ id })
       this.query()
     },
     del(id) {
+      if (this.queryForm.edit == 'false') {
+        this.$tools.message('暂无此项权限', 'warning')
+        return;
+      }
       this.$confirm("确定要删除？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -909,12 +930,24 @@ export default {
   width: 100%;
   height: 50px;
   background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
+  color: #fff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
   .head-left {
     color: #fff;
+  }
+  .head-right {
+    color: #fff;
+    .common {
+      font-size: 20px;
+    }
   }
 }
 

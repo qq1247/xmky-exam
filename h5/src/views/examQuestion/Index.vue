@@ -231,14 +231,22 @@ export default {
       })
     },
     // 编辑分类
-    edit({ id, name }) {
+    edit({ id, name, createUserId }) {
+      if (JSON.parse(this.$store.state.userInfo).userId != createUserId) {
+        this.$tools.message('暂无此项权限', 'warning')
+        return;
+      }
       this.examForm.edit = true
       this.examForm.id = id
       this.examForm.examName = name
       this.examForm.show = true
     },
     // 删除分类
-    async del({ id }) {
+    async del({ id, createUserId }) {
+      if (JSON.parse(this.$store.state.userInfo).userId != createUserId) {
+        this.$tools.message('暂无此项权限', 'warning')
+        return;
+      }
       const res = await this.$https.questionTypeDel({ id }).catch(err => { })
       res.code == 200
         ? (
@@ -275,7 +283,11 @@ export default {
       this.roleForm.writeRoleUser = e
     },
     // 权限人员信息
-    async role({ readUserIds, writeUserIds, id }) {
+    async role({ readUserIds, writeUserIds, id, createUserId }) {
+      if (JSON.parse(this.$store.state.userInfo).userId != createUserId) {
+        this.$tools.message('暂无此项权限', 'warning')
+        return;
+      }
       this.examForm.id = id
       this.roleForm.readRoleUser = readUserIds
         .split(",")
@@ -302,14 +314,19 @@ export default {
       }
     },
     // 试题开放
-    async open() {
+    async open({ createUserId }) {
+      if (JSON.parse(this.$store.state.userInfo).userId != createUserId) {
+        this.$tools.message('暂无此项权限', 'warning')
+        return;
+      }
       this.$tools.message("此功能开发中...", "info")
     },
     // 试题详情
-    goDetail({ id, name }) {
+    goDetail({ id, name, writeUserIds }) {
+      let edit = writeUserIds.split(',').includes(String(JSON.parse(this.$store.state.userInfo).userId))
       this.$router.push({
         path: "/examQuestion/Edit",
-        query: { id, name }
+        query: { id, name, edit }
       })
     },
     // 分页切换
