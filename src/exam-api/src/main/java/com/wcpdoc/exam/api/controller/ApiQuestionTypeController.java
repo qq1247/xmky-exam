@@ -54,7 +54,9 @@ public class ApiQuestionTypeController extends BaseController {
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
-			PageOut listpage = questionTypeService.getListpage(new PageIn(request));
+			PageIn pageIn = new PageIn(request);
+			pageIn.addAttr("curUserId", getCurUser().getId());
+			PageOut listpage = questionTypeService.getListpage(pageIn);
 			for(Map<String, Object> mapList : listpage.getList()){
 				if(mapList.get("readUserIds")!= null){
 					String[] readUserSplit = mapList.get("readUserIds").toString().subSequence(1, mapList.get("readUserIds").toString().length()).toString().split(",");

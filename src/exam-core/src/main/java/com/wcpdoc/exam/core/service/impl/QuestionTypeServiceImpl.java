@@ -79,8 +79,11 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		if(!ValidateUtil.isValid(name)) {
 			throw new MyException("参数错误：name");
 		}
-		
 		QuestionType entity = questionTypeDao.getEntity(id);
+		if (!entity.getWriteUserIds().contains(","+getCurUser().getId()+",")) {
+			throw new MyException("权限不足！");
+		}
+		
 		entity.setName(name);
 		/*if(questionTypeService.existName(entity)) {
 			throw new MyException("名称已存在！");
@@ -105,9 +108,12 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		if (ValidateUtil.isValid(list)) {
 			throw new MyException("请先删除试题分类下所有的试题！");
 		}
+		QuestionType questionType = getEntity(id);
+		if (!questionType.getWriteUserIds().contains(","+getCurUser().getId()+",")) {
+			throw new MyException("权限不足！");
+		}
 		
 		// 删除试题分类
-		QuestionType questionType = getEntity(id);
 		questionType.setState(0);
 		questionType.setUpdateTime(new Date());
 		questionType.setUpdateUserId(getCurUser().getId());

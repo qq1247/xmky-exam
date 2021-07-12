@@ -57,7 +57,9 @@ public class ApiExamTypeController extends BaseController {
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
-			PageOut listpage = examTypeService.getListpage(new PageIn(request));
+			PageIn pageIn = new PageIn(request);
+			pageIn.addAttr("curUserId", getCurUser().getId());
+			PageOut listpage = examTypeService.getListpage(pageIn);
 			for(Map<String, Object> mapList : listpage.getList()){
 				if(mapList.get("readUserIds")!= null){
 					String[] readUserSplit = mapList.get("readUserIds").toString().subSequence(1, mapList.get("readUserIds").toString().length()).toString().split(",");

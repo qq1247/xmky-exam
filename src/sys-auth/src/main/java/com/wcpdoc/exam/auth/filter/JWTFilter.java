@@ -105,7 +105,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 		
 		Date curTime = new Date();
 		long oldTokenTimestamp = oldTokenId;
-		if (curTime.getTime() - oldTokenTimestamp <= tokenRefreshMinute * 60 * 1000) {// 如果距离上次刷新不超过指定分钟，不处理
+		if (curTime.getTime() - oldTokenTimestamp <= tokenRefreshMinute * 60 * 1000) {// 如果距离上次刷新不超过指定分钟，不处理  
 			return;
 		}
 		
@@ -126,6 +126,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 		TokenCache.put(String.format("TOKEN_%s", oldUserId), newToken);
 		
 		// 放入http响应头，供前端替换使用
+		WebUtils.toHttp(response).setHeader("Access-Control-Expose-Headers", "Authorization"); //不加前端只显示，无法获取到自定义header字段
 		WebUtils.toHttp(response).setHeader("Authorization", newToken);
 	}
 

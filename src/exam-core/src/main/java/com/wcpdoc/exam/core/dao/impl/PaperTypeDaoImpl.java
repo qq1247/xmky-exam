@@ -1,10 +1,15 @@
 package com.wcpdoc.exam.core.dao.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Repository;
 
+import com.wcpdoc.exam.base.dao.UserDao;
+import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.core.dao.PaperTypeDao;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
@@ -22,7 +27,9 @@ import com.wcpdoc.exam.core.util.ValidateUtil;
  */
 @Repository
 public class PaperTypeDaoImpl extends RBaseDaoImpl<PaperType> implements PaperTypeDao {
-
+	@Resource
+	private UserDao userDao;
+	
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT PAPER_TYPE.* "
@@ -32,6 +39,22 @@ public class PaperTypeDaoImpl extends RBaseDaoImpl<PaperType> implements PaperTy
 				.addWhere("PAPER_TYPE.STATE = 1")
 				.addWhere("PAPER_TYPE.ID != 1")
 				.addOrder("PAPER_TYPE.UPDATE_TIME", Order.DESC);
+		
+		if (pageIn.get("curUserId", Integer.class) != null) {
+			User user = userDao.getEntity(pageIn.get("curUserId", Integer.class));
+			StringBuilder partSql = new StringBuilder();
+			List<Object> params = new ArrayList<>();
+			partSql.append("(");
+			partSql.append("PAPER_TYPE.READ_USER_IDS LIKE ? ");
+			params.add("%," + user.getId() + ",%");
+			
+			partSql.append("OR PAPER_TYPE.WRITE_USER_IDS LIKE ? ");
+			params.add("%," + user.getId() + ",%");
+			
+			partSql.append(")");
+			sqlUtil.addWhere(partSql.toString(), params.toArray(new Object[params.size()]));
+		}
+		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(), 
 				"updateTime", DateUtil.FORMAT_DATE_TIME, 

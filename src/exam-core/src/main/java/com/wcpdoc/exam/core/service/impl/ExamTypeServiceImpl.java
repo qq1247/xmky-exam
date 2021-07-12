@@ -82,9 +82,12 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 		if(existName(examType)) {
 			throw new MyException("名称已存在！");
 		}
+		ExamType entity = examTypeDao.getEntity(examType.getId());
+		if (!entity.getWriteUserIds().contains(","+getCurUser().getId()+",")) {
+			throw new MyException("权限不足！");
+		}
 		
 		//修改试题分类
-		ExamType entity = examTypeDao.getEntity(examType.getId());
 		entity.setName(examType.getName());
 		entity.setImgId(examType.getImgId());
 		entity.setUpdateTime(new Date());
@@ -105,9 +108,12 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 		if (ValidateUtil.isValid(examList)) {
 			throw new MyException("该考试分类下有试题，不允许删除！");
 		}
+		ExamType examType = getEntity(id);
+		if (!examType.getWriteUserIds().contains(","+getCurUser().getId()+",")) {
+			throw new MyException("权限不足！");
+		}
 		
 		// 删除试题分类
-		ExamType examType = getEntity(id);
 		examType.setState(0);
 		examType.setUpdateTime(new Date());
 		examType.setUpdateUserId(getCurUser().getId());

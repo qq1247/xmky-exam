@@ -531,7 +531,7 @@ code == 401 无权限或登录超时
 | data.name | String  | 名称     |
 | data.orgName | String  | 组织机构名称     |
 
-####考试试题列表：exam/markUserList
+####考试阅卷列表：exam/markUserList
 ######请求参数
 | 参数 | 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
