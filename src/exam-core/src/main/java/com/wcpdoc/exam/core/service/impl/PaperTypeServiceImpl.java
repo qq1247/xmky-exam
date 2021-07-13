@@ -54,9 +54,9 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 			throw new MyException("参数错误：name");
 		}
 		
-		if (existName(paperType)) {
+		/*if (existName(paperType)) {
 			throw new MyException("名称已存在！");
-		}
+		}*/
 				
 		// 添加试卷分类
 		paperType.setReadUserIds(","+getCurUser().getId()+",");
