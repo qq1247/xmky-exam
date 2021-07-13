@@ -240,6 +240,14 @@ public class ApiQuestionController extends BaseController {
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
 			questionService.add(entity);
+			
+			List<QuestionOption> questionOptionList = questionOptionService.getList(question.getId());
+			for (QuestionOption questionOption : questionOptionList) {
+				QuestionOption questionOptionNew = new QuestionOption();
+				BeanUtils.copyProperties(questionOptionNew, questionOption);
+				questionOptionNew.setQuestionId(entity.getId());
+				questionOptionService.add(questionOptionNew);
+			}
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("复制试题错误：{}", e.getMessage());

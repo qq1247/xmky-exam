@@ -122,7 +122,7 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 
 	@Override
 	public List<Question> getList(Integer questionTypeId) {
-		String sql = "SELECT * FROM EXM_QUESTION WHERE STATE = 1 AND QUESTION_TYPE_ID = ?";
+		String sql = "SELECT * FROM EXM_QUESTION WHERE STATE != 0 AND QUESTION_TYPE_ID = ?";
 		return getList(sql, new Object[] { questionTypeId }, Question.class);
 	}
 
