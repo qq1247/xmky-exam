@@ -68,6 +68,10 @@ export default {
         {
           content: '用户管理',
           to: '/user'
+        },
+        {
+          content: '基础管理',
+          to: '/base'
         }
       ],
     }
