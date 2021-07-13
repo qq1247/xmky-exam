@@ -83,22 +83,7 @@ public class ApiMyMarkController extends BaseController {
 			PageIn pageIn = new PageIn(request);
 			pageIn.addAttr("curUserId", getCurUser().getId())
 			  	  .addAttr("state", "1");
-			PageOut pageOut = myMarkService.getListpage(pageIn);
-			
-			Date curTime = new Date();
-			for(Map<String, Object> map : pageOut.getList()) {
-				Date startTime = (Date) map.get("markStartTime");
-				Date endTime = (Date) map.get("markEndTime");
-				if (startTime.getTime() > curTime.getTime()) {
-					map.put("examHand", "AWAIT");
-				} else if (startTime.getTime() <= curTime.getTime() && endTime.getTime() >= curTime.getTime()) {
-					map.put("examHand", "START");
-				} else {
-					map.put("examHand", "END");
-				}
-			}
-
-			return PageResultEx.ok().data(pageOut);
+			return PageResultEx.ok().data(myMarkService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("我的阅卷列表错误：", e);
 			return PageResult.err();
@@ -117,23 +102,9 @@ public class ApiMyMarkController extends BaseController {
 	public PageResult examListpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
-			pageIn.addAttr("CurUserId", getCurUser().getId());
+			pageIn.addAttr("curUserId", getCurUser().getId());
 			pageIn.addAttr("state", "1");
-			PageOut pageOut = examService.getListpage(pageIn);
-			
-			Date curTime = new Date();
-			for(Map<String, Object> map : pageOut.getList()) {
-				Date startTime = (Date) map.get("markStartTime");
-				Date endTime = (Date) map.get("markEndTime");
-				if (startTime.getTime() > curTime.getTime()) {
-					map.put("examHand", "AWAIT");
-				} else if (startTime.getTime() <= curTime.getTime() && endTime.getTime() >= curTime.getTime()) {
-					map.put("examHand", "START");
-				} else {
-					map.put("examHand", "END");
-				}
-			}
-			return PageResultEx.ok().data(pageOut);
+			return PageResultEx.ok().data(examService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("我的阅卷列表错误：", e);
 			return PageResult.err();

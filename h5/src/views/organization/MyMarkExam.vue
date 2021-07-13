@@ -1,65 +1,35 @@
 <template>
   <div class="container">
     <div class="content">
-      <div class="search">
-        <el-form :inline="true" :model="queryForm" class="form-inline" ref="queryForm">
-          <el-form-item label prop="examName">
-            <el-input placeholder="请输入考试名称" v-model="queryForm.examName"></el-input>
-          </el-form-item>
-          <el-form-item style="width: 200px">
-            <el-button @click="query" icon="el-icon-search" type="primary">查询</el-button>
-            <el-button @click="reset">重置</el-button>
-          </el-form-item>
-          <!-- <el-form-item>
-            <el-button
-              @click="editForm.show = true"
-              icon="el-icon-search"
-              type="primary"
-              >添加</el-button
-            >
-          </el-form-item>-->
-        </el-form>
-      </div>
+      <el-form :inline="true" :model="queryForm" ref="queryForm">
+        <el-row>
+          <el-col :span="17">
+            <el-form-item label prop="userName">
+              <el-input @focus="queryForm.queryShow = true" placeholder="请输入用户名称" v-model="queryForm.userName"></el-input>
+            </el-form-item>
+            <el-button @click="query" class="query-search" icon="el-icon-search" type="primary">查询</el-button>
+          </el-col>
+          <el-col :span="7">
+            <el-form-item style="float:right;"></el-form-item>
+          </el-col>
+        </el-row>
+        <div v-if="queryForm.queryShow"></div>
+      </el-form>
       <div class="table">
         <el-table :data="listpage.list" style="width: 100%">
-          <el-table-column label="考试名称">
+          <el-table-column label="用户">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.name }}</span>
+              <span style="margin-left: 10px">{{ scope.row.userName }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="考试开始时间">
+          <el-table-column label="分数">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.startTimeStr }}</span>
+              <span style="margin-left: 10px">{{ scope.row.myExamTotalScore }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="考试结束时间">
+          <el-table-column label="状态">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.endTimeStr }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="阅卷开始时间">
-            <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.markStartTimeStr }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="阅卷结束时间">
-            <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.markEndTimeStr }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="试卷及格分数">
-            <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.paperPassScore }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="试卷总分">
-            <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.paperTotleScore }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="考试人数">
-            <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.userNum }}</span>
+              <span style="margin-left: 10px">{{ scope.row.myExamStateName }}/{{ scope.row.myExamMarkStateName }}</span>
             </template>
           </el-table-column>
           <!-- <el-table-column label="操作">
@@ -72,15 +42,7 @@
           </el-table-column>-->
         </el-table>
       </div>
-      <el-pagination
-        :current-page="listpage.curPage"
-        :page-size="listpage.pageSize"
-        :page-sizes="listpage.pageSizes"
-        :total="listpage.total"
-        @current-change="handleCurrentChange"
-        @size-change="handleSizeChange"
-        layout="total, sizes, prev, pager, next, jumper"
-      ></el-pagination>
+      <el-pagination :current-page="listpage.curPage" :page-size="listpage.pageSize" :total="listpage.total" @current-change="pageChange" background hide-on-single-page layout="prev, pager, next" next-text="下一页" prev-text="上一页"></el-pagination>
     </div>
     <el-dialog :visible.sync="editForm.show" title="更新答案">
       <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
@@ -111,7 +73,7 @@ export default {
       },
       queryForm: {
         //查询表单
-        examName: null,
+        userName: null,
       },
       editForm: {
         //修改表单
@@ -120,7 +82,7 @@ export default {
         show: false, // 是否显示页面
         rules: {
           //校验
-          answer: [{ required: true, message: "请输入答案", trigger: "change" }],
+          answer: [{ required: true, message: '请输入答案', trigger: 'change' }],
         },
       },
     };
@@ -134,97 +96,24 @@ export default {
       let {
         data: { list, total },
       } = await this.$https.myMarkExamListPage({
-        examName: this.queryForm.examName,
+        userName: this.queryForm.userName,
         curPage: this.listpage.curPage,
         pageSize: this.listpage.pageSize,
       });
       this.listpage.total = total;
       this.listpage.list = list;
     },
-    // 重置
-    async reset() {
-      this.listpage.curPage = 1;
-      this.$refs["queryForm"].resetFields();
-      this.query();
-    },
-    handleSizeChange(val) {
+    sizeChange(val) {
       this.listpage.pageSize = val;
       this.query();
     },
-    handleCurrentChange(val) {
+    pageChange(val) {
       this.listpage.curPage = val;
       this.query();
     },
     // 初始化
     async init() {
       this.query();
-    },
-    add() {
-      this.$refs["editForm"].validate(async (valid) => {
-        if (!valid) {
-          return false;
-        }
-
-        let { code, msg } = await this.$https.myMarkAdd({
-          no: this.editForm.no,
-        });
-        if (code != 200) {
-          alert(msg);
-          return;
-        }
-
-        this.editForm.show = false;
-        this.query();
-      });
-    },
-    edit() {
-      this.$refs["editForm"].validate(async (valid) => {
-        if (!valid) {
-          return false;
-        }
-
-        let { code, msg } = await this.$https.myMarkEdit({
-          id: this.editForm.id,
-          no: this.editForm.no,
-        });
-        if (code != 200) {
-          alert(msg);
-          return;
-        }
-
-        this.editForm.show = false;
-        this.query();
-      });
-    },
-    // 获取试题
-    async get(id) {
-      let res = await this.$https.myMarkGet({ id: id });
-      if (res.code != 200) {
-        alert(res.msg);
-        return;
-      }
-
-      this.editForm.show = true;
-      this.editForm.id = res.data.id;
-      this.editForm.no = res.data.no;
-    },
-    // 删除
-    async del(id) {
-      this.$confirm("确定要删除？", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      }).then(async () => {
-        let res = await this.$https.myMarkDel({ id });
-        if (res.code != 200) {
-          this.$message({
-            type: "error",
-            message: res.msg,
-          });
-        }
-
-        this.query();
-      });
     },
   },
 };
@@ -235,13 +124,13 @@ export default {
   align-items: center;
   padding-top: 120px;
   .content {
-    width: 1200px;
-    .search {
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-start;
-    }
+    width: 1170px;
   }
+}
+.query-search {
+  width: 150px;
+  height: 40px;
+  border-radius: 5px;
 }
 .el-input {
   width: 300px;
@@ -253,5 +142,52 @@ export default {
 
 .el-dialog__title {
   float: left;
+}
+/deep/ .el-table th {
+  background-color: #d3dce6;
+  color: #475669;
+  text-align: center;
+  height: 55px;
+}
+/deep/ .el-table td {
+  color: #8392a6;
+  font-size: 12px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+/deep/ .common {
+  padding-right: 10px;
+  color: #0096e7;
+  font-style: inherit;
+  font-weight: bold;
+}
+.el-link {
+  padding-right: 20px;
+  color: #8392a6;
+  font-size: 12px;
+}
+/deep/ .el-input__inner:focus {
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+  border: 1px solid #f2f4f5;
+}
+.common-arrow-down {
+  margin-left: 10px;
+  color: #999;
+  font-size: 12px;
+}
+
+/deep/.el-pagination.is-background .el-pager li:not(.disabled).active {
+  background-color: #0095e5;
+  color: #fff;
+}
+
+/deep/.el-pagination.is-background .btn-next,
+/deep/.el-pagination.is-background .btn-prev,
+/deep/.el-pagination.is-background .el-pager li {
+  margin: 0 3px;
+  min-width: 35px;
+  border: 1px solid #d4dfd9;
+  background-color: #fff;
+  padding: 0 10px;
 }
 </style>
