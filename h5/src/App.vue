@@ -64,6 +64,10 @@ export default {
         {
           content: '我的',
           to: '/my'
+        },
+        {
+          content: '用户管理',
+          to: '/user'
         }
       ],
     }
@@ -93,7 +97,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import url(//at.alicdn.com/t/font_840312_muzyz91khzi.css);
+@import url(//at.alicdn.com/t/font_840312_polq493yfqg.css);
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

@@ -11,7 +11,8 @@
           </el-col>
           <el-col :span="7">
             <el-form-item style="float:right;">
-              <el-button @click="editForm.show = true" icon="el-icon-circle-plus-outline" size="mini" type="primary">添加</el-button>
+              <el-button @click="editForm.show = true" icon="el-icon-circle-plus-outline" size="mini" type="primary">添加用户</el-button>
+              <el-button @click="toOrg" icon="el-icon-circle-plus-outline" size="mini" type="primary">添加机构</el-button>
             </el-form-item>
           </el-col>
         </el-row>
@@ -287,6 +288,9 @@ export default {
     resetData(name) {
       this.$tools.resetData(this, name);
     },
+    toOrg() {
+      window.open("/user/org", "_blank")
+    }
   },
 };
 </script>

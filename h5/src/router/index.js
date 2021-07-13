@@ -61,15 +61,16 @@ const routes = [
     name: 'OrgCron',
     component: () => import('../views/organization/Cron.vue')
   },
+  // 用户相关
   {
-    path: '/organization/user',
-    name: 'OrgUser',
-    component: () => import('../views/organization/User.vue')
+    path: '/user',
+    name: 'User',
+    component: () => import('../views/user/User.vue')
   },
   {
-    path: '/organization/org',
-    name: 'Org',
-    component: () => import('../views/organization/Org.vue')
+    path: '/user/org',
+    name: 'UserOrg',
+    component: () => import('../views/user/Org.vue')
   },
   {
     path: '/organization/parm',
