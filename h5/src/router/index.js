@@ -136,7 +136,7 @@ router.beforeEach((to, from, next) => {
       Message({
         message: '请您重新登录',
         duration: 2000,
-        type: 'warning'
+        type: 'warning',
       })
       next({
         path: '/login',

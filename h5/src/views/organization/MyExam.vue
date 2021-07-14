@@ -15,7 +15,8 @@
             ></el-input>
           </el-form-item>
           <el-form-item style="width: 200px">
-            <el-button @click="query" icon="el-icon-search" type="primary"
+            <el-button @click="query" icon="el-icon-search"
+type="primary"
               >查询</el-button
             >
             <el-button @click="reset">重置</el-button>
@@ -39,12 +40,16 @@
           </el-table-column>
           <el-table-column label="考试开始时间">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.examStartTimeStr }}</span>
+              <span style="margin-left: 10px">{{
+                scope.row.examStartTimeStr
+              }}</span>
             </template>
           </el-table-column>
           <el-table-column label="考试结束时间">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.examEndTimeStr }}</span>
+              <span style="margin-left: 10px">{{
+                scope.row.examEndTimeStr
+              }}</span>
             </template>
           </el-table-column>
           <el-table-column label="考试用户id">
@@ -59,12 +64,16 @@
           </el-table-column>
           <el-table-column label="答题开始时间">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.answerStartTimeStr }}</span>
+              <span style="margin-left: 10px">{{
+                scope.row.answerStartTimeStr
+              }}</span>
             </template>
           </el-table-column>
           <el-table-column label="答题结束时间">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.answerEndTimeStr }}</span>
+              <span style="margin-left: 10px">{{
+                scope.row.answerEndTimeStr
+              }}</span>
             </template>
           </el-table-column>
           <el-table-column label="阅卷人id">
@@ -74,27 +83,35 @@
           </el-table-column>
           <el-table-column label="阅卷人名称">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.markUserName }}</span>
+              <span style="margin-left: 10px">{{
+                scope.row.markUserName
+              }}</span>
             </template>
           </el-table-column>
           <el-table-column label="阅卷开始时间">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.markStartTimeStr }}</span>
+              <span style="margin-left: 10px">{{
+                scope.row.markStartTimeStr
+              }}</span>
             </template>
           </el-table-column>
           <el-table-column label="阅卷结束时间">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.markEndTimeStr }}</span>
+              <span style="margin-left: 10px">{{
+                scope.row.markEndTimeStr
+              }}</span>
             </template>
           </el-table-column>
           <el-table-column label="试卷总分">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.paperTotalScore }}</span>
+              <span style="margin-left: 10px">{{
+                scope.row.paperTotalScore
+              }}</span>
             </template>
           </el-table-column>
           <el-table-column label="试卷得分">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.totalScore}}</span>
+              <span style="margin-left: 10px">{{ scope.row.totalScore }}</span>
             </template>
           </el-table-column>
           <el-table-column label="考试状态">
@@ -114,7 +131,9 @@
           </el-table-column>
           <el-table-column label="阅卷状态名称">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.markStateName }}</span>
+              <span style="margin-left: 10px">{{
+                scope.row.markStateName
+              }}</span>
             </template>
           </el-table-column>
           <el-table-column label="答题状态">
@@ -124,7 +143,9 @@
           </el-table-column>
           <el-table-column label="答题状态名称">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.answerStateName }}</span>
+              <span style="margin-left: 10px">{{
+                scope.row.answerStateName
+              }}</span>
             </template>
           </el-table-column>
           <!-- <el-table-column label="操作">
@@ -157,10 +178,12 @@
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="add" type="primary" v-if="editForm.id == null"
+        <el-button @click="add" type="primary"
+v-if="editForm.id == null"
           >添加</el-button
         >
-        <el-button @click="edit" type="primary" v-if="editForm.id != null"
+        <el-button @click="edit" type="primary"
+v-if="editForm.id != null"
           >修改</el-button
         >
         <el-button @click="editForm.show = false">取 消</el-button>
@@ -174,132 +197,134 @@ export default {
   data() {
     return {
       listpage: {
-        //列表数据
+        // 列表数据
         total: 0, // 总条数
-        curPage: 1, //当前第几页
-        pageSize: 10, //每页多少条
-        pageSizes: [10, 20, 50, 100], //每页多少条
-        list: [], //列表数据
+        curPage: 1, // 当前第几页
+        pageSize: 10, // 每页多少条
+        pageSizes: [10, 20, 50, 100], // 每页多少条
+        list: [], // 列表数据
       },
       queryForm: {
-        //查询表单
+        // 查询表单
         examName: null,
       },
       editForm: {
-        //修改表单
-        id: null, //主键
-        answer: null, //答案
+        // 修改表单
+        id: null, // 主键
+        answer: null, // 答案
         show: false, // 是否显示页面
         rules: {
-          //校验
-          answer: [{ required: true, message: "请输入答案", trigger: "change" }],
+          // 校验
+          answer: [
+            { required: true, message: '请输入答案', trigger: 'change' },
+          ],
         },
       },
-    };
+    }
   },
   created() {
-    this.init();
+    this.init()
   },
   methods: {
     // 查询
     async query() {
-      let {
+      const {
         data: { list, total },
       } = await this.$https.myExamListpage({
         examName: this.queryForm.examName,
         curPage: this.listpage.curPage,
         pageSize: this.listpage.pageSize,
-      });
-      this.listpage.total = total;
-      this.listpage.list = list;
+      })
+      this.listpage.total = total
+      this.listpage.list = list
     },
     // 重置
     async reset() {
-      this.listpage.curPage = 1;
-      this.$refs["queryForm"].resetFields();
-      this.query();
+      this.listpage.curPage = 1
+      this.$refs['queryForm'].resetFields()
+      this.query()
     },
     handleSizeChange(val) {
-      this.listpage.pageSize = val;
-      this.query();
+      this.listpage.pageSize = val
+      this.query()
     },
     handleCurrentChange(val) {
-      this.listpage.curPage = val;
-      this.query();
+      this.listpage.curPage = val
+      this.query()
     },
     // 初始化
     async init() {
-      this.query();
+      this.query()
     },
     add() {
-      this.$refs["editForm"].validate(async (valid) => {
+      this.$refs['editForm'].validate(async (valid) => {
         if (!valid) {
-          return false;
+          return false
         }
 
-        let { code, msg } = await this.$https.myExamAdd({
+        const { code, msg } = await this.$https.myExamAdd({
           no: this.editForm.no,
-        });
+        })
         if (code != 200) {
-          alert(msg);
-          return;
+          alert(msg)
+          return
         }
 
-        this.editForm.show = false;
-        this.query();
-      });
+        this.editForm.show = false
+        this.query()
+      })
     },
     edit() {
-      this.$refs["editForm"].validate(async (valid) => {
+      this.$refs['editForm'].validate(async (valid) => {
         if (!valid) {
-          return false;
+          return false
         }
 
-        let { code, msg } = await this.$https.myExamEdit({
+        const { code, msg } = await this.$https.myExamEdit({
           id: this.editForm.id,
           no: this.editForm.no,
-        });
+        })
         if (code != 200) {
-          alert(msg);
-          return;
+          alert(msg)
+          return
         }
 
-        this.editForm.show = false;
-        this.query();
-      });
+        this.editForm.show = false
+        this.query()
+      })
     },
     // 获取试题
     async get(id) {
-      let res = await this.$https.myExamGet({ id: id });
-      if (res.code != 200) {
-        alert(res.msg);
-        return;
+      const res = await this.$https.myExamGet({ id: id })
+      if (res?.code != 200) {
+        alert(res.msg)
+        return
       }
 
-      this.editForm.show = true;
-      this.editForm.id = res.data.id;
-      this.editForm.no = res.data.no;
+      this.editForm.show = true
+      this.editForm.id = res.data.id
+      this.editForm.no = res.data.no
     },
     // 删除
     async del(id) {
-      this.$confirm("确定要删除？", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
+      this.$confirm('确定要删除？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
       }).then(async () => {
-        let res = await this.$https.myExamDel({ id });
-        if (res.code != 200) {
+        const res = await this.$https.myExamDel({ id })
+        if (res?.code != 200) {
           this.$message({
-            type: "error",
+            type: 'error',
             message: res.msg,
-          });
+          })
         }
 
-        this.query();
-      });
+        this.query()
+      })
     },
   },
-};
+}
 </script>
 <style lang="scss" scoped>
 .container {

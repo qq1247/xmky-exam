@@ -223,35 +223,35 @@ const difficulty = [
     no: 1,
     id: 13,
     dictKey: '1',
-    dictIndex: 'QUESTION_DIFFICULTY'
+    dictIndex: 'QUESTION_DIFFICULTY',
   },
   {
     dictValue: '简单',
     no: 2,
     id: 14,
     dictKey: '2',
-    dictIndex: 'QUESTION_DIFFICULTY'
+    dictIndex: 'QUESTION_DIFFICULTY',
   },
   {
     dictValue: '适中',
     no: 3,
     id: 15,
     dictKey: '3',
-    dictIndex: 'QUESTION_DIFFICULTY'
+    dictIndex: 'QUESTION_DIFFICULTY',
   },
   {
     dictValue: '困难',
     no: 4,
     id: 16,
     dictKey: '4',
-    dictIndex: 'QUESTION_DIFFICULTY'
+    dictIndex: 'QUESTION_DIFFICULTY',
   },
   {
     dictValue: '极难',
     no: 5,
     id: 17,
     dictKey: '5',
-    dictIndex: 'QUESTION_DIFFICULTY'
+    dictIndex: 'QUESTION_DIFFICULTY',
   }
 ]
 
@@ -264,16 +264,22 @@ const questionType = [
     no: 3,
     id: 10,
     dictKey: '3',
-    dictIndex: 'QUESTION_TYPE'
+    dictIndex: 'QUESTION_TYPE',
   },
   {
     dictValue: '判断',
     no: 4,
     id: 11,
     dictKey: '4',
-    dictIndex: 'QUESTION_TYPE'
+    dictIndex: 'QUESTION_TYPE',
   },
-  { dictValue: '问答', no: 5, id: 12, dictKey: '5', dictIndex: 'QUESTION_TYPE' }
+  {
+    dictValue: '问答',
+    no: 5,
+    id: 12,
+    dictKey: '5',
+    dictIndex: 'QUESTION_TYPE',
+  }
 ]
 
 const cardList = {
@@ -330,7 +336,7 @@ const paperList = {
             '<p>abstract修饰符可修饰字段、方法和类</p>',
             '<p>抽象方法的body部分必须用一对大括号{ }包住</p>',
             '<p>声明抽象方法，大括号可有可无</p>',
-            '<p>声明抽象方法不可写出大括号</p>'
+            '<p>声明抽象方法不可写出大括号</p>',
           ],
           id: 1
         }
@@ -360,7 +366,7 @@ const paperList = {
             '<p>&lt;%-- &nbsp;与 --%&gt;</p>',
             '<p>/</p>',
             '<p>/** 与 **/</p>',
-            '<p>&lt;!-- 与 --&gt;</p>'
+            '<p>&lt;!-- 与 --&gt;</p>',
           ],
           id: 2
         }
@@ -465,7 +471,7 @@ const paperIntro = {
     options: '',
     minimizeNum: null,
     updateUserId: 2,
-    updateTime: '2021-07-02 11:12:03'
+    updateTime: '2021-07-02 11:12:03',
   }
 }
 
@@ -547,7 +553,7 @@ const editQuestionList = [
       '<p>abstract修饰符可修饰字段、方法和类</p>',
       '<p>抽象方法的body部分必须用一对大括号{ }包住</p>',
       '<p>声明抽象方法，大括号可有可无</p>',
-      '<p>声明抽象方法不可写出大括号</p>'
+      '<p>声明抽象方法不可写出大括号</p>',
     ],
     answers: ['D'],
     scoreOptions: null,
@@ -567,7 +573,7 @@ const editQuestionList = [
       '<p>&lt;%-- &nbsp;与 --%&gt;</p>',
       '<p>/</p>',
       '<p>/** 与 **/</p>',
-      '<p>&lt;!-- 与 --&gt;</p>'
+      '<p>&lt;!-- 与 --&gt;</p>',
     ],
     answers: ['A', 'D'],
     scoreOptions: null,
@@ -612,7 +618,7 @@ const editQuestionList = [
     no: 1,
     options: [],
     answers: [
-      '<p>string是final的，内部用一个final类型的char数组存储数据，它的拼接效率比较低，实际上是通过建立一个StringBuffer'
+      '<p>string是final的，内部用一个final类型的char数组存储数据，它的拼接效率比较低，实际上是通过建立一个StringBuffer',
     ],
     scoreOptions: null,
     id: 5,

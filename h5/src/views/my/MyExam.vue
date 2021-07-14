@@ -2,7 +2,13 @@
   <div class="container">
     <!-- 导航 -->
     <div class="head">
-      <el-link :underline="false" @click="goBack" class="head-left" icon="el-icon-back">返回</el-link>
+      <el-link
+        :underline="false"
+        @click="goBack"
+        class="head-left"
+        icon="el-icon-back"
+        >返回</el-link
+      >
       <span>{{ paperName }}</span>
       <el-link :underline="false" class="head-right">
         <i class="common common-explain"></i>
@@ -16,13 +22,19 @@
         <div class="paper-intro">{{ paper.id }}</div>
 
         <template v-if="paperQuestion.length > 0">
-          <div :key="index" class="drag-item drag-content" v-for="(item, index) in paperQuestion">
+          <div
+            :key="index"
+            class="drag-item drag-content"
+            v-for="(item, index) in paperQuestion"
+          >
             <div class="chapter">
               <div class="chapter-item">
                 <div class="item-title">{{ item.chapter.name }}</div>
                 <div></div>
               </div>
-              <div class="chapter-description">{{ item.chapter.description }}</div>
+              <div class="chapter-description">
+                {{ item.chapter.description }}
+              </div>
             </div>
 
             <div
@@ -39,12 +51,16 @@
                   class="children-content"
                   v-for="(child, index) in item.questionList"
                 >
-                  <p v-html="(index + 1) + '、' + child.title"></p>
+                  <p v-html="index + 1 + '、' + child.title"></p>
 
                   <!-- 单选 -->
                   <template v-if="child.type === 1">
                     <el-radio-group
-                      @change="((val) => { updateAnswer(child.id, val) })"
+                      @change="
+                        (val) => {
+                          updateAnswer(child.id, val)
+                        }
+                      "
                       class="children-option"
                       v-model="myExamDetailCache[child.id].answers[0]"
                     >
@@ -54,7 +70,11 @@
                         class="option-item"
                         v-for="(option, index) in child.options"
                       >
-                        <span v-html="`${String.fromCharCode(65 + index)}、${option}`"></span>
+                        <span
+                          v-html="
+                            `${String.fromCharCode(65 + index)}、${option}`
+                          "
+                        ></span>
                       </el-radio>
                     </el-radio-group>
                   </template>
@@ -62,7 +82,11 @@
                   <!-- 多选 -->
                   <template v-if="child.type === 2">
                     <el-checkbox-group
-                      @change="((val) => { updateAnswer(child.id, val) })"
+                      @change="
+                        (val) => {
+                          updateAnswer(child.id, val)
+                        }
+                      "
                       class="children-option"
                       v-model="myExamDetailCache[child.id].answers"
                     >
@@ -72,7 +96,11 @@
                         class="option-item"
                         v-for="(option, index) in child.options"
                       >
-                        <span v-html="`${String.fromCharCode(65 + index)}、${option}`"></span>
+                        <span
+                          v-html="
+                            `${String.fromCharCode(65 + index)}、${option}`
+                          "
+                        ></span>
                       </el-checkbox>
                     </el-checkbox-group>
                   </template>
@@ -81,10 +109,20 @@
                   <template v-if="child.type === 3">
                     <el-input
                       class="question-text"
-                      @change="((val) => { updateFillBlanksAnswer(child.id, val, child.answers, index) })"
+                      @change="
+                        (val) => {
+                          updateFillBlanksAnswer(
+                            child.id,
+                            val,
+                            child.answers,
+                            index
+                          )
+                        }
+                      "
                       placeholder="请输入内容"
                       :key="index"
-                      v-for="(answer, index) in myExamDetailCache[child.id].answers"
+                      v-for="(answer, index) in myExamDetailCache[child.id]
+                        .answers"
                       v-model="myExamDetailCache[child.id].answers[index]"
                     >
                       <template slot="prepend">第{{ index + 1 }}空</template>
@@ -94,7 +132,11 @@
                   <!-- 判断 -->
                   <template v-if="child.type === 4">
                     <el-radio-group
-                      @change="((val) => { updateAnswer(child.id, val) })"
+                      @change="
+                        (val) => {
+                          updateAnswer(child.id, val)
+                        }
+                      "
                       class="children-option"
                       v-model="myExamDetailCache[child.id].answers[0]"
                     >
@@ -102,8 +144,9 @@
                         :key="index"
                         :label="option"
                         class="option-item"
-                        v-for="(option, index) in ['对','错']"
-                      >{{ option }}</el-radio>
+                        v-for="(option, index) in ['对', '错']"
+                        >{{ option }}</el-radio
+                      >
                     </el-radio-group>
                   </template>
 
@@ -112,7 +155,11 @@
                     <el-input
                       :rows="2"
                       class="question-text"
-                      @change="((val) => { updateAnswer(child.id, val) })"
+                      @change="
+                        (val) => {
+                          updateAnswer(child.id, val)
+                        }
+                      "
                       placeholder="请输入内容"
                       type="textarea"
                       v-model="myExamDetailCache[child.id].answers[0]"
@@ -129,23 +176,30 @@
         </div>
       </div>
 
-      <el-collapse class="exam-card" v-if="paperQuestion.length > 0" v-model="collapseShow">
+      <el-collapse
+        class="exam-card"
+        v-if="paperQuestion.length > 0"
+        v-model="collapseShow"
+      >
         <template v-if="view == 'false'">
           <div class="exam-head">答题卡</div>
-          <div class="exam-time">倒计时：{{ `${hr}小时${min}分钟${sec}秒` }}</div>
+          <div class="exam-time">
+            倒计时：{{ `${hr}小时${min}分钟${sec}秒` }}
+          </div>
         </template>
         <el-collapse-item
           :key="item.id"
           :name="index"
           :title="item.chapter.name"
-          v-for="(item,index) in paperQuestion"
+          v-for="(item, index) in paperQuestion"
           v-model="questionRouter"
         >
           <a
             @click="toHref(child.id)"
             v-for="(child, index) in item.questionList"
             :key="child.id"
-          >{{ index + 1 }}</a>
+            >{{ index + 1 }}</a
+          >
         </el-collapse-item>
         <div v-if="view == 'false'" class="exam-footer">提交</div>
       </el-collapse>
@@ -179,17 +233,17 @@ export default {
       hr: 0,
       min: 0,
       sec: 0,
-    };
+    }
   },
   created() {
-    const { id, paperId, view, examEndTime } = this.$route.query;
-    this.id = id;
-    this.paperId = paperId;
-    this.view = view;
+    const { id, paperId, view, examEndTime } = this.$route.query
+    this.id = id
+    this.paperId = paperId
+    this.view = view
     this.examEndTime = examEndTime
-    this.init();
+    this.init()
     this._interval = setInterval(() => {
-      this.countdown();
+      this.countdown()
     }, 1000)
   },
   destroyed() {
@@ -198,28 +252,28 @@ export default {
   methods: {
     // 倒计时
     countdown() {
-      const end = Date.parse(new Date(this.examEndTime));
-      const now = Date.parse(new Date());
-      const msec = Math.abs(end - (now + this.timeDiff));
-      let day = parseInt(msec / 1000 / 60 / 60 / 24);
-      let hr = parseInt(msec / 1000 / 60 / 60 % 24);
-      let min = parseInt(msec / 1000 / 60 % 60);
-      let sec = parseInt(msec / 1000 % 60);
-      this.day = day;
-      this.hr = String(hr).padStart(2, '0');
-      this.min = String(min).padStart(2, '0');
-      this.sec = String(sec).padStart(2, '0');
+      const end = Date.parse(new Date(this.examEndTime))
+      const now = Date.parse(new Date())
+      const msec = Math.abs(end - (now + this.timeDiff))
+      const day = parseInt(msec / 1000 / 60 / 60 / 24)
+      const hr = parseInt((msec / 1000 / 60 / 60) % 24)
+      const min = parseInt((msec / 1000 / 60) % 60)
+      const sec = parseInt((msec / 1000) % 60)
+      this.day = day
+      this.hr = String(hr).padStart(2, '0')
+      this.min = String(min).padStart(2, '0')
+      this.sec = String(sec).padStart(2, '0')
     },
     // 返回
     goBack() {
-      this.$router.push('/my');
+      this.$router.back()
     },
     // 初始化
     async init() {
       await this.setTime()
-      await this.queryPaper();
-      await this.queryPaperInfo();
-      await this.queryMyExamAnswerInfo();
+      await this.queryPaper()
+      await this.queryPaperInfo()
+      await this.queryMyExamAnswerInfo()
     },
     async setTime() {
       const systemTime = await this.$https.loginSysTime({})
@@ -230,43 +284,46 @@ export default {
       try {
         const res = await this.$https.paperGet({
           id: this.paperId,
-        });
-        this.paper = { ...res.data };
-      } catch (error) { }
+        })
+        this.paper = { ...res.data }
+      } catch (error) {}
     },
     // 查询试卷信息
     async queryPaperInfo() {
       try {
         const res = await this.$https.paperQuestionList({
           id: this.paperId,
-        });
+        })
         res.data.map((item) => {
-          item.chapter.show = true;
-        });
-        this.paperQuestion = res.data;
+          item.chapter.show = true
+        })
+        this.paperQuestion = res.data
         this.questionRouter = Array.from(res.data.keys())
-      } catch (error) { }
+      } catch (error) {}
     },
     // 查询我的答案信息
     async queryMyExamAnswerInfo() {
       try {
         const res = await this.$https.myExamAnswerList({
           id: this.id,
-        });
+        })
 
-        let paperQuestion = this.paperQuestion.reduce((acc, cur) => {
+        const paperQuestion = this.paperQuestion.reduce((acc, cur) => {
           acc.push(...cur.questionList)
           return acc
         }, [])
 
         this.myExamDetailCache = res.data.reduce((acc, cur, index) => {
-          if (cur.questionType === 3 && paperQuestion[index].id === cur.questionId) {
+          if (
+            cur.questionType === 3 &&
+            paperQuestion[index].id === cur.questionId
+          ) {
             cur.answers.length = paperQuestion[index].answers.length
           }
 
-          acc[cur.questionId] = cur;
-          return acc;
-        }, {});
+          acc[cur.questionId] = cur
+          return acc
+        }, {})
       } catch (error) {
         this.$tools.message(error, 'error')
       }
@@ -274,35 +331,36 @@ export default {
     // 更新答案
     async updateAnswer(questionId, answers) {
       if (!this.myExamDetailCache[questionId]) {
-        this.$tools.message('更新答案失败，请联系管理员', 'error')
-        return;
+        this.$tools.message('更新答案失败，请联系管理员！', 'error')
+        return
       }
 
       const res = await this.$https.myExamUpdateAnswer({
         myExamDetailId: this.myExamDetailCache[questionId].myExamDetailId,
         answers: answers,
-      });
+      })
     },
     // 更新填空答案
     async updateFillBlanksAnswer(questionId, val, answers, index) {
       if (!this.myExamDetailCache[questionId]) {
-        this.$tools.message('更新答案失败，请联系管理员', 'error')
-        return;
+        this.$tools.message('更新答案失败，请联系管理员！', 'error')
+        return
       }
 
-      answers[index] = val;
+      answers[index] = val
       const res = await this.$https.myExamUpdateAnswer({
         myExamDetailId: this.myExamDetailCache[questionId].myExamDetailId,
         answers: answers,
-      });
+      })
     },
     // 定位锚点
     toHref(id) {
-      this.hrefPointer = `#p-${id}`;
-      document.documentElement.scrollTop = (document.querySelector(this.hrefPointer).offsetTop - 50)
-    }
-  }
-};
+      this.hrefPointer = `#p-${id}`
+      document.documentElement.scrollTop =
+        document.querySelector(this.hrefPointer).offsetTop - 50
+    },
+  },
+}
 </script>
 <style lang="scss" scoped>
 .container {
@@ -503,7 +561,7 @@ export default {
 }
 .exam-card {
   width: 214px;
-  font-family: "Microsoft YaHei";
+  font-family: 'Microsoft YaHei';
   border: 1px solid #e6e6e6;
   position: fixed;
   right: 50px;

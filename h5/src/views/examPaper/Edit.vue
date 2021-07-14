@@ -2,7 +2,13 @@
   <div class="container">
     <!-- 导航 -->
     <div class="head">
-      <el-link class="head-left" :underline="false" @click="goBack" icon="el-icon-back">返回</el-link>
+      <el-link
+        class="head-left"
+        :underline="false"
+        @click="goBack"
+        icon="el-icon-back"
+        >返回</el-link
+      >
       <span>{{ paperName }}</span>
       <el-link class="head-right" :underline="false">
         <i class="common common-explain"></i>
@@ -22,14 +28,27 @@
             size="mini"
           >
             <el-form-item label="题目类型" prop="name">
-              <el-input placeholder="请输入章节名称" v-model="chapterForm.name"></el-input>
+              <el-input
+                placeholder="请输入章节名称"
+                v-model="chapterForm.name"
+              ></el-input>
             </el-form-item>
             <el-form-item label="描述">
-              <el-input placeholder="请输入描述" v-model="chapterForm.description"></el-input>
+              <el-input
+                placeholder="请输入描述"
+                v-model="chapterForm.description"
+              ></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="paperChapterAdd">添加</el-button>
-              <el-button type="primary" v-if="chapterForm.edit" @click="paperChapterEdit">修改</el-button>
+              <el-button type="primary" @click="paperChapterAdd"
+                >添加</el-button
+              >
+              <el-button
+                type="primary"
+                v-if="chapterForm.edit"
+                @click="paperChapterEdit"
+                >修改</el-button
+              >
             </el-form-item>
           </el-form>
           <div class="left-top">添加试题</div>
@@ -42,10 +61,16 @@
             size="mini"
           >
             <el-form-item>
-              <el-input placeholder="请输入试题名称" v-model="queryForm.questionTypeName"></el-input>
+              <el-input
+                placeholder="请查询试题分类"
+                v-model="queryForm.questionTypeName"
+              ></el-input>
             </el-form-item>
             <el-form-item>
-              <el-input placeholder="请输入题干" v-model="queryForm.title"></el-input>
+              <el-input
+                placeholder="请输入题干"
+                v-model="queryForm.title"
+              ></el-input>
             </el-form-item>
             <el-form-item>
               <el-select placeholder="请选择类型" v-model="queryForm.type">
@@ -58,7 +83,10 @@
               </el-select>
             </el-form-item>
             <el-form-item>
-              <el-select placeholder="请选择难度" v-model="queryForm.difficulty">
+              <el-select
+                placeholder="请选择难度"
+                v-model="queryForm.difficulty"
+              >
                 <el-option
                   :key="parseInt(dict.dictKey)"
                   :label="dict.dictValue"
@@ -68,16 +96,26 @@
               </el-select>
             </el-form-item>
             <el-form-item>
-              <el-input placeholder="请输入分值" v-model="queryForm.score"></el-input>
+              <el-input
+                placeholder="请输入分值"
+                v-model="queryForm.score"
+              ></el-input>
             </el-form-item>
             <el-form-item>
-              <el-input placeholder="请输入编号" v-model="queryForm.id"></el-input>
+              <el-input
+                placeholder="请输入编号"
+                v-model="queryForm.id"
+              ></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="randomQueryQuestion()">随机查询</el-button>
+              <el-button type="primary" @click="randomQueryQuestion()"
+                >随机查询</el-button
+              >
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="queryQuestion()">查询</el-button>
+              <el-button type="primary" @click="queryQuestion()"
+                >查询</el-button
+              >
             </el-form-item>
           </el-form>
           <div class="drags">
@@ -96,26 +134,26 @@
               <transition-group>
                 <div
                   class="drag-item"
-                  v-for="(item,index) in paperList"
+                  v-for="item in paperList"
                   :key="item.id"
                   :id="item.id"
                 >
-                  <div class="item-title" v-html="(index + 1) + '、' + item.title"></div>
+                  <div
+                    class="item-title"
+                    v-html="`${item.id}、${item.title}`"
+                  ></div>
                   <el-tag effect="dark" size="mini" type="warning">
-                    {{
-                      item.typeName
-                    }}
+                    {{ item.typeName }}
                   </el-tag>
                   <el-tag effect="plain" size="mini" type="danger">
-                    {{
-                      item.difficultyName
-                    }}
+                    {{ item.difficultyName }}
                   </el-tag>
-                  <el-tag effect="plain" size="mini" type="warning">{{ item.score }}分</el-tag>
+                  <el-tag effect="plain" size="mini"
+type="warning"
+                    >{{ item.score }}分</el-tag
+                  >
                   <el-tag effect="plain" size="mini" type="info">
-                    {{
-                      item.updateUserName
-                    }}
+                    {{ item.updateUserName }}
                   </el-tag>
                 </div>
               </transition-group>
@@ -125,6 +163,19 @@
               <span class="data-tip">暂无此类型题目</span>
             </div>
           </div>
+          <el-pagination
+            background
+            small
+            layout="prev, pager, next"
+            prev-text="上一页"
+            next-text="下一页"
+            hide-on-single-page
+            :total="total"
+            :page-size="pageSize"
+            :current-page="curPage"
+            @current-change="pageChange"
+            :pager-count="5"
+          ></el-pagination>
         </el-scrollbar>
       </div>
 
@@ -157,31 +208,37 @@
                       icon="common common-edit"
                       round
                       size="mini"
-                    >编辑</el-button>
+                      >编辑</el-button
+                    >
                     <el-button
                       @click="chapterDel(item.chapter)"
                       class="btn"
                       icon="common common-delete"
                       round
                       size="mini"
-                    >删除章节</el-button>
+                      >删除章节</el-button
+                    >
                     <el-button
                       @click="chapterClear(item.chapter)"
                       class="btn"
                       icon="common common-clear"
                       round
                       size="mini"
-                    >清空试题</el-button>
+                      >清空试题</el-button
+                    >
                     <el-button
                       @click="chapteFold(index)"
                       class="btn"
                       icon="common common-fold"
                       round
                       size="mini"
-                    >折叠</el-button>
+                      >折叠</el-button
+                    >
                   </div>
                 </div>
-                <div class="chapter-description">{{ item.chapter.description }}</div>
+                <div class="chapter-description">
+                  {{ item.chapter.description }}
+                </div>
               </div>
 
               <Draggable
@@ -204,11 +261,14 @@
                     :key="child.id"
                     :id="`p-${child.id}`"
                   >
-                    <p v-html="(index + 1) + '、' + child.title"></p>
+                    <p v-html="index + 1 + '、' + child.title"></p>
 
                     <!-- 单选 -->
                     <template v-if="child.type === 1">
-                      <el-radio-group class="children-option" v-model="child.answers">
+                      <el-radio-group
+                        class="children-option"
+                        v-model="child.answers"
+                      >
                         <el-radio
                           class="option-item"
                           disabled
@@ -216,14 +276,21 @@
                           :label="String.fromCharCode(65 + index)"
                           v-for="(option, index) in child.options"
                         >
-                          <span v-html="`${String.fromCharCode(65 + index)}、${option}`"></span>
+                          <span
+                            v-html="
+                              `${String.fromCharCode(65 + index)}、${option}`
+                            "
+                          ></span>
                         </el-radio>
                       </el-radio-group>
                     </template>
 
                     <!-- 多选 -->
                     <template v-if="child.type === 2">
-                      <el-checkbox-group class="children-option" v-model="child.answers">
+                      <el-checkbox-group
+                        class="children-option"
+                        v-model="child.answers"
+                      >
                         <el-checkbox
                           class="option-item"
                           disabled
@@ -231,7 +298,11 @@
                           :label="String.fromCharCode(65 + index)"
                           v-for="(option, index) in child.options"
                         >
-                          <span v-html="`${String.fromCharCode(65 + index)}、${option}`"></span>
+                          <span
+                            v-html="
+                              `${String.fromCharCode(65 + index)}、${option}`
+                            "
+                          ></span>
                         </el-checkbox>
                       </el-checkbox-group>
                     </template>
@@ -242,19 +313,25 @@
                         class="option-item-text"
                         :key="index"
                         v-for="(option, index) in child.answers"
-                      >{{ option }}</div>
+                      >
+                        {{ option }}
+                      </div>
                     </template>
 
                     <!-- 判断 -->
                     <template v-if="child.type === 4">
-                      <el-radio-group class="children-option" v-model="child.answer">
+                      <el-radio-group
+                        class="children-option"
+                        v-model="child.answer"
+                      >
                         <el-radio
                           class="option-item"
                           disabled
                           :key="index"
                           :label="option"
-                          v-for="(option, index) in ['对','错']"
-                        >{{ option }}</el-radio>
+                          v-for="(option, index) in ['对', '错']"
+                          >{{ option }}</el-radio
+                        >
                       </el-radio-group>
                     </template>
 
@@ -270,20 +347,17 @@
                     <div class="children-footer">
                       <div class="children-tags">
                         <el-tag effect="dark" size="mini" type="warning">
-                          {{
-                            child.typeName
-                          }}
+                          {{ child.typeName }}
                         </el-tag>
                         <el-tag effect="plain" size="mini" type="danger">
-                          {{
-                            child.difficultyName
-                          }}
+                          {{ child.difficultyName }}
                         </el-tag>
-                        <el-tag effect="plain" size="mini" type="warning">{{ child.score }}分</el-tag>
+                        <el-tag effect="plain" size="mini"
+type="warning"
+                          >{{ child.score }}分</el-tag
+                        >
                         <el-tag effect="plain" size="mini" type="info">
-                          {{
-                            child.updateUserName
-                          }}
+                          {{ child.updateUserName }}
                         </el-tag>
                       </div>
                       <div class="children-buts">
@@ -293,14 +367,16 @@
                           icon="el-icon-setting"
                           round
                           size="mini"
-                        >设置</el-button>
+                          >设置</el-button
+                        >
                         <el-button
                           @click="del(child.paperQuestionId)"
                           class="btn"
                           icon="el-icon-delete"
                           round
                           size="mini"
-                        >删除</el-button>
+                          >删除</el-button
+                        >
                       </div>
                     </div>
                   </div>
@@ -323,14 +399,17 @@
         <el-scrollbar wrap-style="overflow-x:hidden;" style="height: 100%">
           <el-collapse v-model="collapseShow" v-if="paperQuestion.length > 0">
             <el-collapse-item
-              v-for="(item,index) in paperQuestion"
+              v-for="(item, index) in paperQuestion"
               :key="item.id"
               :title="item.chapter.name"
               :name="index"
             >
               <div class="route-href">
                 <div
-                  :class="['href-item', hrefPointer === `#p-${child.id}` ? 'href-item-active' : '']"
+                  :class="[
+                    'href-item',
+                    hrefPointer === `#p-${child.id}` ? 'href-item-active' : '',
+                  ]"
                   v-for="(child, index) in item.questionList"
                   :key="child.id"
                 >
@@ -349,20 +428,21 @@
   </div>
 </template>
 <script>
-import Draggable from 'vuedraggable';
+import Draggable from 'vuedraggable'
 export default {
   components: {
-    Draggable
+    Draggable,
   },
   data() {
     return {
       labelPosition: 'left',
       hrefPointer: '',
       paperId: 0,
+      paperTypeId: 0,
       paperName: '',
       pageSize: 10,
       curPage: 1,
-      pageTotal: 0,
+      total: 0,
       collapseShow: 0,
       chapterForm: {
         id: 0,
@@ -371,9 +451,9 @@ export default {
         edit: false,
         rules: {
           name: [
-            { required: true, message: '请输入章节名称', trigger: 'blur' }
-          ]
-        }
+            { required: true, message: '请输入章节名称', trigger: 'blur' },
+          ],
+        },
       },
       queryForm: {
         id: '', // 编号
@@ -384,14 +464,14 @@ export default {
         questionTypeName: '', // 试题分类name
         questionTypeId: 1, // 试题分类id
         difficultyDictList: [], // 难度列表
-        typeDictList: [] // 类型列表
+        typeDictList: [], // 类型列表
       },
       paperList: [],
-      paperQuestion: []
+      paperQuestion: [],
     }
   },
   created() {
-    const { id, name } = this.$route.query
+    const { id, name, paperTypeId } = this.$route.query
     this.paperId = id
     this.paperName = name
     this.init()
@@ -399,7 +479,7 @@ export default {
   methods: {
     // 返回
     goBack() {
-      this.$router.push('/examPaper/list');
+      this.$router.back()
     },
     // 初始化
     async init() {
@@ -420,42 +500,44 @@ export default {
     async query() {
       try {
         const res = await this.$https.paperQuestionList({
-          id: this.paperId
+          id: this.paperId,
         })
         res.data.map((item) => {
           item.chapter.show = true
-          item.questionList.map((question) => {
-
-          })
+          item.questionList.map((question) => {})
         })
         this.paperQuestion = [...res.data]
-      } catch (error) { alert(error) }
+      } catch (error) {
+        this.$tools.message(error.msg, 'error')
+      }
     },
     // 查询试题
-    async queryQuestion(curPage) {
-      const res = await this.$https.questionListPage({
-        id: this.queryForm.id,
-        type: this.queryForm.type,
-        title: this.queryForm.title,
-        questionTypeName: this.queryForm.questionTypeName,
-        difficulty: this.queryForm.difficulty,
-        scoreStart: this.queryForm.score,
-        scoreEnd: this.queryForm.score,
-        exPaperId: this.paperId,
-        curPage: curPage || this.curPage,
-        pageSize: this.pageSize
-      }).catch(err => { })
-      res.code === 200
-        ? (this.paperList = res.data.list, this.pageTotal = res.data.total)
-        : this.$tools.message('请刷新重新获取试题', 'error')
+    async queryQuestion() {
+      const res = await this.$https
+        .questionListPage({
+          id: this.queryForm.id,
+          type: this.queryForm.type,
+          title: this.queryForm.title,
+          questionTypeName: this.queryForm.questionTypeName,
+          difficulty: this.queryForm.difficulty,
+          scoreStart: this.queryForm.score,
+          scoreEnd: this.queryForm.score,
+          exPaperId: this.paperId,
+          curPage: this.curPage,
+          pageSize: this.pageSize,
+        })
+        .catch((err) => {})
+      res?.code === 200
+        ? ((this.paperList = res.data.list), (this.total = res.data.total))
+        : this.$tools.message('请刷新重新获取试题！', 'error')
     },
     // 随机查询试题
     async randomQueryQuestion() {
-      let pageNum = this.pageTotal <= this.pageSize
-        ? 1
-        : Math.ceil(this.pageTotal / this.pageSize)
-      let randomCurPage = Math.floor(Math.random() * (pageNum + 1))
-      this.queryQuestion(randomCurPage)
+      const pageNum =
+        this.total <= this.pageSize ? 1 : Math.ceil(this.total / this.pageSize)
+      const randomCurPage = Math.floor(Math.random() * (pageNum + 1))
+      this.curPage = randomCurPage
+      this.queryQuestion()
     },
     // 添加章节
     paperChapterAdd() {
@@ -464,12 +546,14 @@ export default {
           return
         }
 
-        const res = await this.$https.paperChapterAdd({
-          name: this.chapterForm.name,
-          description: this.chapterForm.description,
-          paperId: this.paperId,
-          type: 1
-        }).catch(err => { })
+        const res = await this.$https
+          .paperChapterAdd({
+            name: this.chapterForm.name,
+            description: this.chapterForm.description,
+            paperId: this.paperId,
+            type: 1,
+          })
+          .catch((err) => {})
         this.refreshData(res, '添加章节')
       })
     },
@@ -482,75 +566,98 @@ export default {
     },
     // 编辑章节
     async paperChapterEdit() {
-      const res = await this.$https.paperChapterEdit({
-        id: this.chapterForm.id,
-        name: this.chapterForm.name,
-        description: this.chapterForm.description
-      }).catch(err => { })
-      res.code === 200
-        ? (this.$tools.message('编辑章节成功！'), this.chapterForm.edit = false, this.query())
-        : this.$tools.message('编辑章节失败！', 'error')
+      const res = await this.$https
+        .paperChapterEdit({
+          id: this.chapterForm.id,
+          name: this.chapterForm.name,
+          description: this.chapterForm.description,
+        })
+        .catch((err) => {})
+      this.refreshData(res, '编辑章节')
     },
     // 删除章节
-    async chapterDel({ id }) {
-      const res = await this.$https.paperChapterDel({
-        id
-      }).catch(err => { })
-      this.refreshData(res, '删除章节')
+    chapterDel({ id }) {
+      this.$confirm(`删除章节将删除章节内的试题，是否删除？`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      })
+        .then(async () => {
+          const res = await this.$https
+            .paperChapterDel({ id })
+            .catch((err) => {})
+          this.refreshData(res, '删除章节')
+        })
+        .catch(() => {})
     },
     // 章节折叠
     chapteFold(index) {
-      this.paperQuestion[index].chapter.show = !this.paperQuestion[index].chapter.show
+      this.paperQuestion[index].chapter.show =
+        !this.paperQuestion[index].chapter.show
     },
     // 清空试卷试题
     async chapterClear({ id }) {
-      const res = await this.$https.paperQuestionClear({
-        chapterId: id
-      }).catch(err => { })
+      const res = await this.$https
+        .paperQuestionClear({
+          chapterId: id,
+        })
+        .catch((err) => {})
       this.refreshData(res, '清空试题')
     },
     // 删除试题
     async del(paperQuestionId) {
-      const res = await this.$https.paperQuestionDel({
-        paperQuestionId
-      }).catch(err => { })
+      const res = await this.$https
+        .paperQuestionDel({
+          paperQuestionId,
+        })
+        .catch((err) => {})
       this.refreshData(res, '删除试题')
     },
     // 更新页面数据
     refreshData(res, title) {
-      res.code === 200
-        ? (this.$tools.message(`${title}成功！`), this.query(), this.queryQuestion())
+      res?.code === 200
+        ? (this.$tools.message(`${title}成功！`),
+          this.query(),
+          this.$tools.resetData(this, 'chapterForm'),
+          this.queryQuestion())
         : this.$tools.message(`${title}失败！`, 'error')
     },
     // 选择拖拽原题
     sourceChoose(e) {
       if (this.paperQuestion.length == 0) {
-        this.$tools.message('请添加章节', 'error')
-        return;
+        this.$tools.message('请添加章节！', 'error')
+        return
       }
     },
     // 拖拽原题结束
     async sourceEnd(e) {
       const chapterId = e.to.dataset.id
       const questionIds = e.item.id
-      const res = await this.$https.paperQuestionAdd({
-        chapterId,
-        questionIds
-      }).catch(err => { })
-      if (res.code !== 200) return false;
+      const res = await this.$https
+        .paperQuestionAdd({
+          chapterId,
+          questionIds,
+        })
+        .catch((err) => {})
+      if (res?.code !== 200) return false
       this.query()
       this.queryQuestion()
     },
     // 章节移动
     chapterUpdate(e) {
-      console.log(e);
+      console.log(e)
+    },
+    pageChange(val = 1) {
+      this.curPage = val
+      this.queryQuestion(val)
     },
     // 定位锚点
     toHref(id) {
-      this.hrefPointer = `#p-${id}`;
-      document.documentElement.scrollTop = (document.querySelector(this.hrefPointer).offsetTop - 50)
-    }
-  }
+      this.hrefPointer = `#p-${id}`
+      document.documentElement.scrollTop =
+        document.querySelector(this.hrefPointer).offsetTop - 50
+    },
+  },
 }
 </script>
 <style lang="scss" scoped>
@@ -631,7 +738,7 @@ export default {
     position: relative;
     border-bottom: 1px solid #d8d8d8;
     &::before {
-      content: "";
+      content: '';
       display: block;
       position: absolute;
       top: 15px;

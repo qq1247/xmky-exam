@@ -8,7 +8,7 @@ const mutations = {
   [types.DEL_USER_INFO](state) {
     state.userInfo = ''
     localStorage.removeItem('userInfo')
-  }
+  },
 }
 
 export default mutations

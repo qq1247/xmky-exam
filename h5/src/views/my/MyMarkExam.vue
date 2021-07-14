@@ -2,7 +2,13 @@
   <div class="container">
     <!-- 导航 -->
     <div class="head">
-      <el-link :underline="false" @click="goBack" class="head-left" icon="el-icon-back">返回</el-link>
+      <el-link
+        :underline="false"
+        @click="goBack"
+        class="head-left"
+        icon="el-icon-back"
+        >返回</el-link
+      >
       <span>{{ paperName }}</span>
       <el-link :underline="false" class="head-right">
         <i class="common common-explain"></i>
@@ -16,13 +22,19 @@
         <div class="paper-intro">{{ paper.id }}</div>
 
         <template v-if="paperQuestion.length > 0">
-          <div :key="index" class="drag-item drag-content" v-for="(item, index) in paperQuestion">
+          <div
+            :key="index"
+            class="drag-item drag-content"
+            v-for="(item, index) in paperQuestion"
+          >
             <div class="chapter">
               <div class="chapter-item">
                 <div class="item-title">{{ item.chapter.name }}</div>
                 <div></div>
               </div>
-              <div class="chapter-description">{{ item.chapter.description }}</div>
+              <div class="chapter-description">
+                {{ item.chapter.description }}
+              </div>
             </div>
 
             <div
@@ -38,11 +50,14 @@
                   class="children-content"
                   v-for="(child, indexc) in item.questionList"
                 >
-                  <p v-html="(indexc + 1) + '、' + child.title"></p>
+                  <p v-html="indexc + 1 + '、' + child.title"></p>
 
                   <!-- 单选 -->
                   <template v-if="child.type === 1">
-                    <el-radio-group class="children-option" v-model="child.examAnswers[0]">
+                    <el-radio-group
+                      class="children-option"
+                      v-model="child.examAnswers[0]"
+                    >
                       <el-radio
                         disabled
                         :key="index"
@@ -50,14 +65,21 @@
                         class="option-item"
                         v-for="(option, index) in child.options"
                       >
-                        <span v-html="`${String.fromCharCode(65 + index)}、${option}`"></span>
+                        <span
+                          v-html="
+                            `${String.fromCharCode(65 + index)}、${option}`
+                          "
+                        ></span>
                       </el-radio>
                     </el-radio-group>
                   </template>
 
                   <!-- 多选 -->
                   <template v-if="child.type === 2">
-                    <el-checkbox-group class="children-option" v-model="child.examAnswers">
+                    <el-checkbox-group
+                      class="children-option"
+                      v-model="child.examAnswers"
+                    >
                       <el-checkbox
                         disabled
                         :key="index"
@@ -65,7 +87,11 @@
                         class="option-item"
                         v-for="(option, index) in child.options"
                       >
-                        <span v-html="`${String.fromCharCode(65 + index)}、${option}`"></span>
+                        <span
+                          v-html="
+                            `${String.fromCharCode(65 + index)}、${option}`
+                          "
+                        ></span>
                       </el-checkbox>
                     </el-checkbox-group>
                   </template>
@@ -86,14 +112,18 @@
 
                   <!-- 判断 -->
                   <template v-if="child.type === 4">
-                    <el-radio-group class="children-option" v-model="child.examAnswers[0]">
+                    <el-radio-group
+                      class="children-option"
+                      v-model="child.examAnswers[0]"
+                    >
                       <el-radio
                         disabled
                         :key="index"
                         :label="option"
                         class="option-item"
-                        v-for="(option, index) in ['对','错']"
-                      >{{ option }}</el-radio>
+                        v-for="(option, index) in ['对', '错']"
+                        >{{ option }}</el-radio
+                      >
                     </el-radio-group>
                   </template>
 
@@ -111,7 +141,9 @@
 
                   <div class="children-analysis">
                     <div>【答案】：{{ child.answers.join(',') }}</div>
-                    <div v-html="`【解析】：${child.analysis || '暂无解析'}`"></div>
+                    <div
+                      v-html="`【解析】：${child.analysis || '暂无解析'}`"
+                    ></div>
                     <div>【分数】：{{ child.score }}分</div>
                     <div>
                       【得分】：
@@ -148,7 +180,7 @@ import ScorePlate from '@/components/ScorePlate.vue'
 import { paperIntro, paperList, answerList } from '@/mock/questionList.js'
 export default {
   components: {
-    ScorePlate
+    ScorePlate,
   },
   data() {
     return {
@@ -166,8 +198,8 @@ export default {
       myExamDetailCache: {},
       selectOption: '',
       paper: {},
-      answerList: []
-    };
+      answerList: [],
+    }
   },
   created() {
     /* const { id, paperId } = this.$route.query;
@@ -179,10 +211,24 @@ export default {
 
     this.paperQuestion.map((cur, index) => {
       cur.questionList.map((item, indexi) => {
-        const [{ myExamDetailId, myExamId, answers }] = answerList.data.filter(itemr => itemr.questionId == item.id)
-        this.$set(this.paperQuestion[index].questionList[indexi], 'myExamDetailId', myExamDetailId)
-        this.$set(this.paperQuestion[index].questionList[indexi], 'myExamId', myExamId)
-        this.$set(this.paperQuestion[index].questionList[indexi], 'examAnswers', answers)
+        const [{ myExamDetailId, myExamId, answers }] = answerList.data.filter(
+          (itemr) => itemr.questionId == item.id
+        )
+        this.$set(
+          this.paperQuestion[index].questionList[indexi],
+          'myExamDetailId',
+          myExamDetailId
+        )
+        this.$set(
+          this.paperQuestion[index].questionList[indexi],
+          'myExamId',
+          myExamId
+        )
+        this.$set(
+          this.paperQuestion[index].questionList[indexi],
+          'examAnswers',
+          answers
+        )
       })
     })
 
@@ -191,51 +237,65 @@ export default {
   methods: {
     // 返回
     goBack() {
-      this.$router.push('/my');
+      this.$router.push('/my')
     },
     // 初始化
     async init() {
-      await this.queryPaper();
-      await this.queryPaperInfo();
-      await this.queryMyExamAnswerInfo();
+      await this.queryPaper()
+      await this.queryPaperInfo()
+      await this.queryMyExamAnswerInfo()
     },
     // 查询试卷
     async queryPaper() {
       try {
         const res = await this.$https.paperGet({
           id: this.paperId,
-        });
-        console.info(res);
-        this.paper = res.data;
-      } catch (error) { }
+        })
+        console.info(res)
+        this.paper = res.data
+      } catch (error) {}
     },
     // 查询试卷信息
     async queryPaperInfo() {
       try {
         const res = await this.$https.paperQuestionList({
           id: this.paperId,
-        });
+        })
         res.data.map((item) => {
-          item.questionList.map(question => {
+          item.questionList.map((question) => {
             question.scorePlate = ''
           })
         })
-        this.paperQuestion = res.data;
-      } catch (error) { }
+        this.paperQuestion = res.data
+      } catch (error) {}
     },
     // 查询我的答案信息
     async queryMyExamAnswerInfo() {
       try {
         const res = await this.$https.myExamAnswerList({
           id: this.id,
-        });
+        })
 
         this.paperQuestion.map((cur, index) => {
           cur.questionList.map((item, indexi) => {
-            const [{ myExamDetailId, myExamId, answers }] = res.data.filter(itemr => itemr.questionId == item.id)
-            this.$set(this.paperQuestion[index].questionList[indexi], 'myExamDetailId', myExamDetailId)
-            this.$set(this.paperQuestion[index].questionList[indexi], 'myExamId', myExamId)
-            this.$set(this.paperQuestion[index].questionList[indexi], 'examAnswers', answers)
+            const [{ myExamDetailId, myExamId, answers }] = res.data.filter(
+              (itemr) => itemr.questionId == item.id
+            )
+            this.$set(
+              this.paperQuestion[index].questionList[indexi],
+              'myExamDetailId',
+              myExamDetailId
+            )
+            this.$set(
+              this.paperQuestion[index].questionList[indexi],
+              'myExamId',
+              myExamId
+            )
+            this.$set(
+              this.paperQuestion[index].questionList[indexi],
+              'examAnswers',
+              answers
+            )
           })
         })
 
@@ -246,12 +306,13 @@ export default {
     },
     // 定位锚点
     toHref(id, index) {
-      this.hrefPointer = `#p-${id}-${index}`;
-      document.documentElement.scrollTop = (document.querySelector(this.hrefPointer).offsetTop - 50)
+      this.hrefPointer = `#p-${id}-${index}`
+      document.documentElement.scrollTop =
+        document.querySelector(this.hrefPointer).offsetTop - 50
     },
     // 设置分数
     async setScore(e, idx, idxc) {
-      let source = this.paperQuestion[idx].questionList[idxc]
+      const source = this.paperQuestion[idx].questionList[idxc]
       this.$set(source, 'scorePlate', e)
       if (e < 0) this.$set(source, 'scorePlate', 0)
       if (e > source.score) this.$set(source, 'scorePlate', source.score)
@@ -273,21 +334,25 @@ export default {
     async myExamUpdateScore(e, idx, idxc) {
       const source = this.paperQuestion[idx].questionList[idxc]
       if (!source.scorePlate) {
-        this.$tools.message('请进行打分', 'warning')
-        return;
+        this.$tools.message('请进行打分！', 'warning')
+        return
       }
-      const res = await this.$https.myExamUpdateScore({
-        myExamDetailId: source.myExamDetailId,
-        score: source.scorePlate,
-      }).catch(err => { })
-      res.code === 200
+      const res = await this.$https
+        .myExamUpdateScore({
+          myExamDetailId: source.myExamDetailId,
+          score: source.scorePlate,
+        })
+        .catch((err) => {})
+      res?.code === 200
         ? this.$tools.message('打分成功！')
         : this.$tools.message('打分失败！', 'error')
     },
     // 上下题定位
     toHref(position, status) {
       let toHref = ''
-      let index = this.answerList.findIndex(item => item.questionId == position)
+      const index = this.answerList.findIndex(
+        (item) => item.questionId == position
+      )
 
       if (status == 'prev') {
         if (index == 0) {
@@ -304,7 +369,8 @@ export default {
         }
         toHref = this.answerList[index + 1].questionId
       }
-      document.documentElement.scrollTop = (document.querySelector(`#p-${toHref}`).offsetTop - 50)
+      document.documentElement.scrollTop =
+        document.querySelector(`#p-${toHref}`).offsetTop - 50
       document.querySelector(`#i-${toHref}`).focus()
     },
     // 上一题
@@ -316,20 +382,13 @@ export default {
       this.toHref(position, 'next')
     },
     // 上一卷
-    prevPaper() {
-
-    },
+    prevPaper() {},
     // 上一卷
-    nextPaper() {
-
-    },
+    nextPaper() {},
     // 完成阅卷
-    checkEnd() {
-
-    },
-
-  }
-};
+    checkEnd() {},
+  },
+}
 </script>
 <style lang="scss" scoped>
 .container {
@@ -530,7 +589,7 @@ export default {
 }
 .exam-card {
   width: 214px;
-  font-family: "Microsoft YaHei";
+  font-family: 'Microsoft YaHei';
   border: 1px solid #e6e6e6;
   position: fixed;
   right: 50px;

@@ -2,22 +2,44 @@
   <div class="container">
     <div class="content">
       <div class="search">
-        <el-form :inline="true" :model="queryForm" class="form-inline" ref="queryForm">
+        <el-form
+          :inline="true"
+          :model="queryForm"
+          class="form-inline"
+          ref="queryForm"
+        >
           <el-form-item label prop="dictIndex">
-            <el-input placeholder="请输入索引" v-model="queryForm.dictIndex"></el-input>
+            <el-input
+              placeholder="请输入索引"
+              v-model="queryForm.dictIndex"
+            ></el-input>
           </el-form-item>
           <el-form-item label prop="dictKey">
-            <el-input placeholder="请输入键" v-model="queryForm.dictKey"></el-input>
+            <el-input
+              placeholder="请输入键"
+              v-model="queryForm.dictKey"
+            ></el-input>
           </el-form-item>
           <el-form-item label prop="dictValue">
-            <el-input placeholder="请输入值" v-model="queryForm.dictValue"></el-input>
+            <el-input
+              placeholder="请输入值"
+              v-model="queryForm.dictValue"
+            ></el-input>
           </el-form-item>
           <el-form-item style="width: 200px">
-            <el-button @click="query" icon="el-icon-search" type="primary">查询</el-button>
+            <el-button @click="query" icon="el-icon-search"
+type="primary"
+              >查询</el-button
+            >
             <el-button @click="reset">重置</el-button>
           </el-form-item>
           <el-form-item>
-            <el-button @click="editForm.show = true" icon="el-icon-search" type="primary">添加</el-button>
+            <el-button
+              @click="editForm.show = true"
+              icon="el-icon-search"
+              type="primary"
+              >添加</el-button
+            >
           </el-form-item>
         </el-form>
       </div>
@@ -46,7 +68,10 @@
           <el-table-column label="操作">
             <template slot-scope="scope">
               <el-button @click="get(scope.row.id)" size="mini">修改</el-button>
-              <el-button @click="del(scope.row.id)" size="mini" type="danger">删除</el-button>
+              <el-button @click="del(scope.row.id)" size="mini"
+type="danger"
+                >删除</el-button
+              >
             </template>
           </el-table-column>
         </el-table>
@@ -64,21 +89,40 @@
     <el-dialog :visible.sync="editForm.show" title="数据字典">
       <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
         <el-form-item label="索引" label-width="120px" prop="dictIndex">
-          <el-input placeholder="请输入索引" v-model="editForm.dictIndex"></el-input>
+          <el-input
+            placeholder="请输入索引"
+            v-model="editForm.dictIndex"
+          ></el-input>
         </el-form-item>
         <el-form-item label="键" label-width="120px" prop="dictKey">
-          <el-input placeholder="请输入键" v-model="editForm.dictKey"></el-input>
+          <el-input
+            placeholder="请输入键"
+            v-model="editForm.dictKey"
+          ></el-input>
         </el-form-item>
         <el-form-item label="值" label-width="120px" prop="dictValue">
-          <el-input placeholder="请输入值" v-model="editForm.dictValue"></el-input>
+          <el-input
+            placeholder="请输入值"
+            v-model="editForm.dictValue"
+          ></el-input>
         </el-form-item>
         <el-form-item label="排序" label-width="120px" prop="no">
-          <el-input-number :max="100" :min="1" v-model.number="editForm.no"></el-input-number>
+          <el-input-number
+            :max="100"
+            :min="1"
+            v-model.number="editForm.no"
+          ></el-input-number>
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="add" type="primary" v-if="editForm.id == null">添加</el-button>
-        <el-button @click="edit" type="primary" v-if="editForm.id != null">修改</el-button>
+        <el-button @click="add" type="primary"
+v-if="editForm.id == null"
+          >添加</el-button
+        >
+        <el-button @click="edit" type="primary"
+v-if="editForm.id != null"
+          >修改</el-button
+        >
         <el-button @click="editForm.show = false">取 消</el-button>
       </div>
     </el-dialog>
@@ -114,26 +158,26 @@ export default {
         rules: {
           // 校验
           dictIndex: [
-            { required: true, message: "请输入排序", trigger: "change" },
+            { required: true, message: '请输入排序', trigger: 'change' },
           ],
           dictKey: [
-            { required: true, message: "请输入排序", trigger: "change" },
+            { required: true, message: '请输入排序', trigger: 'change' },
           ],
           dictValue: [
-            { required: true, message: "请输入排序", trigger: "change" },
+            { required: true, message: '请输入排序', trigger: 'change' },
           ],
-          no: [{ required: true, message: "请输入排序", trigger: "change" }],
+          no: [{ required: true, message: '请输入排序', trigger: 'change' }],
         },
       },
-    };
+    }
   },
   created() {
-    this.init();
+    this.init()
   },
   methods: {
     // 查询
     async query() {
-      let {
+      const {
         data: { list, total },
       } = await this.$https.dictListPage({
         dictIndex: this.queryForm.dictIndex,
@@ -141,32 +185,32 @@ export default {
         dictValue: this.queryForm.dictValue,
         curPage: this.listpage.curPage,
         pageSize: this.listpage.pageSize,
-      });
-      this.listpage.total = total;
-      this.listpage.list = list;
+      })
+      this.listpage.total = total
+      this.listpage.list = list
     },
     // 重置
     async reset() {
-      this.listpage.curPage = 1;
-      this.$refs["queryForm"].resetFields();
-      this.query();
+      this.listpage.curPage = 1
+      this.$refs['queryForm'].resetFields()
+      this.query()
     },
     handleSizeChange(val) {
-      this.listpage.pageSize = val;
-      this.query();
+      this.listpage.pageSize = val
+      this.query()
     },
     handleCurrentChange(val) {
-      this.listpage.curPage = val;
-      this.query();
+      this.listpage.curPage = val
+      this.query()
     },
     // 初始化
     async init() {
-      this.query();
+      this.query()
     },
     add() {
-      this.$refs["editForm"].validate(async (valid) => {
+      this.$refs['editForm'].validate(async (valid) => {
         if (!valid) {
-          return false;
+          return false
         }
 
         const { code, msg } = await this.$https.dictAdd({
@@ -174,20 +218,20 @@ export default {
           dictKey: this.editForm.dictKey,
           dictValue: this.editForm.dictValue,
           no: this.editForm.no,
-        });
+        })
         if (code != 200) {
-          alert(msg);
+          alert(msg)
           return
         }
 
-        this.editForm.show = false;
-        this.query();
+        this.editForm.show = false
+        this.query()
       })
     },
     edit() {
-      this.$refs["editForm"].validate(async (valid) => {
+      this.$refs['editForm'].validate(async (valid) => {
         if (!valid) {
-          return false;
+          return false
         }
 
         const { code, msg } = await this.$https.dictEdit({
@@ -196,51 +240,51 @@ export default {
           dictKey: this.editForm.dictKey,
           dictValue: this.editForm.dictValue,
           no: this.editForm.no,
-        });
+        })
         if (code != 200) {
-          alert(msg);
+          alert(msg)
           return
         }
 
-        this.editForm.show = false;
-        this.query();
+        this.editForm.show = false
+        this.query()
       })
     },
     // 获取试题
     async get(id) {
-      const res = await this.$https.dictGet({ id: id });
-      if (res.code != 200) {
-        alert(res.msg);
+      const res = await this.$https.dictGet({ id: id })
+      if (res?.code != 200) {
+        alert(res.msg)
         return
       }
 
-      this.editForm.show = true;
-      this.editForm.id = res.data.id;
-      this.editForm.dictIndex = res.data.dictIndex;
-      this.editForm.dictKey = res.data.dictKey;
-      this.editForm.dictValue = res.data.dictValue;
-      this.editForm.no = res.data.no;
+      this.editForm.show = true
+      this.editForm.id = res.data.id
+      this.editForm.dictIndex = res.data.dictIndex
+      this.editForm.dictKey = res.data.dictKey
+      this.editForm.dictValue = res.data.dictValue
+      this.editForm.no = res.data.no
     },
     // 删除
     async del(id) {
-      this.$confirm("确定要删除？", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
+      this.$confirm('确定要删除？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
       }).then(async () => {
-        const res = await this.$https.dictDel({ id });
-        if (res.code != 200) {
+        const res = await this.$https.dictDel({ id })
+        if (res?.code != 200) {
           this.$message({
-            type: "error",
+            type: 'error',
             message: res.msg,
-          });
+          })
         }
 
-        this.query();
+        this.query()
       })
-    }
+    },
   },
-};
+}
 </script>
 <style lang="scss" scoped>
 .container {

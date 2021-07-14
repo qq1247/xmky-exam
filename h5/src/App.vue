@@ -22,14 +22,19 @@
               <i class="common common-loginOut" @click="loginOut"></i>
             </el-tooltip>
           </template>
-          <router-link v-else class="header-login" to="/login">登录</router-link>
+          <router-link v-else class="header-login"
+to="/login"
+            >登录</router-link
+          >
         </div>
       </div>
     </header>
     <main class="main">
       <router-view />
     </main>
-    <footer v-if="show" class="footer">Copyright© 2018 All Rights Reserved 版权所有 在线考试</footer>
+    <footer v-if="show" class="footer">
+      Copyright© 2018 All Rights Reserved 版权所有 在线考试
+    </footer>
   </div>
 </template>
 
@@ -39,32 +44,39 @@ export default {
   data() {
     return {
       show: true,
-      menuList: ["PaperAdd", "ExamPaperEdit", "LibraryAdd", "ExamQuestionEdit", 'MyExam', 'MyMarkExam'],
+      menuList: [
+        'PaperAdd',
+        'ExamPaperEdit',
+        'LibraryAdd',
+        'ExamQuestionEdit',
+        'MyExam',
+        'MyMarkExam',
+      ],
       navList: [
         {
-          to: "/",
-          img: require("../src/assets/logo.png"),
+          to: '/',
+          img: require('../src/assets/logo.png'),
         },
         {
-          content: "首页",
-          to: "/",
+          content: '首页',
+          to: '/',
         },
         {
-          content: "试题管理",
-          to: "/examQuestion",
+          content: '试题管理',
+          to: '/examQuestion',
         },
         {
-          content: "试卷管理",
-          to: "/examPaper",
+          content: '试卷管理',
+          to: '/examPaper',
         },
         {
-          content: "考试管理",
-          to: "/examSetting",
+          content: '考试管理',
+          to: '/examSetting',
         },
         {
           content: '我的',
-          to: '/my'
-        }
+          to: '/my',
+        },
       ],
     }
   },
@@ -72,10 +84,10 @@ export default {
     $route: {
       handler(to) {
         if (to.name && this.menuList.includes(to.name)) {
-          this.show = false;
+          this.show = false
           return
         }
-        this.show = true;
+        this.show = true
       },
       deep: true,
       immediate: true,
@@ -86,14 +98,14 @@ export default {
     ...mapActions(['delUserInfo']),
     loginOut() {
       this.delUserInfo()
-      this.$tools.message('退出成功！', 'info')
-    }
+      this.$router.push('/')
+    },
   },
-};
+}
 </script>
 
 <style lang="scss">
-@import url(//at.alicdn.com/t/font_840312_muzyz91khzi.css);
+@import url(//at.alicdn.com/t/font_840312_polq493yfqg.css);
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

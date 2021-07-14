@@ -15,12 +15,12 @@
 </template>
 
 <script>
-import draggable from "vuedraggable";
+import draggable from 'vuedraggable'
 export default {
-  name: "nested-test",
+  name: 'NestedTest',
   methods: {
     emitter(value) {
-      this.$emit("input", value);
+      this.$emit('input', value)
     }
   },
   components: {
@@ -30,15 +30,15 @@ export default {
     dragOptions() {
       return {
         animation: 300,
-        group: "",
+        group: '',
         disabled: false,
-        ghostClass: "ghost",
-      };
+        ghostClass: 'ghost'
+      }
     },
     // this.value when input = v-model
     // this.list  when input != v-model
     realValue() {
-      return this.value ? this.value : this.list;
+      return this.value ? this.value : this.list
     }
   },
   props: {
@@ -53,7 +53,7 @@ export default {
       default: null,
     },
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>

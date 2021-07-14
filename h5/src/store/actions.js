@@ -5,7 +5,7 @@ const actions = {
   },
   delUserInfo({ commit }) {
     commit(types.DEL_USER_INFO)
-  }
+  },
 }
 
 export default actions

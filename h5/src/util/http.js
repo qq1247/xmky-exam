@@ -2,10 +2,10 @@
  * axios封装
  * 请求拦截、响应拦截、错误统一处理
  */
-import axios from 'axios';
-import router from '@/router';
-import store from '@/store';
-import { Message } from 'element-ui';
+import axios from 'axios'
+import router from '@/router'
+import store from '@/store'
+import { Message } from 'element-ui'
 /**
  * 提示函数
  */
@@ -15,7 +15,7 @@ const message = (msg) => {
     duration: 3000,
     type: 'warning',
   })
-};
+}
 
 /**
  * 跳转登录页
@@ -25,20 +25,20 @@ const toLogin = () => {
   router.replace({
     path: '/login',
     query: {
-      redirect: router.currentRoute.fullPath
-    }
+      redirect: router.currentRoute.fullPath,
+    },
   })
-};
+}
 
 /**
  * 根据刷新的token(headers?.Authorization)替换vuex中userInfo的accessToken
  *
  */
-const replaceToken = async(token) => {
+const replaceToken = async (token) => {
   const userInfo = JSON.parse(store.state.userInfo)
   userInfo.accessToken = token
   return JSON.stringify(userInfo)
-};
+}
 
 /**
  * 请求失败后的错误统一处理
@@ -50,15 +50,15 @@ const errorHandle = (status, msg) => {
   switch (status) {
     case 500:
       message(`${msg}`)
-      break;
+      break
     case 401:
     case 403:
       message(`请重新登录`)
-      store.dispatch('delUserInfo');
+      store.dispatch('delUserInfo')
       toLogin()
-      break;
+      break
     case 404:
-      message('请求的资源不存在');
+      message('请求的资源不存在')
       break
     default:
       message(`${msg}`)
@@ -71,22 +71,22 @@ const errorHandle = (status, msg) => {
 let baseUrl
 switch (process.env.VUE_APP_MODE) {
   case 'development':
-    baseUrl = 'http://192.168.110.198:8080/api/';
+    baseUrl = 'http://192.168.110.198:8080/api/'
     break
   case 'production':
-    baseUrl = 'http://prod.com/api/';
+    baseUrl = 'http://prod.com/api/'
     break
   case 'test':
-    baseUrl = 'http://test.com/api/';
+    baseUrl = 'http://test.com/api/'
     break
   default:
-    baseUrl = 'http://192.168.110.198:8080/api/';
+    baseUrl = 'http://192.168.110.198:8080/api/'
 }
 
 // 创建axios实例
 var instance = axios.create({
   baseURL: baseUrl,
-  timeout: 1000 * 1000
+  timeout: 1000 * 1000,
 })
 
 /**
@@ -97,7 +97,7 @@ instance.interceptors.request.use(
   (config) => {
     const userInfo = store.state.userInfo
       ? JSON.parse(store.state.userInfo)
-      : '';
+      : ''
     userInfo?.accessToken &&
       (config.headers.Authorization = userInfo.accessToken)
     return config
@@ -108,11 +108,11 @@ instance.interceptors.request.use(
 // 响应拦截器
 instance.interceptors.response.use(
   // 请求成功
-  async(res) => {
+  async (res) => {
     const {
       data: { code, msg },
       headers,
-      config
+      config,
     } = res
     headers?.authorization &&
       store.dispatch('setUserInfo', await replaceToken(headers.authorization))
@@ -135,14 +135,14 @@ instance.interceptors.response.use(
       error.message.indexOf('timeout') !== -1 &&
       !config._retry
     ) {
-      Message.error('请求超时');
+      Message.error('请求超时')
       return Promise.reject(error)
     }
     if (response) {
       errorHandle(response.status, response.data.message)
       return Promise.reject(response)
     } else {
-      message('请求错误或网站服务器异常！请联系管理员');
+      message('请求错误或网站服务器异常！请联系管理员')
       return Promise.reject(error)
     }
   }

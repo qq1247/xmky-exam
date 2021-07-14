@@ -10,31 +10,31 @@
   </div>
 </template>
 <script>
-import InlineEditor from "@ckeditor/ckeditor5-build-inline";
-import "@ckeditor/ckeditor5-build-inline/build/translations/zh-cn";
+import InlineEditor from '@ckeditor/ckeditor5-build-inline'
+import '@ckeditor/ckeditor5-build-inline/build/translations/zh-cn'
 export default {
-  name: "Editor",
+  name: 'Editor',
   props: {
-    id: { type: String, default: "editorId" },
+    id: { type: String, default: 'editorId' },
     value: {
       type: String,
-      default: "",
+      default: ''
     },
   },
   data() {
     return {
       editor: InlineEditor,
       editorConfig: {
-        language: "zh-cn",
+        language: 'zh-cn'
       },
-    };
+    }
   },
   methods: {
     editData($event) {
-      this.$emit("editorListener", this.id, $event);
+      this.$emit('editorListener', this.id, $event)
     }
   },
-};
+}
 </script>
 <style lang="scss" scoped>
 .editor {

@@ -1,15 +1,21 @@
 <template>
-  <el-popover placement="right" v-model="visible" @hide="hideHandler" trigger="focus">
+  <el-popover
+    placement="right"
+    v-model="visible"
+    @hide="hideHandler"
+    trigger="focus"
+  >
     <!-- 打分间隔和分值 -->
     <div class="score-body">
       <div class="score-step">
         <span>间隔：</span>
         <span
           :class="['step-item', selectStep == index ? 'select-step' : '']"
-          v-for="(item,index) in steps"
+          v-for="(item, index) in steps"
           :key="item"
           @click="stepHandler(index)"
-        >{{ item }}</span>
+          >{{ item }}</span
+        >
         <el-input
           v-model="step"
           type="number"
@@ -22,21 +28,34 @@
         <span>分数：</span>
         <span
           :class="['step-item', selectScore == index ? 'select-step' : '']"
-          v-for="(item,index) in scores"
+          v-for="(item, index) in scores"
           :key="item"
           @click="scoreHandler(index)"
-        >{{ item }}</span>
+          >{{ item }}</span
+        >
       </div>
     </div>
     <!-- 上下一题，上下一卷，结束阅卷操作 -->
     <div class="score-footer">
       <el-button-group>
-        <el-button type="primary" size="small" icon="el-icon-arrow-left" @click="prevQuestion">上一题</el-button>
+        <el-button
+          type="primary"
+          size="small"
+          icon="el-icon-arrow-left"
+          @click="prevQuestion"
+          >上一题</el-button
+        >
         <el-button type="primary" size="small" @click="nextQuestion">
           下一题
           <i class="el-icon-arrow-right el-icon--right"></i>
         </el-button>
-        <el-button type="primary" size="small" icon="el-icon-d-arrow-left" @click="prevPaper">上一卷</el-button>
+        <el-button
+          type="primary"
+          size="small"
+          icon="el-icon-d-arrow-left"
+          @click="prevPaper"
+          >上一卷</el-button
+        >
         <el-button type="primary" size="small" @click="nextPaper">
           下一卷
           <i class="el-icon-d-arrow-right el-icon--right"></i>
@@ -46,7 +65,8 @@
           size="small"
           icon="el-icon-document-checked"
           @click="checkEnd"
-        >完成阅卷</el-button>
+          >完成阅卷</el-button
+        >
       </el-button-group>
     </div>
     <el-input
@@ -128,7 +148,7 @@ export default {
     },
     checkEnd() {
       this.$emit('checkEnd')
-    }
+    },
   },
 }
 </script>

@@ -1,12 +1,23 @@
 <template>
   <div class="container">
-    <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" class="login-wrap">
+    <el-form
+      :model="ruleForm"
+      status-icon
+      :rules="rules"
+      ref="ruleForm"
+      class="login-wrap"
+    >
       <div class="login-title">欢迎登录</div>
       <el-form-item prop="account">
         <template slot="label">
           <i class="common common-wo"></i>
         </template>
-        <el-input type="text" placeholder="请输入账号" v-model="ruleForm.account" autocomplete="off"></el-input>
+        <el-input
+          type="text"
+          placeholder="请输入账号"
+          v-model="ruleForm.account"
+          autocomplete="off"
+        ></el-input>
       </el-form-item>
       <el-form-item prop="password">
         <template slot="label">
@@ -21,23 +32,27 @@
         ></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" class="login-btn" @click="login('ruleForm')">登录</el-button>
+        <el-button
+type="primary"
+class="login-btn" @click="login('ruleForm')"
+          >登录</el-button
+        >
       </el-form-item>
     </el-form>
   </div>
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions } from 'vuex'
 export default {
   data() {
     return {
       ruleForm: {
-        account: "",
-        password: "",
+        account: '',
+        password: ''
       },
       rules: {
-        account: [{ required: true, message: "账号不能为空", trigger: "blur" }],
+        account: [{ required: true, message: '账号不能为空', trigger: 'blur' }],
         password: [
           { required: true, message: '密码不能为空', trigger: 'blur' }
         ]
@@ -57,7 +72,7 @@ export default {
           res.data?.accessToken && this.setUserInfo(JSON.stringify(res.data))
           !this.$route.query.redirect
             ? this.$router.replace({
-              path: "/",
+              path: '/'
             })
             : this.$router.replace({
               path: this.$route.query.redirect
@@ -65,14 +80,14 @@ export default {
           this.$tools.message('登录成功！', 'info')
         } else {
           this.$message({
-            message: "请核对登录信息",
+            message: '请核对登录信息',
             duration: 2000,
-            type: "warning",
+            type: 'warning'
           })
           return false
         }
       })
-    },
+    }
   }
 }
 </script>

@@ -2,7 +2,13 @@
   <div class="container">
     <!-- 导航 -->
     <div class="head">
-      <el-link class="head-left" :underline="false" @click="goBack" icon="el-icon-back">返回</el-link>
+      <el-link
+        class="head-left"
+        :underline="false"
+        @click="goBack"
+        icon="el-icon-back"
+        >返回</el-link
+      >
       <span>{{ queryForm.name }}</span>
       <div class="head-right"></div>
     </div>
@@ -13,7 +19,10 @@
           <el-input placeholder="请输入编号" v-model="queryForm.id"></el-input>
         </el-form-item>
         <el-form-item label>
-          <el-input placeholder="请输入题干" v-model="queryForm.title"></el-input>
+          <el-input
+            placeholder="请输入题干"
+            v-model="queryForm.title"
+          ></el-input>
         </el-form-item>
         <el-form-item label>
           <el-select placeholder="请输入类型" v-model="queryForm.type">
@@ -36,14 +45,23 @@
           </el-select>
         </el-form-item>
         <el-form-item label>
-          <el-input placeholder="分值大于" v-model="queryForm.startScore"></el-input>
+          <el-input
+            placeholder="分值大于"
+            v-model="queryForm.startScore"
+          ></el-input>
         </el-form-item>
         <el-form-item label>
-          <el-input placeholder="分值小于" v-model="queryForm.endScore"></el-input>
+          <el-input
+            placeholder="分值小于"
+            v-model="queryForm.endScore"
+          ></el-input>
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query" icon="el-icon-search" type="primary">查询</el-button>
+        <el-button @click="query" icon="el-icon-search"
+type="primary"
+          >查询</el-button
+        >
       </el-form-item>
     </el-form>
     <!-- 内容 -->
@@ -85,22 +103,19 @@
             <div class="center-card-top" v-html="quesiton.title"></div>
             <div class="center-card-bottom">
               <div class="card-bottom-left">
-                <el-tag class="center-tag-danger" size="mini" type="danger">
-                  {{
-                    quesiton.typeName
-                  }}
-                </el-tag>
-                <el-tag class="center-tag-purple" effect="plain" size="mini">
-                  {{
-                    quesiton.difficultyName
-                  }}
-                </el-tag>
-                <el-tag effect="plain" size="mini" type="danger">{{ quesiton.score }}分</el-tag>
-                <el-tag effect="plain" size="mini">
-                  {{
-                    quesiton.updateUserName
-                  }}
-                </el-tag>
+                <el-tag class="center-tag-danger" size="mini" type="danger">{{
+                  quesiton.typeName
+                }}</el-tag>
+                <el-tag class="center-tag-purple" effect="plain" size="mini">{{
+                  quesiton.difficultyName
+                }}</el-tag>
+                <el-tag effect="plain" size="mini"
+type="danger"
+                  >{{ quesiton.score }}分</el-tag
+                >
+                <el-tag effect="plain" size="mini">{{
+                  quesiton.updateUserName
+                }}</el-tag>
               </div>
               <div class="card-bottom-right">
                 <el-button
@@ -111,7 +126,8 @@
                   round
                   size="mini"
                   type="primary"
-                >详细</el-button>
+                  >详细</el-button
+                >
                 <el-button
                   @click="copy(quesiton.id)"
                   class="btn"
@@ -120,7 +136,8 @@
                   round
                   size="mini"
                   type="primary"
-                >复制</el-button>
+                  >复制</el-button
+                >
                 <el-button
                   @click="del(quesiton.id)"
                   class="btn"
@@ -129,10 +146,23 @@
                   round
                   size="mini"
                   type="primary"
-                >删除</el-button>
+                  >删除</el-button
+                >
               </div>
             </div>
           </el-card>
+          <!-- 分页 -->
+          <el-pagination
+            background
+            layout="prev, pager, next"
+            prev-text="上一页"
+            next-text="下一页"
+            hide-on-single-page
+            :total="list.total"
+            :page-size="list.pageSize"
+            :current-page="list.curPage"
+            @current-change="pageChange"
+          ></el-pagination>
         </template>
         <template v-if="list.questionList.length == 0">
           <div class="data-null">
@@ -144,16 +174,20 @@
       <div class="content-right">
         <el-form
           :model="editForm"
+          ref="editForm"
           :rules="editForm.rules"
           label-width="70px"
-          ref="editForm"
           size="mini"
           v-model="labelPosition"
         >
           <el-row>
             <el-col :span="11">
               <el-form-item label="类型" prop="type">
-                <el-select disabled placeholder="请选择类型" v-model="editForm.type">
+                <el-select
+                  disabled
+                  placeholder="请选择类型"
+                  v-model="editForm.type"
+                >
                   <el-option
                     :key="parseInt(dict.dictKey)"
                     :label="dict.dictValue"
@@ -165,7 +199,10 @@
             </el-col>
             <el-col :span="11">
               <el-form-item label="难度" prop="difficulty">
-                <el-select placeholder="请选择难度" v-model="editForm.difficulty">
+                <el-select
+                  placeholder="请选择难度"
+                  v-model="editForm.difficulty"
+                >
                   <el-option
                     :key="parseInt(dict.dictKey)"
                     :label="dict.dictValue"
@@ -178,14 +215,19 @@
           </el-row>
 
           <el-form-item label="题干" prop="title">
-            <Editor :value="editForm.title" @editorListener="editorListener" id="title"></Editor>
+            <Editor
+              :value="editForm.title"
+              @editorListener="editorListener"
+              id="title"
+            ></Editor>
           </el-form-item>
 
           <template v-if="editForm.type === 1 || editForm.type === 2">
             <el-form-item
               :key="'option' + option.lab"
               :label="'选项' + option.lab"
-              :prop="'options.' + index + '.value'"
+              :prop="`options.${index}.value`"
+              :rules="editForm.rules.option"
               v-for="(option, index) in editForm.options"
             >
               <Editor
@@ -201,13 +243,15 @@
                 @click="addOption()"
                 class="btn2"
                 type="primary"
-              >+添加选项</el-button>
+                >+添加选项</el-button
+              >
               <el-button
                 :disabled="editForm.options.length <= 2"
                 @click="delOption()"
                 class="btn2"
                 type="primary"
-              >-删除选项</el-button>
+                >-删除选项</el-button
+              >
             </el-form-item>
           </template>
 
@@ -217,7 +261,8 @@
                 :key="answer.lab"
                 :label="answer.lab"
                 v-for="answer in editForm.answers"
-              >{{ answer.lab }}</el-radio>
+                >{{ answer.lab }}</el-radio
+              >
             </el-radio-group>
           </el-form-item>
           <el-form-item label="答案" prop="answer" v-if="editForm.type === 2">
@@ -226,15 +271,21 @@
                 :key="answer.lab"
                 :label="answer.lab"
                 v-for="answer in editForm.answers"
-              >{{ answer.lab }}</el-checkbox>
+                >{{ answer.lab }}</el-checkbox
+              >
             </el-checkbox-group>
           </el-form-item>
           <el-form-item label="答案" v-if="editForm.type === 3">
             <el-card class="el-card" shadow="never">
-              <el-alert :closable="false" title="单空有多个同义词，用三竖线分开。如：一般|||通常|||普遍" type="success"></el-alert>
+              <el-alert
+                :closable="false"
+                title="单空有多个同义词，用三竖线分开。如：一般|||通常|||普遍"
+                type="success"
+              ></el-alert>
               <el-form-item
                 :key="'answers' + index"
-                :prop="'answers.' + index + '.value'"
+                :prop="`answers.${index}.value`"
+                :rules="editForm.rules.answer"
                 v-for="(answer, index) in editForm.answers"
               >
                 <el-input v-model="answer.value">
@@ -247,13 +298,15 @@
                 class="btn2"
                 style="margin-left: 78px"
                 type="primary"
-              >+添加填空</el-button>
+                >+添加填空</el-button
+              >
               <el-button
                 :disabled="editForm.answers.length <= 1"
                 @click="delFillBlanks()"
                 class="btn2"
                 type="primary"
-              >-删除填空</el-button>
+                >-删除填空</el-button
+              >
             </el-card>
           </el-form-item>
           <el-form-item label="答案" v-if="editForm.type === 4">
@@ -262,14 +315,23 @@
                 :key="answer.lab"
                 :label="answer.lab"
                 v-for="answer in editForm.judgeAnswers"
-              >{{ answer.lab }}</el-radio>
+                >{{ answer.lab }}</el-radio
+              >
             </el-radio-group>
           </el-form-item>
           <el-form-item label="答案" prop="answer" v-if="editForm.type === 5">
-            <Editor :value="editForm.answer" @editorListener="editorListener" id="answer"></Editor>
+            <Editor
+              :value="editForm.answer"
+              @editorListener="editorListener"
+              id="answer"
+            ></Editor>
           </el-form-item>
           <el-form-item label="解析">
-            <Editor :value="editForm.analysis" @editorListener="editorListener" id="analysis"></Editor>
+            <Editor
+              :value="editForm.analysis"
+              @editorListener="editorListener"
+              id="analysis"
+            ></Editor>
           </el-form-item>
           <el-row>
             <el-col :span="11">
@@ -296,23 +358,48 @@
           </el-row>
           <el-form-item label="分值选项" v-if="editForm.type === 2">
             <el-checkbox-group v-model="editForm.scoreOptions">
-              <el-tooltip class="item" content="默认全对得分" effect="dark" placement="top">
+              <el-tooltip
+                class="item"
+                content="默认全对得分"
+                effect="dark"
+                placement="top"
+              >
                 <el-checkbox label="1">半对半分</el-checkbox>
               </el-tooltip>
             </el-checkbox-group>
           </el-form-item>
           <el-form-item label="分值选项" v-if="editForm.type === 3">
             <el-checkbox-group v-model="editForm.scoreOptions">
-              <el-tooltip class="item" content="默认全对得分" effect="dark" placement="top">
+              <el-tooltip
+                class="item"
+                content="默认全对得分"
+                effect="dark"
+                placement="top"
+              >
                 <el-checkbox label="1">半对半分</el-checkbox>
               </el-tooltip>
-              <el-tooltip class="item" content="默认答案有顺序" effect="dark" placement="top">
+              <el-tooltip
+                class="item"
+                content="默认答案有顺序"
+                effect="dark"
+                placement="top"
+              >
                 <el-checkbox label="2">答案无顺序</el-checkbox>
               </el-tooltip>
-              <el-tooltip class="item" content="默认大小写敏感" effect="dark" placement="top">
+              <el-tooltip
+                class="item"
+                content="默认大小写敏感"
+                effect="dark"
+                placement="top"
+              >
                 <el-checkbox label="3">大小写不敏感</el-checkbox>
               </el-tooltip>
-              <el-tooltip class="item" content="默认等于答案得分" effect="dark" placement="top">
+              <el-tooltip
+                class="item"
+                content="默认等于答案得分"
+                effect="dark"
+                placement="top"
+              >
                 <el-checkbox label="4">包含答案得分</el-checkbox>
               </el-tooltip>
             </el-checkbox-group>
@@ -323,24 +410,28 @@
               style="width: 164px; height: 40px"
               type="primary"
               v-if="!editForm.id"
-            >添加</el-button>
+              >添加</el-button
+            >
             <el-button
               @click="edit(false)"
               style="width: 164px; height: 40px"
               type="primary"
               v-if="editForm.id"
-            >修改</el-button>
+              >修改</el-button
+            >
             <el-button
               @click="edit(true)"
               plain
               style="width: 164px; height: 40px; border-color: #fff"
               type="primary"
               v-if="editForm.id != null"
-            >生成新版本</el-button>
+              >生成新版本</el-button
+            >
           </el-form-item>
         </el-form>
       </div>
     </div>
+    <!-- 上传试题模板 -->
     <el-dialog
       :visible.sync="fileForm.show"
       :show-close="false"
@@ -363,130 +454,134 @@
   </div>
 </template>
 <script>
-import Editor from "@/components/Editor.vue";
+import Editor from '@/components/Editor.vue'
 export default {
   components: {
-    Editor
+    Editor,
   },
   data() {
     return {
-      labelPosition: "left",
-      value: "",
+      labelPosition: 'left',
+      value: '',
       list: {
         // 列表数据
         total: 0, // 总条数
         curPage: 1, // 当前第几页
         pageSize: 6, // 每页多少条
-        questionList: [] // 列表数据
+        questionList: [], // 列表数据
       },
       queryForm: {
         // 查询表单
-        id: "", // 主键
-        name: '', //导航栏名称
-        edit: false, //编辑权限
-        title: "", // 标题
+        id: '', // 主键
+        name: '', // 导航栏名称
+        edit: false, // 编辑权限
+        title: '', // 标题
         type: null, // 类型
         difficulty: null, // 难度
-        startScore: "", // 得分大于
-        endScore: "", // 得分小于
-        questionTypeName: "", // 试题分类name
+        startScore: '', // 得分大于
+        endScore: '', // 得分小于
+        questionTypeName: '', // 试题分类name
         questionTypeId: 1, // 试题分类id
         difficultyDictList: [], // 难度列表
-        typeDictList: [] // 类型列表
+        typeDictList: [], // 类型列表
       },
       editForm: {
         // 修改表单
-        id: 0, // 主键
+        id: null, // 主键
         type: 1, // 类型
         difficulty: 1, // 难度
-        title: "", // 标题
+        title: '', // 标题
         options: [
           {
-            lab: "A",
-            value: "",
+            lab: 'A',
+            value: '',
           },
           {
-            lab: "B",
-            value: "",
-          }
+            lab: 'B',
+            value: '',
+          },
         ], // 选项
-        answer: "", // 答案
+        answer: '', // 答案
         answerMultip: [],
         answers: [
           {
-            lab: "A",
-            value: "",
+            lab: 'A',
+            value: '',
           },
           {
-            lab: "B",
-            value: "",
-          }
+            lab: 'B',
+            value: '',
+          },
         ], // 答案
         judgeAnswers: [
           {
-            lab: "对",
-            value: "",
+            lab: '对',
+            value: '',
           },
           {
-            lab: "错",
-            value: "",
-          }
+            lab: '错',
+            value: '',
+          },
         ],
-        analysis: "", // 解析
+        analysis: '', // 解析
         score: 1, // 分值
         no: 1, // 排序
+        isCrateNew: false,
         scoreOptions: [],
         rules: {
-          type: [{ required: true, message: "请选择类型", trigger: "change" }],
+          type: [{ required: true, message: '请选择类型', trigger: 'change' }],
           difficulty: [
-            { required: true, message: "请选择难度", trigger: "change" }
+            { required: true, message: '请选择难度', trigger: 'change' },
           ],
-          title: [{ required: true, message: "请输入题干", trigger: "change" }],
+          title: [{ required: true, message: '请输入题干', trigger: 'change' }],
+          option: [
+            { required: true, message: '请输入选项内容', trigger: 'change' },
+          ],
           answer: [
-            { required: true, message: "请选择答案", trigger: "change" }
+            { required: true, message: '请选择答案', trigger: 'change' },
           ],
-          score: [{ required: true, message: "请输入分值", trigger: "change" }],
-          no: [{ required: true, message: "请输入排序", trigger: "change" }]
-        }
+          score: [{ required: true, message: '请输入分值', trigger: 'change' }],
+          no: [{ required: true, message: '请输入排序', trigger: 'change' }],
+        },
       },
       typeButtonGroup: [
         // 左侧按钮组1
         {
           type: 1,
-          name: "单选题",
-          img: require("@/assets/img/icon/radio-icon.png")
+          name: '单选题',
+          img: require('@/assets/img/icon/radio-icon.png'),
         },
         {
           type: 2,
-          name: "多选题",
-          img: require("@/assets/img/icon/checkbox-icon.png")
+          name: '多选题',
+          img: require('@/assets/img/icon/checkbox-icon.png'),
         },
         {
           type: 3,
-          name: "填空题",
-          img: require("@/assets/img/icon/blanks-icon.png")
+          name: '填空题',
+          img: require('@/assets/img/icon/blanks-icon.png'),
         },
         {
           type: 4,
-          name: "判断题",
-          img: require("@/assets/img/icon/judge-icon.png")
+          name: '判断题',
+          img: require('@/assets/img/icon/judge-icon.png'),
         },
         {
           type: 5,
-          name: "问答题",
-          img: require("@/assets/img/icon/ask-icon.png")
-        }
+          name: '问答题',
+          img: require('@/assets/img/icon/ask-icon.png'),
+        },
       ],
       handlerButtonGroup: [
         // 左侧按钮组2
         {
-          name: "试题模板",
-          img: require("@/assets/img/icon/template-icon.png")
+          name: '试题模板',
+          img: require('@/assets/img/icon/template-icon.png'),
         },
         {
-          name: "试题导入",
-          img: require("@/assets/img/icon/import-icon.png")
-        }
+          name: '试题导入',
+          img: require('@/assets/img/icon/import-icon.png'),
+        },
         /* {
           name: "试题导出",
           img: require("@/assets/img/icon/export-icon.png")
@@ -497,8 +592,8 @@ export default {
         } */
       ],
       fileForm: {
-        show: false
-      }
+        show: false,
+      },
     }
   },
   created() {
@@ -510,19 +605,19 @@ export default {
   },
   methods: {
     goBack() {
-      this.$router.push("/examQuestion");
+      this.$router.back()
     },
     // 初始化默认值
     async init() {
       this.query() // 查询列表
 
       const typeDictData = await this.$https.dictListPage({
-        dictIndex: "QUESTION_TYPE",
+        dictIndex: 'QUESTION_TYPE',
       })
       this.queryForm.typeDictList = typeDictData.data.list // 初始化类型下拉框
 
       const difficultyDictData = await this.$https.dictListPage({
-        dictIndex: "QUESTION_DIFFICULTY",
+        dictIndex: 'QUESTION_DIFFICULTY',
       })
       this.queryForm.difficultyDictList = difficultyDictData.data.list // 初始化难度下拉框
 
@@ -531,12 +626,12 @@ export default {
       this.editForm.difficulty = 1 // 默认选中简单
       this.editForm.score = 1 // 默认得分为1
       this.editForm.no = 1 // 默认排序为1
-      this.editForm.answer = ""; // 默认答案为空
+      this.editForm.answer = '' // 默认答案为空
     },
     // 查询
     async query() {
       const {
-        data: { list, total }
+        data: { list, total },
       } = await this.$https.questionListPage({
         id: this.queryForm.id,
         questionTypeId: this.queryForm.questionTypeId,
@@ -546,58 +641,62 @@ export default {
         difficulty: this.queryForm.difficulty,
         scoreStart: this.queryForm.scoreStart,
         scoreEnd: this.queryForm.scoreEnd,
-        curPage: this.queryForm.curPage,
-        pageSize: this.queryForm.pageSize
+        curPage: this.list.curPage,
+        pageSize: this.list.pageSize,
       })
       this.list.total = total
       this.list.questionList = list
     },
+    pageChange(val) {
+      this.list.curPage = val
+      this.query()
+    },
     // 更新选项和答案
     updateOptionAndAnswer(value) {
-      this.$refs.editForm.clearValidate(["answer"]) // 清理校验
+      this.$refs.editForm.clearValidate(['answer']) // 清理校验
 
       this.editForm.options = [] // 重置选项
       this.editForm.answers = [] // 重置答案列表
-      this.editForm.answer = ""; // 重置答案
+      this.editForm.answer = '' // 重置答案
       this.editForm.rules.answer = [
-        { required: false, message: "请选择答案", trigger: "change" }
+        { required: false, message: '请选择答案', trigger: 'change' },
       ] // 取消答案校验
       // 如果是单选
       if (value === 1) {
         for (let i = 0; i < 2; i++) {
-          this._addOption(i, ""); // 初始化两个选项
+          this._addOption(i, '') // 初始化两个选项
         }
         this.editForm.rules.answer = [
-          { required: true, message: "请选择答案", trigger: "change" }
+          { required: true, message: '请选择答案', trigger: 'change' },
         ] // 添加答案校验
-        return;
+        return
       }
 
       // 如果是多选
       if (value === 2) {
         this.editForm.answer = []
         for (let i = 0; i < 2; i++) {
-          this._addOption(i, ""); // 初始化两个选项
+          this._addOption(i, '') // 初始化两个选项
         }
         this.editForm.rules.answer = [
           {
-            type: "array",
+            type: 'array',
             required: true,
-            message: "请选择答案",
-            trigger: "change",
-          }
+            message: '请选择答案',
+            trigger: 'change',
+          },
         ] // 添加答案校验
-        return;
+        return
       }
 
       // 如果是填空
       if (value === 3) {
         for (let i = 0; i < 1; i++) {
           const lab = String.fromCharCode(65 + i)
-          this.editForm.answers.push({ lab: lab, value: "" }) // 初始化一个填空
+          this.editForm.answers.push({ lab: lab, value: '' }) // 初始化一个填空
 
-          this.editForm.rules["answers." + i + ".value"] = [
-            { required: true, message: "请输入填空" + lab, trigger: "change" }
+          this.editForm.rules['answers.' + i + '.value'] = [
+            { required: true, message: '请输入填空' + lab, trigger: 'change' },
           ] // 添加答案校验
         }
         return
@@ -605,31 +704,31 @@ export default {
 
       // 如果是对错
       if (value === 4) {
-        this.editForm.answers.push({ lab: "对", value: "" }) // 初始化两个选项
-        this.editForm.answers.push({ lab: "错", value: "" })
+        this.editForm.answers.push({ lab: '对', value: '' }) // 初始化两个选项
+        this.editForm.answers.push({ lab: '错', value: '' })
         this.editForm.rules.answer = [
-          { required: true, message: "请选择答案", trigger: "change" }
+          { required: true, message: '请选择答案', trigger: 'change' },
         ] // 添加答案校验
-        return;
+        return
       }
 
       // 如果是问答
       if (value === 5) {
-        this.editForm.answer = "";
+        this.editForm.answer = ''
         this.editForm.rules.answer = [
-          { required: true, message: "请输入答案", trigger: "change" }
+          { required: true, message: '请输入答案', trigger: 'change' },
         ] // 添加答案校验
       }
     },
     // 添加选项
     addOption() {
       if (this.editForm.options.length >= 7) {
-        alert("最多7个选项");
+        alert('最多7个选项')
         return
       }
 
       const index = this.editForm.options.length
-      this._addOption(index, "");
+      this._addOption(index, '')
     },
     // 添加选项
     _addOption(index, value) {
@@ -637,8 +736,8 @@ export default {
       this.editForm.options.push({ lab: lab, value: value })
       this.editForm.answers.push({ lab: lab, value: value })
 
-      this.editForm.rules["options." + index + ".value"] = [
-        { required: true, message: "请输入选项" + lab, trigger: "change" }
+      this.editForm.rules['options.' + index + '.value'] = [
+        { required: true, message: '请输入选项' + lab, trigger: 'change' },
       ]
     },
     // 删除选项
@@ -649,52 +748,52 @@ export default {
     // 添加填空
     addFillBlanks() {
       const index = this.editForm.answers.length
-      this._addFillBlanks(index, "");
+      this._addFillBlanks(index, '')
     },
     // 添加填空
     _addFillBlanks(index, value) {
       const lab = String.fromCharCode(65 + index)
       this.editForm.answers.push({ lab: lab, value: value })
 
-      this.editForm.rules["answers." + index + ".value"] = [
-        { required: true, message: "请输入填空" + lab, trigger: "change" }
+      this.editForm.rules['answers.' + index + '.value'] = [
+        { required: true, message: '请输入填空' + lab, trigger: 'change' },
       ]
     },
     // 删除填空
     delFillBlanks() {
       if (this.editForm.answers.length <= 1) {
-        alert("最少1个填空");
+        alert('最少1个填空')
         return
       }
 
       this.editForm.answers.pop()
       const index = this.editForm.answers.length
-      this.editForm.rules["answers." + index + ".value"] = [
-        { required: false, message: "请输入填空" + lab, trigger: "change" }
+      this.editForm.rules['answers.' + index + '.value'] = [
+        { required: false, message: '请输入填空' + lab, trigger: 'change' },
       ]
     },
     // 编辑器监听事件
     editorListener(id, value) {
-      if (id.startsWith("option")) {
+      if (id.startsWith('option')) {
         const index = parseInt(id.substr(6).charCodeAt() - 65) // 选项赋值，特殊处理一下
         this.editForm.options[index].value = value
-        return;
+        return
       }
 
       this.editForm[id] = value
     },
     // 更新类型
     updateType(value) {
-      Object.assign(this.$data.editForm, this.$options.data().editForm)
+      this.$tools.resetData(this, 'editForm')
       this.editForm.type = value
     },
     // 添加试题
     async add() {
       if (this.queryForm.edit == 'false') {
-        this.$tools.message('暂无此项权限', 'warning')
-        return;
+        this.$tools.message('暂无此项权限！', 'warning')
+        return
       }
-      this.$refs["editForm"].validate(async (valid) => {
+      this.$refs['editForm'].validate(async (valid) => {
         if (!valid) {
           return false
         }
@@ -706,7 +805,7 @@ export default {
           analysis: this.editForm.analysis,
           score: this.editForm.score,
           no: this.editForm.no,
-          questionTypeId: this.queryForm.questionTypeId
+          questionTypeId: this.queryForm.questionTypeId,
         }
 
         if (params.type === 1 || params.type === 2) {
@@ -730,31 +829,29 @@ export default {
           params.answers = this.editForm.answer
         } else if (params.type === 2) {
           // 如果是多选，答案按逗号分隔
-          params.answers = this.editForm.answerMultip;
+          params.answers = this.editForm.answerMultip
         } else if (params.type === 3) {
           // 如果是填空，答案之间按不可见字符回车分隔
           const _answer = []
           for (const i in this.editForm.answers) {
             _answer[i] = this.editForm.answers[i].value
           }
-          params.answers = _answer;
+          params.answers = _answer
         }
 
         const res = await this.$https.questionAdd(params)
-        if (res.code != 200) {
-          alert(res.msg)
-        }
-
-        this.query()
-      });
+        res?.code == 200
+          ? (this.$tools.message('添加成功！'), this.query())
+          : this.$tools.message('添加失败！', 'error')
+      })
     },
     // 修改试题
     edit(newVer) {
       if (this.queryForm.edit == 'false') {
-        this.$tools.message('暂无此项权限', 'warning')
-        return;
+        this.$tools.message('暂无此项权限！', 'warning')
+        return
       }
-      this.$refs["editForm"].validate((valid) => {
+      this.$refs['editForm'].validate((valid) => {
         if (!valid) {
           return false
         }
@@ -766,7 +863,7 @@ export default {
           title: this.editForm.title,
           analysis: this.editForm.analysis,
           score: this.editForm.score,
-          no: this.editForm.no
+          no: this.editForm.no,
         }
 
         // 选项
@@ -786,7 +883,7 @@ export default {
 
           this.editForm.scoreOptions.forEach((element) => {
             _scoreOptions.push(element)
-          });
+          })
           params.scoreOptions = _scoreOptions
         }
 
@@ -794,39 +891,39 @@ export default {
           params.answers = this.editForm.answer
         } else if (params.type === 2) {
           // 如果是多选，答案按逗号分隔
-          params.answers = this.editForm.answer;
+          params.answers = this.editForm.answerMultip
         } else if (params.type === 3) {
           // 如果是填空，答案之间按不可见字符回车分隔
           const _answer = []
           for (const i in this.editForm.answers) {
             _answer[i] = this.editForm.answers[i].value
           }
-          params.answers = _answer;
+          params.answers = _answer
         }
 
         var msg = newVer
-          ? "确定要生成新版本？"
-          : "当前修改会同步到引用的试卷，确定要修改？";
-        this.$confirm(msg, "提示", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
+          ? '生成新版本不会同步到已引用的试卷，仍要生成新版本？'
+          : '当前修改会同步到引用的试卷，确定要修改？'
+        this.$confirm(msg, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
         })
           .then(async () => {
             const res = await this.$https.questionEdit(params)
-            res.code === 200
+            res?.code === 200
               ? (this.$tools.message('修改成功！'), this.query())
               : this.$tools.message('修改失败！')
           })
-          .catch(() => { })
-      });
+          .catch(() => {})
+      })
     },
     // 获取试题
     async get(id) {
       const res = await this.$https.questionGet({ id })
-      if (res.code != 200) {
+      if (res?.code != 200) {
         this.$tools.message('查询失败！', 'error')
-        return;
+        return
       }
 
       this.editForm.id = res.data.id
@@ -834,7 +931,7 @@ export default {
       this.editForm.difficulty = res.data.difficulty
       this.editForm.title = res.data.title
       this.editForm.answer = res.data.answers[0]
-      this.editForm.answerMultip = res.data.answers;
+      this.editForm.answerMultip = res.data.answers
       this.editForm.analysis = res.data.analysis
       this.editForm.score = res.data.score
       this.editForm.no = res.data.no
@@ -852,7 +949,7 @@ export default {
           this._addOption(i, res.data.options[i])
         }
         this.editForm.scoreOptions =
-          res.data.scoreOptions == null ? [] : res.data.scoreOptions.split(",");
+          res.data.scoreOptions == null ? [] : res.data.scoreOptions.split(',')
       } else if (this.editForm.type === 3) {
         this.editForm.answers = [] // 重置答案列表
         const answers = res.data.answers
@@ -861,60 +958,64 @@ export default {
         }
 
         this.editForm.scoreOptions =
-          res.data.scoreOptions == null ? [] : res.data.scoreOptions.split(",");
+          res.data.scoreOptions == null ? [] : res.data.scoreOptions.split(',')
       }
     },
     async copy(id) {
       if (this.queryForm.edit == 'false') {
-        this.$tools.message('暂无此项权限', 'warning')
-        return;
+        this.$tools.message('暂无此项权限！', 'warning')
+        return
       }
       await this.$https.questionCopy({ id })
       this.query()
     },
     del(id) {
       if (this.queryForm.edit == 'false') {
-        this.$tools.message('暂无此项权限', 'warning')
-        return;
+        this.$tools.message('暂无此项权限！', 'warning')
+        return
       }
-      this.$confirm("确定要删除？", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
+      this.$confirm('确定要删除？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
       }).then(async () => {
         await this.$https.questionDel({ id })
         this.query()
-      });
+      })
     },
     async questionTemplate() {
-      const template = await this.$https.questionTemplate({}, "blob");
-      const blob = new Blob([template], { type: "application/msword" })
+      const template = await this.$https.questionTemplate({}, 'blob')
+      const blob = new Blob([template], { type: 'application/msword' })
       const url = window.URL.createObjectURL(blob)
-      const a = document.createElement("a");
+      const a = document.createElement('a')
       a.href = url
-      a.download = "试题模板.doc";
+      a.download = '试题模板.doc'
       a.click()
       window.URL.revokeObjectURL(url)
     },
     // 上传试题
     async questionImport() {
+      if (!document.querySelector('#docId').files[0]) {
+        this.$tools.message('请选择上传文件', 'warning')
+        return
+      }
       const formData = new FormData()
-      formData.append("file", document.querySelector("#docId").files[0])
-      formData.append("questionTypeId", this.queryForm.questionTypeId)
+      formData.append('file', document.querySelector('#docId').files[0])
+      formData.append('questionTypeId', this.queryForm.questionTypeId)
       const res = await this.$https.questionImport(
         formData,
         undefined,
-        "multipart/form-data"
+        'multipart/form-data'
       )
-      if (res.code == 200) {
-        this.$tools.message("上传成功！");
+      if (res?.code == 200) {
+        this.$tools.message('上传成功！')
         this.fileForm.show = false
         this.query()
       } else {
-        this.$tools.message("上传失败！", error)
+        this.$tools.message('上传失败！', error)
       }
-    }
-  }
+    },
+  },
 }
 </script>
 <style lang="scss" scoped>
@@ -1129,6 +1230,7 @@ export default {
 .el-checkbox {
   margin-right: 10px;
 }
+
 .box-card-no-border {
   border: none;
 }
@@ -1136,23 +1238,28 @@ export default {
 /deep/ .el-card__body {
   padding: 5px;
 }
+
 .el-alert--success.is-light {
   background-color: #ecf7fd;
   color: #0095e5;
   margin-bottom: 10px;
 }
+
 .el-alert {
   padding: 0px;
 }
+
 /deep/ .el-alert__title {
   font-size: 12px;
   color: #0095e5;
 }
+
 .el-input /deep/.el-input-group__prepend {
   background-color: #fff;
   border: 0px;
   width: 38px;
 }
+
 /deep/ .el-form-item--mini.el-form-item,
 .el-form-item--small.el-form-item {
   margin-bottom: 24px;
@@ -1160,5 +1267,20 @@ export default {
 
 /deep/ .el-form-item__error {
   line-height: 20px;
+}
+
+/deep/.el-pagination.is-background .el-pager li:not(.disabled).active {
+  background-color: #0095e5;
+  color: #fff;
+}
+
+/deep/.el-pagination.is-background .btn-next,
+/deep/.el-pagination.is-background .btn-prev,
+/deep/.el-pagination.is-background .el-pager li {
+  margin: 0 3px;
+  min-width: 35px;
+  border: 1px solid #d4dfd9;
+  background-color: #fff;
+  padding: 0 10px;
 }
 </style>

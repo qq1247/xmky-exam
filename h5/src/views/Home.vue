@@ -24,12 +24,12 @@
                 <span class="header-left">{{ item.examName }}</span>
                 <div class="header-right">
                   <i class="common common-setting"></i>
-                  <el-tag type="danger" size="mini" effect="dark">{{ examStatus[item.state] }}</el-tag>
-                  <el-tag
-                    type="warning"
-                    size="mini"
-                    effect="dark"
-                  >{{ readPaperStatus[item.markState] }}</el-tag>
+                  <el-tag type="danger" size="mini" effect="dark">{{
+                    examStatus[item.state]
+                  }}</el-tag>
+                  <el-tag type="warning" size="mini" effect="dark">{{
+                    readPaperStatus[item.markState]
+                  }}</el-tag>
                 </div>
               </div>
               <el-row class="body-item">
@@ -43,7 +43,12 @@
               <el-row class="body-item">
                 <el-col :span="12">
                   <el-col :span="8" class="item-title">及格：</el-col>
-                  <el-col :span="16">{{ item.totalScore }}&nbsp;/&nbsp;{{ item.paperTotalScore }}</el-col>
+                  <el-col
+:span="16"
+                    >{{ item.totalScore }}&nbsp;/&nbsp;{{
+                      item.paperTotalScore
+                    }}</el-col
+                  >
                 </el-col>
                 <el-col :span="12">
                   <el-col :span="11" class="item-title">考试人数：</el-col>
@@ -56,7 +61,8 @@
                 type="primary"
                 icon="el-icon-timer"
                 class="card-btn"
-              >{{ item.markState == 1 ? '开始阅卷' : '开始考试' }}</el-button>
+                >{{ item.markState == 1 ? '开始阅卷' : '开始考试' }}</el-button
+              >
             </el-card>
           </el-col>
         </el-col>
@@ -89,12 +95,12 @@
                 <span class="header-left">{{ item.examName }}</span>
                 <div class="header-right">
                   <i class="common common-setting"></i>
-                  <el-tag type="danger" size="mini" effect="dark">{{ examStatus[item.state] }}</el-tag>
-                  <el-tag
-                    type="warning"
-                    size="mini"
-                    effect="dark"
-                  >{{ readPaperStatus[item.markState] }}</el-tag>
+                  <el-tag type="danger" size="mini" effect="dark">{{
+                    examStatus[item.state]
+                  }}</el-tag>
+                  <el-tag type="warning" size="mini" effect="dark">{{
+                    readPaperStatus[item.markState]
+                  }}</el-tag>
                 </div>
               </div>
               <el-row class="body-item">
@@ -108,7 +114,12 @@
               <el-row class="body-item">
                 <el-col :span="12">
                   <el-col :span="8" class="item-title">及格：</el-col>
-                  <el-col :span="16">{{ item.totalScore }}&nbsp;/&nbsp;{{ item.paperTotalScore }}</el-col>
+                  <el-col
+:span="16"
+                    >{{ item.totalScore }}&nbsp;/&nbsp;{{
+                      item.paperTotalScore
+                    }}</el-col
+                  >
                 </el-col>
                 <el-col :span="12">
                   <el-col :span="11" class="item-title">考试人数：</el-col>
@@ -121,7 +132,8 @@
                 type="primary"
                 icon="el-icon-timer"
                 class="card-btn"
-              >{{ item.markState == 1 ? '开始阅卷' : '开始考试' }}</el-button>
+                >{{ item.markState == 1 ? '开始阅卷' : '开始考试' }}</el-button
+              >
             </el-card>
           </el-col>
         </el-col>
@@ -131,7 +143,7 @@
 </template>
 
 <script>
-import dayjs from 'dayjs';
+import dayjs from 'dayjs'
 export default {
   data() {
     return {
@@ -139,7 +151,7 @@ export default {
       examStatus: ['', '未考试', '考试中', '已交卷', '强制交卷'],
       readPaperStatus: ['', '未阅卷', '阅卷中', '已阅卷'],
       noticeList: []
-    };
+    }
   },
   created() {
     this.init()
@@ -154,7 +166,7 @@ export default {
         curPage: 1,
         pageSize: 6
       }) */
-      let examList = []
+      const examList = []
       for (let i = 0; i < 4; i++) {
         examList.push({
           id: i,
@@ -176,7 +188,7 @@ export default {
           id: index + 1,
           title: '这是一条最新通知',
           time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-          hot: index == 0 ? true : false
+          hot: index == 0,
         })
       }
     }

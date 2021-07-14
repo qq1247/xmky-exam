@@ -33,7 +33,7 @@ export default {
   props: {
     value: {
       type: Boolean | String | Number,
-      default: ''
+      default: '',
     },
     multiple: {
       type: Boolean,
@@ -45,11 +45,11 @@ export default {
     },
     popperClass: {
       type: String,
-      default: ''
+      default: '',
     },
     placeholder: {
       type: String,
-      default: '请选择...'
+      default: '请选择...',
     },
     clearable: {
       type: Boolean,
@@ -92,11 +92,10 @@ export default {
     }
   },
   data() {
-    return {
-    }
+    return {}
   },
   components: {},
-  mounted() { },
+  mounted() {},
   methods: {
     focus() {
       this.$emit('focus')
@@ -106,7 +105,7 @@ export default {
     },
     change(e) {
       this.$emit('change', e)
-    }
+    },
   },
 }
 </script>
