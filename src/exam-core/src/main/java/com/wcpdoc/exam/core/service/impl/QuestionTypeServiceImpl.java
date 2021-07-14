@@ -80,7 +80,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 			throw new MyException("参数错误：name");
 		}
 		QuestionType entity = questionTypeDao.getEntity(id);
-		if (!entity.getWriteUserIds().contains(","+getCurUser().getId()+",")) {
+		if (entity.getCreateUserId() != getCurUser().getId()) {
 			throw new MyException("权限不足！");
 		}
 		
@@ -109,7 +109,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 			throw new MyException("请先删除试题分类下所有的试题！");
 		}
 		QuestionType questionType = getEntity(id);
-		if (!questionType.getWriteUserIds().contains(","+getCurUser().getId()+",")) {
+		if (questionType.getCreateUserId() != getCurUser().getId()) {
 			throw new MyException("权限不足！");
 		}
 		
@@ -133,11 +133,20 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	@Override
 	public void auth(Integer id, String readUserIds, String writeUserIds) {
 		QuestionType entity = getEntity(id);
+		if(entity.getCreateUserId().intValue() != getCurUser().getId()){
+			throw new MyException("非法操作！");
+		}
 		if (ValidateUtil.isValid(readUserIds)) {
 			entity.setReadUserIds(","+readUserIds+",");
 		}
 		if (ValidateUtil.isValid(writeUserIds)) {
 			entity.setWriteUserIds(","+writeUserIds+",");
+		}
+		if(!entity.getReadUserIds().contains(","+getCurUser().getId()+",")){
+			throw new MyException("创建者不能被删除！");
+		}
+		if(!entity.getWriteUserIds().contains(","+getCurUser().getId()+",")){
+			throw new MyException("创建者不能被删除！");
 		}
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());

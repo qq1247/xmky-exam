@@ -37,8 +37,8 @@ code == 401 无权限或登录超时
 | data.list[]                | Object[]   | 分页列表 |
 | data.list[].id             | Integer | 主键     |
 | data.list[].name           | String  | 名称     |
-| data.list[].readUserNames  | String  | 读权限   |
-| data.list[].writeUserNames | String  | 写权限   |
+| data.list[].readUserNames[]  | String[]| 读权限 |
+| data.list[].writeUserNames[] | String[]| 写权限 |
 
 ####试题分类添加：questionType/add
 ######请求参数
@@ -82,8 +82,8 @@ code == 401 无权限或登录超时
 | data.createUserId   | Integer | 创建人ID   |
 | data.createUserName | String  | 创建人名称 |
 | data.createTime     | Date    | 创建时间   |
-| data.readUserIds    | Integer | 读权限     |
-| data.writeUserIds   | Integer | 写权限     |
+| data.readUserIds[]    | String[] | 读权限  |
+| data.writeUserIds[]   | String[] | 写权限  |
 
 ####试题分类合并：questionType/move
 ######请求参数

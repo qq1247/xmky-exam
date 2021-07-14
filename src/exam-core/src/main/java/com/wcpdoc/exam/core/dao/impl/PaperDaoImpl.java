@@ -55,7 +55,7 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 			params.add("%" + user.getId() + "%");
 			
 			partSql.append("OR PAPER_TYPE.READ_USER_IDS LIKE ? ");
-			params.add("%" + user.getOrgId() + "%");
+			params.add("%" + user.getId() + "%");
 			
 			/*if (ValidateUtil.isValid(user.getPostIds())) {
 				String[] postIds = user.getPostIds().substring(1, user.getPostIds().length() - 1).split(",");
@@ -91,7 +91,7 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 
 	@Override
 	public List<Paper> getList(Integer paperTypeId) {
-		String sql = "SELECT * FROM EXM_PAPER WHERE STATE = 1 AND PAPER_TYPE_ID = ?";
+		String sql = "SELECT * FROM EXM_PAPER WHERE STATE != 0 AND PAPER_TYPE_ID = ?";
 		return getList(sql, new Object[] { paperTypeId }, Paper.class);
 	}
 }

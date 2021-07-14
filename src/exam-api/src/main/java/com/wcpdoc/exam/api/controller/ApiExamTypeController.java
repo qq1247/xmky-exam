@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.api.controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -63,26 +65,24 @@ public class ApiExamTypeController extends BaseController {
 			for(Map<String, Object> mapList : listpage.getList()){
 				if(mapList.get("readUserIds")!= null){
 					String[] readUserSplit = mapList.get("readUserIds").toString().subSequence(1, mapList.get("readUserIds").toString().length()).toString().split(",");
+					mapList.put("readUserIds", readUserSplit);
+					List<String> list = new ArrayList<String>();
 					for(String id : readUserSplit){
 						User user = userService.getEntity(Integer.parseInt(id));
-						if(mapList.get("readUserNames") == null){
-							mapList.put("readUserNames", user.getName());
-						}else{
-							mapList.put("readUserNames", mapList.get("readUserNames")+","+user.getName());
-						}
+						list.add(user.getName());
 					}
+					mapList.put("readUserNames", list);
 				}
 				
 				if (mapList.get("writeUserIds")!= null) {
 					String[] writeUserSplit = mapList.get("writeUserIds").toString().subSequence(1, mapList.get("writeUserIds").toString().length()).toString().split(",");
+					mapList.put("writeUserIds", writeUserSplit);
+					List<String> list = new ArrayList<String>();
 					for(String id :writeUserSplit){
 						User user = userService.getEntity(Integer.parseInt(id));
-						if(mapList.get("writeUserNames") == null){
-							mapList.put("writeUserNames", user.getName());
-						}else{
-							mapList.put("writeUserNames", mapList.get("readUserNames")+","+user.getName());
-						}
+						list.add(user.getName());
 					}
+					mapList.put("writeUserNames", list);
 				}
 				
 				if ("0".equals(mapList.get("createUserId").toString())) {
@@ -183,8 +183,8 @@ public class ApiExamTypeController extends BaseController {
 					.addAttr("imgId", entity.getImgId())
 					.addAttr("createUserId", entity.getCreateUserId())
 					.addAttr("createTime", DateUtil.formatDateTime(entity.getCreateTime()))
-					.addAttr("readUserIds", entity.getReadUserIds())
-					.addAttr("writeUserIds", entity.getWriteUserIds());
+					.addAttr("readUserIds", entity.getReadUserIds().subSequence(1, entity.getReadUserIds().length()).toString().split(","))
+					.addAttr("writeUserIds", entity.getWriteUserIds().subSequence(1, entity.getWriteUserIds().length()).toString().split(","));
 		} catch (MyException e) {
 			log.error("获取试题分类错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

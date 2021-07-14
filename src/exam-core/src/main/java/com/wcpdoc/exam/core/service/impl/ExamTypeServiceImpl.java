@@ -55,9 +55,9 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 			throw new MyException("参数错误：name");
 		}
 		
-		if (existName(examType)) {
+		/*if (existName(examType)) {
 			throw new MyException("名称已存在！");
-		}
+		}*/
 				
 		// 添加试题分类
 		examType.setReadUserIds(","+getCurUser().getId()+",");
@@ -79,11 +79,11 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 		if(!ValidateUtil.isValid(examType.getName())) {
 			throw new MyException("参数错误：name");
 		}
-		if(existName(examType)) {
+		/*if(existName(examType)) {
 			throw new MyException("名称已存在！");
-		}
+		}*/
 		ExamType entity = examTypeDao.getEntity(examType.getId());
-		if (!entity.getWriteUserIds().contains(","+getCurUser().getId()+",")) {
+		if (entity.getCreateUserId() != getCurUser().getId()) {
 			throw new MyException("权限不足！");
 		}
 		
@@ -109,7 +109,7 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 			throw new MyException("该考试分类下有试题，不允许删除！");
 		}
 		ExamType examType = getEntity(id);
-		if (!examType.getWriteUserIds().contains(","+getCurUser().getId()+",")) {
+		if (examType.getCreateUserId() != getCurUser().getId()) {
 			throw new MyException("权限不足！");
 		}
 		
@@ -133,11 +133,20 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 	@Override
 	public void doAuth(Integer id, String readUserIds, String writeUserIds) {
 		ExamType entity = getEntity(id);
+		if(entity.getCreateUserId().intValue() != getCurUser().getId()){
+			throw new MyException("非法操作！");
+		}
 		if (ValidateUtil.isValid(readUserIds)) {
 			entity.setReadUserIds(","+readUserIds+",");
 		}
 		if (ValidateUtil.isValid(writeUserIds)) {
 			entity.setWriteUserIds(","+writeUserIds+",");
+		}
+		if(!entity.getReadUserIds().contains(","+getCurUser().getId()+",")){
+			throw new MyException("创建者不能被删除！");
+		}
+		if(!entity.getWriteUserIds().contains(","+getCurUser().getId()+",")){
+			throw new MyException("创建者不能被删除！");
 		}
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());

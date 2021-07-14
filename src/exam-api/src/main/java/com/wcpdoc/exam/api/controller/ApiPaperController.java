@@ -37,6 +37,7 @@ import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 /**
  * 试卷控制层
  * 
@@ -94,6 +95,9 @@ public class ApiPaperController extends BaseController {
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult add(Paper paper, PaperRemark paperRemark) {
 		try {
+			if(!ValidateUtil.isValid(paper.getName())){
+				throw new MyException("参数错误不能为空！");
+			}
 			if (paper.getShowType() == null) {
 				paper.setShowType(new BigDecimal(1));
 			}
@@ -128,6 +132,9 @@ public class ApiPaperController extends BaseController {
 	public PageResult edit(Paper paper, List<PaperRemark> paperRemark) {
 		try {
 			Paper entity = paperService.getEntity(paper.getId());
+			if(entity.getState() == 1){
+				throw new MyException("已发布的不能修改！");
+			}
 			entity.setName(paper.getName());
 			entity.setPassScore(paper.getPassScore());
 			entity.setReadRemark(paper.getReadRemark());
@@ -217,10 +224,34 @@ public class ApiPaperController extends BaseController {
 			Paper paper = paperService.getEntity(id);
 			Paper entity = new Paper();
 			BeanUtils.copyProperties(entity, paper);
+			entity.setName(paper.getName()+"【复件】");
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
 			paperService.add(entity);
 
+			List<PaperQuestion> chapterList = paperQuestionService.getChapterList(paper.getId());
+			if (chapterList != null && chapterList.size() != 0) {
+				for(PaperQuestion paperQuestionChapter : chapterList){
+					PaperQuestion paperQuestionChapterEntity = new PaperQuestion();
+					BeanUtils.copyProperties(paperQuestionChapterEntity, paperQuestionChapter);
+					paperQuestionChapterEntity.setPaperId(entity.getId());
+					paperQuestionService.add(paperQuestionChapterEntity);
+					paperQuestionChapterEntity.setParentSub("_"+paperQuestionChapterEntity.getId()+"_");
+					paperQuestionService.update(paperQuestionChapterEntity);
+					
+					List<PaperQuestion> questionList = paperQuestionService.getQuestionList(paperQuestionChapter.getId());
+					for(PaperQuestion paperQuestionQuestion : questionList){
+						PaperQuestion paperQuestionQuestionEntity = new PaperQuestion();
+						BeanUtils.copyProperties(paperQuestionQuestionEntity, paperQuestionQuestion);
+						paperQuestionQuestionEntity.setParentId(paperQuestionChapterEntity.getId());
+						paperQuestionQuestionEntity.setPaperId(entity.getId());
+						paperQuestionService.add(paperQuestionQuestionEntity);
+						paperQuestionQuestionEntity.setParentSub(paperQuestionChapterEntity.getParentSub() + paperQuestionQuestionEntity.getId()+"_");
+						paperQuestionService.update(paperQuestionQuestionEntity);
+					}
+				}
+			}
+			
 			List<PaperRemark> paperRemarkList = paperRemarkService.getList(paper.getId());
 			if (paperRemarkList != null && paperRemarkList.size() != 0) {
 				for(PaperRemark paperRemark : paperRemarkList){
@@ -299,6 +330,9 @@ public class ApiPaperController extends BaseController {
 		try {
 			paperService.chapterEdit(chapter);
 			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("修改章节错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("修改章节错误：", e);
 			return PageResult.err();

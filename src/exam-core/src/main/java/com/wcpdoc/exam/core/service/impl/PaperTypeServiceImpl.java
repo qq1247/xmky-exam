@@ -78,11 +78,11 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 		if(!ValidateUtil.isValid(paperType.getName())) {
 			throw new MyException("参数错误：name");
 		}
-		if(existName(paperType)) {
+		/*if(existName(paperType)) {
 			throw new MyException("名称已存在！");
-		}
+		}*/
 		PaperType entity = paperTypeDao.getEntity(paperType.getId());
-		if (!entity.getWriteUserIds().contains(","+getCurUser().getId()+",")) {
+		if (entity.getCreateUserId() != getCurUser().getId()) {
 			throw new MyException("权限不足！");
 		}
 		
@@ -105,7 +105,7 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 			throw new MyException("请先删除试卷分类下所有的试卷！");
 		}
 		PaperType paperType = getEntity(id);
-		if (!paperType.getWriteUserIds().contains(","+getCurUser().getId()+",")) {
+		if (paperType.getCreateUserId() != getCurUser().getId()) {
 			throw new MyException("权限不足！");
 		}
 		
@@ -129,11 +129,20 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 	@Override
 	public void doAuth(Integer id, String readUserIds, String writeUserIds) {		
 		PaperType entity = getEntity(id);
+		if(entity.getCreateUserId().intValue() != getCurUser().getId()){
+			throw new MyException("非法操作！");
+		}
 		if (ValidateUtil.isValid(readUserIds)) {
 			entity.setReadUserIds(","+readUserIds+",");
 		}
 		if (ValidateUtil.isValid(writeUserIds)) {
 			entity.setWriteUserIds(","+writeUserIds+",");
+		}
+		if(!entity.getReadUserIds().contains(","+getCurUser().getId()+",")){
+			throw new MyException("创建者不能被删除！");
+		}
+		if(!entity.getWriteUserIds().contains(","+getCurUser().getId()+",")){
+			throw new MyException("创建者不能被删除！");
 		}
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
