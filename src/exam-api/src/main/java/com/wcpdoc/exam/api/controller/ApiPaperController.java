@@ -129,7 +129,7 @@ public class ApiPaperController extends BaseController {
 	@RequestMapping("/edit")
 	@ResponseBody
 	@RequiresRoles("subAdmin")
-	public PageResult edit(Paper paper, List<PaperRemark> paperRemark) {
+	public PageResult edit(Paper paper) { //, List<PaperRemark> paperRemark
 		try {
 			Paper entity = paperService.getEntity(paper.getId());
 			if(entity.getState() == 1){
@@ -145,12 +145,12 @@ public class ApiPaperController extends BaseController {
 			entity.setUpdateTime(new Date());
 			paperService.update(entity);
 
-			paperRemarkService.remove(entity.getId());//重新添加评语
+			/*paperRemarkService.remove(entity.getId());//重新添加评语
 			for (int i = 0; i < paperRemark.size(); i++) {
 				paperRemark.get(i).setNo(i+1);
 				paperRemark.get(i).setPaperId(entity.getId());
 				paperRemarkService.add(paperRemark.get(i));
-			}
+			}*/
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改试卷错误：{}", e.getMessage());
@@ -225,6 +225,7 @@ public class ApiPaperController extends BaseController {
 			Paper entity = new Paper();
 			BeanUtils.copyProperties(entity, paper);
 			entity.setName(paper.getName()+"【复件】");
+			entity.setState(2);
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
 			paperService.add(entity);
