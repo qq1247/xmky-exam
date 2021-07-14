@@ -9,7 +9,7 @@ public class UserToken {
 	private String accessToken;
 	private String userName;
 	private Integer userId;
-	
+	private String[] roles;
 
 	public String getAccessToken() {
 		return accessToken;
@@ -33,6 +33,14 @@ public class UserToken {
 
 	public void setUserId(Integer userId) {
 		this.userId = userId;
+	}
+
+	public String[] getRoles() {
+		return roles;
+	}
+
+	public void setRoles(String[] roles) {
+		this.roles = roles;
 	}
 
 }
