@@ -84,6 +84,9 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 				if (id == null) {
 					throw new MyException("参数错误：id");
 				}
+				if (userIds == null) {
+					throw new MyException("参数错误：userIds");
+				}
 				Exam exam = getEntity(id);
 				if (exam.getState() == 0) {
 					throw new MyException("考试已删除！");

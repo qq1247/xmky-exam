@@ -291,11 +291,16 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			throw new MyException("试卷已发布");
 		}
 
+		
 		// 添加试题
 		PaperQuestion chapter = paperQuestionService.getEntity(chapterId);
 		List<PaperQuestion> questionList = paperQuestionService.getQuestionList(chapterId);
 		int maxNo = questionList.size();
 		for (Integer questionId : questionIds) {
+			PaperQuestion paperQuestion = paperQuestionService.getEntityByChapter(chapterId, questionId);
+			if (paperQuestion != null) {
+				throw new MyException("试卷中已包含此试题！");
+			}
 			Question question = questionService.getEntity(questionId);
 
 			PaperQuestion pq = new PaperQuestion();

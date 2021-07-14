@@ -32,4 +32,9 @@
 		timeToIdleSeconds="0"
 		timeToLiveSeconds="0">
     </cache>
+    <!-- 令牌缓存，用于并发请求时，旧令牌宽限30秒有效期 -->
+	<cache name="OLD_TOKEN_CACHE"
+		maxEntriesLocalHeap="10000"
+		timeToLiveSeconds="30">
+    </cache>
 </ehcache>

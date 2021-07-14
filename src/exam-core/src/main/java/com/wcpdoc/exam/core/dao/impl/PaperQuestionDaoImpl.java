@@ -45,4 +45,10 @@ public class PaperQuestionDaoImpl extends RBaseDaoImpl<PaperQuestion> implements
 		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = ? AND QUESTION_ID = ?";
 		return getEntity(sql, new Object[]{paperId, questionId}, PaperQuestion.class);
 	}
+
+	@Override
+	public PaperQuestion getEntityByChapter(Integer parentId, Integer questionId) {
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PARENT_ID = ? AND QUESTION_ID = ?";
+		return getEntity(sql, new Object[]{parentId, questionId}, PaperQuestion.class);
+	}
 }

@@ -189,12 +189,12 @@ export default {
   },
   methods: {
     // 查询
-    async query() {
+    async query(curPage = 1) {
       const {
         data: { list, total },
       } = await this.$https.cronListPage({
         name: this.queryForm.name,
-        curPage: this.listpage.curPage,
+        curPage: curPage,
         pageSize: this.listpage.pageSize,
       })
       this.listpage.total = total
@@ -344,6 +344,10 @@ export default {
 
         this.query()
       })
+    },
+    // 分页切换
+    pageChange(val) {
+      this.query(val)
     },
   },
 }

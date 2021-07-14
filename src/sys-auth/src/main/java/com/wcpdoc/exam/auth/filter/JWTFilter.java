@@ -16,6 +16,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.wcpdoc.exam.auth.cache.OldTokenCache;
 import com.wcpdoc.exam.auth.cache.TokenCache;
 import com.wcpdoc.exam.auth.entity.JWTToken;
 import com.wcpdoc.exam.core.entity.JwtResult;
@@ -90,44 +91,64 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 		int oldUserId = oldJwtResult.getClaims().get("userId", Integer.class);
 		String oldLoginName = oldJwtResult.getClaims().get("loginName", String.class);
 		
-		String curToken = TokenCache.get(String.format("TOKEN_%s", oldUserId));
+		String tokenKey = String.format("TOKEN_%s", oldUserId);
+		String curToken = TokenCache.get(tokenKey);
 		if (curToken == null) {//缓存中没有令牌（过期清理或人工清理）
 			throw new AuthenticationException(String.format("用户【%s】令牌不存在", oldLoginName));
 		}
 		
-		Long curTokenId = Long.parseLong(JwtUtil.getInstance().parse(curToken).getClaims().getId());
-		if (curTokenId != oldTokenId) {
-			if (log.isDebugEnabled()) {
-				log.debug("shiro权限：用户【{}】令牌过期，旧令牌创建时间【{}】，当前令牌创建时间【{}】", oldLoginName, DateUtil.formatDateTime(new Date(oldTokenId)), DateUtil.formatDateTime(new Date(curTokenId)));
+		try {
+			if (!TokenCache.tryWriteLock(tokenKey, 10000)) { // 同一用户并发请求时，只让一个请求通过，该请求更新令牌后，其他请求就变成了旧令牌，旧令牌宽限30秒有效
+				throw new AuthenticationException(String.format("用户【%s】并发【{}】请求超时", oldLoginName, WebUtils.toHttp(request).getRequestURI()));
 			}
-			throw new AuthenticationException(String.format("用户【%s】令牌过期", oldLoginName));
+			
+			curToken = TokenCache.get(tokenKey); // 当前令牌需要重新获取，因为并发请求等待的时候，令牌已经被更换
+			Long curTokenId = Long.parseLong(JwtUtil.getInstance().parse(curToken).getClaims().getId());
+			if (curTokenId != oldTokenId) {
+				if (log.isDebugEnabled()) {
+					log.debug("shiro权限：用户【{}】令牌过期，旧令牌创建时间【{}】，当前令牌创建时间【{}】", oldLoginName, DateUtil.formatDateTime(new Date(oldTokenId)), DateUtil.formatDateTime(new Date(curTokenId)));
+				}
+				if (ValidateUtil.isValid(OldTokenCache.get(String.format("OLD_TOKEN_%s", oldUserId)))) {// 最新令牌的上一个令牌，并且距离最新令牌30秒内，旧令牌有效
+					if (log.isDebugEnabled()) {
+						log.debug("shiro权限：用户【{}】旧令牌宽限期有效，旧令牌创建时间【{}】，当前令牌创建时间【{}】，", oldLoginName, DateUtil.formatDateTime(new Date(oldTokenId)), DateUtil.formatDateTime(new Date(curTokenId)));
+					}
+					return;
+				}
+				
+				throw new AuthenticationException(String.format("用户【%s】令牌过期", oldLoginName));
+			}
+			
+			Date curTime = new Date();
+			long oldTokenTimestamp = oldTokenId;
+			if (curTime.getTime() - oldTokenTimestamp <= tokenRefreshMinute * 60 * 1000) {// 如果距离上次刷新不超过指定分钟，不处理  
+				return;
+			}
+			
+			// 生成令牌信息（登陆由shiro接收令牌控制）
+			if (log.isDebugEnabled()) {
+				log.debug("shiro权限：用户【{}】刷新令牌，旧令牌创建时间【{}】，当前令牌创建时间【{}】，默认过期分钟【{}】，默认刷新分钟【{}】", 
+						oldLoginName, DateUtil.formatDateTime(new Date(oldTokenId)), DateUtil.formatDateTime(new Date(curTokenId)), tokenExpireMinute, tokenRefreshMinute);
+			}
+			Date newExpTime = DateUtil.getNextMinute(curTime, tokenExpireMinute);
+			Long newTokenId = curTime.getTime();
+			String newToken = JwtUtil.getInstance()
+				.createToken(newTokenId.toString(), oldJwtResult.getClaims().getSubject(), newExpTime)
+				.addAttr("userId", oldJwtResult.getClaims().get("userId"))
+				.addAttr("loginName", oldJwtResult.getClaims().get("loginName"))
+				.build();
+			
+			// 缓存刷新令牌
+			TokenCache.put(String.format("TOKEN_%s", oldUserId), newToken); // 用于续租登陆
+			OldTokenCache.put(String.format("OLD_TOKEN_%s", oldUserId), "true"); // 用于并发请求时，旧令牌宽限30秒有效期
+			
+			// 放入http响应头，供前端替换使用
+			WebUtils.toHttp(response).setHeader("Access-Control-Expose-Headers", "Authorization"); //不加前端只显示，无法获取到自定义header字段
+			WebUtils.toHttp(response).setHeader("Authorization", newToken);
+		} catch (InterruptedException e) {
+			throw new AuthenticationException(String.format("用户【%s】挂起异常", oldLoginName));
+		} finally {
+			TokenCache.releaseLock(tokenKey);
 		}
-		
-		Date curTime = new Date();
-		long oldTokenTimestamp = oldTokenId;
-		if (curTime.getTime() - oldTokenTimestamp <= tokenRefreshMinute * 60 * 1000) {// 如果距离上次刷新不超过指定分钟，不处理  
-			return;
-		}
-		
-		// 生成令牌信息（登陆由shiro接收令牌控制）
-		if (log.isDebugEnabled()) {
-			log.debug("shiro权限：用户【{}】刷新令牌，旧令牌创建时间【{}】，当前令牌创建时间【{}】，默认过期分钟【{}】，默认刷新分钟【{}】", 
-					oldLoginName, DateUtil.formatDateTime(new Date(oldTokenId)), DateUtil.formatDateTime(new Date(curTokenId)), tokenExpireMinute, tokenRefreshMinute);
-		}
-		Date newExpTime = DateUtil.getNextMinute(curTime, tokenExpireMinute);
-		Long newTokenId = curTime.getTime();
-		String newToken = JwtUtil.getInstance()
-			.createToken(newTokenId.toString(), oldJwtResult.getClaims().getSubject(), newExpTime)
-			.addAttr("userId", oldJwtResult.getClaims().get("userId"))
-			.addAttr("loginName", oldJwtResult.getClaims().get("loginName"))
-			.build();
-		
-		// 缓存刷新令牌（用于续租登陆）
-		TokenCache.put(String.format("TOKEN_%s", oldUserId), newToken);
-		
-		// 放入http响应头，供前端替换使用
-		WebUtils.toHttp(response).setHeader("Access-Control-Expose-Headers", "Authorization"); //不加前端只显示，无法获取到自定义header字段
-		WebUtils.toHttp(response).setHeader("Authorization", newToken);
 	}
 
 	/**

@@ -77,7 +77,7 @@ switch (process.env.VUE_APP_MODE) {
     baseUrl = 'http://prod.com/api/'
     break
   case 'test':
-    baseUrl = 'http://test.com/api/'
+    baseUrl = 'http://192.168.110.86:8080/api/'
     break
   default:
     baseUrl = 'http://192.168.110.198:8080/api/'

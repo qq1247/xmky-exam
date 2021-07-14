@@ -28,7 +28,6 @@
           placeholder="请输入密码"
           v-model="ruleForm.password"
           autocomplete="off"
-          @change="login('ruleForm')"
         ></el-input>
       </el-form-item>
       <el-form-item>

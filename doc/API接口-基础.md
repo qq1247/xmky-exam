@@ -33,7 +33,9 @@ code == 401 无权限或登录超时
 |code     | Integer  | 响应码 |
 |msg     | String  | 响应消息 |
 |data.accessToken     | String  | 访问令牌 |
+|data.userId     | name  | 用户ID |
 |data.userName     | name  | 用户名称 |
+|data.roles | String[]  | 角色 |
 
 ####登陆退出：login/out
 ######请求参数
