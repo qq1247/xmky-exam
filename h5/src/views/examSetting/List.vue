@@ -12,7 +12,8 @@
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query()" icon="el-icon-search" type="primary"
+        <el-button @click="query()" icon="el-icon-search"
+type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -250,7 +251,7 @@
                 @click="remarkDel"
                 size="mini"
                 icon="el-icon-minus"
-                >添加评语</el-button
+                >删除阅卷人</el-button
               >
             </el-form-item>
           </div>
@@ -452,6 +453,7 @@ export default {
     async getPaperList(curPage = 1) {
       this.examForm.curPage = curPage
       const paperList = await this.$https.paperListPage({
+        state: 1,
         curPage,
         pageSize: this.examForm.pageSize,
       })
@@ -547,7 +549,7 @@ export default {
           const res = await this.$https.examDel({ id }).catch((err) => {})
           res?.code == 200
             ? (this.$tools.message('删除成功！'), this.query())
-            : this.$tools.message('删除成功！', 'error')
+            : this.$tools.message('删除失败！', 'error')
         })
         .catch(() => {})
     },
@@ -735,12 +737,16 @@ export default {
         res?.code == 200
           ? (this.$tools.message('设置成功！'),
             (this.examForm.readShow = false),
-            this.query())
+            this.pageChange(this.curPage))
           : this.$tools.message('设置失败！', 'error')
       })
     },
     // 编辑考试用户
     async editExamUser() {
+      if (this.examForm.examUser.length == 0) {
+        this.$tools.message('请选择考试用户！', 'warning')
+        return
+      }
       const res = await this.$https
         .examUpdateExamUser({
           id: this.examForm.id,
@@ -751,7 +757,7 @@ export default {
       res?.code == 200
         ? (this.$tools.message('设置成功！'),
           (this.examForm.userShow = false),
-          this.query())
+          this.pageChange(this.curPage))
         : this.$tools.message('设置失败！', 'error')
     },
     // 切换分页
