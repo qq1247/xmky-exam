@@ -148,8 +148,7 @@
                   <el-tag effect="plain" size="mini" type="danger">
                     {{ item.difficultyName }}
                   </el-tag>
-                  <el-tag effect="plain" size="mini"
-type="warning"
+                  <el-tag effect="plain" size="mini" type="warning"
                     >{{ item.score }}分</el-tag
                   >
                   <el-tag effect="plain" size="mini" type="info">
@@ -352,8 +351,7 @@ type="warning"
                         <el-tag effect="plain" size="mini" type="danger">
                           {{ child.difficultyName }}
                         </el-tag>
-                        <el-tag effect="plain" size="mini"
-type="warning"
+                        <el-tag effect="plain" size="mini" type="warning"
                           >{{ child.score }}分</el-tag
                         >
                         <el-tag effect="plain" size="mini" type="info">
@@ -440,7 +438,7 @@ export default {
       paperId: 0,
       paperTypeId: 0,
       paperName: '',
-      pageSize: 10,
+      pageSize: 5,
       curPage: 1,
       total: 0,
       collapseShow: 0,
@@ -471,7 +469,7 @@ export default {
     }
   },
   created() {
-    const { id, name, paperTypeId } = this.$route.query
+    const { id, name } = this.$route.query
     this.paperId = id
     this.paperName = name
     this.init()
@@ -536,7 +534,7 @@ export default {
       const pageNum =
         this.total <= this.pageSize ? 1 : Math.ceil(this.total / this.pageSize)
       const randomCurPage = Math.floor(Math.random() * (pageNum + 1))
-      this.curPage = randomCurPage
+      this.curPage = randomCurPage == 0 ? 1 : randomCurPage
       this.queryQuestion()
     },
     // 添加章节
