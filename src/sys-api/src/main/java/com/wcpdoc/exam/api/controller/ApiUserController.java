@@ -36,6 +36,7 @@ import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.base.service.UserXlsxService;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.exception.MyException;
@@ -91,7 +92,12 @@ public class ApiUserController extends BaseController {
 	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
-			return PageResultEx.ok().data(userService.getListpage(new PageIn(request)));
+			PageOut pageOut = userService.getListpage(new PageIn(request));
+			for (Map<String, Object> map : pageOut.getList()) {
+				map.put("roleNames", ((String) map.get("roles")).contains("subAdmin") ? "子管理员" : "用户");
+			}
+			
+			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("用户列表错误：", e);
 			return PageResult.err();
@@ -121,10 +127,13 @@ public class ApiUserController extends BaseController {
 			if (user.getOrgId() == null) {
 				throw new MyException("参数错误：orgId");
 			}
+			if (ValidateUtil.isValid(user.getRoles()) && !user.getRoles().equals("subAdmin")) {
+				throw new MyException("参数错误：roles");
+			}
 			
 			// 添加用户
 			Date date = new Date();
-			user.setRoles("user");
+			user.setRoles("subAdmin".equals(user.getRoles()) ? "user,subAdmin" : "user");
 			user.setRegistTime(date);
 			user.setUpdateTime(date);
 			user.setUpdateUserId(getCurUser().getId());
@@ -166,6 +175,9 @@ public class ApiUserController extends BaseController {
 			if (userService.existLoginName(user)) {
 				throw new MyException("登录名称已存在");
 			}
+			if (ValidateUtil.isValid(user.getRoles()) && !user.getRoles().equals("subAdmin")) {
+				throw new MyException("参数错误：roles");
+			}
 			
 			// 修改用户
 			User entity = userService.getEntity(user.getId());
@@ -174,7 +186,7 @@ public class ApiUserController extends BaseController {
 				changeLoginName = true;
 			}
 
-			entity.setRoles("user");
+			entity.setRoles("subAdmin".equals(user.getRoles()) ? "user,subAdmin" : "user");
 			entity.setName(user.getName());
 			entity.setLoginName(user.getLoginName());
 			entity.setUpdateTime(new Date());
@@ -437,7 +449,8 @@ public class ApiUserController extends BaseController {
 					.addAttr("lastLoginTime", entity.getLastLoginTime() == null ? null : DateUtil.formatDateTime(entity.getLastLoginTime()))
 					.addAttr("orgId", entity.getOrgId())
 					.addAttr("state", entity.getState())
-					.addAttr("orgName", org == null ? null : org.getName());
+					.addAttr("orgName", org == null ? null : org.getName())
+					.addAttr("roles", entity.getRoles().contains("subAdmin") ? "subAdmin" : "user");
 		} catch (MyException e) {
 			log.error("获取用户错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

@@ -54,6 +54,9 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if(chapter.getPaperId() == null) {
 			throw new MyException("参数错误：paperId");
 		}
+		if(!ValidateUtil.isValid(chapter.getName())) {
+			throw new MyException("参数错误：name");
+		}
 		Paper paper = getEntity(chapter.getPaperId());
 		if (paper.getState() == 0) {
 			throw new MyException("试卷已删除");
@@ -82,6 +85,9 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	public void chapterEdit(PaperQuestion chapter) {
 		//校验数据有效性
 		PaperQuestion entity = paperQuestionService.getEntity(chapter.getId());
+		if(entity == null){
+			throw new MyException("章节无效！");
+		}
 		Paper paper = getEntity(entity.getPaperId());
 		if (paper.getState() == 0) {
 			throw new MyException("试卷已删除");

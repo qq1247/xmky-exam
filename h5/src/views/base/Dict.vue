@@ -1,19 +1,37 @@
 <template>
   <div class="container">
     <div class="content">
-      <div class="search">
-        <el-form
-          :inline="true"
-          :model="queryForm"
-          class="form-inline"
-          ref="queryForm"
-        >
-          <el-form-item label prop="dictIndex">
-            <el-input
-              placeholder="请输入索引"
-              v-model="queryForm.dictIndex"
-            ></el-input>
-          </el-form-item>
+      <el-form :inline="true" :model="queryForm" ref="queryForm">
+        <el-row>
+          <el-col :span="17">
+            <el-form-item label prop="dictIndex">
+              <el-input
+                @focus="queryForm.queryShow = true"
+                placeholder="请输入索引"
+                v-model="queryForm.dictIndex"
+              ></el-input>
+            </el-form-item>
+            <el-button
+              @click="query"
+              class="query-search"
+              icon="el-icon-search"
+              type="primary"
+              >查询</el-button
+            >
+          </el-col>
+          <el-col :span="7">
+            <el-form-item style="float: right">
+              <el-button
+                @click="editForm.show = true"
+                icon="el-icon-circle-plus-outline"
+                size="mini"
+                type="primary"
+                >添加</el-button
+              >
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <div v-if="queryForm.queryShow">
           <el-form-item label prop="dictKey">
             <el-input
               placeholder="请输入键"
@@ -26,23 +44,8 @@
               v-model="queryForm.dictValue"
             ></el-input>
           </el-form-item>
-          <el-form-item style="width: 200px">
-            <el-button @click="query" icon="el-icon-search"
-type="primary"
-              >查询</el-button
-            >
-            <el-button @click="reset">重置</el-button>
-          </el-form-item>
-          <el-form-item>
-            <el-button
-              @click="editForm.show = true"
-              icon="el-icon-search"
-              type="primary"
-              >添加</el-button
-            >
-          </el-form-item>
-        </el-form>
-      </div>
+        </div>
+      </el-form>
       <div class="table">
         <el-table :data="listpage.list" style="width: 100%">
           <el-table-column label="索引">
@@ -67,10 +70,17 @@ type="primary"
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-button @click="get(scope.row.id)" size="mini">修改</el-button>
-              <el-button @click="del(scope.row.id)" size="mini"
-type="danger"
-                >删除</el-button
+              <el-link
+                :underline="false"
+                @click="get(scope.row.id)"
+                icon="common common-edit"
+                >修改</el-link
+              >
+              <el-link
+                :underline="false"
+                @click="del(scope.row.id)"
+                icon="common common-delete"
+                >删除</el-link
               >
             </template>
           </el-table-column>
@@ -79,11 +89,13 @@ type="danger"
       <el-pagination
         :current-page="listpage.curPage"
         :page-size="listpage.pageSize"
-        :page-sizes="listpage.pageSizes"
         :total="listpage.total"
-        @current-change="handleCurrentChange"
-        @size-change="handleSizeChange"
-        layout="total, sizes, prev, pager, next, jumper"
+        @current-change="pageChange"
+        background
+        hide-on-single-page
+        layout="prev, pager, next"
+        next-text="下一页"
+        prev-text="上一页"
       ></el-pagination>
     </div>
     <el-dialog :visible.sync="editForm.show" title="数据字典">
@@ -115,12 +127,10 @@ type="danger"
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="add" type="primary"
-v-if="editForm.id == null"
+        <el-button @click="add" type="primary" v-if="editForm.id == null"
           >添加</el-button
         >
-        <el-button @click="edit" type="primary"
-v-if="editForm.id != null"
+        <el-button @click="edit" type="primary" v-if="editForm.id != null"
           >修改</el-button
         >
         <el-button @click="editForm.show = false">取 消</el-button>
@@ -138,7 +148,7 @@ export default {
         total: 0, // 总条数
         curPage: 1, // 当前第几页
         pageSize: 10, // 每页多少条
-        pageSizes: [10, 20, 50, 100], // 每页多少条
+        pageSizes: [10, 20, 50], // 每页多少条
         list: [], // 列表数据
       },
       queryForm: {
@@ -146,6 +156,7 @@ export default {
         dictIndex: null,
         dictKey: null,
         dictValue: null,
+        queryShow: false,
       },
       editForm: {
         // 修改表单
@@ -177,7 +188,8 @@ export default {
   methods: {
     // 查询
     async query() {
-      const {
+      this.queryForm.queryShow = false
+      let {
         data: { list, total },
       } = await this.$https.dictListPage({
         dictIndex: this.queryForm.dictIndex,
@@ -195,11 +207,11 @@ export default {
       this.$refs['queryForm'].resetFields()
       this.query()
     },
-    handleSizeChange(val) {
+    sizeChange(val) {
       this.listpage.pageSize = val
       this.query()
     },
-    handleCurrentChange(val) {
+    pageChange(val) {
       this.listpage.curPage = val
       this.query()
     },
@@ -250,10 +262,9 @@ export default {
         this.query()
       })
     },
-    // 获取试题
     async get(id) {
       const res = await this.$https.dictGet({ id: id })
-      if (res?.code != 200) {
+      if (res.code != 200) {
         alert(res.msg)
         return
       }
@@ -293,12 +304,12 @@ export default {
   padding-top: 120px;
   .content {
     width: 1170px;
-    .search {
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-start;
-    }
   }
+}
+.query-search {
+  width: 150px;
+  height: 40px;
+  border-radius: 5px;
 }
 .el-input {
   width: 300px;
@@ -310,5 +321,53 @@ export default {
 
 .el-dialog__title {
   float: left;
+}
+/deep/ .el-table th {
+  background-color: #d3dce6;
+  color: #475669;
+  text-align: center;
+  height: 55px;
+}
+/deep/ .el-table td {
+  color: #8392a6;
+  font-size: 12px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+/deep/ .common {
+  padding-right: 10px;
+  color: #0096e7;
+  font-style: inherit;
+  font-weight: bold;
+}
+.el-link {
+  padding-right: 20px;
+  color: #8392a6;
+  font-size: 12px;
+}
+/deep/ .el-input__inner:focus {
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
+    0 0 8px rgba(102, 175, 233, 0.6);
+  border: 1px solid #f2f4f5;
+}
+.common-arrow-down {
+  margin-left: 10px;
+  color: #999;
+  font-size: 12px;
+}
+
+/deep/.el-pagination.is-background .el-pager li:not(.disabled).active {
+  background-color: #0095e5;
+  color: #fff;
+}
+
+/deep/.el-pagination.is-background .btn-next,
+/deep/.el-pagination.is-background .btn-prev,
+/deep/.el-pagination.is-background .el-pager li {
+  margin: 0 3px;
+  min-width: 35px;
+  border: 1px solid #d4dfd9;
+  background-color: #fff;
+  padding: 0 10px;
 }
 </style>

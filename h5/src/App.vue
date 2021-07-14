@@ -77,6 +77,14 @@ export default {
           content: '我的',
           to: '/my',
         },
+        {
+          content: '用户管理',
+          to: '/user'
+        },
+        {
+          content: '基础管理',
+          to: '/base'
+        }
       ],
     }
   },

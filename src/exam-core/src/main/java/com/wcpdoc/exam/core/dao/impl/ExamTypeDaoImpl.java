@@ -38,7 +38,7 @@ public class ExamTypeDaoImpl extends RBaseDaoImpl<ExamType> implements ExamTypeD
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "EXAM_TYPE.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
 				.addWhere("EXAM_TYPE.STATE = 1")
 				.addWhere("EXAM_TYPE.ID != 1")
-				.addOrder("EXAM_TYPE.UPDATE_TIME", Order.DESC);
+				.addOrder("EXAM_TYPE.CREATE_TIME", Order.DESC);
 		
 		if (pageIn.get("curUserId", Integer.class) != null) {
 			User user = userDao.getEntity(pageIn.get("curUserId", Integer.class));

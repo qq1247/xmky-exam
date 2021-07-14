@@ -68,6 +68,7 @@ public class WordServerImpl extends WordServer {
 		int scoreOptionsIndex = 0;
 		int analysisIndex = 0;
 		int curIndex = 0;
+		String delHTMLTag = StringUtil.delHTMLTag(singleQuestion.toString());
 		QuestionEx questionEx = new QuestionEx();
 		for (Node node : singleQuestion) {
 			String rowTxt = Jsoup.clean(node.outerHtml(), Whitelist.none()).trim();
@@ -89,32 +90,32 @@ public class WordServerImpl extends WordServer {
 		}
 
 		if (answerIndex == 0) {
-			throw new MyException("不能从试题找到【答案】：【" + singleQuestion.toString() + "】");
+			throw new MyException("不能从试题找到【答案】：【" + delHTMLTag + "】");
 		}
 		if(scoreIndex == 0){
-			throw new MyException("不能从试题找到【分值】：【" + singleQuestion.toString() + "】");
+			throw new MyException("不能从试题找到【分值】：【" + delHTMLTag + "】");
 		}
 		if(scoreOptionsIndex == 0){
-			throw new MyException("不能从试题找到【分值选项】：【" + singleQuestion.toString() + "】");
+			throw new MyException("不能从试题找到【分值选项】：【" + delHTMLTag + "】");
 		}
 		if (analysisIndex == 0) {
-			throw new MyException("不能从试题找到【解析】：【" + singleQuestion.toString() + "】");
+			throw new MyException("不能从试题找到【解析】：【" + delHTMLTag + "】");
 		}
 		if (answerIndex >= scoreIndex) {
-			throw new MyException("【答案】必须在【分值】之前：【" + singleQuestion.toString() + "】");
+			throw new MyException("【答案】必须在【分值】之前：【" + delHTMLTag + "】");
 		}
 
 		String titleTxt = Jsoup.clean(singleQuestion.get(0).outerHtml(), Whitelist.none()).trim();
 		String typeName = titleTxt.substring(1, 3);
 		Integer type = getType(typeName);
 		if (type == null) {
-			throw new MyException("不能从试题找到【类型】：【" + singleQuestion.toString() + "】");
+			throw new MyException("不能从试题找到【类型】：【" + delHTMLTag + "】");
 		}
 
 		String difficultyName = titleTxt.substring(5, 7);
 		Integer difficulty = getDifficulty(difficultyName);
 		if (difficulty == null) {
-			throw new MyException("不能从试题找到【难度】：【" + singleQuestion.toString() + "】");
+			throw new MyException("不能从试题找到【难度】：【" + delHTMLTag + "】");
 		}
 
 		List<Node> titleNodeList = singleQuestion.subList(0, answerIndex);
@@ -231,7 +232,7 @@ public class WordServerImpl extends WordServer {
 			Set<String> set2 = new HashSet<>(optionList);
 			
 			if (!set2.containsAll(set)) {
-				throw new MyException("选项和答案不匹配：【"+singleQuestion.toString()+"】");
+				throw new MyException("选项和答案不匹配：【"+delHTMLTag+"】");
 			}
 			answer = StringUtil.join(set, ",");
 		} else if (type == 3) {
@@ -255,7 +256,7 @@ public class WordServerImpl extends WordServer {
 			}
 		} else if (type == 4) {
 			if (answer.length() != 1) {
-				throw new MyException("答案只能是一个：【"+singleQuestion.toString()+"】");
+				throw new MyException("答案只能是一个：【"+delHTMLTag+"】");
 			}
 			
 			if ("对是√".contains(answer)) {
@@ -263,7 +264,7 @@ public class WordServerImpl extends WordServer {
 			} else if ("否错×".contains(answer)) {
 				answer = "错";
 			} else {
-				throw new MyException("答案只能填：对错是否√×【"+singleQuestion.toString()+"】");
+				throw new MyException("答案只能填：对错是否√×【"+delHTMLTag+"】");
 			}
 		}
 		

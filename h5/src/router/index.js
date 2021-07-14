@@ -55,31 +55,37 @@ const routes = [
     name: 'ExamQuestionEdit',
     component: () => import('../views/examQuestion/Edit.vue')
   },
-  // 组织机构
+  // 基础相关
   {
-    path: '/organization/cron',
-    name: 'OrgCron',
-    component: () => import('../views/organization/Cron.vue')
+    path: '/base',
+    name: 'Base',
+    component: () => import('../views/base/Index.vue')
   },
   {
-    path: '/organization/user',
-    name: 'OrgUser',
-    component: () => import('../views/organization/User.vue')
+    path: '/base/cron',
+    name: 'BaseCron',
+    component: () => import('../views/base/Cron.vue')
   },
   {
-    path: '/organization/org',
-    name: 'Org',
-    component: () => import('../views/organization/Org.vue')
+    path: '/base/dict',
+    name: 'BaseDict',
+    component: () => import('../views/base/Dict.vue')
   },
   {
-    path: '/organization/parm',
-    name: 'OrgParm',
-    component: () => import('../views/organization/Parm.vue')
+    path: '/base/Param',
+    name: 'BaseParam',
+    component: () => import('../views/base/Param.vue')
+  },
+  // 用户相关
+  {
+    path: '/user',
+    name: 'User',
+    component: () => import('../views/user/User.vue')
   },
   {
-    path: '/organization/dict',
-    name: 'OrgDict',
-    component: () => import('../views/organization/Dict.vue')
+    path: '/user/org',
+    name: 'UserOrg',
+    component: () => import('../views/user/Org.vue')
   },
   {
     path: '/organization/bulletinBoard',
