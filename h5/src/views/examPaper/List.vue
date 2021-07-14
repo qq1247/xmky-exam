@@ -10,8 +10,7 @@
         ></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="query()" icon="el-icon-search"
-type="primary"
+        <el-button @click="query()" icon="el-icon-search" type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -47,7 +46,7 @@ type="primary"
         hide-on-single-page
         :total="total"
         :page-size="pageSize"
-        :current-page="1"
+        :current-page="curPage"
         @current-change="pageChange"
       ></el-pagination>
     </div>
@@ -224,6 +223,7 @@ export default {
     return {
       pageSize: 5,
       total: 1,
+      curPage: 1,
       queryForm: {
         name: '',
         paperTypeId: 0,
@@ -231,6 +231,7 @@ export default {
       paperForm: {
         show: false,
         edit: false,
+        id: 0,
         name: '',
         passScore: '',
         readRemark: '',
@@ -337,7 +338,7 @@ export default {
           return
         }
 
-        const params = {
+        let params = {
           paperTypeId: this.queryForm.paperTypeId,
           genType: this.paperForm.genType,
           name: this.paperForm.name,
@@ -346,20 +347,18 @@ export default {
           readNum: this.paperForm.readNum,
           showType: Number(this.paperForm.showType),
           options: this.paperForm.options.join(','),
-          paperRemark: this.paperForm.paperRemarkShow
-            ? this.paperForm.paperRemark
-            : '',
+          // paperRemark: [],
         }
 
         const res = this.paperForm.edit
-          ? await this.$https.paperEdit(params)
+          ? await this.$https.paperEdit({ ...params, id: this.paperForm.id })
           : await this.$https.paperAdd(params)
         res?.code === 200
           ? (this.$tools.message(
               !this.paperForm.edit ? '添加成功！' : '修改成功！'
             ),
             (this.paperForm.show = false),
-            this.query())
+            this.pageChange())
           : this.$tools.message(
               !this.paperForm.edit ? '添加失败！' : '修改失败！',
               'error'
@@ -369,6 +368,7 @@ export default {
     // 编辑分类
     edit(item) {
       this.paperForm.edit = true
+      this.paperForm.id = item.id
       this.paperForm.genType = item.genType
       this.paperForm.name = item.name
       this.paperForm.passScore = item.passScore
@@ -444,7 +444,8 @@ export default {
         .catch(() => {})
     },
     // 切换分页
-    pageChange(val) {
+    pageChange(val = 1) {
+      this.curPage = val
       this.query(val)
     },
     // tab切换
