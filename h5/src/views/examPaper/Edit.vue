@@ -148,7 +148,8 @@
                   <el-tag effect="plain" size="mini" type="danger">
                     {{ item.difficultyName }}
                   </el-tag>
-                  <el-tag effect="plain" size="mini" type="warning"
+                  <el-tag effect="plain" size="mini"
+type="warning"
                     >{{ item.score }}分</el-tag
                   >
                   <el-tag effect="plain" size="mini" type="info">
@@ -351,7 +352,8 @@
                         <el-tag effect="plain" size="mini" type="danger">
                           {{ child.difficultyName }}
                         </el-tag>
-                        <el-tag effect="plain" size="mini" type="warning"
+                        <el-tag effect="plain" size="mini"
+type="warning"
                           >{{ child.score }}分</el-tag
                         >
                         <el-tag effect="plain" size="mini" type="info">

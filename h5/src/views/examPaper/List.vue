@@ -10,7 +10,8 @@
         ></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="query()" icon="el-icon-search" type="primary"
+        <el-button @click="query()" icon="el-icon-search"
+type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -338,7 +339,7 @@ export default {
           return
         }
 
-        let params = {
+        const params = {
           paperTypeId: this.queryForm.paperTypeId,
           genType: this.paperForm.genType,
           name: this.paperForm.name,

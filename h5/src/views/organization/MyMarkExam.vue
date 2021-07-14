@@ -80,10 +80,12 @@
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="add" type="primary" v-if="editForm.id == null"
+        <el-button @click="add" type="primary"
+v-if="editForm.id == null"
           >添加</el-button
         >
-        <el-button @click="edit" type="primary" v-if="editForm.id != null"
+        <el-button @click="edit" type="primary"
+v-if="editForm.id != null"
           >修改</el-button
         >
         <el-button @click="editForm.show = false">取 消</el-button>
@@ -105,7 +107,7 @@ export default {
         list: [], // 列表数据
       },
       queryForm: {
-        //查询表单
+        // 查询表单
         userName: null,
       },
       editForm: {
@@ -114,7 +116,7 @@ export default {
         answer: null, // 答案
         show: false, // 是否显示页面
         rules: {
-          //校验
+          // 校验
           answer: [
             { required: true, message: '请输入答案', trigger: 'change' },
           ],

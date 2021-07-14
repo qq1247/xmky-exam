@@ -110,7 +110,7 @@ export default {
   methods: {
     // 查询
     async query() {
-      let {
+      const {
         data: { list, total },
       } = await this.$https.parmListPage({
         orgName: this.queryForm.orgName,

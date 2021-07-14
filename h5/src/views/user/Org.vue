@@ -94,10 +94,12 @@
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="add" type="primary" v-if="editForm.id == null"
+        <el-button @click="add" type="primary"
+v-if="editForm.id == null"
           >添加</el-button
         >
-        <el-button @click="edit" type="primary" v-if="editForm.id != null"
+        <el-button @click="edit" type="primary"
+v-if="editForm.id != null"
           >修改</el-button
         >
         <el-button @click="editForm.show = false">取 消</el-button>
@@ -144,7 +146,7 @@ export default {
   methods: {
     // 查询
     async query() {
-      let {
+      const {
         data: { list, total },
       } = await this.$https.orgListPage({
         parentId: this.queryForm.parentId,
