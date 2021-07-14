@@ -212,7 +212,7 @@ export default {
   },
   methods: {
     // 查询
-    async query() {
+    async query(curPage = 1) {
       this.queryForm.queryShow = false
 
       const {
@@ -220,7 +220,7 @@ export default {
       } = await this.$https.userListPage({
         orgName: this.queryForm.orgName,
         name: this.queryForm.name,
-        curPage: this.listpage.curPage,
+        curPage: curPage,
         pageSize: this.listpage.pageSize,
       })
       this.listpage.total = total
