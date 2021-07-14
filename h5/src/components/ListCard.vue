@@ -8,7 +8,7 @@
         <span>创建者：{{ data.createUserName || data.userName }}</span>
       </div>
       <!-- 权限人员展示 -->
-      <template v-if="['question', 'paper', 'exam'].includes(name)">
+      <template v-if="parntClassify.includes(name)">
         <div class="content-info ellipsis">
           <span>读取权限：{{ data.readUserNames.join(',') || '暂无' }}</span>
         </div>
@@ -44,12 +44,12 @@
         <div class="content-info ellipsis">
           <span>发布人：{{ data.userName }}</span>
         </div>
-        <div class="content-info">
+        <!-- <div class="content-info">
           <span class="space"
             >成绩公开：{{ data.scoreState == 1 ? '是' : '否' }}</span
           >
           <span>排名公开：{{ data.rankState == 1 ? '是' : '否' }}</span>
-        </div>
+        </div> -->
         <div class="content-info">
           <span class="space">考试人数：{{ data.userNum }}</span>
           <span>阅卷人数：{{ data.markNum }}</span>
@@ -83,99 +83,81 @@
       </template>
       <!-- 按钮操作 -->
       <div class="handler">
-        <!-- 基础操作 -->
+        <!-- 基础操作（编辑、删除） -->
+        <template v-if="baseSetting.includes(name)">
+          <span data-title="编辑" @click="edit(data)">
+            <i class="common common-edit"></i>
+          </span>
+          <span data-title="删除" @click="del(data)">
+            <i class="common common-delete"></i>
+          </span>
+        </template>
+        <!-- 发布 -->
         <span
-          v-if="baseSetting.includes(name)"
-          data-title="编辑"
-          @click="edit(data)"
-        >
-          <i class="common common-edit"></i>
-        </span>
-        <span
-          v-if="baseSetting.includes(name)"
-          data-title="删除"
-          @click="del(data)"
-        >
-          <i class="common common-delete"></i>
-        </span>
-        <span
-          v-if="['paperList', 'examList'].includes(name)"
+          v-if="childrenClassify.includes(name)"
           data-title="发布"
           @click="publish(data)"
         >
           <i class="common common-publish"></i>
         </span>
-        <!-- 试题 -->
+        <!-- 权限 -->
         <span
-          v-if="['question', 'paper', 'exam'].includes(name)"
+          v-if="parntClassify.includes(name)"
           data-title="权限"
           @click="role(data)"
         >
           <i class="common common-role"></i>
         </span>
+        <!-- 开放（试题分类） -->
         <span v-if="name == 'question'" data-title="开放" @click="open(data)">
           <i class="common common-share"></i>
         </span>
         <!-- 试卷 -->
-        <span v-if="name == 'paperList'" data-title="复制" @click="copy(data)">
-          <i class="common common-copy"></i>
-        </span>
-        <span
-          v-if="name == 'paperList'"
-          data-title="统计"
-          @click="statistics(data)"
-        >
-          <i class="common common-statistics"></i>
-        </span>
-        <!-- <span
-          v-if="name == 'paperList'"
+        <template v-if="name == 'paperList'">
+          <span data-title="复制" @click="copy(data)">
+            <i class="common common-copy"></i>
+          </span>
+          <span data-title="统计" @click="statistics(data)">
+            <i class="common common-statistics"></i>
+          </span>
+          <!-- <span
           data-title="归档"
           @click="archive(data)"
         >
           <i class="common common-archive"></i>
         </span> -->
-        <span
-          v-if="name == 'paperList'"
-          data-title="开始组卷"
-          @click="composition(data)"
-        >
-          <i class="common common-composition"></i>
-        </span>
+          <span data-title="开始组卷" @click="composition(data)">
+            <i class="common common-composition"></i>
+          </span>
+        </template>
         <!-- 考试 -->
-        <span
-          v-if="name == 'examList'"
-          data-title="通知"
-          @click="message(data)"
-        >
-          <i class="common common-messages"></i>
-        </span>
-        <span
-          v-if="name == 'examList'"
-          data-title="阅卷设置"
-          @click="read(data)"
-        >
-          <i class="common common-readPaper"></i>
-        </span>
-        <span
-          v-if="name == 'examList'"
-          data-title="考试用户"
-          @click="user(data)"
-        >
-          <i class="common common-wode"></i>
-        </span>
-        <span
-          v-if="name == 'myExamList' && data.btn == 'unStart'"
-          data-title="未开始"
-        >
-          <i class="common common-wode"></i>
-        </span>
-        <span
-          v-if="name == 'myExamList'"
-          :data-title="data.btn == 'start' ? '开始考试' : '预览考试'"
-          @click="startExam(data)"
-        >
-          <i class="common common-wode"></i>
-        </span>
+        <template v-if="name == 'examList'">
+          <span data-title="通知" @click="message(data)">
+            <i class="common common-messages"></i>
+          </span>
+          <span data-title="阅卷设置" @click="read(data)">
+            <i class="common common-readPaper"></i>
+          </span>
+          <span data-title="考试用户" @click="user(data)">
+            <i class="common common-wode"></i>
+          </span>
+        </template>
+        <!-- 我的考试 -->
+        <template>
+          <span
+            v-if="name == 'myExamList' && data.btn == 'unStart'"
+            data-title="未开始"
+          >
+            <i class="common common-wode"></i>
+          </span>
+          <span
+            v-if="name == 'myExamList'"
+            :data-title="data.btn == 'start' ? '开始考试' : '预览考试'"
+            @click="startExam(data)"
+          >
+            <i class="common common-wode"></i>
+          </span>
+        </template>
         <span
           v-if="detailTitles[name]"
           :data-title="detailTitles[name]"
@@ -208,23 +190,35 @@ export default {
         exam: '考试列表',
       },
       baseSetting: ['question', 'paper', 'exam', 'paperList', 'examList'],
+      parntClassify: ['question', 'paper', 'exam'],
+      childrenClassify: ['paperList', 'examList'],
     }
   },
   methods: {
     // 是否有权限（只有创建者才有权限）
     isRole(data) {
+      // 是否是创建者
       const isCreateUser =
         data.createUserId &&
         JSON.parse(this.$store.state.userInfo).userId != data.createUserId
+      // 是否是修改者
       const isUpdateUser =
         data.updateUserId &&
         JSON.parse(this.$store.state.userInfo).userId != data.updateUserId
-      const isPublish = data.state == 1 ? true : false
-      if (isCreateUser || isUpdateUser || isPublish) {
-        this.$tools.message(
-          isPublish ? '已发布不可修改！' : '暂无此项权限！',
-          'warning'
-        )
+      // 是否已经发布
+      const isPublish = data.state == 1
+      // 是否是分类
+      const isparntClassify = this.parntClassify.includes(this.name)
+      // 是否是子分类
+      const isChildrenClassify = this.childrenClassify.includes(this.name)
+
+      if (isparntClassify && (isCreateUser || isUpdateUser)) {
+        this.$tools.message('暂无此项权限！', 'warning')
+        return true
+      }
+
+      if (isChildrenClassify && isPublish) {
+        this.$tools.message('已发布不可修改！', 'warning')
         return true
       }
       return false
