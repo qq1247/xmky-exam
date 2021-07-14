@@ -58,8 +58,7 @@
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query" icon="el-icon-search"
-type="primary"
+        <el-button @click="query" icon="el-icon-search" type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -109,8 +108,7 @@ type="primary"
                 <el-tag class="center-tag-purple" effect="plain" size="mini">{{
                   quesiton.difficultyName
                 }}</el-tag>
-                <el-tag effect="plain" size="mini"
-type="danger"
+                <el-tag effect="plain" size="mini" type="danger"
                   >{{ quesiton.score }}分</el-tag
                 >
                 <el-tag effect="plain" size="mini">{{
@@ -533,12 +531,16 @@ export default {
           difficulty: [
             { required: true, message: '请选择难度', trigger: 'change' },
           ],
-          title: [{ required: true, message: '请输入题干', trigger: 'change' }],
+          title: [{ required: true, message: '请输入题干', trigger: 'blur' }],
           option: [
             { required: true, message: '请输入选项内容', trigger: 'change' },
           ],
           answer: [
-            { required: true, message: '请选择答案', trigger: 'change' },
+            {
+              required: true,
+              message: '请选择或者输入答案',
+              trigger: 'change',
+            },
           ],
           score: [{ required: true, message: '请输入分值', trigger: 'change' }],
           no: [{ required: true, message: '请输入排序', trigger: 'change' }],
@@ -647,7 +649,7 @@ export default {
       this.list.total = total
       this.list.questionList = list
     },
-    pageChange(val) {
+    pageChange(val = 1) {
       this.list.curPage = val
       this.query()
     },
@@ -841,8 +843,14 @@ export default {
 
         const res = await this.$https.questionAdd(params)
         res?.code == 200
-          ? (this.$tools.message('添加成功！'), this.query())
+          ? ((this.list.total += 1), this.$tools.message('添加成功！'))
           : this.$tools.message('添加失败！', 'error')
+        this.list.total % this.list.pageSize != 0
+          ? (this.list.curPage = Math.ceil(
+              this.list.total / this.list.pageSize
+            ))
+          : (this.list.curPage = this.list.total / this.list.pageSize)
+        this.pageChange(this.list.curPage)
       })
     },
     // 修改试题
@@ -966,8 +974,14 @@ export default {
         this.$tools.message('暂无此项权限！', 'warning')
         return
       }
-      await this.$https.questionCopy({ id })
-      this.query()
+      const res = await this.$https.questionCopy({ id })
+      res?.code == 200
+        ? ((this.list.total += 1), this.$tools.message('复制成功！'))
+        : this.$tools.message('复制失败！', 'error')
+      this.list.total % this.list.pageSize != 0
+        ? (this.list.curPage = Math.ceil(this.list.total / this.list.pageSize))
+        : (this.list.curPage = this.list.total / this.list.pageSize)
+      this.pageChange(this.list.curPage)
     },
     del(id) {
       if (this.queryForm.edit == 'false') {
@@ -979,8 +993,13 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
       }).then(async () => {
-        await this.$https.questionDel({ id })
-        this.query()
+        const res = await this.$https.questionDel({ id })
+        res?.code == 200
+          ? ((this.list.total -= 1), this.$tools.message('删除成功！'))
+          : this.$tools.message('删除失败！', 'error')
+        this.list.total % this.list.pageSize == 0
+          ? ((this.list.curPage -= 1), this.pageChange(this.list.curPage))
+          : this.pageChange(this.list.curPage)
       })
     },
     async questionTemplate() {

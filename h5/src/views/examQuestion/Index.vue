@@ -12,8 +12,7 @@
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query()" icon="el-icon-search"
-type="primary"
+        <el-button @click="query()" icon="el-icon-search" type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -180,7 +179,7 @@ export default {
         examName: '',
         rules: {
           examName: [
-            { required: true, message: '请输入试题名称', trigger: 'blur' },
+            { required: true, message: '请输入分类名称', trigger: 'blur' },
           ],
         },
       },
@@ -271,29 +270,38 @@ export default {
         .catch(() => {})
     },
     // 获取用户
-    async getUserList(name = '', curPage = 1) {
-      this.roleForm.curPage = curPage
+    async getUserList(name = '') {
       const roleUserList = await this.$https.userListPage({
         name,
-        curPage,
+        curPage: this.roleForm.curPage,
         pageSize: this.roleForm.pageSize,
       })
+
+      if (JSON.parse(this.$store.state.userInfo).userId == 1) {
+        roleUserList.data.list.unshift({
+          id: 1,
+          name: '管理员',
+        })
+      }
+
       this.roleForm.roleUserList = roleUserList.data.list
-      this.roleForm.total = roleUserList.data.total
+      this.roleForm.total = roleUserList.data.total + 1
     },
     // 获取更多用户
     getMoreUser(curPage) {
-      this.getUserList(curPage)
+      this.roleForm.curPage = curPage
+      this.getUserList()
     },
     // 根据name 查询人员
     searchUser(name) {
+      this.roleForm.curPage = 1
       this.getUserList(name)
     },
-    // 选择考试用户
+    // 选择读取权限用户
     selectReadUser(e) {
       this.roleForm.readRoleUser = e
     },
-    // 选择考试用户
+    // 选择阅读权限用户
     selectWriteUser(e) {
       this.roleForm.writeRoleUser = e
     },

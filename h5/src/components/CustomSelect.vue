@@ -37,11 +37,11 @@ export default {
     },
     multiple: {
       type: Boolean,
-      default: false
+      default: false,
     },
     tags: {
       type: Boolean,
-      default: false
+      default: false,
     },
     popperClass: {
       type: String,
@@ -53,43 +53,43 @@ export default {
     },
     clearable: {
       type: Boolean,
-      default: false
+      default: false,
     },
     reserveKeyword: {
       type: Boolean,
-      default: false
+      default: false,
     },
     filterable: {
       type: Boolean,
-      default: false
+      default: false,
     },
     remoteMethod: {
-      type: Function
+      type: Function,
     },
     remote: {
       type: Boolean,
-      default: false
+      default: false,
     },
     loading: {
       type: Boolean,
-      default: false
+      default: false,
     },
     currentPage: {
       type: Number,
-      default: 1
+      default: 1,
     },
     pageSize: {
       type: Number,
-      default: 10
+      default: 10,
     },
     total: {
       type: Number,
-      default: 0
+      default: 0,
     },
     showPage: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   data() {
     return {}

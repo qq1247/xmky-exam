@@ -12,8 +12,7 @@
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query()" icon="el-icon-search"
-type="primary"
+        <el-button @click="query()" icon="el-icon-search" type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -147,6 +146,7 @@ type="primary"
             :key="item.value"
             v-model="examForm.examRadio"
             :label="item.value"
+            @change="selectPaperType"
             >{{ item.name }}</el-radio
           >
         </el-form-item>
@@ -358,7 +358,7 @@ export default {
     }
     return {
       pageSize: 5,
-      total: 1,
+      total: 0,
       curPage: 1,
       queryForm: {
         name: '',
@@ -385,7 +385,7 @@ export default {
         scoreState: false,
         rankState: false,
         loginType: false,
-        examRadio: 0,
+        examRadio: 1,
         examRadios: [
           {
             name: '按题阅卷',
@@ -639,12 +639,20 @@ export default {
         })
         .catch(() => {})
     },
+    // 选择阅卷方式
+    selectPaperType(e) {
+      if (e == 0) {
+        this.$tools.message('暂未开放', 'warning')
+        this.examForm.examRadio = 1
+        return
+      }
+      this.examForm.examRadio = e
+    },
     // 获取用户
-    async getUserList(name = '', curPage = 1) {
-      this.examForm.curPage = curPage
+    async getUserList(name = '') {
       const examUsers = await this.$https.userListPage({
         name,
-        curPage,
+        curPage: this.examForm.curPage,
         pageSize: this.examForm.pageSize,
       })
 
@@ -653,10 +661,12 @@ export default {
     },
     // 获取更多用户
     getMoreUser(curPage) {
-      this.getUserList(curPage)
+      this.examForm.curPage = curPage
+      this.getUserList()
     },
     // 根据name 查询人员
     searchUser(name) {
+      this.examForm.curPage = 1
       this.getUserList(name)
     },
     // 选择考试用户
