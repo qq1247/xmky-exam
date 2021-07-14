@@ -262,7 +262,7 @@ export default {
           const res = await this.$https.examTypeDel({ id }).catch((err) => {})
           res?.code == 200
             ? (this.$tools.message('删除成功！'), this.pageChange())
-            : this.$tools.message('删除成功！', 'error')
+            : this.$tools.message(`${res.msg}`, 'error')
         })
         .catch(() => {})
     },
