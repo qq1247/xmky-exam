@@ -1,20 +1,23 @@
 <template>
   <div class="exam-item">
     <div class="exam-content">
-      <div class="title">{{ data.name || data.examName }}</div>
+      <!-- title -->
+      <div class="title ellipsis">{{ data.name || data.examName }}</div>
+      <!-- 创建者 -->
+      <div class="content-info ellipsis">
+        <span>创建者：{{ data.createUserName || data.userName }}</span>
+      </div>
+      <!-- 权限人员展示 -->
       <template v-if="['question', 'paper', 'exam'].includes(name)">
-        <div class="content-info">
-          <span>读取权限：{{ data.readUserNames || "暂无" }}</span>
+        <div class="content-info ellipsis">
+          <span>读取权限：{{ data.readUserNames.join(',') || '暂无' }}</span>
         </div>
-        <div class="content-info">
-          <span>使用权限：{{ data.writeUserNames || "暂无" }}</span>
+        <div class="content-info ellipsis">
+          <span>使用权限：{{ data.writeUserNames.join(',') || '暂无' }}</span>
         </div>
       </template>
       <!-- 试卷列表 -->
       <template v-if="name == 'paperList'">
-        <div class="content-info ellipsis">
-          <span>发布人：{{ data.userName }}</span>
-        </div>
         <div class="content-info ellipsis">
           <span>发布人：{{ data.userName }}</span>
         </div>
@@ -23,8 +26,17 @@
           <span>满分：{{ data.totalScore }}</span>
         </div>
         <div class="content-info">
-          <span class="space">组卷方式：{{ ["人工组卷", "自动组卷"][data.genType] }}</span>
-          <span>展示方式：{{ }}</span>
+          <span class="space"
+            >组卷方式：{{ ['人工组卷', '自动组卷'][data.genType] }}</span
+          >
+          <span
+            >展示方式：{{ ['', '整张', '章节', '单题'][data.showType] }}</span
+          >
+        </div>
+        <div class="content-info">
+          <span style="color: #ff9900">{{
+            data.state == 1 ? '已发布' : '草稿'
+          }}</span>
         </div>
       </template>
       <!-- 考试列表 -->
@@ -33,7 +45,9 @@
           <span>发布人：{{ data.userName }}</span>
         </div>
         <div class="content-info">
-          <span class="space">成绩公开：{{ data.scoreState == 1 ? '是' : '否' }}</span>
+          <span class="space"
+            >成绩公开：{{ data.scoreState == 1 ? '是' : '否' }}</span
+          >
           <span>排名公开：{{ data.rankState == 1 ? '是' : '否' }}</span>
         </div>
         <div class="content-info">
@@ -41,7 +55,9 @@
           <span>阅卷人数：{{ data.markNum }}</span>
         </div>
         <div class="content-info">
-          <span style="color: #ff9900">{{ data.state == 1 ? '已发布' : '草稿' }}</span>
+          <span style="color: #ff9900">{{
+            data.state == 1 ? '已发布' : '草稿'
+          }}</span>
         </div>
       </template>
       <!-- 我的考试列表 -->
@@ -50,16 +66,24 @@
           <span>{{ data.examStartTime }}</span>
         </div>
         <div class="content-info">
-          <span class="space">及格：{{ data.totalScore || 0 }}/{{ data.paperTotalScore }}</span>
+          <span class="space"
+            >及格：{{ data.totalScore || 0 }}/{{ data.paperTotalScore }}</span
+          >
         </div>
-      </template>
-      <template v-if="name == 'myExamList'">
         <div class="tagGroup">
-          <el-tag size="mini" :type="data.state == 3 ? '' : 'danger'">{{ data.stateName }}</el-tag>&nbsp;&nbsp;
-          <el-tag size="mini" :type="data.markState == 3 ? '' : 'danger'">{{ data.markStateName }}</el-tag>&nbsp;&nbsp;
+          <el-tag size="mini" :type="data.state == 3 ? '' : 'danger'">{{
+            data.stateName
+          }}</el-tag
+          >&nbsp;&nbsp;
+          <el-tag size="mini" :type="data.markState == 3 ? '' : 'danger'">{{
+            data.markStateName
+          }}</el-tag
+          >&nbsp;&nbsp;
         </div>
       </template>
+      <!-- 按钮操作 -->
       <div class="handler">
+        <!-- 基础操作 -->
         <span
           v-if="['question', 'paper', 'exam'].includes(name)"
           data-title="编辑"
@@ -68,14 +92,29 @@
           <i class="common common-edit"></i>
         </span>
         <span
-          v-if="['question', 'paper', 'exam'].includes(name)"
+          v-if="
+            ['question', 'paper', 'exam', 'paperList', 'examList'].includes(
+              name
+            )
+          "
           data-title="删除"
           @click="del(data)"
         >
           <i class="common common-delete"></i>
         </span>
+        <span
+          v-if="['paperList', 'examList'].includes(name)"
+          data-title="发布"
+          @click="publish(data)"
+        >
+          <i class="common common-publish"></i>
+        </span>
         <!-- 试题 -->
-        <span v-if="name == 'question'" data-title="权限" @click="role(data)">
+        <span
+          v-if="['question', 'paper', 'exam'].includes(name)"
+          data-title="权限"
+          @click="role(data)"
+        >
           <i class="common common-role"></i>
         </span>
         <span v-if="name == 'question'" data-title="开放" @click="open(data)">
@@ -85,29 +124,53 @@
         <span v-if="name == 'paperList'" data-title="复制" @click="copy(data)">
           <i class="common common-copy"></i>
         </span>
-        <span v-if="name == 'paperList'" data-title="统计" @click="statistics(data)">
+        <span
+          v-if="name == 'paperList'"
+          data-title="统计"
+          @click="statistics(data)"
+        >
           <i class="common common-statistics"></i>
         </span>
-        <span v-if="name == 'paperList'" data-title="归档" @click="archive(data)">
+        <!-- <span
+          v-if="name == 'paperList'"
+          data-title="归档"
+          @click="archive(data)"
+        >
           <i class="common common-archive"></i>
-        </span>
-        <span v-if="name == 'paperList'" data-title="生成试卷" @click="composition(data)">
+        </span> -->
+        <span
+          v-if="name == 'paperList'"
+          data-title="开始组卷"
+          @click="composition(data)"
+        >
           <i class="common common-composition"></i>
         </span>
         <!-- 考试 -->
-        <span v-if="name == 'examList'" data-title="发布" @click="publish(data)">
-          <i class="common common-publish"></i>
-        </span>
-        <span v-if="name == 'examList'" data-title="通知" @click="message(data)">
+        <span
+          v-if="name == 'examList'"
+          data-title="通知"
+          @click="message(data)"
+        >
           <i class="common common-messages"></i>
         </span>
-        <span v-if="name == 'examList'" data-title="阅卷设置" @click="read(data)">
+        <span
+          v-if="name == 'examList'"
+          data-title="阅卷设置"
+          @click="read(data)"
+        >
           <i class="common common-readPaper"></i>
         </span>
-        <span v-if="name == 'examList'" data-title="考试用户" @click="user(data)">
+        <span
+          v-if="name == 'examList'"
+          data-title="考试用户"
+          @click="user(data)"
+        >
           <i class="common common-wode"></i>
         </span>
-        <span v-if="name == 'myExamList' && data.btn == 'unStart'" data-title="未开始">
+        <span
+          v-if="name == 'myExamList' && data.btn == 'unStart'"
+          data-title="未开始"
+        >
           <i class="common common-wode"></i>
         </span>
         <span
@@ -117,7 +180,11 @@
         >
           <i class="common common-wode"></i>
         </span>
-        <span v-if="detailTitles[name]" :data-title="detailTitles[name]" @click="detail(data)">
+        <span
+          v-if="detailTitles[name]"
+          :data-title="detailTitles[name]"
+          @click="detail(data)"
+        >
           <i class="common common-list-row"></i>
         </span>
       </div>
@@ -130,70 +197,88 @@ export default {
   props: {
     data: {
       type: Object,
-      default: {}
+      default: {},
     },
     name: {
       type: String,
-      default: "",
-    }
+      default: '',
+    },
   },
   data() {
     return {
       detailTitles: {
-        question: "考题详情",
-        paper: "试卷列表",
-        exam: "考试列表",
-      }
+        question: '考题详情',
+        paper: '试卷列表',
+        exam: '考试列表',
+      },
     }
   },
   methods: {
+    // 是否有权限（只有创建者才有权限）
+    isRole(data) {
+      const isCreateUser =
+        data.createUserId &&
+        JSON.parse(this.$store.state.userInfo).userId != data.createUserId
+      const isUpdateUser =
+        data.updateUserId &&
+        JSON.parse(this.$store.state.userInfo).userId != data.updateUserId
+      if (isCreateUser || isUpdateUser) {
+        this.$tools.message('暂无此项权限！', 'warning')
+        return true
+      }
+      return false
+    },
     // 编辑
     edit(data) {
-      this.$emit("edit", data)
+      if (this.isRole(data)) return
+      this.$emit('edit', data)
     },
     // 删除
     del(data) {
-      this.$emit("del", data)
+      if (this.isRole(data)) return
+      this.$emit('del', data)
     },
     // 权限
     role(data) {
-      this.$emit("role", data)
+      if (this.isRole(data)) return
+      this.$emit('role', data)
     },
     // 开放
     open(data) {
-      this.$emit("open", data)
+      if (this.isRole(data)) return
+      this.$emit('open', data)
     },
     // 列表|详情
     detail(data) {
-      this.$emit("detail", data)
+      this.$emit('detail', data)
     },
     // 复制
     copy(data) {
-      this.$emit("copy", data)
+      this.$emit('copy', data)
     },
     // 通知
     message(data) {
-      this.$emit("message", data)
+      this.$emit('message', data)
     },
     // 组卷
     composition(data) {
-      this.$emit("composition", data)
+      this.$emit('composition', data)
     },
     // 统计
     statistics(data) {
-      this.$emit("statistics", data)
+      this.$emit('statistics', data)
     },
     // 归档
     archive(data) {
-      this.$emit("archive", data)
+      this.$emit('archive', data)
     },
     // 阅卷设置
     read(data) {
-      this.$emit("read", data)
+      this.$emit('read', data)
     },
     // 考试用户
     user(data) {
-      this.$emit("user", data)
+      this.$emit('user', data)
     },
     // 发布考试
     publish(data) {
@@ -206,8 +291,8 @@ export default {
     // 预览考试
     viewExam(data) {
       this.$emit('viewExam', data)
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -297,7 +382,7 @@ export default {
           }
         }
         &::before {
-          content: "";
+          content: '';
           display: block;
           position: absolute;
           z-index: 100;
@@ -333,7 +418,7 @@ export default {
         opacity: 0;
       }
       &::before {
-        content: "";
+        content: '';
         display: block;
         position: absolute;
         z-index: 100;
