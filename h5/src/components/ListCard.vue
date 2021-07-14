@@ -85,18 +85,14 @@
       <div class="handler">
         <!-- 基础操作 -->
         <span
-          v-if="['question', 'paper', 'exam'].includes(name)"
+          v-if="baseSetting.includes(name)"
           data-title="编辑"
           @click="edit(data)"
         >
           <i class="common common-edit"></i>
         </span>
         <span
-          v-if="
-            ['question', 'paper', 'exam', 'paperList', 'examList'].includes(
-              name
-            )
-          "
+          v-if="baseSetting.includes(name)"
           data-title="删除"
           @click="del(data)"
         >
@@ -211,6 +207,7 @@ export default {
         paper: '试卷列表',
         exam: '考试列表',
       },
+      baseSetting: ['question', 'paper', 'exam', 'paperList', 'examList'],
     }
   },
   methods: {
@@ -222,8 +219,12 @@ export default {
       const isUpdateUser =
         data.updateUserId &&
         JSON.parse(this.$store.state.userInfo).userId != data.updateUserId
-      if (isCreateUser || isUpdateUser) {
-        this.$tools.message('暂无此项权限！', 'warning')
+      const isPublish = data.state == 1 ? true : false
+      if (isCreateUser || isUpdateUser || isPublish) {
+        this.$tools.message(
+          isPublish ? '已发布不可修改！' : '暂无此项权限！',
+          'warning'
+        )
         return true
       }
       return false
