@@ -19,7 +19,7 @@
       <!-- 试卷列表 -->
       <template v-if="name == 'paperList'">
         <div class="content-info ellipsis">
-          <span>发布人：{{ data.userName }}</span>
+          <span>发布人：{{ data.state == 1 ? data.userName : '***' }}</span>
         </div>
         <div class="content-info">
           <span class="space">及格：{{ data.passScore }}</span>
