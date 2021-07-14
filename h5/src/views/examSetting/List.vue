@@ -12,8 +12,7 @@
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query()" icon="el-icon-search"
-type="primary"
+        <el-button @click="query()" icon="el-icon-search" type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -49,7 +48,7 @@ type="primary"
         hide-on-single-page
         :total="total"
         :page-size="pageSize"
-        :current-page="1"
+        :current-page="curPage"
         @current-change="pageChange"
       ></el-pagination>
     </div>
@@ -359,6 +358,7 @@ export default {
     return {
       pageSize: 5,
       total: 1,
+      curPage: 1,
       queryForm: {
         name: '',
         examTypeId: 0,
@@ -490,7 +490,7 @@ export default {
           ? await this.$https
               .examEdit({
                 ...params,
-                id: this.queryForm.examTypeId,
+                id: this.examForm.id,
               })
               .catch((err) => {})
           : await this.$https.examAdd(params).catch((err) => {})
@@ -500,7 +500,9 @@ export default {
               !this.examForm.edit ? '添加成功！' : '修改成功！'
             ),
             (this.examForm.show = false),
-            this.query())
+            this.examForm.edit
+              ? this.pageChange(this.curPage)
+              : this.pageChange())
           : this.$tools.message(
               !this.examForm.edit ? '添加失败！' : '修改失败！',
               'error'
@@ -509,6 +511,7 @@ export default {
     },
     // 编辑分类
     async edit({
+      id,
       name,
       paperId,
       paperName,
@@ -523,6 +526,7 @@ export default {
       await this.getPaperList()
       this.examForm.edit = true
       this.examForm.show = true
+      this.examForm.id = id
       this.examForm.name = name
       this.examForm.selectPaperId = paperId
       this.examForm.paperName = paperName
@@ -751,7 +755,8 @@ export default {
         : this.$tools.message('设置失败！', 'error')
     },
     // 切换分页
-    pageChange(val) {
+    pageChange(val = 1) {
+      this.curPage = val
       this.query(val)
     },
     // 清空还原数据
