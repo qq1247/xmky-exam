@@ -4,11 +4,18 @@
     <el-form :inline="true" :model="queryForm" class="form-inline search">
       <div>
         <el-form-item>
-          <el-input placeholder="请输入名称" v-model="queryForm.queryName" class="query-input"></el-input>
+          <el-input
+            placeholder="请输入名称"
+            v-model="queryForm.queryName"
+            class="query-input"
+          ></el-input>
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query()" icon="el-icon-search" type="primary">查询</el-button>
+        <el-button @click="query()" icon="el-icon-search"
+type="primary"
+          >查询</el-button
+        >
       </el-form-item>
     </el-form>
     <!-- 内容 -->
@@ -18,12 +25,12 @@
           <div
             class="exam-content exam-add"
             @click="
-            examForm.show = true
-            examForm.edit = false
+              examForm.show = true
+              examForm.edit = false
             "
           >
             <i class="common common-plus"></i>
-            <span>添加试题</span>
+            <span>添加试题分类</span>
           </div>
         </div>
         <ListCard
@@ -47,7 +54,7 @@
         hide-on-single-page
         :total="total"
         :page-size="pageSize"
-        :current-page="1"
+        :current-page="curPage"
         @current-change="pageChange"
       ></el-pagination>
     </div>
@@ -60,17 +67,23 @@
       :close-on-click-modal="false"
       @close="resetData('examForm')"
     >
-      <el-form :model="examForm" :rules="examForm.rules" ref="examForm" label-width="60px">
+      <el-form
+        :model="examForm"
+        :rules="examForm.rules"
+        ref="examForm"
+        label-width="60px"
+      >
         <el-form-item label="名称" prop="examName">
-          <el-input placeholder="请输入分类名称" v-model="examForm.examName"></el-input>
+          <el-input
+            placeholder="请输入分类名称"
+            v-model="examForm.examName"
+          ></el-input>
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="addOrEdit" type="primary">
-          {{
-            examForm.edit ? "修改" : "添加"
-          }}
-        </el-button>
+        <el-button @click="addOrEdit" type="primary">{{
+          examForm.edit ? '修改' : '添加'
+        }}</el-button>
         <el-button @click="examForm.show = false">取消</el-button>
       </div>
     </el-dialog>
@@ -92,7 +105,6 @@
             :value="roleForm.readRoleUser"
             :total="roleForm.total"
             :showPage="true"
-            :tags="true"
             :currentPage="roleForm.curPage"
             :pageSize="roleForm.pageSize"
             :remote="true"
@@ -118,7 +130,6 @@
             :value="roleForm.writeRoleUser"
             :total="roleForm.total"
             :showPage="true"
-            :tags="true"
             :currentPage="roleForm.curPage"
             :pageSize="roleForm.pageSize"
             :remote="true"
@@ -147,30 +158,31 @@
 </template>
 
 <script>
-import ListCard from "@/components/ListCard.vue"
-import CustomSelect from '@/components/CustomSelect.vue';
+import ListCard from '@/components/ListCard.vue'
+import CustomSelect from '@/components/CustomSelect.vue'
 export default {
   components: {
     ListCard,
-    CustomSelect
+    CustomSelect,
   },
   data() {
     return {
       pageSize: 5,
       total: 1,
+      curPage: 1,
       queryForm: {
-        queryName: ""
+        queryName: '',
       },
       examForm: {
         show: false,
         edit: false,
         id: 0,
-        examName: "",
+        examName: '',
         rules: {
           examName: [
-            { required: true, message: "请输入试题名称", trigger: "blur" }
-          ]
-        }
+            { required: true, message: '请输入试题名称', trigger: 'blur' },
+          ],
+        },
       },
       roleForm: {
         show: false,
@@ -179,9 +191,9 @@ export default {
         total: 0,
         readRoleUser: [],
         writeRoleUser: [],
-        roleUserList: []
+        roleUserList: [],
       },
-      typeList: []
+      typeList: [],
     }
   },
   mounted() {
@@ -193,14 +205,14 @@ export default {
       const typeList = await this.$https.questionTypeListPage({
         name: this.queryForm.queryName,
         curPage,
-        pageSize: this.pageSize
+        pageSize: this.pageSize,
       })
       this.typeList = typeList.data.list
       this.total = typeList.data.total
     },
     // 添加 || 修改分类名称
     addOrEdit() {
-      this.$refs["examForm"].validate(async valid => {
+      this.$refs['examForm'].validate(async (valid) => {
         if (!valid) {
           return
         }
@@ -210,50 +222,53 @@ export default {
         if (this.examForm.edit) {
           res = await this.$https.questionTypeEdit({
             id: this.examForm.id,
-            name: this.examForm.examName
+            name: this.examForm.examName,
           })
         } else {
           res = await this.$https.questionTypeAdd({
-            name: this.examForm.examName
+            name: this.examForm.examName,
           })
         }
 
-        if (res.code == 200) {
-          this.$tools.message(!this.examForm.edit ? "添加成功！" : "修改成功！")
+        if (res?.code == 200) {
           this.examForm.show = false
-          this.query()
+          this.$tools.message(!this.examForm.edit ? '添加成功！' : '修改成功！')
+          if (this.examForm.edit) {
+            this.pageChange(this.curPage)
+          } else {
+            this.pageChange()
+          }
         } else {
           this.$tools.message(
-            !this.examForm.edit ? "添加失败！" : "修改失败！",
-            "error"
+            !this.examForm.edit ? '添加失败！' : '修改失败！',
+            'error'
           )
         }
       })
     },
     // 编辑分类
-    edit({ id, name, createUserId }) {
-      if (JSON.parse(this.$store.state.userInfo).userId != createUserId) {
-        this.$tools.message('暂无此项权限', 'warning')
-        return;
-      }
+    edit({ id, name }) {
       this.examForm.edit = true
       this.examForm.id = id
       this.examForm.examName = name
       this.examForm.show = true
     },
     // 删除分类
-    async del({ id, createUserId }) {
-      if (JSON.parse(this.$store.state.userInfo).userId != createUserId) {
-        this.$tools.message('暂无此项权限', 'warning')
-        return;
-      }
-      const res = await this.$https.questionTypeDel({ id }).catch(err => { })
-      res.code == 200
-        ? (
-          this.$tools.message("删除成功！"),
-          this.query()
-        )
-        : this.$tools.message("删除成功！", "error");
+    del({ id, name }) {
+      this.$confirm(`确认删除【${name}】吗？`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      })
+        .then(async () => {
+          const res = await this.$https
+            .questionTypeDel({ id })
+            .catch((err) => {})
+          res?.code == 200
+            ? (this.$tools.message('删除成功！'), this.pageChange())
+            : this.$tools.message('删除成功！', 'error')
+        })
+        .catch(() => {})
     },
     // 获取用户
     async getUserList(name = '', curPage = 1) {
@@ -261,7 +276,7 @@ export default {
       const roleUserList = await this.$https.userListPage({
         name,
         curPage,
-        pageSize: this.roleForm.pageSize
+        pageSize: this.roleForm.pageSize,
       })
       this.roleForm.roleUserList = roleUserList.data.list
       this.roleForm.total = roleUserList.data.total
@@ -283,18 +298,10 @@ export default {
       this.roleForm.writeRoleUser = e
     },
     // 权限人员信息
-    async role({ readUserIds, writeUserIds, id, createUserId }) {
-      if (JSON.parse(this.$store.state.userInfo).userId != createUserId) {
-        this.$tools.message('暂无此项权限', 'warning')
-        return;
-      }
+    async role({ readUserIds, writeUserIds, id }) {
       this.examForm.id = id
       this.roleForm.readRoleUser = readUserIds
-        .split(",")
-        .filter(item => item != "")
       this.roleForm.writeRoleUser = writeUserIds
-        .split(",")
-        .filter(item => item != "")
       await this.getUserList()
       this.roleForm.show = true
     },
@@ -302,45 +309,44 @@ export default {
     async editRoleUsers() {
       const res = await this.$https.questionTypeAuth({
         id: this.examForm.id,
-        readUserIds: this.roleForm.readRoleUser.join(","),
-        writeUserIds: this.roleForm.writeRoleUser.join(",")
+        readUserIds: this.roleForm.readRoleUser.join(','),
+        writeUserIds: this.roleForm.writeRoleUser.join(','),
       })
-      if (res.code == 200) {
-        this.$tools.message("权限编辑成功！")
-        this.query()
+      if (res?.code == 200) {
+        this.$tools.message('权限编辑成功！')
+        this.pageChange()
         this.roleForm.show = false
       } else {
-        this.$tools.message("权限编辑失败！", "error")
+        this.$tools.message('权限编辑失败！', 'error')
       }
     },
     // 试题开放
-    async open({ createUserId }) {
-      if (JSON.parse(this.$store.state.userInfo).userId != createUserId) {
-        this.$tools.message('暂无此项权限', 'warning')
-        return;
-      }
-      this.$tools.message("此功能开发中...", "info")
+    async open() {
+      this.$tools.message('此功能开发中...', 'info')
     },
     // 试题详情
     goDetail({ id, name, writeUserIds }) {
-      let edit = writeUserIds.split(',').includes(String(JSON.parse(this.$store.state.userInfo).userId))
+      const edit = writeUserIds.includes(
+        String(JSON.parse(this.$store.state.userInfo).userId)
+      )
       this.$router.push({
-        path: "/examQuestion/Edit",
-        query: { id, name, edit }
+        path: '/examQuestion/Edit',
+        query: { id, name, edit },
       })
     },
     // 分页切换
-    pageChange(val) {
+    pageChange(val = 1) {
+      this.curPage = val
       this.query(val)
     },
     // 清空还原数据
     resetData(name) {
       this.$tools.resetData(this, name)
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
-@import "../../assets/style/index.scss";
+@import '../../assets/style/list-card.scss';
 </style>
