@@ -8,12 +8,12 @@ import org.springframework.cache.Cache;
 import com.wcpdoc.exam.cache.BaseEhCache;
 
 /**
- * 令牌缓存
+ * 旧令牌缓存
  * 
  * v1.0 zhanghc 2021年3月18日下午3:30:37
  */
-public class TokenCache extends BaseEhCache {
-	private static final String CACHE_NAME = "TOKEN_CACHE";
+public class OldTokenCache extends BaseEhCache {
+	private static final String CACHE_NAME = "OLD_TOKEN_CACHE";
 
 	/**
 	 * 放入缓存
@@ -72,47 +72,5 @@ public class TokenCache extends BaseEhCache {
 			list.add(Integer.parseInt(split[1]));
 		}
 		return list;
-	}
-	
-	/**
-	 * 加读锁
-	 * 
-	 * v1.0 zhanghc 2021年7月14日下午2:17:54
-	 * @param key
-	 * @param milliSeconds void
-	 * @return 
-	 * @throws InterruptedException 
-	 */
-	public static boolean tryReadLock(Object key, long milliSeconds) throws InterruptedException {
-		net.sf.ehcache.Cache nativeCache = getNativeCache(CACHE_NAME);
-		return nativeCache.tryReadLockOnKey(key, milliSeconds);
-	}
-	
-	/**
-	 * 加写锁
-	 * 
-	 * v1.0 zhanghc 2021年7月14日下午2:17:54
-	 * @param key
-	 * @param milliSeconds void
-	 * @return 
-	 * @throws InterruptedException 
-	 */
-	public static boolean tryWriteLock(Object key, long milliSeconds) throws InterruptedException {
-		net.sf.ehcache.Cache nativeCache = getNativeCache(CACHE_NAME);
-		return nativeCache.tryWriteLockOnKey(key, milliSeconds);
-	}
-	
-	/**
-	 * 释放锁
-	 * 
-	 * v1.0 zhanghc 2021年7月14日下午2:19:59
-	 * @param key
-	 * @param milliSeconds
-	 * @return
-	 * @throws InterruptedException boolean
-	 */
-	public static void releaseLock(Object key) {
-		net.sf.ehcache.Cache nativeCache = getNativeCache(CACHE_NAME);
-		nativeCache.releaseWriteLockOnKey(key);
 	}
 }
