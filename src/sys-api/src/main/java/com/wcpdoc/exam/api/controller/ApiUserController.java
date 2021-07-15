@@ -61,25 +61,6 @@ public class ApiUserController extends BaseController {
 	private UserXlsxService userXlsxService;
 
 	/**
-	 * 获取组织机构树
-	 * 
-	 * v1.0 zhanghc 2016-6-15下午17:24:19
-	 * 
-	 * @return List<Map<String,Object>>
-	 */
-	@RequestMapping("/orgTreeList")
-	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
-	public PageResult orgTreeList() {
-		try {
-			return PageResultEx.ok().data(orgService.getTreeList());
-		} catch (Exception e) {
-			log.error("获取组织机构树错误：", e);
-			return PageResult.err();
-		}
-	}
-
-	/**
 	 * 用户列表
 	 * 
 	 * v1.0 zhanghc 2016-6-15下午17:24:19
@@ -89,7 +70,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
+	@RequiresRoles(value={"admin","subAdmin","user"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
 			PageOut pageOut = userService.getListpage(new PageIn(request));
