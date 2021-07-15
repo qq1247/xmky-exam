@@ -68,7 +68,7 @@
 							if (d.MY_EXAM_ANSWER_STATE == 2) {
 								return '<span style="color: red;">'+d.MY_EXAM_TOTAL_SCORE+'/'+d.PAPER_TOTAL_SCORE+'（'+d.MY_EXAM_ANSWER_STATE_NAME+'）</span>';
 							}
-							d.MY_EXAM_TOTAL_SCORE+'/'+d.PAPER_TOTAL_SCORE;
+							return d.MY_EXAM_TOTAL_SCORE+'/'+d.PAPER_TOTAL_SCORE;
 						}},
 						{field : "MY_EXAM_STATE_NAME", title : "状态", align : "center", templet : function(d) {
 							return d.MY_EXAM_STATE_NAME + "/" + d.MY_EXAM_MARK_STATE_NAME;
