@@ -239,7 +239,7 @@ public class ApiMyExamController extends BaseController{
 			myExamDetailService.update(myExamDetail);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("更新答案错误：", e);
+			log.error("更新答案错误：", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("更新答案错误：", e);

@@ -175,7 +175,7 @@ public class ApiUserController extends BaseController {
 			if (userService.existLoginName(user)) {
 				throw new MyException("登录名称已存在");
 			}
-			if (ValidateUtil.isValid(user.getRoles()) && !user.getRoles().equals("subAdmin")) {
+			if (!ValidateUtil.isValid(user.getRoles())) {
 				throw new MyException("参数错误：roles");
 			}
 			
@@ -186,7 +186,7 @@ public class ApiUserController extends BaseController {
 				changeLoginName = true;
 			}
 
-			entity.setRoles("subAdmin".equals(user.getRoles()) ? "user,subAdmin" : "user");
+			entity.setRoles(user.getRoles().contains("subAdmin") ? "user,subAdmin" : "user");
 			entity.setName(user.getName());
 			entity.setLoginName(user.getLoginName());
 			entity.setUpdateTime(new Date());

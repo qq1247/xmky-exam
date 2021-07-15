@@ -27,6 +27,7 @@ export default {
   userAdd: (params) => post('user/add', params),
   userEdit: (params) => post('user/edit', params),
   userDel: (params) => post('user/del', params),
+  userInitPwd: (params) => post('user/initPwd', params),
 
   // 数据字典
   dictListPage: (params) => post('dict/listpage', params),
@@ -154,5 +155,6 @@ export default {
 
   // 基础功能相关
   login: (params) => post('login/in', params),
+  loginPwdUpdate: (params) => post('login/pwdUpdate', params),
   loginSysTime: (params) => post('login/sysTime', params),
 }

@@ -324,12 +324,15 @@ export default {
   },
   data() {
     const validateExamTime = (rule, value, callback) => {
+      console.log('====================================');
+      console.log(value);
+      console.log('====================================');
       if (value.length == 0) {
         return callback(new Error('请选择考试时间'))
       }
       if (
         dayjs(value[0]).isSameOrBefore(dayjs()) ||
-        dayjs(value[0]).isSameOrBefore(dayjs())
+        dayjs(value[1]).isSameOrBefore(dayjs())
       ) {
         return callback(
           new Error(`时间应为${dayjs().format('YYYY年MM月DD日')}后的时间`)
@@ -344,7 +347,7 @@ export default {
       }
       if (
         dayjs(value[0]).isSameOrBefore(dayjs(this.examForm.examTime[1])) ||
-        dayjs(value[0]).isSameOrBefore(dayjs(this.examForm.examTime[1]))
+        dayjs(value[1]).isSameOrBefore(dayjs(this.examForm.examTime[1]))
       ) {
         return callback(
           new Error(
