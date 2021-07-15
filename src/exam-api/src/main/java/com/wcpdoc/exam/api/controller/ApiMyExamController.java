@@ -72,7 +72,7 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles(value={"user"},logical = Logical.OR)
+	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
@@ -93,7 +93,7 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/answerList")
 	@ResponseBody
-	@RequiresRoles(value={"user"},logical = Logical.OR)
+	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult answerList(Integer id) {
 		try {
 			List<Map<String, Object>> list = myExamDetailService.getAnswerList(id);
@@ -193,7 +193,7 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/updateAnswer")
 	@ResponseBody
-	@RequiresRoles(value={"user"},logical = Logical.OR)
+	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult updateAnswer(Integer myExamDetailId, String[] answers) {
 		try {
 			// 校验数据有效性
@@ -239,7 +239,7 @@ public class ApiMyExamController extends BaseController{
 			myExamDetailService.update(myExamDetail);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("更新答案错误：", e);
+			log.error("更新答案错误：", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("更新答案错误：", e);
@@ -256,7 +256,7 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/doAnswer")
 	@ResponseBody
-	@RequiresRoles(value={"user"},logical = Logical.OR)
+	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult doAnswer(Integer myExamId) {
 		try {
 			// 校验数据有效性
@@ -292,35 +292,6 @@ public class ApiMyExamController extends BaseController{
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成交卷错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 考试时间表
-	 * 
-	 * v1.0 chenyun 2021年3月23日上午11:00:08
-	 * @return PageResult
-	 */
-	@RequestMapping("/kalendar")
-	@ResponseBody
-	@RequiresRoles(value={"user"},logical = Logical.OR)
-	public PageResult kalendar(Integer year, Integer month) {
-		try {
-			// 校验数据有效性
-			if(year == null){
-				throw new MyException("参数错误：year");
-			}
-			if(month == null){
-				throw new MyException("参数错误：month");
-			}
-			
-			return PageResultEx.ok().data(myExamService.kalendar(year, month));
-		} catch (MyException e) {
-			log.error("考试时间表错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("考试时间表错误：", e);
 			return PageResult.err();
 		}
 	}

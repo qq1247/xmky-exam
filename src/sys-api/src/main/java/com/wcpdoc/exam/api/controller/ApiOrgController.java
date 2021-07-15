@@ -54,25 +54,6 @@ public class ApiOrgController extends BaseController {
 	private OrgXlsxService orgXlsxService;
 
 	/**
-	 * 组织机构树
-	 * 
-	 * v1.0 zhanghc 2016-5-8上午11:00:00
-	 * 
-	 * @return List<Map<String,Object>>
-	 */
-	@RequestMapping("/treeList")
-	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
-	public PageResult treeList() {
-		try {
-			return PageResultEx.ok().data(orgService.getTreeList());
-		} catch (Exception e) {
-			log.error("组织机构树错误：", e);
-			return PageResult.err();
-		}
-	}
-
-	/**
 	 * 组织机构列表
 	 * 
 	 * v1.0 zhanghc 2016-5-8上午11:00:00
@@ -82,7 +63,7 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
+	@RequiresRoles(value={"admin","subAdmin","user"},logical = Logical.OR)
 	public PageResult listpage(PageIn pageIn, Integer parentId, String name) {
 		try {
 			return PageResultEx.ok().data(orgService.getListpage(new PageIn(request)));

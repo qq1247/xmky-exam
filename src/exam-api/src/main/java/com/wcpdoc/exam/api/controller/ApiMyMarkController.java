@@ -1,11 +1,8 @@
 package com.wcpdoc.exam.api.controller;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import javax.annotation.Resource;
@@ -15,11 +12,9 @@ import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.Exam;
@@ -28,12 +23,9 @@ import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyExamDetail;
 import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
-import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
-import com.wcpdoc.exam.core.entity.PaperQuestionEx;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
@@ -132,208 +124,6 @@ public class ApiMyMarkController extends BaseController {
 	}
 	
 	/**
-	 * 按题阅卷
-	 * 
-	 * v1.0 zhanghc 2017年6月26日下午12:30:20
-	 * @param examId
-	 * @return PageResult
-	 */
-	@RequestMapping("/subject")
-	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult subject(Integer paperId) {
-		try {
-			List<Integer> questionIdList = new ArrayList<Integer>();
-			List<PaperQuestion> list = paperQuestionService.getList(paperId);
-			for(PaperQuestion paperQuestion : list){
-				questionIdList.add(paperQuestion.getQuestionId());
-			}
-			return PageResultEx.ok().data(questionIdList);
-		} catch (Exception e) {
-			log.error("添加错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 按卷阅卷
-	 * 
-	 * v1.0 zhanghc 2017年6月26日下午12:30:20
-	 * @param examId
-	 * @return PageResult
-	 */
-	@RequestMapping("/exam")
-	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult exam(Integer paperId) {
-		try {
-			List<Map<String, Object>> mapList = new ArrayList<Map<String, Object>>();
-			List<Exam> examList = examService.getExamList(paperId);
-			for(Exam exam : examList){
-				Map<String, Object> map = new HashMap<String, Object>();
-				User entity = userService.getEntity(exam.getUpdateUserId());
-				map.put("userId", entity.getId());
-				map.put("userName", entity.getName());
-				mapList.add(map);
-			}
-			return PageResultEx.ok().data(mapList);
-		} catch (Exception e) {
-			log.error("添加错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 我的阅卷详细列表
-	 * 
-	 * v1.0 zhanghc 2018年11月11日下午2:26:56
-	 * @param pageIn
-	 * @return String
-	 */
-	@RequestMapping("/detailList")
-	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult detailList() {
-		try {
-			PageIn pageIn = new PageIn(request);
-			pageIn.addAttr("curUserId", getCurUser().getId());
-			PageOut pageOut = myExamService.getListpage(pageIn);
-			List<Map<String, Object>> list = pageOut.getList();
-			
-			Date curTime = new Date();
-			for(Map<String, Object> map : list) {
-				Date startTime = (Date) map.get("EXAM_MARK_START_TIME");
-				Date endTime = (Date) map.get("EXAM_MARK_END_TIME");
-				if (startTime.getTime() > curTime.getTime()) {
-					map.put("EXAM_HAND", "AWAIT");
-				} else if (startTime.getTime() <= curTime.getTime() && endTime.getTime() >= curTime.getTime()) {
-					map.put("EXAM_HAND", "START");
-				} else {
-					map.put("EXAM_HAND", "END");
-				}
-				
-				BigDecimal userScore = (BigDecimal) map.get("MY_EXAM_TOTAL_SCORE");
-				BigDecimal scoreA = (BigDecimal) map.get("EXAM_SCORE_A");
-				String scoreARemark = (String) map.get("EXAM_SCORE_A_REMARK");
-				if (scoreA != null && userScore != null && userScore.doubleValue() >= scoreA.doubleValue()) {
-					map.put("USER_REMARK", scoreARemark);
-					continue;
-				}
-				BigDecimal scoreB = (BigDecimal) map.get("EXAM_SCORE_B");
-				String scoreBRemark = (String) map.get("EXAM_SCORE_B_REMARK");
-				if (scoreB != null && userScore != null && userScore.doubleValue() >= scoreB.doubleValue()) {
-					map.put("USER_REMARK", scoreBRemark);
-					continue;
-				}
-				BigDecimal scoreC = (BigDecimal) map.get("EXAM_SCORE_C");
-				String scoreCRemark = (String) map.get("EXAM_SCORE_C_REMARK");
-				if (scoreC != null && userScore != null && userScore.doubleValue() >= scoreC.doubleValue()) {
-					map.put("USER_REMARK", scoreCRemark);
-					continue;
-				}
-				
-				BigDecimal scoreD = (BigDecimal) map.get("EXAM_SCORE_D");
-				String scoreDRemark = (String) map.get("EXAM_SCORE_D_REMARK");
-				if (scoreD != null && userScore != null && userScore.doubleValue() >= scoreD.doubleValue()) {
-					map.put("USER_REMARK", scoreDRemark);
-					continue;
-				}
-				
-				BigDecimal scoreE = (BigDecimal) map.get("EXAM_SCORE_E");
-				String scoreERemark = (String) map.get("EXAM_SCORE_E_REMARK");
-				if (scoreE != null && userScore != null && userScore.doubleValue() >= scoreE.doubleValue()) {
-					map.put("USER_REMARK", scoreERemark);
-					continue;
-				}
-			}
-			
-			return PageResultEx.ok().data(pageOut);
-		} catch (Exception e) {
-			log.error("我的阅卷详细列表错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 到达阅卷页面
-	 * 
-	 * v1.0 zhanghc 2017-05-25 16:34:59
-	 * @param model
-	 * @param myExamId
-	 * @return String
-	 */
-	@RequestMapping("/toMark")
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public String toMark(Model model, Integer myExamId) {//TODO
-		try {
-			// 校验数据有效性
-			MyExam myExam = myExamService.getEntity(myExamId);
-			if(myExam == null) {
-				throw new MyException("参数错误：myExamId");
-			}
-			Exam exam = examService.getEntity(myExam.getExamId());
-			List<MyMark> myMarkList = myMarkService.getList(myExam.getExamId());
-			boolean ok = false;
-			for (MyMark myMark : myMarkList) {
-				if (myMark.getMarkUserId() == getCurUser().getId()) {
-					ok = true;
-					break;
-				}
-			}
-			if (!ok) {
-				throw new MyException("未参与阅卷：" + exam.getName());
-			}
-
-			if (exam.getState() == 0) {
-				throw new MyException("考试已删除！");
-			}
-			if (exam.getState() == 2) {
-				throw new MyException("考试未发布！");
-			}
-			if (exam.getMarkStartTime().getTime() > (new Date().getTime() - 30000)){//预留30秒网络延时
-				throw new MyException("阅卷未开始！");
-			}
-			if (exam.getMarkEndTime().getTime() < (new Date().getTime() - 30000)){//预留30秒网络延时
-				throw new MyException("阅卷已结束！");
-			}
-
-			// 试卷信息
-			model.addAttribute("exam", exam);//考试信息
-			
-			Paper paper = paperService.getEntity(exam.getPaperId());//试卷信息
-			model.addAttribute("paper", paper);
-			
-			List<PaperQuestionEx> paperQuestionExList = paperService.getPaperList(exam.getPaperId());//试题信息
-			model.addAttribute("paperQuestionExList", paperQuestionExList);
-			
-			model.addAttribute("myExam", myExam);// 我的考试信息
-			
-			List<MyExamDetail> myExamDetailList = myExamDetailService.getList(myExamId);//用户已做答案信息
-			Map<Long, MyExamDetail> myExamDetailMap = new HashMap<Long, MyExamDetail>();
-			for(MyExamDetail myExamDetail : myExamDetailList) {
-				myExamDetailMap.put(myExamDetail.getQuestionId().longValue(), myExamDetail);
-			}
-			model.addAttribute("myExamDetailMap", myExamDetailMap);
-			
-			model.addAttribute("mark", true);// 控制页面展示那部分
-			
-			// 标记为阅卷中
-			if (myExam.getMarkState() == 1) {
-				myExam.setMarkState(2);
-			}
-			if (myExam.getMarkStartTime() == null) {// 第一次进入标记为阅卷时间
-				myExam.setMarkStartTime(new Date());
-			}
-			myExamService.update(myExam);
-			return "exam/myMark/myMarkPaper";
-		} catch (Exception e) {
-			log.error("到达阅卷页面错误：", e);
-			model.addAttribute("message", e.getMessage());
-			return "exam/error";
-		}
-	}
-	
-	/**
 	 * 更新阅卷分数
 	 * 
 	 * v1.0 zhanghc 2017年6月26日下午12:30:20
@@ -343,7 +133,7 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/updateScore")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult updateScore(Integer myExamDetailId, BigDecimal score) {
 		try {
 			// 校验数据有效性
@@ -406,7 +196,7 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/doScore")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult doScore(Integer myExamId) {
 		try {
 			// 校验数据有效性
@@ -484,7 +274,7 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/autoScore")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult autoScore(Integer examId) {
 		try {
 			String processBarId = UUID.randomUUID().toString();

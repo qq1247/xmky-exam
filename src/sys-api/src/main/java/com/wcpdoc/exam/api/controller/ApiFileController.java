@@ -69,7 +69,7 @@ public class ApiFileController extends BaseController {
 	 */
 	@RequestMapping("/upload")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
+	@RequiresRoles(value={"admin","subAdmin","user"},logical = Logical.OR)
 	public PageResult upload(@RequestParam("files") MultipartFile[] files) {
 		try {
 			String[] allowTypes = { "jpg", "gif", "png", "zip", "rar", "doc", "xls", "docx", "xlsx", "mp4" };
@@ -87,46 +87,6 @@ public class ApiFileController extends BaseController {
 	}
 
 	/**
-	 * 完成上传附件
-	 * 
-	 * v1.0 zhanghc 2017年3月6日下午11:51:02
-	 * 
-	 * @param fileIds
-	 * @return PageResult
-	 */
-	@RequestMapping("/uploadAdd")
-	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
-	public PageResult uploadAdd(Integer[] ids) {
-		StringBuilder message = new StringBuilder();
-		try {
-			for (Integer id : ids) {
-				try {
-					if (id == null) {
-						continue;
-					}
-					fileService.doUpload(id);
-				} catch (Exception e) {
-					log.error("完成上传附件失败：", e);
-					message.append(e.getMessage()).append("；");
-				}
-			}
-
-			if (message.length() > 0) {
-				throw new MyException(message.toString());
-			}
-
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("完成上传附件失败：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("完成上传附件失败：", e);
-			return PageResult.err();
-		}
-	}
-
-	/**
 	 * 完成下载附件
 	 * 
 	 * v1.0 zhanghc 2017年3月29日下午10:18:28 
@@ -137,7 +97,7 @@ public class ApiFileController extends BaseController {
 	 */
 	@RequestMapping(value = "/download")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
+	@RequiresRoles(value={"admin","subAdmin","user"},logical = Logical.OR)
 	public void download(Integer id) {
 		OutputStream output = null;
 		try {

@@ -5,45 +5,20 @@
         <el-row>
           <el-col :span="17">
             <el-form-item label prop="name">
-              <el-input
-                @focus="queryForm.queryShow = true"
-                placeholder="请输入名称"
-                v-model="queryForm.name"
-              ></el-input>
+              <el-input @focus="queryForm.queryShow = true" placeholder="请输入名称" v-model="queryForm.name"></el-input>
             </el-form-item>
-            <el-button
-              @click="query"
-              class="query-search"
-              icon="el-icon-search"
-              type="primary"
-              >查询</el-button
-            >
+            <el-button @click="query" class="query-search" icon="el-icon-search" type="primary">查询</el-button>
           </el-col>
           <el-col :span="7">
             <el-form-item style="float: right">
-              <el-button
-                @click="editForm.show = true"
-                icon="el-icon-circle-plus-outline"
-                size="mini"
-                type="primary"
-                >添加用户</el-button
-              >
-              <el-button
-                @click="toOrg"
-                icon="el-icon-circle-plus-outline"
-                size="mini"
-                type="primary"
-                >添加机构</el-button
-              >
+              <el-button @click="editForm.show = true" icon="el-icon-circle-plus-outline" size="mini" type="primary">添加用户</el-button>
+              <el-button @click="toOrg" icon="el-icon-circle-plus-outline" size="mini" type="primary">添加机构</el-button>
             </el-form-item>
           </el-col>
         </el-row>
         <div v-if="queryForm.queryShow">
           <el-form-item label prop="orgName">
-            <el-input
-              placeholder="请输入机构名称"
-              v-model="queryForm.orgName"
-            ></el-input>
+            <el-input placeholder="请输入机构名称" v-model="queryForm.orgName"></el-input>
           </el-form-item>
         </div>
       </el-form>
@@ -69,35 +44,16 @@
               <span style="margin-left: 10px">{{ scope.row.orgName }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="操作">
+          <el-table-column label="操作" width="300">
             <template slot-scope="scope">
-              <el-link
-                :underline="false"
-                @click="get(scope.row.id)"
-                icon="common common-edit"
-                >修改</el-link
-              >
-              <el-link
-                :underline="false"
-                @click="del(scope.row.id)"
-                icon="common common-delete"
-                >删除</el-link
-              >
+              <el-link :underline="false" @click="get(scope.row.id)" icon="common common-edit">修改</el-link>
+              <el-link :underline="false" @click="initPwd(scope.row.id)" icon="common common-edit">密码重置</el-link>
+              <el-link :underline="false" @click="del(scope.row.id)" icon="common common-delete">删除</el-link>
             </template>
           </el-table-column>
         </el-table>
       </div>
-      <el-pagination
-        :current-page="listpage.curPage"
-        :page-size="listpage.pageSize"
-        :total="listpage.total"
-        @current-change="pageChange"
-        background
-        hide-on-single-page
-        layout="prev, pager, next"
-        next-text="下一页"
-        prev-text="上一页"
-      ></el-pagination>
+      <el-pagination :current-page="listpage.curPage" :page-size="listpage.pageSize" :total="listpage.total" @current-change="pageChange" background hide-on-single-page layout="prev, pager, next" next-text="下一页" prev-text="上一页"></el-pagination>
     </div>
     <el-dialog :visible.sync="editForm.show" title="用户">
       <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
@@ -119,42 +75,22 @@
             @focus="getOrgList()"
             placeholder="请选择机构"
           >
-            <el-option
-              :key="item.id"
-              :label="item.name"
-              :value="String(item.id)"
-              v-for="item in editForm.orgListpage.list"
-            ></el-option>
+            <el-option :key="item.id" :label="item.name" :value="String(item.id)" v-for="item in editForm.orgListpage.list"></el-option>
           </CustomSelect>
         </el-form-item>
         <el-form-item label="登录名称" label-width="120px" prop="loginName">
-          <el-input
-            placeholder="请输入登录名称"
-            v-model="editForm.loginName"
-          ></el-input>
+          <el-input placeholder="请输入登录名称" v-model="editForm.loginName"></el-input>
         </el-form-item>
         <el-form-item label="名称" label-width="120px" prop="name">
           <el-input placeholder="请输入名称" v-model="editForm.name"></el-input>
         </el-form-item>
         <el-form-item label="子管理员" label-width="120px" prop="roles">
-          <el-switch
-            active-color="#13ce66"
-            inactive-color="#ff4949"
-            v-model="editForm.roles"
-            active-value="subAdmin"
-            inactive-value=" "
-          ></el-switch>
+          <el-switch active-color="#13ce66" active-value="subAdmin" inactive-color="#ff4949" inactive-value="user" v-model="editForm.roles"></el-switch>
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="add" type="primary"
-v-if="editForm.id == null"
-          >添加</el-button
-        >
-        <el-button @click="edit" type="primary"
-v-if="editForm.id != null"
-          >修改</el-button
-        >
+        <el-button @click="add" type="primary" v-if="editForm.id == null">添加</el-button>
+        <el-button @click="edit" type="primary" v-if="editForm.id != null">修改</el-button>
         <el-button @click="editForm.show = false">取 消</el-button>
       </div>
     </el-dialog>
@@ -283,13 +219,32 @@ export default {
           return
         }
 
-        this.$alert(res.data.initPwd, '初始化密码', {
-          confirmButtonText: '确定',
-        })
+        if (res.data.initPwd) {
+          this.$alert(res.data.initPwd, '初始化密码', {
+            confirmButtonText: '确定',
+          })
+        }
 
         this.editForm.show = false
         this.query()
       })
+    },
+    // 初始化密码
+    async initPwd(id) {
+     const res = await this.$https.initPwd({
+          id: id
+        })
+
+        if (res.code != 200) {
+          alert(res.msg)
+          return
+        }
+
+        if (res.data.initPwd) {
+          this.$alert(res.data.initPwd, '初始化密码', {
+            confirmButtonText: '确定',
+          })
+        }
     },
     // 删除
     async del(id) {
