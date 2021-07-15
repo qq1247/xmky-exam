@@ -65,27 +65,9 @@ const errorHandle = (status, msg) => {
   }
 }
 
-/*
- *根据打包环境配置baseURL
- */
-let baseUrl
-switch (process.env.VUE_APP_MODE) {
-  case 'development':
-    baseUrl = 'http://192.168.110.198:8080/api/'
-    break
-  case 'production':
-    baseUrl = 'http://prod.com/api/'
-    break
-  case 'test':
-    baseUrl = 'http://192.168.110.86:8080/api/'
-    break
-  default:
-    baseUrl = 'http://192.168.110.198:8080/api/'
-}
-
 // 创建axios实例
 var instance = axios.create({
-  baseURL: baseUrl,
+  baseURL: process.env.VUE_APP_BASE_URL,
   timeout: 1000 * 1000,
 })
 
