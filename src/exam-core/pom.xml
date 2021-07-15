@@ -18,6 +18,12 @@
 			<artifactId>sys-base</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- 集成系统附件 -->
+		<dependency>
+			<groupId>com.wcpdoc.exam</groupId>
+			<artifactId>sys-file</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<!-- 集成poi -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>

@@ -3,6 +3,7 @@ package com.wcpdoc.exam.core.util;
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -12,7 +13,87 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 
+import com.wcpdoc.exam.core.exception.MyException;
+
+/**
+ * 字符串工具类
+ * 
+ * @author zhanghc 2015-3-27下午04:58:24
+ */
 public class StringUtil {
+	private static final Random random = new Random();
+	
+	/**
+	 * 获取字符串
+	 * 
+	 * v1.0 zhanghc 2017年4月11日下午11:09:35
+	 * 
+	 * @param file 读取文件
+	 * @param startByte 起始字节
+	 * @param endByte 结束字节
+	 * @param charset 字符集
+	 * @return List<String>
+	 */
+	public static List<String> getString(File file, long startByte, long endByte, String charset) {
+		// 校验数据有效性
+		if (!file.exists() || file.isDirectory() || !file.canRead()) {
+			throw new MyException("参数无效：file");
+		}
+		if (startByte < 0) {
+			throw new MyException("参数无效：startByte");
+		}
+		if (endByte < 0 || endByte < startByte) {
+			throw new MyException("参数无效：endByte");
+		}
+		if (!ValidateUtil.isValid(charset)) {
+			throw new MyException("参数无效：charset");
+		}
+		if (endByte - startByte > 100000) {
+			throw new MyException("不能大于10w个字节");
+		}
+		
+		// 读取指定位置的字符串
+		RandomAccessFile fileRead = null;
+		List<String> result = new ArrayList<String>();
+		try {
+			fileRead = new RandomAccessFile(file, "r");// 只读模式
+			long fileByteLength = fileRead.length();
+			if (fileByteLength == 0L) {
+				return result;
+			}
+			if (startByte > fileByteLength) {
+				return result;
+			}
+			
+			StringBuilder str = new StringBuilder();
+			for (long i = startByte; i < endByte; i++) {
+				fileRead.seek(i);
+				str.append((char)fileRead.read());
+			}
+			
+			String[] strArr = new String(str.toString().getBytes("iso-8859-1"), charset).replaceAll("\r", "").split("\n");
+			return Arrays.asList(strArr);
+		} catch (Exception e) {
+			throw new MyException(e);
+		} finally {
+			IOUtils.closeQuietly(fileRead);
+		}
+	}
+	
+	/**
+	 * 获取字符串
+	 * 
+	 * v1.0 zhanghc 2017年4月11日下午11:09:35
+	 * 
+	 * @param file 读取文件
+	 * @param startByte 起始字节
+	 * @param endByte 结束字节
+	 * @return List<String>
+	 */
+	public static List<String> getString(File file, long startByte, long endByte) {
+		return getString(file, startByte, endByte, "utf-8");
+	}
+	
 	/**
 	 * 获取最后N行字符串
 	 * 
@@ -26,13 +107,13 @@ public class StringUtil {
 	public static List<String> getLastLine(File file, int readNum, String charset) {
 		// 校验数据有效性
 		if (!file.exists() || file.isDirectory() || !file.canRead()) {
-			throw new RuntimeException("参数无效：file");
+			throw new MyException("参数无效：file");
 		}
 		if (readNum <= 0) {
-			throw new RuntimeException("参数无效：readNum");
+			throw new MyException("参数无效：readNum");
 		}
 		if (!ValidateUtil.isValid(charset)) {
-			throw new RuntimeException("参数无效：charset");
+			throw new MyException("参数无效：charset");
 		}
 
 		// 读取最后N行记录
@@ -67,7 +148,7 @@ public class StringUtil {
 			Collections.reverse(result);
 			return result;
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new MyException(e);
 		} finally {
 			IOUtils.closeQuietly(fileRead);
 		}
@@ -123,13 +204,13 @@ public class StringUtil {
 	 * @param separator
 	 * @return String
 	 */
-	public static String join(String[] strArr, String separator) {
+	public static String join(Object[] strArr, String separator) {
 		if (!ValidateUtil.isValid(strArr)) {
-			throw new RuntimeException("无法获取参数：strArr");
+			throw new MyException("参数错误：strArr");
 		}
 
 		StringBuilder sb = new StringBuilder();
-		for (String str : strArr) {
+		for (Object str : strArr) {
 			if (sb.length() > 0) {
 				sb.append(separator);
 			}
@@ -149,7 +230,7 @@ public class StringUtil {
 	 */
 	public static String join(Collection<String> collection, String separator) {
 		if (!ValidateUtil.isValid(collection)) {
-			throw new RuntimeException("无法获取参数：collection");
+			throw new MyException("参数错误：collection");
 		}
 
 		StringBuilder sb = new StringBuilder();
@@ -167,10 +248,10 @@ public class StringUtil {
 	 * 
 	 * v1.0 zhanghc 2017年6月26日下午1:52:55
 	 * 
-	 * @param strArr 默认逗号分隔
+	 * @param strArr 默认英文逗号分隔
 	 * @return String
 	 */
-	public static String join(String[] strArr) {
+	public static String join(Object[] strArr) {
 		return join(strArr, ",");
 	}
 
@@ -184,7 +265,6 @@ public class StringUtil {
 	 */
 	public static String getRandomStr(int length) {
 		StringBuilder value = new StringBuilder();
-		Random random = new Random();
 		for (int i = 0; i < length; i++) {
 			boolean isNum = random.nextInt(2) % 2 == 0;
 			if (isNum) {
@@ -203,5 +283,22 @@ public class StringUtil {
 
 		return value.toString().replaceAll("0", "2").replaceAll("o", "3").replaceAll("O", "4")
 				.replaceAll("1", "5").replaceAll("l", "6").replaceAll("L", "7");
+	}
+	
+	/**
+	 * 获取随机数字
+	 * 
+	 * v1.0 zhanghc 2017年7月13日下午5:59:34
+	 * 
+	 * @param length
+	 * @return String
+	 */
+	public static String getRandomNum(int length) {
+		StringBuilder value = new StringBuilder();
+		for (int i = 0; i < length; i++) {
+			value.append(random.nextInt(10));
+		}
+		
+		return value.toString();
 	}
 }

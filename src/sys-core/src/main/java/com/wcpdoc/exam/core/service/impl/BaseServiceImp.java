@@ -13,7 +13,7 @@ import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.service.BaseService;
 
 /**
- * 服务层实现
+ * 基础服务层实现
  * 
  * v1.0 zhanghc 2015-6-19下午08:30:16
  * 
@@ -27,48 +27,40 @@ public abstract class BaseServiceImp<T> implements BaseService<T> {
 	protected BaseDao<T> dao;
 
 	public abstract void setDao(BaseDao<T> dao);
-
+	
+	@Override
 	public LoginUser getCurUser() {
 		HttpSession session = request.getSession(false);
-		if (session == null) {
-			return null;
-		}
-
-		return (LoginUser) session.getAttribute(ConstantManager.USER);
+		return session == null ? null : (LoginUser) session.getAttribute(ConstantManager.USER);
 	}
 
 	@Override
-	public /* final */ void add(T entity) {
+	public /*final*/ void add(T entity) {
 		dao.add(entity);
 	}
 
 	@Override
-	public /* final */ void update(T entity) {
+	public /*final*/ void update(T entity) {
 		dao.update(entity);
 	}
 
 	@Override
-	public /* final */ void del(Integer id) {
+	public /*final*/ void del(Object id) {
 		dao.del(id);
 	}
 
 	@Override
-	public /* final */ void del(Integer[] ids) {
+	public /*final*/ void del(Object[] ids) {
 		dao.del(ids);
 	}
 
 	@Override
-	public /* final */ T getEntity(Integer id) {
+	public /*final*/ T getEntity(Object id) {
 		return dao.getEntity(id);
 	}
 
 	@Override
-	public /* final */ PageOut getListpage(PageIn pageIn) {
+	public /*final*/ PageOut getListpage(PageIn pageIn) {
 		return dao.getListpage(pageIn);
-	}
-
-	@Override
-	public /* final */ void evict(Object obj) {
-		dao.evict(obj);
 	}
 }

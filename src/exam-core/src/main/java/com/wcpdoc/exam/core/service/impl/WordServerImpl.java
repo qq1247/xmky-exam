@@ -17,6 +17,7 @@ import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 
 import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.WordServer;
 import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
@@ -76,26 +77,26 @@ public class WordServerImpl extends WordServer {
 		}
 
 		if (answerIndex == 0) {
-			throw new RuntimeException("不能从试题找到【答案】：【" + singleQuestion.toString() + "】");
+			throw new MyException("不能从试题找到【答案】：【" + singleQuestion.toString() + "】");
 		}
 		if (analysisIndex == 0) {
-			throw new RuntimeException("不能从试题找到【解析】：【" + singleQuestion.toString() + "】");
+			throw new MyException("不能从试题找到【解析】：【" + singleQuestion.toString() + "】");
 		}
 		if (answerIndex >= analysisIndex) {
-			throw new RuntimeException("【答案】必须在【解析】之前：【" + singleQuestion.toString() + "】");
+			throw new MyException("【答案】必须在【解析】之前：【" + singleQuestion.toString() + "】");
 		}
 
 		String titleTxt = Jsoup.clean(singleQuestion.get(0).outerHtml(), Whitelist.none()).trim();
 		String typeName = titleTxt.substring(1, 3);
 		Integer type = getType(typeName);
 		if (type == null) {
-			throw new RuntimeException("不能从试题找到【类型】：【" + singleQuestion.toString() + "】");
+			throw new MyException("不能从试题找到【类型】：【" + singleQuestion.toString() + "】");
 		}
 
 		String difficultyName = titleTxt.substring(5, 7);
 		Integer difficulty = getDifficulty(difficultyName);
 		if (difficulty == null) {
-			throw new RuntimeException("不能从试题找到【难度】：【" + singleQuestion.toString() + "】");
+			throw new MyException("不能从试题找到【难度】：【" + singleQuestion.toString() + "】");
 		}
 
 		List<Node> titleNodeList = singleQuestion.subList(0, answerIndex);
@@ -147,29 +148,29 @@ public class WordServerImpl extends WordServer {
 			optionList = optionList.subList(0, optionIndexs.size() - 1);
 			for (String option : optionList) {
 				if (optionMap.get(option) == null) {
-					throw new RuntimeException("不能从" + titleNodeList + "发现【" + option + "】选项");
+					throw new MyException("不能从" + titleNodeList + "发现【" + option + "】选项");
 				}
 			}
 			
-			if(optionList.size() >= 1){
+			if(optionList.size() >= 1) {
 				question.setOptionA(optionMap.get("A"));
 			}
-			if(optionList.size() >= 2){
+			if(optionList.size() >= 2) {
 				question.setOptionB(optionMap.get("B"));
 			}
-			if(optionList.size() >= 3){
+			if(optionList.size() >= 3) {
 				question.setOptionC(optionMap.get("C"));
 			}
-			if(optionList.size() >= 4){
+			if(optionList.size() >= 4) {
 				question.setOptionD(optionMap.get("D"));
 			}
-			if(optionList.size() >= 5){
+			if(optionList.size() >= 5) {
 				question.setOptionE(optionMap.get("E"));
 			}
-			if(optionList.size() >= 6){
+			if(optionList.size() >= 6) {
 				question.setOptionF(optionMap.get("F"));
 			}
-			if(optionList.size() >= 7){
+			if(optionList.size() >= 7) {
 				question.setOptionG(optionMap.get("G"));
 			}
 		}
@@ -189,7 +190,7 @@ public class WordServerImpl extends WordServer {
 			Set<String> set2 = new HashSet<>(optionList);
 			
 			if (!set2.containsAll(set)) {
-				throw new RuntimeException("选项和答案不匹配：【"+singleQuestion.toString()+"】");
+				throw new MyException("选项和答案不匹配：【"+singleQuestion.toString()+"】");
 			}
 			answer = StringUtil.join(set, ",");
 		} else if (type == 3) {
@@ -198,7 +199,7 @@ public class WordServerImpl extends WordServer {
 			for (Node node : subList) {
 				String an = Jsoup.clean(node.outerHtml(), Whitelist.none())
 						.replaceAll(" ", "").replaceAll("\r", "").replaceAll("\n", "");
-				if(an.startsWith("【答案】")){
+				if(an.startsWith("【答案】")) {
 					an = an.substring(4);
 				}
 				if (!ValidateUtil.isValid(an)) {
@@ -213,7 +214,7 @@ public class WordServerImpl extends WordServer {
 			}
 		} else if (type == 4) {
 			if (answer.length() != 1) {
-				throw new RuntimeException("答案只能是一个：【"+singleQuestion.toString()+"】");
+				throw new MyException("答案只能是一个：【"+singleQuestion.toString()+"】");
 			}
 			
 			if ("对是√".contains(answer)) {
@@ -221,7 +222,7 @@ public class WordServerImpl extends WordServer {
 			} else if ("否错×".contains(answer)) {
 				answer = "错";
 			} else {
-				throw new RuntimeException("答案只能填：对错是否√×【"+singleQuestion.toString()+"】");
+				throw new MyException("答案只能填：对错是否√×【"+singleQuestion.toString()+"】");
 			}
 		}
 

@@ -1,5 +1,6 @@
 package com.wcpdoc.exam.core.entity;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -11,7 +12,7 @@ import javax.persistence.Table;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import com.wcpdoc.exam.core.util.DateUtil;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * 试题实体
@@ -53,15 +54,22 @@ public class Question {
 	private Integer state;
 	@Column(name = "UPDATE_USER_ID")
 	private Integer updateUserId;
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "UPDATE_TIME")
-	@DateTimeFormat(pattern = DateUtil.FORMAT_DATE_TIME)
 	private Date updateTime;
 	@Column(name = "QUESTION_TYPE_ID")
 	private Integer questionTypeId;
+	@Column(name = "SCORE")
+	private BigDecimal score;
+	@Column(name = "SCORE_OPTIONS")
+	private String scoreOptions;
 	@Column(name = "VER")
 	private Integer ver;
 	@Column(name = "SRC_ID")
 	private Integer srcId;
+	@Column(name = "NO")
+	private Integer no;
 
 	public Integer getId() {
 		return id;
@@ -71,10 +79,12 @@ public class Question {
 		this.id = id;
 	}
 
+	/** 1：单选；2：多选；3：填空；4：判断；5：问答 */
 	public Integer getType() {
 		return type;
 	}
 
+	/** 1：单选；2：多选；3：填空；4：判断；5：问答 */
 	public void setType(Integer type) {
 		this.type = type;
 	}
@@ -167,10 +177,12 @@ public class Question {
 		this.analysis = analysis;
 	}
 
+	/** 0：删除；1：启用；2：禁用 */
 	public Integer getState() {
 		return state;
 	}
 
+	/** 0：删除；1：启用；2：禁用 */
 	public void setState(Integer state) {
 		this.state = state;
 	}
@@ -213,5 +225,29 @@ public class Question {
 
 	public void setSrcId(Integer srcId) {
 		this.srcId = srcId;
+	}
+
+	public Integer getNo() {
+		return no;
+	}
+
+	public void setNo(Integer no) {
+		this.no = no;
+	}
+
+	public BigDecimal getScore() {
+		return score;
+	}
+
+	public void setScore(BigDecimal score) {
+		this.score = score;
+	}
+
+	public String getScoreOptions() {
+		return scoreOptions;
+	}
+
+	public void setScoreOptions(String scoreOptions) {
+		this.scoreOptions = scoreOptions;
 	}
 }

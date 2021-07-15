@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * 缓存配置
  * 
- * v1.0 zhanghc 2019年4月10日下午7:04:50
+ * v1.0 zhanghc 2019年5月25日上午9:56:48
  */
 @Configuration
 public class RedisConf {
@@ -27,17 +27,19 @@ public class RedisConf {
 	 */
 	@Bean
 	public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
+		StringRedisSerializer stringSerializer = new StringRedisSerializer();
 		Jackson2JsonRedisSerializer<Object> jsonSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
 		ObjectMapper om = new ObjectMapper();
 		om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
 		jsonSerializer.setObjectMapper(om);// 转换成对象，默认HashMap。
 
-		StringRedisSerializer stringSerializer = new StringRedisSerializer();
-
 		RedisTemplate<String, Object> template = new RedisTemplate<String, Object>();
 		template.setConnectionFactory(factory);
+		template.setStringSerializer(stringSerializer);
 		template.setKeySerializer(stringSerializer);
 		template.setValueSerializer(jsonSerializer);
+		template.setHashKeySerializer(stringSerializer);
+		template.setHashValueSerializer(jsonSerializer);
 		return template;
 	}
 }

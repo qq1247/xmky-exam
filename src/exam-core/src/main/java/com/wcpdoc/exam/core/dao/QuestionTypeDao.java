@@ -3,7 +3,6 @@ package com.wcpdoc.exam.core.dao;
 import java.util.List;
 import java.util.Map;
 
-import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.QuestionType;
@@ -13,7 +12,7 @@ import com.wcpdoc.exam.core.entity.QuestionType;
  * 
  * v1.0 zhanghc 2016-5-24下午14:54:09
  */
-public interface QuestionTypeDao extends BaseDao<QuestionType>{
+public interface QuestionTypeDao extends BaseDao<QuestionType> {
 
 	/**
 	 * 获取试题分类树
@@ -21,50 +20,7 @@ public interface QuestionTypeDao extends BaseDao<QuestionType>{
 	 * @return List<Map<String,Object>>
 	 */
 	List<Map<String, Object>> getTreeList();
-
-	/**
-	 * 移动试题分类
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * @param sourceId
-	 * @param targetId
-	 * void
-	 */
-	void doMove(Integer sourceId, Integer targetId);
-
-	/**
-	 * 获取所有子试题分类列表，包括自己
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * @param id 
-	 * void
-	 */
-	List<QuestionType> getAllSubQuestionTypeList(Integer id);
 	
-	/**
-	 * 获取试题分类
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * @param name
-	 * @return QuestionType
-	 */
-	QuestionType getQuestionTypeByName(String name);
-
-	/**
-	 * 获取权限用户
-	 * 
-	 * v1.0 zhanghc 2018年5月29日下午11:26:22
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	PageOut getAuthUserListpage(PageIn pageIn);
-
-	/**
-	 * 获取权限用户
-	 * 
-	 * v1.0 zhanghc 2018年5月29日下午11:26:22
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	PageOut getAuthUserAddList(PageIn pageIn);
-
 	/**
 	 * 获取试题分类列表
 	 * 
@@ -81,4 +37,42 @@ public interface QuestionTypeDao extends BaseDao<QuestionType>{
 	 * @return List<QuestionType>
 	 */
 	List<QuestionType> getList(Integer parentId);
+	
+	/**
+	 * 名称是否存在
+	 * 
+	 * v1.0 zhanghc 2020-09-05 10:12:16
+	 * 
+	 * @param name
+	 * @param excludeId
+	 * @return boolean
+	 */
+	boolean existName(String name, Integer excludeId);
+
+	/**
+	 * 获取权限用户列表
+	 * 
+	 * v1.0 zhanghc 2018年5月30日下午6:28:19
+	 * @param pageIn
+	 * @return PageOut
+	 */
+	PageOut getAuthUserListpage(PageIn pageIn);
+
+	/**
+	 * 获取权限岗位列表
+	 * 
+	 * v1.0 zhanghc 2018年5月30日下午6:28:19
+	 * @param pageIn
+	 * @return PageOut
+	 */
+	PageOut getAuthPostListpage(PageIn pageIn);
+
+	/**
+	 * 获取权限机构列表
+	 * 
+	 * v1.0 zhanghc 2018年5月30日下午6:28:19
+	 * @param pageIn
+	 * @return PageOut
+	 */
+	PageOut getAuthOrgListpage(PageIn pageIn);
 }

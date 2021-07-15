@@ -7,8 +7,8 @@ package com.wcpdoc.exam.core.entity;
  */
 public class PageIn {
 	/* 分页信息 */
-	private int page = 1;
-	private int rows = 20;
+	private int curPage = 1;//当前第几页
+	private int pageSize = 20;//每页多少条，最大100条；
 
 	/* 查询参数 */
 	private String one;
@@ -21,32 +21,33 @@ public class PageIn {
 	private String eight;
 	private String nine;
 	private String ten;
+	
+	/* 排序参数 */
+	private String sortOne;
+	private String sortTwo;
+	private String sortThree;
+	private String sortFour;
+	private String sortFive;
+	private String sortSix;
+	private String sortSeven;
+	private String sortEight;
+	private String sortNine;
+	private String sortTen;
 
-	public int getCurrentPage() {
-		return page;
+	public int getCurPage() {
+		return curPage;
+	}
+
+	public void setCurPage(int curPage) {
+		this.curPage = curPage;
 	}
 
 	public int getPageSize() {
-		if (rows > 100) {
-			rows = 100;
-		}
-		return rows;
+		return pageSize;
 	}
 
-	public int getRows() {
-		return rows;
-	}
-
-	public void setRows(int rows) {
-		this.rows = rows;
-	}
-
-	public int getPage() {
-		return page;
-	}
-
-	public void setPage(int page) {
-		this.page = page;
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize > 100 ? 100 : pageSize;
 	}
 
 	public String getOne() {
@@ -127,5 +128,85 @@ public class PageIn {
 
 	public void setTen(String ten) {
 		this.ten = ten;
+	}
+
+	public String getSortOne() {
+		return sortOne;
+	}
+
+	public void setSortOne(String sortOne) {
+		this.sortOne = sortOne;
+	}
+
+	public String getSortTwo() {
+		return sortTwo;
+	}
+
+	public void setSortTwo(String sortTwo) {
+		this.sortTwo = sortTwo;
+	}
+
+	public String getSortThree() {
+		return sortThree;
+	}
+
+	public void setSortThree(String sortThree) {
+		this.sortThree = sortThree;
+	}
+
+	public String getSortFour() {
+		return sortFour;
+	}
+
+	public void setSortFour(String sortFour) {
+		this.sortFour = sortFour;
+	}
+
+	public String getSortFive() {
+		return sortFive;
+	}
+
+	public void setSortFive(String sortFive) {
+		this.sortFive = sortFive;
+	}
+
+	public String getSortSix() {
+		return sortSix;
+	}
+
+	public void setSortSix(String sortSix) {
+		this.sortSix = sortSix;
+	}
+
+	public String getSortSeven() {
+		return sortSeven;
+	}
+
+	public void setSortSeven(String sortSeven) {
+		this.sortSeven = sortSeven;
+	}
+
+	public String getSortEight() {
+		return sortEight;
+	}
+
+	public void setSortEight(String sortEight) {
+		this.sortEight = sortEight;
+	}
+
+	public String getSortNine() {
+		return sortNine;
+	}
+
+	public void setSortNine(String sortNine) {
+		this.sortNine = sortNine;
+	}
+
+	public String getSortTen() {
+		return sortTen;
+	}
+
+	public void setSortTen(String sortTen) {
+		this.sortTen = sortTen;
 	}
 }

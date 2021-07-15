@@ -3,7 +3,6 @@ package com.wcpdoc.exam.file.service.impl;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import javax.annotation.Resource;
 
@@ -14,9 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.wcpdoc.exam.core.dao.BaseDao;
-import com.wcpdoc.exam.core.entity.LoginUser;
+import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.DateUtil;
+import com.wcpdoc.exam.core.util.IdUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.file.dao.FileDao;
 import com.wcpdoc.exam.file.entity.File;
@@ -42,13 +42,13 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 	}
 
 	@Override
-	public String doTempUpload(MultipartFile[] files, String[] allowTypes, LoginUser user, String ip) {
+	public String doTempUpload(MultipartFile[] files, String[] allowTypes) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(files)) {
-			throw new RuntimeException("无法获取参数：files");
+			throw new MyException("参数错误：files");
 		}
 		if (allowTypes == null) {
-			throw new RuntimeException("无法获取参数：allowTypes");
+			throw new MyException("参数错误：allowTypes");
 		}
 
 		// 检验上传类型
@@ -56,16 +56,18 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		for (MultipartFile multipartFile : files) {
 			String extName = FilenameUtils.getExtension(multipartFile.getOriginalFilename());
 			if (!allowTypeList.contains(extName)) {
-				throw new RuntimeException("允许的上传类型为：" + allowTypeList);
+				throw new MyException("允许的上传类型为：" + allowTypeList);
 			}
 		}
 
 		// 创建临时上传目录
 		String baseDir = fileUploadDir;
-		String tempPath = java.io.File.separator + "temp";
-		String timeStr = DateUtil.getFormatDateTime();
-		String ymdPath = java.io.File.separator + timeStr.substring(0, 4) + java.io.File.separator
-				+ timeStr.substring(5, 7) + java.io.File.separator + timeStr.substring(8, 10);
+		String tempPath = String.format("%stemp", java.io.File.separator);
+		String timeStr = DateUtil.formatDateTime(new Date());
+		String ymdPath = String.format("%s%s%s%s%s%s", 
+				java.io.File.separator, timeStr.substring(0, 4), 
+				java.io.File.separator, timeStr.substring(5, 7), 
+				java.io.File.separator, timeStr.substring(8, 10));
 		java.io.File tempUploadDir = new java.io.File(baseDir + tempPath + ymdPath);
 		if (!tempUploadDir.exists()) {
 			tempUploadDir.mkdirs();
@@ -74,12 +76,12 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		// 保存临时上传附件（如果中间有失败，数据库事务会回滚，部分已上传的临时文件会采用定时任务清除）
 		StringBuilder fileIds = new StringBuilder();
 		for (MultipartFile multipartFile : files) {
-			String fileId = UUID.randomUUID().toString();
+			String fileId = IdUtil.getInstance().nextId() + "";
 			java.io.File destFile = new java.io.File(tempUploadDir.getAbsolutePath() + java.io.File.separator + fileId);
 			try {
 				multipartFile.transferTo(destFile);
 			} catch (Exception e) {
-				throw new RuntimeException("保存临时上传附件时失败：", e);
+				throw new MyException(e);
 			}
 
 			// 保存临时上传附件信息到数据库
@@ -88,9 +90,9 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 			file.setExtName(FilenameUtils.getExtension(multipartFile.getOriginalFilename()));
 			file.setFileType(multipartFile.getContentType());
 			file.setPath(tempPath + ymdPath + java.io.File.separator + fileId);
-			file.setIp(ip);
+			file.setIp(request.getRemoteHost());
 			file.setState(0);
-			file.setUpdateUserId(user.getId());
+			file.setUpdateUserId(getCurUser().getId());
 			file.setUpdateTime(new Date());
 			fileDao.add(file);
 
@@ -103,10 +105,10 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 	}
 
 	@Override
-	public void doUpload(Integer id, LoginUser user, String ip) throws Exception {
+	public void doUpload(Integer id) {
 		// 校验数据有效性
 		if (id == null) {
-			throw new RuntimeException("无法获取参数：id");
+			throw new MyException("参数错误：id");
 		}
 		File file = fileDao.getEntity(id);
 		if (file.getState() == 1) {
@@ -115,55 +117,38 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 
 		// 数据库更新附件信息（如果先移动附件成功，而后数据库更新失败，恢复移动附件不好处理）
 		String baseDir = fileUploadDir;
-		java.io.File tempFile = new java.io.File(fileUploadDir + file.getPath());
-		String timeStr = DateUtil.getFormatDateTime();
-		String ymdPath = java.io.File.separator + timeStr.substring(0, 4) + java.io.File.separator
-				+ timeStr.substring(5, 7) + java.io.File.separator + timeStr.substring(8, 10);
+		java.io.File tempFile = new java.io.File(String.format("%s%s", fileUploadDir, file.getPath()));
+		String timeStr = DateUtil.formatDateTime(new Date());
+		String ymdPath = String.format("%s%s%s%s%s%s", 
+				java.io.File.separator, timeStr.substring(0, 4),
+				java.io.File.separator, timeStr.substring(5, 7), 
+				java.io.File.separator, timeStr.substring(8, 10));
 		file.setState(1);
 		file.setPath(ymdPath + java.io.File.separator + tempFile.getName());
-		file.setIp(ip);
-		file.setUpdateUserId(user.getId());
+		file.setIp(request.getRemoteHost());
+		file.setUpdateUserId(getCurUser().getId());
 		file.setUpdateTime(new Date());
-		fileDao.flush();
 
 		// 移动临时附件到附件目录
 		java.io.File destDir = new java.io.File(baseDir + ymdPath);
 		try {
 			FileUtils.moveFileToDirectory(tempFile, destDir, true);
 		} catch (Exception e) {
-			throw new RuntimeException("移动临时附件【" + file.getName() + "】到附件目录时失败：", e);
+			throw new MyException(e);
 		}
 	}
 
 	@Override
-	public void delAndUpdate(Integer[] ids) {
-		// 校验数据有效性
-		if (ids == null) {
-			throw new RuntimeException("无法获取参数：ids");
-		}
-
-		for (Integer id : ids) {
-			// 删除附件
-			File file = getEntity(id);
-			file.setState(0);
-		}
-	}
-
-	@Override
-	public FileEx getEntityEx(Integer id) {
+	public FileEx getFileEx(Integer id) {
 		if (id == null) {
-			throw new RuntimeException("无法获取参数：id");
+			throw new MyException("参数错误：id");
 		}
 
 		File entity = getEntity(id);
-		if (entity == null) {
-			throw new RuntimeException("附件信息不存在");
-		}
-
 		String baseDir = fileUploadDir;
-		java.io.File file = new java.io.File(baseDir + java.io.File.separator + entity.getPath());
+		java.io.File file = new java.io.File(String.format("%s%s%s", baseDir, java.io.File.separator, entity.getPath()));
 		if (!file.exists()) {
-			throw new RuntimeException("附件不存在");
+			throw new MyException("附件不存在");
 		}
 
 		FileEx fileEx = new FileEx();

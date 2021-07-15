@@ -20,12 +20,12 @@
 							<input name="three" class="easyui-textbox" style="width:166px;height:35px;line-height:35px;">
 							<span class="con-span">考试用户：</span>
 							<input name="four" class="easyui-textbox" style="width:166px;height:35px;line-height:35px;">
-							<span class="con-span">判卷用户：</span>
+							<span class="con-span">阅卷用户：</span>
 							<input name="five" class="easyui-textbox" style="width:166px;height:35px;line-height:35px;">
 							<span class="con-span">考试状态：</span>
 							<select name="six" class="easyui-combobox" data-options="editable:false" style="width:166px;height:35px;line-height:35px;">
 								<option value=""></option>
-								<c:forEach var="dict" items="${EXAM_USER_STATE }">
+								<c:forEach var="dict" items="${MY_EXAM_STATE }">
 								<option value="${dict.dictKey }">${dict.dictValue }</option>
 								</c:forEach>
 							</select>
@@ -65,9 +65,9 @@
 						{field : "PAPER_NAME", title : "试卷名称", width : 80, align : "center"},
 						{field : "USER_NAME", title : "考试用户", width : 80, align : "center"},
 						{field : "TOTAL_SCORE", title : "考试得分", width : 80, align : "center"},
-						{field : "EXAM_USER_STATE_NAME", title : "考试状态", width : 80, align : "center"},
-						{field : "MARK_USER_NAME", title : "判卷用户", width : 80, align : "center"},
-						{field : "EXAM_USER_UPDATE_MARK_TIME_STR", title : "判卷时间", width : 80, align : "center"}
+						{field : "MY_EXAM_STATE_NAME", title : "考试状态", width : 80, align : "center"},
+						{field : "MY_MARK_NAME", title : "阅卷用户", width : 80, align : "center"},
+						{field : "MY_EXAM_UPDATE_MARK_TIME_STR", title : "阅卷时间", width : 80, align : "center"}
 						]]
 			});
 		}

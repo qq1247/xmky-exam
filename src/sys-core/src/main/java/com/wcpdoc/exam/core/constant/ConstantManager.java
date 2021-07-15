@@ -6,6 +6,8 @@ package com.wcpdoc.exam.core.constant;
  * v1.0 zhanghc 2016年9月6日下午6:45:12
  */
 public class ConstantManager {
+	/** 超级管理员名称 */
+	public static final String ADMIN_LOGIN_NAME = "admin";
 	/** 当前登录用户，存放在session */
 	public static final String USER = "USER";
 	/** 权限合计，存放在session */

@@ -5,235 +5,253 @@
 	<head>
 		<title>附件列表</title>
 		<%@include file="/script/myJs/common.jspf"%>
-		<script type="text/javascript" src="script/plupload/plupload.full.min.js"></script>
-		<script type="text/javascript" src="script/plupload/i18n/zh_CN.js"></script>
 	</head>
 	<body>
-		<div class="easyui-layout" data-options="fit:true">
-			<div data-options="region:'center',border:false">
+		<div class="layui-fluid">
+			<div class="layui-card">
 				<%-- 附件查询条件 --%>
-				<div id="fileToolbar" style="padding:0 30px;">
-					<div class="conditions">
-						<form id="fileQueryForm">
-							<span class="con-span">名称： </span>
-							<input name="two" class="easyui-textbox" style="width:166px;height:35px;line-height:35px;">
-							<span class="con-span">扩展名： </span>
-							<input name="three" class="easyui-textbox" style="width:166px;height:35px;line-height:35px;">
-							<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-search" data-options="selected:true" onclick="fileQuery();">查询</a>
-							<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-clear" onclick="fileReset();">重置</a>
-						</form>
+				<form id="fileQueryForm" class="layui-form layui-card-header layuiadmin-card-header-auto">
+					<div class="layui-form-item">
+						<div class="layui-inline">
+							<input type="text" name="two" placeholder="请输入名称" class="layui-input">
+						</div>
+						<div class="layui-inline">
+							<input type="text" name="three" placeholder="请输入扩展名" class="layui-input">
+						</div>
+						<div class="layui-inline">
+							<button type="button" class="layui-btn layuiadmin-btn-useradmin" onclick="fileQuery();">
+								<i class="layui-icon layuiadmin-button-btn"></i>查询
+							</button>
+							<button type="button" class="layui-btn layui-btn-primary layuiadmin-btn-useradmin" onclick="fileReset();">
+								<i class="layui-icon layuiadmin-button-btn"></i>重置
+							</button>
+						</div>
 					</div>
-					<div class="opt-buttons">
-						<my:auth url="file/toUpload"><a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" data-options="selected:true" onclick="toFileUpload();">上传</a></my:auth>
-						<my:auth url="file/doDownload"><a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" onclick="doFileDownload();">下载</a></my:auth>
-						<my:auth url="file/doDel"><a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" onclick="doFileDelForBtn();">删除</a></my:auth>
+				</form>
+				<div class="layui-card-body">
+					<div style="padding-bottom: 10px;">
+						<my:auth url="file/toUpload"><button class="layui-btn layuiadmin-btn-useradmin" onclick="toFileUpload();">上传</button></my:auth>
 					</div>
+					<script type="text/html" id="fileToolbar">
+						<my:auth url="file/doDownload"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="fileDownload"><i class="layui-icon layui-icon-edit"></i>下载</a></my:auth>
+						<my:auth url="file/doDel"><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="fileDel"><i class="layui-icon layui-icon-delete"></i>删除</a></my:auth>
+					</script>
+					<%-- 附件数据表格 --%>
+					<table id="fileTable" lay-filter="fileTable"></table>
 				</div>
-				<%-- 附件数据表格 --%>
-				<table id="fileGrid">
-				</table>
 			</div>
 		</div>
 	</body>
+	<%@include file="/script/myJs/tail.jspf"%>
 	<script type="text/javascript">
 		//定义变量
-		var fileGrid = $("#fileGrid"); //附件表格对象
 		var fileQueryForm = $("#fileQueryForm"); //附件查询对象
 		var uploader; //附件上传对象
 	
 		//页面加载完毕，执行如下方法：
 		$(function() {
-			initFileGrid();
+			initFileTable();
 		});
 	
 		//初始化附件表格
-		function initFileGrid() {
-			fileGrid.datagrid( {
+		function initFileTable() {
+			layui.table.render({
+				elem : "#fileTable",
 				url : "file/list",
-				toolbar : "#fileToolbar",
-				columns : [[ 
-						{field : "ID", title : "", checkbox : true}, 
-						{field : "NAME", title : "名称", width : 80, align : "center"},
-						{field : "EXT_NAME", title : "扩展名", width : 80, align : "center"},
-						{field : "IP", title : "上传ip", width : 80, align : "center"},
-						{field : "USERNAME", title : "上传用户", width : 80, align : "center"},
-						{field : "UPDATE_TIME_STR", title : "上传时间", width : 80, align : "center"},
-						]]
+				cols : [[ 
+						{field : "NAME", title : "名称", align : "center"},
+						{field : "EXT_NAME", title : "扩展名", align : "center"},
+						{field : "IP", title : "上传ip", align : "center"},
+						{field : "USERNAME", title : "上传用户", align : "center"},
+						{field : "UPDATE_TIME_STR", title : "上传时间", align : "center"},
+						{fixed : "right", title : "操作 ", toolbar : "#fileToolbar", align : "center"}
+						]],
+				page : true,
+				height : "full-180",
+				method : "post",
+				defaultToolbar : [],
+				parseData : function(file) {
+					return {
+						"code" : file.succ,
+						"msg" : file.msg,
+						"count" : file.data.total,
+						"data" : file.data.rows
+					};
+				},
+				request : {
+					pageName: "curPage",
+					limitName: "pageSize"
+				}, 
+				response : {
+					statusCode : true
+				}
+			});
+			layui.table.on("tool(fileTable)", function(obj) {
+				var data = obj.data;
+				if (obj.event === "fileDownload") {
+					doFileDownload(obj.data.ID);
+				} else if (obj.event === "fileDel") {
+					doFileDel(obj.data.ID);
+				}
 			});
 		}
 	
 		//附件查询
 		function fileQuery() {
-			fileGrid.datagrid("uncheckAll");
-			fileGrid.datagrid("load", $.fn.my.serializeObj(fileQueryForm));
+			layui.table.reload("fileTable", {"where" : $.fn.my.serializeObj(fileQueryForm)});
 		}
 	
 		//附件重置
 		function fileReset() {
-			fileQueryForm.form("reset");
+			fileQueryForm[0].reset();
 			fileQuery();
 		}
 		
 		//到达上传附件页面
 		function toFileUpload() {
-			var fileUploadDialog;
-			fileUploadDialog = $("<div/>").dialog({
-				title : "上传附件",
-				href : "file/toUpload",
-				buttons : [{
-					text : "上传", 
-					iconCls : "icon-add", 
-					selected : true,
-					handler : function (){
-						doFileUpload(fileUploadDialog);
-					}
-				}],
-				onLoad : function() {
-					uploader = new plupload.Uploader({
-						browse_button : "file_browse",
-						file_data_name : "files",
-						url : "${pageContext.request.contextPath}/file/doTempUpload",
-						flash_swf_url : "script/plupload/Moxie.swf",
-						filters : {
-							mime_types : [{ title : "图片", extensions : "jpg,gif,png" }, 
-							              { title : "压缩文件", extensions : "zip,rar" },
-							              { title : "文档", extensions : "doc,docx,xls,xlsx" }
-							              ],
-							max_file_size : "99mb"
+			$.ajax({
+				url : "file/toUpload",
+				dataType : "html",
+				success : function(obj) {
+					layer.open({
+						title : "上传附件",
+						area : ["800px", "500px"],
+						content : obj,
+						btn : ["上传", "取消"],
+						type : 1,
+						yes : function(index, layero) {
+							doFileUpload(index);
 						},
-						init : {
-							FilesAdded : function(up, files) {
-								$("#file_console").html("");
-								
-								var fileListObj = $("#file_list");
-								$.each(files, function(index, domEle){
-									var html = [];
-									html.push("<div id='file_row_" + domEle.id + "'>");
-									html.push("	<input type='hidden' id='ids_" + domEle.id + "' name='ids'>");
-									html.push("	<span>" + domEle.name + "（" + plupload.formatSize(domEle.size) + "）</span>");
-									html.push("	<span id='upload_progress_" + domEle.id + "'>0%</span>");
-									html.push("	<a href='javascript:void(0);' onclick='removeRowForFile(\"" + domEle.id + "\")'>移除</a>");
-									html.push("<div>");
-									fileListObj.append(html.join(""));
-								});
-								uploader.start();
-							},
-							UploadProgress : function(up, file) {
-								$("#upload_progress_" + file.id).html(file.percent + "%");
-							},
-							FileUploaded : function(up, file, responseObj) { //每个附件上传后，服务端返回的响应消息。
-								var response = $.parseJSON(responseObj.response);
-								if(response.success != true){
-									$("#upload_progress_" + file.id).html(response.message);
-									return;
+						success: function(layero, index) {
+							uploader = new plupload.Uploader({
+								browse_button : "file_browse",
+								file_data_name : "files",
+								url : "${pageContext.request.contextPath}/file/doTempUpload",
+								flash_swf_url : "script/plupload/Moxie.swf",
+								filters : {
+									mime_types : [{ title : "图片", extensions : "jpg,gif,png" }, 
+									              { title : "压缩文件", extensions : "zip,rar" },
+									              { title : "文档", extensions : "doc,docx,xls,xlsx" }
+									              ],
+									max_file_size : "99mb"
+								},
+								init : {
+									FilesAdded : function(up, files) {
+										$("#file_console").html("");
+										
+										var fileListObj = $("#fileList");
+										$.each(files, function(index, domEle) {
+											var html = [];
+											html.push("<tr id='file_row_" + domEle.id + "'>");
+											html.push("	<td>"+domEle.name+"<input type='hidden' id='ids_" + domEle.id + "' name='ids'></td>");
+											html.push("	<td>"+plupload.formatSize(domEle.size)+"</td>");
+											html.push("	<td id='upload_progress_"+domEle.id+"'>0%</td>");
+											html.push("	<td><button class=\"layui-btn layui-btn-mini layui-btn-danger test-upload-demo-delete\" onclick='removeRowForFile(\"" + domEle.id + "\")'>移除</button></td>");
+											html.push("</tr>");
+											fileListObj.append(html.join(""));
+										});
+										uploader.start();
+									},
+									UploadProgress : function(up, file) {
+										$("#upload_progress_" + file.id).html(file.percent + "%");
+									},
+									FileUploaded : function(up, file, responseObj) { //每个附件上传后，服务端返回的响应消息。
+										var response = $.parseJSON(responseObj.response);
+										if (!response.succ) {
+											$("#upload_progress_" + file.id).html(response.msg);
+											return;
+										}
+										$("#ids_" + file.id).val(response.data.fileIds);
+									},
+									UploadComplete : function(up, files) {//所有附件上传完成后
+										
+									},
+									Error : function(up, err) { //客户端的错误消息。如附件大小错误，附件不存在， http错误等。
+										$("#file_console").html("");
+										
+										var uploadProgressObj = $("#upload_progress_" + err.file.id);
+										if (uploadProgressObj[0]) {
+											uploadProgressObj.html(err.message);
+										}else{
+											$("#file_console").html(err.message);
+										}
+									}
 								}
-								$("#ids_" + file.id).val(response.data.fileIds);
-							},
-							UploadComplete : function(up, files){//所有附件上传完成后
-								
-							},
-							Error : function(up, err) { //客户端的错误消息。如附件大小错误，附件不存在， http错误等。
-								$("#file_console").html("");
-								
-								var uploadProgressObj = $("#upload_progress_" + err.file.id);
-								if(uploadProgressObj[0]){
-									uploadProgressObj.html(err.message);
-								}else{
-									$("#file_console").html(err.message);
-								}
-							}
+							});
+							uploader.init();
+							
+							layui.form.render(null, "fileEditFrom");
 						}
 					});
-					
-					uploader.init();
 				}
 			});
 		}
 		
 		//完成上传附件
-		function doFileUpload(fileUploadDialog){
-			var fileUploadEditFrom = $("#fileUploadEditFrom");
-			$.messager.confirm("确认消息", "确定要上传？", function(ok) {
-				if (!ok) {
-					return;
-				}
-				
-				var queued = uploader.total.queued; 
-				if(queued != 0){
-					parent.$.messager.alert("提示消息", "正在上传中。。。", "info");
-					return;
-				}
-				
-				fileUploadEditFrom.form("submit", {
-					url : "file/doUpload",
-					success : function(data) {
-						fileGrid.datagrid("reload");
-						$.messager.progress("close");
-
-						var obj = $.parseJSON(data);
-						if (!obj.succ) {
-							parent.$.messager.alert("提示消息", obj.msg, "info");
-							return;
-						}
-
-						fileUploadDialog.dialog("close");
-					}
+		function doFileUpload(fileUploadDialogIndex) {
+			var queued = uploader.total.queued; 
+			if (queued != 0) {
+				layer.alert(obj.msg, {"title" : "正在上传中。。。"});
+				return;
+			}
+			
+			layui.form.on("submit(fileUploadBtn)", function(data) {
+				var ids = [];
+				$("#fileList [name='ids']").each(function (index, domEle) {
+					ids.push(domEle.value);
 				});
-			})
+				data.field.ids = ids;
+				
+				layer.confirm("确定要上传？", function(index) {
+					$.ajax({
+						url : "file/doUpload",
+						data : data.field,
+						success : function(obj) {
+							fileQuery();
+							
+							if (!obj.succ) {
+								layer.alert(obj.msg, {"title" : "提示消息"});
+								return;
+							}
+							
+							layer.close(index);
+							layer.close(fileUploadDialogIndex);
+						}
+					});
+				});
+			});
+			$("[lay-filter='fileUploadBtn']").click();
 		}
 
 		//完成删除附件
-		function doFileDel(params) {
-			$.messager.confirm("确认消息", "确定要删除？", function(ok) {
-				if (!ok) {
-					return;
-				}
-
-				$.messager.progress();
+		function doFileDel(id) {
+			layer.confirm("确定要删除？", function(index) {
 				$.ajax({
 					url : "file/doDel",
-					data : params,
+					data : {id : id},
 					success : function(obj) {
-						fileGrid.datagrid("reload");
-						$.messager.progress("close");
+						fileQuery();
 						
 						if (!obj.succ) {
-							parent.$.messager.alert("提示消息", obj.msg, "info");
+							layer.alert(obj.msg, {"title" : "提示消息"});
+							return;
 						}
+						
+						layer.close(index);
 					}
 				});
 			});
 		}
-
-		//完成删除附件
-		function doFileDelForBtn() {
-			//校验数据有效性
-			var fileGridRows = fileGrid.datagrid("getChecked");
-			if (fileGridRows.length == 0) {
-				parent.$.messager.alert("提示消息", "请选择一行或多行数据！", "info");
-				return;
-			}
-
-			//删除
-			doFileDel($.fn.my.serializeField(fileGridRows));
-		}
 		
 		//移除单行附件
-		function removeRowForFile(fileid){
-			$("#file_row_" + fileid).remove();
-			uploader.removeFile(uploader.getFile(fileid));
+		function removeRowForFile(fileId) {
+			$("#file_row_" + fileId).remove();
+			uploader.removeFile(uploader.getFile(fileId));
 		}
 		
 		//完成附件下载
-		function doFileDownload(){
-			var fileGridRows = fileGrid.datagrid("getChecked");
-			if (fileGridRows.length != 1) {
-				parent.$.messager.alert("提示消息", "请选择一行数据！", "info");
-				return;
-			}
-			
-			window.location.href = "file/doDownload?id=" + fileGridRows[0].ID;
+		function doFileDownload(id) {
+			window.location.href = "file/doDownload?id=" + id;
 		}
-		
 	</script>
 </html>

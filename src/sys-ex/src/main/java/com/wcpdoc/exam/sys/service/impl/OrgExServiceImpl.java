@@ -6,12 +6,17 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.exam.sys.entity.Org;
-import com.wcpdoc.exam.sys.entity.Post;
-import com.wcpdoc.exam.sys.entity.User;
-import com.wcpdoc.exam.sys.service.OrgExService;
-import com.wcpdoc.exam.sys.service.PostService;
-import com.wcpdoc.exam.sys.service.UserService;
+import com.wcpdoc.exam.base.entity.Org;
+import com.wcpdoc.exam.base.entity.Post;
+import com.wcpdoc.exam.base.entity.User;
+import com.wcpdoc.exam.base.service.OrgExService;
+import com.wcpdoc.exam.base.service.OrgService;
+import com.wcpdoc.exam.base.service.PostService;
+import com.wcpdoc.exam.base.service.UserService;
+import com.wcpdoc.exam.core.dao.BaseDao;
+import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
  * 组织机构扩展服务层实现
@@ -19,26 +24,34 @@ import com.wcpdoc.exam.sys.service.UserService;
  * v1.0 zhanghc 2016-5-8上午11:00:00
  */
 @Service
-public class OrgExServiceImpl implements OrgExService {
+public class OrgExServiceImpl extends BaseServiceImp<Object> implements OrgExService {
 	@Resource
 	private PostService postService;
 	@Resource
 	private UserService userService;
+	@Resource
+	private OrgService orgService;
 
 	@Override
 	public void delAndUpdate(Org org) {
-		// 逻辑删除该组织机构下的岗位
-		List<Post> postList = postService.getList(org.getId());
-		for (Post post : postList) {
-			post.setState(0);
-			postService.update(post);
-		}
-
-		// 更新该组织机构下的用户所属组织机构为根组织机构
 		List<User> userList = userService.getList(org.getId());
-		for (User user : userList) {
-			user.setOrgId(1);
-			userService.update(user);
+		if (ValidateUtil.isValid(userList)) {
+			throw new MyException("该机构下有用户，不允许删除！");
 		}
+		
+		List<Post> postList = postService.getList(org.getId());
+		if (ValidateUtil.isValid(postList)) {
+			throw new MyException("该机构下有岗位，不允许删除！");
+		}
+	}
+
+	@Override
+	public void addAndUpdate(Org org, String phone, String pwd) {
+		
+	}
+
+	@Override
+	public void setDao(BaseDao<Object> dao) {
+		
 	}
 }

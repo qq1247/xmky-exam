@@ -29,7 +29,6 @@
 		<module>sys-tag</module>
 		<module>sys-web</module>
 		<module>exam-core</module>
-		<module>exam-home</module>
 		<module>exam-report</module>
 	</modules>
 </project>

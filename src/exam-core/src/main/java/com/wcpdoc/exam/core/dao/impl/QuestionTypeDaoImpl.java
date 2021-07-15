@@ -6,7 +6,7 @@ import java.util.Map;
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.exam.core.dao.QuestionTypeDao;
-import com.wcpdoc.exam.core.dao.impl.BaseDaoImpl;
+import com.wcpdoc.exam.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.QuestionType;
@@ -20,7 +20,7 @@ import com.wcpdoc.exam.core.util.SqlUtil.Order;
  * v1.0 zhanghc 2016-5-24下午14:54:09
  */
 @Repository
-public class QuestionTypeDaoImpl extends BaseDaoImpl<QuestionType> implements QuestionTypeDao {
+public class QuestionTypeDaoImpl extends RBaseDaoImpl<QuestionType> implements QuestionTypeDao {
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
@@ -43,98 +43,73 @@ public class QuestionTypeDaoImpl extends BaseDaoImpl<QuestionType> implements Qu
 
 	@Override
 	public List<Map<String, Object>> getTreeList() {
-		String sql = "SELECT QUESTION_TYPE.ID, QUESTION_TYPE.NAME, QUESTION_TYPE.PARENT_ID, QUESTION_TYPE.PARENT_SUB "
-				+ "FROM EXM_QUESTION_TYPE QUESTION_TYPE "
-				+ "WHERE QUESTION_TYPE.STATE = 1";
-		return getList(sql);
-	}
-
-	@Override
-	public void doMove(Integer sourceId, Integer targetId) {
-		QuestionType sourceQuestionType = getEntity(sourceId);
-		QuestionType targetQuestionType = getEntity(targetId);
-		sourceQuestionType.setParentId(targetId);
-		flush();
-
-		String sql = "UPDATE EXM_QUESTION_TYPE QUESTION_TYPE" //
-				+ "	SET QUESTION_TYPE.PARENT_SUB = REPLACE(QUESTION_TYPE.PARENT_SUB, ?, ?)"
-				+ "	WHERE QUESTION_TYPE.PARENT_SUB LIKE ?";
-		Object[] params = new Object[] { 
-					sourceQuestionType.getParentSub(), 
-					targetQuestionType.getParentSub() + sourceQuestionType.getId() + "_",
-					sourceQuestionType.getParentSub() + "%" };
-		update(sql, params);
-	}
-	
-	@Override
-	public List<QuestionType> getAllSubQuestionTypeList(Integer id) {
-		String sql = "SELECT * FROM EXM_QUESTION_TYPE WHERE PARENT_SUB LIKE ? AND STATE = 1";
-		return getList(sql, new Object[]{"%\\_"+id+"\\_%"}, QuestionType.class);
-	}
-	
-	@Override
-	public QuestionType getQuestionTypeByName(String name) {
-		String sql = "SELECT * FROM EXM_QUESTION_TYPE WHERE NAME = ? AND STATE = 1";
-		return getUnique(sql, new Object[]{name}, QuestionType.class);
-	}
-
-	@Override
-	public PageOut getAuthUserListpage(PageIn pageIn) {
-		String sql = "SELECT USER.ID, USER.NAME AS USER_NAME, USER.LOGIN_NAME, ORG.NAME AS ORG_NAME, POST_USER.POST_NAMES "
-				+ "FROM SYS_USER USER "
-				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
-				+ "LEFT JOIN (SELECT POST_USER.USER_ID, GROUP_CONCAT(POST.NAME) AS POST_NAMES "
-				+ "				FROM SYS_POST_USER POST_USER "
-				+ "				INNER JOIN SYS_POST POST ON POST_USER.POST_ID = POST.ID "
-				+ "				GROUP BY POST_USER.USER_ID ) POST_USER ON USER.ID = POST_USER.USER_ID";
-		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "ORG.ID = ?", pageIn.getOne())
-				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getTen()), 
-						"EXISTS (SELECT 1 FROM EXM_QUESTION_TYPE Z WHERE Z.ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", 
-						pageIn.getTen())
-//				.addWhere("USER.STATE = ?", 1)//已添加过的可以显示
-				.addWhere("USER.ID != ?", 1)//排除管理员
-//				.addWhere("ORG.STATE = ?", 1)//已添加过的可以显示
-				.addOrder("USER.NAME", Order.DESC);
-		
-		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		return pageOut;
-	}
-
-	@Override
-	public PageOut getAuthUserAddList(PageIn pageIn) {
-		String sql = "SELECT USER.ID, USER.NAME AS USER_NAME, USER.LOGIN_NAME, ORG.NAME AS ORG_NAME, POST_USER.POST_NAMES "
-				+ "FROM SYS_USER USER "
-				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
-				+ "LEFT JOIN (SELECT POST_USER.USER_ID, GROUP_CONCAT(POST.NAME) AS POST_NAMES "
-				+ "				FROM SYS_POST_USER POST_USER "
-				+ "				INNER JOIN SYS_POST POST ON POST_USER.POST_ID = POST.ID "
-				+ "				GROUP BY POST_USER.USER_ID ) POST_USER ON USER.ID = POST_USER.USER_ID";
-		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "ORG.ID = ?", pageIn.getOne())
-				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getTen()), 
-						"NOT EXISTS (SELECT 1 FROM EXM_QUESTION_TYPE Z WHERE Z.ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", 
-						pageIn.getTen())
-				.addWhere("USER.STATE = ?", 1)//当前正常的用户
-				.addWhere("USER.ID != ?", 1)//排除管理员
-				.addWhere("ORG.STATE = ?", 1)//当前正常的机构
-				.addOrder("USER.NAME", Order.DESC);
-		
-		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		return pageOut;
+		String sql = "SELECT ID, NAME, PARENT_ID, PARENT_SUB FROM EXM_QUESTION_TYPE WHERE STATE = 1 ORDER BY NO ASC";
+		return getMapList(sql);
 	}
 
 	@Override
 	public List<QuestionType> getList() {
 		String sql = "SELECT * FROM EXM_QUESTION_TYPE WHERE STATE = 1";
-		return getList(sql, QuestionType.class);
+		return getList(sql);
 	}
 
 	@Override
 	public List<QuestionType> getList(Integer parentId) {
 		String sql = "SELECT * FROM EXM_QUESTION_TYPE WHERE STATE = 1 AND PARENT_ID = ?";
-		return getList(sql, new Object[]{parentId}, QuestionType.class);
+		return getList(sql, new Object[] { parentId });
 	}
+	
+	@Override
+	public boolean existName(String name, Integer excludeId) {
+		if (excludeId == null) {
+			String sql = "SELECT COUNT(*) AS NUM FROM EXM_QUESTION_TYPE WHERE NAME = ? AND STATE = 1";
+			return getCount(sql, new Object[] { name }) > 0;
+		}
+
+		String sql = "SELECT COUNT(*) AS NUM FROM EXM_QUESTION_TYPE WHERE NAME = ? AND STATE = 1 AND ID != ?";
+		return getCount(sql, new Object[] { name, excludeId }) > 0;
+	}
+
+	@Override
+	public PageOut getAuthUserListpage(PageIn pageIn) {
+		String sql = "SELECT USER.ID, USER.NAME AS NAME, ORG.NAME AS ORG_NAME "
+				+ "FROM SYS_USER USER "
+				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID ";
+		SqlUtil sqlUtil = new SqlUtil(sql);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "(USER.NAME LIKE ? OR ORG.NAME LIKE ?)", "%" + pageIn.getTwo() + "%", "%" + pageIn.getTwo() + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "EXISTS (SELECT 1 FROM EXM_QUESTION_TYPE Z WHERE Z.ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.getTen())
+				.addWhere("USER.STATE = 1")
+				.addOrder("USER.UPDATE_TIME", Order.DESC);
+		PageOut pageOut = getListpage(sqlUtil, pageIn);
+		return pageOut;
+	}
+
+	@Override
+	public PageOut getAuthPostListpage(PageIn pageIn) {
+		String sql = "SELECT POST.ID, POST.NAME, ORG.NAME AS ORG_NAME "
+				+ "FROM SYS_POST POST "
+				+ "INNER JOIN SYS_ORG ORG ON POST.ORG_ID = ORG.ID";
+		SqlUtil sqlUtil = new SqlUtil(sql);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "(POST.NAME LIKE ? OR ORG.NAME LIKE ?)", "%" + pageIn.getTwo() + "%", "%" + pageIn.getTwo() + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "EXISTS (SELECT 1 FROM EXM_QUESTION_TYPE Z WHERE Z.ID = ? AND Z.POST_IDS LIKE CONCAT('%,', POST.ID, ',%'))", pageIn.getTen())
+				.addWhere("POST.STATE = 1")
+				.addOrder("POST.UPDATE_TIME", Order.DESC);
+		PageOut pageOut = getListpage(sqlUtil, pageIn);
+		return pageOut;
+	}
+
+	@Override
+	public PageOut getAuthOrgListpage(PageIn pageIn) {
+		String sql = "SELECT ORG.ID, ORG.NAME, PARENT_ORG.NAME AS PARENT_ORG_NAME " 
+				+ "FROM SYS_ORG ORG "
+				+ "LEFT JOIN SYS_ORG PARENT_ORG ON ORG.PARENT_ID = PARENT_ORG.ID";
+		SqlUtil sqlUtil = new SqlUtil(sql);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "ORG.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "EXISTS (SELECT 1 FROM EXM_QUESTION_TYPE Z WHERE Z.ID = ? AND Z.ORG_IDS LIKE CONCAT('%,', ORG.ID, ',%'))", pageIn.getTen())
+				.addWhere("ORG.STATE = 1")
+				.addOrder("ORG.UPDATE_TIME", Order.DESC);
+		PageOut pageOut = getListpage(sqlUtil, pageIn);
+		return pageOut;
+	}
+	
 }

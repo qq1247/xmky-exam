@@ -1,7 +1,6 @@
 package com.wcpdoc.exam.core.service;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
@@ -43,8 +42,8 @@ public abstract class WordServer {
 	 * @param word
 	 * @return List<T>
 	 */
-	public <T> List<T> handle(File word) {
-		Document document = Jsoup.parse(word2Html(word));
+	public <T> List<T> handle(InputStream in) {
+		Document document = Jsoup.parse(word2Html(in));
 		headStyle2ElementStyle(document);
 		List<Node> rowNodes = document.body().childNodes();
 		return doDecoder(rowNodes);
@@ -74,7 +73,7 @@ public abstract class WordServer {
 		Map<String, String> cssAttr = new HashMap<>();
 		for (String style : styleArr) {
 			String[] split2 = style.split("\\{|\\}");
-			if(split2[0].startsWith(".p")){
+			if(split2[0].startsWith(".p")) {
 				cssAttr.put(split2[0], split2[1] + "display: inline;");
 			} else {
 				cssAttr.put(split2[0], split2[1]);
@@ -97,9 +96,9 @@ public abstract class WordServer {
 	 * @param word
 	 * @return String
 	 */
-	private String word2Html(File word) {
+	private String word2Html(InputStream word) {
 		try {
-			HWPFDocument wordDocument = new HWPFDocument(new FileInputStream(word));
+			HWPFDocument wordDocument = new HWPFDocument(word);
 			WordToHtmlConverter converter = new WordToHtmlConverter(
 					DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument());
 			converter.setPicturesManager(new PicturesManager() {

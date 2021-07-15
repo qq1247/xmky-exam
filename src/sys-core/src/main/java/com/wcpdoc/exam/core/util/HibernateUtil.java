@@ -50,7 +50,11 @@ public class HibernateUtil {
 		for (Map<String, Object> map : list) {
 			for (int i = 0; i < params.length; i++) {
 				String index = params[i];
-				String key = map.get(params[++i]).toString();
+				if (map.get(params[++i]) == null) {
+					continue;
+				}
+				
+				String key = map.get(params[i]).toString();
 				String indexKey = index + "_" + key;
 				String value = dictMap.get(indexKey);
 				map.put(params[i] + "_NAME", value);

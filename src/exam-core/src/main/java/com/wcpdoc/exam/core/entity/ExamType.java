@@ -11,7 +11,7 @@ import javax.persistence.Table;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import com.wcpdoc.exam.core.util.DateUtil;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * 考试分类实体
@@ -31,10 +31,13 @@ public class ExamType {
 	private Integer parentId;
 	@Column(name = "PARENT_SUB")
 	private String parentSub;
+	@Column(name = "LEVEL")
+	private Integer level;
 	@Column(name = "UPDATE_USER_ID")
 	private Integer updateUserId;
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "UPDATE_TIME")
-	@DateTimeFormat(pattern = DateUtil.FORMAT_DATE_TIME)
 	private Date updateTime;
 	@Column(name = "STATE")
 	private Integer state;
@@ -46,7 +49,7 @@ public class ExamType {
 	private String orgIds;
 	@Column(name = "POST_IDS")
 	private String postIds;
-
+	
 	public Integer getId() {
 		return id;
 	}
@@ -77,6 +80,14 @@ public class ExamType {
 
 	public void setParentSub(String parentSub) {
 		this.parentSub = parentSub;
+	}
+
+	public Integer getLevel() {
+		return level;
+	}
+
+	public void setLevel(Integer level) {
+		this.level = level;
 	}
 
 	public Integer getUpdateUserId() {

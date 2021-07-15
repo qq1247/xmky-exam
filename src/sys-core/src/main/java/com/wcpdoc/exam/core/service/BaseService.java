@@ -1,9 +1,12 @@
 package com.wcpdoc.exam.core.service;
 
+import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 
 /**
+ * 基础服务层接口
+ * 
  * 普通的增删改查不要再次封装，只提供最基本的功能就可以了。
  * 如新增用trycatch，新增失败就不应该继续执行，catch会造成问题。
  * 
@@ -37,7 +40,7 @@ public interface BaseService<T> {
 	 * 
 	 * @param entity
 	 */
-	public void del(Integer id);
+	public void del(Object id);
 
 	/**
 	 * 删除实体
@@ -46,7 +49,7 @@ public interface BaseService<T> {
 	 * 
 	 * @param entity
 	 */
-	public void del(Integer[] ids);
+	public void del(Object[] ids);
 
 	/**
 	 * 获取实体
@@ -55,7 +58,7 @@ public interface BaseService<T> {
 	 * 
 	 * @param entity
 	 */
-	public T getEntity(Integer id);
+	public T getEntity(Object id);
 
 	/**
 	 * 获取分页列表。
@@ -68,12 +71,10 @@ public interface BaseService<T> {
 	public PageOut getListpage(PageIn pageIn);
 
 	/**
-	 * 清除hibernate缓存对象
+	 * 获取当前登录用户
 	 * 
-	 * v1.0 zhanghc 2016年7月13日下午4:07:04
-	 * 
-	 * @param obj
-	 * void
+	 * v1.0 zhanghc 2020年1月16日上午10:47:47
+	 * @return LoginUser
 	 */
-	public void evict(Object obj);
+	LoginUser getCurUser();
 }

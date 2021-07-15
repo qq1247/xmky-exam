@@ -4,12 +4,14 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
-import com.wcpdoc.exam.core.dao.impl.BaseDaoImpl;
+import com.wcpdoc.exam.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
+import com.wcpdoc.exam.core.util.DateUtil;
+import com.wcpdoc.exam.core.util.HibernateUtil;
 import com.wcpdoc.exam.core.util.SqlUtil;
-import com.wcpdoc.exam.core.util.SqlUtil.Order;
 import com.wcpdoc.exam.core.util.ValidateUtil;
+import com.wcpdoc.exam.core.util.SqlUtil.Order;
 import com.wcpdoc.exam.quartz.dao.CronDao;
 import com.wcpdoc.exam.quartz.entity.Cron;
 
@@ -19,7 +21,7 @@ import com.wcpdoc.exam.quartz.entity.Cron;
  * v1.0 zhanghc 2019-07-29 10:38:17
  */
 @Repository
-public class CronDaoImpl extends BaseDaoImpl<Cron> implements CronDao {
+public class CronDaoImpl extends RBaseDaoImpl<Cron> implements CronDao {
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
@@ -30,12 +32,13 @@ public class CronDaoImpl extends BaseDaoImpl<Cron> implements CronDao {
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "CRON.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
 				.addOrder("CRON.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
+		HibernateUtil.formatDate(pageOut.getRows(), "UPDATE_TIME", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;
 	}
 
 	@Override
 	public List<Cron> getList() {
 		String sql = "SELECT * FROM SYS_CRON";
-		return getList(sql, Cron.class);
+		return getList(sql);
 	}
 }

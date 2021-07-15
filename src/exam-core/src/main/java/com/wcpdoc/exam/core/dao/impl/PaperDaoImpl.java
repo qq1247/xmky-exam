@@ -1,39 +1,41 @@
 package com.wcpdoc.exam.core.dao.impl;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Repository;
 
+import com.wcpdoc.exam.base.cache.DictCache;
+import com.wcpdoc.exam.base.dao.UserDao;
+import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.core.dao.PaperDao;
-import com.wcpdoc.exam.core.dao.impl.BaseDaoImpl;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
-import com.wcpdoc.exam.core.entity.PaperType;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.util.HibernateUtil;
 import com.wcpdoc.exam.core.util.SqlUtil;
-import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.util.SqlUtil.Order;
-import com.wcpdoc.exam.sys.cache.DictCache;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
  * 试卷数据访问层实现
  * 
- * v1.0 zhanghc 2017-05-25 16:34:59
+ * zhanghc 2018年10月21日上午8:16:06
  */
 @Repository
-public class PaperDaoImpl extends BaseDaoImpl<Paper> implements PaperDao {
-
+public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
+	@Resource
+	private UserDao userDao;
+	
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT PAPER.ID, PAPER.NAME, PAPER.TOTLE_SCORE, "
-				+ "PAPER_TYPE.NAME AS PAPER_TYPE_NAME, PAPER.STATE "
+		String sql = "SELECT PAPER.ID, PAPER.NAME, PAPER_TYPE.NAME AS PAPER_TYPE_NAME, PAPER.STATE, PAPER.PASS_SCORE, PAPER.TOTAL_SCORE, "
+				+ "	PAPER.SCORE_A, PAPER.SCORE_A_REMARK, PAPER.SCORE_B, PAPER.SCORE_B_REMARK, PAPER.SCORE_C, PAPER.SCORE_C_REMARK, "
+				+ "	PAPER.SCORE_D, PAPER.SCORE_D_REMARK, PAPER.SCORE_E, PAPER.SCORE_E_REMARK "
 				+ "FROM EXM_PAPER PAPER "
 				+ "LEFT JOIN EXM_PAPER_TYPE PAPER_TYPE ON PAPER.PAPER_TYPE_ID = PAPER_TYPE.ID ";
 		
@@ -41,89 +43,36 @@ public class PaperDaoImpl extends BaseDaoImpl<Paper> implements PaperDao {
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "PAPER.PAPER_TYPE_ID = ?", pageIn.getOne())
 				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "PAPER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "PAPER.STATE = ?", pageIn.getThree())
-				.addWhere(ValidateUtil.isValid(pageIn.getEight()), 
-						"(PAPER_TYPE.USER_IDS LIKE ? "
-								+ "OR EXISTS (SELECT 1 FROM SYS_USER Z WHERE Z.ID = ? AND PAPER_TYPE.ORG_IDS LIKE CONCAT('%,', Z.ORG_ID, ',%')) "
-								+ "OR EXISTS (SELECT 1 FROM SYS_POST_USER Z WHERE Z.USER_ID = ? AND PAPER_TYPE.POST_IDS LIKE CONCAT('%,', Z.POST_ID, ',%')))", 
-						"%," + pageIn.getEight() + ",%", pageIn.getEight(), pageIn.getEight())
-				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "PAPER.STATE = ?", pageIn.getTen())
+				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "PAPER.ID = ?", pageIn.getFour())
+				.addWhere(ValidateUtil.isValid(pageIn.getFive()), "PAPER.STATE = ?", pageIn.getTen())
 				.addWhere("PAPER.STATE != ?", 0)
 				.addOrder("PAPER.UPDATE_TIME", Order.DESC);
+		
+		if (ValidateUtil.isValid(pageIn.getTen())) {
+			User user = userDao.getEntity(Integer.parseInt(pageIn.getTen()));
+			StringBuilder partSql = new StringBuilder();
+			List<Object> params = new ArrayList<>();
+			partSql.append("(");
+			partSql.append("PAPER_TYPE.USER_IDS LIKE ? ");
+			params.add("%" + user.getId() + "%");
+			
+			partSql.append("OR PAPER_TYPE.ORG_IDS LIKE ? ");
+			params.add("%" + user.getOrgId() + "%");
+			
+			if (ValidateUtil.isValid(user.getPostIds())) {
+				String[] postIds = user.getPostIds().substring(1, user.getPostIds().length() - 1).split(",");
+				for (String postId : postIds) {
+					partSql.append("OR PAPER_TYPE.POST_IDS LIKE ? ");
+					params.add("%" + postId + "%");
+				}
+			}
+			partSql.append(")");
+			
+			sqlUtil.addWhere(partSql.toString(), params.toArray(new Object[params.size()]));
+		}
+		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), "STATE", "STATE");
-		return pageOut;
-	}
-
-	@Override
-	public PaperType getPaperType(Integer id) {
-		String sql = "SELECT PAPER_TYPE.* "
-				+ "FROM EXM_PAPER_TYPE PAPER_TYPE "
-				+ "INNER JOIN EXM_PAPER PAPER ON PAPER_TYPE.ID = PAPER.PAPER_TYPE_ID "
-				+ "WHERE PAPER.ID = ?";
-		return getUnique(sql, new Object[]{id}, PaperType.class);
-	}
-
-	@Override
-	public List<Map<String, Object>> getPaperCfgPaperTreeList(Integer id) {
-		String sql = "SELECT PAPER_QUESTION.ID, "
-				+ "CASE PAPER_QUESTION.TYPE WHEN '1' THEN PAPER_QUESTION.NAME ELSE QUESTION.TITLE END AS NAME, "
-				+ "PAPER_QUESTION.PARENT_ID, PAPER_QUESTION.NO "
-				+ "FROM EXM_PAPER_QUESTION PAPER_QUESTION "
-				+ "LEFT JOIN EXM_QUESTION QUESTION ON PAPER_QUESTION.QUESTION_ID = QUESTION.ID "
-				+ "WHERE PAPER_QUESTION.PAPER_ID = ? "
-				+ "ORDER BY PAPER_QUESTION.NO ASC ";
-		return getList(sql, new Object[]{id});
-	}
-
-	@Override
-	public PaperQuestion getRootPaperQuestion(Integer id) {
-		String sql = "SELECT * "
-				+ "FROM EXM_PAPER_QUESTION PAPER_QUESTION "
-				+ "WHERE PAPER_QUESTION.PARENT_ID = 0 AND PAPER_ID = ?";
-		return getUnique(sql, new Object[]{id}, PaperQuestion.class);
-	}
-
-	@Override
-	public PageOut getQuestionListpage(PageIn pageIn) {
-
-		String sql = "SELECT QUESTION.ID, QUESTION.ID AS CODE, QUESTION.TITLE, QUESTION.TYPE, QUESTION.DIFFICULTY, "
-				+ "QUESTION.STATE, QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME "
-				+ "FROM EXM_QUESTION QUESTION "
-				+ "LEFT JOIN EXM_QUESTION_TYPE QUESTION_TYPE ON QUESTION.QUESTION_TYPE_ID = QUESTION_TYPE.ID ";
-		
-		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "QUESTION.QUESTION_TYPE_ID = ?", pageIn.getOne())
-				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "QUESTION.ID = ?", pageIn.getTwo())
-				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "QUESTION.TITLE LIKE ?", "%" + pageIn.getThree() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "QUESTION.STATE = ?", pageIn.getFour())//0：删除；1：启用；2：禁用
-				.addWhere(ValidateUtil.isValid(pageIn.getFive()), "QUESTION.TYPE = ?", pageIn.getFive())
-				.addWhere(ValidateUtil.isValid(pageIn.getSix()), "QUESTION.DIFFICULTY = ?", pageIn.getSix())
-				.addWhere(ValidateUtil.isValid(pageIn.getEight()), 
-						"(QUESTION_TYPE.USER_IDS LIKE ? "
-								+ "OR EXISTS (SELECT 1 FROM SYS_USER Z WHERE Z.ID = ? AND QUESTION_TYPE.ORG_IDS LIKE CONCAT('%,', Z.ORG_ID, ',%')) "
-								+ "OR EXISTS (SELECT 1 FROM SYS_POST_USER Z WHERE Z.USER_ID = ? AND QUESTION_TYPE.POST_IDS LIKE CONCAT('%,', Z.POST_ID, ',%')))", 
-						"%," + pageIn.getEight() + ",%", pageIn.getEight(), pageIn.getEight())
-				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "NOT EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.getTen())
-				.addWhere("QUESTION.STATE != ?", 0)
-				.addOrder("QUESTION.UPDATE_TIME", Order.DESC);
-		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), "QUESTION_TYPE", "TYPE", "QUESTION_DIFFICULTY", "DIFFICULTY", "STATE", "STATE");
-		for(Map<String, Object> map : pageOut.getRows()){
-			String title = map.get("TITLE").toString();
-			Document document = Jsoup.parse(title);
-			Elements embeds = document.getElementsByTag("embed");
-			embeds.after("【视频】");
-			embeds.remove();
-			Elements imgs = document.getElementsByTag("img");
-			imgs.after("【图片】");
-			imgs.remove();
-			
-			title = document.body().html();
-			/*if(title.length() > 30){
-				title = title.substring(0, 30) + "...";
-			}*/
-			map.put("TITLE", Jsoup.parse(title).text());
-		}
 		return pageOut;
 	}
 
@@ -143,8 +92,8 @@ public class PaperDaoImpl extends BaseDaoImpl<Paper> implements PaperDao {
 	}
 
 	@Override
-	public List<Paper> getList(Integer paperId) {
+	public List<Paper> getList(Integer paperTypeId) {
 		String sql = "SELECT * FROM EXM_PAPER WHERE STATE = 1 AND PAPER_TYPE_ID = ?";
-		return getList(sql, new Object[]{paperId}, Paper.class);
+		return getList(sql, new Object[] { paperTypeId }, Paper.class);
 	}
 }

@@ -11,51 +11,36 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.springframework.beans.BeanUtils;
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.PaperDao;
-import com.wcpdoc.exam.core.dao.PaperQuestionDao;
-import com.wcpdoc.exam.core.entity.LoginUser;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.PaperQuestionEx;
-import com.wcpdoc.exam.core.entity.PaperType;
 import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.service.PaperQuestionService;
 import com.wcpdoc.exam.core.service.PaperService;
-import com.wcpdoc.exam.core.service.PaperTypeService;
 import com.wcpdoc.exam.core.service.QuestionService;
-import com.wcpdoc.exam.core.service.QuestionTypeService;
-import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.BigDecimalUtil;
 import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.sys.entity.Org;
-import com.wcpdoc.exam.sys.entity.Post;
-import com.wcpdoc.exam.sys.service.UserService;
 
 /**
  * 试卷服务层实现
  * 
- * v1.0 zhanghc 2017-05-25 16:34:59
+ * zhanghc 2018年10月21日上午8:16:06
  */
 @Service
 public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperService {
 	@Resource
 	private PaperDao paperDao;
 	@Resource
-	private PaperQuestionDao paperQuestionDao;
-	@Resource
-	private PaperTypeService paperTypeService;
+	private PaperQuestionService paperQuestionService;
 	@Resource
 	private QuestionService questionService;
-	@Resource
-	private QuestionTypeService questionTypeService;
-	@Resource
-	private UserService userService;
 
 	@Override
 	@Resource(name = "paperDaoImpl")
@@ -64,204 +49,163 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 
 	@Override
-	public List<Map<String, Object>> getPaperTypeTreeList(Integer userId) {
-		Org org = userService.getOrg(userId);
-		List<Post> postList = userService.getPostList(userId);
-		List<PaperType> paperTypeList = paperTypeService.getList();
-		List<Map<String, Object>> paperTypeTreeList = new ArrayList<Map<String,Object>>();
-		
-		for(PaperType paperType : paperTypeList){
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("ID", paperType.getId());
-			map.put("NAME", paperType.getName());
-			map.put("PARENT_ID", paperType.getParentId());
-			//map.put("DISABLED", true);
-			//map.put("EXPANDED", true);
-			
-			if(userId == 1){
-				paperTypeTreeList.add(map);
-				continue;
-			}
-			
-			if(paperType.getUserIds() != null 
-					&& paperType.getUserIds().contains(userId.toString())){//有用户权限
-				paperTypeTreeList.add(map);
-				continue;
-			}
-			if(paperType.getOrgIds() != null 
-					&& paperType.getOrgIds().contains(org.getId().toString())){//有机构权限
-				paperTypeTreeList.add(map);
-				continue;
-			}
-			
-			for(Post post : postList){
-				if(paperType.getPostIds() != null 
-						&& paperType.getPostIds().contains(post.getId().toString())){//有岗位权限
-					paperTypeTreeList.add(map);
-					break;
-				}
-			}
-		}
-		
-		return paperTypeTreeList;
-	}
-
-	@Override
-	public PaperType getPaperType(Integer id) {
-		return paperDao.getPaperType(id);
-	}
-
-	@Override
-	public void doPaperTypeUpdate(Integer[] ids, Integer paperTypeId) {
+	public void doChapterAdd(PaperQuestion chapter) {
 		//校验数据有效性
-		if(!ValidateUtil.isValid(ids)){
-			throw new RuntimeException("无法获取参数：ids");
+		if(chapter.getPaperId() == null) {
+			throw new MyException("参数错误：paperId");
 		}
-		if(paperTypeId == null){
-			throw new RuntimeException("无法获取参数：paperTypeId");
+		Paper paper = getEntity(chapter.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
 		}
-		
-		//完成设置试卷
-		for(Integer id : ids){
-			Paper paper = paperDao.getEntity(id);
-			if(paper.getPaperTypeId() == paperTypeId){
-				continue;
-			}
-			
-			paper.setPaperTypeId(paperTypeId);
-			paperDao.update(paper);
-		}
-	}
-
-	@Override
-	public List<Map<String, Object>> getPaperCfgPaperTreeList(Integer id) {
-		List<Map<String, Object>> list = paperDao.getPaperCfgPaperTreeList(id);
-		for(Map<String, Object> map : list){
-			if(map.get("NAME") == null){
-				continue;
-			}
-			String name = StringUtil.delHTMLTag(map.get("NAME").toString());
-			if(name.length() > 40){
-				name = name.substring(0, 40) + "...";
-			}
-			name = "（" + map.get("NO") + "）" + name;
-			map.put("NAME", name);
-		}
-		return list;
-	}
-
-	@Override
-	public PaperQuestion getPaperQuestion(Integer paperQuestionId) {
-		return paperQuestionDao.getEntity(paperQuestionId);
-	}
-
-	@Override
-	public void initRootPaperQuestion(Integer id, LoginUser user) {
-//		PaperQuestion paperQuestion = paperDao.getRootPaperQuestion(id);
-//		if(paperQuestion == null){
-//			paperQuestion = new PaperQuestion();
-//			paperQuestion.setName("试卷");
-//			paperQuestion.setParentId(0);
-//			paperQuestion.setParentSub("_1_");
-//			paperQuestion.setUpdateTime(new Date());
-//			paperQuestion.setUpdateUserId(user.getId());;
-//			paperQuestion.setType(1);
-//			paperQuestion.setNo(1);
-//			paperQuestion.setPaperId(id);
-//			paperQuestionService.add(paperQuestion);
-//		}
-	}
-
-	@Override
-	public void doChapterAdd(PaperQuestion chapter, LoginUser user) {
-		//校验数据有效性
-		if(chapter.getPaperId() == null){
-			throw new RuntimeException("无法获取参数：paperId");
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
 		}
 				
 		//添加章节
 		chapter.setUpdateTime(new Date());
-		chapter.setUpdateUserId(user.getId());
+		chapter.setUpdateUserId(getCurUser().getId());
 		chapter.setType(1);
 		chapter.setParentId(0);
 		
-		List<PaperQuestion> paperQuestionList = paperQuestionDao.getList(chapter.getParentId());
+		List<PaperQuestion> paperQuestionList = paperQuestionService.getQuestionList(chapter.getParentId());
 		chapter.setNo(paperQuestionList.size() + 1);
 		
-		paperQuestionDao.add(chapter);
+		paperQuestionService.add(chapter);
 		
 		//更新父子关系
 		chapter.setParentSub("_" + chapter.getId() + "_");
-		paperQuestionDao.update(chapter);
+		paperQuestionService.update(chapter);
 	}
 
 	@Override
-	public void doChapterEdit(PaperQuestion chapter, LoginUser user) {
-		PaperQuestion c = paperQuestionDao.getEntity(chapter.getId());
-		c.setName(chapter.getName());
-		c.setDescription(chapter.getDescription());
-		c.setUpdateTime(new Date());
-		c.setUpdateUserId(user.getId());
-		paperQuestionDao.update(c);
-	}
-
-	@Override
-	public PageOut getQuestionListpage(PageIn pageIn) {
-		return paperDao.getQuestionListpage(pageIn);
-	}
-
-	@Override
-	public void doQuestionAdd(Integer chapterId, Integer[] questionIds, LoginUser user){
+	public void doChapterEdit(PaperQuestion chapter) {
 		//校验数据有效性
-		if(chapterId == null){
-			throw new RuntimeException("无法获取参数：chapterId");
+		PaperQuestion entity = paperQuestionService.getEntity(chapter.getId());
+		Paper paper = getEntity(entity.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
 		}
-		if(!ValidateUtil.isValid(questionIds)){
-			throw new RuntimeException("无法获取参数：questionIds");
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
 		}
 		
-		//添加试题
-		PaperQuestion chapter = paperQuestionDao.getEntity(chapterId);
-		List<PaperQuestion> questionList = paperQuestionDao.getList(chapterId);
-		int maxNo = questionList.size();
-		for(Integer questionId : questionIds){
-			PaperQuestion pq = new PaperQuestion();
-			pq.setUpdateTime(new Date());
-			pq.setUpdateUserId(user.getId());
-			pq.setPaperId(chapter.getPaperId());
-			pq.setParentId(chapterId);
-			pq.setQuestionId(questionId);
-			pq.setType(2);
-			pq.setNo(++maxNo);
-			pq.setScore(BigDecimal.ZERO);
-			paperQuestionDao.add(pq);
-		}
+		// 修改章节
+		entity.setName(chapter.getName());
+		entity.setDescription(chapter.getDescription());
+		entity.setUpdateTime(new Date());
+		entity.setUpdateUserId(getCurUser().getId());
+		paperQuestionService.update(entity);
 	}
-
+	
 	@Override
 	public void doChapterDel(Integer chapterId) {
-		//删除章节
-		List<PaperQuestion> questionList = paperQuestionDao.getList(chapterId);
-		for(PaperQuestion pq : questionList){
-			paperQuestionDao.del(pq.getId());
+		//校验数据有效性
+		PaperQuestion entity = paperQuestionService.getEntity(chapterId);
+		Paper paper = getEntity(entity.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
 		}
-		PaperQuestion chapter = paperQuestionDao.getEntity(chapterId);//不要放到下一行，因为第二行执行删除了。
-		paperQuestionDao.del(chapterId);
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
+		}
+				
+		//删除章节
+		List<PaperQuestion> questionList = paperQuestionService.getQuestionList(chapterId);
+		for(PaperQuestion pq : questionList) {
+			paperQuestionService.del(pq.getId());
+		}
+		PaperQuestion chapter = paperQuestionService.getEntity(chapterId);//不要放到下一行，因为第二行执行删除了。
+		paperQuestionService.del(chapterId);
 		
 		//更新总分数
 		updateTotalScore(chapter.getPaperId());
 	}
-
+	
 	@Override
-	public List<PaperQuestion> getPaperQuestionList(Integer paperQuestionId) {
-		return paperQuestionDao.getList(paperQuestionId);
+	public void doChapterUp(Integer chapterId) {
+		//校验数据有效性
+		PaperQuestion entity = paperQuestionService.getEntity(chapterId);
+		Paper paper = getEntity(entity.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
+		}
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
+		}
+		
+		//当前章节上移
+		PaperQuestion chapter = paperQuestionService.getEntity(chapterId);
+		List<PaperQuestion> chapterList = paperQuestionService.getChapterList(chapter.getPaperId());
+		Collections.sort(chapterList, new Comparator<PaperQuestion>() {
+			@Override
+			public int compare(PaperQuestion o1, PaperQuestion o2) {
+				return o2.getNo() - o1.getNo();
+			}
+		});
+		
+		for(PaperQuestion cur : chapterList) {
+			if(chapter.getNo() > cur.getNo()) {
+				Integer no = cur.getNo();
+				cur.setNo(chapter.getNo());
+				chapter.setNo(no);
+				paperQuestionService.update(cur);
+				paperQuestionService.update(chapter);
+				break;
+			}
+		}
 	}
 
 	@Override
-	public List<Map<String, Object>> getQuestionTypeTreeList() {
-		return questionTypeService.getTreeList();
+	public void doChapterDown(Integer chapterId) {
+		//校验数据有效性
+		PaperQuestion entity = paperQuestionService.getEntity(chapterId);
+		Paper paper = getEntity(entity.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
+		}
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
+		}
+		
+		//当前章节下移
+		PaperQuestion chapter = paperQuestionService.getEntity(chapterId);
+		List<PaperQuestion> chapterList = paperQuestionService.getChapterList(chapter.getPaperId());
+		Collections.sort(chapterList, new Comparator<PaperQuestion>() {
+			@Override
+			public int compare(PaperQuestion o1, PaperQuestion o2) {
+				return o1.getNo() - o2.getNo();
+			}
+		});
+		
+		for(PaperQuestion cur : chapterList) {
+			if(chapter.getNo() < cur.getNo()) {
+				Integer no = cur.getNo();
+				cur.setNo(chapter.getNo());
+				chapter.setNo(no);
+				paperQuestionService.update(cur);
+				paperQuestionService.update(chapter);
+				break;
+			}
+		}
 	}
+	
+	private void updateTotalScore(Integer paperId) {
+		BigDecimalUtil bigDecimalUtil = BigDecimalUtil.newInstance(0);
+		List<PaperQuestion> paperQuestionList = paperQuestionService.getList(paperId);
+		for (PaperQuestion paperQuestion : paperQuestionList) {
+			if (paperQuestion.getType() != 2) {
+				continue;
+			}
 
+			bigDecimalUtil.add(paperQuestion.getScore());
+		}
+
+		Paper paper = getEntity(paperId);
+		paper.setTotalScore(bigDecimalUtil.getResult());
+		update(paper);
+	}
+	
 	@Override
 	public List<PaperQuestionEx> getPaperList(Integer id) {
 		List<PaperQuestion> paperQuestionList = paperDao.getPaperQuestionList(id);
@@ -270,21 +214,25 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		
 		Map<Integer, PaperQuestionEx> paperQuestionExMap = new HashMap<Integer, PaperQuestionEx>();
 		Map<Integer, Question> questionMap = new HashMap<Integer, Question>();
-		for(Question question : questionList){
+		for(Question question : questionList) {
 			questionMap.put(question.getId(), question);
 		}
 		
-		for(PaperQuestion paperQuestion : paperQuestionList){
+		for(PaperQuestion paperQuestion : paperQuestionList) {
 			PaperQuestionEx paperQuestionEx = new PaperQuestionEx();
-			BeanUtils.copyProperties(paperQuestion, paperQuestionEx);
+			try {
+				BeanUtils.copyProperties(paperQuestionEx, paperQuestion);
+			} catch (Exception e) {
+				new MyException(e);
+			}
 			paperQuestionEx.setQuestion(questionMap.get(paperQuestionEx.getQuestionId()));
 			paperQuestionExList.add(paperQuestionEx);
 			paperQuestionExMap.put(paperQuestionEx.getId(), paperQuestionEx);
 		}
 		
 		List<PaperQuestionEx> treeList = new ArrayList<PaperQuestionEx>();
-		for(PaperQuestionEx paperQuestionEx : paperQuestionExList){
-			if(paperQuestionEx.getParentId() == 0){
+		for(PaperQuestionEx paperQuestionEx : paperQuestionExList) {
+			if(paperQuestionEx.getParentId() == 0) {
 				treeList.add(paperQuestionEx);
 			}else{
 				PaperQuestionEx parentPaperQuestionEx = paperQuestionExMap.get(paperQuestionEx.getParentId());
@@ -296,204 +244,125 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 
 	@Override
-	public void doScoresUpdate(Integer chapterId, BigDecimal score, String options) {
-		//校验数据有效性
-		if(chapterId == null){
-			throw new RuntimeException("无法获取参数：chapterId");
+	public void doQuestionAdd(Integer chapterId, Integer[] questionIds) {
+		// 校验数据有效性
+		if (chapterId == null) {
+			throw new MyException("无法获取参数：chapterId");
 		}
-		if(score == null){
-			throw new RuntimeException("无法获取参数：score");
+		if (!ValidateUtil.isValid(questionIds)) {
+			throw new MyException("无法获取参数：questionIds");
+		}
+		PaperQuestion entity = paperQuestionService.getEntity(chapterId);
+		Paper paper = getEntity(entity.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
+		}
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
+		}
+
+		// 添加试题
+		PaperQuestion chapter = paperQuestionService.getEntity(chapterId);
+		List<PaperQuestion> questionList = paperQuestionService.getQuestionList(chapterId);
+		int maxNo = questionList.size();
+		for (Integer questionId : questionIds) {
+			Question question = questionService.getEntity(questionId);
+
+			PaperQuestion pq = new PaperQuestion();
+			pq.setUpdateTime(new Date());
+			pq.setUpdateUserId(getCurUser().getId());
+			pq.setPaperId(chapter.getPaperId());
+			pq.setParentId(chapterId);
+			pq.setQuestionId(questionId);
+			pq.setType(2);
+			pq.setNo(++maxNo);
+			pq.setScore(question.getScore());
+			pq.setScoreOptions(question.getScoreOptions());
+			paperQuestionService.add(pq);
 		}
 		
-		//更新试卷分数
-		List<PaperQuestion> pqList = paperQuestionDao.getList(chapterId);
-		for(PaperQuestion pq : pqList){
-			Question question = questionService.getEntity(pq.getQuestionId());
-			if(question.getType() == 2){
-				if(ValidateUtil.isValid(options) && options.contains("1")){
-					pq.setOptions("1");
-				}else{
-					pq.setOptions(null);
-				}
-			}else if(question.getType() == 3){
-				pq.setOptions(options);
-			}else{
-				pq.setOptions(null);
-			}
-			
-			pq.setScore(score);
-			paperQuestionDao.update(pq);
-		}
-		
-		//更新试卷总分
-		if(pqList.size() > 0){
-			updateTotalScore(pqList.get(0).getPaperId());
-		}
+		//更新总分数
+		updateTotalScore(chapter.getPaperId());
 	}
 	
 	@Override
-	public void doScoreUpdate(Integer paperQuestionId, BigDecimal score, String options) {
+	public void doScoreUpdate(Integer paperQuestionId, BigDecimal score) {
 		//校验数据有效性
-		if(paperQuestionId == null){
-			throw new RuntimeException("无法获取参数：paperQuestionId");
+		if(paperQuestionId == null) {
+			throw new MyException("无法获取参数：paperQuestionId");
 		}
-		if(score == null){
-			throw new RuntimeException("无法获取参数：score");
+		if(score == null) {
+			throw new MyException("无法获取参数：score");
 		}
-		
-		PaperQuestion pq = paperQuestionDao.getEntity(paperQuestionId);
-		Question question = questionService.getEntity(pq.getQuestionId());
-		if(question.getType() == 2){
-			if(ValidateUtil.isValid(options) && options.contains("1")){
-				pq.setOptions("1");
-			}else{
-				pq.setOptions(null);
-			}
-		}else if(question.getType() == 3){
-			pq.setOptions(options);
-		}else{
-			pq.setOptions(null);
+		PaperQuestion entity = paperQuestionService.getEntity(paperQuestionId);
+		Paper paper = getEntity(entity.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
+		}
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
 		}
 		
+		// 设置分数
+		PaperQuestion pq = paperQuestionService.getEntity(paperQuestionId);
 		pq.setScore(score);
-		paperQuestionDao.update(pq);
+		paperQuestionService.update(pq);
 		
 		//更新试卷总分
 		updateTotalScore(pq.getPaperId());
 	}
-
-	private void updateTotalScore(Integer paperId) {
-		BigDecimal totalScore = new BigDecimal(0);
-		List<PaperQuestion> paperQuestionList = paperQuestionDao.getPaperQuestionList(paperId);
-		for(PaperQuestion paperQuestion : paperQuestionList){
-			if(paperQuestion.getType() != 2){
-				continue;
-			}
-			
-			totalScore = new BigDecimal(BigDecimalUtil.add(totalScore.toString(), paperQuestion.getScore().toString()));
-		}
-		
-		Paper paper = getEntity(paperId);
-		paper.setTotleScore(totalScore);
-		update(paper);
-	}
 	
 	@Override
-	public List<Question> getQuestionList(Integer paperId) {
-		return paperDao.getQuestionList(paperId);
-	}
-
-	@Override
-	public List<Paper> getList(Integer paperId) {
-		return paperDao.getList(paperId);
-	}
-
-	@Override
-	public void delAndUpdate(Integer[] ids) {
-		//校验数据有效性
-		if(!ValidateUtil.isValid(ids)){
-			throw new RuntimeException("无法获取参数：ids");
+	public void doOptionsUpdate(Integer paperQuestionId, Integer[] options) {
+		// 校验数据有效性
+		if (paperQuestionId == null) {
+			throw new MyException("无法获取参数：paperQuestionId");
 		}
-		
-		//删除试题
-		for(Integer id : ids){
-			Paper paper = getEntity(id);
-			paper.setState(0);
-			update(paper);
+		PaperQuestion entity = paperQuestionService.getEntity(paperQuestionId);
+		Paper paper = getEntity(entity.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
 		}
-	}
-
-	@Override
-	public PaperType getPaperType2(Integer paperTypeId) {
-		return paperTypeService.getEntity(paperTypeId);
-	}
-
-	@Override
-	public List<Map<String, Object>> getQuestionTypeTreeList(Integer userId) {
-		return questionService.getQuestionTypeTreeList(userId);
-	}
-
-	@Override
-	public void doQuestionClear(Integer chapterId, LoginUser currentUser) {
-		//校验数据有效性
-		if(chapterId == null){
-			throw new RuntimeException("无法获取参数：chapterId");
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
 		}
-		
-		List<PaperQuestion> pqList = paperQuestionDao.getList(chapterId);
-		for(PaperQuestion pq : pqList){
-			paperQuestionDao.del(pq.getId());
+
+		// 更新试卷选项
+		PaperQuestion pq = paperQuestionService.getEntity(paperQuestionId);
+		Question question = questionService.getEntity(pq.getQuestionId());
+		if (question.getType() == 2) {
+			if (ValidateUtil.isValid(options) && StringUtil.join(options).contains("1")) {
+				pq.setScoreOptions("1");
+			} else {
+				pq.setScoreOptions(null);
+			}
+		} else if (question.getType() == 3) {
+			pq.setScoreOptions(StringUtil.join(options));
+		} else {
+			pq.setScoreOptions(null);
 		}
+
+		paperQuestionService.update(pq);
 	}
 	
-	@Override
-	public void doChapterUp(Integer chapterId){
-		//校验数据有效性
-		if(chapterId == null){
-			throw new RuntimeException("无法获取参数：chapterId");
-		}
-		
-		//当前章节上移
-		PaperQuestion chapter = paperQuestionDao.getEntity(chapterId);
-		List<PaperQuestion> chapterList = paperQuestionDao.getChapterList(chapter.getPaperId());
-		Collections.sort(chapterList, new Comparator<PaperQuestion>() {
-			@Override
-			public int compare(PaperQuestion o1, PaperQuestion o2) {
-				return o2.getNo() - o1.getNo();
-			}
-		});
-		
-		for(PaperQuestion cur : chapterList){
-			if(chapter.getNo() > cur.getNo()){
-				Integer no = cur.getNo();
-				cur.setNo(chapter.getNo());
-				chapter.setNo(no);
-				paperQuestionDao.update(cur);
-				paperQuestionDao.update(chapter);
-				break;
-			}
-		}
-	}
-
-	@Override
-	public void doChapterDown(Integer chapterId) {
-		//校验数据有效性
-		if(chapterId == null){
-			throw new RuntimeException("无法获取参数：chapterId");
-		}
-		
-		//当前章节下移
-		PaperQuestion chapter = paperQuestionDao.getEntity(chapterId);
-		List<PaperQuestion> chapterList = paperQuestionDao.getChapterList(chapter.getPaperId());
-		Collections.sort(chapterList, new Comparator<PaperQuestion>() {
-			@Override
-			public int compare(PaperQuestion o1, PaperQuestion o2) {
-				return o1.getNo() - o2.getNo();
-			}
-		});
-		
-		for(PaperQuestion cur : chapterList){
-			if(chapter.getNo() < cur.getNo()){
-				Integer no = cur.getNo();
-				cur.setNo(chapter.getNo());
-				chapter.setNo(no);
-				paperQuestionDao.update(cur);
-				paperQuestionDao.update(chapter);
-				break;
-			}
-		}
-	}
-
 	@Override
 	public void doQuestionUp(Integer paperQuestionId) {
 		//校验数据有效性
-		if(paperQuestionId == null){
-			throw new RuntimeException("无法获取参数：paperQuestionId");
+		if(paperQuestionId == null) {
+			throw new MyException("无法获取参数：paperQuestionId");
+		}
+		PaperQuestion entity = paperQuestionService.getEntity(paperQuestionId);
+		Paper paper = getEntity(entity.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
+		}
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
 		}
 		
 		//当前试题上移
-		PaperQuestion pq = paperQuestionDao.getEntity(paperQuestionId);
-		List<PaperQuestion> pqList = paperQuestionDao.getList(pq.getParentId());
+		PaperQuestion pq = paperQuestionService.getEntity(paperQuestionId);
+		List<PaperQuestion> pqList = paperQuestionService.getQuestionList(pq.getParentId());
 		
 		Collections.sort(pqList, new Comparator<PaperQuestion>() {
 			@Override
@@ -502,13 +371,13 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			}
 		});
 		
-		for(PaperQuestion cur : pqList){
-			if(pq.getNo() > cur.getNo()){
+		for(PaperQuestion cur : pqList) {
+			if(pq.getNo() > cur.getNo()) {
 				Integer no = cur.getNo();
 				cur.setNo(pq.getNo());
 				pq.setNo(no);
-				paperQuestionDao.update(cur);
-				paperQuestionDao.update(pq);
+				paperQuestionService.update(cur);
+				paperQuestionService.update(pq);
 				break;
 			}
 		}
@@ -517,13 +386,21 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	@Override
 	public void doQuestionDown(Integer paperQuestionId) {
 		//校验数据有效性
-		if(paperQuestionId == null){
-			throw new RuntimeException("无法获取参数：paperQuestionId");
+		if(paperQuestionId == null) {
+			throw new MyException("无法获取参数：paperQuestionId");
+		}
+		PaperQuestion entity = paperQuestionService.getEntity(paperQuestionId);
+		Paper paper = getEntity(entity.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
+		}
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
 		}
 		
 		//当前试题下移
-		PaperQuestion pq = paperQuestionDao.getEntity(paperQuestionId);
-		List<PaperQuestion> pqList = paperQuestionDao.getList(pq.getParentId());
+		PaperQuestion pq = paperQuestionService.getEntity(paperQuestionId);
+		List<PaperQuestion> pqList = paperQuestionService.getQuestionList(pq.getParentId());
 		
 		Collections.sort(pqList, new Comparator<PaperQuestion>() {
 			@Override
@@ -532,13 +409,13 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			}
 		});
 		
-		for(PaperQuestion cur : pqList){
-			if(pq.getNo() < cur.getNo()){
+		for(PaperQuestion cur : pqList) {
+			if(pq.getNo() < cur.getNo()) {
 				Integer no = cur.getNo();
 				cur.setNo(pq.getNo());
 				pq.setNo(no);
-				paperQuestionDao.update(cur);
-				paperQuestionDao.update(pq);
+				paperQuestionService.update(cur);
+				paperQuestionService.update(pq);
 				break;
 			}
 		}
@@ -546,11 +423,113 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 
 	@Override
 	public void doQuestionDel(Integer paperQuestionId) {
-		paperQuestionDao.del(paperQuestionId);
+		// 校验数据有效性
+		PaperQuestion entity = paperQuestionService.getEntity(paperQuestionId);
+		Paper paper = getEntity(entity.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
+		}
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
+		}
+		
+		// 删除试题
+		PaperQuestion pq = paperQuestionService.getEntity(paperQuestionId);
+		paperQuestionService.del(paperQuestionId);
+		List<PaperQuestion> pqList = paperQuestionService.getQuestionList(pq.getParentId());
+
+		Collections.sort(pqList, new Comparator<PaperQuestion>() {
+			@Override
+			public int compare(PaperQuestion o1, PaperQuestion o2) {
+				return o1.getNo() - o2.getNo();
+			}
+		});
+
+		// 更新排序
+		int maxNo = 1;
+		for (PaperQuestion cur : pqList) {
+			cur.setNo(maxNo++);
+			paperQuestionService.update(cur);
+		}
+		
+		// 更新总分数
+		updateTotalScore(pq.getPaperId());
 	}
 
 	@Override
-	public PaperQuestion getPaperQuestion(Integer paperId, Integer questionId) {
-		return paperQuestionDao.getEntity(paperId, questionId);
+	public void doQuestionClear(Integer chapterId) {
+		// 校验数据有效性
+		if (chapterId == null) {
+			throw new MyException("无法获取参数：chapterId");
+		}
+		PaperQuestion entity = paperQuestionService.getEntity(chapterId);
+		Paper paper = getEntity(entity.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
+		}
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
+		}
+
+		// 清空试题
+		PaperQuestion chapter = paperQuestionService.getEntity(chapterId);
+		List<PaperQuestion> pqList = paperQuestionService.getQuestionList(chapterId);
+		for (PaperQuestion pq : pqList) {
+			paperQuestionService.del(pq.getId());
+		}
+
+		// 更新总分数
+		updateTotalScore(chapter.getPaperId());
+	}
+
+	@Override
+	public List<Question> getQuestionList(Integer paperId) {
+		return paperDao.getQuestionList(paperId);
+	}
+
+	@Override
+	public List<Paper> getList(Integer paperTypeId) {
+		return paperDao.getList(paperTypeId);
+	}
+
+	@Override
+	public void doBatchScoreUpdate(Integer chapterId, BigDecimal score, String options) {
+		// 校验数据有效性
+		if (chapterId == null) {
+			throw new MyException("参数错误：chapterId");
+		}
+		if (score == null) {
+			throw new MyException("参数错误：score");
+		}
+		PaperQuestion entity = paperQuestionService.getEntity(chapterId);
+		Paper paper = getEntity(entity.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
+		}
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
+		}
+
+		// 更新试卷分数
+		List<PaperQuestion> pqList = paperQuestionService.getQuestionList(chapterId);
+		for (PaperQuestion pq : pqList) {
+			pq.setScoreOptions(null);
+			Question question = questionService.getEntity(pq.getQuestionId());
+			if (question.getType() == 2) {
+				if (ValidateUtil.isValid(options) && options.contains("1")) {
+					pq.setScoreOptions("1");
+				}
+			} else if (question.getType() == 3) {
+				pq.setScoreOptions(options);
+			}
+
+			pq.setScore(score);
+			paperQuestionService.update(pq);
+		}
+
+		// 更新试卷总分
+		if (pqList.size() > 0) {
+			updateTotalScore(pqList.get(0).getPaperId());
+		}
 	}
 }

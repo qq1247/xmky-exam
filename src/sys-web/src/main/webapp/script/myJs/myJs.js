@@ -92,6 +92,7 @@ $.ajaxSetup({
 	async : false,
 	cache : false,
 	dataType : "json",
+	traditional : true,
 	error : function (XMLHttpRequest, textStatus, errorThrown) {
 	    if(XMLHttpRequest.readyState != 4){
 	    	alert("未收到服务器响应，请刷新页面后重试！");
@@ -136,4 +137,3 @@ Date.prototype.format = function(fmt) {
 					: (("00" + o[k]).substr(("" + o[k]).length)));
 	return fmt;
 }
-

@@ -12,12 +12,12 @@ import javax.persistence.Table;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import com.wcpdoc.exam.core.util.DateUtil;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * 试卷实体
  * 
- * v1.0 zhanghc 2017-05-25 16:34:59
+ * zhanghc 2018年10月21日上午8:16:06
  */
 @Entity
 @Table(name = "EXM_PAPER")
@@ -28,19 +28,44 @@ public class Paper {
 	private Integer id;
 	@Column(name = "NAME")
 	private String name;
+	@Column(name = "PREVIEW_TYPE")
+	private Integer previewType;
+	@Column(name = "PASS_SCORE")
+	private BigDecimal passScore;
+	@Column(name = "TOTAL_SCORE")
+	private BigDecimal totalScore;
+	@Column(name = "SCORE_A")
+	private BigDecimal scoreA;
+	@Column(name = "SCORE_A_REMARK")
+	private String scoreARemark;
+	@Column(name = "SCORE_B")
+	private BigDecimal scoreB;
+	@Column(name = "SCORE_B_REMARK")
+	private String scoreBRemark;
+	@Column(name = "SCORE_C")
+	private BigDecimal scoreC;
+	@Column(name = "SCORE_C_REMARK")
+	private String scoreCRemark;
+	@Column(name = "SCORE_D")
+	private BigDecimal scoreD;
+	@Column(name = "SCORE_D_REMARK")
+	private String scoreDRemark;
+	@Column(name = "SCORE_E")
+	private BigDecimal scoreE;
+	@Column(name = "SCORE_E_REMARK")
+	private String scoreERemark;
 	@Column(name = "DESCRIPTION")
 	private String description;
-	@Column(name = "TOTLE_SCORE")
-	private BigDecimal totleScore;
+	@Column(name = "PAPER_TYPE_ID")
+	private Integer paperTypeId;
 	@Column(name = "STATE")
 	private Integer state;
 	@Column(name = "UPDATE_USER_ID")
 	private Integer updateUserId;
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "UPDATE_TIME")
-	@DateTimeFormat(pattern = DateUtil.FORMAT_DATE_TIME)
 	private Date updateTime;
-	@Column(name = "PAPER_TYPE_ID")
-	private Integer paperTypeId;
 
 	public Integer getId() {
 		return id;
@@ -58,6 +83,22 @@ public class Paper {
 		this.name = name;
 	}
 
+	public BigDecimal getTotalScore() {
+		return totalScore;
+	}
+
+	public void setTotalScore(BigDecimal totalScore) {
+		this.totalScore = totalScore;
+	}
+
+	public BigDecimal getPassScore() {
+		return passScore;
+	}
+
+	public void setPassScore(BigDecimal passScore) {
+		this.passScore = passScore;
+	}
+
 	public String getDescription() {
 		return description;
 	}
@@ -66,18 +107,28 @@ public class Paper {
 		this.description = description;
 	}
 
-	public BigDecimal getTotleScore() {
-		return totleScore;
+	public Integer getPaperTypeId() {
+		return paperTypeId;
 	}
 
-	public void setTotleScore(BigDecimal totleScore) {
-		this.totleScore = totleScore;
+	public void setPaperTypeId(Integer paperTypeId) {
+		this.paperTypeId = paperTypeId;
 	}
 
+	public Integer getPreviewType() {
+		return previewType;
+	}
+
+	public void setPreviewType(Integer previewType) {
+		this.previewType = previewType;
+	}
+
+	/** 0：删除；1：启用；2：禁用 */
 	public Integer getState() {
 		return state;
 	}
 
+	/** 0：删除；1：启用；2：禁用 */
 	public void setState(Integer state) {
 		this.state = state;
 	}
@@ -98,12 +149,83 @@ public class Paper {
 		this.updateTime = updateTime;
 	}
 
-	public Integer getPaperTypeId() {
-		return paperTypeId;
+	public BigDecimal getScoreA() {
+		return scoreA;
 	}
 
-	public void setPaperTypeId(Integer paperTypeId) {
-		this.paperTypeId = paperTypeId;
+	public void setScoreA(BigDecimal scoreA) {
+		this.scoreA = scoreA;
 	}
 
+	public String getScoreARemark() {
+		return scoreARemark;
+	}
+
+	public void setScoreARemark(String scoreARemark) {
+		this.scoreARemark = scoreARemark;
+	}
+
+	public BigDecimal getScoreB() {
+		return scoreB;
+	}
+
+	public void setScoreB(BigDecimal scoreB) {
+		this.scoreB = scoreB;
+	}
+
+	public String getScoreBRemark() {
+		return scoreBRemark;
+	}
+
+	public void setScoreBRemark(String scoreBRemark) {
+		this.scoreBRemark = scoreBRemark;
+	}
+
+	public BigDecimal getScoreC() {
+		return scoreC;
+	}
+
+	public void setScoreC(BigDecimal scoreC) {
+		this.scoreC = scoreC;
+	}
+
+	public String getScoreCRemark() {
+		return scoreCRemark;
+	}
+
+	public void setScoreCRemark(String scoreCRemark) {
+		this.scoreCRemark = scoreCRemark;
+	}
+
+	public BigDecimal getScoreD() {
+		return scoreD;
+	}
+
+	public void setScoreD(BigDecimal scoreD) {
+		this.scoreD = scoreD;
+	}
+
+	public String getScoreDRemark() {
+		return scoreDRemark;
+	}
+
+	public void setScoreDRemark(String scoreDRemark) {
+		this.scoreDRemark = scoreDRemark;
+	}
+
+	public BigDecimal getScoreE() {
+		return scoreE;
+	}
+
+	public void setScoreE(BigDecimal scoreE) {
+		this.scoreE = scoreE;
+	}
+
+	public String getScoreERemark() {
+		return scoreERemark;
+	}
+
+	public void setScoreERemark(String scoreERemark) {
+		this.scoreERemark = scoreERemark;
+	}
 }

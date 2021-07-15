@@ -1,9 +1,6 @@
 package com.wcpdoc.exam.core.controller;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -14,14 +11,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wcpdoc.exam.core.controller.BaseController;
+import com.wcpdoc.exam.base.entity.User;
+import com.wcpdoc.exam.base.service.OrgService;
 import com.wcpdoc.exam.core.entity.ExamType;
 import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
+import com.wcpdoc.exam.core.entity.PageResultEx;
+import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.ExamTypeService;
 import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.sys.entity.User;
 
 /**
  * 考试分类控制层
@@ -30,16 +28,18 @@ import com.wcpdoc.exam.sys.entity.User;
  */
 @Controller
 @RequestMapping("/examType")
-public class ExamTypeController extends BaseController{
+public class ExamTypeController extends BaseController {
 	private static final Logger log = LoggerFactory.getLogger(ExamTypeController.class);
 	
 	@Resource
 	private ExamTypeService examTypeService;
+	@Resource
+	private OrgService orgService;
 	
 	/**
-	 * 到达考试分类列表页面 
+	 * 到达试题分类列表页面 
+	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
-	 * v1.0 zhanghc 2017-06-28 21:34:41
 	 * @return String
 	 */
 	@RequestMapping("/toList")
@@ -47,49 +47,49 @@ public class ExamTypeController extends BaseController{
 		try {
 			return "exam/examType/examTypeList";
 		} catch (Exception e) {
-			log.error("到达考试分类列表页面错误：", e);
+			log.error("到达试题分类列表页面错误：", e);
 			return "exam/examType/examTypeList";
 		}
 	}
 	
 	/**
-	 * 获取考试分类树
+	 * 试题分类树
+	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
-	 * v1.0 zhanghc 2017-06-28 21:34:41
 	 * @return List<Map<String,Object>>
 	 */
 	@RequestMapping("/treeList")
 	@ResponseBody
-	public List<Map<String, Object>> treeList() {
+	public PageResult treeList() {
 		try {
-			return examTypeService.getTreeList();
+			return new PageResultEx(true, "查询成功", examTypeService.getTreeList());
 		} catch (Exception e) {
-			log.error("获取考试分类树错误：", e);
-			return new ArrayList<Map<String,Object>>();
+			log.error("试题分类树错误：", e);
+			return new PageResult(false, "查询失败");
 		}
 	}
 	
 	/**
-	 * 考试分类列表 
+	 * 试题分类列表 
+	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
-	 * v1.0 zhanghc 2017-06-28 21:34:41
 	 * @return pageOut
 	 */
 	@RequestMapping("/list")
 	@ResponseBody
-	public PageOut list(PageIn pageIn) {
+	public PageResult list(PageIn pageIn) {
 		try {
-			return examTypeService.getListpage(pageIn);
+			return new PageResultEx(true, "查询成功", examTypeService.getListpage(pageIn));
 		} catch (Exception e) {
-			log.error("考试分类列表错误：", e);
-			return new PageOut();
+			log.error("试题分类列表错误：", e);
+			return new PageResult(false, "查询失败");
 		}
 	}
 	
 	/**
-	 * 到达添加考试分类页面 
+	 * 到达添加试题分类页面 
+	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
-	 * v1.0 zhanghc 2017-06-28 21:34:41
 	 * @return String
 	 */
 	@RequestMapping("/toAdd")
@@ -97,36 +97,36 @@ public class ExamTypeController extends BaseController{
 		try {
 			return "exam/examType/examTypeEdit";
 		} catch (Exception e) {
-			log.error("到达添加考试分类页面错误", e);
+			log.error("到达添加试题分类页面错误", e);
 			return "exam/examType/examTypeEdit";
 		}
 	}
 	
 	/**
-	 * 完成添加考试分类
+	 * 完成添加试题分类
+	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
-	 * v1.0 zhanghc 2017-06-28 21:34:41
 	 * @return pageOut
 	 */
 	@RequestMapping("/doAdd")
 	@ResponseBody
 	public PageResult doAdd(ExamType examType) {
 		try {
-			examType.setUpdateUserId(getCurUser().getId());
-			examType.setUpdateTime(new Date());
-			examType.setState(1);
 			examTypeService.addAndUpdate(examType);
 			return new PageResult(true, "添加成功");
+		} catch (MyException e) {
+			log.error("完成添加试题分类错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
-			log.error("完成添加考试分类错误：", e);
-			return new PageResult(false, "添加失败：" + e.getMessage());
+			log.error("完成添加试题分类错误：", e);
+			return new PageResult(false, "未知异常");
 		}
 	}
 	
 	/**
-	 * 到达修改考试分类页面 
+	 * 到达修改试题分类页面 
+	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
-	 * v1.0 zhanghc 2017-06-28 21:34:41
 	 * @return String
 	 */
 	@RequestMapping("/toEdit")
@@ -134,61 +134,77 @@ public class ExamTypeController extends BaseController{
 		try {
 			ExamType examType = examTypeService.getEntity(id);
 			model.addAttribute("examType", examType);
-			
-			ExamType pExamType = examTypeService.getEntity(examType.getParentId());
-			model.addAttribute("pExamType", pExamType);
+			ExamType parentExamType = examTypeService.getEntity(examType.getParentId());
+			if (parentExamType != null) {
+				model.addAttribute("parentExamType", examTypeService.getEntity(examType.getParentId()));
+			}
 			return "exam/examType/examTypeEdit";
 		} catch (Exception e) {
-			log.error("到达修改考试分类页面错误", e);
+			log.error("到达修改试题分类页面错误", e);
 			return "exam/examType/examTypeEdit";
 		}
 	}
 	
 	/**
-	 * 完成修改考试分类
+	 * 完成修改试题分类
+	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
-	 * v1.0 zhanghc 2017-06-28 21:34:41
 	 * @return pageOut
 	 */
 	@RequestMapping("/doEdit")
 	@ResponseBody
 	public PageResult doEdit(ExamType examType) {
 		try {
+			//校验数据有效性
+			if(!ValidateUtil.isValid(examType.getName())) {
+				throw new MyException("参数错误：name");
+			}
+			if(examTypeService.existName(examType)) {
+				throw new MyException("名称已存在！");
+			}
+			
+			//修改试题分类
 			ExamType entity = examTypeService.getEntity(examType.getId());
 			entity.setName(examType.getName());
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(((User)getCurUser()).getId());
 			entity.setNo(examType.getNo());
-			examTypeService.editAndUpdate(entity);
+			examTypeService.update(entity);
 			return new PageResult(true, "修改成功");
+		} catch (MyException e) {
+			log.error("完成修改试题分类错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
-			log.error("完成修改考试分类错误：", e);
-			return new PageResult(false, "修改失败：" + e.getMessage());
+			log.error("完成修改试题分类错误：", e);
+			return new PageResult(false, "未知异常");
 		}
 	}
 	
 	/**
-	 * 完成删除考试分类
+	 * 完成删除试题分类
+	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
-	 * v1.0 zhanghc 2017-06-28 21:34:41
 	 * @return pageOut
 	 */
 	@RequestMapping("/doDel")
 	@ResponseBody
-	public PageResult doDel(Integer[] ids) {
+	public PageResult doDel(Integer id) {
 		try {
-			examTypeService.delAndUpdate(ids);
+			examTypeService.delAndUpdate(id);
 			return new PageResult(true, "删除成功");
+		} catch (MyException e) {
+			log.error("完成删除试题分类错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
-			log.error("完成删除考试分类错误：", e);
-			return new PageResult(false, "删除失败：" + e.getMessage());
+			log.error("完成删除试题分类错误：", e);
+			return new PageResult(false, "未知异常");
 		}
 	}
 	
 	/**
-	 * 到达移动考试分类页面
+	 * 到达移动试题分类页面
 	 * 
-	 * v1.0 zhanghc 2017-06-28 21:34:41
+	 * v1.0 zhanghc 2016-5-8上午11:00:00
 	 * @return String
 	 */
 	@RequestMapping("/toMove")
@@ -196,32 +212,14 @@ public class ExamTypeController extends BaseController{
 		try {
 			return "exam/examType/examTypeMove";
 		} catch (Exception e) {
-			log.error("到达移动考试分类页面错误", e);
+			log.error("到达移动试题分类页面错误", e);
 			return "exam/examType/examTypeMove";
 		}
 	}
 	
 	/**
-	 * 获取考试分类树
-	 * 
-	 * v1.0 zhanghc 2017-06-28 21:34:41
-	 * @return List<Map<String,Object>>
-	 */
-	@RequestMapping("/moveExamTypeTreeList")
-	@ResponseBody
-	public List<Map<String, Object>> moveExamTypeTreeList() {
-		try {
-			return examTypeService.getTreeList();
-		} catch (Exception e) {
-			log.error("获取考试分类树错误：", e);
-			return new ArrayList<Map<String,Object>>();
-		}
-	}
-	
-	/**
-	 * 移动考试分类
-	 * 
-	 * v1.0 zhanghc 2017-06-28 21:34:41
+	 * 移动试题分类
+	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * @param sourceId
 	 * @param targetId
 	 * @return PageResult
@@ -232,9 +230,12 @@ public class ExamTypeController extends BaseController{
 		try {
 			examTypeService.doMove(sourceId, targetId);
 			return new PageResult(true, "移动成功");
+		} catch (MyException e) {
+			log.error("完成移动试题分类错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
-			log.error("移动考试分类错误：", e);
-			return new PageResult(false, "移动失败：" + e.getMessage());
+			log.error("完成移动试题分类错误：", e);
+			return new PageResult(false, "未知异常");
 		}
 	}
 	
@@ -247,241 +248,92 @@ public class ExamTypeController extends BaseController{
 	@RequestMapping("/toAuth")
 	public String toAuth(Model model, Integer id) {
 		try {
-			model.addAttribute("id", id);
-			return "exam/examType/examTypeAuthList";
+			ExamType examType = examTypeService.getEntity(id);
+			model.addAttribute("examType", examType);
+			return "exam/examType/examTypeAuth";
 		} catch (Exception e) {
 			log.error("到达权限列表页面错误：", e);
-			return "exam/examType/examTypeAuthList";
-		}
-	}
-	
-	/**
-	 * 获取组织机构树
-	 * 
-	 * v1.0 zhanghc 2017-05-07 14:56:29
-	 * @return List<Map<String,Object>>
-	 */
-	@RequestMapping("/authUserOrgTreeList")
-	@ResponseBody
-	public List<Map<String, Object>> authUserOrgTreeList() {
-		try {
-			return examTypeService.getOrgTreeList();
-		} catch (Exception e) {
-			log.error("获取组织机构树错误：", e);
-			return new ArrayList<Map<String,Object>>();
+			return "exam/examType/examTypeAuth";
 		}
 	}
 	
 	/**
 	 * 权限用户列表 
 	 * 
-	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param pageIn
 	 * @return PageOut
 	 */
 	@RequestMapping("/authUserList")
 	@ResponseBody
-	public PageOut authUserList(PageIn pageIn) {
+	public PageResult authUserList(PageIn pageIn) {
 		try {
-			return examTypeService.getAuthUserListpage(pageIn);
+			return new PageResultEx(true, "查询成功", examTypeService.getAuthUserListpage(pageIn));
 		} catch (Exception e) {
 			log.error("权限用户列表错误：", e);
-			return new PageOut();
+			return new PageResult(false, "查询失败");
 		}
 	}
 	
 	/**
-	 * 到达添加权限用户列表页面
-	 * 
-	 * v1.0 zhanghc 2017年6月19日上午7:37:14
-	 * @param id
-	 * @param model
-	 * @return String
-	 */
-	@RequestMapping("/toAuthUserAddList")
-	public String toAuthUserAddList(Model model, Integer id) {
-		try {
-			model.addAttribute("id", id);
-			return "exam/examType/examTypeAuthUserAddList";
-		} catch (Exception e) {
-			log.error("到达添加权限用户列表页面错误：", e);
-			return "exam/examType/examTypeAuthUserAddList";
-		}
-	}
-	
-	/**
-	 * 权限用户添加列表 
+	 * 权限岗位列表 
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param pageIn
 	 * @return PageOut
 	 */
-	@RequestMapping("/authUserAddList")
+	@RequestMapping("/authPostList")
 	@ResponseBody
-	public PageOut authUserAddList(PageIn pageIn) {
+	public PageResult authPostList(PageIn pageIn) {
 		try {
-			return examTypeService.getAuthUserAddList(pageIn);
+			return new PageResultEx(true, "查询成功", examTypeService.getAuthPostListpage(pageIn));
 		} catch (Exception e) {
-			log.error("权限用户添加列表错误：", e);
-			return new PageOut();
+			log.error("权限岗位列表错误：", e);
+			return new PageResult(false, "查询失败");
 		}
 	}
 	
 	/**
-	 * 完成添加权限用户
+	 * 权限机构列表 
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
-	 * @param id
-	 * @param userids
-	 * @param syn2Sub
-	 * @return PageResult
+	 * @param pageIn
+	 * @return PageOut
 	 */
-	@RequestMapping("/doAuthUserAdd")
+	@RequestMapping("/authOrgList")
 	@ResponseBody
-	public PageResult doAuthUserAdd(Integer id, Integer[] userIds, boolean syn2Sub) {
+	public PageResult authOrgList(PageIn pageIn) {
 		try {
-			examTypeService.doAuthUserAdd(id, userIds, syn2Sub, getCurUser());
-			return new PageResult(true, "添加成功");
+			return new PageResultEx(true, "查询成功", examTypeService.getAuthOrgListpage(pageIn));
 		} catch (Exception e) {
-			log.error("完成添加权限用户错误：", e);
-			return new PageResult(false, "添加失败：" + e.getMessage());
+			log.error("权限机构列表错误：", e);
+			return new PageResult(false, "查询失败");
 		}
 	}
 	
 	/**
-	 * 完成删除权限用户
+	 * 完成添加权限
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param id
 	 * @param userIds
-	 * @param syn2Sub
-	 * @return PageResult
-	 */
-	@RequestMapping("/doAuthUserDel")
-	@ResponseBody
-	public PageResult doAuthUserDel(Integer id, Integer[] userIds, boolean syn2Sub) {
-		try {
-			examTypeService.doAuthUserDel(id, userIds, syn2Sub, getCurUser());
-			return new PageResult(true, "删除成功");
-		} catch (Exception e) {
-			log.error("完成删除权限用户错误：", e);
-			return new PageResult(false, "删除失败：" + e.getMessage());
-		}
-	}
-	
-	/**
-	 * 完成添加权限机构
-	 * 
-	 * v1.0 zhanghc 2017年6月16日下午5:02:45
-	 * @param id
+	 * @param postIds
 	 * @param orgIds
-	 * @param syn2Sub
+	 * @param syn2Sub true ： 同步授权到子分类
 	 * @return PageResult
 	 */
-	@RequestMapping("/doAuthOrgUpdate")
+	@RequestMapping("/doAuth")
 	@ResponseBody
-	public PageResult doAuthOrgUpdate(Integer id, Integer[] orgIds, boolean syn2Sub) {
+	public PageResult doAuth(Integer id, Integer[] userIds, Integer[] postIds, Integer[] orgIds, boolean syn2Sub) {
 		try {
-			examTypeService.doAuthOrgUpdate(id, orgIds, syn2Sub, getCurUser());
+			examTypeService.doAuth(id, userIds, postIds, orgIds, syn2Sub);
 			return new PageResult(true, "添加成功");
+		} catch (MyException e) {
+			log.error("完成添加权限用户错误：{}", e.getMessage());
+			return new PageResult(false, e.getMessage());
 		} catch (Exception e) {
-			log.error("完成添加权限机构错误：", e);
-			return new PageResult(false, "添加成功：" + e.getMessage());
-		}
-	}
-	
-	/**
-	 * 获取组织机构树
-	 * 
-	 * v1.0 zhanghc 2018年5月31日下午10:07:39
-	 * @return List<Map<String,Object>>
-	 */
-	@RequestMapping("/authOrgOrgTreeList")
-	@ResponseBody
-	public List<Map<String, Object>> authOrgOrgTreeList(Integer id) {
-		try {
-			List<Map<String, Object>> orgTreeList = examTypeService.getOrgTreeList();
-			ExamType examType = examTypeService.getEntity(id);
-			if(examType == null){
-				return orgTreeList;
-			}
-			
-			String orgIds = examType.getOrgIds();
-			if(!ValidateUtil.isValid(orgIds)){
-				return orgTreeList;
-			}
-			
-			for(Map<String, Object> map : orgTreeList){
-				String orgId = map.get("ID").toString();
-				if(orgIds.contains("," + orgId + ",")){
-					map.put("CHECKED", true);
-				}
-			}
-			return orgTreeList;
-		} catch (Exception e) {
-			log.error("获取组织机构树错误：", e);
-			return new ArrayList<Map<String,Object>>();
-		}
-	}
-	
-	/**
-	 * 获取机构岗位树
-	 * 
-	 * v1.0 zhanghc 2018年5月31日下午10:07:39
-	 * @return List<Map<String,Object>>
-	 */
-	@RequestMapping("/authPostOrgTreeList")
-	@ResponseBody
-	public List<Map<String, Object>> authPostOrgTreeList(Integer id) {
-		try {
-			List<Map<String, Object>> orgPostTree = examTypeService.getOrgPostTreeList();
-			ExamType examTypeAuth = examTypeService.getEntity(id);
-			if(examTypeAuth == null){
-				return orgPostTree;
-			}
-			
-			String postIds = examTypeAuth.getPostIds();
-			if(!ValidateUtil.isValid(postIds)){
-				return orgPostTree;
-			}
-			
-			for(Map<String, Object> map : orgPostTree){
-				String type = map.get("TYPE").toString();
-				if(!"POST".equals(type)){
-					continue;
-				}
-				
-				String postId = map.get("ID").toString();
-				if(postIds.contains("," + postId + ",")){
-					map.put("CHECKED", true);
-				}
-			}
-			
-			return orgPostTree;
-		} catch (Exception e) {
-			log.error("获取机构岗位树错误：", e);
-			return new ArrayList<Map<String,Object>>();
-		}
-	}
-	
-	/**
-	 * 完成添加权限岗位
-	 * 
-	 * v1.0 zhanghc 2017年6月16日下午5:02:45
-	 * @param id
-	 * @param orgIds
-	 * @param syn2Sub
-	 * @return PageResult
-	 */
-	@RequestMapping("/doAuthPostUpdate")
-	@ResponseBody
-	public PageResult doAuthPostUpdate(Integer id, Integer[] postIds, boolean syn2Sub) {
-		try {
-			examTypeService.doAuthPostUpdate(id, postIds, syn2Sub, getCurUser());
-			return new PageResult(true, "添加成功");
-		} catch (Exception e) {
-			log.error("完成添加权限岗位错误：", e);
-			return new PageResult(false, "添加成功：" + e.getMessage());
+			log.error("完成添加权限用户错误：", e);
+			return new PageResult(false, "未知异常！");
 		}
 	}
 }

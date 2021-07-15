@@ -1,4 +1,5 @@
 <%@ page language="java" pageEncoding="utf-8"%>
-<div class="easyui-panel" style="height: 100%;">
-	<ul id="paperTypeMoveTree"></ul>
+<ul id="paperTypeMoveTree" class="ztree" style="overflow: auto;"></ul>
+<div class="layui-form-item layui-hide">
+	<input type="button" lay-submit lay-filter="paperTypeMoveBtn">
 </div>

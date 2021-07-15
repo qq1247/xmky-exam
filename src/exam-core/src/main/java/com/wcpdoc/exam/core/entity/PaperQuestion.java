@@ -47,10 +47,10 @@ public class PaperQuestion {
 	private Integer type;
 	@Column(name = "SCORE")
 	private BigDecimal score;
+	@Column(name = "SCORE_OPTIONS")
+	private String scoreOptions;
 	@Column(name = "NO")
 	private Integer no;
-	@Column(name = "OPTIONS")
-	private String options;
 
 	public Integer getId() {
 		return id;
@@ -124,10 +124,12 @@ public class PaperQuestion {
 		this.questionId = questionId;
 	}
 
+	/** 1：章节；2：固定试题；3：随机试题 */
 	public Integer getType() {
 		return type;
 	}
 
+	/** 1：章节；2：固定试题；3：随机试题 */
 	public void setType(Integer type) {
 		this.type = type;
 	}
@@ -148,11 +150,11 @@ public class PaperQuestion {
 		this.score = score;
 	}
 
-	public String getOptions() {
-		return options;
+	public String getScoreOptions() {
+		return scoreOptions;
 	}
 
-	public void setOptions(String options) {
-		this.options = options;
+	public void setScoreOptions(String scoreOptions) {
+		this.scoreOptions = scoreOptions;
 	}
 }

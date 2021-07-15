@@ -4,14 +4,14 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
-import com.wcpdoc.exam.core.dao.impl.BaseDaoImpl;
+import com.wcpdoc.exam.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.HibernateUtil;
 import com.wcpdoc.exam.core.util.SqlUtil;
-import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.util.SqlUtil.Order;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.file.dao.FileDao;
 import com.wcpdoc.exam.file.entity.File;
 
@@ -21,7 +21,7 @@ import com.wcpdoc.exam.file.entity.File;
  * v1.0 zhanghc 2016-11-16下午10:13:48
  */
 @Repository
-public class FileDaoImpl extends BaseDaoImpl<File> implements FileDao {
+public class FileDaoImpl extends RBaseDaoImpl<File> implements FileDao {
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
@@ -31,7 +31,7 @@ public class FileDaoImpl extends BaseDaoImpl<File> implements FileDao {
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "FILE.NAME LIKE ?", "%" + pageIn.getTwo() + "%");
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getThree()), "FILE.EXT_NAME LIKE ?", "%" + pageIn.getThree() + "%");
-		sqlUtil.addWhere("FILE.STATE = ?", 1);
+		sqlUtil.addWhere("FILE.STATE = 1");
 		sqlUtil.addOrder("FILE.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getRows(), "UPDATE_TIME", DateUtil.FORMAT_DATE_TIME);
@@ -41,6 +41,6 @@ public class FileDaoImpl extends BaseDaoImpl<File> implements FileDao {
 	@Override
 	public List<File> getDelList() {
 		String sql = "SELECT * FROM SYS_FILE WHERE STATE = 0";
-		return getList(sql, File.class);
+		return getList(sql);
 	}
 }

@@ -7,97 +7,113 @@
 		<%@include file="/script/myJs/common.jspf"%>
 	</head>
 	<body>
-		<div class="easyui-layout" data-options="fit:true">
-			<div data-options="region:'center',border:false">
+		<div class="layui-fluid">
+			<div class="layui-card">
 				<%-- 在线用户查询条件 --%>
-				<div id="onlineUserToolbar" style="padding:0 30px;">
-					<div class="conditions">
-						<form id="onlineUserQueryForm">
-							<span class="con-span">登陆名称： </span>
-							<input name="two" class="easyui-textbox" style="width:166px;height:35px;line-height:35px;">
-							<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-search" data-options="selected:true" onclick="onlineUserQuery();">查询</a>
-							<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-clear" onclick="onlineUserReset();">重置</a>
-						</form>
+				<form id="onlineUserQueryForm" class="layui-form layui-card-header layuiadmin-card-header-auto">
+					<div class="layui-form-item">
+						<div class="layui-inline">
+							<input type="text" name="two" placeholder="请输入登陆名称" class="layui-input">
+						</div>
+						<div class="layui-inline">
+							<button type="button" class="layui-btn layuiadmin-btn-useradmin" onclick="onlineUserQuery();">
+								<i class="layui-icon layuiadmin-button-btn"></i>查询
+							</button>
+							<button type="button" class="layui-btn layui-btn-primary layuiadmin-btn-useradmin" onclick="onlineUserReset();">
+								<i class="layui-icon layuiadmin-button-btn"></i>重置
+							</button>
+						</div>
 					</div>
-					<div class="opt-buttons">
-						<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" data-options="selected:true" onclick="doOnlineUserDelForBtn();">强制退出</a>
+				</form>
+				<div class="layui-card-body">
+					<div style="padding-bottom: 10px;">
 					</div>
+					<script type="text/html" id="onlineUserToolbar">
+						<my:auth url="onlineUser/doDel"><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="onlineUserDel"><i class="layui-icon layui-icon-delete"></i>强制退出</a></my:auth>
+					</script>
+					<%-- 在线用户数据表格 --%>
+					<table id="onlineUserTable" lay-filter="onlineUserTable"></table>
 				</div>
-				<%-- 在线用户数据表格 --%>
-				<table id="onlineUserGrid">
-				</table>
 			</div>
 		</div>
 	</body>
+	<%@include file="/script/myJs/tail.jspf"%>
 	<script type="text/javascript">
 		//定义变量
-		var onlineUserGrid = $("#onlineUserGrid"); //在线用户表格对象
-		var onlineUserQueryForm = $("#onlineUserQueryForm"); //用户查询对象
+		var onlineUserQueryForm = $("#onlineUserQueryForm"); //在线用户查询对象
 		
 		//页面加载完毕，执行如下方法：
 		$(function() {
-			initOnlineUserGrid();
+			initOnlineUserTable();
 		});
-		
+	
 		//初始化在线用户表格
-		function initOnlineUserGrid() {
-			onlineUserGrid.datagrid( {
+		function initOnlineUserTable() {
+			layui.table.render({
+				elem : "#onlineUserTable",
 				url : "onlineUser/list",
-				toolbar : "#onlineUserToolbar",
-				columns : [[ 
-						{field : "ID", title : "", checkbox : true}, 
-						{field : "SESSIONID", title : "SESSIONID", width : 80, align : "center"}, 
-						{field : "LOGINNAME", title : "登录名称", width : 80, align : "center"}
-						]]
+				cols : [[ 
+						{field : "SESSIONID", title : "SESSIONID", align : "center"}, 
+						{field : "LOGINNAME", title : "登录名称", align : "center"},
+						{fixed : "right", title : "操作 ", toolbar : "#onlineUserToolbar", align : "center"}
+						]],
+				page : true,
+				height : "full-180",
+				method : "post",
+				defaultToolbar : [],
+				parseData : function(onlineUser) {
+					return {
+						"code" : onlineUser.succ,
+						"msg" : onlineUser.msg,
+						"count" : onlineUser.data.total,
+						"data" : onlineUser.data.rows
+					};
+				},
+				request : {
+					pageName: "curPage",
+					limitName: "pageSize"
+				}, 
+				response : {
+					statusCode : true
+				}
+			});
+			layui.table.on("tool(onlineUserTable)", function(obj) {
+				var data = obj.data;
+				if (obj.event === "onlineUserDel") {
+					doOnlineUserDel(obj.data.ID);
+				}
 			});
 		}
-
+		
 		//在线用户查询
 		function onlineUserQuery() {
-			onlineUserGrid.datagrid("uncheckAll");
-			onlineUserGrid.datagrid("load", $.fn.my.serializeObj(onlineUserQueryForm));
+			layui.table.reload("onlineUserTable", {"where" : $.fn.my.serializeObj(onlineUserQueryForm)});
 		}
 	
 		//在线用户重置
 		function onlineUserReset() {
-			onlineUserQueryForm.form("reset");
+			onlineUserQueryForm[0].reset();
 			onlineUserQuery();
 		}
-		
-		//完成强制退出在线用户
-		function doOnlineUserDelete(params) {
-			$.messager.confirm("确认消息", "确定要强制退出？", function(ok){
-				if (!ok){
-					return;
-				}
 
-				$.messager.progress();
+		//完成强制退出在线用户
+		function doOnlineUserDel(id) {
+			layer.confirm("确定要强制退出？", function(index) {
 				$.ajax({
 					url : "onlineUser/doDel",
-					data : params,
-					success : function(obj){
-						$.messager.progress("close");
+					data : {id : id},
+					success : function(obj) {
+						onlineUserQuery();
 						
-						onlineUserGrid.datagrid("load", $.fn.my.serializeObj(onlineUserQueryForm));
-						if(!obj.succ){
-							parent.$.messager.alert("提示消息", obj.msg, "info");
+						if (!obj.succ) {
+							layer.alert(obj.msg, {"title" : "提示消息"});
+							return;
 						}
+						
+						layer.close(index);
 					}
 				});
 			});
-		}
-		
-		//完成强制退出在线用户
-		function doOnlineUserDelForBtn() {
-			//校验数据有效性
-			var onlineUserGridRows = onlineUserGrid.datagrid("getChecked");
-			if(onlineUserGridRows.length == 0){
-				parent.$.messager.alert("提示消息", "请选择一行或多行数据！", "info");
-				return;
-			}
-
-			//强制退出
-			doOnlineUserDelete($.fn.my.serializeField(onlineUserGridRows));
 		}
 	</script>
 </html>

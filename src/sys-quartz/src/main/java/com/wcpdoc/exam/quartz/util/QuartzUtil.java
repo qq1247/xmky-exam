@@ -42,7 +42,11 @@ public class QuartzUtil {
 			scheduler.start();
 		} catch (SchedulerException e) {
 			log.error("获取定时器异常：", e);
-			throw new QuartzException("获取定时器异常");
+			try {
+				throw new QuartzException("获取定时器异常");
+			} catch (QuartzException e1) {
+				e1.printStackTrace();
+			}
 		}
 	}
 
@@ -55,8 +59,9 @@ public class QuartzUtil {
 	 * @param jobId
 	 * @param cronExp
 	 * void
+	 * @throws QuartzException 
 	 */
-	public static void addJob(Class<? extends Job> jobClass, Integer jobId, String cronExp) {
+	public static void addJob(Class<? extends Job> jobClass, Integer jobId, String cronExp) throws QuartzException {
 		try {
 			JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(getJobKey(jobId)).build();
 
@@ -83,8 +88,9 @@ public class QuartzUtil {
 	 * @param jobId
 	 * @param cronExp
 	 * void
+	 * @throws QuartzException 
 	 */
-	public static void updateJob(Class<? extends Job> jobClass, Integer jobId, String cronExp) {
+	public static void updateJob(Class<? extends Job> jobClass, Integer jobId, String cronExp) throws QuartzException {
 		deleteJob(jobId);
 		addJob(jobClass, jobId, cronExp);
 	}
@@ -96,8 +102,9 @@ public class QuartzUtil {
 	 * 
 	 * @param jobId
 	 * void
+	 * @throws QuartzException 
 	 */
-	public static void executeOnceJob(Integer jobId) {
+	public static void executeOnceJob(Integer jobId) throws QuartzException {
 		try {
 			scheduler.triggerJob(getJobKey(jobId));
 		} catch (SchedulerException e) {
@@ -116,8 +123,9 @@ public class QuartzUtil {
 	 * 
 	 * @param jobId
 	 * void
+	 * @throws QuartzException 
 	 */
-	public static void pauseJob(Integer jobId) {
+	public static void pauseJob(Integer jobId) throws QuartzException {
 		try {
 			scheduler.pauseJob(getJobKey(jobId));
 		} catch (SchedulerException e) {
@@ -136,8 +144,9 @@ public class QuartzUtil {
 	 * 
 	 * @param jobId
 	 * void
+	 * @throws QuartzException 
 	 */
-	public static void resumeJob(Integer jobId) {
+	public static void resumeJob(Integer jobId) throws QuartzException {
 		try {
 			scheduler.resumeJob(getJobKey(jobId));
 		} catch (SchedulerException e) {
@@ -156,8 +165,9 @@ public class QuartzUtil {
 	 * 
 	 * @param jobId
 	 * void
+	 * @throws QuartzException 
 	 */
-	public static void deleteJob(Integer jobId) {
+	public static void deleteJob(Integer jobId) throws QuartzException {
 		try {
 			scheduler.deleteJob(getJobKey(jobId));
 		} catch (SchedulerException e) {
@@ -190,8 +200,9 @@ public class QuartzUtil {
 	 * @param cronExp
 	 * @param num
 	 * @return List<Date>
+	 * @throws QuartzException 
 	 */
-	public static List<Date> getRecentTriggerTime(String cronExp, int num) {
+	public static List<Date> getRecentTriggerTime(String cronExp, int num) throws QuartzException {
 		CronTriggerImpl cronTrigger = new CronTriggerImpl();
 		try {
 			cronTrigger.setCronExpression(cronExp);
@@ -210,8 +221,9 @@ public class QuartzUtil {
 	 * 
 	 * @param jobId
 	 * @return Trigger
+	 * @throws QuartzException 
 	 */
-	public static Trigger getTrigger(Integer jobId) {
+	public static Trigger getTrigger(Integer jobId) throws QuartzException {
 		try {
 			return scheduler.getTrigger(getTriggerKey(jobId));
 		} catch (SchedulerException e) {
@@ -259,8 +271,9 @@ public class QuartzUtil {
 	 * 
 	 * @param scheduler
 	 * void
+	 * @throws QuartzException 
 	 */
-	public static void setScheduler(Scheduler scheduler) {
+	public static void setScheduler(Scheduler scheduler) throws QuartzException {
 		if (scheduler.equals(QuartzUtil.scheduler)) {
 			return;
 		}

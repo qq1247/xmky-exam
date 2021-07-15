@@ -2,7 +2,7 @@ package com.wcpdoc.exam.file.dao;
 
 import java.util.List;
 
-import com.wcpdoc.exam.core.dao.BaseDao;
+import com.wcpdoc.exam.core.dao.RBaseDao;
 import com.wcpdoc.exam.file.entity.File;
 
 /**
@@ -10,7 +10,7 @@ import com.wcpdoc.exam.file.entity.File;
  * 
  * v1.0 zhanghc 2016-11-16下午10:13:48
  */
-public interface FileDao extends BaseDao<File> {
+public interface FileDao extends RBaseDao<File> {
 
 	/**
 	 * 获取已删除附件

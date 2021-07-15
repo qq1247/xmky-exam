@@ -24,23 +24,5 @@
 			<artifactId>sys-cache</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- 集成系统日志 -->
-		<dependency>
-			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>sys-log</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<!-- 集成系统附件 -->
-		<dependency>
-			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>sys-file</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<!-- 集成系统定时任务 -->
-		<dependency>
-			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>sys-quartz</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 	</dependencies>
 </project>

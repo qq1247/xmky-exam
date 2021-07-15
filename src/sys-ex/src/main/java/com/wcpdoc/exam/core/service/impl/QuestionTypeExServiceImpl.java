@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionType;
+import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeExService;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
  * 试题分类扩展服务层实现
@@ -25,8 +27,8 @@ public class QuestionTypeExServiceImpl implements QuestionTypeExService {
 	@Override
 	public void delAndUpdate(QuestionType questionType) {
 		List<Question> questionList = questionService.getList(questionType.getId());
-		for (Question question : questionList) {
-			question.setQuestionTypeId(1);
+		if (ValidateUtil.isValid(questionList)) {
+			throw new MyException("该试题分类下有试题，不允许删除！");
 		}
 	}
 }
