@@ -277,7 +277,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	public void questionAdd(Integer chapterId, Integer[] questionIds) {
 		// 校验数据有效性
 		if (chapterId == null) {
-			throw new MyException("无法获取参数：chapterId");
+			throw new MyException("请拖到到合适的位置！");//无法获取参数：chapterId
 		}
 		if (!ValidateUtil.isValid(questionIds)) {
 			throw new MyException("无法获取参数：questionIds");

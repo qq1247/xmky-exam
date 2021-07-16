@@ -137,6 +137,12 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		} else if (question.getType() == 2) {
 			question.setAnswer(StringUtil.join(answers));
 		} else if (question.getType() == 3) {
+			for(String answersString : answers){
+				if(answersString == null || answersString.trim().equals("")){
+					throw new MyException("填空不能为空！");
+				}
+			}
+			
 			question.setAnswer(StringUtil.join(answers, "\n"));
 		}
 		question.setUpdateTime(new Date());
