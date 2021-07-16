@@ -4,7 +4,7 @@
       <!-- title -->
       <div class="title ellipsis">{{ data.name || data.examName }}</div>
       <!-- 创建者 -->
-      <div class="content-info ellipsis">
+      <div class="content-info ellipsis" v-if="parntClassify.includes(name)">
         <span>创建者：{{ data.createUserName || data.userName }}</span>
       </div>
       <!-- 权限人员展示 -->
@@ -42,7 +42,7 @@
       <!-- 考试列表 -->
       <template v-if="name == 'examList'">
         <div class="content-info ellipsis">
-          <span>发布人：{{ data.userName }}</span>
+          <span>发布人：{{ data.state == 1 ? data.userName : '***' }}</span>
         </div>
         <!-- <div class="content-info">
           <span class="space"
@@ -62,6 +62,9 @@
       </template>
       <!-- 我的考试列表 -->
       <template v-if="name == 'myExamList'">
+        <div class="content-info ellipsis">
+          <span>创建者：{{ data.updateUserName }}</span>
+        </div>
         <div class="content-info ellipsis">
           <span>{{ data.examStartTime }}</span>
         </div>
