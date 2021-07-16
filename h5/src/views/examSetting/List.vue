@@ -12,7 +12,7 @@
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query()" icon="el-icon-search" type="primary"
+        <el-button @click="query" icon="el-icon-search" type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -324,9 +324,6 @@ export default {
   },
   data() {
     const validateExamTime = (rule, value, callback) => {
-      console.log('====================================');
-      console.log(value);
-      console.log('====================================');
       if (value.length == 0) {
         return callback(new Error('请选择考试时间'))
       }
@@ -431,10 +428,10 @@ export default {
   },
   methods: {
     // 查询
-    async query(curPage = 1) {
+    async query() {
       const examList = await this.$https.examListPage({
         examTypeId: this.queryForm.examTypeId,
-        curPage,
+        curPage: this.curPage,
         pageSize: this.pageSize,
       })
       this.examList = examList.data.list
@@ -500,18 +497,20 @@ export default {
               .catch((err) => {})
           : await this.$https.examAdd(params).catch((err) => {})
 
-        res?.code === 200
-          ? (this.$tools.message(
-              !this.examForm.edit ? '添加成功！' : '修改成功！'
-            ),
-            (this.examForm.show = false),
-            this.examForm.edit
-              ? this.pageChange(this.curPage)
-              : this.pageChange())
-          : this.$tools.message(
-              !this.examForm.edit ? '添加失败！' : '修改失败！',
-              'error'
-            )
+        if (res?.code == 200) {
+          this.examForm.show = false
+          this.$tools.message(!this.examForm.edit ? '添加成功！' : '修改成功！')
+          if (this.examForm.edit) {
+            this.pageChange()
+          } else {
+            this.pageChange(1)
+          }
+        } else {
+          this.$tools.message(
+            !this.examForm.edit ? '添加失败！' : '修改失败！',
+            'error'
+          )
+        }
       })
     },
     // 编辑分类
@@ -550,9 +549,19 @@ export default {
       })
         .then(async () => {
           const res = await this.$https.examDel({ id }).catch((err) => {})
-          res?.code == 200
-            ? (this.$tools.message('删除成功！'), this.query())
-            : this.$tools.message('删除失败！', 'error')
+          if (res?.code == 200) {
+            this.total -= 1
+            if (this.total <= this.pageSize) {
+              this.pageChange(1)
+              return
+            }
+            this.$tools.message('删除成功！')
+            this.total % this.pageSize == 0 && this.total != this.pageSize
+              ? ((this.curPage -= 1), this.pageChange(this.curPage))
+              : this.pageChange(this.curPage)
+          } else {
+            this.$tools.message(res.msg || '删除失败！', 'error')
+          }
         })
         .catch(() => {})
     },
@@ -750,7 +759,7 @@ export default {
         res?.code == 200
           ? (this.$tools.message('设置成功！'),
             (this.examForm.readShow = false),
-            this.pageChange(this.curPage))
+            this.pageChange())
           : this.$tools.message('设置失败！', 'error')
       })
     },
@@ -770,13 +779,13 @@ export default {
       res?.code == 200
         ? (this.$tools.message('设置成功！'),
           (this.examForm.userShow = false),
-          this.pageChange(this.curPage))
+          this.pageChange())
         : this.$tools.message('设置失败！', 'error')
     },
     // 切换分页
-    pageChange(val = 1) {
-      this.curPage = val
-      this.query(val)
+    pageChange(val) {
+      val && (this.curPage = val)
+      this.query()
     },
     // 清空还原数据
     resetData(name) {

@@ -12,7 +12,7 @@
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query()" icon="el-icon-search" type="primary"
+        <el-button @click="query" icon="el-icon-search" type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -200,10 +200,10 @@ export default {
   },
   methods: {
     // 查询分类数据
-    async query(curPage = 1) {
+    async query() {
       const typeList = await this.$https.questionTypeListPage({
         name: this.queryForm.queryName,
-        curPage,
+        curPage: this.curPage,
         pageSize: this.pageSize,
       })
       this.typeList = typeList.data.list
@@ -233,9 +233,9 @@ export default {
           this.examForm.show = false
           this.$tools.message(!this.examForm.edit ? '添加成功！' : '修改成功！')
           if (this.examForm.edit) {
-            this.pageChange(this.curPage)
-          } else {
             this.pageChange()
+          } else {
+            this.pageChange(1)
           }
         } else {
           this.$tools.message(
@@ -263,9 +263,19 @@ export default {
           const res = await this.$https
             .questionTypeDel({ id })
             .catch((err) => {})
-          res?.code == 200
-            ? (this.$tools.message('删除成功！'), this.pageChange())
-            : this.$tools.message('删除成功！', 'error')
+          if (res?.code == 200) {
+            this.total -= 1
+            if (this.total <= this.pageSize) {
+              this.pageChange(1)
+              return
+            }
+            this.$tools.message('删除成功！')
+            this.total % this.pageSize == 0 && this.total != this.pageSize
+              ? ((this.curPage -= 1), this.pageChange(this.curPage))
+              : this.pageChange(this.curPage)
+          } else {
+            this.$tools.message(res.msg || '删除失败！', 'error')
+          }
         })
         .catch(() => {})
     },
@@ -343,9 +353,9 @@ export default {
       })
     },
     // 分页切换
-    pageChange(val = 1) {
-      this.curPage = val
-      this.query(val)
+    pageChange(val) {
+      val && (this.curPage = val)
+      this.query()
     },
     // 清空还原数据
     resetData(name) {

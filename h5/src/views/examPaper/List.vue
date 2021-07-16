@@ -10,8 +10,7 @@
         ></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="query()" icon="el-icon-search"
-type="primary"
+        <el-button @click="query" icon="el-icon-search" type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -319,10 +318,10 @@ export default {
   },
   methods: {
     // 查询
-    async query(curPage = 1) {
+    async query() {
       const paperList = await this.$https.paperListPage({
         paperTypeId: this.queryForm.paperTypeId,
-        curPage,
+        curPage: this.curPage,
         pageSize: this.pageSize,
       })
       this.paperList = paperList.data.list
@@ -354,16 +353,23 @@ export default {
         const res = this.paperForm.edit
           ? await this.$https.paperEdit({ ...params, id: this.paperForm.id })
           : await this.$https.paperAdd(params)
-        res?.code === 200
-          ? (this.$tools.message(
-              !this.paperForm.edit ? '添加成功！' : '修改成功！'
-            ),
-            (this.paperForm.show = false),
-            this.pageChange())
-          : this.$tools.message(
-              !this.paperForm.edit ? '添加失败！' : '修改失败！',
-              'error'
-            )
+
+        if (res?.code == 200) {
+          this.paperForm.show = false
+          this.$tools.message(
+            !this.paperForm.edit ? '添加成功！' : '修改成功！'
+          )
+          if (this.paperForm.edit) {
+            this.pageChange()
+          } else {
+            this.pageChange(1)
+          }
+        } else {
+          this.$tools.message(
+            !this.paperForm.edit ? '添加失败！' : '修改失败！',
+            'error'
+          )
+        }
       })
     },
     // 编辑分类
@@ -397,9 +403,19 @@ export default {
       })
         .then(async () => {
           const res = await this.$https.paperDel({ id }).catch((err) => {})
-          res?.code == 200
-            ? (this.$tools.message('删除成功！'), this.query())
-            : this.$tools.message('删除成功！', 'error')
+          if (res?.code == 200) {
+            this.total -= 1
+            if (this.total <= this.pageSize) {
+              this.pageChange(1)
+              return
+            }
+            this.$tools.message('删除成功！')
+            this.total % this.pageSize == 0 && this.total != this.pageSize
+              ? ((this.curPage -= 1), this.pageChange(this.curPage))
+              : this.pageChange(this.curPage)
+          } else {
+            this.$tools.message(res.msg || '删除失败！', 'error')
+          }
         })
         .catch(() => {})
     },
@@ -410,7 +426,7 @@ export default {
           id,
         })
         res?.code == 200
-          ? (this.$tools.message('复制成功！'), this.query())
+          ? (this.$tools.message('复制成功！'), this.pageChange())
           : this.$tools.message('复制失败！', 'error')
       } catch (error) {}
     },
@@ -445,9 +461,9 @@ export default {
         .catch(() => {})
     },
     // 切换分页
-    pageChange(val = 1) {
-      this.curPage = val
-      this.query(val)
+    pageChange(val) {
+      val && (this.curPage = val)
+      this.query()
     },
     // tab切换
     paperNext() {
