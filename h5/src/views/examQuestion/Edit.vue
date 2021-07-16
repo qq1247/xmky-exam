@@ -969,6 +969,7 @@ export default {
           res.data.scoreOptions == null ? [] : res.data.scoreOptions.split(',')
       }
     },
+    // 复制试题
     async copy(id) {
       if (this.queryForm.edit == 'false') {
         this.$tools.message('暂无此项权限！', 'warning')
@@ -983,6 +984,7 @@ export default {
         : (this.list.curPage = this.list.total / this.list.pageSize)
       this.pageChange(this.list.curPage)
     },
+    // 删除试题
     del(id) {
       if (this.queryForm.edit == 'false') {
         this.$tools.message('暂无此项权限！', 'warning')
@@ -994,14 +996,23 @@ export default {
         type: 'warning',
       }).then(async () => {
         const res = await this.$https.questionDel({ id })
-        res?.code == 200
-          ? ((this.list.total -= 1), this.$tools.message('删除成功！'))
-          : this.$tools.message('删除失败！', 'error')
-        this.list.total % this.list.pageSize == 0
-          ? ((this.list.curPage -= 1), this.pageChange(this.list.curPage))
-          : this.pageChange(this.list.curPage)
+        if (res?.code == 200) {
+          this.list.total -= 1
+          if (this.list.total <= this.list.pageSize) {
+            this.pageChange(1)
+            return
+          }
+          this.$tools.message('删除成功！')
+          this.list.total % this.list.pageSize == 0 &&
+          this.list.total != this.list.pageSize
+            ? ((this.list.curPage -= 1), this.pageChange(this.list.curPage))
+            : this.pageChange(this.list.curPage)
+        } else {
+          this.$tools.message(res.msg || '删除失败！', 'error')
+        }
       })
     },
+    // 获取试题模板
     async questionTemplate() {
       const template = await this.$https.questionTemplate({}, 'blob')
       const blob = new Blob([template], { type: 'application/msword' })
