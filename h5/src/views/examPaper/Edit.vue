@@ -17,7 +17,11 @@
     <!-- 内容 -->
     <div class="content">
       <div class="content-left">
-        <el-scrollbar wrap-style="overflow-x:hidden;" style="height: 100%">
+        <el-scrollbar
+          wrap-style="overflow-x:hidden;"
+          style="height: 100%"
+          ref="leftScroll"
+        >
           <div class="left-top">添加章节</div>
           <el-form
             :model="chapterForm"
@@ -30,7 +34,7 @@
             <el-form-item label="题目类型" prop="name">
               <el-input
                 placeholder="请输入章节名称"
-                v-model="chapterForm.name"
+                v-model.trim="chapterForm.name"
               ></el-input>
             </el-form-item>
             <el-form-item label="描述">
@@ -129,6 +133,7 @@
               animation="300"
               @end="sourceEnd"
               @choose="sourceChoose"
+              :disabled="paperQuestion.lenght == 0 ? true : false"
               v-if="paperList.length > 0"
             >
               <transition-group>
@@ -148,8 +153,7 @@
                   <el-tag effect="plain" size="mini" type="danger">
                     {{ item.difficultyName }}
                   </el-tag>
-                  <el-tag effect="plain" size="mini"
-type="warning"
+                  <el-tag effect="plain" size="mini" type="warning"
                     >{{ item.score }}分</el-tag
                   >
                   <el-tag effect="plain" size="mini" type="info">
@@ -216,10 +220,10 @@ type="warning"
                       icon="common common-delete"
                       round
                       size="mini"
-                      >删除章节</el-button
+                      >删除</el-button
                     >
                     <el-button
-                      @click="chapterClear(item.chapter)"
+                      @click="chapterClear(item.chapter, index)"
                       class="btn"
                       icon="common common-clear"
                       round
@@ -352,8 +356,7 @@ type="warning"
                         <el-tag effect="plain" size="mini" type="danger">
                           {{ child.difficultyName }}
                         </el-tag>
-                        <el-tag effect="plain" size="mini"
-type="warning"
+                        <el-tag effect="plain" size="mini" type="warning"
                           >{{ child.score }}分</el-tag
                         >
                         <el-tag effect="plain" size="mini" type="info">
@@ -562,6 +565,7 @@ export default {
       this.chapterForm.id = id
       this.chapterForm.name = name
       this.chapterForm.description = description
+      this.$refs.leftScroll.wrap.scrollTop = 0
       this.chapterForm.edit = true
     },
     // 编辑章节
@@ -596,13 +600,23 @@ export default {
         !this.paperQuestion[index].chapter.show
     },
     // 清空试卷试题
-    async chapterClear({ id }) {
-      const res = await this.$https
-        .paperQuestionClear({
-          chapterId: id,
+    async chapterClear({ id }, index) {
+      if (this.paperQuestion[index].questionList.length == 0) {
+        this.$tools.message('试题已清空，请重新添加试题！', 'warning')
+        return
+      }
+      this.$confirm(`确认清空章节下的所有试题吗？`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      })
+        .then(async () => {
+          const res = await this.$https
+            .paperQuestionClear({ chapterId: id })
+            .catch((err) => {})
+          this.refreshData(res, '清空试题')
         })
-        .catch((err) => {})
-      this.refreshData(res, '清空试题')
+        .catch(() => {})
     },
     // 删除试题
     async del(paperQuestionId) {
@@ -703,6 +717,7 @@ export default {
 .drag-content {
   width: 100%;
   border: 1px solid #d8d8d8;
+  border-radius: 5px;
 }
 
 .drag-active {
@@ -792,6 +807,7 @@ export default {
     .drag-item {
       cursor: move;
       margin-bottom: 10px;
+      border-radius: 5px;
     }
   }
   .chapter {
