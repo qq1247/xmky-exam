@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.Question;
 /**
  * 试题服务层接口
@@ -43,7 +45,7 @@ public interface QuestionService extends BaseService<Question>{
 	 * @param newVer
 	 * void 
 	 */
-	void updateAndUpdate(Question question, String[] answers, String[] options, boolean newVer);
+	void updateAndUpdate(Question question, String[] answers, String[] options); //, boolean newVer
 	
 	/**
 	 * 完成导入试题
@@ -82,4 +84,11 @@ public interface QuestionService extends BaseService<Question>{
 	 * @return List<Map<String, Object>>
 	 */
 	List<Map<String, Object>> accuracy(Integer examId);
+	
+	/**
+	 * 随机列表
+	 * 
+	 * v1.0 chenyun 2021年7月19日下午4:26:38
+	 */
+	PageOut randomListpage(PageIn pageIn);
 }

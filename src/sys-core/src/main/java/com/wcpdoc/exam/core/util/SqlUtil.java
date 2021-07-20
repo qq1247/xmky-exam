@@ -47,9 +47,9 @@ public class SqlUtil {
 	 */
 	public SqlUtil addWhere(String condition) {
 		if (where.length() == 0) {
-			where.append(" where ").append(condition);
+			where.append(" WHERE ").append(condition);
 		} else {
-			where.append(" and ").append(condition);
+			where.append(" AND ").append(condition);
 		}
 		return this;
 	}
@@ -107,13 +107,24 @@ public static void main(String[] args) {
 	 */
 	public SqlUtil addOrder(String property, Order order) {
 		if (this.order.length() == 0) {
-			this.order.append(" order by ").append(property).append(" ").append(order.getValue());
+			this.order.append(" ORDER BY ").append(property).append(" ").append(order.getValue());
 		} else {
 			this.order.append(",  ").append(property).append(" ").append(order.getValue());
 		}
 		return this;
 	}
 
+	/**
+	 * 随机查询
+	 * 
+	 * v1.0 chenyun 2021年7月19日下午5:54:08
+	 * @return SqlUtil
+	 */
+	public SqlUtil addOrderRand() {
+		this.order.append(" ORDER BY RAND() ");
+		return this;
+	}
+	
 	/**
 	 * 添加order排序
 	 * 

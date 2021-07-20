@@ -31,10 +31,11 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT QUESTION.*, QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME, USER.NAME AS UPDATE_USER_NAME "
+		String sql = "SELECT QUESTION.*, QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME, UPDATE_USER.NAME AS UPDATE_USER_NAME, CREATE_USER.NAME AS CREATE_USER_NAME "
 				+ "FROM EXM_QUESTION QUESTION "
 				+ "LEFT JOIN EXM_QUESTION_TYPE QUESTION_TYPE ON QUESTION.QUESTION_TYPE_ID = QUESTION_TYPE.ID "
-				+ "LEFT JOIN SYS_USER USER ON QUESTION.UPDATE_USER_ID = USER.ID ";
+				+ "LEFT JOIN SYS_USER CREATE_USER ON QUESTION.CREATE_USER_ID = CREATE_USER.ID "
+				+ "LEFT JOIN SYS_USER UPDATE_USER ON QUESTION.UPDATE_USER_ID = UPDATE_USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(pageIn.get("questionTypeId", Integer.class) != null && !"1".equals(pageIn.get("questionTypeId", Integer.class)), "QUESTION.QUESTION_TYPE_ID = ?", pageIn.get("questionTypeId", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("id")), "QUESTION.ID = ?", pageIn.get("id", Integer.class))
@@ -42,7 +43,7 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")), "QUESTION.STATE = ?", pageIn.get("state", Integer.class))//0：删除；1：启用；2：禁用
 				.addWhere(ValidateUtil.isValid(pageIn.get("type")), "QUESTION.TYPE = ?", pageIn.get("type", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("difficulty")), "QUESTION.DIFFICULTY = ?", pageIn.get("difficulty"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "QUESTION_TYPE.NAME LIKE ?", "%" + pageIn.get("name") + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.get("questionTypeName")), "QUESTION_TYPE.NAME LIKE ?", "%" + pageIn.get("questionTypeName") + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.get("score")), "QUESTION.SCORE = ?", pageIn.get("score"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("scoreStart")), "QUESTION.SCORE >= ?", pageIn.get("scoreStart"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("scoreEnd")), "QUESTION.SCORE <= ?", pageIn.get("scoreEnd"))
@@ -149,4 +150,26 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 		String sql = "SELECT COUNT(ID) AS TOTAL, SUM( SCORE = QUESTION_SCORE ) AS CORRECT, QUESTION_ID FROM EXM_MY_EXAM_DETAIL WHERE EXAM_ID = ? GROUP BY QUESTION_ID ";
 		return getMapList(sql, new Object[] { examId });
 	}
+
+	@Override
+	public PageOut randomListpage(PageIn pageIn) {
+		String sql = "SELECT QUESTION.*, QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME, UPDATE_USER.NAME AS UPDATE_USER_NAME, CREATE_USER.NAME AS CREATE_USER_NAME "
+				+ " from  EXM_QUESTION AS QUESTION "
+				+ " LEFT JOIN EXM_QUESTION_TYPE QUESTION_TYPE ON QUESTION.QUESTION_TYPE_ID = QUESTION_TYPE.ID "
+				+ " LEFT JOIN SYS_USER CREATE_USER ON QUESTION.CREATE_USER_ID = CREATE_USER.ID "
+				+ " LEFT JOIN SYS_USER UPDATE_USER ON QUESTION.UPDATE_USER_ID = UPDATE_USER.ID ";
+		SqlUtil sqlUtil = new SqlUtil(sql);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("id")), "QUESTION.ID = ?", pageIn.get("id", Integer.class))
+				.addWhere(ValidateUtil.isValid(pageIn.get("title")), "QUESTION.TITLE LIKE ?", "%" + pageIn.get("title") + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.get("type")), "QUESTION.TYPE = ?", pageIn.get("type", Integer.class))
+				.addWhere(ValidateUtil.isValid(pageIn.get("difficulty")), "QUESTION.DIFFICULTY = ?", pageIn.get("difficulty"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("questionTypeName")), "QUESTION_TYPE.NAME LIKE ?", "%" + pageIn.get("questionTypeName") + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.get("score")), "QUESTION.SCORE = ?", pageIn.get("score"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("exPaperId")), "NOT EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.get("exPaperId", Integer.class))
+				.addWhere("QUESTION.STATE != ?", 0)
+				.addOrderRand();
+		PageOut pageOut = getListpage(sqlUtil, pageIn);
+		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), "QUESTION_TYPE", "TYPE", "QUESTION_DIFFICULTY", "DIFFICULTY", "STATE", "STATE");
+		return pageOut;
+}
 }

@@ -33,13 +33,14 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 	
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT PAPER.*, PAPER_TYPE.NAME AS PAPER_TYPE_NAME, USER.NAME AS USER_NAME "
+		String sql = "SELECT PAPER.*, PAPER_TYPE.NAME AS PAPER_TYPE_NAME, UPDATE_USER.NAME AS UPDATE_USER_NAME, CREATE_USER.NAME AS CREATE_USER_NAME "
 				+ "FROM EXM_PAPER PAPER "
 				+ "LEFT JOIN EXM_PAPER_TYPE PAPER_TYPE ON PAPER.PAPER_TYPE_ID = PAPER_TYPE.ID "
-				+ "LEFT JOIN SYS_USER USER ON PAPER.UPDATE_USER_ID = USER.ID ";
+				+ "LEFT JOIN SYS_USER CREATE_USER ON PAPER.CREATE_USER_ID = CREATE_USER.ID "
+				+ "LEFT JOIN SYS_USER UPDATE_USER ON PAPER.UPDATE_USER_ID = UPDATE_USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("paperTypeId")), "PAPER.PAPER_TYPE_ID = ?", pageIn.get("paperTypeId"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("userName")), "USER.NAME LIKE ?", "%" + pageIn.get("userName") + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.get("userName")), "CREATE_USER.NAME LIKE ?", "%" + pageIn.get("userName") + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")), "PAPER.STATE = ?", pageIn.get("state"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("PaperId")), "PAPER.ID = ?", pageIn.get("PaperId"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "PAPER.NAME LIKE ?", "%" + pageIn.get("name") + "%")
