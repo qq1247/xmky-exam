@@ -3,6 +3,8 @@ package com.wcpdoc.exam.core.dao;
 import java.util.List;
 import java.util.Map;
 
+import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionType;
 
@@ -47,4 +49,11 @@ public interface QuestionDao extends BaseDao<Question>{
 	 * @return List<Map<String, Object>>
 	 */
 	List<Map<String, Object>> accuracy(Integer examId);
+	
+	/**
+	 * 随机列表
+	 * 
+	 * v1.0 chenyun 2021年7月19日下午4:26:38
+	 */
+	PageOut randomListpage(PageIn pageIn);
 }

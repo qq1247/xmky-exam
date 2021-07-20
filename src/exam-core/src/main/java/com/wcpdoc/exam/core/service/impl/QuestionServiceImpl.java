@@ -23,6 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.QuestionDao;
+import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionEx;
 import com.wcpdoc.exam.core.entity.QuestionOption;
@@ -145,8 +147,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			
 			question.setAnswer(StringUtil.join(answers, "\n"));
 		}
-		question.setUpdateTime(new Date());
-		question.setUpdateUserId(getCurUser().getId());
+		question.setCreateTime(new Date());
+		question.setCreateUserId(getCurUser().getId());
 		question.setVer(1);// 默认版本为1
 		question.setState(2);// 默认禁用
 		add(question);
@@ -170,7 +172,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void updateAndUpdate(Question question, String[] answers, String[] options, boolean newVer) {
+	public void updateAndUpdate(Question question, String[] answers, String[] options) { //, boolean newVer
 		// 校验数据有效性
 		if (question.getType() == null) {
 			throw new MyException("参数错误：type");
@@ -251,7 +253,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 		
 		Question entity = getEntity(question.getId());
-		if (newVer) {
+		/*if (newVer) {
 			// 删除旧版本
 			Question newQuestion = new Question();
 			BeanUtils.copyProperties(entity, newQuestion);
@@ -290,7 +292,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			// 保存附件
 			saveFile(newQuestion);
 			return;
-		}
+		}*/
 
 		// 修改试题
 		// entity.setState(question.getState());
@@ -422,8 +424,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		for (QuestionEx questionEx : questionExList) {
 			Question question = new Question();
 			BeanUtils.copyProperties(questionEx, question);
-			question.setUpdateTime(new Date());
-			question.setUpdateUserId(getCurUser().getId());
+			question.setCreateTime(new Date());
+			question.setCreateUserId(getCurUser().getId());
 			question.setVer(1);
 			question.setState(2);// 默认禁用
 			question.setQuestionTypeId(questionTypeId);
@@ -481,5 +483,10 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			mapList.put("accuracy", df.format((Double.parseDouble(mapList.remove("CORRECT").toString())/ Double.parseDouble(mapList.get("TOTAL").toString()) * 100)));
 		}
 		return accuracyList;
+	}
+
+	@Override
+	public PageOut randomListpage(PageIn pageIn) {
+		return questionDao.randomListpage(pageIn);
 	}
 }

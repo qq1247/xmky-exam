@@ -100,6 +100,37 @@ public class ApiQuestionController extends BaseController {
 		}
 	}
 	
+	
+	
+	/**
+	 * 随机试题列表 
+	 * 
+	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * @return pageOut
+	 */
+	@RequestMapping("/randomListpage")
+	@ResponseBody
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	public PageResult randomListpage() {
+		try {
+			PageIn pageIn = new PageIn(request);
+			PageOut pageOut = questionService.randomListpage(pageIn);
+			for(Map<String, Object> map : pageOut.getList()){
+				map.put("typeName", DictCache.getDictValue("QUESTION_TYPE", map.get("type").toString()));
+				map.put("difficultyName", DictCache.getDictValue("QUESTION_DIFFICULTY", map.get("difficulty").toString()));
+				
+				if (map.get("type").toString().equals("1") || map.get("type").toString().equals("2")) {
+					List<QuestionOption> optionList = questionOptionService.getList(Integer.valueOf(map.get("id").toString()));
+					map.put("option", optionList);
+				}
+			}
+			return PageResultEx.ok().data(pageOut);
+		} catch (Exception e) {
+			log.error("试题列表错误：", e);
+			return PageResult.err();
+		}
+	}
+	
 	/**
 	 * 添加试题
 	 * 
@@ -135,9 +166,9 @@ public class ApiQuestionController extends BaseController {
 	@RequestMapping("/edit")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult edit(Question question, String[] answers, String[] options, boolean newVer) {
+	public PageResult edit(Question question, String[] answers, String[] options) {  //, boolean newVer
 		try {
-			questionService.updateAndUpdate(question, answers, options, newVer);
+			questionService.updateAndUpdate(question, answers, options); //, newVer
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改试题错误：{}", e.getMessage());
@@ -237,8 +268,8 @@ public class ApiQuestionController extends BaseController {
 			Question question = questionService.getEntity(id);
 			Question entity = new Question();
 			BeanUtils.copyProperties(entity, question);
-			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(getCurUser().getId());
+			entity.setCreateTime(new Date());
+			entity.setCreateUserId(getCurUser().getId());
 			questionService.add(entity);
 			
 			List<QuestionOption> questionOptionList = questionOptionService.getList(question.getId());
@@ -327,8 +358,9 @@ public class ApiQuestionController extends BaseController {
 				throw new MyException("试题已删除！");
 			}
 			if (question.getState() == 1) {
-				question.setState(2);
-			} else if (question.getState() == 2) {
+				throw new MyException("试题已发布！");
+			}
+			if (question.getState() == 2) {
 				question.setState(1);
 			}
 
