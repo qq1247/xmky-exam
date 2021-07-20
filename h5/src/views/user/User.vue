@@ -256,6 +256,7 @@ export default {
           loginName: this.editForm.loginName,
           orgId: this.editForm.orgId,
           phone: this.editForm.phone,
+          roles: this.editForm.roles,
         })
 
         if (res.code != 200) {
