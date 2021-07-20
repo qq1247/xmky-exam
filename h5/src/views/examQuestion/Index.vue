@@ -42,6 +42,7 @@
           @role="role"
           @open="open"
           @detail="goDetail"
+          @move="move"
         ></ListCard>
       </div>
       <!-- 分页 -->
@@ -61,7 +62,7 @@
     <el-dialog
       :visible.sync="examForm.show"
       :show-close="false"
-      width="30%"
+      width="40%"
       title="试题分类"
       :close-on-click-modal="false"
       @close="resetData('examForm')"
@@ -87,17 +88,17 @@
       </div>
     </el-dialog>
 
-    <!-- 编辑读写权限 -->
+    <!-- 编辑使用权限 -->
     <el-dialog
       :visible.sync="roleForm.show"
       :show-close="false"
-      width="33%"
+      width="40%"
       title="权限编辑"
       :close-on-click-modal="false"
       @close="resetData('roleForm')"
     >
       <el-form :model="roleForm" ref="examForm" label-width="100px">
-        <el-form-item label="读取权限">
+        <el-form-item label="使用权限">
           <CustomSelect
             placeholder="请选择授权人员"
             :multiple="true"
@@ -122,7 +123,7 @@
             ></el-option>
           </CustomSelect>
         </el-form-item>
-        <el-form-item label="使用权限">
+        <el-form-item label="编辑权限">
           <CustomSelect
             placeholder="请选择授权人员"
             :multiple="true"
@@ -153,6 +154,42 @@
         <el-button @click="roleForm.show = false">取消</el-button>
       </div>
     </el-dialog>
+    <!-- 移动试题分类 -->
+    <el-dialog
+      :visible.sync="examForm.moveShow"
+      :show-close="false"
+      width="40%"
+      title="移动分类下试题"
+      :close-on-click-modal="false"
+      @close="resetData('examForm')"
+    >
+      <el-form :model="examForm" label-width="100px">
+        <el-form-item label="选择试题分类" prop="questionType">
+          <CustomSelect
+            placeholder="请选择试题分类"
+            :value="examForm.questionType"
+            :total="examForm.total"
+            :showPage="true"
+            :currentPage="examForm.curPage"
+            :pageSize="examForm.pageSize"
+            @change="selectQuestionType"
+            @focus="getQuestionType()"
+            @currentChange="getMoreQuestionType"
+          >
+            <el-option
+              v-for="item in examForm.questionTypes"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
+          </CustomSelect>
+        </el-form-item>
+      </el-form>
+      <div class="dialog-footer" slot="footer">
+        <el-button @click="questionMove" type="primary">移动</el-button>
+        <el-button @click="examForm.moveShow = false">取消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -177,9 +214,18 @@ export default {
         edit: false,
         id: 0,
         examName: '',
+        moveShow: false,
+        pageSize: 5,
+        total: 1,
+        curPage: 1,
+        questionType: '',
+        questionTypes: [],
         rules: {
           examName: [
             { required: true, message: '请输入分类名称', trigger: 'blur' },
+          ],
+          questionType: [
+            { required: true, message: '请选择试题分类', trigger: 'blur' },
           ],
         },
       },
@@ -252,6 +298,10 @@ export default {
       this.examForm.examName = name
       this.examForm.show = true
     },
+    move({ id }) {
+      this.examForm.moveShow = true
+      this.examForm.id = id
+    },
     // 删除分类
     del({ id, name }) {
       this.$confirm(`确认删除【${name}】吗？`, '提示', {
@@ -278,6 +328,25 @@ export default {
           }
         })
         .catch(() => {})
+    },
+    // 获取试题分类
+    async getQuestionType() {
+      const typeList = await this.$https.questionTypeListPage({
+        name: '',
+        curPage: this.examForm.curPage,
+        pageSize: this.examForm.pageSize,
+      })
+      this.examForm.questionTypes = typeList.data.list
+      this.examForm.total = typeList.data.total
+    },
+    // 获取更多试题分类
+    getMoreQuestionType(curPage) {
+      this.examForm.curPage = curPage
+      this.getQuestionType()
+    },
+    // 选择试题分类
+    selectQuestionType(e) {
+      this.examForm.questionType = e
     },
     // 获取用户
     async getUserList(name = '') {
@@ -322,6 +391,20 @@ export default {
       this.roleForm.writeRoleUser = writeUserIds
       await this.getUserList()
       this.roleForm.show = true
+    },
+    // 移动试题分类
+    async questionMove() {
+      const res = await this.$https.questionTypeMove({
+        sourceId: this.examForm.id,
+        targetId: this.examForm.questionType,
+      })
+      if (res?.code == 200) {
+        this.examForm.moveShow = false
+        this.$tools.message('移动成功！')
+        this.pageChange()
+      } else {
+        this.$tools.message('移动失败！', 'error')
+      }
     },
     // 编辑权限
     async editRoleUsers() {

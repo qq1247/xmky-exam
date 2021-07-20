@@ -4,75 +4,90 @@
       <!-- title -->
       <div class="title ellipsis">{{ data.name || data.examName }}</div>
       <!-- 创建者 -->
-      <div class="content-info ellipsis" v-if="parntClassify.includes(name)">
+      <div class="content-info ellipsis" v-if="parentClassify.includes(name)">
         <span>创建者：{{ data.createUserName || data.userName }}</span>
       </div>
       <!-- 权限人员展示 -->
-      <template v-if="parntClassify.includes(name)">
+      <template v-if="parentClassify.includes(name)">
         <div class="content-info ellipsis">
-          <span>读取权限：{{ data.readUserNames.join(',') || '暂无' }}</span>
+          <span>使用权限：{{ data.readUserNames.join(',') || '暂无' }}</span>
         </div>
         <div class="content-info ellipsis">
-          <span>使用权限：{{ data.writeUserNames.join(',') || '暂无' }}</span>
+          <span>编辑权限：{{ data.writeUserNames.join(',') || '暂无' }}</span>
         </div>
       </template>
       <!-- 试卷列表 -->
       <template v-if="name == 'paperList'">
-        <div class="content-info ellipsis">
-          <span>发布人：{{ data.state == 1 ? data.userName : '***' }}</span>
-        </div>
-        <div class="content-info">
-          <span class="space">及格：{{ data.passScore }}</span>
-          <span>满分：{{ data.totalScore }}</span>
-        </div>
-        <div class="content-info">
-          <span class="space"
-            >组卷方式：{{ ['人工组卷', '自动组卷'][data.genType] }}</span
+        <el-row :gutter="20" class="content-info">
+          <el-col :span="12" class="info-left"
+            >创建人：{{ data.createUserName }}</el-col
           >
-          <span
-            >展示方式：{{ ['', '整张', '章节', '单题'][data.showType] }}</span
+          <el-col :span="12" class="info-right"
+            >修改人：{{ data.updateUserName || '***' }}</el-col
           >
-        </div>
-        <div class="content-info">
-          <span style="color: #ff9900">{{
+        </el-row>
+        <el-row :gutter="20" class="content-info">
+          <el-col :span="12" class="info-left"
+            >及格：{{ data.passScore }}</el-col
+          >
+          <el-col :span="12" class="info-right"
+            >满分：{{ data.totalScore }}</el-col
+          >
+        </el-row>
+        <el-row :gutter="20" class="content-info">
+          <el-col :span="12" class="info-left"
+            >组卷方式：{{ ['人工组卷', '自动组卷'][data.genType] }}</el-col
+          >
+          <el-col :span="12" class="info-right"
+            >展示方式：{{ ['', '整张', '章节', '单题'][data.showType] }}</el-col
+          >
+        </el-row>
+        <el-row class="content-info">
+          <el-col class="info-state">{{
             data.state == 1 ? '已发布' : '草稿'
-          }}</span>
-        </div>
+          }}</el-col>
+        </el-row>
       </template>
       <!-- 考试列表 -->
       <template v-if="name == 'examList'">
-        <div class="content-info ellipsis">
-          <span>发布人：{{ data.state == 1 ? data.userName : '***' }}</span>
-        </div>
-        <!-- <div class="content-info">
-          <span class="space"
-            >成绩公开：{{ data.scoreState == 1 ? '是' : '否' }}</span
+        <el-row class="content-info">
+          <el-col>发布人：{{ data.updateUserName || '***' }}</el-col>
+        </el-row>
+        <!-- <el-row :gutter="20" class="content-info">
+          <el-col :span="12" class="info-left"
+            >成绩公开：{{ data.scoreState == 1 ? '是' : '否' }}</el-col
           >
-          <span>排名公开：{{ data.rankState == 1 ? '是' : '否' }}</span>
-        </div> -->
-        <div class="content-info">
-          <span class="space">考试人数：{{ data.userNum }}</span>
-          <span>阅卷人数：{{ data.markNum }}</span>
-        </div>
-        <div class="content-info">
-          <span style="color: #ff9900">{{
+          <el-col :span="12" class="info-right"
+            >排名公开：{{ data.rankState == 1 ? '是' : '否' }}</el-col
+          >
+        </el-row> -->
+        <el-row :gutter="20" class="content-info">
+          <el-col :span="12" class="info-left"
+            >考试人数：{{ data.userNum }}</el-col
+          >
+          <el-col :span="12" class="info-right"
+            >阅卷人数：{{ data.markNum }}</el-col
+          >
+        </el-row>
+        <el-row class="content-info">
+          <el-col class="info-state">{{
             data.state == 1 ? '已发布' : '草稿'
-          }}</span>
-        </div>
+          }}</el-col>
+        </el-row>
       </template>
       <!-- 我的考试列表 -->
       <template v-if="name == 'myExamList'">
-        <div class="content-info ellipsis">
-          <span>创建者：{{ data.updateUserName }}</span>
-        </div>
-        <div class="content-info ellipsis">
-          <span>{{ data.examStartTime }}</span>
-        </div>
-        <div class="content-info">
-          <span class="space"
-            >及格：{{ data.totalScore || 0 }}/{{ data.paperTotalScore }}</span
+        <el-row class="content-info">
+          <el-col>创建者：{{ data.updateUserName }}</el-col>
+        </el-row>
+        <el-row class="content-info">
+          <el-col>{{ data.examStartTime }}</el-col>
+        </el-row>
+        <el-row class="content-info">
+          <el-col
+            >及格：{{ data.totalScore || 0 }}/{{ data.paperTotalScore }}</el-col
           >
-        </div>
+        </el-row>
         <div class="tagGroup">
           <el-tag size="mini" :type="data.state == 3 ? '' : 'danger'">{{
             data.stateName
@@ -95,6 +110,10 @@
             <i class="common common-delete"></i>
           </span>
         </template>
+        <!-- 合并 -->
+        <span v-if="name == 'question'" data-title="移动" @click="move(data)">
+          <i class="common common-move"></i>
+        </span>
         <!-- 发布 -->
         <span
           v-if="childrenClassify.includes(name)"
@@ -105,7 +124,7 @@
         </span>
         <!-- 权限 -->
         <span
-          v-if="parntClassify.includes(name)"
+          v-if="parentClassify.includes(name)"
           data-title="权限"
           @click="role(data)"
         >
@@ -193,7 +212,7 @@ export default {
         exam: '考试列表',
       },
       baseSetting: ['question', 'paper', 'exam', 'paperList', 'examList'],
-      parntClassify: ['question', 'paper', 'exam'],
+      parentClassify: ['question', 'paper', 'exam'],
       childrenClassify: ['paperList', 'examList'],
     }
   },
@@ -211,11 +230,11 @@ export default {
       // 是否已经发布
       const isPublish = data.state == 1
       // 是否是分类
-      const isparntClassify = this.parntClassify.includes(this.name)
+      const isparentClassify = this.parentClassify.includes(this.name)
       // 是否是子分类
       const isChildrenClassify = this.childrenClassify.includes(this.name)
 
-      if (isparntClassify && (isCreateUser || isUpdateUser)) {
+      if (isparentClassify && (isCreateUser || isUpdateUser)) {
         this.$tools.message('暂无此项权限！', 'warning')
         return true
       }
@@ -290,6 +309,10 @@ export default {
     viewExam(data) {
       this.$emit('viewExam', data)
     },
+    // 合并
+    move(data) {
+      this.$emit('move', data)
+    },
   },
 }
 </script>
@@ -331,14 +354,17 @@ export default {
     overflow: hidden;
   }
   .content-info {
-    font-size: 12px;
+    font-size: 13px;
     color: #9199a1;
     margin-top: 10px;
-    width: 100%;
-    text-align: center;
-    padding: 0 20px;
-    .space {
-      margin-right: 20px;
+    .info-left {
+      text-align: right;
+    }
+    .info-right {
+      text-align: left;
+    }
+    .info-state {
+      color: #ff9900;
     }
   }
   .handler {
