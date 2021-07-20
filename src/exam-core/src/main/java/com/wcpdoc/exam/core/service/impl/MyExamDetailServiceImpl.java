@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.core.service.impl;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,12 +28,14 @@ import com.wcpdoc.exam.core.entity.MyExamDetail;
 import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.PaperQuestionEx;
 import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
 import com.wcpdoc.exam.core.service.PaperService;
+import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.util.BigDecimalUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 
@@ -56,6 +59,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	private MyExamService myExamService;
 	@Resource
 	private UserService userService;
+	@Resource
+	private QuestionAnswerService questionAnswerService;
 
 	@Override
 	@Resource(name = "myExamDetailDaoImpl")
@@ -196,14 +201,16 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	 * @param userAnswer void
 	 */
 	private void fillBlankHandle(PaperQuestionEx questionAnswer, Question question, MyExamDetail userAnswer) {
-		String questionAnswerStr = question.getAnswer();
+		List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
+		List<String> questionAnswerStringList = new ArrayList<String>();
 		String userAnswerStr = userAnswer.getAnswer();
 		if (dxxbmg(questionAnswer)) {// 如果勾选了大小写不敏感，则全部大写转换一次在处理
-			questionAnswerStr = questionAnswerStr.toUpperCase();
+			for(QuestionAnswer questionAnswerEntity : questionAnswerList){
+				questionAnswerStringList.add(questionAnswerEntity.getAnswer().toUpperCase());
+			}
 			userAnswerStr = userAnswerStr.toUpperCase();
 		}
-
-		String[] questionAnswerArr = questionAnswerStr.split("\n");// 试题答案：一般|||通常|||普遍\njava|||.net
+		String[] questionAnswerArr =  questionAnswerStringList.toArray(new String[questionAnswerStringList.size()]);// 试题答案：一般|||通常|||普遍\njava|||.net
 		String[] userAnswerArr = userAnswerStr.split("\n");// 用户答案：一般情况下\nJava
 		boolean[] userFillBlanksArr = new boolean[questionAnswerArr.length];// 添加用户每个填空是否正确
 		
@@ -260,7 +267,11 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	 * @param userAnswer void
 	 */
 	private void multipleChoiceHandle(PaperQuestionEx questionAnswer, Question question, MyExamDetail userAnswer) {
-		Set<String> questionAnswerSet = new HashSet<String>(Arrays.asList(question.getAnswer().split(",")));
+		List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
+		Set<String> questionAnswerSet = new HashSet<String>();
+		for(QuestionAnswer questionAnswerEntity : questionAnswerList){
+			questionAnswerSet.add(questionAnswerEntity.getAnswer());
+		}
 		Set<String> userAnswerSet = new HashSet<String>(Arrays.asList(userAnswer.getAnswer().split(",")));
 		if (questionAnswerSet.size() == userAnswerSet.size() && questionAnswerSet.containsAll(userAnswerSet)) { // 全对得分
 			userAnswer.setScore(questionAnswer.getScore());
@@ -283,7 +294,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	 * @param userAnswer void
 	 */
 	private void singleChoiceHandle(PaperQuestionEx questionAnswer, Question question, MyExamDetail userAnswer) {
-		if (question.getAnswer().equals(userAnswer.getAnswer())) {// 全对得分
+		List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
+		if (questionAnswerList.get(0).getAnswer().equals(userAnswer.getAnswer())) {// 全对得分
 			userAnswer.setScore(questionAnswer.getScore());
 		}
 	}

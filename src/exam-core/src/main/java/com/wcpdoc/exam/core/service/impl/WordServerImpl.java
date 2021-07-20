@@ -316,7 +316,7 @@ public class WordServerImpl extends WordServer {
 		questionEx.setTitle(title);
 		questionEx.setType(type);
 		questionEx.setDifficulty(getDifficulty(difficultyName));
-		questionEx.setAnswer(answer);
+		//questionEx.setAnswer(answer);
 		questionEx.setScore(new BigDecimal(score2));
 		questionEx.setScoreOptions(scoreOptions2);
 		questionEx.setAnalysis(analysis);

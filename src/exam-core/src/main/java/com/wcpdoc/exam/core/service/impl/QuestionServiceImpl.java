@@ -2,6 +2,7 @@ package com.wcpdoc.exam.core.service.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -26,14 +27,15 @@ import com.wcpdoc.exam.core.dao.QuestionDao;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionEx;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 import com.wcpdoc.exam.core.service.WordServer;
-import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.file.service.FileService;
 
@@ -54,6 +56,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	private UserService userService;
 	@Resource
 	private QuestionOptionService questionOptionService;
+	@Resource
+	private QuestionAnswerService questionAnswerService;
 
 	@Override
 	@Resource(name = "questionDaoImpl")
@@ -62,7 +66,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void addAndUpdate(Question question, String[] answers, String[] options) {
+	public void addAndUpdate(Question question, String[] answers, String[] options, BigDecimal[] scores) {
 		// 校验数据有效性
 		if (question.getType() == null) {
 			throw new MyException("参数错误：type");
@@ -76,7 +80,10 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (!ValidateUtil.isValid(answers)) {
 			throw new MyException("参数错误：answers");
 		}
-
+		if (answers.length != scores.length) {
+			throw new MyException("答案对应分值有误！");
+		}
+		
 		if (question.getType() == 1) {
 			if (options.length < 2) {
 				throw new MyException("参数错误：options长度小于2");
@@ -134,19 +141,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 
 		// 添加试题
-		if (question.getType() == 1 || question.getType() == 4 || question.getType() == 5) {
-			question.setAnswer(answers[0]);
-		} else if (question.getType() == 2) {
-			question.setAnswer(StringUtil.join(answers));
-		} else if (question.getType() == 3) {
-			for(String answersString : answers){
-				if(answersString == null || answersString.trim().equals("")){
-					throw new MyException("填空不能为空！");
-				}
-			}
-			
-			question.setAnswer(StringUtil.join(answers, "\n"));
-		}
 		question.setCreateTime(new Date());
 		question.setCreateUserId(getCurUser().getId());
 		question.setVer(1);// 默认版本为1
@@ -156,6 +150,41 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		question.setSrcId(question.getId());
 		update(question);
 
+		BigDecimal total = new BigDecimal(0.00);
+		//添加试题答案
+		if (question.getType() == 1 || question.getType() == 4 ) {
+			QuestionAnswer questionAnswer = new QuestionAnswer();
+			questionAnswer.setAnswer(answers[0]);
+			questionAnswer.setScore(scores[0]);
+			questionAnswer.setQuestionId(question.getId());
+			questionAnswer.setNo(1);
+			questionAnswerService.add(questionAnswer);
+			total = scores[0];
+		} else if (question.getType() == 2 || question.getType() == 3 || question.getType() == 5) {
+			for(int i = 0; i < answers.length; i++ ){
+				QuestionAnswer questionAnswer = new QuestionAnswer();
+				questionAnswer.setAnswer(answers[i]);
+				questionAnswer.setScore(scores[i]);
+				questionAnswer.setQuestionId(question.getId());
+				questionAnswer.setNo(i+1);
+				questionAnswerService.add(questionAnswer);
+				total = total.add(scores[i]);
+			}
+		} 
+		/*else if (question.getType() == 3) {
+			for(String answersString : answers){
+				if(answersString == null || answersString.trim().equals("")){
+					throw new MyException("填空不能为空！");
+				}
+			}
+			question.setAnswer(StringUtil.join(answers, "\n"));
+		} else if (question.getType() == 5){
+			
+		}*/
+		if (question.getScore().compareTo(total) != 0) {
+			throw new MyException("答案总分有误！ ");
+		}
+		
 		// 添加选项
 		if (question.getType() == 1 || question.getType() == 2) {
 			for (int i = 0; i < options.length; i++) {
@@ -172,7 +201,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void updateAndUpdate(Question question, String[] answers, String[] options) { //, boolean newVer
+	public void updateAndUpdate(Question question, String[] answers, String[] options, BigDecimal[] scores) { //, boolean newVer
 		// 校验数据有效性
 		if (question.getType() == null) {
 			throw new MyException("参数错误：type");
@@ -243,15 +272,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			}
 		}
 		
-		// 如果有新版本标识，删除旧版本，生成新版本
-		if (question.getType() == 1 || question.getType() == 4 || question.getType() == 5) {
-			question.setAnswer(answers[0]);
-		} else if (question.getType() == 2) {
-			question.setAnswer(StringUtil.join(answers));
-		} else if (question.getType() == 3) {
-			question.setAnswer(StringUtil.join(answers, "\n"));
-		}
-		
+		// 如果有新版本标识，删除旧版本，生成新版本		
 		Question entity = getEntity(question.getId());
 		/*if (newVer) {
 			// 删除旧版本
@@ -298,8 +319,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		// entity.setState(question.getState());
 		entity.setDifficulty(question.getDifficulty());
 		entity.setTitle(question.getTitle());
-
-		entity.setAnswer(question.getAnswer());
 		entity.setAnalysis(question.getAnalysis());
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
@@ -308,6 +327,36 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		entity.setNo(question.getNo());
 		update(entity);
 
+		//修改试题答案
+		List<QuestionAnswer> list = questionAnswerService.getList(entity.getId());
+		for(QuestionAnswer questionAnswer : list){
+			questionAnswerService.del(questionAnswer);
+		}
+		
+		BigDecimal total = new BigDecimal(0.00);
+		if (question.getType() == 1 || question.getType() == 4 ) {
+			QuestionAnswer questionAnswer = new QuestionAnswer();
+			questionAnswer.setAnswer(answers[0]);
+			questionAnswer.setScore(scores[0]);
+			questionAnswer.setQuestionId(entity.getId());
+			questionAnswer.setNo(1);
+			questionAnswerService.add(questionAnswer);
+			total = scores[0];
+		} else if (question.getType() == 2 || question.getType() == 3 || question.getType() == 5) {
+			for(int i = 0; i < answers.length; i++ ){
+				QuestionAnswer questionAnswer = new QuestionAnswer();
+				questionAnswer.setAnswer(answers[i]);
+				questionAnswer.setScore(scores[i]);
+				questionAnswer.setQuestionId(entity.getId());
+				questionAnswer.setNo(i+1);
+				questionAnswerService.add(questionAnswer);
+				total = total.add(scores[i]);
+			}
+		} 
+		if (question.getScore().compareTo(total) != 0) {
+			throw new MyException("答案总分有误！ ");
+		}
+		
 		// 修改选项
 		if (question.getType() == 1 || question.getType() == 2) {
 			List<QuestionOption> questionOptionList = questionOptionService.getList(entity.getId());
@@ -347,7 +396,12 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				}
 			}
 		} else if (question.getType() == 5) {// 问答
-			fileIdList.addAll(html2FileIds(question.getAnswer()));
+			List<QuestionAnswer> list = questionAnswerService.getList(question.getId());
+		    StringBuilder answerString = new StringBuilder();    
+		    for (int i = 0; i < list.size(); i++) {                
+		    	answerString.append(list.get(i).getAnswer()).append("/n");
+		    }
+			fileIdList.addAll(html2FileIds(answerString.toString().substring(0,answerString.toString().length()-1)));
 		}
 
 		fileIdList.addAll(html2FileIds(question.getAnalysis()));// 解析

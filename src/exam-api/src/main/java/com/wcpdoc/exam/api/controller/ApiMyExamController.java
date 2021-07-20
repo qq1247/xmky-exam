@@ -26,11 +26,13 @@ import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.PaperService;
+import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
@@ -63,6 +65,8 @@ public class ApiMyExamController extends BaseController{
 	private NotifyService notifyService;
 	@Resource
 	private ParmService parmService;
+	@Resource
+	private QuestionAnswerService questionAnswerService;
 	
 	/**
 	 * 我的考试列表
@@ -99,7 +103,7 @@ public class ApiMyExamController extends BaseController{
 			List<Map<String, Object>> list = myExamDetailService.getAnswerList(id);
 			for (Map<String, Object> map : list) {
 				map.put("myExamDetailId", map.remove("id"));// 前缀为myExamDetail，默认为id有歧义。
-				map.put("answers", new Question().getAnswers((Integer)map.get("questionType"), (String)map.remove("answer")));// 如果没有值，页面也返回字段
+				map.put("answers", new QuestionAnswer().getAnswers((Integer)map.get("questionType"), (String)map.remove("answer")));// 如果没有值，页面也返回字段
 			}
 			
 			return PageResultEx.ok().data(list);

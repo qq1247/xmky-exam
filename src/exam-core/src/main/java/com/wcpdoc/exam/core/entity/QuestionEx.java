@@ -8,6 +8,7 @@ import java.util.List;
  * v1.0 zhanghc 2017-05-07 14:56:29
  */
 public class QuestionEx extends Question {
+	private List<QuestionAnswer> questionAnswersList;
 	private List<QuestionOption> questionOptionList;
 
 	public List<QuestionOption> getQuestionOptionList() {
@@ -18,4 +19,11 @@ public class QuestionEx extends Question {
 		this.questionOptionList = questionOptionList;
 	}
 
+	public List<QuestionAnswer> getQuestionAnswerList() {
+		return questionAnswersList;
+	}
+
+	public void setQuestionAnswerList(List<QuestionAnswer> questionAnswersList) {
+		this.questionAnswersList = questionAnswersList;
+	}
 }
