@@ -108,7 +108,7 @@ public class ApiUserController extends BaseController {
 			if (user.getOrgId() == null) {
 				throw new MyException("参数错误：orgId");
 			}
-			if (ValidateUtil.isValid(user.getRoles()) && !user.getRoles().equals("subAdmin")) {
+			if (!ValidateUtil.isValid(user.getRoles())) {
 				throw new MyException("参数错误：roles");
 			}
 			

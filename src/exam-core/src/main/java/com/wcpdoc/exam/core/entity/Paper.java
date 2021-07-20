@@ -48,6 +48,12 @@ public class Paper {
 	private String options;
 	@Column(name = "MINIMIZE_NUM")
 	private Integer minimizeNum;
+	@Column(name = "CREATE_USER_ID")
+	private Integer createUserId;
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@Column(name = "CREATE_TIME")
+	private Date createTime;
 	@Column(name = "UPDATE_USER_ID")
 	private Integer updateUserId;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -167,6 +173,22 @@ public class Paper {
 
 	public void setOptions(String options) {
 		this.options = options;
+	}
+
+	public Integer getCreateUserId() {
+		return createUserId;
+	}
+
+	public void setCreateUserId(Integer createUserId) {
+		this.createUserId = createUserId;
+	}
+
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
 	}
 
 }

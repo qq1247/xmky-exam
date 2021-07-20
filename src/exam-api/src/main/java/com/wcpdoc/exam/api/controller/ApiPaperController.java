@@ -102,8 +102,8 @@ public class ApiPaperController extends BaseController {
 				paper.setShowType(new BigDecimal(1));
 			}
 			
-			paper.setUpdateUserId(getCurUser().getId());
-			paper.setUpdateTime(new Date());
+			paper.setCreateUserId(getCurUser().getId());
+			paper.setCreateTime(new Date());
 			paper.setTotalScore(BigDecimal.ZERO);
 			paper.setState(2);
 			paperService.add(paper);
@@ -226,8 +226,8 @@ public class ApiPaperController extends BaseController {
 			BeanUtils.copyProperties(entity, paper);
 			entity.setName(paper.getName()+"【复件】");
 			entity.setState(2);
-			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(getCurUser().getId());
+			entity.setCreateTime(new Date());
+			entity.setCreateUserId(getCurUser().getId());
 			paperService.add(entity);
 
 			List<PaperQuestion> chapterList = paperQuestionService.getChapterList(paper.getId());
