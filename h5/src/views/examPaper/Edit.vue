@@ -526,6 +526,7 @@ export default {
           scoreStart: this.queryForm.score,
           scoreEnd: this.queryForm.score,
           exPaperId: this.paperId,
+          // state: 1,
           curPage: this.curPage,
           pageSize: this.pageSize,
         })
@@ -536,11 +537,22 @@ export default {
     },
     // 随机查询试题
     async randomQueryQuestion() {
-      const pageNum =
-        this.total <= this.pageSize ? 1 : Math.ceil(this.total / this.pageSize)
-      const randomCurPage = Math.floor(Math.random() * (pageNum + 1))
-      this.curPage = randomCurPage == 0 ? 1 : randomCurPage
-      this.queryQuestion()
+      const res = await this.$https.randomListPage({
+        id: this.queryForm.id,
+        type: this.queryForm.type,
+        title: this.queryForm.title,
+        questionTypeName: this.queryForm.questionTypeName,
+        difficulty: this.queryForm.difficulty,
+        scoreStart: this.queryForm.score,
+        scoreEnd: this.queryForm.score,
+        exPaperId: this.paperId,
+        // state: 1,
+        curPage: 1,
+        pageSize: this.pageSize,
+      })
+      res?.code === 200
+        ? (this.paperList = res.data.list)
+        : this.$tools.message('请刷新重新获取试题！', 'error')
     },
     // 添加章节
     paperChapterAdd() {
@@ -619,13 +631,19 @@ export default {
         .catch(() => {})
     },
     // 删除试题
-    async del(paperQuestionId) {
-      const res = await this.$https
-        .paperQuestionDel({
-          paperQuestionId,
+    del(paperQuestionId) {
+      this.$confirm(`确认删除该试题吗？`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      })
+        .then(async () => {
+          const res = await this.$https
+            .paperQuestionDel({ paperQuestionId })
+            .catch((err) => {})
+          this.refreshData(res, '删除试题')
         })
-        .catch((err) => {})
-      this.refreshData(res, '删除试题')
+        .catch(() => {})
     },
     // 更新页面数据
     refreshData(res, title) {

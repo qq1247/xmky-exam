@@ -117,11 +117,13 @@ export default {
 
   // 试题相关
   questionListPage: (params) => post('question/listpage', params),
+  randomListPage: (params) => post('question/randomListpage', params),
   questionGet: (params) => post('question/get', params),
   questionAdd: (params) => post('question/add', params),
   questionEdit: (params) => post('question/edit', params),
   questionDel: (params) => post('question/del', params),
   questionCopy: (params) => post('question/copy', params),
+  questionPublish: (params) => post('question/publish', params),
   questionTemplate: (params, type) =>
     post('question/wordTemplateExport', params, type),
   questionImport: (params, type, headers) =>
