@@ -41,7 +41,7 @@ public class ApiDictController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
+	@RequiresRoles(value={"admin","subAdmin"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
 			return PageResultEx.ok().data(dictService.getListpage(new PageIn(request)));

@@ -50,7 +50,7 @@ public class ApiCronController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
+	@RequiresRoles(value={"admin","subAdmin"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
 			PageOut pageOut = cronService.getListpage(new PageIn(request));
