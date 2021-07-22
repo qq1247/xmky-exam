@@ -154,24 +154,42 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			questionAnswer.setAnswer(answers[0]);
 			if (scores != null) {				
 				questionAnswer.setScore(scores[0]);
+			}else{
+				questionAnswer.setScore(new BigDecimal(0));
 			}
 			questionAnswer.setQuestionId(question.getId());
 			questionAnswer.setNo(1);
 			questionAnswerService.add(questionAnswer);
 			total = scores[0];
-		} else if (question.getType() == 2 || question.getType() == 3 || question.getType() == 5) {
+		} else if (question.getType() == 2) {
+			for(int i = 0; i < answers.length; i++ ){
+				QuestionAnswer questionAnswer = new QuestionAnswer();
+				questionAnswer.setAnswer(answers[i]);
+				if (scores != null) {
+					questionAnswer.setScore(scores[0]);
+				}else{
+					questionAnswer.setScore(new BigDecimal(0));
+				}
+				questionAnswer.setQuestionId(question.getId());
+				questionAnswer.setNo(i+1);
+				questionAnswerService.add(questionAnswer);
+				total = question.getScore();
+			}
+		} else if (question.getType() == 3 || question.getType() == 5) {
 			for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();
 				questionAnswer.setAnswer(answers[i]);
 				if (scores != null) {
 					questionAnswer.setScore(scores[i]);
+				}else{
+					questionAnswer.setScore(new BigDecimal(0));
 				}
 				questionAnswer.setQuestionId(question.getId());
 				questionAnswer.setNo(i+1);
 				questionAnswerService.add(questionAnswer);
 				total = total.add(scores[i]);
 			}
-		} 
+		}
 		/*else if (question.getType() == 3) {
 			for(String answersString : answers){
 				if(answersString == null || answersString.trim().equals("")){
@@ -182,7 +200,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		} else if (question.getType() == 5){
 			
 		}*/
-		if (question.getScore().compareTo(total) != 0) {
+		if (question.getAi() == 1 &&  question.getScore().compareTo(total) != 0) {
 			throw new MyException("答案总分有误！ ");
 		}
 		
@@ -318,6 +336,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 
 		// 修改试题
 		// entity.setState(question.getState());
+		entity.setAi(question.getAi());
 		entity.setDifficulty(question.getDifficulty());
 		entity.setTitle(question.getTitle());
 		entity.setAnalysis(question.getAnalysis());
@@ -338,23 +357,45 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (question.getType() == 1 || question.getType() == 4 ) {
 			QuestionAnswer questionAnswer = new QuestionAnswer();
 			questionAnswer.setAnswer(answers[0]);
-			questionAnswer.setScore(scores[0]);
+			if (scores != null) {
+				questionAnswer.setScore(scores[0]);
+			}else{
+				questionAnswer.setScore(new BigDecimal(0));
+			}
 			questionAnswer.setQuestionId(entity.getId());
 			questionAnswer.setNo(1);
 			questionAnswerService.add(questionAnswer);
 			total = scores[0];
-		} else if (question.getType() == 2 || question.getType() == 3 || question.getType() == 5) {
+		} else if (question.getType() == 2) {
 			for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();
 				questionAnswer.setAnswer(answers[i]);
-				questionAnswer.setScore(scores[i]);
+				if (scores != null) {
+					questionAnswer.setScore(scores[0]);
+				}else{
+					questionAnswer.setScore(new BigDecimal(0));
+				}
+				questionAnswer.setQuestionId(entity.getId());
+				questionAnswer.setNo(i+1);
+				questionAnswerService.add(questionAnswer);
+				total = question.getScore();
+			}
+		} else if (question.getType() == 3 || question.getType() == 5) {
+			for(int i = 0; i < answers.length; i++ ){
+				QuestionAnswer questionAnswer = new QuestionAnswer();
+				questionAnswer.setAnswer(answers[i]);
+				if (scores != null) {
+					questionAnswer.setScore(scores[i]);
+				}else{
+					questionAnswer.setScore(new BigDecimal(0));
+				}
 				questionAnswer.setQuestionId(entity.getId());
 				questionAnswer.setNo(i+1);
 				questionAnswerService.add(questionAnswer);
 				total = total.add(scores[i]);
 			}
 		} 
-		if (question.getScore().compareTo(total) != 0) {
+		if (question.getAi() == 1 && question.getScore().compareTo(total) != 0) {
 			throw new MyException("答案总分有误！ ");
 		}
 		

@@ -232,10 +232,42 @@ public class ApiQuestionController extends BaseController {
 					optionList.add(questionOption.getOptions());
 				}
 			}
-			List<QuestionAnswer> QuestionAnswerList = questionAnswerService.getList(question.getId());
 			QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
 			boolean writeAuth = questionTypeService.hasWriteAuth(questionType, getCurUser().getId());		
 			boolean readAuth = questionTypeService.hasReadAuth(questionType, getCurUser().getId());
+			
+			List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
+			List<Map<String, Object>> questionAnswerSplitList = new ArrayList<Map<String, Object>>();
+			if (question.getType() == 3) {
+				for(QuestionAnswer questionAnswer : questionAnswerList){
+					Map<String, Object> map = new HashMap<String, Object>();
+					String[] split = questionAnswer.getAnswer().split("\n");
+					map.put("id", questionAnswer.getId());
+					map.put("answer", split);
+					map.put("score", questionAnswer.getScore());
+					map.put("questionId", questionAnswer.getQuestionId());
+					questionAnswerSplitList.add(map);
+				}
+			} else if (question.getType() == 5 && question.getAi() == 1) {
+				for(QuestionAnswer questionAnswer : questionAnswerList){					
+					Map<String, Object> map = new HashMap<String, Object>();
+					String[] split = questionAnswer.getAnswer().split("\n");
+					map.put("id", questionAnswer.getId());
+					map.put("answer", split);
+					map.put("score", questionAnswer.getScore());
+					map.put("questionId", questionAnswer.getQuestionId());
+					questionAnswerSplitList.add(map);
+				}
+			} else {
+				for(QuestionAnswer questionAnswer : questionAnswerList){
+					Map<String, Object> map = new HashMap<String, Object>();
+					map.put("id", questionAnswer.getId());
+					map.put("answer", questionAnswer.getAnswer());
+					map.put("score", questionAnswer.getScore());
+					map.put("questionId", questionAnswer.getQuestionId());
+					questionAnswerSplitList.add(map);
+				}
+			}
 			PageResultEx pageResult = PageResultEx.ok()
 					.addAttr("id", question.getId())
 					.addAttr("type", question.getType())
@@ -249,7 +281,7 @@ public class ApiQuestionController extends BaseController {
 					.addAttr("scoreOptions", question.getScoreOptions())
 					.addAttr("no", question.getNo())
 					.addAttr("options", optionList.toArray(new String[optionList.size()]))
-					.addAttr("answers", (writeAuth || readAuth) ? QuestionAnswerList : new String[0]);
+					.addAttr("answers", (writeAuth || readAuth) ? questionAnswerSplitList : new String[0]);
 			return pageResult;
 		} catch (MyException e) {
 			log.error("获取试题错误：{}", e.getMessage());
