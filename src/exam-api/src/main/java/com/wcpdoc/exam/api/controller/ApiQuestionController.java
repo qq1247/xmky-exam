@@ -239,6 +239,7 @@ public class ApiQuestionController extends BaseController {
 			PageResultEx pageResult = PageResultEx.ok()
 					.addAttr("id", question.getId())
 					.addAttr("type", question.getType())
+					.addAttr("ai", question.getAi())
 					.addAttr("difficulty", question.getDifficulty())
 					.addAttr("title", question.getTitle())
 					.addAttr("analysis", question.getAnalysis())

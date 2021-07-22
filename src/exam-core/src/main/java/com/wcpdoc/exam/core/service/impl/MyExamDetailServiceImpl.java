@@ -140,16 +140,20 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			for (PaperQuestionEx paperQuestionEx : paperQuestionExList) {// 第一层是章节
 				for (PaperQuestionEx questionAnswer : paperQuestionEx.getSubList()) {// 第二层是试题
 					Question question = questionAnswer.getQuestion();
-					MyExamDetail userAnswer = userAnswerMap.get(question.getId() + 0L);// 获取当前试题对应的用户答案
-					if (!hasQA(question)) {// 非问答题
-						userAnswer.setScore(BigDecimal.ZERO);// 默认设置为0分（为简化代码，以下直接set不用update更新，hibernate会同步到数据库）
+					if (hasAi(question)) {//是否智能判卷
+						continue;
 					} else {
 						hasQA = true;
 					}
-					
+					MyExamDetail userAnswer = userAnswerMap.get(question.getId() + 0L);// 获取当前试题对应的用户答案
 					if (!ValidateUtil.isValid(userAnswer.getAnswer())) {// 如果未作答
 						continue;
 					}
+					
+					/*if (!hasQA(question)) {// 非问答题
+						userAnswer.setScore(BigDecimal.ZERO);// 默认设置为0分（为简化代码，以下直接set不用update更新，hibernate会同步到数据库）
+					}*/
+					userAnswer.setScore(BigDecimal.ZERO);// 默认设置为0分（为简化代码，以下直接set不用update更新，hibernate会同步到数据库）
 					
 					if (hasQA(question)) { // 问答题处理
 						qAHandle(questionAnswer, question, userAnswer);
@@ -161,9 +165,10 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 						fillBlankHandle(questionAnswer, question, userAnswer);
 					}
 					
-					if (!hasQA(question)) {
+					/*if (!hasQA(question)) {
 						totalScore.add(userAnswer.getScore());//合计总分数
-					}
+					}*/
+					totalScore.add(userAnswer.getScore());//合计总分数
 				}
 			}
 			
@@ -172,7 +177,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			String msg = null;
 			Date curTime = new Date();
 			myExam.setMarkStartTime(curTime);
-			if (!hasQA) {//如果没有问答题，表示阅卷完成
+			if (!hasQA) {//如果没有人工阅卷，表示阅卷完成
 				myExam.setMarkState(3);
 				myExam.setAnswerEndTime(curTime);
 				myExam.setTotalScore(totalScore.getResult());
@@ -188,8 +193,64 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		log.info("自动阅卷结束：");
 	}
 
+	/**
+	 * 问答处理
+	 * 
+	 * v1.0 chenyun 2021年7月21日下午2:09:40
+	 * @param questionAnswer
+	 * @param question
+	 * @param userAnswer void
+	 */
 	private void qAHandle(PaperQuestionEx questionAnswer, Question question, MyExamDetail userAnswer) {
-		// 人工阅卷，不处理
+		List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
+		List<String> questionAnswerStringList = new ArrayList<String>();
+		BigDecimal scoreSum = new BigDecimal(0.00);
+		List<BigDecimal> questionAnswerBigDecimalList = new ArrayList<BigDecimal>();
+		String userAnswerStr = userAnswer.getAnswer();
+		if (dxxbmg(questionAnswer)) {// 如果勾选了大小写不敏感，则全部大写转换一次在处理
+			for(QuestionAnswer questionAnswerEntity : questionAnswerList){
+				questionAnswerStringList.add(questionAnswerEntity.getAnswer().toUpperCase());		//大小写不敏感
+				questionAnswerBigDecimalList.add(questionAnswerEntity.getScore());					//分值
+			}
+			userAnswerStr = userAnswerStr.toUpperCase();
+		}else{
+			for(QuestionAnswer questionAnswerEntity : questionAnswerList){
+				questionAnswerStringList.add(questionAnswerEntity.getAnswer());
+				questionAnswerBigDecimalList.add(questionAnswerEntity.getScore());
+			}
+		}
+		BigDecimal[] scoreArr = questionAnswerBigDecimalList.toArray(new BigDecimal[questionAnswerBigDecimalList.size()]);
+		String[] questionAnswerArr =  questionAnswerStringList.toArray(new String[questionAnswerStringList.size()]);// 试题答案：一般|||通常|||普遍\njava|||.net
+		String[] userAnswerArr = userAnswerStr.split("\n");// 用户答案：一般情况下\nJava
+		boolean[] userFillBlanksArr = new boolean[questionAnswerArr.length];// 添加用户每个填空是否正确
+		
+		for (int i = 0; i < questionAnswerArr.length; i++) {// 答案对比
+			String[] _questionAnswerArr = questionAnswerArr[i].split("\\|\\|\\|");// 答案有多个同义词
+			for (int j = 0; j < userAnswerArr.length; j++) {
+				for (String _questionAnswer : _questionAnswerArr) {// 用户答案和试题答案对比
+					if (bhdadf(questionAnswer)) {
+						if (userAnswerArr[j].contains(_questionAnswer)) {
+							userFillBlanksArr[i] = true;
+							scoreSum = scoreSum.add(scoreArr[i]);
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		int trueNum = 0;
+		for (boolean b : userFillBlanksArr) {
+			if (b) {
+				trueNum++;
+			}
+		}
+
+		if (userFillBlanksArr.length == trueNum) {// 默认全对得分
+			userAnswer.setScore(questionAnswer.getScore());
+			return;
+		}
+		userAnswer.setScore(scoreSum);
 	}
 
 	/**
@@ -203,13 +264,22 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	private void fillBlankHandle(PaperQuestionEx questionAnswer, Question question, MyExamDetail userAnswer) {
 		List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
 		List<String> questionAnswerStringList = new ArrayList<String>();
+		BigDecimal scoreSum = new BigDecimal(0.00);
+		List<BigDecimal> questionAnswerBigDecimalList = new ArrayList<BigDecimal>();
 		String userAnswerStr = userAnswer.getAnswer();
 		if (dxxbmg(questionAnswer)) {// 如果勾选了大小写不敏感，则全部大写转换一次在处理
 			for(QuestionAnswer questionAnswerEntity : questionAnswerList){
-				questionAnswerStringList.add(questionAnswerEntity.getAnswer().toUpperCase());
+				questionAnswerStringList.add(questionAnswerEntity.getAnswer().toUpperCase());		//大小写不敏感
+				questionAnswerBigDecimalList.add(questionAnswerEntity.getScore());					//分值
 			}
 			userAnswerStr = userAnswerStr.toUpperCase();
+		}else{
+			for(QuestionAnswer questionAnswerEntity : questionAnswerList){
+				questionAnswerStringList.add(questionAnswerEntity.getAnswer());
+				questionAnswerBigDecimalList.add(questionAnswerEntity.getScore());
+			}
 		}
+		BigDecimal[] scoreArr = questionAnswerBigDecimalList.toArray(new BigDecimal[questionAnswerBigDecimalList.size()]);
 		String[] questionAnswerArr =  questionAnswerStringList.toArray(new String[questionAnswerStringList.size()]);// 试题答案：一般|||通常|||普遍\njava|||.net
 		String[] userAnswerArr = userAnswerStr.split("\n");// 用户答案：一般情况下\nJava
 		boolean[] userFillBlanksArr = new boolean[questionAnswerArr.length];// 添加用户每个填空是否正确
@@ -226,12 +296,14 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 				for (String _questionAnswer : _questionAnswerArr) {// 用户答案和试题答案对比
 					if (userAnswerArr[j].equals(_questionAnswer)) {// 默认等于答案得分，userAnswerStrArr[j].equals(_questionAnswer)位置不要反
 						userFillBlanksArr[i] = true;
+						scoreSum = scoreSum.add(scoreArr[i]);
 						break;
 					}
 
 					if (bhdadf(questionAnswer)) {// 如果勾选了用户答案包含试题答案，则包含得分
 						if (userAnswerArr[j].contains(_questionAnswer)) {
 							userFillBlanksArr[i] = true;
+							scoreSum = scoreSum.add(scoreArr[i]);
 							break;
 						}
 					}
@@ -251,9 +323,10 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			return;
 		}
 
-		if (bdbf(questionAnswer)) {// 如果勾选了半对半分，则半对半分
+		if (bdbf(questionAnswer)) {// 如果勾选了漏选的分，则漏选的分
 			if (trueNum > 0) {
-				userAnswer.setScore(BigDecimalUtil.newInstance(questionAnswer.getScore()).div(2, 2).getResult());
+				//userAnswer.setScore(BigDecimalUtil.newInstance(questionAnswer.getScore()).div(2, 2).getResult());
+				userAnswer.setScore(scoreSum);
 			}
 		}
 	}
@@ -267,20 +340,25 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	 * @param userAnswer void
 	 */
 	private void multipleChoiceHandle(PaperQuestionEx questionAnswer, Question question, MyExamDetail userAnswer) {
+		Set<String> userAnswerSet = new HashSet<String>(Arrays.asList(userAnswer.getAnswer().split(",")));
 		List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
 		Set<String> questionAnswerSet = new HashSet<String>();
+		BigDecimal setScore = new BigDecimal(0.00);
 		for(QuestionAnswer questionAnswerEntity : questionAnswerList){
 			questionAnswerSet.add(questionAnswerEntity.getAnswer());
+			if (userAnswerSet.contains(questionAnswerEntity.getAnswer())) {//如果包含答案，加答案指定分数
+				setScore = setScore.add(questionAnswerEntity.getScore());
+			}
 		}
-		Set<String> userAnswerSet = new HashSet<String>(Arrays.asList(userAnswer.getAnswer().split(",")));
 		if (questionAnswerSet.size() == userAnswerSet.size() && questionAnswerSet.containsAll(userAnswerSet)) { // 全对得分
 			userAnswer.setScore(questionAnswer.getScore());
 			return;
 		}
 
-		if (bdbf(questionAnswer)) { // 如果勾选了半对半分，则半对半分
+		if (bdbf(questionAnswer)) { // 如果勾选了漏选的分，则漏选的分
 			if (questionAnswerSet.containsAll(userAnswerSet)) {
-				userAnswer.setScore(BigDecimalUtil.newInstance(questionAnswer.getScore()).div(2, 2).getResult());
+				//userAnswer.setScore(BigDecimalUtil.newInstance(questionAnswer.getScore()).div(2, 2).getResult());
+				userAnswer.setScore(setScore);   //选对的分数和
 			}
 		}
 	}
@@ -311,6 +389,17 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		return myExam.getState() == 2;
 	}
 
+	/**
+	 * 是否只能判卷
+	 * 
+	 * v1.0 zhanghc 2020年10月13日下午7:40:37
+	 * @param question
+	 * @return boolean
+	 */
+	private boolean hasAi(Question question) {
+		return question.getAi() == 1;
+	}
+	
 	/**
 	 * 是否单选题
 	 * 
@@ -419,7 +508,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	}
 	
 	/**
-	 * 1：半对半分（默认全对得分）
+	 * 1：漏选的分（默认全对得分）
 	 * 
 	 * v1.0 zhanghc 2018年11月14日下午11:07:10
 	 * @param paperQuestionEx

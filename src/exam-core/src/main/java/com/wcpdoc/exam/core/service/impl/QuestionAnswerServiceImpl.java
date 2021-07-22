@@ -32,4 +32,9 @@ public class QuestionAnswerServiceImpl extends BaseServiceImp<QuestionAnswer> im
 		return questionAnswerDao.getList(questionId);
 	}
 
+	@Override
+	public void updateAndDel(Integer id) {
+		questionAnswerDao.del(id);
+	}
+
 }

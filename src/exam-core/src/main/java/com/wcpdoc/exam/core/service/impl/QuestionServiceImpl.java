@@ -80,11 +80,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (!ValidateUtil.isValid(answers)) {
 			throw new MyException("参数错误：answers");
 		}
-		if (answers.length != scores.length) {
-			throw new MyException("答案对应分值有误！");
-		}
 		
-		if (question.getType() == 1) {
+		if (question.getType() == 1 && options != null) {
 			if (options.length < 2) {
 				throw new MyException("参数错误：options长度小于2");
 			}
@@ -99,7 +96,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				throw new MyException("选项和答案不匹配！");
 			}
 		}
-		if (question.getType() == 2) {
+		if (question.getType() == 2 && options != null) {
 			if (options.length < 2) {
 				throw new MyException("参数错误：options长度小于2");
 			}
@@ -155,7 +152,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (question.getType() == 1 || question.getType() == 4 ) {
 			QuestionAnswer questionAnswer = new QuestionAnswer();
 			questionAnswer.setAnswer(answers[0]);
-			questionAnswer.setScore(scores[0]);
+			if (scores != null) {				
+				questionAnswer.setScore(scores[0]);
+			}
 			questionAnswer.setQuestionId(question.getId());
 			questionAnswer.setNo(1);
 			questionAnswerService.add(questionAnswer);
@@ -164,7 +163,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();
 				questionAnswer.setAnswer(answers[i]);
-				questionAnswer.setScore(scores[i]);
+				if (scores != null) {
+					questionAnswer.setScore(scores[i]);
+				}
 				questionAnswer.setQuestionId(question.getId());
 				questionAnswer.setNo(i+1);
 				questionAnswerService.add(questionAnswer);
@@ -330,7 +331,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		//修改试题答案
 		List<QuestionAnswer> list = questionAnswerService.getList(entity.getId());
 		for(QuestionAnswer questionAnswer : list){
-			questionAnswerService.del(questionAnswer);
+			questionAnswerService.updateAndDel(questionAnswer.getId());
 		}
 		
 		BigDecimal total = new BigDecimal(0.00);
