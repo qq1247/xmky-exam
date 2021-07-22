@@ -346,9 +346,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		BigDecimal setScore = new BigDecimal(0.00);
 		for(QuestionAnswer questionAnswerEntity : questionAnswerList){
 			questionAnswerSet.add(questionAnswerEntity.getAnswer());
-			if (userAnswerSet.contains(questionAnswerEntity.getAnswer())) {//如果包含答案，加答案指定分数
-				setScore = setScore.add(questionAnswerEntity.getScore());
-			}
+			setScore = questionAnswerEntity.getScore();
 		}
 		if (questionAnswerSet.size() == userAnswerSet.size() && questionAnswerSet.containsAll(userAnswerSet)) { // 全对得分
 			userAnswer.setScore(questionAnswer.getScore());
