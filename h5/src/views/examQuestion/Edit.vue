@@ -37,13 +37,13 @@
         <el-form-item label>
           <el-input
             placeholder="分值大于"
-            v-model="queryForm.startScore"
+            v-model="queryForm.scoreStart"
           ></el-input>
         </el-form-item>
         <el-form-item label>
           <el-input
             placeholder="分值小于"
-            v-model="queryForm.endScore"
+            v-model="queryForm.scoreEnd"
           ></el-input>
         </el-form-item>
       </div>
@@ -280,25 +280,43 @@
                   inactive-color="#ff4949"
                   :inactive-value="0"
                   v-model="editForm.ai"
-                  @change="aiChange"
                 ></el-switch>
               </el-form-item>
             </el-col>
           </el-row>
 
           <template v-if="editForm.ai == 1">
-            <el-form-item v-if="editForm.type === 2">
-              <el-checkbox-group v-model="editForm.scoreOptions">
-                <el-tooltip
-                  class="item"
-                  content="默认全对得分"
-                  effect="dark"
-                  placement="top"
+            <el-row v-if="editForm.type === 2">
+              <el-col :span="8">
+                <el-form-item>
+                  <el-checkbox-group v-model="editForm.scoreOptions">
+                    <el-tooltip
+                      class="item"
+                      content="默认全对得分"
+                      effect="dark"
+                      placement="top"
+                    >
+                      <el-checkbox label="1">漏选得分</el-checkbox>
+                    </el-tooltip>
+                  </el-checkbox-group>
+                </el-form-item>
+              </el-col>
+              <el-col :span="8">
+                <el-form-item
+                  v-if="editForm.scoreOptions.length > 0"
+                  prop="multipScore"
+                  class="ai-score"
+                  :show-message="editForm.ai == 1 ? true : false"
                 >
-                  <el-checkbox label="1">漏选得分</el-checkbox>
-                </el-tooltip>
-              </el-checkbox-group>
-            </el-form-item>
+                  <el-input
+                    v-if="editForm.ai == 1"
+                    v-model="editForm.multipScore"
+                  >
+                    <template slot="append">分</template>
+                  </el-input>
+                </el-form-item>
+              </el-col>
+            </el-row>
             <el-form-item v-if="editForm.type === 3">
               <el-checkbox-group v-model="editForm.scoreOptions">
                 <el-tooltip
@@ -351,7 +369,11 @@
               >
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="答案" prop="answer" v-if="editForm.type === 2">
+          <el-form-item
+            label="答案"
+            prop="answerMultip"
+            v-if="editForm.type === 2"
+          >
             <el-checkbox-group v-model="editForm.answerMultip">
               <el-checkbox
                 :key="answer.lab"
@@ -365,33 +387,47 @@
             <el-card class="el-card" shadow="never">
               <el-alert
                 :closable="false"
-                title="单空有多个同义词，用三竖线分开。如：一般|||通常|||普遍"
+                title="单个填空有多个同义词，可添加多个标签。如：人民、公民、群众"
                 type="success"
               ></el-alert>
-              <div
+              <el-row
+                :gutter="10"
                 v-for="(answer, index) in editForm.answers"
                 :key="index"
-                class="ai-answers"
               >
-                <el-form-item
-                  :prop="`answers.${index}.value`"
-                  :rules="editForm.rules.answer"
-                  class="ai-answer"
-                >
-                  <el-input v-model="answer.value">
-                    <template slot="prepend">填空{{ answer.lab }}</template>
-                  </el-input>
-                </el-form-item>
-                <el-form-item
-                  :prop="`answers.${index}.score`"
-                  :rules="editForm.rules.aiScore"
-                  class="ai-score"
-                >
-                  <el-input v-if="editForm.ai == 1" v-model="answer.score">
-                    <template slot="append">分</template>
-                  </el-input>
-                </el-form-item>
-              </div>
+                <el-col :span="16">
+                  <el-form-item
+                    :prop="`answers.${index}.value`"
+                    :rules="editForm.rules.answerMultip"
+                  >
+                    <span
+                      style="margin: 0 15px; color: #838ee9; font-size: 12px"
+                      >填空{{ answer.lab }}</span
+                    >
+                    <el-select
+                      v-model="answer.value"
+                      multiple
+                      filterable
+                      remote
+                      allow-create
+                      default-first-option
+                      placeholder="请填写答案"
+                    >
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item
+                    :prop="`answers.${index}.score`"
+                    :rules="editForm.rules.aiScore"
+                    :show-message="editForm.ai == 1 ? true : false"
+                  >
+                    <el-input v-if="editForm.ai == 1" v-model="answer.score">
+                      <template slot="append">分</template>
+                    </el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
               <el-button
                 :disabled="editForm.answers.length >= 7"
                 @click="addFillBlanks()"
@@ -409,7 +445,7 @@
               >
             </el-card>
           </el-form-item>
-          <el-form-item label="答案" v-if="editForm.type === 4">
+          <el-form-item label="答案" prop="answer" v-if="editForm.type === 4">
             <el-radio-group v-model="editForm.answer">
               <el-radio
                 :key="answer.lab"
@@ -419,7 +455,76 @@
               >
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="答案" prop="answer" v-if="editForm.type === 5">
+          <el-form-item
+            label="答案"
+            v-if="editForm.type === 5 && editForm.ai === 1"
+          >
+            <el-card class="el-card" shadow="never">
+              <el-alert
+                :closable="false"
+                title="单个关键词有多个同义词，可添加多个标签。如：人民、公民、群众"
+                type="success"
+              ></el-alert>
+              <el-row
+                :gutter="10"
+                v-for="(answer, index) in editForm.answers"
+                :key="index"
+              >
+                <el-col :span="16">
+                  <el-form-item
+                    :prop="`answers.${index}.value`"
+                    :rules="editForm.rules.answerMultip"
+                  >
+                    <span
+                      style="margin: 0 15px; color: #838ee9; font-size: 12px"
+                      >关键词</span
+                    >
+                    <el-select
+                      v-model="answer.value"
+                      multiple
+                      filterable
+                      remote
+                      allow-create
+                      default-first-option
+                      placeholder="请填写答案"
+                    >
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item
+                    :prop="`answers.${index}.score`"
+                    :rules="editForm.rules.aiScore"
+                    :show-message="editForm.ai == 1 ? true : false"
+                  >
+                    <el-input v-if="editForm.ai == 1" v-model="answer.score">
+                      <template slot="append">分</template>
+                    </el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <el-button
+                :disabled="editForm.answers.length >= 7"
+                @click="addFillBlanks()"
+                class="btn2"
+                style="margin-left: 65px"
+                type="primary"
+                >+添加关键词</el-button
+              >
+              <el-button
+                :disabled="editForm.answers.length <= 1"
+                @click="delFillBlanks()"
+                class="btn2"
+                type="primary"
+                >-删除关键词</el-button
+              >
+            </el-card>
+          </el-form-item>
+          <el-form-item
+            label="答案"
+            prop="answer"
+            v-if="editForm.type === 5 && editForm.ai === 0"
+          >
             <Editor
               :value="editForm.answer"
               @editorListener="editorListener"
@@ -493,9 +598,24 @@ export default {
   },
   data() {
     const validateAiScore = (rule, value, callback) => {
-      if (!this.editForm.ai == 0) {
+      if (this.editForm.ai == 0) {
         return callback()
       }
+      if (value == '') {
+        return callback(new Error('请填写分数'))
+      }
+      if (value > this.editForm.score) {
+        return callback(new Error(`请填写合理分数`))
+      }
+      return callback()
+    }
+
+    const validateMultipScore = (rule, value, callback) => {
+      if (this.editForm.ai == 0 || this.editForm.scoreOptions.length == 0) {
+        this.editForm.multipScore = ''
+        return callback()
+      }
+
       if (value == '') {
         return callback(new Error('请填写分数'))
       }
@@ -522,8 +642,8 @@ export default {
         title: '', // 标题
         type: null, // 类型
         difficulty: null, // 难度
-        startScore: '', // 得分大于
-        endScore: '', // 得分小于
+        scoreStart: '', // 得分大于
+        scoreEnd: '', // 得分小于
         questionTypeName: '', // 试题分类name
         questionTypeId: 1, // 试题分类id
         difficultyDictList: [], // 难度列表
@@ -548,15 +668,16 @@ export default {
         ], // 选项
         answer: '', // 答案
         answerMultip: [],
+        multipScore: '',
         answers: [
           {
             lab: 'A',
-            value: '',
+            value: [],
             score: '',
           },
           {
             lab: 'B',
-            value: '',
+            value: [],
             score: '',
           },
         ], // 答案
@@ -572,7 +693,6 @@ export default {
         ],
         analysis: '', // 解析
         score: 1, // 分值
-        no: 1, // 排序
         isCrateNew: false,
         scoreOptions: [],
         rules: {
@@ -591,8 +711,17 @@ export default {
               trigger: 'change',
             },
           ],
+          answerMultip: [
+            {
+              type: 'array',
+              required: true,
+              message: '请选择或者输入答案',
+              trigger: 'change',
+            },
+          ],
           score: [{ required: true, message: '请输入分值', trigger: 'change' }],
           aiScore: [{ validator: validateAiScore }],
+          multipScore: [{ validator: validateMultipScore }],
         },
       },
       typeButtonGroup: [
@@ -676,7 +805,6 @@ export default {
       this.editForm.type = 1 // 默认选中类型
       this.editForm.difficulty = 1 // 默认选中简单
       this.editForm.score = 1 // 默认得分为1
-      this.editForm.no = 1 // 默认排序为1
       this.editForm.answer = '' // 默认答案为空
     },
     // 查询
@@ -698,6 +826,7 @@ export default {
       this.list.total = total
       this.list.questionList = list
     },
+    // 分页查询
     pageChange(val = 1) {
       this.list.curPage = val
       this.query()
@@ -771,9 +900,6 @@ export default {
         ] // 添加答案校验
       }
     },
-    aiChange() {
-      this.$refs.editForm.validate()
-    },
     // 添加选项
     addOption() {
       if (this.editForm.options.length >= 7) {
@@ -844,10 +970,10 @@ export default {
     updateType(value) {
       this.$tools.resetData(this, 'editForm')
       this.editForm.type = value
-      if (value == 5) this.editForm.ai == 0
+      if (value == 5) this.editForm.ai = 0
     },
     // 添加试题
-    async add() {
+    add() {
       if (this.queryForm.edit == 'false') {
         this.$tools.message('暂无此项权限！', 'warning')
         return
@@ -867,7 +993,7 @@ export default {
           ai: this.editForm.ai,
         }
 
-        if (params.type === 1 || params.type === 2) {
+        if ([1, 2].includes(params.type)) {
           // 如果是单选、多选，提取选项值
           const _options = []
           for (const i in this.editForm.options) {
@@ -875,7 +1001,7 @@ export default {
           }
           params.options = _options
         }
-        if (params.type === 2 || params.type === 3) {
+        if ([2, 3, 5].includes(params.type)) {
           // 如果是多选、填空，提取分值选项
           const _scoreOptions = []
           for (const i in this.editForm.scoreOptions) {
@@ -884,38 +1010,47 @@ export default {
           params.scoreOptions = _scoreOptions
         }
 
-        if (params.type === 1 || params.type === 4 || params.type === 5) {
+        if ([1, 4, 5].includes(params.type)) {
           params.answers = this.editForm.answer
-        } else if (params.type === 2) {
-          // 如果是多选，答案按逗号分隔
-          params.answers = this.editForm.answerMultip
-        } else if (params.type === 3) {
-          // 如果是填空，答案之间按不可见字符回车分隔
-          let _answer = []
-          for (const i in this.editForm.answers) {
-            _answer[i] = this.editForm.answers[i].value
-          }
-          params.answers = _answer
         }
 
-        if (params.ai == 1 && (params.type === 3 || params.type === 5)) {
+        if (params.type === 2) {
+          params.answers = this.editForm.answerMultip
+        }
+
+        if (params.type === 3 || (params.ai === 1 && params.type === 5)) {
+          let _answers = []
+          for (const i in this.editForm.answers) {
+            _answer[i] = this.editForm.answers[i].value.join('\n')
+          }
+          params.answers = _answers
+        }
+
+        if (params.ai == 0 || [1, 4].includes(params.type)) {
+          params.scores = params.score
+        }
+
+        if (params.ai == 1 && params.type == 2) {
+          params.scores =
+            params.scoreOptions.length > 0 ? this.editForm.multipScore : 0
+        }
+
+        if ([3, 5].includes(params.type)) {
           let _scores = []
           for (const i in this.editForm.answers) {
-            _scores[i] = this.editForm.answers[i].score
+            _scores[i] =
+              params.ai == 1 ? this.editForm.answers[i].score : params.score
           }
+          console.log(_scores)
           let sum = 0
           _scores.forEach((item) => {
             sum += Number(item)
           })
-          if (sum > params.score) {
-            this.$tools.message('请重新填写答案分值！', 'warning')
+          if (sum != params.score && params.ai == 1) {
+            this.$tools.message('答案分值相加应等于总分值！', 'warning')
             return
           }
           params.scores = _scores
-        }
-
-        if (params.ai == 0 || [1, 2, 4].includes(params.type)) {
-          params.scores = params.score
         }
 
         const res = await this.$https.questionAdd(params)
@@ -948,12 +1083,11 @@ export default {
           title: this.editForm.title,
           analysis: this.editForm.analysis,
           score: this.editForm.score,
-          no: this.editForm.no,
           ai: this.editForm.ai,
         }
 
         // 选项
-        if (params.type === 1 || params.type === 2) {
+        if ([1, 2].includes(params.type)) {
           // 如果是单选、多选，提取选项值
           const _options = []
           for (const i in this.editForm.options) {
@@ -963,7 +1097,7 @@ export default {
         }
 
         // 分值选项
-        if (params.type === 2 || params.type === 3) {
+        if ([3, 2, 5].includes(params.type)) {
           // 如果是多选、填空，提取分值选项
           const _scoreOptions = []
 
@@ -973,38 +1107,48 @@ export default {
           params.scoreOptions = _scoreOptions
         }
 
-        if (params.type === 1 || params.type === 4 || params.type === 5) {
+        if ([1, 4, 5].includes(params.type)) {
           params.answers = this.editForm.answer
-        } else if (params.type === 2) {
-          // 如果是多选，答案按逗号分隔
+        }
+
+        if (params.type === 2) {
           params.answers = this.editForm.answerMultip
-        } else if (params.type === 3) {
-          // 如果是填空，答案之间按不可见字符回车分隔
-          const _answer = []
+        }
+
+        if (params.type === 3 || (params.ai === 1 && params.type === 5)) {
+          let _answer = []
           for (const i in this.editForm.answers) {
-            _answer[i] = this.editForm.answers[i].value
+            _answer[i] = this.editForm.answers[i].value.join('\n')
           }
           params.answers = _answer
         }
 
-        if (params.ai == 1 && (params.type === 3 || params.type === 5)) {
+        if (params.ai == 0 || [1, 4].includes(params.type)) {
+          params.scores = params.score
+        }
+
+        if (params.ai == 1 && params.type == 2) {
+          console.log(this.editForm.multipScore)
+          params.scores =
+            params.scoreOptions.length > 0 ? this.editForm.multipScore : 0
+        }
+
+        if ([3, 5].includes(params.type)) {
           let _scores = []
           for (const i in this.editForm.answers) {
-            _scores[i] = this.editForm.answers[i].score
+            _scores[i] =
+              params.ai == 1 ? this.editForm.answers[i].score : params.score
           }
+          console.log(_scores)
           let sum = 0
           _scores.forEach((item) => {
             sum += Number(item)
           })
-          if (sum > params.score) {
-            this.$tools.message('请重新填写答案分值！', 'warning')
+          if (sum != params.score && params.ai == 1) {
+            this.$tools.message('答案分值相加应等于总分值！', 'warning')
             return
           }
           params.scores = _scores
-        }
-
-        if (params.ai == 0 || [1, 2, 4].includes(params.type)) {
-          params.scores = params.score
         }
 
         var msg = newVer
@@ -1036,11 +1180,9 @@ export default {
       this.editForm.type = res.data.type
       this.editForm.difficulty = res.data.difficulty
       this.editForm.title = res.data.title
-      this.editForm.answer = res.data.answers[0]
-      this.editForm.answerMultip = res.data.answers
+      this.editForm.answer = res.data.answers[0].answer
       this.editForm.analysis = res.data.analysis
       this.editForm.score = res.data.score
-      this.editForm.no = res.data.no
       this.editForm.ai = res.data.ai
 
       if (this.editForm.type === 1) {
@@ -1049,7 +1191,10 @@ export default {
         for (let i = 0; i < res.data.options.length; i++) {
           this._addOption(i, res.data.options[i])
         }
-      } else if (this.editForm.type === 2) {
+      }
+      if (this.editForm.type === 2) {
+        this.editForm.answerMultip = []
+        this.editForm.multipScore = ''
         this.editForm.options = [] // 重置选项
         this.editForm.answers = [] // 重置答案列表
         for (let i = 0; i < res.data.options.length; i++) {
@@ -1057,7 +1202,13 @@ export default {
         }
         this.editForm.scoreOptions =
           res.data.scoreOptions == null ? [] : res.data.scoreOptions.split(',')
-      } else if (this.editForm.type === 3) {
+        this.editForm.answerMultip = res.data.answers.reduce((acc, cur) => {
+          acc.push(cur.answer)
+          return acc
+        }, [])
+        this.editForm.multipScore = res.data.answers[0].score
+      }
+      if ([3, 5].includes(this.editForm.type)) {
         this.editForm.answers = [] // 重置答案列表
         const answers = res.data.answers
         for (let i = 0; i < answers.length; i++) {
@@ -1066,6 +1217,10 @@ export default {
 
         this.editForm.scoreOptions =
           res.data.scoreOptions == null ? [] : res.data.scoreOptions.split(',')
+      }
+
+      if (res.data.ai == 1 && res.data.type === 5) {
+        this.editForm.answer = ''
       }
     },
     // 复制试题
@@ -1337,9 +1492,8 @@ export default {
 }
 
 .btn2 {
-  width: 65px;
+  padding: 0 10px;
   height: 25px;
-  padding: 0px;
 }
 
 .form-inline .el-form-item {
