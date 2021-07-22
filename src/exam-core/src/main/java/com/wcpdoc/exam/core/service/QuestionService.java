@@ -1,5 +1,6 @@
 package com.wcpdoc.exam.core.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +34,7 @@ public interface QuestionService extends BaseService<Question>{
 	 * @param options
 	 * void
 	 */
-	void addAndUpdate(Question question, String[] answers, String[] options);
+	void addAndUpdate(Question question, String[] answers, String[] options, BigDecimal[] scores);
 
 	/**
 	 * 完成试题修改
@@ -45,7 +46,7 @@ public interface QuestionService extends BaseService<Question>{
 	 * @param newVer
 	 * void 
 	 */
-	void updateAndUpdate(Question question, String[] answers, String[] options); //, boolean newVer
+	void updateAndUpdate(Question question, String[] answers, String[] options, BigDecimal[] scores); //, boolean newVer
 	
 	/**
 	 * 完成导入试题

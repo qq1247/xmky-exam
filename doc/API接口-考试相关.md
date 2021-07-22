@@ -198,13 +198,14 @@ code == 401 无权限或登录超时
 | difficulty     | Integer         | 难度（1：极易；2：简单；3：适中；4：困难；5：极难 ）                                                                             | 是   |
 | title          | String（65535） | 题干                                                                                                                             | 是   |
 | options[]      | String[]        | 选项，type为1,2时有效，len <= 7                                                                                                  | 否   |
-| answers[]      | String[]	   | 答案（类型为1,4,5，answers.len==1，类型为2,3，answers.len>=1）                                                                   | 是   |
 | analysis       | String(65535)   | 解析                                                                                                                             | 是   |
 | state          | Integer         | 状态（1：启用；2：禁用 ）                                                                                                        | 是   |
 | questionTypeId | Integer         | 试题分类ID                                                                                                                       | 是   |
-| score          | Double          | 分值                                                                                                                             | 否   |
+| score          | Double          | 总分值                                                                                                                           | 否   |
 | scoreOptions   | String(8)       | 分值选项，type为2时1有效，type为3时1,2,3,4有效，多选用英文逗号分隔。1：半对半分；2：答案无顺序；3：大小写不敏感；4：包含答案得分 | 否   |
 | no             | Integer         | 排序                                                                                                                             | 是   |
+| answers[]      | String[]	   	   | 答案（类型为1,4,5，answers.len==1，类型为2,3，answers.len>=1）                                                                   | 是   |
+| scores[]      | Double[]	       | 分值                                                                   														  | 是   |
 
 ####试题删除：question/edit
 ######请求参数

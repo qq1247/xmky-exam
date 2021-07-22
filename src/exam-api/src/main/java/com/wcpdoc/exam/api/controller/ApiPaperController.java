@@ -28,12 +28,14 @@ import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.PaperRemark;
 import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.PaperQuestionService;
 import com.wcpdoc.exam.core.service.PaperRemarkService;
 import com.wcpdoc.exam.core.service.PaperService;
+import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
@@ -62,7 +64,8 @@ public class ApiPaperController extends BaseController {
 	private UserService userService;
 	@Resource
 	private QuestionTypeService questionTypeService;
-	
+	@Resource
+	private QuestionAnswerService questionAnswerService;
 	
 	/**
 	 * 试卷列表
@@ -488,13 +491,13 @@ public class ApiPaperController extends BaseController {
 					QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
 					boolean writeAuth = questionTypeService.hasWriteAuth(questionType, getCurUser().getId());
 					boolean readAuth = questionTypeService.hasReadAuth(questionType, getCurUser().getId());
-					String[] answers = question.getAnswers();
+					List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
 					if (!writeAuth & !readAuth) {
-						for (int i = 0; i < answers.length; i++) {
-							answers[i] = null;
+						for(QuestionAnswer questionAnswer : questionAnswerList){
+							questionAnswer.setAnswer(null);
 						}
 					}
-					questionMap.put("answers", answers);
+					questionMap.put("answers", questionAnswerList);
 
 					questionsListMap.add(questionMap);
 				}

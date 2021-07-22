@@ -30,7 +30,7 @@ file:
     dir: d:/bak/file
       
 sys:
-  ver: 2.0.0
+  ver: 3.0.0
 token:
     expireMinute: 1440
     refreshMinute: 60

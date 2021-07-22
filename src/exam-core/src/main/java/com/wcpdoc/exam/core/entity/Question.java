@@ -13,8 +13,6 @@ import javax.persistence.Table;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.wcpdoc.exam.core.exception.MyException;
-import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
  * 试题实体
@@ -34,8 +32,6 @@ public class Question {
 	private Integer difficulty;
 	@Column(name = "TITLE")
 	private String title;
-	@Column(name = "ANSWER")
-	private String answer;
 	@Column(name = "ANALYSIS")
 	private String analysis;
 	@Column(name = "STATE")
@@ -56,6 +52,8 @@ public class Question {
 	private Integer questionTypeId;
 	@Column(name = "SCORE")
 	private BigDecimal score;
+	@Column(name = "AI")
+	private Integer ai;
 	@Column(name = "SCORE_OPTIONS")
 	private String scoreOptions;
 	@Column(name = "VER")
@@ -97,14 +95,6 @@ public class Question {
 
 	public void setTitle(String title) {
 		this.title = title;
-	}
-	
-	public String getAnswer() {
-		return answer;
-	}
-
-	public void setAnswer(String answer) {
-		this.answer = answer;
 	}
 
 	public String getAnalysis() {
@@ -205,37 +195,11 @@ public class Question {
 		this.createTime = createTime;
 	}
 
-	public String[] getAnswers() {
-		if (!ValidateUtil.isValid(answer)) {
-			return new String[0];
-		}
-		
-		if (type == 1 || type == 4 || type == 5) {
-			return new String[] { answer };
-		}
-		if (type == 2) {
-			return answer.split(",");
-		}
-		if (type == 3) {
-			return answer.split("\n");
-		}
-		throw new MyException("getAnswers方法解析错误");
+	public Integer getAi() {
+		return ai;
 	}
-	
-	public String[] getAnswers(Integer type, String answer) {
-		if (!ValidateUtil.isValid(answer)) {
-			return new String[0];
-		}
-		
-		if (type == 1 || type == 4 || type == 5) {
-			return new String[] { answer };
-		}
-		if (type == 2) {
-			return answer.split(",");
-		}
-		if (type == 3) {
-			return answer.split("\n");
-		}
-		throw new MyException("getAnswers方法解析错误");
+
+	public void setAi(Integer ai) {
+		this.ai = ai;
 	}
 }

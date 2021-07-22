@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -37,9 +38,11 @@ import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
@@ -66,6 +69,8 @@ public class ApiQuestionController extends BaseController {
 	private QuestionTypeService questionTypeService;
 	@Resource
 	private QuestionOptionService questionOptionService;
+	@Resource
+	private QuestionAnswerService questionAnswerService;
 	
 	/**
 	 * 试题列表 
@@ -140,9 +145,9 @@ public class ApiQuestionController extends BaseController {
 	@RequestMapping("/add")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult add(Question question, String[] answers, String[] options) {
+	public PageResult add(Question question, String[] answers, String[] options, BigDecimal[] scores) {
 		try {
-			questionService.addAndUpdate(question, answers, options);
+			questionService.addAndUpdate(question, answers, options, scores);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加试题错误：{}", e.getMessage());
@@ -166,9 +171,9 @@ public class ApiQuestionController extends BaseController {
 	@RequestMapping("/edit")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult edit(Question question, String[] answers, String[] options) {  //, boolean newVer
+	public PageResult edit(Question question, String[] answers, String[] options, BigDecimal[] scores) {  //, boolean newVer
 		try {
-			questionService.updateAndUpdate(question, answers, options); //, newVer
+			questionService.updateAndUpdate(question, answers, options, scores); //, newVer
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改试题错误：{}", e.getMessage());
@@ -227,12 +232,14 @@ public class ApiQuestionController extends BaseController {
 					optionList.add(questionOption.getOptions());
 				}
 			}
+			List<QuestionAnswer> QuestionAnswerList = questionAnswerService.getList(question.getId());
 			QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
 			boolean writeAuth = questionTypeService.hasWriteAuth(questionType, getCurUser().getId());		
-			boolean readAuth = questionTypeService.hasReadAuth(questionType, getCurUser().getId());		
+			boolean readAuth = questionTypeService.hasReadAuth(questionType, getCurUser().getId());
 			PageResultEx pageResult = PageResultEx.ok()
 					.addAttr("id", question.getId())
 					.addAttr("type", question.getType())
+					.addAttr("ai", question.getAi())
 					.addAttr("difficulty", question.getDifficulty())
 					.addAttr("title", question.getTitle())
 					.addAttr("analysis", question.getAnalysis())
@@ -242,7 +249,7 @@ public class ApiQuestionController extends BaseController {
 					.addAttr("scoreOptions", question.getScoreOptions())
 					.addAttr("no", question.getNo())
 					.addAttr("options", optionList.toArray(new String[optionList.size()]))
-					.addAttr("answers", (writeAuth || readAuth) ? question.getAnswers() : new String[0]);
+					.addAttr("answers", (writeAuth || readAuth) ? QuestionAnswerList : new String[0]);
 			return pageResult;
 		} catch (MyException e) {
 			log.error("获取试题错误：{}", e.getMessage());
@@ -271,6 +278,14 @@ public class ApiQuestionController extends BaseController {
 			entity.setCreateTime(new Date());
 			entity.setCreateUserId(getCurUser().getId());
 			questionService.add(entity);
+			
+			List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
+			for(QuestionAnswer questionAnswer : questionAnswerList){
+				QuestionAnswer questionAnswerNew = new QuestionAnswer();
+				BeanUtils.copyProperties(questionAnswerNew, questionAnswer);
+				questionAnswerNew.setQuestionId(entity.getId());
+				questionAnswerService.add(questionAnswerNew);
+			}
 			
 			List<QuestionOption> questionOptionList = questionOptionService.getList(question.getId());
 			for (QuestionOption questionOption : questionOptionList) {
@@ -393,7 +408,8 @@ public class ApiQuestionController extends BaseController {
 		}*/
 	
 		Question entity = questionService.getEntity(26);
-
+		List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(entity.getId());
+		
 		Map<String, Object> mapList = new HashMap<String, Object>();
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -409,7 +425,7 @@ public class ApiQuestionController extends BaseController {
 		map.put("optionF", "FFFFFFFFFF");
 		map.put("optionG", "GGGGGGGGGG");
 		
-		map.put("answer", entity.getAnswer());
+		map.put("answer", questionAnswerList);
 		map.put("score", "3.0");
 		map.put("scoreOptions", "半对半错");
 		map.put("analysis", entity.getAnalysis());
