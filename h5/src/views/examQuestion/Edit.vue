@@ -1,17 +1,7 @@
 <template>
   <div class="container">
     <!-- 导航 -->
-    <div class="head">
-      <el-link
-        class="head-left"
-        :underline="false"
-        @click="goBack"
-        icon="el-icon-back"
-        >返回</el-link
-      >
-      <span>{{ queryForm.name }}</span>
-      <div class="head-right"></div>
-    </div>
+    <EditHeader :title="queryForm.name"></EditHeader>
     <!-- 搜索 -->
     <el-form :inline="true" :model="queryForm" class="form-inline search">
       <div>
@@ -65,7 +55,7 @@
     </el-form>
     <!-- 内容 -->
     <div class="content">
-      <div class="content-left">
+      <el-scrollbar wrap-style="overflow-x:hidden;" class="content-left">
         <div class="left-top">添加题型</div>
         <div
           :class="[
@@ -90,34 +80,40 @@
           <img src="../../assets/img/icon/import-icon.png" />
           试题导入
         </div>
-      </div>
-      <div class="content-center">
+      </el-scrollbar>
+      <el-scrollbar wrap-style="overflow-x:hidden;" class="content-center">
         <template v-if="list.questionList.length > 0">
           <el-card
-            :key="quesiton.id"
+            :key="question.id"
             class="center-card"
             shadow="hover"
-            v-for="quesiton in list.questionList"
+            v-for="question in list.questionList"
           >
-            <div class="center-card-top" v-html="quesiton.title"></div>
+            <div
+              class="center-card-top"
+              v-html="`${question.id}、${question.title}`"
+            ></div>
             <div class="center-card-bottom">
               <div class="card-bottom-left">
                 <el-tag class="center-tag-danger" size="mini" type="danger">{{
-                  quesiton.typeName
+                  question.typeName
                 }}</el-tag>
                 <el-tag class="center-tag-purple" effect="plain" size="mini">{{
-                  quesiton.difficultyName
+                  question.difficultyName
                 }}</el-tag>
                 <el-tag effect="plain" size="mini" type="danger"
-                  >{{ quesiton.score }}分</el-tag
+                  >{{ question.score }}分</el-tag
                 >
                 <el-tag effect="plain" size="mini">{{
-                  quesiton.updateUserName
+                  question.createUserName
+                }}</el-tag>
+                <el-tag effect="plain" size="mini">{{
+                  question.state == 1 ? '发布' : '草稿'
                 }}</el-tag>
               </div>
               <div class="card-bottom-right">
                 <el-button
-                  @click="get(quesiton.id)"
+                  @click="get(question.id)"
                   class="btn"
                   icon="el-icon-document"
                   plain
@@ -127,7 +123,7 @@
                   >详细</el-button
                 >
                 <el-button
-                  @click="copy(quesiton.id)"
+                  @click="copy(question.id)"
                   class="btn"
                   icon="el-icon-document-copy"
                   plain
@@ -137,7 +133,7 @@
                   >复制</el-button
                 >
                 <el-button
-                  @click="del(quesiton.id)"
+                  @click="del(question.id)"
                   class="btn"
                   icon="el-icon-delete"
                   plain
@@ -145,6 +141,17 @@
                   size="mini"
                   type="primary"
                   >删除</el-button
+                >
+                <el-button
+                  v-if="question.state == 2"
+                  @click="publish(question.id, question.state)"
+                  class="btn"
+                  icon="el-icon-share"
+                  plain
+                  round
+                  size="mini"
+                  type="primary"
+                  >发布</el-button
                 >
               </div>
             </div>
@@ -168,13 +175,13 @@
             <span class="data-tip">抱歉！暂无信息</span>
           </div>
         </template>
-      </div>
-      <div class="content-right">
+      </el-scrollbar>
+      <el-scrollbar wrap-style="overflow-x:hidden;" class="content-right">
         <el-form
           :model="editForm"
           ref="editForm"
           :rules="editForm.rules"
-          label-width="70px"
+          label-width="80px"
           size="mini"
           v-model="labelPosition"
         >
@@ -253,6 +260,87 @@
             </el-form-item>
           </template>
 
+          <el-row>
+            <el-col :span="13">
+              <el-form-item label="分值" prop="score">
+                <el-input-number
+                  :max="100"
+                  :min="1"
+                  :step="1"
+                  controls-position="right"
+                  v-model.number="editForm.score"
+                ></el-input-number>
+              </el-form-item>
+            </el-col>
+            <el-col :span="9">
+              <el-form-item label="智能阅卷" prop="ai">
+                <el-switch
+                  active-color="#0094e5"
+                  :active-value="1"
+                  inactive-color="#ff4949"
+                  :inactive-value="0"
+                  v-model="editForm.ai"
+                  @change="aiChange"
+                ></el-switch>
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+          <template v-if="editForm.ai == 1">
+            <el-form-item v-if="editForm.type === 2">
+              <el-checkbox-group v-model="editForm.scoreOptions">
+                <el-tooltip
+                  class="item"
+                  content="默认全对得分"
+                  effect="dark"
+                  placement="top"
+                >
+                  <el-checkbox label="1">漏选得分</el-checkbox>
+                </el-tooltip>
+              </el-checkbox-group>
+            </el-form-item>
+            <el-form-item v-if="editForm.type === 3">
+              <el-checkbox-group v-model="editForm.scoreOptions">
+                <el-tooltip
+                  class="item"
+                  content="默认全对得分"
+                  effect="dark"
+                  placement="top"
+                >
+                  <el-checkbox label="1">漏答得分</el-checkbox>
+                </el-tooltip>
+                <el-tooltip
+                  class="item"
+                  content="默认答案有顺序"
+                  effect="dark"
+                  placement="top"
+                >
+                  <el-checkbox label="2">答案无顺序</el-checkbox>
+                </el-tooltip>
+                <el-tooltip
+                  class="item"
+                  content="默认大小写敏感"
+                  effect="dark"
+                  placement="top"
+                >
+                  <el-checkbox label="3">大小写不敏感</el-checkbox>
+                </el-tooltip>
+              </el-checkbox-group>
+            </el-form-item>
+            <el-form-item v-if="editForm.type === 5">
+              <el-checkbox-group v-model="editForm.scoreOptions">
+                <el-tooltip
+                  class="item"
+                  content="大小写不敏感"
+                  effect="dark"
+                  placement="top"
+                >
+                  <el-checkbox label="1">大小写不敏感</el-checkbox>
+                </el-tooltip>
+              </el-checkbox-group>
+            </el-form-item>
+          </template>
+
           <el-form-item label="答案" prop="answer" v-if="editForm.type === 1">
             <el-radio-group v-model="editForm.answer">
               <el-radio
@@ -280,21 +368,35 @@
                 title="单空有多个同义词，用三竖线分开。如：一般|||通常|||普遍"
                 type="success"
               ></el-alert>
-              <el-form-item
-                :key="'answers' + index"
-                :prop="`answers.${index}.value`"
-                :rules="editForm.rules.answer"
+              <div
                 v-for="(answer, index) in editForm.answers"
+                :key="index"
+                class="ai-answers"
               >
-                <el-input v-model="answer.value">
-                  <template slot="prepend">填空{{ answer.lab }}</template>
-                </el-input>
-              </el-form-item>
+                <el-form-item
+                  :prop="`answers.${index}.value`"
+                  :rules="editForm.rules.answer"
+                  class="ai-answer"
+                >
+                  <el-input v-model="answer.value">
+                    <template slot="prepend">填空{{ answer.lab }}</template>
+                  </el-input>
+                </el-form-item>
+                <el-form-item
+                  :prop="`answers.${index}.score`"
+                  :rules="editForm.rules.aiScore"
+                  class="ai-score"
+                >
+                  <el-input v-if="editForm.ai == 1" v-model="answer.score">
+                    <template slot="append">分</template>
+                  </el-input>
+                </el-form-item>
+              </div>
               <el-button
                 :disabled="editForm.answers.length >= 7"
                 @click="addFillBlanks()"
                 class="btn2"
-                style="margin-left: 78px"
+                style="margin-left: 65px"
                 type="primary"
                 >+添加填空</el-button
               >
@@ -331,77 +433,6 @@
               id="analysis"
             ></Editor>
           </el-form-item>
-          <el-row>
-            <el-col :span="11">
-              <el-form-item label="分值" prop="score">
-                <el-input-number
-                  :max="100"
-                  :min="1"
-                  :step="1"
-                  controls-position="right"
-                  v-model.number="editForm.score"
-                ></el-input-number>
-              </el-form-item>
-            </el-col>
-            <el-col :span="11">
-              <el-form-item label="排序" prop="no">
-                <el-input-number
-                  :max="100000"
-                  :min="1"
-                  controls-position="right"
-                  v-model.number="editForm.no"
-                ></el-input-number>
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <el-form-item label="分值选项" v-if="editForm.type === 2">
-            <el-checkbox-group v-model="editForm.scoreOptions">
-              <el-tooltip
-                class="item"
-                content="默认全对得分"
-                effect="dark"
-                placement="top"
-              >
-                <el-checkbox label="1">半对半分</el-checkbox>
-              </el-tooltip>
-            </el-checkbox-group>
-          </el-form-item>
-          <el-form-item label="分值选项" v-if="editForm.type === 3">
-            <el-checkbox-group v-model="editForm.scoreOptions">
-              <el-tooltip
-                class="item"
-                content="默认全对得分"
-                effect="dark"
-                placement="top"
-              >
-                <el-checkbox label="1">半对半分</el-checkbox>
-              </el-tooltip>
-              <el-tooltip
-                class="item"
-                content="默认答案有顺序"
-                effect="dark"
-                placement="top"
-              >
-                <el-checkbox label="2">答案无顺序</el-checkbox>
-              </el-tooltip>
-              <el-tooltip
-                class="item"
-                content="默认大小写敏感"
-                effect="dark"
-                placement="top"
-              >
-                <el-checkbox label="3">大小写不敏感</el-checkbox>
-              </el-tooltip>
-              <el-tooltip
-                class="item"
-                content="默认等于答案得分"
-                effect="dark"
-                placement="top"
-              >
-                <el-checkbox label="4">包含答案得分</el-checkbox>
-              </el-tooltip>
-            </el-checkbox-group>
-          </el-form-item>
           <el-form-item>
             <el-button
               @click="add()"
@@ -417,19 +448,20 @@
               v-if="editForm.id"
               >修改</el-button
             >
-            <el-button
+            <!-- <el-button
               @click="edit(true)"
               plain
               style="width: 164px; height: 40px; border-color: #fff"
               type="primary"
               v-if="editForm.id != null"
               >生成新版本</el-button
-            >
+            > -->
           </el-form-item>
         </el-form>
-      </div>
+      </el-scrollbar>
     </div>
     <!-- 上传试题模板 -->
+
     <el-dialog
       :visible.sync="fileForm.show"
       :show-close="false"
@@ -453,11 +485,25 @@
 </template>
 <script>
 import Editor from '@/components/Editor.vue'
+import EditHeader from '@/components/EditHeader.vue'
 export default {
   components: {
     Editor,
+    EditHeader,
   },
   data() {
+    const validateAiScore = (rule, value, callback) => {
+      if (!this.editForm.ai == 0) {
+        return callback()
+      }
+      if (value == '') {
+        return callback(new Error('请填写分数'))
+      }
+      if (value > this.editForm.score) {
+        return callback(new Error(`请填写合理分数`))
+      }
+      return callback()
+    }
     return {
       labelPosition: 'left',
       value: '',
@@ -489,6 +535,7 @@ export default {
         type: 1, // 类型
         difficulty: 1, // 难度
         title: '', // 标题
+        ai: 1, //AI阅卷
         options: [
           {
             lab: 'A',
@@ -505,10 +552,12 @@ export default {
           {
             lab: 'A',
             value: '',
+            score: '',
           },
           {
             lab: 'B',
             value: '',
+            score: '',
           },
         ], // 答案
         judgeAnswers: [
@@ -543,7 +592,7 @@ export default {
             },
           ],
           score: [{ required: true, message: '请输入分值', trigger: 'change' }],
-          no: [{ required: true, message: '请输入排序', trigger: 'change' }],
+          aiScore: [{ validator: validateAiScore }],
         },
       },
       typeButtonGroup: [
@@ -722,6 +771,9 @@ export default {
         ] // 添加答案校验
       }
     },
+    aiChange() {
+      this.$refs.editForm.validate()
+    },
     // 添加选项
     addOption() {
       if (this.editForm.options.length >= 7) {
@@ -755,7 +807,11 @@ export default {
     // 添加填空
     _addFillBlanks(index, value) {
       const lab = String.fromCharCode(65 + index)
-      this.editForm.answers.push({ lab: lab, value: value })
+      this.editForm.answers.push({
+        lab: lab,
+        value: value.answer,
+        score: value.score,
+      })
 
       this.editForm.rules['answers.' + index + '.value'] = [
         { required: true, message: '请输入填空' + lab, trigger: 'change' },
@@ -788,6 +844,7 @@ export default {
     updateType(value) {
       this.$tools.resetData(this, 'editForm')
       this.editForm.type = value
+      if (value == 5) this.editForm.ai == 0
     },
     // 添加试题
     async add() {
@@ -806,8 +863,8 @@ export default {
           title: this.editForm.title,
           analysis: this.editForm.analysis,
           score: this.editForm.score,
-          no: this.editForm.no,
           questionTypeId: this.queryForm.questionTypeId,
+          ai: this.editForm.ai,
         }
 
         if (params.type === 1 || params.type === 2) {
@@ -834,11 +891,31 @@ export default {
           params.answers = this.editForm.answerMultip
         } else if (params.type === 3) {
           // 如果是填空，答案之间按不可见字符回车分隔
-          const _answer = []
+          let _answer = []
           for (const i in this.editForm.answers) {
             _answer[i] = this.editForm.answers[i].value
           }
           params.answers = _answer
+        }
+
+        if (params.ai == 1 && (params.type === 3 || params.type === 5)) {
+          let _scores = []
+          for (const i in this.editForm.answers) {
+            _scores[i] = this.editForm.answers[i].score
+          }
+          let sum = 0
+          _scores.forEach((item) => {
+            sum += Number(item)
+          })
+          if (sum > params.score) {
+            this.$tools.message('请重新填写答案分值！', 'warning')
+            return
+          }
+          params.scores = _scores
+        }
+
+        if (params.ai == 0 || [1, 2, 4].includes(params.type)) {
+          params.scores = params.score
         }
 
         const res = await this.$https.questionAdd(params)
@@ -872,6 +949,7 @@ export default {
           analysis: this.editForm.analysis,
           score: this.editForm.score,
           no: this.editForm.no,
+          ai: this.editForm.ai,
         }
 
         // 选项
@@ -909,6 +987,26 @@ export default {
           params.answers = _answer
         }
 
+        if (params.ai == 1 && (params.type === 3 || params.type === 5)) {
+          let _scores = []
+          for (const i in this.editForm.answers) {
+            _scores[i] = this.editForm.answers[i].score
+          }
+          let sum = 0
+          _scores.forEach((item) => {
+            sum += Number(item)
+          })
+          if (sum > params.score) {
+            this.$tools.message('请重新填写答案分值！', 'warning')
+            return
+          }
+          params.scores = _scores
+        }
+
+        if (params.ai == 0 || [1, 2, 4].includes(params.type)) {
+          params.scores = params.score
+        }
+
         var msg = newVer
           ? '生成新版本不会同步到已引用的试卷，仍要生成新版本？'
           : '当前修改会同步到引用的试卷，确定要修改？'
@@ -943,6 +1041,7 @@ export default {
       this.editForm.analysis = res.data.analysis
       this.editForm.score = res.data.score
       this.editForm.no = res.data.no
+      this.editForm.ai = res.data.ai
 
       if (this.editForm.type === 1) {
         this.editForm.options = [] // 重置选项
@@ -1012,6 +1111,21 @@ export default {
         }
       })
     },
+    // 发布试题
+    async publish(id, state) {
+      if (state == 1) {
+        this.$tools.message('试题已经发布！', 'warning')
+        return
+      }
+      const res = await this.$https
+        .questionPublish({
+          id,
+        })
+        .catch((err) => {})
+      res?.code == 200
+        ? (this.$tools.message('发布成功！'), this.pageChange())
+        : this.$tools.message('发布失败！', 'error')
+    },
     // 获取试题模板
     async questionTemplate() {
       const template = await this.$https.questionTemplate({}, 'blob')
@@ -1051,35 +1165,11 @@ export default {
 <style lang="scss" scoped>
 .container {
   width: 100%;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   padding-bottom: 10px;
   padding-top: 0;
-}
-
-.head {
-  width: 100%;
-  height: 50px;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(10px);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-  color: #fff;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1000;
-  .head-left {
-    color: #fff;
-  }
-  .head-right {
-    color: #fff;
-    .common {
-      font-size: 20px;
-    }
-  }
 }
 
 .search {
@@ -1093,6 +1183,7 @@ export default {
 .content {
   display: flex;
   width: 100%;
+  height: calc(100vh - 130px);
   padding: 0 20px;
   margin: 0 auto;
 }
@@ -1103,9 +1194,7 @@ export default {
   border-radius: 5px;
   box-shadow: 0 0 13px 3px rgba(30, 159, 255, 0.15);
   .left-top {
-    background-color: #0095e5;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
+    background: #0095e5;
     width: 100%;
     height: 40px;
     line-height: 40px;
@@ -1202,6 +1291,12 @@ export default {
   .center-card-top {
     font-size: 14px;
     text-align: left;
+    display: flex;
+    align-items: center;
+    p {
+      margin: 0;
+      padding: 0;
+    }
   }
   .center-card-bottom {
     display: flex;
@@ -1234,7 +1329,7 @@ export default {
 }
 
 .content-right {
-  width: 460px;
+  width: 500px;
   background: #fff;
   border-radius: 5px;
   padding: 10px 0 0 0;
@@ -1249,6 +1344,7 @@ export default {
 
 .form-inline .el-form-item {
   width: 140px;
+  margin-bottom: 0;
 }
 
 .pagination {
@@ -1283,11 +1379,23 @@ export default {
   font-size: 12px;
   color: #0095e5;
 }
+.ai-answers {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  .ai-answer {
+    width: 75%;
+  }
+  .ai-score {
+    width: 20%;
+  }
+}
 
-.el-input /deep/.el-input-group__prepend {
+.el-input /deep/.el-input-group__prepend,
+.el-input /deep/.el-input-group__append {
   background-color: #fff;
-  border: 0px;
-  width: 38px;
+  padding: 0 10px;
 }
 
 /deep/ .el-form-item--mini.el-form-item,
