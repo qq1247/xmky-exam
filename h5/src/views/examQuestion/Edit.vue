@@ -2,6 +2,7 @@
   <div class="container">
     <!-- 导航 -->
     <EditHeader :title="queryForm.name"></EditHeader>
+
     <!-- 搜索 -->
     <el-form :inline="true" :model="queryForm" class="form-inline search">
       <div>
@@ -53,6 +54,7 @@
         >
       </el-form-item>
     </el-form>
+
     <!-- 内容 -->
     <div class="content">
       <el-scrollbar wrap-style="overflow-x:hidden;" class="content-left">
@@ -85,7 +87,10 @@
         <template v-if="list.questionList.length > 0">
           <el-card
             :key="question.id"
-            class="center-card"
+            :class="[
+              'center-card',
+              question.id == editForm.id ? 'center-card-active' : '',
+            ]"
             shadow="hover"
             v-for="question in list.questionList"
           >
@@ -547,7 +552,7 @@
               >添加</el-button
             >
             <el-button
-              @click="edit(false)"
+              @click="edit()"
               style="width: 164px; height: 40px"
               type="primary"
               v-if="editForm.id"
@@ -565,8 +570,8 @@
         </el-form>
       </el-scrollbar>
     </div>
-    <!-- 上传试题模板 -->
 
+    <!-- 上传试题模板 -->
     <el-dialog
       :visible.sync="fileForm.show"
       :show-close="false"
@@ -972,6 +977,81 @@ export default {
       this.editForm.type = value
       if (value == 5) this.editForm.ai = 0
     },
+    // 组合添加或修改请求参数
+    compistionParam(status) {
+      const params = {
+        type: this.editForm.type,
+        difficulty: this.editForm.difficulty,
+        title: this.editForm.title,
+        analysis: this.editForm.analysis,
+        score: this.editForm.score,
+        ai: this.editForm.ai,
+      }
+
+      status
+        ? (params.questionTypeId = this.queryForm.questionTypeId)
+        : (params.id = this.editForm.id)
+
+      // 选项值(单选、多选)
+      if ([1, 2].includes(params.type)) {
+        params.options = this.editForm.options.reduce((acc, cur) => {
+          acc.push(cur.value)
+          return acc
+        }, [])
+      }
+
+      // 分值选项 (多选【漏选得分】 填空【漏答得分、大小写不敏感】  问答【大小写不敏感】)
+      if ([2, 3, 5].includes(params.type)) {
+        params.scoreOptions = this.editForm.scoreOptions.reduce((acc, cur) => {
+          acc.push(cur)
+          return acc
+        }, [])
+      }
+
+      // 答案（单选、判断、问答【非智能 ai=2】）
+      if ([1, 4, 5].includes(params.type)) {
+        params.answers = this.editForm.answer
+      }
+
+      // 答案（多选）
+      if (params.type === 2) {
+        params.answers = this.editForm.answerMultip
+      }
+
+      // 答案（填空、问答【智能 ai=1】）
+      if (params.type === 3 || (params.ai === 1 && params.type === 5)) {
+        params.answers = this.editForm.answers.reduce((acc, cur) => {
+          acc.push(cur.value.join('\n'))
+          return acc
+        }, [])
+      }
+
+      // 分值选项对应的分值（非智能 ai=2 || 单选、判断）
+      if (params.ai == 0 || [1, 4].includes(params.type)) {
+        params.scores = params.score
+      }
+
+      // 分值选项对应的分值（多选）
+      if (params.ai == 1 && params.type == 2) {
+        params.scores =
+          params.scoreOptions.length > 0 ? this.editForm.multipScore : 0
+      }
+
+      // 分值选项对应的分值（填空、问答）
+      if ([3, 5].includes(params.type)) {
+        params.scores = this.editForm.answers.reduce((acc, cur) => {
+          acc.push(params.ai == 1 ? cur.score : params.score)
+          return acc
+        }, [])
+        let sum = params.scores.reduce((acc, cur) => acc + Number(cur), 0)
+        if (sum != params.score && params.ai == 1) {
+          this.$tools.message('答案分值相加应等于总分值！', 'warning')
+          return
+        }
+      }
+
+      return params
+    },
     // 添加试题
     add() {
       if (this.queryForm.edit == 'false') {
@@ -983,77 +1063,7 @@ export default {
           return false
         }
 
-        const params = {
-          type: this.editForm.type,
-          difficulty: this.editForm.difficulty,
-          title: this.editForm.title,
-          analysis: this.editForm.analysis,
-          score: this.editForm.score,
-          questionTypeId: this.queryForm.questionTypeId,
-          ai: this.editForm.ai,
-        }
-
-        if ([1, 2].includes(params.type)) {
-          // 如果是单选、多选，提取选项值
-          const _options = []
-          for (const i in this.editForm.options) {
-            _options[i] = this.editForm.options[i].value
-          }
-          params.options = _options
-        }
-        if ([2, 3, 5].includes(params.type)) {
-          // 如果是多选、填空，提取分值选项
-          const _scoreOptions = []
-          for (const i in this.editForm.scoreOptions) {
-            _scoreOptions[i] = this.editForm.scoreOptions[i]
-          }
-          params.scoreOptions = _scoreOptions
-        }
-
-        if ([1, 4, 5].includes(params.type)) {
-          params.answers = this.editForm.answer
-        }
-
-        if (params.type === 2) {
-          params.answers = this.editForm.answerMultip
-        }
-
-        if (params.type === 3 || (params.ai === 1 && params.type === 5)) {
-          let _answers = []
-          for (const i in this.editForm.answers) {
-            _answer[i] = this.editForm.answers[i].value.join('\n')
-          }
-          params.answers = _answers
-        }
-
-        if (params.ai == 0 || [1, 4].includes(params.type)) {
-          params.scores = params.score
-        }
-
-        if (params.ai == 1 && params.type == 2) {
-          params.scores =
-            params.scoreOptions.length > 0 ? this.editForm.multipScore : 0
-        }
-
-        if ([3, 5].includes(params.type)) {
-          let _scores = []
-          for (const i in this.editForm.answers) {
-            _scores[i] =
-              params.ai == 1 ? this.editForm.answers[i].score : params.score
-          }
-          console.log(_scores)
-          let sum = 0
-          _scores.forEach((item) => {
-            sum += Number(item)
-          })
-          if (sum != params.score && params.ai == 1) {
-            this.$tools.message('答案分值相加应等于总分值！', 'warning')
-            return
-          }
-          params.scores = _scores
-        }
-
-        const res = await this.$https.questionAdd(params)
+        const res = await this.$https.questionAdd(this.compistionParam(true))
         res?.code == 200
           ? ((this.list.total += 1), this.$tools.message('添加成功！'))
           : this.$tools.message('添加失败！', 'error')
@@ -1066,7 +1076,7 @@ export default {
       })
     },
     // 修改试题
-    edit(newVer) {
+    edit() {
       if (this.queryForm.edit == 'false') {
         this.$tools.message('暂无此项权限！', 'warning')
         return
@@ -1075,92 +1085,15 @@ export default {
         if (!valid) {
           return false
         }
-
-        const params = {
-          id: this.editForm.id,
-          type: this.editForm.type,
-          difficulty: this.editForm.difficulty,
-          title: this.editForm.title,
-          analysis: this.editForm.analysis,
-          score: this.editForm.score,
-          ai: this.editForm.ai,
-        }
-
-        // 选项
-        if ([1, 2].includes(params.type)) {
-          // 如果是单选、多选，提取选项值
-          const _options = []
-          for (const i in this.editForm.options) {
-            _options[i] = this.editForm.options[i].value
-          }
-          params.options = _options
-        }
-
-        // 分值选项
-        if ([3, 2, 5].includes(params.type)) {
-          // 如果是多选、填空，提取分值选项
-          const _scoreOptions = []
-
-          this.editForm.scoreOptions.forEach((element) => {
-            _scoreOptions.push(element)
-          })
-          params.scoreOptions = _scoreOptions
-        }
-
-        if ([1, 4, 5].includes(params.type)) {
-          params.answers = this.editForm.answer
-        }
-
-        if (params.type === 2) {
-          params.answers = this.editForm.answerMultip
-        }
-
-        if (params.type === 3 || (params.ai === 1 && params.type === 5)) {
-          let _answer = []
-          for (const i in this.editForm.answers) {
-            _answer[i] = this.editForm.answers[i].value.join('\n')
-          }
-          params.answers = _answer
-        }
-
-        if (params.ai == 0 || [1, 4].includes(params.type)) {
-          params.scores = params.score
-        }
-
-        if (params.ai == 1 && params.type == 2) {
-          console.log(this.editForm.multipScore)
-          params.scores =
-            params.scoreOptions.length > 0 ? this.editForm.multipScore : 0
-        }
-
-        if ([3, 5].includes(params.type)) {
-          let _scores = []
-          for (const i in this.editForm.answers) {
-            _scores[i] =
-              params.ai == 1 ? this.editForm.answers[i].score : params.score
-          }
-          console.log(_scores)
-          let sum = 0
-          _scores.forEach((item) => {
-            sum += Number(item)
-          })
-          if (sum != params.score && params.ai == 1) {
-            this.$tools.message('答案分值相加应等于总分值！', 'warning')
-            return
-          }
-          params.scores = _scores
-        }
-
-        var msg = newVer
-          ? '生成新版本不会同步到已引用的试卷，仍要生成新版本？'
-          : '当前修改会同步到引用的试卷，确定要修改？'
-        this.$confirm(msg, '提示', {
+        this.$confirm('当前修改会同步到引用的试卷，确定要修改？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning',
         })
           .then(async () => {
-            const res = await this.$https.questionEdit(params)
+            const res = await this.$https.questionEdit(
+              this.compistionParam(false)
+            )
             res?.code === 200
               ? (this.$tools.message('修改成功！'), this.query())
               : this.$tools.message('修改失败！')
@@ -1442,6 +1375,10 @@ export default {
         display: block;
       }
     }
+  }
+  .center-card-active {
+    border: 1px solid #0095e5;
+    box-shadow: 0 0 7px 2px rgba(0, 149, 229, 0.15);
   }
   .center-card-top {
     font-size: 14px;
