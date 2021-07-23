@@ -111,7 +111,7 @@
                 <span slot="append">%</span>
               </el-input>
             </el-form-item>
-            <el-form-item label="考前阅读">
+            <!-- <el-form-item label="考前阅读">
               <Editor
                 :value="paperForm.readRemark"
                 @editorListener="readRemark"
@@ -124,7 +124,7 @@
                 placeholder="请输入阅读时长"
                 v-model="paperForm.readNum"
               ></el-input>
-            </el-form-item>
+            </el-form-item> -->
           </template>
           <template v-if="paperForm.tabActive == '1'">
             <el-form-item label="展示方式">
