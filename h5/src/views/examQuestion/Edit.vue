@@ -283,7 +283,7 @@
                   active-color="#0094e5"
                   :active-value="1"
                   inactive-color="#ff4949"
-                  :inactive-value="0"
+                  :inactive-value="2"
                   v-model="editForm.ai"
                 ></el-switch>
               </el-form-item>
@@ -555,7 +555,7 @@
               @click="edit()"
               style="width: 164px; height: 40px"
               type="primary"
-              v-if="editForm.id && editForm.state === 2"
+              v-if="editForm.id"
               >修改</el-button
             >
             <!-- <el-button
@@ -980,6 +980,11 @@ export default {
     },
     // 组合添加或修改请求参数
     compistionParam(status) {
+      if (this.queryForm.edit == 'false') {
+        this.$tools.message('暂无此项权限！', 'warning')
+        return false
+      }
+
       const params = {
         type: this.editForm.type,
         difficulty: this.editForm.difficulty,
@@ -1047,7 +1052,7 @@ export default {
         let sum = params.scores.reduce((acc, cur) => acc + Number(cur), 0)
         if (sum != params.score && params.ai == 1) {
           this.$tools.message('答案分值相加应等于总分值！', 'warning')
-          return
+          return false
         }
       }
 
@@ -1055,16 +1060,15 @@ export default {
     },
     // 添加试题
     add() {
-      if (this.queryForm.edit == 'false') {
-        this.$tools.message('暂无此项权限！', 'warning')
-        return
-      }
+      const params = this.compistionParam(true)
+      if (!params) return
+
       this.$refs['editForm'].validate(async (valid) => {
         if (!valid) {
           return false
         }
 
-        const res = await this.$https.questionAdd(this.compistionParam(true))
+        const res = await this.$https.questionAdd(params)
         res?.code == 200
           ? ((this.list.total += 1), this.$tools.message('添加成功！'))
           : this.$tools.message('添加失败！', 'error')
@@ -1078,10 +1082,8 @@ export default {
     },
     // 修改试题
     edit() {
-      if (this.queryForm.edit == 'false') {
-        this.$tools.message('暂无此项权限！', 'warning')
-        return
-      }
+      const params = this.compistionParam(false)
+      if (!params) return
 
       this.$refs['editForm'].validate((valid) => {
         if (!valid) {
@@ -1093,9 +1095,7 @@ export default {
           type: 'warning',
         })
           .then(async () => {
-            const res = await this.$https.questionEdit(
-              this.compistionParam(false)
-            )
+            const res = await this.$https.questionEdit(params)
             res?.code === 200
               ? (this.$tools.message('修改成功！'), this.query())
               : this.$tools.message('修改失败！')
@@ -1204,6 +1204,11 @@ export default {
     },
     // 发布试题
     async publish(id, state) {
+      if (this.queryForm.edit == 'false') {
+        this.$tools.message('暂无此项权限！', 'warning')
+        return false
+      }
+
       if (state == 1) {
         this.$tools.message('试题已经发布！', 'warning')
         return
