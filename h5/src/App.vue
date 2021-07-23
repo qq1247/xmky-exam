@@ -3,7 +3,13 @@
     <header class="header" v-if="show">
       <div class="header-content">
         <div class="header-left">
-          <router-link :class="[nav.img ? 'header-logo' : 'header-link']" :key="nav.title" :to="nav.to" exact v-for="nav in navList">
+          <router-link
+            :class="[nav.img ? 'header-logo' : 'header-link']"
+            :key="nav.title"
+            :to="nav.to"
+            exact
+            v-for="nav in navList"
+          >
             {{ nav.content }}
             <el-image :src="nav.img" class="logo-img" v-if="nav.img"></el-image>
           </router-link>
@@ -13,27 +19,41 @@
             欢迎您！
             <span class="user-name">{{ JSON.parse(userInfo).userName }}</span>
             <el-tooltip content="修改密码" effect="dark" placement="right">
-              <i @click="editForm.show = true" class="common common-edit" style="padding-right: 10px;cursor: pointer;"></i>
+              <i
+                @click="editForm.show = true"
+                class="common common-edit"
+                style="padding-right: 10px; cursor: pointer"
+              ></i>
             </el-tooltip>
             <el-tooltip content="退出" effect="dark" placement="right">
               <i @click="loginOut" class="common common-loginOut"></i>
             </el-tooltip>
           </template>
-          <router-link class="header-login" to="/login" v-else>登录</router-link>
+          <router-link class="header-login" to="/login" v-else
+            >登录</router-link
+          >
         </div>
       </div>
     </header>
     <main class="main">
       <router-view />
     </main>
-    <footer class="footer" v-if="show">Copyright© 2018 All Rights Reserved 版权所有 在线考试</footer>
+    <footer class="footer" v-if="show">
+      Copyright© 2018 All Rights Reserved 版权所有 在线考试
+    </footer>
     <el-dialog :visible.sync="editForm.show" title="修改密码">
       <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
         <el-form-item label="旧密码" label-width="120px">
-          <el-input placeholder="请输入旧密码" v-model="editForm.oldPwd"></el-input>
+          <el-input
+            placeholder="请输入旧密码"
+            v-model="editForm.oldPwd"
+          ></el-input>
         </el-form-item>
         <el-form-item label="新密码" label-width="120px">
-          <el-input placeholder="请输入新密码" v-model="editForm.newPwd"></el-input>
+          <el-input
+            placeholder="请输入新密码"
+            v-model="editForm.newPwd"
+          ></el-input>
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
@@ -130,7 +150,7 @@ export default {
         return
       }
 
-      //this.$refs['editForm'].resetFields()
+      // this.$refs['editForm'].resetFields()
       this.editForm.oldPwd = null
       this.editForm.newPwd = null
       this.editForm.show = false
@@ -140,7 +160,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import url(//at.alicdn.com/t/font_840312_polq493yfqg.css);
+@import url(//at.alicdn.com/t/font_840312_htlqmmf9m.css);
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
