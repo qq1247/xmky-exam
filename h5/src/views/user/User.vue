@@ -197,7 +197,7 @@ export default {
         loginName: null, // 登录名称
         orgId: null, // 机构ID
         orgName: null, // 机构名称
-        roles: null, // 角色
+        roles: 'user', // 角色
         show: false, // 是否显示页面
         orgListpage: {
           total: 0,
