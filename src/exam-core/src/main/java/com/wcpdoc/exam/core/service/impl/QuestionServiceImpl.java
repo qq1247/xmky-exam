@@ -30,6 +30,7 @@ import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionEx;
 import com.wcpdoc.exam.core.entity.QuestionOption;
+import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
@@ -140,6 +141,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		// 添加试题
 		question.setCreateTime(new Date());
 		question.setCreateUserId(getCurUser().getId());
+		question.setUpdateTime(new Date());
+		question.setUpdateUserId(getCurUser().getId());
 		question.setVer(1);// 默认版本为1
 		question.setState(2);// 默认禁用
 		add(question);
@@ -293,6 +296,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		
 		// 如果有新版本标识，删除旧版本，生成新版本		
 		Question entity = getEntity(question.getId());
+		if (entity.getState() == 1) {
+			throw new MyException("试题已发布不能修改！");
+		}
 		/*if (newVer) {
 			// 删除旧版本
 			Question newQuestion = new Question();
@@ -546,6 +552,10 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 
 	@Override
 	public void move(Integer id, Integer sourceId, Integer targetId) {
+		QuestionType questionType = questionTypeService.getEntity(sourceId);
+		if (questionType.getCreateUserId() != getCurUser().getId()) {
+			throw new MyException("权限不足！");
+		}
 		List<Question> list = questionDao.getList(sourceId);
 		for (Question question : list) {
 			question.setQuestionTypeId(targetId);

@@ -2,11 +2,8 @@ package com.wcpdoc.exam.core.dao.impl;
 
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.springframework.stereotype.Repository;
 
-import com.wcpdoc.exam.base.dao.UserDao;
 import com.wcpdoc.exam.core.dao.QuestionAnswerDao;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
@@ -19,8 +16,6 @@ import com.wcpdoc.exam.core.entity.QuestionAnswer;
  */
 @Repository
 public class QuestionAnswerDaoImpl extends RBaseDaoImpl<QuestionAnswer> implements QuestionAnswerDao {
-	@Resource
-	private UserDao userDao;
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {

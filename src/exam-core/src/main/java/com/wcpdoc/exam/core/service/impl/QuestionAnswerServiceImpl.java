@@ -22,7 +22,7 @@ public class QuestionAnswerServiceImpl extends BaseServiceImp<QuestionAnswer> im
 	private QuestionAnswerDao questionAnswerDao;
 
 	@Override
-	@Resource(name = "questionDaoImpl")
+	@Resource(name = "questionAnswerDaoImpl")
 	public void setDao(BaseDao<QuestionAnswer> dao) {
 		super.dao = dao;
 	}
