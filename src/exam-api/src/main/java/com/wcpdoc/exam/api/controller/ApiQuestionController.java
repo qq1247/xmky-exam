@@ -307,6 +307,7 @@ public class ApiQuestionController extends BaseController {
 			Question question = questionService.getEntity(id);
 			Question entity = new Question();
 			BeanUtils.copyProperties(entity, question);
+			entity.setState(2);
 			entity.setCreateTime(new Date());
 			entity.setCreateUserId(getCurUser().getId());
 			questionService.add(entity);
