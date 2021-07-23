@@ -110,7 +110,7 @@
                   >{{ question.score }}分</el-tag
                 >
                 <el-tag effect="plain" size="mini">{{
-                  question.createUserName
+                  question.updateUserName
                 }}</el-tag>
                 <el-tag effect="plain" size="mini">{{
                   question.state == 1 ? '发布' : '草稿'
@@ -528,7 +528,7 @@
           <el-form-item
             label="答案"
             prop="answer"
-            v-if="editForm.type === 5 && editForm.ai === 0"
+            v-if="editForm.type === 5 && editForm.ai === 2"
           >
             <Editor
               :value="editForm.answer"
@@ -555,7 +555,7 @@
               @click="edit()"
               style="width: 164px; height: 40px"
               type="primary"
-              v-if="editForm.id"
+              v-if="editForm.id && editForm.state === 2"
               >修改</el-button
             >
             <!-- <el-button
@@ -603,7 +603,7 @@ export default {
   },
   data() {
     const validateAiScore = (rule, value, callback) => {
-      if (this.editForm.ai == 0) {
+      if (this.editForm.ai == 2) {
         return callback()
       }
       if (value == '') {
@@ -616,7 +616,7 @@ export default {
     }
 
     const validateMultipScore = (rule, value, callback) => {
-      if (this.editForm.ai == 0 || this.editForm.scoreOptions.length == 0) {
+      if (this.editForm.ai == 2 || this.editForm.scoreOptions.length == 0) {
         this.editForm.multipScore = ''
         return callback()
       }
@@ -661,6 +661,7 @@ export default {
         difficulty: 1, // 难度
         title: '', // 标题
         ai: 1, //AI阅卷
+        state: 2,
         options: [
           {
             lab: 'A',
@@ -1027,7 +1028,7 @@ export default {
       }
 
       // 分值选项对应的分值（非智能 ai=2 || 单选、判断）
-      if (params.ai == 0 || [1, 4].includes(params.type)) {
+      if (params.ai == 2 || [1, 4].includes(params.type)) {
         params.scores = params.score
       }
 
@@ -1081,11 +1082,12 @@ export default {
         this.$tools.message('暂无此项权限！', 'warning')
         return
       }
+
       this.$refs['editForm'].validate((valid) => {
         if (!valid) {
           return false
         }
-        this.$confirm('当前修改会同步到引用的试卷，确定要修改？', '提示', {
+        this.$confirm('确定要修改？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning',
@@ -1117,6 +1119,7 @@ export default {
       this.editForm.analysis = res.data.analysis
       this.editForm.score = res.data.score
       this.editForm.ai = res.data.ai
+      this.editForm.state = res.data.state
 
       if (this.editForm.type === 1) {
         this.editForm.options = [] // 重置选项
