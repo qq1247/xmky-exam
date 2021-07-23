@@ -290,7 +290,7 @@
             </el-col>
           </el-row>
 
-          <template v-if="editForm.ai == 1">
+          <template v-if="editForm.ai === 1">
             <el-row v-if="editForm.type === 2">
               <el-col :span="8">
                 <el-form-item>
@@ -311,10 +311,10 @@
                   v-if="editForm.scoreOptions.length > 0"
                   prop="multipScore"
                   class="ai-score"
-                  :show-message="editForm.ai == 1 ? true : false"
+                  :show-message="editForm.ai === 1 ? true : false"
                 >
                   <el-input
-                    v-if="editForm.ai == 1"
+                    v-if="editForm.ai === 1"
                     v-model="editForm.multipScore"
                   >
                     <template slot="append">分</template>
@@ -425,9 +425,9 @@
                   <el-form-item
                     :prop="`answers.${index}.score`"
                     :rules="editForm.rules.aiScore"
-                    :show-message="editForm.ai == 1 ? true : false"
+                    :show-message="editForm.ai === 1 ? true : false"
                   >
-                    <el-input v-if="editForm.ai == 1" v-model="answer.score">
+                    <el-input v-if="editForm.ai === 1" v-model="answer.score">
                       <template slot="append">分</template>
                     </el-input>
                   </el-form-item>
@@ -500,9 +500,9 @@
                   <el-form-item
                     :prop="`answers.${index}.score`"
                     :rules="editForm.rules.aiScore"
-                    :show-message="editForm.ai == 1 ? true : false"
+                    :show-message="editForm.ai === 1 ? true : false"
                   >
-                    <el-input v-if="editForm.ai == 1" v-model="answer.score">
+                    <el-input v-if="editForm.ai === 1" v-model="answer.score">
                       <template slot="append">分</template>
                     </el-input>
                   </el-form-item>
@@ -603,28 +603,28 @@ export default {
   },
   data() {
     const validateAiScore = (rule, value, callback) => {
-      if (this.editForm.ai == 2) {
+      if (this.editForm.ai === 2) {
         return callback()
       }
-      if (value == '') {
+      if (value === '') {
         return callback(new Error('请填写分数'))
       }
-      if (value > this.editForm.score) {
+      if (value > this.editForm.score || value <= 0) {
         return callback(new Error(`请填写合理分数`))
       }
       return callback()
     }
 
     const validateMultipScore = (rule, value, callback) => {
-      if (this.editForm.ai == 2 || this.editForm.scoreOptions.length == 0) {
+      if (this.editForm.ai === 2 || this.editForm.scoreOptions.length === 0) {
         this.editForm.multipScore = ''
         return callback()
       }
 
-      if (value == '') {
+      if (value === '') {
         return callback(new Error('请填写分数'))
       }
-      if (value > this.editForm.score) {
+      if (value > this.editForm.score || value <= 0) {
         return callback(new Error(`请填写合理分数`))
       }
       return callback()
@@ -976,7 +976,7 @@ export default {
     updateType(value) {
       this.$tools.resetData(this, 'editForm')
       this.editForm.type = value
-      if (value == 5) this.editForm.ai = 0
+      if (value == 5) this.editForm.ai = 2
     },
     // 组合添加或修改请求参数
     compistionParam(status) {
