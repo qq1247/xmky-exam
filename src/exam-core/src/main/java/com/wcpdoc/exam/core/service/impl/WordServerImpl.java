@@ -1,26 +1,24 @@
 package com.wcpdoc.exam.core.service.impl;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.ListIterator;
 
+import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.safety.Whitelist;
-import org.jsoup.select.Elements;
 
+import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionEx;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.WordServer;
+import com.wcpdoc.exam.core.util.BigDecimalUtil;
 import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 
@@ -28,303 +26,564 @@ import com.wcpdoc.exam.core.util.ValidateUtil;
  * word服务实现
  * 
  * v1.0 zhanghc 2019年7月19日下午11:15:52
+ * 
  */
 public class WordServerImpl extends WordServer {
+	private String[] types = new String[]{"【单选】", "【多选】", "【填空】", "【判断】", "【问答】"};
+	private String[] difficultys = new String[]{"【极易】", "【简单】", "【适中】", "【困难】", "【极难】"};
+	private String[] options = new String[]{"A", "B", "C", "D", "E", "F", "G"};
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T doDecoder(List<Node> rowNodes) {
-		List<Node> singleQuestion = new ArrayList<>();
-		List<QuestionEx> questionList = new ArrayList<>();
-		for (Node node : rowNodes) {
+	public <T> T decoder(List<Node> nodeList) {
+		// 从多行中分隔出不同的题
+		List<Node> singleQuestion = new ArrayList<>();// 一道题的内容
+		List<QuestionEx> questionList = new ArrayList<>();// 解析成试题对象的列表
+
+		ListIterator<Node> nodeIterator = nodeList.listIterator();
+		boolean splitFinish = false;// 分隔完成标识位
+		while (nodeIterator.hasNext()) {
+			Node node = nodeIterator.next();
 			if (node instanceof TextNode) {
 				continue;
 			}
 
 			String rowTxt = Jsoup.clean(node.outerHtml(), Whitelist.none()).trim();
-			if (rowTxt.length() > 7) {
-				String typeName = rowTxt.substring(1, 3);
-				String difficultyName = rowTxt.substring(5, 7);
-				if (containType(typeName) && containDifficulty(difficultyName)) {
-					if (!singleQuestion.isEmpty()) {
-						questionList.add(parseQuestion(singleQuestion));
-						singleQuestion = new ArrayList<>();
-					}
+			if (!ValidateUtil.isValid(rowTxt)) {
+				continue;
+			}
+			if (startsWithType(rowTxt)) {// 如果开始字符串包含试题类型字符串
+				rowTxt = rowTxt.substring(4);
+				if (startsWithDifficulty(rowTxt)) {// 如果开始字符串包含难度类型字符串
+					splitFinish = true;// 表示分隔到一道完整的试题
 				}
 			}
 
+			// 解析出每道题，供业务层使用
+			if (splitFinish && ValidateUtil.isValid(singleQuestion)) {
+				QuestionEx questionEx = parseQuestion(singleQuestion);
+				questionList.add(questionEx);
+				singleQuestion.clear();// 重置单道试题内容
+			}
+
+			splitFinish = false;
 			singleQuestion.add(node);
 		}
+		
+		QuestionEx questionEx = parseQuestion(singleQuestion);// 最后一道题处理（按头标识分隔，最后一道题下面没有分隔了）
+		questionList.add(questionEx);
+		singleQuestion.clear();
 
-		if (!singleQuestion.isEmpty()) {
-			questionList.add(parseQuestion(singleQuestion));
-		}
 		return (T) questionList;
 	}
 
+	/**
+	 * 解析试题
+	 * 
+	 * v1.0 zhanghc 2019年7月19日下午11:15:52
+	 * 
+	 * v3.0 zhanghc 2021年7月21日下午7:15:03
+	 * 重新实现，结构化，增强可读性
+	 * 
+	 * @param singleQuestion
+	 * @return QuestionEx
+	 */
 	private QuestionEx parseQuestion(List<Node> singleQuestion) {
-		int answerIndex = 0;
-		int scoreIndex = 0;
-		int scoreOptionsIndex = 0;
-		int analysisIndex = 0;
-		int curIndex = 0;
-		String delHTMLTag = StringUtil.delHTMLTag(singleQuestion.toString());
+		/**
+		 * word转html后代码
+		 * <p class="a DocDefaults "><span class="a0 " style="">【单选】【极易】我是一道单选题的</span></p> 
+			 <p class="a DocDefaults "><span class="a0 " style="">题干<img height="56" id="rId8" src="D:/bak/file/temp/c066c0cc-54a6-4c1c-bf56-f34d49239852image1.png" width="48">，</span><span class="a0 " style="white-space:pre-wrap;"> </span><span class="a0 " style="">难度为</span><span class="a0 " style="color: #00B050;">极易</span><span class="a0 " style="">。</span></p> 
+			 <p class="a DocDefaults "><span class="a0 " style="font-family: 'SimSun';">A.</span><span class="a0 " style="">单选题的</span><span class="a0 " style="font-family: 'SimSun';">A</span><span class="a0 " style="">选项</span></p> 
+			 <p class="a DocDefaults "><span class="a0 " style="font-family: 'SimSun';">B</span><span class="a0 " style="">。单选题的</span><span class="a0 " style="font-family: 'SimSun';">B</span><span class="a0 " style="">选项</span></p> 
+			 <p class="a DocDefaults "><span class="a0 " style="font-family: 'SimSun';">C</span><span class="a0 " style="">、单选题的</span><span class="a0 " style="font-family: 'SimSun';">C</span><span class="a0 " style="">选项</span></p> 
+			 <p class="a DocDefaults "><span class="a0 " style="font-family: 'SimSun';">D</span><span class="a0 " style="">单选题的</span><span class="a0 " style="font-family: 'SimSun';">D</span><span class="a0 " style="">选项</span></p> 
+			 <p class="a DocDefaults "><span class="a0 " style="">【答案：</span><span class="a0 " style="font-family: 'SimSun';">B</span><span class="a0 " style="">】【分值：</span><span class="a0 " style="font-family: 'SimSun';">2</span><span class="a0 " style="">】</span></p> 
+			 <p class="a DocDefaults "><span class="a0 " style="">【智能阅卷<span class="" style="">：是</span>】</span></p> 
+			 <p class="a DocDefaults "><span class="a0 " style="">【解析】我是单选题的解析</span></p> 
+			 <p class="a DocDefaults ">&nbsp;</p> 
+			 <p class="a DocDefaults "><span class="a0 " style=""><span class="" style="">【多选】【简单】我是一道多选题的题干，难度为简单。</span></span></p> 
+			 <p class="a DocDefaults "><span class="a0 " style="font-family: 'SimSun';white-space:pre-wrap;">A. </span><span class="a0 " style="">多选题的</span><span class="a0 " style="font-family: 'SimSun';">A</span><span class="a0 " style="">选项。</span></p> 
+			 <p class="a DocDefaults "><span class="a0 " style="font-family: 'SimSun';white-space:pre-wrap;">C. </span><span class="a0 " style="">多选题的</span><span class="a0 " style="font-family: 'SimSun';">C</span><span class="a0 " style="">选项。</span></p> 
+			 <p class="a DocDefaults "><span class="a0 " style="font-family: 'SimSun';white-space:pre-wrap;">D. </span><span class="a0 " style="">多选题的</span><span class="a0 " style="font-family: 'SimSun';">D</span><span class="a0 " style="">选项。</span></p> 
+			 <p class="a DocDefaults "><span class="a0 " style="font-family: 'SimSun';white-space:pre-wrap;">B. </span><span class="a0 " style="">多选题的</span><span class="a0 " style="font-family: 'SimSun';">B</span><span class="a0 " style="">选项。</span></p> 
+			 <p class="a DocDefaults "><span class="a0 " style="">【答案：</span><span class="a0 " style="font-family: 'SimSun';">BC</span><span class="a0 " style="">】【分值：</span><span class="a0 " style="font-family: 'SimSun';">2</span><span class="a0 " style="">】</span></p> 
+			 <p class="a DocDefaults "><span class="a0 " style=""><span class="" style="">【智能阅卷：是】【漏选得分：</span></span><span class="a0 " style="font-family: 'SimSun';">1</span><span class="a0 " style="">】</span></p> 
+			 <p class="a DocDefaults "><span class="a0 " style="">【解析】我是多选题的解析</span></p> 
+			 <p class="a DocDefaults ">&nbsp;</p> 
+			 <p class="a DocDefaults "><span class="a0 " style="">【填空】【适中】我是一道填空题的</span><span class="a0 " style="font-family: 'SimSun';">_________</span><span class="a0 " style=""><span class="" style="">，难度为</span></span><span class="a0 " style="font-family: 'SimSun';">_________</span><span class="a0 " style="">。</span></p> 
+			 <p class="a DocDefaults "><span class="a0 " style="">【答案：山西</span><span class="a0 " style="white-space:pre-wrap;"> </span><span class="a0 " style="">晋】【分值：</span><span class="a0 " style="font-family: 'Tahoma';">1</span><span class="a0 " style="">】</span></p> 
+			 <p class="a DocDefaults "><span class="a0 " style="">【答案：一般</span><span class="a0 " style="white-space:pre-wrap;"> </span><span class="a0 " style="">通常</span><span class="a0 " style="white-space:pre-wrap;"> </span><span class="a0 " style="">普遍】【分值：</span><span class="a0 " style="font-family: 'SimSun';">1</span><span class="a0 " style="">】</span></p> 
+			 <p class="a DocDefaults "><span class="a5 a0 " style=""></span><span class="a0 " style=""><span class="" style="">【智能阅卷：是】【答案</span>有<span class="" style="">顺序：</span>否】【大小写<span class="" style="">敏感：</span>否】</span></p> 
+			 <p class="a DocDefaults "><span class="a0 " style="">【解析】我是填空题的解析</span></p> 
+			 <p class="a DocDefaults ">&nbsp;</p> 
+			 <p class="a DocDefaults "><span class="a0 " style=""><span class="" style="">【判断】【困难】我是一道判断题的题干，难度为困难。</span></span></p> 
+			 <p class="a DocDefaults "><span class="a0 " style="">【答案：对】【分值：</span><span class="a0 " style="font-family: 'SimSun';">2</span><span class="a0 " style="">】</span></p> 
+			 <p class="a DocDefaults "><span class="a0 " style=""><span class="" style="">【智能阅卷：是】</span></span></p> 
+			 <p class="a DocDefaults "><span class="a0 " style="">【解析】我是判断题的解析</span></p> 
+			 <p class="a DocDefaults ">&nbsp;</p> 
+			 <p class="a DocDefaults "><span class="a0 " style=""><span class="" style="">【问答】【极难】我是一道问答题的题干，难度为极难。</span></span></p> 
+			 <p class="a DocDefaults "><span class="a0 " style="">【答案：山西</span><span class="a0 " style="white-space:pre-wrap;"> </span><span class="a0 " style="">晋】【分值：</span><span class="a0 " style="font-family: 'Tahoma';">2</span><span class="a0 " style="">】</span></p> 
+			 <p class="a DocDefaults "><span class="a0 " style="">【答案：一般</span><span class="a0 " style="white-space:pre-wrap;"> </span><span class="a0 " style="">通常</span><span class="a0 " style="white-space:pre-wrap;"> </span><span class="a0 " style="">普遍】【分值：</span><span class="a0 " style="font-family: 'SimSun';">3</span><span class="a0 " style="">】</span></p> 
+			 <p class="a DocDefaults "><span class="a0 " style=""><span class="" style="">【智能阅卷：</span>否<span class="" style="">】【大小写敏感：否】</span></span></p>
+			</div> 
+			<div class="footnotes"> 
+			 <p class="a DocDefaults " style="margin-bottom: 0in;">&nbsp;</p>
+			</div> 
+		 */
+		
+		// 解析文本数据，文本格式校验
+		List<Node> titleRows = parseTitleRows(singleQuestion);
+		List<Node> optionRows = parseOptionRows(singleQuestion);
+		List<Node> answerRows = parseAnswerRows(singleQuestion);
+		List<Node> aiRows = parseAiRows(singleQuestion);
+		List<Node> analysisRows = parseAnalysisRows(singleQuestion);
+		
+		int type = parseType(titleRows);
+		int difficulty = parseDifficulty(titleRows);
+		String title = parseTitle(titleRows);
+		List<QuestionOption> questionOptionList = parseQuestionOptionList(optionRows, type);
+		AI ai = parseAi(aiRows);
+		List<QuestionAnswer> questionAnswerList = parseAnswer(answerRows, type, ai);
+		String analysis = parseAnalysis(analysisRows);
+		
+		// 逻辑错误校验
+		String answer = questionAnswerList.get(0).getAnswer();
+		if (type == 1) {//单选
+			if (answer.length() != 1 || getOption(answer) == -1) {
+				throw new MyException(String.format("答案和选项不匹配：%s】", StringUtil.delHTMLTag(singleQuestion.toString())));
+			}
+		}
+		if (type == 2) {//多选
+			if (answer.length() == 0 || answer.length() > options.length) {//最多7个选项
+				throw new MyException(String.format("答案和选项不匹配：%s】", StringUtil.delHTMLTag(singleQuestion.toString())));
+			}
+			for (String an : answer.split("")) {// 每个答案都校验一次
+				if (getOption(an) == -1) {
+					throw new MyException(String.format("答案和选项不匹配：%s】", StringUtil.delHTMLTag(singleQuestion.toString())));
+				}
+			}
+		} 
+		if (type == 4) {// 判断
+			if (answer.length() != 1 || !"对是√否错×".contains(answer)) {
+				throw new MyException(String.format("答案和选项不匹配：%s】", StringUtil.delHTMLTag(singleQuestion.toString())));
+			}
+		}
+		
+		// 转换成需要的试题对象
 		QuestionEx questionEx = new QuestionEx();
-		for (Node node : singleQuestion) {
-			String rowTxt = Jsoup.clean(node.outerHtml(), Whitelist.none()).trim();
-			if (rowTxt.startsWith("【答案】")) {
-				answerIndex = curIndex;
+		questionEx.getQuestion().setType(type);// 类型
+		questionEx.getQuestion().setDifficulty(difficulty);// 难度
+		questionEx.getQuestion().setTitle(title);// 题干
+		if (type == 1 || type == 2) {// 选项
+			for (int i = 0; i < questionOptionList.size(); i++) {
+				QuestionOption questionOption = questionOptionList.get(i);
+				questionOption.setNo(i + 1);
 			}
-
-			else if (rowTxt.startsWith("【分值】")) {
-				scoreIndex = curIndex;
-			} else if (rowTxt.startsWith("【分值选项】")) {
-				scoreOptionsIndex = curIndex;
-			}
-
-			else if (rowTxt.startsWith("【解析】")) {
-				analysisIndex = curIndex;
-			}
-
-			curIndex++;
-		}
-
-		if (answerIndex == 0) {
-			throw new MyException("不能从试题找到【答案】：【" + delHTMLTag + "】");
-		}
-		if(scoreIndex == 0){
-			throw new MyException("不能从试题找到【分值】：【" + delHTMLTag + "】");
-		}
-		if(scoreOptionsIndex == 0){
-			throw new MyException("不能从试题找到【分值选项】：【" + delHTMLTag + "】");
-		}
-		if (analysisIndex == 0) {
-			throw new MyException("不能从试题找到【解析】：【" + delHTMLTag + "】");
-		}
-		if (answerIndex >= scoreIndex) {
-			throw new MyException("【答案】必须在【分值】之前：【" + delHTMLTag + "】");
-		}
-
-		String titleTxt = Jsoup.clean(singleQuestion.get(0).outerHtml(), Whitelist.none()).trim();
-		String typeName = titleTxt.substring(1, 3);
-		Integer type = getType(typeName);
-		if (type == null) {
-			throw new MyException("不能从试题找到【类型】：【" + delHTMLTag + "】");
-		}
-
-		String difficultyName = titleTxt.substring(5, 7);
-		Integer difficulty = getDifficulty(difficultyName);
-		if (difficulty == null) {
-			throw new MyException("不能从试题找到【难度】：【" + delHTMLTag + "】");
-		}
-
-		List<Node> titleNodeList = singleQuestion.subList(0, answerIndex);
-		Element titleElement = ((Element) titleNodeList.get(0)).child(0);
-		titleElement.html(titleElement.html().substring(8));
-		
-		List<Integer> optionIndexs = new ArrayList<>();
-		List<String> optionList = new ArrayList<>();
-		if (type == 1 || type == 2) {//单选或多选
-			curIndex = 0;
-			for (Node node : titleNodeList) {
-				curIndex++;
-				String rowTxt = Jsoup.clean(node.outerHtml(), Whitelist.none()).trim();
-				if (rowTxt.isEmpty()) {
-					continue;
-				}
-				if (rowTxt.startsWith("A") || rowTxt.startsWith("a") 
-						|| rowTxt.startsWith("B") || rowTxt.startsWith("b") 
-						|| rowTxt.startsWith("C") || rowTxt.startsWith("c") 
-						|| rowTxt.startsWith("D") || rowTxt.startsWith("d") 
-						|| rowTxt.startsWith("E") || rowTxt.startsWith("e") 
-						|| rowTxt.startsWith("F") || rowTxt.startsWith("f") 
-						|| rowTxt.startsWith("G") || rowTxt.startsWith("g") ) {
-					optionIndexs.add(curIndex - 1);
-				}
-			}
-			optionIndexs.add(curIndex);
-			Map<String, String> optionMap = new HashMap<>();
-			for (int i = 0; i < optionIndexs.size() - 1; i++) {
-				List<Node> subList = titleNodeList.subList(optionIndexs.get(i), optionIndexs.get(i + 1));
-				Element element = (Element) subList.get(0).childNode(1);
-				String text = element.html().substring(0, 2);
-				if (text.endsWith(",") || text.endsWith("，") || text.endsWith(".") || text.endsWith("。")
-						|| text.endsWith("、")) {
-					element.html(element.html().substring(2));
-				} else {
-					element.html(element.html().substring(1));
-				}
-				optionMap.put(text.substring(0, 1).toUpperCase(), getTxt(titleNodeList, optionIndexs.get(i), optionIndexs.get(i + 1)));
-			}
-
-			optionList.add("A");
-			optionList.add("B");
-			optionList.add("C");
-			optionList.add("D");
-			optionList.add("E");
-			optionList.add("F");
-			optionList.add("G");
-			
-			questionEx.setQuestionOptionList(new ArrayList<>());
-			optionList = optionList.subList(0, optionIndexs.size() - 1); //初始化一个最大的选项，截取到当前最大的选项
-			for (String option : optionList) {
-				if (optionMap.get(option) == null) {
-					throw new MyException("不能从" + titleNodeList + "发现【" + option + "】选项");
-				}
-			}
-			
-			if(optionList.size() >= 1) {
-				QuestionOption questionOption = new QuestionOption();
-				questionOption.setOptions(optionMap.get("A"));
-				questionOption.setNo(1);
-				questionEx.getQuestionOptionList().add(questionOption);
-			}
-			if(optionList.size() >= 2) {
-				QuestionOption questionOption = new QuestionOption();
-				questionOption.setOptions(optionMap.get("B"));
-				questionOption.setNo(2);
-				questionEx.getQuestionOptionList().add(questionOption);
-			}
-			if(optionList.size() >= 3) {
-				QuestionOption questionOption = new QuestionOption();
-				questionOption.setOptions(optionMap.get("C"));
-				questionOption.setNo(3);
-				questionEx.getQuestionOptionList().add(questionOption);
-			}
-			if(optionList.size() >= 4) {
-				QuestionOption questionOption = new QuestionOption();
-				questionOption.setOptions(optionMap.get("D"));
-				questionOption.setNo(4);
-				questionEx.getQuestionOptionList().add(questionOption);
-			}
-			if(optionList.size() >= 5) {
-				QuestionOption questionOption = new QuestionOption();
-				questionOption.setOptions(optionMap.get("E"));
-				questionOption.setNo(5);
-				questionEx.getQuestionOptionList().add(questionOption);
-			}
-			if(optionList.size() >= 6) {
-				QuestionOption questionOption = new QuestionOption();
-				questionOption.setOptions(optionMap.get("F"));
-				questionOption.setNo(6);
-				questionEx.getQuestionOptionList().add(questionOption);
-			}
-			if(optionList.size() >= 7) {
-				QuestionOption questionOption = new QuestionOption();
-				questionOption.setOptions(optionMap.get("G"));
-				questionOption.setNo(7);
-				questionEx.getQuestionOptionList().add(questionOption);
-			}
-		}
-
-		String title = "";
-		if (type == 1 || type == 2) {//单选或多选
-			title = getTxt(singleQuestion, 0, optionIndexs.get(0));
-		} else {
-			title = getTxt(singleQuestion, 0, answerIndex);
+			questionEx.setQuestionOptionList(questionOptionList);
 		}
 		
-		String answer = Jsoup.clean(getTxt(singleQuestion, answerIndex, scoreIndex), Whitelist.none())
-				.replaceAll(" ", "").replaceAll("\r", "").replaceAll("\n", "").substring(4);
-		if (type == 1 || type == 2) {
-			Set<String> set = new LinkedHashSet<>(Arrays.asList(answer.split("")));
-			set.remove("");
-			Set<String> set2 = new HashSet<>(optionList);
-			
-			if (!set2.containsAll(set)) {
-				throw new MyException("选项和答案不匹配：【"+delHTMLTag+"】");
+		if (type == 1 || type == 2 || type == 4) {// 总分数
+			questionEx.getQuestion().setScore(new BigDecimal(questionAnswerList.get(0).getScore().toString()));// 只看第一行
+		} else if (type == 3 || (type == 5 && ai.getAi() == 1)) {// 如果是填空或问答智能阅卷，每项分加一起就是总分
+			BigDecimalUtil bigDecimalUtil = BigDecimalUtil.newInstance(0);
+			for (QuestionAnswer questionAnswer : questionAnswerList) {
+				bigDecimalUtil.add(questionAnswer.getScore());
 			}
-			answer = StringUtil.join(set, ",");
-		} else if (type == 3) {
-			answer = "";
-			List<Node> subList = singleQuestion.subList(answerIndex, scoreIndex);
-			for (Node node : subList) {
-				String an = Jsoup.clean(node.outerHtml(), Whitelist.none())
-						.replaceAll(" ", "").replaceAll("\r", "").replaceAll("\n", "");
-				if(an.startsWith("【答案】")) {
-					an = an.substring(4);
-				}
-				if (!ValidateUtil.isValid(an)) {
-					continue;
-				}
+			questionEx.getQuestion().setScore(bigDecimalUtil.getResult());
+		} else if (type == 5 && ai.getAi() == 2) {// 如果是问答非智能阅卷，分值从智能阅卷行问答分值取
+			questionEx.getQuestion().setScore(new BigDecimal(ai.getQaScore().toString()));
+		}
+
+		if (type == 1 || type == 3 || type == 4 || (type == 5 && ai.getAi() == 1)) {// 答案和分数
+			QuestionAnswer questionAnswer = new QuestionAnswer();
+			questionAnswer.setAnswer(questionAnswerList.get(0).getAnswer());
+			questionAnswer.setScore(new BigDecimal(questionAnswerList.get(0).getScore().toString()));// 和分值一样
+			questionEx.getQuestionAnswerList().add(questionAnswer);
+		} else if (type == 2) {
+			QuestionAnswer questionAnswer = new QuestionAnswer();
+			questionAnswer.setAnswer(questionAnswerList.get(0).getAnswer());
+			questionAnswer.setScore(new BigDecimal(ai.getMissScore().toString()));//从漏选分值取
+			questionEx.getQuestionAnswerList().add(questionAnswer);
+		} else if (type == 5 && ai.getAi() == 2) {
+			QuestionAnswer questionAnswer = new QuestionAnswer();
+			questionAnswer.setAnswer(questionAnswerList.get(0).getAnswer());
+			questionAnswer.setScore(new BigDecimal(ai.getQaScore().toString()));//从问答分值取
+			questionEx.getQuestionAnswerList().add(questionAnswer);
+		}
+		
+		questionEx.getQuestion().setAi(ai.getAi());
+		if (ai.getAi() == 1) {// 如果智能阅卷是开启的
+			if (type == 1 || type == 4) {// 单选、判断不需要
 				
-				if (!answer.isEmpty()) {
-					answer += "\n";
+			} else if (type == 2) {// 多选 1：漏选得分；
+				if (ai.getScoreOptions().toString().contains("1")) {
+					questionEx.getQuestion().setScoreOptions("1");
 				}
-				
-				answer += an;
-			}
-		} else if (type == 4) {
-			if (answer.length() != 1) {
-				throw new MyException("答案只能是一个：【"+delHTMLTag+"】");
-			}
-			
-			if ("对是√".contains(answer)) {
-				answer = "对";
-			} else if ("否错×".contains(answer)) {
-				answer = "错";
-			} else {
-				throw new MyException("答案只能填：对错是否√×【"+delHTMLTag+"】");
+			} else if (type == 3) {// 填空问答 2：答案无顺序；3：大小写不敏感；
+				if (ai.getScoreOptions().toString().contains("2")) {
+					questionEx.getQuestion().setScoreOptions(questionEx.getQuestion().getScoreOptions() + "2");
+				}
+				if (ai.getScoreOptions().toString().contains("3")) {
+					questionEx.getQuestion().setScoreOptions(questionEx.getQuestion().getScoreOptions() + "3");
+				}
+			} else if (type == 5) {// 问答 3：大小写不敏感；
+				if (ai.getScoreOptions().toString().contains("3")) {
+					questionEx.getQuestion().setScoreOptions(questionEx.getQuestion().getScoreOptions() + "3");
+				}
 			}
 		}
-		
-		//分值
-		Elements scoreElement = ((Element) singleQuestion.get(scoreIndex)).getElementsByTag("span");
-		scoreElement.html(scoreElement.html().substring(4));
-		String score = getTxt(singleQuestion, scoreIndex, scoreOptionsIndex);
-		String score2 = Jsoup.clean(score, Whitelist.none());//不填写回只返回样式，特殊处理一下
-		if (!ValidateUtil.isValid(score2)) { 
-			score = null;
-		}
-		
-		//分值选项
-		Elements scoreOptionsElement = ((Element) singleQuestion.get(scoreOptionsIndex)).getElementsByTag("span");
-		//1：半对半分；2：答案无顺序；3：大小写不敏感；4：包含答案得分
-		String substring = scoreOptionsElement.html().substring(6);
-		String scoreOptionsElementString = "";
-		if(substring.contains("半对半分")){
-			scoreOptionsElementString = scoreOptionsElementString + "1,";
-		}
-		if(substring.contains("答案无顺序")){
-			scoreOptionsElementString = scoreOptionsElementString + "2,";
-		}
-		if(substring.contains("大小写不敏感")){
-			scoreOptionsElementString = scoreOptionsElementString + "3,";
-		}
-		if(substring.contains("包含答案得分")){
-			scoreOptionsElementString = scoreOptionsElementString + "4,";
-		}
-		if (!scoreOptionsElementString.isEmpty()) {
-			CharSequence subSequence = scoreOptionsElementString.subSequence(0, scoreOptionsElementString.length()-1);
-			scoreOptionsElement.html(subSequence.toString());
-		}
-		
-		String scoreOptions = getTxt(singleQuestion, scoreOptionsIndex, analysisIndex);
-		String scoreOptions2 = Jsoup.clean(scoreOptions, Whitelist.none());//不填写回只返回样式，特殊处理一下
-		if (!ValidateUtil.isValid(scoreOptions2)) { 
-			scoreOptions = null;
-		}
-		//解析
-		Elements analysisElement = ((Element) singleQuestion.get(analysisIndex)).getElementsByTag("span");
-		analysisElement.html(analysisElement.html().substring(4));
-		String analysis = getTxt(singleQuestion, analysisIndex, singleQuestion.size());
-		String analysis2 = Jsoup.clean(analysis, Whitelist.none());//不填写回只返回样式，特殊处理一下
-		if (!ValidateUtil.isValid(analysis2)) { 
-			analysis = null;
-		}
-
-		questionEx.setTitle(title);
-		questionEx.setType(type);
-		questionEx.setDifficulty(getDifficulty(difficultyName));
-		//questionEx.setAnswer(answer);
-		questionEx.setScore(new BigDecimal(score2));
-		questionEx.setScoreOptions(scoreOptions2);
-		questionEx.setAnalysis(analysis);
+		questionEx.getQuestion().setAnalysis(analysis);
 		return questionEx;
 	}
+	
+	private String parseAnalysis(List<Node> analysisRows) {
+		return getTxt(analysisRows, 0, analysisRows.size());
+	}
 
-	private String getTxt(List<Node> nodeList, int startIdx, int endIdx) {
-		List<Node> subList = nodeList.subList(startIdx, endIdx);
+	private AI parseAi(List<Node> aiRows) {
+		String aiTxt = Jsoup.clean(aiRows.get(0).outerHtml(), Whitelist.none()).trim();
+		int lxdfIndex = aiTxt.indexOf("【漏选得分：");//临时变量可以用汉字首字母
+		int dayxxIndex = aiTxt.indexOf("【答案有顺序：");
+		int dxxmgIndex = aiTxt.indexOf("【大小写敏感：");
+		int lxfzIndex = aiTxt.indexOf("【漏选分值：");
+		int wdIndex = aiTxt.indexOf("【问答分值：");
+		
+		AI ai = new AI();
+		ai.setAi(aiTxt.substring(6, 6 + 1).equals("是") ? 1 : 2);
+		if (lxdfIndex != -1 && aiTxt.substring(lxdfIndex + 6, lxdfIndex + 6 + 1).equals("是")) {
+			ai.getScoreOptions().add(1);
+		}
+		if (dayxxIndex != -1 && aiTxt.substring(dayxxIndex + 7, dayxxIndex + 7 + 1).equals("是")) {
+			ai.getScoreOptions().add(2);
+		}
+		if (dxxmgIndex != -1 && aiTxt.substring(dxxmgIndex + 7, dxxmgIndex + 7 + 1).equals("是")) {
+			ai.getScoreOptions().add(3);
+		}
+		if (lxfzIndex != -1) {
+			try {
+				Double missScore = Double.parseDouble(aiTxt.substring(lxfzIndex + 6, aiTxt.indexOf("】", lxfzIndex + 6)));
+				ai.setMissScore(missScore);
+			} catch (NumberFormatException e) {
+				throw new MyException(String.format("不能从试题解析【漏选分值】：%s】", StringUtil.delHTMLTag(aiRows.toString())));
+			}
+		}
+		if (wdIndex != -1) {
+			try {
+				Double qaScore = Double.parseDouble(aiTxt.substring(wdIndex + 6, aiTxt.indexOf("】", wdIndex + 6)));
+				ai.setQaScore(qaScore);
+			} catch (NumberFormatException e) {
+				throw new MyException(String.format("不能从试题解析【问答分值】：%s】", StringUtil.delHTMLTag(aiRows.toString())));
+			}
+		}
+		return ai;
+	}
+
+	private List<QuestionAnswer> parseAnswer(List<Node> answerNodeList, int type, AI ai) {
+		List<QuestionAnswer> answerScoreList = new ArrayList<>();// 解析答案和分值，如果是填空或问答，答案可能是多行
+		if (type == 1 || type == 2 || type == 3 || type == 4 || (type == 5 && ai.getAi() == 1)) {
+			for (Node answerNode : answerNodeList) {
+				String answerTxt = Jsoup.clean(answerNode.outerHtml(), Whitelist.none()); // 【答案：B】【分值：2】 
+				String answer = answerTxt.substring(4, answerTxt.indexOf("】【分值：")).trim();
+				String scoreStr = answerTxt.substring(answerTxt.length() - 2, answerTxt.length() - 1).trim(); 
+				Double score = null;
+				try {
+					score = Double.parseDouble(scoreStr);
+				} catch (NumberFormatException e) {
+					throw new MyException(String.format("不能从试题找到【分值】：%s】", StringUtil.delHTMLTag(answerNodeList.toString())));
+				}
+				QuestionAnswer questionAnswer = new QuestionAnswer();
+				questionAnswer.setAnswer(answer);// 多选按逗号分隔
+				questionAnswer.setScore(new BigDecimal(score.toString()));
+				answerScoreList.add(questionAnswer);
+			}
+		} else if (type == 5 && ai.getAi() == 2) {// 问答、非智能阅卷
+			String answerTxt = getTxt(answerNodeList, 0, answerNodeList.size());
+			answerTxt.replace("【答案", "").replace("：", "");
+			int lastIndex = answerTxt.lastIndexOf("】");
+			if (lastIndex == -1) {
+				throw new MyException(String.format("答案格式不正确：%s】", StringUtil.delHTMLTag(answerNodeList.toString())));
+			}
+			answerTxt = answerTxt.substring(0, lastIndex) + answerTxt.substring(lastIndex + 1, answerTxt.length());
+			
+			QuestionAnswer questionAnswer = new QuestionAnswer();
+			questionAnswer.setAnswer(answerTxt);
+			questionAnswer.setScore(null);// 分值在智能阅卷行
+			answerScoreList.add(questionAnswer);
+		}
+		
+		return answerScoreList;
+	}
+
+	private List<QuestionOption> parseQuestionOptionList(List<Node> optionRows, Integer type) {
+		if (type != 1 && type != 2) {
+			return null;
+		}
+		List<List<Node>> optionList = new ArrayList<>();// 选项节点（每个选项可以有多行）
+		for (int i = 0; i < options.length; i++) {
+			optionList.add(new ArrayList<>(0));// 先初始化后根据选项位置替换，在剔除最后空白项
+		}
+		
+		int startIndex = 0, endIndex = 0, curIndex = 0;
+		for (Node optionNode : optionRows) {
+			String optionTxt = Jsoup.clean(optionNode.outerHtml(), Whitelist.none()).trim();
+			/*
+			 * B。单选题的B选项 
+			 * 单选题的B选项
+			 * 
+			 * A.单选题的A选项 单选题的A选项
+			 * 
+			 * C、单选题的C选项 
+			 * D单选题的D选项 单选题的D选项
+			 */
+			if (startsWithOption(optionTxt)) {
+				endIndex = curIndex;
+			}
+			if (startIndex < endIndex) {
+				Node startNode = optionRows.get(startIndex);
+				String startTxt = Jsoup.clean(startNode.outerHtml(), Whitelist.none()).trim();
+				int optionIndex = getOption(startTxt);
+				optionList.set(optionIndex, optionRows.subList(startIndex, endIndex));// 根据第一个字符（ABCDEFG)添加到对应的位置，相当于排序
+				startIndex = curIndex;
+			}
+			
+			curIndex++;
+		}
+		
+		Node startNode = optionRows.get(startIndex); // 最后一个选项处理
+		String startTxt = Jsoup.clean(startNode.outerHtml(), Whitelist.none()).trim();
+		int optionIndex = getOption(startTxt);
+		optionList.set(optionIndex, optionRows.subList(startIndex, optionRows.size()));
+		
+		ListIterator<List<Node>> listIterator = optionList.listIterator();// 从后往前循环，去掉多余的空白选项
+		while (listIterator.hasNext()) {
+			listIterator.next();
+		}
+		while (listIterator.hasPrevious()) {
+			List<Node> nodeList = listIterator.previous();
+			if (!nodeList.isEmpty()) {// 最后一个不为空，停止
+				break;
+			}
+			listIterator.remove();
+		}
+		
+		if (optionList.size() < 2) {
+			throw new MyException(String.format("单选或多选最少需要两个选项：%s】", StringUtil.delHTMLTag(optionRows.toString())));
+		}
+		
+		List<QuestionOption> questionOptionList = new ArrayList<>();// 返回解析后的对象
+		for (List<Node> options : optionList) {
+			QuestionOption questionOption = parseQuestionOption(options);
+			questionOptionList.add(questionOption);
+		}
+		return questionOptionList;
+	}
+
+	private String parseTitle(List<Node> titleRows) {
+		String txt = getTxt(titleRows, 0, titleRows.size());
+		for (String type : types) {
+			if (txt.contains(type)) {// 找到只替换第一个
+				txt.replace(type, "");
+				break;
+			}
+		}
+		for (String difficulty : difficultys) {
+			if (txt.contains(difficulty)) {// 找到只替换第一个
+				txt.replace(difficulty, "");
+				break;
+			}
+		}
+		return txt;
+	}
+
+	private int parseDifficulty(List<Node> titleRows) {
+		String titleTxt = Jsoup.clean(titleRows.get(0).outerHtml(), Whitelist.none()).trim();
+		titleTxt = titleTxt.substring(4);
+		if (!startsWithDifficulty(titleTxt)) {
+			throw new MyException(String.format("不能从题干找到%s标签：%s】", StringUtil.join(difficultys), StringUtil.delHTMLTag(titleRows.toString())));
+		}
+		return getDifficulty(titleTxt);
+	}
+
+	private int parseType(List<Node> titleRows) {
+		String titleTxt = Jsoup.clean(titleRows.get(0).outerHtml(), Whitelist.none()).trim();
+		if (!startsWithType(titleTxt)) {
+			throw new MyException(String.format("不能从题干找到%s标签：%s】", StringUtil.join(types), StringUtil.delHTMLTag(titleRows.toString())));
+		}
+		return getType(titleTxt);
+	}
+
+	private List<Node> parseAnalysisRows(List<Node> singleQuestion) {
+		int startIndex = 0, endIndex = 0, curIndex = 0;// 标记起始行和结束行
+		for (Node node : singleQuestion) {
+			String rowTxt = Jsoup.clean(node.outerHtml(), Whitelist.none()).trim();
+			if (rowTxt.startsWith("【解析")) {
+				startIndex = curIndex;
+				endIndex = singleQuestion.size();// 剩余部分全部是解析
+				break;
+			}
+			curIndex++;
+		}
+		
+		if (startIndex == 0 || endIndex == 0) {
+			throw new MyException(String.format("不能从试题找到【解析】：【%s】", StringUtil.delHTMLTag(singleQuestion.toString())));
+		}
+		
+		return singleQuestion.subList(startIndex, endIndex);
+	}
+
+	private List<Node> parseAiRows(List<Node> singleQuestion) {
+		int startIndex = 0, endIndex = 0, curIndex = 0;// 标记起始行和结束行
+		for (Node node : singleQuestion) {
+			String rowTxt = Jsoup.clean(node.outerHtml(), Whitelist.none()).trim();
+			if (rowTxt.startsWith("【智能阅卷")) {
+				startIndex = curIndex;
+				endIndex = curIndex + 1;// 只有一行，索引+1就是结束位置
+				break;
+			}
+			curIndex++;
+		}
+		
+		if (startIndex == 0 || endIndex == 0) {
+			throw new MyException(String.format("不能从试题找到【智能阅卷】：【%s】", StringUtil.delHTMLTag(singleQuestion.toString())));
+		}
+		
+		return singleQuestion.subList(startIndex, endIndex);
+	}
+
+	private List<Node> parseAnswerRows(List<Node> singleQuestion) {
+		int startIndex = 0, endIndex = 0, curIndex = 0;// 标记起始行和结束行
+		for (Node node : singleQuestion) {
+			String rowTxt = Jsoup.clean(node.outerHtml(), Whitelist.none()).trim();
+			if (rowTxt.startsWith("【答案")) {
+				if (startIndex == 0) {// 答案可能有多行，只取第一行的索引
+					startIndex = curIndex;
+				}
+			} else if (rowTxt.startsWith("【智能阅卷")) {
+				endIndex = curIndex;
+				break;//找到就不在循环了
+			}
+			curIndex++;
+		}
+		
+		if (startIndex == 0 || endIndex == 0) {
+			throw new MyException(String.format("不能从试题找到【答案】：【%s】", StringUtil.delHTMLTag(singleQuestion.toString())));
+		}
+		
+		if (startIndex >= endIndex) {
+			throw new MyException(String.format("试题格式错误：【%s】", StringUtil.delHTMLTag(singleQuestion.toString())));
+		}
+		
+		return singleQuestion.subList(startIndex, endIndex);
+	}
+
+	private List<Node> parseOptionRows(List<Node> singleQuestion) {
+		int startIndex = 0, endIndex = 0;// 标记起始行和结束行
+		for (Node node : singleQuestion) {
+			String rowTxt = Jsoup.clean(node.outerHtml(), Whitelist.none()).trim();
+			if (rowTxt.startsWith("【答案")) {
+				break;
+			}
+			endIndex++;
+		}
+		
+		if (endIndex == 0) {
+			throw new MyException(String.format("不能从试题找到【题干】：【%s】", StringUtil.delHTMLTag(singleQuestion.toString())));
+		}
+		
+		List<Node> titleNodeList = singleQuestion.subList(startIndex, endIndex);
+		String rowTxt = Jsoup.clean(titleNodeList.get(0).outerHtml(), Whitelist.none()).trim();
+		int type = getType(rowTxt);
+		if (type == 1 || type == 2) {// 如果是单选或多选，过滤掉题干
+			for (Node optionNode : titleNodeList) {
+				String optionTxt = Jsoup.clean(optionNode.outerHtml(), Whitelist.none()).trim();
+				if (startsWithOption(optionTxt)) {
+					break;
+				}
+				startIndex++;
+			}
+		}
+		
+		return singleQuestion.subList(startIndex, endIndex);
+	}
+
+	private List<Node> parseTitleRows(List<Node> singleQuestion) {
+		int startIndex = 0, endIndex = 0;// 标记起始行和结束行
+		for (Node node : singleQuestion) {
+			String rowTxt = Jsoup.clean(node.outerHtml(), Whitelist.none()).trim();
+			if (rowTxt.startsWith("【答案")) {
+				break;
+			}
+			endIndex++;
+		}
+		
+		if (endIndex == 0) {
+			throw new MyException(String.format("不能从试题找到【题干】：【%s】", StringUtil.delHTMLTag(singleQuestion.toString())));
+		}
+		
+		List<Node> titleNodeList = singleQuestion.subList(startIndex, endIndex);
+		String rowTxt = Jsoup.clean(titleNodeList.get(0).outerHtml(), Whitelist.none()).trim();
+		int type = getType(rowTxt);
+		if (type == 1 || type == 2) {// 如果是单选或多选，过滤掉选项
+			endIndex = 0;
+			for (Node optionNode : titleNodeList) {
+				String optionTxt = Jsoup.clean(optionNode.outerHtml(), Whitelist.none()).trim();
+				if (startsWithOption(optionTxt)) {
+					break;
+				}
+				endIndex++;
+			}
+		}
+		
+		return singleQuestion.subList(startIndex, endIndex);
+	}
+
+	/**
+	 * 获取试题选项
+	 * 
+	 * v1.0 zhanghc 2021年7月24日上午10:57:39
+	 * @param options2
+	 * @return QuestionOption
+	 */
+	private QuestionOption parseQuestionOption(List<Node> options) {
+		//<p class="a DocDefaults "><span class="a0 " style="font-family: 'SimSun';">A.</span><span class="a0 " style="">单选题的</span><span class="a0 " style="font-family: 'SimSun';">A</span><span class="a0 " style="">选项</span></p> 
+		//<p class="a DocDefaults "><span class="a0 " style="font-family: 'SimSun';">B</span><span class="a0 " style="">。单选题的</span><span class="a0 " style="font-family: 'SimSun';">B</span><span class="a0 " style="">选项</span></p> 
+		Element element = (Element) options.get(0).childNodes().get(0);
+		element.html(element.html().substring(1));//截取第一个字符串（前面已经校验，这里肯定已ABCDEFG开头
+		if (element.html().length() > 0) {//如果第一个span第二个字符串包含.。、则剔除
+			if (element.html().startsWith(".") || element.html().startsWith("。") || element.html().startsWith("、")) {
+				element.html(element.html().substring(1));
+			}
+		} else if (options.get(0).childNodes().size() >= 2) {//否则从第二个span找
+			element = (Element) options.get(0).childNodes().get(1);
+			if (element.html().length() > 0) {
+				if (element.html().startsWith(".") || element.html().startsWith("。") || element.html().startsWith("、")) {
+					element.html(element.html().substring(1));
+				}
+			}
+		}
+		QuestionOption questionOption = new QuestionOption();
+		questionOption.setOptions(getTxt(options, 0, options.size()));
+		return questionOption;
+	}
+
+	public static void main(String[] args) throws Exception {
+		WordServer wordServer = new WordServerImpl();
+		File file = new File("c:/试题模板.docx");
+		List<Object> handle = wordServer.handle(FileUtils.openInputStream(file), "D:/bak/file/temp");
+		System.err.println(handle);
+	}
+
+	/**
+	 * 获取文本
+	 * 
+	 * v1.0 zhanghc 2021年7月26日下午4:00:50
+	 * @param nodeList
+	 * @param startIndex
+	 * @param endIndex
+	 * @return String
+	 */
+	private String getTxt(List<Node> nodeList, int startIndex, int endIndex) {
+		List<Node> subList = nodeList.subList(startIndex, endIndex);
 		StringBuilder txt = new StringBuilder();
 		for (Node node : subList) {
 			txt.append(node.outerHtml());
@@ -332,50 +591,122 @@ public class WordServerImpl extends WordServer {
 		
 		return txt.toString();
 	}
+	
+	/**
+	 * 获取难度类型
+	 * 
+	 * v1.0 zhanghc 2021年7月22日上午10:03:58
+	 * @param rowTxt
+	 * @return boolean
+	 */
+	private int getDifficulty(String rowTxt) {
+		for (int i = 0; i < difficultys.length; i++) {
+			if (rowTxt.startsWith(difficultys[i])) {
+				return i + 1;
+			}
+		}
 
-	private boolean containDifficulty(String difficultyName) {
-		return getDifficulty(difficultyName) != null;
+		return 0;
+	}
+	
+	/**
+	 * 起始包含难度字符串
+	 * 
+	 * v1.0 zhanghc 2021年7月22日上午10:03:58
+	 * @param rowTxt
+	 * @return boolean
+	 */
+	private boolean startsWithDifficulty(String rowTxt) {
+		return getDifficulty(rowTxt) > 0;
 	}
 
-	private Integer getDifficulty(String difficultyName) {
-		if ("极易".equals(difficultyName)) {
-			return 1;
+	/**
+	 * 获取试题类型
+	 * 
+	 * v1.0 zhanghc 2021年7月22日上午10:04:14
+	 * @param rowTxt
+	 * @return boolean
+	 */
+	private int getType(String rowTxt) {
+		for (int i = 0; i < types.length; i++) {
+			if (rowTxt.startsWith(types[i])) {
+				return i + 1;
+			}
 		}
-		if ("简单".equals(difficultyName)) {
-			return 2;
-		}
-		if ("适中".equals(difficultyName)) {
-			return 3;
-		}
-		if ("困难".equals(difficultyName)) {
-			return 4;
-		}
-		if ("极难".equals(difficultyName)) {
-			return 5;
-		}
-		return null;
-	}
 
-	private boolean containType(String typeName) {
-		return getType(typeName) != null;
+		return 0;
 	}
+	/**
+	 * 起始包含类型字符串
+	 * 
+	 * v1.0 zhanghc 2021年7月22日上午10:04:14
+	 * @param rowTxt
+	 * @return boolean
+	 */
+	private boolean startsWithType(String rowTxt) {
+		return getType(rowTxt) > 0;
+	}
+	
+	/**
+	 * 获取试题选项
+	 * 
+	 * v1.0 zhanghc 2021年7月22日上午10:04:14
+	 * @param rowTxt
+	 * @return boolean
+	 */
+	private int getOption(String rowTxt) {
+		for (int i = 0; i < options.length; i++) {
+			if (rowTxt.substring(0, 1).equalsIgnoreCase(options[i])) {
+				return i;
+			}
+		}
 
-	private Integer getType(String typeName) {
-		if ("单选".equals(typeName)) {
-			return 1;
+		return -1;
+	}
+	
+	/**
+	 * 起始包含试题选项字符串
+	 * 
+	 * v1.0 zhanghc 2021年7月22日下午3:58:08
+	 * @param rowTxt
+	 * @return boolean
+	 */
+	private boolean startsWithOption(String rowTxt) {
+		return getOption(rowTxt) > -1;
+	}
+	
+	private class AI {
+		private Integer ai;
+		private List<Integer> scoreOptions = new ArrayList<>();
+		private Double missScore;
+		private Double qaScore;
+
+		public Integer getAi() {
+			return ai;
 		}
-		if ("多选".equals(typeName)) {
-			return 2;
+
+		public void setAi(Integer ai) {
+			this.ai = ai;
 		}
-		if ("填空".equals(typeName)) {
-			return 3;
+
+		public List<Integer> getScoreOptions() {
+			return scoreOptions;
 		}
-		if ("判断".equals(typeName)) {
-			return 4;
+
+		public Double getMissScore() {
+			return missScore;
 		}
-		if ("问答".equals(typeName)) {
-			return 5;
+
+		public void setMissScore(Double missScore) {
+			this.missScore = missScore;
 		}
-		return null;
+
+		public Double getQaScore() {
+			return qaScore;
+		}
+
+		public void setQaScore(Double qaScore) {
+			this.qaScore = qaScore;
+		}
 	}
 }

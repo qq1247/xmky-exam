@@ -13,11 +13,10 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,6 +36,7 @@ import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 import com.wcpdoc.exam.core.service.WordServer;
+import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.file.service.FileService;
 
@@ -59,6 +59,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	private QuestionOptionService questionOptionService;
 	@Resource
 	private QuestionAnswerService questionAnswerService;
+	@Value("${file.upload.dir}")
+	private String fileUploadDir;
 
 	@Override
 	@Resource(name = "questionDaoImpl")
@@ -436,13 +438,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (question.getType() == 1 || question.getType() == 2) {// 单选或多选
 			QuestionOption entity = new QuestionOption();
 			entity.setQuestionId(question.getId());
-
-			if (question instanceof QuestionEx) {
-				QuestionEx questionEx = (QuestionEx) question;
-				for (QuestionOption questionOption : questionEx.getQuestionOptionList()) {
-					fileIdList.addAll(html2FileIds(questionOption.getOptions()));
-				}
-			}
 		} else if (question.getType() == 5) {// 问答
 			List<QuestionAnswer> list = questionAnswerService.getList(question.getId());
 		    StringBuilder answerString = new StringBuilder();    
@@ -505,48 +500,57 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	public void wordImp(MultipartFile file, Integer questionTypeId) {
 		// 校验数据有效性
 		String extName = FilenameUtils.getExtension(file.getOriginalFilename());
-		if (!"doc".equals(extName)) {
-			throw new MyException("允许的上传类型为：doc");
+		if (!"docx".equals(extName)) {
+			throw new MyException("允许的上传类型为：docx");
 		}
 
 		// 解析文件
 		WordServer wordServer = new WordServerImpl();
-		InputStream inputStream = null;
-		try {
-			inputStream = file.getInputStream();
+		List<QuestionEx> questionExList = null;
+		try (InputStream inputStream = file.getInputStream()) {
+			questionExList = wordServer.handle(inputStream, fileUploadDir);
 		} catch (IOException e) {
-			IOUtils.closeQuietly(inputStream);
-			throw new MyException("读取文件流异常！");
+			throw new MyException("读取word时异常！");
+		} catch (Exception e) {
+			throw new MyException(e.getMessage());
 		}
-
-		List<QuestionEx> questionExList = wordServer.handle(inputStream);
-		IOUtils.closeQuietly(inputStream);
 
 		// 添加试题
 		for (QuestionEx questionEx : questionExList) {
-			Question question = new Question();
-			BeanUtils.copyProperties(questionEx, question);
+			Question question = questionEx.getQuestion();
 			question.setCreateTime(new Date());
 			question.setCreateUserId(getCurUser().getId());
+			question.setUpdateTime(new Date());
+			question.setUpdateUserId(getCurUser().getId());
 			question.setVer(1);
 			question.setState(2);// 默认禁用
 			question.setQuestionTypeId(questionTypeId);
-			question.setNo(1);
 			add(question);
 
 			question.setSrcId(question.getId());
 			update(question);
 			
 			// 添加试题选项
-			if (questionEx.getType() == 1 || questionEx.getType() == 2) {
-				for (QuestionOption questionOption : questionEx.getQuestionOptionList()) {
-					questionOption.setQuestionId(question.getId());
-					questionOptionService.add(questionOption);
+			for (int i = 0; i < questionEx.getQuestionOptionList().size(); i++) {
+				QuestionOption questionOption = questionEx.getQuestionOptionList().get(i);
+				questionOption.setQuestionId(question.getId());
+				questionOption.setNo(i + 1);
+				questionOptionService.add(questionOption);
+			}
+			
+			// 添加试题答案
+			for (int i = 0; i < questionEx.getQuestionAnswerList().size(); i++) {
+				QuestionAnswer questionAnswer = questionEx.getQuestionAnswerList().get(i);
+				questionAnswer.setQuestionId(question.getId());
+				questionAnswer.setNo(i + 1);
+				if (question.getType() == 2) {
+					questionAnswer.setAnswer(StringUtil.join(questionAnswer.getAnswer().split("")));
 				}
+				questionAnswerService.add(questionAnswer);
 			}
 
 			// 保存附件
-			saveFile(question);
+			//saveFile(question);
 		}
 	}
 
