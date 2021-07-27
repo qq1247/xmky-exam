@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -18,7 +19,6 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
@@ -373,21 +373,22 @@ public class ApiQuestionController extends BaseController {
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public void wordTemplateExport() {
 		OutputStream output = null;
+		InputStream input = null;
 		try {
-			java.io.File file = new java.io.File(this.getClass().getResource("/").getPath() + "res/试题模板.docx");
-			
-			String fileName = new String((file.getName()).getBytes("UTF-8"), "ISO-8859-1");
+			input = this.getClass().getResourceAsStream("/res/试题模板.docx");
+			String fileName = new String(("试题模板.docx").getBytes("UTF-8"), "ISO-8859-1");
 			response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
 			response.setContentType("application/force-download");
 
 			output = response.getOutputStream();
-			FileUtils.copyFile(file, output);
+			IOUtils.copy(input, output);
 		} catch (MyException e) {
 			log.error("下载模板失败：{}", e.getMessage());
 		} catch (Exception e) {
 			log.error("下载模板失败：", e);
 		} finally {
 			IOUtils.closeQuietly(output);
+			IOUtils.closeQuietly(input);
 		}
 	}
 	
