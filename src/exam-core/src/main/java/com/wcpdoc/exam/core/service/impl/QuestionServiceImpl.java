@@ -36,6 +36,7 @@ import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 import com.wcpdoc.exam.core.service.WordServer;
+import com.wcpdoc.exam.core.util.BigDecimalUtil;
 import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.file.service.FileService;
@@ -528,32 +529,36 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			question.setVer(1);
 			question.setState(2);// 默认禁用
 			question.setQuestionTypeId(questionTypeId);
-			add(question);
-
-			question.setSrcId(question.getId());
-			update(question);
 			
-			// 添加试题选项
-			for (int i = 0; i < questionEx.getQuestionOptionList().size(); i++) {
-				QuestionOption questionOption = questionEx.getQuestionOptionList().get(i);
-				questionOption.setQuestionId(question.getId());
-				questionOption.setNo(i + 1);
-				questionOptionService.add(questionOption);
-			}
-			
-			// 添加试题答案
+			String[] answers = new String[questionEx.getQuestionAnswerList().size()];
+			BigDecimal[] scores = new BigDecimal[questionEx.getQuestionAnswerList().size()];
+			BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
 			for (int i = 0; i < questionEx.getQuestionAnswerList().size(); i++) {
-				QuestionAnswer questionAnswer = questionEx.getQuestionAnswerList().get(i);
-				questionAnswer.setQuestionId(question.getId());
-				questionAnswer.setNo(i + 1);
-				if (question.getType() == 2) {
-					questionAnswer.setAnswer(StringUtil.join(questionAnswer.getAnswer().split("")));
+				answers[i] = questionEx.getQuestionAnswerList().get(i).getAnswer();
+				if (question.getType() == 3 || (question.getType() == 5 && question.getAi() == 1)) {
+					answers[i] = StringUtil.join(answers[i].split(" "), '\n');
 				}
-				questionAnswerService.add(questionAnswer);
+				scores[i] = questionEx.getQuestionAnswerList().get(i).getScore();
+				totalScore.add(scores[i]);
 			}
-
-			// 保存附件
-			//saveFile(question);
+			if (question.getType() == 2) {// 多选特殊处理下，答案拆分
+				answers = questionEx.getQuestionAnswerList().get(0).getAnswer().split("");
+				scores = new BigDecimal[answers.length];
+				for (int i = 0; i < scores.length; i++) {
+					scores[i] = questionEx.getQuestionAnswerList().get(0).getScore();
+				}
+			}
+			
+			String [] options = new String[questionEx.getQuestionOptionList().size()];
+			for (int i = 0; i < questionEx.getQuestionOptionList().size(); i++) {
+				options[i] = questionEx.getQuestionOptionList().get(i).getOptions();
+			}
+			
+			if (question.getType() == 3 || (question.getType() == 5 && question.getAi() == 1)) {
+				question.setScore(totalScore.getResult());
+			}
+			
+			addAndUpdate(question, answers, options, scores);
 		}
 	}
 

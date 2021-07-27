@@ -218,6 +218,29 @@ public class StringUtil {
 		}
 		return sb.toString();
 	}
+	
+	/**
+	 * 字符串连接
+	 * 
+	 * v1.0 zhanghc 2021年7月27日下午4:05:56
+	 * @param strArr
+	 * @param separator
+	 * @return String
+	 */
+	public static String join(Object[] strArr, char separator) {
+		if (!ValidateUtil.isValid(strArr)) {
+			throw new MyException("参数错误：strArr");
+		}
+		
+		StringBuilder sb = new StringBuilder();
+		for (Object str : strArr) {
+			if (sb.length() > 0) {
+				sb.append(separator);
+			}
+			sb.append(str);
+		}
+		return sb.toString();
+	}
 
 	/**
 	 * 字符串连接
