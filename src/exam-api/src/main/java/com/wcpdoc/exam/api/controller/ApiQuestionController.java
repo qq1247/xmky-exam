@@ -374,7 +374,7 @@ public class ApiQuestionController extends BaseController {
 	public void wordTemplateExport() {
 		OutputStream output = null;
 		try {
-			java.io.File file = new java.io.File(this.getClass().getResource("/").getPath() + "res/试题模板.doc");
+			java.io.File file = new java.io.File(this.getClass().getResource("/").getPath() + "res/试题模板.docx");
 			
 			String fileName = new String((file.getName()).getBytes("UTF-8"), "ISO-8859-1");
 			response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
