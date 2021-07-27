@@ -358,9 +358,6 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if(score == null) {
 			throw new MyException("无法获取参数：score");
 		}
-		if (paperQuestionAnswerId.length != paperQuestionAnswerScore.length) {
-			throw new MyException("答案或分值有误！");
-		}
 		PaperQuestion entity = paperQuestionService.getEntity(paperQuestionId);
 		Paper paper = getEntity(entity.getPaperId());
 		if (paper.getState() == 0) {
@@ -370,8 +367,12 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			throw new MyException("试卷已发布");
 		}
 		// 设置答案分数
+		
+		if (paperQuestionAnswerId.length != paperQuestionAnswerScore.length) {
+			throw new MyException("答案或分值有误！");
+		}
 		BigDecimal scoreSum = new BigDecimal(0);
-		for (int i = 0; i <= paperQuestionAnswerId.length; i++) {
+		for (int i = 0; i < paperQuestionAnswerId.length; i++) {
 			PaperQuestionAnswer paperQuestionAnswer = paperQuestionAnswerService.getEntity(paperQuestionAnswerId[i]);
 			paperQuestionAnswer.setScore(paperQuestionAnswerScore[i]);
 			paperQuestionAnswerService.update(paperQuestionAnswer);
@@ -416,7 +417,9 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			}
 		} else if (question.getType() == 3) {
 			pq.setScoreOptions(StringUtil.join(scoreOptions));
-		} else {
+		} else if (question.getType() == 5) {
+				pq.setScoreOptions(StringUtil.join(scoreOptions));
+			} else {
 			pq.setScoreOptions(null);
 		}
 
