@@ -559,7 +559,13 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				question.setScore(totalScore.getResult());
 			}
 			
-			addAndUpdate(question, answers, options, scores);
+			String[] split = question.getScoreOptions().split(",");
+			Integer[] scoreOptions = new Integer[split.length];
+			for(int i = 0; i < split.length; i++ ){
+				scoreOptions[i] = Integer.parseInt(split[i]);
+			}
+			
+			addAndUpdate(question, scoreOptions, answers, options, scores);
 		}
 	}
 
