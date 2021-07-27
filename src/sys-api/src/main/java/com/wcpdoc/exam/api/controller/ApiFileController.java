@@ -97,7 +97,6 @@ public class ApiFileController extends BaseController {
 	 */
 	@RequestMapping(value = "/download")
 	@ResponseBody
-	@RequiresRoles(value={"admin","subAdmin","user"},logical = Logical.OR)
 	public void download(Integer id) {
 		OutputStream output = null;
 		try {

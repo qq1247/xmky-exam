@@ -1,17 +1,25 @@
 package com.wcpdoc.exam.core.service.impl;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.safety.Whitelist;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionEx;
@@ -19,8 +27,10 @@ import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.WordServer;
 import com.wcpdoc.exam.core.util.BigDecimalUtil;
+import com.wcpdoc.exam.core.util.SpringUtil;
 import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
+import com.wcpdoc.exam.file.service.FileService;
 
 /**
  * word服务实现
@@ -36,6 +46,9 @@ public class WordServerImpl extends WordServer {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T decoder(List<Node> nodeList) {
+		// 图片本地路径转上传路径
+		transformImgUrl(nodeList);
+		
 		// 从多行中分隔出不同的题
 		List<Node> singleQuestion = new ArrayList<>();// 一道题的内容
 		List<QuestionEx> questionList = new ArrayList<>();// 解析成试题对象的列表
@@ -76,6 +89,59 @@ public class WordServerImpl extends WordServer {
 
 		return (T) questionList;
 	}
+
+	/**
+	 * 图片本地路径转上传路径
+	 * 
+	 * v1.0 zhanghc 2021年7月27日下午1:26:39
+	 * @param nodeList 
+	 * void
+	 */
+	private void transformImgUrl(List<Node> nodeList) {
+		String[] allowTypes = { "jpg", "gif", "png"};
+		
+		for (Node node : nodeList) {
+			if (node instanceof TextNode) {
+				continue;
+			}
+			ListIterator<Element> imgListIterator = ((Element)node).getElementsByTag("img").listIterator();
+			while (imgListIterator.hasNext()) {
+				Element imgElement = imgListIterator.next();
+				File imgFile = new File(imgElement.attr("src"));
+				if (imgFile.exists()) {
+					MultipartFile multipartFile = fileToMultipartFile(imgFile);
+					FileService fileService = SpringUtil.getBean(FileService.class);
+					String fileId = fileService.doTempUpload(new MultipartFile[]{multipartFile}, allowTypes);
+					imgElement.attr("src", String.format("api/file/download?id=%s", fileId));
+				}
+			}
+		}
+	}
+	
+	public MultipartFile fileToMultipartFile(File file) {
+        FileItem fileItem = createFileItem(file);
+        MultipartFile multipartFile = new CommonsMultipartFile(fileItem);
+        return multipartFile;
+    }
+
+    private static FileItem createFileItem(File file) {
+        FileItemFactory factory = new DiskFileItemFactory(16, null);
+        FileItem item = factory.createItem("textField", "text/plain", true, file.getName());
+        int bytesRead = 0;
+        byte[] buffer = new byte[8192];
+        try {
+            FileInputStream fis = new FileInputStream(file);
+            OutputStream os = item.getOutputStream();
+            while ((bytesRead = fis.read(buffer, 0, 8192)) != -1) {
+                os.write(buffer, 0, bytesRead);
+            }
+            os.close();
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return item;
+    }
 
 	/**
 	 * 解析试题
