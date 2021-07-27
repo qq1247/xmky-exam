@@ -110,7 +110,7 @@
                   >{{ question.score }}分</el-tag
                 >
                 <el-tag effect="plain" size="mini">{{
-                  question.createUserName
+                  question.updateUserName
                 }}</el-tag>
                 <el-tag effect="plain" size="mini">{{
                   question.state == 1 ? '发布' : '草稿'
@@ -283,14 +283,14 @@
                   active-color="#0094e5"
                   :active-value="1"
                   inactive-color="#ff4949"
-                  :inactive-value="0"
+                  :inactive-value="2"
                   v-model="editForm.ai"
                 ></el-switch>
               </el-form-item>
             </el-col>
           </el-row>
 
-          <template v-if="editForm.ai == 1">
+          <template v-if="editForm.ai === 1">
             <el-row v-if="editForm.type === 2">
               <el-col :span="8">
                 <el-form-item>
@@ -311,10 +311,10 @@
                   v-if="editForm.scoreOptions.length > 0"
                   prop="multipScore"
                   class="ai-score"
-                  :show-message="editForm.ai == 1 ? true : false"
+                  :show-message="editForm.ai === 1 ? true : false"
                 >
                   <el-input
-                    v-if="editForm.ai == 1"
+                    v-if="editForm.ai === 1"
                     v-model="editForm.multipScore"
                   >
                     <template slot="append">分</template>
@@ -425,9 +425,9 @@
                   <el-form-item
                     :prop="`answers.${index}.score`"
                     :rules="editForm.rules.aiScore"
-                    :show-message="editForm.ai == 1 ? true : false"
+                    :show-message="editForm.ai === 1 ? true : false"
                   >
-                    <el-input v-if="editForm.ai == 1" v-model="answer.score">
+                    <el-input v-if="editForm.ai === 1" v-model="answer.score">
                       <template slot="append">分</template>
                     </el-input>
                   </el-form-item>
@@ -500,9 +500,9 @@
                   <el-form-item
                     :prop="`answers.${index}.score`"
                     :rules="editForm.rules.aiScore"
-                    :show-message="editForm.ai == 1 ? true : false"
+                    :show-message="editForm.ai === 1 ? true : false"
                   >
-                    <el-input v-if="editForm.ai == 1" v-model="answer.score">
+                    <el-input v-if="editForm.ai === 1" v-model="answer.score">
                       <template slot="append">分</template>
                     </el-input>
                   </el-form-item>
@@ -528,7 +528,7 @@
           <el-form-item
             label="答案"
             prop="answer"
-            v-if="editForm.type === 5 && editForm.ai === 0"
+            v-if="editForm.type === 5 && editForm.ai === 2"
           >
             <Editor
               :value="editForm.answer"
@@ -603,28 +603,28 @@ export default {
   },
   data() {
     const validateAiScore = (rule, value, callback) => {
-      if (this.editForm.ai == 0) {
+      if (this.editForm.ai === 2) {
         return callback()
       }
-      if (value == '') {
+      if (value === '') {
         return callback(new Error('请填写分数'))
       }
-      if (value > this.editForm.score) {
+      if (value > this.editForm.score || value <= 0) {
         return callback(new Error(`请填写合理分数`))
       }
       return callback()
     }
 
     const validateMultipScore = (rule, value, callback) => {
-      if (this.editForm.ai == 0 || this.editForm.scoreOptions.length == 0) {
+      if (this.editForm.ai === 2 || this.editForm.scoreOptions.length === 0) {
         this.editForm.multipScore = ''
         return callback()
       }
 
-      if (value == '') {
+      if (value === '') {
         return callback(new Error('请填写分数'))
       }
-      if (value > this.editForm.score) {
+      if (value > this.editForm.score || value <= 0) {
         return callback(new Error(`请填写合理分数`))
       }
       return callback()
@@ -661,6 +661,7 @@ export default {
         difficulty: 1, // 难度
         title: '', // 标题
         ai: 1, //AI阅卷
+        state: 2,
         options: [
           {
             lab: 'A',
@@ -975,10 +976,15 @@ export default {
     updateType(value) {
       this.$tools.resetData(this, 'editForm')
       this.editForm.type = value
-      if (value == 5) this.editForm.ai = 0
+      if (value == 5) this.editForm.ai = 2
     },
     // 组合添加或修改请求参数
     compistionParam(status) {
+      if (this.queryForm.edit == 'false') {
+        this.$tools.message('暂无此项权限！', 'warning')
+        return false
+      }
+
       const params = {
         type: this.editForm.type,
         difficulty: this.editForm.difficulty,
@@ -1027,7 +1033,7 @@ export default {
       }
 
       // 分值选项对应的分值（非智能 ai=2 || 单选、判断）
-      if (params.ai == 0 || [1, 4].includes(params.type)) {
+      if (params.ai == 2 || [1, 4].includes(params.type)) {
         params.scores = params.score
       }
 
@@ -1046,7 +1052,7 @@ export default {
         let sum = params.scores.reduce((acc, cur) => acc + Number(cur), 0)
         if (sum != params.score && params.ai == 1) {
           this.$tools.message('答案分值相加应等于总分值！', 'warning')
-          return
+          return false
         }
       }
 
@@ -1054,16 +1060,15 @@ export default {
     },
     // 添加试题
     add() {
-      if (this.queryForm.edit == 'false') {
-        this.$tools.message('暂无此项权限！', 'warning')
-        return
-      }
+      const params = this.compistionParam(true)
+      if (!params) return
+
       this.$refs['editForm'].validate(async (valid) => {
         if (!valid) {
           return false
         }
 
-        const res = await this.$https.questionAdd(this.compistionParam(true))
+        const res = await this.$https.questionAdd(params)
         res?.code == 200
           ? ((this.list.total += 1), this.$tools.message('添加成功！'))
           : this.$tools.message('添加失败！', 'error')
@@ -1077,23 +1082,20 @@ export default {
     },
     // 修改试题
     edit() {
-      if (this.queryForm.edit == 'false') {
-        this.$tools.message('暂无此项权限！', 'warning')
-        return
-      }
+      const params = this.compistionParam(false)
+      if (!params) return
+
       this.$refs['editForm'].validate((valid) => {
         if (!valid) {
           return false
         }
-        this.$confirm('当前修改会同步到引用的试卷，确定要修改？', '提示', {
+        this.$confirm('确定要修改？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning',
         })
           .then(async () => {
-            const res = await this.$https.questionEdit(
-              this.compistionParam(false)
-            )
+            const res = await this.$https.questionEdit(params)
             res?.code === 200
               ? (this.$tools.message('修改成功！'), this.query())
               : this.$tools.message('修改失败！')
@@ -1117,6 +1119,7 @@ export default {
       this.editForm.analysis = res.data.analysis
       this.editForm.score = res.data.score
       this.editForm.ai = res.data.ai
+      this.editForm.state = res.data.state
 
       if (this.editForm.type === 1) {
         this.editForm.options = [] // 重置选项
@@ -1201,6 +1204,11 @@ export default {
     },
     // 发布试题
     async publish(id, state) {
+      if (this.queryForm.edit == 'false') {
+        this.$tools.message('暂无此项权限！', 'warning')
+        return false
+      }
+
       if (state == 1) {
         this.$tools.message('试题已经发布！', 'warning')
         return

@@ -1,5 +1,6 @@
 <template>
   <el-select
+    :style="{ width: isAuto ? 'auto' : '100%' }"
     :value="value"
     :popper-class="popperClass"
     :multiple="multiple"
@@ -24,6 +25,7 @@
       :page-size="pageSize"
       layout="prev, pager, next"
       :total="total"
+      :page-count="5"
     ></el-pagination>
   </el-select>
 </template>
@@ -31,6 +33,10 @@
 <script>
 export default {
   props: {
+    isAuto: {
+      type: Boolean,
+      default: false,
+    },
     value: {
       type: Boolean | String | Number,
       default: '',

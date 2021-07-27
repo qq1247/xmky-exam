@@ -309,8 +309,9 @@ export default {
     viewExam(data) {
       this.$emit('viewExam', data)
     },
-    // 合并
+    // 移动
     move(data) {
+      if (this.isRole(data)) return
       this.$emit('move', data)
     },
   },
