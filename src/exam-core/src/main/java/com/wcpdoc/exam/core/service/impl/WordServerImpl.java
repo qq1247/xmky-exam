@@ -260,11 +260,15 @@ public class WordServerImpl extends WordServer {
 			questionEx.getQuestion().setScore(new BigDecimal(ai.getQaScore().toString()));
 		}
 
-		if (type == 1 || type == 3 || type == 4 || (type == 5 && ai.getAi() == 1)) {// 答案和分数
+		if (type == 1 || type == 4) {// 答案和分数
 			QuestionAnswer questionAnswer = new QuestionAnswer();
 			questionAnswer.setAnswer(questionAnswerList.get(0).getAnswer());
 			questionAnswer.setScore(new BigDecimal(questionAnswerList.get(0).getScore().toString()));// 和分值一样
 			questionEx.getQuestionAnswerList().add(questionAnswer);
+		} else if (type == 3 || (type == 5 && ai.getAi() == 1)) {
+			for (QuestionAnswer questionAnswer : questionAnswerList) {
+				questionEx.getQuestionAnswerList().add(questionAnswer);
+			}
 		} else if (type == 2) {
 			QuestionAnswer questionAnswer = new QuestionAnswer();
 			questionAnswer.setAnswer(questionAnswerList.get(0).getAnswer());
@@ -286,15 +290,18 @@ public class WordServerImpl extends WordServer {
 					questionEx.getQuestion().setScoreOptions("1");
 				}
 			} else if (type == 3) {// 填空问答 2：答案无顺序；3：大小写不敏感；
+				String sos = "";
+				
 				if (ai.getScoreOptions().toString().contains("2")) {
-					questionEx.getQuestion().setScoreOptions(questionEx.getQuestion().getScoreOptions() + "2");
+					sos += sos.isEmpty() ? "2" : ",2";
 				}
 				if (ai.getScoreOptions().toString().contains("3")) {
-					questionEx.getQuestion().setScoreOptions(questionEx.getQuestion().getScoreOptions() + "3");
+					sos += sos.isEmpty() ? "3" : ",3";
 				}
+				questionEx.getQuestion().setScoreOptions(sos);
 			} else if (type == 5) {// 问答 3：大小写不敏感；
 				if (ai.getScoreOptions().toString().contains("3")) {
-					questionEx.getQuestion().setScoreOptions(questionEx.getQuestion().getScoreOptions() + "3");
+					questionEx.getQuestion().setScoreOptions("3");
 				}
 			}
 		}
@@ -309,8 +316,8 @@ public class WordServerImpl extends WordServer {
 	private AI parseAi(List<Node> aiRows) {
 		String aiTxt = Jsoup.clean(aiRows.get(0).outerHtml(), Whitelist.none()).trim();
 		int lxdfIndex = aiTxt.indexOf("【漏选得分：");//临时变量可以用汉字首字母
-		int dayxxIndex = aiTxt.indexOf("【答案有顺序：");
-		int dxxmgIndex = aiTxt.indexOf("【大小写敏感：");
+		int dayxxIndex = aiTxt.indexOf("【答案无顺序：");
+		int dxxmgIndex = aiTxt.indexOf("【大小写不敏感：");
 		int lxfzIndex = aiTxt.indexOf("【漏选分值：");
 		int wdIndex = aiTxt.indexOf("【问答分值：");
 		
@@ -322,7 +329,7 @@ public class WordServerImpl extends WordServer {
 		if (dayxxIndex != -1 && aiTxt.substring(dayxxIndex + 7, dayxxIndex + 7 + 1).equals("是")) {
 			ai.getScoreOptions().add(2);
 		}
-		if (dxxmgIndex != -1 && aiTxt.substring(dxxmgIndex + 7, dxxmgIndex + 7 + 1).equals("是")) {
+		if (dxxmgIndex != -1 && aiTxt.substring(dxxmgIndex + 8, dxxmgIndex + 8 + 1).equals("是")) {
 			ai.getScoreOptions().add(3);
 		}
 		if (lxfzIndex != -1) {
@@ -448,13 +455,13 @@ public class WordServerImpl extends WordServer {
 		String txt = getTxt(titleRows, 0, titleRows.size());
 		for (String type : types) {
 			if (txt.contains(type)) {// 找到只替换第一个
-				txt.replace(type, "");
+				txt = txt.replace(type, "");
 				break;
 			}
 		}
 		for (String difficulty : difficultys) {
 			if (txt.contains(difficulty)) {// 找到只替换第一个
-				txt.replace(difficulty, "");
+				txt = txt.replace(difficulty, "");
 				break;
 			}
 		}
