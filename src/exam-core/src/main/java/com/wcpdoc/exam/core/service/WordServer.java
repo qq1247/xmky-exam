@@ -106,7 +106,7 @@ public abstract class WordServer {
     	
 		try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
 			Docx4J.toHTML(htmlSettings, os, Docx4J.FLAG_EXPORT_PREFER_XSL);// 写入到输出流
-			return new String(os.toByteArray());
+			return new String(os.toByteArray(), "utf-8");
 		} catch (Exception e) {
     		throw new MyException(e.getMessage());
 		}
