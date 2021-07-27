@@ -26,12 +26,13 @@ import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
+import com.wcpdoc.exam.core.entity.PaperQuestionAnswer;
 import com.wcpdoc.exam.core.entity.PaperRemark;
 import com.wcpdoc.exam.core.entity.Question;
-import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.service.PaperQuestionAnswerService;
 import com.wcpdoc.exam.core.service.PaperQuestionService;
 import com.wcpdoc.exam.core.service.PaperRemarkService;
 import com.wcpdoc.exam.core.service.PaperService;
@@ -66,6 +67,8 @@ public class ApiPaperController extends BaseController {
 	private QuestionTypeService questionTypeService;
 	@Resource
 	private QuestionAnswerService questionAnswerService;
+	@Resource
+	private PaperQuestionAnswerService paperQuestionAnswerService;
 	
 	/**
 	 * 试卷列表
@@ -107,6 +110,8 @@ public class ApiPaperController extends BaseController {
 			
 			paper.setCreateUserId(getCurUser().getId());
 			paper.setCreateTime(new Date());
+			paper.setUpdateTime(new Date());
+			paper.setUpdateUserId(getCurUser().getId());
 			paper.setTotalScore(BigDecimal.ZERO);
 			paper.setState(2);
 			paperService.add(paper);
@@ -231,11 +236,13 @@ public class ApiPaperController extends BaseController {
 			entity.setState(2);
 			entity.setCreateTime(new Date());
 			entity.setCreateUserId(getCurUser().getId());
+			entity.setUpdateTime(new Date());
+			entity.setUpdateUserId(getCurUser().getId());
 			paperService.add(entity);
 
 			List<PaperQuestion> chapterList = paperQuestionService.getChapterList(paper.getId());
 			if (chapterList != null && chapterList.size() != 0) {
-				for(PaperQuestion paperQuestionChapter : chapterList){
+				for(PaperQuestion paperQuestionChapter : chapterList){//章节
 					PaperQuestion paperQuestionChapterEntity = new PaperQuestion();
 					BeanUtils.copyProperties(paperQuestionChapterEntity, paperQuestionChapter);
 					paperQuestionChapterEntity.setPaperId(entity.getId());
@@ -244,7 +251,7 @@ public class ApiPaperController extends BaseController {
 					paperQuestionService.update(paperQuestionChapterEntity);
 					
 					List<PaperQuestion> questionList = paperQuestionService.getQuestionList(paperQuestionChapter.getId());
-					for(PaperQuestion paperQuestionQuestion : questionList){
+					for(PaperQuestion paperQuestionQuestion : questionList){//试卷试题
 						PaperQuestion paperQuestionQuestionEntity = new PaperQuestion();
 						BeanUtils.copyProperties(paperQuestionQuestionEntity, paperQuestionQuestion);
 						paperQuestionQuestionEntity.setParentId(paperQuestionChapterEntity.getId());
@@ -252,6 +259,14 @@ public class ApiPaperController extends BaseController {
 						paperQuestionService.add(paperQuestionQuestionEntity);
 						paperQuestionQuestionEntity.setParentSub(paperQuestionChapterEntity.getParentSub() + paperQuestionQuestionEntity.getId()+"_");
 						paperQuestionService.update(paperQuestionQuestionEntity);
+						
+						List<PaperQuestionAnswer> paperQuestionAnswerList = paperQuestionAnswerService.getPaperQuestionAnswerList(paperQuestionChapter.getId(), paperQuestionQuestion.getQuestionId());
+						for(PaperQuestionAnswer paperQuestionAnswer : paperQuestionAnswerList){
+							PaperQuestionAnswer paperQuestionAnswerEntity = new PaperQuestionAnswer();
+							BeanUtils.copyProperties(paperQuestionAnswerEntity, paperQuestionAnswer);
+							paperQuestionAnswerEntity.setPaperQuestionId(paperQuestionChapterEntity.getId());
+							paperQuestionAnswerService.add(paperQuestionAnswerEntity);
+						}
 					}
 				}
 			}
@@ -289,6 +304,8 @@ public class ApiPaperController extends BaseController {
 		try {
 			Paper entity = paperService.getEntity(id);
 			entity.setState(3);
+			entity.setUpdateTime(new Date());
+			entity.setUpdateUserId(getCurUser().getId());
 			paperService.update(entity);
 			return PageResult.ok();
 		}catch (Exception e) {
@@ -467,6 +484,7 @@ public class ApiPaperController extends BaseController {
 					Map<String, Object> questionMap = new HashMap<>();
 					Question question = questionService.getEntity(paperQuestion.getQuestionId());
 					questionMap.put("id", question.getId());
+					questionMap.put("ai", question.getAi());
 					questionMap.put("type", question.getType());
 					questionMap.put("typeName", DictCache.getDictValue("QUESTION_TYPE", question.getType().toString()));
 					questionMap.put("difficulty", question.getDifficulty());
@@ -479,25 +497,60 @@ public class ApiPaperController extends BaseController {
 					questionMap.put("paperQuestionId", paperQuestion.getId());
 					questionMap.put("options", new String[0]);// 默认为长度为0的数组
 					
-					if(question.getType() == 1 || question.getType() == 2 ){//
+					//if(question.getType() == 1 || question.getType() == 2 ){
 						List<QuestionOption> questionOptionList = questionOptionService.getList(paperQuestion.getQuestionId());
-						String[] options = new String[questionOptionList.size()];
-						for (int i = 0; i < questionOptionList.size(); i++) {
-							options[i] = questionOptionList.get(i).getOptions();// 按选项顺序添加试题
+						if (questionOptionList != null) {							
+							String[] options = new String[questionOptionList.size()];
+							for (int i = 0; i < questionOptionList.size(); i++) {
+								options[i] = questionOptionList.get(i).getOptions();// 按选项顺序添加试题
+							}
+							questionMap.put("options", options);
 						}
-						questionMap.put("options", options);
-					}
+					//}
 					
 					QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
 					boolean writeAuth = questionTypeService.hasWriteAuth(questionType, getCurUser().getId());
 					boolean readAuth = questionTypeService.hasReadAuth(questionType, getCurUser().getId());
-					List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
-					if (!writeAuth & !readAuth) {
-						for(QuestionAnswer questionAnswer : questionAnswerList){
-							questionAnswer.setAnswer(null);
+					List<PaperQuestionAnswer> paperQuestionAnswerList = paperQuestionAnswerService.getPaperQuestionAnswerList(chapter.getId(), question.getId());
+
+					List<Map<String, Object>> questionAnswerSplitList = new ArrayList<Map<String, Object>>();
+					if (question.getType() == 3) {
+						for(PaperQuestionAnswer paperQuestionAnswer : paperQuestionAnswerList){
+							Map<String, Object> questionAnswerMap = new HashMap<String, Object>();
+							String[] split = paperQuestionAnswer.getAnswer().split("\n");
+							questionAnswerMap.put("id", paperQuestionAnswer.getId());
+							questionAnswerMap.put("answer", split);
+							questionAnswerMap.put("score", paperQuestionAnswer.getScore());
+							questionAnswerMap.put("questionId", paperQuestionAnswer.getQuestionId());
+							questionAnswerSplitList.add(questionAnswerMap);
+						}
+					} else if (question.getType() == 5 && question.getAi() == 1) {
+						for(PaperQuestionAnswer paperQuestionAnswer : paperQuestionAnswerList){					
+							Map<String, Object> questionAnswerMap = new HashMap<String, Object>();
+							String[] split = paperQuestionAnswer.getAnswer().split("\n");
+							questionAnswerMap.put("id", paperQuestionAnswer.getId());
+							questionAnswerMap.put("answer", split);
+							questionAnswerMap.put("score", paperQuestionAnswer.getScore());
+							questionAnswerMap.put("questionId", paperQuestionAnswer.getQuestionId());
+							questionAnswerSplitList.add(questionAnswerMap);
+						}
+					} else {
+						for(PaperQuestionAnswer paperQuestionAnswer : paperQuestionAnswerList){
+							Map<String, Object> questionAnswerMap = new HashMap<String, Object>();
+							questionAnswerMap.put("id", paperQuestionAnswer.getId());
+							questionAnswerMap.put("answer", paperQuestionAnswer.getAnswer());
+							questionAnswerMap.put("score", paperQuestionAnswer.getScore());
+							questionAnswerMap.put("questionId", paperQuestionAnswer.getQuestionId());
+							questionAnswerSplitList.add(questionAnswerMap);
 						}
 					}
-					questionMap.put("answers", questionAnswerList);
+					
+					if (!writeAuth & !readAuth) {
+						for(Map<String, Object> forMap : questionAnswerSplitList){
+							forMap.put("answer", null);
+						}
+					}
+					questionMap.put("answers", questionAnswerSplitList);
 
 					questionsListMap.add(questionMap);
 				}
@@ -547,9 +600,9 @@ public class ApiPaperController extends BaseController {
 	@RequestMapping("/updateScore")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult updateScore(Integer paperQuestionId, BigDecimal score) {
+	public PageResult updateScore(Integer paperQuestionId, BigDecimal score, Integer[] paperQuestionAnswerId, BigDecimal[] paperQuestionAnswerScore) {
 		try {
-			paperService.scoreUpdate(paperQuestionId, score);
+			paperService.scoreUpdate(paperQuestionId, score, paperQuestionAnswerId, paperQuestionAnswerScore);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("设置分数错误：{}", e.getMessage());

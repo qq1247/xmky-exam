@@ -57,6 +57,12 @@ public class Exam {
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "UPDATE_TIME")
 	private Date updateTime;
+	@Column(name = "CREATE_USER_ID")
+	private Integer createUserId;
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@Column(name = "CREATE_TIME")
+	private Date createTime;
 	@Column(name = "STATE")
 	private Integer state;
 	@Column(name = "PAPER_ID")
@@ -153,5 +159,17 @@ public class Exam {
 	}
 	public void setExamTypeId(Integer examTypeId) {
 		this.examTypeId = examTypeId;
+	}
+	public Integer getCreateUserId() {
+		return createUserId;
+	}
+	public void setCreateUserId(Integer createUserId) {
+		this.createUserId = createUserId;
+	}
+	public Date getCreateTime() {
+		return createTime;
+	}
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
 	}
 }

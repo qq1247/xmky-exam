@@ -1,5 +1,6 @@
 package com.wcpdoc.exam.core.service.impl;
 
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,11 +19,17 @@ import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.PaperDao;
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
+import com.wcpdoc.exam.core.entity.PaperQuestionAnswer;
 import com.wcpdoc.exam.core.entity.PaperQuestionEx;
+import com.wcpdoc.exam.core.entity.PaperType;
 import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.service.PaperQuestionAnswerService;
 import com.wcpdoc.exam.core.service.PaperQuestionService;
 import com.wcpdoc.exam.core.service.PaperService;
+import com.wcpdoc.exam.core.service.PaperTypeService;
+import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.util.BigDecimalUtil;
 import com.wcpdoc.exam.core.util.StringUtil;
@@ -41,6 +48,12 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	private PaperQuestionService paperQuestionService;
 	@Resource
 	private QuestionService questionService;
+	@Resource
+	private QuestionAnswerService questionAnswerService;
+	@Resource
+	private PaperQuestionAnswerService paperQuestionAnswerService;
+	@Resource
+	private PaperTypeService paperTypeService;
 
 	@Override
 	@Resource(name = "paperDaoImpl")
@@ -317,6 +330,19 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			
 			pq.setParentSub(chapter.getParentSub()+pq.getId()+"_");
 			paperQuestionService.update(pq);
+			
+			//添加试题答案
+			List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(questionId);
+			for(QuestionAnswer questionAnswer : questionAnswerList){
+				PaperQuestionAnswer paperQuestionAnswer = new PaperQuestionAnswer();
+				try {
+					BeanUtils.copyProperties(paperQuestionAnswer, questionAnswer);
+				} catch (IllegalAccessException | InvocationTargetException e) {
+					System.err.println("添加答案错误！");
+				}
+				paperQuestionAnswer.setPaperQuestionId(chapterId);
+				paperQuestionAnswerService.add(paperQuestionAnswer);
+			}
 		}
 		
 		//更新总分数
@@ -324,13 +350,16 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 	
 	@Override
-	public void scoreUpdate(Integer paperQuestionId, BigDecimal score) {
+	public void scoreUpdate(Integer paperQuestionId, BigDecimal score, Integer[] paperQuestionAnswerId, BigDecimal[] paperQuestionAnswerScore) {
 		//校验数据有效性
 		if(paperQuestionId == null) {
 			throw new MyException("无法获取参数：paperQuestionId");
 		}
 		if(score == null) {
 			throw new MyException("无法获取参数：score");
+		}
+		if (paperQuestionAnswerId.length != paperQuestionAnswerScore.length) {
+			throw new MyException("答案或分值有误！");
 		}
 		PaperQuestion entity = paperQuestionService.getEntity(paperQuestionId);
 		Paper paper = getEntity(entity.getPaperId());
@@ -339,6 +368,17 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		}
 		if (paper.getState() == 1) {
 			throw new MyException("试卷已发布");
+		}
+		// 设置答案分数
+		BigDecimal scoreSum = new BigDecimal(0);
+		for (int i = 0; i <= paperQuestionAnswerId.length; i++) {
+			PaperQuestionAnswer paperQuestionAnswer = paperQuestionAnswerService.getEntity(paperQuestionAnswerId[i]);
+			paperQuestionAnswer.setScore(paperQuestionAnswerScore[i]);
+			paperQuestionAnswerService.update(paperQuestionAnswer);
+			scoreSum = scoreSum.add(paperQuestionAnswerScore[i]);
+		}
+		if (scoreSum.compareTo(score) != 0) {
+			throw new MyException("答案分值与总分值不符！");
 		}
 		
 		// 设置分数
@@ -568,6 +608,20 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		// 更新试卷总分
 		if (pqList.size() > 0) {
 			updateTotalScore(pqList.get(0).getPaperId());
+		}
+	}
+
+	@Override
+	public void move(Integer id, Integer sourceId, Integer targetId) {
+		PaperType paperType = paperTypeService.getEntity(sourceId);
+		if (paperType.getCreateUserId() != getCurUser().getId()) {
+			throw new MyException("权限不足！");
+		}
+		
+		List<Paper> list = paperDao.getList(sourceId);
+		for (Paper paper : list) {
+			paper.setPaperTypeId(targetId);
+			update(paper);
 		}
 	}
 }
