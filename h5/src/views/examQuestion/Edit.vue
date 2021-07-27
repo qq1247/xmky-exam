@@ -49,7 +49,7 @@
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query" icon="el-icon-search" type="primary"
+        <el-button @click="search" icon="el-icon-search" type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -112,9 +112,12 @@
                 <el-tag effect="plain" size="mini">{{
                   question.updateUserName
                 }}</el-tag>
-                <el-tag effect="plain" size="mini">{{
-                  question.state == 1 ? '发布' : '草稿'
-                }}</el-tag>
+                <el-tag
+                  :type="question.state == 1 ? 'info' : 'danger'"
+                  effect="dark"
+                  size="mini"
+                  >{{ question.state == 1 ? '发布' : '草稿' }}</el-tag
+                >
               </div>
               <div class="card-bottom-right">
                 <el-button
@@ -192,7 +195,7 @@
         >
           <el-row>
             <el-col :span="11">
-              <el-form-item label="类型" prop="type">
+              <el-form-item label="类型">
                 <el-select
                   disabled
                   placeholder="请选择类型"
@@ -326,14 +329,6 @@
               <el-checkbox-group v-model="editForm.scoreOptions">
                 <el-tooltip
                   class="item"
-                  content="默认全对得分"
-                  effect="dark"
-                  placement="top"
-                >
-                  <el-checkbox label="1">漏答得分</el-checkbox>
-                </el-tooltip>
-                <el-tooltip
-                  class="item"
                   content="默认答案有顺序"
                   effect="dark"
                   placement="top"
@@ -358,7 +353,7 @@
                   effect="dark"
                   placement="top"
                 >
-                  <el-checkbox label="1">大小写不敏感</el-checkbox>
+                  <el-checkbox label="3">大小写不敏感</el-checkbox>
                 </el-tooltip>
               </el-checkbox-group>
             </el-form-item>
@@ -536,7 +531,7 @@
               id="answer"
             ></Editor>
           </el-form-item>
-          <el-form-item label="解析">
+          <el-form-item label="解析" prop="analysis">
             <Editor
               :value="editForm.analysis"
               @editorListener="editorListener"
@@ -795,7 +790,7 @@ export default {
     },
     // 初始化默认值
     async init() {
-      this.query() // 查询列表
+      this.search() // 查询列表
 
       const typeDictData = await this.$https.dictListPage({
         dictIndex: 'QUESTION_TYPE',
@@ -832,79 +827,15 @@ export default {
       this.list.total = total
       this.list.questionList = list
     },
+    // 搜索
+    search() {
+      this.list.curPage = 1
+      this.query()
+    },
     // 分页查询
     pageChange(val = 1) {
       this.list.curPage = val
       this.query()
-    },
-    // 更新选项和答案
-    updateOptionAndAnswer(value) {
-      this.$refs.editForm.clearValidate(['answer']) // 清理校验
-
-      this.editForm.options = [] // 重置选项
-      this.editForm.answers = [] // 重置答案列表
-      this.editForm.answer = '' // 重置答案
-      this.editForm.rules.answer = [
-        { required: false, message: '请选择答案', trigger: 'change' },
-      ] // 取消答案校验
-      // 如果是单选
-      if (value === 1) {
-        for (let i = 0; i < 2; i++) {
-          this._addOption(i, '') // 初始化两个选项
-        }
-        this.editForm.rules.answer = [
-          { required: true, message: '请选择答案', trigger: 'change' },
-        ] // 添加答案校验
-        return
-      }
-
-      // 如果是多选
-      if (value === 2) {
-        this.editForm.answer = []
-        for (let i = 0; i < 2; i++) {
-          this._addOption(i, '') // 初始化两个选项
-        }
-        this.editForm.rules.answer = [
-          {
-            type: 'array',
-            required: true,
-            message: '请选择答案',
-            trigger: 'change',
-          },
-        ] // 添加答案校验
-        return
-      }
-
-      // 如果是填空
-      if (value === 3) {
-        for (let i = 0; i < 1; i++) {
-          const lab = String.fromCharCode(65 + i)
-          this.editForm.answers.push({ lab: lab, value: '' }) // 初始化一个填空
-
-          this.editForm.rules['answers.' + i + '.value'] = [
-            { required: true, message: '请输入填空' + lab, trigger: 'change' },
-          ] // 添加答案校验
-        }
-        return
-      }
-
-      // 如果是对错
-      if (value === 4) {
-        this.editForm.answers.push({ lab: '对', value: '' }) // 初始化两个选项
-        this.editForm.answers.push({ lab: '错', value: '' })
-        this.editForm.rules.answer = [
-          { required: true, message: '请选择答案', trigger: 'change' },
-        ] // 添加答案校验
-        return
-      }
-
-      // 如果是问答
-      if (value === 5) {
-        this.editForm.answer = ''
-        this.editForm.rules.answer = [
-          { required: true, message: '请输入答案', trigger: 'change' },
-        ] // 添加答案校验
-      }
     },
     // 添加选项
     addOption() {
@@ -974,7 +905,7 @@ export default {
     },
     // 更新类型
     updateType(value) {
-      this.$tools.resetData(this, 'editForm')
+      this.$tools.resetData(this,'editForm')
       this.editForm.type = value
       if (value == 5) this.editForm.ai = 2
     },
@@ -1068,16 +999,8 @@ export default {
           return false
         }
 
-        const res = await this.$https.questionAdd(params)
-        res?.code == 200
-          ? ((this.list.total += 1), this.$tools.message('添加成功！'))
-          : this.$tools.message('添加失败！', 'error')
-        this.list.total % this.list.pageSize != 0
-          ? (this.list.curPage = Math.ceil(
-              this.list.total / this.list.pageSize
-            ))
-          : (this.list.curPage = this.list.total / this.list.pageSize)
-        this.pageChange(this.list.curPage)
+        const res = await this.$https.questionAdd(params).catch((err) => {})
+        this.resetQuery(res, '添加')
       })
     },
     // 修改试题
@@ -1095,10 +1018,10 @@ export default {
           type: 'warning',
         })
           .then(async () => {
-            const res = await this.$https.questionEdit(params)
-            res?.code === 200
-              ? (this.$tools.message('修改成功！'), this.query())
-              : this.$tools.message('修改失败！')
+            const res = await this.$https
+              .questionEdit(params)
+              .catch((err) => {})
+            this.resetQuery(res, '修改')
           })
           .catch(() => {})
       })
@@ -1166,13 +1089,7 @@ export default {
         return
       }
       const res = await this.$https.questionCopy({ id })
-      res?.code == 200
-        ? ((this.list.total += 1), this.$tools.message('复制成功！'))
-        : this.$tools.message('复制失败！', 'error')
-      this.list.total % this.list.pageSize != 0
-        ? (this.list.curPage = Math.ceil(this.list.total / this.list.pageSize))
-        : (this.list.curPage = this.list.total / this.list.pageSize)
-      this.pageChange(this.list.curPage)
+      this.resetQuery(res, '复制')
     },
     // 删除试题
     del(id) {
@@ -1186,20 +1103,7 @@ export default {
         type: 'warning',
       }).then(async () => {
         const res = await this.$https.questionDel({ id })
-        if (res?.code == 200) {
-          this.list.total -= 1
-          if (this.list.total <= this.list.pageSize) {
-            this.pageChange(1)
-            return
-          }
-          this.$tools.message('删除成功！')
-          this.list.total % this.list.pageSize == 0 &&
-          this.list.total != this.list.pageSize
-            ? ((this.list.curPage -= 1), this.pageChange(this.list.curPage))
-            : this.pageChange(this.list.curPage)
-        } else {
-          this.$tools.message(res.msg || '删除失败！', 'error')
-        }
+        this.resetQuery(res, '删除')
       })
     },
     // 发布试题
@@ -1218,9 +1122,7 @@ export default {
           id,
         })
         .catch((err) => {})
-      res?.code == 200
-        ? (this.$tools.message('发布成功！'), this.pageChange())
-        : this.$tools.message('发布失败！', 'error')
+      this.resetQuery(res, '发布试题')
     },
     // 获取试题模板
     async questionTemplate() {
@@ -1253,6 +1155,21 @@ export default {
         this.query()
       } else {
         this.$tools.message('上传失败！', error)
+      }
+    },
+    // 还原数据并查询
+    resetQuery(res, msg) {
+      if (res?.code === 200) {
+        this.editForm.id = null
+        this.list.curPage = 1
+        this.query()
+        this.$tools.message(`${msg}成功！`)
+        this.$tools.resetData(this,'editForm')
+        /* this.$nextTick(() => {
+          this.$refs['editForm'].resetFields()
+        }) */
+      } else {
+        this.$tools.message(res.msg || `${msg}失败！`, 'error')
       }
     },
   },
