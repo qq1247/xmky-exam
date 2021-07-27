@@ -310,6 +310,8 @@ public class ApiQuestionController extends BaseController {
 			entity.setState(2);
 			entity.setCreateTime(new Date());
 			entity.setCreateUserId(getCurUser().getId());
+			entity.setUpdateTime(new Date());
+			entity.setUpdateUserId(getCurUser().getId());
 			questionService.add(entity);
 			
 			List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());

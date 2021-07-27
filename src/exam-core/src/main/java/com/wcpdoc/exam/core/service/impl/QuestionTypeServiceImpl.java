@@ -63,6 +63,8 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		questionType.setWriteUserIds(","+getCurUser().getId()+",");
 		questionType.setCreateUserId(getCurUser().getId());
 		questionType.setCreateTime(new Date());
+		questionType.setUpdateTime(new Date());
+		questionType.setUpdateUserId(getCurUser().getId());
 		questionType.setState(1);
 		questionTypeDao.add(questionType);
 		

@@ -38,7 +38,7 @@ public class QuestionTypeDaoImpl extends RBaseDaoImpl<QuestionType> implements Q
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "QUESTION_TYPE.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
 				.addWhere("QUESTION_TYPE.STATE = 1")
 				.addWhere("QUESTION_TYPE.ID != 1")
-				.addOrder("QUESTION_TYPE.CREATE_TIME", Order.DESC);
+				.addOrder("QUESTION_TYPE.UPDATE_TIME", Order.DESC);
 		
 		if (pageIn.get("curUserId", Integer.class) != null) {
 			User user = userDao.getEntity(pageIn.get("curUserId", Integer.class));

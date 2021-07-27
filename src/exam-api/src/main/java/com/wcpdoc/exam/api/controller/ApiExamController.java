@@ -100,6 +100,9 @@ public class ApiExamController extends BaseController{
 			}
 			
 			//添加考试
+			exam.setCreateUserId(getCurUser().getId());
+			exam.setCreateTime(new Date());
+			exam.setUpdateUserId(getCurUser().getId());
 			exam.setUpdateTime(new Date());
 			exam.setUpdateUserId(getCurUser().getId());
 			exam.setState(2);

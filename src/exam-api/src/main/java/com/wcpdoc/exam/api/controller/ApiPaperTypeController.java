@@ -24,6 +24,7 @@ import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.entity.PaperType;
 import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.PaperTypeService;
 import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
@@ -41,6 +42,8 @@ public class ApiPaperTypeController extends BaseController {
 	
 	@Resource
 	private PaperTypeService paperTypeService;
+	@Resource
+	private PaperService paperService;
 	@Resource
 	private OrgService orgService;
 	@Resource
@@ -246,6 +249,29 @@ public class ApiPaperTypeController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加权限用户错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 试题分类合并
+	 * 
+	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * @param id
+	 * @return pageOut
+	 */
+	@RequestMapping("/move")
+	@ResponseBody
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	public PageResult move(Integer id, Integer sourceId, Integer targetId) {
+		try {
+			paperService.move(id, sourceId, targetId);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("合并试题错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		}  catch (Exception e) {
+			log.error("合并试题错误：", e);
 			return PageResult.err();
 		}
 	}

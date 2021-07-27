@@ -157,7 +157,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (question.getType() == 1 || question.getType() == 4 ) {
 			QuestionAnswer questionAnswer = new QuestionAnswer();
 			questionAnswer.setAnswer(answers[0]);
-			if (scores != null) {				
+			if (question.getAi() == 1 && scores != null) {				
 				questionAnswer.setScore(scores[0]);
 			}else{
 				questionAnswer.setScore(new BigDecimal(0));
@@ -170,7 +170,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();
 				questionAnswer.setAnswer(answers[i]);
-				if (scores != null) {
+				if (question.getAi() == 1 && scores != null) {
 					questionAnswer.setScore(scores[0]);
 				}else{
 					questionAnswer.setScore(new BigDecimal(0));
@@ -184,7 +184,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();
 				questionAnswer.setAnswer(answers[i]);
-				if (scores != null) {
+				if (question.getAi() == 1 && scores != null) {
 					questionAnswer.setScore(scores[i]);
 				}else{
 					questionAnswer.setScore(new BigDecimal(0));
@@ -301,6 +301,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (entity.getState() == 1) {
 			throw new MyException("试题已发布不能修改！");
 		}
+		if (entity.getState() == 0) {
+			throw new MyException("试题已删除不能修改！");
+		}
 		/*if (newVer) {
 			// 删除旧版本
 			Question newQuestion = new Question();
@@ -365,7 +368,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (question.getType() == 1 || question.getType() == 4 ) {
 			QuestionAnswer questionAnswer = new QuestionAnswer();
 			questionAnswer.setAnswer(answers[0]);
-			if (scores != null) {
+			if (question.getAi() == 1 && scores != null) {
 				questionAnswer.setScore(scores[0]);
 			}else{
 				questionAnswer.setScore(new BigDecimal(0));
@@ -378,7 +381,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();
 				questionAnswer.setAnswer(answers[i]);
-				if (scores != null) {
+				if (question.getAi() == 1 && scores != null) {
 					questionAnswer.setScore(scores[0]);
 				}else{
 					questionAnswer.setScore(new BigDecimal(0));
@@ -392,7 +395,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();
 				questionAnswer.setAnswer(answers[i]);
-				if (scores != null) {
+				if (question.getAi() == 1 && scores != null) {
 					questionAnswer.setScore(scores[i]);
 				}else{
 					questionAnswer.setScore(new BigDecimal(0));
@@ -556,6 +559,12 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 
 	@Override
 	public void move(Integer id, Integer sourceId, Integer targetId) {
+		if (sourceId == null) {
+			throw new MyException("参数错误：sourceId");
+		}
+		if(targetId == null){
+			throw new MyException("参数错误：targetId");
+		}
 		QuestionType questionType = questionTypeService.getEntity(sourceId);
 		if (questionType.getCreateUserId() != getCurUser().getId()) {
 			throw new MyException("权限不足！");
