@@ -280,11 +280,12 @@
                           :label="String.fromCharCode(65 + index)"
                           v-for="(option, index) in child.options"
                         >
-                          <span
+                          <div
+                            class="flex-items-center"
                             v-html="
                               `${String.fromCharCode(65 + index)}、${option}`
                             "
-                          ></span>
+                          ></div>
                         </el-radio>
                       </el-radio-group>
                     </template>
@@ -302,11 +303,12 @@
                           :label="String.fromCharCode(65 + index)"
                           v-for="(option, index) in child.options"
                         >
-                          <span
+                          <div
+                            class="flex-items-center"
                             v-html="
                               `${String.fromCharCode(65 + index)}、${option}`
                             "
-                          ></span>
+                          ></div>
                         </el-checkbox>
                       </el-checkbox-group>
                     </template>
@@ -345,8 +347,18 @@
                     </template>
 
                     <div class="children-analysis">
-                      <div>【答案】：{{ child.answers[0] }}</div>
-                      <div v-html="`【解析】：${child.analysis}`"></div>
+                      <div v-if="child.ai === 1">
+                        【答案】：{{ child.answers.map((item) => item.answer) }}
+                      </div>
+                      <div
+                        class="flex-items-center"
+                        v-if="child.ai === 2"
+                        v-html="`【答案】：${child.answers[0].answer}`"
+                      ></div>
+                      <div
+                        class="flex-items-center"
+                        v-html="`【解析】：${child.analysis}`"
+                      ></div>
                     </div>
                     <div class="children-footer">
                       <div class="children-tags">
@@ -365,7 +377,7 @@
                       </div>
                       <div class="children-buts">
                         <el-button
-                          @click="setting()"
+                          @click="setting(child)"
                           class="btn"
                           icon="el-icon-setting"
                           round
@@ -428,6 +440,121 @@
         </el-scrollbar>
       </div>
     </div>
+
+    <el-dialog
+      :visible.sync="settingForm.show"
+      :show-close="false"
+      width="40%"
+      title="分值选项设置"
+      ref="settingForm"
+      :close-on-click-modal="false"
+      @close="resetData('settingForm')"
+    >
+      <el-form
+        :model="settingForm"
+        :rules="settingForm.rules"
+        ref="settingForm"
+        label-width="60px"
+      >
+        <el-form-item label="分值" prop="score">
+          <el-input-number
+            :max="100"
+            :min="1"
+            :step="1"
+            controls-position="right"
+            v-model.number="settingForm.score"
+            mini
+          ></el-input-number>
+        </el-form-item>
+
+        <template v-if="settingForm.ai === 1">
+          <template v-if="settingForm.type === 3 || settingForm.type === 5">
+            <el-form-item
+              v-for="(answer, index) in settingForm.answers"
+              :key="index"
+              :label="settingForm.type === 3 ? '填空' : '关键词'"
+              :prop="`answers.${index}.score`"
+              :rules="settingForm.rules.aiScore"
+              :show-message="settingForm.ai === 1 ? true : false"
+            >
+              <el-input v-if="settingForm.ai === 1" v-model="answer.score">
+                <template slot="append">分</template>
+              </el-input>
+            </el-form-item>
+          </template>
+        </template>
+
+        <template v-if="settingForm.ai === 1">
+          <el-row v-if="settingForm.type === 2">
+            <el-col :span="5">
+              <el-form-item>
+                <el-checkbox-group v-model="settingForm.scoreOptions">
+                  <el-tooltip
+                    class="item"
+                    content="默认全对得分"
+                    effect="dark"
+                    placement="top"
+                  >
+                    <el-checkbox label="1">漏选得分</el-checkbox>
+                  </el-tooltip>
+                </el-checkbox-group>
+              </el-form-item>
+            </el-col>
+            <el-col :span="10">
+              <el-form-item
+                v-if="settingForm.scoreOptions.length > 0"
+                prop="multipScore"
+                class="ai-score"
+                :show-message="settingForm.ai === 1 ? true : false"
+              >
+                <el-input
+                  v-if="settingForm.ai === 1"
+                  v-model="settingForm.multipScore"
+                >
+                  <template slot="append">分</template>
+                </el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-form-item v-if="settingForm.type === 3">
+            <el-checkbox-group v-model="settingForm.scoreOptions">
+              <el-tooltip
+                class="item"
+                content="默认答案有顺序"
+                effect="dark"
+                placement="top"
+              >
+                <el-checkbox label="2">答案无顺序</el-checkbox>
+              </el-tooltip>
+              <el-tooltip
+                class="item"
+                content="默认大小写敏感"
+                effect="dark"
+                placement="top"
+              >
+                <el-checkbox label="3">大小写不敏感</el-checkbox>
+              </el-tooltip>
+            </el-checkbox-group>
+          </el-form-item>
+          <el-form-item v-if="settingForm.type === 5">
+            <el-checkbox-group v-model="settingForm.scoreOptions">
+              <el-tooltip
+                class="item"
+                content="大小写不敏感"
+                effect="dark"
+                placement="top"
+              >
+                <el-checkbox label="3">大小写不敏感</el-checkbox>
+              </el-tooltip>
+            </el-checkbox-group>
+          </el-form-item>
+        </template>
+      </el-form>
+      <div class="dialog-footer" slot="footer">
+        <el-button @click="setScore" type="primary">设置</el-button>
+        <el-button @click="settingForm.show = false">取消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -437,6 +564,36 @@ export default {
     Draggable,
   },
   data() {
+    const validateAiScore = (rule, value, callback) => {
+      if (this.settingForm.ai === 2) {
+        return callback()
+      }
+      if (value === '') {
+        return callback(new Error('请填写分数'))
+      }
+      if (value > this.settingForm.score || value <= 0) {
+        return callback(new Error(`请填写合理分数`))
+      }
+      return callback()
+    }
+
+    const validateMultipScore = (rule, value, callback) => {
+      if (
+        this.settingForm.ai === 2 ||
+        this.settingForm.scoreOptions.length === 0
+      ) {
+        this.settingForm.multipScore = ''
+        return callback()
+      }
+
+      if (value === '') {
+        return callback(new Error('请填写分数'))
+      }
+      if (value > this.settingForm.score || value <= 0) {
+        return callback(new Error(`请填写合理分数`))
+      }
+      return callback()
+    }
     return {
       labelPosition: 'left',
       hrefPointer: '',
@@ -471,6 +628,20 @@ export default {
       },
       paperList: [],
       paperQuestion: [],
+      settingForm: {
+        show: false,
+        paperQuestionId: null,
+        type: 1,
+        score: 1,
+        answers: [],
+        scoreOptions: [],
+        multipScore: '',
+        rules: {
+          score: [{ required: true, message: '请输入分值', trigger: 'change' }],
+          aiScore: [{ validator: validateAiScore }],
+          multipScore: [{ validator: validateMultipScore }],
+        },
+      },
     }
   },
   created() {
@@ -526,7 +697,7 @@ export default {
           scoreStart: this.queryForm.score,
           scoreEnd: this.queryForm.score,
           exPaperId: this.paperId,
-          // state: 1,
+          state: 1,
           curPage: this.curPage,
           pageSize: this.pageSize,
         })
@@ -654,6 +825,69 @@ export default {
           this.queryQuestion())
         : this.$tools.message(`${title}失败！`, 'error')
     },
+    // 设置分数
+    setting(data) {
+      this.settingForm.paperQuestionId = data.paperQuestionId
+      this.settingForm.type = data.type
+      this.settingForm.ai = data.ai
+      this.settingForm.score = data.score
+      this.settingForm.scoreOptions = data.scoreOptions
+        ? data.scoreOptions.split(',')
+        : []
+      this.settingForm.answers = data.answers
+      this.settingForm.multipScore =
+        data.type === 2 && data.ai === 1 && data.scoreOptions.length > 0
+          ? data.answers[0].score
+          : ''
+      this.settingForm.show = true
+    },
+    // 设置分数
+    setScore() {
+      let paperQuestionAnswerId = [],
+        paperQuestionAnswerScore = []
+      if (this.settingForm.ai === 1) {
+        paperQuestionAnswerId = this.settingForm.answers.reduce((acc, cur) => {
+          acc.push(cur.id)
+          return acc
+        }, [])
+
+        paperQuestionAnswerScore = this.settingForm.answers.reduce(
+          (acc, cur) => {
+            acc.push(cur.score)
+            return acc
+          },
+          []
+        )
+      }
+
+      this.$refs['settingForm'].validate(async (valid) => {
+        if (!valid) {
+          return false
+        }
+
+        const updateScore = await this.$https
+          .paperUpdateScore({
+            paperQuestionId: this.settingForm.paperQuestionId,
+            score: this.settingForm.score,
+            paperQuestionAnswerId: paperQuestionAnswerId,
+            paperQuestionAnswerScore: paperQuestionAnswerScore,
+          })
+          .catch((err) => {})
+
+        const updateScoreOptions = await this.$https
+          .paperUpdateScoreOptions({
+            paperQuestionId: this.settingForm.paperQuestionId,
+            scoreOptions: this.settingForm.scoreOptions,
+          })
+          .catch((err) => {})
+
+        if (updateScore?.code === 200 && updateScoreOptions?.code === 200) {
+          this.$tools.message('编辑成功！')
+          this.settingForm.show = false
+          this.query()
+        }
+      })
+    },
     // 选择拖拽原题
     sourceChoose(e) {
       if (this.paperQuestion.length == 0) {
@@ -688,6 +922,10 @@ export default {
       this.hrefPointer = `#p-${id}`
       document.documentElement.scrollTop =
         document.querySelector(this.hrefPointer).offsetTop - 50
+    },
+    // 重置数据
+    resetData(name) {
+      this.$tools.resetData(this, name)
     },
   },
 }
@@ -808,6 +1046,8 @@ export default {
     }
     .item-title {
       margin-bottom: 10px;
+      display: flex;
+      align-items: center;
     }
     .el-tag {
       margin-left: 10px;
@@ -887,18 +1127,25 @@ export default {
       border-bottom: none;
     }
     p {
-      margin: 0;
       line-height: 40px;
       padding-left: 10px;
       background: #e5f4fc;
+      display: flex;
+      align-items: center;
     }
   }
   .children-option {
     padding: 10px 0 0 25px;
-    .option-item {
-      display: block;
-      line-height: 30px;
-    }
+  }
+  .option-item,
+  .flex-items-center {
+    display: flex;
+    justify-items: center;
+    line-height: 30px;
+  }
+  /deep/ .el-radio__input,
+  /deep/ .el-checkbox__input {
+    padding-top: 7px;
   }
   .option-item-text {
     border-bottom: 1px solid #d8d8d8;
@@ -912,10 +1159,6 @@ export default {
     margin: 15px 0;
     font-size: 13px;
     color: #666;
-    span {
-      font-size: 15px;
-      font-weight: bold;
-    }
   }
   .el-tag {
     margin-right: 6px;
@@ -966,8 +1209,10 @@ export default {
 
 /deep/ .el-collapse-item__header {
   background: #f1f1f1;
-  color: #333;
+  color: #000;
   padding: 0 10px;
+  height: 40px;
+  line-height: 40px;
 }
 
 .route-href {
