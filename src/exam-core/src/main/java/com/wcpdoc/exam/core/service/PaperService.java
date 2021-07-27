@@ -75,11 +75,13 @@ public interface PaperService extends BaseService<Paper> {
 	 * 设置分数
 	 * 
 	 * v1.0 zhanghc 2018年10月21日下午3:10:37
-	 * @param paperQuestionId 
-	 * @param score 
+	 * @param paperQuestionId
+	 * @param score
+	 * @param paperQuestionAnswerId
+	 * @param paperQuestionAnswerScore void
 	 * void
 	 */
-	void scoreUpdate(Integer paperQuestionId, BigDecimal score);
+	void scoreUpdate(Integer paperQuestionId, BigDecimal score, Integer[] paperQuestionAnswerId, BigDecimal[] paperQuestionAnswerScore);
 	
 	/**
 	 * 完成设置选项
@@ -161,4 +163,13 @@ public interface PaperService extends BaseService<Paper> {
 	 */
 	void batchScoreUpdate(Integer chapterId, BigDecimal score, String options);
 	
+	/**
+	 * 合并
+	 * 
+	 * v1.0 chenyun 2021年3月2日下午1:25:51
+	 * @param id
+	 * @param sourceId
+	 * @param targetId void
+	 */
+	void move(Integer id, Integer sourceId, Integer targetId);
 }

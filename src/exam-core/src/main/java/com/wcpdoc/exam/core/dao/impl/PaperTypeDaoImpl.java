@@ -38,7 +38,7 @@ public class PaperTypeDaoImpl extends RBaseDaoImpl<PaperType> implements PaperTy
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "PAPER_TYPE.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
 				.addWhere("PAPER_TYPE.STATE = 1")
 				.addWhere("PAPER_TYPE.ID != 1")
-				.addOrder("PAPER_TYPE.CREATE_TIME", Order.DESC);
+				.addOrder("PAPER_TYPE.UPDATE_TIME", Order.DESC);
 		
 		if (pageIn.get("curUserId", Integer.class) != null) {
 			User user = userDao.getEntity(pageIn.get("curUserId", Integer.class));

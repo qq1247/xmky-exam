@@ -13,11 +13,10 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,6 +36,8 @@ import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 import com.wcpdoc.exam.core.service.WordServer;
+import com.wcpdoc.exam.core.util.BigDecimalUtil;
+import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.file.service.FileService;
 
@@ -59,6 +60,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	private QuestionOptionService questionOptionService;
 	@Resource
 	private QuestionAnswerService questionAnswerService;
+	@Value("${file.upload.dir}")
+	private String fileUploadDir;
 
 	@Override
 	@Resource(name = "questionDaoImpl")
@@ -67,7 +70,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void addAndUpdate(Question question, String[] answers, String[] options, BigDecimal[] scores) {
+	public void addAndUpdate(Question question, Integer[] scoreOptions, String[] answers, String[] options, BigDecimal[] scores) {
 		// 校验数据有效性
 		if (question.getType() == null) {
 			throw new MyException("参数错误：type");
@@ -139,6 +142,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 
 		// 添加试题
+		question.setScoreOptions(StringUtil.join(scoreOptions));
 		question.setCreateTime(new Date());
 		question.setCreateUserId(getCurUser().getId());
 		question.setUpdateTime(new Date());
@@ -155,7 +159,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (question.getType() == 1 || question.getType() == 4 ) {
 			QuestionAnswer questionAnswer = new QuestionAnswer();
 			questionAnswer.setAnswer(answers[0]);
-			if (scores != null) {				
+			if (question.getAi() == 1 && scores != null) {				
 				questionAnswer.setScore(scores[0]);
 			}else{
 				questionAnswer.setScore(new BigDecimal(0));
@@ -168,7 +172,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();
 				questionAnswer.setAnswer(answers[i]);
-				if (scores != null) {
+				if (question.getAi() == 1 && scores != null) {
 					questionAnswer.setScore(scores[0]);
 				}else{
 					questionAnswer.setScore(new BigDecimal(0));
@@ -182,7 +186,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();
 				questionAnswer.setAnswer(answers[i]);
-				if (scores != null) {
+				if (question.getAi() == 1 && scores != null) {
 					questionAnswer.setScore(scores[i]);
 				}else{
 					questionAnswer.setScore(new BigDecimal(0));
@@ -223,7 +227,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void updateAndUpdate(Question question, String[] answers, String[] options, BigDecimal[] scores) { //, boolean newVer
+	public void updateAndUpdate(Question question, Integer[] scoreOptions, String[] answers, String[] options, BigDecimal[] scores) { //, boolean newVer
 		// 校验数据有效性
 		if (question.getType() == null) {
 			throw new MyException("参数错误：type");
@@ -299,6 +303,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (entity.getState() == 1) {
 			throw new MyException("试题已发布不能修改！");
 		}
+		if (entity.getState() == 0) {
+			throw new MyException("试题已删除不能修改！");
+		}
 		/*if (newVer) {
 			// 删除旧版本
 			Question newQuestion = new Question();
@@ -349,7 +356,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
 		entity.setScore(question.getScore());
-		entity.setScoreOptions(question.getScoreOptions());
+		entity.setScoreOptions(StringUtil.join(scoreOptions));
 		entity.setNo(question.getNo());
 		update(entity);
 
@@ -363,7 +370,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (question.getType() == 1 || question.getType() == 4 ) {
 			QuestionAnswer questionAnswer = new QuestionAnswer();
 			questionAnswer.setAnswer(answers[0]);
-			if (scores != null) {
+			if (question.getAi() == 1 && scores != null) {
 				questionAnswer.setScore(scores[0]);
 			}else{
 				questionAnswer.setScore(new BigDecimal(0));
@@ -376,7 +383,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();
 				questionAnswer.setAnswer(answers[i]);
-				if (scores != null) {
+				if (question.getAi() == 1 && scores != null) {
 					questionAnswer.setScore(scores[0]);
 				}else{
 					questionAnswer.setScore(new BigDecimal(0));
@@ -390,7 +397,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();
 				questionAnswer.setAnswer(answers[i]);
-				if (scores != null) {
+				if (question.getAi() == 1 && scores != null) {
 					questionAnswer.setScore(scores[i]);
 				}else{
 					questionAnswer.setScore(new BigDecimal(0));
@@ -436,13 +443,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (question.getType() == 1 || question.getType() == 2) {// 单选或多选
 			QuestionOption entity = new QuestionOption();
 			entity.setQuestionId(question.getId());
-
-			if (question instanceof QuestionEx) {
-				QuestionEx questionEx = (QuestionEx) question;
-				for (QuestionOption questionOption : questionEx.getQuestionOptionList()) {
-					fileIdList.addAll(html2FileIds(questionOption.getOptions()));
-				}
-			}
 		} else if (question.getType() == 5) {// 问答
 			List<QuestionAnswer> list = questionAnswerService.getList(question.getId());
 		    StringBuilder answerString = new StringBuilder();    
@@ -505,53 +505,72 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	public void wordImp(MultipartFile file, Integer questionTypeId) {
 		// 校验数据有效性
 		String extName = FilenameUtils.getExtension(file.getOriginalFilename());
-		if (!"doc".equals(extName)) {
-			throw new MyException("允许的上传类型为：doc");
+		if (!"docx".equals(extName)) {
+			throw new MyException("允许的上传类型为：docx");
 		}
 
 		// 解析文件
 		WordServer wordServer = new WordServerImpl();
-		InputStream inputStream = null;
-		try {
-			inputStream = file.getInputStream();
+		List<QuestionEx> questionExList = null;
+		try (InputStream inputStream = file.getInputStream()) {
+			questionExList = wordServer.handle(inputStream, fileUploadDir);
 		} catch (IOException e) {
-			IOUtils.closeQuietly(inputStream);
-			throw new MyException("读取文件流异常！");
+			throw new MyException("读取word时异常！");
+		} catch (Exception e) {
+			throw new MyException(e.getMessage());
 		}
-
-		List<QuestionEx> questionExList = wordServer.handle(inputStream);
-		IOUtils.closeQuietly(inputStream);
 
 		// 添加试题
 		for (QuestionEx questionEx : questionExList) {
-			Question question = new Question();
-			BeanUtils.copyProperties(questionEx, question);
+			Question question = questionEx.getQuestion();
 			question.setCreateTime(new Date());
 			question.setCreateUserId(getCurUser().getId());
+			question.setUpdateTime(new Date());
+			question.setUpdateUserId(getCurUser().getId());
 			question.setVer(1);
 			question.setState(2);// 默认禁用
 			question.setQuestionTypeId(questionTypeId);
-			question.setNo(1);
-			add(question);
-
-			question.setSrcId(question.getId());
-			update(question);
 			
-			// 添加试题选项
-			if (questionEx.getType() == 1 || questionEx.getType() == 2) {
-				for (QuestionOption questionOption : questionEx.getQuestionOptionList()) {
-					questionOption.setQuestionId(question.getId());
-					questionOptionService.add(questionOption);
+			String[] answers = new String[questionEx.getQuestionAnswerList().size()];
+			BigDecimal[] scores = new BigDecimal[questionEx.getQuestionAnswerList().size()];
+			BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
+			for (int i = 0; i < questionEx.getQuestionAnswerList().size(); i++) {
+				answers[i] = questionEx.getQuestionAnswerList().get(i).getAnswer();
+				if (question.getType() == 3 || (question.getType() == 5 && question.getAi() == 1)) {
+					answers[i] = StringUtil.join(answers[i].split(" "), '\n');
+				}
+				scores[i] = questionEx.getQuestionAnswerList().get(i).getScore();
+				totalScore.add(scores[i]);
+			}
+			if (question.getType() == 2) {// 多选特殊处理下，答案拆分
+				answers = questionEx.getQuestionAnswerList().get(0).getAnswer().split("");
+				scores = new BigDecimal[answers.length];
+				for (int i = 0; i < scores.length; i++) {
+					scores[i] = questionEx.getQuestionAnswerList().get(0).getScore();
 				}
 			}
-
-			// 保存附件
-			saveFile(question);
+			
+			String [] options = new String[questionEx.getQuestionOptionList().size()];
+			for (int i = 0; i < questionEx.getQuestionOptionList().size(); i++) {
+				options[i] = questionEx.getQuestionOptionList().get(i).getOptions();
+			}
+			
+			if (question.getType() == 3 || (question.getType() == 5 && question.getAi() == 1)) {
+				question.setScore(totalScore.getResult());
+			}
+			
+			addAndUpdate(question, answers, options, scores);
 		}
 	}
 
 	@Override
 	public void move(Integer id, Integer sourceId, Integer targetId) {
+		if (sourceId == null) {
+			throw new MyException("参数错误：sourceId");
+		}
+		if(targetId == null){
+			throw new MyException("参数错误：targetId");
+		}
 		QuestionType questionType = questionTypeService.getEntity(sourceId);
 		if (questionType.getCreateUserId() != getCurUser().getId()) {
 			throw new MyException("权限不足！");

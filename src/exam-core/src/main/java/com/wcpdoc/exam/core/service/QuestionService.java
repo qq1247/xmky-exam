@@ -34,7 +34,7 @@ public interface QuestionService extends BaseService<Question>{
 	 * @param options
 	 * void
 	 */
-	void addAndUpdate(Question question, String[] answers, String[] options, BigDecimal[] scores);
+	void addAndUpdate(Question question, Integer[] scoreOptions, String[] answers, String[] options, BigDecimal[] scores);
 
 	/**
 	 * 完成试题修改
@@ -46,7 +46,7 @@ public interface QuestionService extends BaseService<Question>{
 	 * @param newVer
 	 * void 
 	 */
-	void updateAndUpdate(Question question, String[] answers, String[] options, BigDecimal[] scores); //, boolean newVer
+	void updateAndUpdate(Question question, Integer[] scoreOptions, String[] answers, String[] options, BigDecimal[] scores); //, boolean newVer
 	
 	/**
 	 * 完成导入试题

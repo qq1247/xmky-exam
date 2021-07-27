@@ -1131,7 +1131,7 @@ export default {
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = '试题模板.doc'
+      a.download = '试题模板.docx'
       a.click()
       window.URL.revokeObjectURL(url)
     },

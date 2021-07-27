@@ -1,5 +1,6 @@
 package com.wcpdoc.exam.core.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -7,9 +8,26 @@ import java.util.List;
  * 
  * v1.0 zhanghc 2017-05-07 14:56:29
  */
-public class QuestionEx extends Question {
-	private List<QuestionAnswer> questionAnswersList;
-	private List<QuestionOption> questionOptionList;
+public class QuestionEx {
+	private Question question = new Question();
+	private List<QuestionAnswer> questionAnswerList = new ArrayList<>();
+	private List<QuestionOption> questionOptionList = new ArrayList<>();
+
+	public Question getQuestion() {
+		return question;
+	}
+
+	public void setQuestion(Question question) {
+		this.question = question;
+	}
+
+	public List<QuestionAnswer> getQuestionAnswerList() {
+		return questionAnswerList;
+	}
+
+	public void setQuestionAnswerList(List<QuestionAnswer> questionAnswerList) {
+		this.questionAnswerList = questionAnswerList;
+	}
 
 	public List<QuestionOption> getQuestionOptionList() {
 		return questionOptionList;
@@ -19,11 +37,4 @@ public class QuestionEx extends Question {
 		this.questionOptionList = questionOptionList;
 	}
 
-	public List<QuestionAnswer> getQuestionAnswerList() {
-		return questionAnswersList;
-	}
-
-	public void setQuestionAnswerList(List<QuestionAnswer> questionAnswersList) {
-		this.questionAnswersList = questionAnswersList;
-	}
 }
