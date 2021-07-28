@@ -774,6 +774,8 @@ public class ApiPaperController extends BaseController {
 				throw new MyException("试卷【"+paper.getName()+"】已发布！");
 			}
 			
+			paper.setUpdateTime(new Date());
+			paper.setUpdateUserId(getCurUser().getId());
 			paper.setState(1);
 			paperService.update(paper);
 			return PageResult.ok();
