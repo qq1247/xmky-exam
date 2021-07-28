@@ -181,7 +181,7 @@ code == 401 无权限或登录超时
 | data.list[].difficultyName   | String  | 难度名称     |
 | data.list[].title            | String  | 题干         |
 | data.list[].options[]        | String  | 选项         |
-| data.list[].answer           | String  | 答案         |
+| data.list[].answer[]           | String  | 答案         |
 | data.list[].analysis         | String  | 解析         |
 | data.list[].state            | Integer | 状态         |
 | data.list[].questionTypeId   | Integer | 试题分类ID   |
@@ -202,7 +202,7 @@ code == 401 无权限或登录超时
 | state          | Integer         | 状态（1：启用；2：禁用 ）                                                                                                        | 是   |
 | questionTypeId | Integer         | 试题分类ID                                                                                                                       | 是   |
 | score          | Double          | 总分值                                                                                                                           | 否   |
-| scoreOptions   | String(8)       | 分值选项，type为2时1有效，type为3时1,2,3,4有效，多选用英文逗号分隔。1：半对半分；2：答案无顺序；3：大小写不敏感；4：包含答案得分 | 否   |
+| scoreOptions[]   | Integer[]     | 分值选项                                                                                                                         | 否   |
 | no             | Integer         | 排序                                                                                                                             | 是   |
 | answers[]      | String[]	   	   | 答案（类型为1,4,5，answers.len==1，类型为2,3，answers.len>=1）                                                                   | 是   |
 | scores[]      | Double[]	       | 分值                                                                   														  | 是   |
@@ -416,6 +416,8 @@ code == 401 无权限或登录超时
 | --------------- | ------- | ---------- | ---- |
 | paperQuestionId | Integer | 试题试卷id | 是   |
 | score           | Double  | 分值       | 是   |
+| paperQuestionAnswerId | Integer | 试题试卷答案id | 是 |
+| paperQuestionAnswerScore    | Double  | 试题试卷答案分值  | 是   |
 
 ####试卷试题设置分数选项：paper/updateScoreOptions
 ######请求参数
