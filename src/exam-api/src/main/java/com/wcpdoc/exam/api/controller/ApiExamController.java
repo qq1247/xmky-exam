@@ -349,6 +349,8 @@ public class ApiExamController extends BaseController{
 	public PageResult archive(Integer id) {
 		try {
 			Exam exam = examService.getEntity(id);
+			exam.setUpdateTime(new Date());
+			exam.setUpdateUserId(getCurUser().getId());
 			exam.setState(3);
 			examService.update(exam);
 			return PageResult.ok();
