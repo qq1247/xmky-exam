@@ -112,7 +112,7 @@ public class WordServerImpl extends WordServer {
 					MultipartFile multipartFile = fileToMultipartFile(imgFile);
 					FileService fileService = SpringUtil.getBean(FileService.class);
 					String fileId = fileService.doTempUpload(new MultipartFile[]{multipartFile}, allowTypes);
-					imgElement.attr("src", String.format("api/file/download?id=%s", fileId));
+					imgElement.attr("src", String.format("/api/file/download?id=%s", fileId));
 				}
 			}
 		}
