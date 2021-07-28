@@ -319,9 +319,7 @@
                         class="option-item-text"
                         :key="index"
                         v-for="(option, index) in child.answers"
-                      >
-                        {{ option }}
-                      </div>
+                      ></div>
                     </template>
 
                     <!-- 判断 -->
@@ -347,18 +345,39 @@
                     </template>
 
                     <div class="children-analysis">
-                      <div v-if="child.ai === 1">
-                        【答案】：{{ child.answers.map((item) => item.answer) }}
-                      </div>
-                      <div
-                        class="flex-items-center"
-                        v-if="child.ai === 2"
-                        v-html="`【答案】：${child.answers[0].answer}`"
-                      ></div>
-                      <div
-                        class="flex-items-center"
-                        v-html="`【解析】：${child.analysis}`"
-                      ></div>
+                      <el-row :gutter="10">
+                        <template v-if="child.ai === 1">
+                          <el-col :span="2.5">【答案】：</el-col>
+                          <el-col :span="21">
+                            <div
+                              v-for="answer in child.answers"
+                              :key="answer.id"
+                              class="answers-item"
+                            >
+                              <span
+                                :class="child.answers.length > 1
+                                  ? 'answers-tag'
+                                  : ''"
+                                v-for="(ans, index) in answer.answer"
+                                :key="index"
+                                >{{ ans }}</span
+                              >
+                            </div>
+                          </el-col>
+                        </template>
+                        <template v-if="child.ai === 2">
+                          <el-col :span="2.5"> 【答案】： </el-col>
+                          <el-col :span="21">
+                            <div v-html="`${child.answers[0].answer}`"></div>
+                          </el-col>
+                        </template>
+                      </el-row>
+                      <el-row :gutter="10">
+                        <el-col :span="2.5"> 【解析】： </el-col>
+                        <el-col :span="21">
+                          <div v-html="`${child.analysis}`"></div>
+                        </el-col>
+                      </el-row>
                     </div>
                     <div class="children-footer">
                       <div class="children-tags">
@@ -1159,6 +1178,24 @@ export default {
     margin: 15px 0;
     font-size: 13px;
     color: #666;
+  }
+  .answers-item {
+    width: 100%;
+    span {
+      width: 100%;
+      display: inline;
+      word-wrap: break-word;
+      word-break: normal;
+    }
+    .answers-tag{
+      background: #cdd2f6;
+      color: #fff;
+      padding: 3px 10px;
+      border-radius: 3px;
+      &:not(:last-child) {
+        margin-right: 10px;
+      }
+    }
   }
   .el-tag {
     margin-right: 6px;
