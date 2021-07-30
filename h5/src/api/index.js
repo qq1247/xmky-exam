@@ -148,6 +148,7 @@ export default {
   myExamListPage: (params) => post('myExam/listpage', params),
   myMarkListPage: (params) => post('myMark/listpage', params),
   myExamAnswerList: (params) => post('myExam/answerList', params),
+  myMarkAnswerList: (params) => post('myExam/markAnswerList', params),
   myMarkExamListPage: (params) => post('myMark/examListpage', params),
   myExamUpdateAnswer: (params) => post('myExam/updateAnswer', params),
   myExamUpdateScore: (params) => post('myMark/updateScore', params),

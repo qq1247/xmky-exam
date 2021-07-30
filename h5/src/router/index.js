@@ -111,7 +111,13 @@ const routes = [
   {
     path: '/my',
     name: 'My',
-    component: () => import('../views/my/index.vue'),
+    component: () => import('../views/my/Index.vue'),
+  },
+  // 考试，阅卷列表
+  {
+    path: '/my/list',
+    name: 'MyList',
+    component: () => import('../views/my/List.vue'),
   },
   {
     path: '/my/exam',
