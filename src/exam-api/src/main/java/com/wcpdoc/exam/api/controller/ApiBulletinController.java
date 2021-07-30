@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.api.controller;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -13,27 +14,28 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wcpdoc.exam.core.controller.BaseController;
-import com.wcpdoc.exam.core.entity.BulletinBoard;
+import com.wcpdoc.exam.core.entity.Bulletin;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.exception.MyException;
-import com.wcpdoc.exam.core.service.BulletinBoardService;
+import com.wcpdoc.exam.core.service.BulletinService;
+import com.wcpdoc.exam.core.util.StringUtil;
 /**
- * 公告栏控制层
+ * 公告控制层
  * 
  * v1.0 chenyun 2021-03-24 13:39:37
  */
 @Controller
-@RequestMapping("/api/bulletinBoard")
-public class ApiBulletinBoardController extends BaseController {
-	private static final Logger log = LoggerFactory.getLogger(ApiBulletinBoardController.class);
+@RequestMapping("/api/bulletin")
+public class ApiBulletinController extends BaseController {
+	private static final Logger log = LoggerFactory.getLogger(ApiBulletinController.class);
 	
 	@Resource
-	private BulletinBoardService bulletinBoardService;
+	private BulletinService bulletinService;
 	
 	/**
-	 * 公告栏列表
+	 * 公告列表
 	 * 
 	 * v1.0 chenyun 2021-03-24 13:39:37
 	 * @return pageOut
@@ -43,15 +45,15 @@ public class ApiBulletinBoardController extends BaseController {
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
-			return PageResultEx.ok().data(bulletinBoardService.getListpage(new PageIn(request)));
+			return PageResultEx.ok().data(bulletinService.getListpage(new PageIn(request)));
 		} catch (Exception e) {
-			log.error("公告栏列表错误：", e);
+			log.error("公告列表错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 添加公告栏
+	 * 添加公告
 	 * 
 	 * v1.0 chenyun 2021-03-24 13:39:37
 	 * @return pageOut
@@ -59,24 +61,24 @@ public class ApiBulletinBoardController extends BaseController {
 	@RequestMapping("/add")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult add(BulletinBoard bulletinBoard) {
+	public PageResult add(Bulletin Bulletin) {
 		try {
-			bulletinBoard.setState(1);
-			bulletinBoard.setUpdateTime(new Date());
-			bulletinBoard.setUpdateUserId(getCurUser().getId());
-			bulletinBoardService.add(bulletinBoard);
+			Bulletin.setState(1);
+			Bulletin.setUpdateTime(new Date());
+			Bulletin.setUpdateUserId(getCurUser().getId());
+			bulletinService.add(Bulletin);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("添加公告栏错误：{}", e.getMessage());
+			log.error("添加公告错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("添加公告栏错误：", e);
+			log.error("添加公告错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 修改公告栏
+	 * 修改公告
 	 * 
 	 * v1.0 chenyun 2021-03-24 13:39:37
 	 * @return pageOut
@@ -84,36 +86,29 @@ public class ApiBulletinBoardController extends BaseController {
 	@RequestMapping("/edit")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult edit(BulletinBoard bulletinBoard) {
+	public PageResult edit(Bulletin Bulletin) {
 		try {
-			BulletinBoard entity = bulletinBoardService.getEntity(bulletinBoard.getId());
-			entity.setTitle(bulletinBoard.getTitle());
-			entity.setImgs(bulletinBoard.getImgs());
-			entity.setVideo(bulletinBoard.getVideo());
-			entity.setContent(bulletinBoard.getContent());
-			entity.setImgsHeight(bulletinBoard.getImgsHeight());
-			entity.setImgsWidth(bulletinBoard.getImgsWidth());
-			entity.setUrl(bulletinBoard.getUrl());
-			entity.setTopState(bulletinBoard.getTopState());
-			entity.setNo(bulletinBoard.getNo());
-			entity.setState(bulletinBoard.getState());
+			Bulletin entity = bulletinService.getEntity(Bulletin.getId());
+			entity.setTitle(Bulletin.getTitle());
+			entity.setImgFileId(Bulletin.getImgFileId());
+			entity.setContent(Bulletin.getContent());
+			entity.setReadUserIds(Bulletin.getReadUserIds());
+			entity.setTopState(Bulletin.getTopState());
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
-			entity.setReadUserIds(bulletinBoard.getReadUserIds());
-			entity.setReadOrgIds(bulletinBoard.getReadOrgIds());
-			bulletinBoardService.update(entity);
+			bulletinService.update(entity);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("修改公告栏错误：{}", e.getMessage());
+			log.error("修改公告错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("修改公告栏错误：", e);
+			log.error("修改公告错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 删除公告栏
+	 * 删除公告
 	 * 
 	 * v1.0 chenyun 2021-03-24 13:39:37
 	 * @return pageOut
@@ -123,19 +118,19 @@ public class ApiBulletinBoardController extends BaseController {
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
-			bulletinBoardService.delAndUpdate(id);
+			bulletinService.delAndUpdate(id);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("删除公告栏错误：{}", e.getMessage());
+			log.error("删除公告错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("删除公告栏错误：", e);
+			log.error("删除公告错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 获取公告栏
+	 * 获取公告
 	 * 
 	 * v1.0 chenyun 2021-03-04 15:02:18
 	 * @return pageOut
@@ -143,22 +138,16 @@ public class ApiBulletinBoardController extends BaseController {
 	@RequestMapping("/get")
 	@ResponseBody
 	@RequiresRoles(value={"admin"},logical = Logical.OR)
-	public PageResult get(Integer id) {
-		try {
-			BulletinBoard entity = bulletinBoardService.getEntity(id);
+	public PageResult get(Integer id) {		try {
+			Bulletin entity = bulletinService.getEntity(id);
+			List<Integer> readUserIds = StringUtil.toInt(entity.getReadUserIds());
 			return PageResultEx.ok()
 					.addAttr("id", entity.getId())
 					.addAttr("title", entity.getTitle())
-					.addAttr("imgs", entity.getImgs())
-					.addAttr("video", entity.getVideo())
+					.addAttr("imgFileId", entity.getImgFileId())
 					.addAttr("content", entity.getContent())
-					.addAttr("imgsHeight", entity.getImgsHeight())
-					.addAttr("imgsWidth", entity.getImgsWidth())
-					.addAttr("url", entity.getUrl())
 					.addAttr("topState", entity.getTopState())
-					.addAttr("no", entity.getNo())
-					.addAttr("readUserIds", entity.getReadUserIds())
-					.addAttr("readOrgIds", entity.getReadOrgIds());
+					.addAttr("readUserIds", readUserIds);
 		} catch (MyException e) {
 			log.error("获取参数错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -183,7 +172,7 @@ public class ApiBulletinBoardController extends BaseController {
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult auth(Integer id, String readUserIds, String readOrgIds) {
 		try {
-			bulletinBoardService.auth(id, readUserIds, readOrgIds);
+			bulletinService.auth(id, readUserIds, readOrgIds);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加权限用户错误：{}", e.getMessage());
@@ -206,7 +195,7 @@ public class ApiBulletinBoardController extends BaseController {
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult userList() {
 		try {
-			return PageResultEx.ok().data(bulletinBoardService.getUserListpage(new PageIn(request)));
+			return PageResultEx.ok().data(bulletinService.getUserListpage(new PageIn(request)));
 		} catch (Exception e) {
 			log.error("权限用户列表错误：", e);
 			return PageResult.err();
@@ -225,7 +214,7 @@ public class ApiBulletinBoardController extends BaseController {
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult authOrgList(PageIn pageIn, String name, Integer id) {
 		try {
-			return PageResultEx.ok().data(bulletinBoardService.getOrgListpage(new PageIn(request)));
+			return PageResultEx.ok().data(bulletinService.getOrgListpage(new PageIn(request)));
 		} catch (Exception e) {
 			log.error("权限用户列表错误：", e);
 			return PageResult.err();

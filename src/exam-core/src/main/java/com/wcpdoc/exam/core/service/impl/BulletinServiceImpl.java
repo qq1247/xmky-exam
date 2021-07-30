@@ -7,40 +7,40 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.exam.core.dao.BaseDao;
-import com.wcpdoc.exam.core.dao.BulletinBoardDao;
-import com.wcpdoc.exam.core.entity.BulletinBoard;
+import com.wcpdoc.exam.core.dao.BulletinDao;
+import com.wcpdoc.exam.core.entity.Bulletin;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
-import com.wcpdoc.exam.core.service.BulletinBoardService;
+import com.wcpdoc.exam.core.service.BulletinService;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
- * 公告栏服务层实现
+ * 公告服务层实现
  * 
  * v1.0 chenyun 2021-03-24 13:39:37
  */
 @Service
-public class BulletinBoardServiceImpl extends BaseServiceImp<BulletinBoard> implements BulletinBoardService {
+public class BulletinServiceImpl extends BaseServiceImp<Bulletin> implements BulletinService {
 	@Resource
-	private BulletinBoardDao bulletinBoardDao;
+	private BulletinDao bulletinDao;
 
 	@Override
-	@Resource(name = "bulletinBoardDaoImpl")
-	public void setDao(BaseDao<BulletinBoard> dao) {
+	@Resource(name = "bulletinDaoImpl")
+	public void setDao(BaseDao<Bulletin> dao) {
 		super.dao = dao;
 	}
 	
 	@Override
 	public void delAndUpdate(Integer id) {
 		// 校验数据有效性
-		BulletinBoard entity = getEntity(id);
+		Bulletin entity = getEntity(id);
 		entity.setState(0);
 		update(entity);
 	}
 
 	@Override
 	public void auth(Integer id, String readUserIds, String readOrgIds) {		
-		BulletinBoard entity = getEntity(id);
+		Bulletin entity = getEntity(id);
 		if (!ValidateUtil.isValid(readUserIds)) {
 			entity.setReadUserIds(null);
 		} else {
@@ -58,11 +58,11 @@ public class BulletinBoardServiceImpl extends BaseServiceImp<BulletinBoard> impl
 
 	@Override
 	public PageOut getUserListpage(PageIn pageIn) {
-		return bulletinBoardDao.getUserListpage(pageIn);
+		return bulletinDao.getUserListpage(pageIn);
 	}
 
 	@Override
 	public PageOut getOrgListpage(PageIn pageIn) {
-		return bulletinBoardDao.getOrgListpage(pageIn);
+		return bulletinDao.getOrgListpage(pageIn);
 	}
 }
