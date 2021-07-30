@@ -61,6 +61,17 @@ export default {
   parmEdit: (params) => post('parm/edit', params),
   parmDel: (params) => post('parm/del', params),
 
+  // 上传下载相关
+  fileUpload: (params) => post('file/upload', params),
+  fileDownload: (params) => post('file/download', params),
+
+  // 公告相关
+  bulletinListPage: (params) => post('bulletin/listpage', params),
+  bulletinAdd: (params) => post('bulletin/add', params),
+  bulletinEdit: (params) => post('bulletin/edit', params),
+  bulletinDel: (params) => post('bulletin/del', params),
+  bulletinGet: (params) => post('bulletin/get', params),
+
   // 考试相关
   examListPage: (params) => post('exam/listpage', params),
   examAdd: (params) => post('exam/add', params),

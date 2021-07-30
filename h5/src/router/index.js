@@ -88,9 +88,9 @@ const routes = [
     component: () => import('../views/user/Org.vue'),
   },
   {
-    path: '/organization/bulletinBoard',
-    name: 'OrgBulletinBoard',
-    component: () => import('../views/organization/BulletinBoard.vue'),
+    path: '/my/bulletin',
+    name: 'MyBulletin',
+    component: () => import('../views/my/Bulletin.vue'),
   },
   {
     path: '/organization/myExam',
