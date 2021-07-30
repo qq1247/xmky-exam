@@ -355,9 +355,9 @@
                               class="answers-item"
                             >
                               <span
-                                :class="child.answers.length > 1
-                                  ? 'answers-tag'
-                                  : ''"
+                                :class="
+                                  child.answers.length > 1 ? 'answers-tag' : ''
+                                "
                                 v-for="(ans, index) in answer.answer"
                                 :key="index"
                                 >{{ ans }}</span
@@ -1173,7 +1173,7 @@ export default {
     margin: 0 25px 0;
   }
   .children-analysis {
-    line-height: 25px;
+    line-height: 30px;
     padding-left: 20px;
     margin: 15px 0;
     font-size: 13px;
@@ -1187,7 +1187,7 @@ export default {
       word-wrap: break-word;
       word-break: normal;
     }
-    .answers-tag{
+    .answers-tag {
       background: #cdd2f6;
       color: #fff;
       padding: 3px 10px;
