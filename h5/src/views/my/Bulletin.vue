@@ -264,7 +264,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
       }).then(async () => {
-        const res = await this.$https.userDel({ id })
+        const res = await this.$https.bulletinDel({ id })
         if (res.code != 200) {
           this.$message({
             type: 'error',
