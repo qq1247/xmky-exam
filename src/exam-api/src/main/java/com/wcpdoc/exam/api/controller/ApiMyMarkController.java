@@ -3,6 +3,7 @@ package com.wcpdoc.exam.api.controller;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.annotation.Resource;
@@ -23,6 +24,7 @@ import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyExamDetail;
 import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
@@ -75,7 +77,13 @@ public class ApiMyMarkController extends BaseController {
 			PageIn pageIn = new PageIn(request);
 			pageIn.addAttr("curUserId", getCurUser().getId())
 			  	  .addAttr("state", "1");
-			return PageResultEx.ok().data(myMarkService.getListpage(pageIn));
+			PageOut listpage = myMarkService.getListpage(pageIn);
+			
+			for(Map<String, Object> map : listpage.getList()){
+				map.put("examUserIds", map.get("examUserIds").toString().substring(1, map.get("examUserIds").toString().length() - 1).split(","));
+			}
+			
+			return PageResultEx.ok().data(listpage);
 		} catch (Exception e) {
 			log.error("我的阅卷列表错误：", e);
 			return PageResult.err();
@@ -83,7 +91,7 @@ public class ApiMyMarkController extends BaseController {
 	}
 	
 	/**
-	 * 我的阅卷列表
+	 * 我考试的列表
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @return pageOut

@@ -116,6 +116,35 @@ public class ApiMyExamController extends BaseController{
 		}
 	}
 	
+	/**
+	 * 阅卷考试答案列表
+	 * 
+	 * v1.0 chenyun 2021年7月29日下午6:04:37
+	 * @param userId
+	 * @param examId
+	 * @return PageResult
+	 */
+	@RequestMapping("/markAnswerList")
+	@ResponseBody
+	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
+	public PageResult markAnswerList(Integer userId, Integer examId) {
+		try {
+			List<Map<String, Object>> list = myExamDetailService.getMarkAnswerList(userId, examId);
+			for (Map<String, Object> map : list) {
+				map.put("myExamDetailId", map.remove("id"));// 前缀为myExamDetail，默认为id有歧义。
+				map.put("answers", new QuestionAnswer().getAnswers((Integer)map.get("questionType"), (String)map.remove("answer")));// 如果没有值，页面也返回字段
+			}
+			
+			return PageResultEx.ok().data(list);
+		} catch (MyException e) {
+			log.error("考试答案列表错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("考试答案列表错误：", e);
+			return PageResult.err();
+		}
+	}
+	
 //	/**
 //	 * 到达考试页面
 //	 * 
@@ -237,6 +266,8 @@ public class ApiMyExamController extends BaseController{
 			} else if (question.getType() == 2) {
 				myExamDetail.setAnswer(StringUtil.join(answers));
 			} else if (question.getType() == 3) {
+				myExamDetail.setAnswer(StringUtil.join(answers, "\n"));
+			} else if (question.getType() == 5 && question.getAi() == 1) {
 				myExamDetail.setAnswer(StringUtil.join(answers, "\n"));
 			}
 			myExamDetail.setAnswerTime(new Date());
