@@ -64,7 +64,7 @@
           type="primary"
           size="small"
           icon="el-icon-document-checked"
-          @click="checkEnd"
+          @click="markEnd"
           >完成阅卷</el-button
         >
       </el-button-group>
@@ -87,8 +87,8 @@ export default {
   props: {
     data: {
       type: Object,
-      default: {}
-    }
+      default: {},
+    },
   },
   data() {
     return {
@@ -98,7 +98,7 @@ export default {
       step: '',
       steps: [0.1, 0.5, 1],
       selectStep: 0,
-      selectScore: 0
+      selectScore: 0,
     }
   },
   methods: {
@@ -120,6 +120,7 @@ export default {
       this.createScores(Number(this.steps[index]))
     },
     scoreHandler(index) {
+      document.getElementById(`i-${this.data.id}`).focus()
       this.selectScore = index
       this.$emit('selectScore', Number(this.scores[index]))
     },
@@ -146,8 +147,8 @@ export default {
     nextPaper() {
       this.$emit('nextPaper')
     },
-    checkEnd() {
-      this.$emit('checkEnd')
+    markEnd() {
+      this.$emit('markEnd')
     },
   },
 }
