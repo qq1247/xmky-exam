@@ -142,7 +142,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 
 		// 添加试题
-		question.setScoreOptions(StringUtil.join(scoreOptions));
+		question.setScoreOptions(ValidateUtil.isValid(scoreOptions) ? StringUtil.join(scoreOptions) : null);
 		question.setCreateTime(new Date());
 		question.setCreateUserId(getCurUser().getId());
 		question.setUpdateTime(new Date());
@@ -356,7 +356,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
 		entity.setScore(question.getScore());
-		entity.setScoreOptions(StringUtil.join(scoreOptions));
+		entity.setScoreOptions(ValidateUtil.isValid(scoreOptions) ? StringUtil.join(scoreOptions) : null);
 		entity.setNo(question.getNo());
 		update(entity);
 
@@ -559,10 +559,15 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				question.setScore(totalScore.getResult());
 			}
 			
-			String[] split = question.getScoreOptions().split(",");
-			Integer[] scoreOptions = new Integer[split.length];
-			for(int i = 0; i < split.length; i++ ){
-				scoreOptions[i] = Integer.parseInt(split[i]);
+			Integer[] scoreOptions = null;//new Integer[split.length];
+			if (ValidateUtil.isValid(question.getScoreOptions())) {
+				String[] split = question.getScoreOptions().split(",");
+				scoreOptions = new Integer[split.length];
+				for(int i = 0; i < split.length; i++ ){
+					scoreOptions[i] = Integer.parseInt(split[i]);
+				}
+			} else {
+				scoreOptions = new Integer[0];
 			}
 			
 			addAndUpdate(question, scoreOptions, answers, options, scores);

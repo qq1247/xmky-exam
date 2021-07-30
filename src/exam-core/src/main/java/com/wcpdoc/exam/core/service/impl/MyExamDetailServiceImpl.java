@@ -77,6 +77,11 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	public List<Map<String, Object>> getAnswerList(Integer myExamId) {
 		return myExamDetailDao.getAnswerList(myExamId, getCurUser().getId());
 	}
+
+	@Override
+	public List<Map<String, Object>> getMarkAnswerList(Integer userId, Integer examId) {
+		return myExamDetailDao.getMarkAnswerList(userId, examId);
+	}
 	
 	@Override
 	public void delByMyExamId(Integer myExamId) {

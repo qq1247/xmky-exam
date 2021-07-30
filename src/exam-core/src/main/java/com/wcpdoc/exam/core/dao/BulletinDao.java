@@ -1,16 +1,16 @@
 package com.wcpdoc.exam.core.dao;
 
 import com.wcpdoc.exam.core.dao.RBaseDao;
-import com.wcpdoc.exam.core.entity.BulletinBoard;
+import com.wcpdoc.exam.core.entity.Bulletin;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 
 /**
- * 公告栏数据访问层接口
+ * 公告数据访问层接口
  * 
  * v1.0 chenyun 2021-03-24 13:39:37
  */
-public interface BulletinBoardDao extends RBaseDao<BulletinBoard> {
+public interface BulletinDao extends RBaseDao<Bulletin> {
 	/**
 	 * 获取人员列表
 	 * 

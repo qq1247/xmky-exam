@@ -32,6 +32,16 @@ public interface MyExamDetailDao extends BaseDao<MyExamDetail>{
 	List<Map<String, Object>> getAnswerList(Integer myExamId, Integer curUserId);
 
 	/**
+	 * 阅卷获取我的考试详细列表
+	 * 
+	 * v1.0 chenyun 2021年7月29日下午6:01:59
+	 * @param userId
+	 * @param examId
+	 * @return List<Map<String,Object>>
+	 */
+	List<Map<String, Object>> getMarkAnswerList(Integer userId, Integer examId);
+	
+	/**
 	 * 删除我的考试详细
 	 * 
 	 * v1.0 zhanghc 2020年10月12日下午4:04:24

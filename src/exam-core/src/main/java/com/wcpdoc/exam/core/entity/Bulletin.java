@@ -14,23 +14,23 @@ import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
- * 公告栏实体
+ * 公告实体
  * 
  * v1.0 chenyun 2021-03-24 13:39:37
  */
 @Entity
-@Table(name = "EXM_BULLETIN_BOARD")
-public class BulletinBoard {
+@Table(name = "EXM_BULLETIN")
+public class Bulletin {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID")
 	private Integer id;
 	@Column(name = "TITLE")
 	private String title;
-	@Column(name = "IMGS")
-	private String imgs;
-	@Column(name = "VIDEO")
-	private String video;
+	@Column(name = "IMG_FILE_ID")
+	private String imgFileId;
+	@Column(name = "VIDEO_FILE_ID")
+	private String videoFileId;
 	@Column(name = "CONTENT")
 	private String content;
 	@Column(name = "IMGS_HEIGHT")
@@ -72,22 +72,22 @@ public class BulletinBoard {
 		this.title = title;
 	}
 	
-	public String getImgs() {
-		return imgs;
+	public String getImgFileId() {
+		return imgFileId;
 	}
- 
-	public void setImgs(String imgs) {
-		this.imgs = imgs;
+
+	public void setImgFileId(String imgFileId) {
+		this.imgFileId = imgFileId;
 	}
-	
-	public String getVideo() {
-		return video;
+
+	public String getVideoFileId() {
+		return videoFileId;
 	}
- 
-	public void setVideo(String video) {
-		this.video = video;
+
+	public void setVideoFileId(String videoFileId) {
+		this.videoFileId = videoFileId;
 	}
-	
+
 	public String getContent() {
 		return content;
 	}

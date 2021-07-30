@@ -49,6 +49,7 @@ public class ShiroCfg {
 		shiroFilterFactory.setFilters(jwtFilterMap);
 
 		Map<String, String> filterChainMap = new LinkedHashMap<>();
+		filterChainMap.put("/api/file/download", "anon");
 		filterChainMap.put("/api/login/**", "anon");// /api/login开头的可以匿名访问
 		filterChainMap.put("/**", "jwt");// 其他请求走jwt过滤器
 		shiroFilterFactory.setFilterChainDefinitionMap(filterChainMap);

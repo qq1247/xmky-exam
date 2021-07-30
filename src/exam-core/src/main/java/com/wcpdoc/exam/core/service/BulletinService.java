@@ -1,19 +1,19 @@
 package com.wcpdoc.exam.core.service;
 
 import com.wcpdoc.exam.core.service.BaseService;
-import com.wcpdoc.exam.core.entity.BulletinBoard;
+import com.wcpdoc.exam.core.entity.Bulletin;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 
 /**
- * 公告栏服务层接口
+ * 公告服务层接口
  * 
  * v1.0 chenyun 2021-03-24 13:39:37
  */
-public interface BulletinBoardService extends BaseService<BulletinBoard> {
+public interface BulletinService extends BaseService<Bulletin> {
 
 	/**
-	 * 删除公告栏
+	 * 删除公告
 	 * 
 	 * v1.0 chenyun 2021-03-24 13:39:37
 	 * 

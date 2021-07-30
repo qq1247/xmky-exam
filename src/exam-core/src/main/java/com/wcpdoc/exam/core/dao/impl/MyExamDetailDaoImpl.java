@@ -45,4 +45,14 @@ public class MyExamDetailDaoImpl extends RBaseDaoImpl<MyExamDetail> implements M
 					+" WHERE MY_EXAM_DETAIL.MY_EXAM_ID = ? AND MY_EXAM_DETAIL.USER_ID = ? ";
 		return getMapList(sql, new Object[] { myExamId, curUserId });
 	}
+
+	@Override
+	public List<Map<String, Object>> getMarkAnswerList(Integer userId, Integer examId) {
+		String sql = "SELECT MY_EXAM_DETAIL.*, USER.NAME AS MARK_USER_NAME, QUESTION.TYPE AS QUESTION_TYPE "
+				+" FROM EXM_MY_EXAM_DETAIL MY_EXAM_DETAIL "
+				+" LEFT JOIN EXM_QUESTION QUESTION ON MY_EXAM_DETAIL.QUESTION_ID = QUESTION.ID "
+				+" LEFT JOIN SYS_USER USER ON MY_EXAM_DETAIL.MARK_USER_ID = USER.ID "
+				+" WHERE MY_EXAM_DETAIL.USER_ID = ? AND MY_EXAM_DETAIL.EXAM_ID = ? ";
+	return getMapList(sql, new Object[] { userId, examId });
+	}
 }
