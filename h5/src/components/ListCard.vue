@@ -50,8 +50,13 @@
       </template>
       <!-- 考试列表 -->
       <template v-if="name == 'examList'">
-        <el-row class="content-info">
-          <el-col>发布人：{{ data.updateUserName || '***' }}</el-col>
+        <el-row :gutter="20" class="content-info">
+          <el-col :span="12" class="info-left"
+            >创建人：{{ data.createUserName }}</el-col
+          >
+          <el-col :span="12" class="info-right"
+            >修改人：{{ data.updateUserName || '***' }}</el-col
+          >
         </el-row>
         <!-- <el-row :gutter="20" class="content-info">
           <el-col :span="12" class="info-left"
@@ -75,13 +80,15 @@
           }}</el-col>
         </el-row>
       </template>
-      <!-- 我的考试列表 -->
-      <template v-if="name == 'myExamList'">
+      <!-- 我的考试 || 我的阅卷 -->
+      <template v-if="['myExamList', 'myMarkExamList'].includes(name)">
         <el-row class="content-info">
           <el-col>创建者：{{ data.updateUserName }}</el-col>
         </el-row>
         <el-row class="content-info">
-          <el-col>{{ data.examStartTime }}</el-col>
+          <el-col>{{
+            name === 'myExamList' ? data.examStartTime : data.markStartTime
+          }}</el-col>
         </el-row>
         <el-row class="content-info">
           <el-col
@@ -165,19 +172,47 @@
           </span>
         </template>
         <!-- 我的考试 -->
-        <template>
+        <template v-if="name === 'myExamList'">
           <span
-            v-if="name == 'myExamList' && data.btn == 'unStart'"
-            data-title="未开始"
+            v-if="data.exam === 'unStart' || data.exam === 'end'"
+            :data-title="data.exam == 'unStart' ? '待考试' : '已考试'"
+            @click="exam(data)"
           >
-            <i class="common common-wode"></i>
+            <i
+              :class="[
+                'common',
+                data.exam === 'unStart' ? 'common-wait' : 'common-exam',
+              ]"
+            ></i>
           </span>
           <span
-            v-if="name == 'myExamList'"
-            :data-title="data.btn == 'start' ? '开始考试' : '预览考试'"
-            @click="startExam(data)"
+            v-if="data.exam === 'start'"
+            data-title="考试中"
+            @click="exam(data)"
           >
-            <i class="common common-wode"></i>
+            <i class="common common-examing"></i>
+          </span>
+        </template>
+        <!-- 我的阅卷 -->
+        <template v-if="name === 'myMarkExamList'">
+          <span
+            v-if="data.mark === 'unStart' || data.mark === 'end'"
+            :data-title="data.mark == 'unStart' ? '待阅卷' : '已阅卷'"
+            @click="mark(data)"
+          >
+            <i
+              :class="[
+                'common',
+                data.mark === 'unStart' ? 'common-wait' : 'common-mark',
+              ]"
+            ></i>
+          </span>
+          <span
+            v-if="data.mark === 'start'"
+            data-title="阅卷中"
+            @click="mark(data)"
+          >
+            <i class="common common-marking"></i>
           </span>
         </template>
         <span
@@ -302,12 +337,12 @@ export default {
       this.$emit('publish', data)
     },
     // 开始考试
-    startExam(data) {
-      this.$emit('startExam', data)
+    exam(data) {
+      this.$emit('exam', data)
     },
-    // 预览考试
-    viewExam(data) {
-      this.$emit('viewExam', data)
+    // 开始考试
+    mark(data) {
+      this.$emit('mark', data)
     },
     // 移动
     move(data) {
