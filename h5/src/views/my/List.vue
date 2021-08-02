@@ -1,0 +1,194 @@
+<template>
+  <div class="container">
+    <!-- 搜索 -->
+    <el-form :inline="true" :model="queryForm" class="form-inline search">
+      <div>
+        <el-form-item>
+          <el-input
+            placeholder="请输入考试名称"
+            v-model="queryForm.examName"
+            class="query-input"
+          ></el-input>
+        </el-form-item>
+      </div>
+      <el-form-item>
+        <el-button @click="query" icon="el-icon-search" type="primary"
+          >查询</el-button
+        >
+      </el-form-item>
+    </el-form>
+    <!-- 内容 -->
+    <div class="content">
+      <div class="exam-list" v-if="type === '1'">
+        <ListCard
+          v-for="(item, index) in myExamList"
+          :key="index"
+          :data="item"
+          name="myExamList"
+          @exam="examHandler"
+        ></ListCard>
+      </div>
+      <div class="exam-list" v-if="type === '2'">
+        <ListCard
+          v-for="(item, index) in myExamList"
+          :key="index"
+          :data="item"
+          name="myMarkExamList"
+          @mark="markHandler"
+        ></ListCard>
+      </div>
+      <el-pagination
+        background
+        layout="prev, pager, next"
+        prev-text="上一页"
+        next-text="下一页"
+        hide-on-single-page
+        :total="total"
+        :page-size="pageSize"
+        :current-page="1"
+        @current-change="pageChange"
+      ></el-pagination>
+    </div>
+  </div>
+</template>
+
+<script>
+import ListCard from '@/components/ListCard.vue'
+export default {
+  components: {
+    ListCard,
+  },
+  data() {
+    return {
+      pageSize: 6,
+      curPage: 1,
+      total: 1,
+      type: 1,
+      queryForm: {
+        examName: '',
+      },
+      myExamList: [],
+    }
+  },
+  mounted() {
+    const { type } = this.$route.query
+    this.type = type
+    this.query()
+  },
+  methods: {
+    // 我的考试列表
+    async query() {
+      const loginSysTimeStr = await this.$https.loginSysTime({})
+      const curTime = new Date(loginSysTimeStr.data).getTime()
+      let myExamList
+
+      if (this.type === '1') {
+        myExamList = await this.$https.myExamListPage({
+          name: this.queryForm.examName,
+          curPage: this.curPage,
+          pageSize: this.pageSize,
+        })
+        myExamList.data.list.forEach((item) => {
+          const examStartTime = new Date(item.examStartTime).getTime()
+          const examEndTime = new Date(item.examEndTime).getTime()
+
+          if (curTime < examStartTime) {
+            item.exam = 'unStart'
+          } else if (curTime > examEndTime) {
+            item.exam = 'end'
+          } else {
+            item.exam = 'start'
+          }
+        })
+      }
+
+      if (this.type === '2') {
+        myExamList = await this.$https.myMarkListPage({
+          name: this.queryForm.examName,
+          curPage: this.curPage,
+          pageSize: this.pageSize,
+        })
+        myExamList.data.list.forEach((item) => {
+          const markStartTime = new Date(item.markStartTime).getTime()
+          const markEndTime = new Date(item.markEndTime).getTime()
+          const examStartTime = new Date(item.examStartTime).getTime()
+          const examEndTime = new Date(item.examEndTime).getTime()
+
+          if (curTime < examStartTime) {
+            item.state = 1
+            item.stateName = '待考试'
+          } else if (curTime > examEndTime) {
+            item.state = 3
+            item.stateName = '已考试'
+          } else {
+            item.state = 2
+            item.stateName = '考试中'
+          }
+
+          if (curTime < markStartTime) {
+            item.mark = 'unStart'
+            item.markState = 1
+            item.markStateName = '待阅卷'
+          } else if (curTime > markEndTime) {
+            item.mark = 'end'
+            item.markState = 3
+            item.markStateName = '已阅卷'
+          } else {
+            item.mark = 'start'
+            item.markState = 2
+            item.markStateName = '阅卷中'
+          }
+        })
+      }
+
+      this.myExamList = myExamList.data.list
+      this.total = myExamList.data.total
+    },
+    // 我的考试操作
+    examHandler(data) {
+      const examStartTime = new Date(data.examStartTime).getTime()
+      const now = new Date().getTime()
+      if (now < examStartTime) {
+        this.$tools.message('考试未开始，请等待...', 'warning')
+        return
+      }
+      this.$router.push({
+        path: '/my/exam',
+        query: {
+          id: data.id,
+          paperId: data.paperId,
+          view: data.exam !== 'start',
+          examEndTime: data.exam === 'start' ? data.examEndTime : '',
+        },
+      })
+    },
+    // 我的阅卷操作
+    markHandler(data) {
+      const markStartTime = new Date(data.markStartTime).getTime()
+      const now = new Date().getTime()
+      if (now < markStartTime) {
+        this.$tools.message('阅卷未开始，请等待...', 'warning')
+        return
+      }
+      this.$router.push({
+        path: '/my/markExam',
+        query: {
+          examId: data.examId,
+          paperId: data.paperId,
+          examUserIds: data.examUserIds,
+          view: data.mark !== 'start',
+        },
+      })
+    },
+    // 分页切换
+    pageChange(val) {
+      this.curPage = val
+      this.query()
+    },
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+@import '../../assets/style/list-card.scss';
+</style>

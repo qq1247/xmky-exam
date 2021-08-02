@@ -135,7 +135,7 @@
       :visible.sync="examForm.readShow"
       :show-close="false"
       center
-      width="50%"
+      width="60%"
       :close-on-click-modal="false"
       @close="resetData('examForm')"
     >
@@ -150,12 +150,8 @@
             >{{ item.name }}</el-radio
           >
         </el-form-item>
-        <div>
-          <div
-            v-for="(item, index) in examForm.examRemarks"
-            :key="item.id"
-            class="exam-remark"
-          >
+        <el-row v-for="(item, index) in examForm.examRemarks" :key="item.id">
+          <el-col :span="12">
             <el-form-item
               label="阅卷人"
               :prop="`examRemarks.${index}.examCheckPerson`"
@@ -186,6 +182,9 @@
                 ></el-option>
               </CustomSelect>
             </el-form-item>
+          </el-col>
+
+          <el-col :span="12">
             <el-form-item label="题号" v-if="examForm.examRadio == 0">
               <CustomSelect
                 placeholder="请选择题号"
@@ -211,6 +210,9 @@
                 ></el-option>
               </CustomSelect>
             </el-form-item>
+          </el-col>
+
+          <el-col :span="12">
             <el-form-item label="考试用户" v-if="examForm.examRadio == 1">
               <CustomSelect
                 placeholder="请选择考试用户"
@@ -236,25 +238,25 @@
                 ></el-option>
               </CustomSelect>
             </el-form-item>
-          </div>
-          <div class="remark-buttons">
-            <el-form-item>
-              <el-button
-                @click="remarkAdd"
-                type="primary"
-                size="mini"
-                icon="el-icon-plus"
-                >添加阅卷人</el-button
-              >
-              <el-button
-                v-if="examForm.examRemarks.length > 1"
-                @click="remarkDel"
-                size="mini"
-                icon="el-icon-minus"
-                >删除阅卷人</el-button
-              >
-            </el-form-item>
-          </div>
+          </el-col>
+        </el-row>
+        <div class="remark-buttons">
+          <el-form-item>
+            <el-button
+              @click="remarkAdd"
+              type="primary"
+              size="mini"
+              icon="el-icon-plus"
+              >添加阅卷人</el-button
+            >
+            <el-button
+              v-if="examForm.examRemarks.length > 1"
+              @click="remarkDel"
+              size="mini"
+              icon="el-icon-minus"
+              >删除阅卷人</el-button
+            >
+          </el-form-item>
         </div>
       </el-form>
       <div class="dialog-footer" slot="footer">
@@ -332,7 +334,7 @@ export default {
         dayjs(value[1]).isSameOrBefore(dayjs())
       ) {
         return callback(
-          new Error(`时间应为${dayjs().format('YYYY年MM月DD日')}后的时间`)
+          new Error(`请选择 ${dayjs().format('YYYY-MM-DD HH:mm:ss')} 后的时间`)
         )
       }
       return callback()
@@ -348,9 +350,9 @@ export default {
       ) {
         return callback(
           new Error(
-            `时间应为${dayjs(this.examForm.examTime[1]).format(
-              'YYYY年MM月DD日'
-            )}后的时间`
+            `请选择 ${dayjs(this.examForm.examTime[1]).format(
+              'YYYY-MM-DD HH:mm:ss'
+            )} 后的时间`
           )
         )
       }

@@ -1,3 +1,124 @@
+drop table if exists SYS_ORG;
+
+/*==============================================================*/
+/* Table: SYS_ORG                                               */
+/*==============================================================*/
+create table SYS_ORG
+(
+   ID                   int not null auto_increment comment '主键',
+   NAME                 varchar(32) comment '名称',
+   CODE                 varchar(32) comment '编码唯一',
+   PARENT_ID            int comment '父ID',
+   PARENT_IDS           varchar(128) comment '父级IDS',
+   LEVEL                int comment '级别',
+   UPDATE_USER_ID       int comment '修改人',
+   UPDATE_TIME          datetime comment '修改时间',
+   STATE                int comment '0：删除；1：正常；',
+   NO                   int comment '排序',
+   primary key (ID)
+);
+
+alter table SYS_ORG comment '组织机构';
+
+drop table if exists SYS_USER;
+
+/*==============================================================*/
+/* Table: SYS_USER                                              */
+/*==============================================================*/
+create table SYS_USER
+(
+   ID                   int not null auto_increment comment '主键',
+   NAME                 varchar(16) comment '名称',
+   LOGIN_NAME           varchar(16) comment '登陆账号',
+   EMAIL                varchar(64) comment '邮箱',
+   PHONE                varchar(11) comment '手机号',
+   PWD                  varchar(32) comment '密码',
+   REGIST_TIME          datetime comment '注册时间',
+   LAST_LOGIN_TIME      datetime comment '最后登陆时间',
+   ORG_ID               int comment '组织机构ID',
+   ROLES                varchar(64) comment '角色',
+   UPDATE_USER_ID       int comment '修改人',
+   UPDATE_TIME          datetime comment '修改时间',
+   STATE                int comment '0：删除；1：正常；2：冻结；',
+   primary key (ID)
+);
+
+alter table SYS_USER comment '用户';
+
+drop table if exists SYS_DICT;
+
+/*==============================================================*/
+/* Table: SYS_DICT                                              */
+/*==============================================================*/
+create table SYS_DICT
+(
+   ID                   int not null auto_increment,
+   DICT_INDEX           varchar(32) comment '索引',
+   DICT_KEY             varchar(32) comment '键',
+   DICT_VALUE           varchar(32) comment '值',
+   NO                   int comment '排序',
+   primary key (ID)
+);
+
+alter table SYS_DICT comment '数据字典';
+
+drop table if exists SYS_FILE;
+
+/*==============================================================*/
+/* Table: SYS_FILE                                              */
+/*==============================================================*/
+create table SYS_FILE
+(
+   ID                   int not null auto_increment,
+   NAME                 varchar(64) comment '前缀',
+   EXT_NAME             varchar(32) comment '后缀',
+   FILE_TYPE            varchar(128) comment '类型',
+   PATH                 varchar(64) comment '路径',
+   IP                   varchar(16) comment '上传IP',
+   STATE                int comment '0：删除；1：正常',
+   UPDATE_USER_ID       int comment '更新人',
+   UPDATE_TIME          datetime comment '更新时间',
+   primary key (ID)
+);
+
+alter table SYS_FILE comment '附件';
+
+drop table if exists SYS_CRON;
+
+/*==============================================================*/
+/* Table: SYS_CRON                                              */
+/*==============================================================*/
+create table SYS_CRON
+(
+   ID                   int not null auto_increment comment '主键',
+   NAME                 varchar(32) comment '名称',
+   JOB_CLASS            varchar(64) comment '实现类',
+   CRON                 varchar(64) comment 'cron表达式',
+   STATE                int comment '1：启动；2：停止；',
+   UPDATE_USER_ID       int comment '修改人',
+   UPDATE_TIME          datetime comment '修改时间',
+   primary key (ID)
+);
+
+alter table SYS_CRON comment '定时任务';
+
+drop table if exists SYS_VER;
+
+/*==============================================================*/
+/* Table: SYS_VER                                               */
+/*==============================================================*/
+create table SYS_VER
+(
+   ID                   int not null auto_increment comment 'id',
+   VER                  varchar(16) comment '版本',
+   UPDATE_TIME          datetime comment '修改时间',
+   AUTHOR               varchar(16) comment '作者',
+   REMARK               text comment '备注',
+   primary key (ID)
+);
+
+alter table SYS_VER comment '版本';
+
 drop table if exists EXM_QUESTION_TYPE;
 
 /*==============================================================*/
@@ -86,7 +207,7 @@ create table EXM_QUESTION
    UPDATE_TIME          datetime comment '修改时间',
    QUESTION_TYPE_ID     int comment '试题分类',
    SCORE                decimal(5,2) comment '默认分值',
-   AI                   int comment '0：否；1：是',
+   AI                   int comment '1：是；2：否；',
    SCORE_OPTIONS        varchar(8) comment '1：漏选得分；2：答案无顺序；3：大小写不敏感；',
    VER                  int comment '版本',
    SRC_ID               int comment '源ID',
@@ -153,6 +274,27 @@ create table EXM_EXAM
 
 alter table EXM_EXAM comment '考试';
 
+drop table if exists EXM_QUESTION_TYPE_OPEN;
+
+/*==============================================================*/
+/* Table: EXM_QUESTION_TYPE_OPEN                                */
+/*==============================================================*/
+create table EXM_QUESTION_TYPE_OPEN
+(
+   ID                   int not null auto_increment comment 'id',
+   START_TIME           datetime comment '开始时间',
+   END_TIME             datetime comment '结束时间',
+   USER_IDS             varchar(1024) comment '开放用户',
+   ORG_IDS              varchar(256) comment '开放机构',
+   UPDATE_USER_ID       int comment '修改人',
+   UPDATE_TIME          datetime comment '修改时间',
+   STATE                int comment '0：删除；1：正常',
+   QUESTION_TYPE_ID     int comment '试题分类ID',
+   primary key (ID)
+);
+
+alter table EXM_QUESTION_TYPE_OPEN comment '试题分类';
+
 drop table if exists EXM_QUESTION_OPTION;
 
 /*==============================================================*/
@@ -186,23 +328,6 @@ create table EXM_QUESTION_ANSWER
 
 alter table EXM_QUESTION_ANSWER comment '试题答案';
 
-drop table if exists EXM_PAPER_REMARK;
-
-/*==============================================================*/
-/* Table: EXM_PAPER_REMARK                                      */
-/*==============================================================*/
-create table EXM_PAPER_REMARK
-(
-   ID                   int not null auto_increment comment '主键',
-   SCORE                decimal(5,2) comment '分数（百分比）',
-   REMARK               varchar(32) comment '评语',
-   NO                   int comment '排序',
-   PAPER_ID             int not null comment '试卷ID',
-   primary key (ID)
-);
-
-alter table EXM_PAPER_REMARK comment '试卷评语';
-
 drop table if exists EXM_PAPER_QUESTION;
 
 /*==============================================================*/
@@ -228,26 +353,40 @@ create table EXM_PAPER_QUESTION
 
 alter table EXM_PAPER_QUESTION comment '试卷试题';
 
-drop table if exists EXM_QUESTION_TYPE_OPEN;
+drop table if exists EXM_PAPER_QUESTION_ANSWER;
 
 /*==============================================================*/
-/* Table: EXM_QUESTION_TYPE_OPEN                                */
+/* Table: EXM_PAPER_QUESTION_ANSWER                             */
 /*==============================================================*/
-create table EXM_QUESTION_TYPE_OPEN
+create table EXM_PAPER_QUESTION_ANSWER
 (
-   ID                   int not null auto_increment comment 'id',
-   START_TIME           datetime comment '开始时间',
-   END_TIME             datetime comment '结束时间',
-   USER_IDS             varchar(1024) comment '开放用户',
-   ORG_IDS              varchar(256) comment '开放机构',
-   UPDATE_USER_ID       int comment '修改人',
-   UPDATE_TIME          datetime comment '修改时间',
-   STATE                int comment '0：删除；1：正常',
-   QUESTION_TYPE_ID     int comment '试题分类ID',
+   ID                   int not null auto_increment,
+   ANSWER               text comment '一个答案有多个同义词用\n分隔',
+   SCORE                decimal(5,2) comment '分值',
+   NO                   int comment '排序',
+   QUESTION_ID          int not null comment '试题ID',
+   PAPER_QUESTION_ID    int comment '试卷试题ID',
    primary key (ID)
 );
 
-alter table EXM_QUESTION_TYPE_OPEN comment '试题分类';
+alter table EXM_PAPER_QUESTION_ANSWER comment '试卷试题答案';
+
+drop table if exists EXM_PAPER_REMARK;
+
+/*==============================================================*/
+/* Table: EXM_PAPER_REMARK                                      */
+/*==============================================================*/
+create table EXM_PAPER_REMARK
+(
+   ID                   int not null auto_increment comment '主键',
+   SCORE                decimal(5,2) comment '分数（百分比）',
+   REMARK               varchar(32) comment '评语',
+   NO                   int comment '排序',
+   PAPER_ID             int not null comment '试卷ID',
+   primary key (ID)
+);
+
+alter table EXM_PAPER_REMARK comment '试卷评语';
 
 drop table if exists EXM_MY_MARK;
 
@@ -262,6 +401,7 @@ create table EXM_MY_MARK
    QUESTION_IDS         varchar(1024) comment '试题IDS',
    UPDATE_USER_ID       int comment '修改人',
    UPDATE_TIME          datetime comment '修改时间',
+   AUTO_STATE           int comment '1.已自动阅卷；2.未自动阅卷',
    EXAM_ID              int comment '考试ID',
    primary key (ID)
 );
@@ -317,6 +457,34 @@ create table EXM_MY_EXAM_DETAIL
 
 alter table EXM_MY_EXAM_DETAIL comment '我的考试详细';
 
+drop table if exists EXM_BULLETIN;
+
+/*==============================================================*/
+/* Table: EXM_BULLETIN                                          */
+/*==============================================================*/
+create table EXM_BULLETIN
+(
+   ID                   int not null auto_increment comment '主键',
+   TITLE                varchar(32) comment '标题',
+   IMGS                 varchar(256) comment '图片',
+   VIDEO                varchar(256) comment '视频',
+   CONTENT              text comment '内容',
+   IMGS_HEIGHT          int comment '图片高',
+   IMGS_WIDTH           int comment '图片宽',
+   URL                  varchar(128) comment '跳转链接',
+   TOP_STATE            int comment '1：是；2：否',
+   NO                   int comment '排序',
+   STATE                int comment '0：删除；1：正常；2：轮播展示',
+   UPDATE_TIME          datetime comment '修改时间',
+   UPDATE_USER_ID       int comment '修改人',
+   READ_USER_IDS        varchar(256) comment '用户读权限',
+   READ_ORG_IDS         varchar(64) comment '机构读权限',
+   primary key (ID)
+);
+
+alter table EXM_BULLETIN comment '公告';
+
+
 
 
 
@@ -343,8 +511,8 @@ INSERT INTO `SYS_USER` VALUES ('1', '管理员', 'admin', null, null,'79nRuL+wDo
 INSERT INTO `SYS_DICT` VALUES (1, 'STATE', '0', '删除', 1);
 INSERT INTO `SYS_DICT` VALUES (2, 'STATE', '1', '启用', 2);
 INSERT INTO `SYS_DICT` VALUES (3, 'STATE', '2', '禁用', 3);
-INSERT INTO `SYS_DICT` VALUES (4, 'RES_TYPE', '1', '后台', 1);
-INSERT INTO `SYS_DICT` VALUES (5, 'RES_TYPE', '2', '前台', 2);
+INSERT INTO `SYS_DICT` VALUES (4, 'STATE_YN', '1', '是', 1);
+INSERT INTO `SYS_DICT` VALUES (5, 'STATE_YN', '2', '否', 2);
 INSERT INTO `SYS_DICT` VALUES (6, 'CRON_TYPE', '1', '启动', 1);
 INSERT INTO `SYS_DICT` VALUES (7, 'CRON_TYPE', '2', '停止', 2);
 INSERT INTO `SYS_DICT` VALUES (8, 'QUESTION_TYPE', '1', '单选', 1);
@@ -373,17 +541,9 @@ INSERT INTO `SYS_DICT` VALUES (30, 'MY_EXAM_MARK_STATE', '2', '阅卷中', 2);
 INSERT INTO `SYS_DICT` VALUES (31, 'MY_EXAM_MARK_STATE', '3', '已阅卷', 3);
 INSERT INTO `SYS_DICT` VALUES (32, 'MY_EXAM_ANSWER_STATE', '1', '及格', 1);
 INSERT INTO `SYS_DICT` VALUES (33, 'MY_EXAM_ANSWER_STATE', '2', '不及格', 2);
-INSERT INTO `SYS_DICT` VALUES (34, 'USER_ROLES', '1', 'OP', 1);
-INSERT INTO `SYS_DICT` VALUES (35, 'USER_ROLES', '2', 'AA', 2);
-INSERT INTO `SYS_DICT` VALUES (36, 'EXAM_STATE', '0', '删除', 1);
-INSERT INTO `SYS_DICT` VALUES (37, 'EXAM_STATE', '1', '发布', 2);
-INSERT INTO `SYS_DICT` VALUES (38, 'EXAM_STATE', '2', '草稿', 3);
-INSERT INTO `SYS_DICT` VALUES (39, 'EXAM_SCORE_STATE', '1', '公开', 1);
-INSERT INTO `SYS_DICT` VALUES (40, 'EXAM_SCORE_STATE', '2', '不公开', 2);
-INSERT INTO `SYS_DICT` VALUES (41, 'EXAM_RANK_STATE', '1', '公开', 1);
-INSERT INTO `SYS_DICT` VALUES (42, 'EXAM_RANK_STATE', '2', '不公开', 2);
-INSERT INTO `SYS_DICT` VALUES (43, 'EXAM_LOGIN_TYPE', '1', '安排考试', 1);
-INSERT INTO `SYS_DICT` VALUES (44, 'EXAM_LOGIN_TYPE', '2', '免登陆考试', 2);
+INSERT INTO `SYS_DICT` VALUES (34, 'EXAM_STATE', '0', '删除', 1);
+INSERT INTO `SYS_DICT` VALUES (35, 'EXAM_STATE', '1', '发布', 2);
+INSERT INTO `SYS_DICT` VALUES (36, 'EXAM_STATE', '2', '草稿', 3);
 
 INSERT INTO `SYS_CRON` VALUES ('1', '清理临时附件', 'com.wcpdoc.exam.file.job.ClearFileJob', '0 0 0 1/1 * ? ', '1', '1', '2020-08-26 18:42:08');
 

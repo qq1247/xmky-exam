@@ -1,8 +1,9 @@
 <template>
   <div class="container">
-    <el-carousel :interval="3000" height="400px">
-      <el-carousel-item v-for="item in 6" :key="item">
-        <h3 class="medium">{{ item }}</h3>
+    <el-carousel :interval="3000" height="350px">
+      <el-carousel-item :key="carouse.id" v-for="carouse in carouselList">
+        <p>{{carouse.title}}</p>
+        <img :src="'/api/file/download?id='+carouse.imgFileId" />
       </el-carousel-item>
     </el-carousel>
     <div class="container-content">
@@ -18,18 +19,22 @@
             <span>待考列表</span>
             <span>更多&nbsp;&gt;&gt;</span>
           </div>
-          <el-col :span="12" v-for="item in examList" :key="item.id">
+          <el-col :key="item.id" :span="12" v-for="item in examList">
             <el-card class="box-card" shadow="hover">
-              <div slot="header" class="card-header">
+              <div class="card-header" slot="header">
                 <span class="header-left">{{ item.examName }}</span>
                 <div class="header-right">
                   <i class="common common-setting"></i>
-                  <el-tag type="danger" size="mini" effect="dark">{{
+                  <el-tag effect="dark" size="mini" type="danger">
+                    {{
                     examStatus[item.state]
-                  }}</el-tag>
-                  <el-tag type="warning" size="mini" effect="dark">{{
+                    }}
+                  </el-tag>
+                  <el-tag effect="dark" size="mini" type="warning">
+                    {{
                     readPaperStatus[item.markState]
-                  }}</el-tag>
+                    }}
+                  </el-tag>
                 </div>
               </div>
               <el-row class="body-item">
@@ -43,26 +48,18 @@
               <el-row class="body-item">
                 <el-col :span="12">
                   <el-col :span="8" class="item-title">及格：</el-col>
-                  <el-col
-:span="16"
-                    >{{ item.totalScore }}&nbsp;/&nbsp;{{
-                      item.paperTotalScore
-                    }}</el-col
-                  >
+                  <el-col :span="16">
+                    {{ item.totalScore }}&nbsp;/&nbsp;{{
+                    item.paperTotalScore
+                    }}
+                  </el-col>
                 </el-col>
                 <el-col :span="12">
                   <el-col :span="11" class="item-title">考试人数：</el-col>
                   <el-col :span="13">{{ item.userNum }}</el-col>
                 </el-col>
               </el-row>
-              <el-button
-                round
-                size="mini"
-                type="primary"
-                icon="el-icon-timer"
-                class="card-btn"
-                >{{ item.markState == 1 ? '开始阅卷' : '开始考试' }}</el-button
-              >
+              <el-button class="card-btn" icon="el-icon-timer" round size="mini" type="primary">{{ item.markState == 1 ? '开始阅卷' : '开始考试' }}</el-button>
             </el-card>
           </el-col>
         </el-col>
@@ -72,11 +69,7 @@
           <div class="box-title">
             <span>考试通知</span>
           </div>
-          <el-row
-            v-for="item in noticeList"
-            :key="item.id"
-            :class="['notice', item.hot ? 'notice-hot' : '']"
-          >
+          <el-row :class="['notice', item.hot ? 'notice-hot' : '']" :key="item.id" v-for="item in noticeList">
             <el-col class="notice-left">
               <i class="common common-remind"></i>
               <span>{{ item.title }}</span>
@@ -89,18 +82,22 @@
             <span>待阅列表</span>
             <span>更多&nbsp;&gt;&gt;</span>
           </div>
-          <el-col :span="12" v-for="item in examList" :key="item.id">
+          <el-col :key="item.id" :span="12" v-for="item in examList">
             <el-card class="box-card" shadow="hover">
-              <div slot="header" class="card-header">
+              <div class="card-header" slot="header">
                 <span class="header-left">{{ item.examName }}</span>
                 <div class="header-right">
                   <i class="common common-setting"></i>
-                  <el-tag type="danger" size="mini" effect="dark">{{
+                  <el-tag effect="dark" size="mini" type="danger">
+                    {{
                     examStatus[item.state]
-                  }}</el-tag>
-                  <el-tag type="warning" size="mini" effect="dark">{{
+                    }}
+                  </el-tag>
+                  <el-tag effect="dark" size="mini" type="warning">
+                    {{
                     readPaperStatus[item.markState]
-                  }}</el-tag>
+                    }}
+                  </el-tag>
                 </div>
               </div>
               <el-row class="body-item">
@@ -114,26 +111,18 @@
               <el-row class="body-item">
                 <el-col :span="12">
                   <el-col :span="8" class="item-title">及格：</el-col>
-                  <el-col
-:span="16"
-                    >{{ item.totalScore }}&nbsp;/&nbsp;{{
-                      item.paperTotalScore
-                    }}</el-col
-                  >
+                  <el-col :span="16">
+                    {{ item.totalScore }}&nbsp;/&nbsp;{{
+                    item.paperTotalScore
+                    }}
+                  </el-col>
                 </el-col>
                 <el-col :span="12">
                   <el-col :span="11" class="item-title">考试人数：</el-col>
                   <el-col :span="13">{{ item.userNum }}</el-col>
                 </el-col>
               </el-row>
-              <el-button
-                round
-                size="mini"
-                type="primary"
-                icon="el-icon-timer"
-                class="card-btn"
-                >{{ item.markState == 1 ? '开始阅卷' : '开始考试' }}</el-button
-              >
+              <el-button class="card-btn" icon="el-icon-timer" round size="mini" type="primary">{{ item.markState == 1 ? '开始阅卷' : '开始考试' }}</el-button>
             </el-card>
           </el-col>
         </el-col>
@@ -150,7 +139,8 @@ export default {
       examList: [],
       examStatus: ['', '未考试', '考试中', '已交卷', '强制交卷'],
       readPaperStatus: ['', '未阅卷', '阅卷中', '已阅卷'],
-      noticeList: []
+      noticeList: [],
+      carouselList: [],
     }
   },
   created() {
@@ -158,28 +148,15 @@ export default {
   },
   methods: {
     init() {
+      this.getCarouselList()
       this.getExamList()
       this.getNoticeList()
     },
     async getExamList() {
-      /* const examList = await this.$https.myExamListpage({
+      const examList = await this.$https.myExamListpage({
         curPage: 1,
-        pageSize: 6
-      }) */
-      const examList = []
-      for (let i = 0; i < 4; i++) {
-        examList.push({
-          id: i,
-          examName: '英语考试',
-          examStartTime: '2022-01-01 09:00:00',
-          examEndTime: '2022-01-01 12:00:00',
-          state: i + 1,
-          markState: 1,
-          paperTotalScore: 100,
-          totalScore: 0,
-          userNum: 12
-        })
-      }
+        pageSize: 10,
+      })
       this.examList = examList
     },
     getNoticeList() {
@@ -191,8 +168,19 @@ export default {
           hot: index == 0,
         })
       }
-    }
-  }
+    },
+    // 获取轮播图
+    async getCarouselList() {
+      const {
+        data: { list, total },
+      } = await this.$https.bulletinListPage({
+        curPage: 1,
+        pageSize: 10,
+        topState: 1, // 只查询置顶的
+      })
+      this.carouselList = list
+    },
+  },
 }
 </script>
 

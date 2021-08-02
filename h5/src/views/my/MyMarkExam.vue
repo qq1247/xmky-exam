@@ -22,11 +22,7 @@
         <div class="paper-intro">{{ paper.id }}</div>
 
         <template v-if="paperQuestion.length > 0">
-          <div
-            :key="index"
-            class="drag-item drag-content"
-            v-for="(item, index) in paperQuestion"
-          >
+          <div :key="index" v-for="(item, index) in paperQuestion">
             <div class="chapter">
               <div class="chapter-item">
                 <div class="item-title">{{ item.chapter.name }}</div>
@@ -37,116 +33,146 @@
               </div>
             </div>
 
-            <div
-              :class="[
-                'drag-content',
-                item.questionList.length != 0 ? 'drag-children' : '',
-              ]"
-            >
-              <template v-if="item.questionList.length > 0">
-                <div
-                  :id="`p-${child.id}`"
-                  :key="child.id"
-                  class="children-content"
-                  v-for="(child, indexc) in item.questionList"
-                >
-                  <p v-html="indexc + 1 + '、' + child.title"></p>
+            <template v-if="item.questionList.length > 0">
+              <div
+                :id="`p-${child.id}`"
+                :key="child.id"
+                class="children-content"
+                v-for="(child, indexc) in item.questionList"
+              >
+                <p
+                  class="question-title"
+                  v-html="index + 1 + '、' + child.title"
+                ></p>
 
-                  <!-- 单选 -->
-                  <template v-if="child.type === 1">
-                    <el-radio-group
-                      class="children-option"
-                      v-model="child.examAnswers[0]"
-                    >
-                      <el-radio
-                        disabled
-                        :key="index"
-                        :label="String.fromCharCode(65 + index)"
-                        class="option-item"
-                        v-for="(option, index) in child.options"
-                      >
-                        <span
-                          v-html="
-                            `${String.fromCharCode(65 + index)}、${option}`
-                          "
-                        ></span>
-                      </el-radio>
-                    </el-radio-group>
-                  </template>
-
-                  <!-- 多选 -->
-                  <template v-if="child.type === 2">
-                    <el-checkbox-group
-                      class="children-option"
-                      v-model="child.examAnswers"
-                    >
-                      <el-checkbox
-                        disabled
-                        :key="index"
-                        :label="String.fromCharCode(65 + index)"
-                        class="option-item"
-                        v-for="(option, index) in child.options"
-                      >
-                        <span
-                          v-html="
-                            `${String.fromCharCode(65 + index)}、${option}`
-                          "
-                        ></span>
-                      </el-checkbox>
-                    </el-checkbox-group>
-                  </template>
-
-                  <!-- 填空 -->
-                  <template v-if="child.type === 3">
-                    <el-input
+                <!-- 单选 -->
+                <template v-if="child.type === 1">
+                  <el-radio-group
+                    class="children-option"
+                    v-model="child.examAnswers[0]"
+                  >
+                    <el-radio
                       disabled
-                      class="question-text"
-                      placeholder="请输入内容"
                       :key="index"
-                      v-for="(answer, index) in child.examAnswers"
-                      :value="answer"
+                      :label="String.fromCharCode(65 + index)"
+                      class="option-item"
+                      v-for="(option, index) in child.options"
                     >
-                      <template slot="prepend">第{{ index + 1 }}空</template>
-                    </el-input>
-                  </template>
+                      <div
+                        class="flex-items-center"
+                        v-html="`${String.fromCharCode(65 + index)}、${option}`"
+                      ></div>
+                    </el-radio>
+                  </el-radio-group>
+                </template>
 
-                  <!-- 判断 -->
-                  <template v-if="child.type === 4">
-                    <el-radio-group
-                      class="children-option"
-                      v-model="child.examAnswers[0]"
-                    >
-                      <el-radio
-                        disabled
-                        :key="index"
-                        :label="option"
-                        class="option-item"
-                        v-for="(option, index) in ['对', '错']"
-                        >{{ option }}</el-radio
-                      >
-                    </el-radio-group>
-                  </template>
-
-                  <!-- 问答 -->
-                  <template v-if="child.type === 5">
-                    <el-input
+                <!-- 多选 -->
+                <template v-if="child.type === 2">
+                  <el-checkbox-group
+                    class="children-option"
+                    v-model="child.examAnswers"
+                  >
+                    <el-checkbox
                       disabled
-                      :rows="2"
-                      class="question-text"
-                      placeholder="请输入内容"
-                      type="textarea"
-                      v-model="child.examAnswers[0]"
-                    ></el-input>
-                  </template>
+                      :key="index"
+                      :label="String.fromCharCode(65 + index)"
+                      class="option-item"
+                      v-for="(option, index) in child.options"
+                    >
+                      <div
+                        class="flex-items-center"
+                        v-html="`${String.fromCharCode(65 + index)}、${option}`"
+                      ></div>
+                    </el-checkbox>
+                  </el-checkbox-group>
+                </template>
 
-                  <div class="children-analysis">
-                    <div>【答案】：{{ child.answers.join(',') }}</div>
-                    <div
-                      v-html="`【解析】：${child.analysis || '暂无解析'}`"
-                    ></div>
-                    <div>【分数】：{{ child.score }}分</div>
-                    <div>
-                      【得分】：
+                <!-- 填空 -->
+                <template v-if="child.type === 3">
+                  <el-input
+                    disabled
+                    class="question-text"
+                    placeholder="请输入内容"
+                    :key="index"
+                    v-for="(answer, index) in child.examAnswers"
+                    :value="answer"
+                  >
+                    <template slot="prepend">第{{ index + 1 }}空</template>
+                  </el-input>
+                </template>
+
+                <!-- 判断 -->
+                <template v-if="child.type === 4">
+                  <el-radio-group
+                    class="children-option"
+                    v-model="child.examAnswers[0]"
+                  >
+                    <el-radio
+                      disabled
+                      :key="index"
+                      :label="option"
+                      class="option-item"
+                      v-for="(option, index) in ['对', '错']"
+                      >{{ option }}</el-radio
+                    >
+                  </el-radio-group>
+                </template>
+
+                <!-- 问答 -->
+                <template v-if="child.type === 5">
+                  <el-input
+                    disabled
+                    :rows="2"
+                    class="question-text"
+                    placeholder="请输入内容"
+                    type="textarea"
+                    v-model="child.examAnswers[0]"
+                  ></el-input>
+                </template>
+
+                <div class="children-analysis">
+                  <el-row :gutter="10">
+                    <template v-if="child.ai === 1">
+                      <el-col :span="2.5">【答案】：</el-col>
+                      <el-col :span="21">
+                        <div
+                          v-for="answer in child.answers"
+                          :key="answer.id"
+                          class="answers-item"
+                        >
+                          <span
+                            :class="
+                              child.answers.length > 1 ? 'answers-tag' : ''
+                            "
+                            v-for="(ans, index) in answer.answer"
+                            :key="index"
+                            >{{ ans }}</span
+                          >
+                        </div>
+                      </el-col>
+                    </template>
+                    <template v-if="child.ai === 2">
+                      <el-col :span="2.5"> 【答案】： </el-col>
+                      <el-col :span="21">
+                        <div v-html="`${child.answers[0].answer}`"></div>
+                      </el-col>
+                    </template>
+                  </el-row>
+                  <el-row :gutter="10">
+                    <el-col :span="2.5"> 【解析】： </el-col>
+                    <el-col :span="21">
+                      <div v-html="`${child.analysis}`"></div>
+                    </el-col>
+                  </el-row>
+                  <el-row :gutter="10">
+                    <el-col :span="2.5"> 【分数】： </el-col>
+                    <el-col :span="21">
+                      <div>{{ child.score }}分</div>
+                    </el-col>
+                  </el-row>
+                  <el-row :gutter="10">
+                    <el-col :span="2.5"> 【得分】： </el-col>
+                    <el-col :span="21">
                       <ScorePlate
                         :key="child.id"
                         :data="child"
@@ -157,13 +183,13 @@
                         @nextQuestion="nextQuestion"
                         @prevPaper="prevPaper"
                         @nextPaper="nextPaper"
-                        @checkEnd="checkEnd"
+                        @markEnd="markEnd"
                       ></ScorePlate>
-                    </div>
-                  </div>
+                    </el-col>
+                  </el-row>
                 </div>
-              </template>
-            </div>
+              </div>
+            </template>
           </div>
         </template>
 
@@ -173,22 +199,39 @@
         </div>
       </div>
     </div>
+
+    <!-- 考生列表 -->
+    <div class="user-list">
+      <div class="user-title">考生列表</div>
+      <el-scrollbar
+        wrap-style="overflow-x: hidden;width: 100%;display:flex;flex-direction: column;align-items: center"
+      >
+        <div
+          :class="['user-item', activeId === item ? 'active' : '']"
+          v-for="(item, index) in examUserIds"
+          :key="item"
+          @click="queryExamAnswerInfo(item)"
+        >
+          {{ `考生${index + 1}` }}
+        </div>
+      </el-scrollbar>
+    </div>
   </div>
 </template>
 <script>
 import ScorePlate from '@/components/ScorePlate.vue'
-import { paperIntro, paperList, answerList } from '@/mock/questionList.js'
 export default {
   components: {
     ScorePlate,
   },
   data() {
     return {
-      id: 0,
       labelPosition: 'left',
       paperName: '',
       hrefPointer: '',
       paperId: 0,
+      examId: null,
+      examUserIds: null,
       pageSize: 10,
       curPage: 1,
       pageTotal: 0,
@@ -199,40 +242,15 @@ export default {
       selectOption: '',
       paper: {},
       answerList: [],
+      activeId: null,
     }
   },
   created() {
-    /* const { id, paperId } = this.$route.query;
-    this.id = id;
-    this.paperId = paperId;
-    this.init(); */
-    this.paper = paperIntro.data
-    this.paperQuestion = paperList.data
-
-    this.paperQuestion.map((cur, index) => {
-      cur.questionList.map((item, indexi) => {
-        const [{ myExamDetailId, myExamId, answers }] = answerList.data.filter(
-          (itemr) => itemr.questionId == item.id
-        )
-        this.$set(
-          this.paperQuestion[index].questionList[indexi],
-          'myExamDetailId',
-          myExamDetailId
-        )
-        this.$set(
-          this.paperQuestion[index].questionList[indexi],
-          'myExamId',
-          myExamId
-        )
-        this.$set(
-          this.paperQuestion[index].questionList[indexi],
-          'examAnswers',
-          answers
-        )
-      })
-    })
-
-    this.answerList = answerList.data
+    const { examId, paperId, examUserIds } = this.$route.query
+    this.examId = examId
+    this.paperId = paperId
+    this.examUserIds = examUserIds
+    this.init()
   },
   methods: {
     // 返回
@@ -243,7 +261,7 @@ export default {
     async init() {
       await this.queryPaper()
       await this.queryPaperInfo()
-      await this.queryMyExamAnswerInfo()
+      await this.queryExamAnswerInfo()
     },
     // 查询试卷
     async queryPaper() {
@@ -269,18 +287,19 @@ export default {
         this.paperQuestion = res.data
       } catch (error) {}
     },
-    // 查询我的答案信息
-    async queryMyExamAnswerInfo() {
+    // 查询答案信息
+    async queryExamAnswerInfo(id) {
+      this.activeId = id || this.examUserIds[0]
       try {
-        const res = await this.$https.myExamAnswerList({
-          id: this.id,
+        const res = await this.$https.myMarkAnswerList({
+          examId: this.examId,
+          userId: Number(id || this.examUserIds[0]),
         })
 
         this.paperQuestion.map((cur, index) => {
           cur.questionList.map((item, indexi) => {
-            const [{ myExamDetailId, myExamId, answers }] = res.data.filter(
-              (itemr) => itemr.questionId == item.id
-            )
+            const [{ myExamDetailId, myExamId, answers, score }] =
+              res.data.filter((itemr) => itemr.questionId == item.id)
             this.$set(
               this.paperQuestion[index].questionList[indexi],
               'myExamDetailId',
@@ -295,6 +314,11 @@ export default {
               this.paperQuestion[index].questionList[indexi],
               'examAnswers',
               answers
+            )
+            this.$set(
+              this.paperQuestion[index].questionList[indexi],
+              'scorePlate',
+              score
             )
           })
         })
@@ -333,10 +357,6 @@ export default {
     // 打分
     async myExamUpdateScore(e, idx, idxc) {
       const source = this.paperQuestion[idx].questionList[idxc]
-      if (!source.scorePlate) {
-        this.$tools.message('请进行打分！', 'warning')
-        return
-      }
       const res = await this.$https
         .myExamUpdateScore({
           myExamDetailId: source.myExamDetailId,
@@ -345,7 +365,7 @@ export default {
         .catch((err) => {})
       res?.code === 200
         ? this.$tools.message('打分成功！')
-        : this.$tools.message('打分失败！', 'error')
+        : this.$tools.message(res.msg || '打分失败！', 'error')
     },
     // 上下题定位
     toHref(position, status) {
@@ -382,11 +402,37 @@ export default {
       this.toHref(position, 'next')
     },
     // 上一卷
-    prevPaper() {},
-    // 上一卷
-    nextPaper() {},
+    prevPaper() {
+      let index = this.examUserIds.indexOf(this.activeId)
+      if (index === 0) {
+        this.$tools.message('已经是第一卷了！', 'warning')
+        return
+      }
+      this.queryExamAnswerInfo(this.examUserIds[index - 1])
+    },
+    // 下一卷
+    nextPaper() {
+      let index = this.examUserIds.indexOf(this.activeId)
+      if (index === this.examUserIds.length - 1) {
+        this.$tools.message('已经是最后一卷了！', 'warning')
+        return
+      }
+      this.queryExamAnswerInfo(this.examUserIds[index + 1])
+    },
     // 完成阅卷
-    checkEnd() {},
+    markEnd() {
+      const allQuestions = this.paperQuestion.reduce((acc, cur) => {
+        acc.push(...cur.questionList)
+        return acc
+      }, [])
+      const isEvery = allQuestions.every(
+        (item) => item.scorePlate !== '' && item.scorePlate !== null
+      )
+      if (!isEvery) {
+        this.$tools.message('请给所有试题打分！', 'warning')
+        return
+      }
+    },
   },
 }
 </script>
@@ -490,40 +536,56 @@ export default {
     border: 1px solid #d8d8d8;
     font-size: 14px;
     box-sizing: border-box;
-    margin-bottom: 5px;
-    p {
-      margin: 0;
+    margin-bottom: 10px;
+    .question-title {
+      display: flex;
       line-height: 40px;
       padding: 0 10px;
       background: #e5f4fc;
+      word-wrap: break-word;
+      word-break: break-all;
     }
   }
   .children-option {
     padding: 10px 0 0 25px;
-    .option-item {
-      display: block;
-      line-height: 30px;
-    }
   }
-  .option-item-text {
-    border-bottom: 1px solid #d8d8d8;
-    padding: 20px 10px 5px;
-    color: #333;
-    margin: 0 25px 0;
+  .option-item,
+  .flex-items-center {
+    display: flex;
+    justify-items: center;
+    line-height: 30px;
+  }
+  /deep/ .el-radio__input,
+  /deep/ .el-checkbox__input {
+    padding-top: 7px;
   }
   .question-text {
-    margin: 4px 1%;
+    margin: 10px 1% 0;
     width: 98%;
   }
   .children-analysis {
-    line-height: 25px;
+    line-height: 30px;
     padding-left: 20px;
     margin: 15px 0;
     font-size: 13px;
     color: #666;
+  }
+  .answers-item {
+    width: 100%;
     span {
-      font-size: 15px;
-      font-weight: bold;
+      width: 100%;
+      display: inline;
+      word-wrap: break-word;
+      word-break: normal;
+    }
+    .answers-tag {
+      background: #cdd2f6;
+      color: #fff;
+      padding: 3px 10px;
+      border-radius: 3px;
+      &:not(:last-child) {
+        margin-right: 10px;
+      }
     }
   }
   .el-tag {
@@ -567,7 +629,7 @@ export default {
 .el-input /deep/.el-input-group__prepend {
   background-color: #fff;
   border: 0px;
-  width: 38px;
+  padding: 0 15px 0;
 }
 /deep/ .el-form-item--mini.el-form-item,
 .el-form-item--small.el-form-item {
@@ -587,49 +649,7 @@ export default {
   padding: 10px;
   font-size: 14px;
 }
-.exam-card {
-  width: 214px;
-  font-family: 'Microsoft YaHei';
-  border: 1px solid #e6e6e6;
-  position: fixed;
-  right: 50px;
-  top: 70px;
-}
-.exam-time {
-  line-height: 40px;
-  text-align: center;
-  color: #0094e5;
-}
-.exam-card .exam-head,
-.exam-footer {
-  background: #1e9fff;
-  color: #fff;
-  height: 40px;
-  line-height: 40px;
-  font-size: 18px;
-  text-align: center;
-  padding: 0px 18px;
-  cursor: pointer;
-}
-.exam-card a {
-  width: 32px;
-  height: 25px;
-  border: 1px solid #eceaea;
-  color: #888;
-  text-align: center;
-  line-height: 23px;
-  margin-left: 1px;
-  display: inline-block;
-  margin-top: 5px;
-  margin-right: 5px;
-  border-radius: 3px;
-  text-decoration: none;
-  cursor: pointer;
-}
-.exam-card a:hover {
-  color: #1e9fff;
-  border: 1px solid #1e9fff;
-}
+
 /deep/ #app {
   background: #fff;
 }
@@ -658,5 +678,54 @@ export default {
 }
 /deep/.el-checkbox__input.is-disabled.is-checked .el-checkbox__inner::after {
   border-color: #fff;
+}
+.user-list {
+  position: fixed;
+  width: 120px;
+  height: calc(100% - 90px);
+  background: #fff;
+  z-index: 100;
+  top: 70px;
+  right: 10px;
+  box-shadow: 0 0 13px 0 rgba(0, 0, 0, 0.13);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  .user-title {
+    line-height: 40px;
+    background: #1e9fff;
+    text-align: center;
+    width: 100%;
+    color: #fff;
+    font-size: 14px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+  .user-item {
+    line-height: 30px;
+    width: 100px;
+    text-align: center;
+    border: 1px solid #1e9fff;
+    color: #1e9fff;
+    font-size: 13px;
+    border-radius: 20px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    &:first-child {
+      margin-top: 10px;
+    }
+    &:hover {
+      transition: all 0.2s ease-in;
+      background: #1e9fff;
+      color: #fff;
+    }
+  }
+  .active {
+    transition: all 0.2s ease-in;
+    background: #1e9fff;
+    color: #fff;
+  }
 }
 </style>
