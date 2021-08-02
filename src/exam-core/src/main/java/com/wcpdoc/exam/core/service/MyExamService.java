@@ -6,7 +6,6 @@ import java.util.Map;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
-import com.wcpdoc.exam.core.service.BaseService;
 /**
  * 我的考试服务层接口
  * 
@@ -32,6 +31,16 @@ public interface MyExamService extends BaseService<MyExam>{
 	 * @return List<MyExam>
 	 */
 	List<MyExam> getList(Integer examId);
+	
+	/**
+	 * 获取我的考试列表
+	 * 
+	 * v1.0 chenyun 2021年7月30日下午3:49:53
+	 * @param examId
+	 * @param userId
+	 * @return MyExam
+	 */
+	MyExam getEntity(Integer examId, Integer userId);
 
 	/**
 	 * 考试时间表

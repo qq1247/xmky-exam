@@ -516,6 +516,10 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		
 		// 删除试题
 		PaperQuestion pq = paperQuestionService.getEntity(paperQuestionId);
+		List<PaperQuestionAnswer> paperQuestionAnswerList = paperQuestionAnswerService.getPaperQuestionAnswerList(pq.getParentId(), pq.getQuestionId());//章节id 和 试题id
+		for(PaperQuestionAnswer paperQuestionAnswer : paperQuestionAnswerList){
+			paperQuestionAnswerService.del(paperQuestionAnswer.getId());
+		}
 		paperQuestionService.del(paperQuestionId);
 		List<PaperQuestion> pqList = paperQuestionService.getQuestionList(pq.getParentId());
 

@@ -52,10 +52,11 @@ public interface MyExamDetailService extends BaseService<MyExamDetail>{
 	 * 完成阅卷
 	 * 
 	 * v1.0 zhanghc 2020年10月13日下午1:13:52
+	 * @param id
 	 * @param examId
 	 * @param curUser
 	 * @param processBarId 
 	 * void
 	 */
-	void autoMark(Integer examId, LoginUser curUser, String processBarId);
+	void autoMark(Integer id, Integer examId, LoginUser curUser, String processBarId);
 }

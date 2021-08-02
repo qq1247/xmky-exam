@@ -52,6 +52,12 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		return myExamDao.getList(examId);
 	}
 
+
+	@Override
+	public MyExam getEntity(Integer examId, Integer userId) {
+		return myExamDao.getEntity(examId, userId);
+	}
+	
 	@Override
 	public List<Map<String, Object>> kalendar(Integer year, Integer month) {
 		String time = year+"-"+month+"-01 00:00:00";

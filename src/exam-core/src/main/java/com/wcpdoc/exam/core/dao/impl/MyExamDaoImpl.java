@@ -44,10 +44,9 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 				+ "LEFT JOIN SYS_USER MARK_USER ON MY_EXAM.MARK_USER_ID = MARK_USER.ID ";// 阅卷用户不一定有
 		
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("id")), "EXAM.ID = ?", pageIn.get("id"))
+		sqlUtil.addWhere(pageIn.get("examId", Integer.class) != null, "EXAM.ID = ?", pageIn.get("examId", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("examName")), "EXAM.NAME LIKE ?", "%" + pageIn.get("examName") + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.get("userId")), "EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE USER_ID = ? AND Z.EXAM_ID = MY_EXAM.EXAM_ID)", pageIn.get("userId"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("markUserId")), "MY_EXAM.MARK_USER_ID =  ?", pageIn.get("markUserId"))
+				.addWhere(pageIn.get("examId", Integer.class) != null && pageIn.get("markUserId", Integer.class) != null, "EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.EXAM_ID = ? AND Z.MARK_USER_ID = ? AND Z.EXAM_USER_IDS LIKE CONCAT('%,', MY_EXAM.USER_ID, ',%'))", pageIn.get("examId", Integer.class), pageIn.get("markUserId", Integer.class))
 				.addWhere(pageIn.get("curUserId", Integer.class) != null, "MY_EXAM.USER_ID =  ?", pageIn.get("curUserId", Integer.class))
 				.addWhere("EXAM.STATE = ?", 1)
 //				.addWhere("PAPER.STATE = ?", 1)//删除了试卷也能查看
@@ -77,6 +76,12 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 		return getList(sql, new Object[] { examId }, MyExam.class);
 	}
 
+	@Override
+	public MyExam getEntity(Integer examId, Integer userId) {
+		String sql = "SELECT * FROM EXM_MY_EXAM WHERE EXAM_ID = ? AND USER_ID = ? ";
+		return getEntity(sql, new Object[] { examId, userId });
+	}
+	
 	@Override
 	public List<MyExam> kalendar(Integer userId, Date startTime, Date endTime) {
 		String sql = "SELECT * FROM EXM_MY_EXAM WHERE USER_ID = ? AND ANSWER_TIME >= ? AND ANSWER_TIME <= ? ";
