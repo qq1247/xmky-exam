@@ -26,19 +26,19 @@ public class ProgressBarCache extends BaseEhCache{
 	 * @param msg 
 	 * @return String 唯一ID，用于前端显示当前进度
 	 */
-	public static String setProgressBar(String id, Double curNum, Double totalNum, String msg) {
+	public static String setProgressBar(String id, Double curNum, Double totalNum, String msg, Integer code) {
 		log.debug("设置进度条：{}-{}-{}-{}", id, curNum, totalNum, msg);
 		Cache cache = getCache(CACHE_NAME);
 		ProgressBar progressBar = cache.get(id, ProgressBar.class);
 		if (progressBar == null) {
-			progressBar = new ProgressBar(id, curNum, totalNum, msg);
+			progressBar = new ProgressBar(id, curNum, totalNum, msg, code);
 			cache.put(id, progressBar);
 		}
 		
 		progressBar.setCurNum(curNum);
 		progressBar.setTotalNum(totalNum);
 		progressBar.setMsg(msg);
-		
+		progressBar.setCode(code);
 		return id;
 	}
 	
@@ -57,7 +57,7 @@ public class ProgressBarCache extends BaseEhCache{
 			return progressBar;
 		}
 			
-		log.debug("获取进度条：{}-{}-{}-{}", id, progressBar.getCurNum(), progressBar.getTotalNum(), progressBar.getMsg());
+		log.debug("获取进度条：{}-{}-{}-{}", id, progressBar.getCurNum(), progressBar.getTotalNum(), progressBar.getMsg(), progressBar.getCode());
 		return progressBar;
 	}
 }

@@ -12,15 +12,17 @@ public class ProgressBar {
 	private Double curNum;
 	private Double totalNum;
 	private String msg;
+	private Integer code;
 	
 	public ProgressBar() {
 	}
 
-	public ProgressBar(String id, Double curNum, Double totalNum, String msg) {
+	public ProgressBar(String id, Double curNum, Double totalNum, String msg, Integer code) {
 		this.id = id;
 		this.curNum = curNum;
 		this.totalNum = totalNum;
 		this.msg = msg;
+		this.code = code;
 	}
 
 	/**
@@ -63,5 +65,13 @@ public class ProgressBar {
 
 	public void setMsg(String msg) {
 		this.msg = msg;
+	}
+
+	public Integer getCode() {
+		return code;
+	}
+
+	public void setCode(Integer code) {
+		this.code = code;
 	}
 }
