@@ -39,6 +39,8 @@ public class MyMark {
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "UPDATE_TIME")
 	private Date updateTime;
+	@Column(name = "AUTO_STATE")
+	private Integer autoState;
 
 	public Integer getId() {
 		return id;
@@ -94,5 +96,13 @@ public class MyMark {
 
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
+	}
+
+	public Integer getAutoState() {
+		return autoState;
+	}
+
+	public void setAutoState(Integer autoState) {
+		this.autoState = autoState;
 	}
 }
