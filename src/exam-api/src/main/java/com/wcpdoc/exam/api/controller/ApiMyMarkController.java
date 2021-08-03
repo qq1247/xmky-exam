@@ -91,7 +91,7 @@ public class ApiMyMarkController extends BaseController {
 	}
 	
 	/**
-	 * 我考试的列表
+	 * 我的考试列表
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @return pageOut

@@ -17,6 +17,12 @@
             <span>我的阅卷</span>
           </div>
         </div>
+        <div class="exam-item">
+          <div @click="toBulletin" class="exam-content exam-add">
+            <i class="common common-readPaper"></i>
+            <span>我的公告</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -33,6 +39,9 @@ export default {
     },
     toMyMarkExam() {
       this.$router.push({ path: '/my/list', query: { type: 2 } })
+    },
+    toBulletin() {
+      this.$router.push({ path: '/my/bulletin', query: {  } })
     },
   },
 }

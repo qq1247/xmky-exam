@@ -48,6 +48,7 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 				.addWhere(ValidateUtil.isValid(pageIn.get("examName")), "EXAM.NAME LIKE ?", "%" + pageIn.get("examName") + "%")
 				.addWhere(pageIn.get("examId", Integer.class) != null && pageIn.get("markUserId", Integer.class) != null, "EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.EXAM_ID = ? AND Z.MARK_USER_ID = ? AND Z.EXAM_USER_IDS LIKE CONCAT('%,', MY_EXAM.USER_ID, ',%'))", pageIn.get("examId", Integer.class), pageIn.get("markUserId", Integer.class))
 				.addWhere(pageIn.get("curUserId", Integer.class) != null, "MY_EXAM.USER_ID =  ?", pageIn.get("curUserId", Integer.class))
+				.addWhere("1".equals(pageIn.get("needExam")), "exam.start_time <= ? and EXAM.end_time >= ?", new Date(), new Date())
 				.addWhere("EXAM.STATE = ?", 1)
 //				.addWhere("PAPER.STATE = ?", 1)//删除了试卷也能查看
 //				.addWhere("USER.STATE = ?", 1)

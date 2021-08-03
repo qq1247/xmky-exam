@@ -1,9 +1,10 @@
 <template>
   <div class="container">
+    【{{carouselList}}】
     <el-carousel :interval="3000" height="350px">
       <el-carousel-item :key="carouse.id" v-for="carouse in carouselList">
         <p>{{carouse.title}}</p>
-        <img :src="'/api/file/download?id='+carouse.imgFileId" />
+        <img :src="'/api/file/download?id='+carouse.imgFileId" style="width:400px;height:350px" />
       </el-carousel-item>
     </el-carousel>
     <div class="container-content">
@@ -24,7 +25,6 @@
               <div class="card-header" slot="header">
                 <span class="header-left">{{ item.examName }}</span>
                 <div class="header-right">
-                  <i class="common common-setting"></i>
                   <el-tag effect="dark" size="mini" type="danger">
                     {{
                     examStatus[item.state]
@@ -49,7 +49,7 @@
                 <el-col :span="12">
                   <el-col :span="8" class="item-title">及格：</el-col>
                   <el-col :span="16">
-                    {{ item.totalScore }}&nbsp;/&nbsp;{{
+                    {{ item.totalScore * item.paperTotalScore / 100 }}&nbsp;/&nbsp;{{
                     item.paperTotalScore
                     }}
                   </el-col>
@@ -67,14 +67,14 @@
       <el-row :gutter="10">
         <el-col :span="10">
           <div class="box-title">
-            <span>考试通知</span>
+            <span>公告</span>
           </div>
-          <el-row :class="['notice', item.hot ? 'notice-hot' : '']" :key="item.id" v-for="item in noticeList">
+          <el-row :class="['notice', item.hot ? 'notice-hot' : '']" :key="item.id" v-for="item in bulletinList">
             <el-col class="notice-left">
               <i class="common common-remind"></i>
               <span>{{ item.title }}</span>
             </el-col>
-            <el-col class="notice-right">{{ item.time }}</el-col>
+            <el-col class="notice-right">{{ item.updateTime }}</el-col>
           </el-row>
         </el-col>
         <el-col :span="14">
@@ -82,38 +82,32 @@
             <span>待阅列表</span>
             <span>更多&nbsp;&gt;&gt;</span>
           </div>
-          <el-col :key="item.id" :span="12" v-for="item in examList">
+          <el-col :key="item.id" :span="12" v-for="item in markList">
             <el-card class="box-card" shadow="hover">
               <div class="card-header" slot="header">
-                <span class="header-left">{{ item.examName }}</span>
+                <span class="header-left">{{ item.name }}</span>
                 <div class="header-right">
-                  <i class="common common-setting"></i>
                   <el-tag effect="dark" size="mini" type="danger">
                     {{
                     examStatus[item.state]
-                    }}
-                  </el-tag>
-                  <el-tag effect="dark" size="mini" type="warning">
-                    {{
-                    readPaperStatus[item.markState]
                     }}
                   </el-tag>
                 </div>
               </div>
               <el-row class="body-item">
                 <el-col :span="6" class="item-title">开始时间：</el-col>
-                <el-col :span="18">{{ item.examStartTime }}</el-col>
+                <el-col :span="18">{{ item.markStartTime }}</el-col>
               </el-row>
               <el-row class="body-item">
                 <el-col :span="6" class="item-title">结束时间：</el-col>
-                <el-col :span="18">{{ item.examEndTime }}</el-col>
+                <el-col :span="18">{{ item.markEndTime }}</el-col>
               </el-row>
               <el-row class="body-item">
                 <el-col :span="12">
                   <el-col :span="8" class="item-title">及格：</el-col>
                   <el-col :span="16">
-                    {{ item.totalScore }}&nbsp;/&nbsp;{{
-                    item.paperTotalScore
+                    {{ item.paperPassScore * item.paperTotleScore / 100}} &nbsp;/&nbsp;{{
+                    item.paperTotleScore
                     }}
                   </el-col>
                 </el-col>
@@ -137,9 +131,10 @@ export default {
   data() {
     return {
       examList: [],
+      markList: [],
       examStatus: ['', '未考试', '考试中', '已交卷', '强制交卷'],
       readPaperStatus: ['', '未阅卷', '阅卷中', '已阅卷'],
-      noticeList: [],
+      bulletinList: [],
       carouselList: [],
     }
   },
@@ -149,25 +144,41 @@ export default {
   methods: {
     init() {
       this.getCarouselList()
+      this.getBulletinList()
       this.getExamList()
-      this.getNoticeList()
+      this.getMarkList()
     },
+    // 获取考试列表
     async getExamList() {
-      const examList = await this.$https.myExamListpage({
+      const {
+        data: { list, total },
+      } = await this.$https.myExamListPage({
+        curPage: 1,
+        pageSize: 10,
+        needExam: 1,
+      })
+      this.examList = list
+    },
+    // 获取阅卷列表
+    async getMarkList() {
+      const {
+        data: { list, total },
+      } = await this.$https.myMarkExamListPage({
         curPage: 1,
         pageSize: 10,
       })
-      this.examList = examList
+      this.markList = list
     },
-    getNoticeList() {
-      for (let index = 0; index < 11; index++) {
-        this.noticeList.push({
-          id: index + 1,
-          title: '这是一条最新通知',
-          time: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-          hot: index == 0,
-        })
-      }
+    // 获取公告列表
+    async getBulletinList() {
+      const {
+        data: { list, total },
+      } = await this.$https.bulletinListPage({
+        curPage: 1,
+        pageSize: 10,
+        state: 1,
+      })
+      this.bulletinList = list
     },
     // 获取轮播图
     async getCarouselList() {
@@ -176,7 +187,7 @@ export default {
       } = await this.$https.bulletinListPage({
         curPage: 1,
         pageSize: 10,
-        topState: 1, // 只查询置顶的
+        state: 2,
       })
       this.carouselList = list
     },
