@@ -314,13 +314,13 @@
                     </template>
 
                     <!-- 填空 -->
-                    <template v-if="child.type === 3">
+                    <!-- <template v-if="child.type === 3">
                       <div
                         class="option-item-text"
                         :key="index"
                         v-for="(option, index) in child.answers"
                       ></div>
-                    </template>
+                    </template> -->
 
                     <!-- 判断 -->
                     <template v-if="child.type === 4">
@@ -340,20 +340,21 @@
                     </template>
 
                     <!-- 问答 -->
-                    <template v-if="child.type === 5">
+                    <!-- <template v-if="child.type === 5">
                       <div class="option-item-text">{{ child.answer }}</div>
-                    </template>
+                    </template> -->
 
                     <div class="children-analysis">
                       <el-row :gutter="10">
-                        <template v-if="child.ai === 1">
+                        <template v-if="child.ai === 1 && child.type !== 2">
                           <el-col :span="2.5">【答案】：</el-col>
                           <el-col :span="21">
                             <div
-                              v-for="answer in child.answers"
+                              v-for="(answer,index) in child.answers"
                               :key="answer.id"
                               class="answers-item"
                             >
+                              <span v-if="[3,5].includes(child.type)">{{child.type === 3 ? `填空${index+1}、` : `关键词${index+1}、`}}</span>
                               <span
                                 :class="
                                   child.answers.length > 1 ? 'answers-tag' : ''
@@ -365,10 +366,17 @@
                             </div>
                           </el-col>
                         </template>
-                        <template v-if="child.ai === 2">
+                        <template v-if="child.ai === 2  && child.type !== 2">
                           <el-col :span="2.5"> 【答案】： </el-col>
                           <el-col :span="21">
                             <div v-html="`${child.answers[0].answer}`"></div>
+                          </el-col>
+                        </template>
+                        <!-- 多选 -->
+                        <template v-if="child.type === 2">
+                          <el-col :span="2.5"> 【答案】： </el-col>
+                          <el-col :span="21">
+                            {{ child.answers.map((item) => item.answer).join(',') }}
                           </el-col>
                         </template>
                       </el-row>
@@ -379,6 +387,7 @@
                         </el-col>
                       </el-row>
                     </div>
+
                     <div class="children-footer">
                       <div class="children-tags">
                         <el-tag effect="dark" size="mini" type="warning">
