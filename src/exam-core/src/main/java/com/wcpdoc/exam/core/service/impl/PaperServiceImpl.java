@@ -372,13 +372,16 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			throw new MyException("答案或分值有误！");
 		}
 		BigDecimal scoreSum = new BigDecimal(0);
+		PaperQuestionAnswer paperQuestionAnswer = null;
 		for (int i = 0; i < paperQuestionAnswerId.length; i++) {
-			PaperQuestionAnswer paperQuestionAnswer = paperQuestionAnswerService.getEntity(paperQuestionAnswerId[i]);
+			paperQuestionAnswer = paperQuestionAnswerService.getEntity(paperQuestionAnswerId[i]);
 			paperQuestionAnswer.setScore(paperQuestionAnswerScore[i]);
 			paperQuestionAnswerService.update(paperQuestionAnswer);
 			scoreSum = scoreSum.add(paperQuestionAnswerScore[i]);
 		}
-		if (scoreSum.compareTo(score) != 0) {
+		
+		Question question = questionService.getEntity(paperQuestionAnswer.getQuestionId());
+		if (scoreSum.compareTo(score) != 0 && question.getType() != 1 && question.getType() != 4) {
 			throw new MyException("答案分值与总分值不符！");
 		}
 		
