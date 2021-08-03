@@ -196,7 +196,7 @@
         <!-- 我的阅卷 -->
         <template v-if="name === 'myMarkExamList'">
           <span
-            v-if="data.mark === 'unStart' || data.mark === 'end'"
+            v-if="['unStart', 'end'].includes(data.mark)"
             :data-title="data.mark == 'unStart' ? '待阅卷' : '已阅卷'"
             @click="mark(data)"
           >
@@ -208,12 +208,27 @@
             ></i>
           </span>
           <span
-            v-if="data.mark === 'start'"
+            v-if="data.mark === 'start' && markId === null"
             data-title="阅卷中"
             @click="mark(data)"
           >
             <i class="common common-marking"></i>
           </span>
+          <!-- 智能阅卷 -->
+          <el-progress
+            type="circle"
+            :percentage="percentage"
+            :width="35"
+            :stroke-width="2"
+            data-title="智能阅卷中"
+            :color="colors"
+            v-if="
+              data.mark === 'start' &&
+              percentage > 0 &&
+              markId !== null &&
+              markId === data.examId
+            "
+          ></el-progress>
         </template>
         <span
           v-if="detailTitles[name]"
@@ -238,6 +253,14 @@ export default {
       type: String,
       default: '',
     },
+    percentage: {
+      type: Number,
+      default: 0,
+    },
+    markId: {
+      type: Number,
+      default: null,
+    },
   },
   data() {
     return {
@@ -249,6 +272,13 @@ export default {
       baseSetting: ['question', 'paper', 'exam', 'paperList', 'examList'],
       parentClassify: ['question', 'paper', 'exam'],
       childrenClassify: ['paperList', 'examList'],
+      colors: [
+        { color: '#f56c6c', percentage: 20 },
+        { color: '#e6a23c', percentage: 40 },
+        { color: '#5cb87a', percentage: 60 },
+        { color: '#1989fa', percentage: 80 },
+        { color: '#6f7ad3', percentage: 100 },
+      ],
     }
   },
   methods: {
@@ -362,6 +392,39 @@ export default {
   margin-bottom: 20px;
 }
 
+@mixin tooltips {
+  &::after {
+    content: attr(data-title);
+    display: block;
+    position: absolute;
+    z-index: 100;
+    bottom: -45px;
+    transform: translateX(-50%);
+    left: 50%;
+    width: 70px;
+    height: 30px;
+    line-height: 30px;
+    background: #0095e5;
+    color: #fff;
+    border-radius: 3px;
+    font-size: 13px;
+    opacity: 0;
+  }
+  &::before {
+    content: '';
+    display: block;
+    position: absolute;
+    z-index: 100;
+    bottom: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 0 5px 10px 5px;
+    border-style: solid;
+    border-color: transparent transparent #0095e5;
+    opacity: 0;
+  }
+}
+
 .exam-content {
   display: flex;
   flex-direction: column;
@@ -454,42 +517,16 @@ export default {
           border-color: transparent #4a5766 transparent transparent;
         }
       }
-      &:last-child:hover {
-        .handler-more {
-          left: 50px;
-          opacity: 1;
+      &:last-child {
+        margin-right: 0;
+        &:hover {
+          .handler-more {
+            left: 50px;
+            opacity: 1;
+          }
         }
       }
-      &::after {
-        content: attr(data-title);
-        display: block;
-        position: absolute;
-        z-index: 100;
-        bottom: -45px;
-        transform: translateX(-50%);
-        left: 50%;
-        width: 70px;
-        height: 30px;
-        line-height: 30px;
-        background: #0095e5;
-        color: #fff;
-        border-radius: 3px;
-        font-size: 13px;
-        opacity: 0;
-      }
-      &::before {
-        content: '';
-        display: block;
-        position: absolute;
-        z-index: 100;
-        bottom: -18px;
-        left: 50%;
-        transform: translateX(-50%);
-        border-width: 0 5px 10px 5px;
-        border-style: solid;
-        border-color: transparent transparent #0095e5;
-        opacity: 0;
-      }
+      @include tooltips;
       &:hover {
         border: 1px solid #0095e5;
         background: #0095e5;
@@ -501,6 +538,19 @@ export default {
           opacity: 1;
         }
       }
+    }
+  }
+}
+
+/deep/ .el-progress--circle {
+  margin-top: 25px;
+  @include tooltips;
+  &:hover {
+    &::after {
+      opacity: 1;
+    }
+    &::before {
+      opacity: 1;
     }
   }
 }
