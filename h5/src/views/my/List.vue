@@ -12,7 +12,8 @@
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query" icon="el-icon-search" type="primary"
+        <el-button @click="query" icon="el-icon-search"
+type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -33,6 +34,8 @@
           v-for="(item, index) in myExamList"
           :key="index"
           :data="item"
+          :markId="markId"
+          :percentage="percentage"
           name="myMarkExamList"
           @mark="markHandler"
         ></ListCard>
@@ -64,6 +67,8 @@ export default {
       curPage: 1,
       total: 1,
       type: 1,
+      percentage: 0,
+      markId: null,
       queryForm: {
         examName: '',
       },
@@ -157,27 +162,89 @@ export default {
         query: {
           id: data.id,
           paperId: data.paperId,
-          view: data.exam !== 'start',
+          preview: data.exam !== 'start',
           examEndTime: data.exam === 'start' ? data.examEndTime : '',
         },
       })
     },
     // 我的阅卷操作
-    markHandler(data) {
+    async markHandler(data) {
+      this.markId = data.examId
       const markStartTime = new Date(data.markStartTime).getTime()
       const now = new Date().getTime()
       if (now < markStartTime) {
         this.$tools.message('阅卷未开始，请等待...', 'warning')
         return
       }
-      this.$router.push({
-        path: '/my/markExam',
-        query: {
-          examId: data.examId,
-          paperId: data.paperId,
-          examUserIds: data.examUserIds,
-          view: data.mark !== 'start',
-        },
+
+      if (data.autoState === 1 || now > markStartTime) {
+        this.$router.push({
+          path: '/my/markExam',
+          query: {
+            examId: data.examId,
+            paperId: data.paperId,
+            markId: data.id,
+            preview: data.mark !== 'start',
+          },
+        })
+        return
+      }
+
+      const res = await this.$https
+        .myExamAutoScore({
+          id: data.id,
+          examId: data.examIds,
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+
+      if (res?.code === 200) {
+        setTimeout(async () => {
+          const percentage = await this.getProgress(res.data)
+          if (percentage.data.curNum === percentage.data.totalNum) {
+            this.percentage = 100
+            if (percentage.data.code === 2) {
+              setTimeout(() => {
+                this.$router.push({
+                  path: '/my/markExam',
+                  query: {
+                    examId: data.examId,
+                    markId: data.id,
+                    paperId: data.paperId,
+                    preview: data.mark !== 'start',
+                  },
+                })
+                this.percentage = 0
+                this.markId = null
+                clearTimeout()
+              }, 500)
+            } else {
+              setTimeout(() => {
+                this.percentage = 0
+                this.markId = null
+                this.query()
+              }, 500)
+            }
+            return
+          }
+        }, 1000)
+
+        setTimeout(async () => {
+          const percentage = await this.getProgress(res.data)
+          this.percentage +=
+            Math.ceil(
+              Math.abs(percentage.data.curNum / percentage.data.totalNum) * 100
+            ) - this.percentage
+        }, 1000)
+      } else {
+        this.$tools.message(res.msg || '智能阅卷失败！请重试！', 'erroe')
+      }
+    },
+    // 获取进度
+    async getProgress(id) {
+      return await this.$https.myExamAiProgress({
+        id,
       })
     },
     // 分页切换
