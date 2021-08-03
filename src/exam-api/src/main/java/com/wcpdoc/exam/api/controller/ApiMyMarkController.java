@@ -185,6 +185,18 @@ public class ApiMyMarkController extends BaseController {
 			myExamDetail.setMyMarkId(getCurUser().getId());
 			myExamDetail.setMarkTime(new Date());
 			myExamDetailService.update(myExamDetail);
+			
+			//我的考试更新分数
+			BigDecimal totalScore = new BigDecimal(0);
+			List<MyExamDetail> MyExamDetailList = myExamDetailService.getList(myExamDetail.getMyExamId());
+			for(MyExamDetail entity : MyExamDetailList){
+				totalScore = totalScore.add(entity.getScore());
+			}
+			MyExam myExam = myExamService.getEntity(myExamDetail.getMyExamId());
+			myExam.setAnswerEndTime(new Date());
+			myExam.setTotalScore(totalScore);
+			myExamService.update(myExam);
+			
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("更新分数错误：", e);
