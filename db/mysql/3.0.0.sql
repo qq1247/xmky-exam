@@ -224,7 +224,7 @@ drop table if exists EXM_PAPER;
 /*==============================================================*/
 create table EXM_PAPER
 (
-   ID                   int not null comment '主键',
+   ID                   int not null auto_increment comment '主键',
    NAME                 varchar(32) comment '名称',
    PASS_SCORE           decimal(5,2) comment '及格分数（%）',
    TOTAL_SCORE          decimal(5,2) comment '总分数',
