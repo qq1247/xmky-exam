@@ -166,6 +166,8 @@ export default {
   myExamDoAnswer: (params) => post('myExam/doAnswer', params),
   myExamDoScore: (params) => post('myMark/doScore', params),
   myExamAutoScore: (params) => post('myMark/autoScore', params),
+  myExamAiProgress: (params) => post('progressBar/get', params),
+  myMarksListPage: (params) => post('myMark/markListpage', params),
 
   // 基础功能相关
   login: (params) => post('login/in', params),
