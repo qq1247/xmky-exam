@@ -54,10 +54,12 @@
                       }
                     "
                     class="children-option"
+                    v-if="myExamDetailCache[child.id]"
                     v-model="myExamDetailCache[child.id].answers[0]"
                   >
                     <el-radio
                       :key="index"
+                      :disabled="preview === 'true' ? true : false"
                       :label="String.fromCharCode(65 + index)"
                       class="option-item"
                       v-for="(option, index) in child.options"
@@ -79,12 +81,14 @@
                       }
                     "
                     class="children-option"
+                    v-if="myExamDetailCache[child.id]"
                     v-model="myExamDetailCache[child.id].answers"
                   >
                     <el-checkbox
                       :key="index"
                       :label="String.fromCharCode(65 + index)"
                       class="option-item"
+                      :disabled="preview === 'true' ? true : false"
                       v-for="(option, index) in child.options"
                     >
                       <div
@@ -96,21 +100,19 @@
                 </template>
 
                 <!-- 填空 -->
-                <template v-if="child.type === 3">
+                <template
+                  v-if="child.type === 3 && myExamDetailCache[child.id]"
+                >
                   <el-input
                     class="question-text"
                     @change="
                       (val) => {
-                        updateFillBlanksAnswer(
-                          child.id,
-                          val,
-                          child.answers,
-                          index
-                        )
+                        updateClozeAnswer(child.id, val, child.answers, index)
                       }
                     "
                     placeholder="请输入内容"
                     :key="index"
+                    :disabled="preview === 'true' ? true : false"
                     v-for="(answer, index) in myExamDetailCache[child.id]
                       .answers"
                     v-model="myExamDetailCache[child.id].answers[index]"
@@ -128,6 +130,7 @@
                       }
                     "
                     class="children-option"
+                    v-if="myExamDetailCache[child.id]"
                     v-model="myExamDetailCache[child.id].answers[0]"
                   >
                     <el-radio
@@ -135,6 +138,7 @@
                       :label="option"
                       class="option-item"
                       v-for="(option, index) in ['对', '错']"
+                      :disabled="preview === 'true' ? true : false"
                       >{{ option }}</el-radio
                     >
                   </el-radio-group>
@@ -152,6 +156,8 @@
                     "
                     placeholder="请输入内容"
                     type="textarea"
+                    v-if="myExamDetailCache[child.id]"
+                    :disabled="preview === 'true' ? true : false"
                     v-model="myExamDetailCache[child.id].answers[0]"
                   ></el-input>
                 </template>
@@ -170,7 +176,7 @@
         v-if="paperQuestion.length > 0"
         v-model="collapseShow"
       >
-        <template v-if="view == 'false'">
+        <template v-if="preview == 'false'">
           <div class="exam-head">答题卡</div>
           <div class="exam-time">
             倒计时：<CountDown :time="time" @finish="forceExamEnd"></CountDown>
@@ -190,7 +196,7 @@
             >{{ index + 1 }}</a
           >
         </el-collapse-item>
-        <div v-if="view == 'false'" class="exam-footer" @click="examEnd">
+        <div v-if="preview == 'false'" class="exam-footer" @click="examEnd">
           提交
         </div>
       </el-collapse>
@@ -206,7 +212,7 @@ export default {
   data() {
     return {
       id: 0,
-      view: false,
+      preview: false,
       labelPosition: 'left',
       paperName: '',
       hrefPointer: '',
@@ -226,10 +232,10 @@ export default {
     }
   },
   created() {
-    const { id, paperId, view, examEndTime } = this.$route.query
+    const { id, paperId, preview, examEndTime } = this.$route.query
     this.id = id
     this.paperId = paperId
-    this.view = view
+    this.preview = preview
     this.examEndTime = examEndTime
     this.init()
   },
@@ -238,12 +244,18 @@ export default {
     goBack() {
       this.$router.back()
     },
+    // 定位锚点
+    toHref(id) {
+      this.hrefPointer = `#p-${id}`
+      document.documentElement.scrollTop =
+        document.querySelector(this.hrefPointer).offsetTop - 50
+    },
     // 初始化
     async init() {
       await this.setTime()
       await this.queryPaper()
       await this.queryPaperInfo()
-      await this.queryMyExamAnswerInfo()
+      await this.queryAnswerInfo()
     },
     // 校准时间差
     async setTime() {
@@ -275,7 +287,7 @@ export default {
       } catch (error) {}
     },
     // 查询我的答案信息
-    async queryMyExamAnswerInfo() {
+    async queryAnswerInfo() {
       try {
         const res = await this.$https.myExamAnswerList({
           id: this.id,
@@ -303,7 +315,7 @@ export default {
     },
     // 更新答案
     async updateAnswer(questionId, answers) {
-      if (this.view === 'true') {
+      if (this.preview === 'true') {
         return
       }
 
@@ -318,8 +330,8 @@ export default {
       })
     },
     // 更新填空答案
-    async updateFillBlanksAnswer(questionId, val, answers, index) {
-      if (this.view === 'true') {
+    async updateClozeAnswer(questionId, val, answers, index) {
+      if (this.preview === 'true') {
         return
       }
       if (!this.myExamDetailCache[questionId]) {
@@ -332,12 +344,6 @@ export default {
         myExamDetailId: this.myExamDetailCache[questionId].myExamDetailId,
         answers: answers,
       })
-    },
-    // 定位锚点
-    toHref(id) {
-      this.hrefPointer = `#p-${id}`
-      document.documentElement.scrollTop =
-        document.querySelector(this.hrefPointer).offsetTop - 50
     },
     // 考试结束
     async examEnd() {
@@ -371,256 +377,5 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.container {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  padding-top: 0;
-  padding-bottom: 0;
-  background: #fff;
-}
-
-.head {
-  width: 100%;
-  height: 50px;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(10px);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-  color: #fff;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1000;
-  .head-left {
-    color: #fff;
-  }
-  .head-right {
-    color: #fff;
-    .common {
-      font-size: 20px;
-    }
-  }
-}
-
-.content {
-  width: 100%;
-  margin-top: 50px;
-}
-
-.content-center {
-  background: #fff;
-  margin: 0 auto;
-  width: 960px;
-  .center-drag {
-    width: 100%;
-    padding: 10px;
-    .drag-item {
-      margin-bottom: 10px;
-    }
-  }
-  .chapter {
-    display: flex;
-    flex-direction: column;
-    padding: 0 10px;
-    .chapter-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      .item-title {
-        font-size: 16px;
-      }
-      /deep/.el-button {
-        opacity: 0;
-        .common {
-          font-size: 12px;
-          margin-right: 5px;
-        }
-      }
-      &:hover {
-        .el-button {
-          opacity: 1;
-        }
-      }
-    }
-    .chapter-description {
-      font-size: 14px;
-      color: #999;
-      padding-bottom: 10px;
-      margin-top: -5px;
-    }
-  }
-  .paper-title {
-    font-size: 16px;
-    color: #333;
-    padding: 20px 0 10px 10px;
-  }
-  .paper-intro {
-    font-size: 12px;
-    color: #666;
-    padding: 0 10px 15px;
-    border-bottom: 1px solid #d8d8d8;
-  }
-  .item-title {
-    line-height: 40px;
-  }
-  .children-content {
-    border: 1px solid #d8d8d8;
-    font-size: 14px;
-    box-sizing: border-box;
-    margin-bottom: 10px;
-    .question-title {
-      display: flex;
-      line-height: 40px;
-      padding: 0 10px;
-      background: #e5f4fc;
-      word-wrap: break-word;
-      word-break: break-all;
-    }
-  }
-  .children-option {
-    padding: 10px 0 0 25px;
-  }
-  .option-item,
-  .flex-items-center {
-    display: flex;
-    justify-items: center;
-    line-height: 30px;
-  }
-  /deep/ .el-radio__input,
-  /deep/ .el-checkbox__input {
-    padding-top: 7px;
-  }
-  .option-item-text {
-    border-bottom: 1px solid #d8d8d8;
-    padding: 20px 10px 5px;
-    color: #333;
-    margin: 0 25px 0;
-  }
-  .question-text {
-    margin: 4px 1%;
-    width: 98%;
-  }
-  .children-analysis {
-    line-height: 25px;
-    padding-left: 20px;
-    margin: 15px 0;
-    font-size: 13px;
-    color: #666;
-    span {
-      font-size: 15px;
-      font-weight: bold;
-    }
-  }
-  .el-tag {
-    margin-right: 6px;
-  }
-  .children-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-  }
-  .btn {
-    padding: 5px 10px;
-  }
-}
-
-.data-null {
-  padding-top: 30px;
-  .data-img {
-    width: 64px;
-    height: 64px;
-  }
-  .data-tip {
-    margin: 0 auto 20px;
-  }
-}
-
-.el-radio,
-.el-checkbox {
-  margin-right: 10px;
-}
-
-.box-card-no-border {
-  border: none;
-}
-
-/deep/ .el-card__body {
-  padding: 5px;
-}
-
-.el-input /deep/.el-input-group__prepend {
-  background-color: #fff;
-  border: 0px;
-  width: 38px;
-}
-/deep/ .el-form-item--mini.el-form-item,
-.el-form-item--small.el-form-item {
-  margin-bottom: 24px;
-}
-
-/deep/ .el-form-item__error {
-  line-height: 20px;
-}
-/deep/ .el-collapse-item__header {
-  height: 36px;
-  line-height: 36px;
-  background-color: #f2f2f2;
-  padding-left: 20px;
-}
-/deep/ .el-collapse-item__content {
-  padding: 10px;
-  font-size: 14px;
-}
-.exam-card {
-  width: 214px;
-  font-family: 'Microsoft YaHei';
-  border: 1px solid #e6e6e6;
-  position: fixed;
-  right: 50px;
-  top: 70px;
-}
-.exam-time {
-  line-height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #0094e5;
-}
-.exam-card .exam-head,
-.exam-footer {
-  background: #1e9fff;
-  color: #fff;
-  height: 40px;
-  line-height: 40px;
-  font-size: 18px;
-  text-align: center;
-  padding: 0px 18px;
-  cursor: pointer;
-}
-.exam-card a {
-  width: 32px;
-  height: 25px;
-  border: 1px solid #eceaea;
-  color: #888;
-  text-align: center;
-  line-height: 23px;
-  margin-left: 1px;
-  display: inline-block;
-  margin-top: 5px;
-  margin-right: 5px;
-  border-radius: 3px;
-  text-decoration: none;
-  cursor: pointer;
-}
-.exam-card a:hover {
-  color: #1e9fff;
-  border: 1px solid #1e9fff;
-}
-/deep/ #app {
-  background: #fff;
-}
+@import '@/assets/style/exam.scss';
 </style>
