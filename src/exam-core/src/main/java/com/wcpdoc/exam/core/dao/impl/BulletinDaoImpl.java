@@ -24,7 +24,7 @@ public class BulletinDaoImpl extends RBaseDaoImpl<Bulletin> implements BulletinD
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT BULLETIN.ID, BULLETIN.TITLE, BULLETIN.TOP_STATE, BULLETIN.UPDATE_TIME, "
-				+ "BULLETIN.IMG_FILE_ID, USER.NAME AS UPDATE_USER_NAME, "
+				+ "BULLETIN.IMG_FILE_ID, BULLETIN.STATE, USER.NAME AS UPDATE_USER_NAME, "
 				+ "( SELECT GROUP_CONCAT( Z.NAME ) FROM SYS_USER Z WHERE BULLETIN.READ_USER_IDS LIKE CONCAT( '%', Z.ID, '%' ) ) AS READ_USER_NAMES "
 				+ "FROM EXM_BULLETIN BULLETIN "
 				+ "LEFT JOIN SYS_USER USER ON BULLETIN.UPDATE_USER_ID = USER.ID ";
@@ -32,11 +32,12 @@ public class BulletinDaoImpl extends RBaseDaoImpl<Bulletin> implements BulletinD
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("id")), "BULLETIN.ID = ?", pageIn.get("id"))
 			   .addWhere(ValidateUtil.isValid(pageIn.get("title")), "BULLETIN.TITLE LIKE ?", "%" + pageIn.get("title") + "%")
 			   .addWhere(ValidateUtil.isValid(pageIn.get("topState")), "BULLETIN.TOP_STATE = ?", pageIn.get("topState", Integer.class))
+			   .addWhere(ValidateUtil.isValid(pageIn.get("state")), "BULLETIN.STATE = ?", pageIn.get("state", Integer.class))
 			   .addWhere("BULLETIN.STATE != ?", 0)
 			   .addOrder("BULLETIN.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDate(pageOut.getList(), "UPDATE_TIME", DateUtil.FORMAT_DATE_TIME);
-		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), "TOP_STATE", "topState");
+		HibernateUtil.formatDate(pageOut.getList(), "updateTime", DateUtil.FORMAT_DATE_TIME);
+		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), "STATE_YN", "topState");
 		return pageOut;
 	}
 

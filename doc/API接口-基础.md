@@ -404,6 +404,7 @@ code == 401 无权限或登录超时
 |data.curNum    | Integer   | 当前数量 |
 |data.totalNum    | Integer   | 总数量 |
 |data.msg    | String   | 消息 |
+|data.code    | Integer   | 状态 |
 
 ####公告栏列表：bulletinBoard/listpage
 ######请求参数

@@ -49,16 +49,10 @@
         <el-form-item label="标题" label-width="120px" prop="title">
           <el-input placeholder="请输入标题" v-model="editForm.title"></el-input>
         </el-form-item>
-        <el-form-item label="封面" label-width="120px" prop="imgFileId">
-          <el-upload :headers="headers" :on-success="fileUploadBackcall" :show-file-list="false" action="/api/file/upload" class="avatar-uploader" name="files">
-            <img :src="editForm.imageUrl" class="avatar" v-if="editForm.imageUrl" />
-            <i class="el-icon-plus avatar-uploader-icon" v-else></i>
-          </el-upload>
-        </el-form-item>
         <el-form-item label="内容" label-width="120px" prop="content">
           <Editor :value="editForm.content" @editorListener="editorListener" id="content"></Editor>
         </el-form-item>
-        <el-form-item label="阅读人员" label-width="120px" prop="content">
+        <el-form-item label="阅读人员" label-width="120px" prop="examUser">
           <CustomSelect
             :currentPage="editForm.curPage"
             :filterable="true"
@@ -73,13 +67,22 @@
             @change="selectUser"
             @currentChange="getMoreUser"
             @focus="getUserList()"
-            placeholder="请选择考试用户"
+            placeholder="请选择用户"
           >
             <el-option :key="item.id" :label="item.name" :value="item.id" v-for="item in editForm.examUsers"></el-option>
           </CustomSelect>
         </el-form-item>
-        <el-form-item label="置顶" label-width="120px" prop="topState">
+        <el-form-item label="置顶展示" label-width="120px" prop="topState">
           <el-switch active-color="#13ce66" inactive-color="#ff4949" v-model="editForm.topState" :active-value="1" :inactive-value="2"></el-switch>
+        </el-form-item>
+        <el-form-item label="轮播展示" label-width="120px" prop="state">
+          <el-switch active-color="#13ce66" inactive-color="#ff4949" v-model="editForm.state" :active-value="2" :inactive-value="1"></el-switch>
+        </el-form-item>
+        <el-form-item label="轮播图片" label-width="120px" prop="imgFileId" v-if="editForm.state==2">
+          <el-upload :headers="headers" :on-success="fileUploadBackcall" :show-file-list="false" action="/api/file/upload" class="avatar-uploader" name="files">
+            <img :src="editForm.imageUrl" class="avatar" v-if="editForm.imageUrl" />
+            <i class="el-icon-plus avatar-uploader-icon" v-else></i>
+          </el-upload>
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
@@ -122,6 +125,8 @@ export default {
         imgFileId: null, // 图片
         imageUrl: null,
         content: null, // 内容
+        state: 1, // 状态
+        topState: 1, // 置顶状态
         show: false, // 是否显示页面
         examUsers: [],
         examUser: [],
@@ -131,6 +136,7 @@ export default {
         // 校验
         rules: {
           title: [{ required: true, message: '请输入标题', trigger: 'change' }],
+          examUser: [{ required: true, message: '请选择用户', trigger: 'change' }],
         },
         examRemarks: [
           {
@@ -219,6 +225,7 @@ export default {
           content: this.editForm.content,
           readUserIds: this.editForm.examUser,
           topState: this.editForm.topState,
+          state: this.editForm.state
         })
 
         if (res.code != 200) {
@@ -245,6 +252,7 @@ export default {
           content: this.editForm.content,
           readUserIds: this.editForm.examUser,
           topState: this.editForm.topState,
+          state: this.editForm.state
         })
 
         if (res.code != 200) {
@@ -289,6 +297,7 @@ export default {
       this.editForm.imgFileId = res.data.imgFileId
       this.editForm.content = res.data.content
       this.editForm.topState = res.data.topState
+      this.editForm.state = res.data.state
       this.editForm.imageUrl = "/api/file/download?id=" + res.data.imgFileId
       this.editForm.examUser = res.data.readUserIds 
     },

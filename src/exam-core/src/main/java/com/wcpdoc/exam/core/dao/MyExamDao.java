@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
@@ -34,6 +33,16 @@ public interface MyExamDao extends BaseDao<MyExam>{
 	 * @return List<MyExam>
 	 */
 	List<MyExam> getList(Integer examId);
+
+	/**
+	 * 获取我的考试列表
+	 * 
+	 * v1.0 chenyun 2021年7月30日下午3:49:53
+	 * @param examId
+	 * @param userId
+	 * @return MyExam
+	 */
+	MyExam getEntity(Integer examId, Integer userId);
 	
 	/**
 	 * 考试时间表

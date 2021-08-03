@@ -61,12 +61,11 @@ public class ApiBulletinController extends BaseController {
 	@RequestMapping("/add")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult add(Bulletin Bulletin) {
+	public PageResult add(Bulletin bulletin) {
 		try {
-			Bulletin.setState(1);
-			Bulletin.setUpdateTime(new Date());
-			Bulletin.setUpdateUserId(getCurUser().getId());
-			bulletinService.add(Bulletin);
+			bulletin.setUpdateTime(new Date());
+			bulletin.setUpdateUserId(getCurUser().getId());
+			bulletinService.add(bulletin);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加公告错误：{}", e.getMessage());
@@ -86,14 +85,15 @@ public class ApiBulletinController extends BaseController {
 	@RequestMapping("/edit")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult edit(Bulletin Bulletin) {
+	public PageResult edit(Bulletin bulletin) {
 		try {
-			Bulletin entity = bulletinService.getEntity(Bulletin.getId());
-			entity.setTitle(Bulletin.getTitle());
-			entity.setImgFileId(Bulletin.getImgFileId());
-			entity.setContent(Bulletin.getContent());
-			entity.setReadUserIds(Bulletin.getReadUserIds());
-			entity.setTopState(Bulletin.getTopState());
+			Bulletin entity = bulletinService.getEntity(bulletin.getId());
+			entity.setTitle(bulletin.getTitle());
+			entity.setImgFileId(bulletin.getImgFileId());
+			entity.setContent(bulletin.getContent());
+			entity.setReadUserIds(bulletin.getReadUserIds());
+			entity.setTopState(bulletin.getTopState());
+			entity.setState(bulletin.getState());
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
 			bulletinService.update(entity);
@@ -147,6 +147,7 @@ public class ApiBulletinController extends BaseController {
 					.addAttr("imgFileId", entity.getImgFileId())
 					.addAttr("content", entity.getContent())
 					.addAttr("topState", entity.getTopState())
+					.addAttr("state", entity.getState())
 					.addAttr("readUserIds", readUserIds);
 		} catch (MyException e) {
 			log.error("获取参数错误：{}", e.getMessage());

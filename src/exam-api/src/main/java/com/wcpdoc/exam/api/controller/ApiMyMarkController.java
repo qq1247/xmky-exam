@@ -91,7 +91,7 @@ public class ApiMyMarkController extends BaseController {
 	}
 	
 	/**
-	 * 我考试的列表
+	 * 我的考试列表
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
 	 * @return pageOut
@@ -185,6 +185,18 @@ public class ApiMyMarkController extends BaseController {
 			myExamDetail.setMyMarkId(getCurUser().getId());
 			myExamDetail.setMarkTime(new Date());
 			myExamDetailService.update(myExamDetail);
+			
+			//我的考试更新分数
+			BigDecimal totalScore = new BigDecimal(0);
+			List<MyExamDetail> MyExamDetailList = myExamDetailService.getList(myExamDetail.getMyExamId());
+			for(MyExamDetail entity : MyExamDetailList){
+				totalScore = totalScore.add(entity.getScore());
+			}
+			MyExam myExam = myExamService.getEntity(myExamDetail.getMyExamId());
+			myExam.setAnswerEndTime(new Date());
+			myExam.setTotalScore(totalScore);
+			myExamService.update(myExam);
+			
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("更新分数错误：", e);
@@ -205,12 +217,12 @@ public class ApiMyMarkController extends BaseController {
 	@RequestMapping("/doScore")
 	@ResponseBody
 	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
-	public PageResult doScore(Integer myExamId) {
+	public PageResult doScore(Integer examId, Integer userId, Integer markId) {
 		try {
 			// 校验数据有效性
-			MyExam myExam = myExamService.getEntity(myExamId);
-			List<MyMark> myMarkList = myMarkService.getList(myExam.getExamId());
-			Exam exam = examService.getEntity(myExam.getExamId());
+			//MyExam myExam = myExamService.getEntity(markId);
+			MyMark myMark = myMarkService.getEntity(markId);
+			Exam exam = examService.getEntity(examId);
 			if (exam.getState() == 0) {
 				throw new MyException("考试已删除！");
 			}
@@ -224,18 +236,11 @@ public class ApiMyMarkController extends BaseController {
 				throw new MyException("阅卷已结束！");
 			}
 
-			boolean ok = false;
-			for (MyMark myMark : myMarkList) {
-				if (myMark.getMarkUserId() == getCurUser().getId()) {
-					ok = true;
-					break;
-				}
-			}
-			if (!ok) {
+			if (myMark.getMarkUserId() != getCurUser().getId()) {
 				throw new MyException("未参与阅卷：" + exam.getName());
 			}
-
-			List<MyExamDetail> myExamDetailList = myExamDetailService.getList(myExamId);
+			MyExam myExam = myExamService.getEntity(examId, userId);
+			List<MyExamDetail> myExamDetailList = myExamDetailService.getList(myExam.getId());
 			int num = 0;
 			BigDecimal totalScore = new BigDecimal(0);
 			for (MyExamDetail myExamDetail : myExamDetailList) {
@@ -283,19 +288,39 @@ public class ApiMyMarkController extends BaseController {
 	@RequestMapping("/autoScore")
 	@ResponseBody
 	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
-	public PageResult autoScore(Integer examId) {
+	public PageResult autoScore(Integer id, Integer examId) {
 		try {
-			String processBarId = UUID.randomUUID().toString();
+			String processBarId = UUID.randomUUID().toString().replaceAll("-", "");
 			LoginUser curUser = getCurUser();
 			new Thread(new Runnable() {
 				public void run() {
-					SpringUtil.getBean(MyExamDetailService.class).autoMark(examId, curUser, processBarId);
+					SpringUtil.getBean(MyExamDetailService.class).autoMark(id, examId, curUser, processBarId);
 				}
 			}).start();
 			
 			return PageResultEx.ok().data(processBarId);
 		} catch (Exception e) {
 			log.error("完成试卷错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 我的阅卷列表
+	 * 
+	 * v1.0 chenyun 2021年8月2日下午3:14:45
+	 * @return PageResult
+	 */
+	@RequestMapping("/markListpage")
+	@ResponseBody
+	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
+	public PageResult markListpage() {
+		try {
+			PageIn pageIn = new PageIn(request);
+			pageIn.addAttr("markUserId", getCurUser().getId()); //阅卷人
+			return PageResultEx.ok().data(myExamService.getListpage(pageIn));
+		} catch (Exception e) {
+			log.error("我的考试列表错误：", e);
 			return PageResult.err();
 		}
 	}

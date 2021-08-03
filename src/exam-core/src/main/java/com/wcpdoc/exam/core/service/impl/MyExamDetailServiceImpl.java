@@ -89,7 +89,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	}
 
 	@Override
-	public void autoMark(Integer examId, LoginUser curUser, String processBarId) {
+	public void autoMark(Integer id, Integer examId, LoginUser curUser, String processBarId) {
 		// 校验数据有效性
 		Exam exam = examService.getEntity(examId);
 		log.info("自动阅卷校验：{}", exam.getName());
@@ -109,7 +109,14 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			log.error("自动阅卷异常：阅卷已结束！");
 			throw new MyException("阅卷已结束！");
 		}
-		List<MyMark> myMarkList = myMarkService.getList(examId);
+		MyMark myMark = myMarkService.getEntity(id);
+		if (myMark.getMarkUserId().intValue() != curUser.getId().intValue()) {
+			log.error("自动阅卷异常：未参与阅卷：{}", exam.getName());
+			throw new MyException(String.format("未参与阅卷：%s", exam.getName()));
+		}
+		myMark.setAutoState(1);
+		myMarkService.update(myMark);
+		/*List<MyMark> myMarkList = myMarkService.getList(examId);
 		boolean hasMyMark = false;
 		for (MyMark myMark : myMarkList) {
 			if (myMark.getMarkUserId().intValue() == curUser.getId().intValue()) {
@@ -120,14 +127,20 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		if (!hasMyMark) {
 			log.error("自动阅卷异常：未参与阅卷：{}", exam.getName());
 			throw new MyException(String.format("未参与阅卷：%s", exam.getName()));
-		}
-
+		}*/
+		
 		// 开始自动阅卷
 		log.info("自动阅卷开始：");
+		List<MyExam> myExamList = new ArrayList<MyExam>();
+		String[] examUserIds = myMark.getExamUserIds().substring(1, myMark.getExamUserIds().length()-1).split(",");// 获取用户信息
+		for(String examUserId : examUserIds){
+			myExamList.add(myExamService.getEntity(examId, Integer.parseInt(examUserId)));
+		}
 		List<PaperQuestionEx> paperQuestionExList = paperService.getPaperList(exam.getPaperId());// 获取试卷信息
-		List<MyExam> myExamList = myExamService.getList(examId);// 获取用户信息
+		//List<MyExam> myExamList = myExamService.getList(examId);
 		double myExamCount = myExamList.size();
-		ProgressBarCache.setProgressBar(processBarId, 0.0, myExamCount, null);
+		Integer code = 0;
+		ProgressBarCache.setProgressBar(processBarId, 0.0, myExamCount, null, code);
 		boolean hasQA = false;
 		for (int i = 0; i < myExamList.size(); i++) {
 			MyExam myExam = myExamList.get(i);
@@ -145,9 +158,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			for (PaperQuestionEx paperQuestionEx : paperQuestionExList) {// 第一层是章节
 				for (PaperQuestionEx questionAnswer : paperQuestionEx.getSubList()) {// 第二层是试题
 					Question question = questionAnswer.getQuestion();
-					if (hasAi(question)) {//是否智能判卷
-						continue;
-					} else {
+					if (!hasAi(question)) {//是否智能判卷
 						hasQA = true;
 					}
 					MyExamDetail userAnswer = userAnswerMap.get(question.getId() + 0L);// 获取当前试题对应的用户答案
@@ -184,15 +195,17 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			myExam.setMarkStartTime(curTime);
 			if (!hasQA) {//如果没有人工阅卷，表示阅卷完成
 				myExam.setMarkState(3);
-				myExam.setAnswerEndTime(curTime);
-				myExam.setTotalScore(totalScore.getResult());
-				msg = "自动阅卷完成";
+				code = 3;
+				msg = "阅卷完成";
 			} else {//否则表示阅卷中，等待人工阅卷
 				myExam.setMarkState(2);
-				msg = "自动阅卷部分已完成，问答题请人工阅卷！";
+				code = 2;
+				msg = "自动阅卷部分已完成，请人工阅卷！";
 			}
+			myExam.setAnswerEndTime(curTime);
+			myExam.setTotalScore(totalScore.getResult());
 			myExamService.update(myExam);
-			ProgressBarCache.setProgressBar(processBarId, i + 1.0, myExamCount, msg);
+			ProgressBarCache.setProgressBar(processBarId, i + 1.0, myExamCount, msg, code);
 			log.info("自动阅卷进行：进度{}", ProgressBarCache.getProgressBar(processBarId).getPercent());
 		}
 		log.info("自动阅卷结束：");
