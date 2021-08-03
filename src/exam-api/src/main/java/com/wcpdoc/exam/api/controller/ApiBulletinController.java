@@ -89,7 +89,7 @@ public class ApiBulletinController extends BaseController {
 		try {
 			Bulletin entity = bulletinService.getEntity(bulletin.getId());
 			entity.setTitle(bulletin.getTitle());
-			entity.setImgFileId(bulletin.getImgFileId());
+			entity.setImgs(bulletin.getImgs());
 			entity.setContent(bulletin.getContent());
 			entity.setReadUserIds(bulletin.getReadUserIds());
 			entity.setTopState(bulletin.getTopState());
@@ -144,7 +144,7 @@ public class ApiBulletinController extends BaseController {
 			return PageResultEx.ok()
 					.addAttr("id", entity.getId())
 					.addAttr("title", entity.getTitle())
-					.addAttr("imgFileId", entity.getImgFileId())
+					.addAttr("imgs", entity.getImgs())
 					.addAttr("content", entity.getContent())
 					.addAttr("topState", entity.getTopState())
 					.addAttr("state", entity.getState())
