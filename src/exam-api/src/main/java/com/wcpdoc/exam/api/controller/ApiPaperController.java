@@ -85,11 +85,6 @@ public class ApiPaperController extends BaseController {
 			PageIn pageIn = new PageIn(request);
 			pageIn.addAttr("curUserId", getCurUser().getId());
 			PageOut listpage = paperService.getListpage(pageIn);
-			for(Map<String,Object> map : listpage.getList()){
-				BigDecimal totalScore = new BigDecimal(map.get("totalScore").toString());
-				BigDecimal passRate = new BigDecimal(map.get("passScore").toString()).divide(new BigDecimal(100));
-				map.put("passScore", totalScore.multiply(passRate));
-			}
 			return PageResultEx.ok().data(listpage);
 		} catch (Exception e) {
 			log.error("试卷列表错误：", e);

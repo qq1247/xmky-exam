@@ -35,6 +35,7 @@ import com.wcpdoc.exam.core.service.MyMarkService;
 import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.PaperTypeService;
 import com.wcpdoc.exam.core.service.QuestionService;
+import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
@@ -167,6 +168,9 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		List<MyMark> myMarkList = myMarkService.getList(id);
 		for (MyMark myMark : myMarkList) {
 			myMarkService.del(myMark.getId());
+		}
+		if (markUserIds.length == 1) {
+			examUserIds[0] = StringUtil.join(examUserIds);
 		}
 		
 		for(int i = 0; i < markUserIds.length; i++) {
