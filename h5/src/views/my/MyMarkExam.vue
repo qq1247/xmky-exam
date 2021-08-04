@@ -135,7 +135,13 @@
 
                 <div class="children-analysis">
                   <el-row :gutter="10">
-                    <template v-if="child.ai === 1">
+                    <template v-if="[1, 2, 4].includes(child.type)">
+                      <el-col :span="2.5"> 【答案】： </el-col>
+                      <el-col :span="21">
+                        <div v-html="`${child.answers[0].answer}`"></div>
+                      </el-col>
+                    </template>
+                    <template v-if="child.type === 3">
                       <el-col :span="2.5">【答案】：</el-col>
                       <el-col :span="21">
                         <div
@@ -144,9 +150,7 @@
                           class="answers-item"
                         >
                           <span
-                            :class="
-                              child.answers.length > 1 ? 'answers-tag' : ''
-                            "
+                            class="answers-tag"
                             v-for="(ans, index) in answer.answer"
                             :key="index"
                             >{{ ans }}</span
@@ -154,10 +158,27 @@
                         </div>
                       </el-col>
                     </template>
-                    <template v-if="child.ai === 2">
+                    <template v-if="child.ai === 5">
                       <el-col :span="2.5"> 【答案】： </el-col>
                       <el-col :span="21">
-                        <div v-html="`${child.answers[0].answer}`"></div>
+                        <template v-if="child.ai === 1">
+                          <div
+                            v-for="answer in child.answers"
+                            :key="answer.id"
+                            class="answers-item"
+                          >
+                            <span
+                              class="answers-tag"
+                              v-for="(ans, index) in answer.answer"
+                              :key="index"
+                              >{{ ans }}</span
+                            >
+                          </div>
+                        </template>
+                        <div
+                          v-if="child.ai === 2"
+                          v-html="`${child.answers[0].answer}`"
+                        ></div>
                       </el-col>
                     </template>
                   </el-row>
