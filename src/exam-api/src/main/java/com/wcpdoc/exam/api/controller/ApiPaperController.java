@@ -22,6 +22,7 @@ import com.wcpdoc.exam.base.cache.DictCache;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.entity.Paper;
@@ -83,7 +84,8 @@ public class ApiPaperController extends BaseController {
 		try {
 			PageIn pageIn = new PageIn(request);
 			pageIn.addAttr("curUserId", getCurUser().getId());
-			return PageResultEx.ok().data(paperService.getListpage(pageIn));
+			PageOut listpage = paperService.getListpage(pageIn);
+			return PageResultEx.ok().data(listpage);
 		} catch (Exception e) {
 			log.error("试卷列表错误：", e);
 			return PageResult.err();
