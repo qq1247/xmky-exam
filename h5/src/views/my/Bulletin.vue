@@ -5,13 +5,29 @@
         <el-row>
           <el-col :span="17">
             <el-form-item label prop="name">
-              <el-input @focus="queryForm.queryShow = true" placeholder="请输入标题" v-model="queryForm.title"></el-input>
+              <el-input
+                @focus="queryForm.queryShow = true"
+                placeholder="请输入标题"
+                v-model="queryForm.title"
+              ></el-input>
             </el-form-item>
-            <el-button @click="query" class="query-search" icon="el-icon-search" type="primary">查询</el-button>
+            <el-button
+              @click="query"
+              class="query-search"
+              icon="el-icon-search"
+              type="primary"
+              >查询</el-button
+            >
           </el-col>
           <el-col :span="7">
             <el-form-item style="float: right">
-              <el-button @click="editForm.show = true" icon="el-icon-circle-plus-outline" size="mini" type="primary">添加</el-button>
+              <el-button
+                @click="editForm.show = true"
+                icon="el-icon-circle-plus-outline"
+                size="mini"
+                type="primary"
+                >添加</el-button
+              >
             </el-form-item>
           </el-col>
         </el-row>
@@ -26,33 +42,68 @@
           </el-table-column>
           <el-table-column label="置顶">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.topStateName }}</span>
+              <span style="margin-left: 10px">{{
+                scope.row.topStateName
+              }}</span>
             </template>
           </el-table-column>
           <el-table-column label="读权限">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.readUserNames }}</span>
+              <span style="margin-left: 10px">{{
+                scope.row.readUserNames
+              }}</span>
             </template>
           </el-table-column>
           <el-table-column label="操作" width="300">
             <template slot-scope="scope">
-              <el-link :underline="false" @click="get(scope.row.id)" icon="common common-edit">修改</el-link>
-              <el-link :underline="false" @click="del(scope.row.id)" icon="common common-delete">删除</el-link>
+              <el-link
+                :underline="false"
+                @click="get(scope.row.id)"
+                icon="common common-edit"
+                >修改</el-link
+              >
+              <el-link
+                :underline="false"
+                @click="del(scope.row.id)"
+                icon="common common-delete"
+                >删除</el-link
+              >
             </template>
           </el-table-column>
         </el-table>
       </div>
-      <el-pagination :current-page="listpage.curPage" :page-size="listpage.pageSize" :total="listpage.total" @current-change="pageChange" background hide-on-single-page layout="prev, pager, next" next-text="下一页" prev-text="上一页"></el-pagination>
+      <el-pagination
+        :current-page="listpage.curPage"
+        :page-size="listpage.pageSize"
+        :total="listpage.total"
+        @current-change="pageChange"
+        background
+        hide-on-single-page
+        layout="prev, pager, next"
+        next-text="下一页"
+        prev-text="上一页"
+      ></el-pagination>
     </div>
-    <el-dialog :visible.sync="editForm.show" @close="resetData('editForm')" title="公告">
+    <el-dialog
+      :visible.sync="editForm.show"
+      @close="resetData('editForm')"
+      title="公告"
+    >
       <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
         <el-form-item label="标题" label-width="120px" prop="title">
-          <el-input placeholder="请输入标题" v-model="editForm.title"></el-input>
+          <el-input
+            placeholder="请输入标题"
+            v-model="editForm.title"
+          ></el-input>
         </el-form-item>
         <el-form-item label="内容" label-width="120px" prop="content">
-          <Editor :value="editForm.content" @editorListener="editorListener" id="content"></Editor>
+          <Editor
+            :value="editForm.content"
+            @editorListener="editorListener"
+            id="content"
+          ></Editor>
         </el-form-item>
-        <el-form-item label="阅读人员" label-width="120px" prop="examUser">
+        <el-form-item label="阅读人员" label-width="120px">
           <CustomSelect
             :currentPage="editForm.curPage"
             :filterable="true"
@@ -69,25 +120,62 @@
             @focus="getUserList()"
             placeholder="请选择用户"
           >
-            <el-option :key="item.id" :label="item.name" :value="item.id" v-for="item in editForm.examUsers"></el-option>
+            <el-option
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+              v-for="item in editForm.examUsers"
+            ></el-option>
           </CustomSelect>
         </el-form-item>
         <el-form-item label="置顶展示" label-width="120px" prop="topState">
-          <el-switch active-color="#13ce66" inactive-color="#ff4949" v-model="editForm.topState" :active-value="1" :inactive-value="2"></el-switch>
+          <el-switch
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            v-model="editForm.topState"
+            :active-value="1"
+            :inactive-value="2"
+          ></el-switch>
         </el-form-item>
         <el-form-item label="轮播展示" label-width="120px" prop="state">
-          <el-switch active-color="#13ce66" inactive-color="#ff4949" v-model="editForm.state" :active-value="2" :inactive-value="1"></el-switch>
+          <el-switch
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            v-model="editForm.state"
+            :active-value="2"
+            :inactive-value="1"
+          ></el-switch>
         </el-form-item>
-        <el-form-item label="轮播图片" label-width="120px" prop="imgFileId" v-if="editForm.state==2">
-          <el-upload :headers="headers" :on-success="fileUploadBackcall" :show-file-list="false" action="/api/file/upload" class="avatar-uploader" name="files">
-            <img :src="editForm.imageUrl" class="avatar" v-if="editForm.imageUrl" />
+        <el-form-item
+          label="轮播图片"
+          label-width="120px"
+          prop="imgFileId"
+          v-if="editForm.state == 2"
+        >
+          <el-upload
+            :headers="headers"
+            :on-success="fileUploadBackcall"
+            :show-file-list="false"
+            action="/api/file/upload"
+            class="avatar-uploader"
+            name="files"
+          >
+            <img
+              :src="editForm.imageUrl"
+              class="avatar"
+              v-if="editForm.imageUrl"
+            />
             <i class="el-icon-plus avatar-uploader-icon" v-else></i>
           </el-upload>
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="add" type="primary" v-if="editForm.id == null">添加</el-button>
-        <el-button @click="edit" type="primary" v-if="editForm.id != null">修改</el-button>
+        <el-button @click="add" type="primary" v-if="editForm.id == null"
+          >添加</el-button
+        >
+        <el-button @click="edit" type="primary" v-if="editForm.id != null"
+          >修改</el-button
+        >
         <el-button @click="editForm.show = false">取 消</el-button>
       </div>
     </el-dialog>
@@ -136,7 +224,6 @@ export default {
         // 校验
         rules: {
           title: [{ required: true, message: '请输入标题', trigger: 'change' }],
-          examUser: [{ required: true, message: '请选择用户', trigger: 'change' }],
         },
         examRemarks: [
           {
@@ -165,6 +252,7 @@ export default {
         title: this.queryForm.title,
         curPage: curPage,
         pageSize: this.listpage.pageSize,
+        site: 1,
       })
       this.listpage.total = total
       this.listpage.list = list
@@ -225,7 +313,7 @@ export default {
           content: this.editForm.content,
           readUserIds: this.editForm.examUser,
           topState: this.editForm.topState,
-          state: this.editForm.state
+          state: this.editForm.state,
         })
 
         if (res.code != 200) {
@@ -252,7 +340,7 @@ export default {
           content: this.editForm.content,
           readUserIds: this.editForm.examUser,
           topState: this.editForm.topState,
-          state: this.editForm.state
+          state: this.editForm.state,
         })
 
         if (res.code != 200) {
@@ -298,8 +386,8 @@ export default {
       this.editForm.content = res.data.content
       this.editForm.topState = res.data.topState
       this.editForm.state = res.data.state
-      this.editForm.imageUrl = "/api/file/download?id=" + res.data.imgFileId
-      this.editForm.examUser = res.data.readUserIds 
+      this.editForm.imageUrl = '/api/file/download?id=' + res.data.imgFileId
+      this.editForm.examUser = res.data.readUserIds
     },
     // 分页切换
     pageChange(val) {

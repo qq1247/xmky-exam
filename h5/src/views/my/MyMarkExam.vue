@@ -145,10 +145,11 @@
                       <el-col :span="2.5">【答案】：</el-col>
                       <el-col :span="21">
                         <div
-                          v-for="answer in child.answers"
+                          v-for="(answer, index) in child.answers"
                           :key="answer.id"
                           class="answers-item"
                         >
+                          <span>{{ `填空${index + 1}、` }}</span>
                           <span
                             class="answers-tag"
                             v-for="(ans, index) in answer.answer"
@@ -158,15 +159,16 @@
                         </div>
                       </el-col>
                     </template>
-                    <template v-if="child.ai === 5">
+                    <template v-if="child.type === 5">
                       <el-col :span="2.5"> 【答案】： </el-col>
                       <el-col :span="21">
                         <template v-if="child.ai === 1">
                           <div
-                            v-for="answer in child.answers"
+                            v-for="(answer, index) in child.answers"
                             :key="answer.id"
                             class="answers-item"
                           >
+                            <span>{{ `关键词${index + 1}、` }}</span>
                             <span
                               class="answers-tag"
                               v-for="(ans, index) in answer.answer"

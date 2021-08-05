@@ -88,17 +88,17 @@ export default {
         {
           content: '试题管理',
           to: '/examQuestion',
-          icon: 'common common-index',
+          icon: 'common common-question-manage',
         },
         {
           content: '试卷管理',
           to: '/examPaper',
-          icon: 'common common-manage',
+          icon: 'common common-paper-manage',
         },
         {
           content: '考试管理',
           to: '/examSetting',
-          icon: 'common common-index',
+          icon: 'common common-exam-manage',
         },
         {
           content: '我的',
@@ -108,10 +108,12 @@ export default {
         {
           content: '用户管理',
           to: '/user',
+          icon: 'common common-user-manage',
         },
         {
           content: '基础管理',
           to: '/base',
+          icon: 'common common-base-manage',
         },
       ],
     }
@@ -157,7 +159,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import url(//at.alicdn.com/t/font_840312_ujhku1cp2xd.css);
+@import url(//at.alicdn.com/t/font_840312_zilh4immecl.css);
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
