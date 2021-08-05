@@ -71,7 +71,7 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
@@ -98,7 +98,7 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/examListpage")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult examListpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
