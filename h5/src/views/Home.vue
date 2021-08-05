@@ -85,15 +85,17 @@
             <i class="common common-notice"></i><span>公告</span>
           </div>
           <el-row
-            :class="['notice', item.hot ? 'notice-hot' : '']"
+            :class="['notice', item.topState === 1 ? 'notice-hot' : '']"
             :key="item.id"
             v-for="item in bulletinList"
           >
-            <el-col class="notice-left">
-              <i class="common common-remind"></i>
-              <span>{{ item.title }}</span>
+            <el-col :span="12" class="notice-left">
+              <i></i>
+              <span class="ellipsis">{{ item.title }}</span>
             </el-col>
-            <el-col class="notice-right">{{ item.updateTime }}</el-col>
+            <el-col :span="12" class="notice-right">{{
+              item.updateTime
+            }}</el-col>
           </el-row>
         </el-col>
         <el-col :span="16">
@@ -196,7 +198,7 @@ export default {
     // 获取公告列表
     async getBulletinList() {
       const {
-        data: { list, total },
+        data: { list },
       } = await this.$https.bulletinListPage({
         curPage: 1,
         pageSize: 10,
@@ -207,7 +209,7 @@ export default {
     // 获取轮播图
     async getCarouselList() {
       const {
-        data: { list, total },
+        data: { list },
       } = await this.$https.bulletinListPage({
         curPage: 1,
         pageSize: 10,
@@ -223,19 +225,9 @@ export default {
 .container {
   width: 100%;
 }
-.el-carousel__item {
-  border-radius: 3px;
-  h3 {
-    color: #475669;
-    font-size: 14px;
-    opacity: 0.75;
-    line-height: 300px;
-    text-align: center;
-    margin: 0;
-  }
-}
 
 .el-carousel__item {
+  height: 350px;
   &:nth-child(2n) {
     background-color: #99a9bf;
   }
@@ -249,6 +241,7 @@ export default {
     justify-content: space-between;
     align-items: center;
     margin: 0 auto;
+    padding: 0 30px;
   }
 }
 
@@ -263,7 +256,7 @@ export default {
 
 .box-title {
   font-size: 14px;
-  color: #000;
+  color: #d9534f;
   padding: 20px 0 3px;
   display: flex;
   align-items: center;
@@ -422,19 +415,68 @@ export default {
   background: #fff;
   padding: 0 10px;
   cursor: pointer;
+  &:nth-of-type(2) {
+    padding-top: 10px;
+    .notice-left {
+      i::before {
+        display: none;
+      }
+    }
+  }
+  &:nth-last-of-type(1) {
+    padding-bottom: 10px;
+    .notice-left {
+      i::after {
+        display: none;
+      }
+    }
+  }
   &:hover {
-    color: #000;
+    color: #0095e9;
     .notice-right {
-      color: #000;
+      color: #0095e9;
+    }
+    .notice-left {
+      i {
+        background: #0095e5;
+        box-shadow: 0 0 10px 1px rgba(0, 149, 233, 0.5);
+      }
     }
   }
   .notice-left {
-    i {
-      font-size: 12px;
-      font-weight: 600;
-      margin-right: 5px;
-    }
+    display: flex;
+    align-items: center;
     font-weight: 600;
+    line-height: 40px;
+    i {
+      width: 8px;
+      height: 8px;
+      display: block;
+      background: #dfdfdf;
+      border-radius: 4px;
+      margin-right: 8px;
+      position: relative;
+      &::after,
+      &::before {
+        content: '';
+        position: absolute;
+        box-sizing: border-box;
+        width: 1px;
+        height: calc((40px - 8px) / 2);
+        background: #f7f8f9;
+      }
+      &::after {
+        top: calc((40px - 8px) / 4);
+        left: 4px;
+      }
+      &::before {
+        bottom: calc((40px - 8px) / 4);
+        left: 4px;
+      }
+    }
+    span {
+      flex: 1;
+    }
   }
   .notice-right {
     text-align: right;
@@ -444,6 +486,12 @@ export default {
 
 .notice-hot {
   color: #0095e5;
+  .notice-left {
+    i {
+      background: #0095e5;
+      box-shadow: 0 0 10px 1px rgba(0, 149, 233, 0.5);
+    }
+  }
   .notice-right {
     color: #0095e5;
   }
