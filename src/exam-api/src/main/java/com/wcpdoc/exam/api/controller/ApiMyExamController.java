@@ -126,7 +126,7 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/markAnswerList")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
+	@RequiresRoles(value={"subAdmin","user"},logical = Logical.OR)
 	public PageResult markAnswerList(Integer userId, Integer examId) {
 		try {
 			List<Map<String, Object>> list = myExamDetailService.getMarkAnswerList(userId, examId);
@@ -341,7 +341,7 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/rankingPage")
 	@ResponseBody
-	@RequiresRoles(value={"user"},logical = Logical.OR)
+	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult rankingPage() {
 		try {
 			return PageResultEx.ok().data(myExamService.getRankingPage(new PageIn(request)));
@@ -363,7 +363,7 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/count")
 	@ResponseBody
-	@RequiresRoles(value={"user"},logical = Logical.OR)
+	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult count(Integer examId) {
 		try {
 			return PageResultEx.ok().data(myExamService.count(examId));
@@ -385,7 +385,7 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/email")
 	@ResponseBody
-	@RequiresRoles(value={"user"},logical = Logical.OR)
+	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult email(Integer examId) {
 		try {
 			Parm parm = parmService.getEntity(1);
