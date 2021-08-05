@@ -465,7 +465,7 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/paperQuestionList")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	@RequiresRoles(value={"subAdmin","user"},logical = Logical.OR)
 	public PageResult paperQuestionList(Integer id) {
 		try {
 			List<PaperQuestion> chapterList = paperQuestionService.getChapterList(id);
