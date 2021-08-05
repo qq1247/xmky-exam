@@ -10,7 +10,7 @@
             exact
             v-for="nav in navList"
           >
-            {{ nav.content }}
+            <i :class="nav.icon"></i>{{ nav.content }}
             <el-image :src="nav.img" class="logo-img" v-if="nav.img"></el-image>
           </router-link>
         </div>
@@ -18,19 +18,11 @@
           <template v-if="userInfo">
             欢迎您！
             <span class="user-name">{{ JSON.parse(userInfo).userName }}</span>
-            <el-tooltip content="修改密码" effect="dark" placement="right">
-              <i
-                @click="editForm.show = true"
-                class="common common-edit"
-                style="padding-right: 10px; cursor: pointer"
-              ></i>
-            </el-tooltip>
-            <el-tooltip content="退出" effect="dark" placement="right">
-              <i @click="loginOut" class="common common-loginOut"></i>
-            </el-tooltip>
+            <span @click="editForm.show = true">修改密码</span>
+            <span @click="loginOut">退出</span>
           </template>
           <router-link class="header-login" to="/login" v-else
-            >登录</router-link
+            ><i class="common common-login-out"></i>登录</router-link
           >
         </div>
       </div>
@@ -91,22 +83,27 @@ export default {
         {
           content: '首页',
           to: '/',
+          icon: 'common common-index',
         },
         {
           content: '试题管理',
           to: '/examQuestion',
+          icon: 'common common-index',
         },
         {
           content: '试卷管理',
           to: '/examPaper',
+          icon: 'common common-manage',
         },
         {
           content: '考试管理',
           to: '/examSetting',
+          icon: 'common common-index',
         },
         {
           content: '我的',
           to: '/my',
+          icon: 'common common-mine',
         },
         {
           content: '用户管理',
@@ -160,7 +157,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import url(//at.alicdn.com/t/font_840312_y4musq5pzmo.css);
+@import url(//at.alicdn.com/t/font_840312_ujhku1cp2xd.css);
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

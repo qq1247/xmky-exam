@@ -1,75 +1,94 @@
 <template>
   <div class="container">
-    【{{carouselList}}】
     <el-carousel :interval="3000" height="350px">
-      <el-carousel-item :key="carouse.id" v-for="carouse in carouselList">
-        <p>{{carouse.title}}</p>
-        <img :src="'/api/file/download?id='+carouse.imgFileId" style="width:400px;height:350px" />
+      <el-carousel-item
+        class="banner-list"
+        :key="carouse.id"
+        v-for="carouse in carouselList"
+      >
+        <div class="banner-list">
+          <p>{{ carouse.title }}</p>
+          <img
+            :src="'/api/file/download?id=' + carouse.imgFileId"
+            style="width: 400px; height: 350px"
+          />
+        </div>
       </el-carousel-item>
     </el-carousel>
     <div class="container-content">
       <el-row :gutter="10">
-        <el-col :span="10">
+        <el-col :span="8">
           <div class="box-title">
-            <span>考试时间安排</span>
+            <i class="common common-time"></i><span>考试安排</span>
           </div>
-          <el-calendar :range="['2021-06-01', '2021-06-30']"></el-calendar>
+          <el-calendar :range="['2021-06-01', '2021-06-30']">
+            <template #dateCell="{ date, data }">
+              <div
+                class="date-cell"
+                :class="data.isSelected ? 'is-selected' : ''"
+              >
+                <div class="calendar-day">
+                  {{ data.day.split('-').slice(2).join('-') }}
+                </div>
+              </div>
+            </template>
+          </el-calendar>
         </el-col>
-        <el-col :span="14">
-          <div class="box-title">
-            <span>待考列表</span>
-            <span>更多&nbsp;&gt;&gt;</span>
+        <el-col :span="16">
+          <div class="box-title box-divider">
+            <i class="common common-classify"></i><span>待考列表</span>
           </div>
           <el-col :key="item.id" :span="12" v-for="item in examList">
             <el-card class="box-card" shadow="hover">
               <div class="card-header" slot="header">
                 <span class="header-left">{{ item.examName }}</span>
                 <div class="header-right">
-                  <el-tag effect="dark" size="mini" type="danger">
-                    {{
-                    examStatus[item.state]
-                    }}
-                  </el-tag>
-                  <el-tag effect="dark" size="mini" type="warning">
-                    {{
-                    readPaperStatus[item.markState]
-                    }}
-                  </el-tag>
+                  <div class="exam-status">
+                    {{ examStatus[item.state] }}
+                  </div>
                 </div>
               </div>
               <el-row class="body-item">
-                <el-col :span="6" class="item-title">开始时间：</el-col>
-                <el-col :span="18">{{ item.examStartTime }}</el-col>
-              </el-row>
-              <el-row class="body-item">
-                <el-col :span="6" class="item-title">结束时间：</el-col>
-                <el-col :span="18">{{ item.examEndTime }}</el-col>
+                <span class="start-time">{{ item.examStartTime }}</span
+                >({{ getMinute(item.examStartTime, item.examEndTime) }}分钟)
               </el-row>
               <el-row class="body-item">
                 <el-col :span="12">
-                  <el-col :span="8" class="item-title">及格：</el-col>
-                  <el-col :span="16">
-                    {{ item.totalScore * item.paperTotalScore / 100 }}&nbsp;/&nbsp;{{
-                    item.paperTotalScore
-                    }}
+                  <el-col :span="8" class="item-title"
+                    ><i class="common common-good"></i>及格：</el-col
+                  >
+                  <el-col :span="16" class="item-data">
+                    {{
+                      (item.totalScore * item.paperTotalScore) / 100
+                    }}&nbsp;/&nbsp;{{ item.paperTotalScore }}
                   </el-col>
                 </el-col>
                 <el-col :span="12">
-                  <el-col :span="11" class="item-title">考试人数：</el-col>
-                  <el-col :span="13">{{ item.userNum }}</el-col>
+                  <el-col :span="12" class="item-title"
+                    ><i class="common common-persons"></i>考试人数：</el-col
+                  >
+                  <el-col :span="12" class="item-data">{{
+                    item.userNum
+                  }}</el-col>
                 </el-col>
               </el-row>
-              <el-button class="card-btn" icon="el-icon-timer" round size="mini" type="primary">{{ item.markState == 1 ? '开始阅卷' : '开始考试' }}</el-button>
+              <div class="card-btn">
+                <i class="common common-count-down"></i>开始阅卷
+              </div>
             </el-card>
           </el-col>
         </el-col>
       </el-row>
       <el-row :gutter="10">
-        <el-col :span="10">
+        <el-col :span="8">
           <div class="box-title">
-            <span>公告</span>
+            <i class="common common-notice"></i><span>公告</span>
           </div>
-          <el-row :class="['notice', item.hot ? 'notice-hot' : '']" :key="item.id" v-for="item in bulletinList">
+          <el-row
+            :class="['notice', item.hot ? 'notice-hot' : '']"
+            :key="item.id"
+            v-for="item in bulletinList"
+          >
             <el-col class="notice-left">
               <i class="common common-remind"></i>
               <span>{{ item.title }}</span>
@@ -77,46 +96,47 @@
             <el-col class="notice-right">{{ item.updateTime }}</el-col>
           </el-row>
         </el-col>
-        <el-col :span="14">
-          <div class="box-title">
-            <span>待阅列表</span>
-            <span>更多&nbsp;&gt;&gt;</span>
+        <el-col :span="16">
+          <div class="box-title box-divider">
+            <i class="common common-classify"></i><span>待阅列表</span>
           </div>
           <el-col :key="item.id" :span="12" v-for="item in markList">
             <el-card class="box-card" shadow="hover">
               <div class="card-header" slot="header">
                 <span class="header-left">{{ item.name }}</span>
                 <div class="header-right">
-                  <el-tag effect="dark" size="mini" type="danger">
-                    {{
-                    examStatus[item.state]
-                    }}
-                  </el-tag>
+                  <div class="mark-status">
+                    {{ examStatus[item.state] }}
+                  </div>
                 </div>
               </div>
               <el-row class="body-item">
-                <el-col :span="6" class="item-title">开始时间：</el-col>
-                <el-col :span="18">{{ item.markStartTime }}</el-col>
-              </el-row>
-              <el-row class="body-item">
-                <el-col :span="6" class="item-title">结束时间：</el-col>
-                <el-col :span="18">{{ item.markEndTime }}</el-col>
+                <span class="start-time">{{ item.markStartTime }}</span
+                >({{ getMinute(item.markStartTime, item.markEndTime) }}分钟)
               </el-row>
               <el-row class="body-item">
                 <el-col :span="12">
-                  <el-col :span="8" class="item-title">及格：</el-col>
-                  <el-col :span="16">
-                    {{ item.paperPassScore * item.paperTotleScore / 100}} &nbsp;/&nbsp;{{
-                    item.paperTotleScore
-                    }}
+                  <el-col :span="8" class="item-title"
+                    ><i class="common common-good"></i>及格：</el-col
+                  >
+                  <el-col :span="16" class="item-data">
+                    {{
+                      (item.paperPassScore * item.paperTotleScore) / 100
+                    }}&nbsp;/&nbsp;{{ item.paperTotleScore }}
                   </el-col>
                 </el-col>
                 <el-col :span="12">
-                  <el-col :span="11" class="item-title">考试人数：</el-col>
-                  <el-col :span="13">{{ item.userNum }}</el-col>
+                  <el-col :span="12" class="item-title"
+                    ><i class="common common-persons"></i>考试人数：</el-col
+                  >
+                  <el-col :span="12" class="item-data">{{
+                    item.userNum
+                  }}</el-col>
                 </el-col>
               </el-row>
-              <el-button class="card-btn" icon="el-icon-timer" round size="mini" type="primary">{{ item.markState == 1 ? '开始阅卷' : '开始考试' }}</el-button>
+              <div class="card-btn">
+                <i class="common common-count-down"></i>开始阅卷
+              </div>
             </el-card>
           </el-col>
         </el-col>
@@ -126,14 +146,13 @@
 </template>
 
 <script>
-import dayjs from 'dayjs'
 export default {
   data() {
     return {
       examList: [],
       markList: [],
-      examStatus: ['', '未考试', '考试中', '已交卷', '强制交卷'],
-      readPaperStatus: ['', '未阅卷', '阅卷中', '已阅卷'],
+      examStatus: ['', '待考', '考试', '已考', '已考'],
+      readPaperStatus: ['', '待阅', '阅卷', '已阅'],
       bulletinList: [],
       carouselList: [],
     }
@@ -142,6 +161,11 @@ export default {
     this.init()
   },
   methods: {
+    getMinute(startTime, endTime) {
+      const timeDiff =
+        new Date(endTime).getTime() - new Date(startTime).getTime()
+      return Math.ceil(timeDiff / (1000 * 60 * 60))
+    },
     init() {
       this.getCarouselList()
       this.getBulletinList()
@@ -218,6 +242,14 @@ export default {
   &:nth-child(2n + 1) {
     background-color: #d3dce6;
   }
+  .banner-list {
+    width: 1200px;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 auto;
+  }
 }
 
 .container-content {
@@ -227,30 +259,43 @@ export default {
 
 /deep/.el-card {
   border: 1px solid #fff;
-  &.is-hover-shadow {
-    &:hover,
-    &:focus {
-      border: 1px solid #0095e5;
-      box-shadow: none;
-    }
-  }
 }
 
 .box-title {
   font-size: 14px;
   color: #000;
-  line-height: 50px;
+  padding: 20px 0 3px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 0 10px;
+  font-weight: 600;
+  position: relative;
+  border-color: #dcdcdc;
+  border-width: 0;
+  border-style: solid;
+  i {
+    margin-right: 8px;
+  }
+}
+
+.box-divider {
+  &::after {
+    content: '';
+    margin-left: 10px;
+    display: block;
+    flex: 1;
+    box-sizing: border-box;
+    height: 1px;
+    border-color: inherit;
+    border-style: inherit;
+    border-width: 1px 0 0;
+  }
 }
 
 .box-card {
   margin-bottom: 10px;
   /deep/.el-card__header {
-    padding: 13px;
-    border-bottom: 1px solid #f4f5f7;
+    padding: 10px 13px;
+    border-bottom: 1px solid #fff;
   }
   .card-header {
     display: flex;
@@ -258,31 +303,64 @@ export default {
     justify-content: space-between;
     border: none;
     .header-left {
-      font-size: 13px;
+      font-size: 14px;
       color: #232425;
       font-weight: 600;
+      width: 50%;
     }
     .header-right {
-      .el-tag {
-        margin-left: 8px;
-        border-radius: 20px;
-        padding: 0 8px;
+      .exam-status,
+      .mark-status {
+        width: 70px;
+        line-height: 30px;
+        text-align: center;
+        border: 1px solid #83849a;
+        font-size: 12px;
+        color: #83849a;
+      }
+      .mark-status {
+        border: 1px solid #eab7b7;
+        color: #eab7b7;
       }
     }
   }
   /deep/.el-card__body {
-    padding: 15px;
+    padding: 0 13px 15px;
   }
   .body-item {
     line-height: 30px;
     font-size: 13px;
-    color: #777;
+    font-size: 13px;
+    .start-time {
+      font-weight: 600;
+      font-size: 15px;
+    }
     .item-title {
-      color: #252627;
+      color: #999;
+      font-size: 13px;
+      .common {
+        margin-right: 5px;
+        font-size: 14px;
+      }
+    }
+    .item-data {
+      font-size: 15px;
+      font-weight: 600;
     }
   }
   .card-btn {
-    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #0095e5;
+    width: 125px;
+    line-height: 40px;
+    font-size: 14px;
+    color: #fff;
+    margin-top: 10px;
+    .common-count-down {
+      margin-right: 5px;
+    }
   }
 }
 
@@ -307,7 +385,7 @@ export default {
       &.is-today {
         background: #0095e5;
         color: #fff;
-        border-radius: 5px;
+        border-radius: 50%;
       }
       &.is-selected {
         background: rgba(255, 0, 0, 0.1);
@@ -320,15 +398,16 @@ export default {
     }
   }
   .el-calendar-day {
-    height: 60px;
+    height: 50px;
+    line-height: 50px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 0;
     &:hover {
       background: #fff;
       border: 1px solid #0095e5;
       color: #000;
-      border-radius: 5px;
       box-shadow: 0 0 5px 1px rgba(0, 149, 229, 0.1);
     }
   }
@@ -339,7 +418,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  line-height: 40px;
+  line-height: 30px;
   background: #fff;
   padding: 0 10px;
   cursor: pointer;
@@ -355,10 +434,11 @@ export default {
       font-weight: 600;
       margin-right: 5px;
     }
+    font-weight: 600;
   }
   .notice-right {
     text-align: right;
-    color: #858585;
+    color: #999;
   }
 }
 
