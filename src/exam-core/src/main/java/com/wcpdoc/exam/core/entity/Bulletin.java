@@ -27,9 +27,9 @@ public class Bulletin {
 	private Integer id;
 	@Column(name = "TITLE")
 	private String title;
-	@Column(name = "IMGS")
-	private String imgs;
-	@Column(name = "VIDEO")
+	@Column(name = "IMG_FILE_ID")
+	private String imgFileId;
+	@Column(name = "VIDEO_FILE_ID")
 	private String video;
 	@Column(name = "CONTENT")
 	private String content;
@@ -160,12 +160,12 @@ public class Bulletin {
 		this.topState = topState;
 	}
 
-	public String getImgs() {
-		return imgs;
+	public String getImgFileId() {
+		return imgFileId;
 	}
 
-	public void setImgs(String imgs) {
-		this.imgs = imgs;
+	public void setImgFileId(String imgFileId) {
+		this.imgFileId = imgFileId;
 	}
 
 	public String getVideo() {

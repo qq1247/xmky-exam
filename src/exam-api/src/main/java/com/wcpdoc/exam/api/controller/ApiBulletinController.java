@@ -42,10 +42,12 @@ public class ApiBulletinController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
-			return PageResultEx.ok().data(bulletinService.getListpage(new PageIn(request)));
+			PageIn pageIn = new PageIn(request);
+			pageIn.addAttr("curUserId", getCurUser().getId());
+			return PageResultEx.ok().data(bulletinService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("公告列表错误：", e);
 			return PageResult.err();
@@ -89,7 +91,7 @@ public class ApiBulletinController extends BaseController {
 		try {
 			Bulletin entity = bulletinService.getEntity(bulletin.getId());
 			entity.setTitle(bulletin.getTitle());
-			entity.setImgs(bulletin.getImgs());
+			entity.setImgFileId(bulletin.getImgFileId());
 			entity.setContent(bulletin.getContent());
 			entity.setReadUserIds(bulletin.getReadUserIds());
 			entity.setTopState(bulletin.getTopState());
@@ -137,14 +139,14 @@ public class ApiBulletinController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult get(Integer id) {		try {
 			Bulletin entity = bulletinService.getEntity(id);
 			List<Integer> readUserIds = StringUtil.toInt(entity.getReadUserIds());
 			return PageResultEx.ok()
 					.addAttr("id", entity.getId())
 					.addAttr("title", entity.getTitle())
-					.addAttr("imgs", entity.getImgs())
+					.addAttr("imgFileId", entity.getImgFileId())
 					.addAttr("content", entity.getContent())
 					.addAttr("topState", entity.getTopState())
 					.addAttr("state", entity.getState())
