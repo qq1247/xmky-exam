@@ -1,8 +1,15 @@
 package com.wcpdoc.exam.core.dao.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.exam.base.cache.DictCache;
+import com.wcpdoc.exam.base.dao.UserDao;
+import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.core.dao.BulletinDao;
 import com.wcpdoc.exam.core.entity.Bulletin;
 import com.wcpdoc.exam.core.entity.PageIn;
@@ -20,6 +27,8 @@ import com.wcpdoc.exam.core.util.ValidateUtil;
  */
 @Repository
 public class BulletinDaoImpl extends RBaseDaoImpl<Bulletin> implements BulletinDao {
+	@Resource
+	private UserDao userDao;
 	
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
@@ -32,9 +41,25 @@ public class BulletinDaoImpl extends RBaseDaoImpl<Bulletin> implements BulletinD
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("id")), "BULLETIN.ID = ?", pageIn.get("id"))
 			   .addWhere(ValidateUtil.isValid(pageIn.get("title")), "BULLETIN.TITLE LIKE ?", "%" + pageIn.get("title") + "%")
 			   .addWhere(ValidateUtil.isValid(pageIn.get("topState")), "BULLETIN.TOP_STATE = ?", pageIn.get("topState", Integer.class))
+			   .addWhere(pageIn.get("curUserId1", Integer.class)!= null, "BULLETIN.UPDATE_USER_ID = ?", pageIn.get("curUserId1", Integer.class))
 			   .addWhere(pageIn.get("state", Integer.class)!= null, "BULLETIN.STATE = ?", pageIn.get("state", Integer.class))
 			   .addWhere("BULLETIN.STATE != ?", 0)
+			   .addOrder("BULLETIN.TOP_STATE", Order.ASC)
 			   .addOrder("BULLETIN.UPDATE_TIME", Order.DESC);
+		
+		  if (pageIn.get("readUserIds", Integer.class) != null) {
+			   User user = userDao.getEntity(pageIn.get("readUserIds", Integer.class));
+			   StringBuilder partSql = new StringBuilder();
+			   List<Object> params = new ArrayList<>();
+			   partSql.append("(");
+			   partSql.append("BULLETIN.READ_USER_IDS IS NULL OR BULLETIN.READ_USER_IDS LIKE ? ");
+			   params.add("%," + user.getId() + ",%");
+			   /*partSql.append("OR BULLETIN.READ_ORG_IDS LIKE ? ");
+			   params.add("%," + user.getOrgId() + ",%");*/
+			   partSql.append(")");
+			   sqlUtil.addWhere(partSql.toString(), params.toArray(new Object[params.size()]));
+			  }
+		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(), "updateTime", DateUtil.FORMAT_DATE_TIME);
 		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), "STATE_YN", "topState");

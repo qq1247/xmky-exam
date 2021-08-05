@@ -126,7 +126,7 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/markAnswerList")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
+	@RequiresRoles(value={"subAdmin","user"},logical = Logical.OR)
 	public PageResult markAnswerList(Integer userId, Integer examId) {
 		try {
 			List<Map<String, Object>> list = myExamDetailService.getMarkAnswerList(userId, examId);

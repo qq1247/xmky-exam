@@ -46,7 +46,11 @@ public class ApiBulletinController extends BaseController {
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
-			pageIn.addAttr("curUserId", getCurUser().getId());
+			if(pageIn.get("site", Integer.class) == null){
+				pageIn.addAttr("readUserIds", getCurUser().getId());
+			}else{
+				pageIn.addAttr("curUserId", getCurUser().getId());
+			}
 			return PageResultEx.ok().data(bulletinService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("公告列表错误：", e);
@@ -65,6 +69,9 @@ public class ApiBulletinController extends BaseController {
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult add(Bulletin bulletin) {
 		try {
+			if (bulletin.getReadUserIds() != null) {
+				bulletin.setReadUserIds(","+bulletin.getReadUserIds()+",");
+			}
 			bulletin.setUpdateTime(new Date());
 			bulletin.setUpdateUserId(getCurUser().getId());
 			bulletinService.add(bulletin);
@@ -93,7 +100,11 @@ public class ApiBulletinController extends BaseController {
 			entity.setTitle(bulletin.getTitle());
 			entity.setImgFileId(bulletin.getImgFileId());
 			entity.setContent(bulletin.getContent());
-			entity.setReadUserIds(bulletin.getReadUserIds());
+			if (bulletin.getReadUserIds() != null) {
+				entity.setReadUserIds(","+bulletin.getReadUserIds()+",");
+			}else{
+				entity.setReadUserIds(bulletin.getReadUserIds());
+			}
 			entity.setTopState(bulletin.getTopState());
 			entity.setState(bulletin.getState());
 			entity.setUpdateTime(new Date());
@@ -142,7 +153,10 @@ public class ApiBulletinController extends BaseController {
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult get(Integer id) {		try {
 			Bulletin entity = bulletinService.getEntity(id);
-			List<Integer> readUserIds = StringUtil.toInt(entity.getReadUserIds());
+			List<Integer> readUserIds = null;
+			if(entity.getReadUserIds() != null){
+				readUserIds = StringUtil.toInt(entity.getReadUserIds().substring(1, entity.getReadUserIds().length()-1));
+			}
 			return PageResultEx.ok()
 					.addAttr("id", entity.getId())
 					.addAttr("title", entity.getTitle())
