@@ -21,6 +21,7 @@ import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.BulletinService;
 import com.wcpdoc.exam.core.util.StringUtil;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 /**
  * 公告控制层
  * 
@@ -154,7 +155,7 @@ public class ApiBulletinController extends BaseController {
 	public PageResult get(Integer id) {		try {
 			Bulletin entity = bulletinService.getEntity(id);
 			List<Integer> readUserIds = null;
-			if(entity.getReadUserIds() != null){
+			if(ValidateUtil.isValid(entity.getReadUserIds())){
 				readUserIds = StringUtil.toInt(entity.getReadUserIds().substring(1, entity.getReadUserIds().length()-1));
 			}
 			return PageResultEx.ok()
