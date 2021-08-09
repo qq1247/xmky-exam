@@ -1,7 +1,5 @@
 package com.wcpdoc.exam.core.util;
 
-import com.wcpdoc.exam.core.exception.MyException;
-
 public class IdUtil {
 
 	/**
@@ -60,7 +58,7 @@ public class IdUtil {
 	public synchronized long nextId() {
 		long currStmp = getNewstmp();
 		if (currStmp < lastStmp) {
-			throw new MyException("Clock moved backwards.  Refusing to generate id");
+			throw new RuntimeException("Clock moved backwards.  Refusing to generate id");
 		}
 
 		if (currStmp == lastStmp) {

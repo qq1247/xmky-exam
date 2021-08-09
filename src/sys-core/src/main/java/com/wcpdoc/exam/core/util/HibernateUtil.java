@@ -31,7 +31,7 @@ public class HibernateUtil {
 				Date value = (Date) map.get(key);
 				if (value != null) {
 					format.applyPattern(pattern);
-					map.put(key + "_STR", format.format(value));
+					map.put(key, format.format(value));
 				}
 			}
 		}
@@ -49,15 +49,15 @@ public class HibernateUtil {
 	public static void formatDict(List<Map<String, Object>> list, Map<String, String> dictMap, String... params) {
 		for (Map<String, Object> map : list) {
 			for (int i = 0; i < params.length; i++) {
-				String index = params[i];
-				if (map.get(params[++i]) == null) {
+				String paramIndex = params[i];
+				String paramValue = params[++i];
+				if (map.get(paramValue) == null) {
 					continue;
 				}
-				
-				String key = map.get(params[i]).toString();
-				String indexKey = index + "_" + key;
+				String key = map.get(paramValue).toString();
+				String indexKey = paramIndex + "_" + key;
 				String value = dictMap.get(indexKey);
-				map.put(params[i] + "_NAME", value);
+				map.put(params[i] + "Name", value);
 			}
 		}
 	}

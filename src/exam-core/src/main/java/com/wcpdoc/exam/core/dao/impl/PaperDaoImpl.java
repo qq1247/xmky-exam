@@ -33,46 +33,45 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 	
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT PAPER.ID, PAPER.NAME, PAPER_TYPE.NAME AS PAPER_TYPE_NAME, PAPER.STATE, PAPER.PASS_SCORE, PAPER.TOTAL_SCORE, "
-				+ "	PAPER.SCORE_A, PAPER.SCORE_A_REMARK, PAPER.SCORE_B, PAPER.SCORE_B_REMARK, PAPER.SCORE_C, PAPER.SCORE_C_REMARK, "
-				+ "	PAPER.SCORE_D, PAPER.SCORE_D_REMARK, PAPER.SCORE_E, PAPER.SCORE_E_REMARK "
+		String sql = "SELECT PAPER.*, PAPER_TYPE.NAME AS PAPER_TYPE_NAME, UPDATE_USER.NAME AS UPDATE_USER_NAME, CREATE_USER.NAME AS CREATE_USER_NAME "
 				+ "FROM EXM_PAPER PAPER "
-				+ "LEFT JOIN EXM_PAPER_TYPE PAPER_TYPE ON PAPER.PAPER_TYPE_ID = PAPER_TYPE.ID ";
-		
+				+ "LEFT JOIN EXM_PAPER_TYPE PAPER_TYPE ON PAPER.PAPER_TYPE_ID = PAPER_TYPE.ID "
+				+ "LEFT JOIN SYS_USER CREATE_USER ON PAPER.CREATE_USER_ID = CREATE_USER.ID "
+				+ "LEFT JOIN SYS_USER UPDATE_USER ON PAPER.UPDATE_USER_ID = UPDATE_USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "PAPER.PAPER_TYPE_ID = ?", pageIn.getOne())
-				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "PAPER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "PAPER.STATE = ?", pageIn.getThree())
-				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "PAPER.ID = ?", pageIn.getFour())
-				.addWhere(ValidateUtil.isValid(pageIn.getFive()), "PAPER.STATE = ?", pageIn.getTen())
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("paperTypeId")), "PAPER.PAPER_TYPE_ID = ?", pageIn.get("paperTypeId"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("userName")), "CREATE_USER.NAME LIKE ?", "%" + pageIn.get("userName") + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.get("state")), "PAPER.STATE = ?", pageIn.get("state"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("PaperId")), "PAPER.ID = ?", pageIn.get("PaperId"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "PAPER.NAME LIKE ?", "%" + pageIn.get("name") + "%")
 				.addWhere("PAPER.STATE != ?", 0)
 				.addOrder("PAPER.UPDATE_TIME", Order.DESC);
 		
-		if (ValidateUtil.isValid(pageIn.getTen())) {
-			User user = userDao.getEntity(Integer.parseInt(pageIn.getTen()));
+		if (pageIn.get("curUserId", Integer.class) != null && pageIn.get("curUserId", Integer.class) != 1) {
+			User user = userDao.getEntity(pageIn.get("curUserId", Integer.class));
 			StringBuilder partSql = new StringBuilder();
 			List<Object> params = new ArrayList<>();
 			partSql.append("(");
-			partSql.append("PAPER_TYPE.USER_IDS LIKE ? ");
+			partSql.append("PAPER_TYPE.WRITE_USER_IDS LIKE ? ");
 			params.add("%" + user.getId() + "%");
 			
-			partSql.append("OR PAPER_TYPE.ORG_IDS LIKE ? ");
-			params.add("%" + user.getOrgId() + "%");
+			partSql.append("OR PAPER_TYPE.READ_USER_IDS LIKE ? ");
+			params.add("%" + user.getId() + "%");
 			
-			if (ValidateUtil.isValid(user.getPostIds())) {
+			/*if (ValidateUtil.isValid(user.getPostIds())) {
 				String[] postIds = user.getPostIds().substring(1, user.getPostIds().length() - 1).split(",");
 				for (String postId : postIds) {
 					partSql.append("OR PAPER_TYPE.POST_IDS LIKE ? ");
 					params.add("%" + postId + "%");
 				}
-			}
+			}*/
 			partSql.append(")");
 			
 			sqlUtil.addWhere(partSql.toString(), params.toArray(new Object[params.size()]));
 		}
 		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), "STATE", "STATE");
+		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), "STATE", "STATE");
 		return pageOut;
 	}
 
@@ -93,7 +92,7 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 
 	@Override
 	public List<Paper> getList(Integer paperTypeId) {
-		String sql = "SELECT * FROM EXM_PAPER WHERE STATE = 1 AND PAPER_TYPE_ID = ?";
+		String sql = "SELECT * FROM EXM_PAPER WHERE STATE != 0 AND PAPER_TYPE_ID = ?";
 		return getList(sql, new Object[] { paperTypeId }, Paper.class);
 	}
 }

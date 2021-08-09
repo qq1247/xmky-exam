@@ -1,14 +1,20 @@
 package com.wcpdoc.exam.core.dao.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
+import com.wcpdoc.exam.base.cache.DictCache;
 import com.wcpdoc.exam.core.dao.MyMarkDao;
-import com.wcpdoc.exam.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
+import com.wcpdoc.exam.core.util.DateUtil;
+import com.wcpdoc.exam.core.util.HibernateUtil;
+import com.wcpdoc.exam.core.util.SqlUtil;
+import com.wcpdoc.exam.core.util.SqlUtil.Order;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
  * 我的阅卷数据访问层实现
@@ -20,19 +26,33 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		return null;
-	}
-
-	@Override
-	public void del(Integer roomId, Integer userId) {
-		String sql = "DELETE FROM EXM_MY_MARK WHERE EXAM_ID = ? AND USER_ID = ?";
-		update(sql, new Object[]{roomId, userId});
-	}
-
-	@Override
-	public MyMark getEntity(Integer examId, Integer userId) {
-		String sql = "SELECT * FROM EXM_MY_MARK WHERE EXAM_ID = ? AND USER_ID = ?";
-		return getEntity(sql, new Object[]{examId, userId}, MyMark.class);
+		String sql = "SELECT MY_MARK.ID, EXAM.NAME AS EXAM_NAME, EXAM.START_TIME AS EXAM_START_TIME, EXAM.PAPER_ID AS PAPER_ID, "
+				+ "		EXAM.END_TIME AS EXAM_END_TIME, PAPER.TOTAL_SCORE AS PAPER_TOTAL_SCORE, MY_MARK.EXAM_USER_IDS AS EXAM_USER_IDS, "
+				+ "		EXAM.STATE AS STATE, USER.NAME AS MARK_USER_NAME, USER.ID AS MARK_USER_ID, EXAM.ID AS EXAM_ID, UPDATE_USER.ID AS UPDATE_USER_ID, UPDATE_USER.NAME AS UPDATE_USER_NAME, "
+				+ "		EXAM.MARK_START_TIME AS MARK_START_TIME, EXAM.MARK_END_TIME AS MARK_END_TIME, MY_MARK.AUTO_STATE AS AUTO_STATE, PAPER.PASS_SCORE AS PAPER_PASS_SCORE,  "
+				+ "		(SELECT COUNT(*) FROM EXM_MY_MARK A WHERE A.EXAM_ID = MY_MARK.EXAM_ID) AS USER_NUM "
+				+ "		FROM EXM_MY_MARK MY_MARK "
+				+ "		INNER JOIN EXM_EXAM EXAM ON MY_MARK.EXAM_ID = EXAM.ID "
+				+ "		INNER JOIN EXM_PAPER PAPER ON EXAM.PAPER_ID = PAPER.ID "
+				+ "		INNER JOIN SYS_USER USER ON MY_MARK.MARK_USER_ID = USER.ID "
+				+ "		INNER JOIN SYS_USER UPDATE_USER ON MY_MARK.UPDATE_USER_ID = UPDATE_USER.ID ";
+		
+		SqlUtil sqlUtil = new SqlUtil(sql);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("id")), "EXAM.ID = ?", pageIn.get("id"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("examName")), "EXAM.NAME LIKE ?", "%" + pageIn.get("examName") + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.get("userId")), "EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.MARK_USER_ID = ? AND Z.EXAM_ID = MY_MARK.EXAM_ID)", pageIn.get("userId"))
+				.addWhere(pageIn.get("curUserId", Integer.class) != null, "MY_MARK.MARK_USER_ID =  ?", pageIn.get("curUserId", Integer.class))
+				.addWhere(ValidateUtil.isValid(pageIn.get("startDate")) && ValidateUtil.isValid(pageIn.get("endDate")), "(EXAM.MARK_START_TIME <= ? OR EXAM.MARK_START_TIME >= ?)", pageIn.get("endDate"), pageIn.get("startDate"))
+				.addWhere("1".equals(pageIn.get("needMark")), "EXAM.MARK_START_TIME <= ? AND EXAM.MARK_END_TIME >= ?", new Date(), new Date())
+				.addWhere("EXAM.STATE = ?", 1)
+				.addOrder("MY_MARK.ID", Order.DESC);
+		PageOut pageOut = getListpage(sqlUtil, pageIn);
+		HibernateUtil.formatDate(pageOut.getList(), "examStartTime", DateUtil.FORMAT_DATE_TIME, "examEndTime", DateUtil.FORMAT_DATE_TIME, 
+				"markEndTime", DateUtil.FORMAT_DATE_TIME, "markStartTime", DateUtil.FORMAT_DATE_TIME);
+		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), 
+				"examState", "state"
+				);
+		return pageOut;
 	}
 
 	@Override

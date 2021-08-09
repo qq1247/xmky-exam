@@ -50,12 +50,6 @@
 			<artifactId>sys-quartz</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- 集成系统自定义标签 -->
-		<dependency>
-			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>sys-tag</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		<!-- 集成系统附件 -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
@@ -68,24 +62,24 @@
 			<artifactId>sys-log</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- 集成考试核心
+		<!-- 集成考试核心 -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
 			<artifactId>exam-core</artifactId>
 			<version>${project.version}</version>
-		</dependency> -->
-		<!-- 集成考试首页
+		</dependency>
+		<!-- 集成考试API -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>exam-home</artifactId>
+			<artifactId>exam-api</artifactId>
 			<version>${project.version}</version>
-		</dependency> -->
-		<!-- 集成考试报表
+		</dependency>
+		<!-- 集成基础API -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>exam-report</artifactId>
+			<artifactId>sys-api</artifactId>
 			<version>${project.version}</version>
-		</dependency> -->
+		</dependency>
 	</dependencies>
 	
 	<build>
@@ -95,5 +89,6 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
+		<finalName>examServer-1.0.0</finalName><!-- 打包后文件名称: 项目名-版本 -->
 	</build>
 </project>

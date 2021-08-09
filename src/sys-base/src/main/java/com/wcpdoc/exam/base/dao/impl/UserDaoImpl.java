@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.exam.base.dao.UserDao;
-import com.wcpdoc.exam.base.entity.Post;
 import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.exam.core.entity.PageIn;
@@ -13,8 +12,8 @@ import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.HibernateUtil;
 import com.wcpdoc.exam.core.util.SqlUtil;
-import com.wcpdoc.exam.core.util.SqlUtil.Order;
 import com.wcpdoc.exam.core.util.ValidateUtil;
+import com.wcpdoc.exam.core.util.SqlUtil.Order;
 
 /**
  * 用户数据访问层实现
@@ -26,21 +25,18 @@ public class UserDaoImpl extends RBaseDaoImpl<User> implements UserDao {
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT USER.ID, USER.NAME, USER.LOGIN_NAME, ORG.NAME AS ORG_NAME, "
-				+ "USER.PHONE AS PHONE, USER.REGIST_TIME, USER.LAST_LOGIN_TIME, "
-				+ "(SELECT GROUP_CONCAT(A.NAME) FROM SYS_POST A WHERE USER.POST_IDS LIKE CONCAT('%,' , A.ID, ',%')) AS POST_NAMES "
+		String sql = "SELECT USER.ID, USER.NAME, USER.LOGIN_NAME, USER.ORG_ID, ORG.NAME AS ORG_NAME, "
+				+ "USER.PHONE AS PHONE, USER.REGIST_TIME, USER.LAST_LOGIN_TIME, ROLES "
 				+ "FROM SYS_USER USER " 
 				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID ";
 				
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !("1".equals(pageIn.getOne()) || pageIn.getOne().equals(pageIn.getTen())), "ORG.ID = ?", pageIn.getOne())
-				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "USER.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "ORG.NAME LIKE ?", "%" + pageIn.getThree() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "(SELECT GROUP_CONCAT(A.NAME) FROM SYS_POST A WHERE USER.POST_IDS LIKE CONCAT('%,' , A.ID, ',%')) LIKE ?", "%" + pageIn.getFour() + "%")
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "USER.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
+				.addWhere(ValidateUtil.isValid(pageIn.get("orgName")), "ORG.NAME LIKE ?", String.format("%%%s%%", pageIn.get("orgName")))
 				.addWhere("USER.STATE != ?", 0)
 				.addOrder("USER.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDate(pageOut.getRows(), "REGIST_TIME", DateUtil.FORMAT_DATE, "LAST_LOGIN_TIME", DateUtil.FORMAT_DATE);
+		HibernateUtil.formatDate(pageOut.getList(), "registTime", DateUtil.FORMAT_DATE_TIME, "lastLoginTime", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;
 	}
 
@@ -59,15 +55,6 @@ public class UserDaoImpl extends RBaseDaoImpl<User> implements UserDao {
 		
 		String sql = "SELECT COUNT(*) AS NUM FROM SYS_USER WHERE LOGIN_NAME = ? AND STATE = 1 AND ID != ?";
 		return getCount(sql, new Object[] { loginName, excludeId }) > 0;
-	}
-
-	@Override
-	public List<Post> getPostList(Integer id) {
-		String sql = "SELECT POST.* "
-				+ "FROM SYS_POST POST "
-				+ "WHERE POST.STATE = 1 "
-				+ "		AND EXISTS (SELECT 1 FROM SYS_USER Z WHERE Z.ID = ? AND Z.POST_IDS LIKE CONCAT('%,' , POST.ID, ',%'))";
-		return getList(sql, new Object[] {id}, Post.class);
 	}
 
 	@Override

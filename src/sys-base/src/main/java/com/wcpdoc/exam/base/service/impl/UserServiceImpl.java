@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.base.service.impl;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,15 +10,13 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.exam.auth.cache.TokenCache;
+import com.wcpdoc.exam.auth.realm.JWTRealm;
 import com.wcpdoc.exam.base.dao.UserDao;
-import com.wcpdoc.exam.base.entity.Post;
-import com.wcpdoc.exam.base.entity.Res;
 import com.wcpdoc.exam.base.entity.User;
-import com.wcpdoc.exam.base.service.OrgService;
-import com.wcpdoc.exam.base.service.PostService;
-import com.wcpdoc.exam.base.service.ResService;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.EncryptUtil;
@@ -32,11 +32,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	@Resource
 	private UserDao userDao;
 	@Resource
-	private OrgService orgService;
-	@Resource
-	private PostService postService;
-	@Resource
-	private ResService resService;
+	private JWTRealm jwtRealm;
 
 	@Override
 	@Resource(name = "userDaoImpl")
@@ -52,28 +48,6 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	@Override
 	public User getUser(String loginName) {
 		return userDao.getUser(loginName);
-	}
-
-	@Override
-	public Map<Integer, Long> getAuth(Integer id) {
-		User user = getEntity(id);
-		Map<Integer, Long> authMap = new HashMap<>();
-		if (!ValidateUtil.isValid(user.getPostIds())) {
-			return authMap;
-		}
-		
-		List<Post> postList = userDao.getPostList(id);
-		for (Post post : postList) {
-			List<Res> resList = postService.getResList(post.getId());
-			for (Res res : resList) {
-				if (authMap.get(res.getAuthPos()) == null) {
-					authMap.put(res.getAuthPos(), 0L);
-				}
-				
-				authMap.put(res.getAuthPos(), authMap.get(res.getAuthPos()) | res.getAuthCode());//或运算
-			}
-		}
-		return authMap;
 	}
 
 	@Override
@@ -93,7 +67,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	}
 
 	@Override
-	public void doPwdUpdate(String oldPwd, String newPwd) {
+	public void pwdUpdate(String oldPwd, String newPwd) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(oldPwd)) {
 			throw new MyException("参数错误：oldPwd");
@@ -131,9 +105,69 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 
 		return EncryptUtil.md52Base64(loginName + pwd);
 	}
-
+public static void main(String[] args) {
+	System.err.println(new UserServiceImpl().getEncryptPwd("cy", "111111"));
+}
 	@Override
 	public List<User> getList(Integer orgId) {
 		return userDao.getList(orgId);
+	}
+
+	@Override
+	public void roleUpdate(Integer id, String roles) {
+		// 校验数据有效性
+		if (id == null) {
+			throw new MyException("参数错误：id");
+		}
+		User user = userDao.getEntity(id);
+		if(user == null){
+			throw new MyException("参数错误：id");
+		}
+		
+		if (!ValidateUtil.isValid(roles)) {
+			throw new MyException("参数错误：role");
+		}
+		
+		// 更新角色
+		user.setRoles(String.format("user,%s", roles));
+		user.setUpdateTime(new Date());
+		user.setUpdateUserId(getCurUser().getId());
+		userDao.update(user);
+
+		// 授权立即生效
+		jwtRealm.clearAuth(user.getId());
+	}
+
+	@Override
+	public PageOut onList() {
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		List<Integer> tokenCacheList = TokenCache.getList();
+		for(Integer id : tokenCacheList){
+			User entity = userDao.getEntity(id);
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("id", entity.getId());
+			map.put("name", entity.getName());
+			map.put("loginName", entity.getLoginName());
+			list.add(map);
+		}
+		
+		PageOut pageOut = new PageOut();
+		pageOut.setList(list);
+		pageOut.setTotal(tokenCacheList.size());
+		return pageOut;
+	}
+
+	@Override
+	public void syncUser(List<User> user, Integer orgId) {
+		Date date = new Date();
+		for(User entity : user){
+			entity.setPwd(getEncryptPwd(entity.getLoginName(), entity.getPwd()));
+			entity.setRegistTime(date);
+			entity.setOrgId(orgId);
+			entity.setUpdateUserId(getCurUser().getId());
+			entity.setUpdateTime(date);
+			entity.setState(1);
+			userDao.add(entity);
+		}
 	}
 }

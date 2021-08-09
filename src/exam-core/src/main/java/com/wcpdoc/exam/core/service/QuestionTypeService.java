@@ -1,7 +1,6 @@
 package com.wcpdoc.exam.core.service;
 
 import java.util.List;
-import java.util.Map;
 
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
@@ -19,8 +18,18 @@ public interface QuestionTypeService extends BaseService<QuestionType> {
 	 * @param questionType
 	 * void
 	 */
-	void addAndUpdate(QuestionType questionType);
+	void addAndUpdate(String name, Integer imgId);
 
+	/**
+	 * 修改试题
+	 * 
+	 * v1.0 chenyun 2021年3月18日上午10:20:28
+	 * @param id
+	 * @param name
+	 * @param imgId void
+	 */
+	void editAndUpdate(Integer id, String name, Integer imgId);
+	
 	/**
 	 * 删除试题分类
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
@@ -28,30 +37,6 @@ public interface QuestionTypeService extends BaseService<QuestionType> {
 	 * void
 	 */
 	void delAndUpdate(Integer id);
-	
-	/**
-	 * 获取试题分类树
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * @return List<Map<String,Object>>
-	 */
-	List<Map<String, Object>> getTreeList();
-	
-	/**
-	 * 获取试题分类树
-	 * 
-	 * v1.0 zhanghc 2020年9月28日下午5:19:24
-	 * @return Object
-	 */
-	List<Map<String, Object>> getAuthTreeList();
-
-	/**
-	 * 移动试题分类
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * @param sourceId
-	 * @param targetId
-	 * void
-	 */
-	void doMove(Integer sourceId, Integer targetId);
 	
 	/**
 	 * 名称是否重复
@@ -75,39 +60,38 @@ public interface QuestionTypeService extends BaseService<QuestionType> {
 	 * 
 	 * v1.0 zhanghc 2020年9月8日上午10:06:53
 	 * @param id
-	 * @param userIds
-	 * @param postIds
-	 * @param orgIds
-	 * @param syn2Sub true ： 同步授权到子分类
+	 * @param readUserIds
+	 * @param writeUserIds
 	 * void
 	 */
-	void doAuth(Integer id, Integer[] userIds, Integer[] postIds, Integer[] orgIds, boolean syn2Sub);
+	void auth(Integer id, String readUserIds, String writeUserIds);
 
 	/**
-	 * 获取权限用户列表
+	 * 获取人员列表
 	 * 
 	 * v1.0 zhanghc 2018年5月30日下午6:28:19
 	 * @param pageIn
 	 * @return PageOut
 	 */
-	PageOut getAuthUserListpage(PageIn pageIn);
+	PageOut authUserListpage(PageIn pageIn);
 
 	/**
-	 * 获取权限岗位列表
+	 * 拥有写权限
 	 * 
-	 * v1.0 zhanghc 2018年5月30日下午6:28:19
-	 * @param pageIn
-	 * @return PageOut
+	 * v1.0 zhanghc 2021年7月1日下午2:13:57
+	 * @param questionType
+	 * @param id
+	 * @return boolean
 	 */
-	PageOut getAuthPostListpage(PageIn pageIn);
+	boolean hasWriteAuth(QuestionType questionType, Integer id);
 
 	/**
-	 * 获取权限机构列表
+	 * 拥有读权限
 	 * 
-	 * v1.0 zhanghc 2018年5月30日下午6:28:19
-	 * @param pageIn
-	 * @return PageOut
+	 * v1.0 zhanghc 2021年7月1日下午2:14:10
+	 * @param questionType
+	 * @param userId
+	 * @return boolean
 	 */
-	PageOut getAuthOrgListpage(PageIn pageIn);
-
+	boolean hasReadAuth(QuestionType questionType, Integer userId);
 }

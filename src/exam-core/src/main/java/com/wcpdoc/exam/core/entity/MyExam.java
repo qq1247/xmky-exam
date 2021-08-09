@@ -32,22 +32,22 @@ public class MyExam {
 	private Integer userId;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	@Column(name = "ANSWER_TIME")
-	private Date answerTime;
+	@Column(name = "ANSWER_START_TIME")
+	private Date answerStartTime;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	@Column(name = "ANSWER_FINISH_TIME")
-	private Date answerFinishTime;
+	@Column(name = "ANSWER_END_TIME")
+	private Date answerEndTime;
 	@Column(name = "MARK_USER_ID")
 	private Integer myMarkId;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	@Column(name = "MARK_TIME")
-	private Date markTime;
+	@Column(name = "MARK_START_TIME")
+	private Date markStartTime;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	@Column(name = "MARK_FINISH_TIME")
-	private Date markFinishTime;
+	@Column(name = "MARK_END_TIME")
+	private Date markEndTime;
 	@Column(name = "TOTAL_SCORE")
 	private BigDecimal totalScore;
 	@Column(name = "STATE")
@@ -87,12 +87,12 @@ public class MyExam {
 		this.userId = userId;
 	}
 
-	public Date getAnswerTime() {
-		return answerTime;
+	public Date getAnswerStartTime() {
+		return answerStartTime;
 	}
 
-	public void setAnswerTime(Date answerTime) {
-		this.answerTime = answerTime;
+	public void setAnswerStartTime(Date answerStartTime) {
+		this.answerStartTime = answerStartTime;
 	}
 
 	public Integer getMyMarkId() {
@@ -157,27 +157,27 @@ public class MyExam {
 		this.updateTime = updateTime;
 	}
 
-	public Date getAnswerFinishTime() {
-		return answerFinishTime;
+	public Date getAnswerEndTime() {
+		return answerEndTime;
 	}
 
-	public void setAnswerFinishTime(Date answerFinishTime) {
-		this.answerFinishTime = answerFinishTime;
+	public void setAnswerEndTime(Date answerEndTime) {
+		this.answerEndTime = answerEndTime;
 	}
 
-	public Date getMarkTime() {
-		return markTime;
+	public Date getMarkStartTime() {
+		return markStartTime;
 	}
 
-	public void setMarkTime(Date markTime) {
-		this.markTime = markTime;
+	public void setMarkStartTime(Date markStartTime) {
+		this.markStartTime = markStartTime;
 	}
 
-	public Date getMarkFinishTime() {
-		return markFinishTime;
+	public Date getMarkEndTime() {
+		return markEndTime;
 	}
 
-	public void setMarkFinishTime(Date markFinishTime) {
-		this.markFinishTime = markFinishTime;
+	public void setMarkEndTime(Date markEndTime) {
+		this.markEndTime = markEndTime;
 	}
 }

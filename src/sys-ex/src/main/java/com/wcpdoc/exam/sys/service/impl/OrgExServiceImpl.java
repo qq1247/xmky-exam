@@ -7,11 +7,9 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.exam.base.entity.Org;
-import com.wcpdoc.exam.base.entity.Post;
 import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.base.service.OrgExService;
 import com.wcpdoc.exam.base.service.OrgService;
-import com.wcpdoc.exam.base.service.PostService;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.exception.MyException;
@@ -26,8 +24,6 @@ import com.wcpdoc.exam.core.util.ValidateUtil;
 @Service
 public class OrgExServiceImpl extends BaseServiceImp<Object> implements OrgExService {
 	@Resource
-	private PostService postService;
-	@Resource
 	private UserService userService;
 	@Resource
 	private OrgService orgService;
@@ -37,11 +33,6 @@ public class OrgExServiceImpl extends BaseServiceImp<Object> implements OrgExSer
 		List<User> userList = userService.getList(org.getId());
 		if (ValidateUtil.isValid(userList)) {
 			throw new MyException("该机构下有用户，不允许删除！");
-		}
-		
-		List<Post> postList = postService.getList(org.getId());
-		if (ValidateUtil.isValid(postList)) {
-			throw new MyException("该机构下有岗位，不允许删除！");
 		}
 	}
 

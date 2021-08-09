@@ -26,8 +26,11 @@
 		<module>sys-file</module>
 		<module>sys-log</module>
 		<module>sys-quartz</module>
-		<module>sys-tag</module>
+		<module>sys-auth</module>
 		<module>sys-web</module>
+		<module>sys-api</module>
+		<module>sys-notify</module>
+		<module>exam-api</module>
 		<module>exam-core</module>
 		<module>exam-report</module>
 	</modules>

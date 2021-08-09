@@ -22,7 +22,7 @@ public interface PaperService extends BaseService<Paper> {
 	 * @param user
 	 * void
 	 */
-	void doChapterAdd(PaperQuestion chapter);
+	void chapterAdd(PaperQuestion chapter);
 	
 	/**
 	 * 完成修改章节
@@ -32,7 +32,7 @@ public interface PaperService extends BaseService<Paper> {
 	 * @param user
 	 * void
 	 */
-	void doChapterEdit(PaperQuestion chapter);
+	void chapterEdit(PaperQuestion chapter);
 	
 	/**
 	 * 完成删除章节
@@ -41,7 +41,7 @@ public interface PaperService extends BaseService<Paper> {
 	 * @param chapterId
 	 * void
 	 */
-	void doChapterDel(Integer chapterId);
+	void chapterDel(Integer chapterId);
 	
 	/**
 	 * 获取试卷列表
@@ -69,17 +69,19 @@ public interface PaperService extends BaseService<Paper> {
 	 * @param questionIds
 	 * void
 	 */
-	void doQuestionAdd(Integer chapterId, Integer[] questionIds);
+	void questionAdd(Integer chapterId, Integer[] questionIds);
 	
 	/**
 	 * 设置分数
 	 * 
 	 * v1.0 zhanghc 2018年10月21日下午3:10:37
-	 * @param paperQuestionId 
-	 * @param score 
+	 * @param paperQuestionId
+	 * @param score
+	 * @param paperQuestionAnswerId
+	 * @param paperQuestionAnswerScore void
 	 * void
 	 */
-	void doScoreUpdate(Integer paperQuestionId, BigDecimal score);
+	void scoreUpdate(Integer paperQuestionId, BigDecimal score, Integer[] paperQuestionAnswerId, BigDecimal[] paperQuestionAnswerScore);
 	
 	/**
 	 * 完成设置选项
@@ -89,7 +91,7 @@ public interface PaperService extends BaseService<Paper> {
 	 * @param score 
 	 * void
 	 */
-	void doOptionsUpdate(Integer paperQuestionId, Integer[] options);
+	void optionsUpdate(Integer paperQuestionId, Integer[] scoreOptions);
 
 	/**
 	 * 完成试题上移
@@ -97,7 +99,7 @@ public interface PaperService extends BaseService<Paper> {
 	 * v1.0 zhanghc 2018年10月21日下午4:15:35
 	 * @param paperQuestionId void
 	 */
-	void doQuestionUp(Integer paperQuestionId);
+	void questionUp(Integer paperQuestionId);
 
 	/**
 	 * 完成试题下移
@@ -105,7 +107,7 @@ public interface PaperService extends BaseService<Paper> {
 	 * v1.0 zhanghc 2018年10月21日下午4:15:43
 	 * @param paperQuestionId void
 	 */
-	void doQuestionDown(Integer paperQuestionId);
+	void questionDown(Integer paperQuestionId);
 
 	/**
 	 * 完成试题删除
@@ -113,7 +115,7 @@ public interface PaperService extends BaseService<Paper> {
 	 * v1.0 zhanghc 2018年10月21日下午10:43:15
 	 * @param paperQuestionId void
 	 */
-	void doQuestionDel(Integer paperQuestionId);
+	void questionDel(Integer paperQuestionId);
 	
 	/**
 	 * 完成清空试题
@@ -122,15 +124,16 @@ public interface PaperService extends BaseService<Paper> {
 	 * @param chapterId
 	 * void
 	 */
-	void doQuestionClear(Integer chapterId);
+	void questionClear(Integer chapterId);
 
 	/**
-	 * 完成章节上移
+	 * 完成章节上下移
 	 * 
-	 * v1.0 zhanghc 2018年10月21日下午2:51:35
-	 * @param chapterId void
+	 * v1.0 chenyun 2021年7月9日下午3:22:49
+	 * @param oldId
+	 * @param newId void
 	 */
-	void doChapterUp(Integer chapterId);
+	void chapterUp(Integer oldId, Integer newId);
 	
 	/**
 	 * 完成章节下移
@@ -138,7 +141,7 @@ public interface PaperService extends BaseService<Paper> {
 	 * v1.0 zhanghc 2018年10月21日下午2:51:35
 	 * @param chapterId void
 	 */
-	void doChapterDown(Integer chapterId);
+	void chapterDown(Integer chapterId);
 
 	/**
 	 * 获取试卷列表
@@ -158,6 +161,15 @@ public interface PaperService extends BaseService<Paper> {
 	 * @param options
 	 * void
 	 */
-	void doBatchScoreUpdate(Integer chapterId, BigDecimal score, String options);
+	void batchScoreUpdate(Integer chapterId, BigDecimal score, String options);
 	
+	/**
+	 * 合并
+	 * 
+	 * v1.0 chenyun 2021年3月2日下午1:25:51
+	 * @param id
+	 * @param sourceId
+	 * @param targetId void
+	 */
+	void move(Integer id, Integer sourceId, Integer targetId);
 }

@@ -1,14 +1,21 @@
 package com.wcpdoc.exam.core.dao.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Repository;
 
+import com.wcpdoc.exam.base.dao.UserDao;
+import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.core.dao.ExamTypeDao;
 import com.wcpdoc.exam.core.entity.ExamType;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
+import com.wcpdoc.exam.core.util.DateUtil;
+import com.wcpdoc.exam.core.util.HibernateUtil;
 import com.wcpdoc.exam.core.util.SqlUtil;
 import com.wcpdoc.exam.core.util.SqlUtil.Order;
 import com.wcpdoc.exam.core.util.ValidateUtil;
@@ -20,23 +27,38 @@ import com.wcpdoc.exam.core.util.ValidateUtil;
  */
 @Repository
 public class ExamTypeDaoImpl extends RBaseDaoImpl<ExamType> implements ExamTypeDao {
-
+	@Resource
+	private UserDao userDao;
+	
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT EXAM_TYPE.ID, EXAM_TYPE.NAME, EXAM_TYPE.PARENT_ID, "
-				+ "EXAM_TYPE.PARENT_SUB, PARENT_EXAM_TYPE.NAME AS PARENT_NAME, "
-				+ "EXAM_TYPE.NO, "
-				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_USER _A WHERE EXAM_TYPE.USER_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS USER_NAMES, "
-				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_ORG _A WHERE EXAM_TYPE.ORG_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS ORG_NAMES, "
-				+ "(SELECT GROUP_CONCAT(_A.`NAME`) FROM SYS_POST _A WHERE EXAM_TYPE.POST_IDS LIKE (CONCAT(\"%,\", _A.ID, \",%\"))) AS POST_NAMES "
-				+ "FROM EXM_EXAM_TYPE EXAM_TYPE "
-				+ "LEFT JOIN EXM_EXAM_TYPE PARENT_EXAM_TYPE ON EXAM_TYPE.PARENT_ID = PARENT_EXAM_TYPE.ID ";
+		String sql = "SELECT EXAM_TYPE.* "
+				+ "FROM EXM_EXAM_TYPE EXAM_TYPE ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "EXAM_TYPE.PARENT_ID = ?", pageIn.getOne())//如果查询的是根目录，则查询所有。否则查询选中机构的子机构
-				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "EXAM_TYPE.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
-				.addWhere("EXAM_TYPE.STATE = ?", 1)
-				.addOrder("EXAM_TYPE.NO", Order.ASC);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "EXAM_TYPE.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
+				.addWhere("EXAM_TYPE.STATE = 1")
+				.addWhere("EXAM_TYPE.ID != 1")
+				.addOrder("EXAM_TYPE.UPDATE_TIME", Order.DESC);
+		
+		if (pageIn.get("curUserId", Integer.class) != null) {
+			User user = userDao.getEntity(pageIn.get("curUserId", Integer.class));
+			StringBuilder partSql = new StringBuilder();
+			List<Object> params = new ArrayList<>();
+			partSql.append("(");
+			partSql.append("EXAM_TYPE.READ_USER_IDS LIKE ? ");
+			params.add("%," + user.getId() + ",%");
+			
+			partSql.append("OR EXAM_TYPE.WRITE_USER_IDS LIKE ? ");
+			params.add("%," + user.getId() + ",%");
+			
+			partSql.append(")");
+			sqlUtil.addWhere(partSql.toString(), params.toArray(new Object[params.size()]));
+		}
+		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
+		HibernateUtil.formatDate(pageOut.getList(), 
+				"updateTime", DateUtil.FORMAT_DATE_TIME, 
+				"createTime", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;
 	}
 
@@ -75,8 +97,8 @@ public class ExamTypeDaoImpl extends RBaseDaoImpl<ExamType> implements ExamTypeD
 				+ "FROM SYS_USER USER "
 				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "(USER.NAME LIKE ? OR ORG.NAME LIKE ?)", "%" + pageIn.getTwo() + "%", "%" + pageIn.getTwo() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "EXISTS (SELECT 1 FROM EXM_EXAM_TYPE Z WHERE Z.ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.getTen())
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("Two").toString()), "(USER.NAME LIKE ? OR ORG.NAME LIKE ?)", "%" + pageIn.get("Two") + "%", "%" + pageIn.get("Two").toString() + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.get("Ten").toString()), "EXISTS (SELECT 1 FROM EXM_EXAM_TYPE Z WHERE Z.ID = ? AND Z.USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.get("Ten").toString())
 				.addWhere("USER.STATE = 1")
 				.addOrder("USER.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
@@ -89,8 +111,8 @@ public class ExamTypeDaoImpl extends RBaseDaoImpl<ExamType> implements ExamTypeD
 				+ "FROM SYS_POST POST "
 				+ "INNER JOIN SYS_ORG ORG ON POST.ORG_ID = ORG.ID";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "(POST.NAME LIKE ? OR ORG.NAME LIKE ?)", "%" + pageIn.getTwo() + "%", "%" + pageIn.getTwo() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "EXISTS (SELECT 1 FROM EXM_EXAM_TYPE Z WHERE Z.ID = ? AND Z.POST_IDS LIKE CONCAT('%,', POST.ID, ',%'))", pageIn.getTen())
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("Two").toString()), "(POST.NAME LIKE ? OR ORG.NAME LIKE ?)", "%" + pageIn.get("Two") + "%", "%" + pageIn.get("Two").toString() + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.get("Ten").toString()), "EXISTS (SELECT 1 FROM EXM_EXAM_TYPE Z WHERE Z.ID = ? AND Z.POST_IDS LIKE CONCAT('%,', POST.ID, ',%'))", pageIn.get("Ten").toString())
 				.addWhere("POST.STATE = 1")
 				.addOrder("POST.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
@@ -103,12 +125,24 @@ public class ExamTypeDaoImpl extends RBaseDaoImpl<ExamType> implements ExamTypeD
 				+ "FROM SYS_ORG ORG "
 				+ "LEFT JOIN SYS_ORG PARENT_ORG ON ORG.PARENT_ID = PARENT_ORG.ID";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "ORG.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.getTen()), "EXISTS (SELECT 1 FROM EXM_EXAM_TYPE Z WHERE Z.ID = ? AND Z.ORG_IDS LIKE CONCAT('%,', ORG.ID, ',%'))", pageIn.getTen())
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("Two").toString()), "ORG.NAME LIKE ?", "%" + pageIn.get("Two").toString() + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.get("Ten").toString()), "EXISTS (SELECT 1 FROM EXM_EXAM_TYPE Z WHERE Z.ID = ? AND Z.ORG_IDS LIKE CONCAT('%,', ORG.ID, ',%'))", pageIn.get("Ten").toString())
 				.addWhere("ORG.STATE = 1")
 				.addOrder("ORG.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		return pageOut;
 	}
 	
+	@Override
+	public PageOut authUserListpage(PageIn pageIn) {
+		String sql = "SELECT USER.ID, USER.NAME AS NAME "
+				+ "FROM SYS_USER USER ";
+		SqlUtil sqlUtil = new SqlUtil(sql);
+		sqlUtil.addWhere(pageIn.get("idw", Integer.class) != null, "EXISTS (SELECT 1 FROM EXM_EXAM_TYPE Z WHERE Z.ID = ? AND Z.WRITE_USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.get("idw", Integer.class))
+				.addWhere(pageIn.get("idr", Integer.class) != null, "EXISTS (SELECT 1 FROM EXM_EXAM_TYPE Z WHERE Z.ID = ? AND Z.READ_USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.get("idr", Integer.class))
+				.addWhere("USER.STATE = 1")
+				.addOrder("USER.UPDATE_TIME", Order.DESC);
+		PageOut pageOut = getListpage(sqlUtil, pageIn);
+		return pageOut;
+	}
 }

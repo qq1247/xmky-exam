@@ -1,9 +1,13 @@
 package com.wcpdoc.exam.core.service;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.Question;
 /**
  * 试题服务层接口
@@ -26,21 +30,24 @@ public interface QuestionService extends BaseService<Question>{
 	 * 
 	 * v1.0 zhanghc 2018年10月12日下午1:52:35
 	 * @param question
+	 * @param answers
+	 * @param options
 	 * void
 	 */
-	void addAndUpdate(Question question);
+	void addAndUpdate(Question question, Integer[] scoreOptions, String[] answers, String[] options, BigDecimal[] scores);
 
 	/**
 	 * 完成试题修改
 	 * 
 	 * v1.0 zhanghc 2018年10月12日下午7:30:02
 	 * @param question
-	 * @param answer 答案
-	 * @param newVer 新版本
+	 * @param answer
+	 * @param options
+	 * @param newVer
 	 * void 
 	 */
-	void updateAndUpdate(Question question, boolean newVer);
-
+	void updateAndUpdate(Question question, Integer[] scoreOptions, String[] answers, String[] options, BigDecimal[] scores); //, boolean newVer
+	
 	/**
 	 * 完成导入试题
 	 * 
@@ -50,4 +57,39 @@ public interface QuestionService extends BaseService<Question>{
 	 * @return PageResult
 	 */
 	void wordImp(MultipartFile file, Integer questionTypeId);
+	
+	/**
+	 * 合并
+	 * 
+	 * v1.0 chenyun 2021年3月2日下午1:25:51
+	 * @param id
+	 * @param sourceId
+	 * @param targetId void
+	 */
+	void move(Integer id, Integer sourceId, Integer targetId);
+	
+	/**
+	 * 试题统计（类型和难易程度）
+	 * 
+	 * v1.0 chenyun 2021年3月23日下午2:53:07
+	 * @param questionTypeId
+	 * @return Map<String,Object>
+	 */
+	Map<String, Object> statisticsTypeDifficulty(Integer questionTypeId);
+	
+	/**
+	 * 试题统计
+	 * 
+	 * v1.0 chenyun 2021年3月23日下午2:53:07
+	 * @param examId
+	 * @return List<Map<String, Object>>
+	 */
+	List<Map<String, Object>> accuracy(Integer examId);
+	
+	/**
+	 * 随机列表
+	 * 
+	 * v1.0 chenyun 2021年7月19日下午4:26:38
+	 */
+	PageOut randomListpage(PageIn pageIn);
 }

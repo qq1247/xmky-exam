@@ -29,16 +29,6 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 	}
 
 	@Override
-	public void del(Integer examId, Integer userId) {
-		myMarkDao.del(examId, userId);
-	}
-
-	@Override
-	public MyMark getEntity(Integer examId, Integer userId) {
-		return myMarkDao.getEntity(examId, userId);
-	}
-
-	@Override
 	public List<MyMark> getList(Integer examId) {
 		return myMarkDao.getList(examId);
 	}

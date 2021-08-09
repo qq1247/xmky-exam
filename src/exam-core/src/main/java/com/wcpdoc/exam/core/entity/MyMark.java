@@ -1,11 +1,17 @@
 package com.wcpdoc.exam.core.entity;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * 我的阅卷实体
@@ -21,8 +27,20 @@ public class MyMark {
 	private Integer id;
 	@Column(name = "EXAM_ID")
 	private Integer examId;
-	@Column(name = "USER_ID")
-	private Integer userId;
+	@Column(name = "MARK_USER_ID")
+	private Integer markUserId;
+	@Column(name = "QUESTION_IDS")
+	private String questionIds;
+	@Column(name = "EXAM_USER_IDS")
+	private String examUserIds;
+	@Column(name = "UPDATE_USER_ID")
+	private Integer updateUserId;
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@Column(name = "UPDATE_TIME")
+	private Date updateTime;
+	@Column(name = "AUTO_STATE")
+	private Integer autoState;
 
 	public Integer getId() {
 		return id;
@@ -40,11 +58,51 @@ public class MyMark {
 		this.examId = examId;
 	}
 
-	public Integer getUserId() {
-		return userId;
+	public String getQuestionIds() {
+		return questionIds;
 	}
 
-	public void setUserId(Integer userId) {
-		this.userId = userId;
+	public void setQuestionIds(String questionIds) {
+		this.questionIds = questionIds;
+	}
+
+	public Integer getMarkUserId() {
+		return markUserId;
+	}
+
+	public void setMarkUserId(Integer markUserId) {
+		this.markUserId = markUserId;
+	}
+
+	public String getExamUserIds() {
+		return examUserIds;
+	}
+
+	public void setExamUserIds(String examUserIds) {
+		this.examUserIds = examUserIds;
+	}
+
+	public Integer getUpdateUserId() {
+		return updateUserId;
+	}
+
+	public void setUpdateUserId(Integer updateUserId) {
+		this.updateUserId = updateUserId;
+	}
+
+	public Date getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
+	}
+
+	public Integer getAutoState() {
+		return autoState;
+	}
+
+	public void setAutoState(Integer autoState) {
+		this.autoState = autoState;
 	}
 }

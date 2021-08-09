@@ -1,6 +1,5 @@
 package com.wcpdoc.exam.core.entity;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -28,8 +27,6 @@ public class Exam {
 	private Integer id;
 	@Column(name = "NAME")
 	private String name;
-	@Column(name = "PASS_SCORE")
-	private BigDecimal passScore;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "START_TIME")
@@ -46,28 +43,12 @@ public class Exam {
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "MARK_END_TIME")
 	private Date markEndTime;
-	@Column(name = "GRADE_TYPE")
-	private Integer gradeType;
-	@Column(name = "SCORE_A")
-	private BigDecimal scoreA;
-	@Column(name = "SCORE_A_REMARK")
-	private String scoreARemark;
-	@Column(name = "SCORE_B")
-	private BigDecimal scoreB;
-	@Column(name = "SCORE_B_REMARK")
-	private String scoreBRemark;
-	@Column(name = "SCORE_C")
-	private BigDecimal scoreC;
-	@Column(name = "SCORE_C_REMARK")
-	private String scoreCRemark;
-	@Column(name = "SCORE_D")
-	private BigDecimal scoreD;
-	@Column(name = "SCORE_D_REMARK")
-	private String scoreDRemark;
-	@Column(name = "SCORE_E")
-	private BigDecimal scoreE;
-	@Column(name = "SCORE_E_REMARK")
-	private String scoreERemark;
+	@Column(name = "SCORE_STATE")
+	private Integer scoreState;
+	@Column(name = "RANK_STATE")
+	private Integer rankState;
+	@Column(name = "LOGIN_TYPE")
+	private Integer loginType;
 	@Column(name = "DESCRIPTION")
 	private String description;
 	@Column(name = "UPDATE_USER_ID")
@@ -76,12 +57,19 @@ public class Exam {
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "UPDATE_TIME")
 	private Date updateTime;
+	@Column(name = "CREATE_USER_ID")
+	private Integer createUserId;
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@Column(name = "CREATE_TIME")
+	private Date createTime;
 	@Column(name = "STATE")
 	private Integer state;
 	@Column(name = "PAPER_ID")
 	private Integer paperId;
 	@Column(name = "EXAM_TYPE_ID")
 	private Integer examTypeId;
+	
 	public Integer getId() {
 		return id;
 	}
@@ -93,12 +81,6 @@ public class Exam {
 	}
 	public void setName(String name) {
 		this.name = name;
-	}
-	public BigDecimal getPassScore() {
-		return passScore;
-	}
-	public void setPassScore(BigDecimal passScore) {
-		this.passScore = passScore;
 	}
 	public Date getStartTime() {
 		return startTime;
@@ -124,71 +106,23 @@ public class Exam {
 	public void setMarkEndTime(Date markEndTime) {
 		this.markEndTime = markEndTime;
 	}
-	public Integer getGradeType() {
-		return gradeType;
+	public Integer getScoreState() {
+		return scoreState;
 	}
-	public void setGradeType(Integer gradeType) {
-		this.gradeType = gradeType;
+	public void setScoreState(Integer scoreState) {
+		this.scoreState = scoreState;
 	}
-	public BigDecimal getScoreA() {
-		return scoreA;
+	public Integer getRankState() {
+		return rankState;
 	}
-	public void setScoreA(BigDecimal scoreA) {
-		this.scoreA = scoreA;
+	public void setRankState(Integer rankState) {
+		this.rankState = rankState;
 	}
-	public String getScoreARemark() {
-		return scoreARemark;
+	public Integer getLoginType() {
+		return loginType;
 	}
-	public void setScoreARemark(String scoreARemark) {
-		this.scoreARemark = scoreARemark;
-	}
-	public BigDecimal getScoreB() {
-		return scoreB;
-	}
-	public void setScoreB(BigDecimal scoreB) {
-		this.scoreB = scoreB;
-	}
-	public String getScoreBRemark() {
-		return scoreBRemark;
-	}
-	public void setScoreBRemark(String scoreBRemark) {
-		this.scoreBRemark = scoreBRemark;
-	}
-	public BigDecimal getScoreC() {
-		return scoreC;
-	}
-	public void setScoreC(BigDecimal scoreC) {
-		this.scoreC = scoreC;
-	}
-	public String getScoreCRemark() {
-		return scoreCRemark;
-	}
-	public void setScoreCRemark(String scoreCRemark) {
-		this.scoreCRemark = scoreCRemark;
-	}
-	public BigDecimal getScoreD() {
-		return scoreD;
-	}
-	public void setScoreD(BigDecimal scoreD) {
-		this.scoreD = scoreD;
-	}
-	public String getScoreDRemark() {
-		return scoreDRemark;
-	}
-	public void setScoreDRemark(String scoreDRemark) {
-		this.scoreDRemark = scoreDRemark;
-	}
-	public BigDecimal getScoreE() {
-		return scoreE;
-	}
-	public void setScoreE(BigDecimal scoreE) {
-		this.scoreE = scoreE;
-	}
-	public String getScoreERemark() {
-		return scoreERemark;
-	}
-	public void setScoreERemark(String scoreERemark) {
-		this.scoreERemark = scoreERemark;
+	public void setLoginType(Integer loginType) {
+		this.loginType = loginType;
 	}
 	public String getDescription() {
 		return description;
@@ -225,5 +159,17 @@ public class Exam {
 	}
 	public void setExamTypeId(Integer examTypeId) {
 		this.examTypeId = examTypeId;
+	}
+	public Integer getCreateUserId() {
+		return createUserId;
+	}
+	public void setCreateUserId(Integer createUserId) {
+		this.createUserId = createUserId;
+	}
+	public Date getCreateTime() {
+		return createTime;
+	}
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
 	}
 }

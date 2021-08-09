@@ -24,7 +24,7 @@
 			<artifactId>sys-file</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- 集成poi -->
+		<!-- 集成poi
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
@@ -34,6 +34,17 @@
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-scratchpad</artifactId>
 			<version>3.17</version>
+		</dependency> -->
+		<!-- 集成文档解析 -->
+		<dependency>
+			<groupId>org.docx4j</groupId>
+			<artifactId>docx4j-core</artifactId>
+			<version>8.2.9</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.docx4j</groupId>
+		    <artifactId>docx4j-JAXB-Internal</artifactId>
+		    <version>8.2.9</version>
 		</dependency>
 		<!-- 集成html解析 -->
 		<dependency>

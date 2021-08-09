@@ -28,44 +28,54 @@ public class Paper {
 	private Integer id;
 	@Column(name = "NAME")
 	private String name;
-	@Column(name = "PREVIEW_TYPE")
-	private Integer previewType;
 	@Column(name = "PASS_SCORE")
 	private BigDecimal passScore;
 	@Column(name = "TOTAL_SCORE")
 	private BigDecimal totalScore;
-	@Column(name = "SCORE_A")
-	private BigDecimal scoreA;
-	@Column(name = "SCORE_A_REMARK")
-	private String scoreARemark;
-	@Column(name = "SCORE_B")
-	private BigDecimal scoreB;
-	@Column(name = "SCORE_B_REMARK")
-	private String scoreBRemark;
-	@Column(name = "SCORE_C")
-	private BigDecimal scoreC;
-	@Column(name = "SCORE_C_REMARK")
-	private String scoreCRemark;
-	@Column(name = "SCORE_D")
-	private BigDecimal scoreD;
-	@Column(name = "SCORE_D_REMARK")
-	private String scoreDRemark;
-	@Column(name = "SCORE_E")
-	private BigDecimal scoreE;
-	@Column(name = "SCORE_E_REMARK")
-	private String scoreERemark;
-	@Column(name = "DESCRIPTION")
-	private String description;
-	@Column(name = "PAPER_TYPE_ID")
-	private Integer paperTypeId;
+	@Column(name = "SHOW_TYPE")
+	private BigDecimal showType;
+	@Column(name = "READ_REMARK")
+	private String readRemark;
+	@Column(name = "READ_NUM")
+	private Integer readNum;
 	@Column(name = "STATE")
 	private Integer state;
+	@Column(name = "PAPER_TYPE_ID")
+	private Integer paperTypeId;
+	@Column(name = "GEN_TYPE")
+	private Integer genType;
+	@Column(name = "OPTIONS")
+	private String options;
+	@Column(name = "MINIMIZE_NUM")
+	private Integer minimizeNum;
+	@Column(name = "CREATE_USER_ID")
+	private Integer createUserId;
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@Column(name = "CREATE_TIME")
+	private Date createTime;
 	@Column(name = "UPDATE_USER_ID")
 	private Integer updateUserId;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "UPDATE_TIME")
 	private Date updateTime;
+
+	public BigDecimal getShowType() {
+		return showType;
+	}
+
+	public void setShowType(BigDecimal showType) {
+		this.showType = showType;
+	}
+
+	public Integer getGenType() {
+		return genType;
+	}
+
+	public void setGenType(Integer genType) {
+		this.genType = genType;
+	}
 
 	public Integer getId() {
 		return id;
@@ -99,12 +109,12 @@ public class Paper {
 		this.passScore = passScore;
 	}
 
-	public String getDescription() {
-		return description;
+	public String getReadRemark() {
+		return readRemark;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setReadRemark(String readRemark) {
+		this.readRemark = readRemark;
 	}
 
 	public Integer getPaperTypeId() {
@@ -113,14 +123,6 @@ public class Paper {
 
 	public void setPaperTypeId(Integer paperTypeId) {
 		this.paperTypeId = paperTypeId;
-	}
-
-	public Integer getPreviewType() {
-		return previewType;
-	}
-
-	public void setPreviewType(Integer previewType) {
-		this.previewType = previewType;
 	}
 
 	/** 0：删除；1：启用；2：禁用 */
@@ -149,83 +151,44 @@ public class Paper {
 		this.updateTime = updateTime;
 	}
 
-	public BigDecimal getScoreA() {
-		return scoreA;
+	public Integer getReadNum() {
+		return readNum;
 	}
 
-	public void setScoreA(BigDecimal scoreA) {
-		this.scoreA = scoreA;
+	public void setReadNum(Integer readNum) {
+		this.readNum = readNum;
 	}
 
-	public String getScoreARemark() {
-		return scoreARemark;
+	public Integer getMinimizeNum() {
+		return minimizeNum;
 	}
 
-	public void setScoreARemark(String scoreARemark) {
-		this.scoreARemark = scoreARemark;
+	public void setMinimizeNum(Integer minimizeNum) {
+		this.minimizeNum = minimizeNum;
 	}
 
-	public BigDecimal getScoreB() {
-		return scoreB;
+	public String getOptions() {
+		return options;
 	}
 
-	public void setScoreB(BigDecimal scoreB) {
-		this.scoreB = scoreB;
+	public void setOptions(String options) {
+		this.options = options;
 	}
 
-	public String getScoreBRemark() {
-		return scoreBRemark;
+	public Integer getCreateUserId() {
+		return createUserId;
 	}
 
-	public void setScoreBRemark(String scoreBRemark) {
-		this.scoreBRemark = scoreBRemark;
+	public void setCreateUserId(Integer createUserId) {
+		this.createUserId = createUserId;
 	}
 
-	public BigDecimal getScoreC() {
-		return scoreC;
+	public Date getCreateTime() {
+		return createTime;
 	}
 
-	public void setScoreC(BigDecimal scoreC) {
-		this.scoreC = scoreC;
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
 	}
 
-	public String getScoreCRemark() {
-		return scoreCRemark;
-	}
-
-	public void setScoreCRemark(String scoreCRemark) {
-		this.scoreCRemark = scoreCRemark;
-	}
-
-	public BigDecimal getScoreD() {
-		return scoreD;
-	}
-
-	public void setScoreD(BigDecimal scoreD) {
-		this.scoreD = scoreD;
-	}
-
-	public String getScoreDRemark() {
-		return scoreDRemark;
-	}
-
-	public void setScoreDRemark(String scoreDRemark) {
-		this.scoreDRemark = scoreDRemark;
-	}
-
-	public BigDecimal getScoreE() {
-		return scoreE;
-	}
-
-	public void setScoreE(BigDecimal scoreE) {
-		this.scoreE = scoreE;
-	}
-
-	public String getScoreERemark() {
-		return scoreERemark;
-	}
-
-	public void setScoreERemark(String scoreERemark) {
-		this.scoreERemark = scoreERemark;
-	}
 }

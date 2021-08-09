@@ -23,7 +23,7 @@ public interface LoginUser {
 	 * 
 	 * @return String
 	 */
-	public String getName();
+	//public String getName();
 	
 	/**
 	 * 获取登录名称

@@ -29,12 +29,12 @@ public class FileDaoImpl extends RBaseDaoImpl<File> implements FileDao {
 				+ "FROM SYS_FILE FILE "
 				+ "LEFT JOIN SYS_USER USER ON FILE.UPDATE_USER_ID = USER.ID";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "FILE.NAME LIKE ?", "%" + pageIn.getTwo() + "%");
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.getThree()), "FILE.EXT_NAME LIKE ?", "%" + pageIn.getThree() + "%");
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "FILE.NAME LIKE ?", "%" + pageIn.get("name") + "%");
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("extName")), "FILE.EXT_NAME LIKE ?", "%" + pageIn.get("extName") + "%");
 		sqlUtil.addWhere("FILE.STATE = 1");
 		sqlUtil.addOrder("FILE.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDate(pageOut.getRows(), "UPDATE_TIME", DateUtil.FORMAT_DATE_TIME);
+		HibernateUtil.formatDate(pageOut.getList(), "UPDATE_TIME", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;
 	}
 

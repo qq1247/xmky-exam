@@ -24,4 +24,8 @@ public class BaseEhCache {
 
 		return cache;
 	}
+	
+	protected static net.sf.ehcache.Cache getNativeCache(String cacheName) {
+		return (net.sf.ehcache.Cache)getCache(cacheName).getNativeCache();
+	}
 }

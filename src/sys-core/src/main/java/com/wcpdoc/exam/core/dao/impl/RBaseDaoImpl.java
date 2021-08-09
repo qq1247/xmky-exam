@@ -2,19 +2,20 @@ package com.wcpdoc.exam.core.dao.impl;
 
 import java.lang.reflect.ParameterizedType;
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 
+import org.apache.commons.text.CaseUtils;
 import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.Transformers;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.wcpdoc.exam.core.dao.RBaseDao;
 import com.wcpdoc.exam.core.entity.PageIn;
@@ -42,7 +43,6 @@ import com.wcpdoc.exam.core.util.SqlUtil;
  * @param <T>
  */
 public abstract class RBaseDaoImpl<T> implements RBaseDao<T> {
-	private static final Logger log = LoggerFactory.getLogger(RBaseDaoImpl.class);
 	@Resource
 	private EntityManager entityManager;
 	protected Class<T> clazz;
@@ -127,9 +127,8 @@ public abstract class RBaseDaoImpl<T> implements RBaseDao<T> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public /*final*/ PageOut getListpage(SqlUtil sqlUtil, PageIn pageIn) {
+	public /* final */ PageOut getListpage(SqlUtil sqlUtil, PageIn pageIn) {
 		// 查询列表
-		log.debug("Hibernate：{}", sqlUtil.getWhereParams());
 		String sql = toHibernateSql(sqlUtil.getSql());
 		Query<Map<String, Object>> query = getCurSession().createSQLQuery(sql);
 		for (int i = 0; i < sqlUtil.getWhereParams().size(); i++) {
@@ -139,6 +138,12 @@ public abstract class RBaseDaoImpl<T> implements RBaseDao<T> {
 		query.setMaxResults(pageIn.getPageSize());
 		query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
 		List<Map<String, Object>> result = query.list();
+		for (Map<String, Object> map : result) {// 大写转小写，下划线后一位转大写。
+			Set<String> keySet = new HashSet<>(map.keySet());
+			for (String key : keySet) {
+				map.put(CaseUtils.toCamelCase(key, false, new char[] { '_' }), map.remove(key));
+			}
+		}
 
 		// 查询总记录数
 		sql = toHibernateSql(sqlUtil.getCountSql());
@@ -166,8 +171,15 @@ public abstract class RBaseDaoImpl<T> implements RBaseDao<T> {
 		for (int i = 0; i < params.length; i++) {
 			query.setParameter(i, params[i]);
 		}
-		log.debug("Hibernate：{}", params);
-		return query.list();
+		
+		List<Map<String, Object>> result = query.list();
+		for (Map<String, Object> map : result) {// 大写转小写，下划线后一位转大写。
+			Set<String> keySet = new HashSet<>(map.keySet());
+			for (String key : keySet) {
+				map.put(CaseUtils.toCamelCase(key, false, new char[] { '_' }), map.remove(key));
+			}
+		}
+		return result;
 	}
 	
 	@Override

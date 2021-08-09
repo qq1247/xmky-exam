@@ -2,7 +2,7 @@
 <ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="ehcache.xsd" updateCheck="true"
 	monitoring="autodetect" dynamicConfig="true">
-	<diskStore path="java.io.tmpdir"/>
+	<diskStore path="d:/123"/>
 	<defaultCache 
 		maxElementsInMemory="10000" 
 		eternal="false" 
@@ -12,14 +12,29 @@
 		diskExpiryThreadIntervalSeconds="120" 
 		memoryStoreEvictionPolicy="LRU">
 		<persistence strategy="localTempSwap" />
-	</defaultCache><!-- 来自jar包内ehcache-failsafe.xml-->
-	<!-- 资源缓存，一直保留 -->
+	</defaultCache><!-- 配置来自jar包内ehcache-failsafe.xml-->
+	<!-- 资源缓存，内存 -->
 	<cache name="MY_CACHE"
 		maxEntriesLocalHeap="100000">
 	</cache><!-- maxEntriesLocalHeap必须配置 -->
-	<!-- 进度条缓存，空闲60秒后销毁 -->
+	<!-- 进度条缓存，内存，60秒有效 -->
 	<cache name="PROGRESS_BAR_CACHE"
 		maxEntriesLocalHeap="100000"
-		timeToIdleSeconds="30">
+		timeToIdleSeconds="60">
+    </cache>
+    <!-- 令牌缓存，硬盘持久化 -->
+    <cache name="TOKEN_CACHE" 
+		maxElementsInMemory="1"
+		overflowToDisk="true" 
+		maxElementsOnDisk="0" 
+		diskPersistent="true"
+		eternal="true"
+		timeToIdleSeconds="0"
+		timeToLiveSeconds="0">
+    </cache>
+    <!-- 令牌缓存，用于并发请求时，旧令牌宽限30秒有效期 -->
+	<cache name="OLD_TOKEN_CACHE"
+		maxEntriesLocalHeap="10000"
+		timeToLiveSeconds="30">
     </cache>
 </ehcache>

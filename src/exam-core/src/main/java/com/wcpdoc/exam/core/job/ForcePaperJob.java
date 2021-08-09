@@ -29,7 +29,7 @@ public class ForcePaperJob implements Job{
 		user.setId(1);
 		user.setName("系统管理员");
 		user.setLoginName("sysadmin");
-		examService.doForcePaper(user);
+		examService.forcePaper(user);
 		log.info("成功强制交卷");
 	}
 

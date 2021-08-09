@@ -15,6 +15,11 @@ import org.springframework.core.io.ClassPathResource;
 @Configuration
 @EnableCaching
 public class EhCacheConf {
+	
+	public EhCacheConf() {
+		System.setProperty(net.sf.ehcache.CacheManager.ENABLE_SHUTDOWN_HOOK_PROPERTY, "true");// 参数用于关闭程序时回调接口持久化数据，kill无效。
+	}
+	
 	/**
 	 * 自定义配置
 	 * 

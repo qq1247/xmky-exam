@@ -69,7 +69,7 @@ public class CronController extends BaseController {
 	public PageResult list(PageIn pageIn) {
 		try {
 			PageOut pageOut = cronService.getListpage(pageIn);
-			List<Map<String, Object>> list = pageOut.getRows();
+			List<Map<String, Object>> list = pageOut.getList();
 			for (Map<String, Object> map : list) {
 				if ("1".equals(map.get("STATE").toString())) {
 					map.put("STATE_NAME", "启动");
@@ -85,10 +85,10 @@ public class CronController extends BaseController {
 				}
 				map.put("RECENT_TRIGGER_TIME", timeStr.toString());
 			}
-			return new PageResultEx(true, "查询成功", pageOut);
+			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("定时任务列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 
@@ -148,13 +148,13 @@ public class CronController extends BaseController {
 			// 添加定时任务，默认不启动
 			cron.setState(2);
 			cronService.add(cron);
-			return new PageResult(true, "添加成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成添加定时任务错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加定时任务错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 
@@ -192,13 +192,13 @@ public class CronController extends BaseController {
 	public PageResult doEdit(Cron cron) {
 		try {
 			cronService.updateAndUpdate(cron);
-			return new PageResult(true, "修改成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成修改定时任务错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成修改定时任务错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 
@@ -215,13 +215,13 @@ public class CronController extends BaseController {
 	public PageResult doDel(Integer id) {
 		try {
 			cronService.delAndUpdate(id);
-			return new PageResult(true, "删除成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成删除定时任务错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成删除定时任务错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 	
@@ -237,13 +237,13 @@ public class CronController extends BaseController {
 	public PageResult startTask(Integer id) {
 		try {
 			cronService.startTask(id);
-			return new PageResult(true, "启动成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("启动任务错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("启动任务错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 	
@@ -259,13 +259,13 @@ public class CronController extends BaseController {
 	public PageResult stopTask(Integer id) {
 		try {
 			cronService.stopTask(id);
-			return new PageResult(true, "停止成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("停止任务错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("停止任务错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 	
@@ -281,13 +281,13 @@ public class CronController extends BaseController {
 	public PageResult runOnceTask(Integer id) {
 		try {
 			cronService.runOnceTask(id);
-			return new PageResult(true, "执行成功");
+			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("执行一次错误：{}", e.getMessage());
-			return new PageResult(false, e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("执行一次错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 }

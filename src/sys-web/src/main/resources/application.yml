@@ -1,4 +1,5 @@
 server:
+  port: 8080
   servlet:
     context-path: /
     jsp:
@@ -18,7 +19,19 @@ spring:
       max-request-size: 100MB
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/exam?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
+    username: root
+    password: root
+  jpa:
+    show-sql: false
+    
+file: 
+  upload:
+    dir: d:/bak/file
       
 sys:
-  ver: 2.0.0
-    
+  ver: 3.0.0
+token:
+    expireMinute: 1440
+    refreshMinute: 60
+    secret: 9xzR4+K7XpvbCpoIMocXVxS655xxb9S0Qxd5RDU4b7PeSIhYfYdjg9aOMrhjPjwN

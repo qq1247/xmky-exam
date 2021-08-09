@@ -1,33 +1,26 @@
 package com.wcpdoc.exam.core.service.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.base.service.OrgService;
-import com.wcpdoc.exam.base.service.PostService;
 import com.wcpdoc.exam.base.service.UserService;
-import com.wcpdoc.exam.core.constant.ConstantManager;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.PaperTypeDao;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
+import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperType;
 import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.PaperTypeExService;
 import com.wcpdoc.exam.core.service.PaperTypeService;
-import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
+import com.wcpdoc.exam.file.service.FileService;
 /**
  * 试卷分类服务层实现
  * 
@@ -42,9 +35,11 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 	@Resource
 	private OrgService orgService;
 	@Resource
-	private PostService postService;
-	@Resource
 	private UserService userService;
+	@Resource
+	private PaperService paperService;
+	@Resource
+	private FileService fileService;
 
 	@Override
 	@Resource(name = "paperTypeDaoImpl")
@@ -58,136 +53,67 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 		if (!ValidateUtil.isValid(paperType.getName())) {
 			throw new MyException("参数错误：name");
 		}
-		if (paperType.getParentId() == null || paperType.getParentId() == 0) {
-			throw new MyException("参数错误：parentId");
-		}
 		
-		if (existName(paperType)) {
+		/*if (existName(paperType)) {
 			throw new MyException("名称已存在！");
-		}
+		}*/
 				
 		// 添加试卷分类
+		paperType.setReadUserIds(","+getCurUser().getId()+",");
+		paperType.setWriteUserIds(","+getCurUser().getId()+",");
+		paperType.setCreateUserId(getCurUser().getId());
+		paperType.setCreateTime(new Date());
 		paperType.setUpdateUserId(getCurUser().getId());
 		paperType.setUpdateTime(new Date());
 		paperType.setState(1);
 		add(paperType);
 		
-		// 更新父子关系
-		PaperType parentPaperType = paperTypeDao.getEntity(paperType.getParentId());
-		paperType.setParentSub(parentPaperType.getParentSub() + paperType.getId() + "_");
-		paperType.setLevel(paperType.getParentSub().split("_").length - 1);
-		update(paperType);
+		//保存图片
+		//fileService.doUpload(paperType.getImgId());
 	}
 
+	@Override
+	public void editAndUpdate(PaperType paperType) {
+		//校验数据有效性
+		if(!ValidateUtil.isValid(paperType.getName())) {
+			throw new MyException("参数错误：name");
+		}
+		/*if(existName(paperType)) {
+			throw new MyException("名称已存在！");
+		}*/
+		PaperType entity = paperTypeDao.getEntity(paperType.getId());
+		if (entity.getCreateUserId() != getCurUser().getId()) {
+			throw new MyException("权限不足！");
+		}
+		
+		//修改试卷分类
+		entity.setName(paperType.getName());
+		entity.setImgId(paperType.getImgId());
+		entity.setUpdateTime(new Date());
+		entity.setUpdateUserId(getCurUser().getId());
+		paperTypeDao.update(entity);
+	}
+	
 	@Override
 	public void delAndUpdate(Integer id) {
 		// 校验数据有效性
 		if (id == 1) { //不包括根试卷分类
-			return;
+			throw new MyException("此试卷分类不能被删除！");
 		}
-		List<PaperType> paperTypeList = paperTypeDao.getList(id);
-		if (ValidateUtil.isValid(paperTypeList)) {
-			throw new MyException("请先删除子试卷分类！");
+		List<Paper> paperList = paperService.getList(id);
+		if (ValidateUtil.isValid(paperList)) {
+			throw new MyException("请先删除试卷分类下所有的试卷！");
+		}
+		PaperType paperType = getEntity(id);
+		if (paperType.getCreateUserId() != getCurUser().getId()) {
+			throw new MyException("权限不足！");
 		}
 		
 		// 删除试卷分类
-		PaperType paperType = getEntity(id);
-		paperTypeExService.delAndUpdate(paperType);
-		
 		paperType.setState(0);
 		paperType.setUpdateTime(new Date());
 		paperType.setUpdateUserId(getCurUser().getId());
 		update(paperType);
-	}
-
-	@Override
-	public List<Map<String, Object>> getTreeList() {
-		return paperTypeDao.getTreeList();
-	}
-	
-	@Override
-	public List<Map<String, Object>> getAuthTreeList() {
-		User user = userService.getEntity(getCurUser().getId());
-		List<PaperType> paperTypeList = getList();
-		
-		List<Map<String, Object>> paperTypeTreeList = new ArrayList<Map<String,Object>>();
-		for(PaperType paperType : paperTypeList) {
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("ID", paperType.getId());
-			map.put("NAME", paperType.getName());
-			map.put("PARENT_ID", paperType.getParentId());
-			
-			if(ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {// 系统管理员，拥有所有权限
-				paperTypeTreeList.add(map);
-				continue;
-			}
-			if(ValidateUtil.isValid(paperType.getUserIds()) 
-					&& paperType.getUserIds().contains(String.format(",%s,", user.getId()))) {//有用户权限
-				paperTypeTreeList.add(map);
-				continue;
-			}
-			if(ValidateUtil.isValid(paperType.getOrgIds())
-					&& paperType.getOrgIds().contains(String.format(",%s,", user.getOrgId()))) {//有机构权限
-				paperTypeTreeList.add(map);
-				continue;
-			}
-			if (ValidateUtil.isValid(paperType.getPostIds())
-					&& ValidateUtil.isValid(user.getPostIds())) {
-				Set<String> postList = new HashSet<>(Arrays.asList(user.getPostIds().substring(1, user.getPostIds().length() - 1).split(",")));
-				for(String postId : postList) {
-					if (postService.getEntity(Integer.parseInt(postId)).getState() == 1
-							&& paperType.getPostIds().contains(String.format(",%s,", postId))) {//有岗位权限
-						paperTypeTreeList.add(map);
-						continue;
-					}
-				}
-			}
-		}
-		
-		return paperTypeTreeList;
-	}
-	
-	@Override
-	public void doMove(Integer sourceId, Integer targetId) {
-		// 校验数据有效性
-		if (sourceId == null) {
-			throw new MyException("参数错误：sourceId");
-		}
-		if (targetId == null) {
-			throw new MyException("参数错误：targetId");
-		}
-		if (sourceId == targetId) {
-			throw new MyException("源试卷分类和目标试卷分类一致！");
-		}
-
-		PaperType source = getEntity(sourceId);
-		PaperType target = getEntity(targetId);
-		if (target.getParentSub().contains(source.getParentSub())) {
-			throw new MyException("父试卷分类不能移动到子试卷分类下！");
-		}
-
-		// 移动试卷分类
-		source.setParentId(target.getId());
-		source.setParentSub(String.format("%s%s_", target.getParentSub(), source.getId()));
-		source.setLevel(source.getParentSub().split("_").length - 1);
-		update(source);
-		
-		List<PaperType> subSourceList = paperTypeDao.getList(source.getId());
-		doMove(source, subSourceList);
-	}
-		
-	private void doMove(PaperType target, List<PaperType> subTargetList) {
-		for (PaperType subTarget : subTargetList) {
-			subTarget.setParentId(target.getId());
-			subTarget.setParentSub(String.format("%s%s_", target.getParentSub(), subTarget.getId()));
-			subTarget.setLevel(subTarget.getParentSub().split("_").length - 1);
-			update(subTarget);
-			
-			List<PaperType> subSubTargetList = paperTypeDao.getList(subTarget.getId());
-			if (ValidateUtil.isValid(subSubTargetList)) {
-				doMove(subTarget, subSubTargetList);
-			}
-		}
 	}
 
 	@Override
@@ -201,48 +127,30 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 	}
 
 	@Override
-	public void doAuth(Integer id, Integer[] userIds, Integer[] postIds, Integer[] orgIds, boolean syn2Sub) {
-		if(syn2Sub) {
-			List<PaperType> paperTypeList = paperTypeDao.getList(id);
-			for(PaperType paperType : paperTypeList) {
-				doAuth(paperType.getId(), userIds, postIds, orgIds, syn2Sub);
-			}
-		}
-		
+	public void doAuth(Integer id, String readUserIds, String writeUserIds) {		
 		PaperType entity = getEntity(id);
-		if (!ValidateUtil.isValid(userIds)) {
-			entity.setUserIds(null);
-		} else {
-			entity.setUserIds(String.format(",%s,", StringUtil.join(userIds)));
+		if(entity.getCreateUserId().intValue() != getCurUser().getId()){
+			throw new MyException("非法操作！");
 		}
-		if (!ValidateUtil.isValid(postIds)) {
-			entity.setPostIds(null);
-		} else {
-			entity.setPostIds(String.format(",%s,", StringUtil.join(postIds)));
+		if (ValidateUtil.isValid(readUserIds)) {
+			entity.setReadUserIds(","+readUserIds+",");
 		}
-		if (!ValidateUtil.isValid(orgIds)) {
-			entity.setOrgIds(null);
-		} else {
-			entity.setOrgIds(String.format(",%s,", StringUtil.join(orgIds)));
+		if (ValidateUtil.isValid(writeUserIds)) {
+			entity.setWriteUserIds(","+writeUserIds+",");
 		}
-		
+		if(!entity.getReadUserIds().contains(","+getCurUser().getId()+",")){
+			throw new MyException("创建者不能被删除！");
+		}
+		if(!entity.getWriteUserIds().contains(","+getCurUser().getId()+",")){
+			throw new MyException("创建者不能被删除！");
+		}
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
 		update(entity);
 	}
-
+	
 	@Override
-	public PageOut getAuthUserListpage(PageIn pageIn) {
-		return paperTypeDao.getAuthUserListpage(pageIn);
-	}
-
-	@Override
-	public PageOut getAuthPostListpage(PageIn pageIn) {
-		return paperTypeDao.getAuthPostListpage(pageIn);
-	}
-
-	@Override
-	public PageOut getAuthOrgListpage(PageIn pageIn) {
-		return paperTypeDao.getAuthOrgListpage(pageIn);
+	public PageOut authUserListpage(PageIn pageIn) {
+		return paperTypeDao.authUserListpage(pageIn);
 	}
 }

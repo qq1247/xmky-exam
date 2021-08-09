@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -34,6 +35,8 @@ import com.wcpdoc.exam.core.service.MyMarkService;
 import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.PaperTypeService;
 import com.wcpdoc.exam.core.service.QuestionService;
+import com.wcpdoc.exam.core.util.StringUtil;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
  * 考试服务层实现
@@ -72,109 +75,119 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	@Override
-	public PageOut getUserListpage(PageIn pageIn) {
-		return examDao.getUserListpage(pageIn);
+	public List<Map<String, Object>> getExamUserList(Integer id) {
+		return examDao.getExamUserList(id);
 	}
 
 	@Override
-	public void doCfg(Integer id, Integer[] userIds, Integer[] myMarkIds) {
+	public void updateExamUser(Integer id, Integer[] userIds) {
+		// 校验数据有效性
+				if (id == null) {
+					throw new MyException("参数错误：id");
+				}
+				if (userIds == null) {
+					throw new MyException("参数错误：userIds");
+				}
+				Exam exam = getEntity(id);
+				if (exam.getState() == 0) {
+					throw new MyException("考试已删除！");
+				}
+				if (exam.getState() == 2) {
+					throw new MyException("考试未发布！");// 必须已发布，否则在考试结束前添加或删除考试用户，试题有可能会变更，每个人的考试详细可能不一样（也能处理，比较费事）。
+				}
+
+				if (exam.getEndTime().getTime() <= new Date().getTime()) {
+					throw new MyException("考试已结束，不允许添加！");
+				}
+
+				// 添加我的考试（不能整个重新添加，因为有可能是已开始考试途中添加人员，部分人员已作答）
+				List<MyExam> myExamList = myExamService.getList(id);// 当前考试的人员
+				List<Question> questionList = paperService.getQuestionList(exam.getPaperId());// 试卷的问题
+				Set<Integer> curUserIdSet = new HashSet<>(Arrays.asList(userIds));//当前页面选中的考试的人员
+				ListIterator<MyExam> myExamListIterator = myExamList.listIterator();
+				while (myExamListIterator.hasNext()) {// 如果页面有选择该用户，数据库也有，则不处理
+					MyExam next = myExamListIterator.next();
+					if (curUserIdSet.contains(next.getUserId())) {
+						myExamListIterator.remove();
+						curUserIdSet.remove(next.getUserId());
+					}
+				}
+				myExamListIterator = myExamList.listIterator();
+				while (myExamListIterator.hasNext()) {// 如果页面没有选择该用户，数据库有，则数据库记录删除该用户的考试记录和考试详细记录
+					MyExam next = myExamListIterator.next();
+					myExamDetailService.delByMyExamId(next.getId());
+					
+					myExamService.del(next.getId());
+				}
+				Date curTime = new Date();
+				for (Integer userId : curUserIdSet) {//如果页面有选择该用户，数据库没有，则数据库添加该用户的考试记录和考试详细记录
+					MyExam myExam = new MyExam();
+					myExam.setExamId(id);
+					myExam.setUserId(userId);
+					
+					myExam.setAnswerStartTime(exam.getStartTime());
+					myExam.setAnswerEndTime(exam.getEndTime());
+					myExam.setMarkStartTime(exam.getMarkStartTime());
+					myExam.setMarkEndTime(exam.getMarkEndTime());
+					//myExam.setTotalScore(BigDecimal.ZERO);//没有考试，不要设置分数
+					myExam.setState(1);
+					myExam.setMarkState(1);
+					myExam.setUpdateTime(curTime);
+					myExam.setUpdateUserId(getCurUser().getId());
+					myExamService.add(myExam);// 添加我的考试
+					
+					for (Question question : questionList) {
+						MyExamDetail myExamDetail = new MyExamDetail();
+						myExamDetail.setMyExamId(myExam.getId());
+						myExamDetail.setExamId(myExam.getExamId());
+						myExamDetail.setUserId(myExam.getUserId());
+						myExamDetail.setQuestionId(question.getId());
+						myExamDetail.setQuestionScore(question.getScore());
+						myExamDetailService.add(myExamDetail);// 添加我的考试详细
+					}
+				}
+	}
+
+	@Override
+	public void updateMarkUser(Integer id, Integer[] markUserIds, String[] examUserIds, String[] questionIds) {
 		// 校验数据有效性
 		if (id == null) {
 			throw new MyException("参数错误：id");
 		}
-		Exam exam = getEntity(id);
-		if (exam.getState() == 0) {
-			throw new MyException("考试已删除！");
+		if (markUserIds == null) {
+			throw new MyException("参数错误：markUserIds");
 		}
-//		if (exam.getState() == 2) {
-//			throw new MyException("考试未发布！");
-//		}
-
-		if (exam.getEndTime().getTime() <= new Date().getTime()) {
-			throw new MyException("考试已结束，不允许添加！");
+		if (!ValidateUtil.isValid(examUserIds) && !ValidateUtil.isValid(questionIds)) {// 两个不能都无效
+			throw new MyException("参数错误：examUserIds,questionIds");
 		}
-
-		// 添加我的考试
-		List<MyExam> myExamList = myExamService.getList(id);
-		List<Question> questionList = paperService.getQuestionList(exam.getPaperId());
-		Set<Integer> userIdsSet = new HashSet<>(Arrays.asList(userIds));
-		ListIterator<MyExam> myExamListIterator = myExamList.listIterator();
-		while (myExamListIterator.hasNext()) {//共同的剔除
-			MyExam next = myExamListIterator.next();
-			if (userIdsSet.contains(next.getUserId())) {
-				myExamListIterator.remove();
-				userIdsSet.remove(next.getUserId());
-				
-				for (Question question : questionList) {// 添加我的考试详细
-					MyExamDetail myExamDetail = new MyExamDetail();
-					myExamDetail.setMyExamId(next.getId());
-					myExamDetail.setExamId(next.getExamId());
-					myExamDetail.setUserId(next.getUserId());
-					myExamDetail.setQuestionId(question.getId());
-					myExamDetailService.add(myExamDetail);
-				}
-			}
-		}
-		myExamListIterator = myExamList.listIterator();
-		while (myExamListIterator.hasNext()) {//多余的删除
-			MyExam next = myExamListIterator.next();
-			myExamDetailService.delByMyExamId(next.getId());
-			
-			myExamService.del(next.getId());
-		}
-		Date curTime = new Date();
-		for (Integer userId : userIdsSet) {//没有的添加
-			MyExam myExam = new MyExam();
-			myExam.setExamId(id);
-			myExam.setUserId(userId);
-			//myExam.setTotalScore(BigDecimal.ZERO);//没有考试，不要设置分数
-			myExam.setState(1);
-			myExam.setMarkState(1);
-			myExam.setUpdateTime(curTime);
-			myExam.setUpdateUserId(getCurUser().getId());
-			myExamService.add(myExam);
-			
-			for (Question question : questionList) {// 添加我的考试详细
-				MyExamDetail myExamDetail = new MyExamDetail();
-				myExamDetail.setMyExamId(myExam.getId());
-				myExamDetail.setExamId(myExam.getExamId());
-				myExamDetail.setUserId(myExam.getUserId());
-				myExamDetail.setQuestionId(question.getId());
-				myExamDetailService.add(myExamDetail);
-			}
+		if (ValidateUtil.isValid(examUserIds) && ValidateUtil.isValid(questionIds)) {// 两个不能都有效
+			throw new MyException("参数错误：examUserIds,questionIds");
 		}
 		
-		// 添加我的阅卷
+		// 更新阅卷用户
 		List<MyMark> myMarkList = myMarkService.getList(id);
-		Set<Integer> myMarkIdsSet = new HashSet<>(Arrays.asList(myMarkIds));
-		ListIterator<MyMark> myMarkListIterator = myMarkList.listIterator();
-		while (myMarkListIterator.hasNext()) {//共同的剔除
-			MyMark next = myMarkListIterator.next();
-			if (myMarkIdsSet.contains(next.getUserId())) {
-				myMarkListIterator.remove();
-				myMarkIdsSet.remove(next.getUserId());
-			}
+		for (MyMark myMark : myMarkList) {
+			myMarkService.del(myMark.getId());
 		}
-		myMarkListIterator = myMarkList.listIterator();
-		while (myMarkListIterator.hasNext()) {//多余的删除
-			MyMark next = myMarkListIterator.next();
-			myMarkService.del(next.getId());
+		if (markUserIds.length == 1) {
+			examUserIds[0] = StringUtil.join(examUserIds);
 		}
-		for (Integer userId : myMarkIdsSet) {//没有的添加
+		
+		for(int i = 0; i < markUserIds.length; i++) {
 			MyMark myMark = new MyMark();
+			myMark.setMarkUserId(markUserIds[i]);
+			myMark.setExamUserIds(examUserIds != null ? String.format(",%s,", examUserIds[i]) : null);
+			myMark.setQuestionIds(questionIds != null ? String.format(",%s,", questionIds[i]) : null);
+			myMark.setUpdateUserId(getCurUser().getId());
+			myMark.setUpdateTime(new Date());
 			myMark.setExamId(id);
-			myMark.setUserId(userId);
+			myMark.setAutoState(2);
 			myMarkService.add(myMark);
 		}
 	}
 
 	@Override
-	public void doPaper(LoginUser user, Integer myExamId) {
-		
-	}
-	
-	@Override
-	public void doForcePaper(LoginUser user) {
+	public void forcePaper(LoginUser user) {
 		//标记为强制交卷
 		log.debug("开始强制交卷");
 		examDao.doForcePaper(user);
@@ -187,7 +200,22 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	@Override
-	public PageOut getGradeListpage(PageIn pageIn) {
+	public PageOut getGradeListpage(PageIn pageIn) {   
 		return examDao.getGradeListpage(pageIn);
+	}
+
+	@Override
+	public List<Exam> getExamList(Integer paperId) {
+		return examDao.getExamList(paperId);
+	}
+
+	@Override
+	public List<Map<String, Object>> getMarkExamUserList(Integer id, Integer markUserId) {
+		return examDao.getMarkExamUserList(id, markUserId);
+	}
+
+	@Override
+	public List<Map<String, Object>> getMarkQuestionList(Integer id, Integer markUserId) {
+		return examDao.getMarkQuestionList(id, markUserId);
 	}
 }

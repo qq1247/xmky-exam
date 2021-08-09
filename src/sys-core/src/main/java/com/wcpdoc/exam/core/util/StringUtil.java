@@ -218,6 +218,29 @@ public class StringUtil {
 		}
 		return sb.toString();
 	}
+	
+	/**
+	 * 字符串连接
+	 * 
+	 * v1.0 zhanghc 2021年7月27日下午4:05:56
+	 * @param strArr
+	 * @param separator
+	 * @return String
+	 */
+	public static String join(Object[] strArr, char separator) {
+		if (!ValidateUtil.isValid(strArr)) {
+			throw new MyException("参数错误：strArr");
+		}
+		
+		StringBuilder sb = new StringBuilder();
+		for (Object str : strArr) {
+			if (sb.length() > 0) {
+				sb.append(separator);
+			}
+			sb.append(str);
+		}
+		return sb.toString();
+	}
 
 	/**
 	 * 字符串连接
@@ -300,5 +323,24 @@ public class StringUtil {
 		}
 		
 		return value.toString();
+	}
+	
+	/**
+	 * 字符串转int数组
+	 * 
+	 * v1.0 zhanghc 2021年7月29日下午6:07:14
+	 * @param strArr
+	 * @return List<Integer>
+	 */
+	public static List<Integer> toInt(String strArr) {
+		if (!ValidateUtil.isValid(strArr)) {
+			throw new MyException("参数错误：strArr");
+		}
+		
+		List<Integer> intList = new ArrayList<>();
+		for (String str : strArr.split(",")) {
+			intList.add(Integer.parseInt(str));
+		}
+		return intList;
 	}
 }

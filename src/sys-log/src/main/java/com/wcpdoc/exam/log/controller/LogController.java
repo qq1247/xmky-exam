@@ -85,10 +85,10 @@ public class LogController extends BaseController {
 	@ResponseBody
 	public PageResult list(String logName, Long curReadLen) {
 		try {
-			return new PageResultEx(true, "查询成功", logService.getList(logName, curReadLen));
+			return PageResultEx.ok().data(logService.getList(logName, curReadLen));
 		} catch (Exception e) {
 			log.error("日志列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 }

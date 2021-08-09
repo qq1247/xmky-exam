@@ -1,9 +1,9 @@
 package com.wcpdoc.exam.base.service;
 
 import java.util.List;
-import java.util.Map;
 
 import com.wcpdoc.exam.base.entity.User;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.service.BaseService;
 
 /**
@@ -22,16 +22,6 @@ public interface UserService extends BaseService<User> {
 	 * void
 	 */
 	User getUser(String loginName);
-
-	/**
-	 * 获取权限
-	 * 
-	 * v1.0 zhanghc 2016年8月12日上午10:57:35
-	 * 
-	 * @param id
-	 * @return Map<Integer, Long>
-	 */
-	Map<Integer, Long> getAuth(Integer id);
 
 	/**
 	 * 完成修改密码
@@ -54,7 +44,7 @@ public interface UserService extends BaseService<User> {
 	 * @param newPwd
 	 * void
 	 */
-	void doPwdUpdate(String oldPwd, String newPwd);
+	void pwdUpdate(String oldPwd, String newPwd);
 
 	/**
 	 * 获取加密后的密码
@@ -85,4 +75,30 @@ public interface UserService extends BaseService<User> {
 	 * @return List<User>
 	 */
 	List<User> getList(Integer orgId);
+
+	/**
+	 * 修改角色
+	 * 
+	 * v1.0 chenyun 2021年3月16日下午5:22:45
+	 * @param id
+	 * @param roles void
+	 */
+	void roleUpdate(Integer id, String roles);
+	
+	/**
+	 * 在线用户
+	 * 
+	 * v1.0 chenyun 2021年3月25日上午10:29:51
+	 * @return PageOut
+	 */
+	PageOut onList();
+	
+	/**
+	 * 同步用户
+	 * 
+	 * v1.0 chenyun 2021年3月26日下午3:50:32
+	 * @param user
+	 * @param orgId
+	 */
+	void syncUser(List<User> user, Integer orgId);
 }

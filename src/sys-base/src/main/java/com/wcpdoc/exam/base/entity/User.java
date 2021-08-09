@@ -30,6 +30,8 @@ public class User implements LoginUser {
 	private String name;
 	@Column(name = "LOGIN_NAME")
 	private String loginName;
+	@Column(name = "EMAIL")
+	private String email;
 	@Column(name = "PHONE")
 	private String phone;
 	@Column(name = "PWD")
@@ -50,8 +52,8 @@ public class User implements LoginUser {
 	private Date updateTime;
 	@Column(name = "ORG_ID")
 	private Integer orgId;
-	@Column(name = "POST_IDS")
-	private String postIds;
+	@Column(name = "ROLES")
+	private String roles;
 	@Column(name = "STATE")
 	private Integer state;
 
@@ -143,11 +145,19 @@ public class User implements LoginUser {
 		this.state = state;
 	}
 
-	public String getPostIds() {
-		return postIds;
+	public String getRoles() {
+		return roles;
 	}
 
-	public void setPostIds(String postIds) {
-		this.postIds = postIds;
+	public void setRoles(String roles) {
+		this.roles = roles;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 }

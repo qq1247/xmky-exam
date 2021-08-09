@@ -31,8 +31,8 @@ public class Org {
 	private Integer level;
 	@Column(name = "PARENT_ID")
 	private Integer parentId;
-	@Column(name = "PARENT_SUB")
-	private String parentSub;
+	@Column(name = "PARENT_IDS")
+	private String parentIds;
 	@Column(name = "UPDATE_USER_ID")
 	private Integer updateUserId;
 	@Column(name = "UPDATE_TIME")
@@ -68,12 +68,12 @@ public class Org {
 		this.parentId = parentId;
 	}
 
-	public String getParentSub() {
-		return parentSub;
+	public String getParentIds() {
+		return parentIds;
 	}
 
-	public void setParentSub(String parentSub) {
-		this.parentSub = parentSub;
+	public void setParentIds(String parentIds) {
+		this.parentIds = parentIds;
 	}
 
 	public Integer getUpdateUserId() {

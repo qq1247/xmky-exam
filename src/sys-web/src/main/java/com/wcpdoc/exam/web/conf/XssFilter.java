@@ -50,15 +50,23 @@ public class XssFilter implements Filter {
 		}
 		
 		// sql,xss过滤
-		HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-		if (log.isDebugEnabled()) {
-			log.debug("Xss过滤前：【{}】【{}】", httpServletRequest.getRequestURI(), JSONObject.toJSONString(httpServletRequest.getParameterMap()));
-		}
-		XssHttpServletRequestWrapper xssHttpServletRequestWrapper = new XssHttpServletRequestWrapper(httpServletRequest);
-		chain.doFilter(xssHttpServletRequestWrapper, response);
-		if (log.isDebugEnabled()) {
-			log.debug("Xss过滤后：【{}】【{}】", xssHttpServletRequestWrapper.getRequestURI(), JSONObject.toJSONString(xssHttpServletRequestWrapper.getParameterMap()));
-		}
+ 		HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+ 		if (!(httpServletRequest.getRequestURI().equals("/api/question/add") || httpServletRequest.getRequestURI().equals("/api/question/edit")
+ 		   || httpServletRequest.getRequestURI().equals("/api/paper/add") || httpServletRequest.getRequestURI().equals("/api/paper/edit")
+ 		   || httpServletRequest.getRequestURI().equals("/api/exam/add") || httpServletRequest.getRequestURI().equals("/api/exam/edit")
+ 				)) {
+ 			if (log.isDebugEnabled()) {
+ 				log.debug("Xss过滤前：【{}】【{}】", httpServletRequest.getRequestURI(), JSONObject.toJSONString(httpServletRequest.getParameterMap()));
+ 			}
+ 			XssHttpServletRequestWrapper xssHttpServletRequestWrapper = new XssHttpServletRequestWrapper(httpServletRequest);
+ 			chain.doFilter(xssHttpServletRequestWrapper, response);
+ 			if (log.isDebugEnabled()) {
+ 				log.debug("Xss过滤后：【{}】【{}】", xssHttpServletRequestWrapper.getRequestURI(), JSONObject.toJSONString(xssHttpServletRequestWrapper.getParameterMap()));
+ 			}
+ 			return;
+ 		}
+ 		
+ 		chain.doFilter(httpServletRequest, response);
 	}
 
 	@Override

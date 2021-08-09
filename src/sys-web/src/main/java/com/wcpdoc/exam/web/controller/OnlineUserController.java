@@ -18,9 +18,7 @@ import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.core.constant.ConstantManager;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
-import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
@@ -66,8 +64,8 @@ public class OnlineUserController extends BaseController{
 			for(HttpSession session : sessionList) {
 				User user = (User) session.getAttribute(ConstantManager.USER);
 				
-				if(ValidateUtil.isValid(pageIn.getTwo())) {
-					if(!user.getLoginName().contains(pageIn.getTwo())) {
+				if(ValidateUtil.isValid(pageIn.get("loginName").toString())) {
+					if(!user.getLoginName().contains(pageIn.get("loginName").toString())) {
 						continue;
 					}
 				}
@@ -78,10 +76,10 @@ public class OnlineUserController extends BaseController{
 				list.add(map);
 			}
 			
-			return new PageResultEx(true, "查询成功", new PageOut(list, list.size()));
+			return null; //PageOut(list, list.size()));
 		} catch (Exception e) {
 			log.error("在线用户列表错误：", e);
-			return new PageResult(false, "查询失败");
+			return PageResult.err();
 		}
 	}
 	
@@ -101,10 +99,10 @@ public class OnlineUserController extends BaseController{
 			HttpSession session = sessionMap.get(id);
 			session.invalidate();//可能已失效
 			
-			return new PageResult(true, "强制退出成功");
+			return PageResult.ok();
 		} catch (Exception e) {
 			log.error("完成强制退出在线用户错误：", e);
-			return new PageResult(false, "未知异常！");
+			return PageResult.err();
 		}
 	}
 }
