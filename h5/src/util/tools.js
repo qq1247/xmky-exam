@@ -1,4 +1,3 @@
-import Vue from 'vue'
 import { Message } from 'element-ui'
 const message = (msg, type = 'success', date = 1500) => {
   Message({
@@ -18,4 +17,10 @@ const resetData = (el, name) => {
   }
 }
 
-export { message, resetData }
+const delay = (msec = 1) => {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(), msec * 1000)
+  })
+}
+
+export { message, resetData, delay }

@@ -208,7 +208,7 @@
             ></i>
           </span>
           <span
-            v-if="data.mark === 'start' && markId === null"
+            v-if="data.mark === 'start' && percentage === 0 && markId === null"
             data-title="阅卷中"
             @click="mark(data)"
           >

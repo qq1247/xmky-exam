@@ -12,8 +12,7 @@
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query" icon="el-icon-search"
-type="primary"
+        <el-button @click="query" icon="el-icon-search" type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -171,20 +170,34 @@ export default {
     async markHandler(data) {
       this.markId = data.examId
       const markStartTime = new Date(data.markStartTime).getTime()
+      const markEndTime = new Date(data.markEndTime).getTime()
       const now = new Date().getTime()
       if (now < markStartTime) {
         this.$tools.message('阅卷未开始，请等待...', 'warning')
         return
       }
 
-      if (data.autoState === 1 || now > markStartTime) {
+      if (now > markEndTime) {
         this.$router.push({
           path: '/my/markExam',
           query: {
             examId: data.examId,
             paperId: data.paperId,
             markId: data.id,
-            preview: data.mark !== 'start',
+            preview: true,
+          },
+        })
+        return
+      }
+
+      if (markStartTime < now < markEndTime && data.autoState === 1) {
+        this.$router.push({
+          path: '/my/markExam',
+          query: {
+            examId: data.examId,
+            paperId: data.paperId,
+            markId: data.id,
+            preview: false,
           },
         })
         return
@@ -193,59 +206,59 @@ export default {
       const res = await this.$https
         .myExamAutoScore({
           id: data.id,
-          examId: data.examIds,
+          examId: data.examId,
         })
         .catch((err) => {
           console.log(err)
         })
-
       if (res?.code === 200) {
-        setTimeout(async () => {
-          const percentage = await this.getProgress(res.data)
-          if (percentage.data.curNum === percentage.data.totalNum) {
-            this.percentage = 100
-            if (percentage.data.code === 2) {
-              setTimeout(() => {
-                this.$router.push({
-                  path: '/my/markExam',
-                  query: {
-                    examId: data.examId,
-                    markId: data.id,
-                    paperId: data.paperId,
-                    preview: data.mark !== 'start',
-                  },
-                })
-                this.percentage = 0
-                this.markId = null
-                clearTimeout()
-              }, 500)
-            } else {
-              setTimeout(() => {
-                this.percentage = 0
-                this.markId = null
-                this.query()
-              }, 500)
-            }
-            return
-          }
-        }, 1000)
-
-        setTimeout(async () => {
-          const percentage = await this.getProgress(res.data)
-          this.percentage +=
-            Math.ceil(
-              Math.abs(percentage.data.curNum / percentage.data.totalNum) * 100
-            ) - this.percentage
-        }, 1000)
+        this.percentage = 1
+        const isAiEnd = await this.getProgress(res.data)
+        if (isAiEnd) {
+          this.$router.push({
+            path: '/my/markExam',
+            query: {
+              examId: data.examId,
+              paperId: data.paperId,
+              markId: data.id,
+              preview: false,
+            },
+          })
+          this.$tools.delay().then(() => {
+            this.percentage = 0
+            this.markId = null
+          })
+        }
       } else {
         this.$tools.message(res.msg || '智能阅卷失败！请重试！', 'erroe')
       }
     },
     // 获取进度
     async getProgress(id) {
-      return await this.$https.myExamAiProgress({
-        id,
+      const percentage = await this.$tools.delay().then(() => {
+        return this.$https
+          .myExamAiProgress({
+            id,
+          })
+          .catch((err) => {})
       })
+
+      if (!percentage?.data?.totalNum) {
+        this.percentage = 0
+        this.markId = null
+        return false
+      }
+
+      this.percentage +=
+        Math.ceil(
+          Math.abs(percentage.data.curNum / percentage.data.totalNum) * 100
+        ) - this.percentage
+
+      if (percentage.data.curNum === percentage.data.totalNum) {
+        return true
+      } else {
+        this.getProgress(id)
+      }
     },
     // 分页切换
     pageChange(val) {
