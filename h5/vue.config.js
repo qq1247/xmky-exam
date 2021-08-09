@@ -19,14 +19,21 @@ const getIPAddress = () => {
   }
 }
 
-console.log(process.env.VUE_APP_BASE_URL)
-
 module.exports = {
   publicPath: '/',
   outputDir: 'dist',
   assetsDir: 'assets',
   lintOnSave: true,
   runtimeCompiler: true,
+  pages: {
+    index: {
+      entry: 'src/main.js',
+      template: 'public/index.html',
+      filename: 'index.html',
+      title: '在线考试',
+      chunks: ['chunk-vendors', 'chunk-common', 'index'],
+    },
+  },
   chainWebpack: (config) => {
     config.resolve.alias.set('@', path.resolve(__dirname, './src'))
   },
