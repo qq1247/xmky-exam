@@ -17,7 +17,6 @@
 
 ## 技术实现
 bs架构，采用开源组件jdk8、mysql5.5、springboot2x、elementUI2x
-bs架构，采用开源组件jdk8、mysql5.5、springboot2x、layui2x
 
 ## qq群
 811189776
