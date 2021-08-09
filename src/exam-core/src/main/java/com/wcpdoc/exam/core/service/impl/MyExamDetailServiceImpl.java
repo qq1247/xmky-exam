@@ -134,7 +134,11 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		List<MyExam> myExamList = new ArrayList<MyExam>();
 		String[] examUserIds = myMark.getExamUserIds().substring(1, myMark.getExamUserIds().length()-1).split(",");// 获取用户信息
 		for(String examUserId : examUserIds){
-			myExamList.add(myExamService.getEntity(examId, Integer.parseInt(examUserId)));
+			MyExam myExam = myExamService.getEntity(examId, Integer.parseInt(examUserId));
+			if(myExam == null){
+				continue;
+			}
+			myExamList.add(myExam);
 		}
 		List<PaperQuestionEx> paperQuestionExList = paperService.getPaperList(exam.getPaperId());// 获取试卷信息
 		//List<MyExam> myExamList = myExamService.getList(examId);

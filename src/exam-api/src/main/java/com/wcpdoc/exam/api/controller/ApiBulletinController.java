@@ -70,7 +70,7 @@ public class ApiBulletinController extends BaseController {
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult add(Bulletin bulletin) {
 		try {
-			if (bulletin.getReadUserIds() != null) {
+			if (ValidateUtil.isValid(bulletin.getReadUserIds())) {
 				bulletin.setReadUserIds(","+bulletin.getReadUserIds()+",");
 			}
 			bulletin.setUpdateTime(new Date());
@@ -101,10 +101,10 @@ public class ApiBulletinController extends BaseController {
 			entity.setTitle(bulletin.getTitle());
 			entity.setImgFileId(bulletin.getImgFileId());
 			entity.setContent(bulletin.getContent());
-			if (bulletin.getReadUserIds() != null) {
+			if (ValidateUtil.isValid(bulletin.getReadUserIds())) {
 				entity.setReadUserIds(","+bulletin.getReadUserIds()+",");
 			}else{
-				entity.setReadUserIds(bulletin.getReadUserIds());
+				entity.setReadUserIds(null);
 			}
 			entity.setTopState(bulletin.getTopState());
 			entity.setState(bulletin.getState());
