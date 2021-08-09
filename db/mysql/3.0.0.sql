@@ -555,6 +555,7 @@ INSERT INTO `SYS_VER` VALUES (5, '1.1.3', '2019-08-14 18:49:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (6, '1.1.4', '2019-09-05 09:58:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (7, '1.1.5', '2019-12-16 23:16:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (8, '2.0.0', '2020-10-15 00:00:00', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (9, '3.0.0', '2020-08-06 13:58:00', 'zhanghc', '');
 
 INSERT INTO `EXM_QUESTION_TYPE` VALUES ('1', '试题分类', null, '1', '2017-08-01 22:31:43', '1', '2017-08-01 22:31:43', '1', '1', null, null);
 INSERT INTO `EXM_PAPER_TYPE` VALUES ('1', '试卷分类', null, '1', '2017-08-01 22:31:43', '1', '2017-08-01 22:31:43', '1', '1', null, null);
