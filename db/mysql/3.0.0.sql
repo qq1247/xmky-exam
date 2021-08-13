@@ -128,7 +128,7 @@ create table EXM_QUESTION_TYPE
 (
    ID                   int not null auto_increment comment 'id',
    NAME                 varchar(32) comment '名称',
-   IMG_ID               int comment '附件ID',
+   IMG_FILE_ID               int comment '附件ID',
    CREATE_USER_ID       int comment '创建人',
    CREATE_TIME          datetime comment '创建时间',
    UPDATE_USER_ID       int comment '修改人',
@@ -151,7 +151,7 @@ create table EXM_PAPER_TYPE
 (
    ID                   int not null auto_increment comment 'id',
    NAME                 varchar(32) comment '名称',
-   IMG_ID               int comment '附件ID',
+   IMG_FILE_ID               int comment '附件ID',
    CREATE_USER_ID       int comment '创建人',
    CREATE_TIME          datetime comment '创建时间',
    UPDATE_USER_ID       int comment '修改人',
@@ -174,7 +174,7 @@ create table EXM_EXAM_TYPE
 (
    ID                   int not null auto_increment comment '主键',
    NAME                 varchar(32) comment '名称',
-   IMG_ID               int comment '附件ID',
+   IMG_FILE_ID               int comment '附件ID',
    CREATE_USER_ID       int comment '创建人',
    CREATE_TIME          datetime comment '创建时间',
    UPDATE_USER_ID       int comment '修改人',
@@ -462,12 +462,17 @@ drop table if exists EXM_BULLETIN;
 /*==============================================================*/
 /* Table: EXM_BULLETIN                                          */
 /*==============================================================*/
+drop table if exists EXM_BULLETIN;
+
+/*==============================================================*/
+/* Table: EXM_BULLETIN                                          */
+/*==============================================================*/
 create table EXM_BULLETIN
 (
    ID                   int not null auto_increment comment '主键',
    TITLE                varchar(32) comment '标题',
-   IMGS                 varchar(256) comment '图片',
-   VIDEO                varchar(256) comment '视频',
+   IMG_FILE_ID          varchar(256) comment '图片',
+   VIDEO_FILE_ID        varchar(256) comment '视频',
    CONTENT              text comment '内容',
    IMGS_HEIGHT          int comment '图片高',
    IMGS_WIDTH           int comment '图片宽',
@@ -483,21 +488,6 @@ create table EXM_BULLETIN
 );
 
 alter table EXM_BULLETIN comment '公告';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /*==============================================================*/
