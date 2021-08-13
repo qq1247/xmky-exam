@@ -1,0 +1,46 @@
+<!--
+ * @Description: 
+ * @Version: 1.0
+ * @Company: 
+ * @Author: Che
+ * @Date: 2021-08-09 14:25:53
+ * @LastEditors: Che
+ * @LastEditTime: 2021-08-11 11:02:36
+-->
+<template>
+  <div class="app-container">
+    <app-header></app-header>
+    <app-main></app-main>
+    <app-footer></app-footer>
+  </div>
+</template>
+
+<script>
+import AppHeader from './AppHeader/Index.vue'
+import AppMain from './AppMain.vue'
+import AppFooter from './AppFooter.vue'
+export default {
+  name: 'LayOut',
+  components: {
+    AppHeader,
+    AppMain,
+    AppFooter,
+  },
+  data() {
+    return {}
+  },
+  mounted() {},
+  methods: {},
+}
+</script>
+
+<style lang="scss">
+@import '@/assets/style/element-variables.scss';
+.app-container {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  background: $--background-color-base;
+  color: $--color-text-regular;
+}
+</style>
