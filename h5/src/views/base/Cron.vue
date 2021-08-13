@@ -134,12 +134,10 @@
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="add" type="primary"
-v-if="editForm.id == null"
+        <el-button @click="add" type="primary" v-if="editForm.id == null"
           >添加</el-button
         >
-        <el-button @click="edit" type="primary"
-v-if="editForm.id != null"
+        <el-button @click="edit" type="primary" v-if="editForm.id != null"
           >修改</el-button
         >
         <el-button @click="editForm.show = false">取 消</el-button>
@@ -149,6 +147,16 @@ v-if="editForm.id != null"
 </template>
 
 <script>
+import {
+  cronListPage,
+  cronAdd,
+  cronEdit,
+  cronGet,
+  cronDel,
+  cronStartTask,
+  cronStopTask,
+  cronrunOnceTask,
+} from '@/api/base'
 export default {
   data() {
     return {
@@ -192,7 +200,7 @@ export default {
     async query(curPage = 1) {
       const {
         data: { list, total },
-      } = await this.$https.cronListPage({
+      } = await cronListPage({
         name: this.queryForm.name,
         curPage: curPage,
         pageSize: this.listpage.pageSize,
@@ -223,8 +231,7 @@ export default {
         if (!valid) {
           return false
         }
-
-        const { code, msg } = await this.$https.cronAdd({
+        const { code, msg } = await cronAdd({
           name: this.editForm.name,
           jobClass: this.editForm.jobClass,
           cron: this.editForm.cron,
@@ -244,7 +251,7 @@ export default {
           return false
         }
 
-        const { code, msg } = await this.$https.cronEdit({
+        const { code, msg } = await cronEdit({
           id: this.editForm.id,
           name: this.editForm.name,
           jobClass: this.editForm.jobClass,
@@ -261,7 +268,7 @@ export default {
     },
     // 获取试题
     async get(id) {
-      const res = await this.$https.cronGet({ id: id })
+      const res = await cronGet({ id: id })
       if (res.code != 200) {
         alert(res.msg)
         return
@@ -280,7 +287,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
       }).then(async () => {
-        const res = await this.$https.cronDel({ id })
+        const res = await cronDel({ id })
         if (res?.code != 200) {
           this.$message({
             type: 'error',
@@ -298,7 +305,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
       }).then(async () => {
-        const res = await this.$https.cronStartTask({ id })
+        const res = await cronStartTask({ id })
         if (res?.code != 200) {
           this.$message({
             type: 'error',
@@ -316,7 +323,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
       }).then(async () => {
-        const res = await this.$https.cronStopTask({ id })
+        const res = await cronStopTask({ id })
         if (res?.code != 200) {
           this.$message({
             type: 'error',
@@ -334,7 +341,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
       }).then(async () => {
-        const res = await this.$https.cronrunOnceTask({ id })
+        const res = await cronrunOnceTask({ id })
         if (res?.code != 200) {
           this.$message({
             type: 'error',

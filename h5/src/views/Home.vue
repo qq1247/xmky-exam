@@ -162,7 +162,9 @@
 </template>
 
 <script>
-import getMainColor from '@/util/getImageColor.js'
+import { myExamListPage, myMarkListPage } from '@/api/my'
+import { bulletinListPage } from '@/api/base'
+import getMainColor from '@/utils/getImageColor.js'
 import * as dayjs from 'dayjs'
 export default {
   data() {
@@ -198,7 +200,7 @@ export default {
     async getExamList() {
       const {
         data: { list },
-      } = await this.$https.myExamListPage({
+      } = await myExamListPage({
         curPage: 1,
         pageSize: 10,
         needExam: 1,
@@ -209,7 +211,7 @@ export default {
     async getMarkList() {
       const {
         data: { list },
-      } = await this.$https.myMarkListPage({
+      } = await myMarkListPage({
         curPage: 1,
         pageSize: 10,
         needMark: 1,
@@ -220,7 +222,7 @@ export default {
     async getBulletinList() {
       const {
         data: { list },
-      } = await this.$https.bulletinListPage({
+      } = await bulletinListPage({
         curPage: 1,
         pageSize: 10,
         state: 1,
@@ -231,7 +233,7 @@ export default {
     async getCarouselList() {
       const {
         data: { list },
-      } = await this.$https.bulletinListPage({
+      } = await bulletinListPage({
         curPage: 1,
         pageSize: 10,
         state: 2,
@@ -249,13 +251,13 @@ export default {
       const days = dayjs().daysInMonth()
       const startDate = dayjs().date(1).format('YYYY-MM-DD')
       const endDate = dayjs().date(days).format('YYYY-MM-DD')
-      const examList = await this.$https.myExamListPage({
+      const examList = await myExamListPage({
         curPage: 1,
         pageSize: 10,
         startDate: `${startDate} 00:00:00`,
         endDate: `${endDate} 23:59:59`,
       })
-      const markList = await this.$https.myMarkListPage({
+      const markList = await myMarkListPage({
         curPage: 1,
         pageSize: 10,
         startDate: `${startDate} 00:00:00`,

@@ -94,12 +94,10 @@
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="add" type="primary"
-v-if="editForm.id == null"
+        <el-button @click="add" type="primary" v-if="editForm.id == null"
           >添加</el-button
         >
-        <el-button @click="edit" type="primary"
-v-if="editForm.id != null"
+        <el-button @click="edit" type="primary" v-if="editForm.id != null"
           >修改</el-button
         >
         <el-button @click="editForm.show = false">取 消</el-button>
@@ -109,6 +107,7 @@ v-if="editForm.id != null"
 </template>
 
 <script>
+import { orgListPage, orgAdd, orgEdit, orgGet, orgDel } from '@/api/base'
 export default {
   data() {
     return {
@@ -148,7 +147,7 @@ export default {
     async query() {
       const {
         data: { list, total },
-      } = await this.$https.orgListPage({
+      } = await orgListPage({
         parentId: this.queryForm.parentId,
         name: this.queryForm.name,
         curPage: this.listpage.curPage,
@@ -198,7 +197,7 @@ export default {
           return false
         }
 
-        const { code, msg } = await this.$https.orgAdd({
+        const { code, msg } = await orgAdd({
           name: this.editForm.name,
           parentId: this.editForm.parentId,
           no: this.editForm.no,
@@ -220,7 +219,7 @@ export default {
           return false
         }
 
-        const { code, msg } = await this.$https.orgEdit({
+        const { code, msg } = await orgEdit({
           id: this.editForm.id,
           name: this.editForm.name,
           no: this.editForm.no,
@@ -248,7 +247,7 @@ export default {
         return
       }
 
-      const res = await this.$https.orgGet({ id: id })
+      const res = await orgGet({ id: id })
       if (res.code != 200) {
         alert(res.msg)
         return
@@ -268,7 +267,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
       }).then(async () => {
-        const res = await this.$https.orgDel({ id })
+        const res = await orgDel({ id })
         if (res.code != 200) {
           this.$message({
             type: 'error',

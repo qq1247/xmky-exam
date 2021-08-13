@@ -356,7 +356,7 @@
                           <el-col :span="2.5">【答案】：</el-col>
                           <el-col :span="21">
                             <div
-                              v-for="(answer,index) in child.answers"
+                              v-for="(answer, index) in child.answers"
                               :key="answer.id"
                               class="answers-item"
                             >
@@ -375,7 +375,7 @@
                           <el-col :span="21">
                             <template v-if="child.ai === 1">
                               <div
-                                v-for="(answer,index) in child.answers"
+                                v-for="(answer, index) in child.answers"
                                 :key="answer.id"
                                 class="answers-item"
                               >
@@ -601,6 +601,9 @@
   </div>
 </template>
 <script>
+import { dictListPage } from '@/api/base'
+import { paperQuestionList } from '@/api/paper'
+import { randomListPage } from '@/api/question'
 import Draggable from 'vuedraggable'
 export default {
   components: {
@@ -703,12 +706,12 @@ export default {
       await this.query()
       await this.queryQuestion()
       // 初始化类型下拉框
-      const typeDictData = await this.$https.dictListPage({
+      const typeDictData = await dictListPage({
         dictIndex: 'QUESTION_TYPE',
       })
       this.queryForm.typeDictList = typeDictData.data.list
       // 初始化难度下拉框
-      const difficultyDictData = await this.$https.dictListPage({
+      const difficultyDictData = await dictListPage({
         dictIndex: 'QUESTION_DIFFICULTY',
       })
       this.queryForm.difficultyDictList = difficultyDictData.data.list
@@ -716,7 +719,7 @@ export default {
     // 查询试卷信息
     async query() {
       try {
-        const res = await this.$https.paperQuestionList({
+        const res = await paperQuestionList({
           id: this.paperId,
         })
         res.data.map((item) => {
@@ -751,7 +754,7 @@ export default {
     },
     // 随机查询试题
     async randomQueryQuestion() {
-      const res = await this.$https.randomListPage({
+      const res = await randomListPage({
         id: this.queryForm.id,
         type: this.queryForm.type,
         title: this.queryForm.title,

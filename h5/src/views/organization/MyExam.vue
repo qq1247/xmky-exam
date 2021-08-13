@@ -97,6 +97,7 @@
 </template>
 
 <script>
+import { myExamListPage } from '@/api/my'
 export default {
   data() {
     return {
@@ -122,7 +123,7 @@ export default {
     async query() {
       const {
         data: { list, total },
-      } = await this.$https.myExamListPage({
+      } = await myExamListPage({
         examName: this.queryForm.examName,
         curPage: this.listpage.curPage,
         pageSize: this.listpage.pageSize,

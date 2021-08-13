@@ -183,6 +183,14 @@
 </template>
 
 <script>
+import {
+  bulletinListPage,
+  bulletinAdd,
+  bulletinEdit,
+  bulletinDel,
+  bulletinGet,
+} from '@/api/base'
+import { userListPage } from '@/api/user'
 import Editor from '@/components/Editor.vue'
 import EditHeader from '@/components/EditHeader.vue'
 import CustomSelect from '@/components/CustomSelect.vue'
@@ -248,7 +256,7 @@ export default {
 
       const {
         data: { list, total },
-      } = await this.$https.bulletinListPage({
+      } = await bulletinListPage({
         title: this.queryForm.title,
         curPage: curPage,
         pageSize: this.listpage.pageSize,
@@ -277,7 +285,7 @@ export default {
     },
     // 获取用户
     async getUserList(name = '') {
-      const examUsers = await this.$https.userListPage({
+      const examUsers = await userListPage({
         name,
         curPage: this.editForm.curPage,
         pageSize: this.editForm.pageSize,
@@ -307,7 +315,7 @@ export default {
           return false
         }
 
-        const res = await this.$https.bulletinAdd({
+        const res = await bulletinAdd({
           title: this.editForm.title,
           imgFileId: this.editForm.imgFileId,
           content: this.editForm.content,
@@ -333,7 +341,7 @@ export default {
           return false
         }
 
-        const res = await this.$https.bulletinEdit({
+        const res = await bulletinEdit({
           id: this.editForm.id,
           title: this.editForm.title,
           imgFileId: this.editForm.imgFileId,
@@ -360,7 +368,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
       }).then(async () => {
-        const res = await this.$https.bulletinDel({ id })
+        const res = await bulletinDel({ id })
         if (res.code != 200) {
           this.$message({
             type: 'error',
@@ -373,7 +381,7 @@ export default {
     },
     // 获取用户
     async get(id) {
-      const res = await this.$https.bulletinGet({ id: id })
+      const res = await bulletinGet({ id: id })
       if (res.code != 200) {
         alert(res.msg)
         return

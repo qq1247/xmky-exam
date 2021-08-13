@@ -155,6 +155,14 @@
 </template>
 
 <script>
+import {
+  examTypeListPage,
+  examTypeEdit,
+  examTypeAdd,
+  examTypeDel,
+  examTypeAuth,
+} from '@/api/exam'
+import { userListPage } from '@/api/user'
 import ListCard from '@/components/ListCard.vue'
 import CustomSelect from '@/components/CustomSelect.vue'
 export default {
@@ -199,7 +207,7 @@ export default {
   methods: {
     // 查询分类信息
     async query() {
-      const typeList = await this.$https.examTypeListPage({
+      const typeList = await examTypeListPage({
         name: this.queryForm.queryName,
         curPage: this.curPage,
         pageSize: this.pageSize,
@@ -217,12 +225,12 @@ export default {
         let res
 
         if (this.examForm.edit) {
-          res = await this.$https.examTypeEdit({
+          res = await examTypeEdit({
             id: this.examForm.id,
             name: this.examForm.examName,
           })
         } else {
-          res = await this.$https.examTypeAdd({
+          res = await examTypeAdd({
             name: this.examForm.examName,
           })
         }
@@ -258,7 +266,7 @@ export default {
         type: 'warning',
       })
         .then(async () => {
-          const res = await this.$https.examTypeDel({ id }).catch((err) => {})
+          const res = await examTypeDel({ id }).catch((err) => {})
           if (res?.code == 200) {
             this.total -= 1
             if (this.total <= this.pageSize) {
@@ -277,13 +285,13 @@ export default {
     },
     // 获取用户
     async getUserList(name = '') {
-      const roleUserList = await this.$https.userListPage({
+      const roleUserList = await userListPage({
         name,
         curPage: this.roleForm.curPage,
         pageSize: this.roleForm.pageSize,
       })
 
-      if (JSON.parse(this.$store.state.userInfo).userId == 1) {
+      if (this.$store.getters.userId == 1) {
         roleUserList.data.list.unshift({
           id: 1,
           name: '管理员',
@@ -321,7 +329,7 @@ export default {
     },
     // 编辑权限
     async editRoleUsers() {
-      const res = await this.$https.examTypeAuth({
+      const res = await examTypeAuth({
         id: this.examForm.id,
         readUserIds: this.roleForm.readRoleUser.join(','),
         writeUserIds: this.roleForm.writeRoleUser.join(','),
@@ -337,7 +345,7 @@ export default {
     // 考试子分类
     goDetail({ id }) {
       this.$router.push({
-        path: '/examSetting/list',
+        path: '/exam/list',
         query: { id },
       })
     },

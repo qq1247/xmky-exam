@@ -274,6 +274,8 @@
   </div>
 </template>
 <script>
+import { paperGet, paperQuestionList } from '@/api/paper'
+import { myMarksListPage, myMarkAnswerList } from '@/api/my'
 import ScorePlate from '@/components/ScorePlate.vue'
 export default {
   components: {
@@ -324,7 +326,7 @@ export default {
     // 查询试卷
     async queryPaper() {
       try {
-        const res = await this.$https.paperGet({
+        const res = await paperGet({
           id: this.paperId,
         })
         this.paper = res.data
@@ -333,7 +335,7 @@ export default {
     // 查询试卷信息
     async queryPaperInfo() {
       try {
-        const res = await this.$https.paperQuestionList({
+        const res = await paperQuestionList({
           id: this.paperId,
         })
         res.data.map((item) => {
@@ -346,7 +348,7 @@ export default {
     },
     // 查询考生信息
     async queryExamineeInfo() {
-      const infos = await this.$https.myMarksListPage({
+      const infos = await myMarksListPage({
         curPage: this.curPage,
         pageSize: this.pageSize,
         examId: Number(this.examId),
@@ -359,7 +361,7 @@ export default {
       await this.queryExamineeInfo()
       this.userId = id || this.examUserIds[0].userId
       try {
-        const res = await this.$https.myMarkAnswerList({
+        const res = await myMarkAnswerList({
           examId: this.examId,
           userId: this.userId,
         })

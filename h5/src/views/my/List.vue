@@ -55,7 +55,9 @@
 </template>
 
 <script>
+import { myExamListPage, myMarkListPage } from '@/api/my'
 import ListCard from '@/components/ListCard.vue'
+import { loginSysTime } from '@/api/common'
 export default {
   components: {
     ListCard,
@@ -82,12 +84,12 @@ export default {
   methods: {
     // 我的考试列表
     async query() {
-      const loginSysTimeStr = await this.$https.loginSysTime({})
+      const loginSysTimeStr = await loginSysTime({})
       const curTime = new Date(loginSysTimeStr.data).getTime()
       let myExamList
 
       if (this.type === '1') {
-        myExamList = await this.$https.myExamListPage({
+        myExamList = await myExamListPage({
           name: this.queryForm.examName,
           curPage: this.curPage,
           pageSize: this.pageSize,
@@ -107,7 +109,7 @@ export default {
       }
 
       if (this.type === '2') {
-        myExamList = await this.$https.myMarkListPage({
+        myExamList = await myMarkListPage({
           name: this.queryForm.examName,
           curPage: this.curPage,
           pageSize: this.pageSize,

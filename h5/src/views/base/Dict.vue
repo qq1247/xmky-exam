@@ -127,12 +127,10 @@
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="add" type="primary"
-v-if="editForm.id == null"
+        <el-button @click="add" type="primary" v-if="editForm.id == null"
           >添加</el-button
         >
-        <el-button @click="edit" type="primary"
-v-if="editForm.id != null"
+        <el-button @click="edit" type="primary" v-if="editForm.id != null"
           >修改</el-button
         >
         <el-button @click="editForm.show = false">取 消</el-button>
@@ -142,6 +140,7 @@ v-if="editForm.id != null"
 </template>
 
 <script>
+import { dictListPage, dictAdd, dictEdit, dictGet, dictDel } from '@/api/base'
 export default {
   data() {
     return {
@@ -193,7 +192,7 @@ export default {
       this.queryForm.queryShow = false
       const {
         data: { list, total },
-      } = await this.$https.dictListPage({
+      } = await dictListPage({
         dictIndex: this.queryForm.dictIndex,
         dictKey: this.queryForm.dictKey,
         dictValue: this.queryForm.dictValue,
@@ -227,7 +226,7 @@ export default {
           return false
         }
 
-        const { code, msg } = await this.$https.dictAdd({
+        const { code, msg } = await dictAdd({
           dictIndex: this.editForm.dictIndex,
           dictKey: this.editForm.dictKey,
           dictValue: this.editForm.dictValue,
@@ -248,7 +247,7 @@ export default {
           return false
         }
 
-        const { code, msg } = await this.$https.dictEdit({
+        const { code, msg } = await dictEdit({
           id: this.editForm.id,
           dictIndex: this.editForm.dictIndex,
           dictKey: this.editForm.dictKey,
@@ -265,7 +264,7 @@ export default {
       })
     },
     async get(id) {
-      const res = await this.$https.dictGet({ id: id })
+      const res = await dictGet({ id: id })
       if (res.code != 200) {
         alert(res.msg)
         return
@@ -285,7 +284,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
       }).then(async () => {
-        const res = await this.$https.dictDel({ id })
+        const res = await dictDel({ id })
         if (res?.code != 200) {
           this.$message({
             type: 'error',
