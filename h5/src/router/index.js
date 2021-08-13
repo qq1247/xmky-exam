@@ -188,7 +188,7 @@ export const asyncRoutes = [
       },
     ],
   },
-  /* {
+  {
     path: '/user',
     component: Layout,
     redirect: '/user/index',
@@ -202,22 +202,88 @@ export const asyncRoutes = [
       {
         path: 'index',
         name: 'UserIndex',
-        component: () => import('../views/examSetting/Index.vue'),
+        component: () => import('../views/user/User.vue'),
         meta: {
-          title: '试题列表',
+          title: '用户管理',
         },
       },
       {
-        path: 'list',
-        name: 'SettingList',
-        component: () => import('../views/examSetting/List.vue'),
-        hidden: true,
+        path: 'org',
+        name: 'UserOrg',
+        component: () => import('../views/user/Org.vue'),
         meta: {
-          title: '编辑试题',
+          title: '用户组织',
         },
+        hidden: true,
+      },
+      {
+        path: 'orgExam',
+        name: 'OrgExam',
+        component: () => import('../views/organization/MyExam.vue'),
+        meta: {
+          title: '用户组织',
+        },
+        hidden: true,
+      },
+      {
+        path: 'orgMark',
+        name: 'OrgMark',
+        component: () => import('../views/organization/MyMark.vue'),
+        meta: {
+          title: '用户组织',
+        },
+        hidden: true,
+      },
+      {
+        path: 'orgMarkExam',
+        name: 'OrgMarkExam',
+        component: () => import('../views/organization/MyMarkExam.vue'),
+        meta: {
+          title: '用户组织',
+        },
+        hidden: true,
       },
     ],
-  }, */
+  },
+  {
+    path: '/base',
+    component: Layout,
+    redirect: '/base/index',
+    name: 'Base',
+    meta: {
+      title: '基础管理',
+      icon: 'common common-exam-manage',
+      roles: ['admin'], // you can set roles in root nav
+    },
+    children: [
+      {
+        path: 'index',
+        name: 'BaseIndex',
+        component: () => import('../views/base/Index.vue'),
+        meta: {
+          title: '基础管理',
+        },
+      },
+      {
+        path: 'cron',
+        name: 'BaseCron',
+        component: () => import('../views/base/Cron.vue'),
+        hidden: true,
+      },
+      {
+        path: 'dict',
+        name: 'BaseDict',
+        component: () => import('../views/base/Dict.vue'),
+        hidden: true,
+      },
+      {
+        path: 'param',
+        name: 'BaseParam',
+        component: () => import('../views/base/Param.vue'),
+        hidden: true,
+      },
+    ],
+  },
 ]
 
 /* const routes = [

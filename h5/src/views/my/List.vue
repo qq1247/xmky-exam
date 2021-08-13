@@ -19,25 +19,31 @@
     </el-form>
     <!-- 内容 -->
     <div class="content">
-      <div class="exam-list" v-if="type === 1">
-        <ListCard
-          v-for="(item, index) in myExamList"
-          :key="index"
-          :data="item"
-          name="myExamList"
-          @exam="examHandler"
-        ></ListCard>
-      </div>
-      <div class="exam-list" v-if="type === 2">
-        <ListCard
-          v-for="(item, index) in myExamList"
-          :key="index"
-          :data="item"
-          :markId="markId"
-          :percentage="percentage"
-          name="myMarkExamList"
-          @mark="markHandler"
-        ></ListCard>
+      <template v-if="myExamList.length > 0">
+        <div class="exam-list" v-if="type === 1">
+          <ListCard
+            v-for="(item, index) in myExamList"
+            :key="index"
+            :data="item"
+            name="myExamList"
+            @exam="examHandler"
+          ></ListCard>
+        </div>
+        <div class="exam-list" v-if="type === 2">
+          <ListCard
+            v-for="(item, index) in myExamList"
+            :key="index"
+            :data="item"
+            :markId="markId"
+            :percentage="percentage"
+            name="myMarkExamList"
+            @mark="markHandler"
+          ></ListCard>
+        </div>
+      </template>
+      <div class="data-null" v-else>
+        <img class="data-img" src="../../assets/img/data-null.png" alt />
+        <span class="data-tip">抱歉！暂无信息</span>
       </div>
       <el-pagination
         background

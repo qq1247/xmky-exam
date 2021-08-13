@@ -28,13 +28,13 @@
                 type="primary"
                 >添加用户</el-button
               >
-              <el-button
+              <!-- <el-button
                 @click="toOrg"
                 icon="el-icon-circle-plus-outline"
                 size="mini"
                 type="primary"
                 >添加机构</el-button
-              >
+              > -->
             </el-form-item>
           </el-col>
         </el-row>
@@ -177,8 +177,8 @@ import {
   userInitPwd,
   userDel,
   userGet,
-  orgListPage,
 } from '@/api/user'
+import { orgListPage } from '@/api/base'
 import CustomSelect from '@/components/CustomSelect.vue'
 export default {
   components: {
