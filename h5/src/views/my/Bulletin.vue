@@ -242,7 +242,7 @@ export default {
         ],
       },
       headers: {
-        Authorization: JSON.parse(localStorage.getItem('userInfo')).accessToken,
+        Authorization: this.$store.getters.token,
       },
     }
   },

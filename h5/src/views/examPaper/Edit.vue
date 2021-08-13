@@ -1037,7 +1037,7 @@ export default {
   position: fixed;
   top: 70px;
   left: 20px;
-  bottom: 10px;
+  bottom: 60px;
   z-index: 100;
   .left-top {
     width: 100%;
@@ -1235,11 +1235,11 @@ export default {
 
 .content-right {
   width: 240px;
-  height: calc(100% - 80px);
   background: #fff;
   position: fixed;
   top: 70px;
   right: 20px;
+  bottom: 60px;
   z-index: 100;
   .time-title {
     background-color: rgb(30, 159, 255);
