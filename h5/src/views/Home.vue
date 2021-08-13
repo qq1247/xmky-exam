@@ -72,97 +72,111 @@
             <div class="box-title box-divider">
               <i class="common common-classify"></i><span>待考列表</span>
             </div>
-            <el-row :gutter="10">
-              <el-col :span="12" :key="item.id" v-for="item in examList">
-                <el-card class="box-card" shadow="hover">
-                  <div class="card-header" slot="header">
-                    <span class="header-left">{{ item.examName }}</span>
-                    <div class="header-right">
-                      <div class="exam-status">
-                        {{ examStatus[item.state] }}
+            <template v-if="examList.length > 0">
+              <el-row :gutter="10">
+                <el-col :span="12" :key="item.id" v-for="item in examList">
+                  <el-card class="box-card" shadow="hover">
+                    <div class="card-header" slot="header">
+                      <span class="header-left">{{ item.examName }}</span>
+                      <div class="header-right">
+                        <div class="exam-status">
+                          {{ examStatus[item.state] }}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <el-row class="body-item">
-                    <span class="start-time">{{ item.examStartTime }}</span
-                    >({{
-                      computeMinute(item.examStartTime, item.examEndTime)
-                    }}分钟)
-                  </el-row>
-                  <el-row class="body-item">
-                    <el-col :span="12">
-                      <el-col :span="8" class="item-title"
-                        ><i class="common common-good"></i>及格：</el-col
-                      >
-                      <el-col :span="16" class="item-data">
-                        {{
-                          (item.totalScore * item.paperTotalScore) / 100
-                        }}&nbsp;/&nbsp;{{ item.paperTotalScore }}
+                    <el-row class="body-item">
+                      <span class="start-time">{{ item.examStartTime }}</span
+                      >({{
+                        computeMinute(item.examStartTime, item.examEndTime)
+                      }}分钟)
+                    </el-row>
+                    <el-row class="body-item">
+                      <el-col :span="12">
+                        <el-col :span="8" class="item-title"
+                          ><i class="common common-good"></i>及格：</el-col
+                        >
+                        <el-col :span="16" class="item-data">
+                          {{
+                            (item.totalScore * item.paperTotalScore) / 100
+                          }}&nbsp;/&nbsp;{{ item.paperTotalScore }}
+                        </el-col>
                       </el-col>
-                    </el-col>
-                    <el-col :span="12">
-                      <el-col :span="12" class="item-title"
-                        ><i class="common common-persons"></i>考试人数：</el-col
-                      >
-                      <el-col :span="12" class="item-data">{{
-                        item.userNum
-                      }}</el-col>
-                    </el-col>
-                  </el-row>
-                  <div class="card-btn">
-                    <i class="common common-count-down"></i>开始考试
-                  </div>
-                </el-card>
-              </el-col>
-            </el-row>
+                      <el-col :span="12">
+                        <el-col :span="12" class="item-title"
+                          ><i class="common common-persons"></i
+                          >考试人数：</el-col
+                        >
+                        <el-col :span="12" class="item-data">{{
+                          item.userNum
+                        }}</el-col>
+                      </el-col>
+                    </el-row>
+                    <div class="card-btn">
+                      <i class="common common-count-down"></i>开始考试
+                    </div>
+                  </el-card>
+                </el-col>
+              </el-row>
+            </template>
+            <div class="data-null" v-else>
+              <img class="data-img" src="../assets/img/data-null.png" alt />
+              <span class="data-tip">抱歉！暂无信息</span>
+            </div>
           </div>
           <div>
             <div class="box-title box-divider">
               <i class="common common-classify"></i><span>待阅列表</span>
             </div>
-            <el-row :gutter="10">
-              <el-col :span="12" :key="item.id" v-for="item in markList">
-                <el-card class="box-card" shadow="hover">
-                  <div class="card-header" slot="header">
-                    <span class="header-left">{{ item.examName }}</span>
-                    <div class="header-right">
-                      <div class="mark-status">
-                        {{ examStatus[item.state] }}
+            <template v-if="markList.length > 0">
+              <el-row :gutter="10">
+                <el-col :span="12" :key="item.id" v-for="item in markList">
+                  <el-card class="box-card" shadow="hover">
+                    <div class="card-header" slot="header">
+                      <span class="header-left">{{ item.examName }}</span>
+                      <div class="header-right">
+                        <div class="mark-status">
+                          {{ examStatus[item.state] }}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <el-row class="body-item">
-                    <span class="start-time">{{ item.markStartTime }}</span
-                    >({{
-                      computeMinute(item.markStartTime, item.markEndTime)
-                    }}分钟)
-                  </el-row>
-                  <el-row class="body-item">
-                    <el-col :span="12">
-                      <el-col :span="8" class="item-title"
-                        ><i class="common common-good"></i>及格：</el-col
-                      >
-                      <el-col :span="16" class="item-data">
-                        {{
-                          (item.paperPassScore * item.paperTotalScore) / 100
-                        }}&nbsp;/&nbsp;{{ item.paperTotalScore }}
+                    <el-row class="body-item">
+                      <span class="start-time">{{ item.markStartTime }}</span
+                      >({{
+                        computeMinute(item.markStartTime, item.markEndTime)
+                      }}分钟)
+                    </el-row>
+                    <el-row class="body-item">
+                      <el-col :span="12">
+                        <el-col :span="8" class="item-title"
+                          ><i class="common common-good"></i>及格：</el-col
+                        >
+                        <el-col :span="16" class="item-data">
+                          {{
+                            (item.paperPassScore * item.paperTotalScore) / 100
+                          }}&nbsp;/&nbsp;{{ item.paperTotalScore }}
+                        </el-col>
                       </el-col>
-                    </el-col>
-                    <el-col :span="12">
-                      <el-col :span="12" class="item-title"
-                        ><i class="common common-persons"></i>考试人数：</el-col
-                      >
-                      <el-col :span="12" class="item-data">{{
-                        item.userNum
-                      }}</el-col>
-                    </el-col>
-                  </el-row>
-                  <div class="card-btn">
-                    <i class="common common-count-down"></i>开始阅卷
-                  </div>
-                </el-card>
-              </el-col>
-            </el-row>
+                      <el-col :span="12">
+                        <el-col :span="12" class="item-title"
+                          ><i class="common common-persons"></i
+                          >考试人数：</el-col
+                        >
+                        <el-col :span="12" class="item-data">{{
+                          item.userNum
+                        }}</el-col>
+                      </el-col>
+                    </el-row>
+                    <div class="card-btn">
+                      <i class="common common-count-down"></i>开始阅卷
+                    </div>
+                  </el-card>
+                </el-col>
+              </el-row>
+            </template>
+            <div class="data-null" v-else>
+              <img class="data-img" src="../assets/img/data-null.png" alt />
+              <span class="data-tip">抱歉！暂无信息</span>
+            </div>
           </div>
         </el-col>
       </el-row>

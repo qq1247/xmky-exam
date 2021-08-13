@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-12 10:17:05
  * @LastEditors: Che
- * @LastEditTime: 2021-08-13 12:46:11
+ * @LastEditTime: 2021-08-13 17:29:22
  */
 
 import router from './index'
@@ -27,10 +27,12 @@ router.beforeEach(async (to, from, next) => {
 
   const hasToken = getInfo().accessToken
 
-  const hasAsyncRoutes = getAsyncRoutes().length > 0 ? true : false
+  const hasAsyncRoutes = getAsyncRoutes()
 
   if (hasToken) {
-    if (hasAsyncRoutes) {
+    if (hasAsyncRoutes.length > 0) {
+      // router.addRoutes(hasAsyncRoutes)
+      // next({ ...to, replace: true })
       next()
       NProgress.done()
     } else {
@@ -41,7 +43,6 @@ router.beforeEach(async (to, from, next) => {
           roles
         )
         router.addRoutes(accessRoutes)
-
         next({ ...to, replace: true })
       } catch (error) {
         await store.dispatch('user/resetToken')

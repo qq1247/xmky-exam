@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-11 11:33:30
  * @LastEditors: Che
- * @LastEditTime: 2021-08-13 13:25:44
+ * @LastEditTime: 2021-08-13 16:29:02
  */
 import { asyncRoutes, constantRoutes } from '@/router/index'
 import {
@@ -54,7 +54,7 @@ export function filterAsyncRoutes(routes, roles) {
 }
 
 const state = {
-  routes: getFinallyRoutes(),
+  routes: [],
   addRoutes: getAsyncRoutes(),
 }
 
@@ -63,7 +63,6 @@ const mutations = {
     state.addRoutes = routes
     state.routes = constantRoutes.concat(routes)
     setAsyncRoutes(routes)
-    setFinallyRoutes(constantRoutes.concat(routes))
   },
 }
 

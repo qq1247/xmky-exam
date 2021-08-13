@@ -105,7 +105,7 @@ export const asyncRoutes = [
         name: 'QuestionIndex',
         component: () => import('../views/examQuestion/Index.vue'),
         meta: {
-          title: '试题列表',
+          title: '试题管理',
         },
       },
       {
@@ -135,7 +135,7 @@ export const asyncRoutes = [
         name: 'PaperIndex',
         component: () => import('../views/examPaper/Index.vue'),
         meta: {
-          title: '考试试卷',
+          title: '试卷管理',
         },
       },
       {
@@ -174,7 +174,7 @@ export const asyncRoutes = [
         name: 'SettingIndex',
         component: () => import('../views/examSetting/Index.vue'),
         meta: {
-          title: '试题列表',
+          title: '考试管理',
         },
       },
       {

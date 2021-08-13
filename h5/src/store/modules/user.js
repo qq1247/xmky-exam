@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-11 11:33:30
  * @LastEditors: Che
- * @LastEditTime: 2021-08-13 13:25:19
+ * @LastEditTime: 2021-08-13 16:29:33
  */
 import { login } from '@/api/common'
 import {
@@ -79,7 +79,6 @@ const actions = {
       commit('SET_ROUTES', [])
       removeInfo()
       removeAsyncRoutes()
-      removeFinallyRoutes()
       resetRouter()
       resolve()
     })
