@@ -55,7 +55,12 @@
 </template>
 
 <script>
-import { myExamListPage, myMarkListPage } from '@/api/my'
+import {
+  myExamListPage,
+  myMarkListPage,
+  myExamAutoScore,
+  myExamAiProgress,
+} from '@/api/my'
 import ListCard from '@/components/ListCard.vue'
 import { loginSysTime } from '@/api/common'
 export default {
@@ -205,14 +210,12 @@ export default {
         return
       }
 
-      const res = await this.$https
-        .myExamAutoScore({
-          id: data.id,
-          examId: data.examId,
-        })
-        .catch((err) => {
-          console.log(err)
-        })
+      const res = await myExamAutoScore({
+        id: data.id,
+        examId: data.examId,
+      }).catch((err) => {
+        console.log(err)
+      })
       if (res?.code === 200) {
         this.percentage = 1
         const isAiEnd = await this.getProgress(res.data)
@@ -238,11 +241,9 @@ export default {
     // 获取进度
     async getProgress(id) {
       const percentage = await this.$tools.delay().then(() => {
-        return this.$https
-          .myExamAiProgress({
-            id,
-          })
-          .catch((err) => {})
+        return myExamAiProgress({
+          id,
+        }).catch((err) => {})
       })
 
       if (!percentage?.data?.totalNum) {

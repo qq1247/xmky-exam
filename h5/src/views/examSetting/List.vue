@@ -321,6 +321,9 @@ import {
   examMarkUserList,
   examUserList,
   examPublish,
+  examEdit,
+  examUpdateMarkUser,
+  examUpdateExamUser,
 } from '@/api/exam'
 import { paperListPage } from '@/api/paper'
 import { userListPage } from '@/api/user'
@@ -502,12 +505,10 @@ export default {
         }
 
         const res = this.examForm.edit
-          ? await this.$https
-              .examEdit({
-                ...params,
-                id: this.examForm.id,
-              })
-              .catch((err) => {})
+          ? await examEdit({
+              ...params,
+              id: this.examForm.id,
+            }).catch((err) => {})
           : await examAdd(params).catch((err) => {})
 
         if (res?.code == 200) {
@@ -765,9 +766,7 @@ export default {
           ? (params.questionIds = dynamic)
           : (params.examUserIds = dynamic)
 
-        const res = await this.$https
-          .examUpdateMarkUser(params)
-          .catch((err) => {})
+        const res = await examUpdateMarkUser(params).catch((err) => {})
 
         res?.code == 200
           ? (this.$tools.message('设置成功！'),
@@ -782,12 +781,10 @@ export default {
         this.$tools.message('请选择考试用户！', 'warning')
         return
       }
-      const res = await this.$https
-        .examUpdateExamUser({
-          id: this.examForm.id,
-          userIds: this.examForm.examUser,
-        })
-        .catch((err) => {})
+      const res = await examUpdateExamUser({
+        id: this.examForm.id,
+        userIds: this.examForm.examUser,
+      }).catch((err) => {})
 
       res?.code == 200
         ? (this.$tools.message('设置成功！'),

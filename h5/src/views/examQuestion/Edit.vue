@@ -598,6 +598,8 @@ import {
   questionDel,
   questionTemplate,
   questionImport,
+  questionEdit,
+  questionPublish,
 } from '@/api/question'
 import Editor from '@/components/Editor.vue'
 import EditHeader from '@/components/EditHeader.vue'
@@ -1028,9 +1030,7 @@ export default {
           type: 'warning',
         })
           .then(async () => {
-            const res = await this.$https
-              .questionEdit(params)
-              .catch((err) => {})
+            const res = await questionEdit(params).catch((err) => {})
             this.resetQuery(res, '修改')
           })
           .catch(() => {})
@@ -1127,11 +1127,9 @@ export default {
         this.$tools.message('试题已经发布！', 'warning')
         return
       }
-      const res = await this.$https
-        .questionPublish({
-          id,
-        })
-        .catch((err) => {})
+      const res = await questionPublish({
+        id,
+      }).catch((err) => {})
       this.resetQuery(res, '发布试题')
     },
     // 获取试题模板

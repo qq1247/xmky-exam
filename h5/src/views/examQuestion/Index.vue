@@ -200,6 +200,7 @@ import {
   questionTypeAdd,
   questionTypeMove,
   questionTypeAuth,
+  questionTypeDel,
 } from '@/api/question'
 import { userListPage } from '@/api/user'
 import ListCard from '@/components/ListCard.vue'
@@ -318,9 +319,7 @@ export default {
         type: 'warning',
       })
         .then(async () => {
-          const res = await this.$https
-            .questionTypeDel({ id })
-            .catch((err) => {})
+          const res = await questionTypeDel({ id }).catch((err) => {})
           if (res?.code == 200) {
             this.total -= 1
             if (this.total <= this.pageSize) {

@@ -275,7 +275,12 @@
 </template>
 <script>
 import { paperGet, paperQuestionList } from '@/api/paper'
-import { myMarksListPage, myMarkAnswerList } from '@/api/my'
+import {
+  myMarksListPage,
+  myMarkAnswerList,
+  myExamUpdateScore,
+  myExamDoScore,
+} from '@/api/my'
 import ScorePlate from '@/components/ScorePlate.vue'
 export default {
   components: {
@@ -434,12 +439,10 @@ export default {
     // 打分
     async updateScore(e, idx, idxc) {
       const source = this.paperQuestion[idx].questionList[idxc]
-      const res = await this.$https
-        .myExamUpdateScore({
-          myExamDetailId: source.myExamDetailId,
-          score: source.scorePlate,
-        })
-        .catch((err) => {})
+      const res = await myExamUpdateScore({
+        myExamDetailId: source.myExamDetailId,
+        score: source.scorePlate,
+      }).catch((err) => {})
       res?.code === 200
         ? this.$tools.message('打分成功！')
         : this.$tools.message(res.msg || '打分失败！', 'error')
@@ -528,13 +531,11 @@ export default {
         this.$tools.message('请给所有试题打分！', 'warning')
         return
       }
-      const res = await this.$https
-        .myExamDoScore({
-          examId: this.examId,
-          userId: this.userId,
-          markId: this.markId,
-        })
-        .catch((err) => {})
+      const res = await myExamDoScore({
+        examId: this.examId,
+        userId: this.userId,
+        markId: this.markId,
+      }).catch((err) => {})
       res?.code === 200
         ? (this.$tools.message('阅卷完成！', 'warning'),
           this.queryExamineeInfo())

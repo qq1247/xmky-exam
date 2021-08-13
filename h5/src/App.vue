@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-07-22 18:05:35
  * @LastEditors: Che
- * @LastEditTime: 2021-08-13 14:59:31
+ * @LastEditTime: 2021-08-13 15:49:43
 -->
 <template>
   <div id="app">
@@ -16,7 +16,9 @@
 <script>
 export default {
   name: 'App',
-  data() {},
+  data() {
+    return {}
+  },
   methods: {},
 }
 </script>
