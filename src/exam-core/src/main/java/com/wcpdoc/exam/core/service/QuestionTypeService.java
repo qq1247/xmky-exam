@@ -18,7 +18,7 @@ public interface QuestionTypeService extends BaseService<QuestionType> {
 	 * @param questionType
 	 * void
 	 */
-	void addAndUpdate(String name, Integer imgId);
+	void addAndUpdate(String name, Integer imgFileId);
 
 	/**
 	 * 修改试题
@@ -28,7 +28,7 @@ public interface QuestionTypeService extends BaseService<QuestionType> {
 	 * @param name
 	 * @param imgId void
 	 */
-	void editAndUpdate(Integer id, String name, Integer imgId);
+	void editAndUpdate(Integer id, String name, Integer imgFileId);
 	
 	/**
 	 * 删除试题分类

@@ -88,7 +88,7 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 		
 		//修改试卷分类
 		entity.setName(paperType.getName());
-		entity.setImgId(paperType.getImgId());
+		entity.setImgFileId(paperType.getImgFileId());
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
 		paperTypeDao.update(entity);

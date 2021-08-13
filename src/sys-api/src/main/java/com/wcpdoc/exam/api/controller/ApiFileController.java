@@ -108,6 +108,8 @@ public class ApiFileController extends BaseController {
 
 			output = response.getOutputStream();
 			FileUtils.copyFile(fileEx.getFile(), output);
+		} catch (MyException e) {
+			log.error("完成下载附件失败：", e.getMessage());
 		} catch (Exception e) {
 			log.error("完成下载附件失败：", e);
 		} finally {
