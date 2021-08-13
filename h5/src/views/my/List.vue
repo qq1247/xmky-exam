@@ -19,7 +19,7 @@
     </el-form>
     <!-- 内容 -->
     <div class="content">
-      <div class="exam-list" v-if="type === '1'">
+      <div class="exam-list" v-if="type === 1">
         <ListCard
           v-for="(item, index) in myExamList"
           :key="index"
@@ -28,7 +28,7 @@
           @exam="examHandler"
         ></ListCard>
       </div>
-      <div class="exam-list" v-if="type === '2'">
+      <div class="exam-list" v-if="type === 2">
         <ListCard
           v-for="(item, index) in myExamList"
           :key="index"
@@ -82,7 +82,9 @@ export default {
     }
   },
   mounted() {
-    const { type } = this.$route.query
+    console.log(this.$route)
+    const { type } = this.$route.meta
+
     this.type = type
     this.query()
   },
@@ -93,7 +95,7 @@ export default {
       const curTime = new Date(loginSysTimeStr.data).getTime()
       let myExamList
 
-      if (this.type === '1') {
+      if (this.type === 1) {
         myExamList = await myExamListPage({
           name: this.queryForm.examName,
           curPage: this.curPage,
@@ -113,7 +115,7 @@ export default {
         })
       }
 
-      if (this.type === '2') {
+      if (this.type === 2) {
         myExamList = await myMarkListPage({
           name: this.queryForm.examName,
           curPage: this.curPage,

@@ -55,13 +55,13 @@ export const constantRoutes = [
         path: 'exam',
         component: () => import('@/views/my/List.vue'),
         name: 'ExamList',
-        meta: { title: '我的考试', icon: 'common common-exam' },
+        meta: { title: '我的考试', icon: 'common common-exam', type: 1 },
       },
       {
         path: 'mark',
         component: () => import('@/views/my/List.vue'),
         name: 'MarkList',
-        meta: { title: '我的阅卷', icon: 'common common-mark' },
+        meta: { title: '我的阅卷', icon: 'common common-mark', type: 2 },
       },
       {
         path: 'bulletin',
