@@ -1,0 +1,22 @@
+// mask
+.v-modal {
+  opacity: 1 !important;
+  background: rgba(18, 52, 86, 0.5) !important;
+  backdrop-filter: blur(13px) !important;
+}
+
+// dialog
+.el-dialog {
+  border-radius: 5px !important;
+  box-shadow: 0 0 13px rgba(255, 255, 255, 0.15) !important;
+}
+
+.el-menu-item,
+.el-submenu__title {
+  height: 50px !important;
+  line-height: 50px !important;
+}
+
+.el-menu.el-menu--horizontal {
+  border-bottom: none !important;
+}
