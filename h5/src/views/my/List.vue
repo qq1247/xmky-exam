@@ -206,7 +206,7 @@ export default {
 
       if (markStartTime < now < markEndTime && data.autoState === 1) {
         this.$router.push({
-          path: '/my/markExam',
+          path: '/my/mark/index',
           query: {
             examId: data.examId,
             paperId: data.paperId,
@@ -228,7 +228,7 @@ export default {
         const isAiEnd = await this.getProgress(res.data)
         if (isAiEnd) {
           this.$router.push({
-            path: '/my/markExam',
+            path: '/my/mark/index',
             query: {
               examId: data.examId,
               paperId: data.paperId,
