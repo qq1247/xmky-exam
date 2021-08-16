@@ -69,10 +69,10 @@
     </div>
     <div class="header-center ellipsis">{{ title }}</div>
     <div class="header-right">
-      <span class="preview" @click="preview"
+      <!-- <span class="preview" @click="preview"
         ><i class="el-icon-view"></i>预览</span
       >
-      <span class="line">|</span>
+      <span class="line">|</span> -->
       <span class="user-info"><i class="el-icon-user"></i>{{ name }}</span>
     </div>
   </div>
@@ -118,6 +118,10 @@ export default {
   align-items: center;
   padding: 0 20px;
   color: #fff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 5000;
   .header-left {
     .back {
       color: #fff;
