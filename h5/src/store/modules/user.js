@@ -5,16 +5,10 @@
  * @Author: Che
  * @Date: 2021-08-11 11:33:30
  * @LastEditors: Che
- * @LastEditTime: 2021-08-13 16:29:33
+ * @LastEditTime: 2021-08-16 11:06:18
  */
 import { login } from '@/api/common'
-import {
-  getInfo,
-  setInfo,
-  removeInfo,
-  removeAsyncRoutes,
-  removeFinallyRoutes,
-} from '@/utils/storage'
+import { getInfo, setInfo, removeInfo } from '@/utils/storage'
 import router, { resetRouter } from '@/router/index'
 
 const state = {
@@ -78,7 +72,6 @@ const actions = {
       commit('SET_ROLES', [])
       commit('SET_ROUTES', [])
       removeInfo()
-      removeAsyncRoutes()
       resetRouter()
       resolve()
     })

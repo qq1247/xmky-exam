@@ -5,15 +5,9 @@
  * @Author: Che
  * @Date: 2021-08-11 11:33:30
  * @LastEditors: Che
- * @LastEditTime: 2021-08-13 16:29:02
+ * @LastEditTime: 2021-08-16 10:47:38
  */
 import { asyncRoutes, constantRoutes } from '@/router/index'
-import {
-  getAsyncRoutes,
-  setAsyncRoutes,
-  getFinallyRoutes,
-  setFinallyRoutes,
-} from '@/utils/storage'
 
 /**
  * @name: hasPermission
@@ -55,14 +49,13 @@ export function filterAsyncRoutes(routes, roles) {
 
 const state = {
   routes: [],
-  addRoutes: getAsyncRoutes(),
+  addRoutes: [],
 }
 
 const mutations = {
   SET_ROUTES: (state, routes) => {
     state.addRoutes = routes
     state.routes = constantRoutes.concat(routes)
-    setAsyncRoutes(routes)
   },
 }
 
@@ -73,7 +66,8 @@ const actions = {
       if (roles.includes('admin')) {
         accessedRoutes = asyncRoutes || []
       } else {
-        accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
+        accessedRoutes =
+          roles.length === 0 ? [] : filterAsyncRoutes(asyncRoutes, roles)
       }
       commit('SET_ROUTES', accessedRoutes)
       resolve(accessedRoutes)

@@ -42,47 +42,51 @@ export const constantRoutes = [
         meta: { title: '欢迎登录' },
         hidden: true,
       },
+      {
+        path: '404',
+        component: () => import('@/views/base/404'),
+        name: '404',
+        meta: { title: '404' },
+        hidden: true,
+      },
     ],
   },
   {
     path: '/my',
     component: Layout,
-    redirect: '/my/exam',
+    redirect: '/my/index',
     name: 'My',
     meta: { title: '我的', icon: 'common common-mine' },
     children: [
+      {
+        path: 'index',
+        component: () => import('@/views/my/Index.vue'),
+        name: 'MyIndex',
+        meta: { title: '我的', icon: 'common common-mine' },
+      },
       {
         path: 'exam',
         component: () => import('@/views/my/List.vue'),
         name: 'ExamList',
         meta: { title: '我的考试', icon: 'common common-exam', type: 1 },
+        hidden: true,
       },
       {
         path: 'mark',
         component: () => import('@/views/my/List.vue'),
         name: 'MarkList',
         meta: { title: '我的阅卷', icon: 'common common-mark', type: 2 },
+        hidden: true,
       },
       {
         path: 'bulletin',
         component: () => import('@/views/my/Bulletin.vue'),
         name: 'Bulletin',
-        meta: { title: '我的公告', icon: 'common common-notice' },
-      },
-    ],
-  },
-  {
-    path: '*',
-    component: Layout,
-    redirect: '/404',
-    meta: { title: 'Error' },
-    hidden: true,
-    children: [
-      {
-        path: '404',
-        component: () => import('@/views/base/404'),
-        name: 'Error',
-        meta: { title: '404' },
+        meta: {
+          title: '我的公告',
+          icon: 'common common-notice',
+        },
+        hidden: true,
       },
     ],
   },
@@ -195,7 +199,7 @@ export const asyncRoutes = [
     name: 'User',
     meta: {
       title: '用户管理',
-      icon: 'common common-exam-manage',
+      icon: 'common common-user-manage',
       roles: ['admin'], // you can set roles in root nav
     },
     children: [
@@ -252,7 +256,7 @@ export const asyncRoutes = [
     name: 'Base',
     meta: {
       title: '基础管理',
-      icon: 'common common-exam-manage',
+      icon: 'common common-base-manage',
       roles: ['admin'], // you can set roles in root nav
     },
     children: [
@@ -284,6 +288,7 @@ export const asyncRoutes = [
       },
     ],
   },
+  { path: '*', redirect: '/404', hidden: true },
 ]
 
 /* const routes = [
