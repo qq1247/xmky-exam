@@ -52,19 +52,25 @@
             <div class="box-title">
               <i class="common common-notice"></i><span>公告</span>
             </div>
-            <el-row
-              :class="['notice', item.topState === 1 ? 'notice-hot' : '']"
-              :key="item.id"
-              v-for="item in bulletinList"
-            >
-              <el-col :span="12" class="notice-left">
-                <i></i>
-                <span class="ellipsis">{{ item.title }}</span>
-              </el-col>
-              <el-col :span="12" class="notice-right">{{
-                item.updateTime
-              }}</el-col>
-            </el-row>
+            <template v-if="bulletinList.length > 0">
+              <el-row
+                :class="['notice', item.topState === 1 ? 'notice-hot' : '']"
+                :key="item.id"
+                v-for="item in bulletinList"
+              >
+                <el-col :span="12" class="notice-left">
+                  <i></i>
+                  <span class="ellipsis">{{ item.title }}</span>
+                </el-col>
+                <el-col :span="12" class="notice-right">{{
+                  item.updateTime
+                }}</el-col>
+              </el-row>
+            </template>
+            <div class="data-null" v-else>
+              <img class="data-img" src="../assets/img/data-null.png" alt />
+              <span class="data-tip">抱歉！暂无公告</span>
+            </div>
           </template>
         </el-col>
         <el-col :span="16">
@@ -120,7 +126,7 @@
             </template>
             <div class="data-null" v-else>
               <img class="data-img" src="../assets/img/data-null.png" alt />
-              <span class="data-tip">抱歉！暂无信息</span>
+              <span class="data-tip">抱歉！暂无考试</span>
             </div>
           </div>
           <div>
@@ -175,7 +181,7 @@
             </template>
             <div class="data-null" v-else>
               <img class="data-img" src="../assets/img/data-null.png" alt />
-              <span class="data-tip">抱歉！暂无信息</span>
+              <span class="data-tip">抱歉！暂无阅卷</span>
             </div>
           </div>
         </el-col>
@@ -608,5 +614,8 @@ export default {
   .notice-right {
     color: #0095e5;
   }
+}
+.data-null {
+  padding-top: 20px;
 }
 </style>
