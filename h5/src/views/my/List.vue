@@ -171,7 +171,7 @@ export default {
         return
       }
       this.$router.push({
-        path: '/my/exam',
+        path: '/my/exam/index',
         query: {
           id: data.id,
           paperId: data.paperId,
@@ -193,7 +193,7 @@ export default {
 
       if (now > markEndTime) {
         this.$router.push({
-          path: '/my/markExam',
+          path: '/my/mark/index',
           query: {
             examId: data.examId,
             paperId: data.paperId,
