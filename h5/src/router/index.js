@@ -79,6 +79,18 @@ export const constantRoutes = [
         hidden: true,
       },
       {
+        path: 'exam/index',
+        component: () => import('@/views/my/MyExam.vue'),
+        name: 'ExamIndex',
+        hidden: true,
+      },
+      {
+        path: 'mark/index',
+        component: () => import('@/views/my/MyMarkExam.vue'),
+        name: 'MarkIndex',
+        hidden: true,
+      },
+      {
         path: 'bulletin',
         component: () => import('@/views/my/Bulletin.vue'),
         name: 'Bulletin',
@@ -107,7 +119,7 @@ export const asyncRoutes = [
       {
         path: 'index',
         name: 'QuestionIndex',
-        component: () => import('../views/examQuestion/Index.vue'),
+        component: () => import('../views/question/Index.vue'),
         meta: {
           title: '试题管理',
         },
@@ -115,7 +127,7 @@ export const asyncRoutes = [
       {
         path: 'edit',
         name: 'QuestionEdit',
-        component: () => import('../views/examQuestion/Edit.vue'),
+        component: () => import('../views/question/Edit.vue'),
         hidden: true,
         meta: {
           title: '编辑试题',
@@ -137,7 +149,7 @@ export const asyncRoutes = [
       {
         path: 'index',
         name: 'PaperIndex',
-        component: () => import('../views/examPaper/Index.vue'),
+        component: () => import('../views/paper/Index.vue'),
         meta: {
           title: '试卷管理',
         },
@@ -145,7 +157,7 @@ export const asyncRoutes = [
       {
         path: 'list',
         name: 'PaperList',
-        component: () => import('../views/examPaper/List.vue'),
+        component: () => import('../views/paper/List.vue'),
         hidden: true,
         meta: {
           title: '试卷列表',
@@ -154,7 +166,7 @@ export const asyncRoutes = [
       {
         path: 'edit',
         name: 'PaperEdit',
-        component: () => import('../views/examPaper/Edit.vue'),
+        component: () => import('../views/paper/Edit.vue'),
         hidden: true,
         meta: {
           title: '编辑试卷',
@@ -176,7 +188,7 @@ export const asyncRoutes = [
       {
         path: 'index',
         name: 'SettingIndex',
-        component: () => import('../views/examSetting/Index.vue'),
+        component: () => import('../views/exam/Index.vue'),
         meta: {
           title: '考试管理',
         },
@@ -184,7 +196,7 @@ export const asyncRoutes = [
       {
         path: 'list',
         name: 'SettingList',
-        component: () => import('../views/examSetting/List.vue'),
+        component: () => import('../views/exam/List.vue'),
         hidden: true,
         meta: {
           title: '编辑试题',
@@ -304,41 +316,41 @@ export const asyncRoutes = [
   },
   // 试卷相关
   {
-    path: '/examPaper',
+    path: '/paper',
     name: 'ExamPaper',
-    component: () => import('../views/examPaper/Index.vue'),
+    component: () => import('../views/paper/Index.vue'),
   },
   {
-    path: '/examPaper/list',
+    path: '/paper/list',
     name: 'ExamPaperList',
-    component: () => import('../views/examPaper/List.vue'),
+    component: () => import('../views/paper/List.vue'),
   },
   {
-    path: '/examPaper/edit',
+    path: '/paper/edit',
     name: 'ExamPaperEdit',
-    component: () => import('../views/examPaper/Edit.vue'),
+    component: () => import('../views/paper/Edit.vue'),
   },
   // 考试相关
   {
-    path: '/examSetting',
+    path: '/exam',
     name: 'ExamSetting',
-    component: () => import('../views/examSetting/Index.vue'),
+    component: () => import('../views/exam/Index.vue'),
   },
   {
-    path: '/examSetting/list',
+    path: '/exam/list',
     name: 'ExamSettingList',
-    component: () => import('../views/examSetting/List.vue'),
+    component: () => import('../views/exam/List.vue'),
   },
   // 试题相关
   {
-    path: '/examQuestion',
+    path: '/question',
     name: 'ExamQuestion',
-    component: () => import('../views/examQuestion/Index.vue'),
+    component: () => import('../views/question/Index.vue'),
   },
   {
-    path: '/examQuestion/edit',
+    path: '/question/edit',
     name: 'ExamQuestionEdit',
-    component: () => import('../views/examQuestion/Edit.vue'),
+    component: () => import('../views/question/Edit.vue'),
   },
   // 基础相关
   {
