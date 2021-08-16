@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8000
   servlet:
     context-path: /
     jsp:
@@ -27,7 +27,7 @@ spring:
     
 file: 
   upload:
-    dir: d:/bak/file
+    dir: c:/bak/file
       
 sys:
   ver: 3.0.0
