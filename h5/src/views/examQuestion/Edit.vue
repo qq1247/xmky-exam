@@ -589,6 +589,18 @@
   </div>
 </template>
 <script>
+import { dictListPage } from '@/api/base'
+import {
+  questionListPage,
+  questionAdd,
+  questionGet,
+  questionCopy,
+  questionDel,
+  questionTemplate,
+  questionImport,
+  questionEdit,
+  questionPublish,
+} from '@/api/question'
 import Editor from '@/components/Editor.vue'
 import EditHeader from '@/components/EditHeader.vue'
 export default {
@@ -792,12 +804,12 @@ export default {
     async init() {
       this.search() // 查询列表
 
-      const typeDictData = await this.$https.dictListPage({
+      const typeDictData = await dictListPage({
         dictIndex: 'QUESTION_TYPE',
       })
       this.queryForm.typeDictList = typeDictData.data.list // 初始化类型下拉框
 
-      const difficultyDictData = await this.$https.dictListPage({
+      const difficultyDictData = await dictListPage({
         dictIndex: 'QUESTION_DIFFICULTY',
       })
       this.queryForm.difficultyDictList = difficultyDictData.data.list // 初始化难度下拉框
@@ -812,7 +824,7 @@ export default {
     async query() {
       const {
         data: { list, total },
-      } = await this.$https.questionListPage({
+      } = await questionListPage({
         id: this.queryForm.id,
         questionTypeId: this.queryForm.questionTypeId,
         title: this.queryForm.title,
@@ -905,7 +917,7 @@ export default {
     },
     // 更新类型
     updateType(value) {
-      this.$tools.resetData(this,'editForm')
+      this.$tools.resetData(this, 'editForm')
       this.editForm.type = value
       if (value == 5) this.editForm.ai = 2
     },
@@ -999,7 +1011,7 @@ export default {
           return false
         }
 
-        const res = await this.$https.questionAdd(params).catch((err) => {})
+        const res = await questionAdd(params).catch((err) => {})
         this.resetQuery(res, '添加')
       })
     },
@@ -1018,9 +1030,7 @@ export default {
           type: 'warning',
         })
           .then(async () => {
-            const res = await this.$https
-              .questionEdit(params)
-              .catch((err) => {})
+            const res = await questionEdit(params).catch((err) => {})
             this.resetQuery(res, '修改')
           })
           .catch(() => {})
@@ -1028,7 +1038,7 @@ export default {
     },
     // 获取试题
     async get(id) {
-      const res = await this.$https.questionGet({ id })
+      const res = await questionGet({ id })
       if (res?.code != 200) {
         this.$tools.message('查询失败！', 'error')
         return
@@ -1088,7 +1098,7 @@ export default {
         this.$tools.message('暂无此项权限！', 'warning')
         return
       }
-      const res = await this.$https.questionCopy({ id })
+      const res = await questionCopy({ id })
       this.resetQuery(res, '复制')
     },
     // 删除试题
@@ -1102,7 +1112,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
       }).then(async () => {
-        const res = await this.$https.questionDel({ id })
+        const res = await questionDel({ id })
         this.resetQuery(res, '删除')
       })
     },
@@ -1117,16 +1127,14 @@ export default {
         this.$tools.message('试题已经发布！', 'warning')
         return
       }
-      const res = await this.$https
-        .questionPublish({
-          id,
-        })
-        .catch((err) => {})
+      const res = await questionPublish({
+        id,
+      }).catch((err) => {})
       this.resetQuery(res, '发布试题')
     },
     // 获取试题模板
     async questionTemplate() {
-      const template = await this.$https.questionTemplate({}, 'blob')
+      const template = await questionTemplate({}, 'blob')
       const blob = new Blob([template], { type: 'application/msword' })
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -1144,7 +1152,7 @@ export default {
       const formData = new FormData()
       formData.append('file', document.querySelector('#docId').files[0])
       formData.append('questionTypeId', this.queryForm.questionTypeId)
-      const res = await this.$https.questionImport(
+      const res = await questionImport(
         formData,
         undefined,
         'multipart/form-data'
@@ -1164,7 +1172,7 @@ export default {
         this.list.curPage = 1
         this.query()
         this.$tools.message(`${msg}成功！`)
-        this.$tools.resetData(this,'editForm')
+        this.$tools.resetData(this, 'editForm')
         /* this.$nextTick(() => {
           this.$refs['editForm'].resetFields()
         }) */

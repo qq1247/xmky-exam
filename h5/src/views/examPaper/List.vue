@@ -203,6 +203,14 @@
 </template>
 
 <script>
+import {
+  paperListPage,
+  paperEdit,
+  paperAdd,
+  paperDel,
+  paperCopy,
+  paperPublish,
+} from '@/api/paper'
 import Editor from '@/components/Editor.vue'
 import ListCard from '@/components/ListCard.vue'
 export default {
@@ -319,7 +327,7 @@ export default {
   methods: {
     // 查询
     async query() {
-      const paperList = await this.$https.paperListPage({
+      const paperList = await paperListPage({
         paperTypeId: this.queryForm.paperTypeId,
         curPage: this.curPage,
         pageSize: this.pageSize,
@@ -351,8 +359,8 @@ export default {
         }
 
         const res = this.paperForm.edit
-          ? await this.$https.paperEdit({ ...params, id: this.paperForm.id })
-          : await this.$https.paperAdd(params)
+          ? await paperEdit({ ...params, id: this.paperForm.id })
+          : await paperAdd(params)
 
         if (res?.code == 200) {
           this.paperForm.show = false
@@ -402,7 +410,7 @@ export default {
         type: 'warning',
       })
         .then(async () => {
-          const res = await this.$https.paperDel({ id }).catch((err) => {})
+          const res = await paperDel({ id }).catch((err) => {})
           if (res?.code == 200) {
             this.total -= 1
             if (this.total <= this.pageSize) {
@@ -422,7 +430,7 @@ export default {
     // 复制分类
     async copy({ id }) {
       try {
-        const res = await this.$https.paperCopy({
+        const res = await paperCopy({
           id,
         })
         res?.code == 200
@@ -433,7 +441,7 @@ export default {
     // 生成试卷
     composition({ id, name }) {
       this.$router.push({
-        path: '/examPaper/edit',
+        path: '/paper/edit',
         query: { id, name },
       })
     },
@@ -453,7 +461,7 @@ export default {
         type: 'warning',
       })
         .then(async () => {
-          const res = await this.$https.paperPublish({ id }).catch((err) => {})
+          const res = await paperPublish({ id }).catch((err) => {})
           res?.code == 200
             ? (this.$tools.message('考试发布成功！'), this.pageChange())
             : this.$tools.message('请重新发布考试！', 'error')

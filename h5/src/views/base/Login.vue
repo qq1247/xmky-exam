@@ -31,9 +31,7 @@
         ></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button
-type="primary"
-class="login-btn" @click="login('ruleForm')"
+        <el-button type="primary" class="login-btn" @click="login('ruleForm')"
           >登录</el-button
         >
       </el-form-item>
@@ -42,52 +40,52 @@ class="login-btn" @click="login('ruleForm')"
 </template>
 
 <script>
-import { mapActions } from 'vuex'
 export default {
   data() {
     return {
       ruleForm: {
         account: '',
-        password: ''
+        password: '',
       },
       rules: {
         account: [{ required: true, message: '账号不能为空', trigger: 'blur' }],
         password: [
-          { required: true, message: '密码不能为空', trigger: 'blur' }
-        ]
-      }
+          { required: true, message: '密码不能为空', trigger: 'blur' },
+        ],
+      },
     }
   },
   methods: {
-    ...mapActions(['setUserInfo']),
     // 登录
     login(formName) {
       this.$refs[formName].validate(async (valid) => {
         if (valid) {
-          const res = await this.$https.login({
-            loginName: this.ruleForm.account,
-            pwd: this.ruleForm.password
-          })
-          res.data?.accessToken && this.setUserInfo(JSON.stringify(res.data))
-          !this.$route.query.redirect
-            ? this.$router.replace({
-              path: '/'
+          this.$store
+            .dispatch('user/login', {
+              username: this.ruleForm.account,
+              password: this.ruleForm.password,
             })
-            : this.$router.replace({
-              path: this.$route.query.redirect
+            .then(() => {
+              !this.$route.query.redirect
+                ? this.$router.replace({
+                    path: '/',
+                  })
+                : this.$router.replace({
+                    path: this.$route.query.redirect,
+                  })
+              this.$tools.message('登录成功！', 'info')
             })
-          this.$tools.message('登录成功！', 'info')
         } else {
           this.$message({
             message: '请核对登录信息',
             duration: 2000,
-            type: 'warning'
+            type: 'warning',
           })
           return false
         }
       })
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -95,7 +93,6 @@ export default {
 .container {
   width: 100%;
   height: 100%;
-  //background: url(../../assets/img/login_bgs.jpg) no-repeat;
   background-size: cover;
   justify-content: center;
   align-items: center;

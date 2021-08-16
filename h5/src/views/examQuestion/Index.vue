@@ -194,6 +194,15 @@
 </template>
 
 <script>
+import {
+  questionTypeListPage,
+  questionTypeEdit,
+  questionTypeAdd,
+  questionTypeMove,
+  questionTypeAuth,
+  questionTypeDel,
+} from '@/api/question'
+import { userListPage } from '@/api/user'
 import ListCard from '@/components/ListCard.vue'
 import CustomSelect from '@/components/CustomSelect.vue'
 export default {
@@ -247,7 +256,7 @@ export default {
   methods: {
     // 查询分类数据
     async query() {
-      const typeList = await this.$https.questionTypeListPage({
+      const typeList = await questionTypeListPage({
         name: this.queryForm.queryName,
         curPage: this.curPage,
         pageSize: this.pageSize,
@@ -265,12 +274,12 @@ export default {
         let res
 
         if (this.examForm.edit) {
-          res = await this.$https.questionTypeEdit({
+          res = await questionTypeEdit({
             id: this.examForm.id,
             name: this.examForm.examName,
           })
         } else {
-          res = await this.$https.questionTypeAdd({
+          res = await questionTypeAdd({
             name: this.examForm.examName,
           })
         }
@@ -310,9 +319,7 @@ export default {
         type: 'warning',
       })
         .then(async () => {
-          const res = await this.$https
-            .questionTypeDel({ id })
-            .catch((err) => {})
+          const res = await questionTypeDel({ id }).catch((err) => {})
           if (res?.code == 200) {
             this.total -= 1
             if (this.total <= this.pageSize) {
@@ -331,7 +338,7 @@ export default {
     },
     // 获取试题分类
     async getQuestionType() {
-      const typeList = await this.$https.questionTypeListPage({
+      const typeList = await questionTypeListPage({
         name: '',
         curPage: this.examForm.curPage,
         pageSize: this.examForm.pageSize,
@@ -350,13 +357,13 @@ export default {
     },
     // 获取用户
     async getUserList(name = '') {
-      const roleUserList = await this.$https.userListPage({
+      const roleUserList = await userListPage({
         name,
         curPage: this.roleForm.curPage,
         pageSize: this.roleForm.pageSize,
       })
 
-      if (JSON.parse(this.$store.state.userInfo).userId == 1) {
+      if (this.$store.getters.userId == 1) {
         roleUserList.data.list.unshift({
           id: 1,
           name: '管理员',
@@ -394,7 +401,7 @@ export default {
     },
     // 移动试题分类
     async questionMove() {
-      const res = await this.$https.questionTypeMove({
+      const res = await questionTypeMove({
         sourceId: this.examForm.id,
         targetId: this.examForm.questionType,
       })
@@ -408,7 +415,7 @@ export default {
     },
     // 编辑权限
     async editRoleUsers() {
-      const res = await this.$https.questionTypeAuth({
+      const res = await questionTypeAuth({
         id: this.examForm.id,
         readUserIds: this.roleForm.readRoleUser.join(','),
         writeUserIds: this.roleForm.writeRoleUser.join(','),
@@ -427,11 +434,9 @@ export default {
     },
     // 试题详情
     goDetail({ id, name, writeUserIds }) {
-      const edit = writeUserIds.includes(
-        String(JSON.parse(this.$store.state.userInfo).userId)
-      )
+      const edit = writeUserIds.includes(String(this.$store.getters.userId))
       this.$router.push({
-        path: '/examQuestion/Edit',
+        path: '/question/edit',
         query: { id, name, edit },
       })
     },

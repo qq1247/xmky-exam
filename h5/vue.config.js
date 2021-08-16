@@ -1,3 +1,12 @@
+/*
+ * @Description:
+ * @Version: 1.0
+ * @Company:
+ * @Author: Che
+ * @Date: 2021-07-27 17:31:01
+ * @LastEditors: Che
+ * @LastEditTime: 2021-08-11 11:00:02
+ */
 const path = require('path')
 const os = require('os')
 

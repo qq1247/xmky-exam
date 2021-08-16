@@ -204,7 +204,10 @@
   </div>
 </template>
 <script>
+import { paperGet, paperQuestionList } from '@/api/paper'
+import { myExamAnswerList, myExamUpdateAnswer, myExamDoAnswer } from '@/api/my'
 import CountDown from '@/components/CountDown.vue'
+import { loginSysTime } from '@/api/common'
 export default {
   components: {
     CountDown,
@@ -259,7 +262,7 @@ export default {
     },
     // 校准时间差
     async setTime() {
-      const systemTime = await this.$https.loginSysTime({})
+      const systemTime = await loginSysTime({})
       let times = new Date(systemTime.data) - new Date()
       this.time =
         new Date(this.examEndTime).getTime() - (new Date().getTime() + times)
@@ -267,7 +270,7 @@ export default {
     // 查询试卷
     async queryPaper() {
       try {
-        const res = await this.$https.paperGet({
+        const res = await paperGet({
           id: this.paperId,
         })
         this.paper = { ...res.data }
@@ -276,7 +279,7 @@ export default {
     // 查询试卷信息
     async queryPaperInfo() {
       try {
-        const res = await this.$https.paperQuestionList({
+        const res = await paperQuestionList({
           id: this.paperId,
         })
         res.data.map((item) => {
@@ -289,7 +292,7 @@ export default {
     // 查询我的答案信息
     async queryAnswerInfo() {
       try {
-        const res = await this.$https.myExamAnswerList({
+        const res = await myExamAnswerList({
           id: this.id,
         })
 
@@ -324,7 +327,7 @@ export default {
         return
       }
 
-      const res = await this.$https.myExamUpdateAnswer({
+      const res = await myExamUpdateAnswer({
         myExamDetailId: this.myExamDetailCache[questionId].myExamDetailId,
         answers: answers,
       })
@@ -340,7 +343,7 @@ export default {
       }
 
       answers[index] = val
-      const res = await this.$https.myExamUpdateAnswer({
+      const res = await myExamUpdateAnswer({
         myExamDetailId: this.myExamDetailCache[questionId].myExamDetailId,
         answers: answers,
       })
@@ -352,7 +355,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
       }).then(async () => {
-        const res = await this.$https.myExamDoAnswer({ myExamId: this.id })
+        const res = await myExamDoAnswer({ myExamId: this.id })
         res?.code === 200
           ? this.$router.replace({
               path: '/my',
@@ -367,7 +370,7 @@ export default {
         type: 'info',
         showClose: false,
       }).then(async () => {
-        const res = await this.$https.myExamDoAnswer({ myExamId: this.id })
+        const res = await myExamDoAnswer({ myExamId: this.id })
         this.$router.replace({
           path: '/my',
         })

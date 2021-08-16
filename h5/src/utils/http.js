@@ -12,7 +12,7 @@ import { Message } from 'element-ui'
 const message = (msg) => {
   Message({
     message: msg,
-    duration: 3000,
+    duration: 2000,
     type: 'warning',
   })
 }
@@ -31,16 +31,6 @@ const toLogin = () => {
 }
 
 /**
- * 根据刷新的token(headers?.Authorization)替换vuex中userInfo的accessToken
- *
- */
-const replaceToken = async (token) => {
-  const userInfo = JSON.parse(store.state.userInfo)
-  userInfo.accessToken = token
-  return JSON.stringify(userInfo)
-}
-
-/**
  * 请求失败后的错误统一处理
  * @param {Number} status 请求失败的状态码
  * @param {Number} msg 请求失败返回的message
@@ -53,9 +43,10 @@ const errorHandle = (status, msg) => {
       break
     case 401:
     case 403:
-      message(`请重新登录`)
-      store.dispatch('delUserInfo')
-      toLogin()
+      // message(`请重新登录`)
+      store.dispatch('user/resetToken').then(() => {
+        toLogin()
+      })
       break
     case 404:
       message('请求的资源不存在')
@@ -77,11 +68,8 @@ var instance = axios.create({
  */
 instance.interceptors.request.use(
   (config) => {
-    const userInfo = store.state.userInfo
-      ? JSON.parse(store.state.userInfo)
-      : ''
-    userInfo?.accessToken &&
-      (config.headers.Authorization = userInfo.accessToken)
+    const accessToken = store.state.user.token
+    accessToken && (config.headers.Authorization = accessToken)
     return config
   },
   (error) => Promise.error(error)
@@ -90,14 +78,14 @@ instance.interceptors.request.use(
 // 响应拦截器
 instance.interceptors.response.use(
   // 请求成功
-  async (res) => {
+  (res) => {
     const {
       data: { code, msg },
       headers,
       config,
     } = res
     headers?.authorization &&
-      store.dispatch('setUserInfo', await replaceToken(headers.authorization))
+      store.commit('user/SET_TOKEN', headers.authorization)
     if (config.responseType == 'blob') {
       return Promise.resolve(res.data)
     } else {

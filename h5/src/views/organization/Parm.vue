@@ -15,8 +15,7 @@
             ></el-input>
           </el-form-item>
           <el-form-item style="width: 200px">
-            <el-button @click="query" icon="el-icon-search"
-type="primary"
+            <el-button @click="query" icon="el-icon-search" type="primary"
               >查询</el-button
             >
             <el-button @click="reset">重置</el-button>
@@ -75,8 +74,7 @@ type="primary"
           <el-table-column label="操作">
             <template slot-scope="scope">
               <el-button @click="get(scope.row.id)" size="mini">修改</el-button>
-              <el-button @click="del(scope.row.id)" size="mini"
-type="danger"
+              <el-button @click="del(scope.row.id)" size="mini" type="danger"
                 >删除</el-button
               >
             </template>
@@ -143,12 +141,10 @@ type="danger"
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="add" type="primary"
-v-if="editForm.id == null"
+        <el-button @click="add" type="primary" v-if="editForm.id == null"
           >添加</el-button
         >
-        <el-button @click="edit" type="primary"
-v-if="editForm.id != null"
+        <el-button @click="edit" type="primary" v-if="editForm.id != null"
           >修改</el-button
         >
         <el-button @click="editForm.show = false">取 消</el-button>
@@ -158,6 +154,7 @@ v-if="editForm.id != null"
 </template>
 
 <script>
+import { parmListPage, parmAdd, parmEdit, parmGet, parmDel } from '@/api/base'
 export default {
   data() {
     return {
@@ -207,7 +204,7 @@ export default {
     async query() {
       const {
         data: { list, total },
-      } = await this.$https.parmListPage({
+      } = await parmListPage({
         orgName: this.queryForm.orgName,
         curPage: this.listpage.curPage,
         pageSize: this.listpage.pageSize,
@@ -239,7 +236,7 @@ export default {
           return false
         }
 
-        const { code, msg } = await this.$https.parmAdd({
+        const { code, msg } = await parmAdd({
           emailHost: this.editForm.emailHost,
           emailEncode: this.editForm.emailEncode,
           emailUserName: this.editForm.emailUserName,
@@ -263,7 +260,7 @@ export default {
           return false
         }
 
-        const { code, msg } = await this.$https.parmEdit({
+        const { code, msg } = await parmEdit({
           id: this.editForm.id,
           emailHost: this.editForm.emailHost,
           emailEncode: this.editForm.emailEncode,
@@ -284,7 +281,7 @@ export default {
     },
     // 获取参数
     async get(id) {
-      const res = await this.$https.parmGet({ id: id })
+      const res = await parmGet({ id: id })
       if (res?.code != 200) {
         alert(res.msg)
         return
@@ -307,7 +304,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
       }).then(async () => {
-        const res = await this.$https.parmDel({ id })
+        const res = await parmDel({ id })
         if (res?.code != 200) {
           this.$message({
             type: 'error',

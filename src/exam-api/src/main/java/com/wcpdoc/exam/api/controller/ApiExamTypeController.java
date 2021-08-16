@@ -180,7 +180,7 @@ public class ApiExamTypeController extends BaseController {
 			return PageResultEx.ok()
 					.addAttr("id", entity.getId())
 					.addAttr("name", entity.getName())
-					.addAttr("imgId", entity.getImgId())
+					.addAttr("imgFileId", entity.getImgFileId())
 					.addAttr("createUserId", entity.getCreateUserId())
 					.addAttr("createTime", DateUtil.formatDateTime(entity.getCreateTime()))
 					.addAttr("readUserIds", entity.getReadUserIds().subSequence(1, entity.getReadUserIds().length()).toString().split(","))

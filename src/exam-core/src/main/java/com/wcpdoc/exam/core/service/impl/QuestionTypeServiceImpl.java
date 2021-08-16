@@ -46,7 +46,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	}
 
 	@Override
-	public void addAndUpdate(String name, Integer imgId) {
+	public void addAndUpdate(String name, Integer imgFileId) {
 		//校验数据有效性
 		if (!ValidateUtil.isValid(name)) {
 			throw new MyException("参数错误：name");
@@ -55,7 +55,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		// 添加试题分类
 		QuestionType questionType = new QuestionType();
 		questionType.setName(name);
-		questionType.setImgId(imgId);
+		questionType.setImgFileId(imgFileId);
 		/*if (existName(questionType)) {
 			throw new MyException("名称已存在！");
 		}*/
@@ -73,7 +73,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	}
 
 	@Override
-	public void editAndUpdate(Integer id, String name, Integer imgId) {
+	public void editAndUpdate(Integer id, String name, Integer imgFileId) {
 		//校验数据有效性
 		if(id == null) {
 			throw new MyException("参数错误：id");
@@ -90,7 +90,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		/*if(questionTypeService.existName(entity)) {
 			throw new MyException("名称已存在！");
 		}*/
-		entity.setImgId(imgId);
+		entity.setImgFileId(imgFileId);
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
 		questionTypeDao.update(entity);

@@ -89,7 +89,7 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 		
 		//修改试题分类
 		entity.setName(examType.getName());
-		entity.setImgId(examType.getImgId());
+		entity.setImgFileId(examType.getImgFileId());
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
 		examTypeDao.update(entity);

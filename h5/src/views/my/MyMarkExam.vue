@@ -274,6 +274,13 @@
   </div>
 </template>
 <script>
+import { paperGet, paperQuestionList } from '@/api/paper'
+import {
+  myMarksListPage,
+  myMarkAnswerList,
+  myExamUpdateScore,
+  myExamDoScore,
+} from '@/api/my'
 import ScorePlate from '@/components/ScorePlate.vue'
 export default {
   components: {
@@ -324,7 +331,7 @@ export default {
     // 查询试卷
     async queryPaper() {
       try {
-        const res = await this.$https.paperGet({
+        const res = await paperGet({
           id: this.paperId,
         })
         this.paper = res.data
@@ -333,7 +340,7 @@ export default {
     // 查询试卷信息
     async queryPaperInfo() {
       try {
-        const res = await this.$https.paperQuestionList({
+        const res = await paperQuestionList({
           id: this.paperId,
         })
         res.data.map((item) => {
@@ -346,7 +353,7 @@ export default {
     },
     // 查询考生信息
     async queryExamineeInfo() {
-      const infos = await this.$https.myMarksListPage({
+      const infos = await myMarksListPage({
         curPage: this.curPage,
         pageSize: this.pageSize,
         examId: Number(this.examId),
@@ -359,7 +366,7 @@ export default {
       await this.queryExamineeInfo()
       this.userId = id || this.examUserIds[0].userId
       try {
-        const res = await this.$https.myMarkAnswerList({
+        const res = await myMarkAnswerList({
           examId: this.examId,
           userId: this.userId,
         })
@@ -432,12 +439,10 @@ export default {
     // 打分
     async updateScore(e, idx, idxc) {
       const source = this.paperQuestion[idx].questionList[idxc]
-      const res = await this.$https
-        .myExamUpdateScore({
-          myExamDetailId: source.myExamDetailId,
-          score: source.scorePlate,
-        })
-        .catch((err) => {})
+      const res = await myExamUpdateScore({
+        myExamDetailId: source.myExamDetailId,
+        score: source.scorePlate,
+      }).catch((err) => {})
       res?.code === 200
         ? this.$tools.message('打分成功！')
         : this.$tools.message(res.msg || '打分失败！', 'error')
@@ -526,13 +531,11 @@ export default {
         this.$tools.message('请给所有试题打分！', 'warning')
         return
       }
-      const res = await this.$https
-        .myExamDoScore({
-          examId: this.examId,
-          userId: this.userId,
-          markId: this.markId,
-        })
-        .catch((err) => {})
+      const res = await myExamDoScore({
+        examId: this.examId,
+        userId: this.userId,
+        markId: this.markId,
+      }).catch((err) => {})
       res?.code === 200
         ? (this.$tools.message('阅卷完成！', 'warning'),
           this.queryExamineeInfo())

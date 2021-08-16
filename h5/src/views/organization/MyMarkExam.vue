@@ -80,12 +80,10 @@
         </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="add" type="primary"
-v-if="editForm.id == null"
+        <el-button @click="add" type="primary" v-if="editForm.id == null"
           >添加</el-button
         >
-        <el-button @click="edit" type="primary"
-v-if="editForm.id != null"
+        <el-button @click="edit" type="primary" v-if="editForm.id != null"
           >修改</el-button
         >
         <el-button @click="editForm.show = false">取 消</el-button>
@@ -95,6 +93,7 @@ v-if="editForm.id != null"
 </template>
 
 <script>
+import { myMarkExamListPage } from '@/api/my'
 export default {
   data() {
     return {
@@ -132,7 +131,7 @@ export default {
     async query() {
       const {
         data: { list, total },
-      } = await this.$https.myMarkExamListPage({
+      } = await myMarkExamListPage({
         userName: this.queryForm.userName,
         curPage: this.listpage.curPage,
         pageSize: this.listpage.pageSize,

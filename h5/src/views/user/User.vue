@@ -28,13 +28,13 @@
                 type="primary"
                 >添加用户</el-button
               >
-              <el-button
+              <!-- <el-button
                 @click="toOrg"
                 icon="el-icon-circle-plus-outline"
                 size="mini"
                 type="primary"
                 >添加机构</el-button
-              >
+              > -->
             </el-form-item>
           </el-col>
         </el-row>
@@ -170,6 +170,15 @@
 </template>
 
 <script>
+import {
+  userListPage,
+  userAdd,
+  userEdit,
+  userInitPwd,
+  userDel,
+  userGet,
+} from '@/api/user'
+import { orgListPage } from '@/api/base'
 import CustomSelect from '@/components/CustomSelect.vue'
 export default {
   components: {
@@ -225,7 +234,7 @@ export default {
 
       const {
         data: { list, total },
-      } = await this.$https.userListPage({
+      } = await userListPage({
         orgName: this.queryForm.orgName,
         name: this.queryForm.name,
         curPage: curPage,
@@ -251,7 +260,7 @@ export default {
           return false
         }
 
-        const res = await this.$https.userAdd({
+        const res = await userAdd({
           name: this.editForm.name,
           loginName: this.editForm.loginName,
           orgId: this.editForm.orgId,
@@ -280,7 +289,7 @@ export default {
           return false
         }
 
-        const res = await this.$https.userEdit({
+        const res = await userEdit({
           id: this.editForm.id,
           name: this.editForm.name,
           loginName: this.editForm.loginName,
@@ -306,7 +315,7 @@ export default {
     },
     // 初始化密码
     async initPwd(id) {
-      const res = await this.$https.userInitPwd({
+      const res = await userInitPwd({
         id: id,
       })
 
@@ -328,7 +337,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
       }).then(async () => {
-        const res = await this.$https.userDel({ id })
+        const res = await userDel({ id })
         if (res.code != 200) {
           this.$message({
             type: 'error',
@@ -341,7 +350,7 @@ export default {
     },
     // 获取用户
     async get(id) {
-      const res = await this.$https.userGet({ id: id })
+      const res = await userGet({ id: id })
       if (res.code != 200) {
         alert(res.msg)
         return
@@ -358,7 +367,7 @@ export default {
     },
     // 获取机构列表
     async getOrgList(curPage = 1) {
-      const orgList = await this.$https.orgListPage({
+      const orgList = await orgListPage({
         // name,
         curPage,
         pageSize: this.editForm.orgListpage.pageSize,

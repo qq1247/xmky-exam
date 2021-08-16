@@ -63,6 +63,7 @@
 </template>
 
 <script>
+import { parmListPage, parmAdd, parmEdit, parmGet, parmDel } from '@/api/base'
 export default {
   data() {
     return {
@@ -112,7 +113,7 @@ export default {
     async query() {
       const {
         data: { list, total },
-      } = await this.$https.parmListPage({
+      } = await parmListPage({
         orgName: this.queryForm.orgName,
         curPage: this.listpage.curPage,
         pageSize: this.listpage.pageSize,
@@ -144,7 +145,7 @@ export default {
           return false
         }
 
-        const { code, msg } = await this.$https.parmAdd({
+        const { code, msg } = await parmAdd({
           emailHost: this.editForm.emailHost,
           emailEncode: this.editForm.emailEncode,
           emailUserName: this.editForm.emailUserName,
@@ -168,7 +169,7 @@ export default {
           return false
         }
 
-        const { code, msg } = await this.$https.parmEdit({
+        const { code, msg } = await parmEdit({
           id: this.editForm.id,
           emailHost: this.editForm.emailHost,
           emailEncode: this.editForm.emailEncode,
@@ -189,7 +190,7 @@ export default {
     },
     // 获取参数
     async get(id) {
-      const res = await this.$https.parmGet({ id: id })
+      const res = await parmGet({ id: id })
       if (res.code != 200) {
         alert(res.msg)
         return
@@ -212,7 +213,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
       }).then(async () => {
-        const res = await this.$https.parmDel({ id })
+        const res = await parmDel({ id })
         if (res.code != 200) {
           this.$message({
             type: 'error',

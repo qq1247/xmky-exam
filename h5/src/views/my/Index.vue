@@ -1,3 +1,12 @@
+<!--
+ * @Description: 
+ * @Version: 1.0
+ * @Company: 
+ * @Author: Che
+ * @Date: 2021-08-03 14:22:34
+ * @LastEditors: Che
+ * @LastEditTime: 2021-08-13 10:04:43
+-->
 <template>
   <div class="container">
     <!-- 搜索 -->
@@ -41,7 +50,7 @@ export default {
       this.$router.push({ path: '/my/list', query: { type: 2 } })
     },
     toBulletin() {
-      this.$router.push({ path: '/my/bulletin', query: {  } })
+      this.$router.push({ path: '/my/bulletin', query: {} })
     },
   },
 }

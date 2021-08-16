@@ -286,12 +286,10 @@ export default {
     isRole(data) {
       // 是否是创建者
       const isCreateUser =
-        data.createUserId &&
-        JSON.parse(this.$store.state.userInfo).userId != data.createUserId
+        data.createUserId && this.$store.getters.userId != data.createUserId
       // 是否是修改者
       const isUpdateUser =
-        data.updateUserId &&
-        JSON.parse(this.$store.state.userInfo).userId != data.updateUserId
+        data.updateUserId && this.$store.getters.userId != data.updateUserId
       // 是否已经发布
       const isPublish = data.state == 1
       // 是否是分类

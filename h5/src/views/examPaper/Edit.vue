@@ -356,7 +356,7 @@
                           <el-col :span="2.5">【答案】：</el-col>
                           <el-col :span="21">
                             <div
-                              v-for="(answer,index) in child.answers"
+                              v-for="(answer, index) in child.answers"
                               :key="answer.id"
                               class="answers-item"
                             >
@@ -375,7 +375,7 @@
                           <el-col :span="21">
                             <template v-if="child.ai === 1">
                               <div
-                                v-for="(answer,index) in child.answers"
+                                v-for="(answer, index) in child.answers"
                                 :key="answer.id"
                                 class="answers-item"
                               >
@@ -601,6 +601,18 @@
   </div>
 </template>
 <script>
+import { dictListPage } from '@/api/base'
+import {
+  paperQuestionList,
+  paperChapterAdd,
+  paperChapterEdit,
+  paperChapterDel,
+  paperQuestionClear,
+  paperQuestionDel,
+  paperUpdateScore,
+  paperQuestionAdd,
+} from '@/api/paper'
+import { questionListPage, randomListPage } from '@/api/question'
 import Draggable from 'vuedraggable'
 export default {
   components: {
@@ -703,12 +715,12 @@ export default {
       await this.query()
       await this.queryQuestion()
       // 初始化类型下拉框
-      const typeDictData = await this.$https.dictListPage({
+      const typeDictData = await dictListPage({
         dictIndex: 'QUESTION_TYPE',
       })
       this.queryForm.typeDictList = typeDictData.data.list
       // 初始化难度下拉框
-      const difficultyDictData = await this.$https.dictListPage({
+      const difficultyDictData = await dictListPage({
         dictIndex: 'QUESTION_DIFFICULTY',
       })
       this.queryForm.difficultyDictList = difficultyDictData.data.list
@@ -716,7 +728,7 @@ export default {
     // 查询试卷信息
     async query() {
       try {
-        const res = await this.$https.paperQuestionList({
+        const res = await paperQuestionList({
           id: this.paperId,
         })
         res.data.map((item) => {
@@ -730,28 +742,26 @@ export default {
     },
     // 查询试题
     async queryQuestion() {
-      const res = await this.$https
-        .questionListPage({
-          id: this.queryForm.id,
-          type: this.queryForm.type,
-          title: this.queryForm.title,
-          questionTypeName: this.queryForm.questionTypeName,
-          difficulty: this.queryForm.difficulty,
-          scoreStart: this.queryForm.score,
-          scoreEnd: this.queryForm.score,
-          exPaperId: this.paperId,
-          state: 1,
-          curPage: this.curPage,
-          pageSize: this.pageSize,
-        })
-        .catch((err) => {})
+      const res = await questionListPage({
+        id: this.queryForm.id,
+        type: this.queryForm.type,
+        title: this.queryForm.title,
+        questionTypeName: this.queryForm.questionTypeName,
+        difficulty: this.queryForm.difficulty,
+        scoreStart: this.queryForm.score,
+        scoreEnd: this.queryForm.score,
+        exPaperId: this.paperId,
+        state: 1,
+        curPage: this.curPage,
+        pageSize: this.pageSize,
+      }).catch((err) => {})
       res?.code === 200
         ? ((this.paperList = res.data.list), (this.total = res.data.total))
         : this.$tools.message('请刷新重新获取试题！', 'error')
     },
     // 随机查询试题
     async randomQueryQuestion() {
-      const res = await this.$https.randomListPage({
+      const res = await randomListPage({
         id: this.queryForm.id,
         type: this.queryForm.type,
         title: this.queryForm.title,
@@ -775,14 +785,12 @@ export default {
           return
         }
 
-        const res = await this.$https
-          .paperChapterAdd({
-            name: this.chapterForm.name,
-            description: this.chapterForm.description,
-            paperId: this.paperId,
-            type: 1,
-          })
-          .catch((err) => {})
+        const res = await paperChapterAdd({
+          name: this.chapterForm.name,
+          description: this.chapterForm.description,
+          paperId: this.paperId,
+          type: 1,
+        }).catch((err) => {})
         this.refreshData(res, '添加章节')
       })
     },
@@ -796,13 +804,11 @@ export default {
     },
     // 编辑章节
     async paperChapterEdit() {
-      const res = await this.$https
-        .paperChapterEdit({
-          id: this.chapterForm.id,
-          name: this.chapterForm.name,
-          description: this.chapterForm.description,
-        })
-        .catch((err) => {})
+      const res = await paperChapterEdit({
+        id: this.chapterForm.id,
+        name: this.chapterForm.name,
+        description: this.chapterForm.description,
+      }).catch((err) => {})
       this.refreshData(res, '编辑章节')
     },
     // 删除章节
@@ -813,9 +819,7 @@ export default {
         type: 'warning',
       })
         .then(async () => {
-          const res = await this.$https
-            .paperChapterDel({ id })
-            .catch((err) => {})
+          const res = await paperChapterDel({ id }).catch((err) => {})
           this.refreshData(res, '删除章节')
         })
         .catch(() => {})
@@ -837,9 +841,9 @@ export default {
         type: 'warning',
       })
         .then(async () => {
-          const res = await this.$https
-            .paperQuestionClear({ chapterId: id })
-            .catch((err) => {})
+          const res = await paperQuestionClear({ chapterId: id }).catch(
+            (err) => {}
+          )
           this.refreshData(res, '清空试题')
         })
         .catch(() => {})
@@ -852,9 +856,9 @@ export default {
         type: 'warning',
       })
         .then(async () => {
-          const res = await this.$https
-            .paperQuestionDel({ paperQuestionId })
-            .catch((err) => {})
+          const res = await paperQuestionDel({ paperQuestionId }).catch(
+            (err) => {}
+          )
           this.refreshData(res, '删除试题')
         })
         .catch(() => {})
@@ -908,21 +912,17 @@ export default {
           return false
         }
 
-        const updateScore = await this.$https
-          .paperUpdateScore({
-            paperQuestionId: this.settingForm.paperQuestionId,
-            score: this.settingForm.score,
-            paperQuestionAnswerId: paperQuestionAnswerId,
-            paperQuestionAnswerScore: paperQuestionAnswerScore,
-          })
-          .catch((err) => {})
+        const updateScore = await paperUpdateScore({
+          paperQuestionId: this.settingForm.paperQuestionId,
+          score: this.settingForm.score,
+          paperQuestionAnswerId: paperQuestionAnswerId,
+          paperQuestionAnswerScore: paperQuestionAnswerScore,
+        }).catch((err) => {})
 
-        const updateScoreOptions = await this.$https
-          .paperUpdateScoreOptions({
-            paperQuestionId: this.settingForm.paperQuestionId,
-            scoreOptions: this.settingForm.scoreOptions,
-          })
-          .catch((err) => {})
+        const updateScoreOptions = await paperUpdateScoreOptions({
+          paperQuestionId: this.settingForm.paperQuestionId,
+          scoreOptions: this.settingForm.scoreOptions,
+        }).catch((err) => {})
 
         if (updateScore?.code === 200 && updateScoreOptions?.code === 200) {
           this.$tools.message('编辑成功！')
@@ -942,12 +942,10 @@ export default {
     async sourceEnd(e) {
       const chapterId = e.to.dataset.id
       const questionIds = e.item.id
-      const res = await this.$https
-        .paperQuestionAdd({
-          chapterId,
-          questionIds,
-        })
-        .catch((err) => {})
+      const res = await paperQuestionAdd({
+        chapterId,
+        questionIds,
+      }).catch((err) => {})
       if (res?.code !== 200) return false
       this.query()
       this.queryQuestion()
@@ -1039,7 +1037,7 @@ export default {
   position: fixed;
   top: 70px;
   left: 20px;
-  bottom: 10px;
+  bottom: 60px;
   z-index: 100;
   .left-top {
     width: 100%;
@@ -1237,11 +1235,11 @@ export default {
 
 .content-right {
   width: 240px;
-  height: calc(100% - 80px);
   background: #fff;
   position: fixed;
   top: 70px;
   right: 20px;
+  bottom: 60px;
   z-index: 100;
   .time-title {
     background-color: rgb(30, 159, 255);

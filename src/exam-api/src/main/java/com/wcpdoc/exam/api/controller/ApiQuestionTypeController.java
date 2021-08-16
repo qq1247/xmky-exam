@@ -105,9 +105,9 @@ public class ApiQuestionTypeController extends BaseController {
 	@RequestMapping("/add")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult add(String name, Integer imgId) {
+	public PageResult add(String name, Integer imgFileId) {
 		try {
-			questionTypeService.addAndUpdate(name, imgId);
+			questionTypeService.addAndUpdate(name, imgFileId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加试题分类错误：{}", e.getMessage());
@@ -127,9 +127,9 @@ public class ApiQuestionTypeController extends BaseController {
 	@RequestMapping("/edit")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult edit(Integer id, String name, Integer imgId) {
+	public PageResult edit(Integer id, String name, Integer imgFileId) {
 		try {
-			questionTypeService.editAndUpdate(id, name, imgId);
+			questionTypeService.editAndUpdate(id, name, imgFileId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改试题分类错误：{}", e.getMessage());
@@ -177,7 +177,7 @@ public class ApiQuestionTypeController extends BaseController {
 			return PageResultEx.ok()
 					.addAttr("id", entity.getId())
 					.addAttr("name", entity.getName())
-					.addAttr("imgId", entity.getImgId())
+					.addAttr("imgFileId", entity.getImgFileId())
 					.addAttr("createUserId", entity.getCreateUserId())
 					.addAttr("createTime", DateUtil.formatDateTime(entity.getCreateTime()))
 					.addAttr("readUserIds", entity.getReadUserIds().subSequence(1, entity.getReadUserIds().length()).toString().split(","))

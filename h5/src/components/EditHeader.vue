@@ -73,15 +73,13 @@
         ><i class="el-icon-view"></i>预览</span
       >
       <span class="line">|</span>
-      <span class="user-info"
-        ><i class="el-icon-user"></i>{{ JSON.parse(userInfo).userName }}</span
-      >
+      <span class="user-info"><i class="el-icon-user"></i>{{ name }}</span>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 export default {
   props: {
     title: {
@@ -98,7 +96,7 @@ export default {
   },
   components: {},
   mounted() {},
-  computed: mapState(['userInfo']),
+  computed: mapGetters(['name']),
   methods: {
     goBack() {
       this.$router.back()

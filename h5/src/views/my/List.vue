@@ -19,25 +19,31 @@
     </el-form>
     <!-- 内容 -->
     <div class="content">
-      <div class="exam-list" v-if="type === '1'">
-        <ListCard
-          v-for="(item, index) in myExamList"
-          :key="index"
-          :data="item"
-          name="myExamList"
-          @exam="examHandler"
-        ></ListCard>
-      </div>
-      <div class="exam-list" v-if="type === '2'">
-        <ListCard
-          v-for="(item, index) in myExamList"
-          :key="index"
-          :data="item"
-          :markId="markId"
-          :percentage="percentage"
-          name="myMarkExamList"
-          @mark="markHandler"
-        ></ListCard>
+      <template v-if="myExamList.length > 0">
+        <div class="exam-list" v-if="type === 1">
+          <ListCard
+            v-for="(item, index) in myExamList"
+            :key="index"
+            :data="item"
+            name="myExamList"
+            @exam="examHandler"
+          ></ListCard>
+        </div>
+        <div class="exam-list" v-if="type === 2">
+          <ListCard
+            v-for="(item, index) in myExamList"
+            :key="index"
+            :data="item"
+            :markId="markId"
+            :percentage="percentage"
+            name="myMarkExamList"
+            @mark="markHandler"
+          ></ListCard>
+        </div>
+      </template>
+      <div class="data-null" v-else>
+        <img class="data-img" src="../../assets/img/data-null.png" alt />
+        <span class="data-tip">抱歉！暂无信息</span>
       </div>
       <el-pagination
         background
@@ -55,7 +61,14 @@
 </template>
 
 <script>
+import {
+  myExamListPage,
+  myMarkListPage,
+  myExamAutoScore,
+  myExamAiProgress,
+} from '@/api/my'
 import ListCard from '@/components/ListCard.vue'
+import { loginSysTime } from '@/api/common'
 export default {
   components: {
     ListCard,
@@ -75,19 +88,21 @@ export default {
     }
   },
   mounted() {
-    const { type } = this.$route.query
+    console.log(this.$route)
+    const { type } = this.$route.meta
+
     this.type = type
     this.query()
   },
   methods: {
     // 我的考试列表
     async query() {
-      const loginSysTimeStr = await this.$https.loginSysTime({})
+      const loginSysTimeStr = await loginSysTime({})
       const curTime = new Date(loginSysTimeStr.data).getTime()
       let myExamList
 
-      if (this.type === '1') {
-        myExamList = await this.$https.myExamListPage({
+      if (this.type === 1) {
+        myExamList = await myExamListPage({
           name: this.queryForm.examName,
           curPage: this.curPage,
           pageSize: this.pageSize,
@@ -106,8 +121,8 @@ export default {
         })
       }
 
-      if (this.type === '2') {
-        myExamList = await this.$https.myMarkListPage({
+      if (this.type === 2) {
+        myExamList = await myMarkListPage({
           name: this.queryForm.examName,
           curPage: this.curPage,
           pageSize: this.pageSize,
@@ -203,14 +218,12 @@ export default {
         return
       }
 
-      const res = await this.$https
-        .myExamAutoScore({
-          id: data.id,
-          examId: data.examId,
-        })
-        .catch((err) => {
-          console.log(err)
-        })
+      const res = await myExamAutoScore({
+        id: data.id,
+        examId: data.examId,
+      }).catch((err) => {
+        console.log(err)
+      })
       if (res?.code === 200) {
         this.percentage = 1
         const isAiEnd = await this.getProgress(res.data)
@@ -236,11 +249,9 @@ export default {
     // 获取进度
     async getProgress(id) {
       const percentage = await this.$tools.delay().then(() => {
-        return this.$https
-          .myExamAiProgress({
-            id,
-          })
-          .catch((err) => {})
+        return myExamAiProgress({
+          id,
+        }).catch((err) => {})
       })
 
       if (!percentage?.data?.totalNum) {

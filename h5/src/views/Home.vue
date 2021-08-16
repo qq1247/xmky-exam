@@ -2,20 +2,29 @@
   <div class="container">
     <el-carousel :interval="3000" height="350px">
       <el-carousel-item
-        class="banner-list"
-        :style="{ background: carouse.bg || '#f4f5f7' }"
+        :style="{ background: carouse.bg || '#393d42' }"
         :key="carouse.id"
         v-for="carouse in carouselList"
       >
         <div class="banner-list">
-          <div>
-            <p>{{ carouse.title }}</p>
-            <p>{{ carouse.bg }}</p>
+          <div class="banner-info">
+            <p class="banner-title">{{ carouse.title }}</p>
+            <p class="banner-content">{{ carouse.content }}</p>
+            <div class="banner-btn">查看详情</div>
           </div>
-          <img
-            style="width: 316px; height: 280px"
-            :src="'/api/file/download?id=' + carouse.imgFileId"
-          />
+          <el-image
+            class="banner-image"
+            :src="
+              carouse.imgFileId
+                ? `/api/file/download?id=${carouse.imgFileId}`
+                : carouse.img
+            "
+          >
+            <div slot="placeholder" class="image-slot">加载中...</div>
+            <div slot="error" class="image-slot">
+              <i class="el-icon-picture-outline"></i>
+            </div>
+          </el-image>
         </div>
       </el-carousel-item>
     </el-carousel>
@@ -63,97 +72,111 @@
             <div class="box-title box-divider">
               <i class="common common-classify"></i><span>待考列表</span>
             </div>
-            <el-row :gutter="10">
-              <el-col :span="12" :key="item.id" v-for="item in examList">
-                <el-card class="box-card" shadow="hover">
-                  <div class="card-header" slot="header">
-                    <span class="header-left">{{ item.examName }}</span>
-                    <div class="header-right">
-                      <div class="exam-status">
-                        {{ examStatus[item.state] }}
+            <template v-if="examList.length > 0">
+              <el-row :gutter="10">
+                <el-col :span="12" :key="item.id" v-for="item in examList">
+                  <el-card class="box-card" shadow="hover">
+                    <div class="card-header" slot="header">
+                      <span class="header-left">{{ item.examName }}</span>
+                      <div class="header-right">
+                        <div class="exam-status">
+                          {{ examStatus[item.state] }}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <el-row class="body-item">
-                    <span class="start-time">{{ item.examStartTime }}</span
-                    >({{
-                      computeMinute(item.examStartTime, item.examEndTime)
-                    }}分钟)
-                  </el-row>
-                  <el-row class="body-item">
-                    <el-col :span="12">
-                      <el-col :span="8" class="item-title"
-                        ><i class="common common-good"></i>及格：</el-col
-                      >
-                      <el-col :span="16" class="item-data">
-                        {{
-                          (item.totalScore * item.paperTotalScore) / 100
-                        }}&nbsp;/&nbsp;{{ item.paperTotalScore }}
+                    <el-row class="body-item">
+                      <span class="start-time">{{ item.examStartTime }}</span
+                      >({{
+                        computeMinute(item.examStartTime, item.examEndTime)
+                      }}分钟)
+                    </el-row>
+                    <el-row class="body-item">
+                      <el-col :span="12">
+                        <el-col :span="8" class="item-title"
+                          ><i class="common common-good"></i>及格：</el-col
+                        >
+                        <el-col :span="16" class="item-data">
+                          {{
+                            (item.totalScore * item.paperTotalScore) / 100
+                          }}&nbsp;/&nbsp;{{ item.paperTotalScore }}
+                        </el-col>
                       </el-col>
-                    </el-col>
-                    <el-col :span="12">
-                      <el-col :span="12" class="item-title"
-                        ><i class="common common-persons"></i>考试人数：</el-col
-                      >
-                      <el-col :span="12" class="item-data">{{
-                        item.userNum
-                      }}</el-col>
-                    </el-col>
-                  </el-row>
-                  <div class="card-btn">
-                    <i class="common common-count-down"></i>开始考试
-                  </div>
-                </el-card>
-              </el-col>
-            </el-row>
+                      <el-col :span="12">
+                        <el-col :span="12" class="item-title"
+                          ><i class="common common-persons"></i
+                          >考试人数：</el-col
+                        >
+                        <el-col :span="12" class="item-data">{{
+                          item.userNum
+                        }}</el-col>
+                      </el-col>
+                    </el-row>
+                    <div class="card-btn">
+                      <i class="common common-count-down"></i>开始考试
+                    </div>
+                  </el-card>
+                </el-col>
+              </el-row>
+            </template>
+            <div class="data-null" v-else>
+              <img class="data-img" src="../assets/img/data-null.png" alt />
+              <span class="data-tip">抱歉！暂无信息</span>
+            </div>
           </div>
           <div>
             <div class="box-title box-divider">
               <i class="common common-classify"></i><span>待阅列表</span>
             </div>
-            <el-row :gutter="10">
-              <el-col :span="12" :key="item.id" v-for="item in markList">
-                <el-card class="box-card" shadow="hover">
-                  <div class="card-header" slot="header">
-                    <span class="header-left">{{ item.examName }}</span>
-                    <div class="header-right">
-                      <div class="mark-status">
-                        {{ examStatus[item.state] }}
+            <template v-if="markList.length > 0">
+              <el-row :gutter="10">
+                <el-col :span="12" :key="item.id" v-for="item in markList">
+                  <el-card class="box-card" shadow="hover">
+                    <div class="card-header" slot="header">
+                      <span class="header-left">{{ item.examName }}</span>
+                      <div class="header-right">
+                        <div class="mark-status">
+                          {{ examStatus[item.state] }}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <el-row class="body-item">
-                    <span class="start-time">{{ item.markStartTime }}</span
-                    >({{
-                      computeMinute(item.markStartTime, item.markEndTime)
-                    }}分钟)
-                  </el-row>
-                  <el-row class="body-item">
-                    <el-col :span="12">
-                      <el-col :span="8" class="item-title"
-                        ><i class="common common-good"></i>及格：</el-col
-                      >
-                      <el-col :span="16" class="item-data">
-                        {{
-                          (item.paperPassScore * item.paperTotalScore) / 100
-                        }}&nbsp;/&nbsp;{{ item.paperTotalScore }}
+                    <el-row class="body-item">
+                      <span class="start-time">{{ item.markStartTime }}</span
+                      >({{
+                        computeMinute(item.markStartTime, item.markEndTime)
+                      }}分钟)
+                    </el-row>
+                    <el-row class="body-item">
+                      <el-col :span="12">
+                        <el-col :span="8" class="item-title"
+                          ><i class="common common-good"></i>及格：</el-col
+                        >
+                        <el-col :span="16" class="item-data">
+                          {{
+                            (item.paperPassScore * item.paperTotalScore) / 100
+                          }}&nbsp;/&nbsp;{{ item.paperTotalScore }}
+                        </el-col>
                       </el-col>
-                    </el-col>
-                    <el-col :span="12">
-                      <el-col :span="12" class="item-title"
-                        ><i class="common common-persons"></i>考试人数：</el-col
-                      >
-                      <el-col :span="12" class="item-data">{{
-                        item.userNum
-                      }}</el-col>
-                    </el-col>
-                  </el-row>
-                  <div class="card-btn">
-                    <i class="common common-count-down"></i>开始阅卷
-                  </div>
-                </el-card>
-              </el-col>
-            </el-row>
+                      <el-col :span="12">
+                        <el-col :span="12" class="item-title"
+                          ><i class="common common-persons"></i
+                          >考试人数：</el-col
+                        >
+                        <el-col :span="12" class="item-data">{{
+                          item.userNum
+                        }}</el-col>
+                      </el-col>
+                    </el-row>
+                    <div class="card-btn">
+                      <i class="common common-count-down"></i>开始阅卷
+                    </div>
+                  </el-card>
+                </el-col>
+              </el-row>
+            </template>
+            <div class="data-null" v-else>
+              <img class="data-img" src="../assets/img/data-null.png" alt />
+              <span class="data-tip">抱歉！暂无信息</span>
+            </div>
           </div>
         </el-col>
       </el-row>
@@ -162,7 +185,9 @@
 </template>
 
 <script>
-import getMainColor from '@/util/getImageColor.js'
+import { myExamListPage, myMarkListPage } from '@/api/my'
+import { bulletinListPage } from '@/api/base'
+import getMainColor from '@/utils/getImageColor.js'
 import * as dayjs from 'dayjs'
 export default {
   data() {
@@ -198,7 +223,7 @@ export default {
     async getExamList() {
       const {
         data: { list },
-      } = await this.$https.myExamListPage({
+      } = await myExamListPage({
         curPage: 1,
         pageSize: 10,
         needExam: 1,
@@ -209,7 +234,7 @@ export default {
     async getMarkList() {
       const {
         data: { list },
-      } = await this.$https.myMarkListPage({
+      } = await myMarkListPage({
         curPage: 1,
         pageSize: 10,
         needMark: 1,
@@ -220,7 +245,7 @@ export default {
     async getBulletinList() {
       const {
         data: { list },
-      } = await this.$https.bulletinListPage({
+      } = await bulletinListPage({
         curPage: 1,
         pageSize: 10,
         state: 1,
@@ -231,31 +256,43 @@ export default {
     async getCarouselList() {
       const {
         data: { list },
-      } = await this.$https.bulletinListPage({
+      } = await bulletinListPage({
         curPage: 1,
         pageSize: 10,
         state: 2,
       })
 
-      list.map(async (item) => {
-        const bg = await getMainColor(`/api/file/download?id=${item.imgFileId}`)
-        item.bg = bg
-      })
-
-      this.carouselList = list
+      if (list.length > 0) {
+        list.map(async (item) => {
+          const bg = await getMainColor(
+            `/api/file/download?id=${item.imgFileId}`
+          )
+          item.bg = bg
+        })
+        this.carouselList = list
+      } else {
+        this.carouselList = [
+          {
+            title: '在线考试',
+            content:
+              '一套适用于中小型企业的在线考试系统，开源免费，支持智能阅卷，权限控制等，持续更新，敬请等待~',
+            img: require('../assets/img/banner-img.png'),
+          },
+        ]
+      }
     },
     // 渲染日历
     async renderExamCalendar() {
       const days = dayjs().daysInMonth()
       const startDate = dayjs().date(1).format('YYYY-MM-DD')
       const endDate = dayjs().date(days).format('YYYY-MM-DD')
-      const examList = await this.$https.myExamListPage({
+      const examList = await myExamListPage({
         curPage: 1,
         pageSize: 10,
         startDate: `${startDate} 00:00:00`,
         endDate: `${endDate} 23:59:59`,
       })
-      const markList = await this.$https.myMarkListPage({
+      const markList = await myMarkListPage({
         curPage: 1,
         pageSize: 10,
         startDate: `${startDate} 00:00:00`,
@@ -275,14 +312,53 @@ export default {
 
 .el-carousel__item {
   height: 350px;
-  .banner-list {
-    width: 1200px;
-    height: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 0 auto;
-    padding: 0 30px;
+}
+
+.banner-list {
+  width: 1200px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  margin: 0 auto;
+  padding: 0 30px;
+  .banner-info {
+    flex: 1;
+    padding-right: 100px;
+    color: #fff;
+    .banner-title {
+      font-size: 36px;
+    }
+    .banner-content {
+      font-size: 14px;
+      overflow: hidden;
+      text-indent: 2em;
+      margin: 5px 0 0 30px;
+    }
+    .banner-btn {
+      width: 100px;
+      background: transparent;
+      color: #fff;
+      border: solid 1px #fff;
+      padding: 8px;
+      padding-left: 16px;
+      padding-right: 16px;
+      text-align: center;
+      margin: 10px 0 0 30px;
+      cursor: pointer;
+    }
+  }
+  .banner-image {
+    width: 316px;
+    height: 280px;
+    .image-slot {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #c0c4cc;
+      font-size: 24px;
+    }
   }
 }
 

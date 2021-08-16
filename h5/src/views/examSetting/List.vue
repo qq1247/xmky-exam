@@ -314,6 +314,20 @@
 </template>
 
 <script>
+import {
+  examListPage,
+  examAdd,
+  examDel,
+  examMarkUserList,
+  examUserList,
+  examPublish,
+  examEdit,
+  examUpdateMarkUser,
+  examUpdateExamUser,
+} from '@/api/exam'
+import { paperListPage } from '@/api/paper'
+import { userListPage } from '@/api/user'
+import { questionListPage } from '@/api/question'
 import ListCard from '@/components/ListCard.vue'
 import CustomSelect from '@/components/CustomSelect.vue'
 import * as dayjs from 'dayjs'
@@ -431,7 +445,7 @@ export default {
   methods: {
     // 查询
     async query() {
-      const examList = await this.$https.examListPage({
+      const examList = await examListPage({
         examTypeId: this.queryForm.examTypeId,
         curPage: this.curPage,
         pageSize: this.pageSize,
@@ -454,7 +468,7 @@ export default {
     // 获取试卷列表
     async getPaperList(curPage = 1) {
       this.examForm.curPage = curPage
-      const paperList = await this.$https.paperListPage({
+      const paperList = await paperListPage({
         state: 1,
         curPage,
         pageSize: this.examForm.pageSize,
@@ -491,13 +505,11 @@ export default {
         }
 
         const res = this.examForm.edit
-          ? await this.$https
-              .examEdit({
-                ...params,
-                id: this.examForm.id,
-              })
-              .catch((err) => {})
-          : await this.$https.examAdd(params).catch((err) => {})
+          ? await examEdit({
+              ...params,
+              id: this.examForm.id,
+            }).catch((err) => {})
+          : await examAdd(params).catch((err) => {})
 
         if (res?.code == 200) {
           this.examForm.show = false
@@ -550,7 +562,7 @@ export default {
         type: 'warning',
       })
         .then(async () => {
-          const res = await this.$https.examDel({ id }).catch((err) => {})
+          const res = await examDel({ id }).catch((err) => {})
           if (res?.code == 200) {
             this.total -= 1
             if (this.total <= this.pageSize) {
@@ -587,7 +599,7 @@ export default {
 
       await this.getUserList()
       await this.getQuestionNumList()
-      const examMarkUser = await this.$https.examMarkUserList({ id })
+      const examMarkUser = await examMarkUserList({ id })
 
       if (examMarkUser.data.length > 0) {
         this.examForm.examRemarks = []
@@ -622,7 +634,7 @@ export default {
       this.examForm.id = id
 
       await this.getUserList()
-      const examUsers = await this.$https.examUserList({ id })
+      const examUsers = await examUserList({ id })
 
       if (examUsers.data.length > 0) {
         this.examForm.examUser = []
@@ -646,7 +658,7 @@ export default {
         type: 'warning',
       })
         .then(async () => {
-          const res = await this.$https.examPublish({ id }).catch((err) => {})
+          const res = await examPublish({ id }).catch((err) => {})
           res?.code == 200
             ? (this.$tools.message('考试发布成功！'), this.pageChange())
             : this.$tools.message('请重新发布考试！', 'error')
@@ -664,7 +676,7 @@ export default {
     },
     // 获取用户
     async getUserList(name = '') {
-      const examUsers = await this.$https.userListPage({
+      const examUsers = await userListPage({
         name,
         curPage: this.examForm.curPage,
         pageSize: this.examForm.pageSize,
@@ -704,7 +716,7 @@ export default {
         pageSize: this.examForm.pageSize,
       }
       !id ? params : (params.id = Number(id))
-      const questionNumList = await this.$https.questionListPage(params)
+      const questionNumList = await questionListPage(params)
       this.examForm.examQuestionNums = questionNumList.data.list
       this.examForm.total = questionNumList.data.total
     },
@@ -754,9 +766,7 @@ export default {
           ? (params.questionIds = dynamic)
           : (params.examUserIds = dynamic)
 
-        const res = await this.$https
-          .examUpdateMarkUser(params)
-          .catch((err) => {})
+        const res = await examUpdateMarkUser(params).catch((err) => {})
 
         res?.code == 200
           ? (this.$tools.message('设置成功！'),
@@ -771,12 +781,10 @@ export default {
         this.$tools.message('请选择考试用户！', 'warning')
         return
       }
-      const res = await this.$https
-        .examUpdateExamUser({
-          id: this.examForm.id,
-          userIds: this.examForm.examUser,
-        })
-        .catch((err) => {})
+      const res = await examUpdateExamUser({
+        id: this.examForm.id,
+        userIds: this.examForm.examUser,
+      }).catch((err) => {})
 
       res?.code == 200
         ? (this.$tools.message('设置成功！'),
