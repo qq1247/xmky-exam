@@ -5,15 +5,15 @@
  * @Author: Che
  * @Date: 2021-08-12 10:17:05
  * @LastEditors: Che
- * @LastEditTime: 2021-08-13 17:29:22
+ * @LastEditTime: 2021-08-16 10:24:49
  */
 
-import router from './index'
+import router, { constantRoutes } from './index'
 import store from '@/store/index'
 import { Message } from 'element-ui'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
-import { getInfo, getAsyncRoutes } from '@/utils/storage'
+import { getInfo } from '@/utils/storage'
 import getPageTitle from '@/utils/get-page-title'
 
 NProgress.configure({ showSpinner: false })
@@ -27,12 +27,8 @@ router.beforeEach(async (to, from, next) => {
 
   const hasToken = getInfo().accessToken
 
-  const hasAsyncRoutes = getAsyncRoutes()
-
   if (hasToken) {
-    if (hasAsyncRoutes.length > 0) {
-      // router.addRoutes(hasAsyncRoutes)
-      // next({ ...to, replace: true })
+    if (store.state.permission.routes.length > constantRoutes.length) {
       next()
       NProgress.done()
     } else {

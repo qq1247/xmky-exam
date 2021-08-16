@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-03 14:22:34
  * @LastEditors: Che
- * @LastEditTime: 2021-08-13 10:04:43
+ * @LastEditTime: 2021-08-16 11:10:21
 -->
 <template>
   <div class="container">
@@ -26,7 +26,13 @@
             <span>我的阅卷</span>
           </div>
         </div>
-        <div class="exam-item">
+        <div
+          class="exam-item"
+          v-if="
+            $store.getters.roles.includes('subAdmin') ||
+            $store.getters.roles.includes('admin')
+          "
+        >
           <div @click="toBulletin" class="exam-content exam-add">
             <i class="common common-readPaper"></i>
             <span>我的公告</span>
@@ -44,10 +50,10 @@ export default {
   },
   methods: {
     toMyExam() {
-      this.$router.push({ path: '/my/list', query: { type: 1 } })
+      this.$router.push({ path: '/my/exam' })
     },
     toMyMarkExam() {
-      this.$router.push({ path: '/my/list', query: { type: 2 } })
+      this.$router.push({ path: '/my/mark' })
     },
     toBulletin() {
       this.$router.push({ path: '/my/bulletin', query: {} })

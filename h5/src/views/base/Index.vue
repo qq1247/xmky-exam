@@ -1,3 +1,12 @@
+<!--
+ * @Description: 
+ * @Version: 1.0
+ * @Company: 
+ * @Author: Che
+ * @Date: 2021-07-27 17:31:01
+ * @LastEditors: Che
+ * @LastEditTime: 2021-08-16 10:27:18
+-->
 <template>
   <div class="container">
     <!-- 搜索 -->
@@ -32,9 +41,6 @@
 export default {
   data() {
     return {}
-  },
-  mounted() {
-    this.query(1)
   },
   methods: {
     toDict() {

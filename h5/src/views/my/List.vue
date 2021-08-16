@@ -88,7 +88,6 @@ export default {
     }
   },
   mounted() {
-    console.log(this.$route)
     const { type } = this.$route.meta
 
     this.type = type
