@@ -238,11 +238,7 @@
             </template>
           </div>
         </template>
-
-        <div class="data-null" v-if="paperQuestion.length == 0">
-          <img alt class="data-img" src="../../assets/img/data-null.png" />
-          <span class="data-tip">暂无试卷信息</span>
-        </div>
+        <el-empty v-else description="暂无试卷"></el-empty>
       </div>
     </div>
 
@@ -398,7 +394,7 @@ export default {
             this.$set(
               this.paperQuestion[index].questionList[indexi],
               'isEdit',
-              item.ai === 1 ? true : false
+              item.ai === 1
             )
           })
         })
@@ -451,7 +447,7 @@ export default {
     toHref(position, status) {
       let toHref = ''
 
-      let paperQuestion = this.paperQuestion.reduce((acc, cur) => {
+      const paperQuestion = this.paperQuestion.reduce((acc, cur) => {
         acc.push(...cur.questionList)
         return acc
       }, [])

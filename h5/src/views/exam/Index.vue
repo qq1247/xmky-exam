@@ -12,7 +12,8 @@
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query" icon="el-icon-search" type="primary"
+        <el-button @click="query" icon="el-icon-search"
+type="primary"
           >查询</el-button
         >
       </el-form-item>

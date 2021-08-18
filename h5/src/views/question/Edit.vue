@@ -177,12 +177,9 @@
             @current-change="pageChange"
           ></el-pagination>
         </template>
-        <template v-if="list.questionList.length == 0">
-          <div class="data-null">
-            <img class="data-img" src="../../assets/img/data-null.png" alt />
-            <span class="data-tip">抱歉！暂无信息</span>
-          </div>
-        </template>
+        <el-empty v-else description="暂无试题">
+          <img slot="image" src="../../assets/img/data-null.png" alt="" />
+        </el-empty>
       </el-scrollbar>
       <el-scrollbar wrap-style="overflow-x:hidden;" class="content-right">
         <el-form
@@ -575,10 +572,23 @@
       :close-on-click-modal="false"
     >
       <el-form :model="fileForm" ref="fileForm">
+        <!-- <el-upload
+          :headers="fileForm.headers"
+          :on-success="fileUploadSuccess"
+          :on-remove="fileUploadRemove"
+          :before-remove="fileUploadBeforeRemove"
+          action="/api/file/upload"
+          class="file-uploader"
+          name="files"
+          :file-list="fileForm.fileList"
+          accept=".docx, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        >
+          <el-button size="small" type="primary">上传试题模板</el-button>
+        </el-upload> -->
         <input
           type="file"
           id="docId"
-          accept=".doc, .docx, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          accept=".docx, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         />
       </el-form>
       <div class="dialog-footer" slot="footer">
@@ -667,7 +677,7 @@ export default {
         type: 1, // 类型
         difficulty: 1, // 难度
         title: '', // 标题
-        ai: 1, //AI阅卷
+        ai: 1, // AI阅卷
         state: 2,
         options: [
           {
@@ -786,6 +796,10 @@ export default {
       ],
       fileForm: {
         show: false,
+        headers: {
+          Authorization: this.$store.getters.token,
+        },
+        fileList: [],
       },
     }
   },
@@ -992,7 +1006,7 @@ export default {
           acc.push(params.ai == 1 ? cur.score : params.score)
           return acc
         }, [])
-        let sum = params.scores.reduce((acc, cur) => acc + Number(cur), 0)
+        const sum = params.scores.reduce((acc, cur) => acc + Number(cur), 0)
         if (sum != params.score && params.ai == 1) {
           this.$tools.message('答案分值相加应等于总分值！', 'warning')
           return false
@@ -1173,12 +1187,18 @@ export default {
         this.query()
         this.$tools.message(`${msg}成功！`)
         this.$tools.resetData(this, 'editForm')
-        /* this.$nextTick(() => {
-          this.$refs['editForm'].resetFields()
-        }) */
       } else {
         this.$tools.message(res.msg || `${msg}失败！`, 'error')
       }
+    },
+    fileUploadRemove(file, fileList) {
+      console.log(file, fileList)
+    },
+    fileUploadBeforeRemove(file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`)
+    },
+    fileUploadSuccess(file, fileList) {
+      console.log(file, fileList)
     },
   },
 }
@@ -1190,16 +1210,16 @@ export default {
   display: flex;
   flex-direction: column;
   padding-bottom: 10px;
-  padding-top: 0;
+  padding-top: 60px;
+  margin: 0 auto;
 }
 
 .search {
-  height: 80px;
-  padding: 0 20px;
+  height: 50px;
+  padding: 0 20px 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 60px;
 }
 
 .content {

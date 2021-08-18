@@ -158,7 +158,6 @@ export default {
 .container {
   display: flex;
   align-items: center;
-  padding-top: 120px;
   .content {
     width: 1170px;
   }

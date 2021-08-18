@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-12 10:17:05
  * @LastEditors: Che
- * @LastEditTime: 2021-08-16 10:24:49
+ * @LastEditTime: 2021-08-17 18:41:14
  */
 
 import router, { constantRoutes } from './index'
@@ -26,6 +26,16 @@ router.beforeEach(async (to, from, next) => {
   document.title = getPageTitle(to.meta.title)
 
   const hasToken = getInfo().accessToken
+
+  store.dispatch('setting/changeSetting', {
+    key: 'hideHeader',
+    value: to.meta.hideHeader,
+  })
+
+  store.dispatch('setting/changeSetting', {
+    key: 'hideFooter',
+    value: to.meta.hideFooter,
+  })
 
   if (hasToken) {
     if (store.state.permission.routes.length > constantRoutes.length) {

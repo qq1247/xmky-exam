@@ -12,7 +12,8 @@
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query" icon="el-icon-search" type="primary"
+        <el-button @click="query" icon="el-icon-search"
+type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -41,10 +42,7 @@
           ></ListCard>
         </div>
       </template>
-      <div class="data-null" v-else>
-        <img class="data-img" src="../../assets/img/data-null.png" alt />
-        <span class="data-tip">抱歉！暂无信息</span>
-      </div>
+      <el-empty v-else description="暂无信息"> </el-empty>
       <el-pagination
         background
         layout="prev, pager, next"

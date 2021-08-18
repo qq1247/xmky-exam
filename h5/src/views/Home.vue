@@ -67,10 +67,7 @@
                 }}</el-col>
               </el-row>
             </template>
-            <div class="data-null" v-else>
-              <img class="data-img" src="../assets/img/data-null.png" alt />
-              <span class="data-tip">抱歉！暂无公告</span>
-            </div>
+            <el-empty v-else description="暂无公告"></el-empty>
           </template>
         </el-col>
         <el-col :span="16">
@@ -124,10 +121,7 @@
                 </el-col>
               </el-row>
             </template>
-            <div class="data-null" v-else>
-              <img class="data-img" src="../assets/img/data-null.png" alt />
-              <span class="data-tip">抱歉！暂无考试</span>
-            </div>
+            <el-empty v-else description="暂无考试"></el-empty>
           </div>
           <div>
             <div class="box-title box-divider">
@@ -179,10 +173,7 @@
                 </el-col>
               </el-row>
             </template>
-            <div class="data-null" v-else>
-              <img class="data-img" src="../assets/img/data-null.png" alt />
-              <span class="data-tip">抱歉！暂无阅卷</span>
-            </div>
+            <el-empty v-else description="暂无阅卷"> </el-empty>
           </div>
         </el-col>
       </el-row>
@@ -203,7 +194,14 @@ export default {
       examStatus: ['', '待考', '考试', '已考', '已考'],
       readPaperStatus: ['', '待阅', '阅卷', '已阅'],
       bulletinList: [],
-      carouselList: [],
+      carouselList: [
+        {
+          title: '在线考试',
+          content:
+            '一套适用于中小型企业的在线考试系统，开源免费，支持智能阅卷，权限控制等，持续更新，敬请等待~',
+          img: require('../assets/img/banner-img.png'),
+        },
+      ],
       now: new Date(),
     }
   },
@@ -276,15 +274,6 @@ export default {
           item.bg = bg
         })
         this.carouselList = list
-      } else {
-        this.carouselList = [
-          {
-            title: '在线考试',
-            content:
-              '一套适用于中小型企业的在线考试系统，开源免费，支持智能阅卷，权限控制等，持续更新，敬请等待~',
-            img: require('../assets/img/banner-img.png'),
-          },
-        ]
       }
     },
     // 渲染日历
@@ -314,6 +303,7 @@ export default {
 <style lang="scss" scoped>
 .container {
   width: 100%;
+  margin-top: 0;
 }
 
 .el-carousel__item {
@@ -614,8 +604,5 @@ export default {
   .notice-right {
     color: #0095e5;
   }
-}
-.data-null {
-  padding-top: 20px;
 }
 </style>
