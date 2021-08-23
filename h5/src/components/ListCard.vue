@@ -10,10 +10,10 @@
       <!-- 权限人员展示 -->
       <template v-if="parentClassify.includes(name)">
         <div class="content-info ellipsis">
-          <span>使用权限：{{ data.readUserNames.join(',') || '暂无' }}</span>
+          <span>使用权限：{{ data.readUserNames || '暂无' }}</span>
         </div>
         <div class="content-info ellipsis">
-          <span>编辑权限：{{ data.writeUserNames.join(',') || '暂无' }}</span>
+          <span>编辑权限：{{ data.writeUserNames || '暂无' }}</span>
         </div>
       </template>
       <!-- 试卷列表 -->
@@ -298,12 +298,12 @@ export default {
       const isChildrenClassify = this.childrenClassify.includes(this.name)
 
       if (isparentClassify && (isCreateUser || isUpdateUser)) {
-        this.$tools.message('暂无此项权限！', 'warning')
+        this.$message.warning('暂无此项权限！')
         return true
       }
 
       if (isChildrenClassify && isPublish) {
-        this.$tools.message('已发布不可修改！', 'warning')
+        this.$message.warning('已发布不可修改！')
         return true
       }
       return false
