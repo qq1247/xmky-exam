@@ -1,5 +1,8 @@
 package com.wcpdoc.exam.file.service.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -8,6 +11,7 @@ import javax.annotation.Resource;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -160,5 +164,24 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 	@Override
 	public List<File> getDelList() {
 		return fileDao.getDelList();
+	}
+
+	@Override
+	public void exportTemplate(String templateName){
+		OutputStream output = null;
+		InputStream input = null;
+		try {
+		input = this.getClass().getResourceAsStream("/res/"+templateName);
+		String fileName = new String((templateName).getBytes("UTF-8"), "ISO-8859-1");
+		response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
+		response.setContentType("application/force-download");
+		output = response.getOutputStream();
+		IOUtils.copy(input, output);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			IOUtils.closeQuietly(output);
+			IOUtils.closeQuietly(input);
+		}
 	}
 }

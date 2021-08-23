@@ -53,4 +53,11 @@ public interface FileService extends BaseService<File> {
 	 */
 	List<File> getDelList();
 
+	/**
+	 * 模板导出
+	 * 
+	 * v1.0 chenyun 2021年8月23日上午9:52:56
+	 * @param templateName void
+	 */
+	void exportTemplate(String templateName);
 }
