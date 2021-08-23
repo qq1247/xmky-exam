@@ -32,7 +32,12 @@ public class QuestionTypeDaoImpl extends RBaseDaoImpl<QuestionType> implements Q
 	
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT QUESTION_TYPE.* "
+		String sql = "SELECT QUESTION_TYPE.*, "
+				+ "IFNULL((select GROUP_CONCAT(user.NAME SEPARATOR ',') from sys_user user where user.state!=0 and EXISTS ( SELECT 1 FROM EXM_QUESTION_TYPE qt "
+				+ "WHERE QUESTION_TYPE.ID = qt.ID and qt.WRITE_USER_IDS like CONCAT('%,',user.ID,',%'))),'') as 'WRITE_USER_NAMES',"
+				+ "IFNULL((select GROUP_CONCAT(user.NAME SEPARATOR ',') from sys_user user where user.state!=0 and EXISTS ( SELECT 1 FROM EXM_QUESTION_TYPE qt "
+				+ "WHERE QUESTION_TYPE.ID = qt.ID and qt.READ_USER_IDS like CONCAT('%,',user.ID,',%'))),'') as 'READ_USER_NAMES', "
+				+ "IFNULL((select user.NAME from sys_user user where user.state!=0 and user.ID = QUESTION_TYPE.CREATE_USER_ID),'') as 'CREATE_USER_NAME'"
 				+ "FROM EXM_QUESTION_TYPE QUESTION_TYPE ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "QUESTION_TYPE.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
@@ -90,8 +95,8 @@ public class QuestionTypeDaoImpl extends RBaseDaoImpl<QuestionType> implements Q
 		String sql = "SELECT USER.ID, USER.NAME AS NAME "
 				+ "FROM SYS_USER USER ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(pageIn.get("idw", Integer.class) != null, "EXISTS (SELECT 1 FROM EXM_QUESTION_TYPE Z WHERE Z.ID = ? AND Z.WRITE_USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.get("idw", Integer.class))
-				.addWhere(pageIn.get("idr",  Integer.class) != null, "EXISTS (SELECT 1 FROM EXM_QUESTION_TYPE Z WHERE Z.ID = ? AND Z.READ_USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.get("idr", Integer.class))
+		sqlUtil.addWhere(pageIn.get("idWrite", Integer.class) != null, "EXISTS (SELECT 1 FROM EXM_QUESTION_TYPE Z WHERE Z.ID = ? AND Z.WRITE_USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.get("idWrite", Integer.class))
+				.addWhere(pageIn.get("idRead",  Integer.class) != null, "EXISTS (SELECT 1 FROM EXM_QUESTION_TYPE Z WHERE Z.ID = ? AND Z.READ_USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.get("idRead", Integer.class))
 				.addWhere("USER.STATE = 1")
 				.addOrder("USER.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);

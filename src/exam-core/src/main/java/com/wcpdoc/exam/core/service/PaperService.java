@@ -2,10 +2,12 @@ package com.wcpdoc.exam.core.service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.PaperQuestionEx;
+import com.wcpdoc.exam.core.entity.PaperRemark;
 import com.wcpdoc.exam.core.entity.Question;
 
 /**
@@ -14,6 +16,16 @@ import com.wcpdoc.exam.core.entity.Question;
  * zhanghc 2018年10月21日上午8:16:06
  */
 public interface PaperService extends BaseService<Paper> {
+
+	/**
+	 * 添加试卷
+	 * 
+	 * v1.0 chenyun 2021年8月19日下午5:03:26
+	 * @param paper
+	 * @param paperRemark void
+	 */
+	void addAndUpdate(Paper paper, PaperRemark paperRemark);
+	
 	/**
 	 * 完成添加章节
 	 * 
@@ -94,22 +106,6 @@ public interface PaperService extends BaseService<Paper> {
 	void optionsUpdate(Integer paperQuestionId, Integer[] scoreOptions);
 
 	/**
-	 * 完成试题上移
-	 * 
-	 * v1.0 zhanghc 2018年10月21日下午4:15:35
-	 * @param paperQuestionId void
-	 */
-	void questionUp(Integer paperQuestionId);
-
-	/**
-	 * 完成试题下移
-	 * 
-	 * v1.0 zhanghc 2018年10月21日下午4:15:43
-	 * @param paperQuestionId void
-	 */
-	void questionDown(Integer paperQuestionId);
-
-	/**
 	 * 完成试题删除
 	 * 
 	 * v1.0 zhanghc 2018年10月21日下午10:43:15
@@ -127,21 +123,13 @@ public interface PaperService extends BaseService<Paper> {
 	void questionClear(Integer chapterId);
 
 	/**
-	 * 完成章节上下移
+	 * 完成章节试题移动
 	 * 
 	 * v1.0 chenyun 2021年7月9日下午3:22:49
 	 * @param oldId
 	 * @param newId void
 	 */
-	void chapterUp(Integer oldId, Integer newId);
-	
-	/**
-	 * 完成章节下移
-	 * 
-	 * v1.0 zhanghc 2018年10月21日下午2:51:35
-	 * @param chapterId void
-	 */
-	void chapterDown(Integer chapterId);
+	void movePosition(Integer sourceId, Integer targetId);
 
 	/**
 	 * 获取试卷列表
@@ -172,4 +160,29 @@ public interface PaperService extends BaseService<Paper> {
 	 * @param targetId void
 	 */
 	void move(Integer id, Integer sourceId, Integer targetId);
+	
+	/**
+	 * 拷贝
+	 * 
+	 * v1.0 chenyun 2021年8月19日下午5:09:55
+	 * @param id void
+	 */
+	void copy(Integer id) throws Exception ;
+	
+	/**
+	 * 试卷试题列表
+	 * 
+	 * v1.0 chenyun 2021年8月20日上午9:38:23
+	 * @param id
+	 * @return List<Map<String,Object>>
+	 */
+	List<Map<String, Object>> paperQuestionList(Integer id);
+	
+	/**
+	 * 发布
+	 * 
+	 * v1.0 chenyun 2021年8月23日上午11:06:26
+	 * @param id void
+	 */
+	void publish(Integer id);
 }

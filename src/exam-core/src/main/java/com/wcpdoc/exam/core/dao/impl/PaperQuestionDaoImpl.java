@@ -24,7 +24,7 @@ public class PaperQuestionDaoImpl extends RBaseDaoImpl<PaperQuestion> implements
 
 	@Override
 	public List<PaperQuestion> getQuestionList(Integer parentId) {
-		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PARENT_ID = ? AND TYPE != 1";
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PARENT_ID = ? AND TYPE != 1 ORDER BY NO ASC";
 		return getList(sql, new Object[]{parentId}, PaperQuestion.class);
 	}
 
@@ -36,7 +36,7 @@ public class PaperQuestionDaoImpl extends RBaseDaoImpl<PaperQuestion> implements
 	
 	@Override
 	public List<PaperQuestion> getChapterList(Integer paperId) {
-		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = ? AND TYPE = 1";
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = ? AND TYPE = 1 ORDER BY NO ASC";
 		return getList(sql, new Object[]{paperId}, PaperQuestion.class);
 	}
 
