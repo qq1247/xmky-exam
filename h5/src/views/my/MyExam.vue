@@ -310,7 +310,7 @@ export default {
           return acc
         }, {})
       } catch (error) {
-        this.$tools.message(error, 'error')
+        this.$message.error(error)
       }
     },
     // 更新答案
@@ -320,7 +320,7 @@ export default {
       }
 
       if (!this.myExamDetailCache[questionId]) {
-        this.$tools.message('提交答案失败，请联系管理员！', 'error')
+        this.$message.error('提交答案失败，请联系管理员！')
         return
       }
 
@@ -335,7 +335,7 @@ export default {
         return
       }
       if (!this.myExamDetailCache[questionId]) {
-        this.$tools.message('提交答案失败，请联系管理员！', 'error')
+        this.$message.error('提交答案失败，请联系管理员！')
         return
       }
 
@@ -357,12 +357,12 @@ export default {
           ? this.$router.replace({
               path: '/my',
             })
-          : this.$tools.message('请重新提交试卷！', 'warning')
+          : this.$message.warning('请重新提交试卷！')
       })
     },
     // 倒计时结束，强制交卷
     async forceExamEnd() {
-      this.$alert('考试时间到，已强制交卷！', '', {
+      this.$alert('考试时间到，已强制交卷！', {
         confirmButtonText: '确定',
         type: 'info',
         showClose: false,

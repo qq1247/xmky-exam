@@ -12,8 +12,7 @@
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query" icon="el-icon-search"
-type="primary"
+        <el-button @click="query" icon="el-icon-search" type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -509,22 +508,21 @@ export default {
           ? await examEdit({
               ...params,
               id: this.examForm.id,
-            }).catch((err) => {})
-          : await examAdd(params).catch((err) => {})
+            })
+          : await examAdd(params)
 
         if (res?.code == 200) {
           this.examForm.show = false
-          this.$tools.message(!this.examForm.edit ? '添加成功！' : '修改成功！')
+          this.$message.success(
+            !this.examForm.edit ? '添加成功！' : '修改成功！'
+          )
           if (this.examForm.edit) {
             this.pageChange()
           } else {
             this.pageChange(1)
           }
         } else {
-          this.$tools.message(
-            !this.examForm.edit ? '添加失败！' : '修改失败！',
-            'error'
-          )
+          this.$message.error(!this.examForm.edit ? '添加失败！' : '修改失败！')
         }
       })
     },
@@ -563,35 +561,37 @@ export default {
         type: 'warning',
       })
         .then(async () => {
-          const res = await examDel({ id }).catch((err) => {})
+          const res = await examDel({ id })
           if (res?.code == 200) {
             this.total -= 1
             if (this.total <= this.pageSize) {
               this.pageChange(1)
               return
             }
-            this.$tools.message('删除成功！')
+            this.$message.success('删除成功！')
             this.total % this.pageSize == 0 && this.total != this.pageSize
               ? ((this.curPage -= 1), this.pageChange(this.curPage))
               : this.pageChange(this.curPage)
           } else {
-            this.$tools.message(res.msg || '删除失败！', 'error')
+            this.$message.error(res.msg || '删除失败！')
           }
         })
-        .catch(() => {})
+        .catch((err) => {
+          console.log(err)
+        })
     },
     // 通知
     message({ state }) {
       if (state == 2) {
-        this.$tools.message('请先发布考试！', 'error')
+        this.$message.error('请先发布考试！')
         return
       }
-      this.$tools.message('功能开发中...', 'info')
+      this.$message('功能开发中...')
     },
     // 阅卷设置
     async read({ id, paperId, state }) {
       if (state == 2) {
-        this.$tools.message('请先发布考试！', 'error')
+        this.$message.error('请先发布考试！')
         return
       }
 
@@ -629,7 +629,7 @@ export default {
     // 用户设置
     async user({ id, state }) {
       if (state == 2) {
-        this.$tools.message('请先发布考试！', 'error')
+        this.$message.error('请先发布考试！')
         return
       }
       this.examForm.id = id
@@ -650,7 +650,7 @@ export default {
     // 考试发布
     async publish({ id, state }) {
       if (state == 1) {
-        this.$tools.message('考试已发布!', 'warning')
+        this.$message.warning('考试已发布!')
         return
       }
       this.$confirm(`确认发布考试吗？`, '提示', {
@@ -659,17 +659,19 @@ export default {
         type: 'warning',
       })
         .then(async () => {
-          const res = await examPublish({ id }).catch((err) => {})
+          const res = await examPublish({ id })
           res?.code == 200
-            ? (this.$tools.message('考试发布成功！'), this.pageChange())
-            : this.$tools.message('请重新发布考试！', 'error')
+            ? (this.$message.success('考试发布成功！'), this.pageChange())
+            : this.$message.error('请重新发布考试！')
         })
-        .catch(() => {})
+        .catch((err) => {
+          console.log(err)
+        })
     },
     // 选择阅卷方式
     selectPaperType(e) {
       if (e == 0) {
-        this.$tools.message('暂未开放', 'warning')
+        this.$message.warning('暂未开放')
         this.examForm.examRadio = 1
         return
       }
@@ -767,31 +769,31 @@ export default {
           ? (params.questionIds = dynamic)
           : (params.examUserIds = dynamic)
 
-        const res = await examUpdateMarkUser(params).catch((err) => {})
+        const res = await examUpdateMarkUser(params)
 
         res?.code == 200
-          ? (this.$tools.message('设置成功！'),
+          ? (this.$message('设置成功！'),
             (this.examForm.readShow = false),
             this.pageChange())
-          : this.$tools.message('设置失败！', 'error')
+          : this.$message.error('设置失败！')
       })
     },
     // 编辑考试用户
     async editExamUser() {
       if (this.examForm.examUser.length == 0) {
-        this.$tools.message('请选择考试用户！', 'warning')
+        this.$message.warning('请选择考试用户！')
         return
       }
       const res = await examUpdateExamUser({
         id: this.examForm.id,
         userIds: this.examForm.examUser,
-      }).catch((err) => {})
+      })
 
       res?.code == 200
-        ? (this.$tools.message('设置成功！'),
+        ? (this.$message('设置成功！'),
           (this.examForm.userShow = false),
           this.pageChange())
-        : this.$tools.message('设置失败！', 'error')
+        : this.$message.error('设置失败！')
     },
     // 切换分页
     pageChange(val) {

@@ -12,8 +12,7 @@
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query" icon="el-icon-search"
-type="primary"
+        <el-button @click="query" icon="el-icon-search" type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -237,7 +236,9 @@ export default {
         }
 
         if (res?.code == 200) {
-          this.$tools.message(!this.examForm.edit ? '添加成功！' : '修改成功！')
+          this.$message.success(
+            !this.examForm.edit ? '添加成功！' : '修改成功！'
+          )
           this.examForm.show = false
           if (this.examForm.edit) {
             this.pageChange()
@@ -245,10 +246,7 @@ export default {
             this.pageChange(1)
           }
         } else {
-          this.$tools.message(
-            !this.examForm.edit ? '添加失败！' : '修改失败！',
-            'error'
-          )
+          this.$message.error(!this.examForm.edit ? '添加失败！' : '修改失败！')
         }
       })
     },
@@ -267,22 +265,24 @@ export default {
         type: 'warning',
       })
         .then(async () => {
-          const res = await paperTypeDel({ id }).catch((err) => {})
+          const res = await paperTypeDel({ id })
           if (res?.code == 200) {
             this.total -= 1
             if (this.total <= this.pageSize) {
               this.pageChange(1)
               return
             }
-            this.$tools.message('删除成功！')
+            this.$message.success('删除成功！')
             this.total % this.pageSize == 0 && this.total != this.pageSize
               ? ((this.curPage -= 1), this.pageChange(this.curPage))
               : this.pageChange(this.curPage)
           } else {
-            this.$tools.message(res.msg || '删除失败！', 'error')
+            this.$message.error(res.msg || '删除失败！')
           }
         })
-        .catch(() => {})
+        .catch((err) => {
+          console.log(err)
+        })
     },
     // 获取用户
     async getUserList(name = '') {
@@ -300,7 +300,10 @@ export default {
       }
 
       this.roleForm.roleUserList = roleUserList.data.list
-      this.roleForm.total = roleUserList.data.total + 1
+      this.roleForm.total =
+        this.$store.getters.userId == 1
+          ? roleUserList.data.total + 1
+          : roleUserList.data.total
     },
     // 获取更多用户
     getMoreUser(curPage) {
@@ -324,7 +327,11 @@ export default {
     async role({ readUserIds, writeUserIds, id }) {
       this.examForm.id = id
       this.roleForm.readRoleUser = readUserIds
+        .split(',')
+        .filter((item) => item !== '')
       this.roleForm.writeRoleUser = writeUserIds
+        .split(',')
+        .filter((item) => item !== '')
       await this.getUserList()
       this.roleForm.show = true
     },
@@ -336,11 +343,11 @@ export default {
         writeUserIds: this.roleForm.writeRoleUser.join(','),
       })
       if (res?.code == 200) {
-        this.$tools.message('权限编辑成功！')
+        this.$message.success('权限编辑成功！')
         this.pageChange()
         this.roleForm.show = false
       } else {
-        this.$tools.message('权限编辑失败！', 'error')
+        this.$message.error('权限编辑失败！')
       }
     },
     // 试卷子分类

@@ -215,10 +215,7 @@ export default {
       }).then(async () => {
         const res = await parmDel({ id })
         if (res.code != 200) {
-          this.$message({
-            type: 'error',
-            message: res.msg,
-          })
+          this.$message.error(res.msg)
         }
 
         this.query()

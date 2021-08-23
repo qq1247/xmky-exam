@@ -405,7 +405,7 @@ export default {
           })
         }
       } catch (error) {
-        this.$tools.message(error, 'error')
+        this.$message.error(error)
       }
     },
     // 显示分数编辑板
@@ -438,10 +438,10 @@ export default {
       const res = await myExamUpdateScore({
         myExamDetailId: source.myExamDetailId,
         score: source.scorePlate,
-      }).catch((err) => {})
+      })
       res?.code === 200
-        ? this.$tools.message('打分成功！')
-        : this.$tools.message(res.msg || '打分失败！', 'error')
+        ? this.$message.success('打分成功！')
+        : this.$message.error(res.msg || '打分失败！')
     },
     // 上下题定位
     toHref(position, status) {
@@ -473,7 +473,7 @@ export default {
           index == this.answerList.length - 1 ||
           indexd === -1
         ) {
-          this.$tools.message('没有可阅试题了哦！', 'warning')
+          this.$message.warning('没有可阅试题了哦！')
           return
         }
 
@@ -498,7 +498,7 @@ export default {
         (item) => item.userId === this.userId
       )
       if (index === 0) {
-        this.$tools.message('已经是第一卷了！', 'warning')
+        this.$message.warning('已经是第一卷了！')
         return
       }
       this.queryAnswerInfo(this.examUserIds[index - 1].userId)
@@ -509,7 +509,7 @@ export default {
         (item) => item.userId === this.userId
       )
       if (index === this.examUserIds.length - 1) {
-        this.$tools.message('已经是最后一卷了！', 'warning')
+        this.$message.warning('已经是最后一卷了！')
         return
       }
       this.queryAnswerInfo(this.examUserIds[index + 1].userId)
@@ -524,18 +524,17 @@ export default {
         (item) => item.scorePlate !== '' && item.scorePlate !== null
       )
       if (!isEvery) {
-        this.$tools.message('请给所有试题打分！', 'warning')
+        this.$message.warning('请给所有试题打分！')
         return
       }
       const res = await myExamDoScore({
         examId: this.examId,
         userId: this.userId,
         markId: this.markId,
-      }).catch((err) => {})
+      })
       res?.code === 200
-        ? (this.$tools.message('阅卷完成！', 'warning'),
-          this.queryExamineeInfo())
-        : this.$tools.message('阅卷失败！', 'error')
+        ? (this.$message.warning('阅卷完成！'), this.queryExamineeInfo())
+        : this.$message.error('阅卷失败！')
     },
   },
 }

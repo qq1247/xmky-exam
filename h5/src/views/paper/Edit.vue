@@ -192,7 +192,7 @@
             chosenClass="drag-question-active"
             animation="300"
             v-if="paperQuestion.length > 0"
-            @update="chapterUpdate"
+            @update="chapterMove"
           >
             <div
               class="drag-item drag-content drag-parent"
@@ -202,6 +202,7 @@
               <div class="chapter">
                 <div class="chapter-item">
                   <div class="item-title">{{ item.chapter.name }}</div>
+                  <span>{{ item.chapter.id }}</span>
                   <div>
                     <el-button
                       @click="chapterEdit(item.chapter)"
@@ -254,6 +255,7 @@
                 chosenClass="drag-question-active"
                 animation="300"
                 :data-id="item.chapter.id"
+                @end="questionMove"
               >
                 <template v-if="item.questionList.length > 0">
                   <div
@@ -263,7 +265,7 @@
                     :id="`p-${child.id}`"
                   >
                     <p v-html="index + 1 + '、' + child.title"></p>
-
+                    <span>{{ child.paperQuestionId }}</span>
                     <!-- 单选 -->
                     <template v-if="child.type === 1">
                       <el-radio-group
@@ -346,7 +348,10 @@
                         <template v-if="[1, 2, 4].includes(child.type)">
                           <el-col :span="2.5"> 【答案】： </el-col>
                           <el-col :span="21">
-                            <div v-html="`${child.answers[0].answer}`"></div>
+                            <div
+                              v-if="child.answers.lenght > 0"
+                              v-html="`${child.answers[0].answer}`"
+                            ></div>
                           </el-col>
                         </template>
                         <template v-if="child.type === 3">
@@ -386,7 +391,7 @@
                               </div>
                             </template>
                             <div
-                              v-if="child.ai === 2"
+                              v-if="child.ai === 2 && child.answers.length > 0"
                               v-html="`${child.answers[0].answer}`"
                             ></div>
                           </el-col>
@@ -446,6 +451,7 @@
 
       <div class="content-right">
         <el-scrollbar wrap-style="overflow-x:hidden;" style="height: 100%">
+          <div class="total-score">总分：{{ totalScore }}</div>
           <el-collapse v-model="collapseShow" v-if="paperQuestion.length > 0">
             <el-collapse-item
               v-for="(item, index) in paperQuestion"
@@ -467,7 +473,7 @@
               </div>
             </el-collapse-item>
           </el-collapse>
-          <el-empty v-else description="暂无题目导航信息"> </el-empty>
+          <el-empty v-else description="暂无试题导航"> </el-empty>
         </el-scrollbar>
       </div>
     </div>
@@ -599,6 +605,8 @@ import {
   paperQuestionDel,
   paperUpdateScore,
   paperQuestionAdd,
+  paperMovePosition,
+  paperTotalScore,
 } from '@/api/paper'
 import { questionListPage, randomListPage } from '@/api/question'
 import Draggable from 'vuedraggable'
@@ -641,12 +649,14 @@ export default {
       labelPosition: 'left',
       hrefPointer: '',
       paperId: 0,
+      paperState: 2,
       paperTypeId: 0,
       paperName: '',
       pageSize: 5,
       curPage: 1,
       total: 0,
       collapseShow: 0,
+      totalScore: 0,
       chapterForm: {
         id: 0,
         name: '',
@@ -688,9 +698,10 @@ export default {
     }
   },
   created() {
-    const { id, name } = this.$route.query
+    const { id, name, state } = this.$route.query
     this.paperId = id
     this.paperName = name
+    this.paperState = state
     this.init()
   },
   methods: {
@@ -724,8 +735,9 @@ export default {
           item.questionList.map((question) => {})
         })
         this.paperQuestion = [...res.data]
+        this.computeScore()
       } catch (error) {
-        this.$tools.message(error.msg, 'error')
+        this.$message.error(error.msg)
       }
     },
     // 查询试题
@@ -742,10 +754,26 @@ export default {
         state: 1,
         curPage: this.curPage,
         pageSize: this.pageSize,
-      }).catch((err) => {})
+      })
       res?.code === 200
         ? ((this.paperList = res.data.list), (this.total = res.data.total))
-        : this.$tools.message('请刷新重新获取试题！', 'error')
+        : this.$message.error('请刷新重新获取试题！')
+    },
+    // 计算分数
+    computeScore() {
+      if (this.paperQuestion.length == 0) {
+        this.totalScore = 0
+        return
+      }
+
+      const questionList = this.paperQuestion.reduce((acc, cur) => {
+        acc.push(...cur.questionList)
+        return acc
+      }, [])
+
+      this.totalScore = questionList.reduce((acc, cur) => {
+        return acc + cur.score
+      }, 0)
     },
     // 随机查询试题
     async randomQueryQuestion() {
@@ -764,7 +792,7 @@ export default {
       })
       res?.code === 200
         ? (this.paperList = res.data.list)
-        : this.$tools.message('请刷新重新获取试题！', 'error')
+        : this.$message.error('请刷新重新获取试题！')
     },
     // 添加章节
     paperChapterAdd() {
@@ -778,7 +806,7 @@ export default {
           description: this.chapterForm.description,
           paperId: this.paperId,
           type: 1,
-        }).catch((err) => {})
+        })
         this.refreshData(res, '添加章节')
       })
     },
@@ -796,7 +824,7 @@ export default {
         id: this.chapterForm.id,
         name: this.chapterForm.name,
         description: this.chapterForm.description,
-      }).catch((err) => {})
+      })
       this.refreshData(res, '编辑章节')
     },
     // 删除章节
@@ -807,10 +835,12 @@ export default {
         type: 'warning',
       })
         .then(async () => {
-          const res = await paperChapterDel({ id }).catch((err) => {})
+          const res = await paperChapterDel({ id })
           this.refreshData(res, '删除章节')
         })
-        .catch(() => {})
+        .catch((err) => {
+          console.log(err)
+        })
     },
     // 章节折叠
     chapteFold(index) {
@@ -820,7 +850,7 @@ export default {
     // 清空试卷试题
     async chapterClear({ id }, index) {
       if (this.paperQuestion[index].questionList.length == 0) {
-        this.$tools.message('试题已清空，请重新添加试题！', 'warning')
+        this.$message.warning('试题已清空，请重新添加试题！')
         return
       }
       this.$confirm(`确认清空章节下的所有试题吗？`, '提示', {
@@ -829,12 +859,12 @@ export default {
         type: 'warning',
       })
         .then(async () => {
-          const res = await paperQuestionClear({ chapterId: id }).catch(
-            (err) => {}
-          )
+          const res = await paperQuestionClear({ chapterId: id })
           this.refreshData(res, '清空试题')
         })
-        .catch(() => {})
+        .catch((err) => {
+          console.log(err)
+        })
     },
     // 删除试题
     del(paperQuestionId) {
@@ -844,21 +874,21 @@ export default {
         type: 'warning',
       })
         .then(async () => {
-          const res = await paperQuestionDel({ paperQuestionId }).catch(
-            (err) => {}
-          )
+          const res = await paperQuestionDel({ paperQuestionId })
           this.refreshData(res, '删除试题')
         })
-        .catch(() => {})
+        .catch((err) => {
+          console.log(err)
+        })
     },
     // 更新页面数据
     refreshData(res, title) {
       res?.code === 200
-        ? (this.$tools.message(`${title}成功！`),
+        ? (this.$message(`${title}成功！`),
           this.query(),
           this.$tools.resetData(this, 'chapterForm'),
           this.queryQuestion())
-        : this.$tools.message(`${title}失败！`, 'error')
+        : this.$message.error(`${title}失败！`)
     },
     // 设置分数
     setting(data) {
@@ -905,43 +935,85 @@ export default {
           score: this.settingForm.score,
           paperQuestionAnswerId: paperQuestionAnswerId,
           paperQuestionAnswerScore: paperQuestionAnswerScore,
-        }).catch((err) => {})
+        })
 
         const updateScoreOptions = await paperUpdateScoreOptions({
           paperQuestionId: this.settingForm.paperQuestionId,
           scoreOptions: this.settingForm.scoreOptions,
-        }).catch((err) => {})
+        })
 
         if (updateScore?.code === 200 && updateScoreOptions?.code === 200) {
-          this.$tools.message('编辑成功！')
+          this.$message.success('编辑成功！')
           this.settingForm.show = false
           this.query()
         }
       })
     },
     // 选择拖拽原题
-    sourceChoose(e) {
+    sourceChoose() {
       if (this.paperQuestion.length == 0) {
-        this.$tools.message('请添加章节！', 'error')
+        this.$message.error('请添加章节！')
         return
       }
     },
     // 拖拽原题结束
-    async sourceEnd(e) {
-      const chapterId = e.to.dataset.id
-      const questionIds = e.item.id
+    async sourceEnd({ to, item }) {
+      const chapterId = to.dataset.id
+      const questionIds = item.id
       const res = await paperQuestionAdd({
         chapterId,
         questionIds,
-      }).catch((err) => {})
+      })
       if (res?.code !== 200) return false
       this.query()
       this.queryQuestion()
     },
     // 章节移动
-    chapterUpdate(e) {
-      console.log(e)
+    async chapterMove({ newIndex, oldIndex }) {
+      const sourceId = this.paperQuestion[newIndex].chapter.id
+      const targetId = this.paperQuestion[oldIndex].chapter.id
+      const res = await paperMovePosition({
+        sourceId,
+        targetId,
+      })
+
+      if (res?.code === 200) {
+        this.query()
+      }
     },
+    // 试题移动
+    async questionMove({ to, from, newIndex, oldIndex }) {
+      const toChapterId = to.dataset.id
+      const fromChapterId = from.dataset.id
+      let sourceId, targetId
+      if (toChapterId === fromChapterId) {
+        const sourceQuestion = this.filterQuestion(toChapterId)
+        sourceId = sourceQuestion[newIndex].paperQuestionId
+        targetId = sourceQuestion[oldIndex].paperQuestionId
+      } else {
+        const sourceQuestion = this.filterQuestion(toChapterId)
+        sourceId = sourceQuestion[newIndex].paperQuestionId
+        targetId = toChapterId
+        console.log('跨：', sourceId, targetId)
+      }
+
+      const res = await paperMovePosition({
+        sourceId,
+        targetId,
+      })
+
+      if (res?.code === 200) {
+        this.query()
+      }
+    },
+    // 筛选数据
+    filterQuestion(chapterId) {
+      const list = this.paperQuestion.filter(
+        (item) => item.chapter.id == chapterId
+      )
+      return list[0].questionList
+    },
+    // 分页变化
     pageChange(val = 1) {
       this.curPage = val
       this.queryQuestion(val)
@@ -956,6 +1028,13 @@ export default {
     resetData(name) {
       this.$tools.resetData(this, name)
     },
+  },
+  beforeDestroy() {
+    if (this.paperState === '1') return false
+    paperTotalScore({
+      id: this.paperId,
+      totalScore: this.totalScore,
+    })
   },
 }
 </script>
@@ -982,7 +1061,7 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 5000;
+  z-index: 1500;
   .head-left {
     color: #fff;
   }
@@ -1230,28 +1309,14 @@ export default {
   right: 20px;
   bottom: 20px;
   z-index: 100;
-  .time-title {
+  .total-score {
     background-color: rgb(30, 159, 255);
     width: 100%;
     height: 40px;
     line-height: 40px;
     text-align: center;
-    padding-left: 10px;
-    font-size: 14px;
+    font-size: 15px;
     color: #fff;
-  }
-  .time-residue {
-    font-size: 12px;
-    font-weight: bold;
-    line-height: 50px;
-    text-align: center;
-  }
-  .route-title {
-    background: #0094e5;
-    color: #fff;
-    line-height: 14px;
-    line-height: 40px;
-    padding: 0 10px;
   }
 }
 
