@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-11 11:33:30
  * @LastEditors: Che
- * @LastEditTime: 2021-08-16 11:06:18
+ * @LastEditTime: 2021-08-16 14:09:22
  */
 import { login } from '@/api/common'
 import { getInfo, setInfo, removeInfo } from '@/utils/storage'
@@ -70,7 +70,7 @@ const actions = {
     return new Promise((resolve) => {
       commit('SET_TOKEN', '')
       commit('SET_ROLES', [])
-      commit('SET_ROUTES', [])
+      commit('permission/SET_ROUTES', [], { root: true })
       removeInfo()
       resetRouter()
       resolve()

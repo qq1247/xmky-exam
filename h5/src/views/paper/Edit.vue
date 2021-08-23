@@ -162,10 +162,7 @@
                 </div>
               </transition-group>
             </Draggable>
-            <div v-if="paperList.length == 0" class="data-null">
-              <img class="data-img" src="../../assets/img/data-null.png" alt />
-              <span class="data-tip">暂无此类型题目</span>
-            </div>
+            <el-empty v-else description="暂无此类型题目"> </el-empty>
           </div>
           <el-pagination
             background
@@ -439,17 +436,11 @@
                     </div>
                   </div>
                 </template>
-                <div v-if="item.questionList.length == 0" class="data-null">
-                  <i class="common common-drag data-img"></i>
-                  <span class="data-tip">拖拽题目到此处</span>
-                </div>
+                <el-empty v-else description="拖拽题目到此处"> </el-empty>
               </Draggable>
             </div>
           </Draggable>
-          <div v-if="paperQuestion.length == 0" class="data-null">
-            <img class="data-img" src="../../assets/img/data-null.png" alt />
-            <span class="data-tip">暂无试卷信息</span>
-          </div>
+          <el-empty v-else description="暂无试卷"> </el-empty>
         </div>
       </div>
 
@@ -476,10 +467,7 @@
               </div>
             </el-collapse-item>
           </el-collapse>
-          <div v-if="paperQuestion.length == 0" class="data-null">
-            <img class="data-img" src="../../assets/img/data-null.png" alt />
-            <span class="data-tip">暂无题目导航信息</span>
-          </div>
+          <el-empty v-else description="暂无题目导航信息"> </el-empty>
         </el-scrollbar>
       </div>
     </div>
@@ -890,8 +878,8 @@ export default {
     },
     // 设置分数
     setScore() {
-      let paperQuestionAnswerId = [],
-        paperQuestionAnswerScore = []
+      let paperQuestionAnswerId = []
+      let paperQuestionAnswerScore = []
       if (this.settingForm.ai === 1) {
         paperQuestionAnswerId = this.settingForm.answers.reduce((acc, cur) => {
           acc.push(cur.id)
@@ -978,6 +966,7 @@ export default {
   flex-direction: column;
   padding-top: 0;
   padding-bottom: 0;
+  margin-top: 0;
 }
 
 .head {
@@ -1037,7 +1026,7 @@ export default {
   position: fixed;
   top: 70px;
   left: 20px;
-  bottom: 60px;
+  bottom: 20px;
   z-index: 100;
   .left-top {
     width: 100%;
@@ -1239,7 +1228,7 @@ export default {
   position: fixed;
   top: 70px;
   right: 20px;
-  bottom: 60px;
+  bottom: 20px;
   z-index: 100;
   .time-title {
     background-color: rgb(30, 159, 255);
@@ -1302,17 +1291,6 @@ export default {
       border: 1px solid #0094e5;
       color: #0094e5;
     }
-  }
-}
-
-.data-null {
-  padding-top: 30px;
-  .data-img {
-    width: 64px;
-    height: 64px;
-  }
-  .data-tip {
-    margin: 0 auto 20px;
   }
 }
 

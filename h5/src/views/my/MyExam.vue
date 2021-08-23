@@ -165,10 +165,7 @@
             </template>
           </div>
         </template>
-        <div class="data-null" v-if="paperQuestion.length == 0">
-          <img alt class="data-img" src="../../assets/img/data-null.png" />
-          <span class="data-tip">暂无试卷信息</span>
-        </div>
+        <el-empty v-else description="暂无试卷"> </el-empty>
       </div>
 
       <el-collapse
@@ -263,7 +260,7 @@ export default {
     // 校准时间差
     async setTime() {
       const systemTime = await loginSysTime({})
-      let times = new Date(systemTime.data) - new Date()
+      const times = new Date(systemTime.data) - new Date()
       this.time =
         new Date(this.examEndTime).getTime() - (new Date().getTime() + times)
     },

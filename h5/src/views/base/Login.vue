@@ -96,7 +96,6 @@ export default {
   background-size: cover;
   justify-content: center;
   align-items: center;
-  padding-top: 120px;
 }
 .login-wrap {
   position: relative;

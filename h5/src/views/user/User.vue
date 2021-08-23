@@ -396,7 +396,7 @@ export default {
       this.$tools.resetData(this, name)
     },
     toOrg() {
-      let { href } = this.$router.resolve({ path: '/user/org' })
+      const { href } = this.$router.resolve({ path: '/user/org' })
       window.open(href, '_blank')
     },
   },
@@ -406,7 +406,6 @@ export default {
 .container {
   display: flex;
   align-items: center;
-  padding-top: 120px;
   .content {
     width: 1170px;
   }

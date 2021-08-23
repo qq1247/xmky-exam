@@ -1,7 +1,7 @@
 <!--
- * @Description: 
+ * @Description:
  * @Version: 1.0
- * @Company: 
+ * @Company:
  * @Author: Che
  * @Date: 2021-08-09 17:59:09
  * @LastEditors: Che
@@ -24,7 +24,8 @@
         </el-dropdown-menu>
       </el-dropdown>
     </template>
-    <router-link class="header-login" to="/login" v-else
+    <router-link class="header-login" to="/login"
+v-else
       ><i class="common common-login-out"></i>登录</router-link
     >
     <el-dialog
