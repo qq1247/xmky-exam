@@ -4,55 +4,62 @@
     <EditHeader :title="queryForm.name"></EditHeader>
 
     <!-- 搜索 -->
-    <el-form :inline="true" :model="queryForm" class="form-inline search">
-      <div>
-        <el-form-item label>
-          <el-input placeholder="请输入编号" v-model="queryForm.id"></el-input>
-        </el-form-item>
-        <el-form-item label>
-          <el-input
-            placeholder="请输入题干"
-            v-model="queryForm.title"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label>
-          <el-select placeholder="请输入类型" v-model="queryForm.type">
-            <el-option
-              :key="parseInt(dict.dictKey)"
-              :label="dict.dictValue"
-              :value="parseInt(dict.dictKey)"
-              v-for="dict in queryForm.typeDictList"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label>
-          <el-select placeholder="请输入难度" v-model="queryForm.difficulty">
-            <el-option
-              :key="parseInt(dict.dictKey)"
-              :label="dict.dictValue"
-              :value="parseInt(dict.dictKey)"
-              v-for="dict in queryForm.difficultyDictList"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label>
-          <el-input
-            placeholder="分值大于"
-            v-model="queryForm.scoreStart"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label>
-          <el-input
-            placeholder="分值小于"
-            v-model="queryForm.scoreEnd"
-          ></el-input>
-        </el-form-item>
-      </div>
-      <el-form-item>
-        <el-button @click="search" icon="el-icon-search" type="primary"
-          >查询</el-button
-        >
-      </el-form-item>
+    <el-form :inline="true" :model="queryForm" class="form-inline">
+      <el-row type="flex" justify="space-between">
+        <el-col :span="22">
+          <el-form-item label>
+            <el-input
+              placeholder="请输入编号"
+              v-model="queryForm.id"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label>
+            <el-input
+              placeholder="请输入题干"
+              v-model="queryForm.title"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label>
+            <el-select placeholder="请输入类型" v-model="queryForm.type">
+              <el-option
+                :key="parseInt(dict.dictKey)"
+                :label="dict.dictValue"
+                :value="parseInt(dict.dictKey)"
+                v-for="dict in queryForm.typeList"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label>
+            <el-select placeholder="请输入难度" v-model="queryForm.difficulty">
+              <el-option
+                :key="parseInt(dict.dictKey)"
+                :label="dict.dictValue"
+                :value="parseInt(dict.dictKey)"
+                v-for="dict in queryForm.difficultyList"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label>
+            <el-input
+              placeholder="分值大于"
+              v-model="queryForm.scoreStart"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label>
+            <el-input
+              placeholder="分值小于"
+              v-model="queryForm.scoreEnd"
+            ></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="2">
+          <el-form-item>
+            <el-button @click="search" icon="el-icon-search" type="primary"
+              >查询</el-button
+            >
+          </el-form-item>
+        </el-col>
+      </el-row>
     </el-form>
 
     <!-- 内容 -->
@@ -202,7 +209,7 @@
                     :key="parseInt(dict.dictKey)"
                     :label="dict.dictValue"
                     :value="parseInt(dict.dictKey)"
-                    v-for="dict in queryForm.typeDictList"
+                    v-for="dict in queryForm.typeList"
                   ></el-option>
                 </el-select>
               </el-form-item>
@@ -217,7 +224,7 @@
                     :key="parseInt(dict.dictKey)"
                     :label="dict.dictValue"
                     :value="parseInt(dict.dictKey)"
-                    v-for="dict in queryForm.difficultyDictList"
+                    v-for="dict in queryForm.difficultyList"
                   ></el-option>
                 </el-select>
               </el-form-item>
@@ -550,14 +557,6 @@
               v-if="editForm.id"
               >修改</el-button
             >
-            <!-- <el-button
-              @click="edit(true)"
-              plain
-              style="width: 164px; height: 40px; border-color: #fff"
-              type="primary"
-              v-if="editForm.id != null"
-              >生成新版本</el-button
-            > -->
           </el-form-item>
         </el-form>
       </el-scrollbar>
@@ -567,32 +566,26 @@
     <el-dialog
       :visible.sync="fileForm.show"
       :show-close="false"
-      width="30%"
-      title="上传试题模板"
+      width="40%"
+      title="上传并解析试题"
       :close-on-click-modal="false"
+      @close="templateClear('templateUpload')"
     >
       <el-form :model="fileForm" ref="fileForm">
-        <!-- <el-upload
-          :headers="fileForm.headers"
-          :on-success="fileUploadSuccess"
-          :on-remove="fileUploadRemove"
-          :before-remove="fileUploadBeforeRemove"
-          action="/api/file/upload"
-          class="file-uploader"
-          name="files"
-          :file-list="fileForm.fileList"
-          accept=".docx, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        >
-          <el-button size="small" type="primary">上传试题模板</el-button>
-        </el-upload> -->
-        <input
-          type="file"
-          id="docId"
-          accept=".docx, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        <Upload
+          type="word"
+          ref="templateUpload"
+          @success="templateSucess"
+          @remove="templateRemove"
         />
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="questionImport" type="primary">上传</el-button>
+        <el-button
+          @click="questionImport"
+          :loading="fileForm.isAnalysis"
+          type="primary"
+          >解析试题</el-button
+        >
         <el-button @click="fileForm.show = false">取消</el-button>
       </div>
     </el-dialog>
@@ -600,6 +593,7 @@
 </template>
 <script>
 import { dictListPage } from '@/api/base'
+import Upload from '@/components/upload'
 import {
   questionListPage,
   questionAdd,
@@ -617,6 +611,7 @@ export default {
   components: {
     Editor,
     EditHeader,
+    Upload,
   },
   data() {
     const validateAiScore = (rule, value, callback) => {
@@ -668,8 +663,8 @@ export default {
         scoreEnd: '', // 得分小于
         questionTypeName: '', // 试题分类name
         questionTypeId: 1, // 试题分类id
-        difficultyDictList: [], // 难度列表
-        typeDictList: [], // 类型列表
+        difficultyList: [], // 难度列表
+        typeList: [], // 类型列表
       },
       editForm: {
         // 修改表单
@@ -716,7 +711,6 @@ export default {
         ],
         analysis: '', // 解析
         score: 1, // 分值
-        isCrateNew: false,
         scoreOptions: [],
         rules: {
           type: [{ required: true, message: '请选择类型', trigger: 'change' }],
@@ -796,10 +790,8 @@ export default {
       ],
       fileForm: {
         show: false,
-        headers: {
-          Authorization: this.$store.getters.token,
-        },
-        fileList: [],
+        questionDocIds: [],
+        isAnalysis: false,
       },
     }
   },
@@ -821,12 +813,14 @@ export default {
       const typeDictData = await dictListPage({
         dictIndex: 'QUESTION_TYPE',
       })
-      this.queryForm.typeDictList = typeDictData.data.list // 初始化类型下拉框
+
+      this.queryForm.typeList = typeDictData.data.list // 初始化类型下拉框
 
       const difficultyDictData = await dictListPage({
         dictIndex: 'QUESTION_DIFFICULTY',
       })
-      this.queryForm.difficultyDictList = difficultyDictData.data.list // 初始化难度下拉框
+
+      this.queryForm.difficultyList = difficultyDictData.data.list // 初始化难度下拉框
 
       this.typeButtonGroup[0].checked = true // 默认选中类型按钮
       this.editForm.type = 1 // 默认选中类型
@@ -871,7 +865,7 @@ export default {
       }
 
       const index = this.editForm.options.length
-      this._addOption(index, '')
+      this._addOption(index)
     },
     // 添加选项
     _addOption(index, value) {
@@ -891,7 +885,7 @@ export default {
     // 添加填空
     addFillBlanks() {
       const index = this.editForm.answers.length
-      this._addFillBlanks(index, '')
+      this._addFillBlanks(index)
     },
     // 添加填空
     _addFillBlanks(index, value) {
@@ -938,7 +932,7 @@ export default {
     // 组合添加或修改请求参数
     compistionParam(status) {
       if (this.queryForm.edit == 'false') {
-        this.$tools.message('暂无此项权限！', 'warning')
+        this.$message.warning('暂无此项权限！')
         return false
       }
 
@@ -1008,7 +1002,7 @@ export default {
         }, [])
         const sum = params.scores.reduce((acc, cur) => acc + Number(cur), 0)
         if (sum != params.score && params.ai == 1) {
-          this.$tools.message('答案分值相加应等于总分值！', 'warning')
+          this.$message.warning('答案分值相加应等于总分值！')
           return false
         }
       }
@@ -1025,7 +1019,7 @@ export default {
           return false
         }
 
-        const res = await questionAdd(params).catch((err) => {})
+        const res = await questionAdd(params)
         this.resetQuery(res, '添加')
       })
     },
@@ -1044,17 +1038,19 @@ export default {
           type: 'warning',
         })
           .then(async () => {
-            const res = await questionEdit(params).catch((err) => {})
+            const res = await questionEdit(params)
             this.resetQuery(res, '修改')
           })
-          .catch(() => {})
+          .catch((err) => {
+            console.log(err)
+          })
       })
     },
     // 获取试题
     async get(id) {
       const res = await questionGet({ id })
       if (res?.code != 200) {
-        this.$tools.message('查询失败！', 'error')
+        this.$message.error('查询失败！')
         return
       }
 
@@ -1109,7 +1105,7 @@ export default {
     // 复制试题
     async copy(id) {
       if (this.queryForm.edit == 'false') {
-        this.$tools.message('暂无此项权限！', 'warning')
+        this.$message.warning('暂无此项权限！')
         return
       }
       const res = await questionCopy({ id })
@@ -1118,7 +1114,7 @@ export default {
     // 删除试题
     del(id) {
       if (this.queryForm.edit == 'false') {
-        this.$tools.message('暂无此项权限！', 'warning')
+        this.$message.warning('暂无此项权限！')
         return
       }
       this.$confirm('确定要删除？', '提示', {
@@ -1133,17 +1129,17 @@ export default {
     // 发布试题
     async publish(id, state) {
       if (this.queryForm.edit == 'false') {
-        this.$tools.message('暂无此项权限！', 'warning')
+        this.$message.warning('暂无此项权限！')
         return false
       }
 
       if (state == 1) {
-        this.$tools.message('试题已经发布！', 'warning')
+        this.$message.warning('试题已经发布！')
         return
       }
       const res = await questionPublish({
         id,
-      }).catch((err) => {})
+      })
       this.resetQuery(res, '发布试题')
     },
     // 获取试题模板
@@ -1157,26 +1153,25 @@ export default {
       a.click()
       window.URL.revokeObjectURL(url)
     },
-    // 上传试题
+    // 解析试题
     async questionImport() {
-      if (!document.querySelector('#docId').files[0]) {
-        this.$tools.message('请选择上传文件', 'warning')
+      if (this.fileForm.questionDocIds.length === 0) {
+        this.$message.warning('请选择需解析的文件')
         return
       }
-      const formData = new FormData()
-      formData.append('file', document.querySelector('#docId').files[0])
-      formData.append('questionTypeId', this.queryForm.questionTypeId)
-      const res = await questionImport(
-        formData,
-        undefined,
-        'multipart/form-data'
-      )
+      this.fileForm.isAnalysis = true
+      const res = await questionImport({
+        fileId: this.fileForm.questionDocIds[0].response.data.fileIds,
+        questionTypeId: this.queryForm.questionTypeId,
+      })
       if (res?.code == 200) {
-        this.$tools.message('上传成功！')
+        this.$message.success('解析成功！')
+        this.templateClear()
+        this.fileForm.isAnalysis = false
         this.fileForm.show = false
         this.query()
       } else {
-        this.$tools.message('上传失败！', error)
+        this.$message.error('解析失败！')
       }
     },
     // 还原数据并查询
@@ -1185,20 +1180,24 @@ export default {
         this.editForm.id = null
         this.list.curPage = 1
         this.query()
-        this.$tools.message(`${msg}成功！`)
+        this.$message.success(`${msg}成功！`)
         this.$tools.resetData(this, 'editForm')
       } else {
-        this.$tools.message(res.msg || `${msg}失败！`, 'error')
+        this.$message.error(res.msg || `${msg}失败！`)
       }
     },
-    fileUploadRemove(file, fileList) {
-      console.log(file, fileList)
+    // 上传试题模板成功
+    templateSucess(res, file, fileList) {
+      this.fileForm.questionDocIds = fileList
     },
-    fileUploadBeforeRemove(file, fileList) {
-      return this.$confirm(`确定移除 ${file.name}？`)
+    // 上传试题模板失败
+    templateClear(ref) {
+      this.$refs[ref].clear()
     },
-    fileUploadSuccess(file, fileList) {
-      console.log(file, fileList)
+    // 删除试题模板
+    templateRemove(file, fileList) {
+      this.fileForm.questionDocIds = []
+      console.log('upload_remove', file, fileList)
     },
   },
 }
@@ -1210,22 +1209,29 @@ export default {
   display: flex;
   flex-direction: column;
   padding-bottom: 10px;
-  padding-top: 60px;
+  padding-top: 110px;
   margin: 0 auto;
 }
 
-.search {
-  height: 50px;
-  padding: 0 20px 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.form-inline {
+  height: 60px;
+  padding: 10px 20px;
+  position: fixed;
+  top: 50px;
+  left: 0;
+  right: 0;
+  background: #f7f8f9;
+  z-index: 1500;
+  .el-form-item {
+    width: 140px;
+    margin-bottom: 0;
+  }
 }
 
 .content {
   display: flex;
   width: 100%;
-  height: calc(100vh - 130px);
+  height: calc(100vh - 110px);
   padding: 0 20px;
   margin: 0 auto;
 }
@@ -1385,11 +1391,6 @@ export default {
 .btn2 {
   padding: 0 10px;
   height: 25px;
-}
-
-.form-inline .el-form-item {
-  width: 140px;
-  margin-bottom: 0;
 }
 
 .pagination {

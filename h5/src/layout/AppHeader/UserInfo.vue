@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-09 17:59:09
  * @LastEditors: Che
- * @LastEditTime: 2021-08-13 10:38:00
+ * @LastEditTime: 2021-08-19 16:23:40
 -->
 <template>
   <div class="header-userInfo">
@@ -24,8 +24,7 @@
         </el-dropdown-menu>
       </el-dropdown>
     </template>
-    <router-link class="header-login" to="/login"
-v-else
+    <router-link class="header-login" to="/login" v-else
       ><i class="common common-login-out"></i>登录</router-link
     >
     <el-dialog
@@ -79,7 +78,7 @@ export default {
 
       if (command === 'out') {
         this.$store.dispatch('user/resetToken').then(() => {
-          this.$tools.message('登出成功！', 'info')
+          this.$message('登出成功！')
           this.$router.push('/')
         })
       }
@@ -91,7 +90,7 @@ export default {
       })
 
       if (res.code != 200) {
-        this.$tools.message(res.msg, 'warning')
+        this.$message.warning(res.msg)
         return
       }
 

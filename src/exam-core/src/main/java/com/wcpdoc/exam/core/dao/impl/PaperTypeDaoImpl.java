@@ -32,7 +32,12 @@ public class PaperTypeDaoImpl extends RBaseDaoImpl<PaperType> implements PaperTy
 	
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT PAPER_TYPE.* "
+		String sql = "SELECT PAPER_TYPE.*, "
+				+ "IFNULL((select GROUP_CONCAT(user.NAME SEPARATOR ',') from sys_user user where user.state!=0 and EXISTS ( SELECT 1 FROM EXM_PAPER_TYPE pt "
+				+ "WHERE PAPER_TYPE.ID = pt.ID and	pt.WRITE_USER_IDS like CONCAT('%,',user.ID,',%'))),'') as 'WRITE_USER_NAMES',"
+				+ "IFNULL((select GROUP_CONCAT(user.NAME SEPARATOR ',') from sys_user user where user.state!=0 and EXISTS ( SELECT 1 FROM EXM_PAPER_TYPE pt "
+				+ "WHERE PAPER_TYPE.ID = pt.ID and	pt.READ_USER_IDS like CONCAT('%,',user.ID,',%'))),'') as 'READ_USER_NAMES', "
+				+ "IFNULL((select user.NAME from sys_user user where user.state!=0 and user.ID = PAPER_TYPE.CREATE_USER_ID),'') as 'CREATE_USER_NAME'"
 				+ "FROM EXM_PAPER_TYPE PAPER_TYPE ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "PAPER_TYPE.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))

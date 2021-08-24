@@ -1,9 +1,5 @@
 package com.wcpdoc.exam.api.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import javax.annotation.Resource;
 
 import org.apache.shiro.authz.annotation.Logical;
@@ -14,7 +10,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.base.service.OrgService;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.controller.BaseController;
@@ -62,36 +57,6 @@ public class ApiExamTypeController extends BaseController {
 			PageIn pageIn = new PageIn(request);
 			pageIn.addAttr("curUserId", getCurUser().getId());
 			PageOut listpage = examTypeService.getListpage(pageIn);
-			for(Map<String, Object> mapList : listpage.getList()){
-				if(mapList.get("readUserIds")!= null){
-					String[] readUserSplit = mapList.get("readUserIds").toString().subSequence(1, mapList.get("readUserIds").toString().length()).toString().split(",");
-					mapList.put("readUserIds", readUserSplit);
-					List<String> list = new ArrayList<String>();
-					for(String id : readUserSplit){
-						User user = userService.getEntity(Integer.parseInt(id));
-						list.add(user.getName());
-					}
-					mapList.put("readUserNames", list);
-				}
-				
-				if (mapList.get("writeUserIds")!= null) {
-					String[] writeUserSplit = mapList.get("writeUserIds").toString().subSequence(1, mapList.get("writeUserIds").toString().length()).toString().split(",");
-					mapList.put("writeUserIds", writeUserSplit);
-					List<String> list = new ArrayList<String>();
-					for(String id :writeUserSplit){
-						User user = userService.getEntity(Integer.parseInt(id));
-						list.add(user.getName());
-					}
-					mapList.put("writeUserNames", list);
-				}
-				
-				if ("0".equals(mapList.get("createUserId").toString())) {
-					continue;
-				}
-				
-				User user = userService.getEntity(Integer.parseInt(mapList.get("createUserId").toString()));
-				mapList.put("createUserName", user.getName());				
-			}
 			return PageResultEx.ok().data(listpage);
 		} catch (Exception e) {
 			log.error("试题分类列表错误：", e);
