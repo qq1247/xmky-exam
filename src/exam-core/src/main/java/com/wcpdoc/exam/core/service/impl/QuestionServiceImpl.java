@@ -505,8 +505,14 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 
 	@Override
 	public void wordImp(Integer fileId, Integer questionTypeId, String processBarId) {
-		FileEx fileEx = fileService.getFileEx(fileId);
 		// 校验数据有效性
+		if (fileId == null) {
+			throw new MyException("参数错误：fileId");
+		}
+		if (questionTypeId == null) {
+			throw new MyException("参数错误：questionTypeId");
+		}
+		FileEx fileEx = fileService.getFileEx(fileId);
 		//String extName = FilenameUtils.getExtension(file.getOriginalFilename());
 		if (!"docx".equals(fileEx.getEntity().getExtName())) {
 			throw new MyException("允许的上传类型为：docx");
