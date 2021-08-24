@@ -67,4 +67,21 @@ public interface MyExamService extends BaseService<MyExam>{
 	 * @return Map<String,Object>
 	 */
 	Map<String, Object> count(Integer examId);
+	
+	/**
+	 * 更新答案
+	 * 
+	 * v1.0 chenyun 2021年8月24日上午9:55:53
+	 * @param myExamDetailId
+	 * @param answers void
+	 */
+	void updateAnswer(Integer myExamDetailId, String[] answers);
+	
+	/**
+	 * 完成交卷
+	 * 
+	 * v1.0 chenyun 2021年8月24日上午10:05:25
+	 * @param myExamId void
+	 */
+	void doAnswer(Integer myExamId);
 }

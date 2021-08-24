@@ -1,6 +1,5 @@
 package com.wcpdoc.exam.api.controller;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -19,22 +18,14 @@ import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.base.service.ParmService;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.controller.BaseController;
-import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
-import com.wcpdoc.exam.core.entity.MyExamDetail;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
-import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.exception.MyException;
-import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
 import com.wcpdoc.exam.core.service.MyExamService;
-import com.wcpdoc.exam.core.service.PaperService;
-import com.wcpdoc.exam.core.service.QuestionAnswerService;
-import com.wcpdoc.exam.core.service.QuestionService;
-import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.notify.exception.NotifyException;
 import com.wcpdoc.exam.notify.service.NotifyService;
@@ -52,12 +43,6 @@ public class ApiMyExamController extends BaseController{
 	@Resource
 	private MyExamService myExamService;
 	@Resource
-	private ExamService examService;
-	@Resource
-	private PaperService paperService;
-	@Resource
-	private QuestionService questionService;
-	@Resource
 	private MyExamDetailService myExamDetailService;
 	@Resource
 	private UserService userService;
@@ -65,8 +50,6 @@ public class ApiMyExamController extends BaseController{
 	private NotifyService notifyService;
 	@Resource
 	private ParmService parmService;
-	@Resource
-	private QuestionAnswerService questionAnswerService;
 	
 	/**
 	 * 我的考试列表
@@ -229,49 +212,7 @@ public class ApiMyExamController extends BaseController{
 	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult updateAnswer(Integer myExamDetailId, String[] answers) {
 		try {
-			// 校验数据有效性
-			if (myExamDetailId == null) {
-				throw new MyException("参数错误：myExamDetailId");
-			}
-
-			// if(!ValidateUtil.isValid(answer)) {
-			// 	throw new MyException("参数错误：answer");
-			// }//如取消勾选则为空
-
-			MyExamDetail myExamDetail = myExamDetailService.getEntity(myExamDetailId);
-			if (myExamDetail.getUserId() != getCurUser().getId()) {
-				throw new MyException("未参与考试！");
-			}
-
-			Exam exam = examService.getEntity(myExamDetail.getExamId());
-			if (exam.getState() == 0) {
-				throw new MyException("考试已删除！");
-			}
-			if (exam.getState() == 2) {
-				throw new MyException("考试未发布！");
-			}
-			if (exam.getStartTime().getTime() > (new Date().getTime())) {
-				throw new MyException("考试未开始！");
-			}
-			if (exam.getEndTime().getTime() < (new Date().getTime() - 30000)) {// 预留30秒网络延时
-				throw new MyException("考试已结束！");
-			}
-
-			// 更新我的考试详细信息
-			Question question = questionService.getEntity(myExamDetail.getQuestionId());
-			if (!ValidateUtil.isValid(answers)) {
-				myExamDetail.setAnswer(null);
-			} else if (question.getType() == 1 || question.getType() == 4 || question.getType() == 5) {
-				myExamDetail.setAnswer(answers[0]);
-			} else if (question.getType() == 2) {
-				myExamDetail.setAnswer(StringUtil.join(answers));
-			} else if (question.getType() == 3) {
-				myExamDetail.setAnswer(StringUtil.join(answers, "\n"));
-			} else if (question.getType() == 5 && question.getAi() == 1) {
-				myExamDetail.setAnswer(StringUtil.join(answers, "\n"));
-			}
-			myExamDetail.setAnswerTime(new Date());
-			myExamDetailService.update(myExamDetail);
+			myExamService.updateAnswer(myExamDetailId, answers);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("更新答案错误：", e.getMessage());
@@ -294,33 +235,7 @@ public class ApiMyExamController extends BaseController{
 	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult doAnswer(Integer myExamId) {
 		try {
-			// 校验数据有效性
-			MyExam myExam = myExamService.getEntity(myExamId);
-			if (myExam == null) {
-				throw new MyException("参数错误：myExamId");
-			}
-			if (myExam.getUserId().intValue() != getCurUser().getId()) {
-				throw new MyException("未参与该考试！");
-			}
-
-			Exam exam = examService.getEntity(myExam.getExamId());
-			if (exam.getState() == 0) {
-				throw new MyException("考试已删除！");
-			}
-			if (exam.getState() == 2) {
-				throw new MyException("考试未发布！");
-			}
-			if (exam.getStartTime().getTime() > (new Date().getTime())) {
-				throw new MyException("考试未开始！");
-			}
-			if (exam.getEndTime().getTime() < (new Date().getTime() - 30000)){//预留30秒网络延时
-				throw new MyException("考试已结束！");
-			}
-
-			// 标记为已交卷
-			myExam.setState(3);
-			myExam.setAnswerEndTime(new Date());
-			myExamService.update(myExam);
+			myExamService.doAnswer(myExamId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成交卷错误：{}", e.getMessage());
