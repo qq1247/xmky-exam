@@ -1,5 +1,6 @@
 package com.wcpdoc.exam.core.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.wcpdoc.exam.core.entity.MyMark;
@@ -18,4 +19,23 @@ public interface MyMarkService extends BaseService<MyMark>{
 	 * @return List<MyExam>
 	 */
 	List<MyMark> getList(Integer examId);
+	
+	/**
+	 * 更新阅卷分数
+	 * 
+	 * v1.0 chenyun 2021年8月24日上午9:41:53
+	 * @param myExamDetailId
+	 * @param score void
+	 */
+	void updateScore(Integer myExamDetailId, BigDecimal score);
+	
+	/**
+	 * 完成阅卷
+	 * 
+	 * v1.0 chenyun 2021年8月24日上午9:46:01
+	 * @param examId
+	 * @param userId
+	 * @param markId void
+	 */
+	void doScore(Integer examId, Integer userId, Integer markId);
 }
