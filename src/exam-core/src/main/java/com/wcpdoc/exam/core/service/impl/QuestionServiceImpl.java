@@ -20,7 +20,6 @@ import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.exam.base.cache.ProgressBarCache;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.QuestionDao;
@@ -513,7 +512,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			throw new MyException("参数错误：questionTypeId");
 		}
 		FileEx fileEx = fileService.getFileEx(fileId);
-		//String extName = FilenameUtils.getExtension(file.getOriginalFilename());
 		if (!"docx".equals(fileEx.getEntity().getExtName())) {
 			throw new MyException("允许的上传类型为：docx");
 		}
@@ -529,10 +527,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			throw new MyException(e.getMessage());
 		}
 
-		//添加进度条
-		double questionCount = questionExList.size();
-		ProgressBarCache.setProgressBar(processBarId, 0.0, questionCount, null, null); 
-		
 		// 添加试题
 		for (int  j = 0; j < questionExList.size(); j++) { //QuestionEx questionEx : questionExList
 			Question question = questionExList.get(j).getQuestion();
@@ -584,9 +578,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			}
 			
 			addAndUpdate(question, scoreOptions, answers, options, scores);
-			
-			ProgressBarCache.setProgressBar(processBarId, j + 1.0, questionCount, null, null); //进度
-			ProgressBarCache.getProgressBar(processBarId).getPercent();
 		}
 	}
 
