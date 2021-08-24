@@ -240,8 +240,8 @@ code == 401 无权限或登录超时
 ######请求参数
 | 参数            | 类型    | 描述       | 必填 |
 | --------------- | ------- | ---------- | ---- |
-| file            | file    | 附件       | 是   |
-| question TypeId | Integer | 试题分类ID | 是   |
+| fileId            | fileId    | 附件       | 是   |
+| questionTypeId | Integer | 试题分类ID | 是   |
 
 ####试题模板导出：question/wordTemplateExport
 ######请求参数
