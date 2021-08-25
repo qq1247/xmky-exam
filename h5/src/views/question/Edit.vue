@@ -4,7 +4,12 @@
     <EditHeader :title="queryForm.name"></EditHeader>
 
     <!-- 搜索 -->
-    <el-form :inline="true" :model="queryForm" class="form-inline">
+    <el-form
+      :inline="true"
+      :model="queryForm"
+      class="form-inline"
+      id="question_driver_query"
+    >
       <el-row type="flex" justify="space-between">
         <el-col :span="22">
           <el-form-item label>
@@ -65,32 +70,40 @@
     <!-- 内容 -->
     <div class="content">
       <el-scrollbar wrap-style="overflow-x:hidden;" class="content-left">
-        <div class="left-top">添加题型</div>
-        <div
-          :class="[
-            editForm.type === btn.type
-              ? 'left-center left-center-active'
-              : 'left-center',
-          ]"
-          :key="btn.type"
-          @click="updateType(btn.type)"
-          v-for="btn in typeButtonGroup"
-        >
-          <img :src="btn.img" />
-          {{ btn.name }}
-          <img src="@/assets/img/icon/active-icon.png" />
+        <div id="question_driver_types">
+          <div class="left-top">添加题型</div>
+          <div
+            :class="[
+              editForm.type === btn.type
+                ? 'left-center left-center-active'
+                : 'left-center',
+            ]"
+            :key="btn.type"
+            @click="updateType(btn.type)"
+            v-for="btn in typeButtonGroup"
+          >
+            <img :src="btn.img" />
+            {{ btn.name }}
+            <img src="@/assets/img/icon/active-icon.png" />
+          </div>
         </div>
         <div class="splitLine"></div>
-        <div class="left-bottom" @click="questionTemplate">
-          <img src="../../assets/img/icon/template-icon.png" />
-          试题模板
-        </div>
-        <div class="left-bottom" @click="fileForm.show = true">
-          <img src="../../assets/img/icon/import-icon.png" />
-          试题导入
+        <div id="question_driver_template">
+          <div class="left-bottom" @click="questionTemplate">
+            <img src="../../assets/img/icon/template-icon.png" />
+            试题模板
+          </div>
+          <div class="left-bottom" @click="fileForm.show = true">
+            <img src="../../assets/img/icon/import-icon.png" />
+            试题导入
+          </div>
         </div>
       </el-scrollbar>
-      <el-scrollbar wrap-style="overflow-x:hidden;" class="content-center">
+      <el-scrollbar
+        wrap-style="overflow-x:hidden;"
+        class="content-center"
+        id="question_driver_content"
+      >
         <template v-if="list.questionList.length > 0">
           <el-card
             :key="question.id"
@@ -196,6 +209,7 @@
           label-width="80px"
           size="mini"
           v-model="labelPosition"
+          id="question_driver_editor"
         >
           <el-row>
             <el-col :span="11">
@@ -594,6 +608,10 @@
 <script>
 import { dictListPage } from '@/api/base'
 import Upload from '@/components/upload'
+import Driver from 'driver.js'
+import 'driver.js/dist/driver.min.css'
+import { driverSetting, questionDriverStep } from '@/utils/driverGuide.js'
+import { getDriver } from '@/utils/storage.js'
 import {
   questionListPage,
   questionAdd,
@@ -802,9 +820,20 @@ export default {
     this.queryForm.edit = edit
     this.init()
   },
+  mounted() {
+    if (!getDriver()) {
+      this.driverStep()
+    }
+  },
   methods: {
     goBack() {
       this.$router.back()
+    },
+    // 引导方法
+    driverStep() {
+      const driver = new Driver(driverSetting)
+      driver.defineSteps(questionDriverStep)
+      driver.start()
     },
     // 初始化默认值
     async init() {
@@ -1160,15 +1189,20 @@ export default {
         return
       }
       this.fileForm.isAnalysis = true
-      const res = await questionImport({
-        fileId: this.fileForm.questionDocIds[0].response.data.fileIds,
-        questionTypeId: this.queryForm.questionTypeId,
+      const res = await questionImport(
+        {
+          fileId: this.fileForm.questionDocIds[0].response.data.fileIds,
+          questionTypeId: this.queryForm.questionTypeId,
+        },
+        30000
+      ).catch(() => {
+        this.fileForm.isAnalysis = false
       })
       if (res?.code == 200) {
         this.$message.success('解析成功！')
-        this.templateClear()
         this.fileForm.isAnalysis = false
         this.fileForm.show = false
+        this.templateClear('templateUpload')
         this.query()
       } else {
         this.$message.error('解析失败！')

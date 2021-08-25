@@ -17,6 +17,7 @@
         >
       </el-form-item>
     </el-form>
+
     <!-- 内容 -->
     <div class="content">
       <div class="exam-list">
@@ -58,6 +59,7 @@
         @current-change="pageChange"
       ></el-pagination>
     </div>
+
     <!-- 添加 | 编辑 试题分类 -->
     <el-dialog
       :visible.sync="examForm.show"
@@ -101,44 +103,30 @@
         <el-form-item label="使用权限">
           <CustomSelect
             placeholder="请选择授权人员"
-            :multiple="true"
             :value="roleForm.readRoleUser"
             :total="roleForm.total"
-            :showPage="true"
-            :currentPage="roleForm.curPage"
-            :pageSize="roleForm.pageSize"
-            :remote="true"
-            :reserveKeyword="true"
-            :filterable="true"
-            :remoteMethod="searchUser"
+            @input="searchUser"
             @change="selectReadUser"
-            @focus="getUserList()"
             @currentChange="getMoreUser"
+            @visibleChange="getUserList"
           >
             <el-option
               v-for="item in roleForm.roleUserList"
               :key="item.id"
               :label="item.name"
-              :value="String(item.id)"
+              :value="`${String(item.id)}-${item.name}`"
             ></el-option>
           </CustomSelect>
         </el-form-item>
         <el-form-item label="编辑权限">
           <CustomSelect
             placeholder="请选择授权人员"
-            :multiple="true"
             :value="roleForm.writeRoleUser"
             :total="roleForm.total"
-            :showPage="true"
-            :currentPage="roleForm.curPage"
-            :pageSize="roleForm.pageSize"
-            :remote="true"
-            :reserveKeyword="true"
-            :filterable="true"
-            :remoteMethod="searchUser"
+            @input="searchUser"
             @change="selectWriteUser"
-            @focus="getUserList()"
             @currentChange="getMoreUser"
+            @visibleChange="getUserList"
           >
             <el-option
               v-for="item in roleForm.roleUserList"
@@ -166,15 +154,14 @@
       <el-form :model="examForm" label-width="100px">
         <el-form-item label="选择试题分类" prop="questionType">
           <CustomSelect
+            :multiple="false"
             placeholder="请选择试题分类"
             :value="examForm.questionType"
             :total="examForm.total"
-            :showPage="true"
-            :currentPage="examForm.curPage"
-            :pageSize="examForm.pageSize"
             @change="selectQuestionType"
-            @focus="getQuestionType()"
+            @input="searchQuestionType"
             @currentChange="getMoreQuestionType"
+            @visibleChange="getQuestionType"
           >
             <el-option
               v-for="item in examForm.questionTypes"
@@ -224,7 +211,6 @@ export default {
         id: 0,
         examName: '',
         moveShow: false,
-        pageSize: 5,
         total: 1,
         curPage: 1,
         questionType: '',
@@ -240,8 +226,6 @@ export default {
       },
       roleForm: {
         show: false,
-        curPage: 1,
-        pageSize: 5,
         total: 0,
         readRoleUser: [],
         writeRoleUser: [],
@@ -338,30 +322,33 @@ export default {
         })
     },
     // 获取试题分类
-    async getQuestionType() {
+    async getQuestionType(curPage = 1, name = '') {
       const typeList = await questionTypeListPage({
-        name: '',
-        curPage: this.examForm.curPage,
-        pageSize: this.examForm.pageSize,
+        name,
+        curPage,
+        pageSize: this.pageSize,
       })
       this.examForm.questionTypes = typeList.data.list
       this.examForm.total = typeList.data.total
     },
+    // 根据name 查询试题分类
+    searchQuestionType(name) {
+      this.getQuestionType(1, name)
+    },
     // 获取更多试题分类
-    getMoreQuestionType(curPage) {
-      this.examForm.curPage = curPage
-      this.getQuestionType()
+    getMoreQuestionType(curPage, name) {
+      this.getQuestionType(curPage, name)
     },
     // 选择试题分类
     selectQuestionType(e) {
       this.examForm.questionType = e
     },
     // 获取用户
-    async getUserList(name = '') {
+    async getUserList(curPage = 1, name = '') {
       const roleUserList = await userListPage({
         name,
-        curPage: this.roleForm.curPage,
-        pageSize: this.roleForm.pageSize,
+        curPage,
+        pageSize: this.pageSize,
       })
 
       if (this.$store.getters.userId == 1) {
@@ -378,14 +365,12 @@ export default {
           : roleUserList.data.total
     },
     // 获取更多用户
-    getMoreUser(curPage) {
-      this.roleForm.curPage = curPage
-      this.getUserList()
+    getMoreUser(curPage, name) {
+      this.getUserList(curPage, name)
     },
     // 根据name 查询人员
     searchUser(name) {
-      this.roleForm.curPage = 1
-      this.getUserList(name)
+      this.getUserList(1, name)
     },
     // 选择读取权限用户
     selectReadUser(e) {
