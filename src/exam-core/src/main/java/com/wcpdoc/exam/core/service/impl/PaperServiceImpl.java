@@ -496,7 +496,16 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 
 	@Override
 	public void move(Integer id, Integer sourceId, Integer targetId) {
+		if (sourceId == null) {
+			throw new MyException("参数错误：sourceId");
+		}
+		if(targetId == null){
+			throw new MyException("参数错误：targetId");
+		}
 		PaperType paperType = paperTypeService.getEntity(sourceId);
+		if (paperType.getState() == 0 ){
+			throw new MyException("此分类已被删除！");
+		}
 		if (paperType.getCreateUserId() != getCurUser().getId()) {
 			throw new MyException("权限不足！");
 		}

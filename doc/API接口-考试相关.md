@@ -89,9 +89,8 @@ code == 401 无权限或登录超时
 ######请求参数
 | 参数     | 类型    | 描述   | 必填 |
 | -------- | ------- | ------ | ---- |
-| id       | Integer | 主键   | 是   |
-| sourceId | String  | 源ID   | 否   |
-| targetId | String  | 目标ID | 否   |
+| sourceId | String  | 源ID   | 是   |
+| targetId | String  | 目标ID | 是   |
 
 ####试题分类权限用户：questionType/authUserListpage
 ######请求参数
