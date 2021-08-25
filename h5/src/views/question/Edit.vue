@@ -1189,15 +1189,20 @@ export default {
         return
       }
       this.fileForm.isAnalysis = true
-      const res = await questionImport({
-        fileId: this.fileForm.questionDocIds[0].response.data.fileIds,
-        questionTypeId: this.queryForm.questionTypeId,
+      const res = await questionImport(
+        {
+          fileId: this.fileForm.questionDocIds[0].response.data.fileIds,
+          questionTypeId: this.queryForm.questionTypeId,
+        },
+        30000
+      ).catch(() => {
+        this.fileForm.isAnalysis = false
       })
       if (res?.code == 200) {
         this.$message.success('解析成功！')
         this.fileForm.isAnalysis = false
         this.fileForm.show = false
-        this.templateClear()
+        this.templateClear('templateUpload')
         this.query()
       } else {
         this.$message.error('解析失败！')
