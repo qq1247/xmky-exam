@@ -610,10 +610,10 @@ public class ApiPaperController extends BaseController {
 	 * @param totalScore
 	 * @return PageResult
 	 */
-	@RequestMapping("/totalScore")
+	@RequestMapping("/updateTotalScore")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult totalScore(Integer id, BigDecimal totalScore) {
+	public PageResult updateTotalScore(Integer id, BigDecimal totalScore) {
 		try {
 			Paper paper = paperService.getEntity(id);
 			if(paper.getState() == 0) {
