@@ -590,6 +590,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			throw new MyException("参数错误：targetId");
 		}
 		QuestionType questionType = questionTypeService.getEntity(sourceId);
+		if (questionType.getState() == 0 ){
+			throw new MyException("此分类已被删除！");
+		}
 		if (questionType.getCreateUserId() != getCurUser().getId()) {
 			throw new MyException("权限不足！");
 		}
