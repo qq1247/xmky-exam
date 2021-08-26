@@ -123,7 +123,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if(exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()) {
 			throw new MyException("阅卷结束时间必须大于阅卷开始时间！");
 		}
-		if(!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId())) {
+		if(!hasWriteAuth(entity.getExamTypeId(), getCurUser().getId())) {
 		   throw new MyException("权限不足！");
 		}
 		
