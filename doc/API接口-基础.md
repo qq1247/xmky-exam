@@ -166,9 +166,8 @@ code == 401 无权限或登录超时
 | --------   | -----   | -----  | ---- |
 |name      | String (16)  | 昵称   |   是     |
 |loginName      | String (16)  | 登陆账号   |   否     |
-|phone      | String (11)  | 手机号   |   否     |
-|email      | String (64)  | 邮箱   |   是     |
 |orgId      | Integer  | 组织机构ID   |   是     |
+|roles      | String  |  是否为管理员【user,subAdmin】  |   是     |
 
 ####用户修改：user/edit
 ######请求参数
@@ -176,9 +175,7 @@ code == 401 无权限或登录超时
 | --------   | -----   | -----  | ---- |
 |name      | String (16)  | 名称   |   是     |
 |loginName      | String (16)  | 登陆账号   |   是     |
-|phone      | String (11)  | 手机号   |   否     |
-|email      | String (64)  | 邮箱   |   是     |
-|no    | Integer     |   排序   |   是   |
+|roles      | String  |  是否为管理员【user,subAdmin】  |   是     |
 
 ####用户删除：user/del
 ######请求参数
