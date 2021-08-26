@@ -245,9 +245,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (!ValidateUtil.isValid(answers)) {
 			throw new MyException("参数错误：answers");
 		}
-		if(!hasWriteAuth(question.getQuestionTypeId(), getCurUser().getId())) {
-			throw new MyException("权限不足！");
-		}
 
 		if (question.getType() == 1) {
 			if (options.length < 2) {
@@ -312,6 +309,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 		if (entity.getState() == 0) {
 			throw new MyException("试题已删除不能修改！");
+		}
+		if(!hasWriteAuth(entity.getQuestionTypeId(), getCurUser().getId())) {
+			throw new MyException("权限不足！");
 		}
 		/*if (newVer) {
 			// 删除旧版本

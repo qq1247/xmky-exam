@@ -175,6 +175,7 @@ code == 401 无权限或登录超时
 | --------   | -----   | -----  | ---- |
 |name      | String (16)  | 名称   |   是     |
 |loginName      | String (16)  | 登陆账号   |   是     |
+|orgId      | Integer  | 组织机构ID   |   是     |
 |roles      | String  |  是否为管理员【user,subAdmin】  |   是     |
 
 ####用户删除：user/del
