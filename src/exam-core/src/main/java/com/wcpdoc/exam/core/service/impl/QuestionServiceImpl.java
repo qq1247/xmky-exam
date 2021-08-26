@@ -85,6 +85,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (!ValidateUtil.isValid(answers)) {
 			throw new MyException("参数错误：answers");
 		}
+		if(!hasWriteAuth(question.getQuestionTypeId(), getCurUser().getId())) {
+			throw new MyException("权限不足！");
+		}
 		
 		if (question.getType() == 1 && options != null) {
 			if (options.length < 2) {
@@ -241,6 +244,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 		if (!ValidateUtil.isValid(answers)) {
 			throw new MyException("参数错误：answers");
+		}
+		if(!hasWriteAuth(question.getQuestionTypeId(), getCurUser().getId())) {
+			throw new MyException("权限不足！");
 		}
 
 		if (question.getType() == 1) {
@@ -433,6 +439,19 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		saveFile(entity);
 	}
 
+
+	@Override
+	public void delAndUpdate(Integer id) {
+		Question question = questionDao.getEntity(id);
+		if(!hasWriteAuth(question.getQuestionTypeId(), getCurUser().getId())) {
+			throw new MyException("权限不足！");
+		}
+		question.setState(0);
+		question.setUpdateTime(new Date());
+		question.setUpdateUserId(getCurUser().getId());
+		questionDao.update(question);
+	}
+	
 	@Override
 	public List<Question> getList(Integer questionTypeId) {
 		return questionDao.getList(questionTypeId);
@@ -639,6 +658,10 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	@Override
 	public void copy(Integer id) throws Exception{
 		Question question = questionDao.getEntity(id);
+		if(!hasWriteAuth(question.getQuestionTypeId(), getCurUser().getId())) {
+			throw new MyException("权限不足！");
+		}
+		
 		Question entity = new Question();
 		BeanUtils.copyProperties(entity, question);
 		entity.setState(2);
@@ -663,5 +686,32 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			questionOptionNew.setQuestionId(entity.getId());
 			questionOptionService.add(questionOptionNew);
 		}
+	}
+	
+
+	@Override
+	public void publish(Integer id) throws Exception {
+		Question question = questionDao.getEntity(id);
+		if (question.getState() == 0) {
+			throw new MyException("试题已删除！");
+		}
+		if (question.getState() == 1) {
+			throw new MyException("试题已发布！");
+		}
+		if(!hasWriteAuth(question.getQuestionTypeId(), getCurUser().getId())) {
+			throw new MyException("权限不足！");
+		}
+		if (question.getState() == 2) {
+			question.setState(1);
+		}
+
+		question.setUpdateTime(new Date());
+		question.setUpdateUserId(getCurUser().getId());
+		questionDao.update(question);
+	}
+	
+	private boolean hasWriteAuth(Integer questionTypeId, Integer userId) {
+		QuestionType questionType = questionTypeService.getEntity(questionTypeId);
+		return questionType.getWriteUserIds().contains(String.format(",%s,", userId));
 	}
 }
