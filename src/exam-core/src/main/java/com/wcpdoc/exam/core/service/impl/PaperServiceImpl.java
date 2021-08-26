@@ -93,7 +93,10 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if (paper.getState() == 1) {
 			throw new MyException("试卷已发布");
 		}
-				
+		if(!hasWriteAuth(paper.getPaperTypeId(), getCurUser().getId())) {
+			throw new MyException("权限不足！");
+		}
+		
 		//添加章节
 		chapter.setUpdateTime(new Date());
 		chapter.setUpdateUserId(getCurUser().getId());
@@ -111,6 +114,46 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 
 	@Override
+	public void updateAndUpdate(Paper paper) {
+		Paper entity = paperDao.getEntity(paper.getId());
+		if(entity.getState() == 1){
+			throw new MyException("已发布的不能修改！");
+		}
+		if(!hasWriteAuth(entity.getPaperTypeId(), getCurUser().getId())) {
+			throw new MyException("权限不足！");
+		}
+		
+		entity.setName(paper.getName());
+		entity.setPassScore(paper.getPassScore());
+		entity.setReadRemark(paper.getReadRemark());
+		entity.setReadNum(paper.getReadNum());
+		entity.setShowType(paper.getShowType());
+		entity.setMinimizeNum(paper.getMinimizeNum());
+		entity.setUpdateUserId(getCurUser().getId());
+		entity.setUpdateTime(new Date());
+		paperDao.update(entity);
+
+		/*paperRemarkService.remove(entity.getId());//重新添加评语
+		for (int i = 0; i < paperRemark.size(); i++) {
+			paperRemark.get(i).setNo(i+1);
+			paperRemark.get(i).setPaperId(entity.getId());
+			paperRemarkService.add(paperRemark.get(i));
+		}*/
+	}
+
+	@Override
+	public void delAndUpdate(Integer id) {
+		Paper paper = paperDao.getEntity(id);
+		if(!hasWriteAuth(paper.getPaperTypeId(), getCurUser().getId())) {
+			throw new MyException("权限不足！");
+		}
+		paper.setState(0);
+		paper.setUpdateTime(new Date());
+		paper.setUpdateUserId(getCurUser().getId());
+		paperDao.update(paper);
+	}
+	
+	@Override
 	public void chapterEdit(PaperQuestion chapter) {
 		//校验数据有效性
 		PaperQuestion entity = paperQuestionService.getEntity(chapter.getId());
@@ -123,6 +166,9 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		}
 		if (paper.getState() == 1) {
 			throw new MyException("试卷已发布");
+		}
+		if(!hasWriteAuth(paper.getPaperTypeId(), getCurUser().getId())) {
+			throw new MyException("权限不足！");
 		}
 		
 		// 修改章节
@@ -541,6 +587,9 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	@Override
 	public void copy(Integer id) throws Exception {
 		Paper paper = paperDao.getEntity(id);
+		if(!hasWriteAuth(paper.getPaperTypeId(), getCurUser().getId())) {
+			throw new MyException("权限不足！");
+		}
 		Paper entity = new Paper();
 		BeanUtils.copyProperties(entity, paper);
 		entity.setName(paper.getName()+"【复件】");
@@ -699,6 +748,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			throw new MyException("试卷【"+paper.getName()+"】已发布！");
 		}
 		
+		
 		BigDecimalUtil bigDecimalUtil = BigDecimalUtil.newInstance(0);
 		List<PaperQuestion> paperQuestionList = paperQuestionService.getList(id);
 		for (PaperQuestion paperQuestion : paperQuestionList) {
@@ -731,4 +781,9 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 //		paper.setTotalScore(bigDecimalUtil.getResult());
 //		update(paper);
 //	}
+	
+	private boolean hasWriteAuth(Integer paperTypeId, Integer userId) {
+		PaperType paperType = paperTypeService.getEntity(paperTypeId);
+		return paperType.getWriteUserIds().contains(String.format(",%s,", userId));
+	}
 }

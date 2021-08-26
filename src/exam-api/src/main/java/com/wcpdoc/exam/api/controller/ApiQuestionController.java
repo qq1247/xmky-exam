@@ -2,7 +2,6 @@ package com.wcpdoc.exam.api.controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -181,11 +180,7 @@ public class ApiQuestionController extends BaseController {
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
-			Question question = questionService.getEntity(id);
-			question.setState(0);
-			question.setUpdateTime(new Date());
-			question.setUpdateUserId(getCurUser().getId());
-			questionService.update(question);
+			questionService.delAndUpdate(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("删除试题错误：{}", e.getMessage());
@@ -362,20 +357,7 @@ public class ApiQuestionController extends BaseController {
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult publish(Integer id) {
 		try {
-			Question question = questionService.getEntity(id);
-			if (question.getState() == 0) {
-				throw new MyException("试题已删除！");
-			}
-			if (question.getState() == 1) {
-				throw new MyException("试题已发布！");
-			}
-			if (question.getState() == 2) {
-				question.setState(1);
-			}
-
-			question.setUpdateTime(new Date());
-			question.setUpdateUserId(getCurUser().getId());
-			questionService.update(question);
+			questionService.publish(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("发布错误：{}", e.getMessage());

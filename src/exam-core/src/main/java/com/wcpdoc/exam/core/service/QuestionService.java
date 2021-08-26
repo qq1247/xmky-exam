@@ -47,6 +47,14 @@ public interface QuestionService extends BaseService<Question>{
 	void updateAndUpdate(Question question, Integer[] scoreOptions, String[] answers, String[] options, BigDecimal[] scores); //, boolean newVer
 	
 	/**
+	 * 删除试题
+	 * 
+	 * v1.0 chenyun 2021年8月25日下午5:28:51
+	 * @param id void
+	 */
+	void delAndUpdate(Integer id);
+	
+	/**
 	 * 完成导入试题
 	 * 
 	 * v1.0 zhanghc 2019年8月10日下午5:12:53
@@ -99,4 +107,12 @@ public interface QuestionService extends BaseService<Question>{
 	 * @param id void
 	 */
 	void copy(Integer id) throws Exception;
+	
+	/**
+	 * 发布
+	 * 
+	 * v1.0 chenyun 2021年8月19日下午2:32:57
+	 * @param id void
+	 */
+	void publish(Integer id) throws Exception;
 }
