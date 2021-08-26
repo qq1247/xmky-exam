@@ -921,8 +921,8 @@ export default {
       const lab = String.fromCharCode(65 + index)
       this.editForm.answers.push({
         lab: lab,
-        value: value.answer,
-        score: value.score,
+        value: !value ? '' : value.answer,
+        score: !value ? '' : value.score,
       })
 
       this.editForm.rules['answers.' + index + '.value'] = [
