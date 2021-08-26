@@ -98,10 +98,14 @@ export default {
       this.$message.warning(`最多选择${this.types[this.type].limit}个文件！`)
     },
     beforeUpload(file) {
+      console.log('====================================');
+      console.log(file);
+      console.log('====================================');
       const isType =
         this.type !== '*' &&
         file.type.indexOf(this.types[this.type].type) === -1
-      if (isType) {
+      const suffix = this.types.word.accept.indexOf(file.name) != -1// 部分火狐浏览器获取不到word类型，根据后缀名特殊处理下
+      if (isType || suffix) {
         this.$message.warning('文件格式错误')
         return false
       }
