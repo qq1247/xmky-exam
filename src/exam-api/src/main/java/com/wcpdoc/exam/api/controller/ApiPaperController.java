@@ -90,26 +90,7 @@ public class ApiPaperController extends BaseController {
 	@RequiresRoles("subAdmin")
 	public PageResult edit(Paper paper) { // List<PaperRemark> paperRemark
 		try {
-			Paper entity = paperService.getEntity(paper.getId());
-			if(entity.getState() == 1){
-				throw new MyException("已发布的不能修改！");
-			}
-			entity.setName(paper.getName());
-			entity.setPassScore(paper.getPassScore());
-			entity.setReadRemark(paper.getReadRemark());
-			entity.setReadNum(paper.getReadNum());
-			entity.setShowType(paper.getShowType());
-			entity.setMinimizeNum(paper.getMinimizeNum());
-			entity.setUpdateUserId(getCurUser().getId());
-			entity.setUpdateTime(new Date());
-			paperService.update(entity);
-
-			/*paperRemarkService.remove(entity.getId());//重新添加评语
-			for (int i = 0; i < paperRemark.size(); i++) {
-				paperRemark.get(i).setNo(i+1);
-				paperRemark.get(i).setPaperId(entity.getId());
-				paperRemarkService.add(paperRemark.get(i));
-			}*/
+			paperService.updateAndUpdate(paper);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改试卷错误：{}", e.getMessage());
@@ -131,11 +112,7 @@ public class ApiPaperController extends BaseController {
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
-			Paper paper = paperService.getEntity(id);
-			paper.setState(0);
-			paper.setUpdateTime(new Date());
-			paper.setUpdateUserId(getCurUser().getId());
-			paperService.update(paper);
+			paperService.delAndUpdate(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("删除试卷错误：{}", e.getMessage());

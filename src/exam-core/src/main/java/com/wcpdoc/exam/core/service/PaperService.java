@@ -27,6 +27,22 @@ public interface PaperService extends BaseService<Paper> {
 	void addAndUpdate(Paper paper, PaperRemark paperRemark);
 	
 	/**
+	 * 修改试卷
+	 * 
+	 * v1.0 chenyun 2021年8月25日下午5:35:05
+	 * @param paper void
+	 */
+	void updateAndUpdate(Paper paper);
+	
+	/**
+	 * 删除试卷
+	 * 
+	 * v1.0 chenyun 2021年8月25日下午5:35:00
+	 * @param id void
+	 */
+	void delAndUpdate(Integer id);
+	
+	/**
 	 * 完成添加章节
 	 * 
 	 * v1.0 zhanghc 2017年5月27日上午9:42:57

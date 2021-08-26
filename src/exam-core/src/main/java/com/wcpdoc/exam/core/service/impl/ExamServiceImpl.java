@@ -19,6 +19,7 @@ import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.ExamDao;
 import com.wcpdoc.exam.core.entity.Exam;
+import com.wcpdoc.exam.core.entity.ExamType;
 import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyExamDetail;
@@ -75,6 +76,109 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	@Override
+	public void addAndUpdate(Exam exam) {
+		//校验数据有效性
+		if(exam.getStartTime().getTime() <= new Date().getTime()) {
+			throw new MyException("考试开始时间必须大于当前时间！");
+		}
+		if(exam.getStartTime().getTime() >= exam.getEndTime().getTime()) {
+			throw new MyException("考试结束时间必须大于考试开始时间！");
+		}
+		if(exam.getMarkStartTime().getTime() <= exam.getEndTime().getTime()) {
+			throw new MyException("阅卷开始时间必须大于考试结束时间！");
+		}
+		if(exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()) {
+			throw new MyException("阅卷结束时间必须大于阅卷开始时间！");
+		}
+		if(!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId())) {
+			throw new MyException("权限不足！");
+		}
+		
+		//添加考试
+		exam.setCreateUserId(getCurUser().getId());
+		exam.setCreateTime(new Date());
+		exam.setUpdateUserId(getCurUser().getId());
+		exam.setUpdateTime(new Date());
+		exam.setUpdateUserId(getCurUser().getId());
+		exam.setState(2);
+		examDao.add(exam);
+	}
+	
+	@Override
+	public void updateAndUpdate(Exam exam) {
+		//校验数据有效性
+		Exam entity = examDao.getEntity(exam.getId());
+		if(entity.getState() == 1) {
+			throw new MyException("考试已发布！");
+		}
+		if(exam.getStartTime().getTime() <= new Date().getTime()) {
+			throw new MyException("考试开始时间必须大于当前时间！");
+		}
+		if(exam.getStartTime().getTime() >= exam.getEndTime().getTime()) {
+			throw new MyException("考试结束时间必须大于考试开始时间！");
+		}
+		if(exam.getMarkStartTime().getTime() <= exam.getEndTime().getTime()) {
+			throw new MyException("阅卷开始时间必须大于考试结束时间！");
+		}
+		if(exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()) {
+			throw new MyException("阅卷结束时间必须大于阅卷开始时间！");
+		}
+		if(!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId())) {
+		   throw new MyException("权限不足！");
+		}
+		
+		//添加考试
+		entity.setName(exam.getName());
+		entity.setPaperId(exam.getPaperId());
+		entity.setStartTime(exam.getStartTime());
+		entity.setEndTime(exam.getEndTime());
+		entity.setMarkStartTime(exam.getMarkStartTime());
+		entity.setMarkEndTime(exam.getMarkEndTime());
+		entity.setScoreState(exam.getScoreState());
+		entity.setRankState(exam.getRankState());
+		entity.setLoginType(exam.getLoginType());
+		entity.setDescription(exam.getDescription());
+		entity.setUpdateTime(new Date());
+		entity.setUpdateUserId(getCurUser().getId());
+		examDao.update(entity);
+	}
+	
+	@Override
+	public void delAndUpdate(Integer id) {
+		Date curTime = new Date();
+		Exam exam = examDao.getEntity(id);
+		if(exam.getStartTime().getTime() >= curTime.getTime()
+				&& exam.getEndTime().getTime() <= curTime.getTime()) {
+			throw new MyException("【"+exam.getName()+"】考试未结束");
+		}
+		if(!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId())) {
+			throw new MyException("权限不足！");
+		}
+		
+		exam.setState(0);
+		exam.setUpdateTime(new Date());
+		exam.setUpdateUserId(getCurUser().getId());
+		examDao.update(exam);
+	}
+	
+	@Override
+	public void publish(Integer id) {
+		Exam exam = examDao.getEntity(id);
+		if(exam.getState() == 0) {
+			throw new MyException("考试【"+exam.getName()+"】已删除！");
+		}
+		if(exam.getState() == 1) {
+			throw new MyException("考试【"+exam.getName()+"】已发布！");
+		}
+		if(!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId())) {
+			throw new MyException("权限不足！");
+		}
+		
+		exam.setState(1);
+		examDao.update(exam);
+	}
+	
+	@Override
 	public List<Map<String, Object>> getExamUserList(Integer id) {
 		return examDao.getExamUserList(id);
 	}
@@ -82,70 +186,70 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	@Override
 	public void updateExamUser(Integer id, Integer[] userIds) {
 		// 校验数据有效性
-				if (id == null) {
-					throw new MyException("参数错误：id");
-				}
-				if (userIds == null) {
-					throw new MyException("参数错误：userIds");
-				}
-				Exam exam = getEntity(id);
-				if (exam.getState() == 0) {
-					throw new MyException("考试已删除！");
-				}
-				if (exam.getState() == 2) {
-					throw new MyException("考试未发布！");// 必须已发布，否则在考试结束前添加或删除考试用户，试题有可能会变更，每个人的考试详细可能不一样（也能处理，比较费事）。
-				}
+		if (id == null) {
+			throw new MyException("参数错误：id");
+		}
+		if (userIds == null) {
+			throw new MyException("参数错误：userIds");
+		}
+		Exam exam = getEntity(id);
+		if (exam.getState() == 0) {
+			throw new MyException("考试已删除！");
+		}
+		if (exam.getState() == 2) {
+			throw new MyException("考试未发布！");// 必须已发布，否则在考试结束前添加或删除考试用户，试题有可能会变更，每个人的考试详细可能不一样（也能处理，比较费事）。
+		}
 
-				if (exam.getEndTime().getTime() <= new Date().getTime()) {
-					throw new MyException("考试已结束，不允许添加！");
-				}
+		if (exam.getEndTime().getTime() <= new Date().getTime()) {
+			throw new MyException("考试已结束，不允许添加！");
+		}
 
-				// 添加我的考试（不能整个重新添加，因为有可能是已开始考试途中添加人员，部分人员已作答）
-				List<MyExam> myExamList = myExamService.getList(id);// 当前考试的人员
-				List<Question> questionList = paperService.getQuestionList(exam.getPaperId());// 试卷的问题
-				Set<Integer> curUserIdSet = new HashSet<>(Arrays.asList(userIds));//当前页面选中的考试的人员
-				ListIterator<MyExam> myExamListIterator = myExamList.listIterator();
-				while (myExamListIterator.hasNext()) {// 如果页面有选择该用户，数据库也有，则不处理
-					MyExam next = myExamListIterator.next();
-					if (curUserIdSet.contains(next.getUserId())) {
-						myExamListIterator.remove();
-						curUserIdSet.remove(next.getUserId());
-					}
-				}
-				myExamListIterator = myExamList.listIterator();
-				while (myExamListIterator.hasNext()) {// 如果页面没有选择该用户，数据库有，则数据库记录删除该用户的考试记录和考试详细记录
-					MyExam next = myExamListIterator.next();
-					myExamDetailService.delByMyExamId(next.getId());
-					
-					myExamService.del(next.getId());
-				}
-				Date curTime = new Date();
-				for (Integer userId : curUserIdSet) {//如果页面有选择该用户，数据库没有，则数据库添加该用户的考试记录和考试详细记录
-					MyExam myExam = new MyExam();
-					myExam.setExamId(id);
-					myExam.setUserId(userId);
-					
-					myExam.setAnswerStartTime(exam.getStartTime());
-					myExam.setAnswerEndTime(exam.getEndTime());
-					myExam.setMarkStartTime(exam.getMarkStartTime());
-					myExam.setMarkEndTime(exam.getMarkEndTime());
-					//myExam.setTotalScore(BigDecimal.ZERO);//没有考试，不要设置分数
-					myExam.setState(1);
-					myExam.setMarkState(1);
-					myExam.setUpdateTime(curTime);
-					myExam.setUpdateUserId(getCurUser().getId());
-					myExamService.add(myExam);// 添加我的考试
-					
-					for (Question question : questionList) {
-						MyExamDetail myExamDetail = new MyExamDetail();
-						myExamDetail.setMyExamId(myExam.getId());
-						myExamDetail.setExamId(myExam.getExamId());
-						myExamDetail.setUserId(myExam.getUserId());
-						myExamDetail.setQuestionId(question.getId());
-						myExamDetail.setQuestionScore(question.getScore());
-						myExamDetailService.add(myExamDetail);// 添加我的考试详细
-					}
-				}
+		// 添加我的考试（不能整个重新添加，因为有可能是已开始考试途中添加人员，部分人员已作答）
+		List<MyExam> myExamList = myExamService.getList(id);// 当前考试的人员
+		List<Question> questionList = paperService.getQuestionList(exam.getPaperId());// 试卷的问题
+		Set<Integer> curUserIdSet = new HashSet<>(Arrays.asList(userIds));//当前页面选中的考试的人员
+		ListIterator<MyExam> myExamListIterator = myExamList.listIterator();
+		while (myExamListIterator.hasNext()) {// 如果页面有选择该用户，数据库也有，则不处理
+			MyExam next = myExamListIterator.next();
+			if (curUserIdSet.contains(next.getUserId())) {
+				myExamListIterator.remove();
+				curUserIdSet.remove(next.getUserId());
+			}
+		}
+		myExamListIterator = myExamList.listIterator();
+		while (myExamListIterator.hasNext()) {// 如果页面没有选择该用户，数据库有，则数据库记录删除该用户的考试记录和考试详细记录
+			MyExam next = myExamListIterator.next();
+			myExamDetailService.delByMyExamId(next.getId());
+			
+			myExamService.del(next.getId());
+		}
+		Date curTime = new Date();
+		for (Integer userId : curUserIdSet) {//如果页面有选择该用户，数据库没有，则数据库添加该用户的考试记录和考试详细记录
+			MyExam myExam = new MyExam();
+			myExam.setExamId(id);
+			myExam.setUserId(userId);
+			
+			myExam.setAnswerStartTime(exam.getStartTime());
+			myExam.setAnswerEndTime(exam.getEndTime());
+			myExam.setMarkStartTime(exam.getMarkStartTime());
+			myExam.setMarkEndTime(exam.getMarkEndTime());
+			//myExam.setTotalScore(BigDecimal.ZERO);//没有考试，不要设置分数
+			myExam.setState(1);
+			myExam.setMarkState(1);
+			myExam.setUpdateTime(curTime);
+			myExam.setUpdateUserId(getCurUser().getId());
+			myExamService.add(myExam);// 添加我的考试
+			
+			for (Question question : questionList) {
+				MyExamDetail myExamDetail = new MyExamDetail();
+				myExamDetail.setMyExamId(myExam.getId());
+				myExamDetail.setExamId(myExam.getExamId());
+				myExamDetail.setUserId(myExam.getUserId());
+				myExamDetail.setQuestionId(question.getId());
+				myExamDetail.setQuestionScore(question.getScore());
+				myExamDetailService.add(myExamDetail);// 添加我的考试详细
+			}
+		}
 	}
 
 	@Override
@@ -217,5 +321,10 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	@Override
 	public List<Map<String, Object>> getMarkQuestionList(Integer id, Integer markUserId) {
 		return examDao.getMarkQuestionList(id, markUserId);
+	}
+	
+	private boolean hasWriteAuth(Integer examTypeId, Integer userId) {
+		ExamType examType = examTypeService.getEntity(examTypeId);
+		return examType.getWriteUserIds().contains(String.format(",%s,", userId));
 	}
 }
