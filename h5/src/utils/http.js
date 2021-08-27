@@ -25,7 +25,7 @@ const toLogin = () => {
   router.replace({
     path: '/login',
     query: {
-      redirect: router.currentRoute.fullPath,
+      redirect: '/',
     },
   })
 }

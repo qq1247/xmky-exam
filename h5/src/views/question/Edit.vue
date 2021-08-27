@@ -1501,4 +1501,14 @@ export default {
   background-color: #fff;
   padding: 0 10px;
 }
+
+/deep/.el-select__tags .el-tag {
+  width: 100%;
+  height: auto;
+}
+/deep/.el-select__tags-text {
+  display: inline;
+  white-space: normal;
+  word-break: break-word;
+}
 </style>

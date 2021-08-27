@@ -133,7 +133,7 @@
               animation="300"
               @end="sourceEnd"
               @choose="sourceChoose"
-              :disabled="paperQuestion.lenght == 0 ? true : false"
+              :disabled="paperQuestion.length == 0 ? true : false"
               v-if="paperList.length > 0"
             >
               <transition-group>
@@ -202,7 +202,6 @@
               <div class="chapter">
                 <div class="chapter-item">
                   <div class="item-title">{{ item.chapter.name }}</div>
-                  <span>{{ item.chapter.id }}</span>
                   <div>
                     <el-button
                       @click="chapterEdit(item.chapter)"
@@ -265,7 +264,6 @@
                     :id="`p-${child.id}`"
                   >
                     <p v-html="index + 1 + '、' + child.title"></p>
-                    <span>{{ child.paperQuestionId }}</span>
                     <!-- 单选 -->
                     <template v-if="child.type === 1">
                       <el-radio-group
@@ -349,7 +347,7 @@
                           <el-col :span="2.5"> 【答案】： </el-col>
                           <el-col :span="21">
                             <div
-                              v-if="child.answers.lenght > 0"
+                              v-if="child.answers && child.answers.length > 0"
                               v-html="`${child.answers[0].answer}`"
                             ></div>
                           </el-col>
@@ -391,7 +389,11 @@
                               </div>
                             </template>
                             <div
-                              v-if="child.ai === 2 && child.answers.length > 0"
+                              v-if="
+                                child.ai === 2 &&
+                                child.answers &&
+                                child.answers.length > 0
+                              "
                               v-html="`${child.answers[0].answer}`"
                             ></div>
                           </el-col>
@@ -491,7 +493,7 @@
         :model="settingForm"
         :rules="settingForm.rules"
         ref="settingForm"
-        label-width="60px"
+        label-width="70px"
       >
         <el-form-item label="分值" prop="score">
           <el-input-number
@@ -509,7 +511,9 @@
             <el-form-item
               v-for="(answer, index) in settingForm.answers"
               :key="index"
-              :label="settingForm.type === 3 ? '填空' : '关键词'"
+              :label="
+                settingForm.type === 3 ? `填空_${index}` : `关键词_${index}`
+              "
               :prop="`answers.${index}.score`"
               :rules="settingForm.rules.aiScore"
               :show-message="settingForm.ai === 1 ? true : false"
@@ -607,6 +611,7 @@ import {
   paperQuestionAdd,
   paperMovePosition,
   paperTotalScore,
+  paperUpdateScoreOptions,
 } from '@/api/paper'
 import { questionListPage, randomListPage } from '@/api/question'
 import Draggable from 'vuedraggable'
@@ -901,7 +906,7 @@ export default {
         : []
       this.settingForm.answers = data.answers
       this.settingForm.multipScore =
-        data.type === 2 && data.ai === 1 && data.scoreOptions.length > 0
+        data.type === 2 && data.ai === 1 && data.scoreOptions
           ? data.answers[0].score
           : ''
       this.settingForm.show = true
@@ -916,13 +921,20 @@ export default {
           return acc
         }, [])
 
-        paperQuestionAnswerScore = this.settingForm.answers.reduce(
-          (acc, cur) => {
-            acc.push(cur.score)
+        if (this.settingForm.type === 2) {
+          paperQuestionAnswerScore = this.settingForm.answers.reduce((acc) => {
+            acc.push(this.settingForm.multipScore)
             return acc
-          },
-          []
-        )
+          }, [])
+        } else {
+          paperQuestionAnswerScore = this.settingForm.answers.reduce(
+            (acc, cur) => {
+              acc.push(Number(cur.score))
+              return acc
+            },
+            []
+          )
+        }
       }
 
       this.$refs['settingForm'].validate(async (valid) => {
@@ -934,15 +946,41 @@ export default {
           paperQuestionId: this.settingForm.paperQuestionId,
           score: this.settingForm.score,
           paperQuestionAnswerId: paperQuestionAnswerId,
-          paperQuestionAnswerScore: paperQuestionAnswerScore,
+          paperQuestionAnswerScore:
+            this.settingForm.type === 2
+              ? this.settingForm.scoreOptions.length === 0
+                ? []
+                : paperQuestionAnswerScore
+              : paperQuestionAnswerScore,
         })
 
-        const updateScoreOptions = await paperUpdateScoreOptions({
-          paperQuestionId: this.settingForm.paperQuestionId,
-          scoreOptions: this.settingForm.scoreOptions,
-        })
+        let updateScoreOptions
 
-        if (updateScore?.code === 200 && updateScoreOptions?.code === 200) {
+        if (
+          [2, 3, 5].includes(this.settingForm.type) &&
+          this.settingForm.ai === 1
+        ) {
+          updateScoreOptions = await paperUpdateScoreOptions({
+            paperQuestionId: this.settingForm.paperQuestionId,
+            scoreOptions: this.settingForm.scoreOptions,
+          })
+        }
+
+        // 进行选项请求提交的条件
+        const isUpdateOptions =
+          [2, 3, 5].includes(this.settingForm.type) &&
+          this.settingForm.ai === 1 &&
+          updateScore?.code === 200 &&
+          updateScoreOptions?.code === 200
+
+        // 不进行选项请求提交的条件
+        const notUpdateOptions =
+          ([1, 4].includes(this.settingForm.type) ||
+            ([2, 3, 5].includes(this.settingForm.type) &&
+              this.settingForm.ai === 2)) &&
+          updateScore?.code === 200
+
+        if (isUpdateOptions || notUpdateOptions) {
           this.$message.success('编辑成功！')
           this.settingForm.show = false
           this.query()
