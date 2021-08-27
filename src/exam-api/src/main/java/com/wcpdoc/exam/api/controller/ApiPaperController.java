@@ -601,8 +601,6 @@ public class ApiPaperController extends BaseController {
 			}
 			
 			paper.setTotalScore(totalScore);
-			paper.setUpdateTime(new Date());
-			paper.setUpdateUserId(getCurUser().getId());
 			paperService.update(paper);
 			return PageResult.ok();
 		} catch (MyException e) {

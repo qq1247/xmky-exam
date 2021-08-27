@@ -1,9 +1,10 @@
 <template>
   <el-select
-    :style="{ width: isAuto ? 'auto' : '100%' }"
+    ref="elSelect"
     :value="value"
     :multiple="multiple"
     :placeholder="placeholder"
+    :style="{ width: isAuto ? 'auto' : '100%' }"
     @change="change"
     @visible-change="visibleChange"
   >

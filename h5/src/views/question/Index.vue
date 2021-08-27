@@ -102,6 +102,7 @@
       <el-form :model="roleForm" ref="examForm" label-width="100px">
         <el-form-item label="使用权限">
           <CustomSelect
+            ref="readSelect"
             placeholder="请选择授权人员"
             :value="roleForm.readRoleUser"
             :total="roleForm.total"
@@ -114,12 +115,13 @@
               v-for="item in roleForm.roleUserList"
               :key="item.id"
               :label="item.name"
-              :value="`${String(item.id)}-${item.name}`"
+              :value="item.id"
             ></el-option>
           </CustomSelect>
         </el-form-item>
         <el-form-item label="编辑权限">
           <CustomSelect
+            ref="writeSelect"
             placeholder="请选择授权人员"
             :value="roleForm.writeRoleUser"
             :total="roleForm.total"
@@ -381,16 +383,46 @@ export default {
       this.roleForm.writeRoleUser = e
     },
     // 权限人员信息
-    async role({ readUserIds, writeUserIds, id }) {
+    role({ id, readUserIds, writeUserIds, readUserNames, writeUserNames }) {
       this.examForm.id = id
-      this.roleForm.readRoleUser = readUserIds
-        .split(',')
-        .filter((item) => item !== '')
-      this.roleForm.writeRoleUser = writeUserIds
-        .split(',')
-        .filter((item) => item !== '')
-      await this.getUserList()
+      const { roleIds: readIds, roleNames: readNames } = this.compositionRoles(
+        readUserIds,
+        readUserNames
+      )
+      const { roleIds: writeIds, roleNames: writeNames } =
+        this.compositionRoles(writeUserIds, writeUserNames)
       this.roleForm.show = true
+      this.roleForm.readRoleUser.push(...readIds)
+      this.roleForm.writeRoleUser.push(...writeIds)
+      this.$nextTick(() => {
+        this.$refs['readSelect'].$refs['elSelect'].cachedOptions.push(
+          ...readNames
+        )
+        this.$refs['writeSelect'].$refs['elSelect'].cachedOptions.push(
+          ...writeNames
+        )
+      })
+    },
+    compositionRoles(userIds, userNames) {
+      const ids = userIds
+        .split(',')
+        .filter((item) => item !== '')
+        .map((item) => Number(item))
+      const names = userNames.split(',')
+      const roles = ids.reduce(
+        (acc, cur, index) => {
+          acc['roleIds'].push(cur)
+          acc['roleNames'].push({
+            currentLabel: names[index],
+            currentValue: cur,
+            label: names[index],
+            value: cur,
+          })
+          return acc
+        },
+        { roleIds: [], roleNames: [] }
+      )
+      return roles
     },
     // 移动试题分类
     async questionMove() {
