@@ -90,7 +90,7 @@
       </div>
     </el-dialog>
 
-    <!-- 编辑使用权限 -->
+    <!-- 编辑读写权限 -->
     <el-dialog
       :visible.sync="roleForm.show"
       :show-close="false"
@@ -103,7 +103,7 @@
         <el-form-item label="使用权限">
           <CustomSelect
             ref="readSelect"
-            placeholder="请选择授权人员"
+            placeholder="请选择授权用户"
             :value="roleForm.readRoleUser"
             :total="roleForm.total"
             @input="searchUser"
@@ -122,7 +122,7 @@
         <el-form-item label="编辑权限">
           <CustomSelect
             ref="writeSelect"
-            placeholder="请选择授权人员"
+            placeholder="请选择授权用户"
             :value="roleForm.writeRoleUser"
             :total="roleForm.total"
             @input="searchUser"
@@ -134,7 +134,7 @@
               v-for="item in roleForm.roleUserList"
               :key="item.id"
               :label="item.name"
-              :value="String(item.id)"
+              :value="item.id"
             ></el-option>
           </CustomSelect>
         </el-form-item>
@@ -392,9 +392,9 @@ export default {
       const { roleIds: writeIds, roleNames: writeNames } =
         this.compositionRoles(writeUserIds, writeUserNames)
       this.roleForm.show = true
-      this.roleForm.readRoleUser.push(...readIds)
-      this.roleForm.writeRoleUser.push(...writeIds)
       this.$nextTick(() => {
+        this.roleForm.readRoleUser.push(...readIds)
+        this.roleForm.writeRoleUser.push(...writeIds)
         this.$refs['readSelect'].$refs['elSelect'].cachedOptions.push(
           ...readNames
         )
