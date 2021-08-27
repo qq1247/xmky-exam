@@ -59,7 +59,7 @@
     <el-dialog
       :visible.sync="examForm.show"
       :show-close="false"
-      width="30%"
+      width="40%"
       title="试卷分类"
       ref="examForm"
       :close-on-click-modal="false"
@@ -89,59 +89,47 @@
     <el-dialog
       :visible.sync="roleForm.show"
       :show-close="false"
-      width="33%"
+      width="40%"
       title="权限编辑"
       :close-on-click-modal="false"
       @close="resetData('roleForm')"
     >
       <el-form :model="roleForm" ref="examForm" label-width="100px">
-        <el-form-item label="读取权限">
+        <el-form-item label="使用权限">
           <CustomSelect
-            placeholder="请选择授权人员"
-            :multiple="true"
+            ref="readSelect"
+            placeholder="请选择授权用户"
             :value="roleForm.readRoleUser"
             :total="roleForm.total"
-            :showPage="true"
-            :currentPage="roleForm.curPage"
-            :pageSize="roleForm.pageSize"
-            :remote="true"
-            :reserveKeyword="true"
-            :filterable="true"
-            :remoteMethod="searchUser"
+            @input="searchUser"
             @change="selectReadUser"
-            @focus="getUserList()"
             @currentChange="getMoreUser"
+            @visibleChange="getUserList"
           >
             <el-option
               v-for="item in roleForm.roleUserList"
               :key="item.id"
               :label="item.name"
-              :value="String(item.id)"
+              :value="item.id"
             ></el-option>
           </CustomSelect>
         </el-form-item>
-        <el-form-item label="使用权限">
+        <el-form-item label="编辑权限">
           <CustomSelect
-            placeholder="请选择授权人员"
-            :multiple="true"
+            ref="writeSelect"
+            placeholder="请选择授权用户"
             :value="roleForm.writeRoleUser"
             :total="roleForm.total"
-            :showPage="true"
-            :currentPage="roleForm.curPage"
-            :pageSize="roleForm.pageSize"
-            :remote="true"
-            :reserveKeyword="true"
-            :filterable="true"
-            :remoteMethod="searchUser"
+            @input="searchUser"
             @change="selectWriteUser"
-            @focus="getUserList()"
             @currentChange="getMoreUser"
+            @visibleChange="getUserList"
           >
             <el-option
               v-for="item in roleForm.roleUserList"
               :key="item.id"
               :label="item.name"
-              :value="String(item.id)"
+              :value="item.id"
             ></el-option>
           </CustomSelect>
         </el-form-item>
@@ -285,11 +273,11 @@ export default {
         })
     },
     // 获取用户
-    async getUserList(name = '') {
+    async getUserList(curPage = 1, name = '') {
       const roleUserList = await userListPage({
         name,
-        curPage: this.roleForm.curPage,
-        pageSize: this.roleForm.pageSize,
+        curPage,
+        pageSize: this.pageSize,
       })
 
       if (this.$store.getters.userId == 1) {
@@ -306,34 +294,62 @@ export default {
           : roleUserList.data.total
     },
     // 获取更多用户
-    getMoreUser(curPage) {
-      this.roleForm.curPage = curPage
-      this.getUserList()
+    getMoreUser(curPage, name) {
+      this.getUserList(curPage, name)
     },
     // 根据name 查询人员
     searchUser(name) {
-      this.roleForm.curPage = 1
-      this.getUserList(name)
+      this.getUserList(1, name)
     },
-    // 选择考试用户
+    // 选择读取权限用户
     selectReadUser(e) {
       this.roleForm.readRoleUser = e
     },
-    // 选择考试用户
+    // 选择阅读权限用户
     selectWriteUser(e) {
       this.roleForm.writeRoleUser = e
     },
     // 权限人员信息
-    async role({ readUserIds, writeUserIds, id }) {
+    role({ id, readUserIds, writeUserIds, readUserNames, writeUserNames }) {
       this.examForm.id = id
-      this.roleForm.readRoleUser = readUserIds
-        .split(',')
-        .filter((item) => item !== '')
-      this.roleForm.writeRoleUser = writeUserIds
-        .split(',')
-        .filter((item) => item !== '')
-      await this.getUserList()
+      const { roleIds: readIds, roleNames: readNames } = this.compositionRoles(
+        readUserIds,
+        readUserNames
+      )
+      const { roleIds: writeIds, roleNames: writeNames } =
+        this.compositionRoles(writeUserIds, writeUserNames)
       this.roleForm.show = true
+      this.$nextTick(() => {
+        this.roleForm.readRoleUser.push(...readIds)
+        this.roleForm.writeRoleUser.push(...writeIds)
+        this.$refs['readSelect'].$refs['elSelect'].cachedOptions.push(
+          ...readNames
+        )
+        this.$refs['writeSelect'].$refs['elSelect'].cachedOptions.push(
+          ...writeNames
+        )
+      })
+    },
+    compositionRoles(userIds, userNames) {
+      const ids = userIds
+        .split(',')
+        .filter((item) => item !== '')
+        .map((item) => Number(item))
+      const names = userNames.split(',')
+      const roles = ids.reduce(
+        (acc, cur, index) => {
+          acc['roleIds'].push(cur)
+          acc['roleNames'].push({
+            currentLabel: names[index],
+            currentValue: cur,
+            label: names[index],
+            value: cur,
+          })
+          return acc
+        },
+        { roleIds: [], roleNames: [] }
+      )
+      return roles
     },
     // 编辑权限
     async editRoleUsers() {

@@ -160,19 +160,14 @@
               ]"
             >
               <CustomSelect
+                ref="markUserSelect"
                 placeholder="请选择阅卷人"
                 :value="examForm.examRemarks[index].examCheckPerson"
                 :total="examForm.total"
-                :showPage="true"
-                :remote="true"
-                :reserveKeyword="true"
-                :filterable="true"
-                :pageSize="examForm.pageSize"
-                :currentPage="examForm.curPage"
-                :remoteMethod="searchUser"
+                @input="searchUser"
                 @change="selectPerson($event, index)"
-                @focus="getUserList()"
                 @currentChange="getMoreUser"
+                @visibleChange="getUserList"
               >
                 <el-option
                   v-for="item in examForm.examUsers"
@@ -215,20 +210,14 @@
           <el-col :span="12">
             <el-form-item label="考试用户" v-if="examForm.examRadio == 1">
               <CustomSelect
+                ref="markExamUserSelect" + index
                 placeholder="请选择考试用户"
-                :multiple="true"
                 :value="examForm.examRemarks[index].examUser"
                 :total="examForm.total"
-                :showPage="true"
-                :remote="true"
-                :reserveKeyword="true"
-                :filterable="true"
-                :pageSize="examForm.pageSize"
-                :currentPage="examForm.curPage"
-                :remoteMethod="searchUser"
+                @input="searchUser"
                 @change="selectExamUser($event, index)"
-                @focus="getUserList()"
                 @currentChange="getMoreUser"
+                @visibleChange="getUserList"
               >
                 <el-option
                   v-for="item in examForm.examUsers"
@@ -279,20 +268,14 @@
       <el-form :model="examForm" ref="examForm3" label-width="100px">
         <el-form-item label="考试用户">
           <CustomSelect
+            ref="readSelect"
             placeholder="请选择考试用户"
-            :multiple="true"
             :value="examForm.examUser"
             :total="examForm.total"
-            :showPage="true"
-            :currentPage="examForm.curPage"
-            :pageSize="examForm.pageSize"
-            :remote="true"
-            :reserveKeyword="true"
-            :filterable="true"
-            :remoteMethod="searchUser"
+            @input="searchUser"
             @change="selectUser"
-            @focus="getUserList()"
             @currentChange="getMoreUser"
+            @visibleChange="getUserList"
           >
             <el-option
               v-for="item in examForm.examUsers"
@@ -602,15 +585,22 @@ export default {
       await this.getQuestionNumList()
       const examMarkUser = await examMarkUserList({ id })
 
-      if (examMarkUser.data.length > 0) {
+      this.$nextTick(() => {
         this.examForm.examRemarks = []
-        examMarkUser.data.map((item) => {
+        examMarkUser.data.map((item, index) => {
           if (item?.examUserList) {
             this.examForm.examRadio = 1
             this.examForm.examRemarks.push({
               examCheckPerson: item.markUserId,
               examUser: item.examUserList.map((user) => user.id),
               examQuestionNum: [],
+            })
+
+            this.$refs['markExamUserSelect' + index].$refs['elSelect'].cachedOptions.push({
+              currentLabel: item.name,
+              currentValue: item.id,
+              label: item.name,
+              value: item.id,
             })
           } else {
             this.examForm.examRadio = 0
@@ -622,7 +612,7 @@ export default {
           }
         })
         this.examForm.readEdit = true
-      }
+      })    
 
       this.examForm.readShow = true
     },
@@ -636,14 +626,21 @@ export default {
 
       await this.getUserList()
       const examUsers = await examUserList({ id })
+      this.examForm.examUser = []
 
-      if (examUsers.data.length > 0) {
-        this.examForm.examUser = []
+      this.$nextTick(() => {
         examUsers.data.map((item) => {
+          console.info(this.examForm.examUser)
           this.examForm.examUser.push(item.id)
+          this.$refs['readSelect'].$refs['elSelect'].cachedOptions.push({
+            currentLabel: item.name,
+            currentValue: item.id,
+            label: item.name,
+            value: item.id,
+          })
         })
         this.examForm.userEdit = true
-      }
+      })
 
       this.examForm.userShow = true
     },
