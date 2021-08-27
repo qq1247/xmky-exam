@@ -103,9 +103,11 @@ export default {
       console.log('====================================');
       const isType =
         this.type !== '*' &&
+        file.type !== '' &&
         file.type.indexOf(this.types[this.type].type) === -1
-      const suffix = this.types.word.accept.indexOf(file.name) != -1// 部分火狐浏览器获取不到word类型，根据后缀名特殊处理下
-      if (isType || suffix) {
+      const suffix = this.type !== '*' && file.type === '' && this.types[this.type].accept.split(',').some((item)=> file.name.indexOf(item) != -1)
+      // 部分火狐浏览器获取不到word类型，根据后缀名特殊处理下
+      if (isType || !suffix) {
         this.$message.warning('文件格式错误')
         return false
       }
