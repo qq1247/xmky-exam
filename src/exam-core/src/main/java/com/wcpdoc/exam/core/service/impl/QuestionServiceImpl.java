@@ -563,7 +563,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			for (int i = 0; i < questionExList.get(j).getQuestionAnswerList().size(); i++) {
 				answers[i] = questionExList.get(j).getQuestionAnswerList().get(i).getAnswer();
 				if (question.getType() == 3 || (question.getType() == 5 && question.getAi() == 1)) {
-					answers[i] = StringUtil.join(answers[i].split(" "), '\n');
+					answers[i] = StringUtil.join(answers[i].split("\\s+"), '\n');// 普通空格分隔符可能导致输入多个空格下有问题
 				}
 				scores[i] = questionExList.get(j).getQuestionAnswerList().get(i).getScore();
 				totalScore.add(scores[i]);
