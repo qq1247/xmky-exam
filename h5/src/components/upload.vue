@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-18 16:50:04
  * @LastEditors: Che
- * @LastEditTime: 2021-08-20 15:11:38
+ * @LastEditTime: 2021-08-30 13:45:39
 -->
 <template>
   <el-upload
@@ -98,14 +98,15 @@ export default {
       this.$message.warning(`最多选择${this.types[this.type].limit}个文件！`)
     },
     beforeUpload(file) {
-      console.log('====================================');
-      console.log(file);
-      console.log('====================================');
       const isType =
         this.type !== '*' &&
         file.type !== '' &&
         file.type.indexOf(this.types[this.type].type) === -1
-      const suffix = this.type !== '*' && this.types[this.type].accept.split(',').some((item)=> file.name.indexOf(item) != -1)
+      const suffix =
+        this.type !== '*' &&
+        this.types[this.type].accept
+          .split(',')
+          .some((item) => file.name.indexOf(item) != -1)
       // 部分火狐浏览器获取不到word类型，根据后缀名特殊处理下
       if (isType || !suffix) {
         this.$message.warning('文件格式错误')

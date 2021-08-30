@@ -210,9 +210,9 @@ import {
   paperDel,
   paperCopy,
   paperPublish,
-} from '@/api/paper'
-import Editor from '@/components/Editor.vue'
-import ListCard from '@/components/ListCard.vue'
+} from 'api/paper'
+import Editor from 'components/Editor.vue'
+import ListCard from 'components/ListCard.vue'
 export default {
   components: {
     Editor,
@@ -517,7 +517,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/style/list-card.scss';
+@import 'assets/style/list-card.scss';
 
 /deep/ .el-dialog__header {
   padding: 0;

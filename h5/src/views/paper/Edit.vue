@@ -117,9 +117,7 @@
               >
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="queryQuestion()"
-                >查询</el-button
-              >
+              <el-button type="primary" @click="search()">查询</el-button>
             </el-form-item>
           </el-form>
           <div class="drags">
@@ -343,13 +341,27 @@
 
                     <div class="children-analysis">
                       <el-row :gutter="10">
-                        <template v-if="[1, 2, 4].includes(child.type)">
+                        <template v-if="[1, 4].includes(child.type)">
                           <el-col :span="2.5"> 【答案】： </el-col>
                           <el-col :span="21">
                             <div
                               v-if="child.answers && child.answers.length > 0"
                               v-html="`${child.answers[0].answer}`"
                             ></div>
+                          </el-col>
+                        </template>
+                        <template v-if="child.type === 2">
+                          <el-col :span="2.5"> 【答案】： </el-col>
+                          <el-col :span="21">
+                            <div
+                              v-if="child.answers && child.answers.length > 0"
+                            >
+                              <span
+                                v-for="answer in child.answers"
+                                :key="answer.id"
+                                >{{ answer.answer }}</span
+                              >
+                            </div>
                           </el-col>
                         </template>
                         <template v-if="child.type === 3">
@@ -511,9 +523,7 @@
             <el-form-item
               v-for="(answer, index) in settingForm.answers"
               :key="index"
-              :label="
-                settingForm.type === 3 ? `填空_${index}` : `关键词_${index}`
-              "
+              :label="settingForm.type === 3 ? `填空` : `关键词`"
               :prop="`answers.${index}.score`"
               :rules="settingForm.rules.aiScore"
               :show-message="settingForm.ai === 1 ? true : false"
@@ -599,7 +609,7 @@
   </div>
 </template>
 <script>
-import { dictListPage } from '@/api/base'
+import { dictListPage } from 'api/base'
 import {
   paperQuestionList,
   paperChapterAdd,
@@ -612,8 +622,8 @@ import {
   paperMovePosition,
   paperTotalScore,
   paperUpdateScoreOptions,
-} from '@/api/paper'
-import { questionListPage, randomListPage } from '@/api/question'
+} from 'api/paper'
+import { questionListPage, randomListPage } from 'api/question'
 import Draggable from 'vuedraggable'
 export default {
   components: {
@@ -747,7 +757,6 @@ export default {
     },
     // 查询试题
     async queryQuestion() {
-      this.curPage = 1
       const res = await questionListPage({
         id: this.queryForm.id,
         type: this.queryForm.type,
@@ -780,6 +789,11 @@ export default {
       this.totalScore = questionList.reduce((acc, cur) => {
         return acc + cur.score
       }, 0)
+    },
+    // 条件查询
+    search() {
+      this.curPage = 1
+      this.queryQuestion()
     },
     // 随机查询试题
     async randomQueryQuestion() {

@@ -98,7 +98,7 @@
 </template>
 
 <script>
-import { myMarkListPage } from '@/api/my'
+import { myMarkListPage } from 'api/my'
 export default {
   data() {
     return {

@@ -563,7 +563,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			for (int i = 0; i < questionExList.get(j).getQuestionAnswerList().size(); i++) {
 				answers[i] = questionExList.get(j).getQuestionAnswerList().get(i).getAnswer();
 				if (question.getType() == 3 || (question.getType() == 5 && question.getAi() == 1)) {
-					answers[i] = StringUtil.join(answers[i].split("\\s+"), '\n');// 普通空格分隔符可能导致输入多个空格下有问题
+					answers[i] = StringUtil.join(answers[i].split(" "), '\n');
 				}
 				scores[i] = questionExList.get(j).getQuestionAnswerList().get(i).getScore();
 				totalScore.add(scores[i]);
@@ -609,7 +609,11 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			throw new MyException("参数错误：targetId");
 		}
 		QuestionType questionType = questionTypeService.getEntity(sourceId);
-		if (questionType.getState() == 0 ){
+		if (questionType == null || questionType.getState() == 0 ){
+			throw new MyException("此分类已被删除！");
+		}
+		QuestionType entity = questionTypeService.getEntity(targetId);
+		if (entity == null || entity.getState() == 0) {
 			throw new MyException("此分类已被删除！");
 		}
 		if (questionType.getCreateUserId() != getCurUser().getId()) {

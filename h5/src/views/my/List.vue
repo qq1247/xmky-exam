@@ -63,9 +63,9 @@ import {
   myMarkListPage,
   myExamAutoScore,
   myExamAiProgress,
-} from '@/api/my'
-import ListCard from '@/components/ListCard.vue'
-import { loginSysTime } from '@/api/common'
+} from 'api/my'
+import ListCard from 'components/ListCard.vue'
+import { loginSysTime } from 'api/common'
 export default {
   components: {
     ListCard,
@@ -99,7 +99,7 @@ export default {
 
       if (this.type === 1) {
         myExamList = await myExamListPage({
-          name: this.queryForm.examName,
+          examName: this.queryForm.examName,
           curPage: this.curPage,
           pageSize: this.pageSize,
         })
@@ -119,7 +119,7 @@ export default {
 
       if (this.type === 2) {
         myExamList = await myMarkListPage({
-          name: this.queryForm.examName,
+          examName: this.queryForm.examName,
           curPage: this.curPage,
           pageSize: this.pageSize,
         })

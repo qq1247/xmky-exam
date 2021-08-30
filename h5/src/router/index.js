@@ -31,20 +31,20 @@ export const constantRoutes = [
     children: [
       {
         path: 'home',
-        component: () => import('@/views/Home'),
+        component: () => import('views/Home'),
         name: 'Home',
         meta: { title: '首页' },
       },
       {
         path: 'login',
-        component: () => import('@/views/base/Login'),
+        component: () => import('views/base/Login'),
         name: 'Login',
         meta: { title: '欢迎登录' },
         hidden: true,
       },
       {
         path: '404',
-        component: () => import('@/views/base/404'),
+        component: () => import('views/base/404'),
         name: '404',
         meta: { title: '404' },
         hidden: true,
@@ -60,39 +60,39 @@ export const constantRoutes = [
     children: [
       {
         path: 'index',
-        component: () => import('@/views/my/Index.vue'),
+        component: () => import('views/my/Index.vue'),
         name: 'MyIndex',
         meta: { title: '我的', icon: 'common common-mine' },
       },
       {
         path: 'exam',
-        component: () => import('@/views/my/List.vue'),
+        component: () => import('views/my/List.vue'),
         name: 'ExamList',
         meta: { title: '我的考试', icon: 'common common-exam', type: 1 },
         hidden: true,
       },
       {
         path: 'mark',
-        component: () => import('@/views/my/List.vue'),
+        component: () => import('views/my/List.vue'),
         name: 'MarkList',
         meta: { title: '我的阅卷', icon: 'common common-mark', type: 2 },
         hidden: true,
       },
       {
         path: 'exam/index',
-        component: () => import('@/views/my/MyExam.vue'),
+        component: () => import('views/my/MyExam.vue'),
         name: 'ExamIndex',
         hidden: true,
       },
       {
         path: 'mark/index',
-        component: () => import('@/views/my/MyMarkExam.vue'),
+        component: () => import('views/my/MyMarkExam.vue'),
         name: 'MarkIndex',
         hidden: true,
       },
       {
         path: 'bulletin',
-        component: () => import('@/views/my/Bulletin.vue'),
+        component: () => import('views/my/Bulletin.vue'),
         name: 'Bulletin',
         meta: {
           title: '我的公告',

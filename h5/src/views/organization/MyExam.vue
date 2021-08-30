@@ -97,7 +97,7 @@
 </template>
 
 <script>
-import { myExamListPage } from '@/api/my'
+import { myExamListPage } from 'api/my'
 export default {
   data() {
     return {

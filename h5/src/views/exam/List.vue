@@ -77,14 +77,13 @@
         <el-form-item label="选择试卷" prop="selectPaperId">
           <CustomSelect
             placeholder="请选择试卷"
+            :multiple="false"
             :value="examForm.selectPaperId"
             :total="examForm.total"
-            :showPage="true"
-            :currentPage="examForm.curPage"
-            :pageSize="examForm.pageSize"
+            @input="searchPaper"
             @change="selectPaper"
-            @focus="getPaperList()"
             @currentChange="getMorePaper"
+            @visibleChange="getPaperList"
           >
             <el-option
               v-for="item in examForm.paperList"
@@ -183,18 +182,11 @@
             <el-form-item label="题号" v-if="examForm.examRadio == 0">
               <CustomSelect
                 placeholder="请选择题号"
-                :multiple="true"
                 :value="examForm.examRemarks[index].examQuestionNum"
                 :total="examForm.total"
-                :showPage="true"
-                :remote="true"
-                :reserveKeyword="true"
-                :filterable="true"
-                :pageSize="examForm.pageSize"
-                :currentPage="examForm.curPage"
-                :remoteMethod="searchQuestionNum"
+                @input="searchQuestionNum"
                 @change="selectQuestionNum($event, index)"
-                @focus="getQuestionNumList()"
+                @visibleChange="getQuestionNumList"
                 @currentChange="getMoreQuestionNum"
               >
                 <el-option
@@ -210,7 +202,7 @@
           <el-col :span="12">
             <el-form-item label="考试用户" v-if="examForm.examRadio == 1">
               <CustomSelect
-                ref="markExamUserSelect" + index
+                ref="markExamUserSelect"
                 placeholder="请选择考试用户"
                 :value="examForm.examRemarks[index].examUser"
                 :total="examForm.total"
@@ -307,12 +299,12 @@ import {
   examEdit,
   examUpdateMarkUser,
   examUpdateExamUser,
-} from '@/api/exam'
-import { paperListPage } from '@/api/paper'
-import { userListPage } from '@/api/user'
-import { questionListPage } from '@/api/question'
-import ListCard from '@/components/ListCard.vue'
-import CustomSelect from '@/components/CustomSelect.vue'
+} from 'api/exam'
+import { paperListPage } from 'api/paper'
+import { userListPage } from 'api/user'
+import { questionListPage } from 'api/question'
+import ListCard from 'components/ListCard.vue'
+import CustomSelect from 'components/CustomSelect.vue'
 import * as dayjs from 'dayjs'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 dayjs.extend(isSameOrBefore)
@@ -449,9 +441,9 @@ export default {
       this.examForm.examRemarks.pop()
     },
     // 获取试卷列表
-    async getPaperList(curPage = 1) {
-      this.examForm.curPage = curPage
+    async getPaperList(curPage = 1, name = '') {
       const paperList = await paperListPage({
+        name,
         state: 1,
         curPage,
         pageSize: this.examForm.pageSize,
@@ -460,8 +452,12 @@ export default {
       this.examForm.total = paperList.data.total
     },
     // 获取更多试卷列表
-    getMorePaper(curPage) {
-      this.getPaperList(curPage)
+    getMorePaper(curPage, name) {
+      this.getPaperList(curPage, name)
+    },
+    // 根据name 查询试卷
+    searchPaper(name) {
+      this.getPaperList(1, name)
     },
     // 选择试卷
     selectPaper(e) {
@@ -581,12 +577,9 @@ export default {
       this.examForm.id = id
       this.examForm.paperId = paperId
 
-      await this.getUserList()
-      await this.getQuestionNumList()
       const examMarkUser = await examMarkUserList({ id })
 
       this.$nextTick(() => {
-        this.examForm.examRemarks = []
         examMarkUser.data.map((item, index) => {
           if (item?.examUserList) {
             this.examForm.examRadio = 1
@@ -596,14 +589,23 @@ export default {
               examQuestionNum: [],
             })
 
-            this.$refs['markExamUserSelect' + index].$refs['elSelect'].cachedOptions.push({
-              currentLabel: item.name,
-              currentValue: item.id,
-              label: item.name,
-              value: item.id,
-            })
+            const cachedOptions = item.examUserList.reduce((acc, cur) => {
+              acc.push({
+                currentLabel: cur.name,
+                currentValue: cur.id,
+                label: cur.name,
+                value: cur.id,
+              })
+              return acc
+            }, [])
+
+            console.log(this.$refs)
+
+            this.$refs['markExamUserSelect'].$refs[
+              'elSelect'
+            ].cachedOptions.push(...cachedOptions)
           } else {
-            this.examForm.examRadio = 0
+            this.examForm.examRadio = 1
             this.examForm.examRemarks.push({
               examCheckPerson: item.markUserId,
               examUser: [],
@@ -611,8 +613,19 @@ export default {
             })
           }
         })
+
+        examUsers.data.map((item) => {
+          this.examForm.examUser.push(item.id)
+          this.$refs['readSelect'].$refs['elSelect'].cachedOptions.push({
+            currentLabel: item.name,
+            currentValue: item.id,
+            label: item.name,
+            value: item.id,
+          })
+        })
+
         this.examForm.readEdit = true
-      })    
+      })
 
       this.examForm.readShow = true
     },
@@ -624,13 +637,11 @@ export default {
       }
       this.examForm.id = id
 
-      await this.getUserList()
       const examUsers = await examUserList({ id })
       this.examForm.examUser = []
 
       this.$nextTick(() => {
         examUsers.data.map((item) => {
-          console.info(this.examForm.examUser)
           this.examForm.examUser.push(item.id)
           this.$refs['readSelect'].$refs['elSelect'].cachedOptions.push({
             currentLabel: item.name,

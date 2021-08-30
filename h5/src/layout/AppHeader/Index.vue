@@ -37,7 +37,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/assets/style/variables.scss';
+@import 'assets/style/variables.scss';
 .app-header {
   position: fixed;
   top: 0;

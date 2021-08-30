@@ -140,7 +140,7 @@
 </template>
 
 <script>
-import { dictListPage, dictAdd, dictEdit, dictGet, dictDel } from '@/api/base'
+import { dictListPage, dictAdd, dictEdit, dictGet, dictDel } from 'api/base'
 export default {
   data() {
     return {

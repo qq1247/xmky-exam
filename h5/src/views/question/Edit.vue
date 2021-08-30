@@ -84,7 +84,7 @@
           >
             <img :src="btn.img" />
             {{ btn.name }}
-            <img src="@/assets/img/icon/active-icon.png" />
+            <img src="../../assets/img/icon/active-icon.png" />
           </div>
         </div>
         <div class="splitLine"></div>
@@ -606,8 +606,8 @@
   </div>
 </template>
 <script>
-import { dictListPage } from '@/api/base'
-import Upload from '@/components/upload'
+import { dictListPage } from 'api/base'
+import Upload from 'components/upload'
 import Driver from 'driver.js'
 import 'driver.js/dist/driver.min.css'
 import { driverSetting, questionDriverStep } from '@/utils/driverGuide.js'
@@ -622,9 +622,9 @@ import {
   questionImport,
   questionEdit,
   questionPublish,
-} from '@/api/question'
-import Editor from '@/components/Editor.vue'
-import EditHeader from '@/components/EditHeader.vue'
+} from 'api/question'
+import Editor from 'components/Editor.vue'
+import EditHeader from 'components/EditHeader.vue'
 export default {
   components: {
     Editor,
@@ -764,46 +764,46 @@ export default {
         {
           type: 1,
           name: '单选题',
-          img: require('@/assets/img/icon/radio-icon.png'),
+          img: require('assets/img/icon/radio-icon.png'),
         },
         {
           type: 2,
           name: '多选题',
-          img: require('@/assets/img/icon/checkbox-icon.png'),
+          img: require('assets/img/icon/checkbox-icon.png'),
         },
         {
           type: 3,
           name: '填空题',
-          img: require('@/assets/img/icon/blanks-icon.png'),
+          img: require('assets/img/icon/blanks-icon.png'),
         },
         {
           type: 4,
           name: '判断题',
-          img: require('@/assets/img/icon/judge-icon.png'),
+          img: require('assets/img/icon/judge-icon.png'),
         },
         {
           type: 5,
           name: '问答题',
-          img: require('@/assets/img/icon/ask-icon.png'),
+          img: require('assets/img/icon/ask-icon.png'),
         },
       ],
       handlerButtonGroup: [
         // 左侧按钮组2
         {
           name: '试题模板',
-          img: require('@/assets/img/icon/template-icon.png'),
+          img: require('assets/img/icon/template-icon.png'),
         },
         {
           name: '试题导入',
-          img: require('@/assets/img/icon/import-icon.png'),
+          img: require('assets/img/icon/import-icon.png'),
         },
         /* {
           name: "试题导出",
-          img: require("@/assets/img/icon/export-icon.png")
+          img: require("assets/img/icon/export-icon.png")
         },
         {
           name: "清空试题",
-          img: require("@/assets/img/icon/clear-icon.png")
+          img: require("assets/img/icon/clear-icon.png")
         } */
       ],
       fileForm: {
@@ -1226,12 +1226,12 @@ export default {
     },
     // 上传试题模板失败
     templateClear(ref) {
+      this.fileForm.questionDocIds = []
       this.$refs[ref].clear()
     },
     // 删除试题模板
     templateRemove(file, fileList) {
       this.fileForm.questionDocIds = []
-      console.log('upload_remove', file, fileList)
     },
   },
 }

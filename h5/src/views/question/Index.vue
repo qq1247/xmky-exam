@@ -190,10 +190,10 @@ import {
   questionTypeMove,
   questionTypeAuth,
   questionTypeDel,
-} from '@/api/question'
-import { userListPage } from '@/api/user'
-import ListCard from '@/components/ListCard.vue'
-import CustomSelect from '@/components/CustomSelect.vue'
+} from 'api/question'
+import { userListPage } from 'api/user'
+import ListCard from 'components/ListCard.vue'
+import CustomSelect from 'components/CustomSelect.vue'
 export default {
   components: {
     ListCard,
@@ -403,6 +403,7 @@ export default {
         )
       })
     },
+    // 组合回显数据
     compositionRoles(userIds, userNames) {
       const ids = userIds
         .split(',')
@@ -426,6 +427,11 @@ export default {
     },
     // 移动试题分类
     async questionMove() {
+      if (!this.examForm.questionType) {
+        this.$message.warning('请选择试题分类')
+        return
+      }
+
       const res = await questionTypeMove({
         sourceId: this.examForm.id,
         targetId: this.examForm.questionType,

@@ -28,7 +28,6 @@ import com.wcpdoc.exam.core.entity.PaperType;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
-import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.PaperQuestionAnswerService;
 import com.wcpdoc.exam.core.service.PaperQuestionService;
@@ -360,7 +359,6 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	
 	@Override
 	public void scoreUpdate(Integer paperQuestionId, BigDecimal score, Integer[] paperQuestionAnswerId, BigDecimal[] paperQuestionAnswerScore) {
-		System.err.println("修改分数："+paperQuestionId+"，————————————————————————"+score);
 		//校验数据有效性
 		if(paperQuestionId == null) {
 			throw new MyException("无法获取参数：paperQuestionId");
@@ -378,23 +376,21 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		}
 		// 设置答案分数
 		
-		if (paperQuestionAnswerId != null && paperQuestionAnswerScore != null && paperQuestionAnswerId.length != paperQuestionAnswerScore.length) {
+		if (paperQuestionAnswerId.length != paperQuestionAnswerScore.length) {
 			throw new MyException("答案或分值有误！");
 		}
 		BigDecimal scoreSum = new BigDecimal(0);
 		PaperQuestionAnswer paperQuestionAnswer = null;
-		if (paperQuestionAnswerId != null && paperQuestionAnswerScore != null) {
-			for (int i = 0; i < paperQuestionAnswerId.length; i++) {
-				paperQuestionAnswer = paperQuestionAnswerService.getEntity(paperQuestionAnswerId[i]);
-				paperQuestionAnswer.setScore(paperQuestionAnswerScore[i]);
-				paperQuestionAnswerService.update(paperQuestionAnswer);
-				scoreSum = scoreSum.add(paperQuestionAnswerScore[i]);
-			}
+		for (int i = 0; i < paperQuestionAnswerId.length; i++) {
+			paperQuestionAnswer = paperQuestionAnswerService.getEntity(paperQuestionAnswerId[i]);
+			paperQuestionAnswer.setScore(paperQuestionAnswerScore[i]);
+			paperQuestionAnswerService.update(paperQuestionAnswer);
+			scoreSum = scoreSum.add(paperQuestionAnswerScore[i]);
+		}
 		
 		Question question = questionService.getEntity(paperQuestionAnswer.getQuestionId());
-		if (question.getAi() == 1 && scoreSum.compareTo(score) != 0 && question.getType() != 2 && question.getType() != 1 && question.getType() != 4) {
+		if (scoreSum.compareTo(score) != 0 && question.getType() != 1 && question.getType() != 4) {
 			throw new MyException("答案分值与总分值不符！");
-		}
 		}
 		
 		// 设置分数
@@ -405,7 +401,6 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	
 	@Override
 	public void optionsUpdate(Integer paperQuestionId, Integer[] scoreOptions) {
-		System.err.println("修改选择项："+paperQuestionId);
 		// 校验数据有效性
 		if (paperQuestionId == null) {
 			throw new MyException("无法获取参数：paperQuestionId");
@@ -422,9 +417,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		// 更新试卷选项
 		PaperQuestion pq = paperQuestionService.getEntity(paperQuestionId);
 		Question question = questionService.getEntity(pq.getQuestionId());
-		if (scoreOptions == null || scoreOptions.length == 0) {
-			pq.setScoreOptions(null);
-		} else if (question.getType() == 2) {
+		if (question.getType() == 2) {
 			if (ValidateUtil.isValid(scoreOptions) && StringUtil.join(scoreOptions).contains("1")) {
 				pq.setScoreOptions("1");
 			} else {
@@ -433,8 +426,8 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		} else if (question.getType() == 3) {
 			pq.setScoreOptions(StringUtil.join(scoreOptions));
 		} else if (question.getType() == 5) {
-			pq.setScoreOptions(StringUtil.join(scoreOptions));
-		} else {
+				pq.setScoreOptions(StringUtil.join(scoreOptions));
+			} else {
 			pq.setScoreOptions(null);
 		}
 
@@ -555,7 +548,11 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			throw new MyException("参数错误：targetId");
 		}
 		PaperType paperType = paperTypeService.getEntity(sourceId);
-		if (paperType.getState() == 0 ){
+		if (paperType == null || paperType.getState() == 0 ){
+			throw new MyException("此分类已被删除！");
+		}
+		PaperType entity = paperTypeService.getEntity(targetId);
+		if (entity == null || entity.getState() == 0 ){
 			throw new MyException("此分类已被删除！");
 		}
 		if (paperType.getCreateUserId() != getCurUser().getId()) {
@@ -692,9 +689,9 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 					}
 				//}
 				
-				QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-				boolean writeAuth = questionTypeService.hasWriteAuth(questionType, getCurUser().getId());
-				boolean readAuth = questionTypeService.hasReadAuth(questionType, getCurUser().getId());
+				//QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId()); //子管理员应该可以看到答案   2021-08-30 15:57:33
+				//boolean writeAuth = questionTypeService.hasWriteAuth(questionType, getCurUser().getId());
+				//boolean readAuth = questionTypeService.hasReadAuth(questionType, getCurUser().getId());
 				List<PaperQuestionAnswer> paperQuestionAnswerList = paperQuestionAnswerService.getPaperQuestionAnswerList(chapter.getId(), question.getId());
 
 				List<Map<String, Object>> questionAnswerSplitList = new ArrayList<Map<String, Object>>();
@@ -729,11 +726,11 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 					}
 				}
 				
-				if (!writeAuth && !readAuth) {
+				/*if (!writeAuth && !readAuth) { //子管理员应该可以看到答案   2021-08-30 15:57:33
 					for(Map<String, Object> forMap : questionAnswerSplitList){
-						forMap.put("answer", null);
+						forMap.put("answer", "");
 					}
-				}
+				}*/
 				questionMap.put("answers", questionAnswerSplitList);
 
 				questionsListMap.add(questionMap);

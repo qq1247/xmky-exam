@@ -189,11 +189,11 @@ import {
   bulletinEdit,
   bulletinDel,
   bulletinGet,
-} from '@/api/base'
-import { userListPage } from '@/api/user'
-import Editor from '@/components/Editor.vue'
-import EditHeader from '@/components/EditHeader.vue'
-import CustomSelect from '@/components/CustomSelect.vue'
+} from 'api/base'
+import { userListPage } from 'api/user'
+import Editor from 'components/Editor.vue'
+import EditHeader from 'components/EditHeader.vue'
+import CustomSelect from 'components/CustomSelect.vue'
 export default {
   components: {
     Editor,
