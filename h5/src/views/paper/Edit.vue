@@ -747,6 +747,7 @@ export default {
     },
     // 查询试题
     async queryQuestion() {
+      this.curPage = 1
       const res = await questionListPage({
         id: this.queryForm.id,
         type: this.queryForm.type,
