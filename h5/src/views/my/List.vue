@@ -99,7 +99,7 @@ export default {
 
       if (this.type === 1) {
         myExamList = await myExamListPage({
-          name: this.queryForm.examName,
+          examName: this.queryForm.examName,
           curPage: this.curPage,
           pageSize: this.pageSize,
         })
@@ -119,7 +119,7 @@ export default {
 
       if (this.type === 2) {
         myExamList = await myMarkListPage({
-          name: this.queryForm.examName,
+          examName: this.queryForm.examName,
           curPage: this.curPage,
           pageSize: this.pageSize,
         })
