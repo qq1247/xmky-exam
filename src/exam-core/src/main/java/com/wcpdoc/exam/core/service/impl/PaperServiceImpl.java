@@ -359,7 +359,6 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	
 	@Override
 	public void scoreUpdate(Integer paperQuestionId, BigDecimal score, Integer[] paperQuestionAnswerId, BigDecimal[] paperQuestionAnswerScore) {
-		System.err.println("修改分数："+paperQuestionId+"，————————————————————————"+score);
 		//校验数据有效性
 		if(paperQuestionId == null) {
 			throw new MyException("无法获取参数：paperQuestionId");
@@ -404,7 +403,6 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	
 	@Override
 	public void optionsUpdate(Integer paperQuestionId, Integer[] scoreOptions) {
-		System.err.println("修改选择项："+paperQuestionId);
 		// 校验数据有效性
 		if (paperQuestionId == null) {
 			throw new MyException("无法获取参数：paperQuestionId");
