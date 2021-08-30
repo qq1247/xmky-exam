@@ -725,7 +725,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 				
 				if (!writeAuth && !readAuth) {
 					for(Map<String, Object> forMap : questionAnswerSplitList){
-						forMap.put("answer", null);
+						forMap.put("answer", "");
 					}
 				}
 				questionMap.put("answers", questionAnswerSplitList);
