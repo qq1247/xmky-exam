@@ -117,9 +117,7 @@
               >
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="queryQuestion()"
-                >查询</el-button
-              >
+              <el-button type="primary" @click="search()">查询</el-button>
             </el-form-item>
           </el-form>
           <div class="drags">
@@ -525,9 +523,7 @@
             <el-form-item
               v-for="(answer, index) in settingForm.answers"
               :key="index"
-              :label="
-                settingForm.type === 3 ? `填空` : `关键词`
-              "
+              :label="settingForm.type === 3 ? `填空` : `关键词`"
               :prop="`answers.${index}.score`"
               :rules="settingForm.rules.aiScore"
               :show-message="settingForm.ai === 1 ? true : false"
@@ -793,6 +789,11 @@ export default {
       this.totalScore = questionList.reduce((acc, cur) => {
         return acc + cur.score
       }, 0)
+    },
+    // 条件查询
+    search() {
+      this.curPage = 1
+      this.queryQuestion()
     },
     // 随机查询试题
     async randomQueryQuestion() {
