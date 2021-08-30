@@ -167,6 +167,7 @@ public class ApiUserController extends BaseController {
 				changeLoginName = true;
 			}
 
+			entity.setOrgId(user.getOrgId());
 			entity.setRoles(user.getRoles().contains("subAdmin") ? "user,subAdmin" : "user");
 			entity.setName(user.getName());
 			entity.setLoginName(user.getLoginName());
@@ -257,7 +258,7 @@ public class ApiUserController extends BaseController {
 	 * @param orgId
 	 * @return PageResult
 	 */
-	@RequestMapping("/orgUpdate")
+	/*@RequestMapping("/orgUpdate")
 	@ResponseBody
 	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult orgUpdate(Integer id, Integer orgId) {
@@ -287,7 +288,7 @@ public class ApiUserController extends BaseController {
 			log.error("设置组织机构错误：", e);
 			return PageResult.err();
 		}
-	}
+	}*/
 
 	/**
 	 * 初始化密码

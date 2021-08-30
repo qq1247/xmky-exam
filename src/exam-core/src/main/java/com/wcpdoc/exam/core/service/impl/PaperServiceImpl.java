@@ -28,7 +28,6 @@ import com.wcpdoc.exam.core.entity.PaperType;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
-import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.PaperQuestionAnswerService;
 import com.wcpdoc.exam.core.service.PaperQuestionService;
@@ -686,9 +685,9 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 					}
 				//}
 				
-				QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-				boolean writeAuth = questionTypeService.hasWriteAuth(questionType, getCurUser().getId());
-				boolean readAuth = questionTypeService.hasReadAuth(questionType, getCurUser().getId());
+				//QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId()); //子管理员应该可以看到答案   2021-08-30 15:57:33
+				//boolean writeAuth = questionTypeService.hasWriteAuth(questionType, getCurUser().getId());
+				//boolean readAuth = questionTypeService.hasReadAuth(questionType, getCurUser().getId());
 				List<PaperQuestionAnswer> paperQuestionAnswerList = paperQuestionAnswerService.getPaperQuestionAnswerList(chapter.getId(), question.getId());
 
 				List<Map<String, Object>> questionAnswerSplitList = new ArrayList<Map<String, Object>>();
@@ -723,11 +722,11 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 					}
 				}
 				
-				if (!writeAuth && !readAuth) {
+				/*if (!writeAuth && !readAuth) { //子管理员应该可以看到答案   2021-08-30 15:57:33
 					for(Map<String, Object> forMap : questionAnswerSplitList){
 						forMap.put("answer", "");
 					}
-				}
+				}*/
 				questionMap.put("answers", questionAnswerSplitList);
 
 				questionsListMap.add(questionMap);
