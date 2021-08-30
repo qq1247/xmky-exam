@@ -554,7 +554,11 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			throw new MyException("参数错误：targetId");
 		}
 		PaperType paperType = paperTypeService.getEntity(sourceId);
-		if (paperType.getState() == 0 ){
+		if (paperType == null || paperType.getState() == 0 ){
+			throw new MyException("此分类已被删除！");
+		}
+		PaperType entity = paperTypeService.getEntity(targetId);
+		if (entity == null || entity.getState() == 0 ){
 			throw new MyException("此分类已被删除！");
 		}
 		if (paperType.getCreateUserId() != getCurUser().getId()) {
