@@ -376,23 +376,21 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		}
 		// 设置答案分数
 		
-		if (paperQuestionAnswerId != null && paperQuestionAnswerScore != null && paperQuestionAnswerId.length != paperQuestionAnswerScore.length) {
+		if (paperQuestionAnswerId.length != paperQuestionAnswerScore.length) {
 			throw new MyException("答案或分值有误！");
 		}
 		BigDecimal scoreSum = new BigDecimal(0);
 		PaperQuestionAnswer paperQuestionAnswer = null;
-		if (paperQuestionAnswerId != null && paperQuestionAnswerScore != null) {
-			for (int i = 0; i < paperQuestionAnswerId.length; i++) {
-				paperQuestionAnswer = paperQuestionAnswerService.getEntity(paperQuestionAnswerId[i]);
-				paperQuestionAnswer.setScore(paperQuestionAnswerScore[i]);
-				paperQuestionAnswerService.update(paperQuestionAnswer);
-				scoreSum = scoreSum.add(paperQuestionAnswerScore[i]);
-			}
+		for (int i = 0; i < paperQuestionAnswerId.length; i++) {
+			paperQuestionAnswer = paperQuestionAnswerService.getEntity(paperQuestionAnswerId[i]);
+			paperQuestionAnswer.setScore(paperQuestionAnswerScore[i]);
+			paperQuestionAnswerService.update(paperQuestionAnswer);
+			scoreSum = scoreSum.add(paperQuestionAnswerScore[i]);
+		}
 		
 		Question question = questionService.getEntity(paperQuestionAnswer.getQuestionId());
-		if (question.getAi() == 1 && scoreSum.compareTo(score) != 0 && question.getType() != 2 && question.getType() != 1 && question.getType() != 4) {
+		if (scoreSum.compareTo(score) != 0 && question.getType() != 1 && question.getType() != 4) {
 			throw new MyException("答案分值与总分值不符！");
-		}
 		}
 		
 		// 设置分数
@@ -419,9 +417,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		// 更新试卷选项
 		PaperQuestion pq = paperQuestionService.getEntity(paperQuestionId);
 		Question question = questionService.getEntity(pq.getQuestionId());
-		if (scoreOptions == null || scoreOptions.length == 0) {
-			pq.setScoreOptions(null);
-		} else if (question.getType() == 2) {
+		if (question.getType() == 2) {
 			if (ValidateUtil.isValid(scoreOptions) && StringUtil.join(scoreOptions).contains("1")) {
 				pq.setScoreOptions("1");
 			} else {
@@ -430,8 +426,8 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		} else if (question.getType() == 3) {
 			pq.setScoreOptions(StringUtil.join(scoreOptions));
 		} else if (question.getType() == 5) {
-			pq.setScoreOptions(StringUtil.join(scoreOptions));
-		} else {
+				pq.setScoreOptions(StringUtil.join(scoreOptions));
+			} else {
 			pq.setScoreOptions(null);
 		}
 

@@ -156,7 +156,7 @@ import {
   cronStartTask,
   cronStopTask,
   cronrunOnceTask,
-} from '@/api/base'
+} from 'api/base'
 export default {
   data() {
     return {

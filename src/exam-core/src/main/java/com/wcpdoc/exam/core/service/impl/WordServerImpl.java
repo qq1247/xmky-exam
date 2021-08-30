@@ -310,7 +310,7 @@ public class WordServerImpl extends WordServer {
 	}
 	
 	private String parseAnalysis(List<Node> analysisRows) {
-		return getTxt(analysisRows, 0, analysisRows.size()).replaceFirst("【", "").replaceFirst("解析", "").replaceFirst("】", "");//html可能会把前四个字符分隔显示
+		return getTxt(analysisRows, 0, analysisRows.size());
 	}
 
 	private AI parseAi(List<Node> aiRows) {
@@ -366,16 +366,12 @@ public class WordServerImpl extends WordServer {
 				}
 				QuestionAnswer questionAnswer = new QuestionAnswer();
 				questionAnswer.setAnswer(answer);// 多选按逗号分隔
-				if (type == 4) {
-					questionAnswer.setAnswer("对是√".contains(questionAnswer.getAnswer()) ? "对" :
-						"否错×".contains(questionAnswer.getAnswer()) ? "错" : "对");
-				}
 				questionAnswer.setScore(new BigDecimal(score.toString()));
 				answerScoreList.add(questionAnswer);
 			}
 		} else if (type == 5 && ai.getAi() == 2) {// 问答、非智能阅卷
 			String answerTxt = getTxt(answerNodeList, 0, answerNodeList.size());
-			answerTxt = answerTxt.replaceFirst("【", "").replaceFirst("答", "").replaceFirst("案", "").replaceFirst("：", "");
+			answerTxt.replace("【答案", "").replace("：", "");
 			int lastIndex = answerTxt.lastIndexOf("】");
 			if (lastIndex == -1) {
 				throw new MyException(String.format("答案格式不正确：%s】", StringUtil.delHTMLTag(answerNodeList.toString())));
@@ -457,20 +453,15 @@ public class WordServerImpl extends WordServer {
 
 	private String parseTitle(List<Node> titleRows) {
 		String txt = getTxt(titleRows, 0, titleRows.size());
-		String txtUnWithStyle = Jsoup.clean(txt, Whitelist.none()).trim();
 		for (String type : types) {
-			if (txtUnWithStyle.contains(type)) {// 找到只替换第一个
-				for (String t : type.split("")) {
-					txt = txt.replaceFirst(t, "");
-				}
+			if (txt.contains(type)) {// 找到只替换第一个
+				txt = txt.replace(type, "");
 				break;
 			}
 		}
 		for (String difficulty : difficultys) {
-			if (txtUnWithStyle.contains(difficulty)) {// 找到只替换第一个
-				for (String d : difficulty.split("")) {
-					txt = txt.replaceFirst(d, "");
-				}
+			if (txt.contains(difficulty)) {// 找到只替换第一个
+				txt = txt.replace(difficulty, "");
 				break;
 			}
 		}

@@ -28,7 +28,7 @@
         </el-row>
         <el-row :gutter="20" class="content-info">
           <el-col :span="12" class="info-left"
-            >及格：{{ data.passScore }}</el-col
+            >及格：{{ (data.passScore * data.totalScore) / 100 }}</el-col
           >
           <el-col :span="12" class="info-right"
             >满分：{{ data.totalScore }}</el-col

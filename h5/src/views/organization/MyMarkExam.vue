@@ -93,7 +93,7 @@
 </template>
 
 <script>
-import { myMarkExamListPage } from '@/api/my'
+import { myMarkExamListPage } from 'api/my'
 export default {
   data() {
     return {

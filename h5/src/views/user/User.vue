@@ -113,27 +113,21 @@
       <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
         <el-form-item label="机构名称" label-width="120px">
           <CustomSelect
-            :currentPage="editForm.orgListpage.curPage"
-            :filterable="true"
             :multiple="false"
-            :pageSize="editForm.orgListpage.pageSize"
-            :remote="true"
-            :remoteMethod="searchOrg"
-            :reserveKeyword="true"
-            :showPage="true"
-            :tags="true"
-            :total="editForm.orgListpage.total"
+            ref="addUserSelect"
+            placeholder="请选择机构"
             :value="editForm.orgId"
+            :total="editForm.orgListpage.total"
+            @input="searchOrg"
             @change="selectOrg"
             @currentChange="getMoreOrg"
-            @focus="getOrgList()"
-            placeholder="请选择机构"
+            @visibleChange="getOrgList"
           >
             <el-option
+              v-for="item in editForm.orgListpage.list"
               :key="item.id"
               :label="item.name"
               :value="item.id"
-              v-for="item in editForm.orgListpage.list"
             ></el-option>
           </CustomSelect>
         </el-form-item>
@@ -177,9 +171,9 @@ import {
   userInitPwd,
   userDel,
   userGet,
-} from '@/api/user'
-import { orgListPage } from '@/api/base'
-import CustomSelect from '@/components/CustomSelect.vue'
+} from 'api/user'
+import { orgListPage } from 'api/base'
+import CustomSelect from 'components/CustomSelect.vue'
 export default {
   components: {
     CustomSelect,
@@ -363,9 +357,9 @@ export default {
       this.editForm.roles = res.data.roles
     },
     // 获取机构列表
-    async getOrgList(curPage = 1) {
+    async getOrgList(curPage = 1, name = '') {
       const orgList = await orgListPage({
-        // name,
+        name,
         curPage,
         pageSize: this.editForm.orgListpage.pageSize,
       })
@@ -373,12 +367,12 @@ export default {
       this.editForm.orgListpage.total = orgList.data.total
     },
     // 获取更多用户
-    getMoreOrg(curPage) {
-      this.getOrgList(curPage)
+    getMoreOrg(curPage, name) {
+      this.getOrgList(curPage, name)
     },
     // 根据name查询机构
     searchOrg(name) {
-      this.getOrgList(name)
+      this.getOrgList(1, name)
     },
     // 选择考试用户
     selectOrg(e) {

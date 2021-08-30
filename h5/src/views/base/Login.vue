@@ -31,7 +31,8 @@
         ></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" class="login-btn" @click="login('ruleForm')"
+        <el-button type="primary" class="login-btn"
+@click="login('ruleForm')"
           >登录</el-button
         >
       </el-form-item>

@@ -201,10 +201,10 @@
   </div>
 </template>
 <script>
-import { paperGet, paperQuestionList } from '@/api/paper'
-import { myExamAnswerList, myExamUpdateAnswer, myExamDoAnswer } from '@/api/my'
-import CountDown from '@/components/CountDown.vue'
-import { loginSysTime } from '@/api/common'
+import { paperGet, paperQuestionList } from 'api/paper'
+import { myExamAnswerList, myExamUpdateAnswer, myExamDoAnswer } from 'api/my'
+import CountDown from 'components/CountDown.vue'
+import { loginSysTime } from 'api/common'
 export default {
   components: {
     CountDown,
@@ -377,5 +377,5 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-@import '@/assets/style/exam.scss';
+@import 'assets/style/exam.scss';
 </style>

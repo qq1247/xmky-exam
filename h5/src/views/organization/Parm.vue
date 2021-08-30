@@ -154,7 +154,7 @@
 </template>
 
 <script>
-import { parmListPage, parmAdd, parmEdit, parmGet, parmDel } from '@/api/base'
+import { parmListPage, parmAdd, parmEdit, parmGet, parmDel } from 'api/base'
 export default {
   data() {
     return {
