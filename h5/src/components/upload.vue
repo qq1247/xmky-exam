@@ -1,7 +1,7 @@
 <!--
  * @Description: 封装上传组件
  * @Version: 1.0
- * @Company: 
+ * @Company:
  * @Author: Che
  * @Date: 2021-08-18 16:50:04
  * @LastEditors: Che
@@ -24,7 +24,8 @@
     :on-success="success"
     :before-upload="beforeUpload"
   >
-    <el-button size="small" type="primary" v-if="type !== 'image'"
+    <el-button size="small" type="primary"
+v-if="type !== 'image'"
       >点击上传</el-button
     >
     <i class="el-icon-plus" v-else></i>
@@ -98,13 +99,13 @@ export default {
       this.$message.warning(`最多选择${this.types[this.type].limit}个文件！`)
     },
     beforeUpload(file) {
-      console.log('====================================');
-      console.log(file);
-      console.log('====================================');
+      console.log('====================================')
+      console.log(file)
+      console.log('====================================')
       const isType =
         this.type !== '*' &&
         file.type.indexOf(this.types[this.type].type) === -1
-      const suffix = this.types.word.accept.indexOf(file.name) != -1// 部分火狐浏览器获取不到word类型，根据后缀名特殊处理下
+      const suffix = this.types.word.accept.indexOf(file.name) != -1 // 部分火狐浏览器获取不到word类型，根据后缀名特殊处理下
       if (isType || suffix) {
         this.$message.warning('文件格式错误')
         return false

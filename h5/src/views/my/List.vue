@@ -63,9 +63,9 @@ import {
   myMarkListPage,
   myExamAutoScore,
   myExamAiProgress,
-} from '@/api/my'
-import ListCard from '@/components/ListCard.vue'
-import { loginSysTime } from '@/api/common'
+} from 'api/my'
+import ListCard from 'components/ListCard.vue'
+import { loginSysTime } from 'api/common'
 export default {
   components: {
     ListCard,

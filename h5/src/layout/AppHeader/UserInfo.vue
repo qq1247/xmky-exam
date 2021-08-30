@@ -57,7 +57,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { loginPwdUpdate } from '@/api/common'
+import { loginPwdUpdate } from 'api/common'
 export default {
   name: 'UserInfo',
   data() {

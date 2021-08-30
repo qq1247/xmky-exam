@@ -107,7 +107,7 @@
 </template>
 
 <script>
-import { orgListPage, orgAdd, orgEdit, orgGet, orgDel } from '@/api/base'
+import { orgListPage, orgAdd, orgEdit, orgGet, orgDel } from 'api/base'
 export default {
   data() {
     return {

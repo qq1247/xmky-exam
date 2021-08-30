@@ -26,7 +26,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/assets/style/variables.scss';
+@import 'assets/style/variables.scss';
 // footer
 .app-footer {
   height: 50px;

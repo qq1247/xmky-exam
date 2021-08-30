@@ -43,7 +43,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/assets/style/element-variables.scss';
+@import 'assets/style/element-variables.scss';
 .app-container {
   position: relative;
   width: 100%;

@@ -149,10 +149,10 @@ import {
   examTypeAdd,
   examTypeDel,
   examTypeAuth,
-} from '@/api/exam'
-import { userListPage } from '@/api/user'
-import ListCard from '@/components/ListCard.vue'
-import CustomSelect from '@/components/CustomSelect.vue'
+} from 'api/exam'
+import { userListPage } from 'api/user'
+import ListCard from 'components/ListCard.vue'
+import CustomSelect from 'components/CustomSelect.vue'
 export default {
   components: {
     ListCard,

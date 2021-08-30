@@ -35,7 +35,7 @@
             <div class="box-title">
               <i class="common common-time"></i><span>考试安排</span>
             </div>
-            <el-calendar v-model="now">
+            <Calendar v-model="now" :data="examData" @selectDate="selectDate">
               <template #dateCell="{ date, data }">
                 <div
                   class="date-cell"
@@ -46,7 +46,7 @@
                   </div>
                 </div>
               </template>
-            </el-calendar>
+            </Calendar>
           </template>
           <template>
             <div class="box-title">
@@ -182,13 +182,15 @@
 </template>
 
 <script>
-import { myExamListPage, myMarkListPage } from '@/api/my'
-import { bulletinListPage } from '@/api/base'
+import { myExamListPage, myMarkListPage } from 'api/my'
+import { bulletinListPage } from 'api/base'
 import getMainColor from '@/utils/getImageColor.js'
 import * as dayjs from 'dayjs'
+import Calendar from 'components/Calendar/index'
 export default {
   data() {
     return {
+      examData: [],
       examList: [],
       markList: [],
       examStatus: ['', '待考', '考试', '已考', '已考'],
@@ -204,6 +206,9 @@ export default {
       ],
       now: new Date(),
     }
+  },
+  components: {
+    Calendar,
   },
   created() {
     this.init()
@@ -276,25 +281,51 @@ export default {
         this.carouselList = list
       }
     },
+    selectDate(time) {
+      this.renderExamCalendar(time)
+    },
     // 渲染日历
-    async renderExamCalendar() {
-      const days = dayjs().daysInMonth()
-      const startDate = dayjs().date(1).format('YYYY-MM-DD')
-      const endDate = dayjs().date(days).format('YYYY-MM-DD')
+    async renderExamCalendar(time) {
+      const days = dayjs(time).daysInMonth()
+      const startDate = time || dayjs().date(1).format('YYYY-MM-DD')
+      const endDate = dayjs(time).date(days).format('YYYY-MM-DD')
       const examList = await myExamListPage({
         curPage: 1,
-        pageSize: 10,
+        pageSize: 100,
         startDate: `${startDate} 00:00:00`,
         endDate: `${endDate} 23:59:59`,
       })
       const markList = await myMarkListPage({
         curPage: 1,
-        pageSize: 10,
+        pageSize: 100,
         startDate: `${startDate} 00:00:00`,
         endDate: `${endDate} 23:59:59`,
       })
-      console.log(examList)
-      console.log(markList)
+      console.log(examList.data.list)
+
+      examList.data.list.reduce((acc, exam) => {
+        const params = markList.data.list.filter((mark) => {
+          const examTime = dayjs(exam.examStartTime).format('YYYY-MM-DD')
+          const markTime = dayjs(mark.markStartTime).format('YYYY-MM-DD')
+          if (dayjs(examTime).isSame(dayjs(markTime))) {
+            const key = dayjs(examTime).date()
+            const value = {
+              exam: {
+                startTime: exam.examStartTime,
+                endTime: exam.examEndTime,
+              },
+              mark: {
+                startTime: mark.markStartTime,
+                endTime: mark.markEndTime,
+              },
+            }
+            return {
+              [key]: value,
+            }
+          }
+        })
+        acc = Object.assign(acc, params)
+      }, {})
     },
   },
 }

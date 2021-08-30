@@ -149,10 +149,10 @@ import {
   paperTypeAdd,
   paperTypeDel,
   paperTypeAuth,
-} from '@/api/paper'
-import { userListPage } from '@/api/user'
-import ListCard from '@/components/ListCard.vue'
-import CustomSelect from '@/components/CustomSelect.vue'
+} from 'api/paper'
+import { userListPage } from 'api/user'
+import ListCard from 'components/ListCard.vue'
+import CustomSelect from 'components/CustomSelect.vue'
 export default {
   components: {
     ListCard,

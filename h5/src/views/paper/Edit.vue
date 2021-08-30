@@ -343,13 +343,27 @@
 
                     <div class="children-analysis">
                       <el-row :gutter="10">
-                        <template v-if="[1, 2, 4].includes(child.type)">
+                        <template v-if="[1, 4].includes(child.type)">
                           <el-col :span="2.5"> 【答案】： </el-col>
                           <el-col :span="21">
                             <div
                               v-if="child.answers && child.answers.length > 0"
                               v-html="`${child.answers[0].answer}`"
                             ></div>
+                          </el-col>
+                        </template>
+                        <template v-if="child.type === 2">
+                          <el-col :span="2.5"> 【答案】： </el-col>
+                          <el-col :span="21">
+                            <div
+                              v-if="child.answers && child.answers.length > 0"
+                            >
+                              <span
+                                v-for="answer in child.answers"
+                                :key="answer.id"
+                                >{{ answer.answer }}</span
+                              >
+                            </div>
                           </el-col>
                         </template>
                         <template v-if="child.type === 3">
@@ -512,7 +526,7 @@
               v-for="(answer, index) in settingForm.answers"
               :key="index"
               :label="
-                settingForm.type === 3 ? `填空_${index}` : `关键词_${index}`
+                settingForm.type === 3 ? `填空` : `关键词`
               "
               :prop="`answers.${index}.score`"
               :rules="settingForm.rules.aiScore"
@@ -599,7 +613,7 @@
   </div>
 </template>
 <script>
-import { dictListPage } from '@/api/base'
+import { dictListPage } from 'api/base'
 import {
   paperQuestionList,
   paperChapterAdd,
@@ -612,8 +626,8 @@ import {
   paperMovePosition,
   paperTotalScore,
   paperUpdateScoreOptions,
-} from '@/api/paper'
-import { questionListPage, randomListPage } from '@/api/question'
+} from 'api/paper'
+import { questionListPage, randomListPage } from 'api/question'
 import Draggable from 'vuedraggable'
 export default {
   components: {

@@ -177,9 +177,9 @@ import {
   userInitPwd,
   userDel,
   userGet,
-} from '@/api/user'
-import { orgListPage } from '@/api/base'
-import CustomSelect from '@/components/CustomSelect.vue'
+} from 'api/user'
+import { orgListPage } from 'api/base'
+import CustomSelect from 'components/CustomSelect.vue'
 export default {
   components: {
     CustomSelect,

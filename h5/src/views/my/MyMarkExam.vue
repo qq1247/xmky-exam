@@ -270,14 +270,14 @@
   </div>
 </template>
 <script>
-import { paperGet, paperQuestionList } from '@/api/paper'
+import { paperGet, paperQuestionList } from 'api/paper'
 import {
   myMarksListPage,
   myMarkAnswerList,
   myExamUpdateScore,
   myExamDoScore,
-} from '@/api/my'
-import ScorePlate from '@/components/ScorePlate.vue'
+} from 'api/my'
+import ScorePlate from 'components/ScorePlate.vue'
 export default {
   components: {
     ScorePlate,
@@ -540,5 +540,5 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-@import '@/assets/style/exam.scss';
+@import 'assets/style/exam.scss';
 </style>

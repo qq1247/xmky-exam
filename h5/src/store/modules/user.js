@@ -7,7 +7,7 @@
  * @LastEditors: Che
  * @LastEditTime: 2021-08-16 14:09:22
  */
-import { login } from '@/api/common'
+import { login } from 'api/common'
 import { getInfo, setInfo, removeInfo } from '@/utils/storage'
 import router, { resetRouter } from '@/router/index'
 
