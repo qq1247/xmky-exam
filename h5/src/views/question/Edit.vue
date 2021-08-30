@@ -84,7 +84,7 @@
           >
             <img :src="btn.img" />
             {{ btn.name }}
-            <img src="assets/img/icon/active-icon.png" />
+            <img src="../../assets/img/icon/active-icon.png" />
           </div>
         </div>
         <div class="splitLine"></div>
@@ -1226,12 +1226,12 @@ export default {
     },
     // 上传试题模板失败
     templateClear(ref) {
+      this.fileForm.questionDocIds = []
       this.$refs[ref].clear()
     },
     // 删除试题模板
     templateRemove(file, fileList) {
       this.fileForm.questionDocIds = []
-      console.log('upload_remove', file, fileList)
     },
   },
 }
