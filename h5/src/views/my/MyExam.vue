@@ -19,7 +19,6 @@
     <div class="content">
       <div class="content-center">
         <div class="paper-title">{{ paper.name }}</div>
-        <div class="paper-intro">{{ paper.id }}</div>
 
         <template v-if="paperQuestion.length > 0">
           <div :key="index" v-for="(item, index) in paperQuestion">
@@ -42,7 +41,7 @@
               >
                 <p
                   class="question-title"
-                  v-html="index + 1 + '、' + child.title"
+                  v-html="`${index + 1}、${child.title}`"
                 ></p>
 
                 <!-- 单选 -->
@@ -330,7 +329,8 @@ export default {
       })
     },
     // 更新填空答案
-    async updateClozeAnswer(questionId, val, answers, index) {
+    updateClozeAnswer(questionId, val, answers, index) {
+      console.log(answers)
       if (this.preview === 'true') {
         return
       }
@@ -339,10 +339,9 @@ export default {
         return
       }
 
-      answers[index] = val
-      const res = await myExamUpdateAnswer({
+      myExamUpdateAnswer({
         myExamDetailId: this.myExamDetailCache[questionId].myExamDetailId,
-        answers: answers,
+        answers: this.myExamDetailCache[questionId].answers,
       })
     },
     // 考试结束
