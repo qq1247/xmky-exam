@@ -10,7 +10,7 @@
         ></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="query" icon="el-icon-search" type="primary"
+        <el-button @click="search" icon="el-icon-search" type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -334,6 +334,10 @@ export default {
       })
       this.paperList = paperList.data.list
       this.total = paperList.data.total
+    },
+    search() {
+      this.curPage = 1
+      this.query()
     },
     // 添加试卷信息
     addOrEdit() {
