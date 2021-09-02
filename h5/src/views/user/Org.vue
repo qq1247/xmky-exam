@@ -232,6 +232,7 @@ export default {
 
         this.editForm.show = false
         this.query()
+        this.editForm.id = null
       })
     },
     // 获取机构
