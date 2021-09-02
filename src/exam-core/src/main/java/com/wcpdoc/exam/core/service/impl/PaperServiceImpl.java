@@ -376,11 +376,12 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		}
 		// 设置答案分数
 		
-		if (paperQuestionAnswerId.length != paperQuestionAnswerScore.length) {
+		if (paperQuestionAnswerId != null && paperQuestionAnswerScore != null && paperQuestionAnswerId.length != paperQuestionAnswerScore.length) {
 			throw new MyException("答案或分值有误！");
 		}
 		BigDecimal scoreSum = new BigDecimal(0);
 		PaperQuestionAnswer paperQuestionAnswer = null;
+		if (paperQuestionAnswerId != null && paperQuestionAnswerScore != null) {
 		for (int i = 0; i < paperQuestionAnswerId.length; i++) {
 			paperQuestionAnswer = paperQuestionAnswerService.getEntity(paperQuestionAnswerId[i]);
 			paperQuestionAnswer.setScore(paperQuestionAnswerScore[i]);
@@ -389,8 +390,9 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		}
 		
 		Question question = questionService.getEntity(paperQuestionAnswer.getQuestionId());
-		if (scoreSum.compareTo(score) != 0 && question.getType() != 1 && question.getType() != 4) {
+		if (scoreSum.compareTo(score) != 0 && question.getType() != 1 && question.getType() != 2 && question.getType() != 4) {
 			throw new MyException("答案分值与总分值不符！");
+		}
 		}
 		
 		// 设置分数

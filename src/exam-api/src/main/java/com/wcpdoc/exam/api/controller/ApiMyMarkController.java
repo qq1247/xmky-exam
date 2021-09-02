@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.exam.base.cache.ProgressBarCache;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.entity.MyMark;
@@ -174,6 +175,7 @@ public class ApiMyMarkController extends BaseController {
 		try {
 			String processBarId = UUID.randomUUID().toString().replaceAll("-", "");
 			LoginUser curUser = getCurUser();
+			ProgressBarCache.setProgressBar(processBarId, 0.0, 10.0, null, 0);
 			new Thread(new Runnable() {
 				public void run() {
 					SpringUtil.getBean(MyExamDetailService.class).autoMark(id, examId, curUser, processBarId);
