@@ -12,7 +12,7 @@
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query" icon="el-icon-search" type="primary"
+        <el-button @click="search" icon="el-icon-search" type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -158,6 +158,10 @@ export default {
 
       this.myExamList = myExamList.data.list
       this.total = myExamList.data.total
+    },
+    search() {
+      this.curPage = 1
+      this.query()
     },
     // 我的考试操作
     examHandler(data) {
