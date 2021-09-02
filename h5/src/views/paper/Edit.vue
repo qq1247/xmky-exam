@@ -523,7 +523,9 @@
             <el-form-item
               v-for="(answer, index) in settingForm.answers"
               :key="index"
-              :label="settingForm.type === 3 ? `填空` : `关键词`"
+              :label="
+                settingForm.type === 3 ? `填空${index}` : `关键词${index}`
+              "
               :prop="`answers.${index}.score`"
               :rules="settingForm.rules.aiScore"
               :show-message="settingForm.ai === 1 ? true : false"
@@ -1374,7 +1376,7 @@ export default {
 }
 
 /deep/ .el-collapse-item__header {
-  background: #f1f1f1;
+  background: rgba(54, 54, 69, 0.05);
   color: #000;
   padding: 0 10px;
   height: 40px;
