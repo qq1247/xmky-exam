@@ -387,8 +387,7 @@ export default {
       this.$tools.resetData(this, name)
     },
     toOrg() {
-      const { href } = this.$router.resolve({ path: '/user/org' })
-      window.open(href, '_blank')
+      this.$router.push({ path: '/user/org' })
     },
   },
 }
