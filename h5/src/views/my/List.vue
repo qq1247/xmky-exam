@@ -162,6 +162,7 @@ export default {
     // 我的考试操作
     examHandler(data) {
       const examStartTime = new Date(data.examStartTime).getTime()
+      const examEndTime = new Date(data.examEndTime).getTime()
       const now = new Date().getTime()
       if (now < examStartTime) {
         this.$message.warning('考试未开始，请等待...')
@@ -172,8 +173,8 @@ export default {
         query: {
           id: data.id,
           paperId: data.paperId,
-          preview: data.exam !== 'start',
-          examEndTime: data.exam === 'start' ? data.examEndTime : '',
+          preview: now < examStartTime && now > examEndTime,
+          examEndTime: data.examEndTime,
         },
       })
     },

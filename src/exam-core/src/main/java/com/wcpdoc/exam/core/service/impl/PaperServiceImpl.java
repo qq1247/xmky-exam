@@ -92,7 +92,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if (paper.getState() == 1) {
 			throw new MyException("试卷已发布");
 		}
-		if(!hasWriteAuth(paper.getPaperTypeId(), getCurUser().getId())) {
+		if(!hasWriteAuth(paper.getPaperTypeId(), getCurUser().getId()) && !hasReadAuth(paper.getPaperTypeId(), getCurUser().getId())) {
 			throw new MyException("权限不足！");
 		}
 		
@@ -118,7 +118,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if(entity.getState() == 1){
 			throw new MyException("已发布的不能修改！");
 		}
-		if(!hasWriteAuth(entity.getPaperTypeId(), getCurUser().getId())) {
+		if(!hasWriteAuth(entity.getPaperTypeId(), getCurUser().getId()) && !hasReadAuth(paper.getPaperTypeId(), getCurUser().getId())) {
 			throw new MyException("权限不足！");
 		}
 		
@@ -143,7 +143,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	@Override
 	public void delAndUpdate(Integer id) {
 		Paper paper = paperDao.getEntity(id);
-		if(!hasWriteAuth(paper.getPaperTypeId(), getCurUser().getId())) {
+		if(!hasWriteAuth(paper.getPaperTypeId(), getCurUser().getId()) && !hasReadAuth(paper.getPaperTypeId(), getCurUser().getId())) {
 			throw new MyException("权限不足！");
 		}
 		paper.setState(0);
@@ -166,7 +166,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if (paper.getState() == 1) {
 			throw new MyException("试卷已发布");
 		}
-		if(!hasWriteAuth(paper.getPaperTypeId(), getCurUser().getId())) {
+		if(!hasWriteAuth(paper.getPaperTypeId(), getCurUser().getId()) && !hasReadAuth(paper.getPaperTypeId(), getCurUser().getId())) {
 			throw new MyException("权限不足！");
 		}
 		
@@ -592,7 +592,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	@Override
 	public void copy(Integer id) throws Exception {
 		Paper paper = paperDao.getEntity(id);
-		if(!hasWriteAuth(paper.getPaperTypeId(), getCurUser().getId())) {
+		if(!hasWriteAuth(paper.getPaperTypeId(), getCurUser().getId()) && !hasReadAuth(paper.getPaperTypeId(), getCurUser().getId())) {
 			throw new MyException("权限不足！");
 		}
 		Paper entity = new Paper();
@@ -791,4 +791,9 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		PaperType paperType = paperTypeService.getEntity(paperTypeId);
 		return paperType.getWriteUserIds().contains(String.format(",%s,", userId));
 	}
+	private boolean hasReadAuth(Integer paperTypeId, Integer userId) {
+		PaperType paperType = paperTypeService.getEntity(paperTypeId);
+		return paperType.getReadUserIds().contains(String.format(",%s,", userId));
+	}
+	
 }

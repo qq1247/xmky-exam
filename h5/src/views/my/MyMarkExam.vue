@@ -19,7 +19,6 @@
     <div class="content">
       <div class="content-center">
         <div class="paper-title">{{ paper.name }}</div>
-        <div class="paper-intro">{{ paper.id }}</div>
 
         <template v-if="paperQuestion.length > 0">
           <div :key="index" v-for="(item, index) in paperQuestion">
@@ -42,7 +41,7 @@
               >
                 <p
                   class="question-title"
-                  v-html="index + 1 + '、' + child.title"
+                  v-html="`${indexc + 1}、${child.title}`"
                 ></p>
 
                 <!-- 单选 -->
@@ -70,14 +69,20 @@
                 <!-- 多选 -->
                 <template v-if="child.type === 2">
                   <el-checkbox-group
+                    @change="
+                      (val) => {
+                        updateAnswer(child.id, val)
+                      }
+                    "
                     class="children-option"
-                    v-model="child.examAnswers"
+                    v-if="myExamDetailCache[child.id]"
+                    v-model="myExamDetailCache[child.id].answers"
                   >
                     <el-checkbox
-                      disabled
                       :key="index"
                       :label="String.fromCharCode(65 + index)"
                       class="option-item"
+                      :disabled="preview === 'true' ? true : false"
                       v-for="(option, index) in child.options"
                     >
                       <div

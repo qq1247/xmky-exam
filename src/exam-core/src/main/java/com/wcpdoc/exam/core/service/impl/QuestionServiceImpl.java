@@ -85,7 +85,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (!ValidateUtil.isValid(answers)) {
 			throw new MyException("参数错误：answers");
 		}
-		if(!hasWriteAuth(question.getQuestionTypeId(), getCurUser().getId())) {
+		if(!hasWriteAuth(question.getQuestionTypeId(), getCurUser().getId()) && !hasReadAuth(question.getQuestionTypeId(), getCurUser().getId())) {
 			throw new MyException("权限不足！");
 		}
 		
@@ -310,7 +310,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (entity.getState() == 0) {
 			throw new MyException("试题已删除不能修改！");
 		}
-		if(!hasWriteAuth(entity.getQuestionTypeId(), getCurUser().getId())) {
+		if(!hasWriteAuth(entity.getQuestionTypeId(), getCurUser().getId()) && !hasReadAuth(question.getQuestionTypeId(), getCurUser().getId())) {
 			throw new MyException("权限不足！");
 		}
 		/*if (newVer) {
@@ -443,7 +443,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	@Override
 	public void delAndUpdate(Integer id) {
 		Question question = questionDao.getEntity(id);
-		if(!hasWriteAuth(question.getQuestionTypeId(), getCurUser().getId())) {
+		if(!hasWriteAuth(question.getQuestionTypeId(), getCurUser().getId()) && !hasReadAuth(question.getQuestionTypeId(), getCurUser().getId())) {
 			throw new MyException("权限不足！");
 		}
 		question.setState(0);
@@ -662,7 +662,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	@Override
 	public void copy(Integer id) throws Exception{
 		Question question = questionDao.getEntity(id);
-		if(!hasWriteAuth(question.getQuestionTypeId(), getCurUser().getId())) {
+		if(!hasWriteAuth(question.getQuestionTypeId(), getCurUser().getId()) && !hasReadAuth(question.getQuestionTypeId(), getCurUser().getId())) {
 			throw new MyException("权限不足！");
 		}
 		
@@ -702,7 +702,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (question.getState() == 1) {
 			throw new MyException("试题已发布！");
 		}
-		if(!hasWriteAuth(question.getQuestionTypeId(), getCurUser().getId())) {
+		if(!hasWriteAuth(question.getQuestionTypeId(), getCurUser().getId()) && !hasReadAuth(question.getQuestionTypeId(), getCurUser().getId())) {
 			throw new MyException("权限不足！");
 		}
 		if (question.getState() == 2) {
@@ -717,5 +717,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	private boolean hasWriteAuth(Integer questionTypeId, Integer userId) {
 		QuestionType questionType = questionTypeService.getEntity(questionTypeId);
 		return questionType.getWriteUserIds().contains(String.format(",%s,", userId));
+	}
+	private boolean hasReadAuth(Integer questionTypeId, Integer userId) {
+		QuestionType questionType = questionTypeService.getEntity(questionTypeId);
+		return questionType.getReadUserIds().contains(String.format(",%s,", userId));
 	}
 }
