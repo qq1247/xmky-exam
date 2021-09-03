@@ -35,7 +35,11 @@
             <div class="box-title">
               <i class="common common-time"></i><span>考试安排</span>
             </div>
-            <Calendar v-model="now" :data="examData" @selectDate="selectDate">
+            <Calendar
+              v-model="now"
+              :timePopovers="timePopovers"
+              @selectDate="selectDate"
+            >
               <template #dateCell="{ date, data }">
                 <div
                   class="date-cell"
@@ -190,7 +194,6 @@ import Calendar from 'components/Calendar/index'
 export default {
   data() {
     return {
-      examData: [],
       examList: [],
       markList: [],
       examStatus: ['', '待考', '考试', '已考', '已考'],
@@ -205,6 +208,7 @@ export default {
         },
       ],
       now: new Date(),
+      timePopovers: {},
     }
   },
   components: {
@@ -282,7 +286,8 @@ export default {
       }
     },
     selectDate(time) {
-      this.renderExamCalendar(time)
+      const _time = dayjs(time).date(1).format('YYYY-MM-DD')
+      this.renderExamCalendar(_time)
     },
     // 渲染日历
     async renderExamCalendar(time) {
@@ -301,31 +306,45 @@ export default {
         startDate: `${startDate} 00:00:00`,
         endDate: `${endDate} 23:59:59`,
       })
-      console.log(examList.data.list)
 
-      examList.data.list.reduce((acc, exam) => {
-        const params = markList.data.list.filter((mark) => {
+      let examPopovers =
+        examList.data.list.length > 0 &&
+        examList.data.list.reduce((acc, exam) => {
           const examTime = dayjs(exam.examStartTime).format('YYYY-MM-DD')
-          const markTime = dayjs(mark.markStartTime).format('YYYY-MM-DD')
-          if (dayjs(examTime).isSame(dayjs(markTime))) {
-            const key = dayjs(examTime).date()
-            const value = {
-              exam: {
-                startTime: exam.examStartTime,
-                endTime: exam.examEndTime,
-              },
-              mark: {
-                startTime: mark.markStartTime,
-                endTime: mark.markEndTime,
-              },
-            }
-            return {
-              [key]: value,
-            }
+          if (!acc[examTime]) {
+            acc[examTime] = {}
+            acc[examTime]['exam'] = []
           }
-        })
-        acc = Object.assign(acc, params)
-      }, {})
+
+          acc[examTime]['exam'].push({
+            startTime: exam.examStartTime,
+            endTime: exam.examEndTime,
+            state: exam.stateName,
+          })
+          return acc
+        }, {})
+
+      const timePopovers =
+        markList.data.list.length > 0 &&
+        markList.data.list.reduce((acc, mark) => {
+          const markTime = dayjs(mark.markStartTime).format('YYYY-MM-DD')
+
+          if (!acc[markTime]) {
+            acc[markTime] = {}
+            acc[markTime]['mark'] = []
+          }
+
+          acc[markTime]['mark'].push({
+            startTime: mark.examStartTime,
+            endTime: mark.examEndTime,
+            state: mark.stateName,
+          })
+          return acc
+        }, examPopovers)
+
+      this.$nextTick(() => {
+        this.timePopovers = timePopovers
+      })
     },
   },
 }
@@ -522,8 +541,8 @@ export default {
         border-radius: 50%;
       }
       &.is-selected {
-        background: rgba(255, 0, 0, 0.1);
-        border-radius: 5px;
+        background: rgba(#0095e5, 0.3);
+        border-radius: 50%;
       }
       border: 1px solid #fff;
       &:first-child {
@@ -533,14 +552,15 @@ export default {
   }
   .el-calendar-day {
     height: 50px;
-    line-height: 50px;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
     padding: 0;
     &:hover {
       background: #fff;
       border: 1px solid #0095e5;
+      border-radius: 50%;
       color: #000;
       box-shadow: 0 0 5px 1px rgba(0, 149, 229, 0.1);
     }

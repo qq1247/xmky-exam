@@ -90,9 +90,16 @@
             name === 'myExamList' ? data.examStartTime : data.markStartTime
           }}</el-col>
         </el-row>
-        <el-row class="content-info">
+        <el-row class="content-info" v-if="name === 'myExamList'">
           <el-col
             >及格：{{ data.totalScore || 0 }}/{{ data.paperTotalScore }}</el-col
+          >
+        </el-row>
+        <el-row class="content-info" v-if="name === 'myMarkExamList'">
+          <el-col
+            >及格：{{
+              (data.paperPassScore * data.paperTotalScore) / 100 || 0
+            }}/{{ data.paperTotalScore }}</el-col
           >
         </el-row>
         <div class="tagGroup">

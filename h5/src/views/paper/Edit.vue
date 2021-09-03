@@ -117,7 +117,7 @@
               >
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="search()">查询</el-button>
+              <el-button type="primary" @click="search">查询</el-button>
             </el-form-item>
           </el-form>
           <div class="drags">
