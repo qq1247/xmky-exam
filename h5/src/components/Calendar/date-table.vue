@@ -24,6 +24,7 @@ export default {
     date: Date,
     hideHeader: Boolean,
     firstDayOfWeek: Number,
+    timePopovers: Object,
   },
 
   inject: ['elCalendar'],
@@ -64,6 +65,18 @@ export default {
         }
       }
       return classes
+    },
+
+    getPopoverData({ text, type }) {
+      let status = ['prev', 'current', 'next']
+      const year = new Date(this.date).getFullYear()
+      const month = (new Date(this.date).getMonth() + status.indexOf(type))
+        .toString()
+        .padStart(2, '0')
+      const day = text.toString().padStart(2, '0')
+      const date = `${year}-${month}-${day}`
+      const popoverData = this.timePopovers[date]
+      return popoverData || {}
     },
 
     pickDay({ text, type }) {
@@ -180,6 +193,27 @@ export default {
         ))}
       </thead>
     )
+
+    const plan = (data, type) => (
+      <div class="plan">
+        <div>{type === 1 ? '考试：' : '阅卷：'}</div>
+        <div class="plan-table">
+          <div class="plan-table-th">
+            <span>开始时间</span>
+            <span>结束时间</span>
+            <span>状态</span>
+          </div>
+          {data.map((item) => (
+            <div class="plan-table-td">
+              <span>{item.startTime}</span>
+              <span>{item.endTime}</span>
+              <span>{item.state ? item.state : '未知'}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+
     return (
       <table
         class={{
@@ -206,12 +240,43 @@ export default {
                   class={this.getCellClass(cell)}
                   onClick={this.pickDay.bind(this, cell)}
                 >
-                  <el-popover placement="top-start" width="200" trigger="hover">
-                    <span>{this.cellRenderProxy(cell)}</span>
-                    <div class="el-calendar-day" slot="reference">
+                  {Object.keys(this.getPopoverData(cell)).length > 0 ? (
+                    <el-popover placement="bottom" trigger="hover">
+                      {this.getPopoverData(cell)?.exam &&
+                        plan(this.getPopoverData(cell).exam, 1)}
+                      {this.getPopoverData(cell)?.mark &&
+                        plan(this.getPopoverData(cell).mark, 2)}
+                      <div
+                        class={{
+                          'el-calendar-day': true,
+                          'el-calendar-exam': this.getPopoverData(cell)?.exam,
+                          'el-calendar-mark': this.getPopoverData(cell)?.mark,
+                          'el-calendar-both':
+                            this.getPopoverData(cell)?.exam &&
+                            this.getPopoverData(cell)?.mark,
+                        }}
+                        slot="reference"
+                      >
+                        <span>{this.cellRenderProxy(cell)}</span>
+                        <div>
+                          {this.getPopoverData(cell)?.exam ? (
+                            <span style="font-size: 13px;">考</span>
+                          ) : (
+                            ''
+                          )}
+                          {this.getPopoverData(cell)?.mark ? (
+                            <span style="font-size: 13px;">阅</span>
+                          ) : (
+                            ''
+                          )}
+                        </div>
+                      </div>
+                    </el-popover>
+                  ) : (
+                    <span class="el-calendar-day">
                       {this.cellRenderProxy(cell)}
-                    </div>
-                  </el-popover>
+                    </span>
+                  )}
                 </td>
               ))}
             </tr>
@@ -222,3 +287,51 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+.el-calendar-exam {
+  background: rgba(#f73131, 0.15);
+  border: 2px solid rgba(#f73131, 0.8);
+  border-radius: 8px;
+  span {
+    color: rgba(#f73131, 1);
+  }
+}
+.el-calendar-mark {
+  background: rgba(#4e6ef2, 0.15);
+  border: 2px solid rgba(#4e6ef2, 0.8);
+  border-radius: 8px;
+  span {
+    color: rgba(#4e6ef2, 1);
+  }
+}
+.el-calendar-both {
+  background: rgba(#f7c173, 0.15);
+  border: 2px solid rgba(#f7c173, 0.8);
+  border-radius: 8px;
+  span {
+    color: rgba(#f7c173, 1);
+  }
+}
+.plan {
+  display: flex;
+  font-size: 13px;
+  line-height: 30px;
+  .plan-table {
+    width: 240px;
+    margin-bottom: 15px;
+    .plan-table-th,
+    .plan-table-td {
+      display: flex;
+      span {
+        flex: 1;
+        padding: 0 6px;
+        text-align: center;
+      }
+      &:not(:last-child) {
+        border-bottom: 1px solid #f5f5f5;
+      }
+    }
+  }
+}
+</style>
