@@ -40,16 +40,6 @@
               :timePopovers="timePopovers"
               @selectDate="selectDate"
             >
-              <template #dateCell="{ date, data }">
-                <div
-                  class="date-cell"
-                  :class="data.isSelected ? 'is-selected' : ''"
-                >
-                  <div class="calendar-day">
-                    {{ data.day.split('-').slice(2).join('-') }}
-                  </div>
-                </div>
-              </template>
             </Calendar>
           </template>
           <template>
@@ -307,44 +297,48 @@ export default {
         endDate: `${endDate} 23:59:59`,
       })
 
-      let examPopovers =
-        examList.data.list.length > 0 &&
-        examList.data.list.reduce((acc, exam) => {
-          const examTime = dayjs(exam.examStartTime).format('YYYY-MM-DD')
-          if (!acc[examTime]) {
-            acc[examTime] = {}
-            acc[examTime]['exam'] = []
-          }
+      let timePopovers = {}
 
-          acc[examTime]['exam'].push({
-            startTime: exam.examStartTime,
-            endTime: exam.examEndTime,
-            state: exam.stateName,
-          })
-          return acc
-        }, {})
-
-      const timePopovers =
-        markList.data.list.length > 0 &&
-        markList.data.list.reduce((acc, mark) => {
-          const markTime = dayjs(mark.markStartTime).format('YYYY-MM-DD')
-
-          if (!acc[markTime]) {
-            acc[markTime] = {}
-            acc[markTime]['mark'] = []
-          }
-
-          acc[markTime]['mark'].push({
-            startTime: mark.examStartTime,
-            endTime: mark.examEndTime,
-            state: mark.stateName,
-          })
-          return acc
-        }, examPopovers)
-
-      this.$nextTick(() => {
+      if (examList.data.list.length === 0 && markList.data.list.length === 0) {
         this.timePopovers = timePopovers
-      })
+        return
+      }
+
+      let examPopovers = examList.data.list.reduce((acc, exam) => {
+        const examTime = dayjs(exam.examStartTime).format('YYYY-MM-DD')
+        if (!acc[examTime]) {
+          acc[examTime] = {}
+          acc[examTime]['exam'] = []
+        }
+
+        acc[examTime]['exam'].push({
+          startTime: exam.examStartTime,
+          endTime: exam.examEndTime,
+          state: exam.stateName,
+        })
+        return acc
+      }, {})
+
+      timePopovers = markList.data.list.reduce((acc, mark) => {
+        const markTime = dayjs(mark.markStartTime).format('YYYY-MM-DD')
+
+        if (!acc[markTime]) {
+          acc[markTime] = {}
+        }
+
+        if (!acc[markTime] || !acc[markTime]['mark']) {
+          acc[markTime]['mark'] = []
+        }
+
+        acc[markTime]['mark'].push({
+          startTime: mark.examStartTime,
+          endTime: mark.examEndTime,
+          state: mark.stateName,
+        })
+        return acc
+      }, examPopovers)
+
+      this.timePopovers = timePopovers
     },
   },
 }
@@ -538,11 +532,11 @@ export default {
       &.is-today {
         background: #0095e5;
         color: #fff;
-        border-radius: 50%;
+        border-radius: 8px;
       }
       &.is-selected {
         background: rgba(#0095e5, 0.3);
-        border-radius: 50%;
+        border-radius: 8px;
       }
       border: 1px solid #fff;
       &:first-child {
@@ -560,7 +554,7 @@ export default {
     &:hover {
       background: #fff;
       border: 1px solid #0095e5;
-      border-radius: 50%;
+      border-radius: 8px;
       color: #000;
       box-shadow: 0 0 5px 1px rgba(0, 149, 229, 0.1);
     }
