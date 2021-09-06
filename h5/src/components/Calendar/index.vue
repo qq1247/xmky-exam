@@ -28,6 +28,7 @@
         :selected-day="realSelectedDay"
         :first-day-of-week="realFirstDayOfWeek"
         @pick="pickDay"
+        :timePopovers="timePopovers"
       />
     </div>
     <div v-else class="el-calendar__body" key="has-range">
@@ -99,6 +100,10 @@ export default {
     firstDayOfWeek: {
       type: Number,
       default: 1,
+    },
+    timePopovers: {
+      type: Object,
+      default: {},
     },
   },
 

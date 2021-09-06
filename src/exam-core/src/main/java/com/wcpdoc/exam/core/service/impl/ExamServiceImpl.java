@@ -90,7 +90,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if(exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()) {
 			throw new MyException("阅卷结束时间必须大于阅卷开始时间！");
 		}
-		if(!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId())) {
+		if(!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId()) && !hasReadAuth(exam.getExamTypeId(), getCurUser().getId())) {
 			throw new MyException("权限不足！");
 		}
 		
@@ -123,7 +123,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if(exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()) {
 			throw new MyException("阅卷结束时间必须大于阅卷开始时间！");
 		}
-		if(!hasWriteAuth(entity.getExamTypeId(), getCurUser().getId())) {
+		if(!hasWriteAuth(entity.getExamTypeId(), getCurUser().getId()) && !hasReadAuth(exam.getExamTypeId(), getCurUser().getId())) {
 		   throw new MyException("权限不足！");
 		}
 		
@@ -151,7 +151,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 				&& exam.getEndTime().getTime() <= curTime.getTime()) {
 			throw new MyException("【"+exam.getName()+"】考试未结束");
 		}
-		if(!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId())) {
+		if(!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId()) && !hasReadAuth(exam.getExamTypeId(), getCurUser().getId())) {
 			throw new MyException("权限不足！");
 		}
 		
@@ -170,11 +170,13 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if(exam.getState() == 1) {
 			throw new MyException("考试【"+exam.getName()+"】已发布！");
 		}
-		if(!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId())) {
+		if(!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId()) && !hasReadAuth(exam.getExamTypeId(), getCurUser().getId())) {
 			throw new MyException("权限不足！");
 		}
 		
 		exam.setState(1);
+		exam.setUpdateUserId(getCurUser().getId());
+		exam.setUpdateTime(new Date());
 		examDao.update(exam);
 	}
 	
@@ -326,5 +328,10 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	private boolean hasWriteAuth(Integer examTypeId, Integer userId) {
 		ExamType examType = examTypeService.getEntity(examTypeId);
 		return examType.getWriteUserIds().contains(String.format(",%s,", userId));
+	}
+	
+	private boolean hasReadAuth(Integer examTypeId, Integer userId) {
+		ExamType examType = examTypeService.getEntity(examTypeId);
+		return examType.getReadUserIds().contains(String.format(",%s,", userId));
 	}
 }
