@@ -14,6 +14,7 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import com.wcpdoc.exam.auth.Service.ShiroService;
@@ -69,7 +70,7 @@ public class JWTRealm extends AuthorizingRealm {
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
 		String jwtToken = (String) token.getPrincipal();
 		JwtResult jwtResult = JwtUtil.getInstance().parse(jwtToken);
-		if (jwtResult.getCode() != 200) {
+		if (jwtResult.getCode() != HttpStatus.OK.value()) {
 			throw new AuthenticationException(jwtResult.getMsg());
 		}
 		

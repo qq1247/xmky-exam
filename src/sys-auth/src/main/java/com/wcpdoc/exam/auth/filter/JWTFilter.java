@@ -159,8 +159,8 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 		HttpServletResponse httpResponse = WebUtils.toHttp(response);
 		httpResponse.setCharacterEncoding("UTF-8");
 		httpResponse.setContentType("application/json;charset=UTF-8");
-		httpResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
-		httpResponse.getWriter().write("{\"code\": 401, \"msg\": \"未授权\"}");
+		httpResponse.setStatus(HttpStatus.OK.value());
+		httpResponse.getWriter().write(String.format("{\"code\": %s, \"msg\": \"未授权\"}", HttpStatus.UNAUTHORIZED.value()));
 		return false;
 	}
 
@@ -184,7 +184,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 			httpResponse.setCharacterEncoding("UTF-8");
 			httpResponse.setContentType("application/json;charset=UTF-8");
 			httpResponse.setStatus(HttpStatus.OK.value());
-			httpResponse.getWriter().write("{\"code\": 401, \"msg\": \""+e.getMessage()+"\"}");
+			httpResponse.getWriter().write(String.format("{\"code\": %s, \"msg\": \"%s\"}", HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
 			return false;
 		}
 	}
