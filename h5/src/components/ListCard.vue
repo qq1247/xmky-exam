@@ -172,10 +172,7 @@
             <i class="common common-messages"></i>
           </span>
           <span data-title="阅卷设置" @click="read(data)">
-            <i class="common common-readPaper"></i>
-          </span>
-          <span data-title="考试用户" @click="user(data)">
-            <i class="common common-wode"></i>
+            <i class="common common-setting"></i>
           </span>
         </template>
         <!-- 我的考试 -->
@@ -362,10 +359,6 @@ export default {
     // 阅卷设置
     read(data) {
       this.$emit('read', data)
-    },
-    // 考试用户
-    user(data) {
-      this.$emit('user', data)
     },
     // 发布考试
     publish(data) {
