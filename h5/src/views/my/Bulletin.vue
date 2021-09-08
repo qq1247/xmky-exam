@@ -330,7 +330,7 @@ export default {
         }
 
         this.editForm.show = false
-        this.$tools.resetData(this, 'editForm')
+        this.$refs['editForm'].resetFields()
         this.query()
       })
     },
@@ -357,7 +357,7 @@ export default {
         }
 
         this.editForm.show = false
-        this.$tools.resetData(this, 'editForm')
+        this.$refs['editForm'].resetFields()
         this.query()
       })
     },
@@ -400,7 +400,7 @@ export default {
     },
     // 清空还原数据
     resetData(name) {
-      this.$tools.resetData(this, name)
+      this.$refs[name].resetFields()
     },
   },
 }
