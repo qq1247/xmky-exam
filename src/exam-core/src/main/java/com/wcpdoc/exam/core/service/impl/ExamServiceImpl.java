@@ -186,12 +186,12 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	@Override
-	public void updateExamUser(Integer id, Integer[] userIds) {
+	public void updateMarkSet(Integer id, String[] examUserIds, Integer[] markUserIds) {
 		// 校验数据有效性
 		if (id == null) {
 			throw new MyException("参数错误：id");
 		}
-		if (userIds == null) {
+		if (examUserIds == null) {
 			throw new MyException("参数错误：userIds");
 		}
 		Exam exam = getEntity(id);
@@ -201,56 +201,90 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if (exam.getState() == 2) {
 			throw new MyException("考试未发布！");// 必须已发布，否则在考试结束前添加或删除考试用户，试题有可能会变更，每个人的考试详细可能不一样（也能处理，比较费事）。
 		}
-
+		if(markUserIds.length != 1 && examUserIds.length != markUserIds.length ){
+			throw new MyException("阅卷人数有误！");
+		}
+		if (markUserIds.length == 1) {
+			examUserIds[0] = StringUtil.join(examUserIds);
+		}
 		if (exam.getEndTime().getTime() <= new Date().getTime()) {
 			throw new MyException("考试已结束，不允许添加！");
 		}
-
+		Set<Integer> examUserIdSet = new HashSet<>();
+		
+		// 删除旧阅卷用户
+		List<MyMark> myMarkList = myMarkService.getList(id);
+		for (MyMark myMark : myMarkList) {
+			myMarkService.del(myMark.getId());
+		}
 		// 添加我的考试（不能整个重新添加，因为有可能是已开始考试途中添加人员，部分人员已作答）
 		List<MyExam> myExamList = myExamService.getList(id);// 当前考试的人员
 		List<Question> questionList = paperService.getQuestionList(exam.getPaperId());// 试卷的问题
-		Set<Integer> curUserIdSet = new HashSet<>(Arrays.asList(userIds));//当前页面选中的考试的人员
-		ListIterator<MyExam> myExamListIterator = myExamList.listIterator();
-		while (myExamListIterator.hasNext()) {// 如果页面有选择该用户，数据库也有，则不处理
-			MyExam next = myExamListIterator.next();
-			if (curUserIdSet.contains(next.getUserId())) {
-				myExamListIterator.remove();
-				curUserIdSet.remove(next.getUserId());
+		
+		for(int i = 0; i < markUserIds.length; i++) {
+			//考试人
+			Set<String> curUserIdSet = new HashSet<>(Arrays.asList(examUserIds[i].split(",")));//当前页面选中的考试的人员
+			ListIterator<MyExam> myExamListIterator = myExamList.listIterator();
+			while (myExamListIterator.hasNext()) {// 如果页面有选择该用户，数据库也有，则不处理
+				MyExam next = myExamListIterator.next();
+				if (curUserIdSet.contains(next.getUserId())) {
+					if (examUserIdSet.contains(next.getUserId())) {
+						throw new MyException("考试人员重复！");
+					}
+					
+					myExamListIterator.remove();
+					examUserIdSet.add(next.getUserId());// set中添加考试人员
+					curUserIdSet.remove(next.getUserId());
+				}
 			}
-		}
-		myExamListIterator = myExamList.listIterator();
-		while (myExamListIterator.hasNext()) {// 如果页面没有选择该用户，数据库有，则数据库记录删除该用户的考试记录和考试详细记录
-			MyExam next = myExamListIterator.next();
-			myExamDetailService.delByMyExamId(next.getId());
-			
-			myExamService.del(next.getId());
-		}
-		Date curTime = new Date();
-		for (Integer userId : curUserIdSet) {//如果页面有选择该用户，数据库没有，则数据库添加该用户的考试记录和考试详细记录
-			MyExam myExam = new MyExam();
-			myExam.setExamId(id);
-			myExam.setUserId(userId);
-			
-			myExam.setAnswerStartTime(exam.getStartTime());
-			myExam.setAnswerEndTime(exam.getEndTime());
-			myExam.setMarkStartTime(exam.getMarkStartTime());
-			myExam.setMarkEndTime(exam.getMarkEndTime());
-			//myExam.setTotalScore(BigDecimal.ZERO);//没有考试，不要设置分数
-			myExam.setState(1);
-			myExam.setMarkState(1);
-			myExam.setUpdateTime(curTime);
-			myExam.setUpdateUserId(getCurUser().getId());
-			myExamService.add(myExam);// 添加我的考试
-			
-			for (Question question : questionList) {
-				MyExamDetail myExamDetail = new MyExamDetail();
-				myExamDetail.setMyExamId(myExam.getId());
-				myExamDetail.setExamId(myExam.getExamId());
-				myExamDetail.setUserId(myExam.getUserId());
-				myExamDetail.setQuestionId(question.getId());
-				myExamDetail.setQuestionScore(question.getScore());
-				myExamDetailService.add(myExamDetail);// 添加我的考试详细
+			myExamListIterator = myExamList.listIterator();
+			while (myExamListIterator.hasNext()) {// 如果页面没有选择该用户，数据库有，则数据库记录删除该用户的考试记录和考试详细记录
+				MyExam next = myExamListIterator.next();
+				myExamDetailService.delByMyExamId(next.getId());
+				myExamService.del(next.getId());
 			}
+			Date curTime = new Date();
+			for (String userId : curUserIdSet) {//如果页面有选择该用户，数据库没有，则数据库添加该用户的考试记录和考试详细记录
+				if (examUserIdSet.contains(userId)) {
+					throw new MyException("考试人员重复！");
+				}
+				MyExam myExam = new MyExam();
+				myExam.setExamId(id);
+				myExam.setUserId(Integer.parseInt(userId));
+				
+				myExam.setAnswerStartTime(exam.getStartTime());
+				myExam.setAnswerEndTime(exam.getEndTime());
+				myExam.setMarkStartTime(exam.getMarkStartTime());
+				myExam.setMarkEndTime(exam.getMarkEndTime());
+				//myExam.setTotalScore(BigDecimal.ZERO);//没有考试，不要设置分数
+				myExam.setState(1);
+				myExam.setMarkState(1);
+				myExam.setUpdateTime(curTime);
+				myExam.setUpdateUserId(getCurUser().getId());
+				myExamService.add(myExam);// 添加我的考试
+				
+				for (Question question : questionList) {
+					MyExamDetail myExamDetail = new MyExamDetail();
+					myExamDetail.setMyExamId(myExam.getId());
+					myExamDetail.setExamId(myExam.getExamId());
+					myExamDetail.setUserId(myExam.getUserId());
+					myExamDetail.setQuestionId(question.getId());
+					myExamDetail.setQuestionScore(question.getScore());
+					myExamDetailService.add(myExamDetail);// 添加我的考试详细
+				}
+				examUserIdSet.add(Integer.parseInt(userId));// set中添加考试人员
+			}
+			
+			//阅卷人
+			MyMark myMark = new MyMark();
+			myMark.setMarkUserId(markUserIds[i]);
+			myMark.setExamUserIds(examUserIds != null ? String.format(",%s,", examUserIds[i]) : null);
+			//myMark.setQuestionIds(questionIds != null ? String.format(",%s,", questionIds[i]) : null);  //目前只根据人判卷
+			myMark.setUpdateUserId(getCurUser().getId());
+			myMark.setUpdateTime(new Date());
+			myMark.setExamId(id);
+			myMark.setAutoState(2);
+			myMarkService.add(myMark);
 		}
 	}
 

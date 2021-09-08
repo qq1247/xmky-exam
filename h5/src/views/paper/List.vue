@@ -19,7 +19,10 @@
     <div class="content">
       <div class="exam-list">
         <div class="exam-item">
-          <div class="exam-content exam-add" @click="paperForm.show = true">
+          <div
+            class="exam-content exam-add"
+            @click=";(paperForm.show = true), (paperForm.edit = true)"
+          >
             <i class="common common-plus"></i>
             <span>添加试卷</span>
           </div>
@@ -100,7 +103,7 @@
                 v-model="paperForm.name"
               ></el-input>
             </el-form-item>
-            <el-form-item label="及格分数" prop="passScore" required>
+            <el-form-item label="及格分数" prop="passScore">
               <el-input
                 type="number"
                 min="1"
@@ -311,6 +314,8 @@ export default {
           ],
           passScore: [
             {
+              required: true,
+              trigger: 'blur',
               validator: validatePercentage,
             },
           ],
@@ -384,25 +389,28 @@ export default {
     },
     // 编辑分类
     edit(item) {
-      this.paperForm.edit = true
-      this.paperForm.id = item.id
-      this.paperForm.genType = item.genType
-      this.paperForm.name = item.name
-      this.paperForm.passScore = item.passScore
-      this.paperForm.readRemark = item.readRemark
-      this.paperForm.readNum = item.readNum
-      this.paperForm.showType = String(item.showType)
-      this.paperForm.options = item.options == '' ? [] : item.options.split(',')
-      this.paperForm.paperRemarkShow = !!item.paperRemark
-      this.paperForm.paperRemark = !item.paperRemark
-        ? [
-            {
-              score: '',
-              remark: '',
-            },
-          ]
-        : item.paperRemark
       this.paperForm.show = true
+      this.paperForm.edit = true
+      this.$nextTick(() => {
+        this.paperForm.id = item.id
+        this.paperForm.genType = item.genType
+        this.paperForm.name = item.name
+        this.paperForm.passScore = item.passScore
+        this.paperForm.readRemark = item.readRemark
+        this.paperForm.readNum = item.readNum
+        this.paperForm.showType = String(item.showType)
+        this.paperForm.options =
+          item.options == '' ? [] : item.options.split(',')
+        this.paperForm.paperRemarkShow = !!item.paperRemark
+        this.paperForm.paperRemark = !item.paperRemark
+          ? [
+              {
+                score: '',
+                remark: '',
+              },
+            ]
+          : item.paperRemark
+      })
     },
     // 删除分类
     del({ id, name }) {
@@ -514,7 +522,7 @@ export default {
     },
     // 清空还原数据
     resetData(name) {
-      this.$tools.resetData(this, name)
+      this.$refs[name].resetFields()
     },
   },
 }
