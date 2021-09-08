@@ -22,7 +22,7 @@
           <el-col :span="7">
             <el-form-item style="float: right">
               <el-button
-                @click="editForm.show = true"
+                @click=";(editForm.show = true), (editForm.id = null)"
                 icon="el-icon-circle-plus-outline"
                 size="mini"
                 type="primary"
@@ -107,11 +107,14 @@
     </div>
     <el-dialog
       :visible.sync="editForm.show"
+      :show-close="false"
+      width="40%"
       title="用户"
+      :close-on-click-modal="false"
       @close="resetData('editForm')"
     >
       <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
-        <el-form-item label="机构名称" label-width="120px">
+        <el-form-item label="机构名称" label-width="120px" prop="orgId">
           <CustomSelect
             :multiple="false"
             ref="addUserSelect"
@@ -211,9 +214,9 @@ export default {
         rules: {
           // 校验
           loginName: [
-            { required: true, message: '请输入登录名称', trigger: 'change' },
+            { required: true, message: '请输入登录名称', trigger: 'blur' },
           ],
-          name: [{ required: true, message: '请输入名称', trigger: 'change' }],
+          name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
         },
       },
     }
@@ -272,7 +275,6 @@ export default {
         })
 
         this.editForm.show = false
-        this.$tools.resetData(this, 'editForm')
         this.query()
       })
     },
@@ -303,7 +305,6 @@ export default {
         }
 
         this.editForm.show = false
-        this.$tools.resetData(this, 'editForm')
         this.query()
       })
     },
@@ -349,12 +350,14 @@ export default {
 
       await this.getOrgList()
       this.editForm.show = true
-      this.editForm.id = res.data.id
-      this.editForm.name = res.data.name
-      this.editForm.loginName = res.data.loginName
-      this.editForm.orgId = res.data.orgId
-      this.editForm.orgName = res.data.orgName
-      this.editForm.roles = res.data.roles
+      this.$nextTick(() => {
+        this.editForm.id = res.data.id
+        this.editForm.name = res.data.name
+        this.editForm.loginName = res.data.loginName
+        this.editForm.orgId = res.data.orgId
+        this.editForm.orgName = res.data.orgName
+        this.editForm.roles = res.data.roles
+      })
     },
     // 获取机构列表
     async getOrgList(curPage = 1, name = '') {
@@ -384,7 +387,7 @@ export default {
     },
     // 清空还原数据
     resetData(name) {
-      this.$tools.resetData(this, name)
+      this.$refs[name].resetFields()
     },
     toOrg() {
       this.$router.push({ path: '/user/org' })
