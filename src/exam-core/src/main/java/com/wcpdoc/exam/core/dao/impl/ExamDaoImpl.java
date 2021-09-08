@@ -55,7 +55,7 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 				.addWhere(ValidateUtil.isValid(pageIn.get("startTime")), "EXAM.START_TIME < ?", ValidateUtil.isValid(pageIn.get("START_TIME")) ? DateUtil.getDateTime(pageIn.get("START_TIME")) : null)
 				//.addWhere(pageIn.get("curUserId", Integer.class) != null, "EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.MARK_USER_ID = ? AND Z.EXAM_ID = EXAM.ID)", pageIn.get("curUserId", Integer.class))
 				.addWhere("EXAM.STATE != ?", 0)
-				.addOrder("EXAM.START_TIME", Order.DESC);
+				.addOrder("EXAM.UPDATE_TIME", Order.DESC);
 		
 		if (pageIn.get("curUserId", Integer.class) != null) {//查看权限相关
 			User user = userDao.getEntity(pageIn.get("curUserId", Integer.class));
