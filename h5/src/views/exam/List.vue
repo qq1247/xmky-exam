@@ -21,7 +21,10 @@
     <div class="content">
       <div class="exam-list">
         <div class="exam-item">
-          <div class="exam-content exam-add" @click="examForm.show = true">
+          <div
+            class="exam-content exam-add"
+            @click=";(examForm.show = true), (examForm.edit = false)"
+          >
             <i class="common common-plus"></i>
             <span>添加考试库</span>
           </div>
@@ -36,7 +39,6 @@
           @publish="publish"
           @message="message"
           @read="read"
-          @user="user"
         ></ListCard>
       </div>
       <!-- 分页 -->
@@ -76,6 +78,7 @@
         </el-form-item>
         <el-form-item label="选择试卷" prop="selectPaperId">
           <CustomSelect
+            ref="paperSelect"
             placeholder="请选择试卷"
             :multiple="false"
             :value="examForm.selectPaperId"
@@ -136,9 +139,9 @@
       center
       width="60%"
       :close-on-click-modal="false"
-      @close="resetData('examForm')"
+      @close="resetData('userForm')"
     >
-      <el-form :model="examForm" ref="examForm2" label-width="100px">
+      <el-form :model="examForm" ref="userForm" label-width="100px">
         <el-form-item label="阅卷方式">
           <el-radio
             v-for="item in examForm.examRadios"
@@ -146,20 +149,55 @@
             v-model="examForm.examRadio"
             :label="item.value"
             @change="selectPaperType"
+            prop="examRadio"
             >{{ item.name }}</el-radio
           >
         </el-form-item>
         <el-row v-for="(item, index) in examForm.examRemarks" :key="item.id">
           <el-col :span="12">
             <el-form-item
+              label="考试用户"
+              v-if="examForm.examRadio == 1"
+              :prop="`examRemarks.${index}.examUser`"
+              :rules="[
+                {
+                  required: true,
+                  message: '请选择考试用户',
+                  trigger: 'change',
+                },
+              ]"
+            >
+              <CustomSelect
+                ref="markExamUserSelect"
+                placeholder="请选择考试用户"
+                :value="examForm.examRemarks[index].examUser"
+                :total="examForm.total"
+                @input="searchUser"
+                @change="selectExamUser($event, index)"
+                @currentChange="getMoreUser"
+                @visibleChange="getUserList"
+              >
+                <el-option
+                  v-for="item in examForm.examUsers"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                ></el-option>
+              </CustomSelect>
+            </el-form-item>
+          </el-col>
+
+          <el-col :span="12">
+            <el-form-item
               label="阅卷人"
               :prop="`examRemarks.${index}.examCheckPerson`"
               :rules="[
-                { required: true, message: '请选择...', trigger: 'change' },
+                { required: true, message: '请选择阅卷人', trigger: 'change' },
               ]"
             >
               <CustomSelect
                 ref="markUserSelect"
+                :multiple="false"
                 placeholder="请选择阅卷人"
                 :value="examForm.examRemarks[index].examCheckPerson"
                 :total="examForm.total"
@@ -198,28 +236,6 @@
               </CustomSelect>
             </el-form-item>
           </el-col>
-
-          <el-col :span="12">
-            <el-form-item label="考试用户" v-if="examForm.examRadio == 1">
-              <CustomSelect
-                ref="markExamUserSelect"
-                placeholder="请选择考试用户"
-                :value="examForm.examRemarks[index].examUser"
-                :total="examForm.total"
-                @input="searchUser"
-                @change="selectExamUser($event, index)"
-                @currentChange="getMoreUser"
-                @visibleChange="getUserList"
-              >
-                <el-option
-                  v-for="item in examForm.examUsers"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                ></el-option>
-              </CustomSelect>
-            </el-form-item>
-          </el-col>
         </el-row>
         <div class="remark-buttons">
           <el-form-item>
@@ -241,48 +257,8 @@
         </div>
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="editExamRead">{{
-          examForm.readEdit ? '修改' : '设置'
-        }}</el-button>
+        <el-button @click="editExamRead">保存</el-button>
         <el-button @click="examForm.readShow = false">取 消</el-button>
-      </div>
-    </el-dialog>
-
-    <!-- 考试用户 -->
-    <el-dialog
-      :visible.sync="examForm.userShow"
-      :show-close="false"
-      center
-      width="50%"
-      :close-on-click-modal="false"
-      @close="resetData('examForm')"
-    >
-      <el-form :model="examForm" ref="examForm3" label-width="100px">
-        <el-form-item label="考试用户">
-          <CustomSelect
-            ref="readSelect"
-            placeholder="请选择考试用户"
-            :value="examForm.examUser"
-            :total="examForm.total"
-            @input="searchUser"
-            @change="selectUser"
-            @currentChange="getMoreUser"
-            @visibleChange="getUserList"
-          >
-            <el-option
-              v-for="item in examForm.examUsers"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            ></el-option>
-          </CustomSelect>
-        </el-form-item>
-      </el-form>
-      <div class="dialog-footer" slot="footer">
-        <el-button @click="editExamUser">{{
-          examForm.userEdit ? '修改' : '设置'
-        }}</el-button>
-        <el-button @click="examForm.userShow = false">取 消</el-button>
       </div>
     </el-dialog>
   </div>
@@ -294,11 +270,9 @@ import {
   examAdd,
   examDel,
   examMarkUserList,
-  examUserList,
   examPublish,
   examEdit,
-  examUpdateMarkUser,
-  examUpdateExamUser,
+  examUpdateMarkSet,
 } from 'api/exam'
 import { paperListPage } from 'api/paper'
 import { userListPage } from 'api/user'
@@ -361,9 +335,6 @@ export default {
         paperId: 0,
         show: false,
         readShow: false,
-        userShow: false,
-        readEdit: false,
-        userEdit: false,
         edit: false,
         name: '',
         selectPaperId: '',
@@ -389,13 +360,7 @@ export default {
         ],
         examCheckPersons: [],
         examQuestionNums: [],
-        examRemarks: [
-          {
-            examCheckPerson: '',
-            examQuestionNum: [],
-            examUser: [],
-          },
-        ],
+        examRemarks: [],
         examUser: [],
         examUsers: [],
         rules: {
@@ -437,7 +402,7 @@ export default {
       this.examForm.examRemarks.push({
         examCheckPerson: '',
         examQuestionNum: [],
-        examPaper: [],
+        examUser: [],
       })
     },
     // 删除评语
@@ -523,18 +488,27 @@ export default {
       rankState,
       loginType,
     }) {
-      await this.getPaperList()
-      this.examForm.edit = true
       this.examForm.show = true
-      this.examForm.id = id
-      this.examForm.name = name
-      this.examForm.selectPaperId = paperId
-      this.examForm.paperName = paperName
-      this.examForm.scoreState = scoreState == 1
-      this.examForm.rankState = rankState == 1
-      this.examForm.loginType = loginType == 2
-      this.examForm.examTime = [startTime, endTime]
-      this.examForm.markTime = [markStartTime, markEndTime]
+      this.examForm.edit = true
+      this.$nextTick(() => {
+        this.examForm.id = id
+        this.examForm.name = name
+        this.examForm.selectPaperId = paperId
+        this.examForm.paperName = paperName
+        this.examForm.scoreState = scoreState == 1
+        this.examForm.rankState = rankState == 1
+        this.examForm.loginType = loginType == 2
+        this.examForm.examTime = [startTime, endTime]
+        this.examForm.markTime = [markStartTime, markEndTime]
+
+        this.$refs['paperSelect'] &&
+          this.$refs['paperSelect'].$refs['elSelect'].cachedOptions.push({
+            currentLabel: paperName,
+            currentValue: paperId,
+            label: paperName,
+            value: paperId,
+          })
+      })
     },
     // 删除分类
     del({ id, name }) {
@@ -578,86 +552,61 @@ export default {
         return
       }
 
+      const examMarkUser = await examMarkUserList({ id })
+
+      const num = examMarkUser.data.length > 0 ? examMarkUser.data.length : 1
+      this.examForm.examRemarks = []
+      for (let index = 0; index < num; index++) {
+        this.examForm.examRemarks.push({
+          examCheckPerson: '',
+          examQuestionNum: [],
+          examUser: [],
+        })
+      }
+
+      this.examForm.readShow = true
       this.examForm.id = id
       this.examForm.paperId = paperId
 
-      const examMarkUser = await examMarkUserList({ id })
-
       this.$nextTick(() => {
-        examMarkUser.data.map((item, index) => {
-          if (item?.examUserList) {
-            this.examForm.examRadio = 1
+        if (examMarkUser.data.length > 0) {
+          this.examForm.examRemarks = []
+          examMarkUser.data.map((item, index) => {
             this.examForm.examRemarks.push({
               examCheckPerson: item.markUserId,
               examUser: item.examUserList.map((user) => user.id),
               examQuestionNum: [],
             })
+          })
+        }
 
-            const cachedOptions = item.examUserList.reduce((acc, cur) => {
-              acc.push({
-                currentLabel: cur.name,
-                currentValue: cur.id,
-                label: cur.name,
-                value: cur.id,
-              })
-              return acc
-            }, [])
+        examMarkUser.data.map((item, index) => {
+          const cachedOptions = item.examUserList.reduce((acc, cur) => {
+            acc.push({
+              currentLabel: cur.name,
+              currentValue: cur.id,
+              label: cur.name,
+              value: cur.id,
+            })
+            return acc
+          }, [])
 
-            console.log(this.$refs)
-
-            this.$refs['markExamUserSelect'].$refs[
+          this.$refs['markExamUserSelect'] &&
+            this.$refs['markExamUserSelect'][index].$refs[
               'elSelect'
             ].cachedOptions.push(...cachedOptions)
-          } else {
-            this.examForm.examRadio = 1
-            this.examForm.examRemarks.push({
-              examCheckPerson: item.markUserId,
-              examUser: [],
-              examQuestionNum: item.questionList.map((question) => question.id),
+
+          this.$refs['markUserSelect'] &&
+            this.$refs['markUserSelect'][index].$refs[
+              'elSelect'
+            ].cachedOptions.push({
+              currentLabel: item.markUserName,
+              currentValue: item.markUserId,
+              label: item.markUserName,
+              value: item.markUserId,
             })
-          }
         })
-
-        examUsers.data.map((item) => {
-          this.examForm.examUser.push(item.id)
-          this.$refs['readSelect'].$refs['elSelect'].cachedOptions.push({
-            currentLabel: item.name,
-            currentValue: item.id,
-            label: item.name,
-            value: item.id,
-          })
-        })
-
-        this.examForm.readEdit = true
       })
-
-      this.examForm.readShow = true
-    },
-    // 用户设置
-    async user({ id, state }) {
-      if (state == 2) {
-        this.$message.error('请先发布考试！')
-        return
-      }
-      this.examForm.id = id
-
-      const examUsers = await examUserList({ id })
-      this.examForm.examUser = []
-
-      this.$nextTick(() => {
-        examUsers.data.map((item) => {
-          this.examForm.examUser.push(item.id)
-          this.$refs['readSelect'].$refs['elSelect'].cachedOptions.push({
-            currentLabel: item.name,
-            currentValue: item.id,
-            label: item.name,
-            value: item.id,
-          })
-        })
-        this.examForm.userEdit = true
-      })
-
-      this.examForm.userShow = true
     },
     // 考试发布
     async publish({ id, state }) {
@@ -690,10 +639,10 @@ export default {
       this.examForm.examRadio = e
     },
     // 获取用户
-    async getUserList(name = '') {
+    async getUserList(curPage = 1, name = '') {
       const examUsers = await userListPage({
         name,
-        curPage: this.examForm.curPage,
+        curPage,
         pageSize: this.examForm.pageSize,
       })
 
@@ -701,26 +650,38 @@ export default {
       this.examForm.total = examUsers.data.total
     },
     // 获取更多用户
-    getMoreUser(curPage) {
-      this.examForm.curPage = curPage
-      this.getUserList()
+    getMoreUser(curPage, name) {
+      this.getUserList(curPage, name)
     },
     // 根据name 查询人员
     searchUser(name) {
-      this.examForm.curPage = 1
-      this.getUserList(name)
-    },
-    // 选择考试用户
-    selectUser(e) {
-      this.examForm.examUser = e
+      this.getUserList(1, name)
     },
     // 选择阅卷人员
     selectPerson(e, index) {
       this.examForm.examRemarks[index].examCheckPerson = e
+      this.examForm.examRemarks.map((item, indexe) => {
+        if (
+          index !== indexe &&
+          this.examForm.examRemarks[index].examCheckPerson ===
+            item.examCheckPerson
+        ) {
+          this.examForm.examRemarks[indexe].examCheckPerson = null
+        }
+      })
     },
     // 选择阅卷考生
     selectExamUser(e, index) {
       this.examForm.examRemarks[index].examUser = e
+      this.examForm.examRemarks.map((item, indexe) => {
+        if (index !== indexe) {
+          this.examForm.examRemarks[index].examUser.map((user) => {
+            const indexa = item.examUser.indexOf(user)
+            if (indexa !== -1)
+              this.examForm.examRemarks[indexe].examUser.splice(indexa, 1)
+          })
+        }
+      })
     },
     // 获取题号
     async getQuestionNumList(id = '', curPage = 1) {
@@ -749,7 +710,7 @@ export default {
     },
     // 编辑阅卷
     editExamRead() {
-      this.$refs['examForm2'].validate(async (valid) => {
+      this.$refs['userForm'].validate(async (valid) => {
         if (!valid) {
           return
         }
@@ -781,7 +742,7 @@ export default {
           ? (params.questionIds = dynamic)
           : (params.examUserIds = dynamic)
 
-        const res = await examUpdateMarkUser(params)
+        const res = await examUpdateMarkSet(params)
 
         res?.code == 200
           ? (this.$message('设置成功！'),
@@ -790,23 +751,6 @@ export default {
           : this.$message.error('设置失败！')
       })
     },
-    // 编辑考试用户
-    async editExamUser() {
-      if (this.examForm.examUser.length == 0) {
-        this.$message.warning('请选择考试用户！')
-        return
-      }
-      const res = await examUpdateExamUser({
-        id: this.examForm.id,
-        userIds: this.examForm.examUser,
-      })
-
-      res?.code == 200
-        ? (this.$message('设置成功！'),
-          (this.examForm.userShow = false),
-          this.pageChange())
-        : this.$message.error('设置失败！')
-    },
     // 切换分页
     pageChange(val) {
       val && (this.curPage = val)
@@ -814,7 +758,7 @@ export default {
     },
     // 清空还原数据
     resetData(name) {
-      this.$tools.resetData(this, name)
+      this.$refs[name].resetFields()
     },
   },
 }
