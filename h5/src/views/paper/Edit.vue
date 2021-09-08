@@ -497,7 +497,6 @@
       :show-close="false"
       width="40%"
       title="分值选项设置"
-      ref="settingForm"
       :close-on-click-modal="false"
       @close="resetData('settingForm')"
     >
@@ -908,7 +907,7 @@ export default {
       res?.code === 200
         ? (this.$message(`${title}成功！`),
           this.query(),
-          this.$tools.resetData(this, 'chapterForm'),
+          this.$refs['chapterForm'].resetFields(),
           this.queryQuestion())
         : this.$message.error(`${title}失败！`)
     },
@@ -1081,7 +1080,7 @@ export default {
     },
     // 重置数据
     resetData(name) {
-      this.$tools.resetData(this, name)
+      this.$refs[name].resetFields()
     },
   },
   beforeDestroy() {

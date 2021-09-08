@@ -23,10 +23,7 @@
         <div class="exam-item">
           <div
             class="exam-content exam-add"
-            @click="
-              examForm.show = true
-              examForm.edit = false
-            "
+            @click=";(examForm.show = true), (examForm.edit = false)"
           >
             <i class="common common-plus"></i>
             <span>添加试卷分类</span>
@@ -94,8 +91,8 @@
       :close-on-click-modal="false"
       @close="resetData('roleForm')"
     >
-      <el-form :model="roleForm" ref="examForm" label-width="100px">
-        <el-form-item label="使用权限">
+      <el-form :model="roleForm" ref="roleForm" label-width="100px">
+        <el-form-item label="使用权限" prop="readRoleUser">
           <CustomSelect
             ref="readSelect"
             placeholder="请选择授权用户"
@@ -114,7 +111,7 @@
             ></el-option>
           </CustomSelect>
         </el-form-item>
-        <el-form-item label="编辑权限">
+        <el-form-item label="编辑权限" prop="writeRoleUser">
           <CustomSelect
             ref="writeSelect"
             placeholder="请选择授权用户"
@@ -244,10 +241,12 @@ export default {
     },
     // 编辑分类
     edit({ id, name }) {
-      this.examForm.edit = true
-      this.examForm.id = id
-      this.examForm.examName = name
       this.examForm.show = true
+      this.examForm.edit = true
+      this.$nextTick(() => {
+        this.examForm.id = id
+        this.examForm.examName = name
+      })
     },
     // 删除分类
     del({ id, name }) {
@@ -384,7 +383,7 @@ export default {
     },
     // 清空还原数据
     resetData(name) {
-      this.$tools.resetData(this, name)
+      this.$refs[name].resetFields()
     },
   },
 }

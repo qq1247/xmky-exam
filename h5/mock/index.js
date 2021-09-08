@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-20 16:26:41
  * @LastEditors: Che
- * @LastEditTime: 2021-08-28 02:34:06
+ * @LastEditTime: 2021-09-04 18:10:54
  */
 const questionList = {
   code: 200,
@@ -778,10 +778,81 @@ const roleList = {
   },
 }
 
+const userList = {
+  code: 200,
+  msg: '请求成功',
+  data: {
+    total: 32,
+    list: [
+      {
+        registTime: '2021-08-30 17:17:39',
+        lastLoginTime: null,
+        orgName: '测试部',
+        phone: null,
+        roles: 'user',
+        loginName: 'asd5',
+        name: 'asd5',
+        id: 40,
+        roleNames: '用户',
+        orgId: 3,
+      },
+      {
+        registTime: '2021-07-02 10:28:52',
+        lastLoginTime: '2021-07-14 16:34:09',
+        orgName: '12134',
+        phone: '',
+        roles: 'user',
+        loginName: 'cy411',
+        name: '陈云5',
+        id: 8,
+        roleNames: '用户',
+        orgId: 2,
+      },
+      {
+        registTime: '2021-07-23 13:41:06',
+        lastLoginTime: null,
+        orgName: '组织机构',
+        phone: null,
+        roles: 'user',
+        loginName: '发福答复的',
+        name: '反对法地方',
+        id: 31,
+        roleNames: '用户',
+        orgId: 1,
+      },
+      {
+        registTime: '2021-07-02 10:28:52',
+        lastLoginTime: '2021-08-26 09:34:54',
+        orgName: '组织机构',
+        phone: '',
+        roles: 'user,subAdmin',
+        loginName: 'cy11',
+        name: '陈云1',
+        id: 39,
+        roleNames: '子管理员',
+        orgId: 1,
+      },
+      {
+        registTime: '2021-08-05 10:20:15',
+        lastLoginTime: '2021-08-05 15:33:43',
+        orgName: '组织机构',
+        phone: null,
+        roles: 'user',
+        loginName: 'yonghu',
+        name: 'yonghu',
+        id: 38,
+        roleNames: '用户',
+        orgId: 1,
+      },
+    ],
+  },
+}
+
 export {
   examList,
   roleList,
   userInfo,
+  userList,
   cardList,
   paperList,
   paperIntro,
