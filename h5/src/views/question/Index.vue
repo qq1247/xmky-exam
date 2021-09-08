@@ -24,10 +24,7 @@
         <div class="exam-item">
           <div
             class="exam-content exam-add"
-            @click="
-              examForm.show = true
-              examForm.edit = false
-            "
+            @click=";(examForm.show = true), (examForm.edit = false)"
           >
             <i class="common common-plus"></i>
             <span>添加试题分类</span>
@@ -99,8 +96,8 @@
       :close-on-click-modal="false"
       @close="resetData('roleForm')"
     >
-      <el-form :model="roleForm" ref="examForm" label-width="100px">
-        <el-form-item label="使用权限">
+      <el-form :model="roleForm" ref="roleForm" label-width="100px">
+        <el-form-item label="使用权限" prop="readRoleUser">
           <CustomSelect
             ref="readSelect"
             placeholder="请选择授权用户"
@@ -119,7 +116,7 @@
             ></el-option>
           </CustomSelect>
         </el-form-item>
-        <el-form-item label="编辑权限">
+        <el-form-item label="编辑权限" prop="writeRoleUser">
           <CustomSelect
             ref="writeSelect"
             placeholder="请选择授权用户"
@@ -151,9 +148,14 @@
       width="40%"
       title="移动分类下试题"
       :close-on-click-modal="false"
-      @close="resetData('examForm')"
+      @close="resetData('moveForm')"
     >
-      <el-form :model="examForm" label-width="100px">
+      <el-form
+        :model="examForm"
+        :rules="examForm.rules"
+        ref="moveForm"
+        label-width="120px"
+      >
         <el-form-item label="选择试题分类" prop="questionType">
           <CustomSelect
             :multiple="false"
@@ -215,7 +217,7 @@ export default {
         moveShow: false,
         total: 1,
         curPage: 1,
-        questionType: '',
+        questionType: null,
         questionTypes: [],
         rules: {
           examName: [
@@ -291,10 +293,12 @@ export default {
     },
     // 编辑分类
     edit({ id, name }) {
-      this.examForm.edit = true
-      this.examForm.id = id
-      this.examForm.examName = name
       this.examForm.show = true
+      this.examForm.edit = true
+      this.$nextTick(() => {
+        this.examForm.id = id
+        this.examForm.examName = name
+      })
     },
     move({ id }) {
       this.examForm.moveShow = true
@@ -482,7 +486,7 @@ export default {
     },
     // 清空还原数据
     resetData(name) {
-      this.$tools.resetData(this, name)
+      this.$refs[name].resetFields()
     },
   },
 }
