@@ -7,6 +7,7 @@ import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -38,13 +39,13 @@ public class GlobalExceptionHandler {
 		}
 		
 		if (se instanceof UnauthorizedException) {
-			return PageResult.err().code(401).msg("未授权");
+			return PageResult.err().code(HttpStatus.UNAUTHORIZED.value()).msg("未授权");
 		}
 		if (se instanceof UnauthenticatedException) {
-			return PageResult.err().code(401).msg("未登陆");
+			return PageResult.err().code(HttpStatus.UNAUTHORIZED.value()).msg("未登陆");
 		}
 
 		log.error("shiro未捕获异常：{}", se.getMessage());
-		return PageResult.err().code(401);
+		return PageResult.err().code(HttpStatus.UNAUTHORIZED.value());
 	}
 }

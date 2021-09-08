@@ -193,7 +193,7 @@ public class ApiExamController extends BaseController{
 	}
 	
 	/**
-	 * 考试更新考试用户
+	 * 考试更新考试用户阅卷用户
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param id
@@ -201,12 +201,12 @@ public class ApiExamController extends BaseController{
 	 * @param markIds
 	 * @return PageResult
 	 */
-	@RequestMapping("/updateExamUser")
+	@RequestMapping("/updateMarkSet")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult updateExamUser(Integer id, Integer[] userIds) {
+	public PageResult updateMarkSet(Integer id, String[] examUserIds, Integer[] markUserIds) {
 		try {
-			examService.updateExamUser(id, userIds);
+			examService.updateMarkSet(id, examUserIds, markUserIds);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成更新考试用户错误：{}", e.getMessage());

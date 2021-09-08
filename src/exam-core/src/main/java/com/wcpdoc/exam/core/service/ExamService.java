@@ -56,14 +56,14 @@ public interface ExamService extends BaseService<Exam>{
 	List<Map<String, Object>> getExamUserList(Integer id);
 
 	/**
-	 * 考试更新考试用户
+	 * 考试更新考试用户阅卷用户
 	 * 
 	 * v1.0 zhanghc 2017年6月19日下午3:10:24
 	 * @param id
 	 * @param userIds
 	 * void
 	 */
-	void updateExamUser(Integer id, Integer[] userIds);
+	void updateMarkSet(Integer id, String[] examUserIds, Integer[] markUserIds);
 	
 	/**
 	 * 考试更新判卷用户

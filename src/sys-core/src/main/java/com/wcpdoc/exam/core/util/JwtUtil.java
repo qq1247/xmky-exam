@@ -5,6 +5,7 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 
 import com.wcpdoc.exam.core.entity.JwtResult;
 import com.wcpdoc.exam.core.exception.MyException;
@@ -123,13 +124,13 @@ public class JwtUtil {
 			}
 
 			Claims claims = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody();
-			return new JwtResult(200, "令牌有效", claims);
+			return new JwtResult(HttpStatus.OK.value(), "令牌有效", claims);
 		} catch (ExpiredJwtException e) {
 			log.info("解析令牌错误：{}", "令牌过期");
-			return new JwtResult(401, "令牌过期", e.getClaims());
+			return new JwtResult(HttpStatus.UNAUTHORIZED.value(), "令牌过期", e.getClaims());
 		} catch (Exception e) {
 			log.error("解析令牌错误：{}", e.getMessage());
-			return new JwtResult(500, "未知错误", null);
+			return new JwtResult(HttpStatus.INTERNAL_SERVER_ERROR.value(), "未知错误", null);
 		}
 	}
 	
