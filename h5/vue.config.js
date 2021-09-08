@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-07-27 17:31:01
  * @LastEditors: Che
- * @LastEditTime: 2021-08-30 07:57:17
+ * @LastEditTime: 2021-09-02 17:48:28
  */
 const os = require('os')
 const path = require('path')
@@ -52,6 +52,17 @@ module.exports = {
         components: resolve('src/components'),
       },
     },
+    plugins: [
+      new CompressionWebpackPlugin({
+        filename: '[path][base].gz',
+        algorithm: 'gzip',
+        // test: /\.js$|\.html$|\.json$|\.css/,
+        test: /\.js$|\.json$|\.css/,
+        threshold: 102400, // compression size
+        minRatio: 0.8, // compression ratio
+        deleteOriginalAssets: false, // Deleting source Files
+      }),
+    ],
   },
   chainWebpack(config) {
     // it can improve the speed of the first screen, it is recommended to turn on preload
@@ -105,21 +116,6 @@ module.exports = {
       })
       // https:// webpack.js.org/configuration/optimization/#optimizationruntimechunk
       config.optimization.runtimeChunk('single')
-
-      /* config
-        .plugin('CompressionWebpackPlugin')
-        .use('compression-webpack-plugin', [
-          {
-            filename: '[path].gz[query]',
-            algorithm: 'gzip',
-            // test: /\.js$|\.html$|\.json$|\.css/,
-            test: /\.js$|\.json$|\.css/,
-            threshold: 10240, // compression size
-            minRatio: 0.8, // compression ratio
-            deleteOriginalAssets: false, // Deleting source Files
-          },
-        ])
-        .end() */
     })
   },
   devServer: {
