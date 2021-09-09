@@ -1,7 +1,6 @@
 package com.wcpdoc.exam.api.controller;
 
-import java.util.Date;
-import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -20,8 +19,7 @@ import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.BulletinService;
-import com.wcpdoc.exam.core.util.StringUtil;
-import com.wcpdoc.exam.core.util.ValidateUtil;
+import com.wcpdoc.exam.core.util.DateUtil;
 /**
  * 公告控制层
  * 
@@ -70,12 +68,7 @@ public class ApiBulletinController extends BaseController {
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult add(Bulletin bulletin) {
 		try {
-			if (ValidateUtil.isValid(bulletin.getReadUserIds())) {
-				bulletin.setReadUserIds(","+bulletin.getReadUserIds()+",");
-			}
-			bulletin.setUpdateTime(new Date());
-			bulletin.setUpdateUserId(getCurUser().getId());
-			bulletinService.add(bulletin);
+			bulletinService.addAndUpdate(bulletin);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加公告错误：{}", e.getMessage());
@@ -97,20 +90,7 @@ public class ApiBulletinController extends BaseController {
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult edit(Bulletin bulletin) {
 		try {
-			Bulletin entity = bulletinService.getEntity(bulletin.getId());
-			entity.setTitle(bulletin.getTitle());
-			entity.setImgFileId(bulletin.getImgFileId());
-			entity.setContent(bulletin.getContent());
-			if (ValidateUtil.isValid(bulletin.getReadUserIds())) {
-				entity.setReadUserIds(","+bulletin.getReadUserIds()+",");
-			}else{
-				entity.setReadUserIds(null);
-			}
-			entity.setTopState(bulletin.getTopState());
-			entity.setState(bulletin.getState());
-			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(getCurUser().getId());
-			bulletinService.update(entity);
+			bulletinService.updateAndUpdate(bulletin);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改公告错误：{}", e.getMessage());
@@ -152,20 +132,11 @@ public class ApiBulletinController extends BaseController {
 	@RequestMapping("/get")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult get(Integer id) {		try {
-			Bulletin entity = bulletinService.getEntity(id);
-			List<Integer> readUserIds = null;
-			if(ValidateUtil.isValid(entity.getReadUserIds())){
-				readUserIds = StringUtil.toInt(entity.getReadUserIds().substring(1, entity.getReadUserIds().length()-1));
-			}
-			return PageResultEx.ok()
-					.addAttr("id", entity.getId())
-					.addAttr("title", entity.getTitle())
-					.addAttr("imgFileId", entity.getImgFileId())
-					.addAttr("content", entity.getContent())
-					.addAttr("topState", entity.getTopState())
-					.addAttr("state", entity.getState())
-					.addAttr("readUserIds", readUserIds);
+	public PageResult get(Integer id) {		
+		try {
+			Map<String, Object> map = bulletinService.get(id);
+			map.put("updateTime", DateUtil.formatDateTime(DateUtil.getDate(map.get("updateTime").toString())));
+			return PageResultEx.ok().data(map);
 		} catch (MyException e) {
 			log.error("获取参数错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

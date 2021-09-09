@@ -2,6 +2,7 @@ package com.wcpdoc.exam.core.dao.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -34,7 +35,7 @@ public class BulletinDaoImpl extends RBaseDaoImpl<Bulletin> implements BulletinD
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT BULLETIN.ID, BULLETIN.TITLE, BULLETIN.TOP_STATE, BULLETIN.UPDATE_TIME, "
 				+ "BULLETIN.IMG_FILE_ID, BULLETIN.CONTENT, BULLETIN.STATE, USER.NAME AS UPDATE_USER_NAME, "
-				+ "( SELECT GROUP_CONCAT( Z.NAME ) FROM SYS_USER Z WHERE BULLETIN.READ_USER_IDS LIKE CONCAT( '%', Z.ID, '%' ) ) AS READ_USER_NAMES "
+				+ "( SELECT GROUP_CONCAT( Z.NAME ) FROM SYS_USER Z WHERE BULLETIN.READ_USER_IDS LIKE CONCAT( '%,', Z.ID, ',%' ) ) AS READ_USER_NAMES "
 				+ "FROM EXM_BULLETIN BULLETIN "
 				+ "LEFT JOIN SYS_USER USER ON BULLETIN.UPDATE_USER_ID = USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
@@ -46,7 +47,6 @@ public class BulletinDaoImpl extends RBaseDaoImpl<Bulletin> implements BulletinD
 			   .addWhere("BULLETIN.STATE != ?", 0)
 			   .addOrder("BULLETIN.TOP_STATE", Order.ASC)
 			   .addOrder("BULLETIN.UPDATE_TIME", Order.DESC);
-		
 		  if (pageIn.get("readUserIds", Integer.class) != null) {
 			   User user = userDao.getEntity(pageIn.get("readUserIds", Integer.class));
 			   StringBuilder partSql = new StringBuilder();
@@ -54,8 +54,6 @@ public class BulletinDaoImpl extends RBaseDaoImpl<Bulletin> implements BulletinD
 			   partSql.append("(");
 			   partSql.append("BULLETIN.READ_USER_IDS IS NULL OR BULLETIN.READ_USER_IDS LIKE ? ");
 			   params.add("%," + user.getId() + ",%");
-			   /*partSql.append("OR BULLETIN.READ_ORG_IDS LIKE ? ");
-			   params.add("%," + user.getOrgId() + ",%");*/
 			   partSql.append(")");
 			   sqlUtil.addWhere(partSql.toString(), params.toArray(new Object[params.size()]));
 			  }
@@ -90,5 +88,15 @@ public class BulletinDaoImpl extends RBaseDaoImpl<Bulletin> implements BulletinD
 				.addOrder("ORG.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		return pageOut;
+	}
+
+	@Override
+	public List<Map<String, Object>> get(Integer id) {
+		String sql = "SELECT BULLETIN.ID, BULLETIN.TITLE, BULLETIN.TOP_STATE, BULLETIN.UPDATE_TIME, BULLETIN.IMG_FILE_ID, BULLETIN.CONTENT, BULLETIN.STATE, "
+				+ "USER.NAME AS UPDATE_USER_NAME, BULLETIN.READ_USER_IDS, BULLETIN.READ_ORG_IDS, "
+				+ "IFNULL((SELECT GROUP_CONCAT( USER.NAME SEPARATOR ',' ) FROM sys_user USER WHERE USER.state != 0 AND EXISTS ( SELECT 1 FROM EXM_BULLETIN et WHERE BULLETIN.ID = et.ID AND et.READ_USER_IDS LIKE CONCAT( '%,' , USER.ID, ',%' ))),'') AS 'READ_USER_NAMES', "
+				+ "IFNULL((SELECT GROUP_CONCAT( ORG.NAME SEPARATOR ',' ) FROM sys_org ORG WHERE ORG.state != 0 AND EXISTS ( SELECT 1 FROM EXM_BULLETIN et WHERE BULLETIN.ID = et.ID AND et.READ_ORG_IDS LIKE CONCAT( '%,' , USER.ID, ',%' ))),'') AS 'READ_ORG_NAMES' "
+				+ "FROM EXM_BULLETIN BULLETIN LEFT JOIN SYS_USER USER ON BULLETIN.UPDATE_USER_ID = USER.ID WHERE BULLETIN.ID = ? ";
+		return getMapList(sql, new Object[]{id});
 	}
 }
