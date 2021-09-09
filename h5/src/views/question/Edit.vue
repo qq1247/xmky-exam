@@ -607,7 +607,7 @@
 </template>
 <script>
 import { dictListPage } from 'api/base'
-import Upload from 'components/upload'
+import Upload from 'components/Upload'
 import Driver from 'driver.js'
 import 'driver.js/dist/driver.min.css'
 import { driverSetting, questionDriverStep } from '@/utils/driverGuide.js'
@@ -1205,7 +1205,7 @@ export default {
         this.templateClear('templateUpload')
         this.query()
       } else {
-        this.$message.error('解析失败！')
+        this.$message.error(res.msg)
       }
     },
     // 还原数据并查询

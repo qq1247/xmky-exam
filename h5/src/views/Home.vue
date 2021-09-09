@@ -9,7 +9,7 @@
         <div class="banner-list">
           <div class="banner-info">
             <p class="banner-title">{{ carouse.title }}</p>
-            <p class="banner-content">{{ carouse.content }}</p>
+            <p class="banner-content" v-html="carouse.content"></p>
             <div class="banner-btn">查看详情</div>
           </div>
           <el-image
@@ -366,12 +366,11 @@ export default {
     padding-right: 100px;
     color: #fff;
     .banner-title {
-      font-size: 36px;
+      font-size: 30px;
     }
     .banner-content {
-      font-size: 14px;
+      font-size: 16px;
       overflow: hidden;
-      text-indent: 2em;
       margin: 5px 0 0 30px;
     }
     .banner-btn {

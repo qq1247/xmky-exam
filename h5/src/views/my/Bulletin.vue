@@ -22,7 +22,12 @@
           <el-col :span="7">
             <el-form-item style="float: right">
               <el-button
-                @click="editForm.show = true"
+                @click="
+                  ;(editForm.show = true),
+                    (editForm.id = null),
+                    (editForm.imgFileId = []),
+                    (editForm.content = '')
+                "
                 icon="el-icon-circle-plus-outline"
                 size="mini"
                 type="primary"
@@ -86,8 +91,11 @@
     </div>
     <el-dialog
       :visible.sync="editForm.show"
-      @close="resetData('editForm')"
+      :show-close="false"
+      width="40%"
       title="公告"
+      :close-on-click-modal="false"
+      @close="resetData('editForm')"
     >
       <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
         <el-form-item label="标题" label-width="120px" prop="title">
@@ -103,28 +111,22 @@
             id="content"
           ></Editor>
         </el-form-item>
-        <el-form-item label="阅读人员" label-width="120px">
+        <el-form-item label="阅读人员" label-width="120px" prop="examUser">
           <CustomSelect
-            :currentPage="editForm.curPage"
-            :filterable="true"
-            :multiple="true"
-            :pageSize="editForm.pageSize"
-            :remote="true"
-            :remoteMethod="searchUser"
-            :reserveKeyword="true"
-            :showPage="true"
-            :total="editForm.total"
-            :value="editForm.examUser"
-            @change="selectUser"
-            @currentChange="getMoreUser"
-            @focus="getUserList()"
+            ref="readSelect"
             placeholder="请选择用户"
+            :value="editForm.examUser"
+            :total="editForm.total"
+            @input="searchUser"
+            @change="selectExamUser"
+            @currentChange="getMoreUser"
+            @visibleChange="getUserList"
           >
             <el-option
+              v-for="item in editForm.examUsers"
               :key="item.id"
               :label="item.name"
               :value="item.id"
-              v-for="item in editForm.examUsers"
             ></el-option>
           </CustomSelect>
         </el-form-item>
@@ -146,28 +148,17 @@
             :inactive-value="1"
           ></el-switch>
         </el-form-item>
-        <el-form-item
-          label="轮播图片"
-          label-width="120px"
-          prop="imgFileId"
-          v-if="editForm.state == 2"
-        >
-          <el-upload
-            :headers="headers"
-            :on-success="fileUploadBackcall"
-            :show-file-list="false"
-            action="/api/file/upload"
-            class="avatar-uploader"
-            name="files"
-          >
-            <img
-              :src="editForm.imageUrl"
-              class="avatar"
-              v-if="editForm.imageUrl"
+        <template v-if="editForm.state == 2">
+          <el-form-item label="轮播图片" label-width="120px" prop="imgFileId">
+            <Upload
+              ref="bannerUpload"
+              type="image"
+              :files="editForm.imgFileId"
+              @success="bannerSucess"
+              @remove="bannerRemove"
             />
-            <i class="el-icon-plus avatar-uploader-icon" v-else></i>
-          </el-upload>
-        </el-form-item>
+          </el-form-item>
+        </template>
       </el-form>
       <div class="dialog-footer" slot="footer">
         <el-button @click="add" type="primary" v-if="editForm.id == null"
@@ -191,12 +182,14 @@ import {
   bulletinGet,
 } from 'api/base'
 import { userListPage } from 'api/user'
+import Upload from 'components/Upload'
 import Editor from 'components/Editor.vue'
 import EditHeader from 'components/EditHeader.vue'
 import CustomSelect from 'components/CustomSelect.vue'
 export default {
   components: {
     Editor,
+    Upload,
     EditHeader,
     CustomSelect,
   },
@@ -217,29 +210,20 @@ export default {
       // 修改表单
       editForm: {
         id: null, // 主键
-        title: null, // 标题
-        imgFileId: null, // 图片
-        imageUrl: null,
-        content: null, // 内容
+        title: '', // 标题
+        imgFileId: [], // 图片
+        content: '', // 内容
         state: 1, // 状态
         topState: 1, // 置顶状态
         show: false, // 是否显示页面
         examUsers: [],
         examUser: [],
-        curPage: 1, // 当前第几页
-        pageSize: 10, // 每页多少条
+        pageSize: 5, // 每页多少条
         total: 0,
         // 校验
         rules: {
-          title: [{ required: true, message: '请输入标题', trigger: 'change' }],
+          title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
         },
-        examRemarks: [
-          {
-            examCheckPerson: '',
-            examQuestionNum: [],
-            examUser: [],
-          },
-        ],
       },
       headers: {
         Authorization: this.$store.getters.token,
@@ -279,15 +263,26 @@ export default {
     editorListener(id, value) {
       this.editForm[id] = value
     },
-    fileUploadBackcall(res, file) {
-      this.editForm.imageUrl = '/api/file/download?id=' + res.data.fileIds
-      this.editForm.imgFileId = res.data.fileIds
+    // 上传试题模板成功
+    bannerSucess(res, file, fileList) {
+      this.editForm.imgFileId = fileList
+    },
+    // 上传试题模板失败
+    bannerClear(ref) {
+      if (this.editForm.imgFileId.length > 0) {
+        this.$refs[ref].clear()
+        this.$set(this.editForm, 'imgFileId', [])
+      }
+    },
+    // 删除试题模板
+    bannerRemove(file, fileList) {
+      this.editForm.imgFileId = fileList
     },
     // 获取用户
-    async getUserList(name = '') {
+    async getUserList(curPage = 1, name = '') {
       const examUsers = await userListPage({
         name,
-        curPage: this.editForm.curPage,
+        curPage,
         pageSize: this.editForm.pageSize,
       })
 
@@ -295,17 +290,15 @@ export default {
       this.editForm.total = examUsers.data.total
     },
     // 获取更多用户
-    getMoreUser(curPage) {
-      this.editForm.curPage = curPage
-      this.getUserList()
+    getMoreUser(curPage, name) {
+      this.getUserList(curPage, name)
     },
     // 根据name 查询人员
     searchUser(name) {
-      this.editForm.curPage = 1
-      this.getUserList(name)
+      this.getUserList(1, name)
     },
-    // 选择考试用户
-    selectUser(e) {
+    // 选择阅卷考生
+    selectExamUser(e) {
       this.editForm.examUser = e
     },
     // 添加机构
@@ -317,7 +310,10 @@ export default {
 
         const res = await bulletinAdd({
           title: this.editForm.title,
-          imgFileId: this.editForm.imgFileId,
+          imgFileId:
+            this.editForm.imgFileId.length > 0
+              ? this.editForm.imgFileId[0].response.data.fileIds
+              : null,
           content: this.editForm.content,
           readUserIds: this.editForm.examUser,
           topState: this.editForm.topState,
@@ -330,9 +326,14 @@ export default {
         }
 
         this.editForm.show = false
-        this.$refs['editForm'].resetFields()
         this.query()
       })
+    },
+    getQueryString(url, name) {
+      var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i')
+      var r = url.slice(url.indexOf('?') + 1).match(reg)
+      if (r != null) return unescape(r[2])
+      return null
     },
     // 修改
     edit() {
@@ -340,11 +341,15 @@ export default {
         if (!valid) {
           return false
         }
-
         const res = await bulletinEdit({
           id: this.editForm.id,
           title: this.editForm.title,
-          imgFileId: this.editForm.imgFileId,
+          imgFileId:
+            this.editForm.imgFileId.length > 0
+              ? this.editForm.imgFileId[0]?.response
+                ? this.editForm.imgFileId[0].response.data.fileIds
+                : this.getQueryString(this.editForm.imgFileId[0].url, 'id')
+              : null,
           content: this.editForm.content,
           readUserIds: this.editForm.examUser,
           topState: this.editForm.topState,
@@ -357,7 +362,6 @@ export default {
         }
 
         this.editForm.show = false
-        this.$refs['editForm'].resetFields()
         this.query()
       })
     },
@@ -385,14 +389,51 @@ export default {
       }
 
       this.editForm.show = true
-      this.editForm.id = res.data.id
-      this.editForm.title = res.data.title
-      this.editForm.imgFileId = res.data.imgFileId
-      this.editForm.content = res.data.content
-      this.editForm.topState = res.data.topState
-      this.editForm.state = res.data.state
-      this.editForm.imageUrl = '/api/file/download?id=' + res.data.imgFileId
-      this.editForm.examUser = res.data.readUserIds
+      this.editForm.imgFileId = []
+      this.editForm.content = res.data?.content || ''
+      this.$nextTick(() => {
+        this.editForm.id = res.data.id
+        this.editForm.title = res.data.title
+        this.editForm.topState = res.data.topState
+        this.editForm.state = res.data.state
+        if (res.data.readUserNames !== '') {
+          const { roleIds: readIds, roleNames: readNames } =
+            this.compositionRoles(res.data.readUserIds, res.data.readUserNames)
+          this.editForm.examUser.push(...readIds)
+          this.$refs['readSelect'].$refs['elSelect'].cachedOptions.push(
+            ...readNames
+          )
+        }
+        if (res.data.imgFileId !== '') {
+          this.editForm.imgFileId.push({
+            url: `${process.env.VUE_APP_BASE_URL}file/download?id=${Number(
+              res.data.imgFileId
+            )}`,
+          })
+        }
+      })
+    },
+    // 组合回显数据
+    compositionRoles(userIds, userNames) {
+      const ids = userIds
+        .split(',')
+        .filter((item) => item !== '')
+        .map((item) => Number(item))
+      const names = userNames.split(',')
+      const roles = ids.reduce(
+        (acc, cur, index) => {
+          acc['roleIds'].push(cur)
+          acc['roleNames'].push({
+            currentLabel: names[index],
+            currentValue: cur,
+            label: names[index],
+            value: cur,
+          })
+          return acc
+        },
+        { roleIds: [], roleNames: [] }
+      )
+      return roles
     },
     // 分页切换
     pageChange(val) {
@@ -400,6 +441,7 @@ export default {
     },
     // 清空还原数据
     resetData(name) {
+      this.bannerClear('bannerUpload')
       this.$refs[name].resetFields()
     },
   },
