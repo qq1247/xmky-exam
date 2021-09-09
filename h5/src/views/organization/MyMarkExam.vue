@@ -93,7 +93,7 @@
 </template>
 
 <script>
-import { myMarkExamListPage } from '@/api/my'
+import { myMarkExamListPage } from 'api/my'
 export default {
   data() {
     return {
@@ -158,7 +158,6 @@ export default {
 .container {
   display: flex;
   align-items: center;
-  padding-top: 120px;
   .content {
     width: 1170px;
   }

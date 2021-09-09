@@ -154,7 +154,7 @@
 </template>
 
 <script>
-import { parmListPage, parmAdd, parmEdit, parmGet, parmDel } from '@/api/base'
+import { parmListPage, parmAdd, parmEdit, parmGet, parmDel } from 'api/base'
 export default {
   data() {
     return {
@@ -306,10 +306,7 @@ export default {
       }).then(async () => {
         const res = await parmDel({ id })
         if (res?.code != 200) {
-          this.$message({
-            type: 'error',
-            message: res.msg,
-          })
+          this.$message.error(res.msg)
         }
 
         this.query()
@@ -322,7 +319,6 @@ export default {
 .container {
   display: flex;
   align-items: center;
-  padding-top: 120px;
   .content {
     width: 1170px;
     .search {

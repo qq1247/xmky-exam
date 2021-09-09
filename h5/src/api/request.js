@@ -5,14 +5,21 @@
  * @Author: Che
  * @Date: 2021-07-30 13:36:21
  * @LastEditors: Che
- * @LastEditTime: 2021-08-11 22:51:40
+ * @LastEditTime: 2021-08-25 13:14:32
  */
 import http from '@/utils/http'
 import qs from 'qs'
 
+/**
+ * @name: request
+ * @description: post请求封装
+ * @param {*}
+ * @return {*}
+ */
 const request = (
   url,
   params = {},
+  timeout = 6000,
   responseType = 'json',
   headers = 'application/x-www-form-urlencoded'
 ) =>
@@ -27,6 +34,7 @@ const request = (
     headers: {
       'Content-Type': headers,
     },
+    timeout: timeout,
   })
 
 export default request

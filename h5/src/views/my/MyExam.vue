@@ -19,7 +19,6 @@
     <div class="content">
       <div class="content-center">
         <div class="paper-title">{{ paper.name }}</div>
-        <div class="paper-intro">{{ paper.id }}</div>
 
         <template v-if="paperQuestion.length > 0">
           <div :key="index" v-for="(item, index) in paperQuestion">
@@ -42,7 +41,7 @@
               >
                 <p
                   class="question-title"
-                  v-html="index + 1 + '、' + child.title"
+                  v-html="`${index + 1}、${child.title}`"
                 ></p>
 
                 <!-- 单选 -->
@@ -165,10 +164,7 @@
             </template>
           </div>
         </template>
-        <div class="data-null" v-if="paperQuestion.length == 0">
-          <img alt class="data-img" src="../../assets/img/data-null.png" />
-          <span class="data-tip">暂无试卷信息</span>
-        </div>
+        <el-empty v-else description="暂无试卷"> </el-empty>
       </div>
 
       <el-collapse
@@ -204,10 +200,10 @@
   </div>
 </template>
 <script>
-import { paperGet, paperQuestionList } from '@/api/paper'
-import { myExamAnswerList, myExamUpdateAnswer, myExamDoAnswer } from '@/api/my'
-import CountDown from '@/components/CountDown.vue'
-import { loginSysTime } from '@/api/common'
+import { paperGet, paperQuestionList } from 'api/paper'
+import { myExamAnswerList, myExamUpdateAnswer, myExamDoAnswer } from 'api/my'
+import CountDown from 'components/CountDown.vue'
+import { loginSysTime } from 'api/common'
 export default {
   components: {
     CountDown,
@@ -263,7 +259,7 @@ export default {
     // 校准时间差
     async setTime() {
       const systemTime = await loginSysTime({})
-      let times = new Date(systemTime.data) - new Date()
+      const times = new Date(systemTime.data) - new Date()
       this.time =
         new Date(this.examEndTime).getTime() - (new Date().getTime() + times)
     },
@@ -313,7 +309,7 @@ export default {
           return acc
         }, {})
       } catch (error) {
-        this.$tools.message(error, 'error')
+        this.$message.error(error)
       }
     },
     // 更新答案
@@ -323,7 +319,7 @@ export default {
       }
 
       if (!this.myExamDetailCache[questionId]) {
-        this.$tools.message('提交答案失败，请联系管理员！', 'error')
+        this.$message.error('提交答案失败，请联系管理员！')
         return
       }
 
@@ -333,19 +329,19 @@ export default {
       })
     },
     // 更新填空答案
-    async updateClozeAnswer(questionId, val, answers, index) {
+    updateClozeAnswer(questionId, val, answers, index) {
+      console.log(answers)
       if (this.preview === 'true') {
         return
       }
       if (!this.myExamDetailCache[questionId]) {
-        this.$tools.message('提交答案失败，请联系管理员！', 'error')
+        this.$message.error('提交答案失败，请联系管理员！')
         return
       }
 
-      answers[index] = val
-      const res = await myExamUpdateAnswer({
+      myExamUpdateAnswer({
         myExamDetailId: this.myExamDetailCache[questionId].myExamDetailId,
-        answers: answers,
+        answers: this.myExamDetailCache[questionId].answers,
       })
     },
     // 考试结束
@@ -360,12 +356,12 @@ export default {
           ? this.$router.replace({
               path: '/my',
             })
-          : this.$tools.message('请重新提交试卷！', 'warning')
+          : this.$message.warning('请重新提交试卷！')
       })
     },
     // 倒计时结束，强制交卷
     async forceExamEnd() {
-      this.$alert('考试时间到，已强制交卷！', '', {
+      this.$alert('考试时间到，已强制交卷！', {
         confirmButtonText: '确定',
         type: 'info',
         showClose: false,
@@ -380,5 +376,5 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-@import '@/assets/style/exam.scss';
+@import 'assets/style/exam.scss';
 </style>

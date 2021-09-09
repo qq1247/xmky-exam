@@ -1,13 +1,15 @@
 package com.wcpdoc.exam.core.entity;
 
+import org.springframework.http.HttpStatus;
+
 /**
  * 页面结果
  * 
  * v1.0 zhanghc 2015-6-19下午08:30:16
  */
 public class PageResult {
-	protected static final Integer HTTP_200 = 200;
-	protected static final Integer HTTP_500 = 500;
+	protected static final Integer HTTP_200 = HttpStatus.OK.value();
+	protected static final Integer HTTP_500 = HttpStatus.INTERNAL_SERVER_ERROR.value();
 
 	protected static final String HTTP_200_MSG = "请求成功";
 	protected static final String HTTP_500_MSG = "未知错误";

@@ -31,7 +31,8 @@
         ></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" class="login-btn" @click="login('ruleForm')"
+        <el-button type="primary" class="login-btn"
+@click="login('ruleForm')"
           >登录</el-button
         >
       </el-form-item>
@@ -73,14 +74,10 @@ export default {
                 : this.$router.replace({
                     path: this.$route.query.redirect,
                   })
-              this.$tools.message('登录成功！', 'info')
+              this.$message('登录成功！')
             })
         } else {
-          this.$message({
-            message: '请核对登录信息',
-            duration: 2000,
-            type: 'warning',
-          })
+          this.$message.warning('请核对登录信息')
           return false
         }
       })
@@ -96,7 +93,6 @@ export default {
   background-size: cover;
   justify-content: center;
   align-items: center;
-  padding-top: 120px;
 }
 .login-wrap {
   position: relative;

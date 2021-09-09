@@ -10,10 +10,10 @@
       <!-- 权限人员展示 -->
       <template v-if="parentClassify.includes(name)">
         <div class="content-info ellipsis">
-          <span>使用权限：{{ data.readUserNames.join(',') || '暂无' }}</span>
+          <span>使用权限：{{ data.readUserNames || '暂无' }}</span>
         </div>
         <div class="content-info ellipsis">
-          <span>编辑权限：{{ data.writeUserNames.join(',') || '暂无' }}</span>
+          <span>编辑权限：{{ data.writeUserNames || '暂无' }}</span>
         </div>
       </template>
       <!-- 试卷列表 -->
@@ -28,7 +28,7 @@
         </el-row>
         <el-row :gutter="20" class="content-info">
           <el-col :span="12" class="info-left"
-            >及格：{{ data.passScore }}</el-col
+            >及格：{{ (data.passScore * data.totalScore) / 100 }}</el-col
           >
           <el-col :span="12" class="info-right"
             >满分：{{ data.totalScore }}</el-col
@@ -90,9 +90,16 @@
             name === 'myExamList' ? data.examStartTime : data.markStartTime
           }}</el-col>
         </el-row>
-        <el-row class="content-info">
+        <el-row class="content-info" v-if="name === 'myExamList'">
           <el-col
             >及格：{{ data.totalScore || 0 }}/{{ data.paperTotalScore }}</el-col
+          >
+        </el-row>
+        <el-row class="content-info" v-if="name === 'myMarkExamList'">
+          <el-col
+            >及格：{{
+              (data.paperPassScore * data.paperTotalScore) / 100 || 0
+            }}/{{ data.paperTotalScore }}</el-col
           >
         </el-row>
         <div class="tagGroup">
@@ -165,10 +172,7 @@
             <i class="common common-messages"></i>
           </span>
           <span data-title="阅卷设置" @click="read(data)">
-            <i class="common common-readPaper"></i>
-          </span>
-          <span data-title="考试用户" @click="user(data)">
-            <i class="common common-wode"></i>
+            <i class="common common-setting"></i>
           </span>
         </template>
         <!-- 我的考试 -->
@@ -298,12 +302,12 @@ export default {
       const isChildrenClassify = this.childrenClassify.includes(this.name)
 
       if (isparentClassify && (isCreateUser || isUpdateUser)) {
-        this.$tools.message('暂无此项权限！', 'warning')
+        this.$message.warning('暂无此项权限！')
         return true
       }
 
       if (isChildrenClassify && isPublish) {
-        this.$tools.message('已发布不可修改！', 'warning')
+        this.$message.warning('已发布不可修改！')
         return true
       }
       return false
@@ -355,10 +359,6 @@ export default {
     // 阅卷设置
     read(data) {
       this.$emit('read', data)
-    },
-    // 考试用户
-    user(data) {
-      this.$emit('user', data)
     },
     // 发布考试
     publish(data) {

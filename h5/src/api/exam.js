@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-11 16:28:25
  * @LastEditors: Che
- * @LastEditTime: 2021-08-11 22:47:52
+ * @LastEditTime: 2021-09-03 16:35:52
  */
 import request from './request'
 
@@ -42,30 +42,13 @@ export const examEdit = (params) => request('exam/edit', params)
 export const examDel = (params) => request('exam/del', params)
 
 /**
- * @name: examUpdateExamUser
- * @description: 更新考试用户
+ * @name: examUpdateMarkSet
+ * @description: 更新阅卷用户
  * @param {*}
  * @return {*}
  */
-export const examUpdateExamUser = (params) =>
-  request('exam/updateExamUser', params)
-
-/**
- * @name: examUpdateMarkUser
- * @description: 跟新阅卷用户
- * @param {*}
- * @return {*}
- */
-export const examUpdateMarkUser = (params) =>
-  request('exam/updateMarkUser', params)
-
-/**
- * @name: examUserList
- * @description: 考试用户列表
- * @param {*}
- * @return {*}
- */
-export const examUserList = (params) => request('exam/examUserList', params)
+export const examUpdateMarkSet = (params) =>
+  request('exam/updateMarkSet', params)
 
 /**
  * @name: examMarkUserList

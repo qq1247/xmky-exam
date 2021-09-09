@@ -1,11 +1,11 @@
 <!--
- * @Description: 
+ * @Description:
  * @Version: 1.0
- * @Company: 
+ * @Company:
  * @Author: Che
  * @Date: 2021-07-22 18:05:35
  * @LastEditors: Che
- * @LastEditTime: 2021-08-13 15:49:43
+ * @LastEditTime: 2021-08-18 18:42:19
 -->
 <template>
   <div id="app">
@@ -24,7 +24,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import url(//at.alicdn.com/t/font_840312_icvipdj9m98.css);
+@import url(//at.alicdn.com/t/font_840312_0zlrqvwacx3.css);
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

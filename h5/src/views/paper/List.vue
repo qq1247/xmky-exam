@@ -10,7 +10,7 @@
         ></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="query" icon="el-icon-search" type="primary"
+        <el-button @click="search" icon="el-icon-search" type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -19,7 +19,10 @@
     <div class="content">
       <div class="exam-list">
         <div class="exam-item">
-          <div class="exam-content exam-add" @click="paperForm.show = true">
+          <div
+            class="exam-content exam-add"
+            @click=";(paperForm.show = true), (paperForm.edit = false)"
+          >
             <i class="common common-plus"></i>
             <span>添加试卷</span>
           </div>
@@ -100,7 +103,7 @@
                 v-model="paperForm.name"
               ></el-input>
             </el-form-item>
-            <el-form-item label="及格分数" prop="passScore" required>
+            <el-form-item label="及格分数" prop="passScore">
               <el-input
                 type="number"
                 min="1"
@@ -210,9 +213,9 @@ import {
   paperDel,
   paperCopy,
   paperPublish,
-} from '@/api/paper'
-import Editor from '@/components/Editor.vue'
-import ListCard from '@/components/ListCard.vue'
+} from 'api/paper'
+import Editor from 'components/Editor.vue'
+import ListCard from 'components/ListCard.vue'
 export default {
   components: {
     Editor,
@@ -311,6 +314,8 @@ export default {
           ],
           passScore: [
             {
+              required: true,
+              trigger: 'blur',
               validator: validatePercentage,
             },
           ],
@@ -335,10 +340,14 @@ export default {
       this.paperList = paperList.data.list
       this.total = paperList.data.total
     },
+    search() {
+      this.curPage = 1
+      this.query()
+    },
     // 添加试卷信息
     addOrEdit() {
       if (!this.paperForm.name) {
-        this.$tools.message('试卷名称不能为空', 'error')
+        this.$message('试卷名称不能为空', 'error')
         return
       }
       this.$refs['paperForm'].validate(async (valid) => {
@@ -364,16 +373,14 @@ export default {
 
         if (res?.code == 200) {
           this.paperForm.show = false
-          this.$tools.message(
-            !this.paperForm.edit ? '添加成功！' : '修改成功！'
-          )
+          this.$message(!this.paperForm.edit ? '添加成功！' : '修改成功！')
           if (this.paperForm.edit) {
             this.pageChange()
           } else {
             this.pageChange(1)
           }
         } else {
-          this.$tools.message(
+          this.$message(
             !this.paperForm.edit ? '添加失败！' : '修改失败！',
             'error'
           )
@@ -382,25 +389,28 @@ export default {
     },
     // 编辑分类
     edit(item) {
-      this.paperForm.edit = true
-      this.paperForm.id = item.id
-      this.paperForm.genType = item.genType
-      this.paperForm.name = item.name
-      this.paperForm.passScore = item.passScore
-      this.paperForm.readRemark = item.readRemark
-      this.paperForm.readNum = item.readNum
-      this.paperForm.showType = String(item.showType)
-      this.paperForm.options = item.options == '' ? [] : item.options.split(',')
-      this.paperForm.paperRemarkShow = !!item.paperRemark
-      this.paperForm.paperRemark = !item.paperRemark
-        ? [
-            {
-              score: '',
-              remark: '',
-            },
-          ]
-        : item.paperRemark
       this.paperForm.show = true
+      this.paperForm.edit = true
+      this.$nextTick(() => {
+        this.paperForm.id = item.id
+        this.paperForm.genType = item.genType
+        this.paperForm.name = item.name
+        this.paperForm.passScore = item.passScore
+        this.paperForm.readRemark = item.readRemark
+        this.paperForm.readNum = item.readNum
+        this.paperForm.showType = String(item.showType)
+        this.paperForm.options =
+          item.options == '' ? [] : item.options.split(',')
+        this.paperForm.paperRemarkShow = !!item.paperRemark
+        this.paperForm.paperRemark = !item.paperRemark
+          ? [
+              {
+                score: '',
+                remark: '',
+              },
+            ]
+          : item.paperRemark
+      })
     },
     // 删除分类
     del({ id, name }) {
@@ -410,22 +420,24 @@ export default {
         type: 'warning',
       })
         .then(async () => {
-          const res = await paperDel({ id }).catch((err) => {})
+          const res = await paperDel({ id })
           if (res?.code == 200) {
             this.total -= 1
             if (this.total <= this.pageSize) {
               this.pageChange(1)
               return
             }
-            this.$tools.message('删除成功！')
+            this.$message('删除成功！')
             this.total % this.pageSize == 0 && this.total != this.pageSize
               ? ((this.curPage -= 1), this.pageChange(this.curPage))
               : this.pageChange(this.curPage)
           } else {
-            this.$tools.message(res.msg || '删除失败！', 'error')
+            this.$message(res.msg || '删除失败！', 'error')
           }
         })
-        .catch(() => {})
+        .catch((err) => {
+          console.log(err)
+        })
     },
     // 复制分类
     async copy({ id }) {
@@ -434,25 +446,25 @@ export default {
           id,
         })
         res?.code == 200
-          ? (this.$tools.message('复制成功！'), this.pageChange())
-          : this.$tools.message('复制失败！', 'error')
+          ? (this.$message('复制成功！'), this.pageChange())
+          : this.$message('复制失败！', 'error')
       } catch (error) {}
     },
     // 生成试卷
-    composition({ id, name }) {
+    composition({ id, name, state }) {
       this.$router.push({
         path: '/paper/edit',
-        query: { id, name },
+        query: { id, name, state },
       })
     },
     // 统计分类
     statistics() {
-      this.$tools.message('暂未开放！', 'warning')
+      this.$message('暂未开放！', 'warning')
     },
     // 考试发布
     async publish({ id, state }) {
       if (state == 1) {
-        this.$tools.message('试卷已发布!', 'warning')
+        this.$message('试卷已发布!', 'warning')
         return
       }
       this.$confirm(`确认发布试卷吗？`, '提示', {
@@ -461,12 +473,14 @@ export default {
         type: 'warning',
       })
         .then(async () => {
-          const res = await paperPublish({ id }).catch((err) => {})
+          const res = await paperPublish({ id })
           res?.code == 200
-            ? (this.$tools.message('考试发布成功！'), this.pageChange())
-            : this.$tools.message('请重新发布考试！', 'error')
+            ? (this.$message('考试发布成功！'), this.pageChange())
+            : this.$message('请重新发布考试！', 'error')
         })
-        .catch(() => {})
+        .catch((err) => {
+          console.log(err)
+        })
     },
     // 切换分页
     pageChange(val) {
@@ -490,7 +504,7 @@ export default {
     setPaperType(index) {
       if (index == 1) {
         this.paperForm.genType = 0
-        this.$tools.message('暂未开放！', 'warning')
+        this.$message('暂未开放！', 'warning')
         return
       }
       this.paperForm.genType = index
@@ -508,14 +522,14 @@ export default {
     },
     // 清空还原数据
     resetData(name) {
-      this.$tools.resetData(this, name)
+      this.$refs[name].resetFields()
     },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-@import '@/assets/style/list-card.scss';
+@import 'assets/style/list-card.scss';
 
 /deep/ .el-dialog__header {
   padding: 0;

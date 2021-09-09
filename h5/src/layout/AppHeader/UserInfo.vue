@@ -1,11 +1,11 @@
 <!--
- * @Description: 
+ * @Description:
  * @Version: 1.0
- * @Company: 
+ * @Company:
  * @Author: Che
  * @Date: 2021-08-09 17:59:09
  * @LastEditors: Che
- * @LastEditTime: 2021-08-13 10:38:00
+ * @LastEditTime: 2021-08-19 16:23:40
 -->
 <template>
   <div class="header-userInfo">
@@ -57,7 +57,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { loginPwdUpdate } from '@/api/common'
+import { loginPwdUpdate } from 'api/common'
 export default {
   name: 'UserInfo',
   data() {
@@ -78,7 +78,7 @@ export default {
 
       if (command === 'out') {
         this.$store.dispatch('user/resetToken').then(() => {
-          this.$tools.message('登出成功！', 'info')
+          this.$message('登出成功！')
           this.$router.push('/')
         })
       }
@@ -90,7 +90,7 @@ export default {
       })
 
       if (res.code != 200) {
-        this.$tools.message(res.msg, 'warning')
+        this.$message.warning(res.msg)
         return
       }
 

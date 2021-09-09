@@ -25,7 +25,7 @@ const toLogin = () => {
   router.replace({
     path: '/login',
     query: {
-      redirect: router.currentRoute.fullPath,
+      redirect: '/',
     },
   })
 }
@@ -39,7 +39,7 @@ const errorHandle = (status, msg) => {
   // 状态码判断
   switch (status) {
     case 500:
-      message(`${msg}`)
+      message(msg)
       break
     case 401:
     case 403:
@@ -52,14 +52,14 @@ const errorHandle = (status, msg) => {
       message('请求的资源不存在')
       break
     default:
-      message(`${msg}`)
+      message(msg)
   }
 }
 
 // 创建axios实例
 var instance = axios.create({
   baseURL: process.env.VUE_APP_BASE_URL,
-  timeout: 1000 * 1000,
+  timeout: 6 * 1000,
 })
 
 /**

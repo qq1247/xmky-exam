@@ -54,7 +54,7 @@ public class XssFilter implements Filter {
  		if (!(httpServletRequest.getRequestURI().equals("/api/question/add") || httpServletRequest.getRequestURI().equals("/api/question/edit")
  		   || httpServletRequest.getRequestURI().equals("/api/paper/add") || httpServletRequest.getRequestURI().equals("/api/paper/edit")
  		   || httpServletRequest.getRequestURI().equals("/api/exam/add") || httpServletRequest.getRequestURI().equals("/api/exam/edit")
- 				)) {
+ 		  || httpServletRequest.getRequestURI().equals("/api/bulletin/add") || httpServletRequest.getRequestURI().equals("/api/bulletin/edit") )) {
  			if (log.isDebugEnabled()) {
  				log.debug("Xss过滤前：【{}】【{}】", httpServletRequest.getRequestURI(), JSONObject.toJSONString(httpServletRequest.getParameterMap()));
  			}
@@ -107,6 +107,7 @@ class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 		sqlKeyWords.add("+");
 		
 		pageKeyWords.add("title");//定制非过滤的，通过富文本框处理的
+		pageKeyWords.add("content");
 		pageKeyWords.add("optionA");
 		pageKeyWords.add("optionB");
 		pageKeyWords.add("optionC");

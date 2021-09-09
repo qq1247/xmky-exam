@@ -5,7 +5,7 @@ const getMainColor = (image) => {
       const img = new Image() // 创建img元素
       img.src = image // 设置图片源地址
       img.onload = () => {
-        let color = getImageColor(canvas, img)
+        const color = getImageColor(canvas, img)
         resolve(color)
       }
     } catch (e) {
@@ -19,15 +19,15 @@ const getImageColor = (canvas, img) => {
   context.drawImage(img, 0, 0)
 
   // 获取像素数据
-  let pixelData = context.getImageData(0, 0, canvas.width, canvas.height).data
+  const pixelData = context.getImageData(0, 0, canvas.width, canvas.height).data
   return getCountsArr(pixelData)
 }
 
 const getCountsArr = (pixelData) => {
-  let colorList = []
-  let rgba = []
+  const colorList = []
+  const rgba = []
   let rgbaStr = ''
-  let arr = []
+  const arr = []
 
   // 分组循环
   for (let i = 0; i < pixelData.length; i += 4) {
@@ -47,7 +47,7 @@ const getCountsArr = (pixelData) => {
     }
   }
 
-  for (let prop in colorList) {
+  for (const prop in colorList) {
     arr.push({
       // 如果只获取rgb,则为`rgb(${prop})`
       color: `rgba(${prop})`,

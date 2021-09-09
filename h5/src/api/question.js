@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-11 16:28:12
  * @LastEditors: Che
- * @LastEditTime: 2021-08-11 22:52:37
+ * @LastEditTime: 2021-08-25 13:22:41
  */
 import request from './request'
 
@@ -19,9 +19,9 @@ export const questionDel = (params) => request('question/del', params)
 export const questionCopy = (params) => request('question/copy', params)
 export const questionPublish = (params) => request('question/publish', params)
 export const questionTemplate = (params, type) =>
-  request('question/wordTemplateExport', params, type)
-export const questionImport = (params, type, headers) =>
-  request('question/wordImp', params, type, headers)
+  request('question/wordTemplateExport', params, undefined, type)
+export const questionImport = (params, timeout) =>
+  request('question/wordImp', params, timeout)
 export const questionTypeListPage = (params) =>
   request('questionType/listpage', params)
 export const questionTypeAdd = (params) => request('questionType/add', params)

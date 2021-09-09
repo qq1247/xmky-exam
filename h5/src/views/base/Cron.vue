@@ -22,7 +22,7 @@
           <el-col :span="7">
             <el-form-item style="float: right">
               <el-button
-                @click="editForm.show = true"
+                @click=";(editForm.show = true), (editForm.id = null)"
                 icon="el-icon-circle-plus-outline"
                 size="mini"
                 type="primary"
@@ -115,7 +115,14 @@
         prev-text="上一页"
       ></el-pagination>
     </div>
-    <el-dialog :visible.sync="editForm.show" title="定时任务">
+    <el-dialog
+      :visible.sync="editForm.show"
+      :show-close="false"
+      width="40%"
+      title="定时任务"
+      :close-on-click-modal="false"
+      @close="resetData('editForm')"
+    >
       <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
         <el-form-item label="名称" label-width="120px" prop="name">
           <el-input placeholder="请输入名称" v-model="editForm.name"></el-input>
@@ -156,7 +163,7 @@ import {
   cronStartTask,
   cronStopTask,
   cronrunOnceTask,
-} from '@/api/base'
+} from 'api/base'
 export default {
   data() {
     return {
@@ -181,13 +188,11 @@ export default {
         show: false, // 是否显示页面
         rules: {
           // 校验
-          name: [{ required: true, message: '请输入名称', trigger: 'change' }],
+          name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
           jobClass: [
-            { required: true, message: '请输入实现类', trigger: 'change' },
+            { required: true, message: '请输入实现类', trigger: 'blur' },
           ],
-          cron: [
-            { required: true, message: '请输入表达式', trigger: 'change' },
-          ],
+          cron: [{ required: true, message: '请输入表达式', trigger: 'blur' }],
         },
       },
     }
@@ -275,10 +280,12 @@ export default {
       }
 
       this.editForm.show = true
-      this.editForm.id = res.data.id
-      this.editForm.name = res.data.name
-      this.editForm.jobClass = res.data.jobClass
-      this.editForm.cron = res.data.cron
+      this.$nextTick(() => {
+        this.editForm.id = res.data.id
+        this.editForm.name = res.data.name
+        this.editForm.jobClass = res.data.jobClass
+        this.editForm.cron = res.data.cron
+      })
     },
     // 删除
     async del(id) {
@@ -289,10 +296,7 @@ export default {
       }).then(async () => {
         const res = await cronDel({ id })
         if (res?.code != 200) {
-          this.$message({
-            type: 'error',
-            message: res.msg,
-          })
+          this.$message.error(res.msg)
         }
 
         this.query()
@@ -307,10 +311,7 @@ export default {
       }).then(async () => {
         const res = await cronStartTask({ id })
         if (res?.code != 200) {
-          this.$message({
-            type: 'error',
-            message: res.msg,
-          })
+          this.$message.error(res.msg)
         }
 
         this.query()
@@ -325,10 +326,7 @@ export default {
       }).then(async () => {
         const res = await cronStopTask({ id })
         if (res?.code != 200) {
-          this.$message({
-            type: 'error',
-            message: res.msg,
-          })
+          this.$message.error(res.msg)
         }
 
         this.query()
@@ -343,10 +341,7 @@ export default {
       }).then(async () => {
         const res = await cronrunOnceTask({ id })
         if (res?.code != 200) {
-          this.$message({
-            type: 'error',
-            message: res.msg,
-          })
+          this.$message.error(res.msg)
         }
 
         this.query()
@@ -356,6 +351,9 @@ export default {
     pageChange(val) {
       this.query(val)
     },
+    resetData(name) {
+      this.$refs[name].resetFields()
+    },
   },
 }
 </script>
@@ -363,7 +361,6 @@ export default {
 .container {
   display: flex;
   align-items: center;
-  padding-top: 120px;
   .content {
     width: 1170px;
   }

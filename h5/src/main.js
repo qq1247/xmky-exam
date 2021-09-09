@@ -10,13 +10,13 @@
 import Vue from 'vue'
 
 import 'normalize.css/normalize.css'
-import '@/assets/style/element-variables.scss'
+import 'assets/style/element-variables.scss'
 import ElementUI from 'element-ui'
 import CKEditor from '@ckeditor/ckeditor5-vue2'
 Vue.use(ElementUI)
 Vue.use(CKEditor)
 
-import '@/assets/style/index.scss'
+import 'assets/style/index.scss'
 
 import * as tools from '@/utils/tools.js'
 Vue.prototype.$tools = tools

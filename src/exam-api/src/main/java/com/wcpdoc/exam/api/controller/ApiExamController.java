@@ -85,28 +85,7 @@ public class ApiExamController extends BaseController{
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult add(Exam exam) {
 		try {
-			//校验数据有效性
-			if(exam.getStartTime().getTime() <= new Date().getTime()) {
-				throw new MyException("考试开始时间必须大于当前时间！");
-			}
-			if(exam.getStartTime().getTime() >= exam.getEndTime().getTime()) {
-				throw new MyException("考试结束时间必须大于考试开始时间！");
-			}
-			if(exam.getMarkStartTime().getTime() <= exam.getEndTime().getTime()) {
-				throw new MyException("阅卷开始时间必须大于考试结束时间！");
-			}
-			if(exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()) {
-				throw new MyException("阅卷结束时间必须大于阅卷开始时间！");
-			}
-			
-			//添加考试
-			exam.setCreateUserId(getCurUser().getId());
-			exam.setCreateTime(new Date());
-			exam.setUpdateUserId(getCurUser().getId());
-			exam.setUpdateTime(new Date());
-			exam.setUpdateUserId(getCurUser().getId());
-			exam.setState(2);
-			examService.add(exam);
+			examService.addAndUpdate(exam);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成添加考试错误：{}", e.getMessage());
@@ -128,38 +107,7 @@ public class ApiExamController extends BaseController{
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult edit(Exam exam) {
 		try {
-			//校验数据有效性
-			Exam entity = examService.getEntity(exam.getId());
-			if(entity.getState() == 1) {
-				throw new MyException("考试已发布！");
-			}
-			if(exam.getStartTime().getTime() <= new Date().getTime()) {
-				throw new MyException("考试开始时间必须大于当前时间！");
-			}
-			if(exam.getStartTime().getTime() >= exam.getEndTime().getTime()) {
-				throw new MyException("考试结束时间必须大于考试开始时间！");
-			}
-			if(exam.getMarkStartTime().getTime() <= exam.getEndTime().getTime()) {
-				throw new MyException("阅卷开始时间必须大于考试结束时间！");
-			}
-			if(exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()) {
-				throw new MyException("阅卷结束时间必须大于阅卷开始时间！");
-			}
-			
-			//添加考试
-			entity.setName(exam.getName());
-			entity.setPaperId(exam.getPaperId());
-			entity.setStartTime(exam.getStartTime());
-			entity.setEndTime(exam.getEndTime());
-			entity.setMarkStartTime(exam.getMarkStartTime());
-			entity.setMarkEndTime(exam.getMarkEndTime());
-			entity.setScoreState(exam.getScoreState());
-			entity.setRankState(exam.getRankState());
-			entity.setLoginType(exam.getLoginType());
-			entity.setDescription(exam.getDescription());
-			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(getCurUser().getId());
-			examService.update(entity);
+			examService.updateAndUpdate(exam);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成修改考试错误：{}", e.getMessage());
@@ -181,15 +129,7 @@ public class ApiExamController extends BaseController{
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
-			Date curTime = new Date();
-			Exam exam = examService.getEntity(id);
-			if(exam.getStartTime().getTime() >= curTime.getTime()
-					&& exam.getEndTime().getTime() <= curTime.getTime()) {
-				throw new MyException("【"+exam.getName()+"】考试未结束");
-			}
-			
-			exam.setState(0);
-			examService.update(exam);
+			examService.delAndUpdate(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成删除考试错误：{}", e.getMessage());
@@ -245,7 +185,6 @@ public class ApiExamController extends BaseController{
 				}
 				result.add(map);
 			}
-			
 			return PageResultEx.ok().data(result);
 		}catch (Exception e) {
 			log.error("阅卷用户列表错误：", e);
@@ -254,7 +193,7 @@ public class ApiExamController extends BaseController{
 	}
 	
 	/**
-	 * 考试更新考试用户
+	 * 考试更新考试用户阅卷用户
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param id
@@ -262,12 +201,12 @@ public class ApiExamController extends BaseController{
 	 * @param markIds
 	 * @return PageResult
 	 */
-	@RequestMapping("/updateExamUser")
+	@RequestMapping("/updateMarkSet")
 	@ResponseBody
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult updateExamUser(Integer id, Integer[] userIds) {
+	public PageResult updateMarkSet(Integer id, String[] examUserIds, Integer[] markUserIds) {
 		try {
-			examService.updateExamUser(id, userIds);
+			examService.updateMarkSet(id, examUserIds, markUserIds);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成更新考试用户错误：{}", e.getMessage());
@@ -316,16 +255,7 @@ public class ApiExamController extends BaseController{
 	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult publish(Integer id) {
 		try {
-			Exam exam = examService.getEntity(id);
-			if(exam.getState() == 0) {
-				throw new MyException("考试【"+exam.getName()+"】已删除！");
-			}
-			if(exam.getState() == 1) {
-				throw new MyException("考试【"+exam.getName()+"】已发布！");
-			}
-			
-			exam.setState(1);
-			examService.update(exam);
+			examService.publish(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成发布错误：{}", e.getMessage());

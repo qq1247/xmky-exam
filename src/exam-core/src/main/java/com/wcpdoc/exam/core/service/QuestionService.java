@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.Question;
@@ -49,14 +47,23 @@ public interface QuestionService extends BaseService<Question>{
 	void updateAndUpdate(Question question, Integer[] scoreOptions, String[] answers, String[] options, BigDecimal[] scores); //, boolean newVer
 	
 	/**
+	 * 删除试题
+	 * 
+	 * v1.0 chenyun 2021年8月25日下午5:28:51
+	 * @param id void
+	 */
+	void delAndUpdate(Integer id);
+	
+	/**
 	 * 完成导入试题
 	 * 
 	 * v1.0 zhanghc 2019年8月10日下午5:12:53
-	 * @param file
+	 * @param fileId
 	 * @param questionTypeId
 	 * @return PageResult
+	 * @return processBarId
 	 */
-	void wordImp(MultipartFile file, Integer questionTypeId);
+	void wordImp(Integer fileId, Integer questionTypeId, String processBarId);
 	
 	/**
 	 * 合并
@@ -92,4 +99,20 @@ public interface QuestionService extends BaseService<Question>{
 	 * v1.0 chenyun 2021年7月19日下午4:26:38
 	 */
 	PageOut randomListpage(PageIn pageIn);
+	
+	/**
+	 * 拷贝
+	 * 
+	 * v1.0 chenyun 2021年8月19日下午2:32:57
+	 * @param id void
+	 */
+	void copy(Integer id) throws Exception;
+	
+	/**
+	 * 发布
+	 * 
+	 * v1.0 chenyun 2021年8月19日下午2:32:57
+	 * @param id void
+	 */
+	void publish(Integer id) throws Exception;
 }

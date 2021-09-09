@@ -4,86 +4,106 @@
     <EditHeader :title="queryForm.name"></EditHeader>
 
     <!-- 搜索 -->
-    <el-form :inline="true" :model="queryForm" class="form-inline search">
-      <div>
-        <el-form-item label>
-          <el-input placeholder="请输入编号" v-model="queryForm.id"></el-input>
-        </el-form-item>
-        <el-form-item label>
-          <el-input
-            placeholder="请输入题干"
-            v-model="queryForm.title"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label>
-          <el-select placeholder="请输入类型" v-model="queryForm.type">
-            <el-option
-              :key="parseInt(dict.dictKey)"
-              :label="dict.dictValue"
-              :value="parseInt(dict.dictKey)"
-              v-for="dict in queryForm.typeDictList"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label>
-          <el-select placeholder="请输入难度" v-model="queryForm.difficulty">
-            <el-option
-              :key="parseInt(dict.dictKey)"
-              :label="dict.dictValue"
-              :value="parseInt(dict.dictKey)"
-              v-for="dict in queryForm.difficultyDictList"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label>
-          <el-input
-            placeholder="分值大于"
-            v-model="queryForm.scoreStart"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label>
-          <el-input
-            placeholder="分值小于"
-            v-model="queryForm.scoreEnd"
-          ></el-input>
-        </el-form-item>
-      </div>
-      <el-form-item>
-        <el-button @click="search" icon="el-icon-search" type="primary"
-          >查询</el-button
-        >
-      </el-form-item>
+    <el-form
+      :inline="true"
+      :model="queryForm"
+      class="form-inline"
+      id="question_driver_query"
+    >
+      <el-row type="flex" justify="space-between">
+        <el-col :span="22">
+          <el-form-item label>
+            <el-input
+              placeholder="请输入编号"
+              v-model="queryForm.id"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label>
+            <el-input
+              placeholder="请输入题干"
+              v-model="queryForm.title"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label>
+            <el-select placeholder="请输入类型" v-model="queryForm.type">
+              <el-option
+                :key="parseInt(dict.dictKey)"
+                :label="dict.dictValue"
+                :value="parseInt(dict.dictKey)"
+                v-for="dict in queryForm.typeList"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label>
+            <el-select placeholder="请输入难度" v-model="queryForm.difficulty">
+              <el-option
+                :key="parseInt(dict.dictKey)"
+                :label="dict.dictValue"
+                :value="parseInt(dict.dictKey)"
+                v-for="dict in queryForm.difficultyList"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label>
+            <el-input
+              placeholder="分值大于"
+              v-model="queryForm.scoreStart"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label>
+            <el-input
+              placeholder="分值小于"
+              v-model="queryForm.scoreEnd"
+            ></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="2">
+          <el-form-item>
+            <el-button @click="search" icon="el-icon-search" type="primary"
+              >查询</el-button
+            >
+          </el-form-item>
+        </el-col>
+      </el-row>
     </el-form>
 
     <!-- 内容 -->
     <div class="content">
       <el-scrollbar wrap-style="overflow-x:hidden;" class="content-left">
-        <div class="left-top">添加题型</div>
-        <div
-          :class="[
-            editForm.type === btn.type
-              ? 'left-center left-center-active'
-              : 'left-center',
-          ]"
-          :key="btn.type"
-          @click="updateType(btn.type)"
-          v-for="btn in typeButtonGroup"
-        >
-          <img :src="btn.img" />
-          {{ btn.name }}
-          <img src="@/assets/img/icon/active-icon.png" />
+        <div id="question_driver_types">
+          <div class="left-top">添加题型</div>
+          <div
+            :class="[
+              editForm.type === btn.type
+                ? 'left-center left-center-active'
+                : 'left-center',
+            ]"
+            :key="btn.type"
+            @click="updateType(btn.type)"
+            v-for="btn in typeButtonGroup"
+          >
+            <img :src="btn.img" />
+            {{ btn.name }}
+            <img src="../../assets/img/icon/active-icon.png" />
+          </div>
         </div>
         <div class="splitLine"></div>
-        <div class="left-bottom" @click="questionTemplate">
-          <img src="../../assets/img/icon/template-icon.png" />
-          试题模板
-        </div>
-        <div class="left-bottom" @click="fileForm.show = true">
-          <img src="../../assets/img/icon/import-icon.png" />
-          试题导入
+        <div id="question_driver_template">
+          <div class="left-bottom" @click="questionTemplate">
+            <img src="../../assets/img/icon/template-icon.png" />
+            试题模板
+          </div>
+          <div class="left-bottom" @click="fileForm.show = true">
+            <img src="../../assets/img/icon/import-icon.png" />
+            试题导入
+          </div>
         </div>
       </el-scrollbar>
-      <el-scrollbar wrap-style="overflow-x:hidden;" class="content-center">
+      <el-scrollbar
+        wrap-style="overflow-x:hidden;"
+        class="content-center"
+        id="question_driver_content"
+      >
         <template v-if="list.questionList.length > 0">
           <el-card
             :key="question.id"
@@ -177,12 +197,9 @@
             @current-change="pageChange"
           ></el-pagination>
         </template>
-        <template v-if="list.questionList.length == 0">
-          <div class="data-null">
-            <img class="data-img" src="../../assets/img/data-null.png" alt />
-            <span class="data-tip">抱歉！暂无信息</span>
-          </div>
-        </template>
+        <el-empty v-else description="暂无试题">
+          <img slot="image" src="../../assets/img/data-null.png" alt="" />
+        </el-empty>
       </el-scrollbar>
       <el-scrollbar wrap-style="overflow-x:hidden;" class="content-right">
         <el-form
@@ -192,6 +209,7 @@
           label-width="80px"
           size="mini"
           v-model="labelPosition"
+          id="question_driver_editor"
         >
           <el-row>
             <el-col :span="11">
@@ -205,7 +223,7 @@
                     :key="parseInt(dict.dictKey)"
                     :label="dict.dictValue"
                     :value="parseInt(dict.dictKey)"
-                    v-for="dict in queryForm.typeDictList"
+                    v-for="dict in queryForm.typeList"
                   ></el-option>
                 </el-select>
               </el-form-item>
@@ -220,7 +238,7 @@
                     :key="parseInt(dict.dictKey)"
                     :label="dict.dictValue"
                     :value="parseInt(dict.dictKey)"
-                    v-for="dict in queryForm.difficultyDictList"
+                    v-for="dict in queryForm.difficultyList"
                   ></el-option>
                 </el-select>
               </el-form-item>
@@ -553,14 +571,6 @@
               v-if="editForm.id"
               >修改</el-button
             >
-            <!-- <el-button
-              @click="edit(true)"
-              plain
-              style="width: 164px; height: 40px; border-color: #fff"
-              type="primary"
-              v-if="editForm.id != null"
-              >生成新版本</el-button
-            > -->
           </el-form-item>
         </el-form>
       </el-scrollbar>
@@ -570,26 +580,38 @@
     <el-dialog
       :visible.sync="fileForm.show"
       :show-close="false"
-      width="30%"
-      title="上传试题模板"
+      width="40%"
+      title="上传并解析试题"
       :close-on-click-modal="false"
+      @close="templateClear('templateUpload')"
     >
       <el-form :model="fileForm" ref="fileForm">
-        <input
-          type="file"
-          id="docId"
-          accept=".doc, .docx, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        <Upload
+          type="word"
+          ref="templateUpload"
+          @success="templateSucess"
+          @remove="templateRemove"
         />
       </el-form>
       <div class="dialog-footer" slot="footer">
-        <el-button @click="questionImport" type="primary">上传</el-button>
+        <el-button
+          @click="questionImport"
+          :loading="fileForm.isAnalysis"
+          type="primary"
+          >解析试题</el-button
+        >
         <el-button @click="fileForm.show = false">取消</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 <script>
-import { dictListPage } from '@/api/base'
+import { dictListPage } from 'api/base'
+import Upload from 'components/Upload'
+import Driver from 'driver.js'
+import 'driver.js/dist/driver.min.css'
+import { driverSetting, questionDriverStep } from '@/utils/driverGuide.js'
+import { getDriver } from '@/utils/storage.js'
 import {
   questionListPage,
   questionAdd,
@@ -600,13 +622,14 @@ import {
   questionImport,
   questionEdit,
   questionPublish,
-} from '@/api/question'
-import Editor from '@/components/Editor.vue'
-import EditHeader from '@/components/EditHeader.vue'
+} from 'api/question'
+import Editor from 'components/Editor.vue'
+import EditHeader from 'components/EditHeader.vue'
 export default {
   components: {
     Editor,
     EditHeader,
+    Upload,
   },
   data() {
     const validateAiScore = (rule, value, callback) => {
@@ -658,8 +681,8 @@ export default {
         scoreEnd: '', // 得分小于
         questionTypeName: '', // 试题分类name
         questionTypeId: 1, // 试题分类id
-        difficultyDictList: [], // 难度列表
-        typeDictList: [], // 类型列表
+        difficultyList: [], // 难度列表
+        typeList: [], // 类型列表
       },
       editForm: {
         // 修改表单
@@ -667,7 +690,7 @@ export default {
         type: 1, // 类型
         difficulty: 1, // 难度
         title: '', // 标题
-        ai: 1, //AI阅卷
+        ai: 1, // AI阅卷
         state: 2,
         options: [
           {
@@ -706,7 +729,6 @@ export default {
         ],
         analysis: '', // 解析
         score: 1, // 分值
-        isCrateNew: false,
         scoreOptions: [],
         rules: {
           type: [{ required: true, message: '请选择类型', trigger: 'change' }],
@@ -742,50 +764,52 @@ export default {
         {
           type: 1,
           name: '单选题',
-          img: require('@/assets/img/icon/radio-icon.png'),
+          img: require('assets/img/icon/radio-icon.png'),
         },
         {
           type: 2,
           name: '多选题',
-          img: require('@/assets/img/icon/checkbox-icon.png'),
+          img: require('assets/img/icon/checkbox-icon.png'),
         },
         {
           type: 3,
           name: '填空题',
-          img: require('@/assets/img/icon/blanks-icon.png'),
+          img: require('assets/img/icon/blanks-icon.png'),
         },
         {
           type: 4,
           name: '判断题',
-          img: require('@/assets/img/icon/judge-icon.png'),
+          img: require('assets/img/icon/judge-icon.png'),
         },
         {
           type: 5,
           name: '问答题',
-          img: require('@/assets/img/icon/ask-icon.png'),
+          img: require('assets/img/icon/ask-icon.png'),
         },
       ],
       handlerButtonGroup: [
         // 左侧按钮组2
         {
           name: '试题模板',
-          img: require('@/assets/img/icon/template-icon.png'),
+          img: require('assets/img/icon/template-icon.png'),
         },
         {
           name: '试题导入',
-          img: require('@/assets/img/icon/import-icon.png'),
+          img: require('assets/img/icon/import-icon.png'),
         },
         /* {
           name: "试题导出",
-          img: require("@/assets/img/icon/export-icon.png")
+          img: require("assets/img/icon/export-icon.png")
         },
         {
           name: "清空试题",
-          img: require("@/assets/img/icon/clear-icon.png")
+          img: require("assets/img/icon/clear-icon.png")
         } */
       ],
       fileForm: {
         show: false,
+        questionDocIds: [],
+        isAnalysis: false,
       },
     }
   },
@@ -796,9 +820,20 @@ export default {
     this.queryForm.edit = edit
     this.init()
   },
+  mounted() {
+    if (!getDriver()) {
+      this.driverStep()
+    }
+  },
   methods: {
     goBack() {
       this.$router.back()
+    },
+    // 引导方法
+    driverStep() {
+      const driver = new Driver(driverSetting)
+      driver.defineSteps(questionDriverStep)
+      driver.start()
     },
     // 初始化默认值
     async init() {
@@ -807,12 +842,14 @@ export default {
       const typeDictData = await dictListPage({
         dictIndex: 'QUESTION_TYPE',
       })
-      this.queryForm.typeDictList = typeDictData.data.list // 初始化类型下拉框
+
+      this.queryForm.typeList = typeDictData.data.list // 初始化类型下拉框
 
       const difficultyDictData = await dictListPage({
         dictIndex: 'QUESTION_DIFFICULTY',
       })
-      this.queryForm.difficultyDictList = difficultyDictData.data.list // 初始化难度下拉框
+
+      this.queryForm.difficultyList = difficultyDictData.data.list // 初始化难度下拉框
 
       this.typeButtonGroup[0].checked = true // 默认选中类型按钮
       this.editForm.type = 1 // 默认选中类型
@@ -857,7 +894,7 @@ export default {
       }
 
       const index = this.editForm.options.length
-      this._addOption(index, '')
+      this._addOption(index)
     },
     // 添加选项
     _addOption(index, value) {
@@ -877,15 +914,15 @@ export default {
     // 添加填空
     addFillBlanks() {
       const index = this.editForm.answers.length
-      this._addFillBlanks(index, '')
+      this._addFillBlanks(index)
     },
     // 添加填空
     _addFillBlanks(index, value) {
       const lab = String.fromCharCode(65 + index)
       this.editForm.answers.push({
         lab: lab,
-        value: value.answer,
-        score: value.score,
+        value: !value ? '' : value.answer,
+        score: !value ? '' : value.score,
       })
 
       this.editForm.rules['answers.' + index + '.value'] = [
@@ -924,7 +961,7 @@ export default {
     // 组合添加或修改请求参数
     compistionParam(status) {
       if (this.queryForm.edit == 'false') {
-        this.$tools.message('暂无此项权限！', 'warning')
+        this.$message.warning('暂无此项权限！')
         return false
       }
 
@@ -992,9 +1029,9 @@ export default {
           acc.push(params.ai == 1 ? cur.score : params.score)
           return acc
         }, [])
-        let sum = params.scores.reduce((acc, cur) => acc + Number(cur), 0)
+        const sum = params.scores.reduce((acc, cur) => acc + Number(cur), 0)
         if (sum != params.score && params.ai == 1) {
-          this.$tools.message('答案分值相加应等于总分值！', 'warning')
+          this.$message.warning('答案分值相加应等于总分值！')
           return false
         }
       }
@@ -1011,7 +1048,7 @@ export default {
           return false
         }
 
-        const res = await questionAdd(params).catch((err) => {})
+        const res = await questionAdd(params)
         this.resetQuery(res, '添加')
       })
     },
@@ -1030,17 +1067,19 @@ export default {
           type: 'warning',
         })
           .then(async () => {
-            const res = await questionEdit(params).catch((err) => {})
+            const res = await questionEdit(params)
             this.resetQuery(res, '修改')
           })
-          .catch(() => {})
+          .catch((err) => {
+            console.log(err)
+          })
       })
     },
     // 获取试题
     async get(id) {
       const res = await questionGet({ id })
       if (res?.code != 200) {
-        this.$tools.message('查询失败！', 'error')
+        this.$message.error('查询失败！')
         return
       }
 
@@ -1095,7 +1134,7 @@ export default {
     // 复制试题
     async copy(id) {
       if (this.queryForm.edit == 'false') {
-        this.$tools.message('暂无此项权限！', 'warning')
+        this.$message.warning('暂无此项权限！')
         return
       }
       const res = await questionCopy({ id })
@@ -1104,7 +1143,7 @@ export default {
     // 删除试题
     del(id) {
       if (this.queryForm.edit == 'false') {
-        this.$tools.message('暂无此项权限！', 'warning')
+        this.$message.warning('暂无此项权限！')
         return
       }
       this.$confirm('确定要删除？', '提示', {
@@ -1119,17 +1158,17 @@ export default {
     // 发布试题
     async publish(id, state) {
       if (this.queryForm.edit == 'false') {
-        this.$tools.message('暂无此项权限！', 'warning')
+        this.$message.warning('暂无此项权限！')
         return false
       }
 
       if (state == 1) {
-        this.$tools.message('试题已经发布！', 'warning')
+        this.$message.warning('试题已经发布！')
         return
       }
       const res = await questionPublish({
         id,
-      }).catch((err) => {})
+      })
       this.resetQuery(res, '发布试题')
     },
     // 获取试题模板
@@ -1143,26 +1182,30 @@ export default {
       a.click()
       window.URL.revokeObjectURL(url)
     },
-    // 上传试题
+    // 解析试题
     async questionImport() {
-      if (!document.querySelector('#docId').files[0]) {
-        this.$tools.message('请选择上传文件', 'warning')
+      if (this.fileForm.questionDocIds.length === 0) {
+        this.$message.warning('请选择需解析的文件')
         return
       }
-      const formData = new FormData()
-      formData.append('file', document.querySelector('#docId').files[0])
-      formData.append('questionTypeId', this.queryForm.questionTypeId)
+      this.fileForm.isAnalysis = true
       const res = await questionImport(
-        formData,
-        undefined,
-        'multipart/form-data'
-      )
+        {
+          fileId: this.fileForm.questionDocIds[0].response.data.fileIds,
+          questionTypeId: this.queryForm.questionTypeId,
+        },
+        30000
+      ).catch(() => {
+        this.fileForm.isAnalysis = false
+      })
       if (res?.code == 200) {
-        this.$tools.message('上传成功！')
+        this.$message.success('解析成功！')
+        this.fileForm.isAnalysis = false
         this.fileForm.show = false
+        this.templateClear('templateUpload')
         this.query()
       } else {
-        this.$tools.message('上传失败！', error)
+        this.$message.error(res.msg)
       }
     },
     // 还原数据并查询
@@ -1171,14 +1214,24 @@ export default {
         this.editForm.id = null
         this.list.curPage = 1
         this.query()
-        this.$tools.message(`${msg}成功！`)
+        this.$message.success(`${msg}成功！`)
         this.$tools.resetData(this, 'editForm')
-        /* this.$nextTick(() => {
-          this.$refs['editForm'].resetFields()
-        }) */
       } else {
-        this.$tools.message(res.msg || `${msg}失败！`, 'error')
+        this.$message.error(res.msg || `${msg}失败！`)
       }
+    },
+    // 上传试题模板成功
+    templateSucess(res, file, fileList) {
+      this.fileForm.questionDocIds = fileList
+    },
+    // 上传试题模板失败
+    templateClear(ref) {
+      this.fileForm.questionDocIds = []
+      this.$refs[ref].clear()
+    },
+    // 删除试题模板
+    templateRemove(file, fileList) {
+      this.fileForm.questionDocIds = []
     },
   },
 }
@@ -1190,22 +1243,29 @@ export default {
   display: flex;
   flex-direction: column;
   padding-bottom: 10px;
-  padding-top: 0;
+  padding-top: 110px;
+  margin: 0 auto;
 }
 
-.search {
-  height: 80px;
-  padding: 0 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 60px;
+.form-inline {
+  height: 60px;
+  padding: 10px 20px;
+  position: fixed;
+  top: 50px;
+  left: 0;
+  right: 0;
+  background: #f7f8f9;
+  z-index: 1500;
+  .el-form-item {
+    width: 140px;
+    margin-bottom: 0;
+  }
 }
 
 .content {
   display: flex;
   width: 100%;
-  height: calc(100vh - 130px);
+  height: calc(100vh - 110px);
   padding: 0 20px;
   margin: 0 auto;
 }
@@ -1367,11 +1427,6 @@ export default {
   height: 25px;
 }
 
-.form-inline .el-form-item {
-  width: 140px;
-  margin-bottom: 0;
-}
-
 .pagination {
   font-weight: 400;
   text-align: center;
@@ -1445,5 +1500,15 @@ export default {
   border: 1px solid #d4dfd9;
   background-color: #fff;
   padding: 0 10px;
+}
+
+/deep/.el-select__tags .el-tag {
+  width: 100%;
+  height: auto;
+}
+/deep/.el-select__tags-text {
+  display: inline;
+  white-space: normal;
+  word-break: break-word;
 }
 </style>

@@ -107,7 +107,7 @@
 </template>
 
 <script>
-import { orgListPage, orgAdd, orgEdit, orgGet, orgDel } from '@/api/base'
+import { orgListPage, orgAdd, orgEdit, orgGet, orgDel } from 'api/base'
 export default {
   data() {
     return {
@@ -232,6 +232,7 @@ export default {
 
         this.editForm.show = false
         this.query()
+        this.editForm.id = null
       })
     },
     // 获取机构
@@ -269,10 +270,7 @@ export default {
       }).then(async () => {
         const res = await orgDel({ id })
         if (res.code != 200) {
-          this.$message({
-            type: 'error',
-            message: res.msg,
-          })
+          this.$message.error(res.msg)
         }
 
         this.query()
@@ -285,7 +283,6 @@ export default {
 .container {
   display: flex;
   align-items: center;
-  padding-top: 120px;
   .content {
     width: 1170px;
   }

@@ -1,7 +1,7 @@
 <!--
- * @Description: 
+ * @Description:
  * @Version: 1.0
- * @Company: 
+ * @Company:
  * @Author: Che
  * @Date: 2021-08-09 17:58:47
  * @LastEditors: Che
@@ -30,7 +30,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import NavbarItem from './NavbarItem'
-import variables from '@/assets/style/variables.scss'
+import variables from 'assets/style/variables.scss'
 export default {
   name: 'NavBar',
   data() {

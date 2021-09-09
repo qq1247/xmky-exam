@@ -1,24 +1,24 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import Layout from '@/layout/Index.vue'
 
 // vue-router内部错误,没有进行catch处理
 const originalPush = VueRouter.prototype.push
 const originalReplace = VueRouter.prototype.replace
 // push
 VueRouter.prototype.push = function push(location, onResolve, onReject) {
-  if (onResolve || onReject)
+  if (onResolve || onReject) {
     return originalPush.call(this, location, onResolve, onReject)
+  }
   return originalPush.call(this, location).catch((err) => err)
 }
 // replace
 VueRouter.prototype.replace = function push(location, onResolve, onReject) {
-  if (onResolve || onReject)
+  if (onResolve || onReject) {
     return originalReplace.call(this, location, onResolve, onReject)
+  }
   return originalReplace.call(this, location).catch((err) => err)
 }
-
-/* Layout */
-import Layout from '@/layout/Index.vue'
 
 Vue.use(VueRouter)
 
@@ -31,20 +31,20 @@ export const constantRoutes = [
     children: [
       {
         path: 'home',
-        component: () => import('@/views/Home'),
+        component: () => import('views/Home'),
         name: 'Home',
         meta: { title: '首页' },
       },
       {
         path: 'login',
-        component: () => import('@/views/base/Login'),
+        component: () => import('views/base/Login'),
         name: 'Login',
         meta: { title: '欢迎登录' },
         hidden: true,
       },
       {
         path: '404',
-        component: () => import('@/views/base/404'),
+        component: () => import('views/base/404'),
         name: '404',
         meta: { title: '404' },
         hidden: true,
@@ -60,39 +60,39 @@ export const constantRoutes = [
     children: [
       {
         path: 'index',
-        component: () => import('@/views/my/Index.vue'),
+        component: () => import('views/my/Index.vue'),
         name: 'MyIndex',
         meta: { title: '我的', icon: 'common common-mine' },
       },
       {
         path: 'exam',
-        component: () => import('@/views/my/List.vue'),
+        component: () => import('views/my/List.vue'),
         name: 'ExamList',
         meta: { title: '我的考试', icon: 'common common-exam', type: 1 },
         hidden: true,
       },
       {
         path: 'mark',
-        component: () => import('@/views/my/List.vue'),
+        component: () => import('views/my/List.vue'),
         name: 'MarkList',
         meta: { title: '我的阅卷', icon: 'common common-mark', type: 2 },
         hidden: true,
       },
       {
         path: 'exam/index',
-        component: () => import('@/views/my/MyExam.vue'),
+        component: () => import('views/my/MyExam.vue'),
         name: 'ExamIndex',
         hidden: true,
       },
       {
         path: 'mark/index',
-        component: () => import('@/views/my/MyMarkExam.vue'),
+        component: () => import('views/my/MyMarkExam.vue'),
         name: 'MarkIndex',
         hidden: true,
       },
       {
         path: 'bulletin',
-        component: () => import('@/views/my/Bulletin.vue'),
+        component: () => import('views/my/Bulletin.vue'),
         name: 'Bulletin',
         meta: {
           title: '我的公告',
@@ -131,6 +131,8 @@ export const asyncRoutes = [
         hidden: true,
         meta: {
           title: '编辑试题',
+          hideHeader: true,
+          hideFooter: true,
         },
       },
     ],
@@ -170,6 +172,8 @@ export const asyncRoutes = [
         hidden: true,
         meta: {
           title: '编辑试卷',
+          hideHeader: true,
+          hideFooter: true,
         },
       },
     ],
@@ -199,7 +203,7 @@ export const asyncRoutes = [
         component: () => import('../views/exam/List.vue'),
         hidden: true,
         meta: {
-          title: '编辑试题',
+          title: '考试列表',
         },
       },
     ],
@@ -284,12 +288,18 @@ export const asyncRoutes = [
         path: 'cron',
         name: 'BaseCron',
         component: () => import('../views/base/Cron.vue'),
+        meta: {
+          title: '定时任务',
+        },
         hidden: true,
       },
       {
         path: 'dict',
         name: 'BaseDict',
         component: () => import('../views/base/Dict.vue'),
+        meta: {
+          title: '数据字典',
+        },
         hidden: true,
       },
       {
@@ -302,132 +312,6 @@ export const asyncRoutes = [
   },
   { path: '*', redirect: '/404', hidden: true },
 ]
-
-/* const routes = [
-  {
-    path: '/',
-    name: 'Home',
-    component: Home,
-  },
-  {
-    path: '/login',
-    name: 'Login',
-    component: () => import('../views/base/Login.vue'),
-  },
-  // 试卷相关
-  {
-    path: '/paper',
-    name: 'ExamPaper',
-    component: () => import('../views/paper/Index.vue'),
-  },
-  {
-    path: '/paper/list',
-    name: 'ExamPaperList',
-    component: () => import('../views/paper/List.vue'),
-  },
-  {
-    path: '/paper/edit',
-    name: 'ExamPaperEdit',
-    component: () => import('../views/paper/Edit.vue'),
-  },
-  // 考试相关
-  {
-    path: '/exam',
-    name: 'ExamSetting',
-    component: () => import('../views/exam/Index.vue'),
-  },
-  {
-    path: '/exam/list',
-    name: 'ExamSettingList',
-    component: () => import('../views/exam/List.vue'),
-  },
-  // 试题相关
-  {
-    path: '/question',
-    name: 'ExamQuestion',
-    component: () => import('../views/question/Index.vue'),
-  },
-  {
-    path: '/question/edit',
-    name: 'ExamQuestionEdit',
-    component: () => import('../views/question/Edit.vue'),
-  },
-  // 基础相关
-  {
-    path: '/base',
-    name: 'Base',
-    component: () => import('../views/base/Index.vue'),
-  },
-  {
-    path: '/base/cron',
-    name: 'BaseCron',
-    component: () => import('../views/base/Cron.vue'),
-  },
-  {
-    path: '/base/dict',
-    name: 'BaseDict',
-    component: () => import('../views/base/Dict.vue'),
-  },
-  {
-    path: '/base/Param',
-    name: 'BaseParam',
-    component: () => import('../views/base/Param.vue'),
-  },
-  // 用户相关
-  {
-    path: '/user',
-    name: 'User',
-    component: () => import('../views/user/User.vue'),
-  },
-  {
-    path: '/user/org',
-    name: 'UserOrg',
-    component: () => import('../views/user/Org.vue'),
-  },
-  {
-    path: '/my/bulletin',
-    name: 'MyBulletin',
-    component: () => import('../views/my/Bulletin.vue'),
-  },
-  {
-    path: '/organization/myExam',
-    name: 'OrgMyExam',
-    component: () => import('../views/organization/MyExam.vue'),
-  },
-  {
-    path: '/organization/myMark',
-    name: 'OrgMyMark',
-    component: () => import('../views/organization/MyMark.vue'),
-  },
-  {
-    path: '/organization/myMarkExam',
-    name: 'OrgMyMarkExam',
-    component: () => import('../views/organization/MyMarkExam.vue'),
-  },
-  // 我的
-  {
-    path: '/my',
-    name: 'My',
-    component: () => import('../views/my/Index.vue'),
-  },
-  // 考试，阅卷列表
-  {
-    path: '/my/list',
-    name: 'MyList',
-    component: () => import('../views/my/List.vue'),
-  },
-  {
-    path: '/my/exam',
-    name: 'MyExam',
-    component: () => import('../views/my/MyExam.vue'),
-  },
-  {
-    path: '/my/markExam',
-    name: 'MyMarkExam',
-    component: () => import('../views/my/MyMarkExam.vue'),
-  },
-  { path: '*', component: () => import('../views/base/404.vue') },
-] */
 
 const createRouter = () =>
   new VueRouter({

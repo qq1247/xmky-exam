@@ -22,7 +22,7 @@
           <el-col :span="7">
             <el-form-item style="float: right">
               <el-button
-                @click="editForm.show = true"
+                @click=";(editForm.show = true), (editForm.id = null)"
                 icon="el-icon-circle-plus-outline"
                 size="mini"
                 type="primary"
@@ -98,7 +98,14 @@
         prev-text="上一页"
       ></el-pagination>
     </div>
-    <el-dialog :visible.sync="editForm.show" title="数据字典">
+    <el-dialog
+      :visible.sync="editForm.show"
+      :show-close="false"
+      width="40%"
+      title="数据字典"
+      :close-on-click-modal="false"
+      @close="resetData('editForm')"
+    >
       <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
         <el-form-item label="索引" label-width="120px" prop="dictIndex">
           <el-input
@@ -140,7 +147,7 @@
 </template>
 
 <script>
-import { dictListPage, dictAdd, dictEdit, dictGet, dictDel } from '@/api/base'
+import { dictListPage, dictAdd, dictEdit, dictGet, dictDel } from 'api/base'
 export default {
   data() {
     return {
@@ -170,15 +177,13 @@ export default {
         rules: {
           // 校验
           dictIndex: [
-            { required: true, message: '请输入排序', trigger: 'change' },
+            { required: true, message: '请输入排序', trigger: 'blur' },
           ],
-          dictKey: [
-            { required: true, message: '请输入排序', trigger: 'change' },
-          ],
+          dictKey: [{ required: true, message: '请输入排序', trigger: 'blur' }],
           dictValue: [
-            { required: true, message: '请输入排序', trigger: 'change' },
+            { required: true, message: '请输入排序', trigger: 'blur' },
           ],
-          no: [{ required: true, message: '请输入排序', trigger: 'change' }],
+          no: [{ required: true, message: '请输入排序', trigger: 'blur' }],
         },
       },
     }
@@ -271,11 +276,13 @@ export default {
       }
 
       this.editForm.show = true
-      this.editForm.id = res.data.id
-      this.editForm.dictIndex = res.data.dictIndex
-      this.editForm.dictKey = res.data.dictKey
-      this.editForm.dictValue = res.data.dictValue
-      this.editForm.no = res.data.no
+      this.$nextTick(() => {
+        this.editForm.id = res.data.id
+        this.editForm.dictIndex = res.data.dictIndex
+        this.editForm.dictKey = res.data.dictKey
+        this.editForm.dictValue = res.data.dictValue
+        this.editForm.no = res.data.no
+      })
     },
     // 删除
     async del(id) {
@@ -286,14 +293,14 @@ export default {
       }).then(async () => {
         const res = await dictDel({ id })
         if (res?.code != 200) {
-          this.$message({
-            type: 'error',
-            message: res.msg,
-          })
+          this.$message.error(res.msg)
         }
 
         this.query()
       })
+    },
+    resetData(name) {
+      this.$refs[name].resetFields()
     },
   },
 }
@@ -302,7 +309,6 @@ export default {
 .container {
   display: flex;
   align-items: center;
-  padding-top: 120px;
   .content {
     width: 1170px;
   }

@@ -22,7 +22,7 @@
           <el-col :span="7">
             <el-form-item style="float: right">
               <el-button
-                @click="editForm.show = true"
+                @click=";(editForm.show = true), (editForm.id = null)"
                 icon="el-icon-circle-plus-outline"
                 size="mini"
                 type="primary"
@@ -107,33 +107,30 @@
     </div>
     <el-dialog
       :visible.sync="editForm.show"
+      :show-close="false"
+      width="40%"
       title="用户"
+      :close-on-click-modal="false"
       @close="resetData('editForm')"
     >
       <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
-        <el-form-item label="机构名称" label-width="120px">
+        <el-form-item label="机构名称" label-width="120px" prop="orgId">
           <CustomSelect
-            :currentPage="editForm.orgListpage.curPage"
-            :filterable="true"
             :multiple="false"
-            :pageSize="editForm.orgListpage.pageSize"
-            :remote="true"
-            :remoteMethod="searchOrg"
-            :reserveKeyword="true"
-            :showPage="true"
-            :tags="true"
-            :total="editForm.orgListpage.total"
+            ref="addUserSelect"
+            placeholder="请选择机构"
             :value="editForm.orgId"
+            :total="editForm.orgListpage.total"
+            @input="searchOrg"
             @change="selectOrg"
             @currentChange="getMoreOrg"
-            @focus="getOrgList()"
-            placeholder="请选择机构"
+            @visibleChange="getOrgList"
           >
             <el-option
+              v-for="item in editForm.orgListpage.list"
               :key="item.id"
               :label="item.name"
               :value="item.id"
-              v-for="item in editForm.orgListpage.list"
             ></el-option>
           </CustomSelect>
         </el-form-item>
@@ -177,9 +174,9 @@ import {
   userInitPwd,
   userDel,
   userGet,
-} from '@/api/user'
-import { orgListPage } from '@/api/base'
-import CustomSelect from '@/components/CustomSelect.vue'
+} from 'api/user'
+import { orgListPage } from 'api/base'
+import CustomSelect from 'components/CustomSelect.vue'
 export default {
   components: {
     CustomSelect,
@@ -217,9 +214,9 @@ export default {
         rules: {
           // 校验
           loginName: [
-            { required: true, message: '请输入登录名称', trigger: 'change' },
+            { required: true, message: '请输入登录名称', trigger: 'blur' },
           ],
-          name: [{ required: true, message: '请输入名称', trigger: 'change' }],
+          name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
         },
       },
     }
@@ -278,7 +275,6 @@ export default {
         })
 
         this.editForm.show = false
-        this.$tools.resetData(this, 'editForm')
         this.query()
       })
     },
@@ -309,7 +305,6 @@ export default {
         }
 
         this.editForm.show = false
-        this.$tools.resetData(this, 'editForm')
         this.query()
       })
     },
@@ -339,10 +334,7 @@ export default {
       }).then(async () => {
         const res = await userDel({ id })
         if (res.code != 200) {
-          this.$message({
-            type: 'error',
-            message: res.msg,
-          })
+          this.$message.error(res.msg)
         }
 
         this.query()
@@ -358,17 +350,19 @@ export default {
 
       await this.getOrgList()
       this.editForm.show = true
-      this.editForm.id = res.data.id
-      this.editForm.name = res.data.name
-      this.editForm.loginName = res.data.loginName
-      this.editForm.orgId = res.data.orgId
-      this.editForm.orgName = res.data.orgName
-      this.editForm.roles = res.data.roles
+      this.$nextTick(() => {
+        this.editForm.id = res.data.id
+        this.editForm.name = res.data.name
+        this.editForm.loginName = res.data.loginName
+        this.editForm.orgId = res.data.orgId
+        this.editForm.orgName = res.data.orgName
+        this.editForm.roles = res.data.roles
+      })
     },
     // 获取机构列表
-    async getOrgList(curPage = 1) {
+    async getOrgList(curPage = 1, name = '') {
       const orgList = await orgListPage({
-        // name,
+        name,
         curPage,
         pageSize: this.editForm.orgListpage.pageSize,
       })
@@ -376,12 +370,12 @@ export default {
       this.editForm.orgListpage.total = orgList.data.total
     },
     // 获取更多用户
-    getMoreOrg(curPage) {
-      this.getOrgList(curPage)
+    getMoreOrg(curPage, name) {
+      this.getOrgList(curPage, name)
     },
     // 根据name查询机构
     searchOrg(name) {
-      this.getOrgList(name)
+      this.getOrgList(1, name)
     },
     // 选择考试用户
     selectOrg(e) {
@@ -393,11 +387,10 @@ export default {
     },
     // 清空还原数据
     resetData(name) {
-      this.$tools.resetData(this, name)
+      this.$refs[name].resetFields()
     },
     toOrg() {
-      let { href } = this.$router.resolve({ path: '/user/org' })
-      window.open(href, '_blank')
+      this.$router.push({ path: '/user/org' })
     },
   },
 }
@@ -406,7 +399,6 @@ export default {
 .container {
   display: flex;
   align-items: center;
-  padding-top: 120px;
   .content {
     width: 1170px;
   }

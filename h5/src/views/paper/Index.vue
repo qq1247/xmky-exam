@@ -12,7 +12,7 @@
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query" icon="el-icon-search" type="primary"
+        <el-button @click="search" icon="el-icon-search" type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -23,10 +23,7 @@
         <div class="exam-item">
           <div
             class="exam-content exam-add"
-            @click="
-              examForm.show = true
-              examForm.edit = false
-            "
+            @click=";(examForm.show = true), (examForm.edit = false)"
           >
             <i class="common common-plus"></i>
             <span>添加试卷分类</span>
@@ -59,7 +56,7 @@
     <el-dialog
       :visible.sync="examForm.show"
       :show-close="false"
-      width="30%"
+      width="40%"
       title="试卷分类"
       ref="examForm"
       :close-on-click-modal="false"
@@ -89,59 +86,47 @@
     <el-dialog
       :visible.sync="roleForm.show"
       :show-close="false"
-      width="33%"
+      width="40%"
       title="权限编辑"
       :close-on-click-modal="false"
       @close="resetData('roleForm')"
     >
-      <el-form :model="roleForm" ref="examForm" label-width="100px">
-        <el-form-item label="读取权限">
+      <el-form :model="roleForm" ref="roleForm" label-width="100px">
+        <el-form-item label="使用权限" prop="readRoleUser">
           <CustomSelect
-            placeholder="请选择授权人员"
-            :multiple="true"
+            ref="readSelect"
+            placeholder="请选择授权用户"
             :value="roleForm.readRoleUser"
             :total="roleForm.total"
-            :showPage="true"
-            :currentPage="roleForm.curPage"
-            :pageSize="roleForm.pageSize"
-            :remote="true"
-            :reserveKeyword="true"
-            :filterable="true"
-            :remoteMethod="searchUser"
+            @input="searchUser"
             @change="selectReadUser"
-            @focus="getUserList()"
             @currentChange="getMoreUser"
+            @visibleChange="getUserList"
           >
             <el-option
               v-for="item in roleForm.roleUserList"
               :key="item.id"
               :label="item.name"
-              :value="String(item.id)"
+              :value="item.id"
             ></el-option>
           </CustomSelect>
         </el-form-item>
-        <el-form-item label="使用权限">
+        <el-form-item label="编辑权限" prop="writeRoleUser">
           <CustomSelect
-            placeholder="请选择授权人员"
-            :multiple="true"
+            ref="writeSelect"
+            placeholder="请选择授权用户"
             :value="roleForm.writeRoleUser"
             :total="roleForm.total"
-            :showPage="true"
-            :currentPage="roleForm.curPage"
-            :pageSize="roleForm.pageSize"
-            :remote="true"
-            :reserveKeyword="true"
-            :filterable="true"
-            :remoteMethod="searchUser"
+            @input="searchUser"
             @change="selectWriteUser"
-            @focus="getUserList()"
             @currentChange="getMoreUser"
+            @visibleChange="getUserList"
           >
             <el-option
               v-for="item in roleForm.roleUserList"
               :key="item.id"
               :label="item.name"
-              :value="String(item.id)"
+              :value="item.id"
             ></el-option>
           </CustomSelect>
         </el-form-item>
@@ -161,10 +146,10 @@ import {
   paperTypeAdd,
   paperTypeDel,
   paperTypeAuth,
-} from '@/api/paper'
-import { userListPage } from '@/api/user'
-import ListCard from '@/components/ListCard.vue'
-import CustomSelect from '@/components/CustomSelect.vue'
+} from 'api/paper'
+import { userListPage } from 'api/user'
+import ListCard from 'components/ListCard.vue'
+import CustomSelect from 'components/CustomSelect.vue'
 export default {
   components: {
     ListCard,
@@ -215,6 +200,10 @@ export default {
       this.typeList = typeList.data.list
       this.total = typeList.data.total
     },
+    search() {
+      this.curPage = 1
+      this.query()
+    },
     // 添加 || 修改试卷名称
     addOrEdit() {
       this.$refs['examForm'].validate(async (valid) => {
@@ -236,7 +225,9 @@ export default {
         }
 
         if (res?.code == 200) {
-          this.$tools.message(!this.examForm.edit ? '添加成功！' : '修改成功！')
+          this.$message.success(
+            !this.examForm.edit ? '添加成功！' : '修改成功！'
+          )
           this.examForm.show = false
           if (this.examForm.edit) {
             this.pageChange()
@@ -244,19 +235,18 @@ export default {
             this.pageChange(1)
           }
         } else {
-          this.$tools.message(
-            !this.examForm.edit ? '添加失败！' : '修改失败！',
-            'error'
-          )
+          this.$message.error(!this.examForm.edit ? '添加失败！' : '修改失败！')
         }
       })
     },
     // 编辑分类
     edit({ id, name }) {
-      this.examForm.edit = true
-      this.examForm.id = id
-      this.examForm.examName = name
       this.examForm.show = true
+      this.examForm.edit = true
+      this.$nextTick(() => {
+        this.examForm.id = id
+        this.examForm.examName = name
+      })
     },
     // 删除分类
     del({ id, name }) {
@@ -266,29 +256,31 @@ export default {
         type: 'warning',
       })
         .then(async () => {
-          const res = await paperTypeDel({ id }).catch((err) => {})
+          const res = await paperTypeDel({ id })
           if (res?.code == 200) {
             this.total -= 1
             if (this.total <= this.pageSize) {
               this.pageChange(1)
               return
             }
-            this.$tools.message('删除成功！')
+            this.$message.success('删除成功！')
             this.total % this.pageSize == 0 && this.total != this.pageSize
               ? ((this.curPage -= 1), this.pageChange(this.curPage))
               : this.pageChange(this.curPage)
           } else {
-            this.$tools.message(res.msg || '删除失败！', 'error')
+            this.$message.error(res.msg || '删除失败！')
           }
         })
-        .catch(() => {})
+        .catch((err) => {
+          console.log(err)
+        })
     },
     // 获取用户
-    async getUserList(name = '') {
+    async getUserList(curPage = 1, name = '') {
       const roleUserList = await userListPage({
         name,
-        curPage: this.roleForm.curPage,
-        pageSize: this.roleForm.pageSize,
+        curPage,
+        pageSize: this.pageSize,
       })
 
       if (this.$store.getters.userId == 1) {
@@ -299,33 +291,68 @@ export default {
       }
 
       this.roleForm.roleUserList = roleUserList.data.list
-      this.roleForm.total = roleUserList.data.total + 1
+      this.roleForm.total =
+        this.$store.getters.userId == 1
+          ? roleUserList.data.total + 1
+          : roleUserList.data.total
     },
     // 获取更多用户
-    getMoreUser(curPage) {
-      this.roleForm.curPage = curPage
-      this.getUserList()
+    getMoreUser(curPage, name) {
+      this.getUserList(curPage, name)
     },
     // 根据name 查询人员
     searchUser(name) {
-      this.roleForm.curPage = 1
-      this.getUserList(name)
+      this.getUserList(1, name)
     },
-    // 选择考试用户
+    // 选择读取权限用户
     selectReadUser(e) {
       this.roleForm.readRoleUser = e
     },
-    // 选择考试用户
+    // 选择阅读权限用户
     selectWriteUser(e) {
       this.roleForm.writeRoleUser = e
     },
     // 权限人员信息
-    async role({ readUserIds, writeUserIds, id }) {
+    role({ id, readUserIds, writeUserIds, readUserNames, writeUserNames }) {
       this.examForm.id = id
-      this.roleForm.readRoleUser = readUserIds
-      this.roleForm.writeRoleUser = writeUserIds
-      await this.getUserList()
+      const { roleIds: readIds, roleNames: readNames } = this.compositionRoles(
+        readUserIds,
+        readUserNames
+      )
+      const { roleIds: writeIds, roleNames: writeNames } =
+        this.compositionRoles(writeUserIds, writeUserNames)
       this.roleForm.show = true
+      this.$nextTick(() => {
+        this.roleForm.readRoleUser.push(...readIds)
+        this.roleForm.writeRoleUser.push(...writeIds)
+        this.$refs['readSelect'].$refs['elSelect'].cachedOptions.push(
+          ...readNames
+        )
+        this.$refs['writeSelect'].$refs['elSelect'].cachedOptions.push(
+          ...writeNames
+        )
+      })
+    },
+    compositionRoles(userIds, userNames) {
+      const ids = userIds
+        .split(',')
+        .filter((item) => item !== '')
+        .map((item) => Number(item))
+      const names = userNames.split(',')
+      const roles = ids.reduce(
+        (acc, cur, index) => {
+          acc['roleIds'].push(cur)
+          acc['roleNames'].push({
+            currentLabel: names[index],
+            currentValue: cur,
+            label: names[index],
+            value: cur,
+          })
+          return acc
+        },
+        { roleIds: [], roleNames: [] }
+      )
+      return roles
     },
     // 编辑权限
     async editRoleUsers() {
@@ -335,11 +362,11 @@ export default {
         writeUserIds: this.roleForm.writeRoleUser.join(','),
       })
       if (res?.code == 200) {
-        this.$tools.message('权限编辑成功！')
+        this.$message.success('权限编辑成功！')
         this.pageChange()
         this.roleForm.show = false
       } else {
-        this.$tools.message('权限编辑失败！', 'error')
+        this.$message.error('权限编辑失败！')
       }
     },
     // 试卷子分类
@@ -356,7 +383,7 @@ export default {
     },
     // 清空还原数据
     resetData(name) {
-      this.$tools.resetData(this, name)
+      this.$refs[name].resetFields()
     },
   },
 }

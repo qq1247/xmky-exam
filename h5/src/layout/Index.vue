@@ -1,17 +1,17 @@
 <!--
- * @Description: 
+ * @Description:
  * @Version: 1.0
- * @Company: 
+ * @Company:
  * @Author: Che
  * @Date: 2021-08-09 14:25:53
  * @LastEditors: Che
- * @LastEditTime: 2021-08-11 11:02:36
+ * @LastEditTime: 2021-08-17 18:39:14
 -->
 <template>
   <div class="app-container">
-    <app-header></app-header>
+    <app-header v-if="!hideHeader"></app-header>
     <app-main></app-main>
-    <app-footer></app-footer>
+    <app-footer v-if="!hideFooter"></app-footer>
   </div>
 </template>
 
@@ -29,13 +29,21 @@ export default {
   data() {
     return {}
   },
+  computed: {
+    hideHeader() {
+      return this.$store.state.setting.hideHeader
+    },
+    hideFooter() {
+      return this.$store.state.setting.hideFooter
+    },
+  },
   mounted() {},
   methods: {},
 }
 </script>
 
 <style lang="scss">
-@import '@/assets/style/element-variables.scss';
+@import 'assets/style/element-variables.scss';
 .app-container {
   position: relative;
   width: 100%;

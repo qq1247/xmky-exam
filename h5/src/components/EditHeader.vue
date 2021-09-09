@@ -121,7 +121,7 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 5000;
+  z-index: 1500;
   .header-left {
     .back {
       color: #fff;

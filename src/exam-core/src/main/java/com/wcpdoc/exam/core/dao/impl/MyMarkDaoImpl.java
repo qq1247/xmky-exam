@@ -42,7 +42,7 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 				.addWhere(ValidateUtil.isValid(pageIn.get("examName")), "EXAM.NAME LIKE ?", "%" + pageIn.get("examName") + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.get("userId")), "EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.MARK_USER_ID = ? AND Z.EXAM_ID = MY_MARK.EXAM_ID)", pageIn.get("userId"))
 				.addWhere(pageIn.get("curUserId", Integer.class) != null, "MY_MARK.MARK_USER_ID =  ?", pageIn.get("curUserId", Integer.class))
-				.addWhere(ValidateUtil.isValid(pageIn.get("startDate")) && ValidateUtil.isValid(pageIn.get("endDate")), "(EXAM.MARK_START_TIME <= ? OR EXAM.MARK_START_TIME >= ?)", pageIn.get("endDate"), pageIn.get("startDate"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("startDate")) && ValidateUtil.isValid(pageIn.get("endDate")), "(EXAM.MARK_START_TIME <= ? AND EXAM.MARK_START_TIME >= ?)", pageIn.get("endDate"), pageIn.get("startDate"))
 				.addWhere("1".equals(pageIn.get("needMark")), "EXAM.MARK_START_TIME <= ? AND EXAM.MARK_END_TIME >= ?", new Date(), new Date())
 				.addWhere("EXAM.STATE = ?", 1)
 				.addOrder("MY_MARK.ID", Order.DESC);

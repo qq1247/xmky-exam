@@ -5,12 +5,16 @@
  * @Author: Che
  * @Date: 2021-07-27 17:31:01
  * @LastEditors: Che
- * @LastEditTime: 2021-08-11 11:00:02
+ * @LastEditTime: 2021-09-02 17:48:28
  */
-const path = require('path')
 const os = require('os')
+const path = require('path')
+const CompressionWebpackPlugin = require('compression-webpack-plugin')
 
-// 获取本机电脑IP
+// resolve absolute paths
+const resolve = (dir) => path.join(__dirname, dir)
+
+// Obtain the local IP address
 const getIPAddress = () => {
   const interfaces = os.networkInterfaces()
   for (const devName in interfaces) {
@@ -32,21 +36,88 @@ module.exports = {
   publicPath: '/',
   outputDir: 'dist',
   assetsDir: 'assets',
-  lintOnSave: true,
+  lintOnSave: process.env.NODE_ENV === 'development',
+  productionSourceMap: false,
   runtimeCompiler: true,
-  pages: {
-    index: {
-      entry: 'src/main.js',
-      template: 'public/index.html',
-      filename: 'index.html',
-      title: '在线考试',
-      chunks: ['chunk-vendors', 'chunk-common', 'index'],
+  configureWebpack: {
+    // provide the app's title in webpack's name field, so that
+    // it can be accessed in index.html to inject the correct title.
+    name: '在线考试',
+    resolve: {
+      alias: {
+        '@': resolve('src'),
+        assets: resolve('src/assets'),
+        api: resolve('src/api'),
+        views: resolve('src/views'),
+        components: resolve('src/components'),
+      },
     },
+    plugins: [
+      new CompressionWebpackPlugin({
+        filename: '[path][base].gz',
+        algorithm: 'gzip',
+        // test: /\.js$|\.html$|\.json$|\.css/,
+        test: /\.js$|\.json$|\.css/,
+        threshold: 102400, // compression size
+        minRatio: 0.8, // compression ratio
+        deleteOriginalAssets: false, // Deleting source Files
+      }),
+    ],
   },
-  chainWebpack: (config) => {
-    config.resolve.alias.set('@', path.resolve(__dirname, './src'))
+  chainWebpack(config) {
+    // it can improve the speed of the first screen, it is recommended to turn on preload
+    config.plugin('preload').tap(() => [
+      {
+        rel: 'preload',
+        // to ignore runtime.js
+        // https://github.com/vuejs/vue-cli/blob/dev/packages/@vue/cli-service/lib/config/app.js#L171
+        fileBlacklist: [/\.map$/, /hot-update\.js$/, /runtime\..*\.js$/],
+        include: 'initial',
+      },
+    ])
+
+    // when there are many pages, it will cause too many meaningless requests
+    config.plugins.delete('prefetch')
+
+    config.when(process.env.NODE_ENV !== 'development', (config) => {
+      config
+        .plugin('ScriptExtHtmlWebpackPlugin')
+        .after('html')
+        .use('script-ext-html-webpack-plugin', [
+          {
+            // `runtime` must same as runtimeChunk name. default is `runtime`
+            inline: /runtime\..*\.js$/,
+          },
+        ])
+        .end()
+
+      config.optimization.splitChunks({
+        chunks: 'all',
+        cacheGroups: {
+          libs: {
+            name: 'chunk-libs',
+            test: /[\\/]node_modules[\\/]/,
+            priority: 10,
+            chunks: 'initial', // only package third parties that are initially dependent
+          },
+          elementUI: {
+            name: 'chunk-elementUI', // split elementUI into a single package
+            priority: 20, // the weight needs to be larger than libs and app or it will be packaged into libs or app
+            test: /[\\/]node_modules[\\/]_?element-ui(.*)/, // in order to adapt to cnpm
+          },
+          commons: {
+            name: 'chunk-commons',
+            test: resolve('src/components'), // can customize your rules
+            minChunks: 3, //  minimum common number
+            priority: 5,
+            reuseExistingChunk: true,
+          },
+        },
+      })
+      // https:// webpack.js.org/configuration/optimization/#optimizationruntimechunk
+      config.optimization.runtimeChunk('single')
+    })
   },
-  configureWebpack: () => {},
   devServer: {
     open: true,
     host: getIPAddress(),
@@ -55,10 +126,10 @@ module.exports = {
     hotOnly: true,
     proxy: {
       '/api': {
-        target: process.env.VUE_APP_BASE_URL, // 代理地址，这里设置的地址会代替axios中设置的baseURL
-        changeOrigin: true, // 如果接口跨域，需要进行这个参数配置
+        target: process.env.VUE_APP_BASE_URL, // Address of the proxy, it can replace Axios default URL
+        changeOrigin: true, // Interface cross-domain, Need to open
         // ws: true, // proxy websocket
-        // pathRewrite方法重写url
+        // pathRewrite
         pathRewrite: {
           '^/api': '',
         },

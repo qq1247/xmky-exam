@@ -89,9 +89,8 @@ code == 401 无权限或登录超时
 ######请求参数
 | 参数     | 类型    | 描述   | 必填 |
 | -------- | ------- | ------ | ---- |
-| id       | Integer | 主键   | 是   |
-| sourceId | String  | 源ID   | 否   |
-| targetId | String  | 目标ID | 否   |
+| sourceId | String  | 源ID   | 是   |
+| targetId | String  | 目标ID | 是   |
 
 ####试题分类权限用户：questionType/authUserListpage
 ######请求参数
@@ -222,12 +221,6 @@ code == 401 无权限或登录超时
 | ---- | ------- | ---- | ---- |
 | id   | Integer | 主键 | 是   |
 
-####试题状态：question/state
-######请求参数
-| 参数 | 类型    | 描述 | 必填 |
-| ---- | ------- | ---- | ---- |
-| id   | Integer | 主键 | 是   |
-
 ####试题获取：question/get
 ######请求参数
 | 参数                   | 类型    | 描述 | 必填 |
@@ -246,8 +239,8 @@ code == 401 无权限或登录超时
 ######请求参数
 | 参数            | 类型    | 描述       | 必填 |
 | --------------- | ------- | ---------- | ---- |
-| file            | file    | 附件       | 是   |
-| question TypeId | Integer | 试题分类ID | 是   |
+| fileId            | fileId    | 附件       | 是   |
+| questionTypeId | Integer | 试题分类ID | 是   |
 
 ####试题模板导出：question/wordTemplateExport
 ######请求参数
@@ -434,17 +427,12 @@ code == 401 无权限或登录超时
 | score     | Double  | 分数   | 是   |
 | options   | String  | 选项   | 是   |
 
-####试卷试题上移：paper/questionUp
+####章节试题移动：paper/movePosition
 ######请求参数
 | 参数            | 类型    | 描述       | 必填 |
 | --------------- | ------- | ---------- | ---- |
-| paperQuestionId | Integer | 试卷试题id | 是   |
-
-####试卷试题下移：paper/questionDown
-######请求参数
-| 参数            | 类型    | 描述       | 必填 |
-| --------------- | ------- | ---------- | ---- |
-| paperQuestionId | Integer | 试卷试题id | 是   |
+| sourceId | Integer | 源ID | 是   |
+| targetId | Integer | 目标ID | 是   |
 
 ####试卷试题发布：paper/publish
 ######请求参数

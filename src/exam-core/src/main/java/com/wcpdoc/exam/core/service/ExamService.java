@@ -15,6 +15,38 @@ import com.wcpdoc.exam.core.entity.PageOut;
 public interface ExamService extends BaseService<Exam>{
 	
 	/**
+	 * 添加考试
+	 * 
+	 * v1.0 chenyun 2021年8月25日下午5:58:55
+	 * @param exam void
+	 */
+	void addAndUpdate(Exam exam);
+	
+	/**
+	 * 修改考试
+	 * 
+	 * v1.0 chenyun 2021年8月25日下午6:01:30
+	 * @param exam void
+	 */
+	void updateAndUpdate(Exam exam);
+	
+	/**
+	 * 删除考试
+	 * 
+	 * v1.0 chenyun 2021年8月25日下午6:03:33
+	 * @param id void
+	 */
+	void delAndUpdate(Integer id);
+	
+	/**
+	 * 复制
+	 * 
+	 * v1.0 chenyun 2021年8月25日下午6:06:54
+	 * @param id void
+	 */
+	void publish(Integer id);
+	
+	/**
 	 * 获取考试用户列表 
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
@@ -24,14 +56,14 @@ public interface ExamService extends BaseService<Exam>{
 	List<Map<String, Object>> getExamUserList(Integer id);
 
 	/**
-	 * 考试更新考试用户
+	 * 考试更新考试用户阅卷用户
 	 * 
 	 * v1.0 zhanghc 2017年6月19日下午3:10:24
 	 * @param id
 	 * @param userIds
 	 * void
 	 */
-	void updateExamUser(Integer id, Integer[] userIds);
+	void updateMarkSet(Integer id, String[] examUserIds, Integer[] markUserIds);
 	
 	/**
 	 * 考试更新判卷用户

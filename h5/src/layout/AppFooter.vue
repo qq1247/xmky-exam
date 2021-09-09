@@ -1,7 +1,7 @@
 <!--
- * @Description: 
+ * @Description:
  * @Version: 1.0
- * @Company: 
+ * @Company:
  * @Author: Che
  * @Date: 2021-08-09 15:14:50
  * @LastEditors: Che
@@ -26,7 +26,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '@/assets/style/variables.scss';
+@import 'assets/style/variables.scss';
 // footer
 .app-footer {
   height: 50px;

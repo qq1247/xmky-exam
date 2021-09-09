@@ -19,7 +19,6 @@
     <div class="content">
       <div class="content-center">
         <div class="paper-title">{{ paper.name }}</div>
-        <div class="paper-intro">{{ paper.id }}</div>
 
         <template v-if="paperQuestion.length > 0">
           <div :key="index" v-for="(item, index) in paperQuestion">
@@ -42,7 +41,7 @@
               >
                 <p
                   class="question-title"
-                  v-html="index + 1 + '、' + child.title"
+                  v-html="`${indexc + 1}、${child.title}`"
                 ></p>
 
                 <!-- 单选 -->
@@ -70,14 +69,20 @@
                 <!-- 多选 -->
                 <template v-if="child.type === 2">
                   <el-checkbox-group
+                    @change="
+                      (val) => {
+                        updateAnswer(child.id, val)
+                      }
+                    "
                     class="children-option"
-                    v-model="child.examAnswers"
+                    v-if="myExamDetailCache[child.id]"
+                    v-model="myExamDetailCache[child.id].answers"
                   >
                     <el-checkbox
-                      disabled
                       :key="index"
                       :label="String.fromCharCode(65 + index)"
                       class="option-item"
+                      :disabled="preview === 'true' ? true : false"
                       v-for="(option, index) in child.options"
                     >
                       <div
@@ -238,11 +243,7 @@
             </template>
           </div>
         </template>
-
-        <div class="data-null" v-if="paperQuestion.length == 0">
-          <img alt class="data-img" src="../../assets/img/data-null.png" />
-          <span class="data-tip">暂无试卷信息</span>
-        </div>
+        <el-empty v-else description="暂无试卷"></el-empty>
       </div>
     </div>
 
@@ -274,14 +275,14 @@
   </div>
 </template>
 <script>
-import { paperGet, paperQuestionList } from '@/api/paper'
+import { paperGet, paperQuestionList } from 'api/paper'
 import {
   myMarksListPage,
   myMarkAnswerList,
   myExamUpdateScore,
   myExamDoScore,
-} from '@/api/my'
-import ScorePlate from '@/components/ScorePlate.vue'
+} from 'api/my'
+import ScorePlate from 'components/ScorePlate.vue'
 export default {
   components: {
     ScorePlate,
@@ -398,7 +399,7 @@ export default {
             this.$set(
               this.paperQuestion[index].questionList[indexi],
               'isEdit',
-              item.ai === 1 ? true : false
+              item.ai === 1
             )
           })
         })
@@ -409,7 +410,7 @@ export default {
           })
         }
       } catch (error) {
-        this.$tools.message(error, 'error')
+        this.$message.error(error)
       }
     },
     // 显示分数编辑板
@@ -442,16 +443,16 @@ export default {
       const res = await myExamUpdateScore({
         myExamDetailId: source.myExamDetailId,
         score: source.scorePlate,
-      }).catch((err) => {})
+      })
       res?.code === 200
-        ? this.$tools.message('打分成功！')
-        : this.$tools.message(res.msg || '打分失败！', 'error')
+        ? this.$message.success('打分成功！')
+        : this.$message.error(res.msg || '打分失败！')
     },
     // 上下题定位
     toHref(position, status) {
       let toHref = ''
 
-      let paperQuestion = this.paperQuestion.reduce((acc, cur) => {
+      const paperQuestion = this.paperQuestion.reduce((acc, cur) => {
         acc.push(...cur.questionList)
         return acc
       }, [])
@@ -477,7 +478,7 @@ export default {
           index == this.answerList.length - 1 ||
           indexd === -1
         ) {
-          this.$tools.message('没有可阅试题了哦！', 'warning')
+          this.$message.warning('没有可阅试题了哦！')
           return
         }
 
@@ -502,7 +503,7 @@ export default {
         (item) => item.userId === this.userId
       )
       if (index === 0) {
-        this.$tools.message('已经是第一卷了！', 'warning')
+        this.$message.warning('已经是第一卷了！')
         return
       }
       this.queryAnswerInfo(this.examUserIds[index - 1].userId)
@@ -513,7 +514,7 @@ export default {
         (item) => item.userId === this.userId
       )
       if (index === this.examUserIds.length - 1) {
-        this.$tools.message('已经是最后一卷了！', 'warning')
+        this.$message.warning('已经是最后一卷了！')
         return
       }
       this.queryAnswerInfo(this.examUserIds[index + 1].userId)
@@ -528,22 +529,21 @@ export default {
         (item) => item.scorePlate !== '' && item.scorePlate !== null
       )
       if (!isEvery) {
-        this.$tools.message('请给所有试题打分！', 'warning')
+        this.$message.warning('请给所有试题打分！')
         return
       }
       const res = await myExamDoScore({
         examId: this.examId,
         userId: this.userId,
         markId: this.markId,
-      }).catch((err) => {})
+      })
       res?.code === 200
-        ? (this.$tools.message('阅卷完成！', 'warning'),
-          this.queryExamineeInfo())
-        : this.$tools.message('阅卷失败！', 'error')
+        ? (this.$message.warning('阅卷完成！'), this.queryExamineeInfo())
+        : this.$message.error('阅卷失败！')
     },
   },
 }
 </script>
 <style lang="scss" scoped>
-@import '@/assets/style/exam.scss';
+@import 'assets/style/exam.scss';
 </style>

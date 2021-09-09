@@ -5,9 +5,10 @@
  * @Author: Che
  * @Date: 2021-08-11 13:23:33
  * @LastEditors: Che
- * @LastEditTime: 2021-08-16 10:48:11
+ * @LastEditTime: 2021-08-24 11:36:10
  */
 const InfoKey = 'Login-Info'
+const DriverKey = 'Question-Driver'
 
 const getStorage = (key) => {
   const value =
@@ -26,3 +27,7 @@ const removeStorage = (key) => {
 export const getInfo = () => getStorage(InfoKey)
 export const setInfo = (data) => setStorage(InfoKey, data)
 export const removeInfo = () => removeStorage(InfoKey)
+
+//
+export const getDriver = () => getStorage(DriverKey)
+export const setDriver = (data) => setStorage(DriverKey, data)

@@ -9,7 +9,7 @@
         <div class="banner-list">
           <div class="banner-info">
             <p class="banner-title">{{ carouse.title }}</p>
-            <p class="banner-content">{{ carouse.content }}</p>
+            <p class="banner-content" v-html="carouse.content"></p>
             <div class="banner-btn">查看详情</div>
           </div>
           <el-image
@@ -35,18 +35,12 @@
             <div class="box-title">
               <i class="common common-time"></i><span>考试安排</span>
             </div>
-            <el-calendar v-model="now">
-              <template #dateCell="{ date, data }">
-                <div
-                  class="date-cell"
-                  :class="data.isSelected ? 'is-selected' : ''"
-                >
-                  <div class="calendar-day">
-                    {{ data.day.split('-').slice(2).join('-') }}
-                  </div>
-                </div>
-              </template>
-            </el-calendar>
+            <Calendar
+              v-model="now"
+              :timePopovers="timePopovers"
+              @selectDate="selectDate"
+            >
+            </Calendar>
           </template>
           <template>
             <div class="box-title">
@@ -67,10 +61,7 @@
                 }}</el-col>
               </el-row>
             </template>
-            <div class="data-null" v-else>
-              <img class="data-img" src="../assets/img/data-null.png" alt />
-              <span class="data-tip">抱歉！暂无公告</span>
-            </div>
+            <el-empty v-else description="暂无公告"></el-empty>
           </template>
         </el-col>
         <el-col :span="16">
@@ -124,10 +115,7 @@
                 </el-col>
               </el-row>
             </template>
-            <div class="data-null" v-else>
-              <img class="data-img" src="../assets/img/data-null.png" alt />
-              <span class="data-tip">抱歉！暂无考试</span>
-            </div>
+            <el-empty v-else description="暂无考试"></el-empty>
           </div>
           <div>
             <div class="box-title box-divider">
@@ -179,10 +167,7 @@
                 </el-col>
               </el-row>
             </template>
-            <div class="data-null" v-else>
-              <img class="data-img" src="../assets/img/data-null.png" alt />
-              <span class="data-tip">抱歉！暂无阅卷</span>
-            </div>
+            <el-empty v-else description="暂无阅卷"> </el-empty>
           </div>
         </el-col>
       </el-row>
@@ -191,10 +176,11 @@
 </template>
 
 <script>
-import { myExamListPage, myMarkListPage } from '@/api/my'
-import { bulletinListPage } from '@/api/base'
+import { myExamListPage, myMarkListPage } from 'api/my'
+import { bulletinListPage } from 'api/base'
 import getMainColor from '@/utils/getImageColor.js'
 import * as dayjs from 'dayjs'
+import Calendar from 'components/Calendar/index'
 export default {
   data() {
     return {
@@ -203,9 +189,20 @@ export default {
       examStatus: ['', '待考', '考试', '已考', '已考'],
       readPaperStatus: ['', '待阅', '阅卷', '已阅'],
       bulletinList: [],
-      carouselList: [],
+      carouselList: [
+        {
+          title: '在线考试',
+          content:
+            '一套适用于中小型企业的在线考试系统，开源免费，支持智能阅卷，权限控制等，持续更新，敬请等待~',
+          img: require('../assets/img/banner-img.png'),
+        },
+      ],
       now: new Date(),
+      timePopovers: {},
     }
+  },
+  components: {
+    Calendar,
   },
   created() {
     this.init()
@@ -276,36 +273,72 @@ export default {
           item.bg = bg
         })
         this.carouselList = list
-      } else {
-        this.carouselList = [
-          {
-            title: '在线考试',
-            content:
-              '一套适用于中小型企业的在线考试系统，开源免费，支持智能阅卷，权限控制等，持续更新，敬请等待~',
-            img: require('../assets/img/banner-img.png'),
-          },
-        ]
       }
     },
+    selectDate(time) {
+      const _time = dayjs(time).date(1).format('YYYY-MM-DD')
+      this.renderExamCalendar(_time)
+    },
     // 渲染日历
-    async renderExamCalendar() {
-      const days = dayjs().daysInMonth()
-      const startDate = dayjs().date(1).format('YYYY-MM-DD')
-      const endDate = dayjs().date(days).format('YYYY-MM-DD')
+    async renderExamCalendar(time) {
+      const days = dayjs(time).daysInMonth()
+      const startDate = time || dayjs().date(1).format('YYYY-MM-DD')
+      const endDate = dayjs(time).date(days).format('YYYY-MM-DD')
       const examList = await myExamListPage({
         curPage: 1,
-        pageSize: 10,
+        pageSize: 100,
         startDate: `${startDate} 00:00:00`,
         endDate: `${endDate} 23:59:59`,
       })
       const markList = await myMarkListPage({
         curPage: 1,
-        pageSize: 10,
+        pageSize: 100,
         startDate: `${startDate} 00:00:00`,
         endDate: `${endDate} 23:59:59`,
       })
-      console.log(examList)
-      console.log(markList)
+
+      let timePopovers = {}
+
+      if (examList.data.list.length === 0 && markList.data.list.length === 0) {
+        this.timePopovers = timePopovers
+        return
+      }
+
+      let examPopovers = examList.data.list.reduce((acc, exam) => {
+        const examTime = dayjs(exam.examStartTime).format('YYYY-MM-DD')
+        if (!acc[examTime]) {
+          acc[examTime] = {}
+          acc[examTime]['exam'] = []
+        }
+
+        acc[examTime]['exam'].push({
+          startTime: exam.examStartTime,
+          endTime: exam.examEndTime,
+          state: exam.stateName,
+        })
+        return acc
+      }, {})
+
+      timePopovers = markList.data.list.reduce((acc, mark) => {
+        const markTime = dayjs(mark.markStartTime).format('YYYY-MM-DD')
+
+        if (!acc[markTime]) {
+          acc[markTime] = {}
+        }
+
+        if (!acc[markTime] || !acc[markTime]['mark']) {
+          acc[markTime]['mark'] = []
+        }
+
+        acc[markTime]['mark'].push({
+          startTime: mark.examStartTime,
+          endTime: mark.examEndTime,
+          state: mark.stateName,
+        })
+        return acc
+      }, examPopovers)
+
+      this.timePopovers = timePopovers
     },
   },
 }
@@ -314,6 +347,7 @@ export default {
 <style lang="scss" scoped>
 .container {
   width: 100%;
+  margin-top: 0;
 }
 
 .el-carousel__item {
@@ -332,12 +366,11 @@ export default {
     padding-right: 100px;
     color: #fff;
     .banner-title {
-      font-size: 36px;
+      font-size: 30px;
     }
     .banner-content {
-      font-size: 14px;
+      font-size: 16px;
       overflow: hidden;
-      text-indent: 2em;
       margin: 5px 0 0 30px;
     }
     .banner-btn {
@@ -498,11 +531,11 @@ export default {
       &.is-today {
         background: #0095e5;
         color: #fff;
-        border-radius: 50%;
+        border-radius: 8px;
       }
       &.is-selected {
-        background: rgba(255, 0, 0, 0.1);
-        border-radius: 5px;
+        background: rgba(#0095e5, 0.3);
+        border-radius: 8px;
       }
       border: 1px solid #fff;
       &:first-child {
@@ -512,14 +545,15 @@ export default {
   }
   .el-calendar-day {
     height: 50px;
-    line-height: 50px;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
     padding: 0;
     &:hover {
       background: #fff;
       border: 1px solid #0095e5;
+      border-radius: 8px;
       color: #000;
       box-shadow: 0 0 5px 1px rgba(0, 149, 229, 0.1);
     }
@@ -614,8 +648,5 @@ export default {
   .notice-right {
     color: #0095e5;
   }
-}
-.data-null {
-  padding-top: 20px;
 }
 </style>

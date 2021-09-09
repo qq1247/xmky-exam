@@ -12,7 +12,7 @@
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="query" icon="el-icon-search" type="primary"
+        <el-button @click="search" icon="el-icon-search" type="primary"
           >查询</el-button
         >
       </el-form-item>
@@ -41,10 +41,7 @@
           ></ListCard>
         </div>
       </template>
-      <div class="data-null" v-else>
-        <img class="data-img" src="../../assets/img/data-null.png" alt />
-        <span class="data-tip">抱歉！暂无信息</span>
-      </div>
+      <el-empty v-else description="暂无信息"> </el-empty>
       <el-pagination
         background
         layout="prev, pager, next"
@@ -66,9 +63,9 @@ import {
   myMarkListPage,
   myExamAutoScore,
   myExamAiProgress,
-} from '@/api/my'
-import ListCard from '@/components/ListCard.vue'
-import { loginSysTime } from '@/api/common'
+} from 'api/my'
+import ListCard from 'components/ListCard.vue'
+import { loginSysTime } from 'api/common'
 export default {
   components: {
     ListCard,
@@ -102,7 +99,7 @@ export default {
 
       if (this.type === 1) {
         myExamList = await myExamListPage({
-          name: this.queryForm.examName,
+          examName: this.queryForm.examName,
           curPage: this.curPage,
           pageSize: this.pageSize,
         })
@@ -122,7 +119,7 @@ export default {
 
       if (this.type === 2) {
         myExamList = await myMarkListPage({
-          name: this.queryForm.examName,
+          examName: this.queryForm.examName,
           curPage: this.curPage,
           pageSize: this.pageSize,
         })
@@ -162,12 +159,17 @@ export default {
       this.myExamList = myExamList.data.list
       this.total = myExamList.data.total
     },
+    search() {
+      this.curPage = 1
+      this.query()
+    },
     // 我的考试操作
     examHandler(data) {
       const examStartTime = new Date(data.examStartTime).getTime()
+      const examEndTime = new Date(data.examEndTime).getTime()
       const now = new Date().getTime()
       if (now < examStartTime) {
-        this.$tools.message('考试未开始，请等待...', 'warning')
+        this.$message.warning('考试未开始，请等待...')
         return
       }
       this.$router.push({
@@ -175,8 +177,8 @@ export default {
         query: {
           id: data.id,
           paperId: data.paperId,
-          preview: data.exam !== 'start',
-          examEndTime: data.exam === 'start' ? data.examEndTime : '',
+          preview: now < examStartTime && now > examEndTime,
+          examEndTime: data.examEndTime,
         },
       })
     },
@@ -187,7 +189,7 @@ export default {
       const markEndTime = new Date(data.markEndTime).getTime()
       const now = new Date().getTime()
       if (now < markStartTime) {
-        this.$tools.message('阅卷未开始，请等待...', 'warning')
+        this.$message.warning('阅卷未开始，请等待...')
         return
       }
 
@@ -220,8 +222,6 @@ export default {
       const res = await myExamAutoScore({
         id: data.id,
         examId: data.examId,
-      }).catch((err) => {
-        console.log(err)
       })
       if (res?.code === 200) {
         this.percentage = 1
@@ -242,7 +242,7 @@ export default {
           })
         }
       } else {
-        this.$tools.message(res.msg || '智能阅卷失败！请重试！', 'erroe')
+        this.$message.error(res.msg || '智能阅卷失败！请重试！')
       }
     },
     // 获取进度
@@ -250,7 +250,7 @@ export default {
       const percentage = await this.$tools.delay().then(() => {
         return myExamAiProgress({
           id,
-        }).catch((err) => {})
+        })
       })
 
       if (!percentage?.data?.totalNum) {
