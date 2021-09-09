@@ -310,14 +310,14 @@ export default {
 
         const res = await bulletinAdd({
           title: this.editForm.title,
-          imgFileId:
-            this.editForm.imgFileId.length > 0
-              ? this.editForm.imgFileId[0].response.data.fileIds
-              : null,
           content: this.editForm.content,
           readUserIds: this.editForm.examUser,
           topState: this.editForm.topState,
           state: this.editForm.state,
+          imgFileId:
+            this.editForm.state === 2 && this.editForm.imgFileId.length > 0
+              ? this.editForm.imgFileId[0].response.data.fileIds
+              : null,
         })
 
         if (res.code != 200) {
@@ -345,7 +345,7 @@ export default {
           id: this.editForm.id,
           title: this.editForm.title,
           imgFileId:
-            this.editForm.imgFileId.length > 0
+            this.editForm.state === 2 && this.editForm.imgFileId.length > 0
               ? this.editForm.imgFileId[0]?.response
                 ? this.editForm.imgFileId[0].response.data.fileIds
                 : this.getQueryString(this.editForm.imgFileId[0].url, 'id')
@@ -390,6 +390,7 @@ export default {
 
       this.editForm.show = true
       this.editForm.imgFileId = []
+      this.editForm.examUser = []
       this.editForm.content = res.data?.content || ''
       this.$nextTick(() => {
         this.editForm.id = res.data.id
