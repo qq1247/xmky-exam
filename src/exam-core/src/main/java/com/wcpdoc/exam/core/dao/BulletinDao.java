@@ -1,5 +1,8 @@
 package com.wcpdoc.exam.core.dao;
 
+import java.util.List;
+import java.util.Map;
+
 import com.wcpdoc.exam.core.dao.RBaseDao;
 import com.wcpdoc.exam.core.entity.Bulletin;
 import com.wcpdoc.exam.core.entity.PageIn;
@@ -28,4 +31,13 @@ public interface BulletinDao extends RBaseDao<Bulletin> {
 	 * @return PageOut
 	 */
 	PageOut getOrgListpage(PageIn pageIn);
+	
+	/**
+	 * 获取公告
+	 * 
+	 * v1.0 chenyun 2021年9月8日下午5:19:57
+	 * @param id
+	 * @return List<Map<String, Object>>
+	 */
+	List<Map<String, Object>> get(Integer id);
 }

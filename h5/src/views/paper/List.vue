@@ -21,7 +21,7 @@
         <div class="exam-item">
           <div
             class="exam-content exam-add"
-            @click=";(paperForm.show = true), (paperForm.edit = true)"
+            @click=";(paperForm.show = true), (paperForm.edit = false)"
           >
             <i class="common common-plus"></i>
             <span>添加试卷</span>
