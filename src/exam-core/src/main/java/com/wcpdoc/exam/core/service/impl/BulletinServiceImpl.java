@@ -1,6 +1,8 @@
 package com.wcpdoc.exam.core.service.impl;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -11,8 +13,10 @@ import com.wcpdoc.exam.core.dao.BulletinDao;
 import com.wcpdoc.exam.core.entity.Bulletin;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
+import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.BulletinService;
 import com.wcpdoc.exam.core.util.ValidateUtil;
+import com.wcpdoc.exam.file.service.FileService;
 
 /**
  * 公告服务层实现
@@ -23,11 +27,48 @@ import com.wcpdoc.exam.core.util.ValidateUtil;
 public class BulletinServiceImpl extends BaseServiceImp<Bulletin> implements BulletinService {
 	@Resource
 	private BulletinDao bulletinDao;
+	@Resource
+	private FileService fileService;
 
 	@Override
 	@Resource(name = "bulletinDaoImpl")
 	public void setDao(BaseDao<Bulletin> dao) {
 		super.dao = dao;
+	}
+	
+
+	@Override
+	public void addAndUpdate(Bulletin bulletin) {
+		if (ValidateUtil.isValid(bulletin.getReadUserIds())) {
+			bulletin.setReadUserIds(","+bulletin.getReadUserIds()+",");
+		}
+		bulletin.setUpdateTime(new Date());
+		bulletin.setUpdateUserId(getCurUser().getId());
+		bulletinDao.add(bulletin);
+		if (ValidateUtil.isValid(bulletin.getImgFileId())) {
+			fileService.doUpload(Integer.parseInt(bulletin.getImgFileId()));
+		}
+	}
+
+	@Override
+	public void updateAndUpdate(Bulletin bulletin) {
+		Bulletin entity = bulletinDao.getEntity(bulletin.getId());
+		entity.setTitle(bulletin.getTitle());
+		entity.setImgFileId(bulletin.getImgFileId());
+		entity.setContent(bulletin.getContent());
+		if (ValidateUtil.isValid(bulletin.getReadUserIds())) {
+			entity.setReadUserIds(","+bulletin.getReadUserIds()+",");
+		}else{
+			entity.setReadUserIds(null);
+		}
+		entity.setTopState(bulletin.getTopState());
+		entity.setState(bulletin.getState());
+		entity.setUpdateTime(new Date());
+		entity.setUpdateUserId(getCurUser().getId());
+		bulletinDao.update(entity);
+		if (ValidateUtil.isValid(bulletin.getImgFileId()) && ValidateUtil.isValid(entity.getImgFileId()) && !bulletin.getImgFileId().equals(entity.getImgFileId()) ) {
+			fileService.doUpload(Integer.parseInt(bulletin.getImgFileId()));
+		}
 	}
 	
 	@Override
@@ -64,5 +105,14 @@ public class BulletinServiceImpl extends BaseServiceImp<Bulletin> implements Bul
 	@Override
 	public PageOut getOrgListpage(PageIn pageIn) {
 		return bulletinDao.getOrgListpage(pageIn);
+	}
+
+	@Override
+	public Map<String, Object> get(Integer id) {
+		List<Map<String, Object>> list = bulletinDao.get(id);
+		if (list == null || list.size() != 1) {
+			throw new MyException("错误参数：id");
+		}
+		return list.get(0);
 	}
 }

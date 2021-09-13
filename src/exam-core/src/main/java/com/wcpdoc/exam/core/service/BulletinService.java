@@ -1,6 +1,9 @@
 package com.wcpdoc.exam.core.service;
 
 import com.wcpdoc.exam.core.service.BaseService;
+
+import java.util.Map;
+
 import com.wcpdoc.exam.core.entity.Bulletin;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
@@ -12,6 +15,22 @@ import com.wcpdoc.exam.core.entity.PageOut;
  */
 public interface BulletinService extends BaseService<Bulletin> {
 
+	/**
+	 * 添加公告
+	 * 
+	 * v1.0 chenyun 2021年9月9日下午1:27:47
+	 * @param bulletin void
+	 */
+	void addAndUpdate(Bulletin bulletin);
+	
+	/**
+	 * 修改公告
+	 * 
+	 * v1.0 chenyun 2021年9月9日下午1:27:47
+	 * @param bulletin void
+	 */
+	void updateAndUpdate(Bulletin bulletin);
+	
 	/**
 	 * 删除公告
 	 * 
@@ -49,4 +68,13 @@ public interface BulletinService extends BaseService<Bulletin> {
 	 * @return PageOut
 	 */
 	PageOut getOrgListpage(PageIn pageIn);
+	
+	/**
+	 * 获取公告
+	 * 
+	 * v1.0 chenyun 2021年9月8日下午5:19:57
+	 * @param id
+	 * @return Map<String,Object>
+	 */
+	Map<String, Object> get(Integer id);
 }
