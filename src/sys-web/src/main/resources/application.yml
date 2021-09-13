@@ -12,22 +12,25 @@ spring:
       prefix: /WEB-INF/jsp/
       suffix: .jsp
   profiles:
-    active: local
+    active: dev
   servlet:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/exam?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
+    url: jdbc:mysql://127.0.0.1:3306/exam?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
     username: root
     password: root
   jpa:
-    show-sql: false
+    show-sql: true
     
 file: 
   upload:
     dir: c:/bak/file
+
+logging:
+  config: config/log4j2.xml
       
 sys:
   ver: 3.0.0
@@ -35,3 +38,4 @@ token:
     expireMinute: 1440
     refreshMinute: 60
     secret: 9xzR4+K7XpvbCpoIMocXVxS655xxb9S0Qxd5RDU4b7PeSIhYfYdjg9aOMrhjPjwN
+    
