@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-11 16:28:25
  * @LastEditors: Che
- * @LastEditTime: 2021-09-03 16:35:52
+ * @LastEditTime: 2021-09-15 11:07:56
  */
 import request from './request'
 
@@ -129,3 +129,27 @@ export const examTypeMove = (params) => request('examType/move', params)
  * @return {*}
  */
 export const examTypeAuth = (params) => request('examType/auth', params)
+
+/**
+ * @name: examUserList
+ * @description: 考试人员名单
+ * @param {*}
+ * @return {*}
+ */
+export const examUserList = (params) => request('exam/examUserList', params)
+
+/**
+ * @name: examOnLine
+ * @description: 在线考试人员名单
+ * @param {*}
+ * @return {*}
+ */
+export const examOnLine = (params) => request('exam/onLine', params)
+
+/**
+ * @name: examGradeReport
+ * @description: 考试信息统计
+ * @param {*}
+ * @return {*}
+ */
+export const examGradeReport = (params) => request('gradeReport/count', params)
