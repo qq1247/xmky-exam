@@ -20,206 +20,69 @@
       <div class="content-center">
         <div class="paper-title">{{ paper.name }}</div>
 
-        <template v-if="paperQuestion.length > 0">
-          <div :key="index" v-for="(item, index) in paperQuestion">
-            <div class="chapter">
-              <div class="chapter-item">
-                <div class="item-title">{{ item.chapter.name }}</div>
-                <div></div>
-              </div>
-              <div class="chapter-description">
-                {{ item.chapter.description }}
-              </div>
-            </div>
+        <page-show
+          v-if="showType === '1'"
+          :preview="preview"
+          :paperQuestion="paperQuestion"
+          @updateAnswer="updateAnswer"
+          :myExamDetailCache="myExamDetailCache"
+          @updateClozeAnswer="updateClozeAnswer"
+        ></page-show>
 
-            <template v-if="item.questionList.length > 0">
-              <div
-                :id="`p-${child.id}`"
-                :key="child.id"
-                class="children-content"
-                v-for="(child, index) in item.questionList"
-              >
-                <p
-                  class="question-title"
-                  v-html="`${index + 1}、${child.title}`"
-                ></p>
-
-                <!-- 单选 -->
-                <template v-if="child.type === 1">
-                  <el-radio-group
-                    @change="
-                      (val) => {
-                        updateAnswer(child.id, val)
-                      }
-                    "
-                    class="children-option"
-                    v-if="myExamDetailCache[child.id]"
-                    v-model="myExamDetailCache[child.id].answers[0]"
-                  >
-                    <el-radio
-                      :key="index"
-                      :disabled="preview === 'true' ? true : false"
-                      :label="String.fromCharCode(65 + index)"
-                      class="option-item"
-                      v-for="(option, index) in child.options"
-                    >
-                      <div
-                        class="flex-items-center"
-                        v-html="`${String.fromCharCode(65 + index)}、${option}`"
-                      ></div>
-                    </el-radio>
-                  </el-radio-group>
-                </template>
-
-                <!-- 多选 -->
-                <template v-if="child.type === 2">
-                  <el-checkbox-group
-                    @change="
-                      (val) => {
-                        updateAnswer(child.id, val)
-                      }
-                    "
-                    class="children-option"
-                    v-if="myExamDetailCache[child.id]"
-                    v-model="myExamDetailCache[child.id].answers"
-                  >
-                    <el-checkbox
-                      :key="index"
-                      :label="String.fromCharCode(65 + index)"
-                      class="option-item"
-                      :disabled="preview === 'true' ? true : false"
-                      v-for="(option, index) in child.options"
-                    >
-                      <div
-                        class="flex-items-center"
-                        v-html="`${String.fromCharCode(65 + index)}、${option}`"
-                      ></div>
-                    </el-checkbox>
-                  </el-checkbox-group>
-                </template>
-
-                <!-- 填空 -->
-                <template
-                  v-if="child.type === 3 && myExamDetailCache[child.id]"
-                >
-                  <el-input
-                    class="question-text"
-                    @change="
-                      (val) => {
-                        updateClozeAnswer(child.id, val, child.answers, index)
-                      }
-                    "
-                    placeholder="请输入内容"
-                    :key="index"
-                    :disabled="preview === 'true' ? true : false"
-                    v-for="(answer, index) in myExamDetailCache[child.id]
-                      .answers"
-                    v-model="myExamDetailCache[child.id].answers[index]"
-                  >
-                    <template slot="prepend">第{{ index + 1 }}空</template>
-                  </el-input>
-                </template>
-
-                <!-- 判断 -->
-                <template v-if="child.type === 4">
-                  <el-radio-group
-                    @change="
-                      (val) => {
-                        updateAnswer(child.id, val)
-                      }
-                    "
-                    class="children-option"
-                    v-if="myExamDetailCache[child.id]"
-                    v-model="myExamDetailCache[child.id].answers[0]"
-                  >
-                    <el-radio
-                      :key="index"
-                      :label="option"
-                      class="option-item"
-                      v-for="(option, index) in ['对', '错']"
-                      :disabled="preview === 'true' ? true : false"
-                      >{{ option }}</el-radio
-                    >
-                  </el-radio-group>
-                </template>
-
-                <!-- 问答 -->
-                <template v-if="child.type === 5">
-                  <el-input
-                    :rows="2"
-                    class="question-text"
-                    @change="
-                      (val) => {
-                        updateAnswer(child.id, val)
-                      }
-                    "
-                    placeholder="请输入内容"
-                    type="textarea"
-                    v-if="myExamDetailCache[child.id]"
-                    :disabled="preview === 'true' ? true : false"
-                    v-model="myExamDetailCache[child.id].answers[0]"
-                  ></el-input>
-                </template>
-              </div>
-            </template>
-          </div>
-        </template>
-        <el-empty v-else description="暂无试卷"> </el-empty>
+        <question-show
+          v-if="showType === '3'"
+          :preview="preview"
+          :router-index="routerIndex"
+          :paperQuestion="paperQuestion"
+          :myExamDetailCache="myExamDetailCache"
+          @updateAnswer="updateAnswer"
+          @updateClozeAnswer="updateClozeAnswer"
+          @prevQuestion="prevQuestion"
+          @nextQuestion="nextQuestion"
+        ></question-show>
       </div>
 
-      <el-collapse
-        class="exam-card"
-        v-if="paperQuestion.length > 0"
-        v-model="collapseShow"
-      >
-        <template v-if="preview == 'false'">
-          <div class="exam-head">答题卡</div>
-          <div class="exam-time">
-            倒计时：<CountDown :time="time" @finish="forceExamEnd"></CountDown>
-          </div>
-        </template>
-        <el-collapse-item
-          :key="item.id"
-          :name="index"
-          :title="item.chapter.name"
-          v-for="(item, index) in paperQuestion"
-          v-model="questionRouter"
-        >
-          <a
-            @click="toHref(child.id)"
-            v-for="(child, index) in item.questionList"
-            :key="child.id"
-            >{{ index + 1 }}</a
-          >
-        </el-collapse-item>
-        <div v-if="preview == 'false'" class="exam-footer" @click="examEnd">
-          提交
-        </div>
-      </el-collapse>
+      <question-router
+        v-if="paperQuestion.length"
+        :preview="preview"
+        :show-type="showType"
+        :system-time="systemTime"
+        :router-index="routerIndex"
+        :href-pointer="hrefPointer"
+        :paperQuestion="paperQuestion"
+        :question-router="questionRouter"
+        @sign="sign"
+        @toHref="toHref"
+        @examEnd="examEnd"
+        @forceExamEnd="forceExamEnd"
+      ></question-router>
     </div>
   </div>
 </template>
 <script>
+import { loginSysTime } from 'api/common'
 import { paperGet, paperQuestionList } from 'api/paper'
 import { myExamAnswerList, myExamUpdateAnswer, myExamDoAnswer } from 'api/my'
-import CountDown from 'components/CountDown.vue'
-import { loginSysTime } from 'api/common'
+import PageShow from 'components/PaperContent/PageShow.vue'
+import QuestionShow from 'components/PaperContent/QuestionShow.vue'
+import QuestionRouter from 'components/PaperContent/QuestionRouter.vue'
 export default {
   components: {
-    CountDown,
+    PageShow,
+    QuestionShow,
+    QuestionRouter,
   },
   data() {
     return {
       id: 0,
+      showType: 1,
       preview: false,
-      labelPosition: 'left',
       paperName: '',
       hrefPointer: '',
       paperId: 0,
       pageSize: 10,
       curPage: 1,
       pageTotal: 0,
-      collapseShow: 0,
       paperList: [],
       paperQuestion: [],
       myExamDetailCache: {},
@@ -227,27 +90,23 @@ export default {
       paper: {},
       questionRouter: [],
       examEndTime: '',
-      time: 0,
+      systemTime: 0,
+      routerIndex: 0,
     }
   },
   created() {
-    const { id, paperId, preview, examEndTime } = this.$route.query
+    const { id, paperId, preview, examEndTime, showType } = this.$route.query
     this.id = id
     this.paperId = paperId
     this.preview = preview
     this.examEndTime = examEndTime
+    this.showType = showType
     this.init()
   },
   methods: {
     // 返回
     goBack() {
       this.$router.back()
-    },
-    // 定位锚点
-    toHref(id) {
-      this.hrefPointer = `#p-${id}`
-      document.documentElement.scrollTop =
-        document.querySelector(this.hrefPointer).offsetTop - 50
     },
     // 初始化
     async init() {
@@ -260,7 +119,7 @@ export default {
     async setTime() {
       const systemTime = await loginSysTime({})
       const times = new Date(systemTime.data) - new Date()
-      this.time =
+      this.systemTime =
         new Date(this.examEndTime).getTime() - (new Date().getTime() + times)
     },
     // 查询试卷
@@ -281,8 +140,17 @@ export default {
         res.data.map((item) => {
           item.chapter.show = true
         })
-        this.paperQuestion = res.data
-        this.questionRouter = Array.from(res.data.keys())
+
+        if (this.showType === '1') {
+          this.paperQuestion = res.data
+          this.questionRouter = Array.from(res.data.keys())
+        } else {
+          const paperQuestion = res.data.reduce((acc, cur) => {
+            acc.push(...cur.questionList)
+            return acc
+          }, [])
+          this.paperQuestion = paperQuestion
+        }
       } catch (error) {}
     },
     // 查询我的答案信息
@@ -292,10 +160,15 @@ export default {
           id: this.id,
         })
 
-        const paperQuestion = this.paperQuestion.reduce((acc, cur) => {
-          acc.push(...cur.questionList)
-          return acc
-        }, [])
+        let paperQuestion
+        if (this.showType === '1') {
+          paperQuestion = this.paperQuestion.reduce((acc, cur) => {
+            acc.push(...cur.questionList)
+            return acc
+          }, [])
+        } else {
+          paperQuestion = this.paperQuestion
+        }
 
         this.myExamDetailCache = res.data.reduce((acc, cur, index) => {
           if (
@@ -308,6 +181,33 @@ export default {
           acc[cur.questionId] = cur
           return acc
         }, {})
+
+        // 添加是否作答标记submit
+        if (this.showType === '1') {
+          this.paperQuestion.map((item, indexi) => {
+            item.questionList.map((question, indexq) => {
+              const submit = res.data.some((answer) => {
+                if (answer.questionId === question.id) {
+                  return answer.answers.length
+                }
+              })
+              this.$set(
+                this.paperQuestion[indexi].questionList[indexq],
+                'submit',
+                submit
+              )
+            })
+          })
+        } else {
+          this.paperQuestion.map((item, index) => {
+            const submit = res.data.some((answer) => {
+              if (answer.questionId === item.id) {
+                return answer.answers.length
+              }
+            })
+            this.$set(this.paperQuestion[index], 'submit', submit)
+          })
+        }
       } catch (error) {
         this.$message.error(error)
       }
@@ -327,6 +227,30 @@ export default {
         myExamDetailId: this.myExamDetailCache[questionId].myExamDetailId,
         answers: answers,
       })
+
+      if (res.code === 200) {
+        if (this.showType === '1') {
+          this.paperQuestion.map((item, indexi) => {
+            item.questionList.some((question, indexq) => {
+              if (question.id === questionId) {
+                this.$set(
+                  this.paperQuestion[indexi].questionList[indexq],
+                  'submit',
+                  true
+                )
+                return true
+              }
+            })
+          })
+        } else {
+          this.paperQuestion.some((item, index) => {
+            if (item.id === questionId) {
+              this.$set(this.paperQuestion[index], 'submit', true)
+              return true
+            }
+          })
+        }
+      }
     },
     // 更新填空答案
     updateClozeAnswer(questionId, val, answers, index) {
@@ -339,10 +263,34 @@ export default {
         return
       }
 
-      myExamUpdateAnswer({
+      const res = myExamUpdateAnswer({
         myExamDetailId: this.myExamDetailCache[questionId].myExamDetailId,
         answers: this.myExamDetailCache[questionId].answers,
       })
+
+      if (res.code === 200) {
+        if (this.showType === '1') {
+          this.paperQuestion.map((item, indexi) => {
+            item.questionList.some((question, indexq) => {
+              if (question.id === questionId) {
+                this.$set(
+                  this.paperQuestion[indexi].questionList[indexq],
+                  'submit',
+                  true
+                )
+                return true
+              }
+            })
+          })
+        } else {
+          this.paperQuestion.some((item, index) => {
+            if (item.id === questionId) {
+              this.$set(this.paperQuestion[index], 'submit', true)
+              return true
+            }
+          })
+        }
+      }
     },
     // 考试结束
     async examEnd() {
@@ -371,6 +319,58 @@ export default {
           path: '/my',
         })
       })
+    },
+    // 定位锚点
+    toHref(index) {
+      if (this.showType === '1') {
+        this.hrefPointer = `#p-${index}`
+        document.documentElement.scrollTop =
+          document.querySelector(this.hrefPointer).offsetTop - 50
+      } else {
+        this.routerIndex = index
+      }
+    },
+    // 双击标记
+    sign(index) {
+      if (this.showType === '1') {
+        this.paperQuestion.map((item, indexi) => {
+          item.questionList.some((question, indexq) => {
+            if (question.id === index) {
+              const sign = this.paperQuestion[indexi].questionList[indexq].sign
+              this.$set(
+                this.paperQuestion[indexi].questionList[indexq],
+                'sign',
+                !sign
+              )
+              return true
+            }
+          })
+        })
+      } else {
+        this.paperQuestion.some((item, indexi) => {
+          if (indexi === index) {
+            const sign = this.paperQuestion[indexi].sign
+            this.$set(this.paperQuestion[indexi], 'sign', !sign)
+            return true
+          }
+        })
+      }
+    },
+    // 上一题
+    prevQuestion() {
+      if (this.routerIndex === 0) {
+        this.$message.warning('请您继续作答！')
+        return
+      }
+      this.routerIndex -= 1
+    },
+    // 下一题
+    nextQuestion() {
+      if (this.routerIndex === this.paperQuestion.length - 1) {
+        this.$message.warning('恭喜您已经作答完毕！')
+        return
+      }
+      this.routerIndex += 1
     },
   },
 }
