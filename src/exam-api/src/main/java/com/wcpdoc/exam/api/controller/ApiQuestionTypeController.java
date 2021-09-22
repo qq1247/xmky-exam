@@ -144,8 +144,8 @@ public class ApiQuestionTypeController extends BaseController {
 					.addAttr("imgFileId", entity.getImgFileId())
 					.addAttr("createUserId", entity.getCreateUserId())
 					.addAttr("createTime", DateUtil.formatDateTime(entity.getCreateTime()))
-					.addAttr("readUserIds", entity.getReadUserIds().subSequence(1, entity.getReadUserIds().length()).toString().split(","))
-					.addAttr("writeUserIds", entity.getWriteUserIds().subSequence(1, entity.getWriteUserIds().length()).toString().split(","));
+					.addAttr("readUserIds", entity.getReadUserIds().subSequence(1, entity.getReadUserIds().length() -1 ).toString().split(","))
+					.addAttr("writeUserIds", entity.getWriteUserIds().subSequence(1, entity.getWriteUserIds().length() -1 ).toString().split(","));
 		} catch (MyException e) {
 			log.error("获取试题分类错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

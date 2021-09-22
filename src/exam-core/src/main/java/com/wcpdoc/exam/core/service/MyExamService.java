@@ -60,22 +60,15 @@ public interface MyExamService extends BaseService<MyExam>{
 	PageOut getRankingPage(PageIn pageIn);
 	
 	/**
-	 * 分数统计
-	 * 
-	 * v1.0 chenyun 2021年3月24日上午10:04:05
-	 * @param examId
-	 * @return Map<String,Object>
-	 */
-	Map<String, Object> count(Integer examId);
-	
-	/**
 	 * 更新答案
 	 * 
 	 * v1.0 chenyun 2021年8月24日上午9:55:53
 	 * @param myExamDetailId
+	 * @param answers
+	 * @param fileId
 	 * @param answers void
 	 */
-	void updateAnswer(Integer myExamDetailId, String[] answers);
+	void updateAnswer(Integer myExamDetailId, String[] answers, Integer fileId);
 	
 	/**
 	 * 完成交卷

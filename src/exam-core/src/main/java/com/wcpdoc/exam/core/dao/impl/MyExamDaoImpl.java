@@ -2,7 +2,6 @@ package com.wcpdoc.exam.core.dao.impl;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
@@ -30,7 +29,7 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 		String sql = "SELECT MY_EXAM.ID, EXAM.NAME AS EXAM_NAME, EXAM.START_TIME AS EXAM_START_TIME, "
 				+ "		MY_EXAM.ANSWER_START_TIME, MY_EXAM.ANSWER_END_TIME, "
 				+ "		EXAM.END_TIME AS EXAM_END_TIME, PAPER.ID AS PAPER_ID, PAPER.TOTAL_SCORE AS PAPER_TOTAL_SCORE, "
-				+ "		MY_EXAM.STATE AS STATE, MY_EXAM.TOTAL_SCORE AS TOTAL_SCORE, "
+				+ "		MY_EXAM.STATE AS STATE, MY_EXAM.TOTAL_SCORE AS TOTAL_SCORE, PAPER.SHOW_TYPE AS PAPER_SHOW_TYPE, "
 				+ "		EXAM.MARK_START_TIME AS MARK_START_TIME, EXAM.MARK_END_TIME AS MARK_END_TIME, "
 				+ "		USER.NAME AS USER_NAME, USER.ID AS USER_ID, MARK_USER.NAME AS MARK_USER_NAME, MARK_USER.ID AS MARK_USER_ID, "
 				+ "		USER_UPDATE.ID AS UPDATE_USER_ID, USER_UPDATE.NAME AS UPDATE_USER_NAME,"
@@ -101,16 +100,5 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 				.addOrder("MY_EXAM.TOTAL_SCORE", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		return pageOut;
-	}
-
-	@Override
-	public List<Map<String, Object>> count(Integer examId) {
-		String sql = "SELECT MAX( MY_EXAM.TOTAL_SCORE ) AS MAX, MIN( MY_EXAM.TOTAL_SCORE ) AS MIN, AVG( MY_EXAM.TOTAL_SCORE ) AS AVG, "
-				+ "SUM( MY_EXAM.ANSWER_STATE = 1 ) AS ANSWER, EXM_EXAM.START_TIME AS START_TIME, EXM_EXAM.END_TIME AS END_TIME, "
-				+ "EXM_PAPER.TOTAL_SCORE AS TOTAL_SCORE FROM EXM_MY_EXAM MY_EXAM "
-				+ "INNER JOIN EXM_EXAM ON EXM_EXAM.ID =  MY_EXAM.EXAM_ID "
-				+ "INNER JOIN EXM_PAPER ON EXM_PAPER.ID = EXM_EXAM.PAPER_ID "
-				+ "WHERE MY_EXAM.EXAM_ID = ?";
- 		return getMapList(sql, new Object[] { examId });
 	}
 }

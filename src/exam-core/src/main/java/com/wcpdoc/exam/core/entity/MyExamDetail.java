@@ -50,7 +50,9 @@ public class MyExamDetail {
 	private BigDecimal score;
 	@Column(name = "QUESTION_SCORE")
 	private BigDecimal questionScore;
-
+	@Column(name = "ANSWER_FILE_ID")
+	private Integer answerFileId;
+	
 	public Integer getId() {
 		return id;
 	}
@@ -137,5 +139,13 @@ public class MyExamDetail {
 
 	public void setQuestionScore(BigDecimal questionScore) {
 		this.questionScore = questionScore;
+	}
+
+	public Integer getAnswerFileId() {
+		return answerFileId;
+	}
+
+	public void setAnswerFileId(Integer answerFileId) {
+		this.answerFileId = answerFileId;
 	}
 }

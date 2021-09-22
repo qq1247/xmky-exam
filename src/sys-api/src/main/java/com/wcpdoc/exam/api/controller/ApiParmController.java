@@ -114,9 +114,12 @@ public class ApiParmController extends BaseController {
 	@RequestMapping("/get")
 	@ResponseBody
 	@RequiresRoles(value={"admin"},logical = Logical.OR)
-	public PageResult get(Integer id) {
+	public PageResult get() {
 		try {
-			Parm entity = parmService.getEntity(id);
+			Parm entity = parmService.get();
+			if (entity == null) {
+				return PageResultEx.ok();
+			}
 			return PageResultEx.ok()
 					.addAttr("id", entity.getId())
 					.addAttr("emailHost", entity.getEmailHost())
@@ -170,10 +173,18 @@ public class ApiParmController extends BaseController {
 	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult editLogo(Parm parm) {
 		try {
+			if(parm.getId() == null){
+				parm.setUpdateTime(new Date());
+				parm.setUpdateUserId(getCurUser().getId());
+				parmService.add(parm);
+				return PageResult.ok();
+			}
 			Parm entity = parmService.getEntity(parm.getId());
 			entity.setOrgLogo(parm.getOrgLogo());
 			entity.setOrgName(parm.getOrgName());
-			parmService.updateAndUpdate(entity);
+			entity.setUpdateTime(new Date());
+			entity.setUpdateUserId(getCurUser().getId());
+			parmService.update(entity);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改参数错误：{}", e.getMessage());

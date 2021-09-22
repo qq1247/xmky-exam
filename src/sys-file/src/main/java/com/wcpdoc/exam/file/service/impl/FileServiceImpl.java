@@ -22,6 +22,7 @@ import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.IdUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
+import com.wcpdoc.exam.file.cache.FileIdCache;
 import com.wcpdoc.exam.file.dao.FileDao;
 import com.wcpdoc.exam.file.entity.File;
 import com.wcpdoc.exam.file.entity.FileEx;
@@ -46,7 +47,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 	}
 
 	@Override
-	public String doTempUpload(MultipartFile[] files, String[] allowTypes) {
+	public String doTempUpload(MultipartFile[] files, String[] allowTypes, String uuId) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(files)) {
 			throw new MyException("参数错误：files");
@@ -104,7 +105,17 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 				fileIds.append(",");
 			}
 			fileIds.append(file.getId());
+			
 		}
+		
+		if (ValidateUtil.isValid(uuId)){  //试题FileId校验
+			if (!ValidateUtil.isValid(FileIdCache.getFileId(uuId))) {
+				FileIdCache.setFileId(uuId, fileIds.toString());
+			}else{
+				throw new MyException("上传失败！");
+			}
+		}
+		
 		return fileIds.toString();
 	}
 
@@ -183,5 +194,11 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 			IOUtils.closeQuietly(output);
 			IOUtils.closeQuietly(input);
 		}
+	}
+
+	@Override
+	public Integer getFileId(String uuId) {
+		String fileId = FileIdCache.getFileId(uuId);
+		return Integer.parseInt(fileId);
 	}
 }

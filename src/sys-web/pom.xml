@@ -81,14 +81,37 @@
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
-	
+	<!--maven打包插件-->
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<includeSystemScope>true</includeSystemScope>
+				</configuration>
 			</plugin>
 		</plugins>
-		<finalName>examServer-1.0.0</finalName><!-- 打包后文件名称: 项目名-版本 -->
+		<finalName>exam-3.0.0</finalName><!-- 打包后文件名称: 项目名-版本 -->
+		<resources>
+			<resource>
+				<directory></directory><!-- 从根目录开始 -->
+				<includes><!-- 打包文件 -->
+					<include>config/**</include>
+				</includes>
+				<targetPath>${project.build.directory}</targetPath><!-- 放入war包的同级目录 -->
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory><!-- 从src/main/resources目录开始 -->
+				<includes><!-- 打包文件 -->
+					<include>application.yml</include>
+				</includes>
+				<targetPath>${project.build.directory}/config</targetPath><!--放入war包的同级目录的config目录 -->
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory><!-- 从src/main/resources目录开始 -->
+				<targetPath></targetPath><!-- 放入classes目录下 -->
+			</resource>
+		</resources>
 	</build>
 </project>

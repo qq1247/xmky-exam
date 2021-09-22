@@ -33,5 +33,6 @@
 		<module>exam-api</module>
 		<module>exam-core</module>
 		<module>exam-report</module>
+		<module>exam-wordFilter</module>
 	</modules>
 </project>

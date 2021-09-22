@@ -23,7 +23,7 @@ public interface FileService extends BaseService<File> {
 	 * @param allowTypes 允许上传的类型：zip,doc[,type]
 	 * @return String 更新到数据库后的附件ID，如果是多个，用逗号分隔。
 	 */
-	String doTempUpload(MultipartFile[] files, String[] allowTypes);
+	String doTempUpload(MultipartFile[] files, String[] allowTypes, String uuId);
 
 	/**
 	 * 完成上传附件
@@ -60,4 +60,13 @@ public interface FileService extends BaseService<File> {
 	 * @param templateName void
 	 */
 	void exportTemplate(String templateName);
+	
+	/**
+	 * 获取FileId
+	 * 
+	 * v1.0 chenyun 2021年9月6日下午12:33:55
+	 * @param uuId
+	 * @return Integer
+	 */
+	Integer getFileId(String uuId);
 }

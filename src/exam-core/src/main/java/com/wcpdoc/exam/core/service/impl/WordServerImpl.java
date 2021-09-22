@@ -111,7 +111,7 @@ public class WordServerImpl extends WordServer {
 				if (imgFile.exists()) {
 					MultipartFile multipartFile = fileToMultipartFile(imgFile);
 					FileService fileService = SpringUtil.getBean(FileService.class);
-					String fileId = fileService.doTempUpload(new MultipartFile[]{multipartFile}, allowTypes);
+					String fileId = fileService.doTempUpload(new MultipartFile[]{multipartFile}, allowTypes, null);
 					imgElement.attr("src", String.format("/api/file/download?id=%s", fileId));
 				}
 			}
@@ -310,7 +310,7 @@ public class WordServerImpl extends WordServer {
 	}
 	
 	private String parseAnalysis(List<Node> analysisRows) {
-		return getTxt(analysisRows, 0, analysisRows.size());
+		return getTxt(analysisRows, 0, analysisRows.size()).replaceAll("【解析】", "");
 	}
 
 	private AI parseAi(List<Node> aiRows) {

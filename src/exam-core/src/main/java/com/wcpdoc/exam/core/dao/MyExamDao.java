@@ -2,7 +2,6 @@ package com.wcpdoc.exam.core.dao;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.PageIn;
@@ -63,13 +62,4 @@ public interface MyExamDao extends BaseDao<MyExam>{
 	 * @return PageOut
 	 */
 	PageOut getRankingPage(PageIn pageIn);
-	
-	/**
-	 * 分数统计
-	 * 
-	 * v1.0 chenyun 2021年3月24日上午10:04:05
-	 * @param examId
-	 * @return List<Map<String, Object>>
-	 */
-	List<Map<String, Object>> count(Integer examId);
 }

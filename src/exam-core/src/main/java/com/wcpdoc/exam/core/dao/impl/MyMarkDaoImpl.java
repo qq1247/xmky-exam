@@ -26,7 +26,7 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT MY_MARK.ID, EXAM.NAME AS EXAM_NAME, EXAM.START_TIME AS EXAM_START_TIME, EXAM.PAPER_ID AS PAPER_ID, "
+		String sql = "SELECT MY_MARK.ID, EXAM.NAME AS EXAM_NAME, EXAM.START_TIME AS EXAM_START_TIME, EXAM.PAPER_ID AS PAPER_ID, PAPER.SHOW_TYPE AS PAPER_SHOW_TYPE, "
 				+ "		EXAM.END_TIME AS EXAM_END_TIME, PAPER.TOTAL_SCORE AS PAPER_TOTAL_SCORE, MY_MARK.EXAM_USER_IDS AS EXAM_USER_IDS, "
 				+ "		EXAM.STATE AS STATE, USER.NAME AS MARK_USER_NAME, USER.ID AS MARK_USER_ID, EXAM.ID AS EXAM_ID, UPDATE_USER.ID AS UPDATE_USER_ID, UPDATE_USER.NAME AS UPDATE_USER_NAME, "
 				+ "		EXAM.MARK_START_TIME AS MARK_START_TIME, EXAM.MARK_END_TIME AS MARK_END_TIME, MY_MARK.AUTO_STATE AS AUTO_STATE, PAPER.PASS_SCORE AS PAPER_PASS_SCORE,  "
@@ -50,7 +50,7 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 		HibernateUtil.formatDate(pageOut.getList(), "examStartTime", DateUtil.FORMAT_DATE_TIME, "examEndTime", DateUtil.FORMAT_DATE_TIME, 
 				"markEndTime", DateUtil.FORMAT_DATE_TIME, "markStartTime", DateUtil.FORMAT_DATE_TIME);
 		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), 
-				"examState", "state"
+				"MY_EXAM_MARK_STATE", "state"
 				);
 		return pageOut;
 	}

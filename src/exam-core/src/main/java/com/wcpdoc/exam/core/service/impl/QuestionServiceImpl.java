@@ -10,6 +10,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
@@ -120,20 +122,17 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 					throw new MyException("选项和答案不匹配！");
 				}
 			}
-			// if (question.getType() == 3) {
-			// String pattern = "(___)+";// 正则表达式
-			// Pattern r = Pattern.compile(pattern);
-			// Matcher m = r.matcher(question.getTitle());
-			// int titleNumber = 0;
-			// while (m.find()) {
-			// titleNumber++;
-			// }
-			// String[] split = question.getAnswer().split("/n");
-			// Integer answerNumber = split.length + 1;
-			//
-			// if (titleNumber != answerNumber) {
-			// // throw new MyException("填空和答案个数不匹配！");
-			// }
+		}
+		if (question.getType() == 3) {
+			Pattern p = Pattern.compile("[_]{5,}"); //正则表达式
+			Matcher m = p.matcher(question.getTitle()); // 获取 matcher 对象
+			int count = 0;
+			while(m.find()) {
+				count++;
+			}
+			if (count != answers.length) {
+				throw new MyException("填空答案不匹配！");
+			}
 		}
 		if (question.getType() == 4) {
 			if (answers.length != 1) {
@@ -201,16 +200,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				total = total.add(scores[i]);
 			}
 		}
-		/*else if (question.getType() == 3) {
-			for(String answersString : answers){
-				if(answersString == null || answersString.trim().equals("")){
-					throw new MyException("填空不能为空！");
-				}
-			}
-			question.setAnswer(StringUtil.join(answers, "\n"));
-		} else if (question.getType() == 5){
-			
-		}*/
 		if (question.getAi() == 1 &&  question.getScore().compareTo(total) != 0) {
 			throw new MyException("答案总分有误！ ");
 		}
@@ -277,20 +266,17 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 					throw new MyException("选项和答案不匹配！");
 				}
 			}
-			// if (question.getType() == 3) {
-			// String pattern = "(___)+";// 正则表达式
-			// Pattern r = Pattern.compile(pattern);
-			// Matcher m = r.matcher(question.getTitle());
-			// int titleNumber = 0;
-			// while (m.find()) {
-			// titleNumber++;
-			// }
-			// String[] split = question.getAnswer().split("/n");
-			// Integer answerNumber = split.length + 1;
-			//
-			// if (titleNumber != answerNumber) {
-			// // throw new MyException("填空和答案个数不匹配！");
-			// }
+		}
+		if (question.getType() == 3) {
+			Pattern p = Pattern.compile("[_]{5,}"); //正则表达式
+			Matcher m = p.matcher(question.getTitle()); // 获取 matcher 对象
+			int count = 0;
+			while(m.find()) {
+				count++;
+			}
+			if (count != answers.length) {
+				throw new MyException("填空答案不匹配！");
+			}
 		}
 		if (question.getType() == 4) {
 			if (answers.length != 1) {

@@ -70,10 +70,10 @@ public class ApiFileController extends BaseController {
 	@RequestMapping("/upload")
 	@ResponseBody
 	@RequiresRoles(value={"admin","subAdmin","user"},logical = Logical.OR)
-	public PageResult upload(@RequestParam("files") MultipartFile[] files) {
+	public PageResult upload(@RequestParam("files") MultipartFile[] files, String uuId) {
 		try {
-			String[] allowTypes = { "jpg", "gif", "png", "zip", "rar", "doc", "xls", "docx", "xlsx", "mp4" };
-			String fileIds = fileService.doTempUpload(files, allowTypes);
+			String[] allowTypes = { "jpg", "jpeg", "gif", "png", "zip", "rar", "doc", "xls", "docx", "xlsx", "mp4" };
+			String fileIds = fileService.doTempUpload(files, allowTypes, uuId);
 			Map<String, Object> data = new HashMap<String, Object>();
 			data.put("fileIds", fileIds);
 			return PageResultEx.ok().data(data);
@@ -140,6 +140,30 @@ public class ApiFileController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成删除附件错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 获取附件Id
+	 * 
+	 * v1.0 zhanghc 2021年5月27日下午4:27:54
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/get")
+	@ResponseBody
+	@RequiresRoles(value={"admin"},logical = Logical.OR)
+	public PageResult get(String uuId) {
+		try {
+			Integer fileId = fileService.getFileId(uuId);
+			return PageResultEx.ok()
+					.addAttr("id", fileId);
+		} catch (MyException e) {
+			log.error("删除数据字典错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("删除数据字典错误：", e);
 			return PageResult.err();
 		}
 	}

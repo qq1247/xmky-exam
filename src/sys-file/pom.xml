@@ -24,6 +24,12 @@
 			<artifactId>sys-quartz</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- 集成系统缓存 -->
+		<dependency>
+			<groupId>com.wcpdoc.exam</groupId>
+			<artifactId>sys-cache</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<!-- 集成apache公共组件 -->
 		<dependency>
 			<groupId>commons-fileupload</groupId>
