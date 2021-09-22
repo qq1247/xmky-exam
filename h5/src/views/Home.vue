@@ -46,7 +46,7 @@
             <div class="box-title">
               <i class="common common-notice"></i><span>公告</span>
             </div>
-            <template v-if="bulletinList.length > 0">
+            <template v-if="bulletinList.length">
               <el-row
                 :class="['notice', item.topState === 1 ? 'notice-hot' : '']"
                 :key="item.id"
@@ -69,7 +69,7 @@
             <div class="box-title box-divider">
               <i class="common common-classify"></i><span>待考列表</span>
             </div>
-            <template v-if="examList.length > 0">
+            <template v-if="examList.length">
               <el-row :gutter="10">
                 <el-col :span="12" :key="item.id" v-for="item in examList">
                   <el-card class="box-card" shadow="hover">
@@ -121,7 +121,7 @@
             <div class="box-title box-divider">
               <i class="common common-classify"></i><span>待阅列表</span>
             </div>
-            <template v-if="markList.length > 0">
+            <template v-if="markList.length">
               <el-row :gutter="10">
                 <el-col :span="12" :key="item.id" v-for="item in markList">
                   <el-card class="box-card" shadow="hover">
@@ -171,13 +171,35 @@
           </div>
         </el-col>
       </el-row>
+      <div>
+        <div class="box-title">
+          <i class="common common-data-library"></i><span>开放题库</span>
+        </div>
+        <template v-if="questionTypeOpenList.length">
+          <el-row
+            :class="['notice', item.topState === 1 ? 'notice-hot' : '']"
+            :key="item.id"
+            v-for="item in questionTypeOpenList"
+            @click.native="goDetail(93)"
+          >
+            <el-col :span="12" class="notice-left">
+              <span class="ellipsis">{{ item.questionTypeName }}</span>
+            </el-col>
+            <el-col :span="12" class="notice-right"
+              >{{ item.startTime }} - {{ item.endTime }}</el-col
+            >
+          </el-row>
+        </template>
+        <el-empty v-else description="暂无阅卷"> </el-empty>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { myExamListPage, myMarkListPage } from 'api/my'
 import { bulletinListPage } from 'api/base'
+import { myExamListPage, myMarkListPage } from 'api/my'
+import { questionTypeOpenListPage } from 'api/question'
 import getMainColor from '@/utils/getImageColor.js'
 import * as dayjs from 'dayjs'
 import Calendar from 'components/Calendar/index'
@@ -186,9 +208,10 @@ export default {
     return {
       examList: [],
       markList: [],
-      examStatus: ['', '待考', '考试', '已考', '已考'],
-      readPaperStatus: ['', '待阅', '阅卷', '已阅'],
       bulletinList: [],
+      questionTypeOpenList: [],
+      readPaperStatus: ['', '待阅', '阅卷', '已阅'],
+      examStatus: ['', '待考', '考试', '已考', '已考'],
       carouselList: [
         {
           title: '在线考试',
@@ -221,6 +244,7 @@ export default {
       this.getExamList()
       this.getMarkList()
       this.renderExamCalendar()
+      this.getQuestionTypeOpenList()
     },
     // 获取考试列表
     async getExamList() {
@@ -265,7 +289,7 @@ export default {
         state: 2,
       })
 
-      if (list.length > 0) {
+      if (list.length) {
         list.map(async (item) => {
           const bg = await getMainColor(
             `/api/file/download?id=${item.imgFileId}`
@@ -275,6 +299,7 @@ export default {
         this.carouselList = list
       }
     },
+    // 获取选择月份的时间
     selectDate(time) {
       const _time = dayjs(time).date(1).format('YYYY-MM-DD')
       this.renderExamCalendar(_time)
@@ -339,6 +364,22 @@ export default {
       }, examPopovers)
 
       this.timePopovers = timePopovers
+    },
+    // 获取开放题库
+    async getQuestionTypeOpenList() {
+      const res = await questionTypeOpenListPage({
+        pageSize: 10,
+        curPage: 1,
+      })
+      res?.code === 200 && (this.questionTypeOpenList = res.data.list)
+    },
+    goDetail(id) {
+      this.$router.push({
+        path: '/question/comment',
+        query: {
+          id,
+        },
+      })
     },
   },
 }

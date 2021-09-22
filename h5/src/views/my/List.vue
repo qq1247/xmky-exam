@@ -172,13 +172,15 @@ export default {
         this.$message.warning('考试未开始，请等待...')
         return
       }
+
       this.$router.push({
         path: '/my/exam/index',
         query: {
           id: data.id,
           paperId: data.paperId,
-          preview: now < examStartTime && now > examEndTime,
+          preview: examStartTime < now && now > examEndTime,
           examEndTime: data.examEndTime,
+          showType: data.paperShowType,
         },
       })
     },

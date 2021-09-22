@@ -5,11 +5,16 @@
  * @Author: Che
  * @Date: 2021-08-17 17:50:31
  * @LastEditors: Che
- * @LastEditTime: 2021-08-17 18:29:04
+ * @LastEditTime: 2021-09-14 18:18:01
  */
+import { getInfo } from '@/utils/storage'
+
 const state = {
   hideHeader: false,
   hideFooter: false,
+  lineTime: 0,
+  orgLogo: getInfo().orgLogo,
+  orgName: getInfo().orgName,
 }
 
 const mutations = {
@@ -22,7 +27,10 @@ const mutations = {
 
 const actions = {
   changeSetting({ commit }, data) {
-    commit('CHANGE_SETTING', data)
+    return new Promise((resolve) => {
+      commit('CHANGE_SETTING', data)
+      resolve()
+    })
   },
 }
 

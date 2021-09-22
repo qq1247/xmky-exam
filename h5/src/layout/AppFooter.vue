@@ -5,11 +5,11 @@
  * @Author: Che
  * @Date: 2021-08-09 15:14:50
  * @LastEditors: Che
- * @LastEditTime: 2021-08-11 11:01:35
+ * @LastEditTime: 2021-09-14 16:55:34
 -->
 <template>
   <footer class="app-footer">
-    Copyright© 2018 All Rights Reserved 版权所有 在线考试
+    Copyright© 2018 All Rights Reserved 版权所有 <span>{{ orgName }}</span>
   </footer>
 </template>
 
@@ -19,9 +19,19 @@ export default {
   data() {
     return {}
   },
-  components: {},
-  mounted() {},
-  methods: {},
+  computed: {
+    orgName: {
+      get() {
+        return this.$store.getters.orgName || '在线考试'
+      },
+      set(val) {
+        this.$store.dispatch('settings/changeSetting', {
+          key: 'orgName',
+          value: val,
+        })
+      },
+    },
+  },
 }
 </script>
 

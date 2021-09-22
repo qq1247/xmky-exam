@@ -28,6 +28,5 @@ export const getInfo = () => getStorage(InfoKey)
 export const setInfo = (data) => setStorage(InfoKey, data)
 export const removeInfo = () => removeStorage(InfoKey)
 
-//
 export const getDriver = () => getStorage(DriverKey)
 export const setDriver = (data) => setStorage(DriverKey, data)

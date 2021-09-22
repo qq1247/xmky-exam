@@ -109,7 +109,7 @@
             @visibleChange="getUserList"
           >
             <el-option
-              v-for="item in roleForm.roleUserList"
+              v-for="item in userList"
               :key="item.id"
               :label="item.name"
               :value="item.id"
@@ -128,7 +128,7 @@
             @visibleChange="getUserList"
           >
             <el-option
-              v-for="item in roleForm.roleUserList"
+              v-for="item in userList"
               :key="item.id"
               :label="item.name"
               :value="item.id"
@@ -141,6 +141,7 @@
         <el-button @click="roleForm.show = false">取消</el-button>
       </div>
     </el-dialog>
+
     <!-- 移动试题分类 -->
     <el-dialog
       :visible.sync="examForm.moveShow"
@@ -181,21 +182,191 @@
         <el-button @click="examForm.moveShow = false">取消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 试题开放 -->
+    <el-dialog
+      :visible.sync="openForm.show"
+      title="开放记录"
+      :show-close="false"
+      center
+      width="50%"
+      :close-on-click-modal="false"
+      @close="resetData('openForm')"
+    >
+      <el-form
+        :model="openForm"
+        :rules="openForm.rules"
+        ref="openForm"
+        label-width="100px"
+      >
+        <el-tabs v-model="openForm.tabActive">
+          <el-tab-pane
+            v-for="item in openForm.openTabs"
+            :key="item.name"
+            :label="item.title"
+            :name="item.name"
+          ></el-tab-pane>
+          <template v-if="openForm.tabActive == '0'">
+            <el-table :data="openForm.openHistoryList" style="width: 100%">
+              <el-table-column type="expand">
+                <template slot-scope="props">
+                  <el-form
+                    label-position="right"
+                    class="open-history-table"
+                    label-width="130px"
+                  >
+                    <el-form-item label="ID">
+                      <span>{{ props.row.id }}</span>
+                    </el-form-item>
+                    <el-form-item label="开始时间">
+                      <span>{{ props.row.startTime }}</span>
+                    </el-form-item>
+                    <el-form-item label="结束时间">
+                      <span>{{ props.row.endTime }}</span>
+                    </el-form-item>
+                    <el-form-item label="开放人员">
+                      <span>{{ props.row.userNames }}</span>
+                    </el-form-item>
+                    <el-form-item label="开放机构">
+                      <span>{{ props.row.orgNames }}</span>
+                    </el-form-item>
+                    <el-form-item label="评论方式">
+                      <span>{{
+                        ['不显示', '只读', '可编辑'][props.row.commentState]
+                      }}</span>
+                    </el-form-item>
+                    <el-form-item label="状态">
+                      <span>{{ ['', '开放', '作废'][props.row.state] }}</span>
+                    </el-form-item>
+                  </el-form>
+                </template>
+              </el-table-column>
+              <el-table-column label="开始时间" prop="startTime">
+              </el-table-column>
+              <el-table-column label="结束时间" prop="endTime">
+              </el-table-column>
+              <el-table-column label="操作">
+                <template slot-scope="scope"
+                  ><el-button
+                    @click.native.prevent="delHistory(scope.row.id)"
+                    type="text"
+                    size="small"
+                    :disabled="scope.row.state === 2"
+                  >
+                    作废
+                  </el-button></template
+                ></el-table-column
+              >
+            </el-table>
+            <!-- 分页 -->
+            <el-pagination
+              style="margin-top: 20px"
+              background
+              layout="prev, pager, next"
+              prev-text="上一页"
+              next-text="下一页"
+              hide-on-single-page
+              :total="openForm.pageTotal"
+              :page-size="openForm.pageSize"
+              :current-page="openForm.curPage"
+              @current-change="openPageChange"
+            ></el-pagination>
+          </template>
+          <template v-if="openForm.tabActive == '1'">
+            <el-form-item label="开放时间" prop="openTime">
+              <el-date-picker
+                v-model="openForm.openTime"
+                type="datetimerange"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                value-format="yyyy-MM-dd HH:mm:ss"
+              ></el-date-picker>
+            </el-form-item>
+            <el-form-item label="开放用户" prop="openUser">
+              <CustomSelect
+                ref="openUserSelect"
+                placeholder="请选择用户"
+                :value="openForm.openUser"
+                :total="openForm.total"
+                @input="searchUser"
+                @change="selectOpenUser"
+                @currentChange="getMoreUser"
+                @visibleChange="getUserList"
+              >
+                <el-option
+                  v-for="item in userList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                ></el-option>
+              </CustomSelect>
+            </el-form-item>
+            <el-form-item label="开放机构" prop="openOrg">
+              <CustomSelect
+                ref="writeSelect"
+                placeholder="请选择机构"
+                :value="openForm.openOrg"
+                :total="openForm.total"
+                @input="searchOrg"
+                @change="selectOpenOrg"
+                @currentChange="getMoreOrg"
+                @visibleChange="getOrgList"
+              >
+                <el-option
+                  v-for="item in openForm.openOrgList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                >
+                  <span style="float: left">{{
+                    `${item.name}${
+                      item.parentId === 0 ? '' : ` - ${item.parentName}`
+                    }`
+                  }}</span>
+                </el-option>
+              </CustomSelect>
+            </el-form-item>
+            <el-form-item label="评论方式" prop="openReview">
+              <el-radio
+                v-for="item in openForm.openReviewList"
+                :key="item.value"
+                v-model="openForm.openReview"
+                :label="item.value"
+                @change="selectReviewType"
+                prop="openReview"
+                >{{ item.name }}</el-radio
+              >
+            </el-form-item>
+          </template>
+        </el-tabs>
+      </el-form>
+      <div class="dialog-footer" slot="footer">
+        <el-button @click="addOpen" v-if="openForm.tabActive == '1'">
+          添加
+        </el-button>
+        <el-button @click="openForm.show = false">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import {
   questionTypeListPage,
+  questionTypeOpenListPage,
+  questionTypeOpenAdd,
+  questionTypeOpenDel,
   questionTypeEdit,
   questionTypeAdd,
   questionTypeMove,
   questionTypeAuth,
   questionTypeDel,
 } from 'api/question'
+import { orgListPage } from 'api/base'
 import { userListPage } from 'api/user'
 import ListCard from 'components/ListCard.vue'
 import CustomSelect from 'components/CustomSelect.vue'
+import { orgAdd } from '@/api/base'
 export default {
   components: {
     ListCard,
@@ -206,6 +377,7 @@ export default {
       pageSize: 5,
       total: 1,
       curPage: 1,
+      userList: [],
       queryForm: {
         queryName: '',
       },
@@ -233,7 +405,59 @@ export default {
         total: 0,
         readRoleUser: [],
         writeRoleUser: [],
-        roleUserList: [],
+      },
+      openForm: {
+        id: null,
+        show: false,
+        total: 1,
+        pageSize: 5,
+        pageTotal: 1,
+        curPage: 1,
+        openTime: [],
+        openUser: [],
+        openOrg: [],
+        openOrgList: [],
+        openReview: 0,
+        openReviewList: [
+          {
+            name: '不显示',
+            value: 0,
+          },
+          {
+            name: '只读',
+            value: 1,
+          },
+          {
+            name: '可编辑',
+            value: 2,
+          },
+        ],
+        tabActive: '0',
+        openTabs: [
+          {
+            title: '历史记录',
+            name: '0',
+          },
+          {
+            title: '新增记录',
+            name: '1',
+          },
+        ],
+        openHistoryList: [],
+        rules: {
+          openTime: [
+            { required: true, message: '请选择开放时间', trigger: 'change' },
+          ],
+          openUser: [
+            { required: true, message: '请选择开放人员', trigger: 'change' },
+          ],
+          openOrg: [
+            { required: true, message: '请选择开放机构', trigger: 'change' },
+          ],
+          openReview: [
+            { required: true, message: '请选择评论方式', trigger: 'change' },
+          ],
+        },
       },
       typeList: [],
     }
@@ -252,6 +476,7 @@ export default {
       this.typeList = typeList.data.list
       this.total = typeList.data.total
     },
+    // 搜索
     search() {
       this.curPage = 1
       this.query()
@@ -355,24 +580,24 @@ export default {
     },
     // 获取用户
     async getUserList(curPage = 1, name = '') {
-      const roleUserList = await userListPage({
+      const userList = await userListPage({
         name,
         curPage,
         pageSize: this.pageSize,
       })
 
       if (this.$store.getters.userId == 1) {
-        roleUserList.data.list.unshift({
+        userList.data.list.unshift({
           id: 1,
           name: '管理员',
         })
       }
 
-      this.roleForm.roleUserList = roleUserList.data.list
-      this.roleForm.total =
+      this.userList = userList.data.list
+      this.roleForm.total = this.openForm.total =
         this.$store.getters.userId == 1
-          ? roleUserList.data.total + 1
-          : roleUserList.data.total
+          ? userList.data.total + 1
+          : userList.data.total
     },
     // 获取更多用户
     getMoreUser(curPage, name) {
@@ -389,6 +614,10 @@ export default {
     // 选择阅读权限用户
     selectWriteUser(e) {
       this.roleForm.writeRoleUser = e
+    },
+    // 选择开放用户
+    selectOpenUser(e) {
+      this.openForm.openUser = e
     },
     // 权限人员信息
     role({ id, readUserIds, writeUserIds, readUserNames, writeUserNames }) {
@@ -467,9 +696,79 @@ export default {
         this.$message.error('权限编辑失败！')
       }
     },
+    // 获取开放历史记录
+    async getOpenHistory() {
+      const openHistoryList = await questionTypeOpenListPage({
+        curPage: this.openForm.curPage,
+        pageSize: this.openForm.pageSize,
+      })
+      this.openForm.openHistoryList = openHistoryList.data.list
+      this.openForm.pageTotal = openHistoryList.data.total
+    },
+    // 开放历史记录分页查询
+    openPageChange(val) {
+      val && (this.openForm.curPage = val)
+      this.getOpenHistory()
+    },
+    // 作废开放记录
+    async delHistory(id) {
+      const res = await questionTypeOpenDel({ id })
+      res?.code && ((this.openForm.curPage = 1), this.getOpenHistory())
+    },
     // 试题开放
-    async open() {
-      this.$message('此功能开发中...')
+    async open({ id }) {
+      this.openForm.show = true
+      this.openForm.tabActive = '0'
+      this.openForm.id = id
+      this.openForm.curPage = 1
+      this.getOpenHistory()
+    },
+    // 获取机构
+    async getOrgList(curPage = 1, name = '') {
+      const orgList = await orgListPage({
+        name,
+        curPage,
+        pageSize: this.pageSize,
+      })
+
+      this.openForm.openOrgList = orgList.data.list
+      this.openForm.total = orgList.data.total
+    },
+    // 获取更多机构
+    getMoreOrg(curPage, name) {
+      this.getOrgList(curPage, name)
+    },
+    // 根据name 查询机构
+    searchOrg(name) {
+      this.getOrgList(1, name)
+    },
+    // 选择读取权限机构
+    selectOpenOrg(e) {
+      this.openForm.openOrg = e
+    },
+    // 添加开放记录
+    async addOpen() {
+      const res = await questionTypeOpenAdd({
+        questionTypeId: this.openForm.id,
+        startTime: this.openForm.openTime[0],
+        endTime: this.openForm.openTime[1],
+        userIds: this.openForm.openUser.join(','),
+        orgIds: this.openForm.openOrg.join(','),
+        commentState: this.openForm.openReview,
+      })
+
+      if (res?.code === 200) {
+        this.openForm.tabActive = '0'
+        this.openForm.curPage = 1
+        this.resetData('openForm')
+        this.getOpenHistory()
+      } else {
+        this.$message(res.msg)
+      }
+    },
+    // 选择阅卷方式
+    selectReviewType(e) {
+      this.openForm.openReview = e
     },
     // 试题详情
     goDetail({ id, name, writeUserIds }) {
@@ -494,4 +793,12 @@ export default {
 
 <style lang="scss" scoped>
 @import '../../assets/style/list-card.scss';
+.open-history-table /deep/.el-form-item .el-form-item__label {
+  color: #99a9bf;
+  padding-right: 20px;
+}
+.open-history-table .el-form-item {
+  margin-right: 0;
+  margin-bottom: 0;
+}
 </style>

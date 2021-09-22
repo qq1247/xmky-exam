@@ -106,13 +106,14 @@
       >
         <template v-if="list.questionList.length > 0">
           <el-card
-            :key="question.id"
             :class="[
               'center-card',
               question.id == editForm.id ? 'center-card-active' : '',
             ]"
             shadow="hover"
             v-for="question in list.questionList"
+            :key="question.id"
+            @click.native="showDetails(question.id)"
           >
             <div
               class="center-card-top"
@@ -141,17 +142,17 @@
               </div>
               <div class="card-bottom-right">
                 <el-button
-                  @click="get(question.id)"
+                  @click.stop="questionEdit(question.id)"
                   class="btn"
                   icon="el-icon-document"
                   plain
                   round
                   size="mini"
                   type="primary"
-                  >详细</el-button
+                  >编辑</el-button
                 >
                 <el-button
-                  @click="copy(question.id)"
+                  @click.stop="copy(question.id)"
                   class="btn"
                   icon="el-icon-document-copy"
                   plain
@@ -161,7 +162,7 @@
                   >复制</el-button
                 >
                 <el-button
-                  @click="del(question.id)"
+                  @click.stop="del(question.id)"
                   class="btn"
                   icon="el-icon-delete"
                   plain
@@ -172,7 +173,7 @@
                 >
                 <el-button
                   v-if="question.state == 2"
-                  @click="publish(question.id, question.state)"
+                  @click.stop="publish(question.id, question.state)"
                   class="btn"
                   icon="el-icon-share"
                   plain
@@ -202,377 +203,385 @@
         </el-empty>
       </el-scrollbar>
       <el-scrollbar wrap-style="overflow-x:hidden;" class="content-right">
-        <el-form
-          :model="editForm"
-          ref="editForm"
-          :rules="editForm.rules"
-          label-width="80px"
-          size="mini"
-          v-model="labelPosition"
-          id="question_driver_editor"
-        >
-          <el-row>
-            <el-col :span="11">
-              <el-form-item label="类型">
-                <el-select
-                  disabled
-                  placeholder="请选择类型"
-                  v-model="editForm.type"
-                >
-                  <el-option
-                    :key="parseInt(dict.dictKey)"
-                    :label="dict.dictValue"
-                    :value="parseInt(dict.dictKey)"
-                    v-for="dict in queryForm.typeList"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="11">
-              <el-form-item label="难度" prop="difficulty">
-                <el-select
-                  placeholder="请选择难度"
-                  v-model="editForm.difficulty"
-                >
-                  <el-option
-                    :key="parseInt(dict.dictKey)"
-                    :label="dict.dictValue"
-                    :value="parseInt(dict.dictKey)"
-                    v-for="dict in queryForm.difficultyList"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-          </el-row>
-
-          <el-form-item label="题干" prop="title">
-            <Editor
-              :value="editForm.title"
-              @editorListener="editorListener"
-              id="title"
-            ></Editor>
-          </el-form-item>
-
-          <template v-if="editForm.type === 1 || editForm.type === 2">
-            <el-form-item
-              :key="'option' + option.lab"
-              :label="'选项' + option.lab"
-              :prop="`options.${index}.value`"
-              :rules="editForm.rules.option"
-              v-for="(option, index) in editForm.options"
-            >
-              <Editor
-                :id="'option' + option.lab"
-                :value="option.value"
-                @editorListener="editorListener"
-              ></Editor>
-            </el-form-item>
-            <!-- 选项按钮 -->
-            <el-form-item>
-              <el-button
-                :disabled="editForm.options.length >= 7"
-                @click="addOption()"
-                class="btn2"
-                type="primary"
-                >+添加选项</el-button
-              >
-              <el-button
-                :disabled="editForm.options.length <= 2"
-                @click="delOption()"
-                class="btn2"
-                type="primary"
-                >-删除选项</el-button
-              >
-            </el-form-item>
-          </template>
-
-          <el-row>
-            <el-col :span="13">
-              <el-form-item label="分值" prop="score">
-                <el-input-number
-                  :max="100"
-                  :min="1"
-                  :step="1"
-                  controls-position="right"
-                  v-model.number="editForm.score"
-                ></el-input-number>
-              </el-form-item>
-            </el-col>
-            <el-col :span="9">
-              <el-form-item label="智能阅卷" prop="ai">
-                <el-switch
-                  active-color="#0094e5"
-                  :active-value="1"
-                  inactive-color="#ff4949"
-                  :inactive-value="2"
-                  v-model="editForm.ai"
-                ></el-switch>
-              </el-form-item>
-            </el-col>
-          </el-row>
-
-          <template v-if="editForm.ai === 1">
-            <el-row v-if="editForm.type === 2">
-              <el-col :span="8">
-                <el-form-item>
-                  <el-checkbox-group v-model="editForm.scoreOptions">
-                    <el-tooltip
-                      class="item"
-                      content="默认全对得分"
-                      effect="dark"
-                      placement="top"
-                    >
-                      <el-checkbox label="1">漏选得分</el-checkbox>
-                    </el-tooltip>
-                  </el-checkbox-group>
+        <QuestionDetail
+          v-if="detailStatus"
+          :data="questionDetail"
+          :type="queryForm.typeList"
+          :difficulty="queryForm.difficultyList"
+        ></QuestionDetail>
+        <template v-else>
+          <el-form
+            :model="editForm"
+            ref="editForm"
+            :rules="editForm.rules"
+            label-width="80px"
+            size="mini"
+            v-model="labelPosition"
+            id="question_driver_editor"
+          >
+            <el-row>
+              <el-col :span="11">
+                <el-form-item label="类型">
+                  <el-select
+                    disabled
+                    placeholder="请选择类型"
+                    v-model="editForm.type"
+                  >
+                    <el-option
+                      :key="parseInt(dict.dictKey)"
+                      :label="dict.dictValue"
+                      :value="parseInt(dict.dictKey)"
+                      v-for="dict in queryForm.typeList"
+                    ></el-option>
+                  </el-select>
                 </el-form-item>
               </el-col>
-              <el-col :span="8">
-                <el-form-item
-                  v-if="editForm.scoreOptions.length > 0"
-                  prop="multipScore"
-                  class="ai-score"
-                  :show-message="editForm.ai === 1 ? true : false"
-                >
-                  <el-input
-                    v-if="editForm.ai === 1"
-                    v-model="editForm.multipScore"
+              <el-col :span="11">
+                <el-form-item label="难度" prop="difficulty">
+                  <el-select
+                    placeholder="请选择难度"
+                    v-model="editForm.difficulty"
                   >
-                    <template slot="append">分</template>
-                  </el-input>
+                    <el-option
+                      :key="parseInt(dict.dictKey)"
+                      :label="dict.dictValue"
+                      :value="parseInt(dict.dictKey)"
+                      v-for="dict in queryForm.difficultyList"
+                    ></el-option>
+                  </el-select>
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-form-item v-if="editForm.type === 3">
-              <el-checkbox-group v-model="editForm.scoreOptions">
-                <el-tooltip
-                  class="item"
-                  content="默认答案有顺序"
-                  effect="dark"
-                  placement="top"
-                >
-                  <el-checkbox label="2">答案无顺序</el-checkbox>
-                </el-tooltip>
-                <el-tooltip
-                  class="item"
-                  content="默认大小写敏感"
-                  effect="dark"
-                  placement="top"
-                >
-                  <el-checkbox label="3">大小写不敏感</el-checkbox>
-                </el-tooltip>
-              </el-checkbox-group>
-            </el-form-item>
-            <el-form-item v-if="editForm.type === 5">
-              <el-checkbox-group v-model="editForm.scoreOptions">
-                <el-tooltip
-                  class="item"
-                  content="大小写不敏感"
-                  effect="dark"
-                  placement="top"
-                >
-                  <el-checkbox label="3">大小写不敏感</el-checkbox>
-                </el-tooltip>
-              </el-checkbox-group>
-            </el-form-item>
-          </template>
 
-          <el-form-item label="答案" prop="answer" v-if="editForm.type === 1">
-            <el-radio-group v-model="editForm.answer">
-              <el-radio
-                :key="answer.lab"
-                :label="answer.lab"
-                v-for="answer in editForm.answers"
-                >{{ answer.lab }}</el-radio
+            <el-form-item label="题干" prop="title">
+              <Editor
+                :value="editForm.title"
+                @editorListener="editorListener"
+                id="title"
+              ></Editor>
+            </el-form-item>
+
+            <template v-if="editForm.type === 1 || editForm.type === 2">
+              <el-form-item
+                :key="'option' + option.lab"
+                :label="'选项' + option.lab"
+                :prop="`options.${index}.value`"
+                :rules="editForm.rules.option"
+                v-for="(option, index) in editForm.options"
               >
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item
-            label="答案"
-            prop="answerMultip"
-            v-if="editForm.type === 2"
-          >
-            <el-checkbox-group v-model="editForm.answerMultip">
-              <el-checkbox
-                :key="answer.lab"
-                :label="answer.lab"
-                v-for="answer in editForm.answers"
-                >{{ answer.lab }}</el-checkbox
-              >
-            </el-checkbox-group>
-          </el-form-item>
-          <el-form-item label="答案" v-if="editForm.type === 3">
-            <el-card class="el-card" shadow="never">
-              <el-alert
-                :closable="false"
-                title="单个填空有多个同义词，可添加多个标签。如：人民、公民、群众"
-                type="success"
-              ></el-alert>
-              <el-row
-                :gutter="10"
-                v-for="(answer, index) in editForm.answers"
-                :key="index"
-              >
-                <el-col :span="16">
-                  <el-form-item
-                    :prop="`answers.${index}.value`"
-                    :rules="editForm.rules.answerMultip"
-                  >
-                    <span
-                      style="margin: 0 15px; color: #838ee9; font-size: 12px"
-                      >填空{{ answer.lab }}</span
-                    >
-                    <el-select
-                      v-model="answer.value"
-                      multiple
-                      filterable
-                      remote
-                      allow-create
-                      default-first-option
-                      placeholder="请填写答案"
-                    >
-                    </el-select>
+                <Editor
+                  :id="'option' + option.lab"
+                  :value="option.value"
+                  @editorListener="editorListener"
+                ></Editor>
+              </el-form-item>
+              <!-- 选项按钮 -->
+              <el-form-item>
+                <el-button
+                  :disabled="editForm.options.length >= 7"
+                  @click="addOption()"
+                  class="btn2"
+                  type="primary"
+                  >+添加选项</el-button
+                >
+                <el-button
+                  :disabled="editForm.options.length <= 2"
+                  @click="delOption()"
+                  class="btn2"
+                  type="primary"
+                  >-删除选项</el-button
+                >
+              </el-form-item>
+            </template>
+
+            <el-row>
+              <el-col :span="13">
+                <el-form-item label="分值" prop="score">
+                  <el-input-number
+                    :max="100"
+                    :min="1"
+                    :step="1"
+                    controls-position="right"
+                    v-model.number="editForm.score"
+                  ></el-input-number>
+                </el-form-item>
+              </el-col>
+              <el-col :span="9">
+                <el-form-item label="智能阅卷" prop="ai">
+                  <el-switch
+                    active-color="#0094e5"
+                    :active-value="1"
+                    inactive-color="#ff4949"
+                    :inactive-value="2"
+                    v-model="editForm.ai"
+                  ></el-switch>
+                </el-form-item>
+              </el-col>
+            </el-row>
+
+            <template v-if="editForm.ai === 1">
+              <el-row v-if="editForm.type === 2">
+                <el-col :span="8">
+                  <el-form-item>
+                    <el-checkbox-group v-model="editForm.scoreOptions">
+                      <el-tooltip
+                        class="item"
+                        content="默认全对得分"
+                        effect="dark"
+                        placement="top"
+                      >
+                        <el-checkbox label="1">漏选得分</el-checkbox>
+                      </el-tooltip>
+                    </el-checkbox-group>
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
                   <el-form-item
-                    :prop="`answers.${index}.score`"
-                    :rules="editForm.rules.aiScore"
+                    v-if="editForm.scoreOptions.length > 0"
+                    prop="multipScore"
+                    class="ai-score"
                     :show-message="editForm.ai === 1 ? true : false"
                   >
-                    <el-input v-if="editForm.ai === 1" v-model="answer.score">
+                    <el-input
+                      v-if="editForm.ai === 1"
+                      v-model="editForm.multipScore"
+                    >
                       <template slot="append">分</template>
                     </el-input>
                   </el-form-item>
                 </el-col>
               </el-row>
-              <el-button
-                :disabled="editForm.answers.length >= 7"
-                @click="addFillBlanks()"
-                class="btn2"
-                style="margin-left: 65px"
-                type="primary"
-                >+添加填空</el-button
-              >
-              <el-button
-                :disabled="editForm.answers.length <= 1"
-                @click="delFillBlanks()"
-                class="btn2"
-                type="primary"
-                >-删除填空</el-button
-              >
-            </el-card>
-          </el-form-item>
-          <el-form-item label="答案" prop="answer" v-if="editForm.type === 4">
-            <el-radio-group v-model="editForm.answer">
-              <el-radio
-                :key="answer.lab"
-                :label="answer.lab"
-                v-for="answer in editForm.judgeAnswers"
-                >{{ answer.lab }}</el-radio
-              >
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item
-            label="答案"
-            v-if="editForm.type === 5 && editForm.ai === 1"
-          >
-            <el-card class="el-card" shadow="never">
-              <el-alert
-                :closable="false"
-                title="单个关键词有多个同义词，可添加多个标签。如：人民、公民、群众"
-                type="success"
-              ></el-alert>
-              <el-row
-                :gutter="10"
-                v-for="(answer, index) in editForm.answers"
-                :key="index"
-              >
-                <el-col :span="16">
-                  <el-form-item
-                    :prop="`answers.${index}.value`"
-                    :rules="editForm.rules.answerMultip"
+              <el-form-item v-if="editForm.type === 3">
+                <el-checkbox-group v-model="editForm.scoreOptions">
+                  <el-tooltip
+                    class="item"
+                    content="默认答案有顺序"
+                    effect="dark"
+                    placement="top"
                   >
-                    <span
-                      style="margin: 0 15px; color: #838ee9; font-size: 12px"
-                      >关键词</span
-                    >
-                    <el-select
-                      v-model="answer.value"
-                      multiple
-                      filterable
-                      remote
-                      allow-create
-                      default-first-option
-                      placeholder="请填写答案"
-                    >
-                    </el-select>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="8">
-                  <el-form-item
-                    :prop="`answers.${index}.score`"
-                    :rules="editForm.rules.aiScore"
-                    :show-message="editForm.ai === 1 ? true : false"
+                    <el-checkbox label="2">答案无顺序</el-checkbox>
+                  </el-tooltip>
+                  <el-tooltip
+                    class="item"
+                    content="默认大小写敏感"
+                    effect="dark"
+                    placement="top"
                   >
-                    <el-input v-if="editForm.ai === 1" v-model="answer.score">
-                      <template slot="append">分</template>
-                    </el-input>
-                  </el-form-item>
-                </el-col>
-              </el-row>
+                    <el-checkbox label="3">大小写不敏感</el-checkbox>
+                  </el-tooltip>
+                </el-checkbox-group>
+              </el-form-item>
+              <el-form-item v-if="editForm.type === 5">
+                <el-checkbox-group v-model="editForm.scoreOptions">
+                  <el-tooltip
+                    class="item"
+                    content="大小写不敏感"
+                    effect="dark"
+                    placement="top"
+                  >
+                    <el-checkbox label="3">大小写不敏感</el-checkbox>
+                  </el-tooltip>
+                </el-checkbox-group>
+              </el-form-item>
+            </template>
+
+            <el-form-item label="答案" prop="answer" v-if="editForm.type === 1">
+              <el-radio-group v-model="editForm.answer">
+                <el-radio
+                  :key="answer.lab"
+                  :label="answer.lab"
+                  v-for="answer in editForm.answers"
+                  >{{ answer.lab }}</el-radio
+                >
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item
+              label="答案"
+              prop="answerMultip"
+              v-if="editForm.type === 2"
+            >
+              <el-checkbox-group v-model="editForm.answerMultip">
+                <el-checkbox
+                  :key="answer.lab"
+                  :label="answer.lab"
+                  v-for="answer in editForm.answers"
+                  >{{ answer.lab }}</el-checkbox
+                >
+              </el-checkbox-group>
+            </el-form-item>
+            <el-form-item label="答案" v-if="editForm.type === 3">
+              <el-card class="el-card" shadow="never">
+                <el-alert
+                  :closable="false"
+                  title="单个填空有多个同义词，可添加多个标签。如：人民、公民、群众"
+                  type="success"
+                ></el-alert>
+                <el-row
+                  :gutter="10"
+                  v-for="(answer, index) in editForm.answers"
+                  :key="index"
+                >
+                  <el-col :span="16">
+                    <el-form-item
+                      :prop="`answers.${index}.value`"
+                      :rules="editForm.rules.answerMultip"
+                    >
+                      <span
+                        style="margin: 0 15px; color: #838ee9; font-size: 12px"
+                        >填空{{ answer.lab }}</span
+                      >
+                      <el-select
+                        v-model="answer.value"
+                        multiple
+                        filterable
+                        remote
+                        allow-create
+                        default-first-option
+                        placeholder="请填写答案"
+                      >
+                      </el-select>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="8">
+                    <el-form-item
+                      :prop="`answers.${index}.score`"
+                      :rules="editForm.rules.aiScore"
+                      :show-message="editForm.ai === 1 ? true : false"
+                    >
+                      <el-input v-if="editForm.ai === 1" v-model="answer.score">
+                        <template slot="append">分</template>
+                      </el-input>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-button
+                  :disabled="editForm.answers.length >= 7"
+                  @click="addFillBlanks()"
+                  class="btn2"
+                  style="margin-left: 65px"
+                  type="primary"
+                  >+添加填空</el-button
+                >
+                <el-button
+                  :disabled="editForm.answers.length <= 1"
+                  @click="delFillBlanks()"
+                  class="btn2"
+                  type="primary"
+                  >-删除填空</el-button
+                >
+              </el-card>
+            </el-form-item>
+            <el-form-item label="答案" prop="answer" v-if="editForm.type === 4">
+              <el-radio-group v-model="editForm.answer">
+                <el-radio
+                  :key="answer.lab"
+                  :label="answer.lab"
+                  v-for="answer in editForm.judgeAnswers"
+                  >{{ answer.lab }}</el-radio
+                >
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item
+              label="答案"
+              v-if="editForm.type === 5 && editForm.ai === 1"
+            >
+              <el-card class="el-card" shadow="never">
+                <el-alert
+                  :closable="false"
+                  title="单个关键词有多个同义词，可添加多个标签。如：人民、公民、群众"
+                  type="success"
+                ></el-alert>
+                <el-row
+                  :gutter="10"
+                  v-for="(answer, index) in editForm.answers"
+                  :key="index"
+                >
+                  <el-col :span="16">
+                    <el-form-item
+                      :prop="`answers.${index}.value`"
+                      :rules="editForm.rules.answerMultip"
+                    >
+                      <span
+                        style="margin: 0 15px; color: #838ee9; font-size: 12px"
+                        >关键词</span
+                      >
+                      <el-select
+                        v-model="answer.value"
+                        multiple
+                        filterable
+                        remote
+                        allow-create
+                        default-first-option
+                        placeholder="请填写答案"
+                      >
+                      </el-select>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="8">
+                    <el-form-item
+                      :prop="`answers.${index}.score`"
+                      :rules="editForm.rules.aiScore"
+                      :show-message="editForm.ai === 1 ? true : false"
+                    >
+                      <el-input v-if="editForm.ai === 1" v-model="answer.score">
+                        <template slot="append">分</template>
+                      </el-input>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-button
+                  :disabled="editForm.answers.length >= 7"
+                  @click="addFillBlanks()"
+                  class="btn2"
+                  style="margin-left: 65px"
+                  type="primary"
+                  >+添加关键词</el-button
+                >
+                <el-button
+                  :disabled="editForm.answers.length <= 1"
+                  @click="delFillBlanks()"
+                  class="btn2"
+                  type="primary"
+                  >-删除关键词</el-button
+                >
+              </el-card>
+            </el-form-item>
+            <el-form-item
+              label="答案"
+              prop="answer"
+              v-if="editForm.type === 5 && editForm.ai === 2"
+            >
+              <Editor
+                :value="editForm.answer"
+                @editorListener="editorListener"
+                id="answer"
+              ></Editor>
+            </el-form-item>
+            <el-form-item label="解析" prop="analysis">
+              <Editor
+                :value="editForm.analysis"
+                @editorListener="editorListener"
+                id="analysis"
+              ></Editor>
+            </el-form-item>
+            <el-form-item>
               <el-button
-                :disabled="editForm.answers.length >= 7"
-                @click="addFillBlanks()"
-                class="btn2"
-                style="margin-left: 65px"
+                @click="add()"
+                style="width: 164px; height: 40px"
                 type="primary"
-                >+添加关键词</el-button
+                v-if="!editForm.id"
+                >添加</el-button
               >
               <el-button
-                :disabled="editForm.answers.length <= 1"
-                @click="delFillBlanks()"
-                class="btn2"
+                @click="edit()"
+                style="width: 164px; height: 40px"
                 type="primary"
-                >-删除关键词</el-button
+                v-if="editForm.id"
+                >修改</el-button
               >
-            </el-card>
-          </el-form-item>
-          <el-form-item
-            label="答案"
-            prop="answer"
-            v-if="editForm.type === 5 && editForm.ai === 2"
-          >
-            <Editor
-              :value="editForm.answer"
-              @editorListener="editorListener"
-              id="answer"
-            ></Editor>
-          </el-form-item>
-          <el-form-item label="解析" prop="analysis">
-            <Editor
-              :value="editForm.analysis"
-              @editorListener="editorListener"
-              id="analysis"
-            ></Editor>
-          </el-form-item>
-          <el-form-item>
-            <el-button
-              @click="add()"
-              style="width: 164px; height: 40px"
-              type="primary"
-              v-if="!editForm.id"
-              >添加</el-button
-            >
-            <el-button
-              @click="edit()"
-              style="width: 164px; height: 40px"
-              type="primary"
-              v-if="editForm.id"
-              >修改</el-button
-            >
-          </el-form-item>
-        </el-form>
+            </el-form-item>
+          </el-form>
+        </template>
       </el-scrollbar>
     </div>
 
@@ -607,11 +616,6 @@
 </template>
 <script>
 import { dictListPage } from 'api/base'
-import Upload from 'components/Upload'
-import Driver from 'driver.js'
-import 'driver.js/dist/driver.min.css'
-import { driverSetting, questionDriverStep } from '@/utils/driverGuide.js'
-import { getDriver } from '@/utils/storage.js'
 import {
   questionListPage,
   questionAdd,
@@ -623,13 +627,20 @@ import {
   questionEdit,
   questionPublish,
 } from 'api/question'
+import Driver from 'driver.js'
+import 'driver.js/dist/driver.min.css'
+import { driverSetting, questionDriverStep } from '@/utils/driverGuide.js'
+import { getDriver } from '@/utils/storage.js'
+import Upload from 'components/Upload'
 import Editor from 'components/Editor.vue'
 import EditHeader from 'components/EditHeader.vue'
+import QuestionDetail from 'components/QuestionDetail/Index.vue'
 export default {
   components: {
+    Upload,
     Editor,
     EditHeader,
-    Upload,
+    QuestionDetail,
   },
   data() {
     const validateAiScore = (rule, value, callback) => {
@@ -662,6 +673,8 @@ export default {
     return {
       labelPosition: 'left',
       value: '',
+      detailStatus: false,
+      questionDetail: {},
       list: {
         // 列表数据
         total: 0, // 总条数
@@ -954,6 +967,7 @@ export default {
     },
     // 更新类型
     updateType(value) {
+      this.detailStatus = false
       this.$tools.resetData(this, 'editForm')
       this.editForm.type = value
       if (value == 5) this.editForm.ai = 2
@@ -1075,8 +1089,9 @@ export default {
           })
       })
     },
-    // 获取试题
-    async get(id) {
+    // 编辑试题的详细信息
+    async questionEdit(id) {
+      this.detailStatus = false
       const res = await questionGet({ id })
       if (res?.code != 200) {
         this.$message.error('查询失败！')
@@ -1100,6 +1115,7 @@ export default {
           this._addOption(i, res.data.options[i])
         }
       }
+
       if (this.editForm.type === 2) {
         this.editForm.answerMultip = []
         this.editForm.multipScore = ''
@@ -1116,6 +1132,7 @@ export default {
         }, [])
         this.editForm.multipScore = res.data.answers[0].score
       }
+
       if ([3, 5].includes(this.editForm.type)) {
         this.editForm.answers = [] // 重置答案列表
         const answers = res.data.answers
@@ -1130,6 +1147,19 @@ export default {
       if (res.data.ai == 1 && res.data.type === 5) {
         this.editForm.answer = ''
       }
+    },
+    // 获取试题详情
+    async showDetails(id) {
+      this.detailStatus = true
+      const res = await questionGet({ id })
+      if (res?.code != 200) {
+        this.$message.error('获取详情失败！请重试')
+        this.questionDetail = {}
+        return
+      }
+
+      this.questionDetail = res.data
+      this.editForm.id = res.data.id
     },
     // 复制试题
     async copy(id) {

@@ -291,7 +291,7 @@ export default {
 <style lang="scss">
 .el-calendar-exam {
   background: rgba(#f73131, 0.15);
-  border: 2px solid rgba(#f73131, 0.8);
+  // border: 2px solid rgba(#f73131, 0.8);
   border-radius: 8px;
   span {
     color: rgba(#f73131, 1);
@@ -299,7 +299,7 @@ export default {
 }
 .el-calendar-mark {
   background: rgba(#4e6ef2, 0.15);
-  border: 2px solid rgba(#4e6ef2, 0.8);
+  // border: 2px solid rgba(#4e6ef2, 0.8);
   border-radius: 8px;
   span {
     color: rgba(#4e6ef2, 1);
@@ -307,7 +307,7 @@ export default {
 }
 .el-calendar-both {
   background: rgba(#f7c173, 0.15);
-  border: 2px solid rgba(#f7c173, 0.8);
+  // border: 2px solid rgba(#f7c173, 0.8);
   border-radius: 8px;
   span {
     color: rgba(#f7c173, 1);

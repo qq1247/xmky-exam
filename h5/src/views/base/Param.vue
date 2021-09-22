@@ -1,107 +1,51 @@
+<!--
+ * @Description: 设置logo,name
+ * @Version: 1.0
+ * @Company: 
+ * @Author: Che
+ * @Date: 2021-09-08 13:33:12
+ * @LastEditors: Che
+ * @LastEditTime: 2021-09-14 18:21:33
+-->
 <template>
   <div class="container">
-    <div class="content">
-      <el-card class="box-card">
-        <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
-          <el-form-item label="邮件主机" label-width="120px" prop="emailHost">
-            <el-input
-              placeholder="请输入邮件主机"
-              v-model="editForm.emailHost"
-            ></el-input>
-          </el-form-item>
-          <el-form-item
-            label="邮件用户名"
-            label-width="120px"
-            prop="emailUserName"
-          >
-            <el-input
-              placeholder="请输入邮件用户名"
-              v-model="editForm.emailUserName"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="邮件密码" label-width="120px" prop="emailPwd">
-            <el-input
-              placeholder="请输入邮件密码"
-              v-model="editForm.emailPwd"
-            ></el-input>
-          </el-form-item>
-          <el-form-item
-            label="邮件协议"
-            label-width="120px"
-            prop="emailProtocol"
-          >
-            <el-input
-              placeholder="请输入邮件协议"
-              v-model="editForm.emailProtocol"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="邮件编码" label-width="120px" prop="emailEncode">
-            <el-input
-              placeholder="请输入邮件编码"
-              v-model="editForm.emailEncode"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="单位商标" label-width="120px" prop="orgLogo">
-            <el-input
-              placeholder="请输入单位商标"
-              v-model="editForm.orgLogo"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="单位名称" label-width="120px" prop="orgName">
-            <el-input
-              placeholder="请输入单位名称"
-              v-model="editForm.orgName"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label label-width="120px">
-            <el-button @click="edit" type="primary">修改</el-button>
-          </el-form-item>
-        </el-form>
-      </el-card>
-    </div>
+    <el-form :model="paramForm" ref="paramForm">
+      <el-form-item label="单位名称" label-width="300px" prop="orgName">
+        <el-input
+          placeholder="请输入单位名称"
+          v-model="paramForm.orgName"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="单位商标" label-width="300px" prop="orgLogo">
+        <Upload
+          ref="logoUpload"
+          type="image"
+          :files="paramForm.orgLogo"
+          @success="logoSucess"
+          @remove="logoRemove"
+        />
+      </el-form-item>
+      <el-form-item label label-width="300px">
+        <el-button @click="setting" type="primary">设置</el-button>
+      </el-form-item>
+    </el-form>
   </div>
 </template>
 
 <script>
-import { parmListPage, parmAdd, parmEdit, parmGet, parmDel } from 'api/base'
+import Upload from 'components/Upload'
+import { parmGet, parmEditLogo } from 'api/base'
+import { getInfo, setInfo } from '@/utils/storage'
 export default {
+  components: {
+    Upload,
+  },
   data() {
     return {
-      listpage: {
-        // 列表数据
-        total: 0, // 总条数
-        curPage: 1, // 当前第几页
-        pageSize: 10, // 每页多少条
-        pageSizes: [10, 20, 50, 100], // 每页多少条
-        list: [], // 列表数据
-      },
-      queryForm: {
-        // 查询表单
-        emailHost: null,
-        emailEncode: null,
-        emailUserName: null,
-        emailPwd: null,
-        emailProtocol: null,
-        orgLogo: null,
-        orgName: null,
-      },
-      editForm: {
-        // 修改表单
-        id: null, // 主键
-        emailHost: null,
-        emailEncode: null,
-        emailUserName: null,
-        emailPwd: null,
-        emailProtocol: null,
-        orgLogo: null,
-        orgName: null,
-        show: false, // 是否显示页面
-        rules: {
-          // 校验
-          orgName: [
-            { required: true, message: '请输入排序', trigger: 'change' },
-          ],
-        },
+      paramForm: {
+        orgLogo: [],
+        orgName: '',
+        id: null,
       },
     }
   },
@@ -109,117 +53,76 @@ export default {
     this.init()
   },
   methods: {
-    // 查询
-    async query() {
-      const {
-        data: { list, total },
-      } = await parmListPage({
-        orgName: this.queryForm.orgName,
-        curPage: this.listpage.curPage,
-        pageSize: this.listpage.pageSize,
-      })
-      this.listpage.total = total
-      this.listpage.list = list
-    },
-    // 重置
-    async reset() {
-      this.listpage.curPage = 1
-      this.$refs['queryForm'].resetFields()
-      this.query()
-    },
-    handleSizeChange(val) {
-      this.listpage.pageSize = val
-      this.query()
-    },
-    handleCurrentChange(val) {
-      this.listpage.curPage = val
-      this.query()
-    },
     // 初始化
     async init() {
-      this.query()
-    },
-    add() {
-      this.$refs['editForm'].validate(async (valid) => {
-        if (!valid) {
-          return false
-        }
-
-        const { code, msg } = await parmAdd({
-          emailHost: this.editForm.emailHost,
-          emailEncode: this.editForm.emailEncode,
-          emailUserName: this.editForm.emailUserName,
-          emailPwd: this.editForm.emailPwd,
-          emailProtocol: this.editForm.emailProtocol,
-          orgLogo: this.editForm.orgLogo,
-          orgName: this.editForm.orgName,
+      const res = await parmGet()
+      if (res.code === 200 && res.data) {
+        res.data.orgLogo &&
+          this.paramForm.orgLogo.push({
+            url: `${process.env.VUE_APP_BASE_URL}file/download?id=${Number(
+              res.data.orgLogo
+            )}`,
+          })
+        this.paramForm.orgName = res.data.orgName
+        this.paramForm.id = res.data.id
+        this.$store.dispatch('setting/changeSetting', {
+          key: 'orgLogo',
+          value: res.data.orgLogo,
         })
-        if (code != 200) {
-          alert(msg)
-          return
-        }
-
-        this.editForm.show = false
-        this.query()
-      })
-    },
-    edit() {
-      this.$refs['editForm'].validate(async (valid) => {
-        if (!valid) {
-          return false
-        }
-
-        const { code, msg } = await parmEdit({
-          id: this.editForm.id,
-          emailHost: this.editForm.emailHost,
-          emailEncode: this.editForm.emailEncode,
-          emailUserName: this.editForm.emailUserName,
-          emailPwd: this.editForm.emailPwd,
-          emailProtocol: this.editForm.emailProtocol,
-          orgLogo: this.editForm.orgLogo,
-          orgName: this.editForm.orgName,
+        this.$store.dispatch('setting/changeSetting', {
+          key: 'orgName',
+          value: res.data.orgName,
         })
-        if (code != 200) {
-          alert(msg)
-          return
-        }
 
-        this.editForm.show = false
-        this.query()
-      })
-    },
-    // 获取参数
-    async get(id) {
-      const res = await parmGet({ id: id })
-      if (res.code != 200) {
-        alert(res.msg)
-        return
+        let loginInfo = getInfo()
+        loginInfo.orgLogo = res.data.orgLogo
+        loginInfo.orgName = res.data.orgName
+        setInfo(loginInfo)
       }
-
-      this.editForm.show = true
-      this.editForm.id = res.data.id
-      this.editForm.emailHost = res.data.emailHost
-      this.editForm.emailEncode = res.data.emailEncode
-      this.editForm.emailUserName = res.data.emailUserName
-      this.editForm.emailPwd = res.data.emailPwd
-      this.editForm.emailProtocol = res.data.emailProtocol
-      this.editForm.orgLogo = res.data.orgLogo
-      this.editForm.orgName = res.data.orgName
     },
-    // 删除
-    async del(id) {
-      this.$confirm('确定要删除？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-      }).then(async () => {
-        const res = await parmDel({ id })
-        if (res.code != 200) {
-          this.$message.error(res.msg)
+    // 设置
+    setting() {
+      this.$refs['paramForm'].validate(async (valid) => {
+        if (!valid) {
+          return false
         }
 
-        this.query()
+        const params = {
+          orgLogo:
+            this.paramForm.orgLogo.length > 0
+              ? this.paramForm.orgLogo[0]?.response
+                ? this.paramForm.orgLogo[0].response.data.fileIds
+                : this.$tools.getQueryParam(this.paramForm.orgLogo[0].url, 'id')
+              : null,
+          orgName: this.paramForm.orgName,
+        }
+
+        const { code, msg } = await parmEditLogo(
+          this.paramForm.id ? { id: this.paramForm.id, ...params } : params
+        )
+
+        if (code === 200) {
+          this.paramForm.orgLogo = []
+          this.init()
+        } else {
+          this.$message.error(msg)
+        }
       })
+    },
+    // 上传logo成功
+    logoSucess(res, file, fileList) {
+      this.paramForm.orgLogo = fileList
+    },
+    // 上传logo失败
+    logoClear(ref) {
+      if (this.paramForm.orgLogo.length > 0) {
+        this.$refs[ref].clear()
+        this.$set(this.paramForm, 'orgLogo', [])
+      }
+    },
+    // 删除logo
+    logoRemove(file, fileList) {
+      this.paramForm.orgLogo = fileList
     },
   },
 }
@@ -227,25 +130,6 @@ export default {
 <style lang="scss" scoped>
 .container {
   display: flex;
-  align-items: center;
-  .content {
-    width: 1170px;
-    .search {
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-start;
-    }
-  }
-}
-.el-input {
-  width: 300px;
-  float: left;
-}
-.el-input-number {
-  float: left;
-}
-
-.el-dialog__title {
-  float: left;
+  align-items: flex-start;
 }
 </style>
