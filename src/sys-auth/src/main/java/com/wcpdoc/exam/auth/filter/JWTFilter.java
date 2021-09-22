@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.wcpdoc.exam.auth.cache.OldTokenCache;
+import com.wcpdoc.exam.auth.cache.OnLineCache;
 import com.wcpdoc.exam.auth.cache.TokenCache;
 import com.wcpdoc.exam.auth.entity.JWTToken;
 import com.wcpdoc.exam.core.entity.JwtResult;
@@ -70,7 +71,8 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 		String jwt = WebUtils.toHttp(request).getHeader("Authorization");
 		JWTToken jwtToken = new JWTToken(jwt);
 		getSubject(request, response).login(jwtToken);
-		refreshToken(request, response);
+		int userId = refreshToken(request, response);
+		onLine(userId);//统计在线
 		return true;
 	}
 
@@ -81,7 +83,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 	 * @param request
 	 * @param response void
 	 */
-	private void refreshToken(ServletRequest request, ServletResponse response) {
+	private Integer refreshToken(ServletRequest request, ServletResponse response) {
 		// 校验数据有效性
 		Integer tokenExpireMinute = SpringUtil.getBean(Environment.class).getProperty("token.expireMinute", Integer.class);
 		Integer tokenRefreshMinute = SpringUtil.getBean(Environment.class).getProperty("token.refreshMinute", Integer.class);
@@ -112,7 +114,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 					if (log.isDebugEnabled()) {
 						log.debug("shiro权限：用户【{}】旧令牌宽限期有效，旧令牌创建时间【{}】，当前令牌创建时间【{}】，", oldLoginName, DateUtil.formatDateTime(new Date(oldTokenId)), DateUtil.formatDateTime(new Date(curTokenId)));
 					}
-					return;
+					return oldUserId;
 				}
 				
 				throw new AuthenticationException(String.format("用户【%s】令牌过期", oldLoginName));
@@ -121,7 +123,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 			Date curTime = new Date();
 			long oldTokenTimestamp = oldTokenId;
 			if (curTime.getTime() - oldTokenTimestamp <= tokenRefreshMinute * 60 * 1000) {// 如果距离上次刷新不超过指定分钟，不处理  
-				return;
+				return oldUserId;
 			}
 			
 			// 生成令牌信息（登陆由shiro接收令牌控制）
@@ -144,6 +146,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 			// 放入http响应头，供前端替换使用
 			WebUtils.toHttp(response).setHeader("Access-Control-Expose-Headers", "Authorization"); //不加前端只显示，无法获取到自定义header字段
 			WebUtils.toHttp(response).setHeader("Authorization", newToken);
+			return oldUserId;
 		} catch (InterruptedException e) {
 			throw new AuthenticationException(String.format("用户【%s】挂起异常", oldLoginName));
 		} finally {
@@ -151,6 +154,16 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 		}
 	}
 
+	/**
+	 * 缓存在线用户
+	 * 
+	 * v1.0 chenyun 2021年9月7日下午3:41:59
+	 * @param id void
+	 */
+	private void onLine(Integer id) {
+		OnLineCache.setOnLineTime(id);
+	}
+	
 	/**
 	 * 拒绝访问处理
 	 */
