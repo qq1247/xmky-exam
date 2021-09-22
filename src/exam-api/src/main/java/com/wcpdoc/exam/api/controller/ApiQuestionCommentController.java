@@ -23,6 +23,7 @@ import com.wcpdoc.exam.core.entity.QuestionComment;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.QuestionCommentService;
 import com.wcpdoc.exam.core.util.ValidateUtil;
+import com.wcpdoc.exam.wordFilter.util.SensitiveUtil;
 
 /**
  * 试题评论控制层
@@ -51,10 +52,9 @@ public class ApiQuestionCommentController extends BaseController {
 	public PageResult listpage() {
 		try {
 			PageOut listpage = questionCommentService.getListpage(new PageIn(request));
-			
-			/*for(Map<String, Object> mapList : listpage.getList()){
-					mapList.put("questionCommentSub", questionCommentService.getList( Integer.parseInt(mapList.get("id").toString())));
-			}*/
+			for(Map<String, Object> mapList : listpage.getList()){//敏感词过滤
+				mapList.put("content",SensitiveUtil.replace(mapList.get("content").toString()));
+			}
 			return PageResultEx.ok().data(listpage);
 		} catch (Exception e) {
 			log.error("试题评论列表错误：", e);

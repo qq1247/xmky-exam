@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  * v1.0 chenyun 2021年9月2日下午4:25:01
  */
 @Entity
-@Table(name = "EXM_SENSITIVE")
+@Table(name = "SYS_SENSITIVE")
 public class Sensitive {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

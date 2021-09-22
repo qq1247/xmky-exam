@@ -27,7 +27,7 @@
 		<!-- 集成系统敏感词 -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>exam-wordFilter</artifactId>
+			<artifactId>sys-wordFilter</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<!-- 集成poi
