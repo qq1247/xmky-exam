@@ -5,40 +5,20 @@
  * @Author: Che
  * @Date: 2021-09-10 10:14:03
  * @LastEditors: Che
- * @LastEditTime: 2021-09-13 17:49:09
+ * @LastEditTime: 2021-09-18 12:59:14
 -->
 <template>
   <div class="detail-more">
-    <!-- 类型，难度，其他选项，智能，分数 -->
-    <div class="detail-tags">
-      <el-tag effect="plain" type="info">{{ typeItem(this.data.type) }}</el-tag>
-      <el-tag effect="plain" type="danger">{{
-        difficultyItem(this.data.difficulty)
-      }}</el-tag>
-      <el-tag effect="plain" type="warning">{{
-        ['', '智能', '非智能'][data.ai]
-      }}</el-tag>
-      <el-tag effect="plain" type="success">{{ data.score }}分</el-tag>
-      <template v-if="data.scoreOptions">
-        <el-tag
-          effect="plain"
-          type="info"
-          v-for="item in data.scoreOptions.split(',')"
-          :key="item"
-          >{{ otherItem(item) }}</el-tag
-        >
-      </template>
-    </div>
     <!-- 答案 -->
     <el-row :gutter="10">
       <template v-if="[1, 2, 4].includes(data.type)">
-        <el-col :span="4"> 【答案】</el-col>
+        <el-col :span="1.5"> 【答案】</el-col>
         <el-col :span="20">
           <div v-html="`${data.answers[0].answer}`"></div>
         </el-col>
       </template>
       <template v-if="data.type === 3">
-        <el-col :span="4">【答案】</el-col>
+        <el-col :span="1.5">【答案】</el-col>
         <el-col :span="20">
           <div
             v-for="(answer, index) in data.answers"
@@ -56,7 +36,7 @@
         </el-col>
       </template>
       <template v-if="data.type === 5">
-        <el-col :span="4"> 【答案】</el-col>
+        <el-col :span="1.5"> 【答案】</el-col>
         <el-col :span="20">
           <template v-if="data.ai === 1">
             <div
@@ -79,11 +59,34 @@
     </el-row>
     <!-- 解析 -->
     <el-row :gutter="10">
-      <el-col :span="4"> 【解析】</el-col>
+      <el-col :span="1.5"> 【解析】</el-col>
       <el-col :span="20">
         <div v-html="`${data.analysis}`"></div>
       </el-col>
     </el-row>
+    <!-- 类型，难度，其他选项，智能，分数 -->
+    <div class="detail-tags">
+      <el-tag effect="dark" size="small">{{ typeItem(this.data.type) }}</el-tag>
+      <el-tag effect="dark" size="small" type="danger">{{
+        difficultyItem(this.data.difficulty)
+      }}</el-tag>
+      <el-tag effect="dark" size="small" type="warning">{{
+        ['', '智能', '非智能'][data.ai]
+      }}</el-tag>
+      <el-tag effect="dark" size="small" type="success"
+        >{{ data.score }}分</el-tag
+      >
+      <template v-if="data.scoreOptions">
+        <el-tag
+          effect="dark"
+          size="small"
+          type="info"
+          v-for="item in data.scoreOptions.split(',')"
+          :key="item"
+          >{{ otherItem(item) }}</el-tag
+        >
+      </template>
+    </div>
   </div>
 </template>
 
@@ -151,7 +154,7 @@ export default {
 
 <style lang="scss" scoped>
 .detail-more {
-  margin-top: 40px;
+  margin-top: 20px;
   padding-left: 30px;
   .detail-tags {
     display: flex;

@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-09-10 10:12:59
  * @LastEditors: Che
- * @LastEditTime: 2021-09-13 14:55:25
+ * @LastEditTime: 2021-09-18 14:46:03
 -->
 <template>
   <div class="question-detail">
@@ -43,12 +43,16 @@ export default {
       type: Array,
       default: [],
     },
+    moreDetail: {
+      type: Boolean,
+      default: false,
+    },
   },
   watch: {
     data: {
       deep: true,
       handler() {
-        this.moreStatus = false
+        this.moreStatus = this.moreDetail
       },
     },
   },
@@ -65,7 +69,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .question-detail {
   padding: 20px;
 }

@@ -186,6 +186,7 @@
     <!-- 试题开放 -->
     <el-dialog
       :visible.sync="openForm.show"
+      title="开放记录"
       :show-close="false"
       center
       width="50%"
@@ -240,7 +241,6 @@
                   </el-form>
                 </template>
               </el-table-column>
-              <el-table-column label="ID" prop="id"> </el-table-column>
               <el-table-column label="开始时间" prop="startTime">
               </el-table-column>
               <el-table-column label="结束时间" prop="endTime">
@@ -249,7 +249,7 @@
                 <template slot-scope="scope"
                   ><el-button
                     @click.native.prevent="delHistory(scope.row.id)"
-                    type="danger"
+                    type="text"
                     size="small"
                     :disabled="scope.row.state === 2"
                   >
@@ -260,6 +260,7 @@
             </el-table>
             <!-- 分页 -->
             <el-pagination
+              style="margin-top: 20px"
               background
               layout="prev, pager, next"
               prev-text="上一页"
