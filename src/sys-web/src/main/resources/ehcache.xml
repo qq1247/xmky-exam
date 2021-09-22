@@ -37,4 +37,19 @@
 		maxEntriesLocalHeap="10000"
 		timeToLiveSeconds="30">
     </cache>
+    <!-- 二维码传图，一小时有效期 -->
+	<cache name="FILE_ID_CACHE"
+		maxEntriesLocalHeap="10000"
+		timeToLiveSeconds="3600">
+    </cache>
+    <!-- 在线人员缓存，硬盘持久化 -->
+    <cache name="ON_LINE_CACHE" 
+		maxElementsInMemory="1"
+		overflowToDisk="true" 
+		maxElementsOnDisk="0" 
+		diskPersistent="true"
+		eternal="true"
+		timeToIdleSeconds="0"
+		timeToLiveSeconds="0">
+    </cache>
 </ehcache>
