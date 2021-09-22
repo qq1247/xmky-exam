@@ -24,4 +24,13 @@ public interface ParmService extends BaseService<Parm> {
 	 * @param parm void
 	 */
 	void updateAndUpdate(Parm parm);
+	
+	/**
+	 * 获取实体
+	 * 
+	 * v1.0 chenyun 2021年9月14日上午11:26:30
+	 * @param userId
+	 * @return Parm
+	 */
+	Parm get();
 }

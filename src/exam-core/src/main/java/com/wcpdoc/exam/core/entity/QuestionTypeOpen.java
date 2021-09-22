@@ -14,7 +14,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
- * 试题分类实体
+ * 试题分类开放实体
  * 
  * v1.0 chenyun 2021-03-02 13:43:21
  */
@@ -47,6 +47,8 @@ public class QuestionTypeOpen {
 	private Integer state;
 	@Column(name = "QUESTION_TYPE_ID")
 	private Integer questionTypeId;
+	@Column(name = "COMMENT_STATE")
+	private Integer commentState;
 	
 	public Integer getId() {
 		return id;
@@ -118,5 +120,13 @@ public class QuestionTypeOpen {
 
 	public void setQuestionTypeId(Integer questionTypeId) {
 		this.questionTypeId = questionTypeId;
+	}
+
+	public Integer getCommentState() {
+		return commentState;
+	}
+
+	public void setCommentState(Integer commentState) {
+		this.commentState = commentState;
 	}
 }

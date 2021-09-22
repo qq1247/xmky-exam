@@ -9,6 +9,8 @@ public class UserToken {
 	private String accessToken;
 	private String userName;
 	private Integer userId;
+	private String orgName;
+	private Integer orgLogo;
 	private String[] roles;
 
 	public String getAccessToken() {
@@ -41,6 +43,22 @@ public class UserToken {
 
 	public void setRoles(String[] roles) {
 		this.roles = roles;
+	}
+
+	public String getOrgName() {
+		return orgName;
+	}
+
+	public void setOrgName(String orgName) {
+		this.orgName = orgName;
+	}
+
+	public Integer getOrgLogo() {
+		return orgLogo;
+	}
+
+	public void setOrgLogo(Integer orgLogo) {
+		this.orgLogo = orgLogo;
 	}
 
 }

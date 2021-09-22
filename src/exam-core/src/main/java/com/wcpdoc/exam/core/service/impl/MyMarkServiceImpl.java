@@ -14,6 +14,7 @@ import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyExamDetail;
 import com.wcpdoc.exam.core.entity.MyMark;
+import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.ExamService;
@@ -40,6 +41,8 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 	private ExamService examService;
 	@Resource
 	private MyExamDetailService myExamDetailService;
+	@Resource
+	private PaperServiceImpl paperServiceImpl;
 	
 	@Override
 	@Resource(name = "myMarkDaoImpl")
@@ -55,6 +58,13 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 	@Override
 	public void updateScore(Integer myExamDetailId, BigDecimal score) {
 		// 校验数据有效性
+		if (myExamDetailId == null ) {
+			throw new MyException("参数错误：myExamDetailId");
+		}
+		if (score == null) {
+			throw new MyException("参数错误：score");
+		}
+		
 		MyExamDetail myExamDetail = myExamDetailService.getEntity(myExamDetailId);
 		List<MyMark> myMarkList = myMarkDao.getList(myExamDetail.getExamId());
 		Exam exam = examService.getEntity(myExamDetail.getExamId());
@@ -100,6 +110,9 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		BigDecimal totalScore = new BigDecimal(0);
 		List<MyExamDetail> MyExamDetailList = myExamDetailService.getList(myExamDetail.getMyExamId());
 		for(MyExamDetail entity : MyExamDetailList){
+			if (entity.getScore() == null) {
+				entity.setScore(new BigDecimal(0));
+			}
 			totalScore = totalScore.add(entity.getScore());
 		}
 		MyExam myExam = myExamService.getEntity(myExamDetail.getMyExamId());
@@ -151,11 +164,13 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		myExam.setMyMarkId(getCurUser().getId());
 		myExam.setMarkEndTime(new Date());
 		myExam.setTotalScore(totalScore);
-//					if (totalScore.doubleValue() >= exam.getPassScore().doubleValue() ) {
-//						myExam.setAnswerState(1);
-//					} else {
-//						myExam.setAnswerState(2);
-//					}
+		Paper paper = paperServiceImpl.getEntity(exam.getPaperId());
+		BigDecimal divide = paper.getTotalScore().multiply(paper.getPassScore()).divide(new BigDecimal(100));
+		if (totalScore.compareTo(divide) == 1) {
+			myExam.setAnswerState(1);
+		} else {
+			myExam.setAnswerState(2);
+		}
 		myExam.setUpdateTime(new Date());
 		myExam.setUpdateUserId(getCurUser().getId());
 		myExamService.update(myExam);

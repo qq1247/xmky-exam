@@ -1,8 +1,5 @@
 package com.wcpdoc.exam.core.service.impl;
 
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,8 +8,6 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.exam.core.dao.BaseDao;
@@ -31,6 +26,7 @@ import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.StringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
+import com.wcpdoc.exam.file.service.FileService;
 
 /**
  * 我的考试服务层实现
@@ -39,7 +35,6 @@ import com.wcpdoc.exam.core.util.ValidateUtil;
  */
 @Service
 public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamService {
-	private static final Logger log = LoggerFactory.getLogger(MyExamServiceImpl.class);
 	
 	@Resource
 	private MyExamDao myExamDao;
@@ -49,6 +44,8 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	private ExamService examService;
 	@Resource
 	private MyExamDetailService myExamDetailService;
+	@Resource
+	private FileService fileService;
 
 	@Override
 	@Resource(name = "myExamDaoImpl")
@@ -97,33 +94,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	}
 
 	@Override
-	public Map<String, Object> count(Integer examId) {
-		List<Map<String, Object>> count = myExamDao.count(examId);
-		Map<String, Object> map = new HashMap<String, Object>();
-		DecimalFormat df = new DecimalFormat("0.0");
-		for(Map<String, Object> mapList : count ){			
-			map.put("max", df.format(Double.parseDouble(mapList.get("MAX").toString())));
-			map.put("min", df.format(Double.parseDouble(mapList.get("MIN").toString())));
-			map.put("avg", df.format(Double.parseDouble(mapList.get("AVG").toString())));
-			map.put("pass", df.format(Double.parseDouble(mapList.get("ANSWER").toString())));
-			int minutes = 0;
-			try {
-				SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-				Date startTime = simpleFormat.parse(mapList.get("START_TIME").toString());
-				Date endTime = simpleFormat.parse(mapList.get("END_TIME").toString());
-				minutes = (int) ((endTime.getTime() - startTime.getTime()) / (1000 * 60));  
-			} catch (ParseException e) {
-				log.error(e.getMessage());
-				throw new MyException("时间错误！");
-			}
-			map.put("mins", minutes+"分钟");
-			map.put("totalScore", df.format(Double.parseDouble(mapList.get("TOTAL_SCORE").toString())));
-		}
-		return map;
-	}
-
-	@Override
-	public void updateAnswer(Integer myExamDetailId, String[] answers) {
+	public void updateAnswer(Integer myExamDetailId, String[] answers, Integer fileId) {
 		// 校验数据有效性
 		if (myExamDetailId == null) {
 			throw new MyException("参数错误：myExamDetailId");
@@ -164,6 +135,10 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 			myExamDetail.setAnswer(StringUtil.join(answers, "\n"));
 		} else if (question.getType() == 5 && question.getAi() == 1) {
 			myExamDetail.setAnswer(StringUtil.join(answers, "\n"));
+		}
+		if (fileId != null) {
+			myExamDetail.setAnswerFileId(fileId);
+			fileService.doUpload(fileId);
 		}
 		myExamDetail.setAnswerTime(new Date());
 		myExamDetailService.update(myExamDetail);

@@ -210,9 +210,9 @@ public class ApiMyExamController extends BaseController{
 	@RequestMapping("/updateAnswer")
 	@ResponseBody
 	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
-	public PageResult updateAnswer(Integer myExamDetailId, String[] answers) {
+	public PageResult updateAnswer(Integer myExamDetailId, String[] answers, Integer fileId) {
 		try {
-			myExamService.updateAnswer(myExamDetailId, answers);
+			myExamService.updateAnswer(myExamDetailId, answers, fileId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("更新答案错误：", e.getMessage());
@@ -270,23 +270,19 @@ public class ApiMyExamController extends BaseController{
 	}
 	
 	/**
-	 * 分数统计
+	 * 在线请求
 	 * 
-	 * v1.0 zhanghc 2018年11月24日上午9:13:22
-	 * @param id
+	 * v1.0 chenyun 2021年9月7日下午4:03:28
 	 * @return PageResult
 	 */
-	@RequestMapping("/count")
+	@RequestMapping("/onLine")
 	@ResponseBody
 	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
-	public PageResult count(Integer examId) {
+	public PageResult onLine() {
 		try {
-			return PageResultEx.ok().data(myExamService.count(examId));
-		} catch (MyException e) {
-			log.error("分数统计错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
+			return PageResult.ok();
 		} catch (Exception e) {
-			log.error("分数统计错误：", e);
+			log.error("在线请求错误：", e);
 			return PageResult.err();
 		}
 	}

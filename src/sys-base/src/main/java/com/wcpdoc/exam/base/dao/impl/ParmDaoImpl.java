@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.base.dao.impl;
 
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.exam.base.dao.ParmDao;
@@ -30,6 +32,12 @@ public class ParmDaoImpl extends RBaseDaoImpl<Parm> implements ParmDao {
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(), "UPDATE_TIME", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;
+	}
+
+	@Override
+	public List<Parm> getList() {
+		String sql = "SELECT * FROM SYS_PARM";
+		return getList(sql);
 	}
 
 }

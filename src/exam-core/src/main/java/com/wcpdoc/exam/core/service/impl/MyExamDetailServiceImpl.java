@@ -26,6 +26,7 @@ import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyExamDetail;
 import com.wcpdoc.exam.core.entity.MyMark;
+import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestionEx;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
@@ -61,6 +62,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	private UserService userService;
 	@Resource
 	private QuestionAnswerService questionAnswerService;
+	@Resource
+	private PaperServiceImpl paperServiceImpl;
 
 	@Override
 	@Resource(name = "myExamDetailDaoImpl")
@@ -114,8 +117,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			log.error("自动阅卷异常：未参与阅卷：{}", exam.getName());
 			throw new MyException(String.format("未参与阅卷：%s", exam.getName()));
 		}
-		myMark.setAutoState(1);
-		myMarkService.update(myMark);
+
 		/*List<MyMark> myMarkList = myMarkService.getList(examId);
 		boolean hasMyMark = false;
 		for (MyMark myMark : myMarkList) {
@@ -192,6 +194,10 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 				}
 			}
 			
+			//标记自动阅卷
+			myMark.setAutoState(1);
+			myMarkService.update(myMark);
+			
 			// 标记为阅卷中
 			myExam.setMyMarkId(curUser.getId());
 			String msg = null;
@@ -201,6 +207,14 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 				myExam.setMarkState(3);
 				code = 3;
 				msg = "阅卷完成";
+				
+				Paper paper = paperServiceImpl.getEntity(exam.getPaperId());
+				BigDecimal divide = paper.getTotalScore().multiply(paper.getPassScore()).divide(new BigDecimal(100));
+				if (totalScore.getResult().compareTo(divide) == 1) {
+					myExam.setAnswerState(1);
+				} else {
+					myExam.setAnswerState(2);
+				}
 			} else {//否则表示阅卷中，等待人工阅卷
 				myExam.setMarkState(2);
 				code = 2;
@@ -243,22 +257,17 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		}
 		BigDecimal[] scoreArr = questionAnswerBigDecimalList.toArray(new BigDecimal[questionAnswerBigDecimalList.size()]);
 		String[] questionAnswerArr =  questionAnswerStringList.toArray(new String[questionAnswerStringList.size()]);// 试题答案：一般|||通常|||普遍\njava|||.net
-		String[] userAnswerArr = userAnswerStr.split("\n");// 用户答案：一般情况下\nJava
 		boolean[] userFillBlanksArr = new boolean[questionAnswerArr.length];// 添加用户每个填空是否正确
 		
 		for (int i = 0; i < questionAnswerArr.length; i++) {// 答案对比
-			String[] _questionAnswerArr = questionAnswerArr[i].split("\\|\\|\\|");// 答案有多个同义词
-			for (int j = 0; j < userAnswerArr.length; j++) {
+			String[] _questionAnswerArr = questionAnswerArr[i].split("\n");// 答案有多个同义词
 				for (String _questionAnswer : _questionAnswerArr) {// 用户答案和试题答案对比
-					if (bhdadf(questionAnswer)) {
-						if (userAnswerArr[j].contains(_questionAnswer)) {
-							userFillBlanksArr[i] = true;
-							scoreSum = scoreSum.add(scoreArr[i]);
-							break;
-						}
+					if (userAnswerStr.contains(_questionAnswer)) {
+						userFillBlanksArr[i] = true;
+						scoreSum = scoreSum.add(scoreArr[i]);
+						break;
 					}
 				}
-			}
 		}
 
 		int trueNum = 0;
@@ -307,7 +316,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		boolean[] userFillBlanksArr = new boolean[questionAnswerArr.length];// 添加用户每个填空是否正确
 		
 		for (int i = 0; i < questionAnswerArr.length; i++) {// 答案对比
-			String[] _questionAnswerArr = questionAnswerArr[i].split("\\|\\|\\|");// 答案有多个同义词
+			String[] _questionAnswerArr = questionAnswerArr[i].split("\n");// 答案有多个同义词
 			for (int j = 0; j < userAnswerArr.length; j++) {
 				if (!dawsx(questionAnswer)) {// 如果勾选了答案前后有顺序，则对应位置对比
 					if (i != j) {
@@ -428,7 +437,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	 * @return boolean
 	 */
 	private boolean hasSingleChoice(Question question) {
-		return question.getType() == 1;
+		return question.getType() == 1 && question.getAi() == 1;
 	}
 	
 	/**
@@ -439,7 +448,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	 * @return boolean
 	 */
 	private boolean hasMultipleChoice(Question question) {
-		return question.getType() == 2;
+		return question.getType() == 2  && question.getAi() == 1;
 	}
 	
 	/**
@@ -450,7 +459,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	 * @return boolean
 	 */
 	private boolean hasFillBlank(Question question) {
-		return question.getType() == 3;
+		return question.getType() == 3 && question.getAi() == 1;
 	}
 
 	/**
@@ -461,7 +470,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	 * @return boolean
 	 */
 	private boolean hasTrueFalse(Question question) {
-		return question.getType() == 4;
+		return question.getType() == 4 && question.getAi() == 1;
 	}
 
 	/**
@@ -472,7 +481,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	 * @return boolean
 	 */
 	private boolean hasQA(Question question) {
-		return question.getType() == 5;
+		return question.getType() == 5 && question.getAi() == 1;
 	}
 
 	/**

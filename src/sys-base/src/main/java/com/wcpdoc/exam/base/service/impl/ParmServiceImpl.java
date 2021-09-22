@@ -47,4 +47,12 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		parmExService.updateAndUpdate(parm);
 	}
 
+	@Override
+	public Parm get() {
+		if(parmDao.getList().size() == 0){
+			return null;
+		}
+		return parmDao.getList().get(0);
+	}
+
 }
