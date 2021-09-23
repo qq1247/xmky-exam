@@ -454,10 +454,10 @@ export default {
       const source = this.paperQuestion[idx].questionList[idxc]
       const res = await myExamUpdateScore({
         myExamDetailId: source.myExamDetailId,
-        score: source.scorePlate,
+        score: source.scorePlate || 0,
       })
       res?.code === 200
-        ? this.$message.success('打分成功！')
+        ? (this.$message.success('打分成功！'), this.queryExamineeInfo())
         : this.$message.error(res.msg || '打分失败！')
     },
     // 上下题定位
