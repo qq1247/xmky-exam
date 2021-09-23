@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-09-18 15:44:29
  * @LastEditors: Che
- * @LastEditTime: 2021-09-22 12:52:57
+ * @LastEditTime: 2021-09-23 10:11:47
 -->
 <template>
   <div>
@@ -28,21 +28,21 @@
         <div class="content-handler">
           <span>{{ comment.time }}</span
           ><span
-            class="reply"
+            class="comment"
             v-if="comment.children"
-            @click.stop="showReply(index)"
+            @click.stop="showComment(index)"
             >回复</span
           >
         </div>
-        <ReplyText
+        <CommentText
           showTriangle
-          v-if="comment.reply"
-          @reply="childrenReply($event, comment.id)"
-        ></ReplyText>
+          v-if="comment.comment"
+          @comment="childrenComment(arguments, comment.id)"
+        ></CommentText>
         <div
           class="content-more"
           v-if="comment.children && !comment.children.length"
-          @click="getChildrenReply(comment.id)"
+          @click="getChildrenComment(comment.id)"
         >
           点击查看更多回复！
         </div>
@@ -50,7 +50,10 @@
           :class="comment.children ? 'children-content' : ''"
           v-if="comment.children && comment.children.length"
         >
-          <comment-item :list="comment.children"></comment-item>
+          <comment-item
+            :list="comment.children"
+            @showMore="showMore(comment.id, index)"
+          ></comment-item>
         </div>
       </div>
     </div>
@@ -59,11 +62,11 @@
 </template>
 
 <script>
-import ReplyText from './ReplyText.vue'
+import CommentText from './CommentText.vue'
 export default {
   name: 'CommentItem',
   components: {
-    ReplyText,
+    CommentText,
   },
   props: {
     list: {
@@ -76,18 +79,18 @@ export default {
   },
   mounted() {},
   methods: {
-    showReply(index) {
-      const reply = this.list[index].reply
-      this.$set(this.list[index], 'reply', !reply)
+    showComment(index) {
+      const comment = this.list[index].comment
+      this.$set(this.list[index], 'comment', !comment)
     },
-    childrenReply(text, anonymity, id) {
-      this.$emit('childrenReply', text, anonymity, id)
+    childrenComment([text, anonymity], id) {
+      this.$emit('childrenComment', text, anonymity, id)
     },
-    getChildrenReply(id) {
-      this.$emit('getChildrenReply', id)
+    getChildrenComment(id) {
+      this.$emit('getChildrenComment', id)
     },
-    showMore() {
-      this.$emit('showMore')
+    showMore(id, index) {
+      this.$emit('showMore', id, index)
     },
   },
 }
@@ -116,7 +119,7 @@ export default {
       justify-content: space-between;
       align-items: center;
       padding: 5px 10px 0 0;
-      .reply {
+      .comment {
         cursor: pointer;
         &:hover {
           font-weight: 600;

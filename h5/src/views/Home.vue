@@ -180,7 +180,7 @@
             :class="['notice', item.topState === 1 ? 'notice-hot' : '']"
             :key="item.id"
             v-for="item in questionTypeOpenList"
-            @click.native="goDetail(93)"
+            @click.native="goDetail(item)"
           >
             <el-col :span="12" class="notice-left">
               <span class="ellipsis">{{ item.questionTypeName }}</span>
@@ -373,11 +373,19 @@ export default {
       })
       res?.code === 200 && (this.questionTypeOpenList = res.data.list)
     },
-    goDetail(id) {
+    // 查看试题和评论
+    goDetail({ questionTypeId, startTime, endTime }) {
+      const $_startTime = new Date(startTime).getTime()
+      const $_endTime = new Date(endTime).getTime()
+      const now = new Date().getTime()
+      if (now < $_startTime || now > $_endTime) {
+        this.$message.warning('不在开放时间段，请重新确认时间点！')
+        return
+      }
       this.$router.push({
         path: '/question/comment',
         query: {
-          id,
+          id: questionTypeId,
         },
       })
     },

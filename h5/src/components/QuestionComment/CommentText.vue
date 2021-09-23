@@ -5,22 +5,22 @@
  * @Author: Che
  * @Date: 2021-09-18 16:54:54
  * @LastEditors: Che
- * @LastEditTime: 2021-09-22 10:58:27
+ * @LastEditTime: 2021-09-22 15:12:00
 -->
 <template>
-  <div :class="['reply-content', showTriangle ? 'reply-triangle' : '']">
+  <div :class="['comment-content', showTriangle ? 'comment-triangle' : '']">
     <el-input
-      class="reply-text"
+      class="comment-text"
       type="textarea"
       :rows="2"
       resize="none"
       placeholder="您的解析..."
-      v-model="replyText"
+      v-model="commentText"
     >
     </el-input>
     <div class="comment-btns">
       <el-checkbox v-model="anonymity">匿名</el-checkbox>
-      <el-button type="warning" class="reply-btn" @click="reply"
+      <el-button type="warning" class="comment-btn" @click="comment"
         >评论</el-button
       >
     </div>
@@ -37,20 +37,22 @@ export default {
   },
   data() {
     return {
-      replyText: '',
+      commentText: '',
       anonymity: false,
     }
   },
   methods: {
-    reply() {
-      this.$emit('reply', this.replyText, this.anonymity)
+    comment() {
+      this.$emit('comment', this.commentText, this.anonymity)
+      this.commentText = ''
+      this.anonymity = false
     },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.reply-content {
+.comment-content {
   background: #fff;
   display: flex;
   flex-direction: column;
@@ -58,7 +60,7 @@ export default {
   margin-top: 20px;
   padding: 10px 10px 10px 30px;
   position: relative;
-  .reply-text {
+  .comment-text {
     flex: 1;
     & /deep/.el-textarea__inner {
       border: 1px solid #fc9512;
@@ -69,13 +71,13 @@ export default {
     justify-content: space-between;
     margin-top: 10px;
   }
-  .reply-btn {
+  .comment-btn {
     padding: 5px 20px;
     font-size: 13px;
   }
 }
 
-.reply-triangle {
+.comment-triangle {
   padding: 10px;
   &::after {
     content: '';
