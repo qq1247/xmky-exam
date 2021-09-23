@@ -2,15 +2,32 @@
   <div class="container">
     <el-carousel :interval="3000" height="350px">
       <el-carousel-item
-        :style="{ background: carouse.bg || '#393d42' }"
+        :style="{ background: carouse.bgColor || '#393d42' }"
         :key="carouse.id"
         v-for="carouse in carouselList"
       >
         <div class="banner-list">
           <div class="banner-info">
-            <p class="banner-title">{{ carouse.title }}</p>
-            <p class="banner-content" v-html="carouse.content"></p>
-            <div class="banner-btn">查看详情</div>
+            <p
+              class="banner-title"
+              :style="{ color: carouse.textColor || '#fff' }"
+            >
+              {{ carouse.title }}
+            </p>
+            <p
+              class="banner-content"
+              :style="{ color: carouse.textColor || '#fff' }"
+              v-html="carouse.content"
+            ></p>
+            <div
+              class="banner-btn"
+              :style="{
+                color: carouse.textColor || '#fff',
+                borderColor: carouse.textColor || '#fff',
+              }"
+            >
+              查看详情
+            </div>
           </div>
           <el-image
             class="banner-image"
@@ -289,15 +306,17 @@ export default {
         state: 2,
       })
 
-      if (list.length) {
-        list.map(async (item) => {
-          const bg = await getMainColor(
-            `/api/file/download?id=${item.imgFileId}`
+      this.carouselList = list
+
+      this.$nextTick(async () => {
+        for (let index = 0; index < this.carouselList.length; index++) {
+          const { colorHex, colorReverse } = await getMainColor(
+            `/api/file/download?id=${this.carouselList[index].imgFileId}`
           )
-          item.bg = bg
-        })
-        this.carouselList = list
-      }
+          this.$set(this.carouselList[index], 'bgColor', colorHex)
+          this.$set(this.carouselList[index], 'textColor', colorReverse)
+        }
+      })
     },
     // 获取选择月份的时间
     selectDate(time) {

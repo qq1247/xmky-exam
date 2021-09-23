@@ -6,7 +6,9 @@ const getMainColor = (image) => {
       img.src = image // 设置图片源地址
       img.onload = () => {
         const color = getImageColor(canvas, img)
-        resolve(color)
+        const colorHex = getColorHex(color)
+        const colorReverse = getColorReverse(colorHex)
+        resolve({ colorHex, colorReverse })
       }
     } catch (e) {
       reject(e)
@@ -61,6 +63,33 @@ const getCountsArr = (pixelData) => {
   })
 
   return arr[0].color
+}
+
+const getColorHex = (color) => {
+  // RGBA颜色值的正则
+  let reg = /^(rgba|RGBA)/
+  if (reg.test(color)) {
+    let strHex = '#'
+    // 把RGBA的4个数值变成数组
+    let colorArr = color.replace(/(?:\(|\)|rgba|RGBA)*/g, '').split(',')
+    // 转成16进制
+    for (let i = 0; i < colorArr.length - 1; i++) {
+      let hex = Number(colorArr[i]).toString(16)
+      if (hex === '0') {
+        hex += hex
+      }
+      strHex += hex
+    }
+    return strHex
+  } else {
+    return String(color)
+  }
+}
+
+const getColorReverse = (colorHex) => {
+  let $_colorHex = '0x' + colorHex.replace(/#/g, '')
+  let str = '000000' + (0xffffff - $_colorHex).toString(16)
+  return '#' + str.substring(str.length - 6, str.length)
 }
 
 export default getMainColor
