@@ -30,9 +30,9 @@
 		<module>sys-web</module>
 		<module>sys-api</module>
 		<module>sys-notify</module>
+		<module>sys-wordFilter</module>
 		<module>exam-api</module>
 		<module>exam-core</module>
 		<module>exam-report</module>
-		<module>exam-wordFilter</module>
 	</modules>
 </project>

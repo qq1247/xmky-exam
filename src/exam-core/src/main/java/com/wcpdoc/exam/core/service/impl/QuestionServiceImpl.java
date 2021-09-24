@@ -98,7 +98,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			if (answers.length != 1) {
 				throw new MyException("参数错误：answers");
 			}
-			if (!"ABCDEFG".contains(answers[0])) {
+			if (!"ABCDEFG".contains(answers[0].toUpperCase())) {
 				throw new MyException("参数错误：answer");
 			}
 			int answerIndex = answers[0].getBytes()[0] - 65;
@@ -114,7 +114,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				throw new MyException("参数错误：answers");
 			}
 			for (int i = 0; i < answers.length; i++) {
-				if (!"ABCDEFG".contains(answers[i])) {
+				if (!"ABCDEFG".contains(answers[i].toUpperCase())) {
 					throw new MyException("参数错误：answers");
 				}
 				int answerIndex = answers[i].getBytes()[0] - 65;
@@ -161,7 +161,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		//添加试题答案
 		if (question.getType() == 1 || question.getType() == 4 ) {
 			QuestionAnswer questionAnswer = new QuestionAnswer();
-			questionAnswer.setAnswer(answers[0]);
+			questionAnswer.setAnswer(answers[0].toUpperCase());
 			if (question.getAi() == 1 && scores != null) {				
 				questionAnswer.setScore(scores[0]);
 			}else{
@@ -174,7 +174,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		} else if (question.getType() == 2) {
 			for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();
-				questionAnswer.setAnswer(answers[i]);
+				questionAnswer.setAnswer(answers[i].toUpperCase());
 				if (question.getAi() == 1 && scores != null) {
 					questionAnswer.setScore(scores[0]);
 				}else{

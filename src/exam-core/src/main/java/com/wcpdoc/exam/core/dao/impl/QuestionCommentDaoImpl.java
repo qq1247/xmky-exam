@@ -34,7 +34,7 @@ public class QuestionCommentDaoImpl extends RBaseDaoImpl<QuestionComment> implem
 				.addWhere(pageIn.get("parentId", Integer.class) != null, "QUESTION_COMMENT.PARENT_ID = ?", pageIn.get("parentId", Integer.class))
 				.addWhere(pageIn.get("parentId", Integer.class) == null, "QUESTION_COMMENT.PARENT_ID = 0" )
 				.addWhere("QUESTION_COMMENT.STATE = 1")
-				.addOrder("QUESTION_COMMENT.CREATE_USER_ID", Order.ASC);
+				.addOrder("QUESTION_COMMENT.CREATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(), "createTime", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;

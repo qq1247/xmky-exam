@@ -1,6 +1,8 @@
 package com.wcpdoc.exam.auth.cache;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,10 +25,13 @@ public class OnLineCache extends BaseEhCache{
 	 * v1.0 chenyun 2021年9月7日上午11:00:42
 	 * @param id void
 	 */
-	public static void setOnLineTime(Integer id) {
+	public static void setOnLineTime(Integer id, String ip) {
 		log.debug("设置在线缓存：{}-{}", id);
 		Cache cache = getCache(CACHE_NAME);
-		cache.put(id, new Date().getTime());
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("ip", ip);
+		map.put("time", new Date().getTime());
+		cache.put(id, map);
 	}
 	
 	/**
@@ -36,10 +41,11 @@ public class OnLineCache extends BaseEhCache{
 	 * @param id
 	 * @return Long
 	 */
+	@SuppressWarnings("rawtypes")
 	public static Long getOnLineTime(Integer id) {
 		Cache cache = getCache(CACHE_NAME);
-		Long time = cache.get(id, Long.class);
-		log.debug("获取在线缓存：{}-{}", id, time);
-		return time;
+		Map map = cache.get(id, Map.class);
+		log.debug("获取在线缓存：{}-{}", id, Long.getLong(map.get("time").toString()));
+		return Long.getLong(map.get("time").toString());
 	}
 }

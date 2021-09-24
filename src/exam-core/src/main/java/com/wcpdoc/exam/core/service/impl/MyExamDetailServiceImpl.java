@@ -104,11 +104,11 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			log.error("自动阅卷异常：考试未发布！");
 			throw new MyException("考试未发布！");
 		}
-		if (exam.getMarkStartTime().getTime() > (new Date().getTime() - 30000)){//预留30秒网络延时
+		if (exam.getMarkStartTime().getTime() > (new Date().getTime())){
 			log.error("自动阅卷异常：阅卷未开始！");
 			throw new MyException("阅卷未开始！");
 		}
-		if (exam.getMarkEndTime().getTime() < (new Date().getTime() - 30000)){//预留30秒网络延时
+		if (exam.getMarkEndTime().getTime() < (new Date().getTime())){
 			log.error("自动阅卷异常：阅卷已结束！");
 			throw new MyException("阅卷已结束！");
 		}

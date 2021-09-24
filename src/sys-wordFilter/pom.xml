@@ -7,8 +7,8 @@
 		<artifactId>sys-parent</artifactId>
 		<version>1.0.0</version>
 	</parent>
-    <artifactId>exam-wordFilter</artifactId>
-	<name>exam-wordFilter</name>
+    <artifactId>sys-wordFilter</artifactId>
+	<name>sys-wordFilter</name>
 	<description>敏感词</description>
 
 	<dependencies>
