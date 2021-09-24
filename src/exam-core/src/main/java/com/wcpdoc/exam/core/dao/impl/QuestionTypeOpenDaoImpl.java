@@ -45,8 +45,8 @@ public class QuestionTypeOpenDaoImpl extends RBaseDaoImpl<QuestionTypeOpen> impl
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(pageIn.get("questionTypeId", Integer.class) != null , "QUESTION_TYPE_OPEN.QUESTION_TYPE_ID = ?", pageIn.get("questionTypeId", Integer.class))
 			   .addWhere(pageIn.get("state") != null, "QUESTION_TYPE_OPEN.STATE = ?", pageIn.get("state", Integer.class))
-			   .addOrder("QUESTION_TYPE_OPEN.START_TIME", Order.DESC);;
-		
+			   .addOrder("QUESTION_TYPE_OPEN.UPDATE_TIME", Order.DESC);
+
 	      if (pageIn.get("curUserId", Integer.class) != null ) {
 		      User user = userDao.getEntity(pageIn.get("curUserId", Integer.class));
 		      StringBuilder partSql = new StringBuilder();
