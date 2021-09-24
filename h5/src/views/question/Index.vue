@@ -699,6 +699,7 @@ export default {
     // 获取开放历史记录
     async getOpenHistory() {
       const openHistoryList = await questionTypeOpenListPage({
+        questionTypeId: this.openForm.id,
         curPage: this.openForm.curPage,
         pageSize: this.openForm.pageSize,
       })

@@ -5,19 +5,22 @@
  * @Author: Che
  * @Date: 2021-09-17 17:27:41
  * @LastEditors: Che
- * @LastEditTime: 2021-09-22 13:17:47
+ * @LastEditTime: 2021-09-23 10:17:14
 -->
 <template>
   <div class="container">
-    <template v-if="questionList.length">
-      <div class="question-details">
+    <template v-if="questionList.length"
+      ><div class="question-details">
         <QuestionDetail
           moreDetail
           :data="questionDetail"
           :type="typeList"
           :difficulty="difficultyList"
-        ></QuestionDetail>
-        <ReplyText @reply="questionReply"></ReplyText>
+        ></QuestionDetail
+        ><CommentText
+          @comment="commentReply"
+          :key="questionList[currentIndex].id"
+        ></CommentText>
         <div class="question-pages">
           <el-button
             round
@@ -27,8 +30,7 @@
             @click="prevQuestion"
             :disabled="currentIndex === 0"
             >上一题</el-button
-          >
-          <el-button
+          ><el-button
             round
             type="primary"
             size="small"
@@ -42,14 +44,12 @@
         <QuestionComment
           :list="commentList"
           @showMore="showMore"
-          @childrenReply="childrenReply"
-          @getChildrenReply="getChildrenReply"
+          @childrenComment="commentReply"
+          @getChildrenComment="getChildrenComment"
           v-if="commentList.length"
-        ></QuestionComment>
-        <el-empty v-else description="暂无评论"> </el-empty>
-      </div>
-    </template>
-    <el-empty v-else description="暂无试卷"> </el-empty>
+        ></QuestionComment
+        ><el-empty v-else description="暂无评论"></el-empty></div></template
+    ><el-empty v-else description="暂无试卷"></el-empty>
   </div>
 </template>
 
@@ -63,19 +63,19 @@ import {
 } from 'api/question'
 import QuestionDetail from 'components/QuestionDetail/Index.vue'
 import QuestionComment from 'components/QuestionComment/Index.vue'
-import ReplyText from '@/components/QuestionComment/ReplyText.vue'
+import CommentText from '@/components/QuestionComment/CommentText.vue'
 export default {
   components: {
+    CommentText,
     QuestionDetail,
     QuestionComment,
-    ReplyText,
   },
   data() {
     return {
       id: null,
       curPage: 1,
       pageSize: 10,
-      tatalPage: 0,
+      totalPage: 0,
       typeList: [],
       currentIndex: 0,
       questionList: [],
@@ -105,26 +105,7 @@ export default {
 
       this.query().then((res) => {
         this.showDetails(this.questionList[this.currentIndex].id)
-        this.questionComment().then((comment) => {
-          this.totalPage =
-            comment.data.total % this.pageSize === 0
-              ? comment.data.total / this.pageSize
-              : Math.ceil(comment.data.total / this.pageSize)
-          const moreComment = comment.data.list.reduce((acc, cur) => {
-            acc.push({
-              id: cur.id,
-              name: cur.createUserName || '匿名用户',
-              time: cur.createTime,
-              avatar:
-                'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
-              replay: false,
-              content: cur.content,
-              children: [],
-            })
-            return acc
-          }, [])
-          this.commentList = [...this.commentList, ...moreComment]
-        })
+        this.getQuestionComment()
       })
     },
     // 获取试题列表
@@ -149,57 +130,126 @@ export default {
 
       this.questionDetail = res.data
     },
+    // 上一题
+    prevQuestion() {
+      this.currentIndex -= 1
+      this.changeQuestion()
+    },
+    // 下一题
+    nextQuestion() {
+      this.currentIndex += 1
+      this.changeQuestion()
+    },
+    changeQuestion() {
+      this.curPage = 1
+      this.totalPage = 0
+      this.commentList = []
+      this.showDetails(this.questionList[this.currentIndex].id)
+      this.getQuestionComment()
+    },
     // 获取试题评论
     async questionComment(id) {
       const commentList = await questionCommentListPage({
         questionId: this.questionList[this.currentIndex].id,
         curPage: this.curPage,
         pageSize: this.pageSize,
-        parentId: id ? id : null,
+        parentId: id || null,
       })
-      return commentList
+      const totalPage =
+        commentList.data.total % this.pageSize === 0
+          ? commentList.data.total / this.pageSize
+          : Math.ceil(commentList.data.total / this.pageSize)
+      const moreComment = commentList.data.list.reduce((acc, cur) => {
+        const params = {
+          id: cur.id,
+          curPage: 1,
+          content: cur.content,
+          time: cur.createTime,
+          name: cur.createUserName || '匿名用户',
+          avatar:
+            'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
+        }
+        acc.push(id ? params : { ...params, replay: false, children: [] })
+        return acc
+      }, [])
+      return { totalPage, moreComment }
     },
     // 试题一级评论
-    async oneLevelComment() {
-      const commentList = await this.questionComment()
+    async getQuestionComment() {
+      const { totalPage, moreComment } = await this.questionComment()
+      this.totalPage = totalPage
+      this.commentList = [...this.commentList, ...moreComment]
     },
-    // 试题一级评论
-    async twoLevelComment() {
-      const commentList = await this.questionComment()
+    // 获取二级回复列表
+    async getChildrenComment(id) {
+      const { totalPage, moreComment } = await this.questionComment(id)
+      if (!moreComment.length) {
+        this.$message({
+          message: '没有更多了',
+          duration: 1000,
+          type: 'warning',
+        })
+        return
+      }
+      this.commentList.filter((item, index) => {
+        if (item.id === id) {
+          this.$set(this.commentList[index], 'totalPage', totalPage)
+          this.commentList[index].children = [
+            ...this.commentList[index].children,
+            ...moreComment,
+          ]
+          return true
+        }
+      })
     },
-    // 上一题
-    prevQuestion() {
-      this.commentList = []
-      this.currentIndex -= 1
-      this.showDetails(this.questionList[this.currentIndex].id)
-    },
-    // 下一题
-    nextQuestion() {
-      this.commentList = []
-      this.currentIndex += 1
-      this.showDetails(this.questionList[this.currentIndex].id)
-    },
-    // 获取子级
-    getChildrenReply(id) {
-      console.log(id)
-    },
-    // 试题回复
-    questionReply(text, anonymity) {
+    // 评论回复
+    async commentReply(text, anonymity, id) {
       if (!text) {
         this.$message.warning('请填写评论内容！')
         return
       }
 
-      questionCommentAdd({
+      const res = await questionCommentAdd({
         questionId: this.questionList[this.currentIndex].id,
         content: text,
         anonymity: anonymity ? 0 : 1,
+        parentId: id || null,
       })
+
+      if (res?.code === 200) {
+        this.commentList = []
+        await this.getQuestionComment()
+        id && this.getChildrenComment(id)
+      }
     },
-    showMore() {},
-    // 子级回复
-    childrenReply(text, anonymity, id) {
-      console.log(text, anonymity, id)
+    // 查看更多一级回复
+    async showMore(id, index) {
+      if (index) {
+        // 二级回复查看更多
+        if (
+          this.commentList[index].curPage === this.commentList[index].totalPage
+        ) {
+          this.$message('没有更多了')
+          return
+        }
+        this.commentList[index].curPage += 1
+        const { totalPage, moreComment } = await this.questionComment(id)
+        this.$set(this.commentList[index], 'totalPage', totalPage)
+        this.commentList[index].children = [
+          ...this.commentList[index].children,
+          ...moreComment,
+        ]
+      } else {
+        // 一级回复查看更多
+        if (this.curPage === this.totalPage) {
+          this.$message('没有更多了')
+          return
+        }
+        this.curPage += 1
+        const { totalPage, moreComment } = await this.questionComment()
+        this.totalPage = totalPage
+        this.commentList = [...this.commentList, ...moreComment]
+      }
     },
   },
 }

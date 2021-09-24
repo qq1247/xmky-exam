@@ -73,7 +73,14 @@
         </el-table>
       </div>
     </div>
-    <el-dialog :visible.sync="editForm.show" title="机构">
+    <el-dialog
+      width="40%"
+      title="机构"
+      :show-close="false"
+      :visible.sync="editForm.show"
+      :close-on-click-modal="false"
+      @close="resetData('editForm')"
+    >
       <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
         <el-form-item label="上级机构" label-width="120px">
           <el-input
@@ -180,12 +187,6 @@ export default {
 
       this.listpage.list = treeList
     },
-    // 重置
-    async reset() {
-      this.$refs['queryForm'].resetFields()
-      this.listpage.curPage = 1
-      this.query()
-    },
     // 初始化
     async init() {
       await this.query()
@@ -237,12 +238,9 @@ export default {
     },
     // 获取机构
     async get(id, parentId, parentName) {
-      this.$nextTick(() => {
-        this.$refs['editForm'].resetFields()
-      })
-
       if (!id) {
         this.editForm.show = true
+        this.editForm.id = null
         this.editForm.parentId = parentId
         this.editForm.parentName = parentName
         return
@@ -275,6 +273,10 @@ export default {
 
         this.query()
       })
+    },
+    // 清空还原数据
+    resetData(name) {
+      this.$refs[name].resetFields()
     },
   },
 }

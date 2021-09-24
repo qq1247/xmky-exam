@@ -140,10 +140,22 @@
 
                 <div class="children-analysis">
                   <el-row :gutter="10">
-                    <template v-if="[1, 2, 4].includes(child.type)">
+                    <template v-if="[1, 4].includes(child.type)">
                       <el-col :span="2.5"> 【答案】： </el-col>
                       <el-col :span="21">
                         <div v-html="`${child.answers[0].answer}`"></div>
+                      </el-col>
+                    </template>
+                    <template v-if="child.type === 2">
+                      <el-col :span="2.5"> 【答案】： </el-col>
+                      <el-col :span="21">
+                        <div v-if="child.answers && child.answers.length > 0">
+                          <span
+                            v-for="answer in child.answers"
+                            :key="answer.id"
+                            >{{ answer.answer }}</span
+                          >
+                        </div>
                       </el-col>
                     </template>
                     <template v-if="child.type === 3">
@@ -442,10 +454,10 @@ export default {
       const source = this.paperQuestion[idx].questionList[idxc]
       const res = await myExamUpdateScore({
         myExamDetailId: source.myExamDetailId,
-        score: source.scorePlate,
+        score: source.scorePlate || 0,
       })
       res?.code === 200
-        ? this.$message.success('打分成功！')
+        ? (this.$message.success('打分成功！'), this.queryExamineeInfo())
         : this.$message.error(res.msg || '打分失败！')
     },
     // 上下题定位

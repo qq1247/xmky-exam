@@ -71,8 +71,8 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 		String jwt = WebUtils.toHttp(request).getHeader("Authorization");
 		JWTToken jwtToken = new JWTToken(jwt);
 		getSubject(request, response).login(jwtToken);
-		int userId = refreshToken(request, response);
-		onLine(userId);//统计在线
+		refreshToken(request, response);
+		onLine(request);//统计在线
 		return true;
 	}
 
@@ -83,7 +83,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 	 * @param request
 	 * @param response void
 	 */
-	private Integer refreshToken(ServletRequest request, ServletResponse response) {
+	private void refreshToken(ServletRequest request, ServletResponse response) {
 		// 校验数据有效性
 		Integer tokenExpireMinute = SpringUtil.getBean(Environment.class).getProperty("token.expireMinute", Integer.class);
 		Integer tokenRefreshMinute = SpringUtil.getBean(Environment.class).getProperty("token.refreshMinute", Integer.class);
@@ -114,7 +114,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 					if (log.isDebugEnabled()) {
 						log.debug("shiro权限：用户【{}】旧令牌宽限期有效，旧令牌创建时间【{}】，当前令牌创建时间【{}】，", oldLoginName, DateUtil.formatDateTime(new Date(oldTokenId)), DateUtil.formatDateTime(new Date(curTokenId)));
 					}
-					return oldUserId;
+					return;
 				}
 				
 				throw new AuthenticationException(String.format("用户【%s】令牌过期", oldLoginName));
@@ -123,7 +123,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 			Date curTime = new Date();
 			long oldTokenTimestamp = oldTokenId;
 			if (curTime.getTime() - oldTokenTimestamp <= tokenRefreshMinute * 60 * 1000) {// 如果距离上次刷新不超过指定分钟，不处理  
-				return oldUserId;
+				return;
 			}
 			
 			// 生成令牌信息（登陆由shiro接收令牌控制）
@@ -146,7 +146,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 			// 放入http响应头，供前端替换使用
 			WebUtils.toHttp(response).setHeader("Access-Control-Expose-Headers", "Authorization"); //不加前端只显示，无法获取到自定义header字段
 			WebUtils.toHttp(response).setHeader("Authorization", newToken);
-			return oldUserId;
+			return;
 		} catch (InterruptedException e) {
 			throw new AuthenticationException(String.format("用户【%s】挂起异常", oldLoginName));
 		} finally {
@@ -160,8 +160,11 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 	 * v1.0 chenyun 2021年9月7日下午3:41:59
 	 * @param id void
 	 */
-	private void onLine(Integer id) {
-		OnLineCache.setOnLineTime(id);
+	private void onLine(ServletRequest request) {
+		String oldJwtToken = WebUtils.toHttp(request).getHeader("Authorization");
+		JwtResult oldJwtResult = JwtUtil.getInstance().parse(oldJwtToken);//能到这一步，肯定是登陆成功的，不需要校验空或校验错误。
+		int oldUserId = oldJwtResult.getClaims().get("userId", Integer.class);
+		OnLineCache.setOnLineTime(oldUserId, request.getRemoteHost());
 	}
 	
 	/**

@@ -92,24 +92,6 @@ code == 401 无权限或登录超时
 | sourceId | String  | 源ID   | 是   |
 | targetId | String  | 目标ID | 是   |
 
-####试题分类权限用户：questionType/authUserListpage
-######请求参数
-| 参数     | 类型    | 描述                             | 必填 |
-| -------- | ------- | -------------------------------- | ---- |
-| curPage  | Integer | 当前第几页                       | 否   |
-| pageSize | Integer | 每页多少条                       | 否   |
-| id       | Integer | 主键                             | 是   |
-| rw       | String  | 权限【r:使用权限；w：编辑权限;】 | 是   |
-######响应数据
-| 参数             | 类型    | 描述     |
-| ---------------- | ------- | -------- |
-| code             | Integer | 响应码   |
-| msg              | String  | 响应消息 |
-| data.total       | Integer | 总行数   |
-| data.list[]      | Object[]   | 分页列表 |
-| data.list[].id   | Integer | 用户id   |
-| data.list[].name | String  | 名称     |
-
 ####试题分类开放列表：questionTypeOpen/listpage
 ######请求参数
 | 参数      | 类型    | 描述       | 必填 |
