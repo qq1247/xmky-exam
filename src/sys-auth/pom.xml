@@ -23,7 +23,7 @@
 			<groupId>com.wcpdoc.exam</groupId>
 			<artifactId>sys-cache</artifactId>
 			<version>${project.version}</version>
-		</dependency>
+		</dependency>		
 		<!-- 集成安全框架 -->
 		<dependency>
 			<groupId>org.apache.shiro</groupId>

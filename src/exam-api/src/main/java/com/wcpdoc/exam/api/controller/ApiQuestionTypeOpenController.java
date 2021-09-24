@@ -19,9 +19,10 @@ import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.entity.QuestionTypeOpen;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.QuestionTypeOpenService;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
- * 试题分类控制层
+ * 试题分类开放控制层
  * 
  * v1.0 chenyun 2021-03-02 13:43:21
  */
@@ -34,63 +35,67 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	private QuestionTypeOpenService questionTypeOpenService;
 	
 	/**
-	 * 试题分类列表
+	 * 试题分类开放列表
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
 	 * @return pageOut
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-	public PageResult listpage(PageIn pageIn) {
+	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
+	public PageResult listpage() {
 		try {
+			PageIn pageIn = new PageIn(request);
+			pageIn.addAttr("curUserId", getCurUser().getId());
 			return PageResultEx.ok().data(questionTypeOpenService.getListpage(pageIn));
 		} catch (Exception e) {
-			log.error("试题分类列表错误：", e);
+			log.error("试题分类开放列表错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 完成添加试题分类
+	 * 完成添加试题分类开放
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
 	 * @return pageOut
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult add(QuestionTypeOpen questionTypeOpen) {
 		try {
-			questionTypeOpen.setUpdateUserId(getCurUser().getId());
-			questionTypeOpen.setUpdateTime(new Date());
-			questionTypeOpenService.add(questionTypeOpen);
+			questionTypeOpenService.addAndUpdate(questionTypeOpen);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("完成添加试题分类错误：{}", e.getMessage());
+			log.error("完成添加试题分类开放错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("完成添加试题分类错误：", e);
+			log.error("完成添加试题分类开放错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 完成修改试题分类
+	 * 完成修改试题分类开放
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
 	 * @return pageOut
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult edit(QuestionTypeOpen questionTypeOpen) {
 		try {
 			QuestionTypeOpen entity = questionTypeOpenService.getEntity(questionTypeOpen.getId());
 			entity.setStartTime(questionTypeOpen.getStartTime());
 			entity.setEndTime(questionTypeOpen.getEndTime());
-			entity.setUserIds(questionTypeOpen.getUserIds());
-			entity.setOrgIds(questionTypeOpen.getOrgIds());
+			if (ValidateUtil.isValid(questionTypeOpen.getUserIds())) {
+				entity.setUserIds(","+questionTypeOpen.getUserIds()+",");
+			}
+			if (ValidateUtil.isValid(questionTypeOpen.getOrgIds())) {
+				entity.setOrgIds(","+questionTypeOpen.getOrgIds()+",");
+			}
 			entity.setUpdateUserId(getCurUser().getId());
 			entity.setUpdateTime(new Date());
 			entity.setState(questionTypeOpen.getState());
@@ -98,32 +103,32 @@ public class ApiQuestionTypeOpenController extends BaseController {
 			questionTypeOpenService.update(entity);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("完成修改试题分类错误：{}", e.getMessage());
+			log.error("完成修改试题分类开放错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("完成修改试题分类错误：", e);
+			log.error("完成修改试题分类开放错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 完成删除试题分类
+	 * 完成删除试题分类开放
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
 	 * @return pageOut
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			questionTypeOpenService.delAndUpdate(id);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("完成删除试题分类错误：{}", e.getMessage());
+			log.error("完成删除试题分类开放错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("完成删除试题分类错误：", e);
+			log.error("完成删除试题分类开放错误：", e);
 			return PageResult.err();
 		}
 	}

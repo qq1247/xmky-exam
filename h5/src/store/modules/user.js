@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-11 11:33:30
  * @LastEditors: Che
- * @LastEditTime: 2021-08-16 14:09:22
+ * @LastEditTime: 2021-09-14 17:01:17
  */
 import { login } from 'api/common'
 import { getInfo, setInfo, removeInfo } from '@/utils/storage'
@@ -41,7 +41,7 @@ const actions = {
    * @param {*} userInfo
    * @return {*}
    */
-  login({ commit }, userInfo) {
+  login({ commit, dispatch }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
       login({ loginName: username.trim(), pwd: password })
@@ -51,6 +51,22 @@ const actions = {
           commit('SET_ROLES', data.roles)
           commit('SET_NAME', data.userName)
           commit('SET_USER_ID', data.userId)
+          commit(
+            'setting/CHANGE_SETTING',
+            {
+              key: 'orgLogo',
+              value: data.orgLogo,
+            },
+            { root: true }
+          )
+          commit(
+            'setting/CHANGE_SETTING',
+            {
+              key: 'orgName',
+              value: data.orgName,
+            },
+            { root: true }
+          )
           setInfo(data)
           resolve()
         })
@@ -66,11 +82,27 @@ const actions = {
    * @param {*} commit
    * @return {*}
    */
-  resetToken({ commit }) {
+  resetToken({ commit, dispatch }) {
     return new Promise((resolve) => {
       commit('SET_TOKEN', '')
       commit('SET_ROLES', [])
       commit('permission/SET_ROUTES', [], { root: true })
+      commit(
+        'setting/CHANGE_SETTING',
+        {
+          key: 'orgLogo',
+          value: null,
+        },
+        { root: true }
+      )
+      commit(
+        'setting/CHANGE_SETTING',
+        {
+          key: 'orgName',
+          value: '',
+        },
+        { root: true }
+      )
       removeInfo()
       resetRouter()
       resolve()

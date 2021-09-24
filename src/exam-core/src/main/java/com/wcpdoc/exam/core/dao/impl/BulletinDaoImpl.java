@@ -42,7 +42,7 @@ public class BulletinDaoImpl extends RBaseDaoImpl<Bulletin> implements BulletinD
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("id")), "BULLETIN.ID = ?", pageIn.get("id"))
 			   .addWhere(ValidateUtil.isValid(pageIn.get("title")), "BULLETIN.TITLE LIKE ?", "%" + pageIn.get("title") + "%")
 			   .addWhere(ValidateUtil.isValid(pageIn.get("topState")), "BULLETIN.TOP_STATE = ?", pageIn.get("topState", Integer.class))
-			   .addWhere(pageIn.get("curUserId1", Integer.class)!= null, "BULLETIN.UPDATE_USER_ID = ?", pageIn.get("curUserId1", Integer.class))
+			   .addWhere(pageIn.get("curUserId", Integer.class)!= null, "BULLETIN.UPDATE_USER_ID = ?", pageIn.get("curUserId", Integer.class))
 			   .addWhere(pageIn.get("state", Integer.class)!= null, "BULLETIN.STATE = ?", pageIn.get("state", Integer.class))
 			   .addWhere("BULLETIN.STATE != ?", 0)
 			   .addOrder("BULLETIN.TOP_STATE", Order.ASC)

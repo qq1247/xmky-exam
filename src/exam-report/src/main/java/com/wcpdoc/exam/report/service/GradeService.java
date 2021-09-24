@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.report.service;
 
+import java.util.Map;
+
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 
@@ -18,4 +20,13 @@ public interface GradeService {
 	 * @return PageOut
 	 */
 	PageOut getListpage(PageIn pageIn);
+	
+	/**
+	 * 分数统计
+	 * 
+	 * v1.0 chenyun 2021年3月24日上午10:04:05
+	 * @param examId
+	 * @return Map<String,Object>
+	 */
+	Map<String, Object> count(Integer examId);
 }

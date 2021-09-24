@@ -140,7 +140,7 @@
               >
             </el-form-item>
           </template>
-          <template v-if="paperForm.tabActive == '2'">
+          <!-- <template v-if="paperForm.tabActive == '2'">
             <el-form-item label="防作弊">
               <el-checkbox-group v-model="paperForm.options">
                 <el-checkbox
@@ -150,16 +150,16 @@
                   >{{ item }}</el-checkbox
                 >
               </el-checkbox-group>
-              <!-- <el-input
+              <el-input
                 v-model="paperForm.paperMiniNum"
                 placeholder="最小化次数"
                 v-if="paperForm.options.includes('最小化')"
               >
                 <span slot="append">后交卷</span>
-              </el-input>-->
+              </el-input>
             </el-form-item>
           </template>
-          <!-- <div v-if="paperForm.tabActive == '3'">
+          <div v-if="paperForm.tabActive == '3'">
             <el-form-item label="成绩评语">
               <el-checkbox v-model="paperForm.paperRemarkShow">开启</el-checkbox>
               <template v-if="paperForm.paperRemarkShow">
@@ -186,7 +186,7 @@
                 </div>
               </template>
             </el-form-item>
-          </div>-->
+          </div> -->
         </el-tabs>
       </el-form>
       <div class="dialog-footer" slot="footer">
@@ -199,7 +199,10 @@
         <el-button @click="addOrEdit">
           {{ paperForm.edit ? '修改' : '添加' }}
         </el-button>
-        <el-button @click="paperForm.show = false">取 消</el-button>
+        <el-button
+          @click=";(paperForm.show = false), (paperForm.tabActive = '0')"
+          >取 消</el-button
+        >
       </div>
     </el-dialog>
   </div>
@@ -225,6 +228,8 @@ export default {
     const validatePercentage = (rule, value, callback) => {
       if (!value) {
         return callback(new Error('请输入及格分占总百分比'))
+      } else if (!/^\+?[1-9][0-9]*$/.test(value)) {
+        return callback(new Error(`必须是整数数字`))
       } else if (value > 100 || value < 1) {
         return callback(new Error(`请输入1-100范围的值`))
       } else {
@@ -254,10 +259,6 @@ export default {
             value: '1',
           },
           {
-            name: '章节',
-            value: '2',
-          },
-          {
             name: '单题',
             value: '3',
           },
@@ -284,11 +285,11 @@ export default {
             title: '基础信息',
             name: '0',
           },
-          /* {
+          {
             title: '组卷方式',
             name: '1',
           },
-          {
+          /* {
             title: '防作弊',
             name: '2',
           },

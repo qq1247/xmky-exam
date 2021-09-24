@@ -135,6 +135,15 @@ export const asyncRoutes = [
           hideFooter: true,
         },
       },
+      {
+        path: 'comment',
+        name: 'QuestionComment',
+        component: () => import('../views/question/Comment.vue'),
+        hidden: true,
+        meta: {
+          title: '查看 | 评论试题',
+        },
+      },
     ],
   },
   {

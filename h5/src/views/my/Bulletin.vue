@@ -263,18 +263,18 @@ export default {
     editorListener(id, value) {
       this.editForm[id] = value
     },
-    // 上传试题模板成功
+    // 上传banner成功
     bannerSucess(res, file, fileList) {
       this.editForm.imgFileId = fileList
     },
-    // 上传试题模板失败
+    // 上传banner失败
     bannerClear(ref) {
       if (this.editForm.imgFileId.length > 0) {
         this.$refs[ref].clear()
         this.$set(this.editForm, 'imgFileId', [])
       }
     },
-    // 删除试题模板
+    // 删除banner
     bannerRemove(file, fileList) {
       this.editForm.imgFileId = fileList
     },
@@ -329,12 +329,6 @@ export default {
         this.query()
       })
     },
-    getQueryString(url, name) {
-      var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i')
-      var r = url.slice(url.indexOf('?') + 1).match(reg)
-      if (r != null) return unescape(r[2])
-      return null
-    },
     // 修改
     edit() {
       this.$refs['editForm'].validate(async (valid) => {
@@ -348,7 +342,10 @@ export default {
             this.editForm.state === 2 && this.editForm.imgFileId.length > 0
               ? this.editForm.imgFileId[0]?.response
                 ? this.editForm.imgFileId[0].response.data.fileIds
-                : this.getQueryString(this.editForm.imgFileId[0].url, 'id')
+                : this.$tools.getQueryParam(
+                    this.editForm.imgFileId[0].url,
+                    'id'
+                  )
               : null,
           content: this.editForm.content,
           readUserIds: this.editForm.examUser,

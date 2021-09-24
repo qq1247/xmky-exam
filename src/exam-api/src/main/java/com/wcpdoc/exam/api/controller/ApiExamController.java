@@ -289,4 +289,23 @@ public class ApiExamController extends BaseController{
 			return PageResult.err();
 		}
 	}
+	
+	/**
+	 * 在线情况
+	 * 
+	 * v1.0 chenyun 2021年9月7日下午1:27:31
+	 * @param ids
+	 * @return PageResult
+	 */
+	@RequestMapping("/onLine")
+	@ResponseBody
+	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
+	public PageResult onLine(Integer[] ids) {
+		try {
+			return PageResultEx.ok().data(examService.onLine(ids));
+		}catch (Exception e) {
+			log.error("在线情况：", e);
+			return PageResult.err();
+		}
+	}
 }

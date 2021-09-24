@@ -12,9 +12,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.exam.auth.cache.TokenCache;
+import com.wcpdoc.exam.base.entity.Parm;
 import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.base.entity.UserToken;
 import com.wcpdoc.exam.base.service.LoginService;
+import com.wcpdoc.exam.base.service.ParmService;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
@@ -35,6 +37,8 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 	private String active;
 	@Resource
 	private UserService userService;
+	@Resource
+	private ParmService parmService;
 	@Value("${token.expireMinute}")
 	private Integer tokenExpireMinute;
 	
@@ -78,8 +82,15 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 		user.setLastLoginTime(new Date());
 		userService.update(user);
 		
+		// 机构信息
+		Parm parm = parmService.get();
+		
 		// 返回响应数据
 		UserToken userToken = new UserToken();
+		if (parm != null) {
+			userToken.setOrgName(parm.getOrgName());
+			userToken.setOrgLogo(parm.getOrgLogo());
+		}
 		userToken.setUserName(user.getName());
 		userToken.setAccessToken(accessToken);
 		userToken.setUserId(user.getId());

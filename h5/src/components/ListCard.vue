@@ -153,9 +153,6 @@
           <span data-title="复制" @click="copy(data)">
             <i class="common common-copy"></i>
           </span>
-          <span data-title="统计" @click="statistics(data)">
-            <i class="common common-statistics"></i>
-          </span>
           <!-- <span
           data-title="归档"
           @click="archive(data)"
@@ -168,12 +165,18 @@
         </template>
         <!-- 考试 -->
         <template v-if="name == 'examList'">
-          <span data-title="通知" @click="message(data)">
-            <i class="common common-messages"></i>
-          </span>
           <span data-title="阅卷设置" @click="read(data)">
             <i class="common common-setting"></i>
           </span>
+          <span data-title="在线人员" @click="onLine(data)">
+            <i class="common common-onLine"></i>
+          </span>
+          <span data-title="统计" @click="statistics(data)">
+            <i class="common common-statistics"></i>
+          </span>
+          <!-- <span data-title="通知" @click="message(data)">
+            <i class="common common-messages"></i>
+          </span> -->
         </template>
         <!-- 我的考试 -->
         <template v-if="name === 'myExamList'">
@@ -355,6 +358,9 @@ export default {
     // 归档
     archive(data) {
       this.$emit('archive', data)
+    },
+    onLine(data) {
+      this.$emit('onLine', data)
     },
     // 阅卷设置
     read(data) {

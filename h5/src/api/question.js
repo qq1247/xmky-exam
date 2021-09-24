@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-11 16:28:12
  * @LastEditors: Che
- * @LastEditTime: 2021-08-25 13:22:41
+ * @LastEditTime: 2021-09-22 10:02:36
  */
 import request from './request'
 
@@ -36,3 +36,7 @@ export const questionTypeOpenAdd = (params) =>
   request('questionTypeOpen/add', params)
 export const questionTypeOpenDel = (params) =>
   request('questionTypeOpen/del', params)
+export const questionCommentListPage = (params) =>
+  request('questionComment/listpage', params)
+export const questionCommentAdd = (params) =>
+  request('questionComment/add', params)

@@ -36,8 +36,9 @@
           name="examList"
           @edit="edit"
           @del="del"
+          @onLine="onLine"
           @publish="publish"
-          @message="message"
+          @statistics="statistics"
           @read="read"
         ></ListCard>
       </div>
@@ -132,7 +133,7 @@
       </div>
     </el-dialog>
 
-    <!-- 阅卷方式 -->
+    <!-- 阅卷设置 -->
     <el-dialog
       :visible.sync="examForm.readShow"
       :show-close="false"
@@ -261,17 +262,147 @@
         <el-button @click="examForm.readShow = false">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 考试信息统计 -->
+    <el-dialog :visible.sync="examForm.infoShow" width="60%">
+      <!-- 考试信息 -->
+      <el-descriptions
+        class="stat-desc"
+        title="考试信息"
+        :column="3"
+        size="medium"
+        border
+      >
+        <el-descriptions-item label="卷面总分">{{
+          examForm.statisticsInfo.paperTotalScore
+        }}</el-descriptions-item>
+        <el-descriptions-item label="及格分数">{{
+          (
+            (examForm.statisticsInfo.paperTotalScore *
+              examForm.statisticsInfo.paperPassScore) /
+            100
+          ).toFixed()
+        }}</el-descriptions-item>
+        <el-descriptions-item label="考试时长">{{
+          examForm.statisticsInfo.examStartTime
+            | timeDiff(
+              examForm.statisticsInfo.examStartTime,
+              examForm.statisticsInfo.examEndTime
+            )
+        }}</el-descriptions-item>
+      </el-descriptions>
+
+      <!-- 分数统计 -->
+      <el-descriptions
+        class="stat-desc"
+        title="分数统计"
+        :column="3"
+        size="medium"
+        border
+      >
+        <el-descriptions-item label="最高分">{{
+          examForm.statisticsInfo.max || 0
+        }}</el-descriptions-item>
+        <el-descriptions-item label="最低分">{{
+          examForm.statisticsInfo.min || 0
+        }}</el-descriptions-item>
+        <el-descriptions-item label="平均分">{{
+          examForm.statisticsInfo.avg || 0
+        }}</el-descriptions-item>
+      </el-descriptions>
+
+      <!-- 用户统计 -->
+      <el-descriptions
+        class="stat-desc"
+        title="用户统计"
+        :column="3"
+        size="medium"
+        border
+      >
+        <el-descriptions-item label="及格人数">{{
+          examForm.statisticsInfo.examUserAnswer || 0
+        }}</el-descriptions-item>
+        <el-descriptions-item label="实际人数">{{
+          examForm.statisticsInfo.examUserSum || 0
+        }}</el-descriptions-item>
+        <el-descriptions-item label="及格比例"
+          >{{
+            examForm.statisticsInfo.examUserAnswer ||
+            examForm.statisticsInfo.examUserSum
+              ? (examForm.statisticsInfo.examUserAnswer /
+                  examForm.statisticsInfo.examUserSum) *
+                100
+              : 0
+          }}%</el-descriptions-item
+        >
+      </el-descriptions>
+
+      <!-- 交卷统计 -->
+      <el-descriptions
+        class="stat-desc"
+        title="交卷统计"
+        :column="2"
+        size="medium"
+        border
+      >
+        <el-descriptions-item label="最早交卷">{{
+          examForm.statisticsInfo.maxExam || '待统计'
+        }}</el-descriptions-item>
+        <el-descriptions-item label="最迟交卷">{{
+          examForm.statisticsInfo.minExam || '待统计'
+        }}</el-descriptions-item>
+        <el-descriptions-item label="最长耗时">{{
+          (examForm.statisticsInfo.maxTime || 0) | formateTime
+        }}</el-descriptions-item>
+        <el-descriptions-item label="最短耗时">{{
+          (examForm.statisticsInfo.minTime || 0) | formateTime
+        }}</el-descriptions-item>
+      </el-descriptions>
+    </el-dialog>
+
+    <!-- 实时在线人数 -->
+    <el-drawer
+      title="实时在线考试人员"
+      :visible.sync="examForm.lineShow"
+      direction="ltr"
+      size="30%"
+      @closed="lineEnd"
+    >
+      <el-row>
+        <template v-if="examForm.examUserList.length > 0">
+          <el-col
+            :span="8"
+            v-for="item in examForm.examUserList"
+            :key="item.id"
+          >
+            <div
+              :class="[
+                'line-user',
+                examForm.onLineUser.includes(item.id) ? 'line' : '',
+              ]"
+            >
+              <i class="common common-onLine"></i>
+              <span class="line-name">{{ item.name }}</span>
+            </div>
+          </el-col>
+        </template>
+        <el-empty v-else description="暂无在线人员"> </el-empty>
+      </el-row>
+    </el-drawer>
   </div>
 </template>
 
 <script>
 import {
-  examListPage,
   examAdd,
   examDel,
-  examMarkUserList,
-  examPublish,
   examEdit,
+  examOnLine,
+  examPublish,
+  examUserList,
+  examListPage,
+  examGradeReport,
+  examMarkUserList,
   examUpdateMarkSet,
 } from 'api/exam'
 import { paperListPage } from 'api/paper'
@@ -325,6 +456,7 @@ export default {
       pageSize: 5,
       total: 0,
       curPage: 1,
+      timeLine: null,
       queryForm: {
         name: '',
         examTypeId: 0,
@@ -332,21 +464,24 @@ export default {
       },
       examForm: {
         id: 0,
+        name: '',
         paperId: 0,
+        edit: false,
         show: false,
         readShow: false,
-        edit: false,
-        name: '',
+        infoShow: false,
+        lineShow: false,
         selectPaperId: '',
-        paperList: [],
+        total: 0,
         curPage: 1,
         pageSize: 5,
-        total: 0,
+        paperList: [],
         examTime: [],
         markTime: [],
         scoreState: false,
         rankState: false,
         loginType: false,
+        statisticsInfo: {},
         examRadio: 1,
         examRadios: [
           {
@@ -363,6 +498,8 @@ export default {
         examRemarks: [],
         examUser: [],
         examUsers: [],
+        examUserList: [],
+        onLineUser: [],
         rules: {
           name: [
             { required: true, message: '请填写试卷名称', trigger: 'blur' },
@@ -376,6 +513,21 @@ export default {
       },
       examList: [],
     }
+  },
+  filters: {
+    timeDiff(start, end) {
+      const hour = dayjs(start).diff(dayjs(end), 'hour')
+      const minute = dayjs(start).diff(dayjs(end), 'minute')
+      const second = dayjs(start).diff(dayjs(end), 'second')
+      return `${hour}'${minute}''${second}'''`
+    },
+    formateTime(value) {
+      let time = value / 1000
+      let hour = Math.floor(time / 60 / 60) % 24
+      let minute = Math.floor(time / 60) % 60
+      let second = Math.floor(time) % 60
+      return `${hour}'${minute}''${second}'''`
+    },
   },
   mounted() {
     const { id } = this.$route.query
@@ -537,13 +689,43 @@ export default {
           console.log(err)
         })
     },
-    // 通知
-    message({ state }) {
-      if (state == 2) {
+    // 在线人员
+    async onLine({ id, state }) {
+      if (state === 2) {
         this.$message.error('请先发布考试！')
         return
       }
-      this.$message('功能开发中...')
+      this.examForm.lineShow = true
+      const resList = await examUserList({ id })
+      resList?.code === 200 && (this.examForm.examUserList = resList.data)
+      if (resList?.code === 200 && resList.data.length > 0) {
+        const ids = resList.data.reduce((acc, cur) => {
+          acc.push(cur.id)
+          return acc
+        }, [])
+        let resLine = await examOnLine({ ids })
+        resLine?.code === 200 && (this.examForm.onLineUser = resLine.data)
+        this.timeLine = setInterval(async () => {
+          resLine = await examOnLine({ ids })
+          resLine?.code === 200 && (this.examForm.onLineUser = resLine.data)
+        }, 30 * 1000)
+      }
+    },
+    // 关闭在线人员弹窗
+    lineEnd() {
+      clearInterval(this.timeLine)
+      this.timeLine = null
+    },
+    // 统计
+    async statistics({ id, state, markEndTime }) {
+      if (state === 2 || dayjs().isSameOrBefore(dayjs(markEndTime))) {
+        this.$message.error('阅卷后可查看')
+        return
+      }
+      const statisticsInfo = await examGradeReport({ examId: id })
+      statisticsInfo.code === 200 &&
+        ((this.examForm.statisticsInfo = statisticsInfo.data),
+        (this.examForm.infoShow = true))
     },
     // 阅卷设置
     async read({ id, paperId, state }) {
@@ -843,5 +1025,25 @@ export default {
 
 .remark-buttons {
   margin: 15px 0;
+}
+
+.line-user {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #999;
+  .common-onLine {
+    font-size: 70px;
+  }
+  .line-name {
+    font-size: 16px;
+  }
+}
+.line {
+  color: #1e9fff;
+}
+.stat-desc {
+  margin-top: 30px;
 }
 </style>
