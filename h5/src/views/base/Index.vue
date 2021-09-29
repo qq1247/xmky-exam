@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-07-27 17:31:01
  * @LastEditors: Che
- * @LastEditTime: 2021-09-14 10:48:24
+ * @LastEditTime: 2021-09-28 10:20:17
 -->
 <template>
   <div class="container">
@@ -32,6 +32,12 @@
             <span>系统参数</span>
           </div>
         </div>
+        <div class="exam-item">
+          <div @click="toSensitive" class="exam-content exam-add">
+            <i class="common common-sensitive"></i>
+            <span>敏感词库</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -51,6 +57,9 @@ export default {
     },
     toParam() {
       this.$router.push({ path: '/base/param' })
+    },
+    toSensitive() {
+      this.$router.push({ path: '/base/sensitive' })
     },
   },
 }
