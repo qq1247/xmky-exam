@@ -19,6 +19,7 @@ import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.HibernateUtil;
 import com.wcpdoc.exam.core.util.SqlUtil;
 import com.wcpdoc.exam.core.util.SqlUtil.Order;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
  * 试题分类开放数据访问层实现
@@ -45,9 +46,10 @@ public class QuestionTypeOpenDaoImpl extends RBaseDaoImpl<QuestionTypeOpen> impl
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(pageIn.get("questionTypeId", Integer.class) != null , "QUESTION_TYPE_OPEN.QUESTION_TYPE_ID = ?", pageIn.get("questionTypeId", Integer.class))
 			   .addWhere(pageIn.get("state") != null, "QUESTION_TYPE_OPEN.STATE = ?", pageIn.get("state", Integer.class))
+			   .addWhere(ValidateUtil.isValid(pageIn.get("list")) , "QUESTION_TYPE_OPEN.UPDATE_USER_ID = ?", pageIn.get("curUserId", Integer.class))
 			   .addOrder("QUESTION_TYPE_OPEN.UPDATE_TIME", Order.DESC);
 
-	      if (pageIn.get("curUserId", Integer.class) != null ) {
+	      if (pageIn.get("curUserId", Integer.class) != null && !ValidateUtil.isValid(pageIn.get("list"))) {
 		      User user = userDao.getEntity(pageIn.get("curUserId", Integer.class));
 		      StringBuilder partSql = new StringBuilder();
 		      List<Object> params = new ArrayList<>();
