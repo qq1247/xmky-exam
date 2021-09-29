@@ -55,7 +55,7 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 				.addWhere("QUESTION.STATE != ?", 0)
 				.addOrder("QUESTION.UPDATE_TIME", Order.DESC);
 		
-		if (pageIn.get("curUserId", Integer.class) != null) {
+		if (pageIn.get("curUserId", Integer.class) != null && !ValidateUtil.isValid(pageIn.get("open"))) {
 			User user = userDao.getEntity(pageIn.get("curUserId", Integer.class));
 			StringBuilder partSql = new StringBuilder();
 			List<Object> params = new ArrayList<>();

@@ -1,5 +1,8 @@
 package com.wcpdoc.exam.core.service;
 
+import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageOut;
+import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.entity.QuestionTypeOpen;
 
 /**
@@ -28,4 +31,21 @@ public interface QuestionTypeOpenService extends BaseService<QuestionTypeOpen> {
 	 * void
 	 */
 	void delAndUpdate(Integer id);
+	
+	/**
+	 * 试题开放列表
+	 * 
+	 * v1.0 chenyun 2021年9月29日上午10:50:30
+	 * @return PageOut
+	 */
+	PageOut questionListpage(PageIn pageIn);
+	
+	/**
+	 * 获取试题答案
+	 * 
+	 * v1.0 chenyun 2021年9月29日上午11:12:17
+	 * @param questionId
+	 * @return PageResultEx
+	 */
+	PageResultEx get(Integer questionId);
 }

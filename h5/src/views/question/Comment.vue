@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-09-17 17:27:41
  * @LastEditors: Che
- * @LastEditTime: 2021-09-28 18:18:57
+ * @LastEditTime: 2021-09-29 11:16:57
 -->
 <template>
   <div class="container">
@@ -56,8 +56,8 @@
 <script>
 import { dictListPage } from 'api/base'
 import {
-  questionGet,
-  questionListPage,
+  questionTypeOpenQuestionGet,
+  questionTypeOpenQuestion,
   questionCommentAdd,
   questionCommentListPage,
 } from 'api/question'
@@ -112,7 +112,7 @@ export default {
     async query() {
       const {
         data: { list },
-      } = await questionListPage({
+      } = await questionTypeOpenQuestion({
         questionTypeId: this.id,
         curPage: 1,
         pageSize: 100,
@@ -122,7 +122,7 @@ export default {
     },
     // 获取试题详情
     async showDetails(id) {
-      const res = await questionGet({ id })
+      const res = await questionTypeOpenQuestionGet({ questionId: id })
       if (res?.code != 200) {
         this.$message.error('获取详情失败！请重试')
         this.questionDetail = {}
