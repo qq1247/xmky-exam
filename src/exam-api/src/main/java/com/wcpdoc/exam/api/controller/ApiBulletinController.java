@@ -41,7 +41,6 @@ public class ApiBulletinController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
@@ -65,7 +64,6 @@ public class ApiBulletinController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult add(Bulletin bulletin) {
 		try {
 			bulletinService.addAndUpdate(bulletin);
@@ -87,7 +85,6 @@ public class ApiBulletinController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult edit(Bulletin bulletin) {
 		try {
 			bulletinService.updateAndUpdate(bulletin);
@@ -109,7 +106,6 @@ public class ApiBulletinController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			bulletinService.delAndUpdate(id);
@@ -131,7 +127,6 @@ public class ApiBulletinController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult get(Integer id) {		
 		try {
 			Map<String, Object> map = bulletinService.get(id);
@@ -158,7 +153,6 @@ public class ApiBulletinController extends BaseController {
 	 */
 	@RequestMapping("/auth")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult auth(Integer id, String readUserIds, String readOrgIds) {
 		try {
 			bulletinService.auth(id, readUserIds, readOrgIds);
@@ -181,7 +175,6 @@ public class ApiBulletinController extends BaseController {
 	 */
 	@RequestMapping("/authUserList")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult userList() {
 		try {
 			return PageResultEx.ok().data(bulletinService.getUserListpage(new PageIn(request)));

@@ -2,8 +2,6 @@ package com.wcpdoc.exam.api.controller;
 
 import javax.annotation.Resource;
 
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -53,7 +51,6 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
@@ -74,7 +71,6 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult add(PaperType paperType) {
 		try {
 			paperTypeService.addAndUpdate(paperType);
@@ -96,7 +92,6 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult edit(PaperType paperType) {
 		try {
 			paperTypeService.editAndUpdate(paperType);
@@ -118,7 +113,6 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			paperTypeService.delAndUpdate(id);
@@ -140,7 +134,6 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult get(Integer id) {
 		try {
 			PaperType entity = paperTypeService.getEntity(id);
@@ -203,7 +196,6 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/auth")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult auth(Integer id, String readUserIds, String writeUserIds) {
 		try {
 			paperTypeService.doAuth(id, readUserIds, writeUserIds);
@@ -226,7 +218,6 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/move")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult move(Integer id, Integer sourceId, Integer targetId) {
 		try {
 			paperService.move(id, sourceId, targetId);

@@ -2,8 +2,6 @@ package com.wcpdoc.exam.api.controller;
 
 import javax.annotation.Resource;
 
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -51,7 +49,6 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
@@ -72,7 +69,6 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult add(ExamType examType) {
 		try {
 			examTypeService.addAndUpdate(examType);
@@ -94,7 +90,6 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult edit(ExamType examType) {
 		try {
 			examTypeService.editAndUpdate(examType);
@@ -116,7 +111,6 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			examTypeService.delAndUpdate(id);
@@ -138,7 +132,6 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult get(Integer id) {
 		try {
 			ExamType entity = examTypeService.getEntity(id);
@@ -172,7 +165,6 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/auth")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult auth(Integer id, String readUserIds, String writeUserIds) {
 		try {
 			examTypeService.doAuth(id, readUserIds, writeUserIds);
@@ -195,7 +187,6 @@ public class ApiExamTypeController extends BaseController {
 	 */
 	@RequestMapping("/authUserListpage")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult authUserListpage() {
 		try {
 			PageIn pageIn = new PageIn(request);

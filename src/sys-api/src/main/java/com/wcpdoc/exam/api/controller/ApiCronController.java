@@ -6,8 +6,6 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.quartz.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +48,6 @@ public class ApiCronController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles(value={"admin","subAdmin"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
 			PageOut pageOut = cronService.getListpage(new PageIn(request));
@@ -88,7 +85,6 @@ public class ApiCronController extends BaseController {
 	@SuppressWarnings("unchecked")
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult add(Cron cron) {
 		try {
 			cron.setUpdateUserId(getCurUser().getId());
@@ -137,7 +133,6 @@ public class ApiCronController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult edit(Cron cron) {
 		try {
 			cronService.updateAndUpdate(cron);
@@ -161,7 +156,6 @@ public class ApiCronController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			cronService.delAndUpdate(id);
@@ -184,7 +178,6 @@ public class ApiCronController extends BaseController {
 	 */
 	@RequestMapping("/startTask")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult startTask(Integer id) {
 		try {
 			cronService.startTask(id);
@@ -207,7 +200,6 @@ public class ApiCronController extends BaseController {
 	 */
 	@RequestMapping("/stopTask")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult stopTask(Integer id) {
 		try {
 			cronService.stopTask(id);
@@ -230,7 +222,6 @@ public class ApiCronController extends BaseController {
 	 */
 	@RequestMapping("/runOnceTask")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult runOnceTask(Integer id) {
 		try {
 			cronService.runOnceTask(id);
@@ -253,7 +244,6 @@ public class ApiCronController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult get(Integer id) {
 		try {
 			Cron cron = cronService.getEntity(id);

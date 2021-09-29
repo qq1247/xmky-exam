@@ -9,8 +9,6 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -64,7 +62,6 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
@@ -99,7 +96,6 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/randomListpage")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult randomListpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
@@ -128,7 +124,6 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult add(Question question, Integer[] scoreOptions, String[] answers, String[] options, BigDecimal[] scores) {
 		try {
 			questionService.addAndUpdate(question, scoreOptions, answers, options, scores);
@@ -154,7 +149,6 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult edit(Question question, Integer[] scoreOptions, String[] answers, String[] options, BigDecimal[] scores) {  //, boolean newVer
 		try {
 			questionService.updateAndUpdate(question, scoreOptions, answers, options, scores); //, newVer
@@ -177,7 +171,6 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			questionService.delAndUpdate(id);
@@ -201,7 +194,6 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult get(Integer id) {
 		try {
 			Question question = questionService.getEntity(id);
@@ -281,7 +273,6 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/copy")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult copy(Integer id) {
 		try {
 			questionService.copy(id);
@@ -305,7 +296,6 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/wordImp")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult wordImp(Integer fileId, Integer questionTypeId) {
 		try {
 			String processBarId = UUID.randomUUID().toString().replaceAll("-", "");
@@ -334,7 +324,6 @@ public class ApiQuestionController extends BaseController {
 	 * void
 	 */
 	@RequestMapping(value = "/wordTemplateExport")
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public void wordTemplateExport() {
 		try {
 			fileService.exportTemplate("试题模板.docx");
@@ -354,7 +343,6 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/publish")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult publish(Integer id) {
 		try {
 			questionService.publish(id);
@@ -457,7 +445,6 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/statistics")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult statistics(Integer questionTypeId) {
 		try {
 			return PageResultEx.ok().data(questionService.statisticsTypeDifficulty(questionTypeId));
@@ -479,7 +466,6 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/accuracy")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult accuracy(Integer examId) {
 		try {
 			return PageResultEx.ok().data(questionService.accuracy(examId));

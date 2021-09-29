@@ -6,8 +6,6 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -54,7 +52,6 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
@@ -81,7 +78,6 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/examListpage")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult examListpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
@@ -103,7 +99,6 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult add(MyMark myMark) {
 		try {
 			myMarkService.add(myMark);
@@ -124,7 +119,6 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/updateScore")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult updateScore(Integer myExamDetailId, BigDecimal score) {
 		try {
 			myMarkService.updateScore(myExamDetailId, score);
@@ -147,7 +141,6 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/doScore")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult doScore(Integer examId, Integer userId, Integer markId) {
 		try {
 			myMarkService.doScore(examId, userId, markId);
@@ -170,7 +163,6 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/autoScore")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult autoScore(Integer id, Integer examId) {
 		try {
 			String processBarId = UUID.randomUUID().toString().replaceAll("-", "");
@@ -197,7 +189,6 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/markListpage")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult markListpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
