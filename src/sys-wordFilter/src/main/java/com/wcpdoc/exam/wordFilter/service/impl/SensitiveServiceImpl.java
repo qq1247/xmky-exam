@@ -42,7 +42,10 @@ public class SensitiveServiceImpl extends BaseServiceImp<Sensitive> implements S
 
 	@Override
 	public void initialize() {
-		initialize(sensitiveDao.getEntity(1));
+		Sensitive entity = sensitiveDao.getEntity(1);
+		if (entity != null) {			
+			initialize(entity);
+		}
 	}
     
 	@Override
