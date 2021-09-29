@@ -5,16 +5,26 @@
  * @Author: Che
  * @Date: 2021-09-10 10:14:03
  * @LastEditors: Che
- * @LastEditTime: 2021-09-18 12:59:14
+ * @LastEditTime: 2021-09-27 15:18:52
 -->
 <template>
   <div class="detail-more">
     <!-- 答案 -->
     <el-row :gutter="10">
-      <template v-if="[1, 2, 4].includes(data.type)">
-        <el-col :span="1.5"> 【答案】</el-col>
+      <template v-if="[1, 4].includes(data.type)">
+        <el-col :span="1.5">【答案】</el-col>
         <el-col :span="20">
           <div v-html="`${data.answers[0].answer}`"></div>
+        </el-col>
+      </template>
+      <template v-if="data.type === 2">
+        <el-col :span="1.5">【答案】</el-col>
+        <el-col :span="20">
+          <template v-if="data.answers && data.answers.length > 0">
+            <span v-for="answer in data.answers" :key="answer.id">{{
+              answer.answer
+            }}</span>
+          </template>
         </el-col>
       </template>
       <template v-if="data.type === 3">

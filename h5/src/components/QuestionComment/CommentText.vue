@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-09-18 16:54:54
  * @LastEditors: Che
- * @LastEditTime: 2021-09-22 15:12:00
+ * @LastEditTime: 2021-09-28 12:52:43
 -->
 <template>
   <div :class="['comment-content', showTriangle ? 'comment-triangle' : '']">
@@ -14,7 +14,7 @@
       type="textarea"
       :rows="2"
       resize="none"
-      placeholder="您的解析..."
+      placeholder="您的评论..."
       v-model="commentText"
     >
     </el-input>
