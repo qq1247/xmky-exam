@@ -2,8 +2,6 @@ package com.wcpdoc.exam.api.controller;
 
 import javax.annotation.Resource;
 
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -41,7 +39,6 @@ public class ApiDictController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles(value={"admin","subAdmin"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
 			return PageResultEx.ok().data(dictService.getListpage(new PageIn(request)));
@@ -61,7 +58,6 @@ public class ApiDictController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult add(Dict dict) {
 		try {
 			dictService.addAndUpdate(dict);
@@ -85,7 +81,6 @@ public class ApiDictController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult edit(Dict dict) {
 		try {
 			dictService.updateAndUpdate(dict);
@@ -109,7 +104,6 @@ public class ApiDictController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			dictService.delAndUpdate(id);
@@ -132,7 +126,6 @@ public class ApiDictController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult get(Integer id) {
 		try {
 			Dict dict = dictService.getEntity(id);

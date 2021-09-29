@@ -2,8 +2,6 @@ package com.wcpdoc.exam.api.controller;
 
 import javax.annotation.Resource;
 
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -76,7 +74,6 @@ public class GradeReportController extends BaseController{
 	 */
 	@RequestMapping("/count")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult count(Integer examId) {
 		try {
 			return PageResultEx.ok().data(gradeService.count(examId));

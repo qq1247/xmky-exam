@@ -8,8 +8,6 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -60,7 +58,6 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
@@ -82,7 +79,6 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult add(Exam exam) {
 		try {
 			examService.addAndUpdate(exam);
@@ -104,7 +100,6 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult edit(Exam exam) {
 		try {
 			examService.updateAndUpdate(exam);
@@ -126,7 +121,6 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			examService.delAndUpdate(id);
@@ -149,7 +143,6 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/examUserList")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult examUserList(Integer id) {
 		try {
 			return PageResultEx.ok().data(examService.getExamUserList(id));
@@ -168,7 +161,6 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/markUserList")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult markUserList(Integer id) {
 		try {
 			List<MyMark> myMarkList = myMarkService.getList(id);
@@ -203,7 +195,6 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/updateMarkSet")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult updateMarkSet(Integer id, String[] examUserIds, Integer[] markUserIds) {
 		try {
 			examService.updateMarkSet(id, examUserIds, markUserIds);
@@ -229,7 +220,6 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/updateMarkUser")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult updateMarkUser(Integer id, Integer[] markUserIds, String[] examUserIds, String[] questionIds) {
 		try {
 			examService.updateMarkUser(id, markUserIds, examUserIds, questionIds);
@@ -252,7 +242,6 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/publish")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult publish(Integer id) {
 		try {
 			examService.publish(id);
@@ -275,7 +264,6 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/archive")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult archive(Integer id) {
 		try {
 			Exam exam = examService.getEntity(id);
@@ -299,7 +287,6 @@ public class ApiExamController extends BaseController{
 	 */
 	@RequestMapping("/onLine")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult onLine(Integer[] ids) {
 		try {
 			return PageResultEx.ok().data(examService.onLine(ids));

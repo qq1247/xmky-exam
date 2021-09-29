@@ -69,7 +69,6 @@ public class ApiFileController extends BaseController {
 	 */
 	@RequestMapping("/upload")
 	@ResponseBody
-	@RequiresRoles(value={"admin","subAdmin","user"},logical = Logical.OR)
 	public PageResult upload(@RequestParam("files") MultipartFile[] files, String uuId) {
 		try {
 			String[] allowTypes = { "jpg", "jpeg", "gif", "png", "zip", "rar", "doc", "xls", "docx", "xlsx", "mp4" };

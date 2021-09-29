@@ -1,7 +1,5 @@
 package com.wcpdoc.exam.api.controller;
 
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -34,7 +32,6 @@ public class ApiProgressBarController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult get(String id) {
 		try {
 			ProgressBar progressBar = ProgressBarCache.getProgressBar(id);
