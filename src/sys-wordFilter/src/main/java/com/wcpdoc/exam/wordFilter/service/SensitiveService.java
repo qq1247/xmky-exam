@@ -27,4 +27,11 @@ public interface SensitiveService extends BaseService<Sensitive> {
 	 * @return String
 	 */
 	String replace(String content);
+	
+	/**
+	 * 初始化敏感词
+	 * 
+	 * v1.0 chenyun 2021年9月28日下午5:38:30 void
+	 */
+	void initialize();
 }

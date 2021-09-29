@@ -2,8 +2,6 @@ package com.wcpdoc.exam.api.controller;
 
 import javax.annotation.Resource;
 
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -47,7 +45,6 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
@@ -68,7 +65,6 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult add(String name, Integer imgFileId) {
 		try {
 			questionTypeService.addAndUpdate(name, imgFileId);
@@ -90,7 +86,6 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult edit(Integer id, String name, Integer imgFileId) {
 		try {
 			questionTypeService.editAndUpdate(id, name, imgFileId);
@@ -112,7 +107,6 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			questionTypeService.delAndUpdate(id);
@@ -134,7 +128,6 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult get(Integer id) {
 		try {
 			QuestionType entity = questionTypeService.getEntity(id);
@@ -196,7 +189,6 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/auth")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult auth(Integer id, String readUserIds, String writeUserIds) {
 		try {
 			questionTypeService.auth(id, readUserIds, writeUserIds);
@@ -219,7 +211,6 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/move")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult move(Integer id, Integer sourceId, Integer targetId) {
 		try {
 			questionService.move(id, sourceId, targetId);

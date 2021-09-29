@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-12 10:17:05
  * @LastEditors: Che
- * @LastEditTime: 2021-08-17 18:41:14
+ * @LastEditTime: 2021-09-28 17:37:29
  */
 
 import router, { constantRoutes } from './index'
@@ -14,7 +14,7 @@ import { Message } from 'element-ui'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import { getInfo } from '@/utils/storage'
-import getPageTitle from '@/utils/get-page-title'
+import getPageTitle from '@/utils/getPageTitle'
 
 NProgress.configure({ showSpinner: false })
 

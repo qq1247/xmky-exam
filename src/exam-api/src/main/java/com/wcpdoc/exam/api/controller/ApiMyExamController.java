@@ -5,8 +5,6 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -59,7 +57,6 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
@@ -80,7 +77,6 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/answerList")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult answerList(Integer id) {
 		try {
 			List<Map<String, Object>> list = myExamDetailService.getAnswerList(id);
@@ -109,7 +105,6 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/markAnswerList")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin","user"},logical = Logical.OR)
 	public PageResult markAnswerList(Integer userId, Integer examId) {
 		try {
 			List<Map<String, Object>> list = myExamDetailService.getMarkAnswerList(userId, examId);
@@ -209,7 +204,6 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/updateAnswer")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult updateAnswer(Integer myExamDetailId, String[] answers, Integer fileId) {
 		try {
 			myExamService.updateAnswer(myExamDetailId, answers, fileId);
@@ -232,7 +226,6 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/doAnswer")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult doAnswer(Integer myExamId) {
 		try {
 			myExamService.doAnswer(myExamId);
@@ -256,7 +249,6 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/rankingPage")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult rankingPage() {
 		try {
 			return PageResultEx.ok().data(myExamService.getRankingPage(new PageIn(request)));
@@ -277,7 +269,6 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/onLine")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult onLine() {
 		try {
 			return PageResult.ok();
@@ -296,7 +287,6 @@ public class ApiMyExamController extends BaseController{
 	 */
 	@RequestMapping("/email")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult email(Integer examId) {
 		try {
 			Parm parm = parmService.getEntity(1);

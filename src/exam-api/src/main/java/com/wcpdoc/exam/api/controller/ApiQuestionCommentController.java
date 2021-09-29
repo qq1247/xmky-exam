@@ -6,8 +6,6 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -23,7 +21,7 @@ import com.wcpdoc.exam.core.entity.QuestionComment;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.QuestionCommentService;
 import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.wordFilter.util.SensitiveUtil;
+import com.wcpdoc.exam.wordFilter.service.SensitiveService;
 
 /**
  * 试题评论控制层
@@ -37,7 +35,9 @@ public class ApiQuestionCommentController extends BaseController {
 
 	@Resource
 	private QuestionCommentService questionCommentService;
-
+	@Resource
+	private SensitiveService sensitiveService;
+	
 	/**
 	 * 试题评论列表
 	 * 
@@ -48,12 +48,11 @@ public class ApiQuestionCommentController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles(value={"admin","subAdmin","user"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
 			PageOut listpage = questionCommentService.getListpage(new PageIn(request));
 			for(Map<String, Object> mapList : listpage.getList()){//敏感词过滤
-				mapList.put("content",SensitiveUtil.replace(mapList.get("content").toString()));
+				mapList.put("content",sensitiveService.replace(mapList.get("content").toString()));
 			}
 			return PageResultEx.ok().data(listpage);
 		} catch (Exception e) {
@@ -72,7 +71,6 @@ public class ApiQuestionCommentController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles(value={"admin","subAdmin","user"},logical = Logical.OR)
 	public PageResult add(QuestionComment questionComment, int anonymity) {
 		try {
 			questionCommentService.addAndUpdate(questionComment, anonymity);
@@ -97,7 +95,6 @@ public class ApiQuestionCommentController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles(value={"admin","subAdmin","user"},logical = Logical.OR)
 	public PageResult edit(QuestionComment questionComment) {
 		try {
 			// 校验数据有效性
@@ -130,7 +127,6 @@ public class ApiQuestionCommentController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles(value={"admin","subAdmin","user"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			questionCommentService.delAndUpdate(id);

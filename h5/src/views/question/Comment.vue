@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-09-17 17:27:41
  * @LastEditors: Che
- * @LastEditTime: 2021-09-23 10:17:14
+ * @LastEditTime: 2021-09-28 18:18:57
 -->
 <template>
   <div class="container">
@@ -116,6 +116,7 @@ export default {
         questionTypeId: this.id,
         curPage: 1,
         pageSize: 100,
+        state: 1,
       })
       this.questionList = list
     },

@@ -4,8 +4,6 @@ import java.util.Date;
 
 import javax.annotation.Resource;
 
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -42,7 +40,6 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
@@ -62,7 +59,6 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult add(QuestionTypeOpen questionTypeOpen) {
 		try {
 			questionTypeOpenService.addAndUpdate(questionTypeOpen);
@@ -84,7 +80,6 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult edit(QuestionTypeOpen questionTypeOpen) {
 		try {
 			QuestionTypeOpen entity = questionTypeOpenService.getEntity(questionTypeOpen.getId());
@@ -119,7 +114,6 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			questionTypeOpenService.delAndUpdate(id);

@@ -13,8 +13,6 @@ import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.jxls.common.Context;
 import org.jxls.expression.JexlExpressionEvaluator;
 import org.jxls.transform.Transformer;
@@ -70,12 +68,15 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles(value={"admin","subAdmin","user"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
 			PageOut pageOut = userService.getListpage(new PageIn(request));
 			for (Map<String, Object> map : pageOut.getList()) {
-				map.put("roleNames", ((String) map.get("roles")).contains("subAdmin") ? "子管理员" : "用户");
+				if (map.get("roles") != null) {
+					map.put("roleNames", ((String) map.get("roles")).contains("subAdmin") ? "子管理员" : "用户");
+				}else{
+					map.put("roleNames", "用户");
+				}
 			}
 			
 			return PageResultEx.ok().data(pageOut);
@@ -95,7 +96,6 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult add(User user) {
 		try {
 			// 校验数据有效性
@@ -108,13 +108,10 @@ public class ApiUserController extends BaseController {
 			if (user.getOrgId() == null) {
 				throw new MyException("参数错误：orgId");
 			}
-			if (!ValidateUtil.isValid(user.getRoles())) {
-				throw new MyException("参数错误：roles");
-			}
 			
 			// 添加用户
 			Date date = new Date();
-			user.setRoles("subAdmin".equals(user.getRoles()) ? "user,subAdmin" : "user");
+			user.setRoles("subAdmin".equals(user.getRoles()) ? "subAdmin" : null );
 			user.setRegistTime(date);
 			user.setUpdateTime(date);
 			user.setUpdateUserId(getCurUser().getId());
@@ -146,7 +143,6 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult edit(User user) {
 		try {
 			// 校验数据有效性
@@ -155,9 +151,6 @@ public class ApiUserController extends BaseController {
 			}
 			if (userService.existLoginName(user)) {
 				throw new MyException("登录名称已存在");
-			}
-			if (!ValidateUtil.isValid(user.getRoles())) {
-				throw new MyException("参数错误：roles");
 			}
 			
 			// 修改用户
@@ -204,7 +197,6 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			User user = userService.getEntity(id);
@@ -235,7 +227,6 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/roleUpdate")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult roleUpdate(Integer id, String roles) {
 		try {
 			userService.roleUpdate(id, roles);
@@ -300,7 +291,6 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/initPwd")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult initPwd(Integer id) {
 		try {
 			String initPwd = "111111";//StringUtil.getRandomStr(8);
@@ -325,7 +315,6 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/input")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult input(@RequestParam("file") MultipartFile file) {
 		try {
 			userXlsxService.inputUserXlsx(file);
@@ -344,7 +333,6 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/export")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public void export(String ids) {
 		ServletOutputStream outputStream = null;
 		try {
@@ -387,7 +375,6 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/template")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public void template() {
 		OutputStream output = null;
 		try {
@@ -415,7 +402,6 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult get(Integer id) {
 		try {
 			User entity = userService.getEntity(id);
@@ -432,7 +418,7 @@ public class ApiUserController extends BaseController {
 					.addAttr("orgId", entity.getOrgId())
 					.addAttr("state", entity.getState())
 					.addAttr("orgName", org == null ? null : org.getName())
-					.addAttr("roles", entity.getRoles().contains("subAdmin") ? "subAdmin" : "user");
+					.addAttr("roles", entity.getRoles());
 		} catch (MyException e) {
 			log.error("获取用户错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -452,7 +438,6 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/onList")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult onList() {
 		try {
 			return PageResultEx.ok().data(userService.onList());
@@ -473,7 +458,6 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/exit")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult exit(Integer id) {
 		try {
 			TokenCache.del(id);
@@ -492,7 +476,6 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/syncUser")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult syncUser(String orgName, String orgCode, List<User> user) {
 		// org  [name, code]
 		// user [name, loginName, email, phone, pwd ]

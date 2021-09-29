@@ -2,8 +2,6 @@ package com.wcpdoc.exam.api.controller;
 
 import javax.annotation.Resource;
 
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -38,7 +36,6 @@ public class ApiSensitiveController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult edit(Sensitive sensitive) {
 		try {
 			sensitiveService.updateAndUpdate(sensitive);
@@ -60,7 +57,6 @@ public class ApiSensitiveController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult get(Integer id) {		
 		try {
 			Sensitive entity = sensitiveService.getEntity(1);
@@ -69,8 +65,8 @@ public class ApiSensitiveController extends BaseController {
 			}
 			return PageResultEx.ok()
 					.addAttr("id", entity.getId())
-					.addAttr("title", entity.getBlackList())
-					.addAttr("imgFileId", entity.getWhiteList());
+					.addAttr("blackList", entity.getBlackList())
+					.addAttr("whiteList", entity.getWhiteList());
 		} catch (MyException e) {
 			log.error("获取参数错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -87,9 +83,8 @@ public class ApiSensitiveController extends BaseController {
 	 * @return pageOut
 	 */
 	@RequestMapping("/replace")
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public void replace() {
-        String text = "利于上游行业发展的政策逐渐发布";
+        String text = "黑，黑黑，黑";
         System.out.println(sensitiveService.replace(text));
 	}
 }
