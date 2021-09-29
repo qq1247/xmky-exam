@@ -1,19 +1,21 @@
 package com.wcpdoc.exam.wordFilter.service.impl;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
 import com.startx.http.wordfilter.WordContext;
+import com.startx.http.wordfilter.WordFilter;
+import com.startx.http.wordfilter.WordType;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
-import com.wcpdoc.exam.core.util.SpringUtil;
 import com.wcpdoc.exam.wordFilter.dao.SensitiveDao;
 import com.wcpdoc.exam.wordFilter.entity.Sensitive;
 import com.wcpdoc.exam.wordFilter.service.SensitiveService;
-import com.wcpdoc.exam.wordFilter.util.SensitiveUtil;
 
 /**
  * 公告服务层实现
@@ -31,6 +33,18 @@ public class SensitiveServiceImpl extends BaseServiceImp<Sensitive> implements S
 		super.dao = dao;
 	}
 
+    /**
+     * 词库上下文环境
+     */
+    private final static WordContext context = new WordContext();
+    private final static WordFilter filter = new WordFilter(context);
+	
+
+	@Override
+	public void initialize() {
+		initialize(sensitiveDao.getEntity(1));
+	}
+    
 	@Override
 	public void updateAndUpdate(Sensitive sensitive) {
 		Sensitive entity;
@@ -49,13 +63,29 @@ public class SensitiveServiceImpl extends BaseServiceImp<Sensitive> implements S
 			entity.setUpdateUserId(getCurUser().getId());
 			sensitiveDao.update(entity);
 		}
-		
+		//初始化
+		initialize(sensitive);
+	}
+
+	private void initialize(Sensitive sensitive) {
 		// 初始化
-		SpringUtil.getBean(WordContext.class).initKeyWord(entity);
+		context.delWordMap();
+        Set<String> set = new HashSet<>();
+        String[] blackSplit = sensitive.getBlackList().split("\n");
+        for(String s : blackSplit){        	
+        	set.add(s);
+        }
+        context.addWord(set, WordType.BLACK);
+        set = new HashSet<>();
+        String[] whiteSplit = sensitive.getWhiteList().split("\n");
+        for(String s : whiteSplit){        	
+        	set.add(s);
+        }
+        context.addWord(set, WordType.WHITE);
 	}
 
 	@Override
 	public String replace(String content) {
-		return SensitiveUtil.replace(content);
+		return filter.replace(content);
 	}
 }
