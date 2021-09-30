@@ -137,11 +137,14 @@
         <el-form-item label="登录名称" label-width="120px" prop="loginName">
           <el-input
             placeholder="请输入登录名称"
-            v-model="editForm.loginName"
+            v-model.trim="editForm.loginName"
           ></el-input>
         </el-form-item>
         <el-form-item label="名称" label-width="120px" prop="name">
-          <el-input placeholder="请输入名称" v-model="editForm.name"></el-input>
+          <el-input
+            placeholder="请输入名称"
+            v-model.trim="editForm.name"
+          ></el-input>
         </el-form-item>
         <el-form-item label="子管理员" label-width="120px" prop="roles">
           <el-switch

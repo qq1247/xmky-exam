@@ -246,8 +246,8 @@
               <el-table-column label="结束时间" prop="endTime">
               </el-table-column>
               <el-table-column label="操作">
-                <template slot-scope="scope"
-                  ><el-button
+                <template slot-scope="scope">
+                  <el-button
                     @click.native.prevent="delHistory(scope.row.id)"
                     type="text"
                     size="small"
@@ -447,15 +447,6 @@ export default {
         rules: {
           openTime: [
             { required: true, message: '请选择开放时间', trigger: 'change' },
-          ],
-          openUser: [
-            { required: true, message: '请选择开放人员', trigger: 'change' },
-          ],
-          openOrg: [
-            { required: true, message: '请选择开放机构', trigger: 'change' },
-          ],
-          openReview: [
-            { required: true, message: '请选择评论方式', trigger: 'change' },
           ],
         },
       },
@@ -702,6 +693,7 @@ export default {
         questionTypeId: this.openForm.id,
         curPage: this.openForm.curPage,
         pageSize: this.openForm.pageSize,
+        list: '1',
       })
       this.openForm.openHistoryList = openHistoryList.data.list
       this.openForm.pageTotal = openHistoryList.data.total
@@ -713,8 +705,14 @@ export default {
     },
     // 作废开放记录
     async delHistory(id) {
-      const res = await questionTypeOpenDel({ id })
-      res?.code && ((this.openForm.curPage = 1), this.getOpenHistory())
+      this.$confirm('确定要删除？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }).then(async () => {
+        const res = await questionTypeOpenDel({ id })
+        res?.code && ((this.openForm.curPage = 1), this.getOpenHistory())
+      })
     },
     // 试题开放
     async open({ id }) {
@@ -749,23 +747,29 @@ export default {
     },
     // 添加开放记录
     async addOpen() {
-      const res = await questionTypeOpenAdd({
-        questionTypeId: this.openForm.id,
-        startTime: this.openForm.openTime[0],
-        endTime: this.openForm.openTime[1],
-        userIds: this.openForm.openUser.join(','),
-        orgIds: this.openForm.openOrg.join(','),
-        commentState: this.openForm.openReview,
-      })
+      this.$refs['openForm'].validate(async (valid) => {
+        if (!valid) {
+          return
+        }
 
-      if (res?.code === 200) {
-        this.openForm.tabActive = '0'
-        this.openForm.curPage = 1
-        this.resetData('openForm')
-        this.getOpenHistory()
-      } else {
-        this.$message(res.msg)
-      }
+        const res = await questionTypeOpenAdd({
+          questionTypeId: this.openForm.id,
+          startTime: this.openForm.openTime[0],
+          endTime: this.openForm.openTime[1],
+          userIds: this.openForm.openUser.join(','),
+          orgIds: this.openForm.openOrg.join(','),
+          commentState: this.openForm.openReview,
+        })
+
+        if (res?.code === 200) {
+          this.openForm.tabActive = '0'
+          this.openForm.curPage = 1
+          this.resetData('openForm')
+          this.getOpenHistory()
+        } else {
+          this.$message(res.msg)
+        }
+      })
     },
     // 选择阅卷方式
     selectReviewType(e) {

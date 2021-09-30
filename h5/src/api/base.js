@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-11 17:02:08
  * @LastEditors: Che
- * @LastEditTime: 2021-09-14 13:11:19
+ * @LastEditTime: 2021-09-28 10:04:59
  */
 
 import request from './request'
@@ -45,4 +45,5 @@ export const bulletinDel = (params) => request('bulletin/del', params)
 export const bulletinGet = (params) => request('bulletin/get', params)
 export const bulletinListPage = (params) => request('bulletin/listpage', params)
 
-export const onLine = (params) => request('myExam/onLine', params)
+export const sensitiveEdit = (params) => request('sensitive/edit', params)
+export const sensitiveGet = (params) => request('sensitive/get', params)

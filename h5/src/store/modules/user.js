@@ -5,10 +5,10 @@
  * @Author: Che
  * @Date: 2021-08-11 11:33:30
  * @LastEditors: Che
- * @LastEditTime: 2021-09-14 17:01:17
+ * @LastEditTime: 2021-09-28 17:50:45
  */
 import { login } from 'api/common'
-import { getInfo, setInfo, removeInfo } from '@/utils/storage'
+import { getInfo, setInfo, removeInfo, setOrg } from '@/utils/storage'
 import router, { resetRouter } from '@/router/index'
 
 const state = {
@@ -48,7 +48,7 @@ const actions = {
         .then((res) => {
           const { data } = res
           commit('SET_TOKEN', data.accessToken)
-          commit('SET_ROLES', data.roles)
+          commit('SET_ROLES', data.roles || ['user'])
           commit('SET_NAME', data.userName)
           commit('SET_USER_ID', data.userId)
           commit(
@@ -68,6 +68,7 @@ const actions = {
             { root: true }
           )
           setInfo(data)
+          setOrg({ orgLogo: data.orgLogo, orgName: data.orgName })
           resolve()
         })
         .catch((error) => {
@@ -87,22 +88,6 @@ const actions = {
       commit('SET_TOKEN', '')
       commit('SET_ROLES', [])
       commit('permission/SET_ROUTES', [], { root: true })
-      commit(
-        'setting/CHANGE_SETTING',
-        {
-          key: 'orgLogo',
-          value: null,
-        },
-        { root: true }
-      )
-      commit(
-        'setting/CHANGE_SETTING',
-        {
-          key: 'orgName',
-          value: '',
-        },
-        { root: true }
-      )
       removeInfo()
       resetRouter()
       resolve()

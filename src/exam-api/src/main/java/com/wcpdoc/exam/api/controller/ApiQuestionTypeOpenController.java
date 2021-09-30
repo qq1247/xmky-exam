@@ -4,8 +4,6 @@ import java.util.Date;
 
 import javax.annotation.Resource;
 
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -42,12 +40,31 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
 			pageIn.addAttr("curUserId", getCurUser().getId());
 			return PageResultEx.ok().data(questionTypeOpenService.getListpage(pageIn));
+		} catch (Exception e) {
+			log.error("试题分类开放列表错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 试题开放列表
+	 * 
+	 * v1.0 chenyun 2021-03-02 13:43:21
+	 * @return pageOut
+	 */
+	@RequestMapping("/questionListpage")
+	@ResponseBody
+	public PageResult questionListpage() {
+		try {
+			PageIn pageIn = new PageIn(request);
+			pageIn.addAttr("curUserId", getCurUser().getId())
+			.addAttr("open", "open");
+			return PageResultEx.ok().data(questionTypeOpenService.questionListpage(pageIn));
 		} catch (Exception e) {
 			log.error("试题分类开放列表错误：", e);
 			return PageResult.err();
@@ -62,7 +79,6 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult add(QuestionTypeOpen questionTypeOpen) {
 		try {
 			questionTypeOpenService.addAndUpdate(questionTypeOpen);
@@ -84,7 +100,6 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult edit(QuestionTypeOpen questionTypeOpen) {
 		try {
 			QuestionTypeOpen entity = questionTypeOpenService.getEntity(questionTypeOpen.getId());
@@ -119,7 +134,6 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles(value={"user","subAdmin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			questionTypeOpenService.delAndUpdate(id);
@@ -129,6 +143,28 @@ public class ApiQuestionTypeOpenController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成删除试题分类开放错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 获取试题
+	 * 拥有读写权限才显示答案字段
+	 * 
+	 * v1.0 zhanghc 2021年7月1日下午2:18:05
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/questionGet")
+	@ResponseBody
+	public PageResult questionGet(Integer questionId) {
+		try {
+			return questionTypeOpenService.get(questionId);
+		} catch (MyException e) {
+			log.error("获取试题错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		}  catch (Exception e) {
+			log.error("获取试题错误：", e);
 			return PageResult.err();
 		}
 	}

@@ -5,10 +5,10 @@
  * @Author: Che
  * @Date: 2021-08-12 10:25:32
  * @LastEditors: Che
- * @LastEditTime: 2021-08-12 10:28:53
+ * @LastEditTime: 2021-09-28 17:46:52
  */
-
-const title = '在线考试'
+import store from '@/store/index'
+const title = store.state.setting.orgName || '在线考试'
 
 /**
  * @name: getPageTitle

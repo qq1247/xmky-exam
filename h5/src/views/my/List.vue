@@ -194,58 +194,46 @@ export default {
         this.$message.warning('阅卷未开始，请等待...')
         return
       }
-
-      if (now > markEndTime) {
-        this.$router.push({
-          path: '/my/mark/index',
-          query: {
-            examId: data.examId,
-            paperId: data.paperId,
-            markId: data.id,
-            preview: true,
-          },
+      if (markStartTime < now && now < markEndTime && data.autoState !== 1) {
+        const res = await myExamAutoScore({
+          id: data.id,
+          examId: data.examId,
         })
-        return
-      }
-
-      if (markStartTime < now < markEndTime && data.autoState === 1) {
-        this.$router.push({
-          path: '/my/mark/index',
-          query: {
-            examId: data.examId,
-            paperId: data.paperId,
-            markId: data.id,
-            preview: false,
-          },
-        })
-        return
-      }
-
-      const res = await myExamAutoScore({
-        id: data.id,
-        examId: data.examId,
-      })
-      if (res?.code === 200) {
-        this.percentage = 1
-        const isAiEnd = await this.getProgress(res.data)
-        if (isAiEnd) {
-          this.$router.push({
-            path: '/my/mark/index',
-            query: {
-              examId: data.examId,
-              paperId: data.paperId,
-              markId: data.id,
-              preview: false,
-            },
-          })
-          this.$tools.delay().then(() => {
-            this.percentage = 0
-            this.markId = null
-          })
+        if (res?.code === 200) {
+          this.percentage = 1
+          const isAiEnd = await this.getProgress(res.data)
+          if (isAiEnd) {
+            this.$router.push({
+              path: '/my/mark/index',
+              query: {
+                markId: data.id,
+                examId: data.examId,
+                paperId: data.paperId,
+                markEndTime: markEndTime,
+                markStartTime: markStartTime,
+              },
+            })
+            this.$tools.delay().then(() => {
+              this.percentage = 0
+              this.markId = null
+            })
+            return
+          }
+        } else {
+          this.$message.error(res.msg || '智能阅卷失败！请重试！')
         }
-      } else {
-        this.$message.error(res.msg || '智能阅卷失败！请重试！')
       }
+
+      this.$router.push({
+        path: '/my/mark/index',
+        query: {
+          markId: data.id,
+          examId: data.examId,
+          paperId: data.paperId,
+          markEndTime: markEndTime,
+          markStartTime: markStartTime,
+        },
+      })
     },
     // 获取进度
     async getProgress(id) {

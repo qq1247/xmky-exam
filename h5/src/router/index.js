@@ -315,6 +315,18 @@ export const asyncRoutes = [
         path: 'param',
         name: 'BaseParam',
         component: () => import('../views/base/Param.vue'),
+        meta: {
+          title: '系统参数',
+        },
+        hidden: true,
+      },
+      {
+        path: 'sensitive',
+        name: 'BaseSensitive',
+        component: () => import('../views/base/Sensitive.vue'),
+        meta: {
+          title: '敏感词库',
+        },
         hidden: true,
       },
     ],

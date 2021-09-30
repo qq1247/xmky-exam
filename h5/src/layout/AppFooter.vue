@@ -5,11 +5,17 @@
  * @Author: Che
  * @Date: 2021-08-09 15:14:50
  * @LastEditors: Che
- * @LastEditTime: 2021-09-14 16:55:34
+ * @LastEditTime: 2021-09-26 11:17:39
 -->
 <template>
   <footer class="app-footer">
-    Copyright© 2018 All Rights Reserved 版权所有 <span>{{ orgName }}</span>
+    Copyright© 2021 All Rights Reserved
+    <span class="footer-info"
+      >版权所有&nbsp;{{ orgName }}&nbsp;<img
+        src="../assets/img/logo.png"
+        alt="logo"
+        class="footer-logo"
+    /></span>
   </footer>
 </template>
 
@@ -40,10 +46,22 @@ export default {
 // footer
 .app-footer {
   height: 50px;
-  line-height: 50px;
-  text-align: center;
   color: $white;
-  font-size: 12px;
+  font-size: 13px;
   background: $menuBg;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 calc((100% - 1200px) / 2 + 20px);
+  .footer-info {
+    display: flex;
+    align-items: center;
+  }
+  .footer-logo {
+    width: 20px;
+    height: 20px;
+    margin-left: 5px;
+  }
 }
 </style>

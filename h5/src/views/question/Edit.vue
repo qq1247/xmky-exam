@@ -261,6 +261,10 @@
               ></Editor>
             </el-form-item>
 
+            <div v-if="editForm.type === 3" class="cloze-tip">
+              tip：空位请用英文状态下连续五个的下划线（ _ ）来表示。
+            </div>
+
             <template v-if="editForm.type === 1 || editForm.type === 2">
               <el-form-item
                 :key="'option' + option.lab"
@@ -454,7 +458,7 @@
                     </el-form-item>
                   </el-col>
                 </el-row>
-                <el-button
+                <!-- <el-button
                   :disabled="editForm.answers.length >= 7"
                   @click="addFillBlanks()"
                   class="btn2"
@@ -468,7 +472,7 @@
                   class="btn2"
                   type="primary"
                   >-删除填空</el-button
-                >
+                > -->
               </el-card>
             </el-form-item>
             <el-form-item label="答案" prop="answer" v-if="editForm.type === 4">
@@ -729,7 +733,8 @@ export default {
             value: [],
             score: '',
           },
-        ], // 答案
+        ],
+        // 答案
         judgeAnswers: [
           {
             lab: '对',
@@ -962,8 +967,21 @@ export default {
         this.editForm.options[index].value = value
         return
       }
-
       this.editForm[id] = value
+      if (this.editForm.type === 3 && value.includes('_')) {
+        let underlineNum = value.match(/[_]{5,}/g)
+        if (underlineNum) {
+          this.editForm.answers = []
+          for (let index = 0; index < underlineNum.length; index++) {
+            const lab = String.fromCharCode(65 + index)
+            this.editForm.answers.push({
+              lab,
+              value: [],
+              score: '',
+            })
+          }
+        }
+      }
     },
     // 更新类型
     updateType(value) {
@@ -1134,14 +1152,17 @@ export default {
       }
 
       if ([3, 5].includes(this.editForm.type)) {
-        this.editForm.answers = [] // 重置答案列表
-        const answers = res.data.answers
-        for (let i = 0; i < answers.length; i++) {
-          this._addFillBlanks(i, answers[i])
-        }
-
-        this.editForm.scoreOptions =
-          res.data.scoreOptions == null ? [] : res.data.scoreOptions.split(',')
+        this.$nextTick(() => {
+          const answers = res.data.answers
+          this.editForm.answers = [] // 重置答案列表
+          for (let i = 0; i < answers.length; i++) {
+            this._addFillBlanks(i, answers[i])
+          }
+          this.editForm.scoreOptions =
+            res.data.scoreOptions == null
+              ? []
+              : res.data.scoreOptions.split(',')
+        })
       }
 
       if (res.data.ai == 1 && res.data.type === 5) {
@@ -1502,6 +1523,13 @@ export default {
   }
 }
 
+.cloze-tip {
+  color: #f84040;
+  padding-left: 80px;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
 .el-input /deep/.el-input-group__prepend,
 .el-input /deep/.el-input-group__append {
   background-color: #fff;
@@ -1533,7 +1561,7 @@ export default {
 }
 
 /deep/.el-select__tags .el-tag {
-  width: 100%;
+  width: fit-content;
   height: auto;
 }
 /deep/.el-select__tags-text {

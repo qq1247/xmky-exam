@@ -45,7 +45,10 @@ public class OnLineCache extends BaseEhCache{
 	public static Long getOnLineTime(Integer id) {
 		Cache cache = getCache(CACHE_NAME);
 		Map map = cache.get(id, Map.class);
+		if (map == null) {
+			return Long.parseLong("0");
+		}
 		log.debug("获取在线缓存：{}-{}", id, Long.getLong(map.get("time").toString()));
-		return Long.getLong(map.get("time").toString());
+		return Long.parseLong(map.get("time").toString());
 	}
 }

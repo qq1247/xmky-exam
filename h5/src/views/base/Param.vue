@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-09-08 13:33:12
  * @LastEditors: Che
- * @LastEditTime: 2021-09-14 18:21:33
+ * @LastEditTime: 2021-09-28 17:33:57
 -->
 <template>
   <div class="container">
@@ -35,7 +35,7 @@
 <script>
 import Upload from 'components/Upload'
 import { parmGet, parmEditLogo } from 'api/base'
-import { getInfo, setInfo } from '@/utils/storage'
+import { getOrg, setOrg } from '@/utils/storage'
 export default {
   components: {
     Upload,
@@ -74,10 +74,10 @@ export default {
           value: res.data.orgName,
         })
 
-        let loginInfo = getInfo()
+        let loginInfo = getOrg()
         loginInfo.orgLogo = res.data.orgLogo
         loginInfo.orgName = res.data.orgName
-        setInfo(loginInfo)
+        setOrg(loginInfo)
       }
     },
     // 设置

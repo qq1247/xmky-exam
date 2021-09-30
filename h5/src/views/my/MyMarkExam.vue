@@ -69,20 +69,15 @@
                 <!-- 多选 -->
                 <template v-if="child.type === 2">
                   <el-checkbox-group
-                    @change="
-                      (val) => {
-                        updateAnswer(child.id, val)
-                      }
-                    "
                     class="children-option"
-                    v-if="myExamDetailCache[child.id]"
-                    v-model="myExamDetailCache[child.id].answers"
+                    v-if="child.examAnswers"
+                    v-model="child.examAnswers"
                   >
                     <el-checkbox
+                      disabled
                       :key="index"
-                      :label="String.fromCharCode(65 + index)"
                       class="option-item"
-                      :disabled="preview === 'true' ? true : false"
+                      :label="String.fromCharCode(65 + index)"
                       v-for="(option, index) in child.options"
                     >
                       <div
@@ -218,7 +213,7 @@
                     <el-col :span="21">
                       <span
                         style="margin-right: 15px"
-                        v-if="preview === 'true' || child.isEdit"
+                        v-if="preview === true || child.isEdit"
                         >{{ child.scorePlate || 0 }}</span
                       >
                       <el-tooltip
@@ -231,12 +226,12 @@
                           size="mini"
                           type="primary"
                           icon="el-icon-edit"
-                          v-if="preview === 'false' && child.isEdit"
+                          v-if="preview === false && child.isEdit"
                           @click="showScorePlate(index, indexc)"
                         ></el-button>
                       </el-tooltip>
                       <ScorePlate
-                        v-if="!child.isEdit && preview === 'false'"
+                        v-if="!child.isEdit && preview === false"
                         :key="child.id"
                         :data="child"
                         @input="scoreInput($event, index, indexc)"
@@ -307,27 +302,34 @@ export default {
       paperId: null,
       examId: null,
       markId: null,
-      examUserIds: null,
+      examUserIds: [],
       pageSize: 10,
       curPage: 1,
       pageTotal: 0,
       collapseShow: 0,
       paperList: [],
       paperQuestion: [],
-      myExamDetailCache: {},
       selectOption: '',
       paper: {},
       answerList: [],
       userId: null,
       preview: false,
+      markStartTime: 0,
+      markEndTime: 0,
     }
   },
   created() {
-    const { examId, paperId, markId, preview } = this.$route.query
+    const { examId, paperId, markId, markStartTime, markEndTime } =
+      this.$route.query
     this.examId = examId
     this.paperId = paperId
     this.markId = markId
-    this.preview = preview
+    this.markStartTime = Number(markStartTime)
+    this.markEndTime = Number(markEndTime)
+    const now = new Date().getTime()
+    this.markStartTime < now && now < this.markEndTime && (this.preview = false)
+    ;(this.markStartTime > now || now > this.markEndTime) &&
+      (this.preview = true)
     this.init()
   },
   methods: {
@@ -368,7 +370,7 @@ export default {
     async queryExamineeInfo() {
       const infos = await myMarksListPage({
         curPage: this.curPage,
-        pageSize: this.pageSize,
+        pageSize: 100,
         examId: Number(this.examId),
       })
 
@@ -416,7 +418,7 @@ export default {
           })
         })
 
-        if (this.preview === 'false') {
+        if (this.preview === false) {
           this.$nextTick(() => {
             this.toHref()
           })
@@ -431,6 +433,12 @@ export default {
     },
     // 设置分数
     async setScore(e, idx, idxc) {
+      const now = new Date().getTime()
+      if (this.markStartTime > now || now > this.markEndTime) {
+        this.preview = true
+        this.$message.warning('阅卷已结束')
+        return false
+      }
       const source = this.paperQuestion[idx].questionList[idxc]
       this.$set(source, 'scorePlate', e)
       if (e < 0) this.$set(source, 'scorePlate', 0)
@@ -457,7 +465,7 @@ export default {
         score: source.scorePlate || 0,
       })
       res?.code === 200
-        ? (this.$message.success('打分成功！'), this.queryExamineeInfo())
+        ? this.queryExamineeInfo()
         : this.$message.error(res.msg || '打分失败！')
     },
     // 上下题定位

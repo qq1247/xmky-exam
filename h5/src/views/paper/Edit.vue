@@ -37,7 +37,7 @@
                 v-model.trim="chapterForm.name"
               ></el-input>
             </el-form-item>
-            <el-form-item label="描述">
+            <el-form-item label="描述" prop="description">
               <el-input
                 placeholder="请输入描述"
                 v-model="chapterForm.description"
@@ -523,7 +523,7 @@
               v-for="(answer, index) in settingForm.answers"
               :key="index"
               :label="
-                settingForm.type === 3 ? `填空${index}` : `关键词${index}`
+                settingForm.type === 3 ? `填空${index+1}` : `关键词${index+1}`
               "
               :prop="`answers.${index}.score`"
               :rules="settingForm.rules.aiScore"
@@ -1048,7 +1048,6 @@ export default {
         const sourceQuestion = this.filterQuestion(toChapterId)
         sourceId = sourceQuestion[newIndex].paperQuestionId
         targetId = toChapterId
-        console.log('跨：', sourceId, targetId)
       }
 
       const res = await paperMovePosition({

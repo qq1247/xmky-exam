@@ -5,16 +5,16 @@
  * @Author: Che
  * @Date: 2021-08-17 17:50:31
  * @LastEditors: Che
- * @LastEditTime: 2021-09-14 18:18:01
+ * @LastEditTime: 2021-09-28 17:27:04
  */
-import { getInfo } from '@/utils/storage'
+import { getOrg } from '@/utils/storage'
 
 const state = {
   hideHeader: false,
   hideFooter: false,
   lineTime: 0,
-  orgLogo: getInfo().orgLogo,
-  orgName: getInfo().orgName,
+  orgLogo: getOrg().orgLogo,
+  orgName: getOrg().orgName,
 }
 
 const mutations = {

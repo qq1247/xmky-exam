@@ -4,8 +4,6 @@ import java.util.Date;
 
 import javax.annotation.Resource;
 
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -40,7 +38,6 @@ public class ApiParmController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
 			return PageResultEx.ok().data(parmService.getListpage(new PageIn(request)));
@@ -58,7 +55,6 @@ public class ApiParmController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult add(Parm email) {
 		try {
 			email.setUpdateTime(new Date());
@@ -83,7 +79,6 @@ public class ApiParmController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult edit(Parm parm) {
 		try {
 			Parm entity = parmService.getEntity(parm.getId());
@@ -113,7 +108,6 @@ public class ApiParmController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult get() {
 		try {
 			Parm entity = parmService.get();
@@ -148,7 +142,6 @@ public class ApiParmController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			parmService.del(id);
@@ -170,7 +163,6 @@ public class ApiParmController extends BaseController {
 	 */
 	@RequestMapping("/editLogo")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult editLogo(Parm parm) {
 		try {
 			if(parm.getId() == null){

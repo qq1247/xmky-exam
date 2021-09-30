@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-07-27 17:31:01
  * @LastEditors: Che
- * @LastEditTime: 2021-09-14 17:47:31
+ * @LastEditTime: 2021-09-29 14:34:46
  */
 const resetData = (el, name) => {
   const $data = el.$data[name]
@@ -30,4 +30,19 @@ const getQueryParam = (url, name) => {
   return null
 }
 
-export { resetData, delay, getQueryParam }
+const formateTime = (time) => {
+  const SECOND = 1000
+  const MINUTE = 60 * SECOND
+  const HOUR = 60 * MINUTE
+  const hours = Math.floor(time / HOUR)
+  const minutes = Math.floor((time % HOUR) / MINUTE)
+  const seconds = Math.floor((time % MINUTE) / SECOND)
+
+  return {
+    hours,
+    minutes,
+    seconds,
+  }
+}
+
+export { resetData, delay, getQueryParam, formateTime }

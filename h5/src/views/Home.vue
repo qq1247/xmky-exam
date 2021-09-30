@@ -100,9 +100,9 @@
                     </div>
                     <el-row class="body-item">
                       <span class="start-time">{{ item.examStartTime }}</span
-                      >({{
+                      >（{{
                         computeMinute(item.examStartTime, item.examEndTime)
-                      }}分钟)
+                      }}）
                     </el-row>
                     <el-row class="body-item">
                       <el-col :span="12">
@@ -152,9 +152,9 @@
                     </div>
                     <el-row class="body-item">
                       <span class="start-time">{{ item.markStartTime }}</span
-                      >({{
+                      >（{{
                         computeMinute(item.markStartTime, item.markEndTime)
-                      }}分钟)
+                      }}）
                     </el-row>
                     <el-row class="body-item">
                       <el-col :span="12">
@@ -250,9 +250,10 @@ export default {
   methods: {
     // 计算分钟数
     computeMinute(startTime, endTime) {
-      const timeDiff =
+      const diffTime =
         new Date(endTime).getTime() - new Date(startTime).getTime()
-      return Math.ceil(timeDiff / (1000 * 60 * 60))
+      const { hours, minutes, seconds } = this.$tools.formateTime(diffTime)
+      return `${hours}'${minutes}''${seconds}'''`
     },
     // 初始化
     init() {
@@ -306,17 +307,19 @@ export default {
         state: 2,
       })
 
-      this.carouselList = list
+      if (list.length) {
+        this.carouselList = list
 
-      this.$nextTick(async () => {
-        for (let index = 0; index < this.carouselList.length; index++) {
-          const { colorHex, colorReverse } = await getMainColor(
-            `/api/file/download?id=${this.carouselList[index].imgFileId}`
-          )
-          this.$set(this.carouselList[index], 'bgColor', colorHex)
-          this.$set(this.carouselList[index], 'textColor', colorReverse)
-        }
-      })
+        this.$nextTick(async () => {
+          for (let index = 0; index < this.carouselList.length; index++) {
+            const { colorHex, colorReverse } = await getMainColor(
+              `/api/file/download?id=${this.carouselList[index].imgFileId}`
+            )
+            this.$set(this.carouselList[index], 'bgColor', colorHex)
+            this.$set(this.carouselList[index], 'textColor', colorReverse)
+          }
+        })
+      }
     },
     // 获取选择月份的时间
     selectDate(time) {
@@ -358,7 +361,7 @@ export default {
         acc[examTime]['exam'].push({
           startTime: exam.examStartTime,
           endTime: exam.examEndTime,
-          state: exam.stateName,
+          state: this.setState(exam.examStartTime, exam.examEndTime, 'exam'),
         })
         return acc
       }, {})
@@ -375,25 +378,41 @@ export default {
         }
 
         acc[markTime]['mark'].push({
-          startTime: mark.examStartTime,
-          endTime: mark.examEndTime,
-          state: mark.stateName,
+          startTime: mark.markStartTime,
+          endTime: mark.markEndTime,
+          state: this.setState(mark.markStartTime, mark.markEndTime, 'mark'),
         })
         return acc
       }, examPopovers)
 
       this.timePopovers = timePopovers
     },
+    // 设置时间状态
+    setState(start, end, type) {
+      const startTime = new Date(start).getTime()
+      const endTime = new Date(end).getTime()
+      const now = new Date().getTime()
+
+      let state
+      startTime < now &&
+        endTime > now &&
+        (state = type === 'exam' ? '考试中' : '阅卷中')
+      startTime > now && (state = type == 'exam' ? '待考试' : '待阅卷')
+      endTime < now && (state = type == 'exam' ? '已考试' : '已阅卷')
+
+      return state
+    },
     // 获取开放题库
     async getQuestionTypeOpenList() {
       const res = await questionTypeOpenListPage({
+        state: 1,
         pageSize: 10,
         curPage: 1,
       })
       res?.code === 200 && (this.questionTypeOpenList = res.data.list)
     },
     // 查看试题和评论
-    goDetail({ questionTypeId, startTime, endTime }) {
+    goDetail({ questionTypeId, startTime, endTime, commentState }) {
       const $_startTime = new Date(startTime).getTime()
       const $_endTime = new Date(endTime).getTime()
       const now = new Date().getTime()
@@ -405,6 +424,7 @@ export default {
         path: '/question/comment',
         query: {
           id: questionTypeId,
+          commentState,
         },
       })
     },

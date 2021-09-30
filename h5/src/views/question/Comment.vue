@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-09-17 17:27:41
  * @LastEditors: Che
- * @LastEditTime: 2021-09-23 10:17:14
+ * @LastEditTime: 2021-09-29 17:08:59
 -->
 <template>
   <div class="container">
@@ -18,6 +18,7 @@
           :difficulty="difficultyList"
         ></QuestionDetail
         ><CommentText
+          v-if="commentState === 2"
           @comment="commentReply"
           :key="questionList[currentIndex].id"
         ></CommentText>
@@ -43,21 +44,22 @@
       <div class="question-comments">
         <QuestionComment
           :list="commentList"
+          v-if="commentList.length && commentState !== 0"
+          :commentState="commentState"
           @showMore="showMore"
           @childrenComment="commentReply"
           @getChildrenComment="getChildrenComment"
-          v-if="commentList.length"
         ></QuestionComment
         ><el-empty v-else description="暂无评论"></el-empty></div></template
-    ><el-empty v-else description="暂无试卷"></el-empty>
+    ><el-empty v-else description="暂无试题"></el-empty>
   </div>
 </template>
 
 <script>
 import { dictListPage } from 'api/base'
 import {
-  questionGet,
-  questionListPage,
+  questionTypeOpenQuestionGet,
+  questionTypeOpenQuestion,
   questionCommentAdd,
   questionCommentListPage,
 } from 'api/question'
@@ -77,6 +79,7 @@ export default {
       pageSize: 10,
       totalPage: 0,
       typeList: [],
+      commentState: 0,
       currentIndex: 0,
       questionList: [],
       questionDetail: {},
@@ -85,8 +88,9 @@ export default {
     }
   },
   mounted() {
-    const { id } = this.$route.query
+    const { id, commentState } = this.$route.query
     this.id = id
+    this.commentState = Number(commentState)
     this.init()
   },
   methods: {
@@ -105,23 +109,26 @@ export default {
 
       this.query().then((res) => {
         this.showDetails(this.questionList[this.currentIndex].id)
-        this.getQuestionComment()
+        if (this.commentState !== 0) {
+          this.getQuestionComment()
+        }
       })
     },
     // 获取试题列表
     async query() {
       const {
         data: { list },
-      } = await questionListPage({
+      } = await questionTypeOpenQuestion({
         questionTypeId: this.id,
         curPage: 1,
         pageSize: 100,
+        state: 1,
       })
       this.questionList = list
     },
     // 获取试题详情
     async showDetails(id) {
-      const res = await questionGet({ id })
+      const res = await questionTypeOpenQuestionGet({ questionId: id })
       if (res?.code != 200) {
         this.$message.error('获取详情失败！请重试')
         this.questionDetail = {}
@@ -204,7 +211,7 @@ export default {
     },
     // 评论回复
     async commentReply(text, anonymity, id) {
-      if (!text) {
+      if (!text.trim()) {
         this.$message.warning('请填写评论内容！')
         return
       }

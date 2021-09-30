@@ -2,14 +2,8 @@ package com.startx.http.wordfilter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import com.wcpdoc.exam.core.util.SpringUtil;
-import com.wcpdoc.exam.wordFilter.entity.Sensitive;
-import com.wcpdoc.exam.wordFilter.service.SensitiveService;
 
 /**
  * 词库上下文环境
@@ -26,11 +20,6 @@ public class WordContext {
      * 敏感词字典
      */
     private final Map wordMap = new HashMap(1024);
-
-    /**
-     * 是否已初始化
-     */
-    private boolean init;
     
     /**
      * 获取初始化的敏感词列表
@@ -38,25 +27,16 @@ public class WordContext {
      * @return 敏感词列表
      */
     public Map getWordMap() {
-    	if (!init) {
-    		initKeyWord(SpringUtil.getBean(SensitiveService.class).getEntity(1));
-		}
         return wordMap;
     }
-
+    
     /**
-     * 初始化
+     * 获取初始化的敏感词列表
+     *
+     * @return 敏感词列表
      */
-    public synchronized void initKeyWord(Sensitive sensitive) {
-        try {
-            // 将敏感词库加入到HashMap中
-            addWord(readWordFile(sensitive.getBlackList()), WordType.BLACK);
-            // 将非敏感词库也加入到HashMap中
-            addWord(readWordFile(sensitive.getWhiteList()), WordType.WHITE);
-            init = true;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public void delWordMap() {
+        wordMap.clear();
     }
 
     /**
@@ -159,17 +139,5 @@ public class WordContext {
                 }
             }
         }
-    }
-
-    /**
-     * 读取敏感词库中的内容，将内容添加到set集合中
-     */
-    private Set<String> readWordFile(String txt) throws Exception {
-        Set<String> set = new HashSet<>();
-        String[] split = txt.split("\n");
-        for(String s : split){        	
-        	set.add(s);
-        }
-        return set;
     }
 }
