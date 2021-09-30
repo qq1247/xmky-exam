@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-09 17:59:09
  * @LastEditors: Che
- * @LastEditTime: 2021-08-19 16:23:40
+ * @LastEditTime: 2021-09-30 11:29:36
 -->
 <template>
   <div class="header-userInfo">
@@ -28,22 +28,25 @@
       ><i class="common common-login-out"></i>登录</router-link
     >
     <el-dialog
-      width="40%"
       :visible.sync="editForm.show"
       title="修改密码"
+      :show-close="false"
+      width="50%"
+      :close-on-click-modal="false"
+      @close="resetData('editForm')"
       append-to-body
     >
       <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
-        <el-form-item label="旧密码" label-width="80px">
+        <el-form-item label="旧密码" label-width="80px" prop="oldPwd">
           <el-input
             placeholder="请输入旧密码"
-            v-model="editForm.oldPwd"
+            v-model.trim="editForm.oldPwd"
           ></el-input>
         </el-form-item>
-        <el-form-item label="新密码" label-width="80px">
+        <el-form-item label="新密码" label-width="80px" prop="newPwd">
           <el-input
             placeholder="请输入新密码"
-            v-model="editForm.newPwd"
+            v-model.trim="editForm.newPwd"
           ></el-input>
         </el-form-item>
       </el-form>
@@ -64,6 +67,16 @@ export default {
     return {
       editForm: {
         show: false,
+        oldPwd: '',
+        newPwd: '',
+        rules: {
+          oldPwd: [
+            { required: true, message: '请填写旧密码', trigger: 'blur' },
+          ],
+          newPwd: [
+            { required: true, message: '请填写新密码', trigger: 'blur' },
+          ],
+        },
       },
     }
   },
@@ -84,20 +97,26 @@ export default {
       }
     },
     async pwdUpdate() {
-      const res = await loginPwdUpdate({
-        oldPwd: this.editForm.oldPwd,
-        newPwd: this.editForm.newPwd,
+      this.$refs['editForm'].validate(async (valid) => {
+        if (!valid) {
+          return
+        }
+        const res = await loginPwdUpdate({
+          oldPwd: this.editForm.oldPwd,
+          newPwd: this.editForm.newPwd,
+        })
+
+        if (res.code != 200) {
+          this.$message.warning(res.msg)
+          return
+        }
+
+        this.editForm.show = false
       })
-
-      if (res.code != 200) {
-        this.$message.warning(res.msg)
-        return
-      }
-
-      // this.$refs['editForm'].resetFields()
-      this.editForm.oldPwd = null
-      this.editForm.newPwd = null
-      this.editForm.show = false
+    },
+    // 清空还原数据
+    resetData(name) {
+      this.$refs[name].resetFields()
     },
   },
 }
