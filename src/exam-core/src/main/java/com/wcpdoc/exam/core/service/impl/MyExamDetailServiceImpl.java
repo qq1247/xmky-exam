@@ -354,11 +354,11 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			return;
 		}
 
-		if (bdbf(questionAnswer)) {// 如果勾选了漏选的分，则漏选的分
-			if (trueNum > 0) {
-				//userAnswer.setScore(BigDecimalUtil.newInstance(questionAnswer.getScore()).div(2, 2).getResult());
-				userAnswer.setScore(scoreSum);
-			}
+		//if (bdbf(questionAnswer)) {// 如果勾选了漏选的分，则漏选的分
+		//}
+		if (trueNum > 0) {
+			//userAnswer.setScore(BigDecimalUtil.newInstance(questionAnswer.getScore()).div(2, 2).getResult());
+			userAnswer.setScore(scoreSum);
 		}
 	}
 
