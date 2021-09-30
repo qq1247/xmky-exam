@@ -12,7 +12,9 @@ import com.startx.http.wordfilter.WordContext;
 import com.startx.http.wordfilter.WordFilter;
 import com.startx.http.wordfilter.WordType;
 import com.wcpdoc.exam.core.dao.BaseDao;
+import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.wordFilter.dao.SensitiveDao;
 import com.wcpdoc.exam.wordFilter.entity.Sensitive;
 import com.wcpdoc.exam.wordFilter.service.SensitiveService;
@@ -50,6 +52,13 @@ public class SensitiveServiceImpl extends BaseServiceImp<Sensitive> implements S
     
 	@Override
 	public void updateAndUpdate(Sensitive sensitive) {
+		if (!ValidateUtil.isValid(sensitive.getBlackList())) {
+			throw new MyException("参数错误: blackList");
+		}
+		if (!ValidateUtil.isValid(sensitive.getWhiteList())) {
+			throw new MyException("参数错误: whiteList");
+		}
+		
 		Sensitive entity;
 		if (sensitive.getId() == null) { //添加
 			entity = new Sensitive();
