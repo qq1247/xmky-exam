@@ -448,15 +448,6 @@ export default {
           openTime: [
             { required: true, message: '请选择开放时间', trigger: 'change' },
           ],
-          openUser: [
-            { required: true, message: '请选择开放人员', trigger: 'change' },
-          ],
-          openOrg: [
-            { required: true, message: '请选择开放机构', trigger: 'change' },
-          ],
-          openReview: [
-            { required: true, message: '请选择评论方式', trigger: 'change' },
-          ],
         },
       },
       typeList: [],
