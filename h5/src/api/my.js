@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-11 17:06:11
  * @LastEditors: Che
- * @LastEditTime: 2021-08-11 22:52:28
+ * @LastEditTime: 2021-09-28 10:12:41
  */
 import request from './request'
 export const myExamListPage = (params) => request('myExam/listpage', params)
@@ -25,3 +25,4 @@ export const myExamAutoScore = (params) => request('myMark/autoScore', params)
 export const myExamAiProgress = (params) => request('progressBar/get', params)
 export const myMarksListPage = (params) =>
   request('myMark/markListpage', params)
+export const myExamOnLine = (params) => request('myExam/onLine', params)
