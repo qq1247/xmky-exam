@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-09-16 09:46:16
  * @LastEditors: Che
- * @LastEditTime: 2021-09-16 13:52:02
+ * @LastEditTime: 2021-09-30 09:50:45
 -->
 
 <template>
@@ -37,11 +37,7 @@
             <!-- 单选 -->
             <template v-if="child.type === 1">
               <el-radio-group
-                @change="
-                  (val) => {
-                    updateAnswer(child.id, val)
-                  }
-                "
+                @change="updateAnswer(child.id)"
                 class="children-option"
                 v-if="myExamDetailCache[child.id]"
                 v-model="myExamDetailCache[child.id].answers[0]"
@@ -64,11 +60,7 @@
             <!-- 多选 -->
             <template v-if="child.type === 2">
               <el-checkbox-group
-                @change="
-                  (val) => {
-                    updateAnswer(child.id, val)
-                  }
-                "
+                @change="updateAnswer(child.id)"
                 class="children-option"
                 v-if="myExamDetailCache[child.id]"
                 v-model="myExamDetailCache[child.id].answers"
@@ -92,11 +84,7 @@
             <template v-if="child.type === 3 && myExamDetailCache[child.id]">
               <el-input
                 class="question-text"
-                @change="
-                  (val) => {
-                    updateClozeAnswer(child.id, val, child.answers, index)
-                  }
-                "
+                @change="updateAnswer(child.id)"
                 placeholder="请输入内容"
                 :key="index"
                 :disabled="preview === 'true' ? true : false"
@@ -110,11 +98,7 @@
             <!-- 判断 -->
             <template v-if="child.type === 4">
               <el-radio-group
-                @change="
-                  (val) => {
-                    updateAnswer(child.id, val)
-                  }
-                "
+                @change="updateAnswer(child.id)"
                 class="children-option"
                 v-if="myExamDetailCache[child.id]"
                 v-model="myExamDetailCache[child.id].answers[0]"
@@ -135,11 +119,7 @@
               <el-input
                 :rows="2"
                 class="question-text"
-                @change="
-                  (val) => {
-                    updateAnswer(child.id, val)
-                  }
-                "
+                @change="updateAnswer(child.id)"
                 placeholder="请输入内容"
                 type="textarea"
                 v-if="myExamDetailCache[child.id]"
@@ -175,11 +155,8 @@ export default {
     return {}
   },
   methods: {
-    updateAnswer(childId, value) {
-      this.$emit('updateAnswer', childId, value)
-    },
-    updateClozeAnswer(childId, value, childAnswers, index) {
-      this.$emit('updateClozeAnswer', childId, value, childAnswers, index)
+    updateAnswer(childId) {
+      this.$emit('updateAnswer', childId)
     },
   },
 }

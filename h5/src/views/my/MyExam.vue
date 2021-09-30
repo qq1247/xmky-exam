@@ -26,7 +26,6 @@
           :paperQuestion="paperQuestion"
           @updateAnswer="updateAnswer"
           :myExamDetailCache="myExamDetailCache"
-          @updateClozeAnswer="updateClozeAnswer"
         ></page-show>
 
         <question-show
@@ -36,7 +35,6 @@
           :paperQuestion="paperQuestion"
           :myExamDetailCache="myExamDetailCache"
           @updateAnswer="updateAnswer"
-          @updateClozeAnswer="updateClozeAnswer"
           @prevQuestion="prevQuestion"
           @nextQuestion="nextQuestion"
         ></question-show>
@@ -188,7 +186,14 @@ export default {
             item.questionList.map((question, indexq) => {
               const submit = res.data.some((answer) => {
                 if (answer.questionId === question.id) {
-                  return answer.answers.length
+                  const list = answer.answers
+                  let status
+                  if (list.length) {
+                    status = list.some((item) => item.trim())
+                  } else {
+                    status = false
+                  }
+                  return status
                 }
               })
               this.$set(
@@ -202,7 +207,14 @@ export default {
           this.paperQuestion.map((item, index) => {
             const submit = res.data.some((answer) => {
               if (answer.questionId === item.id) {
-                return answer.answers.length
+                const list = answer.answers
+                let status
+                if (list.length) {
+                  status = list.some((item) => item.trim())
+                } else {
+                  status = false
+                }
+                return status
               }
             })
             this.$set(this.paperQuestion[index], 'submit', submit)
@@ -225,71 +237,40 @@ export default {
 
       const res = await myExamUpdateAnswer({
         myExamDetailId: this.myExamDetailCache[questionId].myExamDetailId,
-        answers: answers,
-      })
-
-      if (res.code === 200) {
-        if (this.showType === '1') {
-          this.paperQuestion.map((item, indexi) => {
-            item.questionList.some((question, indexq) => {
-              if (question.id === questionId) {
-                this.$set(
-                  this.paperQuestion[indexi].questionList[indexq],
-                  'submit',
-                  true
-                )
-                return true
-              }
-            })
-          })
-        } else {
-          this.paperQuestion.some((item, index) => {
-            if (item.id === questionId) {
-              this.$set(this.paperQuestion[index], 'submit', true)
-              return true
-            }
-          })
-        }
-      }
-    },
-    // 更新填空答案
-    updateClozeAnswer(questionId, val, answers, index) {
-      console.log(answers)
-      if (this.preview === 'true') {
-        return
-      }
-      if (!this.myExamDetailCache[questionId]) {
-        this.$message.error('提交答案失败，请联系管理员！')
-        return
-      }
-
-      const res = myExamUpdateAnswer({
-        myExamDetailId: this.myExamDetailCache[questionId].myExamDetailId,
         answers: this.myExamDetailCache[questionId].answers,
       })
 
-      if (res.code === 200) {
-        if (this.showType === '1') {
-          this.paperQuestion.map((item, indexi) => {
-            item.questionList.some((question, indexq) => {
-              if (question.id === questionId) {
-                this.$set(
-                  this.paperQuestion[indexi].questionList[indexq],
-                  'submit',
-                  true
-                )
-                return true
-              }
-            })
-          })
-        } else {
-          this.paperQuestion.some((item, index) => {
-            if (item.id === questionId) {
-              this.$set(this.paperQuestion[index], 'submit', true)
+      res?.code === 200 && this.isEmpty(questionId)
+    },
+    // 标记是否作答
+    isEmpty(questionId) {
+      const list = this.myExamDetailCache[questionId].answers
+      let status
+      if (list.length) {
+        status = list.some((item) => item.trim())
+      } else {
+        status = false
+      }
+      if (this.showType === '1') {
+        this.paperQuestion.map((item, indexi) => {
+          item.questionList.some((question, indexq) => {
+            if (question.id === questionId) {
+              this.$set(
+                this.paperQuestion[indexi].questionList[indexq],
+                'submit',
+                status
+              )
               return true
             }
           })
-        }
+        })
+      } else {
+        this.paperQuestion.some((item, index) => {
+          if (item.id === questionId) {
+            this.$set(this.paperQuestion[index], 'submit', status)
+            return true
+          }
+        })
       }
     },
     // 考试结束

@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-09-16 09:46:28
  * @LastEditors: Che
- * @LastEditTime: 2021-09-16 14:40:07
+ * @LastEditTime: 2021-09-30 09:49:54
 -->
 <template>
   <div class="content-center">
@@ -19,11 +19,7 @@
         <!-- 单选 -->
         <template v-if="paperQuestion[routerIndex].type === 1">
           <el-radio-group
-            @change="
-              (val) => {
-                updateAnswer(paperQuestion[routerIndex].id, val)
-              }
-            "
+            @change="updateAnswer(paperQuestion[routerIndex].id)"
             class="children-option"
             v-if="myExamDetailCache[paperQuestion[routerIndex].id]"
             v-model="
@@ -48,11 +44,7 @@
         <!-- 多选 -->
         <template v-if="paperQuestion[routerIndex].type === 2">
           <el-checkbox-group
-            @change="
-              (val) => {
-                updateAnswer(paperQuestion[routerIndex].id, val)
-              }
-            "
+            @change="updateAnswer(paperQuestion[routerIndex].id)"
             class="children-option"
             v-if="myExamDetailCache[paperQuestion[routerIndex].id]"
             v-model="myExamDetailCache[paperQuestion[routerIndex].id].answers"
@@ -81,16 +73,7 @@
         >
           <el-input
             class="question-text"
-            @change="
-              (val) => {
-                updateClozeAnswer(
-                  paperQuestion[routerIndex].id,
-                  val,
-                  paperQuestion[routerIndex].answers,
-                  index
-                )
-              }
-            "
+            @change="updateAnswer(paperQuestion[routerIndex].id)"
             placeholder="请输入内容"
             :key="index"
             :disabled="preview === 'true' ? true : false"
@@ -108,11 +91,7 @@
         <!-- 判断 -->
         <template v-if="paperQuestion[routerIndex].type === 4">
           <el-radio-group
-            @change="
-              (val) => {
-                updateAnswer(paperQuestion[routerIndex].id, val)
-              }
-            "
+            @change="updateAnswer(paperQuestion[routerIndex].id)"
             class="children-option"
             v-if="myExamDetailCache[paperQuestion[routerIndex].id]"
             v-model="
@@ -135,11 +114,7 @@
           <el-input
             :rows="2"
             class="question-text"
-            @change="
-              (val) => {
-                updateAnswer(paperQuestion[routerIndex].id, val)
-              }
-            "
+            @change="updateAnswer(paperQuestion[routerIndex].id)"
             placeholder="请输入内容"
             type="textarea"
             v-if="myExamDetailCache[paperQuestion[routerIndex].id]"
@@ -184,11 +159,8 @@ export default {
   },
   created() {},
   methods: {
-    updateAnswer(itemId, value) {
-      this.$emit('updateAnswer', itemId, value)
-    },
-    updateClozeAnswer(itemId, value, itemAnswers, index) {
-      this.$emit('updateClozeAnswer', itemId, value, itemAnswers, index)
+    updateAnswer(itemId) {
+      this.$emit('updateAnswer', itemId)
     },
     prevQuestion() {
       this.$emit('prevQuestion')
