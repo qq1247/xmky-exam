@@ -396,9 +396,9 @@ export default {
       let state
       startTime < now &&
         endTime > now &&
-        (state = type == 'exam' ? '考试中' : '阅卷中')
+        (state = type === 'exam' ? '考试中' : '阅卷中')
       startTime > now && (state = type == 'exam' ? '待考试' : '待阅卷')
-      startTime < now && (state = type == 'exam' ? '已考试' : '已阅卷')
+      endTime < now && (state = type == 'exam' ? '已考试' : '已阅卷')
 
       return state
     },
