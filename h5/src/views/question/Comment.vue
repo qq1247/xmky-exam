@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-09-17 17:27:41
  * @LastEditors: Che
- * @LastEditTime: 2021-09-29 11:16:57
+ * @LastEditTime: 2021-09-29 17:08:59
 -->
 <template>
   <div class="container">
@@ -18,6 +18,7 @@
           :difficulty="difficultyList"
         ></QuestionDetail
         ><CommentText
+          v-if="commentState === 2"
           @comment="commentReply"
           :key="questionList[currentIndex].id"
         ></CommentText>
@@ -43,13 +44,14 @@
       <div class="question-comments">
         <QuestionComment
           :list="commentList"
+          v-if="commentList.length && commentState !== 0"
+          :commentState="commentState"
           @showMore="showMore"
           @childrenComment="commentReply"
           @getChildrenComment="getChildrenComment"
-          v-if="commentList.length"
         ></QuestionComment
         ><el-empty v-else description="暂无评论"></el-empty></div></template
-    ><el-empty v-else description="暂无试卷"></el-empty>
+    ><el-empty v-else description="暂无试题"></el-empty>
   </div>
 </template>
 
@@ -77,6 +79,7 @@ export default {
       pageSize: 10,
       totalPage: 0,
       typeList: [],
+      commentState: 0,
       currentIndex: 0,
       questionList: [],
       questionDetail: {},
@@ -85,8 +88,9 @@ export default {
     }
   },
   mounted() {
-    const { id } = this.$route.query
+    const { id, commentState } = this.$route.query
     this.id = id
+    this.commentState = Number(commentState)
     this.init()
   },
   methods: {
@@ -105,7 +109,9 @@ export default {
 
       this.query().then((res) => {
         this.showDetails(this.questionList[this.currentIndex].id)
-        this.getQuestionComment()
+        if (this.commentState !== 0) {
+          this.getQuestionComment()
+        }
       })
     },
     // 获取试题列表
@@ -205,7 +211,7 @@ export default {
     },
     // 评论回复
     async commentReply(text, anonymity, id) {
-      if (!text) {
+      if (!text.trim()) {
         this.$message.warning('请填写评论内容！')
         return
       }

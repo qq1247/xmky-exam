@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-09-28 10:29:46
  * @LastEditors: Che
- * @LastEditTime: 2021-09-28 12:51:04
+ * @LastEditTime: 2021-09-29 15:58:02
 -->
 
 <template>
@@ -59,20 +59,34 @@ export default {
   },
   methods: {
     async getWordList() {
-      const {
-        data: { id, blackList, whiteList },
-      } = await sensitiveGet({})
-      this.sensitiveForm.id = id
-      this.sensitiveForm.blackList = blackList.split('\n')
-      this.sensitiveForm.whiteList = whiteList.split('\n')
+      const { data } = await sensitiveGet({})
+      if (data) {
+        this.sensitiveForm.id = data.id || null
+        this.sensitiveForm.blackList = data.blackList.split('\n')
+        this.sensitiveForm.whiteList = data.whiteList.split('\n')
+      }
     },
     async setting() {
+      if (
+        this.isEmpty(this.sensitiveForm.blackList) ||
+        this.isEmpty(this.sensitiveForm.whiteList)
+      ) {
+        this.$message.warning('词汇不可为空')
+        return
+      }
       const res = await sensitiveEdit({
         id: this.sensitiveForm.id,
         blackList: [this.sensitiveForm.blackList.join('\n')],
         whiteList: [this.sensitiveForm.whiteList.join('\n')],
       })
-      res?.code === 200 && this.getWordList()
+      res?.code === 200 &&
+        (this.$message.success('设置成功！'), this.getWordList())
+    },
+    isEmpty(list) {
+      const empty = list.length && list.some((item) => !item.trim())
+      if (!list.length || empty) {
+        return true
+      }
     },
   },
 }

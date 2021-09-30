@@ -145,10 +145,11 @@
       <el-form :model="examForm" ref="userForm" label-width="100px">
         <el-form-item label="阅卷方式">
           <el-radio
-            v-for="item in examForm.examRadios"
+            v-for="(item,index) in examForm.examRadios"
             :key="item.value"
             v-model="examForm.examRadio"
             :label="item.value"
+            :disabled="index === 0"
             @change="selectPaperType"
             prop="examRadio"
             >{{ item.name }}</el-radio
@@ -284,11 +285,7 @@
           ).toFixed()
         }}</el-descriptions-item>
         <el-descriptions-item label="考试时长">{{
-          examForm.statisticsInfo.examStartTime
-            | timeDiff(
-              examForm.statisticsInfo.examStartTime,
-              examForm.statisticsInfo.examEndTime
-            )
+          diffExamTime
         }}</el-descriptions-item>
       </el-descriptions>
 
@@ -301,13 +298,13 @@
         border
       >
         <el-descriptions-item label="最高分">{{
-          examForm.statisticsInfo.max || 0
+          examForm.statisticsInfo.max ? examForm.statisticsInfo.max.toFixed(2) : 0
         }}</el-descriptions-item>
         <el-descriptions-item label="最低分">{{
-          examForm.statisticsInfo.min || 0
+          examForm.statisticsInfo.min ? examForm.statisticsInfo.min.toFixed(2) : 0
         }}</el-descriptions-item>
         <el-descriptions-item label="平均分">{{
-          examForm.statisticsInfo.avg || 0
+          examForm.statisticsInfo.avg ? examForm.statisticsInfo.avg.toFixed(2) : 0
         }}</el-descriptions-item>
       </el-descriptions>
 
@@ -352,10 +349,10 @@
           examForm.statisticsInfo.minExam || '待统计'
         }}</el-descriptions-item>
         <el-descriptions-item label="最长耗时">{{
-          (examForm.statisticsInfo.maxTime || 0) | formateTime
+          (examForm.statisticsInfo.maxTime || 0) | formateTime(that)
         }}</el-descriptions-item>
         <el-descriptions-item label="最短耗时">{{
-          (examForm.statisticsInfo.minTime || 0) | formateTime
+          (examForm.statisticsInfo.minTime || 0) | formateTime(that)
         }}</el-descriptions-item>
       </el-descriptions>
     </el-dialog>
@@ -453,6 +450,7 @@ export default {
       return callback()
     }
     return {
+      that: this,
       pageSize: 5,
       total: 0,
       curPage: 1,
@@ -514,19 +512,19 @@ export default {
       examList: [],
     }
   },
-  filters: {
-    timeDiff(start, end) {
-      const hour = dayjs(start).diff(dayjs(end), 'hour')
-      const minute = dayjs(start).diff(dayjs(end), 'minute')
-      const second = dayjs(start).diff(dayjs(end), 'second')
-      return `${hour}'${minute}''${second}'''`
+  computed: {
+    diffExamTime() {
+      const diffTime =
+        new Date(this.examForm.statisticsInfo.examEndTime).getTime() -
+        new Date(this.examForm.statisticsInfo.examStartTime).getTime()
+      const { hours, minutes, seconds } = this.$tools.formateTime(diffTime)
+      return `${hours}'${minutes}''${seconds}'''`
     },
-    formateTime(value) {
-      let time = value / 1000
-      let hour = Math.floor(time / 60 / 60) % 24
-      let minute = Math.floor(time / 60) % 60
-      let second = Math.floor(time) % 60
-      return `${hour}'${minute}''${second}'''`
+  },
+  filters: {
+    formateTime(value, that) {
+      const { hours, minutes, seconds } = that.$tools.formateTime(value)
+      return `${hours}'${minutes}''${seconds}'''`
     },
   },
   mounted() {
@@ -813,11 +811,6 @@ export default {
     },
     // 选择阅卷方式
     selectPaperType(e) {
-      if (e == 0) {
-        this.$message.warning('暂未开放')
-        this.examForm.examRadio = 1
-        return
-      }
       this.examForm.examRadio = e
     },
     // 获取用户
