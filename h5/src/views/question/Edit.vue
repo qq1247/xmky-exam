@@ -1533,7 +1533,7 @@ export default {
 }
 
 /deep/.el-select__tags .el-tag {
-  width: 100%;
+  width: fit-content;
   height: auto;
 }
 /deep/.el-select__tags-text {

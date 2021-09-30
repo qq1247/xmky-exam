@@ -100,9 +100,9 @@
                     </div>
                     <el-row class="body-item">
                       <span class="start-time">{{ item.examStartTime }}</span
-                      >({{
+                      >（{{
                         computeMinute(item.examStartTime, item.examEndTime)
-                      }}分钟)
+                      }}）
                     </el-row>
                     <el-row class="body-item">
                       <el-col :span="12">
@@ -152,9 +152,9 @@
                     </div>
                     <el-row class="body-item">
                       <span class="start-time">{{ item.markStartTime }}</span
-                      >({{
+                      >（{{
                         computeMinute(item.markStartTime, item.markEndTime)
-                      }}分钟)
+                      }}）
                     </el-row>
                     <el-row class="body-item">
                       <el-col :span="12">
@@ -250,9 +250,10 @@ export default {
   methods: {
     // 计算分钟数
     computeMinute(startTime, endTime) {
-      const timeDiff =
+      const diffTime =
         new Date(endTime).getTime() - new Date(startTime).getTime()
-      return Math.ceil(timeDiff / (1000 * 60 * 60))
+      const { hours, minutes, seconds } = this.$tools.formateTime(diffTime)
+      return `${hours}'${minutes}''${seconds}'''`
     },
     // 初始化
     init() {
@@ -411,7 +412,7 @@ export default {
       res?.code === 200 && (this.questionTypeOpenList = res.data.list)
     },
     // 查看试题和评论
-    goDetail({ questionTypeId, startTime, endTime }) {
+    goDetail({ questionTypeId, startTime, endTime, commentState }) {
       const $_startTime = new Date(startTime).getTime()
       const $_endTime = new Date(endTime).getTime()
       const now = new Date().getTime()
@@ -423,6 +424,7 @@ export default {
         path: '/question/comment',
         query: {
           id: questionTypeId,
+          commentState,
         },
       })
     },

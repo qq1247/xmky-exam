@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-09-18 15:44:29
  * @LastEditors: Che
- * @LastEditTime: 2021-09-23 10:11:47
+ * @LastEditTime: 2021-09-29 17:01:17
 -->
 <template>
   <div>
@@ -29,7 +29,7 @@
           <span>{{ comment.time }}</span
           ><span
             class="comment"
-            v-if="comment.children"
+            v-if="comment.children && commentState === 2"
             @click.stop="showComment(index)"
             >回复</span
           >
@@ -72,6 +72,10 @@ export default {
     list: {
       type: Array,
       default: () => [],
+    },
+    commentState: {
+      type: Number,
+      default: 0,
     },
   },
   data() {
