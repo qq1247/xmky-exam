@@ -12,7 +12,6 @@ import com.startx.http.wordfilter.WordContext;
 import com.startx.http.wordfilter.WordFilter;
 import com.startx.http.wordfilter.WordType;
 import com.wcpdoc.exam.core.dao.BaseDao;
-import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 import com.wcpdoc.exam.wordFilter.dao.SensitiveDao;
@@ -53,10 +52,10 @@ public class SensitiveServiceImpl extends BaseServiceImp<Sensitive> implements S
 	@Override
 	public void updateAndUpdate(Sensitive sensitive) {
 		if (!ValidateUtil.isValid(sensitive.getBlackList())) {
-			throw new MyException("参数错误: blackList");
+			sensitive.setBlackList(null);
 		}
 		if (!ValidateUtil.isValid(sensitive.getWhiteList())) {
-			throw new MyException("参数错误: whiteList");
+			sensitive.setWhiteList(null);
 		}
 		
 		Sensitive entity;
@@ -82,18 +81,22 @@ public class SensitiveServiceImpl extends BaseServiceImp<Sensitive> implements S
 	private void initialize(Sensitive sensitive) {
 		// 初始化
 		context.delWordMap();
-        Set<String> set = new HashSet<>();
-        String[] blackSplit = sensitive.getBlackList().split("\n");
-        for(String s : blackSplit){        	
-        	set.add(s);
-        }
-        context.addWord(set, WordType.BLACK);
+		Set<String> set = new HashSet<>();
+        if (ValidateUtil.isValid(sensitive.getBlackList())) {			
+        	String[] blackSplit = sensitive.getBlackList().split("\n");
+        	for(String s : blackSplit){        	
+        		set.add(s);
+        	}
+        	context.addWord(set, WordType.BLACK);
+		}
         set = new HashSet<>();
-        String[] whiteSplit = sensitive.getWhiteList().split("\n");
-        for(String s : whiteSplit){        	
-        	set.add(s);
-        }
-        context.addWord(set, WordType.WHITE);
+        if (ValidateUtil.isValid(sensitive.getWhiteList())) {
+        	String[] whiteSplit = sensitive.getWhiteList().split("\n");
+        	for(String s : whiteSplit){        	
+        		set.add(s);
+        	}
+        	context.addWord(set, WordType.WHITE);			
+		}
 	}
 
 	@Override
