@@ -165,18 +165,7 @@ public class ApiParmController extends BaseController {
 	@ResponseBody
 	public PageResult editLogo(Parm parm) {
 		try {
-			if(parm.getId() == null){
-				parm.setUpdateTime(new Date());
-				parm.setUpdateUserId(getCurUser().getId());
-				parmService.add(parm);
-				return PageResult.ok();
-			}
-			Parm entity = parmService.getEntity(parm.getId());
-			entity.setOrgLogo(parm.getOrgLogo());
-			entity.setOrgName(parm.getOrgName());
-			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(getCurUser().getId());
-			parmService.update(entity);
+			parmService.editLogo(parm);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改参数错误：{}", e.getMessage());
