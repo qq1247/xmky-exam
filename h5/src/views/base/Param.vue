@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-09-08 13:33:12
  * @LastEditors: Che
- * @LastEditTime: 2021-09-28 17:33:57
+ * @LastEditTime: 2021-10-08 17:02:29
 -->
 <template>
   <div class="container">
@@ -104,6 +104,9 @@ export default {
         if (code === 200) {
           this.paramForm.orgLogo = []
           this.init()
+          let link = document.querySelector("link[rel*='icon']")
+          link.href = `${process.env.VUE_APP_BASE_URL}login/ico`
+          this.$router.go(0)
         } else {
           this.$message.error(msg)
         }
