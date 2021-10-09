@@ -58,7 +58,10 @@ const errorHandle = (status, msg) => {
 
 // 创建axios实例
 var instance = axios.create({
-  baseURL: process.env.VUE_APP_BASE_URL,
+  baseURL:
+    process.env.NODE_ENV === 'development'
+      ? process.env.VUE_APP_BASE_URL
+      : window.domain.url,
   timeout: 6 * 1000,
 })
 
