@@ -355,10 +355,10 @@
           examForm.statisticsInfo.maxExam || '待统计'
         }}</el-descriptions-item>
         <el-descriptions-item label="最长耗时">{{
-          (examForm.statisticsInfo.maxTime || 0) | formateTime(that)
+          diffMaxTime
         }}</el-descriptions-item>
         <el-descriptions-item label="最短耗时">{{
-          (examForm.statisticsInfo.minTime || 0) | formateTime(that)
+          diffMinTime
         }}</el-descriptions-item>
       </el-descriptions>
     </el-dialog>
@@ -520,17 +520,16 @@ export default {
   },
   computed: {
     diffExamTime() {
-      const diffTime =
-        new Date(this.examForm.statisticsInfo.examEndTime).getTime() -
-        new Date(this.examForm.statisticsInfo.examStartTime).getTime()
-      const { hours, minutes, seconds } = this.$tools.formateTime(diffTime)
-      return `${hours}'${minutes}''${seconds}'''`
+      const diffTime = this.diffTime(this.examForm.statisticsInfo.examEndTime)
+      return diffTime
     },
-  },
-  filters: {
-    formateTime(value, that) {
-      const { hours, minutes, seconds } = that.$tools.formateTime(value)
-      return `${hours}'${minutes}''${seconds}'''`
+    diffMaxTime() {
+      const diffTime = this.diffTime(this.examForm.statisticsInfo.maxExam)
+      return diffTime
+    },
+    diffMinTime() {
+      const diffTime = this.diffTime(this.examForm.statisticsInfo.minExam)
+      return diffTime
     },
   },
   mounted() {
@@ -940,6 +939,14 @@ export default {
     // 清空还原数据
     resetData(name) {
       this.$refs[name].resetFields()
+    },
+    // 计算时间差
+    diffTime(endTime) {
+      const diffTime =
+        new Date(endTime).getTime() -
+        new Date(this.examForm.statisticsInfo.examStartTime).getTime()
+      const { hours, minutes, seconds } = this.$tools.formateTime(diffTime)
+      return `${hours}'${minutes}''${seconds}'''`
     },
   },
 }
