@@ -20,8 +20,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.exam.base.cache.ProgressBarCache;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.QuestionDao;
@@ -522,6 +524,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 
 		// 解析文件
+		ProgressBarCache.setProgressBar(processBarId, 3.0, 10.0, "解析开始", HttpStatus.OK.value());// 主要时间消耗在docx4j解析，进度条只能假模拟
 		WordServer wordServer = new WordServerImpl();
 		List<QuestionEx> questionExList = null;
 		try (InputStream inputStream = new FileInputStream(fileEx.getFile())) {
@@ -533,6 +536,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 
 		// 添加试题
+		ProgressBarCache.setProgressBar(processBarId, 8.0, 10.0, "保存开始", HttpStatus.OK.value());
 		for (int  j = 0; j < questionExList.size(); j++) { //QuestionEx questionEx : questionExList
 			Question question = questionExList.get(j).getQuestion();
 			question.setCreateTime(new Date());
@@ -584,6 +588,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			
 			addAndUpdate(question, scoreOptions, answers, options, scores);
 		}
+		
+		ProgressBarCache.setProgressBar(processBarId, 10.0, 10.0, "保存完成", HttpStatus.OK.value());
 	}
 
 	@Override
