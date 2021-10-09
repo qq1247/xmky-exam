@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-09-28 10:29:46
  * @LastEditors: Che
- * @LastEditTime: 2021-09-29 15:58:02
+ * @LastEditTime: 2021-10-08 15:29:57
 -->
 
 <template>
@@ -20,6 +20,7 @@
           allow-create
           default-first-option
           placeholder="请输入敏感词"
+          @change="selectChange($event, 'blackList')"
         >
         </el-select>
       </el-form-item>
@@ -32,6 +33,7 @@
           allow-create
           default-first-option
           placeholder="请输入解封词"
+          @change="selectChange($event, 'whiteList')"
         >
         </el-select>
       </el-form-item>
@@ -62,18 +64,15 @@ export default {
       const { data } = await sensitiveGet({})
       if (data) {
         this.sensitiveForm.id = data.id || null
-        this.sensitiveForm.blackList = data.blackList.split('\n')
-        this.sensitiveForm.whiteList = data.whiteList.split('\n')
+        this.sensitiveForm.blackList = data.blackList
+          ? data.blackList.split('\n')
+          : []
+        this.sensitiveForm.whiteList = data.whiteList
+          ? data.whiteList.split('\n')
+          : []
       }
     },
     async setting() {
-      if (
-        this.isEmpty(this.sensitiveForm.blackList) ||
-        this.isEmpty(this.sensitiveForm.whiteList)
-      ) {
-        this.$message.warning('词汇不可为空')
-        return
-      }
       const res = await sensitiveEdit({
         id: this.sensitiveForm.id,
         blackList: [this.sensitiveForm.blackList.join('\n')],
@@ -82,11 +81,9 @@ export default {
       res?.code === 200 &&
         (this.$message.success('设置成功！'), this.getWordList())
     },
-    isEmpty(list) {
-      const empty = list.length && list.some((item) => !item.trim())
-      if (!list.length || empty) {
-        return true
-      }
+    selectChange(event, name) {
+      const filterArray = event.filter((item) => item.trim())
+      this.sensitiveForm[name] = filterArray
     },
   },
 }

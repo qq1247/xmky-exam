@@ -1,18 +1,5 @@
-ALTER TABLE `exam_`.`exm_my_exam_detail` ADD COLUMN `ANSWER_FILE_ID` int(11) DEFAULT NULL COMMENT '´ğ°¸¸½¼şID' AFTER `QUESTION_SCORE`;
-
-ALTER TABLE `exam_`.`exm_my_mark` MODIFY COLUMN `AUTO_STATE` int(11) DEFAULT NULL COMMENT '1£ºÒÑ×Ô¶¯ÔÄ¾í£»2£ºÎ´×Ô¶¯ÔÄ¾í' AFTER `EXAM_ID`;
-
-ALTER TABLE `exam_`.`exm_paper` MODIFY COLUMN `MINIMIZE_NUM` int(11) DEFAULT NULL COMMENT '×îĞ¡»¯¾¯¸æ´ÎÊı' AFTER `OPTIONS`;
-
-ALTER TABLE `exam_`.`exm_paper` MODIFY COLUMN `CREATE_USER_ID` int(11) DEFAULT NULL COMMENT '´´½¨ÈË' AFTER `MINIMIZE_NUM`;
-
-ALTER TABLE `exam_`.`exm_question` ADD COLUMN `ANSWER` text CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT '´ğ°¸' AFTER `TITLE`;
-
-ALTER TABLE `exam_`.`exm_question` MODIFY COLUMN `CREATE_USER_ID` int(11) DEFAULT NULL COMMENT '´´½¨ÈË' AFTER `STATE`;
-
-ALTER TABLE `exam_`.`exm_question` MODIFY COLUMN `SCORE_OPTIONS` varchar(8) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '1£º°ë¶Ô°ë·Ö£»2£º´ğ°¸ÎŞË³Ğò£»3£º´óĞ¡Ğ´²»Ãô¸Ğ£»4£º°üº¬´ğ°¸µÃ·Ö' AFTER `SCORE`;
-
-ALTER TABLE `exam_`.`exm_question` MODIFY COLUMN `AI` int(2) DEFAULT NULL COMMENT '0£º·ñ£»1£ºÊÇ' AFTER `SCORE_OPTIONS`;
+ALTER TABLE `EXM_MY_EXAM_DETAIL` ADD COLUMN `ANSWER_FILE_ID` int(11) DEFAULT NULL COMMENT 'ç­”æ¡ˆé™„ä»¶ID' AFTER `QUESTION_SCORE`;
+ALTER TABLE `EXM_QUESTION_TYPE_OPEN` ADD COLUMN `COMMENT_STATE` int(11) DEFAULT NULL COMMENT 'è¯„è®ºçŠ¶æ€(0ï¼šä¸æ˜¾ç¤ºï¼›1ï¼šåªè¯»ï¼›2ï¼šå¯ç¼–è¾‘,)' AFTER `QUESTION_TYPE_ID`;
 
 drop table if exists SYS_SENSITIVE;
 
@@ -22,14 +9,14 @@ drop table if exists SYS_SENSITIVE;
 create table SYS_SENSITIVE
 (
    ID                   int not null auto_increment,
-   WHITE_LIST           text comment '°×Ãûµ¥',
-   BLACK_LIST           text comment 'ºÚÃûµ¥',
-   UPDATE_USER_ID       int comment 'ĞŞ¸ÄÈË',
-   UPDATE_TIME          datetime comment 'ĞŞ¸ÄÊ±¼ä',
+   WHITE_LIST           text comment 'ç™½åå•',
+   BLACK_LIST           text comment 'é»‘åå•',
+   UPDATE_USER_ID       int comment 'ä¿®æ”¹äºº',
+   UPDATE_TIME          datetime comment 'ä¿®æ”¹æ—¶é—´',
    primary key (ID)
 );
 
-alter table SYS_SENSITIVE comment 'Ãô¸Ğ´Ê';
+alter table SYS_SENSITIVE comment 'æ•æ„Ÿè¯';
 
 drop table if exists EXM_QUESTION_COMMENT;
 
@@ -38,21 +25,21 @@ drop table if exists EXM_QUESTION_COMMENT;
 /*==============================================================*/
 create table EXM_QUESTION_COMMENT
 (
-   ID                   int not null auto_increment comment 'Ö÷¼ü',
-   QUESTION_ID          int comment 'ÊÔÌâid',
-   CONTENT              text comment 'ÆÀÂÛÄÚÈİ',
-   PARENT_ID            int comment '¸¸ID',
-   PARENT_SUB           varchar(512) comment '¸¸×Ó¹ØÏµ£¨¸ñÊ½£º_¸¸ID_×ÓID_×Ó×ÓID_... ...£©',
-   LEVEL                int comment '¼¶±ğ',
-   STATE                int comment '×´Ì¬(0£ºÉ¾³ı£»1£ºÕı³£,)',
-   CREATE_USER_ID       int comment '´´½¨ÈË',
-   CREATE_TIME          datetime comment '´´½¨Ê±¼ä',
-   UPDATE_USER_ID       int comment 'ĞŞ¸ÄÈË',
-   UPDATE_TIME          datetime comment 'ĞŞ¸ÄÊ±¼ä',
+   ID                   int not null auto_increment comment 'ä¸»é”®',
+   QUESTION_ID          int comment 'è¯•é¢˜id',
+   CONTENT              text comment 'è¯„è®ºå†…å®¹',
+   PARENT_ID            int comment 'çˆ¶ID',
+   PARENT_SUB           varchar(512) comment 'çˆ¶å­å…³ç³»ï¼ˆæ ¼å¼ï¼š_çˆ¶ID_å­ID_å­å­ID_... ...ï¼‰',
+   LEVEL                int comment 'çº§åˆ«',
+   STATE                int comment 'çŠ¶æ€(0ï¼šåˆ é™¤ï¼›1ï¼šæ­£å¸¸,)',
+   CREATE_USER_ID       int comment 'åˆ›å»ºäºº',
+   CREATE_TIME          datetime comment 'åˆ›å»ºæ—¶é—´',
+   UPDATE_USER_ID       int comment 'ä¿®æ”¹äºº',
+   UPDATE_TIME          datetime comment 'ä¿®æ”¹æ—¶é—´',
    primary key (ID)
 );
 
-alter table EXM_QUESTION_COMMENT comment 'ÊÔÌâÆÀÂÛ';
+alter table EXM_QUESTION_COMMENT comment 'è¯•é¢˜è¯„è®º';
 
 drop table if exists SYS_PARM;
 
@@ -62,24 +49,24 @@ drop table if exists SYS_PARM;
 create table SYS_PARM
 (
    ID                   int not null auto_increment,
-   EMAIL_HOST           varchar(64) comment 'ÓÊ¼şÖ÷»ú',
-   EMAIL_USER_NAME      varchar(64) comment 'ÓÊ¼şÓÃ»§Ãû',
-   EMAIL_PWD            varchar(64) comment 'ÓÊ¼şÃÜÂë',
-   EMAIL_PROTOCOL       varchar(16) comment 'ÓÊ¼şĞ­Òé',
-   EMAIL_ENCODE         varchar(16) comment 'ÓÊ¼ş±àÂë',
-   ORG_LOGO             int comment 'µ¥Î»ÉÌ±ê',
-   ORG_NAME             varchar(32) comment 'µ¥Î»Ãû³Æ',
-   UPDATE_USER_ID       int comment 'ĞŞ¸ÄÈË',
-   UPDATE_TIME          datetime comment 'ĞŞ¸ÄÊ±¼ä',
+   EMAIL_HOST           varchar(64) comment 'é‚®ä»¶ä¸»æœº',
+   EMAIL_USER_NAME      varchar(64) comment 'é‚®ä»¶ç”¨æˆ·å',
+   EMAIL_PWD            varchar(64) comment 'é‚®ä»¶å¯†ç ',
+   EMAIL_PROTOCOL       varchar(16) comment 'é‚®ä»¶åè®®',
+   EMAIL_ENCODE         varchar(16) comment 'é‚®ä»¶ç¼–ç ',
+   ORG_LOGO             int comment 'å•ä½å•†æ ‡',
+   ORG_NAME             varchar(32) comment 'å•ä½åç§°',
+   UPDATE_USER_ID       int comment 'ä¿®æ”¹äºº',
+   UPDATE_TIME          datetime comment 'ä¿®æ”¹æ—¶é—´',
    primary key (ID)
 );
 
-alter table SYS_PARM comment '²ÎÊı';
+alter table SYS_PARM comment 'å‚æ•°';
 
 
 
-INSERT INTO `SYS_DICT` VALUES (37, 'STATE_OPEN', '1', 'Õı³£', 1);
-INSERT INTO `SYS_DICT` VALUES (38, 'STATE_OPEN', '2', '×÷·Ï', 2);
-INSERT INTO `SYS_DICT` VALUES (39, 'STATE_OPEN', '0', 'É¾³ı', 3);
+INSERT INTO `SYS_DICT` VALUES (37, 'STATE_OPEN', '1', 'æ­£å¸¸', 1);
+INSERT INTO `SYS_DICT` VALUES (38, 'STATE_OPEN', '2', 'ä½œåºŸ', 2);
+INSERT INTO `SYS_DICT` VALUES (39, 'STATE_OPEN', '0', 'åˆ é™¤', 3);
 
 INSERT INTO `SYS_VER` VALUES (10, '3.1.0', '2020-09-30 13:58:00', 'zhanghc', '');

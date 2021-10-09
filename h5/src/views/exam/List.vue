@@ -145,7 +145,7 @@
       <el-form :model="examForm" ref="userForm" label-width="100px">
         <el-form-item label="阅卷方式">
           <el-radio
-            v-for="(item,index) in examForm.examRadios"
+            v-for="(item, index) in examForm.examRadios"
             :key="item.value"
             v-model="examForm.examRadio"
             :label="item.value"
@@ -298,13 +298,19 @@
         border
       >
         <el-descriptions-item label="最高分">{{
-          examForm.statisticsInfo.max ? examForm.statisticsInfo.max.toFixed(2) : 0
+          examForm.statisticsInfo.max
+            ? examForm.statisticsInfo.max.toFixed(2)
+            : 0
         }}</el-descriptions-item>
         <el-descriptions-item label="最低分">{{
-          examForm.statisticsInfo.min ? examForm.statisticsInfo.min.toFixed(2) : 0
+          examForm.statisticsInfo.min
+            ? examForm.statisticsInfo.min.toFixed(2)
+            : 0
         }}</el-descriptions-item>
         <el-descriptions-item label="平均分">{{
-          examForm.statisticsInfo.avg ? examForm.statisticsInfo.avg.toFixed(2) : 0
+          examForm.statisticsInfo.avg
+            ? examForm.statisticsInfo.avg.toFixed(2)
+            : 0
         }}</el-descriptions-item>
       </el-descriptions>
 
@@ -343,10 +349,10 @@
         border
       >
         <el-descriptions-item label="最早交卷">{{
-          examForm.statisticsInfo.maxExam || '待统计'
+          examForm.statisticsInfo.minExam || '待统计'
         }}</el-descriptions-item>
         <el-descriptions-item label="最迟交卷">{{
-          examForm.statisticsInfo.minExam || '待统计'
+          examForm.statisticsInfo.maxExam || '待统计'
         }}</el-descriptions-item>
         <el-descriptions-item label="最长耗时">{{
           (examForm.statisticsInfo.maxTime || 0) | formateTime(that)
