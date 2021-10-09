@@ -11,13 +11,19 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.wcpdoc.exam.base.cache.DictCache;
+import com.wcpdoc.exam.base.cache.ProgressBarCache;
 import com.wcpdoc.exam.core.constant.ConstantManager;
+import com.wcpdoc.exam.core.context.UserContext;
 import com.wcpdoc.exam.core.controller.BaseController;
+import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
@@ -31,6 +37,7 @@ import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
+import com.wcpdoc.exam.core.util.SpringUtil;
 import com.wcpdoc.exam.file.service.FileService;
 
 /**
@@ -298,15 +305,26 @@ public class ApiQuestionController extends BaseController {
 	@ResponseBody
 	public PageResult wordImp(Integer fileId, Integer questionTypeId) {
 		try {
+			ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+			RequestContextHolder.setRequestAttributes(requestAttributes, true);// 子线程共享请求属性
+			
 			String processBarId = UUID.randomUUID().toString().replaceAll("-", "");
-			
-			/*new Thread(new Runnable() {
+			ProgressBarCache.setProgressBar(processBarId, 0.0, 10.0, "开始解析", HttpStatus.OK.value());// 初始化进度条
+
+			LoginUser loginUser = getCurUser();
+			new Thread(new Runnable() {
 				public void run() {
-					SpringUtil.getBean(QuestionService.class).wordImp(fileId, questionTypeId, processBarId);
+					UserContext.set(loginUser);// 子线程不走springboot拦截器，人工模拟拦截器，线程上绑定当前登录信息
+					try {
+						SpringUtil.getBean(QuestionService.class).wordImp(fileId, questionTypeId, processBarId);
+					} catch (Exception e) {
+						ProgressBarCache.setProgressBar(processBarId, 10.0, 10.0, "开始解析", HttpStatus.OK.value());
+						log.error("word试题导入错误：", e.getMessage());
+						UserContext.remove();
+					}
 				}
-			}).start();*/
-			
-			questionService.wordImp(fileId, questionTypeId, processBarId);
+			}).start();
+
 			return PageResultEx.ok().data(processBarId);
 		} catch (MyException e) {
 			log.error("导入试题错误：{}", e.getMessage());

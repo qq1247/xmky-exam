@@ -4,13 +4,12 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.wcpdoc.exam.core.context.UserContext;
 import com.wcpdoc.exam.core.dao.BaseDao;
-import com.wcpdoc.exam.core.entity.JwtResult;
 import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.service.BaseService;
-import com.wcpdoc.exam.core.util.JwtUtil;
 
 /**
  * 基础服务层实现
@@ -30,21 +29,7 @@ public abstract class BaseServiceImp<T> implements BaseService<T> {
 	
 	@Override
 	public LoginUser getCurUser() {
-		String jwt = request.getHeader("Authorization");
-		JwtResult jwtResult = JwtUtil.getInstance().parse(jwt);
-
-		LoginUser LoginUser = new LoginUser() {
-			@Override
-			public String getLoginName() {
-				return jwtResult.getClaims().get("loginName", String.class);
-			}
-			
-			@Override
-			public Integer getId() {
-				return jwtResult.getClaims().get("userId", Integer.class);
-			}
-		};
-		return jwtResult == null ? null : LoginUser;
+		return UserContext.get();
 	}
 
 	@Override
