@@ -8,8 +8,8 @@ import org.docx4j.Docx4J;
 import org.docx4j.Docx4jProperties;
 import org.docx4j.convert.out.ConversionFeatures;
 import org.docx4j.convert.out.HTMLSettings;
+import org.docx4j.fonts.BestMatchingMapper;
 import org.docx4j.fonts.IdentityPlusMapper;
-import org.docx4j.fonts.Mapper;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.jsoup.Jsoup;
@@ -110,9 +110,13 @@ public abstract class WordServer {
 		} catch (Docx4JException e) {
 			throw new MyException(e.getMessage());
 		}
-		Mapper fontMapper = new IdentityPlusMapper();
+		
 		try {
-			wordMLPackage.setFontMapper(fontMapper);
+			if (System.getProperty("os.name").toLowerCase().indexOf("windows") >= 0) {
+				wordMLPackage.setFontMapper(new IdentityPlusMapper());// 代码来自官方例子
+			} else {
+				wordMLPackage.setFontMapper(new BestMatchingMapper());
+			}
 		} catch (Exception e) {
 			throw new MyException(e.getMessage());
 		}
