@@ -43,7 +43,11 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
-			pageIn.addAttr("curUserId", getCurUser().getId());
+			if (pageIn.get("list") != null && pageIn.get("list").equals("1")) {
+				pageIn.addAttr("curUserId", getCurUser().getId());
+			}else{
+				pageIn.addAttr("readUserIds", getCurUser().getId());
+			}
 			return PageResultEx.ok().data(questionTypeOpenService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("试题分类开放列表错误：", e);
