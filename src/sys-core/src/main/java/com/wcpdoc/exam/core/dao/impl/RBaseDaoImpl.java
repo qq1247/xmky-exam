@@ -2,6 +2,7 @@ package com.wcpdoc.exam.core.dao.impl;
 
 import java.lang.reflect.ParameterizedType;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -128,9 +129,20 @@ public abstract class RBaseDaoImpl<T> implements RBaseDao<T> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public /* final */ PageOut getListpage(SqlUtil sqlUtil, PageIn pageIn) {
-		// 查询列表
-		String sql = toHibernateSql(sqlUtil.getSql());
+		// 查询总记录数
+		String sql = toHibernateSql(sqlUtil.getCountSql());
 		Query<Map<String, Object>> query = getCurSession().createSQLQuery(sql);
+		for (int i = 0; i < sqlUtil.getWhereParams().size(); i++) {
+			query.setParameter(i, sqlUtil.getWhereParams().get(i));
+		}
+		int total = ((BigInteger) query.uniqueResult()).intValue();
+		if (total == 0) {
+			return new PageOut(new ArrayList<Map<String,Object>>(), 0);// 如果总数为0，就不用在查询分页数据了
+		}
+				
+		// 查询列表
+		sql = toHibernateSql(sqlUtil.getSql());
+		query = getCurSession().createSQLQuery(sql);
 		for (int i = 0; i < sqlUtil.getWhereParams().size(); i++) {
 			query.setParameter(i, sqlUtil.getWhereParams().get(i));
 		}
@@ -144,14 +156,6 @@ public abstract class RBaseDaoImpl<T> implements RBaseDao<T> {
 				map.put(CaseUtils.toCamelCase(key, false, new char[] { '_' }), map.remove(key));
 			}
 		}
-
-		// 查询总记录数
-		sql = toHibernateSql(sqlUtil.getCountSql());
-		query = getCurSession().createSQLQuery(sql);
-		for (int i = 0; i < sqlUtil.getWhereParams().size(); i++) {
-			query.setParameter(i, sqlUtil.getWhereParams().get(i));
-		}
-		int total = ((BigInteger) query.uniqueResult()).intValue();
 
 		// 封装结果
 		return new PageOut(result, total);
