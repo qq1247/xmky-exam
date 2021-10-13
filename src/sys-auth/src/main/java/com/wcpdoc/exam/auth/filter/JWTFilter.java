@@ -201,6 +201,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 			httpResponse.setContentType("application/json;charset=UTF-8");
 			httpResponse.setStatus(HttpStatus.OK.value());
 			httpResponse.getWriter().write(String.format("{\"code\": %s, \"msg\": \"%s\"}", HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
+			log.error("shiro权限异常：", e);
 			return false;
 		}
 	}
