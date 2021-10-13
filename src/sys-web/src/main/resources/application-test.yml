@@ -5,8 +5,6 @@ spring:
     url: jdbc:mysql://192.168.9.194:3306/exam?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
     username: root
     password: root
-  jpa:
-    show-sql: false
 file: 
   upload:
     dir: c:/bak/file

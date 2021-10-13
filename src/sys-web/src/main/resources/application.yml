@@ -18,12 +18,12 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/exam?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    url: jdbc:log4jdbc:mysql://127.0.0.1:3306/exam?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
     username: root
     password: root
   jpa:
-    show-sql: true
+    show-sql: false
     
 file: 
   upload:
