@@ -10,7 +10,6 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.env.Environment;
 
 import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.SpringUtil;
@@ -25,12 +24,11 @@ import com.wcpdoc.exam.file.service.FileService;
 public class ClearFileJob implements Job {
 	private static final Logger log = LoggerFactory.getLogger(ClearFileJob.class);
 	private static final FileService fileService = SpringUtil.getBean(FileService.class);
-	private static final String fileUploadDir = SpringUtil.getBean(Environment.class).getProperty("file.upload.dir");
 
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		// 清理临时附件
-		String baseDir = fileUploadDir;
-		java.io.File dirFile = new java.io.File(baseDir + java.io.File.separator + "temp");
+		String baseDir = fileService.getFileUploadDir();
+		java.io.File dirFile = new java.io.File(String.format("%s/%s", baseDir, "temp"));
 		if (!dirFile.exists()) {
 			log.info("清理临时附件：{}不存在", dirFile.getAbsolutePath());
 			return;
@@ -55,7 +53,7 @@ public class ClearFileJob implements Job {
 		// 清理标记为删除的附件
 		List<File> delFileList = fileService.getDelList();
 		for (File fileEntity : delFileList) {
-			java.io.File delFile = new java.io.File(baseDir + java.io.File.separator + fileEntity.getPath());
+			java.io.File delFile = new java.io.File(String.format("%s/%s", baseDir,fileEntity.getPath()));
 			log.info("清理标记为删除的附件：{}", delFile.getAbsolutePath());
 			try {
 				delFile.delete();

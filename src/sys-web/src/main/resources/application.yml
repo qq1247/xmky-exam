@@ -27,7 +27,7 @@ spring:
     
 file: 
   upload:
-    dir: c:/bak/file
+    dir: bak/file
 db:
   bak:
     dir: bak/db

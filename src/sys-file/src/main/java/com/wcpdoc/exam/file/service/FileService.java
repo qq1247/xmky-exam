@@ -69,4 +69,13 @@ public interface FileService extends BaseService<File> {
 	 * @return Integer
 	 */
 	Integer getFileId(String uuId);
+
+	/**
+	 * 获取上传目录
+	 * 如果配置文件为相对路径，上传目录为当前启动程序目录+配置文件目录
+	 * 
+	 * v1.0 zhanghc 2021年10月14日下午5:03:01
+	 * @return String
+	 */
+	String getFileUploadDir();
 }

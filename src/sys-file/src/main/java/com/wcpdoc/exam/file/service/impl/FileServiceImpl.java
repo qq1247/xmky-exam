@@ -38,7 +38,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 	@Resource
 	private FileDao fileDao;
 	@Value("${file.upload.dir}")
-	private String fileUploadDir;
+	private String FILE_UPLOAD_DIR;
 
 	@Override
 	@Resource(name = "fileDaoImpl")
@@ -66,13 +66,10 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		}
 
 		// 创建临时上传目录
-		String baseDir = fileUploadDir;
-		String tempPath = String.format("%stemp", java.io.File.separator);
+		String baseDir = getFileUploadDir();
+		String tempPath = "/temp";
 		String timeStr = DateUtil.formatDateTime(new Date());
-		String ymdPath = String.format("%s%s%s%s%s%s", 
-				java.io.File.separator, timeStr.substring(0, 4), 
-				java.io.File.separator, timeStr.substring(5, 7), 
-				java.io.File.separator, timeStr.substring(8, 10));
+		String ymdPath = String.format("/%s/%s/%s", timeStr.substring(0, 4), timeStr.substring(5, 7), timeStr.substring(8, 10));
 		java.io.File tempUploadDir = new java.io.File(baseDir + tempPath + ymdPath);
 		if (!tempUploadDir.exists()) {
 			tempUploadDir.mkdirs();
@@ -82,7 +79,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		StringBuilder fileIds = new StringBuilder();
 		for (MultipartFile multipartFile : files) {
 			String fileId = IdUtil.getInstance().nextId() + "";
-			java.io.File destFile = new java.io.File(tempUploadDir.getAbsolutePath() + java.io.File.separator + fileId);
+			java.io.File destFile = new java.io.File(String.format("%s/%s", tempUploadDir.getAbsolutePath(), fileId));
 			try {
 				multipartFile.transferTo(destFile);
 			} catch (Exception e) {
@@ -94,7 +91,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 			file.setName(FilenameUtils.getBaseName(multipartFile.getOriginalFilename()));
 			file.setExtName(FilenameUtils.getExtension(multipartFile.getOriginalFilename()));
 			file.setFileType(multipartFile.getContentType());
-			file.setPath(tempPath + ymdPath + java.io.File.separator + fileId);
+			file.setPath(String.format("%s%s/%s", tempPath, ymdPath, fileId));
 			file.setIp(request.getRemoteHost());
 			file.setState(0);
 			file.setUpdateUserId(getCurUser().getId());
@@ -131,15 +128,12 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		}
 
 		// 数据库更新附件信息（如果先移动附件成功，而后数据库更新失败，恢复移动附件不好处理）
-		String baseDir = fileUploadDir;
-		java.io.File tempFile = new java.io.File(String.format("%s%s", fileUploadDir, file.getPath()));
+		String baseDir = getFileUploadDir();
+		java.io.File tempFile = new java.io.File(String.format("%s%s", baseDir, file.getPath()));
 		String timeStr = DateUtil.formatDateTime(new Date());
-		String ymdPath = String.format("%s%s%s%s%s%s", 
-				java.io.File.separator, timeStr.substring(0, 4),
-				java.io.File.separator, timeStr.substring(5, 7), 
-				java.io.File.separator, timeStr.substring(8, 10));
+		String ymdPath = String.format("/%s/%s/%s", timeStr.substring(0, 4), timeStr.substring(5, 7), timeStr.substring(8, 10));
 		file.setState(1);
-		file.setPath(ymdPath + java.io.File.separator + tempFile.getName());
+		file.setPath(String.format("%s/%s", ymdPath, tempFile.getName()));
 		file.setIp(request.getRemoteHost());
 		file.setUpdateUserId(getCurUser().getId());
 		file.setUpdateTime(new Date());
@@ -160,8 +154,8 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		}
 
 		File entity = getEntity(id);
-		String baseDir = fileUploadDir;
-		java.io.File file = new java.io.File(String.format("%s%s%s", baseDir, java.io.File.separator, entity.getPath()));
+		String baseDir = getFileUploadDir();
+		java.io.File file = new java.io.File(String.format("%s/%s", baseDir, entity.getPath()));
 		if (!file.exists()) {
 			throw new MyException("附件不存在");
 		}
@@ -194,6 +188,15 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 			IOUtils.closeQuietly(output);
 			IOUtils.closeQuietly(input);
 		}
+	}
+	
+	@Override
+	public String getFileUploadDir() {
+		java.io.File dbBakDir = new java.io.File(FILE_UPLOAD_DIR);
+		if (!dbBakDir.isAbsolute()) {
+			dbBakDir = new java.io.File(String.format("%s/%s", System.getProperty("user.dir"), FILE_UPLOAD_DIR));// 如果是相对路径，备份路径为当前war包启动路径+配置文件子目录
+		}
+		return dbBakDir.getAbsolutePath();
 	}
 
 	@Override
