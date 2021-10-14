@@ -8,11 +8,15 @@ import org.docx4j.Docx4J;
 import org.docx4j.Docx4jProperties;
 import org.docx4j.convert.out.ConversionFeatures;
 import org.docx4j.convert.out.HTMLSettings;
+import org.docx4j.fonts.BestMatchingMapper;
+import org.docx4j.fonts.IdentityPlusMapper;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Node;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.wcpdoc.exam.core.exception.MyException;
 
@@ -22,6 +26,7 @@ import com.wcpdoc.exam.core.exception.MyException;
  * v1.0 zhanghc 2019年7月19日下午11:15:52
  */
 public abstract class WordServer {
+	private static final Logger log = LoggerFactory.getLogger(WordServer.class);
 
 	/**
 	 * 文件处理
@@ -30,13 +35,23 @@ public abstract class WordServer {
 	 * 
 	 * @param word word流
 	 * @param imgDir 保存word图片路径
+	 * @param processBarId 
 	 * @return List<T> 实现类decoder()返回值
 	 */
 	public <T> List<T> handle(InputStream word, String imgDir) {
+		log.debug("word解析试题：word转html开始");
+		long startTime = System.currentTimeMillis();
 		String html = word2Html(word, imgDir);
+		long endTime = System.currentTimeMillis();
+		log.debug("word解析试题：word转html结束，用时{}毫秒", endTime - startTime);
+		
+		log.debug("word解析试题：html转解析对象开始");
+		startTime = System.currentTimeMillis();
 		Document document = Jsoup.parse(html);
 		headStyle2ElementStyle(document);
 		List<Node> rowNodes = document.getElementsByClass("document").get(0).childNodes();
+		endTime = System.currentTimeMillis();
+		log.debug("word解析试题：html转解析对象结束，用时{}毫秒", endTime - startTime);
 		return decoder(rowNodes);
 	}
 	
@@ -93,6 +108,16 @@ public abstract class WordServer {
 		try {
 			wordMLPackage = Docx4J.load(word);// 加载word流
 		} catch (Docx4JException e) {
+			throw new MyException(e.getMessage());
+		}
+		
+		try {
+			if (System.getProperty("os.name").toLowerCase().indexOf("windows") >= 0) {
+				wordMLPackage.setFontMapper(new IdentityPlusMapper());// 代码来自官方例子
+			} else {
+				wordMLPackage.setFontMapper(new BestMatchingMapper());
+			}
+		} catch (Exception e) {
 			throw new MyException(e.getMessage());
 		}
 		

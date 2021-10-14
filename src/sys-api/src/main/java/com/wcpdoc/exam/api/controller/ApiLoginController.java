@@ -1,11 +1,15 @@
 package com.wcpdoc.exam.api.controller;
 
+import java.io.File;
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
 import javax.security.auth.login.LoginException;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -134,6 +138,33 @@ public class ApiLoginController extends BaseController {
 		} catch (Exception e) {
 			log.error("获取服务器时间错误：", e);
 			return PageResult.err().msg(e.getMessage());
+		}
+	}
+	
+	/**
+	 * 获取ico
+	 * 
+	 * v1.0 chenyun 2021-10-08 16:05:35
+	 * @return void
+	 */
+	@RequestMapping("/ico")
+	@ResponseBody
+	public void ico() {
+		OutputStream output = null;
+		try {
+			String filepath = String.format(".\\config\\favicon.ico");
+			String fileName = new String("favicon.ico".getBytes("UTF-8"), "ISO-8859-1");
+			response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
+			response.setContentType("application/force-download");
+
+			output = response.getOutputStream();
+			FileUtils.copyFile(new File(filepath), output);
+		} catch (MyException e) {
+			log.error("完成下载附件失败：", e.getMessage());
+		} catch (Exception e) {
+			log.error("完成下载附件失败：", e);
+		} finally {
+			IOUtils.closeQuietly(output);
 		}
 	}
 }

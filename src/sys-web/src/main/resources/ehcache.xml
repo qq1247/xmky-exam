@@ -17,7 +17,7 @@
 	<cache name="MY_CACHE"
 		maxEntriesLocalHeap="100000">
 	</cache><!-- maxEntriesLocalHeap必须配置 -->
-	<!-- 进度条缓存，内存，60秒有效 -->
+	<!-- 进度条缓存，内存，空闲60秒后失效 -->
 	<cache name="PROGRESS_BAR_CACHE"
 		maxEntriesLocalHeap="100000"
 		timeToIdleSeconds="60">

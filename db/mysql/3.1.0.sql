@@ -312,10 +312,12 @@ create table EXM_QUESTION_TYPE_OPEN
    UPDATE_TIME          datetime comment '修改时间',
    STATE                int comment '0：删除；1：正常',
    QUESTION_TYPE_ID     int comment '试题分类ID',
+   COMMENT_STATE        int comment '评论状态(0：不显示；1：只读；2：可编辑,)',
    primary key (ID)
 );
 
 alter table EXM_QUESTION_TYPE_OPEN comment '试题分类';
+
 
 drop table if exists EXM_QUESTION_OPTION;
 

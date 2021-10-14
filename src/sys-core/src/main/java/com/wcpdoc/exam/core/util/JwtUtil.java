@@ -120,7 +120,7 @@ public class JwtUtil {
 	public JwtResult parse(String token) {
 		try {
 			if (!ValidateUtil.isValid(token)) {
-				return new JwtResult(400, "令牌为空", null);
+				return new JwtResult(HttpStatus.BAD_REQUEST.value(), "令牌为空", null);
 			}
 
 			Claims claims = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody();

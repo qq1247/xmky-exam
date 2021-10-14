@@ -33,4 +33,12 @@ public interface ParmService extends BaseService<Parm> {
 	 * @return Parm
 	 */
 	Parm get();
+	
+	/**
+	 * 修改名称和logo
+	 * 
+	 * v1.0 chenyun 2021年10月8日下午2:30:00
+	 * @param parm void
+	 */
+	void editLogo(Parm parm) throws Exception;
 }
