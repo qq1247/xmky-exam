@@ -13,6 +13,13 @@
 		</RollingFile>
 	</appenders>
 	<loggers>
+		<!-- sql日志 -->
+		<Logger name="jdbc.sqlonly" level="off"></Logger>
+		<Logger name="jdbc.sqltiming" level="info"></Logger>
+		<Logger name="jdbc.audit" level="off"></Logger>
+		<Logger name="jdbc.resultset" level="off"></Logger>
+		<Logger name="jdbc.resultsettable" level="off"></Logger>
+		<Logger name="jdbc.connection" level="off"></Logger>
 		<!-- 打印令牌登陆、过期、刷新等日志 -->
 		<Logger name="com.wcpdoc.exam.base.service.impl.LoginServiceImpl" level="info"></Logger>
 		<Logger name="com.wcpdoc.exam.auth.filter.JWTFilter" level="info"></Logger>
