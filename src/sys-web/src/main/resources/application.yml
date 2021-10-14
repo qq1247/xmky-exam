@@ -28,6 +28,9 @@ spring:
 file: 
   upload:
     dir: c:/bak/file
+db:
+  bak:
+    dir: bak/db
 
 logging:
   config: config/log4j2.xml
