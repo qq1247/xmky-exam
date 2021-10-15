@@ -7,6 +7,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.wcpdoc.exam.core.interceptor.RunTimeInterceptor;
 import com.wcpdoc.exam.core.interceptor.UserContextInterceptor;
 
 /**
@@ -18,6 +19,8 @@ import com.wcpdoc.exam.core.interceptor.UserContextInterceptor;
 public class ApplicationCfg implements WebMvcConfigurer {
 	@Resource
 	private UserContextInterceptor userContextInterceptor;
+	@Resource
+	private RunTimeInterceptor runTimeInterceptor;
 
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
@@ -27,6 +30,6 @@ public class ApplicationCfg implements WebMvcConfigurer {
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(userContextInterceptor).addPathPatterns("/api/**");
+		registry.addInterceptor(runTimeInterceptor).addPathPatterns("/api/**");
 	}
-
 }

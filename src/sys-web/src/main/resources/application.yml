@@ -31,14 +31,18 @@ file:
 db:
   bak:
     dir: bak/db
-
+    
+runtime:
+  timeout: 1000
+  exUrl: 
+  
 logging:
   config: config/log4j2.xml
       
-sys:
-  ver: 3.1.0
 token:
     expireMinute: 1440
     refreshMinute: 60
     secret: 9xzR4+K7XpvbCpoIMocXVxS655xxb9S0Qxd5RDU4b7PeSIhYfYdjg9aOMrhjPjwN
-    
+
+sys:
+  ver: 3.2.0

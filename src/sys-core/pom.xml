@@ -80,6 +80,11 @@
 			<artifactId>commons-beanutils</artifactId>
 			<version>1.9.3</version>
 		</dependency>
+		<dependency>
+		   <groupId>org.apache.commons</groupId>
+		   <artifactId>commons-text</artifactId>
+		   <version>1.8</version>
+		</dependency>
 		<!-- 集成第三方授权 令牌 -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
@@ -97,12 +102,6 @@
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt</artifactId>
 			<version>0.9.1</version>
-		</dependency>
-		<!-- sql 大小写转换 -->
-		<dependency>
-		   <groupId>org.apache.commons</groupId>
-		   <artifactId>commons-text</artifactId>
-		   <version>1.8</version>
 		</dependency>
 	</dependencies>
 </project>
