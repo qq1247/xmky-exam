@@ -8,8 +8,6 @@ import javax.annotation.Resource;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -49,7 +47,6 @@ public class ApiFileController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult listpage() {
 		try {
 			return PageResultEx.ok().data(fileService.getListpage(new PageIn(request)));
@@ -127,7 +124,6 @@ public class ApiFileController extends BaseController {
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult del(Integer id) {
 		try {
 			File file = fileService.getEntity(id);
@@ -152,7 +148,6 @@ public class ApiFileController extends BaseController {
 	 */
 	@RequestMapping("/get")
 	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
 	public PageResult get(String uuId) {
 		try {
 			Integer fileId = fileService.getFileId(uuId);

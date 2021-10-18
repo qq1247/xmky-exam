@@ -287,53 +287,6 @@ public class ApiPaperController extends BaseController {
 	}
 	
 	/**
-	 * 章节下移
-	 * 
-	 * v1.0 zhanghc 2018年10月21日上午10:46:54
-	 * @param chapterId
-	 * @return PageResult
-	 */
-//	@RequestMapping("/chapterDown")
-//	@ResponseBody
-//	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-//	public PageResult chapterDown(Integer chapterId) {
-//		try {
-//			paperService.chapterDown(chapterId);
-//			return PageResult.ok();
-//		} catch (MyException e) {
-//			log.error("章节下移错误：{}", e.getMessage());
-//			return PageResult.err().msg(e.getMessage());
-//		} catch (Exception e) {
-//			log.error("章节下移错误：", e);
-//			return PageResult.err();
-//		}
-//	}
-	
-	/**
-	 * 试题列表
-	 * 
-	 * v1.0 zhanghc 2018年10月21日上午8:17:09
-	 * @param pageIn
-	 * @return PageOut
-	 */
-//	@RequestMapping("/questionList")
-//	@ResponseBody
-//	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-//	public PageResult questionList() {
-//		try {
-//			PageIn pageIn = new PageIn(request);
-//			if (getCurUser().getId() != 1) {
-//				pageIn.addAttr("paperId", "1")
-//					  .addAttr("curUserId", getCurUser().getId());
-//			}
-//			return PageResultEx.ok().data(questionService.getListpage(pageIn));
-//		} catch (Exception e) {
-//			log.error("试题列表错误：", e);
-//			return PageResult.err();
-//		}
-//	}
-	
-	/**
 	 * 试卷试题列表
 	 * 拥有读写权限才显示答案字段
 	 * 
@@ -445,52 +398,6 @@ public class ApiPaperController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
-	/**
-	 * 试题上移
-	 * 
-	 * v1.0 zhanghc 2018年10月21日上午10:46:54
-	 * @param paperQuestionId
-	 * @return PageResult
-	 */
-//	@RequestMapping("/questionUp")
-//	@ResponseBody
-//	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-//	public PageResult questionUp(Integer paperQuestionId) {
-//		try {
-//			paperService.questionUp(paperQuestionId);
-//			return PageResult.ok();
-//		} catch (MyException e) {
-//			log.error("试题上移错误：{}", e.getMessage());
-//			return PageResult.err().msg(e.getMessage());
-//		} catch (Exception e) {
-//			log.error("试题上移错误：", e);
-//			return PageResult.err();
-//		}
-//	}
-	
-	/**
-	 * 试题下移
-	 * 
-	 * v1.0 zhanghc 2018年10月21日上午10:46:54
-	 * @param paperQuestionId
-	 * @return PageResult
-	 */
-//	@RequestMapping("/questionDown")
-//	@ResponseBody
-//	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-//	public PageResult questionDown(Integer paperQuestionId) {
-//		try {
-//			paperService.questionDown(paperQuestionId);
-//			return PageResult.ok();
-//		} catch (MyException e) {
-//			log.error("试题下移错误：{}", e.getMessage());
-//			return PageResult.err().msg(e.getMessage());
-//		} catch (Exception e) {
-//			log.error("试题下移错误：", e);
-//			return PageResult.err();
-//		}
-//	}
 	
 	/**
 	 * 试题删除

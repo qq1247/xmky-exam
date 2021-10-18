@@ -149,35 +149,6 @@ public class ApiQuestionTypeController extends BaseController {
 	}
 	
 	/**
-	 * 获取人员列表 
-	 * 
-	 * v1.0 zhanghc 2017年6月16日下午5:02:45
-	 * @param pageIn
-	 * @return PageOut
-	 */
-//	@RequestMapping("/authUserListpage")
-//	@ResponseBody
-//	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-//	public PageResult authUserListpage() {
-//		try {
-//			PageIn pageIn = new PageIn(request);
-//		    if(pageIn.get("id", Integer.class) != null && ValidateUtil.isValid(pageIn.get("write"))){
-//		     pageIn.addAttr("idWrite", pageIn.get("id", Integer.class).toString());
-//		    }
-//		    if(pageIn.get("id", Integer.class) != null && ValidateUtil.isValid(pageIn.get("read"))){
-//		     pageIn.addAttr("idRead", pageIn.get("id", Integer.class).toString());
-//		    }
-//			return PageResultEx.ok().data(questionTypeService.authUserListpage(pageIn));
-//		} catch (MyException e) {
-//			log.error("权限用户列表错误：{}", e.getMessage());
-//			return PageResult.err().msg(e.getMessage());
-//		} catch (Exception e) {
-//			log.error("权限用户列表错误：", e);
-//			return PageResult.err();
-//		}
-//	}
-	
-	/**
 	 * 添加权限
 	 * 
 	 * v1.0 chenyun 2021年3月2日上午10:18:26
