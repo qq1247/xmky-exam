@@ -21,6 +21,7 @@ import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.OnlineUser;
 import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.exception.MyException;
@@ -316,7 +317,7 @@ public class ApiExamController extends BaseController{
 				map.put("onlineTime", DateUtil.formatDateTime(onlineUser.getUpdateTime()));
 			}
 			
-			return PageResultEx.ok().data(null);
+			return PageResultEx.ok().data(new PageOut(examUserList, examUserList.size()));
 		} catch (Exception e) {
 			log.error("在线用户错误：", e);
 			return PageResult.err();
