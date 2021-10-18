@@ -8,4 +8,7 @@ package com.wcpdoc.exam.core.constant;
 public class ConstantManager {
 	/** 超级管理员登陆名称 */
 	public static final String ADMIN_LOGIN_NAME = "admin";
+	/** 子管理员登陆名称 */
+	public static final String SUB_ADMIN_LOGIN_NAME = "subAdmin";
+	
 }

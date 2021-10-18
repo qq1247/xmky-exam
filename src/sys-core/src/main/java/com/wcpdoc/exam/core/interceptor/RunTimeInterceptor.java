@@ -26,10 +26,16 @@ public class RunTimeInterceptor implements HandlerInterceptor {
 	private Integer TIMEOUT;// 超时时间
 	@Value("${runtime.exUrl}")
 	private String EXURL;// 排除链接
+	@Value("${runtime.monitor}")
+	private boolean MONITOR;// 是否监听
 	
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-		if (ValidateUtil.isValid(EXURL) && EXURL.contains(request.getRequestURI())) {
+		if (!MONITOR) {
+			return false;
+		}
+		
+		if (ValidateUtil.isValid(EXURL) && EXURL.equals(request.getRequestURI())) {
 			return false;
 		}
 		

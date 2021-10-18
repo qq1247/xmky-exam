@@ -3,7 +3,6 @@ package com.wcpdoc.exam.base.service;
 import java.util.List;
 
 import com.wcpdoc.exam.base.entity.User;
-import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.service.BaseService;
 
 /**
@@ -86,14 +85,6 @@ public interface UserService extends BaseService<User> {
 	void roleUpdate(Integer id, String roles);
 	
 	/**
-	 * 在线用户
-	 * 
-	 * v1.0 chenyun 2021年3月25日上午10:29:51
-	 * @return PageOut
-	 */
-	PageOut onList();
-	
-	/**
 	 * 同步用户
 	 * 
 	 * v1.0 chenyun 2021年3月26日下午3:50:32
@@ -101,4 +92,5 @@ public interface UserService extends BaseService<User> {
 	 * @param orgId
 	 */
 	void syncUser(List<User> user, Integer orgId);
+
 }

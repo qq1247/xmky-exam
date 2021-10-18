@@ -1,4 +1,4 @@
-package com.wcpdoc.exam.core.entity;
+package com.wcpdoc.exam.auth.entity;
 
 import io.jsonwebtoken.Claims;
 

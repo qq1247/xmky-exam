@@ -8,9 +8,6 @@ import com.wcpdoc.exam.core.entity.LoginUser;
  * v1.0 zhanghc 2021年10月8日下午5:16:38
  */
 public class UserContext {
-	private UserContext() {
-	}
-
 	private static final ThreadLocal<LoginUser> context = new ThreadLocal<>();
 
 	public static void set(LoginUser loginuser) {

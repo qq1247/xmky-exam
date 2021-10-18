@@ -3,7 +3,6 @@ package com.wcpdoc.exam.api.controller;
 import java.io.File;
 import java.io.OutputStream;
 import java.util.Date;
-import java.util.List;
 
 import javax.annotation.Resource;
 import javax.security.auth.login.LoginException;
@@ -16,16 +15,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.base.entity.UserToken;
 import com.wcpdoc.exam.base.service.LoginService;
-import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.util.DateUtil;
-import com.wcpdoc.exam.core.util.Param;
 
 /**
  * 登录控制层
@@ -39,8 +35,6 @@ public class ApiLoginController extends BaseController {
 	
 	@Resource
 	private LoginService loginService;
-	@Resource
-	private UserService userService;
 	
 	/**
 	 * 完成登录
@@ -65,21 +59,6 @@ public class ApiLoginController extends BaseController {
 			log.error("完成登录错误：", e);
 			return PageResult.err();
 		}
-	}
-	
-	/**
-	 * 完成登录
-	 * 
-	 * v1.0 zhanghc 2016年7月18日下午3:23:00
-	 * @param loginName
-	 * @param pwd
-	 * @param model
-	 * @return String
-	 */
-	@RequestMapping("/aa")
-	@ResponseBody
-	public void aa(@Param List<User> user) {
-		System.err.println(user);
 	}
 	
 	/**
@@ -127,6 +106,8 @@ public class ApiLoginController extends BaseController {
 	 * 获取服务器时间
 	 * 
 	 * v1.0 zhanghc 2017年6月25日下午4:19:05
+	 * 每隔30秒前端请求一次，心跳机制检测在线状态
+	 * 
 	 * @return
 	 * PageResult
 	 */
@@ -160,9 +141,9 @@ public class ApiLoginController extends BaseController {
 			output = response.getOutputStream();
 			FileUtils.copyFile(new File(filepath), output);
 		} catch (MyException e) {
-			log.error("完成下载附件失败：", e.getMessage());
+			log.error("获取ico失败：", e.getMessage());
 		} catch (Exception e) {
-			log.error("完成下载附件失败：", e);
+			log.error("获取ico失败：", e);
 		} finally {
 			IOUtils.closeQuietly(output);
 		}

@@ -21,8 +21,8 @@ import com.wcpdoc.exam.auth.Service.ShiroService;
 import com.wcpdoc.exam.auth.cache.TokenCache;
 import com.wcpdoc.exam.auth.entity.AuthUser;
 import com.wcpdoc.exam.auth.entity.JWTToken;
-import com.wcpdoc.exam.core.entity.JwtResult;
-import com.wcpdoc.exam.core.util.JwtUtil;
+import com.wcpdoc.exam.auth.entity.JwtResult;
+import com.wcpdoc.exam.auth.util.JwtUtil;
 
 /**
  * jwt授权认证

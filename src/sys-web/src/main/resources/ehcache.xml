@@ -43,7 +43,7 @@
 		timeToLiveSeconds="3600">
     </cache>
     <!-- 在线人员缓存，硬盘持久化 -->
-    <cache name="ON_LINE_CACHE" 
+    <cache name="ONLINE_CACHE" 
 		maxElementsInMemory="1"
 		overflowToDisk="true" 
 		maxElementsOnDisk="0" 

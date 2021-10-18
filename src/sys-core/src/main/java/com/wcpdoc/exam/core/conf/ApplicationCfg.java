@@ -1,4 +1,4 @@
-package com.wcpdoc.exam.web.conf;
+package com.wcpdoc.exam.core.conf;
 
 import javax.annotation.Resource;
 
@@ -7,6 +7,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.wcpdoc.exam.core.interceptor.OnlineUserInterceptor;
 import com.wcpdoc.exam.core.interceptor.RunTimeInterceptor;
 import com.wcpdoc.exam.core.interceptor.UserContextInterceptor;
 
@@ -21,6 +22,8 @@ public class ApplicationCfg implements WebMvcConfigurer {
 	private UserContextInterceptor userContextInterceptor;
 	@Resource
 	private RunTimeInterceptor runTimeInterceptor;
+	@Resource
+	private OnlineUserInterceptor onlineUserInterceptor;
 
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
@@ -31,5 +34,6 @@ public class ApplicationCfg implements WebMvcConfigurer {
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(userContextInterceptor).addPathPatterns("/api/**");
 		registry.addInterceptor(runTimeInterceptor).addPathPatterns("/api/**");
+		registry.addInterceptor(onlineUserInterceptor).addPathPatterns("/api/**");
 	}
 }

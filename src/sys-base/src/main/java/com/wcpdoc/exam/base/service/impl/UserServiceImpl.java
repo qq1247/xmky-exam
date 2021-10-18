@@ -1,22 +1,17 @@
 package com.wcpdoc.exam.base.service.impl;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.exam.auth.cache.TokenCache;
-import com.wcpdoc.exam.auth.realm.JWTRealm;
 import com.wcpdoc.exam.base.dao.UserDao;
 import com.wcpdoc.exam.base.entity.User;
+import com.wcpdoc.exam.base.service.UserExService;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
-import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.util.EncryptUtil;
@@ -32,7 +27,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	@Resource
 	private UserDao userDao;
 	@Resource
-	private JWTRealm jwtRealm;
+	private UserExService userExService;
 
 	@Override
 	@Resource(name = "userDaoImpl")
@@ -75,17 +70,10 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		if (!ValidateUtil.isValid(newPwd)) {
 			throw new MyException("参数错误：newPwd");
 		}
-		if (getCurUser().getId() != getCurUser().getId().intValue()) {
-			throw new MyException("非法操作！");
-		}
 		User user = getEntity(getCurUser().getId());
-		if (getCurUser().getId().intValue() != getCurUser().getId().intValue()) {
-			throw new MyException("非法操作！");
-		}
-
 		String oldEncryptPwd = getEncryptPwd(user.getLoginName(), oldPwd);
 		if (!user.getPwd().equals(oldEncryptPwd)) {
-			throw new MyException("原始密码错误！");
+			throw new MyException("原始密码错误");
 		}
 
 		// 修改密码
@@ -105,9 +93,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 
 		return EncryptUtil.md52Base64(loginName + pwd);
 	}
-public static void main(String[] args) {
-	System.err.println(new UserServiceImpl().getEncryptPwd("cy", "111111"));
-}
+
 	@Override
 	public List<User> getList(Integer orgId) {
 		return userDao.getList(orgId);
@@ -135,26 +121,7 @@ public static void main(String[] args) {
 		userDao.update(user);
 
 		// 授权立即生效
-		jwtRealm.clearAuth(user.getId());
-	}
-
-	@Override
-	public PageOut onList() {
-		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-		List<Integer> tokenCacheList = TokenCache.getList();
-		for(Integer id : tokenCacheList){
-			User entity = userDao.getEntity(id);
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("id", entity.getId());
-			map.put("name", entity.getName());
-			map.put("loginName", entity.getLoginName());
-			list.add(map);
-		}
-		
-		PageOut pageOut = new PageOut();
-		pageOut.setList(list);
-		pageOut.setTotal(tokenCacheList.size());
-		return pageOut;
+		userExService.roleUpdate(user.getId());
 	}
 
 	@Override

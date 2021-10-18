@@ -25,19 +25,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.wcpdoc.exam.auth.cache.TokenCache;
 import com.wcpdoc.exam.base.entity.Org;
 import com.wcpdoc.exam.base.entity.User;
 import com.wcpdoc.exam.base.entity.UserXlsx;
 import com.wcpdoc.exam.base.service.OrgService;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.base.service.UserXlsxService;
+import com.wcpdoc.exam.core.constant.ConstantManager;
 import com.wcpdoc.exam.core.controller.BaseController;
+import com.wcpdoc.exam.core.entity.OnlineUser;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.service.OnlineUserService;
 import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 
@@ -57,6 +59,8 @@ public class ApiUserController extends BaseController {
 	private OrgService orgService;
 	@Resource
 	private UserXlsxService userXlsxService;
+	@Resource
+	private OnlineUserService onlineUserService;
 
 	/**
 	 * 用户列表
@@ -73,9 +77,23 @@ public class ApiUserController extends BaseController {
 			PageOut pageOut = userService.getListpage(new PageIn(request));
 			for (Map<String, Object> map : pageOut.getList()) {
 				if (map.get("roles") != null) {
-					map.put("roleNames", ((String) map.get("roles")).contains("subAdmin") ? "子管理员" : "用户");
+					map.put("roleNames", ConstantManager.SUB_ADMIN_LOGIN_NAME.equals(((String) map.get("roles"))) ? "子管理员" : "用户");
 				}else{
 					map.put("roleNames", "用户");
+				}
+				
+				if (ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())// 如果是管理员或子管理员，显示在线状态和最后在线时间
+						|| ConstantManager.SUB_ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
+					Integer id = (Integer)map.get("id");
+					OnlineUser onlineUser = onlineUserService.getEntity(id);
+					if (onlineUser == null) {
+						map.put("online", false);
+						map.put("onlineTime", null);
+						continue;
+					}
+					
+					map.put("online", onlineUser.getState());
+					map.put("onlineTime", DateUtil.formatDateTime(onlineUser.getUpdateTime()));
 				}
 			}
 			
@@ -241,47 +259,6 @@ public class ApiUserController extends BaseController {
 	}
 
 	/**
-	 * 设置组织机构
-	 * 
-	 * v1.0 zhanghc 2016-6-15下午17:24:19
-	 * 
-	 * @param ids
-	 * @param orgId
-	 * @return PageResult
-	 */
-	/*@RequestMapping("/orgUpdate")
-	@ResponseBody
-	@RequiresRoles(value={"admin"},logical = Logical.OR)
-	public PageResult orgUpdate(Integer id, Integer orgId) {
-		try {
-			// 校验数据有效性
-			if (id == null) {
-				throw new MyException("参数错误：id");
-			}
-			if (orgId == null) {
-				throw new MyException("参数错误：orgId");
-			}
-			
-			// 设置组织机构
-			User user = userService.getEntity(id);
-			if (user.getOrgId().intValue() != orgId.intValue()) {
-				user.setOrgId(orgId);
-				user.setUpdateTime(new Date());
-				user.setUpdateUserId(getCurUser().getId());
-				user.setRoles(null);//清空岗位，因为机构变更了
-				userService.update(user);
-			}
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("设置组织机构错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("设置组织机构错误：", e);
-			return PageResult.err();
-		}
-	}*/
-
-	/**
 	 * 初始化密码
 	 * 
 	 * v1.0 zhanghc 2017年7月13日下午9:27:18
@@ -429,41 +406,19 @@ public class ApiUserController extends BaseController {
 	}
 	
 	/**
-	 * 获取在线用户
-	 * 
-	 * v1.0 zhanghc 2016-6-15下午17:24:19
-	 * 
-	 * @param id
-	 * @return PageResult
-	 */
-	@RequestMapping("/onList")
-	@ResponseBody
-	public PageResult onList() {
-		try {
-			return PageResultEx.ok().data(userService.onList());
-		} catch (MyException e) {
-			log.error("获取在线用户错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("获取在线用户错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 强制退出在线用户
+	 * 强制退出登陆
 	 * v1.0 zhanghc 2016年8月27日上午11:36:55
-	 * 
+	 * @param userId
 	 * @return pageOut
 	 */
-	@RequestMapping("/exit")
+	@RequestMapping("/out")
 	@ResponseBody
-	public PageResult exit(Integer id) {
+	public PageResult out(Integer userId) {
 		try {
-			TokenCache.del(id);
+			onlineUserService.out(userId);
 			return PageResult.ok();
 		} catch (Exception e) {
-			log.error("强制退出在线用户错误：", e);
+			log.error("强制退出登陆错误：", e);
 			return PageResult.err();
 		}
 	}
