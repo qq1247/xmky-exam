@@ -318,7 +318,7 @@ public class ApiQuestionController extends BaseController {
 					try {
 						SpringUtil.getBean(QuestionService.class).wordImp(fileId, questionTypeId, processBarId);
 					} catch (Exception e) {
-						ProgressBarCache.setProgressBar(processBarId, 10.0, 10.0, "开始解析", HttpStatus.OK.value());
+						ProgressBarCache.setProgressBar(processBarId, 10.0, 10.0, "开始解析", HttpStatus.INTERNAL_SERVER_ERROR.value());
 						log.error("word试题导入错误：", e.getMessage());
 						UserContext.remove();
 					}

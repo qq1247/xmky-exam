@@ -23,7 +23,7 @@ public class LogServiceImpl implements LogService {
 	@Override
 	public Map<String, Object> getList(String logName, Long curReadLen) {
 		// 如果第一次访问，获取前一万个字节的字符串
-		File logFile = new File(String.format("%s%s%s", logDir.getAbsolutePath(), File.separator, logName));
+		File logFile = new File(String.format("%s/%s", logDir.getAbsolutePath(), logName));
 		Long fileLen = logFile.length();
 		if (curReadLen == null) {
 			curReadLen = fileLen - 10000;
