@@ -123,77 +123,6 @@ public class ApiMyExamController extends BaseController{
 		}
 	}
 	
-//	/**
-//	 * 到达考试页面
-//	 * 
-//	 * v1.0 zhanghc 2017-05-25 16:34:59
-//	 * @param model
-//	 * @param myExamId
-//	 * @return String
-//	 */
-//	@RequestMapping("/toExam")
-//	@RequiresRoles(value={"user"},logical = Logical.OR)
-//	public String toExam(Model model, Integer myExamId) {
-//		try {
-//			//校验数据有效性
-//			MyExam myExam = myExamService.getEntity(myExamId);
-//			if(myExam == null) {
-//				throw new MyException("参数错误：myExamId");
-//			}
-//			if (myExam.getUserId().intValue() != getCurUser().getId()) {
-//				throw new MyException("未参与该考试！");
-//			}
-//			
-//			Exam exam = examService.getEntity(myExam.getExamId());
-//			if(exam.getState() == 0) {
-//				throw new MyException("考试已删除！");
-//			}
-//			if(exam.getState() == 2) {
-//				throw new MyException("考试未发布！");
-//			}
-//			if(exam.getStartTime().getTime() > (new Date().getTime())) {
-//				throw new MyException("考试未开始！");
-//			}
-//			if(exam.getEndTime().getTime() < (new Date().getTime() - 30000)){//预留30秒网络延时
-//				throw new MyException("考试已结束！");
-//			}
-//			
-//			// 试卷信息
-//			model.addAttribute("exam", exam);//考试信息
-//			
-//			Paper paper = paperService.getEntity(exam.getPaperId());//试卷信息
-//			model.addAttribute("paper", paper);
-//			
-//			List<PaperQuestionEx> paperQuestionExList = paperService.getPaperList(exam.getPaperId());//试题信息
-//			model.addAttribute("paperQuestionExList", paperQuestionExList);
-//			
-//			model.addAttribute("myExam", myExam);// 我的考试信息
-//			
-//			List<MyExamDetail> myExamDetailList = myExamDetailService.getList(myExamId);//用户已做答案信息
-//			Map<Long, MyExamDetail> myExamDetailMap = new HashMap<Long, MyExamDetail>();
-//			for(MyExamDetail myExamDetail : myExamDetailList) {
-//				myExamDetailMap.put(myExamDetail.getQuestionId().longValue(), myExamDetail);
-//			}
-//			model.addAttribute("myExamDetailMap", myExamDetailMap);
-//			
-//			model.addAttribute("answer", true);// 控制页面展示那部分
-//			
-//			// 标记为考试中
-//			if (myExam.getState() == 1) {
-//				myExam.setState(2);
-//			}
-//			if (myExam.getAnswerStartTime() == null) {
-//				myExam.setAnswerStartTime(new Date());
-//			}
-//			myExamService.update(myExam);
-//			return "exam/myExam/myExamPaper";
-//		} catch (Exception e) {
-//			log.error("到达考试页面错误：", e);
-//			model.addAttribute("message", e.getMessage());
-//			return "exam/error";
-//		}
-//	}
-	
 	/**
 	 * 更新答案
 	 * 
@@ -257,23 +186,6 @@ public class ApiMyExamController extends BaseController{
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("考试时间表错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 在线请求
-	 * 
-	 * v1.0 chenyun 2021年9月7日下午4:03:28
-	 * @return PageResult
-	 */
-	@RequestMapping("/onLine")
-	@ResponseBody
-	public PageResult onLine() {
-		try {
-			return PageResult.ok();
-		} catch (Exception e) {
-			log.error("在线请求错误：", e);
 			return PageResult.err();
 		}
 	}

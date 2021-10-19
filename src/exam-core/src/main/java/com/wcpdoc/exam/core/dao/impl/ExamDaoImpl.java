@@ -112,29 +112,6 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 	@Override
 	public PageOut getGradeListpage(PageIn pageIn) {
 		return null;
-//		String sql = "SELECT EXAM.NAME AS EXAM_NAME, EXAM.START_TIME AS EXAM_START_TIME, "
-//				+ "		EXAM.END_TIME AS EXAM_END_TIME, PAPER.NAME AS PAPER_NAME, USER.NAME AS USER_NAME, "
-//				+ "		MY_EXAM.TOTAL_SCORE, MY_EXAM.STATE AS MY_EXAM_STATE, MY_MARK.NAME AS MY_MARK_NAME, "
-//				+ "		MY_EXAM.UPDATE_MARK_TIME AS MY_EXAM_UPDATE_MARK_TIME "
-//				+ "FROM EXM_MY_EXAM MY_EXAM "
-//				+ "INNER JOIN EXM_EXAM EXAM ON EXAM.ID = MY_EXAM.EXAM_ID "
-//				+ "INNER JOIN EXM_PAPER PAPER ON EXAM.PAPER_ID = PAPER.ID "
-//				+ "INNER JOIN SYS_USER USER ON MY_EXAM.USER_ID = USER.ID "
-//				+ "INNER JOIN SYS_USER MY_MARK ON MY_EXAM.UPDATE_MARK_USER_ID = MY_MARK.ID ";
-//		
-//		SqlUtil sqlUtil = new SqlUtil(sql);
-//		sqlUtil//.addWhere(ValidateUtil.isValid(pageIn.getOne()) && !"1".equals(pageIn.getOne()), "EXAM.EXAM_TYPE_ID = ?", pageIn.getOne())
-//				.addWhere(ValidateUtil.isValid(pageIn.getTwo()), "EXAM.NAME LIKE ?", "%" + pageIn.getTwo() + "%")
-//				.addWhere(ValidateUtil.isValid(pageIn.getThree()), "PAPER.NAME LIKE ?", "%" + pageIn.getThree() + "%")
-//				.addWhere(ValidateUtil.isValid(pageIn.getFour()), "USER.NAME LIKE ?", "%" + pageIn.getFour() + "%")
-//				.addWhere(ValidateUtil.isValid(pageIn.getFive()), "MARK.USER.NAME LIKE ?", "%" + pageIn.getFive() + "%")
-//				.addWhere(ValidateUtil.isValid(pageIn.getSix()), "MY_EXAM.STATE = ?", pageIn.getSix())
-//				.addOrder("EXAM.START_TIME", Order.DESC);
-//		PageOut pageOut = getListpage(sqlUtil, pageIn);
-//		HibernateUtil.formatDate(pageOut.getRows(), "EXAM_START_TIME", DateUtil.FORMAT_DATE_TIME, 
-//				"EXAM_END_TIME", DateUtil.FORMAT_DATE_TIME, "MY_EXAM_UPDATE_MARK_TIME", DateUtil.FORMAT_DATE_TIME);
-//		HibernateUtil.formatDict(pageOut.getRows(), DictCache.getIndexkeyValueMap(), "MY_EXAM_STATE", "MY_EXAM_STATE");
-//		return pageOut;
 	}
 
 	@Override
@@ -148,8 +125,8 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 		String sql = "SELECT USER.ID, USER.NAME AS NAME, ORG.NAME AS ORG_NAME "
 				+ "FROM SYS_USER USER "
 				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
-				+ "WHERE USER.STATE = 1 AND EXISTS (SELECT 1 FROM EXM_MY_EXAM Z WHERE Z.EXAM_ID = ? AND USER.ID = Z.USER_ID) "
-				+ "ORDER BY USER.UPDATE_TIME DESC ";
+				+ "WHERE EXISTS (SELECT 1 FROM EXM_MY_EXAM Z WHERE Z.EXAM_ID = ? AND USER.ID = Z.USER_ID) "
+				+ "ORDER BY USER.UPDATE_TIME DESC ";//USER.STATE = 1 用户被删除也应该显示
 		return getMapList(sql, new Object[]{id});
 	}
 

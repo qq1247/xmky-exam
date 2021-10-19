@@ -1,6 +1,5 @@
 package com.wcpdoc.exam.core.service.impl;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -15,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.exam.auth.cache.OnLineCache;
 import com.wcpdoc.exam.base.service.OrgService;
 import com.wcpdoc.exam.base.service.UserService;
 import com.wcpdoc.exam.core.dao.BaseDao;
@@ -371,15 +369,4 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		return examType.getReadUserIds().contains(String.format(",%s,", userId));
 	}
 
-	@Override
-	public List<Integer> onLine(Integer[] ids) {
-		List<Integer> onLineList = new ArrayList<Integer>();
-		for(Integer id : ids){
-			Long onLineTime = OnLineCache.getOnLineTime(id);
-			if (onLineTime != null && (new Date().getTime() - onLineTime) <= 65000) { //65000毫秒（1分钟05秒）
-				onLineList.add(id);
-			}
-		}
-		return onLineList;
-	}
 }

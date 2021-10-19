@@ -17,12 +17,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.wcpdoc.exam.auth.cache.OldTokenCache;
-import com.wcpdoc.exam.auth.cache.OnLineCache;
 import com.wcpdoc.exam.auth.cache.TokenCache;
 import com.wcpdoc.exam.auth.entity.JWTToken;
-import com.wcpdoc.exam.core.entity.JwtResult;
+import com.wcpdoc.exam.auth.entity.JwtResult;
+import com.wcpdoc.exam.auth.util.JwtUtil;
 import com.wcpdoc.exam.core.util.DateUtil;
-import com.wcpdoc.exam.core.util.JwtUtil;
 import com.wcpdoc.exam.core.util.SpringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 
@@ -72,7 +71,6 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 		JWTToken jwtToken = new JWTToken(jwt);
 		getSubject(request, response).login(jwtToken);
 		refreshToken(request, response);
-		onLine(request);//统计在线
 		return true;
 	}
 
@@ -154,19 +152,6 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 		}
 	}
 
-	/**
-	 * 缓存在线用户
-	 * 
-	 * v1.0 chenyun 2021年9月7日下午3:41:59
-	 * @param id void
-	 */
-	private void onLine(ServletRequest request) {
-		String oldJwtToken = WebUtils.toHttp(request).getHeader("Authorization");
-		JwtResult oldJwtResult = JwtUtil.getInstance().parse(oldJwtToken);//能到这一步，肯定是登陆成功的，不需要校验空或校验错误。
-		int oldUserId = oldJwtResult.getClaims().get("userId", Integer.class);
-		OnLineCache.setOnLineTime(oldUserId, request.getRemoteHost());
-	}
-	
 	/**
 	 * 拒绝访问处理
 	 */

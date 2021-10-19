@@ -19,14 +19,18 @@ import com.wcpdoc.exam.core.constant.ConstantManager;
 import com.wcpdoc.exam.core.controller.BaseController;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyMark;
+import com.wcpdoc.exam.core.entity.OnlineUser;
 import com.wcpdoc.exam.core.entity.PageIn;
+import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
 import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.ExamTypeService;
 import com.wcpdoc.exam.core.service.MyMarkService;
+import com.wcpdoc.exam.core.service.OnlineUserService;
 import com.wcpdoc.exam.core.service.PaperTypeService;
+import com.wcpdoc.exam.core.util.DateUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
@@ -49,6 +53,8 @@ public class ApiExamController extends BaseController{
 	private MyMarkService myMarkService;
 	@Resource
 	private UserService userService;
+	@Resource
+	private OnlineUserService onlineUserService;
 	
 	/**
 	 * 考试列表 
@@ -105,10 +111,10 @@ public class ApiExamController extends BaseController{
 			examService.updateAndUpdate(exam);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("完成修改考试错误：{}", e.getMessage());
+			log.error("修改考试错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("完成修改考试错误：", e);
+			log.error("修改考试错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -126,10 +132,10 @@ public class ApiExamController extends BaseController{
 			examService.delAndUpdate(id);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("完成删除考试错误：{}", e.getMessage());
+			log.error("删除考试错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("完成删除考试错误：", e);
+			log.error("删除考试错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -185,7 +191,7 @@ public class ApiExamController extends BaseController{
 	}
 	
 	/**
-	 * 考试更新考试用户阅卷用户
+	 * 更新考试阅卷用户
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param id
@@ -200,16 +206,16 @@ public class ApiExamController extends BaseController{
 			examService.updateMarkSet(id, examUserIds, markUserIds);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("完成更新考试用户错误：{}", e.getMessage());
+			log.error("更新考试阅卷用户错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("完成更新考试用户错误：", e);
+			log.error("更新考试阅卷用户错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 完成考试更新判卷用户
+	 * 更新阅卷用户
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param id
@@ -225,16 +231,16 @@ public class ApiExamController extends BaseController{
 			examService.updateMarkUser(id, markUserIds, examUserIds, questionIds);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("完成考试配置错误：{}", e.getMessage());
+			log.error("更新阅卷用户错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("完成考试配置错误：", e);
+			log.error("更新阅卷用户错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 完成发布
+	 * 发布
 	 * 
 	 * v1.0 zhanghc 2018年11月24日上午9:13:22
 	 * @param id
@@ -247,10 +253,10 @@ public class ApiExamController extends BaseController{
 			examService.publish(id);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("完成发布错误：{}", e.getMessage());
+			log.error("发布错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("完成发布错误：", e);
+			log.error("发布错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -279,19 +285,41 @@ public class ApiExamController extends BaseController{
 	}
 	
 	/**
-	 * 在线情况
+	 * 在线用户
 	 * 
 	 * v1.0 chenyun 2021年9月7日下午1:27:31
 	 * @param ids
 	 * @return PageResult
 	 */
-	@RequestMapping("/onLine")
+	@RequestMapping("/onlineUser")
 	@ResponseBody
-	public PageResult onLine(Integer[] ids) {
+	public PageResult onlineUser(Integer id) {
 		try {
-			return PageResultEx.ok().data(examService.onLine(ids));
-		}catch (Exception e) {
-			log.error("在线情况：", e);
+			Exam exam = examService.getEntity(id);
+			if (exam.getEndTime().getTime() < System.currentTimeMillis()) {
+				throw new MyException("考试已结束");
+			}
+			
+			List<Map<String, Object>> examUserList = examService.getExamUserList(id);
+			for (Map<String, Object> map : examUserList) {
+				map.put("userId", map.remove("id"));
+				map.put("userName", map.remove("name"));
+				
+				Integer userId = (Integer)map.get("userId");
+				OnlineUser onlineUser = onlineUserService.getEntity(userId);
+				if (onlineUser == null) {
+					map.put("online", false);
+					map.put("onlineTime", null);
+					continue;
+				}
+				
+				map.put("online", onlineUser.getState());
+				map.put("onlineTime", DateUtil.formatDateTime(onlineUser.getUpdateTime()));
+			}
+			
+			return PageResultEx.ok().data(new PageOut(examUserList, examUserList.size()));
+		} catch (Exception e) {
+			log.error("在线用户错误：", e);
 			return PageResult.err();
 		}
 	}

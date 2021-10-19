@@ -12,7 +12,7 @@ import com.wcpdoc.exam.cache.BaseEhCache;
  * 
  * v1.0 zhanghc 2017年7月5日下午4:22:50
  */
-public class ProgressBarCache extends BaseEhCache{
+public class ProgressBarCache extends BaseEhCache {
 	private static final Logger log = LoggerFactory.getLogger(ProgressBarCache.class);
 	private static final String CACHE_NAME = "PROGRESS_BAR_CACHE";
 	

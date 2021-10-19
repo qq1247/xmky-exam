@@ -1,4 +1,4 @@
-package com.wcpdoc.exam.core.util;
+package com.wcpdoc.exam.auth.util;
 
 import java.util.Date;
 
@@ -7,8 +7,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 
-import com.wcpdoc.exam.core.entity.JwtResult;
+import com.wcpdoc.exam.auth.entity.JwtResult;
 import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.util.SpringUtil;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
