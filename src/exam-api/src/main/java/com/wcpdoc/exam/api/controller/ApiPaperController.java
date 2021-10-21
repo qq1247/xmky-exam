@@ -1,7 +1,6 @@
 package com.wcpdoc.exam.api.controller;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 import javax.annotation.Resource;
 
@@ -118,7 +117,7 @@ public class ApiPaperController extends BaseController {
 	}
 	
 	/**
-	 * 试卷浏览
+	 * 获取试卷
 	 * 
 	 * v1.0 chenyun 2021年3月29日下午5:40:20
 	 * @param paperId
@@ -145,16 +144,16 @@ public class ApiPaperController extends BaseController {
 					.addAttr("createUserId", paper.getCreateUserId())
 					.addAttr("updateUserId", paper.getUpdateUserId());
 		} catch (MyException e) {
-			log.error("添加试卷错误：{}", e.getMessage());
+			log.error("获取试卷错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("添加试卷错误：", e);
+			log.error("获取试卷错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 拷贝试卷
+	 * 复制试卷
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @param id
@@ -186,11 +185,7 @@ public class ApiPaperController extends BaseController {
 	@ResponseBody
 	public PageResult archive(Integer id) {
 		try {
-			Paper entity = paperService.getEntity(id);
-			entity.setState(3);
-			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(getCurUser().getId());
-			paperService.update(entity);
+			paperService.archive(id);
 			return PageResult.ok();
 		}catch (Exception e) {
 			log.error("归档错误：", e);
@@ -229,8 +224,9 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/chapterEdit")
 	@ResponseBody
-	public PageResult chapterEdit(PaperQuestion chapter) {
+	public PageResult chapterEdit(PaperQuestion chapter, Integer chapterId) {
 		try {
+			chapter.setId(chapterId);
 			paperService.chapterEdit(chapter);
 			return PageResult.ok();
 		} catch (MyException e) {
@@ -251,9 +247,9 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/chapterDel")
 	@ResponseBody
-	public PageResult chapterDel(Integer id) {
+	public PageResult chapterDel(Integer chapterId) {
 		try {
-			paperService.chapterDel(id);
+			paperService.chapterDel(chapterId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("删除章节错误：{}", e.getMessage());
@@ -265,17 +261,19 @@ public class ApiPaperController extends BaseController {
 	}
 	
 	/**
-	 * 章节试题移动
+	 * 移动章节或试题
+	 * 章节之间可相互移动；同章节下试题之间可相互移动；不同章节下试题可跨章节移动；
 	 * 
 	 * v1.0 zhanghc 2018年10月21日上午10:46:54
-	 * @param chapterId
+	 * @param sourceId
+	 * @param targetId
 	 * @return PageResult
 	 */
-	@RequestMapping("/movePosition")
+	@RequestMapping("/chapterQuestionMove")
 	@ResponseBody
-	public PageResult movePosition(Integer sourceId, Integer targetId) {
+	public PageResult chapterQuestionMove(Integer sourceId, Integer targetId) {
 		try {
-			paperService.movePosition(sourceId, targetId);
+			paperService.chapterQuestionMove(sourceId, targetId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("章节移动错误：{}", e.getMessage());
@@ -332,16 +330,17 @@ public class ApiPaperController extends BaseController {
 	 * 设置分数
 	 * 
 	 * v1.0 zhanghc 2018年10月21日上午10:46:54
-	 * @param paperQuestionId
+	 * @param id
+	 * @param questionId
 	 * @param score
-	 * @param options
+	 * @param subScores 试题为智能阅卷，并且是填空或问答时有效
 	 * @return PageResult
 	 */
-	@RequestMapping("/updateScore")
+	@RequestMapping("/scoreUpdate")
 	@ResponseBody
-	public PageResult updateScore(Integer paperQuestionId, BigDecimal score, Integer[] paperQuestionAnswerId, BigDecimal[] paperQuestionAnswerScore) {
+	public PageResult scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores) {
 		try {
-			paperService.scoreUpdate(paperQuestionId, score, paperQuestionAnswerId, paperQuestionAnswerScore);
+			paperService.scoreUpdate(id, questionId, score, subScores);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("设置分数错误：{}", e.getMessage());
@@ -353,18 +352,18 @@ public class ApiPaperController extends BaseController {
 	}
 	
 	/**
-	 * 设置选项
+	 * 设置分数选项
 	 * 
 	 * v1.0 zhanghc 2018年10月21日上午10:46:54
 	 * @param paperQuestionId
 	 * @param options
 	 * @return PageResult
 	 */
-	@RequestMapping("/updateScoreOptions")
+	@RequestMapping("/scoreOptionUpdate")
 	@ResponseBody
-	public PageResult updateScoreOptions(Integer paperQuestionId, Integer[] scoreOptions) {
+	public PageResult scoreOptionUpdate(Integer id, Integer questionId, Integer[] scoreOptions) {
 		try {
-			paperService.optionsUpdate(paperQuestionId, scoreOptions);
+			paperService.scoreOptionUpdate(id, questionId, scoreOptions);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("设置分数错误：{}", e.getMessage());
@@ -384,20 +383,20 @@ public class ApiPaperController extends BaseController {
 	 * @param options
 	 * @return PageResult
 	 */
-	@RequestMapping("/updateBatchScore")
-	@ResponseBody
-	public PageResult updateBatchScore(Integer chapterId, BigDecimal score, String options) {
-		try {
-			paperService.batchScoreUpdate(chapterId, score, options);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("设置分数错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("设置分数错误：", e);
-			return PageResult.err();
-		}
-	}
+//	@RequestMapping("/updateBatchScore")// 暂时不用
+//	@ResponseBody
+//	public PageResult updateBatchScore(Integer chapterId, BigDecimal score, String options) {
+//		try {
+//			paperService.batchScoreUpdate(chapterId, score, options);
+//			return PageResult.ok();
+//		} catch (MyException e) {
+//			log.error("设置分数错误：{}", e.getMessage());
+//			return PageResult.err().msg(e.getMessage());
+//		} catch (Exception e) {
+//			log.error("设置分数错误：", e);
+//			return PageResult.err();
+//		}
+//	}
 	
 	/**
 	 * 试题删除
@@ -408,9 +407,9 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/questionDel")
 	@ResponseBody
-	public PageResult questionDel(Integer paperQuestionId) {
+	public PageResult questionDel(Integer id, Integer questionId) {
 		try {
-			paperService.questionDel(paperQuestionId);
+			paperService.questionDel(id, questionId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("试题删除错误：{}", e.getMessage());
@@ -435,10 +434,10 @@ public class ApiPaperController extends BaseController {
 			paperService.questionClear(chapterId);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("添加试题错误：{}", e.getMessage());
+			log.error("清空试题错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("添加试题错误：", e);
+			log.error("清空试题错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -466,33 +465,26 @@ public class ApiPaperController extends BaseController {
 	}
 	
 	/**
-	 * 修改试卷总分数
+	 * 更新总分数
+	 * 组卷时，总分数由前端计算并显示（加速响应提高用户体验）
+	 * 在关闭浏览器，或在组卷页面点击返回按钮时，调用该接口来更新试卷总分数。
+	 * 浏览器崩溃或前端异常等原因，不能保证一定能调用到该接口，最终由发布接口保证结果的一致性和正确性。
 	 * 
 	 * v1.0 chenyun 2021年8月23日上午10:58:27
 	 * @param id
-	 * @param totalScore
 	 * @return PageResult
 	 */
-	@RequestMapping("/updateTotalScore")
+	@RequestMapping("/totalScoreUpdate")
 	@ResponseBody
-	public PageResult updateTotalScore(Integer id, BigDecimal totalScore) {
+	public PageResult totalScoreUpdate(Integer id) {
 		try {
-			Paper paper = paperService.getEntity(id);
-			if(paper.getState() == 0) {
-				throw new MyException("试卷【"+paper.getName()+"】已删除！");
-			}
-			if(paper.getState() == 1) {
-				throw new MyException("试卷【"+paper.getName()+"】已发布！");
-			}
-			
-			paper.setTotalScore(totalScore);
-			paperService.update(paper);
+			paperService.totalScoreUpdate(id);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("修改错误：{}", e.getMessage());
+			log.error("更新总分数错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("修改错误：", e);
+			log.error("更新总分数错误：", e);
 			return PageResult.err();
 		}
 	}

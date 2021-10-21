@@ -27,6 +27,7 @@ import com.wcpdoc.exam.core.util.ValidateUtil;
  */
 @Service
 public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginService {
+	@Resource
 	private UserService userService;
 	@Resource
 	private UserExService userExService;

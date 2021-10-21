@@ -252,10 +252,10 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 				myExam.setExamId(id);
 				myExam.setUserId(Integer.parseInt(userId));
 				
-				myExam.setAnswerStartTime(exam.getStartTime());
-				myExam.setAnswerEndTime(exam.getEndTime());
-				myExam.setMarkStartTime(exam.getMarkStartTime());
-				myExam.setMarkEndTime(exam.getMarkEndTime());
+				//myExam.setAnswerStartTime(exam.getStartTime());// 第一次答题记录时间，不是这里
+				//myExam.setAnswerEndTime(exam.getEndTime());
+				//myExam.setMarkStartTime(exam.getMarkStartTime());// 第一次阅卷记录时间，不是这里
+				//myExam.setMarkEndTime(exam.getMarkEndTime());
 				//myExam.setTotalScore(BigDecimal.ZERO);//没有考试，不要设置分数
 				myExam.setState(1);
 				myExam.setMarkState(1);

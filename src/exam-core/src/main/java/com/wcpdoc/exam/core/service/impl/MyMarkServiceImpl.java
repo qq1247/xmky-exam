@@ -23,6 +23,7 @@ import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
 import com.wcpdoc.exam.core.service.PaperQuestionService;
 import com.wcpdoc.exam.core.util.BigDecimalUtil;
+import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
  * 我的阅卷服务层实现
@@ -56,45 +57,55 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 	}
 	
 	@Override
-	public void updateScore(Integer myExamDetailId, BigDecimal score) {
+	public void updateScore(Integer examId, Integer userId, Integer questionId, BigDecimal score) {
 		// 校验数据有效性
-		if (myExamDetailId == null ) {
-			throw new MyException("参数错误：myExamDetailId");
+		if (!ValidateUtil.isValid(examId)) {
+			throw new MyException("参数错误：examId");
 		}
-		if (score == null) {
+		if (!ValidateUtil.isValid(userId)) {
+			throw new MyException("参数错误：userId");
+		}
+		if (!ValidateUtil.isValid(questionId)) {
+			throw new MyException("参数错误：questionId");
+		}
+		if (!ValidateUtil.isValid(score)) {
 			throw new MyException("参数错误：score");
 		}
 		
-		MyExamDetail myExamDetail = myExamDetailService.getEntity(myExamDetailId);
-		List<MyMark> myMarkList = myMarkDao.getList(myExamDetail.getExamId());
-		Exam exam = examService.getEntity(myExamDetail.getExamId());
+		MyExamDetail myExamDetail = myExamDetailService.getEntity(examId, userId, questionId);
+		if (myExamDetail == null) {
+			throw new MyException("未参与考试");
+		}
+		Exam exam = examService.getEntity(examId);
 		if (exam.getState() == 0) {
-			throw new MyException("考试已删除！");
+			throw new MyException("考试已删除");
 		}
 		if (exam.getState() == 2) {
-			throw new MyException("考试未发布！");
+			throw new MyException("考试未发布");
 		}
-		if (exam.getMarkStartTime().getTime() > (new Date().getTime())) {
-			throw new MyException("阅卷未开始！");
+		long curTime = System.currentTimeMillis();
+		if (exam.getStartTime().getTime() > curTime) {
+			throw new MyException("考试未开始");
 		}
-		if (exam.getMarkEndTime().getTime() < (new Date().getTime() - 30000)){//预留30秒网络延时
-			throw new MyException("阅卷已结束！");
+		if (curTime - exam.getEndTime().getTime() > 5000) {// 预留5秒网络延时
+			throw new MyException("考试已结束！");
 		}
-
+		
+		List<MyMark> myMarkList = myMarkDao.getList(examId);
 		boolean ok = false;
 		for (MyMark myMark : myMarkList) {
-			if (myMark.getMarkUserId() == getCurUser().getId()) {
+			if (myMark.getMarkUserId().intValue() == getCurUser().getId().intValue()
+					&& myMark.getExamUserIds().contains(String.format(",%s,", userId.toString()))) {
 				ok = true;
 				break;
 			}
 		}
-
 		if (!ok) {
-			throw new MyException("未参与考试：" + exam.getName());
+			throw new MyException("未参与阅卷");
 		}
 
 		if (score != null) {
-			PaperQuestion paperQuestion = paperQuestionService.getEntity(exam.getPaperId(), myExamDetail.getQuestionId());
+			PaperQuestion paperQuestion = paperQuestionService.getEntity(exam.getPaperId(), questionId);
 			if (BigDecimalUtil.newInstance(score).sub(paperQuestion.getScore()).getResult().doubleValue() > 0) {
 				throw new MyException("最大分值：" + paperQuestion.getScore());
 			}
@@ -106,73 +117,86 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		myExamDetail.setMarkTime(new Date());
 		myExamDetailService.update(myExamDetail);
 		
-		//我的考试更新分数
-		BigDecimal totalScore = new BigDecimal(0);
-		List<MyExamDetail> MyExamDetailList = myExamDetailService.getList(myExamDetail.getMyExamId());
-		for(MyExamDetail entity : MyExamDetailList){
-			if (entity.getScore() == null) {
-				entity.setScore(new BigDecimal(0));
-			}
-			totalScore = totalScore.add(entity.getScore());
+		// 标记为阅卷中，记录阅卷时间
+		MyExam myExam = myExamService.getEntity(examId, userId);
+		myExam.setMarkState(2);
+		if (!ValidateUtil.isValid(myExam.getMarkStartTime())) {
+			myExam.setMarkStartTime(new Date());
+		} else {
+			myExam.setMarkEndTime(new Date());
 		}
-		MyExam myExam = myExamService.getEntity(myExamDetail.getMyExamId());
-		myExam.setAnswerEndTime(new Date());
-		myExam.setTotalScore(totalScore);
 		myExamService.update(myExam);
 	}
 
 	@Override
-	public void doScore(Integer examId, Integer userId, Integer markId) {
+	public void doScore(Integer examId, Integer userId) {
 		// 校验数据有效性
-		//MyExam myExam = myExamService.getEntity(markId);
-		MyMark myMark = myMarkDao.getEntity(markId);
+		if (!ValidateUtil.isValid(examId)) {
+			throw new MyException("参数错误：examId");
+		}
+		if (!ValidateUtil.isValid(userId)) {
+			throw new MyException("参数错误：userId");
+		}
+		
+		MyExam myExam = myExamService.getEntity(examId, userId);
+		if (myExam == null) {
+			throw new MyException("未参与考试");
+		}
 		Exam exam = examService.getEntity(examId);
 		if (exam.getState() == 0) {
-			throw new MyException("考试已删除！");
+			throw new MyException("考试已删除");
 		}
 		if (exam.getState() == 2) {
-			throw new MyException("考试未发布！");
+			throw new MyException("考试未发布");
 		}
-		if (exam.getMarkStartTime().getTime() > (new Date().getTime())) {
-			throw new MyException("阅卷未开始！");
+		long curTime = System.currentTimeMillis();
+		if (exam.getStartTime().getTime() > curTime) {
+			throw new MyException("考试未开始");
 		}
-		if (exam.getMarkEndTime().getTime() < (new Date().getTime() - 30000)){//预留30秒网络延时
-			throw new MyException("阅卷已结束！");
+		if (curTime - exam.getEndTime().getTime() > 5000) {// 预留5秒网络延时
+			throw new MyException("考试已结束！");
 		}
-
-		if (myMark.getMarkUserId() != getCurUser().getId()) {
-			throw new MyException("未参与阅卷：" + exam.getName());
+		
+		List<MyMark> myMarkList = myMarkDao.getList(examId);
+		boolean ok = false;
+		for (MyMark myMark : myMarkList) {
+			if (myMark.getMarkUserId().intValue() == getCurUser().getId().intValue()
+					&& myMark.getExamUserIds().contains(String.format(",%s,", userId.toString()))) {
+				ok = true;
+				break;
+			}
 		}
-		MyExam myExam = myExamService.getEntity(examId, userId);
-		List<MyExamDetail> myExamDetailList = myExamDetailService.getList(myExam.getId());
+		if (!ok) {
+			throw new MyException("未参与阅卷");
+		}
+		
+		List<MyExamDetail> myExamDetailList = myExamDetailService.getList(examId, userId);
 		int num = 0;
-		BigDecimal totalScore = new BigDecimal(0);
+		BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
 		for (MyExamDetail myExamDetail : myExamDetailList) {
 			if (myExamDetail.getScore() == null) {
 				num++;
 			} else {
-				totalScore = BigDecimalUtil.newInstance(myExamDetail.getScore()).add(totalScore).getResult();
+				totalScore.add(myExamDetail.getScore());
 			}
 		}
-
 		if (num > 0) {
 			throw new MyException("还有" + num + "道题未阅！");
 		}
-
-		// 标记为已阅
-		myExam.setMarkState(3);
+		
+		// 标记为已阅，记录阅卷人，统计总分数，标记是否及格
 		myExam.setMyMarkId(getCurUser().getId());
 		myExam.setMarkEndTime(new Date());
-		myExam.setTotalScore(totalScore);
+		myExam.setTotalScore(totalScore.getResult());
+		myExam.setMarkState(3);
+		
 		Paper paper = paperServiceImpl.getEntity(exam.getPaperId());
-		BigDecimal divide = paper.getTotalScore().multiply(paper.getPassScore()).divide(new BigDecimal(100));
-		if (totalScore.compareTo(divide) == 1) {
+		BigDecimal passScore = BigDecimalUtil.newInstance(paper.getTotalScore()).mul(paper.getPassScore()).div(100, 2).getResult();
+		if (BigDecimalUtil.newInstance(totalScore.getResult()).sub(passScore).getResult().doubleValue() > 0) {
 			myExam.setAnswerState(1);
 		} else {
 			myExam.setAnswerState(2);
 		}
-		myExam.setUpdateTime(new Date());
-		myExam.setUpdateUserId(getCurUser().getId());
 		myExamService.update(myExam);
 	}
 }

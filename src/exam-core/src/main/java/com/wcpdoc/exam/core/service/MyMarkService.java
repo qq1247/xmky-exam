@@ -21,13 +21,16 @@ public interface MyMarkService extends BaseService<MyMark>{
 	List<MyMark> getList(Integer examId);
 	
 	/**
-	 * 更新阅卷分数
+	 * 阅卷
 	 * 
 	 * v1.0 chenyun 2021年8月24日上午9:41:53
-	 * @param myExamDetailId
-	 * @param score void
+	 * @param examId
+	 * @param userId
+	 * @param questionId
+	 * @param score
+	 * void
 	 */
-	void updateScore(Integer myExamDetailId, BigDecimal score);
+	void updateScore(Integer examId, Integer userId, Integer questionId, BigDecimal score);
 	
 	/**
 	 * 完成阅卷
@@ -35,7 +38,7 @@ public interface MyMarkService extends BaseService<MyMark>{
 	 * v1.0 chenyun 2021年8月24日上午9:46:01
 	 * @param examId
 	 * @param userId
-	 * @param markId void
+	 * void
 	 */
-	void doScore(Integer examId, Integer userId, Integer markId);
+	void doScore(Integer examId, Integer userId);
 }

@@ -54,9 +54,9 @@ public class RunTimeInterceptor implements HandlerInterceptor {
 		long endTime = System.currentTimeMillis();
 		long runTime = endTime - startTime;
 		if (runTime > TIMEOUT) {
-			log.error("请求耗时异常：链接：{}， 耗时：{}秒，用户：{}，ip:{}，参数:{}", 
+			log.error("请求耗时异常：链接：{}， 耗时：{}毫秒，用户：{}，ip:{}，参数:{}", 
 					request.getRequestURI(),
-					TIMEOUT,
+					runTime,
 					UserContext.get() != null ? UserContext.get().getLoginName() : "匿名",
 					request.getRemoteHost(), 
 					request.getParameterMap());

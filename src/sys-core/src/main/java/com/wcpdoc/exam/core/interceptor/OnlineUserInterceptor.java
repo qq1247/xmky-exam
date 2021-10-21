@@ -28,7 +28,7 @@ public class OnlineUserInterceptor implements HandlerInterceptor {
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		LoginUser loginUser = UserContext.get();
 		if (loginUser == null) {
-			return false;
+			return true;
 		}
 		
 		OnlineUser onlineUser = onlineUserService.getEntity(loginUser.getId());

@@ -124,18 +124,20 @@ public class ApiMyExamController extends BaseController{
 	}
 	
 	/**
-	 * 更新答案
+	 * 答题
 	 * 
 	 * v1.0 zhanghc 2017年6月26日下午12:30:20
-	 * @param myExamDetailId
+	 * @param examId
+	 * @param questionId
 	 * @param answers
+	 * @param fileId
 	 * @return PageResult
 	 */
 	@RequestMapping("/updateAnswer")
 	@ResponseBody
-	public PageResult updateAnswer(Integer myExamDetailId, String[] answers, Integer fileId) {
+	public PageResult updateAnswer(Integer examId, Integer questionId, String[] answers, Integer fileId) {
 		try {
-			myExamService.updateAnswer(myExamDetailId, answers, fileId);
+			myExamService.updateAnswer(examId, getCurUser().getId(), questionId, answers, fileId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("更新答案错误：", e.getMessage());
@@ -147,17 +149,17 @@ public class ApiMyExamController extends BaseController{
 	}
 	
 	/**
-	 * 完成交卷
+	 * 交卷
 	 * 
 	 * v1.0 zhanghc 2017年6月26日下午12:30:20
-	 * @param myExamId
+	 * @param examId
 	 * @return PageResult
 	 */
 	@RequestMapping("/doAnswer")
 	@ResponseBody
-	public PageResult doAnswer(Integer myExamId) {
+	public PageResult doAnswer(Integer examId) {
 		try {
-			myExamService.doAnswer(myExamId);
+			myExamService.doAnswer(examId, getCurUser().getId());
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成交卷错误：{}", e.getMessage());

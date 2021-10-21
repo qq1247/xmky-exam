@@ -189,9 +189,9 @@ public class ApiPaperTypeController extends BaseController {
 	 */
 	@RequestMapping("/move")
 	@ResponseBody
-	public PageResult move(Integer id, Integer sourceId, Integer targetId) {
+	public PageResult move(Integer sourceId, Integer targetId) {
 		try {
-			paperService.move(id, sourceId, targetId);
+			paperService.move(sourceId, targetId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("合并试题错误：{}", e.getMessage());

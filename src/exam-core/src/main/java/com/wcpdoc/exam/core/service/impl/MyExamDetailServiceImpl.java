@@ -72,8 +72,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	}
 
 	@Override
-	public List<MyExamDetail> getList(Integer myExamId) {
-		return myExamDetailDao.getList(myExamId);
+	public List<MyExamDetail> getList(Integer examId, Integer userId) {
+		return myExamDetailDao.getList(examId, userId);
 	}
 
 	@Override
@@ -201,8 +201,6 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			// 标记为阅卷中
 			myExam.setMyMarkId(curUser.getId());
 			String msg = null;
-			Date curTime = new Date();
-			myExam.setMarkStartTime(curTime);
 			if (!hasQA) {//如果没有人工阅卷，表示阅卷完成
 				myExam.setMarkState(3);
 				code = 3;
@@ -220,7 +218,6 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 				code = 2;
 				msg = "自动阅卷部分已完成，请人工阅卷！";
 			}
-			myExam.setAnswerEndTime(curTime);
 			myExam.setTotalScore(totalScore.getResult());
 			myExamService.update(myExam);
 			ProgressBarCache.setProgressBar(processBarId, i + 1.0, myExamCount, msg, code);
@@ -492,7 +489,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	 * @return Map<Long,MyExamDetail>
 	 */
 	private Map<Long, MyExamDetail> getUserAnswer(MyExam myExam) {
-		List<MyExamDetail> myExamDetailList = getList(myExam.getId());
+		List<MyExamDetail> myExamDetailList = getList(myExam.getExamId(), myExam.getUserId());
 		Map<Long, MyExamDetail> myExamDetailMap = new HashMap<Long, MyExamDetail>();
 		for (MyExamDetail myExamDetail : myExamDetailList) {
 			myExamDetailMap.put(myExamDetail.getQuestionId().longValue(), myExamDetail);
@@ -546,5 +543,10 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	private boolean bdbf(PaperQuestionEx paperQuestionEx) {
 		return ValidateUtil.isValid(paperQuestionEx.getScoreOptions()) 
 				&& paperQuestionEx.getScoreOptions().contains("1");
+	}
+
+	@Override
+	public MyExamDetail getEntity(Integer examId, Integer userId, Integer questionId) {
+		return myExamDetailDao.getEntity(examId, userId, questionId);
 	}
 }

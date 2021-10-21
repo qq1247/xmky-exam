@@ -15,9 +15,9 @@ public interface PaperQuestionAnswerDao extends BaseDao<PaperQuestionAnswer>{
 	 * 获取试卷试题答案列表
 	 * 
 	 * v1.0 chenyun 2021年7月23日上午11:27:30
-	 * @param paperQuestionId
+	 * @param paperId
 	 * @param questionId
 	 * @return List<PaperQuestionAnswer>
 	 */
-	List<PaperQuestionAnswer> getPaperQuestionAnswerList(Integer paperQuestionId, Integer questionId);
+	List<PaperQuestionAnswer> getList(Integer paperId, Integer questionId);
 }

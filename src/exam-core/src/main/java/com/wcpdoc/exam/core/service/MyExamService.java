@@ -63,18 +63,29 @@ public interface MyExamService extends BaseService<MyExam>{
 	 * 更新答案
 	 * 
 	 * v1.0 chenyun 2021年8月24日上午9:55:53
-	 * @param myExamDetailId
+	 * 
+	 * v1.1 zhanghc 2021-10-19
+	 * 由原参数myExamDetailId改成examId questionId userId，从接口层面保证字段的好理解
+	 * 
+	 * @param examId
+	 * @param questionId 
+	 * @param userId 
 	 * @param answers
 	 * @param fileId
-	 * @param answers void
+	 * void
 	 */
-	void updateAnswer(Integer myExamDetailId, String[] answers, Integer fileId);
+	void updateAnswer(Integer examId, Integer userId, Integer questionId, String[] answers, Integer fileId);
 	
 	/**
 	 * 完成交卷
 	 * 
 	 * v1.0 chenyun 2021年8月24日上午10:05:25
-	 * @param myExamId void
+	 * v1.1 zhanghc 2021-10-19
+	 * 由原参数mymyExamId改成examId questionId userId，从接口层面保证字段的好理解
+	 * 
+	 * @param examId 
+	 * @param userId 
+	 * void
 	 */
-	void doAnswer(Integer myExamId);
+	void doAnswer(Integer examId, Integer userId);
 }
