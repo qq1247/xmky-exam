@@ -6,7 +6,6 @@ import java.util.Map;
 
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
-import com.wcpdoc.exam.core.entity.PaperQuestionEx;
 import com.wcpdoc.exam.core.entity.PaperRemark;
 import com.wcpdoc.exam.core.entity.Question;
 
@@ -97,15 +96,6 @@ public interface PaperService extends BaseService<Paper> {
 	 * void
 	 */
 	void chapterQuestionMove(Integer sourceId, Integer targetId);
-	
-	/**
-	 * 获取试卷列表
-	 * 
-	 * v1.0 zhanghc 2017年6月6日上午8:52:39
-	 * @param id
-	 * @return List<PaperQuestionEx>
-	 */
-	List<PaperQuestionEx> getPaperList(Integer id);
 	
 	/**
 	 * 获取试题列表

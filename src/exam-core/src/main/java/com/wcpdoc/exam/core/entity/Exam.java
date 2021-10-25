@@ -69,107 +69,154 @@ public class Exam {
 	private Integer paperId;
 	@Column(name = "EXAM_TYPE_ID")
 	private Integer examTypeId;
-	
+	@Column(name = "MARK_STATE")
+	private Integer markState;
+
 	public Integer getId() {
 		return id;
 	}
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
+
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public Date getStartTime() {
 		return startTime;
 	}
+
 	public void setStartTime(Date startTime) {
 		this.startTime = startTime;
 	}
+
 	public Date getEndTime() {
 		return endTime;
 	}
+
 	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
 	}
+
 	public Date getMarkStartTime() {
 		return markStartTime;
 	}
+
 	public void setMarkStartTime(Date markStartTime) {
 		this.markStartTime = markStartTime;
 	}
+
 	public Date getMarkEndTime() {
 		return markEndTime;
 	}
+
 	public void setMarkEndTime(Date markEndTime) {
 		this.markEndTime = markEndTime;
 	}
+
 	public Integer getScoreState() {
 		return scoreState;
 	}
+
 	public void setScoreState(Integer scoreState) {
 		this.scoreState = scoreState;
 	}
+
 	public Integer getRankState() {
 		return rankState;
 	}
+
 	public void setRankState(Integer rankState) {
 		this.rankState = rankState;
 	}
+
 	public Integer getLoginType() {
 		return loginType;
 	}
+
 	public void setLoginType(Integer loginType) {
 		this.loginType = loginType;
 	}
+
 	public String getDescription() {
 		return description;
 	}
+
 	public void setDescription(String description) {
 		this.description = description;
 	}
+
 	public Integer getUpdateUserId() {
 		return updateUserId;
 	}
+
 	public void setUpdateUserId(Integer updateUserId) {
 		this.updateUserId = updateUserId;
 	}
+
 	public Date getUpdateTime() {
 		return updateTime;
 	}
+
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
 	}
+
+	/** 0：删除；1：发布；2：草稿；3：归档 */
 	public Integer getState() {
 		return state;
 	}
+
+	/** 0：删除；1：发布；2：草稿；3：归档 */
 	public void setState(Integer state) {
 		this.state = state;
 	}
+
 	public Integer getPaperId() {
 		return paperId;
 	}
+
 	public void setPaperId(Integer paperId) {
 		this.paperId = paperId;
 	}
+
 	public Integer getExamTypeId() {
 		return examTypeId;
 	}
+
 	public void setExamTypeId(Integer examTypeId) {
 		this.examTypeId = examTypeId;
 	}
+
 	public Integer getCreateUserId() {
 		return createUserId;
 	}
+
 	public void setCreateUserId(Integer createUserId) {
 		this.createUserId = createUserId;
 	}
+
 	public Date getCreateTime() {
 		return createTime;
 	}
+
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
+	}
+
+	/** 1：已阅；2：未阅 */
+	public Integer getMarkState() {
+		return markState;
+	}
+
+	/** 1：已阅；2：未阅 */
+	public void setMarkState(Integer markState) {
+		this.markState = markState;
 	}
 }

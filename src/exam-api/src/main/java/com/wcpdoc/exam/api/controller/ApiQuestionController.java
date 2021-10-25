@@ -323,7 +323,7 @@ public class ApiQuestionController extends BaseController {
 						UserContext.remove();
 					} catch (Exception e) {
 						ProgressBarCache.setProgressBar(processBarId, 10.0, 10.0, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
-						log.error("word试题导入错误：{}", e);
+						log.error("word试题导入错误：", e);
 						UserContext.remove();
 					}
 				}

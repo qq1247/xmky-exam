@@ -296,6 +296,9 @@ public class ApiExamController extends BaseController{
 	public PageResult onlineUser(Integer id) {
 		try {
 			Exam exam = examService.getEntity(id);
+			if (exam.getStartTime().getTime() > System.currentTimeMillis()) {
+				throw new MyException("考试未开始");
+			}
 			if (exam.getEndTime().getTime() < System.currentTimeMillis()) {
 				throw new MyException("考试已结束");
 			}
@@ -318,6 +321,9 @@ public class ApiExamController extends BaseController{
 			}
 			
 			return PageResultEx.ok().data(new PageOut(examUserList, examUserList.size()));
+		} catch (MyException e) {
+			log.error("在线用户错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("在线用户错误：", e);
 			return PageResult.err();

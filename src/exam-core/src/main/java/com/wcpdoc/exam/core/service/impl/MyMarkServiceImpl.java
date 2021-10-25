@@ -185,7 +185,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		}
 		
 		// 标记为已阅，记录阅卷人，统计总分数，标记是否及格
-		myExam.setMyMarkId(getCurUser().getId());
+		myExam.setMarkUserId(getCurUser().getId());
 		myExam.setMarkEndTime(new Date());
 		myExam.setTotalScore(totalScore.getResult());
 		myExam.setMarkState(3);

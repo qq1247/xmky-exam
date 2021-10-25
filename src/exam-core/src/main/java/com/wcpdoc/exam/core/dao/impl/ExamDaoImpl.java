@@ -51,10 +51,13 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examTypeId")), "EXAM.EXAM_TYPE_ID = ?", pageIn.get("examTypeId", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "EXAM.NAME LIKE ?", "%" + pageIn.get("name") + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")), "EXAM.STATE = ?", pageIn.get("state"))//0：删除；1：启用；2：禁用
-				.addWhere(ValidateUtil.isValid(pageIn.get("startTime")), "EXAM.START_TIME > ?", ValidateUtil.isValid(pageIn.get("START_TIME")) ? DateUtil.getDateTime(pageIn.get("START_TIME")) : null)
-				.addWhere(ValidateUtil.isValid(pageIn.get("startTime")), "EXAM.START_TIME < ?", ValidateUtil.isValid(pageIn.get("START_TIME")) ? DateUtil.getDateTime(pageIn.get("START_TIME")) : null)
+				.addWhere(ValidateUtil.isValid(pageIn.get("startTime1")), "EXAM.START_TIME >= ?", ValidateUtil.isValid(pageIn.get("startTime1")) ? DateUtil.getDateTime(pageIn.get("startTime1")) : null)
+				.addWhere(ValidateUtil.isValid(pageIn.get("startTime2")), "EXAM.START_TIME <= ?", ValidateUtil.isValid(pageIn.get("startTime2")) ? DateUtil.getDateTime(pageIn.get("startTime2")) : null)
+				.addWhere(ValidateUtil.isValid(pageIn.get("endTime1")), "EXAM.END_TIME >= ?", ValidateUtil.isValid(pageIn.get("endTime1")) ? DateUtil.getDateTime(pageIn.get("endTime1")) : null)
+				.addWhere(ValidateUtil.isValid(pageIn.get("endTime2")), "EXAM.END_TIME <= ?", ValidateUtil.isValid(pageIn.get("endTime2")) ? DateUtil.getDateTime(pageIn.get("endTime2")) : null)
+				.addWhere(ValidateUtil.isValid(pageIn.get("markState")), "EXAM.MARK_STATE = ?", pageIn.get("markState"))
 				//.addWhere(pageIn.get("curUserId", Integer.class) != null, "EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.MARK_USER_ID = ? AND Z.EXAM_ID = EXAM.ID)", pageIn.get("curUserId", Integer.class))
-				.addWhere("EXAM.STATE != ?", 0)
+				//.addWhere("EXAM.STATE != ?", 0)// 这个由前端添加参数控制
 				.addOrder("EXAM.UPDATE_TIME", Order.DESC);
 		
 		if (pageIn.get("curUserId", Integer.class) != null) {//查看权限相关

@@ -532,7 +532,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		} catch (IOException e) {
 			throw new MyException("读取word时异常！");
 		} catch (Exception e) {
-			throw new MyException(e.getMessage());
+			throw e;
 		}
 
 		// 添加试题

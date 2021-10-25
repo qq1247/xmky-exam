@@ -7,6 +7,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.ShiroException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
@@ -181,6 +182,13 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 		}
 		try {
 			return super.preHandle(request, response);
+		} catch (ShiroException e) {
+			httpResponse.setCharacterEncoding("UTF-8");
+			httpResponse.setContentType("application/json;charset=UTF-8");
+			httpResponse.setStatus(HttpStatus.OK.value());
+			httpResponse.getWriter().write(String.format("{\"code\": %s, \"msg\": \"%s\"}", HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
+			log.error("shiro权限异常：{}", e.getMessage());
+			return false;
 		} catch (Exception e) {
 			httpResponse.setCharacterEncoding("UTF-8");
 			httpResponse.setContentType("application/json;charset=UTF-8");

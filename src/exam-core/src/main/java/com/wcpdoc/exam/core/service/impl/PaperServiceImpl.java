@@ -19,7 +19,6 @@ import com.wcpdoc.exam.core.dao.PaperDao;
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.PaperQuestionAnswer;
-import com.wcpdoc.exam.core.entity.PaperQuestionEx;
 import com.wcpdoc.exam.core.entity.PaperRemark;
 import com.wcpdoc.exam.core.entity.PaperType;
 import com.wcpdoc.exam.core.entity.Question;
@@ -383,43 +382,6 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		paperQuestionService.update(targetPQ);
 	}
 	
-	@Override
-	public List<PaperQuestionEx> getPaperList(Integer id) {
-		List<PaperQuestion> paperQuestionList = paperDao.getPaperQuestionList(id);
-		List<PaperQuestionEx> paperQuestionExList = new ArrayList<PaperQuestionEx>();
-		List<Question> questionList = paperDao.getQuestionList(id);
-		
-		Map<Integer, PaperQuestionEx> paperQuestionExMap = new HashMap<Integer, PaperQuestionEx>();
-		Map<Integer, Question> questionMap = new HashMap<Integer, Question>();
-		for(Question question : questionList) {
-			questionMap.put(question.getId(), question);
-		}
-		
-		for(PaperQuestion paperQuestion : paperQuestionList) {
-			PaperQuestionEx paperQuestionEx = new PaperQuestionEx();
-			try {
-				BeanUtils.copyProperties(paperQuestionEx, paperQuestion);
-			} catch (Exception e) {
-				new MyException(e);
-			}
-			paperQuestionEx.setQuestion(questionMap.get(paperQuestionEx.getQuestionId()));
-			paperQuestionExList.add(paperQuestionEx);
-			paperQuestionExMap.put(paperQuestionEx.getId(), paperQuestionEx);
-		}
-		
-		List<PaperQuestionEx> treeList = new ArrayList<PaperQuestionEx>();
-		for(PaperQuestionEx paperQuestionEx : paperQuestionExList) {
-			if(paperQuestionEx.getParentId() == 0) {
-				treeList.add(paperQuestionEx);
-			}else{
-				PaperQuestionEx parentPaperQuestionEx = paperQuestionExMap.get(paperQuestionEx.getParentId());
-				parentPaperQuestionEx.getSubList().add(paperQuestionEx);
-			}
-		}
-		
-		return treeList;
-	}
-
 	@Override
 	public void questionAdd(Integer chapterId, Integer[] questionIds) {
 		// 校验数据有效性
