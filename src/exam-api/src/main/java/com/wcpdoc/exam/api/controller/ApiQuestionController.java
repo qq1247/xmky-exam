@@ -317,9 +317,13 @@ public class ApiQuestionController extends BaseController {
 					UserContext.set(loginUser);// 子线程不走springboot拦截器，人工模拟拦截器，线程上绑定当前登录信息
 					try {
 						SpringUtil.getBean(QuestionService.class).wordImp(fileId, questionTypeId, processBarId);
+					} catch (MyException e) {
+						ProgressBarCache.setProgressBar(processBarId, 10.0, 10.0, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+						log.error("word试题导入错误：{}", e.getMessage());
+						UserContext.remove();
 					} catch (Exception e) {
-						ProgressBarCache.setProgressBar(processBarId, 10.0, 10.0, "开始解析", HttpStatus.INTERNAL_SERVER_ERROR.value());
-						log.error("word试题导入错误：", e.getMessage());
+						ProgressBarCache.setProgressBar(processBarId, 10.0, 10.0, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+						log.error("word试题导入错误：{}", e);
 						UserContext.remove();
 					}
 				}

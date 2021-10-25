@@ -99,11 +99,7 @@ public class WordServerImpl extends WordServer {
 		List<QuestionEx> questionList = new ArrayList<>();// 解析成试题对象的列表
 		for (List<Node> _singleQuestion : singleQuestionList) {
 			QuestionEx questionEx = null;
-			try {
-				questionEx = parseQuestion(_singleQuestion);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			questionEx = parseQuestion(_singleQuestion);
 			questionList.add(questionEx);
 		}
 		endTime = System.currentTimeMillis();
@@ -219,6 +215,27 @@ public class WordServerImpl extends WordServer {
 		 */
 		
 		// 解析文本数据，文本格式校验
+			/** 解析文本数据，文本格式校验
+			【单选】【极易】蛋黄的颜色主要取决于其中_____的含量()
+			A、 叶黄素
+			B、 胡萝卜素
+			C、 核黄素
+			D、 姜黄素
+			【答案：B】【分值：2】
+			【智能阅卷：是】【漏选得分：是】【漏选分值：1】
+			【解析】
+		*/
+		String singleHtml = Jsoup.clean(singleQuestion.toString(), Whitelist.none()).trim();
+		int answerIndex = singleHtml.indexOf("【答案");
+		int aiIndex = singleHtml.indexOf("【智能阅卷");
+		int analysisIndex = singleHtml.indexOf("【解析");
+		if (answerIndex > aiIndex) {
+			throw new MyException(String.format("答案和智能阅卷顺序错误：%s】", StringUtil.delHTMLTag(singleQuestion.toString())));
+		}
+		if (aiIndex > analysisIndex) {
+			throw new MyException(String.format("智能阅卷和解析顺序错误：%s】", StringUtil.delHTMLTag(singleQuestion.toString())));
+		}
+		
 		List<Node> titleRows = parseTitleRows(singleQuestion);
 		List<Node> optionRows = parseOptionRows(singleQuestion);
 		List<Node> answerRows = parseAnswerRows(singleQuestion);
