@@ -8,6 +8,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -235,14 +237,27 @@ public class WordServerImpl extends WordServer {
 		if (aiIndex > analysisIndex) {
 			throw new MyException(String.format("智能阅卷和解析顺序错误：%s】", StringUtil.delHTMLTag(singleQuestion.toString())));
 		}
-		
 		List<Node> titleRows = parseTitleRows(singleQuestion);
-		List<Node> optionRows = parseOptionRows(singleQuestion);
+		int type = parseType(titleRows);
 		List<Node> answerRows = parseAnswerRows(singleQuestion);
+		if (type == 3) {
+			Pattern p = Pattern.compile("[_]{5,}"); //正则表达式
+			Matcher m = p.matcher(titleRows.toString()); // 获取 matcher 对象
+			int count = 0;
+			while(m.find()) {
+				count++;
+			}
+			if (count != answerRows.size()) {
+				throw new MyException(String.format("填空和答案数量不匹配：%s】", StringUtil.delHTMLTag(singleQuestion.toString())));
+			}
+		}
+		
+		
+		List<Node> optionRows = parseOptionRows(singleQuestion);
 		List<Node> aiRows = parseAiRows(singleQuestion);
 		List<Node> analysisRows = parseAnalysisRows(singleQuestion);
 		
-		int type = parseType(titleRows);
+		
 		int difficulty = parseDifficulty(titleRows);
 		String title = parseTitle(titleRows);
 		List<QuestionOption> questionOptionList = parseQuestionOptionList(optionRows, type);
@@ -571,7 +586,7 @@ public class WordServerImpl extends WordServer {
 				}
 			} else if (rowTxt.startsWith("【智能阅卷")) {
 				endIndex = curIndex;
-				break;//找到就不在循环了
+				break;//找到就不在循环了，智能阅卷就一行
 			}
 			curIndex++;
 		}

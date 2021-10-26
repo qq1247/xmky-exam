@@ -45,7 +45,11 @@ public class ApiProgressBarController extends BaseController {
 			result.put("id", progressBar.getId());
 			result.put("curNum", progressBar.getCurNum());
 			result.put("totalNum", progressBar.getTotalNum());
-			return PageResultEx.custom().data(result).code(progressBar.getCode()).msg(progressBar.getMsg());
+			result.put("percent", progressBar.getPercent());
+			return PageResultEx.custom()
+					.data(result)
+					.code(progressBar.getCode())
+					.msg(progressBar.getMsg());
 		} catch (MyException e) {
 			log.error("获取进度条错误：{}", e.getMessage());
 			return PageResultEx.err().msg(e.getMessage());

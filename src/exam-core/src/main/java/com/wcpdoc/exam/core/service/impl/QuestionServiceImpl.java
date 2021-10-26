@@ -106,7 +106,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			}
 			int answerIndex = answers[0].getBytes()[0] - 65;
 			if (options.length < answerIndex + 1) {
-				throw new MyException("选项和答案不匹配！");
+				throw new MyException("选项和答案不匹配");
 			}
 		}
 		if (question.getType() == 2 && options != null) {
@@ -122,7 +122,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				}
 				int answerIndex = answers[i].getBytes()[0] - 65;
 				if (options.length < answerIndex + 1) {
-					throw new MyException("选项和答案不匹配！");
+					throw new MyException("选项和答案不匹配");
 				}
 			}
 		}
@@ -134,7 +134,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				count++;
 			}
 			if (count != answers.length) {
-				throw new MyException("填空答案不匹配！");
+				throw new MyException("填空和答案数量不匹配");
 			}
 		}
 		if (question.getType() == 4) {
@@ -278,7 +278,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				count++;
 			}
 			if (count != answers.length) {
-				throw new MyException("填空答案不匹配！");
+				throw new MyException("填空和答案数量不匹配！");
 			}
 		}
 		if (question.getType() == 4) {
