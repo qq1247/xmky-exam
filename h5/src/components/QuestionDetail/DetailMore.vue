@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-09-10 10:14:03
  * @LastEditors: Che
- * @LastEditTime: 2021-09-27 15:18:52
+ * @LastEditTime: 2021-10-20 18:29:17
 -->
 <template>
   <div class="detail-more">
@@ -35,7 +35,7 @@
             :key="answer.id"
             class="answers-item"
           >
-            <span>{{ `填空${index + 1}、` }}</span>
+            <span>{{ `填空${$tools.intToChinese(index + 1)}、` }}</span>
             <span
               class="answers-tag"
               v-for="(ans, index) in answer.answer"
@@ -54,7 +54,7 @@
               :key="answer.id"
               class="answers-item"
             >
-              <span>{{ `关键词${index + 1}、` }}</span>
+              <span>{{ `关键词${$tools.intToChinese(index + 1)}、` }}</span>
               <span
                 class="answers-tag"
                 v-for="(ans, index) in answer.answer"

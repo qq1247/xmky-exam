@@ -98,7 +98,9 @@
                     v-for="(answer, index) in child.examAnswers"
                     :value="answer"
                   >
-                    <template slot="prepend">第{{ index + 1 }}空</template>
+                    <template slot="prepend"
+                      >第{{ $tools.intToChinese(index + 1) }}空</template
+                    >
                   </el-input>
                 </template>
 
@@ -161,7 +163,9 @@
                           :key="answer.id"
                           class="answers-item"
                         >
-                          <span>{{ `填空${index + 1}、` }}</span>
+                          <span>{{
+                            `填空${$tools.intToChinese(index + 1)}、`
+                          }}</span>
                           <span
                             class="answers-tag"
                             v-for="(ans, index) in answer.answer"
@@ -180,7 +184,9 @@
                             :key="answer.id"
                             class="answers-item"
                           >
-                            <span>{{ `关键词${index + 1}、` }}</span>
+                            <span>{{
+                              `关键词${$tools.intToChinese(index + 1)}、`
+                            }}</span>
                             <span
                               class="answers-tag"
                               v-for="(ans, index) in answer.answer"
@@ -459,9 +465,12 @@ export default {
     },
     // 打分
     async updateScore(e, idx, idxc) {
+      console.log(e)
       const source = this.paperQuestion[idx].questionList[idxc]
       const res = await myExamUpdateScore({
-        myExamDetailId: source.myExamDetailId,
+        exam: this.examId,
+        questionId,
+        userId: this.userId,
         score: source.scorePlate || 0,
       })
       res?.code === 200
@@ -555,7 +564,6 @@ export default {
       const res = await myExamDoScore({
         examId: this.examId,
         userId: this.userId,
-        markId: this.markId,
       })
       res?.code === 200
         ? (this.$message.warning('阅卷完成！'), this.queryExamineeInfo())

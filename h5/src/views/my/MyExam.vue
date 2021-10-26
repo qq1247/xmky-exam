@@ -24,8 +24,8 @@
           v-if="showType === '1'"
           :preview="preview"
           :paperQuestion="paperQuestion"
-          @updateAnswer="updateAnswer"
           :myExamDetailCache="myExamDetailCache"
+          @updateAnswer="updateAnswer"
         ></page-show>
 
         <question-show
@@ -58,6 +58,7 @@
   </div>
 </template>
 <script>
+import Vue from 'vue'
 import { loginSysTime } from 'api/common'
 import { paperGet, paperQuestionList } from 'api/paper'
 import { myExamAnswerList, myExamUpdateAnswer, myExamDoAnswer } from 'api/my'
@@ -129,6 +130,18 @@ export default {
         this.paper = { ...res.data }
       } catch (error) {}
     },
+    // 将html格式字符串转化为dom的函数
+    htmlStrToDom(htmlstr, parentdata) {
+      let obj = Object.assign({}, parentdata)
+      let component = Vue.extend({
+        template: htmlstr,
+        data() {
+          return obj
+        },
+      })
+      let instance = new component().$mount()
+      return instance.$el
+    },
     // 查询试卷信息
     async queryPaperInfo() {
       try {
@@ -137,6 +150,21 @@ export default {
         })
         res.data.map((item) => {
           item.chapter.show = true
+          item.questionList.map((question) => {
+            let title = question.title
+            let underlineList = title.match(/[_]{5,}/g)
+            underlineList.map((underline, index) => {
+              const titleStart = title.substring(0, title.indexOf(underline))
+              const titleEnd = title.substring(
+                title.indexOf(underline) + underline.length
+              )
+              const inputHtml = `<el-input @change='updateAnswer(paperQuestion[routerIndex].id)' :disabled='preview === 'true' ? true : false' v-model='myExamDetailCache[paperQuestion[routerIndex].id].answers[${index}]'></el-input>`
+              title = `${titleStart}${inputHtml}${titleEnd}`
+            })
+            const repalceTitle = this.htmlStrToDom(title, this).innerHTML
+            console.log(repalceTitle)
+            question.title = repalceTitle
+          })
         })
 
         if (this.showType === '1') {
@@ -225,7 +253,7 @@ export default {
       }
     },
     // 更新答案
-    async updateAnswer(questionId, answers) {
+    async updateAnswer(questionId) {
       if (this.preview === 'true') {
         return
       }
@@ -234,8 +262,9 @@ export default {
         this.$message.error('提交答案失败，请联系管理员！')
         return
       }
-
       const res = await myExamUpdateAnswer({
+        examId: this.id,
+        questionId,
         myExamDetailId: this.myExamDetailCache[questionId].myExamDetailId,
         answers: this.myExamDetailCache[questionId].answers,
       })
@@ -280,7 +309,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
       }).then(async () => {
-        const res = await myExamDoAnswer({ myExamId: this.id })
+        const res = await myExamDoAnswer({ examId: this.id })
         res?.code === 200
           ? this.$router.replace({
               path: '/my',
@@ -295,7 +324,7 @@ export default {
         type: 'info',
         showClose: false,
       }).then(async () => {
-        const res = await myExamDoAnswer({ myExamId: this.id })
+        const res = await myExamDoAnswer({ examId: this.id })
         this.$router.replace({
           path: '/my',
         })

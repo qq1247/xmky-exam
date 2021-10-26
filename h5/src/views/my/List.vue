@@ -21,16 +21,16 @@
     <div class="content">
       <template v-if="myExamList.length > 0">
         <div class="exam-list" v-if="type === 1">
-          <ListCard
+          <MyCard
             v-for="(item, index) in myExamList"
             :key="index"
             :data="item"
             name="myExamList"
             @exam="examHandler"
-          ></ListCard>
+          ></MyCard>
         </div>
         <div class="exam-list" v-if="type === 2">
-          <ListCard
+          <MyCard
             v-for="(item, index) in myExamList"
             :key="index"
             :data="item"
@@ -38,7 +38,7 @@
             :percentage="percentage"
             name="myMarkExamList"
             @mark="markHandler"
-          ></ListCard>
+          ></MyCard>
         </div>
       </template>
       <el-empty v-else description="暂无信息"> </el-empty>
@@ -64,11 +64,11 @@ import {
   myExamAutoScore,
   myExamAiProgress,
 } from 'api/my'
-import ListCard from 'components/ListCard.vue'
+import MyCard from 'components/ListCard/MyCard.vue'
 import { loginSysTime } from 'api/common'
 export default {
   components: {
-    ListCard,
+    MyCard,
   },
   data() {
     return {
@@ -257,7 +257,7 @@ export default {
       if (percentage.data.curNum === percentage.data.totalNum) {
         return true
       } else {
-        this.getProgress(id)
+        await this.getProgress(id)
       }
     },
     // 分页切换

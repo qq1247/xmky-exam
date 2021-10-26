@@ -372,7 +372,9 @@
                               :key="answer.id"
                               class="answers-item"
                             >
-                              <span>{{ `填空${index + 1}、` }}</span>
+                              <span>{{
+                                `填空${$tools.intToChinese(index + 1)}、`
+                              }}</span>
                               <span
                                 class="answers-tag"
                                 v-for="(ans, index) in answer.answer"
@@ -391,7 +393,9 @@
                                 :key="answer.id"
                                 class="answers-item"
                               >
-                                <span>{{ `关键词${index + 1}、` }}</span>
+                                <span>{{
+                                  `关键词${$tools.intToChinese(index + 1)}、`
+                                }}</span>
                                 <span
                                   class="answers-tag"
                                   v-for="(ans, index) in answer.answer"
@@ -430,9 +434,6 @@
                         <el-tag effect="plain" size="mini" type="warning"
                           >{{ child.score }}分</el-tag
                         >
-                        <el-tag effect="plain" size="mini" type="info">
-                          {{ child.updateUserName }}
-                        </el-tag>
                       </div>
                       <div class="children-buts">
                         <el-button
@@ -444,7 +445,7 @@
                           >设置</el-button
                         >
                         <el-button
-                          @click="del(child.paperQuestionId)"
+                          @click="del(child.id)"
                           class="btn"
                           icon="el-icon-delete"
                           round
@@ -523,7 +524,9 @@
               v-for="(answer, index) in settingForm.answers"
               :key="index"
               :label="
-                settingForm.type === 3 ? `填空${index+1}` : `关键词${index+1}`
+                settingForm.type === 3
+                  ? `填空${$tools.intToChinese(index + 1)}`
+                  : `关键词${$tools.intToChinese(index + 1)}`
               "
               :prop="`answers.${index}.score`"
               :rules="settingForm.rules.aiScore"
@@ -618,11 +621,11 @@ import {
   paperChapterDel,
   paperQuestionClear,
   paperQuestionDel,
-  paperUpdateScore,
+  paperScoreUpdate,
   paperQuestionAdd,
-  paperMovePosition,
-  paperTotalScore,
-  paperUpdateScoreOptions,
+  paperChapterQuestionMove,
+  paperTotalScoreUpdate,
+  paperScoreOptionUpdate,
 } from 'api/paper'
 import { questionListPage, randomListPage } from 'api/question'
 import Draggable from 'vuedraggable'
@@ -699,7 +702,7 @@ export default {
       paperQuestion: [],
       settingForm: {
         show: false,
-        paperQuestionId: null,
+        questionId: null,
         type: 1,
         score: 1,
         answers: [],
@@ -856,7 +859,7 @@ export default {
         type: 'warning',
       })
         .then(async () => {
-          const res = await paperChapterDel({ id })
+          const res = await paperChapterDel({ chapterId: id })
           this.refreshData(res, '删除章节')
         })
         .catch((err) => {
@@ -888,14 +891,14 @@ export default {
         })
     },
     // 删除试题
-    del(paperQuestionId) {
+    del(questionId) {
       this.$confirm(`确认删除该试题吗？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
       })
         .then(async () => {
-          const res = await paperQuestionDel({ paperQuestionId })
+          const res = await paperQuestionDel({ id: this.paperId, questionId })
           this.refreshData(res, '删除试题')
         })
         .catch((err) => {
@@ -913,7 +916,7 @@ export default {
     },
     // 设置分数
     setting(data) {
-      this.settingForm.paperQuestionId = data.paperQuestionId
+      this.settingForm.questionId = data.id
       this.settingForm.type = data.type
       this.settingForm.ai = data.ai
       this.settingForm.score = data.score
@@ -929,14 +932,8 @@ export default {
     },
     // 设置分数
     setScore() {
-      let paperQuestionAnswerId = []
       let paperQuestionAnswerScore = []
       if (this.settingForm.ai === 1) {
-        paperQuestionAnswerId = this.settingForm.answers.reduce((acc, cur) => {
-          acc.push(cur.id)
-          return acc
-        }, [])
-
         if (this.settingForm.type === 2) {
           paperQuestionAnswerScore = this.settingForm.answers.reduce((acc) => {
             acc.push(this.settingForm.multipScore)
@@ -957,12 +954,11 @@ export default {
         if (!valid) {
           return false
         }
-
-        const updateScore = await paperUpdateScore({
-          paperQuestionId: this.settingForm.paperQuestionId,
+        const updateScore = await paperScoreUpdate({
+          id: this.paperId,
+          questionId: this.settingForm.questionId,
           score: this.settingForm.score,
-          paperQuestionAnswerId: paperQuestionAnswerId,
-          paperQuestionAnswerScore:
+          subScores:
             this.settingForm.type === 2
               ? this.settingForm.scoreOptions.length === 0
                 ? []
@@ -976,8 +972,9 @@ export default {
           [2, 3, 5].includes(this.settingForm.type) &&
           this.settingForm.ai === 1
         ) {
-          updateScoreOptions = await paperUpdateScoreOptions({
-            paperQuestionId: this.settingForm.paperQuestionId,
+          updateScoreOptions = await paperScoreOptionUpdate({
+            id: this.paperId,
+            questionId: this.settingForm.questionId,
             scoreOptions: this.settingForm.scoreOptions,
           })
         }
@@ -1026,7 +1023,7 @@ export default {
     async chapterMove({ newIndex, oldIndex }) {
       const sourceId = this.paperQuestion[newIndex].chapter.id
       const targetId = this.paperQuestion[oldIndex].chapter.id
-      const res = await paperMovePosition({
+      const res = await paperChapterQuestionMove({
         sourceId,
         targetId,
       })
@@ -1050,7 +1047,7 @@ export default {
         targetId = toChapterId
       }
 
-      const res = await paperMovePosition({
+      const res = await paperChapterQuestionMove({
         sourceId,
         targetId,
       })
@@ -1084,9 +1081,8 @@ export default {
   },
   beforeDestroy() {
     if (this.paperState === '1') return false
-    paperTotalScore({
+    paperTotalScoreUpdate({
       id: this.paperId,
-      totalScore: this.totalScore,
     })
   },
 }

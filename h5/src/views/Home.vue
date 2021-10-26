@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <!-- 轮播图 -->
     <el-carousel :interval="3000" height="350px">
       <el-carousel-item
         :style="{ background: carouse.bgColor || '#393d42' }"
@@ -8,17 +9,17 @@
       >
         <div class="banner-list">
           <div class="banner-info">
-            <p
+            <div
               class="banner-title"
               :style="{ color: carouse.textColor || '#fff' }"
             >
               {{ carouse.title }}
-            </p>
-            <p
-              class="banner-content"
+            </div>
+            <div
+              class="banner-content multi-ellipsis"
               :style="{ color: carouse.textColor || '#fff' }"
               v-html="carouse.content"
-            ></p>
+            ></div>
             <div
               class="banner-btn"
               :style="{
@@ -46,6 +47,21 @@
       </el-carousel-item>
     </el-carousel>
     <div class="container-content">
+      <!-- 公告 -->
+      <NoticeBar
+        left-icon="notice"
+        @link="noticeDetail(10)"
+        v-if="bulletinList.length"
+      >
+        <el-carousel height="40px" :interval="3000" direction="vertical">
+          <el-carousel-item v-for="(item, index) in bulletinList" :key="index">
+            <div class="notice-custom-content">
+              <div class="content-title ellipsis">{{ item.title }}</div>
+              <div>{{ item.updateTime }}</div>
+            </div>
+          </el-carousel-item>
+        </el-carousel>
+      </NoticeBar>
       <el-row :gutter="40">
         <el-col :span="8">
           <template>
@@ -58,27 +74,6 @@
               @selectDate="selectDate"
             >
             </Calendar>
-          </template>
-          <template>
-            <div class="box-title">
-              <i class="common common-notice"></i><span>公告</span>
-            </div>
-            <template v-if="bulletinList.length">
-              <el-row
-                :class="['notice', item.topState === 1 ? 'notice-hot' : '']"
-                :key="item.id"
-                v-for="item in bulletinList"
-              >
-                <el-col :span="12" class="notice-left">
-                  <i></i>
-                  <span class="ellipsis">{{ item.title }}</span>
-                </el-col>
-                <el-col :span="12" class="notice-right">{{
-                  item.updateTime
-                }}</el-col>
-              </el-row>
-            </template>
-            <el-empty v-else description="暂无公告"></el-empty>
           </template>
         </el-col>
         <el-col :span="16">
@@ -194,20 +189,20 @@
         </div>
         <template v-if="questionTypeOpenList.length">
           <el-row
-            :class="['notice', item.topState === 1 ? 'notice-hot' : '']"
+            class="library"
             :key="item.id"
             v-for="item in questionTypeOpenList"
             @click.native="goDetail(item)"
           >
-            <el-col :span="12" class="notice-left">
-              <span class="ellipsis">{{ item.questionTypeName }}</span>
+            <el-col :span="12" class="library-left ellipsis">
+              {{ item.questionTypeName }}
             </el-col>
-            <el-col :span="12" class="notice-right"
+            <el-col :span="12" class="library-right"
               >{{ item.startTime }} - {{ item.endTime }}</el-col
             >
           </el-row>
         </template>
-        <el-empty v-else description="暂无阅卷"> </el-empty>
+        <el-empty v-else description="暂无开放题库"></el-empty>
       </div>
     </div>
   </div>
@@ -217,15 +212,36 @@
 import { bulletinListPage } from 'api/base'
 import { myExamListPage, myMarkListPage } from 'api/my'
 import { questionTypeOpenListPage } from 'api/question'
+import NoticeBar from 'components/NoticeBar/Index'
 import getMainColor from '@/utils/getImageColor.js'
 import * as dayjs from 'dayjs'
 import Calendar from 'components/Calendar/index'
 export default {
+  components: {
+    Calendar,
+    NoticeBar,
+  },
   data() {
     return {
       examList: [],
       markList: [],
-      bulletinList: [],
+      bulletinList: [
+        /* {
+          title: '这是link',
+          topState: 1,
+          updateTime: '2021-10-13 12:00:00',
+        },
+        {
+          title: '这不是link',
+          topState: 1,
+          updateTime: '2021-10-13 12:00:00',
+        },
+        {
+          title: '这不是热门link',
+          topState: 0,
+          updateTime: '2021-10-13 12:00:00',
+        }, */
+      ],
       questionTypeOpenList: [],
       readPaperStatus: ['', '待阅', '阅卷', '已阅'],
       examStatus: ['', '待考', '考试', '已考', '已考'],
@@ -240,9 +256,6 @@ export default {
       now: new Date(),
       timePopovers: {},
     }
-  },
-  components: {
-    Calendar,
   },
   created() {
     this.init()
@@ -428,6 +441,10 @@ export default {
         },
       })
     },
+    // 公告详情
+    noticeDetail(id) {
+      this.$router.push(`/my?noticeId=${id}`)
+    },
   },
 }
 </script>
@@ -458,7 +475,6 @@ export default {
     }
     .banner-content {
       font-size: 16px;
-      overflow: hidden;
       margin: 5px 0 0 30px;
     }
     .banner-btn {
@@ -649,92 +665,39 @@ export default {
 }
 
 // 通知列表
-.notice {
+.notice-custom-content {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  line-height: 30px;
-  background: #fff;
-  padding: 0 10px;
-  cursor: pointer;
-  &:nth-of-type(2) {
-    padding-top: 10px;
-    .notice-left {
-      i::before {
-        display: none;
-      }
-    }
-  }
-  &:nth-last-of-type(1) {
-    padding-bottom: 10px;
-    .notice-left {
-      i::after {
-        display: none;
-      }
-    }
-  }
-  &:hover {
-    color: #0095e9;
-    .notice-right {
-      color: #0095e9;
-    }
-    .notice-left {
-      i {
-        background: #0095e5;
-        box-shadow: 0 0 10px 1px rgba(0, 149, 233, 0.5);
-      }
-    }
-  }
-  .notice-left {
-    display: flex;
-    align-items: center;
-    line-height: 40px;
-    i {
-      width: 8px;
-      height: 8px;
-      display: block;
-      background: #dfdfdf;
-      border-radius: 4px;
-      margin-right: 8px;
-      position: relative;
-      &::after,
-      &::before {
-        content: '';
-        position: absolute;
-        box-sizing: border-box;
-        width: 1px;
-        height: calc((40px - 8px) / 2);
-        background: #f7f8f9;
-      }
-      &::after {
-        top: calc((40px - 8px) / 4);
-        left: 4px;
-      }
-      &::before {
-        bottom: calc((40px - 8px) / 4);
-        left: 4px;
-      }
-    }
-    span {
-      flex: 1;
-    }
-  }
-  .notice-right {
-    text-align: right;
-    color: #999;
+  justify-content: space-between;
+  width: 100%;
+  .content-title {
+    width: 80%;
   }
 }
 
-.notice-hot {
-  color: #0095e5;
-  .notice-left {
-    i {
-      background: #0095e5;
-      box-shadow: 0 0 10px 1px rgba(0, 149, 233, 0.5);
-    }
+// 开放题库
+.library {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  line-height: 40px;
+  background: #fff;
+  padding: 0 10px;
+  cursor: pointer;
+  width: 100%;
+  .library-left {
+    width: 70%;
   }
-  .notice-right {
-    color: #0095e5;
+  .library-right {
+    flex: 1;
+    text-align: right;
+    color: #999;
+  }
+  &:hover {
+    color: #0095e9;
+    .library-right {
+      color: #0095e9;
+    }
   }
 }
 </style>

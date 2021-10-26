@@ -20,26 +20,21 @@
     <!-- 内容 -->
     <div class="content">
       <div class="exam-list">
-        <div class="exam-item">
-          <div
-            class="exam-content exam-add"
-            @click=";(examForm.show = true), (examForm.edit = false)"
-          >
-            <i class="common common-plus"></i>
-            <span>添加考试库</span>
-          </div>
-        </div>
+        <AddCard
+          add-title="添加考试"
+          @addCard=";(examForm.show = true), (examForm.edit = false)"
+        ></AddCard>
         <ListCard
           v-for="(item, index) in examList"
           :key="index"
           :data="item"
           name="examList"
-          @edit="edit"
           @del="del"
+          @edit="edit"
+          @read="read"
           @onLine="onLine"
           @publish="publish"
           @statistics="statistics"
-          @read="read"
         ></ListCard>
       </div>
       <!-- 分页 -->
@@ -376,16 +371,12 @@
           <el-col
             :span="8"
             v-for="item in examForm.examUserList"
-            :key="item.id"
+            :key="item.userId"
           >
-            <div
-              :class="[
-                'line-user',
-                examForm.onLineUser.includes(item.id) ? 'line' : '',
-              ]"
-            >
+            <div :class="['line-user', item.online ? 'line' : '']">
               <i class="common common-onLine"></i>
-              <span class="line-name">{{ item.name }}</span>
+              <span class="line-name">{{ item.userName }}</span>
+              <span class="line-time">最后在线时间：{{ item.onlineTime }}</span>
             </div>
           </el-col>
         </template>
@@ -400,9 +391,8 @@ import {
   examAdd,
   examDel,
   examEdit,
-  examOnLine,
+  onlineUser,
   examPublish,
-  examUserList,
   examListPage,
   examGradeReport,
   examMarkUserList,
@@ -411,13 +401,15 @@ import {
 import { paperListPage } from 'api/paper'
 import { userListPage } from 'api/user'
 import { questionListPage } from 'api/question'
-import ListCard from 'components/ListCard.vue'
+import ListCard from 'components/ListCard/ListCard.vue'
+import AddCard from 'components/ListCard/AddCard.vue'
 import CustomSelect from 'components/CustomSelect.vue'
 import * as dayjs from 'dayjs'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 dayjs.extend(isSameOrBefore)
 export default {
   components: {
+    AddCard,
     ListCard,
     CustomSelect,
   },
@@ -503,7 +495,6 @@ export default {
         examUser: [],
         examUsers: [],
         examUserList: [],
-        onLineUser: [],
         rules: {
           name: [
             { required: true, message: '请填写试卷名称', trigger: 'blur' },
@@ -525,11 +516,11 @@ export default {
     },
     diffMaxTime() {
       const diffTime = this.diffTime(this.examForm.statisticsInfo.maxExam)
-      return diffTime
+      return this.examForm.statisticsInfo.maxExam ? diffTime : 0
     },
     diffMinTime() {
       const diffTime = this.diffTime(this.examForm.statisticsInfo.minExam)
-      return diffTime
+      return this.examForm.statisticsInfo.minExam ? diffTime : 0
     },
   },
   mounted() {
@@ -699,20 +690,13 @@ export default {
         return
       }
       this.examForm.lineShow = true
-      const resList = await examUserList({ id })
+      const resList = await onlineUser({ id })
       resList?.code === 200 && (this.examForm.examUserList = resList.data)
-      if (resList?.code === 200 && resList.data.length > 0) {
-        const ids = resList.data.reduce((acc, cur) => {
-          acc.push(cur.id)
-          return acc
-        }, [])
-        let resLine = await examOnLine({ ids })
-        resLine?.code === 200 && (this.examForm.onLineUser = resLine.data)
-        this.timeLine = setInterval(async () => {
-          resLine = await examOnLine({ ids })
-          resLine?.code === 200 && (this.examForm.onLineUser = resLine.data)
-        }, 30 * 1000)
-      }
+      this.timeLine = setInterval(async () => {
+        const timeUserList = await onlineUser({ id })
+        resList?.code === 200 &&
+          (this.examForm.examUserList = timeUserList.data)
+      }, 30 * 1000)
     },
     // 关闭在线人员弹窗
     lineEnd() {
@@ -1039,11 +1023,16 @@ export default {
   justify-content: center;
   align-items: center;
   color: #999;
+  line-height: 30px;
   .common-onLine {
     font-size: 70px;
   }
   .line-name {
     font-size: 16px;
+  }
+
+  .line-time {
+    font-size: 13px;
   }
 }
 .line {

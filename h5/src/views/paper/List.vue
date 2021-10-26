@@ -18,26 +18,20 @@
     <!-- 内容 -->
     <div class="content">
       <div class="exam-list">
-        <div class="exam-item">
-          <div
-            class="exam-content exam-add"
-            @click=";(paperForm.show = true), (paperForm.edit = false)"
-          >
-            <i class="common common-plus"></i>
-            <span>添加试卷</span>
-          </div>
-        </div>
+        <AddCard
+          add-title="添加试卷"
+          @addCard=";(paperForm.show = true), (paperForm.edit = false)"
+        ></AddCard>
         <ListCard
           v-for="(item, index) in paperList"
           :key="index"
           :data="item"
           name="paperList"
-          @edit="edit"
           @del="del"
+          @edit="edit"
           @copy="copy"
           @publish="publish"
           @composition="composition"
-          @statistics="statistics"
         ></ListCard>
       </div>
       <!-- 分页 -->
@@ -218,10 +212,12 @@ import {
   paperPublish,
 } from 'api/paper'
 import Editor from 'components/Editor.vue'
-import ListCard from 'components/ListCard.vue'
+import ListCard from 'components/ListCard/ListCard.vue'
+import AddCard from 'components/ListCard/AddCard.vue'
 export default {
   components: {
     Editor,
+    AddCard,
     ListCard,
   },
   data() {
@@ -458,8 +454,8 @@ export default {
         query: { id, name, state },
       })
     },
-    // 统计分类
-    statistics() {
+    // 归档
+    archive() {
       this.$message('暂未开放！', 'warning')
     },
     // 考试发布
