@@ -43,6 +43,9 @@ public class PageIn {
 		if (params != null && params.get(key) != null) {
 			return (T) params.get(key);
 		}
+		if (request == null) {// 非前端调用时，request会为空
+			return null;
+		}
 		return (T) request.getParameter(key);
 	}
 

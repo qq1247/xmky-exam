@@ -60,6 +60,9 @@ public class ParmExServiceImpl extends BaseServiceImp<Parm> implements ParmExSer
 
 	@Override
 	public void ImageIcon(Parm parm) throws Exception{
+		if (parm.getOrgLogo() == null) {
+			return;// 如果logo为空，不处理
+		}
 		FileEx fileEx = fileService.getFileEx(parm.getOrgLogo());
 	    FileInputStream in = new FileInputStream(fileEx.getFile());
 	    byte[] bytes = new byte[in.available()];

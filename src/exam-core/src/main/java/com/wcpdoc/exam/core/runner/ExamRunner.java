@@ -31,8 +31,8 @@ public class ExamRunner implements ApplicationRunner {
 		PageIn pageIn = new PageIn();
 		pageIn.setPageSize(100);
 		pageIn.addAttr("endTime1", DateUtil.formatDateTime(new Date()));
-		pageIn.addAttr("state", 1);
-		pageIn.addAttr("markState", 2);
+		pageIn.addAttr("state", "1");
+		pageIn.addAttr("markState", "2");
 		List<Map<String, Object>> resultList = examService.getListpage(pageIn).getList();
 		for (Map<String, Object> result : resultList) {
 			AutoMarkCache.put((Integer)result.get("id"), DateUtil.getDateTime(result.get("endTime").toString()));
