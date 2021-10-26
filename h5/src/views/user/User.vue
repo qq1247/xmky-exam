@@ -117,7 +117,7 @@
         <el-form-item label="机构名称" label-width="120px" prop="orgId">
           <CustomSelect
             :multiple="false"
-            ref="addUserSelect"
+            ref="orgSelect"
             placeholder="请选择机构"
             :value="editForm.orgId"
             :total="editForm.orgListpage.total"
@@ -360,6 +360,12 @@ export default {
         this.editForm.orgId = res.data.orgId
         this.editForm.orgName = res.data.orgName
         this.editForm.roles = res.data.roles
+        this.$refs['orgSelect'].$refs['elSelect'].cachedOptions.push({
+          currentLabel: res.data.orgName,
+          currentValue: res.data.orgId,
+          label: res.data.orgName,
+          value: res.data.orgId,
+        })
       })
     },
     // 获取机构列表

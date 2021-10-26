@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-09-08 13:33:12
  * @LastEditors: Che
- * @LastEditTime: 2021-10-08 17:02:29
+ * @LastEditTime: 2021-10-09 15:54:23
 -->
 <template>
   <div class="container">
@@ -73,7 +73,6 @@ export default {
           key: 'orgName',
           value: res.data.orgName,
         })
-
         let loginInfo = getOrg()
         loginInfo.orgLogo = res.data.orgLogo
         loginInfo.orgName = res.data.orgName
@@ -103,10 +102,10 @@ export default {
 
         if (code === 200) {
           this.paramForm.orgLogo = []
-          this.init()
+          await this.init()
           let link = document.querySelector("link[rel*='icon']")
           link.href = `${process.env.VUE_APP_BASE_URL}login/ico`
-          this.$router.go(0)
+          this.$router.go()
         } else {
           this.$message.error(msg)
         }
