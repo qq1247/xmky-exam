@@ -22,16 +22,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
+import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.util.BigDecimalUtil;
+import com.wcpdoc.core.util.SpringUtil;
+import com.wcpdoc.core.util.StringUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionEx;
 import com.wcpdoc.exam.core.entity.QuestionOption;
-import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.WordServer;
-import com.wcpdoc.exam.core.util.BigDecimalUtil;
-import com.wcpdoc.exam.core.util.SpringUtil;
-import com.wcpdoc.exam.core.util.StringUtil;
-import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.file.service.FileService;
+import com.wcpdoc.file.service.FileService;
 
 /**
  * word服务实现

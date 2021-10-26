@@ -7,20 +7,21 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.exam.base.service.OrgService;
-import com.wcpdoc.exam.base.service.UserService;
-import com.wcpdoc.exam.core.dao.BaseDao;
+import com.wcpdoc.base.service.OrgService;
+import com.wcpdoc.base.service.UserService;
+import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
+import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.service.impl.BaseServiceImp;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.ExamTypeDao;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamType;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
-import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.ExamTypeExService;
 import com.wcpdoc.exam.core.service.ExamTypeService;
-import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.file.service.FileService;
+import com.wcpdoc.file.service.FileService;
 /**
  * 考试分类服务层实现
  * 

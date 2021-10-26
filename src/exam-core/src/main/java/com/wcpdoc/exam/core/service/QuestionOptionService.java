@@ -1,9 +1,8 @@
 package com.wcpdoc.exam.core.service;
 
-import com.wcpdoc.exam.core.service.BaseService;
-
 import java.util.List;
 
+import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 
 /**

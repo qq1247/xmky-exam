@@ -2,6 +2,7 @@ package com.wcpdoc.exam.core.dao;
 
 import java.util.List;
 
+import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 
 /**

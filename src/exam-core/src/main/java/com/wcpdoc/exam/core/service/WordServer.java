@@ -18,7 +18,7 @@ import org.jsoup.nodes.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.core.exception.MyException;
 
 /**
  * word服务

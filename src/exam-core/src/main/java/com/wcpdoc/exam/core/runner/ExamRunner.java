@@ -10,10 +10,10 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
-import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.service.ExamService;
-import com.wcpdoc.exam.core.util.DateUtil;
 
 /**
  * 考试服务启动

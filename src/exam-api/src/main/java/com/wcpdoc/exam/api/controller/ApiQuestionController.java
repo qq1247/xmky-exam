@@ -18,27 +18,27 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.wcpdoc.exam.base.cache.DictCache;
-import com.wcpdoc.exam.base.cache.ProgressBarCache;
-import com.wcpdoc.exam.core.constant.ConstantManager;
-import com.wcpdoc.exam.core.context.UserContext;
-import com.wcpdoc.exam.core.controller.BaseController;
-import com.wcpdoc.exam.core.entity.LoginUser;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
-import com.wcpdoc.exam.core.entity.PageResult;
-import com.wcpdoc.exam.core.entity.PageResultEx;
+import com.wcpdoc.base.cache.DictCache;
+import com.wcpdoc.base.cache.ProgressBarCache;
+import com.wcpdoc.core.constant.ConstantManager;
+import com.wcpdoc.core.context.UserContext;
+import com.wcpdoc.core.controller.BaseController;
+import com.wcpdoc.core.entity.LoginUser;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
+import com.wcpdoc.core.entity.PageResult;
+import com.wcpdoc.core.entity.PageResultEx;
+import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.util.SpringUtil;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.entity.QuestionType;
-import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
-import com.wcpdoc.exam.core.util.SpringUtil;
-import com.wcpdoc.exam.file.service.FileService;
+import com.wcpdoc.file.service.FileService;
 
 /**
  * 试题控制层

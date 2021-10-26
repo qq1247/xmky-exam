@@ -3,6 +3,7 @@ package com.wcpdoc.exam.core.service;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.MyMark;
 /**
  * 我的阅卷服务层接口

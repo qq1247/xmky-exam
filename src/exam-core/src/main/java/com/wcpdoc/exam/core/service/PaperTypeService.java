@@ -2,8 +2,9 @@ package com.wcpdoc.exam.core.service;
 
 import java.util.List;
 
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
+import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.PaperType;
 /**
  * 试卷分类服务层接口

@@ -1,6 +1,8 @@
 package com.wcpdoc.exam.core.service;
 
 import java.util.List;
+
+import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.PaperRemark;
 
 
