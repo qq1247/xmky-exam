@@ -6,7 +6,6 @@ import java.util.Map;
 
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
-import com.wcpdoc.exam.core.entity.PaperQuestionEx;
 import com.wcpdoc.exam.core.entity.PaperRemark;
 import com.wcpdoc.exam.core.entity.Question;
 
@@ -43,6 +42,23 @@ public interface PaperService extends BaseService<Paper> {
 	void delAndUpdate(Integer id);
 	
 	/**
+	 * 拷贝
+	 * 
+	 * v1.0 chenyun 2021年8月19日下午5:09:55
+	 * @param id void
+	 */
+	void copy(Integer id);
+	
+	/**
+	 * 归档
+	 * 
+	 * v1.0 zhanghc 2021年10月20日下午1:36:08
+	 * @param id 
+	 * void
+	 */
+	void archive(Integer id);
+	
+	/**
 	 * 完成添加章节
 	 * 
 	 * v1.0 zhanghc 2017年5月27日上午9:42:57
@@ -72,22 +88,23 @@ public interface PaperService extends BaseService<Paper> {
 	void chapterDel(Integer chapterId);
 	
 	/**
-	 * 获取试卷列表
+	 * 移动章节或试题
 	 * 
-	 * v1.0 zhanghc 2017年6月6日上午8:52:39
-	 * @param id
-	 * @return List<PaperQuestionEx>
+	 * v1.0 chenyun 2021年7月9日下午3:22:49
+	 * @param sourceId
+	 * @param targetId 
+	 * void
 	 */
-	List<PaperQuestionEx> getPaperList(Integer id);
+	void chapterQuestionMove(Integer sourceId, Integer targetId);
 	
 	/**
 	 * 获取试题列表
 	 * 
 	 * v1.0 zhanghc 2017年6月19日下午4:53:21
-	 * @param paperId
+	 * @param id
 	 * @return List<Question>
 	 */
-	List<Question> getQuestionList(Integer paperId);
+	List<Question> getQuestionList(Integer id);
 
 	/**
 	 * 完成添加试题
@@ -103,31 +120,34 @@ public interface PaperService extends BaseService<Paper> {
 	 * 设置分数
 	 * 
 	 * v1.0 zhanghc 2018年10月21日下午3:10:37
-	 * @param paperQuestionId
+	 * @param id
+	 * @param questionId
 	 * @param score
-	 * @param paperQuestionAnswerId
-	 * @param paperQuestionAnswerScore void
+	 * @param subScores 试题为智能阅卷，并且是填空或问答是有效
 	 * void
 	 */
-	void scoreUpdate(Integer paperQuestionId, BigDecimal score, Integer[] paperQuestionAnswerId, BigDecimal[] paperQuestionAnswerScore);
+	void scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores);
 	
 	/**
 	 * 完成设置选项
 	 * 
 	 * v1.0 zhanghc 2018年10月21日下午3:10:37
-	 * @param paperQuestionId 
-	 * @param score 
+	 * @param id
+	 * @param questionId 
+	 * @param scoreOptions 
 	 * void
 	 */
-	void optionsUpdate(Integer paperQuestionId, Integer[] scoreOptions);
+	void scoreOptionUpdate(Integer id, Integer questionId, Integer[] scoreOptions);
 
 	/**
 	 * 完成试题删除
 	 * 
 	 * v1.0 zhanghc 2018年10月21日下午10:43:15
+	 * @param id
+	 * @param questionId
 	 * @param paperQuestionId void
 	 */
-	void questionDel(Integer paperQuestionId);
+	void questionDel(Integer id, Integer questionId);
 	
 	/**
 	 * 完成清空试题
@@ -137,15 +157,6 @@ public interface PaperService extends BaseService<Paper> {
 	 * void
 	 */
 	void questionClear(Integer chapterId);
-
-	/**
-	 * 完成章节试题移动
-	 * 
-	 * v1.0 chenyun 2021年7月9日下午3:22:49
-	 * @param oldId
-	 * @param newId void
-	 */
-	void movePosition(Integer sourceId, Integer targetId);
 
 	/**
 	 * 获取试卷列表
@@ -171,19 +182,10 @@ public interface PaperService extends BaseService<Paper> {
 	 * 合并
 	 * 
 	 * v1.0 chenyun 2021年3月2日下午1:25:51
-	 * @param id
 	 * @param sourceId
 	 * @param targetId void
 	 */
-	void move(Integer id, Integer sourceId, Integer targetId);
-	
-	/**
-	 * 拷贝
-	 * 
-	 * v1.0 chenyun 2021年8月19日下午5:09:55
-	 * @param id void
-	 */
-	void copy(Integer id) throws Exception ;
+	void move(Integer sourceId, Integer targetId);
 	
 	/**
 	 * 试卷试题列表
@@ -201,4 +203,14 @@ public interface PaperService extends BaseService<Paper> {
 	 * @param id void
 	 */
 	void publish(Integer id);
+
+	/**
+	 * 更新总分数
+	 * 
+	 * v1.0 zhanghc 2021年10月20日上午10:59:33
+	 * @param id 
+	 * void
+	 */
+	void totalScoreUpdate(Integer id);
+
 }

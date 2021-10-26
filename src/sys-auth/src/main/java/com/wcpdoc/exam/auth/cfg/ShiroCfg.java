@@ -10,7 +10,6 @@ import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.mgt.SessionStorageEvaluator;
-import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.context.annotation.Bean;
@@ -167,17 +166,19 @@ public class ShiroCfg {
 
 	/**
 	 * 开启注解支持
+	 * 注解代码分布在各处，侵入代码严重。
+	 * 改成过滤器字符串匹配，可解耦，可随时替换成其他权限框架。
 	 * 
 	 * v1.0 zhanghc 2021年3月2日上午11:29:58
 	 * 
 	 * @param securityManager
 	 * @return AuthorizationAttributeSourceAdvisor
 	 */
-	@Bean
-	public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(SecurityManager securityManager) {
-		AuthorizationAttributeSourceAdvisor advisor = new AuthorizationAttributeSourceAdvisor();
-		advisor.setSecurityManager(securityManager);
-		return advisor;
-	}
+//	@Bean
+//	public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(SecurityManager securityManager) {
+//		AuthorizationAttributeSourceAdvisor advisor = new AuthorizationAttributeSourceAdvisor();
+//		advisor.setSecurityManager(securityManager);
+//		return advisor;
+//	}
 
 }

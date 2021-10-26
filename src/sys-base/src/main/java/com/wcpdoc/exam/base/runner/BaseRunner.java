@@ -17,12 +17,5 @@ public class BaseRunner implements ApplicationRunner {
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		DictCache.flushCache();
-		/*ResCache.flushCache();
-
-		ServletContext servletContext = SpringUtil.getBean(ServletContext.class);
-		servletContext.setAttribute(ConstantManager.SESSION_USER_LIST, new HashMap<String, HttpSession>());
-
-		servletContext.setAttribute(ConstantManager.MENU_LIST, ResCache.getBackMenuList());
-		servletContext.setAttribute(ConstantManager.HOME_MENU_LIST, ResCache.getHomeMenuList());*/
 	}
 }

@@ -12,12 +12,13 @@ import java.util.ListIterator;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.safety.Whitelist;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
@@ -39,6 +40,8 @@ import com.wcpdoc.exam.file.service.FileService;
  * 
  */
 public class WordServerImpl extends WordServer {
+	private static final Logger log = LoggerFactory.getLogger(WordServerImpl.class);
+	
 	private String[] types = new String[]{"【单选】", "【多选】", "【填空】", "【判断】", "【问答】"};
 	private String[] difficultys = new String[]{"【极易】", "【简单】", "【适中】", "【困难】", "【极难】"};
 	private String[] options = new String[]{"A", "B", "C", "D", "E", "F", "G"};
@@ -47,17 +50,23 @@ public class WordServerImpl extends WordServer {
 	@Override
 	public <T> T decoder(List<Node> nodeList) {
 		// 图片本地路径转上传路径
+		log.debug("word解析试题：图片转上传路径开始");
+		long startTime = System.currentTimeMillis();
 		transformImgUrl(nodeList);
+		long endTime = System.currentTimeMillis();
+		log.debug("word解析试题：图片转上传路径结束，用时{}毫秒", endTime - startTime);
 		
 		// 从多行中分隔出不同的题
+		log.debug("word解析试题：从多行中分隔出不同的题开始", endTime - startTime);
+		startTime = System.currentTimeMillis();
 		List<Node> singleQuestion = new ArrayList<>();// 一道题的内容
-		List<QuestionEx> questionList = new ArrayList<>();// 解析成试题对象的列表
-
+		List<List<Node>> singleQuestionList = new ArrayList<>();// 所有题的内容
 		ListIterator<Node> nodeIterator = nodeList.listIterator();
 		boolean splitFinish = false;// 分隔完成标识位
 		while (nodeIterator.hasNext()) {
+			
 			Node node = nodeIterator.next();
-			if (node instanceof TextNode) {
+			if (node instanceof TextNode) {// 计算开始时间不能从这里开始，因为continue后再次进来会重新计时
 				continue;
 			}
 
@@ -66,27 +75,35 @@ public class WordServerImpl extends WordServer {
 				continue;
 			}
 			if (startsWithType(rowTxt)) {// 如果开始字符串包含试题类型字符串
-				rowTxt = rowTxt.substring(4);
+				rowTxt = rowTxt.substring(4);// 向后位移4个字符
 				if (startsWithDifficulty(rowTxt)) {// 如果开始字符串包含难度类型字符串
 					splitFinish = true;// 表示分隔到一道完整的试题
 				}
 			}
 
-			// 解析出每道题，供业务层使用
 			if (splitFinish && ValidateUtil.isValid(singleQuestion)) {
-				QuestionEx questionEx = parseQuestion(singleQuestion);
-				questionList.add(questionEx);
-				singleQuestion.clear();// 重置单道试题内容
+				singleQuestionList.add(singleQuestion);
+				singleQuestion = new ArrayList<>();// 重新初始化对象
 			}
 
 			splitFinish = false;
 			singleQuestion.add(node);
 		}
+		singleQuestionList.add(singleQuestion);// 最后一道题处理（按头标识分隔，最后一道题下面没有分隔了）
+		endTime = System.currentTimeMillis();
+		log.debug("word解析试题：从多行中分隔出不同的题结束，用时{}毫秒", endTime - startTime);
 		
-		QuestionEx questionEx = parseQuestion(singleQuestion);// 最后一道题处理（按头标识分隔，最后一道题下面没有分隔了）
-		questionList.add(questionEx);
-		singleQuestion.clear();
-
+		// 解析出每道题，供业务层使用
+		log.debug("word解析试题：试题内容解析成java对象开始", endTime - startTime);
+		startTime = System.currentTimeMillis();
+		List<QuestionEx> questionList = new ArrayList<>();// 解析成试题对象的列表
+		for (List<Node> _singleQuestion : singleQuestionList) {
+			QuestionEx questionEx = null;
+			questionEx = parseQuestion(_singleQuestion);
+			questionList.add(questionEx);
+		}
+		endTime = System.currentTimeMillis();
+		log.debug("word解析试题：试题内容解析成java对象结束，用时{}毫秒", endTime - startTime);
 		return (T) questionList;
 	}
 
@@ -198,6 +215,27 @@ public class WordServerImpl extends WordServer {
 		 */
 		
 		// 解析文本数据，文本格式校验
+			/** 解析文本数据，文本格式校验
+			【单选】【极易】蛋黄的颜色主要取决于其中_____的含量()
+			A、 叶黄素
+			B、 胡萝卜素
+			C、 核黄素
+			D、 姜黄素
+			【答案：B】【分值：2】
+			【智能阅卷：是】【漏选得分：是】【漏选分值：1】
+			【解析】
+		*/
+		String singleHtml = Jsoup.clean(singleQuestion.toString(), Whitelist.none()).trim();
+		int answerIndex = singleHtml.indexOf("【答案");
+		int aiIndex = singleHtml.indexOf("【智能阅卷");
+		int analysisIndex = singleHtml.indexOf("【解析");
+		if (answerIndex > aiIndex) {
+			throw new MyException(String.format("答案和智能阅卷顺序错误：%s】", StringUtil.delHTMLTag(singleQuestion.toString())));
+		}
+		if (aiIndex > analysisIndex) {
+			throw new MyException(String.format("智能阅卷和解析顺序错误：%s】", StringUtil.delHTMLTag(singleQuestion.toString())));
+		}
+		
 		List<Node> titleRows = parseTitleRows(singleQuestion);
 		List<Node> optionRows = parseOptionRows(singleQuestion);
 		List<Node> answerRows = parseAnswerRows(singleQuestion);
@@ -637,13 +675,6 @@ public class WordServerImpl extends WordServer {
 		QuestionOption questionOption = new QuestionOption();
 		questionOption.setOptions(getTxt(options, 0, options.size()));
 		return questionOption;
-	}
-
-	public static void main(String[] args) throws Exception {
-		WordServer wordServer = new WordServerImpl();
-		File file = new File("c:/试题模板.docx");
-		List<Object> handle = wordServer.handle(FileUtils.openInputStream(file), "D:/bak/file/temp");
-		System.err.println(handle);
 	}
 
 	/**

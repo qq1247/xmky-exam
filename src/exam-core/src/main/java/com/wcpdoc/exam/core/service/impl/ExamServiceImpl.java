@@ -1,6 +1,5 @@
 package com.wcpdoc.exam.core.service.impl;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -15,9 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.exam.auth.cache.OnLineCache;
 import com.wcpdoc.exam.base.service.OrgService;
 import com.wcpdoc.exam.base.service.UserService;
+import com.wcpdoc.exam.core.cache.AutoMarkCache;
 import com.wcpdoc.exam.core.dao.BaseDao;
 import com.wcpdoc.exam.core.dao.ExamDao;
 import com.wcpdoc.exam.core.entity.Exam;
@@ -28,6 +27,7 @@ import com.wcpdoc.exam.core.entity.MyExamDetail;
 import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
+import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.ExamService;
@@ -49,7 +49,6 @@ import com.wcpdoc.exam.core.util.ValidateUtil;
 @Service
 public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService {
 	private static final Logger log = LoggerFactory.getLogger(ExamServiceImpl.class);
-	
 	@Resource
 	private ExamDao examDao;
 	@Resource
@@ -92,8 +91,8 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if(exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()) {
 			throw new MyException("阅卷结束时间必须大于阅卷开始时间！");
 		}
-		if(!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId()) && !hasReadAuth(exam.getExamTypeId(), getCurUser().getId())) {
-			throw new MyException("权限不足！");
+		if(!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId())) {
+			throw new MyException("无操作权限");
 		}
 		
 		//添加考试
@@ -103,7 +102,14 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		exam.setUpdateTime(new Date());
 		exam.setUpdateUserId(getCurUser().getId());
 		exam.setState(2);
-		examDao.add(exam);
+		exam.setMarkState(2);// 标记为未阅卷（考试时间结束，定时任务自动阅卷，标记为已阅）
+		
+		Paper paper = paperService.getEntity(exam.getPaperId());
+		if (paper.getMarkType() == 1) {// 如果是自动阅卷类型，没有阅卷开始时间和阅卷结束时间
+			exam.setMarkStartTime(null);
+			exam.setMarkEndTime(null);
+		}
+		add(exam);
 	}
 	
 	@Override
@@ -125,8 +131,8 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if(exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()) {
 			throw new MyException("阅卷结束时间必须大于阅卷开始时间！");
 		}
-		if(!hasWriteAuth(entity.getExamTypeId(), getCurUser().getId()) && !hasReadAuth(exam.getExamTypeId(), getCurUser().getId())) {
-		   throw new MyException("权限不足！");
+		if(!hasWriteAuth(entity.getExamTypeId(), getCurUser().getId())) {
+		   throw new MyException("无操作权限");
 		}
 		
 		//添加考试
@@ -142,7 +148,8 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		entity.setDescription(exam.getDescription());
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
-		examDao.update(entity);
+		//exam.setMarkState(2);// 不处理
+		update(entity);
 	}
 	
 	@Override
@@ -151,35 +158,43 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		Exam exam = examDao.getEntity(id);
 		if(exam.getStartTime().getTime() >= curTime.getTime()
 				&& exam.getEndTime().getTime() <= curTime.getTime()) {
-			throw new MyException("【"+exam.getName()+"】考试未结束");
+			throw new MyException("考试未结束");
 		}
-		if(!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId()) && !hasReadAuth(exam.getExamTypeId(), getCurUser().getId())) {
-			throw new MyException("权限不足！");
+		if(!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId())) {
+			throw new MyException("无操作权限");
 		}
 		
 		exam.setState(0);
 		exam.setUpdateTime(new Date());
 		exam.setUpdateUserId(getCurUser().getId());
-		examDao.update(exam);
+		update(exam);
 	}
 	
 	@Override
 	public void publish(Integer id) {
+		// 校验数据有效性
 		Exam exam = examDao.getEntity(id);
 		if(exam.getState() == 0) {
-			throw new MyException("考试【"+exam.getName()+"】已删除！");
+			throw new MyException("考试已删除");
 		}
 		if(exam.getState() == 1) {
-			throw new MyException("考试【"+exam.getName()+"】已发布！");
+			throw new MyException("考试已发布");
 		}
-		if(!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId()) && !hasReadAuth(exam.getExamTypeId(), getCurUser().getId())) {
-			throw new MyException("权限不足！");
+		if(exam.getState() == 3) {
+			throw new MyException("考试已归档");
+		}
+		if(!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId())) {
+			throw new MyException("无操作权限");
 		}
 		
+		// 发布考试
 		exam.setState(1);
 		exam.setUpdateUserId(getCurUser().getId());
 		exam.setUpdateTime(new Date());
 		examDao.update(exam);
+		
+		// 标记为需要监听的考试（考试结束自动阅卷）
+		AutoMarkCache.put(exam.getId(), exam.getEndTime());
 	}
 	
 	@Override
@@ -254,10 +269,10 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 				myExam.setExamId(id);
 				myExam.setUserId(Integer.parseInt(userId));
 				
-				myExam.setAnswerStartTime(exam.getStartTime());
-				myExam.setAnswerEndTime(exam.getEndTime());
-				myExam.setMarkStartTime(exam.getMarkStartTime());
-				myExam.setMarkEndTime(exam.getMarkEndTime());
+				//myExam.setAnswerStartTime(exam.getStartTime());// 第一次答题记录时间，不是这里
+				//myExam.setAnswerEndTime(exam.getEndTime());
+				//myExam.setMarkStartTime(exam.getMarkStartTime());// 第一次阅卷记录时间，不是这里
+				//myExam.setMarkEndTime(exam.getMarkEndTime());
 				//myExam.setTotalScore(BigDecimal.ZERO);//没有考试，不要设置分数
 				myExam.setState(1);
 				myExam.setMarkState(1);
@@ -285,7 +300,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			myMark.setUpdateUserId(getCurUser().getId());
 			myMark.setUpdateTime(new Date());
 			myMark.setExamId(id);
-			myMark.setAutoState(2);
 			myMarkService.add(myMark);
 		}
 	}
@@ -323,7 +337,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			myMark.setUpdateUserId(getCurUser().getId());
 			myMark.setUpdateTime(new Date());
 			myMark.setExamId(id);
-			myMark.setAutoState(2);
 			myMarkService.add(myMark);
 		}
 	}
@@ -366,20 +379,9 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		return examType.getWriteUserIds().contains(String.format(",%s,", userId));
 	}
 	
-	private boolean hasReadAuth(Integer examTypeId, Integer userId) {
-		ExamType examType = examTypeService.getEntity(examTypeId);
-		return examType.getReadUserIds().contains(String.format(",%s,", userId));
-	}
+//	private boolean hasReadAuth(Integer examTypeId, Integer userId) {
+//		ExamType examType = examTypeService.getEntity(examTypeId);
+//		return examType.getReadUserIds().contains(String.format(",%s,", userId));
+//	}
 
-	@Override
-	public List<Integer> onLine(Integer[] ids) {
-		List<Integer> onLineList = new ArrayList<Integer>();
-		for(Integer id : ids){
-			Long onLineTime = OnLineCache.getOnLineTime(id);
-			if (onLineTime != null && (new Date().getTime() - onLineTime) <= 65000) { //65000毫秒（1分钟05秒）
-				onLineList.add(id);
-			}
-		}
-		return onLineList;
-	}
 }

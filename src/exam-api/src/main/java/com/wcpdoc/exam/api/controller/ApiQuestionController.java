@@ -11,13 +11,19 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.wcpdoc.exam.base.cache.DictCache;
+import com.wcpdoc.exam.base.cache.ProgressBarCache;
 import com.wcpdoc.exam.core.constant.ConstantManager;
+import com.wcpdoc.exam.core.context.UserContext;
 import com.wcpdoc.exam.core.controller.BaseController;
+import com.wcpdoc.exam.core.entity.LoginUser;
 import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PageResult;
@@ -31,6 +37,7 @@ import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
+import com.wcpdoc.exam.core.util.SpringUtil;
 import com.wcpdoc.exam.file.service.FileService;
 
 /**
@@ -298,15 +305,30 @@ public class ApiQuestionController extends BaseController {
 	@ResponseBody
 	public PageResult wordImp(Integer fileId, Integer questionTypeId) {
 		try {
+			ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+			RequestContextHolder.setRequestAttributes(requestAttributes, true);// 子线程共享请求属性
+			
 			String processBarId = UUID.randomUUID().toString().replaceAll("-", "");
-			
-			/*new Thread(new Runnable() {
+			ProgressBarCache.setProgressBar(processBarId, 0.0, 10.0, "开始解析", HttpStatus.OK.value());// 初始化进度条
+
+			LoginUser loginUser = getCurUser();
+			new Thread(new Runnable() {
 				public void run() {
-					SpringUtil.getBean(QuestionService.class).wordImp(fileId, questionTypeId, processBarId);
+					UserContext.set(loginUser);// 子线程不走springboot拦截器，人工模拟拦截器，线程上绑定当前登录信息
+					try {
+						SpringUtil.getBean(QuestionService.class).wordImp(fileId, questionTypeId, processBarId);
+					} catch (MyException e) {
+						ProgressBarCache.setProgressBar(processBarId, 10.0, 10.0, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+						log.error("word试题导入错误：{}", e.getMessage());
+						UserContext.remove();
+					} catch (Exception e) {
+						ProgressBarCache.setProgressBar(processBarId, 10.0, 10.0, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+						log.error("word试题导入错误：", e);
+						UserContext.remove();
+					}
 				}
-			}).start();*/
-			
-			questionService.wordImp(fileId, questionTypeId, processBarId);
+			}).start();
+
 			return PageResultEx.ok().data(processBarId);
 		} catch (MyException e) {
 			log.error("导入试题错误：{}", e.getMessage());
@@ -355,86 +377,6 @@ public class ApiQuestionController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
-	/**
-	 * word试题导出
-	 * 
-	 * v1.0 zhanghc 2019年8月14日下午5:33:20 
-	 * void
-	 */
-//	@RequestMapping(value = "/wordQuestionExport")
-//	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
-//	public Map<String, String> wordQuestionExport(String ids) {
-//		try {
-//		/*if (ids != null) {
-//		Map<String, String> map = new HashMap<>();
-//			throw new RuntimeException("参数无效：dbAddr");
-//		}*/
-//	
-//		Question entity = questionService.getEntity(26);
-//		List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(entity.getId());
-//		
-//		Map<String, Object> mapList = new HashMap<String, Object>();
-//		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-//		Map<String, Object> map = new HashMap<String, Object>();
-//		map.put("typeName", "单选");
-//		map.put("difficultyName", "简单");
-//		map.put("title", entity.getTitle());
-//		
-//		map.put("optionA", "AAAAAAAAA");
-//		map.put("optionB", "BBBBBBBBB");
-//		map.put("optionC", "CCCCCCCCC");
-//		map.put("optionD", "DDDDDDDDD");
-//		map.put("optionE", "EEEEEEEEEE");
-//		map.put("optionF", "FFFFFFFFFF");
-//		map.put("optionG", "GGGGGGGGGG");
-//		
-//		map.put("answer", questionAnswerList);
-//		map.put("score", "3.0");
-//		map.put("scoreOptions", "半对半错");
-//		map.put("analysis", entity.getAnalysis());
-//		list.add(map);
-//		mapList.put("list", list);
-//		
-//		Template template = null;
-//		try {
-//			//设置模板相对路径
-//			File file = new File(this.getClass().getResource("/").toURI().getPath() +"/res/");
-//			
-//			Configuration configuration =  new Configuration(Configuration.VERSION_2_3_22);
-//			configuration.setTemplateLoader(new FileTemplateLoader(file));
-//			configuration.setDefaultEncoding("UTF-8");
-//			configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-//			configuration.setLogTemplateExceptions(false);
-//			configuration.setWrapUncheckedExceptions(true);
-//			
-//			template = configuration.getTemplate("template.doc.ftl");
-//
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		File outFile = new File("D:/outFile/outFile" + Math.random() * 10000 + ".docx"); // 导出文件
-//		Writer out = null;
-//		try {
-//			out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile)));
-//		} catch (FileNotFoundException e1) {
-//			e1.printStackTrace();
-//		}
-//
-//		try {
-//			template.process(mapList, out); // 将填充数据填入模板文件并输出到目标文件
-//		} catch (TemplateException e) {
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		
-//			return null;
-//		} catch (Exception e1) {
-//			e1.printStackTrace();
-//		}
-//			return null;
-//	}
 	
 	/**
 	 * 试题统计（类型，难易程度）

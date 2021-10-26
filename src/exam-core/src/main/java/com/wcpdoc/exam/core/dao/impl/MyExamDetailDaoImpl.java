@@ -25,9 +25,9 @@ public class MyExamDetailDaoImpl extends RBaseDaoImpl<MyExamDetail> implements M
 	}
 
 	@Override
-	public List<MyExamDetail> getList(Integer myExamId) {
-		String sql = "SELECT * FROM EXM_MY_EXAM_DETAIL WHERE MY_EXAM_ID = ?";
-		return getList(sql, new Object[] { myExamId }, MyExamDetail.class);
+	public List<MyExamDetail> getList(Integer examId, Integer userId) {
+		String sql = "SELECT * FROM EXM_MY_EXAM_DETAIL WHERE EXAM_ID = ? AND USER_ID = ?";
+		return getList(sql, new Object[] { examId, userId }, MyExamDetail.class);
 	}
 
 	@Override
@@ -54,5 +54,11 @@ public class MyExamDetailDaoImpl extends RBaseDaoImpl<MyExamDetail> implements M
 				+" LEFT JOIN SYS_USER USER ON MY_EXAM_DETAIL.MARK_USER_ID = USER.ID "
 				+" WHERE MY_EXAM_DETAIL.USER_ID = ? AND MY_EXAM_DETAIL.EXAM_ID = ? ";
 	return getMapList(sql, new Object[] { userId, examId });
+	}
+
+	@Override
+	public MyExamDetail getEntity(Integer examId, Integer userId, Integer questionId) {
+		String sql = "SELECT * FROM EXM_MY_EXAM_DETAIL WHERE EXAM_ID = ? AND USER_ID = ? AND QUESTION_ID = ?";
+		return getEntity(sql, new Object[] { examId, userId, questionId });
 	}
 }

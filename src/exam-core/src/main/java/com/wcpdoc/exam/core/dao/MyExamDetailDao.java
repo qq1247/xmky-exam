@@ -20,7 +20,7 @@ public interface MyExamDetailDao extends BaseDao<MyExamDetail>{
 	 * @param myExamId
 	 * @return List<MyExamDetail>
 	 */
-	List<MyExamDetail> getList(Integer myExamId);
+	List<MyExamDetail> getList(Integer examId, Integer userId);
 	
 	/**
 	 * 获取我的考试详细列表
@@ -48,5 +48,16 @@ public interface MyExamDetailDao extends BaseDao<MyExamDetail>{
 	 * @param myExamId void
 	 */
 	void delByMyExamId(Integer myExamId);
+
+	/**
+	 * 获取我的考试详细
+	 * 
+	 * v1.0 zhanghc 2021年10月19日上午9:55:31
+	 * @param examId
+	 * @param userId
+	 * @param questionId
+	 * @return MyExamDetail
+	 */
+	MyExamDetail getEntity(Integer examId, Integer userId, Integer questionId);
 
 }

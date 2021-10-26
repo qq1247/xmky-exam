@@ -1,4 +1,4 @@
-package com.wcpdoc.exam.web.conf;
+package com.wcpdoc.exam;
 
 import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;

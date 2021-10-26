@@ -134,12 +134,4 @@ public interface ExamService extends BaseService<Exam>{
 	 */
 	List<Map<String, Object>> getMarkQuestionList(Integer id, Integer markUserId); 
 	
-	/**
-	 * 在线情况
-	 * 
-	 * v1.0 chenyun 2021年9月7日下午1:26:04
-	 * @param ids
-	 * @return Integer[]
-	 */
-	List<Integer> onLine(Integer[]  ids);
 }

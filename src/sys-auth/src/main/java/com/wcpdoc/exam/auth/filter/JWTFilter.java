@@ -7,6 +7,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.ShiroException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
@@ -17,12 +18,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.wcpdoc.exam.auth.cache.OldTokenCache;
-import com.wcpdoc.exam.auth.cache.OnLineCache;
 import com.wcpdoc.exam.auth.cache.TokenCache;
 import com.wcpdoc.exam.auth.entity.JWTToken;
-import com.wcpdoc.exam.core.entity.JwtResult;
+import com.wcpdoc.exam.auth.entity.JwtResult;
+import com.wcpdoc.exam.auth.util.JwtUtil;
 import com.wcpdoc.exam.core.util.DateUtil;
-import com.wcpdoc.exam.core.util.JwtUtil;
 import com.wcpdoc.exam.core.util.SpringUtil;
 import com.wcpdoc.exam.core.util.ValidateUtil;
 
@@ -72,7 +72,6 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 		JWTToken jwtToken = new JWTToken(jwt);
 		getSubject(request, response).login(jwtToken);
 		refreshToken(request, response);
-		onLine(request);//统计在线
 		return true;
 	}
 
@@ -155,19 +154,6 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 	}
 
 	/**
-	 * 缓存在线用户
-	 * 
-	 * v1.0 chenyun 2021年9月7日下午3:41:59
-	 * @param id void
-	 */
-	private void onLine(ServletRequest request) {
-		String oldJwtToken = WebUtils.toHttp(request).getHeader("Authorization");
-		JwtResult oldJwtResult = JwtUtil.getInstance().parse(oldJwtToken);//能到这一步，肯定是登陆成功的，不需要校验空或校验错误。
-		int oldUserId = oldJwtResult.getClaims().get("userId", Integer.class);
-		OnLineCache.setOnLineTime(oldUserId, request.getRemoteHost());
-	}
-	
-	/**
 	 * 拒绝访问处理
 	 */
 	@Override
@@ -196,11 +182,19 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 		}
 		try {
 			return super.preHandle(request, response);
+		} catch (ShiroException e) {
+			httpResponse.setCharacterEncoding("UTF-8");
+			httpResponse.setContentType("application/json;charset=UTF-8");
+			httpResponse.setStatus(HttpStatus.OK.value());
+			httpResponse.getWriter().write(String.format("{\"code\": %s, \"msg\": \"%s\"}", HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
+			log.error("shiro权限异常：{}", e.getMessage());
+			return false;
 		} catch (Exception e) {
 			httpResponse.setCharacterEncoding("UTF-8");
 			httpResponse.setContentType("application/json;charset=UTF-8");
 			httpResponse.setStatus(HttpStatus.OK.value());
 			httpResponse.getWriter().write(String.format("{\"code\": %s, \"msg\": \"%s\"}", HttpStatus.UNAUTHORIZED.value(), e.getMessage()));
+			log.error("shiro权限异常：", e);
 			return false;
 		}
 	}

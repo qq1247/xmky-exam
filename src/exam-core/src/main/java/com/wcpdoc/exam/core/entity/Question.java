@@ -195,10 +195,12 @@ public class Question {
 		this.createTime = createTime;
 	}
 
+	/** 智能阅卷：1：是；2：否； */
 	public Integer getAi() {
 		return ai;
 	}
 
+	/** 智能阅卷：1：是；2：否； */
 	public void setAi(Integer ai) {
 		this.ai = ai;
 	}

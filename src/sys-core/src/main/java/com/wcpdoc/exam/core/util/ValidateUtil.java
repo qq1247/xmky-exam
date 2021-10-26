@@ -1,6 +1,8 @@
 package com.wcpdoc.exam.core.util;
 
+import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.Date;
 
 /**
  * 校验工具类
@@ -22,6 +24,61 @@ public class ValidateUtil {
 			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * 是否有效
+	 * 
+	 * v1.0 zhanghc 2021年10月19日上午10:42:11
+	 * @param i
+	 * @return boolean
+	 */
+	public static boolean isValid(Integer i) {
+		return i != null;
+	}
+	
+	/**
+	 * 是否有效
+	 * 
+	 * v1.0 zhanghc 2021年10月19日上午10:42:11
+	 * @param i
+	 * @return boolean
+	 */
+	public static boolean isValid(Long l) {
+		return l != null;
+	}
+	
+	/**
+	 * 是否有效
+	 * 
+	 * v1.0 zhanghc 2021年10月19日上午10:42:11
+	 * @param i
+	 * @return boolean
+	 */
+	public static boolean isValid(Double d) {
+		return d != null;
+	}
+	
+	/**
+	 * 是否有效
+	 * 
+	 * v1.0 zhanghc 2021年10月19日上午10:42:11
+	 * @param i
+	 * @return boolean
+	 */
+	public static boolean isValid(Date d) {
+		return d != null;
+	}
+	
+	/**
+	 * 是否有效
+	 * 
+	 * v1.0 zhanghc 2021年10月19日上午10:42:11
+	 * @param i
+	 * @return boolean
+	 */
+	public static boolean isValid(BigDecimal b) {
+		return b != null;
 	}
 
 	/**

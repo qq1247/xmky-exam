@@ -4,8 +4,6 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.apache.shiro.authz.annotation.Logical;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -193,7 +191,6 @@ public class ApiBulletinController extends BaseController {
 	 */
 	@RequestMapping("/authOrgList")
 	@ResponseBody
-	@RequiresRoles(value={"subAdmin"},logical = Logical.OR)
 	public PageResult authOrgList(PageIn pageIn, String name, Integer id) {
 		try {
 			return PageResultEx.ok().data(bulletinService.getOrgListpage(new PageIn(request)));
