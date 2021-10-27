@@ -90,11 +90,6 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	public List<Map<String, Object>> getMarkAnswerList(Integer userId, Integer examId) {
 		return myExamDetailDao.getMarkAnswerList(userId, examId);
 	}
-	
-	@Override
-	public void delByMyExamId(Integer myExamId) {
-		myExamDetailDao.delByMyExamId(myExamId);
-	}
 
 	@Override
 	public MyExamDetail getEntity(Integer examId, Integer userId, Integer questionId) {
@@ -533,5 +528,10 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			questionOptionCache.put(paperQuestion.getQuestionId(), paperQuestion);
 		}
 		return questionOptionCache;
+	}
+
+	@Override
+	public void del(Integer examId, Integer userId) {
+		myExamDetailDao.del(examId, userId);
 	}
 }

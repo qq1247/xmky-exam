@@ -114,7 +114,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 
 		// 更新阅卷分数
 		myExamDetail.setScore(score);
-		myExamDetail.setMyMarkId(getCurUser().getId());
+		myExamDetail.setMarkUserId(getCurUser().getId());
 		myExamDetail.setMarkTime(new Date());
 		myExamDetailService.update(myExamDetail);
 		

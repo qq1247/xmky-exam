@@ -40,14 +40,6 @@ public interface MyExamDetailService extends BaseService<MyExamDetail>{
 	 * @return List<Map<String,Object>>
 	 */
 	List<Map<String, Object>> getMarkAnswerList(Integer userId, Integer examId);
-	
-	/**
-	 * 删除我的考试详细
-	 * 
-	 * v1.0 zhanghc 2020年10月12日下午4:03:42
-	 * @param myExamId void
-	 */
-	void delByMyExamId(Integer myExamId);
 
 	/**
 	 * 获取我的考试详细
@@ -69,4 +61,13 @@ public interface MyExamDetailService extends BaseService<MyExamDetail>{
 	 * void
 	 */
 	void autoMark(Integer examId);
+
+	/**
+	 * 删除我的考试详细
+	 * 
+	 * v1.0 zhanghc 2021年10月27日下午2:19:13
+	 * @param examId
+	 * @param userId void
+	 */
+	void del(Integer examId, Integer userId);
 }

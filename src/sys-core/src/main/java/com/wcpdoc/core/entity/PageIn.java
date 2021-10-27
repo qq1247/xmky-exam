@@ -11,8 +11,8 @@ import javax.servlet.ServletRequest;
  * v1.0 zhanghc 2015-6-19下午08:30:16
  */
 public class PageIn {
-	private int curPage;// 当前第几页，默认第一页
-	private int pageSize;// 每页多少条，默认20条，最大100条；
+	private int curPage = 1;// 当前第几页，默认第一页
+	private int pageSize = 20;// 每页多少条，默认20条，最大100条；
 
 	private ServletRequest request;
 	private Map<String, Object> params;
@@ -21,8 +21,8 @@ public class PageIn {
 	}
 
 	public PageIn(ServletRequest request) {
-		this.curPage = request.getParameter("curPage") == null ? 1 : Integer.parseInt(request.getParameter("curPage"));
-		this.pageSize = request.getParameter("pageSize") == null ? 20 : Integer.parseInt(request.getParameter("pageSize"));
+		this.curPage = request.getParameter("curPage") == null ? this.curPage : Integer.parseInt(request.getParameter("curPage"));
+		this.pageSize = request.getParameter("pageSize") == null ? this.pageSize : Integer.parseInt(request.getParameter("pageSize"));
 		this.request = request;
 	}
 

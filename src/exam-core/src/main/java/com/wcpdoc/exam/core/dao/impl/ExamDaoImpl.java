@@ -37,7 +37,8 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT EXAM.ID, EXAM.NAME, EXAM.START_TIME, EXAM.END_TIME, EXAM.SCORE_STATE, EXAM.RANK_STATE, EXAM.LOGIN_TYPE, "
-				+ "		EXAM.STATE, EXAM.PAPER_ID AS PAPER_ID, PAPER.NAME AS PAPER_NAME, PAPER.TOTAL_SCORE AS PAPER_TOTLE_SCORE, PAPER.PASS_SCORE AS PAPER_PASS_SCORE, " 
+				+ "		EXAM.STATE, EXAM.PAPER_ID AS PAPER_ID, PAPER.NAME AS PAPER_NAME, PAPER.TOTAL_SCORE AS PAPER_TOTLE_SCORE, "
+				+ "		PAPER.PASS_SCORE AS PAPER_PASS_SCORE, PAPER.MARK_TYPE AS PAPER_MARK_TYPE, " 
 				+ "		EXAM.MARK_START_TIME, EXAM.MARK_END_TIME, UPDATE_USER.NAME AS UPDATE_USER_NAME, UPDATE_USER.ID AS UPDATE_USER_ID, "
 				+ "		CREATE_USER.NAME AS CREATE_USER_NAME, CREATE_USER.ID AS CREATE_USER_ID, "
 				+ "		(SELECT COUNT(*) FROM EXM_MY_EXAM A WHERE A.EXAM_ID = EXAM.ID) AS USER_NUM ," //考试人数
@@ -58,7 +59,7 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 				.addWhere(ValidateUtil.isValid(pageIn.get("endTime2")), "EXAM.END_TIME <= ?", ValidateUtil.isValid(pageIn.get("endTime2")) ? DateUtil.getDateTime(pageIn.get("endTime2")) : null)
 				.addWhere(ValidateUtil.isValid(pageIn.get("markState")), "EXAM.MARK_STATE = ?", pageIn.get("markState"))
 				//.addWhere(pageIn.get("curUserId", Integer.class) != null, "EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.MARK_USER_ID = ? AND Z.EXAM_ID = EXAM.ID)", pageIn.get("curUserId", Integer.class))
-				//.addWhere("EXAM.STATE != ?", 0)// 这个由前端添加参数控制
+				.addWhere("EXAM.STATE != ?", 0)// 这个由前端添加参数控制
 				.addOrder("EXAM.UPDATE_TIME", Order.DESC);
 		
 		if (pageIn.get("curUserId", Integer.class) != null) {//查看权限相关

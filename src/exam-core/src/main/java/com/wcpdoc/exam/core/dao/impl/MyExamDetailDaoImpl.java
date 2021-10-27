@@ -31,12 +31,6 @@ public class MyExamDetailDaoImpl extends RBaseDaoImpl<MyExamDetail> implements M
 	}
 
 	@Override
-	public void delByMyExamId(Integer myExamId) {
-		String sql = "DELETE FROM EXM_MY_EXAM_DETAIL WHERE MY_EXAM_ID = ?";
-		update(sql, new Object[] { myExamId });
-	}
-
-	@Override
 	public List<Map<String, Object>> getAnswerList(Integer myExamId, Integer curUserId) {
 		String sql = "SELECT MY_EXAM_DETAIL.*, USER.NAME AS MARK_USER_NAME, QUESTION.TYPE AS QUESTION_TYPE "
 					+" FROM EXM_MY_EXAM_DETAIL MY_EXAM_DETAIL "
@@ -60,5 +54,11 @@ public class MyExamDetailDaoImpl extends RBaseDaoImpl<MyExamDetail> implements M
 	public MyExamDetail getEntity(Integer examId, Integer userId, Integer questionId) {
 		String sql = "SELECT * FROM EXM_MY_EXAM_DETAIL WHERE EXAM_ID = ? AND USER_ID = ? AND QUESTION_ID = ?";
 		return getEntity(sql, new Object[] { examId, userId, questionId });
+	}
+
+	@Override
+	public void del(Integer examId, Integer userId) {
+		String sql = "DELETE FROM EXM_MY_EXAM_DETAIL WHERE EXAM_ID = ? AND USER_ID = ?";
+		update(sql, new Object[] { examId, userId });
 	}
 }

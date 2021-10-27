@@ -195,8 +195,8 @@ public class ApiExamController extends BaseController{
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param id
-	 * @param userIds
-	 * @param markIds
+	 * @param examUserIds
+	 * @param markUserIds
 	 * @return PageResult
 	 */
 	@RequestMapping("/updateMarkSet")
