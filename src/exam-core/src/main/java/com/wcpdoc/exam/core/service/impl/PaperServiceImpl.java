@@ -423,7 +423,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			Question question = questionService.getEntity(questionId);
 			questionList.add(question);
 			if (paper.getMarkType() == 1 && question.getAi() != 1) {// 如果试卷是智能阅卷，添加试题为人工阅卷类型
-				throw new MyException("试题非智能阅卷类型");
+				throw new MyException("不支持人工阅卷类型的试题");
 			}
 		}
 		

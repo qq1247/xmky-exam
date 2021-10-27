@@ -77,23 +77,12 @@ public class ApiQuestionController extends BaseController {
 			}
 			
 			PageOut listpage = questionService.getListpage(pageIn);
-			for(Map<String, Object> map : listpage.getList()){
-				map.put("typeName", DictCache.getDictValue("QUESTION_TYPE", map.get("type").toString()));
-				map.put("difficultyName", DictCache.getDictValue("QUESTION_DIFFICULTY", map.get("difficulty").toString()));
-				
-				if (map.get("type").toString().equals("1") || map.get("type").toString().equals("2")) {
-					List<QuestionOption> optionList = questionOptionService.getList(Integer.valueOf(map.get("id").toString()));
-					map.put("option", optionList);
-				}
-			}
 			return PageResultEx.ok().data(listpage);
 		} catch (Exception e) {
 			log.error("试题列表错误：", e);
 			return PageResult.err();
 		}
 	}
-	
-	
 	
 	/**
 	 * 随机试题列表 
@@ -317,6 +306,7 @@ public class ApiQuestionController extends BaseController {
 					UserContext.set(loginUser);// 子线程不走springboot拦截器，人工模拟拦截器，线程上绑定当前登录信息
 					try {
 						SpringUtil.getBean(QuestionService.class).wordImp(fileId, questionTypeId, processBarId);
+						ProgressBarCache.setProgressBar(processBarId, 10.0, 10.0, "保存完成", HttpStatus.OK.value());// 放在业务层最后一行，进度已经100%，数据还没有完全插入，这时查询数据库时为空
 					} catch (MyException e) {
 						ProgressBarCache.setProgressBar(processBarId, 10.0, 10.0, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
 						log.error("word试题导入错误：{}", e.getMessage());

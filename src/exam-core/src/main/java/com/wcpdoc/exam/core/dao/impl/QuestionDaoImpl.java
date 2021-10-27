@@ -52,8 +52,8 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 				.addWhere(ValidateUtil.isValid(pageIn.get("exPaperId")), "NOT EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.get("exPaperId", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("paperId")), "EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.get("paperId", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("ai")), "QUESTION.AI = ?", pageIn.get("ai"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("state")), "QUESTION.STATE IN (?)", pageIn.get("state", String.class))
-				.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "QUESTION.STATE IN (?)", "2,3")// 默认查询发布和草稿状态
+				.addWhere(ValidateUtil.isValid(pageIn.get("state")), "QUESTION.STATE = ?", pageIn.get("state", String.class))
+				.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "QUESTION.STATE IN (1,2)")// 默认查询发布和草稿状态
 				.addOrder("QUESTION.UPDATE_TIME", Order.DESC);
 		
 		if (pageIn.get("curUserId", Integer.class) != null && !ValidateUtil.isValid(pageIn.get("open"))) {
@@ -72,7 +72,10 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 		}
 		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), "QUESTION_TYPE", "TYPE", "QUESTION_DIFFICULTY", "DIFFICULTY", "STATE", "STATE");
+		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), 
+				"QUESTION_TYPE", "type", 
+				"QUESTION_DIFFICULTY", "difficulty", 
+				"STATE", "state");
 		return pageOut;
 	}
 

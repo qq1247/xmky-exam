@@ -590,7 +590,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			addAndUpdate(question, scoreOptions, answers, options, scores);
 		}
 		
-		ProgressBarCache.setProgressBar(processBarId, 10.0, 10.0, "保存完成", HttpStatus.OK.value());
 	}
 
 	@Override
