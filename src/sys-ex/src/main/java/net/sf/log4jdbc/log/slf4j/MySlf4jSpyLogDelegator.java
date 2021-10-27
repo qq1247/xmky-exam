@@ -18,6 +18,10 @@ public class MySlf4jSpyLogDelegator extends Slf4jSpyLogDelegator {
 
 	@Override
 	public void sqlTimingOccurred(Spy spy, long execTime, String methodCall, String sql) {
+		if ("getGeneratedKeys()".equals(methodCall)) {// 这个和insert打印一行重复，不需要
+			return;
+		}
+		
 		if (sqlTimingLogger.isErrorEnabled() && (!Properties.isDumpSqlFilteringOn() || shouldSqlBeLogged(sql))) {
 			if (Properties.isSqlTimingErrorThresholdEnabled()
 					&& execTime >= Properties.getSqlTimingErrorThresholdMsec()) {
