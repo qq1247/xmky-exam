@@ -78,77 +78,125 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 
 	@Override
 	public void addAndUpdate(Exam exam) {
-		//校验数据有效性
-		if(exam.getStartTime().getTime() <= new Date().getTime()) {
-			throw new MyException("考试开始时间必须大于当前时间！");
+		// 校验数据有效性
+		if (!ValidateUtil.isValid(exam.getName())) {
+			throw new MyException("参数错误：name");
 		}
-		if(exam.getStartTime().getTime() >= exam.getEndTime().getTime()) {
-			throw new MyException("考试结束时间必须大于考试开始时间！");
+		if (!ValidateUtil.isValid(exam.getPaperId())) {
+			throw new MyException("参数错误：paperId");
 		}
-		if(exam.getMarkStartTime().getTime() <= exam.getEndTime().getTime()) {
-			throw new MyException("阅卷开始时间必须大于考试结束时间！");
+		if (!ValidateUtil.isValid(exam.getStartTime())) {
+			throw new MyException("参数错误：startTime");
 		}
-		if(exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()) {
-			throw new MyException("阅卷结束时间必须大于阅卷开始时间！");
+		if (!ValidateUtil.isValid(exam.getEndTime())) {
+			throw new MyException("参数错误：endTime");
 		}
-		if(!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId())) {
+		if (exam.getStartTime().getTime() <= new Date().getTime()) {
+			throw new MyException("考试开始时间必须大于当前时间");
+		}
+		if (exam.getStartTime().getTime() >= exam.getEndTime().getTime()) {
+			throw new MyException("考试结束时间必须大于考试开始时间");
+		}
+		if (!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId())) {
 			throw new MyException("无操作权限");
 		}
-		
-		//添加考试
+
+		Paper paper = paperService.getEntity(exam.getPaperId());
+		if (paper.getMarkType() == 2) {// 如果是自动阅卷类型，没有阅卷开始时间和阅卷结束时间
+			if (!ValidateUtil.isValid(exam.getMarkStartTime())) {
+				throw new MyException("参数错误：markStartTime");
+			}
+			if (!ValidateUtil.isValid(exam.getMarkEndTime())) {
+				throw new MyException("参数错误：markEndTime");
+			}
+			if (exam.getMarkStartTime().getTime() <= exam.getEndTime().getTime()) {
+				throw new MyException("阅卷开始时间必须大于考试结束时间");
+			}
+			if (exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()) {
+				throw new MyException("阅卷结束时间必须大于阅卷开始时间");
+			}
+		}
+
+		// 添加考试
 		exam.setCreateUserId(getCurUser().getId());
 		exam.setCreateTime(new Date());
 		exam.setUpdateUserId(getCurUser().getId());
 		exam.setUpdateTime(new Date());
-		exam.setUpdateUserId(getCurUser().getId());
-		exam.setState(2);
-		exam.setMarkState(2);// 标记为未阅卷（考试时间结束，定时任务自动阅卷，标记为已阅）
-		
-		Paper paper = paperService.getEntity(exam.getPaperId());
-		if (paper.getMarkType() == 1) {// 如果是自动阅卷类型，没有阅卷开始时间和阅卷结束时间
-			exam.setMarkStartTime(null);
-			exam.setMarkEndTime(null);
-		}
+		exam.setState(2);// 草稿
+		exam.setMarkState(1);// 标记为未阅卷（考试时间结束，定时任务自动阅卷，标记为已阅）
+		exam.setMarkStartTime(paper.getMarkType() == 1 ? null : exam.getMarkStartTime());
+		exam.setMarkEndTime(paper.getMarkType() == 1 ? null : exam.getMarkEndTime());
 		add(exam);
 	}
 	
 	@Override
 	public void updateAndUpdate(Exam exam) {
 		//校验数据有效性
-		Exam entity = examDao.getEntity(exam.getId());
+		if (!ValidateUtil.isValid(exam.getName())) {
+			throw new MyException("参数错误：name");
+		}
+		if (!ValidateUtil.isValid(exam.getPaperId())) {
+			throw new MyException("参数错误：paperId");
+		}
+		if (!ValidateUtil.isValid(exam.getStartTime())) {
+			throw new MyException("参数错误：startTime");
+		}
+		if (!ValidateUtil.isValid(exam.getEndTime())) {
+			throw new MyException("参数错误：endTime");
+		}
+		if (exam.getStartTime().getTime() <= new Date().getTime()) {
+			throw new MyException("考试开始时间必须大于当前时间");
+		}
+		if (exam.getStartTime().getTime() >= exam.getEndTime().getTime()) {
+			throw new MyException("考试结束时间必须大于考试开始时间");
+		}
+		if (!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId())) {
+			throw new MyException("无操作权限");
+		}
+
+		Paper paper = paperService.getEntity(exam.getPaperId());
+		if (paper.getMarkType() == 2) {// 如果是自动阅卷类型，没有阅卷开始时间和阅卷结束时间
+			if (!ValidateUtil.isValid(exam.getMarkStartTime())) {
+				throw new MyException("参数错误：markStartTime");
+			}
+			if (!ValidateUtil.isValid(exam.getMarkEndTime())) {
+				throw new MyException("参数错误：markEndTime");
+			}
+			if (exam.getMarkStartTime().getTime() <= exam.getEndTime().getTime()) {
+				throw new MyException("阅卷开始时间必须大于考试结束时间");
+			}
+			if (exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()) {
+				throw new MyException("阅卷结束时间必须大于阅卷开始时间");
+			}
+		}
+		
+		Exam entity = getEntity(exam.getId());
+		if(entity.getState() == 0) {
+			throw new MyException("已删除");
+		}
 		if(entity.getState() == 1) {
-			throw new MyException("考试已发布！");
+			throw new MyException("已发布");
 		}
-		if(exam.getStartTime().getTime() <= new Date().getTime()) {
-			throw new MyException("考试开始时间必须大于当前时间！");
-		}
-		if(exam.getStartTime().getTime() >= exam.getEndTime().getTime()) {
-			throw new MyException("考试结束时间必须大于考试开始时间！");
-		}
-		if(exam.getMarkStartTime().getTime() <= exam.getEndTime().getTime()) {
-			throw new MyException("阅卷开始时间必须大于考试结束时间！");
-		}
-		if(exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()) {
-			throw new MyException("阅卷结束时间必须大于阅卷开始时间！");
-		}
-		if(!hasWriteAuth(entity.getExamTypeId(), getCurUser().getId())) {
-		   throw new MyException("无操作权限");
+		if(entity.getState() == 3) {
+			throw new MyException("已归档");
 		}
 		
 		//添加考试
 		entity.setName(exam.getName());
-		entity.setPaperId(exam.getPaperId());
 		entity.setStartTime(exam.getStartTime());
 		entity.setEndTime(exam.getEndTime());
-		entity.setMarkStartTime(exam.getMarkStartTime());
-		entity.setMarkEndTime(exam.getMarkEndTime());
-		entity.setScoreState(exam.getScoreState());
-		entity.setRankState(exam.getRankState());
-		entity.setLoginType(exam.getLoginType());
-		entity.setDescription(exam.getDescription());
+		entity.setMarkStartTime(paper.getMarkType() == 1 ? null : exam.getMarkStartTime());
+		entity.setMarkEndTime(paper.getMarkType() == 1 ? null : exam.getMarkEndTime());
+		//exam.setMarkState(1);// 不处理
+		//entity.setScoreState(exam.getScoreState());
+		//entity.setRankState(exam.getRankState());
+		//entity.setLoginType(exam.getLoginType());
+		//entity.setDescription(exam.getDescription());
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
-		//exam.setMarkState(2);// 不处理
+		//entity.setState(null);
+		entity.setPaperId(exam.getPaperId());
+		//exam.setExamTypeId(null);// 分类不变
 		update(entity);
 	}
 	
@@ -186,7 +234,21 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if(!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId())) {
 			throw new MyException("无操作权限");
 		}
-		
+		if (exam.getStartTime().getTime() <= new Date().getTime()) {
+			throw new MyException("考试开始时间必须大于当前时间");
+		}
+		if (exam.getStartTime().getTime() >= exam.getEndTime().getTime()) {
+			throw new MyException("考试结束时间必须大于考试开始时间");
+		}
+		Paper paper = paperService.getEntity(exam.getPaperId());
+		if (paper.getMarkType() == 2) {// 如果是自动阅卷类型，没有阅卷开始时间和阅卷结束时间
+			if (exam.getMarkStartTime().getTime() <= exam.getEndTime().getTime()) {
+				throw new MyException("阅卷开始时间必须大于考试结束时间");
+			}
+			if (exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()) {
+				throw new MyException("阅卷结束时间必须大于阅卷开始时间");
+			}
+		}
 		// 发布考试
 		exam.setState(1);
 		exam.setUpdateUserId(getCurUser().getId());
@@ -256,7 +318,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		}
 		
 		// 同步考试人员和阅卷人员到数据库
-		if (markUserIds.length == 1) {
+		if (ValidateUtil.isValid(markUserIds) && markUserIds.length == 1) {
 			examUserIds[0] = StringUtil.join(examUserIds);// 按逗号分隔的参数，服务器接收会变成数组
 		}
 		

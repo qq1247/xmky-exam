@@ -28,9 +28,12 @@ import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyMark;
+import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.ExamTypeService;
+import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
+import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.PaperTypeService;
 
 /**
@@ -48,6 +51,8 @@ public class ApiExamController extends BaseController{
 	@Resource
 	private PaperTypeService paperTypeService;
 	@Resource
+	private PaperService paperService;
+	@Resource
 	private ExamTypeService examTypeService;
 	@Resource
 	private MyMarkService myMarkService;
@@ -55,6 +60,8 @@ public class ApiExamController extends BaseController{
 	private UserService userService;
 	@Resource
 	private OnlineUserService onlineUserService;
+	@Resource
+	private MyExamService myExamService;
 	
 	/**
 	 * 考试列表 
@@ -169,6 +176,16 @@ public class ApiExamController extends BaseController{
 	@ResponseBody
 	public PageResult markUserList(Integer id) {
 		try {
+			Exam exam = examService.getEntity(id);
+			Paper paper = paperService.getEntity(exam.getPaperId());
+			if (paper.getMarkType() == 1) {// 如果是智能阅卷
+				List<Map<String, Object>> result = new ArrayList<>();
+				Map<String, Object> map = new HashMap<>();
+				map.put("examUserList", myExamService.getUserList(id));
+				result.add(map);
+				return PageResultEx.ok().data(result);
+			}
+			
 			List<MyMark> myMarkList = myMarkService.getList(id);
 			List<Map<String, Object>> result = new ArrayList<>();
 			for (MyMark myMark : myMarkList) {

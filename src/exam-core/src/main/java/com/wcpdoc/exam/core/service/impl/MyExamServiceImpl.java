@@ -197,4 +197,9 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		myExam.setAnswerEndTime(new Date());
 		update(myExam);
 	}
+
+	@Override
+	public List<Map<String, Object>> getUserList(Integer id) {
+		return myExamDao.getUserList(id);
+	}
 }

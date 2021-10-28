@@ -101,7 +101,7 @@ public class ApiMyMarkController extends BaseController {
 			myMarkService.updateScore(examId, userId, questionId, score);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("阅卷错误：", e);
+			log.error("阅卷错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("阅卷错误：", e);
