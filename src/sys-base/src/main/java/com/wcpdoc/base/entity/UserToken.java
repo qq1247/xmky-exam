@@ -7,8 +7,8 @@ package com.wcpdoc.base.entity;
  */
 public class UserToken {
 	private String accessToken;
-	private String userName;
 	private Integer userId;
+	private String userName;
 	private String orgName;
 	private Integer orgLogo;
 	private String[] roles;

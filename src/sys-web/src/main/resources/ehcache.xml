@@ -16,7 +16,7 @@
 	<!-- 资源缓存，内存 -->
 	<cache name="MY_CACHE"
 		maxEntriesLocalHeap="100000">
-	</cache><!-- maxEntriesLocalHeap必须配置 -->
+	</cache>
 	<!-- 进度条缓存，内存，空闲60秒后失效 -->
 	<cache name="PROGRESS_BAR_CACHE"
 		maxEntriesLocalHeap="100000"
@@ -52,4 +52,8 @@
 		timeToIdleSeconds="0"
 		timeToLiveSeconds="0">
     </cache>
+    <!-- 自动阅卷缓存，内存 -->
+	<cache name="AUTO_MARK_CACHE"
+		maxEntriesLocalHeap="100000">
+	</cache>
 </ehcache>

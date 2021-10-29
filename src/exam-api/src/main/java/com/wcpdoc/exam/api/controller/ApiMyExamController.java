@@ -140,7 +140,7 @@ public class ApiMyExamController extends BaseController{
 			myExamService.updateAnswer(examId, getCurUser().getId(), questionId, answers, fileId);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("更新答案错误：", e.getMessage());
+			log.error("更新答案错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("更新答案错误：", e);

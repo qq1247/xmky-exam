@@ -114,17 +114,17 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			log.error("自动阅卷异常：{}已归档", exam.getName());
 			throw new MyException("已归档");
 		}
+		if (exam.getMarkState() == 3) {
+			log.error("自动阅卷异常：{}已阅卷", exam.getName());
+			throw new MyException("已阅卷");
+		}
 		
 		long curTime = System.currentTimeMillis();
-		if (exam.getMarkStartTime().getTime() > curTime){
-			log.error("自动阅卷异常：{}阅卷未开始", exam.getName());
-			throw new MyException("阅卷未开始");
+		if (exam.getEndTime().getTime() > curTime){
+			log.error("自动阅卷异常：{}考试未结束", exam.getName());
+			throw new MyException("考试未结束");
 		}
 		
-		if (exam.getMarkEndTime().getTime() < curTime){
-			log.error("自动阅卷异常：{}阅卷已结束", exam.getName());
-			throw new MyException("阅卷已结束");
-		}
 		Paper paper = paperService.getEntity(exam.getPaperId());// 试卷信息
 		Map<Integer, Question> questionCache = getQuestionCache(exam.getPaperId());// 试题缓存信息
 		if (paper.getMarkType() == 1) {
@@ -134,6 +134,13 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 					throw new MyException("检测到人工阅卷试题");
 				}
 			}
+		}
+		
+		// 延时6秒在开始阅卷（答题时增加了5秒网络延时）
+		try {
+			Thread.sleep(6000);
+		} catch (InterruptedException e) {
+			log.error("自动阅卷异常：{}，延时执行异常", exam.getName());
 		}
 		
 		// 获取考试人员
@@ -159,6 +166,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		
 			if (myExam.getState() == 2) {// 如果是考试中，标记为交卷
 				myExam.setState(3);
+				//myExam.setAnswerEndTime(null);// 交卷时间为最后一次答题时间，这里不处理
 				log.info("自动阅卷进行：{}-{}未交卷，标记为已交卷", user.getId(), user.getName());
 			}
 		
@@ -210,7 +218,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			log.info("自动阅卷进行：{}-{}完成阅卷，自动阅卷部分得{}分", user.getId(), user.getName(), totalScore.getResult());
 		}
 		
-		// 标记考试为已阅（自动阅卷部分）
+		// 标记考试为已阅（自动阅卷部分），如果试卷是人工阅卷，只有这里标记为自动阅卷，才能开始人工阅卷
 		exam.setMarkState(3);
 		examService.update(exam);
 		log.info("自动阅卷进行：标记考试为已阅（自动阅卷部分）");

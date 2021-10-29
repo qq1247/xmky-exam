@@ -13,7 +13,7 @@ import com.wcpdoc.cache.BaseEhCache;
  * v1.0 zhanghc 2021年10月25日下午3:10:12
  */
 public class AutoMarkCache extends BaseEhCache {
-	private static final String CACHE_NAME = "MY_CACHE";
+	private static final String CACHE_NAME = "AUTO_MARK_CACHE";
 
 	/**
 	 * 放入缓存
