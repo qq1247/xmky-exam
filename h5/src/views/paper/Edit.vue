@@ -670,6 +670,7 @@ export default {
       paperId: 0,
       paperState: 2,
       paperTypeId: 0,
+      markType: 1,
       paperName: '',
       pageSize: 5,
       curPage: 1,
@@ -717,10 +718,11 @@ export default {
     }
   },
   created() {
-    const { id, name, state } = this.$route.query
+    const { id, name, state, markType } = this.$route.query
     this.paperId = id
     this.paperName = name
     this.paperState = state
+    this.markType = markType
     this.init()
   },
   methods: {
@@ -763,6 +765,8 @@ export default {
     async queryQuestion() {
       const res = await questionListPage({
         id: this.queryForm.id,
+        ai: this.markType,
+        state: 1,
         type: this.queryForm.type,
         title: this.queryForm.title,
         questionTypeName: this.queryForm.questionTypeName,
@@ -770,7 +774,6 @@ export default {
         scoreStart: this.queryForm.score,
         scoreEnd: this.queryForm.score,
         exPaperId: this.paperId,
-        state: 1,
         curPage: this.curPage,
         pageSize: this.pageSize,
       })
