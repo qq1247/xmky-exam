@@ -10,23 +10,24 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.exam.core.dao.BaseDao;
+import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
+import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.service.impl.BaseServiceImp;
+import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.core.util.StringUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.MyExamDao;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyExamDetail;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.Question;
-import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.QuestionService;
-import com.wcpdoc.exam.core.util.DateUtil;
-import com.wcpdoc.exam.core.util.StringUtil;
-import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.file.service.FileService;
+import com.wcpdoc.file.service.FileService;
 
 /**
  * 我的考试服务层实现
@@ -195,5 +196,10 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		myExam.setState(3);
 		myExam.setAnswerEndTime(new Date());
 		update(myExam);
+	}
+
+	@Override
+	public List<Map<String, Object>> getUserList(Integer id) {
+		return myExamDao.getUserList(id);
 	}
 }

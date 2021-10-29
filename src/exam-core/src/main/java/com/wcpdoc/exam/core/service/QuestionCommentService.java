@@ -3,6 +3,7 @@ package com.wcpdoc.exam.core.service;
 import java.util.List;
 import java.util.Map;
 
+import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.QuestionComment;
 
 /**

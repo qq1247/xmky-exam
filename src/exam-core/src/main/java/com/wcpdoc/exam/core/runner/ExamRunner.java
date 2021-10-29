@@ -10,10 +10,10 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
-import com.wcpdoc.exam.core.entity.PageIn;
 import com.wcpdoc.exam.core.service.ExamService;
-import com.wcpdoc.exam.core.util.DateUtil;
 
 /**
  * 考试服务启动
@@ -31,8 +31,8 @@ public class ExamRunner implements ApplicationRunner {
 		PageIn pageIn = new PageIn();
 		pageIn.setPageSize(100);
 		pageIn.addAttr("endTime1", DateUtil.formatDateTime(new Date()));
-		pageIn.addAttr("state", 1);
-		pageIn.addAttr("markState", 2);
+		pageIn.addAttr("state", "1");
+		pageIn.addAttr("markState", "2");
 		List<Map<String, Object>> resultList = examService.getListpage(pageIn).getList();
 		for (Map<String, Object> result : resultList) {
 			AutoMarkCache.put((Integer)result.get("id"), DateUtil.getDateTime(result.get("endTime").toString()));

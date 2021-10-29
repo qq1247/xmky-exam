@@ -9,13 +9,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wcpdoc.exam.base.cache.DictCache;
-import com.wcpdoc.exam.core.controller.BaseController;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
-import com.wcpdoc.exam.core.entity.PageResult;
-import com.wcpdoc.exam.core.entity.PageResultEx;
-import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.base.cache.DictCache;
+import com.wcpdoc.core.controller.BaseController;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
+import com.wcpdoc.core.entity.PageResult;
+import com.wcpdoc.core.entity.PageResultEx;
+import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.exam.report.service.GradeService;
 
 /**

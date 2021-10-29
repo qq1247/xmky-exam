@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.cache.Cache;
 
-import com.wcpdoc.exam.cache.BaseEhCache;
+import com.wcpdoc.cache.BaseEhCache;
 
 /**
  * 自动阅卷缓存

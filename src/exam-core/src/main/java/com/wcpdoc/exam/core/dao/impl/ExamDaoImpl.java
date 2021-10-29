@@ -9,19 +9,20 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Repository;
 
-import com.wcpdoc.exam.base.cache.DictCache;
-import com.wcpdoc.exam.base.dao.UserDao;
-import com.wcpdoc.exam.base.entity.User;
+import com.wcpdoc.base.cache.DictCache;
+import com.wcpdoc.base.dao.UserDao;
+import com.wcpdoc.base.entity.User;
+import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
+import com.wcpdoc.core.entity.LoginUser;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
+import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.core.util.HibernateUtil;
+import com.wcpdoc.core.util.SqlUtil;
+import com.wcpdoc.core.util.ValidateUtil;
+import com.wcpdoc.core.util.SqlUtil.Order;
 import com.wcpdoc.exam.core.dao.ExamDao;
 import com.wcpdoc.exam.core.entity.Exam;
-import com.wcpdoc.exam.core.entity.LoginUser;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
-import com.wcpdoc.exam.core.util.DateUtil;
-import com.wcpdoc.exam.core.util.HibernateUtil;
-import com.wcpdoc.exam.core.util.SqlUtil;
-import com.wcpdoc.exam.core.util.SqlUtil.Order;
-import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
  * 考试数据访问层实现
@@ -36,7 +37,8 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT EXAM.ID, EXAM.NAME, EXAM.START_TIME, EXAM.END_TIME, EXAM.SCORE_STATE, EXAM.RANK_STATE, EXAM.LOGIN_TYPE, "
-				+ "		EXAM.STATE, EXAM.PAPER_ID AS PAPER_ID, PAPER.NAME AS PAPER_NAME, PAPER.TOTAL_SCORE AS PAPER_TOTLE_SCORE, PAPER.PASS_SCORE AS PAPER_PASS_SCORE, " 
+				+ "		EXAM.STATE, EXAM.PAPER_ID AS PAPER_ID, PAPER.NAME AS PAPER_NAME, PAPER.TOTAL_SCORE AS PAPER_TOTLE_SCORE, "
+				+ "		PAPER.PASS_SCORE AS PAPER_PASS_SCORE, PAPER.MARK_TYPE AS PAPER_MARK_TYPE, " 
 				+ "		EXAM.MARK_START_TIME, EXAM.MARK_END_TIME, UPDATE_USER.NAME AS UPDATE_USER_NAME, UPDATE_USER.ID AS UPDATE_USER_ID, "
 				+ "		CREATE_USER.NAME AS CREATE_USER_NAME, CREATE_USER.ID AS CREATE_USER_ID, "
 				+ "		(SELECT COUNT(*) FROM EXM_MY_EXAM A WHERE A.EXAM_ID = EXAM.ID) AS USER_NUM ," //考试人数
@@ -57,7 +59,7 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 				.addWhere(ValidateUtil.isValid(pageIn.get("endTime2")), "EXAM.END_TIME <= ?", ValidateUtil.isValid(pageIn.get("endTime2")) ? DateUtil.getDateTime(pageIn.get("endTime2")) : null)
 				.addWhere(ValidateUtil.isValid(pageIn.get("markState")), "EXAM.MARK_STATE = ?", pageIn.get("markState"))
 				//.addWhere(pageIn.get("curUserId", Integer.class) != null, "EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.MARK_USER_ID = ? AND Z.EXAM_ID = EXAM.ID)", pageIn.get("curUserId", Integer.class))
-				//.addWhere("EXAM.STATE != ?", 0)// 这个由前端添加参数控制
+				.addWhere("EXAM.STATE != ?", 0)// 这个由前端添加参数控制
 				.addOrder("EXAM.UPDATE_TIME", Order.DESC);
 		
 		if (pageIn.get("curUserId", Integer.class) != null) {//查看权限相关

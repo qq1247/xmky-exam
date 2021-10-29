@@ -11,22 +11,22 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wcpdoc.exam.base.entity.Parm;
-import com.wcpdoc.exam.base.entity.User;
-import com.wcpdoc.exam.base.service.ParmService;
-import com.wcpdoc.exam.base.service.UserService;
-import com.wcpdoc.exam.core.controller.BaseController;
+import com.wcpdoc.base.entity.Parm;
+import com.wcpdoc.base.entity.User;
+import com.wcpdoc.base.service.ParmService;
+import com.wcpdoc.base.service.UserService;
+import com.wcpdoc.core.controller.BaseController;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageResult;
+import com.wcpdoc.core.entity.PageResultEx;
+import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.MyExam;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageResult;
-import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
-import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
 import com.wcpdoc.exam.core.service.MyExamService;
-import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.notify.exception.NotifyException;
-import com.wcpdoc.exam.notify.service.NotifyService;
+import com.wcpdoc.notify.exception.NotifyException;
+import com.wcpdoc.notify.service.NotifyService;
 
 /**
  * 我的考试控制层

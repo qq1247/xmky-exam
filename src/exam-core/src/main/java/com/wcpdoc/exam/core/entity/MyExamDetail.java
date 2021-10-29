@@ -39,7 +39,7 @@ public class MyExamDetail {
 	@Column(name = "ANSWER_TIME")
 	private Date answerTime;
 	@Column(name = "MARK_USER_ID")
-	private Integer myMarkId;
+	private Integer markUserId;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "MARK_TIME")
@@ -101,12 +101,12 @@ public class MyExamDetail {
 		this.answerTime = answerTime;
 	}
 
-	public Integer getMyMarkId() {
-		return myMarkId;
+	public Integer getMarkUserId() {
+		return markUserId;
 	}
 
-	public void setMyMarkId(Integer myMarkId) {
-		this.myMarkId = myMarkId;
+	public void setMarkUserId(Integer markUserId) {
+		this.markUserId = markUserId;
 	}
 
 	public Date getMarkTime() {

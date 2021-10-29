@@ -3,9 +3,10 @@ package com.wcpdoc.exam.core.service;
 import java.util.List;
 import java.util.Map;
 
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
+import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.MyExam;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
 /**
  * 我的考试服务层接口
  * 
@@ -88,4 +89,13 @@ public interface MyExamService extends BaseService<MyExam>{
 	 * void
 	 */
 	void doAnswer(Integer examId, Integer userId);
+
+	/**
+	 * 获取用户列表
+	 * 
+	 * v1.0 zhanghc 2021年10月28日下午1:56:08
+	 * @param id
+	 * @return List<Map<String,Object>>
+	 */
+	List<Map<String, Object>> getUserList(Integer id);
 }

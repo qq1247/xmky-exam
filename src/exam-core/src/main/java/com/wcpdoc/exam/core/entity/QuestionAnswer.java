@@ -9,8 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import com.wcpdoc.exam.core.exception.MyException;
-import com.wcpdoc.exam.core.util.ValidateUtil;
+import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.util.ValidateUtil;
 
 /**
  * 试题答案实体

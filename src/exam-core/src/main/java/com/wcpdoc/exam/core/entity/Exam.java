@@ -210,12 +210,12 @@ public class Exam {
 		this.createTime = createTime;
 	}
 
-	/** 1：已阅；2：未阅 */
+	/** 1：未阅卷；2：阅卷中；3：已阅卷； */
 	public Integer getMarkState() {
 		return markState;
 	}
 
-	/** 1：已阅；2：未阅 */
+	/** 1：未阅卷；2：阅卷中；3：已阅卷； */
 	public void setMarkState(Integer markState) {
 		this.markState = markState;
 	}

@@ -12,9 +12,14 @@ import javax.annotation.Resource;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.exam.base.cache.DictCache;
-import com.wcpdoc.exam.base.service.UserService;
-import com.wcpdoc.exam.core.dao.BaseDao;
+import com.wcpdoc.base.cache.DictCache;
+import com.wcpdoc.base.service.UserService;
+import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.service.impl.BaseServiceImp;
+import com.wcpdoc.core.util.BigDecimalUtil;
+import com.wcpdoc.core.util.StringUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.PaperDao;
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
@@ -24,7 +29,6 @@ import com.wcpdoc.exam.core.entity.PaperType;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
-import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.PaperQuestionAnswerService;
 import com.wcpdoc.exam.core.service.PaperQuestionService;
 import com.wcpdoc.exam.core.service.PaperRemarkService;
@@ -34,9 +38,6 @@ import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
-import com.wcpdoc.exam.core.util.BigDecimalUtil;
-import com.wcpdoc.exam.core.util.StringUtil;
-import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
  * 试卷服务层实现
@@ -422,7 +423,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			Question question = questionService.getEntity(questionId);
 			questionList.add(question);
 			if (paper.getMarkType() == 1 && question.getAi() != 1) {// 如果试卷是智能阅卷，添加试题为人工阅卷类型
-				throw new MyException("试题非智能阅卷类型");
+				throw new MyException("不支持人工阅卷类型的试题");
 			}
 		}
 		

@@ -12,7 +12,7 @@ import javax.persistence.Table;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import com.wcpdoc.exam.core.util.DateUtil;
+import com.wcpdoc.core.util.DateUtil;
 
 /**
  * 试卷试题实体

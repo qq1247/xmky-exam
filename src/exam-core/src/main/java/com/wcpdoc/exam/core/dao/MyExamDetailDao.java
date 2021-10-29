@@ -3,7 +3,7 @@ package com.wcpdoc.exam.core.dao;
 import java.util.List;
 import java.util.Map;
 
-import com.wcpdoc.exam.core.dao.BaseDao;
+import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.exam.core.entity.MyExamDetail;
 
 /**
@@ -40,14 +40,6 @@ public interface MyExamDetailDao extends BaseDao<MyExamDetail>{
 	 * @return List<Map<String,Object>>
 	 */
 	List<Map<String, Object>> getMarkAnswerList(Integer userId, Integer examId);
-	
-	/**
-	 * 删除我的考试详细
-	 * 
-	 * v1.0 zhanghc 2020年10月12日下午4:04:24
-	 * @param myExamId void
-	 */
-	void delByMyExamId(Integer myExamId);
 
 	/**
 	 * 获取我的考试详细
@@ -59,5 +51,14 @@ public interface MyExamDetailDao extends BaseDao<MyExamDetail>{
 	 * @return MyExamDetail
 	 */
 	MyExamDetail getEntity(Integer examId, Integer userId, Integer questionId);
+
+	/**
+	 * 删除我的考试详细
+	 * 
+	 * v1.0 zhanghc 2021年10月27日下午2:20:11
+	 * @param examId
+	 * @param userId void
+	 */
+	void del(Integer examId, Integer userId);
 
 }

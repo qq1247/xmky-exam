@@ -6,8 +6,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -17,21 +20,22 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.safety.Whitelist;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
+import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.util.BigDecimalUtil;
+import com.wcpdoc.core.util.SpringUtil;
+import com.wcpdoc.core.util.StringUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionEx;
 import com.wcpdoc.exam.core.entity.QuestionOption;
-import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.WordServer;
-import com.wcpdoc.exam.core.util.BigDecimalUtil;
-import com.wcpdoc.exam.core.util.SpringUtil;
-import com.wcpdoc.exam.core.util.StringUtil;
-import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.file.service.FileService;
+import com.wcpdoc.file.service.FileService;
 
 /**
  * word服务实现
@@ -235,14 +239,26 @@ public class WordServerImpl extends WordServer {
 		if (aiIndex > analysisIndex) {
 			throw new MyException(String.format("智能阅卷和解析顺序错误：%s】", StringUtil.delHTMLTag(singleQuestion.toString())));
 		}
-		
 		List<Node> titleRows = parseTitleRows(singleQuestion);
-		List<Node> optionRows = parseOptionRows(singleQuestion);
+		int type = parseType(titleRows);
 		List<Node> answerRows = parseAnswerRows(singleQuestion);
+		if (type == 3) {
+			Pattern p = Pattern.compile("[_]{5,}"); //正则表达式
+			Matcher m = p.matcher(titleRows.toString()); // 获取 matcher 对象
+			int count = 0;
+			while(m.find()) {
+				count++;
+			}
+			if (count != answerRows.size()) {
+				throw new MyException(String.format("填空和答案数量不匹配：%s】", StringUtil.delHTMLTag(singleQuestion.toString())));
+			}
+		}
+		
+		
+		List<Node> optionRows = parseOptionRows(singleQuestion);
 		List<Node> aiRows = parseAiRows(singleQuestion);
 		List<Node> analysisRows = parseAnalysisRows(singleQuestion);
 		
-		int type = parseType(titleRows);
 		int difficulty = parseDifficulty(titleRows);
 		String title = parseTitle(titleRows);
 		List<QuestionOption> questionOptionList = parseQuestionOptionList(optionRows, type);
@@ -571,7 +587,7 @@ public class WordServerImpl extends WordServer {
 				}
 			} else if (rowTxt.startsWith("【智能阅卷")) {
 				endIndex = curIndex;
-				break;//找到就不在循环了
+				break;//找到就不在循环了，智能阅卷就一行
 			}
 			curIndex++;
 		}
@@ -652,31 +668,69 @@ public class WordServerImpl extends WordServer {
 	 * 获取试题选项
 	 * 
 	 * v1.0 zhanghc 2021年7月24日上午10:57:39
-	 * @param options2
+	 * @param options
 	 * @return QuestionOption
 	 */
 	private QuestionOption parseQuestionOption(List<Node> options) {
-		//<p class="a DocDefaults "><span class="a0 " style="font-family: 'SimSun';">A.</span><span class="a0 " style="">单选题的</span><span class="a0 " style="font-family: 'SimSun';">A</span><span class="a0 " style="">选项</span></p> 
-		//<p class="a DocDefaults "><span class="a0 " style="font-family: 'SimSun';">B</span><span class="a0 " style="">。单选题的</span><span class="a0 " style="font-family: 'SimSun';">B</span><span class="a0 " style="">选项</span></p> 
-		Element element = (Element) options.get(0).childNodes().get(0);
-		element.html(element.html().substring(1));//截取第一个字符串（前面已经校验，这里肯定已ABCDEFG开头
-		if (element.html().length() > 0) {//如果第一个span第二个字符串包含.。、则剔除
-			if (element.html().startsWith(".") || element.html().startsWith("。") || element.html().startsWith("、")) {
-				element.html(element.html().substring(1));
+		/**
+		 * <p class="a DocDefaults ">
+				<span class="a0 " style="">
+					<span class="" style="white-space:pre-wrap;">
+					</span>
+					<span class="" style="font-family: 'Tahoma';white-space:pre-wrap;">
+						B.
+					</span>
+					便利各项工作的开展
+				</span>
+			</p>
+			<p class="a DocDefaults ">
+				<span class="a0 " style="font-family: 'SimSun';">
+					B
+				</span>
+				<span class="a0 " style="">
+					。单选题的
+				</span>
+				<span class="a0 " style="font-family: 'SimSun';">
+					B
+				</span>
+				<span class="a0 " style="">
+					选项
+				</span>
+			</p>
+		 */
+		Element p = (org.jsoup.nodes.Element) options.get(0);// 能进到这个方法，文本第一行内容肯定是以abcdefg中的一个开头的
+		Elements spans = p.getElementsByTag("span");// 查找所有span标签
+		Iterator<Element> spanIterator = spans.iterator();
+		while (spanIterator.hasNext()) {
+			Element span = spanIterator.next();
+			if (!span.hasText()) {
+				continue;
 			}
-		} else if (options.get(0).childNodes().size() >= 2) {//否则从第二个span找
-			element = (Element) options.get(0).childNodes().get(1);
-			if (element.html().length() > 0) {
-				if (element.html().startsWith(".") || element.html().startsWith("。") || element.html().startsWith("、")) {
-					element.html(element.html().substring(1));
-				}
-			}
+			
+			String text = span.text().trim();
+			span.text(text.substring(1));// 删除第一个字符
+			break;
 		}
+		
+		spanIterator = spans.iterator();
+		while (spanIterator.hasNext()) {
+			Element span = spanIterator.next();
+			if (!span.hasText()) {
+				continue;
+			}
+			
+			String text = span.text().trim();
+			if (text.startsWith(".") || text.startsWith("。") || text.startsWith("、")) {// 如果第一个字符是以.。、中的一个开头
+				span.text(text.substring(1));//  删除第一个字符
+			}
+			break;// 如果没找到，也不在处理
+		}
+		
 		QuestionOption questionOption = new QuestionOption();
 		questionOption.setOptions(getTxt(options, 0, options.size()));
 		return questionOption;
 	}
-
+	
 	/**
 	 * 获取文本
 	 * 

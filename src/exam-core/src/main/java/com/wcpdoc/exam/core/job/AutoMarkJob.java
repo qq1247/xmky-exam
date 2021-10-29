@@ -8,10 +8,10 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.util.SpringUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
-import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
-import com.wcpdoc.exam.core.util.SpringUtil;
 
 /**
  * 自动阅卷任务 

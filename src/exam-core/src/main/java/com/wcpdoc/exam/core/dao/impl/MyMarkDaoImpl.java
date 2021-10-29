@@ -5,16 +5,17 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
-import com.wcpdoc.exam.base.cache.DictCache;
+import com.wcpdoc.base.cache.DictCache;
+import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
+import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.core.util.HibernateUtil;
+import com.wcpdoc.core.util.SqlUtil;
+import com.wcpdoc.core.util.ValidateUtil;
+import com.wcpdoc.core.util.SqlUtil.Order;
 import com.wcpdoc.exam.core.dao.MyMarkDao;
 import com.wcpdoc.exam.core.entity.MyMark;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
-import com.wcpdoc.exam.core.util.DateUtil;
-import com.wcpdoc.exam.core.util.HibernateUtil;
-import com.wcpdoc.exam.core.util.SqlUtil;
-import com.wcpdoc.exam.core.util.SqlUtil.Order;
-import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
  * 我的阅卷数据访问层实现
@@ -29,7 +30,7 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 		String sql = "SELECT MY_MARK.ID, EXAM.NAME AS EXAM_NAME, EXAM.START_TIME AS EXAM_START_TIME, EXAM.PAPER_ID AS PAPER_ID, PAPER.SHOW_TYPE AS PAPER_SHOW_TYPE, "
 				+ "		EXAM.END_TIME AS EXAM_END_TIME, PAPER.TOTAL_SCORE AS PAPER_TOTAL_SCORE, MY_MARK.EXAM_USER_IDS AS EXAM_USER_IDS, "
 				+ "		EXAM.STATE AS STATE, USER.NAME AS MARK_USER_NAME, USER.ID AS MARK_USER_ID, EXAM.ID AS EXAM_ID, UPDATE_USER.ID AS UPDATE_USER_ID, UPDATE_USER.NAME AS UPDATE_USER_NAME, "
-				+ "		EXAM.MARK_START_TIME AS MARK_START_TIME, EXAM.MARK_END_TIME AS MARK_END_TIME, MY_MARK.AUTO_STATE AS AUTO_STATE, PAPER.PASS_SCORE AS PAPER_PASS_SCORE,  "
+				+ "		EXAM.MARK_START_TIME AS MARK_START_TIME, EXAM.MARK_END_TIME AS MARK_END_TIME, PAPER.PASS_SCORE AS PAPER_PASS_SCORE,  "
 				+ "		(SELECT COUNT(*) FROM EXM_MY_MARK A WHERE A.EXAM_ID = MY_MARK.EXAM_ID) AS USER_NUM "
 				+ "		FROM EXM_MY_MARK MY_MARK "
 				+ "		INNER JOIN EXM_EXAM EXAM ON MY_MARK.EXAM_ID = EXAM.ID "

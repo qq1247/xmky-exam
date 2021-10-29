@@ -14,24 +14,27 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wcpdoc.exam.base.service.UserService;
-import com.wcpdoc.exam.core.constant.ConstantManager;
-import com.wcpdoc.exam.core.controller.BaseController;
+import com.wcpdoc.base.service.UserService;
+import com.wcpdoc.core.constant.ConstantManager;
+import com.wcpdoc.core.controller.BaseController;
+import com.wcpdoc.core.entity.OnlineUser;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
+import com.wcpdoc.core.entity.PageResult;
+import com.wcpdoc.core.entity.PageResultEx;
+import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.service.OnlineUserService;
+import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyMark;
-import com.wcpdoc.exam.core.entity.OnlineUser;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
-import com.wcpdoc.exam.core.entity.PageResult;
-import com.wcpdoc.exam.core.entity.PageResultEx;
-import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.ExamTypeService;
+import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
-import com.wcpdoc.exam.core.service.OnlineUserService;
+import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.PaperTypeService;
-import com.wcpdoc.exam.core.util.DateUtil;
-import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
  * 考试控制层
@@ -48,6 +51,8 @@ public class ApiExamController extends BaseController{
 	@Resource
 	private PaperTypeService paperTypeService;
 	@Resource
+	private PaperService paperService;
+	@Resource
 	private ExamTypeService examTypeService;
 	@Resource
 	private MyMarkService myMarkService;
@@ -55,6 +60,8 @@ public class ApiExamController extends BaseController{
 	private UserService userService;
 	@Resource
 	private OnlineUserService onlineUserService;
+	@Resource
+	private MyExamService myExamService;
 	
 	/**
 	 * 考试列表 
@@ -169,6 +176,16 @@ public class ApiExamController extends BaseController{
 	@ResponseBody
 	public PageResult markUserList(Integer id) {
 		try {
+			Exam exam = examService.getEntity(id);
+			Paper paper = paperService.getEntity(exam.getPaperId());
+			if (paper.getMarkType() == 1) {// 如果是智能阅卷
+				List<Map<String, Object>> result = new ArrayList<>();
+				Map<String, Object> map = new HashMap<>();
+				map.put("examUserList", myExamService.getUserList(id));
+				result.add(map);
+				return PageResultEx.ok().data(result);
+			}
+			
 			List<MyMark> myMarkList = myMarkService.getList(id);
 			List<Map<String, Object>> result = new ArrayList<>();
 			for (MyMark myMark : myMarkList) {
@@ -195,8 +212,8 @@ public class ApiExamController extends BaseController{
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param id
-	 * @param userIds
-	 * @param markIds
+	 * @param examUserIds
+	 * @param markUserIds
 	 * @return PageResult
 	 */
 	@RequestMapping("/updateMarkSet")

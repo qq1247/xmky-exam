@@ -16,9 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.exam.base.entity.User;
-import com.wcpdoc.exam.base.service.UserService;
-import com.wcpdoc.exam.core.dao.BaseDao;
+import com.wcpdoc.base.entity.User;
+import com.wcpdoc.base.service.UserService;
+import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.service.impl.BaseServiceImp;
+import com.wcpdoc.core.util.BigDecimalUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.MyExamDetailDao;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
@@ -27,7 +31,6 @@ import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.PaperQuestionAnswer;
 import com.wcpdoc.exam.core.entity.Question;
-import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
 import com.wcpdoc.exam.core.service.MyExamService;
@@ -37,8 +40,6 @@ import com.wcpdoc.exam.core.service.PaperQuestionService;
 import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionService;
-import com.wcpdoc.exam.core.util.BigDecimalUtil;
-import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
  * 我的考试详细服务层实现
@@ -88,11 +89,6 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	@Override
 	public List<Map<String, Object>> getMarkAnswerList(Integer userId, Integer examId) {
 		return myExamDetailDao.getMarkAnswerList(userId, examId);
-	}
-	
-	@Override
-	public void delByMyExamId(Integer myExamId) {
-		myExamDetailDao.delByMyExamId(myExamId);
 	}
 
 	@Override
@@ -150,8 +146,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			log.info("自动阅卷进行：{}-{}开始", user.getId(), user.getName());
 			if (myExam.getState() == 1) {// 如果未考试，直接设为不及格
 				myExam.setMarkUserId(1);
-				myExam.setAnswerStartTime(new Date());
-				myExam.setAnswerEndTime(new Date());
+				myExam.setMarkStartTime(new Date());
+				myExam.setMarkEndTime(new Date());
 				myExam.setMarkState(3);
 				myExam.setTotalScore(BigDecimal.ZERO);
 				myExam.setAnswerState(2);
@@ -168,7 +164,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		
 			if (paper.getMarkType() == 1) {// 如果是智能阅卷，自动记录阅卷用户为管理员，阅卷开始时间等；如果是人工阅卷，阅卷用户在在页面阅卷时记录相关字段
 				myExam.setMarkUserId(1);
-				myExam.setAnswerStartTime(new Date());
+				myExam.setMarkStartTime(new Date());
 			}
 		
 			// 获取每个人的试卷
@@ -181,14 +177,14 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 				
 				// 开始阅卷
 				if (hasAi(question)) {// 如果是智能阅卷
-					if (hasQA(question)) { // 问答题处理
-						qAHandle(question, questionOption, questionAnswerList, userAnswer);
-					} else if (hasSingleChoice(question) || hasTrueFalse(question)) { // 单选判断处理
-						singleChoiceHandle(question, questionOption, questionAnswerList, userAnswer);
-					} else if (hasMultipleChoice(question)) { // 多选处理
-						multipleChoiceHandle(question, questionOption, questionAnswerList, userAnswer);
-					} else if (hasFillBlank(question)) { // 填空处理
-						fillBlankHandle(question, questionOption, questionAnswerList, userAnswer);
+					if (hasQA(question)) { 
+						qAHandle(question, questionOption, questionAnswerList, userAnswer);// 问答题处理
+					} else if (hasSingleChoice(question) || hasTrueFalse(question)) { 
+						singleChoiceHandle(question, questionOption, questionAnswerList, userAnswer);// 单选判断处理
+					} else if (hasMultipleChoice(question)) { 
+						multipleChoiceHandle(question, questionOption, questionAnswerList, userAnswer);// 多选处理
+					} else if (hasFillBlank(question)) { 
+						fillBlankHandle(question, questionOption, questionAnswerList, userAnswer);// 填空处理
 					}
 				
 					totalScore.add(userAnswer.getScore());
@@ -197,7 +193,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			
 			// 完成阅卷
 			if (paper.getMarkType() == 1) {// 如果是智能阅卷
-				myExam.setAnswerEndTime(new Date());// 记录阅卷结束时间
+				myExam.setMarkEndTime(new Date());// 记录阅卷结束时间
 				myExam.setMarkState(3);// 标记为阅卷结束
 				myExam.setTotalScore(totalScore.getResult());// 记录成绩 
 				BigDecimal passScore = BigDecimalUtil.newInstance(paper.getTotalScore())
@@ -207,7 +203,6 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 				} else {
 					myExam.setAnswerState(2);// 标记为不及格
 				}
-				
 			} else {
 				myExam.setMarkState(1);// 标记为未阅卷，等待人工阅卷
 			}
@@ -215,8 +210,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			log.info("自动阅卷进行：{}-{}完成阅卷，自动阅卷部分得{}分", user.getId(), user.getName(), totalScore.getResult());
 		}
 		
-		// 标记考试为可以开始人工阅卷
-		exam.setMarkState(1);
+		// 标记考试为已阅（自动阅卷部分）
+		exam.setMarkState(3);
 		examService.update(exam);
 		log.info("自动阅卷进行：标记考试为已阅（自动阅卷部分）");
 		
@@ -532,5 +527,10 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			questionOptionCache.put(paperQuestion.getQuestionId(), paperQuestion);
 		}
 		return questionOptionCache;
+	}
+
+	@Override
+	public void del(Integer examId, Integer userId) {
+		myExamDetailDao.del(examId, userId);
 	}
 }

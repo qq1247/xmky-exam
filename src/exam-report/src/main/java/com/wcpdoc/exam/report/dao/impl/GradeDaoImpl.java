@@ -7,10 +7,10 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Repository;
 
-import com.wcpdoc.exam.base.dao.UserDao;
-import com.wcpdoc.exam.core.dao.impl.RBaseDaoImpl;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
+import com.wcpdoc.base.dao.UserDao;
+import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.exam.report.dao.GradeDao;
 
 /**

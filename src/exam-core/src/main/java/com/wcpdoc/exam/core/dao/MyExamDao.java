@@ -2,10 +2,12 @@ package com.wcpdoc.exam.core.dao;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
+import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.MyExam;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
 
 /**
  * 我的考试数据访问层接口
@@ -62,4 +64,13 @@ public interface MyExamDao extends BaseDao<MyExam>{
 	 * @return PageOut
 	 */
 	PageOut getRankingPage(PageIn pageIn);
+
+	/**
+	 * 获取用户列表
+	 * 
+	 * v1.0 zhanghc 2021年10月28日下午1:56:20
+	 * @param id
+	 * @return List<Map<String,Object>>
+	 */
+	List<Map<String, Object>> getUserList(Integer id);
 }

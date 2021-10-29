@@ -5,11 +5,11 @@ import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
+import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.exam.core.dao.MyExamDetailDao;
-import com.wcpdoc.exam.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.exam.core.entity.MyExamDetail;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
 
 /**
  * 我的考试详细数据访问层实现
@@ -28,12 +28,6 @@ public class MyExamDetailDaoImpl extends RBaseDaoImpl<MyExamDetail> implements M
 	public List<MyExamDetail> getList(Integer examId, Integer userId) {
 		String sql = "SELECT * FROM EXM_MY_EXAM_DETAIL WHERE EXAM_ID = ? AND USER_ID = ?";
 		return getList(sql, new Object[] { examId, userId }, MyExamDetail.class);
-	}
-
-	@Override
-	public void delByMyExamId(Integer myExamId) {
-		String sql = "DELETE FROM EXM_MY_EXAM_DETAIL WHERE MY_EXAM_ID = ?";
-		update(sql, new Object[] { myExamId });
 	}
 
 	@Override
@@ -60,5 +54,11 @@ public class MyExamDetailDaoImpl extends RBaseDaoImpl<MyExamDetail> implements M
 	public MyExamDetail getEntity(Integer examId, Integer userId, Integer questionId) {
 		String sql = "SELECT * FROM EXM_MY_EXAM_DETAIL WHERE EXAM_ID = ? AND USER_ID = ? AND QUESTION_ID = ?";
 		return getEntity(sql, new Object[] { examId, userId, questionId });
+	}
+
+	@Override
+	public void del(Integer examId, Integer userId) {
+		String sql = "DELETE FROM EXM_MY_EXAM_DETAIL WHERE EXAM_ID = ? AND USER_ID = ?";
+		update(sql, new Object[] { examId, userId });
 	}
 }

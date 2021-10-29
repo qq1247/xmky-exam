@@ -8,12 +8,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wcpdoc.exam.core.controller.BaseController;
-import com.wcpdoc.exam.core.entity.PageResult;
-import com.wcpdoc.exam.core.entity.PageResultEx;
-import com.wcpdoc.exam.core.exception.MyException;
-import com.wcpdoc.exam.wordFilter.entity.Sensitive;
-import com.wcpdoc.exam.wordFilter.service.SensitiveService;
+import com.wcpdoc.core.controller.BaseController;
+import com.wcpdoc.core.entity.PageResult;
+import com.wcpdoc.core.entity.PageResultEx;
+import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.wordFilter.entity.Sensitive;
+import com.wcpdoc.wordFilter.service.SensitiveService;
 
 /**
  * 敏感词控制层

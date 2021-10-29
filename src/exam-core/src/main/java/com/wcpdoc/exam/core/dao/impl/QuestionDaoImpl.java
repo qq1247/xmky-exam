@@ -8,18 +8,19 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Repository;
 
-import com.wcpdoc.exam.base.cache.DictCache;
-import com.wcpdoc.exam.base.dao.UserDao;
-import com.wcpdoc.exam.base.entity.User;
+import com.wcpdoc.base.cache.DictCache;
+import com.wcpdoc.base.dao.UserDao;
+import com.wcpdoc.base.entity.User;
+import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
+import com.wcpdoc.core.util.HibernateUtil;
+import com.wcpdoc.core.util.SqlUtil;
+import com.wcpdoc.core.util.ValidateUtil;
+import com.wcpdoc.core.util.SqlUtil.Order;
 import com.wcpdoc.exam.core.dao.QuestionDao;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionType;
-import com.wcpdoc.exam.core.util.HibernateUtil;
-import com.wcpdoc.exam.core.util.SqlUtil;
-import com.wcpdoc.exam.core.util.SqlUtil.Order;
-import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
  * 试题数据访问层实现
@@ -40,19 +41,19 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 				+ "LEFT JOIN SYS_USER UPDATE_USER ON QUESTION.UPDATE_USER_ID = UPDATE_USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(pageIn.get("questionTypeId", Integer.class) != null && !"1".equals(pageIn.get("questionTypeId", Integer.class)), "QUESTION.QUESTION_TYPE_ID = ?", pageIn.get("questionTypeId", Integer.class))
+		.addWhere(ValidateUtil.isValid(pageIn.get("questionTypeName")), "QUESTION_TYPE.NAME LIKE ?", "%" + pageIn.get("questionTypeName") + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.get("id")), "QUESTION.ID = ?", pageIn.get("id", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("title")), "QUESTION.TITLE LIKE ?", "%" + pageIn.get("title") + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.get("state")), "QUESTION.STATE = ?", pageIn.get("state", Integer.class))//0：删除；1：启用；2：禁用
 				.addWhere(ValidateUtil.isValid(pageIn.get("type")), "QUESTION.TYPE = ?", pageIn.get("type", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("difficulty")), "QUESTION.DIFFICULTY = ?", pageIn.get("difficulty"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("questionTypeName")), "QUESTION_TYPE.NAME LIKE ?", "%" + pageIn.get("questionTypeName") + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.get("score")), "QUESTION.SCORE = ?", pageIn.get("score"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("scoreStart")), "QUESTION.SCORE >= ?", pageIn.get("scoreStart"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("scoreEnd")), "QUESTION.SCORE <= ?", pageIn.get("scoreEnd"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("exPaperId")), "NOT EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.get("exPaperId", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("paperId")), "EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.get("paperId", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("ai")), "QUESTION.AI = ?", pageIn.get("ai"))
-				.addWhere("QUESTION.STATE != ?", 0)
+				.addWhere(ValidateUtil.isValid(pageIn.get("state")), "QUESTION.STATE = ?", pageIn.get("state", String.class))
+				.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "QUESTION.STATE IN (1,2)")// 默认查询发布和草稿状态
 				.addOrder("QUESTION.UPDATE_TIME", Order.DESC);
 		
 		if (pageIn.get("curUserId", Integer.class) != null && !ValidateUtil.isValid(pageIn.get("open"))) {
@@ -71,38 +72,10 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 		}
 		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), "QUESTION_TYPE", "TYPE", "QUESTION_DIFFICULTY", "DIFFICULTY", "STATE", "STATE");
-//		for(Map<String, Object> map : pageOut.getList()) {
-//			String title = map.get("title").toString();
-//			Document document = Jsoup.parse(title);
-//			Elements embeds = document.getElementsByTag("video");
-//			embeds.after("【视频】");
-//			embeds.remove();
-//			Elements imgs = document.getElementsByTag("img");
-//			imgs.after("【图片】");
-//			imgs.remove();
-//			
-//			title = document.body().html();
-//			if(title.length() > 500) {
-//				title = title.substring(0, 500) + "...";
-//			}
-//			map.put("title", Jsoup.parse(title).text());
-//			
-//			String analysis = map.get("analysis").toString();
-//			Document documentAnalysis = Jsoup.parse(analysis);
-//			Elements embedsAnalysis = documentAnalysis.getElementsByTag("video");
-//			embedsAnalysis.after("【视频】");
-//			embedsAnalysis.remove();
-//			Elements imgsAnalysis = documentAnalysis.getElementsByTag("img");
-//			imgsAnalysis.after("【图片】");
-//			imgsAnalysis.remove();
-//			
-//			title = documentAnalysis.body().html();
-//			if(analysis.length() > 500) {
-//				analysis = analysis.substring(0, 500) + "...";
-//			}
-//			map.put("analysis", Jsoup.parse(analysis).text());
-//		}
+		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), 
+				"QUESTION_TYPE", "type", 
+				"QUESTION_DIFFICULTY", "difficulty", 
+				"STATE", "state");
 		return pageOut;
 	}
 
