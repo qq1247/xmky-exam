@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-10-13 14:52:40
  * @LastEditors: Che
- * @LastEditTime: 2021-10-22 10:16:41
+ * @LastEditTime: 2021-10-27 17:44:47
 -->
 <template>
   <div class="exam-item">
@@ -125,7 +125,7 @@ export default {
       const isChildrenClassify = ['paperList', 'examList'].includes(this.name)
 
       if (isChildrenClassify && isPublish) {
-        this.$message.warning('已发布不可修改！')
+        this.$message.warning('已发布不可操作！')
         return true
       }
       return false
