@@ -34,8 +34,6 @@
             v-for="(item, index) in myExamList"
             :key="index"
             :data="item"
-            :markId="markId"
-            :percentage="percentage"
             name="myMarkExamList"
             @mark="markHandler"
           ></MyCard>
@@ -58,12 +56,7 @@
 </template>
 
 <script>
-import {
-  myExamListPage,
-  myMarkListPage,
-  myExamAutoScore,
-  myExamAiProgress,
-} from 'api/my'
+import { myExamListPage, myMarkListPage } from 'api/my'
 import MyCard from 'components/ListCard/MyCard.vue'
 import { loginSysTime } from 'api/common'
 export default {
@@ -76,7 +69,6 @@ export default {
       curPage: 1,
       total: 1,
       type: 1,
-      percentage: 0,
       markId: null,
       queryForm: {
         examName: '',
@@ -164,11 +156,18 @@ export default {
       this.query()
     },
     // 我的考试操作
-    examHandler(data) {
-      const examStartTime = new Date(data.examStartTime).getTime()
-      const examEndTime = new Date(data.examEndTime).getTime()
+    examHandler({
+      id,
+      examId,
+      paperId,
+      paperShowType,
+      examStartTime,
+      examEndTime,
+    }) {
+      const _examStartTime = new Date(examStartTime).getTime()
+      const _examEndTime = new Date(examEndTime).getTime()
       const now = new Date().getTime()
-      if (now < examStartTime) {
+      if (now < _examStartTime) {
         this.$message.warning('考试未开始，请等待...')
         return
       }
@@ -176,89 +175,36 @@ export default {
       this.$router.push({
         path: '/my/exam/index',
         query: {
-          id: data.id,
-          paperId: data.paperId,
-          preview: examStartTime < now && now > examEndTime,
-          examEndTime: data.examEndTime,
-          showType: data.paperShowType,
+          id,
+          examId,
+          paperId,
+          examEndTime,
+          showType: paperShowType,
+          preview: _examStartTime < now && now > _examEndTime,
         },
       })
     },
     // 我的阅卷操作
-    async markHandler(data) {
-      this.markId = data.examId
-      const markStartTime = new Date(data.markStartTime).getTime()
-      const markEndTime = new Date(data.markEndTime).getTime()
+    markHandler({ id, examId, paperId, markStartTime, markEndTime }) {
+      this.markId = examId
+      const _markStartTime = new Date(markStartTime).getTime()
+      const _markEndTime = new Date(markEndTime).getTime()
       const now = new Date().getTime()
-      if (now < markStartTime) {
+      if (now < _markStartTime) {
         this.$message.warning('阅卷未开始，请等待...')
         return
-      }
-      if (markStartTime < now && now < markEndTime && data.autoState !== 1) {
-        const res = await myExamAutoScore({
-          id: data.id,
-          examId: data.examId,
-        })
-        if (res?.code === 200) {
-          this.percentage = 1
-          const isAiEnd = await this.getProgress(res.data)
-          if (isAiEnd) {
-            this.$router.push({
-              path: '/my/mark/index',
-              query: {
-                markId: data.id,
-                examId: data.examId,
-                paperId: data.paperId,
-                markEndTime: markEndTime,
-                markStartTime: markStartTime,
-              },
-            })
-            this.$tools.delay().then(() => {
-              this.percentage = 0
-              this.markId = null
-            })
-            return
-          }
-        } else {
-          this.$message.error(res.msg || '智能阅卷失败！请重试！')
-        }
       }
 
       this.$router.push({
         path: '/my/mark/index',
         query: {
-          markId: data.id,
-          examId: data.examId,
-          paperId: data.paperId,
-          markEndTime: markEndTime,
-          markStartTime: markStartTime,
+          markId: id,
+          examId,
+          paperId,
+          markEndTime: _markEndTime,
+          markStartTime: _markStartTime,
         },
       })
-    },
-    // 获取进度
-    async getProgress(id) {
-      const percentage = await this.$tools.delay().then(() => {
-        return myExamAiProgress({
-          id,
-        })
-      })
-
-      if (!percentage?.data?.totalNum) {
-        this.percentage = 0
-        this.markId = null
-        return false
-      }
-
-      this.percentage +=
-        Math.ceil(
-          Math.abs(percentage.data.curNum / percentage.data.totalNum) * 100
-        ) - this.percentage
-
-      if (percentage.data.curNum === percentage.data.totalNum) {
-        return true
-      } else {
-        await this.getProgress(id)
-      }
     },
     // 分页切换
     pageChange(val) {

@@ -74,11 +74,12 @@ export default {
   data() {
     return {
       id: 0,
-      showType: 1,
-      preview: false,
+      examId: null,
+      paperId: null,
       paperName: '',
       hrefPointer: '',
-      paperId: 0,
+      showType: 1,
+      preview: false,
       pageSize: 10,
       curPage: 1,
       pageTotal: 0,
@@ -94,8 +95,10 @@ export default {
     }
   },
   created() {
-    const { id, paperId, preview, examEndTime, showType } = this.$route.query
+    const { id, examId, paperId, preview, examEndTime, showType } =
+      this.$route.query
     this.id = id
+    this.examId = examId
     this.paperId = paperId
     this.preview = preview
     this.examEndTime = examEndTime
@@ -158,12 +161,11 @@ export default {
               const titleEnd = title.substring(
                 title.indexOf(underline) + underline.length
               )
-              const inputHtml = `<el-input @change='updateAnswer(paperQuestion[routerIndex].id)' :disabled='preview === 'true' ? true : false' v-model='myExamDetailCache[paperQuestion[routerIndex].id].answers[${index}]'></el-input>`
+              const inputHtml = `<el-input @change='updateAnswer(paperQuestion[routerIndex].id)' :disabled="preview === 'true' ? true : false" v-model='myExamDetailCache[paperQuestion[routerIndex].id].answers[${index}]'></el-input>`
               title = `${titleStart}${inputHtml}${titleEnd}`
             })
-            const repalceTitle = this.htmlStrToDom(title, this).innerHTML
-            console.log(repalceTitle)
-            question.title = repalceTitle
+            const repalceTitle = this.htmlStrToDom(title, this.$data).innerHTML
+            console.log(repalceTitle) // question.title = repalceTitle
           })
         })
 
@@ -263,7 +265,7 @@ export default {
         return
       }
       const res = await myExamUpdateAnswer({
-        examId: this.id,
+        examId: this.examId,
         questionId,
         myExamDetailId: this.myExamDetailCache[questionId].myExamDetailId,
         answers: this.myExamDetailCache[questionId].answers,

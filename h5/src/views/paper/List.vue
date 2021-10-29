@@ -91,6 +91,15 @@
                 </div>
               </div>
             </el-form-item>
+            <el-form-item label="阅卷方式" prop="markType">
+              <el-radio
+                v-for="item in paperForm.markTypeList"
+                :key="item.value"
+                v-model="paperForm.markType"
+                :label="item.value"
+                >{{ item.name }}</el-radio
+              >
+            </el-form-item>
             <el-form-item label="试卷名称" prop="name">
               <el-input
                 placeholder="请输入试卷名称"
@@ -305,6 +314,17 @@ export default {
             content: '随机组卷',
           },
         ],
+        markType: '1',
+        markTypeList: [
+          {
+            name: '智能阅卷',
+            value: '1',
+          },
+          {
+            name: '人工阅卷',
+            value: '2',
+          },
+        ],
         rules: {
           name: [
             { required: true, message: '请填写试卷名称', trigger: 'blur' },
@@ -361,6 +381,7 @@ export default {
           readNum: this.paperForm.readNum,
           showType: Number(this.paperForm.showType),
           options: this.paperForm.options.join(','),
+          markType: this.paperForm.markType,
           // paperRemark: [],
         }
 
@@ -448,10 +469,10 @@ export default {
       } catch (error) {}
     },
     // 生成试卷
-    composition({ id, name, state }) {
+    composition({ id, name, state, markType }) {
       this.$router.push({
         path: '/paper/edit',
-        query: { id, name, state },
+        query: { id, name, state, markType },
       })
     },
     // 归档

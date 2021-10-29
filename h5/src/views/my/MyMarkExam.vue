@@ -240,9 +240,11 @@
                         v-if="!child.isEdit && preview === false"
                         :key="child.id"
                         :data="child"
-                        @input="scoreInput($event, index, indexc)"
-                        @blur="scoreBlur($event, index, indexc)"
-                        @selectScore="selectScore($event, index, indexc)"
+                        @input="scoreInput($event, child.id, index, indexc)"
+                        @blur="scoreBlur($event, child.id, index, indexc)"
+                        @selectScore="
+                          selectScore($event, child.id, index, indexc)
+                        "
                         @prevQuestion="prevQuestion"
                         @nextQuestion="nextQuestion"
                         @prevPaper="prevPaper"
@@ -437,8 +439,34 @@ export default {
     showScorePlate(index, indexc) {
       this.$set(this.paperQuestion[index].questionList[indexc], 'isEdit', false)
     },
+    // 打分输入
+    scoreInput(e, questionId, idx, idxc) {
+      this.setScore(e, questionId, idx, idxc)
+    },
+    // 失去焦点提交打分
+    scoreBlur(e, questionId, idx, idxc) {
+      this.updateScore(e, questionId, idx, idxc)
+    },
+    // 点击打分板分值
+    selectScore(e, questionId, idx, idxc) {
+      this.setScore(e, questionId, idx, idxc)
+      this.updateScore(e, questionId, idx, idxc)
+    },
+    // 打分
+    async updateScore(e, questionId, idx, idxc) {
+      const source = this.paperQuestion[idx].questionList[idxc]
+      const res = await myExamUpdateScore({
+        examId: this.examId,
+        questionId,
+        userId: this.userId,
+        score: source.scorePlate || 0,
+      })
+      res?.code === 200
+        ? this.queryExamineeInfo()
+        : this.$message.error(res.msg || '打分失败！')
+    },
     // 设置分数
-    async setScore(e, idx, idxc) {
+    async setScore(e, questionId, idx, idxc) {
       const now = new Date().getTime()
       if (this.markStartTime > now || now > this.markEndTime) {
         this.preview = true
@@ -449,33 +477,6 @@ export default {
       this.$set(source, 'scorePlate', e)
       if (e < 0) this.$set(source, 'scorePlate', 0)
       if (e > source.score) this.$set(source, 'scorePlate', source.score)
-    },
-    // 打分输入
-    scoreInput(e, idx, idxc) {
-      this.setScore(e, idx, idxc)
-    },
-    // 失去焦点提交打分
-    scoreBlur(e, idx, idxc) {
-      this.updateScore(e, idx, idxc)
-    },
-    // 点击打分板分值
-    selectScore(e, idx, idxc) {
-      this.setScore(e, idx, idxc)
-      this.updateScore(e, idx, idxc)
-    },
-    // 打分
-    async updateScore(e, idx, idxc) {
-      console.log(e)
-      const source = this.paperQuestion[idx].questionList[idxc]
-      const res = await myExamUpdateScore({
-        exam: this.examId,
-        questionId,
-        userId: this.userId,
-        score: source.scorePlate || 0,
-      })
-      res?.code === 200
-        ? this.queryExamineeInfo()
-        : this.$message.error(res.msg || '打分失败！')
     },
     // 上下题定位
     toHref(position, status) {

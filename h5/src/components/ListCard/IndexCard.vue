@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-10-13 14:52:40
  * @LastEditors: Che
- * @LastEditTime: 2021-10-20 16:40:02
+ * @LastEditTime: 2021-10-26 13:36:28
 -->
 <template>
   <div class="exam-item">
@@ -48,9 +48,9 @@
             <i class="common common-share"></i>
           </span>
           <!-- 开放 -->
-          <span data-title="回收站" @click="recycle(data)">
+          <!-- <span data-title="回收站" @click="recycle(data)">
             <i class="common common-recycle"></i>
-          </span>
+          </span> -->
         </template>
         <!-- 详情 | 列表 -->
         <span

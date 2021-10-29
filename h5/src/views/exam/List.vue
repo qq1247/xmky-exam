@@ -101,7 +101,12 @@
             value-format="yyyy-MM-dd HH:mm:ss"
           ></el-date-picker>
         </el-form-item>
-        <el-form-item label="阅卷时间" prop="markTime" required>
+        <el-form-item
+          required
+          label="阅卷时间"
+          prop="markTime"
+          v-if="examForm.showMarkTime"
+        >
           <el-date-picker
             v-model="examForm.markTime"
             type="datetimerange"
@@ -138,7 +143,7 @@
       @close="resetData('userForm')"
     >
       <el-form :model="examForm" ref="userForm" label-width="100px">
-        <el-form-item label="阅卷方式">
+        <el-form-item label="阅卷方式" v-if="examForm.paperMarkType === 2">
           <el-radio
             v-for="(item, index) in examForm.examRadios"
             :key="item.value"
@@ -186,6 +191,7 @@
 
           <el-col :span="12">
             <el-form-item
+              v-if="examForm.paperMarkType === 2"
               label="阅卷人"
               :prop="`examRemarks.${index}.examCheckPerson`"
               :rules="[
@@ -234,21 +240,21 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <div class="remark-buttons">
+        <div class="remark-buttons" v-if="examForm.paperMarkType === 2">
           <el-form-item>
             <el-button
               @click="remarkAdd"
               type="primary"
               size="mini"
               icon="el-icon-plus"
-              >添加阅卷人</el-button
+              >添加</el-button
             >
             <el-button
               v-if="examForm.examRemarks.length > 1"
               @click="remarkDel"
               size="mini"
               icon="el-icon-minus"
-              >删除阅卷人</el-button
+              >删除</el-button
             >
           </el-form-item>
         </div>
@@ -376,7 +382,7 @@
             <div :class="['line-user', item.online ? 'line' : '']">
               <i class="common common-onLine"></i>
               <span class="line-name">{{ item.userName }}</span>
-              <span class="line-time">最后在线时间：{{ item.onlineTime }}</span>
+              <span class="line-time">{{ item.onlineTime }}</span>
             </div>
           </el-col>
         </template>
@@ -467,7 +473,9 @@ export default {
         readShow: false,
         infoShow: false,
         lineShow: false,
-        selectPaperId: '',
+        selectPaperId: null,
+        showMarkTime: false,
+        paperMarkType: 1,
         total: 0,
         curPage: 1,
         pageSize: 5,
@@ -577,6 +585,10 @@ export default {
     // 选择试卷
     selectPaper(e) {
       this.examForm.selectPaperId = e
+      const selectPaper = this.examForm.paperList.filter(
+        (item) => item.id === e
+      )
+      this.examForm.showMarkTime = selectPaper[0].markType === 1 ? false : true
     },
     // 添加试卷信息
     addOrEdit() {
@@ -585,17 +597,23 @@ export default {
           return
         }
 
-        const params = {
+        let params = {
           name: this.examForm.name,
           startTime: this.examForm.examTime[0],
           endTime: this.examForm.examTime[1],
-          markStartTime: this.examForm.markTime[0],
-          markEndTime: this.examForm.markTime[1],
           scoreState: this.examForm.scoreState ? 1 : 2,
           rankState: this.examForm.rankState ? 1 : 2,
           loginType: this.examForm.loginType ? 2 : 1,
           paperId: this.examForm.selectPaperId,
           examTypeId: this.queryForm.examTypeId,
+        }
+
+        if (this.examForm.markTime.length) {
+          params = {
+            markStartTime: this.examForm.markTime[0],
+            markEndTime: this.examForm.markTime[1],
+            ...params,
+          }
         }
 
         const res = this.examForm.edit
@@ -684,18 +702,33 @@ export default {
         })
     },
     // 在线人员
-    async onLine({ id, state }) {
+    async onLine({ id, state, startTime, endTime }) {
       if (state === 2) {
         this.$message.error('请先发布考试！')
         return
       }
+
+      const _startTime = new Date(startTime).getTime()
+      const _endTime = new Date(endTime).getTime()
+      const now = new Date().getTime()
+
+      if (_startTime > now) {
+        this.$message.error('未开始考试！')
+        return
+      }
+
+      if (_endTime < now) {
+        this.$message.error('考试已结束！')
+        return
+      }
+
       this.examForm.lineShow = true
       const resList = await onlineUser({ id })
-      resList?.code === 200 && (this.examForm.examUserList = resList.data)
+      resList?.code === 200 && (this.examForm.examUserList = resList.data.list)
       this.timeLine = setInterval(async () => {
         const timeUserList = await onlineUser({ id })
         resList?.code === 200 &&
-          (this.examForm.examUserList = timeUserList.data)
+          (this.examForm.examUserList = timeUserList.data.list)
       }, 30 * 1000)
     },
     // 关闭在线人员弹窗
@@ -715,9 +748,17 @@ export default {
         (this.examForm.infoShow = true))
     },
     // 阅卷设置
-    async read({ id, paperId, state }) {
+    async read({ id, paperId, state, endTime, paperMarkType }) {
       if (state == 2) {
         this.$message.error('请先发布考试！')
+        return
+      }
+
+      const _endTime = new Date(endTime).getTime()
+      const now = new Date().getTime()
+
+      if (_endTime < now) {
+        this.$message.error('考试已结束！')
         return
       }
 
@@ -736,6 +777,7 @@ export default {
       this.examForm.readShow = true
       this.examForm.id = id
       this.examForm.paperId = paperId
+      this.examForm.paperMarkType = paperMarkType
 
       this.$nextTick(() => {
         if (examMarkUser.data.length > 0) {
@@ -1023,7 +1065,6 @@ export default {
   justify-content: center;
   align-items: center;
   color: #999;
-  line-height: 30px;
   .common-onLine {
     font-size: 70px;
   }

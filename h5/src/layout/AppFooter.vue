@@ -5,17 +5,12 @@
  * @Author: Che
  * @Date: 2021-08-09 15:14:50
  * @LastEditors: Che
- * @LastEditTime: 2021-09-26 11:17:39
+ * @LastEditTime: 2021-10-09 15:26:45
 -->
 <template>
   <footer class="app-footer">
     Copyright© 2021 All Rights Reserved
-    <span class="footer-info"
-      >版权所有&nbsp;{{ orgName }}&nbsp;<img
-        src="../assets/img/logo.png"
-        alt="logo"
-        class="footer-logo"
-    /></span>
+    <span class="footer-info">版权所有&nbsp;{{ orgName }}</span>
   </footer>
 </template>
 

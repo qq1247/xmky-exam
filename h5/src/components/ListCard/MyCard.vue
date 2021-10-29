@@ -93,21 +93,6 @@
           >
             <i class="common common-marking"></i>
           </span>
-          <!-- 智能阅卷 -->
-          <el-progress
-            type="circle"
-            :percentage="percentage"
-            :width="35"
-            :stroke-width="2"
-            data-title="智能阅卷中"
-            :color="colors"
-            v-if="
-              data.mark === 'start' &&
-              percentage > 0 &&
-              markId !== null &&
-              markId === data.examId
-            "
-          ></el-progress>
         </template>
       </div>
     </div>
@@ -129,25 +114,9 @@ export default {
       type: String,
       default: '',
     },
-    percentage: {
-      type: Number,
-      default: 0,
-    },
-    markId: {
-      type: Number,
-      default: null,
-    },
   },
   data() {
-    return {
-      colors: [
-        { color: '#f56c6c', percentage: 20 },
-        { color: '#e6a23c', percentage: 40 },
-        { color: '#5cb87a', percentage: 60 },
-        { color: '#1989fa', percentage: 80 },
-        { color: '#6f7ad3', percentage: 100 },
-      ],
-    }
+    return {}
   },
   computed: {
     remainTime() {
