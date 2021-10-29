@@ -25,7 +25,11 @@
             ></el-input>
           </el-form-item>
           <el-form-item label>
-            <el-select placeholder="请输入类型" v-model="queryForm.type">
+            <el-select
+              clearable
+              placeholder="请选择类型"
+              v-model="queryForm.type"
+            >
               <el-option
                 :key="parseInt(dict.dictKey)"
                 :label="dict.dictValue"
@@ -35,12 +39,30 @@
             </el-select>
           </el-form-item>
           <el-form-item label>
-            <el-select placeholder="请输入难度" v-model="queryForm.difficulty">
+            <el-select
+              clearable
+              placeholder="请选择难度"
+              v-model="queryForm.difficulty"
+            >
               <el-option
                 :key="parseInt(dict.dictKey)"
                 :label="dict.dictValue"
                 :value="parseInt(dict.dictKey)"
                 v-for="dict in queryForm.difficultyList"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label>
+            <el-select
+              clearable
+              placeholder="请选择状态"
+              v-model="queryForm.state"
+            >
+              <el-option
+                :key="parseInt(state.key)"
+                :label="state.value"
+                :value="parseInt(state.key)"
+                v-for="state in queryForm.stateList"
               ></el-option>
             </el-select>
           </el-form-item>
@@ -184,11 +206,22 @@ export default {
         title: '', // 标题
         type: null, // 类型
         difficulty: null, // 难度
+        state: '', //状态
         scoreStart: '', // 得分大于
         scoreEnd: '', // 得分小于
         questionTypeName: '', // 试题分类name
         questionTypeId: 1, // 试题分类id
         difficultyList: [], // 难度列表
+        stateList: [
+          {
+            key: '1',
+            value: '发布',
+          },
+          {
+            key: '2',
+            value: '草稿',
+          },
+        ], //状态列表
         typeList: [], // 类型列表
       },
       editForm: {
@@ -317,13 +350,14 @@ export default {
         data: { list, total },
       } = await questionListPage({
         id: this.queryForm.id,
-        questionTypeId: this.queryForm.questionTypeId,
-        title: this.queryForm.title,
-        questionTypeName: this.queryForm.questionTypeName,
         type: this.queryForm.type,
+        state: this.queryForm.state,
+        title: this.queryForm.title,
+        scoreEnd: this.queryForm.scoreEnd,
         difficulty: this.queryForm.difficulty,
         scoreStart: this.queryForm.scoreStart,
-        scoreEnd: this.queryForm.scoreEnd,
+        questionTypeId: this.queryForm.questionTypeId,
+        questionTypeName: this.queryForm.questionTypeName,
         curPage: this.list.curPage,
         pageSize: this.list.pageSize,
       })
