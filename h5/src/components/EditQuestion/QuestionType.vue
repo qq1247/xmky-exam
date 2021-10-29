@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-10-19 14:22:34
  * @LastEditors: Che
- * @LastEditTime: 2021-10-20 13:52:12
+ * @LastEditTime: 2021-10-27 16:16:53
 -->
 <template>
   <div>
@@ -170,7 +170,7 @@ export default {
       if (res?.code == 200) {
         this.percentage = 1
         await this.getProgress(res.data)
-        if (this.percentage == 100) {
+        if (this.percentage === 100) {
           this.$message.success('解析成功！')
           this.fileForm.isAnalysis = false
           this.fileForm.show = false
@@ -179,7 +179,6 @@ export default {
           this.$tools.delay().then(() => {
             this.percentage = 0
           })
-          return
         } else {
           this.fileForm.isAnalysis = false
         }
@@ -189,11 +188,18 @@ export default {
     },
     // 获取进度
     async getProgress(id) {
-      const percentage = await this.$tools.delay().then(() => {
-        return myExamAiProgress({
-          id,
+      const percentage = await this.$tools
+        .delay()
+        .then(() => {
+          return myExamAiProgress({
+            id,
+          })
         })
-      })
+        .catch((err) => {
+          return err.data
+        })
+
+      console.log(percentage)
 
       if (percentage.code !== 200 || !percentage?.data?.percent) {
         this.percentage = 0
