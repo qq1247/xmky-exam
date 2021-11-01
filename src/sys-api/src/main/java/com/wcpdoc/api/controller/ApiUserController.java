@@ -96,7 +96,6 @@ public class ApiUserController extends BaseController {
 					map.put("onlineTime", DateUtil.formatDateTime(onlineUser.getUpdateTime()));
 				}
 			}
-			
 			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("用户列表错误：", e);
@@ -190,7 +189,7 @@ public class ApiUserController extends BaseController {
 			String initPwd = null;
 			Map<String, Object> data = new HashMap<String, Object>();
 			if (changeLoginName) {
-				initPwd = "111111";//StringUtil.getRandomStr(8);
+				initPwd = "111111";// StringUtil.getRandomStr(8);
 				userService.doPwdUpdate(user.getId(), initPwd);
 				data.put("initPwd", initPwd);
 			}
@@ -233,12 +232,73 @@ public class ApiUserController extends BaseController {
 			return PageResult.err();
 		}
 	}
+	
+	/**
+	 * 获取用户
+	 * 
+	 * v1.0 zhanghc 2016-6-15下午17:24:19
+	 * 
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/get")
+	@ResponseBody
+	public PageResult get(Integer id) {
+		try {
+			User entity = userService.getEntity(id);
+			Org org = null;
+			if(entity.getOrgId() != null){
+				org = orgService.getEntity(entity.getOrgId());
+			}
+			return PageResultEx.ok()
+					.addAttr("id", entity.getId())
+					.addAttr("name", entity.getName())
+					.addAttr("loginName", entity.getLoginName())
+					.addAttr("registTime", DateUtil.formatDateTime(entity.getRegistTime()))
+					.addAttr("lastLoginTime", entity.getLastLoginTime() == null ? null : DateUtil.formatDateTime(entity.getLastLoginTime()))
+					.addAttr("orgId", entity.getOrgId())
+					.addAttr("orgName", org == null ? null : org.getName())
+					.addAttr("state", entity.getState())
+					.addAttr("roles", entity.getRoles());
+		} catch (MyException e) {
+			log.error("获取用户错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("获取用户错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+
+	/**
+	 * 初始化密码
+	 * 
+	 * v1.0 zhanghc 2017年7月13日下午9:27:18
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/initPwd")
+	@ResponseBody
+	public PageResult initPwd(Integer id) {
+		try {
+			String initPwd = "111111";//StringUtil.getRandomStr(8);
+			userService.doPwdUpdate(id, initPwd);
+			Map<String, Object> data = new HashMap<String, Object>();
+			data.put("initPwd", initPwd);
+			return PageResultEx.ok().data(data);
+		} catch (MyException e) {
+			log.error("初始化密码错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("初始化密码错误：", e);
+			return PageResult.err();
+		}
+	}
 
 	/**
 	 * 设置角色
 	 * 
 	 * v1.0 zhanghc 2016-6-15下午17:24:19
-	 * 
 	 * @param id
 	 * @param postIds
 	 * @return PageResult
@@ -257,29 +317,21 @@ public class ApiUserController extends BaseController {
 			return PageResult.err();
 		}
 	}
-
+	
 	/**
-	 * 初始化密码
-	 * 
-	 * v1.0 zhanghc 2017年7月13日下午9:27:18
-	 * 
-	 * @param id
-	 * @return PageResult
+	 * 强制退出登陆
+	 * v1.0 zhanghc 2016年8月27日上午11:36:55
+	 * @param userId
+	 * @return pageOut
 	 */
-	@RequestMapping("/initPwd")
+	@RequestMapping("/out")
 	@ResponseBody
-	public PageResult initPwd(Integer id) {
+	public PageResult out(Integer userId) {
 		try {
-			String initPwd = "111111";//StringUtil.getRandomStr(8);
-			userService.doPwdUpdate(id, initPwd);
-			Map<String, Object> data = new HashMap<String, Object>();
-			data.put("initPwd", initPwd);
-			return PageResultEx.ok().data(data);
-		} catch (MyException e) {
-			log.error("初始化密码错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
+			onlineUserService.out(userId);
+			return PageResult.ok();
 		} catch (Exception e) {
-			log.error("初始化密码错误：", e);
+			log.error("强制退出登陆错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -366,60 +418,6 @@ public class ApiUserController extends BaseController {
 			log.error("用户导出模板下载附件失败：", e);
 		} finally {
 			IOUtils.closeQuietly(output);
-		}
-	}
-	
-	/**
-	 * 获取用户
-	 * 
-	 * v1.0 zhanghc 2016-6-15下午17:24:19
-	 * 
-	 * @param id
-	 * @return PageResult
-	 */
-	@RequestMapping("/get")
-	@ResponseBody
-	public PageResult get(Integer id) {
-		try {
-			User entity = userService.getEntity(id);
-			Org org = null;
-			if(entity.getOrgId() != null){
-				org = orgService.getEntity(entity.getOrgId());
-			}
-			return PageResultEx.ok()
-					.addAttr("id", entity.getId())
-					.addAttr("name", entity.getName())
-					.addAttr("loginName", entity.getLoginName())
-					.addAttr("registTime", DateUtil.formatDateTime(entity.getRegistTime()))
-					.addAttr("lastLoginTime", entity.getLastLoginTime() == null ? null : DateUtil.formatDateTime(entity.getLastLoginTime()))
-					.addAttr("orgId", entity.getOrgId())
-					.addAttr("state", entity.getState())
-					.addAttr("orgName", org == null ? null : org.getName())
-					.addAttr("roles", entity.getRoles());
-		} catch (MyException e) {
-			log.error("获取用户错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("获取用户错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 强制退出登陆
-	 * v1.0 zhanghc 2016年8月27日上午11:36:55
-	 * @param userId
-	 * @return pageOut
-	 */
-	@RequestMapping("/out")
-	@ResponseBody
-	public PageResult out(Integer userId) {
-		try {
-			onlineUserService.out(userId);
-			return PageResult.ok();
-		} catch (Exception e) {
-			log.error("强制退出登陆错误：", e);
-			return PageResult.err();
 		}
 	}
 	

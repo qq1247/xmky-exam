@@ -24,17 +24,15 @@ public class OrgDaoImpl extends RBaseDaoImpl<Org> implements OrgDao {
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT ORG.ID, ORG.NAME, ORG.PARENT_ID, PARENT_ORG.NAME AS PARENT_NAME, "
-				+ "ORG.PARENT_IDS, ORG.NO " 
+		String sql = "SELECT ORG.ID, ORG.NAME, ORG.PARENT_ID, PARENT_ORG.NAME AS PARENT_NAME, ORG.NO " 
 				+ "FROM SYS_ORG ORG "
 				+ "LEFT JOIN SYS_ORG PARENT_ORG ON ORG.PARENT_ID = PARENT_ORG.ID";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("parentId")) && !("1".equals(pageIn.get("parentId")) || pageIn.get("parentId").equals(pageIn.get("Ten"))), "ORG.PARENT_ID = ?", pageIn.get("parentId"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "ORG.NAME LIKE ?", "%" + pageIn.get("name") + "%")
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("parentId")), "ORG.PARENT_ID = ?", pageIn.get("parentId"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "ORG.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
 				.addWhere("ORG.STATE = 1")
 				.addOrder("ORG.NO", Order.ASC);
-		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		return pageOut;
+		return getListpage(sqlUtil, pageIn);
 	}
 
 	@Override

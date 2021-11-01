@@ -327,54 +327,6 @@ public class ApiPaperController extends BaseController {
 	}
 	
 	/**
-	 * 设置分数
-	 * 
-	 * v1.0 zhanghc 2018年10月21日上午10:46:54
-	 * @param id
-	 * @param questionId
-	 * @param score
-	 * @param subScores 试题为智能阅卷，并且是填空或问答时有效
-	 * @return PageResult
-	 */
-	@RequestMapping("/scoreUpdate")
-	@ResponseBody
-	public PageResult scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores) {
-		try {
-			paperService.scoreUpdate(id, questionId, score, subScores);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("设置分数错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("设置分数错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 设置分数选项
-	 * 
-	 * v1.0 zhanghc 2018年10月21日上午10:46:54
-	 * @param paperQuestionId
-	 * @param options
-	 * @return PageResult
-	 */
-	@RequestMapping("/scoreOptionUpdate")
-	@ResponseBody
-	public PageResult scoreOptionUpdate(Integer id, Integer questionId, Integer[] scoreOptions) {
-		try {
-			paperService.scoreOptionUpdate(id, questionId, scoreOptions);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("设置分数错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("设置分数错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
 	 * 批量设置分数
 	 * 
 	 * v1.0 zhanghc 2018年10月21日上午10:46:54
@@ -438,6 +390,54 @@ public class ApiPaperController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("清空试题错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 设置分数
+	 * 
+	 * v1.0 zhanghc 2018年10月21日上午10:46:54
+	 * @param id
+	 * @param questionId
+	 * @param score
+	 * @param subScores 试题为智能阅卷，并且是填空或问答时有效
+	 * @return PageResult
+	 */
+	@RequestMapping("/scoreUpdate")
+	@ResponseBody
+	public PageResult scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores) {
+		try {
+			paperService.scoreUpdate(id, questionId, score, subScores);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("设置分数错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("设置分数错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 设置分数选项
+	 * 
+	 * v1.0 zhanghc 2018年10月21日上午10:46:54
+	 * @param paperQuestionId
+	 * @param options
+	 * @return PageResult
+	 */
+	@RequestMapping("/scoreOptionUpdate")
+	@ResponseBody
+	public PageResult scoreOptionUpdate(Integer id, Integer questionId, Integer[] scoreOptions) {
+		try {
+			paperService.scoreOptionUpdate(id, questionId, scoreOptions);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("设置分数错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("设置分数错误：", e);
 			return PageResult.err();
 		}
 	}

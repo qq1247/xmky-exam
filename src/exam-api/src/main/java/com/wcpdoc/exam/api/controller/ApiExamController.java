@@ -148,7 +148,8 @@ public class ApiExamController extends BaseController{
 	}
 	
 	/**
-	 * 考试用户列表 
+	 * 考试用户列表
+	 * 查询当前选中的考试用户时使用
 	 * 
 	 * v1.0 zhanghc 2018年10月31日上午10:27:22
 	 * @param pageIn
@@ -167,6 +168,7 @@ public class ApiExamController extends BaseController{
 	
 	/**
 	 * 阅卷用户列表
+	 * 查询当前选中的考试（阅卷）用户时使用
 	 * 
 	 * v1.0 zhanghc 2018年11月24日上午9:13:22
 	 * @param id
@@ -232,7 +234,7 @@ public class ApiExamController extends BaseController{
 	}
 	
 	/**
-	 * 更新阅卷用户
+	 * 更新阅卷用户（按题阅卷，暂时不用）
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param id
