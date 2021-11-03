@@ -282,7 +282,7 @@ create table EXM_EXAM
    END_TIME             datetime comment '考试结束',
    MARK_START_TIME      datetime comment '阅卷开始',
    MARK_END_TIME        datetime comment '阅卷结束',
-   MARK_STATE           datetime comment '阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）',
+   MARK_STATE           int comment '阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）',
    SCORE_STATE          int comment '成绩状态（1：公开；2：不公开）',
    RANK_STATE           int comment '排名状态（1：公开；2：不公开）',
    LOGIN_TYPE           int comment '登陆方式（1：安排考试；2：免登陆考试）',
@@ -627,7 +627,7 @@ INSERT INTO `SYS_DICT` VALUES (39, 'STATE_OPEN', '0', '删除', 3);
 INSERT INTO `SYS_DICT` VALUES (40, 'PAPER_MARK_TYPE', '1', '智能阅卷', 1);
 INSERT INTO `SYS_DICT` VALUES (41, 'PAPER_MARK_TYPE', '2', '人工阅卷', 2);
 
-INSERT INTO `SYS_CRON` VALUES ('1', '清理临时附件', 'com.wcpdoc.exam.file.job.ClearFileJob', '0 0 0 1/1 * ? ', '1', '1', '2020-08-26 18:42:08');
+INSERT INTO `SYS_CRON` VALUES ('1', '清理临时附件', 'com.wcpdoc.file.job.ClearFileJob', '0 0 0 1/1 * ? ', '1', '1', '2020-08-26 18:42:08');
 INSERT INTO `SYS_CRON` VALUES (2, '数据库备份', 'com.wcpdoc.quartz.job.DbBackJob', '0 0 0 1/1 * ? ', 1, 1, '2020-08-26 18:42:08');
 INSERT INTO `SYS_CRON` VALUES (3, '自动阅卷', 'com.wcpdoc.exam.core.job.AutoMarkJob', '0/1 * * * * ? *', 1, 1, '2020-08-26 18:42:08');
 
