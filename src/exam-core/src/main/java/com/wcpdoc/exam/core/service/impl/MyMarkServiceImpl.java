@@ -89,7 +89,11 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 			throw new MyException("阅卷未开始");
 		}
 		if (curTime - exam.getMarkEndTime().getTime() > 5000) {// 预留5秒网络延时
-			throw new MyException("阅卷已结束！");
+			throw new MyException("阅卷已结束");
+		}
+		
+		if (exam.getMarkState() != 3) {
+			throw new MyException("正在处理智能阅卷部分，请稍后");
 		}
 		
 		List<MyMark> myMarkList = myMarkDao.getList(examId);

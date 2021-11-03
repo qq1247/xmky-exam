@@ -123,7 +123,7 @@ public class ApiUserController extends BaseController {
 				throw new MyException("登录名称已存在");
 			}
 			if (user.getOrgId() == null) {
-				throw new MyException("参数错误：orgId");
+				user.setOrgId(1);// 如果没有默认为根节点
 			}
 			
 			// 添加用户
@@ -259,7 +259,7 @@ public class ApiUserController extends BaseController {
 					.addAttr("orgId", entity.getOrgId())
 					.addAttr("orgName", org == null ? null : org.getName())
 					.addAttr("state", entity.getState())
-					.addAttr("roles", entity.getRoles());
+					.addAttr("roles", entity.getRoles().contains("subAdmin") ? new String[]{"subAdmin"} : new String[]{"user"});
 		} catch (MyException e) {
 			log.error("获取用户错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
