@@ -40,9 +40,23 @@
                 v-for="(child, indexc) in item.questionList"
               >
                 <p
+                  v-if="child.type !== 3"
                   class="question-title"
-                  v-html="`${indexc + 1}、${child.title}`"
+                  v-html="`${index + 1}、${child.title}`"
                 ></p>
+                <div
+                  class="question-title"
+                  v-if="child.type === 3 && child.examAnswers"
+                >
+                  <span>{{ index + 1 }}、</span>
+                  <ClozeTitle
+                    isMark
+                    :title="child.title"
+                    :questionId="child.id"
+                    :paperQuestion="paperQuestion"
+                    :myExamDetailCache="child.examAnswers"
+                  ></ClozeTitle>
+                </div>
 
                 <!-- 单选 -->
                 <template v-if="child.type === 1">
@@ -89,7 +103,7 @@
                 </template>
 
                 <!-- 填空 -->
-                <template v-if="child.type === 3">
+                <!-- <template v-if="child.type === 3">
                   <el-input
                     disabled
                     class="question-text"
@@ -102,7 +116,7 @@
                       >第{{ $tools.intToChinese(index + 1) }}空</template
                     >
                   </el-input>
-                </template>
+                </template> -->
 
                 <!-- 判断 -->
                 <template v-if="child.type === 4">
@@ -298,9 +312,11 @@ import {
   myExamDoScore,
 } from 'api/my'
 import ScorePlate from 'components/ScorePlate.vue'
+import ClozeTitle from '@/components/ClozeTitle.vue'
 export default {
   components: {
     ScorePlate,
+    ClozeTitle,
   },
   data() {
     return {

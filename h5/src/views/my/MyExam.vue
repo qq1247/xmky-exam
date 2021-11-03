@@ -58,7 +58,6 @@
   </div>
 </template>
 <script>
-import Vue from 'vue'
 import { loginSysTime } from 'api/common'
 import { paperGet, paperQuestionList } from 'api/paper'
 import { myExamAnswerList, myExamUpdateAnswer, myExamDoAnswer } from 'api/my'
@@ -133,42 +132,12 @@ export default {
         this.paper = { ...res.data }
       } catch (error) {}
     },
-    // 将html格式字符串转化为dom的函数
-    htmlStrToDom(htmlstr, parentdata) {
-      let obj = Object.assign({}, parentdata)
-      let component = Vue.extend({
-        template: htmlstr,
-        data() {
-          return obj
-        },
-      })
-      let instance = new component().$mount()
-      return instance.$el
-    },
     // 查询试卷信息
     async queryPaperInfo() {
       try {
         const res = await paperQuestionList({
           id: this.paperId,
         })
-        res.data.map((item) => {
-          item.chapter.show = true
-          item.questionList.map((question) => {
-            let title = question.title
-            let underlineList = title.match(/[_]{5,}/g)
-            underlineList.map((underline, index) => {
-              const titleStart = title.substring(0, title.indexOf(underline))
-              const titleEnd = title.substring(
-                title.indexOf(underline) + underline.length
-              )
-              const inputHtml = `<el-input @change='updateAnswer(paperQuestion[routerIndex].id)' :disabled="preview === 'true' ? true : false" v-model='myExamDetailCache[paperQuestion[routerIndex].id].answers[${index}]'></el-input>`
-              title = `${titleStart}${inputHtml}${titleEnd}`
-            })
-            const repalceTitle = this.htmlStrToDom(title, this.$data).innerHTML
-            console.log(repalceTitle) // question.title = repalceTitle
-          })
-        })
-
         if (this.showType === '1') {
           this.paperQuestion = res.data
           this.questionRouter = Array.from(res.data.keys())
@@ -326,7 +295,7 @@ export default {
         type: 'info',
         showClose: false,
       }).then(async () => {
-        const res = await myExamDoAnswer({ examId: this.id })
+        const res = await myExamDoAnswer({ examId: this.examId })
         this.$router.replace({
           path: '/my',
         })
