@@ -330,7 +330,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 	
 	@Override
-	public void chapterQuestionMove(Integer sourceId, Integer targetId) {
+	public void chapterMove(Integer sourceId, Integer targetId) {
 		//校验数据有效性
 		if (!ValidateUtil.isValid(sourceId)) {
 			throw new MyException("参数错误：sourceId");
@@ -338,12 +338,18 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if (!ValidateUtil.isValid(targetId)) {
 			throw new MyException("参数错误：targetId");
 		}
-		PaperQuestion sourcePQ = paperQuestionService.getEntity(sourceId);
-		PaperQuestion targetPQ = paperQuestionService.getEntity(targetId);
-		if (sourcePQ.getPaperId().intValue() != targetPQ.getPaperId().intValue()) {// 如果修改的不是同一张试卷
+		PaperQuestion source = paperQuestionService.getEntity(sourceId);
+		PaperQuestion target = paperQuestionService.getEntity(targetId);
+		if (source.getType() != 1) {
+			throw new MyException("参数错误：sourceId");
+		}
+		if (target.getType() != 1) {
 			throw new MyException("参数错误：targetId");
 		}
-		Paper paper = getEntity(sourcePQ.getPaperId());
+		if (source.getPaperId().intValue() != target.getPaperId().intValue()) {// 如果修改的不是同一张试卷
+			throw new MyException("参数错误：targetId");
+		}
+		Paper paper = getEntity(source.getPaperId());
 		if (paper.getState() == 0) {
 			throw new MyException("试卷已删除");
 		}
@@ -356,31 +362,70 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if(!hasWriteAuth(paper.getPaperTypeId(), getCurUser().getId())) {
 			throw new MyException("无操作权限");
 		}
-		if (sourcePQ.getType().intValue() == 1 && targetPQ.getType().intValue() != 1) {
-			throw new MyException("章节不能移动到试题");
+		
+		// 移动
+		Integer sourceNo = source.getNo();
+		source.setNo(target.getNo());
+		target.setNo(sourceNo);
+		
+		paperQuestionService.update(source);
+		paperQuestionService.update(target);
+	}
+	
+	@Override
+	public void questionMove(Integer id, Integer sourceId, Integer targetId) {
+		//校验数据有效性
+		if (!ValidateUtil.isValid(id)) {
+			throw new MyException("参数错误：id");
 		}
-		if (sourcePQ.getType().intValue() != 1 && targetPQ.getType().intValue() == 1) {
-			throw new MyException("试题不能移动到章节");
+		if (!ValidateUtil.isValid(sourceId)) {
+			throw new MyException("参数错误：sourceId");
+		}
+		if (!ValidateUtil.isValid(targetId)) {
+			throw new MyException("参数错误：targetId");
+		}
+		PaperQuestion source = paperQuestionService.getEntity(id, sourceId);
+		PaperQuestion target = paperQuestionService.getEntity(id, targetId);
+		if (source.getType() == 1) {
+			throw new MyException("参数错误：sourceId");
+		}
+		if (target.getType() == 1) {
+			throw new MyException("参数错误：targetId");
+		}
+		//if (source.getPaperId().intValue() != target.getPaperId().intValue()) {// 如果修改的不是同一张试卷
+		//	throw new MyException("参数错误：targetId");// 肯定是一张，不用在校验
+		//}
+		Paper paper = getEntity(source.getPaperId());
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
+		}
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
+		}
+		if(paper.getState() == 3){
+			throw new MyException("已归档");
+		}
+		if(!hasWriteAuth(paper.getPaperTypeId(), getCurUser().getId())) {
+			throw new MyException("无操作权限");
 		}
 		
-		/*
-		 * 移动
-		 * 章节之间可相互移动；同章节下试题之间可相互移动；不同章节下试题可跨章节移动；
-		 */
-		Integer sourceNo = sourcePQ.getNo();
-		Integer sourceParentId = sourcePQ.getParentId();
-		String sourceParentSub = sourcePQ.getParentSub();
+		// 移动
+		Integer sourceNo = source.getNo();
+		source.setNo(target.getNo());
+		target.setNo(sourceNo);
 		
-		sourcePQ.setNo(targetPQ.getNo());
-		sourcePQ.setParentId(targetPQ.getParentId());// 常规情况下应该分三种情况分别判断，合并代码后，更新父ID不影响三种情况。
-		sourcePQ.setParentSub(targetPQ.getParentSub());
+		if (source.getParentId().intValue() != target.getParentId().intValue()) {// 如果不是同一个章节，更新父子关系
+			Integer parentId = source.getParentId();
+			String parentSub = source.getParentSub();
+			source.setParentId(target.getParentId());
+			source.setParentSub(target.getParentSub());
+			
+			target.setParentId(parentId);
+			target.setParentSub(parentSub);
+		}
 		
-		targetPQ.setNo(sourceNo);
-		targetPQ.setParentId(sourceParentId);
-		targetPQ.setParentSub(sourceParentSub);
-		
-		paperQuestionService.update(sourcePQ);
-		paperQuestionService.update(targetPQ);
+		paperQuestionService.update(source);
+		paperQuestionService.update(target);
 	}
 	
 	@Override
@@ -900,6 +945,4 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		PaperType paperType = paperTypeService.getEntity(paperTypeId);
 		return paperType.getReadUserIds().contains(String.format(",%s,", userId));
 	}
-
-
 }

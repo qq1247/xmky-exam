@@ -157,6 +157,38 @@ public class ApiOrgController extends BaseController {
 			return PageResult.err();
 		}
 	}
+	
+	/**
+	 * 获取组织机构
+	 * 
+	 * v1.0 zhanghc 2016-5-8上午11:00:00
+	 * 
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/get")
+	@ResponseBody
+	public PageResult get(Integer id) {
+		try {
+			Org org = orgService.getEntity(id);
+			Org parentOrg = null;
+			if (org.getParentId() != null) {
+				parentOrg = orgService.getEntity(org.getParentId());
+			}
+			return PageResultEx.ok()
+					.addAttr("id", org.getId())
+					.addAttr("name", org.getName())
+					.addAttr("no", org.getNo())
+					.addAttr("parentId", org.getParentId())
+					.addAttr("parentName", parentOrg == null ? null : parentOrg.getName());
+		} catch (MyException e) {
+			log.error("获取组织机构错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("获取组织机构错误：", e);
+			return PageResult.err();
+		}
+	}
 
 	/**
 	 * 移动组织机构
@@ -263,38 +295,6 @@ public class ApiOrgController extends BaseController {
 			log.error("组织机构导出模板下载附件失败：", e);
 		} finally {
 			IOUtils.closeQuietly(output);
-		}
-	}
-	
-	/**
-	 * 获取组织机构
-	 * 
-	 * v1.0 zhanghc 2016-5-8上午11:00:00
-	 * 
-	 * @param id
-	 * @return PageResult
-	 */
-	@RequestMapping("/get")
-	@ResponseBody
-	public PageResult get(Integer id) {
-		try {
-			Org org = orgService.getEntity(id);
-			Org parentOrg = null;
-			if (org.getParentId() != null) {
-				parentOrg = orgService.getEntity(org.getParentId());
-			}
-			return PageResultEx.ok()
-					.addAttr("id", org.getId())
-					.addAttr("name", org.getName())
-					.addAttr("no", org.getNo())
-					.addAttr("parentId", org.getParentId())
-					.addAttr("parentName", parentOrg == null ? null : parentOrg.getName());
-		} catch (MyException e) {
-			log.error("获取组织机构错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("获取组织机构错误：", e);
-			return PageResult.err();
 		}
 	}
 }

@@ -261,25 +261,49 @@ public class ApiPaperController extends BaseController {
 	}
 	
 	/**
-	 * 移动章节或试题
-	 * 章节之间可相互移动；同章节下试题之间可相互移动；不同章节下试题可跨章节移动；
+	 * 移动章节
 	 * 
 	 * v1.0 zhanghc 2018年10月21日上午10:46:54
 	 * @param sourceId
 	 * @param targetId
 	 * @return PageResult
 	 */
-	@RequestMapping("/chapterQuestionMove")
+	@RequestMapping("/chapterMove")
 	@ResponseBody
-	public PageResult chapterQuestionMove(Integer sourceId, Integer targetId) {
+	public PageResult chapterMove(Integer sourceId, Integer targetId) {
 		try {
-			paperService.chapterQuestionMove(sourceId, targetId);
+			paperService.chapterMove(sourceId, targetId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("章节移动错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("章节移动错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 移动试题
+	 * 只支持同章节下试题移动
+	 * 
+	 * v1.0 zhanghc 2018年10月21日上午10:46:54
+	 * @param id
+	 * @param sourceId
+	 * @param targetId
+	 * @return PageResult
+	 */
+	@RequestMapping("/questionMove")
+	@ResponseBody
+	public PageResult questionMove(Integer id, Integer sourceId, Integer targetId) {
+		try {
+			paperService.questionMove(id, sourceId, targetId);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("试题移动错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("试题移动错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -322,54 +346,6 @@ public class ApiPaperController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("添加试题错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 设置分数
-	 * 
-	 * v1.0 zhanghc 2018年10月21日上午10:46:54
-	 * @param id
-	 * @param questionId
-	 * @param score
-	 * @param subScores 试题为智能阅卷，并且是填空或问答时有效
-	 * @return PageResult
-	 */
-	@RequestMapping("/scoreUpdate")
-	@ResponseBody
-	public PageResult scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores) {
-		try {
-			paperService.scoreUpdate(id, questionId, score, subScores);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("设置分数错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("设置分数错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 设置分数选项
-	 * 
-	 * v1.0 zhanghc 2018年10月21日上午10:46:54
-	 * @param paperQuestionId
-	 * @param options
-	 * @return PageResult
-	 */
-	@RequestMapping("/scoreOptionUpdate")
-	@ResponseBody
-	public PageResult scoreOptionUpdate(Integer id, Integer questionId, Integer[] scoreOptions) {
-		try {
-			paperService.scoreOptionUpdate(id, questionId, scoreOptions);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("设置分数错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("设置分数错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -438,6 +414,54 @@ public class ApiPaperController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("清空试题错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 设置分数
+	 * 
+	 * v1.0 zhanghc 2018年10月21日上午10:46:54
+	 * @param id
+	 * @param questionId
+	 * @param score
+	 * @param subScores 试题为智能阅卷，并且是填空或问答时有效
+	 * @return PageResult
+	 */
+	@RequestMapping("/scoreUpdate")
+	@ResponseBody
+	public PageResult scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores) {
+		try {
+			paperService.scoreUpdate(id, questionId, score, subScores);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("设置分数错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("设置分数错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 设置分数选项
+	 * 
+	 * v1.0 zhanghc 2018年10月21日上午10:46:54
+	 * @param paperQuestionId
+	 * @param options
+	 * @return PageResult
+	 */
+	@RequestMapping("/scoreOptionUpdate")
+	@ResponseBody
+	public PageResult scoreOptionUpdate(Integer id, Integer questionId, Integer[] scoreOptions) {
+		try {
+			paperService.scoreOptionUpdate(id, questionId, scoreOptions);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("设置分数错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("设置分数错误：", e);
 			return PageResult.err();
 		}
 	}

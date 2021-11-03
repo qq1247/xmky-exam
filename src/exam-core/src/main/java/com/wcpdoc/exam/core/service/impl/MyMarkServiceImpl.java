@@ -85,11 +85,15 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 			throw new MyException("考试未发布");
 		}
 		long curTime = System.currentTimeMillis();
-		if (exam.getStartTime().getTime() > curTime) {
-			throw new MyException("考试未开始");
+		if (exam.getMarkStartTime().getTime() > curTime) {
+			throw new MyException("阅卷未开始");
 		}
-		if (curTime - exam.getEndTime().getTime() > 5000) {// 预留5秒网络延时
-			throw new MyException("考试已结束！");
+		if (curTime - exam.getMarkEndTime().getTime() > 5000) {// 预留5秒网络延时
+			throw new MyException("阅卷已结束");
+		}
+		
+		if (exam.getMarkState() != 3) {
+			throw new MyException("正在处理智能阅卷部分，请稍后");
 		}
 		
 		List<MyMark> myMarkList = myMarkDao.getList(examId);
@@ -151,11 +155,11 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 			throw new MyException("考试未发布");
 		}
 		long curTime = System.currentTimeMillis();
-		if (exam.getStartTime().getTime() > curTime) {
-			throw new MyException("考试未开始");
+		if (exam.getMarkStartTime().getTime() > curTime) {
+			throw new MyException("阅卷未开始");
 		}
-		if (curTime - exam.getEndTime().getTime() > 5000) {// 预留5秒网络延时
-			throw new MyException("考试已结束！");
+		if (curTime - exam.getMarkEndTime().getTime() > 5000) {// 预留5秒网络延时
+			throw new MyException("阅卷已结束！");
 		}
 		
 		List<MyMark> myMarkList = myMarkDao.getList(examId);

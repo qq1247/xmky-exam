@@ -1,22 +1,4 @@
 ALTER TABLE `EXM_MY_EXAM_DETAIL` ADD COLUMN `ANSWER_FILE_ID` int(11) DEFAULT NULL COMMENT '答案附件ID' AFTER `QUESTION_SCORE`;
-ALTER TABLE `EXM_QUESTION_TYPE_OPEN` ADD COLUMN `COMMENT_STATE` int(11) DEFAULT NULL COMMENT '评论状态(0：不显示；1：只读；2：可编辑,)' AFTER `QUESTION_TYPE_ID`;
-
-drop table if exists SYS_SENSITIVE;
-
-/*==============================================================*/
-/* Table: SYS_SENSITIVE                                         */
-/*==============================================================*/
-create table SYS_SENSITIVE
-(
-   ID                   int not null auto_increment,
-   WHITE_LIST           text comment '白名单',
-   BLACK_LIST           text comment '黑名单',
-   UPDATE_USER_ID       int comment '修改人',
-   UPDATE_TIME          datetime comment '修改时间',
-   primary key (ID)
-);
-
-alter table SYS_SENSITIVE comment '敏感词';
 
 drop table if exists EXM_QUESTION_COMMENT;
 
@@ -41,6 +23,8 @@ create table EXM_QUESTION_COMMENT
 
 alter table EXM_QUESTION_COMMENT comment '试题评论';
 
+ALTER TABLE `EXM_QUESTION_TYPE_OPEN` ADD COLUMN `COMMENT_STATE` int(11) DEFAULT NULL COMMENT '评论状态(0：不显示；1：只读；2：可编辑,)' AFTER `QUESTION_TYPE_ID`;
+
 drop table if exists SYS_PARM;
 
 /*==============================================================*/
@@ -63,7 +47,22 @@ create table SYS_PARM
 
 alter table SYS_PARM comment '参数';
 
+drop table if exists SYS_SENSITIVE;
 
+/*==============================================================*/
+/* Table: SYS_SENSITIVE                                         */
+/*==============================================================*/
+create table SYS_SENSITIVE
+(
+   ID                   int not null auto_increment,
+   WHITE_LIST           text comment '白名单',
+   BLACK_LIST           text comment '黑名单',
+   UPDATE_USER_ID       int comment '修改人',
+   UPDATE_TIME          datetime comment '修改时间',
+   primary key (ID)
+);
+
+alter table SYS_SENSITIVE comment '敏感词';
 
 INSERT INTO `SYS_DICT` VALUES (37, 'STATE_OPEN', '1', '正常', 1);
 INSERT INTO `SYS_DICT` VALUES (38, 'STATE_OPEN', '2', '作废', 2);

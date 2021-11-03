@@ -89,14 +89,25 @@ public interface PaperService extends BaseService<Paper> {
 	void chapterDel(Integer chapterId);
 	
 	/**
-	 * 移动章节或试题
+	 * 移动章节
 	 * 
 	 * v1.0 chenyun 2021年7月9日下午3:22:49
 	 * @param sourceId
 	 * @param targetId 
 	 * void
 	 */
-	void chapterQuestionMove(Integer sourceId, Integer targetId);
+	void chapterMove(Integer sourceId, Integer targetId);
+	
+	/**
+	 * 移动章节
+	 * 
+	 * v1.0 chenyun 2021年7月9日下午3:22:49
+	 * @param id
+	 * @param sourceId
+	 * @param targetId 
+	 * void
+	 */
+	void questionMove(Integer id, Integer sourceId, Integer targetId);
 	
 	/**
 	 * 获取试题列表
