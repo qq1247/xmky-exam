@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-10-19 14:24:48
  * @LastEditors: Che
- * @LastEditTime: 2021-10-22 16:51:50
+ * @LastEditTime: 2021-11-03 16:16:38
 -->
 <template>
   <div>
@@ -44,7 +44,11 @@
           </el-col>
           <el-col :span="11">
             <el-form-item label="难度" prop="difficulty">
-              <el-select placeholder="请选择难度" v-model="editForm.difficulty">
+              <el-select
+                clearable
+                placeholder="请选择难度"
+                v-model="editForm.difficulty"
+              >
                 <el-option
                   :key="parseInt(dict.dictKey)"
                   :label="dict.dictValue"
@@ -237,12 +241,13 @@
                     >填空{{ $tools.intToChinese(index + 1) }}</span
                   >
                   <el-select
-                    v-model="answer.value"
-                    multiple
-                    filterable
                     remote
+                    multiple
+                    clearable
+                    filterable
                     allow-create
                     default-first-option
+                    v-model="answer.value"
                     placeholder="请填写答案"
                   >
                   </el-select>
@@ -296,12 +301,13 @@
                     >关键词{{ $tools.intToChinese(index + 1) }}</span
                   >
                   <el-select
-                    v-model="answer.value"
-                    multiple
-                    filterable
                     remote
+                    multiple
+                    clearable
+                    filterable
                     allow-create
                     default-first-option
+                    v-model="answer.value"
                     placeholder="请填写答案"
                   >
                   </el-select>

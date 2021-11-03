@@ -77,7 +77,11 @@
               ></el-input>
             </el-form-item>
             <el-form-item>
-              <el-select placeholder="请选择类型" v-model="queryForm.type">
+              <el-select
+                clearable
+                placeholder="请选择类型"
+                v-model="queryForm.type"
+              >
                 <el-option
                   :key="parseInt(dict.dictKey)"
                   :label="dict.dictValue"
@@ -88,6 +92,7 @@
             </el-form-item>
             <el-form-item>
               <el-select
+                clearable
                 placeholder="请选择难度"
                 v-model="queryForm.difficulty"
               >
@@ -623,7 +628,8 @@ import {
   paperQuestionDel,
   paperScoreUpdate,
   paperQuestionAdd,
-  paperChapterQuestionMove,
+  paperChapterMove,
+  paperQuestionMove,
   paperTotalScoreUpdate,
   paperScoreOptionUpdate,
 } from 'api/paper'
@@ -765,7 +771,7 @@ export default {
     async queryQuestion() {
       const res = await questionListPage({
         id: this.queryForm.id,
-        ai: this.markType,
+        ai: this.markType === 1 ? 1 : '',
         state: 1,
         type: this.queryForm.type,
         title: this.queryForm.title,
@@ -848,7 +854,7 @@ export default {
     // 编辑章节
     async paperChapterEdit() {
       const res = await paperChapterEdit({
-        id: this.chapterForm.id,
+        chapterId: this.chapterForm.id,
         name: this.chapterForm.name,
         description: this.chapterForm.description,
       })
@@ -1026,7 +1032,7 @@ export default {
     async chapterMove({ newIndex, oldIndex }) {
       const sourceId = this.paperQuestion[newIndex].chapter.id
       const targetId = this.paperQuestion[oldIndex].chapter.id
-      const res = await paperChapterQuestionMove({
+      const res = await paperChapterMove({
         sourceId,
         targetId,
       })
@@ -1037,20 +1043,23 @@ export default {
     },
     // 试题移动
     async questionMove({ to, from, newIndex, oldIndex }) {
+      console.log(to)
+      console.log(from)
       const toChapterId = to.dataset.id
       const fromChapterId = from.dataset.id
       let sourceId, targetId
       if (toChapterId === fromChapterId) {
         const sourceQuestion = this.filterQuestion(toChapterId)
-        sourceId = sourceQuestion[newIndex].paperQuestionId
-        targetId = sourceQuestion[oldIndex].paperQuestionId
+        sourceId = sourceQuestion[newIndex].id
+        targetId = sourceQuestion[oldIndex].id
       } else {
         const sourceQuestion = this.filterQuestion(toChapterId)
-        sourceId = sourceQuestion[newIndex].paperQuestionId
-        targetId = toChapterId
+        sourceId = sourceQuestion[newIndex].id
+        targetId = sourceQuestion[oldIndex].id
       }
 
-      const res = await paperChapterQuestionMove({
+      const res = await paperQuestionMove({
+        id: this.paperId,
         sourceId,
         targetId,
       })

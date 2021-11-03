@@ -280,7 +280,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
       }).then(async () => {
-        const res = await myExamDoAnswer({ examId: this.id })
+        const res = await myExamDoAnswer({ examId: this.examId })
         res?.code === 200
           ? this.$router.replace({
               path: '/my',
@@ -296,9 +296,11 @@ export default {
         showClose: false,
       }).then(async () => {
         const res = await myExamDoAnswer({ examId: this.examId })
-        this.$router.replace({
-          path: '/my',
-        })
+        res?.code === 200
+          ? this.$router.replace({
+              path: '/my',
+            })
+          : this.$message.warning('请重新提交试卷！')
       })
     },
     // 定位锚点
