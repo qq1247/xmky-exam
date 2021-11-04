@@ -92,7 +92,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		<finalName>exam-3.1.0</finalName><!-- 打包后文件名称: 项目名-版本 -->
+		<finalName>exam-3.2.0</finalName><!-- 打包后文件名称: 项目名-版本 -->
 		<resources>
 			<resource>
 				<directory></directory><!-- 从根目录开始 -->
