@@ -259,7 +259,7 @@ public class ApiUserController extends BaseController {
 					.addAttr("orgId", entity.getOrgId())
 					.addAttr("orgName", org == null ? null : org.getName())
 					.addAttr("state", entity.getState())
-					.addAttr("roles", entity.getRoles().contains("subAdmin") ? new String[]{"subAdmin"} : new String[]{"user"});
+					.addAttr("roles", (ValidateUtil.isValid(entity.getRoles()) && entity.getRoles().contains("subAdmin")) ? new String[]{"subAdmin"} : new String[]{"user"});
 		} catch (MyException e) {
 			log.error("获取用户错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

@@ -72,14 +72,14 @@ http请求头需添加Authorization字段，
 | msg                   | String  | 响应消息                   |
 | data[].questionId     | Integer | 试题ID                     |
 | data[].answerTime     | Date    | 答题时间                   |
-| data[].answers        | Text    | 我的答案，参考question/add |
+| data[].answers        | String[]| 我的答案，参考question/add |
 | data[].markUserId     | Integer | 阅卷人ID                   |
 | data[].markUserName   | String  | 阅卷人名称                 |
 | data[].markTime       | Date    | 阅卷时间                   |
 | data[].score          | Double  | 得分                       |
 | data[].questionScore  | Double  | 试卷分数                   |
 
-### 我的考试答题：myExam/answer
+### 我的考试更新答题：myExam/answer
 | 请求参数| 类型    | 描述           | 必填 |
 | -------------- | ------- | -------------- | ---- |
 | examId | Integer | 考试ID | 是   |
@@ -116,10 +116,11 @@ http请求头需添加Authorization字段，
 ### 我的阅卷列表：myMark/listpage
 | 请求参数| 类型        | 描述       | 必填 |
 | -------- | ----------- | ---------- | ---- |
+| examId | Integer     | 考试ID   | 否   |
 | examName | String (32) | 考试名称   | 否   |
 | curPage  | Integer     | 当前第几页 | 否   |
 | pageSize | Integer     | 每页多少条 | 否   |
-######响应数据
+###### 响应数据
 同myExam/listpage
 
 ### 我的阅卷阅题：myMark/score
@@ -135,8 +136,4 @@ http请求头需添加Authorization字段，
 | -------- | ------- | ---------- | ---- |
 | examId| Integer | 考试ID | 是   |
 | userId| Integer | 考试用户ID | 是   |
-
-
-
-
 

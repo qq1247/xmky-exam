@@ -93,6 +93,7 @@ http请求头需添加Authorization字段，
 | --------   | -----   | -----  | ---- |
 |id| Integer  | 主键   |   是     |
 |name      | String (16)  | 名称   |   是     |
+|parentId      | Integer  | 父ID   |   否     |
 |no    | Integer     |   排序   |   是   |
 
 ### 组织机构删除：org/del
@@ -109,7 +110,7 @@ http请求头需添加Authorization字段，
 | --------   | -----   | -----  |
 |code     | Integer  | 响应码 |
 |msg     | String  | 响应消息 |
-|data.id | Integer  | 名称 |
+|data.id | Integer  | 主键 |
 |data.name     | String  | 名称 |
 |data.parentId     | Integer  | 父ID |
 |data.parentName   | String  | 父名称 |
@@ -316,8 +317,9 @@ http请求头需添加Authorization字段，
 |msg     | String  | 响应消息 |
 |data.id| Integer  | 主键 |
 |data.name     | String  | 名称 |
-|data.jobClass | String  | 实现类 |
+|data.jobClass | String  | 实现类 |triggerTimes
 |data.cron | String  | cron表达式|
+|data.triggerTimes | Date[]| 最近几次触发时间|
 
 ### 定时任务启动：cron/startTask
 | 请求参数|  类型   |  描述  |  必填 |
@@ -367,6 +369,7 @@ http请求头需添加Authorization字段，
 |data     | String  | 附件ID |
 
 ### 进度条获取：progressBar/get
+###### 建议一秒查询一次
 | 请求参数|  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
 | id   | String   | 进度条ID  | 是 |

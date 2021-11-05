@@ -147,8 +147,8 @@ http请求头需添加Authorization字段，
 | data.total            | Integer | 总行数       |
 | data.list[]           | Object[]   | 分页列表     |
 | data.list[].id        | Integer | 主键         |
-| data.list[].startTime | Date    | 类型         |
-| data.list[].endTime   | Date    | 类型名称     |
+| data.list[].startTime | Date    | 开始时间         |
+| data.list[].endTime   | Date    | 结束时间     |
 | data.list[].userIds   | String  | 授权用户IDS      |
 | data.list[].userNames | String  | 授权用户名称     |
 | data.list[].orgIds    | String  | 授权组织机构IDS  |
@@ -183,7 +183,7 @@ http请求头需添加Authorization字段，
 | ai		 | Integer | 智能阅卷（1：是；2：否） | 否   |
 | paperId      | Integer | 试卷ID   | 否   |
 | exPaperId      | Integer | 排除试卷ID（用于组卷时过滤掉已添加过的试题）   | 否   |
-| state | Integer | 状态（0：删除；1：发布；2：草稿），参数为0则查询最近7天已删除的试题 | 否   |
+| state | Integer | 状态（0：删除；1：发布；2：草稿）；默认查询1,2；参数为0则查询最近7天已删除的试题 | 否   |
 | curPage        | Integer | 当前第几页   | 否   |
 | pageSize       | Integer | 每页多少条   | 否   |
 
@@ -258,7 +258,8 @@ http请求头需添加Authorization字段，
 | 请求参数| 类型       | 描述       | 必填 |
 | -------- | ---------- | ---------- | ---- |
 | name     | String(16) | 试卷名称   | 否   |
-| userName | String(16) | 用户名称   | 否   |
+| state| Integer     | 状态| 否   |
+| paperTypeId| Integer     | 试卷分类ID| 否   |
 | curPage  | Integer    | 当前第几页 | 否   |
 | pageSize | Integer    | 每页多少条 | 否   |
 
@@ -314,14 +315,14 @@ http请求头需添加Authorization字段，
 | code                | Integer | 响应码   |
 | msg                 | String  | 响应消息 |
 | data.id             | Integer | 试卷主键 |
-| data.| name | 名称 |
-| data.| passScore | 及格分数 |
-| data.| totalScore | 总分数 |
-| data.| genType | 组件方式 |
-| data.| markType | 阅卷方式 |
-| data.| showType | 展示方式 |
-| data.| state | 状态 |
-| data.| paperTypeId | 试卷分类ID |
+| data.name | 名称 |
+| data.passScore | 及格分数 |
+| data.totalScore | 总分数 |
+| data.genType | 组件方式 |
+| data.markType | 阅卷方式 |
+| data.showType | 展示方式 |
+| data.state | 状态 |
+| data.paperTypeId | 试卷分类ID |
 
 ### 试卷拷贝：paper/copy
 | 请求参数| 类型    | 描述 | 必填 |
@@ -352,8 +353,14 @@ http请求头需添加Authorization字段，
 | ---- | ------- | ------ | ---- |
 | chapterId| Integer | 章节id | 是   |
 
-### 章节或试题移动：paper/chapterQuestionMove
-###### 章节之间可相互移动；同章节下试题之间可相互移动；不同章节下试题可跨章节移动；
+### 章节移动：paper/chapterMove
+| 请求参数| 类型    | 描述       | 必填 |
+| --------------- | ------- | ---------- | ---- |
+| sourceId | Integer | 源章节ID | 是   |
+| targetId | Integer | 目标章节ID | 是   |
+
+### 章节或试题移动：paper/questionMove
+###### 只支持同章节下试题移动
 | 请求参数| 类型    | 描述       | 必填 |
 | --------------- | ------- | ---------- | ---- |
 | sourceId | Integer | 源ID | 是   |
@@ -418,7 +425,7 @@ http请求头需添加Authorization字段，
 | questionId | Integer   | 试题ID | 是   |
 | scoreOptions    | Integer[] | 分数选项     | 是   |
 
-### 试卷试题发布：paper/totalScoreUpdate
+### 试卷更新分数：paper/totalScoreUpdate
 ###### 组卷时，总分数由前端计算并显示（加速响应提高用户体验）
 ###### 在关闭浏览器，或在组卷页面点击返回按钮时，调用该接口来更新试卷总分数。
 ###### 浏览器崩溃或前端异常等原因，不能保证一定能调用到该接口，最终由paper/publish接口保证结果的一致性和正确性。
@@ -435,6 +442,8 @@ http请求头需添加Authorization字段，
 | 请求参数| 类型        | 描述       | 必填 |
 | -------- | ----------- | ---------- | ---- |
 | name     | String (16) | 名称       | 否   |
+| paperTypeId| Integer      | 试题分类ID| 否   |
+| state| Integer      | 考试状态| 否   |
 | curPage  | Integer     | 当前第几页 | 否   |
 | pageSize | Integer     | 每页多少条 | 否   |
 
@@ -480,20 +489,6 @@ http请求头需添加Authorization字段，
 | ---- | ------- | ---- | ---- |
 | id   | Integer | 主键 | 是   |
 
-### 考试用户列表：exam/examUserList
-###### 查询当前选中的考试用户时使用
-| 请求参数| 类型    | 描述 | 必填 |
-| ---- | ------- | ---- | ---- |
-| id   | Integer | 主键 | 是   |
-
-| 响应参数| 类型    | 描述     |
-| --------- | ------- | -------- |
-| code      | Integer | 响应码   |
-| msg       | String  | 响应消息 |
-| data.id   | Integer | 主键     |
-| data.name | String  | 名称     |
-| data.orgName | String  | 组织机构名称     |
-
 ### 考试阅卷用户列表：exam/markUserList
 | 请求参数| 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
@@ -527,7 +522,7 @@ http请求头需添加Authorization字段，
 | code      | Integer | 响应码   |
 | msg       | String  | 响应消息 |
 | data.userId| Integer | 用户ID  |
-| data.userId| userName| 用户名称  |
+| data.userName| String  | 用户名称  |
 | data.online| Boolean| 在线状态（true：在线；false：离线）  |
 | data.onlineTime| Date| 离线时间  |
 
@@ -559,8 +554,3 @@ http请求头需添加Authorization字段，
 | parentId| Integer       | 评论父ID（二级节点是有效） | 否   |
 | content | Integer       | 评论内容  | 是   |
 | anon | Integer       | 匿名（1：是；2：否） | 是   |
-
-### 试卷删除：paper/del
-| 请求参数| 类型    | 描述 | 必填 |
-| ---- | ------- | ---- | ---- |
-| id   | Integer | 主键（管理员可以删除，如果ID为一级节点，可以级联删除二级节点） | 是   |
