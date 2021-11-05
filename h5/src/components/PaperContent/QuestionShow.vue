@@ -5,17 +5,27 @@
  * @Author: Che
  * @Date: 2021-09-16 09:46:28
  * @LastEditors: Che
- * @LastEditTime: 2021-09-30 09:49:54
+ * @LastEditTime: 2021-11-02 16:34:09
 -->
 <template>
   <div class="content-center">
     <template v-if="paperQuestion.length">
       <div :id="`p-${paperQuestion[routerIndex].id}`" class="children-content">
         <p
+          v-if="paperQuestion[routerIndex].type !== 3"
           class="question-title"
           v-html="`${routerIndex + 1}、${paperQuestion[routerIndex].title}`"
         ></p>
-
+        <div class="question-title" v-else>
+          <span>{{ routerIndex + 1 }}、</span>
+          <ClozeTitle
+            :title="paperQuestion[routerIndex].title"
+            :preview="preview"
+            :paperQuestion="paperQuestion"
+            :myExamDetailCache="myExamDetailCache"
+            :routerIndex="routerIndex"
+          ></ClozeTitle>
+        </div>
         <!-- 单选 -->
         <template v-if="paperQuestion[routerIndex].type === 1">
           <el-radio-group
@@ -62,30 +72,6 @@
               ></div>
             </el-checkbox>
           </el-checkbox-group>
-        </template>
-
-        <!-- 填空 -->
-        <template
-          v-if="
-            paperQuestion[routerIndex].type === 3 &&
-            myExamDetailCache[paperQuestion[routerIndex].id]
-          "
-        >
-          <el-input
-            class="question-text"
-            @change="updateAnswer(paperQuestion[routerIndex].id)"
-            placeholder="请输入内容"
-            :key="index"
-            :disabled="preview === 'true' ? true : false"
-            v-for="(answer, index) in myExamDetailCache[
-              paperQuestion[routerIndex].id
-            ].answers"
-            v-model="
-              myExamDetailCache[paperQuestion[routerIndex].id].answers[index]
-            "
-          >
-            <template slot="prepend">第{{ index + 1 }}空</template>
-          </el-input>
         </template>
 
         <!-- 判断 -->
@@ -135,7 +121,11 @@
 </template>
 
 <script>
+import ClozeTitle from '../ClozeTitle.vue'
 export default {
+  components: {
+    ClozeTitle,
+  },
   props: {
     preview: {
       type: [String, Boolean],

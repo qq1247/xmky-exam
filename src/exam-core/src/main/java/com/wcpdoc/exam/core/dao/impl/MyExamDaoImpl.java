@@ -2,19 +2,21 @@ package com.wcpdoc.exam.core.dao.impl;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
-import com.wcpdoc.exam.base.cache.DictCache;
+import com.wcpdoc.base.cache.DictCache;
+import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
+import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.core.util.HibernateUtil;
+import com.wcpdoc.core.util.SqlUtil;
+import com.wcpdoc.core.util.ValidateUtil;
+import com.wcpdoc.core.util.SqlUtil.Order;
 import com.wcpdoc.exam.core.dao.MyExamDao;
 import com.wcpdoc.exam.core.entity.MyExam;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
-import com.wcpdoc.exam.core.util.DateUtil;
-import com.wcpdoc.exam.core.util.HibernateUtil;
-import com.wcpdoc.exam.core.util.SqlUtil;
-import com.wcpdoc.exam.core.util.SqlUtil.Order;
-import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
  * 我的考试数据访问层实现
@@ -26,7 +28,7 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT MY_EXAM.ID, EXAM.NAME AS EXAM_NAME, EXAM.START_TIME AS EXAM_START_TIME, "
+		String sql = "SELECT MY_EXAM.ID, EXAM.ID AS EXAM_ID, EXAM.NAME AS EXAM_NAME, EXAM.START_TIME AS EXAM_START_TIME, "
 				+ "		MY_EXAM.ANSWER_START_TIME, MY_EXAM.ANSWER_END_TIME, "
 				+ "		EXAM.END_TIME AS EXAM_END_TIME, PAPER.ID AS PAPER_ID, PAPER.TOTAL_SCORE AS PAPER_TOTAL_SCORE, "
 				+ "		MY_EXAM.STATE AS STATE, MY_EXAM.TOTAL_SCORE AS TOTAL_SCORE, PAPER.SHOW_TYPE AS PAPER_SHOW_TYPE, "
@@ -100,5 +102,15 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 				.addOrder("MY_EXAM.TOTAL_SCORE", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		return pageOut;
+	}
+
+	@Override
+	public List<Map<String, Object>> getUserList(Integer id) {
+		String sql = "SELECT USER.ID, USER.NAME AS NAME, ORG.NAME AS ORG_NAME "
+				+ "FROM SYS_USER USER "
+				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
+				+ "WHERE EXISTS (SELECT 1 FROM EXM_MY_EXAM Z WHERE Z.EXAM_ID = ? AND Z.USER_ID = USER.ID) "//回显的情况下，用户状态!=1的也查询
+				+ "ORDER BY USER.UPDATE_TIME DESC ";
+		return getMapList(sql, new Object[]{id});
 	}
 }

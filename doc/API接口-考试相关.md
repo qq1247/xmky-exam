@@ -1,5 +1,5 @@
-#在线考试接口文档
-######默认值
+# 在线考试接口文档
+## 默认值
 Date样式：yyyy-MM-dd HH:mm:ss
 curPage = 1
 pageSize = 20
@@ -7,29 +7,33 @@ pageSize <= 100
 code == 200 请求正常
 code == 500 服务器内部错误
 code == 401 无权限或登录超时
+| 响应参数  |  类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | Integer  | 响应码 |
+|msg     | String  | 响应消息 |
 
-######默认响应数据
-| 参数 | 类型    | 描述     |
-| ---- | ------- | -------- |
-| code | Integer | 响应码   |
-| msg  | String  | 响应消息 |
-
-######http请求头、响应头
-除api/login/*接口外，http请求头需添加Authorization字段，
-值为api/login/in的响应数据data.accessToken的值。
+## http请求头、响应头
+http请求头需添加Authorization字段，
+值为login/in的响应参数data.accessToken的值。
 如果某次请求，http响应头有Authorization字段，请缓存该值，
 之后的http请求头Authorization字段使用该缓存值，用于令牌续租。
 
-##考试相关
-####试题分类列表：questionType/listpage
-######请求参数
-| 参数     | 类型        | 描述       | 必填 |
+## 接口命名规则
+主业务/子业务。如：user/add
+
+## 接口参数和返回值命名规则
+不带前缀描述，默认表达主业务+字段的意思。如user/add?id=1，id表示用户ID=1
+带前缀描述，表达前缀业务+字段的意思。如user/add?orgId=1，orgId表示机构ID=1
+
+## 考试相关
+### 试题分类列表：questionType/listpage
+| 请求参数| 类型        | 描述       | 必填 |
 | -------- | ----------- | ---------- | ---- |
 | name     | String (16) | 名称       | 否   |
 | curPage  | Integer     | 当前第几页 | 否   |
 | pageSize | Integer     | 每页多少条 | 否   |
-######响应数据
-| 参数                       | 类型    | 描述     |
+
+| 响应参数| 类型    | 描述     |
 | -------------------------- | ------- | -------- |
 | code                       | Integer | 响应码   |
 | msg                        | String  | 响应消息 |
@@ -40,40 +44,41 @@ code == 401 无权限或登录超时
 | data.list[].readUserNames[]  | String[]| 读权限 |
 | data.list[].writeUserNames[] | String[]| 写权限 |
 
-####试题分类添加：questionType/add
-######请求参数
-| 参数 | 类型        | 描述 | 必填 |
+### 试题分类添加：questionType/add
+| 请求参数| 类型        | 描述 | 必填 |
 | ---- | ----------- | ---- | ---- |
 | name | String (16) | 名称 | 是   |
 
-####试题分类修改：questionType/edit
-######请求参数
-| 参数 | 类型        | 描述 | 必填 |
+### 试题分类修改：questionType/edit
+| 请求参数| 类型        | 描述 | 必填 |
 | ---- | ----------- | ---- | ---- |
 | id   | Integer     | 主键 | 是   |
 | name | String (16) | 名称 | 是   |
 
-####试题分类删除：questionType/del
-######请求参数
-| 参数 | 类型    | 描述 | 必填 |
+### 试题分类删除：questionType/del
+| 请求参数| 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
 | id   | Integer | 主键 | 是   |
 
-####试题分类权限：questionType/auth
-######请求参数
-| 参数         | 类型    | 描述   | 必填 |
+### 试题分类权限：questionType/auth
+| 请求参数 | 类型    | 描述   | 必填 |
 | ------------ | ------- | ------ | ---- |
 | id           | Integer | 主键   | 是   |
 | readUserIds  | String  | 读权限 | 否   |
 | writeUserIds | String  | 写权限 | 否   |
 
-####试题分类详情：questionType/get
-######请求参数
-| 参数 | 类型    | 描述 | 必填 |
+### 试题分类合并：questionType/move
+| 请求参数| 类型    | 描述   | 必填 |
+| -------- | ------- | ------ | ---- |
+| sourceId | String  | 源ID   | 是   |
+| targetId | String  | 目标ID | 是   |
+
+### 试题分类详情：questionType/get
+| 请求参数| 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
 | id   | Integer | 主键 | 是   |
-######响应数据
-| 参数                | 类型    | 描述       |
+
+| 响应参数| 类型    | 描述       |
 | ------------------- | ------- | ---------- |
 | code                | Integer | 响应码     |
 | msg                 | String  | 响应消息   |
@@ -85,71 +90,104 @@ code == 401 无权限或登录超时
 | data.readUserIds[]    | String[] | 读权限  |
 | data.writeUserIds[]   | String[] | 写权限  |
 
-####试题分类合并：questionType/move
-######请求参数
-| 参数     | 类型    | 描述   | 必填 |
-| -------- | ------- | ------ | ---- |
-| sourceId | String  | 源ID   | 是   |
-| targetId | String  | 目标ID | 是   |
+### 试卷分类列表：paperType/listpage
+#### 参考questionType/listpage
 
-####试题分类开放列表：questionTypeOpen/listpage
-######请求参数
-| 参数      | 类型    | 描述       | 必填 |
+### 试卷分类添加：paperType/add
+#### 参考questionType/add
+
+### 试卷分类修改：paperType/edit
+#### 参考questionType/edit
+
+### 试卷分类删除：paperType/del
+#### 参考questionType/del
+
+### 试卷分类权限：paperType/auth
+#### 参考questionType/auth
+
+### 试卷分类合并：paperType/move
+#### 参考questionType/move
+
+### 试卷分类详情：paperType/get
+#### 参考questionType/get
+
+### 考试分类列表：examType/listpage
+#### 参考questionType/listpage
+
+### 考试分类添加：examType/add
+#### 参考questionType/add
+
+### 考试分类修改：examType/edit
+#### 参考questionType/edit
+
+### 考试分类删除：examType/del
+#### 参考questionType/del
+
+### 考试分类权限：examType/auth
+#### 参考questionType/auth
+
+### 考试分类合并：examType/move
+#### 参考questionType/move
+
+### 考试分类详情：examType/get
+#### 参考questionType/get
+
+### 试题分类开放列表：questionTypeOpen/listpage
+| 请求参数| 类型    | 描述       | 必填 |
 | --------- | ------- | ---------- | ---- |
 | startTime | Date    | 开始时间   | 否   |
 | endTime   | Date    | 结束时间   | 否   |
 | curPage   | Integer | 当前第几页 | 否   |
 | pageSize  | Integer | 每页多少条 | 否   |
-######响应数据
-| 参数                  | 类型    | 描述         |
+
+| 响应参数| 类型    | 描述         |
 | --------------------- | ------- | ------------ |
 | code                  | Integer | 响应码       |
 | msg                   | String  | 响应消息     |
 | data.total            | Integer | 总行数       |
 | data.list[]           | Object[]   | 分页列表     |
 | data.list[].id        | Integer | 主键         |
-| data.list[].startTime | Date    | 类型         |
-| data.list[].endTime   | Date    | 类型名称     |
-| data.list[].userIds   | String  | 用户IDS      |
-| data.list[].userNames | String  | 用户名称     |
-| data.list[].orgIds    | String  | 组织机构IDS  |
-| data.list[].orgNames  | String  | 组织机构名称 |
+| data.list[].startTime | Date    | 开始时间         |
+| data.list[].endTime   | Date    | 结束时间     |
+| data.list[].userIds   | String  | 授权用户IDS      |
+| data.list[].userNames | String  | 授权用户名称     |
+| data.list[].orgIds    | String  | 授权组织机构IDS  |
+| data.list[].orgNames  | String  | 授权组织机构名称 |
 
-####试题分类开放添加：questionTypeOpen/add
-######请求参数
-| 参数      | 类型         | 描述     | 必填 |
+### 试题分类开放添加：questionTypeOpen/add
+| 请求参数| 类型         | 描述     | 必填 |
 | --------- | ------------ | -------- | ---- |
 | id        | Integer      | 主键     | 是   |
 | startTime | Date         | 开始时间 | 是   |
 | endTime   | Date         | 结束时间 | 是   |
 | userIds   | String(1024) | 授权用户 | 否   |
-| orgIds    | String(1024) | 授权机构 | 是   |
+| orgIds    | String(1024) | 授权机构 | 否   |
 
-####试题分类开放删除：questionTypeOpen/del
-######请求参数
-| 参数 | 类型    | 描述 | 必填 |
+### 试题分类开放删除：questionTypeOpen/del
+| 请求参数| 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
 | id   | Integer | 主键 | 是   |
 
-####试题列表：question/listpage
-######请求参数
-| 参数           | 类型    | 描述         | 必填 |
+### 试题列表：question/listpage
+| 请求参数| 类型    | 描述         | 必填 |
 | -------------- | ------- | ------------ | ---- |
-| id             | Integer | 试卷id       | 否   |
-| name           | String  | 试题分类名称 | 否   |
+| questionTypeId | Integer | 试题分类id   | 否   |
+| questionTypeName| String  | 试题分类名称 | 否   |
+| id             | Integer | 编号（主键）      | 否   |
 | title          | String  | 题干         | 否   |
 | type           | Integer | 类型         | 否   |
-| exPaperId      | Integer | 排除试卷id   | 否   |
-| paperId      | Integer | 试卷id   | 否   |
 | difficulty     | Integer | 难度         | 否   |
-| scoreStart     | Double  | 分值大于     | 否   |
-| scoreEnd       | Double  | 分值小于     | 否   |
-| questionTypeId | Integer | 试题分类id   | 否   |
-| exAi		 | Integer | 排除智能阅卷试题(exAi=1)   | 否   |
+| score     | Double  | 分值等于     | 否   |
+| scoreStart     | Double  | 分值大于等于     | 否   |
+| scoreEnd       | Double  | 分值小于等于     | 否   |
+| ai		 | Integer | 智能阅卷（1：是；2：否） | 否   |
+| paperId      | Integer | 试卷ID   | 否   |
+| exPaperId      | Integer | 排除试卷ID（用于组卷时过滤掉已添加过的试题）   | 否   |
+| state | Integer | 状态（0：删除；1：发布；2：草稿）；默认查询1,2；参数为0则查询最近7天已删除的试题 | 否   |
 | curPage        | Integer | 当前第几页   | 否   |
 | pageSize       | Integer | 每页多少条   | 否   |
-######响应数据
-| 参数                         | 类型    | 描述         |
+
+| 响应参数| 类型    | 描述         |
 | ---------------------------- | ------- | ------------ |
 | code                         | Integer | 响应码       |
 | msg                          | String  | 响应消息     |
@@ -161,188 +199,179 @@ code == 401 无权限或登录超时
 | data.list[].difficulty       | Integer | 难度         |
 | data.list[].difficultyName   | String  | 难度名称     |
 | data.list[].title            | String  | 题干         |
-| data.list[].options[]        | String  | 选项         |
-| data.list[].answer[]           | String  | 答案         |
-| data.list[].analysis         | String  | 解析         |
 | data.list[].state            | Integer | 状态         |
+| data.list[].stateName            | Integer | 状态名称         |
 | data.list[].questionTypeId   | Integer | 试题分类ID   |
 | data.list[].questionTypeName | Integer | 试题分类名称 |
 | data.list[].score            | Double  | 分值         |
-| data.list[].scoreOptions     | String  | 分值选项     |
-| data.list[].no               | Integer | 排序         |
+| data.list[].scoreOptions     | String[]  | 分值选项     |
+| data.list[].scoreOptionNames     | String[]  | 分值选项名称   |
 
-####试题添加：question/add
-######请求参数
-| 参数           | 类型            | 描述                                                                                                                             | 必填 |
-| -------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------- | ---- |
-| type           | Integer         | 类型（1：单选；2：多选；3：填空；4：判断；5：问答                                                                                | 是   |
-| difficulty     | Integer         | 难度（1：极易；2：简单；3：适中；4：困难；5：极难 ）                                                                             | 是   |
-| title          | String（65535） | 题干                                                                                                                             | 是   |
-| options[]      | String[]        | 选项，type为1,2时有效，len <= 7                                                                                                  | 否   |
-| analysis       | String(65535)   | 解析                                                                                                                             | 是   |
-| state          | Integer         | 状态（1：启用；2：禁用 ）                                                                                                        | 是   |
-| questionTypeId | Integer         | 试题分类ID                                                                                                                       | 是   |
-| score          | Double          | 总分值                                                                                                                           | 否   |
-| scoreOptions[]   | Integer[]     | 分值选项                                                                                                                         | 否   |
-| no             | Integer         | 排序                                                                                                                             | 是   |
-| answers[]      | String[]	   	   | 答案（类型为1,4,5，answers.len==1，类型为2,3，answers.len>=1）                                                                   | 是   |
-| scores[]      | Double[]	       | 分值                                                                   														  | 是   |
+### 试题添加：question/add
+| 请求参数| 类型  | 描述    | 必填 |
+| ------ | ----- | ------- | ---- |
+| type           | Integer         | 类型（1：单选；2：多选；3：填空；4：判断；5：问答 | 是   |
+| difficulty     | Integer         | 难度（1：极易；2：简单；3：适中；4：困难；5：极难 ） | 是   |
+| title          | Text | 题干 | 是   |
+| options[]      | String[]        | 选项，type为1,2时有效，len <= 7  | 否   |
+| ai| Integer    | 智能阅卷（1：是；2：否；）  | 是   |
+| analysis       | Text    | 解析  | 是   |
+| questionTypeId | Integer         | 试题分类ID      | 是   |
+| score          | Double          | 分数   | 是   |
+| scoreOptions[] | Integer[] | 分数选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；）|否|
+| answers[]      | String[]	   | 答案（如果是填空或智能问答，会有多个答案）  | 是   |
+| answerScores[] | Double[] | 答案分值（如果是填空或智能问答，表示每空分值；如果是多选，表示漏选分值）  | 是   |
 
-####试题删除：question/edit
-######请求参数
-| 参数                   | 类型    | 描述 | 必填 |
+### 试题修改：question/edit
+| 请求参数| 类型    | 描述 | 必填 |
 | ---------------------- | ------- | ---- | ---- |
 | id                     | Integer | 主键 | 是   |
-| type                   | Integer | 类型 | 无效 |
-| state                  | Integer | 状态 | 无效 |
+| type                   | Integer | 类型（修改无效） | 否 |
 | 其他字段同question/add |         |      |      |  |
 
-####试题删除：question/del
-######请求参数
-| 参数 | 类型    | 描述 | 必填 |
+### 试题删除：question/del
+| 请求参数| 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
 | id   | Integer | 主键 | 是   |
 
-####试题获取：question/get
-######请求参数
-| 参数                   | 类型    | 描述 | 必填 |
-| ---------------------- | ------- | ---- | ---- |
-| id                     | Integer | 主键 | 是   |
-| answers[]		| String[] | 如果当前用户没有读写权限，则数组长度保留，值为空。其他参考question/add | 是   |
+### 试题获取：question/get
+| 请求参数| 类型    | 描述 | 必填 |
+| -------- | ------- | ---- | ---- |
+| id   | Integer | 主键 | 是   |
+| answers[]	| String[] | 如果当前用户没有读写权限，则数组长度保留，值为空。| 是   |
 | 其他字段同question/add |         |      |      |  |
 
-####试题获取：question/copy
-######请求参数
-| 参数 | 类型    | 描述 | 必填 |
+### 试题获取：question/copy
+| 请求参数| 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
 | id   | Integer | 主键 | 是   |
 
-####试题导入：question/wordImp
-######请求参数
-| 参数            | 类型    | 描述       | 必填 |
+### 试题导入：question/wordImp
+| 请求参数| 类型    | 描述       | 必填 |
 | --------------- | ------- | ---------- | ---- |
 | fileId            | fileId    | 附件       | 是   |
 | questionTypeId | Integer | 试题分类ID | 是   |
 
-####试题模板导出：question/wordTemplateExport
-######请求参数
-无
-######响应数据
-字节流
-
-####试卷列表：paper/listpage
-######请求参数
-| 参数     | 类型       | 描述       | 必填 |
+### 试题模板导出：question/wordTemplateExport
+### 试题导出：question/wordExport 暂未实现
+### 试卷列表：paper/listpage
+| 请求参数| 类型       | 描述       | 必填 |
 | -------- | ---------- | ---------- | ---- |
 | name     | String(16) | 试卷名称   | 否   |
-| userName | String(16) | 用户名称   | 否   |
+| state| Integer     | 状态| 否   |
+| paperTypeId| Integer     | 试卷分类ID| 否   |
 | curPage  | Integer    | 当前第几页 | 否   |
 | pageSize | Integer    | 每页多少条 | 否   |
-######响应数据
-| 参数                      | 类型    | 描述                                                             |
-| ------------------------- | ------- | ---------------------------------------------------------------- |
-| code                      | Integer | 响应码                                                           |
-| msg                       | String  | 响应消息                                                         |
-| data.total                | Integer | 总行数                                                           |
-| data.list[]               | Object[]   | 分页列表                                                         |
-| data.list[].id            | Integer | 主键                                                             |
-| data.list[].name          | String  | 名称                                                             |
-| data.list[].state         | Integer | 状态                                                             |
-| data.list[].stateName     | String  | 状态名称                                                         |
-| data.list[].updateUserId  | Integer | 修改人                                                           |
-| data.list[].updateTime    | Date    | 修改时间                                                         |
-| data.list[].passScore     | Double  | 及格分数（百分比）                                               |
-| data.list[].totalScore    | Double  | 总分数                                                           |
-| data.list[].paperTypeId   | Integer | 试卷分类id                                                       |
-| data.list[].paperTypeName | String  | 试卷分类名称                                                     |
-| data.list[].description   | String  | 描述                                                             |
-| data.list[].showType      | Integer | 1：整卷展示；2：章节显示；3：单题展示；数据字典：PAPER_SHOW_TYPE |
-| data.list[].genType       | Integer | 1：人工组卷；2：随机组卷                                         |
 
-####试卷添加：paper/add
-######请求参数
-| 参数                 | 类型          | 描述                                                                                       | 必填 |
-| -------------------- | ------------- | ------------------------------------------------------------------------------------------ | ---- |
-| genType              | Integer       | 1：人工组卷；2：随机组卷                                                                   | 是   |
-| name                 | String(32)    | 名称                                                                                       | 是   |
-| passScore            | Double        | 及格分数（百分比）                                                                         | 是   |
-| readRemark           | String(65535) | 考前阅读                                                                                   | 是   |
-| readNum              | Integer       | 阅读时长【分钟】                                                                           | 是   |
-| showType             | Integer       | 1：整卷展示；2：章节显示；3：单题展示；数据字典：PAPER_SHOW_TYPE                           | 否   |
-| options              | String(32)    | 1：试题乱序；2：选项乱序；3：禁用右键；4：禁止复制；5：最小化警告；数据字典：PAPER_OPTIONS | 否   |
-| minimizeNum          | Integer       | 最小化警告次数                                                                             | 否   |
-| scoreRemark[]        | String[]      | 分数评语                                                                                   | 否   |
-| scoreRemark[].score  | Double        | 分数（%）                                                                                  | 否   |
-| scoreRemark[].remark | String(32)    | 评语                                                                                       | 否   |
+| 响应参数| 类型    | 描述 |
+| ------------------------- | ------- | ---------------- |
+| code                      | Integer | 响应码    |
+| msg                       | String  | 响应消息 |
+| data.total                | Integer | 总行数  |
+| data.list[]               | Object[]   | 分页列表|
+| data.list[].id            | Integer | 主键    |
+| data.list[].name          | String  | 名称   |
+| data.list[].state         | Integer | 状态   |
+| data.list[].stateName     | String  | 状态名称 |
+| data.list[].updateUserId  | Integer | 修改人   |
+| data.list[].updateTime    | Date    | 修改时间  |
+| data.list[].passScore     | Double  | 及格分数（百分比） |
+| data.list[].totalScore    | Double  | 总分数 |
+| data.list[].paperTypeId   | Integer | 试卷分类id  |
+| data.list[].paperTypeName | String  | 试卷分类名称 |
+| data.list[].showType      | Integer | 展示方式（1：整卷展示；2：章节显示；3：单题展示；） |
+| data.list[].showTypeName      | String| 展示方式名称 |
+| data.list[].genType       | Integer | 组卷方式（1：人工组卷；2：随机组卷） |
+| data.list[].genTypeName       | String| 组卷方式名称 |
 
-####试卷修改：paper/edit
-######请求参数
-| 参数                | 类型    | 描述 | 必填 |
+### 试卷添加：paper/add
+######
+| 请求参数             | 类型          | 描述   | 必填 |
+| ---------| ------------- | -------- | ---- |
+| genType | Integer       | 组卷方式（1：人工组卷；2：随机组卷）   | 是   |
+| markType | Integer       | 阅卷方式（1：智能阅卷；2：人工阅卷；）  | 是   |
+| name  | String(32)    | 名称  | 是   |
+| passScore | Double        | 及格分数（百分比） | 是   |
+| showType | Integer       | 展示方式（1：整卷展示；2：章节显示；3：单题展示；）| 否   |
+
+### 试卷修改：paper/edit
+| 请求参数| 类型    | 描述 | 必填 |
 | ------------------- | ------- | ---- | ---- |
 | id                  | Integer | 主键 | 是   |
 | 其他字段同paper/add |         |      |      |  |
 
-####试卷删除：paper/del
-######请求参数
-| 参数 | 类型    | 描述 | 必填 |
+### 试卷删除：paper/del
+| 请求参数| 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
 | id   | Integer | 主键 | 是   |
 
-####试卷详细：paper/get
-######请求参数
-| 参数 | 类型    | 描述   | 必填 |
+### 试卷详细：paper/get
+| 请求参数| 类型    | 描述   | 必填 |
 | ---- | ------- | ------ | ---- |
 | id   | Integer | 试卷ID | 是   |
-######响应数据
-| 参数                | 类型    | 描述     |
+
+| 响应参数| 类型    | 描述     |
 | ------------------- | ------- | -------- |
 | code                | Integer | 响应码   |
 | msg                 | String  | 响应消息 |
 | data.id             | Integer | 试卷主键 |
-| 其他字段同paper/add |         |          |  |
+| data.name | 名称 |
+| data.passScore | 及格分数 |
+| data.totalScore | 总分数 |
+| data.genType | 组件方式 |
+| data.markType | 阅卷方式 |
+| data.showType | 展示方式 |
+| data.state | 状态 |
+| data.paperTypeId | 试卷分类ID |
 
-####试卷拷贝：paper/copy
-######请求参数
-| 参数 | 类型    | 描述 | 必填 |
+### 试卷拷贝：paper/copy
+| 请求参数| 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
 | id   | Integer | 主键 | 是   |
 
-####试卷归档：paper/archive
-######请求参数
-| 参数 | 类型    | 描述 | 必填 |
+### 试卷归档：paper/archive
+| 请求参数| 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
 | id   | Integer | 主键 | 是   |
 
-####章节添加：paper/chapterAdd
-######请求参数
-| 参数        | 类型    | 描述                              | 必填 |
+### 章节添加：paper/chapterAdd
+| 请求参数| 类型    | 描述                              | 必填 |
 | ----------- | ------- | --------------------------------- | ---- |
 | name        | String  | 章节名称                          | 是   |
 | description | String  | 描述                              | 是   |
-| paperId     | Integer | 试卷id                            | 是   |
-| type        | Integer | 1：章节；2：固定试题；3：随机试题 | 是   |
+| paperId     | Integer | 试卷ID                            | 是   |
 
-####章节修改：paper/chapterEdit
-######请求参数
-| 参数        | 类型    | 描述     | 必填 |
+### 章节修改：paper/chapterEdit
+| 请求参数| 类型    | 描述     | 必填 |
 | ----------- | ------- | -------- | ---- |
-| id          | Integer | 章节id   | 是   |
+| chapterId| Integer | 章节id   | 是   |
 | name        | String  | 章节名称 | 是   |
 | description | String  | 描述     | 是   |
 
-####章节删除：paper/chapterDel
-######请求参数
-| 参数 | 类型    | 描述   | 必填 |
+### 章节删除：paper/chapterDel
+| 请求参数| 类型    | 描述   | 必填 |
 | ---- | ------- | ------ | ---- |
-| id   | Integer | 章节id | 是   |
+| chapterId| Integer | 章节id | 是   |
 
-####试卷试题列表：paper/paperQuestionList
-######请求参数
-| 参数 | 类型    | 描述   | 必填 |
+### 章节移动：paper/chapterMove
+| 请求参数| 类型    | 描述       | 必填 |
+| --------------- | ------- | ---------- | ---- |
+| sourceId | Integer | 源章节ID | 是   |
+| targetId | Integer | 目标章节ID | 是   |
+
+### 章节或试题移动：paper/questionMove
+###### 只支持同章节下试题移动
+| 请求参数| 类型    | 描述       | 必填 |
+| --------------- | ------- | ---------- | ---- |
+| sourceId | Integer | 源ID | 是   |
+| targetId | Integer | 目标ID | 是   |
+
+### 试卷试题列表：paper/paperQuestionList
+| 请求参数| 类型    | 描述   | 必填 |
 | ---- | ------- | ------ | ---- |
 | id   | Integer | 试卷id | 否   |
-######响应数据
-| 参数  |  类型   |  描述  |
+
+| 响应参数|  类型   |  描述  |
 | --------   | -----   | -----  |
 |code     | Integer  | 响应码 |
 |msg     | String  | 响应消息 |
@@ -351,7 +380,6 @@ code == 401 无权限或登录超时
 |data.list[].chapter.id  | Integer  | 章节id |
 |data.list[].chapter.name  | String  | 章节名称 |
 |data.list[].chapter.description  | String  | 章节描述 |
-|data.list[].chapter.parentId  | Integer  | 父id（树形结构的ID） |
 |data.list[].questionList[].id  | Integer  | 试题id |
 |data.list[].questionList[].type  | Integer  | 试题类型，参考question/add |
 |data.list[].questionList[].typeName  | String  | 试题类型名称 |
@@ -362,76 +390,65 @@ code == 401 无权限或登录超时
 |data.list[].questionList[].analysis  | String  | 试题解析 |
 |data.list[].questionList[].score  | Double  | 试题分数 |
 |data.list[].questionList[].updateUserName  | String  | 更新用户 |
-|data.list[].questionList[].paperQuestionId  | String  | 试卷试题ID |
 |data.list[].questionList[].scoreOptions  | String  | 试题分数选项，参考question/add |
 |data.list[].questionList[].options[]  | String[]  | 试题选项，参考question/add |
 
-####试卷试题添加：paper/questionAdd
-######请求参数
-| 参数        | 类型      | 描述   | 必填 |
+### 试卷试题添加：paper/questionAdd
+| 请求参数| 类型      | 描述   | 必填 |
 | ----------- | --------- | ------ | ---- |
 | chapterId   | Integer   | 章节id | 是   |
 | questionIds | Integer[] | 试题id | 是   |
 
-####试卷试题删除：paper/questionDel
-######请求参数
-| 参数            | 类型    | 描述       | 必填 |
+### 试卷试题删除：paper/questionDel
+| 请求参数| 类型    | 描述       | 必填 |
 | --------------- | ------- | ---------- | ---- |
-| paperQuestionId | Integer | 试卷试题id | 是   |
+| id| Integer | 主键| 是   |
+| questionId| Integer | 试题ID | 是   |
 
-####试卷试题清空：paper/questionClear
-######请求参数
-| 参数      | 类型    | 描述   | 必填 |
+### 试卷试题清空：paper/questionClear
+| 请求参数| 类型    | 描述   | 必填 |
 | --------- | ------- | ------ | ---- |
 | chapterId | Integer | 章节id | 是   |
 
-####试卷试题设置分值：paper/updateScore
-######请求参数
-| 参数            | 类型    | 描述       | 必填 |
+### 试卷试题设置分值：paper/scoreUpdate
+| 请求参数| 类型    | 描述       | 必填 |
 | --------------- | ------- | ---------- | ---- |
-| paperQuestionId | Integer | 试题试卷id | 是   |
-| score           | Double  | 分值       | 是   |
-| paperQuestionAnswerId | Integer | 试题试卷答案id | 是 |
-| paperQuestionAnswerScore    | Double  | 试题试卷答案分值  | 是   |
+| id| Integer | 主键 | 是   |
+| questionId| Integer  | 试卷ID       | 是   |
+| socre | Double  | 分数 | 是 |
+| subScores| Double  | 每空分数（试题为智能阅卷，并且是填空或问答时有效） | 是   |
 
-####试卷试题设置分数选项：paper/updateScoreOptions
-######请求参数
-| 参数            | 类型      | 描述       | 必填 |
+### 试卷设置分数选项：paper/scoreOptionUpdate
+| 请求参数| 类型      | 描述       | 必填 |
 | --------------- | --------- | ---------- | ---- |
-| paperQuestionId | Integer   | 试题试卷id | 是   |
-| scoreOptions    | Integer[] | 选项       | 是   |
+| id | Integer   | 主键 | 是   |
+| questionId | Integer   | 试题ID | 是   |
+| scoreOptions    | Integer[] | 分数选项     | 是   |
 
-####试卷试题批量设置分数：paper/updateBatchScore
-######请求参数
-| 参数      | 类型    | 描述   | 必填 |
-| --------- | ------- | ------ | ---- |
-| chapterId | Integer | 章节id | 是   |
-| score     | Double  | 分数   | 是   |
-| options   | String  | 选项   | 是   |
-
-####章节试题移动：paper/movePosition
-######请求参数
-| 参数            | 类型    | 描述       | 必填 |
-| --------------- | ------- | ---------- | ---- |
-| sourceId | Integer | 源ID | 是   |
-| targetId | Integer | 目标ID | 是   |
-
-####试卷试题发布：paper/publish
-######请求参数
-| 参数 | 类型    | 描述   | 必填 |
+### 试卷更新分数：paper/totalScoreUpdate
+###### 组卷时，总分数由前端计算并显示（加速响应提高用户体验）
+###### 在关闭浏览器，或在组卷页面点击返回按钮时，调用该接口来更新试卷总分数。
+###### 浏览器崩溃或前端异常等原因，不能保证一定能调用到该接口，最终由paper/publish接口保证结果的一致性和正确性。
+| 请求参数| 类型    | 描述   | 必填 |
 | ---- | ------- | ------ | ---- |
 | id   | Integer | 试卷id | 是   |
 
-####考试列表：exam/listpage
-######请求参数
-| 参数     | 类型        | 描述       | 必填 |
+### 试卷试题发布：paper/publish
+| 请求参数| 类型    | 描述   | 必填 |
+| ---- | ------- | ------ | ---- |
+| id   | Integer | 试卷id | 是   |
+
+### 考试列表：exam/listpage
+| 请求参数| 类型        | 描述       | 必填 |
 | -------- | ----------- | ---------- | ---- |
 | name     | String (16) | 名称       | 否   |
+| paperTypeId| Integer      | 试题分类ID| 否   |
+| state| Integer      | 考试状态| 否   |
 | curPage  | Integer     | 当前第几页 | 否   |
 | pageSize | Integer     | 每页多少条 | 否   |
-######响应数据
-| 参数             | 类型    | 描述     |
-| ---------------- | ------- | -------- |
+
+| 响应参数| 类型    | 描述     |
+| ---------------- | ------- | ------- |
 | code             | Integer | 响应码   |
 | msg              | String  | 响应消息 |
 | data.total       | Integer | 总行数   |
@@ -439,85 +456,101 @@ code == 401 无权限或登录超时
 | data.list[].id   | Integer | 主键     |
 | data.list[].name | String  | 名称     |
 
-####考试添加：exam/add
-######请求参数
-| 参数          | 类型        | 描述                         		| 必填 |
+### 考试添加：exam/add
+| 请求参数| 类型        | 描述                         		| 必填 |
 | ------------- | ----------- | ------------------------------------| ---- |
-| name          | String (16) | 名称                         		| 是   |
-| startTime     | Date        | 考试开始时间                		| 是   |
-| endTime       | Date        | 考试结束时间                 		| 是   |
-| markStartTime | Date        | 阅卷开始时间               		    | 是   |
-| markEndTime   | Date        | 阅卷结束时间                		| 是   |
-| scoreState    | Integer     | 成绩状态：1：公开；2：不公开        | 是   |
-| rankState     | Integer     | 排名状态：1：公开；2：不公开 		| 是   |
-| loginType     | Integer     | 登录方式：1：安排考试；2：免登陆考试| 是   |
-| description   | String      | 描述						        | 是   |
-| paperId       | Integer     | 试卷ID                              | 是   |
-| examTypeId    | Integer     | 考试分类ID                          | 是   |
+| name          | String (16) | 名称  | 是   |
+| startTime     | Date        | 考试开始时间 | 是   |
+| endTime       | Date        | 考试结束时间  | 是   |
+| markStartTime | Date        | 阅卷开始时间 （试卷为智能阅卷时有效）| 否   |
+| markEndTime   | Date        | 阅卷结束时间 （试卷为智能阅卷时有效）| 否   |
+| paperId       | Integer     | 试卷ID  | 是   |
+| examTypeId    | Integer     | 考试分类ID | 是   |
 
-####考试修改：exam/edit
-######请求参数
-| 参数                 | 类型    | 描述 | 必填 |
+### 考试修改：exam/edit
+| 请求参数| 类型    | 描述 | 必填 |
 | -------------------- | ------- | ---- | ---- |
 | id                   | Integer | 主键 | 是   |
+| examTypeId    | Integer     | 修改无效 | 是   |
 | 其他字段参考exam/add |         |      |      | 
 
-####考试删除：exam/del
-######请求参数
-| 参数 | 类型    | 描述 | 必填 |
+### 考试删除：exam/del
+| 请求参数| 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
 | id   | Integer | 主键 | 是   |
 
-####考试发布：exam/publish
-######请求参数
-| 参数 | 类型    | 描述 | 必填 |
+### 考试发布：exam/publish
+| 请求参数| 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
 | id   | Integer | 主键 | 是   |
 
-####考试更新考试用户：exam/updateExamUser
-######请求参数
-| 参数    | 类型      | 描述        | 必填 |
-| ------- | --------- | ----------- | ---- |
-| id      | Integer   | 主键        | 是   |
-| userIds | Integer[] | 考试用户IDS | 是   |
+### 考试归档：exam/archive
+| 请求参数| 类型    | 描述 | 必填 |
+| ---- | ------- | ---- | ---- |
+| id   | Integer | 主键 | 是   |
 
-####考试更新判卷用户：exam/updateMarkUser
-######请求参数
-| 参数        | 类型      | 描述        | 必填 |
+### 考试阅卷用户列表：exam/markUserList
+| 请求参数| 类型    | 描述 | 必填 |
+| ---- | ------- | ---- | ---- |
+| id   | Integer | 主键 | 是   |
+
+| 响应参数| 类型    | 描述     |
+| --------- | ------- | -------- |
+| code      | Integer | 响应码   |
+| msg       | String  | 响应消息 |
+| data[].markUserId   | Integer | 阅卷用户ID（智能阅卷时有效）     |
+| data[].markUserName | String  | 阅卷用户名称（智能阅卷时有效） |
+| data[].examUserList[].id | Integer  | 考试用户ID |
+| data[].examUserList[].name | String  | 考试用户名称 |
+| data[].examUserList[].orgName | String  | 考试用户组织机构 |
+
+### 考试阅卷设置：exam/updateMarkSet
+| 请求参数| 类型      | 描述        | 必填 |
 | ----------- | --------- | ----------- | ---- |
 | id          | Integer   | 主键        | 是   |
 | markUserIds | Integer[] | 阅卷用户IDS | 是   |
-| examUserIds | Integer[] | 考试用户IDS | 否   |
-| questionIds | Integer[] | 试题IDS     | 否   |
+| examUserIds | Integer[] | 考试用户IDS | 是   |
 
-####考试用户列表：exam/examUserList
-######请求参数
-| 参数 | 类型    | 描述 | 必填 |
-| ---- | ------- | ---- | ---- |
-| id   | Integer | 主键 | 是   |
-######响应数据
-| 参数      | 类型    | 描述     |
+
+### 考试在线用户：exam/onlineUser
+| 请求参数| 类型      | 描述        | 必填 |
+| ----------- | --------- | ----------- | ---- |
+| id          | Integer   | 主键        | 是   |
+
+| 响应参数| 类型    | 描述     |
 | --------- | ------- | -------- |
 | code      | Integer | 响应码   |
 | msg       | String  | 响应消息 |
-| data.id   | Integer | 主键     |
-| data.name | String  | 名称     |
-| data.orgName | String  | 组织机构名称     |
+| data.userId| Integer | 用户ID  |
+| data.userName| String  | 用户名称  |
+| data.online| Boolean| 在线状态（true：在线；false：离线）  |
+| data.onlineTime| Date| 离线时间  |
 
-####考试阅卷列表：exam/markUserList
-######请求参数
-| 参数 | 类型    | 描述 | 必填 |
-| ---- | ------- | ---- | ---- |
-| id   | Integer | 主键 | 是   |
-######响应数据
-| 参数      | 类型    | 描述     |
-| --------- | ------- | -------- |
-| code      | Integer | 响应码   |
-| msg       | String  | 响应消息 |
-| data.markUserId   | Integer | 阅卷用户ID     |
-| data.markUserName | String  | 阅卷用户名称 |
-| data.examUserList[].id | Integer  | 考试用户ID |
-| data.examUserList[].name | String  | 考试用户名称 |
-| data.examUserList[].orgName | String  | 考试用户组织机构 |
-| data.questionList[].id | Integer  | 试题ID |
-| data.questionList[].title | Integer  | 试题题干 |
+### 试题评论列表：questionComment/listpage
+| 请求参数| 类型       | 描述       | 必填 |
+| -------- | ---------- | ---------- | ---- |
+| questionId| Integer | 试题ID | 是   |
+| parentId | Integer  | 父评论ID | 否   |
+| curPage  | Integer    | 当前第几页 | 否   |
+| pageSize | Integer    | 每页多少条 | 否   |
+
+| 响应参数| 类型    | 描述 |
+| ------------------------- | ------- | ---------------- |
+| code                      | Integer | 响应码    |
+| msg                       | String  | 响应消息 |
+| data.total                | Integer | 总行数  |
+| data.list[]               | Object[]   | 分页列表|
+| data.list[].id            | Integer | 主键    |
+| data.list[].content | Text  | 内容   |
+| data.list[].createUserId| Integer | 评论用户ID  |
+| data.list[].createUserName| String  | 评论用户名称 |
+| data.list[].createTime| Date | 评论时间   |
+
+### 试题评论添加：questionComment/add
+######
+| 请求参数             | 类型          | 描述   | 必填 |
+| ---------| ------------- | -------- | ---- |
+| questionId| Integer       | 试题ID | 是   |
+| parentId| Integer       | 评论父ID（二级节点是有效） | 否   |
+| content | Integer       | 评论内容  | 是   |
+| anon | Integer       | 匿名（1：是；2：否） | 是   |

@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-11 16:27:54
  * @LastEditors: Che
- * @LastEditTime: 2021-08-23 14:34:11
+ * @LastEditTime: 2021-11-03 10:33:56
  */
 
 import request from './request'
@@ -30,15 +30,16 @@ export const paperQuestionClear = (params) =>
   request('paper/questionClear', params)
 export const paperQuestionPublish = (params) => request('paper/publish', params)
 
-export const paperMovePosition = (params) =>
-  request('paper/movePosition', params)
-export const paperUpdateScore = (params) => request('paper/updateScore', params)
-export const paperUpdateScoreOptions = (params) =>
-  request('paper/updateScoreOptions', params)
+export const paperChapterMove = (params) => request('paper/chapterMove', params)
+export const paperQuestionMove = (params) =>
+  request('paper/questionMove', params)
+export const paperScoreUpdate = (params) => request('paper/scoreUpdate', params)
+export const paperScoreOptionUpdate = (params) =>
+  request('paper/scoreOptionUpdate', params)
 export const paperBatchScoreUpdate = (params) =>
   request('paper/batchScoreUpdate', params)
-export const paperTotalScore = (params) =>
-  request('paper/updateTotalScore', params)
+export const paperTotalScoreUpdate = (params) =>
+  request('paper/totalScoreUpdate', params)
 export const paperTypeListPage = (params) =>
   request('paperType/listpage', params)
 export const paperTypeAdd = (params) => request('paperType/add', params)

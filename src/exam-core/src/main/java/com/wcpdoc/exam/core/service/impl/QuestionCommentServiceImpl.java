@@ -8,12 +8,13 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.exam.core.dao.BaseDao;
+import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.service.impl.BaseServiceImp;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.QuestionCommentDao;
 import com.wcpdoc.exam.core.entity.QuestionComment;
-import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.QuestionCommentService;
-import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
  * 试题评论服务层实现

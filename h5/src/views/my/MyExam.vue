@@ -24,8 +24,8 @@
           v-if="showType === '1'"
           :preview="preview"
           :paperQuestion="paperQuestion"
-          @updateAnswer="updateAnswer"
           :myExamDetailCache="myExamDetailCache"
+          @updateAnswer="updateAnswer"
         ></page-show>
 
         <question-show
@@ -73,11 +73,12 @@ export default {
   data() {
     return {
       id: 0,
-      showType: 1,
-      preview: false,
+      examId: null,
+      paperId: null,
       paperName: '',
       hrefPointer: '',
-      paperId: 0,
+      showType: 1,
+      preview: false,
       pageSize: 10,
       curPage: 1,
       pageTotal: 0,
@@ -93,8 +94,10 @@ export default {
     }
   },
   created() {
-    const { id, paperId, preview, examEndTime, showType } = this.$route.query
+    const { id, examId, paperId, preview, examEndTime, showType } =
+      this.$route.query
     this.id = id
+    this.examId = examId
     this.paperId = paperId
     this.preview = preview
     this.examEndTime = examEndTime
@@ -135,10 +138,6 @@ export default {
         const res = await paperQuestionList({
           id: this.paperId,
         })
-        res.data.map((item) => {
-          item.chapter.show = true
-        })
-
         if (this.showType === '1') {
           this.paperQuestion = res.data
           this.questionRouter = Array.from(res.data.keys())
@@ -225,7 +224,7 @@ export default {
       }
     },
     // 更新答案
-    async updateAnswer(questionId, answers) {
+    async updateAnswer(questionId) {
       if (this.preview === 'true') {
         return
       }
@@ -234,8 +233,9 @@ export default {
         this.$message.error('提交答案失败，请联系管理员！')
         return
       }
-
       const res = await myExamUpdateAnswer({
+        examId: this.examId,
+        questionId,
         myExamDetailId: this.myExamDetailCache[questionId].myExamDetailId,
         answers: this.myExamDetailCache[questionId].answers,
       })
@@ -280,7 +280,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
       }).then(async () => {
-        const res = await myExamDoAnswer({ myExamId: this.id })
+        const res = await myExamDoAnswer({ examId: this.examId })
         res?.code === 200
           ? this.$router.replace({
               path: '/my',
@@ -295,10 +295,12 @@ export default {
         type: 'info',
         showClose: false,
       }).then(async () => {
-        const res = await myExamDoAnswer({ myExamId: this.id })
-        this.$router.replace({
-          path: '/my',
-        })
+        const res = await myExamDoAnswer({ examId: this.examId })
+        res?.code === 200
+          ? this.$router.replace({
+              path: '/my',
+            })
+          : this.$message.warning('请重新提交试卷！')
       })
     },
     // 定位锚点

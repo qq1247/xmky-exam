@@ -7,9 +7,9 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
-import com.wcpdoc.exam.core.util.DateUtil;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
+import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.exam.report.dao.GradeDao;
 import com.wcpdoc.exam.report.service.GradeService;
 

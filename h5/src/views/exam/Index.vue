@@ -20,16 +20,11 @@
     <!-- 内容 -->
     <div class="content">
       <div class="exam-list">
-        <div class="exam-item">
-          <div
-            class="exam-content exam-add"
-            @click=";(examForm.show = true), (examForm.edit = false)"
-          >
-            <i class="common common-plus"></i>
-            <span>添加考试分类</span>
-          </div>
-        </div>
-        <ListCard
+        <AddCard
+          add-title="添加考试分类"
+          @addCard=";(examForm.show = true), (examForm.edit = false)"
+        ></AddCard>
+        <IndexCard
           v-for="(item, index) in typeList"
           :key="index"
           :data="item"
@@ -38,7 +33,7 @@
           @del="del"
           @role="role"
           @detail="goDetail"
-        ></ListCard>
+        ></IndexCard>
       </div>
       <el-pagination
         background
@@ -148,11 +143,13 @@ import {
   examTypeAuth,
 } from 'api/exam'
 import { userListPage } from 'api/user'
-import ListCard from 'components/ListCard.vue'
+import AddCard from 'components/ListCard/AddCard.vue'
+import IndexCard from 'components/ListCard/IndexCard.vue'
 import CustomSelect from 'components/CustomSelect.vue'
 export default {
   components: {
-    ListCard,
+    AddCard,
+    IndexCard,
     CustomSelect,
   },
   data() {

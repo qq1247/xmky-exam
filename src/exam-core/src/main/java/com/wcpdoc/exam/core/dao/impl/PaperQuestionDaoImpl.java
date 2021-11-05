@@ -4,9 +4,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
+import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.exam.core.dao.PaperQuestionDao;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 
 /**
@@ -44,11 +45,5 @@ public class PaperQuestionDaoImpl extends RBaseDaoImpl<PaperQuestion> implements
 	public PaperQuestion getEntity(Integer paperId, Integer questionId) {
 		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = ? AND QUESTION_ID = ?";
 		return getEntity(sql, new Object[]{paperId, questionId}, PaperQuestion.class);
-	}
-
-	@Override
-	public PaperQuestion getEntityByChapter(Integer parentId, Integer questionId) {
-		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PARENT_ID = ? AND QUESTION_ID = ?";
-		return getEntity(sql, new Object[]{parentId, questionId}, PaperQuestion.class);
 	}
 }

@@ -37,9 +37,15 @@
   cursor: pointer;
   text-align: center;
   transition: all 0.3s ease;
+  position: relative;
   &:hover {
     transform: translateY(-3px);
     box-shadow: 0 10px 16px -10px rgba(95, 101, 105, 0.15);
+  }
+  .tagGroup {
+    position: absolute;
+    right: 0;
+    top: 7px;
   }
   .title {
     font-size: 16px;
@@ -50,15 +56,20 @@
     overflow: hidden;
   }
   .content-info {
-    font-size: 12px;
+    font-size: 13px;
     color: #9199a1;
     margin-top: 10px;
     width: 100%;
     text-align: center;
     padding: 0 20px;
-    .space {
-      margin-right: 20px;
+    .info-state {
+      color: #ff9900;
     }
+  }
+  .count-down {
+    font-size: 13px;
+    margin-top: 10px;
+    color: #e50013;
   }
   .handler {
     span {

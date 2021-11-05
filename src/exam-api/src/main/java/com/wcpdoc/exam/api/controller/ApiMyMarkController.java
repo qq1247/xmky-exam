@@ -2,7 +2,6 @@ package com.wcpdoc.exam.api.controller;
 
 import java.math.BigDecimal;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.annotation.Resource;
 
@@ -12,20 +11,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wcpdoc.exam.base.cache.ProgressBarCache;
-import com.wcpdoc.exam.core.controller.BaseController;
-import com.wcpdoc.exam.core.entity.LoginUser;
-import com.wcpdoc.exam.core.entity.MyMark;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
-import com.wcpdoc.exam.core.entity.PageResult;
-import com.wcpdoc.exam.core.entity.PageResultEx;
-import com.wcpdoc.exam.core.exception.MyException;
+import com.wcpdoc.core.controller.BaseController;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
+import com.wcpdoc.core.entity.PageResult;
+import com.wcpdoc.core.entity.PageResultEx;
+import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.exam.core.service.ExamService;
-import com.wcpdoc.exam.core.service.MyExamDetailService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
-import com.wcpdoc.exam.core.util.SpringUtil;
 
 /**
  * 我的阅卷控制层
@@ -91,43 +85,26 @@ public class ApiMyMarkController extends BaseController {
 	}
 	
 	/**
-	 * 添加阅卷
+	 * 阅卷
 	 * 
 	 * v1.0 zhanghc 2017年6月26日下午12:30:20
 	 * @param examId
-	 * @return PageResult
-	 */
-	@RequestMapping("/add")
-	@ResponseBody
-	public PageResult add(MyMark myMark) {
-		try {
-			myMarkService.add(myMark);
-			return PageResultEx.ok();
-		} catch (Exception e) {
-			log.error("添加错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 更新阅卷分数
-	 * 
-	 * v1.0 zhanghc 2017年6月26日下午12:30:20
-	 * @param myExamDetailId
+	 * @param userId
+	 * @param questionId
 	 * @param score
 	 * @return PageResult
 	 */
 	@RequestMapping("/updateScore")
 	@ResponseBody
-	public PageResult updateScore(Integer myExamDetailId, BigDecimal score) {
+	public PageResult updateScore(Integer examId, Integer userId, Integer questionId, BigDecimal score) {
 		try {
-			myMarkService.updateScore(myExamDetailId, score);
+			myMarkService.updateScore(examId, userId, questionId, score);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("更新分数错误：", e);
+			log.error("阅卷错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("更新分数错误：", e);
+			log.error("阅卷错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -141,42 +118,15 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/doScore")
 	@ResponseBody
-	public PageResult doScore(Integer examId, Integer userId, Integer markId) {
+	public PageResult doScore(Integer examId, Integer userId) {
 		try {
-			myMarkService.doScore(examId, userId, markId);
+			myMarkService.doScore(examId, userId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成阅卷错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成阅卷错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 完成自动阅卷
-	 * 
-	 * v1.0 zhanghc 2017年6月26日下午12:30:20
-	 * @param examId
-	 * @return PageResult
-	 */
-	@RequestMapping("/autoScore")
-	@ResponseBody
-	public PageResult autoScore(Integer id, Integer examId) {
-		try {
-			String processBarId = UUID.randomUUID().toString().replaceAll("-", "");
-			LoginUser curUser = getCurUser();
-			ProgressBarCache.setProgressBar(processBarId, 0.0, 10.0, null, 0);
-			new Thread(new Runnable() {
-				public void run() {
-					SpringUtil.getBean(MyExamDetailService.class).autoMark(id, examId, curUser, processBarId);
-				}
-			}).start();
-			
-			return PageResultEx.ok().data(processBarId);
-		} catch (Exception e) {
-			log.error("完成试卷错误：", e);
 			return PageResult.err();
 		}
 	}

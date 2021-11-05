@@ -77,7 +77,11 @@
               ></el-input>
             </el-form-item>
             <el-form-item>
-              <el-select placeholder="请选择类型" v-model="queryForm.type">
+              <el-select
+                clearable
+                placeholder="请选择类型"
+                v-model="queryForm.type"
+              >
                 <el-option
                   :key="parseInt(dict.dictKey)"
                   :label="dict.dictValue"
@@ -88,6 +92,7 @@
             </el-form-item>
             <el-form-item>
               <el-select
+                clearable
                 placeholder="请选择难度"
                 v-model="queryForm.difficulty"
               >
@@ -372,7 +377,9 @@
                               :key="answer.id"
                               class="answers-item"
                             >
-                              <span>{{ `填空${index + 1}、` }}</span>
+                              <span>{{
+                                `填空${$tools.intToChinese(index + 1)}、`
+                              }}</span>
                               <span
                                 class="answers-tag"
                                 v-for="(ans, index) in answer.answer"
@@ -391,7 +398,9 @@
                                 :key="answer.id"
                                 class="answers-item"
                               >
-                                <span>{{ `关键词${index + 1}、` }}</span>
+                                <span>{{
+                                  `关键词${$tools.intToChinese(index + 1)}、`
+                                }}</span>
                                 <span
                                   class="answers-tag"
                                   v-for="(ans, index) in answer.answer"
@@ -430,9 +439,6 @@
                         <el-tag effect="plain" size="mini" type="warning"
                           >{{ child.score }}分</el-tag
                         >
-                        <el-tag effect="plain" size="mini" type="info">
-                          {{ child.updateUserName }}
-                        </el-tag>
                       </div>
                       <div class="children-buts">
                         <el-button
@@ -444,7 +450,7 @@
                           >设置</el-button
                         >
                         <el-button
-                          @click="del(child.paperQuestionId)"
+                          @click="del(child.id)"
                           class="btn"
                           icon="el-icon-delete"
                           round
@@ -523,7 +529,9 @@
               v-for="(answer, index) in settingForm.answers"
               :key="index"
               :label="
-                settingForm.type === 3 ? `填空${index+1}` : `关键词${index+1}`
+                settingForm.type === 3
+                  ? `填空${$tools.intToChinese(index + 1)}`
+                  : `关键词${$tools.intToChinese(index + 1)}`
               "
               :prop="`answers.${index}.score`"
               :rules="settingForm.rules.aiScore"
@@ -618,11 +626,12 @@ import {
   paperChapterDel,
   paperQuestionClear,
   paperQuestionDel,
-  paperUpdateScore,
+  paperScoreUpdate,
   paperQuestionAdd,
-  paperMovePosition,
-  paperTotalScore,
-  paperUpdateScoreOptions,
+  paperChapterMove,
+  paperQuestionMove,
+  paperTotalScoreUpdate,
+  paperScoreOptionUpdate,
 } from 'api/paper'
 import { questionListPage, randomListPage } from 'api/question'
 import Draggable from 'vuedraggable'
@@ -667,6 +676,7 @@ export default {
       paperId: 0,
       paperState: 2,
       paperTypeId: 0,
+      markType: 1,
       paperName: '',
       pageSize: 5,
       curPage: 1,
@@ -699,7 +709,7 @@ export default {
       paperQuestion: [],
       settingForm: {
         show: false,
-        paperQuestionId: null,
+        questionId: null,
         type: 1,
         score: 1,
         answers: [],
@@ -714,10 +724,11 @@ export default {
     }
   },
   created() {
-    const { id, name, state } = this.$route.query
+    const { id, name, state, markType } = this.$route.query
     this.paperId = id
     this.paperName = name
     this.paperState = state
+    this.markType = markType
     this.init()
   },
   methods: {
@@ -760,6 +771,8 @@ export default {
     async queryQuestion() {
       const res = await questionListPage({
         id: this.queryForm.id,
+        ai: this.markType === 1 ? 1 : '',
+        state: 1,
         type: this.queryForm.type,
         title: this.queryForm.title,
         questionTypeName: this.queryForm.questionTypeName,
@@ -767,7 +780,6 @@ export default {
         scoreStart: this.queryForm.score,
         scoreEnd: this.queryForm.score,
         exPaperId: this.paperId,
-        state: 1,
         curPage: this.curPage,
         pageSize: this.pageSize,
       })
@@ -842,7 +854,7 @@ export default {
     // 编辑章节
     async paperChapterEdit() {
       const res = await paperChapterEdit({
-        id: this.chapterForm.id,
+        chapterId: this.chapterForm.id,
         name: this.chapterForm.name,
         description: this.chapterForm.description,
       })
@@ -856,7 +868,7 @@ export default {
         type: 'warning',
       })
         .then(async () => {
-          const res = await paperChapterDel({ id })
+          const res = await paperChapterDel({ chapterId: id })
           this.refreshData(res, '删除章节')
         })
         .catch((err) => {
@@ -888,14 +900,14 @@ export default {
         })
     },
     // 删除试题
-    del(paperQuestionId) {
+    del(questionId) {
       this.$confirm(`确认删除该试题吗？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
       })
         .then(async () => {
-          const res = await paperQuestionDel({ paperQuestionId })
+          const res = await paperQuestionDel({ id: this.paperId, questionId })
           this.refreshData(res, '删除试题')
         })
         .catch((err) => {
@@ -913,7 +925,7 @@ export default {
     },
     // 设置分数
     setting(data) {
-      this.settingForm.paperQuestionId = data.paperQuestionId
+      this.settingForm.questionId = data.id
       this.settingForm.type = data.type
       this.settingForm.ai = data.ai
       this.settingForm.score = data.score
@@ -929,14 +941,8 @@ export default {
     },
     // 设置分数
     setScore() {
-      let paperQuestionAnswerId = []
       let paperQuestionAnswerScore = []
       if (this.settingForm.ai === 1) {
-        paperQuestionAnswerId = this.settingForm.answers.reduce((acc, cur) => {
-          acc.push(cur.id)
-          return acc
-        }, [])
-
         if (this.settingForm.type === 2) {
           paperQuestionAnswerScore = this.settingForm.answers.reduce((acc) => {
             acc.push(this.settingForm.multipScore)
@@ -957,12 +963,11 @@ export default {
         if (!valid) {
           return false
         }
-
-        const updateScore = await paperUpdateScore({
-          paperQuestionId: this.settingForm.paperQuestionId,
+        const updateScore = await paperScoreUpdate({
+          id: this.paperId,
+          questionId: this.settingForm.questionId,
           score: this.settingForm.score,
-          paperQuestionAnswerId: paperQuestionAnswerId,
-          paperQuestionAnswerScore:
+          subScores:
             this.settingForm.type === 2
               ? this.settingForm.scoreOptions.length === 0
                 ? []
@@ -976,8 +981,9 @@ export default {
           [2, 3, 5].includes(this.settingForm.type) &&
           this.settingForm.ai === 1
         ) {
-          updateScoreOptions = await paperUpdateScoreOptions({
-            paperQuestionId: this.settingForm.paperQuestionId,
+          updateScoreOptions = await paperScoreOptionUpdate({
+            id: this.paperId,
+            questionId: this.settingForm.questionId,
             scoreOptions: this.settingForm.scoreOptions,
           })
         }
@@ -1026,7 +1032,7 @@ export default {
     async chapterMove({ newIndex, oldIndex }) {
       const sourceId = this.paperQuestion[newIndex].chapter.id
       const targetId = this.paperQuestion[oldIndex].chapter.id
-      const res = await paperMovePosition({
+      const res = await paperChapterMove({
         sourceId,
         targetId,
       })
@@ -1037,20 +1043,23 @@ export default {
     },
     // 试题移动
     async questionMove({ to, from, newIndex, oldIndex }) {
+      console.log(to)
+      console.log(from)
       const toChapterId = to.dataset.id
       const fromChapterId = from.dataset.id
       let sourceId, targetId
       if (toChapterId === fromChapterId) {
         const sourceQuestion = this.filterQuestion(toChapterId)
-        sourceId = sourceQuestion[newIndex].paperQuestionId
-        targetId = sourceQuestion[oldIndex].paperQuestionId
+        sourceId = sourceQuestion[newIndex].id
+        targetId = sourceQuestion[oldIndex].id
       } else {
         const sourceQuestion = this.filterQuestion(toChapterId)
-        sourceId = sourceQuestion[newIndex].paperQuestionId
-        targetId = toChapterId
+        sourceId = sourceQuestion[newIndex].id
+        targetId = sourceQuestion[oldIndex].id
       }
 
-      const res = await paperMovePosition({
+      const res = await paperQuestionMove({
+        id: this.paperId,
         sourceId,
         targetId,
       })
@@ -1084,9 +1093,8 @@ export default {
   },
   beforeDestroy() {
     if (this.paperState === '1') return false
-    paperTotalScore({
+    paperTotalScoreUpdate({
       id: this.paperId,
-      totalScore: this.totalScore,
     })
   },
 }

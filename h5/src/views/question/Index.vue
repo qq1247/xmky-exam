@@ -21,27 +21,23 @@
     <!-- 内容 -->
     <div class="content">
       <div class="exam-list">
-        <div class="exam-item">
-          <div
-            class="exam-content exam-add"
-            @click=";(examForm.show = true), (examForm.edit = false)"
-          >
-            <i class="common common-plus"></i>
-            <span>添加试题分类</span>
-          </div>
-        </div>
-        <ListCard
+        <AddCard
+          add-title="添加试题分类"
+          @addCard=";(examForm.show = true), (examForm.edit = false)"
+        ></AddCard>
+        <IndexCard
           v-for="(item, index) in typeList"
           :key="index"
           :data="item"
           name="question"
-          @edit="edit"
           @del="del"
+          @edit="edit"
           @role="role"
           @open="open"
-          @detail="goDetail"
           @move="move"
-        ></ListCard>
+          @recycle="recycle"
+          @detail="goDetail"
+        ></IndexCard>
       </div>
       <!-- 分页 -->
       <el-pagination
@@ -364,12 +360,13 @@ import {
 } from 'api/question'
 import { orgListPage } from 'api/base'
 import { userListPage } from 'api/user'
-import ListCard from 'components/ListCard.vue'
+import AddCard from 'components/ListCard/AddCard.vue'
+import IndexCard from 'components/ListCard/IndexCard.vue'
 import CustomSelect from 'components/CustomSelect.vue'
-import { orgAdd } from '@/api/base'
 export default {
   components: {
-    ListCard,
+    AddCard,
+    IndexCard,
     CustomSelect,
   },
   data() {
@@ -653,6 +650,8 @@ export default {
       )
       return roles
     },
+    // 回收站
+    recycle({ id }) {},
     // 移动试题分类
     async questionMove() {
       if (!this.examForm.questionType) {

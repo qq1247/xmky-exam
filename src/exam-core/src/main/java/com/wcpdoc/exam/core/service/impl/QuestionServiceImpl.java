@@ -23,28 +23,29 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.exam.base.cache.ProgressBarCache;
-import com.wcpdoc.exam.base.service.UserService;
-import com.wcpdoc.exam.core.dao.BaseDao;
+import com.wcpdoc.base.cache.ProgressBarCache;
+import com.wcpdoc.base.service.UserService;
+import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
+import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.service.impl.BaseServiceImp;
+import com.wcpdoc.core.util.BigDecimalUtil;
+import com.wcpdoc.core.util.StringUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.QuestionDao;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionEx;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.entity.QuestionType;
-import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 import com.wcpdoc.exam.core.service.WordServer;
-import com.wcpdoc.exam.core.util.BigDecimalUtil;
-import com.wcpdoc.exam.core.util.StringUtil;
-import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.file.entity.FileEx;
-import com.wcpdoc.exam.file.service.FileService;
+import com.wcpdoc.file.entity.FileEx;
+import com.wcpdoc.file.service.FileService;
 
 /**
  * 试题服务层实现
@@ -105,7 +106,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			}
 			int answerIndex = answers[0].getBytes()[0] - 65;
 			if (options.length < answerIndex + 1) {
-				throw new MyException("选项和答案不匹配！");
+				throw new MyException("选项和答案不匹配");
 			}
 		}
 		if (question.getType() == 2 && options != null) {
@@ -121,7 +122,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				}
 				int answerIndex = answers[i].getBytes()[0] - 65;
 				if (options.length < answerIndex + 1) {
-					throw new MyException("选项和答案不匹配！");
+					throw new MyException("选项和答案不匹配");
 				}
 			}
 		}
@@ -133,7 +134,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				count++;
 			}
 			if (count != answers.length) {
-				throw new MyException("填空答案不匹配！");
+				throw new MyException("填空和答案数量不匹配");
 			}
 		}
 		if (question.getType() == 4) {
@@ -277,7 +278,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				count++;
 			}
 			if (count != answers.length) {
-				throw new MyException("填空答案不匹配！");
+				throw new MyException("填空和答案数量不匹配！");
 			}
 		}
 		if (question.getType() == 4) {
@@ -532,7 +533,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		} catch (IOException e) {
 			throw new MyException("读取word时异常！");
 		} catch (Exception e) {
-			throw new MyException(e.getMessage());
+			throw e;
 		}
 
 		// 添加试题
@@ -589,7 +590,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			addAndUpdate(question, scoreOptions, answers, options, scores);
 		}
 		
-		ProgressBarCache.setProgressBar(processBarId, 10.0, 10.0, "保存完成", HttpStatus.OK.value());
 	}
 
 	@Override

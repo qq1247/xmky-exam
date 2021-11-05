@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-09-16 09:46:16
  * @LastEditors: Che
- * @LastEditTime: 2021-09-30 09:50:45
+ * @LastEditTime: 2021-11-02 16:38:10
 -->
 
 <template>
@@ -30,9 +30,23 @@
             v-for="(child, index) in item.questionList"
           >
             <p
+              v-if="child.type !== 3"
               class="question-title"
               v-html="`${index + 1}、${child.title}`"
             ></p>
+            <div
+              class="question-title"
+              v-if="child.type === 3 && myExamDetailCache[child.id]"
+            >
+              <span>{{ index + 1 }}、</span>
+              <ClozeTitle
+                :title="child.title"
+                :questionId="child.id"
+                :preview="preview"
+                :paperQuestion="paperQuestion"
+                :myExamDetailCache="myExamDetailCache"
+              ></ClozeTitle>
+            </div>
 
             <!-- 单选 -->
             <template v-if="child.type === 1">
@@ -80,21 +94,6 @@
               </el-checkbox-group>
             </template>
 
-            <!-- 填空 -->
-            <template v-if="child.type === 3 && myExamDetailCache[child.id]">
-              <el-input
-                class="question-text"
-                @change="updateAnswer(child.id)"
-                placeholder="请输入内容"
-                :key="index"
-                :disabled="preview === 'true' ? true : false"
-                v-for="(answer, index) in myExamDetailCache[child.id].answers"
-                v-model="myExamDetailCache[child.id].answers[index]"
-              >
-                <template slot="prepend">第{{ index + 1 }}空</template>
-              </el-input>
-            </template>
-
             <!-- 判断 -->
             <template v-if="child.type === 4">
               <el-radio-group
@@ -136,7 +135,11 @@
 </template>
 
 <script>
+import ClozeTitle from '../ClozeTitle.vue'
 export default {
+  components: {
+    ClozeTitle,
+  },
   props: {
     preview: {
       type: [String, Boolean],

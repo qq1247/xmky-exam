@@ -10,23 +10,24 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.exam.core.dao.BaseDao;
+import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
+import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.service.impl.BaseServiceImp;
+import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.core.util.StringUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.MyExamDao;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyExamDetail;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.Question;
-import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.QuestionService;
-import com.wcpdoc.exam.core.util.DateUtil;
-import com.wcpdoc.exam.core.util.StringUtil;
-import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.file.service.FileService;
+import com.wcpdoc.file.service.FileService;
 
 /**
  * 我的考试服务层实现
@@ -94,37 +95,54 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	}
 
 	@Override
-	public void updateAnswer(Integer myExamDetailId, String[] answers, Integer fileId) {
+	public void updateAnswer(Integer examId, Integer userId, Integer questionId, String[] answers, Integer fileId) {
 		// 校验数据有效性
-		if (myExamDetailId == null) {
-			throw new MyException("参数错误：myExamDetailId");
+		if (examId == null) {
+			throw new MyException("参数错误：examId");
+		}
+		if (userId == null) {
+			throw new MyException("参数错误：userId");
+		}
+		if (questionId == null) {
+			throw new MyException("参数错误：questionId");
 		}
 
 		// if(!ValidateUtil.isValid(answer)) {
-		// 	throw new MyException("参数错误：answer");
-		// }//如取消勾选则为空
+		// throw new MyException("参数错误：answer");
+		// }//如是多选取消勾选则为空
 
-		MyExamDetail myExamDetail = myExamDetailService.getEntity(myExamDetailId);
-		if (myExamDetail.getUserId() != getCurUser().getId()) {
-			throw new MyException("未参与考试！");
+		MyExamDetail myExamDetail = myExamDetailService.getEntity(examId, userId, questionId);
+		if (myExamDetail == null) {
+			throw new MyException("未参与考试");
 		}
 
-		Exam exam = examService.getEntity(myExamDetail.getExamId());
+		Exam exam = examService.getEntity(examId);
 		if (exam.getState() == 0) {
-			throw new MyException("考试已删除！");
+			throw new MyException("考试已删除");
 		}
 		if (exam.getState() == 2) {
-			throw new MyException("考试未发布！");
+			throw new MyException("考试未发布");
 		}
-		if (exam.getStartTime().getTime() > (new Date().getTime())) {
-			throw new MyException("考试未开始！");
+		long curTime = System.currentTimeMillis();
+		if (exam.getStartTime().getTime() > curTime) {
+			throw new MyException("考试未开始");
 		}
-		if (exam.getEndTime().getTime() < (new Date().getTime() - 30000)) {// 预留30秒网络延时
+		if (curTime - exam.getEndTime().getTime() > 5000) {// 预留5秒网络延时
 			throw new MyException("考试已结束！");
 		}
 
-		// 更新我的考试详细信息
-		Question question = questionService.getEntity(myExamDetail.getQuestionId());
+		// 标记为考试中，记录答题时间
+		MyExam myExam = getEntity(examId, userId);
+		myExam.setState(2);
+		if (!ValidateUtil.isValid(myExam.getAnswerStartTime())) {
+			myExam.setAnswerStartTime(new Date());
+		} else {
+			myExam.setAnswerEndTime(new Date());
+		}
+		update(myExam);
+		
+		// 保存答案
+		Question question = questionService.getEntity(questionId);
 		if (!ValidateUtil.isValid(answers)) {
 			myExamDetail.setAnswer(null);
 		} else if (question.getType() == 1 || question.getType() == 4 || question.getType() == 5) {
@@ -132,46 +150,56 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		} else if (question.getType() == 2) {
 			myExamDetail.setAnswer(StringUtil.join(answers));
 		} else if (question.getType() == 3) {
-			myExamDetail.setAnswer(StringUtil.join(answers, "\n"));
-		} else if (question.getType() == 5 && question.getAi() == 1) {
-			myExamDetail.setAnswer(StringUtil.join(answers, "\n"));
+			myExamDetail.setAnswer(StringUtil.join(answers, '\n'));
 		}
-		if (fileId != null) {
+		if (ValidateUtil.isValid(fileId)) {
 			myExamDetail.setAnswerFileId(fileId);
-			fileService.doUpload(fileId);
 		}
 		myExamDetail.setAnswerTime(new Date());
 		myExamDetailService.update(myExamDetail);
+		
+		// 保存附件
+		if (ValidateUtil.isValid(fileId)) {
+			fileService.doUpload(fileId);
+		}
 	}
 
 	@Override
-	public void doAnswer(Integer myExamId) {
+	public void doAnswer(Integer examId, Integer userId) {
 		// 校验数据有效性
-		MyExam myExam = myExamDao.getEntity(myExamId);
+		if (!ValidateUtil.isValid(examId)) {
+			throw new MyException("参数错误：examId");
+		}
+		if (!ValidateUtil.isValid(userId)) {
+			throw new MyException("参数错误：userId");
+		}
+		MyExam myExam = getEntity(examId, userId);
 		if (myExam == null) {
-			throw new MyException("参数错误：myExamId");
+			throw new MyException("未参与考试");
 		}
-		if (myExam.getUserId().intValue() != getCurUser().getId()) {
-			throw new MyException("未参与该考试！");
-		}
-	
-		Exam exam = examService.getEntity(myExam.getExamId());
+		Exam exam = examService.getEntity(examId);
 		if (exam.getState() == 0) {
-			throw new MyException("考试已删除！");
+			throw new MyException("考试已删除");
 		}
 		if (exam.getState() == 2) {
-			throw new MyException("考试未发布！");
+			throw new MyException("考试未发布");
 		}
-		if (exam.getStartTime().getTime() > (new Date().getTime())) {
-			throw new MyException("考试未开始！");
+		long curTime = System.currentTimeMillis();
+		if (exam.getStartTime().getTime() > curTime) {
+			throw new MyException("考试未开始");
 		}
-		if (exam.getEndTime().getTime() < (new Date().getTime() - 30000)){//预留30秒网络延时
+		if (curTime - exam.getEndTime().getTime() > 5000) {// 预留5秒网络延时
 			throw new MyException("考试已结束！");
 		}
 	
-		// 标记为已交卷
+		// 标记为已交卷，记录最后交卷时间
 		myExam.setState(3);
 		myExam.setAnswerEndTime(new Date());
-		myExamDao.update(myExam);
+		update(myExam);
+	}
+
+	@Override
+	public List<Map<String, Object>> getUserList(Integer id) {
+		return myExamDao.getUserList(id);
 	}
 }

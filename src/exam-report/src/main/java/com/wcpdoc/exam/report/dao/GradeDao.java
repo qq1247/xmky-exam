@@ -3,7 +3,7 @@ package com.wcpdoc.exam.report.dao;
 import java.util.List;
 import java.util.Map;
 
-import com.wcpdoc.exam.core.dao.RBaseDao;
+import com.wcpdoc.core.dao.RBaseDao;
 
 /**
  * 公告数据访问层接口

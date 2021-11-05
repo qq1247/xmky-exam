@@ -11,22 +11,22 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wcpdoc.exam.base.entity.Parm;
-import com.wcpdoc.exam.base.entity.User;
-import com.wcpdoc.exam.base.service.ParmService;
-import com.wcpdoc.exam.base.service.UserService;
-import com.wcpdoc.exam.core.controller.BaseController;
+import com.wcpdoc.base.entity.Parm;
+import com.wcpdoc.base.entity.User;
+import com.wcpdoc.base.service.ParmService;
+import com.wcpdoc.base.service.UserService;
+import com.wcpdoc.core.controller.BaseController;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageResult;
+import com.wcpdoc.core.entity.PageResultEx;
+import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.MyExam;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageResult;
-import com.wcpdoc.exam.core.entity.PageResultEx;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
-import com.wcpdoc.exam.core.exception.MyException;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
 import com.wcpdoc.exam.core.service.MyExamService;
-import com.wcpdoc.exam.core.util.ValidateUtil;
-import com.wcpdoc.exam.notify.exception.NotifyException;
-import com.wcpdoc.exam.notify.service.NotifyService;
+import com.wcpdoc.notify.exception.NotifyException;
+import com.wcpdoc.notify.service.NotifyService;
 
 /**
  * 我的考试控制层
@@ -124,21 +124,23 @@ public class ApiMyExamController extends BaseController{
 	}
 	
 	/**
-	 * 更新答案
+	 * 答题
 	 * 
 	 * v1.0 zhanghc 2017年6月26日下午12:30:20
-	 * @param myExamDetailId
+	 * @param examId
+	 * @param questionId
 	 * @param answers
+	 * @param fileId
 	 * @return PageResult
 	 */
 	@RequestMapping("/updateAnswer")
 	@ResponseBody
-	public PageResult updateAnswer(Integer myExamDetailId, String[] answers, Integer fileId) {
+	public PageResult updateAnswer(Integer examId, Integer questionId, String[] answers, Integer fileId) {
 		try {
-			myExamService.updateAnswer(myExamDetailId, answers, fileId);
+			myExamService.updateAnswer(examId, getCurUser().getId(), questionId, answers, fileId);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("更新答案错误：", e.getMessage());
+			log.error("更新答案错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("更新答案错误：", e);
@@ -147,17 +149,17 @@ public class ApiMyExamController extends BaseController{
 	}
 	
 	/**
-	 * 完成交卷
+	 * 交卷
 	 * 
 	 * v1.0 zhanghc 2017年6月26日下午12:30:20
-	 * @param myExamId
+	 * @param examId
 	 * @return PageResult
 	 */
 	@RequestMapping("/doAnswer")
 	@ResponseBody
-	public PageResult doAnswer(Integer myExamId) {
+	public PageResult doAnswer(Integer examId) {
 		try {
-			myExamService.doAnswer(myExamId);
+			myExamService.doAnswer(examId, getCurUser().getId());
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成交卷错误：{}", e.getMessage());

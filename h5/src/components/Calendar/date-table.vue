@@ -306,11 +306,11 @@ export default {
   }
 }
 .el-calendar-both {
-  background: rgba(#f7c173, 0.15);
+  background: rgba(#f89913, 0.15);
   // border: 2px solid rgba(#f7c173, 0.8);
   border-radius: 8px;
   span {
-    color: rgba(#f7c173, 1);
+    color: rgba(#f89913, 1);
   }
 }
 .plan {

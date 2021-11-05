@@ -3,6 +3,7 @@ package com.wcpdoc.exam.core.dao;
 import java.util.Date;
 import java.util.List;
 
+import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.exam.core.entity.QuestionTypeOpen;
 
 /**

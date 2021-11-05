@@ -3,9 +3,10 @@ package com.wcpdoc.exam.core.service;
 import java.util.List;
 import java.util.Map;
 
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
+import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.MyExam;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
 /**
  * 我的考试服务层接口
  * 
@@ -63,18 +64,38 @@ public interface MyExamService extends BaseService<MyExam>{
 	 * 更新答案
 	 * 
 	 * v1.0 chenyun 2021年8月24日上午9:55:53
-	 * @param myExamDetailId
+	 * 
+	 * v1.1 zhanghc 2021-10-19
+	 * 由原参数myExamDetailId改成examId questionId userId，从接口层面保证字段的好理解
+	 * 
+	 * @param examId
+	 * @param questionId 
+	 * @param userId 
 	 * @param answers
 	 * @param fileId
-	 * @param answers void
+	 * void
 	 */
-	void updateAnswer(Integer myExamDetailId, String[] answers, Integer fileId);
+	void updateAnswer(Integer examId, Integer userId, Integer questionId, String[] answers, Integer fileId);
 	
 	/**
 	 * 完成交卷
 	 * 
 	 * v1.0 chenyun 2021年8月24日上午10:05:25
-	 * @param myExamId void
+	 * v1.1 zhanghc 2021-10-19
+	 * 由原参数mymyExamId改成examId questionId userId，从接口层面保证字段的好理解
+	 * 
+	 * @param examId 
+	 * @param userId 
+	 * void
 	 */
-	void doAnswer(Integer myExamId);
+	void doAnswer(Integer examId, Integer userId);
+
+	/**
+	 * 获取用户列表
+	 * 
+	 * v1.0 zhanghc 2021年10月28日下午1:56:08
+	 * @param id
+	 * @return List<Map<String,Object>>
+	 */
+	List<Map<String, Object>> getUserList(Integer id);
 }

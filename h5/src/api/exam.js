@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-11 16:28:25
  * @LastEditors: Che
- * @LastEditTime: 2021-09-15 11:07:56
+ * @LastEditTime: 2021-10-18 18:06:13
  */
 import request from './request'
 
@@ -131,20 +131,12 @@ export const examTypeMove = (params) => request('examType/move', params)
 export const examTypeAuth = (params) => request('examType/auth', params)
 
 /**
- * @name: examUserList
- * @description: 考试人员名单
- * @param {*}
- * @return {*}
- */
-export const examUserList = (params) => request('exam/examUserList', params)
-
-/**
- * @name: examOnLine
+ * @name: onlineUser
  * @description: 在线考试人员名单
  * @param {*}
  * @return {*}
  */
-export const examOnLine = (params) => request('exam/onLine', params)
+export const onlineUser = (params) => request('exam/onlineUser', params)
 
 /**
  * @name: examGradeReport

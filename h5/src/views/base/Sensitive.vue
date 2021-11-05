@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-09-28 10:29:46
  * @LastEditors: Che
- * @LastEditTime: 2021-10-08 15:29:57
+ * @LastEditTime: 2021-11-03 16:14:54
 -->
 
 <template>
@@ -16,6 +16,7 @@
           v-model="sensitiveForm.blackList"
           remote
           multiple
+          clearable
           filterable
           allow-create
           default-first-option
@@ -29,6 +30,7 @@
           v-model="sensitiveForm.whiteList"
           remote
           multiple
+          clearable
           filterable
           allow-create
           default-first-option

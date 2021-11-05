@@ -7,19 +7,20 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Repository;
 
-import com.wcpdoc.exam.base.cache.DictCache;
-import com.wcpdoc.exam.base.dao.UserDao;
-import com.wcpdoc.exam.base.entity.User;
+import com.wcpdoc.base.cache.DictCache;
+import com.wcpdoc.base.dao.UserDao;
+import com.wcpdoc.base.entity.User;
+import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
+import com.wcpdoc.core.util.HibernateUtil;
+import com.wcpdoc.core.util.SqlUtil;
+import com.wcpdoc.core.util.ValidateUtil;
+import com.wcpdoc.core.util.SqlUtil.Order;
 import com.wcpdoc.exam.core.dao.PaperDao;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.Question;
-import com.wcpdoc.exam.core.util.HibernateUtil;
-import com.wcpdoc.exam.core.util.SqlUtil;
-import com.wcpdoc.exam.core.util.SqlUtil.Order;
-import com.wcpdoc.exam.core.util.ValidateUtil;
 
 /**
  * 试卷数据访问层实现
@@ -42,7 +43,7 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("paperTypeId")), "PAPER.PAPER_TYPE_ID = ?", pageIn.get("paperTypeId"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("userName")), "CREATE_USER.NAME LIKE ?", "%" + pageIn.get("userName") + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")), "PAPER.STATE = ?", pageIn.get("state"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("PaperId")), "PAPER.ID = ?", pageIn.get("PaperId"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("paperId")), "PAPER.ID = ?", pageIn.get("paperId"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "PAPER.NAME LIKE ?", "%" + pageIn.get("name") + "%")
 				.addWhere("PAPER.STATE != ?", 0)
 				.addOrder("PAPER.UPDATE_TIME", Order.DESC);

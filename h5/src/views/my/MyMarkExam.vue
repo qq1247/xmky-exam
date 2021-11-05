@@ -40,9 +40,23 @@
                 v-for="(child, indexc) in item.questionList"
               >
                 <p
+                  v-if="child.type !== 3"
                   class="question-title"
-                  v-html="`${indexc + 1}、${child.title}`"
+                  v-html="`${index + 1}、${child.title}`"
                 ></p>
+                <div
+                  class="question-title"
+                  v-if="child.type === 3 && child.examAnswers"
+                >
+                  <span>{{ index + 1 }}、</span>
+                  <ClozeTitle
+                    isMark
+                    :title="child.title"
+                    :questionId="child.id"
+                    :paperQuestion="paperQuestion"
+                    :myExamDetailCache="child.examAnswers"
+                  ></ClozeTitle>
+                </div>
 
                 <!-- 单选 -->
                 <template v-if="child.type === 1">
@@ -89,7 +103,7 @@
                 </template>
 
                 <!-- 填空 -->
-                <template v-if="child.type === 3">
+                <!-- <template v-if="child.type === 3">
                   <el-input
                     disabled
                     class="question-text"
@@ -98,9 +112,11 @@
                     v-for="(answer, index) in child.examAnswers"
                     :value="answer"
                   >
-                    <template slot="prepend">第{{ index + 1 }}空</template>
+                    <template slot="prepend"
+                      >第{{ $tools.intToChinese(index + 1) }}空</template
+                    >
                   </el-input>
-                </template>
+                </template> -->
 
                 <!-- 判断 -->
                 <template v-if="child.type === 4">
@@ -161,7 +177,9 @@
                           :key="answer.id"
                           class="answers-item"
                         >
-                          <span>{{ `填空${index + 1}、` }}</span>
+                          <span>{{
+                            `填空${$tools.intToChinese(index + 1)}、`
+                          }}</span>
                           <span
                             class="answers-tag"
                             v-for="(ans, index) in answer.answer"
@@ -180,7 +198,9 @@
                             :key="answer.id"
                             class="answers-item"
                           >
-                            <span>{{ `关键词${index + 1}、` }}</span>
+                            <span>{{
+                              `关键词${$tools.intToChinese(index + 1)}、`
+                            }}</span>
                             <span
                               class="answers-tag"
                               v-for="(ans, index) in answer.answer"
@@ -234,9 +254,11 @@
                         v-if="!child.isEdit && preview === false"
                         :key="child.id"
                         :data="child"
-                        @input="scoreInput($event, index, indexc)"
-                        @blur="scoreBlur($event, index, indexc)"
-                        @selectScore="selectScore($event, index, indexc)"
+                        @input="scoreInput($event, child.id, index, indexc)"
+                        @blur="scoreBlur($event, child.id, index, indexc)"
+                        @selectScore="
+                          selectScore($event, child.id, index, indexc)
+                        "
                         @prevQuestion="prevQuestion"
                         @nextQuestion="nextQuestion"
                         @prevPaper="prevPaper"
@@ -290,9 +312,11 @@ import {
   myExamDoScore,
 } from 'api/my'
 import ScorePlate from 'components/ScorePlate.vue'
+import ClozeTitle from '@/components/ClozeTitle.vue'
 export default {
   components: {
     ScorePlate,
+    ClozeTitle,
   },
   data() {
     return {
@@ -431,8 +455,34 @@ export default {
     showScorePlate(index, indexc) {
       this.$set(this.paperQuestion[index].questionList[indexc], 'isEdit', false)
     },
+    // 打分输入
+    scoreInput(e, questionId, idx, idxc) {
+      this.setScore(e, questionId, idx, idxc)
+    },
+    // 失去焦点提交打分
+    scoreBlur(e, questionId, idx, idxc) {
+      this.updateScore(e, questionId, idx, idxc)
+    },
+    // 点击打分板分值
+    selectScore(e, questionId, idx, idxc) {
+      this.setScore(e, questionId, idx, idxc)
+      this.updateScore(e, questionId, idx, idxc)
+    },
+    // 打分
+    async updateScore(e, questionId, idx, idxc) {
+      const source = this.paperQuestion[idx].questionList[idxc]
+      const res = await myExamUpdateScore({
+        examId: this.examId,
+        questionId,
+        userId: this.userId,
+        score: source.scorePlate || 0,
+      })
+      res?.code === 200
+        ? this.queryExamineeInfo()
+        : this.$message.error(res.msg || '打分失败！')
+    },
     // 设置分数
-    async setScore(e, idx, idxc) {
+    async setScore(e, questionId, idx, idxc) {
       const now = new Date().getTime()
       if (this.markStartTime > now || now > this.markEndTime) {
         this.preview = true
@@ -443,30 +493,6 @@ export default {
       this.$set(source, 'scorePlate', e)
       if (e < 0) this.$set(source, 'scorePlate', 0)
       if (e > source.score) this.$set(source, 'scorePlate', source.score)
-    },
-    // 打分输入
-    scoreInput(e, idx, idxc) {
-      this.setScore(e, idx, idxc)
-    },
-    // 失去焦点提交打分
-    scoreBlur(e, idx, idxc) {
-      this.updateScore(e, idx, idxc)
-    },
-    // 点击打分板分值
-    selectScore(e, idx, idxc) {
-      this.setScore(e, idx, idxc)
-      this.updateScore(e, idx, idxc)
-    },
-    // 打分
-    async updateScore(e, idx, idxc) {
-      const source = this.paperQuestion[idx].questionList[idxc]
-      const res = await myExamUpdateScore({
-        myExamDetailId: source.myExamDetailId,
-        score: source.scorePlate || 0,
-      })
-      res?.code === 200
-        ? this.queryExamineeInfo()
-        : this.$message.error(res.msg || '打分失败！')
     },
     // 上下题定位
     toHref(position, status) {
@@ -555,7 +581,6 @@ export default {
       const res = await myExamDoScore({
         examId: this.examId,
         userId: this.userId,
-        markId: this.markId,
       })
       res?.code === 200
         ? (this.$message.warning('阅卷完成！'), this.queryExamineeInfo())

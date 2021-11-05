@@ -2,6 +2,7 @@ package com.wcpdoc.exam.core.dao;
 
 import java.util.List;
 
+import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 
 /**
@@ -47,14 +48,4 @@ public interface PaperQuestionDao extends BaseDao<PaperQuestion>{
 	 * @return PaperQuestion
 	 */
 	PaperQuestion getEntity(Integer paperId, Integer questionId);
-	
-	/**
-	 * 获取试卷试题
-	 * 
-	 * v1.0 zhanghc 2020年10月15日下午4:38:39
-	 * @param parentId
-	 * @param questionId
-	 * @return PaperQuestion
-	 */
-	PaperQuestion getEntityByChapter(Integer parentId, Integer questionId);
 }

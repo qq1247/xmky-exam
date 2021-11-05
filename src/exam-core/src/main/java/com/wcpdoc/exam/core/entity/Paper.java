@@ -33,7 +33,7 @@ public class Paper {
 	@Column(name = "TOTAL_SCORE")
 	private BigDecimal totalScore;
 	@Column(name = "SHOW_TYPE")
-	private BigDecimal showType;
+	private Integer showType;
 	@Column(name = "READ_REMARK")
 	private String readRemark;
 	@Column(name = "READ_NUM")
@@ -48,6 +48,8 @@ public class Paper {
 	private String options;
 	@Column(name = "MINIMIZE_NUM")
 	private Integer minimizeNum;
+	@Column(name = "MARK_TYPE")
+	private Integer markType;
 	@Column(name = "CREATE_USER_ID")
 	private Integer createUserId;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -61,11 +63,11 @@ public class Paper {
 	@Column(name = "UPDATE_TIME")
 	private Date updateTime;
 
-	public BigDecimal getShowType() {
+	public Integer getShowType() {
 		return showType;
 	}
 
-	public void setShowType(BigDecimal showType) {
+	public void setShowType(Integer showType) {
 		this.showType = showType;
 	}
 
@@ -125,12 +127,12 @@ public class Paper {
 		this.paperTypeId = paperTypeId;
 	}
 
-	/** 0：删除；1：启用；2：禁用 */
+	/** 0：删除；1：发布；2：草稿；3：归档 */
 	public Integer getState() {
 		return state;
 	}
 
-	/** 0：删除；1：启用；2：禁用 */
+	/** 0：删除；1：发布；2：草稿；3：归档 */
 	public void setState(Integer state) {
 		this.state = state;
 	}
@@ -189,6 +191,16 @@ public class Paper {
 
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
+	}
+
+	/** 1：智能阅卷；2：人工阅卷；*/
+	public Integer getMarkType() {
+		return markType;
+	}
+
+	/** 1：智能阅卷；2：人工阅卷；*/
+	public void setMarkType(Integer markType) {
+		this.markType = markType;
 	}
 
 }

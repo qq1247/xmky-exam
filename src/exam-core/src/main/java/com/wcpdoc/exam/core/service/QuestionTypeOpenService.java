@@ -1,8 +1,9 @@
 package com.wcpdoc.exam.core.service;
 
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
-import com.wcpdoc.exam.core.entity.PageResultEx;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
+import com.wcpdoc.core.entity.PageResultEx;
+import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.QuestionTypeOpen;
 
 /**

@@ -2,8 +2,8 @@ package com.wcpdoc.exam.report.service;
 
 import java.util.Map;
 
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
 
 /**
  * 成绩服务层接口

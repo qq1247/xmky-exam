@@ -5,21 +5,28 @@
 import axios from 'axios'
 import router from '@/router'
 import store from '@/store'
-import { Message } from 'element-ui'
+import { Message, Notification } from 'element-ui'
 /**
  * 提示函数
  */
 const message = (msg) => {
-  Message({
-    message: msg,
-    duration: 2000,
-    type: 'warning',
-  })
+  if (msg.length > 60) {
+    Notification({
+      title: '提示',
+      message: msg,
+      type: 'warning',
+    })
+  } else {
+    Message({
+      message: msg,
+      duration: 1500,
+      type: 'warning',
+    })
+  }
 }
 
 /**
  * 跳转登录页
- * 携带当前页面路由，以期在登录页面完成登录后返回当前页面
  */
 const toLogin = () => {
   router.replace({
@@ -57,8 +64,11 @@ const errorHandle = (status, msg) => {
 }
 
 // 创建axios实例
-var instance = axios.create({
-  baseURL: process.env.VUE_APP_BASE_URL,
+const instance = axios.create({
+  baseURL:
+    process.env.NODE_ENV === 'development'
+      ? process.env.VUE_APP_BASE_URL
+      : window.domain.url,
   timeout: 6 * 1000,
 })
 

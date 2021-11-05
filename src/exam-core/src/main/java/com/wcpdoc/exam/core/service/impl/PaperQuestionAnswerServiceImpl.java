@@ -6,7 +6,8 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.exam.core.dao.BaseDao;
+import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.dao.PaperQuestionAnswerDao;
 import com.wcpdoc.exam.core.entity.PaperQuestionAnswer;
 import com.wcpdoc.exam.core.service.PaperQuestionAnswerService;
@@ -29,8 +30,8 @@ public class PaperQuestionAnswerServiceImpl extends BaseServiceImp<PaperQuestion
 	
 
 	@Override
-	public List<PaperQuestionAnswer> getPaperQuestionAnswerList(Integer paperQuestionId, Integer questionId) {
-		return paperQuestionAnswerDao.getPaperQuestionAnswerList(paperQuestionId, questionId);
+	public List<PaperQuestionAnswer> getList(Integer paperId, Integer questionId) {
+		return paperQuestionAnswerDao.getList(paperId, questionId);
 	}
 	
 	@Override

@@ -20,26 +20,21 @@
     <!-- 内容 -->
     <div class="content">
       <div class="exam-list">
-        <div class="exam-item">
-          <div
-            class="exam-content exam-add"
-            @click=";(examForm.show = true), (examForm.edit = false)"
-          >
-            <i class="common common-plus"></i>
-            <span>添加考试库</span>
-          </div>
-        </div>
+        <AddCard
+          add-title="添加考试"
+          @addCard=";(examForm.show = true), (examForm.edit = false)"
+        ></AddCard>
         <ListCard
           v-for="(item, index) in examList"
           :key="index"
           :data="item"
           name="examList"
-          @edit="edit"
           @del="del"
+          @edit="edit"
+          @read="read"
           @onLine="onLine"
           @publish="publish"
           @statistics="statistics"
-          @read="read"
         ></ListCard>
       </div>
       <!-- 分页 -->
@@ -106,7 +101,12 @@
             value-format="yyyy-MM-dd HH:mm:ss"
           ></el-date-picker>
         </el-form-item>
-        <el-form-item label="阅卷时间" prop="markTime" required>
+        <el-form-item
+          required
+          label="阅卷时间"
+          prop="markTime"
+          v-if="examForm.showMarkTime"
+        >
           <el-date-picker
             v-model="examForm.markTime"
             type="datetimerange"
@@ -143,7 +143,7 @@
       @close="resetData('userForm')"
     >
       <el-form :model="examForm" ref="userForm" label-width="100px">
-        <el-form-item label="阅卷方式">
+        <el-form-item label="阅卷方式" v-if="examForm.paperMarkType === 2">
           <el-radio
             v-for="(item, index) in examForm.examRadios"
             :key="item.value"
@@ -191,6 +191,7 @@
 
           <el-col :span="12">
             <el-form-item
+              v-if="examForm.paperMarkType === 2"
               label="阅卷人"
               :prop="`examRemarks.${index}.examCheckPerson`"
               :rules="[
@@ -239,21 +240,21 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <div class="remark-buttons">
+        <div class="remark-buttons" v-if="examForm.paperMarkType === 2">
           <el-form-item>
             <el-button
               @click="remarkAdd"
               type="primary"
               size="mini"
               icon="el-icon-plus"
-              >添加阅卷人</el-button
+              >添加</el-button
             >
             <el-button
               v-if="examForm.examRemarks.length > 1"
               @click="remarkDel"
               size="mini"
               icon="el-icon-minus"
-              >删除阅卷人</el-button
+              >删除</el-button
             >
           </el-form-item>
         </div>
@@ -355,10 +356,10 @@
           examForm.statisticsInfo.maxExam || '待统计'
         }}</el-descriptions-item>
         <el-descriptions-item label="最长耗时">{{
-          (examForm.statisticsInfo.maxTime || 0) | formateTime(that)
+          diffMaxTime
         }}</el-descriptions-item>
         <el-descriptions-item label="最短耗时">{{
-          (examForm.statisticsInfo.minTime || 0) | formateTime(that)
+          diffMinTime
         }}</el-descriptions-item>
       </el-descriptions>
     </el-dialog>
@@ -376,16 +377,12 @@
           <el-col
             :span="8"
             v-for="item in examForm.examUserList"
-            :key="item.id"
+            :key="item.userId"
           >
-            <div
-              :class="[
-                'line-user',
-                examForm.onLineUser.includes(item.id) ? 'line' : '',
-              ]"
-            >
+            <div :class="['line-user', item.online ? 'line' : '']">
               <i class="common common-onLine"></i>
-              <span class="line-name">{{ item.name }}</span>
+              <span class="line-name">{{ item.userName }}</span>
+              <span class="line-time">{{ item.onlineTime }}</span>
             </div>
           </el-col>
         </template>
@@ -400,9 +397,8 @@ import {
   examAdd,
   examDel,
   examEdit,
-  examOnLine,
+  onlineUser,
   examPublish,
-  examUserList,
   examListPage,
   examGradeReport,
   examMarkUserList,
@@ -411,13 +407,15 @@ import {
 import { paperListPage } from 'api/paper'
 import { userListPage } from 'api/user'
 import { questionListPage } from 'api/question'
-import ListCard from 'components/ListCard.vue'
+import ListCard from 'components/ListCard/ListCard.vue'
+import AddCard from 'components/ListCard/AddCard.vue'
 import CustomSelect from 'components/CustomSelect.vue'
 import * as dayjs from 'dayjs'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 dayjs.extend(isSameOrBefore)
 export default {
   components: {
+    AddCard,
     ListCard,
     CustomSelect,
   },
@@ -475,7 +473,9 @@ export default {
         readShow: false,
         infoShow: false,
         lineShow: false,
-        selectPaperId: '',
+        selectPaperId: null,
+        showMarkTime: false,
+        paperMarkType: 1,
         total: 0,
         curPage: 1,
         pageSize: 5,
@@ -503,7 +503,6 @@ export default {
         examUser: [],
         examUsers: [],
         examUserList: [],
-        onLineUser: [],
         rules: {
           name: [
             { required: true, message: '请填写试卷名称', trigger: 'blur' },
@@ -520,17 +519,16 @@ export default {
   },
   computed: {
     diffExamTime() {
-      const diffTime =
-        new Date(this.examForm.statisticsInfo.examEndTime).getTime() -
-        new Date(this.examForm.statisticsInfo.examStartTime).getTime()
-      const { hours, minutes, seconds } = this.$tools.formateTime(diffTime)
-      return `${hours}'${minutes}''${seconds}'''`
+      const diffTime = this.diffTime(this.examForm.statisticsInfo.examEndTime)
+      return diffTime
     },
-  },
-  filters: {
-    formateTime(value, that) {
-      const { hours, minutes, seconds } = that.$tools.formateTime(value)
-      return `${hours}'${minutes}''${seconds}'''`
+    diffMaxTime() {
+      const diffTime = this.diffTime(this.examForm.statisticsInfo.maxExam)
+      return this.examForm.statisticsInfo.maxExam ? diffTime : 0
+    },
+    diffMinTime() {
+      const diffTime = this.diffTime(this.examForm.statisticsInfo.minExam)
+      return this.examForm.statisticsInfo.minExam ? diffTime : 0
     },
   },
   mounted() {
@@ -587,6 +585,10 @@ export default {
     // 选择试卷
     selectPaper(e) {
       this.examForm.selectPaperId = e
+      const selectPaper = this.examForm.paperList.filter(
+        (item) => item.id === e
+      )
+      this.examForm.showMarkTime = selectPaper[0].markType === 1 ? false : true
     },
     // 添加试卷信息
     addOrEdit() {
@@ -595,17 +597,23 @@ export default {
           return
         }
 
-        const params = {
+        let params = {
           name: this.examForm.name,
           startTime: this.examForm.examTime[0],
           endTime: this.examForm.examTime[1],
-          markStartTime: this.examForm.markTime[0],
-          markEndTime: this.examForm.markTime[1],
           scoreState: this.examForm.scoreState ? 1 : 2,
           rankState: this.examForm.rankState ? 1 : 2,
           loginType: this.examForm.loginType ? 2 : 1,
           paperId: this.examForm.selectPaperId,
           examTypeId: this.queryForm.examTypeId,
+        }
+
+        if (this.examForm.markTime.length) {
+          params = {
+            markStartTime: this.examForm.markTime[0],
+            markEndTime: this.examForm.markTime[1],
+            ...params,
+          }
         }
 
         const res = this.examForm.edit
@@ -694,26 +702,34 @@ export default {
         })
     },
     // 在线人员
-    async onLine({ id, state }) {
+    async onLine({ id, state, startTime, endTime }) {
       if (state === 2) {
         this.$message.error('请先发布考试！')
         return
       }
-      this.examForm.lineShow = true
-      const resList = await examUserList({ id })
-      resList?.code === 200 && (this.examForm.examUserList = resList.data)
-      if (resList?.code === 200 && resList.data.length > 0) {
-        const ids = resList.data.reduce((acc, cur) => {
-          acc.push(cur.id)
-          return acc
-        }, [])
-        let resLine = await examOnLine({ ids })
-        resLine?.code === 200 && (this.examForm.onLineUser = resLine.data)
-        this.timeLine = setInterval(async () => {
-          resLine = await examOnLine({ ids })
-          resLine?.code === 200 && (this.examForm.onLineUser = resLine.data)
-        }, 30 * 1000)
+
+      const _startTime = new Date(startTime).getTime()
+      const _endTime = new Date(endTime).getTime()
+      const now = new Date().getTime()
+
+      if (_startTime > now) {
+        this.$message.error('未开始考试！')
+        return
       }
+
+      if (_endTime < now) {
+        this.$message.error('考试已结束！')
+        return
+      }
+
+      this.examForm.lineShow = true
+      const resList = await onlineUser({ id })
+      resList?.code === 200 && (this.examForm.examUserList = resList.data.list)
+      this.timeLine = setInterval(async () => {
+        const timeUserList = await onlineUser({ id })
+        resList?.code === 200 &&
+          (this.examForm.examUserList = timeUserList.data.list)
+      }, 30 * 1000)
     },
     // 关闭在线人员弹窗
     lineEnd() {
@@ -732,9 +748,17 @@ export default {
         (this.examForm.infoShow = true))
     },
     // 阅卷设置
-    async read({ id, paperId, state }) {
+    async read({ id, paperId, state, endTime, paperMarkType }) {
       if (state == 2) {
         this.$message.error('请先发布考试！')
+        return
+      }
+
+      const _endTime = new Date(endTime).getTime()
+      const now = new Date().getTime()
+
+      if (_endTime < now) {
+        this.$message.error('考试已结束！')
         return
       }
 
@@ -753,6 +777,7 @@ export default {
       this.examForm.readShow = true
       this.examForm.id = id
       this.examForm.paperId = paperId
+      this.examForm.paperMarkType = paperMarkType
 
       this.$nextTick(() => {
         if (examMarkUser.data.length > 0) {
@@ -941,6 +966,14 @@ export default {
     resetData(name) {
       this.$refs[name].resetFields()
     },
+    // 计算时间差
+    diffTime(endTime) {
+      const diffTime =
+        new Date(endTime).getTime() -
+        new Date(this.examForm.statisticsInfo.examStartTime).getTime()
+      const { hours, minutes, seconds } = this.$tools.formateTime(diffTime)
+      return `${hours}'${minutes}''${seconds}'''`
+    },
   },
 }
 </script>
@@ -1037,6 +1070,10 @@ export default {
   }
   .line-name {
     font-size: 16px;
+  }
+
+  .line-time {
+    font-size: 13px;
   }
 }
 .line {

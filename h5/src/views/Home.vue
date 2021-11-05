@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <!-- 轮播图 -->
     <el-carousel :interval="3000" height="350px">
       <el-carousel-item
         :style="{ background: carouse.bgColor || '#393d42' }"
@@ -8,17 +9,17 @@
       >
         <div class="banner-list">
           <div class="banner-info">
-            <p
+            <div
               class="banner-title"
               :style="{ color: carouse.textColor || '#fff' }"
             >
               {{ carouse.title }}
-            </p>
-            <p
-              class="banner-content"
+            </div>
+            <div
+              class="banner-content multi-ellipsis"
               :style="{ color: carouse.textColor || '#fff' }"
               v-html="carouse.content"
-            ></p>
+            ></div>
             <div
               class="banner-btn"
               :style="{
@@ -46,45 +47,40 @@
       </el-carousel-item>
     </el-carousel>
     <div class="container-content">
+      <!-- 公告 -->
+      <NoticeBar
+        left-icon="notice"
+        @link="noticeDetail(10)"
+        v-if="bulletinList.length"
+      >
+        <el-carousel height="40px" :interval="3000" direction="vertical">
+          <el-carousel-item v-for="(item, index) in bulletinList" :key="index">
+            <div class="notice-custom-content">
+              <div class="content-title ellipsis">{{ item.title }}</div>
+              <div>{{ item.updateTime }}</div>
+            </div>
+          </el-carousel-item>
+        </el-carousel>
+      </NoticeBar>
       <el-row :gutter="40">
         <el-col :span="8">
           <template>
             <div class="box-title">
-              <i class="common common-time"></i><span>考试安排</span>
+              <i class="common common-time"></i>
+              <span>考试安排</span>
             </div>
             <Calendar
               v-model="now"
               :timePopovers="timePopovers"
               @selectDate="selectDate"
-            >
-            </Calendar>
-          </template>
-          <template>
-            <div class="box-title">
-              <i class="common common-notice"></i><span>公告</span>
-            </div>
-            <template v-if="bulletinList.length">
-              <el-row
-                :class="['notice', item.topState === 1 ? 'notice-hot' : '']"
-                :key="item.id"
-                v-for="item in bulletinList"
-              >
-                <el-col :span="12" class="notice-left">
-                  <i></i>
-                  <span class="ellipsis">{{ item.title }}</span>
-                </el-col>
-                <el-col :span="12" class="notice-right">{{
-                  item.updateTime
-                }}</el-col>
-              </el-row>
-            </template>
-            <el-empty v-else description="暂无公告"></el-empty>
+            ></Calendar>
           </template>
         </el-col>
         <el-col :span="16">
           <div>
             <div class="box-title box-divider">
-              <i class="common common-classify"></i><span>待考列表</span>
+              <i class="common common-classify"></i>
+              <span>待考列表</span>
             </div>
             <template v-if="examList.length">
               <el-row :gutter="10">
@@ -99,16 +95,16 @@
                       </div>
                     </div>
                     <el-row class="body-item">
-                      <span class="start-time">{{ item.examStartTime }}</span
-                      >（{{
+                      <span class="start-time">{{ item.examStartTime }}</span>
+                      （{{
                         computeMinute(item.examStartTime, item.examEndTime)
                       }}）
                     </el-row>
                     <el-row class="body-item">
                       <el-col :span="12">
-                        <el-col :span="8" class="item-title"
-                          ><i class="common common-good"></i>及格：</el-col
-                        >
+                        <el-col :span="8" class="item-title">
+                          <i class="common common-good"></i>及格：
+                        </el-col>
                         <el-col :span="16" class="item-data">
                           {{
                             (item.totalScore * item.paperTotalScore) / 100
@@ -116,16 +112,15 @@
                         </el-col>
                       </el-col>
                       <el-col :span="12">
-                        <el-col :span="12" class="item-title"
-                          ><i class="common common-persons"></i
-                          >考试人数：</el-col
-                        >
-                        <el-col :span="12" class="item-data">{{
-                          item.userNum
-                        }}</el-col>
+                        <el-col :span="12" class="item-title">
+                          <i class="common common-persons"></i>考试人数：
+                        </el-col>
+                        <el-col :span="12" class="item-data">
+                          {{ item.userNum }}
+                        </el-col>
                       </el-col>
                     </el-row>
-                    <div class="card-btn">
+                    <div class="card-btn" @click="goExam(item)">
                       <i class="common common-count-down"></i>开始考试
                     </div>
                   </el-card>
@@ -136,7 +131,8 @@
           </div>
           <div>
             <div class="box-title box-divider">
-              <i class="common common-classify"></i><span>待阅列表</span>
+              <i class="common common-classify"></i>
+              <span>待阅列表</span>
             </div>
             <template v-if="markList.length">
               <el-row :gutter="10">
@@ -151,16 +147,16 @@
                       </div>
                     </div>
                     <el-row class="body-item">
-                      <span class="start-time">{{ item.markStartTime }}</span
-                      >（{{
+                      <span class="start-time">{{ item.markStartTime }}</span>
+                      （{{
                         computeMinute(item.markStartTime, item.markEndTime)
                       }}）
                     </el-row>
                     <el-row class="body-item">
                       <el-col :span="12">
-                        <el-col :span="8" class="item-title"
-                          ><i class="common common-good"></i>及格：</el-col
-                        >
+                        <el-col :span="8" class="item-title">
+                          <i class="common common-good"></i>及格：
+                        </el-col>
                         <el-col :span="16" class="item-data">
                           {{
                             (item.paperPassScore * item.paperTotalScore) / 100
@@ -168,46 +164,46 @@
                         </el-col>
                       </el-col>
                       <el-col :span="12">
-                        <el-col :span="12" class="item-title"
-                          ><i class="common common-persons"></i
-                          >考试人数：</el-col
-                        >
-                        <el-col :span="12" class="item-data">{{
-                          item.userNum
-                        }}</el-col>
+                        <el-col :span="12" class="item-title">
+                          <i class="common common-persons"></i>考试人数：
+                        </el-col>
+                        <el-col :span="12" class="item-data">
+                          {{ item.userNum }}
+                        </el-col>
                       </el-col>
                     </el-row>
-                    <div class="card-btn">
+                    <div class="card-btn" @click="goMark(item)">
                       <i class="common common-count-down"></i>开始阅卷
                     </div>
                   </el-card>
                 </el-col>
               </el-row>
             </template>
-            <el-empty v-else description="暂无阅卷"> </el-empty>
+            <el-empty v-else description="暂无阅卷"></el-empty>
           </div>
         </el-col>
       </el-row>
       <div>
         <div class="box-title">
-          <i class="common common-data-library"></i><span>开放题库</span>
+          <i class="common common-data-library"></i>
+          <span>开放题库</span>
         </div>
         <template v-if="questionTypeOpenList.length">
           <el-row
-            :class="['notice', item.topState === 1 ? 'notice-hot' : '']"
+            class="library"
             :key="item.id"
             v-for="item in questionTypeOpenList"
             @click.native="goDetail(item)"
           >
-            <el-col :span="12" class="notice-left">
-              <span class="ellipsis">{{ item.questionTypeName }}</span>
-            </el-col>
-            <el-col :span="12" class="notice-right"
+            <el-col :span="12" class="library-left ellipsis">{{
+              item.questionTypeName
+            }}</el-col>
+            <el-col :span="12" class="library-right"
               >{{ item.startTime }} - {{ item.endTime }}</el-col
             >
           </el-row>
         </template>
-        <el-empty v-else description="暂无阅卷"> </el-empty>
+        <el-empty v-else description="暂无开放题库"></el-empty>
       </div>
     </div>
   </div>
@@ -217,10 +213,15 @@
 import { bulletinListPage } from 'api/base'
 import { myExamListPage, myMarkListPage } from 'api/my'
 import { questionTypeOpenListPage } from 'api/question'
+import NoticeBar from 'components/NoticeBar/Index'
 import getMainColor from '@/utils/getImageColor.js'
 import * as dayjs from 'dayjs'
 import Calendar from 'components/Calendar/index'
 export default {
+  components: {
+    Calendar,
+    NoticeBar,
+  },
   data() {
     return {
       examList: [],
@@ -241,20 +242,10 @@ export default {
       timePopovers: {},
     }
   },
-  components: {
-    Calendar,
-  },
   created() {
     this.init()
   },
   methods: {
-    // 计算分钟数
-    computeMinute(startTime, endTime) {
-      const diffTime =
-        new Date(endTime).getTime() - new Date(startTime).getTime()
-      const { hours, minutes, seconds } = this.$tools.formateTime(diffTime)
-      return `${hours}'${minutes}''${seconds}'''`
-    },
     // 初始化
     init() {
       this.getCarouselList()
@@ -285,6 +276,13 @@ export default {
         needMark: 1,
       })
       this.markList = list
+    },
+    // 计算分钟数
+    computeMinute(startTime, endTime) {
+      const diffTime =
+        new Date(endTime).getTime() - new Date(startTime).getTime()
+      const minutes = diffTime / (60 * 1000)
+      return `${minutes}分钟`
     },
     // 获取公告列表
     async getBulletinList() {
@@ -320,6 +318,10 @@ export default {
           }
         })
       }
+    },
+    // 公告详情
+    noticeDetail(id) {
+      this.$router.push(`/my?noticeId=${id}`)
     },
     // 获取选择月份的时间
     selectDate(time) {
@@ -428,6 +430,49 @@ export default {
         },
       })
     },
+    // 去考试页面
+    goExam({ id, examId, paperId, paperShowType, examStartTime, examEndTime }) {
+      const _examStartTime = new Date(examStartTime).getTime()
+      const _examEndTime = new Date(examEndTime).getTime()
+      const now = new Date().getTime()
+      if (now < _examStartTime) {
+        this.$message.warning('考试未开始，请等待...')
+        return
+      }
+
+      this.$router.push({
+        path: '/my/exam/index',
+        query: {
+          id,
+          examId,
+          paperId,
+          examEndTime,
+          showType: paperShowType,
+          preview: _examStartTime < now && now > _examEndTime,
+        },
+      })
+    },
+    // 去阅卷页面
+    goMark({ id, examId, paperId, markStartTime, markEndTime }) {
+      const _markStartTime = new Date(markStartTime).getTime()
+      const _markEndTime = new Date(markEndTime).getTime()
+      const now = new Date().getTime()
+      if (now < _markStartTime) {
+        this.$message.warning('阅卷未开始，请等待...')
+        return
+      }
+
+      this.$router.push({
+        path: '/my/mark/index',
+        query: {
+          markId: id,
+          examId,
+          paperId,
+          markEndTime: _markEndTime,
+          markStartTime: _markStartTime,
+        },
+      })
+    },
   },
 }
 </script>
@@ -458,7 +503,6 @@ export default {
     }
     .banner-content {
       font-size: 16px;
-      overflow: hidden;
       margin: 5px 0 0 30px;
     }
     .banner-btn {
@@ -649,92 +693,39 @@ export default {
 }
 
 // 通知列表
-.notice {
+.notice-custom-content {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  line-height: 30px;
-  background: #fff;
-  padding: 0 10px;
-  cursor: pointer;
-  &:nth-of-type(2) {
-    padding-top: 10px;
-    .notice-left {
-      i::before {
-        display: none;
-      }
-    }
-  }
-  &:nth-last-of-type(1) {
-    padding-bottom: 10px;
-    .notice-left {
-      i::after {
-        display: none;
-      }
-    }
-  }
-  &:hover {
-    color: #0095e9;
-    .notice-right {
-      color: #0095e9;
-    }
-    .notice-left {
-      i {
-        background: #0095e5;
-        box-shadow: 0 0 10px 1px rgba(0, 149, 233, 0.5);
-      }
-    }
-  }
-  .notice-left {
-    display: flex;
-    align-items: center;
-    line-height: 40px;
-    i {
-      width: 8px;
-      height: 8px;
-      display: block;
-      background: #dfdfdf;
-      border-radius: 4px;
-      margin-right: 8px;
-      position: relative;
-      &::after,
-      &::before {
-        content: '';
-        position: absolute;
-        box-sizing: border-box;
-        width: 1px;
-        height: calc((40px - 8px) / 2);
-        background: #f7f8f9;
-      }
-      &::after {
-        top: calc((40px - 8px) / 4);
-        left: 4px;
-      }
-      &::before {
-        bottom: calc((40px - 8px) / 4);
-        left: 4px;
-      }
-    }
-    span {
-      flex: 1;
-    }
-  }
-  .notice-right {
-    text-align: right;
-    color: #999;
+  justify-content: space-between;
+  width: 100%;
+  .content-title {
+    width: 80%;
   }
 }
 
-.notice-hot {
-  color: #0095e5;
-  .notice-left {
-    i {
-      background: #0095e5;
-      box-shadow: 0 0 10px 1px rgba(0, 149, 233, 0.5);
-    }
+// 开放题库
+.library {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  line-height: 40px;
+  background: #fff;
+  padding: 0 10px;
+  cursor: pointer;
+  width: 100%;
+  .library-left {
+    width: 70%;
   }
-  .notice-right {
-    color: #0095e5;
+  .library-right {
+    flex: 1;
+    text-align: right;
+    color: #999;
+  }
+  &:hover {
+    color: #0095e9;
+    .library-right {
+      color: #0095e9;
+    }
   }
 }
 </style>

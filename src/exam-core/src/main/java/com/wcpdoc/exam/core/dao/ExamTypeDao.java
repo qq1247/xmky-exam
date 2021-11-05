@@ -3,9 +3,10 @@ package com.wcpdoc.exam.core.dao;
 import java.util.List;
 import java.util.Map;
 
+import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.ExamType;
-import com.wcpdoc.exam.core.entity.PageIn;
-import com.wcpdoc.exam.core.entity.PageOut;
 
 /**
  * 考试分类数据访问层接口
