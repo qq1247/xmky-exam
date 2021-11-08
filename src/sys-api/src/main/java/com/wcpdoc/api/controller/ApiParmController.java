@@ -15,6 +15,7 @@ import com.wcpdoc.base.service.ParmService;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.util.ValidateUtil;
 /**
  * 参数控制层
  * 
@@ -59,17 +60,33 @@ public class ApiParmController extends BaseController {
 	 */
 	@RequestMapping("/email")
 	@ResponseBody
-	public PageResult email(Parm parm) {
+	public PageResult email(String host, String userName, String pwd, String protocol, String encode) {
 		try {
-			Parm entity = parmService.getEntity(parm.getId());
-			entity.setEmailHost(parm.getEmailHost());
-			entity.setEmailUserName(parm.getEmailUserName());
-			entity.setEmailPwd(parm.getEmailPwd());
-			entity.setEmailProtocol(parm.getEmailProtocol());
-			entity.setEmailEncode(parm.getEmailEncode());
+			if (!ValidateUtil.isValid(host)) {
+				return PageResult.err().msg("参数错误：host");
+			}
+			if (!ValidateUtil.isValid(userName)) {
+				return PageResult.err().msg("参数错误：userName");
+			}
+			if (!ValidateUtil.isValid(pwd)) {
+				return PageResult.err().msg("参数错误：pwd");
+			}
+			if (!ValidateUtil.isValid(protocol)) {
+				return PageResult.err().msg("参数错误：protocol");
+			}
+			if (!ValidateUtil.isValid(encode)) {
+				return PageResult.err().msg("参数错误：encode");
+			}
+			
+			Parm entity = parmService.get();
+			entity.setEmailHost(host);
+			entity.setEmailUserName(userName);
+			entity.setEmailPwd(pwd);
+			entity.setEmailProtocol(protocol);
+			entity.setEmailEncode(encode);
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
-			parmService.updateAndUpdate(entity);
+			parmService.update(entity);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加参数错误：{}", e.getMessage());
