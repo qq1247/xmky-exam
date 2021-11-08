@@ -42,12 +42,11 @@ public class BulletinDaoImpl extends RBaseDaoImpl<Bulletin> implements BulletinD
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("id")), "BULLETIN.ID = ?", pageIn.get("id"))
 			   .addWhere(ValidateUtil.isValid(pageIn.get("title")), "BULLETIN.TITLE LIKE ?", "%" + pageIn.get("title") + "%")
-			   .addWhere(ValidateUtil.isValid(pageIn.get("showType")), "BULLETIN.SHOW_TYPE = ?", pageIn.get("showType", Integer.class))
 			   .addWhere(pageIn.get("curUserId", Integer.class)!= null, "BULLETIN.UPDATE_USER_ID = ?", pageIn.get("curUserId", Integer.class))
 			   .addWhere(!ValidateUtil.isValid(pageIn.get("state")), "BULLETIN.STATE IN (1, 2)")
-			   .addWhere(ValidateUtil.isValid(pageIn.get("state")), "BULLETIN.STATE = ?", pageIn.get("state"))
-			   .addWhere(!ValidateUtil.isValid(pageIn.get("showType")), "BULLETIN.SHOW_TYPE IN (1, 2)", pageIn.get("showType"))
-			   .addWhere(ValidateUtil.isValid(pageIn.get("showType")), "BULLETIN.SHOW_TYPE = ?", pageIn.get("showType"))
+			   .addWhere(ValidateUtil.isValid(pageIn.get("state")), "BULLETIN.STATE = ?",  pageIn.get("state", Integer.class))
+			   .addWhere(!ValidateUtil.isValid(pageIn.get("showType")), "BULLETIN.SHOW_TYPE IN (1, 2)")
+			   .addWhere(ValidateUtil.isValid(pageIn.get("showType")), "BULLETIN.SHOW_TYPE = ?", pageIn.get("showType", Integer.class))
 			   .addOrder("BULLETIN.UPDATE_TIME", Order.DESC)
 			   .addOrder("BULLETIN.SHOW_TYPE", Order.DESC)
 			   .addOrder("BULLETIN.UPDATE_TIME", Order.DESC);
