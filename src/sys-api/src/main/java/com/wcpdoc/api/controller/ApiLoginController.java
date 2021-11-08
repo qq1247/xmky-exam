@@ -167,7 +167,7 @@ public class ApiLoginController extends BaseController {
 				logo = fileService.getFileEx(parm.getOrgLogo()).getFile();
 			}
 			
-			if (ico) {
+			if (ico != null && ico) {
 				ImageIcon imageIcon = new ImageIcon(logo.getAbsolutePath());
 			    BufferedImage bufferedImage=new BufferedImage(64,64,BufferedImage.TYPE_INT_RGB);
 			    Graphics2D g=(Graphics2D)bufferedImage.getGraphics();
