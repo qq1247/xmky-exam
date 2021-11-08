@@ -7,7 +7,6 @@ import javax.security.auth.login.LoginException;
 
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.entity.UserToken;
 import com.wcpdoc.base.service.LoginService;
@@ -63,15 +62,8 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 		user.setLastLoginTime(new Date());
 		userService.update(user);
 		
-		// 机构信息
-		Parm parm = parmService.get();
-		
 		// 返回响应数据
 		UserToken userToken = new UserToken();
-		if (parm != null) {
-			userToken.setOrgName(parm.getOrgName());
-			userToken.setOrgLogo(parm.getOrgLogo());
-		}
 		userToken.setUserName(user.getName());
 		userToken.setAccessToken(accessToken);
 		userToken.setUserId(user.getId());

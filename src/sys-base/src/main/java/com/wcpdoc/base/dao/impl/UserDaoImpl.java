@@ -2,6 +2,7 @@ package com.wcpdoc.base.dao.impl;
 
 import java.util.List;
 
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.base.dao.UserDao;
@@ -12,8 +13,8 @@ import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.HibernateUtil;
 import com.wcpdoc.core.util.SqlUtil;
-import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.core.util.SqlUtil.Order;
+import com.wcpdoc.core.util.ValidateUtil;
 
 /**
  * 用户数据访问层实现
@@ -61,5 +62,15 @@ public class UserDaoImpl extends RBaseDaoImpl<User> implements UserDao {
 	public List<User> getList(Integer orgId) {
 		String sql = "SELECT * FROM SYS_USER WHERE ORG_ID = ? AND STATE = 1";
 		return getList(sql, new Object[] { orgId });
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<User> getList(Integer[] ids) {
+		String sql = "SELECT * FROM SYS_USER WHERE ID IN (:IDS)";
+		Query<User> query = getCurSession().createSQLQuery(sql);
+		query.setParameter("IDS", ids);
+		//query.unwrap(NativeQuery.class).addEntity(clazz);
+		return query.list();
 	}
 }

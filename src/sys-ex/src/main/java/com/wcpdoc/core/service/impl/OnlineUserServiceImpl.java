@@ -33,7 +33,7 @@ public class OnlineUserServiceImpl implements OnlineUserService {// 不继承Bas
 
 	@Override
 	public void update(OnlineUser onlineUser) {
-		// set直接修改的是对象的值，这里保持空就可以
+		OnlineUserCache.put(onlineUser);
 	}
 
 	@Override
@@ -72,7 +72,8 @@ public class OnlineUserServiceImpl implements OnlineUserService {// 不继承Bas
 		// 设置为离线
 		OnlineUser onlineUser = getEntity(userId);
 		if (onlineUser != null && onlineUser.getState()) {// 如果在近半分钟内在线，设置为半分钟前，防止页面刷新后还是在线状态
-			onlineUser.setUpdateTime(DateUtil.getNextSecond(onlineUser.getUpdateTime(), -65000));
+			onlineUser.setUpdateTime(DateUtil.getNextSecond(onlineUser.getUpdateTime(), -65));
+			update(onlineUser);
 		}
 	}
 }

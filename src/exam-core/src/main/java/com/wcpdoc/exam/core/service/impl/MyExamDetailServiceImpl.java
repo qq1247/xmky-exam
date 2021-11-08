@@ -82,8 +82,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	}
 
 	@Override
-	public List<Map<String, Object>> getAnswerList(Integer myExamId) {
-		return myExamDetailDao.getAnswerList(myExamId, getCurUser().getId());
+	public List<Map<String, Object>> getAnswerList(Integer examId, Integer userId) {
+		return myExamDetailDao.getAnswerList(examId, userId);
 	}
 
 	@Override

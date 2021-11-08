@@ -64,37 +64,20 @@ public class QuestionAnswer {
 		this.no = no;
 	}
 	
-	public String[] getAnswers(Integer type) {
+	public String[] getAnswers(Integer type, Integer ai, String answer) {
 		if (!ValidateUtil.isValid(answer)) {
 			return new String[0];
 		}
-		
-		if (type == 1 || type == 4 || type == 5) {
+
+		if (type == 1 || type == 4 || (ai == 2 && type == 5)) {
 			return new String[] { answer };
 		}
 		if (type == 2) {
 			return answer.split(",");
 		}
-		if (type == 3) {
+		if (type == 3 || (ai == 1 && type == 5)) {
 			return answer.split("\n");
 		}
-		throw new MyException("getAnswers方法解析错误");
-	}
-	
-	public String[] getAnswers(Integer type, String answer) {
-		if (!ValidateUtil.isValid(answer)) {
-			return new String[0];
-		}
-		
-		if (type == 1 || type == 4 || type == 5) {
-			return new String[] { answer };
-		}
-		if (type == 2) {
-			return answer.split(",");
-		}
-		if (type == 3) {
-			return answer.split("\n");
-		}
-		throw new MyException("getAnswers方法解析错误");
+		throw new MyException("解析错误");
 	}
 }

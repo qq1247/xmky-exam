@@ -37,7 +37,6 @@ public class OnlineUser implements Serializable {
 		if (updateTime == null) {
 			return false;
 		}
-		
 		return System.currentTimeMillis() - updateTime.getTime() < 35000;
 	}
 

@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wcpdoc.base.service.UserService;
-import com.wcpdoc.core.constant.ConstantManager;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.OnlineUser;
 import com.wcpdoc.core.entity.PageIn;
@@ -74,9 +73,7 @@ public class ApiExamController extends BaseController{
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
-			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
-				pageIn.addAttr("curUserId", getCurUser().getId());
-			}
+			pageIn.addAttr("curUserId", getCurUser().getId());
 			return PageResultEx.ok().data(examService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("考试列表错误：", e);
@@ -155,16 +152,16 @@ public class ApiExamController extends BaseController{
 	 * @param pageIn
 	 * @return PageOut
 	 */
-	@RequestMapping("/examUserList")
-	@ResponseBody
-	public PageResult examUserList(Integer id) {
-		try {
-			return PageResultEx.ok().data(examService.getExamUserList(id));
-		} catch (Exception e) {
-			log.error("用户列表错误：", e);
-			return PageResult.err();
-		}
-	}
+//	@RequestMapping("/examUserList")
+//	@ResponseBody
+//	public PageResult examUserList(Integer id) {
+//		try {
+//			return PageResultEx.ok().data(examService.getExamUserList(id));
+//		} catch (Exception e) {
+//			log.error("用户列表错误：", e);
+//			return PageResult.err();
+//		}
+//	}
 	
 	/**
 	 * 阅卷用户列表

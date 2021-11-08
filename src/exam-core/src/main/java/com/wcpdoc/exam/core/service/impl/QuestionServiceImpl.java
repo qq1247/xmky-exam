@@ -26,8 +26,6 @@ import org.springframework.stereotype.Service;
 import com.wcpdoc.base.cache.ProgressBarCache;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.dao.BaseDao;
-import com.wcpdoc.core.entity.PageIn;
-import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.BigDecimalUtil;
@@ -76,7 +74,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void addAndUpdate(Question question, Integer[] scoreOptions, String[] answers, String[] options, BigDecimal[] scores) {
+	public void addAndUpdate(Question question, Integer[] scoreOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
 		// 校验数据有效性
 		if (question.getType() == null) {
 			throw new MyException("参数错误：type");
@@ -90,8 +88,10 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (!ValidateUtil.isValid(answers)) {
 			throw new MyException("参数错误：answers");
 		}
-		if(!hasWriteAuth(question.getQuestionTypeId(), getCurUser().getId()) && !hasReadAuth(question.getQuestionTypeId(), getCurUser().getId())) {
-			throw new MyException("权限不足！");
+		
+		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
+		if(questionTypeService.hasWriteAuth(questionType, question.getId())) {
+			throw new MyException("无操作权限");
 		}
 		
 		if (question.getType() == 1 && options != null) {
@@ -165,21 +165,21 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (question.getType() == 1 || question.getType() == 4 ) {
 			QuestionAnswer questionAnswer = new QuestionAnswer();
 			questionAnswer.setAnswer(answers[0].toUpperCase());
-			if (question.getAi() == 1 && scores != null) {				
-				questionAnswer.setScore(scores[0]);
+			if (question.getAi() == 1 && answerScores != null) {				
+				questionAnswer.setScore(answerScores[0]);
 			}else{
 				questionAnswer.setScore(new BigDecimal(0));
 			}
 			questionAnswer.setQuestionId(question.getId());
 			questionAnswer.setNo(1);
 			questionAnswerService.add(questionAnswer);
-			total = scores[0];
+			total = answerScores[0];
 		} else if (question.getType() == 2) {
 			for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();
 				questionAnswer.setAnswer(answers[i].toUpperCase());
-				if (question.getAi() == 1 && scores != null) {
-					questionAnswer.setScore(scores[0]);
+				if (question.getAi() == 1 && answerScores != null) {
+					questionAnswer.setScore(answerScores[0]);
 				}else{
 					questionAnswer.setScore(new BigDecimal(0));
 				}
@@ -192,15 +192,15 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();
 				questionAnswer.setAnswer(answers[i]);
-				if (question.getAi() == 1 && scores != null) {
-					questionAnswer.setScore(scores[i]);
+				if (question.getAi() == 1 && answerScores != null) {
+					questionAnswer.setScore(answerScores[i]);
 				}else{
 					questionAnswer.setScore(new BigDecimal(0));
 				}
 				questionAnswer.setQuestionId(question.getId());
 				questionAnswer.setNo(i+1);
 				questionAnswerService.add(questionAnswer);
-				total = total.add(scores[i]);
+				total = total.add(answerScores[i]);
 			}
 		}
 		if (question.getAi() == 1 &&  question.getScore().compareTo(total) != 0) {
@@ -223,7 +223,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void updateAndUpdate(Question question, Integer[] scoreOptions, String[] answers, String[] options, BigDecimal[] scores) { //, boolean newVer
+	public void updateAndUpdate(Question question, Integer[] scoreOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
 		// 校验数据有效性
 		if (question.getType() == null) {
 			throw new MyException("参数错误：type");
@@ -299,8 +299,10 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (entity.getState() == 0) {
 			throw new MyException("试题已删除不能修改！");
 		}
-		if(!hasWriteAuth(entity.getQuestionTypeId(), getCurUser().getId()) && !hasReadAuth(question.getQuestionTypeId(), getCurUser().getId())) {
-			throw new MyException("权限不足！");
+		
+		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
+		if(questionTypeService.hasWriteAuth(questionType, question.getId())) {
+			throw new MyException("无操作权限");
 		}
 		/*if (newVer) {
 			// 删除旧版本
@@ -366,21 +368,21 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (question.getType() == 1 || question.getType() == 4 ) {
 			QuestionAnswer questionAnswer = new QuestionAnswer();
 			questionAnswer.setAnswer(answers[0]);
-			if (question.getAi() == 1 && scores != null) {
-				questionAnswer.setScore(scores[0]);
+			if (question.getAi() == 1 && answerScores != null) {
+				questionAnswer.setScore(answerScores[0]);
 			}else{
 				questionAnswer.setScore(new BigDecimal(0));
 			}
 			questionAnswer.setQuestionId(entity.getId());
 			questionAnswer.setNo(1);
 			questionAnswerService.add(questionAnswer);
-			total = scores[0];
+			total = answerScores[0];
 		} else if (question.getType() == 2) {
 			for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();
 				questionAnswer.setAnswer(answers[i]);
-				if (question.getAi() == 1 && scores != null) {
-					questionAnswer.setScore(scores[0]);
+				if (question.getAi() == 1 && answerScores != null) {
+					questionAnswer.setScore(answerScores[0]);
 				}else{
 					questionAnswer.setScore(new BigDecimal(0));
 				}
@@ -393,15 +395,15 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();
 				questionAnswer.setAnswer(answers[i]);
-				if (question.getAi() == 1 && scores != null) {
-					questionAnswer.setScore(scores[i]);
+				if (question.getAi() == 1 && answerScores != null) {
+					questionAnswer.setScore(answerScores[i]);
 				}else{
 					questionAnswer.setScore(new BigDecimal(0));
 				}
 				questionAnswer.setQuestionId(entity.getId());
 				questionAnswer.setNo(i+1);
 				questionAnswerService.add(questionAnswer);
-				total = total.add(scores[i]);
+				total = total.add(answerScores[i]);
 			}
 		} 
 		if (question.getAi() == 1 && question.getScore().compareTo(total) != 0) {
@@ -428,24 +430,20 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		saveFile(entity);
 	}
 
-
 	@Override
 	public void delAndUpdate(Integer id) {
 		Question question = questionDao.getEntity(id);
-		if(!hasWriteAuth(question.getQuestionTypeId(), getCurUser().getId()) && !hasReadAuth(question.getQuestionTypeId(), getCurUser().getId())) {
-			throw new MyException("权限不足！");
+		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
+		if(questionTypeService.hasWriteAuth(questionType, question.getId())) {
+			throw new MyException("无操作权限");
 		}
+		
 		question.setState(0);
 		question.setUpdateTime(new Date());
 		question.setUpdateUserId(getCurUser().getId());
 		questionDao.update(question);
 	}
 	
-	@Override
-	public List<Question> getList(Integer questionTypeId) {
-		return questionDao.getList(questionTypeId);
-	}
-
 	private void saveFile(Question question) {
 		List<Integer> fileIdList = html2FileIds(question.getTitle());// 标题
 
@@ -593,29 +591,32 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void move(Integer id, Integer sourceId, Integer targetId) {
+	public void move(Integer sourceId, Integer targetId) {
+		// 校验数据有效性
 		if (sourceId == null) {
 			throw new MyException("参数错误：sourceId");
 		}
 		if(targetId == null){
 			throw new MyException("参数错误：targetId");
 		}
-		QuestionType questionType = questionTypeService.getEntity(sourceId);
-		if (questionType == null || questionType.getState() == 0 ){
-			throw new MyException("此分类已被删除！");
+		QuestionType source = questionTypeService.getEntity(sourceId);
+		if (source.getState() == 0 ){
+			throw new MyException("该分类已删除");
 		}
-		QuestionType entity = questionTypeService.getEntity(targetId);
-		if (entity == null || entity.getState() == 0) {
-			throw new MyException("此分类已被删除！");
+		QuestionType target = questionTypeService.getEntity(targetId);
+		if (target.getState() == 0) {
+			throw new MyException("该分类已删除");
 		}
-		if (questionType.getCreateUserId() != getCurUser().getId()) {
-			throw new MyException("权限不足！");
+		
+		if (source.getCreateUserId().intValue() != getCurUser().getId().intValue()) {// 只能移动自己的分类
+			throw new MyException("无操作权限");
 		}
-		List<Question> list = questionDao.getList(sourceId);
-		for (Question question : list) {
-			question.setQuestionTypeId(targetId);
-			update(question);
+		if (!target.getWriteUserIds().contains(String.format(",%s,", getCurUser().getId()))) {// 只能移动到自己的分类或有组权限的分类
+			throw new MyException("无操作权限");
 		}
+		
+		// 移动
+		questionDao.updateQuestionType(sourceId, targetId);
 	}
 
 	@Override
@@ -647,15 +648,11 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public PageOut randomListpage(PageIn pageIn) {
-		return questionDao.randomListpage(pageIn);
-	}
-
-	@Override
 	public void copy(Integer id) throws Exception{
 		Question question = questionDao.getEntity(id);
-		if(!hasWriteAuth(question.getQuestionTypeId(), getCurUser().getId()) && !hasReadAuth(question.getQuestionTypeId(), getCurUser().getId())) {
-			throw new MyException("权限不足！");
+		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
+		if(questionTypeService.hasWriteAuth(questionType, question.getId())) {
+			throw new MyException("无操作权限");
 		}
 		
 		Question entity = new Question();
@@ -694,8 +691,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (question.getState() == 1) {
 			throw new MyException("试题已发布！");
 		}
-		if(!hasWriteAuth(question.getQuestionTypeId(), getCurUser().getId()) && !hasReadAuth(question.getQuestionTypeId(), getCurUser().getId())) {
-			throw new MyException("权限不足！");
+		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
+		if(questionTypeService.hasWriteAuth(questionType, question.getId())) {
+			throw new MyException("无操作权限");
 		}
 		if (question.getState() == 2) {
 			question.setState(1);
@@ -706,12 +704,4 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		questionDao.update(question);
 	}
 	
-	private boolean hasWriteAuth(Integer questionTypeId, Integer userId) {
-		QuestionType questionType = questionTypeService.getEntity(questionTypeId);
-		return questionType.getWriteUserIds().contains(String.format(",%s,", userId));
-	}
-	private boolean hasReadAuth(Integer questionTypeId, Integer userId) {
-		QuestionType questionType = questionTypeService.getEntity(questionTypeId);
-		return questionType.getReadUserIds().contains(String.format(",%s,", userId));
-	}
 }

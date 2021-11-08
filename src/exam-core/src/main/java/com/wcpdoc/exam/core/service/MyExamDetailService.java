@@ -26,10 +26,11 @@ public interface MyExamDetailService extends BaseService<MyExamDetail>{
 	 * 获取我的考试详细列表
 	 * 
 	 * v1.0 zhanghc 2017年7月3日上午9:44:45
-	 * @param myExamId
+	 * @param examId
+	 * @param userId
 	 * @return List<Map<String, Object>>
 	 */
-	List<Map<String, Object>> getAnswerList(Integer myExamId);
+	List<Map<String, Object>> getAnswerList(Integer examId, Integer userId);
 
 	/**
 	 * 阅卷获取我的考试详细列表

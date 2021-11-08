@@ -1,6 +1,5 @@
 package com.wcpdoc.exam.core.dao.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -9,17 +8,15 @@ import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.base.cache.DictCache;
 import com.wcpdoc.base.dao.UserDao;
-import com.wcpdoc.base.entity.User;
 import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.util.HibernateUtil;
 import com.wcpdoc.core.util.SqlUtil;
-import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.core.util.SqlUtil.Order;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.PaperDao;
 import com.wcpdoc.exam.core.entity.Paper;
-import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 
 /**
@@ -34,52 +31,22 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 	
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT PAPER.*, PAPER_TYPE.NAME AS PAPER_TYPE_NAME, UPDATE_USER.NAME AS UPDATE_USER_NAME, CREATE_USER.NAME AS CREATE_USER_NAME "
+		String sql = "SELECT PAPER.ID, PAPER.NAME, PAPER.STATE, PAPER.UPDATE_USER_ID, "
+				+ "PAPER.PASS_SCORE, PAPER.TOTAL_SCORE, PAPER.PAPER_TYPE_ID, PAPER.SHOW_TYPE,"
+				+ "PAPER.GEN_TYPE, PAPER_TYPE.NAME AS PAPER_TYPE_NAME, "
+				+ "UPDATE_USER.NAME AS UPDATE_USER_NAME "
 				+ "FROM EXM_PAPER PAPER "
 				+ "LEFT JOIN EXM_PAPER_TYPE PAPER_TYPE ON PAPER.PAPER_TYPE_ID = PAPER_TYPE.ID "
-				+ "LEFT JOIN SYS_USER CREATE_USER ON PAPER.CREATE_USER_ID = CREATE_USER.ID "
 				+ "LEFT JOIN SYS_USER UPDATE_USER ON PAPER.UPDATE_USER_ID = UPDATE_USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("paperTypeId")), "PAPER.PAPER_TYPE_ID = ?", pageIn.get("paperTypeId"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("userName")), "CREATE_USER.NAME LIKE ?", "%" + pageIn.get("userName") + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.get("state")), "PAPER.STATE = ?", pageIn.get("state"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("paperId")), "PAPER.ID = ?", pageIn.get("paperId"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "PAPER.NAME LIKE ?", "%" + pageIn.get("name") + "%")
-				.addWhere("PAPER.STATE != ?", 0)
+		.addWhere(ValidateUtil.isValid(pageIn.get("name")), "PAPER.NAME LIKE ?", "%" + pageIn.get("name") + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId")), "PAPER_TYPE.READ_USER_IDS LIKE ?", String.format("%%%s%%", pageIn.get("curUserId")))// 只看自己的
+				.addWhere("PAPER.STATE IN (1,2)")
 				.addOrder("PAPER.UPDATE_TIME", Order.DESC);
-		
-		if (pageIn.get("curUserId", Integer.class) != null && pageIn.get("curUserId", Integer.class) != 1) {
-			User user = userDao.getEntity(pageIn.get("curUserId", Integer.class));
-			StringBuilder partSql = new StringBuilder();
-			List<Object> params = new ArrayList<>();
-			partSql.append("(");
-			partSql.append("PAPER_TYPE.WRITE_USER_IDS LIKE ? ");
-			params.add("%" + user.getId() + "%");
-			
-			partSql.append("OR PAPER_TYPE.READ_USER_IDS LIKE ? ");
-			params.add("%" + user.getId() + "%");
-			
-			/*if (ValidateUtil.isValid(user.getPostIds())) {
-				String[] postIds = user.getPostIds().substring(1, user.getPostIds().length() - 1).split(",");
-				for (String postId : postIds) {
-					partSql.append("OR PAPER_TYPE.POST_IDS LIKE ? ");
-					params.add("%" + postId + "%");
-				}
-			}*/
-			partSql.append(")");
-			
-			sqlUtil.addWhere(partSql.toString(), params.toArray(new Object[params.size()]));
-		}
-		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), "STATE", "STATE");
 		return pageOut;
-	}
-
-	@Override
-	public List<PaperQuestion> getPaperQuestionList(Integer id) {
-		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = ? ORDER BY NO ASC";
-		return getList(sql, new Object[]{id}, PaperQuestion.class);
 	}
 
 	@Override

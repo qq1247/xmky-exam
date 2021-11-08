@@ -3,7 +3,6 @@ package com.wcpdoc.exam.core.service;
 import java.util.List;
 import java.util.Map;
 
-import com.wcpdoc.core.entity.LoginUser;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.service.BaseService;
@@ -77,16 +76,6 @@ public interface ExamService extends BaseService<Exam>{
 	 * void
 	 */
 	void updateMarkUser(Integer id, Integer[] markUserIds, String[] examUserIds, String[] questionIds);
-	
-	/**
-	 * 完成强制交卷
-	 * 
-	 * v1.0 zhanghc 2017年8月28日上午10:37:27
-	 * @param user
-	 * @param myExamId
-	 * void
-	 */
-	void forcePaper(LoginUser user);
 
 	/**
 	 * 获取考试列表

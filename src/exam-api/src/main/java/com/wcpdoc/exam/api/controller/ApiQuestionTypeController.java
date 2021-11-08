@@ -1,5 +1,10 @@
 package com.wcpdoc.exam.api.controller;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
@@ -8,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
@@ -16,6 +22,7 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
@@ -39,8 +46,8 @@ public class ApiQuestionTypeController extends BaseController {
 	
 	/**
 	 * 试题分类列表 
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
+	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * @return pageOut
 	 */
 	@RequestMapping("/listpage")
@@ -49,8 +56,32 @@ public class ApiQuestionTypeController extends BaseController {
 		try {
 			PageIn pageIn = new PageIn(request);
 			pageIn.addAttr("curUserId", getCurUser().getId());
-			PageOut listpage = questionTypeService.getListpage(pageIn);
-			return PageResultEx.ok().data(listpage);
+			PageOut pageOut = questionTypeService.getListpage(pageIn);
+			for (Map<String, Object> result : pageOut.getList()) {
+				if (!ValidateUtil.isValid((String)result.get("writeUserIds"))) {
+					result.put("writeUserIds", new Integer[0]);
+					result.put("writeUserNames", new String[0]);
+					continue;
+				}
+				
+				Set<Integer> writeUserIdSet = new HashSet<>();
+				for (String id : ((String)result.get("writeUserIds")).split(",")) {
+					if (!ValidateUtil.isValid(id)) {// ,2,3,23, 有空值
+						continue;
+					}
+					writeUserIdSet.add(Integer.parseInt(id));
+				}
+				
+				Integer[] writeUserIds = writeUserIdSet.toArray(new Integer[0]);
+				List<User> writeUserList = userService.getList(writeUserIds);
+				String[] writeUserNames = new String[writeUserList.size()];
+				for (int i = 0; i < writeUserList.size(); i++) {
+					writeUserNames[i] = writeUserList.get(i).getName();
+				}
+				result.put("writeUserIds", writeUserIds);
+				result.put("writeUserNames", writeUserNames);
+			}
+			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("试题分类列表错误：", e);
 			return PageResult.err();
@@ -65,9 +96,9 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	public PageResult add(String name, Integer imgFileId) {
+	public PageResult add(QuestionType questionType) {
 		try {
-			questionTypeService.addAndUpdate(name, imgFileId);
+			questionTypeService.addAndUpdate(questionType);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加试题分类错误：{}", e.getMessage());
@@ -86,9 +117,9 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	public PageResult edit(Integer id, String name, Integer imgFileId) {
+	public PageResult edit(QuestionType questionType) {
 		try {
-			questionTypeService.editAndUpdate(id, name, imgFileId);
+			questionTypeService.editAndUpdate(questionType);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改试题分类错误：{}", e.getMessage());
@@ -122,8 +153,8 @@ public class ApiQuestionTypeController extends BaseController {
 	
 	/**
 	 * 获取试题分类
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
+	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * @return pageOut
 	 */
 	@RequestMapping("/get")
@@ -131,14 +162,30 @@ public class ApiQuestionTypeController extends BaseController {
 	public PageResult get(Integer id) {
 		try {
 			QuestionType entity = questionTypeService.getEntity(id);
+			
+			Set<Integer> writeUserIdSet = new HashSet<>();
+			for (String writeUserId : entity.getWriteUserIds().split(",")) {
+				if (!ValidateUtil.isValid(writeUserId)) {// ,2,3,23, 有空值
+					continue;
+				}
+				writeUserIdSet.add(Integer.parseInt(writeUserId));
+			}
+			
+			Integer[] writeUserIds = writeUserIdSet.toArray(new Integer[0]);
+			List<User> writeUserList = userService.getList(writeUserIds);
+			String[] writeUserNames = new String[writeUserList.size()];
+			for (int i = 0; i < writeUserList.size(); i++) {
+				writeUserNames[i] = writeUserList.get(i).getName();
+			}
+			
 			return PageResultEx.ok()
 					.addAttr("id", entity.getId())
 					.addAttr("name", entity.getName())
-					.addAttr("imgFileId", entity.getImgFileId())
 					.addAttr("createUserId", entity.getCreateUserId())
+					.addAttr("createUserName", userService.getEntity(entity.getCreateUserId()).getName())
 					.addAttr("createTime", DateUtil.formatDateTime(entity.getCreateTime()))
-					.addAttr("readUserIds", entity.getReadUserIds().subSequence(1, entity.getReadUserIds().length() -1 ).toString().split(","))
-					.addAttr("writeUserIds", entity.getWriteUserIds().subSequence(1, entity.getWriteUserIds().length() -1 ).toString().split(","));
+					.addAttr("writeUserIds", writeUserIds)
+					.addAttr("writeUserNames", writeUserNames);
 		} catch (MyException e) {
 			log.error("获取试题分类错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -149,26 +196,24 @@ public class ApiQuestionTypeController extends BaseController {
 	}
 	
 	/**
-	 * 添加权限
+	 * 添加组用户
 	 * 
 	 * v1.0 chenyun 2021年3月2日上午10:18:26
 	 * @param id	
-	 * @param readUserIds
 	 * @param writeUserIds
-	 * @param rwState
 	 * @return PageResult
 	 */
 	@RequestMapping("/auth")
 	@ResponseBody
-	public PageResult auth(Integer id, String readUserIds, String writeUserIds) {
+	public PageResult auth(Integer id, Integer[] writeUserIds) {
 		try {
-			questionTypeService.auth(id, readUserIds, writeUserIds);
+			questionTypeService.auth(id, writeUserIds);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("添加权限用户错误：{}", e.getMessage());
+			log.error("添加组用户错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("添加权限用户错误：", e);
+			log.error("添加组用户错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -182,9 +227,9 @@ public class ApiQuestionTypeController extends BaseController {
 	 */
 	@RequestMapping("/move")
 	@ResponseBody
-	public PageResult move(Integer id, Integer sourceId, Integer targetId) {
+	public PageResult move(Integer sourceId, Integer targetId) {
 		try {
-			questionService.move(id, sourceId, targetId);
+			questionService.move(sourceId, targetId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("合并试题错误：{}", e.getMessage());

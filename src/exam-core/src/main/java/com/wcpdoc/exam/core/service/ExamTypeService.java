@@ -1,9 +1,5 @@
 package com.wcpdoc.exam.core.service;
 
-import java.util.List;
-
-import com.wcpdoc.core.entity.PageIn;
-import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.ExamType;
 /**
@@ -24,7 +20,7 @@ public interface ExamTypeService extends BaseService<ExamType> {
 	/**
 	 * 修改考试分类
 	 * 
-	 * v1.0 cY 2021年6月11日下午2:44:38
+	 * v1.0 cy 2021年6月11日下午2:44:38
 	 * @param examType void
 	 */
 	void editAndUpdate(ExamType examType);
@@ -36,41 +32,4 @@ public interface ExamTypeService extends BaseService<ExamType> {
 	 * void
 	 */
 	void delAndUpdate(Integer id);
-	
-	/**
-	 * 名称是否重复
-	 * 
-	 * v1.0 zhanghc 2020-09-05 10:12:16
-	 * @param examType
-	 * @return boolean
-	 */
-	boolean existName(ExamType examType);
-
-	/**
-	 * 获取考试分类列表
-	 * 
-	 * v1.0 zhanghc 2018年6月3日上午11:19:02
-	 * @return List<ExamType>
-	 */
-	List<ExamType> getList();
-
-	/**
-	 * 完成授权
-	 * 
-	 * v1.0 zhanghc 2020年9月8日上午10:06:53
-	 * @param id
-	 * @param readUserIds
-	 * @param writeUserIds
-	 * void
-	 */
-	void doAuth(Integer id, String readUserIds, String writeUserIds);
-	
-	/**
-	 * 获取人员列表
-	 * 
-	 * v1.0 zhanghc 2018年5月30日下午6:28:19
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	PageOut authUserListpage(PageIn pageIn);
 }

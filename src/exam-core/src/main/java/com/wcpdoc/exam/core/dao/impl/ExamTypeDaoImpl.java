@@ -1,6 +1,5 @@
 package com.wcpdoc.exam.core.dao.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -9,15 +8,12 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.base.dao.UserDao;
-import com.wcpdoc.base.entity.User;
 import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
-import com.wcpdoc.core.util.DateUtil;
-import com.wcpdoc.core.util.HibernateUtil;
 import com.wcpdoc.core.util.SqlUtil;
-import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.core.util.SqlUtil.Order;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.ExamTypeDao;
 import com.wcpdoc.exam.core.entity.ExamType;
 
@@ -33,39 +29,16 @@ public class ExamTypeDaoImpl extends RBaseDaoImpl<ExamType> implements ExamTypeD
 	
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT EXAM_TYPE.*, "
-				+ "IFNULL((select GROUP_CONCAT(user.NAME SEPARATOR ',') from sys_user user where user.state!=0 and EXISTS ( SELECT 1 FROM EXM_EXAM_TYPE et "
-				+ "WHERE EXAM_TYPE.ID = et.ID and et.WRITE_USER_IDS like CONCAT('%,',user.ID,',%'))),'') as 'WRITE_USER_NAMES',"
-				+ "IFNULL((select GROUP_CONCAT(user.NAME SEPARATOR ',') from sys_user user where user.state!=0 and EXISTS ( SELECT 1 FROM EXM_EXAM_TYPE et "
-				+ "WHERE EXAM_TYPE.ID = et.ID and et.READ_USER_IDS like CONCAT('%,',user.ID,',%'))),'') as 'READ_USER_NAMES', "
-				+ "IFNULL((select user.NAME from sys_user user where user.state!=0 and user.ID = EXAM_TYPE.CREATE_USER_ID),'') as 'CREATE_USER_NAME'"
-				+ "FROM EXM_EXAM_TYPE EXAM_TYPE ";
+		String sql = "SELECT PAPER_TYPE.ID, PAPER_TYPE.NAME, PAPER_TYPE.READ_USER_IDS, "
+				+ "PAPER_TYPE.CREATE_USER_ID, USER.NAME AS CREATE_USER_NAME "
+				+ "FROM EXM_PAPER_TYPE PAPER_TYPE "
+				+ "INNER JOIN SYS_USER USER ON PAPER_TYPE.CREATE_USER_ID = USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "EXAM_TYPE.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
-				.addWhere("EXAM_TYPE.STATE = 1")
-				.addWhere("EXAM_TYPE.ID != 1")
-				.addOrder("EXAM_TYPE.UPDATE_TIME", Order.DESC);
-		
-		if (pageIn.get("curUserId", Integer.class) != null) {
-			User user = userDao.getEntity(pageIn.get("curUserId", Integer.class));
-			StringBuilder partSql = new StringBuilder();
-			List<Object> params = new ArrayList<>();
-			partSql.append("(");
-			partSql.append("EXAM_TYPE.READ_USER_IDS LIKE ? ");
-			params.add("%," + user.getId() + ",%");
-			
-			partSql.append("OR EXAM_TYPE.WRITE_USER_IDS LIKE ? ");
-			params.add("%," + user.getId() + ",%");
-			
-			partSql.append(")");
-			sqlUtil.addWhere(partSql.toString(), params.toArray(new Object[params.size()]));
-		}
-		
-		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDate(pageOut.getList(), 
-				"updateTime", DateUtil.FORMAT_DATE_TIME, 
-				"createTime", DateUtil.FORMAT_DATE_TIME);
-		return pageOut;
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "PAPER_TYPE.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
+				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "PAPER_TYPE.CREATE_USER_ID = ?", String.format("%%%s%%", pageIn.get("curUserId", Integer.class)))
+				.addWhere("PAPER_TYPE.STATE = 1")
+				.addOrder("PAPER_TYPE.UPDATE_TIME", Order.DESC);
+		return getListpage(sqlUtil, pageIn);
 	}
 
 	@Override

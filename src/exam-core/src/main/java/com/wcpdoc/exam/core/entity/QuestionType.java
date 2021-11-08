@@ -43,8 +43,6 @@ public class QuestionType {
 	private Date updateTime;
 	@Column(name = "STATE")
 	private Integer state;
-	@Column(name = "READ_USER_IDS")
-	private String readUserIds;
 	@Column(name = "WRITE_USER_IDS")
 	private String writeUserIds;
 	
@@ -95,12 +93,6 @@ public class QuestionType {
 	}
 	public void setState(Integer state) {
 		this.state = state;
-	}
-	public String getReadUserIds() {
-		return readUserIds;
-	}
-	public void setReadUserIds(String readUserIds) {
-		this.readUserIds = readUserIds;
 	}
 	public String getWriteUserIds() {
 		return writeUserIds;

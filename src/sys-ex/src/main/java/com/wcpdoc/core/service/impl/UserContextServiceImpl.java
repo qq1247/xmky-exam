@@ -26,20 +26,20 @@ public class UserContextServiceImpl implements UserContextService {
 			return null;
 		}
 		
-		JwtResult jwtResult = JwtUtil.getInstance().parse(jwt);// 令牌解析失败，不处理
-		if (jwtResult.getCode() != 200) {
+		JwtResult oldJwtResult = JwtUtil.getInstance().parse(jwt);// 令牌解析失败，不处理
+		if (oldJwtResult.getCode() != 200) {
 			return null;
 		}
 		
 		return new LoginUser() {
 			@Override
 			public Integer getId() {
-				return jwtResult.getClaims().get("userId", Integer.class);
+				return oldJwtResult.getClaims().get("userId", Integer.class);
 			}
 
 			@Override
 			public String getLoginName() {
-				return jwtResult.getClaims().get("loginName", String.class);
+				return oldJwtResult.getClaims().get("loginName", String.class);
 			}
 		};
 	}

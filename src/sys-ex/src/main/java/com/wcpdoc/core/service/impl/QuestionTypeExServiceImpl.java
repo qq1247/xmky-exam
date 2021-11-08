@@ -1,14 +1,11 @@
 package com.wcpdoc.core.service.impl;
 
-import java.util.List;
-
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.exception.MyException;
-import com.wcpdoc.core.util.ValidateUtil;
-import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeExService;
@@ -26,9 +23,10 @@ public class QuestionTypeExServiceImpl implements QuestionTypeExService {
 
 	@Override
 	public void delAndUpdate(QuestionType questionType) {
-		List<Question> questionList = questionService.getList(questionType.getId());
-		if (ValidateUtil.isValid(questionList)) {
-			throw new MyException("该试题分类下有试题，不允许删除！");
+		PageIn pageIn = new PageIn().setPageSize(1).addAttr("paperId", questionType.getId());
+		int questionNum = questionService.getListpage(pageIn).getTotal();
+		if (questionNum > 0) {
+			throw new MyException("该分类下有试题，不允许删除");
 		}
 	}
 }

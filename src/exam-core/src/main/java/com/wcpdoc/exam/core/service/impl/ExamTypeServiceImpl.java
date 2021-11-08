@@ -1,22 +1,16 @@
 package com.wcpdoc.exam.core.service.impl;
 
 import java.util.Date;
-import java.util.List;
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.base.service.OrgService;
-import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.dao.BaseDao;
-import com.wcpdoc.core.entity.PageIn;
-import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.ExamTypeDao;
-import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamType;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.ExamTypeExService;
@@ -33,10 +27,6 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 	private ExamTypeDao examTypeDao;
 	@Resource
 	private ExamTypeExService examTypeExService;
-	@Resource
-	private OrgService orgService;
-	@Resource
-	private UserService userService;
 	@Resource
 	private FileService fileService;
 	@Resource
@@ -55,23 +45,20 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 		if (!ValidateUtil.isValid(examType.getName())) {
 			throw new MyException("参数错误：name");
 		}
+		//if (existName(questionType)) {
+		//	throw new MyException("名称已存在！");
+		//} // 不同的子管理员添加可以重复
 		
-		/*if (existName(examType)) {
-			throw new MyException("名称已存在！");
-		}*/
-				
 		// 添加试题分类
-		examType.setReadUserIds(","+getCurUser().getId()+",");
-		examType.setWriteUserIds(","+getCurUser().getId()+",");
 		examType.setCreateUserId(getCurUser().getId());
 		examType.setCreateTime(new Date());
-		examType.setUpdateUserId(getCurUser().getId());
 		examType.setUpdateTime(new Date());
+		examType.setUpdateUserId(getCurUser().getId());
 		examType.setState(1);
 		add(examType);
 		
 		//保存图片
-		//fileService.doUpload(examType.getImgId());
+		//fileService.doUpload(imgId);
 	}
 
 	@Override
@@ -80,38 +67,30 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 		if(!ValidateUtil.isValid(examType.getName())) {
 			throw new MyException("参数错误：name");
 		}
-		/*if(existName(examType)) {
-			throw new MyException("名称已存在！");
-		}*/
-		ExamType entity = examTypeDao.getEntity(examType.getId());
+		ExamType entity = getEntity(examType.getId());
 		if (entity.getCreateUserId() != getCurUser().getId()) {
-			throw new MyException("权限不足！");
+			throw new MyException("无操作权限");
 		}
 		
-		//修改试题分类
+		//保存图片
+		//if (entity.getImgFileId().intValue() != questionType.getImgFileId().intValue()) {
+		//	fileService.doUpload(imgId);
+		//}
+		
+		// 保存试题分类
 		entity.setName(examType.getName());
 		entity.setImgFileId(examType.getImgFileId());
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
-		examTypeDao.update(entity);
-		
-		//保存图片
-		//fileService.doUpload(examType.getImgId());
+		update(entity);
 	}
 	
 	@Override
 	public void delAndUpdate(Integer id) {
 		// 校验数据有效性
-		if (id == 1) { //不包括根试题分类
-			throw new MyException("此考试分类不能被删除！");
-		}
-		List<Exam> examList = examService.getList(id);
-		if (ValidateUtil.isValid(examList)) {
-			throw new MyException("该考试分类下有试题，不允许删除！");
-		}
 		ExamType examType = getEntity(id);
 		if (examType.getCreateUserId() != getCurUser().getId()) {
-			throw new MyException("权限不足！");
+			throw new MyException("无操作权限");
 		}
 		
 		// 删除试题分类
@@ -119,43 +98,8 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 		examType.setUpdateTime(new Date());
 		examType.setUpdateUserId(getCurUser().getId());
 		update(examType);
-	}
-
-	@Override
-	public boolean existName(ExamType examType) {
-		return examTypeDao.existName(examType.getName(), examType.getId());
-	}
-
-	@Override
-	public List<ExamType> getList() {
-		return examTypeDao.getList();
-	}
-
-	@Override
-	public void doAuth(Integer id, String readUserIds, String writeUserIds) {
-		ExamType entity = getEntity(id);
-		if(entity.getCreateUserId().intValue() != getCurUser().getId()){
-			throw new MyException("非法操作！");
-		}
-		if (ValidateUtil.isValid(readUserIds)) {
-			entity.setReadUserIds(","+readUserIds+",");
-		}
-		if (ValidateUtil.isValid(writeUserIds)) {
-			entity.setWriteUserIds(","+writeUserIds+",");
-		}
-		if(!entity.getReadUserIds().contains(","+getCurUser().getId()+",")){
-			throw new MyException("创建者不能被删除！");
-		}
-		if(!entity.getWriteUserIds().contains(","+getCurUser().getId()+",")){
-			throw new MyException("创建者不能被删除！");
-		}
-		entity.setUpdateTime(new Date());
-		entity.setUpdateUserId(getCurUser().getId());
-		update(entity);
-	}
-	
-	@Override
-	public PageOut authUserListpage(PageIn pageIn) {
-		return examTypeDao.authUserListpage(pageIn);
+		
+		// 删除试题分类扩展
+		examTypeExService.delAndUpdate(examType);
 	}
 }

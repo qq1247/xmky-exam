@@ -1,11 +1,8 @@
 package com.wcpdoc.exam.core.dao;
 
 import java.util.List;
-import java.util.Map;
 
 import com.wcpdoc.core.dao.BaseDao;
-import com.wcpdoc.core.entity.PageIn;
-import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.PaperType;
 
 /**
@@ -16,21 +13,6 @@ import com.wcpdoc.exam.core.entity.PaperType;
 public interface PaperTypeDao extends BaseDao<PaperType> {
 
 	/**
-	 * 获取试卷分类树
-	 * v1.0 zhanghc 2016-5-24下午14:54:09
-	 * @return List<Map<String,Object>>
-	 */
-	List<Map<String, Object>> getTreeList();
-	
-	/**
-	 * 获取试卷分类列表
-	 * 
-	 * v1.0 zhanghc 2018年6月3日上午11:20:49
-	 * @return List<PaperType>
-	 */
-	List<PaperType> getList();
-
-	/**
 	 * 获取试卷分类列表
 	 * 
 	 * v1.0 zhanghc 2018年6月6日下午10:03:33
@@ -38,51 +20,4 @@ public interface PaperTypeDao extends BaseDao<PaperType> {
 	 * @return List<PaperType>
 	 */
 	List<PaperType> getList(Integer parentId);
-	
-	/**
-	 * 名称是否存在
-	 * 
-	 * v1.0 zhanghc 2020-09-05 10:12:16
-	 * 
-	 * @param name
-	 * @param excludeId
-	 * @return boolean
-	 */
-	boolean existName(String name, Integer excludeId);
-
-	/**
-	 * 获取权限用户列表
-	 * 
-	 * v1.0 zhanghc 2018年5月30日下午6:28:19
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	PageOut getAuthUserListpage(PageIn pageIn);
-
-	/**
-	 * 获取权限岗位列表
-	 * 
-	 * v1.0 zhanghc 2018年5月30日下午6:28:19
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	PageOut getAuthPostListpage(PageIn pageIn);
-
-	/**
-	 * 获取权限机构列表
-	 * 
-	 * v1.0 zhanghc 2018年5月30日下午6:28:19
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	PageOut getAuthOrgListpage(PageIn pageIn);
-	
-	/**
-	 * 获取人员列表
-	 * 
-	 * v1.0 zhanghc 2018年5月30日下午6:28:19
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	PageOut authUserListpage(PageIn pageIn);
 }

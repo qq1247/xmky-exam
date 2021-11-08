@@ -18,9 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.wcpdoc.base.cache.DictCache;
 import com.wcpdoc.base.cache.ProgressBarCache;
-import com.wcpdoc.core.constant.ConstantManager;
 import com.wcpdoc.core.context.UserContext;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.LoginUser;
@@ -72,39 +70,24 @@ public class ApiQuestionController extends BaseController {
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
-			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
-				pageIn.addAttr("curUserId", getCurUser().getId());
-			}
-			
-			PageOut listpage = questionService.getListpage(pageIn);
-			return PageResultEx.ok().data(listpage);
-		} catch (Exception e) {
-			log.error("试题列表错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 随机试题列表 
-	 * 
-	 * v1.0 zhanghc 2017-05-07 14:56:29
-	 * @return pageOut
-	 */
-	@RequestMapping("/randomListpage")
-	@ResponseBody
-	public PageResult randomListpage() {
-		try {
-			PageIn pageIn = new PageIn(request);
-			PageOut pageOut = questionService.randomListpage(pageIn);
-			for(Map<String, Object> map : pageOut.getList()){
-				map.put("typeName", DictCache.getDictValue("QUESTION_TYPE", map.get("type").toString()));
-				map.put("difficultyName", DictCache.getDictValue("QUESTION_DIFFICULTY", map.get("difficulty").toString()));
-				
-				if (map.get("type").toString().equals("1") || map.get("type").toString().equals("2")) {
-					List<QuestionOption> optionList = questionOptionService.getList(Integer.valueOf(map.get("id").toString()));
-					map.put("option", optionList);
+			pageIn.addAttr("curUserId", getCurUser().getId());
+			PageOut pageOut = questionService.getListpage(pageIn);
+			List<Map<String, Object>> resultList = pageOut.getList();
+			for (Map<String, Object> result : resultList) {
+				if (result.get("scoreOptions") != null) {//1：漏选得分；2：答案无顺序；3：大小写不敏感；
+					StringBuilder scoreOptionNames = new StringBuilder();
+					if (result.get("scoreOptions").toString().contains("1")) {
+						scoreOptionNames.append(" 漏选得分");
+					}
+					if (result.get("scoreOptions").toString().contains("2")) {
+						scoreOptionNames.append(" 答案无顺序");
+					}
+					if (result.get("scoreOptions").toString().contains("3")) {
+						scoreOptionNames.append(" 大小写不敏感");
+					}
 				}
 			}
+			
 			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("试题列表错误：", e);
@@ -113,16 +96,21 @@ public class ApiQuestionController extends BaseController {
 	}
 	
 	/**
-	 * 添加试题
+	 *  添加试题
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
-	 * @return pageOut
+	 * @param question
+	 * @param scoreOptions 分数选项
+	 * @param options 选项（单选多选时有效）
+	 * @param answers 答案
+	 * @param answerScores 答案分数（填空或智能问答有多项）
+	 * @return PageResult
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	public PageResult add(Question question, Integer[] scoreOptions, String[] answers, String[] options, BigDecimal[] scores) {
+	public PageResult add(Question question, Integer[] scoreOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
 		try {
-			questionService.addAndUpdate(question, scoreOptions, answers, options, scores);
+			questionService.addAndUpdate(question, scoreOptions, options, answers, answerScores);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加试题错误：{}", e.getMessage());
@@ -140,14 +128,13 @@ public class ApiQuestionController extends BaseController {
 	 * @param question
 	 * @param answers
 	 * @param options
-	 * @param newVer
 	 * @return PageResult
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	public PageResult edit(Question question, Integer[] scoreOptions, String[] answers, String[] options, BigDecimal[] scores) {  //, boolean newVer
+	public PageResult edit(Question question, Integer[] scoreOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
 		try {
-			questionService.updateAndUpdate(question, scoreOptions, answers, options, scores); //, newVer
+			questionService.updateAndUpdate(question, scoreOptions, options, answers, answerScores);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改试题错误：{}", e.getMessage());
@@ -194,62 +181,37 @@ public class ApiQuestionController extends BaseController {
 		try {
 			Question question = questionService.getEntity(id);
 			List<String> optionList = new ArrayList<>();
-			if (question.getType() == 1 || question.getType() == 2) {
+			if (question.getType() == 1 || question.getType() == 2) {// 如果是单选或多选
 				List<QuestionOption> questionOptionList = questionOptionService.getList(question.getId());
 				for (QuestionOption questionOption : questionOptionList) {
 					optionList.add(questionOption.getOptions());
 				}
 			}
+			
 			QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
 			boolean writeAuth = questionTypeService.hasWriteAuth(questionType, getCurUser().getId());		
-			boolean readAuth = questionTypeService.hasReadAuth(questionType, getCurUser().getId());
 			
 			List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
-			List<Map<String, Object>> questionAnswerSplitList = new ArrayList<Map<String, Object>>();
-			if (question.getType() == 3) {
-				for(QuestionAnswer questionAnswer : questionAnswerList){
-					Map<String, Object> map = new HashMap<String, Object>();
-					String[] split = questionAnswer.getAnswer().split("\n");
-					map.put("id", questionAnswer.getId());
-					map.put("answer", split);
-					map.put("score", questionAnswer.getScore());
-					map.put("questionId", questionAnswer.getQuestionId());
-					questionAnswerSplitList.add(map);
-				}
-			} else if (question.getType() == 5 && question.getAi() == 1) {
-				for(QuestionAnswer questionAnswer : questionAnswerList){					
-					Map<String, Object> map = new HashMap<String, Object>();
-					String[] split = questionAnswer.getAnswer().split("\n");
-					map.put("id", questionAnswer.getId());
-					map.put("answer", split);
-					map.put("score", questionAnswer.getScore());
-					map.put("questionId", questionAnswer.getQuestionId());
-					questionAnswerSplitList.add(map);
-				}
-			} else {
-				for(QuestionAnswer questionAnswer : questionAnswerList){
-					Map<String, Object> map = new HashMap<String, Object>();
-					map.put("id", questionAnswer.getId());
-					map.put("answer", questionAnswer.getAnswer());
-					map.put("score", questionAnswer.getScore());
-					map.put("questionId", questionAnswer.getQuestionId());
-					questionAnswerSplitList.add(map);
-				}
+			List<Map<String, Object>> answerList = new ArrayList<Map<String, Object>>();
+			for(QuestionAnswer answer : questionAnswerList){
+				Map<String, Object> map = new HashMap<String, Object>();
+				map.put("answer", answer.getAnswers(question.getType(), question.getAi(), answer.getAnswer()));
+				map.put("score", answer.getScore());
+				answerList.add(map);
 			}
 			PageResultEx pageResult = PageResultEx.ok()
 					.addAttr("id", question.getId())
 					.addAttr("type", question.getType())
-					.addAttr("ai", question.getAi())
 					.addAttr("difficulty", question.getDifficulty())
 					.addAttr("title", question.getTitle())
+					.addAttr("options", optionList.toArray(new String[optionList.size()]))
+					.addAttr("ai", question.getAi())
 					.addAttr("analysis", question.getAnalysis())
-					.addAttr("state", question.getState())
 					.addAttr("questionTypeId", question.getQuestionTypeId())
 					.addAttr("score", question.getScore())
 					.addAttr("scoreOptions", question.getScoreOptions())
-					.addAttr("no", question.getNo())
-					.addAttr("options", optionList.toArray(new String[optionList.size()]))
-					.addAttr("answers", (writeAuth || readAuth) ? questionAnswerSplitList : new String[0]);
+					.addAttr("answers", (writeAuth) ? answerList : new String[0])
+					.addAttr("state", question.getState());
 			return pageResult;
 		} catch (MyException e) {
 			log.error("获取试题错误：{}", e.getMessage());

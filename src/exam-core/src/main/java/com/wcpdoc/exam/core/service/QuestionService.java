@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import com.wcpdoc.core.entity.PageIn;
-import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.Question;
 /**
@@ -16,36 +14,30 @@ import com.wcpdoc.exam.core.entity.Question;
 public interface QuestionService extends BaseService<Question>{
 
 	/**
-	 * 获取试题列表
+	 *  添加试题
 	 * 
-	 * v1.0 zhanghc 2017年8月6日下午9:43:55
-	 * @param questionTypeId
-	 * @return List<Question>
-	 */
-	List<Question> getList(Integer questionTypeId);
-
-	/**
-	 * 完成试题添加
-	 * 
-	 * v1.0 zhanghc 2018年10月12日下午1:52:35
+	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @param question
-	 * @param answers
-	 * @param options
-	 * void
+	 * @param scoreOptions 分数选项
+	 * @param options 选项（单选多选时有效）
+	 * @param answers 答案
+	 * @param answerScores 答案分数（填空或智能问答有多项）
+	 * @return PageResult
 	 */
-	void addAndUpdate(Question question, Integer[] scoreOptions, String[] answers, String[] options, BigDecimal[] scores);
+	void addAndUpdate(Question question, Integer[] scoreOptions, String[] options, String[] answers, BigDecimal[] answerScores);
 
 	/**
 	 * 完成试题修改
 	 * 
 	 * v1.0 zhanghc 2018年10月12日下午7:30:02
 	 * @param question
-	 * @param answer
-	 * @param options
-	 * @param newVer
-	 * void 
+	 * @param scoreOptions 分数选项
+	 * @param options 选项（单选多选时有效）
+	 * @param answers 答案
+	 * @param answerScores 答案分数（填空或智能问答有多项）
+	 * @return PageResult
 	 */
-	void updateAndUpdate(Question question, Integer[] scoreOptions, String[] answers, String[] options, BigDecimal[] scores); //, boolean newVer
+	void updateAndUpdate(Question question, Integer[] scoreOptions, String[] options, String[] answers, BigDecimal[] answerScores);
 	
 	/**
 	 * 删除试题
@@ -70,11 +62,11 @@ public interface QuestionService extends BaseService<Question>{
 	 * 合并
 	 * 
 	 * v1.0 chenyun 2021年3月2日下午1:25:51
-	 * @param id
-	 * @param sourceId
-	 * @param targetId void
+	 * @param sourceId 试题分类源ID
+	 * @param targetId 试题分类目标ID
+	 * void
 	 */
-	void move(Integer id, Integer sourceId, Integer targetId);
+	void move(Integer sourceId, Integer targetId);
 	
 	/**
 	 * 试题统计（类型和难易程度）
@@ -93,13 +85,6 @@ public interface QuestionService extends BaseService<Question>{
 	 * @return List<Map<String, Object>>
 	 */
 	List<Map<String, Object>> accuracy(Integer examId);
-	
-	/**
-	 * 随机列表
-	 * 
-	 * v1.0 chenyun 2021年7月19日下午4:26:38
-	 */
-	PageOut randomListpage(PageIn pageIn);
 	
 	/**
 	 * 拷贝

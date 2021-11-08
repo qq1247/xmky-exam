@@ -9,14 +9,11 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.base.service.OrgService;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.dao.BaseDao;
-import com.wcpdoc.core.entity.LoginUser;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.exception.MyException;
@@ -26,7 +23,6 @@ import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
 import com.wcpdoc.exam.core.dao.ExamDao;
 import com.wcpdoc.exam.core.entity.Exam;
-import com.wcpdoc.exam.core.entity.ExamType;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyExamDetail;
 import com.wcpdoc.exam.core.entity.MyMark;
@@ -48,7 +44,6 @@ import com.wcpdoc.exam.core.service.QuestionService;
  */
 @Service
 public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService {
-	private static final Logger log = LoggerFactory.getLogger(ExamServiceImpl.class);
 	@Resource
 	private ExamDao examDao;
 	@Resource
@@ -96,9 +91,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		}
 		if (exam.getStartTime().getTime() >= exam.getEndTime().getTime()) {
 			throw new MyException("考试结束时间必须大于考试开始时间");
-		}
-		if (!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId())) {
-			throw new MyException("无操作权限");
 		}
 
 		Paper paper = paperService.getEntity(exam.getPaperId());
@@ -149,9 +141,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		}
 		if (exam.getStartTime().getTime() >= exam.getEndTime().getTime()) {
 			throw new MyException("考试结束时间必须大于考试开始时间");
-		}
-		if (!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId())) {
-			throw new MyException("无操作权限");
 		}
 
 		Paper paper = paperService.getEntity(exam.getPaperId());
@@ -208,9 +197,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 				&& exam.getEndTime().getTime() <= curTime.getTime()) {
 			throw new MyException("考试未结束");
 		}
-		if(!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId())) {
-			throw new MyException("无操作权限");
-		}
 		
 		exam.setState(0);
 		exam.setUpdateTime(new Date());
@@ -230,9 +216,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		}
 		if(exam.getState() == 3) {
 			throw new MyException("考试已归档");
-		}
-		if(!hasWriteAuth(exam.getExamTypeId(), getCurUser().getId())) {
-			throw new MyException("无操作权限");
 		}
 		if (exam.getStartTime().getTime() <= new Date().getTime()) {
 			throw new MyException("考试开始时间必须大于当前时间");
@@ -432,14 +415,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	@Override
-	public void forcePaper(LoginUser user) {
-		//标记为强制交卷
-		log.debug("开始强制交卷");
-		examDao.doForcePaper(user);
-		log.debug("成功强制交卷");
-	}
-
-	@Override
 	public List<Exam> getList(Integer examTypeId) {
 		return examDao.getList(examTypeId);
 	}
@@ -463,15 +438,5 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	public List<Map<String, Object>> getMarkQuestionList(Integer id, Integer markUserId) {
 		return examDao.getMarkQuestionList(id, markUserId);
 	}
-	
-	private boolean hasWriteAuth(Integer examTypeId, Integer userId) {
-		ExamType examType = examTypeService.getEntity(examTypeId);
-		return examType.getWriteUserIds().contains(String.format(",%s,", userId));
-	}
-	
-//	private boolean hasReadAuth(Integer examTypeId, Integer userId) {
-//		ExamType examType = examTypeService.getEntity(examTypeId);
-//		return examType.getReadUserIds().contains(String.format(",%s,", userId));
-//	}
 
 }
