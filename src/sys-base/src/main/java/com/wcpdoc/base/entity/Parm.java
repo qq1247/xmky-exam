@@ -45,6 +45,10 @@ public class Parm {
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private Date updateTime;
+	@Column(name = "FILE_UPLOAD_DIR")
+	private String fileUploadDir;
+	@Column(name = "DB_BAK_DIR")
+	private String dbBakDir;
 
 	public Integer getId() {
 		return id;
@@ -124,5 +128,33 @@ public class Parm {
 
 	public void setOrgName(String orgName) {
 		this.orgName = orgName;
+	}
+
+	/**
+	 * @return the fileUploadDir
+	 */
+	public String getFileUploadDir() {
+		return fileUploadDir;
+	}
+
+	/**
+	 * @param fileUploadDir the fileUploadDir to set
+	 */
+	public void setFileUploadDir(String fileUploadDir) {
+		this.fileUploadDir = fileUploadDir;
+	}
+
+	/**
+	 * @return the dbBakDir
+	 */
+	public String getDbBakDir() {
+		return dbBakDir;
+	}
+
+	/**
+	 * @param dbBakDir the dbBakDir to set
+	 */
+	public void setDbBakDir(String dbBakDir) {
+		this.dbBakDir = dbBakDir;
 	}
 }

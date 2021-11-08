@@ -21,7 +21,6 @@ import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
-import com.wcpdoc.file.entity.File;
 import com.wcpdoc.file.entity.FileEx;
 import com.wcpdoc.file.service.FileService;
 
@@ -122,22 +121,22 @@ public class ApiFileController extends BaseController {
 	 * @param id
 	 * @return PageResult
 	 */
-	@RequestMapping("/del")
-	@ResponseBody
-	public PageResult del(Integer id) {
-		try {
-			File file = fileService.getEntity(id);
-			file.setState(0);
-			fileService.update(file);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("完成删除附件错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("完成删除附件错误：", e);
-			return PageResult.err();
-		}
-	}
+//	@RequestMapping("/del")
+//	@ResponseBody
+//	public PageResult del(Integer id) {
+//		try {
+//			File file = fileService.getEntity(id);
+//			file.setState(0);
+//			fileService.update(file);
+//			return PageResult.ok();
+//		} catch (MyException e) {
+//			log.error("完成删除附件错误：{}", e.getMessage());
+//			return PageResult.err().msg(e.getMessage());
+//		} catch (Exception e) {
+//			log.error("完成删除附件错误：", e);
+//			return PageResult.err();
+//		}
+//	}
 	
 	/**
 	 * 获取附件Id
@@ -146,9 +145,9 @@ public class ApiFileController extends BaseController {
 	 * @param id
 	 * @return PageResult
 	 */
-	@RequestMapping("/get")
+	@RequestMapping("/getId")
 	@ResponseBody
-	public PageResult get(String uuId) {
+	public PageResult getId(String uuId) {
 		try {
 			Integer fileId = fileService.getFileId(uuId);
 			return PageResultEx.ok()

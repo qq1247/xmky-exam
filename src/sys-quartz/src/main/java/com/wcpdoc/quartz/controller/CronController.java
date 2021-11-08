@@ -64,9 +64,9 @@ public class CronController extends BaseController {
 	 * @param pageIn
 	 * @return PageOut
 	 */
-	@RequestMapping("/list")
+	@RequestMapping("/listPage")
 	@ResponseBody
-	public PageResult list(PageIn pageIn) {
+	public PageResult listPage(PageIn pageIn) {
 		try {
 			PageOut pageOut = cronService.getListpage(pageIn);
 			List<Map<String, Object>> list = pageOut.getList();

@@ -98,9 +98,9 @@ public class ApiLoginController extends BaseController {
 	 * @param newPwd
 	 * @return PageResult
 	 */
-	@RequestMapping("/pwdUpdate")
+	@RequestMapping("/pwd")
 	@ResponseBody
-	public PageResult pwdUpdate(String oldPwd, String newPwd) {
+	public PageResult pwd(String oldPwd, String newPwd) {
 		try {
 			loginService.pwdUpdate(oldPwd, newPwd);
 			return PageResult.ok();
