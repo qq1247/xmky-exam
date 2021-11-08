@@ -111,8 +111,7 @@ public class ApiParmController extends BaseController {
 	 * 
 	 * v1.0 wjj 2021年11月8日下午1:35:33
 	 * 
-	 * @param oldDir
-	 * @param newDir
+	 * @param dbBakDir
 	 * @return PageResult
 	 */
 	@RequestMapping("/db")

@@ -44,8 +44,12 @@ public class BulletinDaoImpl extends RBaseDaoImpl<Bulletin> implements BulletinD
 			   .addWhere(ValidateUtil.isValid(pageIn.get("title")), "BULLETIN.TITLE LIKE ?", "%" + pageIn.get("title") + "%")
 			   .addWhere(ValidateUtil.isValid(pageIn.get("showType")), "BULLETIN.SHOW_TYPE = ?", pageIn.get("showType", Integer.class))
 			   .addWhere(pageIn.get("curUserId", Integer.class)!= null, "BULLETIN.UPDATE_USER_ID = ?", pageIn.get("curUserId", Integer.class))
-			   .addWhere(!ValidateUtil.isValid(pageIn.get("state")), "BULLETIN.STATE IN (1, 2)", pageIn.get("state"))
+			   .addWhere(!ValidateUtil.isValid(pageIn.get("state")), "BULLETIN.STATE IN (1, 2)")
 			   .addWhere(ValidateUtil.isValid(pageIn.get("state")), "BULLETIN.STATE = ?", pageIn.get("state"))
+			   .addWhere(!ValidateUtil.isValid(pageIn.get("showType")), "BULLETIN.SHOW_TYPE IN (1, 2)", pageIn.get("showType"))
+			   .addWhere(ValidateUtil.isValid(pageIn.get("showType")), "BULLETIN.SHOW_TYPE = ?", pageIn.get("showType"))
+			   .addOrder("BULLETIN.UPDATE_TIME", Order.DESC)
+			   .addOrder("BULLETIN.SHOW_TYPE", Order.DESC)
 			   .addOrder("BULLETIN.UPDATE_TIME", Order.DESC);
 		  if (pageIn.get("readUserIds", Integer.class) != null) {
 			   User user = userDao.getEntity(pageIn.get("readUserIds", Integer.class));
@@ -93,7 +97,7 @@ public class BulletinDaoImpl extends RBaseDaoImpl<Bulletin> implements BulletinD
 
 	@Override
 	public List<Map<String, Object>> get(Integer id) {
-		String sql = "SELECT BULLETIN.ID, BULLETIN.TITLE, BULLETIN.TOP_STATE, BULLETIN.UPDATE_TIME, BULLETIN.IMG_FILE_ID, BULLETIN.CONTENT, BULLETIN.STATE, "
+		String sql = "SELECT BULLETIN.ID, BULLETIN.TITLE, BULLETIN.SHOW_TYPE, BULLETIN.UPDATE_TIME, BULLETIN.IMG_FILE_ID, BULLETIN.CONTENT, BULLETIN.STATE, "
 				+ "USER.NAME AS UPDATE_USER_NAME, BULLETIN.READ_USER_IDS, BULLETIN.READ_ORG_IDS, "
 				+ "IFNULL((SELECT GROUP_CONCAT( USER.NAME SEPARATOR ',' ) FROM sys_user USER WHERE USER.state != 0 AND EXISTS ( SELECT 1 FROM EXM_BULLETIN et WHERE BULLETIN.ID = et.ID AND et.READ_USER_IDS LIKE CONCAT( '%,' , USER.ID, ',%' ))),'') AS 'READ_USER_NAMES', "
 				+ "IFNULL((SELECT GROUP_CONCAT( ORG.NAME SEPARATOR ',' ) FROM sys_org ORG WHERE ORG.state != 0 AND EXISTS ( SELECT 1 FROM EXM_BULLETIN et WHERE BULLETIN.ID = et.ID AND et.READ_ORG_IDS LIKE CONCAT( '%,' , USER.ID, ',%' ))),'') AS 'READ_ORG_NAMES' "
