@@ -34,7 +34,7 @@ public class BulletinDaoImpl extends RBaseDaoImpl<Bulletin> implements BulletinD
 	
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT BULLETIN.ID, BULLETIN.TITLE, BULLETIN.TOP_STATE, BULLETIN.UPDATE_TIME, "
+		String sql = "SELECT BULLETIN.ID, BULLETIN.TITLE, BULLETIN.SHOW_TYPE, BULLETIN.UPDATE_TIME, "
 				+ "BULLETIN.IMG_FILE_ID, BULLETIN.CONTENT, BULLETIN.STATE, USER.NAME AS UPDATE_USER_NAME, "
 				+ "( SELECT GROUP_CONCAT( Z.NAME ) FROM SYS_USER Z WHERE BULLETIN.READ_USER_IDS LIKE CONCAT( '%,', Z.ID, ',%' ) ) AS READ_USER_NAMES "
 				+ "FROM EXM_BULLETIN BULLETIN "
@@ -42,11 +42,10 @@ public class BulletinDaoImpl extends RBaseDaoImpl<Bulletin> implements BulletinD
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("id")), "BULLETIN.ID = ?", pageIn.get("id"))
 			   .addWhere(ValidateUtil.isValid(pageIn.get("title")), "BULLETIN.TITLE LIKE ?", "%" + pageIn.get("title") + "%")
-			   .addWhere(ValidateUtil.isValid(pageIn.get("topState")), "BULLETIN.TOP_STATE = ?", pageIn.get("topState", Integer.class))
+			   .addWhere(ValidateUtil.isValid(pageIn.get("showType")), "BULLETIN.SHOW_TYPE = ?", pageIn.get("showType", Integer.class))
 			   .addWhere(pageIn.get("curUserId", Integer.class)!= null, "BULLETIN.UPDATE_USER_ID = ?", pageIn.get("curUserId", Integer.class))
-			   .addWhere(pageIn.get("state", Integer.class)!= null, "BULLETIN.STATE = ?", pageIn.get("state", Integer.class))
-			   .addWhere("BULLETIN.STATE != ?", 0)
-			   .addOrder("BULLETIN.TOP_STATE", Order.ASC)
+			   .addWhere(!ValidateUtil.isValid(pageIn.get("state")), "BULLETIN.STATE IN (1, 2)", pageIn.get("state"))
+			   .addWhere(ValidateUtil.isValid(pageIn.get("state")), "BULLETIN.STATE = ?", pageIn.get("state"))
 			   .addOrder("BULLETIN.UPDATE_TIME", Order.DESC);
 		  if (pageIn.get("readUserIds", Integer.class) != null) {
 			   User user = userDao.getEntity(pageIn.get("readUserIds", Integer.class));
@@ -61,7 +60,8 @@ public class BulletinDaoImpl extends RBaseDaoImpl<Bulletin> implements BulletinD
 		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(), "updateTime", DateUtil.FORMAT_DATE_TIME);
-		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), "STATE_YN", "topState");
+		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), 
+				"BULLETIN_SHOW_TYPE", "showType");
 		return pageOut;
 	}
 

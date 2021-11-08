@@ -13,9 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.base.service.ParmService;
 import com.wcpdoc.core.controller.BaseController;
-import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageResult;
-import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 /**
  * 参数控制层
@@ -31,55 +29,37 @@ public class ApiParmController extends BaseController {
 	private ParmService parmService;
 	
 	/**
-	 * 参数列表
+	 * 自定义logo、单位名称
 	 * 
 	 * v1.0 chenyun 2021-03-04 15:02:18
 	 * @return pageOut
 	 */
-	@RequestMapping("/listpage")
+	@RequestMapping("/logo")
 	@ResponseBody
-	public PageResult listpage() {
+	public PageResult logo(Parm parm) {
 		try {
-			return PageResultEx.ok().data(parmService.getListpage(new PageIn(request)));
-		} catch (Exception e) {
-			log.error("参数列表错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 添加参数
-	 * 
-	 * v1.0 chenyun 2021-03-04 15:02:18
-	 * @return pageOut
-	 */
-	@RequestMapping("/add")
-	@ResponseBody
-	public PageResult add(Parm email) {
-		try {
-			email.setUpdateTime(new Date());
-			email.setUpdateUserId(getCurUser().getId());
-			parmService.addAndUpdate(email);
+			parmService.editLogo(parm);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("添加参数错误：{}", e.getMessage());
+			log.error("修改参数错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("添加参数错误：", e);
+			log.error("修改参数错误：", e);
 			return PageResult.err();
 		}
 	}
 	
-	
 	/**
-	 * 修改参数
+	 * 系统参数邮件
 	 * 
-	 * v1.0 chenyun 2021-03-04 15:02:18
-	 * @return pageOut
+	 * v1.0 wjj 2021年11月8日下午1:25:33
+	 * 
+	 * @param parm
+	 * @return PageResult
 	 */
-	@RequestMapping("/edit")
+	@RequestMapping("/email")
 	@ResponseBody
-	public PageResult edit(Parm parm) {
+	public PageResult email(Parm parm) {
 		try {
 			Parm entity = parmService.getEntity(parm.getId());
 			entity.setEmailHost(parm.getEmailHost());
@@ -92,87 +72,64 @@ public class ApiParmController extends BaseController {
 			parmService.updateAndUpdate(entity);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("修改参数错误：{}", e.getMessage());
+			log.error("添加参数错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("修改参数错误：", e);
+			log.error("添加参数错误：", e);
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
-	 * 获取参数
+	 * 系统参数上传附件目录
 	 * 
-	 * v1.0 chenyun 2021-03-04 15:02:18
-	 * @return pageOut
-	 */
-	@RequestMapping("/get")
-	@ResponseBody
-	public PageResult get() {
-		try {
-			Parm entity = parmService.get();
-			if (entity == null) {
-				return PageResultEx.ok();
-			}
-			return PageResultEx.ok()
-					.addAttr("id", entity.getId())
-					.addAttr("emailHost", entity.getEmailHost())
-					.addAttr("emailEncode", entity.getEmailEncode())
-					.addAttr("emailUserName", entity.getEmailUserName())
-					.addAttr("emailPwd", entity.getEmailPwd())
-					.addAttr("emailProtocol", entity.getEmailProtocol())
-					.addAttr("orgLogo", entity.getOrgLogo())
-					.addAttr("orgName", entity.getOrgName());
-		} catch (MyException e) {
-			log.error("获取参数错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("获取参数错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 删除参数
+	 * v1.0 wjj 2021年11月8日下午1:25:33
 	 * 
-	 * v1.0 zhanghc 2016-6-15下午17:24:19
-	 * 
-	 * @param id
+	 * @param uploadDir
 	 * @return PageResult
 	 */
-	@RequestMapping("/del")
+	@RequestMapping("/file")
 	@ResponseBody
-	public PageResult del(Integer id) {
+	public PageResult file(String uploadDir) {
 		try {
-			parmService.del(id);
+			Parm parm = parmService.get();
+			parm.setFileUploadDir(uploadDir);
+			parmService.updateAndUpdate(parm);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("删除参数错误：{}", e.getMessage());
+			log.error("上传附件目录错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("删除参数错误：", e);
+			log.error("上传附件目录错误：", e);
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
-	 * 自定义logo、单位名称
+	 * 系统参数数据库备份目录
+	 * “剪切之前的文件到新位置 对象要克隆” 暂时未实现
 	 * 
-	 * v1.0 chenyun 2021-03-04 15:02:18
-	 * @return pageOut
+	 * v1.0 wjj 2021年11月8日下午1:35:33
+	 * 
+	 * @param oldDir
+	 * @param newDir
+	 * @return PageResult
 	 */
-	@RequestMapping("/editLogo")
+	@RequestMapping("/db")
 	@ResponseBody
-	public PageResult editLogo(Parm parm) {
+	public PageResult db(String dbBakDir) {
 		try {
-			parmService.editLogo(parm);
+			Parm parm = parmService.get();
+			parm.setDbBakDir(dbBakDir);
+			parmService.updateAndUpdate(parm);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("修改参数错误：{}", e.getMessage());
+			log.error("数据库备份目录错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("修改参数错误：", e);
+			log.error("数据库备份目录错误：", e);
 			return PageResult.err();
 		}
+
 	}
 }

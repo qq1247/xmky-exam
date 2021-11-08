@@ -62,7 +62,7 @@ public class BulletinServiceImpl extends BaseServiceImp<Bulletin> implements Bul
 		}else{
 			entity.setReadUserIds(null);
 		}
-		entity.setTopState(bulletin.getTopState());
+		entity.setShowType(bulletin.getShowType());
 		entity.setState(bulletin.getState());
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());

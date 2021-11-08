@@ -78,22 +78,29 @@ public class ApiUserController extends BaseController {
 			for (Map<String, Object> map : pageOut.getList()) {
 				if (map.get("roles") != null) {
 					map.put("roleNames", ConstantManager.SUB_ADMIN_LOGIN_NAME.equals(((String) map.get("roles"))) ? "子管理员" : "用户");
-				}else{
+				} else {
 					map.put("roleNames", "用户");
 				}
-				
-				if (ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())// 如果是管理员或子管理员，显示在线状态和最后在线时间
-						|| ConstantManager.SUB_ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
-					Integer id = (Integer)map.get("id");
+
+				if (ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) { // 如果是管理员，显示在线状态和最后在线时间
+					Integer id = (Integer) map.get("id");
 					OnlineUser onlineUser = onlineUserService.getEntity(id);
 					if (onlineUser == null) {
 						map.put("online", false);
 						map.put("onlineTime", null);
 						continue;
 					}
-					
+
 					map.put("online", onlineUser.getState());
 					map.put("onlineTime", DateUtil.formatDateTime(onlineUser.getUpdateTime()));
+				}
+				
+				if (!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {//只有管理员显示以下字段
+					map.remove("registTime");
+					map.remove("lastLoginTime");
+					map.remove("roles");
+					map.remove("online");
+					map.remove("onlineTime");
 				}
 			}
 			return PageResultEx.ok().data(pageOut);
@@ -125,18 +132,18 @@ public class ApiUserController extends BaseController {
 			if (user.getOrgId() == null) {
 				user.setOrgId(1);// 如果没有默认为根节点
 			}
-			
+
 			// 添加用户
 			Date date = new Date();
-			user.setRoles("subAdmin".equals(user.getRoles()) ? "subAdmin" : null );
+			user.setRoles("subAdmin".equals(user.getRoles()) ? "subAdmin" : null);
 			user.setRegistTime(date);
 			user.setUpdateTime(date);
 			user.setUpdateUserId(getCurUser().getId());
 			user.setState(1);
 			userService.add(user);
-			
+
 			// 设置密码
-			String initPwd = "111111";//StringUtil.getRandomStr(8);
+			String initPwd = "111111";// StringUtil.getRandomStr(8);
 			userService.doPwdUpdate(user.getId(), initPwd);
 			Map<String, Object> data = new HashMap<String, Object>();
 			data.put("initPwd", initPwd);
@@ -169,7 +176,7 @@ public class ApiUserController extends BaseController {
 			if (userService.existLoginName(user)) {
 				throw new MyException("登录名称已存在");
 			}
-			
+
 			// 修改用户
 			User entity = userService.getEntity(user.getId());
 			boolean changeLoginName = false;
@@ -232,7 +239,7 @@ public class ApiUserController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 获取用户
 	 * 
@@ -247,19 +254,27 @@ public class ApiUserController extends BaseController {
 		try {
 			User entity = userService.getEntity(id);
 			Org org = null;
-			if(entity.getOrgId() != null){
+			if (entity.getOrgId() != null) {
 				org = orgService.getEntity(entity.getOrgId());
 			}
-			return PageResultEx.ok()
-					.addAttr("id", entity.getId())
-					.addAttr("name", entity.getName())
-					.addAttr("loginName", entity.getLoginName())
-					.addAttr("registTime", DateUtil.formatDateTime(entity.getRegistTime()))
-					.addAttr("lastLoginTime", entity.getLastLoginTime() == null ? null : DateUtil.formatDateTime(entity.getLastLoginTime()))
-					.addAttr("orgId", entity.getOrgId())
-					.addAttr("orgName", org == null ? null : org.getName())
-					.addAttr("state", entity.getState())
-					.addAttr("roles", (ValidateUtil.isValid(entity.getRoles()) && entity.getRoles().contains("subAdmin")) ? new String[]{"subAdmin"} : new String[]{"user"});
+			
+			PageResultEx pageResult = PageResultEx.ok().addAttr("id", entity.getId())
+				.addAttr("name", entity.getName())
+				.addAttr("loginName", entity.getLoginName())
+				.addAttr("orgId", entity.getOrgId())
+				.addAttr("orgName", org == null ? null : org.getName())
+				.addAttr("state", entity.getState());
+				
+			
+			if (!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
+				return pageResult;
+			}
+			
+			pageResult.addAttr("registTime", DateUtil.formatDateTime(entity.getRegistTime()))
+				.addAttr("lastLoginTime", entity.getLastLoginTime() == null ? null : DateUtil.formatDateTime(entity.getLastLoginTime()))
+				.addAttr("roles", (ValidateUtil.isValid(entity.getRoles()) && entity.getRoles().contains("subAdmin"))
+						? new String[] { "subAdmin" } : new String[] { "user" });
+			return pageResult;
 		} catch (MyException e) {
 			log.error("获取用户错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -268,23 +283,23 @@ public class ApiUserController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
 
 	/**
 	 * 初始化密码
 	 * 
 	 * v1.0 zhanghc 2017年7月13日下午9:27:18
+	 * 
 	 * @param id
 	 * @return PageResult
 	 */
-	@RequestMapping("/initPwd")
+	@RequestMapping("/pwdInit")
 	@ResponseBody
-	public PageResult initPwd(Integer id) {
+	public PageResult pwdInit(Integer id) {
 		try {
-			String initPwd = "111111";//StringUtil.getRandomStr(8);
-			userService.doPwdUpdate(id, initPwd);
+			String pwdInit = "111111";// StringUtil.getRandomStr(8);
+			userService.doPwdUpdate(id, pwdInit);
 			Map<String, Object> data = new HashMap<String, Object>();
-			data.put("initPwd", initPwd);
+			data.put("initPwd", pwdInit);
 			return PageResultEx.ok().data(data);
 		} catch (MyException e) {
 			log.error("初始化密码错误：{}", e.getMessage());
@@ -299,13 +314,14 @@ public class ApiUserController extends BaseController {
 	 * 设置角色
 	 * 
 	 * v1.0 zhanghc 2016-6-15下午17:24:19
+	 * 
 	 * @param id
 	 * @param postIds
 	 * @return PageResult
 	 */
-	@RequestMapping("/roleUpdate")
+	@RequestMapping("/role")
 	@ResponseBody
-	public PageResult roleUpdate(Integer id, String roles) {
+	public PageResult role(Integer id, String roles) {
 		try {
 			userService.roleUpdate(id, roles);
 			return PageResult.ok();
@@ -317,10 +333,10 @@ public class ApiUserController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
-	 * 强制退出登陆
-	 * v1.0 zhanghc 2016年8月27日上午11:36:55
+	 * 强制退出登陆 v1.0 zhanghc 2016年8月27日上午11:36:55
+	 * 
 	 * @param userId
 	 * @return pageOut
 	 */
@@ -335,11 +351,12 @@ public class ApiUserController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 导入用户表
 	 * 
 	 * v1.0 chenyun 2021年3月4日下午5:41:02
+	 * 
 	 * @return PageResult
 	 */
 	@RequestMapping("/input")
@@ -353,11 +370,12 @@ public class ApiUserController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
+
 	/**
 	 * 导出用户表
 	 * 
 	 * v1.0 chenyun 2021年3月4日下午5:41:02
+	 * 
 	 * @return PageResult
 	 */
 	@RequestMapping("/export")
@@ -369,19 +387,20 @@ public class ApiUserController extends BaseController {
 			try {
 				FileOutputStream os = new FileOutputStream("D:/auser.xlsx");
 				Context context = new Context();
-		        //将列表参数放入context中
-		        context.putVar("userXlsxList", userXlsx);
+				// 将列表参数放入context中
+				context.putVar("userXlsxList", userXlsx);
 				InputStream inputStream = this.getClass().getResourceAsStream("/res/userTemplate.xlsx");
 				JxlsHelper jxlsHelper = JxlsHelper.getInstance();
 				Transformer transformer = jxlsHelper.createTransformer(inputStream, os);
-				JexlExpressionEvaluator evaluator = (JexlExpressionEvaluator) transformer.getTransformationConfig().getExpressionEvaluator();
+				JexlExpressionEvaluator evaluator = (JexlExpressionEvaluator) transformer.getTransformationConfig()
+						.getExpressionEvaluator();
 				Map<String, Object> funcs = new HashMap<String, Object>();
 				evaluator.getJexlEngine().setFunctions(funcs);
 				jxlsHelper.processTemplate(context, transformer);
 				os.close();
 
 				FileInputStream fileInputStream = new FileInputStream("D:/auser.xlsx");
-				String fileName = new String(("userTemplate.xlsx").getBytes("UTF-8"),"ISO-8859-1");
+				String fileName = new String(("userTemplate.xlsx").getBytes("UTF-8"), "ISO-8859-1");
 				response.addHeader("Content-Disposition", "attachment;filename" + fileName);
 				response.setContentType("application/fprce-download");
 				outputStream = response.getOutputStream();
@@ -395,11 +414,12 @@ public class ApiUserController extends BaseController {
 			IOUtils.closeQuietly(outputStream);
 		}
 	}
-	
+
 	/**
 	 * 导出模板
 	 * 
 	 * v1.0 chenyun 2021年3月4日下午5:41:02
+	 * 
 	 * @return PageResult
 	 */
 	@RequestMapping("/template")
@@ -407,9 +427,9 @@ public class ApiUserController extends BaseController {
 	public void template() {
 		OutputStream output = null;
 		try {
-			//userXlsxService.templateUserXlsx();
+			// userXlsxService.templateUserXlsx();
 			InputStream inputStream = this.getClass().getResourceAsStream("/res/userExample.xlsx");
-			String fileName = new String(("userExample.xlsx").getBytes("UTF-8"),"ISO-8859-1");
+			String fileName = new String(("userExample.xlsx").getBytes("UTF-8"), "ISO-8859-1");
 			response.addHeader("Content-Disposition", "attachment;filename" + fileName);
 			response.setContentType("application/fprce-download");
 			output = response.getOutputStream();
@@ -420,9 +440,9 @@ public class ApiUserController extends BaseController {
 			IOUtils.closeQuietly(output);
 		}
 	}
-	
+
 	/**
-	 * 组织机构用户同步
+	 * 组织机构用户同步 
 	 * v1.0 zhanghc 2016年8月27日上午11:36:55
 	 * 
 	 * @return pageOut
@@ -430,7 +450,7 @@ public class ApiUserController extends BaseController {
 	@RequestMapping("/syncUser")
 	@ResponseBody
 	public PageResult syncUser(String orgName, String orgCode, List<User> user) {
-		// org  [name, code]
+		// org [name, code]
 		// user [name, loginName, email, phone, pwd ]
 		try {
 			Integer orgId = orgService.syncOrg(orgName, orgCode);

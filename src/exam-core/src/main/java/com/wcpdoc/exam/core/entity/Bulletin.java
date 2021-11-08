@@ -39,8 +39,8 @@ public class Bulletin {
 	private Integer imgsWidth;
 	@Column(name = "URL")
 	private String url;
-	@Column(name = "TOP_STATE")
-	private Integer topState;
+	@Column(name = "SHOW_TYPE")
+	private Integer showType;
 	@Column(name = "NO")
 	private Integer no;
 	@Column(name = "STATE")
@@ -55,7 +55,7 @@ public class Bulletin {
 	private String readUserIds;
 	@Column(name = "READ_ORG_IDS")
 	private String readOrgIds;
-	
+
 	public Integer getId() {
 		return id;
 	}
@@ -63,11 +63,11 @@ public class Bulletin {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	
+
 	public String getTitle() {
 		return title;
 	}
- 
+
 	public void setTitle(String title) {
 		this.title = title;
 	}
@@ -75,11 +75,11 @@ public class Bulletin {
 	public String getContent() {
 		return content;
 	}
- 
+
 	public void setContent(String content) {
 		this.content = content;
 	}
-	
+
 	public Integer getImgsHeight() {
 		return imgsHeight;
 	}
@@ -87,7 +87,7 @@ public class Bulletin {
 	public void setImgsHeight(Integer imgsHeight) {
 		this.imgsHeight = imgsHeight;
 	}
-	
+
 	public Integer getImgsWidth() {
 		return imgsWidth;
 	}
@@ -95,15 +95,15 @@ public class Bulletin {
 	public void setImgsWidth(Integer imgsWidth) {
 		this.imgsWidth = imgsWidth;
 	}
-	
+
 	public String getUrl() {
 		return url;
 	}
- 
+
 	public void setUrl(String url) {
 		this.url = url;
 	}
-	
+
 	public Integer getNo() {
 		return no;
 	}
@@ -111,7 +111,7 @@ public class Bulletin {
 	public void setNo(Integer no) {
 		this.no = no;
 	}
-	
+
 	public Integer getState() {
 		return state;
 	}
@@ -119,7 +119,7 @@ public class Bulletin {
 	public void setState(Integer state) {
 		this.state = state;
 	}
-	
+
 	public Date getUpdateTime() {
 		return updateTime;
 	}
@@ -127,7 +127,7 @@ public class Bulletin {
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
 	}
-	
+
 	public Integer getUpdateUserId() {
 		return updateUserId;
 	}
@@ -135,29 +135,29 @@ public class Bulletin {
 	public void setUpdateUserId(Integer updateUserId) {
 		this.updateUserId = updateUserId;
 	}
-	
+
 	public String getReadUserIds() {
 		return readUserIds;
 	}
- 
+
 	public void setReadUserIds(String readUserIds) {
 		this.readUserIds = readUserIds;
 	}
-	
+
 	public String getReadOrgIds() {
 		return readOrgIds;
 	}
- 
+
 	public void setReadOrgIds(String readOrgIds) {
 		this.readOrgIds = readOrgIds;
 	}
 
-	public Integer getTopState() {
-		return topState;
+	public Integer getShowType() {
+		return showType;
 	}
 
-	public void setTopState(Integer topState) {
-		this.topState = topState;
+	public void setShowType(Integer showType) {
+		this.showType = showType;
 	}
 
 	public String getImgFileId() {
