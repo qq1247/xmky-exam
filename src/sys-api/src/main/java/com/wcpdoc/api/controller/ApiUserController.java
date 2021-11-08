@@ -342,9 +342,9 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/out")
 	@ResponseBody
-	public PageResult out(Integer userId) {
+	public PageResult out(Integer id) {
 		try {
-			onlineUserService.out(userId);
+			onlineUserService.out(id);
 			return PageResult.ok();
 		} catch (Exception e) {
 			log.error("强制退出登陆错误：", e);

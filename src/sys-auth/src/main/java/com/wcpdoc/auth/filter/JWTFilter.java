@@ -49,7 +49,6 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 		} catch (Exception e) {
 			throw new AuthenticationException(e.getMessage());
 		}
-		
 	}
 
 	/**
@@ -93,7 +92,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 		String oldLoginName = oldJwtResult.getClaims().get("loginName", String.class);
 		
 		String tokenKey = String.format("TOKEN_%s", oldUserId);
-		String curToken = TokenCache.get(tokenKey);
+		String curToken = TokenCache.get(oldUserId);
 		if (curToken == null) {//缓存中没有令牌（过期清理或人工清理）
 			throw new AuthenticationException(String.format("用户【%s】令牌不存在", oldLoginName));
 		}
@@ -103,7 +102,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 				throw new AuthenticationException(String.format("用户【%s】并发【{}】请求超时", oldLoginName, WebUtils.toHttp(request).getRequestURI()));
 			}
 			
-			curToken = TokenCache.get(tokenKey); // 当前令牌需要重新获取，因为并发请求等待的时候，令牌已经被更换
+			curToken = TokenCache.get(oldUserId); // 当前令牌需要重新获取，因为并发请求等待的时候，令牌已经被更换
 			Long curTokenId = Long.parseLong(JwtUtil.getInstance().parse(curToken).getClaims().getId());
 			if (curTokenId != oldTokenId) {
 				if (log.isDebugEnabled()) {
@@ -139,7 +138,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 				.build();
 			
 			// 缓存刷新令牌
-			TokenCache.put(String.format("TOKEN_%s", oldUserId), newToken); // 用于续租登陆
+			TokenCache.put(oldUserId, newToken); // 用于续租登陆
 			OldTokenCache.put(String.format("OLD_TOKEN_%s", oldUserId), "true"); // 用于并发请求时，旧令牌宽限30秒有效期
 			
 			// 放入http响应头，供前端替换使用

@@ -1,5 +1,10 @@
 package com.wcpdoc.exam.api.controller;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
@@ -8,7 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wcpdoc.base.service.OrgService;
+import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
@@ -17,10 +22,10 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.PaperType;
 import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.PaperTypeService;
-import com.wcpdoc.file.service.FileService;
 
 /**
  * 试卷分类控制层
@@ -37,11 +42,7 @@ public class ApiPaperTypeController extends BaseController {
 	@Resource
 	private PaperService paperService;
 	@Resource
-	private OrgService orgService;
-	@Resource
 	private UserService userService;
-	@Resource
-	private FileService fileService;
 	
 	/**
 	 * 试卷分类列表 
@@ -55,8 +56,32 @@ public class ApiPaperTypeController extends BaseController {
 		try {
 			PageIn pageIn = new PageIn(request);
 			pageIn.addAttr("curUserId", getCurUser().getId());
-			PageOut listpage = paperTypeService.getListpage(pageIn);
-			return PageResultEx.ok().data(listpage);
+			PageOut pageOut = paperTypeService.getListpage(pageIn);
+			for (Map<String, Object> result : pageOut.getList()) {
+				if (!ValidateUtil.isValid((String)result.get("readUserIds"))) {
+					result.put("readUserIds", new Integer[0]);
+					result.put("readUserNames", new String[0]);
+					continue;
+				}
+				
+				Set<Integer> readUserIdSet = new HashSet<>();
+				for (String id : ((String)result.get("readUserIds")).split(",")) {
+					if (!ValidateUtil.isValid(id)) {// ,2,3,23, 有空值
+						continue;
+					}
+					readUserIdSet.add(Integer.parseInt(id));
+				}
+				
+				Integer[] readUserIds = readUserIdSet.toArray(new Integer[0]);
+				List<User> readUserList = userService.getList(readUserIds);
+				String[] readUserNames = new String[readUserList.size()];
+				for (int i = 0; i < readUserList.size(); i++) {
+					readUserNames[i] = readUserList.get(i).getName();
+				}
+				result.put("readUserIds", readUserIds);
+				result.put("readUserNames", readUserNames);
+			}
+			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("试卷分类列表错误：", e);
 			return PageResult.err();
@@ -64,7 +89,7 @@ public class ApiPaperTypeController extends BaseController {
 	}
 	
 	/**
-	 * 完成添加试卷分类
+	 * 添加试卷分类
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
 	 * @return pageOut
@@ -76,16 +101,16 @@ public class ApiPaperTypeController extends BaseController {
 			paperTypeService.addAndUpdate(paperType);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("完成添加试卷分类错误：{}", e.getMessage());
+			log.error("添加试卷分类错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("完成添加试卷分类错误：", e);
+			log.error("添加试卷分类错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 完成修改试卷分类
+	 * 修改试卷分类
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
 	 * @return pageOut
@@ -97,16 +122,16 @@ public class ApiPaperTypeController extends BaseController {
 			paperTypeService.editAndUpdate(paperType);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("完成修改试卷分类错误：{}", e.getMessage());
+			log.error("修改试卷分类错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("完成修改试卷分类错误：", e);
+			log.error("修改试卷分类错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 完成删除试卷分类
+	 * 删除试卷分类
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
 	 * @return pageOut
@@ -118,10 +143,10 @@ public class ApiPaperTypeController extends BaseController {
 			paperTypeService.delAndUpdate(id);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("完成删除试卷分类错误：{}", e.getMessage());
+			log.error("删除试卷分类错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("完成删除试卷分类错误：", e);
+			log.error("删除试卷分类错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -137,45 +162,58 @@ public class ApiPaperTypeController extends BaseController {
 	public PageResult get(Integer id) {
 		try {
 			PaperType entity = paperTypeService.getEntity(id);
+			
+			Set<Integer> readUserIdSet = new HashSet<>();
+			for (String readUserId : entity.getReadUserIds().split(",")) {
+				if (!ValidateUtil.isValid(readUserId)) {// ,2,3,23, 有空值
+					continue;
+				}
+				readUserIdSet.add(Integer.parseInt(readUserId));
+			}
+			
+			Integer[] readUserIds = readUserIdSet.toArray(new Integer[0]);
+			List<User> readUserList = userService.getList(readUserIds);
+			String[] readUserNames = new String[readUserList.size()];
+			for (int i = 0; i < readUserList.size(); i++) {
+				readUserNames[i] = readUserList.get(i).getName();
+			}
+			
 			return PageResultEx.ok()
 					.addAttr("id", entity.getId())
 					.addAttr("name", entity.getName())
-					.addAttr("imgFileId", entity.getImgFileId())
 					.addAttr("createUserId", entity.getCreateUserId())
+					.addAttr("createUserName", userService.getEntity(entity.getCreateUserId()).getName())
 					.addAttr("createTime", DateUtil.formatDateTime(entity.getCreateTime()))
-					.addAttr("readUserIds", entity.getReadUserIds().subSequence(1, entity.getReadUserIds().length()).toString().split(","))
-					.addAttr("writeUserIds", entity.getWriteUserIds().subSequence(1, entity.getWriteUserIds().length()).toString().split(","));
+					.addAttr("readUserIds", readUserIds)
+					.addAttr("readUserNames", readUserNames);
 		} catch (MyException e) {
-			log.error("获取试卷分类错误：{}", e.getMessage());
+			log.error("获取试题分类错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("获取试卷分类错误：", e);
+			log.error("获取试题分类错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 完成添加权限
+	 * 添加组用户
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param id
-	 * @param userIds
-	 * @param postIds
-	 * @param orgIds
-	 * @param syn2Sub true ： 同步授权到子分类
+	 * @param readUserIds
 	 * @return PageResult
 	 */
 	@RequestMapping("/auth")
 	@ResponseBody
-	public PageResult auth(Integer id, String readUserIds, String writeUserIds) {
+	public PageResult auth(Integer id, Integer[] readUserIds) {
 		try {
-			paperTypeService.doAuth(id, readUserIds, writeUserIds);
+			paperTypeService.auth(id, readUserIds);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("完成添加权限用户错误：{}", e.getMessage());
+			log.error("添加组用户错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("完成添加权限用户错误：", e);
+			log.error("添加组用户错误：", e);
 			return PageResult.err();
 		}
 	}

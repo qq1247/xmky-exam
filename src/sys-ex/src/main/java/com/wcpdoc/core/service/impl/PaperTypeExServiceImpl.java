@@ -28,7 +28,7 @@ public class PaperTypeExServiceImpl implements PaperTypeExService {
 	public void delAndUpdate(PaperType paperType) {
 		List<Paper> paperList = paperService.getList(paperType.getId());
 		if (ValidateUtil.isValid(paperList)) {
-			throw new MyException("该试卷分类下有试卷，不允许删除！");
+			throw new MyException("该试卷分类下有试卷，不允许删除");
 		}
 	}
 }

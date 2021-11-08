@@ -72,10 +72,10 @@ public interface MyExamService extends BaseService<MyExam>{
 	 * @param questionId 
 	 * @param userId 
 	 * @param answers
-	 * @param fileId
+	 * @param answerFileId
 	 * void
 	 */
-	void updateAnswer(Integer examId, Integer userId, Integer questionId, String[] answers, Integer fileId);
+	void answerUpdate(Integer examId, Integer userId, Integer questionId, String[] answers, Integer answerFileId);
 	
 	/**
 	 * 完成交卷
@@ -88,7 +88,7 @@ public interface MyExamService extends BaseService<MyExam>{
 	 * @param userId 
 	 * void
 	 */
-	void doAnswer(Integer examId, Integer userId);
+	void finish(Integer examId, Integer userId);
 
 	/**
 	 * 获取用户列表

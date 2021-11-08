@@ -31,7 +31,7 @@ public interface MyMarkService extends BaseService<MyMark>{
 	 * @param score
 	 * void
 	 */
-	void updateScore(Integer examId, Integer userId, Integer questionId, BigDecimal score);
+	void scoreUpdate(Integer examId, Integer userId, Integer questionId, BigDecimal score);
 	
 	/**
 	 * 完成阅卷
@@ -41,5 +41,5 @@ public interface MyMarkService extends BaseService<MyMark>{
 	 * @param userId
 	 * void
 	 */
-	void doScore(Integer examId, Integer userId);
+	void finish(Integer examId, Integer userId);
 }

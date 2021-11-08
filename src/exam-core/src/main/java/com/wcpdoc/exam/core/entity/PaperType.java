@@ -45,67 +45,76 @@ public class PaperType {
 	private Integer state;
 	@Column(name = "READ_USER_IDS")
 	private String readUserIds;
-	@Column(name = "WRITE_USER_IDS")
-	private String writeUserIds;
-	
+
 	public Integer getId() {
 		return id;
 	}
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
+
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public Integer getImgFileId() {
 		return imgFileId;
 	}
+
 	public void setImgFileId(Integer imgFileId) {
 		this.imgFileId = imgFileId;
 	}
+
 	public Integer getCreateUserId() {
 		return createUserId;
 	}
+
 	public void setCreateUserId(Integer createUserId) {
 		this.createUserId = createUserId;
 	}
+
 	public Date getCreateTime() {
 		return createTime;
 	}
+
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
 	}
+
 	public Integer getUpdateUserId() {
 		return updateUserId;
 	}
+
 	public void setUpdateUserId(Integer updateUserId) {
 		this.updateUserId = updateUserId;
 	}
+
 	public Date getUpdateTime() {
 		return updateTime;
 	}
+
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
 	}
+
 	public Integer getState() {
 		return state;
 	}
+
 	public void setState(Integer state) {
 		this.state = state;
 	}
+
 	public String getReadUserIds() {
 		return readUserIds;
 	}
+
 	public void setReadUserIds(String readUserIds) {
 		this.readUserIds = readUserIds;
-	}
-	public String getWriteUserIds() {
-		return writeUserIds;
-	}
-	public void setWriteUserIds(String writeUserIds) {
-		this.writeUserIds = writeUserIds;
 	}
 }

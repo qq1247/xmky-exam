@@ -43,5 +43,4 @@ public class UserToken {
 		this.roles = roles;
 	}
 
-
 }

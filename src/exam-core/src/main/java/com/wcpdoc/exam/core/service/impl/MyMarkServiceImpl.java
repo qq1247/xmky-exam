@@ -58,7 +58,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 	}
 	
 	@Override
-	public void updateScore(Integer examId, Integer userId, Integer questionId, BigDecimal score) {
+	public void scoreUpdate(Integer examId, Integer userId, Integer questionId, BigDecimal score) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(examId)) {
 			throw new MyException("参数错误：examId");
@@ -134,7 +134,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 	}
 
 	@Override
-	public void doScore(Integer examId, Integer userId) {
+	public void finish(Integer examId, Integer userId) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(examId)) {
 			throw new MyException("参数错误：examId");

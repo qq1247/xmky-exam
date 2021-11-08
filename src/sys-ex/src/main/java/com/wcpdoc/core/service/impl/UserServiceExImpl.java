@@ -53,7 +53,7 @@ public class UserServiceExImpl implements UserExService {
 		}
 		
 		// 缓存刷新令牌（用于续租登陆）
-		TokenCache.put(String.format("TOKEN_%s", user.getId()), token);
+		TokenCache.put(user.getId(), token);
 		return token;
 	}
 

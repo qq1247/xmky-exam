@@ -72,17 +72,17 @@ public class ApiMyExamController extends BaseController{
 	 * 考试答案列表
 	 * 
 	 * v1.0 zhanghc 2018年11月24日上午9:13:22
-	 * @param id
+	 * @param examId
 	 * @return PageResult
 	 */
 	@RequestMapping("/answerList")
 	@ResponseBody
-	public PageResult answerList(Integer id) {
+	public PageResult answerList(Integer examId) {
 		try {
-			List<Map<String, Object>> list = myExamDetailService.getAnswerList(id);
+			List<Map<String, Object>> list = myExamDetailService.getAnswerList(examId, getCurUser().getId());
 			for (Map<String, Object> map : list) {
 				map.put("myExamDetailId", map.remove("id"));// 前缀为myExamDetail，默认为id有歧义。
-				map.put("answers", new QuestionAnswer().getAnswers((Integer)map.get("questionType"), (String)map.remove("answer")));// 如果没有值，页面也返回字段
+				//map.put("answers", new QuestionAnswer().getAnswers((Integer)map.get("questionType"), (String)map.remove("answer")));// 如果没有值，页面也返回字段
 			}
 			
 			return PageResultEx.ok().data(list);
@@ -109,8 +109,11 @@ public class ApiMyExamController extends BaseController{
 		try {
 			List<Map<String, Object>> list = myExamDetailService.getMarkAnswerList(userId, examId);
 			for (Map<String, Object> map : list) {
-				map.put("myExamDetailId", map.remove("id"));// 前缀为myExamDetail，默认为id有歧义。
-				map.put("answers", new QuestionAnswer().getAnswers((Integer)map.get("questionType"), (String)map.remove("answer")));// 如果没有值，页面也返回字段
+				map.put("answers", new QuestionAnswer().getAnswers(
+						(Integer)map.remove("questionType"), 
+						(Integer)map.remove("questionAi"), 
+						(String)map.remove("answer")
+						)); 
 			}
 			
 			return PageResultEx.ok().data(list);
@@ -133,11 +136,11 @@ public class ApiMyExamController extends BaseController{
 	 * @param fileId
 	 * @return PageResult
 	 */
-	@RequestMapping("/updateAnswer")
+	@RequestMapping("/answer")
 	@ResponseBody
-	public PageResult updateAnswer(Integer examId, Integer questionId, String[] answers, Integer fileId) {
+	public PageResult answer(Integer examId, Integer questionId, String[] answers, Integer answerFileId) {
 		try {
-			myExamService.updateAnswer(examId, getCurUser().getId(), questionId, answers, fileId);
+			myExamService.answerUpdate(examId, getCurUser().getId(), questionId, answers, answerFileId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("更新答案错误：{}", e.getMessage());
@@ -155,11 +158,11 @@ public class ApiMyExamController extends BaseController{
 	 * @param examId
 	 * @return PageResult
 	 */
-	@RequestMapping("/doAnswer")
+	@RequestMapping("/finish")
 	@ResponseBody
-	public PageResult doAnswer(Integer examId) {
+	public PageResult finish(Integer examId) {
 		try {
-			myExamService.doAnswer(examId, getCurUser().getId());
+			myExamService.finish(examId, getCurUser().getId());
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成交卷错误：{}", e.getMessage());

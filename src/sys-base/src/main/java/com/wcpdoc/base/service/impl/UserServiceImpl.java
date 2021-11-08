@@ -137,4 +137,9 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 			userDao.add(entity);
 		}
 	}
+
+	@Override
+	public List<User> getList(Integer[] ids) {
+		return userDao.getList(ids);
+	}
 }

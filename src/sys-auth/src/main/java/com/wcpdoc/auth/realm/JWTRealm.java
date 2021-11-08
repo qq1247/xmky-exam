@@ -103,7 +103,7 @@ public class JWTRealm extends AuthorizingRealm {
 	 * @param userId void
 	 */
 	public void clearAuth(Integer userId) {
-		String principal = TokenCache.get(String.format("TOKEN_%s", userId));
+		String principal = TokenCache.get(userId);
 		Subject subject = SecurityUtils.getSubject();
 		SimplePrincipalCollection principals = new SimplePrincipalCollection(principal, getName());
 		subject.runAs(principals);

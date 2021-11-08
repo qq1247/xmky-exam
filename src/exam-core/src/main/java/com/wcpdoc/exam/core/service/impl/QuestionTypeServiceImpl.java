@@ -1,23 +1,18 @@
 package com.wcpdoc.exam.core.service.impl;
 
 import java.util.Date;
-import java.util.List;
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.dao.BaseDao;
-import com.wcpdoc.core.entity.PageIn;
-import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
+import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.QuestionTypeDao;
-import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionType;
-import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeExService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 import com.wcpdoc.file.service.FileService;
@@ -31,11 +26,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	@Resource
 	private QuestionTypeDao questionTypeDao;
 	@Resource
-	private QuestionService questionService;
-	@Resource
 	private QuestionTypeExService questionTypeExService;
-	@Resource
-	private UserService userService;
 	@Resource
 	private FileService fileService;
 	
@@ -47,109 +38,86 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	}
 
 	@Override
-	public void addAndUpdate(String name, Integer imgFileId) {
+	public void addAndUpdate(QuestionType questionType) {
 		//校验数据有效性
-		if (!ValidateUtil.isValid(name)) {
+		if (!ValidateUtil.isValid(questionType.getName())) {
 			throw new MyException("参数错误：name");
 		}
+		//if (existName(questionType)) {
+		//	throw new MyException("名称已存在！");
+		//} // 不同的子管理员添加可以重复
 		
 		// 添加试题分类
-		QuestionType questionType = new QuestionType();
-		questionType.setName(name);
-		questionType.setImgFileId(imgFileId);
-		/*if (existName(questionType)) {
-			throw new MyException("名称已存在！");
-		}*/
-		questionType.setReadUserIds(","+getCurUser().getId()+",");
-		questionType.setWriteUserIds(","+getCurUser().getId()+",");
+		questionType.setWriteUserIds(String.format(",%s,", getCurUser().getId()));
 		questionType.setCreateUserId(getCurUser().getId());
 		questionType.setCreateTime(new Date());
 		questionType.setUpdateTime(new Date());
 		questionType.setUpdateUserId(getCurUser().getId());
 		questionType.setState(1);
-		questionTypeDao.add(questionType);
+		add(questionType);
 		
 		//保存图片
 		//fileService.doUpload(imgId);
 	}
 
 	@Override
-	public void editAndUpdate(Integer id, String name, Integer imgFileId) {
+	public void editAndUpdate(QuestionType questionType) {
 		//校验数据有效性
-		if(id == null) {
-			throw new MyException("参数错误：id");
-		}
-		if(!ValidateUtil.isValid(name)) {
+		if(!ValidateUtil.isValid(questionType.getName())) {
 			throw new MyException("参数错误：name");
 		}
-		QuestionType entity = questionTypeDao.getEntity(id);
+		QuestionType entity = getEntity(questionType.getId());
 		if (entity.getCreateUserId() != getCurUser().getId()) {
-			throw new MyException("权限不足！");
+			throw new MyException("无操作权限");
 		}
 		
-		entity.setName(name);
-		/*if(questionTypeService.existName(entity)) {
-			throw new MyException("名称已存在！");
-		}*/
-		entity.setImgFileId(imgFileId);
+		//保存图片
+		//if (entity.getImgFileId().intValue() != questionType.getImgFileId().intValue()) {
+		//	fileService.doUpload(imgId);
+		//}
+		
+		// 保存试题分类
+		entity.setName(questionType.getName());
+		entity.setImgFileId(questionType.getImgFileId());
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
-		questionTypeDao.update(entity);
-		
-		//保存图片
-		//fileService.doUpload(imgId);
+		update(entity);
 	}
 	
 	@Override
 	public void delAndUpdate(Integer id) {
 		// 校验数据有效性
-		if (id == 1) { //不包括根试题分类
-			throw new MyException("此试题分类不能被删除！");
-		}
-		
-		List<Question> list = questionService.getList(id);
-		if (ValidateUtil.isValid(list)) {
-			throw new MyException("请先删除试题分类下所有的试题！");
-		}
 		QuestionType questionType = getEntity(id);
 		if (questionType.getCreateUserId() != getCurUser().getId()) {
-			throw new MyException("权限不足！");
+			throw new MyException("无操作权限");
 		}
 		
 		// 删除试题分类
 		questionType.setState(0);
 		questionType.setUpdateTime(new Date());
 		questionType.setUpdateUserId(getCurUser().getId());
-		questionTypeDao.update(questionType);
+		update(questionType);
+		
+		// 删除试题分类扩展
+		questionTypeExService.delAndUpdate(questionType);
 	}
 
 	@Override
-	public boolean existName(QuestionType questionType) {
-		return questionTypeDao.existName(questionType.getName(), questionType.getId());
-	}
-
-	@Override
-	public List<QuestionType> getList() {
-		return questionTypeDao.getList();
-	}
-
-	@Override
-	public void auth(Integer id, String readUserIds, String writeUserIds) {
+	public void auth(Integer id, Integer[] writeUserIds) {
+		// 校验数据有效性
 		QuestionType entity = getEntity(id);
-		if(entity.getCreateUserId().intValue() != getCurUser().getId()){
-			throw new MyException("非法操作！");
+		if(entity.getCreateUserId().intValue() != getCurUser().getId().intValue()){
+			throw new MyException("无操作权限");
 		}
-		if (ValidateUtil.isValid(readUserIds)) {
-			entity.setReadUserIds(","+readUserIds+",");
-		}
-		if (ValidateUtil.isValid(writeUserIds)) {
-			entity.setWriteUserIds(","+writeUserIds+",");
-		}
-		if(!entity.getReadUserIds().contains(","+getCurUser().getId()+",")){
-			throw new MyException("创建者不能被删除！");
-		}
-		if(!entity.getWriteUserIds().contains(","+getCurUser().getId()+",")){
-			throw new MyException("创建者不能被删除！");
+		
+		// 更新权限
+		if (!ValidateUtil.isValid(writeUserIds)) {
+			entity.setWriteUserIds(String.format(",%s,", entity.getCreateUserId()));// 如果没有，默认就是创建人（查询的时候方便）
+		} else {
+			entity.setWriteUserIds(String.format(",%s,", StringUtil.join(writeUserIds)));
+			if (!entity.getWriteUserIds().contains(String.format(",%s,", entity.getCreateUserId()))) {// 如果页面没有选择创建人，添加创建人
+				entity.setWriteUserIds(String.format("%s,%s", entity.getWriteUserIds(), entity.getCreateUserId()));
+			}
 		}
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
@@ -157,17 +125,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	}
 
 	@Override
-	public PageOut authUserListpage(PageIn pageIn) {
-		return questionTypeDao.authUserListpage(pageIn);
-	}
-
-	@Override
 	public boolean hasWriteAuth(QuestionType questionType, Integer userId) {
 		return questionType.getWriteUserIds().contains(String.format(",%s,", userId));
-	}
-
-	@Override
-	public boolean hasReadAuth(QuestionType questionType, Integer userId) {
-		return questionType.getReadUserIds().contains(String.format(",%s,", userId));
 	}
 }

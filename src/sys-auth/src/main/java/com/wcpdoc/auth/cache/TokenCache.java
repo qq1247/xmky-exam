@@ -14,6 +14,7 @@ import com.wcpdoc.cache.BaseEhCache;
  */
 public class TokenCache extends BaseEhCache {
 	private static final String CACHE_NAME = "TOKEN_CACHE";
+	private static final String PRE = "TOKEN_%s";
 
 	/**
 	 * 放入缓存
@@ -22,9 +23,9 @@ public class TokenCache extends BaseEhCache {
 	 * @param key
 	 * @param value void
 	 */
-	public static void put(String key, String value) {
+	public static void put(Integer key, String value) {
 		Cache cache = getCache(CACHE_NAME);
-		cache.put(key, value);
+		cache.put(String.format(PRE, key), value);
 //		net.sf.ehcache.Cache nativeCache = (net.sf.ehcache.Cache) cache.getNativeCache();
 //		nativeCache.flush(); //spring包装后，实现了flush
 	}
@@ -36,9 +37,9 @@ public class TokenCache extends BaseEhCache {
 	 * @param key
 	 * @param value void
 	 */
-	public static String get(String key) {
+	public static String get(Integer key) {
 		Cache cache = getCache(CACHE_NAME);
-		return cache.get(key, String.class);
+		return cache.get(String.format(PRE, key), String.class);
 	}
 
 	/**
@@ -48,10 +49,10 @@ public class TokenCache extends BaseEhCache {
 	 * @param key
 	 * @param value void
 	 */
-	public static void del(Integer id) {
+	public static void del(Integer key) {
 		Cache cache = getCache(CACHE_NAME);
 		net.sf.ehcache.Cache nativeCache = (net.sf.ehcache.Cache) cache.getNativeCache();
-		nativeCache.remove("TOKEN_"+id);
+		nativeCache.remove(String.format(PRE, key));
 	}
 	
 	/**

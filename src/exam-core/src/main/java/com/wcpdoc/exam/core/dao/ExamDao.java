@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.wcpdoc.core.dao.BaseDao;
-import com.wcpdoc.core.entity.LoginUser;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.Exam;
@@ -33,15 +32,6 @@ public interface ExamDao extends BaseDao<Exam>{
 	 * @return List<Exam>
 	 */
 	List<Exam> getList(Integer examTypeId);
-
-	/**
-	 * 完成强制交卷
-	 * 
-	 * v1.0 zhanghc 2017年8月28日上午10:42:34
-	 * @param user
-	 * void
-	 */
-	void doForcePaper(LoginUser user);
 
 	/**
 	 * 获取成绩列表

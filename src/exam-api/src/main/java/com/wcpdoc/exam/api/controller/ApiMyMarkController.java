@@ -49,8 +49,7 @@ public class ApiMyMarkController extends BaseController {
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
-			pageIn.addAttr("curUserId", getCurUser().getId())
-			  	  .addAttr("state", "1");
+			pageIn.addAttr("curUserId", getCurUser().getId());
 			PageOut listpage = myMarkService.getListpage(pageIn);
 			
 			for(Map<String, Object> map : listpage.getList()){
@@ -94,11 +93,11 @@ public class ApiMyMarkController extends BaseController {
 	 * @param score
 	 * @return PageResult
 	 */
-	@RequestMapping("/updateScore")
+	@RequestMapping("/score")
 	@ResponseBody
-	public PageResult updateScore(Integer examId, Integer userId, Integer questionId, BigDecimal score) {
+	public PageResult score(Integer examId, Integer userId, Integer questionId, BigDecimal score) {
 		try {
-			myMarkService.updateScore(examId, userId, questionId, score);
+			myMarkService.scoreUpdate(examId, userId, questionId, score);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("阅卷错误：{}", e.getMessage());
@@ -110,17 +109,17 @@ public class ApiMyMarkController extends BaseController {
 	}
 	
 	/**
-	 * 完成阅卷
+	 * 阅卷
 	 * 
 	 * v1.0 zhanghc 2017年6月26日下午12:30:20
 	 * @param examId
 	 * @return PageResult
 	 */
-	@RequestMapping("/doScore")
+	@RequestMapping("/finish")
 	@ResponseBody
-	public PageResult doScore(Integer examId, Integer userId) {
+	public PageResult finish(Integer examId, Integer userId) {
 		try {
-			myMarkService.doScore(examId, userId);
+			myMarkService.finish(examId, userId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成阅卷错误：{}", e.getMessage());

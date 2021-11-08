@@ -95,7 +95,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	}
 
 	@Override
-	public void updateAnswer(Integer examId, Integer userId, Integer questionId, String[] answers, Integer fileId) {
+	public void answerUpdate(Integer examId, Integer userId, Integer questionId, String[] answers, Integer answerFileId) {
 		// 校验数据有效性
 		if (examId == null) {
 			throw new MyException("参数错误：examId");
@@ -152,20 +152,20 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		} else if (question.getType() == 3) {
 			myExamDetail.setAnswer(StringUtil.join(answers, '\n'));
 		}
-		if (ValidateUtil.isValid(fileId)) {
-			myExamDetail.setAnswerFileId(fileId);
+		if (ValidateUtil.isValid(answerFileId)) {
+			myExamDetail.setAnswerFileId(answerFileId);
 		}
 		myExamDetail.setAnswerTime(new Date());
 		myExamDetailService.update(myExamDetail);
 		
 		// 保存附件
-		if (ValidateUtil.isValid(fileId)) {
-			fileService.doUpload(fileId);
+		if (ValidateUtil.isValid(answerFileId)) {
+			fileService.doUpload(answerFileId);
 		}
 	}
 
 	@Override
-	public void doAnswer(Integer examId, Integer userId) {
+	public void finish(Integer examId, Integer userId) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(examId)) {
 			throw new MyException("参数错误：examId");

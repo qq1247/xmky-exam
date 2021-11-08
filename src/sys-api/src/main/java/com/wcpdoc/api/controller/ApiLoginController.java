@@ -1,27 +1,34 @@
 package com.wcpdoc.api.controller;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.OutputStream;
 import java.util.Date;
 
 import javax.annotation.Resource;
+import javax.imageio.ImageIO;
 import javax.security.auth.login.LoginException;
+import javax.swing.ImageIcon;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.base.entity.UserToken;
 import com.wcpdoc.base.service.LoginService;
+import com.wcpdoc.base.service.ParmService;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.core.util.ValidateUtil;
+import com.wcpdoc.file.service.FileService;
 
 /**
  * 登录控制层
@@ -35,6 +42,10 @@ public class ApiLoginController extends BaseController {
 	
 	@Resource
 	private LoginService loginService;
+	@Resource
+	private ParmService parmService;
+	@Resource
+	private FileService fileService;
 	
 	/**
 	 * 完成登录
@@ -123,29 +134,62 @@ public class ApiLoginController extends BaseController {
 	}
 	
 	/**
-	 * 获取ico
+	 * 获取单位名称
 	 * 
 	 * v1.0 chenyun 2021-10-08 16:05:35
 	 * @return void
 	 */
-	@RequestMapping("/ico")
+	@RequestMapping("/orgName")
 	@ResponseBody
-	public void ico() {
-		OutputStream output = null;
+	public PageResult orgName() {
 		try {
-			String filepath = String.format(".\\config\\favicon.ico");
-			String fileName = new String("favicon.ico".getBytes("UTF-8"), "ISO-8859-1");
+			Parm parm = parmService.get();
+			return PageResultEx.ok().data(parm == null ? null : parm.getOrgName());
+		} catch (Exception e) {
+			log.error("获取服务器时间错误：", e);
+			return PageResult.err().msg(e.getMessage());
+		}
+	}
+	/**
+	 * 获取logo
+	 * 
+	 * v1.0 chenyun 2021-10-08 16:05:35
+	 * @param ico 是否ico图片
+	 * @return void
+	 */
+	@RequestMapping("/logo")
+	@ResponseBody
+	public void logo(Boolean ico) {
+		try {
+			File logo = new File("./config/logo.png");
+			Parm parm = parmService.get();
+			if (parm != null && ValidateUtil.isValid(parm.getOrgLogo())) {// 如果有配置，使用自定义logo
+				logo = fileService.getFileEx(parm.getOrgLogo()).getFile();
+			}
+			
+			if (ico) {
+				ImageIcon imageIcon = new ImageIcon(logo.getAbsolutePath());
+			    BufferedImage bufferedImage=new BufferedImage(64,64,BufferedImage.TYPE_INT_RGB);
+			    Graphics2D g=(Graphics2D)bufferedImage.getGraphics();
+			    g.setColor(Color.blue);
+			    g.drawRect(5,5,5,5);
+			    g.fillRect(5,5,5,5);
+			    g.drawImage(imageIcon.getImage(),0,0,64,64,imageIcon.getImageObserver());
+			    ImageIO.write(bufferedImage, "png",  response.getOutputStream());
+			    return;
+			}
+			
+				
+			String fileName = new String((logo.getName()).getBytes("UTF-8"), "ISO-8859-1");
 			response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
 			response.setContentType("application/force-download");
-
-			output = response.getOutputStream();
-			FileUtils.copyFile(new File(filepath), output);
+			FileUtils.copyFile(logo, response.getOutputStream());
 		} catch (MyException e) {
 			log.error("获取ico失败：", e.getMessage());
 		} catch (Exception e) {
 			log.error("获取ico失败：", e);
 		} finally {
-			IOUtils.closeQuietly(output);
+			// 流资源的关闭，这里目前没有
 		}
 	}
 }

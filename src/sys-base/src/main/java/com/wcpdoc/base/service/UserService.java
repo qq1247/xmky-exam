@@ -93,4 +93,13 @@ public interface UserService extends BaseService<User> {
 	 */
 	void syncUser(List<User> user, Integer orgId);
 
+	/**
+	 * 获取用户列表
+	 * 
+	 * v1.0 zhanghc 2021年11月5日上午10:38:37
+	 * @param ids
+	 * @return List<User>
+	 */
+	List<User> getList(Integer[] ids);
+
 }
