@@ -294,7 +294,7 @@ http请求头需添加Authorization字段，
 ### 试题发布：question/publish
 | 请求参数| 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
-| questionType| Integer | 试题分类ID（全部发布） | 否   |
+| questionTypeId| Integer | 试题分类ID（全部发布） | 否   |
 | ids| Integer[] | 试题ID（部分试题发布） | 否   |
 
 ### 试题获取：question/copy
