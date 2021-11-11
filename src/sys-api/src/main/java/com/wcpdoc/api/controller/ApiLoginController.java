@@ -28,6 +28,7 @@ import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
+import com.wcpdoc.file.entity.FileEx;
 import com.wcpdoc.file.service.FileService;
 
 /**
@@ -162,26 +163,32 @@ public class ApiLoginController extends BaseController {
 	public void logo(Boolean ico) {
 		try {
 			File logo = new File("./config/logo.png");
+			String fileName = "logo"; 
+			String fileExName = "png"; 
 			Parm parm = parmService.get();
+			FileEx fileEx = null;
 			if (parm != null && ValidateUtil.isValid(parm.getOrgLogo())) {// 如果有配置，使用自定义logo
-				logo = fileService.getFileEx(parm.getOrgLogo()).getFile();
+				fileEx = fileService.getFileEx(parm.getOrgLogo());
+				logo = fileEx.getFile();
+				fileName = fileEx.getEntity().getName();
+				fileExName = fileEx.getEntity().getExtName();
 			}
-			
 			if (ico != null && ico) {
+				response.addHeader("Content-Disposition", "attachment;filename=" + new String((logo.getName() + ".ico").getBytes("UTF-8"), "ISO-8859-1"));
+				response.setContentType("application/force-download");
+				
 				ImageIcon imageIcon = new ImageIcon(logo.getAbsolutePath());
 			    BufferedImage bufferedImage=new BufferedImage(64,64,BufferedImage.TYPE_INT_RGB);
 			    Graphics2D g=(Graphics2D)bufferedImage.getGraphics();
 			    g.setColor(Color.blue);
 			    g.drawRect(5,5,5,5);
-			    g.fillRect(5,5,5,5);
+			    g.fillRect(5,5,5,5); 
 			    g.drawImage(imageIcon.getImage(),0,0,64,64,imageIcon.getImageObserver());
 			    ImageIO.write(bufferedImage, "png",  response.getOutputStream());
 			    return;
 			}
 			
-				
-			String fileName = new String((logo.getName()).getBytes("UTF-8"), "ISO-8859-1");
-			response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
+			response.addHeader("Content-Disposition", "attachment;filename=" + new String(String.format("%s.%s", fileName, fileExName).getBytes("UTF-8"), "ISO-8859-1"));
 			response.setContentType("application/force-download");
 			FileUtils.copyFile(logo, response.getOutputStream());
 		} catch (MyException e) {

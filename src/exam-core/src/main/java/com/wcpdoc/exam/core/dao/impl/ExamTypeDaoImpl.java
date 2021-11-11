@@ -35,7 +35,7 @@ public class ExamTypeDaoImpl extends RBaseDaoImpl<ExamType> implements ExamTypeD
 				+ "INNER JOIN SYS_USER USER ON PAPER_TYPE.CREATE_USER_ID = USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "PAPER_TYPE.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
-				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "PAPER_TYPE.CREATE_USER_ID = ?", String.format("%%%s%%", pageIn.get("curUserId", Integer.class)))
+				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "PAPER_TYPE.CREATE_USER_ID = ?", pageIn.get("curUserId", Integer.class))
 				.addWhere("PAPER_TYPE.STATE = 1")
 				.addOrder("PAPER_TYPE.UPDATE_TIME", Order.DESC);
 		return getListpage(sqlUtil, pageIn);

@@ -2,6 +2,7 @@ package com.wcpdoc.base.dao.impl;
 
 import java.util.List;
 
+import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
@@ -69,8 +70,8 @@ public class UserDaoImpl extends RBaseDaoImpl<User> implements UserDao {
 	public List<User> getList(Integer[] ids) {
 		String sql = "SELECT * FROM SYS_USER WHERE ID IN (:IDS)";
 		Query<User> query = getCurSession().createSQLQuery(sql);
-		query.setParameter("IDS", ids);
-		//query.unwrap(NativeQuery.class).addEntity(clazz);
+		query.setParameterList("IDS", ids);
+		query.unwrap(NativeQuery.class).addEntity(clazz);
 		return query.list();
 	}
 }

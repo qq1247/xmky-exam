@@ -95,7 +95,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 		
 		if (question.getType() == 1 && options != null) {
-			if (options.length < 2) {
+			if (options.length < 1) {
 				throw new MyException("参数错误：options长度小于2");
 			}
 			if (answers.length != 1) {
@@ -153,12 +153,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		question.setCreateUserId(getCurUser().getId());
 		question.setUpdateTime(new Date());
 		question.setUpdateUserId(getCurUser().getId());
-		question.setVer(1);// 默认版本为1
 		question.setState(2);// 默认禁用
 		add(question);
 		
-		question.setSrcId(question.getId());
-		update(question);
 
 		BigDecimal total = new BigDecimal(0.00);
 		//添加试题答案
@@ -355,7 +352,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		entity.setUpdateUserId(getCurUser().getId());
 		entity.setScore(question.getScore());
 		entity.setScoreOptions(ValidateUtil.isValid(scoreOptions) ? StringUtil.join(scoreOptions) : null);
-		entity.setNo(question.getNo());
 		update(entity);
 
 		//修改试题答案
@@ -542,26 +538,25 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			question.setCreateUserId(getCurUser().getId());
 			question.setUpdateTime(new Date());
 			question.setUpdateUserId(getCurUser().getId());
-			question.setVer(1);
 			question.setState(2);// 默认禁用
 			question.setQuestionTypeId(questionTypeId);
 			
 			String[] answers = new String[questionExList.get(j).getQuestionAnswerList().size()];
-			BigDecimal[] scores = new BigDecimal[questionExList.get(j).getQuestionAnswerList().size()];
+			BigDecimal[] answerScores = new BigDecimal[questionExList.get(j).getQuestionAnswerList().size()];
 			BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
 			for (int i = 0; i < questionExList.get(j).getQuestionAnswerList().size(); i++) {
 				answers[i] = questionExList.get(j).getQuestionAnswerList().get(i).getAnswer();
 				if (question.getType() == 3 || (question.getType() == 5 && question.getAi() == 1)) {
 					answers[i] = StringUtil.join(answers[i].split(" "), '\n');
 				}
-				scores[i] = questionExList.get(j).getQuestionAnswerList().get(i).getScore();
-				totalScore.add(scores[i]);
+				answerScores[i] = questionExList.get(j).getQuestionAnswerList().get(i).getScore();
+				totalScore.add(answerScores[i]);
 			}
 			if (question.getType() == 2) {// 多选特殊处理下，答案拆分
 				answers = questionExList.get(j).getQuestionAnswerList().get(0).getAnswer().split("");
-				scores = new BigDecimal[answers.length];
-				for (int i = 0; i < scores.length; i++) {
-					scores[i] = questionExList.get(j).getQuestionAnswerList().get(0).getScore();
+				answerScores = new BigDecimal[answers.length];
+				for (int i = 0; i < answerScores.length; i++) {
+					answerScores[i] = questionExList.get(j).getQuestionAnswerList().get(0).getScore();
 				}
 			}
 			
@@ -585,7 +580,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				scoreOptions = new Integer[0];
 			}
 			
-			addAndUpdate(question, scoreOptions, answers, options, scores);
+			addAndUpdate(question, scoreOptions, options, answers, answerScores);
 		}
 		
 	}

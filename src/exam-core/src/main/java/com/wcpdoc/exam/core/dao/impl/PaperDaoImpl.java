@@ -41,7 +41,7 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("paperTypeId")), "PAPER.PAPER_TYPE_ID = ?", pageIn.get("paperTypeId"))
 		.addWhere(ValidateUtil.isValid(pageIn.get("name")), "PAPER.NAME LIKE ?", "%" + pageIn.get("name") + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId")), "PAPER_TYPE.READ_USER_IDS LIKE ?", String.format("%%%s%%", pageIn.get("curUserId")))// 只看自己的
+				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "PAPER_TYPE.READ_USER_IDS LIKE ?", String.format("%%%s%%", pageIn.get("curUserId", Integer.class)))// 只看自己的
 				.addWhere("PAPER.STATE IN (1,2)")
 				.addOrder("PAPER.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);

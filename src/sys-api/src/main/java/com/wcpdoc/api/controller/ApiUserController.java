@@ -134,10 +134,10 @@ public class ApiUserController extends BaseController {
 			}
 
 			// 添加用户
-			Date date = new Date();
-			user.setRoles("subAdmin".equals(user.getRoles()) ? "subAdmin" : null);
-			user.setRegistTime(date);
-			user.setUpdateTime(date);
+			Date curTime = new Date();
+			user.setRoles("user");
+			user.setRegistTime(curTime);
+			user.setUpdateTime(curTime);
 			user.setUpdateUserId(getCurUser().getId());
 			user.setState(1);
 			userService.add(user);
@@ -185,7 +185,7 @@ public class ApiUserController extends BaseController {
 			}
 
 			entity.setOrgId(user.getOrgId());
-			entity.setRoles(user.getRoles().contains("subAdmin") ? "user,subAdmin" : "user");
+			//entity.setRoles(null); // 修改不允许修改角色
 			entity.setName(user.getName());
 			entity.setLoginName(user.getLoginName());
 			entity.setUpdateTime(new Date());

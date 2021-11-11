@@ -79,13 +79,15 @@ public class ApiMyExamController extends BaseController{
 	@ResponseBody
 	public PageResult answerList(Integer examId) {
 		try {
-			List<Map<String, Object>> list = myExamDetailService.getAnswerList(examId, getCurUser().getId());
-			for (Map<String, Object> map : list) {
-				map.put("myExamDetailId", map.remove("id"));// 前缀为myExamDetail，默认为id有歧义。
-				//map.put("answers", new QuestionAnswer().getAnswers((Integer)map.get("questionType"), (String)map.remove("answer")));// 如果没有值，页面也返回字段
+			List<Map<String, Object>> answerList = myExamDetailService.getAnswerList(examId, getCurUser().getId());
+			for (Map<String, Object> map : answerList) {
+				map.put("answers", new QuestionAnswer().getAnswers(
+						(Integer)map.get("questionType"), 
+						(Integer)map.get("questionAi"), 
+						(String)map.remove("answer")));
 			}
 			
-			return PageResultEx.ok().data(list);
+			return PageResultEx.ok().data(answerList);
 		} catch (MyException e) {
 			log.error("考试答案列表错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

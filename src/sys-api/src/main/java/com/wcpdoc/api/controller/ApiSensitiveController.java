@@ -1,4 +1,4 @@
-package com.wcpdoc.exam.api.controller;
+package com.wcpdoc.api.controller;
 
 import javax.annotation.Resource;
 

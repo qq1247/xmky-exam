@@ -51,22 +51,12 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 
 	@Override
 	public Parm get() {
-		if(parmDao.getList().size() == 0){
-			return null;
-		}
-		return parmDao.getList().get(0);
+		return parmDao.getEntity(1);
 	}
 
 	@Override
 	public void editLogo(Parm parm) throws Exception {
-		if(parm.getId() == null){
-			parm.setUpdateTime(new Date());
-			parm.setUpdateUserId(getCurUser().getId());
-			parmDao.add(parm);
-			parmExService.ImageIcon(parm);
-			return;
-		}
-		Parm entity = parmDao.getEntity(parm.getId());
+		Parm entity = get();
 		entity.setOrgLogo(parm.getOrgLogo());
 		entity.setOrgName(parm.getOrgName());
 		entity.setUpdateTime(new Date());

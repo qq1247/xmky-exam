@@ -42,9 +42,9 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 				+ "LEFT JOIN SYS_USER UPDATE_USER ON EXAM.UPDATE_USER_ID = UPDATE_USER.ID ";
 		
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examTypeId")), "EXAM.EXAM_TYPE_ID = ?", pageIn.get("examTypeId", Integer.class))
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examTypeId")), "EXAM.EXAM_TYPE_ID = ?", pageIn.get("examTypeId"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "EXAM.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
-				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId")), "EXAM.UPDATE_USER_ID = ?", pageIn.get("curUserId", Integer.class))
+				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "EXAM.UPDATE_USER_ID = ?", pageIn.get("curUserId", Integer.class))
 				.addWhere("PAPER.STATE IN (1,2)")
 				.addOrder("EXAM.UPDATE_TIME", Order.DESC);
 		

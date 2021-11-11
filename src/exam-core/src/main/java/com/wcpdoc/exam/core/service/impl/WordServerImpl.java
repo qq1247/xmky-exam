@@ -261,7 +261,12 @@ public class WordServerImpl extends WordServer {
 		
 		int difficulty = parseDifficulty(titleRows);
 		String title = parseTitle(titleRows);
-		List<QuestionOption> questionOptionList = parseQuestionOptionList(optionRows, type);
+		List<QuestionOption> questionOptionList;
+		try {
+			questionOptionList = parseQuestionOptionList(optionRows, type);
+		} catch (Exception e) {
+			throw new MyException(String.format("解析选项错误：%s】", StringUtil.delHTMLTag(singleQuestion.toString())));
+		}
 		AI ai = parseAi(aiRows);
 		List<QuestionAnswer> questionAnswerList = parseAnswer(answerRows, type, ai);
 		String analysis = parseAnalysis(analysisRows);

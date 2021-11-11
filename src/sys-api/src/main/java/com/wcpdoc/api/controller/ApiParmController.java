@@ -14,6 +14,7 @@ import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.base.service.ParmService;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageResult;
+import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 /**
  * 参数控制层
@@ -130,6 +131,40 @@ public class ApiParmController extends BaseController {
 			log.error("数据库备份目录错误：", e);
 			return PageResult.err();
 		}
-
+	}
+	
+	/**
+	 * 系统参数数据库备份目录
+	 * “剪切之前的文件到新位置 对象要克隆” 暂时未实现
+	 * 
+	 * v1.0 wjj 2021年11月8日下午1:35:33
+	 * 
+	 * @param oldDir
+	 * @param newDir
+	 * @return PageResult
+	 */
+	@RequestMapping("/get")
+	@ResponseBody
+	public PageResult get() {
+		try {
+			Parm parm = parmService.get();
+			return PageResultEx.ok()
+					.addAttr("emailHost", parm.getEmailHost())
+					.addAttr("emailUserName", parm.getEmailUserName())
+					.addAttr("emailPwd", parm.getEmailPwd())
+					.addAttr("emailProtocol", parm.getEmailProtocol())
+					.addAttr("emailEncode", parm.getEmailEncode())
+					.addAttr("orgLogo", parm.getOrgLogo())
+					.addAttr("orgName", parm.getOrgName())
+					.addAttr("fileUploadDir", parm.getFileUploadDir())
+					.addAttr("dbBakDir", parm.getDbBakDir())
+					;
+		} catch (MyException e) {
+			log.error("数据库备份目录错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("数据库备份目录错误：", e);
+			return PageResult.err();
+		}
 	}
 }
