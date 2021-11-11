@@ -275,11 +275,27 @@ http请求头需添加Authorization字段，
 | id   | Integer | 主键 | 是   |
 
 ### 试题获取：question/get
+| 请求参数| 类型    | 描述 | 
+| -------- | ------- | ---- |
+| type           | Integer         | 类型（1：单选；2：多选；3：填空；4：判断；5：问答 |
+| difficulty     | Integer         | 难度（1：极易；2：简单；3：适中；4：困难；5：极难 ） | 
+| title          | Text | 题干 |
+| options[]      | String[]        | 选项，type为1,2时有效，len <= 7  |
+| ai| Integer    | 智能阅卷（1：是；2：否；）  | 
+| analysis       | Text    | 解析  | 
+| questionTypeId | Integer         | 试题分类ID      |
+| score          | Double          | 分数   | 是
+| scoreOptions[] | Integer[] | 分数选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；）|
+| state| Integer | 状态（0：删除；1：发布；2：草稿）|
+| answers[]      | Object[]   | 答案数组   | 
+| answers[].answer      | String   | 答案   | 
+| answers[].score     | Double    | 得分   | 
+
+### 试题发布：question/publish
 | 请求参数| 类型    | 描述 | 必填 |
-| -------- | ------- | ---- | ---- |
-| id   | Integer | 主键 | 是   |
-| answers[]	| String[] | 如果当前用户没有读写权限，则数组长度保留，值为空。| 是   |
-| 其他字段同question/add |         |      |      |  |
+| ---- | ------- | ---- | ---- |
+| questionType| Integer | 试题分类ID（全部发布） | 否   |
+| ids| Integer[] | 试题ID（部分试题发布） | 否   |
 
 ### 试题获取：question/copy
 | 请求参数| 类型    | 描述 | 必填 |
@@ -299,7 +315,6 @@ http请求头需添加Authorization字段，
 | -------- | ---------- | ---------- | ---- |
 | paperTypeId| Integer     | 试卷分类ID| 否   |
 | name     | String(16) | 试卷名称   | 否   |
-| state| Integer     | 状态| 否   |
 | curPage  | Integer    | 当前第几页 | 否   |
 | pageSize | Integer    | 每页多少条 | 否   |
 
@@ -325,7 +340,6 @@ http请求头需添加Authorization字段，
 | data.list[].genTypeName       | String| 组卷方式名称 |
 
 ### 试卷添加：paper/add
-######
 | 请求参数             | 类型          | 描述   | 必填 |
 | ---------| ------------- | -------- | ---- |
 | genType | Integer       | 组卷方式（1：人工组卷；2：随机组卷）   | 是   |
@@ -355,14 +369,14 @@ http请求头需添加Authorization字段，
 | code                | Integer | 响应码   |
 | msg                 | String  | 响应消息 |
 | data.id             | Integer | 试卷主键 |
-| data.name | 名称 |
-| data.passScore | 及格分数 |
-| data.totalScore | 总分数 |
-| data.genType | 组件方式 |
-| data.markType | 阅卷方式 |
-| data.showType | 展示方式 |
-| data.state | 状态 |
-| data.paperTypeId | 试卷分类ID |
+| data.name  | String  | 名称 |
+| data.passScore  | Double| 及格分数 |
+| data.totalScore | Double| 总分数 |
+| data.genType  | Integer| 组件方式 |
+| data.markType  | Integer| 阅卷方式 |
+| data.showType  | Integer| 展示方式 |
+| data.state  | Integer| 状态 |
+| data.paperTypeId  | Integer| 试卷分类ID |
 
 ### 试卷拷贝：paper/copy
 | 请求参数| 类型    | 描述 | 必填 |
@@ -455,7 +469,7 @@ http请求头需添加Authorization字段，
 | --------------- | ------- | ---------- | ---- |
 | id| Integer | 主键 | 是   |
 | questionId| Integer  | 试卷ID       | 是   |
-| socre | Double  | 分数 | 是 |
+| score | Double  | 分数 | 是 |
 | subScores| Double  | 每空分数（试题为智能阅卷，并且是填空或问答时有效） | 是   |
 
 ### 试卷设置分数选项：paper/scoreOptionUpdate
@@ -483,7 +497,6 @@ http请求头需添加Authorization字段，
 | -------- | ----------- | ---------- | ---- |
 | name     | String (16) | 名称       | 否   |
 | paperTypeId| Integer      | 试题分类ID| 否   |
-| state| Integer      | 考试状态| 否   |
 | curPage  | Integer     | 当前第几页 | 否   |
 | pageSize | Integer     | 每页多少条 | 否   |
 
@@ -495,6 +508,13 @@ http请求头需添加Authorization字段，
 | data.list[]      | Object[]   | 分页列表 |
 | data.list[].id   | Integer | 主键     |
 | data.list[].name | String  | 名称     |
+| data.list[].startTime| Date| 开始时间|
+| data.list[].endTime| Date| 结束时间|
+| data.list[].markStartTime| Date| 阅卷开始时间|
+| data.list[].markEndTime| Date| 阅卷结束时间|
+| data.list[].paperTotleScore| Double| 试卷总分    |
+| data.list[].paperPassScore| Double  | 试卷及格分数    |
+| data.list[].updateUserName| String| 更新用户 |
 
 ### 考试添加：exam/add
 | 请求参数| 类型        | 描述                         		| 必填 |

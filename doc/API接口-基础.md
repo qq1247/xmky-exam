@@ -57,9 +57,20 @@ http请求头需添加Authorization字段，
 |data     | Date  | 服务器时间（前端每隔30秒同步一次，保证跟时间相关的业务功能正常） |
 
 ### 商标：login/logo
+| 请求参数     |  类型   |  描述  |  必填 |
+| --------   | -----   | -----  | ---- |
+| ico| Boolean| 转ico | 否 |
+
 | 响应参数  |  类型   |  描述  |
 | --------   | -----   | -----  |
 |     | Binary  | 二进制流 |
+
+### 单位名称：login/orgName
+| 响应参数  |  类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | Integer  | 响应码 |
+|msg     | String  | 响应消息 |
+|data     | String| 单位名称 |
 
 ### 组织机构列表：org/listpage
 | 请求参数     |  类型   |  描述  |  必填 |
@@ -126,6 +137,7 @@ http请求头需添加Authorization字段，
 | --------   | -----   | -----  | ---- |
 | name | String(16) | 名称   |   否     |
 | orgName| String(16) | 组织机构名称   |   否     |
+| type| Integer  | 类型|   否     |
 | curPage | Integer | 当前第几页  |   否     |
 | pageSize | Integer  | 每页多少条   |   否     |
 
@@ -429,22 +441,49 @@ http请求头需添加Authorization字段，
 | --------   | -----   | -----  | ---- |
 |id    | Integer     |   主键   |   是   |
 
-
 ### 系统参数邮件：parm/email
 | 请求参数|  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
 |host| String（64）| 主机   |   是     |
 |userName| String (64)  | 用户名   |   是     |
-|pwd| text  | String（64）   |   密码     |
+|pwd| text  | String（64）   |   是     |
 |protocol| String（16）| 协议  |   是     |
 |encode| String (16)  | 编码   |  是   |
+
+### 系统参数单位名称：parm/logo
+| 请求参数|  类型   |  描述  |  必填 |
+| --------   | -----   | -----  | ---- |
+|orgLogo| Integer| 机构logo ID  |   否     |
+|orgName| String (64)  | 机构名称  |   否     |
 
 ### 系统参数上传附件目录：parm/file
 | 请求参数|  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
-|uploadDir| String（64）| 上传目录   |   是    |
+|uploadDir| String（64）| 上传目录   |   否   |
 
 ### 系统参数数据库备份目录：parm/db
 | 请求参数|  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
-|bakDir| String（64）| 上传目录   |   是    |
+|bakDir| String（64）| 上传目录   |   否    |
+
+### 系统参数密码初始化：parm/pwd
+| 请求参数|  类型   |  描述  |  必填 |
+| --------   | -----   | -----  | ---- |
+|type| Integer| 密码类型（1：随机；2：固定）|   否    |
+|value| String(32)| 密码|   否    |
+
+
+### 系统参数获取：parm/get
+| 请求参数|  类型   |  描述  |
+| --------   | -----   | -----  |
+|emailHost| String（64）| 主机   | 
+|emailUserName| String (64)  | 用户名   | 
+|emailPwd| text  | String（64）   |  
+|emailProtocol| String（16）| 协议  |  
+|emailEncode| String (16)  | 编码   |  
+|orgLogo| Integer| 机构logo ID  |   
+|orgName| String (64)  | 机构名称  |  
+|fileUploadDir| String（64）| 上传目录   |  
+|dbBakDir| String（64）| 上传目录   |   
+|pwdType| Integer| 密码类型   |   
+|pwdValue| String（32）| 密码   |   
