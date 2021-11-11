@@ -155,7 +155,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		question.setUpdateUserId(getCurUser().getId());
 		question.setState(2);// 默认禁用
 		add(question);
-		
 
 		BigDecimal total = new BigDecimal(0.00);
 		//添加试题答案

@@ -41,8 +41,10 @@ http请求头需添加Authorization字段，
 | data.list[]                | Object[]   | 分页列表 |
 | data.list[].id             | Integer | 主键     |
 | data.list[].name           | String  | 名称     |
-| data.list[].readUserNames[]  | String[]| 读权限 |
-| data.list[].writeUserNames[] | String[]| 写权限 |
+| data.list[].createUserId| String  | 创建用户ID   |
+| data.list[].createUserName| String  | 创建用户名称  |
+| data.list[].writeUserIds[] | Integer  | 组用户ID |
+| data.list[].writeUserNames[] | String[] | 组用户 |
 
 ### 试题分类添加：questionType/add
 | 请求参数| 类型        | 描述 | 必填 |
@@ -64,8 +66,7 @@ http请求头需添加Authorization字段，
 | 请求参数 | 类型    | 描述   | 必填 |
 | ------------ | ------- | ------ | ---- |
 | id           | Integer | 主键   | 是   |
-| readUserIds  | String  | 读权限 | 否   |
-| writeUserIds | String  | 写权限 | 否   |
+| writeUserIds | String[]  | 组用户 | 是   |
 
 ### 试题分类合并：questionType/move
 | 请求参数| 类型    | 描述   | 必填 |
@@ -87,11 +88,28 @@ http请求头需添加Authorization字段，
 | data.createUserId   | Integer | 创建人ID   |
 | data.createUserName | String  | 创建人名称 |
 | data.createTime     | Date    | 创建时间   |
-| data.readUserIds[]    | String[] | 读权限  |
-| data.writeUserIds[]   | String[] | 写权限  |
+| data.writeUserIds[]   | String[] | 组用户ID  |
+| data.writeUserNames[]   | String[] | 组用户名称  |
 
 ### 试卷分类列表：paperType/listpage
-#### 参考questionType/listpage
+| 请求参数| 类型        | 描述       | 必填 |
+| -------- | ----------- | ---------- | ---- |
+| name     | String (16) | 名称       | 否   |
+| curPage  | Integer     | 当前第几页 | 否   |
+| pageSize | Integer     | 每页多少条 | 否   |
+
+| 响应参数| 类型    | 描述     |
+| -------------------------- | ------- | -------- |
+| code                       | Integer | 响应码   |
+| msg                        | String  | 响应消息 |
+| data.total                 | Integer | 总行数   |
+| data.list[]                | Object[]   | 分页列表 |
+| data.list[].id             | Integer | 主键     |
+| data.list[].name           | String  | 名称     |
+| data.list[].createUserId| String  | 创建用户ID   |
+| data.list[].createUserName| String  | 创建用户名称  |
+| data.list[].readUserIds[] | Integer  | 组用户ID |
+| data.list[].readUserNames[] | String[] | 组用户 |
 
 ### 试卷分类添加：paperType/add
 #### 参考questionType/add
@@ -103,16 +121,46 @@ http请求头需添加Authorization字段，
 #### 参考questionType/del
 
 ### 试卷分类权限：paperType/auth
-#### 参考questionType/auth
+| 请求参数 | 类型    | 描述   | 必填 |
+| ------------ | ------- | ------ | ---- |
+| id           | Integer | 主键   | 是   |
+| readUserIds | String[]  | 组用户 | 是   |
 
 ### 试卷分类合并：paperType/move
 #### 参考questionType/move
 
 ### 试卷分类详情：paperType/get
-#### 参考questionType/get
+| 请求参数| 类型    | 描述 | 必填 |
+| ---- | ------- | ---- | ---- |
+| id   | Integer | 主键 | 是   |
+
+| 响应参数| 类型    | 描述       |
+| ------------------- | ------- | ---------- |
+| code                | Integer | 响应码     |
+| msg                 | String  | 响应消息   |
+| data.id             | Integer | 分类id     |
+| data.name           | String  | 分类名称   |
+| data.createUserId   | Integer | 创建人ID   |
+| data.createUserName | String  | 创建人名称 |
+| data.createTime     | Date    | 创建时间   |
+| data.readUserIds[]   | String[] | 组用户ID  |
+| data.readUserNames[]   | String[] | 组用户名称  |
 
 ### 考试分类列表：examType/listpage
-#### 参考questionType/listpage
+| 请求参数| 类型        | 描述       | 必填 |
+| -------- | ----------- | ---------- | ---- |
+| name     | String (16) | 名称       | 否   |
+| curPage  | Integer     | 当前第几页 | 否   |
+| pageSize | Integer     | 每页多少条 | 否   |
+
+| 响应参数| 类型    | 描述     |
+| -------------------------- | ------- | -------- |
+| code                       | Integer | 响应码   |
+| msg                        | String  | 响应消息 |
+| data.total                 | Integer | 总行数   |
+| data.list[]                | Object[]   | 分页列表 |
+| data.list[].id             | Integer | 主键     |
+| data.list[].name           | String  | 名称     |
 
 ### 考试分类添加：examType/add
 #### 参考questionType/add
@@ -122,12 +170,6 @@ http请求头需添加Authorization字段，
 
 ### 考试分类删除：examType/del
 #### 参考questionType/del
-
-### 考试分类权限：examType/auth
-#### 参考questionType/auth
-
-### 考试分类合并：examType/move
-#### 参考questionType/move
 
 ### 考试分类详情：examType/get
 #### 参考questionType/get
@@ -178,8 +220,6 @@ http请求头需添加Authorization字段，
 | type           | Integer | 类型         | 否   |
 | difficulty     | Integer | 难度         | 否   |
 | score     | Double  | 分值等于     | 否   |
-| scoreStart     | Double  | 分值大于等于     | 否   |
-| scoreEnd       | Double  | 分值小于等于     | 否   |
 | ai		 | Integer | 智能阅卷（1：是；2：否） | 否   |
 | paperId      | Integer | 试卷ID   | 否   |
 | exPaperId      | Integer | 排除试卷ID（用于组卷时过滤掉已添加过的试题）   | 否   |
@@ -257,9 +297,9 @@ http请求头需添加Authorization字段，
 ### 试卷列表：paper/listpage
 | 请求参数| 类型       | 描述       | 必填 |
 | -------- | ---------- | ---------- | ---- |
+| paperTypeId| Integer     | 试卷分类ID| 否   |
 | name     | String(16) | 试卷名称   | 否   |
 | state| Integer     | 状态| 否   |
-| paperTypeId| Integer     | 试卷分类ID| 否   |
 | curPage  | Integer    | 当前第几页 | 否   |
 | pageSize | Integer    | 每页多少条 | 否   |
 

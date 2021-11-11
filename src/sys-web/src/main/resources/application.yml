@@ -22,8 +22,6 @@ spring:
     url: jdbc:log4jdbc:mysql://127.0.0.1:3306/exam?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
     username: root
     password: root
-  jpa:
-    show-sql: false
     
 file: 
   upload:
