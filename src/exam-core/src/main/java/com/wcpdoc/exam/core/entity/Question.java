@@ -56,12 +56,6 @@ public class Question {
 	private Integer ai;
 	@Column(name = "SCORE_OPTIONS")
 	private String scoreOptions;
-	@Column(name = "VER")
-	private Integer ver;
-	@Column(name = "SRC_ID")
-	private Integer srcId;
-	@Column(name = "NO")
-	private Integer no;
 
 	public Integer getId() {
 		return id;
@@ -137,30 +131,6 @@ public class Question {
 
 	public void setQuestionTypeId(Integer questionTypeId) {
 		this.questionTypeId = questionTypeId;
-	}
-
-	public Integer getVer() {
-		return ver;
-	}
-
-	public void setVer(Integer ver) {
-		this.ver = ver;
-	}
-
-	public Integer getSrcId() {
-		return srcId;
-	}
-
-	public void setSrcId(Integer srcId) {
-		this.srcId = srcId;
-	}
-
-	public Integer getNo() {
-		return no;
-	}
-
-	public void setNo(Integer no) {
-		this.no = no;
 	}
 
 	public BigDecimal getScore() {

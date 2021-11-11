@@ -153,11 +153,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		question.setCreateUserId(getCurUser().getId());
 		question.setUpdateTime(new Date());
 		question.setUpdateUserId(getCurUser().getId());
-		question.setVer(1);// 默认版本为1
 		question.setState(2);// 默认禁用
 		add(question);
 		
-		question.setSrcId(question.getId());
 		update(question);
 
 		BigDecimal total = new BigDecimal(0.00);
@@ -355,7 +353,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		entity.setUpdateUserId(getCurUser().getId());
 		entity.setScore(question.getScore());
 		entity.setScoreOptions(ValidateUtil.isValid(scoreOptions) ? StringUtil.join(scoreOptions) : null);
-		entity.setNo(question.getNo());
 		update(entity);
 
 		//修改试题答案
@@ -542,7 +539,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			question.setCreateUserId(getCurUser().getId());
 			question.setUpdateTime(new Date());
 			question.setUpdateUserId(getCurUser().getId());
-			question.setVer(1);
 			question.setState(2);// 默认禁用
 			question.setQuestionTypeId(questionTypeId);
 			

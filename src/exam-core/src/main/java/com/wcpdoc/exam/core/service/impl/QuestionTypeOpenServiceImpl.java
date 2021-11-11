@@ -140,7 +140,6 @@ public class QuestionTypeOpenServiceImpl extends BaseServiceImp<QuestionTypeOpen
 				.addAttr("questionTypeId", question.getQuestionTypeId())
 				.addAttr("score", question.getScore())
 				.addAttr("scoreOptions", question.getScoreOptions())
-				.addAttr("no", question.getNo())
 				.addAttr("options", optionList.toArray(new String[optionList.size()]))
 				.addAttr("answers", questionAnswerSplitList);
 		return pageResult;
