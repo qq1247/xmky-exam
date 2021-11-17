@@ -92,26 +92,6 @@ http请求头需添加Authorization字段，
 | -------- | ------- | ---------- | ---- |
 | examId | Integer | 考试ID | 是   |
 
-### 公告栏列表：myExam/bulletinListpage
-| 求参数|  类型   |  描述  |  必填 |
-| --------   | -----   | -----  | ---- |
-| showType  | Integer  | 展示类型   |   否     |
-| curPage | Integer | 当前第几页  |   否     |
-| pageSize | Integer  | 每页多少条   |   否     |
-
-| 响应参数|  类型   |  描述  |
-| --------   | -----   | -----  |
-|code     | Integer  | 响应码 |
-|msg     | String  | 响应消息 |
-|data.total     | Integer  | 总行数 |
-|data.list[]      | Object[]  | 分页列表 |
-|data.list[].id   | Integer  | 主键 |
-|data.list[].title | String  | 标题 |
-|data.list[].content | String  | 内容 |
-|data.list[].showType      | Integer  | 展示状态 |
-|data.list[].showTypeName      | String  | 展示状态名称 |
-|data.list[].imgFileId     | String  | 图片附件ID |
-
 ### 我的阅卷考试列表：myMark/examListpage
 | 请求参数| 类型        | 描述       | 必填 |
 | -------- | ----------- | ---------- | ---- |

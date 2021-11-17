@@ -514,7 +514,6 @@ http请求头需添加Authorization字段，
 | data.list[].markEndTime| Date| 阅卷结束时间|
 | data.list[].paperTotleScore| Double| 试卷总分    |
 | data.list[].paperPassScore| Double  | 试卷及格分数    |
-| data.list[].updateUserName| String| 更新用户 |
 
 ### 考试添加：exam/add
 | 请求参数| 类型        | 描述                         		| 必填 |

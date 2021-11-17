@@ -8,13 +8,16 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.base.dao.UserDao;
+import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.base.entity.User;
+import com.wcpdoc.base.service.ParmService;
 import com.wcpdoc.base.service.UserExService;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.EncryptUtil;
+import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 
 /**
@@ -28,7 +31,9 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	private UserDao userDao;
 	@Resource
 	private UserExService userExService;
-
+	@Resource
+	private ParmService parmService;
+	
 	@Override
 	@Resource(name = "userDaoImpl")
 	public void setDao(BaseDao<User> dao) {
@@ -46,10 +51,19 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	}
 
 	@Override
-	public void doPwdUpdate(Integer id, String newPwd) {
+	public String doPwdUpdate(Integer id) {
 		// 校验数据有效性
 		if (id == null) {
 			throw new MyException("参数错误：id");
+		}
+		
+		//获取默认密码类型
+		Parm parm = parmService.get();
+		String newPwd = null;
+		if (parm.getPwdType() == 1) {
+			newPwd = StringUtil.getRandomStr(8);
+		}else {
+			newPwd = parm.getPwdValue();
 		}
 		if (!ValidateUtil.isValid(newPwd)) {
 			throw new MyException("参数错误：newPwd");
@@ -59,6 +73,8 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		User user = getEntity(id);
 		user.setPwd(getEncryptPwd(user.getLoginName(), newPwd));
 		update(user);
+		
+		return newPwd;
 	}
 
 	@Override
@@ -100,7 +116,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	}
 
 	@Override
-	public void roleUpdate(Integer id, String roles) {
+	public void roleUpdate(Integer id, String[] roles) {
 		// 校验数据有效性
 		if (id == null) {
 			throw new MyException("参数错误：id");
@@ -110,12 +126,17 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 			throw new MyException("参数错误：id");
 		}
 		
-		if (!ValidateUtil.isValid(roles)) {
+		if (!ValidateUtil.isValid(roles) && roles.length != 1) {
 			throw new MyException("参数错误：role");
 		}
 		
 		// 更新角色
-		user.setRoles(String.format("user,%s", roles));
+		user.setRoles("user");
+		user.setType(1);
+		if ("subAdmin".equals(roles[0])) {
+			user.setRoles(String.format("subAdmin,%s", user.getRoles()));
+			user.setType(2);
+		}
 		user.setUpdateTime(new Date());
 		user.setUpdateUserId(getCurUser().getId());
 		userDao.update(user);

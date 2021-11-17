@@ -29,9 +29,9 @@ public interface UserService extends BaseService<User> {
 	 * 
 	 * @param id
 	 * @param newPwd
-	 * void
+	 * String
 	 */
-	void doPwdUpdate(Integer id, String newPwd);
+	String doPwdUpdate(Integer id);
 
 	/**
 	 * 完成修改密码
@@ -82,7 +82,7 @@ public interface UserService extends BaseService<User> {
 	 * @param id
 	 * @param roles void
 	 */
-	void roleUpdate(Integer id, String roles);
+	void roleUpdate(Integer id, String[] roles);
 	
 	/**
 	 * 同步用户
