@@ -50,7 +50,7 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 				.addWhere(ValidateUtil.isValid(pageIn.get("difficulty")), "QUESTION.DIFFICULTY = ?", pageIn.get("difficulty"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("score")), "QUESTION.SCORE = ?", pageIn.get("score"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("ai")), "QUESTION.AI = ?", pageIn.get("ai"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("paperId")), "EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.get("paperId"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("paperId", Integer.class)), "EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.get("paperId", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("exPaperId")), "NOT EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.get("exPaperId"))
 				.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "QUESTION.STATE IN (1,2)")// 默认查询发布和草稿状态
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && "0".equals(pageIn.get("state")), "QUESTION.STATE = 0 AND QUESTION.UPDATE_TIME > ?", DateUtil.getNextDay(new Date(), -7))// 查询已删除并且最近7天的试题（回收站使用）
@@ -93,5 +93,11 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 	public void updateQuestionType(Integer sourceId, Integer targetId) {
 		String sql = "UPDATE EXM_QUESTION SET QUESTION_TYPE_ID = ? WHER QUESTION_TYPE_ID = ?";
 		update(sql, new Object[]{targetId, sourceId});
+	}
+
+	@Override
+	public void updateState(Integer questionTypeId, Integer userId) {
+		String sql = "UPDATE EXM_QUESTION SET STATE = 1 WHERE STATE = 2 AND QUESTION_TYPE_ID = (SELECT ID FROM EXM_QUESTION_TYPE WHERE ID = ? AND WRITE_USER_IDS LIKE CONCAT('%,', ? ,',%') )";
+		update(sql, new Object[]{questionTypeId, userId });
 	}
 }
