@@ -27,7 +27,7 @@ public class UserDaoImpl extends RBaseDaoImpl<User> implements UserDao {
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT USER.ID, USER.NAME, USER.LOGIN_NAME, USER.ORG_ID, ORG.NAME AS ORG_NAME, "
+		String sql = "SELECT USER.ID, USER.NAME, USER.TYPE, USER.LOGIN_NAME, USER.ORG_ID, ORG.NAME AS ORG_NAME, "
 				+ "USER.REGIST_TIME, USER.LAST_LOGIN_TIME, USER.ROLES "
 				+ "FROM SYS_USER USER " 
 				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID ";
@@ -35,6 +35,7 @@ public class UserDaoImpl extends RBaseDaoImpl<User> implements UserDao {
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "USER.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
 				.addWhere(ValidateUtil.isValid(pageIn.get("orgName")), "ORG.NAME LIKE ?", String.format("%%%s%%", pageIn.get("orgName")))
+				.addWhere(ValidateUtil.isValid(pageIn.get("type")), "USER.TYPE = ?", pageIn.get("type", Integer.class))
 				.addWhere("USER.STATE != ?", 0)
 				.addOrder("USER.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);

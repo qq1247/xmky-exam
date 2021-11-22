@@ -23,6 +23,7 @@ import com.wcpdoc.auth.entity.JWTToken;
 import com.wcpdoc.auth.entity.JwtResult;
 import com.wcpdoc.auth.service.ShiroService;
 import com.wcpdoc.auth.util.JwtUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 
 /**
  * jwt授权认证
@@ -83,8 +84,8 @@ public class JWTRealm extends AuthorizingRealm {
 	 */
 	@Override
 	public boolean hasRole(PrincipalCollection principal, String roleIdentifier) {
-		AuthorizationInfo info = this.getAuthorizationInfo(principal);
-        return (info.getRoles() != null && info.getRoles().contains("admin")) || super.hasRole(principal, roleIdentifier);
+		//AuthorizationInfo info = this.getAuthorizationInfo(principal);
+        return super.hasRole(principal, roleIdentifier);
 	}
 	
 	/**
@@ -92,8 +93,8 @@ public class JWTRealm extends AuthorizingRealm {
 	 */
 	@Override
     public  boolean isPermitted(PrincipalCollection principal, String permission) {
-        AuthorizationInfo info = this.getAuthorizationInfo(principal);
-        return info.getRoles().contains("admin") || super.isPermitted(principal, permission);
+        //AuthorizationInfo info = this.getAuthorizationInfo(principal);
+        return super.isPermitted(principal, permission);
     }
 	
 	/**
@@ -104,6 +105,9 @@ public class JWTRealm extends AuthorizingRealm {
 	 */
 	public void clearAuth(Integer userId) {
 		String principal = TokenCache.get(userId);
+		if (!ValidateUtil.isValid(principal)) {
+			return;
+		}
 		Subject subject = SecurityUtils.getSubject();
 		SimplePrincipalCollection principals = new SimplePrincipalCollection(principal, getName());
 		subject.runAs(principals);

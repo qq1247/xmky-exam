@@ -18,6 +18,7 @@ import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.exam.core.entity.Bulletin;
 import com.wcpdoc.exam.core.service.BulletinService;
+
 /**
  * 公告控制层
  * 
@@ -42,11 +43,7 @@ public class ApiBulletinController extends BaseController {
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
-			if(pageIn.get("site", Integer.class) == null){
-				pageIn.addAttr("readUserIds", getCurUser().getId());
-			}else{
-				pageIn.addAttr("curUserId", getCurUser().getId());
-			}
+			pageIn.addAttr("curUserId", getCurUser().getId());
 			return PageResultEx.ok().data(bulletinService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("公告列表错误：", e);
@@ -129,6 +126,8 @@ public class ApiBulletinController extends BaseController {
 		try {
 			Map<String, Object> map = bulletinService.get(id);
 			map.put("updateTime", DateUtil.formatDateTime(DateUtil.getDate(map.get("updateTime").toString())));
+			map.put("startTime", DateUtil.formatDateTime(DateUtil.getDate(map.get("startTime").toString())));
+			map.put("endTime", DateUtil.formatDateTime(DateUtil.getDate(map.get("endTime").toString())));
 			return PageResultEx.ok().data(map);
 		} catch (MyException e) {
 			log.error("获取参数错误：{}", e.getMessage());
@@ -149,7 +148,7 @@ public class ApiBulletinController extends BaseController {
 	 * @param rwState
 	 * @return PageResult
 	 */
-	@RequestMapping("/auth")
+	/*@RequestMapping("/auth")
 	@ResponseBody
 	public PageResult auth(Integer id, String readUserIds, String readOrgIds) {
 		try {
@@ -162,7 +161,7 @@ public class ApiBulletinController extends BaseController {
 			log.error("添加权限用户错误：", e);
 			return PageResult.err();
 		}
-	}
+	}*/
 	
 	/**
 	 * 获取人员列表 
@@ -171,7 +170,7 @@ public class ApiBulletinController extends BaseController {
 	 * @param pageIn
 	 * @return PageOut
 	 */
-	@RequestMapping("/authUserList")
+	/*@RequestMapping("/authUserList")
 	@ResponseBody
 	public PageResult userList() {
 		try {
@@ -180,7 +179,7 @@ public class ApiBulletinController extends BaseController {
 			log.error("权限用户列表错误：", e);
 			return PageResult.err();
 		}
-	}
+	}*/
 	
 	/**
 	 * 获取组织机构列表 
@@ -189,7 +188,7 @@ public class ApiBulletinController extends BaseController {
 	 * @param pageIn
 	 * @return PageOut
 	 */
-	@RequestMapping("/authOrgList")
+	/*@RequestMapping("/authOrgList")
 	@ResponseBody
 	public PageResult authOrgList(PageIn pageIn, String name, Integer id) {
 		try {
@@ -198,5 +197,5 @@ public class ApiBulletinController extends BaseController {
 			log.error("权限用户列表错误：", e);
 			return PageResult.err();
 		}
-	}
+	}*/
 }

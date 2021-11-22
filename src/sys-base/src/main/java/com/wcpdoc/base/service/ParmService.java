@@ -41,4 +41,29 @@ public interface ParmService extends BaseService<Parm> {
 	 * @param parm void
 	 */
 	void editLogo(Parm parm) throws Exception;
+	
+	/**
+	 * 系统参数密码初始化
+	 * 
+	 * v1.0 chenyun 2021年11月12日上午10:09:26
+	 * @param type
+	 * @param value void
+	 */
+	void pwd(Integer type, String value);
+	
+	/**
+	 * 系统参数上传附件目录
+	 * 
+	 * v1.0 chenyun 2021年11月12日上午11:15:48
+	 * @param uploadDir void
+	 */
+	void file(String uploadDir);
+	
+	/**
+	 * 系统参数数据库备份目录
+	 * 
+	 * v1.0 chenyun 2021年11月12日上午10:34:57
+	 * @param bakDir void
+	 */
+	void db(String bakDir);
 }

@@ -56,6 +56,8 @@ public class User implements LoginUser {
 	private String roles;
 	@Column(name = "STATE")
 	private Integer state;
+	@Column(name = "TYPE")
+	private Integer type;
 
 	public Integer getId() {
 		return id;
@@ -159,5 +161,13 @@ public class User implements LoginUser {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
 	}
 }

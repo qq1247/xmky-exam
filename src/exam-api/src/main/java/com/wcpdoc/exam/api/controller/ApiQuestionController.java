@@ -312,14 +312,15 @@ public class ApiQuestionController extends BaseController {
 	 * 发布
 	 * 
 	 * v1.0 zhanghc 2018年11月24日上午9:13:22
-	 * @param id
+	 * @param questionTypeId
+	 * @param ids
 	 * @return PageResult
 	 */
 	@RequestMapping("/publish")
 	@ResponseBody
-	public PageResult publish(Integer id) {
+	public PageResult publish(Integer questionTypeId, Integer[] ids) {
 		try {
-			questionService.publish(id);
+			questionService.publish(questionTypeId, ids);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("发布错误：{}", e.getMessage());

@@ -43,6 +43,7 @@ public class BulletinServiceImpl extends BaseServiceImp<Bulletin> implements Bul
 		if (ValidateUtil.isValid(bulletin.getReadUserIds())) {
 			bulletin.setReadUserIds(","+bulletin.getReadUserIds()+",");
 		}
+		bulletin.setState(1);
 		bulletin.setUpdateTime(new Date());
 		bulletin.setUpdateUserId(getCurUser().getId());
 		bulletinDao.add(bulletin);
@@ -54,6 +55,7 @@ public class BulletinServiceImpl extends BaseServiceImp<Bulletin> implements Bul
 	@Override
 	public void updateAndUpdate(Bulletin bulletin) {
 		Bulletin entity = bulletinDao.getEntity(bulletin.getId());
+		String oldImgFileId = entity.getImgFileId();
 		entity.setTitle(bulletin.getTitle());
 		entity.setImgFileId(bulletin.getImgFileId());
 		entity.setContent(bulletin.getContent());
@@ -63,11 +65,12 @@ public class BulletinServiceImpl extends BaseServiceImp<Bulletin> implements Bul
 			entity.setReadUserIds(null);
 		}
 		entity.setShowType(bulletin.getShowType());
-		entity.setState(bulletin.getState());
+		entity.setStartTime(bulletin.getStartTime());
+		entity.setEndTime(bulletin.getEndTime());
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
 		bulletinDao.update(entity);
-		if (ValidateUtil.isValid(bulletin.getImgFileId()) && ValidateUtil.isValid(entity.getImgFileId()) && !bulletin.getImgFileId().equals(entity.getImgFileId()) ) {
+		if (ValidateUtil.isValid(bulletin.getImgFileId()) && !bulletin.getImgFileId().equals(oldImgFileId) ) {
 			fileService.doUpload(Integer.parseInt(bulletin.getImgFileId()));
 		}
 	}

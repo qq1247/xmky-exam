@@ -20,7 +20,7 @@ public interface QuestionCommentService extends BaseService<QuestionComment> {
 	 * @param questionComment
 	 * @param anonymity void
 	 */
-	void addAndUpdate(QuestionComment questionComment, int anonymity);
+	void addAndUpdate(QuestionComment questionComment, Integer anonymity);
 
 	/**
 	 * 删除试题评论 

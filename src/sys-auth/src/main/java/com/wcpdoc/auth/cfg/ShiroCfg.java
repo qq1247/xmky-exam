@@ -51,64 +51,28 @@ public class ShiroCfg {
 
 		Map<String, String> filterChainMap = new LinkedHashMap<>();
 		filterChainMap.put("/api/file/download", "anon");
+		filterChainMap.put("/api/file/getId", "anon");
 		filterChainMap.put("/api/login/**", "anon");// /api/login开头的可以匿名访问
-		
+		filterChainMap.put("/api/dict/listpage", "jwt,anyRolesEx[admin,subAdmin,user]");
+		filterChainMap.put("/api/user/listpage", "jwt,anyRolesEx[admin,subAdmin]");
+		filterChainMap.put("/api/org/listpage", "jwt,anyRolesEx[admin,subAdmin]");
+		filterChainMap.put("/api/bulletin/listpage", "jwt,anyRolesEx[admin,subAdmin,user]");
+		filterChainMap.put("/api/paper/get", "jwt,anyRolesEx[subAdmin,user]");
+
 		//管理员请求
-		filterChainMap.put("/api/dict/add", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/dict/edit", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/dict/del", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/dict/get", "jwt,anyRolesEx[admin]");
+		filterChainMap.put("/api/dict/**", "jwt,anyRolesEx[admin]");
 		filterChainMap.put("/api/cron/**", "jwt,anyRolesEx[admin]");
 		filterChainMap.put("/api/parm/**", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/parm/**", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/org/add", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/org/edit", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/org/del", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/org/move", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/org/input", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/org/export", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/org/template", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/org/get", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/user/add", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/user/edit", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/user/del", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/user/roleUpdate", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/user/initPwd", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/user/input", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/user/export", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/user/template", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/user/get", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/user/onList", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/user/exit", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/user/syncUser", "jwt,anyRolesEx[admin]");
+		filterChainMap.put("/api/org/**", "jwt,anyRolesEx[admin]");
+		filterChainMap.put("/api/user/**", "jwt,anyRolesEx[admin]");
 		filterChainMap.put("/api/sensitive/**", "jwt,anyRolesEx[admin]");
+		filterChainMap.put("/api/bulletin/**", "jwt,anyRolesEx[admin]");
 		
 		//子管理请求
-		filterChainMap.put("/api/bulletin/add", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/bulletin/edit", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/bulletin/del", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/bulletin/auth", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/bulletin/authUserList", "jwt,anyRolesEx[subAdmin]");
 		filterChainMap.put("/api/exam/**", "jwt,anyRolesEx[subAdmin]");
 		filterChainMap.put("/api/examType/**", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/paper/listpage", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/paper/add", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/paper/edit", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/paper/del", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/paper/copy", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/paper/archive", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/paper/chapterAdd", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/paper/chapterEdit", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/paper/chapterDel", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/paper/movePosition", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/paper/questionAdd", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/paper/updateScore", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/paper/updateScoreOptions", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/paper/updateBatchScore", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/paper/questionDel", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/paper/questionClear", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/paper/publish", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/paper/updateTotalScore", "jwt,anyRolesEx[subAdmin]");
+		filterChainMap.put("/api/paper/**", "jwt,anyRolesEx[subAdmin]");
+		filterChainMap.put("/api/myMark/**", "jwt,anyRolesEx[subAdmin]");
 		filterChainMap.put("/api/paperRemark/**", "jwt,anyRolesEx[subAdmin]");
 		filterChainMap.put("/api/paperType/**", "jwt,anyRolesEx[subAdmin]");
 		filterChainMap.put("/api/question/**", "jwt,anyRolesEx[subAdmin]");

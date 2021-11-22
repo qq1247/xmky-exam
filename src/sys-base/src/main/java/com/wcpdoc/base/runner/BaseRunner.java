@@ -5,6 +5,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import com.wcpdoc.base.cache.DictCache;
+import com.wcpdoc.base.cache.ParmCache;
 
 /**
  * 基础服务启动
@@ -17,5 +18,6 @@ public class BaseRunner implements ApplicationRunner {
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		DictCache.flushCache();
+		ParmCache.flushCache();
 	}
 }

@@ -49,7 +49,11 @@ public class Parm {
 	private String fileUploadDir;
 	@Column(name = "DB_BAK_DIR")
 	private String dbBakDir;
-
+	@Column(name = "PWD_TYPE")
+	private Integer pwdType;
+	@Column(name = "PWD_VALUE")
+	private String pwdValue;
+	
 	public Integer getId() {
 		return id;
 	}
@@ -130,31 +134,35 @@ public class Parm {
 		this.orgName = orgName;
 	}
 
-	/**
-	 * @return the fileUploadDir
-	 */
 	public String getFileUploadDir() {
 		return fileUploadDir;
 	}
-
-	/**
-	 * @param fileUploadDir the fileUploadDir to set
-	 */
+	
 	public void setFileUploadDir(String fileUploadDir) {
 		this.fileUploadDir = fileUploadDir;
 	}
 
-	/**
-	 * @return the dbBakDir
-	 */
 	public String getDbBakDir() {
 		return dbBakDir;
 	}
 
-	/**
-	 * @param dbBakDir the dbBakDir to set
-	 */
 	public void setDbBakDir(String dbBakDir) {
 		this.dbBakDir = dbBakDir;
+	}
+
+	public Integer getPwdType() {
+		return pwdType;
+	}
+
+	public void setPwdType(Integer pwdType) {
+		this.pwdType = pwdType;
+	}
+
+	public String getPwdValue() {
+		return pwdValue;
+	}
+
+	public void setPwdValue(String pwdValue) {
+		this.pwdValue = pwdValue;
 	}
 }

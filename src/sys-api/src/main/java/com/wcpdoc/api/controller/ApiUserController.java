@@ -136,6 +136,7 @@ public class ApiUserController extends BaseController {
 			// 添加用户
 			Date curTime = new Date();
 			user.setRoles("user");
+			user.setType(1);
 			user.setRegistTime(curTime);
 			user.setUpdateTime(curTime);
 			user.setUpdateUserId(getCurUser().getId());
@@ -143,8 +144,7 @@ public class ApiUserController extends BaseController {
 			userService.add(user);
 
 			// 设置密码
-			String initPwd = "111111";// StringUtil.getRandomStr(8);
-			userService.doPwdUpdate(user.getId(), initPwd);
+			String initPwd = userService.doPwdUpdate(user.getId());
 			Map<String, Object> data = new HashMap<String, Object>();
 			data.put("initPwd", initPwd);
 			return PageResultEx.ok().data(data);
@@ -193,11 +193,9 @@ public class ApiUserController extends BaseController {
 			userService.update(entity);
 
 			// 更新密码
-			String initPwd = null;
 			Map<String, Object> data = new HashMap<String, Object>();
 			if (changeLoginName) {
-				initPwd = "111111";// StringUtil.getRandomStr(8);
-				userService.doPwdUpdate(user.getId(), initPwd);
+				String initPwd = userService.doPwdUpdate(user.getId());
 				data.put("initPwd", initPwd);
 			}
 
@@ -296,8 +294,7 @@ public class ApiUserController extends BaseController {
 	@ResponseBody
 	public PageResult pwdInit(Integer id) {
 		try {
-			String pwdInit = "111111";// StringUtil.getRandomStr(8);
-			userService.doPwdUpdate(id, pwdInit);
+			String pwdInit = userService.doPwdUpdate(id);
 			Map<String, Object> data = new HashMap<String, Object>();
 			data.put("initPwd", pwdInit);
 			return PageResultEx.ok().data(data);
@@ -321,7 +318,7 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/role")
 	@ResponseBody
-	public PageResult role(Integer id, String roles) {
+	public PageResult role(Integer id, String[] roles) {
 		try {
 			userService.roleUpdate(id, roles);
 			return PageResult.ok();

@@ -19,10 +19,10 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.base.cache.ParmCache;
 import com.wcpdoc.base.cache.ProgressBarCache;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.dao.BaseDao;
@@ -64,8 +64,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	private QuestionOptionService questionOptionService;
 	@Resource
 	private QuestionAnswerService questionAnswerService;
-	@Value("${file.upload.dir}")
-	private String fileUploadDir;
 
 	@Override
 	@Resource(name = "questionDaoImpl")
@@ -522,7 +520,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		WordServer wordServer = new WordServerImpl();
 		List<QuestionEx> questionExList = null;
 		try (InputStream inputStream = new FileInputStream(fileEx.getFile())) {
-			questionExList = wordServer.handle(inputStream, fileUploadDir);
+			questionExList = wordServer.handle(inputStream, ParmCache.get().getFileUploadDir());  //questionExList = wordServer.handle(inputStream, fileUploadDir);
 		} catch (IOException e) {
 			throw new MyException("读取word时异常！");
 		} catch (Exception e) {
@@ -677,25 +675,35 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	
 
 	@Override
-	public void publish(Integer id) throws Exception {
-		Question question = questionDao.getEntity(id);
-		if (question.getState() == 0) {
-			throw new MyException("试题已删除！");
+	public void publish(Integer questionTypeId, Integer[] ids) throws Exception {
+		if (questionTypeId == null && ids == null ) {
+			throw new MyException("questionType或者ids参数错误！");
 		}
-		if (question.getState() == 1) {
-			throw new MyException("试题已发布！");
+		
+		if (questionTypeId != null) {
+			questionDao.updateState(questionTypeId, getCurUser().getId());
+			return;
 		}
-		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-		if(questionTypeService.hasWriteAuth(questionType, question.getId())) {
-			throw new MyException("无操作权限");
-		}
-		if (question.getState() == 2) {
-			question.setState(1);
-		}
+		
+		for (Integer id : ids) {
+			Question question = questionDao.getEntity(id);
+			if (question.getState() == 0) {
+				throw new MyException("试题已删除！");
+			}
+			if (question.getState() == 1) {
+				throw new MyException("试题已发布！");
+			}
+			QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
+			if(questionTypeService.hasWriteAuth(questionType, question.getId())) {
+				throw new MyException("无操作权限");
+			}
+			if (question.getState() == 2) {
+				question.setState(1);
+			}
 
-		question.setUpdateTime(new Date());
-		question.setUpdateUserId(getCurUser().getId());
-		questionDao.update(question);
+			question.setUpdateTime(new Date());
+			question.setUpdateUserId(getCurUser().getId());
+			questionDao.update(question);
+		}
 	}
-	
 }

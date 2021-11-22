@@ -84,4 +84,9 @@ public class ParmExServiceImpl extends BaseServiceImp<Parm> implements ParmExSer
 	      ex.printStackTrace();
 	    }
 	}
+	
+	@Override
+	public void doUpload(Parm parm) {
+		fileService.doUpload(parm.getOrgLogo());
+	}
 }

@@ -397,7 +397,7 @@ http请求头需添加Authorization字段，
 ### 公告栏列表：bulletin/listpage
 | 求参数|  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
-| name  | String  | 名称   |   是     |
+| showType  | Integer  | 展示类型   |   否     |
 | curPage | Integer | 当前第几页  |   否     |
 | pageSize | Integer  | 每页多少条   |   否     |
 

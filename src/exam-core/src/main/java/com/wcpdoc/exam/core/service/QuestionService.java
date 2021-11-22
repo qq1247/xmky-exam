@@ -98,7 +98,9 @@ public interface QuestionService extends BaseService<Question>{
 	 * 发布
 	 * 
 	 * v1.0 chenyun 2021年8月19日下午2:32:57
+	 * @param questionType
+	 * @param ids
 	 * @param id void
 	 */
-	void publish(Integer id) throws Exception;
+	void publish(Integer questionType, Integer[] ids) throws Exception;
 }

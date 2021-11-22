@@ -39,4 +39,13 @@ public interface QuestionDao extends BaseDao<Question>{
 	 * @param targetId void
 	 */
 	void updateQuestionType(Integer sourceId, Integer targetId);
+	
+	/**
+	 * 修改试题状态
+	 * 
+	 * v1.0 chenyun 2021年11月11日下午4:30:42
+	 * @param questionTypeId
+	 * @param userId void
+	 */
+	void updateState(Integer questionTypeId, Integer userId);
 }
