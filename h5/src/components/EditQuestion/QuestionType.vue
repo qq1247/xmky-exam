@@ -1,11 +1,11 @@
 <!--
  * @Description: 添加试题
  * @Version: 1.0
- * @Company: 
+ * @Company:
  * @Author: Che
  * @Date: 2021-10-19 14:22:34
  * @LastEditors: Che
- * @LastEditTime: 2021-10-27 16:16:53
+ * @LastEditTime: 2021-11-11 18:06:49
 -->
 <template>
   <div>
@@ -13,41 +13,39 @@
       <div class="left-top">添加题型</div>
       <div
         :class="[
-          'left-center',
-          questionType === btn.type
-            ? 'left-center left-center-active'
-            : 'left-center',
+          'type-btn',
+          questionType === btn.type ? 'type-btn type-btn-active' : 'type-btn',
         ]"
         :key="btn.type"
         @click="updateType(btn.type)"
-        v-for="btn in typeButtonGroup"
+        v-for="btn in typeButtons"
       >
-        <img :src="btn.img" />
+        <i :class="btn.icon"></i>
         {{ btn.name }}
-        <img src="../../assets/img/icon/active-icon.png" />
+        <i class="common common-subscript sub-script"></i>
       </div>
     </div>
     <div class="splitLine"></div>
-    <div id="question_driver_template">
-      <div class="left-bottom" @click="questionTemplate">
-        <img src="../../assets/img/icon/template-icon.png" />
-        试题模板
-      </div>
-      <div class="left-bottom" @click="fileForm.show = true">
-        <img src="../../assets/img/icon/import-icon.png" />
-        试题导入
-      </div>
+    <div
+      id="question_driver_template"
+      class="handler-btn"
+      :key="handler.type"
+      @click="otherHandler(handler.type)"
+      v-for="handler in handlerButtons"
+    >
+      <i :class="handler.icon"></i>
+      {{ handler.name }}
     </div>
     <!-- 上传试题模板 -->
     <el-dialog
-      :visible.sync="fileForm.show"
+      :visible.sync="handlerForm.fileShow"
       :show-close="false"
       width="40%"
       title="上传并解析试题"
       :close-on-click-modal="false"
       @close="templateClear('templateUpload')"
     >
-      <el-form :model="fileForm" ref="fileForm">
+      <el-form :model="handlerForm" ref="handlerForm">
         <Upload
           type="word"
           ref="templateUpload"
@@ -58,19 +56,19 @@
       <div class="dialog-footer" slot="footer">
         <el-button
           @click="questionImport"
-          :loading="fileForm.isAnalysis"
+          :loading="handlerForm.isAnalysis"
           type="primary"
           >{{ percentage ? `解析中 ${percentage}%` : '解析试题' }}</el-button
         >
-        <el-button @click="fileForm.show = false">取消</el-button>
+        <el-button @click="handlerForm.fileShow = false">取消</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { questionTemplate, questionImport } from 'api/question'
-import { myExamAiProgress } from 'api/my'
+import { questionTemplate, questionImport, questionPublish } from 'api/question'
+import { progressBarGet } from 'api/common'
 import Upload from 'components/Upload'
 export default {
   components: { Upload },
@@ -83,55 +81,58 @@ export default {
   data() {
     return {
       percentage: 0,
-      typeButtonGroup: [
+      typeButtons: [
         // 左侧按钮组1
         {
           type: 1,
           name: '单选题',
-          img: require('assets/img/icon/radio-icon.png'),
+          icon: 'common common-radio',
         },
         {
           type: 2,
           name: '多选题',
-          img: require('assets/img/icon/checkbox-icon.png'),
+          icon: 'common common-checkbox',
         },
         {
           type: 3,
           name: '填空题',
-          img: require('assets/img/icon/blanks-icon.png'),
+          icon: 'common common-cloze',
         },
         {
           type: 4,
           name: '判断题',
-          img: require('assets/img/icon/judge-icon.png'),
+          icon: 'common common-judge',
         },
         {
           type: 5,
           name: '问答题',
-          img: require('assets/img/icon/ask-icon.png'),
+          icon: 'common common-ask',
         },
       ],
-      handlerButtonGroup: [
+      handlerButtons: [
         // 左侧按钮组2
         {
+          type: 1,
           name: '试题模板',
-          img: require('assets/img/icon/template-icon.png'),
+          icon: 'common common-template-down',
         },
         {
+          type: 2,
           name: '试题导入',
-          img: require('assets/img/icon/import-icon.png'),
+          icon: 'common common-template-up',
+        },
+        {
+          type: 3,
+          name: '一键发布',
+          icon: 'common common-publish',
         },
         /* {
-          name: "试题导出",
-          img: require("assets/img/icon/export-icon.png")
-        },
-        {
           name: "清空试题",
           img: require("assets/img/icon/clear-icon.png")
         } */
       ],
-      fileForm: {
-        show: false,
+      handlerForm: {
+        fileShow: false,
         questionDocIds: [],
         isAnalysis: false,
       },
@@ -156,31 +157,31 @@ export default {
     },
     // 解析试题
     async questionImport() {
-      if (this.fileForm.questionDocIds.length === 0) {
+      if (this.handlerForm.questionDocIds.length === 0) {
         this.$message.warning('请选择需解析的文件')
         return
       }
-      this.fileForm.isAnalysis = true
+      this.handlerForm.isAnalysis = true
       const res = await questionImport({
-        fileId: this.fileForm.questionDocIds[0].response.data.fileIds,
+        fileId: this.handlerForm.questionDocIds[0].response.data.fileIds,
         questionTypeId: this.$parent.$parent.queryForm.questionTypeId,
       }).catch(() => {
-        this.fileForm.isAnalysis = false
+        this.handlerForm.isAnalysis = false
       })
       if (res?.code == 200) {
         this.percentage = 1
         await this.getProgress(res.data)
         if (this.percentage === 100) {
           this.$message.success('解析成功！')
-          this.fileForm.isAnalysis = false
-          this.fileForm.show = false
+          this.handlerForm.isAnalysis = false
+          this.handlerForm.fileShow = false
           this.templateClear('templateUpload')
           this.$parent.$parent.query()
           this.$tools.delay().then(() => {
             this.percentage = 0
           })
         } else {
-          this.fileForm.isAnalysis = false
+          this.handlerForm.isAnalysis = false
         }
       } else {
         this.$message.error(res.msg)
@@ -191,16 +192,13 @@ export default {
       const percentage = await this.$tools
         .delay()
         .then(() => {
-          return myExamAiProgress({
+          return progressBarGet({
             id,
           })
         })
         .catch((err) => {
           return err.data
         })
-
-      console.log(percentage)
-
       if (percentage.code !== 200 || !percentage?.data?.percent) {
         this.percentage = 0
         return false
@@ -216,16 +214,59 @@ export default {
     },
     // 上传试题模板成功
     templateSucess(res, file, fileList) {
-      this.fileForm.questionDocIds = fileList
+      this.handlerForm.questionDocIds = fileList
     },
     // 上传试题模板失败
     templateClear(ref) {
-      this.fileForm.questionDocIds = []
+      this.handlerForm.questionDocIds = []
       this.$refs[ref].clear()
     },
     // 删除试题模板
     templateRemove(file, fileList) {
-      this.fileForm.questionDocIds = []
+      this.handlerForm.questionDocIds = []
+    },
+    otherHandler(type) {
+      switch (type) {
+        case 1:
+          this.questionTemplate()
+          break
+        case 2:
+          this.handlerForm.fileShow = true
+          break
+        case 3:
+          const parentData = this.$parent.$parent.$data
+          if (!['', '2'].includes(parentData.queryForm.state)) {
+            this.$message.warning('请选择草稿状态再发布！')
+            return
+          }
+          this.$confirm('请选择发布方式？', '发布方式', {
+            distinguishCancelAndClose: true,
+            confirmButtonText: '全部发布',
+            cancelButtonText: '单页发布',
+          })
+            .then(async () => {
+              await questionPublish({
+                questionTypeId: parentData.queryForm.questionTypeId,
+              })
+              this.$parent.$parent.search()
+            })
+            .catch(async (action) => {
+              if (action === 'cancel') {
+                const ids = parentData.list.questionList.reduce((acc, cur) => {
+                  cur.state === 2 && acc.push(cur.id)
+                  return acc
+                }, [])
+                if (!ids.length) return false
+                await questionPublish({
+                  ids,
+                })
+                this.$parent.$parent.search()
+              }
+            })
+          break
+        default:
+          break
+      }
     },
   },
 }
@@ -246,10 +287,9 @@ export default {
   left: 0;
   z-index: 100;
 }
-.left-center {
+.type-btn {
   width: 110px;
   height: 40px;
-  border: 1px solid #eeeeff;
   margin: 7px auto;
   line-height: 40px;
   position: relative;
@@ -257,34 +297,40 @@ export default {
   display: flex;
   align-items: center;
   font-size: 14px;
+  user-select: none;
+  border-radius: 3px;
+  border: 1px solid #eeeeff;
   &:nth-of-type(2) {
     margin-top: 50px;
   }
   &:hover {
     border: 1px solid #0095e5;
-    img:last-child {
-      display: block;
-    }
   }
-  img {
+  i {
+    font-size: 16px;
     &:first-child {
+      display: block;
       width: 22px;
       height: 22px;
+      line-height: 22px;
+      text-align: center;
       margin: 0 10px;
+      color: #0095e5;
     }
     &:last-child {
-      width: 28px;
-      height: 22px;
+      font-size: 22px;
       position: absolute;
-      bottom: -1px;
-      right: 0px;
+      bottom: -11px;
+      right: -1px;
+      color: #0095e5;
       display: none;
     }
   }
 }
-.left-center-active {
+.type-btn-active {
   border: 1px solid #0095e5;
-  img:last-child {
+  color: #0095e5;
+  i:last-child {
     display: block;
   }
 }
@@ -294,7 +340,7 @@ export default {
   height: 1px;
   margin: 16px auto;
 }
-.left-bottom {
+.handler-btn {
   width: 110px;
   height: 40px;
   background: #eee;
@@ -306,13 +352,19 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  user-select: none;
+  border-radius: 3px;
   &:hover {
-    border: 1px solid #0095e5;
-    color: #0095e5;
+    background: #0095e5;
+    color: #ffff;
   }
-  img {
+  i {
     width: 16px;
     height: 16px;
+    line-height: 16px;
+    text-align: center;
+    font-size: 16px;
+    display: block;
     margin-right: 10px;
   }
 }

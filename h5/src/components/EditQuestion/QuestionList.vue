@@ -1,11 +1,11 @@
 <!--
  * @Description: 试题列表
  * @Version: 1.0
- * @Company: 
+ * @Company:
  * @Author: Che
  * @Date: 2021-10-19 14:23:55
  * @LastEditors: Che
- * @LastEditTime: 2021-10-21 13:19:11
+ * @LastEditTime: 2021-11-12 09:16:07
 -->
 <template>
   <div>
@@ -44,47 +44,49 @@
           </div>
           <div class="card-bottom-right">
             <el-button
-              v-if="question.state == 2"
-              @click.stop="questionEdit(question.id)"
-              class="btn"
-              icon="el-icon-document"
               plain
               round
+              class="btn"
               size="mini"
               type="primary"
-              >编辑</el-button
-            >
-            <el-button
-              @click.stop="copy(question.id)"
-              class="btn"
               icon="el-icon-document-copy"
-              plain
-              round
-              size="mini"
-              type="primary"
+              @click.stop="copy(question.id)"
               >复制</el-button
             >
-            <el-button
-              @click.stop="del(question.id)"
-              class="btn"
-              icon="el-icon-delete"
-              plain
-              round
-              size="mini"
-              type="primary"
-              >删除</el-button
-            >
-            <el-button
-              v-if="question.state == 2"
-              @click.stop="publish(question.id, question.state)"
-              class="btn"
-              icon="el-icon-share"
-              plain
-              round
-              size="mini"
-              type="primary"
-              >发布</el-button
-            >
+            <template v-if="question.state !== 0">
+              <el-button
+                plain
+                round
+                class="btn"
+                size="mini"
+                type="primary"
+                icon="el-icon-delete"
+                @click.stop="del(question.id)"
+                >删除</el-button
+              >
+            </template>
+            <template v-if="question.state === 2">
+              <el-button
+                plain
+                round
+                class="btn"
+                size="mini"
+                type="primary"
+                icon="el-icon-document"
+                @click.stop="questionEdit(question.id)"
+                >编辑</el-button
+              >
+              <el-button
+                plain
+                round
+                class="btn"
+                size="mini"
+                type="primary"
+                icon="el-icon-share"
+                @click.stop="publish(question.id, question.state)"
+                >发布</el-button
+              >
+            </template>
           </div>
         </div>
       </el-card>
@@ -155,7 +157,6 @@ export default {
   flex-direction: column;
   &:hover {
     border: 1px solid #0095e5;
-    box-shadow: 0 0 7px 2px rgba(0, 149, 229, 0.15);
     .card-bottom-right {
       display: block;
     }
@@ -163,7 +164,6 @@ export default {
 }
 .center-card-active {
   border: 1px solid #0095e5;
-  box-shadow: 0 0 7px 2px rgba(0, 149, 229, 0.15);
 }
 .center-card-top {
   font-size: 14px;
@@ -179,7 +179,8 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 10px 0 5px;
+  height: 30px;
+  margin: 10px 0 -5px;
   .el-tag {
     margin-right: 8px;
   }
