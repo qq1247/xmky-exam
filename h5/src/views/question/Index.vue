@@ -93,25 +93,6 @@
       @close="resetData('roleForm')"
     >
       <el-form :model="roleForm" ref="roleForm" label-width="100px">
-        <el-form-item label="使用权限" prop="readRoleUser">
-          <CustomSelect
-            ref="readSelect"
-            placeholder="请选择授权用户"
-            :value="roleForm.readRoleUser"
-            :total="roleForm.total"
-            @input="searchUser"
-            @change="selectReadUser"
-            @currentChange="getMoreUser"
-            @visibleChange="getUserList"
-          >
-            <el-option
-              v-for="item in userList"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            ></el-option>
-          </CustomSelect>
-        </el-form-item>
         <el-form-item label="编辑权限" prop="writeRoleUser">
           <CustomSelect
             ref="writeSelect"
@@ -608,21 +589,13 @@ export default {
       this.openForm.openUser = e
     },
     // 权限人员信息
-    role({ id, readUserIds, writeUserIds, readUserNames, writeUserNames }) {
+    role({ id, writeUserIds, writeUserNames }) {
       this.examForm.id = id
-      const { roleIds: readIds, roleNames: readNames } = this.compositionRoles(
-        readUserIds,
-        readUserNames
-      )
       const { roleIds: writeIds, roleNames: writeNames } =
         this.compositionRoles(writeUserIds, writeUserNames)
       this.roleForm.show = true
       this.$nextTick(() => {
-        this.roleForm.readRoleUser.push(...readIds)
         this.roleForm.writeRoleUser.push(...writeIds)
-        this.$refs['readSelect'].$refs['elSelect'].cachedOptions.push(
-          ...readNames
-        )
         this.$refs['writeSelect'].$refs['elSelect'].cachedOptions.push(
           ...writeNames
         )
@@ -631,10 +604,9 @@ export default {
     // 组合回显数据
     compositionRoles(userIds, userNames) {
       const ids = userIds
-        .split(',')
         .filter((item) => item !== '')
         .map((item) => Number(item))
-      const names = userNames.split(',')
+      const names = userNames
       const roles = ids.reduce(
         (acc, cur, index) => {
           acc['roleIds'].push(cur)
@@ -776,7 +748,7 @@ export default {
     },
     // 试题详情
     goDetail({ id, name, writeUserIds }) {
-      const edit = writeUserIds.includes(String(this.$store.getters.userId))
+      const edit = writeUserIds.includes(this.$store.getters.userId)
       this.$router.push({
         path: '/question/edit',
         query: { id, name, edit },

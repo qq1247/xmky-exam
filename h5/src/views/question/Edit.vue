@@ -214,6 +214,10 @@ export default {
         difficultyList: [], // 难度列表
         stateList: [
           {
+            key: '0',
+            value: '回收站',
+          },
+          {
             key: '1',
             value: '发布',
           },
@@ -526,22 +530,25 @@ export default {
 
       // 分值选项对应的分值（非智能 ai=2 || 单选、判断）
       if (params.ai == 2 || [1, 4].includes(params.type)) {
-        params.scores = params.score
+        params.answerScores = params.score
       }
 
       // 分值选项对应的分值（多选）
       if (params.ai == 1 && params.type == 2) {
-        params.scores =
+        params.answerScores =
           params.scoreOptions.length > 0 ? this.editForm.multipScore : 0
       }
 
       // 分值选项对应的分值（填空、问答）
       if ([3, 5].includes(params.type)) {
-        params.scores = this.editForm.answers.reduce((acc, cur) => {
+        params.answerScores = this.editForm.answers.reduce((acc, cur) => {
           acc.push(params.ai == 1 ? cur.score : params.score)
           return acc
         }, [])
-        const sum = params.scores.reduce((acc, cur) => acc + Number(cur), 0)
+        const sum = params.answerScores.reduce(
+          (acc, cur) => acc + Number(cur),
+          0
+        )
         if (sum != params.score && params.ai == 1) {
           this.$message.warning('答案分值相加应等于总分值！')
           return false
@@ -707,6 +714,7 @@ export default {
       if (res?.code === 200) {
         this.editForm.id = null
         this.list.curPage = 1
+        this.queryForm.state = ''
         this.query()
         this.$message.success(`${msg}成功！`)
         this.$tools.resetData(this, 'editForm')
