@@ -40,6 +40,7 @@ export const constantRoutes = [
         component: () => import('views/base/Login'),
         name: 'Login',
         meta: { title: '欢迎登录' },
+
         hidden: true,
       },
       {
@@ -51,12 +52,119 @@ export const constantRoutes = [
       },
     ],
   },
+]
+
+// admin
+export const manageRoutes = [
+  {
+    path: '/user',
+    component: Layout,
+    redirect: '/user/index',
+    name: 'User',
+    meta: {
+      title: '用户管理',
+      icon: 'common common-user-manage',
+    },
+    children: [
+      {
+        path: 'index',
+        name: 'UserIndex',
+        component: () => import('../views/user/User.vue'),
+        meta: {
+          title: '用户管理',
+        },
+      },
+      {
+        path: 'org',
+        name: 'UserOrg',
+        component: () => import('../views/user/Org.vue'),
+        meta: {
+          title: '用户组织',
+        },
+        hidden: true,
+      },
+    ],
+  },
+  {
+    path: '/base',
+    component: Layout,
+    redirect: '/base/index',
+    name: 'Base',
+    meta: {
+      title: '基础管理',
+      icon: 'common common-base-manage',
+    },
+    children: [
+      {
+        path: 'index',
+        name: 'BaseIndex',
+        component: () => import('../views/base/Index.vue'),
+        meta: {
+          title: '基础管理',
+        },
+      },
+      {
+        path: 'cron',
+        name: 'BaseCron',
+        component: () => import('../views/base/Cron.vue'),
+        meta: {
+          title: '定时任务',
+        },
+        hidden: true,
+      },
+      {
+        path: 'dict',
+        name: 'BaseDict',
+        component: () => import('../views/base/Dict.vue'),
+        meta: {
+          title: '数据字典',
+        },
+        hidden: true,
+      },
+      {
+        path: 'param',
+        name: 'BaseParam',
+        component: () => import('../views/base/Param/Index.vue'),
+        meta: {
+          title: '系统参数',
+        },
+        hidden: true,
+      },
+      {
+        path: 'sensitive',
+        name: 'BaseSensitive',
+        component: () => import('../views/base/Sensitive.vue'),
+        meta: {
+          title: '敏感词库',
+        },
+        hidden: true,
+      },
+      {
+        path: 'bulletin',
+        name: 'Bulletin',
+        component: () => import('views/base/Bulletin.vue'),
+        meta: {
+          title: '我的公告',
+        },
+        hidden: true,
+      },
+    ],
+  },
+  { path: '*', redirect: '/404', hidden: true },
+]
+
+// [user,subAdmin]
+export const businessRoutes = [
   {
     path: '/my',
     component: Layout,
     redirect: '/my/index',
     name: 'My',
-    meta: { title: '我的', icon: 'common common-mine' },
+    meta: {
+      title: '我的',
+      icon: 'common common-mine',
+      roles: ['user', 'subAdmin'],
+    },
     children: [
       {
         path: 'index',
@@ -90,21 +198,8 @@ export const constantRoutes = [
         name: 'MarkIndex',
         hidden: true,
       },
-      {
-        path: 'bulletin',
-        component: () => import('views/my/Bulletin.vue'),
-        name: 'Bulletin',
-        meta: {
-          title: '我的公告',
-          icon: 'common common-notice',
-        },
-        hidden: true,
-      },
     ],
   },
-]
-
-export const asyncRoutes = [
   {
     path: '/question',
     component: Layout,
@@ -113,7 +208,7 @@ export const asyncRoutes = [
     meta: {
       title: '试题管理',
       icon: 'common common-question-manage',
-      roles: ['admin', 'subAdmin'], // you can set roles in root nav
+      roles: ['subAdmin'],
     },
     children: [
       {
@@ -154,7 +249,7 @@ export const asyncRoutes = [
     meta: {
       title: '试卷管理',
       icon: 'common common-paper-manage',
-      roles: ['admin', 'subAdmin'], // you can set roles in root nav
+      roles: ['subAdmin'],
     },
     children: [
       {
@@ -195,7 +290,7 @@ export const asyncRoutes = [
     meta: {
       title: '考试管理',
       icon: 'common common-exam-manage',
-      roles: ['admin', 'subAdmin'], // you can set roles in root nav
+      roles: ['subAdmin'],
     },
     children: [
       {
@@ -214,120 +309,6 @@ export const asyncRoutes = [
         meta: {
           title: '考试列表',
         },
-      },
-    ],
-  },
-  {
-    path: '/user',
-    component: Layout,
-    redirect: '/user/index',
-    name: 'User',
-    meta: {
-      title: '用户管理',
-      icon: 'common common-user-manage',
-      roles: ['admin'], // you can set roles in root nav
-    },
-    children: [
-      {
-        path: 'index',
-        name: 'UserIndex',
-        component: () => import('../views/user/User.vue'),
-        meta: {
-          title: '用户管理',
-        },
-      },
-      {
-        path: 'org',
-        name: 'UserOrg',
-        component: () => import('../views/user/Org.vue'),
-        meta: {
-          title: '用户组织',
-        },
-        hidden: true,
-      },
-      {
-        path: 'orgExam',
-        name: 'OrgExam',
-        component: () => import('../views/organization/MyExam.vue'),
-        meta: {
-          title: '用户组织',
-        },
-        hidden: true,
-      },
-      {
-        path: 'orgMark',
-        name: 'OrgMark',
-        component: () => import('../views/organization/MyMark.vue'),
-        meta: {
-          title: '用户组织',
-        },
-        hidden: true,
-      },
-      {
-        path: 'orgMarkExam',
-        name: 'OrgMarkExam',
-        component: () => import('../views/organization/MyMarkExam.vue'),
-        meta: {
-          title: '用户组织',
-        },
-        hidden: true,
-      },
-    ],
-  },
-  {
-    path: '/base',
-    component: Layout,
-    redirect: '/base/index',
-    name: 'Base',
-    meta: {
-      title: '基础管理',
-      icon: 'common common-base-manage',
-      roles: ['admin'], // you can set roles in root nav
-    },
-    children: [
-      {
-        path: 'index',
-        name: 'BaseIndex',
-        component: () => import('../views/base/Index.vue'),
-        meta: {
-          title: '基础管理',
-        },
-      },
-      {
-        path: 'cron',
-        name: 'BaseCron',
-        component: () => import('../views/base/Cron.vue'),
-        meta: {
-          title: '定时任务',
-        },
-        hidden: true,
-      },
-      {
-        path: 'dict',
-        name: 'BaseDict',
-        component: () => import('../views/base/Dict.vue'),
-        meta: {
-          title: '数据字典',
-        },
-        hidden: true,
-      },
-      {
-        path: 'param',
-        name: 'BaseParam',
-        component: () => import('../views/base/Param.vue'),
-        meta: {
-          title: '系统参数',
-        },
-        hidden: true,
-      },
-      {
-        path: 'sensitive',
-        name: 'BaseSensitive',
-        component: () => import('../views/base/Sensitive.vue'),
-        meta: {
-          title: '敏感词库',
-        },
-        hidden: true,
       },
     ],
   },

@@ -96,7 +96,7 @@ export default {
       score: '',
       scores: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
       step: '',
-      steps: [0.1, 0.5, 1],
+      steps: [0.5, 1],
       selectStep: 0,
       selectScore: 0,
     }

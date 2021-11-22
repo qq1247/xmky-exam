@@ -1,27 +1,17 @@
 <!--
  * @Description: 业务卡片
  * @Version: 1.0
- * @Company: 
+ * @Company:
  * @Author: Che
  * @Date: 2021-10-13 14:52:40
  * @LastEditors: Che
- * @LastEditTime: 2021-10-27 17:44:47
+ * @LastEditTime: 2021-11-17 13:49:03
 -->
 <template>
   <div class="exam-item">
     <div class="exam-content">
       <!-- 标题 -->
       <div class="title ellipsis">{{ data.name || data.examName }}</div>
-      <el-row :gutter="20" class="content-info">
-        <!-- 创建人 -->
-        <el-col :span="12" class="info-left"
-          >创建人：{{ data.createUserName }}</el-col
-        >
-        <!-- 修改人 -->
-        <el-col :span="12" class="info-right"
-          >修改人：{{ data.updateUserName || '***' }}</el-col
-        >
-      </el-row>
       <template v-if="name == 'paperList'">
         <el-row :gutter="20" class="content-info">
           <el-col :span="12" class="info-left"
@@ -39,14 +29,35 @@
             >展示方式：{{ ['', '整张', '章节', '单题'][data.showType] }}</el-col
           >
         </el-row>
+        <el-row class="content-info">
+          <el-col :span="24" class="info-right"
+            >阅卷方式：{{ ['', '智能阅卷', '人工阅卷'][data.markType] }}</el-col
+          >
+        </el-row>
       </template>
       <template v-if="name == 'examList'">
         <el-row :gutter="20" class="content-info">
           <el-col :span="12" class="info-left"
-            >考试人数：{{ data.userNum }}</el-col
+            >及格：{{
+              (data.paperPassScore * data.paperTotleScore) / 100
+            }}</el-col
           >
           <el-col :span="12" class="info-right"
-            >阅卷人数：{{ data.markNum }}</el-col
+            >满分：{{ data.paperTotleScore }}</el-col
+          >
+        </el-row>
+        <el-row class="content-info">
+          <el-col class="info-left"
+            >考试时间：{{ data.startTime }}（{{
+              computeMinute(data.startTime, data.endTime)
+            }}）</el-col
+          >
+        </el-row>
+        <el-row class="content-info">
+          <el-col class="info-left"
+            >阅卷时间：{{ data.markStartTime }}（{{
+              computeMinute(data.markStartTime, data.markEndTime)
+            }}）</el-col
           >
         </el-row>
       </template>
@@ -129,6 +140,13 @@ export default {
         return true
       }
       return false
+    },
+    // 计算时长
+    computeMinute(startTime, endTime) {
+      const diffTime =
+        new Date(endTime).getTime() - new Date(startTime).getTime()
+      const minutes = diffTime / (60 * 1000)
+      return `${minutes}分钟`
     },
     // 编辑
     edit(data) {

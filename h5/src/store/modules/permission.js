@@ -5,9 +5,9 @@
  * @Author: Che
  * @Date: 2021-08-11 11:33:30
  * @LastEditors: Che
- * @LastEditTime: 2021-08-16 10:47:38
+ * @LastEditTime: 2021-11-19 14:10:08
  */
-import { asyncRoutes, constantRoutes } from '@/router/index'
+import { manageRoutes, businessRoutes, constantRoutes } from '@/router/index'
 
 /**
  * @name: hasPermission
@@ -60,14 +60,14 @@ const mutations = {
 }
 
 const actions = {
-  generateRoutes({ commit, state }, roles) {
+  generateRoutes({ commit }, roles) {
     return new Promise((resolve) => {
       let accessedRoutes
       if (roles.includes('admin')) {
-        accessedRoutes = asyncRoutes || []
+        accessedRoutes = manageRoutes || []
       } else {
         accessedRoutes =
-          roles.length === 0 ? [] : filterAsyncRoutes(asyncRoutes, roles)
+          roles.length === 0 ? [] : filterAsyncRoutes(businessRoutes, roles)
       }
       commit('SET_ROUTES', accessedRoutes)
       resolve(accessedRoutes)

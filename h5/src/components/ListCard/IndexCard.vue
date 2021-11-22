@@ -1,28 +1,32 @@
 <!--
  * @Description: 业务卡片
  * @Version: 1.0
- * @Company: 
+ * @Company:
  * @Author: Che
  * @Date: 2021-10-13 14:52:40
  * @LastEditors: Che
- * @LastEditTime: 2021-10-26 13:36:28
+ * @LastEditTime: 2021-11-15 14:55:57
 -->
 <template>
   <div class="exam-item">
     <div class="exam-content">
       <!-- 标题 -->
-      <div class="title ellipsis">{{ data.name || data.examName }}</div>
-      <!-- 创建者 -->
-      <div class="content-info ellipsis">
-        创建者：{{ data.createUserName || data.userName }}
+      <div class="title ellipsis">
+        {{ data.name || data.examName }}
       </div>
+      <template v-if="name === 'question'">
+        <!-- 创建者 -->
+        <div class="content-info ellipsis">
+          创建者：{{ data.createUserName || data.userName }}
+        </div>
+        <!-- 编辑权限 -->
+        <div class="content-info ellipsis">
+          <span>编辑权限：{{ data.writeUserNames.join(',') || '暂无' }}</span>
+        </div>
+      </template>
       <!-- 使用权限 -->
-      <div class="content-info ellipsis">
-        <span>使用权限：{{ data.readUserNames || '暂无' }}</span>
-      </div>
-      <!-- 编辑权限 -->
-      <div class="content-info ellipsis">
-        <span>编辑权限：{{ data.writeUserNames || '暂无' }}</span>
+      <div class="content-info ellipsis" v-if="name == 'paper'">
+        <span>使用权限：{{ data.readUserNames.join(',') || '暂无' }}</span>
       </div>
 
       <div class="handler">
@@ -35,7 +39,11 @@
           <i class="common common-delete"></i>
         </span>
         <!-- 权限 -->
-        <span data-title="权限" @click="role(data)">
+        <span
+          data-title="权限"
+          @click="role(data)"
+          v-if="['question', 'paper'].includes(name)"
+        >
           <i class="common common-role"></i>
         </span>
         <template v-if="name == 'question'">
@@ -97,7 +105,6 @@ export default {
         data.updateUserId && this.$store.getters.userId != data.updateUserId
       // 是否是分类
       const isparentClassify = ['question', 'paper', 'exam'].includes(this.name)
-      // 是否是子分类
 
       if (isparentClassify && (isCreateUser || isUpdateUser)) {
         this.$message.warning('暂无此项权限！')
