@@ -33,8 +33,8 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT EXAM.ID, EXAM.NAME, EXAM.START_TIME, EXAM.END_TIME, "
-				+ "EXAM.MARK_START_TIME, EXAM.MARK_END_TIME, EXAM.STATE, "
-				+ "PAPER.TOTAL_SCORE AS PAPER_TOTLE_SCORE, "
+				+ "EXAM.MARK_START_TIME, EXAM.MARK_END_TIME, EXAM.STATE, PAPER.MARK_TYPE AS PAPER_MARK_TYPE, "
+				+ "PAPER.TOTAL_SCORE AS PAPER_TOTLE_SCORE, PAPER.ID AS PAPER_ID, PAPER.NAME AS PAPER_NAME, "
 				+ "PAPER.PASS_SCORE AS PAPER_PASS_SCORE, UPDATE_USER.NAME AS UPDATE_USER_NAME "
 				+ "FROM EXM_EXAM EXAM "
 				+ "LEFT JOIN EXM_EXAM_TYPE EXAM_TYPE ON EXAM.EXAM_TYPE_ID = EXAM_TYPE.ID "
@@ -45,7 +45,7 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examTypeId")), "EXAM.EXAM_TYPE_ID = ?", pageIn.get("examTypeId"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "EXAM.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
 				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "EXAM.UPDATE_USER_ID = ?", pageIn.get("curUserId", Integer.class))
-				.addWhere("PAPER.STATE IN (1,2)")
+				.addWhere("EXAM.STATE IN (1,2)")
 				.addOrder("EXAM.UPDATE_TIME", Order.DESC);
 		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);

@@ -29,15 +29,15 @@ public class ExamTypeDaoImpl extends RBaseDaoImpl<ExamType> implements ExamTypeD
 	
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT PAPER_TYPE.ID, PAPER_TYPE.NAME, PAPER_TYPE.READ_USER_IDS, "
-				+ "PAPER_TYPE.CREATE_USER_ID, USER.NAME AS CREATE_USER_NAME "
-				+ "FROM EXM_PAPER_TYPE PAPER_TYPE "
-				+ "INNER JOIN SYS_USER USER ON PAPER_TYPE.CREATE_USER_ID = USER.ID ";
+		String sql = "SELECT EXAM_TYPE.ID, EXAM_TYPE.NAME, EXAM_TYPE.CREATE_USER_ID, "
+				+ "USER.NAME AS CREATE_USER_NAME "
+				+ "FROM EXM_EXAM_TYPE EXAM_TYPE "
+				+ "INNER JOIN SYS_USER USER ON EXAM_TYPE.CREATE_USER_ID = USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "PAPER_TYPE.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
-				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "PAPER_TYPE.CREATE_USER_ID = ?", pageIn.get("curUserId", Integer.class))
-				.addWhere("PAPER_TYPE.STATE = 1")
-				.addOrder("PAPER_TYPE.UPDATE_TIME", Order.DESC);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "EXAM_TYPE.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
+				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "EXAM_TYPE.CREATE_USER_ID = ?", pageIn.get("curUserId", Integer.class))
+				.addWhere("EXAM_TYPE.STATE = 1")
+				.addOrder("EXAM_TYPE.UPDATE_TIME", Order.DESC);
 		return getListpage(sqlUtil, pageIn);
 	}
 
