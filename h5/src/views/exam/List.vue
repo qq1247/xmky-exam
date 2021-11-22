@@ -92,7 +92,7 @@
             ></el-option>
           </CustomSelect>
         </el-form-item>
-        <el-form-item label="考试时间" prop="examTime" required>
+        <el-form-item label="考试时间" prop="examTime">
           <el-date-picker
             v-model="examForm.examTime"
             type="datetimerange"
@@ -102,7 +102,6 @@
           ></el-date-picker>
         </el-form-item>
         <el-form-item
-          required
           label="阅卷时间"
           prop="markTime"
           v-if="examForm.showMarkTime"
@@ -207,7 +206,7 @@
                 @input="searchUser"
                 @change="selectPerson($event, index)"
                 @currentChange="getMoreUser"
-                @visibleChange="getUserList"
+                @visibleChange="getUserList(2)"
               >
                 <el-option
                   v-for="item in examForm.examUsers"
@@ -510,8 +509,8 @@ export default {
           selectPaperId: [
             { required: true, message: '请选择试卷', trigger: 'blur' },
           ],
-          examTime: [{ validator: validateExamTime }],
-          markTime: [{ validator: validateMarkTime }],
+          examTime: [{ required: true, validator: validateExamTime }],
+          markTime: [{ required: true, validator: validateMarkTime }],
         },
       },
       examList: [],
@@ -535,6 +534,11 @@ export default {
     const { id } = this.$route.query
     this.queryForm.examTypeId = id
     this.query()
+    const nextDay = dayjs(new Date().getTime() + 1000 * 60 * 60 * 24).format(
+      'YYYY-MM-DD'
+    )
+    this.examForm.examTime = [`${nextDay} 08:00:00`, `${nextDay} 12:00:00`]
+    this.examForm.markTime = [`${nextDay} 14:00:00`, `${nextDay} 18:00:00`]
   },
   methods: {
     // 查询
@@ -845,12 +849,11 @@ export default {
       this.examForm.examRadio = e
     },
     // 获取用户
-    async getUserList(curPage = 1, name = '') {
-      const examUsers = await userListPage({
-        name,
-        curPage,
-        pageSize: this.examForm.pageSize,
-      })
+    async getUserList(type = 1, curPage = 1, name = '') {
+      let params = { name, curPage, pageSize: this.examForm.pageSize }
+      const examUsers = await userListPage(
+        type === 1 ? params : { type, ...params }
+      )
 
       this.examForm.examUsers = examUsers.data.list
       this.examForm.total = examUsers.data.total
