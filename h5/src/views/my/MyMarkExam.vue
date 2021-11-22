@@ -308,8 +308,8 @@ import { paperGet, paperQuestionList } from 'api/paper'
 import {
   myMarksListPage,
   myMarkAnswerList,
-  myExamUpdateScore,
-  myExamDoScore,
+  myMarkScore,
+  myMarkFinish,
 } from 'api/my'
 import ScorePlate from 'components/ScorePlate.vue'
 import ClozeTitle from '@/components/ClozeTitle.vue'
@@ -471,7 +471,7 @@ export default {
     // 打分
     async updateScore(e, questionId, idx, idxc) {
       const source = this.paperQuestion[idx].questionList[idxc]
-      const res = await myExamUpdateScore({
+      const res = await myMarkScore({
         examId: this.examId,
         questionId,
         userId: this.userId,
@@ -578,7 +578,7 @@ export default {
         this.$message.warning('请给所有试题打分！')
         return
       }
-      const res = await myExamDoScore({
+      const res = await myMarkFinish({
         examId: this.examId,
         userId: this.userId,
       })

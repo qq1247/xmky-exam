@@ -60,7 +60,7 @@
 <script>
 import { loginSysTime } from 'api/common'
 import { paperGet, paperQuestionList } from 'api/paper'
-import { myExamAnswerList, myExamUpdateAnswer, myExamDoAnswer } from 'api/my'
+import { myExamAnswerList, myExamAnswer, myExamFinish } from 'api/my'
 import PageShow from 'components/PaperContent/PageShow.vue'
 import QuestionShow from 'components/PaperContent/QuestionShow.vue'
 import QuestionRouter from 'components/PaperContent/QuestionRouter.vue'
@@ -233,7 +233,7 @@ export default {
         this.$message.error('提交答案失败，请联系管理员！')
         return
       }
-      const res = await myExamUpdateAnswer({
+      const res = await myExamAnswer({
         examId: this.examId,
         questionId,
         myExamDetailId: this.myExamDetailCache[questionId].myExamDetailId,
@@ -280,7 +280,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
       }).then(async () => {
-        const res = await myExamDoAnswer({ examId: this.examId })
+        const res = await myExamFinish({ examId: this.examId })
         res?.code === 200
           ? this.$router.replace({
               path: '/my',
@@ -295,7 +295,7 @@ export default {
         type: 'info',
         showClose: false,
       }).then(async () => {
-        const res = await myExamDoAnswer({ examId: this.examId })
+        const res = await myExamFinish({ examId: this.examId })
         res?.code === 200
           ? this.$router.replace({
               path: '/my',

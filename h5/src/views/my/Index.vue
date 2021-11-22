@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-03 14:22:34
  * @LastEditors: Che
- * @LastEditTime: 2021-08-17 13:49:44
+ * @LastEditTime: 2021-11-15 17:21:11
 -->
 <template>
   <div class="container">
@@ -14,28 +14,16 @@
     <!-- 内容 -->
     <div class="content">
       <div class="exam-list">
-        <div class="exam-item">
+        <div class="exam-item" v-if="$store.getters.roles.includes('user')">
           <div @click="toMyExam" class="exam-content exam-add">
             <i class="common common-exam"></i>
             <span>我的考试</span>
           </div>
         </div>
-        <div class="exam-item">
+        <div class="exam-item" v-if="$store.getters.roles.includes('subAdmin')">
           <div @click="toMyMarkExam" class="exam-content exam-add">
             <i class="common common-readPaper"></i>
             <span>我的阅卷</span>
-          </div>
-        </div>
-        <div
-          class="exam-item"
-          v-if="
-            $store.getters.roles.includes('subAdmin') ||
-            $store.getters.roles.includes('admin')
-          "
-        >
-          <div @click="toBulletin" class="exam-content exam-add">
-            <i class="common common-notice"></i>
-            <span>我的公告</span>
           </div>
         </div>
       </div>
@@ -54,9 +42,6 @@ export default {
     },
     toMyMarkExam() {
       this.$router.push({ path: '/my/mark' })
-    },
-    toBulletin() {
-      this.$router.push({ path: '/my/bulletin', query: {} })
     },
   },
 }
