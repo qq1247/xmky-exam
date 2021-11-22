@@ -247,35 +247,55 @@ export default {
   },
   methods: {
     // 初始化
-    init() {
-      this.getCarouselList()
+    async init() {
       this.getBulletinList()
-      this.getExamList()
-      this.getMarkList()
-      this.renderExamCalendar()
+      await this.renderCalendar()
+      this.renderList()
       this.getQuestionTypeOpenList()
     },
-    // 获取考试列表
-    async getExamList() {
+    // 获取考试列表和阅卷列表
+    async getExamAndMark(time = undefined) {
+      const days = dayjs(time).daysInMonth()
+      const startDate = time || dayjs().date(1).format('YYYY-MM-DD')
+      const endDate = dayjs(time).date(days).format('YYYY-MM-DD')
       const {
-        data: { list },
+        data: { list: examList },
       } = await myExamListPage({
         curPage: 1,
-        pageSize: 10,
-        needExam: 1,
+        pageSize: 100,
+        startDate: `${startDate} 00:00:00`,
+        endDate: `${endDate} 23:59:59`,
       })
-      this.examList = list
+      // const {
+      //   data: { list: markList },
+      // } = await myMarkListPage({
+      //   curPage: 1,
+      //   pageSize: 100,
+      //   startDate: `${startDate} 00:00:00`,
+      //   endDate: `${endDate} 23:59:59`,
+      // })
+      if (dayjs(time).month() === dayjs().month()) {
+        this.examList = examList
+        this.markList = markList
+      }
+      return {
+        examList,
+        // markList,
+      }
     },
-    // 获取阅卷列表
-    async getMarkList() {
-      const {
-        data: { list },
-      } = await myMarkListPage({
-        curPage: 1,
-        pageSize: 10,
-        needMark: 1,
+    // 渲染考试和阅卷列表
+    renderList() {
+      this.examList = this.examList.filter((item) => {
+        const examEndTime = new Date(item.examEndTime).getTime()
+        const now = new Date().getTime()
+        if (examEndTime > now) return item
       })
-      this.markList = list
+
+      this.markList = this.markList.filter((item) => {
+        const markEndTime = new Date(item.markEndTime).getTime()
+        const now = new Date().getTime()
+        if (markEndTime > now) return item
+      })
     },
     // 计算分钟数
     computeMinute(startTime, endTime) {
@@ -290,21 +310,16 @@ export default {
         data: { list },
       } = await bulletinListPage({
         curPage: 1,
-        pageSize: 10,
-        state: 1,
+        pageSize: 100,
       })
-      this.bulletinList = list
+      this.bulletinList = list.filter(
+        (item) => item.showType === 2 || item.showType === 1
+      )
+      const carouselList = list.filter((item) => item.showType === 3)
+      this.getCarouselList(carouselList)
     },
     // 获取轮播图
-    async getCarouselList() {
-      const {
-        data: { list },
-      } = await bulletinListPage({
-        curPage: 1,
-        pageSize: 10,
-        state: 2,
-      })
-
+    async getCarouselList(list) {
       if (list.length) {
         this.carouselList = list
 
@@ -326,34 +341,20 @@ export default {
     // 获取选择月份的时间
     selectDate(time) {
       const _time = dayjs(time).date(1).format('YYYY-MM-DD')
-      this.renderExamCalendar(_time)
+      this.renderCalendar(_time)
     },
     // 渲染日历
-    async renderExamCalendar(time) {
-      const days = dayjs(time).daysInMonth()
-      const startDate = time || dayjs().date(1).format('YYYY-MM-DD')
-      const endDate = dayjs(time).date(days).format('YYYY-MM-DD')
-      const examList = await myExamListPage({
-        curPage: 1,
-        pageSize: 100,
-        startDate: `${startDate} 00:00:00`,
-        endDate: `${endDate} 23:59:59`,
-      })
-      const markList = await myMarkListPage({
-        curPage: 1,
-        pageSize: 100,
-        startDate: `${startDate} 00:00:00`,
-        endDate: `${endDate} 23:59:59`,
-      })
+    async renderCalendar(time) {
+      const { examList /* markList */ } = await this.getExamAndMark(time)
 
       let timePopovers = {}
 
-      if (examList.data.list.length === 0 && markList.data.list.length === 0) {
+      if (examList.length === 0 && markList.length === 0) {
         this.timePopovers = timePopovers
         return
       }
 
-      let examPopovers = examList.data.list.reduce((acc, exam) => {
+      let examPopovers = examList.reduce((acc, exam) => {
         const examTime = dayjs(exam.examStartTime).format('YYYY-MM-DD')
         if (!acc[examTime]) {
           acc[examTime] = {}
@@ -368,7 +369,7 @@ export default {
         return acc
       }, {})
 
-      timePopovers = markList.data.list.reduce((acc, mark) => {
+       timePopovers = markList.reduce((acc, mark) => {
         const markTime = dayjs(mark.markStartTime).format('YYYY-MM-DD')
 
         if (!acc[markTime]) {

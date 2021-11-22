@@ -1,11 +1,11 @@
 <!--
  * @Description: 公告栏
  * @Version: 1.0
- * @Company: 
+ * @Company:
  * @Author: Che
  * @Date: 2021-10-15 10:54:53
  * @LastEditors: Che
- * @LastEditTime: 2021-10-18 09:24:08
+ * @LastEditTime: 2021-11-05 17:27:00
 -->
 <template>
   <div
@@ -52,7 +52,7 @@ export default {
     },
     bgColor: {
       type: String,
-      default: '#fffbe8',
+      default: '#fff',
     },
     color: {
       type: String,
@@ -87,6 +87,7 @@ export default {
   cursor: pointer;
   border-width: 1px;
   border-style: solid;
+  border-radius: 20px;
   .notice-left,
   .notice-right {
     width: 40px;

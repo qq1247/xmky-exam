@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-07-27 17:31:01
  * @LastEditors: Che
- * @LastEditTime: 2021-09-28 10:20:17
+ * @LastEditTime: 2021-11-15 17:21:24
 -->
 <template>
   <div class="container">
@@ -14,6 +14,12 @@
     <!-- 内容 -->
     <div class="content">
       <div class="exam-list">
+        <div class="exam-item">
+          <div @click="toBulletin" class="exam-content exam-add">
+            <i class="common common-notice"></i>
+            <span>我的公告</span>
+          </div>
+        </div>
         <div class="exam-item">
           <div @click="toDict" class="exam-content exam-add">
             <i class="common common-data-library"></i>
@@ -60,6 +66,9 @@ export default {
     },
     toSensitive() {
       this.$router.push({ path: '/base/sensitive' })
+    },
+    toBulletin() {
+      this.$router.push({ path: '/base/bulletin' })
     },
   },
 }

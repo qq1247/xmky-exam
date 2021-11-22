@@ -69,26 +69,42 @@
               <span style="margin-left: 10px">{{ scope.row.orgName }}</span>
             </template>
           </el-table-column>
+          <el-table-column label="子管理员">
+            <template slot-scope="scope">
+              <el-switch
+                active-color="#13ce66"
+                :active-value="2"
+                inactive-color="#ff4949"
+                :inactive-value="1"
+                v-model="scope.row.type"
+                @change="setSubAdmin($event, scope.row.id)"
+              ></el-switch>
+            </template>
+          </el-table-column>
           <el-table-column label="操作" width="300">
             <template slot-scope="scope">
-              <el-link
-                :underline="false"
-                @click="get(scope.row.id)"
-                icon="common common-edit"
-                >修改</el-link
+              <el-tooltip placement="top" content="编辑">
+                <i class="common common-edit" @click="get(scope.row.id)"></i>
+              </el-tooltip>
+              <el-tooltip placement="top" content="删除">
+                <i class="common common-delete" @click="del(scope.row.id)"></i>
+              </el-tooltip>
+              <el-tooltip placement="top" content="密码重置">
+                <i
+                  class="common common-pwd-reset"
+                  @click="initPwd(scope.row.id)"
+                ></i>
+              </el-tooltip>
+              <el-tooltip
+                placement="top"
+                content="强制下线"
+                v-if="scope.row.online"
               >
-              <el-link
-                :underline="false"
-                @click="initPwd(scope.row.id)"
-                icon="common common-edit"
-                >密码重置</el-link
-              >
-              <el-link
-                :underline="false"
-                @click="del(scope.row.id)"
-                icon="common common-delete"
-                >删除</el-link
-              >
+                <i
+                  class="common common-off-line"
+                  @click="offLine(scope.row.id)"
+                ></i>
+              </el-tooltip>
             </template>
           </el-table-column>
         </el-table>
@@ -146,15 +162,6 @@
             v-model.trim="editForm.name"
           ></el-input>
         </el-form-item>
-        <el-form-item label="子管理员" label-width="120px" prop="roles">
-          <el-switch
-            active-color="#13ce66"
-            active-value="subAdmin"
-            inactive-color="#ff4949"
-            inactive-value="user"
-            v-model="editForm.roles"
-          ></el-switch>
-        </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
         <el-button @click="add" type="primary" v-if="editForm.id == null"
@@ -171,12 +178,14 @@
 
 <script>
 import {
-  userListPage,
   userAdd,
+  userOut,
   userEdit,
-  userInitPwd,
-  userDel,
   userGet,
+  userDel,
+  userRole,
+  userPwdInit,
+  userListPage,
 } from 'api/user'
 import { orgListPage } from 'api/base'
 import CustomSelect from 'components/CustomSelect.vue'
@@ -206,7 +215,6 @@ export default {
         loginName: null, // 登录名称
         orgId: null, // 机构ID
         orgName: null, // 机构名称
-        roles: 'user', // 角色
         show: false, // 是否显示页面
         orgListpage: {
           total: 0,
@@ -225,7 +233,7 @@ export default {
     }
   },
   created() {
-    this.init()
+    this.query()
   },
   methods: {
     // 查询
@@ -249,10 +257,6 @@ export default {
       this.listpage.curPage = 1
       this.query()
     },
-    // 初始化
-    async init() {
-      await this.query()
-    },
     // 添加机构
     add() {
       this.$refs['editForm'].validate(async (valid) => {
@@ -265,7 +269,6 @@ export default {
           loginName: this.editForm.loginName,
           orgId: this.editForm.orgId,
           phone: this.editForm.phone,
-          roles: this.editForm.roles,
         })
 
         if (res.code != 200) {
@@ -293,7 +296,6 @@ export default {
           name: this.editForm.name,
           loginName: this.editForm.loginName,
           orgId: this.editForm.orgId,
-          roles: this.editForm.roles,
         })
 
         if (res.code != 200) {
@@ -311,9 +313,14 @@ export default {
         this.query()
       })
     },
+    // 设置子管理员
+    async setSubAdmin(e, id) {
+      const roles = [e === 2 ? 'subAdmin' : 'user']
+      await userRole({ id, roles })
+    },
     // 初始化密码
     async initPwd(id) {
-      const res = await userInitPwd({
+      const res = await userPwdInit({
         id: id,
       })
 
@@ -340,6 +347,12 @@ export default {
           this.$message.error(res.msg)
         }
 
+        this.query()
+      })
+    },
+    // 强制下线
+    offLine(id) {
+      userOut({ id }).then((res) => {
         this.query()
       })
     },
@@ -440,28 +453,16 @@ export default {
   text-align: center;
   border-bottom: 1px solid #ddd;
 }
-/deep/ .common {
-  padding-right: 10px;
+.common {
+  padding: 0 10px;
   color: #0096e7;
-  font-style: inherit;
-  font-weight: bold;
-}
-.el-link {
-  padding-right: 20px;
-  color: #8392a6;
-  font-size: 12px;
+  font-size: 18px;
 }
 /deep/ .el-input__inner:focus {
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
     0 0 8px rgba(102, 175, 233, 0.6);
   border: 1px solid #f2f4f5;
 }
-.common-arrow-down {
-  margin-left: 10px;
-  color: #999;
-  font-size: 12px;
-}
-
 /deep/.el-pagination.is-background .el-pager li:not(.disabled).active {
   background-color: #0095e5;
   color: #fff;

@@ -1,22 +1,23 @@
 <!--
- * @Description: 设置logo,name
+ * @Description: 
  * @Version: 1.0
- * @Company:
+ * @Company: 
  * @Author: Che
- * @Date: 2021-09-08 13:33:12
+ * @Date: 2021-11-12 11:00:07
  * @LastEditors: Che
- * @LastEditTime: 2021-11-09 15:10:27
+ * @LastEditTime: 2021-11-12 16:44:54
 -->
 <template>
-  <div class="container">
-    <el-form :model="paramForm" ref="paramForm">
-      <el-form-item label="单位名称" label-width="300px" prop="orgName">
+  <div class="param-option">
+    <div class="param-title">单位参数</div>
+    <el-form :model="paramForm" :label-position="labelPosition" ref="paramForm">
+      <el-form-item label="单位名称" label-width="100px" prop="orgName">
         <el-input
           placeholder="请输入单位名称"
           v-model="paramForm.orgName"
         ></el-input>
       </el-form-item>
-      <el-form-item label="单位商标" label-width="300px" prop="orgLogo">
+      <el-form-item label="单位商标" label-width="100px" prop="orgLogo">
         <Upload
           ref="logoUpload"
           type="image"
@@ -26,7 +27,7 @@
           size="1"
         />
       </el-form-item>
-      <el-form-item label label-width="300px">
+      <el-form-item label label-width="100px">
         <el-button @click="setting" type="primary">设置</el-button>
       </el-form-item>
     </el-form>
@@ -35,46 +36,49 @@
 
 <script>
 import Upload from 'components/Upload'
-import { parmLogo, parmGet } from 'api/base'
-import { getOrg, setOrg } from '@/utils/storage'
+import { parmLogo } from 'api/base'
 export default {
-  components: {
-    Upload,
+  components: { Upload },
+  props: {
+    logo: {
+      type: Number,
+      default: null,
+    },
+    name: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
+      labelPosition: 'left',
       paramForm: {
         orgLogo: [],
         orgName: '',
-        id: null,
       },
     }
   },
-  created() {
-    this.init()
+  watch: {
+    logo: {
+      immediate: true,
+      handler(n, o) {
+        this.setData()
+      },
+    },
+  },
+  update() {
+    this.setData()
   },
   methods: {
     // 初始化
-    async init() {
-      const {
-        code,
-        data: { orgLogo, orgName },
-      } = await parmGet()
-      if (code === 200) {
-        this.paramForm.orgLogo.push({
-          url: `${process.env.VUE_APP_BASE_URL}file/download?id=${Number(
-            orgLogo
-          )}`,
-        })
-        this.paramForm.orgName = orgName
-        this.$store.dispatch('setting/changeSetting', {
-          key: 'orgName',
-          value: orgName,
-        })
-        let loginInfo = getOrg()
-        loginInfo.orgName = orgName
-        setOrg(loginInfo)
-      }
+    async setData() {
+      this.paramForm.orgLogo = []
+      this.paramForm.orgLogo.push({
+        url: `${process.env.VUE_APP_BASE_URL}file/download?id=${Number(
+          this.logo
+        )}`,
+      })
+      this.paramForm.orgName = this.name
     },
     // 设置
     setting() {
@@ -96,11 +100,11 @@ export default {
         const { code, msg } = await parmLogo(params)
 
         if (code === 200) {
-          this.paramForm.orgLogo = []
-          await this.init()
-          let link = document.querySelector("link[rel*='icon']")
-          link.href = `${process.env.VUE_APP_BASE_URL}login/logo?icon=true`
-          this.$router.go()
+          this.$message({
+            message: '设置成功',
+            duration: 1000,
+          })
+          this.$emit('resetLogo')
         } else {
           this.$message.error(msg)
         }
@@ -124,9 +128,3 @@ export default {
   },
 }
 </script>
-<style lang="scss" scoped>
-.container {
-  display: flex;
-  align-items: flex-start;
-}
-</style>

@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-11 13:25:40
  * @LastEditors: Che
- * @LastEditTime: 2021-08-11 22:52:22
+ * @LastEditTime: 2021-11-09 09:37:49
  */
 import request from './request'
 
@@ -18,12 +18,12 @@ import request from './request'
 export const login = (params) => request('login/in', params)
 
 /**
- * @name: loginPwdUpdate
+ * @name: loginPwd
  * @description: 设置密码
  * @param {*}
  * @return {*}
  */
-export const loginPwdUpdate = (params) => request('login/pwdUpdate', params)
+export const loginPwd = (params) => request('login/pwd', params)
 
 /**
  * @name: loginSysTime
@@ -32,6 +32,14 @@ export const loginPwdUpdate = (params) => request('login/pwdUpdate', params)
  * @return {*}
  */
 export const loginSysTime = (params) => request('login/sysTime', params)
+
+/**
+ * @name: loginOrgName
+ * @description: 获取orgName
+ * @param {*}
+ * @return {*}
+ */
+export const loginOrgName = (params) => request('login/orgName', params)
 
 /**
  * @name: fileUpload
@@ -48,3 +56,11 @@ export const fileUpload = (params) => request('file/upload', params)
  * @return {*}
  */
 export const fileDownload = (params) => request('file/download', params)
+
+/**
+ * @name: fileDownload
+ * @description: 获取进度
+ * @param {*}
+ * @return {*}
+ */
+export const progressBarGet = (params) => request('progressBar/get', params)

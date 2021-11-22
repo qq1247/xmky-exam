@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-17 17:50:31
  * @LastEditors: Che
- * @LastEditTime: 2021-09-28 17:27:04
+ * @LastEditTime: 2021-11-09 14:33:51
  */
 import { getOrg } from '@/utils/storage'
 
@@ -13,7 +13,6 @@ const state = {
   hideHeader: false,
   hideFooter: false,
   lineTime: 0,
-  orgLogo: getOrg().orgLogo,
   orgName: getOrg().orgName,
 }
 

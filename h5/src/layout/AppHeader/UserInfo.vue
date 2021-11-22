@@ -60,7 +60,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { loginPwdUpdate } from 'api/common'
+import { loginPwd } from 'api/common'
 export default {
   name: 'UserInfo',
   data() {
@@ -101,7 +101,7 @@ export default {
         if (!valid) {
           return
         }
-        const res = await loginPwdUpdate({
+        const res = await loginPwd({
           oldPwd: this.editForm.oldPwd,
           newPwd: this.editForm.newPwd,
         })

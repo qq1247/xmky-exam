@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-09 17:59:47
  * @LastEditors: Che
- * @LastEditTime: 2021-09-14 16:51:26
+ * @LastEditTime: 2021-11-09 13:34:52
 -->
 <template>
   <router-link to="/" class="header-logo">
@@ -16,22 +16,11 @@
 <script>
 export default {
   data() {
-    return {}
-  },
-  computed: {
-    orgLogo: {
-      get() {
-        return this.$store.getters.orgLogo
-          ? `/api/file/download?id=${this.$store.getters.orgLogo}`
-          : require('../../assets/img/logo.png')
-      },
-      set(val) {
-        this.$store.dispatch('settings/changeSetting', {
-          key: 'orgLogo',
-          value: val,
-        })
-      },
-    },
+    return {
+      orgLogo:
+        `${process.env.VUE_APP_BASE_URL}login/logo` ||
+        require('../../assets/img/logo.png'),
+    }
   },
 }
 </script>

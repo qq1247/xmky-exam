@@ -48,14 +48,14 @@
           <el-table-column label="置顶">
             <template slot-scope="scope">
               <span style="margin-left: 10px">{{
-                scope.row.topStateName
+                scope.row.showType === 2 ? '是' : '否'
               }}</span>
             </template>
           </el-table-column>
           <el-table-column label="读权限">
             <template slot-scope="scope">
               <span style="margin-left: 10px">{{
-                scope.row.readUserNames
+                scope.row.readUserNames || '所有人'
               }}</span>
             </template>
           </el-table-column>
@@ -130,25 +130,25 @@
             ></el-option>
           </CustomSelect>
         </el-form-item>
-        <el-form-item label="置顶展示" label-width="120px" prop="topState">
-          <el-switch
-            active-color="#13ce66"
-            inactive-color="#ff4949"
-            v-model="editForm.topState"
-            :active-value="1"
-            :inactive-value="2"
-          ></el-switch>
+        <el-form-item label="展示时间" label-width="120px" prop="showTime">
+          <el-date-picker
+            v-model="editForm.showTime"
+            type="datetimerange"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            value-format="yyyy-MM-dd HH:mm:ss"
+          ></el-date-picker>
         </el-form-item>
-        <el-form-item label="轮播展示" label-width="120px" prop="state">
-          <el-switch
-            active-color="#13ce66"
-            inactive-color="#ff4949"
-            v-model="editForm.state"
-            :active-value="2"
-            :inactive-value="1"
-          ></el-switch>
+        <el-form-item label="展示状态" label-width="120px" prop="showType">
+          <el-radio
+            v-for="item in editForm.showTypeList"
+            :key="item.value"
+            v-model="editForm.showType"
+            :label="item.value"
+            >{{ item.name }}</el-radio
+          >
         </el-form-item>
-        <template v-if="editForm.state == 2">
+        <template v-if="editForm.showType === 3">
           <el-form-item label="轮播图片" label-width="120px" prop="imgFileId">
             <Upload
               ref="bannerUpload"
@@ -156,6 +156,7 @@
               :files="editForm.imgFileId"
               @success="bannerSucess"
               @remove="bannerRemove"
+              :size="2"
             />
           </el-form-item>
         </template>
@@ -186,6 +187,9 @@ import Upload from 'components/Upload'
 import Editor from 'components/Editor.vue'
 import EditHeader from 'components/EditHeader.vue'
 import CustomSelect from 'components/CustomSelect.vue'
+import * as dayjs from 'dayjs'
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
+dayjs.extend(isSameOrBefore)
 export default {
   components: {
     Editor,
@@ -194,6 +198,20 @@ export default {
     CustomSelect,
   },
   data() {
+    const validateShowTime = (rule, value, callback) => {
+      if (value.length == 0) {
+        return callback(new Error('请选择展示时间'))
+      }
+      if (
+        dayjs(value[0]).isSameOrBefore(dayjs()) ||
+        dayjs(value[1]).isSameOrBefore(dayjs())
+      ) {
+        return callback(
+          new Error(`请选择 ${dayjs().format('YYYY-MM-DD HH:mm:ss')} 后的时间`)
+        )
+      }
+      return callback()
+    }
     return {
       // 列表数据
       listpage: {
@@ -213,8 +231,22 @@ export default {
         title: '', // 标题
         imgFileId: [], // 图片
         content: '', // 内容
-        state: 1, // 状态
-        topState: 1, // 置顶状态
+        showTime: [], //展示时间
+        showType: 1, // 置顶状态
+        showTypeList: [
+          {
+            name: '默认',
+            value: 1,
+          },
+          {
+            name: '置顶',
+            value: 2,
+          },
+          {
+            name: '轮播',
+            value: 3,
+          },
+        ],
         show: false, // 是否显示页面
         examUsers: [],
         examUser: [],
@@ -223,6 +255,7 @@ export default {
         // 校验
         rules: {
           title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
+          showTime: [{ required: true, validator: validateShowTime }],
         },
       },
       headers: {
@@ -244,7 +277,6 @@ export default {
         title: this.queryForm.title,
         curPage: curPage,
         pageSize: this.listpage.pageSize,
-        site: 1,
       })
       this.listpage.total = total
       this.listpage.list = list
@@ -312,10 +344,11 @@ export default {
           title: this.editForm.title,
           content: this.editForm.content,
           readUserIds: this.editForm.examUser,
-          topState: this.editForm.topState,
-          state: this.editForm.state,
+          showType: this.editForm.showType,
+          startTime: this.editForm.showTime[0],
+          endTime: this.editForm.showTime[1],
           imgFileId:
-            this.editForm.state === 2 && this.editForm.imgFileId.length > 0
+            this.editForm.showType === 3 && this.editForm.imgFileId.length > 0
               ? this.editForm.imgFileId[0].response.data.fileIds
               : null,
         })
@@ -339,7 +372,7 @@ export default {
           id: this.editForm.id,
           title: this.editForm.title,
           imgFileId:
-            this.editForm.state === 2 && this.editForm.imgFileId.length > 0
+            this.editForm.showType === 3 && this.editForm.imgFileId.length > 0
               ? this.editForm.imgFileId[0]?.response
                 ? this.editForm.imgFileId[0].response.data.fileIds
                 : this.$tools.getQueryParam(
@@ -349,8 +382,9 @@ export default {
               : null,
           content: this.editForm.content,
           readUserIds: this.editForm.examUser,
-          topState: this.editForm.topState,
-          state: this.editForm.state,
+          showType: this.editForm.showType,
+          startTime: this.editForm.showTime[0],
+          endTime: this.editForm.showTime[1],
         })
 
         if (res.code != 200) {
@@ -392,8 +426,11 @@ export default {
       this.$nextTick(() => {
         this.editForm.id = res.data.id
         this.editForm.title = res.data.title
-        this.editForm.topState = res.data.topState
-        this.editForm.state = res.data.state
+        this.editForm.showType = res.data.showType
+        this.editForm.showTime = [
+          `${res.data.startTime}`,
+          `${res.data.endTime}`,
+        ]
         if (res.data.readUserNames !== '') {
           const { roleIds: readIds, roleNames: readNames } =
             this.compositionRoles(res.data.readUserIds, res.data.readUserNames)

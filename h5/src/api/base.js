@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-11 17:02:08
  * @LastEditors: Che
- * @LastEditTime: 2021-09-28 10:04:59
+ * @LastEditTime: 2021-11-17 11:15:52
  */
 
 import request from './request'
@@ -33,11 +33,11 @@ export const orgTreeList = (params) => request('org/treeList', params)
 export const orgListPage = (params) => request('org/listpage', params)
 
 export const parmGet = (params) => request('parm/get', params)
-export const parmAdd = (params) => request('parm/add', params)
-export const parmEdit = (params) => request('parm/edit', params)
-export const parmDel = (params) => request('parm/del', params)
-export const parmEditLogo = (params) => request('parm/editLogo', params)
-export const parmListPage = (params) => request('parm/listpage', params)
+export const parmEmail = (params) => request('parm/email', params)
+export const parmFile = (params) => request('parm/file', params)
+export const parmLogo = (params) => request('parm/logo', params)
+export const parmDb = (params) => request('parm/db', params)
+export const parmPwd = (params) => request('parm/pwd', params)
 
 export const bulletinAdd = (params) => request('bulletin/add', params)
 export const bulletinEdit = (params) => request('bulletin/edit', params)

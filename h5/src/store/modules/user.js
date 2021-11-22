@@ -5,9 +5,9 @@
  * @Author: Che
  * @Date: 2021-08-11 11:33:30
  * @LastEditors: Che
- * @LastEditTime: 2021-09-28 17:50:45
+ * @LastEditTime: 2021-11-09 14:32:29
  */
-import { login } from 'api/common'
+import { login, loginOrgName } from 'api/common'
 import { getInfo, setInfo, removeInfo, setOrg } from '@/utils/storage'
 import router, { resetRouter } from '@/router/index'
 
@@ -41,34 +41,27 @@ const actions = {
    * @param {*} userInfo
    * @return {*}
    */
-  login({ commit, dispatch }, userInfo) {
+  login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
       login({ loginName: username.trim(), pwd: password })
-        .then((res) => {
+        .then(async (res) => {
           const { data } = res
           commit('SET_TOKEN', data.accessToken)
           commit('SET_ROLES', data.roles || ['user'])
           commit('SET_NAME', data.userName)
           commit('SET_USER_ID', data.userId)
-          commit(
-            'setting/CHANGE_SETTING',
-            {
-              key: 'orgLogo',
-              value: data.orgLogo,
-            },
-            { root: true }
-          )
+          const { data: orgName } = await loginOrgName()
           commit(
             'setting/CHANGE_SETTING',
             {
               key: 'orgName',
-              value: data.orgName,
+              value: orgName,
             },
             { root: true }
           )
           setInfo(data)
-          setOrg({ orgLogo: data.orgLogo, orgName: data.orgName })
+          setOrg({ orgName })
           resolve()
         })
         .catch((error) => {

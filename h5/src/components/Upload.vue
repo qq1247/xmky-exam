@@ -1,11 +1,11 @@
 <!--
  * @Description: 封装上传组件
  * @Version: 1.0
- * @Company: 
+ * @Company:
  * @Author: Che
  * @Date: 2021-08-18 16:50:04
  * @LastEditors: Che
- * @LastEditTime: 2021-09-09 14:43:35
+ * @LastEditTime: 2021-11-05 09:51:07
 -->
 <template>
   <el-upload
@@ -52,6 +52,10 @@ export default {
       type: Array,
       default: () => [],
     },
+    size: {
+      type: [String, Number],
+      default: 20,
+    },
   },
   data() {
     return {
@@ -59,7 +63,6 @@ export default {
         Authorization: this.$store.getters.token,
       },
       fileList: this.files,
-      size: 20,
       totalSize: 0,
       types: {
         '*': {

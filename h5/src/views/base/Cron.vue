@@ -69,36 +69,30 @@
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-link
-                :underline="false"
-                @click="get(scope.row.id)"
-                icon="common common-edit"
-                >修改</el-link
-              >
-              <el-link
-                :underline="false"
-                @click="del(scope.row.id)"
-                icon="common common-delete"
-                >删除</el-link
-              >
-              <el-link
-                :underline="false"
-                @click="startTask(scope.row.id)"
-                icon="common common-edit"
-                >启动任务</el-link
-              >
-              <el-link
-                :underline="false"
-                @click="stopTask(scope.row.id)"
-                icon="common common-edit"
-                >停止任务</el-link
-              >
-              <el-link
-                :underline="false"
-                @click="onceTask(scope.row.id)"
-                icon="common common-edit"
-                >执行一次</el-link
-              >
+              <el-tooltip placement="top" content="编辑">
+                <i class="common common-edit" @click="get(scope.row.id)"></i>
+              </el-tooltip>
+              <el-tooltip placement="top" content="删除">
+                <i class="common common-delete" @click="del(scope.row.id)"></i>
+              </el-tooltip>
+              <el-tooltip placement="top" content="启动任务">
+                <i
+                  class="common common-start"
+                  @click="startTask(scope.row.id)"
+                ></i>
+              </el-tooltip>
+              <el-tooltip placement="top" content="停止任务">
+                <i
+                  class="common common-end"
+                  @click="stopTask(scope.row.id)"
+                ></i>
+              </el-tooltip>
+              <el-tooltip placement="top" content="执行一次">
+                <i
+                  class="common common-once"
+                  @click="onceTask(scope.row.id)"
+                ></i>
+              </el-tooltip>
             </template>
           </el-table-column>
         </el-table>
@@ -393,11 +387,10 @@ export default {
   text-align: center;
   border-bottom: 1px solid #ddd;
 }
-/deep/ .common {
-  padding-right: 10px;
+.common {
+  padding: 0 10px;
   color: #0096e7;
-  font-style: inherit;
-  font-weight: bold;
+  font-size: 18px;
 }
 .el-link {
   padding-right: 20px;

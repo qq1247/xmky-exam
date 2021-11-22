@@ -7,7 +7,7 @@
       ref="ruleForm"
       class="login-wrap"
     >
-      <div class="login-title">欢迎登录 管理员 admin1/111111 考试用户 user1/111111 超级管理员 admin/111111</div>
+      <div class="login-title">欢迎登录</div>
       <el-form-item prop="account">
         <template slot="label">
           <i class="common common-wo"></i>
@@ -31,8 +31,7 @@
         ></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" class="login-btn"
-@click="login('ruleForm')"
+        <el-button type="primary" class="login-btn" @click="login('ruleForm')"
           >登录</el-button
         >
       </el-form-item>

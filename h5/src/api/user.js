@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-11 16:28:34
  * @LastEditors: Che
- * @LastEditTime: 2021-08-11 22:52:45
+ * @LastEditTime: 2021-11-05 10:32:30
  */
 import request from './request'
 
@@ -50,9 +50,25 @@ export const userEdit = (params) => request('user/edit', params)
 export const userDel = (params) => request('user/del', params)
 
 /**
- * @name: userInitPwd
+ * @name: userPwdInit
  * @description: 初始用户密码
  * @param {*}
  * @return {*}
  */
-export const userInitPwd = (params) => request('user/initPwd', params)
+export const userPwdInit = (params) => request('user/pwdInit', params)
+
+/**
+ * @name: userRole
+ * @description: 权限变为子管理员
+ * @param {*}
+ * @return {*}
+ */
+export const userRole = (params) => request('user/role', params)
+
+/**
+ * @name: userOut
+ * @description: 强制下线
+ * @param {*}
+ * @return {*}
+ */
+export const userOut = (params) => request('user/out', params)

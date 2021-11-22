@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-12 10:17:05
  * @LastEditors: Che
- * @LastEditTime: 2021-10-08 17:02:23
+ * @LastEditTime: 2021-11-09 11:17:55
  */
 
 import router, { constantRoutes } from './index'
@@ -38,7 +38,7 @@ router.beforeEach(async (to, from, next) => {
   })
 
   let link = document.querySelector("link[rel*='icon']")
-  link.href = `${process.env.VUE_APP_BASE_URL}login/ico`
+  link.href = `${process.env.VUE_APP_BASE_URL}login/logo?icon=true`
 
   if (hasToken) {
     if (store.state.permission.routes.length > constantRoutes.length) {
