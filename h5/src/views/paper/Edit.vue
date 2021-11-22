@@ -116,14 +116,20 @@
                 v-model="queryForm.id"
               ></el-input>
             </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="randomQueryQuestion()"
-                >随机查询</el-button
-              >
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="search">查询</el-button>
-            </el-form-item>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item>
+                  <el-button type="primary" @click="randomQueryQuestion()"
+                    >随机查询</el-button
+                  >
+                </el-form-item>
+              </el-col>
+              <el-col :span="12">
+                <el-form-item>
+                  <el-button type="primary" @click="search">查询</el-button>
+                </el-form-item>
+              </el-col>
+            </el-row>
           </el-form>
           <div class="drags">
             <Draggable
@@ -134,7 +140,7 @@
               :group="{ name: 'paper', put: false }"
               chosenClass="drag-active"
               animation="300"
-              @end="sourceEnd"
+              :move="sourceEnd"
               @choose="sourceChoose"
               :disabled="paperQuestion.length == 0 ? true : false"
               v-if="paperList.length > 0"
@@ -1017,7 +1023,8 @@ export default {
       }
     },
     // 拖拽原题结束
-    async sourceEnd({ to, item }) {
+    async sourceEnd(e) {
+      console.log(e)
       const chapterId = to.dataset.id
       const questionIds = item.id
       const res = await paperQuestionAdd({

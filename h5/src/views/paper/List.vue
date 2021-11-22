@@ -314,15 +314,15 @@ export default {
             content: '随机组卷',
           },
         ],
-        markType: '1',
+        markType: 1,
         markTypeList: [
           {
             name: '智能阅卷',
-            value: '1',
+            value: 1,
           },
           {
             name: '人工阅卷',
-            value: '2',
+            value: 2,
           },
         ],
         rules: {
@@ -417,6 +417,7 @@ export default {
         this.paperForm.readRemark = item.readRemark
         this.paperForm.readNum = item.readNum
         this.paperForm.showType = String(item.showType)
+        this.paperForm.markType = item.markType
         this.paperForm.options =
           item.options == '' ? [] : item.options.split(',')
         this.paperForm.paperRemarkShow = !!item.paperRemark

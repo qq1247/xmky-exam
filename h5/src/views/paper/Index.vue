@@ -106,25 +106,6 @@
             ></el-option>
           </CustomSelect>
         </el-form-item>
-        <el-form-item label="编辑权限" prop="writeRoleUser">
-          <CustomSelect
-            ref="writeSelect"
-            placeholder="请选择授权用户"
-            :value="roleForm.writeRoleUser"
-            :total="roleForm.total"
-            @input="searchUser"
-            @change="selectWriteUser"
-            @currentChange="getMoreUser"
-            @visibleChange="getUserList"
-          >
-            <el-option
-              v-for="item in roleForm.roleUserList"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            ></el-option>
-          </CustomSelect>
-        </el-form-item>
       </el-form>
       <div class="dialog-footer" slot="footer">
         <el-button @click="editRoleUsers" type="primary">编辑</el-button>
@@ -310,32 +291,25 @@ export default {
       this.roleForm.writeRoleUser = e
     },
     // 权限人员信息
-    role({ id, readUserIds, writeUserIds, readUserNames, writeUserNames }) {
+    role({ id, readUserIds, readUserNames }) {
       this.examForm.id = id
       const { roleIds: readIds, roleNames: readNames } = this.compositionRoles(
         readUserIds,
         readUserNames
       )
-      const { roleIds: writeIds, roleNames: writeNames } =
-        this.compositionRoles(writeUserIds, writeUserNames)
       this.roleForm.show = true
       this.$nextTick(() => {
         this.roleForm.readRoleUser.push(...readIds)
-        this.roleForm.writeRoleUser.push(...writeIds)
         this.$refs['readSelect'].$refs['elSelect'].cachedOptions.push(
           ...readNames
-        )
-        this.$refs['writeSelect'].$refs['elSelect'].cachedOptions.push(
-          ...writeNames
         )
       })
     },
     compositionRoles(userIds, userNames) {
       const ids = userIds
-        .split(',')
         .filter((item) => item !== '')
         .map((item) => Number(item))
-      const names = userNames.split(',')
+      const names = userNames
       const roles = ids.reduce(
         (acc, cur, index) => {
           acc['roleIds'].push(cur)
