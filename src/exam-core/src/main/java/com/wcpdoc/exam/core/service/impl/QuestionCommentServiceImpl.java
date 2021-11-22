@@ -33,13 +33,16 @@ public class QuestionCommentServiceImpl extends BaseServiceImp<QuestionComment> 
 	}
 
 	@Override
-	public void addAndUpdate(QuestionComment questionComment, int anonymity) {
+	public void addAndUpdate(QuestionComment questionComment, Integer anonymity) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(questionComment.getContent())) {
 			throw new MyException("参数错误：content");
 		}
 		if (questionComment.getQuestionId() == null || questionComment.getQuestionId() <= 0) {
 			throw new MyException("参数错误：questionId");
+		}
+		if (anonymity == null) {
+			throw new MyException("参数错误：anonymity");
 		}
 		
 		// 添加试题评论

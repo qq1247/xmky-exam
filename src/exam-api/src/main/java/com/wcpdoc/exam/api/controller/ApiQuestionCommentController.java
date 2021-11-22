@@ -1,6 +1,5 @@
 package com.wcpdoc.exam.api.controller;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +17,6 @@ import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
-import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.QuestionComment;
 import com.wcpdoc.exam.core.service.QuestionCommentService;
 import com.wcpdoc.wordFilter.service.SensitiveService;
@@ -71,7 +69,7 @@ public class ApiQuestionCommentController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	public PageResult add(QuestionComment questionComment, int anonymity) {
+	public PageResult add(QuestionComment questionComment, Integer anonymity) {
 		try {
 			questionCommentService.addAndUpdate(questionComment, anonymity);
 			Map<String, Object> data = new HashMap<String, Object>();
@@ -81,38 +79,6 @@ public class ApiQuestionCommentController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("添加试题评论错误：", e);
-			return PageResult.err();
-		}
-	}
-
-	/**
-	 * 修改试题评论
-	 * 
-	 * v1.0 zhanghc 2016-5-8上午11:00:00
-	 * 
-	 * @param questionComment
-	 * @return PageResult
-	 */
-	@RequestMapping("/edit")
-	@ResponseBody
-	public PageResult edit(QuestionComment questionComment) {
-		try {
-			// 校验数据有效性
-			if (!ValidateUtil.isValid(questionComment.getContent())) {
-				throw new MyException("参数错误：content");
-			}
-			
-			QuestionComment entity = questionCommentService.getEntity(questionComment.getId());
-			entity.setContent(questionComment.getContent());
-			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(getCurUser().getId());
-			questionCommentService.update(entity);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("修改试题评论错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("修改试题评论错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -129,7 +95,7 @@ public class ApiQuestionCommentController extends BaseController {
 	@ResponseBody
 	public PageResult del(Integer id) {
 		try {
-			questionCommentService.delAndUpdate(id);
+			//questionCommentService.delAndUpdate(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("删除试题评论错误：{}", e.getMessage());
