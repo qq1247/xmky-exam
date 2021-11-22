@@ -136,6 +136,7 @@ public class ApiUserController extends BaseController {
 			// 添加用户
 			Date curTime = new Date();
 			user.setRoles("user");
+			user.setType(1);
 			user.setRegistTime(curTime);
 			user.setUpdateTime(curTime);
 			user.setUpdateUserId(getCurUser().getId());
