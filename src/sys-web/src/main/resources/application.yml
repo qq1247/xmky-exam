@@ -19,7 +19,7 @@ spring:
       max-request-size: 100MB
   datasource:
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:mysql://127.0.0.1:3306/exam?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
+    url: jdbc:log4jdbc:mysql://192.168.110.86:3306/exam?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
     username: root
     password: root
     
@@ -41,7 +41,6 @@ logging:
 token:
     expireMinute: 1440
     refreshMinute: 60
-    secret: 9xzR4+K7XpvbCpoIMocXVxS655xxb9S0Qxd5RDU4b7PeSIhYfYdjg9aOMrhjPjwN
-
+    
 sys:
   ver: 3.2.0

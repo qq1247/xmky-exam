@@ -87,7 +87,7 @@ public class ApiParmController extends BaseController {
 			entity.setEmailEncode(encode);
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
-			parmService.update(entity);
+			parmService.updateAndUpdate(entity);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加参数错误：{}", e.getMessage());
@@ -101,7 +101,7 @@ public class ApiParmController extends BaseController {
 	/**
 	 * 系统参数上传附件目录
 	 * 
-	 * v1.0 wjj 2021年11月8日下午1:25:33
+	 * v1.0 chenyun 2021-11-12 10:34:15
 	 * 
 	 * @param uploadDir
 	 * @return PageResult
@@ -110,9 +110,7 @@ public class ApiParmController extends BaseController {
 	@ResponseBody
 	public PageResult file(String uploadDir) {
 		try {
-			Parm parm = parmService.get();
-			parm.setFileUploadDir(uploadDir);
-			parmService.updateAndUpdate(parm);
+			parmService.file(uploadDir);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("上传附件目录错误：{}", e.getMessage());
@@ -125,20 +123,17 @@ public class ApiParmController extends BaseController {
 
 	/**
 	 * 系统参数数据库备份目录
-	 * “剪切之前的文件到新位置 对象要克隆” 暂时未实现
 	 * 
-	 * v1.0 wjj 2021年11月8日下午1:35:33
+	 * v1.0 chenyun 2021-11-12 10:34:15
 	 * 
-	 * @param dbBakDir
+	 * @param bakDir
 	 * @return PageResult
 	 */
 	@RequestMapping("/db")
 	@ResponseBody
-	public PageResult db(String dbBakDir) {
+	public PageResult db(String bakDir) {
 		try {
-			Parm parm = parmService.get();
-			parm.setDbBakDir(dbBakDir);
-			parmService.updateAndUpdate(parm);
+			parmService.db(bakDir);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("数据库备份目录错误：{}", e.getMessage());
@@ -150,13 +145,33 @@ public class ApiParmController extends BaseController {
 	}
 	
 	/**
-	 * 系统参数数据库备份目录
-	 * “剪切之前的文件到新位置 对象要克隆” 暂时未实现
+	 * 系统参数密码初始化
 	 * 
-	 * v1.0 wjj 2021年11月8日下午1:35:33
+	 * v1.0 chenyun 2021-11-12 10:08:32
 	 * 
-	 * @param oldDir
-	 * @param newDir
+	 * @param type
+	 * @param value
+	 * @return PageResult
+	 */
+	@RequestMapping("/pwd")
+	@ResponseBody
+	public PageResult pwd(Integer type, String value) {
+		try {
+			parmService.pwd(type, value);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("设置参数密码初始化错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("设置参数密码初始化错误：", e);
+			return PageResult.err();
+		}
+	}
+		
+	/**
+	 *  获取参数
+	 * 
+	 * v1.0 chenyun 2021年11月12日下午3:38:42
 	 * @return PageResult
 	 */
 	@RequestMapping("/get")
@@ -174,12 +189,13 @@ public class ApiParmController extends BaseController {
 					.addAttr("orgName", parm.getOrgName())
 					.addAttr("fileUploadDir", parm.getFileUploadDir())
 					.addAttr("dbBakDir", parm.getDbBakDir())
-					;
+					.addAttr("pwdType", parm.getPwdType())
+					.addAttr("pwdValue", parm.getPwdValue());
 		} catch (MyException e) {
-			log.error("数据库备份目录错误：{}", e.getMessage());
+			log.error("获取参数错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("数据库备份目录错误：", e);
+			log.error("获取参数错误：", e);
 			return PageResult.err();
 		}
 	}

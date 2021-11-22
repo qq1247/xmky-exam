@@ -287,6 +287,21 @@ public class StringUtil {
 	 * @return String
 	 */
 	public static String getRandomStr(int length) {
+		String value = getRandom(length);
+		
+		return value.replaceAll("0", "2").replaceAll("o", "3").replaceAll("O", "4")
+				.replaceAll("1", "5").replaceAll("l", "6").replaceAll("L", "7");
+	}
+	
+	/**
+	 * 获取随机字符串（大小写字母+数字）
+	 * 
+	 * v1.0 zhanghc 2017年7月13日下午5:59:34
+	 * 
+	 * @param length
+	 * @return String
+	 */
+	public static String getRandom(int length) {
 		StringBuilder value = new StringBuilder();
 		for (int i = 0; i < length; i++) {
 			boolean isNum = random.nextInt(2) % 2 == 0;
@@ -304,8 +319,7 @@ public class StringUtil {
 			value.append((char) (random.nextInt(26) + 97));
 		}
 
-		return value.toString().replaceAll("0", "2").replaceAll("o", "3").replaceAll("O", "4")
-				.replaceAll("1", "5").replaceAll("l", "6").replaceAll("L", "7");
+		return value.toString();
 	}
 	
 	/**

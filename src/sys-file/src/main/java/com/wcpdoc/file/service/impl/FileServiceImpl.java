@@ -12,7 +12,6 @@ import javax.annotation.Resource;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +25,7 @@ import com.wcpdoc.file.cache.FileIdCache;
 import com.wcpdoc.file.dao.FileDao;
 import com.wcpdoc.file.entity.File;
 import com.wcpdoc.file.entity.FileEx;
+import com.wcpdoc.file.service.FileExService;
 import com.wcpdoc.file.service.FileService;
 
 /**
@@ -37,8 +37,8 @@ import com.wcpdoc.file.service.FileService;
 public class FileServiceImpl extends BaseServiceImp<File> implements FileService {
 	@Resource
 	private FileDao fileDao;
-	@Value("${file.upload.dir}")
-	private String FILE_UPLOAD_DIR;
+	@Resource
+	private FileExService fileExService;
 
 	@Override
 	@Resource(name = "fileDaoImpl")
@@ -192,9 +192,9 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 	
 	@Override
 	public String getFileUploadDir() {
-		java.io.File dbBakDir = new java.io.File(FILE_UPLOAD_DIR);
+		java.io.File dbBakDir = new java.io.File(fileExService.getFileUploadDir());
 		if (!dbBakDir.isAbsolute()) {
-			dbBakDir = new java.io.File(String.format("%s/%s", System.getProperty("user.dir"), FILE_UPLOAD_DIR));// 如果是相对路径，备份路径为当前war包启动路径+配置文件子目录
+			dbBakDir = new java.io.File(String.format("%s/%s", System.getProperty("user.dir"), fileExService.getFileUploadDir()));// 如果是相对路径，备份路径为当前war包启动路径+配置文件子目录
 		}
 		return dbBakDir.getAbsolutePath();
 	}

@@ -22,6 +22,7 @@ import org.springframework.core.env.Environment;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.SpringUtil;
+import com.wcpdoc.quartz.service.CronExService;
 
 /**
  * 数据库自动备份
@@ -30,7 +31,7 @@ import com.wcpdoc.core.util.SpringUtil;
  */
 public class DbBackJob implements Job {
 	private static final Logger log = LoggerFactory.getLogger(DbBackJob.class);
-	private static final String DB_BAK_DIR = SpringUtil.getBean(Environment.class).getProperty("db.bak.dir");
+	private static final String DB_BAK_DIR = SpringUtil.getBean(CronExService.class).getDbBakDir();//SpringUtil.getBean(Environment.class).getProperty("db.bak.dir");
 	private static final String DB_URL = SpringUtil.getBean(Environment.class).getProperty("spring.datasource.url");
 	private static final String DB_USERNAME = SpringUtil.getBean(Environment.class).getProperty("spring.datasource.username");
 	private static final String DB_PASSWORD = SpringUtil.getBean(Environment.class).getProperty("spring.datasource.password");
