@@ -1,9 +1,3 @@
-/*==============================================================*/
-/* DBMS name:      MySQL 5.0                                    */
-/* Created on:     2021/11/11 11:25:00                          */
-/*==============================================================*/
-
-
 drop table if exists EXM_BULLETIN;
 
 drop table if exists EXM_EXAM;
@@ -53,13 +47,14 @@ drop table if exists SYS_SENSITIVE;
 drop table if exists SYS_USER;
 
 drop table if exists SYS_VER;
-
 /*==============================================================*/
 /* Table: EXM_BULLETIN                                          */
 /*==============================================================*/
 create table EXM_BULLETIN
 (
    ID                   int not null auto_increment comment '主键',
+   START_TIME           datetime comment '开始时间',
+   END_TIME             datetime comment '结束时间',
    TITLE                varchar(32) comment '标题',
    IMG_FILE_ID          varchar(256) comment '图片',
    VIDEO_FILE_ID        varchar(256) comment '视频',
@@ -114,7 +109,7 @@ create table EXM_EXAM_TYPE
 (
    ID                   int not null auto_increment comment '主键',
    NAME                 varchar(32) comment '名称',
-   IMG_ID               int comment '附件ID',
+   IMG_FILE_ID          int comment '图片ID',
    CREATE_USER_ID       int comment '创建人',
    CREATE_TIME          datetime comment '创建时间',
    UPDATE_USER_ID       int comment '修改人',
@@ -277,7 +272,7 @@ create table EXM_PAPER_TYPE
 (
    ID                   int not null auto_increment comment 'id',
    NAME                 varchar(32) comment '名称',
-   IMG_ID               int comment '附件ID',
+   IMG_FILE_ID          int comment '图片ID',
    CREATE_USER_ID       int comment '创建人',
    CREATE_TIME          datetime comment '创建时间',
    UPDATE_USER_ID       int comment '修改人',
@@ -370,7 +365,7 @@ create table EXM_QUESTION_TYPE
 (
    ID                   int not null auto_increment comment 'id',
    NAME                 varchar(32) comment '名称',
-   IMG_ID               int comment '附件ID',
+   IMG_FILE_ID          int comment '图片ID',
    CREATE_USER_ID       int comment '创建人',
    CREATE_TIME          datetime comment '创建时间',
    UPDATE_USER_ID       int comment '修改人',
@@ -556,9 +551,9 @@ alter table SYS_VER comment '版本';
 /* 数据								*/
 /*==============================================================*/
 
-INSERT INTO `SYS_ORG` VALUES ('1', '组织机构', 'code', '0', '_1_', '1', '1', '2017-08-01 22:31:43', '1', '1');
+INSERT INTO `SYS_ORG` VALUES (1, '组织机构', 'code', '0', '_1_', '1', '1', '2017-08-01 22:31:43', '1', '1');
 
-INSERT INTO `SYS_USER` VALUES ('1', '管理员', 'admin', null, null,'79nRuL+wDo42R5kPfXTR2A==', '2017-08-01 22:31:43', '2017-08-01 22:31:43', null, 'admin', '1', '1', '2017-08-01 22:31:43', '1');
+INSERT INTO `SYS_USER` VALUES (1, '管理员', 'admin', null, null,'79nRuL+wDo42R5kPfXTR2A==', '2017-08-01 22:31:43', '2017-08-01 22:31:43', null, 'admin', '1', '1', '1', '2017-08-01 22:31:43');
 
 INSERT INTO `SYS_DICT` VALUES (1, 'STATE', '0', '删除', 1);
 INSERT INTO `SYS_DICT` VALUES (2, 'STATE', '1', '启用', 2);
@@ -621,3 +616,5 @@ INSERT INTO `SYS_VER` VALUES (11, '3.2.0', '2020-10-31 16:43:00', 'zhanghc', '')
 INSERT INTO `EXM_EXAM_TYPE` VALUES ('1', '考试分类', NULL, '1', '2021-11-11 09:20:44', '1', '2021-11-11 09:20:40', '1');
 INSERT INTO `EXM_PAPER_TYPE` VALUES ('1', '试卷分类', NULL, '1', '2021-11-11 09:21:07', '1', '2021-11-11 09:21:11', '1', '1');
 INSERT INTO `EXM_QUESTION_TYPE` VALUES ('1', '试题分类', NULL, '1', '2021-11-11 09:21:51', '1', '2021-11-11 09:21:55', '1', NULL);
+
+INSERT INTO `SYS_PARM` VALUES (1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 2, '111111');
