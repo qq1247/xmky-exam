@@ -59,71 +59,71 @@ drop table if exists SYS_VER;
 /*==============================================================*/
 create table EXM_BULLETIN
 (
-   ID                   int not null auto_increment comment 'Ö÷¼ü',
-   TITLE                varchar(32) comment '±êÌâ',
-   IMG_FILE_ID          varchar(256) comment 'Í¼Æ¬',
-   VIDEO_FILE_ID        varchar(256) comment 'ÊÓÆµ',
-   CONTENT              text comment 'ÄÚÈİ',
-   IMGS_HEIGHT          int comment 'Í¼Æ¬¸ß',
-   IMGS_WIDTH           int comment 'Í¼Æ¬¿í',
-   URL                  varchar(128) comment 'Ìø×ªÁ´½Ó',
-   SHOW_TYPE            int comment 'Õ¹Ê¾ÀàĞÍ£¨1£ºÕı³££»2£ºÖÃ¶¥£»3£ºÂÖ²¥£»£©',
-   NO                   int comment 'ÅÅĞò',
-   STATE                int comment '0£ºÉ¾³ı£»1£º·¢²¼£»2£º²İ¸å',
-   UPDATE_TIME          datetime comment 'ĞŞ¸ÄÊ±¼ä',
-   UPDATE_USER_ID       int comment 'ĞŞ¸ÄÈË',
-   READ_USER_IDS        varchar(256) comment 'ÓÃ»§¶ÁÈ¨ÏŞ',
-   READ_ORG_IDS         varchar(64) comment '»ú¹¹¶ÁÈ¨ÏŞ',
+   ID                   int not null auto_increment comment 'ä¸»é”®',
+   TITLE                varchar(32) comment 'æ ‡é¢˜',
+   IMG_FILE_ID          varchar(256) comment 'å›¾ç‰‡',
+   VIDEO_FILE_ID        varchar(256) comment 'è§†é¢‘',
+   CONTENT              text comment 'å†…å®¹',
+   IMGS_HEIGHT          int comment 'å›¾ç‰‡é«˜',
+   IMGS_WIDTH           int comment 'å›¾ç‰‡å®½',
+   URL                  varchar(128) comment 'è·³è½¬é“¾æ¥',
+   SHOW_TYPE            int comment 'å±•ç¤ºç±»å‹ï¼ˆ1ï¼šæ­£å¸¸ï¼›2ï¼šç½®é¡¶ï¼›3ï¼šè½®æ’­ï¼›ï¼‰',
+   NO                   int comment 'æ’åº',
+   STATE                int comment '0ï¼šåˆ é™¤ï¼›1ï¼šå‘å¸ƒï¼›2ï¼šè‰ç¨¿',
+   UPDATE_TIME          datetime comment 'ä¿®æ”¹æ—¶é—´',
+   UPDATE_USER_ID       int comment 'ä¿®æ”¹äºº',
+   READ_USER_IDS        varchar(256) comment 'ç”¨æˆ·è¯»æƒé™',
+   READ_ORG_IDS         varchar(64) comment 'æœºæ„è¯»æƒé™',
    primary key (ID)
 );
 
-alter table EXM_BULLETIN comment '¹«¸æ';
+alter table EXM_BULLETIN comment 'å…¬å‘Š';
 
 /*==============================================================*/
 /* Table: EXM_EXAM                                              */
 /*==============================================================*/
 create table EXM_EXAM
 (
-   ID                   int not null auto_increment comment 'Ö÷¼ü',
-   NAME                 varchar(32) comment 'Ãû³Æ',
-   START_TIME           datetime comment '¿¼ÊÔ¿ªÊ¼',
-   END_TIME             datetime comment '¿¼ÊÔ½áÊø',
-   MARK_START_TIME      datetime comment 'ÔÄ¾í¿ªÊ¼',
-   MARK_END_TIME        datetime comment 'ÔÄ¾í½áÊø',
-   MARK_STATE           datetime comment 'ÔÄ¾í×´Ì¬£¨1£ºÎ´ÔÄ¾í£»2£ºÔÄ¾íÖĞ£»3£ºÒÑÔÄ¾í£»£©',
-   SCORE_STATE          int comment '³É¼¨×´Ì¬£¨1£º¹«¿ª£»2£º²»¹«¿ª£©',
-   RANK_STATE           int comment 'ÅÅÃû×´Ì¬£¨1£º¹«¿ª£»2£º²»¹«¿ª£©',
-   LOGIN_TYPE           int comment 'µÇÂ½·½Ê½£¨1£º°²ÅÅ¿¼ÊÔ£»2£ºÃâµÇÂ½¿¼ÊÔ£©',
-   DESCRIPTION          varchar(512) comment 'ÃèÊö',
-   CREATE_USER_ID       int comment '´´½¨ÈË',
-   CREATE_TIME          datetime comment '´´½¨Ê±¼ä',
-   UPDATE_USER_ID       int comment 'ĞŞ¸ÄÈË',
-   UPDATE_TIME          datetime comment 'ĞŞ¸ÄÊ±¼ä',
-   STATE                int comment '×´Ì¬£¨0£ºÉ¾³ı£»1£º·¢²¼£»2£º²İ¸å£»3£º¹éµµ£©',
-   PAPER_ID             int comment 'ÊÔ¾íID',
-   EXAM_TYPE_ID         int comment '¿¼ÊÔ·ÖÀàID',
+   ID                   int not null auto_increment comment 'ä¸»é”®',
+   NAME                 varchar(32) comment 'åç§°',
+   START_TIME           datetime comment 'è€ƒè¯•å¼€å§‹',
+   END_TIME             datetime comment 'è€ƒè¯•ç»“æŸ',
+   MARK_START_TIME      datetime comment 'é˜…å·å¼€å§‹',
+   MARK_END_TIME        datetime comment 'é˜…å·ç»“æŸ',
+   MARK_STATE           datetime comment 'é˜…å·çŠ¶æ€ï¼ˆ1ï¼šæœªé˜…å·ï¼›2ï¼šé˜…å·ä¸­ï¼›3ï¼šå·²é˜…å·ï¼›ï¼‰',
+   SCORE_STATE          int comment 'æˆç»©çŠ¶æ€ï¼ˆ1ï¼šå…¬å¼€ï¼›2ï¼šä¸å…¬å¼€ï¼‰',
+   RANK_STATE           int comment 'æ’åçŠ¶æ€ï¼ˆ1ï¼šå…¬å¼€ï¼›2ï¼šä¸å…¬å¼€ï¼‰',
+   LOGIN_TYPE           int comment 'ç™»é™†æ–¹å¼ï¼ˆ1ï¼šå®‰æ’è€ƒè¯•ï¼›2ï¼šå…ç™»é™†è€ƒè¯•ï¼‰',
+   DESCRIPTION          varchar(512) comment 'æè¿°',
+   CREATE_USER_ID       int comment 'åˆ›å»ºäºº',
+   CREATE_TIME          datetime comment 'åˆ›å»ºæ—¶é—´',
+   UPDATE_USER_ID       int comment 'ä¿®æ”¹äºº',
+   UPDATE_TIME          datetime comment 'ä¿®æ”¹æ—¶é—´',
+   STATE                int comment 'çŠ¶æ€ï¼ˆ0ï¼šåˆ é™¤ï¼›1ï¼šå‘å¸ƒï¼›2ï¼šè‰ç¨¿ï¼›3ï¼šå½’æ¡£ï¼‰',
+   PAPER_ID             int comment 'è¯•å·ID',
+   EXAM_TYPE_ID         int comment 'è€ƒè¯•åˆ†ç±»ID',
    primary key (ID)
 );
 
-alter table EXM_EXAM comment '¿¼ÊÔ';
+alter table EXM_EXAM comment 'è€ƒè¯•';
 
 /*==============================================================*/
 /* Table: EXM_EXAM_TYPE                                         */
 /*==============================================================*/
 create table EXM_EXAM_TYPE
 (
-   ID                   int not null auto_increment comment 'Ö÷¼ü',
-   NAME                 varchar(32) comment 'Ãû³Æ',
-   IMG_ID               int comment '¸½¼şID',
-   CREATE_USER_ID       int comment '´´½¨ÈË',
-   CREATE_TIME          datetime comment '´´½¨Ê±¼ä',
-   UPDATE_USER_ID       int comment 'ĞŞ¸ÄÈË',
-   UPDATE_TIME          datetime comment 'ĞŞ¸ÄÊ±¼ä',
-   STATE                int comment '0£ºÉ¾³ı£»1£ºÕı³£',
+   ID                   int not null auto_increment comment 'ä¸»é”®',
+   NAME                 varchar(32) comment 'åç§°',
+   IMG_ID               int comment 'é™„ä»¶ID',
+   CREATE_USER_ID       int comment 'åˆ›å»ºäºº',
+   CREATE_TIME          datetime comment 'åˆ›å»ºæ—¶é—´',
+   UPDATE_USER_ID       int comment 'ä¿®æ”¹äºº',
+   UPDATE_TIME          datetime comment 'ä¿®æ”¹æ—¶é—´',
+   STATE                int comment '0ï¼šåˆ é™¤ï¼›1ï¼šæ­£å¸¸',
    primary key (ID)
 );
 
-alter table EXM_EXAM_TYPE comment '¿¼ÊÔ·ÖÀà';
+alter table EXM_EXAM_TYPE comment 'è€ƒè¯•åˆ†ç±»';
 
 /*==============================================================*/
 /* Table: EXM_MY_EXAM                                           */
@@ -131,23 +131,23 @@ alter table EXM_EXAM_TYPE comment '¿¼ÊÔ·ÖÀà';
 create table EXM_MY_EXAM
 (
    ID                   int not null auto_increment comment 'id',
-   EXAM_ID              int comment '¿¼ÊÔID',
-   USER_ID              int comment 'ÓÃ»§ID',
-   ANSWER_START_TIME    datetime comment '´ğÌâÊ±¼ä',
-   ANSWER_END_TIME      datetime comment '´ğÌâÍê³ÉÊ±¼ä',
-   MARK_USER_ID         int comment 'ÔÄ¾íÓÃ»§',
-   MARK_START_TIME      datetime comment 'ÔÄ¾íÊ±¼ä',
-   MARK_END_TIME        datetime comment 'ÔÄ¾íÍê³ÉÊ±¼ä',
-   TOTAL_SCORE          decimal(5,2) comment '×Ü·ÖÊı',
-   STATE                int comment '1£ºÎ´¿¼ÊÔ£»2£º¿¼ÊÔÖĞ£»3£ºÒÑ½»¾í£»4£ºÇ¿ÖÆ½»¾í£»',
-   MARK_STATE           int comment '1£ºÎ´ÔÄ¾í£»2£ºÔÄ¾íÖĞ£»3£ºÒÑÔÄ¾í£»',
-   ANSWER_STATE         int comment '1£º¼°¸ñ£»2£º²»¼°¸ñ',
-   UPDATE_USER_ID       int comment 'ĞŞ¸ÄÈË',
-   UPDATE_TIME          datetime comment 'ĞŞ¸ÄÊ±¼ä',
+   EXAM_ID              int comment 'è€ƒè¯•ID',
+   USER_ID              int comment 'ç”¨æˆ·ID',
+   ANSWER_START_TIME    datetime comment 'ç­”é¢˜æ—¶é—´',
+   ANSWER_END_TIME      datetime comment 'ç­”é¢˜å®Œæˆæ—¶é—´',
+   MARK_USER_ID         int comment 'é˜…å·ç”¨æˆ·',
+   MARK_START_TIME      datetime comment 'é˜…å·æ—¶é—´',
+   MARK_END_TIME        datetime comment 'é˜…å·å®Œæˆæ—¶é—´',
+   TOTAL_SCORE          decimal(5,2) comment 'æ€»åˆ†æ•°',
+   STATE                int comment '1ï¼šæœªè€ƒè¯•ï¼›2ï¼šè€ƒè¯•ä¸­ï¼›3ï¼šå·²äº¤å·ï¼›4ï¼šå¼ºåˆ¶äº¤å·ï¼›',
+   MARK_STATE           int comment '1ï¼šæœªé˜…å·ï¼›2ï¼šé˜…å·ä¸­ï¼›3ï¼šå·²é˜…å·ï¼›',
+   ANSWER_STATE         int comment '1ï¼šåŠæ ¼ï¼›2ï¼šä¸åŠæ ¼',
+   UPDATE_USER_ID       int comment 'ä¿®æ”¹äºº',
+   UPDATE_TIME          datetime comment 'ä¿®æ”¹æ—¶é—´',
    primary key (ID)
 );
 
-alter table EXM_MY_EXAM comment 'ÎÒµÄ¿¼ÊÔ';
+alter table EXM_MY_EXAM comment 'æˆ‘çš„è€ƒè¯•';
 
 /*==============================================================*/
 /* Table: EXM_MY_EXAM_DETAIL                                    */
@@ -155,21 +155,21 @@ alter table EXM_MY_EXAM comment 'ÎÒµÄ¿¼ÊÔ';
 create table EXM_MY_EXAM_DETAIL
 (
    ID                   int not null auto_increment comment 'id',
-   MY_EXAM_ID           int comment '¿¼ÊÔÓÃ»§ID',
-   EXAM_ID              int comment '¿¼ÊÔID',
-   USER_ID              int comment 'ÓÃ»§ID',
-   QUESTION_ID          int comment 'ÊÔÌâID',
-   ANSWER_TIME          datetime comment '´ğÌâÊ±¼ä',
-   MARK_USER_ID         int comment 'ÔÄ¾íÓÃ»§ID',
-   MARK_TIME            datetime comment 'ÔÄ¾íÊ±¼ä',
-   ANSWER               text comment '´ğ°¸',
-   SCORE                decimal(5,2) comment 'µÃ·Ö',
-   QUESTION_SCORE       decimal(5,2) comment 'ÊÔÌâ·ÖÖµ',
-   ANSWER_FILE_ID       int comment '´ğ°¸¸½¼şID',
+   MY_EXAM_ID           int comment 'è€ƒè¯•ç”¨æˆ·ID',
+   EXAM_ID              int comment 'è€ƒè¯•ID',
+   USER_ID              int comment 'ç”¨æˆ·ID',
+   QUESTION_ID          int comment 'è¯•é¢˜ID',
+   ANSWER_TIME          datetime comment 'ç­”é¢˜æ—¶é—´',
+   MARK_USER_ID         int comment 'é˜…å·ç”¨æˆ·ID',
+   MARK_TIME            datetime comment 'é˜…å·æ—¶é—´',
+   ANSWER               text comment 'ç­”æ¡ˆ',
+   SCORE                decimal(5,2) comment 'å¾—åˆ†',
+   QUESTION_SCORE       decimal(5,2) comment 'è¯•é¢˜åˆ†å€¼',
+   ANSWER_FILE_ID       int comment 'ç­”æ¡ˆé™„ä»¶ID',
    primary key (ID)
 );
 
-alter table EXM_MY_EXAM_DETAIL comment 'ÎÒµÄ¿¼ÊÔÏêÏ¸';
+alter table EXM_MY_EXAM_DETAIL comment 'æˆ‘çš„è€ƒè¯•è¯¦ç»†';
 
 /*==============================================================*/
 /* Table: EXM_MY_MARK                                           */
@@ -177,43 +177,43 @@ alter table EXM_MY_EXAM_DETAIL comment 'ÎÒµÄ¿¼ÊÔÏêÏ¸';
 create table EXM_MY_MARK
 (
    ID                   int not null auto_increment comment 'id',
-   MARK_USER_ID         int comment 'ÔÄ¾íÓÃ»§ID',
-   EXAM_USER_IDS        varchar(1024) comment '¿¼ÊÔÓÃ»§IDS',
-   QUESTION_IDS         varchar(1024) comment 'ÊÔÌâIDS',
-   UPDATE_USER_ID       int comment 'ĞŞ¸ÄÈË',
-   UPDATE_TIME          datetime comment 'ĞŞ¸ÄÊ±¼ä',
-   EXAM_ID              int comment '¿¼ÊÔID',
+   MARK_USER_ID         int comment 'é˜…å·ç”¨æˆ·ID',
+   EXAM_USER_IDS        varchar(1024) comment 'è€ƒè¯•ç”¨æˆ·IDS',
+   QUESTION_IDS         varchar(1024) comment 'è¯•é¢˜IDS',
+   UPDATE_USER_ID       int comment 'ä¿®æ”¹äºº',
+   UPDATE_TIME          datetime comment 'ä¿®æ”¹æ—¶é—´',
+   EXAM_ID              int comment 'è€ƒè¯•ID',
    primary key (ID)
 );
 
-alter table EXM_MY_MARK comment 'ÎÒµÄÔÄ¾í';
+alter table EXM_MY_MARK comment 'æˆ‘çš„é˜…å·';
 
 /*==============================================================*/
 /* Table: EXM_PAPER                                             */
 /*==============================================================*/
 create table EXM_PAPER
 (
-   ID                   int not null auto_increment comment 'Ö÷¼ü',
-   NAME                 varchar(32) comment 'Ãû³Æ',
-   PASS_SCORE           decimal(5,2) comment '¼°¸ñ·ÖÊı£¨%£©',
-   TOTAL_SCORE          decimal(5,2) comment '×Ü·ÖÊı',
-   MARK_TYPE            int comment 'ÔÄ¾í·½Ê½£¨1£ºÖÇÄÜÔÄ¾í£»2£ºÈË¹¤ÔÄ¾í£»£©Êı¾İ×Öµä£ºPAPER_MARK_TYPE',
-   SHOW_TYPE            int comment 'Õ¹Ê¾·½Ê½£¨1£ºÕû¾íÕ¹Ê¾£»2£ºÕÂ½ÚÏÔÊ¾£»3£ºµ¥ÌâÕ¹Ê¾£»£©Êı¾İ×Öµä£ºPAPER_SHOW_TYPE',
-   READ_REMARK          text comment '¿¼Ç°ÔÄ¶Á',
-   READ_NUM             int comment 'ÔÄ¶ÁÊ±³¤£¨·Ö£©',
-   STATE                int comment '0£ºÉ¾³ı£»1£º·¢²¼£»2£º²İ¸å£»3£º¹éµµ',
-   PAPER_TYPE_ID        int not null comment 'ÊÔ¾í·ÖÀàID',
-   GEN_TYPE             int comment '×é¾í·½Ê½£¨1£ºÈË¹¤×é¾í£»2£ºËæ»ú×é¾í£©',
-   OPTIONS              varchar(32) comment '1£ºÊÔÌâÂÒĞò£»2£ºÑ¡ÏîÂÒĞò£»3£º½ûÓÃÓÒ¼ü£»4£º½ûÖ¹¸´ÖÆ£»5£º×îĞ¡»¯¾¯¸æ',
-   MINIMIZE_NUM         int comment '×îĞ¡»¯¾¯¸æ´ÎÊı£¨OPTIONS=5ÓĞĞ§£©',
-   CREATE_USER_ID       int comment '´´½¨ÈË',
-   CREATE_TIME          datetime comment '´´½¨Ê±¼ä',
-   UPDATE_USER_ID       int comment 'ĞŞ¸ÄÈË',
-   UPDATE_TIME          datetime comment 'ĞŞ¸ÄÊ±¼ä',
+   ID                   int not null auto_increment comment 'ä¸»é”®',
+   NAME                 varchar(32) comment 'åç§°',
+   PASS_SCORE           decimal(5,2) comment 'åŠæ ¼åˆ†æ•°ï¼ˆ%ï¼‰',
+   TOTAL_SCORE          decimal(5,2) comment 'æ€»åˆ†æ•°',
+   MARK_TYPE            int comment 'é˜…å·æ–¹å¼ï¼ˆ1ï¼šæ™ºèƒ½é˜…å·ï¼›2ï¼šäººå·¥é˜…å·ï¼›ï¼‰æ•°æ®å­—å…¸ï¼šPAPER_MARK_TYPE',
+   SHOW_TYPE            int comment 'å±•ç¤ºæ–¹å¼ï¼ˆ1ï¼šæ•´å·å±•ç¤ºï¼›2ï¼šç« èŠ‚æ˜¾ç¤ºï¼›3ï¼šå•é¢˜å±•ç¤ºï¼›ï¼‰æ•°æ®å­—å…¸ï¼šPAPER_SHOW_TYPE',
+   READ_REMARK          text comment 'è€ƒå‰é˜…è¯»',
+   READ_NUM             int comment 'é˜…è¯»æ—¶é•¿ï¼ˆåˆ†ï¼‰',
+   STATE                int comment '0ï¼šåˆ é™¤ï¼›1ï¼šå‘å¸ƒï¼›2ï¼šè‰ç¨¿ï¼›3ï¼šå½’æ¡£',
+   PAPER_TYPE_ID        int not null comment 'è¯•å·åˆ†ç±»ID',
+   GEN_TYPE             int comment 'ç»„å·æ–¹å¼ï¼ˆ1ï¼šäººå·¥ç»„å·ï¼›2ï¼šéšæœºç»„å·ï¼‰',
+   OPTIONS              varchar(32) comment '1ï¼šè¯•é¢˜ä¹±åºï¼›2ï¼šé€‰é¡¹ä¹±åºï¼›3ï¼šç¦ç”¨å³é”®ï¼›4ï¼šç¦æ­¢å¤åˆ¶ï¼›5ï¼šæœ€å°åŒ–è­¦å‘Š',
+   MINIMIZE_NUM         int comment 'æœ€å°åŒ–è­¦å‘Šæ¬¡æ•°ï¼ˆOPTIONS=5æœ‰æ•ˆï¼‰',
+   CREATE_USER_ID       int comment 'åˆ›å»ºäºº',
+   CREATE_TIME          datetime comment 'åˆ›å»ºæ—¶é—´',
+   UPDATE_USER_ID       int comment 'ä¿®æ”¹äºº',
+   UPDATE_TIME          datetime comment 'ä¿®æ”¹æ—¶é—´',
    primary key (ID)
 );
 
-alter table EXM_PAPER comment 'ÊÔ¾í';
+alter table EXM_PAPER comment 'è¯•å·';
 
 /*==============================================================*/
 /* Table: EXM_PAPER_QUESTION                                    */
@@ -221,22 +221,22 @@ alter table EXM_PAPER comment 'ÊÔ¾í';
 create table EXM_PAPER_QUESTION
 (
    ID                   int not null auto_increment comment 'id',
-   NAME                 varchar(32) comment 'ÕÂ½ÚÃû³Æ',
-   DESCRIPTION          varchar(512) comment 'ÕÂ½ÚÃèÊö',
-   PARENT_ID            int comment '¸¸ID',
-   PARENT_SUB           varchar(512) comment '¸¸×Ó¹ØÏµ£¨¸ñÊ½£º_¸¸ID_×ÓID_×Ó×ÓID_... ...£©',
-   UPDATE_USER_ID       int comment 'ĞŞ¸ÄÈË',
-   UPDATE_TIME          datetime comment 'ĞŞ¸ÄÊ±¼ä',
-   PAPER_ID             int comment 'ÊÔ¾íID',
-   QUESTION_ID          int comment 'ÊÔÌâID',
-   TYPE                 int comment '1£ºÕÂ½Ú£»2£º¹Ì¶¨ÊÔÌâ£»3£ºËæ»úÊÔÌâ',
-   SCORE                decimal(5,2) comment '·ÖÊı',
-   SCORE_OPTIONS        varchar(8) comment '1£ºÂ©Ñ¡µÃ·Ö£»2£º´ğ°¸ÎŞË³Ğò£»3£º´óĞ¡Ğ´²»Ãô¸Ğ£»',
-   NO                   int comment 'ÅÅĞò',
+   NAME                 varchar(32) comment 'ç« èŠ‚åç§°',
+   DESCRIPTION          varchar(512) comment 'ç« èŠ‚æè¿°',
+   PARENT_ID            int comment 'çˆ¶ID',
+   PARENT_SUB           varchar(512) comment 'çˆ¶å­å…³ç³»ï¼ˆæ ¼å¼ï¼š_çˆ¶ID_å­ID_å­å­ID_... ...ï¼‰',
+   UPDATE_USER_ID       int comment 'ä¿®æ”¹äºº',
+   UPDATE_TIME          datetime comment 'ä¿®æ”¹æ—¶é—´',
+   PAPER_ID             int comment 'è¯•å·ID',
+   QUESTION_ID          int comment 'è¯•é¢˜ID',
+   TYPE                 int comment '1ï¼šç« èŠ‚ï¼›2ï¼šå›ºå®šè¯•é¢˜ï¼›3ï¼šéšæœºè¯•é¢˜',
+   SCORE                decimal(5,2) comment 'åˆ†æ•°',
+   SCORE_OPTIONS        varchar(8) comment '1ï¼šæ¼é€‰å¾—åˆ†ï¼›2ï¼šç­”æ¡ˆæ— é¡ºåºï¼›3ï¼šå¤§å°å†™ä¸æ•æ„Ÿï¼›',
+   NO                   int comment 'æ’åº',
    primary key (ID)
 );
 
-alter table EXM_PAPER_QUESTION comment 'ÊÔ¾íÊÔÌâ';
+alter table EXM_PAPER_QUESTION comment 'è¯•å·è¯•é¢˜';
 
 /*==============================================================*/
 /* Table: EXM_PAPER_QUESTION_ANSWER                             */
@@ -244,31 +244,31 @@ alter table EXM_PAPER_QUESTION comment 'ÊÔ¾íÊÔÌâ';
 create table EXM_PAPER_QUESTION_ANSWER
 (
    ID                   int not null auto_increment,
-   ANSWER               text comment 'Ò»¸ö´ğ°¸ÓĞ¶à¸öÍ¬Òå´ÊÓÃ\n·Ö¸ô',
-   SCORE                decimal(5,2) comment '·ÖÖµ',
-   NO                   int comment 'ÅÅĞò',
-   PAPER_ID             int comment 'ÊÔ¾íID',
-   QUESTION_ID          int not null comment 'ÊÔÌâID',
-   PAPER_QUESTION_ID    int comment 'ÊÔ¾íÊÔÌâID',
+   ANSWER               text comment 'ä¸€ä¸ªç­”æ¡ˆæœ‰å¤šä¸ªåŒä¹‰è¯ç”¨\nåˆ†éš”',
+   SCORE                decimal(5,2) comment 'åˆ†å€¼',
+   NO                   int comment 'æ’åº',
+   PAPER_ID             int comment 'è¯•å·ID',
+   QUESTION_ID          int not null comment 'è¯•é¢˜ID',
+   PAPER_QUESTION_ID    int comment 'è¯•å·è¯•é¢˜ID',
    primary key (ID)
 );
 
-alter table EXM_PAPER_QUESTION_ANSWER comment 'ÊÔ¾íÊÔÌâ´ğ°¸';
+alter table EXM_PAPER_QUESTION_ANSWER comment 'è¯•å·è¯•é¢˜ç­”æ¡ˆ';
 
 /*==============================================================*/
 /* Table: EXM_PAPER_REMARK                                      */
 /*==============================================================*/
 create table EXM_PAPER_REMARK
 (
-   ID                   int not null auto_increment comment 'Ö÷¼ü',
-   SCORE                decimal(5,2) comment '·ÖÊı£¨°Ù·Ö±È£©',
-   REMARK               varchar(32) comment 'ÆÀÓï',
-   NO                   int comment 'ÅÅĞò',
-   PAPER_ID             int not null comment 'ÊÔ¾íID',
+   ID                   int not null auto_increment comment 'ä¸»é”®',
+   SCORE                decimal(5,2) comment 'åˆ†æ•°ï¼ˆç™¾åˆ†æ¯”ï¼‰',
+   REMARK               varchar(32) comment 'è¯„è¯­',
+   NO                   int comment 'æ’åº',
+   PAPER_ID             int not null comment 'è¯•å·ID',
    primary key (ID)
 );
 
-alter table EXM_PAPER_REMARK comment 'ÊÔ¾íÆÀÓï';
+alter table EXM_PAPER_REMARK comment 'è¯•å·è¯„è¯­';
 
 /*==============================================================*/
 /* Table: EXM_PAPER_TYPE                                        */
@@ -276,18 +276,18 @@ alter table EXM_PAPER_REMARK comment 'ÊÔ¾íÆÀÓï';
 create table EXM_PAPER_TYPE
 (
    ID                   int not null auto_increment comment 'id',
-   NAME                 varchar(32) comment 'Ãû³Æ',
-   IMG_ID               int comment '¸½¼şID',
-   CREATE_USER_ID       int comment '´´½¨ÈË',
-   CREATE_TIME          datetime comment '´´½¨Ê±¼ä',
-   UPDATE_USER_ID       int comment 'ĞŞ¸ÄÈË',
-   UPDATE_TIME          datetime comment 'ĞŞ¸ÄÊ±¼ä',
-   STATE                int comment '0£ºÉ¾³ı£»1£ºÕı³£',
-   READ_USER_IDS        varchar(1024) comment '¶ÁÈ¨ÏŞ',
+   NAME                 varchar(32) comment 'åç§°',
+   IMG_ID               int comment 'é™„ä»¶ID',
+   CREATE_USER_ID       int comment 'åˆ›å»ºäºº',
+   CREATE_TIME          datetime comment 'åˆ›å»ºæ—¶é—´',
+   UPDATE_USER_ID       int comment 'ä¿®æ”¹äºº',
+   UPDATE_TIME          datetime comment 'ä¿®æ”¹æ—¶é—´',
+   STATE                int comment '0ï¼šåˆ é™¤ï¼›1ï¼šæ­£å¸¸',
+   READ_USER_IDS        varchar(1024) comment 'è¯»æƒé™',
    primary key (ID)
 );
 
-alter table EXM_PAPER_TYPE comment 'ÊÔ¾í·ÖÀà';
+alter table EXM_PAPER_TYPE comment 'è¯•å·åˆ†ç±»';
 
 /*==============================================================*/
 /* Table: EXM_QUESTION                                          */
@@ -295,23 +295,23 @@ alter table EXM_PAPER_TYPE comment 'ÊÔ¾í·ÖÀà';
 create table EXM_QUESTION
 (
    ID                   int not null auto_increment,
-   TYPE                 int comment '1£ºµ¥Ñ¡£»2£º¶àÑ¡£»3£ºÌî¿Õ£»4£ºÅĞ¶Ï£»5£ºÎÊ´ğ',
-   DIFFICULTY           int comment '1£º¼«Ò×£»2£º¼òµ¥£»3£ºÊÊÖĞ£»4£ºÀ§ÄÑ£»5£º¼«ÄÑ',
-   TITLE                text comment 'Ìâ¸É',
-   ANALYSIS             text comment '½âÎö',
-   STATE                int comment '×´Ì¬£¨0£ºÉ¾³ı£»1£º·¢²¼£»2£º²İ¸å£©',
-   CREATE_USER_ID       int comment '´´½¨ÈË',
-   CREATE_TIME          datetime comment '´´½¨Ê±¼ä',
-   UPDATE_USER_ID       int comment 'ĞŞ¸ÄÈË',
-   UPDATE_TIME          datetime comment 'ĞŞ¸ÄÊ±¼ä',
-   QUESTION_TYPE_ID     int comment 'ÊÔÌâ·ÖÀà',
-   SCORE                decimal(5,2) comment 'Ä¬ÈÏ·ÖÖµ',
-   AI                   int comment 'ÖÇÄÜÔÄ¾í£¨1£ºÊÇ£»2£º·ñ£»£©',
-   SCORE_OPTIONS        varchar(8) comment '·ÖÖµÑ¡Ïî£¨1£ºÂ©Ñ¡µÃ·Ö£»2£º´ğ°¸ÎŞË³Ğò£»3£º´óĞ¡Ğ´²»Ãô¸Ğ£»)',
+   TYPE                 int comment '1ï¼šå•é€‰ï¼›2ï¼šå¤šé€‰ï¼›3ï¼šå¡«ç©ºï¼›4ï¼šåˆ¤æ–­ï¼›5ï¼šé—®ç­”',
+   DIFFICULTY           int comment '1ï¼šææ˜“ï¼›2ï¼šç®€å•ï¼›3ï¼šé€‚ä¸­ï¼›4ï¼šå›°éš¾ï¼›5ï¼šæéš¾',
+   TITLE                text comment 'é¢˜å¹²',
+   ANALYSIS             text comment 'è§£æ',
+   STATE                int comment 'çŠ¶æ€ï¼ˆ0ï¼šåˆ é™¤ï¼›1ï¼šå‘å¸ƒï¼›2ï¼šè‰ç¨¿ï¼‰',
+   CREATE_USER_ID       int comment 'åˆ›å»ºäºº',
+   CREATE_TIME          datetime comment 'åˆ›å»ºæ—¶é—´',
+   UPDATE_USER_ID       int comment 'ä¿®æ”¹äºº',
+   UPDATE_TIME          datetime comment 'ä¿®æ”¹æ—¶é—´',
+   QUESTION_TYPE_ID     int comment 'è¯•é¢˜åˆ†ç±»',
+   SCORE                decimal(5,2) comment 'é»˜è®¤åˆ†å€¼',
+   AI                   int comment 'æ™ºèƒ½é˜…å·ï¼ˆ1ï¼šæ˜¯ï¼›2ï¼šå¦ï¼›ï¼‰',
+   SCORE_OPTIONS        varchar(8) comment 'åˆ†å€¼é€‰é¡¹ï¼ˆ1ï¼šæ¼é€‰å¾—åˆ†ï¼›2ï¼šç­”æ¡ˆæ— é¡ºåºï¼›3ï¼šå¤§å°å†™ä¸æ•æ„Ÿï¼›)',
    primary key (ID)
 );
 
-alter table EXM_QUESTION comment 'ÊÔÌâ';
+alter table EXM_QUESTION comment 'è¯•é¢˜';
 
 /*==============================================================*/
 /* Table: EXM_QUESTION_ANSWER                                   */
@@ -319,35 +319,35 @@ alter table EXM_QUESTION comment 'ÊÔÌâ';
 create table EXM_QUESTION_ANSWER
 (
    ID                   int not null auto_increment,
-   ANSWER               text comment 'Ò»¸ö´ğ°¸ÓĞ¶à¸öÍ¬Òå´ÊÓÃ\n·Ö¸ô',
-   SCORE                decimal(5,2) comment '·ÖÖµ',
-   NO                   int comment 'ÅÅĞò',
-   QUESTION_ID          int not null comment 'ÊÔÌâID',
+   ANSWER               text comment 'ä¸€ä¸ªç­”æ¡ˆæœ‰å¤šä¸ªåŒä¹‰è¯ç”¨\nåˆ†éš”',
+   SCORE                decimal(5,2) comment 'åˆ†å€¼',
+   NO                   int comment 'æ’åº',
+   QUESTION_ID          int not null comment 'è¯•é¢˜ID',
    primary key (ID)
 );
 
-alter table EXM_QUESTION_ANSWER comment 'ÊÔÌâ´ğ°¸';
+alter table EXM_QUESTION_ANSWER comment 'è¯•é¢˜ç­”æ¡ˆ';
 
 /*==============================================================*/
 /* Table: EXM_QUESTION_COMMENT                                  */
 /*==============================================================*/
 create table EXM_QUESTION_COMMENT
 (
-   ID                   int not null auto_increment comment 'Ö÷¼ü',
-   QUESTION_ID          int comment 'ÊÔÌâid',
-   CONTENT              text comment 'ÆÀÂÛÄÚÈİ',
-   PARENT_ID            int comment '¸¸ID',
-   PARENT_SUB           varchar(512) comment '¸¸×Ó¹ØÏµ£¨¸ñÊ½£º_¸¸ID_×ÓID_×Ó×ÓID_... ...£©',
-   LEVEL                int comment '¼¶±ğ',
-   STATE                int comment '×´Ì¬(0£ºÉ¾³ı£»1£ºÕı³£,)',
-   CREATE_USER_ID       int comment '´´½¨ÈË',
-   CREATE_TIME          datetime comment '´´½¨Ê±¼ä',
-   UPDATE_USER_ID       int comment 'ĞŞ¸ÄÈË',
-   UPDATE_TIME          datetime comment 'ĞŞ¸ÄÊ±¼ä',
+   ID                   int not null auto_increment comment 'ä¸»é”®',
+   QUESTION_ID          int comment 'è¯•é¢˜id',
+   CONTENT              text comment 'è¯„è®ºå†…å®¹',
+   PARENT_ID            int comment 'çˆ¶ID',
+   PARENT_SUB           varchar(512) comment 'çˆ¶å­å…³ç³»ï¼ˆæ ¼å¼ï¼š_çˆ¶ID_å­ID_å­å­ID_... ...ï¼‰',
+   LEVEL                int comment 'çº§åˆ«',
+   STATE                int comment 'çŠ¶æ€(0ï¼šåˆ é™¤ï¼›1ï¼šæ­£å¸¸,)',
+   CREATE_USER_ID       int comment 'åˆ›å»ºäºº',
+   CREATE_TIME          datetime comment 'åˆ›å»ºæ—¶é—´',
+   UPDATE_USER_ID       int comment 'ä¿®æ”¹äºº',
+   UPDATE_TIME          datetime comment 'ä¿®æ”¹æ—¶é—´',
    primary key (ID)
 );
 
-alter table EXM_QUESTION_COMMENT comment 'ÊÔÌâÆÀÂÛ';
+alter table EXM_QUESTION_COMMENT comment 'è¯•é¢˜è¯„è®º';
 
 /*==============================================================*/
 /* Table: EXM_QUESTION_OPTION                                   */
@@ -355,13 +355,13 @@ alter table EXM_QUESTION_COMMENT comment 'ÊÔÌâÆÀÂÛ';
 create table EXM_QUESTION_OPTION
 (
    ID                   int not null auto_increment,
-   OPTIONS              text comment 'Ñ¡Ïî£¨optionÊÇ¹Ø¼ü×Ö£©',
-   NO                   int comment 'ÅÅĞò',
-   QUESTION_ID          int not null comment 'ÊÔÌâID',
+   OPTIONS              text comment 'é€‰é¡¹ï¼ˆoptionæ˜¯å…³é”®å­—ï¼‰',
+   NO                   int comment 'æ’åº',
+   QUESTION_ID          int not null comment 'è¯•é¢˜ID',
    primary key (ID)
 );
 
-alter table EXM_QUESTION_OPTION comment 'ÊÔÌâÑ¡Ïî';
+alter table EXM_QUESTION_OPTION comment 'è¯•é¢˜é€‰é¡¹';
 
 /*==============================================================*/
 /* Table: EXM_QUESTION_TYPE                                     */
@@ -369,18 +369,18 @@ alter table EXM_QUESTION_OPTION comment 'ÊÔÌâÑ¡Ïî';
 create table EXM_QUESTION_TYPE
 (
    ID                   int not null auto_increment comment 'id',
-   NAME                 varchar(32) comment 'Ãû³Æ',
-   IMG_ID               int comment '¸½¼şID',
-   CREATE_USER_ID       int comment '´´½¨ÈË',
-   CREATE_TIME          datetime comment '´´½¨Ê±¼ä',
-   UPDATE_USER_ID       int comment 'ĞŞ¸ÄÈË',
-   UPDATE_TIME          datetime comment 'ĞŞ¸ÄÊ±¼ä',
-   STATE                int comment '0£ºÉ¾³ı£»1£ºÕı³£',
-   WRITE_USER_IDS       varchar(1024) comment 'Ğ´È¨ÏŞ',
+   NAME                 varchar(32) comment 'åç§°',
+   IMG_ID               int comment 'é™„ä»¶ID',
+   CREATE_USER_ID       int comment 'åˆ›å»ºäºº',
+   CREATE_TIME          datetime comment 'åˆ›å»ºæ—¶é—´',
+   UPDATE_USER_ID       int comment 'ä¿®æ”¹äºº',
+   UPDATE_TIME          datetime comment 'ä¿®æ”¹æ—¶é—´',
+   STATE                int comment '0ï¼šåˆ é™¤ï¼›1ï¼šæ­£å¸¸',
+   WRITE_USER_IDS       varchar(1024) comment 'å†™æƒé™',
    primary key (ID)
 );
 
-alter table EXM_QUESTION_TYPE comment 'ÊÔÌâ·ÖÀà';
+alter table EXM_QUESTION_TYPE comment 'è¯•é¢˜åˆ†ç±»';
 
 /*==============================================================*/
 /* Table: EXM_QUESTION_TYPE_OPEN                                */
@@ -388,36 +388,36 @@ alter table EXM_QUESTION_TYPE comment 'ÊÔÌâ·ÖÀà';
 create table EXM_QUESTION_TYPE_OPEN
 (
    ID                   int not null auto_increment comment 'id',
-   START_TIME           datetime comment '¿ªÊ¼Ê±¼ä',
-   END_TIME             datetime comment '½áÊøÊ±¼ä',
-   USER_IDS             varchar(1024) comment '¿ª·ÅÓÃ»§',
-   ORG_IDS              varchar(256) comment '¿ª·Å»ú¹¹',
-   UPDATE_USER_ID       int comment 'ĞŞ¸ÄÈË',
-   UPDATE_TIME          datetime comment 'ĞŞ¸ÄÊ±¼ä',
-   STATE                int comment '0£ºÉ¾³ı£»1£ºÕı³£',
-   QUESTION_TYPE_ID     int comment 'ÊÔÌâ·ÖÀàID',
-   COMMENT_STATE        int comment 'ÆÀÂÛ×´Ì¬(0£º¹Ø±Õ£»1£ºÖ»¶Á£»2£º¿É±à¼­,)',
+   START_TIME           datetime comment 'å¼€å§‹æ—¶é—´',
+   END_TIME             datetime comment 'ç»“æŸæ—¶é—´',
+   USER_IDS             varchar(1024) comment 'å¼€æ”¾ç”¨æˆ·',
+   ORG_IDS              varchar(256) comment 'å¼€æ”¾æœºæ„',
+   UPDATE_USER_ID       int comment 'ä¿®æ”¹äºº',
+   UPDATE_TIME          datetime comment 'ä¿®æ”¹æ—¶é—´',
+   STATE                int comment '0ï¼šåˆ é™¤ï¼›1ï¼šæ­£å¸¸',
+   QUESTION_TYPE_ID     int comment 'è¯•é¢˜åˆ†ç±»ID',
+   COMMENT_STATE        int comment 'è¯„è®ºçŠ¶æ€(0ï¼šå…³é—­ï¼›1ï¼šåªè¯»ï¼›2ï¼šå¯ç¼–è¾‘,)',
    primary key (ID)
 );
 
-alter table EXM_QUESTION_TYPE_OPEN comment 'ÊÔÌâ·ÖÀà¿ª·Å';
+alter table EXM_QUESTION_TYPE_OPEN comment 'è¯•é¢˜åˆ†ç±»å¼€æ”¾';
 
 /*==============================================================*/
 /* Table: SYS_CRON                                              */
 /*==============================================================*/
 create table SYS_CRON
 (
-   ID                   int not null auto_increment comment 'Ö÷¼ü',
-   NAME                 varchar(32) comment 'Ãû³Æ',
-   JOB_CLASS            varchar(64) comment 'ÊµÏÖÀà',
-   CRON                 varchar(64) comment 'cron±í´ïÊ½',
-   STATE                int comment '1£ºÆô¶¯£»2£ºÍ£Ö¹£»',
-   UPDATE_USER_ID       int comment 'ĞŞ¸ÄÈË',
-   UPDATE_TIME          datetime comment 'ĞŞ¸ÄÊ±¼ä',
+   ID                   int not null auto_increment comment 'ä¸»é”®',
+   NAME                 varchar(32) comment 'åç§°',
+   JOB_CLASS            varchar(64) comment 'å®ç°ç±»',
+   CRON                 varchar(64) comment 'cronè¡¨è¾¾å¼',
+   STATE                int comment '1ï¼šå¯åŠ¨ï¼›2ï¼šåœæ­¢ï¼›',
+   UPDATE_USER_ID       int comment 'ä¿®æ”¹äºº',
+   UPDATE_TIME          datetime comment 'ä¿®æ”¹æ—¶é—´',
    primary key (ID)
 );
 
-alter table SYS_CRON comment '¶¨Ê±ÈÎÎñ';
+alter table SYS_CRON comment 'å®šæ—¶ä»»åŠ¡';
 
 /*==============================================================*/
 /* Table: SYS_DICT                                              */
@@ -425,14 +425,14 @@ alter table SYS_CRON comment '¶¨Ê±ÈÎÎñ';
 create table SYS_DICT
 (
    ID                   int not null auto_increment,
-   DICT_INDEX           varchar(32) comment 'Ë÷Òı',
-   DICT_KEY             varchar(32) comment '¼ü',
-   DICT_VALUE           varchar(32) comment 'Öµ',
-   NO                   int comment 'ÅÅĞò',
+   DICT_INDEX           varchar(32) comment 'ç´¢å¼•',
+   DICT_KEY             varchar(32) comment 'é”®',
+   DICT_VALUE           varchar(32) comment 'å€¼',
+   NO                   int comment 'æ’åº',
    primary key (ID)
 );
 
-alter table SYS_DICT comment 'Êı¾İ×Öµä';
+alter table SYS_DICT comment 'æ•°æ®å­—å…¸';
 
 /*==============================================================*/
 /* Table: SYS_FILE                                              */
@@ -440,38 +440,38 @@ alter table SYS_DICT comment 'Êı¾İ×Öµä';
 create table SYS_FILE
 (
    ID                   int not null auto_increment,
-   NAME                 varchar(64) comment 'Ç°×º',
-   EXT_NAME             varchar(32) comment 'ºó×º',
-   FILE_TYPE            varchar(128) comment 'ÀàĞÍ',
-   PATH                 varchar(64) comment 'Â·¾¶',
-   IP                   varchar(16) comment 'ÉÏ´«IP',
-   STATE                int comment '0£ºÉ¾³ı£»1£ºÕı³£',
-   UPDATE_USER_ID       int comment '¸üĞÂÈË',
-   UPDATE_TIME          datetime comment '¸üĞÂÊ±¼ä',
+   NAME                 varchar(64) comment 'å‰ç¼€',
+   EXT_NAME             varchar(32) comment 'åç¼€',
+   FILE_TYPE            varchar(128) comment 'ç±»å‹',
+   PATH                 varchar(64) comment 'è·¯å¾„',
+   IP                   varchar(16) comment 'ä¸Šä¼ IP',
+   STATE                int comment '0ï¼šåˆ é™¤ï¼›1ï¼šæ­£å¸¸',
+   UPDATE_USER_ID       int comment 'æ›´æ–°äºº',
+   UPDATE_TIME          datetime comment 'æ›´æ–°æ—¶é—´',
    primary key (ID)
 );
 
-alter table SYS_FILE comment '¸½¼ş';
+alter table SYS_FILE comment 'é™„ä»¶';
 
 /*==============================================================*/
 /* Table: SYS_ORG                                               */
 /*==============================================================*/
 create table SYS_ORG
 (
-   ID                   int not null auto_increment comment 'Ö÷¼ü',
-   NAME                 varchar(32) comment 'Ãû³Æ',
-   CODE                 varchar(32) comment '±àÂëÎ¨Ò»',
-   PARENT_ID            int comment '¸¸ID',
-   PARENT_IDS           varchar(128) comment '¸¸¼¶IDS',
-   LEVEL                int comment '¼¶±ğ',
-   UPDATE_USER_ID       int comment 'ĞŞ¸ÄÈË',
-   UPDATE_TIME          datetime comment 'ĞŞ¸ÄÊ±¼ä',
-   STATE                int comment '0£ºÉ¾³ı£»1£ºÕı³££»',
-   NO                   int comment 'ÅÅĞò',
+   ID                   int not null auto_increment comment 'ä¸»é”®',
+   NAME                 varchar(32) comment 'åç§°',
+   CODE                 varchar(32) comment 'ç¼–ç å”¯ä¸€',
+   PARENT_ID            int comment 'çˆ¶ID',
+   PARENT_IDS           varchar(128) comment 'çˆ¶çº§IDS',
+   LEVEL                int comment 'çº§åˆ«',
+   UPDATE_USER_ID       int comment 'ä¿®æ”¹äºº',
+   UPDATE_TIME          datetime comment 'ä¿®æ”¹æ—¶é—´',
+   STATE                int comment '0ï¼šåˆ é™¤ï¼›1ï¼šæ­£å¸¸ï¼›',
+   NO                   int comment 'æ’åº',
    primary key (ID)
 );
 
-alter table SYS_ORG comment '×éÖ¯»ú¹¹';
+alter table SYS_ORG comment 'ç»„ç»‡æœºæ„';
 
 /*==============================================================*/
 /* Table: SYS_PARM                                              */
@@ -479,23 +479,23 @@ alter table SYS_ORG comment '×éÖ¯»ú¹¹';
 create table SYS_PARM
 (
    ID                   int not null auto_increment,
-   EMAIL_HOST           varchar(64) comment 'ÓÊ¼şÖ÷»ú',
-   EMAIL_USER_NAME      varchar(64) comment 'ÓÊ¼şÓÃ»§Ãû',
-   EMAIL_PWD            varchar(64) comment 'ÓÊ¼şÃÜÂë',
-   EMAIL_PROTOCOL       varchar(16) comment 'ÓÊ¼şĞ­Òé',
-   EMAIL_ENCODE         varchar(16) comment 'ÓÊ¼ş±àÂë',
-   ORG_LOGO             int comment 'µ¥Î»ÉÌ±ê',
-   ORG_NAME             varchar(32) comment 'µ¥Î»Ãû³Æ',
-   UPDATE_USER_ID       int comment 'ĞŞ¸ÄÈË',
-   UPDATE_TIME          datetime comment 'ĞŞ¸ÄÊ±¼ä',
-   FILE_UPLOAD_DIR      varchar(64) comment 'ÉÏ´«Ä¿Â¼',
-   DB_BAK_DIR           varchar(64) comment 'Êı¾İ¿â±¸·İÄ¿Â¼',
-   PWD_TYPE             int comment 'ÃÜÂëÀàĞÍ£¨1£ºËæ»ú£»2£º¹Ì¶¨£©',
-   PWD_VALUE            varchar(32) comment 'ÃÜÂë³õÊ¼»¯Ä¬ÈÏÖµ',
+   EMAIL_HOST           varchar(64) comment 'é‚®ä»¶ä¸»æœº',
+   EMAIL_USER_NAME      varchar(64) comment 'é‚®ä»¶ç”¨æˆ·å',
+   EMAIL_PWD            varchar(64) comment 'é‚®ä»¶å¯†ç ',
+   EMAIL_PROTOCOL       varchar(16) comment 'é‚®ä»¶åè®®',
+   EMAIL_ENCODE         varchar(16) comment 'é‚®ä»¶ç¼–ç ',
+   ORG_LOGO             int comment 'å•ä½å•†æ ‡',
+   ORG_NAME             varchar(32) comment 'å•ä½åç§°',
+   UPDATE_USER_ID       int comment 'ä¿®æ”¹äºº',
+   UPDATE_TIME          datetime comment 'ä¿®æ”¹æ—¶é—´',
+   FILE_UPLOAD_DIR      varchar(64) comment 'ä¸Šä¼ ç›®å½•',
+   DB_BAK_DIR           varchar(64) comment 'æ•°æ®åº“å¤‡ä»½ç›®å½•',
+   PWD_TYPE             int comment 'å¯†ç ç±»å‹ï¼ˆ1ï¼šéšæœºï¼›2ï¼šå›ºå®šï¼‰',
+   PWD_VALUE            varchar(32) comment 'å¯†ç åˆå§‹åŒ–é»˜è®¤å€¼',
    primary key (ID)
 );
 
-alter table SYS_PARM comment '²ÎÊı';
+alter table SYS_PARM comment 'å‚æ•°';
 
 /*==============================================================*/
 /* Table: SYS_SENSITIVE                                         */
@@ -503,38 +503,38 @@ alter table SYS_PARM comment '²ÎÊı';
 create table SYS_SENSITIVE
 (
    ID                   int not null auto_increment,
-   WHITE_LIST           text comment '°×Ãûµ¥',
-   BLACK_LIST           text comment 'ºÚÃûµ¥',
-   UPDATE_USER_ID       int comment 'ĞŞ¸ÄÈË',
-   UPDATE_TIME          datetime comment 'ĞŞ¸ÄÊ±¼ä',
+   WHITE_LIST           text comment 'ç™½åå•',
+   BLACK_LIST           text comment 'é»‘åå•',
+   UPDATE_USER_ID       int comment 'ä¿®æ”¹äºº',
+   UPDATE_TIME          datetime comment 'ä¿®æ”¹æ—¶é—´',
    primary key (ID)
 );
 
-alter table SYS_SENSITIVE comment 'Ãô¸Ğ´Ê';
+alter table SYS_SENSITIVE comment 'æ•æ„Ÿè¯';
 
 /*==============================================================*/
 /* Table: SYS_USER                                              */
 /*==============================================================*/
 create table SYS_USER
 (
-   ID                   int not null auto_increment comment 'Ö÷¼ü',
-   NAME                 varchar(16) comment 'Ãû³Æ',
-   LOGIN_NAME           varchar(16) comment 'µÇÂ½ÕËºÅ',
-   EMAIL                varchar(64) comment 'ÓÊÏä',
-   PHONE                varchar(11) comment 'ÊÖ»úºÅ',
-   PWD                  varchar(32) comment 'ÃÜÂë',
-   REGIST_TIME          datetime comment '×¢²áÊ±¼ä',
-   LAST_LOGIN_TIME      datetime comment '×îºóµÇÂ½Ê±¼ä',
-   ORG_ID               int comment '×éÖ¯»ú¹¹ID',
-   ROLES                varchar(64) comment '½ÇÉ«',
-   TYPE                 int comment 'ÀàĞÍ£¨1£ºÆÕÍ¨ÓÃ»§£»2£º¹ÜÀíÔ±£©',
-   STATE                int comment '×´Ì¬£¨0£ºÉ¾³ı£»1£ºÕı³££»2£º¶³½á£»£©',
-   UPDATE_USER_ID       int comment 'ĞŞ¸ÄÈË',
-   UPDATE_TIME          datetime comment 'ĞŞ¸ÄÊ±¼ä',
+   ID                   int not null auto_increment comment 'ä¸»é”®',
+   NAME                 varchar(16) comment 'åç§°',
+   LOGIN_NAME           varchar(16) comment 'ç™»é™†è´¦å·',
+   EMAIL                varchar(64) comment 'é‚®ç®±',
+   PHONE                varchar(11) comment 'æ‰‹æœºå·',
+   PWD                  varchar(32) comment 'å¯†ç ',
+   REGIST_TIME          datetime comment 'æ³¨å†Œæ—¶é—´',
+   LAST_LOGIN_TIME      datetime comment 'æœ€åç™»é™†æ—¶é—´',
+   ORG_ID               int comment 'ç»„ç»‡æœºæ„ID',
+   ROLES                varchar(64) comment 'è§’è‰²',
+   TYPE                 int comment 'ç±»å‹ï¼ˆ1ï¼šæ™®é€šç”¨æˆ·ï¼›2ï¼šç®¡ç†å‘˜ï¼‰',
+   STATE                int comment 'çŠ¶æ€ï¼ˆ0ï¼šåˆ é™¤ï¼›1ï¼šæ­£å¸¸ï¼›2ï¼šå†»ç»“ï¼›ï¼‰',
+   UPDATE_USER_ID       int comment 'ä¿®æ”¹äºº',
+   UPDATE_TIME          datetime comment 'ä¿®æ”¹æ—¶é—´',
    primary key (ID)
 );
 
-alter table SYS_USER comment 'ÓÃ»§';
+alter table SYS_USER comment 'ç”¨æˆ·';
 
 /*==============================================================*/
 /* Table: SYS_VER                                               */
@@ -542,41 +542,41 @@ alter table SYS_USER comment 'ÓÃ»§';
 create table SYS_VER
 (
    ID                   int not null auto_increment comment 'id',
-   VER                  varchar(16) comment '°æ±¾',
-   UPDATE_TIME          datetime comment 'ĞŞ¸ÄÊ±¼ä',
-   AUTHOR               varchar(16) comment '×÷Õß',
-   REMARK               text comment '±¸×¢',
+   VER                  varchar(16) comment 'ç‰ˆæœ¬',
+   UPDATE_TIME          datetime comment 'ä¿®æ”¹æ—¶é—´',
+   AUTHOR               varchar(16) comment 'ä½œè€…',
+   REMARK               text comment 'å¤‡æ³¨',
    primary key (ID)
 );
 
-alter table SYS_VER comment '°æ±¾';
+alter table SYS_VER comment 'ç‰ˆæœ¬';
 
 
 /*==============================================================*/
-/* Êı¾İ								*/
+/* æ•°æ®								*/
 /*==============================================================*/
 
-INSERT INTO `SYS_ORG` VALUES ('1', '×éÖ¯»ú¹¹', 'code', '0', '_1_', '1', '1', '2017-08-01 22:31:43', '1', '1');
+INSERT INTO `SYS_ORG` VALUES ('1', 'ç»„ç»‡æœºæ„', 'code', '0', '_1_', '1', '1', '2017-08-01 22:31:43', '1', '1');
 
-INSERT INTO `SYS_USER` VALUES ('1', '¹ÜÀíÔ±', 'admin', null, null,'79nRuL+wDo42R5kPfXTR2A==', '2017-08-01 22:31:43', '2017-08-01 22:31:43', null, 'admin', '1', '2017-08-01 22:31:43', '1');
+INSERT INTO `SYS_USER` VALUES ('1', 'ç®¡ç†å‘˜', 'admin', null, null,'79nRuL+wDo42R5kPfXTR2A==', '2017-08-01 22:31:43', '2017-08-01 22:31:43', null, 'admin', '1', '1', '2017-08-01 22:31:43', '1');
 
-INSERT INTO `SYS_DICT` VALUES (1, 'STATE', '0', 'É¾³ı', 1);
-INSERT INTO `SYS_DICT` VALUES (2, 'STATE', '1', 'ÆôÓÃ', 2);
-INSERT INTO `SYS_DICT` VALUES (3, 'STATE', '2', '½ûÓÃ', 3);
-INSERT INTO `SYS_DICT` VALUES (4, 'STATE_YN', '1', 'ÊÇ', 1);
-INSERT INTO `SYS_DICT` VALUES (5, 'STATE_YN', '2', '·ñ', 2);
-INSERT INTO `SYS_DICT` VALUES (6, 'CRON_TYPE', '1', 'Æô¶¯', 1);
-INSERT INTO `SYS_DICT` VALUES (7, 'CRON_TYPE', '2', 'Í£Ö¹', 2);
-INSERT INTO `SYS_DICT` VALUES (8, 'QUESTION_TYPE', '1', 'µ¥Ñ¡', 1);
-INSERT INTO `SYS_DICT` VALUES (9, 'QUESTION_TYPE', '2', '¶àÑ¡', 2);
-INSERT INTO `SYS_DICT` VALUES (10, 'QUESTION_TYPE', '3', 'Ìî¿Õ', 3);
-INSERT INTO `SYS_DICT` VALUES (11, 'QUESTION_TYPE', '4', 'ÅĞ¶Ï', 4);
-INSERT INTO `SYS_DICT` VALUES (12, 'QUESTION_TYPE', '5', 'ÎÊ´ğ', 5);
-INSERT INTO `SYS_DICT` VALUES (13, 'QUESTION_DIFFICULTY', '1', '¼«Ò×', 1);
-INSERT INTO `SYS_DICT` VALUES (14, 'QUESTION_DIFFICULTY', '2', '¼òµ¥', 2);
-INSERT INTO `SYS_DICT` VALUES (15, 'QUESTION_DIFFICULTY', '3', 'ÊÊÖĞ', 3);
-INSERT INTO `SYS_DICT` VALUES (16, 'QUESTION_DIFFICULTY', '4', 'À§ÄÑ', 4);
-INSERT INTO `SYS_DICT` VALUES (17, 'QUESTION_DIFFICULTY', '5', '¼«ÄÑ', 5);
+INSERT INTO `SYS_DICT` VALUES (1, 'STATE', '0', 'åˆ é™¤', 1);
+INSERT INTO `SYS_DICT` VALUES (2, 'STATE', '1', 'å¯ç”¨', 2);
+INSERT INTO `SYS_DICT` VALUES (3, 'STATE', '2', 'ç¦ç”¨', 3);
+INSERT INTO `SYS_DICT` VALUES (4, 'STATE_YN', '1', 'æ˜¯', 1);
+INSERT INTO `SYS_DICT` VALUES (5, 'STATE_YN', '2', 'å¦', 2);
+INSERT INTO `SYS_DICT` VALUES (6, 'CRON_TYPE', '1', 'å¯åŠ¨', 1);
+INSERT INTO `SYS_DICT` VALUES (7, 'CRON_TYPE', '2', 'åœæ­¢', 2);
+INSERT INTO `SYS_DICT` VALUES (8, 'QUESTION_TYPE', '1', 'å•é€‰', 1);
+INSERT INTO `SYS_DICT` VALUES (9, 'QUESTION_TYPE', '2', 'å¤šé€‰', 2);
+INSERT INTO `SYS_DICT` VALUES (10, 'QUESTION_TYPE', '3', 'å¡«ç©º', 3);
+INSERT INTO `SYS_DICT` VALUES (11, 'QUESTION_TYPE', '4', 'åˆ¤æ–­', 4);
+INSERT INTO `SYS_DICT` VALUES (12, 'QUESTION_TYPE', '5', 'é—®ç­”', 5);
+INSERT INTO `SYS_DICT` VALUES (13, 'QUESTION_DIFFICULTY', '1', 'ææ˜“', 1);
+INSERT INTO `SYS_DICT` VALUES (14, 'QUESTION_DIFFICULTY', '2', 'ç®€å•', 2);
+INSERT INTO `SYS_DICT` VALUES (15, 'QUESTION_DIFFICULTY', '3', 'é€‚ä¸­', 3);
+INSERT INTO `SYS_DICT` VALUES (16, 'QUESTION_DIFFICULTY', '4', 'å›°éš¾', 4);
+INSERT INTO `SYS_DICT` VALUES (17, 'QUESTION_DIFFICULTY', '5', 'æéš¾', 5);
 INSERT INTO `SYS_DICT` VALUES (18, 'QUESTION_OPTIONS', '1', 'A', 1);
 INSERT INTO `SYS_DICT` VALUES (19, 'QUESTION_OPTIONS', '2', 'B', 2);
 INSERT INTO `SYS_DICT` VALUES (20, 'QUESTION_OPTIONS', '3', 'C', 3);
@@ -584,29 +584,29 @@ INSERT INTO `SYS_DICT` VALUES (21, 'QUESTION_OPTIONS', '4', 'D', 4);
 INSERT INTO `SYS_DICT` VALUES (22, 'QUESTION_OPTIONS', '5', 'E', 5);
 INSERT INTO `SYS_DICT` VALUES (23, 'QUESTION_OPTIONS', '6', 'F', 6);
 INSERT INTO `SYS_DICT` VALUES (24, 'QUESTION_OPTIONS', '7', 'G', 7);
-INSERT INTO `SYS_DICT` VALUES (25, 'MY_EXAM_STATE', '1', 'Î´¿¼ÊÔ', 1);
-INSERT INTO `SYS_DICT` VALUES (26, 'MY_EXAM_STATE', '2', '¿¼ÊÔÖĞ', 2);
-INSERT INTO `SYS_DICT` VALUES (27, 'MY_EXAM_STATE', '3', 'ÒÑ½»¾í', 3);
-INSERT INTO `SYS_DICT` VALUES (28, 'MY_EXAM_STATE', '4', 'Ç¿ÖÆ½»¾í', 4);
-INSERT INTO `SYS_DICT` VALUES (29, 'MY_EXAM_MARK_STATE', '1', 'Î´ÔÄ¾í', 1);
-INSERT INTO `SYS_DICT` VALUES (30, 'MY_EXAM_MARK_STATE', '2', 'ÔÄ¾íÖĞ', 2);
-INSERT INTO `SYS_DICT` VALUES (31, 'MY_EXAM_MARK_STATE', '3', 'ÒÑÔÄ¾í', 3);
-INSERT INTO `SYS_DICT` VALUES (32, 'MY_EXAM_ANSWER_STATE', '1', '¼°¸ñ', 1);
-INSERT INTO `SYS_DICT` VALUES (33, 'MY_EXAM_ANSWER_STATE', '2', '²»¼°¸ñ', 2);
-INSERT INTO `SYS_DICT` VALUES (34, 'EXAM_STATE', '0', 'É¾³ı', 1);
-INSERT INTO `SYS_DICT` VALUES (35, 'EXAM_STATE', '1', '·¢²¼', 2);
-INSERT INTO `SYS_DICT` VALUES (36, 'EXAM_STATE', '2', '²İ¸å', 3);
-INSERT INTO `SYS_DICT` VALUES (37, 'STATE_OPEN', '1', 'Õı³£', 1);
-INSERT INTO `SYS_DICT` VALUES (38, 'STATE_OPEN', '2', '×÷·Ï', 2);
-INSERT INTO `SYS_DICT` VALUES (39, 'STATE_OPEN', '0', 'É¾³ı', 3);
-INSERT INTO `SYS_DICT` VALUES (40, 'PAPER_MARK_TYPE', '1', 'ÖÇÄÜÔÄ¾í', 1);
-INSERT INTO `SYS_DICT` VALUES (41, 'PAPER_MARK_TYPE', '2', 'ÈË¹¤ÔÄ¾í', 2);
+INSERT INTO `SYS_DICT` VALUES (25, 'MY_EXAM_STATE', '1', 'æœªè€ƒè¯•', 1);
+INSERT INTO `SYS_DICT` VALUES (26, 'MY_EXAM_STATE', '2', 'è€ƒè¯•ä¸­', 2);
+INSERT INTO `SYS_DICT` VALUES (27, 'MY_EXAM_STATE', '3', 'å·²äº¤å·', 3);
+INSERT INTO `SYS_DICT` VALUES (28, 'MY_EXAM_STATE', '4', 'å¼ºåˆ¶äº¤å·', 4);
+INSERT INTO `SYS_DICT` VALUES (29, 'MY_EXAM_MARK_STATE', '1', 'æœªé˜…å·', 1);
+INSERT INTO `SYS_DICT` VALUES (30, 'MY_EXAM_MARK_STATE', '2', 'é˜…å·ä¸­', 2);
+INSERT INTO `SYS_DICT` VALUES (31, 'MY_EXAM_MARK_STATE', '3', 'å·²é˜…å·', 3);
+INSERT INTO `SYS_DICT` VALUES (32, 'MY_EXAM_ANSWER_STATE', '1', 'åŠæ ¼', 1);
+INSERT INTO `SYS_DICT` VALUES (33, 'MY_EXAM_ANSWER_STATE', '2', 'ä¸åŠæ ¼', 2);
+INSERT INTO `SYS_DICT` VALUES (34, 'EXAM_STATE', '0', 'åˆ é™¤', 1);
+INSERT INTO `SYS_DICT` VALUES (35, 'EXAM_STATE', '1', 'å‘å¸ƒ', 2);
+INSERT INTO `SYS_DICT` VALUES (36, 'EXAM_STATE', '2', 'è‰ç¨¿', 3);
+INSERT INTO `SYS_DICT` VALUES (37, 'STATE_OPEN', '1', 'æ­£å¸¸', 1);
+INSERT INTO `SYS_DICT` VALUES (38, 'STATE_OPEN', '2', 'ä½œåºŸ', 2);
+INSERT INTO `SYS_DICT` VALUES (39, 'STATE_OPEN', '0', 'åˆ é™¤', 3);
+INSERT INTO `SYS_DICT` VALUES (40, 'PAPER_MARK_TYPE', '1', 'æ™ºèƒ½é˜…å·', 1);
+INSERT INTO `SYS_DICT` VALUES (41, 'PAPER_MARK_TYPE', '2', 'äººå·¥é˜…å·', 2);
 
-INSERT INTO `SYS_CRON` VALUES ('1', 'ÇåÀíÁÙÊ±¸½¼ş', 'com.wcpdoc.file.job.ClearFileJob', '0 0 0 1/1 * ? ', '1', '1', '2020-08-26 18:42:08');
-INSERT INTO `SYS_CRON` VALUES (2, 'Êı¾İ¿â±¸·İ', 'com.wcpdoc.quartz.job.DbBackJob', '0 0 0 1/1 * ? ', 1, 1, '2020-08-26 18:42:08');
-INSERT INTO `SYS_CRON` VALUES (3, '×Ô¶¯ÔÄ¾í', 'com.wcpdoc.exam.core.job.AutoMarkJob', '0/1 * * * * ? *', 1, 1, '2020-08-26 18:42:08');
+INSERT INTO `SYS_CRON` VALUES ('1', 'æ¸…ç†ä¸´æ—¶é™„ä»¶', 'com.wcpdoc.file.job.ClearFileJob', '0 0 0 1/1 * ? ', '1', '1', '2020-08-26 18:42:08');
+INSERT INTO `SYS_CRON` VALUES (2, 'æ•°æ®åº“å¤‡ä»½', 'com.wcpdoc.quartz.job.DbBackJob', '0 0 0 1/1 * ? ', 1, 1, '2020-08-26 18:42:08');
+INSERT INTO `SYS_CRON` VALUES (3, 'è‡ªåŠ¨é˜…å·', 'com.wcpdoc.exam.core.job.AutoMarkJob', '0/1 * * * * ? *', 1, 1, '2020-08-26 18:42:08');
 
-INSERT INTO `SYS_VER` VALUES (1, '1.0.0', '2017-09-07 15:06:00', 'zhanghc', '³õÊ¼°æ±¾');
+INSERT INTO `SYS_VER` VALUES (1, '1.0.0', '2017-09-07 15:06:00', 'zhanghc', 'åˆå§‹ç‰ˆæœ¬');
 INSERT INTO `SYS_VER` VALUES (2, '1.1.0', '2018-11-27 22:47:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (3, '1.1.1', '2019-02-23 15:35:21', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (4, '1.1.2', '2019-03-03 13:20:00', 'zhanghc', '');
@@ -618,10 +618,10 @@ INSERT INTO `SYS_VER` VALUES (9, '3.0.0', '2020-08-06 13:58:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (10, '3.1.0', '2020-09-30 13:58:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (11, '3.2.0', '2020-10-31 16:43:00', 'zhanghc', '');
 
-INSERT INTO `SYS_CRON` VALUES (2, 'Êı¾İ¿â±¸·İ', 'com.wcpdoc.quartz.job.DbBackJob', '0 0 0 1/1 * ? ', 1, 1, '2020-08-26 18:42:08');
-INSERT INTO `SYS_CRON` VALUES (3, '×Ô¶¯ÔÄ¾í', 'com.wcpdoc.exam.core.job.AutoMarkJob', '0/1 * * * * ? *', 1, 1, '2020-08-26 18:42:08');
+INSERT INTO `SYS_CRON` VALUES (2, 'æ•°æ®åº“å¤‡ä»½', 'com.wcpdoc.quartz.job.DbBackJob', '0 0 0 1/1 * ? ', 1, 1, '2020-08-26 18:42:08');
+INSERT INTO `SYS_CRON` VALUES (3, 'è‡ªåŠ¨é˜…å·', 'com.wcpdoc.exam.core.job.AutoMarkJob', '0/1 * * * * ? *', 1, 1, '2020-08-26 18:42:08');
 
 
-INSERT INTO `EXM_EXAM_TYPE` VALUES ('1', '¿¼ÊÔ·ÖÀà', NULL, '1', '2021-11-11 09:20:44', '1', '2021-11-11 09:20:40', '1');
-INSERT INTO `EXM_PAPER_TYPE` VALUES ('1', 'ÊÔ¾í·ÖÀà', NULL, '1', '2021-11-11 09:21:07', '1', '2021-11-11 09:21:11', '1', '1');
-INSERT INTO `EXM_QUESTION_TYPE` VALUES ('1', 'ÊÔÌâ·ÖÀà', NULL, '1', '2021-11-11 09:21:51', '1', '2021-11-11 09:21:55', '1', NULL);
+INSERT INTO `EXM_EXAM_TYPE` VALUES ('1', 'è€ƒè¯•åˆ†ç±»', NULL, '1', '2021-11-11 09:20:44', '1', '2021-11-11 09:20:40', '1');
+INSERT INTO `EXM_PAPER_TYPE` VALUES ('1', 'è¯•å·åˆ†ç±»', NULL, '1', '2021-11-11 09:21:07', '1', '2021-11-11 09:21:11', '1', '1');
+INSERT INTO `EXM_QUESTION_TYPE` VALUES ('1', 'è¯•é¢˜åˆ†ç±»', NULL, '1', '2021-11-11 09:21:51', '1', '2021-11-11 09:21:55', '1', NULL);
