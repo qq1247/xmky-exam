@@ -128,7 +128,7 @@ public class ApiUserController extends BaseController {
 			
 			// 添加用户
 			Date date = new Date();
-			user.setRoles("subAdmin".equals(user.getRoles()) ? "subAdmin" : null );
+			user.setRoles("subAdmin".equals(user.getRoles()) ? "user,subAdmin" : "user");
 			user.setRegistTime(date);
 			user.setUpdateTime(date);
 			user.setUpdateUserId(getCurUser().getId());

@@ -26,8 +26,6 @@ import org.springframework.stereotype.Service;
 import com.wcpdoc.base.cache.ProgressBarCache;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.dao.BaseDao;
-import com.wcpdoc.core.entity.PageIn;
-import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.BigDecimalUtil;
@@ -644,11 +642,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			mapList.put("accuracy", df.format((Double.parseDouble(mapList.remove("CORRECT").toString())/ Double.parseDouble(mapList.get("TOTAL").toString()) * 100)));
 		}
 		return accuracyList;
-	}
-
-	@Override
-	public PageOut randomListpage(PageIn pageIn) {
-		return questionDao.randomListpage(pageIn);
 	}
 
 	@Override

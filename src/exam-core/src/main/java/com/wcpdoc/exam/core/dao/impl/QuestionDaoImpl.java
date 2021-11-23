@@ -16,8 +16,8 @@ import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.util.HibernateUtil;
 import com.wcpdoc.core.util.SqlUtil;
-import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.core.util.SqlUtil.Order;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.QuestionDao;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionType;
@@ -54,7 +54,8 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 				.addWhere(ValidateUtil.isValid(pageIn.get("ai")), "QUESTION.AI = ?", pageIn.get("ai"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")), "QUESTION.STATE = ?", pageIn.get("state", String.class))
 				.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "QUESTION.STATE IN (1,2)")// 默认查询发布和草稿状态
-				.addOrder("QUESTION.UPDATE_TIME", Order.DESC);
+				.addOrder(!ValidateUtil.isValid(pageIn.get("rand")), "QUESTION.UPDATE_TIME", Order.DESC)
+				.addOrder(ValidateUtil.isValid(pageIn.get("rand")), "Rand()", Order.NULL);
 		
 		if (pageIn.get("curUserId", Integer.class) != null && !ValidateUtil.isValid(pageIn.get("open"))) {
 			User user = userDao.getEntity(pageIn.get("curUserId", Integer.class));
@@ -117,26 +118,4 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 		String sql = "SELECT COUNT(ID) AS TOTAL, SUM( SCORE = QUESTION_SCORE ) AS CORRECT, QUESTION_ID FROM EXM_MY_EXAM_DETAIL WHERE EXAM_ID = ? GROUP BY QUESTION_ID ";
 		return getMapList(sql, new Object[] { examId });
 	}
-
-	@Override
-	public PageOut randomListpage(PageIn pageIn) {
-		String sql = "SELECT QUESTION.*, QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME, UPDATE_USER.NAME AS UPDATE_USER_NAME, CREATE_USER.NAME AS CREATE_USER_NAME "
-				+ " from  EXM_QUESTION AS QUESTION "
-				+ " LEFT JOIN EXM_QUESTION_TYPE QUESTION_TYPE ON QUESTION.QUESTION_TYPE_ID = QUESTION_TYPE.ID "
-				+ " LEFT JOIN SYS_USER CREATE_USER ON QUESTION.CREATE_USER_ID = CREATE_USER.ID "
-				+ " LEFT JOIN SYS_USER UPDATE_USER ON QUESTION.UPDATE_USER_ID = UPDATE_USER.ID ";
-		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("id")), "QUESTION.ID = ?", pageIn.get("id", Integer.class))
-				.addWhere(ValidateUtil.isValid(pageIn.get("title")), "QUESTION.TITLE LIKE ?", "%" + pageIn.get("title") + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.get("type")), "QUESTION.TYPE = ?", pageIn.get("type", Integer.class))
-				.addWhere(ValidateUtil.isValid(pageIn.get("difficulty")), "QUESTION.DIFFICULTY = ?", pageIn.get("difficulty"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("questionTypeName")), "QUESTION_TYPE.NAME LIKE ?", "%" + pageIn.get("questionTypeName") + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.get("score")), "QUESTION.SCORE = ?", pageIn.get("score"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("exPaperId")), "NOT EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.get("exPaperId", Integer.class))
-				.addWhere("QUESTION.STATE != ?", 0)
-				.addOrderRand();
-		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), "QUESTION_TYPE", "TYPE", "QUESTION_DIFFICULTY", "DIFFICULTY", "STATE", "STATE");
-		return pageOut;
-}
 }

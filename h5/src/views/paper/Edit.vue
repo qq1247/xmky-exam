@@ -633,7 +633,7 @@ import {
   paperTotalScoreUpdate,
   paperScoreOptionUpdate,
 } from 'api/paper'
-import { questionListPage, randomListPage } from 'api/question'
+import { questionListPage } from 'api/question'
 import Draggable from 'vuedraggable'
 export default {
   components: {
@@ -810,7 +810,7 @@ export default {
     },
     // 随机查询试题
     async randomQueryQuestion() {
-      const res = await randomListPage({
+      const res = await questionListPage({
         id: this.queryForm.id,
         type: this.queryForm.type,
         title: this.queryForm.title,
@@ -819,7 +819,8 @@ export default {
         scoreStart: this.queryForm.score,
         scoreEnd: this.queryForm.score,
         exPaperId: this.paperId,
-        // state: 1,
+        state: 1,
+        rand: 'rand',
         curPage: 1,
         pageSize: this.pageSize,
       })

@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.wcpdoc.base.cache.DictCache;
 import com.wcpdoc.base.cache.ProgressBarCache;
 import com.wcpdoc.core.constant.ConstantManager;
 import com.wcpdoc.core.context.UserContext;
@@ -78,34 +77,6 @@ public class ApiQuestionController extends BaseController {
 			
 			PageOut listpage = questionService.getListpage(pageIn);
 			return PageResultEx.ok().data(listpage);
-		} catch (Exception e) {
-			log.error("试题列表错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 随机试题列表 
-	 * 
-	 * v1.0 zhanghc 2017-05-07 14:56:29
-	 * @return pageOut
-	 */
-	@RequestMapping("/randomListpage")
-	@ResponseBody
-	public PageResult randomListpage() {
-		try {
-			PageIn pageIn = new PageIn(request);
-			PageOut pageOut = questionService.randomListpage(pageIn);
-			for(Map<String, Object> map : pageOut.getList()){
-				map.put("typeName", DictCache.getDictValue("QUESTION_TYPE", map.get("type").toString()));
-				map.put("difficultyName", DictCache.getDictValue("QUESTION_DIFFICULTY", map.get("difficulty").toString()));
-				
-				if (map.get("type").toString().equals("1") || map.get("type").toString().equals("2")) {
-					List<QuestionOption> optionList = questionOptionService.getList(Integer.valueOf(map.get("id").toString()));
-					map.put("option", optionList);
-				}
-			}
-			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("试题列表错误：", e);
 			return PageResult.err();

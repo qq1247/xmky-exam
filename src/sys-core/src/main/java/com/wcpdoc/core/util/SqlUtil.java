@@ -15,7 +15,7 @@ public class SqlUtil {
 	 * @author zhanghc 2015-3-30下午03:46:14
 	 */
 	public enum Order {
-		ASC("ASC"), DESC("DESC");
+		ASC("ASC"), DESC("DESC"), NULL("");
 
 		private String value;
 
@@ -111,17 +111,6 @@ public static void main(String[] args) {
 		} else {
 			this.order.append(",  ").append(property).append(" ").append(order.getValue());
 		}
-		return this;
-	}
-
-	/**
-	 * 随机查询
-	 * 
-	 * v1.0 chenyun 2021年7月19日下午5:54:08
-	 * @return SqlUtil
-	 */
-	public SqlUtil addOrderRand() {
-		this.order.append(" ORDER BY RAND() ");
 		return this;
 	}
 	
