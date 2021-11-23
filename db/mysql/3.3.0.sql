@@ -602,7 +602,7 @@ INSERT INTO `SYS_DICT` VALUES (39, 'STATE_OPEN', '0', '删除', 3);
 INSERT INTO `SYS_DICT` VALUES (40, 'PAPER_MARK_TYPE', '1', '智能阅卷', 1);
 INSERT INTO `SYS_DICT` VALUES (41, 'PAPER_MARK_TYPE', '2', '人工阅卷', 2);
 
-INSERT INTO `SYS_CRON` VALUES ('1', '清理临时附件', 'com.wcpdoc.file.job.ClearFileJob', '0 0 0 1/1 * ? ', '1', '1', '2020-08-26 18:42:08');
+INSERT INTO `SYS_CRON` VALUES (1, '清理临时附件', 'com.wcpdoc.file.job.ClearFileJob', '0 0 0 1/1 * ? ', '1', '1', '2020-08-26 18:42:08');
 INSERT INTO `SYS_CRON` VALUES (2, '数据库备份', 'com.wcpdoc.quartz.job.DbBackJob', '0 0 0 1/1 * ? ', 1, 1, '2020-08-26 18:42:08');
 INSERT INTO `SYS_CRON` VALUES (3, '自动阅卷', 'com.wcpdoc.exam.core.job.AutoMarkJob', '0/1 * * * * ? *', 1, 1, '2020-08-26 18:42:08');
 
@@ -617,10 +617,6 @@ INSERT INTO `SYS_VER` VALUES (8, '2.0.0', '2020-10-15 00:00:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (9, '3.0.0', '2020-08-06 13:58:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (10, '3.1.0', '2020-09-30 13:58:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (11, '3.2.0', '2020-10-31 16:43:00', 'zhanghc', '');
-
-INSERT INTO `SYS_CRON` VALUES (2, '数据库备份', 'com.wcpdoc.quartz.job.DbBackJob', '0 0 0 1/1 * ? ', 1, 1, '2020-08-26 18:42:08');
-INSERT INTO `SYS_CRON` VALUES (3, '自动阅卷', 'com.wcpdoc.exam.core.job.AutoMarkJob', '0/1 * * * * ? *', 1, 1, '2020-08-26 18:42:08');
-
 
 INSERT INTO `EXM_EXAM_TYPE` VALUES ('1', '考试分类', NULL, '1', '2021-11-11 09:20:44', '1', '2021-11-11 09:20:40', '1');
 INSERT INTO `EXM_PAPER_TYPE` VALUES ('1', '试卷分类', NULL, '1', '2021-11-11 09:21:07', '1', '2021-11-11 09:21:11', '1', '1');
