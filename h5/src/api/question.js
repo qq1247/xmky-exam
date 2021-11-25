@@ -10,8 +10,6 @@
 import request from './request'
 
 export const questionListPage = (params) => request('question/listpage', params)
-export const randomListPage = (params) =>
-  request('question/randomListpage', params)
 export const questionGet = (params) => request('question/get', params)
 export const questionAdd = (params) => request('question/add', params)
 export const questionEdit = (params) => request('question/edit', params)
