@@ -62,8 +62,12 @@
           </el-carousel-item>
         </el-carousel>
       </NoticeBar>
+
       <el-row :gutter="40">
-        <el-col :span="8">
+        <el-col
+          :span="8"
+          v-if="onlyRole.includes('user') || onlyRole.includes('subAdmin')"
+        >
           <template>
             <div class="box-title">
               <i class="common common-time"></i>
@@ -77,7 +81,7 @@
           </template>
         </el-col>
         <el-col :span="16">
-          <div>
+          <div v-if="onlyRole.includes('user')">
             <div class="box-title box-divider">
               <i class="common common-classify"></i>
               <span>待考列表</span>
@@ -129,7 +133,7 @@
             </template>
             <el-empty v-else description="暂无考试"></el-empty>
           </div>
-          <div>
+          <div v-if="onlyRole.includes('subAdmin')">
             <div class="box-title box-divider">
               <i class="common common-classify"></i>
               <span>待阅列表</span>
@@ -183,7 +187,7 @@
           </div>
         </el-col>
       </el-row>
-      <div>
+      <div v-if="onlyRole.includes('user')">
         <div class="box-title">
           <i class="common common-data-library"></i>
           <span>开放题库</span>
@@ -210,6 +214,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import { bulletinListPage } from 'api/base'
 import { myExamListPage, myMarkListPage } from 'api/my'
 import { questionTypeOpenListPage } from 'api/question'
@@ -245,10 +250,16 @@ export default {
   created() {
     this.init()
   },
+  computed: {
+    ...mapGetters(['onlyRole']),
+  },
   methods: {
     // 初始化
     async init() {
       this.getBulletinList()
+      if (this.onlyRole.includes('admin')) {
+        return
+      }
       await this.renderCalendar()
       this.renderList()
       this.getQuestionTypeOpenList()
@@ -258,29 +269,30 @@ export default {
       const days = dayjs(time).daysInMonth()
       const startDate = time || dayjs().date(1).format('YYYY-MM-DD')
       const endDate = dayjs(time).date(days).format('YYYY-MM-DD')
-      const {
-        data: { list: examList },
-      } = await myExamListPage({
-        curPage: 1,
-        pageSize: 100,
-        startDate: `${startDate} 00:00:00`,
-        endDate: `${endDate} 23:59:59`,
-      })
-      // const {
-      //   data: { list: markList },
-      // } = await myMarkListPage({
-      //   curPage: 1,
-      //   pageSize: 100,
-      //   startDate: `${startDate} 00:00:00`,
-      //   endDate: `${endDate} 23:59:59`,
-      // })
+      let examList, markList
+      if (this.onlyRole.includes('user')) {
+        examList = await myExamListPage({
+          curPage: 1,
+          pageSize: 100,
+          startDate: `${startDate} 00:00:00`,
+          endDate: `${endDate} 23:59:59`,
+        })
+      }
+      if (this.onlyRole.includes('subAdmin')) {
+        markList = await myMarkListPage({
+          curPage: 1,
+          pageSize: 100,
+          startDate: `${startDate} 00:00:00`,
+          endDate: `${endDate} 23:59:59`,
+        })
+      }
       if (dayjs(time).month() === dayjs().month()) {
-        this.examList = examList
-        this.markList = markList
+        this.examList = (examList && examList?.data?.list) || []
+        this.markList = (markList && markList?.data?.list) || []
       }
       return {
-        examList,
-        // markList,
+        examList: (examList && examList?.data?.list) || [],
+        markList: (markList && markList?.data?.list) || [],
       }
     },
     // 渲染考试和阅卷列表
@@ -345,7 +357,7 @@ export default {
     },
     // 渲染日历
     async renderCalendar(time) {
-      const { examList /* markList */ } = await this.getExamAndMark(time)
+      const { examList, markList } = await this.getExamAndMark(time)
 
       let timePopovers = {}
 
@@ -369,7 +381,7 @@ export default {
         return acc
       }, {})
 
-       timePopovers = markList.reduce((acc, mark) => {
+      timePopovers = markList.reduce((acc, mark) => {
         const markTime = dayjs(mark.markStartTime).format('YYYY-MM-DD')
 
         if (!acc[markTime]) {

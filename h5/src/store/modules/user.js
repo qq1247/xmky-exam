@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-11 11:33:30
  * @LastEditors: Che
- * @LastEditTime: 2021-11-09 14:32:29
+ * @LastEditTime: 2021-11-25 13:07:45
  */
 import { login, loginOrgName } from 'api/common'
 import { getInfo, setInfo, removeInfo, setOrg } from '@/utils/storage'
@@ -16,6 +16,7 @@ const state = {
   name: getInfo().userName,
   userId: getInfo().userId,
   roles: getInfo().roles,
+  onlyRole: getInfo().onlyRole,
 }
 
 const mutations = {
@@ -30,6 +31,9 @@ const mutations = {
   },
   SET_ROLES: (state, roles) => {
     state.roles = roles
+  },
+  SET_ONLY_ROLE: (state, onlyRole) => {
+    state.onlyRole = onlyRole
   },
 }
 
@@ -47,10 +51,14 @@ const actions = {
       login({ loginName: username.trim(), pwd: password })
         .then(async (res) => {
           const { data } = res
+          const role = data.roles.includes('subAdmin')
+            ? ['subAdmin']
+            : data.roles
           commit('SET_TOKEN', data.accessToken)
           commit('SET_ROLES', data.roles || ['user'])
           commit('SET_NAME', data.userName)
           commit('SET_USER_ID', data.userId)
+          commit('SET_ONLY_ROLE', role)
           const { data: orgName } = await loginOrgName()
           commit(
             'setting/CHANGE_SETTING',
@@ -60,7 +68,7 @@ const actions = {
             },
             { root: true }
           )
-          setInfo(data)
+          setInfo({ onlyRole: role, ...data })
           setOrg({ orgName })
           resolve()
         })
@@ -76,10 +84,11 @@ const actions = {
    * @param {*} commit
    * @return {*}
    */
-  resetToken({ commit, dispatch }) {
+  resetToken({ commit }) {
     return new Promise((resolve) => {
       commit('SET_TOKEN', '')
       commit('SET_ROLES', [])
+      commit('SET_ONLY_ROLE', [])
       commit('permission/SET_ROUTES', [], { root: true })
       removeInfo()
       resetRouter()

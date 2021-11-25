@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-03 14:22:34
  * @LastEditors: Che
- * @LastEditTime: 2021-11-15 17:21:11
+ * @LastEditTime: 2021-11-25 15:49:40
 -->
 <template>
   <div class="container">
@@ -14,13 +14,16 @@
     <!-- 内容 -->
     <div class="content">
       <div class="exam-list">
-        <div class="exam-item" v-if="$store.getters.roles.includes('user')">
+        <div class="exam-item" v-if="$store.getters.onlyRole.includes('user')">
           <div @click="toMyExam" class="exam-content exam-add">
             <i class="common common-exam"></i>
             <span>我的考试</span>
           </div>
         </div>
-        <div class="exam-item" v-if="$store.getters.roles.includes('subAdmin')">
+        <div
+          class="exam-item"
+          v-if="$store.getters.onlyRole.includes('subAdmin')"
+        >
           <div @click="toMyMarkExam" class="exam-content exam-add">
             <i class="common common-readPaper"></i>
             <span>我的阅卷</span>

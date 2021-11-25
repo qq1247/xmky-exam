@@ -66,13 +66,14 @@ export default {
               password: this.ruleForm.password,
             })
             .then(() => {
-              !this.$route.query.redirect
+              this.$store.getters.onlyRole.includes('admin')
                 ? this.$router.replace({
-                    path: '/',
+                    path: '/user/index',
                   })
                 : this.$router.replace({
-                    path: this.$route.query.redirect,
+                    path: '/',
                   })
+
               this.$message('登录成功！')
             })
         } else {

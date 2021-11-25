@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-12 10:17:05
  * @LastEditors: Che
- * @LastEditTime: 2021-11-09 11:17:55
+ * @LastEditTime: 2021-11-25 13:54:38
  */
 
 import router, { constantRoutes } from './index'
@@ -46,7 +46,7 @@ router.beforeEach(async (to, from, next) => {
       NProgress.done()
     } else {
       try {
-        const roles = store.state.user.roles
+        const roles = store.getters.onlyRole
         const accessRoutes = await store.dispatch(
           'permission/generateRoutes',
           roles
