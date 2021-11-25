@@ -34,5 +34,6 @@
 		<module>exam-api</module>
 		<module>exam-core</module>
 		<module>exam-report</module>
+		<module>sys-textSimilarity</module>
 	</modules>
 </project>
