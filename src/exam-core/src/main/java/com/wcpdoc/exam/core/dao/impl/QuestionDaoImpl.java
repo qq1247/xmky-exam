@@ -1,5 +1,6 @@
 package com.wcpdoc.exam.core.dao.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.base.cache.DictCache;
 import com.wcpdoc.base.dao.UserDao;
+import com.wcpdoc.base.entity.User;
 import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
@@ -56,7 +58,23 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && "0".equals(pageIn.get("state")), "QUESTION.STATE = 0 AND QUESTION.UPDATE_TIME > ?", DateUtil.getNextDay(new Date(), -7))// 查询已删除并且最近7天的试题（回收站使用）
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "QUESTION.STATE = ?", pageIn.get("state"))// 默认查询发布和草稿状态
 				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "QUESTION_TYPE.WRITE_USER_IDS LIKE ?", String.format("%%%s%%", pageIn.get("curUserId", Integer.class)))// 只看自己的
-				.addOrder("QUESTION.UPDATE_TIME", Order.DESC);
+				.addOrder(!ValidateUtil.isValid(pageIn.get("rand")), "QUESTION.UPDATE_TIME", Order.DESC)
+				.addOrder(ValidateUtil.isValid(pageIn.get("rand")), "Rand()", Order.NULL);
+		
+		if (pageIn.get("curUserId", Integer.class) != null && !ValidateUtil.isValid(pageIn.get("open"))) {
+			User user = userDao.getEntity(pageIn.get("curUserId", Integer.class));
+			StringBuilder partSql = new StringBuilder();
+			List<Object> params = new ArrayList<>();
+			partSql.append("(");
+			partSql.append("QUESTION_TYPE.READ_USER_IDS LIKE ? ");
+			params.add("%," + user.getId() + ",%");
+			
+			partSql.append("OR QUESTION_TYPE.WRITE_USER_IDS LIKE ? ");
+			params.add("%," + user.getId() + ",%");
+			
+			partSql.append(")");
+			sqlUtil.addWhere(partSql.toString(), params.toArray(new Object[params.size()]));
+		}
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), 
 				"QUESTION_TYPE", "type", 

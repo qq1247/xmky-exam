@@ -72,26 +72,24 @@ public class ParmCache extends BaseEhCache {
 		Parm parm = SpringUtil.getBean(ParmService.class).get();
 		Parm source = parm;
 		Parm target = new Parm();
-		BeanUtils.copyProperties(source, target);
+		BeanUtils.copyProperties(target, target);
 		
-		if (!ValidateUtil.isValid(source.getFileUploadDir())) {// 文件路径
-			target.setFileUploadDir(String.format("%s\\%s", System.getProperty("user.dir"), "bak\\file"));
-		}else {
-			target.setFileUploadDir(String.format("%s\\%s", source.getFileUploadDir(), "bak\\file"));
+		target.setFileUploadDir(String.format("%s/%s", System.getProperty("user.dir"), "bak/file"));
+		if (ValidateUtil.isValid(source.getFileUploadDir())) {
+			target.setFileUploadDir(String.format("%s/%s", source.getFileUploadDir(), "bak/file"));
 		}
-		java.io.File fileUploadDir = new java.io.File(source.getFileUploadDir());
+		java.io.File fileUploadDir = new java.io.File(target.getFileUploadDir());
 		if (!fileUploadDir.isAbsolute()) {
-			target.setFileUploadDir(String.format("%s\\%s\\%s", System.getProperty("user.dir"), source.getFileUploadDir(), "bak\\file"));// 如果是相对路径，备份路径为当前war包启动路径+配置文件子目录
+			target.setFileUploadDir(String.format("%s/%s", System.getProperty("user.dir"), target.getFileUploadDir()));// 如果是相对路径，备份路径为当前war包启动路径+配置文件子目录
 		}
 
-		if (!ValidateUtil.isValid(source.getDbBakDir())) {// 数据库备份路径
-			target.setDbBakDir(String.format("%s\\%s", System.getProperty("user.dir"), "bak\\db"));
-		}else {
-			target.setDbBakDir(String.format("%s\\%s", source.getDbBakDir(), "bak\\db"));
+		target.setDbBakDir(String.format("%s/%s", System.getProperty("user.dir"), "bak/db"));
+		if (ValidateUtil.isValid(source.getDbBakDir())) {
+			target.setDbBakDir(String.format("%s/%s", source.getDbBakDir(), "bak/db"));
 		}
-		java.io.File dbBakDir = new java.io.File(source.getDbBakDir());
+		java.io.File dbBakDir = new java.io.File(target.getDbBakDir());
 		if (!dbBakDir.isAbsolute()) {
-			target.setDbBakDir(String.format("%s\\%s\\%s", System.getProperty("user.dir"), source.getDbBakDir(), "bak\\db"));// 如果是相对路径，备份路径为当前war包启动路径+配置文件子目录
+			target.setDbBakDir(String.format("%s/%s", System.getProperty("user.dir"), target.getDbBakDir()));// 如果是相对路径，备份路径为当前war包启动路径+配置文件子目录
 		}
 		
 		Map<String, Parm> parmMap = getParmMap();
