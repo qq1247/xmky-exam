@@ -105,7 +105,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if (entity.getState() == 3) {
 			throw new MyException("已归档");
 		}
-		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
+		PaperType paperType = paperTypeService.getEntity(entity.getPaperTypeId());
 		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
 		}
