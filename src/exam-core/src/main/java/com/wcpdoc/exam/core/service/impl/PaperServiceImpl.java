@@ -77,7 +77,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	public void addAndUpdate(Paper paper, PaperRemark paperRemark) {// paperRemark暂时不用保留
 		// 校验数据有效性
 		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(!paperTypeService.hasReadAuth(paperType, getCurUser().getId())) {
+		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -105,8 +105,8 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if (entity.getState() == 3) {
 			throw new MyException("已归档");
 		}
-		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(!paperTypeService.hasReadAuth(paperType, getCurUser().getId())) {
+		PaperType paperType = paperTypeService.getEntity(entity.getPaperTypeId());
+		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
 		}
 
@@ -128,7 +128,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			throw new MyException("已删除");
 		}
 		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(!paperTypeService.hasReadAuth(paperType, getCurUser().getId())) {
+		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -144,7 +144,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		// 校验数据有效性
 		Paper paper = paperDao.getEntity(id);
 		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(!paperTypeService.hasReadAuth(paperType, getCurUser().getId())) {
+		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -220,7 +220,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			throw new MyException("已归档");
 		}
 		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(!paperTypeService.hasReadAuth(paperType, getCurUser().getId())) {
+		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -251,7 +251,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			throw new MyException("已归档");
 		}
 		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(!paperTypeService.hasReadAuth(paperType, getCurUser().getId())) {
+		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -291,7 +291,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			throw new MyException("已归档");
 		}
 		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(!paperTypeService.hasReadAuth(paperType, getCurUser().getId())) {
+		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -324,7 +324,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			throw new MyException("已归档");
 		}
 		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(!paperTypeService.hasReadAuth(paperType, getCurUser().getId())) {
+		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
 		}
 				
@@ -367,7 +367,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			throw new MyException("已归档");
 		}
 		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(!paperTypeService.hasReadAuth(paperType, getCurUser().getId())) {
+		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -414,7 +414,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			throw new MyException("已归档");
 		}
 		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(!paperTypeService.hasReadAuth(paperType, getCurUser().getId())) {
+		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -461,7 +461,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			throw new MyException("已归档");
 		}
 		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(!paperTypeService.hasReadAuth(paperType, getCurUser().getId())) {
+		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
 		}
 		List<PaperQuestion> paperQuestionList = paperQuestionService.getList(paper.getId());
@@ -572,7 +572,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			throw new MyException("已归档");
 		}
 		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(!paperTypeService.hasReadAuth(paperType, getCurUser().getId())) {
+		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -611,7 +611,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			throw new MyException("已归档");
 		}
 		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(!paperTypeService.hasReadAuth(paperType, getCurUser().getId())) {
+		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
 		}
 		PaperQuestion pq = paperQuestionService.getEntity(id, questionId);
@@ -665,7 +665,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			throw new MyException("已归档");
 		}
 		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(!paperTypeService.hasReadAuth(paperType, getCurUser().getId())) {
+		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
 		}
 		PaperQuestion pq = paperQuestionService.getEntity(id, questionId);
@@ -710,7 +710,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			throw new MyException("已归档");
 		}
 		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(!paperTypeService.hasReadAuth(paperType, getCurUser().getId())) {
+		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
 		}
 
@@ -888,7 +888,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			throw new MyException("已归档");
 		}
 		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(!paperTypeService.hasReadAuth(paperType, getCurUser().getId())) {
+		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
 		}
 
@@ -939,7 +939,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			throw new MyException("已归档");
 		}
 		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(!paperTypeService.hasReadAuth(paperType, getCurUser().getId())) {
+		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
 		}
 		

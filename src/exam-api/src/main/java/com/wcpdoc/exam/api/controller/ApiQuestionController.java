@@ -19,6 +19,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.wcpdoc.base.cache.ProgressBarCache;
+import com.wcpdoc.core.constant.ConstantManager;
 import com.wcpdoc.core.context.UserContext;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.LoginUser;
@@ -88,7 +89,12 @@ public class ApiQuestionController extends BaseController {
 				}
 			}
 			
-			return PageResultEx.ok().data(pageOut);
+			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
+				pageIn.addAttr("curUserId", getCurUser().getId());
+			}
+			
+			PageOut listpage = questionService.getListpage(pageIn);
+			return PageResultEx.ok().data(listpage);
 		} catch (Exception e) {
 			log.error("试题列表错误：", e);
 			return PageResult.err();

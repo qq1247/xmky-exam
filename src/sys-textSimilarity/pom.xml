@@ -2,33 +2,40 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+
 	<parent>
 		<groupId>com.wcpdoc.exam</groupId>
 		<artifactId>sys-parent</artifactId>
-		<version>3.2.1</version>
+		<version>3.2.0</version>
 	</parent>
-	<artifactId>sys-api</artifactId>
-	<name>sys-api</name>
-	<description>系统API</description>
+	<artifactId>sys-textSimilarity</artifactId>
+	<name>sys-textSimilarity</name>
+	<description>文本相似比较</description>
 
 	<dependencies>
+
+		<dependency>
+			<groupId>com.hankcs</groupId>
+			<artifactId>hanlp</artifactId>
+			<version>portable-1.7.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-core</artifactId>
+			<version>1.20</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>27.0-jre</version>
+		</dependency>
+
 		<!-- 集成系统基础 -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
 			<artifactId>sys-base</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- 集成附件 -->
-		<dependency>
-			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>sys-file</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<!-- 集成敏感词 -->
-		<dependency>
-			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>sys-wordFilter</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 	</dependencies>
+
 </project>
