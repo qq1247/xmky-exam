@@ -135,7 +135,7 @@
             <Draggable
               tag="div"
               class="drag-content"
-              :list="paperList"
+              v-model="paperList"
               :sort="false"
               :group="{ name: 'paper', put: false }"
               chosenClass="drag-active"
@@ -143,7 +143,6 @@
               @end="sourceEnd"
               @choose="sourceChoose"
               :disabled="paperQuestion.length == 0 ? true : false"
-              v-if="paperList.length > 0"
             >
               <transition-group>
                 <div
@@ -171,7 +170,8 @@
                 </div>
               </transition-group>
             </Draggable>
-            <el-empty v-else description="暂无此类型题目"> </el-empty>
+            <el-empty v-if="!paperList.length" description="暂无此类型题目">
+            </el-empty>
           </div>
           <el-pagination
             background
@@ -196,7 +196,7 @@
         <div class="center-drag">
           <Draggable
             tag="div"
-            :list="paperQuestion"
+            v-model="paperQuestion"
             group="paperParent"
             chosenClass="drag-question-active"
             animation="300"
@@ -258,7 +258,7 @@
                   'drag-content',
                   item.questionList.length != 0 ? 'drag-children' : '',
                 ]"
-                :list="item.questionList"
+                v-model="item.questionList"
                 group="paper"
                 chosenClass="drag-question-active"
                 animation="300"
@@ -1050,8 +1050,6 @@ export default {
     },
     // 试题移动
     async questionMove({ to, from, newIndex, oldIndex }) {
-      console.log(to)
-      console.log(from)
       const toChapterId = to.dataset.id
       const fromChapterId = from.dataset.id
       let sourceId, targetId
