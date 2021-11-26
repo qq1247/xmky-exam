@@ -373,16 +373,11 @@ export default {
         }
 
         const params = {
-          paperTypeId: this.queryForm.paperTypeId,
           genType: this.paperForm.genType,
           name: this.paperForm.name,
           passScore: this.paperForm.passScore,
-          readRemark: this.paperForm.readRemark,
-          readNum: this.paperForm.readNum,
           showType: Number(this.paperForm.showType),
-          options: this.paperForm.options.join(','),
           markType: this.paperForm.markType,
-          // paperRemark: [],
         }
 
         const res = this.paperForm.edit
@@ -414,21 +409,8 @@ export default {
         this.paperForm.genType = item.genType
         this.paperForm.name = item.name
         this.paperForm.passScore = item.passScore
-        this.paperForm.readRemark = item.readRemark
-        this.paperForm.readNum = item.readNum
         this.paperForm.showType = String(item.showType)
         this.paperForm.markType = item.markType
-        this.paperForm.options =
-          item.options == '' ? [] : item.options.split(',')
-        this.paperForm.paperRemarkShow = !!item.paperRemark
-        this.paperForm.paperRemark = !item.paperRemark
-          ? [
-              {
-                score: '',
-                remark: '',
-              },
-            ]
-          : item.paperRemark
       })
     },
     // 删除分类
