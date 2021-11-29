@@ -1,8 +1,11 @@
-package com.wcpdoc.textSimilarity.entity;
+package com.wcpdoc.textSimilarity.util;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
+import com.wcpdoc.textSimilarity.entity.Article;
+import com.wcpdoc.textSimilarity.entity.WordFreq;
 
 /**
  * 用于表示比较两篇文章的任务。设置了任务状态；可查看比较的结果。

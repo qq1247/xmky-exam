@@ -13,7 +13,7 @@ public interface TextSimilarityService {
 	 * 
 	 * @param sentence
 	 * @param compareSentence
-	 * @return double 
+	 * @return double -1 异常
 	 */
 	double getSimilarity(String sentence, String compareSentence);
 

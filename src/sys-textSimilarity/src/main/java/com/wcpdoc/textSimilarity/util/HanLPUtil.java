@@ -16,7 +16,6 @@ import com.hankcs.hanlp.HanLP;
 import com.hankcs.hanlp.corpus.tag.Nature;
 import com.hankcs.hanlp.seg.common.Term;
 import com.wcpdoc.textSimilarity.entity.Article;
-import com.wcpdoc.textSimilarity.entity.CompareTask;
 import com.wcpdoc.textSimilarity.entity.WordFreq;
 
 
