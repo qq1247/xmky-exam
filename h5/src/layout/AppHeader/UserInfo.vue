@@ -5,16 +5,24 @@
  * @Author: Che
  * @Date: 2021-08-09 17:59:09
  * @LastEditors: Che
- * @LastEditTime: 2021-09-30 11:29:36
+ * @LastEditTime: 2021-11-25 16:11:30
 -->
 <template>
   <div class="header-userInfo">
     <template v-if="token">
       <el-dropdown trigger="hover" @command="handleCommand">
         <span class="el-dropdown-link">
-          欢迎您！{{ name }}<i class="el-icon-arrow-down el-icon--right"></i>
+          欢迎您！{{ name
+          }}<i :class="['common tag', `common-${level[onlyRole[0]]}`]"></i
+          ><i class="el-icon-arrow-down el-icon--right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item
+            icon="common common-change"
+            command="change"
+            v-if="roles.includes('subAdmin')"
+            >切换角色</el-dropdown-item
+          >
           <el-dropdown-item icon="common common-edit" command="edit"
             >修改密码</el-dropdown-item
           >
@@ -61,10 +69,16 @@
 <script>
 import { mapGetters } from 'vuex'
 import { loginPwd } from 'api/common'
+import { getInfo, setInfo } from '@/utils/storage'
 export default {
   name: 'UserInfo',
   data() {
     return {
+      level: {
+        admin: 'setting',
+        subAdmin: 'finish',
+        user: 'user',
+      },
       editForm: {
         show: false,
         oldPwd: '',
@@ -81,10 +95,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['token', 'name']),
+    ...mapGetters(['token', 'name', 'roles', 'onlyRole']),
   },
   methods: {
-    handleCommand(command) {
+    async handleCommand(command) {
       if (command === 'edit') {
         this.editForm.show = true
       }
@@ -93,6 +107,36 @@ export default {
         this.$store.dispatch('user/resetToken').then(() => {
           this.$message('登出成功！')
           this.$router.push('/')
+        })
+      }
+
+      if (command === 'change') {
+        this.$confirm(
+          `确定要切换为【${
+            this.onlyRole.includes('subAdmin') ? '普通用户' : '子管理员'
+          }】角色吗？`,
+          '角色切换',
+          {
+            confirmButtonText: '切换',
+            cancelButtonText: '取消',
+            type: 'warning',
+          }
+        ).then(async () => {
+          const onlyRole = this.onlyRole.includes('subAdmin')
+            ? ['user']
+            : ['subAdmin']
+          this.$store.commit('user/SET_ONLY_ROLE', onlyRole)
+          const userInfo = getInfo()
+          userInfo.onlyRole = onlyRole
+          setInfo(userInfo)
+          const accessRoutes = await this.$store.dispatch(
+            'permission/generateRoutes',
+            onlyRole
+          )
+          this.$router.addRoutes(accessRoutes)
+          this.$router.replace({
+            path: '/',
+          })
         })
       }
     },
@@ -135,6 +179,9 @@ export default {
       cursor: default;
     }
   }
+  .tag {
+    margin: 0 5px;
+  }
   .common-login-out {
     margin-right: 10px;
   }
@@ -149,9 +196,9 @@ export default {
     text-decoration: none;
     background: #0095e5;
   }
-}
 
-.el-dropdown-link {
-  color: #fff;
+  .el-dropdown-link {
+    color: #fff;
+  }
 }
 </style>

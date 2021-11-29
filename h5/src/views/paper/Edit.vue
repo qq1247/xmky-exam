@@ -135,15 +135,14 @@
             <Draggable
               tag="div"
               class="drag-content"
-              :list="paperList"
+              v-model="paperList"
               :sort="false"
               :group="{ name: 'paper', put: false }"
               chosenClass="drag-active"
               animation="300"
-              :move="sourceEnd"
+              @end="sourceEnd"
               @choose="sourceChoose"
               :disabled="paperQuestion.length == 0 ? true : false"
-              v-if="paperList.length > 0"
             >
               <transition-group>
                 <div
@@ -171,7 +170,8 @@
                 </div>
               </transition-group>
             </Draggable>
-            <el-empty v-else description="暂无此类型题目"> </el-empty>
+            <el-empty v-if="!paperList.length" description="暂无此类型题目">
+            </el-empty>
           </div>
           <el-pagination
             background
@@ -196,7 +196,7 @@
         <div class="center-drag">
           <Draggable
             tag="div"
-            :list="paperQuestion"
+            v-model="paperQuestion"
             group="paperParent"
             chosenClass="drag-question-active"
             animation="300"
@@ -237,7 +237,7 @@
                       >清空试题</el-button
                     >
                     <el-button
-                      @click="chapteFold(index)"
+                      @click="chapterFold(index)"
                       class="btn"
                       icon="common common-fold"
                       round
@@ -258,7 +258,7 @@
                   'drag-content',
                   item.questionList.length != 0 ? 'drag-children' : '',
                 ]"
-                :list="item.questionList"
+                v-model="item.questionList"
                 group="paper"
                 chosenClass="drag-question-active"
                 animation="300"
@@ -777,7 +777,7 @@ export default {
     async queryQuestion() {
       const res = await questionListPage({
         id: this.queryForm.id,
-        ai: this.markType === 1 ? 1 : '',
+        ai: this.markType === '1' ? 1 : '',
         state: 1,
         type: this.queryForm.type,
         title: this.queryForm.title,
@@ -883,7 +883,7 @@ export default {
         })
     },
     // 章节折叠
-    chapteFold(index) {
+    chapterFold(index) {
       this.paperQuestion[index].chapter.show =
         !this.paperQuestion[index].chapter.show
     },
@@ -1024,10 +1024,9 @@ export default {
       }
     },
     // 拖拽原题结束
-    async sourceEnd(e) {
-      console.log(e)
+    async sourceEnd({ to, item }) {
       const chapterId = to.dataset.id
-      const questionIds = item.id
+      const questionIds = Number(item.id)
       const res = await paperQuestionAdd({
         chapterId,
         questionIds,
@@ -1051,8 +1050,6 @@ export default {
     },
     // 试题移动
     async questionMove({ to, from, newIndex, oldIndex }) {
-      console.log(to)
-      console.log(from)
       const toChapterId = to.dataset.id
       const fromChapterId = from.dataset.id
       let sourceId, targetId
