@@ -315,6 +315,7 @@ http请求头需添加Authorization字段，
 | -------- | ---------- | ---------- | ---- |
 | paperTypeId| Integer     | 试卷分类ID| 否   |
 | name     | String(16) | 试卷名称   | 否   |
+| state     | Integer | 状态（默认查询草稿和已发布） | 否   |
 | curPage  | Integer    | 当前第几页 | 否   |
 | pageSize | Integer    | 每页多少条 | 否   |
 
@@ -347,6 +348,7 @@ http请求头需添加Authorization字段，
 | name  | String(32)    | 名称  | 是   |
 | passScore | Double        | 及格分数（百分比） | 是   |
 | showType | Integer       | 展示方式（1：整卷展示；2：章节显示；3：单题展示；）| 否   |
+| paperTypeId | Integer       | 试题分类ID | 是  |
 
 ### 试卷修改：paper/edit
 | 请求参数| 类型    | 描述 | 必填 |
