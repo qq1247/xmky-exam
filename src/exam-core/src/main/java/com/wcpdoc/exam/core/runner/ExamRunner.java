@@ -5,6 +5,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -21,20 +23,22 @@ import com.wcpdoc.exam.core.service.ExamService;
  */
 @Component
 public class ExamRunner implements ApplicationRunner {
+	private static final Logger log = LoggerFactory.getLogger(ExamRunner.class);
+	
 	@Resource
 	private ExamService examService;
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		// 服务启动的时候，查找所有考试未结束，并且未自动阅卷的考试，加入定时任务监听，用于考试结束时自动阅卷
+		// 服务启动的时候，查找需要自动阅卷的考试，加入定时任务监听，用于考试结束时自动阅卷
 		PageIn pageIn = new PageIn();
 		pageIn.setPageSize(100);
-		// pageIn.addAttr("endTime1", DateUtil.formatDateTime(new Date()));// 只要是未结束的都需要阅卷
-		pageIn.addAttr("state", "1");
-		pageIn.addAttr("markState", "1");
+		pageIn.addAttr("state", "1");// 已发布
+		pageIn.addAttr("markState", "1");// 未自动阅卷
 		List<Map<String, Object>> resultList = examService.getListpage(pageIn).getList();
 		for (Map<String, Object> result : resultList) {
 			AutoMarkCache.put((Integer)result.get("id"), DateUtil.getDateTime(result.get("endTime").toString()));
+			log.info("启动监听：【{}-{}】加入监听，{}开始自动阅卷", result.get("id"), result.get("name"), result.get("endTime"));
 		}
 	}
 }

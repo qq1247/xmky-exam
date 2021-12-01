@@ -69,6 +69,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	private PaperQuestionAnswerService paperQuestionAnswerService;
 	@Resource
 	private PaperQuestionService paperQuestionService;
+	@Resource
+	private MyExamDetailService myExamDetailService;
 
 	@Override
 	@Resource(name = "myExamDetailDaoImpl")
@@ -160,6 +162,11 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 				myExam.setAnswerState(2);
 				//myExam.setState(1);// 状态还是未考试，不改变
 				myExamService.update(myExam);
+				List<MyExamDetail> userAnswerList = getList(examId, myExam.getUserId());
+				for (MyExamDetail userAnswer : userAnswerList) {
+					userAnswer.setScore(BigDecimal.ZERO);
+					myExamDetailService.update(userAnswer);// 没作答也都标记为0分。影响的地方为人工阅卷时，所有题都有分数，才允许阅卷完成。
+				}
 				log.info("自动阅卷进行：{}-{}未考试，得0分，不及格", user.getId(), user.getName());
 				continue;
 			}
@@ -196,6 +203,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 					}
 				
 					totalScore.add(userAnswer.getScore());
+					myExamDetailService.update(userAnswer);
 				}
 			}
 			
