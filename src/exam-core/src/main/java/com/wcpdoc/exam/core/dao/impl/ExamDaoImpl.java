@@ -47,7 +47,6 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 				.addWhere(ValidateUtil.isValid(pageIn.get("markState")), "EXAM.MARK_STATE = ?", pageIn.get("markState", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "EXAM.STATE = ?", pageIn.get("state", Integer.class))
 				.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "EXAM.STATE IN (1,2)")
-				.addWhere(ValidateUtil.isValid(pageIn.get("markEndTime")), "EXAM.MARK_END_TIME >= ?", pageIn.get("markEndTime"))
 				.addOrder("EXAM.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(), 

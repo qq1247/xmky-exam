@@ -177,7 +177,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 				log.info("自动阅卷进行：{}-{}未交卷，标记为已交卷", user.getId(), user.getName());
 			}
 		
-			if (paper.getMarkType() == 1) {// 如果是智能阅卷，自动记录阅卷用户为管理员，阅卷开始时间等；如果是人工阅卷，阅卷用户在在页面阅卷时记录相关字段
+			if (paper.getMarkType() == 1) {// 如果是智能阅卷，自动记录阅卷用户为管理员，阅卷开始时间等；如果是人工阅卷，阅卷人为当前登录用户，阅卷开始时间为第一次给某一张卷子阅第一道题的时间
 				myExam.setMarkUserId(1);
 				myExam.setMarkStartTime(new Date());
 			}
@@ -202,8 +202,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 						fillBlankHandle(question, questionOption, questionAnswerList, userAnswer);// 填空处理
 					}
 				
-					totalScore.add(userAnswer.getScore());
-					myExamDetailService.update(userAnswer);
+					totalScore.add(userAnswer.getScore());// 累加当前分数到总分数
+					myExamDetailService.update(userAnswer);// 更新每道题的分数
 				}
 			}
 			
@@ -219,19 +219,29 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 				} else {
 					myExam.setAnswerState(2);// 标记为不及格
 				}
-			} else {
-				myExam.setMarkState(1);// 标记为未阅卷，等待人工阅卷
-			}
+			} 
+			//if (paper.getMarkType() == 2) {
+				// myExam.setMarkState(1);// 标记为未阅卷，等待人工阅卷。不需要处理（在考试的阅卷设置已经标记为未阅卷）
+			//}
 			myExamService.update(myExam);
 			log.info("自动阅卷进行：{}-{}完成阅卷，自动阅卷部分得{}分", user.getId(), user.getName(), totalScore.getResult());
 		}
 		
-		// 标记考试为已阅（自动阅卷部分），如果试卷是人工阅卷，只有这里标记为自动阅卷，才能开始人工阅卷
-		exam.setMarkState(3);
-		examService.update(exam);
-		log.info("自动阅卷进行：标记考试为已阅（自动阅卷部分）");
+		// 如果试卷是智能阅卷类型，标记考试为已阅卷。
+		if (paper.getMarkType() == 1) {
+			exam.setMarkState(3);
+			examService.update(exam);
+			log.info("自动阅卷完成：标记考试为已阅卷，结束");
+			return;
+		}
 		
-		log.info("自动阅卷完成");
+		// 如果试卷是人工阅卷类型，标记考试为阅卷中。（阅卷人在开始阅卷时，如果考试状态为未阅卷则不能阅卷，因为自动阅卷还未完成。）
+		if (paper.getMarkType() == 2) {
+			exam.setMarkState(2);
+			examService.update(exam);
+			log.info("自动阅卷完成：标记考试为阅卷中，等待人工阅卷");
+			return;
+		}
 	}
 
 	@Override
@@ -264,33 +274,35 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		}
 		
 		Paper paper = paperService.getEntity(exam.getPaperId());// 试卷信息
-		// 延时1秒在完成阅卷
+		// 延时2秒在完成阅卷
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			log.error("完成阅卷异常：{}，延时执行异常", exam.getName());
 		}
 		
-		//考试详情
 		log.info("完成阅卷开始：{}", exam.getName());
-		Date curTimeDate = new Date();
-		List<MyExam> list = myExamService.getMarkList(examId, 3); //!=3
+		// 获取所有考试用户
+		List<MyExam> list = myExamService.getList(examId);
 		for(MyExam myExam : list){
-			//我的考试
+			if (myExam.getMarkState() == 3) {//已阅卷的不处理
+				continue;
+			}
+			
+			// 开始阅卷
 			myExam.setMarkUserId(1);
-			myExam.setMarkStartTime(curTimeDate);
-			myExam.setMarkEndTime(curTimeDate);
+			myExam.setMarkStartTime(new Date());
+			
 			List<MyExamDetail> myExamDetailList = getList(myExam.getExamId(), myExam.getUserId());//计算总分
 			BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
 			for (MyExamDetail myExamDetail : myExamDetailList) {
-				if (myExamDetail.getScore() == null) {//我的考试详情没阅卷分数
+				if (myExamDetail.getScore() == null) {//当阅卷人没有阅卷或部分未阅卷时，阅卷时间到。
 					BigDecimal bigDecimal = new BigDecimal(0);
 					totalScore.add(bigDecimal);
 					myExamDetail.setScore(bigDecimal);
 					myExamDetail.setMarkUserId(1);
-					myExamDetail.setMarkTime(curTimeDate);
+					myExamDetail.setMarkTime(new Date());
 				    myExamDetailDao.update(myExamDetail);
-					
 				} else {
 					totalScore.add(myExamDetail.getScore());
 				}
@@ -303,15 +315,16 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 				myExam.setAnswerState(2);
 			}
 			myExam.setMarkState(3);
+			myExam.setMarkEndTime(new Date());
 			myExamService.update(myExam);
 		}
 		
-		//完成阅卷
+		// 完成阅卷
 		if (exam.getMarkStartTime() == null) {			
-			exam.setMarkStartTime(curTimeDate);
+			exam.setMarkStartTime(new Date());
 		}
 		if (exam.getMarkEndTime() == null) {			
-			exam.setMarkEndTime(curTimeDate);
+			exam.setMarkEndTime(new Date());
 		}
 		exam.setMarkState(3);
 		examService.update(exam);

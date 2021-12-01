@@ -31,7 +31,7 @@ public class OutMarkJob implements Job {
 		}
 		for (Integer examId : examList) {
 			try {
-				if (OutMarkCache.get(examId).getTime() >= System.currentTimeMillis()) {// 如果阅卷未结束，不处理
+				if (OutMarkCache.get(examId).getTime() > System.currentTimeMillis()) {// 如果阅卷未结束，不处理
 					continue;
 				}
 				

@@ -63,11 +63,6 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	public List<MyExam> getList(Integer examId) {
 		return myExamDao.getList(examId);
 	}
-
-	@Override
-	public List<MyExam> getMarkList(Integer examId, Integer markState){
-		return myExamDao.getMarkList(examId, markState);
-	}
 	
 	@Override
 	public MyExam getEntity(Integer examId, Integer userId) {
@@ -140,6 +135,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		myExam.setState(2);
 		if (!ValidateUtil.isValid(myExam.getAnswerStartTime())) {
 			myExam.setAnswerStartTime(new Date());
+			myExam.setAnswerEndTime(new Date());// 如果只答一道题，这里不加，结束时间就是空
 		} else {
 			myExam.setAnswerEndTime(new Date());
 		}

@@ -1,6 +1,5 @@
 package com.wcpdoc.exam.core.runner;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -43,10 +42,11 @@ public class ExamRunner implements ApplicationRunner {
 			log.info("启动监听：【{}-{}】加入监听，{}开始自动阅卷", result.get("id"), result.get("name"), result.get("endTime"));
 		}
 		
+		// 服务启动的时候，查找需要完成阅卷的考试，加入定时任务监听，用于阅卷结束时自动阅卷
 		pageIn = new PageIn();
 		pageIn.setPageSize(100);
-		pageIn.addAttr("markEndTime", DateUtil.formatDateTime(new Date()));
-		pageIn.addAttr("state", "1");
+		pageIn.addAttr("markState", "2"); // 阅卷中
+		pageIn.addAttr("state", "1");// 已发布
 		resultList = examService.getListpage(pageIn).getList();
 		for (Map<String, Object> result : resultList) {
 			OutMarkCache.put((Integer)result.get("id"), DateUtil.getDateTime(result.get("markEndTime").toString()));
