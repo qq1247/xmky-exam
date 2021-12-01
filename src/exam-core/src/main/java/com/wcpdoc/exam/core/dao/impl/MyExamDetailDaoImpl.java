@@ -67,4 +67,12 @@ public class MyExamDetailDaoImpl extends RBaseDaoImpl<MyExamDetail> implements M
 		String sql = "DELETE FROM EXM_MY_EXAM_DETAIL WHERE EXAM_ID = ? AND USER_ID = ?";
 		update(sql, new Object[] { examId, userId });
 	}
+
+	@Override
+	public List<Map<String, Object>> getOutMarkList(Integer examId, Integer questionId) {
+		String sql = "SELECT MY_EXAM_DETAIL.ID, MY_EXAM_DETAIL.MY_EXAM_ID, "
+				+"FROM EXM_MY_EXAM_DETAIL MY_EXAM_DETAIL "
+				+"WHERE MY_EXAM_DETAIL.SCORE = NULL AND MY_EXAM_DETAIL.EXAM_ID = ? AND MY_EXAM_DETAIL.QUESTION_ID = ?";
+	return getMapList(sql, new Object[] { examId, questionId });
+	}
 }

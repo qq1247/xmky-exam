@@ -26,7 +26,6 @@ public class GradeServiceImpl implements GradeService {
 	
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	

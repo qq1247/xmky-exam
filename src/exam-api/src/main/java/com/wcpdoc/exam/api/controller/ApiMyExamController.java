@@ -96,38 +96,7 @@ public class ApiMyExamController extends BaseController{
 			return PageResult.err();
 		}
 	}
-	
-	/**
-	 * 阅卷考试答案列表
-	 * 
-	 * v1.0 chenyun 2021年7月29日下午6:04:37
-	 * @param userId
-	 * @param examId
-	 * @return PageResult
-	 */
-	@RequestMapping("/markAnswerList")
-	@ResponseBody
-	public PageResult markAnswerList(Integer userId, Integer examId) {
-		try {
-			List<Map<String, Object>> list = myExamDetailService.getMarkAnswerList(userId, examId);
-			for (Map<String, Object> map : list) {
-				map.put("answers", new QuestionAnswer().getAnswers(
-						(Integer)map.remove("questionType"), 
-						(Integer)map.remove("questionAi"), 
-						(String)map.remove("answer")
-						)); 
-			}
-			
-			return PageResultEx.ok().data(list);
-		} catch (MyException e) {
-			log.error("考试答案列表错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("考试答案列表错误：", e);
-			return PageResult.err();
-		}
-	}
-	
+
 	/**
 	 * 答题
 	 * 

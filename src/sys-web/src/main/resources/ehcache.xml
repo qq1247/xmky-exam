@@ -56,4 +56,8 @@
 	<cache name="AUTO_MARK_CACHE"
 		maxEntriesLocalHeap="100000">
 	</cache>
+	    <!-- 完成阅卷缓存，内存 -->
+	<cache name="OUT_MARK_CACHE"
+		maxEntriesLocalHeap="100000">
+	</cache>
 </ehcache>

@@ -23,13 +23,6 @@ spring:
     username: root
     password: root
     
-file: 
-  upload:
-    dir: bak/file
-db:
-  bak:
-    dir: bak/db
-    
 runtime:
   timeout: 1000
   exUrl: 
