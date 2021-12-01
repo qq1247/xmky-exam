@@ -126,7 +126,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		if (exam.getStartTime().getTime() > curTime) {
 			throw new MyException("考试未开始");
 		}
-		if (curTime - exam.getEndTime().getTime() > 5000) {// 预留5秒网络延时
+		if (curTime - exam.getEndTime().getTime() > 1000) {// 预留1秒网络延时
 			throw new MyException("考试已结束！");
 		}
 
@@ -188,7 +188,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		if (exam.getStartTime().getTime() > curTime) {
 			throw new MyException("考试未开始");
 		}
-		if (curTime - exam.getEndTime().getTime() > 5000) {// 预留5秒网络延时
+		if (curTime - exam.getEndTime().getTime() > 1000) {// 预留1秒网络延时
 			throw new MyException("考试已结束！");
 		}
 	

@@ -88,7 +88,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		if (exam.getMarkStartTime().getTime() > curTime) {
 			throw new MyException("阅卷未开始");
 		}
-		if (curTime - exam.getMarkEndTime().getTime() > 5000) {// 预留5秒网络延时
+		if (curTime - exam.getMarkEndTime().getTime() > 1000) {// 预留1秒网络延时
 			throw new MyException("阅卷已结束");
 		}
 		if (exam.getMarkState() == 1) {
@@ -161,7 +161,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		if (exam.getMarkStartTime().getTime() > curTime) {
 			throw new MyException("阅卷未开始");
 		}
-		if (curTime - exam.getMarkEndTime().getTime() > 5000) {// 预留5秒网络延时
+		if (curTime - exam.getMarkEndTime().getTime() > 1000) {// 预留1秒网络延时
 			throw new MyException("阅卷已结束！");
 		}
 		

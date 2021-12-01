@@ -138,9 +138,9 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			}
 		}
 		
-		// 延时6秒在开始阅卷（答题时增加了5秒网络延时）
+		// 延时2秒在开始阅卷
 		try {
-			Thread.sleep(6000);
+			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			log.error("自动阅卷异常：{}，延时执行异常", exam.getName());
 		}
