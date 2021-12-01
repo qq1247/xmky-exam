@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -263,10 +262,6 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			log.error("完成阅卷异常：{}阅卷未结束", exam.getName());
 			throw new MyException("阅卷未结束");
 		}
-		if (exam.getMarkState() == 3){
-			log.error("完成阅卷异常：{}已阅卷", exam.getName());
-			throw new MyException("已阅卷");
-		}
 		
 		Paper paper = paperService.getEntity(exam.getPaperId());// 试卷信息
 		// 延时1秒在完成阅卷
@@ -278,48 +273,46 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		
 		//考试详情
 		log.info("完成阅卷开始：{}", exam.getName());
-		List<Map<String, Object>> outMarkList = myExamDetailDao.getOutMarkList(exam.getId(), exam.getPaperId());
-		Set<Integer> myExamIdSet = new HashSet<Integer>();
-		for(Map<String, Object> map : outMarkList){
-			myExamIdSet.add(Integer.parseInt(map.get("myExamId").toString()));
-			MyExamDetail entity = myExamDetailDao.getEntity(Integer.parseInt(map.get("id").toString()));
-			entity.setScore(new BigDecimal(0));
-			entity.setMarkUserId(1);
-			entity.setMarkTime(new Date());
-			myExamDetailDao.update(entity);
-		}
-		
-		//我的考试
 		Date curTimeDate = new Date();
-		Iterator<Integer> it = myExamIdSet.iterator();
-		while (it.hasNext()) {
-		MyExam entity = myExamService.getEntity(it.next());
-		entity.setMarkUserId(1);
-		entity.setMarkStartTime(curTimeDate);
-		entity.setMarkEndTime(curTimeDate);
-		List<MyExamDetail> myExamDetailList = getList(entity.getExamId(), entity.getUserId());//计算总分
-		BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
-		for (MyExamDetail myExamDetail : myExamDetailList) {
-			if (myExamDetail.getScore() == null) {
-				totalScore.add(new BigDecimal(0));
-			} else {
-				totalScore.add(myExamDetail.getScore());
+		List<MyExam> list = myExamService.getMarkList(examId, 3); //!=3
+		for(MyExam myExam : list){
+			//我的考试
+			myExam.setMarkUserId(1);
+			myExam.setMarkStartTime(curTimeDate);
+			myExam.setMarkEndTime(curTimeDate);
+			List<MyExamDetail> myExamDetailList = getList(myExam.getExamId(), myExam.getUserId());//计算总分
+			BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
+			for (MyExamDetail myExamDetail : myExamDetailList) {
+				if (myExamDetail.getScore() == null) {//我的考试详情没阅卷分数
+					BigDecimal bigDecimal = new BigDecimal(0);
+					totalScore.add(bigDecimal);
+					myExamDetail.setScore(bigDecimal);
+					myExamDetail.setMarkUserId(1);
+					myExamDetail.setMarkTime(curTimeDate);
+				    myExamDetailDao.update(myExamDetail);
+					
+				} else {
+					totalScore.add(myExamDetail.getScore());
+				}
 			}
-		}
-		entity.setTotalScore(totalScore.getResult());
-		BigDecimal passScore = BigDecimalUtil.newInstance(paper.getTotalScore()).mul(paper.getPassScore()).div(100, 2).getResult();
-		if (BigDecimalUtil.newInstance(totalScore.getResult()).sub(passScore).getResult().doubleValue() >= 0) {
-			entity.setAnswerState(1);
-		} else {
-			entity.setAnswerState(2);
-		}
-		entity.setMarkState(3);
-		myExamService.update(entity);
+			myExam.setTotalScore(totalScore.getResult());
+			BigDecimal passScore = BigDecimalUtil.newInstance(paper.getTotalScore()).mul(paper.getPassScore()).div(100, 2).getResult();
+			if (BigDecimalUtil.newInstance(totalScore.getResult()).sub(passScore).getResult().doubleValue() >= 0) {
+				myExam.setAnswerState(1);
+			} else {
+				myExam.setAnswerState(2);
+			}
+			myExam.setMarkState(3);
+			myExamService.update(myExam);
 		}
 		
 		//完成阅卷
-		exam.setMarkStartTime(curTimeDate);
-		exam.setMarkEndTime(curTimeDate);
+		if (exam.getMarkStartTime() == null) {			
+			exam.setMarkStartTime(curTimeDate);
+		}
+		if (exam.getMarkEndTime() == null) {			
+			exam.setMarkEndTime(curTimeDate);
+		}
 		exam.setMarkState(3);
 		examService.update(exam);
 		log.info("完成阅卷结束：{}", exam.getName());

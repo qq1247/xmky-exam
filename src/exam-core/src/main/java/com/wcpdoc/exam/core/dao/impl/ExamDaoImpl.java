@@ -45,7 +45,6 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "EXAM.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
 				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "EXAM.UPDATE_USER_ID = ?", pageIn.get("curUserId", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("markState")), "EXAM.MARK_STATE = ?", pageIn.get("markState", Integer.class))
-				.addWhere(ValidateUtil.isValid(pageIn.get("markStateNot")), "EXAM.MARK_STATE != ?", pageIn.get("markStateNot", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "EXAM.STATE = ?", pageIn.get("state", Integer.class))
 				.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "EXAM.STATE IN (1,2)")
 				.addWhere(ValidateUtil.isValid(pageIn.get("markEndTime")), "EXAM.MARK_END_TIME >= ?", pageIn.get("markEndTime"))

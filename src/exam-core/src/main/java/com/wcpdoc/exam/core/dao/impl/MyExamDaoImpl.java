@@ -113,4 +113,10 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 				+ "ORDER BY USER.UPDATE_TIME DESC ";
 		return getMapList(sql, new Object[]{id});
 	}
+
+	@Override
+	public List<MyExam> getMarkList(Integer examId, Integer markState) {
+		String sql = "SELECT * FROM EXM_MY_EXAM WHERE EXAM_ID = ? AND MARK_STATE != ? "; //ID, EXAM_ID, MARK_STATE 
+		return getList(sql, new Object[] { examId, markState }, MyExam.class);
+	}
 }

@@ -64,7 +64,11 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		return myExamDao.getList(examId);
 	}
 
-
+	@Override
+	public List<MyExam> getMarkList(Integer examId, Integer markState){
+		return myExamDao.getMarkList(examId, markState);
+	}
+	
 	@Override
 	public MyExam getEntity(Integer examId, Integer userId) {
 		return myExamDao.getEntity(examId, userId);

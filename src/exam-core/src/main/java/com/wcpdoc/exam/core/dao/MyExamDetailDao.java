@@ -60,14 +60,4 @@ public interface MyExamDetailDao extends BaseDao<MyExamDetail>{
 	 * @param userId void
 	 */
 	void del(Integer examId, Integer userId);
-
-	/**
-	 * 获取未完成阅卷详情
-	 * 
-	 * v1.0 chenyun 2021年11月30日下午5:44:58
-	 * @param examId
-	 * @param questionId
-	 * @return List<Map<String, Object>>
-	 */
-	List<Map<String, Object>> getOutMarkList(Integer examId, Integer questionId);
 }

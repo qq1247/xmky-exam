@@ -47,10 +47,10 @@ public class ExamRunner implements ApplicationRunner {
 		pageIn.setPageSize(100);
 		pageIn.addAttr("markEndTime", DateUtil.formatDateTime(new Date()));
 		pageIn.addAttr("state", "1");
-		pageIn.addAttr("markStateNot", "3");
 		resultList = examService.getListpage(pageIn).getList();
 		for (Map<String, Object> result : resultList) {
 			OutMarkCache.put((Integer)result.get("id"), DateUtil.getDateTime(result.get("markEndTime").toString()));
+			log.info("启动监听：【{}-{}】加入监听，{}开始完成阅卷", result.get("id"), result.get("name"), result.get("markEndTime"));
 		}
 	}
 }

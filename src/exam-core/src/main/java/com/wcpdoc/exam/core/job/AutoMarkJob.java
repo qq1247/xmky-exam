@@ -26,6 +26,9 @@ public class AutoMarkJob implements Job {
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		List<Integer> examList = AutoMarkCache.getList();
+		if (examList == null || examList.size() == 0) {
+			return;
+		}
 		for (Integer examId : examList) {
 			try {
 				if (AutoMarkCache.get(examId).getTime() > System.currentTimeMillis()) {// 如果考试未结束，不处理

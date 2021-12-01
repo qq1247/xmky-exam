@@ -22,10 +22,13 @@ import com.wcpdoc.exam.core.service.MyExamDetailService;
 public class OutMarkJob implements Job {
 	private static final Logger log = LoggerFactory.getLogger(OutMarkJob.class);
 	private static final MyExamDetailService myExamDetailService = SpringUtil.getBean(MyExamDetailService.class);
-
+	
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		List<Integer> examList = OutMarkCache.getList();
+		if (examList == null || examList.size() == 0) {
+			return;
+		}
 		for (Integer examId : examList) {
 			try {
 				if (OutMarkCache.get(examId).getTime() >= System.currentTimeMillis()) {// 如果阅卷未结束，不处理
