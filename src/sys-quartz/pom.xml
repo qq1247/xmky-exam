@@ -12,10 +12,10 @@
 	<description>系统定时任务</description>
 
 	<dependencies>
-		<!-- 集成系统核心 -->
+		<!-- 集成系统基础 -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>sys-core</artifactId>
+			<artifactId>sys-base</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<!-- 集成定时任务 -->

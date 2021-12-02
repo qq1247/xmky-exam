@@ -133,16 +133,11 @@ public class ApiPaperController extends BaseController {
 					.addAttr("name", paper.getName())
 					.addAttr("passScore", paper.getPassScore())
 					.addAttr("totalScore", paper.getTotalScore())
-					.addAttr("showType", paper.getShowType())
-					.addAttr("readRemark", paper.getReadRemark())
-					.addAttr("readNum", paper.getReadNum())
-					.addAttr("state", paper.getState())
-					.addAttr("paperTypeId", paper.getPaperTypeId())
 					.addAttr("genType", paper.getGenType())
-					.addAttr("options", paper.getOptions())
-					.addAttr("minimizeNum", paper.getMinimizeNum())
-					.addAttr("createUserId", paper.getCreateUserId())
-					.addAttr("updateUserId", paper.getUpdateUserId());
+					.addAttr("markType", paper.getMarkType())
+					.addAttr("showType", paper.getShowType())
+					.addAttr("state", paper.getState())
+					.addAttr("paperTypeId", paper.getPaperTypeId());
 		} catch (MyException e) {
 			log.error("获取试卷错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -289,8 +284,8 @@ public class ApiPaperController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2018年10月21日上午10:46:54
 	 * @param id
-	 * @param sourceId
-	 * @param targetId
+	 * @param sourceId 源试题ID
+	 * @param targetId 目标试题ID
 	 * @return PageResult
 	 */
 	@RequestMapping("/questionMove")

@@ -4,14 +4,15 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
+import com.wcpdoc.base.cache.DictCache;
 import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.HibernateUtil;
 import com.wcpdoc.core.util.SqlUtil;
-import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.core.util.SqlUtil.Order;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.quartz.dao.CronDao;
 import com.wcpdoc.quartz.entity.Cron;
 
@@ -25,7 +26,7 @@ public class CronDaoImpl extends RBaseDaoImpl<Cron> implements CronDao {
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT CRON.ID, CRON.NAME, CRON.JOB_CLASS, CRON.CRON, CRON.STATE, USER.NAME AS UPDATE_USER_NAME, CRON.UPDATE_TIME "
+		String sql = "SELECT CRON.ID, CRON.NAME, CRON.JOB_CLASS, CRON.CRON, CRON.STATE "
 				+ "FROM SYS_CRON CRON "
 				+ "LEFT JOIN SYS_USER USER ON CRON.UPDATE_USER_ID = USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
@@ -33,6 +34,7 @@ public class CronDaoImpl extends RBaseDaoImpl<Cron> implements CronDao {
 				.addOrder("CRON.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(), "UPDATE_TIME", DateUtil.FORMAT_DATE_TIME);
+		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), "STATE", "state");
 		return pageOut;
 	}
 

@@ -29,8 +29,7 @@ public class ExamTypeDaoImpl extends RBaseDaoImpl<ExamType> implements ExamTypeD
 	
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT EXAM_TYPE.ID, EXAM_TYPE.NAME, EXAM_TYPE.CREATE_USER_ID, "
-				+ "USER.NAME AS CREATE_USER_NAME "
+		String sql = "SELECT EXAM_TYPE.ID, EXAM_TYPE.NAME "
 				+ "FROM EXM_EXAM_TYPE EXAM_TYPE "
 				+ "INNER JOIN SYS_USER USER ON EXAM_TYPE.CREATE_USER_ID = USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);

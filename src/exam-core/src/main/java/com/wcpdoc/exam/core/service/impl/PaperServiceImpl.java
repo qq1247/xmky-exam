@@ -828,12 +828,12 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 				Map<String, Object> questionMap = new HashMap<>();
 				Question question = idQuestionMap.get(paperQuestion.getQuestionId());
 				questionMap.put("id", question.getId());
-				questionMap.put("ai", question.getAi());
 				questionMap.put("type", question.getType());
 				questionMap.put("typeName", DictCache.getDictValue("QUESTION_TYPE", question.getType().toString()));
 				questionMap.put("difficulty", question.getDifficulty());
 				questionMap.put("difficultyName", DictCache.getDictValue("QUESTION_DIFFICULTY", question.getDifficulty().toString()));
 				questionMap.put("title", question.getTitle());
+				questionMap.put("ai", question.getAi());
 				questionMap.put("analysis", question.getAnalysis());
 				questionMap.put("score", paperQuestion.getScore());// 分数从试卷中取
 				questionMap.put("scoreOptions", paperQuestion.getScoreOptions());// 分数选项从试卷中取

@@ -15,7 +15,6 @@ import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
-import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.exam.core.entity.ExamType;
 import com.wcpdoc.exam.core.service.ExamTypeService;
 
@@ -35,7 +34,7 @@ public class ApiExamTypeController extends BaseController {
 	private UserService userService;
 	
 	/**
-	 * 试题分类列表 
+	 * 考试分类列表 
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
 	 * @return pageOut
@@ -49,13 +48,13 @@ public class ApiExamTypeController extends BaseController {
 			PageOut pageOut = examTypeService.getListpage(pageIn);
 			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
-			log.error("试题分类列表错误：", e);
+			log.error("考试分类列表错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 添加试题分类
+	 * 添加考试分类
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
 	 * @return pageOut
@@ -67,16 +66,16 @@ public class ApiExamTypeController extends BaseController {
 			examTypeService.addAndUpdate(examType);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("添加试题分类错误：{}", e.getMessage());
+			log.error("添加考试分类错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("添加试题分类错误：", e);
+			log.error("添加考试分类错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 修改试题分类
+	 * 修改考试分类
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
 	 * @return pageOut
@@ -88,16 +87,16 @@ public class ApiExamTypeController extends BaseController {
 			examTypeService.editAndUpdate(examType);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("修改试题分类错误：{}", e.getMessage());
+			log.error("修改考试分类错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("修改试题分类错误：", e);
+			log.error("修改考试分类错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 删除试题分类
+	 * 删除考试分类
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * 
 	 * @return pageOut
@@ -109,16 +108,16 @@ public class ApiExamTypeController extends BaseController {
 			examTypeService.delAndUpdate(id);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("删除试题分类错误：{}", e.getMessage());
+			log.error("删除考试分类错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("删除试题分类错误：", e);
+			log.error("删除考试分类错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 获取试题分类
+	 * 获取考试分类
 	 * 
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * @return pageOut
@@ -130,10 +129,7 @@ public class ApiExamTypeController extends BaseController {
 			ExamType entity = examTypeService.getEntity(id);
 			return PageResultEx.ok()
 					.addAttr("id", entity.getId())
-					.addAttr("name", entity.getName())
-					.addAttr("createUserId", entity.getCreateUserId())
-					.addAttr("createUserName", userService.getEntity(entity.getCreateUserId()).getName())
-					.addAttr("createTime", DateUtil.formatDateTime(entity.getCreateTime()));
+					.addAttr("name", entity.getName());
 		} catch (MyException e) {
 			log.error("获取考试分类错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

@@ -45,7 +45,7 @@ public class SensitiveServiceImpl extends BaseServiceImp<Sensitive> implements S
 	public void initialize() {
 		Sensitive entity = sensitiveDao.getEntity(1);
 		if (entity != null) {			
-			initialize(entity);
+			init(entity);
 		}
 	}
     
@@ -75,10 +75,10 @@ public class SensitiveServiceImpl extends BaseServiceImp<Sensitive> implements S
 			sensitiveDao.update(entity);
 		}
 		//初始化
-		initialize(sensitive);
+		init(sensitive);
 	}
 
-	private void initialize(Sensitive sensitive) {
+	private void init(Sensitive sensitive) {
 		// 初始化
 		context.delWordMap();
 		Set<String> set = new HashSet<>();

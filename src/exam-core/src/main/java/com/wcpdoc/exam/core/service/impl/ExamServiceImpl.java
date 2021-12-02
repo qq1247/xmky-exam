@@ -383,43 +383,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	@Override
-	public void updateMarkUser(Integer id, Integer[] markUserIds, String[] examUserIds, String[] questionIds) {
-		// 校验数据有效性
-		if (id == null) {
-			throw new MyException("参数错误：id");
-		}
-		if (markUserIds == null) {
-			throw new MyException("参数错误：markUserIds");
-		}
-		if (!ValidateUtil.isValid(examUserIds) && !ValidateUtil.isValid(questionIds)) {// 两个不能都无效
-			throw new MyException("参数错误：examUserIds,questionIds");
-		}
-		if (ValidateUtil.isValid(examUserIds) && ValidateUtil.isValid(questionIds)) {// 两个不能都有效
-			throw new MyException("参数错误：examUserIds,questionIds");
-		}
-		
-		// 更新阅卷用户
-		List<MyMark> myMarkList = myMarkService.getList(id);
-		for (MyMark myMark : myMarkList) {
-			myMarkService.del(myMark.getId());
-		}
-		if (markUserIds.length == 1) {
-			examUserIds[0] = StringUtil.join(examUserIds);
-		}
-		
-		for(int i = 0; i < markUserIds.length; i++) {
-			MyMark myMark = new MyMark();
-			myMark.setMarkUserId(markUserIds[i]);
-			myMark.setExamUserIds(examUserIds != null ? String.format(",%s,", examUserIds[i]) : null);
-			myMark.setQuestionIds(questionIds != null ? String.format(",%s,", questionIds[i]) : null);
-			myMark.setUpdateUserId(getCurUser().getId());
-			myMark.setUpdateTime(new Date());
-			myMark.setExamId(id);
-			myMarkService.add(myMark);
-		}
-	}
-
-	@Override
 	public List<Exam> getList(Integer examTypeId) {
 		return examDao.getList(examTypeId);
 	}

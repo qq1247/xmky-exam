@@ -103,8 +103,8 @@ public interface PaperService extends BaseService<Paper> {
 	 * 
 	 * v1.0 chenyun 2021年7月9日下午3:22:49
 	 * @param id
-	 * @param sourceId
-	 * @param targetId 
+	 * @param sourceId 源试题ID
+	 * @param targetId 目标试题ID
 	 * void
 	 */
 	void questionMove(Integer id, Integer sourceId, Integer targetId);

@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.wcpdoc.core.controller.BaseController;
-import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
@@ -44,16 +43,16 @@ public class ApiFileController extends BaseController {
 	 * 
 	 * @return pageOut
 	 */
-	@RequestMapping("/listpage")
-	@ResponseBody
-	public PageResult listpage() {
-		try {
-			return PageResultEx.ok().data(fileService.getListpage(new PageIn(request)));
-		} catch (Exception e) {
-			log.error("附件列表错误：", e);
-			return PageResult.err();
-		}
-	}
+//	@RequestMapping("/listpage") // 业务上不需要
+//	@ResponseBody
+//	public PageResult listpage() {
+//		try {
+//			return PageResultEx.ok().data(fileService.getListpage(new PageIn(request)));
+//		} catch (Exception e) {
+//			log.error("附件列表错误：", e);
+//			return PageResult.err();
+//		}
+//	}
 
 	/**
 	 * 完成临时上传附件
@@ -65,10 +64,10 @@ public class ApiFileController extends BaseController {
 	 */
 	@RequestMapping("/upload")
 	@ResponseBody
-	public PageResult upload(@RequestParam("files") MultipartFile[] files, String uuId) {
+	public PageResult upload(@RequestParam("files") MultipartFile[] files, String uuid) {
 		try {
 			String[] allowTypes = { "jpg", "jpeg", "gif", "png", "zip", "rar", "doc", "xls", "docx", "xlsx", "mp4" };
-			String fileIds = fileService.doTempUpload(files, allowTypes, uuId);
+			String fileIds = fileService.doTempUpload(files, allowTypes, uuid);
 			Map<String, Object> data = new HashMap<String, Object>();
 			data.put("fileIds", fileIds);
 			return PageResultEx.ok().data(data);
@@ -139,24 +138,24 @@ public class ApiFileController extends BaseController {
 //	}
 	
 	/**
-	 * 获取附件Id
+	 * 获取附件id
 	 * 
 	 * v1.0 zhanghc 2021年5月27日下午4:27:54
 	 * @param id
 	 * @return PageResult
 	 */
-	@RequestMapping("/getId")
+	@RequestMapping("/id")
 	@ResponseBody
-	public PageResult getId(String uuId) {
+	public PageResult id(String uuid) {
 		try {
-			Integer fileId = fileService.getFileId(uuId);
+			Integer fileId = fileService.getFileId(uuid);
 			return PageResultEx.ok()
 					.addAttr("id", fileId);
 		} catch (MyException e) {
-			log.error("删除数据字典错误：{}", e.getMessage());
+			log.error("获取附件id错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("删除数据字典错误：", e);
+			log.error("获取附件id错误：", e);
 			return PageResult.err();
 		}
 	}

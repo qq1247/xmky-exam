@@ -53,19 +53,13 @@ public class ApiCronController extends BaseController {
 			PageOut pageOut = cronService.getListpage(new PageIn(request));
 			List<Map<String, Object>> list = pageOut.getList();
 			for (Map<String, Object> map : list) {
-				if ("1".equals(map.get("state").toString())) {
-					map.put("stateName", "启动");
-				} else if ("2".equals(map.get("state").toString())) {
-					map.put("stateName", "停止");
-				}
-				
-				String cron = map.get("cron").toString();
+				String cron = (String)map.get("cron");
 				List<Date> timeList = QuartzUtil.getRecentTriggerTime(cron, 3);
-				StringBuilder timeStr = new StringBuilder();
-				for (Date date : timeList) {
-					timeStr.append(DateUtil.formatDateCustom(date, DateUtil.FORMAT_DATE_TIME)).append("；");
+				String[] triggerTimes = new String[3]; 
+				for (int i = 0; i < timeList.size(); i++) {
+					triggerTimes[i] = DateUtil.formatDateTime(timeList.get(i));
 				}
-				map.put("recentTriggerTime", timeStr.toString());
+				map.put("triggerTimes", triggerTimes);
 			}
 			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
@@ -115,10 +109,10 @@ public class ApiCronController extends BaseController {
 			cronService.add(cron);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("完成添加定时任务错误：{}", e.getMessage());
+			log.error("添加定时任务错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("完成添加定时任务错误：", e);
+			log.error("添加定时任务错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -138,10 +132,10 @@ public class ApiCronController extends BaseController {
 			cronService.updateAndUpdate(cron);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("完成修改定时任务错误：{}", e.getMessage());
+			log.error("修改定时任务错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("完成修改定时任务错误：", e);
+			log.error("修改定时任务错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -161,10 +155,10 @@ public class ApiCronController extends BaseController {
 			cronService.delAndUpdate(id);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("完成删除定时任务错误：{}", e.getMessage());
+			log.error("删除定时任务错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("完成删除定时任务错误：", e);
+			log.error("删除定时任务错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -247,16 +241,24 @@ public class ApiCronController extends BaseController {
 	public PageResult get(Integer id) {
 		try {
 			Cron cron = cronService.getEntity(id);
+			List<Date> timeList = QuartzUtil.getRecentTriggerTime(cron.getCron(), 3);
+			String[] triggerTimes = new String[3]; 
+			for (int i = 0; i < timeList.size(); i++) {
+				triggerTimes[i] = DateUtil.formatDateTime(timeList.get(i));
+			}
+			
 			return PageResultEx.ok()
 					.addAttr("id", cron.getId())
 					.addAttr("name", cron.getName())
 					.addAttr("jobClass", cron.getJobClass())
-					.addAttr("cron", cron.getCron());
+					.addAttr("cron", cron.getCron())
+					.addAttr("triggerTimes", triggerTimes)
+					;
 		} catch (MyException e) {
-			log.error("删除数据字典错误：{}", e.getMessage());
+			log.error("获取定时任务错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("删除数据字典错误：", e);
+			log.error("获取定时任务错误：", e);
 			return PageResult.err();
 		}
 	}

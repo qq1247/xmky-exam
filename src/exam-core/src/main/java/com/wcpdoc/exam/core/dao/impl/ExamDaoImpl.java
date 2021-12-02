@@ -33,19 +33,20 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT EXAM.ID, EXAM.NAME, EXAM.START_TIME, EXAM.END_TIME, "
-				+ "EXAM.MARK_START_TIME, EXAM.MARK_END_TIME, EXAM.STATE, PAPER.MARK_TYPE AS PAPER_MARK_TYPE, "
-				+ "PAPER.TOTAL_SCORE AS PAPER_TOTLE_SCORE, PAPER.ID AS PAPER_ID, PAPER.NAME AS PAPER_NAME, "
-				+ "PAPER.PASS_SCORE AS PAPER_PASS_SCORE, UPDATE_USER.NAME AS UPDATE_USER_NAME "
+				+ "EXAM.MARK_START_TIME, EXAM.MARK_END_TIME, EXAM.STATE, PAPER.MARK_TYPE AS PAPER_MARK_TYPE, "// PAPER_MARK_TYPE 修改时使用
+				+ "PAPER.ID AS PAPER_ID, PAPER.NAME AS PAPER_NAME, "
+				+ "PAPER.TOTAL_SCORE AS PAPER_TOTLE_SCORE, PAPER.PASS_SCORE AS PAPER_PASS_SCORE "
 				+ "FROM EXM_EXAM EXAM "
 				+ "LEFT JOIN EXM_EXAM_TYPE EXAM_TYPE ON EXAM.EXAM_TYPE_ID = EXAM_TYPE.ID "
 				+ "LEFT JOIN EXM_PAPER PAPER ON EXAM.PAPER_ID = PAPER.ID "
 				+ "LEFT JOIN SYS_USER UPDATE_USER ON EXAM.UPDATE_USER_ID = UPDATE_USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examTypeId")), "EXAM.EXAM_TYPE_ID = ?", pageIn.get("examTypeId"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "EXAM.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "EXAM.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
+				.addWhere(ValidateUtil.isValid(pageIn.get("examTypeId")), "EXAM.EXAM_TYPE_ID = ?", pageIn.get("examTypeId"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "EXAM.UPDATE_USER_ID = ?", pageIn.get("curUserId", Integer.class))
-				.addWhere(ValidateUtil.isValid(pageIn.get("markState")), "EXAM.MARK_STATE = ?", pageIn.get("markState", Integer.class))
+				.addWhere(ValidateUtil.isValid(pageIn.get("markState")), "EXAM.MARK_STATE = ?", pageIn.get("markState", Integer.class))// 接口不需要
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "EXAM.STATE = ?", pageIn.get("state", Integer.class))
+				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && "0".equals(pageIn.get("state")), "EXAM.STATE IN (1,2)")
 				.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "EXAM.STATE IN (1,2)")
 				.addOrder("EXAM.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
@@ -54,7 +55,8 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 				"endTime", DateUtil.FORMAT_DATE_TIME,
 				"markStartTime", DateUtil.FORMAT_DATE_TIME,
 				"markEndTime", DateUtil.FORMAT_DATE_TIME);
-		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), "EXAM_STATE", "state");
+		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), 
+				"EXAM_STATE", "state");
 		return pageOut;
 	}
 	
