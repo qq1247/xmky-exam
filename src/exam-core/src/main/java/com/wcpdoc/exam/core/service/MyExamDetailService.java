@@ -64,6 +64,15 @@ public interface MyExamDetailService extends BaseService<MyExamDetail>{
 	void autoMark(Integer examId);
 
 	/**
+	 * 完成阅卷
+	 * 
+	 * v1.0 zhanghc 2020年10月13日下午1:13:52
+	 * @param examId
+	 * void
+	 */
+	void outMark(Integer examId);
+	
+	/**
 	 * 删除我的考试详细
 	 * 
 	 * v1.0 zhanghc 2021年10月27日下午2:19:13

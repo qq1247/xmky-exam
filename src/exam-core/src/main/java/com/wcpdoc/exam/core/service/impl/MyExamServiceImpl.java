@@ -63,8 +63,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	public List<MyExam> getList(Integer examId) {
 		return myExamDao.getList(examId);
 	}
-
-
+	
 	@Override
 	public MyExam getEntity(Integer examId, Integer userId) {
 		return myExamDao.getEntity(examId, userId);
@@ -127,7 +126,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		if (exam.getStartTime().getTime() > curTime) {
 			throw new MyException("考试未开始");
 		}
-		if (curTime - exam.getEndTime().getTime() > 5000) {// 预留5秒网络延时
+		if (curTime - exam.getEndTime().getTime() > 1000) {// 预留1秒网络延时
 			throw new MyException("考试已结束！");
 		}
 
@@ -136,6 +135,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		myExam.setState(2);
 		if (!ValidateUtil.isValid(myExam.getAnswerStartTime())) {
 			myExam.setAnswerStartTime(new Date());
+			myExam.setAnswerEndTime(new Date());// 如果只答一道题，这里不加，结束时间就是空
 		} else {
 			myExam.setAnswerEndTime(new Date());
 		}
@@ -188,7 +188,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		if (exam.getStartTime().getTime() > curTime) {
 			throw new MyException("考试未开始");
 		}
-		if (curTime - exam.getEndTime().getTime() > 5000) {// 预留5秒网络延时
+		if (curTime - exam.getEndTime().getTime() > 1000) {// 预留1秒网络延时
 			throw new MyException("考试已结束！");
 		}
 	

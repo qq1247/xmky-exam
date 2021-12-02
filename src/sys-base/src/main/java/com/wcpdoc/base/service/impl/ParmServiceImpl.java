@@ -114,8 +114,8 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		parmDao.update(parm);
 		
 		try {
-			File oldFileUploadFile = new File(String.format("%s\\%s", oldFileUploadDir, "bak\\file"));
-			File uploadDirFile = new File(String.format("%s\\%s", uploadDir, "bak"));
+			File oldFileUploadFile = new File(String.format("%s/%s", oldFileUploadDir, "bak/file"));
+			File uploadDirFile = new File(String.format("%s/%s", uploadDir, "bak"));
 			FileUtils.moveToDirectory(oldFileUploadFile, uploadDirFile, true);
 		} catch (Exception e) {
 			if (e.getMessage().contains("does not exist")) {
@@ -145,8 +145,8 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		parmDao.update(parm);
 		
 		try {
-			File oldBakFile = new File(String.format("%s\\%s", oldBakDir, "bak\\db"));
-			File bakDirFile = new File(String.format("%s\\%s", bakDir, "bak"));
+			File oldBakFile = new File(String.format("%s/%s", oldBakDir, "bak/db"));
+			File bakDirFile = new File(String.format("%s/%s", bakDir, "bak"));
 			FileUtils.moveToDirectory(oldBakFile, bakDirFile, true);
 		} catch (Exception e) {
 			if (e.getMessage().contains("does not exist")) {

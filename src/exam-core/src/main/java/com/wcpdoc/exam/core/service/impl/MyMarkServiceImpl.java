@@ -88,12 +88,14 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		if (exam.getMarkStartTime().getTime() > curTime) {
 			throw new MyException("阅卷未开始");
 		}
-		if (curTime - exam.getMarkEndTime().getTime() > 5000) {// 预留5秒网络延时
+		if (curTime - exam.getMarkEndTime().getTime() > 1000) {// 预留1秒网络延时
 			throw new MyException("阅卷已结束");
 		}
-		
-		if (exam.getMarkState() != 3) {
+		if (exam.getMarkState() == 1) {
 			throw new MyException("正在处理智能阅卷部分，请稍后");
+		}
+		if (exam.getMarkState() == 3) {
+			throw new MyException("阅卷已结束");
 		}
 		
 		List<MyMark> myMarkList = myMarkDao.getList(examId);
@@ -124,9 +126,10 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		
 		// 标记为阅卷中，记录阅卷时间
 		MyExam myExam = myExamService.getEntity(examId, userId);
-		myExam.setMarkState(2);
+		//myExam.setMarkState(2); //自动阅卷时已标记为阅卷中
 		if (!ValidateUtil.isValid(myExam.getMarkStartTime())) {
 			myExam.setMarkStartTime(new Date());
+			myExam.setMarkEndTime(new Date());//如果只阅一道题，就没有结束时间。
 		} else {
 			myExam.setMarkEndTime(new Date());
 		}
@@ -158,7 +161,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		if (exam.getMarkStartTime().getTime() > curTime) {
 			throw new MyException("阅卷未开始");
 		}
-		if (curTime - exam.getMarkEndTime().getTime() > 5000) {// 预留5秒网络延时
+		if (curTime - exam.getMarkEndTime().getTime() > 1000) {// 预留1秒网络延时
 			throw new MyException("阅卷已结束！");
 		}
 		
@@ -197,7 +200,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		
 		Paper paper = paperServiceImpl.getEntity(exam.getPaperId());
 		BigDecimal passScore = BigDecimalUtil.newInstance(paper.getTotalScore()).mul(paper.getPassScore()).div(100, 2).getResult();
-		if (BigDecimalUtil.newInstance(totalScore.getResult()).sub(passScore).getResult().doubleValue() > 0) {
+		if (BigDecimalUtil.newInstance(totalScore.getResult()).sub(passScore).getResult().doubleValue() >= 0) {
 			myExam.setAnswerState(1);
 		} else {
 			myExam.setAnswerState(2);

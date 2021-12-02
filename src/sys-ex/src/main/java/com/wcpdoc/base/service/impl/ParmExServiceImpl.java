@@ -75,7 +75,7 @@ public class ParmExServiceImpl extends BaseServiceImp<Parm> implements ParmExSer
 	    g.drawRect(5,5,5,5);
 	    g.fillRect(5,5,5,5);
 	    g.drawImage(imageIcon.getImage(),0,0,64,64,imageIcon.getImageObserver());
-	    String filepath = String.format(".\\config\\favicon.ico");
+	    String filepath = String.format("./config/favicon.ico");
 	    try {
 	      ImageIO.write(bufferedImage, "png",  new File(filepath));
 	      //System.out.println("文件已经生成，路经为" + filepath);

@@ -88,7 +88,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 		
 		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-		if(questionTypeService.hasWriteAuth(questionType, question.getId())) {
+		if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -294,8 +294,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			throw new MyException("试题已删除不能修改！");
 		}
 		
-		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-		if(questionTypeService.hasWriteAuth(questionType, question.getId())) {
+		QuestionType questionType = questionTypeService.getEntity(entity.getQuestionTypeId());
+		if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
 			throw new MyException("无操作权限");
 		}
 		/*if (newVer) {
@@ -427,7 +427,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	public void delAndUpdate(Integer id) {
 		Question question = questionDao.getEntity(id);
 		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-		if(questionTypeService.hasWriteAuth(questionType, question.getId())) {
+		if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -504,6 +504,10 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	@Override
 	public void wordImp(Integer fileId, Integer questionTypeId, String processBarId) {
 		// 校验数据有效性
+		if(!questionTypeService.hasWriteAuth(questionTypeService.getEntity(questionTypeId), getCurUser().getId())) {
+			throw new MyException("无操作权限");
+		}
+		
 		if (fileId == null) {
 			throw new MyException("参数错误：fileId");
 		}
@@ -643,7 +647,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	public void copy(Integer id) throws Exception{
 		Question question = questionDao.getEntity(id);
 		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-		if(questionTypeService.hasWriteAuth(questionType, question.getId())) {
+		if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -694,7 +698,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				throw new MyException("试题已发布！");
 			}
 			QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-			if(questionTypeService.hasWriteAuth(questionType, question.getId())) {
+			if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
 				throw new MyException("无操作权限");
 			}
 			if (question.getState() == 2) {

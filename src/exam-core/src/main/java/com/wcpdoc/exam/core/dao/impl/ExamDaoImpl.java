@@ -40,19 +40,19 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 				+ "LEFT JOIN EXM_EXAM_TYPE EXAM_TYPE ON EXAM.EXAM_TYPE_ID = EXAM_TYPE.ID "
 				+ "LEFT JOIN EXM_PAPER PAPER ON EXAM.PAPER_ID = PAPER.ID "
 				+ "LEFT JOIN SYS_USER UPDATE_USER ON EXAM.UPDATE_USER_ID = UPDATE_USER.ID ";
-		
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examTypeId")), "EXAM.EXAM_TYPE_ID = ?", pageIn.get("examTypeId"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "EXAM.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
 				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "EXAM.UPDATE_USER_ID = ?", pageIn.get("curUserId", Integer.class))
-				.addWhere("EXAM.STATE IN (1,2)")
+				.addWhere(ValidateUtil.isValid(pageIn.get("markState")), "EXAM.MARK_STATE = ?", pageIn.get("markState", Integer.class))
+				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "EXAM.STATE = ?", pageIn.get("state", Integer.class))
+				.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "EXAM.STATE IN (1,2)")
 				.addOrder("EXAM.UPDATE_TIME", Order.DESC);
-		
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(), 
-				"startTime", DateUtil.FORMAT_DATE_TIME, 
-				"endTime", DateUtil.FORMAT_DATE_TIME, 
-				"markStartTime", DateUtil.FORMAT_DATE_TIME, 
+				"startTime", DateUtil.FORMAT_DATE_TIME,
+				"endTime", DateUtil.FORMAT_DATE_TIME,
+				"markStartTime", DateUtil.FORMAT_DATE_TIME,
 				"markEndTime", DateUtil.FORMAT_DATE_TIME);
 		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), "EXAM_STATE", "state");
 		return pageOut;

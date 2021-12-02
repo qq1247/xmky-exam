@@ -60,5 +60,4 @@ public interface MyExamDetailDao extends BaseDao<MyExamDetail>{
 	 * @param userId void
 	 */
 	void del(Integer examId, Integer userId);
-
 }

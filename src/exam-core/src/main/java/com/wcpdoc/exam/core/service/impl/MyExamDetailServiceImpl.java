@@ -69,6 +69,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	private PaperQuestionAnswerService paperQuestionAnswerService;
 	@Resource
 	private PaperQuestionService paperQuestionService;
+	@Resource
+	private MyExamDetailService myExamDetailService;
 
 	@Override
 	@Resource(name = "myExamDetailDaoImpl")
@@ -136,9 +138,9 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			}
 		}
 		
-		// 延时6秒在开始阅卷（答题时增加了5秒网络延时）
+		// 延时2秒在开始阅卷
 		try {
-			Thread.sleep(6000);
+			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			log.error("自动阅卷异常：{}，延时执行异常", exam.getName());
 		}
@@ -160,6 +162,11 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 				myExam.setAnswerState(2);
 				//myExam.setState(1);// 状态还是未考试，不改变
 				myExamService.update(myExam);
+				List<MyExamDetail> userAnswerList = getList(examId, myExam.getUserId());
+				for (MyExamDetail userAnswer : userAnswerList) {
+					userAnswer.setScore(BigDecimal.ZERO);
+					myExamDetailService.update(userAnswer);// 没作答也都标记为0分。影响的地方为人工阅卷时，所有题都有分数，才允许阅卷完成。
+				}
 				log.info("自动阅卷进行：{}-{}未考试，得0分，不及格", user.getId(), user.getName());
 				continue;
 			}
@@ -170,7 +177,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 				log.info("自动阅卷进行：{}-{}未交卷，标记为已交卷", user.getId(), user.getName());
 			}
 		
-			if (paper.getMarkType() == 1) {// 如果是智能阅卷，自动记录阅卷用户为管理员，阅卷开始时间等；如果是人工阅卷，阅卷用户在在页面阅卷时记录相关字段
+			if (paper.getMarkType() == 1) {// 如果是智能阅卷，自动记录阅卷用户为管理员，阅卷开始时间等；如果是人工阅卷，阅卷人为当前登录用户，阅卷开始时间为第一次给某一张卷子阅第一道题的时间
 				myExam.setMarkUserId(1);
 				myExam.setMarkStartTime(new Date());
 			}
@@ -195,7 +202,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 						fillBlankHandle(question, questionOption, questionAnswerList, userAnswer);// 填空处理
 					}
 				
-					totalScore.add(userAnswer.getScore());
+					totalScore.add(userAnswer.getScore());// 累加当前分数到总分数
+					myExamDetailService.update(userAnswer);// 更新每道题的分数
 				}
 			}
 			
@@ -211,21 +219,118 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 				} else {
 					myExam.setAnswerState(2);// 标记为不及格
 				}
-			} else {
-				myExam.setMarkState(1);// 标记为未阅卷，等待人工阅卷
-			}
+			} 
+			//if (paper.getMarkType() == 2) {
+				// myExam.setMarkState(1);// 标记为未阅卷，等待人工阅卷。不需要处理（在考试的阅卷设置已经标记为未阅卷）
+			//}
 			myExamService.update(myExam);
 			log.info("自动阅卷进行：{}-{}完成阅卷，自动阅卷部分得{}分", user.getId(), user.getName(), totalScore.getResult());
 		}
 		
-		// 标记考试为已阅（自动阅卷部分），如果试卷是人工阅卷，只有这里标记为自动阅卷，才能开始人工阅卷
-		exam.setMarkState(3);
-		examService.update(exam);
-		log.info("自动阅卷进行：标记考试为已阅（自动阅卷部分）");
+		// 如果试卷是智能阅卷类型，标记考试为已阅卷。
+		if (paper.getMarkType() == 1) {
+			exam.setMarkState(3);
+			examService.update(exam);
+			log.info("自动阅卷完成：标记考试为已阅卷，结束");
+			return;
+		}
 		
-		log.info("自动阅卷完成");
+		// 如果试卷是人工阅卷类型，标记考试为阅卷中。（阅卷人在开始阅卷时，如果考试状态为未阅卷则不能阅卷，因为自动阅卷还未完成。）
+		if (paper.getMarkType() == 2) {
+			exam.setMarkState(2);
+			examService.update(exam);
+			log.info("自动阅卷完成：标记考试为阅卷中，等待人工阅卷");
+			return;
+		}
 	}
 
+	@Override
+	public void outMark(Integer examId) {
+		// 校验数据有效性
+		Exam exam = examService.getEntity(examId);
+		log.info("完成阅卷校验：{}", exam.getName());
+		
+		if (exam.getState() == 0) {
+			log.error("完成阅卷异常：{}已删除", exam.getName());
+			throw new MyException("已删除");
+		}
+		if (exam.getState() == 2) {
+			log.error("完成阅卷异常：{}未发布", exam.getName());
+			throw new MyException("未发布");
+		}
+		if (exam.getState() == 3) {
+			log.error("完成阅卷异常：{}已归档", exam.getName());
+			throw new MyException("已归档");
+		}
+		
+		long curTime = System.currentTimeMillis();
+		if (exam.getEndTime().getTime() > curTime){
+			log.error("完成阅卷异常：{}考试未结束", exam.getName());
+			throw new MyException("考试未结束");
+		}
+		if (exam.getMarkEndTime().getTime() > curTime){
+			log.error("完成阅卷异常：{}阅卷未结束", exam.getName());
+			throw new MyException("阅卷未结束");
+		}
+		
+		Paper paper = paperService.getEntity(exam.getPaperId());// 试卷信息
+		// 延时2秒在完成阅卷
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			log.error("完成阅卷异常：{}，延时执行异常", exam.getName());
+		}
+		
+		log.info("完成阅卷开始：{}", exam.getName());
+		// 获取所有考试用户
+		List<MyExam> list = myExamService.getList(examId);
+		for(MyExam myExam : list){
+			if (myExam.getMarkState() == 3) {//已阅卷的不处理
+				continue;
+			}
+			
+			// 开始阅卷
+			myExam.setMarkUserId(1);
+			myExam.setMarkStartTime(new Date());
+			
+			List<MyExamDetail> myExamDetailList = getList(myExam.getExamId(), myExam.getUserId());//计算总分
+			BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
+			for (MyExamDetail myExamDetail : myExamDetailList) {
+				if (myExamDetail.getScore() == null) {//当阅卷人没有阅卷或部分未阅卷时，阅卷时间到。
+					BigDecimal bigDecimal = new BigDecimal(0);
+					totalScore.add(bigDecimal);
+					myExamDetail.setScore(bigDecimal);
+					myExamDetail.setMarkUserId(1);
+					myExamDetail.setMarkTime(new Date());
+				    myExamDetailDao.update(myExamDetail);
+				} else {
+					totalScore.add(myExamDetail.getScore());
+				}
+			}
+			myExam.setTotalScore(totalScore.getResult());
+			BigDecimal passScore = BigDecimalUtil.newInstance(paper.getTotalScore()).mul(paper.getPassScore()).div(100, 2).getResult();
+			if (BigDecimalUtil.newInstance(totalScore.getResult()).sub(passScore).getResult().doubleValue() >= 0) {
+				myExam.setAnswerState(1);
+			} else {
+				myExam.setAnswerState(2);
+			}
+			myExam.setMarkState(3);
+			myExam.setMarkEndTime(new Date());
+			myExamService.update(myExam);
+		}
+		
+		// 完成阅卷
+		if (exam.getMarkStartTime() == null) {			
+			exam.setMarkStartTime(new Date());
+		}
+		if (exam.getMarkEndTime() == null) {			
+			exam.setMarkEndTime(new Date());
+		}
+		exam.setMarkState(3);
+		examService.update(exam);
+		log.info("完成阅卷结束：{}", exam.getName());
+	}
+	
 	/**
 	 * 问答处理
 	 * 

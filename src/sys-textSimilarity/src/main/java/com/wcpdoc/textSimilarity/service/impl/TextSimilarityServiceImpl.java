@@ -26,10 +26,10 @@ public class TextSimilarityServiceImpl implements TextSimilarityService {
 			return result;
 		} catch (IOException e) {
 			e.printStackTrace();
-			return 0;
+			return -1;
 		} catch (TikaException e) {
 			e.printStackTrace();
-			return 0;
+			return -1;
 		}
 	}
 

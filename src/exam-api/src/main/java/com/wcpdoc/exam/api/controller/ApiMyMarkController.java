@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.api.controller;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -17,7 +18,9 @@ import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.service.ExamService;
+import com.wcpdoc.exam.core.service.MyExamDetailService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
 
@@ -37,6 +40,8 @@ public class ApiMyMarkController extends BaseController {
 	private ExamService examService;
 	@Resource
 	private MyMarkService myMarkService;
+	@Resource
+	private MyExamDetailService myExamDetailService;
 	
 	/**
 	 * 我的阅卷列表
@@ -131,20 +136,51 @@ public class ApiMyMarkController extends BaseController {
 	}
 	
 	/**
-	 * 我的阅卷列表
+	 * 阅卷考生
 	 * 
 	 * v1.0 chenyun 2021年8月2日下午3:14:45
 	 * @return PageResult
 	 */
-	@RequestMapping("/markListpage")
+	@RequestMapping("/userListpage")
 	@ResponseBody
-	public PageResult markListpage() {
+	public PageResult userListpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
 			pageIn.addAttr("markUserId", getCurUser().getId()); //阅卷人
 			return PageResultEx.ok().data(myExamService.getListpage(pageIn));
 		} catch (Exception e) {
 			log.error("我的考试列表错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 阅卷考试答案列表
+	 * 
+	 * v1.0 chenyun 2021年7月29日下午6:04:37
+	 * @param userId
+	 * @param examId
+	 * @return PageResult
+	 */
+	@RequestMapping("/answerList")
+	@ResponseBody
+	public PageResult answerList(Integer userId, Integer examId) {
+		try {
+			List<Map<String, Object>> list = myExamDetailService.getMarkAnswerList(userId, examId);
+			for (Map<String, Object> map : list) {
+				map.put("answers", new QuestionAnswer().getAnswers(
+						(Integer)map.remove("questionType"), 
+						(Integer)map.remove("questionAi"), 
+						(String)map.remove("answer")
+						)); 
+			}
+			
+			return PageResultEx.ok().data(list);
+		} catch (MyException e) {
+			log.error("考试答案列表错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("考试答案列表错误：", e);
 			return PageResult.err();
 		}
 	}

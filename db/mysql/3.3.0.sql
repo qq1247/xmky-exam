@@ -85,7 +85,7 @@ create table EXM_EXAM
    END_TIME             datetime comment '考试结束',
    MARK_START_TIME      datetime comment '阅卷开始',
    MARK_END_TIME        datetime comment '阅卷结束',
-   MARK_STATE           datetime comment '阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）',
+   MARK_STATE           int comment '阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）',
    SCORE_STATE          int comment '成绩状态（1：公开；2：不公开）',
    RANK_STATE           int comment '排名状态（1：公开；2：不公开）',
    LOGIN_TYPE           int comment '登陆方式（1：安排考试；2：免登陆考试）',
@@ -612,9 +612,7 @@ INSERT INTO `SYS_VER` VALUES (8, '2.0.0', '2020-10-15 00:00:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (9, '3.0.0', '2020-08-06 13:58:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (10, '3.1.0', '2020-09-30 13:58:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (11, '3.2.0', '2020-10-31 16:43:00', 'zhanghc', '');
-
-INSERT INTO `EXM_EXAM_TYPE` VALUES ('1', '考试分类', NULL, '1', '2021-11-11 09:20:44', '1', '2021-11-11 09:20:40', '1');
-INSERT INTO `EXM_PAPER_TYPE` VALUES ('1', '试卷分类', NULL, '1', '2021-11-11 09:21:07', '1', '2021-11-11 09:21:11', '1', '1');
-INSERT INTO `EXM_QUESTION_TYPE` VALUES ('1', '试题分类', NULL, '1', '2021-11-11 09:21:51', '1', '2021-11-11 09:21:55', '1', NULL);
+INSERT INTO `SYS_VER` VALUES (12, '3.2.1', '2021-11-25 16:26:01', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (13, '3.3.0', '2020-11-28 11:11:11', 'zhanghc', '');
 
 INSERT INTO `SYS_PARM` VALUES (1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 2, '111111');
