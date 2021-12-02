@@ -154,7 +154,7 @@ export default {
     async queryAnswerInfo() {
       try {
         const res = await myExamAnswerList({
-          id: this.id,
+          examId: this.examId,
         })
 
         let paperQuestion

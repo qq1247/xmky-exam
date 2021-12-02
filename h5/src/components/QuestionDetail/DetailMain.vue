@@ -5,11 +5,14 @@
  * @Author: Che
  * @Date: 2021-09-10 10:13:52
  * @LastEditors: Che
- * @LastEditTime: 2021-09-18 17:29:59
+ * @LastEditTime: 2021-12-01 17:58:22
 -->
 <template>
   <div class="detail-main">
-    <div class="detail-title" v-html="`${data.id}、${data.title}`"></div>
+    <div class="detail-title">
+      <span>{{ data.id }}、</span>
+      <div v-html="`${data.title}`"></div>
+    </div>
     <template v-if="data.type === 4">
       <div
         class="detail-option"
@@ -50,9 +53,13 @@ export default {
   margin-bottom: 20px;
 }
 .detail-title {
+  font-size: 14px;
+  text-align: left;
   display: flex;
-  align-items: center;
-  margin-bottom: 10px;
+  p {
+    margin: 0;
+    padding: 0;
+  }
 }
 .detail-option {
   display: flex;

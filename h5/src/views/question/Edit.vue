@@ -68,14 +68,8 @@
           </el-form-item>
           <el-form-item label>
             <el-input
-              placeholder="分值大于"
-              v-model="queryForm.scoreStart"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label>
-            <el-input
-              placeholder="分值小于"
-              v-model="queryForm.scoreEnd"
+              placeholder="分值等于"
+              v-model="queryForm.score"
             ></el-input>
           </el-form-item>
         </el-col>
@@ -152,6 +146,7 @@ import EditHeader from 'components/EditHeader.vue'
 import QuestionType from '@/components/EditQuestion/QuestionType.vue'
 import QuestionList from '@/components/EditQuestion/QuestionList.vue'
 import QuestionEdit from '@/components/EditQuestion/QuestionEdit.vue'
+import { login } from '@/api/common'
 export default {
   components: {
     EditHeader,
@@ -207,8 +202,7 @@ export default {
         type: null, // 类型
         difficulty: null, // 难度
         state: '', //状态
-        scoreStart: '', // 得分大于
-        scoreEnd: '', // 得分小于
+        score: '', // 得分等于
         questionTypeName: '', // 试题分类name
         questionTypeId: 1, // 试题分类id
         difficultyList: [], // 难度列表
@@ -357,9 +351,8 @@ export default {
         type: this.queryForm.type,
         state: this.queryForm.state,
         title: this.queryForm.title,
-        scoreEnd: this.queryForm.scoreEnd,
+        score: this.queryForm.score,
         difficulty: this.queryForm.difficulty,
-        scoreStart: this.queryForm.scoreStart,
         questionTypeId: this.queryForm.questionTypeId,
         questionTypeName: this.queryForm.questionTypeName,
         curPage: this.list.curPage,
@@ -410,6 +403,7 @@ export default {
     },
     // 添加填空
     _addFillBlanks(index, value) {
+      console.log(value)
       let lab
       if ([3, 5].includes(this.editForm.type)) {
         lab = this.$tools.intToChinese(index + 1)
@@ -475,7 +469,7 @@ export default {
       if (value == 5) this.editForm.ai = 2
     },
     // 组合添加或修改请求参数
-    compistionParam(status) {
+    compositionParam(status) {
       if (this.queryForm.edit == 'false') {
         this.$message.warning('暂无此项权限！')
         return false
@@ -559,7 +553,7 @@ export default {
     },
     // 添加试题
     add() {
-      const params = this.compistionParam(true)
+      const params = this.compositionParam(true)
       if (!params) return
 
       this.$refs.questionDetail.$refs['editForm'].validate(async (valid) => {
@@ -573,7 +567,7 @@ export default {
     },
     // 修改试题
     edit() {
-      const params = this.compistionParam(false)
+      const params = this.compositionParam(false)
       if (!params) return
 
       this.$refs.questionDetail.$refs['editForm'].validate((valid) => {
@@ -607,7 +601,7 @@ export default {
       this.editForm.type = res.data.type
       this.editForm.difficulty = res.data.difficulty
       this.editForm.title = res.data.title
-      this.editForm.answer = res.data.answers[0].answer
+      this.editForm.answer = res.data.answers[0].answer[0]
       this.editForm.analysis = res.data.analysis
       this.editForm.score = res.data.score
       this.editForm.ai = res.data.ai
@@ -632,13 +626,16 @@ export default {
         this.editForm.scoreOptions =
           res.data.scoreOptions == null ? [] : res.data.scoreOptions.split(',')
         this.editForm.answerMultip = res.data.answers.reduce((acc, cur) => {
-          acc.push(cur.answer)
+          acc.push(cur.answer[0])
           return acc
         }, [])
         this.editForm.multipScore = res.data.answers[0].score
       }
 
-      if ([3, 5].includes(this.editForm.type)) {
+      if (
+        this.editForm.type === 3 ||
+        (this.editForm.type === 5 && this.editForm.ai === 1)
+      ) {
         this.$nextTick(() => {
           const answers = res.data.answers
           this.editForm.answers = [] // 重置答案列表
@@ -705,7 +702,7 @@ export default {
         return
       }
       const res = await questionPublish({
-        id,
+        ids: [`${id}`],
       })
       this.resetQuery(res, '发布试题')
     },

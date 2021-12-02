@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-11 17:06:11
  * @LastEditors: Che
- * @LastEditTime: 2021-11-08 14:33:54
+ * @LastEditTime: 2021-11-30 11:00:55
  */
 import request from './request'
 
@@ -20,7 +20,6 @@ export const myMarkExamListPage = (params) =>
 export const myMarkScore = (params) => request('myMark/score', params)
 export const myMarkFinish = (params) => request('myMark/finish', params)
 
-export const myMarkAnswerList = (params) =>
-  request('myExam/markAnswerList', params)
-export const myMarksListPage = (params) =>
-  request('myMark/markListpage', params)
+export const myMarkAnswerList = (params) => request('myMark/answerList', params)
+export const myMarkUserListPage = (params) =>
+  request('myMark/userListpage', params)

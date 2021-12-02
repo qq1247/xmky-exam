@@ -373,6 +373,7 @@ export default {
         }
 
         const params = {
+          paperTypeId: this.queryForm.paperTypeId,
           genType: this.paperForm.genType,
           name: this.paperForm.name,
           passScore: this.paperForm.passScore,

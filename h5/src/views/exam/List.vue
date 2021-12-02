@@ -173,10 +173,14 @@
                 placeholder="请选择考试用户"
                 :value="examForm.examRemarks[index].examUser"
                 :total="examForm.total"
-                @input="searchUser"
+                @input="(keyword) => searchUser(keyword, 1)"
                 @change="selectExamUser($event, index)"
-                @currentChange="getMoreUser"
-                @visibleChange="getUserList"
+                @currentChange="
+                  (curPage, keyword) => getMoreUser(1, curPage, keyword)
+                "
+                @visibleChange="
+                  (curPage, keyword) => getUserList(1, curPage, keyword)
+                "
               >
                 <el-option
                   v-for="item in examForm.examUsers"
@@ -203,10 +207,14 @@
                 placeholder="请选择阅卷人"
                 :value="examForm.examRemarks[index].examCheckPerson"
                 :total="examForm.total"
-                @input="searchUser"
+                @input="(keyword) => searchUser(keyword, 2)"
                 @change="selectPerson($event, index)"
-                @currentChange="getMoreUser"
-                @visibleChange="getUserList(2)"
+                @currentChange="
+                  (curPage, keyword) => getMoreUser(2, curPage, keyword)
+                "
+                @visibleChange="
+                  (curPage, keyword) => getUserList(2, curPage, keyword)
+                "
               >
                 <el-option
                   v-for="item in examForm.examUsers"
@@ -667,7 +675,14 @@ export default {
         this.examForm.rankState = rankState == 1
         this.examForm.loginType = loginType == 2
         this.examForm.examTime = [startTime, endTime]
-        this.examForm.markTime = [markStartTime, markEndTime]
+
+        const nextDay = dayjs(
+          new Date().getTime() + 1000 * 60 * 60 * 24
+        ).format('YYYY-MM-DD')
+        this.examForm.markTime = [
+          markStartTime || `${nextDay} 14:00:00`,
+          markEndTime || `${nextDay} 18:00:00`,
+        ]
 
         this.$refs['paperSelect'] &&
           this.$refs['paperSelect'].$refs['elSelect'].cachedOptions.push({
@@ -852,19 +867,19 @@ export default {
     async getUserList(type = 1, curPage = 1, name = '') {
       let params = { name, curPage, pageSize: this.examForm.pageSize }
       const examUsers = await userListPage(
-        type === 1 ? params : { type, ...params }
+        type === 1 ? params : { type: 2, ...params }
       )
 
       this.examForm.examUsers = examUsers.data.list
       this.examForm.total = examUsers.data.total
     },
     // 获取更多用户
-    getMoreUser(curPage, name) {
-      this.getUserList(curPage, name)
+    getMoreUser(type, curPage, name) {
+      this.getUserList(type, curPage, name)
     },
     // 根据name 查询人员
-    searchUser(name) {
-      this.getUserList(1, name)
+    searchUser(name, type) {
+      this.getUserList(type, 1, name)
     },
     // 选择阅卷人员
     selectPerson(e, index) {

@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-10-19 14:23:55
  * @LastEditors: Che
- * @LastEditTime: 2021-11-12 09:16:07
+ * @LastEditTime: 2021-11-29 15:44:08
 -->
 <template>
   <div>
@@ -17,10 +17,10 @@
         :key="question.id"
         @click.native="showDetails(question.id)"
       >
-        <div
-          class="center-card-top"
-          v-html="`${question.id}、${question.title}`"
-        ></div>
+        <div class="center-card-top">
+          <span>{{ question.id }}、</span>
+          <div v-html="`${question.title}`"></div>
+        </div>
         <div class="center-card-bottom">
           <div class="card-bottom-left">
             <el-tag class="center-tag-danger" size="mini" type="danger">{{
@@ -169,7 +169,6 @@ export default {
   font-size: 14px;
   text-align: left;
   display: flex;
-  align-items: center;
   p {
     margin: 0;
     padding: 0;

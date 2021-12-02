@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-09-10 10:14:03
  * @LastEditors: Che
- * @LastEditTime: 2021-10-20 18:29:17
+ * @LastEditTime: 2021-12-01 17:54:54
 -->
 <template>
   <div class="detail-more">
@@ -22,7 +22,7 @@
         <el-col :span="20">
           <template v-if="data.answers && data.answers.length > 0">
             <span v-for="answer in data.answers" :key="answer.id">{{
-              answer.answer
+              answer.answer[0]
             }}</span>
           </template>
         </el-col>

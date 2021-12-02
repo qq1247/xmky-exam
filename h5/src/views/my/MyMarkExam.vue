@@ -39,11 +39,10 @@
                 class="children-content"
                 v-for="(child, indexc) in item.questionList"
               >
-                <p
-                  v-if="child.type !== 3"
-                  class="question-title"
-                  v-html="`${index + 1}、${child.title}`"
-                ></p>
+                <div class="question-title" v-if="child.type !== 3">
+                  <span>{{ index + 1 }}、</span>
+                  <div v-html="`${child.title}`"></div>
+                </div>
                 <div
                   class="question-title"
                   v-if="child.type === 3 && child.examAnswers"
@@ -164,7 +163,7 @@
                           <span
                             v-for="answer in child.answers"
                             :key="answer.id"
-                            >{{ answer.answer }}</span
+                            >{{ answer.answer[0] }}</span
                           >
                         </div>
                       </el-col>
@@ -306,7 +305,7 @@
 <script>
 import { paperGet, paperQuestionList } from 'api/paper'
 import {
-  myMarksListPage,
+  myMarkUserListPage,
   myMarkAnswerList,
   myMarkScore,
   myMarkFinish,
@@ -392,7 +391,7 @@ export default {
     },
     // 查询考生信息
     async queryExamineeInfo() {
-      const infos = await myMarksListPage({
+      const infos = await myMarkUserListPage({
         curPage: this.curPage,
         pageSize: 100,
         examId: Number(this.examId),
@@ -572,7 +571,7 @@ export default {
         return acc
       }, [])
       const isEvery = allQuestions.every(
-        (item) => item.scorePlate !== '' && item.scorePlate !== null
+        (item) => item.scorePlate !== '' || item.scorePlate !== null
       )
       if (!isEvery) {
         this.$message.warning('请给所有试题打分！')

@@ -151,10 +151,10 @@
                   :key="item.id"
                   :id="item.id"
                 >
-                  <div
-                    class="item-title"
-                    v-html="`${item.id}、${item.title}`"
-                  ></div>
+                  <div class="item-title">
+                    <span>{{ item.id }}、</span>
+                    <div v-html="`${item.title}`"></div>
+                  </div>
                   <el-tag effect="dark" size="mini" type="warning">
                     {{ item.typeName }}
                   </el-tag>
@@ -272,7 +272,10 @@
                     :key="child.id"
                     :id="`p-${child.id}`"
                   >
-                    <p v-html="index + 1 + '、' + child.title"></p>
+                    <div class="item-title">
+                      <span>{{ index + 1 }}、</span>
+                      <div v-html="`${child.title}`"></div>
+                    </div>
                     <!-- 单选 -->
                     <template v-if="child.type === 1">
                       <el-radio-group
@@ -370,7 +373,7 @@
                               <span
                                 v-for="answer in child.answers"
                                 :key="answer.id"
-                                >{{ answer.answer }}</span
+                                >{{ answer.answer[0] }}</span
                               >
                             </div>
                           </el-col>
@@ -818,6 +821,7 @@ export default {
     async randomQueryQuestion() {
       const res = await questionListPage({
         id: this.queryForm.id,
+        ai: this.markType === '1' ? 1 : '',
         type: this.queryForm.type,
         title: this.queryForm.title,
         questionTypeName: this.queryForm.questionTypeName,
@@ -1219,11 +1223,6 @@ export default {
       font-size: 14px;
       cursor: move;
     }
-    .item-title {
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-    }
     .el-tag {
       margin-left: 10px;
     }
@@ -1291,9 +1290,6 @@ export default {
     padding: 0 10px 15px;
     border-bottom: 1px solid #d8d8d8;
   }
-  .item-title {
-    line-height: 40px;
-  }
   .children-content {
     border: 1px solid #d8d8d8;
     font-size: 14px;
@@ -1301,12 +1297,8 @@ export default {
     &:not(:last-child) {
       border-bottom: none;
     }
-    p {
-      line-height: 40px;
-      padding-left: 10px;
+    .item-title {
       background: #e5f4fc;
-      display: flex;
-      align-items: center;
     }
   }
   .children-option {
@@ -1364,6 +1356,17 @@ export default {
   }
   .btn {
     padding: 5px 10px;
+  }
+}
+
+.item-title {
+  font-size: 14px;
+  text-align: left;
+  line-height: 30px;
+  display: flex;
+  p {
+    margin: 0;
+    padding: 0;
   }
 }
 

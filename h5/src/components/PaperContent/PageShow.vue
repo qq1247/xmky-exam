@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-09-16 09:46:16
  * @LastEditors: Che
- * @LastEditTime: 2021-11-02 16:38:10
+ * @LastEditTime: 2021-11-30 10:32:48
 -->
 
 <template>
@@ -29,11 +29,10 @@
             class="children-content"
             v-for="(child, index) in item.questionList"
           >
-            <p
-              v-if="child.type !== 3"
-              class="question-title"
-              v-html="`${index + 1}、${child.title}`"
-            ></p>
+            <div class="question-title" v-if="child.type !== 3">
+              <span>{{ index + 1 }}、</span>
+              <div v-html="`${child.title}`"></div>
+            </div>
             <div
               class="question-title"
               v-if="child.type === 3 && myExamDetailCache[child.id]"

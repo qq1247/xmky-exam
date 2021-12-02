@@ -49,7 +49,7 @@
       </el-form>
       <div class="table">
         <el-table :data="listpage.list" style="width: 100%">
-          <el-table-column label="名称">
+          <el-table-column label="姓名">
             <template slot-scope="scope">
               <span style="margin-left: 10px">{{ scope.row.name }}</span>
             </template>
@@ -156,9 +156,9 @@
             v-model.trim="editForm.loginName"
           ></el-input>
         </el-form-item>
-        <el-form-item label="名称" label-width="120px" prop="name">
+        <el-form-item label="姓名" label-width="120px" prop="name">
           <el-input
-            placeholder="请输入名称"
+            placeholder="请输入姓名"
             v-model.trim="editForm.name"
           ></el-input>
         </el-form-item>

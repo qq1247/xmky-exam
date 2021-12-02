@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-10-19 14:24:48
  * @LastEditors: Che
- * @LastEditTime: 2021-11-03 16:16:38
+ * @LastEditTime: 2021-12-01 17:45:27
 -->
 <template>
   <div>
@@ -18,10 +18,10 @@
     <template v-else>
       <el-form
         :model="editForm"
+        size="mini"
         ref="editForm"
         :rules="editForm.rules"
         label-width="80px"
-        size="mini"
         label-position="labelPosition"
         id="question_driver_editor"
       >
