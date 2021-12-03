@@ -62,18 +62,6 @@ http请求头需添加Authorization字段，
 | ---- | ------- | ---- | ---- |
 | id   | Integer | 主键 | 是   |
 
-### 试题分类权限：questionType/auth
-| 请求参数 | 类型    | 描述   | 必填 |
-| ------------ | ------- | ------ | ---- |
-| id           | Integer | 主键   | 是   |
-| writeUserIds | String[]  | 组用户 | 是   |
-
-### 试题分类合并：questionType/move
-| 请求参数| 类型    | 描述   | 必填 |
-| -------- | ------- | ------ | ---- |
-| sourceId | String  | 源ID   | 是   |
-| targetId | String  | 目标ID | 是   |
-
 ### 试题分类详情：questionType/get
 | 请求参数| 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
@@ -90,6 +78,18 @@ http请求头需添加Authorization字段，
 | data.createTime     | Date    | 创建时间   |
 | data.writeUserIds[]   | String[] | 组用户ID  |
 | data.writeUserNames[]   | String[] | 组用户名称  |
+
+### 试题分类权限：questionType/auth
+| 请求参数 | 类型    | 描述   | 必填 |
+| ------------ | ------- | ------ | ---- |
+| id           | Integer | 主键   | 是   |
+| writeUserIds | String[]  | 组用户 | 是   |
+
+### 试题分类合并：questionType/move
+| 请求参数| 类型    | 描述   | 必填 |
+| -------- | ------- | ------ | ---- |
+| sourceId | String  | 源ID   | 是   |
+| targetId | String  | 目标ID | 是   |
 
 ### 试卷分类列表：paperType/listpage
 | 请求参数| 类型        | 描述       | 必填 |
@@ -120,15 +120,6 @@ http请求头需添加Authorization字段，
 ### 试卷分类删除：paperType/del
 #### 参考questionType/del
 
-### 试卷分类权限：paperType/auth
-| 请求参数 | 类型    | 描述   | 必填 |
-| ------------ | ------- | ------ | ---- |
-| id           | Integer | 主键   | 是   |
-| readUserIds | String[]  | 组用户 | 是   |
-
-### 试卷分类合并：paperType/move
-#### 参考questionType/move
-
 ### 试卷分类详情：paperType/get
 | 请求参数| 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
@@ -145,6 +136,15 @@ http请求头需添加Authorization字段，
 | data.createTime     | Date    | 创建时间   |
 | data.readUserIds[]   | String[] | 组用户ID  |
 | data.readUserNames[]   | String[] | 组用户名称  |
+
+### 试卷分类权限：paperType/auth
+| 请求参数 | 类型    | 描述   | 必填 |
+| ------------ | ------- | ------ | ---- |
+| id           | Integer | 主键   | 是   |
+| readUserIds | String[]  | 组用户 | 是   |
+
+### 试卷分类合并：paperType/move
+#### 参考questionType/move
 
 ### 考试分类列表：examType/listpage
 | 请求参数| 类型        | 描述       | 必填 |
@@ -172,7 +172,16 @@ http请求头需添加Authorization字段，
 #### 参考questionType/del
 
 ### 考试分类详情：examType/get
-#### 参考questionType/get
+| 请求参数| 类型    | 描述 | 必填 |
+| ---- | ------- | ---- | ---- |
+| id   | Integer | 主键 | 是   |
+
+| 响应参数| 类型    | 描述       |
+| ------------------- | ------- | ---------- |
+| code                | Integer | 响应码     |
+| msg                 | String  | 响应消息   |
+| data.id             | Integer | 分类id     |
+| data.name           | String  | 分类名称   |
 
 ### 试题分类开放列表：questionTypeOpen/listpage
 | 请求参数| 类型    | 描述       | 必填 |
@@ -219,11 +228,12 @@ http请求头需添加Authorization字段，
 | title          | String  | 题干         | 否   |
 | type           | Integer | 类型         | 否   |
 | difficulty     | Integer | 难度         | 否   |
-| score     | Double  | 分值等于     | 否   |
+| score     | Double  | 分值     | 否   |
 | ai		 | Integer | 智能阅卷（1：是；2：否） | 否   |
 | paperId      | Integer | 试卷ID   | 否   |
 | exPaperId      | Integer | 排除试卷ID（用于组卷时过滤掉已添加过的试题）   | 否   |
 | state | Integer | 状态（0：删除；1：发布；2：草稿）；默认查询1,2；参数为0则查询最近7天已删除的试题 | 否   |
+| rand        | Object | 随机查询 （任意字符串）  | 否   |
 | curPage        | Integer | 当前第几页   | 否   |
 | pageSize       | Integer | 每页多少条   | 否   |
 
@@ -275,8 +285,9 @@ http请求头需添加Authorization字段，
 | id   | Integer | 主键 | 是   |
 
 ### 试题获取：question/get
-| 请求参数| 类型    | 描述 | 
+| 响应参数| 类型    | 描述 | 
 | -------- | ------- | ---- |
+| id           | Integer         | 主键 |
 | type           | Integer         | 类型（1：单选；2：多选；3：填空；4：判断；5：问答 |
 | difficulty     | Integer         | 难度（1：极易；2：简单；3：适中；4：困难；5：极难 ） | 
 | title          | Text | 题干 |
@@ -291,12 +302,6 @@ http请求头需添加Authorization字段，
 | answers[].answer      | String   | 答案   | 
 | answers[].score     | Double    | 得分   | 
 
-### 试题发布：question/publish
-| 请求参数| 类型    | 描述 | 必填 |
-| ---- | ------- | ---- | ---- |
-| questionTypeId| Integer | 试题分类ID（全部发布） | 否   |
-| ids| Integer[] | 试题ID（部分试题发布） | 否   |
-
 ### 试题获取：question/copy
 | 请求参数| 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
@@ -309,6 +314,16 @@ http请求头需添加Authorization字段，
 | questionTypeId | Integer | 试题分类ID | 是   |
 
 ### 试题模板导出：question/wordTemplateExport
+| 响应参数|  类型   |  描述  |
+| --------   | -----   | -----  |
+|	| Binary| 二进制流|
+
+### 试题发布：question/publish
+| 请求参数| 类型    | 描述 | 必填 |
+| ---- | ------- | ---- | ---- |
+| questionTypeId| Integer | 试题分类ID（全部发布） | 否   |
+| ids| Integer[] | 试题ID（部分试题发布） | 否   |
+
 ### 试题导出：question/wordExport 暂未实现
 ### 试卷列表：paper/listpage
 | 请求参数| 类型       | 描述       | 必填 |
@@ -329,12 +344,12 @@ http请求头需添加Authorization字段，
 | data.list[].name          | String  | 名称   |
 | data.list[].state         | Integer | 状态   |
 | data.list[].stateName     | String  | 状态名称 |
-| data.list[].updateUserId  | Integer | 修改人   |
-| data.list[].updateTime    | Date    | 修改时间  |
 | data.list[].passScore     | Double  | 及格分数（百分比） |
 | data.list[].totalScore    | Double  | 总分数 |
 | data.list[].paperTypeId   | Integer | 试卷分类id  |
 | data.list[].paperTypeName | String  | 试卷分类名称 |
+| data.list[].markType      | Integer | 阅卷方式（1：智能阅卷；2：人工阅卷；） |
+| data.list[].markTypeName      | String| 阅卷方式名称 |
 | data.list[].showType      | Integer | 展示方式（1：整卷展示；2：章节显示；3：单题展示；） |
 | data.list[].showTypeName      | String| 展示方式名称 |
 | data.list[].genType       | Integer | 组卷方式（1：人工组卷；2：随机组卷） |
@@ -347,7 +362,7 @@ http请求头需添加Authorization字段，
 | markType | Integer       | 阅卷方式（1：智能阅卷；2：人工阅卷；）  | 是   |
 | name  | String(32)    | 名称  | 是   |
 | passScore | Double        | 及格分数（百分比） | 是   |
-| showType | Integer       | 展示方式（1：整卷展示；2：章节显示；3：单题展示；）| 否   |
+| showType | Integer       | 展示方式（1：整卷展示；3：单题展示；）| 否   |
 | paperTypeId | Integer       | 试题分类ID | 是  |
 
 ### 试卷修改：paper/edit
@@ -419,8 +434,9 @@ http请求头需添加Authorization字段，
 ###### 只支持同章节下试题移动
 | 请求参数| 类型    | 描述       | 必填 |
 | --------------- | ------- | ---------- | ---- |
-| sourceId | Integer | 源ID | 是   |
-| targetId | Integer | 目标ID | 是   |
+| id | Integer | 主键 | 是   |
+| sourceId | Integer | 源试题ID | 是   |
+| targetId | Integer | 目标试题ID | 是   |
 
 ### 试卷试题列表：paper/paperQuestionList
 | 请求参数| 类型    | 描述   | 必填 |
@@ -442,12 +458,14 @@ http请求头需添加Authorization字段，
 |data.list[].questionList[].difficulty  | Integer  | 试题难度，难易度参考question/add|
 |data.list[].questionList[].difficultyName  | String  | 试题难度名称 |
 |data.list[].questionList[].title  | String  | 试题标题 |
-|data.list[].questionList[].answers[]  | String  | 试题答案，参考question/add |
+|data.list[].questionList[].ai  | Integer  | 是否智能阅卷|
 |data.list[].questionList[].analysis  | String  | 试题解析 |
 |data.list[].questionList[].score  | Double  | 试题分数 |
-|data.list[].questionList[].updateUserName  | String  | 更新用户 |
 |data.list[].questionList[].scoreOptions  | String  | 试题分数选项，参考question/add |
 |data.list[].questionList[].options[]  | String[]  | 试题选项，参考question/add |
+|data.list[].questionList[].answers[]  | Object[]  | 试题答案，参考question/add |
+|data.list[].questionList[].answers[].score  | Double  | 试题分数，参考question/add |
+|data.list[].questionList[].answers[].answer  | String | 试题答案，参考question/add |
 
 ### 试卷试题添加：paper/questionAdd
 | 请求参数| 类型      | 描述   | 必填 |
@@ -470,7 +488,7 @@ http请求头需添加Authorization字段，
 | 请求参数| 类型    | 描述       | 必填 |
 | --------------- | ------- | ---------- | ---- |
 | id| Integer | 主键 | 是   |
-| questionId| Integer  | 试卷ID       | 是   |
+| questionId| Integer  | 试题ID       | 是   |
 | score | Double  | 分数 | 是 |
 | subScores| Double  | 每空分数（试题为智能阅卷，并且是填空或问答时有效） | 是   |
 
@@ -481,6 +499,11 @@ http请求头需添加Authorization字段，
 | questionId | Integer   | 试题ID | 是   |
 | scoreOptions    | Integer[] | 分数选项     | 是   |
 
+### 试卷试题发布：paper/publish
+| 请求参数| 类型    | 描述   | 必填 |
+| ---- | ------- | ------ | ---- |
+| id   | Integer | 试卷id | 是   |
+
 ### 试卷更新分数：paper/totalScoreUpdate
 ###### 组卷时，总分数由前端计算并显示（加速响应提高用户体验）
 ###### 在关闭浏览器，或在组卷页面点击返回按钮时，调用该接口来更新试卷总分数。
@@ -489,16 +512,12 @@ http请求头需添加Authorization字段，
 | ---- | ------- | ------ | ---- |
 | id   | Integer | 试卷id | 是   |
 
-### 试卷试题发布：paper/publish
-| 请求参数| 类型    | 描述   | 必填 |
-| ---- | ------- | ------ | ---- |
-| id   | Integer | 试卷id | 是   |
-
 ### 考试列表：exam/listpage
 | 请求参数| 类型        | 描述       | 必填 |
 | -------- | ----------- | ---------- | ---- |
 | name     | String (16) | 名称       | 否   |
-| paperTypeId| Integer      | 试题分类ID| 否   |
+| examTypeId| Integer      | 试题分类ID| 否   |
+| state| Integer      | 状态 | 否   |
 | curPage  | Integer     | 当前第几页 | 否   |
 | pageSize | Integer     | 每页多少条 | 否   |
 
@@ -514,8 +533,12 @@ http请求头需添加Authorization字段，
 | data.list[].endTime| Date| 结束时间|
 | data.list[].markStartTime| Date| 阅卷开始时间|
 | data.list[].markEndTime| Date| 阅卷结束时间|
+| data.list[].state   | Integer | 考试状态     |
+| data.list[].paperMarkType  | Integer |  试卷阅卷类型   |
+| data.list[].paperId| Integer| 试卷Id    |
+| data.list[].paperName|String| 试卷名称    |
 | data.list[].paperTotleScore| Double| 试卷总分    |
-| data.list[].paperPassScore| Double  | 试卷及格分数    |
+| data.list[].paperPassScore| Double  | 试卷及格分数   |
 
 ### 考试添加：exam/add
 | 请求参数| 类型        | 描述                         		| 必填 |

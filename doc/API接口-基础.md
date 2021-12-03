@@ -43,6 +43,7 @@ http请求头需添加Authorization字段，
 |data.roles | String[]  | 角色 |
 
 ### 登陆退出：login/out
+
 ### 登陆修改密码：login/pwd
 | 请求参数     |  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
@@ -149,6 +150,7 @@ http请求头需添加Authorization字段，
 |data.list[]      | Object[]  | 分页列表 |
 |data.list[].id   | Integer  | 主键 |
 |data.list[].name | String  | 名称 |
+|data.list[].type | Integer  | 类型 |
 |data.list[].loginName | String  | 登陆名称 |
 |data.list[].orgId | Integer  | 组织机构ID |
 |data.list[].orgName | String  | 组织机构名称 |
@@ -174,6 +176,7 @@ http请求头需添加Authorization字段，
 ### 用户修改：user/edit
 | 请求参数     |  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
+|id      | Integer  | 主键   |   是     |
 |name      | String (16)  | 名称   |   是     |
 |loginName      | String (16)  | 登陆账号   |   是     |
 |orgId      | Integer  | 组织机构ID   |   是     |
@@ -201,12 +204,12 @@ http请求头需添加Authorization字段，
 |data.id| Integer  | 主键 |
 |data.name     | String  | 名称 |
 |data.loginName     | String  | 登陆账号 |
-|data.registTime     | Date  | 注册时间（admin可见） |
-|data.lastLoginTime     | Date  | 最后登陆时间（admin可见） |
 |data.orgId     | Integer  | 组织机构ID |
 |data.orgName   | String  | 组织机构名称 |
 |data.roles | String[]  | 角色（admin可见） |
 |data.state   | Integer  | 状态（0：删除；1：正常；） |
+|data.registTime     | Date  | 注册时间（admin可见） |
+|data.lastLoginTime     | Date  | 最后登陆时间（admin可见） |
 
 ### 用户密码初始化：user/pwdInit
 | 请求参数     |  类型   |  描述  |  必填 |
@@ -277,6 +280,21 @@ http请求头需添加Authorization字段，
 | --------   | -----   | -----  | ---- |
 |id    | Integer     |   主键   |   是   |
 
+### 数据字典获取：dict/get
+| 请求参数|  类型   |  描述  |  必填 |
+| --------   | -----   | -----  | ---- |
+|id    | Integer     |   主键   |   是   |
+
+| 响应参数  |  类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | Integer  | 响应码 |
+|msg     | String  | 响应消息 |
+|data.id| Integer  | 主键 |
+|data.dictIndex     | String  | 索引 |
+|data.dictKey | String  | 键 |
+|data.dictValue | String  | 值|
+|data.no | Integer| 排序|
+
 ### 定时任务列表：cron/listpage
 | 请求参数|  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
@@ -329,7 +347,7 @@ http请求头需添加Authorization字段，
 |msg     | String  | 响应消息 |
 |data.id| Integer  | 主键 |
 |data.name     | String  | 名称 |
-|data.jobClass | String  | 实现类 |triggerTimes
+|data.jobClass | String  | 实现类 |
 |data.cron | String  | cron表达式|
 |data.triggerTimes | Date[]| 最近几次触发时间|
 
@@ -369,7 +387,7 @@ http请求头需添加Authorization字段，
 | --------   | -----   | -----  |
 |	| Binary| 二进制流|
 
-### 附件获取ID：file/getId
+### 附件获取ID：file/id
 | 请求参数|  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
 |uuid| String| 移动端在浏览器上扫码传图时，二维码携带自定义uuid，移动端上传图片后， 浏览器通过该uuid反向获取上传的附件ID，浏览器建议查询间隔为1秒一次 |   是   |
@@ -397,7 +415,9 @@ http请求头需添加Authorization字段，
 ### 公告栏列表：bulletin/listpage
 | 求参数|  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
+| title  | String  | 标题   |   否     |
 | showType  | Integer  | 展示类型   |   否     |
+| state  | Integer  | 状态  |   否     |
 | curPage | Integer | 当前第几页  |   否     |
 | pageSize | Integer  | 每页多少条   |   否     |
 
@@ -410,11 +430,12 @@ http请求头需添加Authorization字段，
 |data.list[].id   | Integer  | 主键 |
 |data.list[].title | String  | 标题 |
 |data.list[].content | String  | 内容 |
-|data.list[].showType      | Integer  | 展示状态 |
-|data.list[].showTypeName      | String  | 展示状态名称 |
+|data.list[].showType      | Integer  | 展示类型 |
+|data.list[].showTypeName      | String  | 展示类型名称 |
+|data.list[].startTime | Date  | 开始时间 |
+|data.list[].endTime | Date  | 结束时间 |
 |data.list[].imgFileId     | String  | 图片附件ID |
-|data.list[].updateTime | String  | 更新时间 |
-|data.list[].updateUserName | String  | 更新用户名称 |
+|data.list[].state | Integer  | 状态 |
 |data.list[].readUserNames | String  | 用户读权限 |
 
 ### 公告栏添加：bulletin/add
@@ -441,6 +462,33 @@ http请求头需添加Authorization字段，
 | --------   | -----   | -----  | ---- |
 |id    | Integer     |   主键   |   是   |
 
+### 公告栏列表：bulletin/get
+| 求参数|  类型   |  描述  |  必填 |
+| --------   | -----   | -----  | ---- |
+| id  | Integer  | 主键  | 是     |
+
+| 响应参数|  类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | Integer  | 响应码 |
+|msg     | String  | 响应消息 |
+|data.total     | Integer  | 总行数 |
+|data.id   | Integer  | 主键 |
+|data.title | String  | 标题 |
+|data.state | Integer  | 状态 |
+|data.content | String  | 状态 |
+|data.showType      | Integer  | 展示类型 |
+|data.startTime | Date  | 开始时间 |
+|data.endTime | Date  | 结束时间 |
+|data.imgFileId     | String  | 图片附件ID |
+|data.readUserIds | Integer[]  | 用户读权限ID |
+|data.readUserNames | String[]  | 用户读权限名称 |
+
+### 系统参数单位名称：parm/logo
+| 请求参数|  类型   |  描述  |  必填 |
+| --------   | -----   | -----  | ---- |
+|orgLogo| Integer| 机构logo ID  |   否     |
+|orgName| String (64)  | 机构名称  |   否     |
+
 ### 系统参数邮件：parm/email
 | 请求参数|  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
@@ -449,12 +497,6 @@ http请求头需添加Authorization字段，
 |pwd| text  | String（64）   |   是     |
 |protocol| String（16）| 协议  |   是     |
 |encode| String (16)  | 编码   |  是   |
-
-### 系统参数单位名称：parm/logo
-| 请求参数|  类型   |  描述  |  必填 |
-| --------   | -----   | -----  | ---- |
-|orgLogo| Integer| 机构logo ID  |   否     |
-|orgName| String (64)  | 机构名称  |   否     |
 
 ### 系统参数上传附件目录：parm/file
 | 请求参数|  类型   |  描述  |  必填 |
@@ -472,9 +514,8 @@ http请求头需添加Authorization字段，
 |type| Integer| 密码类型（1：随机；2：固定）|   否    |
 |value| String(32)| 密码|   否    |
 
-
 ### 系统参数获取：parm/get
-| 请求参数|  类型   |  描述  |
+| 请求参数|  类型   |  描述  | 
 | --------   | -----   | -----  |
 |emailHost| String（64）| 主机   | 
 |emailUserName| String (64)  | 用户名   | 
@@ -487,3 +528,15 @@ http请求头需添加Authorization字段，
 |dbBakDir| String（64）| 上传目录   |   
 |pwdType| Integer| 密码类型   |   
 |pwdValue| String（32）| 密码   |   
+
+### 敏感词添加：sensitive/edit
+| 请求参数|  类型   |  描述  |  必填 |
+| --------   | -----   | -----  | ---- |
+|whiteList   | text    | 白名单 | 否  |
+|blackList   | text    | 黑名单 |  否 |
+
+### 敏感词获取：sensitive/get
+| 请求参数|  类型   |  描述  | 
+| --------   | -----   | -----  | 
+|whiteList   | text    | 白名单 |
+|blackList   | text    | 黑名单 |
