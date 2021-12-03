@@ -232,7 +232,7 @@
                     <el-col :span="21">
                       <span
                         style="margin-right: 15px"
-                        v-if="preview === true || child.isEdit"
+                        v-if="preview === 'true' || child.isEdit"
                         >{{ child.scorePlate || 0 }}</span
                       >
                       <el-tooltip
@@ -245,12 +245,12 @@
                           size="mini"
                           type="primary"
                           icon="el-icon-edit"
-                          v-if="preview === false && child.isEdit"
+                          v-if="preview === 'false' && child.isEdit"
                           @click="showScorePlate(index, indexc)"
                         ></el-button>
                       </el-tooltip>
                       <ScorePlate
-                        v-if="!child.isEdit && preview === false"
+                        v-if="!child.isEdit && preview === 'false'"
                         :key="child.id"
                         :data="child"
                         @input="scoreInput($event, child.id, index, indexc)"
@@ -286,7 +286,7 @@
             'user-item',
             userId === item.userId
               ? 'active'
-              : item.markState === 3
+              : item.examMarkState === 3
               ? 'end'
               : '',
           ]"
@@ -296,7 +296,7 @@
         >
           <span style="margin-right: 10px">{{ item.userName }}</span>
           <span style="margin-right: 10px">{{ item.totalScore || 0 }}分</span>
-          <i v-if="item.markState === 3" class="common common-finish"></i>
+          <i v-if="item.examMarkState === 3" class="common common-finish"></i>
         </div>
       </el-scrollbar>
     </div>
@@ -305,7 +305,7 @@
 <script>
 import { paperGet, paperQuestionList } from 'api/paper'
 import {
-  myMarkUserListPage,
+  myMarkUserList,
   myMarkAnswerList,
   myMarkScore,
   myMarkFinish,
@@ -336,23 +336,15 @@ export default {
       paper: {},
       answerList: [],
       userId: null,
-      preview: false,
-      markStartTime: 0,
-      markEndTime: 0,
+      preview: 'false',
     }
   },
   created() {
-    const { examId, paperId, markId, markStartTime, markEndTime } =
-      this.$route.query
+    const { examId, paperId, markId, preview } = this.$route.query
     this.examId = examId
     this.paperId = paperId
     this.markId = markId
-    this.markStartTime = Number(markStartTime)
-    this.markEndTime = Number(markEndTime)
-    const now = new Date().getTime()
-    this.markStartTime < now && now < this.markEndTime && (this.preview = false)
-    ;(this.markStartTime > now || now > this.markEndTime) &&
-      (this.preview = true)
+    this.preview = preview
     this.init()
   },
   methods: {
@@ -391,9 +383,7 @@ export default {
     },
     // 查询考生信息
     async queryExamineeInfo() {
-      const infos = await myMarkUserListPage({
-        curPage: this.curPage,
-        pageSize: 100,
+      const infos = await myMarkUserList({
         examId: Number(this.examId),
       })
 
@@ -441,7 +431,7 @@ export default {
           })
         })
 
-        if (this.preview === false) {
+        if (this.preview === 'false') {
           this.$nextTick(() => {
             this.toHref()
           })
@@ -482,10 +472,8 @@ export default {
     },
     // 设置分数
     async setScore(e, questionId, idx, idxc) {
-      const now = new Date().getTime()
-      if (this.markStartTime > now || now > this.markEndTime) {
-        this.preview = true
-        this.$message.warning('阅卷已结束')
+      if ((this.preview = 'true')) {
+        this.$message.warning('阅卷未开始或已结束')
         return false
       }
       const source = this.paperQuestion[idx].questionList[idxc]

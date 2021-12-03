@@ -94,7 +94,7 @@
                       <span class="header-left">{{ item.examName }}</span>
                       <div class="header-right">
                         <div class="exam-status">
-                          {{ examStatus[item.state] }}
+                          {{ item.stateName }}
                         </div>
                       </div>
                     </div>
@@ -146,7 +146,7 @@
                       <span class="header-left">{{ item.examName }}</span>
                       <div class="header-right">
                         <div class="mark-status">
-                          {{ examStatus[item.state] }}
+                          {{ item.markStateName }}
                         </div>
                       </div>
                     </div>
@@ -216,7 +216,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { bulletinListPage } from 'api/base'
-import { myExamListPage, myMarkListPage } from 'api/my'
+import { myExamListPage } from 'api/my'
 import { questionTypeOpenListPage } from 'api/question'
 import NoticeBar from 'components/NoticeBar/Index'
 import getMainColor from '@/utils/getImageColor.js'
@@ -233,7 +233,6 @@ export default {
       markList: [],
       bulletinList: [],
       questionTypeOpenList: [],
-      readPaperStatus: ['', '待阅', '阅卷', '已阅'],
       examStatus: ['', '待考', '考试', '已考', '已考'],
       carouselList: [
         {
@@ -257,64 +256,11 @@ export default {
     // 初始化
     async init() {
       this.getBulletinList()
-      if (this.onlyRole.includes('admin')) {
-        return
+      if (!this.onlyRole.includes('admin')) {
+        await this.renderCalendar()
+        this.renderList()
+        this.getQuestionTypeOpenList()
       }
-      await this.renderCalendar()
-      this.renderList()
-      this.getQuestionTypeOpenList()
-    },
-    // 获取考试列表和阅卷列表
-    async getExamAndMark(time = undefined) {
-      const days = dayjs(time).daysInMonth()
-      const startDate = time || dayjs().date(1).format('YYYY-MM-DD')
-      const endDate = dayjs(time).date(days).format('YYYY-MM-DD')
-      let examList, markList
-      if (this.onlyRole.includes('user')) {
-        examList = await myExamListPage({
-          curPage: 1,
-          pageSize: 100,
-          startDate: `${startDate} 00:00:00`,
-          endDate: `${endDate} 23:59:59`,
-        })
-      }
-      if (this.onlyRole.includes('subAdmin')) {
-        markList = await myMarkListPage({
-          curPage: 1,
-          pageSize: 100,
-          startDate: `${startDate} 00:00:00`,
-          endDate: `${endDate} 23:59:59`,
-        })
-      }
-      if (dayjs(time).month() === dayjs().month()) {
-        this.examList = (examList && examList?.data?.list) || []
-        this.markList = (markList && markList?.data?.list) || []
-      }
-      return {
-        examList: (examList && examList?.data?.list) || [],
-        markList: (markList && markList?.data?.list) || [],
-      }
-    },
-    // 渲染考试和阅卷列表
-    renderList() {
-      this.examList = this.examList.filter((item) => {
-        const examEndTime = new Date(item.examEndTime).getTime()
-        const now = new Date().getTime()
-        if (examEndTime > now) return item
-      })
-
-      this.markList = this.markList.filter((item) => {
-        const markEndTime = new Date(item.markEndTime).getTime()
-        const now = new Date().getTime()
-        if (markEndTime > now) return item
-      })
-    },
-    // 计算分钟数
-    computeMinute(startTime, endTime) {
-      const diffTime =
-        new Date(endTime).getTime() - new Date(startTime).getTime()
-      const minutes = diffTime / (60 * 1000)
-      return `${minutes}分钟`
     },
     // 获取公告列表
     async getBulletinList() {
@@ -350,6 +296,49 @@ export default {
     noticeDetail(id) {
       this.$router.push(`/my?noticeId=${id}`)
     },
+    // 获取考试列表和阅卷列表
+    async getExamAndMark(time = undefined) {
+      const days = dayjs(time).daysInMonth()
+      const startDate = time || dayjs().date(1).format('YYYY-MM-DD')
+      const endDate = dayjs(time).date(days).format('YYYY-MM-DD')
+      let examList, markList
+      if (this.onlyRole.includes('user')) {
+        examList = await myExamListPage({
+          curPage: 1,
+          pageSize: 100,
+          startTime: `${startDate} 00:00:00`,
+          endTime: `${endDate} 23:59:59`,
+        })
+      }
+      if (this.onlyRole.includes('subAdmin')) {
+        markList = await {
+          curPage: 1,
+          pageSize: 100,
+          startTime: `${startDate} 00:00:00`,
+          endTime: `${endDate} 23:59:59`,
+        }
+      }
+      if (dayjs(time).month() === dayjs().month()) {
+        this.examList = (examList && examList?.data?.list) || []
+        this.markList = (markList && markList?.data?.list) || []
+      }
+      return {
+        examList: (examList && examList?.data?.list) || [],
+        markList: (markList && markList?.data?.list) || [],
+      }
+    },
+    // 渲染考试和阅卷列表
+    renderList() {
+      this.examList = this.examList.filter((item) => item.state === 1)
+      this.markList = this.markList.filter((item) => item.markState === 1)
+    },
+    // 计算分钟数
+    computeMinute(startTime, endTime) {
+      const diffTime =
+        new Date(endTime).getTime() - new Date(startTime).getTime()
+      const minutes = diffTime / (60 * 1000)
+      return `${minutes}分钟`
+    },
     // 获取选择月份的时间
     selectDate(time) {
       const _time = dayjs(time).date(1).format('YYYY-MM-DD')
@@ -376,7 +365,7 @@ export default {
         acc[examTime]['exam'].push({
           startTime: exam.examStartTime,
           endTime: exam.examEndTime,
-          state: this.setState(exam.examStartTime, exam.examEndTime, 'exam'),
+          state: exam.stateName,
         })
         return acc
       }, {})
@@ -395,27 +384,12 @@ export default {
         acc[markTime]['mark'].push({
           startTime: mark.markStartTime,
           endTime: mark.markEndTime,
-          state: this.setState(mark.markStartTime, mark.markEndTime, 'mark'),
+          state: exam.markStateName,
         })
         return acc
       }, examPopovers)
 
       this.timePopovers = timePopovers
-    },
-    // 设置时间状态
-    setState(start, end, type) {
-      const startTime = new Date(start).getTime()
-      const endTime = new Date(end).getTime()
-      const now = new Date().getTime()
-
-      let state
-      startTime < now &&
-        endTime > now &&
-        (state = type === 'exam' ? '考试中' : '阅卷中')
-      startTime > now && (state = type == 'exam' ? '待考试' : '待阅卷')
-      endTime < now && (state = type == 'exam' ? '已考试' : '已阅卷')
-
-      return state
     },
     // 获取开放题库
     async getQuestionTypeOpenList() {
@@ -444,11 +418,8 @@ export default {
       })
     },
     // 去考试页面
-    goExam({ id, examId, paperId, paperShowType, examStartTime, examEndTime }) {
-      const _examStartTime = new Date(examStartTime).getTime()
-      const _examEndTime = new Date(examEndTime).getTime()
-      const now = new Date().getTime()
-      if (now < _examStartTime) {
+    goExam({ id, state, examId, paperId, paperShowType, examEndTime }) {
+      if (state === 1) {
         this.$message.warning('考试未开始，请等待...')
         return
       }
@@ -461,16 +432,13 @@ export default {
           paperId,
           examEndTime,
           showType: paperShowType,
-          preview: _examStartTime < now && now > _examEndTime,
+          preview: state !== 2,
         },
       })
     },
     // 去阅卷页面
-    goMark({ id, examId, paperId, markStartTime, markEndTime }) {
-      const _markStartTime = new Date(markStartTime).getTime()
-      const _markEndTime = new Date(markEndTime).getTime()
-      const now = new Date().getTime()
-      if (now < _markStartTime) {
+    goMark({ id, examId, paperId, markState }) {
+      if (markState === 1) {
         this.$message.warning('阅卷未开始，请等待...')
         return
       }
@@ -481,8 +449,7 @@ export default {
           markId: id,
           examId,
           paperId,
-          markEndTime: _markEndTime,
-          markStartTime: _markStartTime,
+          preview: markState !== 2,
         },
       })
     },

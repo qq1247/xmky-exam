@@ -5,21 +5,25 @@
  * @Author: Che
  * @Date: 2021-10-13 14:52:40
  * @LastEditors: Che
- * @LastEditTime: 2021-10-22 10:29:44
+ * @LastEditTime: 2021-12-03 16:05:40
 -->
 <template>
   <div class="exam-item">
     <div class="exam-content">
       <!-- 考试，阅卷 标签 -->
-      <div class="tagGroup">
-        <el-tag size="mini" :type="data.state == 3 ? '' : 'danger'">{{
-          data.stateName
-        }}</el-tag
-        >&nbsp;&nbsp;
-        <el-tag size="mini" :type="data.markState == 3 ? '' : 'danger'">{{
-          data.markStateName
-        }}</el-tag
-        >&nbsp;&nbsp;
+      <div class="tag-group">
+        <el-tag
+          size="mini"
+          v-if="name == 'myExamList'"
+          :type="data.state == 3 ? '' : 'danger'"
+          >{{ data.stateName }}</el-tag
+        >
+        <el-tag
+          size="mini"
+          v-if="name == 'myExamMarkList'"
+          :type="data.markState == 3 ? '' : 'danger'"
+          >{{ data.markStateName }}</el-tag
+        >
       </div>
       <!-- 标题 -->
       <div class="title ellipsis">{{ data.name || data.examName }}</div>
@@ -36,13 +40,14 @@
           >及格：{{ data.totalScore || 0 }}/{{ data.paperTotalScore }}</el-col
         >
       </el-row>
-      <el-row class="content-info" v-if="name === 'myMarkExamList'">
+      <el-row class="content-info" v-if="name === 'myExamMarkList'">
         <el-col
           >及格：{{
             (data.paperPassScore * data.paperTotalScore) / 100 || 0
           }}/{{ data.paperTotalScore }}</el-col
         >
       </el-row>
+
       <CountDown
         class="count-down"
         v-if="remainTime > 0"
@@ -52,46 +57,14 @@
       <div class="handler">
         <!-- 我的考试 -->
         <template v-if="name === 'myExamList'">
-          <span
-            v-if="data.exam === 'unStart' || data.exam === 'end'"
-            :data-title="data.exam == 'unStart' ? '待考试' : '已考试'"
-            @click="exam(data)"
-          >
-            <i
-              :class="[
-                'common',
-                data.exam === 'unStart' ? 'common-wait' : 'common-exam',
-              ]"
-            ></i>
-          </span>
-          <span
-            v-if="data.exam === 'start'"
-            data-title="考试中"
-            @click="exam(data)"
-          >
-            <i class="common common-examing"></i>
+          <span :data-title="data.stateName" @click="exam(data)">
+            <i :class="['common', stateIcon[data.state]]"></i>
           </span>
         </template>
         <!-- 我的阅卷 -->
-        <template v-if="name === 'myMarkExamList'">
-          <span
-            v-if="['unStart', 'end'].includes(data.mark)"
-            :data-title="data.mark == 'unStart' ? '待阅卷' : '已阅卷'"
-            @click="mark(data)"
-          >
-            <i
-              :class="[
-                'common',
-                data.mark === 'unStart' ? 'common-wait' : 'common-mark',
-              ]"
-            ></i>
-          </span>
-          <span
-            v-if="data.mark === 'start'"
-            data-title="阅卷中"
-            @click="mark(data)"
-          >
-            <i class="common common-marking"></i>
+        <template v-if="name === 'myExamMarkList'">
+          <span :data-title="data.markStateName" @click="mark(data)">
+            <i :class="['common', markStateIcon[data.markState]]"></i>
           </span>
         </template>
       </div>
@@ -116,7 +89,10 @@ export default {
     },
   },
   data() {
-    return {}
+    return {
+      markStateIcon: ['', 'common-wait', 'common-marking', 'common-mark'],
+      stateIcon: ['', 'common-wait', 'common-examing', 'common-exam'],
+    }
   },
   computed: {
     remainTime() {

@@ -34,7 +34,7 @@
             v-for="(item, index) in myExamList"
             :key="index"
             :data="item"
-            name="myMarkExamList"
+            name="myExamMarkList"
             @mark="markHandler"
           ></MyCard>
         </div>
@@ -56,9 +56,8 @@
 </template>
 
 <script>
-import { myExamListPage, myMarkListPage } from 'api/my'
+import { myExamListPage } from 'api/my'
 import MyCard from 'components/ListCard/MyCard.vue'
-import { loginSysTime } from 'api/common'
 export default {
   components: {
     MyCard,
@@ -85,68 +84,11 @@ export default {
   methods: {
     // 我的考试列表
     async query() {
-      const loginSysTimeStr = await loginSysTime({})
-      const curTime = new Date(loginSysTimeStr.data).getTime()
-      let myExamList
-
-      if (this.type === 1) {
-        myExamList = await myExamListPage({
-          examName: this.queryForm.examName,
-          curPage: this.curPage,
-          pageSize: this.pageSize,
-        })
-        myExamList.data.list.forEach((item) => {
-          const examStartTime = new Date(item.examStartTime).getTime()
-          const examEndTime = new Date(item.examEndTime).getTime()
-
-          if (curTime < examStartTime) {
-            item.exam = 'unStart'
-          } else if (curTime > examEndTime) {
-            item.exam = 'end'
-          } else {
-            item.exam = 'start'
-          }
-        })
-      }
-
-      if (this.type === 2) {
-        myExamList = await myMarkListPage({
-          examName: this.queryForm.examName,
-          curPage: this.curPage,
-          pageSize: this.pageSize,
-        })
-        myExamList.data.list.forEach((item) => {
-          const markStartTime = new Date(item.markStartTime).getTime()
-          const markEndTime = new Date(item.markEndTime).getTime()
-          const examStartTime = new Date(item.examStartTime).getTime()
-          const examEndTime = new Date(item.examEndTime).getTime()
-
-          if (curTime < examStartTime) {
-            item.state = 1
-            item.stateName = '待考试'
-          } else if (curTime > examEndTime) {
-            item.state = 3
-            item.stateName = '已考试'
-          } else {
-            item.state = 2
-            item.stateName = '考试中'
-          }
-
-          if (curTime < markStartTime) {
-            item.mark = 'unStart'
-            item.markState = 1
-            item.markStateName = '待阅卷'
-          } else if (curTime > markEndTime) {
-            item.mark = 'end'
-            item.markState = 3
-            item.markStateName = '已阅卷'
-          } else {
-            item.mark = 'start'
-            item.markState = 2
-            item.markStateName = '阅卷中'
-          }
-        })
-      }
+      const myExamList = await myExamListPage({
+        examName: this.queryForm.examName,
+        curPage: this.curPage,
+        pageSize: this.pageSize,
+      })
 
       this.myExamList = myExamList.data.list
       this.total = myExamList.data.total
@@ -156,18 +98,8 @@ export default {
       this.query()
     },
     // 我的考试操作
-    examHandler({
-      id,
-      examId,
-      paperId,
-      paperShowType,
-      examStartTime,
-      examEndTime,
-    }) {
-      const _examStartTime = new Date(examStartTime).getTime()
-      const _examEndTime = new Date(examEndTime).getTime()
-      const now = new Date().getTime()
-      if (now < _examStartTime) {
+    examHandler({ id, state, examId, paperId, paperShowType, examEndTime }) {
+      if (state === 1) {
         this.$message.warning('考试未开始，请等待...')
         return
       }
@@ -180,17 +112,13 @@ export default {
           paperId,
           examEndTime,
           showType: paperShowType,
-          preview: _examStartTime < now && now > _examEndTime,
+          preview: state !== 2,
         },
       })
     },
     // 我的阅卷操作
-    markHandler({ id, examId, paperId, markStartTime, markEndTime }) {
-      this.markId = examId
-      const _markStartTime = new Date(markStartTime).getTime()
-      const _markEndTime = new Date(markEndTime).getTime()
-      const now = new Date().getTime()
-      if (now < _markStartTime) {
+    markHandler({ id, examId, markState, paperId }) {
+      if (markState === 1) {
         this.$message.warning('阅卷未开始，请等待...')
         return
       }
@@ -201,8 +129,7 @@ export default {
           markId: id,
           examId,
           paperId,
-          markEndTime: _markEndTime,
-          markStartTime: _markStartTime,
+          preview: markState !== 2,
         },
       })
     },

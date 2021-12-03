@@ -57,10 +57,7 @@
           </el-table-column>
           <el-table-column label="最近三次运行时间">
             <template slot-scope="scope">
-              <span
-                :key="item"
-                v-for="item in scope.row.recentTriggerTime.split('；')"
-              >
+              <span :key="item" v-for="item in scope.row.triggerTimes">
                 <el-tag effect="plain" style="margin-bottom: 3px" v-if="item">{{
                   item
                 }}</el-tag>

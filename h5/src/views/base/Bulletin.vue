@@ -154,7 +154,7 @@
               ref="bannerUpload"
               type="image"
               :files="editForm.imgFileId"
-              @success="bannerSucess"
+              @success="bannerSuccess"
               @remove="bannerRemove"
               :size="2"
             />
@@ -296,7 +296,7 @@ export default {
       this.editForm[id] = value
     },
     // 上传banner成功
-    bannerSucess(res, file, fileList) {
+    bannerSuccess(res, file, fileList) {
       this.editForm.imgFileId = fileList
     },
     // 上传banner失败
@@ -451,10 +451,9 @@ export default {
     // 组合回显数据
     compositionRoles(userIds, userNames) {
       const ids = userIds
-        .split(',')
         .filter((item) => item !== '')
         .map((item) => Number(item))
-      const names = userNames.split(',')
+      const names = userNames
       const roles = ids.reduce(
         (acc, cur, index) => {
           acc['roleIds'].push(cur)
@@ -476,7 +475,9 @@ export default {
     },
     // 清空还原数据
     resetData(name) {
-      this.bannerClear('bannerUpload')
+      if (this.editForm.showType === 3) {
+        this.bannerClear('bannerUpload')
+      }
       this.$refs[name].resetFields()
     },
   },
