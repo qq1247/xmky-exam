@@ -42,23 +42,20 @@ public class SensitiveServiceImpl extends BaseServiceImp<Sensitive> implements S
 	
 
 	@Override
-	public void initialize() {
-		Sensitive entity = sensitiveDao.getEntity(1);
-		if (entity == null) {
-		   entity = sensitiveDao.getList();
-		   if (entity == null) {
-		    entity = new Sensitive();
-		    entity.setWhiteList(null);
-		    entity.setBlackList(null);
-		    entity.setUpdateTime(new Date());
-		    entity.setUpdateUserId(1);
-		    sensitiveDao.add(entity);
-		   }
-		   if (entity != null && entity.getId() != 1) {
-		    sensitiveDao.getUpdateId(entity.getId()); //sql 修改敏感词id为1
-		   }
+	public void init() {
+		Sensitive sensitive = sensitiveDao.getEntity(1);
+		if (sensitive != null) {
+			init(sensitive);
+			return;
 		}
-		init(entity);
+		
+		sensitive = new Sensitive();
+	    sensitive.setWhiteList(null);
+	    sensitive.setBlackList(null);
+	    sensitive.setUpdateTime(new Date());
+	    sensitive.setUpdateUserId(1);
+	    add(sensitive);
+	    init(sensitive);
 	}
     
 	@Override

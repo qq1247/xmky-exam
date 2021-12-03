@@ -18,13 +18,4 @@ public interface SensitiveDao extends RBaseDao<Sensitive> {
 	 * @return Sensitive
 	 */
 	Sensitive getList();
-	
-
-	/**
-	 * 修改id
-	 * 
-	 * v1.0 chenyun 2021年12月3日下午3:59:37
-	 * @return Sensitive
-	 */
-	void getUpdateId(Integer id);
 }

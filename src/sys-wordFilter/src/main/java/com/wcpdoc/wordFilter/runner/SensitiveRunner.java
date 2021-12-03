@@ -25,6 +25,6 @@ public class SensitiveRunner implements ApplicationRunner {
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		log.info("启动监听：敏感词初始化");
-		sensitiveService.initialize();
+		sensitiveService.init();
 	}
 }
