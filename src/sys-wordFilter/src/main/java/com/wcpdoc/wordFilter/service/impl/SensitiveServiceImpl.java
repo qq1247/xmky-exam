@@ -48,7 +48,6 @@ public class SensitiveServiceImpl extends BaseServiceImp<Sensitive> implements S
 		   entity = sensitiveDao.getList();
 		   if (entity == null) {
 		    entity = new Sensitive();
-		    entity.setId(1);
 		    entity.setWhiteList(null);
 		    entity.setBlackList(null);
 		    entity.setUpdateTime(new Date());
