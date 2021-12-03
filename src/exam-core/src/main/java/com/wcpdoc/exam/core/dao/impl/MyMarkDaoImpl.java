@@ -26,19 +26,17 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT MY_MARK.ID, EXAM.NAME AS EXAM_NAME, EXAM.START_TIME AS EXAM_START_TIME, EXAM.PAPER_ID AS PAPER_ID, PAPER.SHOW_TYPE AS PAPER_SHOW_TYPE, "
-				+ "		EXAM.END_TIME AS EXAM_END_TIME, PAPER.TOTAL_SCORE AS PAPER_TOTAL_SCORE, MY_MARK.EXAM_USER_IDS AS EXAM_USER_IDS, "
-				+ "		EXAM.STATE AS STATE, USER.NAME AS MARK_USER_NAME, USER.ID AS MARK_USER_ID, EXAM.ID AS EXAM_ID, UPDATE_USER.ID AS UPDATE_USER_ID, UPDATE_USER.NAME AS UPDATE_USER_NAME, "
-				+ "		EXAM.MARK_START_TIME AS MARK_START_TIME, EXAM.MARK_END_TIME AS MARK_END_TIME, PAPER.PASS_SCORE AS PAPER_PASS_SCORE "
-				+ "		FROM EXM_MY_MARK MY_MARK "
-				+ "		INNER JOIN EXM_EXAM EXAM ON MY_MARK.EXAM_ID = EXAM.ID "
-				+ "		INNER JOIN EXM_PAPER PAPER ON EXAM.PAPER_ID = PAPER.ID "
-				+ "		INNER JOIN SYS_USER USER ON MY_MARK.MARK_USER_ID = USER.ID "
-				+ "		INNER JOIN SYS_USER UPDATE_USER ON MY_MARK.UPDATE_USER_ID = UPDATE_USER.ID ";
-		
+		String sql = "SELECT EXAM.ID AS EXAM_ID, EXAM.NAME AS EXAM_NAME, EXAM.START_TIME AS EXAM_START_TIME, EXAM.END_TIME AS EXAM_END_TIME, "
+				+ "EXAM.MARK_START_TIME AS EXAM_MARK_START_TIME, EXAM.MARK_END_TIME AS EXAM_MARK_END_TIME, "
+				+ "USER.ID AS MARK_USER_ID, USER.NAME AS MARK_USER_NAME, EXAM.PAPER_ID AS PAPER_ID, "
+				+ "PAPER.PASS_SCORE AS PAPER_PASS_SCORE, PAPER.TOTAL_SCORE AS PAPER_TOTAL_SCORE, "
+				+ "EXAM.MARK_STATE AS EXAM_MARK_STATE, PAPER.SHOW_TYPE AS PAPER_SHOW_TYPE "
+				+ "FROM EXM_MY_MARK MY_MARK "
+				+ "INNER JOIN EXM_EXAM EXAM ON MY_MARK.EXAM_ID = EXAM.ID "
+				+ "INNER JOIN EXM_PAPER PAPER ON EXAM.PAPER_ID = PAPER.ID "
+				+ "INNER JOIN SYS_USER USER ON MY_MARK.MARK_USER_ID = USER.ID";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examName")), "EXAM.NAME LIKE ?", "%" + pageIn.get("examName") + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.get("userId")), "EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.MARK_USER_ID = ? AND Z.EXAM_ID = MY_MARK.EXAM_ID)", pageIn.get("userId"))
 				.addWhere(pageIn.get("curUserId", Integer.class) != null, "MY_MARK.MARK_USER_ID =  ?", pageIn.get("curUserId", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("startDate")) && ValidateUtil.isValid(pageIn.get("endDate")), "(EXAM.MARK_START_TIME <= ? AND EXAM.MARK_START_TIME >= ?)", pageIn.get("endDate"), pageIn.get("startDate"))
 				.addWhere("EXAM.STATE = ?", 1)
@@ -47,7 +45,8 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 		HibernateUtil.formatDate(pageOut.getList(), "examStartTime", DateUtil.FORMAT_DATE_TIME, "examEndTime", DateUtil.FORMAT_DATE_TIME, 
 				"markEndTime", DateUtil.FORMAT_DATE_TIME, "markStartTime", DateUtil.FORMAT_DATE_TIME);
 		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), 
-				"MY_EXAM_MARK_STATE", "state"
+				"MY_EXAM_MARK_STATE", "examMarkState",
+				"PAPER_SHOW_TYPE", "paperShowType"
 				);
 		return pageOut;
 	}

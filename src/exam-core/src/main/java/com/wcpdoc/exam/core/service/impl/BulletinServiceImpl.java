@@ -1,8 +1,6 @@
 package com.wcpdoc.exam.core.service.impl;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -11,7 +9,6 @@ import org.springframework.stereotype.Service;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
-import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.BulletinDao;
@@ -109,14 +106,5 @@ public class BulletinServiceImpl extends BaseServiceImp<Bulletin> implements Bul
 	@Override
 	public PageOut getOrgListpage(PageIn pageIn) {
 		return bulletinDao.getOrgListpage(pageIn);
-	}
-
-	@Override
-	public Map<String, Object> get(Integer id) {
-		List<Map<String, Object>> list = bulletinDao.get(id);
-		if (list == null || list.size() != 1) {
-			throw new MyException("错误参数：id");
-		}
-		return list.get(0);
 	}
 }

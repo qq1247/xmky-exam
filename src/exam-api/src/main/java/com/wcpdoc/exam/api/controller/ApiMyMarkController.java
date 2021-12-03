@@ -44,26 +44,6 @@ public class ApiMyMarkController extends BaseController {
 	private MyExamDetailService myExamDetailService;
 	
 	/**
-	 * 我的考试列表
-	 * 
-	 * v1.0 zhanghc 2017-05-25 16:34:59
-	 * @return pageOut
-	 */
-	@RequestMapping("/examListpage")
-	@ResponseBody
-	public PageResult examListpage() {
-		try {
-			PageIn pageIn = new PageIn(request);
-			pageIn.addAttr("curUserId", getCurUser().getId());
-			pageIn.addAttr("state", "1");
-			return PageResultEx.ok().data(examService.getListpage(pageIn));
-		} catch (Exception e) {
-			log.error("我的阅卷列表错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
 	 * 我的阅卷列表
 	 * 
 	 * v1.0 zhanghc 2017-05-25 16:34:59
@@ -76,11 +56,6 @@ public class ApiMyMarkController extends BaseController {
 			PageIn pageIn = new PageIn(request);
 			pageIn.addAttr("curUserId", getCurUser().getId());
 			PageOut listpage = myMarkService.getListpage(pageIn);
-			
-			for(Map<String, Object> map : listpage.getList()){
-				map.put("examUserIds", map.get("examUserIds").toString().substring(1, map.get("examUserIds").toString().length() - 1).split(","));
-			}
-			
 			return PageResultEx.ok().data(listpage);
 		} catch (Exception e) {
 			log.error("我的阅卷列表错误：", e);
@@ -166,7 +141,7 @@ public class ApiMyMarkController extends BaseController {
 	@ResponseBody
 	public PageResult answerList(Integer userId, Integer examId) {
 		try {
-			List<Map<String, Object>> list = myExamDetailService.getMarkAnswerList(userId, examId);
+			List<Map<String, Object>> list = myExamDetailService.getAnswerList(examId, userId);
 			for (Map<String, Object> map : list) {
 				map.put("answers", new QuestionAnswer().getAnswers(
 						(Integer)map.remove("questionType"), 

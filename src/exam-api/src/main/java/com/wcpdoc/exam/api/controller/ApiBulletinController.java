@@ -1,6 +1,8 @@
 package com.wcpdoc.exam.api.controller;
 
-import java.util.Map;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -10,12 +12,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.base.entity.User;
+import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
-import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Bulletin;
 import com.wcpdoc.exam.core.service.BulletinService;
 
@@ -31,6 +35,8 @@ public class ApiBulletinController extends BaseController {
 	
 	@Resource
 	private BulletinService bulletinService;
+	@Resource
+	private UserService userService;
 	
 	/**
 	 * 公告列表
@@ -124,11 +130,37 @@ public class ApiBulletinController extends BaseController {
 	@ResponseBody
 	public PageResult get(Integer id) {		
 		try {
-			Map<String, Object> map = bulletinService.get(id);
-			map.put("updateTime", DateUtil.formatDateTime(DateUtil.getDate(map.get("updateTime").toString())));
-			map.put("startTime", DateUtil.formatDateTime(DateUtil.getDate(map.get("startTime").toString())));
-			map.put("endTime", DateUtil.formatDateTime(DateUtil.getDate(map.get("endTime").toString())));
-			return PageResultEx.ok().data(map);
+			Bulletin bulletin = bulletinService.getEntity(id);
+			Integer[] readUserIds = new Integer[0];
+			String[] readUserNames = new String[0];
+			if (ValidateUtil.isValid(bulletin.getReadUserIds())) {
+				Set<Integer> readUserIdSet = new HashSet<>();
+				for (String readUserId : bulletin.getReadUserIds().split(",")) {
+					if (!ValidateUtil.isValid(readUserId)) {// ,2,3,23, 有空值
+						continue;
+					}
+					readUserIdSet.add(Integer.parseInt(readUserId));
+				}
+				
+				readUserIds = readUserIdSet.toArray(new Integer[0]);
+				List<User> readUserList = userService.getList(readUserIds);
+				readUserNames = new String[readUserList.size()];
+				for (int i = 0; i < readUserList.size(); i++) {
+					readUserNames[i] = readUserList.get(i).getName();
+				}
+			}
+			return PageResultEx.ok()
+					.addAttr("id", bulletin.getId())
+					.addAttr("title", bulletin.getTitle())
+					.addAttr("showType", bulletin.getShowType())
+					.addAttr("startTime", bulletin.getStartTime())
+					.addAttr("endTime", bulletin.getEndTime())
+					.addAttr("fileId", bulletin.getImgFileId())
+					.addAttr("content", bulletin.getContent())
+					.addAttr("state", bulletin.getState())
+					.addAttr("readUserIds", readUserIds)
+					.addAttr("readUserNames", readUserNames)
+					;
 		} catch (MyException e) {
 			log.error("获取参数错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -137,65 +169,4 @@ public class ApiBulletinController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
-	/**
-	 * 添加权限
-	 * 
-	 * v1.0 chenyun 2021年3月2日上午10:18:26
-	 * @param id	
-	 * @param readUserIds
-	 * @param writeUserIds
-	 * @param rwState
-	 * @return PageResult
-	 */
-	/*@RequestMapping("/auth")
-	@ResponseBody
-	public PageResult auth(Integer id, String readUserIds, String readOrgIds) {
-		try {
-			bulletinService.auth(id, readUserIds, readOrgIds);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("添加权限用户错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("添加权限用户错误：", e);
-			return PageResult.err();
-		}
-	}*/
-	
-	/**
-	 * 获取人员列表 
-	 * 
-	 * v1.0 zhanghc 2017年6月16日下午5:02:45
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	/*@RequestMapping("/authUserList")
-	@ResponseBody
-	public PageResult userList() {
-		try {
-			return PageResultEx.ok().data(bulletinService.getUserListpage(new PageIn(request)));
-		} catch (Exception e) {
-			log.error("权限用户列表错误：", e);
-			return PageResult.err();
-		}
-	}*/
-	
-	/**
-	 * 获取组织机构列表 
-	 * 
-	 * v1.0 zhanghc 2017年6月16日下午5:02:45
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	/*@RequestMapping("/authOrgList")
-	@ResponseBody
-	public PageResult authOrgList(PageIn pageIn, String name, Integer id) {
-		try {
-			return PageResultEx.ok().data(bulletinService.getOrgListpage(new PageIn(request)));
-		} catch (Exception e) {
-			log.error("权限用户列表错误：", e);
-			return PageResult.err();
-		}
-	}*/
 }

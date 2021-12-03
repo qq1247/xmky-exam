@@ -1,7 +1,5 @@
 package com.wcpdoc.exam.core.service;
 
-import java.util.Map;
-
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.service.BaseService;
@@ -67,13 +65,4 @@ public interface BulletinService extends BaseService<Bulletin> {
 	 * @return PageOut
 	 */
 	PageOut getOrgListpage(PageIn pageIn);
-	
-	/**
-	 * 获取公告
-	 * 
-	 * v1.0 chenyun 2021年9月8日下午5:19:57
-	 * @param id
-	 * @return Map<String,Object>
-	 */
-	Map<String, Object> get(Integer id);
 }
