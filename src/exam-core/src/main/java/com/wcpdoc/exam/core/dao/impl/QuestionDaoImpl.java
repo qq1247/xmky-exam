@@ -97,8 +97,8 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 	}
 
 	@Override
-	public void updateState(Integer questionTypeId, Integer userId) {
-		String sql = "UPDATE EXM_QUESTION SET STATE = 1 WHERE STATE = 2 AND QUESTION_TYPE_ID = (SELECT ID FROM EXM_QUESTION_TYPE WHERE ID = ? AND WRITE_USER_IDS LIKE CONCAT('%,', ? ,',%') )";
-		update(sql, new Object[]{questionTypeId, userId });
+	public void publish(Integer questionTypeId) {
+		String sql = "UPDATE EXM_QUESTION SET STATE = 1 WHERE STATE = 2 AND QUESTION_TYPE_ID = ?";
+		update(sql, new Object[]{ questionTypeId });
 	}
 }

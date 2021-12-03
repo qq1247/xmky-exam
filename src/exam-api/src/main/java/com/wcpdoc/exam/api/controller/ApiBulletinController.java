@@ -19,6 +19,7 @@ import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Bulletin;
 import com.wcpdoc.exam.core.service.BulletinService;
@@ -153,9 +154,9 @@ public class ApiBulletinController extends BaseController {
 					.addAttr("id", bulletin.getId())
 					.addAttr("title", bulletin.getTitle())
 					.addAttr("showType", bulletin.getShowType())
-					.addAttr("startTime", bulletin.getStartTime())
-					.addAttr("endTime", bulletin.getEndTime())
-					.addAttr("fileId", bulletin.getImgFileId())
+					.addAttr("startTime", DateUtil.formatDateTime(bulletin.getStartTime()))
+					.addAttr("endTime", DateUtil.formatDateTime(bulletin.getEndTime()))
+					.addAttr("imgFileId", bulletin.getImgFileId())
 					.addAttr("content", bulletin.getContent())
 					.addAttr("state", bulletin.getState())
 					.addAttr("readUserIds", readUserIds)

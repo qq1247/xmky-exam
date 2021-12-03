@@ -25,4 +25,16 @@ public class SensitiveDaoImpl extends RBaseDaoImpl<Sensitive> implements Sensiti
 	public PageOut getListpage(PageIn pageIn) {
 		return null;
 	}
+
+	@Override
+	public Sensitive getList() {
+		String sql = "SELECT * FROM SYS_SENSITIVE LIMIT 0,1";
+		return getEntity(sql, new Object[0]);
+	}
+	
+	@Override
+	public void getUpdateId(Integer id) {
+		String sql = "UPDATE SYS_SENSITIVE SET ID = 1 where ID = ? ";
+		update(sql, new Object[] { id });
+	}
 }

@@ -116,13 +116,11 @@ public class ApiMyMarkController extends BaseController {
 	 * v1.0 chenyun 2021年8月2日下午3:14:45
 	 * @return PageResult
 	 */
-	@RequestMapping("/userListpage")
+	@RequestMapping("/userList")
 	@ResponseBody
-	public PageResult userListpage() {
+	public PageResult userList(Integer examId) {
 		try {
-			PageIn pageIn = new PageIn(request);
-			pageIn.addAttr("markUserId", getCurUser().getId()); //阅卷人
-			return PageResultEx.ok().data(myExamService.getListpage(pageIn));
+			return PageResultEx.ok().data(myMarkService.getUserList(examId));
 		} catch (Exception e) {
 			log.error("我的考试列表错误：", e);
 			return PageResult.err();
