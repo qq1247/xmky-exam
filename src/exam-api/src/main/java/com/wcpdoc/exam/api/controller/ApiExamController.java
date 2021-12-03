@@ -147,7 +147,54 @@ public class ApiExamController extends BaseController {
 			return PageResult.err();
 		}
 	}
+	
+	/**
+	 * 发布
+	 * 
+	 * v1.0 zhanghc 2018年11月24日上午9:13:22
+	 * 
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/publish")
+	@ResponseBody
+	public PageResult publish(Integer id) {
+		try {
+			examService.publish(id);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("发布错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("发布错误：", e);
+			return PageResult.err();
+		}
+	}
 
+	/**
+	 * 归档
+	 * 
+	 * v1.0 zhanghc 2018年11月24日上午9:13:22
+	 * 
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/archive")
+	@ResponseBody
+	public PageResult archive(Integer id) {
+		try {
+			Exam exam = examService.getEntity(id);
+			exam.setUpdateTime(new Date());
+			exam.setUpdateUserId(getCurUser().getId());
+			exam.setState(3);
+			examService.update(exam);
+			return PageResult.ok();
+		} catch (Exception e) {
+			log.error("归档错误：", e);
+			return PageResult.err();
+		}
+	}
+	
 	/**
 	 * 考试用户列表 查询当前选中的考试用户时使用
 	 * 
@@ -233,79 +280,6 @@ public class ApiExamController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("更新考试阅卷用户错误：", e);
-			return PageResult.err();
-		}
-	}
-
-	/**
-	 * 更新阅卷用户（按题阅卷，暂时不用）
-	 * 
-	 * v1.0 zhanghc 2017年6月16日下午5:02:45
-	 * 
-	 * @param id
-	 * @param markUserIds
-	 * @param examUserIds
-	 * @param questionIds
-	 * @return PageResult
-	 */
-	@RequestMapping("/updateMarkUser")
-	@ResponseBody
-	public PageResult updateMarkUser(Integer id, Integer[] markUserIds, String[] examUserIds, String[] questionIds) {
-		try {
-			examService.updateMarkUser(id, markUserIds, examUserIds, questionIds);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("更新阅卷用户错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("更新阅卷用户错误：", e);
-			return PageResult.err();
-		}
-	}
-
-	/**
-	 * 发布
-	 * 
-	 * v1.0 zhanghc 2018年11月24日上午9:13:22
-	 * 
-	 * @param id
-	 * @return PageResult
-	 */
-	@RequestMapping("/publish")
-	@ResponseBody
-	public PageResult publish(Integer id) {
-		try {
-			examService.publish(id);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("发布错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("发布错误：", e);
-			return PageResult.err();
-		}
-	}
-
-	/**
-	 * 归档
-	 * 
-	 * v1.0 zhanghc 2018年11月24日上午9:13:22
-	 * 
-	 * @param id
-	 * @return PageResult
-	 */
-	@RequestMapping("/archive")
-	@ResponseBody
-	public PageResult archive(Integer id) {
-		try {
-			Exam exam = examService.getEntity(id);
-			exam.setUpdateTime(new Date());
-			exam.setUpdateUserId(getCurUser().getId());
-			exam.setState(3);
-			examService.update(exam);
-			return PageResult.ok();
-		} catch (Exception e) {
-			log.error("归档错误：", e);
 			return PageResult.err();
 		}
 	}

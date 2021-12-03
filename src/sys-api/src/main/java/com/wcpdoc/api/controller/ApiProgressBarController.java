@@ -42,7 +42,6 @@ public class ApiProgressBarController extends BaseController {
 				throw new MyException("参数错误：id");
 			}
 			Map<String, Object> result = new HashMap<>();
-			result.put("id", progressBar.getId());
 			result.put("curNum", progressBar.getCurNum());
 			result.put("totalNum", progressBar.getTotalNum());
 			result.put("percent", progressBar.getPercent());

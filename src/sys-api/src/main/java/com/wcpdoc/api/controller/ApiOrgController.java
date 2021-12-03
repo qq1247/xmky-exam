@@ -171,16 +171,12 @@ public class ApiOrgController extends BaseController {
 	public PageResult get(Integer id) {
 		try {
 			Org org = orgService.getEntity(id);
-			Org parentOrg = null;
-			if (org.getParentId() != null) {
-				parentOrg = orgService.getEntity(org.getParentId());
-			}
 			return PageResultEx.ok()
 					.addAttr("id", org.getId())
 					.addAttr("name", org.getName())
-					.addAttr("no", org.getNo())
 					.addAttr("parentId", org.getParentId())
-					.addAttr("parentName", parentOrg == null ? null : parentOrg.getName());
+					.addAttr("parentName", org.getParentId() == null ? null : orgService.getEntity(org.getParentId()).getName())
+					.addAttr("no", org.getNo());
 		} catch (MyException e) {
 			log.error("获取组织机构错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

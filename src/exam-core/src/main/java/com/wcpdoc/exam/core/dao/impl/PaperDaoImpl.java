@@ -32,19 +32,25 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT PAPER.ID, PAPER.NAME, PAPER.STATE, "
-				+ "PAPER.PASS_SCORE, PAPER.TOTAL_SCORE, PAPER.PAPER_TYPE_ID, PAPER.SHOW_TYPE,"
-				+ "PAPER.GEN_TYPE, PAPER_TYPE.NAME AS PAPER_TYPE_NAME, PAPER.MARK_TYPE "
+				+ "PAPER.PASS_SCORE, PAPER.TOTAL_SCORE, PAPER.PAPER_TYPE_ID, PAPER_TYPE.NAME AS PAPER_TYPE_NAME, "
+				+ "PAPER.MARK_TYPE, PAPER.SHOW_TYPE, PAPER.GEN_TYPE "
 				+ "FROM EXM_PAPER PAPER "
 				+ "LEFT JOIN EXM_PAPER_TYPE PAPER_TYPE ON PAPER.PAPER_TYPE_ID = PAPER_TYPE.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("paperTypeId")), "PAPER.PAPER_TYPE_ID = ?", pageIn.get("paperTypeId"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "PAPER.NAME LIKE ?", "%" + pageIn.get("name") + "%")
 				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "PAPER_TYPE.READ_USER_IDS LIKE ?", String.format("%%%s%%", pageIn.get("curUserId", Integer.class)))// 只看自己的
-				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && "1".equals(pageIn.get("state")), "PAPER.STATE = 1")
 				.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "PAPER.STATE IN (1,2)")
+				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && "0".equals(pageIn.get("state")), "PAPER.STATE IN (1,2)")
+				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "PAPER.STATE = ?", pageIn.get("state"))
 				.addOrder("PAPER.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), "STATE", "STATE");
+		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), 
+				"EXAM_STATE", "state",
+				"PAPER_MARK_TYPE", "markType",
+				"PAPER_SHOW_TYPE", "showType",
+				"PAPER_GEN_TYPE", "genType"
+				);
 		return pageOut;
 	}
 

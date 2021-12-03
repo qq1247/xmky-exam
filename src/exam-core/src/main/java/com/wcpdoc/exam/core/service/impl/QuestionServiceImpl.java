@@ -683,9 +683,14 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (questionTypeId == null && ids == null ) {
 			throw new MyException("questionType或者ids参数错误！");
 		}
-		
+		QuestionType questionType;
 		if (questionTypeId != null) {
-			questionDao.updateState(questionTypeId, getCurUser().getId());
+			questionType = questionTypeService.getEntity(questionTypeId);
+			if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
+				throw new MyException("无操作权限");
+			}
+			
+			questionDao.publish(questionTypeId);
 			return;
 		}
 		
@@ -697,7 +702,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			if (question.getState() == 1) {
 				throw new MyException("试题已发布！");
 			}
-			QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
+			questionType = questionTypeService.getEntity(question.getQuestionTypeId());
 			if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
 				throw new MyException("无操作权限");
 			}

@@ -256,7 +256,8 @@ public class ApiUserController extends BaseController {
 				org = orgService.getEntity(entity.getOrgId());
 			}
 			
-			PageResultEx pageResult = PageResultEx.ok().addAttr("id", entity.getId())
+			PageResultEx pageResult = PageResultEx.ok()
+				.addAttr("id", entity.getId())
 				.addAttr("name", entity.getName())
 				.addAttr("loginName", entity.getLoginName())
 				.addAttr("orgId", entity.getOrgId())

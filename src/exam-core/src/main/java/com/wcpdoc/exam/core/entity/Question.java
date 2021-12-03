@@ -99,12 +99,12 @@ public class Question {
 		this.analysis = analysis;
 	}
 
-	/** 0：删除；1：启用；2：禁用 */
+	/** （0：删除；1：发布；2：草稿） */
 	public Integer getState() {
 		return state;
 	}
 
-	/** 0：删除；1：启用；2：禁用 */
+	/** （0：删除；1：发布；2：草稿） */
 	public void setState(Integer state) {
 		this.state = state;
 	}

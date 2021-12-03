@@ -42,11 +42,20 @@ public class SensitiveServiceImpl extends BaseServiceImp<Sensitive> implements S
 	
 
 	@Override
-	public void initialize() {
-		Sensitive entity = sensitiveDao.getEntity(1);
-		if (entity != null) {			
-			initialize(entity);
+	public void init() {
+		Sensitive sensitive = sensitiveDao.getEntity(1);
+		if (sensitive != null) {
+			init(sensitive);
+			return;
 		}
+		
+		sensitive = new Sensitive();
+	    sensitive.setWhiteList(null);
+	    sensitive.setBlackList(null);
+	    sensitive.setUpdateTime(new Date());
+	    sensitive.setUpdateUserId(1);
+	    add(sensitive);
+	    init(sensitive);
 	}
     
 	@Override
@@ -58,27 +67,17 @@ public class SensitiveServiceImpl extends BaseServiceImp<Sensitive> implements S
 			sensitive.setWhiteList(null);
 		}
 		
-		Sensitive entity;
-		if (sensitive.getId() == null) { //添加
-			entity = new Sensitive();
-			entity.setBlackList(sensitive.getBlackList());
-			entity.setWhiteList(sensitive.getWhiteList());
-			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(getCurUser().getId());
-			sensitiveDao.add(entity);
-		}else{			                 //修改
-			entity = sensitiveDao.getEntity(sensitive.getId());
-			entity.setBlackList(sensitive.getBlackList());
-			entity.setWhiteList(sensitive.getWhiteList());
-			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(getCurUser().getId());
-			sensitiveDao.update(entity);
-		}
+		Sensitive entity = sensitiveDao.getEntity(1);//默认修改id为1
+		entity.setBlackList(sensitive.getBlackList());
+		entity.setWhiteList(sensitive.getWhiteList());
+		entity.setUpdateTime(new Date());
+		entity.setUpdateUserId(getCurUser().getId());
+		sensitiveDao.update(entity);
 		//初始化
-		initialize(sensitive);
+		init(sensitive);
 	}
 
-	private void initialize(Sensitive sensitive) {
+	private void init(Sensitive sensitive) {
 		// 初始化
 		context.delWordMap();
 		Set<String> set = new HashSet<>();

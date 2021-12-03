@@ -63,6 +63,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 
 	@Override
 	public void editLogo(Parm parm) throws Exception {
+		// 更新logo
 		Parm entity = get();
 		Integer orgLogo = entity.getOrgLogo();
 		entity.setOrgLogo(parm.getOrgLogo());
@@ -71,10 +72,12 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		entity.setUpdateUserId(getCurUser().getId());
 		parmDao.update(entity);
 		
-		parmExService.ImageIcon(entity);
+		// 保存附件
 		if (parm.getOrgLogo() != null && parm.getOrgLogo() != orgLogo) {
 			parmExService.doUpload(parm);
 		}
+		
+		// 配置刷入缓存
 		ParmCache.flushCache();
 	}
 

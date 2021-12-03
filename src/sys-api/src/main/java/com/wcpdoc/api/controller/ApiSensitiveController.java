@@ -64,7 +64,6 @@ public class ApiSensitiveController extends BaseController {
 				return PageResultEx.ok();
 			}
 			return PageResultEx.ok()
-					.addAttr("id", entity.getId())
 					.addAttr("blackList", entity.getBlackList())
 					.addAttr("whiteList", entity.getWhiteList());
 		} catch (MyException e) {
@@ -74,17 +73,5 @@ public class ApiSensitiveController extends BaseController {
 			log.error("获取参数错误：", e);
 			return PageResult.err();
 		}
-	}
-	
-	/**
-	 * 获取敏感词
-	 * 
-	 * v1.0 chenyun 2021-03-04 15:02:18
-	 * @return pageOut
-	 */
-	@RequestMapping("/replace")
-	public void replace() {
-        String text = "黑，黑黑，黑";
-        System.out.println(sensitiveService.replace(text));
 	}
 }

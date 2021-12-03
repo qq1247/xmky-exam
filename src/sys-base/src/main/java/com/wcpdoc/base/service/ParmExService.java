@@ -29,14 +29,6 @@ public interface ParmExService extends BaseService<Parm> {
 	void updateAndUpdate(Parm parm);
 	
 	/**
-	 * 图片转换icon格式
-	 * 
-	 * v1.0 chenyun 2021年10月8日下午2:36:39
-	 * @param parm void
-	 */
-	void ImageIcon(Parm parm) throws Exception;
-	
-	/**
 	 * 保存图片
 	 * 
 	 * v1.0 chenyun 2021年11月15日下午4:30:11

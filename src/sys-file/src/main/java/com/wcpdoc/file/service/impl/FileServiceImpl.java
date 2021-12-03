@@ -200,8 +200,8 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 	}
 
 	@Override
-	public Integer getFileId(String uuId) {
-		String fileId = FileIdCache.getFileId(uuId);
+	public Integer getFileId(String uuid) {
+		String fileId = FileIdCache.getFileId(uuid);
 		return Integer.parseInt(fileId);
 	}
 }

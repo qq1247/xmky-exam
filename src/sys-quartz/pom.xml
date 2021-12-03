@@ -5,17 +5,17 @@
 	<parent>
 		<groupId>com.wcpdoc.exam</groupId>
 		<artifactId>sys-parent</artifactId>
-		<version>3.2.1</version>
+		<version>3.3.0</version>
 	</parent>
 	<artifactId>sys-quartz</artifactId>
 	<name>sys-quartz</name>
 	<description>系统定时任务</description>
 
 	<dependencies>
-		<!-- 集成系统核心 -->
+		<!-- 集成系统基础 -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>sys-core</artifactId>
+			<artifactId>sys-base</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<!-- 集成定时任务 -->

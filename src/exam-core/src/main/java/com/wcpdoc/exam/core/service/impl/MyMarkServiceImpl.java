@@ -3,15 +3,18 @@ package com.wcpdoc.exam.core.service.impl;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.base.cache.DictCache;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.BigDecimalUtil;
+import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.MyMarkDao;
 import com.wcpdoc.exam.core.entity.Exam;
@@ -206,5 +209,24 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 			myExam.setAnswerState(2);
 		}
 		myExamService.update(myExam);
+	}
+
+	@Override
+	public List<Map<String, Object>> getUserList(Integer examId) {
+		List<Map<String, Object>> userList = myMarkDao.getUserList(examId, getCurUser().getId());
+		for(Map<String, Object> map : userList){
+			map.put("examStartTime", DateUtil.formatDateTime(DateUtil.getDateTime(map.get("examStartTime").toString())));
+			map.put("examEndTime", DateUtil.formatDateTime(DateUtil.getDateTime(map.get("examStartTime").toString())));
+			map.put("markEndTime", DateUtil.formatDateTime(DateUtil.getDateTime(map.get("examStartTime").toString())));
+			map.put("markStartTime", DateUtil.formatDateTime(DateUtil.getDateTime(map.get("examStartTime").toString())));
+			map.put("answerStartTime", DateUtil.formatDateTime(DateUtil.getDateTime(map.get("examStartTime").toString())));
+			map.put("answerEndTime", DateUtil.formatDateTime(DateUtil.getDateTime(map.get("examStartTime").toString())));
+			
+			map.put("stateName", DictCache.getDictValue("MY_EXAM_STATE", map.get("state") == null ? null : map.get("state").toString()));
+			map.put("answerStateName", DictCache.getDictValue("MY_EXAM_ANSWER_STATE", map.get("answerState") == null ? null : map.get("answerState").toString()));
+			map.put("markStateName", DictCache.getDictValue("MY_EXAM_MARK_STATE", map.get("markState") == null ? null : map.get("markState").toString()));
+			map.put("paperShowTypeName", DictCache.getDictValue("PAPER_SHOW_TYPE", map.get("paperShowType") == null ? null : map.get("paperShowType").toString()));
+		}
+		return userList;
 	}
 }

@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.core.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.exam.core.entity.MyMark;
@@ -21,4 +22,13 @@ public interface MyMarkDao extends BaseDao<MyMark>{
 	 */
 	List<MyMark> getList(Integer examId);
 	
+	/**
+	 * 阅卷考生
+	 * 
+	 * v1.0 chenyun 2021年12月3日下午2:01:49
+	 * @param examId
+	 * @param markUserId //当前登录用户
+	 * @return List<Map<String,String>>
+	 */
+	List<Map<String, Object>> getUserList(Integer examId, Integer markUserId);
 }
