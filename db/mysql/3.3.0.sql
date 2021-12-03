@@ -548,7 +548,7 @@ alter table SYS_VER comment '版本';
 
 
 /*==============================================================*/
-/* 数据								*/
+/* 数据															*/
 /*==============================================================*/
 
 INSERT INTO `SYS_ORG` VALUES (1, '组织机构', 'code', '0', '_1_', '1', '1', '2017-08-01 22:31:43', '1', '1');
@@ -596,6 +596,14 @@ INSERT INTO `SYS_DICT` VALUES (38, 'STATE_OPEN', '2', '作废', 2);
 INSERT INTO `SYS_DICT` VALUES (39, 'STATE_OPEN', '0', '删除', 3);
 INSERT INTO `SYS_DICT` VALUES (40, 'PAPER_MARK_TYPE', '1', '智能阅卷', 1);
 INSERT INTO `SYS_DICT` VALUES (41, 'PAPER_MARK_TYPE', '2', '人工阅卷', 2);
+INSERT INTO `SYS_DICT` VALUES (42, 'PAPER_SHOW_TYPE', '1', '整卷展示', 1);
+INSERT INTO `SYS_DICT` VALUES (43, 'PAPER_SHOW_TYPE', '2', '章节显示', 2);
+INSERT INTO `SYS_DICT` VALUES (44, 'PAPER_SHOW_TYPE', '3', '单题展示', 3);
+INSERT INTO `SYS_DICT` VALUES (45, 'PAPER_GEN_TYPE', '1', '人工组卷', 1);
+INSERT INTO `SYS_DICT` VALUES (46, 'PAPER_GEN_TYPE', '2', '随机组卷', 2);
+INSERT INTO `SYS_DICT` VALUES (47, 'EXAM_STATE', '3', '归档', 4);
+INSERT INTO `SYS_DICT` VALUES (48, 'BULLETIN_SHOW_TYPE', '1', '正常', 1);
+INSERT INTO `SYS_DICT` VALUES (49, 'BULLETIN_SHOW_TYPE', '2', '置顶', 2);
 
 INSERT INTO `SYS_CRON` VALUES (1, '清理临时附件', 'com.wcpdoc.file.job.ClearFileJob', '0 0 0 1/1 * ? ', '1', '1', '2020-08-26 18:42:08');
 INSERT INTO `SYS_CRON` VALUES (2, '数据库备份', 'com.wcpdoc.quartz.job.DbBackJob', '0 0 0 1/1 * ? ', 1, 1, '2020-08-26 18:42:08');
@@ -613,6 +621,6 @@ INSERT INTO `SYS_VER` VALUES (9, '3.0.0', '2020-08-06 13:58:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (10, '3.1.0', '2020-09-30 13:58:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (11, '3.2.0', '2020-10-31 16:43:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (12, '3.2.1', '2021-11-25 16:26:01', 'zhanghc', '');
-INSERT INTO `SYS_VER` VALUES (13, '3.3.0', '2020-11-28 11:11:11', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (13, '3.3.0', '2020-11-30 11:11:11', 'zhanghc', '');
 
 INSERT INTO `SYS_PARM` VALUES (1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 2, '111111');
