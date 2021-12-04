@@ -386,8 +386,7 @@ export default {
       const infos = await myMarkUserList({
         examId: Number(this.examId),
       })
-
-      this.examUserIds = infos.data.list
+      this.examUserIds = infos.data
     },
     // 查询答案信息
     async queryAnswerInfo(id) {

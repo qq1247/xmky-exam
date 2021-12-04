@@ -21,8 +21,8 @@
         <el-tag
           size="mini"
           v-if="name == 'myExamMarkList'"
-          :type="data.markState == 3 ? '' : 'danger'"
-          >{{ data.markStateName }}</el-tag
+          :type="data.examMarkState == 3 ? '' : 'danger'"
+          >{{ data.examMarkStateName }}</el-tag
         >
       </div>
       <!-- 标题 -->
@@ -63,8 +63,8 @@
         </template>
         <!-- 我的阅卷 -->
         <template v-if="name === 'myExamMarkList'">
-          <span :data-title="data.markStateName" @click="mark(data)">
-            <i :class="['common', markStateIcon[data.markState]]"></i>
+          <span :data-title="data.examMarkStateName" @click="mark(data)">
+            <i :class="['common', markStateIcon[data.examMarkState]]"></i>
           </span>
         </template>
       </div>

@@ -417,9 +417,12 @@ export default {
         },
       })
     },
-    // 去考试页面
-    goExam({ id, state, examId, paperId, paperShowType, examEndTime }) {
-      if (state === 1) {
+    // 我的考试操作
+    goExam({ id, examId, paperId, paperShowType, examStartTime, examEndTime }) {
+      const _examStartTime = new Date(examStartTime).getTime()
+      const _examEndTime = new Date(examEndTime).getTime()
+      const now = new Date().getTime()
+      if (now < _examStartTime) {
         this.$message.warning('考试未开始，请等待...')
         return
       }
@@ -432,13 +435,16 @@ export default {
           paperId,
           examEndTime,
           showType: paperShowType,
-          preview: state !== 2,
+          preview: _examStartTime < now && now > _examEndTime,
         },
       })
     },
-    // 去阅卷页面
-    goMark({ id, examId, paperId, markState }) {
-      if (markState === 1) {
+    // 我的阅卷操作
+    goMark({ id, examId, paperId, markStartTime, markEndTime }) {
+      const _markStartTime = new Date(markStartTime).getTime()
+      const _markEndTime = new Date(markEndTime).getTime()
+      const now = new Date().getTime()
+      if (now < _markStartTime) {
         this.$message.warning('阅卷未开始，请等待...')
         return
       }
@@ -449,7 +455,8 @@ export default {
           markId: id,
           examId,
           paperId,
-          preview: markState !== 2,
+          markEndTime: _markEndTime,
+          markStartTime: _markStartTime,
         },
       })
     },
