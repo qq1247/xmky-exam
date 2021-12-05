@@ -37,14 +37,15 @@ public class OnlineUserInterceptor implements HandlerInterceptor {
 			onlineUser.setUpdateTime(new Date());
 			onlineUser.setLoginName(loginUser.getLoginName());
 			onlineUserService.update(onlineUser);
-		} else {
-			onlineUser = new OnlineUser();
-			onlineUser.setIp(request.getRemoteHost());
-			onlineUser.setUpdateTime(new Date());
-			onlineUser.setId(loginUser.getId());
-			onlineUser.setLoginName(loginUser.getLoginName());
-			onlineUserService.add(onlineUser);
+			return true;
 		}
+		
+		onlineUser = new OnlineUser();
+		onlineUser.setIp(request.getRemoteHost());
+		onlineUser.setUpdateTime(new Date());
+		onlineUser.setId(loginUser.getId());
+		onlineUser.setLoginName(loginUser.getLoginName());
+		onlineUserService.add(onlineUser);
 		return true;
 	}
 }

@@ -45,8 +45,13 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 				.addWhere("EXAM.STATE = ?", 1)
 				.addOrder("MY_MARK.ID", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDate(pageOut.getList(), "examStartTime", DateUtil.FORMAT_DATE_TIME, "examEndTime", DateUtil.FORMAT_DATE_TIME, 
-				"markEndTime", DateUtil.FORMAT_DATE_TIME, "markStartTime", DateUtil.FORMAT_DATE_TIME);
+		HibernateUtil.formatDate(pageOut.getList(), 
+				"examStartTime", DateUtil.FORMAT_DATE_TIME, 
+				"examEndTime", DateUtil.FORMAT_DATE_TIME, 
+				"examMarkEndTime", DateUtil.FORMAT_DATE_TIME, 
+				"examMarkStartTime", DateUtil.FORMAT_DATE_TIME, 
+				"markEndTime", DateUtil.FORMAT_DATE_TIME, 
+				"markStartTime", DateUtil.FORMAT_DATE_TIME);
 		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), 
 				"MY_EXAM_MARK_STATE", "examMarkState",
 				"PAPER_SHOW_TYPE", "paperShowType"
@@ -64,7 +69,9 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 	public List<Map<String, Object>> getUserList(Integer examId, Integer markUserId) {
 		String sql = "SELECT USER.ID AS USER_ID, USER.NAME AS USER_NAME, ORG.ID AS ORG_ID, ORG.NAME AS ORG_NAME, "
 				+ "MY_EXAM.ANSWER_START_TIME, MY_EXAM.ANSWER_END_TIME, MARK_USER.ID AS MARK_USER_ID, MARK_USER.NAME AS MARK_USER_NAME, "
-				+ "EXAM.MARK_START_TIME AS MARK_START_TIME, EXAM.MARK_END_TIME AS MARK_END_TIME, MY_EXAM.STATE AS STATE, "
+				+ "EXAM.MARK_START_TIME AS MARK_START_TIME, EXAM.MARK_END_TIME AS MARK_END_TIME, "
+				+ "EXAM.START_TIME AS EXAM_START_TIME, EXAM.END_TIME AS EXAM_END_TIME, "
+				+ "MY_EXAM.STATE AS STATE, "
 				+ "MY_EXAM.MARK_STATE AS MARK_STATE, MY_EXAM.ANSWER_STATE AS ANSWER_STATE, MY_EXAM.TOTAL_SCORE AS TOTAL_SCORE, "
 				+ "PAPER.TOTAL_SCORE AS PAPER_TOTAL_SCORE, PAPER.PASS_SCORE AS PAPER_PASS_SCORE "
 				+ "FROM EXM_MY_EXAM MY_EXAM "
@@ -73,7 +80,11 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 				+ "LEFT JOIN SYS_USER USER ON MY_EXAM.USER_ID = USER.ID "
 				+ "LEFT JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
 				+ "LEFT JOIN SYS_USER MARK_USER ON MY_EXAM.MARK_USER_ID = MARK_USER.ID "
-				+ "WHERE EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.EXAM_ID = ? AND Z.MARK_USER_ID = ? AND Z.EXAM_USER_IDS LIKE CONCAT('%,', MY_EXAM.USER_ID, ',%'))";// 阅卷用户不一定有
-		return getMapList(sql, new Object[] { examId, markUserId });
+				+ "WHERE MY_EXAM.EXAM_ID = ? "
+				+ "		AND EXISTS ("
+				+ "		SELECT 1 FROM "
+				+ "		EXM_MY_MARK Z "
+				+ "		WHERE Z.EXAM_ID = ? AND Z.MARK_USER_ID = ? AND Z.EXAM_USER_IDS LIKE CONCAT('%,', MY_EXAM.USER_ID, ',%'))";// 阅卷用户不一定有
+		return getMapList(sql, new Object[] { examId, examId, markUserId });
 	}
 }

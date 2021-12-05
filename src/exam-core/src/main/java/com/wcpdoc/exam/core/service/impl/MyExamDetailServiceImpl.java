@@ -298,9 +298,10 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 					myExamDetail.setMarkUserId(1);
 					myExamDetail.setMarkTime(new Date());
 				    myExamDetailDao.update(myExamDetail);
-				} else {
-					totalScore.add(myExamDetail.getScore());
+				    continue;
 				}
+				
+				totalScore.add(myExamDetail.getScore());
 			}
 			myExam.setTotalScore(totalScore.getResult());
 			BigDecimal passScore = BigDecimalUtil.newInstance(paper.getTotalScore()).mul(paper.getPassScore()).div(100, 2).getResult();

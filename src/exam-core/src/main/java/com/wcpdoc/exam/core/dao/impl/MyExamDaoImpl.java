@@ -45,8 +45,11 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examName")), "EXAM.NAME LIKE ?", "%" + pageIn.get("examName") + "%")
 				.addWhere(pageIn.get("curUserId", Integer.class) != null, "MY_EXAM.USER_ID =  ?", pageIn.get("curUserId", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("startTime")) && ValidateUtil.isValid(pageIn.get("endTime")), 
-						"((EXAM.START_TIME <= ? AND EXAM.START_TIME >= ?) OR (EXAM.START_TIME <= ? AND EXAM.START_TIME >= ?))", 
-						pageIn.get("startTime"), pageIn.get("startTime"), pageIn.get("endTime"), pageIn.get("endTime"))
+						"((EXAM.START_TIME <= ? AND ? >= EXAM.END_TIME) OR (EXAM.START_TIME <= ? AND ? >= EXAM.END_TIME) OR (EXAM.START_TIME >= ? AND EXAM.END_TIME >= ?))", 
+						pageIn.get("startTime"), pageIn.get("startTime"),
+						pageIn.get("endTime"), pageIn.get("endTime"),
+						pageIn.get("startTime"), pageIn.get("endTime")
+						)
 				.addWhere("EXAM.STATE = ?", 1)
 //				.addWhere("PAPER.STATE = ?", 1)//删除了试卷也能查看
 //				.addWhere("USER.STATE = ?", 1)

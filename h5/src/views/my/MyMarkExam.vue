@@ -471,7 +471,7 @@ export default {
     },
     // 设置分数
     async setScore(e, questionId, idx, idxc) {
-      if ((this.preview = 'true')) {
+      if ((this.preview === 'true')) {
         this.$message.warning('阅卷未开始或已结束')
         return false
       }

@@ -55,8 +55,13 @@ public class ApiMyMarkController extends BaseController {
 		try {
 			PageIn pageIn = new PageIn(request);
 			pageIn.addAttr("curUserId", getCurUser().getId());
-			PageOut listpage = myMarkService.getListpage(pageIn);
-			return PageResultEx.ok().data(listpage);
+			PageOut pageOut = myMarkService.getListpage(pageIn);
+			for (Map<String, Object> map : pageOut.getList()) {
+				map.put("markStartTime", map.get("examMarkStartTime"));
+				map.put("markEndTime", map.get("examMarkEndTime"));
+			}
+			
+			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("我的阅卷列表错误：", e);
 			return PageResult.err();

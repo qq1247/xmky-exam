@@ -156,6 +156,7 @@ export default {
           paperId,
           markEndTime: _markEndTime,
           markStartTime: _markStartTime,
+          preview: _markStartTime < now && now > _markEndTime,
         },
       })
     },
