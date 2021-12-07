@@ -446,6 +446,8 @@ http请求头需添加Authorization字段，
 |showType      | Integer  | 展示状态（1：正常；2：置顶；3：轮播；）   |   是     |
 |imgFileId     | String (256)  | 轮播图附件ID   |  否     |
 |readUserIds      | String (256)  | 用户读权限（不填表示所有人都可以读取）  |   否     |
+|startTime | Date  | 开始时间 |   是     |
+|endTime | Date  | 结束时间 |   是     |
 
 ### 公告栏修改：bulletin/edit
 | 请求参数|  类型   |  描述  |  必填 |
@@ -456,6 +458,8 @@ http请求头需添加Authorization字段，
 |showType      | Integer  | 展示状态（1：正常；2：置顶；3：轮播；）   |   是     |
 |imgFileId     | String (256)  | 轮播图附件ID   |  否     |
 |readUserIds      | String (256)  | 用户读权限（不填表示所有人都可以读取）  |   否     |
+|startTime | Date  | 开始时间 |   是     |
+|endTime | Date  | 结束时间 |   是     |
 
 ### 公告栏删除：bulletin/del
 | 请求参数|  类型   |  描述  |  必填 |
@@ -471,11 +475,10 @@ http请求头需添加Authorization字段，
 | --------   | -----   | -----  |
 |code     | Integer  | 响应码 |
 |msg     | String  | 响应消息 |
-|data.total     | Integer  | 总行数 |
 |data.id   | Integer  | 主键 |
 |data.title | String  | 标题 |
 |data.state | Integer  | 状态 |
-|data.content | String  | 状态 |
+|data.content | text  | 内容 |
 |data.showType      | Integer  | 展示类型 |
 |data.startTime | Date  | 开始时间 |
 |data.endTime | Date  | 结束时间 |

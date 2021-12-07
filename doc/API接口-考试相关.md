@@ -285,24 +285,30 @@ http请求头需添加Authorization字段，
 | id   | Integer | 主键 | 是   |
 
 ### 试题获取：question/get
+| 请求参数| 类型    | 描述 | 必填 |
+| ---- | ------- | ---- | ---- |
+| id   | Integer | 主键 | 是   |
+
 | 响应参数| 类型    | 描述 | 
 | -------- | ------- | ---- |
-| id           | Integer         | 主键 |
-| type           | Integer         | 类型（1：单选；2：多选；3：填空；4：判断；5：问答 |
-| difficulty     | Integer         | 难度（1：极易；2：简单；3：适中；4：困难；5：极难 ） | 
-| title          | Text | 题干 |
-| options[]      | String[]        | 选项，type为1,2时有效，len <= 7  |
-| ai| Integer    | 智能阅卷（1：是；2：否；）  | 
-| analysis       | Text    | 解析  | 
-| questionTypeId | Integer         | 试题分类ID      |
-| score          | Double          | 分数   | 是
-| scoreOptions[] | Integer[] | 分数选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；）|
-| state| Integer | 状态（0：删除；1：发布；2：草稿）|
-| answers[]      | Object[]   | 答案数组   | 
-| answers[].answer      | String   | 答案   | 
-| answers[].score     | Double    | 得分   | 
+| code                | Integer | 响应码     |
+| msg                 | String  | 响应消息   |
+| data.id           | Integer         | 主键 |
+| data.type           | Integer         | 类型（1：单选；2：多选；3：填空；4：判断；5：问答 |
+| data.difficulty     | Integer         | 难度（1：极易；2：简单；3：适中；4：困难；5：极难 ） | 
+| data.title          | Text | 题干 |
+| data.options[]      | String[]        | 选项，type为1,2时有效，len <= 7  |
+| data.ai| Integer    | 智能阅卷（1：是；2：否；）  | 
+| data.analysis       | Text    | 解析  | 
+| data.questionTypeId | Integer         | 试题分类ID      |
+| data.score          | Double          | 分数   | 是
+| data.scoreOptions[] | Integer[] | 分数选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；）|
+| data.state| Integer | 状态（0：删除；1：发布；2：草稿）|
+| data.answers[]      | Object[]   | 答案数组   | 
+| data.answers[].answer      | String   | 答案   | 
+| data.answers[].score     | Double    | 得分   | 
 
-### 试题获取：question/copy
+### 试题复制：question/copy
 | 请求参数| 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
 | id   | Integer | 主键 | 是   |
@@ -363,7 +369,7 @@ http请求头需添加Authorization字段，
 | name  | String(32)    | 名称  | 是   |
 | passScore | Double        | 及格分数（百分比） | 是   |
 | showType | Integer       | 展示方式（1：整卷展示；3：单题展示；）| 否   |
-| paperTypeId | Integer       | 试题分类ID | 是  |
+| paperTypeId | Integer       | 试卷分类ID | 是  |
 
 ### 试卷修改：paper/edit
 | 请求参数| 类型    | 描述 | 必填 |
@@ -389,7 +395,7 @@ http请求头需添加Authorization字段，
 | data.name  | String  | 名称 |
 | data.passScore  | Double| 及格分数 |
 | data.totalScore | Double| 总分数 |
-| data.genType  | Integer| 组件方式 |
+| data.genType  | Integer| 组卷方式 |
 | data.markType  | Integer| 阅卷方式 |
 | data.showType  | Integer| 展示方式 |
 | data.state  | Integer| 状态 |
@@ -430,11 +436,11 @@ http请求头需添加Authorization字段，
 | sourceId | Integer | 源章节ID | 是   |
 | targetId | Integer | 目标章节ID | 是   |
 
-### 章节或试题移动：paper/questionMove
+### 试题移动：paper/questionMove
 ###### 只支持同章节下试题移动
 | 请求参数| 类型    | 描述       | 必填 |
 | --------------- | ------- | ---------- | ---- |
-| id | Integer | 主键 | 是   |
+| id | Integer | 主键【试卷】 | 是   |
 | sourceId | Integer | 源试题ID | 是   |
 | targetId | Integer | 目标试题ID | 是   |
 
@@ -499,7 +505,7 @@ http请求头需添加Authorization字段，
 | questionId | Integer   | 试题ID | 是   |
 | scoreOptions    | Integer[] | 分数选项     | 是   |
 
-### 试卷试题发布：paper/publish
+### 试卷发布：paper/publish
 | 请求参数| 类型    | 描述   | 必填 |
 | ---- | ------- | ------ | ---- |
 | id   | Integer | 试卷id | 是   |
@@ -516,7 +522,7 @@ http请求头需添加Authorization字段，
 | 请求参数| 类型        | 描述       | 必填 |
 | -------- | ----------- | ---------- | ---- |
 | name     | String (16) | 名称       | 否   |
-| examTypeId| Integer      | 试题分类ID| 否   |
+| examTypeId| Integer      | 考试分类ID| 否   |
 | state| Integer      | 状态 | 否   |
 | curPage  | Integer     | 当前第几页 | 否   |
 | pageSize | Integer     | 每页多少条 | 否   |
@@ -534,6 +540,7 @@ http请求头需添加Authorization字段，
 | data.list[].markStartTime| Date| 阅卷开始时间|
 | data.list[].markEndTime| Date| 阅卷结束时间|
 | data.list[].state   | Integer | 考试状态     |
+| data.list[].stateName|String| 考试状态名称    |
 | data.list[].paperMarkType  | Integer |  试卷阅卷类型   |
 | data.list[].paperId| Integer| 试卷Id    |
 | data.list[].paperName|String| 试卷名称    |
@@ -593,7 +600,8 @@ http请求头需添加Authorization字段，
 | ----------- | --------- | ----------- | ---- |
 | id          | Integer   | 主键        | 是   |
 | markUserIds | Integer[] | 阅卷用户IDS | 是   |
-| examUserIds | Integer[] | 考试用户IDS | 是   |
+| examUserIds | Integer[] | 考试用户IDS | 否   |
+| questionIds | Integer[] | 试题IDS examUserIds和questionIds都有效时，默认使用examUserIds  | 否   |
 
 
 ### 考试在线用户：exam/onlineUser
