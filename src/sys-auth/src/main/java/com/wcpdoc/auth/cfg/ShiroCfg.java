@@ -79,7 +79,9 @@ public class ShiroCfg {
 		filterChainMap.put("/api/question/**", "jwt,anyRolesEx[subAdmin]");
 		filterChainMap.put("/api/questionType/**", "jwt,anyRolesEx[subAdmin]");
 		
-		filterChainMap.put("/**", "jwt");// 其他请求走jwt过滤器
+		filterChainMap.put("/api/**", "jwt");// 普通用户jwt过滤器
+		
+		filterChainMap.put("/**", "anon");// 静态资源不拦截
 		shiroFilterFactory.setFilterChainDefinitionMap(filterChainMap);
 		return shiroFilterFactory;
 	}

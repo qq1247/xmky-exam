@@ -27,7 +27,7 @@ public class ApplicationCfg implements WebMvcConfigurer {
 
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
-		registry.addRedirectViewController("/", "login/toIn");
+		registry.addRedirectViewController("/", "index.html");
 	}
 	
 	@Override
