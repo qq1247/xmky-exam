@@ -97,6 +97,7 @@
 			<resource>
 				<directory></directory><!-- 从根目录开始 -->
 				<includes><!-- 打包文件 -->
+					<include>dll/**</include>
 					<include>config/**</include>
 				</includes>
 				<targetPath>${project.build.directory}</targetPath><!-- 放入war包的同级目录 -->

@@ -2,24 +2,54 @@ package com.wcpdoc.exam.report.service;
 
 import java.util.Map;
 
-import com.wcpdoc.core.entity.PageIn;
-import com.wcpdoc.core.entity.PageOut;
+import org.hyperic.sigar.SigarException;
 
 /**
- * 成绩服务层接口
+ * 统计服务层接口
  * 
  * v1.0 zhanghc 2017年8月29日下午2:03:36
  */
 public interface GradeService {
 
 	/**
-	 * 获取列表
+	 * 首页用户
 	 * 
-	 * v1.0 zhanghc 2017年8月29日下午2:03:36
-	 * @param pageIn
-	 * @return PageOut
+	 * v1.0 chenyun 2021年12月10日上午10:14:11
+	 * @return Map<String,Object>
 	 */
-	PageOut getListpage(PageIn pageIn);
+	Map<String, Object> homeUser();
+	
+	/**
+	 * 首页子管理
+	 * 
+	 * v1.0 chenyun 2021年12月10日上午10:14:11
+	 * @return Map<String,Object>
+	 */
+	Map<String, Object> homeSubAdmin();
+	
+	/**
+	 * 首页管理
+	 * 
+	 * v1.0 chenyun 2021年12月10日上午10:14:11
+	 * @return Map<String,Object>
+	 */
+	Map<String, Object> homeAdmin();
+	
+	/**
+	 * 服务器参数
+	 * 
+	 * v1.0 chenyun 2021年12月10日上午10:14:11
+	 * @return Map<String,Object>
+	 */
+	Map<String, Object> serverParam() throws SigarException ;
+	
+	/**
+	 * 慢接口日志
+	 * 
+	 * v1.0 chenyun 2021年12月10日上午10:14:11
+	 * @return Map<String,Object>
+	 */
+	Map<String, Object> slowLog();
 	
 	/**
 	 * 分数统计

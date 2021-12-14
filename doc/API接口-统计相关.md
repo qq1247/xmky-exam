@@ -26,7 +26,7 @@ http请求头需添加Authorization字段，
 带前缀描述，表达前缀业务+字段的意思。如user/add?orgId=1，orgId表示机构ID=1
 
 ## 统计相关
-### 试题统计：--/--
+### 试题统计：report/--
 | 请求参数| 类型        | 描述       | 必填 |
 | -------- | ----------- | ---------- | ---- |
 | questionTypeId | Integer | 试题分类ID   | 是   |
@@ -45,7 +45,7 @@ http请求头需添加Authorization字段，
 | data.aiList[].name        | String | 智能名称  |
 | data.aiList[].value       | String  | 智能值  |
 
-### 考试统计：--/--
+### 考试统计：report/--
 | 请求参数| 类型    | 描述       | 必填 |
 | ---- | ------- | ---------- | ---- |
 | examId | Integer | 考试ID | 是   |
@@ -76,7 +76,7 @@ http请求头需添加Authorization字段，
 | data.scoreGradeList[].name        | String | 分数段名称  |
 | data.scoreGradeList[].value       | String  | 分数段值  |
 
-### 考试用户排名：--/--
+### 考试用户排名：report/--
 | 请求参数| 类型        | 描述       | 必填 |
 | -------- | ----------- | ---------- | ---- |
 | examId | Integer | 考试ID | 是   |
@@ -104,7 +104,7 @@ http请求头需添加Authorization字段，
 | data.list[].myMarkUserId        | Integer | 阅卷用户Id  |
 | data.list[].myMarkUserName       | String | 阅卷用户名称 |
 
-### 考试错题分析：--/--
+### 考试错题分析：report/--
 | 请求参数| 类型        | 描述       | 必填 |
 | -------- | ----------- | ---------- | ---- |
 | examId | Integer | 考试ID | 是   |
@@ -120,7 +120,7 @@ http请求头需添加Authorization字段，
 | data.list[].userNum        | Integer | 考试用户数量 |
 | data.list[].succUserNum        | Integer | 答对用户数量 |
 
-### 首页展示：--/--  普通用户
+### 首页展示（普通用户）：report/homeUser
 | 响应数据| 类型    | 描述 |
 | --------------------------- | ------- | ----- |
 | code                      | Integer | 响应码    |
@@ -134,14 +134,12 @@ http请求头需添加Authorization字段，
 | data[].exam.missNum   | Integer  | 缺考次数     |
 | data[].exam.succNum  | Integer  | 通过次数    |
 | data[].exam.top      | Double | 最高排名 |
-| data[].score.passRate        | Double | 及格率  |
-| data[].score.total  | Double  | 总分数  |
 | data[].score.avg | Double  | 平均分   |
 | data[].score.min  | Double  | 最低分   |
 | data[].score.max | Double  |最高分  |
 | data[].score.sd | Double  | 标准差 |
 
-### 首页展示：--/--  子管理
+### 首页展示(子管理)：report/homeSubAdmin
 | 响应数据| 类型    | 描述 |
 | --------------------------- | ------- | ----- |
 | code                      | Integer | 响应码    |
@@ -151,42 +149,43 @@ http请求头需添加Authorization字段，
 | data.orgId        | Integer | 组织机构Id |
 | data.orgName        | String | 组织机构名称  |
 | data.type        | Integer | 用户类型 |
-| data.examNum       | Integer    | 创建试卷次数     |
+| data.examNum       | Integer    | 创建考试次数     |
 | data.paperNum   | Integer  | 创建试卷次数     |
 | data.questionNum  | Integer  | 创建试题次数    |
-| data.MarkNum      | Integer | 待阅试卷 |
+| data.markNum      | Integer | 待阅试卷 |
 
-### 首页展示：--/--  超级管理员
+### 首页展示(超级管理员)：report/homeAdmin
 | 响应数据| 类型    | 描述 |
 | --------------------------- | ------- | ----- |
 | code                    | Integer | 响应码    |
 | msg                     | String  | 响应消息  |
 | data.userNum            | Integer | 创建用户数   |
 | data.subAdminNum        | Integer | 创建子管理数 |
-| data.exanNum            | Integer | 创建考试数   |
-| data.questionNum        | Integer | 创建试题数   |
-| data.paperNum           | Integer | 创建考试数   |
 | data.bulletinNum        | Integer | 创建公告数   |
 | data.onUserNum          | Integer | 在线用户     |
 
-### 服务器参数：--/-- 
+### 服务器参数：report/serverParam
 | 响应数据| 类型    | 描述 |
-| --------------------------- | ------- | ----- |
-| code                      | Integer | 响应码    |
-| msg                       | String  | 响应消息 |
-| data.CPU        | String | CPU |
-| data.RAM        | String | 内存 |
-| data.HDD        | String | 硬盘 |
-| data.SYS        | String | 系统 |
-| data.CpuRate    | String | CPU使用率 |
-| data.JAVA       | String | JAVA  |
-| data.WEB        | String | WEB服务器  |
-| data.JVM        | String | JVM内存   |
-| data.SQL        | String | 数据库 |
-| data.fileBak    | String | 上传附件目录 |
-| data.dbBak      | String | 数据库备份目录 |
+| --------------------------- | ------- | -----  |
+| code                        | Integer | 响应码   |
+| msg                         | String  | 响应消息 |
+| data.sys                    | String  | 系统     | 
+| data.cpuType                | String  | CPU型号  |
+| data.freeCpu                | Double  | CPU剩余值|
+| data.totalCpu               | Double  | CPU总值  |
+| data.freeRam                | Long    | 剩余内存 |
+| data.totalRam               | Long    |  总内存  |
+| data.freeHdd                | Long    | 剩余硬盘 |
+| data.totalHdd               | Long    |  总硬盘  |
+| data.freeJvm                | Long    | 剩余JVM  |
+| data.TotalJvm               | Long    |  总JVM   |
+| data.java                   | String  | jdk版本  |
+| data.web                    | String  | WEB服务器|
+| data.sql                    | String  | 数据库   |
+| data.fileBak                | String  | 上传附件目录  |
+| data.dbBak                  | String  | 数据库备份目录|
 
-### 满接口日志：--/-- 
+### 慢接口日志：report/slowLog
 | 响应数据| 类型    | 描述 |
 | --------------------------- | ------- | ----- |
 | code                      | Integer | 响应码    |

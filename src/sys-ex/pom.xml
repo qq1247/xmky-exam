@@ -36,5 +36,11 @@
 			<artifactId>sys-notify</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- 集成统计 -->
+		<dependency>
+			<groupId>com.wcpdoc.exam</groupId>
+			<artifactId>exam-report</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>

@@ -1,5 +1,7 @@
 package com.wcpdoc.core.cache;
 
+import java.util.List;
+
 import org.springframework.cache.Cache;
 
 import com.wcpdoc.cache.BaseEhCache;
@@ -35,6 +37,19 @@ public class OnlineUserCache extends BaseEhCache {
 	public static void remove(Integer userId) {
 		net.sf.ehcache.Cache nativeCache = getNativeCache(CACHE_NAME);
 		nativeCache.remove(userId);
+	}
+	
+	/**
+	 * 获取缓存key
+	 * 
+	 * v1.0 chenyun 2021-12-13 11:04:27
+	 * @param onlineUser void
+	 */
+	@SuppressWarnings("unchecked")
+	public static List<Integer> getKeys() {
+		net.sf.ehcache.Cache nativeCache = getNativeCache(CACHE_NAME);
+		List<Integer> keys = nativeCache.getKeys();
+		return keys;
 	}
 	
 	/**

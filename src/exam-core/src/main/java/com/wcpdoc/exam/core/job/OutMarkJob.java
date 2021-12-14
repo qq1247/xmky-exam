@@ -12,6 +12,7 @@ import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.SpringUtil;
 import com.wcpdoc.exam.core.cache.OutMarkCache;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
+import com.wcpdoc.exam.core.service.MyExamService;
 
 /**
  * 完成阅卷任务 
@@ -22,6 +23,7 @@ import com.wcpdoc.exam.core.service.MyExamDetailService;
 public class OutMarkJob implements Job {
 	private static final Logger log = LoggerFactory.getLogger(OutMarkJob.class);
 	private static final MyExamDetailService myExamDetailService = SpringUtil.getBean(MyExamDetailService.class);
+	private static final MyExamService myExamService = SpringUtil.getBean(MyExamService.class);
 	
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -34,13 +36,16 @@ public class OutMarkJob implements Job {
 				if (OutMarkCache.get(examId).getTime() > System.currentTimeMillis()) {// 如果阅卷未结束，不处理
 					continue;
 				}
-				
+
 				OutMarkCache.del(examId);// 考试时间已结束，先清理监听在完成阅卷。可能造成的问题是正在阅卷，定时任务又执行一次。
 				myExamDetailService.outMark(examId);// 完成阅卷
+				myExamService.rank(examId);// 完成排序
 			} catch (MyException e) {// 一个有问题，不要影响其他任务执行。
 				log.error("自动阅卷错误：{}", e.getMessage());
+				continue;
 			} catch (Exception e) {
 				log.error("自动阅卷错误：", e);
+				continue;
 			}
 		}
 	}

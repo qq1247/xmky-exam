@@ -6,11 +6,70 @@ import java.util.Map;
 import com.wcpdoc.core.dao.RBaseDao;
 
 /**
- * 公告数据访问层接口
+ * 统计数据访问层接口
  * 
  * v1.0 chenyun 2021-03-24 13:39:37
  */
 public interface GradeDao extends RBaseDao<Object> {
+	
+	/**
+	 * 首页user
+	 * 
+	 * v1.0 chenyun 2021年12月10日下午1:37:38
+	 * @param userId
+	 * @return Map<String,Object>
+	 */
+	List<Map<String, Object>> homeUser(Integer userId);
+	
+	/**
+	 * 首页subAdmin
+	 * 
+	 * v1.0 chenyun 2021年12月10日下午1:37:38
+	 * @param userId
+	 * @return Map<String,Object>
+	 */
+	List<Map<String, Object>> homeSubAdminExam(Integer userId);
+	
+	/**
+	 * 首页subAdmin
+	 * 
+	 * v1.0 chenyun 2021年12月10日下午1:37:38
+	 * @param userId
+	 * @return Map<String,Object>
+	 */
+	List<Map<String, Object>> homeSubAdminPaper(Integer userId);
+	/**
+	 * 首页subAdmin
+	 * 
+	 * v1.0 chenyun 2021年12月10日下午1:37:38
+	 * @param userId
+	 * @return Map<String,Object>
+	 */
+	List<Map<String, Object>> homeSubAdminQuestion(Integer userId);
+	/**
+	 * 首页subAdmin
+	 * 
+	 * v1.0 chenyun 2021年12月10日下午1:37:38
+	 * @param userId
+	 * @return Map<String,Object>
+	 */
+	List<Map<String, Object>> homeSubAdminMark(Integer userId);
+
+	/**
+	 * 首页admin
+	 * 
+	 * v1.0 chenyun 2021年12月10日下午1:37:38
+	 * @return Map<String,Object>
+	 */
+	List<Map<String, Object>> homeAdminUser();
+	
+	/**
+	 * 首页admin
+	 * 
+	 * v1.0 chenyun 2021年12月10日下午1:37:38
+	 * @return Map<String,Object>
+	 */
+	List<Map<String, Object>> homeAdminBulletin();
 	
 	/**
 	 * 分数统计
