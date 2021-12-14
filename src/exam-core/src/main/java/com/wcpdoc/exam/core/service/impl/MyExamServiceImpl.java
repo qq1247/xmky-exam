@@ -202,4 +202,15 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	public List<Map<String, Object>> getUserList(Integer id) {
 		return myExamDao.getUserList(id);
 	}
+
+	@Override
+	public void rank(Integer examId) {
+		List<MyExam> rankList = myExamDao.rankList(examId);
+		for (int i = 1; i <= rankList.size(); i++) {
+			MyExam myExam = rankList.get(i-1);
+			myExam.setNo(i);
+			myExamDao.update(myExam);
+		}
+		
+	}
 }

@@ -98,4 +98,12 @@ public interface MyExamService extends BaseService<MyExam>{
 	 * @return List<Map<String,Object>>
 	 */
 	List<Map<String, Object>> getUserList(Integer id);
+	
+	/**
+	 * 考试排名
+	 * 
+	 * v1.0 chenyun 2021年12月10日上午10:40:54
+	 * @param examId void
+	 */
+	void rank(Integer examId);
 }

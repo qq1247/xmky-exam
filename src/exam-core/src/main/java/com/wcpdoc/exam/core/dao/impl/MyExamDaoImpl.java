@@ -117,4 +117,10 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 				+ "ORDER BY USER.UPDATE_TIME DESC ";
 		return getMapList(sql, new Object[]{id});
 	}
+
+	@Override
+	public List<MyExam> rankList(Integer examId) {
+		String sql = "SELECT * FROM EXM_MY_EXAM WHERE EXAM_ID = ? ORDER BY TOTAL_SCORE DESC, ANSWER_END_TIME ASC ";
+ 		return getList(sql, new Object[] { examId });
+	}
 }

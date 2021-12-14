@@ -73,4 +73,13 @@ public interface MyExamDao extends BaseDao<MyExam>{
 	 * @return List<Map<String,Object>>
 	 */
 	List<Map<String, Object>> getUserList(Integer id);
+	
+	/**
+	 * 排名列表
+	 * 
+	 * v1.0 chenyun 2021年12月10日上午10:44:13
+	 * @param examId
+	 * @return List<MyExam>
+	 */
+	List<MyExam> rankList(Integer examId);
 }
