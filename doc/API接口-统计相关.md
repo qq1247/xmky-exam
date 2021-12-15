@@ -164,26 +164,14 @@ http请求头需添加Authorization字段，
 | data.bulletinNum        | Integer | 创建公告数   |
 | data.onUserNum          | Integer | 在线用户     |
 
-### 服务器参数：report/serverParam
+### 服务器参数：report/server/parm
 | 响应数据| 类型    | 描述 |
 | --------------------------- | ------- | -----  |
 | code                        | Integer | 响应码   |
 | msg                         | String  | 响应消息 |
-| data.sys                    | String  | 系统     | 
-| data.cpuType                | String  | CPU型号  |
-| data.freeCpu                | Double  | CPU剩余值|
-| data.totalCpu               | Double  | CPU总值  |
-| data.freeRam                | Long    | 剩余内存 |
-| data.totalRam               | Long    |  总内存  |
-| data.freeHdd                | Long    | 剩余硬盘 |
-| data.totalHdd               | Long    |  总硬盘  |
-| data.freeJvm                | Long    | 剩余JVM  |
-| data.TotalJvm               | Long    |  总JVM   |
-| data.java                   | String  | jdk版本  |
-| data.web                    | String  | WEB服务器|
-| data.sql                    | String  | 数据库   |
-| data.fileBak                | String  | 上传附件目录  |
-| data.dbBak                  | String  | 数据库备份目录|
+| data.list[]                  | Object[]   | 对象列表     |
+| data.list[].name               | String | 名称  |
+| data.list[].value             | String | 值  |
 
 ### 慢接口日志：report/slowLog
 | 响应数据| 类型    | 描述 |

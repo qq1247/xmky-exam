@@ -13,6 +13,7 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.exam.report.service.GradeService;
+import com.wcpdoc.exam.report.service.ServerPramService;
  
 /**
  * 成绩报表控制层
@@ -26,6 +27,8 @@ public class ApiReportController extends BaseController{
     
     @Resource
     private GradeService gradeService;
+    @Resource
+    private ServerPramService serverParmService;
     
     /**
      * 首页用户
@@ -93,11 +96,11 @@ public class ApiReportController extends BaseController{
      * v1.0 chenyun 2021年12月10日上午10:14:34
      * @return PageResult
      */
-    @RequestMapping("/serverParam")
+    @RequestMapping("/server/parm")
     @ResponseBody
-    public PageResult serverParam() {
+    public PageResult serverParm() {
         try {
-            return PageResultEx.ok().data(gradeService.serverParam());
+            return PageResultEx.ok().data(serverParmService.getList());
         } catch (MyException e) {
             log.error("首页用户统计错误：{}", e.getMessage());
             return PageResult.err().msg(e.getMessage());

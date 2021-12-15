@@ -19,7 +19,7 @@
 			<version>${project.version}</version>
 		</dependency>
 		
-		<!-- 服务器信息检测 -->
+		<!-- 集成服务器参数 -->
 		<dependency>
 		    <groupId>org.hyperic</groupId>
 		    <artifactId>sigar</artifactId>

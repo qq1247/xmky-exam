@@ -2,8 +2,6 @@ package com.wcpdoc.exam.report.service;
 
 import java.util.Map;
 
-import org.hyperic.sigar.SigarException;
-
 /**
  * 统计服务层接口
  * 
@@ -34,14 +32,6 @@ public interface GradeService {
 	 * @return Map<String,Object>
 	 */
 	Map<String, Object> homeAdmin();
-	
-	/**
-	 * 服务器参数
-	 * 
-	 * v1.0 chenyun 2021年12月10日上午10:14:11
-	 * @return Map<String,Object>
-	 */
-	Map<String, Object> serverParam() throws SigarException ;
 	
 	/**
 	 * 慢接口日志

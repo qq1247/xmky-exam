@@ -109,10 +109,6 @@
 				</includes>
 				<targetPath>${project.build.directory}/config</targetPath><!--放入war包的同级目录的config目录 -->
 			</resource>
-			<resource>
-				<directory>src/main/resources</directory><!-- 从src/main/resources目录开始 -->
-				<targetPath></targetPath><!-- 放入classes目录下 -->
-			</resource>
 		</resources>
 	</build>
 </project>
