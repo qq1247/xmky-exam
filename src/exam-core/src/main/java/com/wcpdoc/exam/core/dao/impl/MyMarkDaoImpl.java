@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
-import com.wcpdoc.base.cache.DictCache;
 import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
@@ -51,10 +50,6 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 				"examMarkStartTime", DateUtil.FORMAT_DATE_TIME, 
 				"markEndTime", DateUtil.FORMAT_DATE_TIME, 
 				"markStartTime", DateUtil.FORMAT_DATE_TIME);
-		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), 
-				"MY_EXAM_MARK_STATE", "examMarkState",
-				"PAPER_SHOW_TYPE", "paperShowType"
-				);
 		return pageOut;
 	}
 

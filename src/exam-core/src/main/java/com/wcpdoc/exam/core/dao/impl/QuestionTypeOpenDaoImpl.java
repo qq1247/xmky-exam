@@ -8,7 +8,6 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Repository;
 
-import com.wcpdoc.base.cache.DictCache;
 import com.wcpdoc.base.dao.UserDao;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
@@ -69,7 +68,6 @@ public class QuestionTypeOpenDaoImpl extends RBaseDaoImpl<QuestionTypeOpen> impl
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 				HibernateUtil.formatDate(pageOut.getList(), "startTime", DateUtil.FORMAT_DATE_TIME);
 				HibernateUtil.formatDate(pageOut.getList(), "endTime", DateUtil.FORMAT_DATE_TIME);
-				HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), "STATE_OPEN", "state");
 		return pageOut;
 	}
 

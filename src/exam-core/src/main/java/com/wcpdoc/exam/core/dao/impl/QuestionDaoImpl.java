@@ -8,13 +8,11 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Repository;
 
-import com.wcpdoc.base.cache.DictCache;
 import com.wcpdoc.base.dao.UserDao;
 import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.util.DateUtil;
-import com.wcpdoc.core.util.HibernateUtil;
 import com.wcpdoc.core.util.SqlUtil;
 import com.wcpdoc.core.util.SqlUtil.Order;
 import com.wcpdoc.core.util.ValidateUtil;
@@ -59,29 +57,7 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 				.addOrder(!ValidateUtil.isValid(pageIn.get("rand")), "QUESTION.UPDATE_TIME", Order.DESC)
 				.addOrder(ValidateUtil.isValid(pageIn.get("rand")), "Rand()", Order.NULL);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), 
-				"QUESTION_TYPE", "type", 
-				"QUESTION_DIFFICULTY", "difficulty", 
-				"STATE", "state");
 		return pageOut;
-	}
-
-	@Override
-	public List<Map<String, Object>> statisticsTypeDifficulty(Integer questionTypeId) {
-		String sql = "SELECT COUNT( * ) AS TOTAL, "
-				+ "SUM( CASE WHEN TYPE = 1 THEN  TYPE ELSE 0 END) AS TYPE1, "
-				+ "SUM( CASE WHEN TYPE = 2 THEN  TYPE ELSE 0 END) AS TYPE2, "
-				+ "SUM( CASE WHEN TYPE = 3 THEN  TYPE ELSE 0 END) AS TYPE3, "
-				+ "SUM( CASE WHEN TYPE = 4 THEN  TYPE ELSE 0 END) AS TYPE4, "
-				+ "SUM( CASE WHEN TYPE = 5 THEN  TYPE ELSE 0 END) AS TYPE5, "
-				+ "SUM( CASE WHEN DIFFICULTY = 1 THEN  DIFFICULTY ELSE 0 END) AS DIFFICULTY1, "
-				+ "SUM( CASE WHEN DIFFICULTY = 2 THEN  DIFFICULTY ELSE 0 END) AS DIFFICULTY2, "
-				+ "SUM( CASE WHEN DIFFICULTY = 3 THEN  DIFFICULTY ELSE 0 END) AS DIFFICULTY3, "
-				+ "SUM( CASE WHEN DIFFICULTY = 4 THEN  DIFFICULTY ELSE 0 END) AS DIFFICULTY4, "
-				+ "SUM( CASE WHEN DIFFICULTY = 5 THEN  DIFFICULTY ELSE 0 END) AS DIFFICULTY5 "
-				+ "FROM EXM_QUESTION  WHERE STATE = 1 "
-				+ "AND QUESTION_TYPE_ID = ?";
-		return getMapList(sql, new Object[] { questionTypeId });
 	}
 
 	@Override

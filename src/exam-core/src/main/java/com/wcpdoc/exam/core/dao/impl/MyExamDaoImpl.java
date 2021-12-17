@@ -6,15 +6,14 @@ import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
-import com.wcpdoc.base.cache.DictCache;
 import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.HibernateUtil;
 import com.wcpdoc.core.util.SqlUtil;
-import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.core.util.SqlUtil.Order;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.MyExamDao;
 import com.wcpdoc.exam.core.entity.MyExam;
 
@@ -62,12 +61,6 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 				"examMarkStartTime", DateUtil.FORMAT_DATE_TIME, 
 				"answerStartTime", DateUtil.FORMAT_DATE_TIME, 
 				"answerEndTime", DateUtil.FORMAT_DATE_TIME);
-		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), 
-				"MY_EXAM_STATE", "state",
-				"MY_EXAM_ANSWER_STATE", "answerState",
-				"MY_EXAM_MARK_STATE", "markState",
-				"PAPER_SHOW_TYPE", "paperShowType"
-				);
 		return pageOut;
 	}
 
