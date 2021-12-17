@@ -39,7 +39,7 @@ public class OutMarkJob implements Job {
 
 				OutMarkCache.del(examId);// 考试时间已结束，先清理监听在完成阅卷。可能造成的问题是正在阅卷，定时任务又执行一次。
 				myExamDetailService.outMark(examId);// 完成阅卷
-				myExamService.rank(examId);// 完成排序
+				myExamService.rank(examId);// 完成排名
 			} catch (MyException e) {// 一个有问题，不要影响其他任务执行。
 				log.error("自动阅卷错误：{}", e.getMessage());
 				continue;
