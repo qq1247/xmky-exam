@@ -62,8 +62,8 @@ http请求头需添加Authorization字段，
 | data.exam.userNum       | Integer    | 考试用户数量                   |
 | data.exam.missUserNum   | Integer  | 缺考用户数量                       |
 | data.exam.succUserNum  | Integer  | 成绩合格用户数量       |
-| data.myExam.answerStartTime  | Date  | 答题开始时间（用于统计最短交卷时间）      |
-| data.myExam.answerEndTime  | Date  | 答题结束时间       |
+| data.myExam.answerStartTime  | Date  | 答题开始时间（用于统计最短交卷时间）暂不使用      |
+| data.myExam.answerEndTime  | Date  | 答题结束时间  暂不使用   |
 | data.score.total  | Double  | 总分数  |
 | data.score.avg | Double  | 平均分   |
 | data.score.min  | Double  | 最低分   |
@@ -159,10 +159,10 @@ http请求头需添加Authorization字段，
 | --------------------------- | ------- | ----- |
 | code                    | Integer | 响应码    |
 | msg                     | String  | 响应消息  |
-| data.userNum            | Integer | 创建用户数   |
-| data.subAdminNum        | Integer | 创建子管理数 |
-| data.bulletinNum        | Integer | 创建公告数   |
-| data.onlineUserNum          | Integer | 在线用户     |
+| data.user.num            | Integer | 创建用户数   |
+| data.subAdmin.num        | Integer | 创建子管理数 |
+| data.bulletin.num        | Integer | 创建公告数   |
+| data.onlineUser.num          | Integer | 在线用户     |
 
 ### 服务器参数：report/server/parm
 | 响应数据| 类型    | 描述 |
@@ -178,4 +178,4 @@ http请求头需添加Authorization字段，
 | --------------------------- | ------- | ----- |
 | code                      | Integer | 响应码    |
 | msg                       | String  | 响应消息 |
-| data.list[]                  | String[]   | 字符串列表     |
+| data                 | String[]   | 字符串列表     |

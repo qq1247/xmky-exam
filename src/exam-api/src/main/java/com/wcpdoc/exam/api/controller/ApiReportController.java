@@ -12,7 +12,7 @@ import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
-import com.wcpdoc.exam.report.service.GradeService;
+import com.wcpdoc.exam.report.service.ReportService;
 import com.wcpdoc.exam.report.service.ServerPramService;
  
 /**
@@ -26,7 +26,7 @@ public class ApiReportController extends BaseController{
     private static final Logger log = LoggerFactory.getLogger(ApiReportController.class);
     
     @Resource
-    private GradeService gradeService;
+    private ReportService reportService;
     @Resource
     private ServerPramService serverParmService;
     
@@ -36,11 +36,11 @@ public class ApiReportController extends BaseController{
      * v1.0 chenyun 2021年12月10日上午10:14:34
      * @return PageResult
      */
-    @RequestMapping("/homeUser")
+    @RequestMapping("/home/user")
     @ResponseBody
     public PageResult homeUser() {
         try {
-            return PageResultEx.ok().data(gradeService.homeUser());
+            return PageResultEx.ok().data(reportService.homeUser());
         } catch (MyException e) {
             log.error("首页用户统计错误：{}", e.getMessage());
             return PageResult.err().msg(e.getMessage());
@@ -56,16 +56,16 @@ public class ApiReportController extends BaseController{
      * v1.0 chenyun 2021年12月10日上午10:14:34
      * @return PageResult
      */
-    @RequestMapping("/homeSubAdmin")
+    @RequestMapping("/home/subAdmin")
     @ResponseBody
     public PageResult homeSubAdmin() {
         try {
-            return PageResultEx.ok().data(gradeService.homeSubAdmin());
+            return PageResultEx.ok().data(reportService.homeSubAdmin());
         } catch (MyException e) {
-            log.error("首页用户统计错误：{}", e.getMessage());
+            log.error("首页子管理统计错误：{}", e.getMessage());
             return PageResult.err().msg(e.getMessage());
         } catch (Exception e) {
-            log.error("首页用户统计错误：", e);
+            log.error("首页子管理统计错误：", e);
             return PageResult.err();
         }
     }
@@ -76,16 +76,16 @@ public class ApiReportController extends BaseController{
      * v1.0 chenyun 2021年12月10日上午10:14:34
      * @return PageResult
      */
-    @RequestMapping("/homeAdmin")
+    @RequestMapping("/home/admin")
     @ResponseBody
     public PageResult homeAdmin() {
         try {
-            return PageResultEx.ok().data(gradeService.homeAdmin());
+            return PageResultEx.ok().data(reportService.homeAdmin());
         } catch (MyException e) {
-            log.error("首页用户统计错误：{}", e.getMessage());
+            log.error("首页管理员统计错误：{}", e.getMessage());
             return PageResult.err().msg(e.getMessage());
         } catch (Exception e) {
-            log.error("首页用户统计错误：", e);
+            log.error("首页管理员统计错误：", e);
             return PageResult.err();
         }
     }
@@ -102,10 +102,114 @@ public class ApiReportController extends BaseController{
         try {
             return PageResultEx.ok().data(serverParmService.getList());
         } catch (MyException e) {
-            log.error("首页用户统计错误：{}", e.getMessage());
+            log.error("首页服务器参数统计错误：{}", e.getMessage());
             return PageResult.err().msg(e.getMessage());
         } catch (Exception e) {
-            log.error("首页用户统计错误：", e);
+            log.error("首页服务器参数统计错误：", e);
+            return PageResult.err();
+        }
+    }
+    
+    /**
+     * 慢接口日志
+     * 
+     * v1.0 chenyun 2021-12-15 13:49:29
+     * @return PageResult
+     */
+    @RequestMapping("/server/log")
+    @ResponseBody
+    public PageResult serverLog() {
+        try {
+           return PageResultEx.ok().data(reportService.serverLog());
+        } catch (MyException e) {
+            log.error("首页慢接口日志统计错误：{}", e.getMessage());
+            return PageResult.err().msg(e.getMessage());
+        } catch (Exception e) {
+            log.error("首页慢接口日志统计错误：", e);
+            return PageResult.err();
+        }
+    }
+    
+    /**
+     * 试题统计
+     * 
+     * v1.0 chenyun 2021-12-15 13:44:47
+     * @param id
+     * @return PageResult
+     */
+    @RequestMapping("/question/statis")
+    @ResponseBody
+    public PageResult questionStatis(Integer questionTypeId) {
+        try {
+            return PageResultEx.ok().data(reportService.questionStatis(questionTypeId));
+        } catch (MyException e) {
+            log.error("试题统计错误：{}", e.getMessage());
+            return PageResult.err().msg(e.getMessage());
+        } catch (Exception e) {
+            log.error("试题统计错误：", e);
+            return PageResult.err();
+        }
+    }
+    
+    /**
+     * 考试统计
+     * 
+     * v1.0 chenyun 2021-12-15 13:44:47
+     * @param id
+     * @return PageResult
+     */
+    @RequestMapping("/exam/statis")
+    @ResponseBody
+    public PageResult examStatis(Integer examId) {
+        try {
+            return PageResultEx.ok().data(reportService.examStatis(examId));
+        } catch (MyException e) {
+            log.error("考试统计错误：{}", e.getMessage());
+            return PageResult.err().msg(e.getMessage());
+        } catch (Exception e) {
+            log.error("考试统计错误：", e);
+            return PageResult.err();
+        }
+    }
+    
+    /**
+     * 考试排名
+     * 
+     * v1.0 chenyun 2021-12-15 13:44:47
+     * @param id
+     * @return PageResult
+     */
+    @RequestMapping("/myExam/listpage")
+    @ResponseBody
+    public PageResult myExamListpage(Integer examId) {
+        try {
+            return PageResultEx.ok().data(reportService.myExamListpage(examId));
+        } catch (MyException e) {
+            log.error("考试排名错误：{}", e.getMessage());
+            return PageResult.err().msg(e.getMessage());
+        } catch (Exception e) {
+            log.error("考试排名错误：", e);
+            return PageResult.err();
+        }
+    }
+    
+    /**
+     * 错题分析
+     * 
+     * v1.0 chenyun 2021-12-15 13:44:47
+     * @param id
+     * @return PageResult
+     */
+    @RequestMapping("/question/listpage")
+    @ResponseBody
+    public PageResult questionListpage(Integer examId) {
+        try {
+            return PageResultEx.ok().data(reportService.questionListpage(examId));
+        } catch (MyException e) {
+            log.error("错题分析统计错误：{}", e.getMessage());
+            return PageResult.err().msg(e.getMessage());
+        } catch (Exception e) {
+            log.error("错题分析统计错误：", e);
             return PageResult.err();
         }
     }
@@ -121,7 +225,7 @@ public class ApiReportController extends BaseController{
     @ResponseBody
     public PageResult count(Integer examId) {
         try {
-            return PageResultEx.ok().data(gradeService.count(examId));
+            return PageResultEx.ok().data(reportService.count(examId));
         } catch (MyException e) {
             log.error("分数统计错误：{}", e.getMessage());
             return PageResult.err().msg(e.getMessage());

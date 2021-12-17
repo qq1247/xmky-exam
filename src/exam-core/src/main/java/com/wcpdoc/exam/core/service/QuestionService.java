@@ -69,15 +69,6 @@ public interface QuestionService extends BaseService<Question>{
 	void move(Integer sourceId, Integer targetId);
 	
 	/**
-	 * 试题统计（类型和难易程度）
-	 * 
-	 * v1.0 chenyun 2021年3月23日下午2:53:07
-	 * @param questionTypeId
-	 * @return Map<String,Object>
-	 */
-	Map<String, Object> statisticsTypeDifficulty(Integer questionTypeId);
-	
-	/**
 	 * 试题统计
 	 * 
 	 * v1.0 chenyun 2021年3月23日下午2:53:07

@@ -616,23 +616,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public Map<String, Object> statisticsTypeDifficulty(Integer questionTypeId) {
-		List<Map<String, Object>> list = questionDao.statisticsTypeDifficulty(questionTypeId);
-		DecimalFormat df = new DecimalFormat("0.0");
-		for (Map<String, Object> map : list) {
-			for (int i = 1; i <= 5; i++) {
-				double T1 = Double.parseDouble(map.remove("TYPE"+i).toString()) / Double.parseDouble(map.get("TOTAL").toString());
-				map.put("type"+i, df.format(T1 * 100));
-				
-				double D1 = Double.parseDouble(map.remove("DIFFICULTY"+i).toString()) / Double.parseDouble(map.get("TOTAL").toString());
-				map.put("difficulty"+i, df.format(D1 * 100));
-			}
-			return map;
-		}
-		return null;
-	}
-
-	@Override
 	public List<Map<String, Object>> accuracy(Integer examId) {
 		DecimalFormat df = new DecimalFormat("0.0");
 		List<Map<String, Object>> accuracyList = questionDao.accuracy(examId);

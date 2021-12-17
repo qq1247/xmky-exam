@@ -10,7 +10,7 @@ import com.wcpdoc.core.dao.RBaseDao;
  * 
  * v1.0 chenyun 2021-03-24 13:39:37
  */
-public interface GradeDao extends RBaseDao<Object> {
+public interface ReportDao extends RBaseDao<Object> {
 	
 	/**
 	 * 首页user
@@ -70,6 +70,51 @@ public interface GradeDao extends RBaseDao<Object> {
 	 * @return Map<String,Object>
 	 */
 	List<Map<String, Object>> homeAdminBulletin();
+	
+	/**
+	 * 试题统计
+	 * 
+	 * v1.0 chenyun 2021年12月15日下午4:16:58
+	 * @param questionTypeId
+	 * @return List<Map<String, Object>>
+	 */
+	List<Map<String, Object>> questionStatis(Integer questionTypeId);
+	
+	/**
+	 * 考试统计
+	 * 
+	 * v1.0 chenyun 2021年12月16日上午9:38:30
+	 * @param examId
+	 * @return List<Map<String,Object>>
+	 */
+	List<Map<String, Object>> examStatis(Integer examId);
+	
+	/**
+	 * 考试统计-试题类型列表
+	 * 
+	 * v1.0 chenyun 2021年12月16日上午9:38:30
+	 * @param paperId
+	 * @return List<Map<String,Object>>
+	 */
+	List<Map<String, Object>> examStatisType(Integer paperId);
+	
+	/**
+	 * 考试排名
+	 * 
+	 * v1.0 chenyun 2021年12月16日上午9:38:30
+	 * @param examId
+	 * @return List<Map<String,Object>>
+	 */
+	List<Map<String, Object>> myExamListpage(Integer examId);
+
+	/**
+	 * 错题分析
+	 * 
+	 * v1.0 chenyun 2021年12月16日上午9:38:30
+	 * @param examId
+	 * @return List<Map<String,Object>>
+	 */
+	List<Map<String, Object>> questionListpage(Integer examId);
 	
 	/**
 	 * 分数统计

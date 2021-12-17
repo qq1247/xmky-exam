@@ -338,27 +338,6 @@ public class ApiQuestionController extends BaseController {
 	}
 	
 	/**
-	 * 试题统计（类型，难易程度）
-	 * 
-	 * v1.0 zhanghc 2017-05-07 14:56:29
-	 * @param id
-	 * @return pageOut
-	 */
-	@RequestMapping("/statistics")
-	@ResponseBody
-	public PageResult statistics(Integer questionTypeId) {
-		try {
-			return PageResultEx.ok().data(questionService.statisticsTypeDifficulty(questionTypeId));
-		} catch (MyException e) {
-			log.error("试题统计错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		}  catch (Exception e) {
-			log.error("试题统计错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
 	 * 试题准确率
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29

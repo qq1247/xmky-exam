@@ -31,26 +31,24 @@ public class JwtSecretRunner implements ApplicationRunner {
 	    File file = new File(filepath);
 	    String random = null;
 	    if (!file.exists()) {
-	    	file.mkdirs();
 	    	log.info("启动监听：自动生成令牌秘钥");
 		    random = StringUtil.getRandom(64);
 	     	try (FileWriter writer = new FileWriter(file)) {
 		     writer.write(random);
 		    }
 	     	JwtSecretCache.addCache(random);
+	     	return;
 	    }
 	    
-	    if (file.exists()) {
-	    	log.info("启动监听：加载令牌秘钥到缓存");
-            FileInputStream fileInputStream = new FileInputStream(file);
-            InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            StringBuffer sb = new StringBuffer();
-            String text = null;
-            while((text = bufferedReader.readLine()) != null){
-                sb.append(text);
-            }
-	    	JwtSecretCache.addCache(sb.toString());
-	    }
+    	log.info("启动监听：加载令牌秘钥到缓存");
+        FileInputStream fileInputStream = new FileInputStream(file);
+        InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
+        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+        StringBuffer sb = new StringBuffer();
+        String text = null;
+        while((text = bufferedReader.readLine()) != null){
+            sb.append(text);
+        }
+    	JwtSecretCache.addCache(sb.toString());
 	}
 }

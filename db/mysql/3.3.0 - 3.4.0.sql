@@ -1,0 +1,1 @@
+ALTER TABLE `exam`.`exm_my_exam` ADD COLUMN `NO` int(11) DEFAULT NULL COMMENT '排序' AFTER `UPDATE_TIME`;
