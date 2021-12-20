@@ -190,7 +190,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		for(int i = 1; i <= 5 ; i++ ){
 			map = new HashMap<>();
 			map.put("name", DictCache.getDictValue("QUESTION_TYPE", i+""));
-			map.put("value", questionStatisMap.get("type"+i));
+			map.put("value", questionStatisMap.get("type"+i) == null ? 0 : questionStatisMap.get("type"+i));
 			list.add(map);
 		}
 		result.put("typeList", list);
@@ -199,7 +199,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		for(int i = 1; i <= 5 ; i++ ){
 			map = new HashMap<>();
 			map.put("name", DictCache.getDictValue("QUESTION_DIFFICULTY", i+""));
-			map.put("value", questionStatisMap.get("difficulty"+i));
+			map.put("value", questionStatisMap.get("difficulty"+i) == null ? 0 : questionStatisMap.get("difficulty"+i));
 			list.add(map);
 		}
 		result.put("difficultyList", list);
@@ -238,9 +238,9 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		map.put("endTime", examMap.get("examEndTime"));
 		map.put("markStartTime", examMap.get("examMarkStartTime"));
 		map.put("markEndTime", examMap.get("examMarkEndTime"));
-		map.put("userNum", examMap.get("examUserNum"));
-		map.put("missUserNum", examMap.get("missUserNum"));
-		map.put("succUserNum", examMap.get("succUserNum"));
+		map.put("userNum", examMap.get("examUserNum") == null ? 0 : examMap.get("examUserNum"));
+		map.put("missUserNum", examMap.get("missUserNum") == null ? 0 : examMap.get("missUserNum"));
+		map.put("succUserNum", examMap.get("succUserNum") == null ? 0 : examMap.get("succUserNum"));
 		result.put("exam", map);
 		map.put("total", examMap.get("total"));
 		map.put("avg", examMap.get("avg"));
@@ -254,7 +254,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		for(int i = 1; i <= 5 ; i++ ){
 			map = new HashMap<>();
 			map.put("name", DictCache.getDictValue("QUESTION_TYPE", i+""));
-			map.put("value", examStatisType.get(0).get("type"+i));
+			map.put("value", examStatisType.get(0).get("type"+i) == null ? 0 :  examStatisType.get(0).get("type"+i));
 			list.add(map);
 		}
 		result.put("typeList", list);

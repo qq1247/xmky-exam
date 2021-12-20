@@ -221,7 +221,7 @@ public class ApiReportController extends BaseController{
      * @param id
      * @return PageResult
      */
-    @RequestMapping("/count")
+/*    @RequestMapping("/count")
     @ResponseBody
     public PageResult count(Integer examId) {
         try {
@@ -233,5 +233,5 @@ public class ApiReportController extends BaseController{
             log.error("分数统计错误：", e);
             return PageResult.err();
         }
-    }
+    }*/
 }
