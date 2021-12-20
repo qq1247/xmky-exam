@@ -1,6 +1,8 @@
 package com.wcpdoc.exam.core.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -205,7 +207,14 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 
 	@Override
 	public void rank(Integer examId) {
-		List<MyExam> rankList = myExamDao.rankList(examId);
+		List<MyExam> rankList = myExamDao.getList(examId);
+		Collections.sort(rankList, new Comparator<MyExam>() {
+			@Override
+			public int compare(MyExam o1, MyExam o2) {
+				return o2.getTotalScore().compareTo(o1.getTotalScore());
+			}
+		});
+		
 		for (int i = 1; i <= rankList.size(); i++) {
 			MyExam myExam = rankList.get(i-1);
 			myExam.setNo(i);
