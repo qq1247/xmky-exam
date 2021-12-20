@@ -523,7 +523,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 	
 	@Override
-	public void scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores) {
+	public void scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores, Integer[] scoreOptions) {
 		//校验数据有效性
 		if(!ValidateUtil.isValid(id)) {
 			throw new MyException("参数错误：id");
@@ -578,6 +578,27 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		
 		// 设置分数
 		PaperQuestion pq = paperQuestionService.getEntity(id, questionId);
+		
+		// 设置分数选项
+		String scoreOptionStr = scoreOptions == null ? "" : StringUtil.join(scoreOptions);
+		if (question.getType() == 2) {// 分数选项：1：漏选得分；2：答案无顺序；3：大小写不敏感；
+			if (scoreOptionStr.contains("1")) {
+				pq.setScoreOptions("1");
+			}
+		} else if (question.getType() == 3) {
+			if (scoreOptionStr.contains("2") && scoreOptionStr.contains("3")) {
+				pq.setScoreOptions("2,3");
+			} else if (scoreOptionStr.contains("2")) {
+				pq.setScoreOptions("2");
+			} else if (scoreOptionStr.contains("3")) {
+				pq.setScoreOptions("3");
+			}  
+		} else if (question.getType() == 5 && question.getAi() == 1) {
+			if (scoreOptionStr.contains("3")) {
+				pq.setScoreOptions("3");
+			}
+		}
+		
 		pq.setScore(score);
 		paperQuestionService.update(pq);
 		
@@ -635,7 +656,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			} else if (scoreOptionStr.contains("3")) {
 				pq.setScoreOptions("3");
 			}  
-		} else if (question.getType() == 5) {
+		} else if (question.getType() == 5 && question.getAi() == 1) {
 			if (scoreOptionStr.contains("3")) {
 				pq.setScoreOptions("3");
 			}
