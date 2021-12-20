@@ -497,6 +497,7 @@ http请求头需添加Authorization字段，
 | questionId| Integer  | 试题ID       | 是   |
 | score | Double  | 分数 | 是 |
 | subScores| Double  | 每空分数（试题为智能阅卷，并且是填空或问答时有效） | 是   |
+| scoreOptions    | Integer[] | 分数选项     | 否  |
 
 ### 试卷设置分数选项：paper/scoreOptionUpdate
 | 请求参数| 类型      | 描述       | 必填 |
