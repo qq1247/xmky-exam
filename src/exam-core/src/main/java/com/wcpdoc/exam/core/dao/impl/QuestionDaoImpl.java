@@ -68,7 +68,7 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 
 	@Override
 	public void updateQuestionType(Integer sourceId, Integer targetId) {
-		String sql = "UPDATE EXM_QUESTION SET QUESTION_TYPE_ID = ? WHER QUESTION_TYPE_ID = ?";
+		String sql = "UPDATE EXM_QUESTION SET QUESTION_TYPE_ID = ? WHERE QUESTION_TYPE_ID = ?";
 		update(sql, new Object[]{targetId, sourceId});
 	}
 
