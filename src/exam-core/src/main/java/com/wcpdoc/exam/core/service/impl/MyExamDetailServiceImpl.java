@@ -3,6 +3,8 @@ package com.wcpdoc.exam.core.service.impl;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -278,8 +280,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		
 		log.info("完成阅卷开始：{}", exam.getName());
 		// 获取所有考试用户
-		List<MyExam> list = myExamService.getList(examId);
-		for(MyExam myExam : list){
+		List<MyExam> myExamList = myExamService.getList(examId);
+		for(MyExam myExam : myExamList){
 			if (myExam.getMarkState() == 3) {//已阅卷的不处理（没考试的人考试时间结束已自动阅卷；人工阅卷在阅卷时间结束之前已经（部分）阅完）
 				continue;
 			}
@@ -312,10 +314,26 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			}
 			myExam.setMarkState(3);
 			myExam.setMarkEndTime(new Date());
-			myExamService.update(myExam);
 		}
 		
-		// 完成阅卷
+		//排名
+		Collections.sort(myExamList, new Comparator<MyExam>() {
+			@Override
+			public int compare(MyExam o1, MyExam o2) {
+				if (o2.getTotalScore().compareTo(o1.getTotalScore()) == 0) {
+					return Integer.parseInt(String.valueOf(o1.getAnswerEndTime().getTime() - o2.getAnswerEndTime().getTime())); 
+				}
+				
+				return o2.getTotalScore().compareTo(o1.getTotalScore());
+			}
+		});
+		
+		for (int i = 0; i < myExamList.size(); i++) {
+			myExamList.get(i).setNo(i + 1);
+			myExamService.update(myExamList.get(i));
+		}
+		
+//		 完成阅卷
 //		if (exam.getMarkStartTime() == null) {			
 //			exam.setMarkStartTime(new Date());
 //		}
