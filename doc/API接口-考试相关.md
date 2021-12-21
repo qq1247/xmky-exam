@@ -571,6 +571,26 @@ http请求头需添加Authorization字段，
 | ---- | ------- | ---- | ---- |
 | id   | Integer | 主键 | 是   |
 
+### 考试添加：exam/get
+| 请求参数| 类型        | 描述   |
+| ------------- | ----------- | ------|
+| id          | Integer | 主键  |
+
+| 响应参数| 类型    | 描述     |
+| ---------------- | ------- | ------- |
+| code             | Integer | 响应码   |
+| msg              | String  | 响应消息 |
+| data.total       | Integer | 总行数   |
+| data.name          | String (16) | 名称  |
+| data.startTime     | Date        | 考试开始时间 |
+| data.endTime       | Date        | 考试结束时间  |
+| data.markStartTime | Date        | 阅卷开始时间 |
+| data.markEndTime   | Date        | 阅卷结束时间 |
+| data.paperId       | Integer     | 试卷ID  |
+| data.paperName       | Integer     | 试卷名称  |
+| data.examTypeId    | Integer     | 考试分类ID |
+| data.examTypeId    | Integer     | 考试分类名称 |
+
 ### 考试发布：exam/publish
 | 请求参数| 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |

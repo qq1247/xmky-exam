@@ -149,6 +149,28 @@ public class ApiExamController extends BaseController {
 	}
 	
 	/**
+	 * 获取考试
+	 * 
+	 * v1.0 zhanghc 2017-06-11 09:13:23
+	 * 
+	 * @return pageOut
+	 */
+	@RequestMapping("/get")
+	@ResponseBody
+	public PageResult get(Integer id) {
+		try {
+			examService.delAndUpdate(id);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("删除考试错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("删除考试错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
 	 * 发布
 	 * 
 	 * v1.0 zhanghc 2018年11月24日上午9:13:22
