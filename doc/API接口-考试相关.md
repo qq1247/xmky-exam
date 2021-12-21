@@ -254,7 +254,7 @@ http请求头需添加Authorization字段，
 | data.list[].questionTypeId   | Integer | 试题分类ID   |
 | data.list[].questionTypeName | Integer | 试题分类名称 |
 | data.list[].score            | Double  | 分值         |
-| data.list[].scoreOptions     | String[]  | 分值选项     |
+| data.list[].scoreOptions     | Integer[]  | 分值选项     |
 | data.list[].scoreOptionNames     | String[]  | 分值选项名称   |
 
 ### 试题添加：question/add
@@ -467,7 +467,7 @@ http请求头需添加Authorization字段，
 |data.list[].questionList[].ai  | Integer  | 是否智能阅卷|
 |data.list[].questionList[].analysis  | String  | 试题解析 |
 |data.list[].questionList[].score  | Double  | 试题分数 |
-|data.list[].questionList[].scoreOptions  | String  | 试题分数选项，参考question/add |
+|data.list[].questionList[].scoreOptions  | Integer[]  | 试题分数选项，参考question/add |
 |data.list[].questionList[].options[]  | String[]  | 试题选项，参考question/add |
 |data.list[].questionList[].answers[]  | Object[]  | 试题答案，参考question/add |
 |data.list[].questionList[].answers[].score  | Double  | 试题分数，参考question/add |
