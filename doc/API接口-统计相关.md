@@ -95,12 +95,12 @@ http请求头需添加Authorization字段，
 | data.list[].myExamState        | Integer | 考试状态  |
 | data.list[].myExamMarkState        | Integer | 阅卷状态  |
 | data.list[].paperTotalScore        | Double | 试卷总分数 |
-| data.list[].paperPassScore        | Double | 试卷及格比例  |
+| data.list[].paperPassScore        | Double | 试卷及格分数  |
 | data.list[].myExamScore        | Double | 我的考试分数  |
-| data.list[].myExamStartTime        | Date | 考试开始时间  |
-| data.list[].myExamEndTime       | Date | 考试结束时间  |
-| data.list[].myExamMarkStartTime        | Date | 阅卷开始时间  |
-| data.list[].myExamMarkEndTime       | Date | 阅卷结束时间  |
+| data.list[].myExamStartTime        | Date | 我的考试开始时间  |
+| data.list[].myExamEndTime       | Date | 我的考试结束时间  |
+| data.list[].myExamMarkStartTime        | Date | 我的阅卷开始时间  |
+| data.list[].myExamMarkEndTime       | Date | 我的阅卷结束时间  |
 | data.list[].myMarkUserId        | Integer | 阅卷用户Id  |
 | data.list[].myMarkUserName       | String | 阅卷用户名称 |
 

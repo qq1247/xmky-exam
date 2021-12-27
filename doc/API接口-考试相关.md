@@ -254,7 +254,7 @@ http请求头需添加Authorization字段，
 | data.list[].questionTypeId   | Integer | 试题分类ID   |
 | data.list[].questionTypeName | Integer | 试题分类名称 |
 | data.list[].score            | Double  | 分值         |
-| data.list[].scoreOptions     | Integer[]  | 分值选项     |
+| data.list[].scoreOptions     | String[]  | 分值选项     |
 | data.list[].scoreOptionNames     | String[]  | 分值选项名称   |
 
 ### 试题添加：question/add
@@ -467,7 +467,7 @@ http请求头需添加Authorization字段，
 |data.list[].questionList[].ai  | Integer  | 是否智能阅卷|
 |data.list[].questionList[].analysis  | String  | 试题解析 |
 |data.list[].questionList[].score  | Double  | 试题分数 |
-|data.list[].questionList[].scoreOptions  | Integer[]  | 试题分数选项，参考question/add |
+|data.list[].questionList[].scoreOptions  | String  | 试题分数选项，参考question/add |
 |data.list[].questionList[].options[]  | String[]  | 试题选项，参考question/add |
 |data.list[].questionList[].answers[]  | Object[]  | 试题答案，参考question/add |
 |data.list[].questionList[].answers[].score  | Double  | 试题分数，参考question/add |
@@ -576,20 +576,21 @@ http请求头需添加Authorization字段，
 | ------------- | ----------- | ------|
 | id          | Integer | 主键  |
 
-| 响应参数| 类型    | 描述     |
-| ---------------- | ------- | ------- |
-| code             | Integer | 响应码   |
-| msg              | String  | 响应消息 |
-| data.total       | Integer | 总行数   |
-| data.name          | String (16) | 名称  |
+| 响应参数  | 类型    | 描述     |
+| --------| ------- | ------- |
+| code     | Integer | 响应码   |
+| msg     | String  | 响应消息 |
+| data.id  | Integer | 主键  |
+| data.name          | String | 名称  |
 | data.startTime     | Date        | 考试开始时间 |
 | data.endTime       | Date        | 考试结束时间  |
 | data.markStartTime | Date        | 阅卷开始时间 |
 | data.markEndTime   | Date        | 阅卷结束时间 |
 | data.paperId       | Integer     | 试卷ID  |
-| data.paperName       | Integer     | 试卷名称  |
+| data.paperName       | String     | 试卷名称  |
 | data.examTypeId    | Integer     | 考试分类ID |
-| data.examTypeId    | Integer     | 考试分类名称 |
+| data.examTypeName    | String     | 考试分类名称 |
+| data.paperMarkType    | Integer     | 试卷阅卷类型 |
 
 ### 考试发布：exam/publish
 | 请求参数| 类型    | 描述 | 必填 |
