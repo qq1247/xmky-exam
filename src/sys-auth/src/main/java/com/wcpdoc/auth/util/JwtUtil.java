@@ -16,6 +16,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
 
 /**
  * 令牌工具类
@@ -128,6 +129,9 @@ public class JwtUtil {
 		} catch (ExpiredJwtException e) {
 			log.info("解析令牌错误：{}", "令牌过期");
 			return new JwtResult(HttpStatus.UNAUTHORIZED.value(), "令牌过期", e.getClaims());
+		} catch (SignatureException e) {
+			log.info("解析令牌错误：{}", "签名错误");
+			return new JwtResult(HttpStatus.INTERNAL_SERVER_ERROR.value(), "令牌过期", null);
 		} catch (Exception e) {
 			log.error("解析令牌错误：{}", e.getMessage());
 			return new JwtResult(HttpStatus.INTERNAL_SERVER_ERROR.value(), "未知错误", null);
