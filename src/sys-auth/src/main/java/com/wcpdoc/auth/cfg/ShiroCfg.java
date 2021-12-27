@@ -59,17 +59,20 @@ public class ShiroCfg {
 		filterChainMap.put("/api/bulletin/listpage", "jwt,anyRolesEx[admin,subAdmin,user]");
 		filterChainMap.put("/api/paper/get", "jwt,anyRolesEx[subAdmin,user]");
 		filterChainMap.put("/api/paper/paperQuestionList", "jwt,anyRolesEx[subAdmin,user]");
-
+		filterChainMap.put("/api/report/home/user", "jwt,anyRolesEx[user]");
+		
 		//管理员请求
+		filterChainMap.put("/api/report/home/admin", "jwt,anyRolesEx[admin]");
+		filterChainMap.put("/api/report/server/**", "jwt,anyRolesEx[admin]");
 		filterChainMap.put("/api/dict/**", "jwt,anyRolesEx[admin]");
 		filterChainMap.put("/api/cron/**", "jwt,anyRolesEx[admin]");
 		filterChainMap.put("/api/parm/**", "jwt,anyRolesEx[admin]");
 		filterChainMap.put("/api/org/**", "jwt,anyRolesEx[admin]");
 		filterChainMap.put("/api/user/**", "jwt,anyRolesEx[admin]");
 		filterChainMap.put("/api/sensitive/**", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/bulletin/**", "jwt,anyRolesEx[admin]");
 		
 		//子管理请求
+		filterChainMap.put("/api/report/**", "jwt,anyRolesEx[subAdmin]");
 		filterChainMap.put("/api/exam/**", "jwt,anyRolesEx[subAdmin]");
 		filterChainMap.put("/api/examType/**", "jwt,anyRolesEx[subAdmin]");
 		filterChainMap.put("/api/paper/**", "jwt,anyRolesEx[subAdmin]");

@@ -169,19 +169,27 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			questionAnswerService.add(questionAnswer);
 			total = answerScores[0];
 		} else if (question.getType() == 2) {
+			total = question.getScore();
+			QuestionAnswer questionAnswer = new QuestionAnswer();
+			String answerString = "";
 			for(int i = 0; i < answers.length; i++ ){
-				QuestionAnswer questionAnswer = new QuestionAnswer();
-				questionAnswer.setAnswer(answers[i].toUpperCase());
+				if (answerString == "") {
+					answerString = answers[i].toUpperCase();
+				}else{
+					answerString = answerString + "," + answers[i].toUpperCase();
+				}
+				
 				if (question.getAi() == 1 && answerScores != null) {
 					questionAnswer.setScore(answerScores[0]);
 				}else{
 					questionAnswer.setScore(new BigDecimal(0));
 				}
-				questionAnswer.setQuestionId(question.getId());
-				questionAnswer.setNo(i+1);
-				questionAnswerService.add(questionAnswer);
-				total = question.getScore();
 			}
+			
+			questionAnswer.setAnswer(answerString);
+			questionAnswer.setQuestionId(question.getId());
+			questionAnswer.setNo(1);
+			questionAnswerService.add(questionAnswer);
 		} else if (question.getType() == 3 || question.getType() == 5) {
 			for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();
@@ -371,7 +379,28 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			questionAnswerService.add(questionAnswer);
 			total = answerScores[0];
 		} else if (question.getType() == 2) {
+			total = question.getScore();
+			QuestionAnswer questionAnswer = new QuestionAnswer();
+			String answerString = "";
 			for(int i = 0; i < answers.length; i++ ){
+				if (answerString == "") {
+					answerString = answers[i].toUpperCase();
+				}else{
+					answerString = answerString + "," + answers[i].toUpperCase();
+				}
+				
+				if (question.getAi() == 1 && answerScores != null) {
+					questionAnswer.setScore(answerScores[0]);
+				}else{
+					questionAnswer.setScore(new BigDecimal(0));
+				}
+			}
+			
+			questionAnswer.setAnswer(answerString);
+			questionAnswer.setQuestionId(question.getId());
+			questionAnswer.setNo(1);
+			questionAnswerService.add(questionAnswer);
+			/*for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();
 				questionAnswer.setAnswer(answers[i]);
 				if (question.getAi() == 1 && answerScores != null) {
@@ -383,7 +412,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				questionAnswer.setNo(i+1);
 				questionAnswerService.add(questionAnswer);
 				total = question.getScore();
-			}
+			}*/
 		} else if (question.getType() == 3 || question.getType() == 5) {
 			for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();

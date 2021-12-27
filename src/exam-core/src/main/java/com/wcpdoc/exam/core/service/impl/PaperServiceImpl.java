@@ -857,7 +857,19 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 				questionMap.put("ai", question.getAi());
 				questionMap.put("analysis", question.getAnalysis());
 				questionMap.put("score", paperQuestion.getScore());// 分数从试卷中取
-				questionMap.put("scoreOptions", paperQuestion.getScoreOptions());// 分数选项从试卷中取
+				
+				Integer[] scoreOptions = null;//new Integer[split.length];
+				if (ValidateUtil.isValid(paperQuestion.getScoreOptions())) {
+					String[] split = paperQuestion.getScoreOptions().split(",");
+					scoreOptions = new Integer[split.length];
+					for(int i = 0; i < split.length; i++ ){
+						scoreOptions[i] = Integer.parseInt(split[i]);
+					}
+				} else {
+					scoreOptions = new Integer[0];
+				}
+				
+				questionMap.put("scoreOptions", scoreOptions);// 分数选项从试卷中取
 				questionMap.put("options", new String[0]);// 默认为长度为0的数组
 				if (question.getType() == 1 || question.getType() == 2) {// 如果是单选或多选，添加选项
 					List<QuestionOption> questionOptionList = questionOptionService
