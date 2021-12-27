@@ -16,16 +16,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
 import com.wcpdoc.base.cache.DictCache;
+import com.wcpdoc.base.entity.Dict;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
+import com.wcpdoc.core.util.BigDecimalUtil;
 import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Exam;
+import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.Paper;
+import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.service.ExamService;
+import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 import com.wcpdoc.exam.report.dao.ReportDao;
@@ -56,6 +61,8 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 	private ExamService examService;
 	@Resource
 	private PaperService paperService;
+	@Resource
+	private MyExamService myExamService;
 	
 	@Override
 	public void setDao(BaseDao<Object> dao) {}
@@ -223,44 +230,116 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		if (!ValidateUtil.isValid(examId)) {
 			throw new MyException("参数错误：examId");
 		}
-		Exam entity = examService.getEntity(examId);
-		if (entity.getMarkEndTime().getTime() >= System.currentTimeMillis()) {
+		Exam exam = examService.getEntity(examId);
+		if (exam.getEndTime().getTime() >= System.currentTimeMillis()) {
+			throw new MyException("考试时间未结束！");
+		}
+		if (exam.getMarkEndTime() != null && exam.getMarkEndTime().getTime() >= System.currentTimeMillis()) {
 			throw new MyException("阅卷时间未结束！");
 		}
 		
-		Map<String, Object> result = new HashMap<String, Object>();
-		
-		List<Map<String, Object>> examStatis = reportDao.examStatis(examId);
-		Map<String, Object> examMap = examStatis.get(0);
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("name", examMap.get("examName"));
-		map.put("startTime", examMap.get("examStartTime"));
-		map.put("endTime", examMap.get("examEndTime"));
-		map.put("markStartTime", examMap.get("examMarkStartTime"));
-		map.put("markEndTime", examMap.get("examMarkEndTime"));
-		map.put("userNum", examMap.get("examUserNum") == null ? 0 : examMap.get("examUserNum"));
-		map.put("missUserNum", examMap.get("missUserNum") == null ? 0 : examMap.get("missUserNum"));
-		map.put("succUserNum", examMap.get("succUserNum") == null ? 0 : examMap.get("succUserNum"));
-		result.put("exam", map);
-		map.put("total", examMap.get("total"));
-		map.put("avg", examMap.get("avg"));
-		map.put("min", examMap.get("min"));
-		map.put("max", examMap.get("max"));
-		map.put("sd", examMap.get("sd")); //标准差
-		result.put("score", map);
-		
-		List<Map<String, Object>> examStatisType = reportDao.examStatisType(entity.getPaperId()); //类型列表
-		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-		for(int i = 1; i <= 5 ; i++ ){
-			map = new HashMap<>();
-			map.put("name", DictCache.getDictValue("QUESTION_TYPE", i+""));
-			map.put("value", examStatisType.get(0).get("type"+i) == null ? 0 :  examStatisType.get(0).get("type"+i));
-			list.add(map);
+		// 获取考试、试卷、人员成绩信息
+		Paper paper = paperService.getEntity(exam.getPaperId());
+		List<MyExam> myExamList = myExamService.getList(examId);
+		List<Question> questionList = paperService.getQuestionList(exam.getPaperId());
+		Map<Integer, Question> questionCache = new HashMap<>();
+		for (Question question : questionList) {
+			questionCache.put(question.getId(), question);
 		}
-		result.put("typeList", list);
 		
-		list = new ArrayList<Map<String, Object>>();
-		result.put("scoreGradeList", list);
+		// 统计考试基础信息
+		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> examResult = new HashMap<String, Object>();
+		examResult.put("name", exam.getName());// 考试名称
+		examResult.put("startTime", DateUtil.formatDateTime(exam.getStartTime()));// 考试开始时间
+		examResult.put("endTime", DateUtil.formatDateTime(exam.getEndTime()));// 考试结束时间
+		examResult.put("markStartTime", exam.getMarkStartTime() == null ? null : DateUtil.formatDateTime(exam.getMarkStartTime()));// 阅卷开始时间
+		examResult.put("markEndTime", exam.getMarkEndTime() == null ? null : DateUtil.formatDateTime(exam.getMarkEndTime()));// 阅卷结束时间
+		examResult.put("userNum", myExamList.size());// 考试人数
+		examResult.put("missUserNum", 0);// 未考试人数
+		examResult.put("succUserNum", 0);// 及格人数
+		for (MyExam myExam : myExamList) {
+			if (myExam.getState() == 1) {
+				examResult.put("missUserNum", (Integer)examResult.get("missUserNum") + 1);
+			}
+			if (myExam.getAnswerState() == 1) {
+				examResult.put("succUserNum", (Integer)examResult.get("succUserNum") + 1);
+			}
+		}
+		result.put("exam", examResult);// 考试基础信息
+		
+		// 统计考试合计信息
+		Map<String, Object> scoreResult = new HashMap<String, Object>();
+		scoreResult.put("total", paper.getTotalScore());// 考试总分
+		scoreResult.put("avg", 0.0);// 平均分
+		scoreResult.put("min", 0.0);// 最低分
+		scoreResult.put("max", 0.0);// 最高分
+		
+		for (MyExam myExam : myExamList) {
+			if (myExam.getState() == 1) {// 排除掉未考试的
+				continue;
+			}
+			
+			scoreResult.put("min", Math.min(myExam.getTotalScore().doubleValue(), (double)scoreResult.get("min")));
+			scoreResult.put("max", Math.max(myExam.getTotalScore().doubleValue(), (double)scoreResult.get("max")));
+			scoreResult.put("avg", BigDecimalUtil.newInstance(scoreResult.get("avg")).add(myExam.getTotalScore()).getResult().doubleValue());
+		}
+		
+		if (myExamList.size() != 0) {// 被除数不能为0
+			scoreResult.put("avg", BigDecimalUtil.newInstance(scoreResult.get("avg")).div(myExamList.size(), 2).getResult().doubleValue());
+		}
+		result.put("score", scoreResult);
+		
+		// 统计试题类型占比
+		List<Dict> dictList = DictCache.getDictList("QUESTION_TYPE");
+		List<Map<String, Object>> typeResultList = new ArrayList<Map<String, Object>>();
+		Map<String, Map<String, Object>> typeCache = new HashMap<>();
+		for (Dict dict : dictList) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("key", dict.getDictKey());// 试题类型关键词
+			map.put("name", dict.getDictValue());// 试题类型名称
+			map.put("value", 0);// 试题类型总数
+			
+			typeCache.put(dict.getDictKey(), map);
+			typeResultList.add(map);
+		}
+		
+		for (Question question : questionList) {
+			Map<String, Object> map = typeCache.get(question.getType().toString());
+			map.put("value", (int)map.get("value") + 1);// 按分类累加
+		}
+		
+		for (Map<String, Object> typeResult : typeResultList) {
+			typeResult.remove("key");// 接口没有这个字段，移除掉
+		}
+		
+		// 统计分数段占比
+		double scoreGrade = BigDecimalUtil.newInstance(paper.getTotalScore()).div(10, 3).getResult().doubleValue();// 分数保留两位小数，十等分后需要保留3位小数
+		List<Map<String, Object>> scoreGradeResultList = new ArrayList<Map<String, Object>>();
+		for (int i = 0; i < 10; i++) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("startScore", BigDecimalUtil.newInstance(scoreGrade).mul(i).getResult().doubleValue());// 分数段最小值
+			map.put("endScore", BigDecimalUtil.newInstance(scoreGrade).mul(i + 1).getResult().doubleValue());// 分数段最大值
+			map.put("name", String.format("%s-%s", map.get("startScore"), map.get("endScore")));// 初始化名称
+			map.put("value", 0);// 初始化值为0
+			
+			scoreGradeResultList.add(map);
+		}
+		for (MyExam myExam : myExamList) {
+			for (Map<String, Object> map : scoreGradeResultList) {
+				double startScore = (double) map.get("startScore");
+				double endScore = (double) map.get("endScore");
+				if (myExam.getTotalScore().doubleValue() >= startScore && myExam.getTotalScore().doubleValue() < endScore) {// 不包括最大边界值，如60不属于50分数段
+					map.put("value", (int)map.get("value") + 1);
+				}
+			}
+		}
+		for (Map<String, Object> map : scoreGradeResultList) {
+			map.remove("startScore");// 移除非接口字段
+			map.remove("endScore");// 移除非接口字段
+		}
+		
+		result.put("scoreGradeList", scoreGradeResultList);
 		return result;
 	}
 	
@@ -272,17 +351,17 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 			throw new MyException("参数错误：examId");
 		}
 		Exam exam = examService.getEntity(examId);
-		if (exam.getMarkEndTime().getTime() >= System.currentTimeMillis()) {
+		if (exam.getMarkEndTime() != null && exam.getMarkEndTime().getTime() >= System.currentTimeMillis()) {
 			throw new MyException("阅卷时间未结束！");
 		}
 		
 		Paper paper = paperService.getEntity(exam.getPaperId());
 		List<Map<String, Object>> myExamListpage = reportDao.myExamListpage(examId);
 		for(Map<String, Object> map : myExamListpage){
-			map.put("myExamStartTime", map.get("myExamStartTime") == null ? "" : DateUtil.formatDateTime(DateUtil.getDateTime(map.get("myExamStartTime").toString())));
-			map.put("myExamEndTime", map.get("myExamEndTime") == null ? "" : DateUtil.formatDateTime(DateUtil.getDateTime(map.get("myExamEndTime").toString())));
-			map.put("myExamMarkStartTime", map.get("myExamMarkStartTime") == null ? "" : DateUtil.formatDateTime(DateUtil.getDateTime(map.get("myExamMarkStartTime").toString())));
-			map.put("myExamMarkEndTime", map.get("myExamMarkEndTime") == null ? "" : DateUtil.formatDateTime(DateUtil.getDateTime(map.get("myExamMarkEndTime").toString())));
+			map.put("myExamStartTime", map.get("myExamStartTime") == null ? null : DateUtil.formatDateTime(DateUtil.getDateTime(map.get("myExamStartTime").toString())));
+			map.put("myExamEndTime", map.get("myExamEndTime") == null ? null : DateUtil.formatDateTime(DateUtil.getDateTime(map.get("myExamEndTime").toString())));
+			map.put("myExamMarkStartTime", map.get("myExamMarkStartTime") == null ? null : DateUtil.formatDateTime(DateUtil.getDateTime(map.get("myExamMarkStartTime").toString())));
+			map.put("myExamMarkEndTime", map.get("myExamMarkEndTime") == null ? null : DateUtil.formatDateTime(DateUtil.getDateTime(map.get("myExamMarkEndTime").toString())));
 			
 			map.put("paperTotalScore", paper.getTotalScore());
 			map.put("paperPassScore", paper.getPassScore());
@@ -297,11 +376,12 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 			throw new MyException("参数错误：examId");
 		}
 		Exam exam = examService.getEntity(examId);
-		if (exam.getMarkEndTime().getTime() >= System.currentTimeMillis()) {
+		if (exam.getMarkEndTime() != null && exam.getMarkEndTime().getTime() >= System.currentTimeMillis()) {
 			throw new MyException("阅卷时间未结束！");
 		}
 		
-		return reportDao.questionListpage(exam.getId());
+		List<Map<String, Object>> resultList = reportDao.questionListpage(exam.getId());
+		return resultList;
 	}
 	
 	@Override
