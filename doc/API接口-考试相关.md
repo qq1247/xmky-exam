@@ -245,17 +245,14 @@ http请求头需添加Authorization字段，
 | data.list[]                  | Object[]   | 分页列表     |
 | data.list[].id               | Integer | 主键         |
 | data.list[].type             | Integer | 类型         |
-| data.list[].typeName         | String  | 类型名称     |
 | data.list[].difficulty       | Integer | 难度         |
-| data.list[].difficultyName   | String  | 难度名称     |
 | data.list[].title            | String  | 题干         |
+| data.list[].options            | String[]  | 选项（type=1,2时有效）         |
 | data.list[].state            | Integer | 状态         |
-| data.list[].stateName            | Integer | 状态名称         |
 | data.list[].questionTypeId   | Integer | 试题分类ID   |
 | data.list[].questionTypeName | Integer | 试题分类名称 |
 | data.list[].score            | Double  | 分值         |
-| data.list[].scoreOptions     | String[]  | 分值选项     |
-| data.list[].scoreOptionNames     | String[]  | 分值选项名称   |
+| data.list[].scoreOptions     | Integer[]  | 分值选项     |
 
 ### 试题添加：question/add
 | 请求参数| 类型  | 描述    | 必填 |
