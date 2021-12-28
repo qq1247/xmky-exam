@@ -41,9 +41,11 @@ public interface QuestionService extends BaseService<Question>{
 	 * 删除试题
 	 * 
 	 * v1.0 chenyun 2021年8月25日下午5:28:51
-	 * @param id void
+	 * @param questionTypeId 
+	 * @param ids 
+	 * void
 	 */
-	void delAndUpdate(Integer id);
+	void delAndUpdate(Integer questionTypeId, Integer[] ids);
 	
 	/**
 	 * 完成导入试题

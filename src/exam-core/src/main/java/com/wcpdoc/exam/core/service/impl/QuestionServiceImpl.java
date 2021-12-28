@@ -6,8 +6,10 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -451,17 +453,51 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void delAndUpdate(Integer id) {
-		Question question = questionDao.getEntity(id);
-		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-		if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
-			throw new MyException("无操作权限");
+	public void delAndUpdate(Integer questionTypeId, Integer[] ids) {
+		// 校验数据有效性
+		if (!ValidateUtil.isValid(questionTypeId) && !ValidateUtil.isValid(ids)) {// 不能同时无效
+			throw new MyException("参数错误：questionTypeId");
+		}
+		if (ValidateUtil.isValid(questionTypeId) && ValidateUtil.isValid(ids)) {// 不能同时有效
+			throw new MyException("参数错误：questionTypeId");
+		}
+		List<Question> questionList = new ArrayList<>();
+		if (ValidateUtil.isValid(questionTypeId)) {// 如果是按类型删除
+			QuestionType questionType = questionTypeService.getEntity(questionTypeId);
+			if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
+				throw new MyException("无操作权限");
+			}
+			questionList = questionDao.getList(questionTypeId);
 		}
 		
-		question.setState(0);
-		question.setUpdateTime(new Date());
-		question.setUpdateUserId(getCurUser().getId());
-		questionDao.update(question);
+		if (ValidateUtil.isValid(ids)) {// 如果是按ID删除
+			Map<Integer, QuestionType> questionTypeCache = new HashMap<>();
+			for (Integer id : ids) {
+				Question question = getEntity(id);
+				if (question.getState() == 0) {
+					throw new MyException(String.format("试题已删除：%s", id));
+				}
+				
+				QuestionType questionType = null;
+				if (questionTypeCache.get(question.getQuestionTypeId()) == null) {
+					questionType = questionTypeService.getEntity(question.getQuestionTypeId());
+					questionTypeCache.put(questionType.getId(), questionType);
+				}
+				
+				if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
+					throw new MyException("无操作权限");
+				}
+				questionList.add(question);
+			}
+		}
+		
+		// 删除试题
+		for (Question question : questionList) {// 逻辑删除
+			question.setState(0);
+			question.setUpdateTime(new Date());
+			question.setUpdateUserId(getCurUser().getId());
+			update(question);
+		}
 	}
 	
 	private void saveFile(Question question) {
@@ -639,7 +675,13 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 		
 		// 移动
-		questionDao.updateQuestionType(sourceId, targetId);
+		List<Question> questionList = questionDao.getList(sourceId);
+		for (Question question : questionList) {
+			question.setQuestionTypeId(targetId);
+			question.setUpdateTime(new Date());
+			question.setUpdateUserId(getCurUser().getId());
+			questionDao.update(question);
+		}
 	}
 
 	@Override
@@ -679,39 +721,52 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 
 	@Override
 	public void publish(Integer questionTypeId, Integer[] ids) throws Exception {
-		if (questionTypeId == null && ids == null ) {
-			throw new MyException("questionType或者ids参数错误");
+		// 校验数据有效性
+		if (!ValidateUtil.isValid(questionTypeId) && !ValidateUtil.isValid(ids)) {// 不能同时无效
+			throw new MyException("参数错误：questionTypeId");
 		}
-		QuestionType questionType;
-		if (questionTypeId != null) {
-			questionType = questionTypeService.getEntity(questionTypeId);
+		if (ValidateUtil.isValid(questionTypeId) && ValidateUtil.isValid(ids)) {// 不能同时有效
+			throw new MyException("参数错误：questionTypeId");
+		}
+		List<Question> questionList = new ArrayList<>();
+		if (ValidateUtil.isValid(questionTypeId)) {// 如果是按类型删除
+			QuestionType questionType = questionTypeService.getEntity(questionTypeId);
 			if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
 				throw new MyException("无操作权限");
 			}
-			
-			questionDao.publish(questionTypeId);
-			return;
+			questionList = questionDao.getList(questionTypeId);
 		}
 		
-		for (Integer id : ids) {
-			Question question = questionDao.getEntity(id);
-			if (question.getState() == 0) {
-				throw new MyException("试题已删除");
+		if (ValidateUtil.isValid(ids)) {// 如果是按ID删除
+			Map<Integer, QuestionType> questionTypeCache = new HashMap<>();
+			for (Integer id : ids) {
+				Question question = getEntity(id);
+				if (question.getState() == 0) {
+					throw new MyException(String.format("试题已删除：%s", id));
+				}
+				if (question.getState() == 1) {
+					throw new MyException(String.format("试题已发布：%s", id));
+				}
+				
+				QuestionType questionType = null;
+				if (questionTypeCache.get(question.getQuestionTypeId()) == null) {
+					questionType = questionTypeService.getEntity(question.getQuestionTypeId());
+					questionTypeCache.put(questionType.getId(), questionType);
+				}
+				
+				if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
+					throw new MyException("无操作权限");
+				}
+				questionList.add(question);
 			}
-			if (question.getState() == 1) {
-				throw new MyException("试题已发布");
-			}
-			questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-			if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
-				throw new MyException("无操作权限");
-			}
-			if (question.getState() == 2) {
-				question.setState(1);
-			}
-
+		}
+		
+		// 删除试题
+		for (Question question : questionList) {// 逻辑删除
+			question.setState(1);
 			question.setUpdateTime(new Date());
 			question.setUpdateUserId(getCurUser().getId());
-			questionDao.update(question);
+			update(question);
 		}
 	}
 }
