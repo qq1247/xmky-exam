@@ -4,12 +4,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -206,7 +204,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			}
 		}
 		if (question.getAi() == 1 &&  question.getScore().compareTo(total) != 0) {
-			throw new MyException("答案总分有误！ ");
+			throw new MyException("答案总分有误 ");
 		}
 		
 		// 添加选项
@@ -252,7 +250,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			}
 			int answerIndex = answers[0].getBytes()[0] - 65;
 			if (options.length < answerIndex + 1) {
-				throw new MyException("选项和答案不匹配！");
+				throw new MyException("选项和答案不匹配");
 			}
 		}
 		if (question.getType() == 2) {
@@ -268,7 +266,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				}
 				int answerIndex = answers[i].getBytes()[0] - 65;
 				if (options.length < answerIndex + 1) {
-					throw new MyException("选项和答案不匹配！");
+					throw new MyException("选项和答案不匹配");
 				}
 			}
 		}
@@ -280,7 +278,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				count++;
 			}
 			if (count != answers.length) {
-				throw new MyException("填空和答案数量不匹配！");
+				throw new MyException("填空和答案数量不匹配");
 			}
 		}
 		if (question.getType() == 4) {
@@ -296,10 +294,10 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		// 如果有新版本标识，删除旧版本，生成新版本		
 		Question entity = getEntity(question.getId());
 		if (entity.getState() == 1) {
-			throw new MyException("试题已发布不能修改！");
+			throw new MyException("试题已发布不能修改");
 		}
 		if (entity.getState() == 0) {
-			throw new MyException("试题已删除不能修改！");
+			throw new MyException("试题已删除不能修改");
 		}
 		
 		QuestionType questionType = questionTypeService.getEntity(entity.getQuestionTypeId());
@@ -429,7 +427,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			}
 		} 
 		if (question.getAi() == 1 && question.getScore().compareTo(total) != 0) {
-			throw new MyException("答案总分有误！ ");
+			throw new MyException("答案总分有误 ");
 		}
 		
 		// 修改选项
@@ -555,7 +553,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		try (InputStream inputStream = new FileInputStream(fileEx.getFile())) {
 			questionExList = wordServer.handle(inputStream, ParmCache.get().getFileUploadDir());  //questionExList = wordServer.handle(inputStream, fileUploadDir);
 		} catch (IOException e) {
-			throw new MyException("读取word时异常！");
+			throw new MyException("读取word时异常");
 		} catch (Exception e) {
 			throw e;
 		}
@@ -645,17 +643,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public List<Map<String, Object>> accuracy(Integer examId) {
-		DecimalFormat df = new DecimalFormat("0.0");
-		List<Map<String, Object>> accuracyList = questionDao.accuracy(examId);
-		for (Map<String, Object> mapList : accuracyList) {
-			mapList.put("questionId", mapList.remove("QUESTION_ID").toString());
-			mapList.put("accuracy", df.format((Double.parseDouble(mapList.remove("CORRECT").toString())/ Double.parseDouble(mapList.get("TOTAL").toString()) * 100)));
-		}
-		return accuracyList;
-	}
-
-	@Override
 	public void copy(Integer id) throws Exception{
 		Question question = questionDao.getEntity(id);
 		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
@@ -693,7 +680,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	@Override
 	public void publish(Integer questionTypeId, Integer[] ids) throws Exception {
 		if (questionTypeId == null && ids == null ) {
-			throw new MyException("questionType或者ids参数错误！");
+			throw new MyException("questionType或者ids参数错误");
 		}
 		QuestionType questionType;
 		if (questionTypeId != null) {
@@ -709,10 +696,10 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		for (Integer id : ids) {
 			Question question = questionDao.getEntity(id);
 			if (question.getState() == 0) {
-				throw new MyException("试题已删除！");
+				throw new MyException("试题已删除");
 			}
 			if (question.getState() == 1) {
-				throw new MyException("试题已发布！");
+				throw new MyException("试题已发布");
 			}
 			questionType = questionTypeService.getEntity(question.getQuestionTypeId());
 			if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {

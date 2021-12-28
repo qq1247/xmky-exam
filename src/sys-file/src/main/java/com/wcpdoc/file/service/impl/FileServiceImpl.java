@@ -109,7 +109,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 			if (!ValidateUtil.isValid(FileIdCache.getFileId(uuId))) {
 				FileIdCache.setFileId(uuId, fileIds.toString());
 			}else{
-				throw new MyException("上传失败！");
+				throw new MyException("上传失败");
 			}
 		}
 		

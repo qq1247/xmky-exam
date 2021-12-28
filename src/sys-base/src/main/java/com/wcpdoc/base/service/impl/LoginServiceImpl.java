@@ -52,7 +52,7 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 		
 		User user = userService.getUser(loginName);
 		if(user == null || !user.getPwd().equals(userService.getEncryptPwd(loginName, pwd))) {
-			throw new LoginException("用户名或密码错误！");
+			throw new LoginException("用户名或密码错误");
 		}
 		
 		// 生成令牌信息（登陆由shiro接收令牌控制）

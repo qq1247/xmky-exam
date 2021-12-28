@@ -67,7 +67,7 @@ public class UserXlsxServiceImpl extends BaseServiceImp<Object> implements UserX
 			try {
 				input = file.getInputStream();
 			} catch (Exception e) {
-				throw new MyException("未找到指定的文件！");
+				throw new MyException("未找到指定的文件");
 			}
 			// Excel2003
 			if (".xls".equals(suffix)) {
@@ -116,21 +116,21 @@ public class UserXlsxServiceImpl extends BaseServiceImp<Object> implements UserX
 				case 0:
 					if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
 						if(!"用户昵称".equals(cell.getStringCellValue())){
-							throw new MyException("模板有误！");
+							throw new MyException("模板有误");
 						}
 					}
 					break;
 				case 1:
 					if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
 						if(!"用户登录名".equals(cell.getStringCellValue())){
-							throw new MyException("模板有误！");
+							throw new MyException("模板有误");
 						}
 					}
 					break;
 				case 2:
 					if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
 						if(!"用户所属机构".equals(cell.getStringCellValue())){
-							throw new MyException("模板有误！");
+							throw new MyException("模板有误");
 						}
 					}
 					break;

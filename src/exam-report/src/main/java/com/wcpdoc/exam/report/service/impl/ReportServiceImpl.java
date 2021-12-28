@@ -131,7 +131,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 	@Override
 	public Map<String, Object> homeAdmin() {
 		if (getCurUser().getId().intValue() != 1) {
-			throw new MyException("登录用户角色错误！");
+			throw new MyException("登录用户角色错误");
 		}
 
 		Map<String, Object> result = new HashMap<String, Object>();
@@ -184,7 +184,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		}
 		QuestionType questionType = questionTypeService.getEntity(questionTypeId);
 		if (questionType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
-			throw new MyException("权限不足！");
+			throw new MyException("权限不足");
 		}
 		
 		Map<String, Object> result = new HashMap<String, Object>();
@@ -232,10 +232,10 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		}
 		Exam exam = examService.getEntity(examId);
 		if (exam.getEndTime().getTime() >= System.currentTimeMillis()) {
-			throw new MyException("考试时间未结束！");
+			throw new MyException("考试时间未结束");
 		}
 		if (exam.getMarkEndTime() != null && exam.getMarkEndTime().getTime() >= System.currentTimeMillis()) {
-			throw new MyException("阅卷时间未结束！");
+			throw new MyException("阅卷时间未结束");
 		}
 		
 		// 获取考试、试卷、人员成绩信息
@@ -352,7 +352,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		}
 		Exam exam = examService.getEntity(examId);
 		if (exam.getMarkEndTime() != null && exam.getMarkEndTime().getTime() >= System.currentTimeMillis()) {
-			throw new MyException("阅卷时间未结束！");
+			throw new MyException("阅卷时间未结束");
 		}
 		
 		Paper paper = paperService.getEntity(exam.getPaperId());
@@ -377,7 +377,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		}
 		Exam exam = examService.getEntity(examId);
 		if (exam.getMarkEndTime() != null && exam.getMarkEndTime().getTime() >= System.currentTimeMillis()) {
-			throw new MyException("阅卷时间未结束！");
+			throw new MyException("阅卷时间未结束");
 		}
 		
 		List<Map<String, Object>> resultList = reportDao.questionListpage(exam.getId());

@@ -127,7 +127,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 			throw new MyException("考试未开始");
 		}
 		if (curTime - exam.getEndTime().getTime() > 1000) {// 预留1秒网络延时
-			throw new MyException("考试已结束！");
+			throw new MyException("考试已结束");
 		}
 
 		// 标记为考试中，记录答题时间
@@ -189,7 +189,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 			throw new MyException("考试未开始");
 		}
 		if (curTime - exam.getEndTime().getTime() > 1000) {// 预留1秒网络延时
-			throw new MyException("考试已结束！");
+			throw new MyException("考试已结束");
 		}
 	
 		// 标记为已交卷，记录最后交卷时间

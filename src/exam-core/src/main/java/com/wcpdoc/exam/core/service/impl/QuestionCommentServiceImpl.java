@@ -75,7 +75,7 @@ public class QuestionCommentServiceImpl extends BaseServiceImp<QuestionComment> 
 		// 校验数据有效性
 		List<Map<String, Object>> list = questionCommentDao.getList(id);
 		if (list.size() > 0) {
-			throw new MyException("请先删除子试题评论！");
+			throw new MyException("请先删除子试题评论");
 		}
 		
 		// 删除试题评论

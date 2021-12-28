@@ -54,7 +54,7 @@ public class QuestionTypeOpenServiceImpl extends BaseServiceImp<QuestionTypeOpen
 		// 校验数据有效性
 		List<QuestionTypeOpen> list = questionTypeOpenDao.getList(questionTypeOpen.getStartTime(), questionTypeOpen.getEndTime(), questionTypeOpen.getQuestionTypeId());
 		if (list.size() != 0) {
-			throw new MyException("该时间段已存在，请重新选择时间段！");
+			throw new MyException("该时间段已存在，请重新选择时间段");
 		}
 		
 		if (ValidateUtil.isValid(questionTypeOpen.getUserIds())) {

@@ -61,7 +61,7 @@ public class OrgXlsxServiceImpl extends BaseServiceImp<Object> implements OrgXls
 			try {
 				input = file.getInputStream();
 			} catch (Exception e) {
-				throw new MyException("未找到指定的文件！");
+				throw new MyException("未找到指定的文件");
 			}
 			// Excel2003
 			if (".xls".equals(suffix)) {
@@ -110,21 +110,21 @@ public class OrgXlsxServiceImpl extends BaseServiceImp<Object> implements OrgXls
 				case 0:
 					if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
 						if(!"组织名称".equals(cell.getStringCellValue())){
-							throw new MyException("模板有误！");
+							throw new MyException("模板有误");
 						}
 					}
 					break;
 				case 1:
 					if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
 						if(!"所属机构".equals(cell.getStringCellValue())){
-							throw new MyException("模板有误！");
+							throw new MyException("模板有误");
 						}
 					}
 					break;
 				case 2:
 					if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
 						if(!"排序".equals(cell.getStringCellValue())){
-							throw new MyException("模板有误！");
+							throw new MyException("模板有误");
 						}
 					}
 					break;
@@ -202,11 +202,11 @@ public class OrgXlsxServiceImpl extends BaseServiceImp<Object> implements OrgXls
 				
 				List<Org> sonOrg = orgService.getList(orgOld.getId());
 				if (sonOrg != null) {
-					throw new MyException("此组织机构下有附属机构不能被移动！");
+					throw new MyException("此组织机构下有附属机构不能被移动");
 				}
 
 				if (orgOld.getParentIds().contains(parentOrg.getParentIds())) {
-					throw new MyException("父组织机构不能移动到子组织机构下！");
+					throw new MyException("父组织机构不能移动到子组织机构下");
 				}
 				
 				orgOld.setParentId(parentOrg.getId());

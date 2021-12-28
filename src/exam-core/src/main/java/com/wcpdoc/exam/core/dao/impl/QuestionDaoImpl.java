@@ -1,8 +1,6 @@
 package com.wcpdoc.exam.core.dao.impl;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -32,7 +30,7 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT QUESTION.ID, QUESTION.TYPE, QUESTION.DIFFICULTY, QUESTION.TITLE, "
-				+ "QUESTION.STATE, QUESTION.QUESTION_TYPE_ID, QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME, "
+				+ "QUESTION.STATE, QUESTION.AI, QUESTION.QUESTION_TYPE_ID, QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME, "
 				+ "QUESTION.SCORE, QUESTION.SCORE_OPTIONS, CREATE_USER.NAME AS CREATE_USER_NAME "
 				+ "FROM EXM_QUESTION QUESTION "
 				+ "LEFT JOIN EXM_QUESTION_TYPE QUESTION_TYPE ON QUESTION.QUESTION_TYPE_ID = QUESTION_TYPE.ID "
@@ -56,12 +54,6 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 				.addOrder(ValidateUtil.isValid(pageIn.get("rand")), "Rand()", Order.NULL);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		return pageOut;
-	}
-
-	@Override
-	public List<Map<String, Object>> accuracy(Integer examId) {
-		String sql = "SELECT COUNT(ID) AS TOTAL, SUM( SCORE = QUESTION_SCORE ) AS CORRECT, QUESTION_ID FROM EXM_MY_EXAM_DETAIL WHERE EXAM_ID = ? GROUP BY QUESTION_ID ";
-		return getMapList(sql, new Object[] { examId });
 	}
 
 	@Override

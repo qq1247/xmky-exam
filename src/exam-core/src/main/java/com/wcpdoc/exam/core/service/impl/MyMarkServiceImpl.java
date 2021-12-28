@@ -165,7 +165,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 			throw new MyException("阅卷未开始");
 		}
 		if (curTime - exam.getMarkEndTime().getTime() > 1000) {// 预留1秒网络延时
-			throw new MyException("阅卷已结束！");
+			throw new MyException("阅卷已结束");
 		}
 		
 		List<MyMark> myMarkList = myMarkDao.getList(examId);
@@ -192,7 +192,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 			}
 		}
 		if (num > 0) {
-			throw new MyException("还有" + num + "道题未阅！");
+			throw new MyException("还有" + num + "道题未阅");
 		}
 		
 		// 标记为已阅，记录阅卷人，统计总分数，标记是否及格

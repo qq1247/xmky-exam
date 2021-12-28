@@ -19,6 +19,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.wcpdoc.base.cache.ProgressBarCache;
+import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.context.UserContext;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.LoginUser;
@@ -59,6 +60,8 @@ public class ApiQuestionController extends BaseController {
 	private QuestionAnswerService questionAnswerService;
 	@Resource
 	private FileService fileService;
+	@Resource
+	private UserService userService;
 	
 	/**
 	 * 试题列表 
@@ -231,7 +234,8 @@ public class ApiQuestionController extends BaseController {
 					.addAttr("score", question.getScore())
 					.addAttr("scoreOptions", scoreOptions)
 					.addAttr("answers", (writeAuth) ? answerList : new String[0])
-					.addAttr("state", question.getState());
+					.addAttr("state", question.getState())
+					.addAttr("createUserName", userService.getEntity(question.getCreateUserId()).getName());
 			return pageResult;
 		} catch (MyException e) {
 			log.error("获取试题错误：{}", e.getMessage());
@@ -347,27 +351,6 @@ public class ApiQuestionController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("发布错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 试题准确率
-	 * 
-	 * v1.0 zhanghc 2017-05-07 14:56:29
-	 * @param id
-	 * @return pageOut
-	 */
-	@RequestMapping("/accuracy")
-	@ResponseBody
-	public PageResult accuracy(Integer examId) {
-		try {
-			return PageResultEx.ok().data(questionService.accuracy(examId));
-		} catch (MyException e) {
-			log.error("试题统计错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		}  catch (Exception e) {
-			log.error("试题统计错误：", e);
 			return PageResult.err();
 		}
 	}

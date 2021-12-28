@@ -1,8 +1,6 @@
 package com.wcpdoc.exam.core.service;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
 
 import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.Question;
@@ -67,15 +65,6 @@ public interface QuestionService extends BaseService<Question>{
 	 * void
 	 */
 	void move(Integer sourceId, Integer targetId);
-	
-	/**
-	 * 试题统计
-	 * 
-	 * v1.0 chenyun 2021年3月23日下午2:53:07
-	 * @param examId
-	 * @return List<Map<String, Object>>
-	 */
-	List<Map<String, Object>> accuracy(Integer examId);
 	
 	/**
 	 * 拷贝

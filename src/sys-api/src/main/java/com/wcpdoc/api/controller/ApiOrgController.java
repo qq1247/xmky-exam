@@ -111,10 +111,10 @@ public class ApiOrgController extends BaseController {
 				throw new MyException("参数错误：name");
 			}
 			if (orgService.existName(org)) {
-				throw new MyException("名称已存在！");
+				throw new MyException("名称已存在");
 			}
 			if (orgService.existCode(org)) {
-				throw new MyException("编码已存在！");
+				throw new MyException("编码已存在");
 			}
 
 			// 修改组织机构

@@ -47,10 +47,10 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 		}
 		
 		if (existName(org)) {
-			throw new MyException("名称已存在！");
+			throw new MyException("名称已存在");
 		}
 		if (existCode(org)) {
-			throw new MyException("编码已存在！");
+			throw new MyException("编码已存在");
 		}
 		
 		// 添加组织机构
@@ -74,7 +74,7 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 		}
 		List<Org> orgList = orgDao.getList(id);
 		if (ValidateUtil.isValid(orgList)) {
-			throw new MyException("请先删除子组织机构！");
+			throw new MyException("请先删除子组织机构");
 		}
 		
 		// 删除组织机构
@@ -102,14 +102,14 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 			throw new MyException("参数错误：targetId");
 		}
 		if (sourceId == targetId) {
-			throw new MyException("源组织机构和目标组织机构一致！");
+			throw new MyException("源组织机构和目标组织机构一致");
 		}
 
 		Org source = getEntity(sourceId);
 		Org target = getEntity(targetId);
 		
 		if (target.getParentIds().contains(source.getParentIds())) {
-			throw new MyException("父组织机构不能移动到子组织机构下！");
+			throw new MyException("父组织机构不能移动到子组织机构下");
 		}
 
 		// 移动组织机构

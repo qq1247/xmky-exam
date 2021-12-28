@@ -46,7 +46,7 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 			throw new MyException("参数错误：name");
 		}
 		//if (existName(questionType)) {
-		//	throw new MyException("名称已存在！");
+		//	throw new MyException("名称已存在");
 		//} // 不同的子管理员添加可以重复
 		
 		// 添加试题分类
