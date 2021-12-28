@@ -623,4 +623,4 @@ INSERT INTO `SYS_VER` VALUES (10, '3.1.0', '2020-09-30 13:58:00', 'zhanghc', '')
 INSERT INTO `SYS_VER` VALUES (11, '3.2.0', '2020-10-31 16:43:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (12, '3.2.1', '2021-11-25 16:26:01', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (13, '3.3.0', '2020-11-30 11:11:11', 'zhanghc', '');
-INSERT INTO `SYS_VER` VALUES (13, '3.4.0', '2020-12-24 11:11:11', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (14, '3.4.0', '2021-12-31 12:00:00', 'zhanghc', '');
