@@ -478,8 +478,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 					throw new MyException(String.format("试题已删除：%s", id));
 				}
 				
-				QuestionType questionType = null;
-				if (questionTypeCache.get(question.getQuestionTypeId()) == null) {
+				QuestionType questionType = questionTypeCache.get(question.getQuestionTypeId());
+				if (questionType == null) {
 					questionType = questionTypeService.getEntity(question.getQuestionTypeId());
 					questionTypeCache.put(questionType.getId(), questionType);
 				}
@@ -748,8 +748,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 					throw new MyException(String.format("试题已发布：%s", id));
 				}
 				
-				QuestionType questionType = null;
-				if (questionTypeCache.get(question.getQuestionTypeId()) == null) {
+				QuestionType questionType = questionTypeCache.get(question.getQuestionTypeId());
+				if (questionType == null) {
 					questionType = questionTypeService.getEntity(question.getQuestionTypeId());
 					questionTypeCache.put(questionType.getId(), questionType);
 				}

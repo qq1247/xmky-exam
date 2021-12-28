@@ -59,7 +59,7 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 
 	@Override
 	public List<Question> getList(Integer questionTypeId) {
-		String sql = "SELECT * FROM EXM_QUESTION WHERE STATE IN (1, 2)";
+		String sql = "SELECT * FROM EXM_QUESTION WHERE STATE IN (1, 2) AND QUESTION_TYPE_ID = ?";
 		return getList(sql);
 	}
 
