@@ -19,7 +19,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.wcpdoc.base.cache.ProgressBarCache;
-import com.wcpdoc.core.constant.ConstantManager;
 import com.wcpdoc.core.context.UserContext;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.LoginUser;
@@ -73,29 +72,31 @@ public class ApiQuestionController extends BaseController {
 		try {
 			PageIn pageIn = new PageIn(request);
 			pageIn.addAttr("curUserId", getCurUser().getId());
-			PageOut pageOut = questionService.getListpage(pageIn);
-			List<Map<String, Object>> resultList = pageOut.getList();
+			PageOut pageout = questionService.getListpage(pageIn);
+			List<Map<String, Object>> resultList = pageout.getList();
 			for (Map<String, Object> result : resultList) {
-				if (result.get("scoreOptions") != null) {//1：漏选得分；2：答案无顺序；3：大小写不敏感；
-					StringBuilder scoreOptionNames = new StringBuilder();
-					if (result.get("scoreOptions").toString().contains("1")) {
-						scoreOptionNames.append(" 漏选得分");
+				Integer id = (Integer) result.get("id");
+				Integer type = (Integer) result.get("type");
+				
+				result.put("options", new String[0]);
+				if (type == 1 || type == 2) {// 如果是单选或多选，添加选项字段
+					List<QuestionOption> questionOptionList = questionOptionService.getList(id);
+					String[] options = new String[questionOptionList.size()];
+					for (int i = 0; i < questionOptionList.size(); i++) {
+						options[i] = questionOptionList.get(i).getOptions();
 					}
-					if (result.get("scoreOptions").toString().contains("2")) {
-						scoreOptionNames.append(" 答案无顺序");
-					}
-					if (result.get("scoreOptions").toString().contains("3")) {
-						scoreOptionNames.append(" 大小写不敏感");
+					result.put("options", options);
+				}
+				
+				if (result.get("scoreOptions") != null) {// 前后端分离下，接口定义只有数组形式
+					String[] _scoreOptions = result.get("scoreOptions").toString().split(",");
+					Integer[] scoreOptions = new Integer[_scoreOptions.length]; 
+					for (int i = 0; i < _scoreOptions.length; i++) {
+						scoreOptions[i] = Integer.parseInt(_scoreOptions[i]);
 					}
 				}
 			}
-			
-			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
-				pageIn.addAttr("curUserId", getCurUser().getId());
-			}
-			
-			PageOut listpage = questionService.getListpage(pageIn);
-			return PageResultEx.ok().data(listpage);
+			return PageResultEx.ok().data(pageout);
 		} catch (Exception e) {
 			log.error("试题列表错误：", e);
 			return PageResult.err();

@@ -253,6 +253,7 @@ http请求头需添加Authorization字段，
 | data.list[].questionTypeName | Integer | 试题分类名称 |
 | data.list[].score            | Double  | 分值         |
 | data.list[].scoreOptions     | Integer[]  | 分值选项     |
+| data.list[].createUserName     | String  | 创建人     |
 
 ### 试题添加：question/add
 | 请求参数| 类型  | 描述    | 必填 |
