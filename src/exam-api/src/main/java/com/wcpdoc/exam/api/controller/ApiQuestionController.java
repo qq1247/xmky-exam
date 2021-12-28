@@ -29,6 +29,7 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.SpringUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
@@ -205,6 +206,18 @@ public class ApiQuestionController extends BaseController {
 				map.put("score", answer.getScore());
 				answerList.add(map);
 			}
+			
+			Integer[] scoreOptions = null;//new Integer[split.length];
+			if (ValidateUtil.isValid(question.getScoreOptions())) {
+				String[] split = question.getScoreOptions().split(",");
+				scoreOptions = new Integer[split.length];
+				for(int i = 0; i < split.length; i++ ){
+					scoreOptions[i] = Integer.parseInt(split[i]);
+				}
+			} else {
+				scoreOptions = new Integer[0];
+			}
+			
 			PageResultEx pageResult = PageResultEx.ok()
 					.addAttr("id", question.getId())
 					.addAttr("type", question.getType())
@@ -215,7 +228,7 @@ public class ApiQuestionController extends BaseController {
 					.addAttr("analysis", question.getAnalysis())
 					.addAttr("questionTypeId", question.getQuestionTypeId())
 					.addAttr("score", question.getScore())
-					.addAttr("scoreOptions", question.getScoreOptions())
+					.addAttr("scoreOptions", scoreOptions)
 					.addAttr("answers", (writeAuth) ? answerList : new String[0])
 					.addAttr("state", question.getState());
 			return pageResult;
