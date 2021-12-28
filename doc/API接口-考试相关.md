@@ -248,6 +248,7 @@ http请求头需添加Authorization字段，
 | data.list[].difficulty       | Integer | 难度         |
 | data.list[].title            | String  | 题干         |
 | data.list[].options            | String[]  | 选项（type=1,2时有效）         |
+| data.list[].ai            | Integer  | 智能阅卷        |
 | data.list[].state            | Integer | 状态         |
 | data.list[].questionTypeId   | Integer | 试题分类ID   |
 | data.list[].questionTypeName | Integer | 试题分类名称 |
@@ -280,7 +281,8 @@ http请求头需添加Authorization字段，
 ### 试题删除：question/del
 | 请求参数| 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
-| id   | Integer | 主键 | 是   |
+| ids   | Integer[] | 主键 | 是   |
+| questionTypeId   | Integer | 试题分类ID（和ids只能有一个有效） | 是   |
 
 ### 试题获取：question/get
 | 请求参数| 类型    | 描述 | 必填 |
@@ -302,9 +304,10 @@ http请求头需添加Authorization字段，
 | data.score          | Double          | 分数   | 是
 | data.scoreOptions[] | Integer[] | 分数选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；）|
 | data.state| Integer | 状态（0：删除；1：发布；2：草稿）|
-| data.answers[]      | Object[]   | 答案数组   | 
-| data.answers[].answer      | String   | 答案   | 
-| data.answers[].score     | Double    | 得分   | 
+| data.answers[]      | Object[]   | 答案数组   |
+| data.answers[].answer      | String   | 答案   |
+| data.answers[].score     | Double    | 得分   |
+| data.answers[].createUserName     | String  | 创建人  |
 
 ### 试题复制：question/copy
 | 请求参数| 类型    | 描述 | 必填 |
