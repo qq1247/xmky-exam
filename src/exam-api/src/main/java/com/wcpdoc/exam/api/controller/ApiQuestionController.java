@@ -160,14 +160,15 @@ public class ApiQuestionController extends BaseController {
 	 * 删除试题
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
-	 * @param id
+	 * @param questionTypeId
+	 * @param ids
 	 * @return pageOut
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	public PageResult del(Integer id) {
+	public PageResult del(Integer questionTypeId, Integer[] ids) {
 		try {
-			questionService.delAndUpdate(id);
+			questionService.delAndUpdate(questionTypeId, ids);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("删除试题错误：{}", e.getMessage());

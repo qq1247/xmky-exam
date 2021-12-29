@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.core.dao.impl;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -57,14 +58,9 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 	}
 
 	@Override
-	public void updateQuestionType(Integer sourceId, Integer targetId) {
-		String sql = "UPDATE EXM_QUESTION SET QUESTION_TYPE_ID = ? WHERE QUESTION_TYPE_ID = ?";
-		update(sql, new Object[]{targetId, sourceId});
+	public List<Question> getList(Integer questionTypeId) {
+		String sql = "SELECT * FROM EXM_QUESTION WHERE STATE IN (1, 2) AND QUESTION_TYPE_ID = ?";
+		return getList(sql);
 	}
 
-	@Override
-	public void publish(Integer questionTypeId) {
-		String sql = "UPDATE EXM_QUESTION SET STATE = 1 WHERE STATE = 2 AND QUESTION_TYPE_ID = ?";
-		update(sql, new Object[]{ questionTypeId });
-	}
 }
