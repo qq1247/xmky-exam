@@ -25,11 +25,13 @@ import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Exam;
+import com.wcpdoc.exam.core.entity.ExamType;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.service.ExamService;
+import com.wcpdoc.exam.core.service.ExamTypeService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
@@ -63,6 +65,8 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 	private PaperService paperService;
 	@Resource
 	private MyExamService myExamService;
+	@Resource
+	private ExamTypeService examTypeService;
 	
 	@Override
 	public void setDao(BaseDao<Object> dao) {}
@@ -88,10 +92,10 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		data.put("top", homeUserMap.get("top"));
 		result.put("exam", data);
 		data = new HashMap<String, Object>();
-		data.put("avg", homeUserMap.get("avg"));
-		data.put("min", homeUserMap.get("min"));
-		data.put("max", homeUserMap.get("max"));
-		data.put("sd", homeUserMap.get("sd")); //标准差
+		data.put("avg", homeUserMap.get("avg") == null ? 0 : homeUserMap.get("avg"));
+		data.put("min", homeUserMap.get("min") == null ? 0 : homeUserMap.get("min"));
+		data.put("max", homeUserMap.get("max") == null ? 0 : homeUserMap.get("max"));
+		data.put("sd", homeUserMap.get("sd") == null ? 0 : homeUserMap.get("sd")); //标准差
 		result.put("score", data);
 		return result;
 	}
@@ -154,6 +158,10 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 	
 	@Override
 	public List<String> serverLog() throws Exception {
+		if (getCurUser().getId().intValue() != 1) {
+			throw new MyException("登录用户角色错误");
+		}
+		
 		List<String> result = new ArrayList<String>();
 		File log4j2File = new File(ResourceUtils.getURL("./config/log4j2.xml").getFile()); // 从log4j.xml解析日志文件目录
 		Document parse = Jsoup.parse(log4j2File, "UTF-8");
@@ -230,6 +238,11 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		if (!ValidateUtil.isValid(examId)) {
 			throw new MyException("参数错误：examId");
 		}
+		ExamType examType = examTypeService.getEntity(examId);
+		if (examType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
+			throw new MyException("权限不足");
+		}
+		
 		Exam exam = examService.getEntity(examId);
 		if (exam.getEndTime().getTime() >= System.currentTimeMillis()) {
 			throw new MyException("考试时间未结束");
@@ -350,6 +363,11 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		if (!ValidateUtil.isValid(examId)) {
 			throw new MyException("参数错误：examId");
 		}
+		ExamType examType = examTypeService.getEntity(examId);
+		if (examType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
+			throw new MyException("权限不足");
+		}
+		
 		Exam exam = examService.getEntity(examId);
 		if (exam.getMarkEndTime() != null && exam.getMarkEndTime().getTime() >= System.currentTimeMillis()) {
 			throw new MyException("阅卷时间未结束");
@@ -374,6 +392,10 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		//校验数据有效性
 		if (!ValidateUtil.isValid(examId)) {
 			throw new MyException("参数错误：examId");
+		}
+		ExamType examType = examTypeService.getEntity(examId);
+		if (examType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
+			throw new MyException("权限不足");
 		}
 		Exam exam = examService.getEntity(examId);
 		if (exam.getMarkEndTime() != null && exam.getMarkEndTime().getTime() >= System.currentTimeMillis()) {
