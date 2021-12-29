@@ -241,32 +241,34 @@ public class ApiOrgController extends BaseController {
 		try {
 			List<OrgXlsx> orgXlsx = orgXlsxService.exportOrgXlsx(ids);
 			try {
-				FileOutputStream os = new FileOutputStream("D:/aorg.xlsx");
-				Context context = new Context();
-		        //将列表参数放入context中
-		        context.putVar("orgXlsxList", orgXlsx);
-				InputStream inputStream = this.getClass().getResourceAsStream("/res/orgTemplate.xlsx");
-				JxlsHelper jxlsHelper = JxlsHelper.getInstance();
-				Transformer transformer = jxlsHelper.createTransformer(inputStream, os);
-				JexlExpressionEvaluator evaluator = (JexlExpressionEvaluator) transformer.getTransformationConfig().getExpressionEvaluator();
-				Map<String, Object> funcs = new HashMap<String, Object>();
-				evaluator.getJexlEngine().setFunctions(funcs);
-				jxlsHelper.processTemplate(context, transformer);
-				os.close();
-
-				FileInputStream fileInputStream = new FileInputStream("D:/aorg.xlsx");
-				String fileName = new String(("orgExample.xlsx").getBytes("UTF-8"),"ISO-8859-1");
-				response.addHeader("Content-Disposition", "attachment;filename" + fileName);
-				response.setContentType("application/fprce-download");
-				outputStream = response.getOutputStream();
-				IOUtils.copy(fileInputStream, outputStream);
+				try(FileOutputStream os = new FileOutputStream("D:/aorg.xlsx")) {
+					Context context = new Context();
+			        //将列表参数放入context中
+			        context.putVar("orgXlsxList", orgXlsx);
+					InputStream inputStream = this.getClass().getResourceAsStream("/res/orgTemplate.xlsx");
+					JxlsHelper jxlsHelper = JxlsHelper.getInstance();
+					Transformer transformer = jxlsHelper.createTransformer(inputStream, os);
+					JexlExpressionEvaluator evaluator = (JexlExpressionEvaluator) transformer.getTransformationConfig().getExpressionEvaluator();
+					Map<String, Object> funcs = new HashMap<String, Object>();
+					evaluator.getJexlEngine().setFunctions(funcs);
+					jxlsHelper.processTemplate(context, transformer);
+				} catch (Exception e) {
+					throw new MyException("读取文件");
+				}
+				try(FileInputStream fileInputStream = new FileInputStream("D:/aorg.xlsx")) {
+					String fileName = new String(("orgExample.xlsx").getBytes("UTF-8"),"ISO-8859-1");
+					response.addHeader("Content-Disposition", "attachment;filename" + fileName);
+					response.setContentType("application/fprce-download");
+					outputStream = response.getOutputStream();
+					IOUtils.copy(fileInputStream, outputStream);
+				} catch (Exception e) {
+					throw new MyException("读取文件");
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		} catch (Exception e) {
-			log.error("组织机构列表错误：", e);
-		} finally {
-			IOUtils.closeQuietly(outputStream);
+			log.error("导出组织机构表错误：", e);
 		}
 	}
 	
@@ -281,16 +283,17 @@ public class ApiOrgController extends BaseController {
 	public void template() {
 		OutputStream output = null;
 		try {
-			InputStream inputStream = this.getClass().getResourceAsStream("/res/orgExample.xlsx");
-			String fileName = new String(("orgExample.xlsx").getBytes("UTF-8"),"ISO-8859-1");
-			response.addHeader("Content-Disposition", "attachment;filename" + fileName);
-			response.setContentType("application/fprce-download");
-			output = response.getOutputStream();
-			IOUtils.copy(inputStream, output);
+			try(InputStream inputStream = this.getClass().getResourceAsStream("/res/orgExample.xlsx")) {
+				String fileName = new String(("orgExample.xlsx").getBytes("UTF-8"),"ISO-8859-1");
+				response.addHeader("Content-Disposition", "attachment;filename" + fileName);
+				response.setContentType("application/fprce-download");
+				output = response.getOutputStream();
+				IOUtils.copy(inputStream, output);
+			} catch (Exception e) {
+				throw new MyException("读取文件错误");
+			}
 		} catch (Exception e) {
 			log.error("组织机构导出模板下载附件失败：", e);
-		} finally {
-			IOUtils.closeQuietly(output);
 		}
 	}
 }

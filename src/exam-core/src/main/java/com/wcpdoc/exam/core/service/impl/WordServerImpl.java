@@ -150,16 +150,18 @@ public class WordServerImpl extends WordServer {
         FileItem item = factory.createItem("textField", "text/plain", true, file.getName());
         int bytesRead = 0;
         byte[] buffer = new byte[8192];
-        try {
-            FileInputStream fis = new FileInputStream(file);
-            OutputStream os = item.getOutputStream();
-            while ((bytesRead = fis.read(buffer, 0, 8192)) != -1) {
-                os.write(buffer, 0, bytesRead);
+        try (FileInputStream fis = new FileInputStream(file)) {
+        	try (OutputStream os = item.getOutputStream()) {
+	            while ((bytesRead = fis.read(buffer, 0, 8192)) != -1) {
+	                os.write(buffer, 0, bytesRead);
+	            }
+            } catch (IOException e) {
+            	log.error(String.format("WordServerImpl --> createFileItem --> OutputStream  --> %s", e.getMessage()));
+            	throw new MyException(e.getMessage());
             }
-            os.close();
-            fis.close();
         } catch (IOException e) {
-            e.printStackTrace();
+        	log.error(String.format("WordServerImpl --> createFileItem --> FileInputStream --> %s", e.getMessage()));
+        	throw new MyException(e.getMessage());
         }
         return item;
     }
