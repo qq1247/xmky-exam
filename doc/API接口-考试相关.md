@@ -251,7 +251,6 @@ http请求头需添加Authorization字段，
 | data.list[].ai            | Integer  | 智能阅卷        |
 | data.list[].state            | Integer | 状态         |
 | data.list[].questionTypeId   | Integer | 试题分类ID   |
-| data.list[].questionTypeName | Integer | 试题分类名称 |
 | data.list[].score            | Double  | 分值         |
 | data.list[].scoreOptions     | Integer[]  | 分值选项     |
 | data.list[].createUserName     | String  | 创建人     |
@@ -262,7 +261,7 @@ http请求头需添加Authorization字段，
 | type           | Integer         | 类型（1：单选；2：多选；3：填空；4：判断；5：问答 | 是   |
 | difficulty     | Integer         | 难度（1：极易；2：简单；3：适中；4：困难；5：极难 ） | 是   |
 | title          | Text | 题干 | 是   |
-| options[]      | String[]        | 选项，type为1,2时有效，len <= 7  | 否   |
+| options[]      | String[]        | 选项，type为1,2时有效，len &lt;= 7  | 否   |
 | ai| Integer    | 智能阅卷（1：是；2：否；）  | 是   |
 | analysis       | Text    | 解析  | 是   |
 | questionTypeId | Integer         | 试题分类ID      | 是   |
@@ -354,13 +353,9 @@ http请求头需添加Authorization字段，
 | data.list[].passScore     | Double  | 及格分数（百分比） |
 | data.list[].totalScore    | Double  | 总分数 |
 | data.list[].paperTypeId   | Integer | 试卷分类id  |
-| data.list[].paperTypeName | String  | 试卷分类名称 |
 | data.list[].markType      | Integer | 阅卷方式（1：智能阅卷；2：人工阅卷；） |
-| data.list[].markTypeName      | String| 阅卷方式名称 |
 | data.list[].showType      | Integer | 展示方式（1：整卷展示；2：章节显示；3：单题展示；） |
-| data.list[].showTypeName      | String| 展示方式名称 |
 | data.list[].genType       | Integer | 组卷方式（1：人工组卷；2：随机组卷） |
-| data.list[].genTypeName       | String| 组卷方式名称 |
 
 ### 试卷添加：paper/add
 | 请求参数             | 类型          | 描述   | 必填 |
@@ -461,9 +456,7 @@ http请求头需添加Authorization字段，
 |data.list[].chapter.description  | String  | 章节描述 |
 |data.list[].questionList[].id  | Integer  | 试题id |
 |data.list[].questionList[].type  | Integer  | 试题类型，参考question/add |
-|data.list[].questionList[].typeName  | String  | 试题类型名称 |
 |data.list[].questionList[].difficulty  | Integer  | 试题难度，难易度参考question/add|
-|data.list[].questionList[].difficultyName  | String  | 试题难度名称 |
 |data.list[].questionList[].title  | String  | 试题标题 |
 |data.list[].questionList[].ai  | Integer  | 是否智能阅卷|
 |data.list[].questionList[].analysis  | String  | 试题解析 |
@@ -542,7 +535,6 @@ http请求头需添加Authorization字段，
 | data.list[].markStartTime| Date| 阅卷开始时间|
 | data.list[].markEndTime| Date| 阅卷结束时间|
 | data.list[].state   | Integer | 考试状态     |
-| data.list[].stateName|String| 考试状态名称    |
 | data.list[].paperMarkType  | Integer |  试卷阅卷类型   |
 | data.list[].paperId| Integer| 试卷Id    |
 | data.list[].paperName|String| 试卷名称    |
@@ -590,7 +582,6 @@ http请求头需添加Authorization字段，
 | data.paperId       | Integer     | 试卷ID  |
 | data.paperName       | String     | 试卷名称  |
 | data.examTypeId    | Integer     | 考试分类ID |
-| data.examTypeName    | String     | 考试分类名称 |
 | data.paperMarkType    | Integer     | 试卷阅卷类型 |
 
 ### 考试发布：exam/publish
