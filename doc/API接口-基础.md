@@ -3,7 +3,7 @@
 Date样式：yyyy-MM-dd HH:mm:ss
 curPage = 1
 pageSize = 20
-pageSize <= 100
+pageSize &lt;= 100
 code == 200 请求正常
 code == 500 服务器内部错误
 code == 401 无权限或登录超时
@@ -313,7 +313,6 @@ http请求头需添加Authorization字段，
 |data.list[].jobClass | String  | 实现类 |
 |data.list[].cron | String  | cron表达式 |
 |data.list[].state | Integer | 状态 |
-|data.list[].stateName | String  | 状态名称 |
 |data.list[].triggerTimes | Date[]  | 最近几次触发时间  |
 
 ### 定时任务添加：cron/add
@@ -431,7 +430,6 @@ http请求头需添加Authorization字段，
 |data.list[].title | String  | 标题 |
 |data.list[].content | String  | 内容 |
 |data.list[].showType      | Integer  | 展示类型 |
-|data.list[].showTypeName      | String  | 展示类型名称 |
 |data.list[].startTime | Date  | 开始时间 |
 |data.list[].endTime | Date  | 结束时间 |
 |data.list[].imgFileId     | String  | 图片附件ID |

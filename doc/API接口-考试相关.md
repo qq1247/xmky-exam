@@ -3,7 +3,7 @@
 Date样式：yyyy-MM-dd HH:mm:ss
 curPage = 1
 pageSize = 20
-pageSize <= 100
+pageSize &lt;= 100
 code == 200 请求正常
 code == 500 服务器内部错误
 code == 401 无权限或登录超时
@@ -296,7 +296,7 @@ http请求头需添加Authorization字段，
 | data.type           | Integer         | 类型（1：单选；2：多选；3：填空；4：判断；5：问答 |
 | data.difficulty     | Integer         | 难度（1：极易；2：简单；3：适中；4：困难；5：极难 ） | 
 | data.title          | Text | 题干 |
-| data.options[]      | String[]        | 选项，type为1,2时有效，len <= 7  |
+| data.options[]      | String[]        | 选项，type为1,2时有效，len &lt;= 7  |
 | data.ai| Integer    | 智能阅卷（1：是；2：否；）  | 
 | data.analysis       | Text    | 解析  | 
 | data.questionTypeId | Integer         | 试题分类ID      |
