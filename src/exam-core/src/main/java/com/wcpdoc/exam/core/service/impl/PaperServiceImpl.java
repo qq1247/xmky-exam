@@ -373,9 +373,12 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		
 		// 移动
 		Integer sourceNo = source.getNo();
+		source.setUpdateUserId(getCurUser().getId());
+		source.setUpdateTime(new Date());
 		source.setNo(target.getNo());
+		target.setUpdateUserId(getCurUser().getId());
+		target.setUpdateTime(new Date());
 		target.setNo(sourceNo);
-		
 		paperQuestionService.update(source);
 		paperQuestionService.update(target);
 	}
@@ -420,7 +423,11 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		
 		// 移动
 		Integer sourceNo = source.getNo();
+		source.setUpdateUserId(getCurUser().getId());
+		source.setUpdateTime(new Date());
 		source.setNo(target.getNo());
+		target.setUpdateUserId(getCurUser().getId());
+		target.setUpdateTime(new Date());
 		target.setNo(sourceNo);
 		
 		if (source.getParentId().intValue() != target.getParentId().intValue()) {// 如果不是同一个章节，更新父子关系

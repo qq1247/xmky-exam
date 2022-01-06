@@ -78,6 +78,8 @@ public class QuestionTypeOpenServiceImpl extends BaseServiceImp<QuestionTypeOpen
 		// 校验数据有效性
 		QuestionTypeOpen entity = getEntity(id);
 		entity.setState(2);
+		entity.setUpdateTime(new Date());
+		entity.setUpdateUserId(getCurUser().getId());
 		update(entity);
 	}
 
