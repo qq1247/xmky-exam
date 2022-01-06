@@ -325,6 +325,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		for (Map<String, Object> typeResult : typeResultList) {
 			typeResult.remove("key");// 接口没有这个字段，移除掉
 		}
+		result.put("typeList", typeResultList);
 		
 		// 统计分数段占比
 		double scoreGrade = BigDecimalUtil.newInstance(paper.getTotalScore()).div(10, 3).getResult().doubleValue();// 分数保留两位小数，十等分后需要保留3位小数
