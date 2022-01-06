@@ -250,6 +250,7 @@ http请求头需添加Authorization字段，
 | data.list[].options            | String[]  | 选项（type=1,2时有效）         |
 | data.list[].ai            | Integer  | 智能阅卷        |
 | data.list[].state            | Integer | 状态         |
+| data.list[].analysis            | String | 解析         |
 | data.list[].questionTypeId   | Integer | 试题分类ID   |
 | data.list[].score            | Double  | 分值         |
 | data.list[].scoreOptions     | Integer[]  | 分值选项     |
@@ -583,6 +584,7 @@ http请求头需添加Authorization字段，
 | data.paperName       | String     | 试卷名称  |
 | data.examTypeId    | Integer     | 考试分类ID |
 | data.paperMarkType    | Integer     | 试卷阅卷类型 |
+| data.state    | Integer     | 状态 |
 
 ### 考试发布：exam/publish
 | 请求参数| 类型    | 描述 | 必填 |

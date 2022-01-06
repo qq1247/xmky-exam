@@ -94,6 +94,7 @@ http请求头需添加Authorization字段，
 | data.list[].orgName        | String | 组织机构名称  |
 | data.list[].myExamState        | Integer | 考试状态  |
 | data.list[].myExamMarkState        | Integer | 阅卷状态  |
+| data.list[].myExamAnswerState        | Integer | 答题状态  |
 | data.list[].paperTotalScore        | Double | 试卷总分数 |
 | data.list[].paperPassScore        | Double | 试卷及格分数  |
 | data.list[].myExamScore        | Double | 我的考试分数  |

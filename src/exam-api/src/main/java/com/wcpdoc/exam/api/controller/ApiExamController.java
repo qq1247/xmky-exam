@@ -173,6 +173,7 @@ public class ApiExamController extends BaseController {
 					.addAttr("paperMarkType", paper.getMarkType())
 					.addAttr("examTypeId", exam.getExamTypeId())
 					.addAttr("examTypeName", examTypeService.getEntity(exam.getExamTypeId()).getName())
+					.addAttr("state", exam.getState())
 					;
 		} catch (MyException e) {
 			log.error("获取考试错误：{}", e.getMessage());

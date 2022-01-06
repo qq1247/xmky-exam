@@ -32,7 +32,7 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT QUESTION.ID, QUESTION.TYPE, QUESTION.DIFFICULTY, QUESTION.TITLE, "
 				+ "QUESTION.STATE, QUESTION.AI, QUESTION.QUESTION_TYPE_ID, QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME, "
-				+ "QUESTION.SCORE, QUESTION.SCORE_OPTIONS, CREATE_USER.NAME AS CREATE_USER_NAME "
+				+ "QUESTION.SCORE, QUESTION.SCORE_OPTIONS, QUESTION.ANALYSIS, CREATE_USER.NAME AS CREATE_USER_NAME "
 				+ "FROM EXM_QUESTION QUESTION "
 				+ "LEFT JOIN EXM_QUESTION_TYPE QUESTION_TYPE ON QUESTION.QUESTION_TYPE_ID = QUESTION_TYPE.ID "
 				+ "LEFT JOIN SYS_USER CREATE_USER ON QUESTION.CREATE_USER_ID = CREATE_USER.ID ";
@@ -60,7 +60,7 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 	@Override
 	public List<Question> getList(Integer questionTypeId) {
 		String sql = "SELECT * FROM EXM_QUESTION WHERE STATE IN (1, 2) AND QUESTION_TYPE_ID = ?";
-		return getList(sql);
+		return getList(sql, new Object[] { questionTypeId });
 	}
 
 }
