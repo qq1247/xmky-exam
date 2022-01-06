@@ -218,7 +218,7 @@ create table EXM_PAPER_QUESTION
 (
    ID                   int not null auto_increment comment 'id',
    NAME                 varchar(32) comment '章节名称',
-   DESCRIPTION          varchar(512) comment '章节描述',
+   DESCRIPTION          text comment '章节描述',
    PARENT_ID            int comment '父ID',
    PARENT_SUB           varchar(512) comment '父子关系（格式：_父ID_子ID_子子ID_... ...）',
    UPDATE_USER_ID       int comment '修改人',
