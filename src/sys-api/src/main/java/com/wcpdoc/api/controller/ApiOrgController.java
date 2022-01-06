@@ -175,7 +175,7 @@ public class ApiOrgController extends BaseController {
 					.addAttr("id", org.getId())
 					.addAttr("name", org.getName())
 					.addAttr("parentId", org.getParentId())
-					.addAttr("parentName", (org.getParentId() == null || org.getParentId() == 0) ? null : orgService.getEntity(org.getParentId()).getName())// 顶级机构0是虚拟的，数据库没有记录
+					.addAttr("parentName", org.getParentId() == null ? null : orgService.getEntity(org.getParentId()).getName())
 					.addAttr("no", org.getNo());
 		} catch (MyException e) {
 			log.error("获取组织机构错误：{}", e.getMessage());

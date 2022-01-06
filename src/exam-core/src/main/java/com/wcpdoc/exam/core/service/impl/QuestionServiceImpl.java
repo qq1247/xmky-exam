@@ -114,6 +114,12 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			if (answers.length < 1) {
 				throw new MyException("参数错误：answers");
 			}
+			if (scoreOptions.length <= 0) {
+				scoreOptions[0] = 1; //多选的漏选得分必填
+			}
+			if (answerScores.length == 0) {
+				answerScores[0] = question.getScore().divide(new BigDecimal(2));//答案分数是分数的一半
+			}
 			for (int i = 0; i < answers.length; i++) {
 				if (!"ABCDEFG".contains(answers[i].toUpperCase())) {
 					throw new MyException("参数错误：answers");
@@ -144,8 +150,11 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				throw new MyException("参数错误：answers");
 			}
 		}
-
+		
 		// 添加试题
+		if (question.getType() == 1 || question.getType() == 2 || question.getType() == 4) {
+			question.setAi(1);
+		}
 		question.setScoreOptions(ValidateUtil.isValid(scoreOptions) ? StringUtil.join(scoreOptions) : null);
 		question.setCreateTime(new Date());
 		question.setCreateUserId(getCurUser().getId());
@@ -262,6 +271,12 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			if (answers.length < 1) {
 				throw new MyException("参数错误：answers");
 			}
+			if (scoreOptions.length <= 0) {
+				scoreOptions[0] = 1; //多选的漏选得分必填
+			}
+			if (answerScores.length <= 0) {
+				answerScores[0] = question.getScore().divide(new BigDecimal(2));//答案分数是分数的一半
+			}
 			for (int i = 0; i < answers.length; i++) {
 				if (!"ABCDEFG".contains(answers[i])) {
 					throw new MyException("参数错误：answers");
@@ -349,7 +364,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 
 		// 修改试题
 		// entity.setState(question.getState());
-		entity.setAi(question.getAi());
+		if (question.getType() == 3 || question.getType() == 5 ) {
+			entity.setAi(question.getAi());
+		}
 		entity.setDifficulty(question.getDifficulty());
 		entity.setTitle(question.getTitle());
 		entity.setAnalysis(question.getAnalysis());

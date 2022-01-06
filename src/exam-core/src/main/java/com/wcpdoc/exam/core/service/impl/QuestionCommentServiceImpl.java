@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
+import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.QuestionCommentDao;
 import com.wcpdoc.exam.core.entity.QuestionComment;
@@ -88,6 +89,12 @@ public class QuestionCommentServiceImpl extends BaseServiceImp<QuestionComment> 
 
 	@Override
 	public List<Map<String, Object>> getList(Integer parentId) {
-		return questionCommentDao.getList(parentId);
+		List<Map<String, Object>> list = questionCommentDao.getList(parentId);
+		for(Map<String, Object> map : list){
+			if (map.get("createTime") != null) {
+				map.put("createTime", DateUtil.formatDateTime( DateUtil.getDateTime(map.get("createTime").toString())));
+			}
+		}
+		return list;
 	}
 }

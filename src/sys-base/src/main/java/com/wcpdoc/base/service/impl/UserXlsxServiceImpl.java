@@ -229,24 +229,22 @@ public class UserXlsxServiceImpl extends BaseServiceImp<Object> implements UserX
 
 	@Override
 	public void templateUserXlsx() {
-		try {
-           //浏览器下载
-           //指定数据生成后的文件输入流（将上述out的路径作为文件的输入流）
-           @SuppressWarnings("resource")
-           FileInputStream fileInputStream = new FileInputStream("target/classes/res/userExample.xlsx");
-           //导出excel文件，设置文件名
-           String filename = URLEncoder.encode("用户信息表模板.xlsx", "UTF-8");
-           //设置下载头
-           response.setHeader("Content-Disposition", "attachment;filename=" + filename);
-           ServletOutputStream outputStream = response.getOutputStream();
-           //将文件写入浏览器
-           byte[] bys = new byte[fileInputStream.available()];
-           fileInputStream.read(bys);
-           outputStream.write(bys);
-           outputStream.flush();
-           outputStream.close();
+        //浏览器下载
+        //指定数据生成后的文件输入流（将上述out的路径作为文件的输入流）
+		try(FileInputStream fileInputStream = new FileInputStream("target/classes/res/userExample.xlsx")) {
+            //导出excel文件，设置文件名
+            String filename = URLEncoder.encode("用户信息表模板.xlsx", "UTF-8");
+            //设置下载头
+            response.setHeader("Content-Disposition", "attachment;filename=" + filename);
+            ServletOutputStream outputStream = response.getOutputStream();
+            //将文件写入浏览器
+            byte[] bys = new byte[fileInputStream.available()];
+            fileInputStream.read(bys);
+            outputStream.write(bys);
+            outputStream.flush();
+            outputStream.close();
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new MyException("读取文件错误");
 		}
 	}
 }
