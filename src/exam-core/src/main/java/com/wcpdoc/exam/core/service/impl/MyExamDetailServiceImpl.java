@@ -229,6 +229,23 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			exam.setMarkState(3);
 			examService.update(exam);
 			log.info("自动阅卷完成：标记考试为已阅卷，结束");
+			
+			//排名
+			Collections.sort(myExamList, new Comparator<MyExam>() {
+				@Override
+				public int compare(MyExam o1, MyExam o2) {
+					if (o2.getTotalScore().compareTo(o1.getTotalScore()) == 0 && o1.getAnswerEndTime() != null && o2.getAnswerEndTime() != null) {
+						return Integer.parseInt(String.valueOf(o1.getAnswerEndTime().getTime() - o2.getAnswerEndTime().getTime())); 
+					}
+					
+					return o2.getTotalScore().compareTo(o1.getTotalScore());
+				}
+			});
+			
+			for (int i = 0; i < myExamList.size(); i++) {
+				myExamList.get(i).setNo(i + 1);
+				myExamService.update(myExamList.get(i));
+			}
 			return;
 		}
 		
