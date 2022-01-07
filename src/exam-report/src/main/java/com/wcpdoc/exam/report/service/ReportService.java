@@ -3,6 +3,9 @@ package com.wcpdoc.exam.report.service;
 import java.util.List;
 import java.util.Map;
 
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
+
 /**
  * 统计服务层接口
  * 
@@ -64,19 +67,19 @@ public interface ReportService {
 	 * 考试排名
 	 * 
 	 * v1.0 chenyun 2021年12月15日下午1:47:12
-	 * @param examId
-	 * @return List<Map<String, Object>>
+	 * @param pageIn
+	 * @return PageOut
 	 */
-	List<Map<String, Object>> myExamListpage(Integer examId);
+	PageOut myExamListpage(PageIn pageIn);
 	
 	/**
 	 * 错题分析
 	 * 
 	 * v1.0 chenyun 2021年12月16日下午1:45:11
-	 * @param examId
-	 * @return List<Map<String,Object>>
+	 * @param pageIn
+	 * @return PageOut
 	 */
-	List<Map<String, Object>> questionListpage(Integer examId);
+	PageOut questionListpage(PageIn pageIn);
 	
 	/**
 	 * 分数统计

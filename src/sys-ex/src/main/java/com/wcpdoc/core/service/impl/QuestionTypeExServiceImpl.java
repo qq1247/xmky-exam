@@ -23,7 +23,7 @@ public class QuestionTypeExServiceImpl implements QuestionTypeExService {
 
 	@Override
 	public void delAndUpdate(QuestionType questionType) {
-		PageIn pageIn = new PageIn().setPageSize(1).addAttr("paperId", questionType.getId());
+		PageIn pageIn = new PageIn().setPageSize(1).addAttr("questionTypeId", questionType.getId().toString());
 		int questionNum = questionService.getListpage(pageIn).getTotal();
 		if (questionNum > 0) {
 			throw new MyException("该分类下有试题，不允许删除");

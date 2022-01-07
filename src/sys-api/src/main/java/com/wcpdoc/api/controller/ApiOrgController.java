@@ -175,7 +175,7 @@ public class ApiOrgController extends BaseController {
 					.addAttr("id", org.getId())
 					.addAttr("name", org.getName())
 					.addAttr("parentId", org.getParentId())
-					.addAttr("parentName", org.getParentId() == null ? null : orgService.getEntity(org.getParentId()).getName())
+					.addAttr("parentName", (org.getParentId() == null || org.getParentId() == 0) ? null : orgService.getEntity(org.getParentId()).getName())
 					.addAttr("no", org.getNo());
 		} catch (MyException e) {
 			log.error("获取组织机构错误：{}", e.getMessage());

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wcpdoc.core.controller.BaseController;
+import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
@@ -176,14 +177,13 @@ public class ApiReportController extends BaseController{
      * 考试排名
      * 
      * v1.0 chenyun 2021-12-15 13:44:47
-     * @param id
      * @return PageResult
      */
     @RequestMapping("/myExam/listpage")
     @ResponseBody
-    public PageResult myExamListpage(Integer examId) {
+    public PageResult myExamListpage() {
         try {
-            return PageResultEx.ok().data(reportService.myExamListpage(examId));
+            return PageResultEx.ok().data(reportService.myExamListpage(new PageIn(request)));
         } catch (MyException e) {
             log.error("考试排名错误：{}", e.getMessage());
             return PageResult.err().msg(e.getMessage());
@@ -197,14 +197,13 @@ public class ApiReportController extends BaseController{
      * 错题分析
      * 
      * v1.0 chenyun 2021-12-15 13:44:47
-     * @param id
      * @return PageResult
      */
     @RequestMapping("/question/listpage")
     @ResponseBody
-    public PageResult questionListpage(Integer examId) {
+    public PageResult questionListpage() {
         try {
-            return PageResultEx.ok().data(reportService.questionListpage(examId));
+            return PageResultEx.ok().data(reportService.questionListpage(new PageIn(request)));
         } catch (MyException e) {
             log.error("错题分析统计错误：{}", e.getMessage());
             return PageResult.err().msg(e.getMessage());

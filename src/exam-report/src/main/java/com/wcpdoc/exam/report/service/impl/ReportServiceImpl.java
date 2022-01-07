@@ -18,6 +18,8 @@ import org.springframework.util.ResourceUtils;
 import com.wcpdoc.base.cache.DictCache;
 import com.wcpdoc.base.entity.Dict;
 import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.BigDecimalUtil;
@@ -238,12 +240,12 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		if (!ValidateUtil.isValid(examId)) {
 			throw new MyException("参数错误：examId");
 		}
-		ExamType examType = examTypeService.getEntity(examId);
+		Exam exam = examService.getEntity(examId);
+		ExamType examType = examTypeService.getEntity(exam.getExamTypeId());
 		if (examType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("权限不足");
 		}
 		
-		Exam exam = examService.getEntity(examId);
 		if (exam.getEndTime().getTime() >= System.currentTimeMillis()) {
 			throw new MyException("考试时间未结束");
 		}
@@ -359,24 +361,25 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 	
 
 	@Override
-	public List<Map<String, Object>> myExamListpage(Integer examId) {
+	public PageOut myExamListpage(PageIn pageIn) {
 		//校验数据有效性
-		if (!ValidateUtil.isValid(examId)) {
+		Integer examId = Integer.parseInt(pageIn.get("examId"));
+		if (!ValidateUtil.isValid(pageIn.get("examId"))) {
 			throw new MyException("参数错误：examId");
 		}
-		ExamType examType = examTypeService.getEntity(examId);
+		Exam exam = examService.getEntity(examId);
+		ExamType examType = examTypeService.getEntity(exam.getExamTypeId());
 		if (examType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("权限不足");
 		}
 		
-		Exam exam = examService.getEntity(examId);
 		if (exam.getMarkEndTime() != null && exam.getMarkEndTime().getTime() >= System.currentTimeMillis()) {
 			throw new MyException("阅卷时间未结束");
 		}
 		
 		Paper paper = paperService.getEntity(exam.getPaperId());
-		List<Map<String, Object>> myExamListpage = reportDao.myExamListpage(examId);
-		for(Map<String, Object> map : myExamListpage){
+		PageOut pageOut = reportDao.myExamListpage(pageIn);
+		for(Map<String, Object> map : pageOut.getList()){
 			map.put("myExamStartTime", map.get("myExamStartTime") == null ? null : DateUtil.formatDateTime(DateUtil.getDateTime(map.get("myExamStartTime").toString())));
 			map.put("myExamEndTime", map.get("myExamEndTime") == null ? null : DateUtil.formatDateTime(DateUtil.getDateTime(map.get("myExamEndTime").toString())));
 			map.put("myExamMarkStartTime", map.get("myExamMarkStartTime") == null ? null : DateUtil.formatDateTime(DateUtil.getDateTime(map.get("myExamMarkStartTime").toString())));
@@ -385,26 +388,27 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 			map.put("paperTotalScore", paper.getTotalScore());
 			map.put("paperPassScore", paper.getPassScore());
 		}
-		return myExamListpage;
+		return pageOut;
 	}
 	
 	@Override
-	public List<Map<String, Object>> questionListpage(Integer examId) {
+	public PageOut questionListpage(PageIn pageIn) {
 		//校验数据有效性
+		Integer examId = Integer.parseInt(pageIn.get("examId"));
 		if (!ValidateUtil.isValid(examId)) {
 			throw new MyException("参数错误：examId");
 		}
-		ExamType examType = examTypeService.getEntity(examId);
+		Exam exam = examService.getEntity(examId);
+		ExamType examType = examTypeService.getEntity(exam.getExamTypeId());
 		if (examType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("权限不足");
 		}
-		Exam exam = examService.getEntity(examId);
 		if (exam.getMarkEndTime() != null && exam.getMarkEndTime().getTime() >= System.currentTimeMillis()) {
 			throw new MyException("阅卷时间未结束");
 		}
 		
-		List<Map<String, Object>> resultList = reportDao.questionListpage(exam.getId());
-		return resultList;
+		PageOut pageOut = reportDao.questionListpage(pageIn);
+		return pageOut;
 	}
 	
 	@Override

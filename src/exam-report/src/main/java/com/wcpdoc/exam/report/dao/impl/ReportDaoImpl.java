@@ -8,6 +8,9 @@ import org.springframework.stereotype.Repository;
 import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
+import com.wcpdoc.core.util.SqlUtil;
+import com.wcpdoc.core.util.ValidateUtil;
+import com.wcpdoc.core.util.SqlUtil.Order;
 import com.wcpdoc.exam.report.dao.ReportDao;
 
 /**
@@ -115,7 +118,7 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 	}
 	
 	@Override
-	public List<Map<String, Object>> myExamListpage(Integer examId) {
+	public PageOut myExamListpage(PageIn pageIn) {
 		String sql = "SELECT MY_EXAM.NO AS MY_EXAM_NO, USER.ID AS USER_ID, USER.NAME AS USER_NAME, USER.ORG_ID AS ORG_ID, "
 				+ "ORG.NAME AS ORG_NAME, MY_EXAM.STATE AS MY_EXAM_STATE, MY_EXAM.MARK_STATE AS MY_EXAM_MARK_STATE, "
 				+ "MY_EXAM.TOTAL_SCORE AS MY_EXAM_SCORE, MY_EXAM.ANSWER_START_TIME AS MY_EXAM_START_TIME,  "
@@ -123,18 +126,28 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 				+ "MY_EXAM.MARK_END_TIME AS MY_EXAM_MARK_END_TIME, MY_EXAM.MARK_USER_ID AS MY_MARK_USER_ID, "
 				+ "(SELECT MARK_USER.NAME FROM SYS_USER MARK_USER WHERE MARK_USER.ID = MY_EXAM.MARK_USER_ID ) AS MY_MARK_USER_NAME "
 				+ "FROM EXM_MY_EXAM MY_EXAM INNER JOIN SYS_USER AS USER ON MY_EXAM.USER_ID = USER.ID "
-				+ "LEFT JOIN SYS_ORG AS ORG ON USER.ORG_ID = ORG.ID WHERE MY_EXAM.EXAM_ID = ? ORDER BY MY_EXAM.NO ASC, MY_EXAM.ANSWER_END_TIME DESC ";
-		return getMapList(sql, new Object[] { examId });
+				+ "LEFT JOIN SYS_ORG AS ORG ON USER.ORG_ID = ORG.ID ";
+		
+		SqlUtil sqlUtil = new SqlUtil(sql);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examId")), "MY_EXAM.EXAM_ID = ?", pageIn.get("examId"))
+				.addOrder("MY_EXAM.NO", Order.ASC)
+				.addOrder("MY_EXAM.ANSWER_END_TIME", Order.DESC);
+		return getListpage(sqlUtil, pageIn);
 	}
 
 	@Override
-	public List<Map<String, Object>> questionListpage(Integer examId) {
-		String sql = "SELECT QUESTION.ID AS QUESTION_ID, QUESTION.TITLE AS QUESTION_TITLE, COUNT(MY_EXAM_DETAIL.USER_ID) AS USER_NUM, "
-				+ "SUM(MY_EXAM_DETAIL.SCORE = MY_EXAM_DETAIL.QUESTION_SCORE) AS SUCC_USER_NUM "
-				+ "FROM EXM_MY_EXAM_DETAIL MY_EXAM_DETAIL "
-				+ "INNER JOIN EXM_QUESTION QUESTION ON MY_EXAM_DETAIL.QUESTION_ID = QUESTION.ID WHERE MY_EXAM_DETAIL.EXAM_ID = ? "
-				+ "GROUP BY MY_EXAM_DETAIL.QUESTION_ID ";
-		return getMapList(sql, new Object[] { examId });
+	public PageOut questionListpage(PageIn pageIn) {
+		String sql = "SELECT QUESTION.ID AS QUESTION_ID, QUESTION.TITLE AS QUESTION_TITLE, "
+				+ "	MY_EXAM_DETAIL.USER_NUM, MY_EXAM_DETAIL.SUCC_USER_NUM "
+				+ "FROM (SELECT MAX(QUESTION_ID) AS QUESTION_ID, COUNT(USER_ID) AS USER_NUM, SUM( SCORE = QUESTION_SCORE ) AS SUCC_USER_NUM "
+				+ "			FROM EXM_MY_EXAM_DETAIL "
+				+ "			WHERE EXAM_ID = " + pageIn.get("examId")//? "
+				+ "			GROUP BY QUESTION_ID) MY_EXAM_DETAIL "
+				+ "INNER JOIN EXM_QUESTION QUESTION ON MY_EXAM_DETAIL.QUESTION_ID = QUESTION.ID  ";
+		SqlUtil sqlUtil = new SqlUtil(sql);
+		sqlUtil//.addWhere(ValidateUtil.isValid(pageIn.get("examId")), "", pageIn.get("examId"))
+				.addOrder("MY_EXAM_DETAIL.SUCC_USER_NUM", Order.DESC);
+		return getListpage(sqlUtil, pageIn);
 	}
 	
 	@Override

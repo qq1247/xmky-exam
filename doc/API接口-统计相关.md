@@ -76,10 +76,12 @@ http请求头需添加Authorization字段，
 | data.scoreGradeList[].name        | String | 分数段名称  |
 | data.scoreGradeList[].value       | String  | 分数段值  |
 
-### 考试排名：report/myExam/listpage
+### 用户考试列表：report/myExam/listpage
 | 请求参数| 类型        | 描述       | 必填 |
 | -------- | ----------- | ---------- | ---- |
 | examId | Integer | 考试ID | 是   |
+| curPage   | Integer | 当前第几页 | 否   |
+| pageSize  | Integer | 每页多少条 | 否   |
 
 | 响应数据| 类型    | 描述 |
 | --------------------------- | ------- | ----- |
@@ -105,10 +107,12 @@ http请求头需添加Authorization字段，
 | data.list[].myMarkUserId        | Integer | 阅卷用户Id  |
 | data.list[].myMarkUserName       | String | 阅卷用户名称 |
 
-### 错题分析：report/question/listpage
+### 试题列表：report/question/listpage
 | 请求参数| 类型        | 描述       | 必填 |
 | -------- | ----------- | ---------- | ---- |
 | examId | Integer | 考试ID | 是   |
+| curPage   | Integer | 当前第几页 | 否   |
+| pageSize  | Integer | 每页多少条 | 否   |
 
 | 响应数据| 类型    | 描述 |
 | --------------------------- | ------- | ----- |
