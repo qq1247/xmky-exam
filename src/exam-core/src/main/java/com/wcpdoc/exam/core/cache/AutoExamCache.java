@@ -8,17 +8,17 @@ import org.springframework.cache.Cache;
 import com.wcpdoc.cache.BaseEhCache;
 
 /**
- * 完成阅卷缓存
+ * 自动阅卷缓存
  * 
- * v1.0 chenyun 2021年11月30日 15:12:01
+ * v1.0 zhanghc 2021年10月25日下午3:10:12
  */
-public class OutMarkCache extends BaseEhCache {
-	private static final String CACHE_NAME = "OUT_MARK_CACHE";
+public class AutoExamCache extends BaseEhCache {
+	private static final String CACHE_NAME = "AUTO_MARK_CACHE";
 
 	/**
 	 * 放入缓存
 	 * 
-	 * v1.0 chenyun 2021年11月30日 15:12:01
+	 * v1.0 zhanghc 2021年3月18日下午3:34:11
 	 * @param key
 	 * @param value 
 	 * void
@@ -31,7 +31,7 @@ public class OutMarkCache extends BaseEhCache {
 	/**
 	 * 获取缓存
 	 * 
-	 * v1.0 chenyun 2021年11月30日 15:12:01
+	 * v1.0 zhanghc 2021年3月18日下午3:34:11
 	 * @param key
 	 * @param value 
 	 * void
@@ -44,7 +44,7 @@ public class OutMarkCache extends BaseEhCache {
 	/**
 	 * 删除缓存
 	 * 
-	 * v1.0 chenyun 2021年11月30日 15:12:01
+	 * v1.0 zhanghc 2021年3月18日下午3:34:11
 	 * @param key
 	 * @param value 
 	 * void
@@ -57,7 +57,7 @@ public class OutMarkCache extends BaseEhCache {
 	/**
 	 * 缓存列表
 	 * 
-	 * v1.0 chenyun 2021年11月30日 15:12:01
+	 * v1.0 zhanghc 2021年3月18日下午3:34:11
 	 * @param key
 	 * @param value 
 	 * void

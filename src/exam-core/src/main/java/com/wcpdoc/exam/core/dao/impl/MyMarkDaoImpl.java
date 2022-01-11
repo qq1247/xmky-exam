@@ -38,8 +38,10 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examName")), "EXAM.NAME LIKE ?", "%" + pageIn.get("examName") + "%")
 				.addWhere(pageIn.get("curUserId", Integer.class) != null, "MY_MARK.MARK_USER_ID =  ?", pageIn.get("curUserId", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("startTime")) && ValidateUtil.isValid(pageIn.get("endTime")), 
-						"((EXAM.MARK_START_TIME <= ? AND EXAM.MARK_START_TIME >= ?) OR (EXAM.MARK_START_TIME <= ? AND EXAM.MARK_START_TIME >= ? ))", 
-						pageIn.get("startTime"), pageIn.get("startTime"), pageIn.get("endTime"), pageIn.get("endTime"))
+						"((EXAM.MARK_START_TIME <= ? AND ? >= EXAM.MARK_END_TIME) OR (EXAM.MARK_START_TIME <= ? AND ? >= EXAM.MARK_END_TIME) OR (EXAM.MARK_START_TIME >= ? AND EXAM.MARK_END_TIME >= ?))",
+						pageIn.get("startTime"), pageIn.get("startTime"),
+						pageIn.get("endTime"), pageIn.get("endTime"),
+						pageIn.get("startTime"), pageIn.get("endTime"))
 				.addWhere("EXAM.STATE = ?", 1)
 				.addOrder("MY_MARK.ID", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
@@ -62,11 +64,8 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 	@Override
 	public List<Map<String, Object>> getUserList(Integer examId, Integer markUserId) {
 		String sql = "SELECT USER.ID AS USER_ID, USER.NAME AS USER_NAME, ORG.ID AS ORG_ID, ORG.NAME AS ORG_NAME, "
-				+ "MY_EXAM.ANSWER_START_TIME, MY_EXAM.ANSWER_END_TIME, MARK_USER.ID AS MARK_USER_ID, MARK_USER.NAME AS MARK_USER_NAME, "
-				+ "EXAM.MARK_START_TIME AS MARK_START_TIME, EXAM.MARK_END_TIME AS MARK_END_TIME, "
-				+ "EXAM.START_TIME AS EXAM_START_TIME, EXAM.END_TIME AS EXAM_END_TIME, "
-				+ "MY_EXAM.STATE AS STATE, "
-				+ "MY_EXAM.MARK_STATE AS MARK_STATE, MY_EXAM.ANSWER_STATE AS ANSWER_STATE, MY_EXAM.TOTAL_SCORE AS TOTAL_SCORE, "
+				+ "MY_EXAM.ANSWER_START_TIME, MY_EXAM.ANSWER_END_TIME, MY_EXAM.MARK_START_TIME, MY_EXAM.MARK_END_TIME, "
+				+ "MY_EXAM.STATE, MY_EXAM.MARK_STATE, MY_EXAM.ANSWER_STATE, MY_EXAM.TOTAL_SCORE, "
 				+ "PAPER.TOTAL_SCORE AS PAPER_TOTAL_SCORE, PAPER.PASS_SCORE AS PAPER_PASS_SCORE "
 				+ "FROM EXM_MY_EXAM MY_EXAM "
 				+ "INNER JOIN EXM_EXAM EXAM ON MY_EXAM.EXAM_ID = EXAM.ID "
@@ -76,8 +75,8 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 				+ "LEFT JOIN SYS_USER MARK_USER ON MY_EXAM.MARK_USER_ID = MARK_USER.ID "
 				+ "WHERE MY_EXAM.EXAM_ID = ? "
 				+ "		AND EXISTS ("
-				+ "		SELECT 1 FROM "
-				+ "		EXM_MY_MARK Z "
+				+ "		SELECT 1 "
+				+ "		FROM EXM_MY_MARK Z "
 				+ "		WHERE Z.EXAM_ID = ? AND Z.MARK_USER_ID = ? AND Z.EXAM_USER_IDS LIKE CONCAT('%,', MY_EXAM.USER_ID, ',%'))";// 阅卷用户不一定有
 		return getMapList(sql, new Object[] { examId, examId, markUserId });
 	}

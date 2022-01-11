@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.exam.core.cache.AutoExamCache;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
-import com.wcpdoc.exam.core.cache.OutMarkCache;
 import com.wcpdoc.exam.core.service.ExamService;
 
 /**
@@ -38,7 +38,7 @@ public class ExamRunner implements ApplicationRunner {
 		pageIn.addAttr("markState", "1");// 未自动阅卷
 		List<Map<String, Object>> resultList = examService.getListpage(pageIn).getList();
 		for (Map<String, Object> result : resultList) {
-			AutoMarkCache.put((Integer)result.get("id"), DateUtil.getDateTime(result.get("endTime").toString()));
+			AutoExamCache.put((Integer)result.get("id"), DateUtil.getDateTime(result.get("endTime").toString()));
 			log.info("启动监听：【{}-{}】加入监听，{}开始自动阅卷", result.get("id"), result.get("name"), result.get("endTime"));
 		}
 		
@@ -52,7 +52,7 @@ public class ExamRunner implements ApplicationRunner {
 			if (result.get("markEndTime") == null) {// 智能试卷不需要定时任务处理
 				continue;
 			}
-			OutMarkCache.put((Integer)result.get("id"), DateUtil.getDateTime(result.get("markEndTime").toString()));
+			AutoMarkCache.put((Integer)result.get("id"), DateUtil.getDateTime(result.get("markEndTime").toString()));
 			log.info("启动监听：【{}-{}】加入监听，{}开始完成阅卷", result.get("id"), result.get("name"), result.get("markEndTime"));
 		}
 	}

@@ -143,40 +143,22 @@ http请求头需添加Authorization字段，
 | 请求参数| 类型    | 描述       | 必填 |
 | -------- | ------- | ---------- | ---- |
 | examId| Integer | 考试ID | 是   |
-| mark| Boolen | 只看未阅和阅卷中 | 否   |
 ###### 响应数据
 | 响应数据| 类型    | 描述 |
 | --------------------------- | ------- | ----- |
 | code                        | Integer | 响应码   |
 | msg                         | String  | 响应消息  |
-| data.total                  | Integer | 总行数 |
-| data.list[]                 | arr[]   | 分页列表   |
-| data.list[].userId        | Integer | 用户Id  |
-| data.list[].userName        | String  | 用户名称  |
-| data.list[].orgId        | Integer | 组织机构Id  |
-| data.list[].orgName        | String  | 组织机构名称  |
-| data.list[].markState       | Integer | 阅卷状态  |
-
-### 我的阅卷用户列表：myMark/userDetail
-| 请求参数| 类型    | 描述       | 必填 |
-| -------- | ------- | ---------- | ---- |
-| examId| Integer | 考试ID | 是   |
-| userId| Integer | 用户ID | 是   |
-
-###### 响应数据
-| 响应数据| 类型    | 描述 |
-| --------------------------- | ------- | ----- |
-| code                        | Integer | 响应码   |
-| msg                         | String  | 响应消息  |
-| data.total                  | Integer | 总行数 |
-| data.list[]                 | arr[]   | 分页列表   |
+| data.userId        | Integer | 用户Id  |
+| data.userName        | String  | 用户名称  |
+| data.orgId        | Integer | 组织机构Id  |
+| data.orgName        | String  | 组织机构名称  |
 | data.list[].answerStartTime   | Date    | 答题开始时间 |
 | data.list[].answerEndTime     | Date    | 答题完成时间  |
-| data.list[].markStartTime   | Date    | 阅卷开始时间 |
-| data.list[].markEndTime     | Date    | 阅卷结束时间  |
-| data.list[].state       | Integer | 考试状态  |
-| data.list[].markState       | Integer | 阅卷状态  |
-| data.list[].answerState       | Integer | 答题状态  |
+| data.list[].markStartTime   | Date    | 阅卷用户开始阅卷时间 |
+| data.list[].markEndTime     | Date    | 阅卷用户最后阅卷时间  |
+| data.list[].state       | Integer | 我的考试状态（（1：未考试；2：考试中；3：已交卷；4：强制交卷；））  |
+| data.list[].markState       | Integer | 阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）  |
+| data.list[].answerState       | Integer | 答题状态（1：及格；2：不及格）  |
 | data.list[].totalScore | Double  | 个人总分数  |
 | data.list[].paperTotalScore | Double  | 试卷总分数  |
 | data.list[].paperPassScore | Double  | 试卷通过分数  |
