@@ -100,6 +100,9 @@
 					<include>dll/**</include>
 					<include>config/**</include>
 				</includes>
+				<excludes>
+					<exclude>config/jwtSecret.txt</exclude>
+				</excludes>
 				<targetPath>${project.build.directory}</targetPath><!-- 放入war包的同级目录 -->
 			</resource>
 			<resource>
