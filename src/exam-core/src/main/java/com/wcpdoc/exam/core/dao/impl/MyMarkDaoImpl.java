@@ -62,7 +62,7 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 	}
 
 	@Override
-	public List<Map<String, Object>> getUserList(Integer examId, Integer markUserId) {
+	public List<Map<String, Object>> getUserList(Integer examId, Integer markUserId, String examUserName) {
 		String sql = "SELECT USER.ID AS USER_ID, USER.NAME AS USER_NAME, ORG.ID AS ORG_ID, ORG.NAME AS ORG_NAME, "
 				+ "MY_EXAM.ANSWER_START_TIME, MY_EXAM.ANSWER_END_TIME, MY_EXAM.MARK_START_TIME, MY_EXAM.MARK_END_TIME, "
 				+ "MY_EXAM.STATE, MY_EXAM.MARK_STATE, MY_EXAM.ANSWER_STATE, MY_EXAM.TOTAL_SCORE, "
@@ -77,7 +77,12 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 				+ "		AND EXISTS ("
 				+ "		SELECT 1 "
 				+ "		FROM EXM_MY_MARK Z "
-				+ "		WHERE Z.EXAM_ID = ? AND Z.MARK_USER_ID = ? AND Z.EXAM_USER_IDS LIKE CONCAT('%,', MY_EXAM.USER_ID, ',%'))";// 阅卷用户不一定有
-		return getMapList(sql, new Object[] { examId, examId, markUserId });
+				+ "		WHERE Z.EXAM_ID = ? AND Z.MARK_USER_ID = ? AND Z.EXAM_USER_IDS LIKE CONCAT('%,', MY_EXAM.USER_ID, ',%')) ";// 阅卷用户不一定有
+		if (!ValidateUtil.isValid(examUserName)) {
+			return getMapList(sql, new Object[] { examId, examId, markUserId });
+		}
+		
+		sql += " AND USER.NAME LIKE ?";
+		return getMapList(sql, new Object[] { examId, examId, markUserId, String.format("%%%s%%", examUserName) });
 	}
 }

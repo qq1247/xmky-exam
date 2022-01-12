@@ -337,7 +337,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		Collections.sort(myExamList, new Comparator<MyExam>() {
 			@Override
 			public int compare(MyExam o1, MyExam o2) {
-				if (o2.getTotalScore().compareTo(o1.getTotalScore()) == 0) {
+				if (o2.getTotalScore().compareTo(o1.getTotalScore()) == 0 
+						&& o1.getAnswerEndTime() != null && o2.getAnswerEndTime() != null) {
 					return Integer.parseInt(String.valueOf(o1.getAnswerEndTime().getTime() - o2.getAnswerEndTime().getTime())); 
 				}
 				
