@@ -195,8 +195,6 @@ public class ApiLoginController extends BaseController {
 			log.error("获取ico失败：", e.getMessage());
 		} catch (Exception e) {
 			log.error("获取ico失败：", e);
-		} finally {
-			// 流资源的关闭，这里目前没有
 		}
 	}
 }

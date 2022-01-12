@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.auth.cache.TokenCache;
 import com.wcpdoc.auth.entity.JwtResult;
 import com.wcpdoc.auth.util.JwtUtil;
 import com.wcpdoc.core.entity.LoginUser;
@@ -42,5 +43,10 @@ public class UserContextServiceImpl implements UserContextService {
 				return oldJwtResult.getClaims().get("loginName", String.class);
 			}
 		};
+	}
+
+	@Override
+	public boolean valide(LoginUser user) {
+		return user != null && TokenCache.get(user.getId()) != null;
 	}
 }
