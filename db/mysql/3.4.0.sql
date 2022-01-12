@@ -612,6 +612,7 @@ INSERT INTO `SYS_DICT` VALUES (52, 'QUESTION_SCORE_OPTIONS', '3', '大小写不�
 INSERT INTO `SYS_CRON` VALUES (1, '清理临时附件', 'com.wcpdoc.file.job.ClearFileJob', '0 0 0 1/1 * ? ', '1', '1', '2020-08-26 18:42:08');
 INSERT INTO `SYS_CRON` VALUES (2, '数据库备份', 'com.wcpdoc.quartz.job.DbBackJob', '0 0 0 1/1 * ? ', 1, 1, '2020-08-26 18:42:08');
 INSERT INTO `SYS_CRON` VALUES (3, '自动阅卷', 'com.wcpdoc.exam.core.job.AutoMarkJob', '0/1 * * * * ? *', 1, 1, '2020-08-26 18:42:08');
+INSERT INTO `SYS_CRON` VALUES (4, '自动考试', 'com.wcpdoc.exam.core.job.AutoExamJob', '0/1 * * * * ? *', 1, 1, '2020-08-26 18:42:08');
 
 INSERT INTO `SYS_VER` VALUES (1, '1.0.0', '2017-09-07 15:06:00', 'zhanghc', '初始版本');
 INSERT INTO `SYS_VER` VALUES (2, '1.1.0', '2018-11-27 22:47:00', 'zhanghc', '');

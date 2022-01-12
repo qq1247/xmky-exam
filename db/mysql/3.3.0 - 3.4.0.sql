@@ -6,4 +6,6 @@ INSERT INTO `SYS_DICT` VALUES (50, 'QUESTION_SCORE_OPTIONS', '1', '漏选得分'
 INSERT INTO `SYS_DICT` VALUES (51, 'QUESTION_SCORE_OPTIONS', '2', '答案无顺序', 2);
 INSERT INTO `SYS_DICT` VALUES (52, 'QUESTION_SCORE_OPTIONS', '3', '大小写不敏感', 3);
 
+INSERT INTO `SYS_CRON` VALUES (4, '自动考试', 'com.wcpdoc.exam.core.job.AutoExamJob', '0/1 * * * * ? *', 1, 1, '2020-08-26 18:42:08');
+
 INSERT INTO `SYS_VER` VALUES (14, '3.4.0', '2021-12-31 12:00:00', 'zhanghc', '');
