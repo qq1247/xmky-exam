@@ -10,12 +10,5 @@ import com.wcpdoc.wordFilter.entity.Sensitive;
  * v1.0 chenyun 2021年9月2日下午4:27:42
  */
 public interface SensitiveDao extends RBaseDao<Sensitive> {
-
-	/**
-	 * 获取敏感词列表
-	 * 
-	 * v1.0 chenyun 2021年12月3日下午3:59:37
-	 * @return Sensitive
-	 */
-	Sensitive getList();
+	
 }

@@ -150,16 +150,18 @@ public class WordServerImpl extends WordServer {
         FileItem item = factory.createItem("textField", "text/plain", true, file.getName());
         int bytesRead = 0;
         byte[] buffer = new byte[8192];
-        try {
-            FileInputStream fis = new FileInputStream(file);
-            OutputStream os = item.getOutputStream();
-            while ((bytesRead = fis.read(buffer, 0, 8192)) != -1) {
-                os.write(buffer, 0, bytesRead);
+        try (FileInputStream fis = new FileInputStream(file)) {
+        	try (OutputStream os = item.getOutputStream()) {
+	            while ((bytesRead = fis.read(buffer, 0, 8192)) != -1) {
+	                os.write(buffer, 0, bytesRead);
+	            }
+            } catch (IOException e) {
+            	log.error(String.format("WordServerImpl --> createFileItem --> OutputStream  --> %s", e.getMessage()));
+            	throw new MyException(e.getMessage());
             }
-            os.close();
-            fis.close();
         } catch (IOException e) {
-            e.printStackTrace();
+        	log.error(String.format("WordServerImpl --> createFileItem --> FileInputStream --> %s", e.getMessage()));
+        	throw new MyException(e.getMessage());
         }
         return item;
     }
@@ -415,8 +417,10 @@ public class WordServerImpl extends WordServer {
 		if (type == 1 || type == 2 || type == 3 || type == 4 || (type == 5 && ai.getAi() == 1)) {
 			for (Node answerNode : answerNodeList) {
 				String answerTxt = Jsoup.clean(answerNode.outerHtml(), Whitelist.none()); // 【答案：B】【分值：2】 
+				System.err.println(answerTxt.indexOf("】【分值："));
 				String answer = answerTxt.substring(4, answerTxt.indexOf("】【分值：")).trim();
-				String scoreStr = answerTxt.substring(answerTxt.length() - 2, answerTxt.length() - 1).trim(); 
+				System.err.println(answerTxt.indexOf("】【分值："));  
+				String scoreStr = answerTxt.substring(answerTxt.indexOf("【分值：") + 4, answerTxt.length() - 1).trim(); //  原 ： answerTxt.length() - 2    现： answerTxt.indexOf("【分值：") + 4        问题：【分值：22】  这个分值可能是两位数
 				Double score = null;
 				try {
 					score = Double.parseDouble(scoreStr);

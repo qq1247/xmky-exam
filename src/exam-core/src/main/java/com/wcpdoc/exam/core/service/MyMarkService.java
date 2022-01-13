@@ -49,7 +49,8 @@ public interface MyMarkService extends BaseService<MyMark>{
 	 * 
 	 * v1.0 chenyun 2021年12月3日下午1:59:07
 	 * @param examId
+	 * @param examUserName
 	 * @return List<Map<String,Object>>
 	 */
-	List<Map<String, Object>> getUserList(Integer examId);
+	List<Map<String, Object>> getUserList(Integer examId, String examUserName);
 }

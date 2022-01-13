@@ -5,14 +5,13 @@
  * @Author: Che
  * @Date: 2021-08-17 17:50:31
  * @LastEditors: Che
- * @LastEditTime: 2021-12-20 10:50:33
+ * @LastEditTime: 2022-01-13 10:54:23
  */
 import { getSetting } from '@/utils/storage'
 
 const state = {
   lineTime: 0,
   orgName: getSetting().orgName,
-  tabIndex: getSetting().tabIndex,
 }
 
 const mutations = {

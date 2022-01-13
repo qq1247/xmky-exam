@@ -1,8 +1,6 @@
 package com.wcpdoc.exam.core.service;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
 
 import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.Question;
@@ -43,9 +41,11 @@ public interface QuestionService extends BaseService<Question>{
 	 * 删除试题
 	 * 
 	 * v1.0 chenyun 2021年8月25日下午5:28:51
-	 * @param id void
+	 * @param questionTypeId 
+	 * @param ids 
+	 * void
 	 */
-	void delAndUpdate(Integer id);
+	void delAndUpdate(Integer questionTypeId, Integer[] ids);
 	
 	/**
 	 * 完成导入试题
@@ -67,24 +67,6 @@ public interface QuestionService extends BaseService<Question>{
 	 * void
 	 */
 	void move(Integer sourceId, Integer targetId);
-	
-	/**
-	 * 试题统计（类型和难易程度）
-	 * 
-	 * v1.0 chenyun 2021年3月23日下午2:53:07
-	 * @param questionTypeId
-	 * @return Map<String,Object>
-	 */
-	Map<String, Object> statisticsTypeDifficulty(Integer questionTypeId);
-	
-	/**
-	 * 试题统计
-	 * 
-	 * v1.0 chenyun 2021年3月23日下午2:53:07
-	 * @param examId
-	 * @return List<Map<String, Object>>
-	 */
-	List<Map<String, Object>> accuracy(Integer examId);
 	
 	/**
 	 * 拷贝

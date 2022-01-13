@@ -56,10 +56,6 @@ public class ApiMyMarkController extends BaseController {
 			PageIn pageIn = new PageIn(request);
 			pageIn.addAttr("curUserId", getCurUser().getId());
 			PageOut pageOut = myMarkService.getListpage(pageIn);
-			for (Map<String, Object> map : pageOut.getList()) {
-				map.put("markStartTime", map.get("examMarkStartTime"));
-				map.put("markEndTime", map.get("examMarkEndTime"));
-			}
 			
 			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
@@ -119,13 +115,15 @@ public class ApiMyMarkController extends BaseController {
 	 * 阅卷考生
 	 * 
 	 * v1.0 chenyun 2021年8月2日下午3:14:45
+	 * @param examId
+	 * @param userName
 	 * @return PageResult
 	 */
 	@RequestMapping("/userList")
 	@ResponseBody
-	public PageResult userList(Integer examId) {
+	public PageResult userList(Integer examId, String userName) {
 		try {
-			return PageResultEx.ok().data(myMarkService.getUserList(examId));
+			return PageResultEx.ok().data(myMarkService.getUserList(examId, userName));
 		} catch (Exception e) {
 			log.error("我的考试列表错误：", e);
 			return PageResult.err();

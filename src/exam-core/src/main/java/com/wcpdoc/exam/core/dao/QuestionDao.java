@@ -1,7 +1,6 @@
 package com.wcpdoc.exam.core.dao;
 
 import java.util.List;
-import java.util.Map;
 
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.exam.core.entity.Question;
@@ -12,40 +11,14 @@ import com.wcpdoc.exam.core.entity.Question;
  * v1.0 zhanghc 2017-05-07 14:56:29
  */
 public interface QuestionDao extends BaseDao<Question>{
-	
-	/**
-	 * 试题统计(类型和难易程度)
-	 * 
-	 * v1.0 chenyun 2021年3月23日下午2:53:07
-	 * @param questionTypeId
-	 * @return List<Map<String, Object>>
-	 */
-	List<Map<String, Object>> statisticsTypeDifficulty(Integer questionTypeId);
-	
-	/**
-	 * 试题统计
-	 * 
-	 * v1.0 chenyun 2021年3月23日下午2:53:07
-	 * @param examId
-	 * @return List<Map<String, Object>>
-	 */
-	List<Map<String, Object>> accuracy(Integer examId);
 
 	/**
-	 * 更新试题分类
+	 * 获取试题列表
 	 * 
-	 * v1.0 zhanghc 2021年11月5日下午5:03:27
-	 * @param sourceId
-	 * @param targetId void
-	 */
-	void updateQuestionType(Integer sourceId, Integer targetId);
-	
-	/**
-	 * 发布试题
-	 * 
-	 * v1.0 chenyun 2021年11月11日下午4:30:42
+	 * v1.0 zhanghc 2021年12月28日下午2:56:17
 	 * @param questionTypeId
-	 * @param userId void
+	 * @return List<Question>
 	 */
-	void publish(Integer questionTypeId);
+	List<Question> getList(Integer questionTypeId);
+
 }

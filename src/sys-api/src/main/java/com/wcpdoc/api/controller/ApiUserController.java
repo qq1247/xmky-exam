@@ -382,8 +382,7 @@ public class ApiUserController extends BaseController {
 		ServletOutputStream outputStream = null;
 		try {
 			List<UserXlsx> userXlsx = userXlsxService.exportUserXlsx(ids);
-			try {
-				FileOutputStream os = new FileOutputStream("D:/auser.xlsx");
+			try(FileOutputStream os = new FileOutputStream("D:/auser.xlsx")) {
 				Context context = new Context();
 				// 将列表参数放入context中
 				context.putVar("userXlsxList", userXlsx);
@@ -395,21 +394,20 @@ public class ApiUserController extends BaseController {
 				Map<String, Object> funcs = new HashMap<String, Object>();
 				evaluator.getJexlEngine().setFunctions(funcs);
 				jxlsHelper.processTemplate(context, transformer);
-				os.close();
-
-				FileInputStream fileInputStream = new FileInputStream("D:/auser.xlsx");
+			} catch (Exception e) {
+				throw new MyException("读取文件");
+			}
+			try(FileInputStream fileInputStream = new FileInputStream("D:/auser.xlsx")) {
 				String fileName = new String(("userTemplate.xlsx").getBytes("UTF-8"), "ISO-8859-1");
 				response.addHeader("Content-Disposition", "attachment;filename" + fileName);
 				response.setContentType("application/fprce-download");
 				outputStream = response.getOutputStream();
 				IOUtils.copy(fileInputStream, outputStream);
 			} catch (Exception e) {
-				e.printStackTrace();
+				throw new MyException("读取文件");
 			}
 		} catch (Exception e) {
 			log.error("用户列表错误：", e);
-		} finally {
-			IOUtils.closeQuietly(outputStream);
 		}
 	}
 

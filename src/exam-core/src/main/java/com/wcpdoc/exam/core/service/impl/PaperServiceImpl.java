@@ -373,9 +373,12 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		
 		// 移动
 		Integer sourceNo = source.getNo();
+		source.setUpdateUserId(getCurUser().getId());
+		source.setUpdateTime(new Date());
 		source.setNo(target.getNo());
+		target.setUpdateUserId(getCurUser().getId());
+		target.setUpdateTime(new Date());
 		target.setNo(sourceNo);
-		
 		paperQuestionService.update(source);
 		paperQuestionService.update(target);
 	}
@@ -420,7 +423,11 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		
 		// 移动
 		Integer sourceNo = source.getNo();
+		source.setUpdateUserId(getCurUser().getId());
+		source.setUpdateTime(new Date());
 		source.setNo(target.getNo());
+		target.setUpdateUserId(getCurUser().getId());
+		target.setUpdateTime(new Date());
 		target.setNo(sourceNo);
 		
 		if (source.getParentId().intValue() != target.getParentId().intValue()) {// 如果不是同一个章节，更新父子关系
@@ -523,7 +530,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 	
 	@Override
-	public void scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores) {
+	public void scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores, Integer[] scoreOptions) {
 		//校验数据有效性
 		if(!ValidateUtil.isValid(id)) {
 			throw new MyException("参数错误：id");
@@ -578,6 +585,27 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		
 		// 设置分数
 		PaperQuestion pq = paperQuestionService.getEntity(id, questionId);
+		
+		// 设置分数选项
+		String scoreOptionStr = scoreOptions == null ? "" : StringUtil.join(scoreOptions);
+		if (question.getType() == 2) {// 分数选项：1：漏选得分；2：答案无顺序；3：大小写不敏感；
+			if (scoreOptionStr.contains("1")) {
+				pq.setScoreOptions("1");
+			}
+		} else if (question.getType() == 3) {
+			if (scoreOptionStr.contains("2") && scoreOptionStr.contains("3")) {
+				pq.setScoreOptions("2,3");
+			} else if (scoreOptionStr.contains("2")) {
+				pq.setScoreOptions("2");
+			} else if (scoreOptionStr.contains("3")) {
+				pq.setScoreOptions("3");
+			}  
+		} else if (question.getType() == 5 && question.getAi() == 1) {
+			if (scoreOptionStr.contains("3")) {
+				pq.setScoreOptions("3");
+			}
+		}
+		
 		pq.setScore(score);
 		paperQuestionService.update(pq);
 		
@@ -635,7 +663,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			} else if (scoreOptionStr.contains("3")) {
 				pq.setScoreOptions("3");
 			}  
-		} else if (question.getType() == 5) {
+		} else if (question.getType() == 5 && question.getAi() == 1) {
 			if (scoreOptionStr.contains("3")) {
 				pq.setScoreOptions("3");
 			}
@@ -836,7 +864,19 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 				questionMap.put("ai", question.getAi());
 				questionMap.put("analysis", question.getAnalysis());
 				questionMap.put("score", paperQuestion.getScore());// 分数从试卷中取
-				questionMap.put("scoreOptions", paperQuestion.getScoreOptions());// 分数选项从试卷中取
+				
+				Integer[] scoreOptions = null;//new Integer[split.length];
+				if (ValidateUtil.isValid(paperQuestion.getScoreOptions())) {
+					String[] split = paperQuestion.getScoreOptions().split(",");
+					scoreOptions = new Integer[split.length];
+					for(int i = 0; i < split.length; i++ ){
+						scoreOptions[i] = Integer.parseInt(split[i]);
+					}
+				} else {
+					scoreOptions = new Integer[0];
+				}
+				
+				questionMap.put("scoreOptions", scoreOptions);// 分数选项从试卷中取
 				questionMap.put("options", new String[0]);// 默认为长度为0的数组
 				if (question.getType() == 1 || question.getType() == 2) {// 如果是单选或多选，添加选项
 					List<QuestionOption> questionOptionList = questionOptionService

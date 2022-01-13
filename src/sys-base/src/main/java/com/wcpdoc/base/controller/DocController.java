@@ -93,8 +93,6 @@ public class DocController extends BaseController {
 	@RequestMapping("")
 	public String toEdit(Model model) {
 		try {
-			String remoteHost = request.getRemoteHost();
-			System.err.println(remoteHost);
 			model.addAttribute("mdFileList", mdFileList);
 			return "doc/docEdit";
 		} catch (Exception e) {

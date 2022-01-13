@@ -3,7 +3,7 @@
 Date样式：yyyy-MM-dd HH:mm:ss
 curPage = 1
 pageSize = 20
-pageSize <= 100
+pageSize &lt;= 100
 code == 200 请求正常
 code == 500 服务器内部错误
 code == 401 无权限或登录超时
@@ -245,17 +245,16 @@ http请求头需添加Authorization字段，
 | data.list[]                  | Object[]   | 分页列表     |
 | data.list[].id               | Integer | 主键         |
 | data.list[].type             | Integer | 类型         |
-| data.list[].typeName         | String  | 类型名称     |
 | data.list[].difficulty       | Integer | 难度         |
-| data.list[].difficultyName   | String  | 难度名称     |
 | data.list[].title            | String  | 题干         |
+| data.list[].options            | String[]  | 选项（type=1,2时有效）         |
+| data.list[].ai            | Integer  | 智能阅卷        |
 | data.list[].state            | Integer | 状态         |
-| data.list[].stateName            | Integer | 状态名称         |
+| data.list[].analysis            | String | 解析         |
 | data.list[].questionTypeId   | Integer | 试题分类ID   |
-| data.list[].questionTypeName | Integer | 试题分类名称 |
 | data.list[].score            | Double  | 分值         |
-| data.list[].scoreOptions     | String[]  | 分值选项     |
-| data.list[].scoreOptionNames     | String[]  | 分值选项名称   |
+| data.list[].scoreOptions     | Integer[]  | 分值选项     |
+| data.list[].createUserName     | String  | 创建人     |
 
 ### 试题添加：question/add
 | 请求参数| 类型  | 描述    | 必填 |
@@ -263,7 +262,7 @@ http请求头需添加Authorization字段，
 | type           | Integer         | 类型（1：单选；2：多选；3：填空；4：判断；5：问答 | 是   |
 | difficulty     | Integer         | 难度（1：极易；2：简单；3：适中；4：困难；5：极难 ） | 是   |
 | title          | Text | 题干 | 是   |
-| options[]      | String[]        | 选项，type为1,2时有效，len <= 7  | 否   |
+| options[]      | String[]        | 选项，type为1,2时有效，len &lt;= 7  | 否   |
 | ai| Integer    | 智能阅卷（1：是；2：否；）  | 是   |
 | analysis       | Text    | 解析  | 是   |
 | questionTypeId | Integer         | 试题分类ID      | 是   |
@@ -282,7 +281,8 @@ http请求头需添加Authorization字段，
 ### 试题删除：question/del
 | 请求参数| 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
-| id   | Integer | 主键 | 是   |
+| ids   | Integer[] | 主键 | 是   |
+| questionTypeId   | Integer | 试题分类ID（和ids只能有一个有效） | 是   |
 
 ### 试题获取：question/get
 | 请求参数| 类型    | 描述 | 必填 |
@@ -297,16 +297,17 @@ http请求头需添加Authorization字段，
 | data.type           | Integer         | 类型（1：单选；2：多选；3：填空；4：判断；5：问答 |
 | data.difficulty     | Integer         | 难度（1：极易；2：简单；3：适中；4：困难；5：极难 ） | 
 | data.title          | Text | 题干 |
-| data.options[]      | String[]        | 选项，type为1,2时有效，len <= 7  |
+| data.options[]      | String[]        | 选项，type为1,2时有效，len &lt;= 7  |
 | data.ai| Integer    | 智能阅卷（1：是；2：否；）  | 
 | data.analysis       | Text    | 解析  | 
 | data.questionTypeId | Integer         | 试题分类ID      |
 | data.score          | Double          | 分数   | 是
 | data.scoreOptions[] | Integer[] | 分数选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；）|
 | data.state| Integer | 状态（0：删除；1：发布；2：草稿）|
-| data.answers[]      | Object[]   | 答案数组   | 
-| data.answers[].answer      | String   | 答案   | 
-| data.answers[].score     | Double    | 得分   | 
+| data.answers[]      | Object[]   | 答案数组   |
+| data.answers[].answer      | String   | 答案   |
+| data.answers[].score     | Double    | 得分   |
+| data.answers[].createUserName     | String  | 创建人  |
 
 ### 试题复制：question/copy
 | 请求参数| 类型    | 描述 | 必填 |
@@ -353,13 +354,9 @@ http请求头需添加Authorization字段，
 | data.list[].passScore     | Double  | 及格分数（百分比） |
 | data.list[].totalScore    | Double  | 总分数 |
 | data.list[].paperTypeId   | Integer | 试卷分类id  |
-| data.list[].paperTypeName | String  | 试卷分类名称 |
 | data.list[].markType      | Integer | 阅卷方式（1：智能阅卷；2：人工阅卷；） |
-| data.list[].markTypeName      | String| 阅卷方式名称 |
 | data.list[].showType      | Integer | 展示方式（1：整卷展示；2：章节显示；3：单题展示；） |
-| data.list[].showTypeName      | String| 展示方式名称 |
 | data.list[].genType       | Integer | 组卷方式（1：人工组卷；2：随机组卷） |
-| data.list[].genTypeName       | String| 组卷方式名称 |
 
 ### 试卷添加：paper/add
 | 请求参数             | 类型          | 描述   | 必填 |
@@ -460,9 +457,7 @@ http请求头需添加Authorization字段，
 |data.list[].chapter.description  | String  | 章节描述 |
 |data.list[].questionList[].id  | Integer  | 试题id |
 |data.list[].questionList[].type  | Integer  | 试题类型，参考question/add |
-|data.list[].questionList[].typeName  | String  | 试题类型名称 |
 |data.list[].questionList[].difficulty  | Integer  | 试题难度，难易度参考question/add|
-|data.list[].questionList[].difficultyName  | String  | 试题难度名称 |
 |data.list[].questionList[].title  | String  | 试题标题 |
 |data.list[].questionList[].ai  | Integer  | 是否智能阅卷|
 |data.list[].questionList[].analysis  | String  | 试题解析 |
@@ -497,6 +492,7 @@ http请求头需添加Authorization字段，
 | questionId| Integer  | 试题ID       | 是   |
 | score | Double  | 分数 | 是 |
 | subScores| Double  | 每空分数（试题为智能阅卷，并且是填空或问答时有效） | 是   |
+| scoreOptions    | Integer[] | 分数选项     | 否  |
 
 ### 试卷设置分数选项：paper/scoreOptionUpdate
 | 请求参数| 类型      | 描述       | 必填 |
@@ -540,7 +536,6 @@ http请求头需添加Authorization字段，
 | data.list[].markStartTime| Date| 阅卷开始时间|
 | data.list[].markEndTime| Date| 阅卷结束时间|
 | data.list[].state   | Integer | 考试状态     |
-| data.list[].stateName|String| 考试状态名称    |
 | data.list[].paperMarkType  | Integer |  试卷阅卷类型   |
 | data.list[].paperId| Integer| 试卷Id    |
 | data.list[].paperName|String| 试卷名称    |
@@ -569,6 +564,27 @@ http请求头需添加Authorization字段，
 | 请求参数| 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
 | id   | Integer | 主键 | 是   |
+
+### 考试添加：exam/get
+| 请求参数| 类型        | 描述   |
+| ------------- | ----------- | ------|
+| id          | Integer | 主键  |
+
+| 响应参数  | 类型    | 描述     |
+| --------| ------- | ------- |
+| code     | Integer | 响应码   |
+| msg     | String  | 响应消息 |
+| data.id  | Integer | 主键  |
+| data.name          | String | 名称  |
+| data.startTime     | Date        | 考试开始时间 |
+| data.endTime       | Date        | 考试结束时间  |
+| data.markStartTime | Date        | 阅卷开始时间 |
+| data.markEndTime   | Date        | 阅卷结束时间 |
+| data.paperId       | Integer     | 试卷ID  |
+| data.paperName       | String     | 试卷名称  |
+| data.examTypeId    | Integer     | 考试分类ID |
+| data.paperMarkType    | Integer     | 试卷阅卷类型 |
+| data.state    | Integer     | 状态 |
 
 ### 考试发布：exam/publish
 | 请求参数| 类型    | 描述 | 必填 |

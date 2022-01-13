@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
+import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.QuestionCommentDao;
 import com.wcpdoc.exam.core.entity.QuestionComment;
@@ -75,7 +76,7 @@ public class QuestionCommentServiceImpl extends BaseServiceImp<QuestionComment> 
 		// 校验数据有效性
 		List<Map<String, Object>> list = questionCommentDao.getList(id);
 		if (list.size() > 0) {
-			throw new MyException("请先删除子试题评论！");
+			throw new MyException("请先删除子试题评论");
 		}
 		
 		// 删除试题评论
@@ -88,6 +89,12 @@ public class QuestionCommentServiceImpl extends BaseServiceImp<QuestionComment> 
 
 	@Override
 	public List<Map<String, Object>> getList(Integer parentId) {
-		return questionCommentDao.getList(parentId);
+		List<Map<String, Object>> list = questionCommentDao.getList(parentId);
+		for(Map<String, Object> map : list){
+			if (map.get("createTime") != null) {
+				map.put("createTime", DateUtil.formatDateTime( DateUtil.getDateTime(map.get("createTime").toString())));
+			}
+		}
+		return list;
 	}
 }

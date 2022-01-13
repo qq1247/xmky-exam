@@ -27,8 +27,9 @@ public interface MyMarkDao extends BaseDao<MyMark>{
 	 * 
 	 * v1.0 chenyun 2021年12月3日下午2:01:49
 	 * @param examId
-	 * @param markUserId //当前登录用户
+	 * @param markUserId
+	 * @param examUserName
 	 * @return List<Map<String,String>>
 	 */
-	List<Map<String, Object>> getUserList(Integer examId, Integer markUserId);
+	List<Map<String, Object>> getUserList(Integer examId, Integer markUserId, String examUserName);
 }

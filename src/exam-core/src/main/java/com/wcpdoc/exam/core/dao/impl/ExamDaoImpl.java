@@ -7,7 +7,6 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Repository;
 
-import com.wcpdoc.base.cache.DictCache;
 import com.wcpdoc.base.dao.UserDao;
 import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.core.entity.PageIn;
@@ -55,8 +54,6 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 				"endTime", DateUtil.FORMAT_DATE_TIME,
 				"markStartTime", DateUtil.FORMAT_DATE_TIME,
 				"markEndTime", DateUtil.FORMAT_DATE_TIME);
-		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), 
-				"EXAM_STATE", "state");
 		return pageOut;
 	}
 	

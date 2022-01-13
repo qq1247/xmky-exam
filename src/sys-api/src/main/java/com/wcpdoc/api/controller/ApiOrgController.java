@@ -111,10 +111,10 @@ public class ApiOrgController extends BaseController {
 				throw new MyException("参数错误：name");
 			}
 			if (orgService.existName(org)) {
-				throw new MyException("名称已存在！");
+				throw new MyException("名称已存在");
 			}
 			if (orgService.existCode(org)) {
-				throw new MyException("编码已存在！");
+				throw new MyException("编码已存在");
 			}
 
 			// 修改组织机构
@@ -175,7 +175,7 @@ public class ApiOrgController extends BaseController {
 					.addAttr("id", org.getId())
 					.addAttr("name", org.getName())
 					.addAttr("parentId", org.getParentId())
-					.addAttr("parentName", org.getParentId() == null ? null : orgService.getEntity(org.getParentId()).getName())
+					.addAttr("parentName", (org.getParentId() == null || org.getParentId() == 0) ? null : orgService.getEntity(org.getParentId()).getName())
 					.addAttr("no", org.getNo());
 		} catch (MyException e) {
 			log.error("获取组织机构错误：{}", e.getMessage());

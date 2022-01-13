@@ -627,7 +627,7 @@ INSERT INTO `SYS_DICT` VALUES (39, 'STATE_OPEN', '0', '删除', 3);
 INSERT INTO `SYS_DICT` VALUES (40, 'PAPER_MARK_TYPE', '1', '智能阅卷', 1);
 INSERT INTO `SYS_DICT` VALUES (41, 'PAPER_MARK_TYPE', '2', '人工阅卷', 2);
 
-INSERT INTO `SYS_CRON` VALUES ('1', '清理临时附件', 'com.wcpdoc.file.job.ClearFileJob', '0 0 0 1/1 * ? ', '1', '1', '2020-08-26 18:42:08');
+INSERT INTO `SYS_CRON` VALUES (1, '清理临时附件', 'com.wcpdoc.file.job.ClearFileJob', '0 0 0 1/1 * ? ', '1', '1', '2020-08-26 18:42:08');
 INSERT INTO `SYS_CRON` VALUES (2, '数据库备份', 'com.wcpdoc.quartz.job.DbBackJob', '0 0 0 1/1 * ? ', 1, 1, '2020-08-26 18:42:08');
 INSERT INTO `SYS_CRON` VALUES (3, '自动阅卷', 'com.wcpdoc.exam.core.job.AutoMarkJob', '0/1 * * * * ? *', 1, 1, '2020-08-26 18:42:08');
 

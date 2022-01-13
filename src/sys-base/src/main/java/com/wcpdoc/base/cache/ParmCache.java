@@ -1,5 +1,6 @@
 package com.wcpdoc.base.cache;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,6 +71,18 @@ public class ParmCache extends BaseEhCache {
 	 */
 	private static void addCache() {
 		Parm parm = SpringUtil.getBean(ParmService.class).get();
+		//为空默认赋值
+		if (parm == null) {
+			parm = new Parm();
+			parm.setUpdateUserId(1);
+			parm.setUpdateTime(new Date());
+			parm.setFileUploadDir(String.format("%s/%s", System.getProperty("user.dir"), "bak/file"));
+			parm.setDbBakDir(String.format("%s/%s", System.getProperty("user.dir"), "bak/db"));
+			parm.setPwdType(2);
+			parm.setPwdValue("111111");
+			SpringUtil.getBean(ParmService.class).add(parm);
+		}
+		
 		Parm source = parm;
 		Parm target = new Parm();
 		BeanUtils.copyProperties(target, target);

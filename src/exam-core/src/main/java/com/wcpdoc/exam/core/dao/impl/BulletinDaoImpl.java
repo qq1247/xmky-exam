@@ -4,7 +4,6 @@ import java.util.Date;
 
 import org.springframework.stereotype.Repository;
 
-import com.wcpdoc.base.cache.DictCache;
 import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
@@ -48,10 +47,6 @@ public class BulletinDaoImpl extends RBaseDaoImpl<Bulletin> implements BulletinD
 		HibernateUtil.formatDate(pageOut.getList(), 
 				"startTime", DateUtil.FORMAT_DATE_TIME,
 				"endTime", DateUtil.FORMAT_DATE_TIME);
-		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), 
-				"BULLETIN_SHOW_TYPE", "showType",
-				"EXAM_STATE", "state"
-				);
 		return pageOut;
 	}
 

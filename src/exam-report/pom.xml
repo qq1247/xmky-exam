@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.wcpdoc.exam</groupId>
 		<artifactId>sys-parent</artifactId>
-		<version>3.3.0</version>
+		<version>3.4.0</version>
 	</parent>
 	<artifactId>exam-report</artifactId>
 	<name>exam-report</name>
@@ -18,5 +18,12 @@
 			<artifactId>exam-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<!-- 集成服务器参数 -->
+		<dependency>
+		    <groupId>org.hyperic</groupId>
+		    <artifactId>sigar</artifactId>
+		    <version>1.6.5.132</version>
+		</dependency> 
 	</dependencies>
 </project>

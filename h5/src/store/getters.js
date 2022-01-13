@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-11 11:33:30
  * @LastEditors: Che
- * @LastEditTime: 2021-12-20 10:53:09
+ * @LastEditTime: 2022-01-13 10:54:11
  */
 const getters = {
   name: (state) => state.user.name,

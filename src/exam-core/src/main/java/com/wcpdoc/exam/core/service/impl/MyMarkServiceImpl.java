@@ -9,7 +9,6 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.base.cache.DictCache;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
@@ -165,7 +164,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 			throw new MyException("阅卷未开始");
 		}
 		if (curTime - exam.getMarkEndTime().getTime() > 1000) {// 预留1秒网络延时
-			throw new MyException("阅卷已结束！");
+			throw new MyException("阅卷已结束");
 		}
 		
 		List<MyMark> myMarkList = myMarkDao.getList(examId);
@@ -192,7 +191,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 			}
 		}
 		if (num > 0) {
-			throw new MyException("还有" + num + "道题未阅！");
+			throw new MyException("还有" + num + "道题未阅");
 		}
 		
 		// 标记为已阅，记录阅卷人，统计总分数，标记是否及格
@@ -212,20 +211,21 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 	}
 
 	@Override
-	public List<Map<String, Object>> getUserList(Integer examId) {
-		List<Map<String, Object>> userList = myMarkDao.getUserList(examId, getCurUser().getId());
+	public List<Map<String, Object>> getUserList(Integer examId, String examUserName) {
+		List<Map<String, Object>> userList = myMarkDao.getUserList(examId, getCurUser().getId(), examUserName);
 		for(Map<String, Object> map : userList){
-			map.put("examStartTime", DateUtil.formatDateTime(DateUtil.getDateTime(map.get("examStartTime").toString())));
-			map.put("examEndTime", DateUtil.formatDateTime(DateUtil.getDateTime(map.get("examStartTime").toString())));
-			map.put("markEndTime", DateUtil.formatDateTime(DateUtil.getDateTime(map.get("examStartTime").toString())));
-			map.put("markStartTime", DateUtil.formatDateTime(DateUtil.getDateTime(map.get("examStartTime").toString())));
-			map.put("answerStartTime", DateUtil.formatDateTime(DateUtil.getDateTime(map.get("examStartTime").toString())));
-			map.put("answerEndTime", DateUtil.formatDateTime(DateUtil.getDateTime(map.get("examStartTime").toString())));
-			
-			map.put("stateName", DictCache.getDictValue("MY_EXAM_STATE", map.get("state") == null ? null : map.get("state").toString()));
-			map.put("answerStateName", DictCache.getDictValue("MY_EXAM_ANSWER_STATE", map.get("answerState") == null ? null : map.get("answerState").toString()));
-			map.put("markStateName", DictCache.getDictValue("MY_EXAM_MARK_STATE", map.get("markState") == null ? null : map.get("markState").toString()));
-			map.put("paperShowTypeName", DictCache.getDictValue("PAPER_SHOW_TYPE", map.get("paperShowType") == null ? null : map.get("paperShowType").toString()));
+			if (map.get("answerStartTime") != null) {
+				map.put("answerStartTime", DateUtil.formatDateTime((Date)map.get("answerStartTime")));
+			}
+			if (map.get("answerStartTime") != null) {
+				map.put("answerEndTime", DateUtil.formatDateTime((Date)map.get("answerEndTime")));
+			}
+			if (map.get("answerStartTime") != null) {
+				map.put("markEndTime", DateUtil.formatDateTime((Date)map.get("markEndTime")));
+			}
+			if (map.get("answerStartTime") != null) {
+				map.put("markStartTime", DateUtil.formatDateTime((Date)map.get("markStartTime")));
+			}
 		}
 		return userList;
 	}

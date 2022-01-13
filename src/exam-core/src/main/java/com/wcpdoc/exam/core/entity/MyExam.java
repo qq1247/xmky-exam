@@ -62,6 +62,8 @@ public class MyExam {
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "UPDATE_TIME")
 	private Date updateTime;
+	@Column(name = "NO")
+	private Integer no;
 
 	public Integer getId() {
 		return id;
@@ -179,5 +181,13 @@ public class MyExam {
 
 	public void setMarkEndTime(Date markEndTime) {
 		this.markEndTime = markEndTime;
+	}
+
+	public Integer getNo() {
+		return no;
+	}
+
+	public void setNo(Integer no) {
+		this.no = no;
 	}
 }

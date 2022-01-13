@@ -5,12 +5,15 @@
 	<parent>
 		<groupId>com.wcpdoc.exam</groupId>
 		<artifactId>sys-parent</artifactId>
-		<version>3.3.0</version>
+		<version>3.4.0</version>
 	</parent>
 	<artifactId>sys-core</artifactId>
 	<name>sys-core</name>
 	<description>系统核心</description>
-
+	<properties>
+		<!-- 使用新版本log4j2，解决2021.12月爆发的jndi注入攻击漏洞 -->
+        <log4j2.version>2.17.0</log4j2.version>
+    </properties>
 	<dependencies>
 		<!-- 集成web应用 -->
 		<dependency>
@@ -81,9 +84,9 @@
 			<version>1.9.3</version>
 		</dependency>
 		<dependency>
-		   <groupId>org.apache.commons</groupId>
-		   <artifactId>commons-text</artifactId>
-		   <version>1.8</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
+			<version>1.8</version>
 		</dependency>
 		<!-- 集成json解析 -->
 		<dependency>

@@ -184,7 +184,7 @@ public class ApiMyExamController extends BaseController{
 				if (!ValidateUtil.isValid(user.getEmail())) {
 					continue;
 				}
-				notifyService.pushEmail(parm.getEmailUserName(), user.getEmail(), "考试邮箱通知！", user.getName()+"-昵称。");
+				notifyService.pushEmail(parm.getEmailUserName(), user.getEmail(), "考试邮箱通知", user.getName()+"-昵称。");
 			}
 			return PageResult.ok();
 		} catch (NotifyException e) {

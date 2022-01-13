@@ -54,7 +54,7 @@ public class QuestionTypeOpenServiceImpl extends BaseServiceImp<QuestionTypeOpen
 		// 校验数据有效性
 		List<QuestionTypeOpen> list = questionTypeOpenDao.getList(questionTypeOpen.getStartTime(), questionTypeOpen.getEndTime(), questionTypeOpen.getQuestionTypeId());
 		if (list.size() != 0) {
-			throw new MyException("该时间段已存在，请重新选择时间段！");
+			throw new MyException("该时间段已存在，请重新选择时间段");
 		}
 		
 		if (ValidateUtil.isValid(questionTypeOpen.getUserIds())) {
@@ -78,6 +78,8 @@ public class QuestionTypeOpenServiceImpl extends BaseServiceImp<QuestionTypeOpen
 		// 校验数据有效性
 		QuestionTypeOpen entity = getEntity(id);
 		entity.setState(2);
+		entity.setUpdateTime(new Date());
+		entity.setUpdateUserId(getCurUser().getId());
 		update(entity);
 	}
 
@@ -99,7 +101,17 @@ public class QuestionTypeOpenServiceImpl extends BaseServiceImp<QuestionTypeOpen
 		
 		List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
 		List<Map<String, Object>> questionAnswerSplitList = new ArrayList<Map<String, Object>>();
-		if (question.getType() == 3) {
+		if (question.getType() == 2) {
+			for(QuestionAnswer questionAnswer : questionAnswerList){
+				Map<String, Object> map = new HashMap<String, Object>();
+				String[] split = questionAnswer.getAnswer().split(",");
+				map.put("id", questionAnswer.getId());
+				map.put("answer", split);
+				map.put("score", questionAnswer.getScore());
+				map.put("questionId", questionAnswer.getQuestionId());
+				questionAnswerSplitList.add(map);
+			}
+		} else if  (question.getType() == 3) {
 			for(QuestionAnswer questionAnswer : questionAnswerList){
 				Map<String, Object> map = new HashMap<String, Object>();
 				String[] split = questionAnswer.getAnswer().split("\n");
@@ -129,6 +141,18 @@ public class QuestionTypeOpenServiceImpl extends BaseServiceImp<QuestionTypeOpen
 				questionAnswerSplitList.add(map);
 			}
 		}
+		
+		Integer[] scoreOptions = null;//new Integer[split.length];
+		if (ValidateUtil.isValid(question.getScoreOptions())) {
+			String[] split = question.getScoreOptions().split(",");
+			scoreOptions = new Integer[split.length];
+			for(int i = 0; i < split.length; i++ ){
+				scoreOptions[i] = Integer.parseInt(split[i]);
+			}
+		} else {
+			scoreOptions = new Integer[0];
+		}
+		
 		PageResultEx pageResult = PageResultEx.ok()
 				.addAttr("id", question.getId())
 				.addAttr("type", question.getType())
@@ -139,7 +163,7 @@ public class QuestionTypeOpenServiceImpl extends BaseServiceImp<QuestionTypeOpen
 				.addAttr("state", question.getState())
 				.addAttr("questionTypeId", question.getQuestionTypeId())
 				.addAttr("score", question.getScore())
-				.addAttr("scoreOptions", question.getScoreOptions())
+				.addAttr("scoreOptions", scoreOptions)
 				.addAttr("options", optionList.toArray(new String[optionList.size()]))
 				.addAttr("answers", questionAnswerSplitList);
 		return pageResult;

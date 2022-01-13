@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-10-13 14:52:40
  * @LastEditors: Che
- * @LastEditTime: 2022-01-12 15:33:34
+ * @LastEditTime: 2022-01-13 10:49:33
 -->
 <template>
   <div class="exam-item">

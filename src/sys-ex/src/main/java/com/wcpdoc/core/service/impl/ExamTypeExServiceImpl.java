@@ -28,7 +28,7 @@ public class ExamTypeExServiceImpl implements ExamTypeExService {
 	public void delAndUpdate(ExamType examType) {
 		List<Exam> examList = examService.getList(examType.getId());
 		if (ValidateUtil.isValid(examList)) {
-			throw new MyException("该考试分类下有试题，不允许删除！");
+			throw new MyException("该考试分类下有试题，不允许删除");
 		}
 	}
 }

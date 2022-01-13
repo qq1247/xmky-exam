@@ -30,8 +30,8 @@ public class FileIdCache extends BaseEhCache{
 		Cache cache = getCache(CACHE_NAME);
 		String cacheFileId = cache.get(id, String.class);
 		if (ValidateUtil.isValid(cacheFileId)) {
-			log.debug("附件上传失败：{}-已存在！", id);
-			throw new MyException("上传失败！");
+			log.debug("附件上传失败：{}-已存在", id);
+			throw new MyException("上传失败");
 		}
 		cache.put(id, fileId);
 	}

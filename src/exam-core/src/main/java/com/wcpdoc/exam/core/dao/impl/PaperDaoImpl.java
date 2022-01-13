@@ -6,12 +6,10 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Repository;
 
-import com.wcpdoc.base.cache.DictCache;
 import com.wcpdoc.base.dao.UserDao;
 import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
-import com.wcpdoc.core.util.HibernateUtil;
 import com.wcpdoc.core.util.SqlUtil;
 import com.wcpdoc.core.util.SqlUtil.Order;
 import com.wcpdoc.core.util.ValidateUtil;
@@ -45,12 +43,6 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "PAPER.STATE = ?", pageIn.get("state"))
 				.addOrder("PAPER.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), 
-				"EXAM_STATE", "state",
-				"PAPER_MARK_TYPE", "markType",
-				"PAPER_SHOW_TYPE", "showType",
-				"PAPER_GEN_TYPE", "genType"
-				);
 		return pageOut;
 	}
 

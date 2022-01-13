@@ -1,6 +1,5 @@
 package com.wcpdoc.file.service.impl;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
@@ -109,7 +108,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 			if (!ValidateUtil.isValid(FileIdCache.getFileId(uuId))) {
 				FileIdCache.setFileId(uuId, fileIds.toString());
 			}else{
-				throw new MyException("上传失败！");
+				throw new MyException("上传失败");
 			}
 		}
 		
@@ -173,20 +172,14 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 
 	@Override
 	public void exportTemplate(String templateName){
-		OutputStream output = null;
-		InputStream input = null;
-		try {
-		input = this.getClass().getResourceAsStream("/res/"+templateName);
-		String fileName = new String((templateName).getBytes("UTF-8"), "ISO-8859-1");
-		response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
-		response.setContentType("application/force-download");
-		output = response.getOutputStream();
-		IOUtils.copy(input, output);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			IOUtils.closeQuietly(output);
-			IOUtils.closeQuietly(input);
+		try(InputStream input = this.getClass().getResourceAsStream("/res/"+templateName)) {
+			String fileName = new String((templateName).getBytes("UTF-8"), "ISO-8859-1");
+			response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
+			response.setContentType("application/force-download");
+			OutputStream output = response.getOutputStream();
+			IOUtils.copy(input, output);
+		} catch (Exception e) {
+			throw new MyException("读取文件错误");
 		}
 	}
 	

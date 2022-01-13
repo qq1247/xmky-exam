@@ -109,7 +109,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		Parm parm = get();
 		String oldFileUploadDir = parm.getFileUploadDir();
 		if (oldFileUploadDir.equals(uploadDir)) {
-			throw new MyException("目录名称相同！");
+			throw new MyException("目录名称相同");
 		}
 		parm.setUpdateTime(new Date());
 		parm.setUpdateUserId(getCurUser().getId());
@@ -122,7 +122,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 			FileUtils.moveToDirectory(oldFileUploadFile, uploadDirFile, true);
 		} catch (Exception e) {
 			if (e.getMessage().contains("does not exist")) {
-				throw new MyException("源文件已被删除！");
+				throw new MyException("源文件已被删除");
 			}
 			throw new MyException(e);
 		}
@@ -139,7 +139,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		Parm parm = get();
 		String oldBakDir = parm.getDbBakDir();
 		if (oldBakDir.equals(bakDir)) {
-			throw new MyException("目录名称相同！");
+			throw new MyException("目录名称相同");
 		}
 		
 		parm.setUpdateTime(new Date());
@@ -153,7 +153,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 			FileUtils.moveToDirectory(oldBakFile, bakDirFile, true);
 		} catch (Exception e) {
 			if (e.getMessage().contains("does not exist")) {
-				throw new MyException("源文件已被删除！");
+				throw new MyException("源文件已被删除");
 			}
 			throw new MyException(e);
 		}

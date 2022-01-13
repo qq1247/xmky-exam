@@ -26,7 +26,7 @@ http请求头需添加Authorization字段，
 带前缀描述，表达前缀业务+字段的意思。如user/add?orgId=1，orgId表示机构ID=1
 
 ## 统计相关
-### 试题统计：--/--
+### 试题统计：report/question/statis
 | 请求参数| 类型        | 描述       | 必填 |
 | -------- | ----------- | ---------- | ---- |
 | questionTypeId | Integer | 试题分类ID   | 是   |
@@ -45,7 +45,7 @@ http请求头需添加Authorization字段，
 | data.aiList[].name        | String | 智能名称  |
 | data.aiList[].value       | String  | 智能值  |
 
-### 考试统计：--/--
+### 考试统计：report/exam/statis
 | 请求参数| 类型    | 描述       | 必填 |
 | ---- | ------- | ---------- | ---- |
 | examId | Integer | 考试ID | 是   |
@@ -54,21 +54,21 @@ http请求头需添加Authorization字段，
 | --------------------- | ------- | -------------------------- |
 | code                  | Integer | 响应码                     |
 | msg                   | String  | 响应消息                   |
-| data[].exam.name     | String |  考试名称       |
-| data[].exam.startTime     | Date    | 考试开始时间           |
-| data[].exam.endTime        | Date   | 考试结束时间           |
-| data[].exam.markStartTime    | Date | 阅卷开始时间               |
-| data[].exam.markEndTime   | Date   | 阅卷结束时间                 |
-| data[].exam.userNum       | Integer    | 考试用户数量                   |
-| data[].exam.missUserNum   | Integer  | 缺考用户数量                       |
-| data[].exam.succUserNum  | Integer  | 成绩合格用户数量       |
-| data[].myExam.answerStartTime  | Date  | 答题开始时间（用于统计最短交卷时间）      |
-| data[].myExam.answerEndTime  | Date  | 答题结束时间       |
-| data[].score.total  | Double  | 总分数  |
-| data[].score.avg | Double  | 平均分   |
-| data[].score.min  | Double  | 最低分   |
-| data[].score.max | Double  |最高分  |
-| data[].score.sd | Double  | 标准差 |
+| data.exam.name     | String |  考试名称       |
+| data.exam.startTime     | Date    | 考试开始时间           |
+| data.exam.endTime        | Date   | 考试结束时间           |
+| data.exam.markStartTime    | Date | 阅卷开始时间               |
+| data.exam.markEndTime   | Date   | 阅卷结束时间                 |
+| data.exam.userNum       | Integer    | 考试用户数量                   |
+| data.exam.missUserNum   | Integer  | 缺考用户数量                       |
+| data.exam.succUserNum  | Integer  | 成绩合格用户数量       |
+| data.myExam.answerStartTime  | Date  | 答题开始时间（用于统计最短交卷时间）暂不使用      |
+| data.myExam.answerEndTime  | Date  | 答题结束时间  暂不使用   |
+| data.score.total  | Double  | 总分数  |
+| data.score.avg | Double  | 平均分   |
+| data.score.min  | Double  | 最低分   |
+| data.score.max | Double  |最高分  |
+| data.score.sd | Double  | 标准差 |
 | data.typeList[]               | Object[]   | 类型列表   |
 | data.typeList[].name        | String | 类型名称  |
 | data.typeList[].value       | String  | 类型值  |
@@ -76,10 +76,12 @@ http请求头需添加Authorization字段，
 | data.scoreGradeList[].name        | String | 分数段名称  |
 | data.scoreGradeList[].value       | String  | 分数段值  |
 
-### 考试用户排名：--/--
+### 用户考试列表：report/myExam/listpage
 | 请求参数| 类型        | 描述       | 必填 |
 | -------- | ----------- | ---------- | ---- |
 | examId | Integer | 考试ID | 是   |
+| curPage   | Integer | 当前第几页 | 否   |
+| pageSize  | Integer | 每页多少条 | 否   |
 
 | 响应数据| 类型    | 描述 |
 | --------------------------- | ------- | ----- |
@@ -87,27 +89,30 @@ http请求头需添加Authorization字段，
 | msg                       | String  | 响应消息 |
 | data.total                | Integer | 总行数  |
 | data.list[]               | Object[]   | 分页列表|
-| data.list[].no        | Integer | 考试排序  |
+| data.list[].myExamNo        | Integer | 考试排序  |
 | data.list[].userId        | Integer | 考试用户Id |
 | data.list[].userName        | String | 考试用户名称  |
 | data.list[].orgId        | Integer | 组织机构Id |
 | data.list[].orgName        | String | 组织机构名称  |
 | data.list[].myExamState        | Integer | 考试状态  |
 | data.list[].myExamMarkState        | Integer | 阅卷状态  |
+| data.list[].myExamAnswerState        | Integer | 答题状态  |
 | data.list[].paperTotalScore        | Double | 试卷总分数 |
-| data.list[].paperPassScore        | Double | 试卷及格比例  |
+| data.list[].paperPassScore        | Double | 试卷及格分数  |
 | data.list[].myExamScore        | Double | 我的考试分数  |
-| data.list[].myExamStartTime        | Date | 考试开始时间  |
-| data.list[].myExamEndTime       | Date | 考试结束时间  |
-| data.list[].myExamMarkStartTime        | Date | 阅卷开始时间  |
-| data.list[].myExamMarkEndTime       | Date | 阅卷结束时间  |
+| data.list[].myExamStartTime        | Date | 我的考试开始时间  |
+| data.list[].myExamEndTime       | Date | 我的考试结束时间  |
+| data.list[].myExamMarkStartTime        | Date | 我的阅卷开始时间  |
+| data.list[].myExamMarkEndTime       | Date | 我的阅卷结束时间  |
 | data.list[].myMarkUserId        | Integer | 阅卷用户Id  |
 | data.list[].myMarkUserName       | String | 阅卷用户名称 |
 
-### 考试错题分析：--/--
+### 试题列表：report/question/listpage
 | 请求参数| 类型        | 描述       | 必填 |
 | -------- | ----------- | ---------- | ---- |
 | examId | Integer | 考试ID | 是   |
+| curPage   | Integer | 当前第几页 | 否   |
+| pageSize  | Integer | 每页多少条 | 否   |
 
 | 响应数据| 类型    | 描述 |
 | --------------------------- | ------- | ----- |
@@ -115,80 +120,67 @@ http请求头需添加Authorization字段，
 | msg                       | String  | 响应消息 |
 | data.total                | Integer | 总行数  |
 | data.list[]               | Object[]   | 分页列表|
-| data.list[].questionId        | Integer | 考试排序  |
-| data.list[].questionTitle        | Integer | 考试用户Id |
+| data.list[].questionId        | Integer | 试题ID  |
+| data.list[].questionTitle        | Integer | 试题标题 |
 | data.list[].userNum        | Integer | 考试用户数量 |
 | data.list[].succUserNum        | Integer | 答对用户数量 |
 
-### 首页展示：--/--  普通用户
+### 首页统计（普通用户）：report/home/user
 | 响应数据| 类型    | 描述 |
 | --------------------------- | ------- | ----- |
 | code                      | Integer | 响应码    |
 | msg                       | String  | 响应消息 |
-| data.userId        | Integer | 考试用户Id |
-| data.userName        | String | 考试用户名称  |
-| data.orgId        | Integer | 组织机构Id |
-| data.orgName        | String | 组织机构名称  |
-| data.type        | Integer | 用户类型 |
-| data[].exam.examNum       | Integer    | 考试次数     |
-| data[].exam.missNum   | Integer  | 缺考次数     |
-| data[].exam.succNum  | Integer  | 通过次数    |
-| data[].exam.top      | Double | 最高排名 |
-| data[].score.passRate        | Double | 及格率  |
-| data[].score.total  | Double  | 总分数  |
-| data[].score.avg | Double  | 平均分   |
-| data[].score.min  | Double  | 最低分   |
-| data[].score.max | Double  |最高分  |
-| data[].score.sd | Double  | 标准差 |
+| data.user.id        | Integer | 考试用户Id |
+| data.user.name        | String | 考试用户名称  |
+| data.org.id        | Integer | 组织机构Id |
+| data.org.name        | String | 组织机构名称  |
+| data.user.type        | Integer | 用户类型 |
+| data.exam.num       | Integer    | 考试次数     |
+| data.exam.missNum   | Integer  | 缺考次数     |
+| data.exam.succNum  | Integer  | 通过次数    |
+| data.exam.top      | Double | 最高排名 |
+| data.score.avg | Double  | 平均分   |
+| data.score.min  | Double  | 最低分   |
+| data.score.max | Double  |最高分  |
+| data.score.sd | Double  | 标准差 |
 
-### 首页展示：--/--  子管理
+### 首页统计(子管理)：report/home/subAdmin
 | 响应数据| 类型    | 描述 |
 | --------------------------- | ------- | ----- |
 | code                      | Integer | 响应码    |
 | msg                       | String  | 响应消息 |
-| data.userId        | Integer | 考试用户Id |
-| data.userName        | String | 考试用户名称  |
-| data.orgId        | Integer | 组织机构Id |
-| data.orgName        | String | 组织机构名称  |
-| data.type        | Integer | 用户类型 |
-| data.examNum       | Integer    | 创建试卷次数     |
-| data.paperNum   | Integer  | 创建试卷次数     |
-| data.questionNum  | Integer  | 创建试题次数    |
-| data.MarkNum      | Integer | 待阅试卷 |
+| data.user.id        | Integer | 考试用户Id |
+| data.user.name        | String | 考试用户名称  |
+| data.org.id        | Integer | 组织机构Id |
+| data.org.name        | String | 组织机构名称  |
+| data.user.type        | Integer | 用户类型 |
+| data.exam.num       | Integer    | 创建考试数量     |
+| data.paper.num   | Integer  | 创建试卷数量     |
+| data.question.num  | Integer  | 创建试题数量    |
+| data.myMark.num      | Integer | 待阅试卷 |
 
-### 首页展示：--/--  超级管理员
+### 首页统计(超级管理员)：report/home/admin
 | 响应数据| 类型    | 描述 |
 | --------------------------- | ------- | ----- |
 | code                    | Integer | 响应码    |
 | msg                     | String  | 响应消息  |
-| data.userNum            | Integer | 创建用户数   |
-| data.subAdminNum        | Integer | 创建子管理数 |
-| data.exanNum            | Integer | 创建考试数   |
-| data.questionNum        | Integer | 创建试题数   |
-| data.paperNum           | Integer | 创建考试数   |
-| data.bulletinNum        | Integer | 创建公告数   |
-| data.onUserNum          | Integer | 在线用户     |
+| data.user.num            | Integer | 创建用户数   |
+| data.subAdmin.num        | Integer | 创建子管理数 |
+| data.bulletin.num        | Integer | 创建公告数   |
+| data.onlineUser.num          | Integer | 在线用户     |
 
-### 服务器参数：--/-- 
+### 服务器参数：report/server/parm
+| 响应数据| 类型    | 描述 |
+| --------------------------- | ------- | -----  |
+| code                        | Integer | 响应码   |
+| msg                         | String  | 响应消息 |
+| data.list[]                  | Object[]   | 对象列表     |
+| data.list[].name               | String | 名称  |
+| data.list[].value             | String | 值  |
+
+### 慢接口日志：report/server/log
 | 响应数据| 类型    | 描述 |
 | --------------------------- | ------- | ----- |
 | code                      | Integer | 响应码    |
 | msg                       | String  | 响应消息 |
-| data.CPU        | String | CPU |
-| data.RAM        | String | 内存 |
-| data.HDD        | String | 硬盘 |
-| data.SYS        | String | 系统 |
-| data.CpuRate    | String | CPU使用率 |
-| data.JAVA       | String | JAVA  |
-| data.WEB        | String | WEB服务器  |
-| data.JVM        | String | JVM内存   |
-| data.SQL        | String | 数据库 |
-| data.fileBak    | String | 上传附件目录 |
-| data.dbBak      | String | 数据库备份目录 |
-
-### 满接口日志：--/-- 
-| 响应数据| 类型    | 描述 |
-| --------------------------- | ------- | ----- |
-| code                      | Integer | 响应码    |
-| msg                       | String  | 响应消息 |
-| data.content              | text    | 考试用户Id |
+| data                 | String[]   | 字符串列表     |

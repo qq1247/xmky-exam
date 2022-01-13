@@ -149,6 +149,42 @@ public class ApiExamController extends BaseController {
 	}
 	
 	/**
+	 * 获取考试
+	 * 
+	 * v1.0 zhanghc 2021年12月21日下午4:36:14
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/get")
+	@ResponseBody
+	public PageResult get(Integer id) {
+		try {
+			Exam exam = examService.getEntity(id);
+			Paper paper = paperService.getEntity(exam.getPaperId());
+			return PageResultEx.ok()
+					.addAttr("id", exam.getId())
+					.addAttr("name", exam.getName())
+					.addAttr("startTime", DateUtil.formatDateTime(exam.getStartTime()))
+					.addAttr("endTime", DateUtil.formatDateTime(exam.getEndTime()))
+					.addAttr("markStartTime", exam.getMarkStartTime() == null ? null : DateUtil.formatDateTime(exam.getMarkStartTime()))
+					.addAttr("markEndTime", exam.getMarkEndTime() == null ? null : DateUtil.formatDateTime(exam.getMarkEndTime()))
+					.addAttr("paperId", exam.getPaperId())
+					.addAttr("paperName", paper.getName())
+					.addAttr("paperMarkType", paper.getMarkType())
+					.addAttr("examTypeId", exam.getExamTypeId())
+					.addAttr("examTypeName", examTypeService.getEntity(exam.getExamTypeId()).getName())
+					.addAttr("state", exam.getState())
+					;
+		} catch (MyException e) {
+			log.error("获取考试错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("获取考试错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
 	 * 发布
 	 * 
 	 * v1.0 zhanghc 2018年11月24日上午9:13:22

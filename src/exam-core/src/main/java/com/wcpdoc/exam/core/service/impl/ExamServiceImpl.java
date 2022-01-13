@@ -20,8 +20,8 @@ import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
+import com.wcpdoc.exam.core.cache.AutoExamCache;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
-import com.wcpdoc.exam.core.cache.OutMarkCache;
 import com.wcpdoc.exam.core.dao.ExamDao;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
@@ -96,7 +96,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 
 		Paper paper = paperService.getEntity(exam.getPaperId());
 		if (paper.getState() != 1) {
-			throw new MyException("试卷未发布！");
+			throw new MyException("试卷未发布");
 		}
 		if (paper.getMarkType() == 2) {// 如果是自动阅卷类型，没有阅卷开始时间和阅卷结束时间
 			if (!ValidateUtil.isValid(exam.getMarkStartTime())) {
@@ -243,8 +243,10 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		examDao.update(exam);
 		
 		// 标记为需要监听的考试（考试结束自动阅卷）
-		AutoMarkCache.put(exam.getId(), exam.getEndTime());
-		OutMarkCache.put(exam.getId(), exam.getMarkEndTime());
+		AutoExamCache.put(exam.getId(), exam.getEndTime());
+		if (paper.getMarkType() == 2) {// 智能试卷，考试结束，定时任务就处理完成了
+			AutoMarkCache.put(exam.getId(), exam.getMarkEndTime());
+		}
 	}
 	
 	@Override

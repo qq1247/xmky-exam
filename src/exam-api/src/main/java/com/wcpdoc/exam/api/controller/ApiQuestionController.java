@@ -19,7 +19,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.wcpdoc.base.cache.ProgressBarCache;
-import com.wcpdoc.core.constant.ConstantManager;
+import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.context.UserContext;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.LoginUser;
@@ -29,6 +29,7 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.SpringUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
@@ -59,6 +60,8 @@ public class ApiQuestionController extends BaseController {
 	private QuestionAnswerService questionAnswerService;
 	@Resource
 	private FileService fileService;
+	@Resource
+	private UserService userService;
 	
 	/**
 	 * 试题列表 
@@ -72,29 +75,31 @@ public class ApiQuestionController extends BaseController {
 		try {
 			PageIn pageIn = new PageIn(request);
 			pageIn.addAttr("curUserId", getCurUser().getId());
-			PageOut pageOut = questionService.getListpage(pageIn);
-			List<Map<String, Object>> resultList = pageOut.getList();
+			PageOut pageout = questionService.getListpage(pageIn);
+			List<Map<String, Object>> resultList = pageout.getList();
 			for (Map<String, Object> result : resultList) {
-				if (result.get("scoreOptions") != null) {//1：漏选得分；2：答案无顺序；3：大小写不敏感；
-					StringBuilder scoreOptionNames = new StringBuilder();
-					if (result.get("scoreOptions").toString().contains("1")) {
-						scoreOptionNames.append(" 漏选得分");
+				Integer id = (Integer) result.get("id");
+				Integer type = (Integer) result.get("type");
+				
+				result.put("options", new String[0]);
+				if (type == 1 || type == 2) {// 如果是单选或多选，添加选项字段
+					List<QuestionOption> questionOptionList = questionOptionService.getList(id);
+					String[] options = new String[questionOptionList.size()];
+					for (int i = 0; i < questionOptionList.size(); i++) {
+						options[i] = questionOptionList.get(i).getOptions();
 					}
-					if (result.get("scoreOptions").toString().contains("2")) {
-						scoreOptionNames.append(" 答案无顺序");
-					}
-					if (result.get("scoreOptions").toString().contains("3")) {
-						scoreOptionNames.append(" 大小写不敏感");
+					result.put("options", options);
+				}
+				
+				if (result.get("scoreOptions") != null) {// 前后端分离下，接口定义只有数组形式
+					String[] _scoreOptions = result.get("scoreOptions").toString().split(",");
+					Integer[] scoreOptions = new Integer[_scoreOptions.length]; 
+					for (int i = 0; i < _scoreOptions.length; i++) {
+						scoreOptions[i] = Integer.parseInt(_scoreOptions[i]);
 					}
 				}
 			}
-			
-			if(!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
-				pageIn.addAttr("curUserId", getCurUser().getId());
-			}
-			
-			PageOut listpage = questionService.getListpage(pageIn);
-			return PageResultEx.ok().data(listpage);
+			return PageResultEx.ok().data(pageout);
 		} catch (Exception e) {
 			log.error("试题列表错误：", e);
 			return PageResult.err();
@@ -155,14 +160,15 @@ public class ApiQuestionController extends BaseController {
 	 * 删除试题
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
-	 * @param id
+	 * @param questionTypeId
+	 * @param ids
 	 * @return pageOut
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	public PageResult del(Integer id) {
+	public PageResult del(Integer questionTypeId, Integer[] ids) {
 		try {
-			questionService.delAndUpdate(id);
+			questionService.delAndUpdate(questionTypeId, ids);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("删除试题错误：{}", e.getMessage());
@@ -205,6 +211,18 @@ public class ApiQuestionController extends BaseController {
 				map.put("score", answer.getScore());
 				answerList.add(map);
 			}
+			
+			Integer[] scoreOptions = null;//new Integer[split.length];
+			if (ValidateUtil.isValid(question.getScoreOptions())) {
+				String[] split = question.getScoreOptions().split(",");
+				scoreOptions = new Integer[split.length];
+				for(int i = 0; i < split.length; i++ ){
+					scoreOptions[i] = Integer.parseInt(split[i]);
+				}
+			} else {
+				scoreOptions = new Integer[0];
+			}
+			
 			PageResultEx pageResult = PageResultEx.ok()
 					.addAttr("id", question.getId())
 					.addAttr("type", question.getType())
@@ -215,9 +233,10 @@ public class ApiQuestionController extends BaseController {
 					.addAttr("analysis", question.getAnalysis())
 					.addAttr("questionTypeId", question.getQuestionTypeId())
 					.addAttr("score", question.getScore())
-					.addAttr("scoreOptions", question.getScoreOptions())
+					.addAttr("scoreOptions", scoreOptions)
 					.addAttr("answers", (writeAuth) ? answerList : new String[0])
-					.addAttr("state", question.getState());
+					.addAttr("state", question.getState())
+					.addAttr("createUserName", userService.getEntity(question.getCreateUserId()).getName());
 			return pageResult;
 		} catch (MyException e) {
 			log.error("获取试题错误：{}", e.getMessage());
@@ -333,48 +352,6 @@ public class ApiQuestionController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("发布错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 试题统计（类型，难易程度）
-	 * 
-	 * v1.0 zhanghc 2017-05-07 14:56:29
-	 * @param id
-	 * @return pageOut
-	 */
-	@RequestMapping("/statistics")
-	@ResponseBody
-	public PageResult statistics(Integer questionTypeId) {
-		try {
-			return PageResultEx.ok().data(questionService.statisticsTypeDifficulty(questionTypeId));
-		} catch (MyException e) {
-			log.error("试题统计错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		}  catch (Exception e) {
-			log.error("试题统计错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 试题准确率
-	 * 
-	 * v1.0 zhanghc 2017-05-07 14:56:29
-	 * @param id
-	 * @return pageOut
-	 */
-	@RequestMapping("/accuracy")
-	@ResponseBody
-	public PageResult accuracy(Integer examId) {
-		try {
-			return PageResultEx.ok().data(questionService.accuracy(examId));
-		} catch (MyException e) {
-			log.error("试题统计错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		}  catch (Exception e) {
-			log.error("试题统计错误：", e);
 			return PageResult.err();
 		}
 	}

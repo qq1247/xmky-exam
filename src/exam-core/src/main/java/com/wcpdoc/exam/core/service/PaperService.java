@@ -138,7 +138,7 @@ public interface PaperService extends BaseService<Paper> {
 	 * @param subScores 试题为智能阅卷，并且是填空或问答是有效
 	 * void
 	 */
-	void scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores);
+	void scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores, Integer[] scoreOptions);
 	
 	/**
 	 * 完成设置选项

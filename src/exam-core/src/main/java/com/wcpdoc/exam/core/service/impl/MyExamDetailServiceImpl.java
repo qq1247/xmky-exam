@@ -3,6 +3,8 @@ package com.wcpdoc.exam.core.service.impl;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -227,6 +229,23 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			exam.setMarkState(3);
 			examService.update(exam);
 			log.info("自动阅卷完成：标记考试为已阅卷，结束");
+			
+			//排名
+			Collections.sort(myExamList, new Comparator<MyExam>() {
+				@Override
+				public int compare(MyExam o1, MyExam o2) {
+					if (o2.getTotalScore().compareTo(o1.getTotalScore()) == 0 && o1.getAnswerEndTime() != null && o2.getAnswerEndTime() != null) {
+						return Integer.parseInt(String.valueOf(o1.getAnswerEndTime().getTime() - o2.getAnswerEndTime().getTime())); 
+					}
+					
+					return o2.getTotalScore().compareTo(o1.getTotalScore());
+				}
+			});
+			
+			for (int i = 0; i < myExamList.size(); i++) {
+				myExamList.get(i).setNo(i + 1);
+				myExamService.update(myExamList.get(i));
+			}
 			return;
 		}
 		
@@ -269,7 +288,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		}
 		
 		Paper paper = paperService.getEntity(exam.getPaperId());// 试卷信息
-		// 延时2秒在完成阅卷
+		// 延时2秒在完成阅卷（在页面阅卷时间到时+1秒网络延时，当前任务开始时在推迟1秒）
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
@@ -278,9 +297,9 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		
 		log.info("完成阅卷开始：{}", exam.getName());
 		// 获取所有考试用户
-		List<MyExam> list = myExamService.getList(examId);
-		for(MyExam myExam : list){
-			if (myExam.getMarkState() == 3) {//已阅卷的不处理
+		List<MyExam> myExamList = myExamService.getList(examId);
+		for(MyExam myExam : myExamList){
+			if (myExam.getMarkState() == 3) {//已阅卷的不处理（没考试的人考试时间结束已自动阅卷；人工阅卷在阅卷时间结束之前已经（部分）阅完）
 				continue;
 			}
 			
@@ -293,7 +312,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			for (MyExamDetail myExamDetail : myExamDetailList) {
 				if (myExamDetail.getScore() == null) {//当阅卷人没有阅卷或部分未阅卷时，阅卷时间到。
 					BigDecimal bigDecimal = new BigDecimal(0);
-					totalScore.add(bigDecimal);
+//					totalScore.add(bigDecimal);
 					myExamDetail.setScore(bigDecimal);
 					myExamDetail.setMarkUserId(1);
 					myExamDetail.setMarkTime(new Date());
@@ -312,16 +331,33 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			}
 			myExam.setMarkState(3);
 			myExam.setMarkEndTime(new Date());
-			myExamService.update(myExam);
 		}
 		
-		// 完成阅卷
-		if (exam.getMarkStartTime() == null) {			
-			exam.setMarkStartTime(new Date());
+		//排名
+		Collections.sort(myExamList, new Comparator<MyExam>() {
+			@Override
+			public int compare(MyExam o1, MyExam o2) {
+				if (o2.getTotalScore().compareTo(o1.getTotalScore()) == 0 
+						&& o1.getAnswerEndTime() != null && o2.getAnswerEndTime() != null) {
+					return Integer.parseInt(String.valueOf(o1.getAnswerEndTime().getTime() - o2.getAnswerEndTime().getTime())); 
+				}
+				
+				return o2.getTotalScore().compareTo(o1.getTotalScore());
+			}
+		});
+		
+		for (int i = 0; i < myExamList.size(); i++) {
+			myExamList.get(i).setNo(i + 1);
+			myExamService.update(myExamList.get(i));
 		}
-		if (exam.getMarkEndTime() == null) {			
-			exam.setMarkEndTime(new Date());
-		}
+		
+//		 完成阅卷
+//		if (exam.getMarkStartTime() == null) {			
+//			exam.setMarkStartTime(new Date());
+//		}
+//		if (exam.getMarkEndTime() == null) {			
+//			exam.setMarkEndTime(new Date());
+//		}
 		exam.setMarkState(3);
 		examService.update(exam);
 		log.info("完成阅卷结束：{}", exam.getName());

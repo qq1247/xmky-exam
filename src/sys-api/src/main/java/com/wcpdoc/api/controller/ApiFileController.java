@@ -7,7 +7,6 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -92,22 +91,21 @@ public class ApiFileController extends BaseController {
 	@RequestMapping(value = "/download")
 	@ResponseBody
 	public void download(Integer id) {
-		OutputStream output = null;
 		try {
 			FileEx fileEx = fileService.getFileEx(id);
 			String fileName = new String((fileEx.getEntity().getName() + "." 
 					+ fileEx.getEntity().getExtName()).getBytes("UTF-8"), "ISO-8859-1");
 			response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
 			response.setContentType("application/force-download");
-
-			output = response.getOutputStream();
-			FileUtils.copyFile(fileEx.getFile(), output);
+			try (OutputStream output = response.getOutputStream()){
+				FileUtils.copyFile(fileEx.getFile(), output);
+			} catch (Exception e) {
+				throw new MyException("拷贝文件错误");
+			} 
 		} catch (MyException e) {
 			log.error("完成下载附件失败：", e.getMessage());
 		} catch (Exception e) {
 			log.error("完成下载附件失败：", e);
-		} finally {
-			IOUtils.closeQuietly(output);
 		}
 	}
 

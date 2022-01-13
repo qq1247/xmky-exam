@@ -3,6 +3,7 @@ package com.wcpdoc;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
@@ -20,6 +21,8 @@ public class Application extends SpringBootServletInitializer{
 	}
 	
 	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
+		SpringApplication application = new SpringApplication(Application.class);
+		application.addListeners(new ApplicationPidFileWriter());
+		application.run();
 	}
 }

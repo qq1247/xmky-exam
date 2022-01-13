@@ -2,19 +2,16 @@ package com.wcpdoc.exam.core.dao.impl;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Repository;
 
-import com.wcpdoc.base.cache.DictCache;
 import com.wcpdoc.base.dao.UserDao;
 import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.util.DateUtil;
-import com.wcpdoc.core.util.HibernateUtil;
 import com.wcpdoc.core.util.SqlUtil;
 import com.wcpdoc.core.util.SqlUtil.Order;
 import com.wcpdoc.core.util.ValidateUtil;
@@ -34,13 +31,11 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT QUESTION.ID, QUESTION.TYPE, QUESTION.DIFFICULTY, QUESTION.TITLE, "
-				+ "QUESTION.STATE, QUESTION.QUESTION_TYPE_ID, QUESTION.SCORE, QUESTION.SCORE_OPTIONS, "
-				+ "QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME, UPDATE_USER.NAME AS UPDATE_USER_NAME, "
-				+ "CREATE_USER.NAME AS CREATE_USER_NAME "
+				+ "QUESTION.STATE, QUESTION.AI, QUESTION.QUESTION_TYPE_ID, QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME, "
+				+ "QUESTION.SCORE, QUESTION.SCORE_OPTIONS, QUESTION.ANALYSIS, CREATE_USER.NAME AS CREATE_USER_NAME "
 				+ "FROM EXM_QUESTION QUESTION "
 				+ "LEFT JOIN EXM_QUESTION_TYPE QUESTION_TYPE ON QUESTION.QUESTION_TYPE_ID = QUESTION_TYPE.ID "
-				+ "LEFT JOIN SYS_USER CREATE_USER ON QUESTION.CREATE_USER_ID = CREATE_USER.ID "
-				+ "LEFT JOIN SYS_USER UPDATE_USER ON QUESTION.UPDATE_USER_ID = UPDATE_USER.ID ";
+				+ "LEFT JOIN SYS_USER CREATE_USER ON QUESTION.CREATE_USER_ID = CREATE_USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("questionTypeId")), "QUESTION.QUESTION_TYPE_ID = ?", pageIn.get("questionTypeId"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("questionTypeName")), "QUESTION_TYPE.NAME LIKE ?", String.format("%%%s%%", pageIn.get("questionTypeName")))
@@ -59,46 +54,13 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 				.addOrder(!ValidateUtil.isValid(pageIn.get("rand")), "QUESTION.UPDATE_TIME", Order.DESC)
 				.addOrder(ValidateUtil.isValid(pageIn.get("rand")), "Rand()", Order.NULL);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		HibernateUtil.formatDict(pageOut.getList(), DictCache.getIndexkeyValueMap(), 
-				"QUESTION_TYPE", "type", 
-				"QUESTION_DIFFICULTY", "difficulty", 
-				"STATE", "state");
 		return pageOut;
 	}
 
 	@Override
-	public List<Map<String, Object>> statisticsTypeDifficulty(Integer questionTypeId) {
-		String sql = "SELECT COUNT( * ) AS TOTAL, "
-				+ "SUM( CASE WHEN TYPE = 1 THEN  TYPE ELSE 0 END) AS TYPE1, "
-				+ "SUM( CASE WHEN TYPE = 2 THEN  TYPE ELSE 0 END) AS TYPE2, "
-				+ "SUM( CASE WHEN TYPE = 3 THEN  TYPE ELSE 0 END) AS TYPE3, "
-				+ "SUM( CASE WHEN TYPE = 4 THEN  TYPE ELSE 0 END) AS TYPE4, "
-				+ "SUM( CASE WHEN TYPE = 5 THEN  TYPE ELSE 0 END) AS TYPE5, "
-				+ "SUM( CASE WHEN DIFFICULTY = 1 THEN  DIFFICULTY ELSE 0 END) AS DIFFICULTY1, "
-				+ "SUM( CASE WHEN DIFFICULTY = 2 THEN  DIFFICULTY ELSE 0 END) AS DIFFICULTY2, "
-				+ "SUM( CASE WHEN DIFFICULTY = 3 THEN  DIFFICULTY ELSE 0 END) AS DIFFICULTY3, "
-				+ "SUM( CASE WHEN DIFFICULTY = 4 THEN  DIFFICULTY ELSE 0 END) AS DIFFICULTY4, "
-				+ "SUM( CASE WHEN DIFFICULTY = 5 THEN  DIFFICULTY ELSE 0 END) AS DIFFICULTY5 "
-				+ "FROM EXM_QUESTION  WHERE STATE = 1 "
-				+ "AND QUESTION_TYPE_ID = ?";
-		return getMapList(sql, new Object[] { questionTypeId });
+	public List<Question> getList(Integer questionTypeId) {
+		String sql = "SELECT * FROM EXM_QUESTION WHERE STATE IN (1, 2) AND QUESTION_TYPE_ID = ?";
+		return getList(sql, new Object[] { questionTypeId });
 	}
 
-	@Override
-	public List<Map<String, Object>> accuracy(Integer examId) {
-		String sql = "SELECT COUNT(ID) AS TOTAL, SUM( SCORE = QUESTION_SCORE ) AS CORRECT, QUESTION_ID FROM EXM_MY_EXAM_DETAIL WHERE EXAM_ID = ? GROUP BY QUESTION_ID ";
-		return getMapList(sql, new Object[] { examId });
-	}
-
-	@Override
-	public void updateQuestionType(Integer sourceId, Integer targetId) {
-		String sql = "UPDATE EXM_QUESTION SET QUESTION_TYPE_ID = ? WHER QUESTION_TYPE_ID = ?";
-		update(sql, new Object[]{targetId, sourceId});
-	}
-
-	@Override
-	public void publish(Integer questionTypeId) {
-		String sql = "UPDATE EXM_QUESTION SET STATE = 1 WHERE STATE = 2 AND QUESTION_TYPE_ID = ?";
-		update(sql, new Object[]{ questionTypeId });
-	}
 }

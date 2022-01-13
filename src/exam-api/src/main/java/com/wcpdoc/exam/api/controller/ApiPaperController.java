@@ -425,9 +425,9 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/scoreUpdate")
 	@ResponseBody
-	public PageResult scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores) {
+	public PageResult scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores, Integer[] scoreOptions) {
 		try {
-			paperService.scoreUpdate(id, questionId, score, subScores);
+			paperService.scoreUpdate(id, questionId, score, subScores, scoreOptions);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("设置分数错误：{}", e.getMessage());
@@ -446,7 +446,7 @@ public class ApiPaperController extends BaseController {
 	 * @param options
 	 * @return PageResult
 	 */
-	@RequestMapping("/scoreOptionUpdate")
+	/*@RequestMapping("/scoreOptionUpdate")
 	@ResponseBody
 	public PageResult scoreOptionUpdate(Integer id, Integer questionId, Integer[] scoreOptions) {
 		try {
@@ -459,7 +459,7 @@ public class ApiPaperController extends BaseController {
 			log.error("设置分数错误：", e);
 			return PageResult.err();
 		}
-	}
+	}*/
 	
 	/**
 	 * 发布
