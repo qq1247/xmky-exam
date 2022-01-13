@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-18 16:50:04
  * @LastEditors: Che
- * @LastEditTime: 2021-11-05 09:51:07
+ * @LastEditTime: 2021-12-28 16:32:06
 -->
 <template>
   <el-upload
@@ -24,14 +24,17 @@
     :on-success="success"
     :before-upload="beforeUpload"
   >
-    <el-button size="small" type="primary" v-if="type !== 'image'"
-      >点击上传</el-button
-    >
-    <i class="el-icon-plus" v-else></i>
-    <div slot="tip" class="upload-tip">
-      可以上传{{ limit ? limit : 'N' }}个{{
-        type === '*' ? '任意' : this.type
-      }}文件，且不超过{{ size }}M
+    <div slot="default">
+      <el-button type="primary" v-if="type !== 'image'"
+        ><i class="common common-line-upload"></i
+        >&nbsp;&nbsp;点击上传</el-button
+      >
+      <i class="el-icon-plus" v-else></i>
+      <div slot="tip" class="upload-tip">
+        可以上传{{ limit ? limit : 'N' }}个{{
+          type === '*' ? '任意' : this.type
+        }}文件，且不超过{{ size }}M
+      </div>
     </div>
   </el-upload>
 </template>

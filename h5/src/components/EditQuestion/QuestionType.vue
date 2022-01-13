@@ -5,12 +5,12 @@
  * @Author: Che
  * @Date: 2021-10-19 14:22:34
  * @LastEditors: Che
- * @LastEditTime: 2021-11-11 18:06:49
+ * @LastEditTime: 2021-12-29 09:45:32
 -->
 <template>
   <div>
     <div id="question_driver_types">
-      <div class="left-top">添加题型</div>
+      <div class="top">添加题型</div>
       <div
         :class="[
           'type-btn',
@@ -25,7 +25,7 @@
         <i class="common common-subscript sub-script"></i>
       </div>
     </div>
-    <div class="splitLine"></div>
+    <div class="divider"></div>
     <div
       id="question_driver_template"
       class="handler-btn"
@@ -36,42 +36,12 @@
       <i :class="handler.icon"></i>
       {{ handler.name }}
     </div>
-    <!-- 上传试题模板 -->
-    <el-dialog
-      :visible.sync="handlerForm.fileShow"
-      :show-close="false"
-      width="40%"
-      title="上传并解析试题"
-      :close-on-click-modal="false"
-      @close="templateClear('templateUpload')"
-    >
-      <el-form :model="handlerForm" ref="handlerForm">
-        <Upload
-          type="word"
-          ref="templateUpload"
-          @success="templateSucess"
-          @remove="templateRemove"
-        />
-      </el-form>
-      <div class="dialog-footer" slot="footer">
-        <el-button
-          @click="questionImport"
-          :loading="handlerForm.isAnalysis"
-          type="primary"
-          >{{ percentage ? `解析中 ${percentage}%` : '解析试题' }}</el-button
-        >
-        <el-button @click="handlerForm.fileShow = false">取消</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { questionTemplate, questionImport, questionPublish } from 'api/question'
-import { progressBarGet } from 'api/common'
-import Upload from 'components/Upload'
+import { questionPublish, questionDel } from 'api/question'
 export default {
-  components: { Upload },
   props: {
     questionType: {
       type: Number,
@@ -80,7 +50,6 @@ export default {
   },
   data() {
     return {
-      percentage: 0,
       typeButtons: [
         // 左侧按钮组1
         {
@@ -113,29 +82,20 @@ export default {
         // 左侧按钮组2
         {
           type: 1,
-          name: '试题模板',
+          name: '导入导出',
           icon: 'common common-template-down',
         },
         {
           type: 2,
-          name: '试题导入',
-          icon: 'common common-template-up',
-        },
-        {
-          type: 3,
           name: '一键发布',
           icon: 'common common-publish',
         },
-        /* {
-          name: "清空试题",
-          img: require("assets/img/icon/clear-icon.png")
-        } */
+        {
+          type: 3,
+          name: '一键清空',
+          icon: 'common common-delete',
+        },
       ],
-      handlerForm: {
-        fileShow: false,
-        questionDocIds: [],
-        isAnalysis: false,
-      },
     }
   },
   mounted() {},
@@ -144,148 +104,113 @@ export default {
     updateType(value) {
       this.$emit('updateType', value)
     },
-    // 获取试题模板
-    async questionTemplate() {
-      const template = await questionTemplate({}, 'blob')
-      const blob = new Blob([template], { type: 'application/msword' })
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = '试题模板.docx'
-      a.click()
-      window.URL.revokeObjectURL(url)
-    },
-    // 解析试题
-    async questionImport() {
-      if (this.handlerForm.questionDocIds.length === 0) {
-        this.$message.warning('请选择需解析的文件')
-        return
-      }
-      this.handlerForm.isAnalysis = true
-      const res = await questionImport({
-        fileId: this.handlerForm.questionDocIds[0].response.data.fileIds,
-        questionTypeId: this.$parent.$parent.queryForm.questionTypeId,
-      }).catch(() => {
-        this.handlerForm.isAnalysis = false
-      })
-      if (res?.code == 200) {
-        this.percentage = 1
-        await this.getProgress(res.data)
-        if (this.percentage === 100) {
-          this.$message.success('解析成功！')
-          this.handlerForm.isAnalysis = false
-          this.handlerForm.fileShow = false
-          this.templateClear('templateUpload')
-          this.$parent.$parent.query()
-          this.$tools.delay().then(() => {
-            this.percentage = 0
-          })
-        } else {
-          this.handlerForm.isAnalysis = false
-        }
-      } else {
-        this.$message.error(res.msg)
-      }
-    },
-    // 获取进度
-    async getProgress(id) {
-      const percentage = await this.$tools
-        .delay()
-        .then(() => {
-          return progressBarGet({
-            id,
-          })
-        })
-        .catch((err) => {
-          return err.data
-        })
-      if (percentage.code !== 200 || !percentage?.data?.percent) {
-        this.percentage = 0
-        return false
-      }
-
-      this.percentage = percentage.data.percent
-
-      if (percentage?.data?.percent !== 100) {
-        await this.getProgress(id)
-      } else {
-        return true
-      }
-    },
-    // 上传试题模板成功
-    templateSucess(res, file, fileList) {
-      this.handlerForm.questionDocIds = fileList
-    },
-    // 上传试题模板失败
-    templateClear(ref) {
-      this.handlerForm.questionDocIds = []
-      this.$refs[ref].clear()
-    },
-    // 删除试题模板
-    templateRemove(file, fileList) {
-      this.handlerForm.questionDocIds = []
-    },
+    // 操作函数
     otherHandler(type) {
+      const parentData = this.$parent.$parent.$data
       switch (type) {
         case 1:
-          this.questionTemplate()
+          this.$emit('showTemplate', true)
           break
         case 2:
-          this.handlerForm.fileShow = true
-          break
-        case 3:
-          const parentData = this.$parent.$parent.$data
           if (!['', '2'].includes(parentData.queryForm.state)) {
             this.$message.warning('请选择草稿状态再发布！')
             return
           }
-          this.$confirm('请选择发布方式？', '发布方式', {
-            distinguishCancelAndClose: true,
-            confirmButtonText: '全部发布',
-            cancelButtonText: '单页发布',
-          })
-            .then(async () => {
-              await questionPublish({
-                questionTypeId: parentData.queryForm.questionTypeId,
-              })
-              this.$parent.$parent.search()
-            })
-            .catch(async (action) => {
-              if (action === 'cancel') {
-                const ids = parentData.list.questionList.reduce((acc, cur) => {
-                  cur.state === 2 && acc.push(cur.id)
-                  return acc
-                }, [])
-                if (!ids.length) return false
-                await questionPublish({
-                  ids,
-                })
-                this.$parent.$parent.search()
-              }
-            })
+          this.publish(parentData)
+          break
+        case 3:
+          this.del(parentData)
           break
         default:
           break
       }
+    },
+    // 发布操作
+    publish(parentData) {
+      this.$confirm('请选择发布方式？', '发布方式', {
+        distinguishCancelAndClose: true,
+        confirmButtonText: '全部发布',
+        cancelButtonText: '单页发布',
+      })
+        .then(async () => {
+          await questionPublish({
+            questionTypeId: parentData.queryForm.questionTypeId,
+          })
+          this.$message.success('全部发布成功！')
+          this.$emit('showTemplate', false)
+        })
+        .catch(async (action) => {
+          if (action === 'cancel') {
+            const ids = parentData.list.questionList.reduce((acc, cur) => {
+              cur.state === 2 && acc.push(cur.id)
+              return acc
+            }, [])
+            if (!ids.length) return false
+            await questionPublish({
+              ids,
+            })
+            this.$message.success('单页发布成功！')
+            this.$emit('showTemplate', false)
+          }
+        })
+    },
+    // 清空操作
+    del(parentData) {
+      this.$confirm('请选择清空方式？', '清空方式', {
+        distinguishCancelAndClose: true,
+        confirmButtonText: '全部清空',
+        cancelButtonText: '单页清空',
+      })
+        .then(async () => {
+          await questionDel({
+            questionTypeId: parentData.queryForm.questionTypeId,
+          })
+          this.$message.success('全部清空成功！')
+          this.$emit('showTemplate', false)
+        })
+        .catch(async (action) => {
+          if (action === 'cancel') {
+            const ids = parentData.list.questionList.reduce((acc, cur) => {
+              acc.push(cur.id)
+              return acc
+            }, [])
+            if (!ids.length) return false
+            await questionDel({
+              ids,
+            })
+            this.$message.success('单页清空成功！')
+            this.$emit('showTemplate', false)
+          }
+        })
     },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.left-top {
-  background: #0095e5;
+.top {
+  background: #fff;
   width: 100%;
   height: 40px;
   line-height: 40px;
-  text-align: left;
-  padding-left: 10px;
-  font-size: 14px;
-  color: #fff;
+  color: #333;
   position: absolute;
   top: 0;
   left: 0;
   z-index: 100;
+  font-weight: 600;
+  padding-left: 30px;
+  border-bottom: 1px solid #eee;
+  &::before {
+    content: '';
+    display: inline-block;
+    position: relative;
+    top: 2px;
+    left: -10px;
+    width: 2px;
+    height: 14px;
+    background: #0095e5;
+  }
 }
 .type-btn {
   width: 110px;
@@ -334,10 +259,8 @@ export default {
     display: block;
   }
 }
-.splitLine {
-  background: #eee;
-  width: 100%;
-  height: 1px;
+.divider {
+  border-bottom: 1px solid #eee;
   margin: 16px auto;
 }
 .handler-btn {

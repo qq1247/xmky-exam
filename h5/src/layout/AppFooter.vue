@@ -5,11 +5,11 @@
  * @Author: Che
  * @Date: 2021-08-09 15:14:50
  * @LastEditors: Che
- * @LastEditTime: 2021-10-09 15:26:45
+ * @LastEditTime: 2022-01-12 11:11:42
 -->
 <template>
   <footer class="app-footer">
-    Copyright© 2021 All Rights Reserved
+    <span>Copyright© {{ year }} All Rights Reserved</span>
     <span class="footer-info">版权所有&nbsp;{{ orgName }}</span>
   </footer>
 </template>
@@ -18,7 +18,9 @@
 export default {
   name: 'AppFooter',
   data() {
-    return {}
+    return {
+      year: new Date().getFullYear(),
+    }
   },
   computed: {
     orgName: {
@@ -26,7 +28,7 @@ export default {
         return this.$store.getters.orgName || '在线考试'
       },
       set(val) {
-        this.$store.dispatch('settings/changeSetting', {
+        this.$store.dispatch('setting/changeSetting', {
           key: 'orgName',
           value: val,
         })
@@ -41,14 +43,15 @@ export default {
 // footer
 .app-footer {
   height: 50px;
-  color: $white;
+  color: $menuBg;
   font-size: 13px;
-  background: $menuBg;
+  background: $white;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   padding: 0 calc((100% - 1200px) / 2 + 20px);
+  border-top: 1px solid #f2f2f2;
   .footer-info {
     display: flex;
     align-items: center;

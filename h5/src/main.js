@@ -1,20 +1,18 @@
 /*
- * @Description:
+ * @Description: exam
  * @Version: 1.0
  * @Company:
  * @Author: Che
  * @Date: 2021-07-27 17:31:01
  * @LastEditors: Che
- * @LastEditTime: 2021-08-12 18:08:53
+ * @LastEditTime: 2022-01-09 14:04:45
  */
 import Vue from 'vue'
 
 import 'normalize.css/normalize.css'
 import 'assets/style/element-variables.scss'
 import ElementUI from 'element-ui'
-import CKEditor from '@ckeditor/ckeditor5-vue2'
 Vue.use(ElementUI)
-Vue.use(CKEditor)
 
 import 'assets/style/index.scss'
 

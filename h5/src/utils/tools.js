@@ -5,8 +5,10 @@
  * @Author: Che
  * @Date: 2021-07-27 17:31:01
  * @LastEditors: Che
- * @LastEditTime: 2021-10-19 09:35:08
+ * @LastEditTime: 2022-01-10 18:45:24
  */
+import router from '@/router/index'
+
 const resetData = (el, name) => {
   const $data = el.$data[name]
   const data = el.$options.data()[name]
@@ -117,4 +119,14 @@ const intToChinese = (value) => {
   })
 }
 
-export { resetData, delay, getQueryParam, formateTime, intToChinese }
+/**
+ * @name: switchTab
+ * @description: 切换tab
+ * @param { name, id = null, tab }
+ * @return {*}
+ */
+const switchTab = (name, params) => {
+  router.push({ name, params })
+}
+
+export { resetData, delay, getQueryParam, formateTime, intToChinese, switchTab }

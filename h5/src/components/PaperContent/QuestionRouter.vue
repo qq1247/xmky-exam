@@ -5,12 +5,12 @@
  * @Author: Che
  * @Date: 2021-09-16 13:27:05
  * @LastEditors: Che
- * @LastEditTime: 2021-09-16 17:44:22
+ * @LastEditTime: 2022-01-06 18:38:44
 -->
 
 <template>
   <el-collapse class="exam-card" v-model="collapseShow">
-    <template v-if="preview == 'false'">
+    <template v-if="preview == 'false' || !preview">
       <div class="exam-head">答题卡</div>
       <div class="exam-time">
         倒计时：<CountDown
@@ -19,7 +19,7 @@
         ></CountDown>
       </div>
     </template>
-    <template v-if="showType === '1'">
+    <template v-if="showType === 1 || showType === '1'">
       <el-collapse-item
         :key="item.id"
         :name="index"
@@ -42,7 +42,7 @@
         >
       </el-collapse-item>
     </template>
-    <template v-if="showType === '3'">
+    <template v-if="showType === '3' || showType === '3'">
       <div class="question-router">
         <a
           :class="[
@@ -60,7 +60,11 @@
       </div>
     </template>
 
-    <div v-if="preview == 'false'" class="exam-footer" @click="examEnd">
+    <div
+      v-if="preview == 'false' || !preview"
+      class="exam-footer"
+      @click="examEnd"
+    >
       提交
     </div>
   </el-collapse>

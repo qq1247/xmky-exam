@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-11 16:28:25
  * @LastEditors: Che
- * @LastEditTime: 2021-10-18 18:06:13
+ * @LastEditTime: 2021-12-21 16:26:48
  */
 import request from './request'
 
@@ -16,6 +16,14 @@ import request from './request'
  * @return {*}
  */
 export const examListPage = (params) => request('exam/listpage', params)
+
+/**
+ * @name: examGet
+ * @description: 查询考试信息
+ * @param {*}
+ * @return {*}
+ */
+export const examGet = (params) => request('exam/get', params)
 
 /**
  * @name: examAdd

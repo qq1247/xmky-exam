@@ -5,9 +5,11 @@
  * @Author: Che
  * @Date: 2021-08-11 11:33:30
  * @LastEditors: Che
- * @LastEditTime: 2021-11-19 14:10:08
+ * @LastEditTime: 2021-12-29 10:20:37
  */
-import { manageRoutes, businessRoutes, constantRoutes } from '@/router/index'
+import constantRoutes from '@/router/constant'
+import manageRoutes from '@/router/manage'
+import businessRoutes from '@/router/business'
 
 /**
  * @name: hasPermission

@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-10-13 14:52:40
  * @LastEditors: Che
- * @LastEditTime: 2021-11-15 14:55:57
+ * @LastEditTime: 2022-01-06 14:22:57
 -->
 <template>
   <div class="exam-item">
@@ -52,13 +52,13 @@
             <i class="common common-move"></i>
           </span>
           <!-- 开放 -->
-          <span data-title="开放" @click="open(data)">
+          <span data-title="模拟练习" @click="open(data)">
             <i class="common common-share"></i>
           </span>
-          <!-- 开放 -->
-          <!-- <span data-title="回收站" @click="recycle(data)">
-            <i class="common common-recycle"></i>
-          </span> -->
+          <!-- 统计 -->
+          <span data-title="统计" @click="statistics(data)">
+            <i class="common common-statistics"></i>
+          </span>
         </template>
         <!-- 详情 | 列表 -->
         <span
@@ -144,6 +144,9 @@ export default {
     // 列表 |详情
     detail(data) {
       this.$emit('detail', data)
+    },
+    statistics(data) {
+      this.$emit('statistics', data)
     },
   },
 }

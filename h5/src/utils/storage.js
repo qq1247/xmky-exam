@@ -5,11 +5,11 @@
  * @Author: Che
  * @Date: 2021-08-11 13:23:33
  * @LastEditors: Che
- * @LastEditTime: 2021-09-28 17:25:21
+ * @LastEditTime: 2021-12-31 12:58:12
  */
 const InfoKey = 'Login-Info'
-const OrgKey = 'Org-Info'
-const DriverKey = 'Question-Driver'
+const SettingKey = 'Setting-Info'
+const DictKey = 'Dict-Info'
 
 const getStorage = (key) => {
   const value =
@@ -29,8 +29,9 @@ export const getInfo = () => getStorage(InfoKey)
 export const setInfo = (data) => setStorage(InfoKey, data)
 export const removeInfo = () => removeStorage(InfoKey)
 
-export const getDriver = () => getStorage(DriverKey)
-export const setDriver = (data) => setStorage(DriverKey, data)
+export const getSetting = () => getStorage(SettingKey)
+export const setSetting = (data) => setStorage(SettingKey, data)
 
-export const getOrg = () => getStorage(OrgKey)
-export const setOrg = (data) => setStorage(OrgKey, data)
+export const getDict = () => getStorage(DictKey)
+export const setDict = (data) => setStorage(DictKey, data)
+export const removeDict = () => removeStorage(DictKey)

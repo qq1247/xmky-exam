@@ -5,19 +5,19 @@
  * @Author: Che
  * @Date: 2021-08-09 14:25:53
  * @LastEditors: Che
- * @LastEditTime: 2021-08-17 18:39:14
+ * @LastEditTime: 2021-12-15 14:50:50
 -->
 <template>
   <div class="app-container">
-    <app-header v-if="!hideHeader"></app-header>
-    <app-main></app-main>
-    <app-footer v-if="!hideFooter"></app-footer>
+    <app-header v-if="layout"></app-header>
+    <app-main :height="layout"></app-main>
+    <app-footer></app-footer>
   </div>
 </template>
 
 <script>
 import AppHeader from './AppHeader/Index.vue'
-import AppMain from './AppMain.vue'
+import AppMain from './AppMain/Index.vue'
 import AppFooter from './AppFooter.vue'
 export default {
   name: 'LayOut',
@@ -27,14 +27,17 @@ export default {
     AppFooter,
   },
   data() {
-    return {}
+    return {
+      layout: true,
+    }
   },
-  computed: {
-    hideHeader() {
-      return this.$store.state.setting.hideHeader
-    },
-    hideFooter() {
-      return this.$store.state.setting.hideFooter
+  watch: {
+    $route: {
+      immediate: true,
+      deep: true,
+      handler(e) {
+        this.layout = e.meta?.layout
+      },
     },
   },
   mounted() {},
@@ -47,8 +50,11 @@ export default {
 .app-container {
   position: relative;
   width: 100%;
-  min-height: 100%;
+  min-height: 100vh;
+  height: 100%;
   background: $--background-color-base;
   color: $--color-text-regular;
+  display: flex;
+  flex-direction: column;
 }
 </style>

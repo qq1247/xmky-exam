@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-10-13 14:52:40
  * @LastEditors: Che
- * @LastEditTime: 2021-12-03 16:05:40
+ * @LastEditTime: 2022-01-12 18:16:22
 -->
 <template>
   <div class="exam-item">
@@ -16,13 +16,13 @@
           size="mini"
           v-if="name == 'myExamList'"
           :type="data.state == 3 ? '' : 'danger'"
-          >{{ data.stateName }}</el-tag
+          >{{ data.state | examStateName }}</el-tag
         >
         <el-tag
           size="mini"
           v-if="name == 'myExamMarkList'"
           :type="data.examMarkState == 3 ? '' : 'danger'"
-          >{{ data.examMarkStateName }}</el-tag
+          >{{ data.examMarkState | markStateName }}</el-tag
         >
       </div>
       <!-- 标题 -->
@@ -35,16 +35,15 @@
           name === 'myExamList' ? data.examStartTime : data.markStartTime
         }}</el-col>
       </el-row>
-      <el-row class="content-info" v-if="name === 'myExamList'">
-        <el-col
-          >及格：{{ data.totalScore || 0 }}/{{ data.paperTotalScore }}</el-col
-        >
-      </el-row>
-      <el-row class="content-info" v-if="name === 'myExamMarkList'">
-        <el-col
+      <el-row class="content-info">
+        <el-col :span="8">总分：{{ data.paperTotalScore }}</el-col>
+        <el-col :span="8"
           >及格：{{
-            (data.paperPassScore * data.paperTotalScore) / 100 || 0
-          }}/{{ data.paperTotalScore }}</el-col
+            (data.paperPassScore / 100) * data.paperTotalScore || 0
+          }}</el-col
+        >
+        <el-col :span="8" v-if="name === 'myExamList'"
+          >得分：{{ data.totalScore === null ? '-' : data.totalScore }}</el-col
         >
       </el-row>
 
@@ -57,14 +56,20 @@
       <div class="handler">
         <!-- 我的考试 -->
         <template v-if="name === 'myExamList'">
-          <span :data-title="data.stateName" @click="exam(data)">
+          <span :data-title="data.state | examStateName" @click="exam(data)">
             <i :class="['common', stateIcon[data.state]]"></i>
           </span>
         </template>
         <!-- 我的阅卷 -->
         <template v-if="name === 'myExamMarkList'">
-          <span :data-title="data.examMarkStateName" @click="mark(data)">
+          <span
+            :data-title="data.examMarkState | markStateName"
+            @click="mark(data)"
+          >
             <i :class="['common', markStateIcon[data.examMarkState]]"></i>
+          </span>
+          <span data-title="考生列表" @click="markUser(data)">
+            <i class="common common-user"></i>
           </span>
         </template>
       </div>
@@ -74,6 +79,7 @@
 
 <script>
 import CountDown from '../CountDown.vue'
+import { getOneDict } from '@/utils/getDict'
 export default {
   components: {
     CountDown,
@@ -104,6 +110,16 @@ export default {
       return diffTime
     },
   },
+  filters: {
+    examStateName(data) {
+      return getOneDict('MY_EXAM_STATE').find((item) => item.no === data)
+        .dictValue
+    },
+    markStateName(data) {
+      return getOneDict('MY_EXAM_MARK_STATE').find((item) => item.no === data)
+        .dictValue
+    },
+  },
   methods: {
     // 开始考试
     exam(data) {
@@ -112,6 +128,10 @@ export default {
     // 开始考试
     mark(data) {
       this.$emit('mark', data)
+    },
+    // 考生列表
+    markUser(data) {
+      this.$emit('markUser', data)
     },
   },
 }

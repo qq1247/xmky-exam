@@ -66,14 +66,9 @@ export default {
               password: this.ruleForm.password,
             })
             .then(() => {
-              this.$store.getters.onlyRole.includes('admin')
-                ? this.$router.replace({
-                    path: '/user/index',
-                  })
-                : this.$router.replace({
-                    path: '/',
-                  })
-
+              this.$router.replace({
+                path: '/',
+              })
               this.$message('登录成功！')
             })
         } else {
@@ -89,7 +84,7 @@ export default {
 <style lang="scss" scoped>
 .container {
   width: 100%;
-  height: 100%;
+  height: calc(100vh - 50px);
   background-size: cover;
   justify-content: center;
   align-items: center;

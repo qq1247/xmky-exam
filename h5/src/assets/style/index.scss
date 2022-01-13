@@ -17,6 +17,8 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   scroll-behavior: smooth;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 p {
@@ -60,16 +62,13 @@ div:focus {
   display: none;
 }
 
-// ckeditor inline z-index
-:root {
-  --ck-z-default: 100 !important;
-}
-
 .container {
-  width: 1200px;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  padding-top: 50px;
-  padding-bottom: 50px;
-  margin: 20px auto;
+  margin: 0 auto;
+}
+
+.tox-tinymce-aux {
+  z-index: 2200 !important;
 }

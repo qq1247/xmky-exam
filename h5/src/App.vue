@@ -1,11 +1,11 @@
 <!--
- * @Description:
+ * @Description: App
  * @Version: 1.0
  * @Company:
  * @Author: Che
  * @Date: 2021-07-22 18:05:35
  * @LastEditors: Che
- * @LastEditTime: 2021-11-25 10:48:38
+ * @LastEditTime: 2022-01-10 11:37:21
 -->
 <template>
   <div id="app">
@@ -68,10 +68,11 @@ export default {
 </script>
 
 <style lang="scss">
-@import url(//at.alicdn.com/t/font_840312_pado4a0jzcs.css);
+@import url(//at.alicdn.com/t/font_840312_r0dbcdj8zk.css);
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  height: 100%;
+  position: relative;
+  width: 100%;
 }
 </style>

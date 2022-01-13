@@ -5,8 +5,8 @@
  * @Author: Che
  * @Date: 2021-10-09 13:15:51
  * @LastEditors: Che
- * @LastEditTime: 2021-10-09 14:47:27
+ * @LastEditTime: 2022-01-06 11:35:33
  */
 window.domain = {
-  url: 'http://192.168.9.194:8000/api/',
+  url: 'http://192.168.110.86:8000/api/',
 }

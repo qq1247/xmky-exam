@@ -5,28 +5,26 @@
  * @Author: Che
  * @Date: 2021-08-09 18:01:26
  * @LastEditors: Che
- * @LastEditTime: 2021-08-12 09:18:30
+ * @LastEditTime: 2021-12-29 18:40:43
 -->
 <template>
   <header class="app-header">
-    <div class="header-container">
-      <logo></logo>
-      <nav-bar></nav-bar>
-      <user-info></user-info>
-    </div>
+    <Back></Back>
+    <Content></Content>
+    <Info></Info>
   </header>
 </template>
 
 <script>
-import Logo from './Logo'
-import NavBar from './Navbar'
-import UserInfo from './UserInfo'
+import Back from './Back.vue'
+import Content from './Content.vue'
+import Info from './Info.vue'
 export default {
   name: 'AppHeader',
   components: {
-    Logo,
-    NavBar,
-    UserInfo,
+    Back,
+    Content,
+    Info,
   },
   data() {
     return {}
@@ -37,21 +35,17 @@ export default {
 </script>
 
 <style lang="scss">
-@import 'assets/style/variables.scss';
 .app-header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: 50px;
-  z-index: 1000;
-  background: $menuBg;
-  .header-container {
-    width: 1200px;
-    height: 100%;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-  }
+  z-index: 2000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  border-bottom: 1px solid #ebeef5;
 }
 </style>

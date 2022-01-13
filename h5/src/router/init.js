@@ -1,15 +1,16 @@
 /*
- * @Description:
+ * @Description: 初始化路由
  * @Version: 1.0
  * @Company:
  * @Author: Che
  * @Date: 2021-08-12 10:17:05
  * @LastEditors: Che
- * @LastEditTime: 2021-11-25 13:54:38
+ * @LastEditTime: 2022-01-06 11:29:13
  */
 
-import router, { constantRoutes } from './index'
+import router from './index'
 import store from '@/store/index'
+import constantRoutes from './constant'
 import { Message } from 'element-ui'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
@@ -27,18 +28,8 @@ router.beforeEach(async (to, from, next) => {
 
   const hasToken = getInfo().accessToken
 
-  store.dispatch('setting/changeSetting', {
-    key: 'hideHeader',
-    value: to.meta.hideHeader,
-  })
-
-  store.dispatch('setting/changeSetting', {
-    key: 'hideFooter',
-    value: to.meta.hideFooter,
-  })
-
   let link = document.querySelector("link[rel*='icon']")
-  link.href = `${process.env.VUE_APP_BASE_URL}login/logo?icon=true`
+  link.href = `/api/login/logo?icon=true`
 
   if (hasToken) {
     if (store.state.permission.routes.length > constantRoutes.length) {

@@ -5,15 +5,14 @@
  * @Author: Che
  * @Date: 2021-08-17 17:50:31
  * @LastEditors: Che
- * @LastEditTime: 2021-11-09 14:33:51
+ * @LastEditTime: 2021-12-20 10:50:33
  */
-import { getOrg } from '@/utils/storage'
+import { getSetting } from '@/utils/storage'
 
 const state = {
-  hideHeader: false,
-  hideFooter: false,
   lineTime: 0,
-  orgName: getOrg().orgName,
+  orgName: getSetting().orgName,
+  tabIndex: getSetting().tabIndex,
 }
 
 const mutations = {

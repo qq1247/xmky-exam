@@ -1,8 +1,5 @@
 <template>
   <div class="container">
-    <!-- 导航 -->
-    <EditHeader :title="queryForm.name"></EditHeader>
-
     <!-- 搜索 -->
     <el-form
       :inline="true"
@@ -90,13 +87,21 @@
           ref="questionType"
           :questionType="editForm.type"
           @updateType="updateType"
+          @showTemplate="showTemplate"
         ></QuestionType>
       </el-scrollbar>
       <el-scrollbar
         wrap-style="overflow-x:hidden;"
         class="content-center"
         id="question_driver_content"
-        ><QuestionList
+      >
+        <QuestionTemplate
+          ref="questionTemplate"
+          v-if="questionTemplate"
+          @showTemplate="showTemplate"
+        ></QuestionTemplate>
+        <QuestionList
+          v-else
           ref="questionList"
           :list="list"
           :id="editForm.id"
@@ -106,15 +111,14 @@
           @pageChange="pageChange"
           @showDetails="showDetails"
           @questionEdit="questionEdit"
-        ></QuestionList
-      ></el-scrollbar>
+        ></QuestionList>
+      </el-scrollbar>
       <el-scrollbar wrap-style="overflow-x:hidden;" class="content-right">
         <QuestionEdit
           ref="questionDetail"
           :edit-form="editForm"
-          :query-form="queryForm"
           :detailStatus="detailStatus"
-          :questionDetail="questionDetail"
+          :id="editForm.id"
           @add="add"
           @edit="edit"
           @addOption="addOption"
@@ -128,7 +132,7 @@
   </div>
 </template>
 <script>
-import { dictListPage } from 'api/base'
+import { getOneDict } from '@/utils/getDict'
 import {
   questionListPage,
   questionAdd,
@@ -138,21 +142,16 @@ import {
   questionEdit,
   questionPublish,
 } from 'api/question'
-import Driver from 'driver.js'
-import 'driver.js/dist/driver.min.css'
-import { driverSetting, questionDriverStep } from '@/utils/driverGuide.js'
-import { getDriver } from '@/utils/storage.js'
-import EditHeader from 'components/EditHeader.vue'
 import QuestionType from '@/components/EditQuestion/QuestionType.vue'
 import QuestionList from '@/components/EditQuestion/QuestionList.vue'
 import QuestionEdit from '@/components/EditQuestion/QuestionEdit.vue'
-import { login } from '@/api/common'
+import QuestionTemplate from '@/components/EditQuestion/QuestionTemplate.vue'
 export default {
   components: {
-    EditHeader,
     QuestionType,
     QuestionList,
     QuestionEdit,
+    QuestionTemplate,
   },
   data() {
     const validateAiScore = (rule, value, callback) => {
@@ -173,7 +172,7 @@ export default {
         this.editForm.multipScore = ''
         return callback()
       }
-
+      console.log(value)
       if (value === '') {
         return callback(new Error('请填写分数'))
       }
@@ -186,6 +185,7 @@ export default {
     return {
       detailStatus: false,
       questionDetail: {},
+      questionTemplate: false,
       list: {
         // 列表数据
         total: 0, // 总条数
@@ -242,7 +242,6 @@ export default {
         ], // 选项
         answer: '', // 答案
         answerMultip: [],
-        multipScore: '',
         answers: [
           {
             lab: 'A',
@@ -268,6 +267,7 @@ export default {
         ],
         analysis: '', // 解析
         score: 1, // 分值
+        multipScore: 0.5,
         scoreOptions: [],
         rules: {
           type: [{ required: true, message: '请选择类型', trigger: 'change' }],
@@ -282,7 +282,7 @@ export default {
             {
               required: true,
               message: '请选择或者输入答案',
-              trigger: 'change',
+              trigger: 'blur',
             },
           ],
           answerMultip: [
@@ -290,53 +290,43 @@ export default {
               type: 'array',
               required: true,
               message: '请选择或者输入答案',
-              trigger: 'change',
+              trigger: 'blur',
             },
           ],
-          score: [{ required: true, message: '请输入分值', trigger: 'change' }],
           aiScore: [{ validator: validateAiScore }],
-          multipScore: [{ validator: validateMultipScore }],
+          multipScore: [
+            { required: true, trigger: 'blur', validator: validateMultipScore },
+          ],
         },
       },
     }
   },
+  watch: {
+    'editForm.score': {
+      deep: true,
+      immediate: true,
+      handler(newValue) {
+        if (this.editForm.type === 2) {
+          this.editForm.multipScore = newValue / 2
+        }
+      },
+    },
+  },
   created() {
-    const { id, name, edit } = this.$route.query
-    this.queryForm.questionTypeId = id
-    this.queryForm.name = name
-    this.queryForm.edit = edit
+    this.queryForm.questionTypeId = this.$route.params.id
   },
   mounted() {
     this.init()
-    if (!getDriver()) {
-      this.driverStep()
-    }
   },
   methods: {
     goBack() {
       this.$router.back()
     },
-    // 引导方法
-    driverStep() {
-      const driver = new Driver(driverSetting)
-      driver.defineSteps(questionDriverStep)
-      driver.start()
-    },
     // 初始化默认值
     async init() {
       this.search() // 查询列表
-
-      const typeDictData = await dictListPage({
-        dictIndex: 'QUESTION_TYPE',
-      })
-
-      this.queryForm.typeList = typeDictData.data.list // 初始化类型下拉框
-
-      const difficultyDictData = await dictListPage({
-        dictIndex: 'QUESTION_DIFFICULTY',
-      })
-
-      this.queryForm.difficultyList = difficultyDictData.data.list // 初始化难度下拉框
+      this.queryForm.typeList = getOneDict('QUESTION_TYPE')
+      this.queryForm.difficultyList = getOneDict('QUESTION_DIFFICULTY')
       this.editForm.type = 1 // 默认选中类型
       this.editForm.difficulty = 1 // 默认选中简单
       this.editForm.score = 1 // 默认得分为 1
@@ -403,7 +393,6 @@ export default {
     },
     // 添加填空
     _addFillBlanks(index, value) {
-      console.log(value)
       let lab
       if ([3, 5].includes(this.editForm.type)) {
         lab = this.$tools.intToChinese(index + 1)
@@ -528,9 +517,8 @@ export default {
       }
 
       // 分值选项对应的分值（多选）
-      if (params.ai == 1 && params.type == 2) {
-        params.answerScores =
-          params.scoreOptions.length > 0 ? this.editForm.multipScore : 0
+      if (params.type == 2) {
+        params.answerScores = this.editForm.multipScore
       }
 
       // 分值选项对应的分值（填空、问答）
@@ -624,12 +612,16 @@ export default {
           this._addOption(i, res.data.options[i])
         }
         this.editForm.scoreOptions =
-          res.data.scoreOptions == null ? [] : res.data.scoreOptions.split(',')
+          res.data.scoreOptions == null ? [] : res.data.scoreOptions
         this.editForm.answerMultip = res.data.answers.reduce((acc, cur) => {
-          acc.push(cur.answer[0])
+          acc.push(...cur.answer)
           return acc
         }, [])
         this.editForm.multipScore = res.data.answers[0].score
+      }
+
+      if (this.editForm.type === 5 && this.editForm.ai === 2) {
+        this.editForm.answers = [] // 重置答案列表
       }
 
       if (
@@ -643,9 +635,7 @@ export default {
             this._addFillBlanks(i, answers[i])
           }
           this.editForm.scoreOptions =
-            res.data.scoreOptions == null
-              ? []
-              : res.data.scoreOptions.split(',')
+            res.data.scoreOptions == null ? [] : res.data.scoreOptions
         })
       }
 
@@ -656,15 +646,7 @@ export default {
     // 获取试题详情
     async showDetails(id) {
       this.detailStatus = true
-      const res = await questionGet({ id })
-      if (res?.code != 200) {
-        this.$message.error('获取详情失败！请重试')
-        this.questionDetail = {}
-        return
-      }
-
-      this.questionDetail = res.data
-      this.editForm.id = res.data.id
+      this.editForm.id = id
     },
     // 复制试题
     async copy(id) {
@@ -686,7 +668,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning',
       }).then(async () => {
-        const res = await questionDel({ id })
+        const res = await questionDel({ ids: [`${id}`] })
         this.resetQuery(res, '删除')
       })
     },
@@ -705,6 +687,11 @@ export default {
         ids: [`${id}`],
       })
       this.resetQuery(res, '发布试题')
+    },
+    // 显示试题操作模板
+    showTemplate(e) {
+      this.questionTemplate = e
+      this.search()
     },
     // 还原数据并查询
     resetQuery(res, msg) {
@@ -725,22 +712,16 @@ export default {
 <style lang="scss" scoped>
 .container {
   width: 100%;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  padding-bottom: 10px;
-  padding-top: 110px;
-  margin: 0 auto;
 }
 
 .form-inline {
   height: 60px;
-  padding: 10px 20px;
+  padding: 10px 20px 10px 70px;
   position: fixed;
   top: 50px;
   left: 0;
   right: 0;
-  background: #f7f8f9;
+  background: #fff;
   z-index: 1500;
   .el-form-item {
     width: 140px;
@@ -751,16 +732,14 @@ export default {
 .content {
   display: flex;
   width: 100%;
-  height: calc(100vh - 110px);
-  padding: 0 20px;
+  height: calc(100vh - 120px);
+  padding: 45px 0 0;
   margin: 0 auto;
 }
 
 .content-left {
   width: 145px;
   background: #fff;
-  border-radius: 5px;
-  box-shadow: 0 0 13px 3px rgba(30, 159, 255, 0.15);
   position: relative;
 }
 
@@ -771,9 +750,7 @@ export default {
 .content-right {
   width: 500px;
   background: #fff;
-  border-radius: 5px;
-  padding: 10px 0 0 0;
-  box-shadow: 0 0 13px 3px rgba(191, 198, 204, 0.15);
+  padding: 10px 20px 0 0;
 }
 
 .pagination {

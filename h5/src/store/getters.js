@@ -5,15 +5,16 @@
  * @Author: Che
  * @Date: 2021-08-11 11:33:30
  * @LastEditors: Che
- * @LastEditTime: 2021-11-25 09:49:33
+ * @LastEditTime: 2021-12-20 10:53:09
  */
 const getters = {
-  token: (state) => state.user.token,
-  userId: (state) => state.user.userId,
   name: (state) => state.user.name,
+  token: (state) => state.user.token,
   roles: (state) => state.user.roles,
+  userId: (state) => state.user.userId,
   onlyRole: (state) => state.user.onlyRole,
   orgName: (state) => state.setting.orgName,
+  tabIndex: (state) => state.setting.tabIndex,
   permission_routes: (state) => state.permission.routes,
 }
 export default getters

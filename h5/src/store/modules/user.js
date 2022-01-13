@@ -5,10 +5,18 @@
  * @Author: Che
  * @Date: 2021-08-11 11:33:30
  * @LastEditors: Che
- * @LastEditTime: 2021-11-25 13:07:45
+ * @LastEditTime: 2021-12-27 10:27:39
  */
 import { login, loginOrgName } from 'api/common'
-import { getInfo, setInfo, removeInfo, setOrg } from '@/utils/storage'
+import {
+  getInfo,
+  setInfo,
+  removeInfo,
+  setSetting,
+  getDict,
+  removeDict,
+} from '@/utils/storage'
+import { getDictList } from '@/utils/getDict'
 import router, { resetRouter } from '@/router/index'
 
 const state = {
@@ -69,7 +77,10 @@ const actions = {
             { root: true }
           )
           setInfo({ onlyRole: role, ...data })
-          setOrg({ orgName })
+          setSetting({ orgName })
+          if (!getDict()) {
+            getDictList()
+          }
           resolve()
         })
         .catch((error) => {
@@ -89,8 +100,18 @@ const actions = {
       commit('SET_TOKEN', '')
       commit('SET_ROLES', [])
       commit('SET_ONLY_ROLE', [])
+      commit('SET_ONLY_ROLE', [])
       commit('permission/SET_ROUTES', [], { root: true })
+      commit(
+        'setting/CHANGE_SETTING',
+        {
+          key: 'tabIndex',
+          value: '1',
+        },
+        { root: true }
+      )
       removeInfo()
+      removeDict()
       resetRouter()
       resolve()
     })

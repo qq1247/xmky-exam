@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-10-13 14:52:40
  * @LastEditors: Che
- * @LastEditTime: 2021-11-17 13:49:03
+ * @LastEditTime: 2022-01-12 15:33:34
 -->
 <template>
   <div class="exam-item">
@@ -146,7 +146,7 @@ export default {
       const diffTime =
         new Date(endTime).getTime() - new Date(startTime).getTime()
       const minutes = diffTime / (60 * 1000)
-      return `${minutes}分钟`
+      return `${minutes.toFixed(2)}分钟`
     },
     // 编辑
     edit(data) {

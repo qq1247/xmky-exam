@@ -1,11 +1,11 @@
 /*
- * @Description: post封装
+ * @Description: request封装
  * @Version: 1.0
  * @Company:
  * @Author: Che
  * @Date: 2021-07-30 13:36:21
  * @LastEditors: Che
- * @LastEditTime: 2021-08-25 13:14:32
+ * @LastEditTime: 2021-12-16 16:10:44
  */
 import http from '@/utils/http'
 import qs from 'qs'

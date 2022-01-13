@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-09-16 09:46:16
  * @LastEditors: Che
- * @LastEditTime: 2021-11-30 10:32:48
+ * @LastEditTime: 2022-01-10 17:44:11
 -->
 
 <template>
@@ -17,9 +17,10 @@
             <div class="item-title">{{ item.chapter.name }}</div>
             <div></div>
           </div>
-          <div class="chapter-description">
-            {{ item.chapter.description }}
-          </div>
+          <div
+            class="chapter-description"
+            v-html="item.chapter.description"
+          ></div>
         </div>
 
         <template v-if="item.questionList.length > 0">
@@ -142,7 +143,7 @@ export default {
   props: {
     preview: {
       type: [String, Boolean],
-      default: '',
+      default: 'false',
     },
     paperQuestion: {
       type: Array,

@@ -5,10 +5,47 @@
  * @Author: Che
  * @Date: 2021-09-10 10:14:03
  * @LastEditors: Che
- * @LastEditTime: 2021-12-01 17:54:54
+ * @LastEditTime: 2022-01-12 10:54:39
 -->
 <template>
-  <div class="detail-more">
+  <div class="detail-more" v-if="Object.keys(data).length">
+    <!-- 类型，难度，其他选项，智能，分数 -->
+    <div class="detail-tags">
+      <el-tag class="center-tag-danger" size="mini" type="danger">{{
+        data.type | typeName
+      }}</el-tag>
+
+      <el-tag class="center-tag-purple" effect="plain" size="mini">{{
+        data.difficulty | difficultyName
+      }}</el-tag>
+
+      <el-tag effect="plain" size="mini" type="warning">{{
+        ['', '智能', '非智能'][data.ai]
+      }}</el-tag>
+
+      <el-tag effect="plain" size="mini" type="danger"
+        >{{ data.score }}分</el-tag
+      >
+
+      <el-tag effect="plain" size="mini">{{ data.createUserName }}</el-tag>
+
+      <el-tag
+        :type="data.state == 1 ? 'info' : 'danger'"
+        effect="plain"
+        size="mini"
+        >{{ data.state == 1 ? '发布' : '草稿' }}</el-tag
+      >
+
+      <template v-if="data.scoreOptions">
+        <el-tag
+          size="small"
+          type="info"
+          v-for="item in data.scoreOptions"
+          :key="item"
+          >{{ getValue(item) }}</el-tag
+        >
+      </template>
+    </div>
     <!-- 答案 -->
     <el-row :gutter="10">
       <template v-if="[1, 4].includes(data.type)">
@@ -17,6 +54,7 @@
           <div v-html="`${data.answers[0].answer}`"></div>
         </el-col>
       </template>
+
       <template v-if="data.type === 2">
         <el-col :span="1.5">【答案】</el-col>
         <el-col :span="20">
@@ -27,6 +65,7 @@
           </template>
         </el-col>
       </template>
+
       <template v-if="data.type === 3">
         <el-col :span="1.5">【答案】</el-col>
         <el-col :span="20">
@@ -45,6 +84,7 @@
           </div>
         </el-col>
       </template>
+
       <template v-if="data.type === 5">
         <el-col :span="1.5"> 【答案】</el-col>
         <el-col :span="20">
@@ -74,46 +114,16 @@
         <div v-html="`${data.analysis}`"></div>
       </el-col>
     </el-row>
-    <!-- 类型，难度，其他选项，智能，分数 -->
-    <div class="detail-tags">
-      <el-tag effect="dark" size="small">{{ typeItem(this.data.type) }}</el-tag>
-      <el-tag effect="dark" size="small" type="danger">{{
-        difficultyItem(this.data.difficulty)
-      }}</el-tag>
-      <el-tag effect="dark" size="small" type="warning">{{
-        ['', '智能', '非智能'][data.ai]
-      }}</el-tag>
-      <el-tag effect="dark" size="small" type="success"
-        >{{ data.score }}分</el-tag
-      >
-      <template v-if="data.scoreOptions">
-        <el-tag
-          effect="dark"
-          size="small"
-          type="info"
-          v-for="item in data.scoreOptions.split(',')"
-          :key="item"
-          >{{ otherItem(item) }}</el-tag
-        >
-      </template>
-    </div>
   </div>
 </template>
 
 <script>
+import { getOneDict } from '@/utils/getDict'
 export default {
   props: {
     data: {
       type: Object,
       default: () => {},
-    },
-    type: {
-      type: Array,
-      default: [],
-    },
-    difficulty: {
-      type: Array,
-      default: [],
     },
   },
   data() {
@@ -132,28 +142,27 @@ export default {
           dictValue: '大小写不敏感',
         },
       ],
+      typeList: [],
+      difficultyList: [],
     }
   },
-  computed: {
-    typeItem() {
-      return function (type) {
-        return this.getValue(this.type, type)
-      }
+  filters: {
+    typeName(data) {
+      return getOneDict('QUESTION_TYPE').find((item) => item.no === data)
+        .dictValue
     },
-    difficultyItem() {
-      return function (type) {
-        return this.getValue(this.difficulty, type)
-      }
-    },
-    otherItem() {
-      return function (type) {
-        return this.getValue(this.otherOptions, type)
-      }
+    difficultyName(data) {
+      return getOneDict('QUESTION_DIFFICULTY').find((item) => item.no === data)
+        .dictValue
     },
   },
+  created() {
+    this.typeList = getOneDict('QUESTION_TYPE')
+    this.difficultyList = getOneDict('QUESTION_DIFFICULTY')
+  },
   methods: {
-    getValue(arr, type) {
-      const [value] = arr.filter(
+    getValue(type) {
+      const [value] = this.otherOptions.filter(
         (item) => Number(item.dictKey) === Number(type)
       )
       return value.dictValue

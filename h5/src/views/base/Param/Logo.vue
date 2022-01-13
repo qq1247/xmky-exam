@@ -5,11 +5,11 @@
  * @Author: Che
  * @Date: 2021-11-12 11:00:07
  * @LastEditors: Che
- * @LastEditTime: 2021-11-12 16:44:54
+ * @LastEditTime: 2022-01-10 11:31:12
 -->
 <template>
   <div class="param-option">
-    <div class="param-title">单位参数</div>
+    <div class="param-title">单位信息</div>
     <el-form :model="paramForm" :label-position="labelPosition" ref="paramForm">
       <el-form-item label="单位名称" label-width="100px" prop="orgName">
         <el-input
@@ -22,7 +22,7 @@
           ref="logoUpload"
           type="image"
           :files="paramForm.orgLogo"
-          @success="logoSucess"
+          @success="logoSuccess"
           @remove="logoRemove"
           size="1"
         />
@@ -74,9 +74,7 @@ export default {
     async setData() {
       this.paramForm.orgLogo = []
       this.paramForm.orgLogo.push({
-        url: `${process.env.VUE_APP_BASE_URL}file/download?id=${Number(
-          this.logo
-        )}`,
+        url: `/api/file/download?id=${Number(this.logo)}`,
       })
       this.paramForm.orgName = this.name
     },
@@ -111,7 +109,7 @@ export default {
       })
     },
     // 上传logo成功
-    logoSucess(res, file, fileList) {
+    logoSuccess(res, file, fileList) {
       this.paramForm.orgLogo = fileList
     },
     // 上传logo失败

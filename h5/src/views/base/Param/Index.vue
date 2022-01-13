@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-11-12 10:58:56
  * @LastEditors: Che
- * @LastEditTime: 2021-11-12 17:56:22
+ * @LastEditTime: 2022-01-10 11:31:26
 -->
 <template>
   <div class="container param-container">
@@ -15,14 +15,14 @@
       :pwdType="pwdType"
       @init="() => init()"
     ></PassWord>
-    <!-- Email -->
-    <Email :emailParams="emailParams"></Email>
+    <!-- Logo -->
+    <Logo :logo="orgLogo" :name="orgName" @resetLogo="resetLogo"></Logo>
     <!-- File -->
     <File :dir="fileUploadDir"></File>
     <!-- DataBase -->
     <DataBase :dir="dbBakDir"></DataBase>
-    <!-- Logo -->
-    <Logo :logo="orgLogo" :name="orgName" @resetLogo="resetLogo"></Logo>
+    <!-- Email -->
+    <Email :emailParams="emailParams"></Email>
   </div>
 </template>
 
@@ -33,7 +33,7 @@ import Email from '../Param/Email.vue'
 import DataBase from '../Param/DataBase.vue'
 import PassWord from '../Param/PassWord.vue'
 import { parmGet } from 'api/base'
-import { getOrg, setOrg } from '@/utils/storage'
+import { getSetting, setSetting } from '@/utils/storage'
 export default {
   components: {
     Logo,
@@ -42,7 +42,6 @@ export default {
     DataBase,
     PassWord,
   },
-  props: {},
   data() {
     return {
       orgLogo: null,
@@ -76,16 +75,13 @@ export default {
     },
     async resetLogo() {
       await this.init()
-      let link = document.querySelector("link[rel*='icon']")
-      link.href = `${process.env.VUE_APP_BASE_URL}login/logo?icon=true`
       this.$store.dispatch('setting/changeSetting', {
         key: 'orgName',
         value: this.orgName,
       })
-      let loginInfo = getOrg()
+      let loginInfo = getSetting()
       loginInfo.orgName = this.orgName
-      setOrg(loginInfo)
-      this.$router.go()
+      setSetting(loginInfo)
     },
   },
 }
