@@ -722,4 +722,8 @@ export default {
     line-height: 40px;
   }
 }
+
+.content-center {
+  width: 960px;
+}
 </style>
