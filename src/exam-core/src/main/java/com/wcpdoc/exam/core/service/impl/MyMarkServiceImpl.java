@@ -217,14 +217,14 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 			if (map.get("answerStartTime") != null) {
 				map.put("answerStartTime", DateUtil.formatDateTime((Date)map.get("answerStartTime")));
 			}
-			if (map.get("answerStartTime") != null) {
+			if (map.get("answerEndTime") != null) {
 				map.put("answerEndTime", DateUtil.formatDateTime((Date)map.get("answerEndTime")));
 			}
-			if (map.get("answerStartTime") != null) {
-				map.put("markEndTime", DateUtil.formatDateTime((Date)map.get("markEndTime")));
-			}
-			if (map.get("answerStartTime") != null) {
+			if (map.get("markStartTime") != null) {
 				map.put("markStartTime", DateUtil.formatDateTime((Date)map.get("markStartTime")));
+			}
+			if (map.get("markEndTime") != null) {
+				map.put("markEndTime", DateUtil.formatDateTime((Date)map.get("markEndTime")));
 			}
 		}
 		return userList;
