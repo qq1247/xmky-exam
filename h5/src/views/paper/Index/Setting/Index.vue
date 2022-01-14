@@ -19,7 +19,9 @@
       </el-tab-pane>
     </el-tabs>
     <div class="setting-right">
-      <component :is="currentView"></component>
+      <el-card class="box-card" shadow="never">
+        <component :is="currentView"></component>
+      </el-card>
     </div>
   </div>
 </template>

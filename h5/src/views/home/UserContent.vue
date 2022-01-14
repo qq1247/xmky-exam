@@ -1,11 +1,11 @@
 <!--
  * @Description: 用户·子管理员
  * @Version: 1.0
- * @Company: 
+ * @Company:
  * @Author: Che
  * @Date: 2021-12-13 13:58:07
  * @LastEditors: Che
- * @LastEditTime: 2022-01-13 18:21:41
+ * @LastEditTime: 2022-01-14 16:25:25
 -->
 <template>
   <div class="home-content">
@@ -31,7 +31,11 @@
         <el-col :span="17">
           <template v-if="examList.length">
             <div class="info-list">
-              <div class="info-item" :key="item.id" v-for="item in examList">
+              <div
+                class="info-item info-item-evenly"
+                :key="item.id"
+                v-for="item in examList"
+              >
                 <div class="item-left ellipsis">{{ item.examName }}</div>
                 <div class="item-time">
                   {{ item.examStartTime }}（{{
@@ -82,15 +86,6 @@
             <div class="info-list">
               <div class="info-item" :key="item.id" v-for="item in markList">
                 <div class="item-left ellipsis">{{ item.examName }}</div>
-                <div class="item-time">
-                  {{ item.examStartTime }}（{{
-                    computeMinute(item.examMarkStartTime, item.examMarkEndTime)
-                  }}）
-                </div>
-                <div class="item-score">总分：{{ item.paperTotalScore }}</div>
-                <div class="item-pass">
-                  及格：{{ (item.paperPassScore / 100) * item.paperTotalScore }}
-                </div>
                 <div class="item-right">
                   <div class="item-btn" @click="goMark(item)">
                     <i class="common common-count-down"></i>开始阅卷
@@ -311,7 +306,7 @@ export default {
       }, {})
 
       timePopovers = markList.reduce((acc, mark) => {
-        const markTime = dayjs(mark.examMarkStartTime).format('YYYY-MM-DD')
+        const markTime = dayjs(mark.markStartTime).format('YYYY-MM-DD')
         if (!acc[markTime]) {
           acc[markTime] = {}
         }
@@ -321,8 +316,8 @@ export default {
         }
 
         acc[markTime]['mark'].push({
-          startTime: mark.examMarkStartTime,
-          endTime: mark.examMarkEndTime,
+          startTime: mark.markStartTime,
+          endTime: mark.markEndTime,
           state: mark.examMarkState,
         })
         return acc
