@@ -5,14 +5,69 @@
  * @Author: Che
  * @Date: 2021-07-27 17:31:01
  * @LastEditors: Che
- * @LastEditTime: 2021-09-02 17:48:28
+ * @LastEditTime: 2022-01-14 19:23:27
  */
 const os = require('os')
 const path = require('path')
+const fs = require('fs')
+const stat = fs.stat
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
 
 // resolve absolute paths
 const resolve = (dir) => path.join(__dirname, dir)
+
+//copy dir
+const copy = (src, dst) => {
+  fs.readdir(src, function (err, paths) {
+    if (err) {
+      throw err
+    }
+    paths.forEach(function (path) {
+      let _src = `${src}/${path}`
+      let _dst = `${dst}/${path}`
+      let readable
+      let writable
+      stat(_src, function (err, st) {
+        if (err) {
+          throw err
+        }
+
+        if (st.isFile()) {
+          readable = fs.createReadStream(_src) //创建读取流
+          writable = fs.createWriteStream(_dst) //创建写入流
+          readable.pipe(writable)
+        } else if (st.isDirectory()) {
+          exists(_src, _dst, copy)
+        }
+      })
+    })
+  })
+}
+
+// isDir
+const exists = (src, dst, callback) => {
+  fs.exists(dst, function (exists) {
+    if (exists) {
+      callback(src, dst)
+    } else {
+      fs.mkdir(dst, function () {
+        callback(src, dst)
+      })
+    }
+  })
+}
+
+/* exists(
+  './public/tinymce/plugins/uploadImg',
+  './node_modules/tinymce/plugins/uploadImg',
+  copy
+) */
+
+exists(
+  resolve('public/tinymce/plugins/uploadImg'),
+  resolve('node_modules/tinymce/plugins/uploadImg'),
+  copy
+)
 
 // Obtain the local IP address
 const getIPAddress = () => {

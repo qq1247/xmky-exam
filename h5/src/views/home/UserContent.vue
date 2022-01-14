@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-12-13 13:58:07
  * @LastEditors: Che
- * @LastEditTime: 2022-01-14 16:25:25
+ * @LastEditTime: 2022-01-14 19:49:23
 -->
 <template>
   <div class="home-content">
@@ -316,8 +316,8 @@ export default {
         }
 
         acc[markTime]['mark'].push({
-          startTime: mark.markStartTime,
-          endTime: mark.markEndTime,
+          startTime: mark.examMarkStartTime,
+          endTime: mark.examMarkEndTime,
           state: mark.examMarkState,
         })
         return acc

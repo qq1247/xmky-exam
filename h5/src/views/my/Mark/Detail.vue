@@ -401,6 +401,7 @@ export default {
     async init() {
       await this.queryPaper()
       await this.queryPaperInfo()
+      await this.queryExamineeInfo()
       await this.queryAnswerInfo()
     },
     // 查询试卷
@@ -450,8 +451,10 @@ export default {
     },
     // 查询答案信息
     async queryAnswerInfo(id) {
-      await this.queryExamineeInfo()
-      this.userId = id || this.userList[0].userId
+      if (!id || !this.userId) {
+        this.userId = id || this.userList[0].userId
+      }
+
       try {
         const res = await myMarkAnswerList({
           examId: this.examId,
