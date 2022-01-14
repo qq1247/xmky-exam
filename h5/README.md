@@ -1,129 +1,41 @@
-<!--
- * @Description: 前端简介
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-05-24 15:46:00
- * @LastEditors: Che
- * @LastEditTime: 2021-09-30 17:37:57
--->
-# 在线考试
+# 前端源码
+## v3.4.0 cy 2021-12-31 12:12:12
+###### 新增功能：试题编辑、组卷时支持实时预览
+###### 优化改进：去除上侧菜单、去除弹窗，整体样式切换成左侧菜单加右侧标签页的交互方式
+###### bug修复：组卷时，左侧试题概率性不能拖动
+###### bug修复：富文本上传图片使用相对路径，保证迁移服务器时不受影响
+###### bug修复：计算答题、阅卷时间等用向上取整的方式，计算百分比等用四舍五入的方式
 
-<p align="center">
-  <a href="https://github.com/vuejs/vue">
-    <img src="https://img.shields.io/badge/vue-2.6.10-brightgreen.svg" alt="vue">
-  </a>
-  <a href="https://gitee.com/zhanghucheng/exam">
-    <img src="https://img.shields.io/badge/online--exam-3.1.0-brightgreen.svg" alt="online-exam">
-  </a>
-  <a href="https://gitee.com/zhanghucheng/exam/blob/master/LICENSE">
-    <img src="https://img.shields.io/github/license/mashape/apistatus.svg" alt="license">
-  </a>
-  <a href="https://gitee.com/zhanghucheng/exam/releases">
-    <img src="https://img.shields.io/badge/release-3.1.0-blue.svg" alt="release">
-  </a>
-</p>
+## v3.3.0 cy 2021-11-30 11:11:11
+###### 优化改进：接口命名和参数变更，更加易读
+###### 优化改进：支持不同角色切换
+###### 优化改进：子管理员只能用于出题阅卷等；
+###### 优化改进：试题支持批量发布
+###### 优化改进：支持页面修改参数，如数据库备份路径；上传路劲；初始化密码值；
+###### 新增功能：试题回收站，防止用户误删时恢复
 
-## 简介
+## v3.2.1 zhc 2021-11-25 16:27:52
+###### 无
 
-[online-exam](https://gitee.com/zhanghucheng/exam) 是一个在线考试前端解决方案，它基于 [vue](https://github.com/vuejs/vue) 和 [element-ui](https://github.com/ElemeFE/element)实现。它使用了最新的前端技术栈，内置了动态路由，权限验证，提炼了典型的业务模型，提供了丰富的功能组件，它可以帮助你快速搭建企业级在线考试产品原型。相信不管你的需求是什么，本项目都能帮助到你。
+## v3.2.0 cy 2021-10-31 18:08:00
+###### 改进体验：支持5个下划线表示一个填空，可以直接在试卷题干上填空
+###### 改进体验：数字转义成汉字，如 填空1 显示成 填空一
+###### 改进体验：我的考试未开考时，点击无效。时间到则允许进入。
+###### 改进体验：公告显示不友好，调整至轮播图下侧滚动展示
 
-- [在线预览](http://47.92.221.134:8080/)
+## v3.1.0 cy 2021-09-30 13:58:00
+###### 改进体验：考试人和阅卷人都放到一个页面，简化操作
+###### 新增功能：首页添加日历，鼠标放到日期上时，弹出当天考试或阅卷的信息
+###### 新增功能：实时查看考试用户在线状态
+###### 新增功能：管理者可以选择时间段开放题库，用于考前背题
+###### 新增功能：背题时，支持试题评论，用于加强记忆
+###### 新增功能：子管理员可以查看考试最高、最低分等
+###### 新增功能：管理员允许自定义单位名称、logo等
+###### 新增功能：试卷支持按整卷或单提显示
+###### 新增功能：考试时，试卷右侧导航栏支持颜色标记状态，如已做、未做、疑问
 
-## 前序准备
+## v3.0.0 cy 2021-08-10 13:58:00
+###### 前后端分离，使用vue+elementUI框架
+###### 重新设计交互方式，界面偏前端样式
+###### 和v2.0.0不兼容
 
-你需要在本地安装 [node](http://nodejs.org/) 和 [git](https://git-scm.com/)。本项目技术栈基于 [ES2015+](http://es6.ruanyifeng.com/)、[vue](https://cn.vuejs.org/index.html)、[vuex](https://vuex.vuejs.org/zh-cn/)、[vue-router](https://router.vuejs.org/zh-cn/) 、[vue-cli](https://github.com/vuejs/vue-cli) 、[axios](https://github.com/axios/axios) 和 [element-ui](https://github.com/ElemeFE/element)。
-
-<p align="center">
-  <img width="900" src="https://images.gitee.com/uploads/images/2021/0806/144840_bb72dd0d_393390.png">
-</p>
-
-## 功能
-
-```
-- 登录
-
-- 权限验证
-  - 页面权限
-  - 权限配置
-
-- 多环境发布
-  - dev
-  - prod
-
-- 功能
-  - 编辑多类型试题
-  - 组合多类型试卷
-  - 组织考试
-  - 实时考试
-  - 自动阅卷
-```
-
-## 开发
-
-```bash
-# 克隆项目
-git clone https://gitee.com/zhanghucheng/exam.git
-
-# 进入项目目录
-cd exam/h5
-
-# 安装依赖
-npm install
-
-# 建议不要直接使用 cnpm 安装依赖，会有各种诡异的 bug。可以通过如下操作解决 npm 下载速度慢的问题
-npm install --registry=https://registry.npm.taobao.org
-
-# 启动服务
-npm run serve:dev
-```
-
-浏览器访问 http://localhost:9000
-
-## 发布
-
-```bash
-# 构建测试环境
-npm run build:test
-
-# 构建生产环境
-npm run build:prod
-```
-
-## 其它
-
-```bash
-# 代码格式检查
-npm run lint
-
-# 代码格式检查并自动修复
-npm run lint -- --fix
-```
-
-## Online Demo
-
-[在线 Demo](http://47.92.221.134:8080/)
-
-## Changelog
-
-Detailed changes for each release are documented in the [release notes](https://gitee.com/zhanghucheng/exam/blob/master/h5/CHANGELOG.md).
-
-
-## Browsers support
-
-Modern browsers and Internet Explorer 10+.
-
-| [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt="IE / Edge" width="24px" height="24px" />](https://godban.github.io/browsers-support-badges/)</br>IE / Edge | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" />](https://godban.github.io/browsers-support-badges/)</br>Firefox | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](https://godban.github.io/browsers-support-badges/)</br>Chrome | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](https://godban.github.io/browsers-support-badges/)</br>Safari |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| IE10, IE11, Edge                                                                                                                                                                                                 | last 2 versions                                                                                                                                                                                                    | last 2 versions                                                                                                                                                                                                | last 2 versions                                                                                                                                                                                                |
-## 交流群
-
-<a href="https://jq.qq.com/?_wv=1027&k=GXh1hHSy">
-    <img src="https://img.shields.io/badge/qq-811189776-blue" alt="811189776">
-  </a>
-
-## License
-
-[MIT](https://gitee.com/zhanghucheng/exam/blob/master/LICENSE)
-
-Copyright (c) 2018-present ZhangHuCheng

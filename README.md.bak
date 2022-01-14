@@ -24,11 +24,6 @@
 ## 技术实现
 bs架构，采用开源组件jdk8、mysql5.7、springboot2x、elementUI2x
 
-## api接口文档
-<a href="doc">接口文档</a>
-
-<a href="doc">部署手册</a>
-
 ## 技术交流
 ![输入图片说明](img/7.png)
 <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=Vqhsz3XUUg-SS4m8LM0mrL3WcnKrL9xo&jump_from=webapi"><img border="0" src="//pub.idqqimg.com/wpa/images/group.png" alt="在线考试技术交流群" title="在线考试技术交流群"></a>
