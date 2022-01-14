@@ -439,10 +439,8 @@ export default {
     },
     // 未阅考生列表
     filterUserList(e) {
-      const filterUserNum = this.allUserList.filter(
-        (item) => item.markState === 1
-      ).length
-      if (!filterUserNum) {
+      const isAllMark = this.allUserList.every((item) => item.markState === 3)
+      if (isAllMark) {
         this.$message.success('已经全部阅卷！')
         this.isFilter = !e
         return

@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2022-01-11 17:08:31
  * @LastEditors: Che
- * @LastEditTime: 2022-01-13 11:01:24
+ * @LastEditTime: 2022-01-14 09:36:51
 -->
 <template>
   <div class="container">
@@ -36,7 +36,7 @@
         </el-table-column>
         <el-table-column label="考试状态">
           <template slot-scope="scope">
-            <span>{{ scope.row.userId | stateName }}</span>
+            <span>{{ scope.row.state | stateName }}</span>
           </template>
         </el-table-column>
         <el-table-column label="阅卷状态">
