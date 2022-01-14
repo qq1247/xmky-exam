@@ -5,17 +5,14 @@
  * @Author: Che
  * @Date: 2021-12-16 16:15:14
  * @LastEditors: Che
- * @LastEditTime: 2022-01-12 10:55:27
+ * @LastEditTime: 2022-01-14 11:15:59
 -->
 <template>
   <div class="container">
     <div class="info-content">
       <div class="content-item" v-if="statisInfo.exam">
         <p><span>考试名称：</span>{{ statisInfo.exam.name }}</p>
-        <p>
-          <span>开始时间：</span
-          >{{ timeRange(statisInfo.exam.startTime, statisInfo.exam.endTime) }}
-        </p>
+        <p><span>开始时间：</span>{{ statisInfo.exam.startTime }}</p>
         <p><span>考试时长：</span>{{ statisInfo.exam.succNum }}</p>
         <p><span>考试人数：</span>{{ statisInfo.exam.userNum }}</p>
         <p><span>缺考人数：</span>{{ statisInfo.exam.missUserNum }}</p>
@@ -122,7 +119,9 @@
           <el-table-column width="100" label="正确率">
             <template slot-scope="scope">
               <span
-                >{{ (scope.row.succUserNum / scope.row.userNum) * 100 }}%</span
+                >{{
+                  Math.round((scope.row.succUserNum / scope.row.userNum) * 100)
+                }}%</span
               >
             </template>
           </el-table-column>
@@ -288,7 +287,7 @@ export default {
       }
       const diffTime =
         new Date(endTime).getTime() - new Date(startTime).getTime()
-      const minutes = diffTime / (60 * 1000)
+      const minutes = Math.floor(diffTime / (60 * 1000))
       return `${minutes}分钟`
     },
     // 分页查询
