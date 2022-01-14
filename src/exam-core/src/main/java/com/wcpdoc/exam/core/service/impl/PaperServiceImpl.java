@@ -114,6 +114,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		// entity.setGenType(paper.getGenType());//不能修改
 		entity.setShowType(paper.getShowType());
 		entity.setName(paper.getName());
+		entity.setMarkType(paper.getMarkType());
 		entity.setPassScore(paper.getPassScore());
 		entity.setUpdateUserId(getCurUser().getId());
 		entity.setUpdateTime(new Date());
