@@ -434,9 +434,12 @@ export default {
       })
       this.allUserList = userList.data
       this.userList = userList.data
-      this.userInfo = this.userId
-        ? this.userList.find((item) => item.userId == Number(this.userId))
-        : this.userList[0]
+      this.userId = this.userId || this.userList[0].userId
+      const userIndex = this.userList.findIndex(
+        (item) => item.userId == Number(this.userId)
+      )
+      this.userInfo = this.userList[userIndex]
+      console.log(userIndex)
     },
     // 未阅考生列表
     filterUserList(e) {
@@ -450,11 +453,7 @@ export default {
       this.queryAnswerInfo()
     },
     // 查询答案信息
-    async queryAnswerInfo(id) {
-      if (!id || !this.userId) {
-        this.userId = id || this.userList[0].userId
-      }
-
+    async queryAnswerInfo() {
       try {
         const res = await myMarkAnswerList({
           examId: this.examId,
@@ -599,8 +598,9 @@ export default {
         this.$message.warning('已经是第一卷了！')
         return
       }
-      this.queryAnswerInfo(this.userList[index - 1].userId)
+      this.userId = this.userList[index - 1].userId
       this.userInfo = this.userList[index - 1]
+      this.queryAnswerInfo()
     },
     // 下一卷
     nextPaper() {
@@ -611,8 +611,9 @@ export default {
         this.$message.warning('已经是最后一卷了！')
         return
       }
-      this.queryAnswerInfo(this.userList[index + 1].userId)
+      this.userId = this.userList[index + 1].userId
       this.userInfo = this.userList[index + 1]
+      this.queryAnswerInfo()
     },
     // 完成阅卷
     async markEnd() {
