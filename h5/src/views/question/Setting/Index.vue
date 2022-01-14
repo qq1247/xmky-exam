@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-12-31 11:19:55
  * @LastEditors: Che
- * @LastEditTime: 2022-01-05 09:56:27
+ * @LastEditTime: 2022-01-14 16:49:13
 -->
 <template>
   <div class="container setting-container">
@@ -19,7 +19,9 @@
       </el-tab-pane>
     </el-tabs>
     <div class="setting-right">
-      <component :is="currentView"></component>
+      <el-card class="box-card" shadow="never">
+        <component :is="currentView"></component>
+      </el-card>
     </div>
   </div>
 </template>

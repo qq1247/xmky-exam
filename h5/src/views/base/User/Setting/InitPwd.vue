@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-12-21 10:11:03
  * @LastEditors: Che
- * @LastEditTime: 2022-01-10 11:23:54
+ * @LastEditTime: 2022-01-14 17:11:54
 -->
 <template>
   <div class="container">
@@ -58,9 +58,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.container {
-  padding-left: 50px;
-}
 .form-footer {
   margin-top: 10px;
 }

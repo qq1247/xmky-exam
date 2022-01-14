@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-12-13 13:58:07
  * @LastEditors: Che
- * @LastEditTime: 2022-01-13 18:21:41
+ * @LastEditTime: 2022-01-14 16:25:25
 -->
 <template>
   <div class="home-content">
@@ -121,7 +121,7 @@
                 @click="getBulletin(item)"
               >
                 <div class="item-left ellipsis">{{ item.title }}</div>
-                <div class="item-right">{{ item.endTime }}</div>
+                <div class="item-right">{{ item.startTime }}</div>
               </div>
             </div>
           </template>
