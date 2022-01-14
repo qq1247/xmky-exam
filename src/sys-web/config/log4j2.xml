@@ -15,7 +15,7 @@
 	<loggers>
 		<!-- sql日志 -->
 		<Logger name="jdbc.sqlonly" level="off"></Logger>
-		<Logger name="jdbc.sqltiming" level="info"></Logger>
+		<Logger name="jdbc.sqltiming" level="off"></Logger>
 		<Logger name="jdbc.audit" level="off"></Logger>
 		<Logger name="jdbc.resultset" level="off"></Logger>
 		<Logger name="jdbc.resultsettable" level="off"></Logger>
@@ -24,10 +24,10 @@
 		<Logger name="com.wcpdoc.exam.base.service.impl.LoginServiceImpl" level="info"></Logger>
 		<Logger name="com.wcpdoc.exam.auth.filter.JWTFilter" level="info"></Logger>
 		<!-- 打印进度条 -->
-		<Logger name="com.wcpdoc.exam.base.cache.ProgressBarCache" level="debug"></Logger>
+		<Logger name="com.wcpdoc.exam.base.cache.ProgressBarCache" level="info"></Logger>
 		<!-- 打印试题解析进度 -->
-		<Logger name="com.wcpdoc.exam.core.service.WordServer" level="debug"></Logger>
-		<Logger name="com.wcpdoc.exam.core.service.impl.WordServerImpl" level="debug"></Logger>
+		<Logger name="com.wcpdoc.exam.core.service.WordServer" level="info"></Logger>
+		<Logger name="com.wcpdoc.exam.core.service.impl.WordServerImpl" level="info"></Logger>
 		<root level="info">
 			<appender-ref ref="rollingFile" />
 			<appender-ref ref="console" />
