@@ -453,7 +453,10 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		Set<String> userAnswerSet = new HashSet<String>(Arrays.asList(userAnswer.getAnswer().split(",")));// 获取用户答案
 		Set<String> questionAnswerSet = new HashSet<String>();// 获取试题答案
 		for(PaperQuestionAnswer questionAnswer : questionAnswerList){
-			questionAnswerSet.add(questionAnswer.getAnswer());
+			String[] questionAnswerSplit = questionAnswer.getAnswer().split(",");
+			for (int i = 0; i < questionAnswerSplit.length; i++) {
+				questionAnswerSet.add(questionAnswerSplit[i]);
+			}
 		}
 		
 		if (questionAnswerSet.size() == userAnswerSet.size() && questionAnswerSet.containsAll(userAnswerSet)) {// 如果完全正确，得满分
