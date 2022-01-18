@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -28,14 +29,17 @@ import com.alibaba.fastjson.JSONObject;
 public class XssFilter implements Filter {
 	private static final Logger log = LoggerFactory.getLogger(XssFilter.class);
 
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        
+    }
+	
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
  		HttpServletRequest httpServletRequest = (HttpServletRequest) request;
  		if (!(httpServletRequest.getRequestURI().equals("/api/question/add") || httpServletRequest.getRequestURI().equals("/api/question/edit")
- 		   || httpServletRequest.getRequestURI().equals("/api/paper/add") || httpServletRequest.getRequestURI().equals("/api/paper/edit")
- 		   || httpServletRequest.getRequestURI().equals("/api/exam/add") || httpServletRequest.getRequestURI().equals("/api/exam/edit")
  		  || httpServletRequest.getRequestURI().equals("/api/bulletin/add") || httpServletRequest.getRequestURI().equals("/api/bulletin/edit")
- 		 || httpServletRequest.getRequestURI().equals("/api/paper/chapterAdd") || httpServletRequest.getRequestURI().equals("/api/paper/chapterEdit") 
+ 		 || httpServletRequest.getRequestURI().equals("/api/paper/chapterAdd") || httpServletRequest.getRequestURI().equals("/api/paper/chapterEdit")
  		 ) && httpServletRequest.getRequestURI().startsWith("/api/") ) {
  			if (log.isDebugEnabled()) {
  				log.debug("Xss过滤前：【{}】【{}】", httpServletRequest.getRequestURI(), JSONObject.toJSONString(httpServletRequest.getParameterMap()));
@@ -50,6 +54,11 @@ public class XssFilter implements Filter {
  		
  		chain.doFilter(httpServletRequest, response);
 	}
+	
+	@Override
+    public void destroy() {
+ 
+    }
 }
 
 /**
