@@ -44,17 +44,15 @@ public class SensitiveServiceImpl extends BaseServiceImp<Sensitive> implements S
 	@Override
 	public void init() {
 		Sensitive sensitive = sensitiveDao.getEntity(1);
-		if (sensitive != null) {
-			init(sensitive);
-			return;
+		if (sensitive == null) {
+			sensitive = new Sensitive();
+		    sensitive.setWhiteList(null);
+		    sensitive.setBlackList(null);
+		    sensitive.setUpdateTime(new Date());
+		    sensitive.setUpdateUserId(1);
+		    add(sensitive);
 		}
 		
-		sensitive = new Sensitive();
-	    sensitive.setWhiteList(null);
-	    sensitive.setBlackList(null);
-	    sensitive.setUpdateTime(new Date());
-	    sensitive.setUpdateUserId(1);
-	    add(sensitive);
 	    init(sensitive);
 	}
     
