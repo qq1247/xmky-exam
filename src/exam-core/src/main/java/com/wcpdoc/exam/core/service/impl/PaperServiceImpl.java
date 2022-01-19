@@ -544,7 +544,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		}
 		
 		Question question = questionService.getEntity(questionId);
-		List<PaperQuestionAnswer> answerList = null;
+		List<PaperQuestionAnswer> answerList = paperQuestionAnswerService.getList(id, questionId);
 		if (question.getAi() == 1 && (question.getType() == 3 || question.getType() == 5)) {// 试题为智能阅卷，并且是填空或问答时有效
 			if(!ValidateUtil.isValid(subScores)) {
 				throw new MyException("参数错误：subScores");
@@ -558,7 +558,6 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 				throw new MyException("参数错误：subScores总分和score不匹配");
 			}
 			
-			answerList = paperQuestionAnswerService.getList(id, questionId);
 			if (subScores.length != answerList.size()) {
 				throw new MyException("参数错误：subScores个数不匹配");
 			}
@@ -610,10 +609,24 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		pq.setScore(score);
 		paperQuestionService.update(pq);
 		
-		if (question.getAi() == 1 && (question.getType() == 3 || question.getType() == 5)) {// 试题为智能阅卷，并且是填空或问答时更新子分数
-			for (int i = 0; i < subScores.length; i++) {
+//		if (question.getAi() == 1 && (question.getType() == 3 || question.getType() == 5)) {// 试题为智能阅卷，并且是填空或问答时更新子分数
+//			for (int i = 0; i < subScores.length; i++) {
+//				PaperQuestionAnswer answer = answerList.get(i);
+//				answer.setScore(subScores[i]);
+//				paperQuestionAnswerService.update(answer);
+//			}
+//		}
+		if (question.getAi() == 1 && (question.getType() == 2 || question.getType() == 3 || question.getType() == 5 )) {
+			for (int i = 0; i < subScores.length; i++) {//TODO  页面传值有问题 随后改
 				PaperQuestionAnswer answer = answerList.get(i);
 				answer.setScore(subScores[i]);
+				paperQuestionAnswerService.update(answer);
+			}
+		}
+		if (question.getAi() == 1 && (question.getType() == 1 || question.getType() == 4)) {
+			for (int i = 0; i < subScores.length; i++) {
+				PaperQuestionAnswer answer = answerList.get(i);
+				answer.setScore(score);
 				paperQuestionAnswerService.update(answer);
 			}
 		}
@@ -759,6 +772,11 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		return paperDao.getQuestionList(id);
 	}
 
+	@Override
+	public List<PaperQuestion> getPaperQuestionList(Integer id) {
+		return paperDao.getPaperQuestionList(id);
+	}
+	
 	@Override
 	public List<Paper> getList(Integer paperTypeId) {
 		return paperDao.getList(paperTypeId);

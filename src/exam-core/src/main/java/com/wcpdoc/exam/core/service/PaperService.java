@@ -119,6 +119,15 @@ public interface PaperService extends BaseService<Paper> {
 	List<Question> getQuestionList(Integer id);
 
 	/**
+	 * 获取试题列表
+	 * 
+	 * v1.0 zhanghc 2017年6月19日下午4:53:21
+	 * @param id
+	 * @return List<PaperQuestion>
+	 */
+	List<PaperQuestion> getPaperQuestionList(Integer id);
+	
+	/**
 	 * 完成添加试题
 	 * 
 	 * v1.0 zhanghc 2017年5月27日下午3:32:43
