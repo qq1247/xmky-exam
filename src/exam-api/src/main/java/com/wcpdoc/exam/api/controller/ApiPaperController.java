@@ -354,20 +354,20 @@ public class ApiPaperController extends BaseController {
 	 * @param options
 	 * @return PageResult
 	 */
-//	@RequestMapping("/updateBatchScore")// 暂时不用
-//	@ResponseBody
-//	public PageResult updateBatchScore(Integer chapterId, BigDecimal score, String options) {
-//		try {
-//			paperService.batchScoreUpdate(chapterId, score, options);
-//			return PageResult.ok();
-//		} catch (MyException e) {
-//			log.error("设置分数错误：{}", e.getMessage());
-//			return PageResult.err().msg(e.getMessage());
-//		} catch (Exception e) {
-//			log.error("设置分数错误：", e);
-//			return PageResult.err();
-//		}
-//	}
+	@RequestMapping("/updateBatchScore")// 暂时不用
+	@ResponseBody
+	public PageResult updateBatchScore(Integer chapterId, BigDecimal[] score, Integer[] scoreOptions) {
+		try {
+			paperService.batchScoreUpdate(chapterId, score, scoreOptions);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("设置分数错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("设置分数错误：", e);
+			return PageResult.err();
+		}
+	}
 	
 	/**
 	 * 试题删除

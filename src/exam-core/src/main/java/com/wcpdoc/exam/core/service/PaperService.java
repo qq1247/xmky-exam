@@ -193,11 +193,10 @@ public interface PaperService extends BaseService<Paper> {
 	 * 
 	 * v1.0 zhanghc 2017年6月9日下午4:21:52
 	 * @param chapterId
-	 * @param scores
-	 * @param options
-	 * void
+	 * @param score
+	 * @param scoreOptions void
 	 */
-	void batchScoreUpdate(Integer chapterId, BigDecimal score, String options);
+	void batchScoreUpdate(Integer chapterId, BigDecimal[] score, Integer[] scoreOptions);
 	
 	/**
 	 * 合并

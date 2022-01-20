@@ -114,7 +114,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			if (answers.length < 1) {
 				throw new MyException("参数错误：answers");
 			}
-			if (scoreOptions.length <= 0) {
+			if (scoreOptions == null || scoreOptions.length <= 0) {
+				scoreOptions = new Integer[1];
 				scoreOptions[0] = 1; //多选的漏选得分必填
 			}
 			if (answerScores.length == 0) {

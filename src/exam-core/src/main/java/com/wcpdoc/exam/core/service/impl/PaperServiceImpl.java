@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.core.service.impl;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -617,13 +618,13 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 //			}
 //		}
 		if (question.getAi() == 1 && (question.getType() == 2 || question.getType() == 3 || question.getType() == 5 )) {
-			for (int i = 0; i < subScores.length; i++) {//TODO  页面传值有问题 随后改
+			for (int i = 0; i < subScores.length; i++) {
 				PaperQuestionAnswer answer = answerList.get(i);
 				answer.setScore(subScores[i]);
 				paperQuestionAnswerService.update(answer);
 			}
 		}
-		if (question.getAi() == 1 && (question.getType() == 1 || question.getType() == 4)) {
+		if (question.getAi() == 1 && (question.getType() == 1 || question.getType() == 4)) { //TODO  页面传值有问题 随后改
 			for (int i = 0; i < subScores.length; i++) {
 				PaperQuestionAnswer answer = answerList.get(i);
 				answer.setScore(score);
@@ -783,7 +784,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 
 	@Override
-	public void batchScoreUpdate(Integer chapterId, BigDecimal score, String options) {
+	public void batchScoreUpdate(Integer chapterId, BigDecimal[] score, Integer[] scoreOptions) { //
 		// 校验数据有效性
 		if (chapterId == null) {
 			throw new MyException("参数错误：chapterId");
@@ -802,20 +803,94 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 
 		// 更新试卷分数
 		List<PaperQuestion> pqList = paperQuestionService.getQuestionList(chapterId);
-		for (PaperQuestion pq : pqList) {
-			pq.setScoreOptions(null);
+		for(int i = 0; i < pqList.size(); i ++ ){
+			PaperQuestion pq = pqList.get(i);
 			Question question = questionService.getEntity(pq.getQuestionId());
 			if (question.getType() == 2) {
-				if (ValidateUtil.isValid(options) && options.contains("1")) {
+				if (ValidateUtil.isValid(scoreOptions[i]) && scoreOptions[i] == 1 ) {
 					pq.setScoreOptions("1");
 				}
 			} else if (question.getType() == 3) {
-				pq.setScoreOptions(options);
+				if (ValidateUtil.isValid(scoreOptions[i]) && (scoreOptions[i] == 2 || scoreOptions[i] == 3 ) ) {
+					pq.setScoreOptions(scoreOptions[i].toString());
+				}
+			} else if (question.getType() == 5) {
+				if (ValidateUtil.isValid(scoreOptions[i]) && scoreOptions[i] == 3 ) {
+					pq.setScoreOptions("3");
+				}
 			}
-
-			pq.setScore(score);
+			pq.setScore(score[i]);
 			paperQuestionService.update(pq);
-		}
+			//更新答案分数
+			List<PaperQuestionAnswer> paperQuestionAnswerList = paperQuestionAnswerService.getList(pq.getPaperId(), pq.getQuestionId());
+	        NumberFormat nformat = NumberFormat.getNumberInstance();
+	        nformat.setMaximumFractionDigits(2);
+			if (question.getType() == 1 || question.getType() == 4) { //单选 判断
+				for(PaperQuestionAnswer paperQuestionAnswer : paperQuestionAnswerList){
+					paperQuestionAnswer.setScore(score[i]); // 单选和判断 score[i] 和 subScores[i] 同一个值
+					paperQuestionAnswerService.update(paperQuestionAnswer);
+				}
+			}
+			if (question.getType() == 2) {// 多选
+				for(PaperQuestionAnswer paperQuestionAnswer : paperQuestionAnswerList){
+					paperQuestionAnswer.setScore(new BigDecimal(nformat.format(score[i].divide(new BigDecimal(2)))));
+					paperQuestionAnswerService.update(paperQuestionAnswer);
+				}
+			}
+			
+			if (question.getType() == 3 || question.getType() == 5 ) { // 填空 问答  分值平分
+				BigDecimal bitScore = new BigDecimal(0); //保留两位数的平均值
+				BigDecimal lastOneScore = new BigDecimal(0); // 不能被平分的最后一位分值
+				if (paperQuestionAnswerList != null && paperQuestionAnswerList.size() > 0) {
+			        BigDecimal listSize = new BigDecimal(paperQuestionAnswerList.size());
+					BigDecimal averageScore = score[i].divide(listSize); // 平均分
+					bitScore = new BigDecimal(nformat.format(averageScore));
+					BigDecimal multiply = bitScore.multiply(listSize);// 平均分*size
+					
+					if (score[i].compareTo(multiply) != 0) {// 不能平分平均分
+						lastOneScore = score[i].subtract(bitScore.multiply(new BigDecimal(paperQuestionAnswerList.size() - 1)));
+					}
+				}
+				
+				if (lastOneScore.compareTo(new BigDecimal(0)) == 0) {//可以平分
+					for(PaperQuestionAnswer paperQuestionAnswer : paperQuestionAnswerList){
+						paperQuestionAnswer.setScore(bitScore);
+						paperQuestionAnswerService.update(paperQuestionAnswer);
+					}
+					return;
+				}
+				
+				for(int j = 1; j <= paperQuestionAnswerList.size(); j++){ //不能平分
+					PaperQuestionAnswer paperQuestionAnswer = paperQuestionAnswerList.get(j);
+					paperQuestionAnswer.setScore(bitScore);
+					if (j == paperQuestionAnswerList.size() ) {
+						paperQuestionAnswer.setScore(lastOneScore);
+					}
+					paperQuestionAnswerService.update(paperQuestionAnswer);
+				}
+			}
+		}	
+//		for (PaperQuestion pq : pqList) {
+//			pq.setScoreOptions(null);
+//			Question question = questionService.getEntity(pq.getQuestionId());
+//			if (question.getType() == 2) {
+//				if (ValidateUtil.isValid(options) && options.contains("1")) {
+//					pq.setScoreOptions("1");
+//				}
+//			} else if (question.getType() == 3) {
+//				pq.setScoreOptions(options);
+//			}
+//
+//			pq.setScore(score);
+//			paperQuestionService.update(pq);
+//			//更新答案分数
+//			if (question.getType() == 1 || question.getType() == 4) { //单选 判断
+//				
+//			}
+//			if (question.getType() == 2 || question.getType() == 3 || question.getType() == 5 ) { //多选  填空 问答  分值平分
+//				
+//			}
+//		}
 	}
 
 	@Override
