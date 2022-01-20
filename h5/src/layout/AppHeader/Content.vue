@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-12-14 09:40:45
  * @LastEditors: Che
- * @LastEditTime: 2022-01-12 10:59:49
+ * @LastEditTime: 2022-01-19 17:43:05
 -->
 <template>
   <div class="header-content">
@@ -93,6 +93,10 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+/deep/ .el-tabs {
+  height: 50px;
 }
 /deep/ .el-tabs__header {
   margin: 0;

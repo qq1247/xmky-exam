@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-12-29 10:01:01
  * @LastEditors: Che
- * @LastEditTime: 2022-01-12 10:06:38
+ * @LastEditTime: 2022-01-19 15:54:14
  */
 import Layout from '@/layout/Index.vue'
 export default [
@@ -26,7 +26,7 @@ export default [
         name: 'QuestionIndex',
         component: () => import('@/views/question/Index.vue'),
         meta: {
-          title: '试题管理',
+          title: '试题分类',
           layout: 'subAdmin',
         },
         children: [
@@ -87,7 +87,7 @@ export default [
         name: 'PaperIndex',
         component: () => import('@/views/paper/Index/Index.vue'),
         meta: {
-          title: '试卷管理',
+          title: '试卷分类',
           layout: 'subAdmin',
         },
         children: [
@@ -151,7 +151,7 @@ export default [
         name: 'ExamIndex',
         component: () => import('@/views/exam/Index/Index.vue'),
         meta: {
-          title: '考试管理',
+          title: '考试分类',
           layout: 'subAdmin',
         },
         children: [
