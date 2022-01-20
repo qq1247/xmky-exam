@@ -29,7 +29,7 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 	@Override
 	public List<Map<String, Object>> homeUser(Integer userId) {
 		String sql = "SELECT USER.ID AS USER_ID, USER.NAME AS USER_NAME, USER.ORG_ID AS ORG_ID ,ORG.NAME AS ORG_NAME, USER.TYPE AS TYPE, "
-				+ "COUNT( MY_EXAM.TOTAL_SCORE ) AS EXAM_NUM, COUNT( MY_EXAM.STATE = 1 ) AS MISS_NUM, COUNT( MY_EXAM.ANSWER_STATE = 1 ) AS SUCC_NUM, "
+				+ "COUNT( MY_EXAM.TOTAL_SCORE ) AS EXAM_NUM, SUM( MY_EXAM.STATE = 1 ) AS MISS_NUM, SUM( MY_EXAM.ANSWER_STATE = 1 ) AS SUCC_NUM, "
 				+ "MIN( MY_EXAM.NO ) AS TOP, MAX( MY_EXAM.TOTAL_SCORE ) AS MAX, MIN( MY_EXAM.TOTAL_SCORE ) AS MIN, "
 				+ "AVG( MY_EXAM.TOTAL_SCORE ) AS AVG, VARIANCE( MY_EXAM.TOTAL_SCORE ) AS SD "
 				+ "FROM EXM_MY_EXAM MY_EXAM "
@@ -39,6 +39,15 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
  		return getMapList(sql, new Object[] { userId });
 	}
 
+	@Override
+	public Integer homeUserMissNum(Integer userId) {
+		String sql = "SELECT COUNT(MY_EXAM.ID) "
+				+ "FROM EXM_MY_EXAM MY_EXAM "
+				+ "INNER JOIN EXM_EXAM AS EXAM ON MY_EXAM.EXAM_ID = EXAM.ID "
+				+ "WHERE MY_EXAM.STATE = 1 AND EXAM.START_TIME < NOW() AND MY_EXAM.USER_ID = ? ";
+ 		return getCount(sql, new Object[] { userId });
+	}
+	
 	@Override
 	public List<Map<String, Object>> homeSubAdminExam(Integer userId) {
 		String sql = "SELECT USER.ID AS USER_ID, USER.NAME AS USER_NAME, USER.ORG_ID AS ORG_ID ,ORG.NAME AS ORG_NAME, "
@@ -96,18 +105,6 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 		return getMapList(sql, new Object[] { questionTypeId });
 	}
 	
-	@Override
-	public List<Map<String, Object>> examStatis(Integer examId) {
-		String sql = "SELECT EXAM.NAME AS EXAM_NAME, EXAM.START_TIME AS EXAM_START_TIME, EXAM.END_TIME AS EXAM_END_TIME, EXAM.MARK_START_TIME AS EXAM_MARK_START_TIME, "
-				+ "EXAM.MARK_END_TIME AS EXAM_MARK_END_TIME, COUNT( MY_EXAM.ID ) AS EXAM_USER_NUM, COUNT( MY_EXAM.STATE = 1 ) AS MISS_USER_NUM, "
-				+ "COUNT( MY_EXAM.ANSWER_STATE = 1 ) AS SUCC_USER_NUM, PAPER.TOTAL_SCORE AS TOTAL, MAX( MY_EXAM.TOTAL_SCORE ) AS MAX, "
-				+ "MIN( MY_EXAM.TOTAL_SCORE ) AS MIN, AVG( MY_EXAM.TOTAL_SCORE ) AS AVG, VARIANCE( MY_EXAM.TOTAL_SCORE ) AS SD FROM EXM_MY_EXAM MY_EXAM "
-				+ "INNER JOIN EXM_EXAM EXAM ON EXAM.ID = MY_EXAM.EXAM_ID INNER JOIN EXM_PAPER PAPER ON PAPER.ID = EXAM.PAPER_ID "
-				+ "WHERE MY_EXAM.EXAM_ID = ? ";
-		return getMapList(sql, new Object[] { examId });
-	}
-	
-
 	@Override
 	public List<Map<String, Object>> examStatisType(Integer paperId) {
 		String sql = "SELECT SUM( QUESTION.TYPE = 1 ) AS TYPE1, SUM( QUESTION.TYPE = 2 ) AS TYPE2, SUM( QUESTION.TYPE = 3 ) AS TYPE3, "
