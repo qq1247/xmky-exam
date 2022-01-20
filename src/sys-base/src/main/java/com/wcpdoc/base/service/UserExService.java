@@ -26,5 +26,15 @@ public interface UserExService {
 	 * @return String
 	 */
 	String generateToken(User user);
+	
+	/**
+	 * 刷新令牌
+	 * 
+	 * v1.0 zhanghc 2021年10月18日上午10:16:02
+	 * @param user
+	 * @param token
+	 * void
+	 */
+	void refreshToken(User user, String token);
 
 }

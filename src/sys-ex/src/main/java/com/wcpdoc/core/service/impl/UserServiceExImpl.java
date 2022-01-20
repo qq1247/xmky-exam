@@ -52,9 +52,11 @@ public class UserServiceExImpl implements UserExService {
 					user.getLoginName(), null, DateUtil.formatDateTime(new Date(tokenId)));
 		}
 		
-		// 缓存刷新令牌（用于续租登陆）
-		TokenCache.put(user.getId(), token);
 		return token;
 	}
 
+	@Override
+	public void refreshToken(User user, String token) {
+		TokenCache.put(user.getId(), token);// 缓存刷新令牌（用于续租登陆）
+	}
 }

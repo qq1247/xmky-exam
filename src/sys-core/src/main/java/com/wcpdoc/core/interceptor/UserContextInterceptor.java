@@ -28,6 +28,10 @@ public class UserContextInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		LoginUser user = userContextService.getUser(request, response, handler);
+		if (!userContextService.valide(user)) { // 解决后台强制退出后，前台访问任意接口携带令牌，导致再次被解析，显示用户在线的问题
+			return true;
+		}
+		
 		UserContext.set(user);
 		return true;
 	}

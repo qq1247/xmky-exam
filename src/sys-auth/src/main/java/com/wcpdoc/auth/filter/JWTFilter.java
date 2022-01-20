@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.wcpdoc.auth.cache.OldTokenCache;
 import com.wcpdoc.auth.cache.TokenCache;
@@ -166,19 +165,11 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 	}
 
 	/**
-	 * 支持跨域
+	 * 异常处理
 	 */
 	@Override
 	protected boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
-		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		HttpServletResponse httpResponse = (HttpServletResponse) response;
-		httpResponse.setHeader("Access-control-Allow-Origin", httpRequest.getHeader("Origin"));
-		httpResponse.setHeader("Access-control-Allow-Methods", "GET,POST,OPTIONS,PUT,DELETE");
-		httpResponse.setHeader("Access-control-Allow-Headers", httpRequest.getHeader("Access-Control-Request-Headers"));
-		if (httpRequest.getMethod().equals(RequestMethod.OPTIONS.name())) {
-			httpResponse.setStatus(HttpStatus.OK.value());
-			return false;
-		}
 		try {
 			return super.preHandle(request, response);
 		} catch (ShiroException e) {
