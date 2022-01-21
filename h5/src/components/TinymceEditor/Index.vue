@@ -1,11 +1,11 @@
 <!--
  * @Description: tinymce富文本
  * @Version: 1.0
- * @Company: 
+ * @Company:
  * @Author: Che
  * @Date: 2021-12-16 15:16:59
  * @LastEditors: Che
- * @LastEditTime: 2022-01-11 14:25:53
+ * @LastEditTime: 2022-01-17 09:31:05
 -->
 <template>
   <div class="tinymce-box">
@@ -16,7 +16,6 @@
       :disabled="disabled"
       :placeholder="placeholder"
       @input="editorListener($event)"
-      @click="onClick"
     >
     </editor>
     <tinymce-image ref="customImage"></tinymce-image>
@@ -127,10 +126,7 @@ export default {
   methods: {
     editorListener: _.debounce(function ($event) {
       this.$emit('editorListener', this.id, $event)
-    }, 500),
-    onClick(e) {
-      this.$emit('onClick', e, tinymce)
-    },
+    }, 300),
   },
 }
 </script>

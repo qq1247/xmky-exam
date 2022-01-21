@@ -57,7 +57,7 @@ export default {
     return {
       pageSize: 6,
       curPage: 1,
-      total: 1,
+      total: 0,
       queryForm: {
         examName: '',
       },
@@ -76,8 +76,8 @@ export default {
         pageSize: this.pageSize,
       })
 
-      this.myExamList = myExamList.data.list
-      this.total = myExamList.data.total
+      this.myExamList = myExamList.data?.list || []
+      this.total = myExamList.data?.total || 0
     },
     search() {
       this.curPage = 1
@@ -122,7 +122,6 @@ export default {
 <style lang="scss" scoped>
 @import 'assets/style/list-card.scss';
 .container {
-  width: 1200px;
   margin: 0 auto 20px;
 }
 </style>

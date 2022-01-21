@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-08-11 16:27:54
  * @LastEditors: Che
- * @LastEditTime: 2021-11-03 10:33:56
+ * @LastEditTime: 2022-01-20 14:01:16
  */
 
 import request from './request'
@@ -31,6 +31,8 @@ export const paperQuestionClear = (params) =>
 export const paperQuestionPublish = (params) => request('paper/publish', params)
 
 export const paperChapterMove = (params) => request('paper/chapterMove', params)
+export const paperUpdateBatchScore = (params) =>
+  request('paper/updateBatchScore', params)
 export const paperQuestionMove = (params) =>
   request('paper/questionMove', params)
 export const paperScoreUpdate = (params) => request('paper/scoreUpdate', params)

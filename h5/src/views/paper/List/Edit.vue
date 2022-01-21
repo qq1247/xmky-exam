@@ -88,7 +88,7 @@
               class="drag-content"
               v-model="paperList"
               :sort="false"
-              :group="{ name: 'paper' }"
+              :group="{ name: 'paper', put: false }"
               chosenClass="drag-active"
               animation="300"
               @end="sourceEnd"
@@ -127,14 +127,11 @@
             background
             small
             layout="prev, pager, next"
-            prev-text="上一页"
-            next-text="下一页"
             hide-on-single-page
             :total="total"
             :page-size="pageSize"
             :current-page="curPage"
             @current-change="pageChange"
-            :pager-count="5"
           ></el-pagination>
         </el-scrollbar>
       </div>
@@ -209,6 +206,14 @@
                       round
                       size="mini"
                       >清空试题</el-button
+                    >
+                    <el-button
+                      @click="batchSetting(item.chapter, index)"
+                      class="btn"
+                      icon="common common-setting"
+                      round
+                      size="mini"
+                      >批量设置</el-button
                     >
                     <el-button
                       @click="chapterFold(index)"
@@ -481,6 +486,7 @@
               <template v-if="item.questionList.length > 0">
                 <div
                   class="children-content"
+                  style="margin-bottom: 10px"
                   v-for="(child, index) in item.questionList"
                   :key="child.id"
                   :id="`p-${child.id}`"
@@ -560,7 +566,7 @@
       <div class="content-right">
         <el-scrollbar wrap-style="overflow-x:hidden;" style="height: 100%">
           <div class="total-score">总分：{{ totalScore }}</div>
-          <el-collapse v-model="collapseShow" v-if="paperQuestion.length > 0">
+          <el-collapse v-model="questionRouter" v-if="paperQuestion.length > 0">
             <el-collapse-item
               v-for="(item, index) in paperQuestion"
               :key="item.id"
@@ -686,6 +692,77 @@
         <el-button @click="settingForm.show = false">取消</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog
+      :visible.sync="batchForm.show"
+      :show-close="false"
+      width="40%"
+      title="批量设置"
+      :close-on-click-modal="false"
+      @close="resetData('batchForm')"
+    >
+      <el-form
+        :model="batchForm"
+        :rules="batchForm.rules"
+        ref="batchForm"
+        label-width="80px"
+      >
+        <el-form-item label="每题得分" prop="score">
+          <el-input-number
+            :max="100"
+            :min="1"
+            :step="1"
+            controls-position="right"
+            v-model.number="batchForm.score"
+          ></el-input-number>
+        </el-form-item>
+        <el-form-item label="选项设置">
+          <el-checkbox-group v-model="batchForm.scoreOptions">
+            <el-tooltip
+              class="item"
+              content="默认题目分数的一半"
+              effect="dark"
+              placement="top"
+            >
+              <el-checkbox :label="1">漏选得分</el-checkbox>
+            </el-tooltip>
+            <el-tooltip
+              class="item"
+              content="默认答案有顺序"
+              effect="dark"
+              placement="top"
+            >
+              <el-checkbox :label="2">答案无顺序</el-checkbox>
+            </el-tooltip>
+            <el-tooltip
+              class="item"
+              content="默认大小写敏感"
+              effect="dark"
+              placement="top"
+            >
+              <el-checkbox :label="3">大小写不敏感</el-checkbox>
+            </el-tooltip>
+          </el-checkbox-group>
+        </el-form-item>
+        <el-form-item
+          label="漏选得分"
+          prop="multipScore"
+          v-if="batchForm.scoreOptions.includes(1)"
+        >
+          <el-input-number
+            :max="100"
+            :min="1"
+            :step="1"
+            controls-position="right"
+            v-model.number="batchForm.multipScore"
+          ></el-input-number>
+        </el-form-item>
+      </el-form>
+      <div class="dialog-footer" slot="footer">
+        <el-button @click="setBatchScore" type="primary">设置</el-button>
+        <el-button @click="batchForm.show = false">取消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -702,6 +779,7 @@ import {
   paperChapterMove,
   paperQuestionMove,
   paperTotalScoreUpdate,
+  paperUpdateBatchScore,
 } from 'api/paper'
 import { questionListPage } from 'api/question'
 import TinymceEditor from 'components/TinymceEditor/Index.vue'
@@ -756,7 +834,6 @@ export default {
       pageSize: 5,
       curPage: 1,
       total: 0,
-      collapseShow: 0,
       totalScore: 0,
       chapterForm: {
         id: 0,
@@ -796,7 +873,26 @@ export default {
           multipScore: [{ validator: validateMultipScore }],
         },
       },
+      batchForm: {
+        show: false,
+        id: null,
+        score: '',
+        scoreOptions: [],
+        multipScore: '',
+        rules: {
+          score: [
+            { required: true, message: '请设置每题得分', trigger: 'change' },
+          ],
+        },
+      },
     }
+  },
+  computed: {
+    questionRouter() {
+      return this.paperQuestion.map((item, index) => {
+        return index
+      })
+    },
   },
   filters: {
     typeName(data) {
@@ -921,7 +1017,7 @@ export default {
     },
     setChapterName(e) {},
     // 编辑章节
-    async editorListener(id, value, chapter) {
+    editorListener(id, value, chapter) {
       const chapterInfo = {}
       if (id === 'chapterName') {
         chapterInfo.name = value
@@ -930,7 +1026,7 @@ export default {
         chapterInfo.name = chapter.name
         chapterInfo.description = value
       }
-      const res = await paperChapterEdit({
+      paperChapterEdit({
         chapterId: chapter.id,
         ...chapterInfo,
       })
@@ -955,6 +1051,11 @@ export default {
     chapterFold(index) {
       this.paperQuestion[index].chapter.show =
         !this.paperQuestion[index].chapter.show
+    },
+    // 展示批量设置
+    batchSetting({ id }) {
+      this.batchForm.id = id
+      this.batchForm.show = true
     },
     // 清空试卷试题
     async chapterClear({ id }, index) {
@@ -1063,6 +1164,22 @@ export default {
         }
       })
     },
+    // 批量设置分数
+    async setBatchScore() {
+      const res = await paperUpdateBatchScore({
+        chapterId: this.batchForm.id,
+        score: this.batchForm.score,
+        subScores: this.batchForm.scoreOptions.includes(1)
+          ? this.batchForm.multipScore
+          : null,
+        scoreOptions: this.batchForm.scoreOptions,
+      })
+      if (res?.code === 200) {
+        this.$message.success('编辑成功！')
+        this.batchForm.show = false
+        this.query()
+      }
+    },
     // 拖拽原题结束
     async sourceEnd({ to, item }) {
       const chapterId = to.dataset.id
@@ -1121,8 +1238,9 @@ export default {
     // 定位锚点
     toHref(id) {
       this.hrefPointer = `#p-${id}`
-      document.documentElement.scrollTop =
-        document.querySelector(this.hrefPointer).offsetTop - 50
+      document
+        .querySelector(this.hrefPointer)
+        .scrollIntoView({ block: 'end', inline: 'nearest' })
     },
     // 重置数据
     resetData(name) {
@@ -1228,6 +1346,9 @@ export default {
       padding: 15px;
       font-size: 14px;
       cursor: move;
+      &:last-child {
+        border-bottom: none;
+      }
     }
     .el-tag {
       margin-left: 10px;

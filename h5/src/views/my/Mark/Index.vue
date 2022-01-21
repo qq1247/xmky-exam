@@ -62,7 +62,7 @@ export default {
     return {
       pageSize: 6,
       curPage: 1,
-      total: 1,
+      total: 0,
       queryForm: {
         examName: '',
       },
@@ -87,7 +87,7 @@ export default {
       })
 
       this.myMarkList = myMarkList.data?.list || []
-      this.total = myMarkList.data?.total || []
+      this.total = myMarkList.data?.total || 0
     },
     search() {
       this.curPage = 1
