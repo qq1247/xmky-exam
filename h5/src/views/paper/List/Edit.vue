@@ -358,7 +358,7 @@
                               <span
                                 v-for="answer in child.answers"
                                 :key="answer.id"
-                                >{{ answer.answer[0] }}</span
+                                >{{ answer.answer.join('，') }}</span
                               >
                             </div>
                           </el-col>
@@ -1269,7 +1269,7 @@ export default {
 .content {
   display: flex;
   width: 100%;
-  height: calc(100vh - 105px);
+  height: calc(100vh - 60px);
   margin: 0 auto;
 }
 

@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-12-16 16:01:13
  * @LastEditors: Che
- * @LastEditTime: 2022-01-19 10:48:58
+ * @LastEditTime: 2022-01-21 17:02:16
 -->
 <template>
   <div class="container">
@@ -97,13 +97,8 @@ export default {
       if (value.length == 0) {
         return callback(new Error('请选择考试时间'))
       }
-      if (
-        dayjs(value[0]).isSameOrBefore(dayjs()) ||
-        dayjs(value[1]).isSameOrBefore(dayjs())
-      ) {
-        return callback(
-          new Error(`请选择 ${dayjs().format('YYYY-MM-DD HH:mm:ss')} 后的时间`)
-        )
+      if (dayjs(value[1]).isSameOrBefore(dayjs())) {
+        return callback(new Error(`请选择当前时间后的时间段`))
       }
       return callback()
     }
@@ -116,13 +111,7 @@ export default {
         dayjs(value[0]).isSameOrBefore(dayjs(this.examForm.examTime[1])) ||
         dayjs(value[1]).isSameOrBefore(dayjs(this.examForm.examTime[1]))
       ) {
-        return callback(
-          new Error(
-            `请选择 ${dayjs(this.examForm.examTime[1]).format(
-              'YYYY-MM-DD HH:mm:ss'
-            )} 后的时间`
-          )
-        )
+        return callback(new Error(`请选择考试时间后的时间段`))
       }
       return callback()
     }

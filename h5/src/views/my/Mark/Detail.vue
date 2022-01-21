@@ -151,22 +151,6 @@
                   </el-checkbox-group>
                 </template>
 
-                <!-- 填空 -->
-                <!-- <template v-if="child.type === 3">
-                  <el-input
-                    disabled
-                    class="question-text"
-                    placeholder="请输入内容"
-                    :key="index"
-                    v-for="(answer, index) in child.examAnswers"
-                    :value="answer"
-                  >
-                    <template slot="prepend"
-                      >第{{ $tools.intToChinese(index + 1) }}空</template
-                    >
-                  </el-input>
-                </template> -->
-
                 <!-- 判断 -->
                 <template v-if="child.type === 4">
                   <el-radio-group
@@ -213,7 +197,7 @@
                           <span
                             v-for="answer in child.answers"
                             :key="answer.id"
-                            >{{ answer.answer[0] }}</span
+                            >{{ answer.answer.join('，') }}</span
                           >
                         </div>
                       </el-col>

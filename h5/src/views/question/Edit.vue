@@ -731,7 +731,7 @@ export default {
 .content {
   display: flex;
   width: 100%;
-  height: calc(100vh - 120px);
+  height: calc(100vh - 70px);
   padding: 45px 0 0;
   margin: 0 auto;
 }

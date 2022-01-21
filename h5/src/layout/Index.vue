@@ -5,13 +5,13 @@
  * @Author: Che
  * @Date: 2021-08-09 14:25:53
  * @LastEditors: Che
- * @LastEditTime: 2022-01-13 10:51:13
+ * @LastEditTime: 2022-01-21 15:48:49
 -->
 <template>
   <div class="app-container">
     <app-header v-if="layout"></app-header>
     <app-main :height="layout"></app-main>
-    <app-footer></app-footer>
+    <!-- <app-footer></app-footer> -->
   </div>
 </template>
 
