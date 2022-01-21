@@ -76,9 +76,10 @@
                 <div class="item-title">{{ item.chapter.name }}</div>
                 <div></div>
               </div>
-              <div class="chapter-description">
-                {{ item.chapter.description }}
-              </div>
+              <div
+                class="chapter-description"
+                v-html="item.chapter.description"
+              ></div>
             </div>
 
             <template v-if="item.questionList.length > 0">
@@ -439,7 +440,6 @@ export default {
         (item) => item.userId == Number(this.userId)
       )
       this.userInfo = this.userList[userIndex]
-      console.log(userIndex)
     },
     // 未阅考生列表
     filterUserList(e) {
@@ -577,8 +577,9 @@ export default {
         toHref = newPaperQuestion[indexd].id
       }
 
-      document.documentElement.scrollTop =
-        document.querySelector(`#p-${toHref}`).offsetTop - 50
+      document
+        .querySelector(this.hrefPointer)
+        .scrollIntoView({ block: 'end', inline: 'nearest' })
       document.querySelector(`#i-${toHref}`).focus()
     },
     // 上一题

@@ -32,7 +32,6 @@
         :router-index="routerIndex"
         :href-pointer="hrefPointer"
         :paperQuestion="paperQuestion"
-        :question-router="questionRouter"
         @sign="sign"
         @toHref="toHref"
         @examEnd="examEnd"
@@ -71,7 +70,6 @@ export default {
       myExamDetailCache: {},
       selectOption: '',
       paper: {},
-      questionRouter: [],
       examEndTime: '',
       systemTime: 0,
       routerIndex: 0,
@@ -124,7 +122,6 @@ export default {
         })
         if (this.showType === 1) {
           this.paperQuestion = res.data
-          this.questionRouter = Array.from(res.data.keys())
         } else {
           const paperQuestion = res.data.reduce((acc, cur) => {
             acc.push(...cur.questionList)
@@ -279,20 +276,18 @@ export default {
         type: 'info',
         showClose: false,
       }).then(async () => {
-        const res = await myExamFinish({ examId: this.examId })
-        res?.code === 200
-          ? this.$router.replace({
-              name: 'Home',
-            })
-          : this.$message.warning('请重新提交试卷！')
+        this.$router.replace({
+          name: 'Home',
+        })
       })
     },
     // 定位锚点
     toHref(index) {
       if (this.showType === 1) {
         this.hrefPointer = `#p-${index}`
-        document.documentElement.scrollTop =
-          document.querySelector(this.hrefPointer).offsetTop - 50
+        document
+          .querySelector(this.hrefPointer)
+          .scrollIntoView({ block: 'end', inline: 'nearest' })
       } else {
         this.routerIndex = index
       }

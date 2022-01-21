@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-12-28 14:46:05
  * @LastEditors: Che
- * @LastEditTime: 2022-01-04 13:45:38
+ * @LastEditTime: 2022-01-18 10:57:38
 -->
 <template>
   <div class="">
@@ -81,12 +81,6 @@ export default {
         this.$message.warning('请选择需解析的文件')
         return
       }
-      const loading = this.$loading({
-        lock: true,
-        text: '解析试题中...',
-        spinner: 'el-icon-loading',
-        background: 'rgba(255, 255, 255, 0.88)',
-      })
       const res = await questionImport({
         fileId: this.handlerForm.questionDocIds[0].response.data.fileIds,
         questionTypeId: this.$parent.$parent.queryForm.questionTypeId,
@@ -96,7 +90,6 @@ export default {
       if (res?.code == 200) {
         await this.getProgress(res.data)
         if (this.percentage === 100) {
-          loading.close()
           this.$message.success('解析成功！')
           this.templateClear('templateUpload')
           this.$emit('showTemplate', false)
@@ -126,11 +119,19 @@ export default {
         return false
       }
 
+      const loading = this.$loading({
+        lock: true,
+        text: `试题解析中...${percentage?.data?.percent}%`,
+        spinner: 'el-icon-loading',
+        background: 'rgba(255, 255, 255, 0.88)',
+      })
+
       this.percentage = percentage.data.percent
 
       if (percentage?.data?.percent !== 100) {
         await this.getProgress(id)
       } else {
+        loading.close()
         return true
       }
     },

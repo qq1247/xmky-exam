@@ -172,7 +172,6 @@ export default {
         this.editForm.multipScore = ''
         return callback()
       }
-      console.log(value)
       if (value === '') {
         return callback(new Error('请填写分数'))
       }

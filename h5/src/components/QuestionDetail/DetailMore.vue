@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-09-10 10:14:03
  * @LastEditors: Che
- * @LastEditTime: 2022-01-13 10:50:35
+ * @LastEditTime: 2022-01-18 10:03:23
 -->
 <template>
   <div class="detail-more" v-if="Object.keys(data).length">
@@ -60,7 +60,7 @@
         <el-col :span="20">
           <template v-if="data.answers && data.answers.length > 0">
             <span v-for="answer in data.answers" :key="answer.id">{{
-              answer.answer[0]
+              answer.answer.join('，')
             }}</span>
           </template>
         </el-col>

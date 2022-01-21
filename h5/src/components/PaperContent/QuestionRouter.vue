@@ -5,11 +5,11 @@
  * @Author: Che
  * @Date: 2021-09-16 13:27:05
  * @LastEditors: Che
- * @LastEditTime: 2022-01-13 10:50:22
+ * @LastEditTime: 2022-01-18 16:20:53
 -->
 
 <template>
-  <el-collapse class="exam-card" v-model="collapseShow">
+  <el-collapse class="exam-card" v-model="questionRouter">
     <template v-if="preview == 'false' || !preview">
       <div class="exam-head">答题卡</div>
       <div class="exam-time">
@@ -25,7 +25,6 @@
         :name="index"
         :title="item.chapter.name"
         v-for="(item, index) in paperQuestion"
-        v-model="questionRouter"
       >
         <a
           :class="[
@@ -95,10 +94,6 @@ export default {
       type: Number,
       default: 0,
     },
-    questionRouter: {
-      type: Array,
-      default: () => [],
-    },
     hrefPointer: {
       type: [String, Number],
       default: '',
@@ -112,9 +107,14 @@ export default {
     CountDown,
   },
   data() {
-    return {
-      collapseShow: 0,
-    }
+    return {}
+  },
+  computed: {
+    questionRouter() {
+      return this.paperQuestion.map((item, index) => {
+        return index
+      })
+    },
   },
   methods: {
     forceExamEnd() {
