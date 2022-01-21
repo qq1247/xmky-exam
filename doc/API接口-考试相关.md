@@ -494,12 +494,13 @@ http请求头需添加Authorization字段，
 | subScores| Double  | 每空分数（试题为智能阅卷，并且是填空或问答时有效） | 是   |
 | scoreOptions    | Integer[] | 分数选项     | 否  |
 
-### 试卷设置分数选项：paper/scoreOptionUpdate
+### 试卷批量设置分数：paper/updateBatchScore
 | 请求参数| 类型      | 描述       | 必填 |
 | --------------- | --------- | ---------- | ---- |
-| id | Integer   | 主键 | 是   |
-| questionId | Integer   | 试题ID | 是   |
-| scoreOptions    | Integer[] | 分数选项     | 是   |
+| chapterId | Integer   | 章节id | 是   |
+| score | Double   | 分数 | 是   |
+| subScores| Double  | 漏选得分  | 否   |
+| scoreOptions    | Integer[] | 分数选项   | 是   |
 
 ### 试卷发布：paper/publish
 | 请求参数| 类型    | 描述   | 必填 |

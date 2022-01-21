@@ -7,7 +7,6 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.wcpdoc.core.interceptor.CrossDomainInterceptor;
 import com.wcpdoc.core.interceptor.OnlineUserInterceptor;
 import com.wcpdoc.core.interceptor.RunTimeInterceptor;
 import com.wcpdoc.core.interceptor.UserContextInterceptor;
@@ -25,8 +24,6 @@ public class ApplicationCfg implements WebMvcConfigurer {
 	private RunTimeInterceptor runTimeInterceptor;
 	@Resource
 	private OnlineUserInterceptor onlineUserInterceptor;
-	@Resource
-	private CrossDomainInterceptor crossDomainInterceptor;
 	
 
 	@Override
@@ -36,7 +33,6 @@ public class ApplicationCfg implements WebMvcConfigurer {
 	
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(crossDomainInterceptor).addPathPatterns("/api/**");
 		registry.addInterceptor(userContextInterceptor).addPathPatterns("/api/**");
 		registry.addInterceptor(runTimeInterceptor).addPathPatterns("/api/**");
 		registry.addInterceptor(onlineUserInterceptor).addPathPatterns("/api/**");
