@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-07-27 17:31:01
  * @LastEditors: Che
- * @LastEditTime: 2022-01-14 19:23:27
+ * @LastEditTime: 2022-01-20 12:22:19
  */
 const os = require('os')
 const path = require('path')
@@ -56,12 +56,6 @@ const exists = (src, dst, callback) => {
     }
   })
 }
-
-/* exists(
-  './public/tinymce/plugins/uploadImg',
-  './node_modules/tinymce/plugins/uploadImg',
-  copy
-) */
 
 exists(
   resolve('public/tinymce/plugins/uploadImg'),
