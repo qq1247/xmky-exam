@@ -24,6 +24,15 @@ public interface ReportDao extends RBaseDao<Object> {
 	List<Map<String, Object>> homeUser(Integer userId);
 	
 	/**
+	 * 缺考数
+	 * 
+	 * v1.0 chenyun 2022年1月19日下午2:23:33
+	 * @param userId
+	 * @return Integer
+	 */
+	Integer homeUserMissNum(Integer userId);
+	
+	/**
 	 * 首页subAdmin
 	 * 
 	 * v1.0 chenyun 2021年12月10日下午1:37:38
@@ -81,16 +90,7 @@ public interface ReportDao extends RBaseDao<Object> {
 	 * @return List<Map<String, Object>>
 	 */
 	List<Map<String, Object>> questionStatis(Integer questionTypeId);
-	
-	/**
-	 * 考试统计
-	 * 
-	 * v1.0 chenyun 2021年12月16日上午9:38:30
-	 * @param examId
-	 * @return List<Map<String,Object>>
-	 */
-	List<Map<String, Object>> examStatis(Integer examId);
-	
+
 	/**
 	 * 考试统计-试题类型列表
 	 * 

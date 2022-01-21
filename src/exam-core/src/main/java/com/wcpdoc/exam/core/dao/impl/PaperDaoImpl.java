@@ -15,6 +15,7 @@ import com.wcpdoc.core.util.SqlUtil.Order;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.PaperDao;
 import com.wcpdoc.exam.core.entity.Paper;
+import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 
 /**
@@ -55,6 +56,14 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 		return getList(sql, new Object[]{id}, Question.class);
 	}
 
+	@Override
+	public List<PaperQuestion> getPaperQuestionList(Integer id) {
+		String sql = "SELECT PAPER_QUESTION.* "
+				+ "FROM EXM_PAPER_QUESTION PAPER_QUESTION "
+				+ "WHERE PAPER_QUESTION.PAPER_ID = ? AND PAPER_QUESTION.TYPE = 2";
+		return getList(sql, new Object[]{id}, PaperQuestion.class);
+	}
+	
 	@Override
 	public List<Paper> getList(Integer paperTypeId) {
 		String sql = "SELECT * FROM EXM_PAPER WHERE STATE != 0 AND PAPER_TYPE_ID = ?";

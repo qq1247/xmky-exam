@@ -28,7 +28,7 @@ import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyExamDetail;
 import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.Paper;
-import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.ExamTypeService;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
@@ -315,7 +315,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		List<MyExam> myExamList = myExamService.getList(id);// 当前考试的人员
 		ListIterator<MyExam> myExamListIterator = myExamList.listIterator();
 		Date curTime = new Date();
-		List<Question> questionList = paperService.getQuestionList(exam.getPaperId());// 试题列表
+		List<PaperQuestion> paperQuestionList = paperService.getPaperQuestionList(exam.getPaperId());// 试题列表（不能用试题中的试题 分值修改有问题 只能用试卷试题中的试题）
 		while (myExamListIterator.hasNext()) {// 同步考试人员信息
 			/**
 			 * 页面：1,2,3
@@ -348,18 +348,18 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			myExam.setUpdateUserId(getCurUser().getId());
 			myExamService.add(myExam);// 添加我的考试
 			
-			for (Question question : questionList) {
+			for (PaperQuestion paperQuestion : paperQuestionList) {
 				MyExamDetail myExamDetail = new MyExamDetail();
 				myExamDetail.setMyExamId(myExam.getId());
 				myExamDetail.setExamId(myExam.getExamId());
 				myExamDetail.setUserId(myExam.getUserId());
-				myExamDetail.setQuestionId(question.getId());
+				myExamDetail.setQuestionId(paperQuestion.getQuestionId());
 				//myExamDetail.setAnswerTime(null);
 				//myExamDetail.setMarkUserId(null);
 				//myExamDetail.setMarkTime(null);
 				//myExamDetail.setAnswer(null);
 				//myExamDetail.setScore(null);
-				myExamDetail.setQuestionScore(question.getScore());
+				myExamDetail.setQuestionScore(paperQuestion.getScore());
 				//myExamDetail.setAnswerFileId(null);
 				myExamDetailService.add(myExamDetail);// 添加我的考试详细
 			}

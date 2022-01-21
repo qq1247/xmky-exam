@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.exam.core.entity.Paper;
+import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 
 /**
@@ -21,6 +22,16 @@ public interface PaperDao extends RBaseDao<Paper> {
 	 * List<Question>
 	 */
 	List<Question> getQuestionList(Integer id);
+
+	/**
+	 * 获取试题列表
+	 * 
+	 * v1.0 zhanghc 2017年6月6日上午9:18:38
+	 * @param id
+	 * @return
+	 * List<PaperQuestion>
+	 */
+	List<PaperQuestion> getPaperQuestionList(Integer id);
 
 	/**
 	 * 获取试卷列表

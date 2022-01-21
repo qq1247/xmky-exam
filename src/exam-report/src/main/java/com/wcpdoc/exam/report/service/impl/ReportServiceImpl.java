@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.report.service.impl;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -89,15 +90,15 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		result.put("org", data);
 		data = new HashMap<String, Object>();
 		data.put("num", homeUserMap.get("examNum"));
-		data.put("missNum", homeUserMap.get("missNum"));
+		data.put("missNum", reportDao.homeUserMissNum(getCurUser().getId())); //缺考题统计错误，时间没到的状态也是1，单独查询   homeUserMap.get("missNum")
 		data.put("succNum", homeUserMap.get("succNum"));
 		data.put("top", homeUserMap.get("top"));
 		result.put("exam", data);
 		data = new HashMap<String, Object>();
-		data.put("avg", homeUserMap.get("avg") == null ? 0 : homeUserMap.get("avg"));
+		data.put("avg", homeUserMap.get("avg") == null ? 0 : String.format("%.2f", homeUserMap.get("avg")).toString());
 		data.put("min", homeUserMap.get("min") == null ? 0 : homeUserMap.get("min"));
 		data.put("max", homeUserMap.get("max") == null ? 0 : homeUserMap.get("max"));
-		data.put("sd", homeUserMap.get("sd") == null ? 0 : homeUserMap.get("sd")); //标准差
+		data.put("sd", homeUserMap.get("sd") == null ? 0 : String.format("%.2f", homeUserMap.get("sd")).toString()); //标准差
 		result.put("score", data);
 		return result;
 	}
@@ -287,7 +288,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		Map<String, Object> scoreResult = new HashMap<String, Object>();
 		scoreResult.put("total", paper.getTotalScore());// 考试总分
 		scoreResult.put("avg", 0.0);// 平均分
-		scoreResult.put("min", 0.0);// 最低分
+		scoreResult.put("min", paper.getTotalScore().doubleValue());// 默认最低分是0.0  最低分就会一直是0.0
 		scoreResult.put("max", 0.0);// 最高分
 		
 		for (MyExam myExam : myExamList) {
@@ -297,7 +298,11 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 			
 			scoreResult.put("min", Math.min(myExam.getTotalScore().doubleValue(), (double)scoreResult.get("min")));
 			scoreResult.put("max", Math.max(myExam.getTotalScore().doubleValue(), (double)scoreResult.get("max")));
-			scoreResult.put("avg", BigDecimalUtil.newInstance(scoreResult.get("avg")).add(myExam.getTotalScore()).getResult().doubleValue());
+			scoreResult.put("avg", BigDecimalUtil.newInstance(scoreResult.get("avg")).add(  myExam.getTotalScore()).getResult().doubleValue());
+		}
+		
+		if (paper.getTotalScore().compareTo(new BigDecimal(scoreResult.get("min").toString())) == 0) { //最小值和总分一样 默认赋值0.0
+			scoreResult.put("min",0.0);
 		}
 		
 		if (myExamList.size() != 0) {// 被除数不能为0
@@ -336,7 +341,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 			Map<String, Object> map = new HashMap<>();
 			map.put("startScore", BigDecimalUtil.newInstance(scoreGrade).mul(i).getResult().doubleValue());// 分数段最小值
 			map.put("endScore", BigDecimalUtil.newInstance(scoreGrade).mul(i + 1).getResult().doubleValue());// 分数段最大值
-			map.put("name", String.format("%s-%s", map.get("startScore"), map.get("endScore")));// 初始化名称
+			map.put("name", map.get("endScore"));// 初始化名称   去掉 开始值     map.put("name", String.format("%s-%s", map.get("startScore"), map.get("endScore")));
 			map.put("value", 0);// 初始化值为0
 			
 			scoreGradeResultList.add(map);

@@ -57,6 +57,7 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 		
 		// 生成令牌信息（登陆由shiro接收令牌控制）
 		String accessToken = userExService.generateToken(user);
+		userExService.refreshToken(user, accessToken);
 		
 		//更新用户登录时间
 		user.setLastLoginTime(new Date());

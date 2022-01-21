@@ -351,23 +351,24 @@ public class ApiPaperController extends BaseController {
 	 * v1.0 zhanghc 2018年10月21日上午10:46:54
 	 * @param chapterId
 	 * @param score
-	 * @param options
+	 * @param subScores
+	 * @param scoreOptions
 	 * @return PageResult
 	 */
-//	@RequestMapping("/updateBatchScore")// 暂时不用
-//	@ResponseBody
-//	public PageResult updateBatchScore(Integer chapterId, BigDecimal score, String options) {
-//		try {
-//			paperService.batchScoreUpdate(chapterId, score, options);
-//			return PageResult.ok();
-//		} catch (MyException e) {
-//			log.error("设置分数错误：{}", e.getMessage());
-//			return PageResult.err().msg(e.getMessage());
-//		} catch (Exception e) {
-//			log.error("设置分数错误：", e);
-//			return PageResult.err();
-//		}
-//	}
+	@RequestMapping("/updateBatchScore")
+	@ResponseBody
+	public PageResult updateBatchScore(Integer chapterId, BigDecimal score, BigDecimal subScores, Integer[] scoreOptions) {
+		try {
+			paperService.batchScoreUpdate(chapterId, score, subScores, scoreOptions);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("设置分数错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("设置分数错误：", e);
+			return PageResult.err();
+		}
+	}
 	
 	/**
 	 * 试题删除
@@ -437,29 +438,6 @@ public class ApiPaperController extends BaseController {
 			return PageResult.err();
 		}
 	}
-	
-	/**
-	 * 设置分数选项
-	 * 
-	 * v1.0 zhanghc 2018年10月21日上午10:46:54
-	 * @param paperQuestionId
-	 * @param options
-	 * @return PageResult
-	 */
-	/*@RequestMapping("/scoreOptionUpdate")
-	@ResponseBody
-	public PageResult scoreOptionUpdate(Integer id, Integer questionId, Integer[] scoreOptions) {
-		try {
-			paperService.scoreOptionUpdate(id, questionId, scoreOptions);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("设置分数错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("设置分数错误：", e);
-			return PageResult.err();
-		}
-	}*/
 	
 	/**
 	 * 发布

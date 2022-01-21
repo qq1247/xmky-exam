@@ -172,6 +172,7 @@ public class ServerParmServiceImpl implements ServerPramService {
 				System.getProperty("os.name").toLowerCase().startsWith("windows") ? ";" : ":",
 				getDllFile().getParentFile().getCanonicalPath());// getCanonicalPath 返回全路径，不带.
 		System.setProperty("java.library.path", path);
+		log.info("设置环境变量：{}", path);
 	}
 
 	/**
@@ -181,10 +182,16 @@ public class ServerParmServiceImpl implements ServerPramService {
 	 * @return File
 	 */
 	private static File getDllFile() {
-		return new File(String.format(".\\dll\\sigar\\x%s\\%s", 
+		return new File(String.format(".%sdll%ssigar%sx%s%s%s", 
+				File.separator, 
+				File.separator, 
+				File.separator,// linux下\\不识别
 				System.getProperty("sun.arch.data.model"),
+				File.separator, 
 				System.getProperty("os.name").toLowerCase().startsWith("windows")  
-						? ("amd64".equals(System.getProperty("os.arch")) ? "sigar-amd64-winnt" : "sigar-x86-winnt") // win32、64位
-						: ("x64".equals(System.getProperty("os.arch")) ? "libsigar-amd64-linux" : "libsigar-x86-linux")));// linux32、64位
+						? (("x64".equals(System.getProperty("os.arch")) || "amd64".equals(System.getProperty("os.arch")))
+								? "sigar-amd64-winnt" : "sigar-x86-winnt") // win32、64位
+						: (("x64".equals(System.getProperty("os.arch")) || "amd64".equals(System.getProperty("os.arch")))
+								? "libsigar-amd64-linux" : "libsigar-x86-linux")));// linux32、64位
 	}
 }

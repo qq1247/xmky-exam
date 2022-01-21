@@ -119,6 +119,15 @@ public interface PaperService extends BaseService<Paper> {
 	List<Question> getQuestionList(Integer id);
 
 	/**
+	 * 获取试题列表
+	 * 
+	 * v1.0 zhanghc 2017年6月19日下午4:53:21
+	 * @param id
+	 * @return List<PaperQuestion>
+	 */
+	List<PaperQuestion> getPaperQuestionList(Integer id);
+	
+	/**
 	 * 完成添加试题
 	 * 
 	 * v1.0 zhanghc 2017年5月27日下午3:32:43
@@ -139,17 +148,6 @@ public interface PaperService extends BaseService<Paper> {
 	 * void
 	 */
 	void scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores, Integer[] scoreOptions);
-	
-	/**
-	 * 完成设置选项
-	 * 
-	 * v1.0 zhanghc 2018年10月21日下午3:10:37
-	 * @param id
-	 * @param questionId 
-	 * @param scoreOptions 
-	 * void
-	 */
-	void scoreOptionUpdate(Integer id, Integer questionId, Integer[] scoreOptions);
 
 	/**
 	 * 完成试题删除
@@ -184,11 +182,11 @@ public interface PaperService extends BaseService<Paper> {
 	 * 
 	 * v1.0 zhanghc 2017年6月9日下午4:21:52
 	 * @param chapterId
-	 * @param scores
-	 * @param options
-	 * void
+	 * @param score
+	 * @param subScores
+	 * @param scoreOptions void
 	 */
-	void batchScoreUpdate(Integer chapterId, BigDecimal score, String options);
+	void batchScoreUpdate(Integer chapterId, BigDecimal score, BigDecimal subScores, Integer[] scoreOptions);
 	
 	/**
 	 * 合并

@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.core.service.impl;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -544,7 +545,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		}
 		
 		Question question = questionService.getEntity(questionId);
-		List<PaperQuestionAnswer> answerList = null;
+		List<PaperQuestionAnswer> answerList = paperQuestionAnswerService.getList(id, questionId);
 		if (question.getAi() == 1 && (question.getType() == 3 || question.getType() == 5)) {// 试题为智能阅卷，并且是填空或问答时有效
 			if(!ValidateUtil.isValid(subScores)) {
 				throw new MyException("参数错误：subScores");
@@ -558,7 +559,6 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 				throw new MyException("参数错误：subScores总分和score不匹配");
 			}
 			
-			answerList = paperQuestionAnswerService.getList(id, questionId);
 			if (subScores.length != answerList.size()) {
 				throw new MyException("参数错误：subScores个数不匹配");
 			}
@@ -610,67 +610,27 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		pq.setScore(score);
 		paperQuestionService.update(pq);
 		
-		if (question.getAi() == 1 && (question.getType() == 3 || question.getType() == 5)) {// 试题为智能阅卷，并且是填空或问答时更新子分数
+//		if (question.getAi() == 1 && (question.getType() == 3 || question.getType() == 5)) {// 试题为智能阅卷，并且是填空或问答时更新子分数
+//			for (int i = 0; i < subScores.length; i++) {
+//				PaperQuestionAnswer answer = answerList.get(i);
+//				answer.setScore(subScores[i]);
+//				paperQuestionAnswerService.update(answer);
+//			}
+//		}
+		if (question.getAi() == 1 && (question.getType() == 2 || question.getType() == 3 || question.getType() == 5 )) {
 			for (int i = 0; i < subScores.length; i++) {
 				PaperQuestionAnswer answer = answerList.get(i);
 				answer.setScore(subScores[i]);
 				paperQuestionAnswerService.update(answer);
 			}
 		}
-	}
-	
-	@Override
-	public void scoreOptionUpdate(Integer id, Integer questionId, Integer[] scoreOptions) {
-		// 校验数据有效性
-		if (!ValidateUtil.isValid(id)) {
-			throw new MyException("参数错误：id");
-		}
-		if (!ValidateUtil.isValid(questionId)) {
-			throw new MyException("参数错误：questionId");
-		}
-		
-		Paper paper = getEntity(id);
-		if (paper.getState() == 0) {
-			throw new MyException("试卷已删除");
-		}
-		if (paper.getState() == 1) {
-			throw new MyException("试卷已发布");
-		}
-		if(paper.getState() == 3){
-			throw new MyException("已归档");
-		}
-		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
-			throw new MyException("无操作权限");
-		}
-		PaperQuestion pq = paperQuestionService.getEntity(id, questionId);
-		if (pq == null) {
-			throw new MyException("参数错误：questionId");
-		}
-
-		// 设置分数选项
-		Question question = questionService.getEntity(questionId);
-		String scoreOptionStr = scoreOptions == null ? "" : StringUtil.join(scoreOptions);
-		pq.setScoreOptions(null);// 默认先置为空
-		if (question.getType() == 2) {// 分数选项：1：漏选得分；2：答案无顺序；3：大小写不敏感；
-			if (scoreOptionStr.contains("1")) {
-				pq.setScoreOptions("1");
-			}
-		} else if (question.getType() == 3) {
-			if (scoreOptionStr.contains("2") && scoreOptionStr.contains("3")) {
-				pq.setScoreOptions("2,3");
-			} else if (scoreOptionStr.contains("2")) {
-				pq.setScoreOptions("2");
-			} else if (scoreOptionStr.contains("3")) {
-				pq.setScoreOptions("3");
-			}  
-		} else if (question.getType() == 5 && question.getAi() == 1) {
-			if (scoreOptionStr.contains("3")) {
-				pq.setScoreOptions("3");
+		if (question.getAi() == 1 && (question.getType() == 1 || question.getType() == 4)) { //TODO  页面传值有问题 随后改
+			for (int i = 0; i < subScores.length; i++) {
+				PaperQuestionAnswer answer = answerList.get(i);
+				answer.setScore(score);
+				paperQuestionAnswerService.update(answer);
 			}
 		}
-
-		paperQuestionService.update(pq);
 	}
 
 	@Override
@@ -760,12 +720,17 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 
 	@Override
+	public List<PaperQuestion> getPaperQuestionList(Integer id) {
+		return paperDao.getPaperQuestionList(id);
+	}
+	
+	@Override
 	public List<Paper> getList(Integer paperTypeId) {
 		return paperDao.getList(paperTypeId);
 	}
 
 	@Override
-	public void batchScoreUpdate(Integer chapterId, BigDecimal score, String options) {
+	public void batchScoreUpdate(Integer chapterId, BigDecimal score, BigDecimal subScores, Integer[] scoreOptions) {
 		// 校验数据有效性
 		if (chapterId == null) {
 			throw new MyException("参数错误：chapterId");
@@ -783,21 +748,100 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		}
 
 		// 更新试卷分数
+		String scoreOptionsString = "";
+		if (scoreOptions != null && scoreOptions.length > 0) {			
+			scoreOptionsString = StringUtil.join(scoreOptions);
+		}
+		
 		List<PaperQuestion> pqList = paperQuestionService.getQuestionList(chapterId);
-		for (PaperQuestion pq : pqList) {
-			pq.setScoreOptions(null);
+		for(int i = 0; i < pqList.size(); i ++ ){
+			PaperQuestion pq = pqList.get(i);
 			Question question = questionService.getEntity(pq.getQuestionId());
 			if (question.getType() == 2) {
-				if (ValidateUtil.isValid(options) && options.contains("1")) {
+				if (ValidateUtil.isValid(scoreOptionsString) && scoreOptionsString.contains("1")) {
 					pq.setScoreOptions("1");
 				}
 			} else if (question.getType() == 3) {
-				pq.setScoreOptions(options);
+				if (ValidateUtil.isValid(scoreOptionsString) && (scoreOptionsString.contains("2") || scoreOptionsString.contains("3")) ) {
+					pq.setScoreOptions(scoreOptionsString);
+				}
+			} else if (question.getType() == 5) {
+				if (ValidateUtil.isValid(scoreOptionsString) && scoreOptionsString.contains("3")) {
+					pq.setScoreOptions("3");
+				}
 			}
-
 			pq.setScore(score);
 			paperQuestionService.update(pq);
-		}
+			//更新答案分数
+			List<PaperQuestionAnswer> paperQuestionAnswerList = paperQuestionAnswerService.getList(pq.getPaperId(), pq.getQuestionId());
+	        NumberFormat nformat = NumberFormat.getNumberInstance();
+	        nformat.setMaximumFractionDigits(2);
+			if (question.getType() == 1 || question.getType() == 4) { //单选 判断
+				for(PaperQuestionAnswer paperQuestionAnswer : paperQuestionAnswerList){
+					paperQuestionAnswer.setScore(score);
+					paperQuestionAnswerService.update(paperQuestionAnswer);
+				}
+			}
+			if (question.getType() == 2 && ValidateUtil.isValid(scoreOptionsString) && scoreOptionsString.contains("1")) {// 多选
+				for(PaperQuestionAnswer paperQuestionAnswer : paperQuestionAnswerList){
+					paperQuestionAnswer.setScore(subScores);
+					paperQuestionAnswerService.update(paperQuestionAnswer);
+				}
+			}
+			
+			if (question.getType() == 3 || question.getType() == 5 ) { // 填空  问答
+				BigDecimal bitScore = new BigDecimal(0); //保留两位数的平均值
+				BigDecimal lastOneScore = new BigDecimal(0); // 不能被平分的最后一位分值
+				if (paperQuestionAnswerList != null && paperQuestionAnswerList.size() > 0) {
+			        BigDecimal listSize = new BigDecimal(paperQuestionAnswerList.size());
+					BigDecimal averageScore = score.divide(listSize, 2, BigDecimal.ROUND_HALF_UP); // 平均分
+					bitScore = new BigDecimal(nformat.format(averageScore));
+					BigDecimal multiply = bitScore.multiply(listSize);// 平均分*size
+					
+					if (score.compareTo(multiply) != 0) {// 不能平分平均分
+						lastOneScore = score.subtract(bitScore.multiply(new BigDecimal(paperQuestionAnswerList.size() - 1)));
+					}
+				}
+				
+				if (lastOneScore.compareTo(new BigDecimal(0)) == 0) {//可以平分
+					for(PaperQuestionAnswer paperQuestionAnswer : paperQuestionAnswerList){
+						paperQuestionAnswer.setScore(bitScore);
+						paperQuestionAnswerService.update(paperQuestionAnswer);
+					}
+					continue;
+				}
+				
+				for(int j = 1; j <= paperQuestionAnswerList.size(); j++){ //不能平分
+					PaperQuestionAnswer paperQuestionAnswer = paperQuestionAnswerList.get(j-1);
+					paperQuestionAnswer.setScore(bitScore);
+					if (j == paperQuestionAnswerList.size() ) {
+						paperQuestionAnswer.setScore(lastOneScore);
+					}
+					paperQuestionAnswerService.update(paperQuestionAnswer);
+				}
+			}
+		}	
+//		for (PaperQuestion pq : pqList) {
+//			pq.setScoreOptions(null);
+//			Question question = questionService.getEntity(pq.getQuestionId());
+//			if (question.getType() == 2) {
+//				if (ValidateUtil.isValid(options) && options.contains("1")) {
+//					pq.setScoreOptions("1");
+//				}
+//			} else if (question.getType() == 3) {
+//				pq.setScoreOptions(options);
+//			}
+//
+//			pq.setScore(score);
+//			paperQuestionService.update(pq);
+//			//更新答案分数
+//			if (question.getType() == 1 || question.getType() == 4) { //单选 判断
+//				
+//			}
+//			if (question.getType() == 2 || question.getType() == 3 || question.getType() == 5 ) { //多选  填空 问答  分值平分
+//				
+//			}
+//		}
 	}
 
 	@Override
