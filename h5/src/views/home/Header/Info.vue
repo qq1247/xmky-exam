@@ -5,32 +5,27 @@
  * @Author: Che
  * @Date: 2022-01-07 09:51:39
  * @LastEditors: Che
- * @LastEditTime: 2022-01-13 10:56:40
+ * @LastEditTime: 2022-01-18 09:53:05
 -->
 <template>
-  <div>
-    <el-dropdown trigger="hover" @command="handleCommand">
-      <div class="el-dropdown-link">
-        <p>
-          {{ level[onlyRole[0]] }}
-          <i class="el-icon-arrow-down el-icon--right"></i>
-        </p>
-      </div>
-      <el-dropdown-menu slot="dropdown">
-        <el-dropdown-item
-          icon="common common-change"
-          command="change"
-          v-if="roles.includes('subAdmin')"
-          >切换角色</el-dropdown-item
-        >
-        <el-dropdown-item icon="common common-edit" command="edit"
-          >修改密码</el-dropdown-item
-        >
-        <el-dropdown-item icon="common common-login-out" command="out"
-          >退出</el-dropdown-item
-        >
-      </el-dropdown-menu>
-    </el-dropdown>
+  <div class="header-info">
+    <span class="info-role">{{ level[onlyRole[0]] }}</span>
+    <i
+      class="common common-change"
+      v-if="roles.includes('subAdmin')"
+      @click="handleCommand('change')"
+      title="切换角色"
+    ></i>
+    <i
+      class="common common-setting"
+      @click="handleCommand('edit')"
+      title="修改密码"
+    ></i>
+    <i
+      class="common common-login-out"
+      @click="handleCommand('out')"
+      title="退出登录"
+    ></i>
     <el-dialog
       :visible.sync="editForm.show"
       title="修改密码"
@@ -161,4 +156,37 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.header-info {
+  display: flex;
+  align-items: center;
+  i {
+    display: inline-block;
+    line-height: 20px;
+    font-size: 18px;
+    padding-left: 10px;
+    margin-left: 10px;
+    cursor: pointer;
+    border-left: 1px solid #f1f1f1;
+    &:hover {
+      color: #0095e5;
+    }
+  }
+  .common-change {
+    width: 24px;
+    height: 24px;
+    border-radius: 20px;
+    background: #0095e5;
+    font-size: 16px;
+    color: #fff;
+    margin-left: 20px;
+    padding-left: 0;
+    text-align: center;
+    border: 1px solid #0095e5;
+    &:hover {
+      transition: all 0.3s ease-in-out;
+      background: #fff;
+    }
+  }
+}
+</style>

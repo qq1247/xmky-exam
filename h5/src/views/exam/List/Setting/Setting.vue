@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-12-16 16:01:13
  * @LastEditors: Che
- * @LastEditTime: 2022-01-05 13:12:53
+ * @LastEditTime: 2022-01-19 10:48:58
 -->
 <template>
   <div class="container">
@@ -86,7 +86,6 @@ import { examAdd, examEdit, examGet } from 'api/exam'
 import { paperListPage } from 'api/paper'
 import * as dayjs from 'dayjs'
 import CustomSelect from 'components/CustomSelect.vue'
-
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 dayjs.extend(isSameOrBefore)
 export default {
@@ -138,9 +137,6 @@ export default {
         paperList: [],
         examTime: [],
         markTime: [],
-        scoreState: false,
-        rankState: false,
-        loginType: false,
         examRadio: 1,
         examRadios: [
           {
@@ -178,26 +174,21 @@ export default {
           endTime,
           markStartTime,
           markEndTime,
-          scoreState,
-          rankState,
-          loginType,
+          paperMarkType,
         },
       } = await examGet({ id: this.id })
       this.$nextTick(() => {
         this.examForm.name = name
         this.examForm.selectPaperId = paperId
         this.examForm.paperName = paperName
-        this.examForm.scoreState = scoreState == 1
-        this.examForm.rankState = rankState == 1
-        this.examForm.loginType = loginType == 2
         this.examForm.examTime = [startTime, endTime]
-        const nextDay = dayjs(
-          new Date().getTime() + 1000 * 60 * 60 * 24
-        ).format('YYYY-MM-DD')
+        this.examForm.showMarkTime = paperMarkType === 1 ? false : true
+        const _markStartTime = this.getHour(2, endTime)
+        const _markEndTime = this.getHour(1, _markStartTime)
         if (markStartTime || markEndTime) {
           this.examForm.markTime = [
-            markStartTime || `${nextDay} 14:00:00`,
-            markEndTime || `${nextDay} 18:00:00`,
+            markStartTime || `${_markStartTime}`,
+            markEndTime || `${_markEndTime}`,
           ]
         }
 
@@ -210,14 +201,23 @@ export default {
           })
       })
     } else {
-      const nextDay = dayjs(new Date().getTime() + 1000 * 60 * 60 * 24).format(
-        'YYYY-MM-DD'
-      )
-      this.examForm.examTime = [`${nextDay} 08:00:00`, `${nextDay} 12:00:00`]
-      this.examForm.markTime = [`${nextDay} 14:00:00`, `${nextDay} 18:00:00`]
+      const examStartTime = this.getHour(2)
+      const examEndTime = this.getHour(1, examStartTime)
+      const markStartTime = this.getHour(2, examEndTime)
+      const markEndTime = this.getHour(1, markStartTime)
+      this.examForm.examTime = [`${examStartTime}`, `${examEndTime}`]
+      this.examForm.markTime = [`${markStartTime}`, `${markEndTime}`]
     }
   },
   methods: {
+    // 获取任意时候后的N个小时整点
+    getHour(n, day) {
+      const millisecond = day ? new Date(day).getTime() : new Date().getTime()
+      const nextTime = dayjs(millisecond + 1000 * 60 * 60 * n).format(
+        'YYYY-MM-DD HH'
+      )
+      return `${nextTime}:00:00`
+    },
     // 获取试卷列表
     async getPaperList(curPage = 1, name = '') {
       const paperList = await paperListPage({
@@ -256,9 +256,6 @@ export default {
           name: this.examForm.name,
           startTime: this.examForm.examTime[0],
           endTime: this.examForm.examTime[1],
-          scoreState: this.examForm.scoreState ? 1 : 2,
-          rankState: this.examForm.rankState ? 1 : 2,
-          loginType: this.examForm.loginType ? 2 : 1,
           paperId: this.examForm.selectPaperId,
           examTypeId: this.examTypeId,
         }

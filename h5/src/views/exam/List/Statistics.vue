@@ -5,26 +5,38 @@
  * @Author: Che
  * @Date: 2021-12-16 16:15:14
  * @LastEditors: Che
- * @LastEditTime: 2022-01-14 11:15:59
+ * @LastEditTime: 2022-01-19 14:05:24
 -->
 <template>
   <div class="container">
     <div class="info-content">
-      <div class="content-item" v-if="statisInfo.exam">
-        <p><span>考试名称：</span>{{ statisInfo.exam.name }}</p>
-        <p><span>开始时间：</span>{{ statisInfo.exam.startTime }}</p>
-        <p><span>考试时长：</span>{{ statisInfo.exam.succNum }}</p>
-        <p><span>考试人数：</span>{{ statisInfo.exam.userNum }}</p>
-        <p><span>缺考人数：</span>{{ statisInfo.exam.missUserNum }}</p>
-        <p><span>合格人数：</span>{{ statisInfo.exam.succUserNum }}</p>
-      </div>
-      <div class="content-item" v-if="statisInfo.score">
-        <p><span>总分数：</span>{{ statisInfo.score.total }}</p>
-        <p><span>平均分：</span>{{ statisInfo.score.avg }}</p>
-        <p><span>最高分：</span>{{ statisInfo.score.max }}</p>
-        <p><span>最低分：</span>{{ statisInfo.score.min }}</p>
-        <p><span>标准差：</span>{{ statisInfo.score.sd }}</p>
-      </div>
+      <el-card class="box-card" shadow="never" v-if="statisInfo.typeList">
+        <div slot="header">
+          <span>统计信息</span>
+        </div>
+        <div class="content-item">
+          <template v-if="statisInfo.exam">
+            <p><span>考试名称：</span>{{ statisInfo.exam.name }}</p>
+            <p><span>开始时间：</span>{{ statisInfo.exam.startTime }}</p>
+            <p>
+              <span>考试时长：</span
+              >{{
+                timeRange(statisInfo.exam.startTime, statisInfo.exam.endTime)
+              }}
+            </p>
+            <p><span>考试人数：</span>{{ statisInfo.exam.userNum }}</p>
+            <p><span>缺考人数：</span>{{ statisInfo.exam.missUserNum }}</p>
+            <p><span>合格人数：</span>{{ statisInfo.exam.succUserNum }}</p>
+          </template>
+          <template v-if="statisInfo.score">
+            <p><span>总分数：</span>{{ statisInfo.score.total }}</p>
+            <p><span>平均分：</span>{{ statisInfo.score.avg }}</p>
+            <p><span>最高分：</span>{{ statisInfo.score.max }}</p>
+            <p><span>最低分：</span>{{ statisInfo.score.min }}</p>
+            <p><span>标准差：</span>{{ statisInfo.score.sd }}</p>
+          </template>
+        </div>
+      </el-card>
       <el-card class="box-card" shadow="never" v-if="statisInfo.typeList">
         <div slot="header">
           <span>试题类型</span>
@@ -229,39 +241,43 @@ export default {
     chartDom(id, data) {
       let chartDom = document.getElementById(id)
       let myChart = echarts.init(chartDom)
+
+      let legendData = data.map((item) => item.name)
+      let seriesData = data.map((item) => item.value)
+
       let option = {
         tooltip: {
-          trigger: 'item',
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow',
+          },
         },
-        legend: {
-          top: '5%',
-          left: 'center',
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true,
         },
+        xAxis: [
+          {
+            type: 'category',
+            data: legendData,
+            axisTick: {
+              alignWithLabel: true,
+            },
+          },
+        ],
+        yAxis: [
+          {
+            type: 'value',
+          },
+        ],
         series: [
           {
-            name: '类型',
-            type: 'pie',
-            radius: ['30%', '40%'],
-            avoidLabelOverlap: false,
-            itemStyle: {
-              borderRadius: 10,
-              borderColor: '#fff',
-              borderWidth: 2,
-            },
-            label: {
-              show: false,
-              position: 'center',
-            },
-            emphasis: {
-              label: {
-                show: true,
-                fontSize: '14',
-              },
-            },
-            labelLine: {
-              show: false,
-            },
-            data,
+            name: '数值',
+            type: 'bar',
+            barWidth: '50%',
+            data: seriesData,
           },
         ],
       }
@@ -310,9 +326,9 @@ export default {
   width: 100%;
   height: 100%;
   display: flex;
+  justify-content: stretch;
   line-height: 30px;
   .content-item {
-    width: 25%;
     span {
       display: inline-block;
       text-align: right;
@@ -322,8 +338,11 @@ export default {
 }
 
 .box-card {
-  margin: 0 30px 30px 0;
-  width: 40%;
+  margin-right: 20px;
+  flex: 1;
+  &:first-child {
+    margin-left: 20px;
+  }
   /deep/ .el-card__header {
     position: relative;
     &::after {
@@ -349,6 +368,6 @@ export default {
 }
 
 .ranking-error {
-  padding: 30px;
+  padding: 20px;
 }
 </style>

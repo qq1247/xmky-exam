@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-12-16 16:01:13
  * @LastTinymceEditors: Che
- * @LastEditTime: 2022-01-06 11:28:50
+ * @LastEditTime: 2022-01-17 17:30:39
 -->
 <template>
   <div class="container">
@@ -86,12 +86,11 @@ export default {
       if (value.length == 0) {
         return callback(new Error('请选择展示时间'))
       }
-      if (
-        dayjs(value[0]).isSameOrBefore(dayjs()) ||
-        dayjs(value[1]).isSameOrBefore(dayjs())
-      ) {
+      if (dayjs(value[1]).isSameOrBefore(dayjs())) {
         return callback(
-          new Error(`请选择 ${dayjs().format('YYYY-MM-DD HH:mm:ss')} 后的时间`)
+          new Error(
+            `结束时间应为 ${dayjs().format('YYYY-MM-DD HH:mm:ss')} 后的时间`
+          )
         )
       }
       return callback()
