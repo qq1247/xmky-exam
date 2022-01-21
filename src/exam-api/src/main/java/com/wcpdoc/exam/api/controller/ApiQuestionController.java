@@ -98,6 +98,16 @@ public class ApiQuestionController extends BaseController {
 						scoreOptions[i] = Integer.parseInt(_scoreOptions[i]);
 					}
 				}
+				
+				List<QuestionAnswer> questionAnswerList = questionAnswerService.getList((Integer)result.get("id"));
+				List<Map<String, Object>> answerList = new ArrayList<Map<String, Object>>();
+				for(QuestionAnswer answer : questionAnswerList){
+					Map<String, Object> map = new HashMap<String, Object>();
+					map.put("answer", answer.getAnswers((Integer)result.get("type"), (Integer)result.get("ai"), answer.getAnswer()));
+					map.put("score", answer.getScore());
+					answerList.add(map);
+				}
+				result.put("answers", answerList);
 			}
 			return PageResultEx.ok().data(pageout);
 		} catch (Exception e) {
