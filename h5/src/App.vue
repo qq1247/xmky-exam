@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-07-22 18:05:35
  * @LastEditors: Che
- * @LastEditTime: 2022-01-13 10:46:11
+ * @LastEditTime: 2022-01-21 17:51:11
 -->
 <template>
   <div id="app">
@@ -68,7 +68,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import url(//at.alicdn.com/t/font_840312_r0dbcdj8zk.css);
+@import url(//at.alicdn.com/t/font_840312_vsjts3pcd4p.css);
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

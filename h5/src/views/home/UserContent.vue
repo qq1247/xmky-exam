@@ -5,7 +5,7 @@
  * @Author: Che
  * @Date: 2021-12-13 13:58:07
  * @LastEditors: Che
- * @LastEditTime: 2022-01-14 19:49:23
+ * @LastEditTime: 2022-01-21 18:10:07
 -->
 <template>
   <div class="home-content">
@@ -30,28 +30,40 @@
         </el-col>
         <el-col :span="17">
           <template v-if="examList.length">
-            <div class="info-list">
-              <div
-                class="info-item info-item-evenly"
-                :key="item.id"
-                v-for="item in examList"
-              >
-                <div class="item-left ellipsis">{{ item.examName }}</div>
-                <div class="item-time">
-                  {{ item.examStartTime }}（{{
-                    computeMinute(item.examStartTime, item.examEndTime)
-                  }}）
-                </div>
-                <div class="item-score">总分：{{ item.paperTotalScore }}</div>
-                <div class="item-pass">
-                  及格：{{ (item.paperPassScore / 100) * item.paperTotalScore }}
-                </div>
-                <div class="item-right">
-                  <div class="item-btn" @click="goExam(item)">
-                    <i class="common common-count-down"></i>开始考试
+            <div
+              class="info-item today-item"
+              :style="{
+                display: isToday(item.examStartTime, item.examEndTime)
+                  ? 'flex'
+                  : 'none',
+              }"
+              :key="item.id"
+              v-for="item in examList"
+            >
+              <template v-if="isToday(item.examStartTime, item.examEndTime)">
+                <i class="common common-wait-mark today-icon"></i>
+                <div class="item-center">
+                  <div class="info-item ellipsis">{{ item.examName }}</div>
+                  <div class="info-item">
+                    <div class="item-time">
+                      {{ item.examStartTime }}（{{
+                        computeMinute(item.examStartTime, item.examEndTime)
+                      }}）
+                    </div>
+                    <div class="item-score">
+                      总分：{{ item.paperTotalScore }}
+                    </div>
+                    <div class="item-pass">
+                      及格：{{
+                        (item.paperPassScore / 100) * item.paperTotalScore
+                      }}
+                    </div>
                   </div>
                 </div>
-              </div>
+                <div class="item-btn" @click="goExam(item)">
+                  <i class="common common-count-down"></i>开始考试
+                </div>
+              </template>
             </div>
           </template>
           <el-empty v-else description="暂无考试"></el-empty>
@@ -83,15 +95,45 @@
         </el-col>
         <el-col :span="16">
           <template v-if="markList.length">
-            <div class="info-list">
-              <div class="info-item" :key="item.id" v-for="item in markList">
-                <div class="item-left ellipsis">{{ item.examName }}</div>
-                <div class="item-right">
-                  <div class="item-btn" @click="goMark(item)">
-                    <i class="common common-count-down"></i>开始阅卷
+            <div
+              class="info-item today-item"
+              :style="{
+                display: isToday(item.examMarkStartTime, item.examMarkEndTime)
+                  ? 'flex'
+                  : 'none',
+              }"
+              :key="item.id"
+              v-for="item in markList"
+            >
+              <template
+                v-if="isToday(item.examMarkStartTime, item.examMarkEndTime)"
+              >
+                <i class="common common-wait-exam today-icon"></i>
+                <div class="item-center">
+                  <div class="info-item ellipsis">{{ item.examName }}</div>
+                  <div class="info-item">
+                    <div class="item-time">
+                      {{ item.examMarkStartTime }}（{{
+                        computeMinute(
+                          item.examMarkStartTime,
+                          item.examMarkEndTime
+                        )
+                      }}）
+                    </div>
+                    <div class="item-score">
+                      总分：{{ item.paperTotalScore }}
+                    </div>
+                    <div class="item-pass">
+                      及格：{{
+                        (item.paperPassScore / 100) * item.paperTotalScore
+                      }}
+                    </div>
                   </div>
                 </div>
-              </div>
+                <div class="item-btn" @click="goMark(item)">
+                  <i class="common common-count-down"></i>开始阅卷
+                </div>
+              </template>
             </div>
           </template>
           <el-empty v-else description="暂无试卷"></el-empty>
@@ -275,6 +317,17 @@ export default {
       const minutes = diffTime / (60 * 1000)
       return `${minutes.toFixed(2)}分钟`
     },
+    // 是否是今天
+    isToday(startTime, endTime) {
+      const today = new Date().getTime()
+      const _startTime = new Date(
+        `${dayjs(startTime).format('YYYY-MM-DD')} 00:00:00`
+      ).getTime()
+      const _endTime = new Date(
+        `${dayjs(endTime).format('YYYY-MM-DD')} 23:59:59`
+      ).getTime()
+      return today > _startTime && today < _endTime
+    },
     // 获取选择月份的时间
     selectDate(time) {
       const _time = dayjs(time).date(1).format('YYYY-MM-DD')
@@ -306,7 +359,7 @@ export default {
       }, {})
 
       timePopovers = markList.reduce((acc, mark) => {
-        const markTime = dayjs(mark.markStartTime).format('YYYY-MM-DD')
+        const markTime = dayjs(mark.examMarkStartTime).format('YYYY-MM-DD')
         if (!acc[markTime]) {
           acc[markTime] = {}
         }
@@ -507,22 +560,18 @@ export default {
   }
 }
 
-.info-list {
+.info-item {
+  line-height: 45px;
+  font-size: 13px;
   display: flex;
-  flex-direction: column;
-  .info-item {
-    line-height: 50px;
-    font-size: 13px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #e6ebf5;
-    color: #333;
-    padding: 0 5px;
-    cursor: pointer;
-    &:hover {
-      color: #0095e5;
-    }
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e6ebf5;
+  color: #333;
+  padding: 0 5px;
+  cursor: pointer;
+  &:hover {
+    color: #0095e5;
   }
   .item-left {
     flex: 1;
@@ -550,6 +599,33 @@ export default {
       background: rgba(#0095e5, 0.8);
       border: 1px solid rgba(#0095e5, 0.8);
       color: #fff;
+    }
+  }
+}
+
+.today-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  .today-icon {
+    display: inline-block;
+    width: 64px;
+    height: 64px;
+    line-height: 64px;
+    font-size: 40px;
+    text-align: center;
+    color: #fff;
+    background: #42a5f5;
+    border-radius: 4px;
+  }
+  .item-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0 20px;
+    .info-item {
+      line-height: 35px;
+      border: none;
     }
   }
 }
