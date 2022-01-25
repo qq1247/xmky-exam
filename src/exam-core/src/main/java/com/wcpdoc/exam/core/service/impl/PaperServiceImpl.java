@@ -201,7 +201,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 						throw new MyException(e.getMessage());
 					}
 					copyAnswer.setPaperQuestionId(copyChapter.getId());
-					copyAnswer.setPaperId(id);
+					copyAnswer.setPaperId(copyPaper.getId());
 					paperQuestionAnswerService.add(copyAnswer);
 				}
 			}
