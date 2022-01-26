@@ -199,7 +199,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	}
 
 	@Override
-	public List<Map<String, Object>> getUserList(Integer id) {
-		return myExamDao.getUserList(id);
+	public List<Map<String, Object>> getUserList(Integer examId) {
+		return myExamDao.getUserList(examId);
 	}
 }

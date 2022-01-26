@@ -20,7 +20,7 @@ public interface MyExamDetailService extends BaseService<MyExamDetail>{
 	 * @param userId
 	 * @return List<MyExamDetail>
 	 */
-	List<MyExamDetail> getList(Integer examId, Integer userId);
+	List<MyExamDetail> getUserAnswerList(Integer examId, Integer userId);
 
 	/**
 	 * 获取我的考试详细列表
@@ -51,7 +51,7 @@ public interface MyExamDetailService extends BaseService<MyExamDetail>{
 	 * @param examId
 	 * void
 	 */
-	void autoMark(Integer examId);
+	void doExam(Integer examId);
 
 	/**
 	 * 完成阅卷
@@ -60,7 +60,7 @@ public interface MyExamDetailService extends BaseService<MyExamDetail>{
 	 * @param examId
 	 * void
 	 */
-	void outMark(Integer examId);
+	void doMark(Integer examId);
 	
 	/**
 	 * 删除我的考试详细

@@ -180,7 +180,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 			throw new MyException("未参与阅卷");
 		}
 		
-		List<MyExamDetail> myExamDetailList = myExamDetailService.getList(examId, userId);
+		List<MyExamDetail> myExamDetailList = myExamDetailService.getUserAnswerList(examId, userId);
 		int num = 0;
 		BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
 		for (MyExamDetail myExamDetail : myExamDetailList) {

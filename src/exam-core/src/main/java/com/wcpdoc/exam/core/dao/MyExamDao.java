@@ -69,8 +69,8 @@ public interface MyExamDao extends BaseDao<MyExam>{
 	 * 获取用户列表
 	 * 
 	 * v1.0 zhanghc 2021年10月28日下午1:56:20
-	 * @param id
+	 * @param examId
 	 * @return List<Map<String,Object>>
 	 */
-	List<Map<String, Object>> getUserList(Integer id);
+	List<Map<String, Object>> getUserList(Integer examId);
 }
