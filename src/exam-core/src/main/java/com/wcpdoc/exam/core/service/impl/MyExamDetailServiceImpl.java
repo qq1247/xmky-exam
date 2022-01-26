@@ -25,6 +25,7 @@ import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.BigDecimalUtil;
 import com.wcpdoc.core.util.ValidateUtil;
+import com.wcpdoc.exam.core.cache.AutoMarkCache;
 import com.wcpdoc.exam.core.dao.MyExamDetailDao;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
@@ -220,7 +221,9 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			exam.setMarkState(2);
 			examService.update(exam);
 			log.info("自动考试完成：标记考试为阅卷中，等待人工阅卷");
-			return;
+			
+			// 加入完成阅卷监听，保证自动考试完成，才能进行自动阅卷完成
+			AutoMarkCache.put(examId, exam.getMarkEndTime());
 		}
 	}
 
