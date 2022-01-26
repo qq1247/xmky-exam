@@ -543,7 +543,7 @@ http请求头需添加Authorization字段，
 | data.list[].paperMarkType  | Integer |  试卷阅卷类型   |
 | data.list[].paperId| Integer| 试卷Id    |
 | data.list[].paperName|String| 试卷名称    |
-| data.list[].paperTotleScore| Double| 试卷总分    |
+| data.list[].paperTotalScore| Double| 试卷总分    |
 | data.list[].paperPassScore| Double  | 试卷及格分数   |
 
 ### 考试添加：exam/add

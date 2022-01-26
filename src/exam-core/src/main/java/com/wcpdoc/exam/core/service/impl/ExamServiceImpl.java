@@ -23,6 +23,7 @@ import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.AutoExamCache;
 import com.wcpdoc.exam.core.dao.ExamDao;
 import com.wcpdoc.exam.core.entity.Exam;
+import com.wcpdoc.exam.core.entity.ExamType;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyExamDetail;
 import com.wcpdoc.exam.core.entity.MyMark;
@@ -86,9 +87,9 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if (!ValidateUtil.isValid(exam.getEndTime())) {
 			throw new MyException("参数错误：endTime");
 		}
-		if (exam.getStartTime().getTime() <= new Date().getTime()) {
-			throw new MyException("考试开始时间必须大于当前时间");
-		}
+//		if (exam.getStartTime().getTime() <= new Date().getTime()) {
+//			throw new MyException("考试开始时间必须大于当前时间");
+//		}
 		if (exam.getStartTime().getTime() >= exam.getEndTime().getTime()) {
 			throw new MyException("考试结束时间必须大于考试开始时间");
 		}
@@ -139,9 +140,9 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if (!ValidateUtil.isValid(exam.getEndTime())) {
 			throw new MyException("参数错误：endTime");
 		}
-		if (exam.getStartTime().getTime() <= new Date().getTime()) {
-			throw new MyException("考试开始时间必须大于当前时间");
-		}
+//		if (exam.getStartTime().getTime() <= new Date().getTime()) {
+//			throw new MyException("考试开始时间必须大于当前时间");
+//		}
 		if (exam.getStartTime().getTime() >= exam.getEndTime().getTime()) {
 			throw new MyException("考试结束时间必须大于考试开始时间");
 		}
@@ -196,8 +197,12 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	public void delAndUpdate(Integer id) {
 		Date curTime = new Date();
 		Exam exam = examDao.getEntity(id);
-		if(exam.getStartTime().getTime() >= curTime.getTime()
-				&& exam.getEndTime().getTime() <= curTime.getTime()) {
+		ExamType examType = examTypeService.getEntity(exam.getExamTypeId());
+		if(examType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
+			throw new MyException("无操作权限");
+		}
+		
+		if(exam.getState() == 1 && exam.getStartTime().getTime() >= curTime.getTime() && exam.getEndTime().getTime() <= curTime.getTime()) {
 			throw new MyException("考试未结束");
 		}
 		
@@ -220,9 +225,9 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if(exam.getState() == 3) {
 			throw new MyException("考试已归档");
 		}
-		if (exam.getStartTime().getTime() <= new Date().getTime()) {
-			throw new MyException("考试开始时间必须大于当前时间");
-		}
+//		if (exam.getStartTime().getTime() <= new Date().getTime()) {
+//			throw new MyException("考试开始时间必须大于当前时间");
+//		}
 		if (exam.getStartTime().getTime() >= exam.getEndTime().getTime()) {
 			throw new MyException("考试结束时间必须大于考试开始时间");
 		}
