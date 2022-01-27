@@ -624,7 +624,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 				paperQuestionAnswerService.update(answer);
 			}
 		}
-		if (question.getAi() == 1 && (question.getType() == 1 || question.getType() == 4)) { //TODO  页面传值有问题 随后改
+		if (question.getAi() == 1 && (question.getType() == 1 || question.getType() == 4)) {
 			for (int i = 0; i < subScores.length; i++) {
 				PaperQuestionAnswer answer = answerList.get(i);
 				answer.setScore(score);
@@ -976,7 +976,15 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
 		}
-
+		List<PaperQuestion> chapterList = paperQuestionService.getChapterList(id);
+		if (chapterList == null || chapterList.size() <= 0) {
+			throw new MyException("至少需要添加一道试题！");
+		}
+		List<PaperQuestion> QuestionList = paperQuestionService.getQuestionList(chapterList.get(0).getId());
+		if (QuestionList == null || QuestionList.size() <= 0) {
+			throw new MyException("至少需要添加一道试题！");
+		}
+		
 		List<Question> questionList = paperDao.getQuestionList(id);
 		boolean ai = true;
 		for (Question question : questionList) {
