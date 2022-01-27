@@ -121,9 +121,9 @@ public class ApiMyMarkController extends BaseController {
 	 */
 	@RequestMapping("/userList")
 	@ResponseBody
-	public PageResult userList(Integer examId, String userName) {
+	public PageResult userList(Integer examId, String userName, Integer userId) {
 		try {
-			return PageResultEx.ok().data(myMarkService.getUserList(examId, userName));
+			return PageResultEx.ok().data(myMarkService.getUserList(examId, userName, userId));
 		} catch (Exception e) {
 			log.error("我的考试列表错误：", e);
 			return PageResult.err();

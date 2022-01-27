@@ -246,7 +246,8 @@ public class WordServerImpl extends WordServer {
 		List<Node> answerRows = parseAnswerRows(singleQuestion);
 		if (type == 3) {
 			Pattern p = Pattern.compile("[_]{5,}"); //正则表达式
-			Matcher m = p.matcher(titleRows.toString()); // 获取 matcher 对象
+			String txt = getTxt(titleRows, 0, titleRows.size());
+			Matcher m = p.matcher(Jsoup.clean(txt, Whitelist.none())); // 获取 matcher 对象
 			int count = 0;
 			while(m.find()) {
 				count++;
