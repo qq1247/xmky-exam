@@ -135,10 +135,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (question.getType() == 3) {
 			Pattern p = Pattern.compile("[_]{5,}"); //正则表达式
 			Matcher m = p.matcher(Jsoup.clean(question.getTitle(), Whitelist.none())); // 获取 matcher 对象
-			
-//			String txt = getTxt(titleRows, 0, titleRows.size());
-//			Matcher m = p.matcher(Jsoup.clean(txt, Whitelist.none())); // 获取 matcher 对象
-			
 			int count = 0;
 			while(m.find()) {
 				count++;
@@ -295,7 +291,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 		if (question.getType() == 3) {
 			Pattern p = Pattern.compile("[_]{5,}"); //正则表达式
-			Matcher m = p.matcher(question.getTitle()); // 获取 matcher 对象
+			Matcher m = p.matcher(Jsoup.clean(question.getTitle(), Whitelist.none()));// 获取 matcher 对象
 			int count = 0;
 			while(m.find()) {
 				count++;
