@@ -17,7 +17,7 @@ import com.wcpdoc.core.interceptor.UserContextInterceptor;
  * v1.0 zhanghc 2019年9月29日下午2:30:20
  */
 @Configuration
-public class ApplicationCfg implements WebMvcConfigurer {
+public class ApplicationConf implements WebMvcConfigurer {
 	@Resource
 	private UserContextInterceptor userContextInterceptor;
 	@Resource
