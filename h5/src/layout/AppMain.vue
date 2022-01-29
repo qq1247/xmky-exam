@@ -26,7 +26,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .app-main {
   min-height: calc(100vh - 50px);
   width: 100%;

@@ -267,7 +267,7 @@ export default [
         component: () => import('views/my/Mark/Index.vue'),
         name: 'MyMarkIndex',
         meta: {
-          title: '阅卷管理',
+          title: '阅卷分类',
           icon: 'common common-exam',
           layout: 'subAdmin',
         },

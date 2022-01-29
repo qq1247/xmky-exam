@@ -109,17 +109,14 @@ export default {
       }
     },
     parseFormat(timeData) {
-      const { days, hours, minutes, seconds } = timeData
-      if(days){
-        return `${String(days).padStart(2, '0')}天${String(hours).padStart(2, '0')}时${String(minutes).padStart(
-        2,
-        '0'
-      )}分${String(seconds).padStart(2, '0')}秒`
-      }else{
-        return `${String(hours).padStart(2, '0')}时${String(minutes).padStart(
-        2,
-        '0'
-      )}分${String(seconds).padStart(2, '0')}秒`
+      const days = String(timeData.days).padStart(2, '0')
+      const hours = String(timeData.hours).padStart(2, '0')
+      const minutes = String(timeData.minutes).padStart(2, '0')
+      const seconds = String(timeData.seconds).padStart(2, '0')
+      if (days) {
+        return `${days}天${hours}:${minutes}:${seconds}`
+      } else {
+        return `${hours}:${minutes}:${seconds}`
       }
     },
   },

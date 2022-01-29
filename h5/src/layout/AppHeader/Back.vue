@@ -78,6 +78,7 @@ export default {
   line-height: 50px;
   margin-left: 8px;
   margin-left: 20px;
+  width: 20%;
   .no-redirect {
     color: #97a8be;
     cursor: text;

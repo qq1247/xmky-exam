@@ -67,7 +67,7 @@ export default {
 
 <style lang="scss" scoped>
 .header-info {
-  width: 15%;
+  width: 20%;
   height: 100%;
   display: flex;
   align-items: center;

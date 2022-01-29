@@ -74,13 +74,11 @@
             :key="answer.id"
             class="answers-item"
           >
-            <span>{{ `填空${$tools.intToChinese(index + 1)}、` }}</span>
-            <span
-              class="answers-tag"
-              v-for="(ans, index) in answer.answer"
-              :key="index"
-              >{{ ans }}</span
-            >
+            <span>{{
+              `填空${$tools.intToChinese(index + 1)}、${answer.answer.join(
+                '，'
+              )}`
+            }}</span>
           </div>
         </el-col>
       </template>

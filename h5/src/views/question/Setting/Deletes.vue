@@ -36,7 +36,7 @@ export default {
   },
   methods: {
     del() {
-      this.$confirm(`确认删除吗？`, '提示', {
+      this.$confirm(`确认删除吗？不影响已经创建的试卷和考试`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
