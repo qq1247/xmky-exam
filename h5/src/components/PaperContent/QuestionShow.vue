@@ -8,40 +8,45 @@
  * @LastEditTime: 2021-11-02 16:34:09
 -->
 <template>
-  <div class="content-center">
+  <div>
     <template v-if="paperQuestion.length">
-      <div :id="`p-${paperQuestion[routerIndex].id}`" class="children-content">
-        <p
-          v-if="paperQuestion[routerIndex].type !== 3"
-          class="question-title"
-          v-html="`${routerIndex + 1}、${paperQuestion[routerIndex].title}`"
-        ></p>
+      <div class="chapter">
+        <div class="chapter-item">
+          <div class="item-title">{{ chapter.name }}</div>
+          <div></div>
+        </div>
+        <div class="chapter-description" v-html="chapter.description"></div>
+      </div>
+
+      <div class="children-content">
+        <div class="question-title" v-if="questionList[index].type !== 3">
+          <div>{{ index + 1 }}、</div>
+          <div v-html="`${questionList[index].title}`"></div>
+        </div>
         <div class="question-title" v-else>
-          <span>{{ routerIndex + 1 }}、</span>
+          <span>{{ index + 1 }}、</span>
           <ClozeTitle
-            :title="paperQuestion[routerIndex].title"
+            :title="questionList[index].title"
             :preview="preview"
             :paperQuestion="paperQuestion"
             :myExamDetailCache="myExamDetailCache"
-            :routerIndex="routerIndex"
+            :questionId="routerIndex"
           ></ClozeTitle>
         </div>
         <!-- 单选 -->
-        <template v-if="paperQuestion[routerIndex].type === 1">
+        <template v-if="questionList[index].type === 1">
           <el-radio-group
-            @change="updateAnswer(paperQuestion[routerIndex].id)"
+            @change="updateAnswer(questionList[index].id)"
             class="children-option"
-            v-if="myExamDetailCache[paperQuestion[routerIndex].id]"
-            v-model="
-              myExamDetailCache[paperQuestion[routerIndex].id].answers[0]
-            "
+            v-if="myExamDetailCache[questionList[index].id]"
+            v-model="myExamDetailCache[questionList[index].id].answers[0]"
           >
             <el-radio
               :key="index"
               :disabled="preview === 'true' ? true : false"
               :label="String.fromCharCode(65 + index)"
               class="option-item"
-              v-for="(option, index) in paperQuestion[routerIndex].options"
+              v-for="(option, index) in questionList[index].options"
             >
               <div
                 class="flex-items-center"
@@ -52,19 +57,19 @@
         </template>
 
         <!-- 多选 -->
-        <template v-if="paperQuestion[routerIndex].type === 2">
+        <template v-if="questionList[index].type === 2">
           <el-checkbox-group
-            @change="updateAnswer(paperQuestion[routerIndex].id)"
+            @change="updateAnswer(questionList[index].id)"
             class="children-option"
-            v-if="myExamDetailCache[paperQuestion[routerIndex].id]"
-            v-model="myExamDetailCache[paperQuestion[routerIndex].id].answers"
+            v-if="myExamDetailCache[questionList[index].id]"
+            v-model="myExamDetailCache[questionList[index].id].answers"
           >
             <el-checkbox
               :key="index"
               :label="String.fromCharCode(65 + index)"
               class="option-item"
               :disabled="preview === 'true' ? true : false"
-              v-for="(option, index) in paperQuestion[routerIndex].options"
+              v-for="(option, index) in questionList[index].options"
             >
               <div
                 class="flex-items-center"
@@ -75,14 +80,12 @@
         </template>
 
         <!-- 判断 -->
-        <template v-if="paperQuestion[routerIndex].type === 4">
+        <template v-if="questionList[index].type === 4">
           <el-radio-group
-            @change="updateAnswer(paperQuestion[routerIndex].id)"
+            @change="updateAnswer(questionList[index].id)"
             class="children-option"
-            v-if="myExamDetailCache[paperQuestion[routerIndex].id]"
-            v-model="
-              myExamDetailCache[paperQuestion[routerIndex].id].answers[0]
-            "
+            v-if="myExamDetailCache[questionList[index].id]"
+            v-model="myExamDetailCache[questionList[index].id].answers[0]"
           >
             <el-radio
               :key="index"
@@ -96,21 +99,20 @@
         </template>
 
         <!-- 问答 -->
-        <template v-if="paperQuestion[routerIndex].type === 5">
+        <template v-if="questionList[index].type === 5">
           <el-input
             :rows="2"
             class="question-text"
-            @change="updateAnswer(paperQuestion[routerIndex].id)"
+            @change="updateAnswer(questionList[index].id)"
             placeholder="请输入内容"
             type="textarea"
-            v-if="myExamDetailCache[paperQuestion[routerIndex].id]"
+            v-if="myExamDetailCache[questionList[index].id]"
             :disabled="preview === 'true' ? true : false"
-            v-model="
-              myExamDetailCache[paperQuestion[routerIndex].id].answers[0]
-            "
+            v-model="myExamDetailCache[questionList[index].id].answers[0]"
           ></el-input>
         </template>
       </div>
+
       <div class="question-pages">
         <el-button @click="prevQuestion">上一题</el-button>
         <el-button @click="nextQuestion">下一题</el-button>
@@ -128,8 +130,8 @@ export default {
   },
   props: {
     preview: {
-      type: [String, Boolean],
-      default: '',
+      type: Boolean,
+      default: false,
     },
     paperQuestion: {
       type: Array,
@@ -145,18 +147,67 @@ export default {
     },
   },
   data() {
-    return {}
+    return {
+      chapter: {},
+      questionList: [],
+      index: 0,
+    }
   },
-  created() {},
+  watch: {
+    routerIndex: {
+      deep: true,
+      immediate: true,
+      handler(n) {
+        this.questionList.length && this.getQuestion(n)
+      },
+    },
+  },
+  mounted() {
+    this.getQuestion()
+  },
   methods: {
+    getQuestion(routerIndex) {
+      this.questionList = this.paperQuestion.reduce((acc, cur) => {
+        acc.push(...cur.questionList)
+        return acc
+      }, [])
+
+      this.routerIndex = Number(routerIndex || this.questionList[0].id)
+
+      this.index = this.questionList.findIndex(
+        (question) => question.id === this.routerIndex
+      )
+      // 查找试题所在的章节信息
+      this.paperQuestion.some((item) => {
+        const question = item.questionList.some(
+          (question) => question.id === this.routerIndex
+        )
+        if (question) {
+          this.chapter = item.chapter
+          return true
+        }
+      })
+    },
     updateAnswer(itemId) {
       this.$emit('updateAnswer', itemId)
     },
+    // 上一题
     prevQuestion() {
-      this.$emit('prevQuestion')
+      if (this.index === 0) {
+        this.$message.warning('请您继续作答！')
+        return
+      }
+      this.index -= 1
+      this.$emit('prevQuestion', this.questionList[this.index].id)
     },
+    // 下一题
     nextQuestion() {
-      this.$emit('nextQuestion')
+      if (this.index === this.questionList.length - 1) {
+        this.$message.warning('恭喜您已经作答完毕！')
+        return
+      }
+      this.index += 1
+      this.$emit('nextQuestion', this.questionList[this.index].id)
     },
   },
 }

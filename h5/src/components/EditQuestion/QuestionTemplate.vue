@@ -114,17 +114,21 @@ export default {
         .catch((err) => {
           return err.data
         })
-      if (percentage.code !== 200 || !percentage?.data?.percent) {
-        this.percentage = 0
-        return false
-      }
 
       const loading = this.$loading({
         lock: true,
-        text: `试题解析中...${percentage?.data?.percent}%`,
+        text: `试题解析进度：${percentage?.data?.percent || 10}%`,
         spinner: 'el-icon-loading',
         background: 'rgba(255, 255, 255, 0.88)',
       })
+
+      if (percentage.code !== 200 || !percentage?.data?.percent) {
+        console.log('error')
+        this.percentage = 0
+        this.templateClear('templateUpload')
+        loading.close()
+        return false
+      }
 
       this.percentage = percentage.data.percent
 

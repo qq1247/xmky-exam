@@ -7,9 +7,8 @@
  * @LastEditors: Che
  * @LastEditTime: 2022-01-13 10:48:32
 -->
-
 <template>
-  <div class="content-center">
+  <div>
     <template v-if="paperQuestion.length">
       <div :key="index" v-for="(item, index) in paperQuestion">
         <div class="chapter">
@@ -28,10 +27,14 @@
             :id="`p-${child.id}`"
             :key="child.id"
             class="children-content"
+            :style="{
+              marginBottom: child.type == 3 ? '10px' : '0',
+              borderBottom: '1px solid #f3f3f3',
+            }"
             v-for="(child, index) in item.questionList"
           >
             <div class="question-title" v-if="child.type !== 3">
-              <span>{{ index + 1 }}、</span>
+              <div>{{ index + 1 }}、</div>
               <div v-html="`${child.title}`"></div>
             </div>
             <div
@@ -58,7 +61,7 @@
               >
                 <el-radio
                   :key="index"
-                  :disabled="preview === 'true' ? true : false"
+                  :disabled="preview"
                   :label="String.fromCharCode(65 + index)"
                   class="option-item"
                   v-for="(option, index) in child.options"
@@ -83,7 +86,7 @@
                   :key="index"
                   :label="String.fromCharCode(65 + index)"
                   class="option-item"
-                  :disabled="preview === 'true' ? true : false"
+                  :disabled="preview"
                   v-for="(option, index) in child.options"
                 >
                   <div
@@ -107,7 +110,7 @@
                   :label="option"
                   class="option-item"
                   v-for="(option, index) in ['对', '错']"
-                  :disabled="preview === 'true' ? true : false"
+                  :disabled="preview"
                   >{{ option }}</el-radio
                 >
               </el-radio-group>
@@ -122,7 +125,7 @@
                 placeholder="请输入内容"
                 type="textarea"
                 v-if="myExamDetailCache[child.id]"
-                :disabled="preview === 'true' ? true : false"
+                :disabled="preview"
                 v-model="myExamDetailCache[child.id].answers[0]"
               ></el-input>
             </template>
@@ -142,8 +145,8 @@ export default {
   },
   props: {
     preview: {
-      type: [String, Boolean],
-      default: 'false',
+      type: Boolean,
+      default: false,
     },
     paperQuestion: {
       type: Array,

@@ -130,7 +130,7 @@ export default {
       this.$confirm('请选择发布方式？', '发布方式', {
         distinguishCancelAndClose: true,
         confirmButtonText: '全部发布',
-        cancelButtonText: '单页发布',
+        cancelButtonText: '当页发布',
       })
         .then(async () => {
           await questionPublish({
@@ -149,7 +149,7 @@ export default {
             await questionPublish({
               ids,
             })
-            this.$message.success('单页发布成功！')
+            this.$message.success('当页发布成功！')
             this.$emit('showTemplate', false)
           }
         })
@@ -159,7 +159,7 @@ export default {
       this.$confirm('请选择清空方式？', '清空方式', {
         distinguishCancelAndClose: true,
         confirmButtonText: '全部清空',
-        cancelButtonText: '单页清空',
+        cancelButtonText: '当页清空',
       })
         .then(async () => {
           await questionDel({
@@ -178,7 +178,7 @@ export default {
             await questionDel({
               ids,
             })
-            this.$message.success('单页清空成功！')
+            this.$message.success('当页清空成功！')
             this.$emit('showTemplate', false)
           }
         })

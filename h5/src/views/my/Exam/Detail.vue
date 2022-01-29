@@ -6,7 +6,7 @@
         <div class="paper-title">{{ paper.name }}</div>
 
         <page-show
-          v-if="showType === 1"
+          v-if="showType === 1 && Object.keys(myExamDetailCache).length"
           :preview="preview"
           :paperQuestion="paperQuestion"
           :myExamDetailCache="myExamDetailCache"
@@ -14,7 +14,7 @@
         ></page-show>
 
         <question-show
-          v-if="showType === 3"
+          v-if="showType === 3 && Object.keys(myExamDetailCache).length"
           :preview="preview"
           :router-index="routerIndex"
           :paperQuestion="paperQuestion"
@@ -26,11 +26,10 @@
       </div>
 
       <question-router
+        v-if="paperQuestion.length"
         :preview="preview"
-        :show-type="showType"
         :system-time="systemTime"
         :router-index="routerIndex"
-        :href-pointer="hrefPointer"
         :paperQuestion="paperQuestion"
         @sign="sign"
         @toHref="toHref"
@@ -59,7 +58,6 @@ export default {
       examId: null,
       paperId: null,
       paperName: '',
-      hrefPointer: '',
       showType: 1,
       preview: false,
       pageSize: 10,
@@ -81,9 +79,9 @@ export default {
 
     this.examId = examId
     this.paperId = paperId
-    this.preview = preview
+    this.preview = JSON.parse(preview)
     this.examEndTime = examEndTime
-    this.showType = showType
+    this.showType = Number(showType)
     this.init()
   },
   methods: {
@@ -120,15 +118,7 @@ export default {
         const res = await paperQuestionList({
           id: this.paperId,
         })
-        if (this.showType === 1) {
-          this.paperQuestion = res.data
-        } else {
-          const paperQuestion = res.data.reduce((acc, cur) => {
-            acc.push(...cur.questionList)
-            return acc
-          }, [])
-          this.paperQuestion = paperQuestion
-        }
+        this.paperQuestion = res.data
       } catch (error) {}
     },
     // 查询我的答案信息
@@ -138,16 +128,12 @@ export default {
           examId: this.examId,
         })
 
-        let paperQuestion
-        if (this.showType === 1) {
-          paperQuestion = this.paperQuestion.reduce((acc, cur) => {
-            acc.push(...cur.questionList)
-            return acc
-          }, [])
-        } else {
-          paperQuestion = this.paperQuestion
-        }
+        let paperQuestion = this.paperQuestion.reduce((acc, cur) => {
+          acc.push(...cur.questionList)
+          return acc
+        }, [])
 
+        // 组合试卷答案信息
         this.myExamDetailCache = res.data.reduce((acc, cur, index) => {
           if (
             cur.questionType === 3 &&
@@ -161,32 +147,10 @@ export default {
         }, {})
 
         // 添加是否作答标记submit
-        if (this.showType === 1) {
-          this.paperQuestion.map((item, indexi) => {
-            item.questionList.map((question, indexq) => {
-              const submit = res.data.some((answer) => {
-                if (answer.questionId === question.id) {
-                  const list = answer.answers
-                  let status
-                  if (list.length) {
-                    status = list.some((item) => item.trim())
-                  } else {
-                    status = false
-                  }
-                  return status
-                }
-              })
-              this.$set(
-                this.paperQuestion[indexi].questionList[indexq],
-                'submit',
-                submit
-              )
-            })
-          })
-        } else {
-          this.paperQuestion.map((item, index) => {
+        this.paperQuestion.map((item, paperIndex) => {
+          item.questionList.map((question, questionIndex) => {
             const submit = res.data.some((answer) => {
-              if (answer.questionId === item.id) {
+              if (answer.questionId === question.id) {
                 const list = answer.answers
                 let status
                 if (list.length) {
@@ -197,16 +161,20 @@ export default {
                 return status
               }
             })
-            this.$set(this.paperQuestion[index], 'submit', submit)
+            this.$set(
+              this.paperQuestion[paperIndex].questionList[questionIndex],
+              'submit',
+              submit
+            )
           })
-        }
+        })
       } catch (error) {
         this.$message.error(error)
       }
     },
     // 更新答案
     async updateAnswer(questionId) {
-      if (this.preview === 'true') {
+      if (this.preview) {
         return
       }
 
@@ -232,27 +200,18 @@ export default {
       } else {
         status = false
       }
-      if (this.showType === 1) {
-        this.paperQuestion.map((item, indexi) => {
-          item.questionList.some((question, indexq) => {
-            if (question.id === questionId) {
-              this.$set(
-                this.paperQuestion[indexi].questionList[indexq],
-                'submit',
-                status
-              )
-              return true
-            }
-          })
-        })
-      } else {
-        this.paperQuestion.some((item, index) => {
-          if (item.id === questionId) {
-            this.$set(this.paperQuestion[index], 'submit', status)
+      this.paperQuestion.map((item, paperIndex) => {
+        item.questionList.some((question, questionIndex) => {
+          if (question.id === questionId) {
+            this.$set(
+              this.paperQuestion[paperIndex].questionList[questionIndex],
+              'submit',
+              status
+            )
             return true
           }
         })
-      }
+      })
     },
     // 考试结束
     async examEnd() {
@@ -283,64 +242,41 @@ export default {
     },
     // 定位锚点
     toHref(index) {
+      this.routerIndex = index
       if (this.showType === 1) {
-        this.hrefPointer = `#p-${index}`
         document
-          .querySelector(this.hrefPointer)
+          .querySelector(`#p-${index}`)
           .scrollIntoView({ block: 'end', inline: 'nearest' })
-      } else {
-        this.routerIndex = index
       }
     },
     // 双击标记
     sign(index) {
-      if (this.showType === 1) {
-        this.paperQuestion.map((item, indexi) => {
-          item.questionList.some((question, indexq) => {
-            if (question.id === index) {
-              const sign = this.paperQuestion[indexi].questionList[indexq].sign
-              this.$set(
-                this.paperQuestion[indexi].questionList[indexq],
-                'sign',
-                !sign
-              )
-              return true
-            }
-          })
-        })
-      } else {
-        this.paperQuestion.some((item, indexi) => {
-          if (indexi === index) {
-            const sign = this.paperQuestion[indexi].sign
-            this.$set(this.paperQuestion[indexi], 'sign', !sign)
+      this.paperQuestion.map((item, paperIndex) => {
+        item.questionList.some((question, questionIndex) => {
+          if (question.id === index) {
+            const sign =
+              this.paperQuestion[paperIndex].questionList[questionIndex].sign
+            this.$set(
+              this.paperQuestion[paperIndex].questionList[questionIndex],
+              'sign',
+              !sign
+            )
             return true
           }
         })
-      }
+      })
     },
     // 上一题
-    prevQuestion() {
-      if (this.routerIndex === 0) {
-        this.$message.warning('请您继续作答！')
-        return
-      }
-      this.routerIndex -= 1
+    prevQuestion(index) {
+      this.routerIndex = index
     },
     // 下一题
-    nextQuestion() {
-      if (this.routerIndex === this.paperQuestion.length - 1) {
-        this.$message.warning('恭喜您已经作答完毕！')
-        return
-      }
-      this.routerIndex += 1
+    nextQuestion(index) {
+      this.routerIndex = index
     },
   },
 }
 </script>
 <style lang="scss" scoped>
 @import 'assets/style/exam.scss';
-.container {
-  width: 960px;
-  margin: 0 auto;
-}
 </style>

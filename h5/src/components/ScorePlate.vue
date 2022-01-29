@@ -1,13 +1,9 @@
 <template>
-  <el-popover
-    placement="right"
-    v-model="visible"
-    @hide="hideHandler"
-    trigger="focus"
-  >
+  <div class="score-plate">
+    <div class="plate-header">打分板</div>
     <!-- 打分间隔和分值 -->
-    <div class="score-body">
-      <div class="score-step">
+    <div class="plate-body">
+      <div class="plate-step">
         <span>间隔：</span>
         <span
           :class="['step-item', selectStep == index ? 'select-step' : '']"
@@ -24,7 +20,7 @@
           @input="stepInput"
         ></el-input>
       </div>
-      <div class="score-step">
+      <div class="plate-step">
         <span>分数：</span>
         <span
           :class="['step-item', selectScore == index ? 'select-step' : '']"
@@ -36,50 +32,33 @@
       </div>
     </div>
     <!-- 上下一题，上下一卷，结束阅卷操作 -->
-    <div class="score-footer">
-      <el-button-group>
-        <el-button
-          type="primary"
-          size="small"
-          icon="el-icon-arrow-left"
-          @click="prevQuestion"
-          >上一题</el-button
-        >
-        <el-button type="primary" size="small" @click="nextQuestion">
-          下一题
-          <i class="el-icon-arrow-right el-icon--right"></i>
-        </el-button>
-        <el-button
-          type="primary"
-          size="small"
-          icon="el-icon-d-arrow-left"
-          @click="prevPaper"
-          >上一卷</el-button
-        >
-        <el-button type="primary" size="small" @click="nextPaper">
-          下一卷
-          <i class="el-icon-d-arrow-right el-icon--right"></i>
-        </el-button>
-        <el-button
-          type="primary"
-          size="small"
-          icon="el-icon-document-checked"
-          @click="markEnd"
-          >完成阅卷</el-button
-        >
-      </el-button-group>
+    <div class="plate-footer">
+      <div class="footer-left">
+        <el-switch v-model="markType" active-text="自动" inactive-text="人工">
+        </el-switch>
+      </div>
+      <div class="footer-right">
+        <div v-if="markType">
+          <el-switch
+            v-model="isNextQuestion"
+            active-text="下一题"
+            inactive-text="同题"
+          >
+          </el-switch>
+        </div>
+        <div v-else>
+          <el-button type="primary" size="small" @click="nextQuestion">
+            下一题
+            <i class="el-icon-arrow-right el-icon--right"></i>
+          </el-button>
+          <el-button type="primary" size="small" @click="nextPaper">
+            下一卷
+            <i class="el-icon-d-arrow-right el-icon--right"></i>
+          </el-button>
+        </div>
+      </div>
     </div>
-    <el-input
-      :id="`i-${data.id}`"
-      type="number"
-      slot="reference"
-      class="score-input"
-      placeholder="请点击 | 输入分数"
-      :value="data.scorePlate"
-      @input="input"
-      @blur="blur"
-    ></el-input>
-  </el-popover>
+  </div>
 </template>
 
 <script>
@@ -99,15 +78,11 @@ export default {
       steps: [0.5, 1],
       selectStep: 0,
       selectScore: 0,
+      markType: true,
+      isNextQuestion: true,
     }
   },
   methods: {
-    input(e) {
-      this.$emit('input', e)
-    },
-    blur(e) {
-      this.$emit('blur', e)
-    },
     createScores(step) {
       this.scores = []
       this.selectScore = 0
@@ -120,7 +95,6 @@ export default {
       this.createScores(Number(this.steps[index]))
     },
     scoreHandler(index) {
-      document.getElementById(`i-${this.data.id}`).focus()
       this.selectScore = index
       this.$emit('selectScore', Number(this.scores[index]))
     },
@@ -133,42 +107,53 @@ export default {
     hideHandler() {
       Object.assign(this.$data, this.$options.data())
     },
-    prevQuestion() {
-      this.$emit('prevQuestion', this.data.id)
-      this.hideHandler()
-    },
     nextQuestion() {
       this.$emit('nextQuestion', this.data.id)
       this.hideHandler()
     },
-    prevPaper() {
-      this.$emit('prevPaper')
-    },
     nextPaper() {
       this.$emit('nextPaper')
-    },
-    markEnd() {
-      this.$emit('markEnd')
     },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.score-input {
-  width: 200px;
-  /deep/.el-input__inner {
-    border-color: #fff #fff #dcdfe6 #fff;
+.score-plate {
+  flex: 1;
+  max-width: 560px;
+  border: 1px solid #f2f2f2;
+  border-radius: 5px;
+  padding: 0 20px;
+  line-height: 50px;
+  box-shadow: 0 0 16px -3px rgba(0, 0, 0, 0.15);
+}
+.plate-header {
+  font-size: 16px;
+  padding-left: 10px;
+  position: relative;
+  &::after {
+    content: '';
+    display: block;
+    width: 2px;
+    height: 20px;
+    position: absolute;
+    background: #0095e5;
+    top: 15px;
+    left: 0;
   }
 }
-/deep/.el-popover {
-  padding: 0;
+.plate-body {
+  border-top: 1px solid #dcdfe6;
+  border-bottom: 1px solid #dcdfe6;
 }
-.score-footer {
-  text-align: center;
-  padding: 10px 0 0 30px;
+.plate-footer {
+  display: flex;
+  .footer-left {
+    flex: 1;
+  }
 }
-.score-step {
+.plate-step {
   display: flex;
   align-items: center;
   .step-item {

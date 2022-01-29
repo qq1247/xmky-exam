@@ -486,12 +486,17 @@
               <template v-if="item.questionList.length > 0">
                 <div
                   class="children-content"
-                  style="margin-bottom: 10px"
                   v-for="(child, index) in item.questionList"
                   :key="child.id"
                   :id="`p-${child.id}`"
                 >
-                  <div class="item-title">
+                  <div
+                    class="item-title"
+                    :style="{
+                      marginBottom: child.type == 3 ? '10px' : '0',
+                      borderBottom: '1px solid #f3f3f3',
+                    }"
+                  >
                     <span>{{ index + 1 }}、</span>
                     <div v-html="`${child.title}`"></div>
                   </div>
@@ -564,29 +569,33 @@
       </div>
 
       <div class="content-right">
+        <div class="total-score">总分：{{ totalScore }}</div>
         <el-scrollbar wrap-style="overflow-x:hidden;" style="height: 100%">
-          <div class="total-score">总分：{{ totalScore }}</div>
-          <el-collapse v-model="questionRouter" v-if="paperQuestion.length > 0">
-            <el-collapse-item
+          <template v-if="paperQuestion.length > 0">
+            <div
+              class="router-content"
               v-for="(item, index) in paperQuestion"
-              :key="item.id"
-              :title="item.chapter.name"
-              :name="index"
+              :key="index"
             >
-              <div class="route-href">
-                <div
+              <div class="router-title" v-if="item.questionList">
+                第{{ $tools.intToChinese(index + 1) }}章（共{{
+                  item.questionList.length
+                }}题，合计{{ computeChapterScore(item.questionList) }}分）
+              </div>
+              <div class="router-link" v-if="item.questionList">
+                <a
                   :class="[
-                    'href-item',
-                    hrefPointer === `#p-${child.id}` ? 'href-item-active' : '',
+                    'router-index',
+                    routerIndex === child.id ? 'router-active' : '',
                   ]"
+                  @click="toHref(child.id)"
                   v-for="(child, index) in item.questionList"
                   :key="child.id"
+                  >{{ index + 1 }}</a
                 >
-                  <span @click="toHref(child.id)">{{ index + 1 }}</span>
-                </div>
               </div>
-            </el-collapse-item>
-          </el-collapse>
+            </div>
+          </template>
           <el-empty v-else description="暂无试题导航"> </el-empty>
         </el-scrollbar>
       </div>
@@ -825,7 +834,7 @@ export default {
     }
     return {
       preview: false,
-      hrefPointer: '',
+      routerIndex: '',
       paperId: 0,
       paperState: 2,
       paperTypeId: 0,
@@ -834,7 +843,6 @@ export default {
       pageSize: 5,
       curPage: 1,
       total: 0,
-      totalScore: 0,
       chapterForm: {
         id: 0,
         name: '章节名称',
@@ -888,10 +896,21 @@ export default {
     }
   },
   computed: {
-    questionRouter() {
-      return this.paperQuestion.map((item, index) => {
-        return index
-      })
+    totalScore() {
+      if (this.paperQuestion.length == 0) {
+        return 0
+      }
+
+      const questionList = this.paperQuestion.reduce((acc, cur) => {
+        acc.push(...cur.questionList)
+        return acc
+      }, [])
+
+      const totalScore = questionList.reduce((acc, cur) => {
+        return acc + cur.score
+      }, 0)
+
+      return totalScore
     },
   },
   filters: {
@@ -938,7 +957,6 @@ export default {
           item.questionList.map((question) => {})
         })
         this.paperQuestion = [...res.data]
-        this.computeScore()
       } catch (error) {
         this.$message.error(error.msg)
       }
@@ -963,21 +981,12 @@ export default {
         ? ((this.paperList = res.data.list), (this.total = res.data.total))
         : this.$message.error('请刷新重新获取试题！')
     },
-    // 计算分数
-    computeScore() {
-      if (this.paperQuestion.length == 0) {
-        this.totalScore = 0
-        return
-      }
-
-      const questionList = this.paperQuestion.reduce((acc, cur) => {
-        acc.push(...cur.questionList)
-        return acc
-      }, [])
-
-      this.totalScore = questionList.reduce((acc, cur) => {
+    // 计算章节分数
+    computeChapterScore(data) {
+      const num = data.reduce((acc, cur) => {
         return acc + cur.score
       }, 0)
+      return num
     },
     // 条件查询
     search() {
@@ -1237,9 +1246,9 @@ export default {
     },
     // 定位锚点
     toHref(id) {
-      this.hrefPointer = `#p-${id}`
+      this.routerIndex = id
       document
-        .querySelector(this.hrefPointer)
+        .querySelector(`#p-${id}`)
         .scrollIntoView({ block: 'end', inline: 'nearest' })
     },
     // 重置数据
@@ -1258,14 +1267,8 @@ export default {
 
 <style lang="scss" scoped>
 .container {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  padding-top: 0;
-  padding-bottom: 0;
-  margin-top: -15px;
+  margin-top: -20px;
 }
-
 .content {
   display: flex;
   width: 100%;
@@ -1436,6 +1439,9 @@ export default {
     .chapter {
       line-height: 40px;
     }
+    .drag-content {
+      border: none;
+    }
   }
   .chapter {
     display: flex;
@@ -1490,7 +1496,8 @@ export default {
     border-bottom: 1px solid #d8d8d8;
   }
   .children-content {
-    border: 1px solid #d8d8d8;
+    border-left: 1px solid #f3f3f3;
+    border-right: 1px solid #f3f3f3;
     font-size: 14px;
     box-sizing: border-box;
     &:not(:last-child) {
@@ -1576,7 +1583,7 @@ export default {
 .item-title {
   font-size: 14px;
   text-align: left;
-  line-height: 30px;
+  line-height: 50px;
   display: flex;
   padding-left: 7px;
   p {
@@ -1588,53 +1595,56 @@ export default {
 .content-right {
   width: 240px;
   background: #fff;
+  position: relative;
+  padding-top: 40px;
   .total-score {
-    background-color: rgb(30, 159, 255);
+    background: #0094e5;
     width: 100%;
     height: 40px;
     line-height: 40px;
-    text-align: center;
-    font-size: 15px;
+    font-size: 16px;
     color: #fff;
+    text-align: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
   }
 }
 
-/deep/ .el-collapse-item__header {
-  background: rgba(54, 54, 69, 0.05);
-  color: #000;
-  padding: 0 10px;
-  height: 40px;
-  line-height: 40px;
-}
+.router-content {
+  margin: 0 20px;
+  .router-title {
+    line-height: 40px;
+    font-size: 13px;
+  }
 
-.route-href {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  width: 100%;
-  padding: 10px 15px 0;
-  .href-item {
-    width: 20%;
-    height: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  .router-index {
+    position: relative;
+    width: 28px;
+    height: 28px;
+    color: #c3c3c3;
+    line-height: 28px;
+    background: #f4f4f4;
+    border: 1px solid #e5e5e5;
+    text-align: center;
+    display: inline-block;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    border-radius: 3px;
+    text-decoration: none;
     cursor: pointer;
-    span {
-      display: inline-block;
-      width: 30px;
-      height: 30px;
-      line-height: 30px;
-      text-align: center;
-      font-size: 14px;
-      border: 1px solid #d8d8d8;
+    user-select: none;
+    &:nth-child(5n) {
+      margin-right: 0;
     }
   }
-  .href-item-active {
-    span {
-      border: 1px solid #0094e5;
-      color: #0094e5;
-    }
+
+  .router-active,
+  a:hover {
+    background: #c2e4ff;
+    border: 1px solid #7fc2f6;
+    color: #83c3f7;
   }
 }
 

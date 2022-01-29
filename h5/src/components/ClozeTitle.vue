@@ -20,23 +20,16 @@ export default {
       default: 0,
     },
     preview: {
-      type: [String, Boolean],
-      default: '',
+      type: Boolean,
+      default: false,
     },
     paperQuestion: {
       type: Array,
       default: () => [],
     },
     myExamDetailCache: {
-      type: [Object, Array],
-    },
-    routerIndex: {
-      type: Number,
-      default: null,
-    },
-    isMark: {
-      type: Boolean,
-      default: false,
+      type: Object,
+      default: () => {},
     },
   },
   data() {
@@ -56,11 +49,7 @@ export default {
         title.indexOf(underline) + underline.length
       )
       // questionId 存在则为整卷方式，否则为单体方式
-      const inputHtml = questionId
-        ? props.isMark
-          ? `<el-input class="title-text" :disabled="${props.isMark}" v-model="myExamDetailCache[${index}]"></el-input>`
-          : `<el-input class="title-text" @change='updateAnswer(${questionId})' :disabled='preview === "true" ? true : false' v-model='myExamDetailCache[${questionId}].answers[${index}]'></el-input>`
-        : `<el-input class="title-text" @change='updateAnswer(paperQuestion[routerIndex].id)' :disabled='preview === "true" ? true : false' v-model='myExamDetailCache[paperQuestion[routerIndex].id].answers[${index}]'></el-input>`
+      const inputHtml = `<el-input class="cloze-input" @change='updateAnswer(${questionId})' :disabled='${props.preview}' v-model='myExamDetailCache[${questionId}].answers[${index}]'></el-input>`
       title = `${titleStart}${inputHtml}${titleEnd}`
     })
     let titleTemplate = {
@@ -69,7 +58,7 @@ export default {
         return props
       },
     }
-    if (!props.isMark) {
+    if (!props.preview) {
       Object.assign(titleTemplate, {
         methods: {
           updateAnswer,
@@ -82,8 +71,8 @@ export default {
 </script>
 
 <style lang="scss">
-.title-text {
-  width: fit-content;
-  min-width: 100px;
+.cloze-input {
+  width: fit-content !important;
+  min-width: 100px !important;
 }
 </style>
