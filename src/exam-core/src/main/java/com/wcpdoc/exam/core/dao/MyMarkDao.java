@@ -31,5 +31,5 @@ public interface MyMarkDao extends BaseDao<MyMark>{
 	 * @param examUserName
 	 * @return List<Map<String,String>>
 	 */
-	List<Map<String, Object>> getUserList(Integer examId, Integer markUserId, String examUserName);
+	List<Map<String, Object>> getUserList(Integer examId, Integer markUserId, String examUserName, Integer examUserId);
 }

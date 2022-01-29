@@ -76,12 +76,8 @@ public class ApiUserController extends BaseController {
 		try {
 			PageOut pageOut = userService.getListpage(new PageIn(request));
 			for (Map<String, Object> map : pageOut.getList()) {
-				if (map.get("roles") != null) {
-					map.put("roleNames", ConstantManager.SUB_ADMIN_LOGIN_NAME.equals(((String) map.get("roles"))) ? "子管理员" : "用户");
-				} else {
-					map.put("roleNames", "用户");
-				}
-
+				map.put("roles", map.get("roles").toString().split(","));
+				
 				if (ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) { // 如果是管理员，显示在线状态和最后在线时间
 					Integer id = (Integer) map.get("id");
 					OnlineUser onlineUser = onlineUserService.getEntity(id);

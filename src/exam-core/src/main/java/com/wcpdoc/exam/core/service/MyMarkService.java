@@ -52,5 +52,5 @@ public interface MyMarkService extends BaseService<MyMark>{
 	 * @param examUserName
 	 * @return List<Map<String,Object>>
 	 */
-	List<Map<String, Object>> getUserList(Integer examId, String examUserName);
+	List<Map<String, Object>> getUserList(Integer examId, String examUserName, Integer userId);
 }

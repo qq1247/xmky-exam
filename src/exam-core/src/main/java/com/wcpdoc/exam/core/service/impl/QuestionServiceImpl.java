@@ -19,6 +19,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.safety.Whitelist;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -133,7 +134,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 		if (question.getType() == 3) {
 			Pattern p = Pattern.compile("[_]{5,}"); //正则表达式
-			Matcher m = p.matcher(question.getTitle()); // 获取 matcher 对象
+			Matcher m = p.matcher(Jsoup.clean(question.getTitle(), Whitelist.none())); // 获取 matcher 对象
 			int count = 0;
 			while(m.find()) {
 				count++;
@@ -290,7 +291,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 		if (question.getType() == 3) {
 			Pattern p = Pattern.compile("[_]{5,}"); //正则表达式
-			Matcher m = p.matcher(question.getTitle()); // 获取 matcher 对象
+			Matcher m = p.matcher(Jsoup.clean(question.getTitle(), Whitelist.none()));// 获取 matcher 对象
 			int count = 0;
 			while(m.find()) {
 				count++;

@@ -153,6 +153,9 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		}
 
 		File entity = getEntity(id);
+		if (entity == null) {
+			throw new MyException("id不存在");// 测试切换数据库时，文件找不到，报错太多，转成自定义异常，log打印一行就可以。
+		}
 		String baseDir = getFileUploadDir();
 		java.io.File file = new java.io.File(String.format("%s/%s", baseDir, entity.getPath()));
 		if (!file.exists()) {

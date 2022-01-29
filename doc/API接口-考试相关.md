@@ -255,6 +255,9 @@ http请求头需添加Authorization字段，
 | data.list[].score            | Double  | 分值         |
 | data.list[].scoreOptions     | Integer[]  | 分值选项     |
 | data.list[].createUserName     | String  | 创建人     |
+| data.list[].answers[]      | Object[]   | 答案数组   |
+| data.list[].answers[].answer      | String   | 答案   |
+| data.list[].answers[].score     | Double    | 得分   |
 
 ### 试题添加：question/add
 | 请求参数| 类型  | 描述    | 必填 |
@@ -444,7 +447,7 @@ http请求头需添加Authorization字段，
 ### 试卷试题列表：paper/paperQuestionList
 | 请求参数| 类型    | 描述   | 必填 |
 | ---- | ------- | ------ | ---- |
-| id   | Integer | 试卷id | 否   |
+| id   | Integer | 试卷id | 是   |
 
 | 响应参数|  类型   |  描述  |
 | --------   | -----   | -----  |
@@ -540,7 +543,7 @@ http请求头需添加Authorization字段，
 | data.list[].paperMarkType  | Integer |  试卷阅卷类型   |
 | data.list[].paperId| Integer| 试卷Id    |
 | data.list[].paperName|String| 试卷名称    |
-| data.list[].paperTotleScore| Double| 试卷总分    |
+| data.list[].paperTotalScore| Double| 试卷总分    |
 | data.list[].paperPassScore| Double  | 试卷及格分数   |
 
 ### 考试添加：exam/add

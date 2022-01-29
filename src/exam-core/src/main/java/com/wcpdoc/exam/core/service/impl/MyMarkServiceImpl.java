@@ -180,7 +180,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 			throw new MyException("未参与阅卷");
 		}
 		
-		List<MyExamDetail> myExamDetailList = myExamDetailService.getList(examId, userId);
+		List<MyExamDetail> myExamDetailList = myExamDetailService.getUserAnswerList(examId, userId);
 		int num = 0;
 		BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
 		for (MyExamDetail myExamDetail : myExamDetailList) {
@@ -211,8 +211,8 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 	}
 
 	@Override
-	public List<Map<String, Object>> getUserList(Integer examId, String examUserName) {
-		List<Map<String, Object>> userList = myMarkDao.getUserList(examId, getCurUser().getId(), examUserName);
+	public List<Map<String, Object>> getUserList(Integer examId, String examUserName, Integer userId) {
+		List<Map<String, Object>> userList = myMarkDao.getUserList(examId, getCurUser().getId(), examUserName, userId);
 		for(Map<String, Object> map : userList){
 			if (map.get("answerStartTime") != null) {
 				map.put("answerStartTime", DateUtil.formatDateTime((Date)map.get("answerStartTime")));

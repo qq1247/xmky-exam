@@ -102,12 +102,12 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 	}
 
 	@Override
-	public List<Map<String, Object>> getUserList(Integer id) {
+	public List<Map<String, Object>> getUserList(Integer examId) {
 		String sql = "SELECT USER.ID, USER.NAME AS NAME, ORG.NAME AS ORG_NAME "
 				+ "FROM SYS_USER USER "
 				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
 				+ "WHERE EXISTS (SELECT 1 FROM EXM_MY_EXAM Z WHERE Z.EXAM_ID = ? AND Z.USER_ID = USER.ID) "//回显的情况下，用户状态!=1的也查询
 				+ "ORDER BY USER.UPDATE_TIME DESC ";
-		return getMapList(sql, new Object[]{id});
+		return getMapList(sql, new Object[]{examId});
 	}
 }

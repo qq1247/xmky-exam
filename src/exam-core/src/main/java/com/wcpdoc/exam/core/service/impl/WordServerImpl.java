@@ -246,7 +246,8 @@ public class WordServerImpl extends WordServer {
 		List<Node> answerRows = parseAnswerRows(singleQuestion);
 		if (type == 3) {
 			Pattern p = Pattern.compile("[_]{5,}"); //正则表达式
-			Matcher m = p.matcher(titleRows.toString()); // 获取 matcher 对象
+			String txt = getTxt(titleRows, 0, titleRows.size());
+			Matcher m = p.matcher(Jsoup.clean(txt, Whitelist.none())); // 获取 matcher 对象
 			int count = 0;
 			while(m.find()) {
 				count++;
@@ -417,9 +418,7 @@ public class WordServerImpl extends WordServer {
 		if (type == 1 || type == 2 || type == 3 || type == 4 || (type == 5 && ai.getAi() == 1)) {
 			for (Node answerNode : answerNodeList) {
 				String answerTxt = Jsoup.clean(answerNode.outerHtml(), Whitelist.none()); // 【答案：B】【分值：2】 
-				System.err.println(answerTxt.indexOf("】【分值："));
 				String answer = answerTxt.substring(4, answerTxt.indexOf("】【分值：")).trim();
-				System.err.println(answerTxt.indexOf("】【分值："));  
 				String scoreStr = answerTxt.substring(answerTxt.indexOf("【分值：") + 4, answerTxt.length() - 1).trim(); //  原 ： answerTxt.length() - 2    现： answerTxt.indexOf("【分值：") + 4        问题：【分值：22】  这个分值可能是两位数
 				Double score = null;
 				try {
