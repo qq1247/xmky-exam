@@ -470,11 +470,11 @@ export default {
       }
     },
     // 下一题
-    nextQuestion() {
+    async nextQuestion() {
       const questionLength = this.questionList.length
       if (this.index < questionLength - 1) {
+        await this.markEnd()
         this.index += 1
-        this.markEnd()
       } else {
         this.nextPaper()
         this.index = 0
@@ -489,9 +489,9 @@ export default {
         this.$message.warning('已经是最后一卷了！')
         return
       }
+      await this.markEnd()
       this.userId = this.userList[index + 1].userId
       this.userInfo = this.userList[index + 1]
-      this.markEnd()
       await this.queryAnswerInfo()
     },
     // 完成阅卷
