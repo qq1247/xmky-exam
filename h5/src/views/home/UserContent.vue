@@ -55,7 +55,10 @@
                     </div>
                     <div class="item-pass">
                       及格：{{
-                        (item.paperPassScore / 100) * item.paperTotalScore
+                        (
+                          (item.paperPassScore / 100) *
+                          item.paperTotalScore
+                        ).toFixed(2)
                       }}
                     </div>
                   </div>
@@ -125,7 +128,10 @@
                     </div>
                     <div class="item-pass">
                       及格：{{
-                        (item.paperPassScore / 100) * item.paperTotalScore
+                        (
+                          (item.paperPassScore / 100) *
+                          item.paperTotalScore
+                        ).toFixed(2)
                       }}
                     </div>
                   </div>

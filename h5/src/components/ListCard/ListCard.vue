@@ -39,11 +39,11 @@
         <el-row :gutter="20" class="content-info">
           <el-col :span="12" class="info-left"
             >及格：{{
-              (data.paperPassScore * data.paperTotleScore) / 100
+              ((data.paperPassScore / 100) * data.paperTotalScore).toFixed(2)
             }}</el-col
           >
           <el-col :span="12" class="info-right"
-            >满分：{{ data.paperTotleScore }}</el-col
+            >满分：{{ data.paperTotalScore }}</el-col
           >
         </el-row>
         <el-row class="content-info">
@@ -132,11 +132,15 @@ export default {
     isRole(data) {
       // 是否已经发布
       const isPublish = data.state == 1
-      // 是否是子分类
-      const isChildrenClassify = ['paperList', 'examList'].includes(this.name)
 
-      if (isChildrenClassify && isPublish) {
-        this.$message.warning('已发布不可操作！')
+      const now = new Date().getTime()
+      const startTime = new Date(data.startTime).getTime()
+      const endTime = new Date(data.endTime).getTime()
+      // 是否在考试时间段内
+      const examTimeRange = now > startTime && now < endTime
+
+      if (this.name === 'examList' && isPublish && examTimeRange) {
+        this.$message.warning('暂无此项权限！')
         return true
       }
       return false

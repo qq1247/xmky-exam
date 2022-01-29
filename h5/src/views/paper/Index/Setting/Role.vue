@@ -10,6 +10,14 @@
 
 <template>
   <div class="container">
+    <el-alert
+      show-icon
+      type="success"
+      effect="dark"
+      title="共享权限"
+      description="共享试卷给其他管理员。如各部门创建各部门的入职试卷后，共享给人事，人事选择对应的试卷面试候选人"
+      style="margin-bottom: 20px"
+    ></el-alert>
     <el-form :model="roleForm" ref="roleForm" label-width="100px">
       <el-form-item label="使用权限" prop="readRoleUser">
         <CustomSelect

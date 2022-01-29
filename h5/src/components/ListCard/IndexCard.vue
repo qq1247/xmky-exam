@@ -100,13 +100,10 @@ export default {
       // 是否是创建者
       const isCreateUser =
         data.createUserId && this.$store.getters.userId != data.createUserId
-      // 是否是修改者
-      const isUpdateUser =
-        data.updateUserId && this.$store.getters.userId != data.updateUserId
       // 是否是分类
-      const isparentClassify = ['question', 'paper', 'exam'].includes(this.name)
+      const isParentClassify = ['question', 'paper', 'exam'].includes(this.name)
 
-      if (isparentClassify && (isCreateUser || isUpdateUser)) {
+      if (isParentClassify && isCreateUser) {
         this.$message.warning('暂无此项权限！')
         return true
       }

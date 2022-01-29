@@ -9,6 +9,14 @@
 -->
 <template>
   <div class="container">
+    <el-alert
+      show-icon
+      type="success"
+      effect="dark"
+      title="移动"
+      description="移动当前分类到其他分类"
+      style="margin-bottom: 20px"
+    ></el-alert>
     <el-form
       :model="examForm"
       :rules="examForm.rules"

@@ -14,7 +14,6 @@ const getters = {
   userId: (state) => state.user.userId,
   onlyRole: (state) => state.user.onlyRole,
   orgName: (state) => state.setting.orgName,
-  tabIndex: (state) => state.setting.tabIndex,
   permission_routes: (state) => state.permission.routes,
 }
 export default getters

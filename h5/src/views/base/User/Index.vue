@@ -53,9 +53,13 @@
                 <span style="margin-left: 10px">{{ scope.row.loginName }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="角色">
+            <el-table-column label="功能" width="240px">
               <template slot-scope="scope">
-                <span style="margin-left: 10px">{{ scope.row.roleNames }}</span>
+                <span style="margin-left: 10px">{{
+                  scope.row.roles.includes('subAdmin')
+                    ? '答题 | 出题 | 组织考试 | 阅卷 | 统计'
+                    : '答题'
+                }}</span>
               </template>
             </el-table-column>
             <el-table-column label="机构名称">
@@ -63,7 +67,7 @@
                 <span style="margin-left: 10px">{{ scope.row.orgName }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="子管理员">
+            <el-table-column label="子管理员" width="80px">
               <template slot-scope="scope">
                 <el-switch
                   active-color="#13ce66"

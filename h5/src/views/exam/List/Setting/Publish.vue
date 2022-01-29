@@ -11,7 +11,8 @@
   <div class="container">
     <el-alert
       show-icon
-      type="warning"
+      effect="dark"
+      type="success"
       title="发布以进行后续操作操作"
       description="只有发布状态才可以进行阅卷设置、在线人员、统计等的操作"
     ></el-alert>

@@ -103,7 +103,7 @@ export default {
     width: 100%;
     height: 50px;
     line-height: 50px;
-    font-weight: 700;
+    font-weight: 600;
     border-bottom: 1px solid #ececec;
     margin-bottom: 20px;
   }
