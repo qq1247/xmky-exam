@@ -9,13 +9,6 @@
 -->
 <template>
   <div class="container">
-    <el-alert
-      show-icon
-      type="success"
-      effect="dark"
-      title="此操作将恢复到初始密码"
-      description="恢复的初始密码由系统设置中确定"
-    ></el-alert>
     <div class="form-footer">
       <el-button @click="initPwd" type="success">初始化密码</el-button>
     </div>
