@@ -73,43 +73,48 @@ public class ServerParmServiceImpl implements ServerPramService {
 			
 			data = new HashMap<String, Object>();
 			data.put("name", "CPU");
-			data.put("value", String.format("%sGHZ * %s", cpuInfo.getMhz() / 1000.0, cpuInfos.length));
+			data.put("value", String.format("%sGHZ * %s核", cpuInfo.getMhz() / 1000.0, cpuInfos.length));
 			result.add(data);
 			
 			CpuPerc[] cpuPercs = sigar.getCpuPercList();
+			data = new HashMap<String, Object>();
+			data.put("name", String.format("CPU使用率"));
 			for (int i = 0; i < cpuPercs.length; i++) {
-				data = new HashMap<String, Object>();
-				data.put("name", String.format("CPU-%s使用率", i));
-				data.put("value", CpuPerc.format(cpuPercs[i].getCombined()));
-				result.add(data);
+				data.put("value", String.format("%s[%s] ", 
+						data.get("value") == null ? "" : data.get("value"),
+						CpuPerc.format(cpuPercs[i].getCombined())));
 			}
+			result.add(data);
 			
 			// 获取内存信息
 			Mem mem = sigar.getMem();
 			data = new HashMap<String, Object>();
-			data.put("name", "内存");
+			data.put("name", "总共内存占用");
 			data.put("value", String.format("%sM/%sM", mem.getUsed() / 1024 / 1024, mem.getTotal() / 1024 / 1024));
 			result.add(data);
 			
 			Runtime runtime = Runtime.getRuntime();
 			data = new HashMap<String, Object>();
-			data.put("name", "程序内存");
+			data.put("name", "当前服务占用");
 			data.put("value", String.format("%sM/%sM", runtime.freeMemory() / 1024 / 1024, runtime.totalMemory() / 1024 / 1024));
 			result.add(data);
 			
 			// 获取硬盘信息
 			FileSystem[] fileSystems = sigar.getFileSystemList();
+			data = new HashMap<String, Object>();
+			data.put("name", "硬盘占用率");
 			for (FileSystem fileSystem : fileSystems) {
 				if (fileSystem.getType() != 2) {// 比如光驱
 					continue;
 				}
 				
 				FileSystemUsage fileSystemUsage = sigar.getFileSystemUsage(fileSystem.getDirName());
-				data = new HashMap<String, Object>();
-				data.put("name", fileSystem.getDirName());
-				data.put("value", String.format("%sG/%sG", fileSystemUsage.getUsed() / 1024 / 1024, fileSystemUsage.getTotal() / 1024 / 1024));
-				result.add(data);
+				data.put("value", String.format("%s[%s - %sG/%sG] ", 
+						data.get("value") == null ? "" : data.get("value"),
+						fileSystem.getDirName(), 
+						fileSystemUsage.getUsed() / 1024 / 1024, fileSystemUsage.getTotal() / 1024 / 1024));
 			}
+			result.add(data);
 			
 			// 软件信息
 			data = new HashMap<String, Object>();
