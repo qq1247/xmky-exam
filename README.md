@@ -5,16 +5,18 @@
 ## 界面
 ### 首页
 ![输入图片说明](img/1.png)
-### 组卷
+### 人工组卷
 ![输入图片说明](img/2.png)
-### 答题
+### 考试答题
 ![输入图片说明](img/3.png)
-### 阅卷
+### 人工阅卷
 ![输入图片说明](img/4.png)
 ### 编辑试题
 ![输入图片说明](img/5.png)
-### 导入试题
+### 考试统计
 ![输入图片说明](img/6.png)
+### 试题导入
+![输入图片说明](img/7.png)
 
 ## 账号
 系统管理员	admin	111111
@@ -31,7 +33,7 @@
 ## 技术实现
 bs架构，采用开源组件jdk8、mysql5.7、springboot2x、elementUI2x
 
-![输入图片说明](img/7.png)
+![输入图片说明](img/9.png)
 <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=Vqhsz3XUUg-SS4m8LM0mrL3WcnKrL9xo&jump_from=webapi"><img border="0" src="//pub.idqqimg.com/wpa/images/group.png" alt="在线考试技术交流群" title="在线考试技术交流群"></a>
 
 ## 开源项目推荐

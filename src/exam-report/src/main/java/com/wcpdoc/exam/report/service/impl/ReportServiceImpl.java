@@ -171,7 +171,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		Elements elementsByTag = parse.getElementsByTag("RollingFile");
 		File logFile = new File(elementsByTag.attr("filename"));
 		Long fileLen = logFile.length();
-		Long curReadLen = fileLen - 10000;
+		Long curReadLen = fileLen - 10000;//只读取最后10000字节的日志
 		curReadLen = curReadLen < 0 ? 0 : curReadLen;
 		List<String> strList = StringUtil.getString(logFile, curReadLen, fileLen);
 

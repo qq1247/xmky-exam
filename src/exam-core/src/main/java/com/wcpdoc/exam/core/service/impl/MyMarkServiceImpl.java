@@ -191,7 +191,8 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 			}
 		}
 		if (num > 0) {
-			throw new MyException("还有" + num + "道题未阅");
+			return;// 如果还有题未阅，不标记未阅卷完成。如果阅卷时间结束，定时任务会处理。
+			//throw new MyException("还有" + num + "道题未阅");
 		}
 		
 		// 标记为已阅，记录阅卷人，统计总分数，标记是否及格
