@@ -9,14 +9,8 @@
 -->
 <template>
   <div class="container">
-    <el-alert
-      show-icon
-      type="success"
-      effect="dark"
-      title="启动任务"
-    ></el-alert>
     <div class="form-footer">
-      <el-button @click="startTask" type="success">启动任务</el-button>
+      <el-button @click="startTask" type="primary">启动</el-button>
     </div>
   </div>
 </template>
@@ -39,9 +33,10 @@ export default {
       const res = await cronStartTask({ id: this.id })
       if (res?.code != 200) {
         this.$message.error(res.msg)
+        return
       }
 
-      this.$router.back()
+      this.$message.success('启动成功')
     },
   },
 }

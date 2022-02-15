@@ -90,7 +90,7 @@ export default [
     name: 'Bulletin',
     meta: {
       layout: 'admin',
-      title: '我的公告',
+      title: '公告管理',
       icon: 'common common-notice',
     },
     children: [
@@ -100,7 +100,7 @@ export default [
         name: 'BulletinIndex',
         meta: {
           layout: 'admin',
-          title: '我的公告',
+          title: '公告管理',
           icon: 'common common-notice',
         },
         children: [

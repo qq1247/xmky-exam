@@ -27,7 +27,7 @@
                   icon="el-icon-circle-plus-outline"
                   size="mini"
                   type="primary"
-                  >添加用户</el-button
+                  >添加</el-button
                 >
               </el-form-item>
             </el-col>
@@ -48,26 +48,17 @@
                 <span style="margin-left: 10px">{{ scope.row.name }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="登录名称">
+            <el-table-column label="登录账号">
               <template slot-scope="scope">
                 <span style="margin-left: 10px">{{ scope.row.loginName }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="功能" width="240px">
-              <template slot-scope="scope">
-                <span style="margin-left: 10px">{{
-                  scope.row.roles.includes('subAdmin')
-                    ? '答题 | 出题 | 组织考试 | 阅卷 | 统计'
-                    : '答题'
-                }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="机构名称">
+            <el-table-column label="所属机构">
               <template slot-scope="scope">
                 <span style="margin-left: 10px">{{ scope.row.orgName }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="子管理员" width="80px">
+            <el-table-column label="子管理员权限">
               <template slot-scope="scope">
                 <el-switch
                   active-color="#13ce66"
@@ -79,22 +70,25 @@
                 ></el-switch>
               </template>
             </el-table-column>
+            <el-table-column label="权限描述" width="240px">
+              <template slot-scope="scope">
+                <span style="margin-left: 10px">{{
+                  scope.row.roles.includes('subAdmin')
+                    ? '答题 | 出题 | 组织考试 | 阅卷 | 统计'
+                    : '答题'
+                }}</span>
+              </template>
+            </el-table-column>
             <el-table-column label="操作" width="300">
               <template slot-scope="scope">
-                <el-tooltip placement="top" content="编辑">
+                <el-tooltip placement="top" content="修改">
                   <i class="common common-edit" @click="edit(scope.row.id)"></i>
                 </el-tooltip>
                 <el-tooltip placement="top" content="删除">
-                  <i
-                    class="common common-delete"
-                    @click="del(scope.row.id)"
-                  ></i>
+                  <i class="common common-delete" @click="del(scope.row.id)"></i>
                 </el-tooltip>
-                <el-tooltip placement="top" content="密码重置">
-                  <i
-                    class="common common-pwd-reset"
-                    @click="initPwd(scope.row.id)"
-                  ></i>
+                <el-tooltip placement="top" content="重置密码">
+                  <i class="common common-pwd-reset" @click="initPwd(scope.row.id)"></i>
                 </el-tooltip>
                 <el-tooltip
                   placement="top"
@@ -181,7 +175,7 @@ export default {
       const roles = [e === 2 ? 'subAdmin' : 'user']
       await userRole({ id, roles })
     },
-    // 初始化密码
+    // 重置密码
     async initPwd(id) {
       this.$tools.switchTab('UserIndexSetting', {
         id,

@@ -44,7 +44,7 @@
               <span style="margin-left: 10px">{{ scope.row.stateName }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="最近三次运行时间">
+          <el-table-column label="最近三次触发时间">
             <template slot-scope="scope">
               <span :key="item" v-for="item in scope.row.triggerTimes">
                 <el-tag effect="plain" style="margin-bottom: 3px" v-if="item">{{
@@ -55,7 +55,7 @@
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-tooltip placement="top" content="编辑">
+              <el-tooltip placement="top" content="修改">
                 <i class="common common-edit" @click="edit(scope.row.id)"></i>
               </el-tooltip>
               <el-tooltip placement="top" content="删除">
@@ -73,7 +73,7 @@
                   @click="stopTask(scope.row.id)"
                 ></i>
               </el-tooltip>
-              <el-tooltip placement="top" content="执行一次">
+              <el-tooltip placement="top" content="运行一次">
                 <i
                   class="common common-once"
                   @click="onceTask(scope.row.id)"
@@ -168,7 +168,7 @@ export default {
         tab: '3',
       })
     },
-    // 执行一次
+    // 运行一次
     onceTask(id) {
       this.$tools.switchTab('CronIndexSetting', {
         id,

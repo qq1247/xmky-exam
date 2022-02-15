@@ -24,7 +24,9 @@
       <el-card class="box-card" shadow="never">
         <div slot="header">
           <div class="header-name">{{ contentName }}</div>
-          <div class="header-intro">{{ contentIntro }}</div>
+          <div class="header-intro">{{ contentIntro }}
+            <router-link :to="{name: contentUrl}" v-if="contentUrl" class="header-url">去设置</router-link>
+          </div>
         </div>
         <component :is="currentView"></component>
       </el-card>
@@ -46,14 +48,17 @@ export default {
     return {
       tab: [
         {
-          name: '编辑',
-          intro: '这是编辑副标题',
+          name: '用户信息',
+          intro: '添加/修改',
           icon: 'common common-edit',
-          contentName: '这是编辑内容标题',
-          contentIntro: '这是编辑内容副标题',
+          contentName: '用户信息',
+          contentIntro: '',
           index: '1',
         },
       ],
+      contentName: '',
+      contentIntro: '',
+      contentUrl: '',
       viewList: [Setting, InitPwd, Delete],
       currentView: null,
     }
@@ -63,19 +68,20 @@ export default {
       this.tab = [
         ...this.tab,
         {
-          name: '初始化密码',
-          intro: '这是编辑副标题',
+          name: '重置密码',
+          intro: '恢复默认密码',
           icon: 'common common-lock',
-          contentName: '这是密码内容标题',
-          contentIntro: '这是密码内容副标题',
+          contentName: '重置密码',
+          contentIntro: '恢复默认密码，一般在用户忘记密码时使用。可在【系统参数/用户密码】设置默认值。',
+          contentUrl: 'ParamIndex',
           index: '2',
         },
         {
           name: '删除',
-          intro: '这是编辑副标题',
+          intro: '删除用户',
           icon: 'common common-delete',
-          contentName: '这是内容标题',
-          contentIntro: '这是内容副标题',
+          contentName: '删除',
+          contentIntro: '用户被删除后，之前参加过的考试、答题等信息会保留。',
           index: '3',
         },
       ]
@@ -83,6 +89,7 @@ export default {
     this.currentView = this.viewList[Number(this.tabIndex) - 1]
     this.contentName = this.tab[Number(this.tabIndex) - 1].contentName
     this.contentIntro = this.tab[Number(this.tabIndex) - 1].contentIntro
+    this.contentUrl = this.tab[Number(this.tabIndex) - 1].contentUrl || ''
   },
   computed: {
     tabIndex: {
@@ -93,6 +100,7 @@ export default {
         this.currentView = this.viewList[Number(val) - 1]
         this.contentName = this.tab[Number(val) - 1].contentName
         this.contentIntro = this.tab[Number(val) - 1].contentIntro
+        this.contentUrl = this.tab[Number(val) - 1].contentUrl || ''
       },
     },
   },
@@ -107,6 +115,8 @@ export default {
 }
 /deep/ .el-tabs {
   margin-right: 20px;
+  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
+  border: none;
 }
 /deep/ .el-tabs__item {
   height: auto;
@@ -115,6 +125,12 @@ export default {
   &:last-child {
     border-bottom: none;
   }
+}
+/deep/ .el-tabs--right .el-tabs__header.is-right{
+  margin-left: 0;
+}
+/deep/ .el-tabs--right .el-tabs__active-bar.is-right {
+  width: 3px;
 }
 /deep/ .el-tabs__header {
   background: #fff;
@@ -144,11 +160,16 @@ export default {
   .label-intro {
     font-size: 12px;
     color: #999;
-    margin-top: 10px;
+    margin-top: 2px;
   }
 }
 .setting-right {
   flex: 1;
+}
+
+/deep/.el-card {
+  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
+  border: none;
 }
 
 /deep/.el-card__header {
@@ -164,5 +185,11 @@ export default {
 .header-intro {
   font-size: 13px;
   color: #999;
+}
+.header-url {
+  font-size: 13px;
+  color: #0094e5;
+  text-decoration: underline;
+  cursor: pointer;
 }
 </style>

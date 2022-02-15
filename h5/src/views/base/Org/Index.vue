@@ -36,7 +36,7 @@
               <span style="margin-left: 10px">{{ scope.row.name }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="上级机构">
+          <el-table-column label="所属机构">
             <template slot-scope="scope">
               <span style="margin-left: 10px">{{ scope.row.parentName }}</span>
             </template>
@@ -46,27 +46,17 @@
               <span style="margin-left: 10px">{{ scope.row.no }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="操作">
+          <el-table-column label="操作" width="300">
             <template slot-scope="scope">
-              <el-link
-                :underline="false"
-                @click="add(scope.row.id)"
-                icon="common common-add"
-                >添加</el-link
-              >
-              <el-link
-                :underline="false"
-                @click="edit(scope.row.id)"
-                icon="common common-edit"
-                >修改</el-link
-              >
-              <el-link
-                :underline="false"
-                @click="del(scope.row.id)"
-                icon="common common-delete"
-                v-if="scope.row.id != 1"
-                >删除</el-link
-              >
+              <el-tooltip placement="top" content="添加">
+                <i class="common common-add" @click="add(scope.row.id)"></i>
+              </el-tooltip>
+              <el-tooltip placement="top" content="修改">
+                <i class="common common-edit" @click="edit(scope.row.id)"></i>
+              </el-tooltip>
+              <el-tooltip placement="top" content="删除">
+                <i class="common common-delete" @click="del(scope.row.id)"></i>
+              </el-tooltip>
             </template>
           </el-table-column>
         </el-table>
@@ -208,16 +198,10 @@ export default {
   text-align: center;
   border-bottom: 1px solid #ddd;
 }
-/deep/ .common {
-  padding-right: 10px;
+.common {
+  padding: 0 10px;
   color: #0096e7;
-  font-style: inherit;
-  font-weight: bold;
-}
-.el-link {
-  padding-right: 20px;
-  color: #8392a6;
-  font-size: 12px;
+  font-size: 18px;
 }
 /deep/ .el-input__inner:focus {
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
