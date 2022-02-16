@@ -21,16 +21,16 @@
     <div class="info-content">
       <template v-if="onlyRole[0] === 'user'">
         <div class="content-item" v-if="userInfo.exam">
-          <p><span>考试次数：</span>{{ userInfo.exam.num }}</p>
-          <p><span>缺考次数：</span>{{ userInfo.exam.missNum }}</p>
-          <p><span>通过次数：</span>{{ userInfo.exam.succNum }}</p>
-          <p><span>最高排名：</span>{{ userInfo.exam.top }}</p>
+          <p><span>参加考试：</span>{{ userInfo.exam.num }}场</p>
+          <p><span>一共缺考：</span>{{ userInfo.exam.missNum }}次</p>
+          <p><span>一共及格：</span>{{ userInfo.exam.succNum }}次</p>
+          <p><span>最高排名：</span>{{ userInfo.exam.top }}名</p>
         </div>
         <div class="content-item" v-if="userInfo.score">
-          <p><span>平均分：</span>{{ userInfo.score.avg }}</p>
-          <p><span>最低分：</span>{{ userInfo.score.min }}</p>
-          <p><span>最高分：</span>{{ userInfo.score.max }}</p>
-          <p><span>标准差：</span>{{ userInfo.score.sd }}</p>
+          <p><span>平均成绩：</span>{{ userInfo.score.avg }}分</p>
+          <p><span>最低成绩：</span>{{ userInfo.score.min }}分</p>
+          <p><span>最高成绩：</span>{{ userInfo.score.max }}分</p>
+          <!-- <p><span>标准差：</span>{{ userInfo.score.sd }}</p> -->
         </div>
       </template>
       <template v-if="onlyRole[0] === 'subAdmin'">
@@ -43,10 +43,10 @@
             userInfo.myMark
           "
         >
-          <p><span>创建考试次数：</span>{{ userInfo.exam.num }}</p>
-          <p><span>创建试卷次数：</span>{{ userInfo.paper.num }}</p>
-          <p><span>创建试题次数：</span>{{ userInfo.question.num }}</p>
-          <p><span>待阅试卷：</span>{{ userInfo.myMark.num }}</p>
+          <p><span>创建考试：</span>{{ userInfo.exam.num }}场</p>
+          <p><span>创建试卷：</span>{{ userInfo.paper.num }}张</p>
+          <p><span>创建试题：</span>{{ userInfo.question.num }}题</p>
+          <p><span>待阅试卷：</span>{{ userInfo.myMark.num }}张</p>
         </div>
       </template>
       <template v-if="onlyRole[0] === 'admin'">
@@ -59,10 +59,10 @@
             userInfo.onlineUser
           "
         >
-          <p><span>创建用户数：</span>{{ userInfo.user.num }}</p>
-          <p><span>创建子管理数：</span>{{ userInfo.subAdmin.num }}</p>
-          <p><span>创建公告数：</span>{{ userInfo.bulletin.num }}</p>
-          <p><span>在线用户：</span>{{ userInfo.onlineUser.num }}</p>
+          <p><span>创建用户：</span>{{ userInfo.user.num }}人</p>
+          <p><span>创建子管理：</span>{{ userInfo.subAdmin.num }}人</p>
+          <p><span>创建公告：</span>{{ userInfo.bulletin.num }}个</p>
+          <p><span>在线用户：</span>{{ userInfo.onlineUser.num }}个</p>
         </div>
       </template>
     </div>
