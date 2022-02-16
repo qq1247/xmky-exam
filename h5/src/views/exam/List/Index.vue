@@ -144,14 +144,14 @@ export default {
         tab: '3',
       })
     },
-    // 阅卷设置
+    // 考试用户
     read({ id }) {
       this.$tools.switchTab('ExamListMarkSetting', {
         id,
         examTypeId: this.$route.params.id,
       })
     },
-    // 在线人员
+    // 在线用户
     onLine({ id }) {
       this.$tools.switchTab('ExamListLine', {
         id,

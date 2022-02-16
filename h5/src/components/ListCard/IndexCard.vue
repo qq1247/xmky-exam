@@ -21,28 +21,36 @@
         </div>
         <!-- 编辑权限 -->
         <div class="content-info ellipsis">
-          <span>编辑权限：{{ data.writeUserNames.join(',') || '暂无' }}</span>
+          <span>操作权限：{{ data.writeUserNames.join(',') || '暂无' }}</span>
         </div>
       </template>
       <!-- 使用权限 -->
       <div class="content-info ellipsis" v-if="name == 'paper'">
-        <span>使用权限：{{ data.readUserNames.join(',') || '暂无' }}</span>
+        <span>共享权限：{{ data.readUserNames.join(',') || '暂无' }}</span>
       </div>
 
       <div class="handler">
-        <!-- 编辑 -->
-        <span data-title="编辑" @click="edit(data)">
+        <!-- 修改 -->
+        <span data-title="修改" @click="edit(data)">
           <i class="common common-edit"></i>
         </span>
         <!-- 删除 -->
         <span data-title="删除" @click="del(data)">
           <i class="common common-delete"></i>
         </span>
-        <!-- 权限 -->
+        <!-- 操作权限 -->
         <span
-          data-title="权限"
+          data-title="操作权限"
           @click="role(data)"
-          v-if="['question', 'paper'].includes(name)"
+          v-if="['question'].includes(name)"
+        >
+          <i class="common common-role"></i>
+        </span>
+        <!-- 共享权限 -->
+        <span
+          data-title="共享权限"
+          @click="role(data)"
+          v-if="['paper'].includes(name)"
         >
           <i class="common common-role"></i>
         </span>
@@ -56,7 +64,7 @@
             <i class="common common-share"></i>
           </span>
           <!-- 统计 -->
-          <span data-title="统计" @click="statistics(data)">
+          <span data-title="试题统计" @click="statistics(data)">
             <i class="common common-statistics"></i>
           </span>
         </template>
@@ -88,7 +96,7 @@ export default {
   data() {
     return {
       detailTitles: {
-        question: '考题详情',
+        question: '试题列表',
         paper: '试卷列表',
         exam: '考试列表',
       },

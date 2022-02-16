@@ -94,10 +94,10 @@
           </span>
         </template>
         <template v-if="name == 'examList'">
-          <span data-title="阅卷设置" @click="read(data)">
+          <span data-title="考试用户" @click="read(data)">
             <i class="common common-setting"></i>
           </span>
-          <span data-title="在线人员" @click="onLine(data)">
+          <span data-title="在线用户" @click="onLine(data)">
             <i class="common common-onLine"></i>
           </span>
           <span data-title="统计" @click="statistics(data)">
@@ -185,7 +185,7 @@ export default {
     onLine(data) {
       this.$emit('onLine', data)
     },
-    // 阅卷设置
+    // 考试用户
     read(data) {
       this.$emit('read', data)
     },

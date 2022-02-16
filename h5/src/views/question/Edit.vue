@@ -662,10 +662,11 @@ export default {
         this.$message.warning('暂无此项权限！')
         return
       }
-      this.$confirm('确定要删除？', '提示', {
+      this.$confirm(`确定要删除？<br/>不影响关联的试卷等，可以正常显示和使用`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
+        dangerouslyUseHTMLString: true,
       }).then(async () => {
         const res = await questionDel({ ids: [`${id}`] })
         this.resetQuery(res, '删除')

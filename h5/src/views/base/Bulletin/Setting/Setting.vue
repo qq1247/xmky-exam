@@ -39,7 +39,7 @@
           ></el-option>
         </CustomSelect>
       </el-form-item>
-      <el-form-item label="显示时间" label-width="120px" prop="showTime">
+      <el-form-item label="公告时间" label-width="120px" prop="showTime">
         <el-date-picker
           v-model="editForm.showTime"
           type="datetimerange"

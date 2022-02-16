@@ -24,6 +24,7 @@
         >
         </Upload>
       </el-form>
+      <div style="color:#0094e5">按照试题模板格式填写并上传</div>
       <div class="handler-template">
         <div class="template-item" @click="questionTemplate">
           <i class="common common-word-template"></i>

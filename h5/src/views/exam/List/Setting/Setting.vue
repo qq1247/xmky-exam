@@ -15,7 +15,7 @@
       ref="examForm"
       label-width="100px"
     >
-      <el-form-item label="试卷名称" prop="name">
+      <el-form-item label="考试名称" prop="name">
         <el-input
           placeholder="请输入试卷名称"
           v-model="examForm.name"

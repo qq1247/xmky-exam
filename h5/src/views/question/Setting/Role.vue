@@ -10,19 +10,11 @@
 
 <template>
   <div class="container">
-    <el-alert
-      show-icon
-      type="success"
-      effect="dark"
-      title="协助编辑"
-      description="允许其他子管理员协助添加试题。如自己创建一个分类后，让同事添加试题，自己做审核"
-      style="margin-bottom: 20px"
-    ></el-alert>
     <el-form :model="roleForm" ref="roleForm" label-width="120px">
-      <el-form-item label="编辑权限" prop="writeRoleUser">
+      <el-form-item label="操作用户" prop="writeRoleUser">
         <CustomSelect
           ref="writeSelect"
-          placeholder="请选择授权用户"
+          placeholder="请选择用户"
           :value="roleForm.writeRoleUser"
           :total="roleForm.total"
           @input="searchUser"

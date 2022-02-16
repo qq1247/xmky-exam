@@ -81,7 +81,7 @@ export default {
           intro: '删除用户',
           icon: 'common common-delete',
           contentName: '删除',
-          contentIntro: '用户被删除后，之前参加过的考试、答题等信息会保留。',
+          contentIntro: '用户被删除后，之前创建的考试、答题等信息会保留。',
           index: '3',
         },
       ]

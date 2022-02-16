@@ -190,7 +190,7 @@ export default [
             name: 'ExamListMarkSetting',
             component: () => import('@/views/exam/List/MarkSetting.vue'),
             meta: {
-              title: '阅卷设置',
+              title: '考试用户',
               layout: 'subAdmin',
             },
           },
@@ -199,7 +199,7 @@ export default [
             name: 'ExamListLine',
             component: () => import('@/views/exam/List/OnLine.vue'),
             meta: {
-              title: '在线人员',
+              title: '在线用户',
               layout: 'subAdmin',
             },
           },

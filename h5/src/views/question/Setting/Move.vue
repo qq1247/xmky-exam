@@ -9,21 +9,13 @@
 -->
 <template>
   <div class="container">
-    <el-alert
-      show-icon
-      type="success"
-      effect="dark"
-      title="移动"
-      description="移动当前分类到其他分类"
-      style="margin-bottom: 20px"
-    ></el-alert>
     <el-form
       :model="examForm"
       :rules="examForm.rules"
       ref="moveForm"
       label-width="120px"
     >
-      <el-form-item label="选择试题分类" prop="questionType">
+      <el-form-item label="移动到" prop="questionType">
         <CustomSelect
           :multiple="false"
           placeholder="请选择试题分类"

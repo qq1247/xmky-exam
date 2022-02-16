@@ -9,13 +9,6 @@
 -->
 <template>
   <div class="container">
-    <el-alert
-      show-icon
-      type="error"
-      effect="dark"
-      title="删除后不可恢复，请慎重操作！"
-      description="删除操作将删除所关联的所有信息，文件等..."
-    ></el-alert>
     <div class="form-footer">
       <el-button @click="del" type="danger">删除</el-button>
     </div>
