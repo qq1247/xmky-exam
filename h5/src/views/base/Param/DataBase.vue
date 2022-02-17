@@ -9,8 +9,7 @@
 -->
 <template>
   <div class="param-option">
-    <div class="param-title">数据库备份目录设置</div>
-    <el-form :model="paramForm" :label-position="labelPosition" ref="paramForm">
+    <el-form :model="paramForm" ref="paramForm">
       <el-form-item label="目录名称" label-width="100px" prop="dbBakDir">
         <el-input
           placeholder="请输入目录名称"
@@ -25,31 +24,23 @@
 </template>
 
 <script>
-import { parmDb } from 'api/base'
+import { parmGet, parmDb } from 'api/base'
 export default {
-  props: {
-    dir: {
-      type: String,
-      default: '',
-    },
-  },
   data() {
     return {
-      labelPosition: 'left',
       paramForm: {
-        dbBakDir: this.dir,
+        dbBakDir: '',
       },
     }
   },
-  watch: {
-    dir: {
-      immediate: true,
-      handler() {
-        this.paramForm.dbBakDir = this.dir
-      },
-    },
+  created() {
+    this.init()
   },
   methods: {
+    async init() {
+      const { data } = await parmGet()
+      this.paramForm.dbBakDir = data.dbBakDir
+    },
     // 设置
     setting() {
       this.$refs['paramForm'].validate(async (valid) => {

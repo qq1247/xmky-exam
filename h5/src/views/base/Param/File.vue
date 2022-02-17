@@ -9,12 +9,11 @@
 -->
 <template>
   <div class="param-option">
-    <div class="param-title">附件目录设置</div>
-    <el-form :model="paramForm" :label-position="labelPosition" ref="paramForm">
-      <el-form-item label="目录名称" label-width="100px" prop="uploadDir">
+    <el-form :model="paramForm" ref="paramForm">
+      <el-form-item label="目录名称" label-width="100px" prop="fileUploadDir">
         <el-input
           placeholder="请输入目录名称"
-          v-model="paramForm.uploadDir"
+          v-model="paramForm.fileUploadDir"
         ></el-input>
       </el-form-item>
       <el-form-item label label-width="100px">
@@ -25,31 +24,23 @@
 </template>
 
 <script>
-import { parmFile } from 'api/base'
+import { parmGet, parmFile } from 'api/base'
 export default {
-  props: {
-    dir: {
-      type: String,
-      default: '',
-    },
-  },
   data() {
     return {
-      labelPosition: 'left',
       paramForm: {
-        uploadDir: this.dir,
+        fileUploadDir: '',
       },
     }
   },
-  watch: {
-    dir: {
-      immediate: true,
-      handler() {
-        this.paramForm.uploadDir = this.dir
-      },
-    },
+  created() {
+    this.init()
   },
   methods: {
+    async init() {
+      const { data } = await parmGet()
+      this.paramForm.fileUploadDir = data.fileUploadDir
+    },
     // 设置
     setting() {
       this.$refs['paramForm'].validate(async (valid) => {
@@ -58,7 +49,7 @@ export default {
         }
 
         const { code, msg } = await parmFile({
-          uploadDir: this.paramForm.uploadDir,
+          uploadDir: this.paramForm.fileUploadDir,
         })
 
         if (code === 200) {

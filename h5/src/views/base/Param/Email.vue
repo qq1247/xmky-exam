@@ -9,8 +9,7 @@
 -->
 <template>
   <div class="param-option">
-    <div class="param-title">Email设置</div>
-    <el-form :model="paramForm" :label-position="labelPosition" ref="paramForm">
+    <el-form :model="paramForm" :rules="paramForm.rules" ref="paramForm">
       <el-form-item label="用户名" label-width="100px" prop="emailUserName">
         <el-input
           placeholder="请输入用户名"
@@ -49,17 +48,10 @@
 </template>
 
 <script>
-import { parmEmail } from 'api/base'
+import { parmGet, parmEmail } from 'api/base'
 export default {
-  props: {
-    emailParams: {
-      type: Object,
-      default: () => {},
-    },
-  },
   data() {
     return {
-      labelPosition: 'left',
       paramForm: {
         emailPwd: '',
         emailHost: '',
@@ -86,27 +78,18 @@ export default {
       },
     }
   },
-  watch: {
-    emailParams: {
-      deep: true,
-      immediate: true,
-      handler(n, o) {
-        const {
-          emailPwd,
-          emailHost,
-          emailEncode,
-          emailUserName,
-          emailProtocol,
-        } = n
-        this.paramForm.emailPwd = emailPwd
-        this.paramForm.emailHost = emailHost
-        this.paramForm.emailEncode = emailEncode
-        this.paramForm.emailUserName = emailUserName
-        this.paramForm.emailProtocol = emailProtocol
-      },
-    },
+  created() {
+    this.init()
   },
   methods: {
+    async init() {
+      const { data } = await parmGet()
+      this.paramForm.emailPwd = data.emailPwd
+      this.paramForm.emailHost = data.emailHost
+      this.paramForm.emailProtocol = data.emailProtocol
+      this.paramForm.emailEncode = data.emailEncode
+      this.paramForm.emailUserName = data.emailUserName
+    },
     // 设置
     setting() {
       this.$refs['paramForm'].validate(async (valid) => {
@@ -115,11 +98,11 @@ export default {
         }
 
         const params = {
-          emailPwd: this.paramForm.emailPwd,
-          emailHost: this.paramForm.emailHost,
-          emailEncode: this.paramForm.emailEncode,
-          emailUserName: this.paramForm.emailUserName,
-          emailProtocol: this.paramForm.emailProtocol,
+          pwd: this.paramForm.emailPwd,
+          host: this.paramForm.emailHost,
+          encode: this.paramForm.emailEncode,
+          userName: this.paramForm.emailUserName,
+          protocol: this.paramForm.emailProtocol,
         }
 
         const { code, msg } = await parmEmail(params)

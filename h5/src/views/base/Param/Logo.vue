@@ -9,8 +9,7 @@
 -->
 <template>
   <div class="param-option">
-    <div class="param-title">单位信息</div>
-    <el-form :model="paramForm" :label-position="labelPosition" ref="paramForm">
+    <el-form :model="paramForm" ref="paramForm">
       <el-form-item label="单位名称" label-width="100px" prop="orgName">
         <el-input
           placeholder="请输入单位名称"
@@ -36,47 +35,29 @@
 
 <script>
 import Upload from 'components/Upload'
-import { parmLogo } from 'api/base'
+import { parmGet, parmLogo } from 'api/base'
+import { getSetting, setSetting } from '@/utils/storage'
 export default {
   components: { Upload },
-  props: {
-    logo: {
-      type: Number,
-      default: null,
-    },
-    name: {
-      type: String,
-      default: '',
-    },
-  },
   data() {
     return {
-      labelPosition: 'left',
       paramForm: {
         orgLogo: [],
         orgName: '',
       },
     }
   },
-  watch: {
-    logo: {
-      immediate: true,
-      handler(n, o) {
-        this.setData()
-      },
-    },
-  },
-  update() {
-    this.setData()
+  created() {
+    this.init()
   },
   methods: {
     // 初始化
-    async setData() {
-      this.paramForm.orgLogo = []
+    async init() {
+      const { data } = await parmGet()
+      this.paramForm.orgName = data.orgName
       this.paramForm.orgLogo.push({
-        url: `/api/file/download?id=${Number(this.logo)}`,
+        url: `/api/file/download?id=${Number(data.orgLogo)}`,
       })
-      this.paramForm.orgName = this.name
     },
     // 设置
     setting() {
@@ -102,7 +83,13 @@ export default {
             message: '设置成功',
             duration: 1000,
           })
-          this.$emit('resetLogo')
+          this.$store.dispatch('setting/changeSetting', {
+            key: 'orgName',
+            value: this.paramForm.orgName,
+          })
+          let loginInfo = getSetting()
+          loginInfo.orgName = this.paramForm.orgName
+          setSetting(loginInfo)
         } else {
           this.$message.error(msg)
         }

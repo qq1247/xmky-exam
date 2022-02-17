@@ -9,13 +9,12 @@
 -->
 <template>
   <div class="param-option">
-    <div class="param-title">用户密码</div>
-    <el-form :model="paramForm" :label-position="labelPosition" ref="paramForm">
-      <el-form-item label="类型" label-width="100px" prop="type">
+    <el-form :model="paramForm" ref="paramForm">
+      <el-form-item label="类型" label-width="100px" prop="pwdType">
         <el-radio
           v-for="item in paramForm.typeList"
           :key="item.value"
-          v-model="paramForm.type"
+          v-model="paramForm.pwdType"
           :label="item.value"
           >{{ item.name }}</el-radio
         >
@@ -23,12 +22,12 @@
       <el-form-item
         label="密码"
         label-width="100px"
-        prop="value"
-        v-if="paramForm.type === 2"
+        prop="pwdValue"
+        v-if="paramForm.pwdType === 2"
       >
         <el-input
           placeholder="请输入密码"
-          v-model.trim="paramForm.value"
+          v-model.trim="paramForm.pwdValue"
         ></el-input>
       </el-form-item>
       <el-form-item label label-width="100px">
@@ -39,24 +38,13 @@
 </template>
 
 <script>
-import { parmPwd } from 'api/base'
+import { parmGet, parmPwd } from 'api/base'
 export default {
-  props: {
-    pwdType: {
-      type: Number,
-      default: 1,
-    },
-    pwdValue: {
-      type: String,
-      default: '',
-    },
-  },
   data() {
     return {
-      labelPosition: 'left',
       paramForm: {
-        type: this.pwdType,
-        value: this.pwdValue,
+        pwdType: 1,
+        pwdValue: '',
         typeList: [
           {
             name: '随机',
@@ -70,21 +58,15 @@ export default {
       },
     }
   },
-  watch: {
-    pwdType: {
-      immediate: true,
-      handler(n, o) {
-        this.paramForm.type = n
-      },
-    },
-    pwdValue: {
-      immediate: true,
-      handler(n, o) {
-        this.paramForm.value = n
-      },
-    },
+  created() {
+    this.init()
   },
   methods: {
+    async init() {
+      const { data } = await parmGet()
+      this.paramForm.pwdType = data.pwdType
+      this.paramForm.pwdValue = data.pwdValue
+    },
     // 设置
     setting() {
       this.$refs['paramForm'].validate(async (valid) => {
@@ -92,7 +74,7 @@ export default {
           return false
         }
 
-        if (this.paramForm.type === 2 && !this.paramForm.value) {
+        if (this.paramForm.pwdType === 2 && !this.paramForm.pwdValue) {
           this.$message({
             message: '请输入密码',
             duration: 1000,
@@ -102,13 +84,13 @@ export default {
         }
 
         const params =
-          this.paramForm.type === 1
+          this.paramForm.pwdType === 1
             ? {
-                type: this.paramForm.type,
+                type: this.paramForm.pwdType,
               }
             : {
-                type: this.paramForm.type,
-                value: this.paramForm.value,
+                type: this.paramForm.pwdType,
+                value: this.paramForm.pwdValue,
               }
 
         const { code, msg } = await parmPwd(params)
@@ -116,9 +98,7 @@ export default {
         if (code === 200) {
           this.$message({
             message: '设置成功',
-            duration: 1000,
           })
-          this.$emit('init')
         } else {
           this.$message.error(msg)
         }

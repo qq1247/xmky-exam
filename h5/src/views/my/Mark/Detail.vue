@@ -325,6 +325,7 @@ export default {
       try {
         const res = await paperQuestionList({
           id: this.paperId,
+          examId: this.examId,
         })
         this.paperQuestion = res.data
         const questionList = res.data.reduce((acc, cur) => {

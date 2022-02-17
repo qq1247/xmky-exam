@@ -76,7 +76,6 @@ export default {
   created() {
     const { examId, paperId, preview, examEndTime, showType } =
       this.$route.params
-
     this.examId = examId
     this.paperId = paperId
     this.preview = JSON.parse(preview)
@@ -117,6 +116,7 @@ export default {
       try {
         const res = await paperQuestionList({
           id: this.paperId,
+          examId: this.examId,
         })
         this.paperQuestion = res.data
       } catch (error) {}
