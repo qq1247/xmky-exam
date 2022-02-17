@@ -1,7 +1,7 @@
 <!--
- * @Description: 
+ * @Description:
  * @Version: 1.0
- * @Company: 
+ * @Company:
  * @Author: Che
  * @Date: 2021-11-22 09:46:18
  * @LastEditors: Che
@@ -112,46 +112,52 @@ export default {
       this.$tools.switchTab('PaperListSetting', {
         id: 0,
         paperTypeId: this.$route.params.id,
+        genType: 0,
         tab: '1',
       })
     },
     // 编辑分类
-    edit({ id }) {
+    edit({ id, genType }) {
       this.$tools.switchTab('PaperListSetting', {
         id,
         paperTypeId: this.$route.params.id,
+        genType,
         tab: '1',
       })
     },
     // 考试发布
-    publish({ id }) {
+    publish({ id, genType }) {
       this.$tools.switchTab('PaperListSetting', {
         id,
         paperTypeId: this.$route.params.id,
+        genType,
         tab: '3',
       })
     },
     // 复制分类
-    copy({ id }) {
+    copy({ id, genType }) {
       this.$tools.switchTab('PaperListSetting', {
         id,
         paperTypeId: this.$route.params.id,
+        genType,
         tab: '2',
       })
     },
     // 删除分类
-    del({ id }) {
+    del({ id, genType }) {
       this.$tools.switchTab('PaperListSetting', {
         id,
         paperTypeId: this.$route.params.id,
+        genType,
         tab: '4',
       })
     },
     // 组合试卷
-    composition({ id }) {
+    composition({ id, genType }) {
       this.$tools.switchTab('PaperListEdit', {
         id,
         paperTypeId: this.$route.params.id,
+        genType,
       })
     },
     // 切换分页

@@ -1,7 +1,7 @@
 <!--
  * @Description: 设置
  * @Version: 1.0
- * @Company: 
+ * @Company:
  * @Author: Che
  * @Date: 2021-12-16 16:01:13
  * @LastEditors: Che
@@ -240,7 +240,7 @@ export default {
             content: '人工组卷',
           },
           {
-            icon: 'common-exchange',
+            icon: 'common-random',
             content: '随机组卷',
           },
         ],
@@ -276,7 +276,7 @@ export default {
     if (Number(this.id)) {
       const res = await paperGet({ id: this.id })
       this.$nextTick(() => {
-        this.paperForm.genType = res.data.genType
+        this.paperForm.genType = res.data.genType - 1
         this.paperForm.name = res.data.name
         this.paperForm.passScore = res.data.passScore
         this.paperForm.showType = String(res.data.showType)
@@ -298,7 +298,7 @@ export default {
 
         const params = {
           paperTypeId: this.paperTypeId,
-          genType: this.paperForm.genType,
+          genType: this.paperForm.genType + 1,
           name: this.paperForm.name,
           passScore: this.paperForm.passScore,
           showType: Number(this.paperForm.showType),
@@ -332,11 +332,6 @@ export default {
     },
     // 组卷方式
     setPaperType(index) {
-      if (index == 1) {
-        this.paperForm.genType = 0
-        this.$message('暂未开放！', 'warning')
-        return
-      }
       this.paperForm.genType = index
     },
     // 添加评语

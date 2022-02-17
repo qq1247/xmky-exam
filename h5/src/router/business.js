@@ -113,7 +113,7 @@ export default [
         },
         children: [
           {
-            path: '/paper/list/setting/:id/:paperTypeId/:tab?',
+            path: '/paper/list/setting/:id/:paperTypeId/:genType/:tab?',
             name: 'PaperListSetting',
             component: () => import('@/views/paper/List/Setting/Index.vue'),
             meta: {
@@ -122,9 +122,9 @@ export default [
             },
           },
           {
-            path: '/paper/list/edit/:id/:paperTypeId',
+            path: '/paper/list/edit/:id/:paperTypeId/:genType/:tab?',
             name: 'PaperListEdit',
-            component: () => import('@/views/paper/List/Edit.vue'),
+            component: () => import('@/views/paper/List/Edit/Index.vue'),
             meta: {
               title: '组合试卷',
               layout: 'subAdmin',

@@ -137,13 +137,18 @@ export default {
   position: relative;
   .tinymce-content {
     border: 1px solid #dcdfe6;
-    padding: 0 7px;
-    border-radius: 5px;
+    padding: 0 10px;
+    border-radius: 3px;
+    &[contentEditable='true']:focus,
+    &[contentEditable='true']:hover {
+      border: 1px solid #c0c4cc;
+      cursor: text;
+    }
   }
 }
-.tinymce-content {
-  width: auto;
-  line-height: 30px;
-  background: #fff;
+/deep/
+  .mce-content-body:not([dir='rtl'])[data-mce-placeholder]:not(.mce-visualblocks)::before {
+  left: 10px;
+  color: #c4c4cf;
 }
 </style>

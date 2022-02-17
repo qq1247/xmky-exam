@@ -44,9 +44,21 @@ export const paperTotalScoreUpdate = (params) =>
   request('paper/totalScoreUpdate', params)
 export const paperTypeListPage = (params) =>
   request('paperType/listpage', params)
+
 export const paperTypeAdd = (params) => request('paperType/add', params)
 export const paperTypeEdit = (params) => request('paperType/edit', params)
 export const paperTypeDel = (params) => request('paperType/del', params)
 export const paperTypeGet = (params) => request('paperType/get', params)
 export const paperTypeMove = (params) => request('paperType/move', params)
 export const paperTypeAuth = (params) => request('paperType/auth', params)
+
+export const randChapterRulesAdd = (params) =>
+  request('randChapterRules/add', params)
+export const randChapterRulesEdit = (params) =>
+  request('randChapterRules/edit', params)
+export const randChapterRulesDel = (params) =>
+  request('randChapterRules/del', params)
+export const randChapterRulesGet = (params) =>
+  request('randChapterRules/get', params)
+export const randChapterRulesList = (params) =>
+  request('randChapterRules/randChapterRulesList', params)
