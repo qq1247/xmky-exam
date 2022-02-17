@@ -9,7 +9,7 @@
 -->
 <template>
   <div class="param-option">
-    <div class="param-title">密码初始化</div>
+    <div class="param-title">用户密码</div>
     <el-form :model="paramForm" :label-position="labelPosition" ref="paramForm">
       <el-form-item label="类型" label-width="100px" prop="type">
         <el-radio

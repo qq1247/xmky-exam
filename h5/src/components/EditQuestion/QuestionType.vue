@@ -92,7 +92,7 @@ export default {
         },
         {
           type: 3,
-          name: '一键清空',
+          name: '一键删除',
           icon: 'common common-delete',
         },
       ],
@@ -127,7 +127,7 @@ export default {
     },
     // 发布操作
     publish(parentData) {
-      this.$confirm('请选择发布方式？', '发布方式', {
+      this.$confirm('确定要发布？', '提示', {
         distinguishCancelAndClose: true,
         confirmButtonText: '全部发布',
         cancelButtonText: '当页发布',
@@ -154,18 +154,19 @@ export default {
           }
         })
     },
-    // 清空操作
+    // 删除操作
     del(parentData) {
-      this.$confirm('请选择清空方式？', '清空方式', {
+      this.$confirm('确定要删除？<br/>不影响关联的试卷等，可以正常显示和使用', '提示', {
         distinguishCancelAndClose: true,
-        confirmButtonText: '全部清空',
-        cancelButtonText: '当页清空',
+        confirmButtonText: '全部删除',
+        cancelButtonText: '当页删除',
+        dangerouslyUseHTMLString: true,
       })
         .then(async () => {
           await questionDel({
             questionTypeId: parentData.queryForm.questionTypeId,
           })
-          this.$message.success('全部清空成功！')
+          this.$message.success('删除成功！')
           this.$emit('showTemplate', false)
         })
         .catch(async (action) => {
@@ -178,7 +179,7 @@ export default {
             await questionDel({
               ids,
             })
-            this.$message.success('当页清空成功！')
+            this.$message.success('删除成功！')
             this.$emit('showTemplate', false)
           }
         })

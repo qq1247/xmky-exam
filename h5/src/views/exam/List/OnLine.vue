@@ -19,7 +19,7 @@
           </div>
         </el-col>
       </template>
-      <el-empty v-else description="暂无在线人员"> </el-empty>
+      <el-empty v-else description="暂无在线用户"> </el-empty>
     </el-row>
   </div>
 </template>

@@ -64,16 +64,16 @@
           <el-col :span="12">
             <el-form-item
               v-if="examForm.paperMarkType === 2"
-              label="阅卷人"
+              label="阅卷用户"
               :prop="`examRemarks.${index}.examCheckPerson`"
               :rules="[
-                { required: true, message: '请选择阅卷人', trigger: 'change' },
+                { required: true, message: '请选择用户', trigger: 'change' },
               ]"
             >
               <CustomSelect
                 ref="markUserSelect"
                 :multiple="false"
-                placeholder="请选择阅卷人"
+                placeholder="请选择用户"
                 :value="examForm.examRemarks[index].examCheckPerson"
                 :total="examForm.total"
                 @input="(keyword) => searchUser(keyword, 2)"
@@ -281,7 +281,7 @@ export default {
     searchUser(name, type) {
       this.getUserList(type, 1, name)
     },
-    // 选择阅卷人员
+    // 选择阅卷用户
     selectPerson(e, index) {
       this.examForm.examRemarks[index].examCheckPerson = e
       this.examForm.examRemarks.map((item, indexe) => {

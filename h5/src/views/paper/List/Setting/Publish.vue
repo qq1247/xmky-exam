@@ -9,12 +9,6 @@
 -->
 <template>
   <div class="container">
-    <el-alert
-      show-icon
-      type="success"
-      effect="dark"
-      title="发布后将不可进行组合试卷"
-    ></el-alert>
     <div class="form-footer">
       <el-button @click="publish" type="primary"> 发布 </el-button>
     </div>

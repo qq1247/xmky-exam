@@ -20,7 +20,7 @@
           id="content"
         ></TinymceEditor>
       </el-form-item>
-      <el-form-item label="阅读人员" label-width="120px" prop="examUser">
+      <el-form-item label="阅读用户" label-width="120px" prop="examUser">
         <CustomSelect
           ref="readSelect"
           placeholder="请选择用户"
@@ -39,12 +39,12 @@
           ></el-option>
         </CustomSelect>
       </el-form-item>
-      <el-form-item label="展示时间" label-width="120px" prop="showTime">
+      <el-form-item label="公告时间" label-width="120px" prop="showTime">
         <el-date-picker
           v-model="editForm.showTime"
           type="datetimerange"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
+          start-placeholder="开始时间"
+          end-placeholder="结束时间"
           value-format="yyyy-MM-dd HH:mm:ss"
         ></el-date-picker>
       </el-form-item>
@@ -102,7 +102,7 @@ export default {
         showType: 1, // 置顶状态
         showTypeList: [
           {
-            name: '默认',
+            name: '正常',
             value: 1,
           },
           {

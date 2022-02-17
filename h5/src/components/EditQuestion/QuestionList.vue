@@ -117,7 +117,7 @@
                 type="primary"
                 icon="el-icon-document"
                 @click.stop="questionEdit(question.id)"
-                >编辑</el-button
+                >修改</el-button
               >
               <el-button
                 plain

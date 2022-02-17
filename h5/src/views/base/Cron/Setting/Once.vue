@@ -9,14 +9,8 @@
 -->
 <template>
   <div class="container">
-    <el-alert
-      show-icon
-      type="success"
-      effect="dark"
-      title="执行一次"
-    ></el-alert>
     <div class="form-footer">
-      <el-button @click="onceTask" type="success">执行一次</el-button>
+      <el-button @click="onceTask" type="primary">运行</el-button>
     </div>
   </div>
 </template>
@@ -34,14 +28,15 @@ export default {
     this.id = this.$route.params.id
   },
   methods: {
-    // 启动任务
+    // 运行一次
     async onceTask() {
       const res = await cronrunOnceTask({ id: this.id })
       if (res?.code != 200) {
         this.$message.error(res.msg)
+        return
       }
 
-      this.$router.back()
+      this.$message.success('运行成功')
     },
   },
 }

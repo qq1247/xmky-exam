@@ -10,7 +10,7 @@
 <template>
   <div class="container">
     <div class="form-footer">
-      <el-button @click="initPwd" type="success">初始化密码</el-button>
+      <el-button @click="initPwd" type="primary">重置</el-button>
     </div>
   </div>
 </template>
@@ -27,7 +27,7 @@ export default {
     this.id = this.$route.params.id
   },
   methods: {
-    // 初始化密码
+    // 重置密码
     async initPwd() {
       const res = await userPwdInit({
         id: this.id,
@@ -39,7 +39,7 @@ export default {
       }
 
       if (res.data.initPwd) {
-        this.$alert(res.data.initPwd, '初始化密码', {
+        this.$alert('当前密码：' + res.data.initPwd, '提示', {
           confirmButtonText: '确定',
         }).then((res) => {
           this.$router.back()

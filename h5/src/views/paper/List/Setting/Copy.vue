@@ -9,12 +9,6 @@
 -->
 <template>
   <div class="container">
-    <el-alert
-      show-icon
-      type="success"
-      effect="dark"
-      title="将复制相同数据的一张试卷"
-    ></el-alert>
     <div class="form-footer">
       <el-button @click="copy" type="primary"> 复制 </el-button>
     </div>

@@ -70,7 +70,7 @@
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-tooltip placement="top" content="编辑">
+              <el-tooltip placement="top" content="修改">
                 <i class="common common-edit" @click="edit(scope.row.id)"></i>
               </el-tooltip>
               <el-tooltip placement="top" content="删除">

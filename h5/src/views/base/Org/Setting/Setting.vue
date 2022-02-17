@@ -10,7 +10,7 @@
 <template>
   <div class="container">
     <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
-      <el-form-item label="上级机构" label-width="120px">
+      <el-form-item label="所属机构" label-width="120px">
         <el-input disabled placeholder v-model="editForm.parentName"></el-input>
       </el-form-item>
       <el-form-item label="名称" label-width="120px" prop="name">

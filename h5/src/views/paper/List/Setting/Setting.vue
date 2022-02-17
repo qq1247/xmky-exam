@@ -15,61 +15,62 @@
       ref="paperForm"
       label-width="100px"
     >
-      <el-tabs v-model="paperForm.tabActive">
-        <el-tab-pane
-          v-for="item in paperForm.paperTabs"
-          :key="item.name"
-          :label="item.title"
-          :name="item.name"
-        ></el-tab-pane>
-        <template v-if="paperForm.tabActive == '0'">
-          <el-form-item>
-            <div class="exam-type">
-              <div
-                :class="
-                  paperForm.genType == index
-                    ? 'type-item type-item-active'
-                    : 'type-item '
-                "
-                v-for="(item, index) in paperForm.genTypes"
-                :key="item.content"
-                @click="setPaperType(index)"
-              >
-                <i :class="['common', `${item.icon}`]"></i>
-                <i
-                  class="common common-selected"
-                  v-if="paperForm.genType == index"
-                ></i>
-                {{ item.content }}
-              </div>
-            </div>
-          </el-form-item>
-          <el-form-item label="阅卷方式" prop="markType">
-            <el-radio
-              v-for="item in paperForm.markTypeList"
-              :key="item.value"
-              v-model="paperForm.markType"
-              :label="item.value"
-              >{{ item.name }}</el-radio
-            >
-          </el-form-item>
-          <el-form-item label="试卷名称" prop="name">
-            <el-input
-              placeholder="请输入试卷名称"
-              v-model="paperForm.name"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="及格分数" prop="passScore">
-            <el-input
-              type="number"
-              min="1"
-              max="100"
-              placeholder="请输入及格分数占总分百分比"
-              v-model="paperForm.passScore"
-            >
-              <span slot="append">%</span>
-            </el-input>
-          </el-form-item>
+      <el-form-item label="组卷方式">
+        <div class="exam-type">
+          <div
+            :class="
+              paperForm.genType == index
+                ? 'type-item type-item-active'
+                : 'type-item '
+            "
+            v-for="(item, index) in paperForm.genTypes"
+            :key="item.content"
+            @click="setPaperType(index)"
+          >
+            <i :class="['common', `${item.icon}`]"></i>
+            <i
+              class="common common-selected"
+              v-if="paperForm.genType == index"
+            ></i>
+            {{ item.content }}
+          </div>
+        </div>
+      </el-form-item>
+      <el-form-item label="阅卷方式" prop="markType">
+        <el-radio
+          v-for="item in paperForm.markTypeList"
+          :key="item.value"
+          v-model="paperForm.markType"
+          :label="item.value"
+          >{{ item.name }}</el-radio
+        >
+      </el-form-item>
+      <el-form-item label="试卷名称" prop="name">
+        <el-input
+          placeholder="请输入试卷名称"
+          v-model="paperForm.name"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="及格（%）" prop="passScore">
+        <el-input
+          type="number"
+          min="1"
+          max="100"
+          placeholder="请输入及格分数占总分百分比"
+          v-model="paperForm.passScore"
+        >
+          <span slot="append">%</span>
+        </el-input>
+      </el-form-item>
+      <el-form-item label="展示方式">
+        <el-radio
+          v-for="item in paperForm.showTypes"
+          :key="item.value"
+          v-model="paperForm.showType"
+          :label="item.value"
+          >{{ item.name }}</el-radio
+        >
+      </el-form-item>
           <!-- <el-form-item label="考前阅读">
               <TinymceEditor
                 :value="paperForm.readRemark"
@@ -84,18 +85,6 @@
                 v-model="paperForm.readNum"
               ></el-input>
             </el-form-item> -->
-        </template>
-        <template v-if="paperForm.tabActive == '1'">
-          <el-form-item label="展示方式">
-            <el-radio
-              v-for="item in paperForm.showTypes"
-              :key="item.value"
-              v-model="paperForm.showType"
-              :label="item.value"
-              >{{ item.name }}</el-radio
-            >
-          </el-form-item>
-        </template>
         <!-- <template v-if="paperForm.tabActive == '2'">
             <el-form-item label="防作弊">
               <el-checkbox-group v-model="paperForm.options">
@@ -143,7 +132,6 @@
               </template>
             </el-form-item>
           </div> -->
-      </el-tabs>
     </el-form>
     <div class="form-footer">
       <!-- <el-button

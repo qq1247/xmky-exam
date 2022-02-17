@@ -10,7 +10,7 @@
 <template>
   <div class="container">
     <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
-      <el-form-item label="机构名称" label-width="120px" prop="orgId">
+      <el-form-item label="所属机构" label-width="120px" prop="orgId">
         <CustomSelect
           :multiple="false"
           ref="orgSelect"
@@ -30,9 +30,9 @@
           ></el-option>
         </CustomSelect>
       </el-form-item>
-      <el-form-item label="登录名称" label-width="120px" prop="loginName">
+      <el-form-item label="登录账号" label-width="120px" prop="loginName">
         <el-input
-          placeholder="请输入登录名称"
+          placeholder="请输入登录账号"
           v-model.trim="editForm.loginName"
         ></el-input>
       </el-form-item>
@@ -64,7 +64,7 @@ export default {
       editForm: {
         // 修改表单
         name: null, // 名称
-        loginName: null, // 登录名称
+        loginName: null, // 登录账号
         orgId: null, // 机构ID
         orgName: null, // 机构名称
         show: false, // 是否显示页面
@@ -77,9 +77,9 @@ export default {
         rules: {
           // 校验
           loginName: [
-            { required: true, message: '请输入登录名称', trigger: 'blur' },
+            { required: true, message: '请输入登录账号', trigger: 'blur' },
           ],
-          name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
+          name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
         },
       },
     }
@@ -129,7 +129,7 @@ export default {
           return
         }
         this.$router.back()
-        this.$alert(res.data.initPwd, '初始化密码', {
+        this.$alert(res.data.initPwd, '重置密码', {
           confirmButtonText: '确定',
         })
       })
@@ -154,7 +154,7 @@ export default {
         }
 
         if (res.data.initPwd) {
-          this.$alert(res.data.initPwd, '初始化密码', {
+          this.$alert(res.data.initPwd, '重置密码', {
             confirmButtonText: '确定',
           })
         }
