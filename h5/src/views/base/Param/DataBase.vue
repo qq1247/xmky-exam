@@ -10,9 +10,9 @@
 <template>
   <div class="param-option">
     <el-form :model="paramForm" ref="paramForm">
-      <el-form-item label="目录名称" label-width="100px" prop="dbBakDir">
+      <el-form-item label="备份目录" label-width="100px" prop="dbBakDir">
         <el-input
-          placeholder="请输入目录名称"
+          placeholder="请输入备份目录"
           v-model="paramForm.dbBakDir"
         ></el-input>
       </el-form-item>

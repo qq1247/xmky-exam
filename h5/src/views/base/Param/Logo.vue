@@ -10,13 +10,13 @@
 <template>
   <div class="param-option">
     <el-form :model="paramForm" ref="paramForm">
-      <el-form-item label="单位名称" label-width="100px" prop="orgName">
+      <el-form-item label="企业名称" label-width="100px" prop="orgName">
         <el-input
-          placeholder="请输入单位名称"
+          placeholder="请输入企业名称"
           v-model="paramForm.orgName"
         ></el-input>
       </el-form-item>
-      <el-form-item label="单位商标" label-width="100px" prop="orgLogo">
+      <el-form-item label="LOGO" label-width="100px" prop="orgLogo">
         <Upload
           ref="logoUpload"
           type="image"

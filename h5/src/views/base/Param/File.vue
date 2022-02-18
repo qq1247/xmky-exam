@@ -10,9 +10,9 @@
 <template>
   <div class="param-option">
     <el-form :model="paramForm" ref="paramForm">
-      <el-form-item label="目录名称" label-width="100px" prop="fileUploadDir">
+      <el-form-item label="上传目录" label-width="100px" prop="fileUploadDir">
         <el-input
-          placeholder="请输入目录名称"
+          placeholder="请输入上传目录"
           v-model="paramForm.fileUploadDir"
         ></el-input>
       </el-form-item>

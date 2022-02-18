@@ -10,7 +10,7 @@
 <template>
   <div class="param-option">
     <el-form :model="paramForm" ref="paramForm">
-      <el-form-item label="类型" label-width="100px" prop="pwdType">
+      <el-form-item label="生成策略" label-width="100px" prop="pwdType">
         <el-radio
           v-for="item in paramForm.typeList"
           :key="item.value"
@@ -20,7 +20,7 @@
         >
       </el-form-item>
       <el-form-item
-        label="密码"
+        label="默认为"
         label-width="100px"
         prop="pwdValue"
         v-if="paramForm.pwdType === 2"
@@ -47,11 +47,11 @@ export default {
         pwdValue: '',
         typeList: [
           {
-            name: '随机',
+            name: '随机密码',
             value: 1,
           },
           {
-            name: '固定',
+            name: '固定密码',
             value: 2,
           },
         ],
