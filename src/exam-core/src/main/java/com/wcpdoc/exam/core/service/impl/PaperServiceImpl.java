@@ -30,6 +30,7 @@ import com.wcpdoc.exam.core.entity.PaperType;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
+import com.wcpdoc.exam.core.entity.RandChapterRules;
 import com.wcpdoc.exam.core.service.PaperQuestionAnswerService;
 import com.wcpdoc.exam.core.service.PaperQuestionService;
 import com.wcpdoc.exam.core.service.PaperRemarkService;
@@ -39,6 +40,7 @@ import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
+import com.wcpdoc.exam.core.service.RandChapterRulesService;
 
 /**
  * 试卷服务层实现
@@ -67,6 +69,8 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	private PaperRemarkService paperRemarkService;
 	@Resource
 	private QuestionOptionService questionOptionService;
+	@Resource
+	private RandChapterRulesService randChapterRulesService;
 
 	@Override
 	@Resource(name = "paperDaoImpl")
@@ -75,7 +79,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 	
 	@Override
-	public void addAndUpdate(Paper paper, PaperRemark paperRemark) {// paperRemark暂时不用保留
+	public Integer addAndUpdate(Paper paper, PaperRemark paperRemark) {// paperRemark暂时不用保留
 		// 校验数据有效性
 		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
 		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
@@ -91,6 +95,8 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		paper.setTotalScore(BigDecimal.ZERO);// 默认总分数为0
 		paper.setState(2);// 默认为草稿
 		add(paper);
+		
+		return paper.getId();//快速创建考试需要用id查找信息
 	}
 	
 	@Override
@@ -112,7 +118,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		}
 
 		// 更新试卷
-		// entity.setGenType(paper.getGenType());//不能修改
+		entity.setGenType(paper.getGenType());
 		entity.setShowType(paper.getShowType());
 		entity.setName(paper.getName());
 		entity.setMarkType(paper.getMarkType());
@@ -166,45 +172,64 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		add(copyPaper);
 
 		List<PaperQuestion> chapterList = paperQuestionService.getChapterList(paper.getId());// 复制章节
-		for (PaperQuestion chapter : chapterList) {
-			PaperQuestion copyChapter = new PaperQuestion();
-			try {
-				BeanUtils.copyProperties(copyChapter, chapter);
-			} catch (Exception e) {
-				throw new MyException(e.getMessage());
-			}
-			copyChapter.setPaperId(copyPaper.getId());
-			paperQuestionService.add(copyChapter);
-			copyChapter.setParentSub(String.format("_%s_", copyChapter.getId()));
-			paperQuestionService.update(copyChapter);
-			
-			List<PaperQuestion> questionList = paperQuestionService.getQuestionList(chapter.getId());//复制试题
-			for (PaperQuestion question : questionList) {
-				PaperQuestion copyQuestion = new PaperQuestion();
+		
+			for (PaperQuestion chapter : chapterList) {
+				PaperQuestion copyChapter = new PaperQuestion();
 				try {
-					BeanUtils.copyProperties(copyQuestion, question);
+					BeanUtils.copyProperties(copyChapter, chapter);
 				} catch (Exception e) {
 					throw new MyException(e.getMessage());
 				}
-				copyQuestion.setParentId(copyChapter.getId());
-				copyQuestion.setPaperId(copyPaper.getId());
-				paperQuestionService.add(copyQuestion);
-				copyQuestion.setParentSub(String.format("%s%s_", copyChapter.getParentSub(), copyQuestion.getId()));
-				paperQuestionService.update(copyQuestion);
+				copyChapter.setPaperId(copyPaper.getId());
+				paperQuestionService.add(copyChapter);
+				copyChapter.setParentSub(String.format("_%s_", copyChapter.getId()));
+				paperQuestionService.update(copyChapter);
+				
+				if (copyPaper.getGenType() == 1) {// 人工组卷
+					List<PaperQuestion> questionList = paperQuestionService.getQuestionList(chapter.getId(), null, null);//复制试题
+					for (PaperQuestion question : questionList) {
+						PaperQuestion copyQuestion = new PaperQuestion();
+						try {
+							BeanUtils.copyProperties(copyQuestion, question);
+						} catch (Exception e) {
+							throw new MyException(e.getMessage());
+						}
+						copyQuestion.setParentId(copyChapter.getId());
+						copyQuestion.setPaperId(copyPaper.getId());
+						paperQuestionService.add(copyQuestion);
+						copyQuestion.setParentSub(String.format("%s%s_", copyChapter.getParentSub(), copyQuestion.getId()));
+						paperQuestionService.update(copyQuestion);
 
-				List<PaperQuestionAnswer> answerList = paperQuestionAnswerService.getList(id, question.getQuestionId());// 复制答案
-				for (PaperQuestionAnswer answer : answerList) {
-					PaperQuestionAnswer copyAnswer = new PaperQuestionAnswer();
-					try {
-						BeanUtils.copyProperties(copyAnswer, answer);
-					} catch (Exception e) {
-						throw new MyException(e.getMessage());
+						List<PaperQuestionAnswer> answerList = paperQuestionAnswerService.getList(id, question.getQuestionId());// 复制答案
+						for (PaperQuestionAnswer answer : answerList) {
+							PaperQuestionAnswer copyAnswer = new PaperQuestionAnswer();
+							try {
+								BeanUtils.copyProperties(copyAnswer, answer);
+							} catch (Exception e) {
+								throw new MyException(e.getMessage());
+							}
+							copyAnswer.setPaperQuestionId(copyChapter.getId());
+							copyAnswer.setPaperId(copyPaper.getId());
+							paperQuestionAnswerService.add(copyAnswer);
+						}
 					}
-					copyAnswer.setPaperQuestionId(copyChapter.getId());
-					copyAnswer.setPaperId(copyPaper.getId());
-					paperQuestionAnswerService.add(copyAnswer);
+				} else {// 随机组卷
+					List<RandChapterRules> randChapterRuleList = randChapterRulesService.getChapterList(chapter.getPaperId(), chapter.getId());
+					for(RandChapterRules randChapterRules : randChapterRuleList){
+						RandChapterRules copyRandChapterRules = new RandChapterRules();
+						try {
+							BeanUtils.copyProperties(copyRandChapterRules, randChapterRules);
+						} catch (Exception e) {
+							throw new MyException(e.getMessage());
+						}
+						
+						copyRandChapterRules.setPaperId(copyPaper.getId());
+						copyRandChapterRules.setPaperQuestionId(copyChapter.getId());
+						copyRandChapterRules.setUpdateTime(new Date());
+						copyRandChapterRules.setUpdateUserId(getCurUser().getId());
+						randChapterRulesService.add(copyRandChapterRules);
+					}
 				}
-			}
 		}
 	}
 	
@@ -329,13 +354,22 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
 		}
-				
+		
 		//删除章节
-		List<PaperQuestion> questionList = paperQuestionService.getQuestionList(chapterId);
+		List<PaperQuestion> questionList = paperQuestionService.getQuestionList(chapterId, null, null);// 删除章节下试题
 		for(PaperQuestion pq : questionList) {
-			paperQuestionService.del(pq.getId());// 删除章节下试题
+			paperQuestionService.del(pq.getId());
+		}
+		
+		if (paper.getGenType() == 2) {//删除随机章节规则
+			List<RandChapterRules> chapterList = randChapterRulesService.getChapterList(paper.getId(), chapterId);
+			for(RandChapterRules rcr : chapterList) {
+				randChapterRulesService.del(rcr.getId());
+			}
 		}
 		paperQuestionService.del(chapterId);// 删除章节
+		
+		
 	}
 	
 	@Override
@@ -670,7 +704,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		paperQuestionService.del(pq.getId());// 删除试题
 		
 		// 同级试题重新排序
-		List<PaperQuestion> pqList = paperQuestionService.getQuestionList(pq.getParentId());
+		List<PaperQuestion> pqList = paperQuestionService.getQuestionList(pq.getParentId(), null, null);
 		int maxNo = 1;
 		for (PaperQuestion cur : pqList) {
 			cur.setNo(maxNo++);
@@ -704,7 +738,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		}
 
 		// 清空试题
-		List<PaperQuestion> pqList = paperQuestionService.getQuestionList(chapterId);
+		List<PaperQuestion> pqList = paperQuestionService.getQuestionList(chapterId, null, null);
 		for (PaperQuestion pq : pqList) {
 			List<PaperQuestionAnswer> answerList = paperQuestionAnswerService.getList(pq.getPaperId(), pq.getQuestionId());// 删除答案
 			for(PaperQuestionAnswer answer : answerList){
@@ -718,7 +752,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	public List<Question> getQuestionList(Integer id) {
 		return paperDao.getQuestionList(id);
 	}
-
+	
 	@Override
 	public List<PaperQuestion> getPaperQuestionList(Integer id) {
 		return paperDao.getPaperQuestionList(id);
@@ -753,7 +787,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			scoreOptionsString = StringUtil.join(scoreOptions);
 		}
 		
-		List<PaperQuestion> pqList = paperQuestionService.getQuestionList(chapterId);
+		List<PaperQuestion> pqList = paperQuestionService.getQuestionList(chapterId, null, null);
 		for(int i = 0; i < pqList.size(); i ++ ){
 			PaperQuestion pq = pqList.get(i);
 			Question question = questionService.getEntity(pq.getQuestionId());
@@ -878,83 +912,164 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 
 	@Override
-	public List<Map<String, Object>> paperQuestionList(Integer id) {
-		List<PaperQuestion> chapterList = paperQuestionService.getChapterList(id);
+	public List<Map<String, Object>> paperQuestionList(Integer id, Integer examId, Integer userId) {
+		Paper paper = paperDao.getEntity(id);
 		List<Map<String, Object>> resultList = new ArrayList<>();
-		List<Question> questionList = getQuestionList(id);
+		
+		List<PaperQuestion> chapterList = paperQuestionService.getChapterList(paper.getId());
 		Map<Integer, Question> idQuestionMap = new HashMap<>();
-		for (Question question : questionList) {
-			idQuestionMap.put(question.getId(), question);
-		}
-
-		for (PaperQuestion chapter : chapterList) {
-			Map<String, Object> singleResult = new HashMap<String, Object>();// 章节
-			Map<String, Object> chapterMap = new HashMap<String, Object>();
-			chapterMap.put("id", chapter.getId());
-			chapterMap.put("name", chapter.getName());
-			chapterMap.put("description", chapter.getDescription());
-			singleResult.put("chapter", chapterMap);
-
-			List<PaperQuestion> paperQuestionList = paperQuestionService.getQuestionList(chapter.getId());// 试题
-			List<Map<String, Object>> questionsListMap = new ArrayList<>();
-			for (PaperQuestion paperQuestion : paperQuestionList) {
-				Map<String, Object> questionMap = new HashMap<>();
-				Question question = idQuestionMap.get(paperQuestion.getQuestionId());
-				questionMap.put("id", question.getId());
-				questionMap.put("type", question.getType());
-				questionMap.put("typeName", DictCache.getDictValue("QUESTION_TYPE", question.getType().toString()));
-				questionMap.put("difficulty", question.getDifficulty());
-				questionMap.put("difficultyName", DictCache.getDictValue("QUESTION_DIFFICULTY", question.getDifficulty().toString()));
-				questionMap.put("title", question.getTitle());
-				questionMap.put("ai", question.getAi());
-				questionMap.put("analysis", question.getAnalysis());
-				questionMap.put("score", paperQuestion.getScore());// 分数从试卷中取
-				
-				Integer[] scoreOptions = null;//new Integer[split.length];
-				if (ValidateUtil.isValid(paperQuestion.getScoreOptions())) {
-					String[] split = paperQuestion.getScoreOptions().split(",");
-					scoreOptions = new Integer[split.length];
-					for(int i = 0; i < split.length; i++ ){
-						scoreOptions[i] = Integer.parseInt(split[i]);
-					}
-				} else {
-					scoreOptions = new Integer[0];
-				}
-				
-				questionMap.put("scoreOptions", scoreOptions);// 分数选项从试卷中取
-				questionMap.put("options", new String[0]);// 默认为长度为0的数组
-				if (question.getType() == 1 || question.getType() == 2) {// 如果是单选或多选，添加选项
-					List<QuestionOption> questionOptionList = questionOptionService
-							.getList(paperQuestion.getQuestionId());
-					String[] options = new String[questionOptionList.size()];
-					for (int i = 0; i < questionOptionList.size(); i++) {
-						options[i] = questionOptionList.get(i).getOptions();// 按选项顺序添加试题
-					}
-					questionMap.put("options", options);
-				}
-
-				List<PaperQuestionAnswer> answerList = paperQuestionAnswerService.getList(id, question.getId());// 答案
-				List<Map<String, Object>> answerMapList = new ArrayList<Map<String, Object>>();
-				for (PaperQuestionAnswer answer : answerList) {
-					Map<String, Object> map2 = new HashMap<String, Object>();
-					map2.put("score", answer.getScore());
-
-					if (question.getType() == 3 || (question.getType() == 5 && question.getAi() == 1)) {
-						map2.put("answer", answer.getAnswer().split("\n"));
-					} else if (question.getType() == 2) {
-						map2.put("answer", answer.getAnswer().split(","));
-					} else {
-						map2.put("answer", new String[] { answer.getAnswer() });
-					}
-
-					answerMapList.add(map2);
-				}
-
-				questionMap.put("answers", answerMapList);
-				questionsListMap.add(questionMap);
+		if (paper.getGenType() == 1) {
+			List<Question> questionList = getQuestionList(id);
+			for (Question question : questionList) {
+				idQuestionMap.put(question.getId(), question);
 			}
-			singleResult.put("questionList", questionsListMap);
-			resultList.add(singleResult);
+			
+			for (PaperQuestion chapter : chapterList) {
+				Map<String, Object> singleResult = new HashMap<String, Object>();// 章节
+				Map<String, Object> chapterMap = new HashMap<String, Object>();
+				chapterMap.put("id", chapter.getId());
+				chapterMap.put("name", chapter.getName());
+				chapterMap.put("description", chapter.getDescription());
+				singleResult.put("chapter", chapterMap);
+
+				List<PaperQuestion> paperQuestionList = paperQuestionService.getQuestionList(chapter.getId(), null, null);// 试题
+				List<Map<String, Object>> questionsListMap = new ArrayList<>();
+				for (PaperQuestion paperQuestion : paperQuestionList) {
+					Map<String, Object> questionMap = new HashMap<>();
+					Question question = idQuestionMap.get(paperQuestion.getQuestionId());
+					questionMap.put("id", question.getId());
+					questionMap.put("type", question.getType());
+					questionMap.put("typeName", DictCache.getDictValue("QUESTION_TYPE", question.getType().toString()));
+					questionMap.put("difficulty", question.getDifficulty());
+					questionMap.put("difficultyName", DictCache.getDictValue("QUESTION_DIFFICULTY", question.getDifficulty().toString()));
+					questionMap.put("title", question.getTitle());
+					questionMap.put("ai", question.getAi());
+					questionMap.put("analysis", question.getAnalysis());
+					questionMap.put("score", paperQuestion.getScore());// 分数从试卷中取
+					
+					Integer[] scoreOptions = null;//new Integer[split.length];
+					if (ValidateUtil.isValid(paperQuestion.getScoreOptions())) {
+						String[] split = paperQuestion.getScoreOptions().split(",");
+						scoreOptions = new Integer[split.length];
+						for(int i = 0; i < split.length; i++ ){
+							scoreOptions[i] = Integer.parseInt(split[i]);
+						}
+					} else {
+						scoreOptions = new Integer[0];
+					}
+					
+					questionMap.put("scoreOptions", scoreOptions);// 分数选项从试卷中取
+					questionMap.put("options", new String[0]);// 默认为长度为0的数组
+					if (question.getType() == 1 || question.getType() == 2) {// 如果是单选或多选，添加选项
+						List<QuestionOption> questionOptionList = questionOptionService
+								.getList(paperQuestion.getQuestionId());
+						String[] options = new String[questionOptionList.size()];
+						for (int i = 0; i < questionOptionList.size(); i++) {
+							options[i] = questionOptionList.get(i).getOptions();// 按选项顺序添加试题
+						}
+						questionMap.put("options", options);
+					}
+
+					List<PaperQuestionAnswer> answerList = paperQuestionAnswerService.getList(id, question.getId());// 答案
+					List<Map<String, Object>> answerMapList = new ArrayList<Map<String, Object>>();
+					for (PaperQuestionAnswer answer : answerList) {
+						Map<String, Object> map2 = new HashMap<String, Object>();
+						map2.put("score", answer.getScore());
+
+						if (question.getType() == 3 || (question.getType() == 5 && question.getAi() == 1)) {
+							map2.put("answer", answer.getAnswer().split("\n"));
+						} else if (question.getType() == 2) {
+							map2.put("answer", answer.getAnswer().split(","));
+						} else {
+							map2.put("answer", new String[] { answer.getAnswer() });
+						}
+
+						answerMapList.add(map2);
+					}
+
+					questionMap.put("answers", answerMapList);
+					questionsListMap.add(questionMap);
+				}
+				singleResult.put("questionList", questionsListMap);
+				resultList.add(singleResult);
+			}
+		} else {
+			List<Question> questionList = paperQuestionService.getQuestionRandList(examId, paper.getId());
+			for (Question question : questionList) {
+				idQuestionMap.put(question.getId(), question);
+			}
+			
+			for (PaperQuestion chapter : chapterList) {
+				Map<String, Object> singleResult = new HashMap<String, Object>();// 章节
+				Map<String, Object> chapterMap = new HashMap<String, Object>();
+				chapterMap.put("id", chapter.getId());
+				chapterMap.put("name", chapter.getName());
+				chapterMap.put("description", chapter.getDescription());
+				singleResult.put("chapter", chapterMap);
+				// 章节规则
+				List<Map<String, Object>> randChapterRulesListMap = new ArrayList<>();
+				if (!ValidateUtil.isValid(userId)) {
+					userId = getCurUser().getId();
+				}
+				List<PaperQuestion> questionRandList = paperQuestionService.getQuestionList(chapter.getId(), examId, userId);//随机试题
+				for (PaperQuestion paperQuestion : questionRandList) {
+					Map<String, Object> randChapterRulesMap = new HashMap<>();
+					Question question = idQuestionMap.get(paperQuestion.getQuestionId());
+					randChapterRulesMap.put("id", question.getId());
+					randChapterRulesMap.put("type", question.getType());
+					randChapterRulesMap.put("typeName", DictCache.getDictValue("QUESTION_TYPE", question.getType().toString()));
+					randChapterRulesMap.put("difficulty", question.getDifficulty());
+					randChapterRulesMap.put("difficultyName", DictCache.getDictValue("QUESTION_DIFFICULTY", question.getDifficulty().toString()));
+					randChapterRulesMap.put("title", question.getTitle());
+					randChapterRulesMap.put("ai", question.getAi());
+					randChapterRulesMap.put("analysis", question.getAnalysis());
+					randChapterRulesMap.put("score", paperQuestion.getScore());
+					
+					Integer[] scoreOptions = null;
+					if (ValidateUtil.isValid(paperQuestion.getScoreOptions())) {
+						String[] split = paperQuestion.getScoreOptions().split(",");
+						scoreOptions = new Integer[split.length];
+						for(int i = 0; i < split.length; i++ ){
+							scoreOptions[i] = Integer.parseInt(split[i]);
+						}
+					} else {
+						scoreOptions = new Integer[0];
+					}
+					
+					randChapterRulesMap.put("scoreOptions", scoreOptions);
+					randChapterRulesMap.put("options", new String[0]);// 默认为长度为0的数组
+					if (question.getType() == 1 || question.getType() == 2) {// 如果是单选或多选，添加选项
+						List<QuestionOption> questionOptionList = questionOptionService.getList(paperQuestion.getQuestionId());
+						String[] options = new String[questionOptionList.size()];
+						for (int i = 0; i < questionOptionList.size(); i++) {
+							options[i] = questionOptionList.get(i).getOptions();// 按选项顺序添加试题
+						}
+						randChapterRulesMap.put("options", options);
+					}
+
+					List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());// 答案
+					List<Map<String, Object>> answerMapList = new ArrayList<Map<String, Object>>();
+					for (QuestionAnswer answer : questionAnswerList) {
+						Map<String, Object> map2 = new HashMap<String, Object>();
+						map2.put("score", answer.getScore());
+
+						if (question.getType() == 3 || (question.getType() == 5 && question.getAi() == 1)) {
+							map2.put("answer", answer.getAnswer().split("\n"));
+						} else if (question.getType() == 2) {
+							map2.put("answer", answer.getAnswer().split(","));
+						} else {
+							map2.put("answer", new String[] { answer.getAnswer() });
+						}
+
+						answerMapList.add(map2);
+					}
+
+					randChapterRulesMap.put("answers", answerMapList);
+					randChapterRulesListMap.add(randChapterRulesMap);
+				}
+				singleResult.put("questionList", randChapterRulesListMap);
+				resultList.add(singleResult);
+			}
 		}
 		return resultList;
 	}
@@ -978,39 +1093,63 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		}
 		List<PaperQuestion> chapterList = paperQuestionService.getChapterList(id);
 		if (chapterList == null || chapterList.size() <= 0) {
-			throw new MyException("至少需要添加一道试题！");
+			throw new MyException("至少需要添加一个章节");
 		}
-		List<PaperQuestion> QuestionList = paperQuestionService.getQuestionList(chapterList.get(0).getId());
-		if (QuestionList == null || QuestionList.size() <= 0) {
-			throw new MyException("至少需要添加一道试题！");
-		}
-		
-		List<Question> questionList = paperDao.getQuestionList(id);
-		boolean ai = true;
-		for (Question question : questionList) {
-			if (question.getAi() != 1) {
-				ai = false;
-				break;
+		if (paper.getGenType() == 1 ) {
+			List<PaperQuestion> QuestionList = paperQuestionService.getQuestionList(chapterList.get(0).getId(), null, null);
+			if (QuestionList == null || QuestionList.size() <= 0) {				
+				throw new MyException("至少需要添加一道试题");
 			}
 		}
-
+		if (paper.getGenType() == 2 ) {//章节随机规则
+			List<RandChapterRules> RandChapterRulesList = randChapterRulesService.getChapterList(id, chapterList.get(0).getId());
+			if (RandChapterRulesList == null || RandChapterRulesList.size() <= 0) {
+				throw new MyException("至少需要添加一个章节规则");
+			}
+		}
+		
+		randChapterRulesService.checkRandChapterRules(id);//校验章节随机规则
+		
+		boolean ai = true;
+		BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0); //试卷总分
+		if (paper.getGenType() == 1) {
+			List<Question> questionList = paperDao.getQuestionList(id);
+			for (Question question : questionList) {
+				if (question.getAi() != 1) {
+					ai = false;
+					break;
+				}
+			}
+			
+			List<PaperQuestion> paperQuestionList = paperQuestionService.getList(id);
+			for (PaperQuestion paperQuestion : paperQuestionList) {
+				if (paperQuestion.getType() == 1) {
+					continue;
+				}
+				totalScore.add(paperQuestion.getScore());
+			}
+		}
+		
+		if (paper.getGenType() == 2) {
+			for (PaperQuestion paperQuestion : chapterList) {
+				List<RandChapterRules> randChapterRulesList = randChapterRulesService.getChapterList(paperQuestion.getPaperId(), paperQuestion.getId());
+				for (RandChapterRules randChapterRules : randChapterRulesList) {
+					totalScore.add(new BigDecimal(randChapterRules.getTotalNumber()).multiply(randChapterRules.getScore()));
+					if (randChapterRules.getAi() != 1) {
+						ai = false;
+					}
+				}
+			}
+		}
+		
 		if (paper.getMarkType() == 1 && !ai) {
 			throw new MyException("包含人工阅卷试题，发布失败");
 		}
-
-		// 发布试卷
-		List<PaperQuestion> paperQuestionList = paperQuestionService.getList(id);
-		BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
-		for (PaperQuestion paperQuestion : paperQuestionList) {
-			if (paperQuestion.getType() == 1) {
-				continue;
-			}
-			totalScore.add(paperQuestion.getScore());
-		}
-
 		if (paper.getMarkType() == 2 && ai) {// 如果试题不包含人工阅卷试题，修改试卷类型为智能阅卷
 			paper.setMarkType(1);
 		}
+		
+		// 发布试卷
 		paper.setTotalScore(totalScore.getResult());
 		paper.setUpdateTime(new Date());
 		paper.setUpdateUserId(getCurUser().getId());

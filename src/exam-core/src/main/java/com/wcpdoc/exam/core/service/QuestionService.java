@@ -1,7 +1,10 @@
 package com.wcpdoc.exam.core.service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.Question;
 /**
@@ -85,4 +88,21 @@ public interface QuestionService extends BaseService<Question>{
 	 * @param id void
 	 */
 	void publish(Integer questionType, Integer[] ids) throws Exception;
+	
+	/**
+	 * 获取随机试题
+	 * 
+	 * v1.0 chenyun 2022年2月11日下午1:35:07
+	 * @return List<Question>
+	 */
+	List<Question> randomQuestion(Integer questionTypeId, Integer type, Integer difficulty, BigDecimal queryScore, Integer ai, Integer totalNumber);
+	
+	/**
+	 * 试题分类下试题 (章节随机规则)
+	 * 
+	 * v1.0 chenyun 2022年2月18日上午11:14:03
+	 * @param pageIn
+	 * @return PageOut
+	 */
+	PageOut getListpageMap(PageIn pageIn);
 }

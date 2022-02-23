@@ -1,5 +1,6 @@
 package com.wcpdoc.exam.core.service.impl;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -29,14 +30,17 @@ import com.wcpdoc.exam.core.entity.MyExamDetail;
 import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
+import com.wcpdoc.exam.core.entity.RandChapterRules;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.ExamTypeService;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
+import com.wcpdoc.exam.core.service.PaperQuestionService;
 import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.PaperTypeService;
 import com.wcpdoc.exam.core.service.QuestionService;
+import com.wcpdoc.exam.core.service.RandChapterRulesService;
 
 /**
  * 考试服务层实现
@@ -65,6 +69,10 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	private MyMarkService myMarkService;
 	@Resource
 	private UserService userService;
+	@Resource
+	private PaperQuestionService paperQuestionService;
+	@Resource
+	private RandChapterRulesService randChapterRulesService;
 	
 	@Override
 	@Resource(name = "examDaoImpl")
@@ -73,7 +81,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	@Override
-	public void addAndUpdate(Exam exam) {
+	public Integer addAndUpdate(Exam exam) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(exam.getName())) {
 			throw new MyException("参数错误：name");
@@ -123,6 +131,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		exam.setMarkStartTime(paper.getMarkType() == 1 ? null : exam.getMarkStartTime());
 		exam.setMarkEndTime(paper.getMarkType() == 1 ? null : exam.getMarkEndTime());
 		add(exam);
+		return exam.getId(); //快速创建考试需要用id查找信息
 	}
 	
 	@Override
@@ -240,11 +249,48 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 				throw new MyException("阅卷结束时间必须大于阅卷开始时间");
 			}
 		}
+		if (paper.getGenType() == 2) {
+			randChapterRulesService.checkRandChapterRules(id);//校验章节随机规则
+		}
+		
+		String[] examUserIds = new String[0];
+		Integer[] markUserIds = new Integer[0];
+		if (paper.getMarkType() == 2) {//人工
+			List<MyMark> myMarkList = myMarkService.getList(exam.getId());
+			if (myMarkList != null && myMarkList.size() > 0 ) {
+				examUserIds = new String[myMarkList.size()];
+				markUserIds = new Integer[myMarkList.size()];
+				for (int i = 0; i < myMarkList.size(); i++) {
+					markUserIds[i] = myMarkList.get(i).getMarkUserId();
+					examUserIds[i] = myMarkList.get(i).getExamUserIds().substring(1, myMarkList.get(i).getExamUserIds().length()-1);
+				}
+			}
+		}
+
+		List<MyExam> myExamList = myExamService.getList(exam.getId()) ;//看看有没有考试人
+		if (myExamList != null && myExamList.size() > 0 ) {//如果有删除重新添加试题
+			if (paper.getMarkType() == 1) {
+				examUserIds = new String[myExamList.size()];
+			}
+
+			for(int i = 0; i < myExamList.size(); i++){
+				if (paper.getMarkType() == 1) {
+					examUserIds[i] = myExamList.get(i).getUserId().toString();
+				}
+				
+				myExamService.del(myExamService.getEntity(myExamList.get(i).getExamId(), myExamList.get(i).getUserId()).getId()); //不修改状态，直接删除 无用的数据
+				myExamDetailService.del(myExamList.get(i).getId(), myExamList.get(i).getUserId());
+			}
+		}
+		
 		// 发布考试
 		exam.setState(1);
 		exam.setUpdateUserId(getCurUser().getId());
 		exam.setUpdateTime(new Date());
 		examDao.update(exam);
+		if (exam.getId() != null  && examUserIds.length > 0) {
+			updateMarkSet(id, examUserIds, markUserIds); //重新设置考试人 阅卷人
+		}
 		
 		// 标记为需要监听的考试（考试结束自动阅卷）
 		AutoExamCache.put(exam.getId(), exam.getEndTime());
@@ -273,9 +319,9 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if (exam.getState() == 0) {
 			throw new MyException("考试已删除");
 		}
-		if (exam.getState() == 2) {
-			throw new MyException("考试未发布");
-		}
+//		if (exam.getState() == 2) {
+//			throw new MyException("考试未发布");
+//		}
 		if (exam.getState() == 3) {
 			throw new MyException("考试已归档");
 		}
@@ -319,7 +365,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		List<MyExam> myExamList = myExamService.getList(id);// 当前考试的人员
 		ListIterator<MyExam> myExamListIterator = myExamList.listIterator();
 		Date curTime = new Date();
-		List<PaperQuestion> paperQuestionList = paperService.getPaperQuestionList(exam.getPaperId());// 试题列表（不能用试题中的试题 分值修改有问题 只能用试卷试题中的试题）
 		while (myExamListIterator.hasNext()) {// 同步考试人员信息
 			/**
 			 * 页面：1,2,3
@@ -333,39 +378,109 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			} else {// 页面没有数据库有，删除数据库数据
 				myExamDetailService.del(myExam.getExamId(), myExam.getUserId());
 				myExamService.del(myExam.getId());
+				paperQuestionService.del(myExam.getExamId(), myExam.getUserId());//如果试卷时随机组卷 删除随机试题
 			}
 		}
-		for (Integer userId : examUserIdSet) {// 页面有数据库没有，数据库添加
-			MyExam myExam = new MyExam();
-			myExam.setExamId(id);
-			myExam.setUserId(userId);
-			// myExam.setAnswerStartTime(exam.getStartTime());// 第一次答题记录时间，不是这里
-			// myExam.setAnswerEndTime(exam.getEndTime());
-			//myExam.setMarkUserId(null);
-			// myExam.setMarkStartTime(exam.getMarkStartTime());
-			// myExam.setMarkEndTime(exam.getMarkEndTime());
-			// myExam.setTotalScore(BigDecimal.ZERO);//没有考试，不要设置分数
-			myExam.setState(1);// 未考试
-			myExam.setMarkState(1);// 未阅卷
-			//myExam.setAnswerState(null);// 不设置及格状态
-			myExam.setUpdateTime(curTime);
-			myExam.setUpdateUserId(getCurUser().getId());
-			myExamService.add(myExam);// 添加我的考试
-			
-			for (PaperQuestion paperQuestion : paperQuestionList) {
-				MyExamDetail myExamDetail = new MyExamDetail();
-				myExamDetail.setMyExamId(myExam.getId());
-				myExamDetail.setExamId(myExam.getExamId());
-				myExamDetail.setUserId(myExam.getUserId());
-				myExamDetail.setQuestionId(paperQuestion.getQuestionId());
-				//myExamDetail.setAnswerTime(null);
-				//myExamDetail.setMarkUserId(null);
-				//myExamDetail.setMarkTime(null);
-				//myExamDetail.setAnswer(null);
-				//myExamDetail.setScore(null);
-				myExamDetail.setQuestionScore(paperQuestion.getScore());
-				//myExamDetail.setAnswerFileId(null);
-				myExamDetailService.add(myExamDetail);// 添加我的考试详细
+		
+		if (paper.getGenType() == 1) {//人工组卷
+			List<PaperQuestion> paperQuestionList = paperService.getPaperQuestionList(exam.getPaperId());// 试题列表（不能用试题中的试题 分值修改有问题 只能用试卷试题中的试题）
+			for (Integer userId : examUserIdSet) {// 页面有数据库没有，数据库添加
+				MyExam myExam = new MyExam();
+				myExam.setExamId(id);
+				myExam.setUserId(userId);
+				// myExam.setAnswerStartTime(exam.getStartTime());// 第一次答题记录时间，不是这里
+				// myExam.setAnswerEndTime(exam.getEndTime());
+				//myExam.setMarkUserId(null);
+				// myExam.setMarkStartTime(exam.getMarkStartTime());
+				// myExam.setMarkEndTime(exam.getMarkEndTime());
+				// myExam.setTotalScore(BigDecimal.ZERO);//没有考试，不要设置分数
+				myExam.setState(1);// 未考试
+				myExam.setMarkState(1);// 未阅卷
+				//myExam.setAnswerState(null);// 不设置及格状态
+				myExam.setUpdateTime(curTime);
+				myExam.setUpdateUserId(getCurUser().getId());
+				myExamService.add(myExam);// 添加我的考试
+				
+				if (exam.getState() == 1) {
+					for (PaperQuestion paperQuestion : paperQuestionList) {
+						MyExamDetail myExamDetail = new MyExamDetail();
+						myExamDetail.setMyExamId(myExam.getId());
+						myExamDetail.setExamId(myExam.getExamId());
+						myExamDetail.setUserId(myExam.getUserId());
+						myExamDetail.setQuestionId(paperQuestion.getQuestionId());
+						//myExamDetail.setAnswerTime(null);
+						//myExamDetail.setMarkUserId(null);
+						//myExamDetail.setMarkTime(null);
+						//myExamDetail.setAnswer(null);
+						//myExamDetail.setScore(null);
+						myExamDetail.setQuestionScore(paperQuestion.getScore());
+						//myExamDetail.setAnswerFileId(null);
+						myExamDetailService.add(myExamDetail);// 添加我的考试详细
+					}
+				}
+			}
+		}
+		if (paper.getGenType() == 2) {//随机组卷
+			Map<Integer, List<Map<String, Object>>> checkRandChapterRules = randChapterRulesService.checkRandChapterRules(paper.getId());// 章节中所有试题分类下的所有试题
+			List<PaperQuestion> chapterList = paperQuestionService.getChapterList(paper.getId());//章节
+			for(Integer userId : examUserIdSet){
+				MyExam myExam = new MyExam();
+				myExam.setExamId(id);
+				myExam.setUserId(userId);
+				myExam.setState(1);// 未考试
+				myExam.setMarkState(1);// 未阅卷
+				myExam.setUpdateTime(curTime);
+				myExam.setUpdateUserId(getCurUser().getId());
+				myExamService.add(myExam);// 添加我的考试
+				
+				if (exam.getState() == 1) {
+					for (PaperQuestion chapter : chapterList) {
+						for(RandChapterRules randChapterRules : randChapterRulesService.getChapterList(chapter.getPaperId(), chapter.getId())){//章节规则
+							// 试题类型、试题难易程度、分值、自能阅卷、个数
+							for (int i = 1; i <= randChapterRules.getTotalNumber(); i++) {//随机试题
+								List<Map<String, Object>> list = checkRandChapterRules.get(randChapterRules.getQuestionTypeId());
+								for(int j = 0; j < list.size(); j++){
+									if ( !(!ValidateUtil.isValid(randChapterRules.getType()) || randChapterRules.getType().equals(list.get(j).get("type").toString())) 
+											&& !(!ValidateUtil.isValid(randChapterRules.getDifficulty()) || randChapterRules.getDifficulty().equals(list.get(j).get("difficulty").toString())) 
+											&& !(!ValidateUtil.isValid(randChapterRules.getAi()) || randChapterRules.getAi().equals(list.get(j).get("ai").toString()))
+											&& !(!ValidateUtil.isValid(randChapterRules.getQueryScore()) || randChapterRules.getQueryScore().equals(list.get(j).get("score").toString())) ) {
+											continue;
+										}
+										PaperQuestion paperQuestion = new PaperQuestion();
+										paperQuestion.setUpdateTime(new Date());
+										paperQuestion.setUpdateUserId(getCurUser().getId());
+										paperQuestion.setQuestionId(Integer.valueOf(list.get(j).get("id").toString()));
+										paperQuestion.setType(3);
+										paperQuestion.setNo(i);
+										paperQuestion.setScore(randChapterRules.getScore());
+										paperQuestion.setScoreOptions(randChapterRules.getScoreOptions());
+										paperQuestion.setParentId(randChapterRules.getPaperQuestionId());
+										paperQuestion.setPaperId(randChapterRules.getPaperId());
+										paperQuestion.setExamId(myExam.getExamId());
+										paperQuestion.setUserId(userId);
+										paperQuestion.setRandChapterRulesId(randChapterRules.getId());
+										paperQuestionService.add(paperQuestion);
+										
+										paperQuestion.setParentSub(String.format("%s%s_", chapter.getParentSub(), paperQuestion.getId()));
+										paperQuestionService.update(paperQuestion);
+										
+										MyExamDetail myExamDetail = new MyExamDetail();
+										myExamDetail.setMyExamId(myExam.getId());
+										myExamDetail.setExamId(myExam.getExamId());
+										myExamDetail.setUserId(myExam.getUserId());
+										myExamDetail.setQuestionId(Integer.valueOf(list.get(j).get("id").toString()));
+										myExamDetail.setQuestionScore(randChapterRules.getScore());
+										myExamDetailService.add(myExamDetail);// 添加我的考试详细
+										
+										list.remove(j);//删除列表中现在
+										break;
+								}
+								Collections.shuffle(list);//乱序
+								checkRandChapterRules.put(randChapterRules.getQuestionTypeId(), list);
+							}
+						}
+					}
+				}
 			}
 		}
 		
@@ -388,6 +503,11 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		}
 	}
 
+	public List<Map<String, Object>> getMapList(Integer examTypeId) {
+		
+		return null;
+	}
+	
 	@Override
 	public List<Exam> getList(Integer examTypeId) {
 		return examDao.getList(examTypeId);

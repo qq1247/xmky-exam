@@ -1,5 +1,6 @@
 package com.wcpdoc.exam.core.dao.impl;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -36,6 +37,10 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 				+ "FROM EXM_QUESTION QUESTION "
 				+ "LEFT JOIN EXM_QUESTION_TYPE QUESTION_TYPE ON QUESTION.QUESTION_TYPE_ID = QUESTION_TYPE.ID "
 				+ "LEFT JOIN SYS_USER CREATE_USER ON QUESTION.CREATE_USER_ID = CREATE_USER.ID ";
+		if (ValidateUtil.isValid(pageIn.get("exPaperId"))) {
+			sql += "LEFT JOIN EXM_PAPER_QUESTION Z ON Z.QUESTION_ID = QUESTION.ID ";
+		}
+		
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("questionTypeId")), "QUESTION.QUESTION_TYPE_ID = ?", pageIn.get("questionTypeId"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("questionTypeName")), "QUESTION_TYPE.NAME LIKE ?", String.format("%%%s%%", pageIn.get("questionTypeName")))
@@ -46,7 +51,7 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 				.addWhere(ValidateUtil.isValid(pageIn.get("score")), "QUESTION.SCORE = ?", pageIn.get("score"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("ai")), "QUESTION.AI = ?", pageIn.get("ai"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("paperId", Integer.class)), "EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.get("paperId", Integer.class))
-				.addWhere(ValidateUtil.isValid(pageIn.get("exPaperId")), "NOT EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.QUESTION_ID = QUESTION.ID)", pageIn.get("exPaperId"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("exPaperId")), " Z.PAPER_ID != ? ", pageIn.get("exPaperId"))
 				.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "QUESTION.STATE IN (1,2)")// 默认查询发布和草稿状态
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && "0".equals(pageIn.get("state")), "QUESTION.STATE = 0 AND QUESTION.UPDATE_TIME > ?", DateUtil.getNextDay(new Date(), -7))// 查询已删除并且最近7天的试题（回收站使用）
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "QUESTION.STATE = ?", pageIn.get("state"))// 默认查询发布和草稿状态
@@ -63,4 +68,58 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 		return getList(sql, new Object[] { questionTypeId });
 	}
 
+	@Override
+	public List<Question> randomQuestion(Integer questionTypeId, Integer type, Integer difficulty,  BigDecimal queryScore, Integer ai, Integer totalNumber) {
+		String sql = "SELECT QUESTION.* "
+				+ "FROM EXM_QUESTION QUESTION "
+				+ "WHERE QUESTION.STATE = 1 AND QUESTION.QUESTION_TYPE_ID = ? AND QUESTION.TYPE = ? ";
+		
+		if (ValidateUtil.isValid(difficulty) && ValidateUtil.isValid(queryScore) && ValidateUtil.isValid(ai) ) {
+			sql += "AND QUESTION.DIFFICULTY = ? AND QUESTION.SCORE = ? AND QUESTION.AI = ? ORDER BY RAND() LIMIT 0,? ";
+			return getList(sql, new Object[] { questionTypeId, type, difficulty, queryScore, ai, totalNumber}, Question.class);
+		}
+		
+		if (!ValidateUtil.isValid(difficulty) && !ValidateUtil.isValid(queryScore) && ValidateUtil.isValid(ai) ) {
+			sql += "AND QUESTION.AI = ? ORDER BY RAND() LIMIT 0,? ";
+			return getList(sql, new Object[] { questionTypeId, type, ai, totalNumber}, Question.class);
+		}
+		
+		if (!ValidateUtil.isValid(difficulty) && ValidateUtil.isValid(queryScore) && ValidateUtil.isValid(ai) ) {
+			sql += "AND QUESTION.SCORE = ? AND QUESTION.AI = ? ORDER BY RAND() LIMIT 0,? ";
+			return getList(sql, new Object[] { questionTypeId, type, queryScore, ai, totalNumber}, Question.class);
+		}
+		
+		if (!ValidateUtil.isValid(difficulty) && ValidateUtil.isValid(queryScore) && !ValidateUtil.isValid(ai) ) {
+			sql += "AND QUESTION.SCORE = ? ORDER BY RAND() LIMIT 0,? ";
+			return getList(sql, new Object[] { questionTypeId, type, queryScore, totalNumber}, Question.class);
+		}
+		
+		if (ValidateUtil.isValid(difficulty) && !ValidateUtil.isValid(queryScore) && ValidateUtil.isValid(ai) ) {
+			sql += "AND QUESTION.DIFFICULTY = ? AND QUESTION.AI = ? ORDER BY RAND() LIMIT 0,? ";
+			return getList(sql, new Object[] { questionTypeId, type, difficulty, ai, totalNumber}, Question.class);
+		}
+
+		if (ValidateUtil.isValid(difficulty) && ValidateUtil.isValid(queryScore) && !ValidateUtil.isValid(ai) ) {
+			sql += "AND QUESTION.DIFFICULTY = ? ORDER BY RAND() LIMIT 0,? ";
+			return getList(sql, new Object[] { questionTypeId, type, difficulty, totalNumber}, Question.class);
+		}
+		
+		if (ValidateUtil.isValid(difficulty) && !ValidateUtil.isValid(queryScore) && !ValidateUtil.isValid(ai) ) {
+			sql += "AND QUESTION.DIFFICULTY = ? ORDER BY RAND() LIMIT 0,? ";
+			return getList(sql, new Object[] { questionTypeId, type, difficulty, totalNumber}, Question.class);
+		}
+		
+		sql += "ORDER BY RAND() LIMIT 0,? ";
+		return getList(sql, new Object[] { questionTypeId, type, totalNumber}, Question.class);
+	}
+
+	@Override
+	public PageOut getListpageMap(PageIn pageIn) {
+		String sql = "SELECT QUESTION.ID, QUESTION.TYPE, QUESTION.DIFFICULTY, QUESTION.AI, QUESTION.SCORE "
+				+ "FROM EXM_QUESTION QUESTION ";
+		SqlUtil sqlUtil = new SqlUtil(sql);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("questionTypeId", Integer.class)), "QUESTION.QUESTION_TYPE_ID = ?", pageIn.get("questionTypeId", Integer.class))
+			   .addWhere("QUESTION.STATE = 1 ");
+		return getListpage(sqlUtil, pageIn);
+	}
 }
