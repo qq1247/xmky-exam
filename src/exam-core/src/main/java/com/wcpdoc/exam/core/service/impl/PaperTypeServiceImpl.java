@@ -40,7 +40,7 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 	}
 
 	@Override
-	public void addAndUpdate(PaperType paperType) {
+	public Integer addAndUpdate(PaperType paperType) {
 		//校验数据有效性
 		if (!ValidateUtil.isValid(paperType.getName())) {
 			throw new MyException("参数错误：name");
@@ -60,6 +60,7 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 		
 		//保存图片
 		//fileService.doUpload(imgId);
+		return paperType.getId(); //快速创建考试需要用id查找信息
 	}
 
 	@Override

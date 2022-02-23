@@ -20,7 +20,7 @@ public interface ExamService extends BaseService<Exam>{
 	 * v1.0 chenyun 2021年8月25日下午5:58:55
 	 * @param exam void
 	 */
-	void addAndUpdate(Exam exam);
+	Integer addAndUpdate(Exam exam);
 	
 	/**
 	 * 修改考试
