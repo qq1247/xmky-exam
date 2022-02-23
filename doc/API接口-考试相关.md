@@ -454,6 +454,8 @@ http请求头需添加Authorization字段，
 | 请求参数| 类型    | 描述   | 必填 |
 | ---- | ------- | ------ | ---- |
 | id   | Integer | 试卷id | 是   |
+| examId  | Integer | 试题id | 否  |
+| userId  | Integer | 人员id | 否   |
 
 | 响应参数|  类型   |  描述  |
 | --------   | -----   | -----  |
