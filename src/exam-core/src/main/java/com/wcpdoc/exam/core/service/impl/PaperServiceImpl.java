@@ -13,7 +13,6 @@ import javax.annotation.Resource;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.base.cache.DictCache;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
@@ -939,9 +938,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 					Question question = idQuestionMap.get(paperQuestion.getQuestionId());
 					questionMap.put("id", question.getId());
 					questionMap.put("type", question.getType());
-					questionMap.put("typeName", DictCache.getDictValue("QUESTION_TYPE", question.getType().toString()));
 					questionMap.put("difficulty", question.getDifficulty());
-					questionMap.put("difficultyName", DictCache.getDictValue("QUESTION_DIFFICULTY", question.getDifficulty().toString()));
 					questionMap.put("title", question.getTitle());
 					questionMap.put("ai", question.getAi());
 					questionMap.put("analysis", question.getAnalysis());
@@ -1017,9 +1014,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 					Question question = idQuestionMap.get(paperQuestion.getQuestionId());
 					randChapterRulesMap.put("id", question.getId());
 					randChapterRulesMap.put("type", question.getType());
-					randChapterRulesMap.put("typeName", DictCache.getDictValue("QUESTION_TYPE", question.getType().toString()));
 					randChapterRulesMap.put("difficulty", question.getDifficulty());
-					randChapterRulesMap.put("difficultyName", DictCache.getDictValue("QUESTION_DIFFICULTY", question.getDifficulty().toString()));
 					randChapterRulesMap.put("title", question.getTitle());
 					randChapterRulesMap.put("ai", question.getAi());
 					randChapterRulesMap.put("analysis", question.getAnalysis());

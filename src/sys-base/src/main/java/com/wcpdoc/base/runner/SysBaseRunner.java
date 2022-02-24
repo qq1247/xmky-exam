@@ -11,7 +11,6 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-import com.wcpdoc.base.cache.DictCache;
 import com.wcpdoc.base.cache.ParmCache;
 import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.base.service.ParmService;
@@ -30,9 +29,6 @@ public class SysBaseRunner implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		log.info("启动监听：数据字典加入缓存");
-		DictCache.flushCache();
-		
 		Parm parm = parmService.getEntity(1);
 		if (parm == null) {
 			parm = new Parm();

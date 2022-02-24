@@ -1,12 +1,14 @@
 package com.wcpdoc.base.service.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.base.cache.DictCache;
 import com.wcpdoc.base.dao.DictDao;
 import com.wcpdoc.base.entity.Dict;
 import com.wcpdoc.base.service.DictService;
@@ -38,9 +40,6 @@ public class DictServiceImpl extends BaseServiceImp<Dict> implements DictService
 	public void addAndUpdate(Dict dict) {
 		// 添加数据字典
 		add(dict);
-
-		// 刷新缓存
-		DictCache.flushCache();
 	}
 
 	@Override
@@ -52,17 +51,29 @@ public class DictServiceImpl extends BaseServiceImp<Dict> implements DictService
 		entity.setDictValue(dict.getDictValue());
 		entity.setNo(dict.getNo());
 		update(entity);
-
-		// 刷新缓存
-		DictCache.flushCache();
 	}
 
 	@Override
 	public void delAndUpdate(Integer id) {
 		// 删除数据字典
 		del(id);
+	}
 
-		// 刷新缓存
-		DictCache.flushCache();
+	@Override
+	public List<Dict> getList(String index) {
+		List<Dict> dictList = getList();
+		List<Dict> targetDictList = new ArrayList<>();
+		for (Dict dict : dictList) {
+			targetDictList.add(dict);
+		}
+		
+		Collections.sort(targetDictList, new Comparator<Dict>() {
+			@Override
+			public int compare(Dict o1, Dict o2) {
+				return o1.getNo() - o2.getNo();
+			}
+			
+		});
+		return dictDao.getList();
 	}
 }
