@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.base.cache.ParmCache;
 import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.ParmService;
@@ -177,7 +178,7 @@ public class ApiMyExamController extends BaseController{
 	@ResponseBody
 	public PageResult email(Integer examId) {
 		try {
-			Parm parm = parmService.getEntity(1);
+			Parm parm = ParmCache.get();
 			List<MyExam> list = myExamService.getList(examId);
 			for(MyExam myExam : list){
 				User user = userService.getEntity(myExam.getUserId());

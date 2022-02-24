@@ -19,13 +19,13 @@ import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
 
 /**
- * 考试服务启动
+ * 考试核心初始化
  * 
  * v1.0 zhanghc 2019年9月29日下午2:32:16
  */
 @Component
-public class ExamRunner implements ApplicationRunner {
-	private static final Logger log = LoggerFactory.getLogger(ExamRunner.class);
+public class ExamCoreRunner implements ApplicationRunner {
+	private static final Logger log = LoggerFactory.getLogger(ExamCoreRunner.class);
 	
 	@Resource
 	private ExamService examService;

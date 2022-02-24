@@ -14,7 +14,7 @@ import com.wcpdoc.auth.cache.JwtSecretCache;
 import com.wcpdoc.core.util.StringUtil;
 
 /**
- * 授权服务启动
+ * 系统权限初始化
  * 
  * v1.0 chenyun 2021年11月16日下午1:44:19
  */

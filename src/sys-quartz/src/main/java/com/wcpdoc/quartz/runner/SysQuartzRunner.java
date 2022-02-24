@@ -16,13 +16,13 @@ import com.wcpdoc.quartz.service.CronService;
 import com.wcpdoc.quartz.util.QuartzUtil;
 
 /**
- * 定时任务启动
+ * 系统定时任务初始化
  * 
  * v1.0 zhanghc 2019年12月16日下午11:32:55
  */
 @Component
-public class QuartzRunner implements ApplicationRunner {
-	private static final Logger log = LoggerFactory.getLogger(QuartzRunner.class);
+public class SysQuartzRunner implements ApplicationRunner {
+	private static final Logger log = LoggerFactory.getLogger(SysQuartzRunner.class);
 	
 	@Resource
 	private CronService cronService;

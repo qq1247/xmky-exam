@@ -79,7 +79,7 @@ public class ApiParmController extends BaseController {
 				return PageResult.err().msg("参数错误：encode");
 			}
 			
-			Parm entity = parmService.get();
+			Parm entity = parmService.getEntity(1);
 			entity.setEmailHost(host);
 			entity.setEmailUserName(userName);
 			entity.setEmailPwd(pwd);
@@ -178,7 +178,7 @@ public class ApiParmController extends BaseController {
 	@ResponseBody
 	public PageResult get() {
 		try {
-			Parm parm = parmService.get();
+			Parm parm = parmService.getEntity(1);
 			return PageResultEx.ok()
 					.addAttr("emailHost", parm.getEmailHost())
 					.addAttr("emailUserName", parm.getEmailUserName())
