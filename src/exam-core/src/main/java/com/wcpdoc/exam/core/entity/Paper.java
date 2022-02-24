@@ -71,10 +71,12 @@ public class Paper {
 		this.showType = showType;
 	}
 
+	/** 1：人工组卷；2：随机组卷 */
 	public Integer getGenType() {
 		return genType;
 	}
 
+	/** 1：人工组卷；2：随机组卷 */
 	public void setGenType(Integer genType) {
 		this.genType = genType;
 	}

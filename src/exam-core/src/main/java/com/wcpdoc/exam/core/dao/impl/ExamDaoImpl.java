@@ -103,4 +103,10 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 		return getMapList(sql, new Object[]{id, markUserId});
 	}
 
+	@Override
+	public List<Exam> getUnMarkList() {
+		String sql = "SELECT * FROM EXM_QUESTION WHERE STATE = 1 AND MARK_STATE IN (1,2)";
+		return getList(sql);
+	}
+
 }

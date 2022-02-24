@@ -611,8 +611,6 @@ INSERT INTO `SYS_DICT` VALUES (52, 'QUESTION_SCORE_OPTIONS', '3', '大小写不�
 
 INSERT INTO `SYS_CRON` VALUES (1, '清理临时附件', 'com.wcpdoc.file.job.ClearFileJob', '0 0 0 1/1 * ? ', '1', '1', '2020-08-26 18:42:08');
 INSERT INTO `SYS_CRON` VALUES (2, '数据库备份', 'com.wcpdoc.quartz.job.DbBackJob', '0 0 0 1/1 * ? ', 1, 1, '2020-08-26 18:42:08');
-INSERT INTO `SYS_CRON` VALUES (3, '自动阅卷', 'com.wcpdoc.exam.core.job.AutoMarkJob', '0/1 * * * * ? *', 1, 1, '2020-08-26 18:42:08');
-INSERT INTO `SYS_CRON` VALUES (4, '自动考试', 'com.wcpdoc.exam.core.job.AutoExamJob', '0/1 * * * * ? *', 1, 1, '2020-08-26 18:42:08');
 
 INSERT INTO `SYS_VER` VALUES (1, '1.0.0', '2017-09-07 15:06:00', 'zhanghc', '初始版本');
 INSERT INTO `SYS_VER` VALUES (2, '1.1.0', '2018-11-27 22:47:00', 'zhanghc', '');
@@ -629,3 +627,4 @@ INSERT INTO `SYS_VER` VALUES (12, '3.2.1', '2021-11-25 16:26:01', 'zhanghc', '')
 INSERT INTO `SYS_VER` VALUES (13, '3.3.0', '2020-11-30 11:11:11', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (14, '3.4.0', '2021-12-31 12:00:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (15, '3.5.0', '2022-01-28 15:36:51', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (16, '3.6.0', '2022-02-28 13:58:02', 'zhanghc', '');

@@ -1,7 +1,7 @@
 package com.wcpdoc.exam.core.runner;
 
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
@@ -11,11 +11,12 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.DateUtil;
-import com.wcpdoc.exam.core.cache.AutoExamCache;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
+import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.service.ExamService;
+import com.wcpdoc.exam.core.service.MyExamDetailService;
 
 /**
  * 考试服务启动
@@ -28,29 +29,45 @@ public class ExamRunner implements ApplicationRunner {
 	
 	@Resource
 	private ExamService examService;
+	@Resource
+	private MyExamDetailService myExamDetailService;
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		// 查找未阅卷的考试，加入定时任务监听，用于考试结束时自动阅卷
-		PageIn pageIn = new PageIn();
-		pageIn.setPageSize(100);
-		pageIn.addAttr("state", "1");// 已发布
-		pageIn.addAttr("markState", "1");// 未阅卷
-		List<Map<String, Object>> resultList = examService.getListpage(pageIn).getList();
-		for (Map<String, Object> result : resultList) {
-			AutoExamCache.put((Integer)result.get("id"), DateUtil.getDateTime(result.get("endTime").toString()));
-			log.info("启动监听：【{}-{}】加入监听，{}开始自动阅卷", result.get("id"), result.get("name"), result.get("endTime"));
+		// 加载未阅卷的考试列表
+		AutoMarkCache.reloadCache();
+		List<Exam> examList = AutoMarkCache.getList();
+		for (Exam exam : examList) {
+			log.info("启动监听：【{}-{}】加入监听，{}开始自动阅卷", 
+					exam.getId(), 
+					exam.getName(), // 未阅卷 取 考试结束时间；阅卷中 取 阅卷结束时间
+					exam.getMarkState() == 1 ? DateUtil.formatDateTime(exam.getEndTime()) : DateUtil.formatDateTime(exam.getMarkEndTime()));
 		}
 		
-		// 查找需要完成阅卷的考试，加入定时任务监听，用于阅卷结束时自动阅卷
-		pageIn = new PageIn();
-		pageIn.setPageSize(100);
-		pageIn.addAttr("state", "1");// 已发布
-		pageIn.addAttr("markState", "2"); // 阅卷中
-		resultList = examService.getListpage(pageIn).getList();
-		for (Map<String, Object> result : resultList) {
-			AutoMarkCache.put((Integer)result.get("id"), DateUtil.getDateTime(result.get("markEndTime").toString()));
-			log.info("启动监听：【{}-{}】加入监听，{}开始完成阅卷", result.get("id"), result.get("name"), result.get("markEndTime"));
+		// 监听阅卷时间到，自动阅卷
+		while (true) {
+			TimeUnit.SECONDS.sleep(1);
+			
+			examList = AutoMarkCache.getList(); // 每次重新取，因为运行中会动态添加删除等。如新发布的考试
+			for (Exam exam : examList) {
+				try {
+					if (exam.getMarkState() == 1 && exam.getEndTime().getTime() <= System.currentTimeMillis()) {
+						AutoMarkCache.del(exam.getId());// 先清理掉缓存，不在监听（如果阅卷报错，在执行一遍也报错，应该人工修复问题后，管理员页面，手动点击刷新缓存重新执行任务）
+						myExamDetailService.doExam(exam.getId());
+					} else if (exam.getMarkState() == 2 && exam.getMarkEndTime().getTime() <= System.currentTimeMillis()) {
+						AutoMarkCache.del(exam.getId());
+						myExamDetailService.doMark(exam.getId());
+					}
+				} catch (MyException e) {// 一个有问题，不影响其他任务执行
+					//TODO 发送错误信息给管理员
+					AutoMarkCache.del(exam.getId());
+					log.error("自动阅卷错误：{}", e.getMessage());
+				} catch (Exception e) {
+					//TODO 发送错误信息给管理员
+					AutoMarkCache.del(exam.getId());
+					log.error("自动阅卷错误：", e);
+				}
+			}
 		}
 	}
 }

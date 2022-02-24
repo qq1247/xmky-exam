@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
@@ -115,7 +116,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			log.error("自动考试异常：{}已归档", exam.getName());
 			throw new MyException("已归档");
 		}
-		if (exam.getMarkState() == 3) {
+		if (exam.getMarkState() == 2 || exam.getMarkState() == 3) {
 			log.error("自动考试异常：{}已阅卷", exam.getName());
 			throw new MyException("已阅卷");
 		}
@@ -128,46 +129,33 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		
 		// 延时2秒后开始（答题时预留了1秒网络延时，这里在延时1秒，保证都是答题完成后的结果）
 		try {
-			Thread.sleep(2000);
+			TimeUnit.SECONDS.sleep(2);
 		} catch (InterruptedException e) {
 			log.error("自动考试异常：{}，延时执行异常", exam.getName());
 		}
 		
 		Paper paper = paperService.getEntity(exam.getPaperId());// 试卷信息
 		List<MyExam> myExamList = myExamService.getList(examId);// 考试用户列表
-		Map<Integer, Question> questionCache = null;
-		Map<Integer, List<PaperQuestionAnswer>> questionAnswerListCache = null;
-		Map<Integer, PaperQuestion> questionOptionCache = null;
-		log.info("自动考试开始：{}", exam.getName());
-		// 获取考试用户列表
-		if (paper.getGenType() == 1) {
-			questionCache = getQuestionCache(exam.getPaperId());// 试题缓存信息
-			if (paper.getMarkType() == 1) {
-				for (Question question : questionCache.values()) {
-					if (question.getAi() == 2) {
-						log.error("自动考试异常：{}检测到人工阅卷试题", exam.getName());
-						throw new MyException("检测到人工阅卷试题");
-					}
+		Map<Integer, Question> questionCache = paper.getGenType() == 1 
+				? getQuestionCache(exam.getPaperId()) 
+				: getQuestionRandCache(exam.getPaperId(), exam.getId());// 试题缓存信息
+		Map<Integer, List<PaperQuestionAnswer>> questionAnswerListCache = paper.getGenType() == 1 
+				? questionAnswerListCache(exam.getPaperId(), questionCache.values()) 
+				: questionRandAnswerListCache(exam.getId(), exam.getPaperId(), questionCache.values());//试题答案缓存信息
+		Map<Integer, PaperQuestion> questionOptionCache = paper.getGenType() == 1 
+				? questionOptionCache(exam.getPaperId()) 
+				: questionRandOptionCache(exam.getId(), exam.getPaperId());;//试题选项缓存信息
+		if (paper.getMarkType() == 1) {
+			for (Question question : questionCache.values()) {
+				if (question.getAi() == 2) {
+					log.error("自动考试异常：{}检测到人工阅卷试题", exam.getName());
+					throw new MyException("检测到人工阅卷试题");
 				}
 			}
-			
-			questionAnswerListCache = questionAnswerListCache(exam.getPaperId(), questionCache.values());//试题答案缓存信息
-			questionOptionCache = questionOptionCache(exam.getPaperId());//试题选项缓存信息
-		} else {
-			questionCache = getQuestionRandCache(exam.getPaperId(), exam.getId());// 随机试题缓存信息
-			if (paper.getMarkType() == 1) {
-				for (Question question : questionCache.values()) {
-					if (question.getAi() == 2) {
-						log.error("自动考试异常：{}检测到人工阅卷试题", exam.getName());
-						throw new MyException("检测到人工阅卷试题");
-					}
-				}
-			}
-			
-			questionAnswerListCache = questionRandAnswerListCache(exam.getId(), exam.getPaperId(), questionCache.values()); // 随机试题答案缓存信息,为了阅卷方便组合成试题试卷答案格式
-			questionOptionCache = questionRandOptionCache(exam.getId(), exam.getPaperId());//随机试题选项缓存信息,为了阅卷方便组合成试题试卷答案格式
 		}
 		
+		// 获取考试用户列表
+		log.info("自动考试开始：{}", exam.getName());
 		for (MyExam myExam : myExamList) {
 			User user = userService.getEntity(myExam.getUserId());
 			log.info("自动考试进行：{}-{}开始", user.getId(), user.getName());
@@ -243,7 +231,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			log.info("自动考试完成：标记考试为阅卷中，等待人工阅卷");
 			
 			// 加入完成阅卷监听，保证自动考试完成，才能进行自动阅卷完成
-			AutoMarkCache.put(examId, exam.getMarkEndTime());
+			AutoMarkCache.put(examId, exam);
 		}
 	}
 
@@ -332,7 +320,6 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			
 			myExamService.update(myExam);
 			log.info("完成考试进行：{}-{}完成阅卷，考试得{}分", user.getId(), user.getName(), totalScore.getResult());
-
 		}
 		
 		// 更新用户排名
