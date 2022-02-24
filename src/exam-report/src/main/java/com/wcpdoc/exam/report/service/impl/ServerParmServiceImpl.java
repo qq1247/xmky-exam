@@ -52,13 +52,20 @@ public class ServerParmServiceImpl implements ServerPramService {
 			sigar = new Sigar();
 		} catch (Exception e) {
 			log.error("服务器参数初始化错误：", e);
-			sigar = new Sigar();
 		}
 	}
 	
 	@Override
 	public List<Map<String, Object>> getList() {
 		List<Map<String, Object>> result = new ArrayList<Map<String,Object>>();
+		if (sigar == null) {
+			Map<String, Object> data = new HashMap<String, Object>();
+			data.put("name", "获取硬件配置");
+			data.put("value", "未知错误");
+			result.add(data);
+			return result;
+		}
+		
 		Connection connection = null;
 		try {
 			// 获取操作系统信息
