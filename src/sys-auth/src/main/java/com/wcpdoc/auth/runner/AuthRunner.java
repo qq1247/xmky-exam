@@ -1,7 +1,6 @@
 package com.wcpdoc.auth.runner;
 
 import java.io.File;
-import java.io.FileWriter;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -14,7 +13,7 @@ import com.wcpdoc.auth.cache.JwtSecretCache;
 import com.wcpdoc.core.util.StringUtil;
 
 /**
- * 系统权限初始化
+ * 系统权限启动
  * 
  * v1.0 chenyun 2021年11月16日下午1:44:19
  */
@@ -24,22 +23,27 @@ public class AuthRunner implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		log.info("启动监听：加载秘钥文件开始");
-	    File jwtSecretFile = new File(String.format("./config/jwtSecret.txt"));
+		// 如果是第一次启动程序，生成秘钥文件
+	    File jwtSecretFile = new File(String.format(".%sconfig%sjwtSecret.txt", File.separator, File.separator));
 	    if (!jwtSecretFile.exists()) {
-	    	log.info("启动监听：秘钥文件不存在，开始写入秘钥");
-	    	String secret = StringUtil.getRandom(64);
-	     	try (FileWriter writer = new FileWriter(jwtSecretFile)) {
-		    	writer.write(secret);
+	    	log.info("系统权限启动：生成秘钥文件");
+	    	String jwtSecret = StringUtil.getRandom(64);
+	     	try {
+	     		FileUtils.writeStringToFile(jwtSecretFile, jwtSecret, "utf-8");
 		    } catch (Exception e) {
-				log.error("启动监听：写入秘钥文件失败", e);
-				return;
+				log.error("系统权限启动：写入秘钥失败", e);
 			}
 	    }
 	    
-        String secret = FileUtils.readFileToString(jwtSecretFile, "UTF-8");
-        log.info("启动监听：加载秘钥到缓冲");
-    	JwtSecretCache.addCache(secret);
-    	log.info("启动监听：加载秘钥成功");
+	    // 读取秘钥文件并缓存
+	    log.info("系统权限启动：读取秘钥文件并缓存");
+	    String jwtSecret = null;
+	    try {
+	    	jwtSecret = FileUtils.readFileToString(jwtSecretFile, "utf-8");
+	    } catch (Exception e) {
+			log.error("系统权限启动：读取秘钥失败，生成临时秘钥并缓存", e);
+			jwtSecret = StringUtil.getRandom(64);
+		}
+	    JwtSecretCache.flushCache(jwtSecret);
 	}
 }

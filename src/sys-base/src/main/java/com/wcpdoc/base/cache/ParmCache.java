@@ -28,9 +28,9 @@ public class ParmCache extends BaseEhCache {
 		Cache cache = getCache(CACHE_NAME);
 		Parm target = new Parm();
 		try {
-			BeanUtils.copyProperties(parm, target);// 如果在事务内，修改属性会同步到数据库
-		} catch (Exception e) {
-			log.error("刷新缓存异常：参数拷贝失败", e);
+			BeanUtils.copyProperties(parm, target);// 如果在事务内，修改属性会同步到数据库。查阅TransactionConf
+		} catch (Exception e) {// 测试，非业务层方法调用获取parm.getEntity(1)，修改属性，不会同步到数据库。事务已结束
+			log.error("刷新缓存异常：参数拷贝失败", e);// 非业务层方法调用业务层方法，业务层获取parm.getEntity(1)，修改属性，会同步到数据库。有新事务则加入事务
 			throw new MyException("刷新缓存异常：参数拷贝失败");
 		}
 		cache.put(PARM_KEY, target);

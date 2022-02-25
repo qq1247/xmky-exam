@@ -17,7 +17,7 @@ import com.wcpdoc.base.service.ParmService;
 import com.wcpdoc.core.util.SpringUtil;
 
 /**
- * 系统基础初始化
+ * 系统基础启动
  * 
  * v1.0 zhanghc 2019年9月29日下午2:32:16
  */
@@ -29,8 +29,10 @@ public class SysBaseRunner implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
+		// 如果是第一次启动程序，初始化系统参数表
 		Parm parm = parmService.getEntity(1);
 		if (parm == null) {
+			log.info("系统基础启动：初始化系统参数表");
 			parm = new Parm();
 			parm.setId(1);
 			parm.setUpdateUserId(1);
@@ -40,10 +42,10 @@ public class SysBaseRunner implements ApplicationRunner {
 			parm.setPwdType(2);
 			parm.setPwdValue("111111");
 			SpringUtil.getBean(ParmService.class).add(parm);
-			log.info("系统基础初始化：初始化系统参数表");
 		}
 		
-		log.info("系统基础初始化：缓存系统参数");
+		// 缓存系统参数
+		log.info("系统基础启动：缓存系统参数");
 		ParmCache.flushCache(parm);
 	}
 }
