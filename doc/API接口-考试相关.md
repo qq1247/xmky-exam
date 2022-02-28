@@ -268,6 +268,7 @@ http请求头需添加Authorization字段，
 | options[]      | String[]        | 选项，type为1,2时有效，len &lt;= 7  | 否   |
 | ai| Integer    | 智能阅卷（1：是；2：否；）  | 是   |
 | analysis       | Text    | 解析  | 是   |
+| state | Integer         | 状态（1：发布；2：草稿）  | 是   |
 | questionTypeId | Integer         | 试题分类ID      | 是   |
 | score          | Double          | 分数   | 是   |
 | scoreOptions[] | Integer[] | 分数选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；）|否|
@@ -322,6 +323,7 @@ http请求头需添加Authorization字段，
 | --------------- | ------- | ---------- | ---- |
 | fileId            | fileId    | 附件       | 是   |
 | questionTypeId | Integer | 试题分类ID | 是   |
+| state | Integer    | 状态（1：发布；2：草稿）  | 是   |
 
 ### 试题模板导出：question/wordTemplateExport
 | 响应参数|  类型   |  描述  |
