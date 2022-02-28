@@ -58,8 +58,9 @@ public interface QuestionService extends BaseService<Question>{
 	 * @param questionTypeId
 	 * @return PageResult
 	 * @return processBarId
+	 * @return state
 	 */
-	void wordImp(Integer fileId, Integer questionTypeId, String processBarId);
+	void wordImp(Integer fileId, Integer questionTypeId, String processBarId, Integer state);
 	
 	/**
 	 * 合并

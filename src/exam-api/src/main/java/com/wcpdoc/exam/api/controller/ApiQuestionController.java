@@ -289,7 +289,7 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/wordImp")
 	@ResponseBody
-	public PageResult wordImp(Integer fileId, Integer questionTypeId) {
+	public PageResult wordImp(Integer fileId, Integer questionTypeId, Integer state) {
 		try {
 			ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 			RequestContextHolder.setRequestAttributes(requestAttributes, true);// 子线程共享请求属性
@@ -302,7 +302,7 @@ public class ApiQuestionController extends BaseController {
 				public void run() {
 					UserContext.set(loginUser);// 子线程不走springboot拦截器，人工模拟拦截器，线程上绑定当前登录信息
 					try {
-						SpringUtil.getBean(QuestionService.class).wordImp(fileId, questionTypeId, processBarId);
+						SpringUtil.getBean(QuestionService.class).wordImp(fileId, questionTypeId, processBarId, state);
 						ProgressBarCache.setProgressBar(processBarId, 10.0, 10.0, "保存完成", HttpStatus.OK.value());// 放在业务层最后一行，进度已经100%，数据还没有完全插入，这时查询数据库时为空
 					} catch (MyException e) {
 						ProgressBarCache.setProgressBar(processBarId, 10.0, 10.0, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());

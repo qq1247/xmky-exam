@@ -40,6 +40,7 @@ import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionEx;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.entity.QuestionType;
+import com.wcpdoc.exam.core.service.PaperQuestionService;
 import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
@@ -67,7 +68,10 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	private QuestionOptionService questionOptionService;
 	@Resource
 	private QuestionAnswerService questionAnswerService;
-
+	@Resource
+	private PaperQuestionService paperQuestionService;
+	
+	
 	@Override
 	@Resource(name = "questionDaoImpl")
 	public void setDao(BaseDao<Question> dao) {
@@ -164,7 +168,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		question.setCreateUserId(getCurUser().getId());
 		question.setUpdateTime(new Date());
 		question.setUpdateUserId(getCurUser().getId());
-		question.setState(2);// 默认禁用
+		//question.setState(2);// 默认禁用
 		add(question);
 
 		BigDecimal total = new BigDecimal(0.00);
@@ -252,7 +256,12 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (!ValidateUtil.isValid(answers)) {
 			throw new MyException("参数错误：answers");
 		}
-
+		
+		List<Map<String, Object>> questionList = paperQuestionService.questionList(question.getId());//判断是否被试卷引用
+		if (questionList.size() > 0) {
+			throw new MyException("此试题已被试卷引用，无法修改");
+		}
+		
 		if (question.getType() == 1) {
 			if (options.length < 2) {
 				throw new MyException("参数错误：options长度小于2");
@@ -371,6 +380,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (question.getType() == 3 || question.getType() == 5 ) {
 			entity.setAi(question.getAi());
 		}
+		
+		entity.setState(question.getState());
 		entity.setDifficulty(question.getDifficulty());
 		entity.setTitle(question.getTitle());
 		entity.setAnalysis(question.getAnalysis());
@@ -586,7 +597,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void wordImp(Integer fileId, Integer questionTypeId, String processBarId) {
+	public void wordImp(Integer fileId, Integer questionTypeId, String processBarId, Integer state) {
 		// 校验数据有效性
 		if(!questionTypeService.hasWriteAuth(questionTypeService.getEntity(questionTypeId), getCurUser().getId())) {
 			throw new MyException("无操作权限");
@@ -623,7 +634,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			question.setCreateUserId(getCurUser().getId());
 			question.setUpdateTime(new Date());
 			question.setUpdateUserId(getCurUser().getId());
-			question.setState(2);// 默认禁用
+			question.setState(state);// 页面添加决定是否发布
 			question.setQuestionTypeId(questionTypeId);
 			
 			String[] answers = new String[questionExList.get(j).getQuestionAnswerList().size()];
