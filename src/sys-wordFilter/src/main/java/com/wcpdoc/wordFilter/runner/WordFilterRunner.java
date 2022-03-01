@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import com.wcpdoc.wordFilter.service.SensitiveService;
 
 /**
- * 初始化敏感词
+ * 系统敏感词启动
  * 
  * v1.0 chenyun 2021年9月28日下午5:37:24
  */
@@ -24,8 +24,7 @@ public class WordFilterRunner implements ApplicationRunner {
 	
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		log.info("启动监听：敏感词初始化开始");
+		log.info("系统敏感词启动：敏感词初始化");
 		sensitiveService.init();
-		log.info("启动监听：敏感词初始化成功");
 	}
 }

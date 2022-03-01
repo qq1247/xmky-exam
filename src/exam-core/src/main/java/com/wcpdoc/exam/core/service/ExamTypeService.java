@@ -15,7 +15,7 @@ public interface ExamTypeService extends BaseService<ExamType> {
 	 * @param examType
 	 * void
 	 */
-	void addAndUpdate(ExamType examType);
+	Integer addAndUpdate(ExamType examType);
 	
 	/**
 	 * 修改考试分类

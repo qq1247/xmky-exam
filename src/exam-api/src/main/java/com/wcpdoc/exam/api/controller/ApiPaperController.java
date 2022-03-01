@@ -63,8 +63,7 @@ public class ApiPaperController extends BaseController {
 	@ResponseBody
 	public PageResult add(Paper paper, PaperRemark paperRemark) {
 		try {
-			paperService.addAndUpdate(paper, paperRemark);
-			return PageResult.ok();
+			return PageResultEx.ok().data(paperService.addAndUpdate(paper, paperRemark));
 		} catch (MyException e) {
 			log.error("添加试卷错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -313,9 +312,9 @@ public class ApiPaperController extends BaseController {
 	 */
 	@RequestMapping("/paperQuestionList")
 	@ResponseBody
-	public PageResult paperQuestionList(Integer id) {
+	public PageResult paperQuestionList(Integer id, Integer examId, Integer userId) {
 		try {
-			return PageResultEx.ok().data(paperService.paperQuestionList(id));
+			return PageResultEx.ok().data(paperService.paperQuestionList(id, examId, userId));
 		} catch (Exception e) {
 			log.error("试题列表错误：", e);
 			return PageResult.err();

@@ -49,6 +49,7 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 						pageIn.get("endTime"), pageIn.get("endTime"),
 						pageIn.get("startTime"), pageIn.get("endTime")
 						)
+				.addWhere("PAPER.STATE = ?", 1)
 				.addWhere("EXAM.STATE = ?", 1)
 //				.addWhere("PAPER.STATE = ?", 1)//删除了试卷也能查看
 //				.addWhere("USER.STATE = ?", 1)

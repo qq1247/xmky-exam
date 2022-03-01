@@ -63,8 +63,7 @@ public class ApiExamTypeController extends BaseController {
 	@ResponseBody
 	public PageResult add(ExamType examType) {
 		try {
-			examTypeService.addAndUpdate(examType);
-			return PageResult.ok();
+			return PageResultEx.ok().data(examTypeService.addAndUpdate(examType));
 		} catch (MyException e) {
 			log.error("添加考试分类错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

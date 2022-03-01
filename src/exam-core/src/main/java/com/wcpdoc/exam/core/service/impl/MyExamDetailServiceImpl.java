@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.core.service.impl;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
@@ -74,7 +76,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	private PaperQuestionService paperQuestionService;
 	@Resource
 	private MyExamDetailService myExamDetailService;
-
+	
 	@Override
 	@Resource(name = "myExamDetailDaoImpl")
 	public void setDao(BaseDao<MyExamDetail> dao) {
@@ -114,7 +116,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			log.error("自动考试异常：{}已归档", exam.getName());
 			throw new MyException("已归档");
 		}
-		if (exam.getMarkState() == 3) {
+		if (exam.getMarkState() == 2 || exam.getMarkState() == 3) {
 			log.error("自动考试异常：{}已阅卷", exam.getName());
 			throw new MyException("已阅卷");
 		}
@@ -125,8 +127,24 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			throw new MyException("考试未结束");
 		}
 		
+		// 延时2秒后开始（答题时预留了1秒网络延时，这里在延时1秒，保证都是答题完成后的结果）
+		try {
+			TimeUnit.SECONDS.sleep(2);
+		} catch (InterruptedException e) {
+			log.error("自动考试异常：{}，延时执行异常", exam.getName());
+		}
+		
 		Paper paper = paperService.getEntity(exam.getPaperId());// 试卷信息
-		Map<Integer, Question> questionCache = getQuestionCache(exam.getPaperId());// 试题缓存信息
+		List<MyExam> myExamList = myExamService.getList(examId);// 考试用户列表
+		Map<Integer, Question> questionCache = paper.getGenType() == 1 
+				? getQuestionCache(exam.getPaperId()) 
+				: getQuestionRandCache(exam.getPaperId(), exam.getId());// 试题缓存信息
+		Map<Integer, List<PaperQuestionAnswer>> questionAnswerListCache = paper.getGenType() == 1 
+				? questionAnswerListCache(exam.getPaperId(), questionCache.values()) 
+				: questionRandAnswerListCache(exam.getId(), exam.getPaperId(), questionCache.values());//试题答案缓存信息
+		Map<Integer, PaperQuestion> questionOptionCache = paper.getGenType() == 1 
+				? questionOptionCache(exam.getPaperId()) 
+				: questionRandOptionCache(exam.getId(), exam.getPaperId());;//试题选项缓存信息
 		if (paper.getMarkType() == 1) {
 			for (Question question : questionCache.values()) {
 				if (question.getAi() == 2) {
@@ -136,18 +154,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			}
 		}
 		
-		// 延时2秒后开始（答题时预留了1秒网络延时，这里在延时1秒，保证都是答题完成后的结果）
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			log.error("自动考试异常：{}，延时执行异常", exam.getName());
-		}
-		
 		// 获取考试用户列表
 		log.info("自动考试开始：{}", exam.getName());
-		Map<Integer, List<PaperQuestionAnswer>> questionAnswerListCache = questionAnswerListCache(exam.getPaperId(), questionCache.values());//试题答案缓存信息
-		Map<Integer, PaperQuestion> questionOptionCache = questionOptionCache(exam.getPaperId());//试题选项缓存信息
-		List<MyExam> myExamList = myExamService.getList(examId);// 考试用户列表
 		for (MyExam myExam : myExamList) {
 			User user = userService.getEntity(myExam.getUserId());
 			log.info("自动考试进行：{}-{}开始", user.getId(), user.getName());
@@ -223,7 +231,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			log.info("自动考试完成：标记考试为阅卷中，等待人工阅卷");
 			
 			// 加入完成阅卷监听，保证自动考试完成，才能进行自动阅卷完成
-			AutoMarkCache.put(examId, exam.getMarkEndTime());
+			AutoMarkCache.put(examId, exam);
 		}
 	}
 
@@ -312,7 +320,6 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			
 			myExamService.update(myExam);
 			log.info("完成考试进行：{}-{}完成阅卷，考试得{}分", user.getId(), user.getName(), totalScore.getResult());
-
 		}
 		
 		// 更新用户排名
@@ -628,6 +635,22 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	}
 	
 	/**
+	 * 获取随机试题缓存
+	 * 
+	 * v1.0 chenyun 2022年2月16日下午2:10:27
+	 * @param paperId
+	 * @return Map<Integer,Question>
+	 */
+	private Map<Integer, Question> getQuestionRandCache(Integer paperId, Integer examId) {
+		Map<Integer, Question> questionCache = new HashMap<>();
+		List<Question> questionList = paperQuestionService.getQuestionRandList(examId, paperId);
+		for (Question question : questionList) {
+			questionCache.put(question.getId(), question);
+		}
+		return questionCache;
+	}
+	
+	/**
 	 * 获取试题答案缓存
 	 * 
 	 * v1.0 zhanghc 2021年10月22日下午1:32:06
@@ -640,6 +663,35 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		for (Question question : questionList) {
 			List<PaperQuestionAnswer> questionAnswerList = paperQuestionAnswerService.getList(paperId, question.getId());
 			questionAnswerListCache.put(question.getId(), questionAnswerList);
+		}
+		return questionAnswerListCache;
+	}
+	
+	/**
+	 * 获取随机试题答案缓存
+	 * 
+	 * v1.0 chenyun 2022年2月16日下午2:55:06
+	 * @param paperId
+	 * @param questionRandList
+	 * @return Map<Integer,List<PaperQuestionAnswer>>
+	 */
+	private Map<Integer, List<PaperQuestionAnswer>> questionRandAnswerListCache(Integer examId, Integer paperId, Collection<Question> questionRandList) {
+		Map<Integer, List<PaperQuestionAnswer>> questionAnswerListCache = new HashMap<>();
+		for (Question question : questionRandList) {
+			// 随机答案组合成试题试卷答案格式, id是随机试题id,分值只有是多选的时候有用漏选的分
+			List<Map<String, Object>> questionAnswerList = paperQuestionService.questionAnswerList(examId, paperId, question.getId());
+			
+			List<PaperQuestionAnswer> paperQuestionAnswerList = new ArrayList<PaperQuestionAnswer>();
+			for(Map<String, Object> map : questionAnswerList){
+				PaperQuestionAnswer paperQuestionAnswer = new PaperQuestionAnswer();
+				paperQuestionAnswer.setId(Integer.valueOf(map.get("id").toString()));
+				paperQuestionAnswer.setAnswer(map.get("answer").toString());
+				paperQuestionAnswer.setScore(new BigDecimal(map.get("score").toString()));
+				paperQuestionAnswer.setPaperId(Integer.valueOf(map.get("paperId").toString()));
+				paperQuestionAnswer.setQuestionId(Integer.valueOf(map.get("questionId").toString()));
+				paperQuestionAnswerList.add(paperQuestionAnswer);
+			}
+			questionAnswerListCache.put(question.getId(), paperQuestionAnswerList);
 		}
 		return questionAnswerListCache;
 	}
@@ -663,6 +715,22 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		return questionOptionCache;
 	}
 
+	/**
+	 * 获取随机试题选项缓存
+	 * 
+	 * v1.0 chenyun 2022年2月16日下午3:40:08
+	 * @param paperId
+	 * @return Map<Integer,PaperQuestion>
+	 */
+	private Map<Integer, PaperQuestion> questionRandOptionCache(Integer examId, Integer paperId) {
+		List<PaperQuestion> paperQuestionList = paperQuestionService.getPaperQuestionList(examId, paperId);
+		Map<Integer, PaperQuestion> questionOptionCache = new HashMap<>();
+		for (PaperQuestion paperQuestion : paperQuestionList) {
+			questionOptionCache.put(paperQuestion.getQuestionId(), paperQuestion);
+		}
+		return questionOptionCache;
+	}
+	
 	@Override
 	public void del(Integer examId, Integer userId) {
 		myExamDetailDao.del(examId, userId);

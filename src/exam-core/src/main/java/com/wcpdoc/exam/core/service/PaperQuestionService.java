@@ -1,9 +1,11 @@
 package com.wcpdoc.exam.core.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
+import com.wcpdoc.exam.core.entity.Question;
 
 /**
  * 试卷试题服务层接口
@@ -19,8 +21,8 @@ public interface PaperQuestionService extends BaseService<PaperQuestion>{
 	 * @param parentId
 	 * @return List<PaperQuestion>
 	 */
-	List<PaperQuestion> getQuestionList(Integer parentId);
-
+	List<PaperQuestion> getQuestionList(Integer parentId, Integer examId, Integer userId);
+	
 	/**
 	 * 获取试卷试题列表
 	 * 
@@ -49,4 +51,51 @@ public interface PaperQuestionService extends BaseService<PaperQuestion>{
 	 * @return PaperQuestion
 	 */
 	PaperQuestion getEntity(Integer paperId, Integer questionId);
+	
+	/**
+	 * 删除随机试题
+	 * 
+	 * v1.0 chenyun 2022年2月15日上午9:56:07
+	 * @param userId
+	 * @param paperId void
+	 */
+	void del(Integer examId, Integer userId);
+	
+	/**
+	 * 获取随机试题列表
+	 * 
+	 * v1.0 chenyun 2022年2月15日下午1:24:04
+	 * @param paperId
+	 * @param examId
+	 * @return List<Question>
+	 */
+	List<Question> getQuestionRandList(Integer examId, Integer paperId);
+	
+	/**
+	 * 获取随机试题列表答案
+	 * 
+	 * v1.0 chenyun 2022年2月16日下午3:16:06
+	 * @param paperId
+	 * @param questionId
+	 * @return List<Map<String, Object>>
+	 */
+	List<Map<String, Object>> questionAnswerList(Integer examId, Integer paperId, Integer questionId);
+	
+	/**
+	 * 获取随机试题列表选择项
+	 * 
+	 * v1.0 chenyun 2022年2月16日下午3:44:18
+	 * @param paperId
+	 * @return List<PaperQuestion>
+	 */
+	List<PaperQuestion> getPaperQuestionList(Integer examId, Integer paperId);
+	
+	/**
+	 * 用于试题修改校验
+	 * 
+	 * v1.0 chenyun 2022年2月28日上午11:02:40
+	 * @param questionId
+	 * @return List<Map<String,Object>>
+	 */
+	List<Map<String, Object>> questionList(Integer questionId);
 }

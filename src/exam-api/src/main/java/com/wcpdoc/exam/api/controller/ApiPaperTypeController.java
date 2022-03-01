@@ -98,8 +98,7 @@ public class ApiPaperTypeController extends BaseController {
 	@ResponseBody
 	public PageResult add(PaperType paperType) {
 		try {
-			paperTypeService.addAndUpdate(paperType);
-			return PageResult.ok();
+			return PageResultEx.ok().data(paperTypeService.addAndUpdate(paperType));
 		} catch (MyException e) {
 			log.error("添加试卷分类错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

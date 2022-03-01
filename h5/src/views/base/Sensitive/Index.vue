@@ -11,7 +11,7 @@
 <template>
   <div class="container param-container">
     <div class="param-option">
-      <div class="param-title">数据库备份目录设置</div>
+      <div class="param-title">敏感词设置</div>
       <el-form :model="sensitiveForm" ref="sensitiveForm">
         <el-form-item label="黑名单" label-width="150px" prop="orgName">
           <el-select

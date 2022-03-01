@@ -4,6 +4,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.base.cache.ParmCache;
 import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.base.service.ParmService;
 import com.wcpdoc.core.util.ValidateUtil;
@@ -23,7 +24,7 @@ public class EmailExServiceImpl implements EmailExService {
 
 	@Override
 	public Email getEmail() throws EmailException {
-		Parm parm = parmService.getEntity(1);
+		Parm parm = ParmCache.get();
 		if (!ValidateUtil.isValid(parm.getEmailHost()) || !ValidateUtil.isValid(parm.getEmailUserName()) || 
 				!ValidateUtil.isValid(parm.getEmailPwd()) || !ValidateUtil.isValid(parm.getEmailProtocol()) || 
 				!ValidateUtil.isValid(parm.getEmailEncode())) {

@@ -16,8 +16,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
-import com.wcpdoc.base.cache.DictCache;
 import com.wcpdoc.base.entity.Dict;
+import com.wcpdoc.base.service.DictService;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
@@ -70,6 +70,8 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 	private MyExamService myExamService;
 	@Resource
 	private ExamTypeService examTypeService;
+	@Resource
+	private DictService dictService;
 	
 	@Override
 	public void setDao(BaseDao<Object> dao) {}
@@ -207,7 +209,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();//类型列表
 		for(int i = 1; i <= 5 ; i++ ){
 			map = new HashMap<>();
-			map.put("name", DictCache.getDictValue("QUESTION_TYPE", i+""));
+			map.put("name", i);
 			map.put("value", questionStatisMap.get("type"+i) == null ? 0 : questionStatisMap.get("type"+i));
 			list.add(map);
 		}
@@ -216,7 +218,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		list = new ArrayList<Map<String, Object>>(); //难度列表
 		for(int i = 1; i <= 5 ; i++ ){
 			map = new HashMap<>();
-			map.put("name", DictCache.getDictValue("QUESTION_DIFFICULTY", i+""));
+			map.put("name", i);
 			map.put("value", questionStatisMap.get("difficulty"+i) == null ? 0 : questionStatisMap.get("difficulty"+i));
 			list.add(map);
 		}
@@ -311,7 +313,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		result.put("score", scoreResult);
 		
 		// 统计试题类型占比
-		List<Dict> dictList = DictCache.getDictList("QUESTION_TYPE");
+		List<Dict> dictList = dictService.getList("QUESTION_TYPE");
 		List<Map<String, Object>> typeResultList = new ArrayList<Map<String, Object>>();
 		Map<String, Map<String, Object>> typeCache = new HashMap<>();
 		for (Dict dict : dictList) {

@@ -218,7 +218,7 @@ create table EXM_PAPER_QUESTION
 (
    ID                   int not null auto_increment comment 'id',
    NAME                 varchar(32) comment '章节名称',
-   DESCRIPTION          text comment '章节描述',
+   DESCRIPTION          varchar(512) comment '章节描述',
    PARENT_ID            int comment '父ID',
    PARENT_SUB           varchar(512) comment '父子关系（格式：_父ID_子ID_子子ID_... ...）',
    UPDATE_USER_ID       int comment '修改人',
@@ -229,6 +229,9 @@ create table EXM_PAPER_QUESTION
    SCORE                decimal(5,2) comment '分数',
    SCORE_OPTIONS        varchar(8) comment '1：漏选得分；2：答案无顺序；3：大小写不敏感；',
    NO                   int comment '排序',
+   RAND_CHAPTER_RULES_ID int comment '随机章节规则ID',
+   USER_ID              int comment '考试用户id',
+   EXAM_ID              int comment '考试ID',
    primary key (ID)
 );
 
@@ -627,4 +630,6 @@ INSERT INTO `SYS_VER` VALUES (12, '3.2.1', '2021-11-25 16:26:01', 'zhanghc', '')
 INSERT INTO `SYS_VER` VALUES (13, '3.3.0', '2020-11-30 11:11:11', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (14, '3.4.0', '2021-12-31 12:00:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (15, '3.5.0', '2022-01-28 15:36:51', 'zhanghc', '');
-INSERT INTO `SYS_VER` VALUES (16, '3.6.0', '2022-02-28 13:58:02', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (15, '3.6.0', '2022-02-28 15:36:51', 'zhanghc', '');
+
+ALTER TABLE `EXM_PAPER_QUESTION` ADD INDEX `QUESTION_ID`(`QUESTION_ID`) USING BTREE;

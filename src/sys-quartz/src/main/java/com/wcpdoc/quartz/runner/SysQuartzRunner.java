@@ -16,13 +16,13 @@ import com.wcpdoc.quartz.service.CronService;
 import com.wcpdoc.quartz.util.QuartzUtil;
 
 /**
- * 定时任务启动
+ * 系统定时任务启动
  * 
  * v1.0 zhanghc 2019年12月16日下午11:32:55
  */
 @Component
-public class QuartzRunner implements ApplicationRunner {
-	private static final Logger log = LoggerFactory.getLogger(QuartzRunner.class);
+public class SysQuartzRunner implements ApplicationRunner {
+	private static final Logger log = LoggerFactory.getLogger(SysQuartzRunner.class);
 	
 	@Resource
 	private CronService cronService;
@@ -32,18 +32,17 @@ public class QuartzRunner implements ApplicationRunner {
 		List<Cron> cronList = cronService.getList();
 		for (Cron cron : cronList) {
 			if (cron.getState() != 1) {
-				log.info("启动监听：定时任务【{}】：默认关闭", cron.getName());
+				log.info("系统定时任务启动：【{}】：默认关闭", cron.getName());
 				continue;
 			}
 			
 			try {
-				log.info("启动监听：定时任务【{}】启动开始：", cron.getName());
+				log.info("系统定时任务启动：【{}】启动", cron.getName());
 				@SuppressWarnings("unchecked")
 				Class<Job> jobClass = (Class<Job>) Class.forName(cron.getJobClass());
 				QuartzUtil.addJob(jobClass, cron.getId(), cron.getCron());
-				log.info("启动监听：定时任务【{}】启动完成：", cron.getName());
 			} catch (Exception e) {
-				log.error(String.format("启动监听：定时任务【{}】启动失败：", cron.getName()), e);
+				log.error(String.format("系统定时任务启动：【{}】启动失败：", cron.getName()), e);
 			}
 		}
 	}

@@ -23,7 +23,4 @@ public class CronExServiceImpl extends BaseServiceImp<Cron> implements CronExSer
 	public String getDbBakDir() {
 		return ParmCache.get().getDbBakDir();
 	}
-
-
-
 }

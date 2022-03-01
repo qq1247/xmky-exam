@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.core.service.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -10,6 +11,7 @@ import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.dao.PaperQuestionDao;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
+import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.service.PaperQuestionService;
 
 /**
@@ -29,8 +31,8 @@ public class PaperQuestionServiceImpl extends BaseServiceImp<PaperQuestion> impl
 	}
 
 	@Override
-	public List<PaperQuestion> getQuestionList(Integer parentId) {
-		return paperQuestionDao.getQuestionList(parentId);
+	public List<PaperQuestion> getQuestionList(Integer parentId, Integer examId, Integer userId) {
+		return paperQuestionDao.getQuestionList(parentId, examId, userId);
 	}
 
 	@Override
@@ -48,4 +50,28 @@ public class PaperQuestionServiceImpl extends BaseServiceImp<PaperQuestion> impl
 		return paperQuestionDao.getEntity(paperId, questionId);
 	}
 
+	@Override
+	public void del(Integer examId, Integer userId) {
+		paperQuestionDao.del(examId, userId);
+	}
+
+	@Override
+	public List<Question> getQuestionRandList(Integer examId, Integer paperId) {
+		return paperQuestionDao.getQuestionRandList(examId, paperId);
+	}
+	
+	@Override
+	public List<Map<String, Object>> questionAnswerList(Integer examId, Integer paperId, Integer questionId) {
+		return paperQuestionDao.questionAnswerList(examId, paperId, questionId);
+	}
+	
+	@Override
+	public List<PaperQuestion> getPaperQuestionList(Integer examId, Integer paperId) {
+		return paperQuestionDao.getPaperQuestionList(examId, paperId);
+	}
+
+	@Override
+	public List<Map<String, Object>> questionList(Integer questionId) {
+		return paperQuestionDao.questionList(questionId);
+	}
 }

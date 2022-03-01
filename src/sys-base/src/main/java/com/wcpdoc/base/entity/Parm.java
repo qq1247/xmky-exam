@@ -4,8 +4,6 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -22,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 @Table(name = "SYS_PARM")
 public class Parm {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	//@GeneratedValue(strategy = GenerationType.AUTO)// 清空数据库时，重启程序时需要恢复id为1的数据
 	@Column(name = "ID")
 	private Integer id;
 	@Column(name = "EMAIL_HOST")

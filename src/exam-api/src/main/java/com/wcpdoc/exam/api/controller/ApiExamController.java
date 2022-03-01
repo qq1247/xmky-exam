@@ -93,8 +93,7 @@ public class ApiExamController extends BaseController {
 	@ResponseBody
 	public PageResult add(Exam exam) {
 		try {
-			examService.addAndUpdate(exam);
-			return PageResult.ok();
+			return PageResultEx.ok().data(examService.addAndUpdate(exam));
 		} catch (MyException e) {
 			log.error("完成添加考试错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

@@ -43,7 +43,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		
 		// 扩展处理
 		parmExService.addAndUpdate(parm);
-		ParmCache.flushCache();
+		ParmCache.flushCache(parm);
 	}
 	
 	@Override
@@ -53,18 +53,13 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		
 		// 扩展处理
 		parmExService.updateAndUpdate(parm);
-		ParmCache.flushCache();
-	}
-
-	@Override
-	public Parm get() {
-		return parmDao.getEntity(1);
+		ParmCache.flushCache(parm);
 	}
 
 	@Override
 	public void editLogo(Parm parm) throws Exception {
 		// 更新logo
-		Parm entity = get();
+		Parm entity = getEntity(1);
 		Integer orgLogo = entity.getOrgLogo();
 		entity.setOrgLogo(parm.getOrgLogo());
 		entity.setOrgName(parm.getOrgName());
@@ -78,7 +73,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		}
 		
 		// 配置刷入缓存
-		ParmCache.flushCache();
+		ParmCache.flushCache(parm);
 	}
 
 	@Override
@@ -88,7 +83,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 			throw new MyException("参数错误：type");
 		}
 		
-		Parm entity = get();
+		Parm entity = getEntity(1);
 		entity.setPwdType(type);
 		if (type == 2) {
 			entity.setPwdValue(value);
@@ -96,7 +91,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
 		parmDao.update(entity);
-		ParmCache.flushCache();
+		ParmCache.flushCache(entity);
 	}
 
 	@Override
@@ -106,7 +101,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 			throw new MyException("参数错误：uploadDir");
 		}
 		
-		Parm parm = get();
+		Parm parm = getEntity(1);
 		String oldFileUploadDir = parm.getFileUploadDir();
 		if (oldFileUploadDir.equals(uploadDir)) {
 			throw new MyException("目录名称相同");
@@ -126,7 +121,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 			}
 			throw new MyException(e);
 		}
-		ParmCache.flushCache();
+		ParmCache.flushCache(parm);
 	}
 	
 	@Override
@@ -136,7 +131,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 			throw new MyException("参数错误：bakDir");
 		}
 		
-		Parm parm = get();
+		Parm parm = getEntity(1);
 		String oldBakDir = parm.getDbBakDir();
 		if (oldBakDir.equals(bakDir)) {
 			throw new MyException("目录名称相同");
@@ -157,6 +152,6 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 			}
 			throw new MyException(e);
 		}
-		ParmCache.flushCache();
+		ParmCache.flushCache(parm);
 	}
 }

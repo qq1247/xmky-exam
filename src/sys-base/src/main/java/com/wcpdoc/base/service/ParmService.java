@@ -26,15 +26,6 @@ public interface ParmService extends BaseService<Parm> {
 	void updateAndUpdate(Parm parm);
 	
 	/**
-	 * 获取实体
-	 * 
-	 * v1.0 chenyun 2021年9月14日上午11:26:30
-	 * @param userId
-	 * @return Parm
-	 */
-	Parm get();
-	
-	/**
 	 * 修改名称和logo
 	 * 
 	 * v1.0 chenyun 2021年10月8日下午2:30:00
@@ -66,4 +57,5 @@ public interface ParmService extends BaseService<Parm> {
 	 * @param bakDir void
 	 */
 	void db(String bakDir);
+
 }

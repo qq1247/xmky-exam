@@ -69,5 +69,13 @@ public interface ExamDao extends BaseDao<Exam>{
 	 * @param markUserId
 	 * @return List<Map<String,Object>>
 	 */
-	List<Map<String, Object>> getMarkQuestionList(Integer id, Integer markUserId); 
+	List<Map<String, Object>> getMarkQuestionList(Integer id, Integer markUserId);
+
+	/**
+	 * 获取未阅卷的考试
+	 * 
+	 * v1.0 zhanghc 2022年2月24日上午11:44:21
+	 * @return List<Exam>
+	 */
+	List<Exam> getUnMarkList(); 
 }

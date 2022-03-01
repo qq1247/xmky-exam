@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.base.cache.ParmCache;
 import com.wcpdoc.base.dao.UserDao;
 import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.base.entity.User;
@@ -58,7 +59,7 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		}
 		
 		//获取默认密码类型
-		Parm parm = parmService.get();
+		Parm parm = ParmCache.get();
 		String newPwd = null;
 		if (parm.getPwdType() == 1) {
 			newPwd = StringUtil.getRandomStr(8);

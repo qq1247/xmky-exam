@@ -21,9 +21,9 @@
 		
 		<!-- 集成服务器参数 -->
 		<dependency>
-		    <groupId>org.hyperic</groupId>
+		    <groupId>org.fusesource</groupId>
 		    <artifactId>sigar</artifactId>
-		    <version>1.6.5.132</version>
+		    <version>1.6.4</version>
 		</dependency> 
 	</dependencies>
 </project>

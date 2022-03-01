@@ -18,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.base.cache.ParmCache;
 import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.base.entity.UserToken;
 import com.wcpdoc.base.service.LoginService;
@@ -144,7 +145,7 @@ public class ApiLoginController extends BaseController {
 	@ResponseBody
 	public PageResult orgName() {
 		try {
-			Parm parm = parmService.get();
+			Parm parm = ParmCache.get();
 			return PageResultEx.ok().data(parm == null ? null : parm.getOrgName());
 		} catch (Exception e) {
 			log.error("获取服务器时间错误：", e);
@@ -165,7 +166,7 @@ public class ApiLoginController extends BaseController {
 			File logo = new File("./config/logo.png");
 			String fileName = "logo"; 
 			String fileExName = "png"; 
-			Parm parm = parmService.get();
+			Parm parm = ParmCache.get();
 			FileEx fileEx = null;
 			if (parm != null && ValidateUtil.isValid(parm.getOrgLogo())) {// 如果有配置，使用自定义logo
 				fileEx = fileService.getFileEx(parm.getOrgLogo());

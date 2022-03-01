@@ -42,6 +42,7 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 						pageIn.get("startTime"), pageIn.get("startTime"),
 						pageIn.get("endTime"), pageIn.get("endTime"),
 						pageIn.get("startTime"), pageIn.get("endTime"))
+				.addWhere("PAPER.STATE = ?", 1)
 				.addWhere("EXAM.STATE = ?", 1)
 				.addOrder("MY_MARK.ID", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);

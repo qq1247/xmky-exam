@@ -40,7 +40,7 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 	}
 
 	@Override
-	public void addAndUpdate(ExamType examType) {
+	public Integer addAndUpdate(ExamType examType) {
 		//校验数据有效性
 		if (!ValidateUtil.isValid(examType.getName())) {
 			throw new MyException("参数错误：name");
@@ -59,6 +59,7 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 		
 		//保存图片
 		//fileService.doUpload(imgId);
+		return examType.getId(); //快速创建考试需要用id查找信息
 	}
 
 	@Override

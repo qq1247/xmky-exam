@@ -50,4 +50,13 @@ public interface DictService extends BaseService<Dict> {
 	 * void
 	 */
 	void delAndUpdate(Integer id);
+
+	/**
+	 * 获取数据字典列表
+	 * 
+	 * v1.0 zhanghc 2022年2月24日下午5:31:31
+	 * @param index
+	 * @return List<Dict>
+	 */
+	List<Dict> getList(String index);
 }

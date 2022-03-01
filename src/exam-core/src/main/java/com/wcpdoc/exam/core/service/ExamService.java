@@ -20,7 +20,7 @@ public interface ExamService extends BaseService<Exam>{
 	 * v1.0 chenyun 2021年8月25日下午5:58:55
 	 * @param exam void
 	 */
-	void addAndUpdate(Exam exam);
+	Integer addAndUpdate(Exam exam);
 	
 	/**
 	 * 修改考试
@@ -110,6 +110,14 @@ public interface ExamService extends BaseService<Exam>{
 	 * @param markUserId
 	 * @return List<Map<String,Object>>
 	 */
-	List<Map<String, Object>> getMarkQuestionList(Integer id, Integer markUserId); 
+	List<Map<String, Object>> getMarkQuestionList(Integer id, Integer markUserId);
+
+	/**
+	 * 获取未阅卷的考试列表
+	 * 
+	 * v1.0 zhanghc 2022年2月24日上午11:43:34
+	 * @return List<Exam>
+	 */
+	List<Exam> getUnMarkList(); 
 	
 }

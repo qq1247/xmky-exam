@@ -24,7 +24,7 @@ public interface PaperService extends BaseService<Paper> {
 	 * @param paper
 	 * @param paperRemark void
 	 */
-	void addAndUpdate(Paper paper, PaperRemark paperRemark);
+	Integer addAndUpdate(Paper paper, PaperRemark paperRemark);
 	
 	/**
 	 * 修改试卷
@@ -117,7 +117,7 @@ public interface PaperService extends BaseService<Paper> {
 	 * @return List<Question>
 	 */
 	List<Question> getQuestionList(Integer id);
-
+	
 	/**
 	 * 获取试题列表
 	 * 
@@ -202,9 +202,11 @@ public interface PaperService extends BaseService<Paper> {
 	 * 
 	 * v1.0 chenyun 2021年8月20日上午9:38:23
 	 * @param id
+	 * @param examId
+	 * @param userId
 	 * @return List<Map<String,Object>>
 	 */
-	List<Map<String, Object>> paperQuestionList(Integer id);
+	List<Map<String, Object>> paperQuestionList(Integer id, Integer examId, Integer userId);
 	
 	/**
 	 * 发布
