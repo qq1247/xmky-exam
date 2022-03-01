@@ -8,11 +8,7 @@
  * @LastEditTime: 2022-01-05 09:47:03
 -->
 <template>
-  <div class="container">
-    <div class="form-footer">
-      <el-button @click="copy" type="primary"> 复制 </el-button>
-    </div>
-  </div>
+  <el-button @click="copy" type="primary"> 复制 </el-button>
 </template>
 
 <script>
@@ -39,9 +35,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss" scoped>
-.form-footer {
-  margin-top: 10px;
-}
-</style>

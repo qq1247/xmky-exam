@@ -1,16 +1,16 @@
 <template>
   <div class="container">
-    <RuleEdit v-if="genType === 1"></RuleEdit>
-    <RandomEdit v-if="genType === 2"></RandomEdit>
+    <RulePaper v-if="genType === 1"></RulePaper>
+    <RandomPaper v-if="genType === 2"></RandomPaper>
   </div>
 </template>
 <script>
-import RuleEdit from './RuleEdit.vue'
-import RandomEdit from './RandomEdit.vue'
+import RulePaper from './RulePaper/Index.vue'
+import RandomPaper from './RandomPaper.vue'
 export default {
   components: {
-    RuleEdit,
-    RandomEdit,
+    RulePaper,
+    RandomPaper,
   },
   data() {
     return {

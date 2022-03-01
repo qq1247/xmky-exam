@@ -8,26 +8,24 @@
  * @LastEditTime: 2022-01-04 16:27:19
 -->
 <template>
-  <div class="container">
-    <el-form
-      :model="examForm"
-      :rules="examForm.rules"
-      ref="examForm"
-      label-width="60px"
-    >
-      <el-form-item label="名称" prop="examName">
-        <el-input
-          placeholder="请输入分类名称"
-          v-model="examForm.examName"
-        ></el-input>
-      </el-form-item>
-    </el-form>
-    <div class="form-footer">
+  <el-form
+    :model="examForm"
+    :rules="examForm.rules"
+    ref="examForm"
+    label-width="100px"
+  >
+    <el-form-item label="名称" prop="examName">
+      <el-input
+        placeholder="请输入分类名称"
+        v-model="examForm.examName"
+      ></el-input>
+    </el-form-item>
+    <el-form-item>
       <el-button @click="addOrEdit" type="primary">{{
         id ? '修改' : '添加'
       }}</el-button>
-    </div>
-  </div>
+    </el-form-item>
+  </el-form>
 </template>
 
 <script>
@@ -88,9 +86,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss" scoped>
-.form-footer {
-  padding-left: 60px;
-}
-</style>

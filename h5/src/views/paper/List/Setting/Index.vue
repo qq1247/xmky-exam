@@ -8,7 +8,7 @@
  * @LastEditTime: 2022-01-14 17:06:14
 -->
 <template>
-  <div class="container setting-container"> 
+  <div class="container setting-container">
     <el-tabs v-model="tabIndex" tab-position="right">
       <el-tab-pane :key="item.index" v-for="item in tab" :name="item.index">
         <div class="pane-label" slot="label">
@@ -24,7 +24,14 @@
       <el-card class="box-card" shadow="never">
         <div slot="header">
           <div class="header-name">{{ contentName }}</div>
-          <div class="header-intro">{{ contentIntro }}<router-link :to="{name: contentUrl}" v-if="contentUrl" class="header-url">去设置</router-link>
+          <div class="header-intro">
+            {{ contentIntro
+            }}<router-link
+              :to="{ name: contentUrl }"
+              v-if="contentUrl"
+              class="header-url"
+              >去设置</router-link
+            >
           </div>
         </div>
         <component :is="currentView"></component>
@@ -39,12 +46,6 @@ import Copy from './Copy.vue'
 import Publish from './Publish.vue'
 import Delete from './Deletes.vue'
 export default {
-  components: {
-    Setting,
-    Copy,
-    Publish,
-    Delete,
-  },
   data() {
     return {
       tab: [
@@ -53,7 +54,8 @@ export default {
           intro: '添加/修改',
           icon: 'common common-edit',
           contentName: '试卷信息',
-          contentIntro: '阅卷方式选择人工阅卷，发布时检测到所有试题为智能题，则自动变更为智能阅卷。',
+          contentIntro:
+            '阅卷方式选择人工阅卷，发布时检测到所有试题为智能题，则自动变更为智能阅卷。',
           index: '1',
         },
       ],
@@ -128,7 +130,7 @@ export default {
 }
 /deep/ .el-tabs {
   margin-right: 20px;
-  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
   border: none;
 }
 /deep/ .el-tabs__item {
@@ -139,7 +141,7 @@ export default {
     border-bottom: none;
   }
 }
-/deep/ .el-tabs--right .el-tabs__header.is-right{
+/deep/ .el-tabs--right .el-tabs__header.is-right {
   margin-left: 0;
 }
 /deep/ .el-tabs--right .el-tabs__active-bar.is-right {
@@ -181,7 +183,7 @@ export default {
 }
 
 /deep/.el-card {
-  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
   border: none;
 }
 

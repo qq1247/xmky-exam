@@ -8,11 +8,7 @@
  * @LastEditTime: 2022-01-06 14:26:29
 -->
 <template>
-  <div class="container">
-    <div class="form-footer">
-      <el-button @click="publish" type="primary"> 发布 </el-button>
-    </div>
-  </div>
+  <el-button @click="publish" type="primary"> 发布 </el-button>
 </template>
 
 <script>
@@ -60,9 +56,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss" scoped>
-.form-footer {
-  margin-top: 10px;
-}
-</style>

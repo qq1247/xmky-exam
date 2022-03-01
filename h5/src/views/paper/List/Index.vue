@@ -95,6 +95,7 @@ export default {
     async query() {
       const paperList = await paperListPage({
         paperTypeId: this.queryForm.paperTypeId,
+        name: this.queryForm.name,
         curPage: this.curPage,
         pageSize: this.pageSize,
       })
