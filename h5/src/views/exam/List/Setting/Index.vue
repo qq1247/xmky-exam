@@ -8,7 +8,7 @@
  * @LastEditTime: 2022-01-14 17:06:45
 -->
 <template>
-  <div class="container setting-container"> 
+  <div class="container setting-container">
     <el-tabs v-model="tabIndex" tab-position="right">
       <el-tab-pane :key="item.index" v-for="item in tab" :name="item.index">
         <div class="pane-label" slot="label">
@@ -24,7 +24,14 @@
       <el-card class="box-card" shadow="never">
         <div slot="header">
           <div class="header-name">{{ contentName }}</div>
-          <div class="header-intro">{{ contentIntro }}<router-link :to="{name: contentUrl}" v-if="contentUrl" class="header-url">去设置</router-link>
+          <div class="header-intro">
+            {{ contentIntro
+            }}<router-link
+              :to="{ name: contentUrl }"
+              v-if="contentUrl"
+              class="header-url"
+              >去设置</router-link
+            >
           </div>
         </div>
         <component :is="currentView"></component>
@@ -38,11 +45,6 @@ import Setting from './Setting.vue'
 import Publish from './Publish.vue'
 import Delete from './Deletes.vue'
 export default {
-  components: {
-    Setting,
-    Publish,
-    Delete,
-  },
   data() {
     return {
       tab: [
@@ -51,7 +53,8 @@ export default {
           intro: '添加/修改',
           icon: 'common common-edit',
           contentName: '考试信息',
-          contentIntro: '1：试卷是智能阅卷类型，不显示阅卷时间，考试时间结束时自动阅卷；2：试卷是人工阅卷类型，需填阅卷时间，阅卷时间结束时自动结束考试；3：未答题和未阅卷部分自动标记为0分；4：考试（阅卷）时间到到，才允许查看考试统计；5：考试时间范围内，才允许查看在线用户',
+          contentIntro:
+            '1：试卷是智能阅卷类型，不显示阅卷时间，考试时间结束时自动阅卷；2：试卷是人工阅卷类型，需填阅卷时间，阅卷时间结束时自动结束考试；3：未答题和未阅卷部分自动标记为0分；4：考试（阅卷）时间到到，才允许查看考试统计；5：考试时间范围内，才允许查看在线用户',
           index: '1',
         },
       ],
@@ -124,7 +127,7 @@ export default {
 }
 /deep/ .el-tabs {
   margin-right: 20px;
-  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
   border: none;
 }
 /deep/ .el-tabs__item {
@@ -135,7 +138,7 @@ export default {
     border-bottom: none;
   }
 }
-/deep/ .el-tabs--right .el-tabs__header.is-right{
+/deep/ .el-tabs--right .el-tabs__header.is-right {
   margin-left: 0;
 }
 /deep/ .el-tabs--right .el-tabs__active-bar.is-right {
@@ -177,7 +180,7 @@ export default {
 }
 
 /deep/.el-card {
-  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
   border: none;
 }
 

@@ -8,138 +8,136 @@
  * @LastEditTime: 2022-01-06 16:11:45
 -->
 <template>
-  <div class="container">
-    <el-card class="box-card" shadow="never">
-      <el-form :model="examForm" ref="userForm" label-width="100px">
-        <el-form-item label="阅卷方式" v-if="examForm.paperMarkType === 2">
-          <el-radio
-            v-for="(item, index) in examForm.examRadios"
-            :key="item.value"
-            v-model="examForm.examRadio"
-            :label="item.value"
-            :disabled="index === 0"
-            @change="selectPaperType"
-            prop="examRadio"
-            >{{ item.name }}</el-radio
+  <el-card style="width: 1200px; margin: 0 auto" shadow="never">
+    <el-form :model="examForm" ref="userForm" label-width="100px">
+      <el-form-item label="阅卷方式" v-if="examForm.paperMarkType === 2">
+        <el-radio
+          v-for="(item, index) in examForm.examRadios"
+          :key="item.value"
+          v-model="examForm.examRadio"
+          :label="item.value"
+          :disabled="index === 0"
+          @change="selectPaperType"
+          prop="examRadio"
+          >{{ item.name }}</el-radio
+        >
+      </el-form-item>
+      <el-row v-for="(item, index) in examForm.examRemarks" :key="item.id">
+        <el-col :span="12">
+          <el-form-item
+            label="考试用户"
+            v-if="examForm.examRadio == 1"
+            :prop="`examRemarks.${index}.examUser`"
+            :rules="[
+              {
+                required: true,
+                message: '请选择考试用户',
+                trigger: 'change',
+              },
+            ]"
+          >
+            <CustomSelect
+              ref="markExamUserSelect"
+              placeholder="请选择考试用户"
+              :value="examForm.examRemarks[index].examUser"
+              :total="examForm.total"
+              @input="(keyword) => searchUser(keyword, 1)"
+              @change="selectExamUser($event, index)"
+              @currentChange="
+                (curPage, keyword) => getMoreUser(1, curPage, keyword)
+              "
+              @visibleChange="
+                (curPage, keyword) => getUserList(1, curPage, keyword)
+              "
+            >
+              <el-option
+                v-for="item in examForm.examUsers"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              ></el-option>
+            </CustomSelect>
+          </el-form-item>
+        </el-col>
+
+        <el-col :span="12">
+          <el-form-item
+            v-if="examForm.paperMarkType === 2"
+            label="阅卷用户"
+            :prop="`examRemarks.${index}.examCheckPerson`"
+            :rules="[
+              { required: true, message: '请选择用户', trigger: 'change' },
+            ]"
+          >
+            <CustomSelect
+              ref="markUserSelect"
+              :multiple="false"
+              placeholder="请选择用户"
+              :value="examForm.examRemarks[index].examCheckPerson"
+              :total="examForm.total"
+              @input="(keyword) => searchUser(keyword, 2)"
+              @change="selectPerson($event, index)"
+              @currentChange="
+                (curPage, keyword) => getMoreUser(2, curPage, keyword)
+              "
+              @visibleChange="
+                (curPage, keyword) => getUserList(2, curPage, keyword)
+              "
+            >
+              <el-option
+                v-for="item in examForm.examUsers"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              ></el-option>
+            </CustomSelect>
+          </el-form-item>
+        </el-col>
+
+        <el-col :span="12">
+          <el-form-item label="题号" v-if="examForm.examRadio == 0">
+            <CustomSelect
+              placeholder="请选择题号"
+              :value="examForm.examRemarks[index].examQuestionNum"
+              :total="examForm.total"
+              @input="searchQuestionNum"
+              @change="selectQuestionNum($event, index)"
+              @visibleChange="getQuestionNumList"
+              @currentChange="getMoreQuestionNum"
+            >
+              <el-option
+                v-for="item in examForm.examQuestionNums"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              ></el-option>
+            </CustomSelect>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <div class="remark-buttons" v-if="examForm.paperMarkType === 2">
+        <el-form-item>
+          <el-button
+            @click="remarkAdd"
+            type="primary"
+            size="mini"
+            icon="el-icon-plus"
+            >添加</el-button
+          >
+          <el-button
+            v-if="examForm.examRemarks.length > 1"
+            @click="remarkDel"
+            size="mini"
+            icon="el-icon-minus"
+            >删除</el-button
           >
         </el-form-item>
-        <el-row v-for="(item, index) in examForm.examRemarks" :key="item.id">
-          <el-col :span="12">
-            <el-form-item
-              label="考试用户"
-              v-if="examForm.examRadio == 1"
-              :prop="`examRemarks.${index}.examUser`"
-              :rules="[
-                {
-                  required: true,
-                  message: '请选择考试用户',
-                  trigger: 'change',
-                },
-              ]"
-            >
-              <CustomSelect
-                ref="markExamUserSelect"
-                placeholder="请选择考试用户"
-                :value="examForm.examRemarks[index].examUser"
-                :total="examForm.total"
-                @input="(keyword) => searchUser(keyword, 1)"
-                @change="selectExamUser($event, index)"
-                @currentChange="
-                  (curPage, keyword) => getMoreUser(1, curPage, keyword)
-                "
-                @visibleChange="
-                  (curPage, keyword) => getUserList(1, curPage, keyword)
-                "
-              >
-                <el-option
-                  v-for="item in examForm.examUsers"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                ></el-option>
-              </CustomSelect>
-            </el-form-item>
-          </el-col>
-
-          <el-col :span="12">
-            <el-form-item
-              v-if="examForm.paperMarkType === 2"
-              label="阅卷用户"
-              :prop="`examRemarks.${index}.examCheckPerson`"
-              :rules="[
-                { required: true, message: '请选择用户', trigger: 'change' },
-              ]"
-            >
-              <CustomSelect
-                ref="markUserSelect"
-                :multiple="false"
-                placeholder="请选择用户"
-                :value="examForm.examRemarks[index].examCheckPerson"
-                :total="examForm.total"
-                @input="(keyword) => searchUser(keyword, 2)"
-                @change="selectPerson($event, index)"
-                @currentChange="
-                  (curPage, keyword) => getMoreUser(2, curPage, keyword)
-                "
-                @visibleChange="
-                  (curPage, keyword) => getUserList(2, curPage, keyword)
-                "
-              >
-                <el-option
-                  v-for="item in examForm.examUsers"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                ></el-option>
-              </CustomSelect>
-            </el-form-item>
-          </el-col>
-
-          <el-col :span="12">
-            <el-form-item label="题号" v-if="examForm.examRadio == 0">
-              <CustomSelect
-                placeholder="请选择题号"
-                :value="examForm.examRemarks[index].examQuestionNum"
-                :total="examForm.total"
-                @input="searchQuestionNum"
-                @change="selectQuestionNum($event, index)"
-                @visibleChange="getQuestionNumList"
-                @currentChange="getMoreQuestionNum"
-              >
-                <el-option
-                  v-for="item in examForm.examQuestionNums"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                ></el-option>
-              </CustomSelect>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <div class="remark-buttons" v-if="examForm.paperMarkType === 2">
-          <el-form-item>
-            <el-button
-              @click="remarkAdd"
-              type="primary"
-              size="mini"
-              icon="el-icon-plus"
-              >添加</el-button
-            >
-            <el-button
-              v-if="examForm.examRemarks.length > 1"
-              @click="remarkDel"
-              size="mini"
-              icon="el-icon-minus"
-              >删除</el-button
-            >
-          </el-form-item>
-        </div>
-      </el-form>
-      <div class="form-footer">
-        <el-button @click="editExamRead">设置</el-button>
       </div>
-    </el-card>
-  </div>
+      <el-form-item>
+        <el-button @click="editExamRead">设置</el-button>
+      </el-form-item>
+    </el-form>
+  </el-card>
 </template>
 
 <script>
@@ -379,12 +377,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss" scoped>
-.container {
-  width: 1200px;
-}
-.form-footer {
-  padding-left: 100px;
-}
-</style>

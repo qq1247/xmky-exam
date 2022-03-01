@@ -8,43 +8,46 @@
  * @LastEditTime: 2021-11-12 17:05:58
 -->
 <template>
-  <div class="param-option">
-    <el-form :model="paramForm" :rules="paramForm.rules" ref="paramForm">
-      <el-form-item label="用户名" label-width="100px" prop="emailUserName">
-        <el-input
-          placeholder="请输入用户名"
-          v-model="paramForm.emailUserName"
-        ></el-input>
-      </el-form-item>
-      <el-form-item label="密码" label-width="100px" prop="emailPwd">
-        <el-input
-          placeholder="请输入密码"
-          v-model="paramForm.emailPwd"
-        ></el-input>
-      </el-form-item>
-      <el-form-item label="主机" label-width="100px" prop="emailHost">
-        <el-input
-          placeholder="请输入主机"
-          v-model="paramForm.emailHost"
-        ></el-input>
-      </el-form-item>
-      <el-form-item label="协议" label-width="100px" prop="emailProtocol">
-        <el-input
-          placeholder="请输入协议"
-          v-model="paramForm.emailProtocol"
-        ></el-input>
-      </el-form-item>
-      <el-form-item label="编码" label-width="100px" prop="emailEncode">
-        <el-input
-          placeholder="请输入编码"
-          v-model="paramForm.emailEncode"
-        ></el-input>
-      </el-form-item>
-      <el-form-item label label-width="100px">
-        <el-button @click="setting" type="primary">设置</el-button>
-      </el-form-item>
-    </el-form>
-  </div>
+  <el-form
+    :model="paramForm"
+    :rules="paramForm.rules"
+    ref="paramForm"
+    label-width="100px"
+  >
+    <el-form-item label="用户名" prop="emailUserName">
+      <el-input
+        placeholder="请输入用户名"
+        v-model="paramForm.emailUserName"
+      ></el-input>
+    </el-form-item>
+    <el-form-item label="密码" prop="emailPwd">
+      <el-input
+        placeholder="请输入密码"
+        v-model="paramForm.emailPwd"
+      ></el-input>
+    </el-form-item>
+    <el-form-item label="主机" prop="emailHost">
+      <el-input
+        placeholder="请输入主机"
+        v-model="paramForm.emailHost"
+      ></el-input>
+    </el-form-item>
+    <el-form-item label="协议" prop="emailProtocol">
+      <el-input
+        placeholder="请输入协议"
+        v-model="paramForm.emailProtocol"
+      ></el-input>
+    </el-form-item>
+    <el-form-item label="编码" prop="emailEncode">
+      <el-input
+        placeholder="请输入编码"
+        v-model="paramForm.emailEncode"
+      ></el-input>
+    </el-form-item>
+    <el-form-item>
+      <el-button @click="setting" type="primary">设置</el-button>
+    </el-form-item>
+  </el-form>
 </template>
 
 <script>

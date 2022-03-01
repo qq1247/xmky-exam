@@ -41,7 +41,7 @@
               v-for="item in examList"
             >
               <template v-if="isToday(item.examStartTime, item.examEndTime)">
-                <i class="common common-wait-mark today-icon"></i>
+                <i class="common common-wait-exam today-icon"></i>
                 <div class="item-center">
                   <div class="info-item ellipsis">{{ item.examName }}</div>
                   <div class="info-item">
@@ -111,7 +111,7 @@
               <template
                 v-if="isToday(item.examMarkStartTime, item.examMarkEndTime)"
               >
-                <i class="common common-wait-exam today-icon"></i>
+                <i class="common common-wait-mark today-icon"></i>
                 <div class="item-center">
                   <div class="info-item ellipsis">{{ item.examName }}</div>
                   <div class="info-item">
@@ -205,12 +205,19 @@
             <span>快捷导航</span>
           </div>
           <div class="nav-box">
-            <div class="nav-item" v-for="nav in navList" :key="nav.path">
-              <i
-                :class="[`common ${nav.meta.icon}`]"
-                @click="$router.push(nav.path)"
-              ></i>
-              <span>{{ nav.meta.title }}</span>
+            <div
+              class="nav-item"
+              v-for="nav in navList"
+              :key="nav.path"
+              @click="$router.push(nav.path)"
+            >
+              <template v-if="nav.name !== 'Quick'">
+                <i :class="[`common ${nav.meta.icon}`]"></i>
+                <span>{{ nav.meta.title }}</span>
+              </template>
+            </div>
+            <div class="easy-exam" @click="$router.push({ name: 'Quick' })">
+              <i class="common common-quick"></i>
             </div>
           </div>
         </el-card>
@@ -270,7 +277,7 @@ export default {
   methods: {
     setNavBar() {
       this.navList = this.permission_routes.filter(
-        (item) => item?.meta?.layout === this.onlyRole[0]
+        (item) => item?.meta?.layout === this.onlyRole[0] && !item?.meta?.hidden
       )
     },
     // 获取公告列表
@@ -479,13 +486,13 @@ export default {
 .nav-router {
   line-height: 40px;
   border-bottom: 1px solid #cfcfcf;
-  background: rgba(#0095e5, 0.8);
+  background: rgba(#0094e5, 0.8);
   border-radius: 20px;
   margin-bottom: 10px;
   color: #fff;
   text-align: center;
   &:hover {
-    background: rgba(#0095e5, 1);
+    background: rgba(#0094e5, 1);
   }
   .common {
     margin-right: 10px;
@@ -505,7 +512,7 @@ export default {
       left: 10px;
       width: 4px;
       height: 20px;
-      background: #0095e5;
+      background: #0094e5;
     }
   }
   /deep/.el-card__body {
@@ -575,9 +582,8 @@ export default {
   border-bottom: 1px solid #e6ebf5;
   color: #333;
   padding: 0 5px;
-  cursor: pointer;
   &:hover {
-    color: #0095e5;
+    color: #0094e5;
   }
   .item-left {
     flex: 1;
@@ -602,8 +608,8 @@ export default {
       margin-right: 5px;
     }
     &:hover {
-      background: rgba(#0095e5, 0.8);
-      border: 1px solid rgba(#0095e5, 0.8);
+      background: rgba(#0094e5, 0.8);
+      border: 1px solid rgba(#0094e5, 0.8);
       color: #fff;
     }
   }
@@ -615,14 +621,9 @@ export default {
   padding: 10px;
   .today-icon {
     display: inline-block;
-    width: 64px;
-    height: 64px;
-    line-height: 64px;
-    font-size: 40px;
+    font-size: 60px;
     text-align: center;
-    color: #fff;
-    background: #42a5f5;
-    border-radius: 4px;
+    color: #c9c9c9;
   }
   .item-center {
     flex: 1;
@@ -644,6 +645,7 @@ export default {
   width: 100%;
   display: flex;
   flex-wrap: wrap;
+  position: relative;
   .nav-item {
     width: 50%;
     min-height: 130px;
@@ -654,11 +656,59 @@ export default {
     align-items: center;
     color: #555;
     cursor: pointer;
+    &:nth-child(1) {
+      border-top-left-radius: 10px;
+    }
+    &:nth-child(2) {
+      border-top-right-radius: 10px;
+    }
+    &:nth-child(3) {
+      border-bottom-left-radius: 10px;
+    }
+    &:nth-child(4) {
+      border-bottom-right-radius: 10px;
+    }
     &:hover {
-      color: #0095e5;
+      color: #fff;
+      background: #0094e5;
+      & ~ .easy-exam {
+        box-shadow: 0 0 0 10px #fff;
+        background: #0094e5;
+        color: #fff;
+        i {
+          color: #fff;
+        }
+      }
     }
     i {
       font-size: 40px;
+    }
+  }
+
+  .easy-exam {
+    position: absolute;
+    background: #fff;
+    width: 100px;
+    height: 100px;
+    line-height: 100px;
+    text-align: center;
+    border-radius: 50%;
+    top: calc(50% - 50px);
+    left: calc(50% - 50px);
+    box-shadow: 0 0 13px 3px rgba(#000, 0.13);
+    outline: 3px solid #0094e5;
+    cursor: pointer;
+    &:hover {
+      box-shadow: 0 0 0 10px #fff;
+      background: #0094e5;
+      color: #fff;
+      i {
+        color: #fff;
+      }
+    }
+    i {
+      font-size: 40px;
+      color: #0094e5;
     }
   }
 }

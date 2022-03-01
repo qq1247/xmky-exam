@@ -306,8 +306,8 @@ export default {
     // 初始化
     async init() {
       await this.queryPaper()
-      await this.queryPaperInfo()
       await this.queryExamineeInfo()
+      await this.queryPaperInfo()
       await this.queryAnswerInfo()
       this.getQuestion()
     },
@@ -326,6 +326,7 @@ export default {
         const res = await paperQuestionList({
           id: this.paperId,
           examId: this.examId,
+          userId: this.userId,
         })
         this.paperQuestion = res.data
         const questionList = res.data.reduce((acc, cur) => {

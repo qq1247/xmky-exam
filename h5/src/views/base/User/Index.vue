@@ -85,10 +85,16 @@
                   <i class="common common-edit" @click="edit(scope.row.id)"></i>
                 </el-tooltip>
                 <el-tooltip placement="top" content="删除">
-                  <i class="common common-delete" @click="del(scope.row.id)"></i>
+                  <i
+                    class="common common-delete"
+                    @click="del(scope.row.id)"
+                  ></i>
                 </el-tooltip>
                 <el-tooltip placement="top" content="重置密码">
-                  <i class="common common-pwd-reset" @click="initPwd(scope.row.id)"></i>
+                  <i
+                    class="common common-pwd-reset"
+                    @click="initPwd(scope.row.id)"
+                  ></i>
                 </el-tooltip>
                 <el-tooltip
                   placement="top"
@@ -261,19 +267,5 @@ export default {
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
     0 0 8px rgba(102, 175, 233, 0.6);
   border: 1px solid #f2f4f5;
-}
-/deep/.el-pagination.is-background .el-pager li:not(.disabled).active {
-  background-color: #0095e5;
-  color: #fff;
-}
-
-/deep/.el-pagination.is-background .btn-next,
-/deep/.el-pagination.is-background .btn-prev,
-/deep/.el-pagination.is-background .el-pager li {
-  margin: 0 3px;
-  min-width: 35px;
-  border: 1px solid #d4dfd9;
-  background-color: #fff;
-  padding: 0 10px;
 }
 </style>

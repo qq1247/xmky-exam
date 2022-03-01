@@ -8,29 +8,27 @@
  * @LastEditTime: 2022-01-13 14:52:46
 -->
 <template>
-  <div class="param-option">
-    <el-form :model="paramForm" ref="paramForm">
-      <el-form-item label="单位名称" label-width="100px" prop="orgName">
-        <el-input
-          placeholder="请输入单位名称"
-          v-model="paramForm.orgName"
-        ></el-input>
-      </el-form-item>
-      <el-form-item label="单位商标" label-width="100px" prop="orgLogo">
-        <Upload
-          ref="logoUpload"
-          type="image"
-          :files="paramForm.orgLogo"
-          @success="logoSuccess"
-          @remove="logoRemove"
-          size="1"
-        />
-      </el-form-item>
-      <el-form-item label label-width="100px">
-        <el-button @click="setting" type="primary">设置</el-button>
-      </el-form-item>
-    </el-form>
-  </div>
+  <el-form :model="paramForm" label-width="100px" ref="paramForm">
+    <el-form-item label="单位名称" prop="orgName">
+      <el-input
+        placeholder="请输入单位名称"
+        v-model="paramForm.orgName"
+      ></el-input>
+    </el-form-item>
+    <el-form-item label="单位商标" prop="orgLogo">
+      <Upload
+        ref="logoUpload"
+        type="image"
+        :files="paramForm.orgLogo"
+        @success="logoSuccess"
+        @remove="logoRemove"
+        size="1"
+      />
+    </el-form-item>
+    <el-form-item>
+      <el-button @click="setting" type="primary">设置</el-button>
+    </el-form-item>
+  </el-form>
 </template>
 
 <script>

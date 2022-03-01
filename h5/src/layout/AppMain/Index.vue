@@ -77,7 +77,7 @@ export default {
   methods: {
     setNavBar() {
       this.navs = this.permission_routes.filter(
-        (item) => item?.meta?.layout === this.onlyRole[0]
+        (item) => item?.meta?.layout === this.onlyRole[0] && !item?.meta?.hidden
       )
     },
   },

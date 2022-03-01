@@ -24,7 +24,7 @@
         >
         </Upload>
       </el-form>
-      <div style="color:#0094e5">按照试题模板格式填写并上传</div>
+      <div style="color: #0094e5">按照试题模板格式填写并上传</div>
       <div class="handler-template">
         <div class="template-item" @click="questionTemplate">
           <i class="common common-word-template"></i>
@@ -84,7 +84,8 @@ export default {
       }
       const res = await questionImport({
         fileId: this.handlerForm.questionDocIds[0].response.data.fileIds,
-        questionTypeId: this.$parent.$parent.queryForm.questionTypeId,
+        questionTypeId: this.$parent.$parent.questionTypeId,
+        state: 2,
       }).catch(() => {
         this.handlerForm.isAnalysis = false
       })

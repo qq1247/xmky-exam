@@ -24,3 +24,17 @@
 .el-message {
   top: 60px !important;
 }
+
+.el-pagination.is-background .el-pager li:not(.disabled).active {
+  background-color: #0094e5 !important;
+  color: #fff;
+}
+
+.el-pagination.is-background .btn-next,
+.el-pagination.is-background .btn-prev,
+.el-pagination.is-background .el-pager li {
+  border: 1px solid #d4dfd9 !important;
+  background-color: #fff !important;
+  padding: 0 10px !important;
+  line-height: 26px;
+}

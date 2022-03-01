@@ -72,12 +72,12 @@
         <el-form-item label="考试方式">
           <el-checkbox v-model="examForm.loginType">免登录</el-checkbox>
         </el-form-item> -->
+      <el-form-item>
+        <el-button @click="addOrEdit" type="primary">{{
+          id ? '修改' : '添加'
+        }}</el-button>
+      </el-form-item>
     </el-form>
-    <div class="form-footer">
-      <el-button @click="addOrEdit" type="primary">{{
-        id ? '修改' : '添加'
-      }}</el-button>
-    </div>
   </div>
 </template>
 
@@ -275,9 +275,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss" scoped>
-.form-footer {
-  padding-left: 100px;
-}
-</style>

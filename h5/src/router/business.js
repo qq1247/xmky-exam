@@ -330,5 +330,17 @@ export default [
       },
     ],
   },
+  {
+    path: '/quick',
+    component: () => import('@/views/quick/Index.vue'),
+    name: 'Quick',
+    meta: {
+      title: '模拟练习',
+      icon: 'common common-quick',
+      layout: 'subAdmin',
+      roles: ['subAdmin'],
+      hidden: true,
+    },
+  },
   { path: '*', redirect: '/404', hidden: true },
 ]

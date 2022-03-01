@@ -8,19 +8,17 @@
  * @LastEditTime: 2021-11-12 16:50:17
 -->
 <template>
-  <div class="param-option">
-    <el-form :model="paramForm" ref="paramForm">
-      <el-form-item label="目录名称" label-width="100px" prop="fileUploadDir">
-        <el-input
-          placeholder="请输入目录名称"
-          v-model="paramForm.fileUploadDir"
-        ></el-input>
-      </el-form-item>
-      <el-form-item label label-width="100px">
-        <el-button @click="setting" type="primary">设置</el-button>
-      </el-form-item>
-    </el-form>
-  </div>
+  <el-form :model="paramForm" label-width="100px" ref="paramForm">
+    <el-form-item label="目录名称" prop="fileUploadDir">
+      <el-input
+        placeholder="请输入目录名称"
+        v-model="paramForm.fileUploadDir"
+      ></el-input>
+    </el-form-item>
+    <el-form-item>
+      <el-button @click="setting" type="primary">设置</el-button>
+    </el-form-item>
+  </el-form>
 </template>
 
 <script>

@@ -1,35 +1,20 @@
-<!--
- * @Description: 添加试题
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-10-19 14:22:34
- * @LastEditors: Che
- * @LastEditTime: 2022-01-13 10:49:10
--->
 <template>
   <div>
-    <div id="question_driver_types">
-      <div class="top">添加题型</div>
-      <div
-        :class="[
-          'type-btn',
-          questionType === btn.type ? 'type-btn type-btn-active' : 'type-btn',
-        ]"
-        :key="btn.type"
-        @click="updateType(btn.type)"
-        v-for="btn in typeButtons"
-      >
-        <i :class="btn.icon"></i>
-        {{ btn.name }}
-        <i class="common common-subscript sub-script"></i>
-      </div>
+    <div class="top">添加题型</div>
+    <div
+      :class="['type-btn', questionType === btn.type ? 'type-btn-active' : '']"
+      :key="btn.type"
+      @click="updateType(btn.type)"
+      v-for="btn in typeButtons"
+    >
+      <i :class="btn.icon"></i>
+      {{ btn.name }}
+      <i class="common common-subscript sub-script"></i>
     </div>
     <div class="divider"></div>
     <div
-      id="question_driver_template"
       class="handler-btn"
-      :key="handler.type"
+      :key="`handler${handler.type}`"
       @click="otherHandler(handler.type)"
       v-for="handler in handlerButtons"
     >
@@ -42,14 +27,9 @@
 <script>
 import { questionPublish, questionDel } from 'api/question'
 export default {
-  props: {
-    questionType: {
-      type: Number,
-      default: 1,
-    },
-  },
   data() {
     return {
+      questionType: 1,
       typeButtons: [
         // 左侧按钮组1
         {
@@ -102,6 +82,7 @@ export default {
   methods: {
     // 更新类型
     updateType(value) {
+      this.questionType = value
       this.$emit('updateType', value)
     },
     // 操作函数
@@ -134,7 +115,7 @@ export default {
       })
         .then(async () => {
           await questionPublish({
-            questionTypeId: parentData.queryForm.questionTypeId,
+            questionTypeId: parentData.questionTypeId,
           })
           this.$message.success('全部发布成功！')
           this.$emit('showTemplate', false)
@@ -156,15 +137,19 @@ export default {
     },
     // 删除操作
     del(parentData) {
-      this.$confirm('确定要删除？<br/>不影响关联的试卷等，可以正常显示和使用', '提示', {
-        distinguishCancelAndClose: true,
-        confirmButtonText: '全部删除',
-        cancelButtonText: '当页删除',
-        dangerouslyUseHTMLString: true,
-      })
+      this.$confirm(
+        '确定要删除？<br/>不影响关联的试卷等，可以正常显示和使用',
+        '提示',
+        {
+          distinguishCancelAndClose: true,
+          confirmButtonText: '全部删除',
+          cancelButtonText: '当页删除',
+          dangerouslyUseHTMLString: true,
+        }
+      )
         .then(async () => {
           await questionDel({
-            questionTypeId: parentData.queryForm.questionTypeId,
+            questionTypeId: parentData.questionTypeId,
           })
           this.$message.success('删除成功！')
           this.$emit('showTemplate', false)

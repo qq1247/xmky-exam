@@ -215,21 +215,6 @@ export default {
   font-size: 12px;
 }
 
-/deep/.el-pagination.is-background .el-pager li:not(.disabled).active {
-  background-color: #0095e5;
-  color: #fff;
-}
-
-/deep/.el-pagination.is-background .btn-next,
-/deep/.el-pagination.is-background .btn-prev,
-/deep/.el-pagination.is-background .el-pager li {
-  margin: 0 3px;
-  min-width: 35px;
-  border: 1px solid #d4dfd9;
-  background-color: #fff;
-  padding: 0 10px;
-}
-
 /deep/.avatar-uploader .el-upload {
   border: 1px dashed #d9d9d9;
   border-radius: 6px;

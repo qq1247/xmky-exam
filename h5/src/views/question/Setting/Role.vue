@@ -9,32 +9,30 @@
 -->
 
 <template>
-  <div class="container">
-    <el-form :model="roleForm" ref="roleForm" label-width="120px">
-      <el-form-item label="操作用户" prop="writeRoleUser">
-        <CustomSelect
-          ref="writeSelect"
-          placeholder="请选择用户"
-          :value="roleForm.writeRoleUser"
-          :total="roleForm.total"
-          @input="searchUser"
-          @change="selectWriteUser"
-          @currentChange="getMoreUser"
-          @visibleChange="getUserList"
-        >
-          <el-option
-            v-for="item in userList"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id"
-          ></el-option>
-        </CustomSelect>
-      </el-form-item>
-    </el-form>
-    <div class="form-footer">
+  <el-form :model="roleForm" ref="roleForm" label-width="100px">
+    <el-form-item label="操作用户" prop="writeRoleUser">
+      <CustomSelect
+        ref="writeSelect"
+        placeholder="请选择用户"
+        :value="roleForm.writeRoleUser"
+        :total="roleForm.total"
+        @input="searchUser"
+        @change="selectWriteUser"
+        @currentChange="getMoreUser"
+        @visibleChange="getUserList"
+      >
+        <el-option
+          v-for="item in userList"
+          :key="item.id"
+          :label="item.name"
+          :value="item.id"
+        ></el-option>
+      </CustomSelect>
+    </el-form-item>
+    <el-form-item>
       <el-button @click="editRoleUsers" type="primary">编辑</el-button>
-    </div>
-  </div>
+    </el-form-item>
+  </el-form>
 </template>
 
 <script>
@@ -142,9 +140,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss" scoped>
-.form-footer {
-  padding-left: 120px;
-}
-</style>

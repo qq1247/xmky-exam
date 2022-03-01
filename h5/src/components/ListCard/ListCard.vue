@@ -23,7 +23,7 @@
         </el-row>
         <el-row :gutter="20" class="content-info">
           <el-col :span="12" class="info-left"
-            >组卷方式：{{ ['人工组卷', '自动组卷'][data.genType] }}</el-col
+            >组卷方式：{{ ['人工组卷', '自动组卷'][data.genType - 1] }}</el-col
           >
           <el-col :span="12" class="info-right"
             >展示方式：{{ ['', '整张', '章节', '单题'][data.showType] }}</el-col

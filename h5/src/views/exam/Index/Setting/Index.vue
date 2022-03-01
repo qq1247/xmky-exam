@@ -36,10 +36,6 @@
 import Setting from './Setting.vue'
 import Delete from './Deletes.vue'
 export default {
-  components: {
-    Setting,
-    Delete,
-  },
   data() {
     return {
       tab: [
@@ -48,7 +44,8 @@ export default {
           intro: '添加/修改',
           icon: 'common common-edit',
           contentName: '考试分类信息',
-          contentIntro: '为考试创建一个分类。建议：按类型分开存放，方便管理维护 ',
+          contentIntro:
+            '为考试创建一个分类。建议：按类型分开存放，方便管理维护 ',
           index: '1',
         },
       ],
@@ -110,7 +107,7 @@ export default {
 }
 /deep/ .el-tabs {
   margin-right: 20px;
-  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
   border: none;
 }
 /deep/ .el-tabs__item {
@@ -121,7 +118,7 @@ export default {
     border-bottom: none;
   }
 }
-/deep/ .el-tabs--right .el-tabs__header.is-right{
+/deep/ .el-tabs--right .el-tabs__header.is-right {
   margin-left: 0;
 }
 /deep/ .el-tabs--right .el-tabs__active-bar.is-right {
@@ -163,7 +160,7 @@ export default {
 }
 
 /deep/.el-card {
-  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
   border: none;
 }
 

@@ -24,8 +24,14 @@
       <el-card class="box-card" shadow="never">
         <div slot="header">
           <div class="header-name">{{ contentName }}</div>
-          <div class="header-intro">{{ contentIntro }}
-            <router-link :to="{name: contentUrl}" v-if="contentUrl" class="header-url">去设置</router-link>
+          <div class="header-intro">
+            {{ contentIntro }}
+            <router-link
+              :to="{ name: contentUrl }"
+              v-if="contentUrl"
+              class="header-url"
+              >去设置</router-link
+            >
           </div>
         </div>
         <component :is="currentView"></component>
@@ -40,12 +46,6 @@ import Role from './Role.vue'
 import Move from './Move.vue'
 import Delete from './Deletes.vue'
 export default {
-  components: {
-    Setting,
-    Role,
-    Move,
-    Delete,
-  },
   data() {
     return {
       tab: [
@@ -54,7 +54,8 @@ export default {
           intro: '添加/修改',
           icon: 'common common-edit',
           contentName: '试题分类信息',
-          contentIntro: '为试题创建一个分类。建议：按类型分开存放，方便管理维护',
+          contentIntro:
+            '为试题创建一个分类。建议：按类型分开存放，方便管理维护',
           index: '1',
         },
       ],
@@ -87,7 +88,8 @@ export default {
           intro: '允许其他子管理员协助添加试题',
           icon: 'common common-role',
           contentName: '操作权限',
-          contentIntro: '允许其他子管理员协助添加试题。建议：题量大的情况下，添加一个子管理员来协助添加试题，自己做最后的审核（发布）。',
+          contentIntro:
+            '允许其他子管理员协助添加试题。建议：题量大的情况下，添加一个子管理员来协助添加试题，自己做最后的审核（发布）。',
           index: '2',
         },
         {
@@ -129,7 +131,7 @@ export default {
 }
 /deep/ .el-tabs {
   margin-right: 20px;
-  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
   border: none;
 }
 /deep/ .el-tabs__item {
@@ -140,7 +142,7 @@ export default {
     border-bottom: none;
   }
 }
-/deep/ .el-tabs--right .el-tabs__header.is-right{
+/deep/ .el-tabs--right .el-tabs__header.is-right {
   margin-left: 0;
 }
 /deep/ .el-tabs--right .el-tabs__active-bar.is-right {
@@ -182,7 +184,7 @@ export default {
 }
 
 /deep/.el-card {
-  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
   border: none;
 }
 
@@ -207,4 +209,3 @@ export default {
   cursor: pointer;
 }
 </style>
-

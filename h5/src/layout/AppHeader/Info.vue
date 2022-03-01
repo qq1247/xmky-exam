@@ -9,14 +9,6 @@
 -->
 <template>
   <div class="header-info">
-    <el-button
-      class="info-view"
-      type="text"
-      icon="el-icon-view"
-      v-if="viewShow"
-      @click="view"
-      >预览</el-button
-    >
     <div class="info-name">
       <span class="user-name">{{ name }}</span>
       <i class="common common-login-out" @click="loginOut"></i>
@@ -73,20 +65,6 @@ export default {
   align-items: center;
   padding-right: 30px;
   justify-content: flex-end;
-  .info-view {
-    margin-right: 30px;
-    position: relative;
-    &::after {
-      content: '';
-      display: block;
-      position: absolute;
-      top: 12px;
-      right: -15px;
-      width: 1px;
-      height: 15px;
-      background: #cfcfcf;
-    }
-  }
   .info-name {
     display: flex;
     align-items: center;

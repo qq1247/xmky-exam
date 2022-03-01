@@ -8,37 +8,35 @@
  * @LastEditTime: 2022-01-05 10:03:04
 -->
 <template>
-  <div class="container">
-    <el-form
-      :model="examForm"
-      :rules="examForm.rules"
-      ref="moveForm"
-      label-width="120px"
-    >
-      <el-form-item label="移动到" prop="questionType">
-        <CustomSelect
-          :multiple="false"
-          placeholder="请选择试题分类"
-          :value="examForm.questionType"
-          :total="examForm.total"
-          @change="selectQuestionType"
-          @input="searchQuestionType"
-          @currentChange="getMoreQuestionType"
-          @visibleChange="getQuestionType"
-        >
-          <el-option
-            v-for="item in examForm.questionTypes"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id"
-          ></el-option>
-        </CustomSelect>
-      </el-form-item>
-    </el-form>
-    <div class="form-footer">
+  <el-form
+    :model="examForm"
+    :rules="examForm.rules"
+    ref="moveForm"
+    label-width="100px"
+  >
+    <el-form-item label="移动到" prop="questionType">
+      <CustomSelect
+        :multiple="false"
+        placeholder="请选择试题分类"
+        :value="examForm.questionType"
+        :total="examForm.total"
+        @change="selectQuestionType"
+        @input="searchQuestionType"
+        @currentChange="getMoreQuestionType"
+        @visibleChange="getQuestionType"
+      >
+        <el-option
+          v-for="item in examForm.questionTypes"
+          :key="item.id"
+          :label="item.name"
+          :value="item.id"
+        ></el-option>
+      </CustomSelect>
+    </el-form-item>
+    <el-form-item>
       <el-button @click="questionMove" type="primary">编辑</el-button>
-    </div>
-  </div>
+    </el-form-item>
+  </el-form>
 </template>
 
 <script>
@@ -112,9 +110,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss" scoped>
-.form-footer {
-  padding-left: 120px;
-}
-</style>

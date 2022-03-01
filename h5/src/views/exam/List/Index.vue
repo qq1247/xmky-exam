@@ -100,6 +100,7 @@ export default {
     async query() {
       const examList = await examListPage({
         examTypeId: this.queryForm.examTypeId,
+        name: this.queryForm.name,
         curPage: this.curPage,
         pageSize: this.pageSize,
       })

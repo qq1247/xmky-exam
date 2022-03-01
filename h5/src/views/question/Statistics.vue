@@ -9,27 +9,25 @@
 -->
 
 <template>
-  <div class="container">
-    <div class="chart-info">
-      <el-card class="box-card" shadow="never">
-        <div slot="header">
-          <span>智能试题</span>
-        </div>
-        <div id="questionAi"></div>
-      </el-card>
-      <el-card class="box-card" shadow="never">
-        <div slot="header">
-          <span>试题难度</span>
-        </div>
-        <div id="questionDifficulty"></div>
-      </el-card>
-      <el-card class="box-card" shadow="never">
-        <div slot="header">
-          <span>试题类型</span>
-        </div>
-        <div id="questionType"></div>
-      </el-card>
-    </div>
+  <div class="chart-info">
+    <el-card class="box-card" shadow="never">
+      <div slot="header">
+        <span>智能试题</span>
+      </div>
+      <div id="questionAi"></div>
+    </el-card>
+    <el-card class="box-card" shadow="never">
+      <div slot="header">
+        <span>试题难度</span>
+      </div>
+      <div id="questionDifficulty"></div>
+    </el-card>
+    <el-card class="box-card" shadow="never">
+      <div slot="header">
+        <span>试题类型</span>
+      </div>
+      <div id="questionType"></div>
+    </el-card>
   </div>
 </template>
 

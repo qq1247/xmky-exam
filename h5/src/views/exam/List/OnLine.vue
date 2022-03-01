@@ -8,20 +8,18 @@
  * @LastEditTime: 2022-01-06 17:31:54
 -->
 <template>
-  <div class="container">
-    <el-row>
-      <template v-if="examUserList.length > 0">
-        <el-col :span="6" v-for="item in examUserList" :key="item.userId">
-          <div :class="['line-user', item.online ? 'line' : '']">
-            <i class="common common-onLine"></i>
-            <span class="line-name">{{ item.userName }}</span>
-            <span class="line-time">{{ item.onlineTime }}</span>
-          </div>
-        </el-col>
-      </template>
-      <el-empty v-else description="暂无在线用户"> </el-empty>
-    </el-row>
-  </div>
+  <el-row class="container">
+    <template v-if="examUserList.length > 0">
+      <el-col :span="6" v-for="item in examUserList" :key="item.userId">
+        <div :class="['line-user', item.online ? 'line' : '']">
+          <i class="common common-onLine"></i>
+          <span class="line-name">{{ item.userName }}</span>
+          <span class="line-time">{{ item.onlineTime }}</span>
+        </div>
+      </el-col>
+    </template>
+    <el-empty v-else description="暂无在线用户"> </el-empty>
+  </el-row>
 </template>
 
 <script>
@@ -98,8 +96,5 @@ export default {
 .line {
   color: #1e9fff;
   border: 1px solid #1e9fff;
-}
-.form-footer {
-  padding-left: 60px;
 }
 </style>

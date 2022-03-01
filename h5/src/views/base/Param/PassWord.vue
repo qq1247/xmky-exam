@@ -8,33 +8,26 @@
  * @LastEditTime: 2021-11-12 18:05:06
 -->
 <template>
-  <div class="param-option">
-    <el-form :model="paramForm" ref="paramForm">
-      <el-form-item label="类型" label-width="100px" prop="pwdType">
-        <el-radio
-          v-for="item in paramForm.typeList"
-          :key="item.value"
-          v-model="paramForm.pwdType"
-          :label="item.value"
-          >{{ item.name }}</el-radio
-        >
-      </el-form-item>
-      <el-form-item
-        label="密码"
-        label-width="100px"
-        prop="pwdValue"
-        v-if="paramForm.pwdType === 2"
+  <el-form :model="paramForm" label-width="100px" ref="paramForm">
+    <el-form-item label="类型" prop="pwdType">
+      <el-radio
+        v-for="item in paramForm.typeList"
+        :key="item.value"
+        v-model="paramForm.pwdType"
+        :label="item.value"
+        >{{ item.name }}</el-radio
       >
-        <el-input
-          placeholder="请输入密码"
-          v-model.trim="paramForm.pwdValue"
-        ></el-input>
-      </el-form-item>
-      <el-form-item label label-width="100px">
-        <el-button @click="setting" type="primary">设置</el-button>
-      </el-form-item>
-    </el-form>
-  </div>
+    </el-form-item>
+    <el-form-item label="密码" prop="pwdValue" v-if="paramForm.pwdType === 2">
+      <el-input
+        placeholder="请输入密码"
+        v-model.trim="paramForm.pwdValue"
+      ></el-input>
+    </el-form-item>
+    <el-form-item>
+      <el-button @click="setting" type="primary">设置</el-button>
+    </el-form-item>
+  </el-form>
 </template>
 
 <script>
