@@ -47,6 +47,8 @@ drop table if exists SYS_SENSITIVE;
 drop table if exists SYS_USER;
 
 drop table if exists SYS_VER;
+
+drop table if exists EXM_RAND_CHAPTER_RULES;
 /*==============================================================*/
 /* Table: EXM_BULLETIN                                          */
 /*==============================================================*/
@@ -550,6 +552,28 @@ create table SYS_VER
 
 alter table SYS_VER comment '版本';
 
+/*==============================================================*/
+/* Table: EXM_RAND_CHAPTER_RULES                                */
+/*==============================================================*/
+create table EXM_RAND_CHAPTER_RULES
+(
+   ID                   int not null auto_increment comment 'id',
+   UPDATE_USER_ID       int comment '修改人',
+   UPDATE_TIME          datetime comment '修改时间',
+   PAPER_ID             int comment '试卷ID',
+   QUESTION_TYPE_ID     int comment '试题分类ID',
+   TYPE                 int comment '1：单选；2：多选；3：填空；4：判断；5：问答',
+   DIFFICULTY           varchar(10) comment '1：极易；2：简单；3：适中；4：困难；5：极难',
+   AI                   varchar(10) comment '智能阅卷',
+   SCORE_OPTIONS        varchar(8) comment '1：漏选得分；2：答案无顺序；3：大小写不敏感；',
+   TOTAL_NUMBER         int comment '几道题',
+   SCORE                decimal(5,2) comment '分数',
+   NO                   int comment '排序',
+   PAPER_QUESTION_ID    int comment '试卷试题ID',
+   primary key (ID)
+);
+
+alter table EXM_RAND_CHAPTER_RULES comment '随机章节规则';
 
 /*==============================================================*/
 /* 数据															*/
