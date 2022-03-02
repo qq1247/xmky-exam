@@ -53,7 +53,7 @@
       <el-form-item>
         <el-button
           :disabled="editForm.options.length >= 7"
-          @click="addOption"
+          @click="addOption(editForm.options.length, '')"
           class="option-btn"
           type="primary"
           >+添加选项</el-button
@@ -292,7 +292,7 @@
         </el-row>
         <el-button
           :disabled="editForm.answers.length >= 7"
-          @click="addFillBlanks"
+          @click="addFillBlanks(editForm.answers.length,'')"
           class="option-btn"
           style="margin-left: 65px"
           type="primary"
@@ -569,8 +569,7 @@ export default {
     },
     // 添加选项
     addOption(index, value) {
-      const _index = index || this.editForm.options.length
-      const lab = String.fromCharCode(65 + _index)
+      const lab = String.fromCharCode(65 + index)
 
       this.editForm.options.push({ lab, value })
       this.editForm.answers.push({ lab, value })
@@ -582,8 +581,7 @@ export default {
     },
     // 添加填空
     addFillBlanks(index, value) {
-      const _index = index || this.editForm.answers.length
-      let lab = this.$tools.intToChinese(_index)
+      let lab = this.$tools.intToChinese(index)
 
       this.editForm.answers.push({
         lab: lab,
