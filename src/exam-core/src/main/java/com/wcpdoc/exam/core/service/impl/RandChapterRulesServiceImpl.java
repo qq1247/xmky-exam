@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.entity.PageIn;
-import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.ValidateUtil;
@@ -82,9 +81,8 @@ public class RandChapterRulesServiceImpl extends BaseServiceImp<RandChapterRules
 				randChapterRulesMap.put("questionTypeId", randChapterRules.getQuestionTypeId());
 				randChapterRulesMap.put("questionTypeName", questionTypeService.getEntity(randChapterRules.getQuestionTypeId()).getName());
 				randChapterRulesMap.put("type", randChapterRules.getType());
-				randChapterRulesMap.put("difficulty", randChapterRules.getDifficulty());
-				randChapterRulesMap.put("queryScore", randChapterRules.getQueryScore());
-				randChapterRulesMap.put("ai", randChapterRules.getAi());
+				randChapterRulesMap.put("difficulty", randChapterRules.getDifficulty().split(","));
+				randChapterRulesMap.put("ai", randChapterRules.getAi().split(","));
 				Integer[] scoreOptions = null;
 				if (ValidateUtil.isValid(randChapterRules.getScoreOptions())) {
 					String[] split = randChapterRules.getScoreOptions().split(",");
@@ -148,13 +146,7 @@ public class RandChapterRulesServiceImpl extends BaseServiceImp<RandChapterRules
 			throw new MyException("无操作权限");
 		}
 		if (randChapterRules.getType() != 3 && randChapterRules.getType() != 5) {//除填空和阅读其他都是智能阅卷
-			randChapterRules.setAi(1);
-		}
-		
-		//随机试题是否为空
-		List<Question> randomQuestionList = questionService.randomQuestion(randChapterRules.getQuestionTypeId(), randChapterRules.getType(), randChapterRules.getDifficulty(), randChapterRules.getQueryScore(), randChapterRules.getAi(), randChapterRules.getTotalNumber()); // 试题分类id、试题类型、试题难易程度、分值、自能阅卷、个数
-		if (randomQuestionList == null || randomQuestionList.size() < randChapterRules.getTotalNumber()) {
-			throw new MyException(String.format("该试题库中有%s道符合您需求的试题！", randomQuestionList.size()));
+			randChapterRules.setAi("1");
 		}
 		
 		if (randChapterRules.getType() == 2) {
@@ -198,12 +190,6 @@ public class RandChapterRulesServiceImpl extends BaseServiceImp<RandChapterRules
 			throw new MyException("无操作权限");
 		}
 		
-		//随机试题是否为空
-		List<Question> randomQuestionList = questionService.randomQuestion(randChapterRules.getQuestionTypeId(), randChapterRules.getType(), randChapterRules.getDifficulty(), randChapterRules.getQueryScore(), randChapterRules.getAi(), randChapterRules.getTotalNumber()); // 试题分类id、试题类型、试题难易程度、分值、自能阅卷、个数
-		if (randomQuestionList == null || randomQuestionList.size() < randChapterRules.getTotalNumber()) {
-			throw new MyException(String.format("该试题库中有%s道符合您需求的试题！", randomQuestionList.size()));
-		}
-		
 		Paper paper = paperService.getEntity(randChapterRules.getPaperId());//试卷校验
 		if (paper.getState() == 0) {
 			throw new MyException("试卷已删除");
@@ -219,14 +205,13 @@ public class RandChapterRulesServiceImpl extends BaseServiceImp<RandChapterRules
 			throw new MyException("无操作权限");
 		}
 		if (randChapterRules.getType() != 3 && randChapterRules.getType() != 5) {//除填空和阅读其他都是智能阅卷
-			randChapterRules.setAi(1);
+			randChapterRules.setAi("1");
 		}
 		
 		RandChapterRules entity = getEntity(randChapterRules.getId());
 		entity.setQuestionTypeId(randChapterRules.getQuestionTypeId());
 		entity.setType(randChapterRules.getType());
 		entity.setDifficulty(randChapterRules.getDifficulty());
-		entity.setQueryScore(randChapterRules.getQueryScore());
 		entity.setAi(randChapterRules.getAi());
 		entity.setScoreOptions(randChapterRules.getScoreOptions());
 		entity.setTotalNumber(randChapterRules.getTotalNumber());
@@ -267,81 +252,54 @@ public class RandChapterRulesServiceImpl extends BaseServiceImp<RandChapterRules
 	}
 
 	@Override
-	public Map<Integer, List<Map<String, Object>>> checkRandChapterRules(Integer paperId) { //Map<试题分类id, 试题分类下所有的试题>  
-		// 试题分类id、试题类型、试题难易程度、分值、自能阅卷、个数
+	public Map<Integer, List<Question>> checkRandChapterRules(Integer paperId) {
 		Map<Integer, Integer> totalNumberMap = new HashMap<Integer, Integer>(); // 记录试题分类中试题总条数
-		Map<Integer, List<Map<String, Object>>> questionTypeMap = new HashMap<Integer, List<Map<String, Object>>>(); // 记录试题分类id_页数
-		Map<String, Integer> randChapterMap = new HashMap<String, Integer>(); // 记录章节规则
-		//随机章节规则
+		Map<String, Integer> randChapterMap = new HashMap<String, Integer>(); // 记录符合章节规则条数
 		PageIn pageIn;
-		List<RandChapterRules> chapterList = randChapterRulesDao.getChapterList(paperId, null);
+		List<RandChapterRules> chapterList = randChapterRulesDao.getChapterList(paperId, null);// 获取所有章节随机规则
 		for (RandChapterRules randChapterRules : chapterList) {
 			pageIn = new PageIn();
 			pageIn.setCurPage(1);
 			pageIn.setPageSize(1000);
 			pageIn.addAttr("questionTypeId", randChapterRules.getQuestionTypeId());
-			// 规则中某分类的总条数
 			totalNumberMap.put(randChapterRules.getQuestionTypeId(), totalNumberMap.get(randChapterRules.getQuestionTypeId()) == null ? randChapterRules.getTotalNumber() : totalNumberMap.get(randChapterRules.getQuestionTypeId()) + randChapterRules.getTotalNumber());
-			// 章节规则
-			String randChapterMapKey = randChapterRules.getQuestionTypeId()+","+randChapterRules.getType()+","+randChapterRules.getDifficulty()+","+randChapterRules.getAi()+","+randChapterRules.getQueryScore();
+			String randChapterMapKey = randChapterRules.getQuestionTypeId()+"_"+randChapterRules.getType()+"_"+randChapterRules.getDifficulty()+"_"+randChapterRules.getAi();
 			randChapterMap.put(randChapterMapKey, randChapterMap.get(randChapterMapKey) == null ? randChapterRules.getTotalNumber() : randChapterMap.get(randChapterMapKey) + randChapterRules.getTotalNumber() );
 		}
 		
 		Set<Integer> totalNumberKey = totalNumberMap.keySet();
-		for(Integer key : totalNumberKey){//试题分类
-			Integer total = totalNumberMap.get(key);
+		Map<Integer, List<Question>> questionTypeMap = new HashMap<Integer, List<Question>>(); // 记录试题分类下所有试题
+		for(Integer questionTypeId : totalNumberKey){// 试题分类
+			Integer total = totalNumberMap.get(questionTypeId);
 			
-			int counter = 1; // 一共多少页才够 
-			boolean is = true;
-			while (is) { // 试题总数需要大于随机题数
-				pageIn = new PageIn();
-				pageIn.setCurPage(counter);
-				pageIn.setPageSize(1000);
-				pageIn.addAttr("questionTypeId", key);
-				PageOut listpage = questionService.getListpageMap(pageIn);
-				if (questionTypeMap.get(key) == null  || questionTypeMap.get(key).size() <= 0) {
-					questionTypeMap.put(key, listpage.getList());
-				} else {
-					List<Map<String, Object>> list = questionTypeMap.get(key);
-					list.addAll(listpage.getList());
-					questionTypeMap.put(key, list);
-				}
-
-				if (listpage.getList().size() < 1000 ) {
-					is = false;
-					break;
-				}
-
-				counter ++;
+			List<Question> questionList = questionService.getQuestionList(questionTypeId);// 获取试题分类下所有试题
+			questionTypeMap.put(questionTypeId, questionList);
+			
+			if (questionList.size() < total) {
+				throw new MyException(String.format("%s分类中试题数量总数不够", questionTypeService.getEntity(questionTypeId).getName()));
 			}
 			
-			if (questionTypeMap.get(key).size() < total) {
-				throw new MyException("试题分类中试题数量总数不够");
-			}
-			
-			for (int i = 1; i <= counter; i++) {// 试题总数需要大于随机题数条件
-				List<Map<String, Object>> list = questionTypeMap.get(key);
-				Set<String> keySet = randChapterMap.keySet();
-				for (String randChapterKey : keySet) {
-					for(int j = 0; j< list.size(); j++){//第 i页试题列表
+			for (int i = 1; i <= total; i++) {// 试题总数需要大于随机题数条件
+				List<Question> list = questionTypeMap.get(questionTypeId);
+				Set<String> randChapterKeySet = randChapterMap.keySet();
+				for (String randChapterKey : randChapterKeySet) {
+					for(int j = 0; j< list.size(); j++){
 						if (randChapterMap.get(randChapterKey) <= 0) {
 							break;
 						}
-						String[] split = randChapterKey.split(",");//章节规则 个数是固定的   0、ID, 1、TYPE, 2、DIFFICULTY, 3、AI, 4、SCORE
-						Map<String, Object> map = list.get(j); //ID, TYPE, DIFFICULTY, AI, SCORE
-							//split[0] 0 是ID 不做比较
-						if ( (split[1].equals("null") || split[1].equals(map.get("type").toString())) && (split[2].equals("null") || split[2].equals(map.get("difficulty").toString())) 
-								&& (split[3].equals("null") || split[3].equals(map.get("ai").toString())) && (split[4].equals("null") || split[4].equals(map.get("score").toString())) ) {
+						
+						String[] split = randChapterKey.split("_");// 章节规则 个数是固定的   0、ID, 1、TYPE, 2、DIFFICULTY, 3、AI
+						Question question = list.get(j); // ID, TYPE, DIFFICULTY, AI split[0] 0 是ID 不做比较
+						if ( split[1].equals(question.getType().toString()) && split[2].contains(question.getDifficulty().toString()) && split[3].contains(question.getAi().toString()) ) {
 							randChapterMap.put(randChapterKey, randChapterMap.get(randChapterKey) - 1);
 						}
 					}
 				}
 			}
 			
-			//判断那个randChapterMap 是否所有的都匹配到
 			for (String randChapterKey : randChapterMap.keySet()) {
 				if ( randChapterMap.get(randChapterKey) > 0) {
-					throw new MyException("试题分类中试题符合要求数量不够");
+					throw new MyException(String.format("%s分类中符合要求的数量不够", questionTypeService.getEntity(questionTypeId).getName()));
 				}
 			}
 		}
