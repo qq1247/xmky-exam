@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.wcpdoc.core.service.BaseService;
+import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.RandChapterRules;
 
 
@@ -61,7 +62,7 @@ public interface RandChapterRulesService extends BaseService<RandChapterRules> {
 	 * 
 	 * v1.0 chenyun 2022年2月18日上午9:27:27
 	 * @param paperId
-	 * @return Map<Integer, List<Map<String, Object>>>
+	 * @return Map<Integer, List<Question>>
 	 */
-	Map<Integer, List<Map<String, Object>>> checkRandChapterRules(Integer paperId);
+	Map<Integer, List<Question>> checkRandChapterRules(Integer paperId);
 }

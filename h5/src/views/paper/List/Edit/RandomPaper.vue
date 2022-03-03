@@ -71,30 +71,32 @@
             :rules="rules"
             :ref="`ruleForm${index}${randIndex}`"
           >
-            <el-form-item prop="questionTypeId">
-              <CustomSelect
-                :ref="`questionSelect${index}${randIndex}`"
-                :isAuto="false"
-                :multiple="false"
-                placeholder="请选择题库"
-                :value="rand.questionTypeId"
-                :total="total"
-                @change="(e) => selectQuestionType(e, index, randIndex)"
-                @input="searchQuestionType"
-                @currentChange="getMoreQuestionType"
-                @visibleChange="getQuestionType"
-              >
-                <el-option
-                  v-for="item in questionTypes"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                ></el-option>
-              </CustomSelect>
-            </el-form-item>
             <el-row>
-              <el-col :span="5"
-                ><el-form-item prop="type">
+              <el-col :span="3">
+                <el-form-item prop="questionTypeId">
+                  <CustomSelect
+                    :ref="`questionSelect${index}${randIndex}`"
+                    :isAuto="false"
+                    :multiple="false"
+                    placeholder="请选择题库"
+                    :value="rand.questionTypeId"
+                    :total="total"
+                    @change="(e) => selectQuestionType(e, index, randIndex)"
+                    @input="searchQuestionType"
+                    @currentChange="getMoreQuestionType"
+                    @visibleChange="getQuestionType"
+                  >
+                    <el-option
+                      v-for="item in questionTypes"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    ></el-option>
+                  </CustomSelect>
+                </el-form-item>
+              </el-col>
+              <el-col :span="3" :offset="1">
+                <el-form-item prop="type">
                   <el-select
                     clearable
                     placeholder="请选择类型"
@@ -106,12 +108,15 @@
                       :value="parseInt(dict.dictKey)"
                       v-for="dict in typeDictList"
                     ></el-option>
-                  </el-select> </el-form-item
-              ></el-col>
-              <el-col :span="5"
-                ><el-form-item>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="4" :offset="1">
+                <el-form-item prop="difficulty">
                   <el-select
+                    multiple
                     clearable
+                    collapse-tags
                     placeholder="请选择难度"
                     v-model="rand.difficulty"
                   >
@@ -121,15 +126,20 @@
                       :value="parseInt(dict.dictKey)"
                       v-for="dict in difficultyDictList"
                     ></el-option>
-                  </el-select> </el-form-item
-              ></el-col>
+                  </el-select>
+                </el-form-item>
+              </el-col>
               <el-col
-                :span="5"
+                :span="4"
+                :offset="1"
                 v-if="markType === 2 && [3, 5].includes(rand.type)"
-                ><el-form-item prop="ai">
+              >
+                <el-form-item prop="ai">
                   <el-select
+                    multiple
                     clearable
-                    placeholder="请选择是否智能"
+                    collapse-tags
+                    placeholder="是否智能"
                     v-model="rand.ai"
                   >
                     <el-option
@@ -138,15 +148,27 @@
                       :value="parseInt(dict.dictKey)"
                       v-for="dict in aiList"
                     ></el-option>
-                  </el-select> </el-form-item
-              ></el-col>
-              <el-col :span="4"
-                ><el-form-item>
-                  <el-input
-                    placeholder="请输入分值"
-                    v-model="rand.queryScore"
-                  ></el-input> </el-form-item
-              ></el-col>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="6" :offset="1">
+                <div style="display: flex; align-items: center">
+                  <el-form-item prop="totalNumber">
+                    添加：<el-input
+                      class="rule-input"
+                      v-model="rand.totalNumber"
+                    ></el-input
+                    >道题，&nbsp;&nbsp;
+                  </el-form-item>
+                  <el-form-item prop="score">
+                    每题&nbsp;&nbsp;<el-input
+                      class="rule-input"
+                      v-model="rand.score"
+                    ></el-input
+                    >分
+                  </el-form-item>
+                </div>
+              </el-col>
             </el-row>
             <el-form-item
               label="分数选项："
@@ -173,24 +195,6 @@
                 </el-tooltip>
               </el-checkbox-group>
             </el-form-item>
-            <el-row>
-              <el-col :span="1">添加：</el-col>
-              <el-col :span="4.5">
-                <el-form-item prop="totalNumber">
-                  <el-input
-                    class="rule-input"
-                    v-model="rand.totalNumber"
-                  ></el-input
-                  >道题，每题&nbsp;&nbsp;&nbsp;&nbsp;
-                </el-form-item>
-              </el-col>
-              <el-col :span="4">
-                <el-form-item prop="score">
-                  <el-input class="rule-input" v-model="rand.score"></el-input
-                  >分
-                </el-form-item>
-              </el-col>
-            </el-row>
             <el-row>
               <el-col :span="2"
                 ><el-form-item>
@@ -286,7 +290,22 @@ export default {
           { required: true, message: '请选择题库', trigger: 'change' },
         ],
         type: [{ required: true, message: '请选择类型', trigger: 'change' }],
-        ai: [{ required: true, message: '请选择是否智能', trigger: 'change' }],
+        difficulty: [
+          {
+            required: true,
+            message: '请选择类型',
+            trigger: 'change',
+            type: 'array',
+          },
+        ],
+        ai: [
+          {
+            required: true,
+            message: '请选择是否智能',
+            trigger: 'change',
+            type: 'array',
+          },
+        ],
         totalNumber: [
           {
             required: true,
@@ -396,9 +415,8 @@ export default {
         questionTypeId: null,
         questionTypeName: '',
         type: 1,
-        difficulty: 1,
-        queryScore: '',
-        ai: 1,
+        difficulty: [],
+        ai: [],
         scoreOptions: [],
         totalNumber: '',
         score: '',
@@ -443,10 +461,9 @@ export default {
           paperId: this.paperId,
           questionTypeId: ruleParam.questionTypeId,
           paperQuestionId: this.paperQuestionRules[index].chapter.id,
-          ai: ruleParam.ai,
+          ai: [3, 5].includes(ruleParam.type) ? ruleParam.ai : [],
           type: ruleParam.type,
           difficulty: ruleParam.difficulty,
-          queryScore: ruleParam.queryScore,
           scoreOptions: ruleParam.scoreOptions,
           totalNumber: ruleParam.totalNumber,
           score: ruleParam.score,
@@ -605,8 +622,12 @@ export default {
 }
 
 .rule-input {
-  width: 100px;
+  width: 50px;
   margin-right: 10px;
+  /deep/ .el-input__inner {
+    border: none;
+    border-bottom: 1px solid #dcdfe6;
+  }
 }
 
 .handler-btn {

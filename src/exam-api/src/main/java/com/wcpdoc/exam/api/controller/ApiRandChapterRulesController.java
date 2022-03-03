@@ -142,9 +142,8 @@ public class ApiRandChapterRulesController extends BaseController {
 					.addAttr("paperId", randChapterRules.getPaperId())
 					.addAttr("questionTypeId", randChapterRules.getQuestionTypeId())
 					.addAttr("type", randChapterRules.getType())
-					.addAttr("difficulty", randChapterRules.getDifficulty())
-					.addAttr("queryScore", randChapterRules.getQueryScore())
-					.addAttr("ai", randChapterRules.getAi())
+					.addAttr("difficulty", randChapterRules.getDifficulty().split(","))
+					.addAttr("ai", randChapterRules.getAi().split(","))
 					.addAttr("scoreOptions", scoreOptions)
 					.addAttr("totalNumber", randChapterRules.getTotalNumber())
 					.addAttr("score", randChapterRules.getScore());

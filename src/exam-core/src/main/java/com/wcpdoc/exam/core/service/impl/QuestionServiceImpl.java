@@ -27,8 +27,6 @@ import com.wcpdoc.base.cache.ParmCache;
 import com.wcpdoc.base.cache.ProgressBarCache;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.dao.BaseDao;
-import com.wcpdoc.core.entity.PageIn;
-import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.BigDecimalUtil;
@@ -803,12 +801,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public List<Question> randomQuestion(Integer questionTypeId, Integer type, Integer difficulty, BigDecimal queryScore, Integer ai, Integer totalNumber) {
-		return questionDao.randomQuestion(questionTypeId, type, difficulty, queryScore, ai, totalNumber);
-	}
-
-	@Override
-	public PageOut getListpageMap(PageIn pageIn) {
-		return questionDao.getListpageMap(pageIn);
+	public List<Question> getQuestionList(Integer questionTypeId) {
+		return questionDao.getQuestionList(questionTypeId);
 	}
 }
