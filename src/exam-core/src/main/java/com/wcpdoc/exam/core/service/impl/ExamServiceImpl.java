@@ -30,6 +30,7 @@ import com.wcpdoc.exam.core.entity.MyExamDetail;
 import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
+import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.RandChapterRules;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.ExamTypeService;
@@ -382,102 +383,80 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			}
 		}
 		
+		List<PaperQuestion> paperQuestionList = null;
+		Map<Integer, List<Question>> checkRandChapterRules = null;
 		if (paper.getGenType() == 1) {//人工组卷
-			List<PaperQuestion> paperQuestionList = paperService.getPaperQuestionList(exam.getPaperId());// 试题列表（不能用试题中的试题 分值修改有问题 只能用试卷试题中的试题）
-			for (Integer userId : examUserIdSet) {// 页面有数据库没有，数据库添加
-				MyExam myExam = new MyExam();
-				myExam.setExamId(id);
-				myExam.setUserId(userId);
-				// myExam.setAnswerStartTime(exam.getStartTime());// 第一次答题记录时间，不是这里
-				// myExam.setAnswerEndTime(exam.getEndTime());
-				//myExam.setMarkUserId(null);
-				// myExam.setMarkStartTime(exam.getMarkStartTime());
-				// myExam.setMarkEndTime(exam.getMarkEndTime());
-				// myExam.setTotalScore(BigDecimal.ZERO);//没有考试，不要设置分数
-				myExam.setState(1);// 未考试
-				myExam.setMarkState(1);// 未阅卷
-				//myExam.setAnswerState(null);// 不设置及格状态
-				myExam.setUpdateTime(curTime);
-				myExam.setUpdateUserId(getCurUser().getId());
-				myExamService.add(myExam);// 添加我的考试
-				
-				if (exam.getState() == 1) {
-					for (PaperQuestion paperQuestion : paperQuestionList) {
-						MyExamDetail myExamDetail = new MyExamDetail();
-						myExamDetail.setMyExamId(myExam.getId());
-						myExamDetail.setExamId(myExam.getExamId());
-						myExamDetail.setUserId(myExam.getUserId());
-						myExamDetail.setQuestionId(paperQuestion.getQuestionId());
-						//myExamDetail.setAnswerTime(null);
-						//myExamDetail.setMarkUserId(null);
-						//myExamDetail.setMarkTime(null);
-						//myExamDetail.setAnswer(null);
-						//myExamDetail.setScore(null);
-						myExamDetail.setQuestionScore(paperQuestion.getScore());
-						//myExamDetail.setAnswerFileId(null);
-						myExamDetailService.add(myExamDetail);// 添加我的考试详细
-					}
-				}
-			}
+			paperQuestionList = paperService.getPaperQuestionList(exam.getPaperId());// 试题列表（不能用试题中的试题 分值修改有问题 只能用试卷试题中的试题）
 		}
 		if (paper.getGenType() == 2) {//随机组卷
-			Map<Integer, List<Map<String, Object>>> checkRandChapterRules = randChapterRulesService.checkRandChapterRules(paper.getId());// 章节中所有试题分类下的所有试题
-			List<PaperQuestion> chapterList = paperQuestionService.getChapterList(paper.getId());//章节
-			for(Integer userId : examUserIdSet){
-				MyExam myExam = new MyExam();
-				myExam.setExamId(id);
-				myExam.setUserId(userId);
-				myExam.setState(1);// 未考试
-				myExam.setMarkState(1);// 未阅卷
-				myExam.setUpdateTime(curTime);
-				myExam.setUpdateUserId(getCurUser().getId());
-				myExamService.add(myExam);// 添加我的考试
-				
-				if (exam.getState() == 1) {
-					for (PaperQuestion chapter : chapterList) {
-						for(RandChapterRules randChapterRules : randChapterRulesService.getChapterList(chapter.getPaperId(), chapter.getId())){//章节规则
-							// 试题类型、试题难易程度、分值、自能阅卷、个数
-							for (int i = 1; i <= randChapterRules.getTotalNumber(); i++) {//随机试题
-								List<Map<String, Object>> list = checkRandChapterRules.get(randChapterRules.getQuestionTypeId());
-								for(int j = 0; j < list.size(); j++){
-									if ( !(!ValidateUtil.isValid(randChapterRules.getType()) || randChapterRules.getType().equals(list.get(j).get("type").toString())) 
-											&& !(!ValidateUtil.isValid(randChapterRules.getDifficulty()) || randChapterRules.getDifficulty().equals(list.get(j).get("difficulty").toString())) 
-											&& !(!ValidateUtil.isValid(randChapterRules.getAi()) || randChapterRules.getAi().equals(list.get(j).get("ai").toString()))
-											&& !(!ValidateUtil.isValid(randChapterRules.getQueryScore()) || randChapterRules.getQueryScore().equals(list.get(j).get("score").toString())) ) {
-											continue;
-										}
-										PaperQuestion paperQuestion = new PaperQuestion();
-										paperQuestion.setUpdateTime(new Date());
-										paperQuestion.setUpdateUserId(getCurUser().getId());
-										paperQuestion.setQuestionId(Integer.valueOf(list.get(j).get("id").toString()));
-										paperQuestion.setType(3);
-										paperQuestion.setNo(i);
-										paperQuestion.setScore(randChapterRules.getScore());
-										paperQuestion.setScoreOptions(randChapterRules.getScoreOptions());
-										paperQuestion.setParentId(randChapterRules.getPaperQuestionId());
-										paperQuestion.setPaperId(randChapterRules.getPaperId());
-										paperQuestion.setExamId(myExam.getExamId());
-										paperQuestion.setUserId(userId);
-										paperQuestion.setRandChapterRulesId(randChapterRules.getId());
-										paperQuestionService.add(paperQuestion);
-										
-										paperQuestion.setParentSub(String.format("%s%s_", chapter.getParentSub(), paperQuestion.getId()));
-										paperQuestionService.update(paperQuestion);
-										
-										MyExamDetail myExamDetail = new MyExamDetail();
-										myExamDetail.setMyExamId(myExam.getId());
-										myExamDetail.setExamId(myExam.getExamId());
-										myExamDetail.setUserId(myExam.getUserId());
-										myExamDetail.setQuestionId(Integer.valueOf(list.get(j).get("id").toString()));
-										myExamDetail.setQuestionScore(randChapterRules.getScore());
-										myExamDetailService.add(myExamDetail);// 添加我的考试详细
-										
-										list.remove(j);//删除列表中现在
-										break;
-								}
-								Collections.shuffle(list);//乱序
-								checkRandChapterRules.put(randChapterRules.getQuestionTypeId(), list);
+			paperQuestionList = paperQuestionService.getChapterList(paper.getId());//章节
+			checkRandChapterRules = randChapterRulesService.checkRandChapterRules(paper.getId());// Map<试题分类id, 试题分类下所有的试题>  分页查询出来的
+		}
+		for(Integer userId : examUserIdSet){
+			MyExam myExam = new MyExam();
+			myExam.setExamId(id);
+			myExam.setUserId(userId);
+			myExam.setState(1);// 未考试
+			myExam.setMarkState(1);// 未阅卷
+			myExam.setUpdateTime(curTime);
+			myExam.setUpdateUserId(getCurUser().getId());
+			myExamService.add(myExam);// 添加我的考试
+			
+			if (exam.getState() == 1 && paper.getGenType() == 1) {
+				for (PaperQuestion paperQuestion : paperQuestionList) {
+					MyExamDetail myExamDetail = new MyExamDetail();
+					myExamDetail.setMyExamId(myExam.getId());
+					myExamDetail.setExamId(myExam.getExamId());
+					myExamDetail.setUserId(myExam.getUserId());
+					myExamDetail.setQuestionId(paperQuestion.getQuestionId());
+					myExamDetail.setQuestionScore(paperQuestion.getScore());
+					myExamDetailService.add(myExamDetail);// 添加我的考试详细
+				}
+			}
+			if (exam.getState() == 1 && paper.getGenType() == 2) {
+				for (PaperQuestion chapter : paperQuestionList) {
+					for(RandChapterRules randChapterRules : randChapterRulesService.getChapterList(chapter.getPaperId(), chapter.getId())){//章节规则
+						// 试题类型、试题难易程度、分值、自能阅卷、个数
+						for (int i = 1; i <= randChapterRules.getTotalNumber(); i++) {//随机试题
+							List<Question> questionList = checkRandChapterRules.get(randChapterRules.getQuestionTypeId());
+							for(int j = 0; j < questionList.size(); j++){
+								if ( !(!ValidateUtil.isValid(randChapterRules.getType()) || randChapterRules.getType().equals(questionList.get(j).getType())) 
+										&& !(!ValidateUtil.isValid(randChapterRules.getDifficulty()) || randChapterRules.getDifficulty().contains(questionList.get(j).getDifficulty().toString())) 
+										&& !(!ValidateUtil.isValid(randChapterRules.getAi()) || randChapterRules.getAi().contains(questionList.get(j).getAi().toString())) ) {
+										continue;
+									}
+								
+									PaperQuestion paperQuestion = new PaperQuestion();
+									paperQuestion.setUpdateTime(new Date());
+									paperQuestion.setUpdateUserId(getCurUser().getId());
+									paperQuestion.setQuestionId(questionList.get(j).getId());
+									paperQuestion.setType(3);
+									paperQuestion.setNo(i);
+									paperQuestion.setScore(randChapterRules.getScore());
+									paperQuestion.setScoreOptions(randChapterRules.getScoreOptions());
+									paperQuestion.setParentId(randChapterRules.getPaperQuestionId());
+									paperQuestion.setPaperId(randChapterRules.getPaperId());
+									paperQuestion.setExamId(myExam.getExamId());
+									paperQuestion.setUserId(userId);
+									paperQuestion.setRandChapterRulesId(randChapterRules.getId());
+									paperQuestionService.add(paperQuestion);
+									
+									paperQuestion.setParentSub(String.format("%s%s_", chapter.getParentSub(), paperQuestion.getId()));
+									paperQuestionService.update(paperQuestion);
+									
+									MyExamDetail myExamDetail = new MyExamDetail();
+									myExamDetail.setMyExamId(myExam.getId());
+									myExamDetail.setExamId(myExam.getExamId());
+									myExamDetail.setUserId(myExam.getUserId());
+									myExamDetail.setQuestionId(questionList.get(j).getId());
+									myExamDetail.setQuestionScore(randChapterRules.getScore());
+									myExamDetailService.add(myExamDetail);// 添加我的考试详细
+									
+									questionList.remove(j);//删除列表中现在
+									break;
 							}
+							Collections.shuffle(questionList);//乱序
+							checkRandChapterRules.put(randChapterRules.getQuestionTypeId(), questionList);
 						}
 					}
 				}

@@ -6,8 +6,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
 
 import com.wcpdoc.base.entity.Parm;
+import com.wcpdoc.base.service.ParmService;
 import com.wcpdoc.cache.BaseEhCache;
 import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.util.SpringUtil;
 
 /**
  * 系统参数缓存
@@ -26,14 +28,25 @@ public class ParmCache extends BaseEhCache {
 	 */
 	public static void flushCache(Parm parm) {
 		Cache cache = getCache(CACHE_NAME);
-		Parm target = new Parm();
+		Parm source = new Parm();
 		try {
-			BeanUtils.copyProperties(parm, target);// 如果在事务内，修改属性会同步到数据库。查阅TransactionConf
+			BeanUtils.copyProperties(source, parm);// 如果在事务内，修改属性会同步到数据库。查阅TransactionConf
 		} catch (Exception e) {// 测试，非业务层方法调用获取parm.getEntity(1)，修改属性，不会同步到数据库。事务已结束
 			log.error("刷新缓存异常：参数拷贝失败", e);// 非业务层方法调用业务层方法，业务层获取parm.getEntity(1)，修改属性，会同步到数据库。有新事务则加入事务
 			throw new MyException("刷新缓存异常：参数拷贝失败");
 		}
-		cache.put(PARM_KEY, target);
+		cache.put(PARM_KEY, source);
+	}
+	
+	/**
+	 * 重新加载缓存
+	 * 
+	 * v1.0 zhanghc 2022年2月24日上午10:47:16
+	 * void
+	 */
+	public static void reloadCache() {
+		Parm parm = SpringUtil.getBean(ParmService.class).getEntity(1);
+		flushCache(parm);
 	}
 
 	/**

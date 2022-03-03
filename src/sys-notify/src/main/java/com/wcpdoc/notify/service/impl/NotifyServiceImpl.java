@@ -48,8 +48,8 @@ public class NotifyServiceImpl implements NotifyService {
 	public void pushSMS(String phone, String code) throws NotifyException {
 		try {
 			//极光短信
-			//String appkey = "e78cb874b49a11bb8dfb6019";
-			//String masterSecret = "a1d06fc43c21b97b62fd8a1c";
+			//String appkey = "";
+			//String masterSecret = "";
 			//SMSClient client = new SMSClient(masterSecret, appkey);
 	        //SMSPayload payload = SMSPayload.newBuilder()
 	        //		.setMobileNumber(phone)

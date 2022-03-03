@@ -690,9 +690,8 @@ http请求头需添加Authorization字段，
 | paperId | Integer       | 试卷ID  | 是   |
 | questionTypeId  | Integer   | 试题分类ID  | 是   |
 | type |Integer      | 选择类型 | 是   |
-| difficulty | Integer   | 难易程度 | 否   |
-| queryScore | Double       | 分值 | 否 |
-| ai | Integer       | 智能阅卷 |  否  |
+| difficulty | String[]   | 难易程度 | 否   |
+| ai | String[]   | 智能阅卷 |  否  |
 | scoreOptions | String(8)       | 分数选择项 |  否  |
 | totalNumber | Integer    | 多少道题 | 是  |
 | score | Double  | 分数 | 是  |
@@ -721,9 +720,8 @@ http请求头需添加Authorization字段，
 | data.paperId  | Integer  | 试卷ID |
 | data.questionTypeId  | Integer  | 试题分类ID |
 | data.type  | Integer  | 选择类型 |
-| data.difficulty  | Integer  | 难易程度 |
-| data.queryScore  | Double  | 分值 |
-| data.ai  | Integer  | 智能阅卷 |
+| data.difficulty  | String[]  | 难易程度 |
+| data.ai  | String[]  | 智能阅卷 |
 | data.scoreOptions |  String[]  | 分数选择项 |
 | data.totalNumber  | Integer  | 多少道题 |
 | data.score  | Double  | 分数 |
@@ -744,9 +742,8 @@ http请求头需添加Authorization字段，
 |data.list[].paperQuestionRand[].paperId  | Integer  | 试卷ID |
 |data.list[].paperQuestionRand[].questionTypeId  | Integer  | 试题分类ID |
 |data.list[].paperQuestionRand[].type  | Integer  | 选择类型 |
-|data.list[].paperQuestionRand[].difficulty  | Integer  | 难易程度 |
-|data.list[].paperQuestionRand[].queryScore  | Double  | 分值 |
-|data.list[].paperQuestionRand[].ai  | Integer  | 智能阅卷 |
+|data.list[].paperQuestionRand[].difficulty  | String[]  | 难易程度 |
+|data.list[].paperQuestionRand[].ai  | String[]  | 智能阅卷 |
 |data.list[].paperQuestionRand[].scoreOptions |  String[]  | 分数选择项 |
 |data.list[].paperQuestionRand[].totalNumber  | Integer  | 多少道题 |
 |data.list[].paperQuestionRand[].score  | Double  | 分数 |

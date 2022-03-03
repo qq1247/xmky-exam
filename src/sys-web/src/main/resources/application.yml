@@ -42,4 +42,4 @@ token:
     refreshMinute: 60
     
 sys:
-  ver: 3.5.0
+  ver: 3.6.0

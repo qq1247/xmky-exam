@@ -1,17 +1,21 @@
 package com.wcpdoc.exam.core.dao.impl;
 
-import java.math.BigDecimal;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.base.dao.UserDao;
 import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
+import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.SqlUtil;
 import com.wcpdoc.core.util.SqlUtil.Order;
@@ -65,57 +69,21 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 	}
 
 	@Override
-	public List<Question> randomQuestion(Integer questionTypeId, Integer type, Integer difficulty,  BigDecimal queryScore, Integer ai, Integer totalNumber) {
-		String sql = "SELECT QUESTION.* "
+	public List<Question> getQuestionList(Integer questionTypeId) {
+		String sql = "SELECT QUESTION.ID, QUESTION.TYPE, QUESTION.DIFFICULTY, QUESTION.AI "
 				+ "FROM EXM_QUESTION QUESTION "
-				+ "WHERE QUESTION.STATE = 1 AND QUESTION.QUESTION_TYPE_ID = ? AND QUESTION.TYPE = ? ";
-		
-		if (ValidateUtil.isValid(difficulty) && ValidateUtil.isValid(queryScore) && ValidateUtil.isValid(ai) ) {
-			sql += "AND QUESTION.DIFFICULTY = ? AND QUESTION.SCORE = ? AND QUESTION.AI = ? ORDER BY RAND() LIMIT 0,? ";
-			return getList(sql, new Object[] { questionTypeId, type, difficulty, queryScore, ai, totalNumber}, Question.class);
+				+ "WHERE QUESTION.QUESTION_TYPE_ID = ? AND QUESTION.STATE = 1 ";
+		List<Map<String, Object>> questionMapList = getMapList(sql, new Object[] { questionTypeId });
+		List<Question> questionList = new ArrayList<Question>();
+		for(Map<String, Object> questionMap : questionMapList){
+			Question question = new Question();
+			try {
+				BeanUtils.populate(question, questionMap);
+			} catch (IllegalAccessException | InvocationTargetException e) {
+				throw new MyException("sql 转换错误");
+			}
+			questionList.add(question);
 		}
-		
-		if (!ValidateUtil.isValid(difficulty) && !ValidateUtil.isValid(queryScore) && ValidateUtil.isValid(ai) ) {
-			sql += "AND QUESTION.AI = ? ORDER BY RAND() LIMIT 0,? ";
-			return getList(sql, new Object[] { questionTypeId, type, ai, totalNumber}, Question.class);
-		}
-		
-		if (!ValidateUtil.isValid(difficulty) && ValidateUtil.isValid(queryScore) && ValidateUtil.isValid(ai) ) {
-			sql += "AND QUESTION.SCORE = ? AND QUESTION.AI = ? ORDER BY RAND() LIMIT 0,? ";
-			return getList(sql, new Object[] { questionTypeId, type, queryScore, ai, totalNumber}, Question.class);
-		}
-		
-		if (!ValidateUtil.isValid(difficulty) && ValidateUtil.isValid(queryScore) && !ValidateUtil.isValid(ai) ) {
-			sql += "AND QUESTION.SCORE = ? ORDER BY RAND() LIMIT 0,? ";
-			return getList(sql, new Object[] { questionTypeId, type, queryScore, totalNumber}, Question.class);
-		}
-		
-		if (ValidateUtil.isValid(difficulty) && !ValidateUtil.isValid(queryScore) && ValidateUtil.isValid(ai) ) {
-			sql += "AND QUESTION.DIFFICULTY = ? AND QUESTION.AI = ? ORDER BY RAND() LIMIT 0,? ";
-			return getList(sql, new Object[] { questionTypeId, type, difficulty, ai, totalNumber}, Question.class);
-		}
-
-		if (ValidateUtil.isValid(difficulty) && ValidateUtil.isValid(queryScore) && !ValidateUtil.isValid(ai) ) {
-			sql += "AND QUESTION.DIFFICULTY = ? ORDER BY RAND() LIMIT 0,? ";
-			return getList(sql, new Object[] { questionTypeId, type, difficulty, totalNumber}, Question.class);
-		}
-		
-		if (ValidateUtil.isValid(difficulty) && !ValidateUtil.isValid(queryScore) && !ValidateUtil.isValid(ai) ) {
-			sql += "AND QUESTION.DIFFICULTY = ? ORDER BY RAND() LIMIT 0,? ";
-			return getList(sql, new Object[] { questionTypeId, type, difficulty, totalNumber}, Question.class);
-		}
-		
-		sql += "ORDER BY RAND() LIMIT 0,? ";
-		return getList(sql, new Object[] { questionTypeId, type, totalNumber}, Question.class);
-	}
-
-	@Override
-	public PageOut getListpageMap(PageIn pageIn) {
-		String sql = "SELECT QUESTION.ID, QUESTION.TYPE, QUESTION.DIFFICULTY, QUESTION.AI, QUESTION.SCORE "
-				+ "FROM EXM_QUESTION QUESTION ";
-		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("questionTypeId", Integer.class)), "QUESTION.QUESTION_TYPE_ID = ?", pageIn.get("questionTypeId", Integer.class))
-			   .addWhere("QUESTION.STATE = 1 ");
-		return getListpage(sqlUtil, pageIn);
+		return questionList;
 	}
 }

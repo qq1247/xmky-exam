@@ -1,11 +1,8 @@
 package com.wcpdoc.exam.core.dao;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import com.wcpdoc.core.dao.BaseDao;
-import com.wcpdoc.core.entity.PageIn;
-import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.Question;
 
 /**
@@ -23,22 +20,13 @@ public interface QuestionDao extends BaseDao<Question>{
 	 * @return List<Question>
 	 */
 	List<Question> getList(Integer questionTypeId);
-
 	
 	/**
-	 * 获取随机试题id
+	 * 试题分类下所有发布试题
 	 * 
-	 * v1.0 chenyun 2022年2月11日下午1:35:07
-	 * @return List<Integer>
+	 * v1.0 chenyun 2022年3月2日下午3:10:03
+	 * @param questionTypeId
+	 * @return List<Question>
 	 */
-	List<Question> randomQuestion(Integer questionTypeId, Integer type, Integer difficulty, BigDecimal queryScore, Integer ai, Integer totalNumber);
-	
-	/**
-	 * 试题分类下试题 (章节随机规则)
-	 * 
-	 * v1.0 chenyun 2022年2月18日上午11:14:03
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	PageOut getListpageMap(PageIn pageIn);
+	List<Question> getQuestionList(Integer questionTypeId);
 }

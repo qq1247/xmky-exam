@@ -39,11 +39,9 @@ public class RandChapterRules {
 	@Column(name = "TYPE")
 	private Integer type;
 	@Column(name = "DIFFICULTY")
-	private Integer difficulty;
-	@Column(name = "QUERY_SCORE")
-	private BigDecimal queryScore;
+	private String difficulty;
 	@Column(name = "AI")
-	private Integer ai;
+	private String ai;
 	@Column(name = "SCORE_OPTIONS")
 	private String scoreOptions;
 	@Column(name = "TOTAL_NUMBER")
@@ -91,18 +89,6 @@ public class RandChapterRules {
 	public void setType(Integer type) {
 		this.type = type;
 	}
-	public Integer getDifficulty() {
-		return difficulty;
-	}
-	public void setDifficulty(Integer difficulty) {
-		this.difficulty = difficulty;
-	}
-	public Integer getAi() {
-		return ai;
-	}
-	public void setAi(Integer ai) {
-		this.ai = ai;
-	}
 	public String getScoreOptions() {
 		return scoreOptions;
 	}
@@ -133,10 +119,16 @@ public class RandChapterRules {
 	public void setPaperQuestionId(Integer paperQuestionId) {
 		this.paperQuestionId = paperQuestionId;
 	}
-	public BigDecimal getQueryScore() {
-		return queryScore;
+	public String getDifficulty() {
+		return difficulty;
 	}
-	public void setQueryScore(BigDecimal queryScore) {
-		this.queryScore = queryScore;
+	public void setDifficulty(String difficulty) {
+		this.difficulty = difficulty;
+	}
+	public String getAi() {
+		return ai;
+	}
+	public void setAi(String ai) {
+		this.ai = ai;
 	}
 }

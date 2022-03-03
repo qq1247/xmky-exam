@@ -1130,7 +1130,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 				List<RandChapterRules> randChapterRulesList = randChapterRulesService.getChapterList(paperQuestion.getPaperId(), paperQuestion.getId());
 				for (RandChapterRules randChapterRules : randChapterRulesList) {
 					totalScore.add(new BigDecimal(randChapterRules.getTotalNumber()).multiply(randChapterRules.getScore()));
-					if (randChapterRules.getAi() != 1) {
+					if (randChapterRules.getAi().contains("2")) {
 						ai = false;
 					}
 				}
