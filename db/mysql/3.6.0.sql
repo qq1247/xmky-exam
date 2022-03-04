@@ -14,6 +14,8 @@ drop table if exists EXM_PAPER;
 
 drop table if exists EXM_PAPER_QUESTION;
 
+drop table if exists EXM_PAPER_QUESTION_RULE;
+
 drop table if exists EXM_PAPER_QUESTION_ANSWER;
 
 drop table if exists EXM_PAPER_REMARK;
@@ -48,7 +50,6 @@ drop table if exists SYS_USER;
 
 drop table if exists SYS_VER;
 
-drop table if exists EXM_RAND_CHAPTER_RULES;
 /*==============================================================*/
 /* Table: EXM_BULLETIN                                          */
 /*==============================================================*/
@@ -231,13 +232,36 @@ create table EXM_PAPER_QUESTION
    SCORE                decimal(5,2) comment '分数',
    SCORE_OPTIONS        varchar(8) comment '1：漏选得分；2：答案无顺序；3：大小写不敏感；',
    NO                   int comment '排序',
-   RAND_CHAPTER_RULES_ID int comment '随机章节规则ID',
-   USER_ID              int comment '考试用户id',
+   PAPER_QUESTION_RULE_ID int comment '试卷试题规则ID',
+   USER_ID              int comment '考试用户ID',
    EXAM_ID              int comment '考试ID',
    primary key (ID)
 );
 
 alter table EXM_PAPER_QUESTION comment '试卷试题';
+
+/*==============================================================*/
+/* Table: EXM_PAPER_QUESTION_RULE                               */
+/*==============================================================*/
+create table EXM_PAPER_QUESTION_RULE
+(
+   ID                   int not null auto_increment comment 'id',
+   QUESTION_TYPE_ID     int comment '试题分类ID',
+   TYPE                 int comment '1：单选；2：多选；3：填空；4：判断；5：问答',
+   DIFFICULTYS          varchar(16) comment '1：极易；2：简单；3：适中；4：困难；5：极难',
+   AIS                  varchar(16) comment '智能阅卷',
+   SCORE_OPTIONS        varchar(8) comment '1：漏选得分；2：答案无顺序；3：大小写不敏感；',
+   NUM                  int comment '题数',
+   SCORE                decimal(5,2) comment '分数',
+   PAPER_ID             int comment '试卷ID',
+   PAPER_QUESTION_ID    int comment '试卷试题ID',
+   NO                   int comment '排序',
+   UPDATE_USER_ID       int comment '修改人',
+   UPDATE_TIME          datetime comment '修改时间',
+   primary key (ID)
+);
+
+alter table EXM_PAPER_QUESTION_RULE comment '试卷试题规则';
 
 /*==============================================================*/
 /* Table: EXM_PAPER_QUESTION_ANSWER                             */
@@ -551,29 +575,6 @@ create table SYS_VER
 );
 
 alter table SYS_VER comment '版本';
-
-/*==============================================================*/
-/* Table: EXM_RAND_CHAPTER_RULES                                */
-/*==============================================================*/
-create table EXM_RAND_CHAPTER_RULES
-(
-   ID                   int not null auto_increment comment 'id',
-   UPDATE_USER_ID       int comment '修改人',
-   UPDATE_TIME          datetime comment '修改时间',
-   PAPER_ID             int comment '试卷ID',
-   QUESTION_TYPE_ID     int comment '试题分类ID',
-   TYPE                 int comment '1：单选；2：多选；3：填空；4：判断；5：问答',
-   DIFFICULTY           varchar(10) comment '1：极易；2：简单；3：适中；4：困难；5：极难',
-   AI                   varchar(10) comment '智能阅卷',
-   SCORE_OPTIONS        varchar(8) comment '1：漏选得分；2：答案无顺序；3：大小写不敏感；',
-   TOTAL_NUMBER         int comment '几道题',
-   SCORE                decimal(5,2) comment '分数',
-   NO                   int comment '排序',
-   PAPER_QUESTION_ID    int comment '试卷试题ID',
-   primary key (ID)
-);
-
-alter table EXM_RAND_CHAPTER_RULES comment '随机章节规则';
 
 /*==============================================================*/
 /* 数据															*/

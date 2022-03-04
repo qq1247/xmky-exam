@@ -683,31 +683,31 @@ http请求头需添加Authorization字段，
 | content | Integer       | 评论内容  | 是   |
 | anon | Integer       | 匿名（1：是；2：否） | 是   |
 
-### 随机章节规则添加：randChapterRules/add
+### 随机章节规则添加：paperQuestionRule/add
 | 请求参数             | 类型          | 描述   | 必填 |
 | ---------| ------------- | -------- | ---- |
 | paperQuestionId | Integer       | 章节ID   | 是   |
 | paperId | Integer       | 试卷ID  | 是   |
 | questionTypeId  | Integer   | 试题分类ID  | 是   |
 | type |Integer      | 选择类型 | 是   |
-| difficulty | String[]   | 难易程度 | 否   |
-| ai | String[]   | 智能阅卷 |  否  |
+| difficultys | Integer[]   | 难易程度 | 否   |
+| ais | Integer[]   | 智能阅卷 |  否  |
 | scoreOptions | String(8)       | 分数选择项 |  否  |
-| totalNumber | Integer    | 多少道题 | 是  |
+| num | Integer    | 题数 | 是  |
 | score | Double  | 分数 | 是  |
 
-### 随机章节规则修改：randChapterRules/edit
+### 随机章节规则修改：paperQuestionRule/edit
 | 请求参数| 类型    | 描述 | 必填 |
 | ------------------- | ------- | ---- | ---- |
 | id                  | Integer | 主键 | 是   |
 | 其他字段同paper/add |         |      |      |  |
 
-### 随机章节规则删除：randChapterRules/del
+### 随机章节规则删除：paperQuestionRule/del
 | 请求参数| 类型    | 描述 | 必填 |
 | ---- | ------- | ---- | ---- |
 | ids   | Integer[] | 主键ids | 是   |
 
-### 随机章节规则详细：randChapterRules/get
+### 随机章节规则详细：paperQuestionRule/get
 | 请求参数| 类型    | 描述   | 必填 |
 | ---- | ------- | ------ | ---- |
 | id  | Integer | 试卷ID | 是   |
@@ -720,13 +720,13 @@ http请求头需添加Authorization字段，
 | data.paperId  | Integer  | 试卷ID |
 | data.questionTypeId  | Integer  | 试题分类ID |
 | data.type  | Integer  | 选择类型 |
-| data.difficulty  | String[]  | 难易程度 |
-| data.ai  | String[]  | 智能阅卷 |
+| data.difficultys  | Integer[]  | 难易程度 |
+| data.ais  | Integer[]  | 智能阅卷 |
 | data.scoreOptions |  String[]  | 分数选择项 |
-| data.totalNumber  | Integer  | 多少道题 |
+| data.num  | Integer  | 题数 |
 | data.score  | Double  | 分数 |
 
-### 随机章节规则列表：randChapterRules/randChapterRulesList
+### 随机章节规则列表：paperQuestionRule/paperQuestionRuleList
 | 请求参数| 类型       | 描述       | 必填 |
 | -------- | ---------- | ---------- | ---- |
 | paperId | Integer | 试卷ID | 是   |
@@ -742,8 +742,8 @@ http请求头需添加Authorization字段，
 |data.list[].paperQuestionRand[].paperId  | Integer  | 试卷ID |
 |data.list[].paperQuestionRand[].questionTypeId  | Integer  | 试题分类ID |
 |data.list[].paperQuestionRand[].type  | Integer  | 选择类型 |
-|data.list[].paperQuestionRand[].difficulty  | String[]  | 难易程度 |
-|data.list[].paperQuestionRand[].ai  | String[]  | 智能阅卷 |
+|data.list[].paperQuestionRand[].difficultys  | Integer[]  | 难易程度 |
+|data.list[].paperQuestionRand[].ais  | Integer[]  | 智能阅卷 |
 |data.list[].paperQuestionRand[].scoreOptions |  String[]  | 分数选择项 |
-|data.list[].paperQuestionRand[].totalNumber  | Integer  | 多少道题 |
+|data.list[].paperQuestionRand[].num  | Integer  | 题数 |
 |data.list[].paperQuestionRand[].score  | Double  | 分数 |
