@@ -13,7 +13,7 @@
       <div class="content-item" v-if="statisInfo.exam">
         <p><span>考试名称：</span>{{ statisInfo.exam.name }}</p>
         <p><span>开始时间：</span>{{ statisInfo.exam.startTime }}</p>
-        <p><span>考试时长：</span>{{ statisInfo.exam.succNum }}</p>
+        <p><span>考试时长：</span>{{ timeRange(statisInfo.exam.startTime, statisInfo.exam.endTime) }}</p>
         <p><span>考试人数：</span>{{ statisInfo.exam.userNum }}</p>
         <p><span>缺考人数：</span>{{ statisInfo.exam.missUserNum }}</p>
         <p><span>合格人数：</span>{{ statisInfo.exam.succUserNum }}</p>
@@ -73,16 +73,16 @@
             <template slot-scope="scope">
               <span
                 :style="{
-                  color: scope.row.myExamAnswerState === 2 ? 'red' : 'black',
+                  color: !computePassState(scope.row.paperTotalScore,scope.row.myExamScore, scope.row.paperPassScore ) ? 'red' : 'black',
                 }"
-                >{{ scope.row.myExamAnswerState | passState }}</span
+                >{{ computePassState(scope.row.paperTotalScore,scope.row.myExamScore, scope.row.paperPassScore ) ? '及格' : '未及格' }}</span
               >
             </template>
           </el-table-column>
           <el-table-column label="分数">
             <template slot-scope="scope">
               <span
-                >{{ scope.row.myExamScore || '--' }}&nbsp;/&nbsp;{{
+                >{{ scope.row.myExamScore }}&nbsp;/&nbsp;{{
                   scope.row.paperTotalScore || '--'
                 }}</span
               >
@@ -198,6 +198,11 @@ export default {
     }
   },
   methods: {
+  	computePassState(paperTotalScore, myExamScore, paperPassScore){
+  		const pass = (myExamScore / paperTotalScore) * 100
+  		const state = pass > paperPassScore ? true : false
+  		return state
+  	},
     // 考试基础信息
     async getExamStatis(examId) {
       const res = await getExamStatis({

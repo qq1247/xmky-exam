@@ -1,6 +1,6 @@
 {
   "name": "online-exam",
-  "version": "3.1.0",
+  "version": "3.4.1",
   "private": true,
   "scripts": {
     "lint": "vue-cli-service lint --fix",
@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@tinymce/tinymce-vue": "3",
-    "axios": "^0.21.1",
+    "axios": "^0.21.4",
     "core-js": "^3.17.1",
     "dayjs": "^1.10.6",
     "echarts": "^5.2.2",

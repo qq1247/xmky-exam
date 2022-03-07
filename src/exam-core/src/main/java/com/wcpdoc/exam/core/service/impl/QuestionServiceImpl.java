@@ -205,13 +205,13 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				questionAnswer.setAnswer(answers[i]);
 				if (question.getAi() == 1 && answerScores != null) {
 					questionAnswer.setScore(answerScores[i]);
+					total = total.add(answerScores[i]);
 				}else{
 					questionAnswer.setScore(new BigDecimal(0));
 				}
 				questionAnswer.setQuestionId(question.getId());
 				questionAnswer.setNo(i+1);
 				questionAnswerService.add(questionAnswer);
-				total = total.add(answerScores[i]);
 			}
 		}
 		if (question.getAi() == 1 &&  question.getScore().compareTo(total) != 0) {
