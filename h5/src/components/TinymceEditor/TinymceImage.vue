@@ -125,8 +125,8 @@ export default {
           _self.listObj[fileName] = {
             hasSuccess: false,
             uid: file.uid,
-            width: this.width,
-            height: this.height,
+            width: img.width,
+            height: img.height,
           }
         }
         resolve(true)
