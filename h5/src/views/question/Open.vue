@@ -237,7 +237,6 @@ export default {
       const userList = await userListPage({
         name,
         curPage,
-        type: 2,
         pageSize: 5,
       })
 
