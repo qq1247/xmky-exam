@@ -24,13 +24,14 @@ import com.wcpdoc.exam.core.dao.PaperDao;
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.PaperQuestionAnswer;
+import com.wcpdoc.exam.core.entity.PaperQuestionRule;
 import com.wcpdoc.exam.core.entity.PaperRemark;
 import com.wcpdoc.exam.core.entity.PaperType;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
-import com.wcpdoc.exam.core.entity.RandChapterRules;
 import com.wcpdoc.exam.core.service.PaperQuestionAnswerService;
+import com.wcpdoc.exam.core.service.PaperQuestionRuleService;
 import com.wcpdoc.exam.core.service.PaperQuestionService;
 import com.wcpdoc.exam.core.service.PaperRemarkService;
 import com.wcpdoc.exam.core.service.PaperService;
@@ -39,7 +40,6 @@ import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
-import com.wcpdoc.exam.core.service.RandChapterRulesService;
 
 /**
  * 试卷服务层实现
@@ -69,7 +69,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	@Resource
 	private QuestionOptionService questionOptionService;
 	@Resource
-	private RandChapterRulesService randChapterRulesService;
+	private PaperQuestionRuleService paperQuestionRuleService;
 
 	@Override
 	@Resource(name = "paperDaoImpl")
@@ -213,20 +213,20 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 						}
 					}
 				} else {// 随机组卷
-					List<RandChapterRules> randChapterRuleList = randChapterRulesService.getChapterList(chapter.getPaperId(), chapter.getId());
-					for(RandChapterRules randChapterRules : randChapterRuleList){
-						RandChapterRules copyRandChapterRules = new RandChapterRules();
+					List<PaperQuestionRule> randChapterRuleList = paperQuestionRuleService.getChapterList(chapter.getPaperId(), chapter.getId());
+					for(PaperQuestionRule paperQuestionRule : randChapterRuleList){
+						PaperQuestionRule copyPaperQuestionRule = new PaperQuestionRule();
 						try {
-							BeanUtils.copyProperties(copyRandChapterRules, randChapterRules);
+							BeanUtils.copyProperties(copyPaperQuestionRule, paperQuestionRule);
 						} catch (Exception e) {
 							throw new MyException(e.getMessage());
 						}
 						
-						copyRandChapterRules.setPaperId(copyPaper.getId());
-						copyRandChapterRules.setPaperQuestionId(copyChapter.getId());
-						copyRandChapterRules.setUpdateTime(new Date());
-						copyRandChapterRules.setUpdateUserId(getCurUser().getId());
-						randChapterRulesService.add(copyRandChapterRules);
+						copyPaperQuestionRule.setPaperId(copyPaper.getId());
+						copyPaperQuestionRule.setPaperQuestionId(copyChapter.getId());
+						copyPaperQuestionRule.setUpdateTime(new Date());
+						copyPaperQuestionRule.setUpdateUserId(getCurUser().getId());
+						paperQuestionRuleService.add(copyPaperQuestionRule);
 					}
 				}
 		}
@@ -361,9 +361,9 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		}
 		
 		if (paper.getGenType() == 2) {//删除随机章节规则
-			List<RandChapterRules> chapterList = randChapterRulesService.getChapterList(paper.getId(), chapterId);
-			for(RandChapterRules rcr : chapterList) {
-				randChapterRulesService.del(rcr.getId());
+			List<PaperQuestionRule> chapterList = paperQuestionRuleService.getChapterList(paper.getId(), chapterId);
+			for(PaperQuestionRule rcr : chapterList) {
+				paperQuestionRuleService.del(rcr.getId());
 			}
 		}
 		paperQuestionService.del(chapterId);// 删除章节
@@ -1097,13 +1097,13 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			}
 		}
 		if (paper.getGenType() == 2 ) {//章节随机规则
-			List<RandChapterRules> RandChapterRulesList = randChapterRulesService.getChapterList(id, chapterList.get(0).getId());
-			if (RandChapterRulesList == null || RandChapterRulesList.size() <= 0) {
+			List<PaperQuestionRule> PaperQuestionRuleList = paperQuestionRuleService.getChapterList(id, chapterList.get(0).getId());
+			if (PaperQuestionRuleList == null || PaperQuestionRuleList.size() <= 0) {
 				throw new MyException("至少需要添加一个章节规则");
 			}
 		}
 		
-		randChapterRulesService.checkRandChapterRules(id);//校验章节随机规则
+		//paperQuestionRuleService.checkRandChapterRules(id);//校验章节随机规则
 		
 		boolean ai = true;
 		BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0); //试卷总分
@@ -1127,10 +1127,10 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		
 		if (paper.getGenType() == 2) {
 			for (PaperQuestion paperQuestion : chapterList) {
-				List<RandChapterRules> randChapterRulesList = randChapterRulesService.getChapterList(paperQuestion.getPaperId(), paperQuestion.getId());
-				for (RandChapterRules randChapterRules : randChapterRulesList) {
-					totalScore.add(new BigDecimal(randChapterRules.getTotalNumber()).multiply(randChapterRules.getScore()));
-					if (randChapterRules.getAi().contains("2")) {
+				List<PaperQuestionRule> paperQuestionRuleList = paperQuestionRuleService.getChapterList(paperQuestion.getPaperId(), paperQuestion.getId());
+				for (PaperQuestionRule paperQuestionRule : paperQuestionRuleList) {
+					totalScore.add(new BigDecimal(paperQuestionRule.getNum()).multiply(paperQuestionRule.getScore()));
+					if (paperQuestionRule.getAis().contains("2")) {
 						ai = false;
 					}
 				}

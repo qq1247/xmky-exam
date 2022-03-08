@@ -20,13 +20,4 @@ public interface QuestionDao extends BaseDao<Question>{
 	 * @return List<Question>
 	 */
 	List<Question> getList(Integer questionTypeId);
-	
-	/**
-	 * 试题分类下所有发布试题
-	 * 
-	 * v1.0 chenyun 2022年3月2日下午3:10:03
-	 * @param questionTypeId
-	 * @return List<Question>
-	 */
-	List<Question> getQuestionList(Integer questionTypeId);
 }

@@ -51,8 +51,8 @@ public class PaperQuestion {
 	private String scoreOptions;
 	@Column(name = "NO")
 	private Integer no;
-	@Column(name = "RAND_CHAPTER_RULES_ID")
-	private Integer randChapterRulesId;
+	@Column(name = "PAPER_QUESTION_RULE_ID")
+	private Integer paperQuestionRuleId;
 	@Column(name = "EXAM_ID")
 	private Integer examId;
 	@Column(name = "USER_ID")
@@ -163,13 +163,12 @@ public class PaperQuestion {
 	public void setScoreOptions(String scoreOptions) {
 		this.scoreOptions = scoreOptions;
 	}
-
-	public Integer getRandChapterRulesId() {
-		return randChapterRulesId;
+	public Integer getPaperQuestionRuleId() {
+		return paperQuestionRuleId;
 	}
 
-	public void setRandChapterRulesId(Integer randChapterRulesId) {
-		this.randChapterRulesId = randChapterRulesId;
+	public void setPaperQuestionRuleId(Integer paperQuestionRuleId) {
+		this.paperQuestionRuleId = paperQuestionRuleId;
 	}
 
 	public Integer getExamId() {

@@ -69,9 +69,4 @@ public class PaperQuestionServiceImpl extends BaseServiceImp<PaperQuestion> impl
 	public List<PaperQuestion> getPaperQuestionList(Integer examId, Integer paperId) {
 		return paperQuestionDao.getPaperQuestionList(examId, paperId);
 	}
-
-	@Override
-	public List<Map<String, Object>> questionList(Integer questionId) {
-		return paperQuestionDao.questionList(questionId);
-	}
 }
