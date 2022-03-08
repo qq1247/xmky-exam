@@ -5,9 +5,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -388,14 +390,20 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	private void generatePaper(List<PaperQuestion> myQuestionList, List<PaperQuestionRule> paperQuestionList, Map<Integer, List<Question>> checkPaperQuestionRule, Integer userId, Integer examId) {
-		Set<String> used = new HashSet<String>();
-		for(PaperQuestionRule paperQuestionRule : paperQuestionList){// 章节规则
+		Set<Integer> usedQuestion = new HashSet<Integer>();
+		Iterator<Entry<Integer, List<Question>>> iterator = checkPaperQuestionRule.entrySet().iterator();// 打乱试题顺序
+		while(iterator.hasNext()) {
+	        Entry<Integer, List<Question>> next = iterator.next();
+	        Collections.shuffle(next.getValue());
+	        checkPaperQuestionRule.put(next.getKey(), next.getValue());
+	    }
+		
+		for(PaperQuestionRule paperQuestionRule : paperQuestionList){// 循环所有规则
 			List<Question> questionList = checkPaperQuestionRule.get(paperQuestionRule.getQuestionTypeId());
-			for (int i = 1; i <= paperQuestionRule.getNum(); i++) {// 随机试题
-				Integer number = paperQuestionRule.getNum();
-				Collections.shuffle(questionList);// 打乱顺序
+			for (int i = 1; i <= paperQuestionRule.getNum(); i++) {// 循环单个规则试题数量
+				Integer ruleRemainNum = paperQuestionRule.getNum();
 				for(int j = 0; j < questionList.size(); j++){
-					if (number <= 0) {
+					if (ruleRemainNum <= 0) {
 						break;
 					}
 					if ( !paperQuestionRule.getType().equals(questionList.get(j).getType()) 
@@ -404,7 +412,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 							continue;
 					}
 					
-					if (used.contains(paperQuestionRule.getQuestionTypeId()+","+questionList.get(j).getId().intValue())) {//重复试题不添加
+					if (usedQuestion.contains(questionList.get(j).getId())) {//重复试题不添加
 						continue;
 					}
 					
@@ -426,9 +434,9 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					paperQuestion.setParentSub(String.format("_%s_%s_", paperQuestion.getParentId(), paperQuestion.getId()));
 					paperQuestionService.update(paperQuestion);
 
-					used.add(paperQuestionRule.getQuestionTypeId()+","+questionList.get(j).getId());
+					usedQuestion.add(questionList.get(j).getId());
 					myQuestionList.add(paperQuestion);
-					number--;
+					ruleRemainNum--;
 				}
 			}
 		}
