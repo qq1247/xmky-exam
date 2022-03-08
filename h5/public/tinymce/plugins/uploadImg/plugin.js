@@ -55,8 +55,8 @@ import TinymceUpload from '@/components/TinymceEditor/TinymceImage' // 引入自
                     editor.dom.createHTML('img', {
                       src: item.url,
                       id: idName,
-                      width: 100,
-                      height: 100,
+                      width: item.width,
+                      height: item.height,
                     })
                   )
                 }
