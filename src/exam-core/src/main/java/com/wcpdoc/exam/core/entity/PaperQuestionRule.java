@@ -20,8 +20,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  * v1.0 chenyun 2022年2月11日 09:48:21
  */
 @Entity
-@Table(name = "EXM_RAND_CHAPTER_RULES")
-public class RandChapterRules {
+@Table(name = "EXM_PAPER_QUESTION_RULE")
+public class PaperQuestionRule {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID")
@@ -38,14 +38,14 @@ public class RandChapterRules {
 	private Integer questionTypeId;
 	@Column(name = "TYPE")
 	private Integer type;
-	@Column(name = "DIFFICULTY")
-	private String difficulty;
-	@Column(name = "AI")
-	private String ai;
+	@Column(name = "DIFFICULTYS")
+	private String difficultys;
+	@Column(name = "AIS")
+	private String ais;
 	@Column(name = "SCORE_OPTIONS")
 	private String scoreOptions;
-	@Column(name = "TOTAL_NUMBER")
-	private Integer totalNumber;
+	@Column(name = "NUM")
+	private Integer num;
 	@Column(name = "SCORE")
 	private BigDecimal score;
 	@Column(name = "PAPER_QUESTION_ID")
@@ -95,11 +95,11 @@ public class RandChapterRules {
 	public void setScoreOptions(String scoreOptions) {
 		this.scoreOptions = scoreOptions;
 	}
-	public Integer getTotalNumber() {
-		return totalNumber;
+	public Integer getNum() {
+		return num;
 	}
-	public void setTotalNumber(Integer totalNumber) {
-		this.totalNumber = totalNumber;
+	public void setNum(Integer num) {
+		this.num = num;
 	}
 	public BigDecimal getScore() {
 		return score;
@@ -119,16 +119,32 @@ public class RandChapterRules {
 	public void setPaperQuestionId(Integer paperQuestionId) {
 		this.paperQuestionId = paperQuestionId;
 	}
-	public String getDifficulty() {
-		return difficulty;
+	public String getDifficultys() {
+		return difficultys;
 	}
-	public void setDifficulty(String difficulty) {
-		this.difficulty = difficulty;
+	public Integer[] getDifficultyArr() {
+		String[] split = difficultys.split(",");
+		Integer[] difficultysInteger = new Integer[split.length];
+		for(int i = 0; i < split.length; i++){
+			difficultysInteger[i] = Integer.valueOf(split[i]);
+		}
+		return difficultysInteger;
 	}
-	public String getAi() {
-		return ai;
+	public void setDifficultys(String difficultys) {
+		this.difficultys = difficultys;
 	}
-	public void setAi(String ai) {
-		this.ai = ai;
+	public String getAis() {
+		return ais;
+	}
+	public Integer[] getAiArr() {
+		String[] split = ais.split(",");
+		Integer[] aisInteger = new Integer[split.length];
+		for(int i = 0; i < split.length; i++){
+			aisInteger[i] = Integer.valueOf(split[i]);
+		}
+		return aisInteger;
+	}
+	public void setAis(String ais) {
+		this.ais = ais;
 	}
 }
