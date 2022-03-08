@@ -114,7 +114,8 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		try {
 			File oldFileUploadFile = new File(String.format("%s/%s", oldFileUploadDir, "bak/file"));
 			File uploadDirFile = new File(String.format("%s/%s", uploadDir, "bak"));
-			FileUtils.moveToDirectory(oldFileUploadFile, uploadDirFile, true);
+			FileUtils.copyDirectoryToDirectory(oldFileUploadFile, uploadDirFile);//FileUtils.moveToDirectory();// 目录存在报错为已存在
+			FileUtils.deleteDirectory(oldFileUploadFile);
 		} catch (Exception e) {
 			if (e.getMessage().contains("does not exist")) {
 				throw new MyException("源文件已被删除");
@@ -145,7 +146,8 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		try {
 			File oldBakFile = new File(String.format("%s/%s", oldBakDir, "bak/db"));
 			File bakDirFile = new File(String.format("%s/%s", bakDir, "bak"));
-			FileUtils.moveToDirectory(oldBakFile, bakDirFile, true);
+			FileUtils.copyDirectoryToDirectory(oldBakFile, bakDirFile);//FileUtils.moveToDirectory();// 目录存在报错为已存在
+			FileUtils.deleteDirectory(oldBakFile);
 		} catch (Exception e) {
 			if (e.getMessage().contains("does not exist")) {
 				throw new MyException("源文件已被删除");
