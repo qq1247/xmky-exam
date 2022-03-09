@@ -92,6 +92,16 @@
               class="btn"
               size="mini"
               type="primary"
+              icon="el-icon-document"
+              @click.stop="questionEdit(question.id, question.type)"
+              >修改</el-button
+            >
+            <el-button
+              plain
+              round
+              class="btn"
+              size="mini"
+              type="primary"
               icon="el-icon-document-copy"
               @click.stop="copy(question.id)"
               >复制</el-button
@@ -109,16 +119,6 @@
               >
             </template>
             <template v-if="question.state === 2">
-              <el-button
-                plain
-                round
-                class="btn"
-                size="mini"
-                type="primary"
-                icon="el-icon-document"
-                @click.stop="questionEdit(question.id, question.type)"
-                >修改</el-button
-              >
               <el-button
                 plain
                 round
