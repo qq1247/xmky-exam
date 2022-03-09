@@ -53,7 +53,7 @@
         <el-card
           class="box-card"
           shadow="never"
-          v-for="(rand, randIndex) in item.randChapterRulesList"
+          v-for="(rand, randIndex) in item.paperQuestionRuleList"
           :key="rand.id"
         >
           <div slot="header">
@@ -78,7 +78,7 @@
                     :ref="`questionSelect${index}${randIndex}`"
                     :isAuto="false"
                     :multiple="false"
-                    placeholder="请选择题库"
+                    placeholder="试题分类"
                     :value="rand.questionTypeId"
                     :total="total"
                     @change="(e) => selectQuestionType(e, index, randIndex)"
@@ -97,11 +97,7 @@
               </el-col>
               <el-col :span="3" :offset="1">
                 <el-form-item prop="type">
-                  <el-select
-                    clearable
-                    placeholder="请选择类型"
-                    v-model="rand.type"
-                  >
+                  <el-select clearable placeholder="类型" v-model="rand.type">
                     <el-option
                       :key="parseInt(dict.dictKey)"
                       :label="dict.dictValue"
@@ -117,7 +113,7 @@
                     multiple
                     clearable
                     collapse-tags
-                    placeholder="请选择难度"
+                    placeholder="难度"
                     v-model="rand.difficulty"
                   >
                     <el-option
@@ -236,11 +232,11 @@ import {
   paperChapterAdd,
   paperChapterEdit,
   paperChapterDel,
-  randChapterRulesAdd,
-  randChapterRulesEdit,
-  randChapterRulesDel,
-  randChapterRulesGet,
-  randChapterRulesList,
+  paperQuestionRuleAdd,
+  paperQuestionRuleEdit,
+  paperQuestionRuleDel,
+  paperQuestionRuleList,
+  paperQuestionTypeList,
 } from 'api/paper'
 import { questionTypeListPage } from 'api/question'
 import { getOneDict } from '@/utils/getDict'
@@ -287,7 +283,7 @@ export default {
       paperQuestionRules: [],
       rules: {
         questionTypeId: [
-          { required: true, message: '请选择题库', trigger: 'change' },
+          { required: true, message: '请选择试题分类', trigger: 'change' },
         ],
         type: [{ required: true, message: '请选择类型', trigger: 'change' }],
         difficulty: [
@@ -343,7 +339,7 @@ export default {
     },
     // 查询组卷规则
     async query() {
-      const res = await randChapterRulesList({
+      const res = await paperQuestionRuleList({
         paperId: this.paperId,
       })
       this.paperQuestionRules = res.data
@@ -351,8 +347,8 @@ export default {
       this.$nextTick(() => {
         if (this.paperQuestionRules.length) {
           this.paperQuestionRules.map((item, index) => {
-            if (item.randChapterRulesList.length) {
-              item.randChapterRulesList.map((rule, indexRule) => {
+            if (item.paperQuestionRuleList.length) {
+              item.paperQuestionRuleList.map((rule, indexRule) => {
                 this.$refs[`questionSelect${index}${indexRule}`][0].$refs[
                   'elSelect'
                 ].cachedOptions.push({
@@ -409,7 +405,7 @@ export default {
     },
     // 添加组卷规则
     addQuestionRule(index) {
-      this.paperQuestionRules[index].randChapterRulesList.push({
+      this.paperQuestionRules[index].paperQuestionRuleList.push({
         id: null,
         paperId: 2,
         questionTypeId: null,
@@ -442,9 +438,16 @@ export default {
     },
     // 选择试题分类
     selectQuestionType(e, index, randIndex) {
-      this.paperQuestionRules[index].randChapterRulesList[
+      this.paperQuestionRules[index].paperQuestionRuleList[
         randIndex
       ].questionTypeId = e
+      // this.filterRule(e)
+    },
+    // 筛选规则
+    async filterRule(questionTypeId) {
+      const typeList = await paperQuestionTypeList({
+        questionTypeId,
+      })
     },
     // 添加 | 修改自由组卷规则
     editQuestionRule(index, randIndex) {
@@ -454,25 +457,25 @@ export default {
         }
 
         const ruleParam =
-          this.paperQuestionRules[index].randChapterRulesList[randIndex]
+          this.paperQuestionRules[index].paperQuestionRuleList[randIndex]
 
         let res
         const params = {
           paperId: this.paperId,
           questionTypeId: ruleParam.questionTypeId,
           paperQuestionId: this.paperQuestionRules[index].chapter.id,
-          ai: [3, 5].includes(ruleParam.type) ? ruleParam.ai : [],
+          ais: [3, 5].includes(ruleParam.type) ? ruleParam.ai : [],
           type: ruleParam.type,
-          difficulty: ruleParam.difficulty,
+          difficultys: ruleParam.difficulty,
           scoreOptions: ruleParam.scoreOptions,
-          totalNumber: ruleParam.totalNumber,
+          num: ruleParam.totalNumber,
           score: ruleParam.score,
         }
 
         if (!ruleParam.id) {
-          res = await randChapterRulesAdd(params)
+          res = await paperQuestionRuleAdd(params)
         } else {
-          res = await randChapterRulesEdit({ id: ruleParam.id, ...params })
+          res = await paperQuestionRuleEdit({ id: ruleParam.id, ...params })
         }
 
         if (res?.code == 200) {
@@ -490,11 +493,14 @@ export default {
     // 删除自由组卷规则
     async delRule(index, randIndex) {
       const rule =
-        this.paperQuestionRules[index].randChapterRulesList[randIndex]
+        this.paperQuestionRules[index].paperQuestionRuleList[randIndex]
       if (!rule.id) {
-        this.paperQuestionRules[index].randChapterRulesList.splice(randIndex, 1)
+        this.paperQuestionRules[index].paperQuestionRuleList.splice(
+          randIndex,
+          1
+        )
       } else {
-        const res = await randChapterRulesDel({
+        const res = await paperQuestionRuleDel({
           ids: [`${rule.id}`],
         })
         this.refreshData(res, '删除规则')
@@ -502,7 +508,7 @@ export default {
     },
     // 清空章节下的所有规则
     async delRules(index) {
-      const ids = this.paperQuestionRules[index].randChapterRulesList.reduce(
+      const ids = this.paperQuestionRules[index].paperQuestionRuleList.reduce(
         (acc, cur) => {
           cur.id && acc.push(cur.id)
           return acc
@@ -510,12 +516,12 @@ export default {
         []
       )
       if (ids.length) {
-        const res = await randChapterRulesDel({
+        const res = await paperQuestionRuleDel({
           ids,
         })
         this.refreshData(res, '清空规则')
       } else {
-        this.paperQuestionRules[index].randChapterRulesList = []
+        this.paperQuestionRules[index].paperQuestionRuleList = []
       }
     },
     // 更新页面数据
