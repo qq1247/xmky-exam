@@ -98,9 +98,9 @@
         >
       </el-form-item>
     </template>
-    <el-form-item>
+    <div class="footer">
       <el-button @click="next" type="primary">下一步</el-button>
-    </el-form-item>
+    </div>
   </el-form>
 </template>
 
@@ -111,6 +111,7 @@ import {
   paperTypeListPage,
   paperGet,
   paperAdd,
+  paperEdit,
 } from 'api/paper'
 import { getQuick, setQuick } from '@/utils/storage'
 import CustomSelect from 'components/CustomSelect.vue'
@@ -133,6 +134,7 @@ export default {
         paperType: 0,
         paperTypeId: null,
         paperId: null,
+        paperList: [],
         paperTypeList: [
           {
             name: '选择试卷',
@@ -171,7 +173,6 @@ export default {
             remark: '',
           },
         ],
-        tabActive: '0',
         paperTabs: [
           {
             title: '基础信息',
@@ -223,21 +224,54 @@ export default {
       },
     }
   },
+  async created() {
+    const quickInfo = getQuick()
+    if (!Object.keys(quickInfo).length || !quickInfo) return false
+
+    // 创建试卷
+    if (quickInfo.paperType) {
+      this.paperForm.paperType = quickInfo.paperType
+      this.$nextTick(() => {
+        this.paperForm.genType = quickInfo.genType - 1
+        this.paperForm.name = quickInfo.name
+        this.paperForm.passScore = quickInfo.passScore
+        this.paperForm.showType = String(quickInfo.showType)
+        this.paperForm.markType = quickInfo.markType
+      })
+    }
+
+    // 选择试卷
+    if (!quickInfo.paperType) {
+      this.paperForm.paperType = quickInfo.paperType
+      await this.selectPaperType(quickInfo.paperType)
+      this.$nextTick(() => {
+        this.paperForm.selectPaperId = quickInfo.id
+        this.$refs['paperSelect'] &&
+          this.$refs['paperSelect'].$refs['elSelect'].cachedOptions.push({
+            currentLabel: quickInfo.name,
+            currentValue: quickInfo.id,
+            label: quickInfo.name,
+            value: quickInfo.id,
+          })
+      })
+    }
+  },
   methods: {
     // 选择模式
-    async selectPaperType(e) {
-      this.$refs['paperForm'].clearValidate()
-      if (e) {
-        const paperTypeList = await this.getPaperTypeList('我的试卷')
-        if (!paperTypeList.length) {
+    async selectPaperType(paperType) {
+      if (paperType) {
+        const paperTypeList = await paperTypeListPage({
+          name: '我的试卷',
+          curPage: 1,
+          pageSize: this.paperForm.pageSize,
+        })
+        if (!paperTypeList?.data?.list.length) {
           const res = await paperTypeAdd({
             name: '我的试卷',
           })
-          if (res?.code === 200) {
-            this.paperForm.paperTypeId = res.data
-          }
+          res?.code === 200 && (this.paperForm.paperTypeId = res.data)
         } else {
-          this.paperForm.paperTypeId = paperTypeList[0].id
+          this.paperForm.paperTypeId = paperTypeList?.data?.list[0].id
         }
       }
     },
@@ -249,15 +283,6 @@ export default {
         return
       }
       this.paperForm.genType = index
-    },
-    // 获取试卷分类
-    async getPaperTypeList(name) {
-      const paperTypeList = await paperTypeListPage({
-        name,
-        curPage: 1,
-        pageSize: this.paperForm.pageSize,
-      })
-      return paperTypeList.data.list
     },
     // 获取试卷列表
     async getPaperList(curPage = 1, name = '') {
@@ -297,41 +322,33 @@ export default {
             showType: Number(this.paperForm.showType),
             markType: this.paperForm.markType,
           }
-          const { data } = await paperAdd(params)
-          this.paperForm.paperId = data
+
+          if (getQuick().paperType && getQuick()?.state === 1) {
+            this.$emit('next', '3')
+            return false
+          }
+
+          const res =
+            getQuick()?.paperType === 1 && getQuick()?.id
+              ? await paperEdit({ ...params, id: getQuick()?.id })
+              : await paperAdd(params)
+          this.paperForm.paperId = res.data || getQuick()?.id
           await this.setQuickInfo()
+          this.$emit('next', '2')
         } else {
           this.paperForm.paperId = this.paperForm.selectPaperId
           await this.setQuickInfo()
+          this.$emit('next', '3')
         }
-        this.$emit('next', {
-          paperType: this.paperForm.paperType,
-        })
       })
     },
     // 设置quickInfo
     async setQuickInfo() {
-      let quickInfo = getQuick() || {}
-      if (
-        quickInfo?.type === this.paperForm.paperType &&
-        quickInfo?.paperId === this.paperForm.paperId
-      ) {
-        return
-      }
-      const {
-        data: { name, genType, markType, passScore, showType },
-      } = await paperGet({ id: this.paperForm.paperId })
-      quickInfo = {
-        ...quickInfo,
-        genType,
-        markType,
-        showType,
-        passScore,
-        paperName: name,
+      const { data } = await paperGet({ id: this.paperForm.paperId })
+      setQuick({
+        ...data,
         paperType: this.paperForm.paperType,
-        paperId: this.paperForm.paperId,
-      }
-      setQuick(quickInfo)
+      })
     },
   },
 }
@@ -388,5 +405,17 @@ export default {
 .type-item-active {
   border: 1px solid #1e9fff;
   color: #1e9fff;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: calc(100% - 201px);
+  right: 0;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(13px);
+  display: flex;
+  padding: 10px 10px 10px 30px;
+  box-shadow: 1px -3px 13px -6px rgba(#000000, 0.15);
 }
 </style>

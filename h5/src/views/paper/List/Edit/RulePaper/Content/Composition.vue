@@ -580,7 +580,7 @@ export default {
     },
   },
   async created() {
-    this.paperId = this.$route.params.id || getQuick().paperId
+    this.paperId = this.$route.params.id || getQuick().id
     this.query()
   },
   activated() {
@@ -847,7 +847,6 @@ export default {
   background: #fff;
   width: calc(100% - 500px);
   overflow: scroll;
-  margin: 0 10px;
   .center-drag {
     width: 100%;
     padding: 10px;
@@ -943,10 +942,10 @@ export default {
     display: flex;
     justify-items: center;
     line-height: 30px;
-  }
-  /deep/ .el-radio__input,
-  /deep/ .el-checkbox__input {
-    padding-top: 7px;
+    /deep/ .el-radio__input,
+    /deep/ .el-checkbox__input {
+      padding-top: 9px;
+    }
   }
   .option-item-text {
     border-bottom: 1px solid #d8d8d8;

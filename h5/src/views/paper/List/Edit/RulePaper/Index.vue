@@ -5,15 +5,16 @@
         <Nav @tab="(e) => (tabIndex = e)"></Nav>
         <QuestionDrag v-if="tabIndex === '1'" ref="questionDrag"></QuestionDrag>
         <QuestionAdd v-if="tabIndex === '2'"></QuestionAdd>
+        <QuestionTemplate v-if="tabIndex === '3'"></QuestionTemplate>
         <QuestionRouter
-          v-if="tabIndex === '3'"
+          v-if="tabIndex === '4'"
           ref="questionRouter"
         ></QuestionRouter>
       </el-scrollbar>
     </div>
 
     <div class="paper-content">
-      <Header ref="paperHeader"></Header>
+      <Header ref="paperHeader" :paperName="paperName"></Header>
       <Composition
         v-if="!preview"
         :paperState="paperState"
@@ -24,24 +25,26 @@
   </div>
 </template>
 <script>
-import { getQuick } from '@/utils/storage'
-import QuestionRouter from './Handler/QuestionRouter.vue'
-import QuestionDrag from './Handler/QuestionDrag.vue'
-import QuestionAdd from './Handler/QuestionAdd.vue'
 import Nav from './Handler/Nav.vue'
 import Header from './Content/Header.vue'
 import Preview from './Content/Preview.vue'
 import Composition from './Content/Composition.vue'
-import { paperTotalScoreUpdate, paperGet } from 'api/paper'
+import QuestionAdd from './Handler/QuestionAdd.vue'
+import QuestionDrag from './Handler/QuestionDrag.vue'
+import QuestionTemplate from './Handler/QuestionTemplate.vue'
+import QuestionRouter from './Handler/QuestionRouter.vue'
+import { paperGet } from 'api/paper'
+import { getQuick } from '@/utils/storage'
 export default {
   components: {
     Nav,
-    QuestionRouter,
-    QuestionAdd,
-    QuestionDrag,
-    Composition,
     Header,
     Preview,
+    Composition,
+    QuestionAdd,
+    QuestionDrag,
+    QuestionRouter,
+    QuestionTemplate,
   },
   data() {
     return {
@@ -55,28 +58,13 @@ export default {
     }
   },
   async created() {
-    this.paperId = this.$route.params.id || getQuick.paperId
+    this.paperId = this.$route.params.id || getQuick().id
     if (Number(this.paperId)) {
       const res = await paperGet({ id: this.paperId })
       this.paperName = res.data.name
       this.paperState = res.data.state
       this.markType = res.data.markType
     }
-  },
-  async activated() {
-    this.paperId = this.$route.params.id || getQuick.paperId
-    if (Number(this.paperId)) {
-      const res = await paperGet({ id: this.paperId })
-      this.paperName = res.data.name
-      this.paperState = res.data.state
-      this.markType = res.data.markType
-    }
-  },
-  beforeDestroy() {
-    if (this.paperState === 1 || !Number(this.paperId)) return false
-    paperTotalScoreUpdate({
-      id: this.paperId,
-    })
   },
 }
 </script>
@@ -101,6 +89,5 @@ export default {
   background: #fff;
   width: calc(100% - 500px);
   overflow: scroll;
-  margin: 0 10px;
 }
 </style>

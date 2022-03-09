@@ -35,24 +35,11 @@
           </el-tab-pane>
         </el-tabs>
         <div class="setting-right">
-          <el-card class="box-card" shadow="never">
-            <div slot="header">
-              <div class="header-name">
-                {{ tab[Number(tabIndex) - 1].contentName }}
-              </div>
-              <div class="header-intro">
-                {{ tab[Number(tabIndex) - 1].contentIntro }}
-              </div>
-            </div>
-            <keep-alive>
-              <component
-                :is="viewList[Number(tabIndex) - 1]"
-                :paperType="paperType"
-                @next="next"
-                @prev="prev"
-              ></component>
-            </keep-alive>
-          </el-card>
+          <component
+            :is="viewList[Number(tabIndex) - 1]"
+            @prev="(e) => (tabIndex = e)"
+            @next="(e) => (tabIndex = e)"
+          ></component>
         </div>
       </div>
     </main>
@@ -62,9 +49,10 @@
 <script>
 import { mapGetters } from 'vuex'
 import { removeQuick } from '@/utils/storage'
-import PaperSetting from './PaperSetting/Index.vue'
+import PaperSetting from './PaperSetting.vue'
+import PaperComposition from './PaperComposition.vue'
 import ExamSetting from './ExamSetting.vue'
-import RemarkSetting from './RemarkSetting.vue'
+import MarkSetting from './MarkSetting.vue'
 import ExamPublish from './ExamPublish.vue'
 export default {
   data() {
@@ -74,48 +62,48 @@ export default {
           name: '设置试卷',
           intro: '添加/修改',
           icon: 'common common-classify',
-          contentName: '试题分类信息',
-          contentIntro:
-            '为试题创建一个分类。建议：按类型分开存放，方便管理维护',
           index: '1',
+        },
+        {
+          name: '快速组卷',
+          intro: '添加/修改',
+          icon: 'common common-classify',
+          index: '2',
         },
         {
           name: '设置考试',
           intro: '添加/修改',
           icon: 'common common-exam',
-          contentName: '试题分类信息',
-          contentIntro:
-            '为试题创建一个分类。建议：按类型分开存放，方便管理维护',
-          index: '2',
+          index: '3',
         },
         {
           name: '设置人员',
           intro: '添加/修改',
           icon: 'common common-role',
-          contentName: '试题分类信息',
-          contentIntro:
-            '为试题创建一个分类。建议：按类型分开存放，方便管理维护',
-          index: '3',
+          index: '4',
         },
         {
           name: '发布试卷',
           intro: '添加/修改',
           icon: 'common common-publish',
-          contentName: '试题分类信息',
-          contentIntro:
-            '为试题创建一个分类。建议：按类型分开存放，方便管理维护',
-          index: '4',
+          index: '5',
         },
       ],
-      viewList: [PaperSetting, ExamSetting, RemarkSetting, ExamPublish],
+      viewList: [
+        PaperSetting,
+        PaperComposition,
+        ExamSetting,
+        MarkSetting,
+        ExamPublish,
+      ],
       tabIndex: '1',
-      tabActive: '1',
-      paperType: 0,
-      markType: 1,
     }
   },
   computed: {
     ...mapGetters(['name']),
+  },
+  created() {
+    removeQuick()
   },
   methods: {
     loginOut() {
@@ -133,13 +121,6 @@ export default {
         .catch((err) => {
           console.log(err)
         })
-    },
-    next(e) {
-      this.tabIndex = '' + (Number(this.tabIndex) + 1)
-      this.paperType = e.paperType
-    },
-    prev() {
-      this.tabIndex = '' + (Number(this.tabIndex) - 1)
     },
   },
   destroyed() {
@@ -275,31 +256,7 @@ export default {
 }
 .setting-right {
   flex: 1;
-  margin-left: 200px;
-}
-
-/deep/.el-card {
-  border: none;
-}
-
-/deep/.el-card__header {
-  padding: 20px 20px 0;
-  border-bottom: transparent;
-}
-
-.header-name {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 5px;
-}
-.header-intro {
-  font-size: 13px;
-  color: #999;
-}
-.header-url {
-  font-size: 13px;
-  color: #0094e5;
-  text-decoration: underline;
-  cursor: pointer;
+  margin-left: 201px;
+  padding-right: 20px;
 }
 </style>

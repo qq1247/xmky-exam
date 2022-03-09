@@ -6,7 +6,7 @@
     </div>
     <div class="quick-info">
       <div class="info-name">试卷名称：</div>
-      <div class="info-content">{{ quickInfo.paperName }}</div>
+      <div class="info-content">{{ quickInfo.name }}</div>
     </div>
     <div class="quick-info">
       <div class="info-name">组卷方式：</div>
@@ -22,7 +22,9 @@
     </div>
     <div class="quick-info">
       <div class="info-name">及格：</div>
-      <div class="info-content">{{ quickInfo.passScore }}</div>
+      <div class="info-content">
+        {{ ((quickInfo.passScore / 100) * quickInfo.totalScore).toFixed() }}
+      </div>
     </div>
     <div class="quick-info">
       <div class="info-name">展示方式：</div>
@@ -37,15 +39,13 @@
     >
       <div class="info-name">考试 / 阅卷：</div>
       <div class="info-content">
-        {{ user.examUserList.join(',') }} / {{ user.markUserName }}
+        <span>{{ user.examUserList.join(',') }}</span
+        ><span v-if="user.markUserName">/ {{ user.markUserName }}</span>
       </div>
     </div>
-    <div class="quick-info">
-      <div class="info-name"></div>
-      <div>
-        <el-button @click="$emit('prev')" type="primary">上一步</el-button>
-        <el-button @click="publish" type="primary">发布</el-button>
-      </div>
+    <div class="footer">
+      <el-button @click="$emit('prev', '4')" type="primary">上一步</el-button>
+      <el-button @click="publish" type="primary">发布</el-button>
     </div>
   </div>
 </template>
@@ -59,6 +59,9 @@ export default {
       quickInfo: {},
     }
   },
+  created() {
+    this.quickInfo = getQuick()
+  },
   methods: {
     async publish() {
       const res = await examPublish({ id: this.quickInfo.examId })
@@ -69,9 +72,6 @@ export default {
         this.$message.error('请重新发布考试！')
       }
     },
-  },
-  activated() {
-    this.quickInfo = getQuick()
   },
 }
 </script>
@@ -91,5 +91,16 @@ export default {
 }
 .info-content {
   padding-left: 10px;
+}
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: calc(100% - 201px);
+  right: 0;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(13px);
+  display: flex;
+  padding: 10px 10px 10px 30px;
+  box-shadow: 1px -3px 13px -6px rgba(#000000, 0.15);
 }
 </style>

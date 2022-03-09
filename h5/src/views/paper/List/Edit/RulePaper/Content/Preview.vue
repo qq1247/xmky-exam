@@ -98,11 +98,7 @@ export default {
     return { paperQuestion: [], paperName: '' }
   },
   async created() {
-    this.paperId = this.$route.params.id || getQuick().paperId
-    this.query()
-  },
-  activated() {
-    this.paperId = this.$route.params.id || getQuick().paperId
+    this.paperId = this.$route.params.id || getQuick().id
     this.query()
   },
   methods: {

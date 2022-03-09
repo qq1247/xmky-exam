@@ -90,11 +90,16 @@
         ></QuestionType>
       </el-scrollbar>
       <el-scrollbar wrap-style="overflow-x:hidden;" class="content-center">
-        <QuestionTemplate
-          ref="questionTemplate"
-          v-if="questionTemplate"
-          @showTemplate="showTemplate"
-        ></QuestionTemplate>
+        <template v-if="questionTemplate">
+          <div class="top">
+            <div class="top-title">试题模板操作</div>
+          </div>
+          <QuestionTemplate
+            ref="questionTemplate"
+            :questionTypeId="questionTypeId"
+            @showTemplate="showTemplate"
+          ></QuestionTemplate>
+        </template>
         <QuestionList
           v-else
           ref="questionList"

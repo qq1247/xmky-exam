@@ -198,7 +198,7 @@ export default {
         difficulty: this.queryForm.difficulty,
         scoreStart: this.queryForm.score,
         scoreEnd: this.queryForm.score,
-        exPaperId: this.$route.params.id || getQuick().paperId,
+        exPaperId: this.$route.params.id || getQuick().id,
         curPage: this.curPage,
         pageSize: this.pageSize,
       })

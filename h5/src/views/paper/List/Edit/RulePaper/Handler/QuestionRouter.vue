@@ -68,7 +68,7 @@ export default {
     async query() {
       try {
         const res = await paperQuestionList({
-          id: this.$route.params.id || getQuick().paperId,
+          id: this.$route.params.id || getQuick().id,
         })
         res.data.map((item) => {
           item.chapter.show = true

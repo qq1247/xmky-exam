@@ -213,7 +213,7 @@ export default {
         name,
         state: 1,
         curPage,
-        pageSize: this.examForm.pageSize,
+        pageSize: 5,
       })
       this.examForm.paperList = paperList.data.list
       this.examForm.total = paperList.data.total

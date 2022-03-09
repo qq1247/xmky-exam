@@ -122,10 +122,10 @@
         >
       </el-form-item>
     </div>
-    <el-form-item>
-      <el-button @click="$emit('prev')" type="primary">上一步</el-button>
+    <div class="footer">
+      <el-button @click="$emit('prev', '3')" type="primary">上一步</el-button>
       <el-button @click="next" type="primary">下一步</el-button>
-    </el-form-item>
+    </div>
   </el-form>
 </template>
 
@@ -170,6 +170,65 @@ export default {
         examUsers: [],
         examUserList: [],
       },
+    }
+  },
+  async created() {
+    const quickInfo = getQuick()
+    if (!Object.keys(quickInfo).length || !quickInfo) return false
+    if (quickInfo.examId) {
+      this.examForm.paperMarkType = getQuick().markType
+
+      const examMarkUser = await examMarkUserList({ id: quickInfo.examId })
+
+      const num = examMarkUser.data.length > 0 ? examMarkUser.data.length : 1
+      this.examForm.examRemarks = []
+      for (let index = 0; index < num; index++) {
+        this.examForm.examRemarks.push({
+          examCheckPerson: '',
+          examQuestionNum: [],
+          examUser: [],
+        })
+      }
+
+      this.$nextTick(() => {
+        if (examMarkUser.data.length > 0) {
+          this.examForm.examRemarks = []
+          examMarkUser.data.map((item, index) => {
+            this.examForm.examRemarks.push({
+              examCheckPerson: item.markUserId,
+              examUser: item.examUserList.map((user) => user.id),
+              examQuestionNum: [],
+            })
+          })
+        }
+
+        examMarkUser.data.map((item, index) => {
+          const cachedOptions = item.examUserList.reduce((acc, cur) => {
+            acc.push({
+              currentLabel: cur.name,
+              currentValue: cur.id,
+              label: cur.name,
+              value: cur.id,
+            })
+            return acc
+          }, [])
+
+          this.$refs['markExamUserSelect'] &&
+            this.$refs['markExamUserSelect'][index].$refs[
+              'elSelect'
+            ].cachedOptions.push(...cachedOptions)
+
+          this.$refs['markUserSelect'] &&
+            this.$refs['markUserSelect'][index].$refs[
+              'elSelect'
+            ].cachedOptions.push({
+              currentLabel: item.markUserName,
+              currentValue: item.markUserId,
+              label: item.markUserName,
+              value: item.markUserId,
+            })
+        })
+      })
     }
   },
   methods: {
@@ -282,9 +341,7 @@ export default {
           return acc
         }, [])
         await this.setQuickInfo(userList)
-        this.$emit('next', {
-          paperType: getQuick().paperType,
-        })
+        this.$emit('next', '5')
       })
     },
     // 设置quickInfo
@@ -302,3 +359,16 @@ export default {
   },
 }
 </script>
+<style lang="scss" scoped>
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: calc(100% - 201px);
+  right: 0;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(13px);
+  display: flex;
+  padding: 10px 10px 10px 30px;
+  box-shadow: 1px -3px 13px -6px rgba(#000000, 0.15);
+}
+</style>

@@ -27,8 +27,12 @@ export default {
           name: '2',
         },
         {
-          label: '答题卡',
+          label: '批量操作',
           name: '3',
+        },
+        {
+          label: '答题卡',
+          name: '4',
         },
       ],
     }
@@ -76,6 +80,11 @@ export default {
   /deep/ .el-tabs__header {
     background: #fff;
     width: 100%;
+  }
+
+  /deep/ .el-tabs__item {
+    height: 38px;
+    line-height: 40px;
   }
 }
 </style>

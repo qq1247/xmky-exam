@@ -5,9 +5,9 @@
       ref="questionForm"
       :model="questionForm"
       :rules="questionForm.rules"
-      label-width="100px"
+      label-width="80px"
     >
-      <el-form-item label="选择题库" prop="questionTypeId">
+      <el-form-item label="试题分类" prop="questionTypeId">
         <CustomSelect
           :multiple="false"
           placeholder="请选择试题分类"
@@ -43,23 +43,7 @@
           </div>
         </div>
       </el-form-item>
-      <el-form-item label="快捷操作">
-        <div class="template-btn">
-          <Upload
-            type="word"
-            ref="templateUpload"
-            @success="templateSuccess"
-            @remove="templateRemove"
-          >
-          </Upload>
-          <div class="template-item" @click="questionTemplate">
-            <i class="common common-word-template"></i>
-            <p>下载试题模板</p>
-          </div>
-        </div>
-      </el-form-item>
     </el-form>
-    <div class="wrap-title">编辑区域</div>
     <EditModule
       ref="editModule"
       publish
@@ -72,18 +56,11 @@
 </template>
 
 <script>
-import Upload from 'components/Upload'
 import CustomSelect from 'components/CustomSelect.vue'
 import EditModule from 'components/EditQuestion/EditModule.vue'
-import {
-  questionTypeListPage,
-  questionAdd,
-  questionTemplate,
-  questionImport,
-} from 'api/question'
-import { progressBarGet } from 'api/common'
+import { questionTypeListPage, questionAdd } from 'api/question'
 export default {
-  components: { Upload, CustomSelect, EditModule },
+  components: { CustomSelect, EditModule },
   data() {
     return {
       questionForm: {
@@ -126,12 +103,8 @@ export default {
           icon: 'common common-ask',
         },
       ],
-      questionDocIds: [],
-      isAnalysis: false,
-      percentage: 0,
     }
   },
-  mounted() {},
   methods: {
     // 选择试题类型
     selectType(e) {
@@ -276,7 +249,7 @@ export default {
 
 <style lang="scss" scoped>
 .handler-content {
-  padding: 50px 0 10px;
+  padding: 50px 20px 10px;
 }
 
 .types {

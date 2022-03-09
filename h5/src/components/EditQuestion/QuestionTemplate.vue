@@ -1,43 +1,40 @@
 <!--
  * @Description: 试题模板下载、试题上传解析、试题导出
  * @Version: 1.0
- * @Company: 
+ * @Company:
  * @Author: Che
  * @Date: 2021-12-28 14:46:05
  * @LastEditors: Che
  * @LastEditTime: 2022-01-18 10:57:38
 -->
 <template>
-  <div class="">
-    <!-- top -->
-    <div class="top">
-      <div class="top-title">试题模板操作</div>
-    </div>
-
-    <div class="handler-content">
-      <el-form :model="handlerForm" ref="handlerForm">
-        <Upload
-          type="word"
-          ref="templateUpload"
-          @success="templateSuccess"
-          @remove="templateRemove"
-        >
-        </Upload>
-      </el-form>
-      <div style="color: #0094e5">按照试题模板格式填写并上传</div>
-      <div class="handler-template">
-        <div class="template-item" @click="questionTemplate">
-          <i class="common common-word-template"></i>
-          <p>下载试题模板</p>
-        </div>
-        <div class="template-item" @click="questionExport">
-          <i class="common common-word-template"></i>
-          <p>导出试题模板</p>
-        </div>
-        <div class="template-item template-item-active" @click="showTemplate">
-          <i class="common common-view-list"></i>
-          <p>返回试题列表</p>
-        </div>
+  <div class="template-content">
+    <el-form :model="handlerForm" ref="handlerForm">
+      <Upload
+        type="word"
+        ref="templateUpload"
+        @success="templateSuccess"
+        @remove="templateRemove"
+      >
+      </Upload>
+    </el-form>
+    <div class="tips">按照试题模板格式填写并上传</div>
+    <div class="handler-template">
+      <div class="template-item" @click="questionTemplate">
+        <i class="common common-word-template"></i>
+        <p>下载试题模板</p>
+      </div>
+      <div class="template-item" @click="questionExport">
+        <i class="common common-word-template"></i>
+        <p>导出试题模板</p>
+      </div>
+      <div
+        v-if="back"
+        class="template-item template-item-active"
+        @click="showTemplate"
+      >
+        <i class="common common-view-list"></i>
+        <p>返回试题列表</p>
       </div>
     </div>
   </div>
@@ -50,6 +47,16 @@ import { progressBarGet } from 'api/common'
 export default {
   components: {
     Upload,
+  },
+  props: {
+    back: {
+      type: Boolean,
+      default: true,
+    },
+    questionTypeId: {
+      type: Number,
+      default: null,
+    },
   },
   data() {
     return {
@@ -78,13 +85,14 @@ export default {
     },
     // 解析试题
     async questionImport() {
-      if (this.handlerForm.questionDocIds.length === 0) {
-        this.$message.warning('请选择需解析的文件')
+      if (!this.questionTypeId) {
+        this.$message.warning('请选择试题分类')
+        this.templateClear('templateUpload')
         return
       }
       const res = await questionImport({
         fileId: this.handlerForm.questionDocIds[0].response.data.fileIds,
-        questionTypeId: this.$parent.$parent.questionTypeId,
+        questionTypeId: this.questionTypeId,
         state: 2,
       }).catch(() => {
         this.handlerForm.isAnalysis = false
@@ -102,7 +110,7 @@ export default {
     },
     // 导出试题
     questionExport() {
-      this.$message.warning('暂未开放！')
+      this.$message('暂未开放！')
     },
     // 获取进度
     async getProgress(id) {
@@ -160,37 +168,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.top {
-  background: #fff;
-  width: calc(100% - 20px);
-  height: 40px;
-  color: #333;
-  position: absolute;
-  top: 0;
-  left: 10px;
-  z-index: 100;
-  font-weight: 600;
-  padding-left: 30px;
-  border-bottom: 1px solid #eee;
-  display: flex;
-  justify-content: space-between;
-  &::before {
-    content: '';
-    display: inline-block;
-    position: relative;
-    top: 14px;
-    left: -10px;
-    width: 2px;
-    height: 14px;
-    background: #0095e5;
-  }
-  .top-title {
-    flex: 1;
-    line-height: 40px;
-  }
-}
-
-.handler-content {
+.template-content {
   padding: 100px 20px 20px;
   display: flex;
   flex-direction: column;
@@ -237,5 +215,11 @@ export default {
   p {
     margin-top: 20px;
   }
+}
+
+.tips {
+  color: #0095e5;
+  font-size: 13px;
+  margin-top: 3px;
 }
 </style>

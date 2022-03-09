@@ -23,17 +23,16 @@
 
 <script>
 export default {
+  props: {
+    paperName: {
+      type: String,
+      default: '',
+    },
+  },
   data() {
     return {
       preview: false,
-      paperName: '',
     }
-  },
-  created() {
-    this.paperName = this.$parent.paperName
-  },
-  activated() {
-    this.paperName = this.$parent.paperName
   },
   methods: {
     setType(e) {
