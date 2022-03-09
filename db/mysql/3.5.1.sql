@@ -627,3 +627,4 @@ INSERT INTO `SYS_VER` VALUES (12, '3.2.1', '2021-11-25 16:26:01', 'zhanghc', '')
 INSERT INTO `SYS_VER` VALUES (13, '3.3.0', '2020-11-30 11:11:11', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (14, '3.4.0', '2021-12-31 12:00:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (15, '3.5.0', '2022-01-28 15:36:51', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (18, '3.5.1', '2022-03-08 15:32:00', 'zhanghc', '');

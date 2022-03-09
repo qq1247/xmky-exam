@@ -1,0 +1,1 @@
+INSERT INTO `SYS_VER` VALUES (18, '3.5.1', '2022-03-08 15:32:00', 'zhanghc', '');
