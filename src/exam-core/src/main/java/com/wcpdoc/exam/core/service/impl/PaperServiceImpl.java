@@ -1103,7 +1103,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			}
 		}
 		
-		//paperQuestionRuleService.checkRandChapterRules(id);//校验章节随机规则
+		paperQuestionRuleService.publishCheck(paper);//校验章节随机规则
 		
 		boolean ai = true;
 		BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0); //试卷总分
