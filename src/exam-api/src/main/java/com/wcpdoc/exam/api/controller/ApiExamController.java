@@ -308,7 +308,7 @@ public class ApiExamController extends BaseController {
 	@ResponseBody
 	public PageResult updateMarkSet(Integer id, String[] examUserIds, Integer[] markUserIds) {
 		try {
-			examService.updateMarkSet(id, examUserIds, markUserIds);
+			examService.assignPaper(id, examUserIds, markUserIds);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("更新考试阅卷用户错误：{}", e.getMessage());

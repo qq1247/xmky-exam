@@ -85,12 +85,4 @@ public class PaperQuestionDaoImpl extends RBaseDaoImpl<PaperQuestion> implements
 				+ "WHERE PAPER_QUESTION.TYPE != 1 AND PAPER_QUESTION.EXAM_ID = ? AND PAPER_QUESTION.PAPER_ID = ? ";
 		return getList(sql, new Object[]{ examId, paperId }, PaperQuestion.class);
 	}
-
-	@Override
-	public List<Map<String, Object>> questionList(Integer questionId) {
-		String sql = "SELECT QUESTION_ANSWER.ID "
-				+ "FROM EXM_QUESTION_ANSWER QUESTION_ANSWER "
-				+ "WHERE QUESTION_ANSWER.TYPE != 1 AND QUESTION_ANSWER.QUESTION_ID = ? ";
-		return getMapList(sql, new Object[]{ questionId });
-	}
 }

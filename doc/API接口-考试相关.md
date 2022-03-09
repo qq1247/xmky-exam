@@ -747,3 +747,17 @@ http请求头需添加Authorization字段，
 |data.list[].paperQuestionRand[].scoreOptions |  String[]  | 分数选择项 |
 |data.list[].paperQuestionRand[].num  | Integer  | 题数 |
 |data.list[].paperQuestionRand[].score  | Double  | 分数 |
+
+### 试题列表：paperQuestionRule/questionList
+| 请求参数| 类型       | 描述       | 必填 |
+| -------- | ---------- | ---------- | ---- |
+| questionTypeId | Integer | 试题分类ID | 是   |
+
+| 响应参数| 类型    | 描述 |
+| ------------------------- | ------- | ---------------- |
+| code                      | Integer | 响应码    |
+| msg                       | String  | 响应消息 |
+|data[].type  | Integer  | 类型 |
+|data[].difficulty  | Integer  | 难易程度 |
+|data[].ai | Integer  | 是否智能 |
+|data[].num | Integer  | 数量 |

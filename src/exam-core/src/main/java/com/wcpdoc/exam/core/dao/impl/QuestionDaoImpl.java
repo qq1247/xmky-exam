@@ -1,21 +1,16 @@
 package com.wcpdoc.exam.core.dao.impl;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.base.dao.UserDao;
 import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
-import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.SqlUtil;
 import com.wcpdoc.core.util.SqlUtil.Order;
@@ -66,24 +61,5 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 	public List<Question> getList(Integer questionTypeId) {
 		String sql = "SELECT * FROM EXM_QUESTION WHERE STATE IN (1, 2) AND QUESTION_TYPE_ID = ?";
 		return getList(sql, new Object[] { questionTypeId });
-	}
-
-	@Override
-	public List<Question> getQuestionList(Integer questionTypeId) {
-		String sql = "SELECT QUESTION.ID, QUESTION.TYPE, QUESTION.DIFFICULTY, QUESTION.AI "
-				+ "FROM EXM_QUESTION QUESTION "
-				+ "WHERE QUESTION.QUESTION_TYPE_ID = ? AND QUESTION.STATE = 1 ";
-		List<Map<String, Object>> questionMapList = getMapList(sql, new Object[] { questionTypeId });
-		List<Question> questionList = new ArrayList<Question>();
-		for(Map<String, Object> questionMap : questionMapList){
-			Question question = new Question();
-			try {
-				BeanUtils.populate(question, questionMap);
-			} catch (IllegalAccessException | InvocationTargetException e) {
-				throw new MyException("sql 转换错误");
-			}
-			questionList.add(question);
-		}
-		return questionList;
 	}
 }

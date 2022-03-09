@@ -33,6 +33,7 @@ import com.wcpdoc.core.util.BigDecimalUtil;
 import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.QuestionDao;
+import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionEx;
@@ -211,13 +212,13 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				questionAnswer.setAnswer(answers[i]);
 				if (question.getAi() == 1 && answerScores != null) {
 					questionAnswer.setScore(answerScores[i]);
+					total = total.add(answerScores[i]);
 				}else{
 					questionAnswer.setScore(new BigDecimal(0));
 				}
 				questionAnswer.setQuestionId(question.getId());
 				questionAnswer.setNo(i+1);
 				questionAnswerService.add(questionAnswer);
-				total = total.add(answerScores[i]);
 			}
 		}
 		if (question.getAi() == 1 &&  question.getScore().compareTo(total) != 0) {
@@ -255,7 +256,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			throw new MyException("参数错误：answers");
 		}
 		
-		List<Map<String, Object>> questionList = paperQuestionService.questionList(question.getId());//判断是否被试卷引用
+		List<PaperQuestion> questionList = paperQuestionService.getQuestionList(question.getId(),null,null);//判断是否被试卷引用
 		if (questionList.size() > 0) {
 			throw new MyException("此试题已被试卷引用，无法修改");
 		}
@@ -449,13 +450,13 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				questionAnswer.setAnswer(answers[i]);
 				if (question.getAi() == 1 && answerScores != null) {
 					questionAnswer.setScore(answerScores[i]);
+					total = total.add(answerScores[i]);
 				}else{
 					questionAnswer.setScore(new BigDecimal(0));
 				}
 				questionAnswer.setQuestionId(entity.getId());
 				questionAnswer.setNo(i+1);
 				questionAnswerService.add(questionAnswer);
-				total = total.add(answerScores[i]);
 			}
 		} 
 		if (question.getAi() == 1 && question.getScore().compareTo(total) != 0) {
@@ -798,10 +799,5 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			question.setUpdateUserId(getCurUser().getId());
 			update(question);
 		}
-	}
-
-	@Override
-	public List<Question> getQuestionList(Integer questionTypeId) {
-		return questionDao.getQuestionList(questionTypeId);
 	}
 }
