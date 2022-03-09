@@ -5,11 +5,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -258,7 +256,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		
 		String[] examUserIds = new String[0];
 		Integer[] markUserIds = new Integer[0];
-		if (paper.getMarkType() == 2) {//人工
+		if (paper.getMarkType() == 2) {//人工阅卷
 			List<MyMark> myMarkList = myMarkService.getList(exam.getId());
 			if (myMarkList != null && myMarkList.size() > 0 ) {
 				examUserIds = new String[myMarkList.size()];
@@ -345,7 +343,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			markUserIdSet.add(userId);
 		}
 		
-		synUserForAssignPaper(id, examUserIdSet);
+		synExamUserForAssignPaper(id, examUserIdSet);
 		
 		// 分配试卷
 		List<PaperQuestion> myQuestionList = null;// 我的试题列表
@@ -353,28 +351,26 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			myQuestionList = paperService.getPaperQuestionList(exam.getPaperId());
 		}
 		
-		Date curTime = new Date();
 		for(Integer userId : examUserIdSet){
 			MyExam myExam = new MyExam();
 			myExam.setExamId(id);
 			myExam.setUserId(userId);
 			myExam.setState(1);// 未考试
 			myExam.setMarkState(1);// 未阅卷
-			myExam.setUpdateTime(curTime);
+			myExam.setUpdateTime(new Date());
 			myExam.setUpdateUserId(getCurUser().getId());
 			myExamService.add(myExam);// 添加我的考试
 			
-			if (paper.getMarkType() == 2) {// 如果试卷是智能阅卷类型，没有阅卷用户
-				addMyMark(id, examUserIds, markUserIds, curTime);
+			if (paper.getMarkType() == 2) {// 如果试卷是人工试卷，添加阅卷用户
+				synMarkUserForAssignPaper(id, examUserIds, markUserIds);
 			}
 			
-			if (exam.getState() != 1) {// 没发布，结束
+			if (exam.getState() != 1) {// 没发布，不生成试卷（不确定使用的那个试卷）
 				continue;
 			}
 			
-			if (paper.getGenType() == 2) {
-				myQuestionList = new ArrayList<PaperQuestion>();
-				generatePaper(myQuestionList, paperRuleList, questionListCache, userId, myExam.getExamId());// 添加随机试题
+			if (paper.getGenType() == 2) {// 如果是随机组卷，重新生成试卷
+				myQuestionList = generatePaper(paperRuleList, questionListCache, userId, myExam.getExamId());
 			}
 			
 			for (PaperQuestion paperQuestion : myQuestionList) {
@@ -389,39 +385,38 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		}
 	}
 
-	private void generatePaper(List<PaperQuestion> myQuestionList, List<PaperQuestionRule> paperQuestionList, Map<Integer, List<Question>> checkPaperQuestionRule, Integer userId, Integer examId) {
+	private List<PaperQuestion> generatePaper(List<PaperQuestionRule> paperRuleList, Map<Integer, List<Question>> questionListCache, Integer userId, Integer examId) {
+		// 试题打乱顺序
 		Set<Integer> usedQuestion = new HashSet<Integer>();
-		Iterator<Entry<Integer, List<Question>>> iterator = checkPaperQuestionRule.entrySet().iterator();// 打乱试题顺序
-		while(iterator.hasNext()) {
-	        Entry<Integer, List<Question>> next = iterator.next();
-	        Collections.shuffle(next.getValue());
-	        checkPaperQuestionRule.put(next.getKey(), next.getValue());
+		for(List<Question> questionList : questionListCache.values()) {
+	        Collections.shuffle(questionList);
 	    }
 		
-		for(PaperQuestionRule paperQuestionRule : paperQuestionList){// 循环所有规则
-			List<Question> questionList = checkPaperQuestionRule.get(paperQuestionRule.getQuestionTypeId());
-			for (int i = 1; i <= paperQuestionRule.getNum(); i++) {// 循环单个规则试题数量
-				Integer ruleRemainNum = paperQuestionRule.getNum();
-				for(int j = 0; j < questionList.size(); j++){
-					if (ruleRemainNum <= 0) {
+		// 生成试卷
+		List<PaperQuestion> randPaper = new ArrayList<>();
+		for(PaperQuestionRule paperQuestionRule : paperRuleList) {// 循环所有规则
+			Integer ruleRemainNum = paperQuestionRule.getNum();
+			for (int i = 0; i < paperQuestionRule.getNum(); i++) {// 循环单个规则试题数量
+				for(Question question : questionListCache.get(paperQuestionRule.getQuestionTypeId())) {// 循环当前规则下试题分类的所有试题（已乱序）
+					if (ruleRemainNum <= 0) {// 该规则下试题都找到，处理下一个规则
 						break;
 					}
-					if ( !paperQuestionRule.getType().equals(questionList.get(j).getType()) 
-							|| !paperQuestionRule.getDifficultys().contains(questionList.get(j).getDifficulty().toString()) 
-							|| !paperQuestionRule.getAis().contains(questionList.get(j).getAi().toString()) ) {
+					if (paperQuestionRule.getType().intValue() != question.getType().intValue()
+							|| !paperQuestionRule.getDifficultys().contains(question.getDifficulty().toString()) 
+							|| !paperQuestionRule.getAis().contains(question.getAi().toString()) ) {// 当前试题不符合规则，不添加
 							continue;
 					}
 					
-					if (usedQuestion.contains(questionList.get(j).getId())) {//重复试题不添加
+					if (usedQuestion.contains(question.getId())) {// 添加过，不添加
 						continue;
 					}
 					
 					PaperQuestion paperQuestion = new PaperQuestion();
 					paperQuestion.setUpdateTime(new Date());
 					paperQuestion.setUpdateUserId(getCurUser().getId());
-					paperQuestion.setQuestionId(questionList.get(j).getId());
+					paperQuestion.setQuestionId(question.getId());
 					paperQuestion.setType(3);
-					paperQuestion.setNo(i);
+					paperQuestion.setNo(i + 1);
 					paperQuestion.setScore(paperQuestionRule.getScore());
 					paperQuestion.setScoreOptions(paperQuestionRule.getScoreOptions());
 					paperQuestion.setParentId(paperQuestionRule.getPaperQuestionId());
@@ -429,20 +424,23 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					paperQuestion.setExamId(examId);
 					paperQuestion.setUserId(userId);
 					paperQuestion.setPaperQuestionRuleId(paperQuestionRule.getId());
-					paperQuestionService.add(paperQuestion);// 添加我的考试详细
+					paperQuestionService.add(paperQuestion);// 添加试题
 					
 					paperQuestion.setParentSub(String.format("_%s_%s_", paperQuestion.getParentId(), paperQuestion.getId()));
 					paperQuestionService.update(paperQuestion);
 
-					usedQuestion.add(questionList.get(j).getId());
-					myQuestionList.add(paperQuestion);
+					usedQuestion.add(question.getId());
+					randPaper.add(paperQuestion);
+					
 					ruleRemainNum--;
 				}
 			}
 		}
+		
+		return randPaper;
 	}
 
-	private void addMyMark(Integer id, String[] examUserIds, Integer[] markUserIds, Date curTime) {
+	private void synMarkUserForAssignPaper(Integer id, String[] examUserIds, Integer[] markUserIds) {
 		List<MyMark> myMarkList = myMarkService.getList(id);// 获取我的考试列表
 		for (MyMark myMark : myMarkList) {
 			myMarkService.del(myMark.getId());
@@ -453,13 +451,13 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			myMark.setMarkUserId(markUserIds[i]);
 			myMark.setExamUserIds(String.format(",%s,", examUserIds[i]));
 			myMark.setUpdateUserId(getCurUser().getId());
-			myMark.setUpdateTime(curTime);
+			myMark.setUpdateTime(new Date());
 			myMark.setExamId(id);
 			myMarkService.add(myMark);
 		}
 	}
 	
-	private void synUserForAssignPaper(Integer id, Set<Integer> examUserIdSet) {
+	private void synExamUserForAssignPaper(Integer id, Set<Integer> examUserIdSet) {
 		List<MyExam> myExamList = myExamService.getList(id);// 当前考试的人员
 		ListIterator<MyExam> myExamListIterator = myExamList.listIterator();
 		
@@ -525,7 +523,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			}
 		}
 		
-		if (paper.getGenType().intValue() == 2) {// 
+		if (paper.getGenType().intValue() == 2) {
 			Map<PaperQuestionRuleEx, Integer> ruleExNumCache = new HashMap<>();
 			for (Integer questionTypeId : questionListCache.keySet()) {
 				for (Question question : questionListCache.get(questionTypeId)) {
@@ -541,13 +539,13 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			for (PaperQuestionRule paperRule : paperRuleList) {
 				for (Integer difficulty : paperRule.getDifficultyArr()) {
 					for (Integer ai : paperRule.getAiArr()) {
-						PaperQuestionRuleEx paperQuestionRuleEx = new PaperQuestionRuleEx(paperRule.getType(), difficulty, ai);
-						if (ruleExNumCache.get(paperQuestionRuleEx) == null) {
+						PaperQuestionRuleEx paperRuleEx = new PaperQuestionRuleEx(paperRule.getType(), difficulty, ai);
+						if (ruleExNumCache.get(paperRuleEx) == null) {
 							PaperQuestion paperQuestion = paperQuestionService.getEntity(paperRule.getPaperQuestionId());
 							throw new MyException(String.format("%s章节下第%s个规则题数不足%s道", paperQuestion.getName(), paperRule.getNo(), paperRule.getNum()));
 						}
 						
-						Integer num = ruleExNumCache.put(paperQuestionRuleEx,  ruleExNumCache.get(paperQuestionRuleEx) - paperRule.getNum());
+						Integer num = ruleExNumCache.put(paperRuleEx, ruleExNumCache.get(paperRuleEx) - paperRule.getNum());
 						if (num < 0) {
 							PaperQuestion paperQuestion = paperQuestionService.getEntity(paperRule.getPaperQuestionId());
 							throw new MyException(String.format("%s章节下第%s个规则题数不足%s道", paperQuestion.getName(), paperRule.getNo(), paperRule.getNum()));
