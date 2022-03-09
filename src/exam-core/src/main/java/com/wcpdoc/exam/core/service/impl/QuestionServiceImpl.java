@@ -33,6 +33,7 @@ import com.wcpdoc.core.util.BigDecimalUtil;
 import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.QuestionDao;
+import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
@@ -40,6 +41,7 @@ import com.wcpdoc.exam.core.entity.QuestionEx;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.service.PaperQuestionService;
+import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
@@ -69,7 +71,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	private QuestionAnswerService questionAnswerService;
 	@Resource
 	private PaperQuestionService paperQuestionService;
-	
+	@Resource
+	private PaperService paperService;
 	
 	@Override
 	@Resource(name = "questionDaoImpl")
@@ -256,9 +259,10 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			throw new MyException("参数错误：answers");
 		}
 		
-		List<PaperQuestion> questionList = paperQuestionService.getQuestionList(question.getId(),null,null);//判断是否被试卷引用
-		if (questionList.size() > 0) {
-			throw new MyException("此试题已被试卷引用，无法修改");
+		List<PaperQuestion> questionList = paperQuestionService.getPaperQuestionList(question.getId());//判断是否被试卷引用
+		if (ValidateUtil.isValid(questionList)) {
+			Paper paper = paperService.getEntity(questionList.get(0).getPaperId());
+			throw new MyException(String.format("此试题已被%s试卷引用", paper.getName()));
 		}
 		
 		if (question.getType() == 1) {
