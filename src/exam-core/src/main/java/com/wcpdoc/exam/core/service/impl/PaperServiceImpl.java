@@ -21,6 +21,7 @@ import com.wcpdoc.core.util.BigDecimalUtil;
 import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.PaperDao;
+import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.PaperQuestionAnswer;
@@ -30,6 +31,7 @@ import com.wcpdoc.exam.core.entity.PaperType;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
+import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.PaperQuestionAnswerService;
 import com.wcpdoc.exam.core.service.PaperQuestionRuleService;
 import com.wcpdoc.exam.core.service.PaperQuestionService;
@@ -70,7 +72,9 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	private QuestionOptionService questionOptionService;
 	@Resource
 	private PaperQuestionRuleService paperQuestionRuleService;
-
+	@Resource
+	private ExamService examService;
+	
 	@Override
 	@Resource(name = "paperDaoImpl")
 	public void setDao(BaseDao<Paper> dao) {
@@ -105,9 +109,9 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if (entity.getState() == 0) {
 			throw new MyException("已删除");
 		}
-		if (entity.getState() == 1) {
-			throw new MyException("已发布");
-		}
+//		if (entity.getState() == 1) {
+//			throw new MyException("已发布");
+//		}
 		if (entity.getState() == 3) {
 			throw new MyException("已归档");
 		}
@@ -115,7 +119,16 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
 		}
-
+		
+		List<Exam> examList = examService.getList(); //是否被考试引用
+		if (ValidateUtil.isValid(examList)) {
+			for(Exam exam : examList){
+				if (exam.getPaperId().intValue() ==  paper.getId().intValue()) {
+					throw new MyException(String.format("该试卷已被【%s】考试引用", exam.getName()));
+				}
+			}
+		}
+		
 		// 更新试卷
 		entity.setGenType(paper.getGenType());
 		entity.setShowType(paper.getShowType());

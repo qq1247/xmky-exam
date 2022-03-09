@@ -17,8 +17,6 @@ import org.springframework.stereotype.Service;
 import com.wcpdoc.base.service.OrgService;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.dao.BaseDao;
-import com.wcpdoc.core.entity.PageIn;
-import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.StringUtil;
@@ -562,16 +560,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	@Override
-	public PageOut getGradeListpage(PageIn pageIn) {   
-		return examDao.getGradeListpage(pageIn);
-	}
-
-	@Override
-	public List<Exam> getExamList(Integer paperId) {
-		return examDao.getExamList(paperId);
-	}
-
-	@Override
 	public List<Map<String, Object>> getMarkExamUserList(Integer id, Integer markUserId) {
 		return examDao.getMarkExamUserList(id, markUserId);
 	}
@@ -584,6 +572,11 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	@Override
 	public List<Exam> getUnMarkList() {
 		return examDao.getUnMarkList();
+	}
+
+	@Override
+	public List<Exam> getList() {
+		return examDao.getList();
 	}
 
 }

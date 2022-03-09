@@ -259,10 +259,10 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			throw new MyException("参数错误：answers");
 		}
 		
-		List<PaperQuestion> questionList = paperQuestionService.getPaperQuestionList(question.getId());//判断是否被试卷引用
-		if (ValidateUtil.isValid(questionList)) {
-			Paper paper = paperService.getEntity(questionList.get(0).getPaperId());
-			throw new MyException(String.format("此试题已被%s试卷引用", paper.getName()));
+		List<PaperQuestion> paperQuestionList = paperQuestionService.getPaperQuestionList(question.getId());//判断是否被试卷引用
+		if (ValidateUtil.isValid(paperQuestionList)) {
+			Paper paper = paperService.getEntity(paperQuestionList.get(0).getPaperId());
+			throw new MyException(String.format("该题已被【%s】试卷引用", paper.getName()));
 		}
 		
 		if (question.getType() == 1) {
