@@ -683,50 +683,20 @@ http请求头需添加Authorization字段，
 | content | Integer       | 评论内容  | 是   |
 | anon | Integer       | 匿名（1：是；2：否） | 是   |
 
-### 随机章节规则添加：paperQuestionRule/add
+### 随机章节规则更新：paperQuestionRule/update
 | 请求参数             | 类型          | 描述   | 必填 |
 | ---------| ------------- | -------- | ---- |
-| paperQuestionId | Integer       | 章节ID   | 是   |
 | paperId | Integer       | 试卷ID  | 是   |
-| questionTypeId  | Integer   | 试题分类ID  | 是   |
-| type |Integer      | 选择类型 | 是   |
+| paperQuestionId | Integer       | 章节ID   | 是   |
+| questionTypeIds  | Integer[] | 试题分类ID  | 是   |
+| types |Integer[] | 选择类型 | 是   |
 | difficultys | Integer[]   | 难易程度 | 否   |
 | ais | Integer[]   | 智能阅卷 |  否  |
 | scoreOptions | String(8)       | 分数选择项 |  否  |
-| num | Integer    | 题数 | 是  |
-| score | Double  | 分数 | 是  |
+| nums | Integer[] | 题数 | 是  |
+| scores | Double[]  | 分数 | 是  |
 
-### 随机章节规则修改：paperQuestionRule/edit
-| 请求参数| 类型    | 描述 | 必填 |
-| ------------------- | ------- | ---- | ---- |
-| id                  | Integer | 主键 | 是   |
-| 其他字段同paper/add |         |      |      |  |
-
-### 随机章节规则删除：paperQuestionRule/del
-| 请求参数| 类型    | 描述 | 必填 |
-| ---- | ------- | ---- | ---- |
-| ids   | Integer[] | 主键ids | 是   |
-
-### 随机章节规则详细：paperQuestionRule/get
-| 请求参数| 类型    | 描述   | 必填 |
-| ---- | ------- | ------ | ---- |
-| id  | Integer | 试卷ID | 是   |
-
-| 响应参数| 类型    | 描述     |
-| ------------------- | ------- | -------- |
-| code                | Integer | 响应码   |
-| msg                 | String  | 响应消息 |
-| data.id             | Integer | 随机章节规则ID |
-| data.paperId  | Integer  | 试卷ID |
-| data.questionTypeId  | Integer  | 试题分类ID |
-| data.type  | Integer  | 选择类型 |
-| data.difficultys  | Integer[]  | 难易程度 |
-| data.ais  | Integer[]  | 智能阅卷 |
-| data.scoreOptions |  String[]  | 分数选择项 |
-| data.num  | Integer  | 题数 |
-| data.score  | Double  | 分数 |
-
-### 随机章节规则列表：paperQuestionRule/paperQuestionRuleList
+### 随机章节规则列表：paperQuestionRule/chapterAndRuleList
 | 请求参数| 类型       | 描述       | 必填 |
 | -------- | ---------- | ---------- | ---- |
 | paperId | Integer | 试卷ID | 是   |
@@ -738,26 +708,12 @@ http请求头需添加Authorization字段，
 |data.list[].chapter.id  | Integer  | 章节id |
 |data.list[].chapter.name  | String  | 章节名称 |
 |data.list[].chapter.description  | String  | 章节描述 |
-|data.list[].paperQuestionRand[].id  | Integer  | 章节规则ID |
-|data.list[].paperQuestionRand[].paperId  | Integer  | 试卷ID |
-|data.list[].paperQuestionRand[].questionTypeId  | Integer  | 试题分类ID |
-|data.list[].paperQuestionRand[].type  | Integer  | 选择类型 |
-|data.list[].paperQuestionRand[].difficultys  | Integer[]  | 难易程度 |
-|data.list[].paperQuestionRand[].ais  | Integer[]  | 智能阅卷 |
-|data.list[].paperQuestionRand[].scoreOptions |  String[]  | 分数选择项 |
-|data.list[].paperQuestionRand[].num  | Integer  | 题数 |
-|data.list[].paperQuestionRand[].score  | Double  | 分数 |
-
-### 试题列表：paperQuestionRule/questionList
-| 请求参数| 类型       | 描述       | 必填 |
-| -------- | ---------- | ---------- | ---- |
-| questionTypeId | Integer | 试题分类ID | 是   |
-
-| 响应参数| 类型    | 描述 |
-| ------------------------- | ------- | ---------------- |
-| code                      | Integer | 响应码    |
-| msg                       | String  | 响应消息 |
-|data[].type  | Integer  | 类型 |
-|data[].difficulty  | Integer  | 难易程度 |
-|data[].ai | Integer  | 是否智能 |
-|data[].num | Integer  | 数量 |
+|data.list[].rule[].id  | Integer  | 章节规则ID |
+|data.list[].rule[].paperId  | Integer  | 试卷ID |
+|data.list[].rule[].questionTypeId  | Integer  | 试题分类ID |
+|data.list[].rule[].type  | Integer  | 选择类型 |
+|data.list[].rule[].difficultys  | Integer[]  | 难易程度 |
+|data.list[].rule[].ais  | Integer[]  | 智能阅卷 |
+|data.list[].rule[].scoreOptions |  String[]  | 分数选择项 |
+|data.list[].rule[].num  | Integer  | 题数 |
+|data.list[].rule[].score  | Double  | 分数 |
