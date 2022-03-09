@@ -464,7 +464,7 @@ export default {
           paperId: this.paperId,
           questionTypeId: ruleParam.questionTypeId,
           paperQuestionId: this.paperQuestionRules[index].chapter.id,
-          ais: [3, 5].includes(ruleParam.type) ? ruleParam.ai : [],
+          ais: [3, 5].includes(ruleParam.type) ? ruleParam.ai : [1],
           type: ruleParam.type,
           difficultys: ruleParam.difficulty,
           scoreOptions: ruleParam.scoreOptions,
