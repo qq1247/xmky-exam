@@ -687,12 +687,12 @@ http请求头需添加Authorization字段，
 | 请求参数             | 类型          | 描述   | 必填 |
 | ---------| ------------- | -------- | ---- |
 | paperId | Integer       | 试卷ID  | 是   |
-| paperQuestionId | Integer       | 章节ID   | 是   |
+| chapterId | Integer       | 章节ID   | 是   |
 | questionTypeIds  | Integer[] | 试题分类ID  | 是   |
 | types |Integer[] | 选择类型 | 是   |
 | difficultys | String[]   | 难易程度 | 是  |
 | ais | String[]   | 智能阅卷 |  是  |
-| scoreOptions | String[]   | 分数选择项 | 是 |
+| scoreOptions | String[]   | 分数选择项 | 否 |
 | nums | Integer[] | 题数 | 是  |
 | scores | Double[]  | 分数 | 是  |
 
