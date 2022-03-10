@@ -531,10 +531,13 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		List<Question> questionList = new ArrayList<>();
 		for (Integer questionId : questionIds) {
 			Question question = questionService.getEntity(questionId);
-			questionList.add(question);
+			if (question.getState() != 1) {
+				throw new MyException("当前试题未发布");
+			}
 			if (paper.getMarkType() == 1 && question.getAi() != 1) {// 如果试卷是智能阅卷，添加试题为人工阅卷类型
 				throw new MyException("不支持人工阅卷类型的试题");
 			}
+			questionList.add(question);
 		}
 		
 		// 添加试题
