@@ -3,8 +3,6 @@ package com.wcpdoc.exam.core.service;
 import java.util.List;
 import java.util.Map;
 
-import com.wcpdoc.core.entity.PageIn;
-import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.Exam;
 /**
@@ -73,24 +71,14 @@ public interface ExamService extends BaseService<Exam>{
 	 * @return List<Exam>
 	 */
 	List<Exam> getList(Integer examTypeId);
-
-	/**
-	 * 获取成绩列表
-	 * 
-	 * v1.0 zhanghc 2017年8月29日下午3:16:12
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	PageOut getGradeListpage(PageIn pageIn);
-
+	
 	/**
 	 * 获取考试列表
 	 * 
-	 * v1.0 zhanghc 2017年8月6日下午10:03:09
-	 * @param paperId
+	 * v1.0 chenyun 2022年3月9日下午4:36:27
 	 * @return List<Exam>
 	 */
-	List<Exam> getExamList(Integer paperId);
+	List<Exam> getList();
 	
 	/**
 	 * 获取阅卷考试用户列表

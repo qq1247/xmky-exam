@@ -4,8 +4,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -127,6 +129,12 @@ public class PaperQuestionRuleServiceImpl extends BaseServiceImp<PaperQuestionRu
 		if (!ValidateUtil.isValid(paperQuestionRule.getScore())) {
 			throw new MyException("参数错误：score");
 		}
+		if (!ValidateUtil.isValid(paperQuestionRule.getAis())) {
+			throw new MyException("参数错误：ais");
+		}
+		if (!ValidateUtil.isValid(paperQuestionRule.getDifficultys())) {
+			throw new MyException("参数错误：difficultys");
+		}
 		
 		QuestionType questionType = questionTypeService.getEntity(paperQuestionRule.getQuestionTypeId());// 试题分类校验
 		if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
@@ -184,6 +192,12 @@ public class PaperQuestionRuleServiceImpl extends BaseServiceImp<PaperQuestionRu
 		}
 		if (!ValidateUtil.isValid(paperQuestionRule.getScore())) {
 			throw new MyException("参数错误：score");
+		}
+		if (!ValidateUtil.isValid(paperQuestionRule.getAis())) {
+			throw new MyException("参数错误：ais");
+		}
+		if (!ValidateUtil.isValid(paperQuestionRule.getDifficultys())) {
+			throw new MyException("参数错误：difficultys");
 		}
 		
 		QuestionType questionType = questionTypeService.getEntity(paperQuestionRule.getQuestionTypeId());// 试题分类校验
@@ -283,4 +297,55 @@ public class PaperQuestionRuleServiceImpl extends BaseServiceImp<PaperQuestionRu
 		}
 		return paperQuestionRuleExList;
 	}
+	
+	@Override
+	public void publishCheck(Paper paper){
+		Map<Integer, List<Question>> questionListCache = null;// 试题分类下所有的试题条件
+		List<PaperQuestionRule> paperRuleList = null;// 随机章节规则
+		if (paper.getGenType() == 2) {// 获取随机组卷 列表
+			questionListCache = new HashMap<>();
+			paperRuleList = getChapterList(paper.getId(), null);
+			Set<Integer> questionTypeIdSet = new HashSet<>();
+			for (PaperQuestionRule rule : paperRuleList) {
+				if (questionTypeIdSet.contains(rule.getQuestionTypeId())) {
+					continue;
+				}
+				questionTypeIdSet.add(rule.getQuestionTypeId());
+				List<Question> questionList =  getQuestionList(rule.getQuestionTypeId());
+				questionListCache.put(rule.getQuestionTypeId(), questionList);
+			}
+		}
+		
+		Map<PaperQuestionRuleEx, Integer> ruleExNumCache = new HashMap<>();
+		for (Integer questionTypeId : questionListCache.keySet()) {
+			for (Question question : questionListCache.get(questionTypeId)) {
+				PaperQuestionRuleEx paperQuestionRuleEx = new PaperQuestionRuleEx(question.getType(), question.getDifficulty(), question.getAi());
+				if (ruleExNumCache.get(paperQuestionRuleEx) == null) {
+					ruleExNumCache.put(paperQuestionRuleEx, 1);
+				} else {
+					ruleExNumCache.put(paperQuestionRuleEx, ruleExNumCache.get(paperQuestionRuleEx) + 1); // 
+				}
+			}
+		}
+		
+		for (PaperQuestionRule paperRule : paperRuleList) {
+			for (Integer difficulty : paperRule.getDifficultyArr()) {
+				for (Integer ai : paperRule.getAiArr()) {
+					PaperQuestionRuleEx paperRuleEx = new PaperQuestionRuleEx(paperRule.getType(), difficulty, ai);
+					if (ruleExNumCache.get(paperRuleEx) == null) {
+						PaperQuestion paperQuestion = paperQuestionService.getEntity(paperRule.getPaperQuestionId());
+						throw new MyException(String.format("%s章节下第%s个规则题数不足%s道", paperQuestion.getName(), paperRule.getNo(), paperRule.getNum()));
+					}
+					
+					Integer num = ruleExNumCache.put(paperRuleEx, ruleExNumCache.get(paperRuleEx) - paperRule.getNum());
+					if (num < 0) {
+						PaperQuestion paperQuestion = paperQuestionService.getEntity(paperRule.getPaperQuestionId());
+						throw new MyException(String.format("%s章节下第%s个规则题数不足%s道", paperQuestion.getName(), paperRule.getNo(), paperRule.getNum()));
+					}
+				}
+			}
+		}
+	
+	}
+	
 }

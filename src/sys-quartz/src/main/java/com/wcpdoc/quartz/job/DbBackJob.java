@@ -53,9 +53,9 @@ public class DbBackJob implements Job {
 		} else {
 			bakCmd.add("sh"); bakCmd.add("-c");
 		}
-		bakCmd.add(String.format("mysqldump -h%s -p%s -u%s -p%s --default-character-set=%s %s > %s/%s.sql", 
+		bakCmd.add(String.format("mysqldump -h%s -p%s -u%s -p%s --default-character-set=%s %s > %s%s%s.sql", 
 				getIp(DB_URL), getPort(DB_URL), DB_USERNAME, DB_PASSWORD, getEncoding(DB_URL), getDbName(DB_URL),
-				dbBakDir.getAbsolutePath(), DateUtil.formatDate(new Date())));
+				dbBakDir.getAbsolutePath(), File.separator, DateUtil.formatDate(new Date())));
 		
 		Process process = null;
 		try {

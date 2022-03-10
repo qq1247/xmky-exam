@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.wcpdoc.core.dao.BaseDao;
-import com.wcpdoc.core.entity.PageIn;
-import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.exam.core.entity.Exam;
 
 /**
@@ -32,24 +30,14 @@ public interface ExamDao extends BaseDao<Exam>{
 	 * @return List<Exam>
 	 */
 	List<Exam> getList(Integer examTypeId);
-
-	/**
-	 * 获取成绩列表
-	 * 
-	 * v1.0 zhanghc 2017年8月29日下午3:18:37
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	PageOut getGradeListpage(PageIn pageIn);
 	
 	/**
-	 * 获取考试列表
+	 * 获取考试分类列表
 	 * 
-	 * v1.0 zhanghc 2017年8月6日下午10:03:09
-	 * @param paperId
+	 * v1.0 chenyun 2022年3月9日下午4:37:56
 	 * @return List<Exam>
 	 */
-	List<Exam> getExamList(Integer paperId);
+	List<Exam> getList();
 	
 	/**
 	 * 阅卷考试用户列表

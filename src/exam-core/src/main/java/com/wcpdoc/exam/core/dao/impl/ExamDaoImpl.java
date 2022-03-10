@@ -59,19 +59,14 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 	
 	@Override
 	public List<Exam> getList(Integer examTypeId) {
-		String sql = "SELECT * FROM EXM_EXAM EXAM_TYPE WHERE STATE !=0 AND EXAM_TYPE_ID = ?";
+		String sql = "SELECT * FROM EXM_EXAM WHERE STATE !=0 AND EXAM_TYPE_ID = ?";
 		return getList(sql, new Object[]{examTypeId}, Exam.class);
 	}
-
+	
 	@Override
-	public PageOut getGradeListpage(PageIn pageIn) {
-		return null;
-	}
-
-	@Override
-	public List<Exam> getExamList(Integer paperId) {
-		String sql = "SELECT * FROM EXM_EXAM EXAM_TYPE WHERE STATE = 1 AND PAPER_ID = ?";
-		return getList(sql, new Object[]{paperId}, Exam.class);
+	public List<Exam> getList() {
+		String sql = "SELECT * FROM EXM_EXAM WHERE STATE !=0 ";
+		return getList(sql, new Object[]{}, Exam.class);
 	}
 	
 	@Override
@@ -108,5 +103,4 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 		String sql = "SELECT * FROM EXM_EXAM WHERE STATE = 1 AND MARK_STATE IN (1,2)";
 		return getList(sql);
 	}
-
 }

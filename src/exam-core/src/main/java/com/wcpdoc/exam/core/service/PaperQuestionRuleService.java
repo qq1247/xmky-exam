@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.wcpdoc.core.service.BaseService;
+import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestionRule;
 import com.wcpdoc.exam.core.entity.PaperQuestionRuleEx;
 import com.wcpdoc.exam.core.entity.Question;
@@ -75,4 +76,12 @@ public interface PaperQuestionRuleService extends BaseService<PaperQuestionRule>
 	 * @return  List<PaperQuestionRuleEx> 
 	 */
 	 List<PaperQuestionRuleEx>  questionListCache(Integer questionTypeId);
+	 
+	 /**
+	  * 发布校验
+	  * 
+	  * v1.0 chenyun 2022年3月9日下午3:59:27
+	  * @param paper void
+	  */
+	 void publishCheck(Paper paper);
 }
