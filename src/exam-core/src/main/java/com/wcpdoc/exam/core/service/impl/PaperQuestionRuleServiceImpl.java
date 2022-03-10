@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.core.service.impl;
 
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
+import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.PaperQuestionRuleDao;
 import com.wcpdoc.exam.core.entity.Paper;
@@ -60,7 +62,7 @@ public class PaperQuestionRuleServiceImpl extends BaseServiceImp<PaperQuestionRu
 	}
 
 	@Override
-	public List<Map<String, Object>> paperQuestionRuleList(Integer paperId) {
+	public List<Map<String, Object>> chapterAndRuleList(Integer paperId) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(paperId)) {
 			throw new MyException("参数错误：paperId");
@@ -75,7 +77,7 @@ public class PaperQuestionRuleServiceImpl extends BaseServiceImp<PaperQuestionRu
 			chapterMap.put("description", chapter.getDescription());
 			singleResult.put("chapter", chapterMap);
 			// 章节规则
-			List<Map<String, Object>> paperQuestionRuleListMap = new ArrayList<>();
+			List<Map<String, Object>> ruleMap = new ArrayList<>();
 			List<PaperQuestionRule> paperQuestionRuleList = getChapterList(chapter.getPaperId(), chapter.getId());
 			for (PaperQuestionRule paperQuestionRule : paperQuestionRuleList) {
 				Map<String, Object> paperQuestionRuleMap = new HashMap<>();
@@ -99,48 +101,56 @@ public class PaperQuestionRuleServiceImpl extends BaseServiceImp<PaperQuestionRu
 				paperQuestionRuleMap.put("scoreOptions", scoreOptions);
 				paperQuestionRuleMap.put("totalNumber", paperQuestionRule.getNum());
 				paperQuestionRuleMap.put("score", paperQuestionRule.getScore());
-				paperQuestionRuleListMap.add(paperQuestionRuleMap);
+				ruleMap.add(paperQuestionRuleMap);
 			}
 			
-			singleResult.put("paperQuestionRuleList", paperQuestionRuleListMap);
+			singleResult.put("rule", ruleMap);
 			resultList.add(singleResult);
 		}
 		return resultList;
 	}
-	
+
 	@Override
-	public void addAndUpdate(PaperQuestionRule paperQuestionRule) {
+	public void update(Integer paperId, Integer chapterId, Integer[] questionTypeIds, Integer[] types, String[] difficultys, String[] ais, String[] scoreOptions, Integer[] nums, BigDecimal[] scores) {
 		// 校验数据有效性
-		if (!ValidateUtil.isValid(paperQuestionRule.getPaperQuestionId())) {
-			throw new MyException("参数错误：paperQuestionId");
-		}
-		if (!ValidateUtil.isValid(paperQuestionRule.getPaperId())) {
+		if (!ValidateUtil.isValid(paperId)) {
 			throw new MyException("参数错误：paperId");
 		}
-		if (!ValidateUtil.isValid(paperQuestionRule.getQuestionTypeId())) {
-			throw new MyException("参数错误：questionTypeId");
+		if (!ValidateUtil.isValid(chapterId)) {
+			throw new MyException("参数错误：chapterId");
 		}
-		if (!ValidateUtil.isValid(paperQuestionRule.getType())) {
-			throw new MyException("参数错误：type");
+		if (!ValidateUtil.isValid(questionTypeIds)) {
+			throw new MyException("参数错误：questionTypeIds");
 		}
-		if (!ValidateUtil.isValid(paperQuestionRule.getNum())) {
-			throw new MyException("参数错误：totalNumber");
+		if (!ValidateUtil.isValid(types)) {
+			throw new MyException("参数错误：types");
 		}
-		if (!ValidateUtil.isValid(paperQuestionRule.getScore())) {
-			throw new MyException("参数错误：score");
-		}
-		if (!ValidateUtil.isValid(paperQuestionRule.getAis())) {
-			throw new MyException("参数错误：ais");
-		}
-		if (!ValidateUtil.isValid(paperQuestionRule.getDifficultys())) {
+		if (!ValidateUtil.isValid(difficultys)) {
 			throw new MyException("参数错误：difficultys");
 		}
-		
-		QuestionType questionType = questionTypeService.getEntity(paperQuestionRule.getQuestionTypeId());// 试题分类校验
-		if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
-			throw new MyException("无操作权限");
+		if (!ValidateUtil.isValid(ais)) {
+			throw new MyException("参数错误：ais");
 		}
-		Paper paper = paperService.getEntity(paperQuestionRule.getPaperId());//试卷校验
+		if (!ValidateUtil.isValid(nums)) {
+			throw new MyException("参数错误：nums");
+		}
+		if (!ValidateUtil.isValid(scores)) {
+			throw new MyException("参数错误：scores");
+		}
+		
+		if (questionTypeIds.length == 1) {
+			difficultys[0] = StringUtil.join(difficultys);// 规则只有一个的情况下按逗号分隔的难度被拆分成了数组
+			ais[0] = StringUtil.join(ais);
+		}
+		
+		for (int i = 0; i < questionTypeIds.length; i++) {// 试题分类校验
+			QuestionType questionType = questionTypeService.getEntity(questionTypeIds[i]);
+			if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
+				throw new MyException("无操作权限");
+			}
+		}
+		
+		Paper paper = paperService.getEntity(paperId);//试卷校验
 		if (paper.getState() == 0) {
 			throw new MyException("试卷已删除");
 		}
@@ -150,117 +160,57 @@ public class PaperQuestionRuleServiceImpl extends BaseServiceImp<PaperQuestionRu
 		if(paper.getState() == 3){
 			throw new MyException("已归档");
 		}
+		
 		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());// 试卷分类权限校验
 		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
 		}
-		if (paperQuestionRule.getType() != 3 && paperQuestionRule.getType() != 5) {//除填空和阅读其他都是智能阅卷
-			paperQuestionRule.setAis("1");
+		
+		if(paper.getMarkType() == 1){//判断智能试卷
+			for (int i = 0; i < ais.length; i++) {
+				if (ais[i].contains("2")) {
+					throw new MyException("智能试卷不能包含非智能题");
+				}
+			}
 		}
 		
-		if (paperQuestionRule.getType() == 2) {
-			paperQuestionRule.setScoreOptions("2");
+		for (int i = 0; i < types.length; i++) {
+			if (types[i] != 3 && types[i] != 5) {//除填空和阅读其他都是智能阅卷
+				ais[i] = "1";
+			}
+			
+			if (types[i] == 2) {// 多选漏选的分必填
+				scoreOptions[i] = "2";
+			}
 		}
 		
-		paperQuestionRule.setUpdateUserId(getCurUser().getId());
-		paperQuestionRule.setUpdateTime(new Date());
-		List<PaperQuestionRule> paperQuestionRuleList = getChapterList(paperQuestionRule.getPaperId(), paperQuestionRule.getPaperQuestionId());
-		paperQuestionRule.setNo(paperQuestionRuleList.size() + 1 );
-		add(paperQuestionRule);
-	}
-
-	@Override
-	public void updateAndUpdate(PaperQuestionRule paperQuestionRule) {
-		// 校验数据有效性
-		if (!ValidateUtil.isValid(paperQuestionRule.getId())) {
-			throw new MyException("参数错误：id");
-		}
-		if (!ValidateUtil.isValid(paperQuestionRule.getPaperQuestionId())) {
-			throw new MyException("参数错误：paperQuestionId");
-		}
-		if (!ValidateUtil.isValid(paperQuestionRule.getPaperId())) {
-			throw new MyException("参数错误：paperId");
-		}
-		if (!ValidateUtil.isValid(paperQuestionRule.getQuestionTypeId())) {
-			throw new MyException("参数错误：questionTypeId");
-		}
-		if (!ValidateUtil.isValid(paperQuestionRule.getType())) {
-			throw new MyException("参数错误：type");
-		}
-		if (!ValidateUtil.isValid(paperQuestionRule.getNum())) {
-			throw new MyException("参数错误：totalNumber");
-		}
-		if (!ValidateUtil.isValid(paperQuestionRule.getScore())) {
-			throw new MyException("参数错误：score");
-		}
-		if (!ValidateUtil.isValid(paperQuestionRule.getAis())) {
-			throw new MyException("参数错误：ais");
-		}
-		if (!ValidateUtil.isValid(paperQuestionRule.getDifficultys())) {
-			throw new MyException("参数错误：difficultys");
+		//删除
+		List<PaperQuestionRule> chapterList = paperQuestionRuleDao.getChapterList(paperId, chapterId);
+		for(PaperQuestionRule paperQuestionRule : chapterList){
+			del(paperQuestionRule.getId());
 		}
 		
-		QuestionType questionType = questionTypeService.getEntity(paperQuestionRule.getQuestionTypeId());// 试题分类校验
-		if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
-			throw new MyException("无操作权限");
+		//添加
+		for (int i = 0; i < questionTypeIds.length; i++) {
+			PaperQuestionRule paperQuestionRule = new PaperQuestionRule();
+			paperQuestionRule.setPaperId(paperId);
+			paperQuestionRule.setPaperQuestionId(chapterId);
+			paperQuestionRule.setQuestionTypeId(questionTypeIds[i]);
+			paperQuestionRule.setType(types[i]);
+			paperQuestionRule.setDifficultys(difficultys[i]);
+			paperQuestionRule.setAis(ais[i]);
+			if (ValidateUtil.isValid(scoreOptions)) {
+				paperQuestionRule.setScoreOptions(scoreOptions[i]);
+			}
+			paperQuestionRule.setScore(scores[i]);
+			paperQuestionRule.setNum(nums[i]);
+			paperQuestionRule.setNo(i + 1 );
+			paperQuestionRule.setUpdateUserId(getCurUser().getId());
+			paperQuestionRule.setUpdateTime(new Date());
+			add(paperQuestionRule);
 		}
-		
-		Paper paper = paperService.getEntity(paperQuestionRule.getPaperId());//试卷校验
-		if (paper.getState() == 0) {
-			throw new MyException("试卷已删除");
-		}
-		if (paper.getState() == 1) {
-			throw new MyException("试卷已发布");
-		}
-		if(paper.getState() == 3){
-			throw new MyException("已归档");
-		}
-		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());//试卷分类权限校验
-		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
-			throw new MyException("无操作权限");
-		}
-		if (paperQuestionRule.getType() != 3 && paperQuestionRule.getType() != 5) {//除填空和阅读其他都是智能阅卷
-			paperQuestionRule.setAis("1");
-		}
-		
-		PaperQuestionRule entity = getEntity(paperQuestionRule.getId());
-		entity.setQuestionTypeId(paperQuestionRule.getQuestionTypeId());
-		entity.setType(paperQuestionRule.getType());
-		entity.setDifficultys(paperQuestionRule.getDifficultys());
-		entity.setAis(paperQuestionRule.getAis());
-		entity.setScoreOptions(paperQuestionRule.getScoreOptions());
-		entity.setNum(paperQuestionRule.getNum());
-		entity.setScore(paperQuestionRule.getScore());
-		entity.setUpdateUserId(getCurUser().getId());
-		entity.setUpdateTime(new Date());
-		update(entity);
 	}
 	
-	@Override
-	public void delAndUpdate(Integer[] ids) {
-		// 校验数据有效性
-		if (!ValidateUtil.isValid(ids)) {
-			throw new MyException("参数错误：ids");
-		}
-		
-		PaperQuestionRule paperQuestionRule = null;
-		for (Integer id : ids) {
-			paperQuestionRule = getEntity(id);
-			if (paperQuestionRule == null) {
-				throw new MyException("参数错误：ids");
-			}
-			del(paperQuestionRule.getId());//删除随机章节
-		}
-		
-		// 同级随机章节重新排序
-		List<PaperQuestionRule> chapterList = getChapterList(paperQuestionRule.getPaperId(), paperQuestionRule.getPaperQuestionId());
-		int maxNo = 1;
-		for (PaperQuestionRule cur : chapterList) {
-			cur.setNo(maxNo++);
-			update(cur);
-		}
-	}
-
 	@Override
 	public List<PaperQuestionRule> getChapterList(Integer paperId, Integer paperQuestionId) {
 		return paperQuestionRuleDao.getChapterList(paperId, paperQuestionId);
@@ -347,5 +297,4 @@ public class PaperQuestionRuleServiceImpl extends BaseServiceImp<PaperQuestionRu
 		}
 	
 	}
-	
 }

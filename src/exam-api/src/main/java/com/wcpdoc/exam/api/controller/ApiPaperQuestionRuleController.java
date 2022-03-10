@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.api.controller;
 
+import java.math.BigDecimal;
+
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
@@ -12,8 +14,6 @@ import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
-import com.wcpdoc.core.util.ValidateUtil;
-import com.wcpdoc.exam.core.entity.PaperQuestionRule;
 import com.wcpdoc.exam.core.service.PaperQuestionRuleService;
 
 /**
@@ -35,11 +35,11 @@ public class ApiPaperQuestionRuleController extends BaseController {
 	 * v1.0 chenyun 2022年2月11日上午10:59:35
 	 * @return pageOut
 	 */
-	@RequestMapping("/paperQuestionRuleList")
+	@RequestMapping("/chapterAndRuleList")
 	@ResponseBody
-	public PageResult paperQuestionRuleList(Integer paperId){
+	public PageResult chapterAndRuleList(Integer paperId){
 		try {
-			return PageResultEx.ok().data(paperQuestionRuleService.paperQuestionRuleList(paperId));
+			return PageResultEx.ok().data(paperQuestionRuleService.chapterAndRuleList(paperId));
 		} catch (MyException e) {
 			log.error("随机章节规则列表错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -50,17 +50,25 @@ public class ApiPaperQuestionRuleController extends BaseController {
 	}
 	
 	/**
-	 * 添加随机章节规则
+	 * 更新随机章节规则
 	 * 
-	 * v1.0 chenyun 2022年2月11日上午10:59:35
-	 * @param chapter
+	 * v1.0 chenyun 2022年3月9日下午5:31:08
+	 * @param paperId
+	 * @param chapterId
+	 * @param questionTypeIds
+	 * @param types
+	 * @param difficultys
+	 * @param ais
+	 * @param scoreOptions
+	 * @param nums
+	 * @param scores
 	 * @return PageResult
 	 */
-	@RequestMapping("/add")
+	@RequestMapping("/update")
 	@ResponseBody
-	public PageResult add(PaperQuestionRule paperQuestionRule) {
+	public PageResult update(Integer paperId, Integer chapterId, Integer[] questionTypeIds, Integer[] types, String[] difficultys, String[] ais, String[] scoreOptions,  Integer[] nums,  BigDecimal[] scores ) {
 		try {
-			paperQuestionRuleService.addAndUpdate(paperQuestionRule);
+			paperQuestionRuleService.update(paperId, chapterId, questionTypeIds, types, difficultys, ais, scoreOptions, nums, scores);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加章节规则错误：{}", e.getMessage());
@@ -72,108 +80,23 @@ public class ApiPaperQuestionRuleController extends BaseController {
 	}
 	
 	/**
-	 * 修改随机章节规则
-	 * 
-	 * v1.0 chenyun 2022年2月11日上午10:59:35
-	 * @param chapter
-	 * @return PageResult
-	 */
-	@RequestMapping("/edit")
-	@ResponseBody
-	public PageResult edit(PaperQuestionRule paperQuestionRule) {
-		try {
-			paperQuestionRuleService.updateAndUpdate(paperQuestionRule);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("添加随机章节规则错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("添加随机章节规则错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 删除随机章节规则
-	 * 
-	 * v1.0 chenyun 2022年2月11日下午4:04:19
-	 * @param paperQuestionRuleId
-	 * @return PageResult
-	 */
-	@RequestMapping("/del")
-	@ResponseBody
-	public PageResult del(Integer[] ids) {
-		try {
-			paperQuestionRuleService.delAndUpdate(ids);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("随机章节规则删除错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("随机章节规则删除错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 获取随机章节规则
-	 * 
-	 * v1.0 chenyun 2021年3月29日下午5:40:20
-	 * @param paperId
-	 * @return PageResult
-	 */
-	@RequestMapping("/get")
-	@ResponseBody
-	public PageResult get(Integer id) {
-		try {
-			PaperQuestionRule paperQuestionRule = paperQuestionRuleService.getEntity(id);
-			Integer[] scoreOptions = null;
-			if (ValidateUtil.isValid(paperQuestionRule.getScoreOptions())) {
-				String[] split = paperQuestionRule.getScoreOptions().split(",");
-				scoreOptions = new Integer[split.length];
-				for(int i = 0; i < split.length; i++ ){
-					scoreOptions[i] = Integer.parseInt(split[i]);
-				}
-			} else {
-				scoreOptions = new Integer[0];
-			}
-			return PageResultEx.ok()
-					.addAttr("id", paperQuestionRule.getId())
-					.addAttr("paperId", paperQuestionRule.getPaperId())
-					.addAttr("questionTypeId", paperQuestionRule.getQuestionTypeId())
-					.addAttr("type", paperQuestionRule.getType())
-					.addAttr("difficultys", paperQuestionRule.getDifficultyArr())
-					.addAttr("ais", paperQuestionRule.getAiArr())
-					.addAttr("scoreOptions", scoreOptions)
-					.addAttr("num", paperQuestionRule.getNum())
-					.addAttr("score", paperQuestionRule.getScore());
-		} catch (MyException e) {
-			log.error("获取随机章节规则错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("获取随机章节规则错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 试题列表
+	 * 试题统计列表
 	 * 
 	 * v1.0 chenyun 2022年3月8日上午10:37:09
 	 * @param questionTypeId
 	 * @return PageResult
 	 */
-	@RequestMapping("/questionList")
-	@ResponseBody
-	public PageResult questionList(Integer questionTypeId){
-		try {
-			return PageResultEx.ok().data(paperQuestionRuleService.questionListCache(questionTypeId));
-		} catch (MyException e) {
-			log.error("试题列表错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("试题列表错误：", e);
-			return PageResult.err();
-		}
-	}
+//	@RequestMapping("/questionList")
+//	@ResponseBody
+//	public PageResult questionList(Integer questionTypeId){
+//		try {
+//			return PageResultEx.ok().data(paperQuestionRuleService.questionListCache(questionTypeId));
+//		} catch (MyException e) {
+//			log.error("试题列表错误：{}", e.getMessage());
+//			return PageResult.err().msg(e.getMessage());
+//		} catch (Exception e) {
+//			log.error("试题列表错误：", e);
+//			return PageResult.err();
+//		}
+//	}
 }

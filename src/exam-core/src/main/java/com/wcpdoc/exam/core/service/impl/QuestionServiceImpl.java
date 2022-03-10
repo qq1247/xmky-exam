@@ -326,9 +326,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		
 		// 如果有新版本标识，删除旧版本，生成新版本		
 		Question entity = getEntity(question.getId());
-		if (entity.getState() == 1) {
-			throw new MyException("试题已发布不能修改");
-		}
+//		if (entity.getState() == 1) {
+//			throw new MyException("试题已发布不能修改");
+//		}
 		if (entity.getState() == 0) {
 			throw new MyException("试题已删除不能修改");
 		}

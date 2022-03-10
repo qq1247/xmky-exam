@@ -1,5 +1,6 @@
 package com.wcpdoc.exam.core.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -17,28 +18,20 @@ import com.wcpdoc.exam.core.entity.Question;
  */
 public interface PaperQuestionRuleService extends BaseService<PaperQuestionRule> {
 	/**
-	 * 添加随机章节规则
+	 * 更新随机章节
 	 * 
-	 * v1.0 chenyun 2022年2月11日上午11:01:19
-	 * @param paperQuestionRule void
+	 * v1.0 chenyun 2022年3月9日下午5:30:00
+	 * @param paperId
+	 * @param chapterId
+	 * @param questionTypeIds
+	 * @param types
+	 * @param difficultys
+	 * @param ais
+	 * @param scoreOptions
+	 * @param nums
+	 * @param scores void
 	 */
-	void addAndUpdate(PaperQuestionRule paperQuestionRule);
-	
-	/**
-	 * 修改随机章节规则
-	 * 
-	 * v1.0 chenyun 2022年2月11日上午11:01:19
-	 * @param paperQuestionRule void
-	 */
-	void updateAndUpdate(PaperQuestionRule paperQuestionRule);
-	
-	/**
-	 * 删除随机章节规则
-	 * 
-	 * v1.0 chenyun 2022年2月11日下午3:55:33
-	 * @param ids void
-	 */
-	void delAndUpdate(Integer[] ids);
+	void update(Integer paperId, Integer chapterId, Integer[] questionTypeIds, Integer[] types, String[] difficultys, String[] ais, String[] scoreOptions, Integer[] nums, BigDecimal[] scores );
 	
 	/**
 	 * 获取随机章节规则列表
@@ -47,7 +40,7 @@ public interface PaperQuestionRuleService extends BaseService<PaperQuestionRule>
 	 * @param paperId
 	 * @return List<Map<String,Object>>
 	 */
-	List<Map<String, Object>> paperQuestionRuleList(Integer paperId);
+	List<Map<String, Object>> chapterAndRuleList(Integer paperId);
 	
 	/**
 	 * 获取随机章节规则列表
