@@ -93,7 +93,7 @@ export default {
       const res = await questionImport({
         fileId: this.handlerForm.questionDocIds[0].response.data.fileIds,
         questionTypeId: this.questionTypeId,
-        state: 2,
+        state: 1,
       }).catch(() => {
         this.handlerForm.isAnalysis = false
       })
@@ -133,7 +133,6 @@ export default {
       })
 
       if (percentage.code !== 200 || !percentage?.data?.percent) {
-        console.log('error')
         this.percentage = 0
         this.templateClear('templateUpload')
         loading.close()

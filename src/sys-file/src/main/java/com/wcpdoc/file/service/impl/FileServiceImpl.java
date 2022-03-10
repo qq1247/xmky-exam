@@ -68,7 +68,8 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		String baseDir = getFileUploadDir();
 		String tempPath = "/temp";
 		String timeStr = DateUtil.formatDateTime(new Date());
-		String ymdPath = String.format("/%s/%s/%s", timeStr.substring(0, 4), timeStr.substring(5, 7), timeStr.substring(8, 10));
+		String ymdPath = String.format("%s%s%s%s%s%s", java.io.File.separator, timeStr.substring(0, 4), 
+				java.io.File.separator, timeStr.substring(5, 7), java.io.File.separator, timeStr.substring(8, 10));
 		java.io.File tempUploadDir = new java.io.File(baseDir + tempPath + ymdPath);
 		if (!tempUploadDir.exists()) {
 			tempUploadDir.mkdirs();
@@ -78,7 +79,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		StringBuilder fileIds = new StringBuilder();
 		for (MultipartFile multipartFile : files) {
 			String fileId = IdUtil.getInstance().nextId() + "";
-			java.io.File destFile = new java.io.File(String.format("%s/%s", tempUploadDir.getAbsolutePath(), fileId));
+			java.io.File destFile = new java.io.File(String.format("%s%s%s", tempUploadDir.getAbsolutePath(), java.io.File.separator, fileId));
 			try {
 				multipartFile.transferTo(destFile);
 			} catch (Exception e) {
@@ -90,7 +91,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 			file.setName(FilenameUtils.getBaseName(multipartFile.getOriginalFilename()));
 			file.setExtName(FilenameUtils.getExtension(multipartFile.getOriginalFilename()));
 			file.setFileType(multipartFile.getContentType());
-			file.setPath(String.format("%s%s/%s", tempPath, ymdPath, fileId));
+			file.setPath(String.format("%s%s%s%s", tempPath, ymdPath, java.io.File.separator, fileId));
 			file.setIp(request.getRemoteHost());
 			file.setState(0);
 			file.setUpdateUserId(getCurUser().getId());
@@ -130,9 +131,10 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		String baseDir = getFileUploadDir();
 		java.io.File tempFile = new java.io.File(String.format("%s%s", baseDir, file.getPath()));
 		String timeStr = DateUtil.formatDateTime(new Date());
-		String ymdPath = String.format("/%s/%s/%s", timeStr.substring(0, 4), timeStr.substring(5, 7), timeStr.substring(8, 10));
+		String ymdPath = String.format("%s%s%s%s%s%s", java.io.File.separator, timeStr.substring(0, 4), java.io.File.separator, 
+				timeStr.substring(5, 7), java.io.File.separator, timeStr.substring(8, 10));
 		file.setState(1);
-		file.setPath(String.format("%s/%s", ymdPath, tempFile.getName()));
+		file.setPath(String.format("%s%s%s", ymdPath, java.io.File.separator, tempFile.getName()));
 		file.setIp(request.getRemoteHost());
 		file.setUpdateUserId(getCurUser().getId());
 		file.setUpdateTime(new Date());
@@ -157,7 +159,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 			throw new MyException("id不存在");// 测试切换数据库时，文件找不到，报错太多，转成自定义异常，log打印一行就可以。
 		}
 		String baseDir = getFileUploadDir();
-		java.io.File file = new java.io.File(String.format("%s/%s", baseDir, entity.getPath()));
+		java.io.File file = new java.io.File(String.format("%s%s%s", baseDir, java.io.File.separator, entity.getPath()));
 		if (!file.exists()) {
 			throw new MyException("附件不存在");
 		}
@@ -190,7 +192,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 	public String getFileUploadDir() {
 		java.io.File dbBakDir = new java.io.File(fileExService.getFileUploadDir());
 		if (!dbBakDir.isAbsolute()) {
-			dbBakDir = new java.io.File(String.format("%s/%s", System.getProperty("user.dir"), fileExService.getFileUploadDir()));// 如果是相对路径，备份路径为当前war包启动路径+配置文件子目录
+			dbBakDir = new java.io.File(String.format("%s%s%s", System.getProperty("user.dir"), java.io.File.separator, fileExService.getFileUploadDir()));// 如果是相对路径，备份路径为当前war包启动路径+配置文件子目录
 		}
 		return dbBakDir.getAbsolutePath();
 	}

@@ -320,7 +320,7 @@ export default [
         },
       },
       {
-        path: 'comment',
+        path: 'comment/:questionTypeId/:commentState?',
         name: 'SimulateComment',
         component: () => import('@/views/simulate/Comment.vue'),
         hidden: true,

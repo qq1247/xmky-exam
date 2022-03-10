@@ -61,6 +61,7 @@ import {
 import QuestionDetail from 'components/QuestionDetail/Index.vue'
 import QuestionComment from 'components/QuestionComment/Index.vue'
 import CommentText from 'components/QuestionComment/CommentText.vue'
+import { getOneDict } from '@/utils/getDict'
 export default {
   components: {
     CommentText,
@@ -69,7 +70,7 @@ export default {
   },
   data() {
     return {
-      id: null,
+      questionTypeId: null,
       curPage: 1,
       pageSize: 10,
       totalPage: 0,
@@ -83,26 +84,17 @@ export default {
     }
   },
   mounted() {
-    const { id, commentState } = this.$route.query
-    this.id = id
+    const { questionTypeId, commentState } = this.$route.params
+    this.questionTypeId = questionTypeId
     this.commentState = Number(commentState)
+    this.difficultyList = getOneDict('QUESTION_DIFFICULTY')
+    this.typeList = getOneDict('QUESTION_TYPE')
     this.init()
   },
   methods: {
-    async init() {
-      const typeDictData = await dictListPage({
-        dictIndex: 'QUESTION_TYPE',
-      })
-
-      this.typeList = typeDictData.data.list // 初始化类型下拉框
-
-      const difficultyDictData = await dictListPage({
-        dictIndex: 'QUESTION_DIFFICULTY',
-      })
-
-      this.difficultyList = difficultyDictData.data.list // 初始化难度下拉框
-
-      this.query().then((res) => {
+    init() {
+      this.query().then(() => {
+        if (!this.questionList.length) return
         this.showDetails(this.questionList[this.currentIndex].id)
         if (this.commentState !== 0) {
           this.getQuestionComment()
@@ -114,7 +106,7 @@ export default {
       const {
         data: { list },
       } = await questionTypeOpenQuestion({
-        questionTypeId: this.id,
+        questionTypeId: this.questionTypeId,
         curPage: 1,
         pageSize: 100,
         state: 1,
@@ -122,8 +114,8 @@ export default {
       this.questionList = list
     },
     // 获取试题详情
-    async showDetails(id) {
-      const res = await questionTypeOpenQuestionGet({ questionId: id })
+    async showDetails(questionId) {
+      const res = await questionTypeOpenQuestionGet({ questionId })
       if (res?.code != 200) {
         this.$message.error('获取详情失败！请重试')
         this.questionDetail = {}

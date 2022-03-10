@@ -144,7 +144,7 @@ public class ServerParmServiceImpl implements ServerPramService {
 			DatabaseMetaData metaData = connection.getMetaData();
 			data = new HashMap<String, Object>();
 			data.put("name", "数据库");
-			data.put("value", String.format("%s/%s", metaData.getDatabaseProductName(), metaData.getDatabaseProductVersion()));
+			data.put("value", String.format("%s%s%s", metaData.getDatabaseProductName(), File.separator, metaData.getDatabaseProductVersion()));
 			result.add(data);
 			
 			// 其他信息

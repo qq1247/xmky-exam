@@ -1,11 +1,14 @@
 package com.wcpdoc.base.service.impl;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 
 import javax.annotation.Resource;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.base.cache.ParmCache;
@@ -25,6 +28,7 @@ import com.wcpdoc.core.util.ValidateUtil;
  */
 @Service
 public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService {
+	private static final Logger log = LoggerFactory.getLogger(ParmServiceImpl.class);
 	@Resource
 	private ParmDao parmDao;
 	@Resource
@@ -111,16 +115,17 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		parm.setFileUploadDir(uploadDir);
 		parmDao.update(parm);
 		
+		File oldFileUploadFile = new File(String.format("%s%s%s%s%s", oldFileUploadDir, File.separator, "bak", File.separator, "file"));
+		File uploadDirFile = new File(String.format("%s%s%s", uploadDir, File.separator, "bak"));
 		try {
-			File oldFileUploadFile = new File(String.format("%s/%s", oldFileUploadDir, "bak/file"));
-			File uploadDirFile = new File(String.format("%s/%s", uploadDir, "bak"));
 			FileUtils.copyDirectoryToDirectory(oldFileUploadFile, uploadDirFile);//FileUtils.moveToDirectory();// 目录存在报错为已存在
 			FileUtils.deleteDirectory(oldFileUploadFile);
 		} catch (Exception e) {
 			if (e.getMessage().contains("does not exist")) {
-				throw new MyException("源文件已被删除");
+				throw new MyException("原备份目录不存在，不能移动");
 			}
-			throw new MyException(e);
+			log.error("移动上传备份目录失败：", e);
+			throw new MyException("未知异常");
 		}
 		ParmCache.flushCache(parm);
 	}
@@ -138,22 +143,31 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 			throw new MyException("目录名称相同");
 		}
 		
+		// 修改参数
 		parm.setUpdateTime(new Date());
 		parm.setUpdateUserId(getCurUser().getId());
 		parm.setDbBakDir(bakDir);
 		parmDao.update(parm);
 		
-		try {
-			File oldBakFile = new File(String.format("%s/%s", oldBakDir, "bak/db"));
-			File bakDirFile = new File(String.format("%s/%s", bakDir, "bak"));
-			FileUtils.copyDirectoryToDirectory(oldBakFile, bakDirFile);//FileUtils.moveToDirectory();// 目录存在报错为已存在
-			FileUtils.deleteDirectory(oldBakFile);
-		} catch (Exception e) {
-			if (e.getMessage().contains("does not exist")) {
-				throw new MyException("源文件已被删除");
+		// 移动备份目录
+			File oldBakFile = new File(String.format("%s%s%s%s%s", oldBakDir, File.separator, "bak", File.separator, "db"));
+			File bakDirFile = new File(String.format("%s%s%s", bakDir, File.separator, "bak"));
+			try {
+				FileUtils.copyDirectoryToDirectory(oldBakFile, bakDirFile);//FileUtils.moveToDirectory();// 在已存在的目录上移动不支持
+				FileUtils.deleteDirectory(oldBakFile);
+			} catch (Exception e) {
+				if (e.getMessage().contains("does not exist")) {
+					throw new MyException("原备份目录不存在，不能移动");
+				}
+				log.error("移动数据库备份目录失败：", e);
+				throw new MyException("未知异常");
 			}
-			throw new MyException(e);
-		}
+		
+		// 更新缓存
 		ParmCache.flushCache(parm);
+	}
+	
+	public static void main(String[] args) throws IOException {
+		FileUtils.copyDirectoryToDirectory(new File("c:/123"), new File("c:/456"));
 	}
 }

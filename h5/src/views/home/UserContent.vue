@@ -414,9 +414,9 @@ export default {
         return
       }
       this.$router.push({
-        path: '/question/comment',
-        query: {
-          id: questionTypeId,
+        name: 'SimulateComment',
+        params: {
+          questionTypeId,
           commentState,
         },
       })
