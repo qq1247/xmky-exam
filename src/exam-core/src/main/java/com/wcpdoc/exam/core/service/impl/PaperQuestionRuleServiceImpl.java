@@ -250,22 +250,18 @@ public class PaperQuestionRuleServiceImpl extends BaseServiceImp<PaperQuestionRu
 	
 	@Override
 	public void publishCheck(Paper paper){
-		Map<Integer, List<Question>> questionListCache = null;// 试题分类下所有的试题条件
-		List<PaperQuestionRule> paperRuleList = null;// 随机章节规则
-		if (paper.getGenType() == 2) {// 获取随机组卷 列表
-			questionListCache = new HashMap<>();
-			paperRuleList = getChapterList(paper.getId(), null);
-			Set<Integer> questionTypeIdSet = new HashSet<>();
-			for (PaperQuestionRule rule : paperRuleList) {
-				if (questionTypeIdSet.contains(rule.getQuestionTypeId())) {
-					continue;
-				}
-				questionTypeIdSet.add(rule.getQuestionTypeId());
-				List<Question> questionList =  getQuestionList(rule.getQuestionTypeId());
-				questionListCache.put(rule.getQuestionTypeId(), questionList);
+		Map<Integer, List<Question>> questionListCache = new HashMap<>();// 试题分类下所有的试题条件
+		List<PaperQuestionRule> paperRuleList = getChapterList(paper.getId(), null);// 随机章节规则
+		Set<Integer> questionTypeIdSet = new HashSet<>();
+		for (PaperQuestionRule rule : paperRuleList) {
+			if (questionTypeIdSet.contains(rule.getQuestionTypeId())) {
+				continue;
 			}
+			questionTypeIdSet.add(rule.getQuestionTypeId());
+			List<Question> questionList =  getQuestionList(rule.getQuestionTypeId());
+			questionListCache.put(rule.getQuestionTypeId(), questionList);
 		}
-		
+	
 		Map<PaperQuestionRuleEx, Integer> ruleExNumCache = new HashMap<>();
 		for (Integer questionTypeId : questionListCache.keySet()) {
 			for (Question question : questionListCache.get(questionTypeId)) {
@@ -295,6 +291,5 @@ public class PaperQuestionRuleServiceImpl extends BaseServiceImp<PaperQuestionRu
 				}
 			}
 		}
-	
 	}
 }

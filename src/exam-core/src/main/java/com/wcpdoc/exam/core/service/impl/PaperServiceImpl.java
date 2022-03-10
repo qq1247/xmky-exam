@@ -1119,8 +1119,6 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			}
 		}
 		
-		paperQuestionRuleService.publishCheck(paper);//校验章节随机规则
-		
 		boolean ai = true;
 		BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0); //试卷总分
 		if (paper.getGenType() == 1) {
@@ -1142,6 +1140,8 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		}
 		
 		if (paper.getGenType() == 2) {
+			paperQuestionRuleService.publishCheck(paper);//校验章节随机规则
+			
 			for (PaperQuestion paperQuestion : chapterList) {
 				List<PaperQuestionRule> paperQuestionRuleList = paperQuestionRuleService.getChapterList(paperQuestion.getPaperId(), paperQuestion.getId());
 				for (PaperQuestionRule paperQuestionRule : paperQuestionRuleList) {
