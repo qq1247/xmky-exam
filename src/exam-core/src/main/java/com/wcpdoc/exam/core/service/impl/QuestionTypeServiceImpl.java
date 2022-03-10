@@ -116,7 +116,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		} else {
 			entity.setWriteUserIds(String.format(",%s,", StringUtil.join(writeUserIds)));
 			if (!entity.getWriteUserIds().contains(String.format(",%s,", entity.getCreateUserId()))) {// 如果页面没有选择创建人，添加创建人
-				entity.setWriteUserIds(String.format("%s,%s", entity.getWriteUserIds(), entity.getCreateUserId()));
+				entity.setWriteUserIds(String.format("%s%s,", entity.getWriteUserIds(), entity.getCreateUserId()));
 			}
 		}
 		entity.setUpdateTime(new Date());
