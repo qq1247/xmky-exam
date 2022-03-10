@@ -77,7 +77,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		}
 		
 		// 配置刷入缓存
-		ParmCache.flushCache(parm);
+		ParmCache.flushCache(entity);
 	}
 
 	@Override
