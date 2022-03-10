@@ -690,9 +690,9 @@ http请求头需添加Authorization字段，
 | paperQuestionId | Integer       | 章节ID   | 是   |
 | questionTypeIds  | Integer[] | 试题分类ID  | 是   |
 | types |Integer[] | 选择类型 | 是   |
-| difficultys | Integer[]   | 难易程度 | 否   |
-| ais | Integer[]   | 智能阅卷 |  否  |
-| scoreOptions | String(8)       | 分数选择项 |  否  |
+| difficultys | String[]   | 难易程度 | 是  |
+| ais | String[]   | 智能阅卷 |  是  |
+| scoreOptions | String[]   | 分数选择项 | 是 |
 | nums | Integer[] | 题数 | 是  |
 | scores | Double[]  | 分数 | 是  |
 
@@ -712,8 +712,8 @@ http请求头需添加Authorization字段，
 |data.list[].rule[].paperId  | Integer  | 试卷ID |
 |data.list[].rule[].questionTypeId  | Integer  | 试题分类ID |
 |data.list[].rule[].type  | Integer  | 选择类型 |
-|data.list[].rule[].difficultys  | Integer[]  | 难易程度 |
-|data.list[].rule[].ais  | Integer[]  | 智能阅卷 |
+|data.list[].rule[].difficultys  | String[]  | 难易程度 |
+|data.list[].rule[].ais  | String[]  | 智能阅卷 |
 |data.list[].rule[].scoreOptions |  String[]  | 分数选择项 |
 |data.list[].rule[].num  | Integer  | 题数 |
 |data.list[].rule[].score  | Double  | 分数 |
