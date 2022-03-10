@@ -68,9 +68,9 @@ export default {
     $route: {
       immediate: true,
       handler(e) {
-        if (e.name === 'Login') return //未登录的时候不做路由面包屑校验
         this.active = e.path.split('/')[1]
         this.layout = e.meta.layout
+        if (e.name === 'Login') return //未登录的时候不做路由面包屑校验
         this.setNavBar()
       },
     },

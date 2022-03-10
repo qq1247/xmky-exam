@@ -285,9 +285,10 @@ export default {
     // 编辑试题
     questionEdit({ id, type }) {
       this.detailStatus = false
-      this.questionId = id
-      this.questionType = type
-      this.$refs.questionType.questionType = type
+      this.$nextTick(() => {
+        this.questionId = id
+        this.questionType = type
+      })
     },
     // 复制试题
     async copy(id) {

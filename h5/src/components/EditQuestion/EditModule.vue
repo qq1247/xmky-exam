@@ -144,6 +144,19 @@
       </el-col>
     </el-row>
 
+    <!-- 状态 -->
+    <el-form-item label="状态">
+      <el-switch
+        active-color="#0094e5"
+        :active-value="1"
+        active-text="发布"
+        inactive-color="#ff4949"
+        :inactive-value="2"
+        inactive-text="试卷不可见"
+        v-model="editForm.state"
+      ></el-switch>
+    </el-form-item>
+
     <!-- 答案 -->
     <el-form-item
       label="答案"
@@ -292,7 +305,7 @@
         </el-row>
         <el-button
           :disabled="editForm.answers.length >= 7"
-          @click="addFillBlanks(editForm.answers.length,'')"
+          @click="addFillBlanks(editForm.answers.length, '')"
           class="option-btn"
           style="margin-left: 65px"
           type="primary"
@@ -509,7 +522,7 @@ export default {
             ]
     },
     questionId(n) {
-      if(n){
+      if (n) {
         this.getQuestionDetail(n)
       }
     },
@@ -668,6 +681,7 @@ export default {
         analysis: this.editForm.analysis,
         score: this.editForm.score,
         ai: this.editForm.ai,
+        state: this.editForm.state,
       }
 
       status
