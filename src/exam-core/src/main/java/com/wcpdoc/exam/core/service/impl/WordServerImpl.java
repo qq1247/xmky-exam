@@ -433,7 +433,10 @@ public class WordServerImpl extends WordServer {
 			}
 		} else if (type == 5 && ai.getAi() == 2) {// 问答、非智能阅卷
 			String answerTxt = getTxt(answerNodeList, 0, answerNodeList.size());
-			answerTxt = answerTxt.replace("【答案：", "");
+			answerTxt = answerTxt.replaceFirst("【", "");
+			answerTxt = answerTxt.replaceFirst("答", "");
+			answerTxt = answerTxt.replaceFirst("案", "");
+			answerTxt = answerTxt.replaceFirst("：", "");
 			int lastIndex = answerTxt.lastIndexOf("】");
 			if (lastIndex == -1) {
 				throw new MyException(String.format("答案格式不正确：%s】", StringUtil.delHTMLTag(answerNodeList.toString())));
