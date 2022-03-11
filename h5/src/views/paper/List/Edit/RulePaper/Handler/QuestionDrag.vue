@@ -141,7 +141,7 @@
 <script>
 import { getQuick } from '@/utils/storage'
 import { getOneDict } from '@/utils/getDict'
-import { paperQuestionAdd } from 'api/paper'
+import { paperQuestionAdd, paperGet } from 'api/paper'
 import { questionListPage } from 'api/question'
 import Draggable from 'vuedraggable'
 export default {
@@ -153,6 +153,7 @@ export default {
       total: 1,
       curPage: 1,
       pageSize: 5,
+      markType: 1,
       paperList: [],
       queryForm: {
         id: '', // 编号
@@ -177,12 +178,13 @@ export default {
         .dictValue
     },
   },
-  created() {
-    this.queryQuestion()
+  async created() {
     this.queryForm.typeDictList = getOneDict('QUESTION_TYPE')
     this.queryForm.difficultyDictList = getOneDict('QUESTION_DIFFICULTY')
-  },
-  activated() {
+    const res = await paperGet({
+      id: this.$route.params.id || getQuick().id,
+    })
+    this.markType = res.data.markType
     this.queryQuestion()
   },
   methods: {
@@ -222,33 +224,7 @@ export default {
         difficulty: this.queryForm.difficulty,
         scoreStart: this.queryForm.score,
         scoreEnd: this.queryForm.score,
-        exPaperId: this.paperId,
-        state: 1,
-        rand: 'rand',
-        curPage: 1,
-        pageSize: this.pageSize,
-      })
-      res?.code === 200
-        ? (this.paperList = res.data.list)
-        : this.$message.error('请刷新重新获取试题！')
-    },
-    // 条件查询
-    search() {
-      this.curPage = 1
-      this.queryQuestion()
-    },
-    // 随机查询试题
-    async randomQueryQuestion() {
-      const res = await questionListPage({
-        id: this.queryForm.id,
-        ai: this.markType === 1 ? 1 : '',
-        type: this.queryForm.type,
-        title: this.queryForm.title,
-        questionTypeName: this.queryForm.questionTypeName,
-        difficulty: this.queryForm.difficulty,
-        scoreStart: this.queryForm.score,
-        scoreEnd: this.queryForm.score,
-        exPaperId: this.paperId,
+        exPaperId: this.$route.params.id || getQuick().id,
         state: 1,
         rand: 'rand',
         curPage: 1,

@@ -115,6 +115,7 @@ import {
 } from 'api/paper'
 import { getQuick, setQuick } from '@/utils/storage'
 import CustomSelect from 'components/CustomSelect.vue'
+import dayjs from 'dayjs'
 export default {
   components: { CustomSelect },
   data() {
@@ -260,6 +261,8 @@ export default {
     // 选择模式
     async selectPaperType(paperType) {
       if (paperType) {
+        this.paperForm.name = dayjs().format('YYYY-MM-DD')
+        this.paperForm.passScore = 60
         const paperTypeList = await paperTypeListPage({
           name: '我的试卷',
           curPage: 1,

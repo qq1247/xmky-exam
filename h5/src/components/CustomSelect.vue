@@ -115,10 +115,11 @@ export default {
   padding-bottom: 35px;
 }
 .select-input {
-  padding: 0 10px;
+  padding: 0 5px;
   /deep/.el-input__inner {
     border: none;
     border-bottom: 1px solid #dcdfe6;
+    border-radius: 0;
   }
 }
 .select-pager {
@@ -127,7 +128,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px 0;
+  padding: 10px 5px 0;
   .page-pre,
   .page-next {
     width: 30%;

@@ -173,7 +173,7 @@
                   </template>
                   <div
                     v-if="item.type === 5"
-                    v-html="`${myExamDetailCache[routerIndex].answers}[0]`"
+                    v-html="`${myExamDetailCache[routerIndex].answers}`"
                   ></div>
                 </el-col>
               </el-row>
