@@ -1,7 +1,6 @@
 package com.wcpdoc.exam.core.dao;
 
 import java.util.List;
-import java.util.Map;
 
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
@@ -82,16 +81,6 @@ public interface PaperQuestionDao extends BaseDao<PaperQuestion>{
 	 * @return List<Question>
 	 */
 	List<Question> getQuestionRandList(Integer examId, Integer paperId);
-	
-	/**
-	 * 获取随机试题列表答案
-	 * 
-	 * v1.0 chenyun 2022年2月16日下午3:16:06
-	 * @param paperId
-	 * @param questionId
-	 * @return List<Map<String, Object>>
-	 */
-	List<Map<String, Object>> questionAnswerList(Integer examId, Integer paperId, Integer questionId);
 	
 	/**
 	 * 获取随机试题列表选择项

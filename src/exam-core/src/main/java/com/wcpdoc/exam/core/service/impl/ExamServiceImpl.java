@@ -1,5 +1,6 @@
 package com.wcpdoc.exam.core.service.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -19,6 +20,7 @@ import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
+import com.wcpdoc.core.util.BigDecimalUtil;
 import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
@@ -30,18 +32,22 @@ import com.wcpdoc.exam.core.entity.MyExamDetail;
 import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
+import com.wcpdoc.exam.core.entity.PaperQuestionAnswer;
 import com.wcpdoc.exam.core.entity.PaperQuestionRule;
 import com.wcpdoc.exam.core.entity.PaperQuestionRuleEx;
 import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.ExamTypeService;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
+import com.wcpdoc.exam.core.service.PaperQuestionAnswerService;
 import com.wcpdoc.exam.core.service.PaperQuestionRuleService;
 import com.wcpdoc.exam.core.service.PaperQuestionService;
 import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.PaperTypeService;
+import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionService;
 
 /**
@@ -75,6 +81,10 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	private PaperQuestionService paperQuestionService;
 	@Resource
 	private PaperQuestionRuleService paperQuestionRuleService;
+	@Resource
+	private QuestionAnswerService questionAnswerService;
+	@Resource
+	private PaperQuestionAnswerService paperQuestionAnswerService;
 	
 	@Override
 	@Resource(name = "examDaoImpl")
@@ -429,7 +439,71 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 
 					usedQuestion.add(question.getId());
 					randPaper.add(paperQuestion);
+
 					
+					//添加试题答案
+					BigDecimal total = new BigDecimal(0.00);
+					List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());//获取试题答案
+					
+					if (!ValidateUtil.isValid(questionAnswerList)) {// 计算每个题多少分
+						continue;
+					}
+					int listSize = questionAnswerList.size();
+					List<BigDecimal> singleScoreList = new ArrayList<>();
+					BigDecimal singleScore = BigDecimalUtil.newInstance(paperQuestionRule.getScore()).div(listSize, 3).getResult();
+					for (int j = 1; j < listSize; j++) {
+						singleScoreList.add(singleScore);
+					}
+					singleScoreList.add(BigDecimalUtil.newInstance(singleScore).mul(listSize - 1).sub(paperQuestionRule.getScore()).mul(-1).getResult());
+					for(int j = 0; j < questionAnswerList.size(); j++ ){
+						if (question.getType() == 1 || question.getType() == 4 ) {
+							PaperQuestionAnswer paperQuestionAnswer = new PaperQuestionAnswer();
+							paperQuestionAnswer.setAnswer(questionAnswerList.get(j).getAnswer());
+							if (question.getAi() == 1 && paperQuestionRule.getScore() != null) {
+								paperQuestionAnswer.setScore(singleScoreList.get(j));
+							}else{
+								paperQuestionAnswer.setScore(new BigDecimal(0));
+							}
+							paperQuestionAnswer.setPaperId(paperQuestionRule.getPaperId());
+							paperQuestionAnswer.setPaperQuestionId(paperQuestion.getId());
+							paperQuestionAnswer.setQuestionId(question.getId());
+							paperQuestionAnswer.setNo(j+1);
+							paperQuestionAnswerService.add(paperQuestionAnswer);
+							total = paperQuestionRule.getScore();
+						} else if (question.getType() == 2) {
+							PaperQuestionAnswer paperQuestionAnswer = new PaperQuestionAnswer();
+							if (question.getAi() == 1 && questionAnswerList.get(j).getAnswer() != null) {
+								paperQuestionAnswer.setScore(singleScoreList.get(j).divide(new BigDecimal(2)));
+							}else{
+								paperQuestionAnswer.setScore(new BigDecimal(0));
+							}
+							paperQuestionAnswer.setAnswer(questionAnswerList.get(j).getAnswer());
+							paperQuestionAnswer.setPaperId(paperQuestionRule.getPaperId());
+							paperQuestionAnswer.setPaperQuestionId(paperQuestion.getId());
+							paperQuestionAnswer.setQuestionId(question.getId());
+							paperQuestionAnswer.setNo(j+1);
+							paperQuestionAnswerService.add(paperQuestionAnswer);
+							total = paperQuestionRule.getScore();
+						} else if (question.getType() == 3 || question.getType() == 5) {
+							PaperQuestionAnswer paperQuestionAnswer = new PaperQuestionAnswer();
+							
+							if (question.getAi() == 1 && questionAnswerList.get(j).getAnswer() != null) {
+								paperQuestionAnswer.setScore(singleScoreList.get(j));
+							}else{
+								paperQuestionAnswer.setScore(new BigDecimal(0));
+							}
+							paperQuestionAnswer.setAnswer(questionAnswerList.get(j).getAnswer());
+							paperQuestionAnswer.setPaperId(paperQuestionRule.getPaperId());
+							paperQuestionAnswer.setPaperQuestionId(paperQuestion.getId());
+							paperQuestionAnswer.setQuestionId(question.getId());
+							paperQuestionAnswer.setNo(j+1);
+							paperQuestionAnswerService.add(paperQuestionAnswer);
+							total = total.add(singleScoreList.get(j));
+						}
+					}
+					if (question.getAi() == 1 && paperQuestionRule.getScore().compareTo(total) != 0) {
+						throw new MyException("答案总分有误 ");
+					}
 					ruleRemainNum--;
 				}
 			}
@@ -552,21 +626,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					PaperQuestion paperQuestion = paperQuestionService.getEntity(paperRule.getPaperQuestionId());
 					throw new MyException(String.format("【%s】章节下第【%s】个规则题数不足【%s】道", paperQuestion.getName(), paperRule.getNo(), paperRule.getNum()));
 				}
-//				for (Integer difficulty : paperRule.getDifficultyArr()) {
-//					for (Integer ai : paperRule.getAiArr()) {
-//						PaperQuestionRuleEx paperRuleEx = new PaperQuestionRuleEx(paperRule.getType(), difficulty, ai);
-//						if (ruleExNumCache.get(paperRuleEx) == null) {
-//							PaperQuestion paperQuestion = paperQuestionService.getEntity(paperRule.getPaperQuestionId());
-//							throw new MyException(String.format("%s章节下第%s个规则题数不足%s道", paperQuestion.getName(), paperRule.getNo(), paperRule.getNum()));
-//						}
-//						
-//						Integer num = ruleExNumCache.put(paperRuleEx, ruleExNumCache.get(paperRuleEx) - paperRule.getNum());
-//						if (num < 0) {
-//							PaperQuestion paperQuestion = paperQuestionService.getEntity(paperRule.getPaperQuestionId());
-//							throw new MyException(String.format("%s章节下第%s个规则题数不足%s道", paperQuestion.getName(), paperRule.getNo(), paperRule.getNum()));
-//						}
-//					}
-//				}
 			}
 		}
 	}
@@ -595,5 +654,12 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	public List<Exam> getList() {
 		return examDao.getList();
 	}
-
+	
+	
+	public static void main(String[] args) {
+		BigDecimal divide = new BigDecimal(1).divide(new BigDecimal(3), 2, BigDecimal.ROUND_FLOOR);
+		System.err.println(divide);
+	}
+	
+	
 }

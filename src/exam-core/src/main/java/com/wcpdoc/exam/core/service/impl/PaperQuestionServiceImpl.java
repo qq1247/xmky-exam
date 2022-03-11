@@ -1,7 +1,6 @@
 package com.wcpdoc.exam.core.service.impl;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -63,11 +62,6 @@ public class PaperQuestionServiceImpl extends BaseServiceImp<PaperQuestion> impl
 	@Override
 	public List<Question> getQuestionRandList(Integer examId, Integer paperId) {
 		return paperQuestionDao.getQuestionRandList(examId, paperId);
-	}
-	
-	@Override
-	public List<Map<String, Object>> questionAnswerList(Integer examId, Integer paperId, Integer questionId) {
-		return paperQuestionDao.questionAnswerList(examId, paperId, questionId);
 	}
 	
 	@Override

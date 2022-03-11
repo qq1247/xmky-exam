@@ -1,7 +1,6 @@
 package com.wcpdoc.exam.core.service.impl;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -679,20 +678,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	private Map<Integer, List<PaperQuestionAnswer>> questionRandAnswerListCache(Integer examId, Integer paperId, Collection<Question> questionRandList) {
 		Map<Integer, List<PaperQuestionAnswer>> questionAnswerListCache = new HashMap<>();
 		for (Question question : questionRandList) {
-			// 随机答案组合成试题试卷答案格式, id是随机试题id,分值只有是多选的时候有用漏选的分
-			List<Map<String, Object>> questionAnswerList = paperQuestionService.questionAnswerList(examId, paperId, question.getId());
-			
-			List<PaperQuestionAnswer> paperQuestionAnswerList = new ArrayList<PaperQuestionAnswer>();
-			for(Map<String, Object> map : questionAnswerList){
-				PaperQuestionAnswer paperQuestionAnswer = new PaperQuestionAnswer();
-				paperQuestionAnswer.setId(Integer.valueOf(map.get("id").toString()));
-				paperQuestionAnswer.setAnswer(map.get("answer").toString());
-				paperQuestionAnswer.setScore(new BigDecimal(map.get("score").toString()));
-				paperQuestionAnswer.setPaperId(Integer.valueOf(map.get("paperId").toString()));
-				paperQuestionAnswer.setQuestionId(Integer.valueOf(map.get("questionId").toString()));
-				paperQuestionAnswerList.add(paperQuestionAnswer);
-			}
-			questionAnswerListCache.put(question.getId(), paperQuestionAnswerList);
+			List<PaperQuestionAnswer> questionAnswerList = paperQuestionAnswerService.getList(paperId, question.getId());
+			questionAnswerListCache.put(question.getId(), questionAnswerList);
 		}
 		return questionAnswerListCache;
 	}

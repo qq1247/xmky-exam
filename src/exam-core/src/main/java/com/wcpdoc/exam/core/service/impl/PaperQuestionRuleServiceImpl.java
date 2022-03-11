@@ -186,7 +186,7 @@ public class PaperQuestionRuleServiceImpl extends BaseServiceImp<PaperQuestionRu
 				if (!ValidateUtil.isValid(scoreOptions)) {
 					scoreOptions = new String[1];
 				}
-				scoreOptions[i] = "2";
+				scoreOptions[i] = "1";
 			}
 		}
 		

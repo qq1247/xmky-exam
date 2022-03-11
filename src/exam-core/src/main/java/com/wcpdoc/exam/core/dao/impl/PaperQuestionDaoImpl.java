@@ -1,7 +1,6 @@
 package com.wcpdoc.exam.core.dao.impl;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
@@ -73,15 +72,6 @@ public class PaperQuestionDaoImpl extends RBaseDaoImpl<PaperQuestion> implements
 				+ "INNER JOIN EXM_QUESTION QUESTION ON PAPER_QUESTION.QUESTION_ID = QUESTION.ID "
 				+ "WHERE PAPER_QUESTION.TYPE != 1 AND PAPER_QUESTION.EXAM_ID = ? AND PAPER_QUESTION.PAPER_ID = ? ";
 		return getList(sql, new Object[]{ examId, paperId }, Question.class);
-	}
-
-	@Override
-	public List<Map<String, Object>> questionAnswerList(Integer examId, Integer paperId, Integer questionId) {
-		String sql = "SELECT PAPER_QUESTION.ID, QUESTION_ANSWER.ANSWER, PAPER_QUESTION.SCORE, PAPER_QUESTION.PAPER_ID, PAPER_QUESTION.QUESTION_ID "
-				+ "FROM EXM_QUESTION_ANSWER QUESTION_ANSWER "
-				+ "INNER JOIN EXM_PAPER_QUESTION PAPER_QUESTION ON QUESTION_ANSWER.QUESTION_ID = PAPER_QUESTION.QUESTION_ID "
-				+ "WHERE PAPER_QUESTION.TYPE != 1 AND PAPER_QUESTION.EXAM_ID = ? AND PAPER_QUESTION.PAPER_ID = ? AND PAPER_QUESTION.QUESTION_ID = ? ORDER BY QUESTION_ANSWER.NO ASC ";
-		return getMapList(sql, new Object[]{ examId, paperId, questionId });
 	}
 	
 	@Override
