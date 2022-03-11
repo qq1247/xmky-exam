@@ -141,7 +141,9 @@ public class PaperQuestionRuleServiceImpl extends BaseServiceImp<PaperQuestionRu
 		if (questionTypeIds.length == 1) {
 			difficultys[0] = StringUtil.join(difficultys);// 规则只有一个的情况下按逗号分隔的难度被拆分成了数组
 			ais[0] = StringUtil.join(ais);
-			scoreOptions[0] = StringUtil.join(scoreOptions);
+			if (ValidateUtil.isValid(scoreOptions)) {
+				scoreOptions[0] = StringUtil.join(scoreOptions);
+			}
 		}
 		
 		for (int i = 0; i < questionTypeIds.length; i++) {// 试题分类校验
