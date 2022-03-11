@@ -535,21 +535,38 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			}
 			
 			for (PaperQuestionRule paperRule : paperRuleList) {
-				for (Integer difficulty : paperRule.getDifficultyArr()) {
-					for (Integer ai : paperRule.getAiArr()) {
-						PaperQuestionRuleEx paperRuleEx = new PaperQuestionRuleEx(paperRule.getType(), difficulty, ai);
-						if (ruleExNumCache.get(paperRuleEx) == null) {
-							PaperQuestion paperQuestion = paperQuestionService.getEntity(paperRule.getPaperQuestionId());
-							throw new MyException(String.format("%s章节下第%s个规则题数不足%s道", paperQuestion.getName(), paperRule.getNo(), paperRule.getNum()));
-						}
-						
-						Integer num = ruleExNumCache.put(paperRuleEx, ruleExNumCache.get(paperRuleEx) - paperRule.getNum());
-						if (num < 0) {
-							PaperQuestion paperQuestion = paperQuestionService.getEntity(paperRule.getPaperQuestionId());
-							throw new MyException(String.format("%s章节下第%s个规则题数不足%s道", paperQuestion.getName(), paperRule.getNo(), paperRule.getNum()));
+				Integer paperRuleNum = paperRule.getNum();
+				Set<PaperQuestionRuleEx> keySet = ruleExNumCache.keySet();
+				for(PaperQuestionRuleEx paperQuestionRuleEx : keySet){
+					if (paperRule.getType() == paperQuestionRuleEx.getType() 
+							&& paperRule.getDifficultys().contains(paperQuestionRuleEx.getDifficulty().toString()) 
+							&& paperRule.getAis().contains(paperQuestionRuleEx.getAi().toString()) ) { //如果包含
+						paperRuleNum = paperRuleNum - ruleExNumCache.get(paperQuestionRuleEx);
+						if (paperRuleNum <= 0) {
+							break;
 						}
 					}
 				}
+				
+				if (paperRuleNum > 0) {
+					PaperQuestion paperQuestion = paperQuestionService.getEntity(paperRule.getPaperQuestionId());
+					throw new MyException(String.format("【%s】章节下第【%s】个规则题数不足【%s】道", paperQuestion.getName(), paperRule.getNo(), paperRule.getNum()));
+				}
+//				for (Integer difficulty : paperRule.getDifficultyArr()) {
+//					for (Integer ai : paperRule.getAiArr()) {
+//						PaperQuestionRuleEx paperRuleEx = new PaperQuestionRuleEx(paperRule.getType(), difficulty, ai);
+//						if (ruleExNumCache.get(paperRuleEx) == null) {
+//							PaperQuestion paperQuestion = paperQuestionService.getEntity(paperRule.getPaperQuestionId());
+//							throw new MyException(String.format("%s章节下第%s个规则题数不足%s道", paperQuestion.getName(), paperRule.getNo(), paperRule.getNum()));
+//						}
+//						
+//						Integer num = ruleExNumCache.put(paperRuleEx, ruleExNumCache.get(paperRuleEx) - paperRule.getNum());
+//						if (num < 0) {
+//							PaperQuestion paperQuestion = paperQuestionService.getEntity(paperRule.getPaperQuestionId());
+//							throw new MyException(String.format("%s章节下第%s个规则题数不足%s道", paperQuestion.getName(), paperRule.getNo(), paperRule.getNum()));
+//						}
+//					}
+//				}
 			}
 		}
 	}
