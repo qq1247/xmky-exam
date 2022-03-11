@@ -119,7 +119,13 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		}
 
 		if (score != null) {
-			PaperQuestion paperQuestion = paperQuestionService.getEntity(exam.getPaperId(), questionId);
+			Paper paper = paperServiceImpl.getEntity(exam.getPaperId());
+			PaperQuestion paperQuestion;
+			if (paper.getGenType() == 1) {
+				paperQuestion = paperQuestionService.getEntity(exam.getPaperId(), questionId);
+			} else {
+				paperQuestion = paperQuestionService.getEntity(exam.getPaperId(), questionId, userId);
+			}
 			if (BigDecimalUtil.newInstance(score).sub(paperQuestion.getScore()).getResult().doubleValue() > 0) {
 				throw new MyException("最大分值：" + paperQuestion.getScore());
 			}
