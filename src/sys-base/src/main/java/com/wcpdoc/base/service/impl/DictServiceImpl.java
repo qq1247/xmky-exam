@@ -61,9 +61,12 @@ public class DictServiceImpl extends BaseServiceImp<Dict> implements DictService
 
 	@Override
 	public List<Dict> getList(String index) {
-		List<Dict> dictList = getList();
+		List<Dict> dictList = dictDao.getList();
 		List<Dict> targetDictList = new ArrayList<>();
 		for (Dict dict : dictList) {
+			if (!dict.getDictIndex().equals(index)) {
+				continue;
+			}
 			targetDictList.add(dict);
 		}
 		
@@ -74,6 +77,6 @@ public class DictServiceImpl extends BaseServiceImp<Dict> implements DictService
 			}
 			
 		});
-		return dictDao.getList();
+		return targetDictList;
 	}
 }
