@@ -487,14 +487,14 @@ export default {
       const index = this.userList.findIndex(
         (item) => item.userId === this.userId
       )
+      await this.markEnd()
+      await this.queryAnswerInfo()
       if (index === this.userList.length - 1) {
         this.$message.warning('已经是最后一卷了！')
         return
       }
-      await this.markEnd()
       this.userId = this.userList[index + 1].userId
       this.userInfo = this.userList[index + 1]
-      await this.queryAnswerInfo()
     },
     // 完成阅卷
     async markEnd() {
