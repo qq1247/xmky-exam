@@ -23,14 +23,6 @@
             ></el-input>
             <div class="chapter-handler">
               <el-button
-                @click="delRules(index)"
-                class="btn"
-                icon="common common-delete"
-                round
-                size="mini"
-                >清空规则</el-button
-              >
-              <el-button
                 @click="chapterDel(item.chapter)"
                 class="btn"
                 icon="common common-delete"
@@ -50,38 +42,26 @@
             id="chapterDesc"
           ></TinymceEditor>
         </div>
-        <el-card
+        <el-form
           class="box-card"
-          shadow="never"
-          v-for="(rand, randIndex) in item.paperQuestionRuleList"
-          :key="rand.id"
+          :model="paperQuestionRules[index]"
+          :ref="`ruleForm${index}`"
         >
-          <div slot="header">
-            <span>筛选规则</span>
-            <el-button
-              style="float: right; margin-top: -2px"
-              @click="delRule(index, randIndex)"
-              size="mini"
-              round
-              >删除</el-button
-            >
-          </div>
-          <el-form
-            :model="rand"
-            :rules="rules"
-            :ref="`ruleForm${index}${randIndex}`"
-          >
+          <div v-for="(rule, ruleIndex) in item.rule" :key="rule.id">
             <el-row>
               <el-col :span="3">
-                <el-form-item prop="questionTypeId">
+                <el-form-item
+                  :prop="`rule.${ruleIndex}.questionTypeId`"
+                  :rules="rules.questionTypeId"
+                >
                   <CustomSelect
-                    :ref="`questionSelect${index}${randIndex}`"
+                    :ref="`questionSelect${index}${ruleIndex}`"
                     :isAuto="false"
                     :multiple="false"
                     placeholder="试题分类"
-                    :value="rand.questionTypeId"
+                    :value="rule.questionTypeId"
                     :total="total"
-                    @change="(e) => selectQuestionType(e, index, randIndex)"
+                    @change="(e) => selectQuestionType(e, index, ruleIndex)"
                     @input="searchQuestionType"
                     @currentChange="getMoreQuestionType"
                     @visibleChange="getQuestionType"
@@ -96,8 +76,11 @@
                 </el-form-item>
               </el-col>
               <el-col :span="3" :offset="1">
-                <el-form-item prop="type">
-                  <el-select clearable placeholder="类型" v-model="rand.type">
+                <el-form-item
+                  :prop="`rule.${ruleIndex}.type`"
+                  :rules="rules.type"
+                >
+                  <el-select clearable placeholder="类型" v-model="rule.type">
                     <el-option
                       :key="parseInt(dict.dictKey)"
                       :label="dict.dictValue"
@@ -108,13 +91,16 @@
                 </el-form-item>
               </el-col>
               <el-col :span="4" :offset="1">
-                <el-form-item prop="difficulty">
+                <el-form-item
+                  :prop="`rule.${ruleIndex}.difficulty`"
+                  :rules="rules.difficulty"
+                >
                   <el-select
                     multiple
                     clearable
                     collapse-tags
                     placeholder="难度"
-                    v-model="rand.difficulty"
+                    v-model="rule.difficulty"
                   >
                     <el-option
                       :key="parseInt(dict.dictKey)"
@@ -128,15 +114,15 @@
               <el-col
                 :span="4"
                 :offset="1"
-                v-if="markType === 2 && [3, 5].includes(rand.type)"
+                v-if="markType === 2 && [3, 5].includes(rule.type)"
               >
-                <el-form-item prop="ai">
+                <el-form-item :prop="`rule.${ruleIndex}.ai`" :rules="rules.ai">
                   <el-select
                     multiple
                     clearable
                     collapse-tags
                     placeholder="是否智能"
-                    v-model="rand.ai"
+                    v-model="rule.ai"
                   >
                     <el-option
                       :key="parseInt(dict.dictKey)"
@@ -149,17 +135,23 @@
               </el-col>
               <el-col :span="6" :offset="1">
                 <div style="display: flex; align-items: center">
-                  <el-form-item prop="totalNumber">
+                  <el-form-item
+                    :prop="`rule.${ruleIndex}.totalNumber`"
+                    :rules="rules.totalNumber"
+                  >
                     添加：<el-input
                       class="rule-input"
-                      v-model="rand.totalNumber"
+                      v-model="rule.totalNumber"
                     ></el-input
                     >道题，&nbsp;&nbsp;
                   </el-form-item>
-                  <el-form-item prop="score">
+                  <el-form-item
+                    :prop="`rule.${ruleIndex}.score`"
+                    :rules="rules.score"
+                  >
                     每题&nbsp;&nbsp;<el-input
                       class="rule-input"
-                      v-model="rand.score"
+                      v-model="rule.score"
                     ></el-input
                     >分
                   </el-form-item>
@@ -169,11 +161,11 @@
             <el-form-item
               label="分数选项："
               label-width="85px"
-              v-if="rand.ai === 1 && [3, 5].includes(rand.type)"
+              v-if="rule.ai.includes(1) && [3, 5].includes(rule.type)"
             >
-              <el-checkbox-group v-model="rand.scoreOptions">
+              <el-checkbox-group v-model="rule.scoreOptions">
                 <el-tooltip
-                  v-if="rand.type === 3"
+                  v-if="rule.type === 3"
                   class="item"
                   content="默认答案有顺序"
                   effect="dark"
@@ -191,32 +183,30 @@
                 </el-tooltip>
               </el-checkbox-group>
             </el-form-item>
-            <el-row>
-              <el-col :span="2"
-                ><el-form-item>
-                  <el-button
-                    type="primary"
-                    @click="editQuestionRule(index, randIndex)"
-                    >{{ !rand.id ? '添加' : '修改' }}</el-button
-                  >
-                </el-form-item></el-col
-              >
-              <el-col :span="2"
-                ><el-form-item>
-                  <el-button
-                    type="primary"
-                    @click="resetQuestionRule(index, randIndex)"
-                    >重置</el-button
-                  >
-                </el-form-item></el-col
-              >
-            </el-row>
-          </el-form>
-        </el-card>
-        <div class="handler-btn" @click="addQuestionRule(index)">
-          <i class="common common-plus"></i>
-          <span>添加筛选</span>
-        </div>
+          </div>
+        </el-form>
+        <el-button
+          size="mini"
+          type="primary"
+          class="rule-btn"
+          @click="addQuestionRule(index)"
+          :disabled="item.rule.length >= 10"
+          >+添加规则</el-button
+        >
+        <el-button
+          size="mini"
+          type="danger"
+          class="rule-btn"
+          @click="delQuestionRule(index)"
+          :disabled="item.rule.length <= 1"
+          >-删除规则</el-button
+        >
+        <el-button
+          style="display: block"
+          type="primary"
+          @click="updateQuestionRule(index)"
+          >更新规则</el-button
+        >
       </div>
     </div>
 
@@ -232,11 +222,8 @@ import {
   paperChapterAdd,
   paperChapterEdit,
   paperChapterDel,
-  paperQuestionRuleAdd,
-  paperQuestionRuleEdit,
-  paperQuestionRuleDel,
+  paperQuestionRuleUpdate,
   paperQuestionRuleList,
-  paperQuestionTypeList,
 } from 'api/paper'
 import { questionTypeListPage } from 'api/question'
 import { getOneDict } from '@/utils/getDict'
@@ -347,8 +334,8 @@ export default {
       this.$nextTick(() => {
         if (this.paperQuestionRules.length) {
           this.paperQuestionRules.map((item, index) => {
-            if (item.paperQuestionRuleList.length) {
-              item.paperQuestionRuleList.map((rule, indexRule) => {
+            if (item.rule.length) {
+              item.rule.map((rule, indexRule) => {
                 this.$refs[`questionSelect${index}${indexRule}`][0].$refs[
                   'elSelect'
                 ].cachedOptions.push({
@@ -405,7 +392,7 @@ export default {
     },
     // 添加组卷规则
     addQuestionRule(index) {
-      this.paperQuestionRules[index].paperQuestionRuleList.push({
+      this.paperQuestionRules[index].rule.push({
         id: null,
         paperId: 2,
         questionTypeId: null,
@@ -416,6 +403,63 @@ export default {
         scoreOptions: [],
         totalNumber: '',
         score: '',
+      })
+    },
+    // 删除自由组卷规则
+    delQuestionRule(index) {
+      this.paperQuestionRules[index].rule.pop()
+    },
+    // 添加 | 修改自由组卷规则
+    updateQuestionRule(index) {
+      if (!this.paperQuestionRules[index]?.rule.length) {
+        this.$message.warning('规则不能为空')
+        return
+      }
+      this.$refs[`ruleForm${index}`][0].validate(async (valid) => {
+        if (!valid) {
+          return
+        }
+        const ruleParam = this.paperQuestionRules[index].rule.reduce(
+          (acc, cur) => {
+            ;[3, 5].includes(cur.type)
+              ? this.markType === 1
+                ? acc.ais.push('1')
+                : acc.ais.push(cur.ai.join(','))
+              : acc.ais.push('1')
+            ;[3, 5].includes(cur.type)
+              ? acc.scoreOptions.push(cur.scoreOptions.join(','))
+              : acc.scoreOptions.push('')
+            acc.difficultys.push(cur.difficulty.join(','))
+            acc.nums.push(cur.totalNumber)
+            acc.types.push(cur.type)
+            acc.scores.push(cur.score)
+            acc.questionTypeIds.push(cur.questionTypeId)
+
+            return acc
+          },
+          {
+            ais: [],
+            nums: [],
+            types: [],
+            scores: [],
+            difficultys: [],
+            scoreOptions: [],
+            questionTypeIds: [],
+          }
+        )
+
+        const res = await paperQuestionRuleUpdate({
+          paperId: this.paperId,
+          chapterId: this.paperQuestionRules[index].chapter.id,
+          ...ruleParam,
+        })
+
+        if (res?.code == 200) {
+          this.$message.success('更新成功！')
+          this.query()
+        } else {
+          this.$message.success('更新失败！')
+        }
       })
     },
     // 获取试题分类
@@ -437,92 +481,8 @@ export default {
       this.getQuestionType(curPage, name)
     },
     // 选择试题分类
-    selectQuestionType(e, index, randIndex) {
-      this.paperQuestionRules[index].paperQuestionRuleList[
-        randIndex
-      ].questionTypeId = e
-      // this.filterRule(e)
-    },
-    // 筛选规则
-    async filterRule(questionTypeId) {
-      const typeList = await paperQuestionTypeList({
-        questionTypeId,
-      })
-    },
-    // 添加 | 修改自由组卷规则
-    editQuestionRule(index, randIndex) {
-      this.$refs[`ruleForm${index}${randIndex}`][0].validate(async (valid) => {
-        if (!valid) {
-          return
-        }
-
-        const ruleParam =
-          this.paperQuestionRules[index].paperQuestionRuleList[randIndex]
-
-        let res
-        const params = {
-          paperId: this.paperId,
-          questionTypeId: ruleParam.questionTypeId,
-          paperQuestionId: this.paperQuestionRules[index].chapter.id,
-          ais: [3, 5].includes(ruleParam.type) ? this.markType === 1 ? [1] : ruleParam.ai : [1],
-          type: ruleParam.type,
-          difficultys: ruleParam.difficulty,
-          scoreOptions: ruleParam.scoreOptions,
-          num: ruleParam.totalNumber,
-          score: ruleParam.score,
-        }
-
-        if (!ruleParam.id) {
-          res = await paperQuestionRuleAdd(params)
-        } else {
-          res = await paperQuestionRuleEdit({ id: ruleParam.id, ...params })
-        }
-
-        if (res?.code == 200) {
-          this.$message.success(!ruleParam.id ? '添加成功！' : '修改成功！')
-          this.query()
-        } else {
-          this.$message.error(!ruleParam.id ? '添加失败！' : '修改失败！')
-        }
-      })
-    },
-    // 重置自由组卷规则
-    resetQuestionRule(index, randIndex) {
-      this.$refs[`ruleForm${index}${randIndex}`][0].resetFields()
-    },
-    // 删除自由组卷规则
-    async delRule(index, randIndex) {
-      const rule =
-        this.paperQuestionRules[index].paperQuestionRuleList[randIndex]
-      if (!rule.id) {
-        this.paperQuestionRules[index].paperQuestionRuleList.splice(
-          randIndex,
-          1
-        )
-      } else {
-        const res = await paperQuestionRuleDel({
-          ids: [`${rule.id}`],
-        })
-        this.refreshData(res, '删除规则')
-      }
-    },
-    // 清空章节下的所有规则
-    async delRules(index) {
-      const ids = this.paperQuestionRules[index].paperQuestionRuleList.reduce(
-        (acc, cur) => {
-          cur.id && acc.push(cur.id)
-          return acc
-        },
-        []
-      )
-      if (ids.length) {
-        const res = await paperQuestionRuleDel({
-          ids,
-        })
-        this.refreshData(res, '清空规则')
-      } else {
-        this.paperQuestionRules[index].paperQuestionRuleList = []
-      }
+    selectQuestionType(e, index, ruleIndex) {
+      this.paperQuestionRules[index].rule[ruleIndex].questionTypeId = e
     },
     // 更新页面数据
     refreshData(res, title) {
@@ -624,7 +584,6 @@ export default {
 
 .box-card {
   margin: 10px 20px 0;
-  box-shadow: 0 0 13px -4px rgba(0, 0, 0, 0.13);
 }
 
 .rule-input {
@@ -634,6 +593,10 @@ export default {
     border: none;
     border-bottom: 1px solid #dcdfe6;
   }
+}
+
+.rule-btn {
+  margin: 10px 0 20px 20px;
 }
 
 .handler-btn {

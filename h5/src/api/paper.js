@@ -52,15 +52,7 @@ export const paperTypeGet = (params) => request('paperType/get', params)
 export const paperTypeMove = (params) => request('paperType/move', params)
 export const paperTypeAuth = (params) => request('paperType/auth', params)
 
-export const paperQuestionRuleAdd = (params) =>
-  request('paperQuestionRule/add', params)
-export const paperQuestionRuleEdit = (params) =>
-  request('paperQuestionRule/edit', params)
-export const paperQuestionRuleDel = (params) =>
-  request('paperQuestionRule/del', params)
-export const paperQuestionRuleGet = (params) =>
-  request('paperQuestionRule/get', params)
+export const paperQuestionRuleUpdate = (params) =>
+  request('paperQuestionRule/update', params)
 export const paperQuestionRuleList = (params) =>
-  request('paperQuestionRule/paperQuestionRuleList', params)
-export const paperQuestionTypeList = (params) =>
-  request('paperQuestionRule/questionList', params)
+  request('paperQuestionRule/chapterAndRuleList', params)

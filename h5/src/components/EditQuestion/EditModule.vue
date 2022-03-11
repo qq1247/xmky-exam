@@ -146,15 +146,14 @@
 
     <!-- 状态 -->
     <el-form-item label="状态">
-      <el-switch
-        active-color="#0094e5"
-        :active-value="1"
-        active-text="发布"
-        inactive-color="#ff4949"
-        :inactive-value="2"
-        inactive-text="试卷不可见"
-        v-model="editForm.state"
-      ></el-switch>
+      <el-radio-group v-model="editForm.state">
+        <el-radio
+          :key="state.value"
+          :label="state.value"
+          v-for="state in editForm.states"
+          >{{ state.lab }}</el-radio
+        >
+      </el-radio-group>
     </el-form-item>
 
     <!-- 答案 -->
@@ -432,7 +431,7 @@ export default {
         difficultyList: [],
         title: '', // 标题
         ai: 1, // AI阅卷
-        state: 2,
+        state: 1,
         options: [
           {
             lab: 'A',
@@ -455,6 +454,16 @@ export default {
             lab: 'B',
             value: [],
             score: '',
+          },
+        ],
+        states: [
+          {
+            lab: '发布',
+            value: 1,
+          },
+          {
+            lab: '草稿',
+            value: 2,
           },
         ],
         // 答案
