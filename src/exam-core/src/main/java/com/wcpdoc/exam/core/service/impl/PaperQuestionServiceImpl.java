@@ -51,6 +51,11 @@ public class PaperQuestionServiceImpl extends BaseServiceImp<PaperQuestion> impl
 	}
 
 	@Override
+	public PaperQuestion getEntity(Integer paperId, Integer questionId, Integer userId) {
+		return paperQuestionDao.getEntity(paperId, questionId, userId);
+	}
+	
+	@Override
 	public void del(Integer examId, Integer userId) {
 		paperQuestionDao.del(examId, userId);
 	}

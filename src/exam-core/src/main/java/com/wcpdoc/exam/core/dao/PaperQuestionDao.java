@@ -54,6 +54,17 @@ public interface PaperQuestionDao extends BaseDao<PaperQuestion>{
 	PaperQuestion getEntity(Integer paperId, Integer questionId);
 	
 	/**
+	 * 获取试卷试题
+	 * 
+	 * v1.0 chenyun 2022年3月11日下午2:36:41
+	 * @param paperId
+	 * @param questionId
+	 * @param userId
+	 * @return PaperQuestion
+	 */
+	PaperQuestion getEntity(Integer paperId, Integer questionId, Integer userId);
+	
+	/**
 	 * 删除随机试题
 	 * 
 	 * v1.0 chenyun 2022年2月15日上午9:56:07

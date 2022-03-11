@@ -55,6 +55,12 @@ public class PaperQuestionDaoImpl extends RBaseDaoImpl<PaperQuestion> implements
 	}
 	
 	@Override
+	public PaperQuestion getEntity(Integer paperId, Integer questionId, Integer userId) {
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = ? AND QUESTION_ID = ? AND USER_ID = ?";
+		return getEntity(sql, new Object[]{paperId, questionId, userId}, PaperQuestion.class);
+	}
+	
+	@Override
 	public void del(Integer examId, Integer userId) {
 		String sql = "DELETE FROM EXM_PAPER_QUESTION WHERE TYPE != 1 AND EXAM_ID = ? AND USER_ID = ? ";
 		update(sql, new Object[] { examId, userId });
