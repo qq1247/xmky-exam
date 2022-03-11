@@ -173,7 +173,7 @@
                   </template>
                   <div
                     v-if="item.type === 5"
-                    v-html="`${myExamDetailCache[routerIndex].answers}`"
+                    v-html="`${myExamDetailCache[routerIndex].answers}[0]`"
                   ></div>
                 </el-col>
               </el-row>
@@ -362,8 +362,8 @@ export default {
       const userList = await myMarkUserList({
         examId: Number(this.examId),
       })
-      this.allUserList = userList.data
-      this.userList = userList.data
+      this.allUserList = userList.data.filter((user) => user.state !== 1)
+      this.userList = userList.data.filter((user) => user.state !== 1)
       this.userId = this.userId || this.userList[0].userId
       this.queryOneExamineeInfo()
     },

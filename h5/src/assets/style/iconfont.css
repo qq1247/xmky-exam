@@ -1,0 +1,705 @@
+@font-face {
+  font-family: 'common';
+  src: url('../font/iconfont.woff') format('woff'),
+    url('../font/iconfont.ttf') format('truetype');
+}
+
+.common {
+  font-family: 'common' !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.common-quick:before {
+  content: '\e656';
+}
+
+.common-wait-mark:before {
+  content: '\e69c';
+}
+
+.common-wait-exam:before {
+  content: '\e64a';
+}
+
+.common-count-down:before {
+  content: '\e63a';
+}
+
+.common-add:before {
+  content: '\e7e6';
+}
+
+.common-email:before {
+  content: '\e7b1';
+}
+
+.common-random:before {
+  content: '\ea8d';
+}
+
+.common-line-upload:before {
+  content: '\ebb3';
+}
+
+.common-line-dowmload:before {
+  content: '\ebb4';
+}
+
+.common-word-template:before {
+  content: '\e75d';
+}
+
+.common-click:before {
+  content: '\e708';
+}
+
+.common-image:before {
+  content: '\e658';
+}
+
+.common-full:before {
+  content: '\e657';
+}
+
+.common-simulate:before {
+  content: '\e64d';
+}
+
+.common-mark-paper:before {
+  content: '\e6b0';
+}
+
+.common-change:before {
+  content: '\e645';
+}
+
+.common-subscript:before {
+  content: '\e81d';
+}
+
+.common-template-down:before {
+  content: '\e640';
+}
+
+.common-template-up:before {
+  content: '\e641';
+}
+
+.common-once:before {
+  content: '\e63e';
+}
+
+.common-off-line:before {
+  content: '\e6ca';
+}
+
+.common-end:before {
+  content: '\e631';
+}
+
+.common-start:before {
+  content: '\e64b';
+}
+
+.common-pwd-reset:before {
+  content: '\e634';
+}
+
+.common-sensitive:before {
+  content: '\e62c';
+}
+
+.common-copy:before {
+  content: '\e66b';
+}
+
+.common-recycle:before {
+  content: '\e66c';
+}
+
+.common-time:before {
+  content: '\e628';
+}
+
+.common-setting:before {
+  content: '\e629';
+}
+
+.common-data-library:before {
+  content: '\e638';
+}
+
+.common-onLine:before {
+  content: '\e677';
+}
+
+.common-question-manage:before {
+  content: '\e626';
+}
+
+.common-exam-manage:before {
+  content: '\e71d';
+}
+
+.common-base-manage:before {
+  content: '\e639';
+}
+
+.common-user-manage:before {
+  content: '\e623';
+}
+
+.common-perfect:before {
+  content: '\e6a8';
+}
+
+.common-persons:before {
+  content: '\e621';
+}
+
+.common-good:before {
+  content: '\e624';
+}
+
+.common-classify:before {
+  content: '\e62d';
+}
+
+.common-notice:before {
+  content: '\e62f';
+}
+
+.common-paper-manage:before {
+  content: '\e6e7';
+}
+
+.common-index:before {
+  content: '\e63d';
+}
+
+.common-mine:before {
+  content: '\e61f';
+}
+
+.common-finish:before {
+  content: '\e655';
+}
+
+.common-wait:before {
+  content: '\e61e';
+}
+
+.common-marking:before {
+  content: '\e661';
+}
+
+.common-mark:before {
+  content: '\e65f';
+}
+
+.common-exam:before {
+  content: '\e724';
+}
+
+.common-examing:before {
+  content: '\e63c';
+}
+
+.common-preview:before {
+  content: '\e627';
+}
+
+.common-judge:before {
+  content: '\e654';
+}
+
+.common-cloze:before {
+  content: '\e761';
+}
+
+.common-checkbox:before {
+  content: '\e738';
+}
+
+.common-radio:before {
+  content: '\e67b';
+}
+
+.common-ask:before {
+  content: '\e6d6';
+}
+
+.common-move:before {
+  content: '\e667';
+}
+
+.common-merge:before {
+  content: '\e669';
+}
+
+.common-org:before {
+  content: '\e6cf';
+}
+
+.common-login-out:before {
+  content: '\e653';
+}
+
+.common-publish:before {
+  content: '\e61d';
+}
+
+.common-readPaper:before {
+  content: '\e6ec';
+}
+
+.common-fold:before {
+  content: '\e680';
+}
+
+.common-clear:before {
+  content: '\e61a';
+}
+
+.common-drag:before {
+  content: '\e698';
+}
+
+.common-archive:before {
+  content: '\e666';
+}
+
+.common-statistics:before {
+  content: '\e719';
+}
+
+.common-knowledge:before {
+  content: '\e617';
+}
+
+.common-bishitiku:before {
+  content: '\ea96';
+}
+
+.common-person:before {
+  content: '\e650';
+}
+
+.common-explain:before {
+  content: '\e64f';
+}
+
+.common-role:before {
+  content: '\e644';
+}
+
+.common-composition:before {
+  content: '\e886';
+}
+
+.common-shaixuan:before {
+  content: '\e6b3';
+}
+
+.common-shangpin:before {
+  content: '\e635';
+}
+
+.common-RectangleCopy:before {
+  content: '\e6a7';
+}
+
+.common-ic_list:before {
+  content: '\e612';
+}
+
+.common-messages:before {
+  content: '\e7a8';
+}
+
+.common-listgrid:before {
+  content: '\e65d';
+}
+
+.common-dingdan:before {
+  content: '\e610';
+}
+
+.common-wode:before {
+  content: '\e93b';
+}
+
+.common-payment:before {
+  content: '\e613';
+}
+
+.common-time-limit:before {
+  content: '\e709';
+}
+
+.common-settlement:before {
+  content: '\e60d';
+}
+
+.common-postal-code:before {
+  content: '\e60f';
+}
+
+.common-provinces:before {
+  content: '\e87f';
+}
+
+.common-order:before {
+  content: '\e60e';
+}
+
+.common-content:before {
+  content: '\e62e';
+}
+
+.common-content1:before {
+  content: '\e64e';
+}
+
+.common-title:before {
+  content: '\e6f6';
+}
+
+.common-sex:before {
+  content: '\ea5e';
+}
+
+.common-id-card:before {
+  content: '\e751';
+}
+
+.common-receive:before {
+  content: '\e60b';
+}
+
+.common-details:before {
+  content: '\e60c';
+}
+
+.common-day:before {
+  content: '\e699';
+}
+
+.common-send:before {
+  content: '\e633';
+}
+
+.common-nick-name:before {
+  content: '\e637';
+}
+
+.common-take-over:before {
+  content: '\e616';
+}
+
+.common-cart-null1:before {
+  content: '\e607';
+}
+
+.common-cart-null2:before {
+  content: '\e648';
+}
+
+.common-confirm-lock:before {
+  content: '\e620';
+}
+
+.common-auth-code:before {
+  content: '\e63b';
+}
+
+.common-img-code:before {
+  content: '\e68b';
+}
+
+.common-phone:before {
+  content: '\e61c';
+}
+
+.common-shiled:before {
+  content: '\e6de';
+}
+
+.common-jian-up:before {
+  content: '\e609';
+}
+
+.common-jian-down:before {
+  content: '\e60a';
+}
+
+.common-home:before {
+  content: '\e605';
+}
+
+.common-avatar:before {
+  content: '\e7c9';
+}
+
+.common-lock:before {
+  content: '\e615';
+}
+
+.common-answer:before {
+  content: '\e6a2';
+}
+
+.common-mall:before {
+  content: '\e606';
+}
+
+.common-cart-null:before {
+  content: '\e622';
+}
+
+.common-data-null:before {
+  content: '\e869';
+}
+
+.common-to-top:before {
+  content: '\e7b0';
+}
+
+.common-dbarrow-up:before {
+  content: '\e604';
+}
+
+.common-dbarrow-down:before {
+  content: '\e601';
+}
+
+.common-loading:before {
+  content: '\e62a';
+}
+
+.common-question:before {
+  content: '\e618';
+}
+
+.common-question-mark:before {
+  content: '\e647';
+}
+
+.common-selected:before {
+  content: '\e6ad';
+}
+
+.common-success:before {
+  content: '\e6b1';
+}
+
+.common-warning:before {
+  content: '\e6b6';
+}
+
+.common-wrong:before {
+  content: '\e6b7';
+}
+
+.common-favorite:before {
+  content: '\e608';
+}
+
+.common-favorite-fill:before {
+  content: '\e82b';
+}
+
+.common-star-fill:before {
+  content: '\e630';
+}
+
+.common-star:before {
+  content: '\e704';
+}
+
+.common-qq-music:before {
+  content: '\e643';
+}
+
+.common-friend-group:before {
+  content: '\e619';
+}
+
+.common-ali-pay:before {
+  content: '\e696';
+}
+
+.common-wo:before {
+  content: '\e602';
+}
+
+.common-view-gallery:before {
+  content: '\e6b4';
+}
+
+.common-view-list:before {
+  content: '\e6b5';
+}
+
+.common-kefu:before {
+  content: '\e61b';
+}
+
+.common-shoping-bag:before {
+  content: '\e664';
+}
+
+.common-wepay:before {
+  content: '\e65a';
+}
+
+.common-plaint:before {
+  content: '\e603';
+}
+
+.common-ding-talk:before {
+  content: '\e887';
+}
+
+.common-box:before {
+  content: '\e6cb';
+}
+
+.common-more-row:before {
+  content: '\e684';
+}
+
+.common-more-col:before {
+  content: '\e6a5';
+}
+
+.common-wifi:before {
+  content: '\e6f2';
+}
+
+.common-list-row:before {
+  content: '\e600';
+}
+
+.common-remind:before {
+  content: '\e713';
+}
+
+.common-cart:before {
+  content: '\e63f';
+}
+
+.common-qr-code:before {
+  content: '\e642';
+}
+
+.common-scanner:before {
+  content: '\e649';
+}
+
+.common-sound:before {
+  content: '\e64c';
+}
+
+.common-search:before {
+  content: '\e651';
+}
+
+.common-photo:before {
+  content: '\e663';
+}
+
+.common-message:before {
+  content: '\e665';
+}
+
+.common-navigate:before {
+  content: '\e652';
+}
+
+.common-voice:before {
+  content: '\e687';
+}
+
+.common-shield:before {
+  content: '\e646';
+}
+
+.common-share:before {
+  content: '\e632';
+}
+
+.common-arrow-down:before {
+  content: '\e692';
+}
+
+.common-arrow-left:before {
+  content: '\e693';
+}
+
+.common-arrow-right:before {
+  content: '\e694';
+}
+
+.common-arrow-up:before {
+  content: '\e695';
+}
+
+.common-close:before {
+  content: '\e69a';
+}
+
+.common-plus:before {
+  content: '\e6b9';
+}
+
+.common-minus:before {
+  content: '\e6ba';
+}
+
+.common-qzone:before {
+  content: '\e697';
+}
+
+.common-address:before {
+  content: '\e614';
+}
+
+.common-delete:before {
+  content: '\e636';
+}
+
+.common-user:before {
+  content: '\e6a4';
+}
+
+.common-service:before {
+  content: '\e625';
+}
+
+.common-edit:before {
+  content: '\e67c';
+}
+
+.common-android:before {
+  content: '\e881';
+}
+
+.common-apple:before {
+  content: '\e882';
+}
+
+.common-qq:before {
+  content: '\e883';
+}
+
+.common-blog:before {
+  content: '\e884';
+}
+
+.common-wechat:before {
+  content: '\e885';
+}

@@ -68,7 +68,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import url(//at.alicdn.com/t/font_840312_illxabejpi9.css);
+@import url('./assets/style/iconfont.css');
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

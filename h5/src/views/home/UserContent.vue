@@ -218,6 +218,7 @@
             </div>
             <div class="easy-exam" @click="$router.push({ name: 'Quick' })">
               <i class="common common-quick"></i>
+              <span>快速考试</span>
             </div>
           </div>
         </el-card>
@@ -690,8 +691,10 @@ export default {
     background: #fff;
     width: 100px;
     height: 100px;
-    line-height: 100px;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     border-radius: 50%;
     top: calc(50% - 50px);
     left: calc(50% - 50px);
