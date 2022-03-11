@@ -284,12 +284,13 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		Paper paper = paperService.getEntity(exam.getPaperId());// 试卷信息
 		List<MyExam> myExamList = myExamService.getList(examId);// 考试用户列表
 		for(MyExam myExam : myExamList){
+			User user = userService.getEntity(myExam.getUserId());
 			if (myExam.getMarkState() == 3) {//已阅卷的不处理（没考试的人考试时间结束已自动阅卷；人工阅卷在阅卷时间结束之前已经（部分）阅完）
+				log.info("完成考试进行：{}-{}{}，不处理", user.getId(), user.getName(), myExam.getState() == 1 ? "未考试" : "已阅卷");
 				continue;
 			}
 			
 			// 开始补全未处理的阅卷数据，并合计成绩
-			User user = userService.getEntity(myExam.getUserId());
 			if (myExam.getMarkStartTime() == null) {// 一道题也没有阅
 				myExam.setMarkUserId(1);//记录阅卷人为admin
 				myExam.setMarkStartTime(new Date());// 阅卷时间为当前时间

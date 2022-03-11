@@ -56,6 +56,7 @@ public class ExamCoreRunner implements ApplicationRunner {
 						continue;
 					}
 					
+					AutoMarkCache.del(unMarkExam.getId());// 删除缓存不在监听，如果阅卷报错，在执行一遍也报错。应该给管理员发送邮件，修复问题后，刷新缓存重新执行任务
 					if (unMarkExam.getMarkState() == 1) {
 						myExamDetailService.doExam(unMarkExam.getId());
 					} else if (unMarkExam.getMarkState() == 2){
@@ -65,8 +66,6 @@ public class ExamCoreRunner implements ApplicationRunner {
 					log.error("自动阅卷错误：{}", e.getMessage());
 				} catch (Exception e) {
 					log.error("自动阅卷错误：", e);
-				} finally {
-					AutoMarkCache.del(unMarkExam.getId());// 删除缓存不在监听，如果阅卷报错，在执行一遍也报错。应该给管理员发送邮件，修复问题后，刷新缓存重新执行任务
 				}
 			}
 		}

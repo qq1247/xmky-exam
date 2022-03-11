@@ -100,6 +100,11 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 			throw new MyException("阅卷已结束");
 		}
 		
+		MyExam myExam = myExamService.getEntity(examId, userId);
+		if (myExam.getState() == 1) {
+			throw new MyException("用户未考试");
+		}
+		
 		List<MyMark> myMarkList = myMarkDao.getList(examId);
 		boolean ok = false;
 		for (MyMark myMark : myMarkList) {
@@ -127,7 +132,6 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		myExamDetailService.update(myExamDetail);
 		
 		// 标记为阅卷中，记录阅卷时间
-		MyExam myExam = myExamService.getEntity(examId, userId);
 		//myExam.setMarkState(2); //自动阅卷时已标记为阅卷中
 		if (!ValidateUtil.isValid(myExam.getMarkStartTime())) {
 			myExam.setMarkStartTime(new Date());
@@ -135,6 +139,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		} else {
 			myExam.setMarkEndTime(new Date());
 		}
+		myExam.setMarkUserId(getCurUser().getId());// 一张试卷可能多个人阅卷（按题阅卷），更新成最后一个人。
 		myExamService.update(myExam);
 	}
 
@@ -180,14 +185,14 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 			throw new MyException("未参与阅卷");
 		}
 		
-		List<MyExamDetail> myExamDetailList = myExamDetailService.getUserAnswerList(examId, userId);
+		List<MyExamDetail> userAnswerList = myExamDetailService.getUserAnswerList(examId, userId);
 		int num = 0;
 		BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
-		for (MyExamDetail myExamDetail : myExamDetailList) {
-			if (myExamDetail.getScore() == null) {
+		for (MyExamDetail userAnswer : userAnswerList) {
+			if (userAnswer.getScore() == null) {
 				num++;
 			} else {
-				totalScore.add(myExamDetail.getScore());
+				totalScore.add(userAnswer.getScore());
 			}
 		}
 		if (num > 0) {

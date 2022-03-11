@@ -42,7 +42,7 @@ public class DbBackJob implements Job {
 		log.info("数据库备份开始：");
 		File dbBakDir = new File(DB_BAK_DIR);
 		if (!dbBakDir.isAbsolute()) {
-			dbBakDir = new File(System.getProperty("user.dir") + "/" + DB_BAK_DIR);// 如果是相对路径，备份路径为当前war包启动路径+配置文件子目录
+			dbBakDir = new File(String.format("%s%s%s", System.getProperty("user.dir"), File.separator, DB_BAK_DIR));// 如果是相对路径，备份路径为当前war包启动路径+配置文件子目录
 		}
 		dbBakDir.mkdirs();
 		log.info("数据库备份目录：{}", dbBakDir.getAbsolutePath());
