@@ -61,7 +61,7 @@ public interface PaperQuestionService extends BaseService<PaperQuestion>{
 	 * @param userId
 	 * @return PaperQuestion
 	 */
-	PaperQuestion getEntity(Integer paperId, Integer questionId, Integer userId);
+	PaperQuestion getEntity(Integer examId, Integer paperId, Integer questionId, Integer userId);
 	
 	/**
 	 * 删除随机试题
