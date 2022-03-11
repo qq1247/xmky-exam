@@ -33,14 +33,12 @@
             <div
               class="info-item today-item"
               :style="{
-                display: isToday(item.examStartTime, item.examEndTime)
-                  ? 'flex'
-                  : 'none',
+                display: isExam(item.state, item.markState) ? 'flex' : 'none',
               }"
               :key="item.id"
               v-for="item in examList"
             >
-              <template v-if="isToday(item.examStartTime, item.examEndTime)">
+              <template v-if="isExam(item.state, item.markState)">
                 <i class="common common-wait-exam today-icon"></i>
                 <div class="item-center">
                   <div class="info-item ellipsis">{{ item.examName }}</div>
@@ -101,7 +99,7 @@
             <div
               class="info-item today-item"
               :style="{
-                display: isToday(item.examMarkStartTime, item.examMarkEndTime)
+                display: isMark(item.examMarkStartTime, item.examMarkEndTime)
                   ? 'flex'
                   : 'none',
               }"
@@ -109,7 +107,7 @@
               v-for="item in markList"
             >
               <template
-                v-if="isToday(item.examMarkStartTime, item.examMarkEndTime)"
+                v-if="isMark(item.examMarkStartTime, item.examMarkEndTime)"
               >
                 <i class="common common-wait-mark today-icon"></i>
                 <div class="item-center">
@@ -263,6 +261,18 @@ export default {
   },
   computed: {
     ...mapGetters(['permission_routes', 'onlyRole']),
+    // 是否展示考试
+    isExam(state, markState) {
+      return (state, markState) => {
+        return state === 3 || (state === 1 && markState === 3)
+      }
+    },
+    // 是否展示阅卷
+    isMark(markState) {
+      return (markState) => {
+        return markState !== 3
+      }
+    },
   },
   watch: {
     '$store.getters.onlyRole': {
@@ -330,17 +340,6 @@ export default {
         new Date(endTime).getTime() - new Date(startTime).getTime()
       const minutes = diffTime / (60 * 1000)
       return `${minutes.toFixed(2)}分钟`
-    },
-    // 是否是今天
-    isToday(startTime, endTime) {
-      const today = new Date().getTime()
-      const _startTime = new Date(
-        `${dayjs(startTime).format('YYYY-MM-DD')} 00:00:00`
-      ).getTime()
-      const _endTime = new Date(
-        `${dayjs(endTime).format('YYYY-MM-DD')} 23:59:59`
-      ).getTime()
-      return today > _startTime && today < _endTime
     },
     // 获取选择月份的时间
     selectDate(time) {

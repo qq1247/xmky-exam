@@ -142,6 +142,7 @@
 <script>
 import { paperEdit, paperAdd, paperGet } from 'api/paper'
 import TinymceEditor from 'components/TinymceEditor/Index.vue'
+import dayjs from 'dayjs'
 
 export default {
   components: {
@@ -262,6 +263,9 @@ export default {
         this.paperForm.showType = String(res.data.showType)
         this.paperForm.markType = res.data.markType
       })
+    } else {
+      this.paperForm.name = dayjs().format('YYYY-MM-DD')
+      this.paperForm.passScore = 60
     }
   },
   methods: {
