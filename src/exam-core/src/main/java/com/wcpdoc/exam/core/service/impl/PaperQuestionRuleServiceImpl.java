@@ -183,6 +183,9 @@ public class PaperQuestionRuleServiceImpl extends BaseServiceImp<PaperQuestionRu
 			}
 			
 			if (types[i] == 2) {// 多选漏选的分必填
+				if (!ValidateUtil.isValid(scoreOptions)) {
+					scoreOptions = new String[1];
+				}
 				scoreOptions[i] = "2";
 			}
 		}
