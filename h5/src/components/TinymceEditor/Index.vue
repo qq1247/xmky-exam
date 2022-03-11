@@ -35,6 +35,7 @@ import 'tinymce/skins/content/default/content.css'
 import 'tinymce/themes/silver/theme.min.js'
 import 'tinymce/icons/default/icons' // 解决了icons.js 报错Unexpected token '<'
 import 'tinymce/plugins/table'
+import 'tinymce/plugins/imagetools'
 import 'tinymce/plugins/uploadImg'
 export default {
   components: {
@@ -65,7 +66,7 @@ export default {
     },
     plugins: {
       type: [String, Array],
-      default: 'uploadImg table',
+      default: 'uploadImg table imagetools',
       // 'link lists image code table wordcount media preview fullscreen help',
     },
     toolbar: {
