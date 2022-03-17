@@ -46,6 +46,7 @@
           class="box-card"
           :model="paperQuestionRules[index]"
           :ref="`ruleForm${index}`"
+          size="small"
         >
           <div v-for="(rule, ruleIndex) in item.rule" :key="rule.id">
             <el-row>
@@ -56,13 +57,13 @@
                 >
                   <CustomSelect
                     :ref="`questionSelect${index}${ruleIndex}`"
+                    :total="total"
                     :isAuto="false"
                     :multiple="false"
                     placeholder="试题分类"
                     :value="rule.questionTypeId"
-                    :total="total"
-                    @change="(e) => selectQuestionType(e, index, ruleIndex)"
                     @input="searchQuestionType"
+                    @change="(e) => selectQuestionType(e, index, ruleIndex)"
                     @currentChange="getMoreQuestionType"
                     @visibleChange="getQuestionType"
                   >
@@ -114,7 +115,7 @@
               <el-col
                 :span="4"
                 :offset="1"
-                v-if="markType === 2 && [3, 5].includes(rule.type)"
+                v-if="markType === 1 && [3, 5].includes(rule.type)"
               >
                 <el-form-item :prop="`rule.${ruleIndex}.ai`" :rules="rules.ai">
                   <el-select
@@ -210,7 +211,7 @@
       </div>
     </div>
 
-    <div class="handler-btn" @click="paperChapterAdd" v-if="paperState === 2">
+    <div class="handler-btn" @click="paperChapterAdd">
       <i class="common common-random"></i>
       <span>随机组合章节</span>
     </div>
@@ -229,6 +230,7 @@ import { questionTypeListPage } from 'api/question'
 import { getOneDict } from '@/utils/getDict'
 import TinymceEditor from 'components/TinymceEditor/Index.vue'
 import CustomSelect from 'components/CustomSelect.vue'
+import { getQuick } from '@/utils/storage'
 export default {
   components: {
     TinymceEditor,
@@ -237,7 +239,6 @@ export default {
   data() {
     return {
       paperId: 0,
-      paperState: 1,
       paperTypeId: 0,
       markType: 1,
       paperName: '',
@@ -248,11 +249,11 @@ export default {
           no: 1,
           dictKey: '1',
         },
-        {
+        /* {
           dictValue: '非智能',
           no: 2,
           dictKey: '2',
-        },
+        }, */
       ],
       typeDictList: [],
       questionTypes: [],
@@ -307,36 +308,18 @@ export default {
     }
   },
   async created() {
-    this.paperId = this.$route.params.id
+    this.paperId = this.$route.params.id || getQuick().id
+    await this.init()
     if (Number(this.paperId)) {
       const res = await paperGet({ id: this.paperId })
       this.$nextTick(() => {
         this.paperName = res.data.name
-        this.paperState = res.data.state
         this.markType = res.data.markType
-      })
-    }
-    this.init()
-  },
-  methods: {
-    init() {
-      this.typeDictList = getOneDict('QUESTION_TYPE')
-      this.difficultyDictList = getOneDict('QUESTION_DIFFICULTY')
-      this.query()
-    },
-    // 查询组卷规则
-    async query() {
-      const res = await paperQuestionRuleList({
-        paperId: this.paperId,
-      })
-      this.paperQuestionRules = res.data
-
-      this.$nextTick(() => {
         if (this.paperQuestionRules.length) {
           this.paperQuestionRules.map((item, index) => {
             if (item.rule.length) {
-              item.rule.map((rule, indexRule) => {
-                this.$refs[`questionSelect${index}${indexRule}`][0].$refs[
+              item.rule.map((rule, ruleIndex) => {
+                this.$refs[`questionSelect${index}${ruleIndex}`][0].$refs[
                   'elSelect'
                 ].cachedOptions.push({
                   currentLabel: rule.questionTypeName,
@@ -349,6 +332,21 @@ export default {
           })
         }
       })
+    }
+  },
+  methods: {
+    async init() {
+      this.typeDictList = getOneDict('QUESTION_TYPE')
+      this.difficultyDictList = getOneDict('QUESTION_DIFFICULTY')
+      await this.query()
+    },
+    // 查询组卷规则
+    async query() {
+      const res = await paperQuestionRuleList({
+        paperId: this.paperId,
+      })
+
+      this.paperQuestionRules = res.data
     },
     // 添加章节
     async paperChapterAdd() {
@@ -421,14 +419,15 @@ export default {
         }
         const ruleParam = this.paperQuestionRules[index].rule.reduce(
           (acc, cur) => {
-            ;[3, 5].includes(cur.type)
+            /* ;[3, 5].includes(cur.type)
               ? this.markType === 1
                 ? acc.ais.push('1')
                 : acc.ais.push(cur.ai.join(','))
-              : acc.ais.push('1')
+              : acc.ais.push('1') */
+            acc.ais.push('1')
             ;[3, 5].includes(cur.type)
               ? acc.scoreOptions.push(cur.scoreOptions.join(','))
-              : acc.scoreOptions.push('')
+              : acc.scoreOptions.push(cur.type === 2 ? '1' : '')
             acc.difficultys.push(cur.difficulty.join(','))
             acc.nums.push(cur.totalNumber)
             acc.types.push(cur.type)
