@@ -37,6 +37,7 @@
     </el-form-item>
     <el-form-item label="阅卷方式" prop="markType">
       <el-radio
+        @change="selectMarkType"
         v-for="item in paperForm.markTypeList"
         :key="item.value"
         v-model="paperForm.markType"
@@ -317,6 +318,15 @@ export default {
     // 组卷方式
     setPaperType(index) {
       this.paperForm.genType = index
+      this.paperForm.markType = 1
+    },
+    // 选择阅卷类型
+    selectMarkType(e) {
+      if (e === 2 && this.paperForm.genType === 1) {
+        this.$message.warning('暂不支持')
+        this.paperForm.markType = 1
+        return
+      }
     },
     // 添加评语
     remarkAdd() {

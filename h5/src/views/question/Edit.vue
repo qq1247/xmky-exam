@@ -116,13 +116,13 @@
       <el-scrollbar wrap-style="overflow-x:hidden;" class="content-right">
         <!-- 试题参数详情 -->
         <QuestionDetail
-          v-if="detailStatus"
+          v-show="detailStatus"
           :data="questionDetail"
           :comment="false"
         ></QuestionDetail>
 
         <!-- 编辑试题 -->
-        <template v-else>
+        <div v-show="!detailStatus">
           <div class="top">设置</div>
           <EditModule
             key="editModule"
@@ -134,7 +134,7 @@
             @add="add"
             @edit="edit"
           ></EditModule>
-        </template>
+        </div>
       </el-scrollbar>
     </div>
   </div>

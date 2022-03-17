@@ -582,6 +582,7 @@ export default {
   border-bottom: 1px solid #e6ebf5;
   color: #333;
   padding: 0 5px;
+  cursor: pointer;
   &:hover {
     color: #0094e5;
   }
