@@ -153,16 +153,7 @@ export default {
           return
         }
 
-        if (res.data.initPwd) {
-          this.$alert(res.data.initPwd, '重置密码', {
-            confirmButtonText: '确定',
-          })
-        }
-
-        this.$store.dispatch('setting/changeSetting', {
-          key: 'tabIndex',
-          value: '1',
-        })
+        this.$router.back()
       })
     },
     // 获取机构列表

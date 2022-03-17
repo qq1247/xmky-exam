@@ -42,7 +42,12 @@
 
 <script>
 import Upload from 'components/Upload'
-import { questionTemplate, questionImport } from 'api/question'
+import {
+  questionImport,
+  questionTypeAdd,
+  questionTemplate,
+  questionTypeListPage,
+} from 'api/question'
 import { progressBarGet } from 'api/common'
 export default {
   components: {
@@ -72,6 +77,15 @@ export default {
     showTemplate() {
       this.$emit('showTemplate', false)
     },
+    // 获取试题分类
+    async getQuestionType(curPage = 1, name = '') {
+      const typeList = await questionTypeListPage({
+        name,
+        curPage,
+        pageSize: 5,
+      })
+      return typeList.data.list
+    },
     // 获取试题模板
     async questionTemplate() {
       const template = await questionTemplate({}, 'blob')
@@ -86,9 +100,16 @@ export default {
     // 解析试题
     async questionImport() {
       if (!this.questionTypeId) {
-        this.$message.warning('请选择试题分类')
-        this.templateClear('templateUpload')
-        return
+        const questionTypeList = await this.getQuestionType()
+        if (questionTypeList.length) {
+          this.$message.warning('请选择试题分类')
+          this.templateClear('templateUpload')
+          return
+        }
+        const createQuestionType = await questionTypeAdd({
+          name: '我的试题',
+        })
+        this.questionTypeId = createQuestionType.data
       }
       const res = await questionImport({
         fileId: this.handlerForm.questionDocIds[0].response.data.fileIds,
