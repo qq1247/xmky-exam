@@ -1,4 +1,4 @@
-INSERT INTO `SYS_VER` VALUES (16, '3.6.0', '2022-02-28 13:58:02', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (16, '3.6.0', '2021-03-17 16:14:00', 'zhanghc', '');
 DELETE FROM `SYS_CRON` WHERE ID IN (3, 4);
 
 drop table if exists EXM_PAPER_QUESTION_RULE;
