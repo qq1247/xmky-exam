@@ -8,5 +8,5 @@
  * @LastEditTime: 2022-01-13 10:44:15
  */
 window.domain = {
-  url: 'http://192.168.110.86:8000/api/',
+  url: 'http://127.0.0.1:8000/api/',
 }
