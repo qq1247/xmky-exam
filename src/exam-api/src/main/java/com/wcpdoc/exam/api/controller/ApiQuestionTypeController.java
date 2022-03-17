@@ -99,7 +99,7 @@ public class ApiQuestionTypeController extends BaseController {
 	public PageResult add(QuestionType questionType) {
 		try {
 			questionTypeService.addAndUpdate(questionType);
-			return PageResult.ok();
+			return PageResultEx.ok().data(questionType.getId());
 		} catch (MyException e) {
 			log.error("添加试题分类错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

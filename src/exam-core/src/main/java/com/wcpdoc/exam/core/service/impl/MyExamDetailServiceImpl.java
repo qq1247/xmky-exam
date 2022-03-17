@@ -190,6 +190,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 					}
 				
 					totalScore.add(userAnswer.getScore());// 累加当前分数到总分数
+					userAnswer.setMarkTime(new Date());
+					userAnswer.setMarkUserId(1);
 					myExamDetailService.update(userAnswer);// 更新每道题的分数（没作答也都标记为0分。影响的地方为人工阅卷时，所有题都有分数，才允许阅卷完成。）
 				} else if (myExam.getState() == 1) {// 如果人工题未考试，标记分数为0。
 					userAnswer.setMarkTime(new Date());
