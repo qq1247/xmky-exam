@@ -33,12 +33,12 @@
             <div
               class="info-item today-item"
               :style="{
-                display: isExam(item.state, item.markState) ? 'flex' : 'none',
+                display: isExam(item.state) ? 'flex' : 'none',
               }"
               :key="item.id"
               v-for="item in examList"
             >
-              <template v-if="isExam(item.state, item.markState)">
+              <template v-if="isExam(item.state)">
                 <i class="common common-wait-exam today-icon"></i>
                 <div class="item-center">
                   <div class="info-item ellipsis">{{ item.examName }}</div>
@@ -262,9 +262,9 @@ export default {
   computed: {
     ...mapGetters(['permission_routes', 'onlyRole']),
     // 是否展示考试
-    isExam(state, markState) {
-      return (state, markState) => {
-        return state === 3 || (state === 1 && markState === 3)
+    isExam(state) {
+      return (state) => {
+        return state !== 3
       }
     },
     // 是否展示阅卷
