@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -190,6 +191,11 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 				
 					totalScore.add(userAnswer.getScore());// 累加当前分数到总分数
 					myExamDetailService.update(userAnswer);// 更新每道题的分数（没作答也都标记为0分。影响的地方为人工阅卷时，所有题都有分数，才允许阅卷完成。）
+				} else if (myExam.getState() == 1) {// 如果人工题未考试，标记分数为0。
+					userAnswer.setMarkTime(new Date());
+					userAnswer.setMarkUserId(1);
+					userAnswer.setScore(BigDecimal.ZERO);
+					myExamDetailService.update(userAnswer);
 				}
 			}
 			
@@ -678,7 +684,15 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	private Map<Integer, List<PaperQuestionAnswer>> questionRandAnswerListCache(Integer examId, Integer paperId, Collection<Question> questionRandList) {
 		Map<Integer, List<PaperQuestionAnswer>> questionAnswerListCache = new HashMap<>();
 		for (Question question : questionRandList) {
-			List<PaperQuestionAnswer> questionAnswerList = paperQuestionAnswerService.getList(paperId, question.getId());
+			List<PaperQuestionAnswer> questionAnswerList = paperQuestionAnswerService.getList(paperId, question.getId());// 如果两个随机试卷有一个一样的题，会重复
+			ListIterator<PaperQuestionAnswer> listIterator = questionAnswerList.listIterator();
+			Integer paperQuestionId = questionAnswerList.get(0).getPaperQuestionId();// 取一张试卷的答案就可以，分数等都一样
+			while (listIterator.hasNext()) {
+				PaperQuestionAnswer next = listIterator.next();
+				if (next.getPaperQuestionId().intValue() != paperQuestionId.intValue()) {
+					listIterator.remove();
+				}
+			}
 			questionAnswerListCache.put(question.getId(), questionAnswerList);
 		}
 		return questionAnswerListCache;
