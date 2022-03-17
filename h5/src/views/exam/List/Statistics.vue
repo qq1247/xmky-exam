@@ -186,19 +186,22 @@ export default {
   },
   filters: {
     examState(data) {
-      return getOneDict('MY_EXAM_STATE').find((item) => item.no === data)
-        .dictValue
+      return getOneDict('MY_EXAM_STATE').find(
+        (item) => Number(item.dictKey) === data
+      ).dictValue
     },
     markState(data) {
-      return getOneDict('MY_EXAM_MARK_STATE').find((item) => item.no === data)
-        .dictValue
+      return getOneDict('MY_EXAM_MARK_STATE').find(
+        (item) => Number(item.dictKey) === data
+      ).dictValue
     },
     passState(data) {
       if (!data) {
         return '--'
       }
-      return getOneDict('MY_EXAM_ANSWER_STATE').find((item) => item.no === data)
-        .dictValue
+      return getOneDict('MY_EXAM_ANSWER_STATE').find(
+        (item) => Number(item.dictKey) === data
+      ).dictValue
     },
   },
   async mounted() {

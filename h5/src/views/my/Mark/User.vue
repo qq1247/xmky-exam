@@ -81,12 +81,14 @@ export default {
   },
   filters: {
     stateName(data) {
-      return getOneDict('MY_EXAM_STATE').find((item) => item.no === data)
-        .dictValue
+      return getOneDict('MY_EXAM_STATE').find(
+        (item) => Number(item.dictKey) === data
+      ).dictValue
     },
     markStateName(data) {
-      return getOneDict('MY_EXAM_MARK_STATE').find((item) => item.no === data)
-        .dictValue
+      return getOneDict('MY_EXAM_MARK_STATE').find(
+        (item) => Number(item.dictKey) === data
+      ).dictValue
     },
   },
   mounted() {
