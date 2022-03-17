@@ -146,12 +146,14 @@ export default {
   },
   filters: {
     typeName(data) {
-      return getOneDict('QUESTION_TYPE').find((item) => item.no === data)
-        .dictValue
+      return getOneDict('QUESTION_TYPE').find(
+        (item) => Number(item.dictKey) === data
+      ).dictValue
     },
     difficultyName(data) {
-      return getOneDict('QUESTION_DIFFICULTY').find((item) => item.no === data)
-        .dictValue
+      return getOneDict('QUESTION_DIFFICULTY').find(
+        (item) => Number(item.dictKey) === data
+      ).dictValue
     },
   },
   created() {

@@ -23,15 +23,15 @@
         </el-row>
         <el-row :gutter="20" class="content-info">
           <el-col :span="12" class="info-left"
-            >组卷方式：{{ ['人工组卷', '自动组卷'][data.genType - 1] }}</el-col
+            >组卷方式：{{ data.genType | genType }}</el-col
           >
           <el-col :span="12" class="info-right"
-            >展示方式：{{ ['', '整张', '章节', '单题'][data.showType] }}</el-col
+            >展示方式：{{ data.showType | showType }}</el-col
           >
         </el-row>
         <el-row class="content-info">
           <el-col :span="24" class="info-right"
-            >阅卷方式：{{ ['', '智能阅卷', '人工阅卷'][data.markType] }}</el-col
+            >阅卷方式：{{ data.markType | markType }}</el-col
           >
         </el-row>
       </template>
@@ -62,9 +62,7 @@
         </el-row>
       </template>
       <el-row class="content-info">
-        <el-col class="info-state">{{
-          data.state == 1 ? '已发布' : '草稿'
-        }}</el-col>
+        <el-col class="info-state">{{ data.state | state }}</el-col>
       </el-row>
       <div class="handler">
         <!-- 编辑 -->
@@ -113,6 +111,7 @@
 </template>
 
 <script>
+import { getOneDict } from '@/utils/getDict'
 export default {
   props: {
     data: {
@@ -127,6 +126,29 @@ export default {
   data() {
     return {}
   },
+  filters: {
+    genType(data) {
+      return getOneDict('PAPER_GEN_TYPE').find(
+        (item) => Number(item.dictKey) === data
+      ).dictValue
+    },
+    markType(data) {
+      return getOneDict('PAPER_MARK_TYPE').find(
+        (item) => Number(item.dictKey) === data
+      ).dictValue
+    },
+    showType(data) {
+      return getOneDict('PAPER_SHOW_TYPE').find(
+        (item) => Number(item.dictKey) === data
+      ).dictValue
+    },
+    state(data) {
+      return getOneDict('EXAM_STATE').find(
+        (item) => Number(item.dictKey) === data
+      ).dictValue
+    },
+  },
+  create() {},
   methods: {
     // 是否有权限（只有创建者才有权限）
     isRole(data) {
