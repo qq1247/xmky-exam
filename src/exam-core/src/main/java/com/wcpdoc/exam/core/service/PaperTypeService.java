@@ -16,7 +16,7 @@ public interface PaperTypeService extends BaseService<PaperType> {
 	 * @param paperType
 	 * void
 	 */
-	Integer addAndUpdate(PaperType paperType);
+	void addAndUpdate(PaperType paperType);
 
 	/**
 	 * 修改试卷分类
