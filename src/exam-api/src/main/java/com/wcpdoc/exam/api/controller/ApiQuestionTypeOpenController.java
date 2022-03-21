@@ -1,6 +1,8 @@
 package com.wcpdoc.exam.api.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -16,7 +18,9 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.ValidateUtil;
+import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionTypeOpen;
+import com.wcpdoc.exam.core.service.PaperQuestionRuleService;
 import com.wcpdoc.exam.core.service.QuestionTypeOpenService;
 
 /**
@@ -31,6 +35,8 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	
 	@Resource
 	private QuestionTypeOpenService questionTypeOpenService;
+	@Resource
+	private PaperQuestionRuleService paperQuestionRuleService;
 	
 	/**
 	 * 试题分类开放列表
@@ -164,6 +170,36 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	public PageResult questionGet(Integer questionId) {
 		try {
 			return questionTypeOpenService.get(questionId);
+		} catch (MyException e) {
+			log.error("获取试题错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		}  catch (Exception e) {
+			log.error("获取试题错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 获取试题ids
+	 * 
+	 * v1.0 zhanghc 2022年3月18日上午10:32:57
+	 * @param questionTypeId
+	 * @return PageResult
+	 */
+	@RequestMapping("/questionIds")
+	@ResponseBody
+	public PageResult questionIds(Integer questionTypeId) {
+		try {
+			List<Integer> questionIds = new ArrayList<>();
+			List<Question> questionList = paperQuestionRuleService.getQuestionList(questionTypeId);
+			for (Question question : questionList) {
+				if (question.getType() == 3 || question.getType() == 5) {
+					continue;
+				}
+				questionIds.add(question.getId());
+			}
+			
+			return PageResultEx.ok().data(questionIds);
 		} catch (MyException e) {
 			log.error("获取试题错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

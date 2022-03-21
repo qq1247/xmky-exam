@@ -225,6 +225,17 @@ http请求头需添加Authorization字段，
 | ---- | ------- | ---- | ---- |
 | id   | Integer | 主键 | 是   |
 
+### 试题分类开放列表：questionTypeOpen/questionIds
+| 请求参数| 类型    | 描述       | 必填 |
+| --------- | ------- | ---------- | ---- |
+| questionTypeId | Integer    | 试题分类ID   | 是   |
+
+| 响应参数| 类型    | 描述         |
+| --------------------- | ------- | ------------ |
+| code                  | Integer | 响应码       |
+| msg                   | String  | 响应消息     |
+| data            | Integer[] |  试题IDS       |
+
 ### 试题列表：question/listpage
 | 请求参数| 类型    | 描述         | 必填 |
 | -------------- | ------- | ------------ | ---- |
