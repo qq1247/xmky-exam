@@ -37,6 +37,7 @@
     </el-form-item>
     <el-form-item label="阅卷方式" prop="markType">
       <el-radio
+        :disabled="paperForm.state === 1 ? true : false"
         @change="selectMarkType"
         v-for="item in paperForm.markTypeList"
         :key="item.value"
@@ -169,6 +170,7 @@ export default {
         passScore: '',
         readRemark: '',
         readNum: '',
+        state: 2,
         showType: '1',
         showTypes: [
           {
@@ -263,6 +265,7 @@ export default {
         this.paperForm.passScore = res.data.passScore
         this.paperForm.showType = String(res.data.showType)
         this.paperForm.markType = res.data.markType
+        this.paperForm.state = res.data.state
       })
     } else {
       this.paperForm.name = dayjs().format('YYYY-MM-DD')
@@ -317,6 +320,9 @@ export default {
     },
     // 组卷方式
     setPaperType(index) {
+      if(this.paperForm.state === 1){
+        return
+      }
       this.paperForm.genType = index
       this.paperForm.markType = 1
     },

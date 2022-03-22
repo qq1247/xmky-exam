@@ -109,9 +109,14 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if (entity.getState() == 0) {
 			throw new MyException("已删除");
 		}
-//		if (entity.getState() == 1) {
-//			throw new MyException("已发布");
-//		}
+		if (entity.getState() == 1) {// 已发布时不能修改组卷方式和阅卷方式
+			if (entity.getGenType().intValue() != paper.getGenType().intValue()) {
+				throw new MyException("已发布");
+			}
+			if (entity.getMarkType().intValue() != paper.getMarkType().intValue()) {
+				throw new MyException("已发布");
+			}
+		}
 		if (entity.getState() == 3) {
 			throw new MyException("已归档");
 		}
