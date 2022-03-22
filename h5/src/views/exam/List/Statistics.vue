@@ -94,8 +94,8 @@
           <el-table-column label="分数">
             <template slot-scope="scope">
               <span
-                >{{ scope.row.myExamScore || '--' }}&nbsp;/&nbsp;{{
-                  scope.row.paperTotalScore || '--'
+                >{{ scope.row.myExamScore }}&nbsp;/&nbsp;{{
+                  scope.row.paperTotalScore
                 }}</span
               >
             </template>
@@ -121,9 +121,9 @@
       </template>
       <template v-if="tabIndex === '1'">
         <el-table :data="errorList" style="width: 100%">
-          <el-table-column prop="questionId" label="试题ID" width="100">
+          <el-table-column prop="questionId" label="编号" width="100">
           </el-table-column>
-          <el-table-column label="试题标题">
+          <el-table-column label="题干">
             <template slot-scope="scope">
               <span v-html="scope.row.questionTitle"></span>
             </template>
@@ -306,7 +306,7 @@ export default {
       }
       const diffTime =
         new Date(endTime).getTime() - new Date(startTime).getTime()
-      const minutes = Math.floor(diffTime / (60 * 1000))
+      const minutes = Math.ceil(diffTime / (60 * 1000))
       return `${minutes}分钟`
     },
     // 分页查询
