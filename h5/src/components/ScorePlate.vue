@@ -71,7 +71,6 @@ export default {
   },
   data() {
     return {
-      visible: false,
       score: '',
       scores: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
       step: '',
@@ -104,12 +103,10 @@ export default {
       if (Number(e) > this.data.score) this.step = this.data.score
       this.createScores(this.step)
     },
-    hideHandler() {
-      Object.assign(this.$data, this.$options.data())
-    },
     nextQuestion() {
-      this.$emit('nextQuestion', this.data.id)
-      this.hideHandler()
+      this.$emit('nextQuestion')
+      this.createScores(0.5)
+      this.step = ''
     },
     nextPaper() {
       this.$emit('nextPaper')

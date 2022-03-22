@@ -47,8 +47,9 @@
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button
-              type="primary"
+              :type="scope.row.state === 1 ? 'danger' : 'primary'"
               size="small"
+              :disabled="scope.row.state === 1 ? true : false"
               @click="goMark(scope.row.userId)"
               >阅卷</el-button
             >
