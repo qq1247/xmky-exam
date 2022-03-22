@@ -165,8 +165,8 @@
     justify-items: center;
     line-height: 30px;
   }
-  /deep/ .el-radio__input,
-  /deep/ .el-checkbox__input {
+  /deep/ .option-item .el-radio__input,
+  /deep/ .option-item .el-checkbox__input {
     padding-top: 7px;
   }
   /deep/ .el-textarea__inner {

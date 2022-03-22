@@ -30,8 +30,6 @@ export const questionTypeGet = (params) => request('questionType/get', params)
 export const questionTypeMove = (params) => request('questionType/move', params)
 export const questionTypeAuth = (params) => request('questionType/auth', params)
 
-export const questionTypeOpenQuestion = (params) =>
-  request('questionTypeOpen/questionListpage', params)
 export const questionTypeOpenListPage = (params) =>
   request('questionTypeOpen/listpage', params)
 export const questionTypeOpenAdd = (params) =>
@@ -40,6 +38,8 @@ export const questionTypeOpenDel = (params) =>
   request('questionTypeOpen/del', params)
 export const questionTypeOpenQuestionGet = (params) =>
   request('questionTypeOpen/questionGet', params)
+export const questionTypeOpenQuestionIds = (params) =>
+  request('questionTypeOpen/questionIds', params)
 
 export const questionCommentListPage = (params) =>
   request('questionComment/listpage', params)

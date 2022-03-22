@@ -320,12 +320,13 @@ export default [
         },
       },
       {
-        path: 'comment/:questionTypeId/:commentState?',
-        name: 'SimulateComment',
-        component: () => import('@/views/simulate/Comment.vue'),
+        path: 'test/:questionTypeId/:commentState?',
+        name: 'SimulateTest',
+        component: () => import('@/views/simulate/Test/Index.vue'),
         hidden: true,
         meta: {
-          title: '查看 | 评论试题',
+          title: '背题 | 模拟测试',
+          layout: 'user',
         },
       },
     ],

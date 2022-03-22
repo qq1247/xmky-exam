@@ -1,7 +1,7 @@
 <!--
- * @Description: 
+ * @Description:
  * @Version: 1.0
- * @Company: 
+ * @Company:
  * @Author: Che
  * @Date: 2021-09-10 10:14:03
  * @LastEditors: Che
@@ -12,11 +12,11 @@
     <!-- 类型，难度，其他选项，智能，分数 -->
     <div class="detail-tags">
       <el-tag class="center-tag-danger" size="mini" type="danger">{{
-        data.type | typeName
+        data.type | type
       }}</el-tag>
 
       <el-tag class="center-tag-purple" effect="plain" size="mini">{{
-        data.difficulty | difficultyName
+        data.difficulty | difficulty
       }}</el-tag>
 
       <el-tag effect="plain" size="mini" type="warning">{{
@@ -26,8 +26,6 @@
       <el-tag effect="plain" size="mini" type="danger"
         >{{ data.score }}分</el-tag
       >
-
-      <el-tag effect="plain" size="mini">{{ data.createUserName }}</el-tag>
 
       <el-tag
         :type="data.state == 1 ? 'info' : 'danger'"
@@ -145,12 +143,12 @@ export default {
     }
   },
   filters: {
-    typeName(data) {
+    type(data) {
       return getOneDict('QUESTION_TYPE').find(
         (item) => Number(item.dictKey) === data
       ).dictValue
     },
-    difficultyName(data) {
+    difficulty(data) {
       return getOneDict('QUESTION_DIFFICULTY').find(
         (item) => Number(item.dictKey) === data
       ).dictValue

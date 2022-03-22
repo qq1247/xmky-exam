@@ -183,7 +183,7 @@
                 class="info-item"
                 :key="item.id"
                 v-for="item in questionTypeOpenList"
-                @click="goDetail(item)"
+                @click="goTest(item)"
               >
                 <div class="item-left ellipsis">
                   {{ item.questionTypeName }}
@@ -404,8 +404,8 @@ export default {
       })
       res?.code === 200 && (this.questionTypeOpenList = res.data.list)
     },
-    // 查看试题和评论
-    goDetail({ questionTypeId, startTime, endTime, commentState }) {
+    // 模拟练习
+    goTest({ questionTypeId, startTime, endTime, commentState }) {
       const $_startTime = new Date(startTime).getTime()
       const $_endTime = new Date(endTime).getTime()
       const now = new Date().getTime()
@@ -414,7 +414,7 @@ export default {
         return
       }
       this.$router.push({
-        name: 'SimulateComment',
+        name: 'SimulateTest',
         params: {
           questionTypeId,
           commentState,

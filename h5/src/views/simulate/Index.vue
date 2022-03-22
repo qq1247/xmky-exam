@@ -1,7 +1,7 @@
 <!--
  * @Description: 模拟列表
  * @Version: 1.0
- * @Company: 
+ * @Company:
  * @Author: Che
  * @Date: 2021-12-22 16:57:28
  * @LastEditors: Che
@@ -14,7 +14,7 @@
         class="info-item"
         :key="item.id"
         v-for="item in questionTypeOpenList"
-        @click="goDetail(item)"
+        @click="goTest(item)"
       >
         <div class="item-left">{{ item.questionTypeName }}</div>
         <div class="item-right">{{ item.startTime }} - {{ item.endTime }}</div>
@@ -46,7 +46,7 @@ export default {
       res?.code === 200 && (this.questionTypeOpenList = res.data.list)
     },
     // 查看试题和评论
-    goDetail({ questionTypeId, startTime, endTime, commentState }) {
+    goTest({ questionTypeId, startTime, endTime, commentState }) {
       const $_startTime = new Date(startTime).getTime()
       const $_endTime = new Date(endTime).getTime()
       const now = new Date().getTime()
@@ -55,7 +55,7 @@ export default {
         return
       }
       this.$router.push({
-        name: 'SimulateComment',
+        name: 'SimulateTest',
         params: {
           questionTypeId,
           commentState,
