@@ -163,7 +163,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			// 获取考试用户的试卷
 			List<MyExamDetail> userAnswerList = getUserAnswerList(examId, myExam.getUserId());
 			BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
-			if (paper.getMarkType() == 1) {// 如果是智能阅卷，记录阅卷开始时间；
+			if (paper.getMarkType() == 1 || myExam.getState() == 1) {// 如果是智能阅卷或未考试，记录阅卷开始时间；
 				myExam.setMarkStartTime(new Date());
 			}
 			

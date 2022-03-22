@@ -514,8 +514,8 @@ export default {
       }
       const diffTime =
         new Date(endTime).getTime() - new Date(startTime).getTime()
-      const minutes = diffTime / (60 * 1000)
-      return `${minutes.toFixed(2)}分钟`
+      const minutes = Math.ceil(diffTime / (60 * 1000))
+      return `${minutes}分钟`
     },
   },
 }
