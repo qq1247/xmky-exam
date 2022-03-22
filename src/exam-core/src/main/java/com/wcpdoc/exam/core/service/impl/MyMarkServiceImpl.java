@@ -143,7 +143,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		myExamDetailService.update(myExamDetail);
 		
 		// 标记为阅卷中，记录阅卷时间
-		//myExam.setMarkState(2); //自动阅卷时已标记为阅卷中
+		myExam.setMarkState(2); 
 		if (!ValidateUtil.isValid(myExam.getMarkStartTime())) {
 			myExam.setMarkStartTime(new Date());
 			myExam.setMarkEndTime(new Date());//如果只阅一道题，就没有结束时间。

@@ -297,16 +297,22 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		Paper paper = paperService.getEntity(exam.getPaperId());// 试卷信息
 		List<MyExam> myExamList = myExamService.getList(examId);// 考试用户列表
 		for(MyExam myExam : myExamList){
-			User user = userService.getEntity(myExam.getUserId());
-			if (myExam.getMarkState() == 3) {//已阅卷的不处理（没考试的人考试时间结束已阅卷；人工阅卷在阅卷时间结束之前已经部分或全部阅完）
-				log.info("主观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】{}，不处理", exam.getId(), exam.getName(), user.getId(), user.getName(), myExam.getState() == 1 ? "未考试" : "已阅卷");
+			User examUser = userService.getEntity(myExam.getUserId());
+			User markUser = userService.getEntity(myExam.getMarkUserId());
+			if (myExam.getMarkState() == 3) {//已阅卷的不处理（没考试的人考试时间结束已阅卷；人工阅卷在阅卷时间结束之前已经部分试卷阅完）
+				log.info("主观题阅卷进行：【{}-{}】【{}-{} 已阅 {}-{}】{}，不处理", exam.getId(), exam.getName(), 
+						markUser.getId(), markUser.getName(), examUser.getId(), examUser.getName(), myExam.getState() == 1 ? "未考试" : "已阅卷");
 				continue;
 			}
 			
 			// 开始补全未处理的阅卷数据，并合计成绩
-			if (myExam.getMarkStartTime() == null) {// 一道题也没有阅
+			if (myExam.getMarkState() == 1) {// 一道题也没有阅
 				myExam.setMarkUserId(1);//记录阅卷人为admin
 				myExam.setMarkStartTime(new Date());// 阅卷时间为当前时间
+				log.info("主观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】，无人阅卷", exam.getId(), exam.getName(), examUser.getId(), examUser.getName());
+			} else if (myExam.getMarkState() == 2) {
+				log.info("主观题阅卷进行：【{}-{}】【{}-{} 阅 {}-{}】，部分阅完", exam.getId(), exam.getName(), 
+						markUser.getId(), markUser.getName(), examUser.getId(), examUser.getName());
 			}
 			
 			List<MyExamDetail> userAnswerList = getUserAnswerList(myExam.getExamId(), myExam.getUserId());// 用户答案
@@ -333,7 +339,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			myExam.setMarkEndTime(new Date());// 标记阅卷结束时间
 			
 			myExamService.update(myExam);
-			log.info("主观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】，得{}分，{}", exam.getId(), exam.getName(), user.getId(), user.getName(), 
+			log.info("主观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】，得{}分，{}", exam.getId(), exam.getName(), examUser.getId(), examUser.getName(), 
 					totalScore.getResult(), myExam.getAnswerState() == 1 ? "及格" : "不及格");
 		}
 		
