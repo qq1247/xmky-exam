@@ -210,6 +210,7 @@ export default {
   created() {
     this.questionTypeId = Number(this.$route.params.id)
     this.queryForm.typeList = getOneDict('QUESTION_TYPE')
+    this.queryForm.difficultyList = getOneDict('QUESTION_DIFFICULTY')
     this.search()
   },
   methods: {

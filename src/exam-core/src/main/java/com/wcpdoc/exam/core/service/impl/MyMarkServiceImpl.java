@@ -7,8 +7,12 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.base.entity.User;
+import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
@@ -35,6 +39,7 @@ import com.wcpdoc.exam.core.service.PaperQuestionService;
  */
 @Service
 public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkService {
+	private static final Logger log = LoggerFactory.getLogger(MyMarkServiceImpl.class);
 	@Resource
 	private MyMarkDao myMarkDao;
 	@Resource
@@ -47,6 +52,8 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 	private MyExamDetailService myExamDetailService;
 	@Resource
 	private PaperServiceImpl paperServiceImpl;
+	@Resource
+	private UserService userService;
 	
 	@Override
 	@Resource(name = "myMarkDaoImpl")
@@ -106,29 +113,27 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		}
 		
 		List<MyMark> myMarkList = myMarkDao.getList(examId);
-		boolean ok = false;
+		boolean hasMark = false;
 		for (MyMark myMark : myMarkList) {
 			if (myMark.getMarkUserId().intValue() == getCurUser().getId().intValue()
 					&& myMark.getExamUserIds().contains(String.format(",%s,", userId.toString()))) {
-				ok = true;
+				hasMark = true;
 				break;
 			}
 		}
-		if (!ok) {
+		if (!hasMark) {
 			throw new MyException("未参与阅卷");
 		}
 
-		if (score != null) {
-			Paper paper = paperServiceImpl.getEntity(exam.getPaperId());
-			PaperQuestion paperQuestion;
-			if (paper.getGenType() == 1) {
-				paperQuestion = paperQuestionService.getEntity(exam.getPaperId(), questionId);
-			} else {
-				paperQuestion = paperQuestionService.getEntity(exam.getId(), exam.getPaperId(), questionId, userId);
-			}
-			if (BigDecimalUtil.newInstance(score).sub(paperQuestion.getScore()).getResult().doubleValue() > 0) {
-				throw new MyException("最大分值：" + paperQuestion.getScore());
-			}
+		Paper paper = paperServiceImpl.getEntity(exam.getPaperId());
+		PaperQuestion paperQuestion;
+		if (paper.getGenType() == 1) {
+			paperQuestion = paperQuestionService.getEntity(exam.getPaperId(), questionId);
+		} else {
+			paperQuestion = paperQuestionService.getEntity(exam.getId(), exam.getPaperId(), questionId, userId);
+		}
+		if (BigDecimalUtil.newInstance(score).sub(paperQuestion.getScore()).getResult().doubleValue() > 0) {
+			throw new MyException("最大分值：" + paperQuestion.getScore());
 		}
 
 		// 更新阅卷分数
@@ -138,7 +143,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		myExamDetailService.update(myExamDetail);
 		
 		// 标记为阅卷中，记录阅卷时间
-		//myExam.setMarkState(2); //自动阅卷时已标记为阅卷中
+		myExam.setMarkState(2); // 只要打分就标记为阅卷中，可能的问题为前端调用了交卷方法，然后调用该方法时，交卷方法调用失败。这个给分了，阅卷时间到，发现交卷就不在处理，导致结果错误
 		if (!ValidateUtil.isValid(myExam.getMarkStartTime())) {
 			myExam.setMarkStartTime(new Date());
 			myExam.setMarkEndTime(new Date());//如果只阅一道题，就没有结束时间。
@@ -179,31 +184,30 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		}
 		
 		List<MyMark> myMarkList = myMarkDao.getList(examId);
-		boolean ok = false;
+		boolean hasMark = false;
 		for (MyMark myMark : myMarkList) {
 			if (myMark.getMarkUserId().intValue() == getCurUser().getId().intValue()
 					&& myMark.getExamUserIds().contains(String.format(",%s,", userId.toString()))) {
-				ok = true;
+				hasMark = true;// 多人阅卷情况下，有一个符合就可以
 				break;
 			}
 		}
-		if (!ok) {
+		if (!hasMark) {
 			throw new MyException("未参与阅卷");
 		}
 		
+		// 如果还有未阅卷的题，不交卷
 		List<MyExamDetail> userAnswerList = myExamDetailService.getUserAnswerList(examId, userId);
-		int num = 0;
 		BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
+		User examUser = userService.getEntity(userId);
+		User markUser = userService.getEntity(getCurUser().getId());
 		for (MyExamDetail userAnswer : userAnswerList) {
-			if (userAnswer.getScore() == null) {
-				num++;
-			} else {
-				totalScore.add(userAnswer.getScore());
+			if (userAnswer.getScore() == null) {// 如果按题阅卷或多人阅一张试卷，交卷时应该等待所有题都阅卷。阅卷时间到也会做最终的处理。
+				log.info("主观题交卷：【{}-{}】【{}-{} 阅 {}-{}】，编号为{}的试题未阅卷，等待完成", exam.getId(), exam.getName(), 
+						markUser.getId(), markUser.getName(), examUser.getId(), examUser.getName(), userAnswer.getQuestionId());
+				return;
 			}
-		}
-		if (num > 0) {
-			return;// 如果还有题未阅，不标记未阅卷完成。如果阅卷时间结束，定时任务会处理。
-			//throw new MyException("还有" + num + "道题未阅");
+			totalScore.add(userAnswer.getScore());
 		}
 		
 		// 标记为已阅，记录阅卷人，统计总分数，标记是否及格
@@ -220,6 +224,9 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 			myExam.setAnswerState(2);
 		}
 		myExamService.update(myExam);
+		log.info("主观题交卷：【{}-{}】【{}-{} 阅 {}-{}】，得{}分，{}", exam.getId(), exam.getName(), 
+				markUser.getId(), markUser.getName(), examUser.getId(), examUser.getName(), 
+				myExam.getTotalScore(), myExam.getAnswerState() == 1 ? "及格" : "不及格");
 	}
 
 	@Override

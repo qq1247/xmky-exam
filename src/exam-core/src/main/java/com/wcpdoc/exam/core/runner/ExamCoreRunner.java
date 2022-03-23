@@ -34,40 +34,49 @@ public class ExamCoreRunner implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		// 服务启动的时候，加载未阅卷的考试列表
-		AutoMarkCache.reloadCache();
-		List<Exam> unMarkExamList = AutoMarkCache.getList();
-		for (Exam exam : unMarkExamList) {
-			log.info("考试核心启动：【{}-{}】加入监听，{}开始自动阅卷", 
-					exam.getId(), 
-					exam.getName(), // 未阅卷 取 考试结束时间；阅卷中 取 阅卷结束时间
-					exam.getMarkState() == 1 ? DateUtil.formatDateTime(exam.getEndTime()) : DateUtil.formatDateTime(exam.getMarkEndTime()));
-		}
-		
-		// 监听阅卷时间到，自动阅卷
-		while (true) {
-			TimeUnit.SECONDS.sleep(1);
-			
-			unMarkExamList = AutoMarkCache.getList(); // 每次重新取，因为运行中会动态添加删除等。如新发布的考试
-			for (Exam unMarkExam : unMarkExamList) {
-				try {
-					if ((unMarkExam.getMarkState() == 1 && unMarkExam.getEndTime().getTime() > System.currentTimeMillis())
-							|| (unMarkExam.getMarkState() == 2 && unMarkExam.getMarkEndTime().getTime() > System.currentTimeMillis())) {
-						continue;
+		new Thread(new Runnable() {// SpringApplication.callRunners方法会顺序执行ApplicationRunner实现，while (true)不返回导致其他任务不执行
+			@Override
+			public void run() {
+				// 服务启动的时候，加载未阅卷的考试列表
+				AutoMarkCache.reloadCache();
+				List<Exam> unMarkExamList = AutoMarkCache.getList();
+				for (Exam exam : unMarkExamList) {
+					log.info("考试核心启动：【{}-{}】加入监听，{}开始自动阅卷", 
+							exam.getId(), 
+							exam.getName(), // 未阅卷 取 考试结束时间；阅卷中 取 阅卷结束时间
+							exam.getMarkState() == 1 ? DateUtil.formatDateTime(exam.getEndTime()) : DateUtil.formatDateTime(exam.getMarkEndTime()));
+				}
+				
+				// 监听阅卷时间到，自动阅卷
+				while (true) {
+					try {
+						TimeUnit.SECONDS.sleep(1);
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
 					}
 					
-					AutoMarkCache.del(unMarkExam.getId());// 删除缓存不在监听，如果阅卷报错，在执行一遍也报错。应该给管理员发送邮件，修复问题后，刷新缓存重新执行任务
-					if (unMarkExam.getMarkState() == 1) {
-						myExamDetailService.doExam(unMarkExam.getId());
-					} else if (unMarkExam.getMarkState() == 2){
-						myExamDetailService.doMark(unMarkExam.getId());
+					unMarkExamList = AutoMarkCache.getList(); // 每次重新取，因为运行中会动态添加删除等。如新发布的考试
+					for (Exam unMarkExam : unMarkExamList) {
+						try {
+							if ((unMarkExam.getMarkState() == 1 && unMarkExam.getEndTime().getTime() > System.currentTimeMillis())
+									|| (unMarkExam.getMarkState() == 2 && unMarkExam.getMarkEndTime().getTime() > System.currentTimeMillis())) {
+								continue;
+							}
+							
+							AutoMarkCache.del(unMarkExam.getId());// 删除缓存不在监听，如果阅卷报错，在执行一遍也报错。应该给管理员发送邮件，修复问题后，刷新缓存重新执行任务
+							if (unMarkExam.getMarkState() == 1) {
+								myExamDetailService.doExam(unMarkExam.getId());
+							} else if (unMarkExam.getMarkState() == 2){
+								myExamDetailService.doMark(unMarkExam.getId());
+							}
+						} catch (MyException e) {// 一个有问题，不影响其他任务执行
+							log.error("自动阅卷错误：{}", e.getMessage());
+						} catch (Exception e) {
+							log.error("自动阅卷错误：", e);
+						}
 					}
-				} catch (MyException e) {// 一个有问题，不影响其他任务执行
-					log.error("自动阅卷错误：{}", e.getMessage());
-				} catch (Exception e) {
-					log.error("自动阅卷错误：", e);
 				}
 			}
-		}
+		}).start();
 	}
 }

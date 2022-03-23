@@ -102,28 +102,28 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	public void doExam(Integer examId) {
 		// 校验数据有效性
 		Exam exam = examService.getEntity(examId);
-		log.info("自动考试校验：{}", exam.getName());
+		log.info("客观题阅卷校验：【{}-{}】", exam.getId(), exam.getName());
 		
 		if (exam.getState() == 0) {
-			log.error("自动考试异常：{}已删除", exam.getName());
+			log.error("客观题阅卷异常：【{}-{}】已删除", exam.getId(), exam.getName());
 			throw new MyException("已删除");
 		}
 		if (exam.getState() == 2) {
-			log.error("自动考试异常：{}未发布", exam.getName());
+			log.error("客观题阅卷异常：【{}-{}】未发布", exam.getId(), exam.getName());
 			throw new MyException("未发布");
 		}
 		if (exam.getState() == 3) {
-			log.error("自动考试异常：{}已归档", exam.getName());
+			log.error("客观题阅卷异常：【{}-{}】已归档", exam.getId(), exam.getName());
 			throw new MyException("已归档");
 		}
-		if (exam.getMarkState() == 2 || exam.getMarkState() == 3) {
-			log.error("自动考试异常：{}已阅卷", exam.getName());
+		if (exam.getMarkState() != 1) {
+			log.error("客观题阅卷异常：【{}-{}】已阅卷", exam.getId(), exam.getName());
 			throw new MyException("已阅卷");
 		}
 		
 		long curTime = System.currentTimeMillis();
 		if (exam.getEndTime().getTime() > curTime){
-			log.error("自动考试异常：{}考试未结束", exam.getName());
+			log.error("客观题阅卷异常：【{}-{}】考试未结束", exam.getId(), exam.getName());
 			throw new MyException("考试未结束");
 		}
 		
@@ -131,7 +131,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		try {
 			TimeUnit.SECONDS.sleep(2);
 		} catch (InterruptedException e) {
-			log.error("自动考试异常：{}，延时执行异常", exam.getName());
+			log.error("客观题阅卷异常：【{}-{}】延时执行异常", exam.getId(), exam.getName());
 		}
 		
 		Paper paper = paperService.getEntity(exam.getPaperId());// 试卷信息
@@ -148,31 +148,31 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		if (paper.getMarkType() == 1) {
 			for (Question question : questionCache.values()) {
 				if (question.getAi() == 2) {
-					log.error("自动考试异常：{}检测到人工阅卷试题", exam.getName());
-					throw new MyException("检测到人工阅卷试题");
+					log.error("客观题阅卷异常：【{}-{}】检测到主观试题，编号为【{}】", exam.getId(), exam.getName(), question.getId());
+					throw new MyException(String.format("检测到主观试题，编号为【%s】", question.getId()));
 				}
 			}
 		}
 		
 		// 获取考试用户列表
-		log.info("自动考试开始：{}", exam.getName());
+		log.info("客观题阅卷开始：【{}-{}】", exam.getId(), exam.getName());
 		for (MyExam myExam : myExamList) {
 			User user = userService.getEntity(myExam.getUserId());
-			log.info("自动考试进行：{}-{}开始", user.getId(), user.getName());
+			log.info("客观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】开始", exam.getId(), exam.getName(), user.getId(), user.getName());
 		
 			// 获取考试用户的试卷
 			List<MyExamDetail> userAnswerList = getUserAnswerList(examId, myExam.getUserId());
 			BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
-			if (paper.getMarkType() == 1) {// 如果是智能阅卷，记录阅卷开始时间；
+			if (paper.getMarkType() == 1 || myExam.getState() == 1) {// 如果是智能阅卷或未考试，记录阅卷开始时间；
 				myExam.setMarkStartTime(new Date());
 			}
 			
 			// 开始阅卷
 			if (myExam.getState() == 1) {// 如果未考试，状态还是未考试
-				log.info("自动考试进行：{}-{}未考试，得0分，不及格", user.getId(), user.getName());
+				log.info("客观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】未考试", exam.getId(), exam.getName(), user.getId(), user.getName());
 			} else if (myExam.getState() == 2) {// 如果是考试中，标记为交卷
 				myExam.setState(3);
-				log.info("自动考试进行：{}-{}未交卷，标记为已交卷", user.getId(), user.getName());
+				log.info("客观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】未交卷，标记为已交卷", exam.getId(), exam.getName(), user.getId(), user.getName());
 			}
 			for (MyExamDetail userAnswer : userAnswerList) {
 				Question question = questionCache.get(userAnswer.getQuestionId());
@@ -217,7 +217,13 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			}
 			
 			myExamService.update(myExam);
-			log.info("自动考试进行：{}-{}完成阅卷，自动考试部分得{}分", user.getId(), user.getName(), totalScore.getResult());
+			if (paper.getMarkType() == 1) {
+				log.info("客观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】完成阅卷，得{}分，{}", exam.getId(), exam.getName(), user.getId(), user.getName(), 
+						totalScore.getResult(), myExam.getAnswerState() == 1 ? "及格" : "不及格");
+			} else {
+				log.info("客观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】完成阅卷，客观题部分得{}分", exam.getId(), exam.getName(), user.getId(), user.getName(), 
+						totalScore.getResult());
+			}
 		}
 		
 		// 如果试卷是智能阅卷类型，更新用户排名
@@ -227,17 +233,17 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			// 完成考试
 			exam.setMarkState(3);
 			examService.update(exam);
-			log.info("自动考试完成：标记考试为已阅卷，结束");
+			log.info("客观题阅卷完成：标记考试为已阅卷，结束");
 			return;
 		}
 		
-		// 如果试卷是人工阅卷类型，标记考试为阅卷中，等待人工阅卷。（阅卷人在开始阅卷时，如果考试状态为未阅卷则不能阅卷，因为自动考试还未完成。）
+		// 如果试卷是人工阅卷类型，标记考试为阅卷中，等待人工阅卷。（阅卷人在开始阅卷时，如果考试状态为未阅卷则不能阅卷，因为客观题阅卷还未完成。）
 		if (paper.getMarkType() == 2) {
 			exam.setMarkState(2);
 			examService.update(exam);
-			log.info("自动考试完成：标记考试为阅卷中，等待人工阅卷");
+			log.info("客观题阅卷完成：标记考试为阅卷中，等待人工阅卷");
 			
-			// 加入完成阅卷监听，保证自动考试完成，才能进行自动阅卷完成
+			// 加入完成阅卷监听，保证客观题阅卷完成，才能进行自动阅卷完成
 			AutoMarkCache.put(examId, exam);
 		}
 	}
@@ -246,64 +252,70 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	public void doMark(Integer examId) {
 		// 校验数据有效性
 		Exam exam = examService.getEntity(examId);
-		log.info("完成阅卷校验：{}", exam.getName());
+		log.info("主观题阅卷校验：【{}-{}】", exam.getId(), exam.getName());
 		
 		if (exam.getState() == 0) {
-			log.error("完成阅卷异常：{}已删除", exam.getName());
+			log.error("主观题阅卷异常：【{}-{}】已删除", exam.getId(), exam.getName());
 			throw new MyException("已删除");
 		}
 		if (exam.getState() == 2) {
-			log.error("完成阅卷异常：{}未发布", exam.getName());
+			log.error("主观题阅卷异常：【{}-{}】未发布", exam.getId(), exam.getName());
 			throw new MyException("未发布");
 		}
 		if (exam.getState() == 3) {
-			log.error("完成阅卷异常：{}已归档", exam.getName());
+			log.error("主观题阅卷异常：【{}-{}】已归档", exam.getId(), exam.getName());
 			throw new MyException("已归档");
 		}
-		if (exam.getMarkState() == 1) {// 如果状态不是阅卷中，表示自动考试任务错误
-			log.error("自动阅卷异常：{}智能题未阅卷", exam.getName());
+		if (exam.getMarkState() == 1) {// 客观题阅卷没阅完
+			log.error("主观题阅卷异常：【{}-{}】智能题未阅卷", exam.getId(), exam.getName());
 			throw new MyException("智能题未阅卷");
 		}
 		if (exam.getMarkState() == 3) {
-			log.error("自动阅卷异常：{}已阅卷", exam.getName());
+			log.error("主观题阅卷异常：【{}-{}】已阅卷", exam.getId(), exam.getName());
 			throw new MyException("已阅卷");
 		}
 		
 		long curTime = System.currentTimeMillis();
 		if (exam.getEndTime().getTime() > curTime) {
-			log.error("完成阅卷异常：{}考试未结束", exam.getName());
+			log.error("主观题阅卷异常：【{}-{}】考试未结束", exam.getId(), exam.getName());
 			throw new MyException("考试未结束");
 		}
 		if (exam.getMarkEndTime().getTime() > curTime) {
-			log.error("完成阅卷异常：{}阅卷未结束", exam.getName());
+			log.error("主观题阅卷异常：【{}-{}】阅卷未结束", exam.getId(), exam.getName());
 			throw new MyException("阅卷未结束");
 		}
 		
-		// 延时2秒在完成阅卷（阅卷时预留了1秒网络延时，这里在延时1秒，保证都是人工阅卷完成后的结果）
+		// 延时2秒在主观题阅卷（阅卷时预留了1秒网络延时，这里在延时1秒，保证都是人工阅卷完成后的结果）
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
-			log.error("完成阅卷异常：{}，延时执行异常", exam.getName());
+			log.error("主观题阅卷异常：【{}-{}】延时执行异常", exam.getId(), exam.getName());
 		}
 		
 		// 获取考试用户列表
-		log.info("完成阅卷开始：{}", exam.getName());
+		log.info("主观题阅卷开始：【{}-{}】", exam.getId(), exam.getName());
 		Paper paper = paperService.getEntity(exam.getPaperId());// 试卷信息
 		List<MyExam> myExamList = myExamService.getList(examId);// 考试用户列表
 		for(MyExam myExam : myExamList){
-			User user = userService.getEntity(myExam.getUserId());
-			if (myExam.getMarkState() == 3) {//已阅卷的不处理（没考试的人考试时间结束已自动阅卷；人工阅卷在阅卷时间结束之前已经（部分）阅完）
-				log.info("完成考试进行：{}-{}{}，不处理", user.getId(), user.getName(), myExam.getState() == 1 ? "未考试" : "已阅卷");
+			User examUser = userService.getEntity(myExam.getUserId());
+			User markUser = userService.getEntity(myExam.getMarkUserId());
+			if (myExam.getMarkState() == 3) {//已阅卷的不处理（没考试的人考试时间结束已阅卷；人工阅卷在阅卷时间结束之前已经部分试卷阅完）
+				log.info("主观题阅卷进行：【{}-{}】【{}-{} 已阅 {}-{}】{}，不处理", exam.getId(), exam.getName(), 
+						markUser.getId(), markUser.getName(), examUser.getId(), examUser.getName(), myExam.getState() == 1 ? "未考试" : "已阅卷");
 				continue;
 			}
 			
 			// 开始补全未处理的阅卷数据，并合计成绩
-			if (myExam.getMarkStartTime() == null) {// 一道题也没有阅
+			if (myExam.getMarkState() == 1) {// 一道题也没有阅
 				myExam.setMarkUserId(1);//记录阅卷人为admin
 				myExam.setMarkStartTime(new Date());// 阅卷时间为当前时间
+				log.info("主观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】，无人阅卷", exam.getId(), exam.getName(), examUser.getId(), examUser.getName());
+			} else if (myExam.getMarkState() == 2) {
+				log.info("主观题阅卷进行：【{}-{}】【{}-{} 阅 {}-{}】，部分阅完", exam.getId(), exam.getName(), 
+						markUser.getId(), markUser.getName(), examUser.getId(), examUser.getName());
 			}
 			
-			List<MyExamDetail> userAnswerList = getUserAnswerList(myExam.getExamId(), myExam.getUserId());//计算总分
+			List<MyExamDetail> userAnswerList = getUserAnswerList(myExam.getExamId(), myExam.getUserId());// 用户答案
 			BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
 			for (MyExamDetail userAnswer : userAnswerList) {
 				if (userAnswer.getScore() == null) {//当阅卷人没有阅卷或部分未阅卷时，阅卷时间到。
@@ -327,7 +339,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			myExam.setMarkEndTime(new Date());// 标记阅卷结束时间
 			
 			myExamService.update(myExam);
-			log.info("完成考试进行：{}-{}完成阅卷，考试得{}分", user.getId(), user.getName(), totalScore.getResult());
+			log.info("主观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】，得{}分，{}", exam.getId(), exam.getName(), examUser.getId(), examUser.getName(), 
+					totalScore.getResult(), myExam.getAnswerState() == 1 ? "及格" : "不及格");
 		}
 		
 		// 更新用户排名
@@ -336,7 +349,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		// 完成考试
 		exam.setMarkState(3);
 		examService.update(exam);
-		log.info("完成阅卷结束：标记考试为已阅卷，结束");
+		log.info("主观题阅卷结束：标记考试为已阅卷，结束");
 	}
 
 	/**
@@ -514,7 +527,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 				}
 				
 				for (String synonym : synonyms) {// 循环每一项同义词
-					if (userAnswers[i].equals(synonym)) {// 如果用户某一空答案，匹配某一项关键词的同义词
+					if (userAnswers[i].contains(synonym)) {// 如果用户某一空答案，匹配某一项关键词的同义词
 						userAnswer.setScore(BigDecimalUtil.newInstance(userAnswer.getScore())
 								.add(questionAnswer.getScore()).getResult());// 累计该关键词的分数
 						break;// 匹配到一个同义词就结束；返回大循环继续对比其他关键词

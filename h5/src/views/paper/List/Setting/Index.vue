@@ -96,7 +96,7 @@ export default {
           intro: '发布试卷',
           icon: 'common common-publish',
           contentName: '删除',
-          contentIntro: '发布后，试卷不可更改',
+          contentIntro: '发布后，可被共享权限的用户使用',
           index: '3',
         },
         {

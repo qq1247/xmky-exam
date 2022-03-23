@@ -64,6 +64,7 @@
       </el-form-item>
       <el-form-item label="阅卷方式" prop="markType">
         <el-radio
+          :disabled="paperForm.state === 1 ? true : false"
           v-for="item in paperForm.markTypeList"
           :key="item.value"
           v-model="paperForm.markType"
@@ -153,6 +154,7 @@ export default {
         passScore: '',
         readRemark: '',
         readNum: '',
+        state: 2,
         showType: '1',
         showTypes: [
           {
@@ -238,6 +240,7 @@ export default {
         this.paperForm.passScore = quickInfo.passScore
         this.paperForm.showType = String(quickInfo.showType)
         this.paperForm.markType = quickInfo.markType
+        this.paperForm.state = quickInfo.state
       })
     }
 
@@ -280,6 +283,7 @@ export default {
     },
     // 组卷方式
     setPaperType(index) {
+      if( this.paperForm.state === 1)  return
       if (index == 1) {
         this.paperForm.genType = 0
         this.$message('暂未开放！', 'warning')

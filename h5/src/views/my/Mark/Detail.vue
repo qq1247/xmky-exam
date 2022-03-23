@@ -1,5 +1,6 @@
 <template>
   <div class="content">
+    <!-- 考生信息 -->
     <el-scrollbar wrap-style="overflow-x:hidden;" class="content-left">
       <div class="user-info">
         <el-avatar :size="64" v-if="userInfo">{{
@@ -71,11 +72,13 @@
         </div>
       </div>
     </el-scrollbar>
+
     <!-- 内容 -->
     <div class="content-center">
       <div class="paper-title">{{ paper.name }}</div>
 
       <template v-if="questionList.length">
+        <!-- 章节 -->
         <div class="chapter">
           <div class="chapter-item">
             <div class="item-title">{{ chapter.name }}</div>
@@ -84,15 +87,16 @@
           <div class="chapter-description" v-html="chapter.description"></div>
         </div>
 
+        <!-- 试题 -->
         <div
           class="children-content"
           v-for="(item, indexQuestion) in questionList"
           :key="item.id"
           style="border-bottom: 1px solid #f3f3f3"
         >
-          <template v-if="index === indexQuestion">
+          <template v-if="routerQuestionId === item.id">
             <div class="question-title">
-              <div>{{ index + 1 }}、</div>
+              <div>{{ indexQuestion + 1 }}、</div>
               <div v-html="`${item.title}`"></div>
             </div>
 
@@ -102,17 +106,17 @@
                   <el-col :span="2.5">【答案】：</el-col>
                   <el-col :span="21">
                     <div
-                      v-for="(answer, index) in item.answers"
+                      v-for="(answer, indexAnswers) in item.answers"
                       :key="answer.id"
                       class="answers-item"
                     >
                       <span>{{
-                        `填空${$tools.intToChinese(index + 1)}、`
+                        `填空${$tools.intToChinese(indexAnswers + 1)}、`
                       }}</span>
                       <span
                         class="answers-tag"
-                        v-for="(ans, index) in answer.answer"
-                        :key="index"
+                        v-for="(ans, indexAnswer) in answer.answer"
+                        :key="indexAnswer"
                         >{{ ans }}</span
                       >
                     </div>
@@ -123,17 +127,17 @@
                   <el-col :span="21">
                     <template v-if="item.ai === 1">
                       <div
-                        v-for="(answer, index) in item.answers"
+                        v-for="(answer, indexAnswers) in item.answers"
                         :key="answer.id"
                         class="answers-item"
                       >
                         <span>{{
-                          `关键词${$tools.intToChinese(index + 1)}、`
+                          `关键词${$tools.intToChinese(indexAnswers + 1)}、`
                         }}</span>
                         <span
                           class="answers-tag"
-                          v-for="(ans, index) in answer.answer"
-                          :key="index"
+                          v-for="(ans, indexAnswer) in answer.answer"
+                          :key="indexAnswer"
                           >{{ ans }}</span
                         >
                       </div>
@@ -158,22 +162,27 @@
                 <el-col :span="2.5">【用户答案】</el-col>
                 <el-col :span="21">
                   <template
-                    v-if="item.type === 3 && myExamDetailCache[routerIndex]"
+                    v-if="
+                      item.type === 3 && myExamDetailCache[routerQuestionId]
+                    "
                   >
                     <div
-                      v-for="(answer, index) in myExamDetailCache[routerIndex]
-                        .answers"
+                      v-for="(answer, indexCache) in myExamDetailCache[
+                        routerQuestionId
+                      ].answers"
                       :key="answer.id"
                       class="answers-item"
                     >
                       <span>{{
-                        `填空${$tools.intToChinese(index + 1)}、${answer}`
+                        `填空${$tools.intToChinese(indexCache + 1)}、${answer}`
                       }}</span>
                     </div>
                   </template>
                   <div
-                    v-if="item.type === 5"
-                    v-html="`${myExamDetailCache[routerIndex].answers}`"
+                    v-if="
+                      item.type === 5 && myExamDetailCache[routerQuestionId]
+                    "
+                    v-html="`${myExamDetailCache[routerQuestionId].answers}`"
                   ></div>
                 </el-col>
               </el-row>
@@ -186,17 +195,15 @@
                 </el-col>
                 <el-col :span="21">
                   <span style="margin-right: 15px" v-if="preview">{{
-                    item.scorePlate || 0
+                    item.scorePlate
                   }}</span>
                   <div v-if="!preview">
-                    <el-input-number
-                      v-model="item.scorePlate"
-                      controls-position="right"
-                      @blur="scoreChange"
+                    <el-input
+                      class="score-input"
+                      v-model.number="item.scorePlate"
                       @change="scoreChange"
-                      :min="0"
-                      :max="item.score"
-                    ></el-input-number>
+                      @input="(e) => computeScore(e, indexQuestion, item.score)"
+                    ></el-input>
                     <span>（本题满分：{{ item.score }}）</span>
                   </div>
                 </el-col>
@@ -204,6 +211,8 @@
             </div>
           </template>
         </div>
+
+        <!-- 答题卡 -->
         <div class="mark-router">
           <div class="router-content">
             <p class="router-title">答题卡</p>
@@ -211,19 +220,19 @@
               <a
                 :class="[
                   'router-index',
-                  routerIndex === item.id ? 'router-active' : '',
+                  routerQuestionId === item.id ? 'router-active' : '',
                 ]"
-                v-for="(item, index) in questionList"
+                v-for="(item, indexRoute) in questionList"
                 :key="item.id"
-                @click="routerIndex = item.id"
-                >{{ index + 1 }}</a
+                @click="routerQuestionId = item.id"
+                >{{ indexRoute + 1 }}</a
               >
             </div>
           </div>
           <ScorePlate
             v-if="!preview"
             ref="scorePlate"
-            :data="questionList[index]"
+            :data="questionDetail"
             @selectScore="selectScore"
             @nextQuestion="nextQuestion"
             @nextPaper="nextPaper"
@@ -251,8 +260,8 @@ export default {
   },
   data() {
     return {
-      index: 0,
-      routerIndex: 0,
+      questionDetail: {},
+      routerQuestionId: 0,
       paperId: null,
       examId: null,
       userId: null,
@@ -265,7 +274,6 @@ export default {
       chapter: {},
       myExamDetailCache: {},
       paper: {},
-      answerList: [],
       preview: false,
       customColors: [
         { color: '#f56c6c', percentage: 20 },
@@ -275,18 +283,11 @@ export default {
         { color: '#6f7ad3', percentage: 100 },
       ],
       percentage: 0,
+      markEndNum: 0,
     }
   },
-  computed: {
-    markEndNum() {
-      const num = this.userList.filter((item) => item.markState === 3)
-      const percentage = (num.length / this.userList.length) * 100
-      this.percentage = percentage ? Number(percentage.toFixed()) : 0
-      return num.length
-    },
-  },
   watch: {
-    routerIndex: {
+    routerQuestionId: {
       deep: true,
       immediate: true,
       handler(n) {
@@ -310,6 +311,14 @@ export default {
       await this.queryPaperInfo()
       await this.queryAnswerInfo()
       this.getQuestion()
+      this.updatePercentage()
+    },
+    // 更新阅卷进度条
+    updatePercentage() {
+      const num = this.userList.filter((item) => item.markState === 3)
+      const percentage = (num.length / this.userList.length) * 100
+      this.percentage = percentage ? Number(percentage.toFixed()) : 0
+      this.markEndNum = num.length
     },
     // 查询试卷
     async queryPaper() {
@@ -329,27 +338,31 @@ export default {
           userId: this.userId,
         })
         this.paperQuestion = res.data
-        const questionList = res.data.reduce((acc, cur) => {
+        this.questionList = res.data.reduce((acc, cur) => {
           const filterQuestion = cur.questionList.filter(
             (question) => question.ai === 2
           )
           acc.push(...filterQuestion)
           return acc
         }, [])
-        this.questionList = questionList
       } catch (error) {}
     },
     // 获取当前试题
-    getQuestion(routerIndex) {
-      this.routerIndex = Number(routerIndex || this.questionList[0].id)
-
-      this.index = this.questionList.findIndex(
-        (question) => question.id === this.routerIndex
+    getQuestion(routerQuestionId) {
+      this.routerQuestionId = Number(
+        routerQuestionId || this.questionList[0].id
       )
+
+      this.$nextTick(() => {
+        this.questionDetail = this.questionList.find(
+          (question) => question.id === this.routerQuestionId
+        )
+      })
+
       // 查找试题所在的章节信息
       this.paperQuestion.some((item) => {
         const question = item.questionList.some(
-          (question) => question.id === this.routerIndex
+          (question) => question.id === this.routerQuestionId
         )
         if (question) {
           this.chapter = item.chapter
@@ -374,12 +387,15 @@ export default {
         userId: this.userId,
       })
       this.userInfo = userList.data[0]
+      this.routerQuestionId = userList.data[0].id
     },
     // 选择考生
     changeUser(userId) {
       this.userId = userId
       this.queryOneExamineeInfo()
       this.queryAnswerInfo()
+      this.$refs.scorePlate.createScores(0.5)
+      this.$refs.scorePlate.step = ''
     },
     // 未阅考生列表
     filterUserList(e) {
@@ -406,10 +422,10 @@ export default {
         })
 
         // 组合试卷答案信息
-        this.myExamDetailCache = res.data.reduce((acc, cur, index) => {
+        this.myExamDetailCache = res.data.reduce((acc, cur) => {
           this.questionList.map((question) => {
             if (question.id === cur.questionId) {
-              question.scorePlate = cur.score
+              question.scorePlate = cur.score === null ? '' : cur.score
               acc[cur.questionId] = cur
             }
           })
@@ -419,8 +435,20 @@ export default {
         this.$message.error(error)
       }
     },
+    // 填写打分
     scoreChange() {
       this.updateScore()
+    },
+    // 计算实时分数阈值
+    computeScore(e, index, score) {
+      this.$forceUpdate()
+
+      if (Number(e) > score) {
+        this.$set(this.questionList[index], 'scorePlate', score)
+      }
+      if (Number(e) < 0) {
+        this.$set(this.questionList[index], 'scorePlate', 0)
+      }
     },
     // 点击打分板分值
     async selectScore(e) {
@@ -434,17 +462,25 @@ export default {
         return false
       }
 
-      const source = this.questionList[this.index]
-      this.$set(this.questionList[this.index], 'scorePlate', Number(e))
+      const indexActivate = this.questionList.findIndex(
+        (question) => question.id === this.routerQuestionId
+      )
+
+      const source = this.questionList[indexActivate]
+      this.$set(this.questionList[indexActivate], 'scorePlate', Number(e))
 
       if (Number(e) < 0)
-        this.$set(this.questionList[this.index], 'scorePlate', 0)
+        this.$set(this.questionList[indexActivate], 'scorePlate', 0)
       if (Number(e) > source.score)
-        this.$set(this.questionList[this.index], 'scorePlate', source.score)
+        this.$set(this.questionList[indexActivate], 'scorePlate', source.score)
+      this.$forceUpdate()
     },
     // 打分
     async updateScore() {
-      const source = this.questionList[this.index]
+      const indexActivate = this.questionList.findIndex(
+        (question) => question.id === this.routerQuestionId
+      )
+      const source = this.questionList[indexActivate]
       const res = await myMarkScore({
         examId: this.examId,
         questionId: source.id,
@@ -453,6 +489,7 @@ export default {
       })
 
       if (res?.code === 200) {
+        this.$message('打分成功！')
         const { markType, isNextQuestion } = this.$refs.scorePlate
         if (!markType) {
           return false
@@ -473,35 +510,47 @@ export default {
     },
     // 下一题
     async nextQuestion() {
+      const indexActivate = this.questionList.findIndex(
+        (question) => question.id === this.routerQuestionId
+      )
       const questionLength = this.questionList.length
-      if (this.index < questionLength - 1) {
-        await this.markEnd()
-        this.index += 1
+
+      if (indexActivate < questionLength - 1) {
+        this.markEnd()
+        this.routerQuestionId = this.questionList[indexActivate + 1].id
       } else {
-        this.nextPaper()
-        this.index = 0
+        this.nextPaper(1)
       }
     },
     // 下一卷
-    async nextPaper() {
-      const index = this.userList.findIndex(
+    async nextPaper(state) {
+      const indexPaper = this.userList.findIndex(
         (item) => item.userId === this.userId
       )
       await this.markEnd()
-      await this.queryAnswerInfo()
-      if (index === this.userList.length - 1) {
+      if (indexPaper === this.userList.length - 1) {
         this.$message.warning('已经是最后一卷了！')
         return
       }
-      this.userId = this.userList[index + 1].userId
-      this.userInfo = this.userList[index + 1]
+      const { markType, isNextQuestion } = this.$refs.scorePlate
+      // 自动且下一题 || 人工且未阅卷
+      if ((markType && isNextQuestion) || (!markType && state === 1)) {
+        this.routerQuestionId = this.questionList[0].id
+      }
+
+      this.userId = this.userList[indexPaper + 1].userId
+      this.userInfo = this.userList[indexPaper + 1]
+      await this.queryAnswerInfo()
     },
     // 完成阅卷
     async markEnd() {
-      const isEvery = this.questionList.every(
-        (item) => item.scorePlate !== '' || item.scorePlate !== null
+      const isEnd = this.questionList.every((item) => item.scorePlate !== '')
+      if (!isEnd) return false
+      const indexPaper = this.userList.findIndex(
+        (item) => item.userId === this.userId
       )
-      if (!isEvery) return false
+      this.$set(this.userList[indexPaper], 'markState', 3)
+      this.updatePercentage()
       await myMarkFinish({
         examId: this.examId,
         userId: this.userId,
@@ -514,8 +563,8 @@ export default {
       }
       const diffTime =
         new Date(endTime).getTime() - new Date(startTime).getTime()
-      const minutes = diffTime / (60 * 1000)
-      return `${minutes.toFixed(2)}分钟`
+      const minutes = Math.ceil(diffTime / (60 * 1000))
+      return `${minutes}分钟`
     },
   },
 }
@@ -559,16 +608,15 @@ export default {
   line-height: 50px;
 }
 
-/deep/ .el-input-number .el-input .el-input__inner {
-  width: 100%;
-  background-color: transparent;
-  border: none;
-  border-bottom: 1px solid #333;
-  border-radius: 0;
-  height: 20px;
-}
-/deep/ .el-input-number .el-input-number__decrease,
-/deep/ .el-input-number .el-input-number__increase {
-  display: none;
+.score-input {
+  width: 100px;
+  /deep/ & .el-input__inner {
+    width: 100%;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid #333;
+    border-radius: 0;
+    height: 20px;
+  }
 }
 </style>
