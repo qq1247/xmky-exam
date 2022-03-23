@@ -193,7 +193,7 @@ public class ApiLoginController extends BaseController {
 			response.setContentType("application/force-download");
 			FileUtils.copyFile(logo, response.getOutputStream());
 		} catch (MyException e) {
-			log.error("获取ico失败：", e.getMessage());
+			log.error("获取ico失败：{}", e.getMessage());
 		} catch (Exception e) {
 			log.error("获取ico失败：", e);
 		}

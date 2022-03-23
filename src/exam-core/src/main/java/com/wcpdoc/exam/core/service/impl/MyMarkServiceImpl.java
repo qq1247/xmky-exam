@@ -143,7 +143,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		myExamDetailService.update(myExamDetail);
 		
 		// 标记为阅卷中，记录阅卷时间
-		myExam.setMarkState(2); 
+		myExam.setMarkState(2); // 只要打分就标记为阅卷中，可能的问题为前端调用了交卷方法，然后调用该方法时，交卷方法调用失败。这个给分了，阅卷时间到，发现交卷就不在处理，导致结果错误
 		if (!ValidateUtil.isValid(myExam.getMarkStartTime())) {
 			myExam.setMarkStartTime(new Date());
 			myExam.setMarkEndTime(new Date());//如果只阅一道题，就没有结束时间。
