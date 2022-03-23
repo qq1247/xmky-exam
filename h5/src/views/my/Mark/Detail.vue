@@ -198,13 +198,12 @@
                     item.scorePlate
                   }}</span>
                   <div v-if="!preview">
-                    <el-input-number
-                      v-model="item.scorePlate"
-                      controls-position="right"
-                      @blur="scoreChange"
-                      :min="0"
-                      :max="item.score"
-                    ></el-input-number>
+                    <el-input
+                      class="score-input"
+                      v-model.number="item.scorePlate"
+                      @change="scoreChange"
+                      @input="(e) => computeScore(e, indexQuestion, item.score)"
+                    ></el-input>
                     <span>（本题满分：{{ item.score }}）</span>
                   </div>
                 </el-col>
@@ -284,15 +283,8 @@ export default {
         { color: '#6f7ad3', percentage: 100 },
       ],
       percentage: 0,
+      markEndNum: 0,
     }
-  },
-  computed: {
-    markEndNum() {
-      const num = this.userList.filter((item) => item.markState === 3)
-      const percentage = (num.length / this.userList.length) * 100
-      this.percentage = percentage ? Number(percentage.toFixed()) : 0
-      return num.length
-    },
   },
   watch: {
     routerQuestionId: {
@@ -319,6 +311,14 @@ export default {
       await this.queryPaperInfo()
       await this.queryAnswerInfo()
       this.getQuestion()
+      this.updatePercentage()
+    },
+    // 更新阅卷进度条
+    updatePercentage() {
+      const num = this.userList.filter((item) => item.markState === 3)
+      const percentage = (num.length / this.userList.length) * 100
+      this.percentage = percentage ? Number(percentage.toFixed()) : 0
+      this.markEndNum = num.length
     },
     // 查询试卷
     async queryPaper() {
@@ -425,7 +425,7 @@ export default {
         this.myExamDetailCache = res.data.reduce((acc, cur) => {
           this.questionList.map((question) => {
             if (question.id === cur.questionId) {
-              question.scorePlate = cur.score
+              question.scorePlate = cur.score === null ? '' : cur.score
               acc[cur.questionId] = cur
             }
           })
@@ -438,6 +438,17 @@ export default {
     // 填写打分
     scoreChange() {
       this.updateScore()
+    },
+    // 计算实时分数阈值
+    computeScore(e, index, score) {
+      this.$forceUpdate()
+
+      if (Number(e) > score) {
+        this.$set(this.questionList[index], 'scorePlate', score)
+      }
+      if (Number(e) < 0) {
+        this.$set(this.questionList[index], 'scorePlate', 0)
+      }
     },
     // 点击打分板分值
     async selectScore(e) {
@@ -503,7 +514,9 @@ export default {
         (question) => question.id === this.routerQuestionId
       )
       const questionLength = this.questionList.length
+
       if (indexActivate < questionLength - 1) {
+        this.markEnd()
         this.routerQuestionId = this.questionList[indexActivate + 1].id
       } else {
         this.nextPaper(1)
@@ -514,6 +527,16 @@ export default {
       const indexPaper = this.userList.findIndex(
         (item) => item.userId === this.userId
       )
+
+      const isEnd = this.questionList.every(
+        (item) => item.scorePlate !== '' || item.scorePlate !== null
+      )
+
+      if (isEnd) {
+        this.$set(this.userList[indexPaper], 'markState', 3)
+        this.updatePercentage()
+      }
+
       await this.markEnd()
       if (indexPaper === this.userList.length - 1) {
         this.$message.warning('已经是最后一卷了！')
@@ -531,10 +554,10 @@ export default {
     },
     // 完成阅卷
     async markEnd() {
-      const isEvery = this.questionList.every(
+      const isEnd = this.questionList.every(
         (item) => item.scorePlate !== '' || item.scorePlate !== null
       )
-      if (!isEvery) return false
+      if (!isEnd) return false
       await myMarkFinish({
         examId: this.examId,
         userId: this.userId,
@@ -592,16 +615,15 @@ export default {
   line-height: 50px;
 }
 
-/deep/ .el-input-number .el-input .el-input__inner {
-  width: 100%;
-  background-color: transparent;
-  border: none;
-  border-bottom: 1px solid #333;
-  border-radius: 0;
-  height: 20px;
-}
-/deep/ .el-input-number .el-input-number__decrease,
-/deep/ .el-input-number .el-input-number__increase {
-  display: none;
+.score-input {
+  width: 100px;
+  /deep/ & .el-input__inner {
+    width: 100%;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid #333;
+    border-radius: 0;
+    height: 20px;
+  }
 }
 </style>

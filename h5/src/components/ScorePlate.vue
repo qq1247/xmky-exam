@@ -99,9 +99,15 @@ export default {
     },
     stepInput(e) {
       this.step = e
-      if (e < 0) this.step = 0
-      if (Number(e) > this.data.score) this.step = this.data.score
-      this.createScores(this.step)
+      if (e !== '') {
+        if (Number(e) <= 0) {
+          this.step = 0
+          this.scores = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+          return
+        }
+        if (Number(e) > this.data.score) this.step = this.data.score
+        this.createScores(this.step)
+      }
     },
     nextQuestion() {
       this.$emit('nextQuestion')
