@@ -527,23 +527,13 @@ export default {
       const indexPaper = this.userList.findIndex(
         (item) => item.userId === this.userId
       )
-
-      const isEnd = this.questionList.every(
-        (item) => item.scorePlate !== '' || item.scorePlate !== null
-      )
-
-      if (isEnd) {
-        this.$set(this.userList[indexPaper], 'markState', 3)
-        this.updatePercentage()
-      }
-
       await this.markEnd()
       if (indexPaper === this.userList.length - 1) {
         this.$message.warning('已经是最后一卷了！')
         return
       }
       const { markType, isNextQuestion } = this.$refs.scorePlate
-      // 自动且下一题
+      // 自动且下一题 || 人工且未阅卷
       if ((markType && isNextQuestion) || (!markType && state === 1)) {
         this.routerQuestionId = this.questionList[0].id
       }
@@ -554,10 +544,13 @@ export default {
     },
     // 完成阅卷
     async markEnd() {
-      const isEnd = this.questionList.every(
-        (item) => item.scorePlate !== '' || item.scorePlate !== null
-      )
+      const isEnd = this.questionList.every((item) => item.scorePlate !== '')
       if (!isEnd) return false
+      const indexPaper = this.userList.findIndex(
+        (item) => item.userId === this.userId
+      )
+      this.$set(this.userList[indexPaper], 'markState', 3)
+      this.updatePercentage()
       await myMarkFinish({
         examId: this.examId,
         userId: this.userId,
