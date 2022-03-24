@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -78,12 +79,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	public void setDao(BaseDao<Question> dao) {
 		super.dao = dao;
 	}
-public static void main(String[] args) {
-	String[] options = new String[]{"A","B"}; 
-	if (options.length < 2) {
-		throw new MyException("参数错误：options长度小于2");
-	}
-}
+
 	@Override
 	public void addAndUpdate(Question question, Integer[] scoreOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
 		// 校验数据有效性
@@ -116,6 +112,7 @@ public static void main(String[] args) {
 			questionAnswerService.add(questionAnswer);
 		} else if (question.getType() == 2) {
 			QuestionAnswer questionAnswer = new QuestionAnswer();
+			Arrays.sort(answers);// 页面前选b在选a，传值为ba，处理一下
 			questionAnswer.setAnswer(StringUtil.join(answers));
 			questionAnswer.setScore(answerScores[0]);
 			questionAnswer.setQuestionId(question.getId());
@@ -214,6 +211,7 @@ public static void main(String[] args) {
 			questionAnswerService.add(questionAnswer);
 		} else if (question.getType() == 2) {
 			QuestionAnswer questionAnswer = new QuestionAnswer();
+			Arrays.sort(answers);// 页面前选b在选a，传值为ba，处理一下
 			questionAnswer.setAnswer(StringUtil.join(answers));
 			questionAnswer.setScore(answerScores[0]);
 			questionAnswer.setQuestionId(question.getId());
@@ -595,6 +593,9 @@ public static void main(String[] args) {
 			if (ValidateUtil.isValid(scoreOptions)) {
 				throw new MyException("参数错误：scoreOptions");
 			}
+			if (ValidateUtil.isValid(answerScores)) {
+				throw new MyException("参数错误：answerScores");
+			}
 		} else if (question.getType() == 2) {// 如果是多选
 			if (!ValidateUtil.isValid(options)) {
 				throw new MyException("参数错误：options");
@@ -646,7 +647,7 @@ public static void main(String[] args) {
 						throw new MyException("参数错误：scoreOption");
 					}
 					for (Integer scoreOption : scoreOptions) {
-						if (scoreOption != 2 || scoreOption != 3) {//分值选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；)
+						if (scoreOption != 2 && scoreOption != 3) {//分值选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；)
 							throw new MyException("参数错误：scoreOption");
 						}
 					}
@@ -686,6 +687,9 @@ public static void main(String[] args) {
 			
 			if (ValidateUtil.isValid(scoreOptions)) {
 				throw new MyException("参数错误：scoreOptions");
+			}
+			if (ValidateUtil.isValid(answerScores)) {
+				throw new MyException("参数错误：answerScores");
 			}
 		} else if (question.getType() == 5) {
 			if (question.getAi() == 1) {
