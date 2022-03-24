@@ -34,12 +34,7 @@
         >
           <div
             :style="{
-              color:
-                questionDetail.finish &&
-                questionDetail.selected === String.fromCharCode(65 + index) &&
-                questionDetail.selected !== questionDetail.answers[0].answer
-                  ? 'red'
-                  : '',
+              color: questionDetail.finish ? optionColor(index) : '',
             }"
             class="flex-items-center"
             v-html="`${String.fromCharCode(65 + index)}、${option}`"
@@ -62,6 +57,9 @@
           v-for="(option, index) in questionDetail.options"
         >
           <div
+            :style="{
+              color: questionDetail.finish ? optionColor(index) : '',
+            }"
             class="flex-items-center"
             v-html="`${String.fromCharCode(65 + index)}、${option}`"
           ></div>
@@ -81,7 +79,12 @@
           class="option-item"
           v-for="(option, index) in ['对', '错']"
           :disabled="questionDetail.finish ? true : false"
-          >{{ option }}</el-radio
+          ><span
+            :style="{
+              color: questionDetail.finish ? optionColor(option) : '',
+            }"
+            >{{ option }}</span
+          ></el-radio
         >
       </el-radio-group>
 
@@ -285,19 +288,67 @@ export default {
     }
   },
   computed: {
-    errorOption(index) {
+    optionColor(index) {
       return (index) => {
-        console.log(index)
-        this.questionDetail.finish &&
-          this.questionDetail.selected === String.fromCharCode(65 + index) &&
-          this.questionDetail.selected !== this.questionDetail.answers[0].answer
-      }
-    },
-    successOption(index) {
-      return (index) => {
-        this.questionDetail.finish &&
-          this.questionDetail.selected === String.fromCharCode(65 + index) &&
-          this.questionDetail.selected === this.questionDetail.answers[0].answer
+        // 单选
+        if (this.questionDetail.type === 1) {
+          // 选择完毕且与正确答案不匹配
+          if (
+            this.questionDetail.selected === String.fromCharCode(65 + index) &&
+            String.fromCharCode(65 + index) !==
+              this.questionDetail.answers[0].answer
+          ) {
+            return '#ea6a77'
+          }
+
+          // 正确答案
+          if (
+            this.questionDetail.answers[0].answer ===
+            String.fromCharCode(65 + index)
+          ) {
+            return '#75cd61'
+          }
+        }
+
+        // 判断
+        if (this.questionDetail.type === 4) {
+          // 选择完毕且与正确答案不匹配
+          if (
+            this.questionDetail.selected === index &&
+            index !== this.questionDetail.answers[0].answer
+          ) {
+            return '#ea6a77'
+          }
+
+          // 正确答案
+          if (this.questionDetail.answers[0].answer === index) {
+            return '#75cd61'
+          }
+        }
+
+        // 多选
+        if (this.questionDetail.type === 2) {
+          // 选择完毕且与正确答案不匹配
+          if (
+            this.questionDetail.selected.includes(
+              String.fromCharCode(65 + index)
+            ) &&
+            !this.questionDetail.answers[0].answer.includes(
+              String.fromCharCode(65 + index)
+            )
+          ) {
+            return '#ea6a77'
+          }
+
+          // 正确答案
+          if (
+            this.questionDetail.answers[0].answer.includes(
+              String.fromCharCode(65 + index)
+            )
+          ) {
+            return '#75cd61'
+          }
+        }
       }
     },
   },
@@ -342,7 +393,9 @@ export default {
       }
 
       if (flag) {
-        this.nextQuestion()
+        setTimeout(() => {
+          this.nextQuestion()
+        }, 300)
       }
     },
     // 上一题
