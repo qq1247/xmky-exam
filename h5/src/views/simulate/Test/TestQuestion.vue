@@ -1,5 +1,6 @@
 <template>
   <div class="content-center">
+    <!--  -->
     <div class="children-content" v-if="!isRecite">
       <!-- 标题 -->
       <div class="question-title" v-if="questionDetail.type !== 3">
@@ -32,6 +33,14 @@
           :key="index"
         >
           <div
+            :style="{
+              color:
+                questionDetail.finish &&
+                questionDetail.selected === String.fromCharCode(65 + index) &&
+                questionDetail.selected !== questionDetail.answers[0].answer
+                  ? 'red'
+                  : '',
+            }"
             class="flex-items-center"
             v-html="`${String.fromCharCode(65 + index)}、${option}`"
           ></div>
@@ -275,6 +284,23 @@ export default {
       analysisDetail: false,
     }
   },
+  computed: {
+    errorOption(index) {
+      return (index) => {
+        console.log(index)
+        this.questionDetail.finish &&
+          this.questionDetail.selected === String.fromCharCode(65 + index) &&
+          this.questionDetail.selected !== this.questionDetail.answers[0].answer
+      }
+    },
+    successOption(index) {
+      return (index) => {
+        this.questionDetail.finish &&
+          this.questionDetail.selected === String.fromCharCode(65 + index) &&
+          this.questionDetail.selected === this.questionDetail.answers[0].answer
+      }
+    },
+  },
   methods: {
     // 校验答案
     checkAnswer() {
@@ -461,5 +487,12 @@ export default {
   padding: 10px;
   background: #fff;
   border-bottom: 10px solid #f7f8f9;
+}
+
+.error {
+  color: red;
+}
+.success {
+  color: green;
 }
 </style>
