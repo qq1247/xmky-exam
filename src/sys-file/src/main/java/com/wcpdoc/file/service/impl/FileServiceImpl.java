@@ -11,6 +11,8 @@ import javax.annotation.Resource;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,6 +36,7 @@ import com.wcpdoc.file.service.FileService;
  */
 @Service
 public class FileServiceImpl extends BaseServiceImp<File> implements FileService {
+	private static final Logger log = LoggerFactory.getLogger(FileServiceImpl.class);
 	@Resource
 	private FileDao fileDao;
 	@Resource
@@ -144,7 +147,8 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		try {
 			FileUtils.moveFileToDirectory(tempFile, destDir, true);
 		} catch (Exception e) {
-			throw new MyException(e);
+			log.error("移动附件失败：{} 到 {}", tempFile.getAbsolutePath(), destDir.getAbsolutePath());
+			throw new MyException("保存附件失败");
 		}
 	}
 

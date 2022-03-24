@@ -19,7 +19,6 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.safety.Whitelist;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -88,134 +87,37 @@ public static void main(String[] args) {
 	@Override
 	public void addAndUpdate(Question question, Integer[] scoreOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
 		// 校验数据有效性
-		if (question.getType() == null) {
-			throw new MyException("参数错误：type");
-		}
-		if (question.getDifficulty() == null) {
-			throw new MyException("参数错误：difficulty");
-		}
-		if (!ValidateUtil.isValid(question.getTitle())) {
-			throw new MyException("参数错误：title");
-		}
-		if (!ValidateUtil.isValid(answers)) {
-			throw new MyException("参数错误：answers");
-		}
-		
-		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-		if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
-			throw new MyException("无操作权限");
-		}
-		
-		if (question.getType() == 1) {// 如果是单选
-			if (!ValidateUtil.isValid(options)) {
-				throw new MyException("参数错误：options");
-			}
-			if (options.length < 2) {
-				throw new MyException("参数错误：options长度小于2");
-			}
-			if (answers.length != 1) {
-				throw new MyException("参数错误：answers");
-			}
-			if (!"ABCDEFG".contains(answers[0].toUpperCase())) {
-				throw new MyException("参数错误：answer");
-			}
-			int answerIndex = answers[0].getBytes()[0] - 65;
-			if (options.length < answerIndex + 1) {// 总共四个选项，答案是E就是有问题的
-				throw new MyException("选项和答案不匹配");
-			}
-		} else if (question.getType() == 2) {
-			if (!ValidateUtil.isValid(options)) {
-				throw new MyException("参数错误：options");
-			}
-			if (options.length < 2) {
-				throw new MyException("参数错误：options长度小于2");
-			}
-			if (answers.length < 2) { // 最少两个答案
-				throw new MyException("参数错误：answers");
-			}
-			if (scoreOptions == null || scoreOptions.length <= 0) {
-				scoreOptions = new Integer[1];
-				scoreOptions[0] = 1; //多选的漏选得分必填
-			}
-			if (answerScores.length == 0) {
-				answerScores[0] = question.getScore().divide(new BigDecimal(2));//答案分数是分数的一半
-			}
-			for (int i = 0; i < answers.length; i++) {
-				if (!"ABCDEFG".contains(answers[i].toUpperCase())) {
-					throw new MyException("参数错误：answers");
-				}
-				int answerIndex = answers[i].getBytes()[0] - 65;
-				if (options.length < answerIndex + 1) {
-					throw new MyException("选项和答案不匹配");
-				}
-			}
-		}
-		if (question.getType() == 3) {
-			Pattern p = Pattern.compile("[_]{5,}"); //正则表达式
-			Matcher m = p.matcher(Jsoup.clean(question.getTitle(), Whitelist.none())); // 获取 matcher 对象
-			int count = 0;
-			while(m.find()) {
-				count++;
-			}
-			if (count != answers.length) {
-				throw new MyException("填空和答案数量不匹配");
-			}
-		}
-		if (question.getType() == 4) {
-			if (answers.length != 1) {
-				throw new MyException("参数错误：answers");
-			}
-
-			if (!"对是√否错×".contains(answers[0])) {
-				throw new MyException("参数错误：answers");
-			}
-		}
+		addAndUpdateValid(question, scoreOptions, options, answers, answerScores);
 		
 		// 添加试题
-		if (question.getType() == 1 || question.getType() == 2 || question.getType() == 4) {
-			question.setAi(1);
-		}
-		question.setScoreOptions(ValidateUtil.isValid(scoreOptions) ? StringUtil.join(scoreOptions) : null);
 		question.setCreateTime(new Date());
 		question.setCreateUserId(getCurUser().getId());
 		question.setUpdateTime(new Date());
 		question.setUpdateUserId(getCurUser().getId());
-		//question.setState(2);// 默认禁用
+		//question.setState(2);// 通过页面去控制添加的是草稿还是发布
+		if (question.getType() == 1 || question.getType() == 4 ) {
+			question.setAi(1);
+			question.setScoreOptions(null);
+		} else if (question.getType() == 2) {
+			question.setAi(1);
+			question.setScoreOptions("1");//多选的漏选得分必填。漏选分值页面控制
+		} else if (question.getType() == 3 || question.getType() == 5 ) {
+			question.setScoreOptions(ValidateUtil.isValid(scoreOptions) ? StringUtil.join(scoreOptions) : null);
+		}
 		add(question);
 
-		BigDecimal total = new BigDecimal(0.00);
-		//添加试题答案
+		//添加答案
 		if (question.getType() == 1 || question.getType() == 4 ) {
 			QuestionAnswer questionAnswer = new QuestionAnswer();
-			questionAnswer.setAnswer(answers[0].toUpperCase());
-			if (question.getAi() == 1 && answerScores != null) {				
-				questionAnswer.setScore(answerScores[0]);
-			}else{
-				questionAnswer.setScore(new BigDecimal(0));
-			}
+			questionAnswer.setAnswer(answers[0]);
+			questionAnswer.setScore(question.getScore());
 			questionAnswer.setQuestionId(question.getId());
 			questionAnswer.setNo(1);
 			questionAnswerService.add(questionAnswer);
-			total = answerScores[0];
 		} else if (question.getType() == 2) {
-			total = question.getScore();
 			QuestionAnswer questionAnswer = new QuestionAnswer();
-			String answerString = "";
-			for(int i = 0; i < answers.length; i++ ){
-				if (answerString == "") {
-					answerString = answers[i].toUpperCase();
-				}else{
-					answerString = answerString + "," + answers[i].toUpperCase();
-				}
-				
-				if (question.getAi() == 1 && answerScores != null) {
-					questionAnswer.setScore(answerScores[0]);
-				}else{
-					questionAnswer.setScore(new BigDecimal(0));
-				}
-			}
-			
-			questionAnswer.setAnswer(answerString);
+			questionAnswer.setAnswer(StringUtil.join(answers));
+			questionAnswer.setScore(answerScores[0]);
 			questionAnswer.setQuestionId(question.getId());
 			questionAnswer.setNo(1);
 			questionAnswerService.add(questionAnswer);
@@ -223,19 +125,11 @@ public static void main(String[] args) {
 			for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();
 				questionAnswer.setAnswer(answers[i]);
-				if (question.getAi() == 1 && answerScores != null) {
-					questionAnswer.setScore(answerScores[i]);
-					total = total.add(answerScores[i]);
-				}else{
-					questionAnswer.setScore(new BigDecimal(0));
-				}
+				questionAnswer.setScore(question.getAi() == 1 ? answerScores[i] : BigDecimal.ZERO);
 				questionAnswer.setQuestionId(question.getId());
-				questionAnswer.setNo(i+1);
+				questionAnswer.setNo(i + 1);
 				questionAnswerService.add(questionAnswer);
 			}
-		}
-		if (question.getAi() == 1 &&  question.getScore().compareTo(total) != 0) {
-			throw new MyException("答案总分有误 ");
 		}
 		
 		// 添加选项
@@ -250,231 +144,90 @@ public static void main(String[] args) {
 		}
 
 		// 保存附件
-		saveFile(question);
+		List<Integer> fileIdList = html2FileIds(question.getTitle());
+		fileIdList.addAll(html2FileIds(question.getAnalysis()));
+		if (question.getType() == 1 || question.getType() == 2) {
+			for (int i = 0; i < options.length; i++) {
+				fileIdList.addAll(html2FileIds(options[i]));
+			}
+		}
+
+		for (Integer fileId : fileIdList) {
+			fileService.doUpload(fileId);
+		}
 	}
 
 	@Override
 	public void updateAndUpdate(Question question, Integer[] scoreOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
 		// 校验数据有效性
-		if (question.getType() == null) {
+		Question entity = getEntity(question.getId());
+		question.setQuestionTypeId(entity.getQuestionTypeId());//校验用
+		if (entity.getType() != question.getType()) {
 			throw new MyException("参数错误：type");
 		}
-		if (question.getDifficulty() == null) {
-			throw new MyException("参数错误：difficulty");
+//		if (entity.getState() == 1) {// 未被引用可以修改
+//			throw new MyException("试题已发布");
+//		}
+		if (entity.getState() == 0) {
+			throw new MyException("已删除");
 		}
-		if (!ValidateUtil.isValid(question.getTitle())) {
-			throw new MyException("参数错误：title");
-		}
-		if (!ValidateUtil.isValid(answers)) {
-			throw new MyException("参数错误：answers");
-		}
-		
 		List<PaperQuestion> paperQuestionList = paperQuestionService.getPaperQuestionList(question.getId());//判断是否被试卷引用
 		if (ValidateUtil.isValid(paperQuestionList)) {
 			Paper paper = paperService.getEntity(paperQuestionList.get(0).getPaperId());
 			throw new MyException(String.format("该题已被【%s】试卷引用", paper.getName()));
 		}
 		
-		if (question.getType() == 1) {
-			if (options.length < 2) {
-				throw new MyException("参数错误：options长度小于2");
-			}
-			if (answers.length != 1) {
-				throw new MyException("参数错误：answers");
-			}
-			if (!"ABCDEFG".contains(answers[0])) {
-				throw new MyException("参数错误：answer");
-			}
-			int answerIndex = answers[0].getBytes()[0] - 65;
-			if (options.length < answerIndex + 1) {
-				throw new MyException("选项和答案不匹配");
-			}
-		}
-		if (question.getType() == 2) {
-			if (options.length < 2) {
-				throw new MyException("参数错误：options长度小于2");
-			}
-			if (answers.length < 1) {
-				throw new MyException("参数错误：answers");
-			}
-			if (scoreOptions.length <= 0) {
-				scoreOptions[0] = 1; //多选的漏选得分必填
-			}
-			if (answerScores.length <= 0) {
-				answerScores[0] = question.getScore().divide(new BigDecimal(2));//答案分数是分数的一半
-			}
-			for (int i = 0; i < answers.length; i++) {
-				if (!"ABCDEFG".contains(answers[i])) {
-					throw new MyException("参数错误：answers");
-				}
-				int answerIndex = answers[i].getBytes()[0] - 65;
-				if (options.length < answerIndex + 1) {
-					throw new MyException("选项和答案不匹配");
-				}
-			}
-		}
-		if (question.getType() == 3) {
-			Pattern p = Pattern.compile("[_]{5,}"); //正则表达式
-			Matcher m = p.matcher(Jsoup.clean(question.getTitle(), Whitelist.none()));// 获取 matcher 对象
-			int count = 0;
-			while(m.find()) {
-				count++;
-			}
-			if (count != answers.length) {
-				throw new MyException("填空和答案数量不匹配");
-			}
-		}
-		if (question.getType() == 4) {
-			if (answers.length != 1) {
-				throw new MyException("参数错误：answers");
-			}
-
-			if (!"对是√否错×".contains(answers[0])) {
-				throw new MyException("参数错误：answers");
-			}
-		}
-		
-		// 如果有新版本标识，删除旧版本，生成新版本		
-		Question entity = getEntity(question.getId());
-//		if (entity.getState() == 1) {
-//			throw new MyException("试题已发布不能修改");
-//		}
-		if (entity.getState() == 0) {
-			throw new MyException("试题已删除不能修改");
-		}
-		
-		QuestionType questionType = questionTypeService.getEntity(entity.getQuestionTypeId());
-		if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
-			throw new MyException("无操作权限");
-		}
-		/*if (newVer) {
-			// 删除旧版本
-			Question newQuestion = new Question();
-			BeanUtils.copyProperties(entity, newQuestion);
-			entity.setState(0);
-			update(entity);
-
-			// 生成新版本
-			// newQuestion.setState(question.getState());
-			newQuestion.setDifficulty(question.getDifficulty());
-			newQuestion.setTitle(question.getTitle());
-			newQuestion.setAnswer(question.getAnswer());
-			newQuestion.setAnalysis(question.getAnalysis());
-			newQuestion.setUpdateTime(new Date());
-			newQuestion.setUpdateUserId(getCurUser().getId());
-			newQuestion.setScore(question.getScore());
-			newQuestion.setScoreOptions(question.getScoreOptions());
-			newQuestion.setNo(question.getNo());
-			newQuestion.setVer(entity.getVer() + 1);
-			add(newQuestion);
-
-			if (question.getType() == 1 || question.getType() == 2) {
-				List<QuestionOption> questionOptionList = questionOptionService.getList(entity.getId());
-				for (QuestionOption questionOption : questionOptionList) {
-					questionOptionService.del(questionOption.getId());
-				}
-
-				for (int i = 0; i < options.length; i++) {
-					QuestionOption questionOption = new QuestionOption();
-					questionOption.setQuestionId(entity.getId());
-					questionOption.setOptions(options[i]);
-					questionOption.setNo(i + 1);
-					questionOptionService.add(questionOption);
-				}
-			}
-
-			// 保存附件
-			saveFile(newQuestion);
-			return;
-		}*/
+		addAndUpdateValid(question, scoreOptions, options, answers, answerScores);
 
 		// 修改试题
-		// entity.setState(question.getState());
-		if (question.getType() == 3 || question.getType() == 5 ) {
-			entity.setAi(question.getAi());
-		}
-		
-		entity.setState(question.getState());
-		entity.setDifficulty(question.getDifficulty());
 		entity.setTitle(question.getTitle());
+		entity.setDifficulty(question.getDifficulty());
+		entity.setAi(question.getAi());
+		entity.setScore(question.getScore());
+		entity.setState(question.getState());
 		entity.setAnalysis(question.getAnalysis());
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
-		entity.setScore(question.getScore());
-		entity.setScoreOptions(ValidateUtil.isValid(scoreOptions) ? StringUtil.join(scoreOptions) : null);
+		
+		if (entity.getType() == 1 || entity.getType() == 4 ) {
+			entity.setAi(1);
+			entity.setScoreOptions(null);
+		} else if (question.getType() == 2) {
+			entity.setAi(1);
+			entity.setScoreOptions("1");//多选的漏选得分必填。漏选分值页面控制
+		} else if (question.getType() == 3 || question.getType() == 5 ) {
+			entity.setScoreOptions(ValidateUtil.isValid(scoreOptions) ? StringUtil.join(scoreOptions) : null);
+		}
 		update(entity);
 
-		//修改试题答案
+		// 修改答案
 		List<QuestionAnswer> list = questionAnswerService.getList(entity.getId());
 		for(QuestionAnswer questionAnswer : list){
-			questionAnswerService.updateAndDel(questionAnswer.getId());
+			questionAnswerService.del(questionAnswer.getId());
 		}
-		
-		BigDecimal total = new BigDecimal(0.00);
 		if (question.getType() == 1 || question.getType() == 4 ) {
 			QuestionAnswer questionAnswer = new QuestionAnswer();
 			questionAnswer.setAnswer(answers[0]);
-			if (question.getAi() == 1 && answerScores != null) {
-				questionAnswer.setScore(answerScores[0]);
-			}else{
-				questionAnswer.setScore(new BigDecimal(0));
-			}
-			questionAnswer.setQuestionId(entity.getId());
-			questionAnswer.setNo(1);
-			questionAnswerService.add(questionAnswer);
-			total = answerScores[0];
-		} else if (question.getType() == 2) {
-			total = question.getScore();
-			QuestionAnswer questionAnswer = new QuestionAnswer();
-			String answerString = "";
-			for(int i = 0; i < answers.length; i++ ){
-				if (answerString == "") {
-					answerString = answers[i].toUpperCase();
-				}else{
-					answerString = answerString + "," + answers[i].toUpperCase();
-				}
-				
-				if (question.getAi() == 1 && answerScores != null) {
-					questionAnswer.setScore(answerScores[0]);
-				}else{
-					questionAnswer.setScore(new BigDecimal(0));
-				}
-			}
-			
-			questionAnswer.setAnswer(answerString);
+			questionAnswer.setScore(question.getScore());
 			questionAnswer.setQuestionId(question.getId());
 			questionAnswer.setNo(1);
 			questionAnswerService.add(questionAnswer);
-			/*for(int i = 0; i < answers.length; i++ ){
-				QuestionAnswer questionAnswer = new QuestionAnswer();
-				questionAnswer.setAnswer(answers[i]);
-				if (question.getAi() == 1 && answerScores != null) {
-					questionAnswer.setScore(answerScores[0]);
-				}else{
-					questionAnswer.setScore(new BigDecimal(0));
-				}
-				questionAnswer.setQuestionId(entity.getId());
-				questionAnswer.setNo(i+1);
-				questionAnswerService.add(questionAnswer);
-				total = question.getScore();
-			}*/
+		} else if (question.getType() == 2) {
+			QuestionAnswer questionAnswer = new QuestionAnswer();
+			questionAnswer.setAnswer(StringUtil.join(answers));
+			questionAnswer.setScore(answerScores[0]);
+			questionAnswer.setQuestionId(question.getId());
+			questionAnswer.setNo(1);
+			questionAnswerService.add(questionAnswer);
 		} else if (question.getType() == 3 || question.getType() == 5) {
 			for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();
 				questionAnswer.setAnswer(answers[i]);
-				if (question.getAi() == 1 && answerScores != null) {
-					questionAnswer.setScore(answerScores[i]);
-					total = total.add(answerScores[i]);
-				}else{
-					questionAnswer.setScore(new BigDecimal(0));
-				}
-				questionAnswer.setQuestionId(entity.getId());
-				questionAnswer.setNo(i+1);
+				questionAnswer.setScore(question.getAi() == 1 ? answerScores[i] : BigDecimal.ZERO);
+				questionAnswer.setQuestionId(question.getId());
+				questionAnswer.setNo(i + 1);
 				questionAnswerService.add(questionAnswer);
 			}
-		} 
-		if (question.getAi() == 1 && question.getScore().compareTo(total) != 0) {
-			throw new MyException("答案总分有误 ");
 		}
 		
 		// 修改选项
@@ -494,7 +247,17 @@ public static void main(String[] args) {
 		}
 
 		// 保存附件
-		saveFile(entity);
+		List<Integer> fileIdList = html2FileIds(question.getTitle());
+		fileIdList.addAll(html2FileIds(question.getAnalysis()));
+		if (question.getType() == 1 || question.getType() == 2) {
+			for (int i = 0; i < options.length; i++) {
+				fileIdList.addAll(html2FileIds(options[i]));
+			}
+		}
+
+		for (Integer fileId : fileIdList) {
+			fileService.doUpload(fileId);
+		}
 	}
 
 	@Override
@@ -545,28 +308,6 @@ public static void main(String[] args) {
 		}
 	}
 	
-	private void saveFile(Question question) {
-		List<Integer> fileIdList = html2FileIds(question.getTitle());// 标题
-
-		if (question.getType() == 1 || question.getType() == 2) {// 单选或多选
-			QuestionOption entity = new QuestionOption();
-			entity.setQuestionId(question.getId());
-		} else if (question.getType() == 5) {// 问答
-			List<QuestionAnswer> list = questionAnswerService.getList(question.getId());
-		    StringBuilder answerString = new StringBuilder();    
-		    for (int i = 0; i < list.size(); i++) {                
-		    	answerString.append(list.get(i).getAnswer()).append("/n");
-		    }
-			fileIdList.addAll(html2FileIds(answerString.toString().substring(0,answerString.toString().length()-1)));
-		}
-
-		fileIdList.addAll(html2FileIds(question.getAnalysis()));// 解析
-
-		for (Integer fileId : fileIdList) {
-			fileService.doUpload(fileId);
-		}
-	}
-
 	private List<Integer> html2FileIds(String html) {
 		List<Integer> fileIdList = new ArrayList<>();
 		if (!ValidateUtil.isValid(html)) {
@@ -812,6 +553,176 @@ public static void main(String[] args) {
 			question.setUpdateTime(new Date());
 			question.setUpdateUserId(getCurUser().getId());
 			update(question);
+		}
+	}
+	
+	private void addAndUpdateValid(Question question, Integer[] scoreOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
+		if (!ValidateUtil.isValid(question.getType())) {
+			throw new MyException("参数错误：type");
+		}
+		if (!ValidateUtil.isValid(question.getDifficulty())) {
+			throw new MyException("参数错误：difficulty");
+		}
+		if (!ValidateUtil.isValid(question.getTitle())) {
+			throw new MyException("参数错误：title");
+		}
+		if (!ValidateUtil.isValid(answers)) {
+			throw new MyException("参数错误：answers");
+		}
+		
+		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
+		if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
+			throw new MyException("无操作权限");
+		}
+		
+		if (question.getType() == 1) {// 如果是单选
+			if (!ValidateUtil.isValid(options)) {
+				throw new MyException("参数错误：options");
+			}
+			if (options.length < 2) {
+				throw new MyException("参数错误：options长度小于2");
+			}
+			if (answers.length != 1) {
+				throw new MyException("参数错误：answers");
+			}
+			if (!"ABCDEFG".contains(answers[0])) {
+				throw new MyException("参数错误：answer");
+			}
+			int answerIndex = answers[0].getBytes()[0] - 65;
+			if (options.length < answerIndex + 1) {// 总共四个选项，答案是E就是有问题的
+				throw new MyException("选项和答案不匹配");
+			}
+			if (ValidateUtil.isValid(scoreOptions)) {
+				throw new MyException("参数错误：scoreOptions");
+			}
+		} else if (question.getType() == 2) {// 如果是多选
+			if (!ValidateUtil.isValid(options)) {
+				throw new MyException("参数错误：options");
+			}
+			if (options.length < 2) {
+				throw new MyException("参数错误：options长度小于2");
+			}
+			if (answers.length < 2) { // 最少两个答案
+				throw new MyException("参数错误：answers");
+			}
+			for (int i = 0; i < answers.length; i++) {
+				if (!"ABCDEFG".contains(answers[i])) {
+					throw new MyException("参数错误：answers");
+				}
+				int answerIndex = answers[i].getBytes()[0] - 65;
+				if (options.length < answerIndex + 1) {// 总共四个选项，答案包含E就是有问题的
+					throw new MyException("选项和答案不匹配");
+				}
+			}
+			if (answerScores.length != 1) {
+				throw new MyException("参数错误：answerScores");
+			}
+			if (BigDecimalUtil.newInstance(question.getScore()).sub(answerScores[0]).getResult().doubleValue() <= 0) {
+				throw new MyException("漏选分数大于试题分数");
+			}
+			
+			if (ValidateUtil.isValid(scoreOptions) && scoreOptions[0] != 1) {
+				throw new MyException("参数错误：scoreOptions");
+			}
+		} else if (question.getType() == 3) {
+			Matcher matcher = Pattern.compile("[_]{5,}").matcher(question.getTitle());
+			int fillBlankNum = 0;
+			while(matcher.find()) {
+				fillBlankNum++;
+			}
+			if (fillBlankNum == 0) {
+				throw new MyException("最少1个填空");
+			}
+			if (fillBlankNum > 7) {
+				throw new MyException("最多7个填空");
+			}
+			if (fillBlankNum != answers.length) {
+				throw new MyException("填空和答案数量不匹配");
+			}
+				
+			if (question.getAi() == 1) {
+				if (ValidateUtil.isValid(scoreOptions)) {
+					if (scoreOptions.length > 2) {
+						throw new MyException("参数错误：scoreOption");
+					}
+					for (Integer scoreOption : scoreOptions) {
+						if (scoreOption != 2 || scoreOption != 3) {//分值选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；)
+							throw new MyException("参数错误：scoreOption");
+						}
+					}
+				}
+				
+				if (!ValidateUtil.isValid(answerScores)) {
+					throw new MyException("参数错误：answerScores");
+				}
+				if (answerScores.length != answers.length) {
+					throw new MyException("答案和分数不匹配");
+				}
+				
+				BigDecimalUtil totalScore = BigDecimalUtil.newInstance(BigDecimal.ZERO);
+				for (BigDecimal answerScore : answerScores) {
+					totalScore.add(answerScore);
+				}
+				if (totalScore.sub(question.getScore()).getResult().doubleValue() != 0) {
+					throw new MyException("单项分值合计和总分数不匹配");
+				}
+			} 
+			if (question.getAi() == 2) {
+				if (ValidateUtil.isValid(scoreOptions)) {
+					throw new MyException("参数错误：scoreOption");
+				}
+				if (ValidateUtil.isValid(answerScores)) {
+					throw new MyException("参数错误：answerScores");
+				}
+			}
+		} else if (question.getType() == 4) {
+			if (answers.length != 1) {
+				throw new MyException("参数错误：answers");
+			}
+
+			if (!"对是√否错×".contains(answers[0])) {
+				throw new MyException("参数错误：answers");
+			}
+			
+			if (ValidateUtil.isValid(scoreOptions)) {
+				throw new MyException("参数错误：scoreOptions");
+			}
+		} else if (question.getType() == 5) {
+			if (question.getAi() == 1) {
+				if (ValidateUtil.isValid(scoreOptions)) {
+					if (scoreOptions.length != 1) {
+						throw new MyException("参数错误：scoreOption");
+					}
+					for (Integer scoreOption : scoreOptions) {
+						if (scoreOption != 3) {//分值选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；)
+							throw new MyException("参数错误：scoreOption");
+						}
+					}
+				}
+				
+				if (!ValidateUtil.isValid(answerScores)) {
+					throw new MyException("参数错误：answerScores");
+				}
+				if (answerScores.length != answers.length) {
+					throw new MyException("答案和分数不匹配");
+				}
+				
+				BigDecimalUtil totalScore = BigDecimalUtil.newInstance(BigDecimal.ZERO);
+				for (BigDecimal answerScore : answerScores) {
+					totalScore.add(answerScore);
+				}
+				if (totalScore.sub(question.getScore()).getResult().doubleValue() != 0) {
+					throw new MyException("单项分值合计和总分数不匹配");
+				}
+			} 
+			if (question.getAi() == 2) {
+				if (ValidateUtil.isValid(scoreOptions)) {
+					throw new MyException("参数错误：scoreOption");
+				}
+				if (ValidateUtil.isValid(answerScores)) {
+					throw new MyException("参数错误：answerScores");
+				}
+			}
 		}
 	}
 }

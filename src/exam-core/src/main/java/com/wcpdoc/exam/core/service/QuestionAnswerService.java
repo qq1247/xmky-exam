@@ -20,11 +20,4 @@ public interface QuestionAnswerService extends BaseService<QuestionAnswer>{
 	 */
 	List<QuestionAnswer> getList(Integer questionId);
 	
-	/**
-	 * 删除试题答案
-	 * 
-	 * v1.0 chenyun 2021年7月21日下午7:08:30
-	 * @param id void
-	 */
-	void updateAndDel(Integer id);
 }
