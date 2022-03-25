@@ -27,11 +27,11 @@ public interface PaperQuestionRuleService extends BaseService<PaperQuestionRule>
 	 * @param types
 	 * @param difficultys
 	 * @param ais
-	 * @param scoreOptions
+	 * @param aiOptions
 	 * @param nums
 	 * @param scores void
 	 */
-	void update(Integer paperId, Integer chapterId, Integer[] questionTypeIds, Integer[] types, String[] difficultys, String[] ais, String[] scoreOptions, Integer[] nums, BigDecimal[] scores );
+	void update(Integer paperId, Integer chapterId, Integer[] questionTypeIds, Integer[] types, String[] difficultys, String[] ais, String[] aiOptions, Integer[] nums, BigDecimal[] scores );
 	
 	/**
 	 * 获取随机章节规则列表

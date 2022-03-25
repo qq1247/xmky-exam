@@ -81,9 +81,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void addAndUpdate(Question question, Integer[] scoreOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
+	public void addAndUpdate(Question question, Integer[] aiOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
 		// 校验数据有效性
-		addAndUpdateValid(question, scoreOptions, options, answers, answerScores);
+		addAndUpdateValid(question, aiOptions, options, answers, answerScores);
 		
 		// 添加试题
 		question.setCreateTime(new Date());
@@ -93,12 +93,12 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		//question.setState(2);// 通过页面去控制添加的是草稿还是发布
 		if (question.getType() == 1 || question.getType() == 4 ) {
 			question.setAi(1);
-			question.setScoreOptions(null);
+			question.setAiOptions(null);
 		} else if (question.getType() == 2) {
 			question.setAi(1);
-			question.setScoreOptions("1");//多选的漏选得分必填。漏选分值页面控制
+			question.setAiOptions("1");//多选的漏选得分必填。漏选分值页面控制
 		} else if (question.getType() == 3 || question.getType() == 5 ) {
-			question.setScoreOptions(ValidateUtil.isValid(scoreOptions) ? StringUtil.join(scoreOptions) : null);
+			question.setAiOptions(ValidateUtil.isValid(aiOptions) ? StringUtil.join(aiOptions) : null);
 		}
 		add(question);
 
@@ -155,7 +155,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void updateAndUpdate(Question question, Integer[] scoreOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
+	public void updateAndUpdate(Question question, Integer[] aiOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
 		// 校验数据有效性
 		Question entity = getEntity(question.getId());
 		question.setQuestionTypeId(entity.getQuestionTypeId());//校验用
@@ -174,7 +174,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			throw new MyException(String.format("该题已被【%s】试卷引用", paper.getName()));
 		}
 		
-		addAndUpdateValid(question, scoreOptions, options, answers, answerScores);
+		addAndUpdateValid(question, aiOptions, options, answers, answerScores);
 
 		// 修改试题
 		entity.setTitle(question.getTitle());
@@ -188,12 +188,12 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		
 		if (entity.getType() == 1 || entity.getType() == 4 ) {
 			entity.setAi(1);
-			entity.setScoreOptions(null);
+			entity.setAiOptions(null);
 		} else if (question.getType() == 2) {
 			entity.setAi(1);
-			entity.setScoreOptions("1");//多选的漏选得分必填。漏选分值页面控制
+			entity.setAiOptions("1");//多选的漏选得分必填。漏选分值页面控制
 		} else if (question.getType() == 3 || question.getType() == 5 ) {
-			entity.setScoreOptions(ValidateUtil.isValid(scoreOptions) ? StringUtil.join(scoreOptions) : null);
+			entity.setAiOptions(ValidateUtil.isValid(aiOptions) ? StringUtil.join(aiOptions) : null);
 		}
 		update(entity);
 
@@ -417,18 +417,18 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				question.setScore(totalScore.getResult());
 			}
 			
-			Integer[] scoreOptions = null;//new Integer[split.length];
-			if (ValidateUtil.isValid(question.getScoreOptions())) {
-				String[] split = question.getScoreOptions().split(",");
-				scoreOptions = new Integer[split.length];
+			Integer[] aiOptions = null;//new Integer[split.length];
+			if (ValidateUtil.isValid(question.getAiOptions())) {
+				String[] split = question.getAiOptions().split(",");
+				aiOptions = new Integer[split.length];
 				for(int i = 0; i < split.length; i++ ){
-					scoreOptions[i] = Integer.parseInt(split[i]);
+					aiOptions[i] = Integer.parseInt(split[i]);
 				}
 			} else {
-				scoreOptions = new Integer[0];
+				aiOptions = new Integer[0];
 			}
 			
-			addAndUpdate(question, scoreOptions, options, answers, answerScores);
+			addAndUpdate(question, aiOptions, options, answers, answerScores);
 		}
 		
 	}
@@ -554,7 +554,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 	}
 	
-	private void addAndUpdateValid(Question question, Integer[] scoreOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
+	private void addAndUpdateValid(Question question, Integer[] aiOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
 		if (!ValidateUtil.isValid(question.getType())) {
 			throw new MyException("参数错误：type");
 		}
@@ -590,8 +590,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			if (options.length < answerIndex + 1) {// 总共四个选项，答案是E就是有问题的
 				throw new MyException("选项和答案不匹配");
 			}
-			if (ValidateUtil.isValid(scoreOptions)) {
-				throw new MyException("参数错误：scoreOptions");
+			if (ValidateUtil.isValid(aiOptions)) {
+				throw new MyException("参数错误：aiOptions");
 			}
 			if (ValidateUtil.isValid(answerScores)) {
 				throw new MyException("参数错误：answerScores");
@@ -622,8 +622,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				throw new MyException("漏选分数大于试题分数");
 			}
 			
-			if (ValidateUtil.isValid(scoreOptions) && scoreOptions[0] != 1) {
-				throw new MyException("参数错误：scoreOptions");
+			if (ValidateUtil.isValid(aiOptions) && aiOptions[0] != 1) {
+				throw new MyException("参数错误：aiOptions");
 			}
 		} else if (question.getType() == 3) {
 			Matcher matcher = Pattern.compile("[_]{5,}").matcher(question.getTitle());
@@ -642,11 +642,11 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			}
 				
 			if (question.getAi() == 1) {
-				if (ValidateUtil.isValid(scoreOptions)) {
-					if (scoreOptions.length > 2) {
+				if (ValidateUtil.isValid(aiOptions)) {
+					if (aiOptions.length > 2) {
 						throw new MyException("参数错误：scoreOption");
 					}
-					for (Integer scoreOption : scoreOptions) {
+					for (Integer scoreOption : aiOptions) {
 						if (scoreOption != 2 && scoreOption != 3) {//分值选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；)
 							throw new MyException("参数错误：scoreOption");
 						}
@@ -669,7 +669,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				}
 			} 
 			if (question.getAi() == 2) {
-				if (ValidateUtil.isValid(scoreOptions)) {
+				if (ValidateUtil.isValid(aiOptions)) {
 					throw new MyException("参数错误：scoreOption");
 				}
 				if (ValidateUtil.isValid(answerScores)) {
@@ -685,19 +685,19 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				throw new MyException("参数错误：answers");
 			}
 			
-			if (ValidateUtil.isValid(scoreOptions)) {
-				throw new MyException("参数错误：scoreOptions");
+			if (ValidateUtil.isValid(aiOptions)) {
+				throw new MyException("参数错误：aiOptions");
 			}
 			if (ValidateUtil.isValid(answerScores)) {
 				throw new MyException("参数错误：answerScores");
 			}
 		} else if (question.getType() == 5) {
 			if (question.getAi() == 1) {
-				if (ValidateUtil.isValid(scoreOptions)) {
-					if (scoreOptions.length != 1) {
+				if (ValidateUtil.isValid(aiOptions)) {
+					if (aiOptions.length != 1) {
 						throw new MyException("参数错误：scoreOption");
 					}
-					for (Integer scoreOption : scoreOptions) {
+					for (Integer scoreOption : aiOptions) {
 						if (scoreOption != 3) {//分值选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；)
 							throw new MyException("参数错误：scoreOption");
 						}
@@ -720,7 +720,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				}
 			} 
 			if (question.getAi() == 2) {
-				if (ValidateUtil.isValid(scoreOptions)) {
+				if (ValidateUtil.isValid(aiOptions)) {
 					throw new MyException("参数错误：scoreOption");
 				}
 				if (ValidateUtil.isValid(answerScores)) {

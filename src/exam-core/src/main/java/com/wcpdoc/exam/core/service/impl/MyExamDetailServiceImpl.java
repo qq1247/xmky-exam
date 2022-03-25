@@ -612,8 +612,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	 * @return boolean
 	 */
 	private boolean dxxbmg(PaperQuestion paperQuestion) {
-		return ValidateUtil.isValid(paperQuestion.getScoreOptions()) 
-				&& paperQuestion.getScoreOptions().contains("3");
+		return ValidateUtil.isValid(paperQuestion.getAiOptions()) 
+				&& paperQuestion.getAiOptions().contains("3");
 	}
 	
 	/**
@@ -624,8 +624,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	 * @return boolean
 	 */
 	private boolean lxdf(PaperQuestion paperQuestion) {
-		return ValidateUtil.isValid(paperQuestion.getScoreOptions()) 
-				&& paperQuestion.getScoreOptions().contains("1");
+		return ValidateUtil.isValid(paperQuestion.getAiOptions()) 
+				&& paperQuestion.getAiOptions().contains("1");
 	}
 
 	/**
@@ -636,8 +636,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	 * @return boolean
 	 */
 	private boolean dawsx(PaperQuestion paperQuestion) {
-		return ValidateUtil.isValid(paperQuestion.getScoreOptions()) 
-				&& paperQuestion.getScoreOptions().contains("2");
+		return ValidateUtil.isValid(paperQuestion.getAiOptions()) 
+				&& paperQuestion.getAiOptions().contains("2");
 	}
 	
 	/**

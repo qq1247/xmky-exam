@@ -16,26 +16,26 @@ public interface QuestionService extends BaseService<Question>{
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @param question
-	 * @param scoreOptions 分数选项
+	 * @param aiOptions 分数选项
 	 * @param options 选项（单选多选时有效）
 	 * @param answers 答案
 	 * @param answerScores 答案分数（填空或智能问答有多项）
 	 * @return PageResult
 	 */
-	void addAndUpdate(Question question, Integer[] scoreOptions, String[] options, String[] answers, BigDecimal[] answerScores);
+	void addAndUpdate(Question question, Integer[] aiOptions, String[] options, String[] answers, BigDecimal[] answerScores);
 
 	/**
 	 * 完成试题修改
 	 * 
 	 * v1.0 zhanghc 2018年10月12日下午7:30:02
 	 * @param question
-	 * @param scoreOptions 分数选项
+	 * @param aiOptions 分数选项
 	 * @param options 选项（单选多选时有效）
 	 * @param answers 答案
 	 * @param answerScores 答案分数（填空或智能问答有多项）
 	 * @return PageResult
 	 */
-	void updateAndUpdate(Question question, Integer[] scoreOptions, String[] options, String[] answers, BigDecimal[] answerScores);
+	void updateAndUpdate(Question question, Integer[] aiOptions, String[] options, String[] answers, BigDecimal[] answerScores);
 	
 	/**
 	 * 删除试题

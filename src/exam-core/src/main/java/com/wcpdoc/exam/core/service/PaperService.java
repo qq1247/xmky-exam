@@ -147,7 +147,7 @@ public interface PaperService extends BaseService<Paper> {
 	 * @param subScores 试题为智能阅卷，并且是填空或问答是有效
 	 * void
 	 */
-	void scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores, Integer[] scoreOptions);
+	void scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores, Integer[] aiOptions);
 
 	/**
 	 * 完成试题删除
@@ -184,9 +184,9 @@ public interface PaperService extends BaseService<Paper> {
 	 * @param chapterId
 	 * @param score
 	 * @param subScores
-	 * @param scoreOptions void
+	 * @param aiOptions void
 	 */
-	void batchScoreUpdate(Integer chapterId, BigDecimal score, BigDecimal subScores, Integer[] scoreOptions);
+	void batchScoreUpdate(Integer chapterId, BigDecimal score, BigDecimal subScores, Integer[] aiOptions);
 	
 	/**
 	 * 合并

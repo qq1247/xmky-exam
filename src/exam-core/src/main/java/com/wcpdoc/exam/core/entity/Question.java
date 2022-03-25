@@ -54,8 +54,8 @@ public class Question {
 	private BigDecimal score;
 	@Column(name = "AI")
 	private Integer ai;
-	@Column(name = "SCORE_OPTIONS")
-	private String scoreOptions;
+	@Column(name = "AI_OPTIONS")
+	private String aiOptions;
 
 	public Integer getId() {
 		return id;
@@ -141,12 +141,12 @@ public class Question {
 		this.score = score;
 	}
 
-	public String getScoreOptions() {
-		return scoreOptions;
+	public String getAiOptions() {
+		return aiOptions;
 	}
 
-	public void setScoreOptions(String scoreOptions) {
-		this.scoreOptions = scoreOptions;
+	public void setAiOptions(String aiOptions) {
+		this.aiOptions = aiOptions;
 	}
 
 	public Integer getCreateUserId() {

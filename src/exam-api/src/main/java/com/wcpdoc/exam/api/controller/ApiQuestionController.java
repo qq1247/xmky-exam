@@ -91,11 +91,11 @@ public class ApiQuestionController extends BaseController {
 					result.put("options", options);
 				}
 				
-				if (result.get("scoreOptions") != null) {// 前后端分离下，接口定义只有数组形式
-					String[] _scoreOptions = result.get("scoreOptions").toString().split(",");
-					Integer[] scoreOptions = new Integer[_scoreOptions.length]; 
-					for (int i = 0; i < _scoreOptions.length; i++) {
-						scoreOptions[i] = Integer.parseInt(_scoreOptions[i]);
+				if (result.get("aiOptions") != null) {// 前后端分离下，接口定义只有数组形式
+					String[] _aiOptions = result.get("aiOptions").toString().split(",");
+					Integer[] aiOptions = new Integer[_aiOptions.length]; 
+					for (int i = 0; i < _aiOptions.length; i++) {
+						aiOptions[i] = Integer.parseInt(_aiOptions[i]);
 					}
 				}
 				
@@ -121,7 +121,7 @@ public class ApiQuestionController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @param question
-	 * @param scoreOptions 分数选项
+	 * @param aiOptions 分数选项
 	 * @param options 选项（单选多选时有效）
 	 * @param answers 答案
 	 * @param answerScores 答案分数（填空或智能问答有多项）
@@ -129,9 +129,9 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	public PageResult add(Question question, Integer[] scoreOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
+	public PageResult add(Question question, Integer[] aiOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
 		try {
-			questionService.addAndUpdate(question, scoreOptions, options, answers, answerScores);
+			questionService.addAndUpdate(question, aiOptions, options, answers, answerScores);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加试题错误：{}", e.getMessage());
@@ -153,9 +153,9 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	public PageResult edit(Question question, Integer[] scoreOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
+	public PageResult edit(Question question, Integer[] aiOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
 		try {
-			questionService.updateAndUpdate(question, scoreOptions, options, answers, answerScores);
+			questionService.updateAndUpdate(question, aiOptions, options, answers, answerScores);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改试题错误：{}", e.getMessage());
@@ -222,15 +222,15 @@ public class ApiQuestionController extends BaseController {
 				answerList.add(map);
 			}
 			
-			Integer[] scoreOptions = null;//new Integer[split.length];
-			if (ValidateUtil.isValid(question.getScoreOptions())) {
-				String[] split = question.getScoreOptions().split(",");
-				scoreOptions = new Integer[split.length];
+			Integer[] aiOptions = null;//new Integer[split.length];
+			if (ValidateUtil.isValid(question.getAiOptions())) {
+				String[] split = question.getAiOptions().split(",");
+				aiOptions = new Integer[split.length];
 				for(int i = 0; i < split.length; i++ ){
-					scoreOptions[i] = Integer.parseInt(split[i]);
+					aiOptions[i] = Integer.parseInt(split[i]);
 				}
 			} else {
-				scoreOptions = new Integer[0];
+				aiOptions = new Integer[0];
 			}
 			
 			PageResultEx pageResult = PageResultEx.ok()
@@ -243,7 +243,7 @@ public class ApiQuestionController extends BaseController {
 					.addAttr("analysis", question.getAnalysis())
 					.addAttr("questionTypeId", question.getQuestionTypeId())
 					.addAttr("score", question.getScore())
-					.addAttr("scoreOptions", scoreOptions)
+					.addAttr("aiOptions", aiOptions)
 					.addAttr("answers", (writeAuth) ? answerList : new String[0])
 					.addAttr("state", question.getState())
 					.addAttr("createUserName", userService.getEntity(question.getCreateUserId()).getName());

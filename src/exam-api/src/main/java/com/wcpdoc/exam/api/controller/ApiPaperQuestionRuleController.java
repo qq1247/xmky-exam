@@ -59,16 +59,16 @@ public class ApiPaperQuestionRuleController extends BaseController {
 	 * @param types
 	 * @param difficultys
 	 * @param ais
-	 * @param scoreOptions
+	 * @param aiOptions
 	 * @param nums
 	 * @param scores
 	 * @return PageResult
 	 */
 	@RequestMapping("/update")
 	@ResponseBody
-	public PageResult update(Integer paperId, Integer chapterId, Integer[] questionTypeIds, Integer[] types, String[] difficultys, String[] ais, String[] scoreOptions,  Integer[] nums,  BigDecimal[] scores ) {
+	public PageResult update(Integer paperId, Integer chapterId, Integer[] questionTypeIds, Integer[] types, String[] difficultys, String[] ais, String[] aiOptions,  Integer[] nums,  BigDecimal[] scores ) {
 		try {
-			paperQuestionRuleService.update(paperId, chapterId, questionTypeIds, types, difficultys, ais, scoreOptions, nums, scores);
+			paperQuestionRuleService.update(paperId, chapterId, questionTypeIds, types, difficultys, ais, aiOptions, nums, scores);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加章节规则错误：{}", e.getMessage());

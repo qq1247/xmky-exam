@@ -426,7 +426,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					paperQuestion.setType(3);
 					paperQuestion.setNo(i + 1);
 					paperQuestion.setScore(paperQuestionRule.getScore());
-					paperQuestion.setScoreOptions(paperQuestionRule.getScoreOptions());
+					paperQuestion.setAiOptions(paperQuestionRule.getAiOptions());
 					paperQuestion.setParentId(paperQuestionRule.getPaperQuestionId());
 					paperQuestion.setPaperId(paperQuestionRule.getPaperId());
 					paperQuestion.setExamId(examId);

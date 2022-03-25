@@ -88,17 +88,17 @@ public class PaperQuestionRuleServiceImpl extends BaseServiceImp<PaperQuestionRu
 				paperQuestionRuleMap.put("type", paperQuestionRule.getType());
 				paperQuestionRuleMap.put("difficulty", paperQuestionRule.getDifficultyArr());
 				paperQuestionRuleMap.put("ai", paperQuestionRule.getAiArr());
-				Integer[] scoreOptions = null;
-				if (ValidateUtil.isValid(paperQuestionRule.getScoreOptions())) {
-					String[] split = paperQuestionRule.getScoreOptions().split(",");
-					scoreOptions = new Integer[split.length];
+				Integer[] aiOptions = null;
+				if (ValidateUtil.isValid(paperQuestionRule.getAiOptions())) {
+					String[] split = paperQuestionRule.getAiOptions().split(",");
+					aiOptions = new Integer[split.length];
 					for(int i = 0; i < split.length; i++ ){
-						scoreOptions[i] = Integer.parseInt(split[i]);
+						aiOptions[i] = Integer.parseInt(split[i]);
 					}
 				} else {
-					scoreOptions = new Integer[0];
+					aiOptions = new Integer[0];
 				}
-				paperQuestionRuleMap.put("scoreOptions", scoreOptions);
+				paperQuestionRuleMap.put("aiOptions", aiOptions);
 				paperQuestionRuleMap.put("totalNumber", paperQuestionRule.getNum());
 				paperQuestionRuleMap.put("score", paperQuestionRule.getScore());
 				ruleMap.add(paperQuestionRuleMap);
@@ -111,7 +111,7 @@ public class PaperQuestionRuleServiceImpl extends BaseServiceImp<PaperQuestionRu
 	}
 
 	@Override
-	public void update(Integer paperId, Integer chapterId, Integer[] questionTypeIds, Integer[] types, String[] difficultys, String[] ais, String[] scoreOptions, Integer[] nums, BigDecimal[] scores) {
+	public void update(Integer paperId, Integer chapterId, Integer[] questionTypeIds, Integer[] types, String[] difficultys, String[] ais, String[] aiOptions, Integer[] nums, BigDecimal[] scores) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(paperId)) {
 			throw new MyException("参数错误：paperId");
@@ -141,8 +141,8 @@ public class PaperQuestionRuleServiceImpl extends BaseServiceImp<PaperQuestionRu
 		if (questionTypeIds.length == 1) {
 			difficultys[0] = StringUtil.join(difficultys);// 规则只有一个的情况下按逗号分隔的难度被拆分成了数组
 			ais[0] = StringUtil.join(ais);
-			if (ValidateUtil.isValid(scoreOptions)) {
-				scoreOptions[0] = StringUtil.join(scoreOptions);
+			if (ValidateUtil.isValid(aiOptions)) {
+				aiOptions[0] = StringUtil.join(aiOptions);
 			}
 		}
 		
@@ -183,10 +183,10 @@ public class PaperQuestionRuleServiceImpl extends BaseServiceImp<PaperQuestionRu
 			}
 			
 			if (types[i] == 2) {// 多选漏选的分必填
-				if (!ValidateUtil.isValid(scoreOptions)) {
-					scoreOptions = new String[1];
+				if (!ValidateUtil.isValid(aiOptions)) {
+					aiOptions = new String[1];
 				}
-				scoreOptions[i] = "1";
+				aiOptions[i] = "1";
 			}
 		}
 		
@@ -205,8 +205,8 @@ public class PaperQuestionRuleServiceImpl extends BaseServiceImp<PaperQuestionRu
 			paperQuestionRule.setType(types[i]);
 			paperQuestionRule.setDifficultys(difficultys[i]);
 			paperQuestionRule.setAis(ais[i]);
-			if (ValidateUtil.isValid(scoreOptions)) {
-				paperQuestionRule.setScoreOptions(scoreOptions[i]);
+			if (ValidateUtil.isValid(aiOptions)) {
+				paperQuestionRule.setAiOptions(aiOptions[i]);
 			}
 			paperQuestionRule.setScore(scores[i]);
 			paperQuestionRule.setNum(nums[i]);
