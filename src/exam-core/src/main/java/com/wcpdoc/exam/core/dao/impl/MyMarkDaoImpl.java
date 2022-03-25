@@ -1,7 +1,6 @@
 package com.wcpdoc.exam.core.dao.impl;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
@@ -60,35 +59,5 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 	public List<MyMark> getList(Integer examId) {
 		String sql = "SELECT * FROM EXM_MY_MARK WHERE EXAM_ID = ?";
 		return getList(sql, new Object[] { examId }, MyMark.class);
-	}
-
-	@Override
-	public List<Map<String, Object>> getUserList(Integer examId, Integer markUserId, String examUserName, Integer examUserId) {
-		String sql = "SELECT USER.ID AS USER_ID, USER.NAME AS USER_NAME, ORG.ID AS ORG_ID, ORG.NAME AS ORG_NAME, "
-				+ "MY_EXAM.ANSWER_START_TIME, MY_EXAM.ANSWER_END_TIME, MY_EXAM.MARK_START_TIME, MY_EXAM.MARK_END_TIME, "
-				+ "MY_EXAM.STATE, MY_EXAM.MARK_STATE, MY_EXAM.ANSWER_STATE, MY_EXAM.TOTAL_SCORE, "
-				+ "PAPER.TOTAL_SCORE AS PAPER_TOTAL_SCORE, PAPER.PASS_SCORE AS PAPER_PASS_SCORE "
-				+ "FROM EXM_MY_EXAM MY_EXAM "
-				+ "INNER JOIN EXM_EXAM EXAM ON MY_EXAM.EXAM_ID = EXAM.ID "
-				+ "INNER JOIN EXM_PAPER PAPER ON EXAM.PAPER_ID = PAPER.ID "
-				+ "LEFT JOIN SYS_USER USER ON MY_EXAM.USER_ID = USER.ID "
-				+ "LEFT JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
-				+ "LEFT JOIN SYS_USER MARK_USER ON MY_EXAM.MARK_USER_ID = MARK_USER.ID "
-				+ "WHERE MY_EXAM.EXAM_ID = ? "
-				+ "		AND EXISTS ("
-				+ "		SELECT 1 "
-				+ "		FROM EXM_MY_MARK Z "
-				+ "		WHERE Z.EXAM_ID = ? AND Z.MARK_USER_ID = ? AND Z.EXAM_USER_IDS LIKE CONCAT('%,', MY_EXAM.USER_ID, ',%')) ";// 阅卷用户不一定有
-		if (!ValidateUtil.isValid(examUserName) && !ValidateUtil.isValid(examUserId)) {
-			return getMapList(sql, new Object[] { examId, examId, markUserId });
-		}
-		
-		if (ValidateUtil.isValid(examUserName)) {
-			sql += " AND USER.NAME LIKE ?";
-			return getMapList(sql, new Object[] { examId, examId, markUserId, String.format("%%%s%%", examUserName) });
-		}
-		
-			sql += " AND USER.ID = ?";
-			return getMapList(sql, new Object[] { examId, examId, markUserId, examUserId});
 	}
 }

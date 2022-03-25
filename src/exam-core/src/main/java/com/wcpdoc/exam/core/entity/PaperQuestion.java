@@ -47,8 +47,8 @@ public class PaperQuestion {
 	private Integer type;
 	@Column(name = "SCORE")
 	private BigDecimal score;
-	@Column(name = "SCORE_OPTIONS")
-	private String scoreOptions;
+	@Column(name = "AI_OPTIONS")
+	private String aiOptions;
 	@Column(name = "NO")
 	private Integer no;
 	@Column(name = "PAPER_QUESTION_RULE_ID")
@@ -156,12 +156,12 @@ public class PaperQuestion {
 		this.score = score;
 	}
 
-	public String getScoreOptions() {
-		return scoreOptions;
+	public String getAiOptions() {
+		return aiOptions;
 	}
 
-	public void setScoreOptions(String scoreOptions) {
-		this.scoreOptions = scoreOptions;
+	public void setAiOptions(String aiOptions) {
+		this.aiOptions = aiOptions;
 	}
 	public Integer getPaperQuestionRuleId() {
 		return paperQuestionRuleId;

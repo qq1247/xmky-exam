@@ -42,8 +42,8 @@ public class PaperQuestionRule {
 	private String difficultys;
 	@Column(name = "AIS")
 	private String ais;
-	@Column(name = "SCORE_OPTIONS")
-	private String scoreOptions;
+	@Column(name = "AI_OPTIONS")
+	private String aiOptions;
 	@Column(name = "NUM")
 	private Integer num;
 	@Column(name = "SCORE")
@@ -89,11 +89,11 @@ public class PaperQuestionRule {
 	public void setType(Integer type) {
 		this.type = type;
 	}
-	public String getScoreOptions() {
-		return scoreOptions;
+	public String getAiOptions() {
+		return aiOptions;
 	}
-	public void setScoreOptions(String scoreOptions) {
-		this.scoreOptions = scoreOptions;
+	public void setAiOptions(String aiOptions) {
+		this.aiOptions = aiOptions;
 	}
 	public Integer getNum() {
 		return num;

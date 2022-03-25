@@ -193,9 +193,6 @@ public class ApiQuestionTypeOpenController extends BaseController {
 			List<Integer> questionIds = new ArrayList<>();
 			List<Question> questionList = paperQuestionRuleService.getQuestionList(questionTypeId);
 			for (Question question : questionList) {
-				if (question.getType() == 3 || question.getType() == 5) {
-					continue;
-				}
 				questionIds.add(question.getId());
 			}
 			

@@ -137,8 +137,4 @@ public class JwtUtil {
 			return new JwtResult(HttpStatus.INTERNAL_SERVER_ERROR.value(), "未知错误", null);
 		}
 	}
-	
-	public static void main(String[] args) {
-		
-	}
 }

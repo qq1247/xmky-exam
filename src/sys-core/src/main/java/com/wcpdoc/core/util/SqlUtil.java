@@ -90,12 +90,7 @@ public class SqlUtil {
 		}
 		return this;
 	}
-public static void main(String[] args) {
-	Object[] par = new Object[2];
-	par[0] = 1;
-	par[1] = 2;
-	new SqlUtil("").addWhere(true, "", par);
-}
+
 	/**
 	 * 添加order排序
 	 * 

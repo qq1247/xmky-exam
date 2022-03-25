@@ -298,8 +298,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		List<MyExam> myExamList = myExamService.getList(examId);// 考试用户列表
 		for(MyExam myExam : myExamList){
 			User examUser = userService.getEntity(myExam.getUserId());
-			User markUser = userService.getEntity(myExam.getMarkUserId());
 			if (myExam.getMarkState() == 3) {//已阅卷的不处理（没考试的人考试时间结束已阅卷；人工阅卷在阅卷时间结束之前已经部分试卷阅完）
+				User markUser = userService.getEntity(myExam.getMarkUserId());
 				log.info("主观题阅卷进行：【{}-{}】【{}-{} 已阅 {}-{}】{}，不处理", exam.getId(), exam.getName(), 
 						markUser.getId(), markUser.getName(), examUser.getId(), examUser.getName(), myExam.getState() == 1 ? "未考试" : "已阅卷");
 				continue;
@@ -311,6 +311,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 				myExam.setMarkStartTime(new Date());// 阅卷时间为当前时间
 				log.info("主观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】，无人阅卷", exam.getId(), exam.getName(), examUser.getId(), examUser.getName());
 			} else if (myExam.getMarkState() == 2) {
+				User markUser = userService.getEntity(myExam.getMarkUserId());
 				log.info("主观题阅卷进行：【{}-{}】【{}-{} 阅 {}-{}】，部分阅完", exam.getId(), exam.getName(), 
 						markUser.getId(), markUser.getName(), examUser.getId(), examUser.getName());
 			}
@@ -611,8 +612,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	 * @return boolean
 	 */
 	private boolean dxxbmg(PaperQuestion paperQuestion) {
-		return ValidateUtil.isValid(paperQuestion.getScoreOptions()) 
-				&& paperQuestion.getScoreOptions().contains("3");
+		return ValidateUtil.isValid(paperQuestion.getAiOptions()) 
+				&& paperQuestion.getAiOptions().contains("3");
 	}
 	
 	/**
@@ -623,8 +624,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	 * @return boolean
 	 */
 	private boolean lxdf(PaperQuestion paperQuestion) {
-		return ValidateUtil.isValid(paperQuestion.getScoreOptions()) 
-				&& paperQuestion.getScoreOptions().contains("1");
+		return ValidateUtil.isValid(paperQuestion.getAiOptions()) 
+				&& paperQuestion.getAiOptions().contains("1");
 	}
 
 	/**
@@ -635,8 +636,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	 * @return boolean
 	 */
 	private boolean dawsx(PaperQuestion paperQuestion) {
-		return ValidateUtil.isValid(paperQuestion.getScoreOptions()) 
-				&& paperQuestion.getScoreOptions().contains("2");
+		return ValidateUtil.isValid(paperQuestion.getAiOptions()) 
+				&& paperQuestion.getAiOptions().contains("2");
 	}
 	
 	/**

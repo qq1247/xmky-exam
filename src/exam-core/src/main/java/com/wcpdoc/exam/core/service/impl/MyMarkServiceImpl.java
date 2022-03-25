@@ -3,7 +3,6 @@ package com.wcpdoc.exam.core.service.impl;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -17,7 +16,6 @@ import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.BigDecimalUtil;
-import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.MyMarkDao;
 import com.wcpdoc.exam.core.entity.Exam;
@@ -227,25 +225,5 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		log.info("主观题交卷：【{}-{}】【{}-{} 阅 {}-{}】，得{}分，{}", exam.getId(), exam.getName(), 
 				markUser.getId(), markUser.getName(), examUser.getId(), examUser.getName(), 
 				myExam.getTotalScore(), myExam.getAnswerState() == 1 ? "及格" : "不及格");
-	}
-
-	@Override
-	public List<Map<String, Object>> getUserList(Integer examId, String examUserName, Integer userId) {
-		List<Map<String, Object>> userList = myMarkDao.getUserList(examId, getCurUser().getId(), examUserName, userId);
-		for(Map<String, Object> map : userList){
-			if (map.get("answerStartTime") != null) {
-				map.put("answerStartTime", DateUtil.formatDateTime((Date)map.get("answerStartTime")));
-			}
-			if (map.get("answerEndTime") != null) {
-				map.put("answerEndTime", DateUtil.formatDateTime((Date)map.get("answerEndTime")));
-			}
-			if (map.get("markStartTime") != null) {
-				map.put("markStartTime", DateUtil.formatDateTime((Date)map.get("markStartTime")));
-			}
-			if (map.get("markEndTime") != null) {
-				map.put("markEndTime", DateUtil.formatDateTime((Date)map.get("markEndTime")));
-			}
-		}
-		return userList;
 	}
 }

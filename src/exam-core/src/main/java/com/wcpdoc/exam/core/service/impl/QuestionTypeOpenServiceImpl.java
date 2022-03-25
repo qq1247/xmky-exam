@@ -142,15 +142,15 @@ public class QuestionTypeOpenServiceImpl extends BaseServiceImp<QuestionTypeOpen
 			}
 		}
 		
-		Integer[] scoreOptions = null;//new Integer[split.length];
-		if (ValidateUtil.isValid(question.getScoreOptions())) {
-			String[] split = question.getScoreOptions().split(",");
-			scoreOptions = new Integer[split.length];
+		Integer[] aiOptions = null;//new Integer[split.length];
+		if (ValidateUtil.isValid(question.getAiOptions())) {
+			String[] split = question.getAiOptions().split(",");
+			aiOptions = new Integer[split.length];
 			for(int i = 0; i < split.length; i++ ){
-				scoreOptions[i] = Integer.parseInt(split[i]);
+				aiOptions[i] = Integer.parseInt(split[i]);
 			}
 		} else {
-			scoreOptions = new Integer[0];
+			aiOptions = new Integer[0];
 		}
 		
 		PageResultEx pageResult = PageResultEx.ok()
@@ -163,7 +163,7 @@ public class QuestionTypeOpenServiceImpl extends BaseServiceImp<QuestionTypeOpen
 				.addAttr("state", question.getState())
 				.addAttr("questionTypeId", question.getQuestionTypeId())
 				.addAttr("score", question.getScore())
-				.addAttr("scoreOptions", scoreOptions)
+				.addAttr("aiOptions", aiOptions)
 				.addAttr("options", optionList.toArray(new String[optionList.size()]))
 				.addAttr("answers", questionAnswerSplitList);
 		return pageResult;

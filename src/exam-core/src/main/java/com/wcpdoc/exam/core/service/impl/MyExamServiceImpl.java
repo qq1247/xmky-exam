@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.core.service.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -148,6 +149,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		} else if (question.getType() == 1 || question.getType() == 4 || question.getType() == 5) {
 			myExamDetail.setAnswer(answers[0]);
 		} else if (question.getType() == 2) {
+			Arrays.sort(answers);// 页面先选d在选c，值为db，这里重新排序一下
 			myExamDetail.setAnswer(StringUtil.join(answers));
 		} else if (question.getType() == 3) {
 			myExamDetail.setAnswer(StringUtil.join(answers, '\n'));

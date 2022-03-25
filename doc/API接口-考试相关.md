@@ -270,7 +270,7 @@ http请求头需添加Authorization字段，
 | data.list[].analysis            | String | 解析         |
 | data.list[].questionTypeId   | Integer | 试题分类ID   |
 | data.list[].score            | Double  | 分值         |
-| data.list[].scoreOptions     | Integer[]  | 分值选项     |
+| data.list[].aiOptions     | Integer[]  | 分值选项     |
 | data.list[].createUserName     | String  | 创建人     |
 | data.list[].answers[]      | Object[]   | 答案数组   |
 | data.list[].answers[].answer      | String   | 答案   |
@@ -288,7 +288,7 @@ http请求头需添加Authorization字段，
 | state | Integer         | 状态（1：发布；2：草稿）  | 是   |
 | questionTypeId | Integer         | 试题分类ID      | 是   |
 | score          | Double          | 分数   | 是   |
-| scoreOptions[] | Integer[] | 分数选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；）|否|
+| aiOptions[] | Integer[] | 分数选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；）|否|
 | answers[]      | String[]	   | 答案（如果是填空或智能问答，会有多个答案）  | 是   |
 | answerScores[] | Double[] | 答案分值（如果是填空或智能问答，表示每空分值；如果是多选，表示漏选分值）  | 是   |
 
@@ -323,7 +323,7 @@ http请求头需添加Authorization字段，
 | data.analysis       | Text    | 解析  | 
 | data.questionTypeId | Integer         | 试题分类ID      |
 | data.score          | Double          | 分数   | 是
-| data.scoreOptions[] | Integer[] | 分数选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；）|
+| data.aiOptions[] | Integer[] | 分数选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；）|
 | data.state| Integer | 状态（0：删除；1：发布；2：草稿）|
 | data.answers[]      | Object[]   | 答案数组   |
 | data.answers[].answer      | String   | 答案   |
@@ -492,7 +492,7 @@ http请求头需添加Authorization字段，
 |data.list[].questionList[].ai  | Integer  | 是否智能阅卷|
 |data.list[].questionList[].analysis  | String  | 试题解析 |
 |data.list[].questionList[].score  | Double  | 试题分数 |
-|data.list[].questionList[].scoreOptions  | String  | 试题分数选项，参考question/add |
+|data.list[].questionList[].aiOptions  | String  | 试题分数选项，参考question/add |
 |data.list[].questionList[].options[]  | String[]  | 试题选项，参考question/add |
 |data.list[].questionList[].answers[]  | Object[]  | 试题答案，参考question/add |
 |data.list[].questionList[].answers[].score  | Double  | 试题分数，参考question/add |
@@ -522,7 +522,7 @@ http请求头需添加Authorization字段，
 | questionId| Integer  | 试题ID       | 是   |
 | score | Double  | 分数 | 是 |
 | subScores| Double  | 每空分数（试题为智能阅卷，并且是填空或问答时有效） | 是   |
-| scoreOptions    | Integer[] | 分数选项     | 否  |
+| aiOptions    | Integer[] | 分数选项     | 否  |
 
 ### 试卷批量设置分数：paper/updateBatchScore
 | 请求参数| 类型      | 描述       | 必填 |
@@ -530,7 +530,7 @@ http请求头需添加Authorization字段，
 | chapterId | Integer   | 章节id | 是   |
 | score | Double   | 分数 | 是   |
 | subScores| Double  | 漏选得分  | 否   |
-| scoreOptions    | Integer[] | 分数选项   | 是   |
+| aiOptions    | Integer[] | 分数选项   | 是   |
 
 ### 试卷发布：paper/publish
 | 请求参数| 类型    | 描述   | 必填 |
@@ -656,7 +656,6 @@ http请求头需添加Authorization字段，
 | examUserIds | Integer[] | 考试用户IDS | 否   |
 | questionIds | Integer[] | 试题IDS examUserIds和questionIds都有效时，默认使用examUserIds  | 否   |
 
-
 ### 考试在线用户：exam/onlineUser
 | 请求参数| 类型      | 描述        | 必填 |
 | ----------- | --------- | ----------- | ---- |
@@ -670,6 +669,16 @@ http请求头需添加Authorization字段，
 | data.userName| String  | 用户名称  |
 | data.online| Boolean| 在线状态（true：在线；false：离线）  |
 | data.onlineTime| Date| 离线时间  |
+
+### 考试成绩：exam/score
+| 请求参数| 类型      | 描述        | 必填 |
+| ----------- | --------- | ----------- | ---- |
+| state          | Integer   | 成绩状态（1：公开；2：不公开）  | 是   |
+
+### 考试排名：exam/rank
+| 请求参数| 类型      | 描述        | 必填 |
+| ----------- | --------- | ----------- | ---- |
+| state          | Integer   | 排名状态（1：公开；2：不公开）  | 是   |
 
 ### 试题评论列表：questionComment/listpage
 | 请求参数| 类型       | 描述       | 必填 |
@@ -709,7 +718,7 @@ http请求头需添加Authorization字段，
 | types |Integer[] | 选择类型 | 是   |
 | difficultys | String[]   | 难易程度 | 是  |
 | ais | String[]   | 智能阅卷 |  是  |
-| scoreOptions | String[]   | 分数选择项 | 否 |
+| aiOptions | String[]   | 分数选择项 | 否 |
 | nums | Integer[] | 题数 | 是  |
 | scores | Double[]  | 分数 | 是  |
 
@@ -731,6 +740,6 @@ http请求头需添加Authorization字段，
 |data.list[].rule[].type  | Integer  | 选择类型 |
 |data.list[].rule[].difficultys  | String[]  | 难易程度 |
 |data.list[].rule[].ais  | String[]  | 智能阅卷 |
-|data.list[].rule[].scoreOptions |  String[]  | 分数选择项 |
+|data.list[].rule[].aiOptions |  String[]  | 分数选择项 |
 |data.list[].rule[].num  | Integer  | 题数 |
 |data.list[].rule[].score  | Double  | 分数 |

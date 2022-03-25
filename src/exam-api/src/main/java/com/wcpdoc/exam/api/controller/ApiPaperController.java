@@ -351,14 +351,14 @@ public class ApiPaperController extends BaseController {
 	 * @param chapterId
 	 * @param score
 	 * @param subScores
-	 * @param scoreOptions
+	 * @param aiOptions
 	 * @return PageResult
 	 */
 	@RequestMapping("/updateBatchScore")
 	@ResponseBody
-	public PageResult updateBatchScore(Integer chapterId, BigDecimal score, BigDecimal subScores, Integer[] scoreOptions) {
+	public PageResult updateBatchScore(Integer chapterId, BigDecimal score, BigDecimal subScores, Integer[] aiOptions) {
 		try {
-			paperService.batchScoreUpdate(chapterId, score, subScores, scoreOptions);
+			paperService.batchScoreUpdate(chapterId, score, subScores, aiOptions);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("设置分数错误：{}", e.getMessage());
@@ -421,13 +421,14 @@ public class ApiPaperController extends BaseController {
 	 * @param questionId
 	 * @param score
 	 * @param subScores 试题为智能阅卷，并且是填空或问答时有效
+	 * @param aiOptions 
 	 * @return PageResult
 	 */
 	@RequestMapping("/scoreUpdate")
 	@ResponseBody
-	public PageResult scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores, Integer[] scoreOptions) {
+	public PageResult scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores, Integer[] aiOptions) {
 		try {
-			paperService.scoreUpdate(id, questionId, score, subScores, scoreOptions);
+			paperService.scoreUpdate(id, questionId, score, subScores, aiOptions);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("设置分数错误：{}", e.getMessage());

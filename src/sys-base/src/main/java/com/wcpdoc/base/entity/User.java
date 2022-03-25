@@ -58,6 +58,8 @@ public class User implements LoginUser {
 	private Integer state;
 	@Column(name = "TYPE")
 	private Integer type;
+	@Column(name = "HEAD_FILE_ID")
+	private Integer headFileId;
 
 	public Integer getId() {
 		return id;
@@ -169,5 +171,13 @@ public class User implements LoginUser {
 
 	public void setType(Integer type) {
 		this.type = type;
+	}
+
+	public Integer getHeadFileId() {
+		return headFileId;
+	}
+
+	public void setHeadFileId(Integer headFileId) {
+		this.headFileId = headFileId;
 	}
 }

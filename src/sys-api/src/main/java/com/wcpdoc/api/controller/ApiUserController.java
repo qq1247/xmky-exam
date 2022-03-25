@@ -186,6 +186,8 @@ public class ApiUserController extends BaseController {
 			entity.setLoginName(user.getLoginName());
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
+			entity.setEmail(user.getEmail());
+			entity.setHeadFileId(user.getHeadFileId());
 			userService.update(entity);
 
 			// 更新密码
@@ -258,8 +260,10 @@ public class ApiUserController extends BaseController {
 				.addAttr("loginName", entity.getLoginName())
 				.addAttr("orgId", entity.getOrgId())
 				.addAttr("orgName", org == null ? null : org.getName())
-				.addAttr("state", entity.getState());
-				
+				.addAttr("state", entity.getState())
+				.addAttr("email", entity.getEmail())
+				.addAttr("headFileId", entity.getHeadFileId())
+				;
 			
 			if (!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
 				return pageResult;
