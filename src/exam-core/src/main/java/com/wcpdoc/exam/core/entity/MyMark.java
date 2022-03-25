@@ -1,6 +1,8 @@
 package com.wcpdoc.exam.core.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +14,7 @@ import javax.persistence.Table;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.wcpdoc.core.util.ValidateUtil;
 
 /**
  * 我的阅卷实体
@@ -75,7 +78,20 @@ public class MyMark {
 	public String getExamUserIds() {
 		return examUserIds;
 	}
-
+	
+	public Integer[] getExamUserIdArr() {
+		if (!ValidateUtil.isValid(examUserIds)) {
+			return null;
+		}
+		
+		List<Integer> examUserIdList = new ArrayList<>();
+		for (String examUserId : examUserIds.substring(1, examUserIds.length() - 1).split(",")) {
+			examUserIdList.add(Integer.parseInt(examUserId));
+		}
+		
+		return examUserIdList.toArray(new Integer[0]);
+	}
+	
 	public void setExamUserIds(String examUserIds) {
 		this.examUserIds = examUserIds;
 	}

@@ -120,18 +120,22 @@ public class Exam {
 		this.markEndTime = markEndTime;
 	}
 
+	/** 成绩状态（1：公开；2：不公开） */
 	public Integer getScoreState() {
 		return scoreState;
 	}
 
+	/** 成绩状态（1：公开；2：不公开） */
 	public void setScoreState(Integer scoreState) {
 		this.scoreState = scoreState;
 	}
 
+	/** 排名状态（1：公开；2：不公开） */
 	public Integer getRankState() {
 		return rankState;
 	}
 
+	/** 排名状态（1：公开；2：不公开） */
 	public void setRankState(Integer rankState) {
 		this.rankState = rankState;
 	}

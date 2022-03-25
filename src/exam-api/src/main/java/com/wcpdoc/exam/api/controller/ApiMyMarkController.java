@@ -1,6 +1,8 @@
 package com.wcpdoc.exam.api.controller;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,17 +14,27 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.base.entity.Org;
+import com.wcpdoc.base.entity.User;
+import com.wcpdoc.base.service.OrgService;
+import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.exam.core.entity.Exam;
+import com.wcpdoc.exam.core.entity.MyExam;
+import com.wcpdoc.exam.core.entity.MyMark;
+import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
+import com.wcpdoc.exam.core.service.PaperService;
 
 /**
  * 我的阅卷控制层
@@ -42,6 +54,12 @@ public class ApiMyMarkController extends BaseController {
 	private MyMarkService myMarkService;
 	@Resource
 	private MyExamDetailService myExamDetailService;
+	@Resource
+	private UserService userService;
+	@Resource
+	private OrgService orgService;
+	@Resource
+	private PaperService paperService;
 	
 	/**
 	 * 我的阅卷列表
@@ -112,20 +130,105 @@ public class ApiMyMarkController extends BaseController {
 	}
 	
 	/**
-	 * 阅卷考生
+	 * 考试用户列表
 	 * 
 	 * v1.0 chenyun 2021年8月2日下午3:14:45
 	 * @param examId
-	 * @param userName
 	 * @return PageResult
 	 */
 	@RequestMapping("/userList")
 	@ResponseBody
-	public PageResult userList(Integer examId, String userName, Integer userId) {
+	public PageResult userList(Integer examId) {
 		try {
-			return PageResultEx.ok().data(myMarkService.getUserList(examId, userName, userId));
+			// 校验数据有效性
+			List<MyMark> myMarkList = myMarkService.getList(examId);
+			MyMark myMark = null;
+			for (MyMark _myMark : myMarkList) {
+				if (_myMark.getMarkUserId().intValue() == getCurUser().getId().intValue()) {
+					myMark = _myMark;
+					break;
+				}
+			}
+			if (myMark == null) {
+				throw new MyException("未参与该场考试");
+			}
+			
+			// 返回考试用户IDS
+			List<User> userList = userService.getList(myMark.getExamUserIdArr());
+			List<Map<String, Object>> result = new ArrayList<>();
+			Map<Integer, Org> orgCache = new HashMap<>();// 机构不会很多，缓存利用
+			for (User user : userList) {
+				Map<String, Object> sigleResult = new HashMap<>();
+				sigleResult.put("userId", user.getId());
+				sigleResult.put("userName", user.getName());
+				sigleResult.put("userHeadFileId", user.getHeadFileId());
+				if (orgCache.get(user.getOrgId()) == null) {
+					orgCache.put(user.getOrgId(), orgService.getEntity(user.getOrgId()));
+				}
+				sigleResult.put("orgId", orgCache.get(user.getOrgId()).getId());
+				sigleResult.put("orgName", orgCache.get(user.getOrgId()).getName());
+				result.add(sigleResult);
+			}
+			
+			return PageResultEx.ok();
+		} catch (MyException e) {
+			log.error("考试用户列表错误：{}", e.getMessage());
+			return PageResult.err();
 		} catch (Exception e) {
-			log.error("我的考试列表错误：", e);
+			log.error("考试用户列表错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 考试用户
+	 * 
+	 * v1.0 zhanghc 2022年3月25日下午1:54:56
+	 * @param examId
+	 * @param userId
+	 * @return PageResult
+	 */
+	@RequestMapping("/user")
+	@ResponseBody
+	public PageResult user(Integer examId, Integer userId) {
+		try {
+			// 校验数据有效性
+			List<MyMark> myMarkList = myMarkService.getList(examId);
+			MyMark myMark = null;
+			for (MyMark _myMark : myMarkList) {
+				if (_myMark.getMarkUserId().intValue() == getCurUser().getId().intValue()) {
+					myMark = _myMark;
+					break;
+				}
+			}
+			if (myMark == null) {
+				throw new MyException("未参与该场考试");
+			}
+			if (!myMark.getExamUserIds().contains(String.format(",%s,", userId))) {
+				throw new MyException("未参与该用户阅卷");
+			}
+			
+			// 获取考试用户信息
+			MyExam myExam = myExamService.getEntity(examId, userId);
+			Exam exam = examService.getEntity(examId);
+			Paper paper = paperService.getEntity(exam.getPaperId());
+			return PageResultEx.ok()
+					.addAttr("answerStartTime", myExam.getAnswerStartTime() == null ? null : DateUtil.formatDateTime(myExam.getAnswerStartTime()))
+					.addAttr("answerEndTime", myExam.getAnswerEndTime() == null ? null : DateUtil.formatDateTime(myExam.getAnswerEndTime()))
+					.addAttr("markStartTime", myExam.getMarkStartTime() == null ? null : DateUtil.formatDateTime(myExam.getMarkStartTime()))
+					.addAttr("markEndTime", myExam.getMarkEndTime() == null ? null : DateUtil.formatDateTime(myExam.getMarkEndTime()))
+					.addAttr("state", myExam.getState())
+					.addAttr("markState", myExam.getMarkState())
+					.addAttr("answerState", myExam.getAnswerState())
+					.addAttr("totalScore", exam.getScoreState() == 1 ? myExam.getTotalScore() : null)// 成绩不公开则不显示
+					.addAttr("paperTotalScore", paper.getTotalScore())
+					.addAttr("paperPassScore", paper.getPassScore())
+					;
+		} catch (MyException e) {
+			log.error("考试用户错误：{}", e.getMessage());
+			return PageResult.err();
+		} catch (Exception e) {
+			log.error("考试用户错误：", e);
 			return PageResult.err();
 		}
 	}
