@@ -604,7 +604,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				throw new MyException("参数错误：options长度小于2");
 			}
 			if (answers.length < 2) { // 最少两个答案
-				throw new MyException("参数错误：answers");
+				throw new MyException("参数错误：answers最少两个答案");
 			}
 			for (int i = 0; i < answers.length; i++) {
 				if (!"ABCDEFG".contains(answers[i])) {

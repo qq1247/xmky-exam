@@ -18,6 +18,7 @@ import com.wcpdoc.base.service.ParmService;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
@@ -62,7 +63,18 @@ public class ApiMyExamController extends BaseController{
 		try {
 			PageIn pageIn = new PageIn(request);
 			pageIn.addAttr("curUserId", getCurUser().getId());
-			return PageResultEx.ok().data(myExamService.getListpage(pageIn));
+			PageOut pageOut = myExamService.getListpage(pageIn);
+			for (Map<String, Object> map : pageOut.getList()) {
+				if ((Integer)map.remove("examScoreState") == 2) {
+					map.put("totalScore", null);// 不显示分数
+				}
+				if ((Integer)map.remove("examRankState") == 2) {
+					map.put("no", null);// 不显示排名
+					map.put("userNum", null);// 不显示排名
+				}
+			}
+			
+			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("我的考试列表错误：", e);
 			return PageResult.err();

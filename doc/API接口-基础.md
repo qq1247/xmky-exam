@@ -136,7 +136,7 @@ http请求头需添加Authorization字段，
 ### 用户列表：user/listpage
 | 请求参数     |  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
-| name | String(16) | 名称   |   否     |
+| name | String(16) | 名称或组织架构  |   否     |
 | orgName| String(16) | 组织机构名称   |   否     |
 | type| Integer  | 类型|   否     |
 | curPage | Integer | 当前第几页  |   否     |
@@ -524,19 +524,19 @@ http请求头需添加Authorization字段，
 |value| String(32)| 密码|   否    |
 
 ### 系统参数获取：parm/get
-| 请求参数|  类型   |  描述  | 
+| 请求参数|  类型   |  描述  |
 | --------   | -----   | -----  |
-|emailHost| String（64）| 主机   | 
-|emailUserName| String (64)  | 用户名   | 
-|emailPwd| text  | String（64）   |  
-|emailProtocol| String（16）| 协议  |  
-|emailEncode| String (16)  | 编码   |  
-|orgLogo| Integer| 机构logo ID  |   
-|orgName| String (64)  | 机构名称  |  
-|fileUploadDir| String（64）| 上传目录   |  
-|dbBakDir| String（64）| 上传目录   |   
-|pwdType| Integer| 密码类型   |   
-|pwdValue| String（32）| 密码   |   
+|emailHost| String（64）| 主机   |
+|emailUserName| String (64)  | 用户名   |
+|emailPwd| text  | String（64）   |
+|emailProtocol| String（16）| 协议  |
+|emailEncode| String (16)  | 编码   |
+|orgLogo| Integer| 机构logo ID  |
+|orgName| String (64)  | 机构名称  |
+|fileUploadDir| String（64）| 上传目录   |
+|dbBakDir| String（64）| 上传目录   |
+|pwdType| Integer| 密码类型   |
+|pwdValue| String（32）| 密码   |
 
 ### 敏感词添加：sensitive/edit
 | 请求参数|  类型   |  描述  |  必填 |

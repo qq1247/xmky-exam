@@ -47,7 +47,7 @@ http请求头需添加Authorization字段，
 | data.list[].examEndTime     | Date    | 考试结束时间 |
 | data.list[].examMarkStartTime   | Date    | （考试的）阅卷开始时间 |
 | data.list[].examMarkEndTime     | Date    | （考试的）阅卷结束时间  |
-| data.list[].examMarkState     | Date    | 阅卷状态（考试的  |
+| data.list[].examMarkState     | Date    | （考试的 )阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；） |
 | data.list[].paperId         | Double  | 试卷ID  |
 | data.list[].paperPassScore | Double  | 试卷及格分数  |
 | data.list[].paperTotalScore | Double  | 试卷总分  |
@@ -58,10 +58,11 @@ http请求头需添加Authorization字段，
 | data.list[].answerEndTime   | Date    | 答题结束时间|
 | data.list[].markUserId      | Integer | 阅卷人ID   |
 | data.list[].markUserName    | String  | 阅卷人名称  |
-| data.list[].totalScore      | Double  | 我的得分  |
+| data.list[].totalScore      | Double  | 我的得分 （考试不显示成绩返回null） |
 | data.list[].state           | Integer | 考试状态（1：未考试；2：考试中；3：已交卷；4：强制交卷；） |
 | data.list[].markState       | Integer | 阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；） |
 | data.list[].answerState     | Integer | 答题状态（1：及格；2：不及格） |
+| data.list[].no     | Integer | 排名（考试不显示排名返回null） |
 
 
 ### 我的考试答案列表：myExam/answerList

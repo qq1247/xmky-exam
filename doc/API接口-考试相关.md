@@ -656,7 +656,6 @@ http请求头需添加Authorization字段，
 | examUserIds | Integer[] | 考试用户IDS | 否   |
 | questionIds | Integer[] | 试题IDS examUserIds和questionIds都有效时，默认使用examUserIds  | 否   |
 
-
 ### 考试在线用户：exam/onlineUser
 | 请求参数| 类型      | 描述        | 必填 |
 | ----------- | --------- | ----------- | ---- |
@@ -670,6 +669,16 @@ http请求头需添加Authorization字段，
 | data.userName| String  | 用户名称  |
 | data.online| Boolean| 在线状态（true：在线；false：离线）  |
 | data.onlineTime| Date| 离线时间  |
+
+### 考试成绩：exam/score
+| 请求参数| 类型      | 描述        | 必填 |
+| ----------- | --------- | ----------- | ---- |
+| state          | Integer   | 成绩状态（1：公开；2：不公开）  | 是   |
+
+### 考试排名：exam/rank
+| 请求参数| 类型      | 描述        | 必填 |
+| ----------- | --------- | ----------- | ---- |
+| state          | Integer   | 排名状态（1：公开；2：不公开）  | 是   |
 
 ### 试题评论列表：questionComment/listpage
 | 请求参数| 类型       | 描述       | 必填 |
