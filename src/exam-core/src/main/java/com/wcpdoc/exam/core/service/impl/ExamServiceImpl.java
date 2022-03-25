@@ -654,12 +654,4 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	public List<Exam> getList() {
 		return examDao.getList();
 	}
-	
-	
-	public static void main(String[] args) {
-		BigDecimal divide = new BigDecimal(1).divide(new BigDecimal(3), 2, BigDecimal.ROUND_FLOOR);
-		System.err.println(divide);
-	}
-	
-	
 }

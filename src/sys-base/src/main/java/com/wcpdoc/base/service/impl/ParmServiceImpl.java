@@ -1,7 +1,6 @@
 package com.wcpdoc.base.service.impl;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Date;
 
 import javax.annotation.Resource;
@@ -165,9 +164,5 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		
 		// 更新缓存
 		ParmCache.flushCache(parm);
-	}
-	
-	public static void main(String[] args) throws IOException {
-		FileUtils.copyDirectoryToDirectory(new File("c:/123"), new File("c:/456"));
 	}
 }

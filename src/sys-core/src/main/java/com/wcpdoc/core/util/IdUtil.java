@@ -92,15 +92,4 @@ public class IdUtil {
 	private long getNewstmp() {
 		return System.currentTimeMillis();
 	}
-
-	public static void main(String[] args) {
-		IdUtil snowFlake = new IdUtil(2, 3);
-
-		long start = System.currentTimeMillis();
-		for (int i = 0; i < 100000; i++) {
-			System.out.println(snowFlake.nextId());
-		}
-
-		System.out.println(System.currentTimeMillis() - start);
-	}
 }
