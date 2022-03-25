@@ -85,8 +85,8 @@
       </el-col>
       <el-col :span="18">
         <div v-if="editForm.ai === 1 && editForm.type === 3">
-          <el-form-item prop="scoreOptions">
-            <el-checkbox-group v-model="editForm.scoreOptions">
+          <el-form-item prop="aiOptions">
+            <el-checkbox-group v-model="editForm.aiOptions">
               <el-tooltip
                 class="item"
                 content="默认答案有顺序"
@@ -107,8 +107,8 @@
           </el-form-item>
         </div>
         <div v-if="editForm.ai === 1 && editForm.type === 5">
-          <el-form-item prop="scoreOptions">
-            <el-checkbox-group v-model="editForm.scoreOptions">
+          <el-form-item prop="aiOptions">
+            <el-checkbox-group v-model="editForm.aiOptions">
               <el-tooltip
                 class="item"
                 content="大小写不敏感"
@@ -137,10 +137,12 @@
         </el-form-item>
       </el-col>
       <el-col :span="12" v-if="editForm.type === 2">
-        <div class="lose">
-          漏选得
-          <el-input size="mini" v-model="editForm.multipScore"> </el-input>分
-        </div>
+        <el-form-item prop="multipScore">
+          <div class="lose">
+            漏选得
+            <el-input size="mini" v-model="editForm.multipScore"> </el-input>分
+          </div>
+        </el-form-item>
       </el-col>
     </el-row>
 
@@ -410,15 +412,14 @@ export default {
     }
 
     const validateMultipScore = (rule, value, callback) => {
-      if (this.editForm.ai === 2 || this.editForm.scoreOptions.length === 0) {
-        this.editForm.multipScore = ''
-        return callback()
-      }
       if (value === '') {
         return callback(new Error('请填写分数'))
       }
-      if (value > this.editForm.score || value <= 0) {
-        return callback(new Error(`请填写合理分数`))
+      if (value >= this.editForm.score) {
+        return callback(new Error(`漏选分值应小于总分`))
+      }
+      if (value < 0) {
+        return callback(new Error(`漏选分值不能小于0分`))
       }
       return callback()
     }
@@ -480,7 +481,7 @@ export default {
         analysis: '', // 解析
         score: 1, // 分值
         multipScore: 0.5,
-        scoreOptions: [],
+        aiOptions: [],
         rules: {
           title: [{ required: true, message: '请输入题干', trigger: 'blur' }],
           option: [
@@ -649,8 +650,7 @@ export default {
         for (let i = 0; i < res.data.options.length; i++) {
           this.addOption(i, res.data.options[i])
         }
-        this.editForm.scoreOptions =
-          res.data.scoreOptions == null ? [] : res.data.scoreOptions
+        this.editForm.aiOptions = res.data.aiOptions
         this.editForm.answerMultip = res.data.answers.reduce((acc, cur) => {
           acc.push(...cur.answer)
           return acc
@@ -672,8 +672,7 @@ export default {
           for (let i = 0; i < answers.length; i++) {
             this.addFillBlanks(i, answers[i])
           }
-          this.editForm.scoreOptions =
-            res.data.scoreOptions == null ? [] : res.data.scoreOptions
+          this.editForm.aiOptions = res.data.aiOptions
         })
       }
 
@@ -706,9 +705,14 @@ export default {
         }, [])
       }
 
-      // 分值选项 (多选【漏选得分】 填空【漏答得分、大小写不敏感】  问答【大小写不敏感】)
-      if ([2, 3, 5].includes(params.type)) {
-        params.scoreOptions = this.editForm.scoreOptions.reduce((acc, cur) => {
+      // 分值选项（多选【漏选得分】）
+      if (params.type === 2) {
+        params.aiOptions = [1]
+      }
+
+      // 分值选项 ( 填空【漏答得分、大小写不敏感】  问答【大小写不敏感】)
+      if ([3, 5].includes(params.type) && params.ai === 1) {
+        params.aiOptions = this.editForm.aiOptions.reduce((acc, cur) => {
           acc.push(cur)
           return acc
         }, [])
@@ -732,18 +736,13 @@ export default {
         }, [])
       }
 
-      // 分值选项对应的分值（非智能 ai=2 || 单选、判断）
-      if (params.ai == 2 || [1, 4].includes(params.type)) {
-        params.answerScores = params.score
-      }
-
       // 分值选项对应的分值（多选）
       if (params.type == 2) {
         params.answerScores = this.editForm.multipScore
       }
 
       // 分值选项对应的分值（填空、问答）
-      if ([3, 5].includes(params.type)) {
+      if ([3, 5].includes(params.type) && params.ai === 1) {
         params.answerScores = this.editForm.answers.reduce((acc, cur) => {
           acc.push(params.ai == 1 ? cur.score : params.score)
           return acc
@@ -871,5 +870,10 @@ export default {
 
 /deep/ .el-form-item__error {
   line-height: 20px;
+}
+
+/deep/ .el-checkbox,
+/deep/ .el-radio {
+  margin-right: 20px;
 }
 </style>

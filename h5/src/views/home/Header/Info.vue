@@ -21,6 +21,7 @@
       @click="handleCommand('edit')"
       title="修改密码"
     ></i>
+    <Screenfull class="screenfull" />
     <i
       class="common common-login-out"
       @click="handleCommand('out')"
@@ -61,7 +62,11 @@
 import { mapGetters } from 'vuex'
 import { loginPwd } from 'api/common'
 import { getInfo, setInfo } from '@/utils/storage'
+import Screenfull from '@/components/Screenfull/index.vue'
 export default {
+  components: {
+    Screenfull,
+  },
   data() {
     return {
       level: {
@@ -92,14 +97,12 @@ export default {
       if (command === 'edit') {
         this.editForm.show = true
       }
-
       if (command === 'out') {
         this.$store.dispatch('user/resetToken').then(() => {
           this.$message('登出成功！')
           this.$router.push('/')
         })
       }
-
       if (command === 'change') {
         this.$confirm(
           `确定要切换为【${
@@ -139,12 +142,10 @@ export default {
           oldPwd: this.editForm.oldPwd,
           newPwd: this.editForm.newPwd,
         })
-
         if (res.code != 200) {
           this.$message.warning(res.msg)
           return
         }
-
         this.editForm.show = false
       })
     },
@@ -153,6 +154,7 @@ export default {
       this.$refs[name].resetFields()
     },
   },
+  components: { Screenfull },
 }
 </script>
 
@@ -187,6 +189,11 @@ export default {
       transition: all 0.3s ease-in-out;
       background: #fff;
     }
+  }
+  .screenfull {
+    margin-left: 10px;
+    padding-left: 10px;
+    border-left: 1px solid #f1f1f1;
   }
 }
 </style>

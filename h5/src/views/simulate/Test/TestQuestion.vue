@@ -7,16 +7,11 @@
         <div>{{ questionDetail.id }}、</div>
         <div v-html="`${questionDetail.title}`"></div>
       </div>
-      <!-- <div class="question-title" v-else>
+
+      <div class="question-title" v-else>
         <span>{{ questionDetail.id }}、</span>
-        <ClozeTitle
-          :title="questionDetail.title"
-          :finish="finish"
-          :paperQuestion="paperQuestion"
-          :myExamDetailCache="myExamDetailCache"
-          :questionId="routerIndex"
-        ></ClozeTitle>
-      </div> -->
+        <ClozeTitle :detail="questionDetail"></ClozeTitle>
+      </div>
 
       <!-- 单选 -->
       <el-radio-group
@@ -89,18 +84,15 @@
       </el-radio-group>
 
       <!-- 问答 -->
-      <!-- <template v-if="questionDetail.type === 5">
+      <template v-if="questionDetail.type === 5">
         <el-input
           :rows="2"
           type="textarea"
           class="question-text"
-          @change="checkAnswer"
           placeholder="请输入内容"
-          v-if="myExamDetailCache[questionDetail.id]"
-          :disabled="finish === 'true' ? true : false"
-          v-model="myExamDetailCache[questionDetail.id].answers[0]"
+          v-model="questionDetail.selected"
         ></el-input>
-      </template> -->
+      </template>
     </div>
 
     <div class="children-content" v-else>
@@ -109,16 +101,11 @@
         <div>{{ questionDetail.id }}、</div>
         <div v-html="`${questionDetail.title}`"></div>
       </div>
-      <!-- <div class="question-title" v-else>
+
+      <div class="question-title" v-else>
         <span>{{ questionDetail.id }}、</span>
-        <ClozeTitle
-          :title="questionDetail.title"
-          :finish="finish"
-          :paperQuestion="paperQuestion"
-          :myExamDetailCache="myExamDetailCache"
-          :questionId="routerIndex"
-        ></ClozeTitle>
-      </div> -->
+        <ClozeTitle :detail="questionDetail" recite></ClozeTitle>
+      </div>
 
       <!-- 单选 -->
       <el-radio-group
@@ -177,18 +164,32 @@
       </el-radio-group>
 
       <!-- 问答 -->
-      <!-- <template v-if="questionDetail.type === 5">
-        <el-input
-          :rows="2"
-          type="textarea"
-          class="question-text"
-          @change="checkAnswer"
-          placeholder="请输入内容"
-          v-if="myExamDetailCache[questionDetail.id]"
-          :disabled="finish === 'true' ? true : false"
-          v-model="myExamDetailCache[questionDetail.id].answers[0]"
-        ></el-input>
-      </template> -->
+      <template v-if="questionDetail.type === 5"> </template>
+
+      <template v-if="questionDetail.type === 5">
+        <template v-if="questionDetail.ai === 1">
+          <div
+            v-for="(answer, indexAnswers) in questionDetail.answers"
+            :key="answer.id"
+            class="answers-item"
+          >
+            <span>{{
+              `关键词${$tools.intToChinese(indexAnswers + 1)}、`
+            }}</span>
+            <span
+              class="answers-tag"
+              v-for="(ans, indexAnswer) in answer.answer"
+              :key="indexAnswer"
+              >{{ ans }}</span
+            >
+          </div>
+        </template>
+        <div
+          style="padding: 10px"
+          v-if="questionDetail.ai === 2"
+          v-html="`${questionDetail.answers[0].answer}`"
+        ></div>
+      </template>
     </div>
 
     <el-row class="test-handler">
@@ -258,10 +259,12 @@
 
 <script>
 import { questionCommentAdd, questionCommentListPage } from 'api/question'
+import ClozeTitle from './ClozeTitle.vue'
 import QuestionComment from 'components/QuestionComment/Index.vue'
 import CommentText from 'components/QuestionComment/CommentText.vue'
 export default {
   components: {
+    ClozeTitle,
     CommentText,
     QuestionComment,
   },
@@ -298,7 +301,7 @@ export default {
             String.fromCharCode(65 + index) !==
               this.questionDetail.answers[0].answer
           ) {
-            return '#ea6a77'
+            return '#FF5722'
           }
 
           // 正确答案
@@ -306,7 +309,7 @@ export default {
             this.questionDetail.answers[0].answer ===
             String.fromCharCode(65 + index)
           ) {
-            return '#75cd61'
+            return '#5FB878'
           }
         }
 
@@ -317,12 +320,12 @@ export default {
             this.questionDetail.selected === index &&
             index !== this.questionDetail.answers[0].answer
           ) {
-            return '#ea6a77'
+            return '#FF5722'
           }
 
           // 正确答案
           if (this.questionDetail.answers[0].answer === index) {
-            return '#75cd61'
+            return '#5FB878'
           }
         }
 
@@ -337,7 +340,7 @@ export default {
               String.fromCharCode(65 + index)
             )
           ) {
-            return '#ea6a77'
+            return '#FF5722'
           }
 
           // 正确答案
@@ -346,7 +349,7 @@ export default {
               String.fromCharCode(65 + index)
             )
           ) {
-            return '#75cd61'
+            return '#5FB878'
           }
         }
       }
@@ -542,10 +545,8 @@ export default {
   border-bottom: 10px solid #f7f8f9;
 }
 
-.error {
-  color: red;
-}
-.success {
-  color: green;
+.answers-item {
+  line-height: 40px;
+  margin-left: 40px;
 }
 </style>

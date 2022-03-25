@@ -68,9 +68,22 @@ export default {
         return
       }
       const questionDetail = await this.getQuestionDetail(questionId)
+
+      let selected
+      if ([1, 4, 5].includes(questionDetail.type)) {
+        selected = ''
+      }
+
+      if ([2, 3].includes(questionDetail.type)) {
+        selected = []
+        if (questionDetail.type === 3) {
+          selected.length = questionDetail.answers.length
+        }
+      }
+
       this.questionList[index] = this.questionDetail = {
         ...questionDetail,
-        selected: questionDetail.type === 2 ? [] : '',
+        selected,
         finish: false,
       }
     },

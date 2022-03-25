@@ -471,6 +471,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { getOneDict } from '@/utils/getDict'
 import { getQuick } from '@/utils/storage'
 import {
@@ -614,7 +615,7 @@ export default {
       this.refreshData(res, '添加章节')
     },
     // 编辑章节
-    editorListener(id, value, chapter) {
+    editorListener: _.debounce(function (id, value, chapter) {
       const chapterInfo = {}
       if (id === 'chapterName') {
         chapterInfo.name = value
@@ -627,8 +628,7 @@ export default {
         chapterId: chapter.id,
         ...chapterInfo,
       })
-      // this.refreshData(res, '编辑章节')
-    },
+    }, 300),
     // 删除章节
     chapterDel({ id }) {
       this.$confirm(`删除章节将删除章节内的试题，是否删除？`, '提示', {
@@ -902,10 +902,6 @@ export default {
         }
       }
     }
-    /deep/.tinymce-box .tinymce-content {
-      line-height: 30px;
-      border: none;
-    }
   }
   .drag-parent {
     padding: 10px;
@@ -1047,5 +1043,10 @@ export default {
     width: 80px;
     margin: 0 10px;
   }
+}
+
+/deep/.tinymce-box .tinymce-content {
+  line-height: 30px;
+  border: 1px solid #fff;
 }
 </style>

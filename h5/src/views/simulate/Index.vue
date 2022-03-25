@@ -70,6 +70,10 @@ export default {
 .container {
   width: 1200px;
   margin: 0 auto 20px;
+  padding: 10px 20px;
+  background: #fff;
+  border-radius: 5px;
+  border: 1px solid #ececec;
 }
 .info-list {
   display: flex;
@@ -85,6 +89,9 @@ export default {
     cursor: pointer;
     &:hover {
       color: #0095e5;
+    }
+    &:last-child {
+      border-bottom: none;
     }
   }
 }
