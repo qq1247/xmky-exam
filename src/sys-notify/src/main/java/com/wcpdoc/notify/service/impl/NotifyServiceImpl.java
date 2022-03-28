@@ -1,18 +1,13 @@
 package com.wcpdoc.notify.service.impl;
 
 import javax.annotation.Resource;
+import javax.mail.internet.MimeMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
-import com.aliyuncs.CommonRequest;
-import com.aliyuncs.CommonResponse;
-import com.aliyuncs.DefaultAcsClient;
-import com.aliyuncs.IAcsClient;
-import com.aliyuncs.http.MethodType;
-import com.aliyuncs.profile.DefaultProfile;
 import com.wcpdoc.notify.exception.NotifyException;
 import com.wcpdoc.notify.service.EmailService;
 import com.wcpdoc.notify.service.NotifyService;
@@ -32,11 +27,12 @@ public class NotifyServiceImpl implements NotifyService {
 	public void pushEmail(String from, String to, String title, String content) throws NotifyException {
 		try {
 			log.debug("推送邮件：{}向{}发送{}", from, to, title);
-			SimpleMailMessage mailMessage = new SimpleMailMessage();
-			mailMessage.setFrom(from);
-			mailMessage.setTo(to);
-			mailMessage.setSubject(title);
-			mailMessage.setText(content);
+			MimeMessage mailMessage = emailService.getJavaMailSender().createMimeMessage();
+			MimeMessageHelper messageHelper = new MimeMessageHelper(mailMessage, true);
+			messageHelper.setFrom(from);
+			messageHelper.setTo(to);
+			messageHelper.setSubject(title);
+			messageHelper.setText(content, true);
 			emailService.getJavaMailSender().send(mailMessage);
 		} catch (Exception e) {
 			log.error("推送邮件：", e);
@@ -62,22 +58,22 @@ public class NotifyServiceImpl implements NotifyService {
 			//SendSMSResult  res = client.sendTemplateSMS(payload);
 	        
 	        //阿里云短信
-	        String appkey = "";
-		    String accessKeySecret = "";
-	        DefaultProfile profile = DefaultProfile.getProfile("cn-hangzhou", appkey, accessKeySecret);
-	        IAcsClient client = new DefaultAcsClient(profile);
-	        CommonRequest request = new CommonRequest();
-	        request.setMethod(MethodType.POST);
-	        request.setDomain("dysmsapi.aliyuncs.com");
-	        request.setVersion("2017-05-25");
-	        request.setAction("SendSms");
-	        request.putQueryParameter("RegionId", "cn-hangzhou");
-	        request.putQueryParameter("PhoneNumbers", phone);
-	        request.putQueryParameter("SignName", "Hi您好");
-	        request.putQueryParameter("TemplateCode", "SMS_177160250");
-	        request.putQueryParameter("TemplateParam", "{\"code\":\""+code+"\"}");
-	        @SuppressWarnings("unused")
-			CommonResponse response = client.getCommonResponse(request);
+//	        String appkey = "";
+//		    String accessKeySecret = "";
+//	        DefaultProfile profile = DefaultProfile.getProfile("cn-hangzhou", appkey, accessKeySecret);
+//	        IAcsClient client = new DefaultAcsClient(profile);
+//	        CommonRequest request = new CommonRequest();
+//	        request.setMethod(MethodType.POST);
+//	        request.setDomain("dysmsapi.aliyuncs.com");
+//	        request.setVersion("2017-05-25");
+//	        request.setAction("SendSms");
+//	        request.putQueryParameter("RegionId", "cn-hangzhou");
+//	        request.putQueryParameter("PhoneNumbers", phone);
+//	        request.putQueryParameter("SignName", "Hi您好");
+//	        request.putQueryParameter("TemplateCode", "SMS_177160250");
+//	        request.putQueryParameter("TemplateParam", "{\"code\":\""+code+"\"}");
+//	        @SuppressWarnings("unused")
+//			CommonResponse response = client.getCommonResponse(request);
 		} catch (Exception e) {
 			log.error("阿里云短信：【{}】推送【{}】时，{}", phone, code, e.getMessage());
 			throw new NotifyException(String.format("阿里云短信：【{}】推送【{}】时，{}", phone, code, "未知异常"));

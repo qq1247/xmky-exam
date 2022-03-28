@@ -29,7 +29,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!-- 集成短信 -->
+		<!-- 集成短信
 		<dependency>
 			<groupId>com.aliyun</groupId>
 			<artifactId>aliyun-java-sdk-core</artifactId>
@@ -48,6 +48,6 @@
 					<artifactId>jaxb-impl</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
+		</dependency> -->
 	</dependencies>
 </project>
