@@ -439,4 +439,41 @@ public class ApiExamController extends BaseController {
 			return PageResult.err();
 		}
 	}
+	
+	/**
+	 * 考试阅卷公开
+	 * 
+	 * v1.0 zhanghc 2022年3月25日上午10:08:41
+	 * @param state 
+	 * @return PageResult
+	 */
+	@RequestMapping("/anon")
+	@ResponseBody
+	public PageResult anon(Integer id, Integer state) {
+		try {
+			// 校验数据有效性
+			if (!ValidateUtil.isValid(state)) {
+				throw new MyException("参数错误:state");
+			}
+			if (state != 1 && state != 2) {
+				throw new MyException("参数错误:state");
+			}
+			
+			Exam exam = examService.getEntity(id);
+			if (exam == null) {
+				throw new MyException("参数错误:state");
+			}
+			
+			// 更新排名状态
+			exam.setAnonState(state);
+			examService.add(exam);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("考试阅卷公开错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("考试阅卷公开错误：", e);
+			return PageResult.err();
+		}
+	}
 }

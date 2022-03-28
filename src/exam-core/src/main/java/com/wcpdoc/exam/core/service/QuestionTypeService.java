@@ -50,8 +50,8 @@ public interface QuestionTypeService extends BaseService<QuestionType> {
 	 * 
 	 * v1.0 zhanghc 2021年7月1日下午2:13:57
 	 * @param questionType
-	 * @param id
+	 * @param userId
 	 * @return boolean
 	 */
-	boolean hasWriteAuth(QuestionType questionType, Integer id);
+	boolean hasWriteAuth(QuestionType questionType, Integer userId);
 }

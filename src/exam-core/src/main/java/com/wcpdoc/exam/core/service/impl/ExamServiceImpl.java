@@ -142,6 +142,9 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		exam.setMarkState(1);// 标记为未阅卷（考试时间结束，定时任务自动阅卷，标记为已阅）
 		exam.setMarkStartTime(paper.getMarkType() == 1 ? null : exam.getMarkStartTime());
 		exam.setMarkEndTime(paper.getMarkType() == 1 ? null : exam.getMarkEndTime());
+		exam.setScoreState(2);
+		exam.setRankState(2);
+		exam.setAnonState(2);
 		add(exam);
 		return exam.getId(); //快速创建考试需要用id查找信息
 	}

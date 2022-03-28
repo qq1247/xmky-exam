@@ -71,6 +71,8 @@ public class Exam {
 	private Integer examTypeId;
 	@Column(name = "MARK_STATE")
 	private Integer markState;
+	@Column(name = "ANON_STATE")
+	private Integer anonState;
 
 	public Integer getId() {
 		return id;
@@ -222,5 +224,15 @@ public class Exam {
 	/** 1：未阅卷；2：阅卷中；3：已阅卷； */
 	public void setMarkState(Integer markState) {
 		this.markState = markState;
+	}
+
+	/** 1：公开；2：不公开 */
+	public Integer getAnonState() {
+		return anonState;
+	}
+
+	/** 1：公开；2：不公开 */
+	public void setAnonState(Integer anonState) {
+		this.anonState = anonState;
 	}
 }
