@@ -157,16 +157,18 @@ public class ApiMyMarkController extends BaseController {
 			List<User> userList = userService.getList(myMark.getExamUserIdArr());
 			List<Map<String, Object>> result = new ArrayList<>();
 			Map<Integer, Org> orgCache = new HashMap<>();// 机构不会很多，缓存利用
+			Exam exam = examService.getEntity(examId);
+			int pos = 1;
 			for (User user : userList) {
 				Map<String, Object> sigleResult = new HashMap<>();
 				sigleResult.put("userId", user.getId());
-				sigleResult.put("userName", user.getName());
-				sigleResult.put("userHeadFileId", user.getHeadFileId());
+				sigleResult.put("userName", exam.getAnonState() == 1 ? user.getName() : "用户" + pos++);//  如果是匿名阅卷，不显示名称等
+				sigleResult.put("userHeadFileId", exam.getAnonState() == 1 ? user.getHeadFileId() : null);
 				if (orgCache.get(user.getOrgId()) == null) {
 					orgCache.put(user.getOrgId(), orgService.getEntity(user.getOrgId()));
 				}
-				sigleResult.put("orgId", orgCache.get(user.getOrgId()).getId());
-				sigleResult.put("orgName", orgCache.get(user.getOrgId()).getName());
+				sigleResult.put("orgId", user.getOrgId());
+				sigleResult.put("orgName", exam.getAnonState() == 1 ? orgCache.get(user.getOrgId()).getName() : "-");
 				result.add(sigleResult);
 			}
 			
