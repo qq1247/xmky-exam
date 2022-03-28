@@ -9,8 +9,13 @@
 -->
 <template>
   <div class="container">
-    <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
-      <el-form-item label="所属机构" label-width="120px" prop="orgId">
+    <el-form
+      :model="editForm"
+      :rules="editForm.rules"
+      ref="editForm"
+      label-width="120px"
+    >
+      <el-form-item label="所属机构" prop="orgId">
         <CustomSelect
           :multiple="false"
           ref="orgSelect"
@@ -30,23 +35,39 @@
           ></el-option>
         </CustomSelect>
       </el-form-item>
-      <el-form-item label="登录账号" label-width="120px" prop="loginName">
+      <el-form-item label="登录账号" prop="loginName">
         <el-input
           placeholder="请输入登录账号"
           v-model.trim="editForm.loginName"
         ></el-input>
       </el-form-item>
-      <el-form-item label="姓名" label-width="120px" prop="name">
+      <el-form-item label="姓名" prop="name">
         <el-input
           placeholder="请输入姓名"
           v-model.trim="editForm.name"
         ></el-input>
       </el-form-item>
+      <el-form-item label="邮箱" prop="email">
+        <el-input
+          placeholder="请输入邮箱"
+          v-model.trim="editForm.email"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="头像" prop="avatar">
+        <Upload
+          ref="avatarUpload"
+          type="image"
+          :files="editForm.avatar"
+          @success="avatarSuccess"
+          @remove="avatarRemove"
+          size="1"
+        />
+      </el-form-item>
+      <el-form-item>
+        <el-button @click="add" type="primary" v-if="!id">添加</el-button>
+        <el-button @click="edit" type="primary" v-if="id">修改</el-button>
+      </el-form-item>
     </el-form>
-    <div class="form-footer">
-      <el-button @click="add" type="primary" v-if="!id">添加</el-button>
-      <el-button @click="edit" type="primary" v-if="id">修改</el-button>
-    </div>
   </div>
 </template>
 
@@ -54,11 +75,24 @@
 import { userAdd, userEdit, userGet } from 'api/user'
 import { orgListPage } from 'api/base'
 import CustomSelect from 'components/CustomSelect.vue'
+import Upload from '@/components/Upload.vue'
 export default {
   components: {
+    Upload,
     CustomSelect,
   },
   data() {
+    const validateEmail = (rule, value, callback) => {
+      if (
+        value &&
+        !/^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(
+          value
+        )
+      ) {
+        return callback(new Error(`邮箱格式有误`))
+      }
+      return callback()
+    }
     return {
       id: null,
       editForm: {
@@ -68,6 +102,8 @@ export default {
         orgId: null, // 机构ID
         orgName: null, // 机构名称
         show: false, // 是否显示页面
+        email: '',
+        avatar: [],
         orgListpage: {
           total: 0,
           curPage: 1,
@@ -80,6 +116,7 @@ export default {
             { required: true, message: '请输入登录账号', trigger: 'blur' },
           ],
           name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
+          email: [{ required: false, validator: validateEmail }],
         },
       },
     }
@@ -106,6 +143,12 @@ export default {
           label: res.data.orgName,
           value: res.data.orgId,
         })
+        this.editForm.email = res.data.email || ''
+        if (res.data.headFileId) {
+          this.editForm.avatar.push({
+            url: `/api/file/download?id=${Number(res.data.headFileId)}`,
+          })
+        }
       })
     }
   },
@@ -122,6 +165,13 @@ export default {
           loginName: this.editForm.loginName,
           orgId: this.editForm.orgId,
           phone: this.editForm.phone,
+          headFileId:
+            this.editForm.avatar.length > 0
+              ? this.editForm.avatar[0]?.response
+                ? this.editForm.avatar[0].response.data.fileIds
+                : this.$tools.getQueryParam(this.editForm.avatar[0].url, 'id')
+              : null,
+          email: this.editForm.email,
         })
 
         if (res.code != 200) {
@@ -146,6 +196,13 @@ export default {
           name: this.editForm.name,
           loginName: this.editForm.loginName,
           orgId: this.editForm.orgId,
+          headFileId:
+            this.editForm.avatar.length > 0
+              ? this.editForm.avatar[0]?.response
+                ? this.editForm.avatar[0].response.data.fileIds
+                : this.$tools.getQueryParam(this.editForm.avatar[0].url, 'id')
+              : null,
+          email: this.editForm.email,
         })
 
         if (res.code != 200) {
@@ -177,6 +234,14 @@ export default {
     // 选择考试用户
     selectOrg(e) {
       this.editForm.orgId = e
+    },
+    // 上传头像成功
+    avatarSuccess(res, file, fileList) {
+      this.editForm.avatar = fileList
+    },
+    // 删除头像
+    avatarRemove(file, fileList) {
+      this.editForm.avatar = fileList
     },
   },
 }

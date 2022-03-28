@@ -14,7 +14,7 @@
       <div slot="header">
         <span>待考列表</span>
         <el-button
-          style="float: right; padding: 3px 0"
+          class="box-more"
           type="text"
           @click="$router.push({ name: 'MyExam' })"
           >更多</el-button
@@ -80,7 +80,7 @@
       <div slot="header">
         <span>待阅列表</span>
         <el-button
-          style="float: right; padding: 3px 0"
+          class="box-more"
           type="text"
           @click="$router.push({ name: 'MyMark' })"
           >更多</el-button
@@ -149,9 +149,7 @@
         <el-card class="box-card" shadow="never">
           <div slot="header">
             <span>最新公告</span>
-            <el-button style="float: right; padding: 3px 0" type="text"
-              >更多</el-button
-            >
+            <el-button class="box-more" type="text">更多</el-button>
           </div>
           <template v-if="bulletinList.length">
             <div class="info-list">
@@ -173,7 +171,10 @@
         <el-card class="box-card" shadow="never">
           <div slot="header">
             <span>模拟练习</span>
-            <el-button style="float: right; padding: 3px 0" type="text"
+            <el-button
+              type="text"
+              class="box-more"
+              @click="$router.push({ name: 'SimulateIndex' })"
               >更多</el-button
             >
           </div>
@@ -737,5 +738,10 @@ export default {
   .bulletin-content {
     text-indent: 2em;
   }
+}
+
+.box-more {
+  float: right;
+  padding: 3px 0;
 }
 </style>

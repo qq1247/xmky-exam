@@ -23,7 +23,6 @@
 </template>
 
 <script>
-import _ from 'lodash'
 import TinymceImage from './TinymceImage'
 // 文档 http://tinymce.ax-z.cn/
 // 引入组件
@@ -79,10 +78,6 @@ export default {
       type: String,
       default: 'editorId',
     },
-    border: {
-      type: Boolean,
-      default: true,
-    },
   },
   data() {
     return {
@@ -125,9 +120,9 @@ export default {
     },
   },
   methods: {
-    editorListener: _.debounce(function ($event) {
+    editorListener($event) {
       this.$emit('editorListener', this.id, $event)
-    }, 300),
+    },
   },
 }
 </script>

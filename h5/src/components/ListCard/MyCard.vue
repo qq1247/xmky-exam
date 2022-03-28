@@ -39,7 +39,7 @@
         <el-col :span="8">总分：{{ data.paperTotalScore }}</el-col>
         <el-col :span="8"
           >及格：{{
-            (data.paperPassScore / 100) * data.paperTotalScore || 0
+            Math.ceil((data.paperPassScore / 100) * data.paperTotalScore) || 0
           }}</el-col
         >
         <el-col :span="8" v-if="name === 'myExamList'"

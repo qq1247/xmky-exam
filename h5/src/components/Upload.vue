@@ -24,17 +24,14 @@
     :on-success="success"
     :before-upload="beforeUpload"
   >
-    <div slot="default">
-      <el-button type="primary" v-if="type !== 'image'"
-        ><i class="common common-line-upload"></i
-        >&nbsp;&nbsp;点击上传</el-button
-      >
-      <i class="el-icon-plus" v-else></i>
-      <div slot="tip" class="upload-tip">
-        可以上传{{ limit ? limit : 'N' }}个{{
-          type === '*' ? '任意' : this.type
-        }}文件，且不超过{{ size }}M
-      </div>
+    <el-button type="primary" v-if="type !== 'image'"
+      ><i class="common common-line-upload"></i>&nbsp;&nbsp;点击上传</el-button
+    >
+    <i class="el-icon-plus" v-else></i>
+    <div slot="tip" class="upload-tip">
+      可以上传{{ limit ? limit : 'N' }}个{{
+        type === '*' ? '任意' : this.type
+      }}文件，且不超过{{ size }}M
     </div>
   </el-upload>
 </template>
@@ -170,8 +167,11 @@ export default {
 
 <style lang="scss" scoped>
 .upload-tip {
+  min-width: 210px;
+  width: 100%;
   font-size: 12px;
   color: #999;
   margin-top: 5px;
+  line-height: 20px;
 }
 </style>
