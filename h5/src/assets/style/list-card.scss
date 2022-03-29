@@ -102,6 +102,10 @@
           padding: 12px 0;
           border-bottom: 1px solid #65707d;
           line-height: 1.45;
+          .common {
+            font-size: 14px;
+            margin-right: 10px;
+          }
           &:last-child {
             border-bottom: none;
           }
@@ -123,10 +127,16 @@
           border-color: transparent #4a5766 transparent transparent;
         }
       }
-      &:last-child:hover {
-        .handler-more {
-          left: 50px;
-          opacity: 1;
+      &:last-child {
+        &::after,
+        &::before {
+          display: none;
+        }
+        &:hover {
+          .handler-more {
+            left: 50px;
+            opacity: 1;
+          }
         }
       }
       &::after {

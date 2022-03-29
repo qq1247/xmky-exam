@@ -22,3 +22,4 @@ export const myMarkFinish = (params) => request('myMark/finish', params)
 
 export const myMarkAnswerList = (params) => request('myMark/answerList', params)
 export const myMarkUserList = (params) => request('myMark/userList', params)
+export const myMarkUser = (params) => request('myMark/user', params)

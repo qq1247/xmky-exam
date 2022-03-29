@@ -13,7 +13,10 @@
             :label="item.userName"
             :value="item.userId"
           >
-            <span>{{ item.userName }}&nbsp;/&nbsp;{{ item.orgName }}</span>
+            <span style="float: left">{{ item.userName }}</span>
+            <span style="float: right; color: #8492a6; font-size: 12px">{{
+              item.orgName
+            }}</span>
           </el-option>
         </el-select>
       </div>
@@ -246,6 +249,7 @@
 <script>
 import { paperGet, paperQuestionList } from 'api/paper'
 import {
+  myMarkUser,
   myMarkUserList,
   myMarkAnswerList,
   myMarkScore,
@@ -382,12 +386,12 @@ export default {
     },
     // 查询单个考生信息
     async queryOneExamineeInfo() {
-      const userList = await myMarkUserList({
+      const userInfo = await myMarkUser({
         examId: Number(this.examId),
         userId: this.userId,
       })
-      this.userInfo = userList.data[0]
-      this.routerQuestionId = userList.data[0].id
+      this.userInfo = userInfo
+      this.routerQuestionId = userInfo.id
     },
     // 选择考生
     changeUser(userId) {

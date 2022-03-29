@@ -153,3 +153,35 @@ export const onlineUser = (params) => request('exam/onlineUser', params)
  * @return {*}
  */
 export const examGradeReport = (params) => request('gradeReport/count', params)
+
+/**
+ * @name: examAnon
+ * @description: 用户匿名
+ * @param {*}
+ * @return {*}
+ */
+export const examAnon = (params) => request('exam/anon', params)
+
+/**
+ * @name: examRank
+ * @description: 排名公开
+ * @param {*}
+ * @return {*}
+ */
+export const examRank = (params) => request('exam/rank', params)
+
+/**
+ * @name: examScore
+ * @description: 成绩公开
+ * @param {*}
+ * @return {*}
+ */
+export const examScore = (params) => request('exam/score', params)
+
+/**
+ * @name: examEmail
+ * @description: 邮件通知
+ * @param {*}
+ * @return {*}
+ */
+export const examEmail = (params) => request('exam/mail', params)

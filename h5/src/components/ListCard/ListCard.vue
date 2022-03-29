@@ -95,15 +95,29 @@
           <span data-title="考试用户" @click="read(data)">
             <i class="common common-setting"></i>
           </span>
-          <span data-title="在线用户" @click="onLine(data)">
-            <i class="common common-onLine"></i>
-          </span>
           <span data-title="统计" @click="statistics(data)">
             <i class="common common-statistics"></i>
           </span>
-          <!-- <span data-title="通知" @click="message(data)">
-            <i class="common common-messages"></i>
-          </span> -->
+          <span>
+            <i class="common common-more-row"></i>
+            <div class="handler-more">
+              <div class="more-item" @click="onLine(data)">
+                <i class="common common-onLine"></i>在线用户
+              </div>
+              <div class="more-item" @click="anonymous(data)">
+                <i class="common common-anonymous"></i>匿名展示
+              </div>
+              <div class="more-item" @click="ranking(data)">
+                <i class="common common-ranking"></i>排名公开
+              </div>
+              <div class="more-item" @click="score(data)">
+                <i class="common common-score"></i>成绩公开
+              </div>
+              <div class="more-item" @click="message(data)">
+                <i class="common common-messages"></i>邮件通知
+              </div>
+            </div>
+          </span>
         </template>
       </div>
     </div>
@@ -210,6 +224,18 @@ export default {
     // 考试用户
     read(data) {
       this.$emit('read', data)
+    },
+    // 匿名展示
+    anonymous(data) {
+      this.$emit('anonymous', data)
+    },
+    // 排名公开
+    ranking(data) {
+      this.$emit('ranking', data)
+    },
+    // 成绩公开
+    score(data) {
+      this.$emit('score', data)
     },
     // 通知
     message(data) {

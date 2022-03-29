@@ -44,6 +44,10 @@
 import Setting from './Setting.vue'
 import Publish from './Publish.vue'
 import Delete from './Deletes.vue'
+import Anonymous from './Anonymous.vue'
+import Ranking from './Ranking.vue'
+import Score from './Score.vue'
+import Message from './Message.vue'
 export default {
   data() {
     return {
@@ -61,7 +65,7 @@ export default {
       contentName: '',
       contentIntro: '',
       contentUrl: '',
-      viewList: [Setting, Publish, Delete],
+      viewList: [Setting, Publish, Delete, Anonymous, Ranking, Score, Message],
       currentView: null,
     }
   },
@@ -86,7 +90,7 @@ export default {
           name: '发布',
           intro: '发布考试',
           icon: 'common common-publish',
-          contentName: '删除',
+          contentName: '发布',
           contentIntro: '1：发布后，考试不可更改；2：发布后才允许设置考试用户',
           index: '2',
         },
@@ -97,6 +101,38 @@ export default {
           contentName: '删除',
           contentIntro: '不影响关联的试题、试卷等，可以正常显示和使用',
           index: '3',
+        },
+        {
+          name: '匿名',
+          intro: '匿名展示',
+          icon: 'common common-anonymous',
+          contentName: '匿名',
+          contentIntro: '不影响关联的试题、试卷等，可以正常显示和使用',
+          index: '4',
+        },
+        {
+          name: '排名',
+          intro: '排名公开',
+          icon: 'common common-ranking',
+          contentName: '排名',
+          contentIntro: '不影响关联的试题、试卷等，可以正常显示和使用',
+          index: '5',
+        },
+        {
+          name: '成绩',
+          intro: '成绩公开',
+          icon: 'common common-score',
+          contentName: '成绩',
+          contentIntro: '不影响关联的试题、试卷等，可以正常显示和使用',
+          index: '6',
+        },
+        {
+          name: '通知',
+          intro: '邮件通知',
+          icon: 'common common-message',
+          contentName: '通知',
+          contentIntro: '不影响关联的试题、试卷等，可以正常显示和使用',
+          index: '7',
         },
       ]
     }

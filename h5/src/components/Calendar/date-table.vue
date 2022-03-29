@@ -292,11 +292,10 @@ export default {
 <style lang="scss" scoped>
 .day-mark {
   display: block;
-  width: 8px;
-  height: 8px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
   background: #44cede;
-  margin-top: 3px;
 }
 .is-today,
 .is-selected {

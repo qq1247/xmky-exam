@@ -5,17 +5,17 @@
         {{ i18nDate }}
       </div>
       <div class="el-calendar__button-group" v-if="validatedRange.length === 0">
-        <el-button-group>
-          <el-button type="plain" size="mini" @click="selectDate('prev-month')">
-            {{ t('el.datepicker.prevMonth') }}
-          </el-button>
-          <el-button type="plain" size="mini" @click="selectDate('today')">
-            {{ t('el.datepicker.today') }}
-          </el-button>
-          <el-button type="plain" size="mini" @click="selectDate('next-month')">
-            {{ t('el.datepicker.nextMonth') }}
-          </el-button>
-        </el-button-group>
+        <i
+          title="上个月"
+          class="el-icon-d-arrow-left"
+          @click="selectDate('prev-month')"
+        ></i>
+        <i title="今天" class="el-icon-link" @click="selectDate('today')"></i>
+        <i
+          title="下个月"
+          class="el-icon-d-arrow-right"
+          @click="selectDate('next-month')"
+        ></i>
       </div>
     </div>
     <div
@@ -298,3 +298,18 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.el-icon-d-arrow-left,
+.el-icon-d-arrow-right {
+  padding: 3px;
+  border: 1px solid #ececec;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.el-icon-link {
+  margin: 0 10px;
+  cursor: pointer;
+}
+</style>

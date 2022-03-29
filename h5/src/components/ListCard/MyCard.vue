@@ -28,22 +28,32 @@
       <!-- 标题 -->
       <div class="title ellipsis">{{ data.name || data.examName }}</div>
       <el-row class="content-info">
-        <el-col>创建者：{{ data.updateUserName }}</el-col>
-      </el-row>
-      <el-row class="content-info">
         <el-col>{{
           name === 'myExamList' ? data.examStartTime : data.markStartTime
         }}</el-col>
       </el-row>
       <el-row class="content-info">
-        <el-col :span="8">总分：{{ data.paperTotalScore }}</el-col>
         <el-col :span="8"
-          >及格：{{
-            Math.ceil((data.paperPassScore / 100) * data.paperTotalScore) || 0
+          >答题：{{
+            computeMinute(data.answerStartTime, data.answerEndTime)
           }}</el-col
         >
+        <el-col
+          :span="8"
+          :style="{
+            color:
+              Number(
+                ((data.paperPassScore / 100) * data.paperTotalScore).toFixed(2)
+              ) > data.totalScore
+                ? 'red'
+                : '',
+          }"
+          >分数：{{ data.totalScore !== null ? data.totalScore : '-' }} /
+          {{ data.paperTotalScore }}</el-col
+        >
         <el-col :span="8" v-if="name === 'myExamList'"
-          >得分：{{ data.totalScore === null ? '-' : data.totalScore }}</el-col
+          >排名：{{ data.no === null ? '-' : data.no }} /
+          {{ data.userNum === null ? '-' : data.userNum }}</el-col
         >
       </el-row>
 
@@ -134,6 +144,16 @@ export default {
     // 考生列表
     markUser(data) {
       this.$emit('markUser', data)
+    },
+    // 计算分钟数
+    computeMinute(startTime, endTime) {
+      if (!startTime || !endTime) {
+        return '0分钟'
+      }
+      const diffTime =
+        new Date(endTime).getTime() - new Date(startTime).getTime()
+      const minutes = diffTime / (60 * 1000)
+      return `${minutes.toFixed(2)}分钟`
     },
   },
 }

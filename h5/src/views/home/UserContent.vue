@@ -9,220 +9,156 @@
 -->
 <template>
   <div class="home-content">
-    <!-- 待考列表 -->
-    <el-card class="box-card" shadow="never" v-if="onlyRole.includes('user')">
-      <div slot="header">
-        <span>待考列表</span>
-        <el-button
-          class="box-more"
-          type="text"
-          @click="$router.push({ name: 'MyExam' })"
-          >更多</el-button
+    <div class="home-calendar">
+      <Calendar
+        v-model="now"
+        :timePopovers="timePopovers"
+        @selectDate="selectDate"
+      ></Calendar>
+    </div>
+    <div class="home-todo">
+      <!-- 普通用户 -->
+      <template v-if="onlyRole.includes('user')">
+        <div
+          class="info-item today-item"
+          :style="{
+            display: isExam(item.state) ? 'flex' : 'none',
+          }"
+          :key="item.id"
+          v-for="item in examList"
         >
-      </div>
-      <el-row :gutter="30">
-        <el-col :span="7">
-          <Calendar
-            v-model="now"
-            :timePopovers="timePopovers"
-            @selectDate="selectDate"
-          ></Calendar>
-        </el-col>
-        <el-col :span="17">
-          <template v-if="examList.length">
-            <div
-              class="info-item today-item"
-              :style="{
-                display: isExam(item.state) ? 'flex' : 'none',
-              }"
-              :key="item.id"
-              v-for="item in examList"
-            >
-              <template v-if="isExam(item.state)">
-                <i class="common common-wait-exam today-icon"></i>
-                <div class="item-center">
-                  <div class="info-item ellipsis">{{ item.examName }}</div>
-                  <div class="info-item">
-                    <div class="item-time">
-                      {{ item.examStartTime }}（{{
-                        computeMinute(item.examStartTime, item.examEndTime)
-                      }}）
-                    </div>
-                    <div class="item-score">
-                      总分：{{ item.paperTotalScore }}
-                    </div>
-                    <div class="item-pass">
-                      及格：{{
-                        (
-                          (item.paperPassScore / 100) *
-                          item.paperTotalScore
-                        ).toFixed(2)
-                      }}
-                    </div>
-                  </div>
+          <template v-if="isExam(item.state)">
+            <i class="common common-wait-exam today-icon"></i>
+            <div class="item-center">
+              <div class="info-item ellipsis">{{ item.examName }}</div>
+              <div class="info-item">
+                <div class="item-time">
+                  {{ item.examStartTime }}（{{
+                    computeMinute(item.examStartTime, item.examEndTime)
+                  }}）
                 </div>
-                <div class="item-btn" @click="goExam(item)">
-                  <i class="common common-count-down"></i>开始考试
-                </div>
-              </template>
-            </div>
-          </template>
-          <el-empty v-else description="暂无考试"></el-empty>
-        </el-col>
-      </el-row>
-    </el-card>
-    <!-- 待阅列表 -->
-    <el-card
-      class="box-card"
-      shadow="never"
-      v-if="onlyRole.includes('subAdmin')"
-    >
-      <div slot="header">
-        <span>待阅列表</span>
-        <el-button
-          class="box-more"
-          type="text"
-          @click="$router.push({ name: 'MyMark' })"
-          >更多</el-button
-        >
-      </div>
-      <el-row :gutter="30">
-        <el-col :span="8">
-          <Calendar
-            v-model="now"
-            :timePopovers="timePopovers"
-            @selectDate="selectDate"
-          ></Calendar>
-        </el-col>
-        <el-col :span="16">
-          <template v-if="markList.length">
-            <div
-              class="info-item today-item"
-              :style="{
-                display: isMark(item.examMarkStartTime, item.examMarkEndTime)
-                  ? 'flex'
-                  : 'none',
-              }"
-              :key="item.id"
-              v-for="item in markList"
-            >
-              <template
-                v-if="isMark(item.examMarkStartTime, item.examMarkEndTime)"
-              >
-                <i class="common common-wait-mark today-icon"></i>
-                <div class="item-center">
-                  <div class="info-item ellipsis">{{ item.examName }}</div>
-                  <div class="info-item">
-                    <div class="item-time">
-                      {{ item.examMarkStartTime }}（{{
-                        computeMinute(
-                          item.examMarkStartTime,
-                          item.examMarkEndTime
-                        )
-                      }}）
-                    </div>
-                    <div class="item-score">
-                      总分：{{ item.paperTotalScore }}
-                    </div>
-                    <div class="item-pass">
-                      及格：{{
-                        (
-                          (item.paperPassScore / 100) *
-                          item.paperTotalScore
-                        ).toFixed(2)
-                      }}
-                    </div>
-                  </div>
-                </div>
-                <div class="item-btn" @click="goMark(item)">
-                  <i class="common common-count-down"></i>开始阅卷
-                </div>
-              </template>
-            </div>
-          </template>
-          <el-empty v-else description="暂无试卷"></el-empty>
-        </el-col>
-      </el-row>
-    </el-card>
-    <el-row :gutter="30">
-      <el-col :span="12">
-        <el-card class="box-card" shadow="never">
-          <div slot="header">
-            <span>最新公告</span>
-            <el-button class="box-more" type="text">更多</el-button>
-          </div>
-          <template v-if="bulletinList.length">
-            <div class="info-list">
-              <div
-                class="info-item"
-                v-for="item in bulletinList"
-                :key="item.id"
-                @click="getBulletin(item)"
-              >
-                <div class="item-left ellipsis">{{ item.title }}</div>
-                <div class="item-right">{{ item.endTime }}</div>
-              </div>
-            </div>
-          </template>
-          <el-empty v-else description="暂无公告"></el-empty>
-        </el-card>
-      </el-col>
-      <el-col :span="12" v-if="onlyRole.includes('user')">
-        <el-card class="box-card" shadow="never">
-          <div slot="header">
-            <span>模拟练习</span>
-            <el-button
-              type="text"
-              class="box-more"
-              @click="$router.push({ name: 'SimulateIndex' })"
-              >更多</el-button
-            >
-          </div>
-          <template v-if="questionTypeOpenList.length">
-            <div class="info-list">
-              <div
-                class="info-item"
-                :key="item.id"
-                v-for="item in questionTypeOpenList"
-                @click="goTest(item)"
-              >
-                <div class="item-left ellipsis">
-                  {{ item.questionTypeName }}
-                </div>
-                <div class="item-right">
-                  {{ item.startTime }} - {{ item.endTime }}
+                <div class="item-score">总分：{{ item.paperTotalScore }}</div>
+                <div class="item-pass">
+                  及格：{{
+                    (
+                      (item.paperPassScore / 100) *
+                      item.paperTotalScore
+                    ).toFixed(2)
+                  }}
                 </div>
               </div>
             </div>
+            <div class="item-btn" @click="goExam(item)">
+              <i class="common common-count-down"></i>开始考试
+            </div>
           </template>
-          <el-empty v-else description="暂无模拟试卷"></el-empty>
-        </el-card>
-      </el-col>
-      <el-col :span="12" v-if="onlyRole.includes('subAdmin')">
-        <el-card class="box-card" shadow="never">
-          <div slot="header">
-            <span>快捷导航</span>
+        </div>
+        <div
+          class="info-item today-item"
+          :key="item.id"
+          v-for="item in questionTypeOpenList"
+        >
+          <i class="common common-test today-icon"></i>
+          <div class="item-center">
+            <div class="info-item ellipsis">{{ item.questionTypeName }}</div>
+            <div class="info-item">
+              <div class="item-time">
+                {{ item.startTime }} - {{ item.endTime }}
+              </div>
+            </div>
           </div>
-          <div class="nav-box">
+          <div class="item-btn" @click="goTest(item)">
+            <i class="common common-count-down"></i>模拟练习
+          </div>
+        </div>
+      </template>
+      <!-- 子管理员 -->
+      <template v-if="onlyRole.includes('subAdmin')">
+        <div
+          class="info-item today-item"
+          :style="{
+            display: isMark(item.examMarkStartTime, item.examMarkEndTime)
+              ? 'flex'
+              : 'none',
+          }"
+          :key="item.id"
+          v-for="item in markList"
+        >
+          <template v-if="isMark(item.examMarkStartTime, item.examMarkEndTime)">
+            <i class="common common-wait-mark today-icon"></i>
+            <div class="item-center">
+              <div class="info-item ellipsis">{{ item.examName }}</div>
+              <div class="info-item">
+                <div class="item-time">
+                  {{ item.examMarkStartTime }}（{{
+                    computeMinute(item.examMarkStartTime, item.examMarkEndTime)
+                  }}）
+                </div>
+                <div class="item-score">总分：{{ item.paperTotalScore }}</div>
+                <div class="item-pass">
+                  及格：{{
+                    (
+                      (item.paperPassScore / 100) *
+                      item.paperTotalScore
+                    ).toFixed(2)
+                  }}
+                </div>
+              </div>
+            </div>
+            <div class="item-btn" @click="goMark(item)">
+              <i class="common common-count-down"></i>开始阅卷
+            </div>
+          </template>
+        </div>
+      </template>
+    </div>
+    <div class="home-info">
+      <!-- 快捷导航 -->
+      <el-card class="box-card" shadow="never">
+        <div slot="header">
+          <span>快捷导航</span>
+        </div>
+        <el-link
+          class="quick-nav"
+          v-for="nav in navList"
+          :key="nav.path"
+          @click="$router.push(nav.path)"
+          >{{ nav.meta.title }}</el-link
+        >
+        <el-link class="quick-nav" @click="$router.push({ name: 'Quick' })"
+          >快速考试</el-link
+        >
+      </el-card>
+      <!-- 最新公告 -->
+      <el-card class="box-card" shadow="never">
+        <div slot="header">
+          <span>最新公告</span>
+          <el-button class="box-more" type="text">更多</el-button>
+        </div>
+        <template v-if="bulletinList.length">
+          <div class="info-list">
             <div
-              class="nav-item"
-              v-for="nav in navList"
-              :key="nav.path"
-              @click="$router.push(nav.path)"
+              class="info-item"
+              v-for="item in bulletinList"
+              :key="item.id"
+              @click="getBulletin(item)"
             >
-              <template v-if="nav.name !== 'Quick'">
-                <i :class="[`common ${nav.meta.icon}`]"></i>
-                <span>{{ nav.meta.title }}</span>
-              </template>
-            </div>
-            <div class="easy-exam" @click="$router.push({ name: 'Quick' })">
-              <i class="common common-quick"></i>
-              <span>快速考试</span>
+              <div class="item-left ellipsis">{{ item.title }}</div>
+              <div class="item-right">{{ item.endTime }}</div>
             </div>
           </div>
-        </el-card>
-      </el-col>
-    </el-row>
+        </template>
+        <el-empty v-else description="暂无公告"></el-empty>
+      </el-card>
+      <!-- 服务支持 -->
+      <el-card class="box-card" shadow="never">
+        <div slot="header">
+          <span>服务支持</span>
+        </div>
+        <p style="line-height: 30px">技术支持：在线考试</p>
+        <p style="line-height: 30px">服务热线：18735101234</p>
+      </el-card>
+    </div>
     <el-dialog
       center
       :title="bulletinDetail.title"
@@ -398,22 +334,26 @@ export default {
     },
     // 获取开放题库
     async getQuestionTypeOpenList() {
+      const days = dayjs().daysInMonth()
+      const startDate = dayjs().date(1).format('YYYY-MM-DD')
+      const endDate = dayjs().date(days).format('YYYY-MM-DD')
       const res = await questionTypeOpenListPage({
         state: 1,
         pageSize: 10,
         curPage: 1,
+        startTime: `${startDate} 00:00:00`,
+        endTime: `${endDate} 23:59:59`,
       })
-      res?.code === 200 && (this.questionTypeOpenList = res.data.list)
+
+      if (res?.code !== 200) return
+      this.questionTypeOpenList = res.data.list.filter((item) => {
+        const $_endTime = new Date(item.endTime).getTime()
+        const now = new Date().getTime()
+        return now < $_endTime
+      })
     },
     // 模拟练习
-    goTest({ questionTypeId, startTime, endTime, commentState }) {
-      const $_startTime = new Date(startTime).getTime()
-      const $_endTime = new Date(endTime).getTime()
-      const now = new Date().getTime()
-      if (now < $_startTime || now > $_endTime) {
-        this.$message.warning('不在开放时间段，请重新确认时间点！')
-        return
-      }
+    goTest({ questionTypeId, commentState }) {
       this.$router.push({
         name: 'SimulateTest',
         params: {
@@ -468,10 +408,24 @@ export default {
 
 <style lang="scss" scoped>
 .home-content {
-  margin: 20px 0;
+  margin-top: 20px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
 }
+.home-calendar {
+  width: 20%;
+}
+
+.home-todo {
+  flex: 1;
+  background: #fff;
+  margin: 0 10px;
+}
+
+.home-info {
+  width: 25%;
+}
+
 .content-left {
   width: 150px;
   display: flex;
@@ -517,14 +471,13 @@ export default {
     }
   }
   /deep/.el-card__body {
-    padding: 13px 13px 0;
-    min-height: 300px;
+    padding: 10px 10px 0;
   }
 }
 
 // 日历
 /deep/.el-calendar__body {
-  padding: 12px 16px 16px;
+  padding: 10px;
 }
 
 /deep/.el-calendar-table {
@@ -540,14 +493,15 @@ export default {
       }
     }
     td {
+      margin-top: 10px;
       &.is-today {
         background: #44cede;
         color: #fff;
-        border-radius: 50%;
+        border-radius: 5px;
       }
       &.is-selected {
         background: #44cede;
-        border-radius: 50%;
+        border-radius: 5px;
         color: #fff;
       }
       border: 1px solid #fff;
@@ -557,17 +511,17 @@ export default {
     }
   }
   .el-calendar-day {
-    height: 40px;
+    height: 30px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     padding: 0;
-    border-radius: 50%;
+    border-radius: 5px;
     &:hover {
       background: #fff;
       border: 1px solid #44cede;
-      border-radius: 50%;
+      border-radius: 5px;
       color: #000;
       box-shadow: 0 0 5px 1px rgba(0, 149, 229, 0.1);
     }
@@ -623,7 +577,7 @@ export default {
   padding: 10px;
   .today-icon {
     display: inline-block;
-    font-size: 60px;
+    font-size: 50px;
     text-align: center;
     color: #c9c9c9;
   }
@@ -633,7 +587,7 @@ export default {
     flex-direction: column;
     padding: 0 20px;
     .info-item {
-      line-height: 35px;
+      line-height: 30px;
       border: none;
     }
   }
@@ -743,5 +697,9 @@ export default {
 .box-more {
   float: right;
   padding: 3px 0;
+}
+
+.quick-nav {
+  margin: 10px;
 }
 </style>

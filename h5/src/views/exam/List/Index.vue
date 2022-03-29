@@ -40,8 +40,12 @@
             @del="del"
             @edit="edit"
             @read="read"
+            @score="score"
             @onLine="onLine"
             @publish="publish"
+            @ranking="ranking"
+            @message="message"
+            @anonymous="anonymous"
             @statistics="statistics"
           ></ListCard>
         </div>
@@ -143,6 +147,38 @@ export default {
         id,
         examTypeId: this.$route.params.id,
         tab: '3',
+      })
+    },
+    // 匿名展示
+    anonymous({ id }) {
+      this.$tools.switchTab('ExamListSetting', {
+        id,
+        examTypeId: this.$route.params.id,
+        tab: '4',
+      })
+    },
+    // 排名公开
+    ranking({ id }) {
+      this.$tools.switchTab('ExamListSetting', {
+        id,
+        examTypeId: this.$route.params.id,
+        tab: '5',
+      })
+    },
+    // 成绩公开
+    score({ id }) {
+      this.$tools.switchTab('ExamListSetting', {
+        id,
+        examTypeId: this.$route.params.id,
+        tab: '6',
+      })
+    },
+    // 邮箱通知
+    message({ id }) {
+      this.$tools.switchTab('ExamListSetting', {
+        id,
+        examTypeId: this.$route.params.id,
+        tab: '7',
       })
     },
     // 考试用户

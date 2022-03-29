@@ -68,7 +68,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import url('//at.alicdn.com/t/font_840312_rw304ovt2h.css');
+@import url('//at.alicdn.com/t/font_840312_rcj2z5gziys.css');
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
