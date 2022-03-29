@@ -511,9 +511,9 @@ public class ApiExamController extends BaseController {
 			if (exam.getState() != 1) {
 				throw new MyException("考试未发布");
 			}
-//			if (exam.getEndTime().before(new Date()) ) {
-//				throw new MyException("考试时间已结束");
-//			}
+			if (exam.getEndTime().before(new Date()) ) {
+				throw new MyException("考试时间已结束");
+			}
 			examService.mail(exam, notifyType, content);
 			return PageResult.ok();
 		} catch (MyException e) {
