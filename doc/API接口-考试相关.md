@@ -194,6 +194,7 @@ http请求头需添加Authorization字段，
 | --------- | ------- | ---------- | ---- |
 | startTime | Date    | 开始时间   | 否   |
 | endTime   | Date    | 结束时间   | 否   |
+| state   | Integer | 状态 | 否   |
 | curPage   | Integer | 当前第几页 | 否   |
 | pageSize  | Integer | 每页多少条 | 否   |
 

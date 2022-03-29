@@ -16,6 +16,7 @@ import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.HibernateUtil;
 import com.wcpdoc.core.util.SqlUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.core.util.SqlUtil.Order;
 import com.wcpdoc.exam.core.dao.QuestionTypeOpenDao;
 import com.wcpdoc.exam.core.entity.QuestionTypeOpen;
@@ -46,6 +47,12 @@ public class QuestionTypeOpenDaoImpl extends RBaseDaoImpl<QuestionTypeOpen> impl
 		sqlUtil.addWhere(pageIn.get("questionTypeId", Integer.class) != null , "QUESTION_TYPE_OPEN.QUESTION_TYPE_ID = ?", pageIn.get("questionTypeId", Integer.class))
 			   .addWhere(pageIn.get("state") != null, "QUESTION_TYPE_OPEN.STATE = ?", pageIn.get("state", Integer.class))
 			   .addWhere(pageIn.get("curUserId", Integer.class)!= null , "QUESTION_TYPE_OPEN.UPDATE_USER_ID = ?", pageIn.get("curUserId", Integer.class))
+			   .addWhere(ValidateUtil.isValid(pageIn.get("startTime")) && ValidateUtil.isValid(pageIn.get("endTime")), 
+						"((QUESTION_TYPE_OPEN.START_TIME <= ? AND ? >= QUESTION_TYPE_OPEN.END_TIME) OR (QUESTION_TYPE_OPEN.START_TIME <= ? AND ? >= QUESTION_TYPE_OPEN.END_TIME) OR (QUESTION_TYPE_OPEN.START_TIME >= ? AND QUESTION_TYPE_OPEN.END_TIME >= ?))", 
+						pageIn.get("startTime"), pageIn.get("startTime"),
+						pageIn.get("endTime"), pageIn.get("endTime"),
+						pageIn.get("startTime"), pageIn.get("endTime")
+						)
 			   .addOrder("QUESTION_TYPE_OPEN.UPDATE_TIME", Order.DESC);
 
 	      if (pageIn.get("readUserIds", Integer.class) != null) {
