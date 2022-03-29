@@ -13,6 +13,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.base.cache.ParmCache;
@@ -681,6 +682,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 				.replace("【考试结束时间】", DateUtil.formatDateTime(exam.getMarkEndTime()))
 				.replace("【阅卷开始时间】", DateUtil.formatDateTime(exam.getStartTime()))
 				.replace("【阅卷结束时间】", DateUtil.formatDateTime(exam.getEndTime()));
+		content = StringEscapeUtils.unescapeXml(content);;// 转义 &lt;为 <  &gt; 为 > 
 		if (notifyType == 1) {
 			List<MyExam> myExamList = myExamService.getList(exam.getId());// 所有考试人员
 			for(MyExam myExam : myExamList){
