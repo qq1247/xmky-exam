@@ -622,6 +622,9 @@ http请求头需添加Authorization字段，
 | data.examTypeId    | Integer     | 考试分类ID |
 | data.paperMarkType    | Integer     | 试卷阅卷类型 |
 | data.state    | Integer     | 状态 |
+| data.scoreState    | Integer     | 成绩状态 |
+| data.rankState    | Integer     | 排名状态 |
+| data.anonState    | Integer     | 匿名阅卷状态 |
 
 ### 考试发布：exam/publish
 | 请求参数| 类型    | 描述 | 必填 |
@@ -673,17 +676,27 @@ http请求头需添加Authorization字段，
 ### 考试成绩公开：exam/score
 | 请求参数| 类型      | 描述        | 必填 |
 | ----------- | --------- | ----------- | ---- |
+| id          | Integer   |  考试id     | 是   |
 | state          | Integer   | 成绩状态（1：公开；2：不公开）  | 是   |
 
 ### 考试排名公开：exam/rank
 | 请求参数| 类型      | 描述        | 必填 |
 | ----------- | --------- | ----------- | ---- |
+| id          | Integer   |  考试id     | 是   |
 | state          | Integer   | 排名状态（1：公开；2：不公开）  | 是   |
 
 ### 考试匿名阅卷公开：exam/anon
 | 请求参数| 类型      | 描述        | 必填 |
 | ----------- | --------- | ----------- | ---- |
+| id          | Integer   |  考试id     | 是   |
 | state          | Integer   | 匿名阅卷状态（1：公开；2：不公开）  | 是   |
+
+### 考试邮件通知：exam/mail
+| 请求参数| 类型      | 描述        | 必填 |
+| ----------- | --------- | ----------- | ---- |
+| id          | Integer   |  考试id     | 是   |
+| notifyType     | Integer   |  状态 【1.考试人；2.阅卷人；3.当前登录人】  | 是   |
+| content     | String   |  内容    | 是   |
 
 ### 试题评论列表：questionComment/listpage
 | 请求参数| 类型       | 描述       | 必填 |

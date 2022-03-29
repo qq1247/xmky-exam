@@ -140,7 +140,7 @@ http请求头需添加Authorization字段，
 | examId| Integer | 考试ID | 是   |
 | userId| Integer | 考试用户ID | 是   |
 
-### 我的阅卷用户列表：myMark/userIdList
+### 我的阅卷用户列表：myMark/userList
 | 请求参数| 类型    | 描述       | 必填 |
 | -------- | ------- | ---------- | ---- |
 | examId| Integer | 考试ID | 是   |
