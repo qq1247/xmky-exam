@@ -90,10 +90,10 @@ public class ApiParmController extends BaseController {
 			parmService.updateAndUpdate(entity);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("添加参数错误：{}", e.getMessage());
+			log.error("添加邮件错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("添加参数错误：", e);
+			log.error("添加邮件错误：", e);
 			return PageResult.err();
 		}
 	}

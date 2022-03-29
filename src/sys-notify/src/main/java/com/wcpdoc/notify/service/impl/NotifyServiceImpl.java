@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
+import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.notify.exception.NotifyException;
 import com.wcpdoc.notify.service.EmailService;
 import com.wcpdoc.notify.service.NotifyService;
@@ -30,13 +31,21 @@ public class NotifyServiceImpl implements NotifyService {
 			MimeMessage mailMessage = emailService.getJavaMailSender().createMimeMessage();
 			MimeMessageHelper messageHelper = new MimeMessageHelper(mailMessage, true);
 			messageHelper.setFrom(from);
-			messageHelper.setTo(to);
+			messageHelper.setTo(to.split(","));
 			messageHelper.setSubject(title);
 			messageHelper.setText(content, true);
 			emailService.getJavaMailSender().send(mailMessage);
 		} catch (Exception e) {
-			log.error("推送邮件：", e);
-			throw new NotifyException("推送邮件异常");
+			if (e.getMessage().contains("550 User has no permission")) {
+				log.error("推送邮件错误：需要开启POP3/SMTP服务");
+				throw new MyException("需要开启POP3/SMTP服务");
+			}
+			if (e.getMessage().contains("535 ")) {
+				log.error("推送邮件错误：需要使用授权码替代密码");
+				throw new MyException("需要使用授权码替代密码");
+			}
+			log.error("推送邮件错误：", e);
+			throw new NotifyException(e.getMessage());
 		}
 	}
 

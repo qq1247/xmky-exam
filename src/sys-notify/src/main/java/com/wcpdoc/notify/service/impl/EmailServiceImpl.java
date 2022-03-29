@@ -31,12 +31,13 @@ public class EmailServiceImpl implements EmailService {
 	public JavaMailSender init() throws EmailException {
 		log.info("初始化邮件服务开始");
 		Email email = emailExService.getEmail();
-		JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
-		javaMailSender.setHost(email.getHost());
-		javaMailSender.setUsername(email.getUserName());
-		javaMailSender.setPassword(email.getPwd());
-		javaMailSender.setProtocol(email.getProtocol());
-		javaMailSender.setDefaultEncoding(email.getEncode());
+		JavaMailSenderImpl javaMailSenderImpl = new JavaMailSenderImpl();
+		javaMailSenderImpl.setHost(email.getHost());
+		javaMailSenderImpl.setUsername(email.getUserName());
+		javaMailSenderImpl.setPassword(email.getPwd());
+		javaMailSenderImpl.setProtocol(email.getProtocol());
+		javaMailSenderImpl.setDefaultEncoding(email.getEncode());
+		javaMailSender = javaMailSenderImpl;
 		log.info("初始化邮件服务成功：{},{},{},{}", email.getHost(), email.getUserName(), email.getProtocol(), email.getEncode());
 		return javaMailSender;
 	}

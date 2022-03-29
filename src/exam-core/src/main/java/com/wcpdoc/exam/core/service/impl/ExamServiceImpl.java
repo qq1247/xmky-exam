@@ -15,12 +15,16 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.base.cache.ParmCache;
+import com.wcpdoc.base.entity.Parm;
+import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.OrgService;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.BigDecimalUtil;
+import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
@@ -49,6 +53,7 @@ import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.PaperTypeService;
 import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionService;
+import com.wcpdoc.notify.service.NotifyService;
 
 /**
  * 考试服务层实现
@@ -85,6 +90,8 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	private QuestionAnswerService questionAnswerService;
 	@Resource
 	private PaperQuestionAnswerService paperQuestionAnswerService;
+	@Resource
+	private NotifyService notifyService;
 	
 	@Override
 	@Resource(name = "examDaoImpl")
@@ -656,5 +663,65 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	@Override
 	public List<Exam> getList() {
 		return examDao.getList();
+	}
+
+	@Override
+	public void mail(Exam exam, Integer notifyType, String content) {
+		Parm parm = ParmCache.get();
+		if (parm == null) {
+			throw new MyException("管理员未配置系统参数");
+		}
+		if (!ValidateUtil.isValid(parm.getEmailUserName())) {
+			throw new MyException("管理员未配置邮箱地址");
+		}
+		
+		List<Integer> userList = new ArrayList<Integer>();
+		content = content.replace("【考试名称】", exam.getName())
+				.replace("【考试开始时间】", DateUtil.formatDateTime(exam.getMarkStartTime()))
+				.replace("【考试结束时间】", DateUtil.formatDateTime(exam.getMarkEndTime()))
+				.replace("【阅卷开始时间】", DateUtil.formatDateTime(exam.getStartTime()))
+				.replace("【阅卷结束时间】", DateUtil.formatDateTime(exam.getEndTime()));
+		if (notifyType == 1) {
+			List<MyExam> myExamList = myExamService.getList(exam.getId());//所有考试人员
+			for(MyExam myExam : myExamList){
+				userList.add(myExam.getUserId());
+			}
+		} else if (notifyType == 2) {
+			List<MyMark> myMarkList = myMarkService.getList(exam.getId());//阅卷人
+			for(MyMark myMark : myMarkList){
+				userList.add(myMark.getMarkUserId());
+			}
+		} else {
+			userList.add(getCurUser().getId());
+		}
+		
+		String userName = null;
+		String newContent;
+		
+		for(Integer userId : userList){
+			newContent = content;
+			User user = userService.getEntity(userId);
+			newContent = newContent.replace("【姓名】", user.getName());
+			
+			if (!ValidateUtil.isValid(user.getEmail())) {
+				if (!ValidateUtil.isValid(userName)) {
+					userName = user.getName();
+				} else {
+					userName = String.format("%s,%s", userName, user.getName());
+				}
+				continue;
+			}
+			try {
+			notifyService.pushEmail(parm.getEmailUserName(), user.getEmail(), exam.getName(), newContent);
+			} catch (MyException e) {
+				throw new MyException(e.getMessage());
+			} catch (Exception e) {
+				
+			} 
+		}
+		
+		if (ValidateUtil.isValid(userName)) {
+			throw new MyException(String.format("%s 未填写邮箱地址", userName) );
+		}
 	}
 }

@@ -108,4 +108,13 @@ public interface ExamService extends BaseService<Exam>{
 	 */
 	List<Exam> getUnMarkList(); 
 	
+	/**
+	 * 考试邮件通知
+	 * 
+	 * v1.0 chenyun 2022年3月28日下午2:24:28
+	 * @param exam
+	 * @param notifyType 1.发送考试人  2.发送阅卷人  3.发送当前登录人
+	 * @param content void
+	 */
+	void mail(Exam exam, Integer notifyType, String content);
 }

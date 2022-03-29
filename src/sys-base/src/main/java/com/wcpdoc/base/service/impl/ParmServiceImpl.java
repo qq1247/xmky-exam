@@ -19,6 +19,8 @@ import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.ValidateUtil;
+import com.wcpdoc.notify.exception.NotifyException;
+import com.wcpdoc.notify.service.NotifyService;
 
 /**
  * 参数服务层实现
@@ -32,7 +34,9 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 	private ParmDao parmDao;
 	@Resource
 	private ParmExService parmExService;
-
+	@Resource
+	private NotifyService notifyService;
+	
 	@Override
 	@Resource(name = "parmDaoImpl")
 	public void setDao(BaseDao<Parm> dao) {
@@ -55,8 +59,15 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		update(parm);
 		
 		// 扩展处理
-		parmExService.updateAndUpdate(parm);
 		ParmCache.flushCache(parm);
+		parmExService.updateAndUpdate(parm);
+
+		// 发送邮件
+		try {
+			notifyService.pushEmail(parm.getEmailUserName(), parm.getEmailUserName(), "邮箱配置", "邮箱配置成功！");
+		} catch (NotifyException e) {
+			throw new MyException(e.getMessage());
+		}
 	}
 
 	@Override
