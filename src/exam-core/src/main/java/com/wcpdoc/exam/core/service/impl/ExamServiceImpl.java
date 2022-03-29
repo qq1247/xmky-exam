@@ -682,46 +682,42 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 				.replace("【阅卷开始时间】", DateUtil.formatDateTime(exam.getStartTime()))
 				.replace("【阅卷结束时间】", DateUtil.formatDateTime(exam.getEndTime()));
 		if (notifyType == 1) {
-			List<MyExam> myExamList = myExamService.getList(exam.getId());//所有考试人员
+			List<MyExam> myExamList = myExamService.getList(exam.getId());// 所有考试人员
 			for(MyExam myExam : myExamList){
 				userList.add(myExam.getUserId());
 			}
 		} else if (notifyType == 2) {
-			List<MyMark> myMarkList = myMarkService.getList(exam.getId());//阅卷人
+			List<MyMark> myMarkList = myMarkService.getList(exam.getId());// 所有阅卷人
 			for(MyMark myMark : myMarkList){
 				userList.add(myMark.getMarkUserId());
 			}
 		} else {
-			userList.add(getCurUser().getId());
+			userList.add(getCurUser().getId());// 当前登录用户
 		}
 		
-		String userName = null;
 		String newContent;
-		
+		StringBuilder errMsg = new StringBuilder();
 		for(Integer userId : userList){
 			newContent = content;
 			User user = userService.getEntity(userId);
 			newContent = newContent.replace("【姓名】", user.getName());
 			
 			if (!ValidateUtil.isValid(user.getEmail())) {
-				if (!ValidateUtil.isValid(userName)) {
-					userName = user.getName();
-				} else {
-					userName = String.format("%s,%s", userName, user.getName());
-				}
+				errMsg.append(String.format("【%s】未填写邮箱地址", user.getName())).append("<br/>");
 				continue;
 			}
+			
 			try {
-			notifyService.pushEmail(parm.getEmailUserName(), user.getEmail(), exam.getName(), newContent);
+				notifyService.pushEmail(parm.getEmailUserName(), user.getEmail(), exam.getName(), newContent);
 			} catch (MyException e) {
-				throw new MyException(e.getMessage());
+				throw new MyException(e.getMessage());//发件人邮箱错误,所有邮件不能被发出
 			} catch (Exception e) {
-				
+				errMsg.append(String.format("考试【%s】发送邮件给【%s】失败", exam.getName(), user.getName())).append("<br/>");
 			} 
 		}
 		
-		if (ValidateUtil.isValid(userName)) {
-			throw new MyException(String.format("%s 未填写邮箱地址", userName) );
+		if (errMsg.length() > 0) {
+			throw new MyException(errMsg.toString());
 		}
 	}
 }
