@@ -585,7 +585,7 @@ alter table SYS_VER comment '版本';
 
 INSERT INTO `SYS_ORG` VALUES (1, '组织机构', 'code', '0', '_1_', '1', '1', '2017-08-01 22:31:43', '1', '1');
 
-INSERT INTO `SYS_USER` VALUES (1, '管理员', 'admin', null, null,'79nRuL+wDo42R5kPfXTR2A==', '2017-08-01 22:31:43', '2017-08-01 22:31:43', null, 'admin', '1', '1', '1', '2017-08-01 22:31:43');
+INSERT INTO `SYS_USER` VALUES (1, '管理员', 'admin', null, null,'79nRuL+wDo42R5kPfXTR2A==',null, '2017-08-01 22:31:43', '2017-08-01 22:31:43', null, 'admin', '1', '1', '1', '2017-08-01 22:31:43');
 
 INSERT INTO `SYS_DICT` VALUES (1, 'STATE', '0', '删除', 1);
 INSERT INTO `SYS_DICT` VALUES (2, 'STATE', '1', '启用', 2);
