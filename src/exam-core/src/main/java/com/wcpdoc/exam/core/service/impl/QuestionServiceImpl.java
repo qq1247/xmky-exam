@@ -400,12 +400,13 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				answerScores[i] = questionExList.get(j).getQuestionAnswerList().get(i).getScore();
 				totalScore.add(answerScores[i]);
 			}
+			if (question.getType() == 1 || question.getType() == 4 
+					|| (question.getType() == 5 && question.getAi() == 2) || (question.getType() == 3 && question.getAi() == 2)) {
+				answerScores = null;//添加试题严格校验后，不允许传入错误数据
+			}
 			if (question.getType() == 2) {// 多选特殊处理下，答案拆分
 				answers = questionExList.get(j).getQuestionAnswerList().get(0).getAnswer().split("");
-				answerScores = new BigDecimal[answers.length];
-				for (int i = 0; i < answerScores.length; i++) {
-					answerScores[i] = questionExList.get(j).getQuestionAnswerList().get(0).getScore();
-				}
+				answerScores = new BigDecimal[]{questionExList.get(j).getQuestionAnswerList().get(0).getScore()};
 			}
 			
 			String [] options = new String[questionExList.get(j).getQuestionOptionList().size()];
