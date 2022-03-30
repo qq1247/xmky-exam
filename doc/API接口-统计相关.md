@@ -174,9 +174,9 @@ http请求头需添加Authorization字段，
 | --------------------------- | ------- | -----  |
 | code                        | Integer | 响应码   |
 | msg                         | String  | 响应消息 |
-| data.list[]                  | Object[]   | 对象列表     |
-| data.list[].name               | String | 名称  |
-| data.list[].value             | String | 值  |
+| data[]                  | Object[]   | 对象列表     |
+| data[].name               | String | 名称  |
+| data[].value             | String | 值 （部分字段为数组，如c盘d盘） |
 
 ### 慢接口日志：report/server/log
 | 响应数据| 类型    | 描述 |
