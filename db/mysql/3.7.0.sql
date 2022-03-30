@@ -88,7 +88,7 @@ create table EXM_EXAM
    END_TIME             datetime comment '考试结束',
    MARK_START_TIME      datetime comment '阅卷开始',
    MARK_END_TIME        datetime comment '阅卷结束',
-   MARK_STATE           datetime comment '阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）',
+   MARK_STATE           int comment '阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）',
    SCORE_STATE          int comment '成绩状态（1：公开；2：不公开）',
    RANK_STATE           int comment '排名状态（1：公开；2：不公开）',
    ANON_STATE           int comment '匿名阅卷状态（1：公开；2：不公开）',
@@ -585,7 +585,7 @@ alter table SYS_VER comment '版本';
 
 INSERT INTO `SYS_ORG` VALUES (1, '组织机构', 'code', '0', '_1_', '1', '1', '2017-08-01 22:31:43', '1', '1');
 
-INSERT INTO `SYS_USER` VALUES (1, '管理员', 'admin', null, null,'79nRuL+wDo42R5kPfXTR2A==', '2017-08-01 22:31:43', '2017-08-01 22:31:43', null, 'admin', '1', '1', '1', '2017-08-01 22:31:43');
+INSERT INTO `SYS_USER` VALUES (1, '管理员', 'admin', null, null,'79nRuL+wDo42R5kPfXTR2A==',null, '2017-08-01 22:31:43', '2017-08-01 22:31:43', null, 'admin', '1', '1', '1', '2017-08-01 22:31:43');
 
 INSERT INTO `SYS_DICT` VALUES (1, 'STATE', '0', '删除', 1);
 INSERT INTO `SYS_DICT` VALUES (2, 'STATE', '1', '启用', 2);

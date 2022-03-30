@@ -86,11 +86,12 @@ public class ServerParmServiceImpl implements ServerPramService {
 			CpuPerc[] cpuPercs = sigar.getCpuPercList();
 			data = new HashMap<String, Object>();
 			data.put("name", String.format("CPU使用率"));
+			List<String> values = new ArrayList<>();
 			for (int i = 0; i < cpuPercs.length; i++) {
-				data.put("value", String.format("%s[%s] ", 
-						data.get("value") == null ? "" : data.get("value"),
-						CpuPerc.format(cpuPercs[i].getCombined())));
+				values.add(CpuPerc.format(cpuPercs[i].getCombined()));
+				
 			}
+			data.put("value", values);
 			result.add(data);
 			
 			// 获取内存信息
@@ -110,17 +111,16 @@ public class ServerParmServiceImpl implements ServerPramService {
 			FileSystem[] fileSystems = sigar.getFileSystemList();
 			data = new HashMap<String, Object>();
 			data.put("name", "硬盘占用率");
+			values = new ArrayList<>();
 			for (FileSystem fileSystem : fileSystems) {
 				if (fileSystem.getType() != 2) {// 比如光驱
 					continue;
 				}
 				
 				FileSystemUsage fileSystemUsage = sigar.getFileSystemUsage(fileSystem.getDirName());
-				data.put("value", String.format("%s[%s - %sG/%sG] ", 
-						data.get("value") == null ? "" : data.get("value"),
-						fileSystem.getDirName(), 
-						fileSystemUsage.getUsed() / 1024 / 1024, fileSystemUsage.getTotal() / 1024 / 1024));
+				values.add(String.format("[%s - %sG/%sG]", fileSystem.getDirName(), fileSystemUsage.getUsed() / 1024 / 1024, fileSystemUsage.getTotal() / 1024 / 1024));
 			}
+			data.put("value", values);
 			result.add(data);
 			
 			// 软件信息
