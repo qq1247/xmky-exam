@@ -164,7 +164,7 @@
               label-width="85px"
               v-if="rule.ai.includes(1) && [3, 5].includes(rule.type)"
             >
-              <el-checkbox-group v-model="rule.scoreOptions">
+              <el-checkbox-group v-model="rule.aiOptions">
                 <el-tooltip
                   v-if="rule.type === 3"
                   class="item"
@@ -315,22 +315,7 @@ export default {
       this.$nextTick(() => {
         this.paperName = res.data.name
         this.markType = res.data.markType
-        if (this.paperQuestionRules.length) {
-          this.paperQuestionRules.map((item, index) => {
-            if (item.rule.length) {
-              item.rule.map((rule, ruleIndex) => {
-                this.$refs[`questionSelect${index}${ruleIndex}`][0].$refs[
-                  'elSelect'
-                ].cachedOptions.push({
-                  currentLabel: rule.questionTypeName,
-                  currentValue: rule.questionTypeId,
-                  label: rule.questionTypeName,
-                  value: rule.questionTypeId,
-                })
-              })
-            }
-          })
-        }
+        this.showSelectContent()
       })
     }
   },
@@ -398,7 +383,7 @@ export default {
         type: 1,
         difficulty: [],
         ai: [],
-        scoreOptions: [],
+        aiOptions: [],
         totalNumber: '',
         score: '',
       })
@@ -426,8 +411,8 @@ export default {
               : acc.ais.push('1') */
             acc.ais.push('1')
             ;[3, 5].includes(cur.type)
-              ? acc.scoreOptions.push(cur.scoreOptions.join(','))
-              : acc.scoreOptions.push(cur.type === 2 ? '1' : '')
+              ? acc.aiOptions.push(cur.aiOptions.join(','))
+              : acc.aiOptions.push(cur.type === 2 ? '1' : '')
             acc.difficultys.push(cur.difficulty.join(','))
             acc.nums.push(cur.totalNumber)
             acc.types.push(cur.type)
@@ -442,7 +427,7 @@ export default {
             types: [],
             scores: [],
             difficultys: [],
-            scoreOptions: [],
+            aiOptions: [],
             questionTypeIds: [],
           }
         )
@@ -456,6 +441,7 @@ export default {
         if (res?.code == 200) {
           this.$message.success('更新成功！')
           this.query()
+          this.showSelectContent()
         } else {
           this.$message.success('更新失败！')
         }
@@ -482,6 +468,28 @@ export default {
     // 选择试题分类
     selectQuestionType(e, index, ruleIndex) {
       this.paperQuestionRules[index].rule[ruleIndex].questionTypeId = e
+    },
+    // 回显下拉框内容
+    showSelectContent() {
+      if (this.paperQuestionRules.length) {
+        this.paperQuestionRules.map((item, index) => {
+          if (item.rule.length) {
+            item.rule.map((rule, ruleIndex) => {
+              this.$refs[`questionSelect${index}${ruleIndex}`][0].$refs[
+                'elSelect'
+              ].cachedOptions.push({
+                currentLabel: rule.questionTypeName,
+                currentValue: rule.questionTypeId,
+                label: rule.questionTypeName,
+                value: rule.questionTypeId,
+              })
+              this.$refs[`questionSelect${index}${ruleIndex}`][0].$refs[
+                'elSelect'
+              ].selectedLabel = rule.questionTypeName
+            })
+          }
+        })
+      }
     },
     // 更新页面数据
     refreshData(res, title) {
