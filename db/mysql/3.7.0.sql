@@ -88,7 +88,7 @@ create table EXM_EXAM
    END_TIME             datetime comment '考试结束',
    MARK_START_TIME      datetime comment '阅卷开始',
    MARK_END_TIME        datetime comment '阅卷结束',
-   MARK_STATE           datetime comment '阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）',
+   MARK_STATE           int comment '阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）',
    SCORE_STATE          int comment '成绩状态（1：公开；2：不公开）',
    RANK_STATE           int comment '排名状态（1：公开；2：不公开）',
    ANON_STATE           int comment '匿名阅卷状态（1：公开；2：不公开）',
