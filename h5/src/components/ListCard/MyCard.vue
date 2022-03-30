@@ -20,7 +20,7 @@
         >
         <el-tag
           size="mini"
-          v-if="name == 'myExamMarkList'"
+          v-if="name == 'myMarkList'"
           :type="data.examMarkState == 3 ? '' : 'danger'"
           >{{ data.examMarkState | markStateName }}</el-tag
         >
@@ -28,35 +28,45 @@
       <!-- 标题 -->
       <div class="title ellipsis">{{ data.name || data.examName }}</div>
       <el-row class="content-info">
-        <el-col>{{
-          name === 'myExamList' ? data.examStartTime : data.markStartTime
-        }}</el-col>
+        <el-col>考试开始：{{ data.examStartTime }}</el-col>
+        <el-col v-if="name === 'myMarkList'"
+          >阅卷开始：{{ data.examMarkStartTime }}</el-col
+        >
+        <template v-if="name === 'myExamList'">
+          <el-col :span="8"
+            >答题：{{
+              computeMinute(data.answerStartTime, data.answerEndTime)
+            }}</el-col
+          >
+          <el-col
+            :span="8"
+            :style="{
+              color:
+                Number(
+                  ((data.paperPassScore / 100) * data.paperTotalScore).toFixed(
+                    2
+                  )
+                ) > data.totalScore
+                  ? 'red'
+                  : '',
+            }"
+            >分数：{{ data.totalScore !== null ? data.totalScore : '-' }} /
+            {{ data.paperTotalScore }}</el-col
+          >
+          <el-col :span="8" v-if="name === 'myExamList'"
+            >排名：{{ data.no === null ? '-' : data.no }} /
+            {{ data.userNum === null ? '-' : data.userNum }}</el-col
+          >
+        </template>
+        <template v-if="name === 'myMarkList'">
+          <el-col
+            >分数：{{
+              ((data.paperPassScore / 100) * data.paperTotalScore).toFixed(2)
+            }}
+            / {{ data.paperTotalScore }}</el-col
+          >
+        </template>
       </el-row>
-      <el-row class="content-info">
-        <el-col :span="8"
-          >答题：{{
-            computeMinute(data.answerStartTime, data.answerEndTime)
-          }}</el-col
-        >
-        <el-col
-          :span="8"
-          :style="{
-            color:
-              Number(
-                ((data.paperPassScore / 100) * data.paperTotalScore).toFixed(2)
-              ) > data.totalScore
-                ? 'red'
-                : '',
-          }"
-          >分数：{{ data.totalScore !== null ? data.totalScore : '-' }} /
-          {{ data.paperTotalScore }}</el-col
-        >
-        <el-col :span="8" v-if="name === 'myExamList'"
-          >排名：{{ data.no === null ? '-' : data.no }} /
-          {{ data.userNum === null ? '-' : data.userNum }}</el-col
-        >
-      </el-row>
-
       <CountDown
         class="count-down"
         v-if="remainTime > 0"
@@ -71,7 +81,7 @@
           </span>
         </template>
         <!-- 我的阅卷 -->
-        <template v-if="name === 'myExamMarkList'">
+        <template v-if="name === 'myMarkList'">
           <span
             :data-title="data.examMarkState | markStateName"
             @click="mark(data)"

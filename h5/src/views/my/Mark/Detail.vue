@@ -3,19 +3,25 @@
     <!-- 考生信息 -->
     <el-scrollbar wrap-style="overflow-x:hidden;" class="content-left">
       <div class="user-info">
-        <el-avatar :size="64" v-if="userInfo">{{
-          (userInfo.userName && userInfo.userName.slice(0, 1)) || '头像'
-        }}</el-avatar>
+        <el-avatar
+          :size="64"
+          fit="fill"
+          v-if="userInfo.userHeadFileId"
+          :src="`/api/file/download?id=${Number(userInfo.userHeadFileId)}`"
+          ><i class="common common-wo"></i
+        ></el-avatar>
         <el-select v-model="userId" placeholder="请选择" @change="changeUser">
           <el-option
-            v-for="item in userList"
+            v-for="(item, index) in userList"
             :key="item.userId"
-            :label="item.userName"
+            :label="item.userName || `匿名${index + 1}`"
             :value="item.userId"
           >
-            <span style="float: left">{{ item.userName }}</span>
+            <span style="float: left">{{
+              item.userName || `匿名${index + 1}`
+            }}</span>
             <span style="float: right; color: #8492a6; font-size: 12px">{{
-              item.orgName
+              item.orgName || '--'
             }}</span>
           </el-option>
         </el-select>
@@ -39,12 +45,13 @@
           <div class="item-title"><span>成绩</span></div>
           <div class="item-num">
             {{
-              (
-                (userInfo.totalScore / userInfo.paperTotalScore) *
-                100
-              ).toFixed() >= userInfo.paperPassScore
-                ? '通过'
-                : '未通过'
+              userInfo.totalScore === null
+                ? '--'
+                : computePass(
+                    userInfo.totalScore,
+                    userInfo.paperTotalScore,
+                    userInfo.paperPassScore
+                  )
             }}
           </div>
         </div>
@@ -390,8 +397,8 @@ export default {
         examId: Number(this.examId),
         userId: this.userId,
       })
-      this.userInfo = userInfo
-      this.routerQuestionId = userInfo.id
+      this.userInfo = userInfo.data
+      this.routerQuestionId = userInfo.data.id
     },
     // 选择考生
     changeUser(userId) {
@@ -569,6 +576,12 @@ export default {
         new Date(endTime).getTime() - new Date(startTime).getTime()
       const minutes = Math.ceil(diffTime / (60 * 1000))
       return `${minutes}分钟`
+    },
+    // 计算分数通过否
+    computePass(totalScore, paperTotalScore, paperPassScore) {
+      const isPass =
+        ((totalScore / paperTotalScore) * 100).toFixed() >= paperPassScore
+      return isPass ? '通过' : '未通过'
     },
   },
 }

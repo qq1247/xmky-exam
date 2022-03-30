@@ -1,12 +1,3 @@
-<!--
- * @Description: 用户·子管理员
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-12-13 13:58:07
- * @LastEditors: Che
- * @LastEditTime: 2022-01-21 18:10:07
--->
 <template>
   <div class="home-content">
     <div class="home-calendar">
@@ -16,7 +7,7 @@
         @selectDate="selectDate"
       ></Calendar>
     </div>
-    <div class="home-todo">
+    <div class="home-todos">
       <!-- 普通用户 -->
       <template v-if="onlyRole.includes('user')">
         <div
@@ -156,7 +147,17 @@
           <span>服务支持</span>
         </div>
         <p style="line-height: 30px">技术支持：在线考试</p>
-        <p style="line-height: 30px">服务热线：18735101234</p>
+        <p style="line-height: 30px">
+          服务热线：<a
+            target="_blank"
+            href="https://jq.qq.com/?_wv=1027&k=GXh1hHSy"
+          >
+            <img
+              src="https://img.shields.io/badge/qq-811189776-blue"
+              alt="811189776"
+            />
+          </a>
+        </p>
       </el-card>
     </div>
     <el-dialog
@@ -415,8 +416,7 @@ export default {
 .home-calendar {
   width: 20%;
 }
-
-.home-todo {
+.home-todos {
   flex: 1;
   background: #fff;
   margin: 0 10px;
@@ -426,37 +426,9 @@ export default {
   width: 25%;
 }
 
-.content-left {
-  width: 150px;
-  display: flex;
-  flex-direction: column;
-}
-
-.content-right {
-  flex: 1;
-  margin-left: 50px;
-}
-
-// 导航
-.nav-router {
-  line-height: 40px;
-  border-bottom: 1px solid #cfcfcf;
-  background: rgba(#0094e5, 0.8);
-  border-radius: 20px;
-  margin-bottom: 10px;
-  color: #fff;
-  text-align: center;
-  &:hover {
-    background: rgba(#0094e5, 1);
-  }
-  .common {
-    margin-right: 10px;
-  }
-}
-
 // 卡片
 .box-card {
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   /deep/ .el-card__header {
     position: relative;
     &::after {
@@ -595,80 +567,6 @@ export default {
 
 /deep/ .el-empty {
   padding: 35px 0;
-}
-
-.nav-box {
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  position: relative;
-  .nav-item {
-    width: 50%;
-    min-height: 130px;
-    height: calc(100% / 2);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: #555;
-    cursor: pointer;
-    &:nth-child(1) {
-      border-top-left-radius: 10px;
-    }
-    &:nth-child(2) {
-      border-top-right-radius: 10px;
-    }
-    &:nth-child(3) {
-      border-bottom-left-radius: 10px;
-    }
-    &:nth-child(4) {
-      border-bottom-right-radius: 10px;
-    }
-    &:hover {
-      color: #fff;
-      background: #0094e5;
-      & ~ .easy-exam {
-        box-shadow: 0 0 0 10px #fff;
-        background: #0094e5;
-        color: #fff;
-        i {
-          color: #fff;
-        }
-      }
-    }
-    i {
-      font-size: 40px;
-    }
-  }
-
-  .easy-exam {
-    position: absolute;
-    background: #fff;
-    width: 100px;
-    height: 100px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    top: calc(50% - 50px);
-    left: calc(50% - 50px);
-    box-shadow: 0 0 13px 3px rgba(#000, 0.13);
-    outline: 3px solid #0094e5;
-    cursor: pointer;
-    &:hover {
-      box-shadow: 0 0 0 10px #fff;
-      background: #0094e5;
-      color: #fff;
-      i {
-        color: #fff;
-      }
-    }
-    i {
-      font-size: 40px;
-      color: #0094e5;
-    }
-  }
 }
 
 /deep/ .el-dialog__header {

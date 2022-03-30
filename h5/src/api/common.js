@@ -58,7 +58,7 @@ export const fileUpload = (params) => request('file/upload', params)
 export const fileDownload = (params) => request('file/download', params)
 
 /**
- * @name: fileDownload
+ * @name: progressBarGet
  * @description: 获取进度
  * @param {*}
  * @return {*}

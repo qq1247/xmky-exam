@@ -48,7 +48,7 @@ export default {
       const titleEnd = title.substring(
         title.indexOf(underline) + underline.length
       )
-      // questionId 存在则为整卷方式，否则为单体方式
+      // questionId 存在则为整卷方式，否则为单题方式
       const inputHtml = `<el-input class="cloze-input" @change='updateAnswer(${questionId})' :disabled='${props.preview}' v-model='myExamDetailCache[${questionId}].answers[${index}]'></el-input>`
       title = `${titleStart}${inputHtml}${titleEnd}`
     })

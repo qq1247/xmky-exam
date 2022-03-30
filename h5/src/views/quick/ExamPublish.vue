@@ -29,7 +29,7 @@
     <div class="quick-info">
       <div class="info-name">展示方式：</div>
       <div class="info-content">
-        {{ quickInfo.showType === 1 ? '整张' : '单体' }}
+        {{ quickInfo.showType === 1 ? '整张' : '单题' }}
       </div>
     </div>
     <div

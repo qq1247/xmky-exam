@@ -1,12 +1,3 @@
-<!--
- * @Description: 设置
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-12-16 16:01:13
- * @LastEditors: Che
- * @LastEditTime: 2022-01-06 16:11:45
--->
 <template>
   <el-card style="width: 1200px; margin: 0 auto" shadow="never">
     <el-form :model="examForm" ref="userForm" label-width="100px">

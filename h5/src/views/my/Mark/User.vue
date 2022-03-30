@@ -1,12 +1,3 @@
-<!--
- * @Description: 
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2022-01-11 17:08:31
- * @LastEditors: Che
- * @LastEditTime: 2022-01-14 09:36:51
--->
 <template>
   <div class="container">
     <el-form :inline="true" :model="queryForm" ref="queryForm">
@@ -30,9 +21,42 @@
     </el-form>
     <div class="table">
       <el-table :data="userList" style="width: 100%">
-        <el-table-column label="姓名" width="120px" prop="userName">
+        <el-table-column label="姓名" width="120px">
+          <template slot-scope="scope">
+            <span>{{ scope.row.userName || `匿名${scope.$index + 1}` }}</span>
+          </template>
         </el-table-column>
-        <el-table-column label="分数" width="70px" prop="totalScore">
+        <el-table-column label="分数">
+          <template slot-scope="scope">
+            <span
+              :style="{
+                color:
+                  Number(
+                    (
+                      (scope.row.paperPassScore / 100) *
+                      scope.row.paperTotalScore
+                    ).toFixed(2)
+                  ) > scope.row.totalScore
+                    ? '#FF5722'
+                    : '#5FB878',
+              }"
+              >{{ scope.row.totalScore || '--' }}</span
+            >
+          </template>
+        </el-table-column>
+        <el-table-column label="答题用时">
+          <template slot-scope="scope">
+            <span>{{
+              computeMinute(scope.row.answerStartTime, scope.row.answerEndTime)
+            }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="阅卷用时">
+          <template slot-scope="scope">
+            <span>{{
+              computeMinute(scope.row.markStartTime, scope.row.markEndTime)
+            }}</span>
+          </template>
         </el-table-column>
         <el-table-column label="考试状态">
           <template slot-scope="scope">
@@ -107,6 +131,16 @@ export default {
         examId: this.examId,
       })
       this.userList = data
+    },
+    // 计算分钟数
+    computeMinute(startTime, endTime) {
+      if (!startTime || !endTime) {
+        return '--'
+      }
+      const diffTime =
+        new Date(endTime).getTime() - new Date(startTime).getTime()
+      const minutes = Math.ceil(diffTime / (60 * 1000))
+      return `${minutes}分钟`
     },
     // 我的阅卷操作
     goMark(userId) {

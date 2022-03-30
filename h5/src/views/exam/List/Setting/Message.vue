@@ -4,8 +4,8 @@
       v-model="state"
       :active-value="2"
       :inactive-value="1"
-      active-text="阅卷人"
-      inactive-text="考试人"
+      active-text="阅卷用户"
+      inactive-text="考试用户"
       @change="changeType"
     >
     </el-switch>

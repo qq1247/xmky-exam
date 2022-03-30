@@ -26,7 +26,7 @@
               v-for="(item, index) in myMarkList"
               :key="index"
               :data="item"
-              name="myExamMarkList"
+              name="myMarkList"
               @mark="markHandler"
               @markUser="markUserHandler"
             ></MyCard>
