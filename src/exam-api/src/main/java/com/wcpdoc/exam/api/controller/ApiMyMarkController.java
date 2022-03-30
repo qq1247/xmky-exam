@@ -172,7 +172,7 @@ public class ApiMyMarkController extends BaseController {
 				result.add(sigleResult);
 			}
 			
-			return PageResultEx.ok();
+			return PageResultEx.ok().data(result);
 		} catch (MyException e) {
 			log.error("考试用户列表错误：{}", e.getMessage());
 			return PageResult.err();
