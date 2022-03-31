@@ -25,13 +25,15 @@ const state = {
   userId: getInfo().userId,
   roles: getInfo().roles,
   onlyRole: getInfo().onlyRole,
+  orgName: getInfo().orgName,
+  userAvatar: getInfo().userAvatar,
 }
 
 const mutations = {
   SET_TOKEN: (state, token) => {
     state.token = token
   },
-  SET_NAME: (state, name) => {
+  SET_USER_NAME: (state, name) => {
     state.name = name
   },
   SET_USER_ID: (state, userId) => {
@@ -42,6 +44,12 @@ const mutations = {
   },
   SET_ONLY_ROLE: (state, onlyRole) => {
     state.onlyRole = onlyRole
+  },
+  SET_ORG_NAME: (state, orgName) => {
+    state.orgName = orgName
+  },
+  SET_USER_AVATAR: (state, userAvatar) => {
+    state.userAvatar = userAvatar
   },
 }
 
@@ -64,9 +72,11 @@ const actions = {
             : data.roles
           commit('SET_TOKEN', data.accessToken)
           commit('SET_ROLES', data.roles || ['user'])
-          commit('SET_NAME', data.userName)
+          commit('SET_USER_NAME', data.userName)
           commit('SET_USER_ID', data.userId)
           commit('SET_ONLY_ROLE', role)
+          commit('SET_ORG_NAME', null)
+          commit('SET_USER_AVATAR', null)
           const { data: orgName } = await loginOrgName()
           commit(
             'setting/CHANGE_SETTING',
@@ -76,7 +86,7 @@ const actions = {
             },
             { root: true }
           )
-          setInfo({ onlyRole: role, ...data })
+          setInfo({ onlyRole: role, orgName: null, userAvatar: null, ...data })
           setSetting({ orgName })
           if (!getDict()) {
             getDictList()

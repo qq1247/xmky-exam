@@ -10,56 +10,18 @@
 <template>
   <el-scrollbar wrap-style="overflow-x:hidden;" class="content-left">
     <div class="user-info">
-      <el-avatar :size="64" v-if="$store.getters.name">{{
-        ($store.getters.name && $store.getters.name.slice(0, 1)) || '头像'
-      }}</el-avatar>
+      <el-avatar
+        :size="64"
+        v-if="$store.getters.userAvatar"
+        :src="`/api/file/download?id=${Number($store.getters.userAvatar)}`"
+        ><i class="common common-wo"></i
+      ></el-avatar>
       <div class="user-name">
         {{ $store.getters.name || '***' }}&nbsp;/&nbsp;{{
           $store.getters.orgName || '***'
         }}
       </div>
     </div>
-    <!-- <div class="user-info">
-      <el-avatar :size="80" v-if="userInfo">{{
-        (userInfo.userName && userInfo.userName.slice(0, 1)) || '头像'
-      }}</el-avatar>
-      <div class="user-name">
-        {{ userInfo.userName || '***' }}
-      </div>
-    </div>
-    <div class="user-intro">
-      <div class="intro-item">
-        <div class="item-title"><span>得分</span></div>
-        <div class="item-num">
-          {{ userInfo.totalScore === null ? '--' : userInfo.totalScore }}
-        </div>
-      </div>
-      <div class="intro-item">
-        <div class="item-title"><span>答题用时</span></div>
-        <div class="item-num">
-          {{ computeMinute(userInfo.answerStartTime, userInfo.answerEndTime) }}
-        </div>
-      </div>
-      <div class="intro-item">
-        <div class="item-title"><span>成绩</span></div>
-        <div class="item-num">
-          {{
-            (
-              (userInfo.totalScore / userInfo.paperTotalScore) *
-              100
-            ).toFixed() >= userInfo.paperPassScore
-              ? '通过'
-              : '未通过'
-          }}
-        </div>
-      </div>
-      <div class="intro-item">
-        <div class="item-title"><span>阅卷用时</span></div>
-        <div class="item-num">
-          {{ computeMinute(userInfo.markStartTime, userInfo.markEndTime) }}
-        </div>
-      </div>
-    </div> -->
     <div class="exam-head">
       <span>答题卡</span>
     </div>
@@ -154,16 +116,6 @@ export default {
         return acc + cur.score
       }, 0)
       return num
-    },
-    // 计算分钟数
-    computeMinute(startTime, endTime) {
-      if (!startTime || !endTime) {
-        return '--'
-      }
-      const diffTime =
-        new Date(endTime).getTime() - new Date(startTime).getTime()
-      const minutes = diffTime / (60 * 1000)
-      return `${minutes.toFixed(2)}分钟`
     },
     forceExamEnd() {
       this.$emit('forceExamEnd')

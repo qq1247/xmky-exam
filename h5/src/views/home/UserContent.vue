@@ -7,43 +7,52 @@
         @selectDate="selectDate"
       ></Calendar>
     </div>
-    <div class="home-todos">
+    <div class="home-list">
       <!-- 普通用户 -->
       <template v-if="onlyRole.includes('user')">
-        <div
-          class="info-item today-item"
-          :style="{
-            display: isExam(item.state) ? 'flex' : 'none',
-          }"
-          :key="item.id"
-          v-for="item in examList"
-        >
-          <template v-if="isExam(item.state)">
-            <i class="common common-wait-exam today-icon"></i>
-            <div class="item-center">
-              <div class="info-item ellipsis">{{ item.examName }}</div>
-              <div class="info-item">
-                <div class="item-time">
-                  {{ item.examStartTime }}（{{
-                    computeMinute(item.examStartTime, item.examEndTime)
-                  }}）
-                </div>
-                <div class="item-score">总分：{{ item.paperTotalScore }}</div>
-                <div class="item-pass">
-                  及格：{{
-                    (
-                      (item.paperPassScore / 100) *
-                      item.paperTotalScore
-                    ).toFixed(2)
-                  }}
+        <!-- 待考列表 -->
+        <template v-if="examList.length">
+          <div
+            class="info-item today-item"
+            :style="{
+              display: isExam(item.state) ? 'flex' : 'none',
+            }"
+            :key="item.id"
+            v-for="item in examList"
+          >
+            <template v-if="isExam(item.state)">
+              <i class="common common-wait-exam today-icon"></i>
+              <div class="item-center">
+                <div class="info-item ellipsis">{{ item.examName }}</div>
+                <div class="info-item">
+                  <div class="item-time">
+                    {{ item.examStartTime }}（{{
+                      $tools.computeMinute(
+                        item.examStartTime,
+                        item.examEndTime
+                      )
+                    }}）
+                  </div>
+                  <div class="item-score">总分：{{ item.paperTotalScore }}</div>
+                  <div class="item-pass">
+                    及格：{{
+                      (
+                        (item.paperPassScore / 100) *
+                        item.paperTotalScore
+                      ).toFixed(2)
+                    }}
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="item-btn" @click="goExam(item)">
-              <i class="common common-count-down"></i>开始考试
-            </div>
-          </template>
-        </div>
+              <div class="item-btn" @click="goExam(item)">
+                <i class="common common-count-down"></i>开始考试
+              </div>
+            </template>
+          </div>
+        </template>
+        <el-empty v-else description="暂无待考"></el-empty>
+
+        <!-- 模拟练习 -->
         <div
           class="info-item today-item"
           :key="item.id"
@@ -65,42 +74,50 @@
       </template>
       <!-- 子管理员 -->
       <template v-if="onlyRole.includes('subAdmin')">
-        <div
-          class="info-item today-item"
-          :style="{
-            display: isMark(item.examMarkStartTime, item.examMarkEndTime)
-              ? 'flex'
-              : 'none',
-          }"
-          :key="item.id"
-          v-for="item in markList"
-        >
-          <template v-if="isMark(item.examMarkStartTime, item.examMarkEndTime)">
-            <i class="common common-wait-mark today-icon"></i>
-            <div class="item-center">
-              <div class="info-item ellipsis">{{ item.examName }}</div>
-              <div class="info-item">
-                <div class="item-time">
-                  {{ item.examMarkStartTime }}（{{
-                    computeMinute(item.examMarkStartTime, item.examMarkEndTime)
-                  }}）
-                </div>
-                <div class="item-score">总分：{{ item.paperTotalScore }}</div>
-                <div class="item-pass">
-                  及格：{{
-                    (
-                      (item.paperPassScore / 100) *
-                      item.paperTotalScore
-                    ).toFixed(2)
-                  }}
+        <template v-if="markList.length">
+          <div
+            class="info-item today-item"
+            :style="{
+              display: isMark(item.examMarkStartTime, item.examMarkEndTime)
+                ? 'flex'
+                : 'none',
+            }"
+            :key="item.id"
+            v-for="item in markList"
+          >
+            <template
+              v-if="isMark(item.examMarkStartTime, item.examMarkEndTime)"
+            >
+              <i class="common common-wait-mark today-icon"></i>
+              <div class="item-center">
+                <div class="info-item ellipsis">{{ item.examName }}</div>
+                <div class="info-item">
+                  <div class="item-time">
+                    {{ item.examMarkStartTime }}（{{
+                      $tools.computeMinute(
+                        item.examMarkStartTime,
+                        item.examMarkEndTime
+                      )
+                    }}）
+                  </div>
+                  <div class="item-score">总分：{{ item.paperTotalScore }}</div>
+                  <div class="item-pass">
+                    及格：{{
+                      (
+                        (item.paperPassScore / 100) *
+                        item.paperTotalScore
+                      ).toFixed(2)
+                    }}
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="item-btn" @click="goMark(item)">
-              <i class="common common-count-down"></i>开始阅卷
-            </div>
-          </template>
-        </div>
+              <div class="item-btn" @click="goMark(item)">
+                <i class="common common-count-down"></i>开始阅卷
+              </div>
+            </template>
+          </div>
+        </template>
+        <el-empty v-else description="暂无待阅"></el-empty>
       </template>
     </div>
     <div class="home-info">
@@ -124,7 +141,6 @@
       <el-card class="box-card" shadow="never">
         <div slot="header">
           <span>最新公告</span>
-          <el-button class="box-more" type="text">更多</el-button>
         </div>
         <template v-if="bulletinList.length">
           <div class="info-list">
@@ -148,7 +164,7 @@
         </div>
         <p style="line-height: 30px">技术支持：在线考试</p>
         <p style="line-height: 30px">
-          服务热线：<a
+          在线服务：<a
             target="_blank"
             href="https://jq.qq.com/?_wv=1027&k=GXh1hHSy"
           >
@@ -271,13 +287,6 @@ export default {
         examList: (examList && examList?.data?.list) || [],
         markList: (markList && markList?.data?.list) || [],
       }
-    },
-    // 计算分钟数
-    computeMinute(startTime, endTime) {
-      const diffTime =
-        new Date(endTime).getTime() - new Date(startTime).getTime()
-      const minutes = diffTime / (60 * 1000)
-      return `${minutes.toFixed(2)}分钟`
     },
     // 获取选择月份的时间
     selectDate(time) {
@@ -416,7 +425,7 @@ export default {
 .home-calendar {
   width: 20%;
 }
-.home-todos {
+.home-list {
   flex: 1;
   background: #fff;
   margin: 0 10px;
@@ -431,14 +440,15 @@ export default {
   margin-bottom: 20px;
   /deep/ .el-card__header {
     position: relative;
+    padding: 10px 10px 10px 20px;
     &::after {
       content: '';
       display: block;
       position: absolute;
-      top: 18px;
+      top: 14px;
       left: 10px;
-      width: 4px;
-      height: 20px;
+      width: 3px;
+      height: 14px;
       background: #0094e5;
     }
   }

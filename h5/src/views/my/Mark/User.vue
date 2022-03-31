@@ -47,14 +47,20 @@
         <el-table-column label="答题用时">
           <template slot-scope="scope">
             <span>{{
-              computeMinute(scope.row.answerStartTime, scope.row.answerEndTime)
+              $tools.computeMinute(
+                scope.row.answerStartTime,
+                scope.row.answerEndTime
+              )
             }}</span>
           </template>
         </el-table-column>
         <el-table-column label="阅卷用时">
           <template slot-scope="scope">
             <span>{{
-              computeMinute(scope.row.markStartTime, scope.row.markEndTime)
+              $tools.computeMinute(
+                scope.row.markStartTime,
+                scope.row.markEndTime
+              )
             }}</span>
           </template>
         </el-table-column>
@@ -131,16 +137,6 @@ export default {
         examId: this.examId,
       })
       this.userList = data
-    },
-    // 计算分钟数
-    computeMinute(startTime, endTime) {
-      if (!startTime || !endTime) {
-        return '--'
-      }
-      const diffTime =
-        new Date(endTime).getTime() - new Date(startTime).getTime()
-      const minutes = Math.ceil(diffTime / (60 * 1000))
-      return `${minutes}分钟`
     },
     // 我的阅卷操作
     goMark(userId) {

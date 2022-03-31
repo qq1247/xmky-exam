@@ -428,8 +428,7 @@ export default {
           content: cur.content,
           time: cur.createTime,
           name: cur.createUserName || '匿名用户',
-          avatar:
-            'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
+          avatar: cur.createUserHeadFileId,
         }
         acc.push(id ? params : { ...params, replay: false, children: [] })
         return acc

@@ -49,14 +49,14 @@
         <el-row class="content-info">
           <el-col class="info-left"
             >考试时间：{{ data.startTime }}（{{
-              computeMinute(data.startTime, data.endTime)
+              $tools.computeMinute(data.startTime, data.endTime)
             }}）</el-col
           >
         </el-row>
         <el-row class="content-info">
           <el-col class="info-left"
             >阅卷时间：{{ data.markStartTime }}（{{
-              computeMinute(data.markStartTime, data.markEndTime)
+              $tools.computeMinute(data.markStartTime, data.markEndTime)
             }}）</el-col
           >
         </el-row>
@@ -105,7 +105,7 @@
                 <i class="common common-onLine"></i>在线用户
               </div>
               <div class="more-item" @click="anonymous(data)">
-                <i class="common common-anonymous"></i>匿名展示
+                <i class="common common-anonymous"></i>匿名阅卷
               </div>
               <div class="more-item" @click="ranking(data)">
                 <i class="common common-ranking"></i>排名公开
@@ -181,13 +181,6 @@ export default {
       }
       return false
     },
-    // 计算时长
-    computeMinute(startTime, endTime) {
-      const diffTime =
-        new Date(endTime).getTime() - new Date(startTime).getTime()
-      const minutes = diffTime / (60 * 1000)
-      return `${minutes.toFixed(2)}分钟`
-    },
     // 编辑
     edit(data) {
       if (this.isRole(data)) return
@@ -225,7 +218,7 @@ export default {
     read(data) {
       this.$emit('read', data)
     },
-    // 匿名展示
+    // 匿名阅卷
     anonymous(data) {
       this.$emit('anonymous', data)
     },

@@ -5,7 +5,6 @@
       <div class="user-info">
         <el-avatar
           :size="64"
-          fit="fill"
           v-if="userInfo.userHeadFileId"
           :src="`/api/file/download?id=${Number(userInfo.userHeadFileId)}`"
           ><i class="common common-wo"></i
@@ -37,7 +36,10 @@
           <div class="item-title"><span>答题用时</span></div>
           <div class="item-num">
             {{
-              computeMinute(userInfo.answerStartTime, userInfo.answerEndTime)
+              $tools.computeMinute(
+                userInfo.answerStartTime,
+                userInfo.answerEndTime
+              )
             }}
           </div>
         </div>
@@ -58,7 +60,9 @@
         <div class="intro-item">
           <div class="item-title"><span>阅卷用时</span></div>
           <div class="item-num">
-            {{ computeMinute(userInfo.markStartTime, userInfo.markEndTime) }}
+            {{
+              $tools.computeMinute(userInfo.markStartTime, userInfo.markEndTime)
+            }}
           </div>
         </div>
       </div>
@@ -566,16 +570,6 @@ export default {
         examId: this.examId,
         userId: this.userId,
       })
-    },
-    // 计算分钟数
-    computeMinute(startTime, endTime) {
-      if (!startTime || !endTime) {
-        return '--'
-      }
-      const diffTime =
-        new Date(endTime).getTime() - new Date(startTime).getTime()
-      const minutes = Math.ceil(diffTime / (60 * 1000))
-      return `${minutes}分钟`
     },
     // 计算分数通过否
     computePass(totalScore, paperTotalScore, paperPassScore) {

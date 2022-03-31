@@ -42,6 +42,7 @@
   &:hover {
     transform: translateY(-3px);
     box-shadow: 0 10px 16px -10px rgba(95, 101, 105, 0.15);
+    z-index: 100;
   }
   .tag-group {
     position: absolute;
@@ -84,8 +85,9 @@
       border: 1px solid #eff3f7;
       margin-top: 25px;
       line-height: 35px;
-      position: relative;
       transition: all 0.3s ease-in-out;
+      position: relative;
+
       .handler-more {
         background: #4a5766;
         width: 120px;
@@ -93,8 +95,8 @@
         border-radius: 3px;
         font-size: 12px;
         position: absolute;
-        left: 60px;
-        top: 50%;
+        left: 390px;
+        top: 85%;
         transform: translateY(-50%);
         opacity: 0;
         transition: all 0.3s ease-in-out;
@@ -128,13 +130,14 @@
         }
       }
       &:last-child {
+        position: initial;
         &::after,
         &::before {
           display: none;
         }
         &:hover {
           .handler-more {
-            left: 50px;
+            left: 380px;
             opacity: 1;
           }
         }

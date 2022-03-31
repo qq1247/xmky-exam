@@ -98,7 +98,7 @@
         </div>
         <p style="line-height: 30px">技术支持：在线考试</p>
         <p style="line-height: 30px">
-          服务热线：<a
+          在线服务：<a
             target="_blank"
             href="https://jq.qq.com/?_wv=1027&k=GXh1hHSy"
           >
@@ -204,15 +204,16 @@ export default {
   margin-bottom: 20px;
   /deep/ .el-card__header {
     position: relative;
+    padding: 10px 10px 10px 20px;
     &::after {
       content: '';
       display: block;
       position: absolute;
-      top: 18px;
+      top: 14px;
       left: 10px;
-      width: 4px;
-      height: 20px;
-      background: #0095e5;
+      width: 3px;
+      height: 14px;
+      background: #0094e5;
     }
   }
   /deep/.el-card__body {

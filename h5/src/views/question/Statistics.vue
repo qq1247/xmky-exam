@@ -1,13 +1,3 @@
-<!--
- * @Description: 统计试题信息
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-12-16 16:15:14
- * @LastEditors: Che
- * @LastEditTime: 2022-01-06 16:24:12
--->
-
 <template>
   <div class="chart-info">
     <el-card class="box-card" shadow="never">
@@ -33,15 +23,24 @@
 
 <script>
 import * as echarts from 'echarts'
+import { getOneDict } from '@/utils/getDict'
 import { getQuestionStatis } from 'api/report'
 
 export default {
   data() {
     return {
       statisInfo: {},
+      aiNames: [],
+      difficultyNames: [],
+      typeNames: [],
     }
   },
   async mounted() {
+    this.aiNames = getOneDict('PAPER_MARK_TYPE').map((item) => item.dictValue)
+    this.difficultyNames = getOneDict('QUESTION_DIFFICULTY').map(
+      (item) => item.dictValue
+    )
+    this.typeNames = getOneDict('QUESTION_TYPE').map((item) => item.dictValue)
     this.id = this.$route.params.id
     if (this.id) {
       await this.getQuestionStatis()
@@ -99,6 +98,15 @@ export default {
     },
     // 渲染饼图
     renderChart() {
+      this.statisInfo.aiList.map((ai) => {
+        ai.name = this.aiNames[ai.name - 1]
+      })
+      this.statisInfo.difficultyList.map((difficulty) => {
+        difficulty.name = this.difficultyNames[difficulty.name - 1]
+      })
+      this.statisInfo.typeList.map((type) => {
+        type.name = this.typeNames[type.name - 1]
+      })
       this.chartDom('questionAi', this.statisInfo.aiList)
       this.chartDom('questionDifficulty', this.statisInfo.difficultyList)
       this.chartDom('questionType', this.statisInfo.typeList)

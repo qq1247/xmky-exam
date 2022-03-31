@@ -1,12 +1,3 @@
-<!--
- * @Description: 
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-11-12 09:46:04
- * @LastEditors: Che
- * @LastEditTime: 2022-01-05 13:31:22
--->
 <template>
   <div class="container">
     <template v-if="hashChildren">
@@ -149,7 +140,7 @@ export default {
         tab: '3',
       })
     },
-    // 匿名展示
+    // 匿名阅卷
     anonymous({ id }) {
       this.$tools.switchTab('ExamListSetting', {
         id,

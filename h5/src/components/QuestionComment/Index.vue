@@ -15,10 +15,10 @@
       :key="comment.id"
     >
       <el-avatar
-        shape="square"
         :size="40"
-        icon="el-icon-user-solid"
-        v-if="comment.avatar"
+        shape="square"
+        :src="`/api/file/download?id=${Number(comment.avatar)}`"
+        ><i class="common common-wo"></i
       ></el-avatar>
       <div class="item-content">
         <div class="content-info">
