@@ -132,6 +132,7 @@ http请求头需添加Authorization字段，
 | msg                       | String  | 响应消息 |
 | data.user.id        | Integer | 考试用户Id |
 | data.user.name        | String | 考试用户名称  |
+| data.user.headFileId        | String | 考试用户头像  |
 | data.org.id        | Integer | 组织机构Id |
 | data.org.name        | String | 组织机构名称  |
 | data.user.type        | Integer | 用户类型 |
@@ -149,8 +150,9 @@ http请求头需添加Authorization字段，
 | --------------------------- | ------- | ----- |
 | code                      | Integer | 响应码    |
 | msg                       | String  | 响应消息 |
-| data.user.id        | Integer | 考试用户Id |
-| data.user.name        | String | 考试用户名称  |
+| data.user.id        | Integer | 用户Id |
+| data.user.name        | String | 用户名称  |
+| data.user.headFileId  | String | 用户头像  |
 | data.org.id        | Integer | 组织机构Id |
 | data.org.name        | String | 组织机构名称  |
 | data.user.type        | Integer | 用户类型 |

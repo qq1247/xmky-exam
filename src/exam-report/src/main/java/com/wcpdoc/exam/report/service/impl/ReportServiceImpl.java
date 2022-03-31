@@ -84,6 +84,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("id", homeUserMap.get("userId"));
 		data.put("name", homeUserMap.get("userName"));
+		data.put("headFileId", homeUserMap.get("userHeadFileId"));
 		data.put("type", homeUserMap.get("type"));
 		result.put("user", data);
 		data = new HashMap<String, Object>();
@@ -113,6 +114,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("id", examMap.get("userId"));
 		data.put("name", examMap.get("userName"));
+		data.put("headFileId", examMap.get("userHeadFileId"));
 		data.put("type", examMap.get("type"));
 		result.put("user", data);
 		data = new HashMap<String, Object>();
