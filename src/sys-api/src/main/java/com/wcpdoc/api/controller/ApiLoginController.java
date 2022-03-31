@@ -148,7 +148,7 @@ public class ApiLoginController extends BaseController {
 			Parm parm = ParmCache.get();
 			return PageResultEx.ok().data(parm == null ? null : parm.getOrgName());
 		} catch (Exception e) {
-			log.error("获取服务器时间错误：", e);
+			log.error("获取单位名称错误：", e);
 			return PageResult.err().msg(e.getMessage());
 		}
 	}

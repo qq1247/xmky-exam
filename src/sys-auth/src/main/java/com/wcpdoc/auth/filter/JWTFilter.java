@@ -114,7 +114,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 					return;
 				}
 				
-				throw new AuthenticationException(String.format("用户【%s】令牌过期【%s - %s】", oldLoginName, oldTokenId, curToken));
+				throw new AuthenticationException(String.format("用户【%s】令牌过期【%s - %s】", oldLoginName, oldTokenId, curTokenId));
 			}
 			
 			Date curTime = new Date();

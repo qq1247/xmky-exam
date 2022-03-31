@@ -27,8 +27,9 @@ public class QuestionCommentDaoImpl extends RBaseDaoImpl<QuestionComment> implem
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT QUESTION_COMMENT.ID, QUESTION_COMMENT.CONTENT, QUESTION_COMMENT.CREATE_USER_ID, "
-				+ "(SELECT USER.NAME FROM SYS_USER USER WHERE USER.ID = QUESTION_COMMENT.CREATE_USER_ID) as CREATE_USER_NAME, "
-				+ "QUESTION_COMMENT.CREATE_TIME FROM EXM_QUESTION_COMMENT QUESTION_COMMENT";
+				+ "USER.NAME AS CREATE_USER_NAME, USER.HEAD_FILE_ID AS CREATE_USER_HEAD_FILE_ID, QUESTION_COMMENT.CREATE_TIME "
+				+ "FROM EXM_QUESTION_COMMENT QUESTION_COMMENT "
+				+ "LEFT JOIN SYS_USER USER ON USER.ID = QUESTION_COMMENT.CREATE_USER_ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("content")), "QUESTION_COMMENT.CONTENT LIKE ?", "%" + pageIn.get("content") + "%")
 				.addWhere(pageIn.get("questionId", Integer.class) != null, "QUESTION_COMMENT.QUESTION_ID = ?", pageIn.get("questionId", Integer.class))

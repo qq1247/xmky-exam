@@ -717,6 +717,7 @@ http请求头需添加Authorization字段，
 | data.list[].content | Text  | 内容   |
 | data.list[].createUserId| Integer | 评论用户ID  |
 | data.list[].createUserName| String  | 评论用户名称 |
+| data.list[].createUserHeadFileId| String  | 评论用户头像 |
 | data.list[].createTime| Date | 评论时间   |
 
 ### 试题评论添加：questionComment/add

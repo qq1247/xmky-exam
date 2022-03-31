@@ -228,11 +228,11 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		
 		list = new ArrayList<Map<String, Object>>(); //智能列表
 		map = new HashMap<>();
-		map.put("name", "智能阅卷");
+		map.put("name", 1);
 		map.put("value", questionStatisMap.get("ai1") == null ? 0 : questionStatisMap.get("ai1"));
 		list.add(map);
 		map = new HashMap<>();
-		map.put("name", "非智能阅卷");
+		map.put("name", 2);
 		map.put("value", questionStatisMap.get("ai2") == null ? 0 : questionStatisMap.get("ai2"));
 		list.add(map);
 		result.put("aiList", list);
