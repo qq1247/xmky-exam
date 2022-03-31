@@ -1,9 +1,12 @@
 <template>
   <el-scrollbar wrap-style="overflow-x:hidden;" class="content-left">
     <div class="user-info">
-      <el-avatar :size="64" v-if="$store.getters.name">{{
-        ($store.getters.name && $store.getters.name.slice(0, 1)) || '头像'
-      }}</el-avatar>
+      <el-avatar
+        :size="64"
+        v-if="$store.getters.userAvatar"
+        :src="`/api/file/download?id=${Number($store.getters.userAvatar)}`"
+        ><i class="common common-wo"></i
+      ></el-avatar>
       <div class="user-name">
         {{ $store.getters.name || '***' }}&nbsp;/&nbsp;{{
           $store.getters.orgName || '***'

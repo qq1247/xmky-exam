@@ -1,18 +1,12 @@
-<!--
- * @Description: 用户信息
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-12-13 09:46:35
- * @LastEditors: Che
- * @LastEditTime: 2022-01-12 18:25:08
--->
 <template>
   <div class="user-info">
     <div class="info-handler">
-      <el-avatar :size="80" v-if="userInfo.user">{{
-        (userInfo.user.name && userInfo.user.name.slice(0, 1)) || '头像'
-      }}</el-avatar>
+      <el-avatar
+        :size="80"
+        v-if="userInfo.user"
+        :src="`/api/file/download?id=${Number(userInfo.user.headFileId)}`"
+        ><i class="common common-wo"></i
+      ></el-avatar>
       <div class="info-user">
         <p v-if="userInfo.user">{{ userInfo.user.name || '***' }}</p>
         <p v-if="userInfo.org">{{ userInfo.org.name || '***' }}</p>
@@ -71,7 +65,9 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { getInfo, setInfo } from '@/utils/storage'
 import { getUserInfo, getSubAdminInfo, getAdminInfo } from 'api/report'
+import user from '@/store/modules/user'
 export default {
   data() {
     return {
@@ -96,14 +92,24 @@ export default {
     async getUserInfo() {
       const userInfo = await getUserInfo()
       this.userInfo = userInfo.data
+      this.setUserInfo()
     },
     async getSubAdminInfo() {
       const userInfo = await getSubAdminInfo()
       this.userInfo = userInfo.data
+      this.setUserInfo()
     },
     async getAdminInfo() {
       const userInfo = await getAdminInfo()
       this.userInfo = userInfo.data
+    },
+    setUserInfo() {
+      const userInfo = getInfo()
+      userInfo.orgName = this.userInfo.org.name
+      userInfo.userAvatar = this.userInfo.user.headFileId
+      setInfo(userInfo)
+      this.$store.commit('user/SET_ORG_NAME', this.userInfo.org.name)
+      this.$store.commit('user/SET_USER_AVATAR', this.userInfo.user.headFileId)
     },
   },
 }

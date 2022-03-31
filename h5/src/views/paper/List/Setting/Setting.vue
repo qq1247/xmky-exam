@@ -17,11 +17,11 @@
     <el-form-item label="组卷方式">
       <div class="exam-type">
         <div
-          :class="
-            paperForm.genType == index
-              ? 'type-item type-item-active'
-              : 'type-item '
-          "
+          :class="[
+            'type-item',
+            paperForm.genType == index ? 'type-item-active' : '',
+            id ? 'type-item-disabled' : '',
+          ]"
           v-for="(item, index) in paperForm.genTypes"
           :key="item.content"
           @click="setPaperType(index)"
@@ -37,7 +37,7 @@
     </el-form-item>
     <el-form-item label="阅卷方式" prop="markType">
       <el-radio
-        :disabled="paperForm.state === 1 ? true : false"
+        :disabled="id ? true : false"
         @change="selectMarkType"
         v-for="item in paperForm.markTypeList"
         :key="item.value"
@@ -320,7 +320,7 @@ export default {
     },
     // 组卷方式
     setPaperType(index) {
-      if(this.paperForm.state === 1){
+      if (this.id) {
         return
       }
       this.paperForm.genType = index
@@ -400,6 +400,16 @@ export default {
 .type-item-active {
   border: 1px solid #1e9fff;
   color: #1e9fff;
+}
+
+.type-item-disabled {
+  border: 1px solid #c0c4cc;
+  color: #c0c4cc;
+  .common-selected {
+    &::after {
+      border-bottom: 25px solid #c0c4cc;
+    }
+  }
 }
 
 .exam-remark {

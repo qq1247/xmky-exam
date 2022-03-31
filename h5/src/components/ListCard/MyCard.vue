@@ -27,41 +27,47 @@
       </div>
       <!-- 标题 -->
       <div class="title ellipsis">{{ data.name || data.examName }}</div>
-      <el-row class="content-info">
-        <el-col>考试开始：{{ data.examStartTime }}</el-col>
-        <el-col v-if="name === 'myMarkList'"
+      <el-row>
+        <el-col class="content-info"
+          >考试开始：{{ data.examStartTime }}（{{
+            $tools.computeMinute(data.examStartTime, data.examEndTime)
+          }}）</el-col
+        >
+        <el-col class="content-info" v-if="name === 'myMarkList'"
           >阅卷开始：{{ data.examMarkStartTime }}</el-col
         >
-        <template v-if="name === 'myExamList'">
-          <el-col :span="8"
-            >答题：{{
-              computeMinute(data.answerStartTime, data.answerEndTime)
-            }}</el-col
-          >
-          <el-col
-            :span="8"
-            :style="{
-              color:
-                Number(
-                  ((data.paperPassScore / 100) * data.paperTotalScore).toFixed(
-                    2
-                  )
-                ) > data.totalScore
-                  ? 'red'
-                  : '',
-            }"
-            >分数：{{ data.totalScore !== null ? data.totalScore : '-' }} /
-            {{ data.paperTotalScore }}</el-col
-          >
-          <el-col :span="8" v-if="name === 'myExamList'"
-            >排名：{{ data.no === null ? '-' : data.no }} /
-            {{ data.userNum === null ? '-' : data.userNum }}</el-col
-          >
-        </template>
+        <el-col>
+          <el-row v-if="name === 'myExamList'" class="content-info">
+            <el-col :span="8"
+              >答题：{{
+                $tools.computeMinute(data.answerStartTime, data.answerEndTime)
+              }}</el-col
+            >
+            <el-col
+              :span="8"
+              :style="{
+                color:
+                  data.totalScore !== null &&
+                  (
+                    (data.paperPassScore / 100) *
+                    data.paperTotalScore
+                  ).toFixed() > data.totalScore
+                    ? 'red'
+                    : '',
+              }"
+              >分数：{{ data.totalScore !== null ? data.totalScore : '-' }} /
+              {{ data.paperTotalScore }}</el-col
+            >
+            <el-col :span="8" v-if="name === 'myExamList'"
+              >排名：{{ data.no === null ? '-' : data.no }} /
+              {{ data.userNum === null ? '-' : data.userNum }}</el-col
+            >
+          </el-row>
+        </el-col>
         <template v-if="name === 'myMarkList'">
-          <el-col
+          <el-col class="content-info"
             >分数：{{
-              ((data.paperPassScore / 100) * data.paperTotalScore).toFixed(2)
+              ((data.paperPassScore / 100) * data.paperTotalScore).toFixed()
             }}
             / {{ data.paperTotalScore }}</el-col
           >
@@ -154,16 +160,6 @@ export default {
     // 考生列表
     markUser(data) {
       this.$emit('markUser', data)
-    },
-    // 计算分钟数
-    computeMinute(startTime, endTime) {
-      if (!startTime || !endTime) {
-        return '0分钟'
-      }
-      const diffTime =
-        new Date(endTime).getTime() - new Date(startTime).getTime()
-      const minutes = diffTime / (60 * 1000)
-      return `${minutes.toFixed(2)}分钟`
     },
   },
 }

@@ -95,7 +95,7 @@ export default {
           name: '发布',
           intro: '发布试卷',
           icon: 'common common-publish',
-          contentName: '删除',
+          contentName: '发布',
           contentIntro: '发布后，可被共享权限的用户使用',
           index: '3',
         },

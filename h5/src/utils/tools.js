@@ -1,12 +1,3 @@
-/*
- * @Description:
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-07-27 17:31:01
- * @LastEditors: Che
- * @LastEditTime: 2022-01-13 10:55:47
- */
 import router from '@/router/index'
 
 const resetData = (el, name) => {
@@ -122,11 +113,34 @@ const intToChinese = (value) => {
 /**
  * @name: switchTab
  * @description: 切换tab
- * @param { name, id = null, tab }
+ * @param { name, params }
  * @return {*}
  */
 const switchTab = (name, params) => {
   router.push({ name, params })
 }
 
-export { resetData, delay, getQueryParam, formateTime, intToChinese, switchTab }
+/**
+ * @name: $tools.computeMinute
+ * @description: 计算分钟数
+ * @param { startTime, endTime }
+ * @return {*}
+ */
+const computeMinute = (startTime, endTime) => {
+  if (!startTime || !endTime) {
+    return '--'
+  }
+  const diffTime = new Date(endTime).getTime() - new Date(startTime).getTime()
+  const minutes = Math.ceil(diffTime / (60 * 1000))
+  return `${minutes}分钟`
+}
+
+export {
+  delay,
+  switchTab,
+  resetData,
+  formateTime,
+  intToChinese,
+  getQueryParam,
+  computeMinute,
+}

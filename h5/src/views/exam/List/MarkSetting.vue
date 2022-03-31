@@ -273,25 +273,25 @@ export default {
     // 选择阅卷用户
     selectPerson(e, index) {
       this.examForm.examRemarks[index].examCheckPerson = e
-      this.examForm.examRemarks.map((item, indexe) => {
+      this.examForm.examRemarks.map((item, indexMark) => {
         if (
-          index !== indexe &&
+          index !== indexMark &&
           this.examForm.examRemarks[index].examCheckPerson ===
             item.examCheckPerson
         ) {
-          this.examForm.examRemarks[indexe].examCheckPerson = null
+          this.examForm.examRemarks[indexMark].examCheckPerson = null
         }
       })
     },
     // 选择阅卷考生
     selectExamUser(e, index) {
       this.examForm.examRemarks[index].examUser = e
-      this.examForm.examRemarks.map((item, indexe) => {
-        if (index !== indexe) {
+      this.examForm.examRemarks.map((item, indexMark) => {
+        if (index !== indexMark) {
           this.examForm.examRemarks[index].examUser.map((user) => {
-            const indexa = item.examUser.indexOf(user)
-            if (indexa !== -1)
-              this.examForm.examRemarks[indexe].examUser.splice(indexa, 1)
+            const indexUser = item.examUser.indexOf(user)
+            if (indexUser !== -1)
+              this.examForm.examRemarks[indexMark].examUser.splice(indexUser, 1)
           })
         }
       })
