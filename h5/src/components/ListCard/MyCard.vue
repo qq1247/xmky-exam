@@ -34,7 +34,9 @@
           }}）</el-col
         >
         <el-col class="content-info" v-if="name === 'myMarkList'"
-          >阅卷开始：{{ data.examMarkStartTime }}</el-col
+          >阅卷开始：{{ data.examMarkStartTime }}（{{
+            $tools.computeMinute(data.examMarkStartTime, data.examMarkEndTime)
+          }}）</el-col
         >
         <el-col>
           <el-row v-if="name === 'myExamList'" class="content-info">
