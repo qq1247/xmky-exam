@@ -149,12 +149,22 @@ http请求头需添加Authorization字段，
 | --------------------------- | ------- | ----- |
 | code                        | Integer | 响应码   |
 | msg                         | String  | 响应消息  |
-| data.list[]                 | arr[]   | 数组列表   |
-| data.list[].userId        | Integer | 用户ID  |
-| data.list[].userName        | String  | 用户名称  |
-| data.list[].userHeadFileId        | Integer  | 用户头像  |
-| data.list[].orgId   | Integer    | 机构ID|
-| data.list[].orgName     | String    | 机构名称 |
+| data                 | arr[]   | 数组列表   |
+| data[].userId        | Integer | 用户ID  |
+| data[].userName        | String  | 用户名称（匿名阅卷时不显示）  |
+| data[].userHeadFileId        | Integer  | 用户头像（匿名阅卷时不显示）  |
+| data[].orgId   | Integer    | 机构ID|
+| data[].orgName     | String    | 机构名称（匿名阅卷时不显示） |
+| data[].answerStartTime   | Date    | 答题开始时间 |
+| data[].answerEndTime     | Date    | 答题完成时间  |
+| data[].markStartTime   | Date    | 阅卷用户开始阅卷时间 |
+| data[].markEndTime     | Date    | 阅卷用户最后阅卷时间  |
+| data[].state       | Integer | 我的考试状态（（1：未考试；2：考试中；3：已交卷；4：强制交卷；））  |
+| data[].markState       | Integer | 阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）  |
+| data[].answerState       | Integer | 答题状态（1：及格；2：不及格） （成绩不公开时不显示） |
+| data[].totalScore | Double  | 个人总分数（成绩不公开时不显示）  |
+| data[].paperTotalScore | Double  | 试卷总分数  |
+| data[].paperPassScore | Double  | 试卷通过分数  |
 
 ### 我的阅卷用户：myMark/user
 | 请求参数| 类型    | 描述       | 必填 |
@@ -166,14 +176,19 @@ http请求头需添加Authorization字段，
 | --------------------------- | ------- | ----- |
 | code                        | Integer | 响应码   |
 | msg                         | String  | 响应消息  |
+| data.userId        | Integer | 用户ID  |
+| data.userName        | String  | 用户名称（匿名阅卷时不显示）  |
+| data.userHeadFileId        | Integer  | 用户头像（匿名阅卷时不显示）  |
+| data.orgId   | Integer    | 机构ID |
+| data.orgName     | String    | 机构名称（匿名阅卷时不显示） |
 | data.answerStartTime   | Date    | 答题开始时间 |
 | data.answerEndTime     | Date    | 答题完成时间  |
 | data.markStartTime   | Date    | 阅卷用户开始阅卷时间 |
 | data.markEndTime     | Date    | 阅卷用户最后阅卷时间  |
 | data.state       | Integer | 我的考试状态（（1：未考试；2：考试中；3：已交卷；4：强制交卷；））  |
 | data.markState       | Integer | 阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）  |
-| data.answerState       | Integer | 答题状态（1：及格；2：不及格）  |
-| data.totalScore | Double  | 个人总分数  |
+| data.answerState       | Integer | 答题状态（1：及格；2：不及格） （成绩不公开时不显示） |
+| data.totalScore | Double  | 个人总分数 （成绩不公开时不显示） |
 | data.paperTotalScore | Double  | 试卷总分数  |
 | data.paperPassScore | Double  | 试卷通过分数  |
 

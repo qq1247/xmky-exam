@@ -158,17 +158,28 @@ public class ApiMyMarkController extends BaseController {
 			List<Map<String, Object>> result = new ArrayList<>();
 			Map<Integer, Org> orgCache = new HashMap<>();// 机构不会很多，缓存利用
 			Exam exam = examService.getEntity(examId);
-			int pos = 1;
+			Paper paper = paperService.getEntity(exam.getPaperId());
 			for (User user : userList) {
+				MyExam myExam = myExamService.getEntity(examId, user.getId());
 				Map<String, Object> sigleResult = new HashMap<>();
 				sigleResult.put("userId", user.getId());
-				sigleResult.put("userName", exam.getAnonState() == 1 ? user.getName() : "用户" + pos++);//  如果是匿名阅卷，不显示名称等
+				sigleResult.put("userName", exam.getAnonState() == 1 ? user.getName() : null);//  如果是匿名阅卷，不显示名称等
 				sigleResult.put("userHeadFileId", exam.getAnonState() == 1 ? user.getHeadFileId() : null);
 				if (orgCache.get(user.getOrgId()) == null) {
 					orgCache.put(user.getOrgId(), orgService.getEntity(user.getOrgId()));
 				}
 				sigleResult.put("orgId", user.getOrgId());
-				sigleResult.put("orgName", exam.getAnonState() == 1 ? orgCache.get(user.getOrgId()).getName() : "-");
+				sigleResult.put("orgName", exam.getAnonState() == 1 ? orgCache.get(user.getOrgId()).getName() : null);
+				sigleResult.put("answerStartTime", myExam.getAnswerStartTime() == null ? null : DateUtil.formatDateTime(myExam.getAnswerStartTime()));
+				sigleResult.put("answerEndTime", myExam.getAnswerEndTime() == null ? null : DateUtil.formatDateTime(myExam.getAnswerEndTime()));
+				sigleResult.put("markStartTime", myExam.getMarkStartTime() == null ? null : DateUtil.formatDateTime(myExam.getMarkStartTime()));
+				sigleResult.put("markEndTime", myExam.getMarkEndTime() == null ? null : DateUtil.formatDateTime(myExam.getMarkEndTime()));
+				sigleResult.put("state", myExam.getState());
+				sigleResult.put("markState", myExam.getMarkState());
+				sigleResult.put("answerState", exam.getScoreState() == 1 ? myExam.getAnswerState() : null);
+				sigleResult.put("totalScore", exam.getScoreState() == 1 ? myExam.getTotalScore() : null);// 成绩不公开则不显示
+				sigleResult.put("paperTotalScore", paper.getTotalScore());
+				sigleResult.put("paperPassScore", paper.getPassScore());
 				result.add(sigleResult);
 			}
 			
@@ -212,20 +223,26 @@ public class ApiMyMarkController extends BaseController {
 			
 			// 获取考试用户信息
 			MyExam myExam = myExamService.getEntity(examId, userId);
+			User user = userService.getEntity(userId);
+			Org org = orgService.getEntity(user.getOrgId());
 			Exam exam = examService.getEntity(examId);
 			Paper paper = paperService.getEntity(exam.getPaperId());
 			return PageResultEx.ok()
+					.addAttr("userId", user.getId())
+					.addAttr("userName", exam.getAnonState() == 1 ? user.getName() : null)//  如果是匿名阅卷，不显示名称等
+					.addAttr("userHeadFileId", exam.getAnonState() == 1 ? user.getHeadFileId() : null)
+					.addAttr("org", user.getOrgId())
+					.addAttr("orgName", exam.getAnonState() == 1 ? org.getName() : null)
 					.addAttr("answerStartTime", myExam.getAnswerStartTime() == null ? null : DateUtil.formatDateTime(myExam.getAnswerStartTime()))
 					.addAttr("answerEndTime", myExam.getAnswerEndTime() == null ? null : DateUtil.formatDateTime(myExam.getAnswerEndTime()))
 					.addAttr("markStartTime", myExam.getMarkStartTime() == null ? null : DateUtil.formatDateTime(myExam.getMarkStartTime()))
 					.addAttr("markEndTime", myExam.getMarkEndTime() == null ? null : DateUtil.formatDateTime(myExam.getMarkEndTime()))
 					.addAttr("state", myExam.getState())
 					.addAttr("markState", myExam.getMarkState())
-					.addAttr("answerState", myExam.getAnswerState())
+					.addAttr("answerState", exam.getScoreState() == 1 ? myExam.getAnswerState() : null)
 					.addAttr("totalScore", exam.getScoreState() == 1 ? myExam.getTotalScore() : null)// 成绩不公开则不显示
 					.addAttr("paperTotalScore", paper.getTotalScore())
-					.addAttr("paperPassScore", paper.getPassScore())
-					;
+					.addAttr("paperPassScore", paper.getPassScore());
 		} catch (MyException e) {
 			log.error("考试用户错误：{}", e.getMessage());
 			return PageResult.err();
