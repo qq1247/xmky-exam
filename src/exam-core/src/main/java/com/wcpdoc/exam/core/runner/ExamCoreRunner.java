@@ -11,12 +11,16 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
+import com.wcpdoc.base.cache.ParmCache;
+import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
+import com.wcpdoc.notify.exception.NotifyException;
+import com.wcpdoc.notify.service.NotifyService;
 
 /**
  * 考试核心启动
@@ -31,6 +35,8 @@ public class ExamCoreRunner implements ApplicationRunner {
 	private ExamService examService;
 	@Resource
 	private MyExamDetailService myExamDetailService;
+	@Resource
+	private NotifyService notifyService;
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
@@ -52,7 +58,7 @@ public class ExamCoreRunner implements ApplicationRunner {
 					try {
 						TimeUnit.SECONDS.sleep(1);
 					} catch (InterruptedException e1) {
-						e1.printStackTrace();
+						log.error("自动阅卷错误：", e1);
 					}
 					
 					unMarkExamList = AutoMarkCache.getList(); // 每次重新取，因为运行中会动态添加删除等。如新发布的考试
@@ -71,8 +77,20 @@ public class ExamCoreRunner implements ApplicationRunner {
 							}
 						} catch (MyException e) {// 一个有问题，不影响其他任务执行
 							log.error("自动阅卷错误：{}", e.getMessage());
+							Parm parm = ParmCache.get();
+							try {
+								notifyService.pushEmail(parm.getEmailUserName(), parm.getEmailUserName(), "在线考试-自动阅卷失败", e.getMessage());
+							} catch (NotifyException e1) {
+								log.error("自动阅卷错误：{}", e.getMessage());
+							}
 						} catch (Exception e) {
 							log.error("自动阅卷错误：", e);
+							Parm parm = ParmCache.get();
+							try {
+								notifyService.pushEmail(parm.getEmailUserName(), parm.getEmailUserName(), "在线考试-自动阅卷失败", e.getMessage());
+							} catch (NotifyException e1) {
+								log.error("自动阅卷错误：{}", e.getMessage());
+							}
 						}
 					}
 				}
@@ -80,3 +98,4 @@ public class ExamCoreRunner implements ApplicationRunner {
 		}).start();
 	}
 }
+
