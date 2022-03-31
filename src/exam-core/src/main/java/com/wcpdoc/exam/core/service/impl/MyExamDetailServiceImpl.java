@@ -136,9 +136,7 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		
 		Paper paper = paperService.getEntity(exam.getPaperId());// 试卷信息
 		List<MyExam> myExamList = myExamService.getList(examId);// 考试用户列表
-		Map<Integer, Question> questionCache = paper.getGenType() == 1 
-				? getQuestionCache(exam.getPaperId()) 
-				: getQuestionRandCache(exam.getPaperId(), exam.getId());// 试题缓存信息
+		Map<Integer, Question> questionCache = getQuestionCache(exam, paper);// 试题缓存信息
 		Map<Integer, List<PaperQuestionAnswer>> questionAnswerListCache = paper.getGenType() == 1 
 				? questionAnswerListCache(exam.getPaperId(), questionCache.values()) 
 				: questionRandAnswerListCache(exam.getId(), exam.getPaperId(), questionCache.values());//试题答案缓存信息
@@ -644,28 +642,15 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	 * 获取试题缓存
 	 * 
 	 * v1.0 zhanghc 2021年10月22日下午1:22:13
-	 * @param paperId
+	 * @param exam
+	 * @param paper
 	 * @return Map<Integer,Question>
 	 */
-	private Map<Integer, Question> getQuestionCache(Integer paperId) {
-		List<Question> questionList = paperService.getQuestionList(paperId);
+	private Map<Integer, Question> getQuestionCache(Exam exam, Paper paper) {
+		List<Question> questionList = paper.getGenType() == 1 
+				? paperService.getQuestionList(paper.getId()) 
+				: paperService.getQuestionList(paper.getId(), exam.getId());
 		Map<Integer, Question> questionCache = new HashMap<>();
-		for (Question question : questionList) {
-			questionCache.put(question.getId(), question);
-		}
-		return questionCache;
-	}
-	
-	/**
-	 * 获取随机试题缓存
-	 * 
-	 * v1.0 chenyun 2022年2月16日下午2:10:27
-	 * @param paperId
-	 * @return Map<Integer,Question>
-	 */
-	private Map<Integer, Question> getQuestionRandCache(Integer paperId, Integer examId) {
-		Map<Integer, Question> questionCache = new HashMap<>();
-		List<Question> questionList = paperQuestionService.getQuestionRandList(examId, paperId);
 		for (Question question : questionList) {
 			questionCache.put(question.getId(), question);
 		}

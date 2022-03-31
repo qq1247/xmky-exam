@@ -109,13 +109,11 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if (entity.getState() == 0) {
 			throw new MyException("已删除");
 		}
-		if (entity.getState() == 1) {// 已发布时不能修改组卷方式和阅卷方式
-			if (entity.getGenType().intValue() != paper.getGenType().intValue()) {
-				throw new MyException("已发布");
-			}
-			if (entity.getMarkType().intValue() != paper.getMarkType().intValue()) {
-				throw new MyException("已发布");
-			}
+		if (entity.getGenType().intValue() != paper.getGenType().intValue()) {// 类型的切换导致修改的地方多，暂时不允许修改 22.03.31 zhanghc
+			throw new MyException("参数错误：genType");
+		}
+		if (entity.getMarkType().intValue() != paper.getMarkType().intValue()) {
+			throw new MyException("参数错误：markType");
 		}
 		if (entity.getState() == 3) {
 			throw new MyException("已归档");
@@ -771,6 +769,11 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	@Override
 	public List<Question> getQuestionList(Integer id) {
 		return paperDao.getQuestionList(id);
+	}
+	
+	@Override
+	public List<Question> getQuestionList(Integer id, Integer examId) {
+		return paperDao.getQuestionList(id, examId);
 	}
 	
 	@Override

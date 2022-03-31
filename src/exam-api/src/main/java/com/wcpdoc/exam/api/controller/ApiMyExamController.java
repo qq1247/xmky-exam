@@ -67,6 +67,7 @@ public class ApiMyExamController extends BaseController{
 			for (Map<String, Object> map : pageOut.getList()) {
 				if ((Integer)map.remove("examScoreState") == 2) {
 					map.put("totalScore", null);// 不显示分数
+					map.put("answerState", null);// 不显示及格状态
 				}
 				if ((Integer)map.remove("examRankState") == 2) {
 					map.put("no", null);// 不显示排名

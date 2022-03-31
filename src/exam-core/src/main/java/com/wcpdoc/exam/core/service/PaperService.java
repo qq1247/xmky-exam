@@ -110,13 +110,23 @@ public interface PaperService extends BaseService<Paper> {
 	void questionMove(Integer id, Integer sourceId, Integer targetId);
 	
 	/**
-	 * 获取试题列表
+	 * 获取试题列表（固定试卷）
 	 * 
 	 * v1.0 zhanghc 2017年6月19日下午4:53:21
 	 * @param id
 	 * @return List<Question>
 	 */
 	List<Question> getQuestionList(Integer id);
+	
+	/**
+	 * 获取试题列表（随机试卷）
+	 * 
+	 * v1.0 zhanghc 2022年3月31日上午11:17:58
+	 * @param id
+	 * @param examId
+	 * @return List<Question>
+	 */
+	List<Question> getQuestionList(Integer id, Integer examId);
 	
 	/**
 	 * 获取试题列表

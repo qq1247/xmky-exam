@@ -22,6 +22,16 @@ public interface PaperDao extends RBaseDao<Paper> {
 	 * List<Question>
 	 */
 	List<Question> getQuestionList(Integer id);
+	
+	/**
+	 * 获取试题列表
+	 * 
+	 * v1.0 zhanghc 2022年3月31日上午11:19:01
+	 * @param id
+	 * @param examId
+	 * @return List<Question>
+	 */
+	List<Question> getQuestionList(Integer id, Integer examId);
 
 	/**
 	 * 获取试题列表

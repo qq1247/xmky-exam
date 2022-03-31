@@ -50,10 +50,17 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 	@Override
 	public List<Question> getQuestionList(Integer id) {
 		String sql = "SELECT QUESTION.* "
-				+ "FROM EXM_PAPER_QUESTION PAPER_QUESTION "
-				+ "INNER JOIN EXM_QUESTION QUESTION ON PAPER_QUESTION.QUESTION_ID = QUESTION.ID "
-				+ "WHERE PAPER_QUESTION.PAPER_ID = ? AND PAPER_QUESTION.TYPE = 2";// AND QUESTION.STATE = 1 如果删除试题，试卷关联的试题也能看
-		return getList(sql, new Object[]{id}, Question.class);
+				+ "FROM EXM_QUESTION QUESTION "
+				+ "WHERE EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = ? AND Z.TYPE = 2 AND Z.QUESTION_ID = QUESTION.ID)";// AND QUESTION.STATE = 1 如果删除试题，试卷关联的试题也能看
+		return getList(sql, new Object[] { id }, Question.class);
+	}
+	
+	@Override
+	public List<Question> getQuestionList(Integer id, Integer examId) {
+		String sql = "SELECT QUESTION.* "
+				+ "FROM EXM_QUESTION QUESTION "
+				+ "WHERE EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.EXAM_ID = ? AND Z.PAPER_ID = ? AND Z.TYPE = 3 AND Z.QUESTION_ID = QUESTION.ID)";// AND QUESTION.STATE = 1 如果删除试题，试卷关联的试题也能看
+		return getList(sql, new Object[] { examId, id }, Question.class);
 	}
 
 	@Override
