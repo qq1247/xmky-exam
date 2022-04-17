@@ -15,9 +15,9 @@ import com.wcpdoc.base.cache.ParmCache;
 import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
 import com.wcpdoc.exam.core.entity.Exam;
-import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
 import com.wcpdoc.notify.exception.NotifyException;
 import com.wcpdoc.notify.service.NotifyService;
@@ -31,8 +31,6 @@ import com.wcpdoc.notify.service.NotifyService;
 public class ExamCoreRunner implements ApplicationRunner {
 	private static final Logger log = LoggerFactory.getLogger(ExamCoreRunner.class);
 	
-	@Resource
-	private ExamService examService;
 	@Resource
 	private MyExamDetailService myExamDetailService;
 	@Resource
@@ -63,36 +61,65 @@ public class ExamCoreRunner implements ApplicationRunner {
 					
 					unMarkExamList = AutoMarkCache.getList(); // 每次重新取，因为运行中会动态添加删除等。如新发布的考试
 					for (Exam unMarkExam : unMarkExamList) {
+						if ((unMarkExam.getMarkState() == 1 && unMarkExam.getEndTime().getTime() > System.currentTimeMillis())
+								|| (unMarkExam.getMarkState() == 2 && unMarkExam.getMarkEndTime().getTime() > System.currentTimeMillis())) {
+							continue;
+						}
+						
 						try {
-							if ((unMarkExam.getMarkState() == 1 && unMarkExam.getEndTime().getTime() > System.currentTimeMillis())
-									|| (unMarkExam.getMarkState() == 2 && unMarkExam.getMarkEndTime().getTime() > System.currentTimeMillis())) {
+							if (!AutoMarkCache.tryWriteLock(unMarkExam.getId(), 10000)) {// 尝试加写锁，答题，交卷，变更时间等功能暂停
+								log.info("自动阅卷错误：【{}-{}】尝试加写锁失败，耗时10秒，等待下一次运行", unMarkExam.getId(), unMarkExam.getName());
 								continue;
 							}
-							
-							AutoMarkCache.del(unMarkExam.getId());// 删除缓存不在监听，如果阅卷报错，在执行一遍也报错。应该给管理员发送邮件，修复问题后，刷新缓存重新执行任务
+						} catch (Exception e1) {
+							log.error("自动阅卷错误：【{}-{}】尝试加写锁失败，强制被中断，等待下一次运行，{}", unMarkExam.getId(), unMarkExam.getName(), e1.getMessage());
+							continue;
+						}
+						
+						unMarkExam = AutoMarkCache.get(unMarkExam.getId());
+						if ((unMarkExam == null 
+								|| unMarkExam.getMarkState() == 1 && unMarkExam.getEndTime().getTime() > System.currentTimeMillis())
+								|| (unMarkExam.getMarkState() == 2 && unMarkExam.getMarkEndTime().getTime() > System.currentTimeMillis())) {
+							log.info("自动阅卷错误：【{}-{}】第二次读取缓存时数据变更，等待下一次运行", unMarkExam.getId(), unMarkExam.getName());
+							continue;// 二次判断，因为有可能时间已经变更
+						}
+						
+						try {
 							if (unMarkExam.getMarkState() == 1) {
 								myExamDetailService.doExam(unMarkExam.getId());
 							} else if (unMarkExam.getMarkState() == 2){
 								myExamDetailService.doMark(unMarkExam.getId());
 							}
+							
+							if (unMarkExam.getMarkState() == 3) {
+								AutoMarkCache.del(unMarkExam.getId());// 不要放finally，主观试卷第一次阅客观题，第二次完成最终阅卷
+							}
 						} catch (MyException e) {// 一个有问题，不影响其他任务执行
 							log.error("自动阅卷错误：{}", e.getMessage());
-							Parm parm = ParmCache.get();
-							try {
-								notifyService.pushEmail(parm.getEmailUserName(), parm.getEmailUserName(), "在线考试-自动阅卷失败", e.getMessage());
-							} catch (NotifyException e1) {
-								log.error("自动阅卷错误：{}", e.getMessage());
-							}
+							AutoMarkCache.del(unMarkExam.getId());// 如果已经异常，给管理员发送邮件
+							sendEmail(e);
 						} catch (Exception e) {
 							log.error("自动阅卷错误：", e);
-							Parm parm = ParmCache.get();
-							try {
-								notifyService.pushEmail(parm.getEmailUserName(), parm.getEmailUserName(), "在线考试-自动阅卷失败", e.getMessage());
-							} catch (NotifyException e1) {
-								log.error("自动阅卷错误：{}", e.getMessage());
-							}
+							AutoMarkCache.del(unMarkExam.getId());
+							sendEmail(e);
+						} finally {
+							AutoMarkCache.releaseWriteLock(unMarkExam.getId());// 释放写锁
 						}
 					}
+				}
+			}
+
+			private void sendEmail(Exception e) {
+				Parm parm = ParmCache.get();
+				try {
+					if (!ValidateUtil.isValid(parm.getEmailUserName())) {
+						log.info("自动阅卷错误：没有配置管理员邮箱，不能推送异常信息");
+						return;
+					}
+					
+					notifyService.pushEmail(parm.getEmailUserName(), parm.getEmailUserName(), "在线考试-自动阅卷失败", e.getMessage());
+				} catch (NotifyException e1) {
+					log.error("自动阅卷错误：{}", e.getMessage());
 				}
 			}
 		}).start();

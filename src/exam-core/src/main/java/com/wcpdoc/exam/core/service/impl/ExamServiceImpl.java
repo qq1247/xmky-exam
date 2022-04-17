@@ -722,4 +722,94 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			throw new MyException(errMsg.toString());
 		}
 	}
+
+	@Override
+	public void timeUpdate(Integer id, Integer timeState, Integer minute) {
+		// 校验数据有效性
+		if (!ValidateUtil.isValid(id)) {
+			throw new MyException("参数错误:id");
+		}
+		if (timeState != 1 && timeState != 2 && timeState != 3 && timeState != 4) {
+			throw new MyException("参数错误:timeState");
+		}
+		if (!ValidateUtil.isValid(minute)) {
+			throw new MyException("参数错误:minute");
+		}
+		
+		Exam exam = getEntity(id);
+		Date curTime = new Date();
+		if (timeState == 1) {
+			if (exam.getStartTime().getTime() < curTime.getTime()) {
+				throw new MyException("考试已开始");
+			}
+			Date newStartTime = DateUtil.getNextMinute(exam.getStartTime(), minute);
+			if (newStartTime.getTime() > exam.getEndTime().getTime()) {
+				throw new MyException("minute范围超出上限");
+			}
+			if (exam.getMarkState() != 1) {
+				throw new MyException("已阅卷");
+			}
+		}
+		if (timeState == 2) {
+			if (exam.getEndTime().getTime() < curTime.getTime()) {
+				throw new MyException("参数错误：考试已结束");
+			}
+			if (ValidateUtil.isValid(exam.getMarkStartTime())) {// 需要人工阅卷
+				Date newEndTime = DateUtil.getNextMinute(exam.getEndTime(), minute);
+				if (newEndTime.getTime() > exam.getMarkStartTime().getTime()) {
+					throw new MyException("minute范围超出上限");
+				}
+			}
+			if (exam.getMarkState() != 1) {
+				throw new MyException("已阅卷");
+			}
+		}
+		if (timeState == 3) {//时间状态：1：考试开始时间；2：考试结束时间；3：阅卷开始时间；4：阅卷结束时间
+			if (exam.getMarkStartTime().getTime() < curTime.getTime()) {
+				throw new MyException("阅卷已开始");
+			}
+			if (!ValidateUtil.isValid(exam.getMarkStartTime())) {
+				throw new MyException("参数错误：无需阅卷");
+			}
+			Date newMarkStartTime = DateUtil.getNextMinute(exam.getMarkStartTime(), minute);
+			if (newMarkStartTime.getTime() > exam.getMarkEndTime().getTime()) {
+				throw new MyException("minute范围超出上限");
+			}
+			if (exam.getMarkState() == 3) {
+				throw new MyException("已阅卷");
+			}
+		}
+		if (timeState == 4) {
+			if (exam.getMarkEndTime().getTime() < curTime.getTime()) {
+				throw new MyException("阅卷已结束");
+			}
+			if (!ValidateUtil.isValid(exam.getMarkEndTime())) {
+				throw new MyException("无需阅卷");
+			}
+			if (exam.getMarkState() == 3) {
+				throw new MyException("已阅卷");
+			}
+		}
+		
+		// 变更考试时间
+		if (timeState == 1) {
+			Date newStartTime = DateUtil.getNextMinute(exam.getStartTime(), minute);
+			exam.setStartTime(newStartTime.getTime() > curTime.getTime() ? newStartTime : curTime);
+		} else if (timeState == 2) {
+			Date newEndTime = DateUtil.getNextMinute(exam.getEndTime(), minute);
+			exam.setEndTime(newEndTime.getTime() > exam.getStartTime().getTime() ? newEndTime : exam.getStartTime());
+		} else if (timeState == 3) {
+			Date newMarkStartTime = DateUtil.getNextMinute(exam.getMarkStartTime(), minute);
+			exam.setMarkStartTime(newMarkStartTime.getTime() > exam.getEndTime().getTime() ? newMarkStartTime : exam.getEndTime());
+		} else if (timeState == 4) {
+			Date newMarkEndTime = DateUtil.getNextMinute(exam.getMarkEndTime(), minute);
+			exam.setMarkEndTime(newMarkEndTime.getTime() > exam.getMarkStartTime().getTime() ? newMarkEndTime : exam.getMarkStartTime());
+		}
+		exam.setUpdateTime(curTime);
+		exam.setUpdateUserId(getCurUser().getId());
+		update(exam);
+		
+		// 缓存放入新时间
+		AutoMarkCache.put(exam.getId(), exam);
+	}
 }
