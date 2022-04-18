@@ -724,13 +724,13 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	@Override
-	public void timeUpdate(Integer id, Integer timeState, Integer minute) {
+	public void timeUpdate(Integer id, Integer timeType, Integer minute) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(id)) {
 			throw new MyException("参数错误:id");
 		}
-		if (timeState != 1 && timeState != 2 && timeState != 3 && timeState != 4) {
-			throw new MyException("参数错误:timeState");
+		if (timeType != 1 && timeType != 2 && timeType != 3 && timeType != 4) {
+			throw new MyException("参数错误:timeType");
 		}
 		if (!ValidateUtil.isValid(minute)) {
 			throw new MyException("参数错误:minute");
@@ -738,7 +738,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		
 		Exam exam = getEntity(id);
 		Date curTime = new Date();
-		if (timeState == 1) {
+		if (timeType == 1) {
 			if (exam.getStartTime().getTime() < curTime.getTime()) {
 				throw new MyException("考试已开始");
 			}
@@ -750,7 +750,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 				throw new MyException("已阅卷");
 			}
 		}
-		if (timeState == 2) {
+		if (timeType == 2) {
 			if (exam.getEndTime().getTime() < curTime.getTime()) {
 				throw new MyException("参数错误：考试已结束");
 			}
@@ -764,7 +764,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 				throw new MyException("已阅卷");
 			}
 		}
-		if (timeState == 3) {//时间状态：1：考试开始时间；2：考试结束时间；3：阅卷开始时间；4：阅卷结束时间
+		if (timeType == 3) {//时间状态：1：考试开始时间；2：考试结束时间；3：阅卷开始时间；4：阅卷结束时间
 			if (exam.getMarkStartTime().getTime() < curTime.getTime()) {
 				throw new MyException("阅卷已开始");
 			}
@@ -779,7 +779,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 				throw new MyException("已阅卷");
 			}
 		}
-		if (timeState == 4) {
+		if (timeType == 4) {
 			if (exam.getMarkEndTime().getTime() < curTime.getTime()) {
 				throw new MyException("阅卷已结束");
 			}
@@ -792,16 +792,16 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		}
 		
 		// 变更考试时间
-		if (timeState == 1) {
+		if (timeType == 1) {
 			Date newStartTime = DateUtil.getNextMinute(exam.getStartTime(), minute);
 			exam.setStartTime(newStartTime.getTime() > curTime.getTime() ? newStartTime : curTime);
-		} else if (timeState == 2) {
+		} else if (timeType == 2) {
 			Date newEndTime = DateUtil.getNextMinute(exam.getEndTime(), minute);
 			exam.setEndTime(newEndTime.getTime() > exam.getStartTime().getTime() ? newEndTime : exam.getStartTime());
-		} else if (timeState == 3) {
+		} else if (timeType == 3) {
 			Date newMarkStartTime = DateUtil.getNextMinute(exam.getMarkStartTime(), minute);
 			exam.setMarkStartTime(newMarkStartTime.getTime() > exam.getEndTime().getTime() ? newMarkStartTime : exam.getEndTime());
-		} else if (timeState == 4) {
+		} else if (timeType == 4) {
 			Date newMarkEndTime = DateUtil.getNextMinute(exam.getMarkEndTime(), minute);
 			exam.setMarkEndTime(newMarkEndTime.getTime() > exam.getMarkStartTime().getTime() ? newMarkEndTime : exam.getMarkStartTime());
 		}

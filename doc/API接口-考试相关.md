@@ -699,6 +699,13 @@ http请求头需添加Authorization字段，
 | notifyType     | Integer   |  状态 【1.考试人；2.阅卷人；3.当前登录人】  | 是   |
 | content     | String   |  内容    | 是   |
 
+### 考试变更时间：exam/time
+| 请求参数| 类型      | 描述        | 必填 |
+| ----------- | --------- | ----------- | ---- |
+| id          | Integer   |  考试id     | 是   |
+| timeType     | Integer   |  状态 【1：考试开始时间；2：考试结束时间；3：阅卷开始时间；4：阅卷结束时间】  | 是   |
+| minute     | Integer   |  分钟数    | 是   |
+
 ### 试题评论列表：questionComment/listpage
 | 请求参数| 类型       | 描述       | 必填 |
 | -------- | ---------- | ---------- | ---- |
