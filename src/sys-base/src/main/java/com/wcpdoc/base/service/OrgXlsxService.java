@@ -1,10 +1,7 @@
 package com.wcpdoc.base.service;
 
-import java.util.List;
-
 import org.springframework.web.multipart.MultipartFile;
 
-import com.wcpdoc.base.entity.OrgXlsx;
 import com.wcpdoc.core.service.BaseService;
 
 /**
@@ -26,7 +23,7 @@ public interface OrgXlsxService extends BaseService<Object> {
 	 * 
 	 * v1.0 chenyun 2021年3月4日下午5:29:49 void
 	 */
-	List<OrgXlsx> exportOrgXlsx(String ids);
+	void export(Integer[] ids);
 	
 	/**
 	 * 导出模板

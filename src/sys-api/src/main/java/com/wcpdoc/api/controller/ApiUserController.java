@@ -1,22 +1,12 @@
 package com.wcpdoc.api.controller;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
-import javax.servlet.ServletOutputStream;
 
-import org.apache.commons.io.IOUtils;
-import org.jxls.common.Context;
-import org.jxls.expression.JexlExpressionEvaluator;
-import org.jxls.transform.Transformer;
-import org.jxls.util.JxlsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -27,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.wcpdoc.base.entity.Org;
 import com.wcpdoc.base.entity.User;
-import com.wcpdoc.base.entity.UserXlsx;
 import com.wcpdoc.base.service.OrgService;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.base.service.UserXlsxService;
@@ -378,39 +367,16 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/export")
 	@ResponseBody
-	public void export(String ids) {
-		ServletOutputStream outputStream = null;
+	public void export(Integer[] ids) {
 		try {
-			List<UserXlsx> userXlsx = userXlsxService.exportUserXlsx(ids);
-			try(FileOutputStream os = new FileOutputStream("D:/auser.xlsx")) {
-				Context context = new Context();
-				// 将列表参数放入context中
-				context.putVar("userXlsxList", userXlsx);
-				InputStream inputStream = this.getClass().getResourceAsStream("/res/userTemplate.xlsx");
-				JxlsHelper jxlsHelper = JxlsHelper.getInstance();
-				Transformer transformer = jxlsHelper.createTransformer(inputStream, os);
-				JexlExpressionEvaluator evaluator = (JexlExpressionEvaluator) transformer.getTransformationConfig()
-						.getExpressionEvaluator();
-				Map<String, Object> funcs = new HashMap<String, Object>();
-				evaluator.getJexlEngine().setFunctions(funcs);
-				jxlsHelper.processTemplate(context, transformer);
-			} catch (Exception e) {
-				throw new MyException("读取文件");
-			}
-			try(FileInputStream fileInputStream = new FileInputStream("D:/auser.xlsx")) {
-				String fileName = new String(("userTemplate.xlsx").getBytes("UTF-8"), "ISO-8859-1");
-				response.addHeader("Content-Disposition", "attachment;filename" + fileName);
-				response.setContentType("application/fprce-download");
-				outputStream = response.getOutputStream();
-				IOUtils.copy(fileInputStream, outputStream);
-			} catch (Exception e) {
-				throw new MyException("读取文件");
-			}
+	        userXlsxService.export(ids);
+		} catch (MyException e) {
+			log.error("导出用户表失败：", e.getMessage());
 		} catch (Exception e) {
-			log.error("用户列表错误：", e);
+			log.error("导出用户表失败：", e);
 		}
 	}
-
+	
 	/**
 	 * 导出模板
 	 * 
@@ -421,19 +387,10 @@ public class ApiUserController extends BaseController {
 	@RequestMapping("/template")
 	@ResponseBody
 	public void template() {
-		OutputStream output = null;
 		try {
-			// userXlsxService.templateUserXlsx();
-			InputStream inputStream = this.getClass().getResourceAsStream("/res/userExample.xlsx");
-			String fileName = new String(("userExample.xlsx").getBytes("UTF-8"), "ISO-8859-1");
-			response.addHeader("Content-Disposition", "attachment;filename" + fileName);
-			response.setContentType("application/fprce-download");
-			output = response.getOutputStream();
-			IOUtils.copy(inputStream, output);
+			userXlsxService.templateUserXlsx();
 		} catch (Exception e) {
 			log.error("用户导出模板下载附件失败：", e);
-		} finally {
-			IOUtils.closeQuietly(output);
 		}
 	}
 

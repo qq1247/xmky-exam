@@ -1,29 +1,21 @@
 package com.wcpdoc.base.service.impl;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.alibaba.excel.EasyExcel;
 import com.wcpdoc.base.entity.Org;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.entity.UserXlsx;
@@ -33,7 +25,7 @@ import com.wcpdoc.base.service.UserXlsxService;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
-import com.wcpdoc.core.util.EncryptUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 
 /**
  * 组织机构表格服务层实现
@@ -42,6 +34,7 @@ import com.wcpdoc.core.util.EncryptUtil;
  */
 @Service
 public class UserXlsxServiceImpl extends BaseServiceImp<Object> implements UserXlsxService {
+	private static final Logger log = LoggerFactory.getLogger(UserXlsxServiceImpl.class);
 	
 	@Resource
 	private OrgService orgService;
@@ -57,194 +50,82 @@ public class UserXlsxServiceImpl extends BaseServiceImp<Object> implements UserX
 
 	@Override
 	public void inputUserXlsx(MultipartFile file) {
-		// 解析Excel,读取内容,path Excel路径
-		// 文件路径 test.xlsx 文件在代码打包里面，给他这个excel放到C盘根目录下
-		String path = "E:\\auser.xlsx";
-		InputStream input = null;
-		if (path != null && path.length() > 7) {
-			// 判断文件是否是Excel(2003、2007)
-			String suffix = path.substring(path.lastIndexOf("."), path.length());
-			try {
-				input = file.getInputStream();
-			} catch (Exception e) {
-				throw new MyException("未找到指定的文件");
-			}
-			// Excel2003
-			if (".xls".equals(suffix)) {
-				POIFSFileSystem fileSystem = null;
-				// 工作簿
-				HSSFWorkbook workBook = null;
-				try {
-					fileSystem = new POIFSFileSystem(input);
-					workBook = new HSSFWorkbook(fileSystem);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				// 获取第一个工作簿
-				HSSFSheet sheet = workBook.getSheetAt(0);
-				getContent((Sheet) sheet);
-				// Excel2007
-			} else if (".xlsx".equals(suffix)) {
-				XSSFWorkbook workBook = null;
-				try {
-					workBook = new XSSFWorkbook(input);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				// 获取第一个工作簿
-				XSSFSheet sheet = workBook.getSheetAt(0);
-				getContent((Sheet) sheet);
-			}
-		} else {
-			System.out.println("非法的文件路径!");
-		}
-	}
-	
-
-	//获取Excel内容
-	@SuppressWarnings("deprecation")
-	public void getContent(Sheet sheet) {
-		// Excel数据总行数
-		int rowCount = sheet.getPhysicalNumberOfRows();
-		//判断模板是否正确
-		if(rowCount > 2){
-			Row row = sheet.getRow(1);
-			int cellCount = row.getPhysicalNumberOfCells();
-			for (int j = 0; j < cellCount; j++) {
-				Cell cell = row.getCell(j);
-				switch (j) {
-				case 0:
-					if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
-						if(!"用户昵称".equals(cell.getStringCellValue())){
-							throw new MyException("模板有误");
-						}
-					}
-					break;
-				case 1:
-					if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
-						if(!"用户登录名".equals(cell.getStringCellValue())){
-							throw new MyException("模板有误");
-						}
-					}
-					break;
-				case 2:
-					if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
-						if(!"用户所属机构".equals(cell.getStringCellValue())){
-							throw new MyException("模板有误");
-						}
-					}
-					break;
-				}
-			}
-		}
-		
-		// 遍历数据行，略过标题行，从第三行开始
-		for (int i = 2; i < rowCount; i++) {
-			Row row = sheet.getRow(i);
-			int cellCount = row.getPhysicalNumberOfCells();
-			// 遍历行单元格
-			Map<String, Object> map = new HashMap<String, Object>();
-			for (int j = 0; j < cellCount; j++) {
-				Cell cell = row.getCell(j);
-				switch (j) {
-				case 0:
-					// 根据cell中的类型来输出数据
-					if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
-						map.put("name", cell.getStringCellValue());
-					}
-					break;
-				case 1:
-					if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
-						map.put("loginName", cell.getStringCellValue());
-					}
-					break;
-				case 2:
-					if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
-						map.put("orgName", cell.getStringCellValue());
-					}
-					break;
-				}
-			}
-			addContent(map);
-		}
-	}
-	
-	//保存Excel内容
-	public void addContent(Map<String, Object> map) {
-		//map.get("name");		map.get("loginName");		map.get("orgName");
-		Org org = orgService.getOrg(map.get("orgName").toString());
-		User user = userService.getUser(map.get("loginName").toString());
-		if (user == null) {
-			Date date = new Date();
-			User entity = new User();
-			entity.setName(map.get("name").toString());
-			entity.setLoginName(map.get("loginName").toString());
-			entity.setPwd(EncryptUtil.md52Base64(map.get("loginName").toString() + "111111"));
-			entity.setRegistTime(date);
-			entity.setOrgId(org.getId());
-			entity.setUpdateTime(date);
-			entity.setUpdateUserId(getCurUser().getId());	
-			entity.setState(1);
-			userService.add(entity);
-			return;
-		}
-		if (user != null && org.getId() != user.getOrgId()) {
-			Date date = new Date();
-			User entity = new User();
-			entity.setName(map.get("name").toString());
-			entity.setLoginName(map.get("loginName").toString());
-			entity.setPwd(EncryptUtil.md52Base64(map.get("loginName").toString() + "111111"));
-			entity.setRegistTime(date);
-			entity.setOrgId(org.getId());
-			entity.setUpdateTime(date);
-			entity.setUpdateUserId(getCurUser().getId());	
-			entity.setState(1);
-			userService.add(entity);
-			return;
-		}
-		if (user != null && org.getId() == user.getOrgId()) {
-			if (map.get("name").toString().equals(user.getName()) ) {
-				return;
-			}
-			user.setName(map.get("name").toString());
-			user.setUpdateTime(new Date());
-			user.setUpdateUserId(getCurUser().getId());
-			userService.update(user);
-			return;
+	    // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
+	    // 参数一：读取的excel文件路径
+	    // 参数二：读取sheet的一行，将参数封装在DemoData实体类中
+	    // 参数三：读取每一行的时候会执行DemoDataListener监听器
+	    try {
+			EasyExcel.read(file.getInputStream(), UserXlsx.class, new UserXlsxDataListener()).sheet().doRead();
+		} catch (IOException e) {
+			log.error("导入用户错误：", e);
+			throw new MyException("导入用户错误");
 		}
 	}
 	
 	@Override
-	public List<UserXlsx> exportUserXlsx(String ids) {
-		List<UserXlsx> userXlsx = new ArrayList<UserXlsx>();
-		
-		String[] split = ids.split(",");
-		for(String idString : split){
-			User user = userService.getEntity(Integer.parseInt(idString));
-			Org org = orgService.getEntity(user.getOrgId().intValue());
-			userXlsx.add( new UserXlsx(user.getName(), user.getLoginName(), org.getName()));
+	public void export(Integer[] ids) {
+		// 校验数据有效性
+		if (!ValidateUtil.isValid(ids)) {
+			throw new MyException("参数错误：ids");
 		}
-		return userXlsx;
+		
+		try {
+	        // 这里注意 有同学反应使用swagger 会导致各种问题，请直接用浏览器或者用postman
+	        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+	        response.setCharacterEncoding("utf-8");
+	        // 这里URLEncoder.encode可以防止中文乱码 当然和easyexcel没有关系
+	        String fileName = URLEncoder.encode("用户表", "UTF-8").replaceAll("\\+", "%20");
+	        response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+	        
+	        // 这里 需要指定写用哪个class去读，然后写到第一个sheet，名字为模板 然后文件流会自动关闭
+	        // 如果这里想使用03 则 传入excelType参数即可
+	        // 参数一：写入excel文件路径
+	        // 参数二：写入的数据类型是DemoData
+	        // data()方法是写入的数据，结果是List<DemoData>集合
+			EasyExcel.write(response.getOutputStream(), UserXlsx.class).sheet("用户表").doWrite(userXlsxExport(ids));
+		} catch (IOException e) {
+			log.error("导出用户错误：", e);
+			throw new MyException("导出用户错误");
+		}
 	}
-
+	
+	private List<UserXlsx> userXlsxExport(Integer[] ids) {
+		List<UserXlsx> list = new ArrayList<UserXlsx>();
+		for(Integer id : ids){
+			User user = userService.getEntity(id);
+			if (user == null) {
+				throw new MyException("参数错误：ids");
+			}
+			Org org = orgService.getEntity(user.getOrgId().intValue());
+			if (org == null) {
+				throw new MyException("参数错误：ids");
+			}
+			
+			UserXlsx userXlsx = new UserXlsx();
+			userXlsx.setName(user.getName());
+			userXlsx.setLoginName(user.getLoginName());
+			userXlsx.setOrgName(org.getName());
+			userXlsx.setEmail(user.getEmail());
+			userXlsx.setPhone(user.getPhone());
+            list.add(userXlsx);
+        }
+        return list;
+    }
+	
 	@Override
 	public void templateUserXlsx() {
-        //浏览器下载
-        //指定数据生成后的文件输入流（将上述out的路径作为文件的输入流）
-		try(FileInputStream fileInputStream = new FileInputStream("target/classes/res/userExample.xlsx")) {
-            //导出excel文件，设置文件名
-            String filename = URLEncoder.encode("用户信息表模板.xlsx", "UTF-8");
-            //设置下载头
-            response.setHeader("Content-Disposition", "attachment;filename=" + filename);
-            ServletOutputStream outputStream = response.getOutputStream();
-            //将文件写入浏览器
-            byte[] bys = new byte[fileInputStream.available()];
-            fileInputStream.read(bys);
-            outputStream.write(bys);
-            outputStream.flush();
-            outputStream.close();
+		ServletOutputStream outputStream = null;
+		try {
+			InputStream inputStream = this.getClass().getResourceAsStream("/res/userExample.xlsx");
+			response.setContentType("application/x-download");
+			String filename = URLEncoder.encode("userExample.xlsx", "UTF-8").replaceAll("\\+", "%20");
+			response.setHeader("Content-Disposition", "attachment;filename=" + filename);
+			outputStream = response.getOutputStream();
+			IOUtils.copy(inputStream, outputStream);
 		} catch (Exception e) {
 			throw new MyException("读取文件错误");
+		} finally {
+			IOUtils.closeQuietly(outputStream);
 		}
 	}
 }

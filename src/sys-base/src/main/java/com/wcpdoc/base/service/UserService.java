@@ -101,5 +101,4 @@ public interface UserService extends BaseService<User> {
 	 * @return List<User>
 	 */
 	List<User> getList(Integer[] ids);
-
 }
