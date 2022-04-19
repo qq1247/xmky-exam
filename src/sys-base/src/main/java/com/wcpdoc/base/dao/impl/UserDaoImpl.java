@@ -33,10 +33,10 @@ public class UserDaoImpl extends RBaseDaoImpl<User> implements UserDao {
 				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID ";
 				
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "USER.NAME LIKE ? OR ORG.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")), String.format("%%%s%%", pageIn.get("name")))
-				.addWhere(ValidateUtil.isValid(pageIn.get("orgName")), "ORG.NAME LIKE ?", String.format("%%%s%%", pageIn.get("orgName")))
-				.addWhere(ValidateUtil.isValid(pageIn.get("type")), "USER.TYPE = ?", pageIn.get("type", Integer.class))
-				.addWhere("USER.STATE != ?", 0)
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "USER.NAME LIKE :USER.NAME OR ORG.NAME LIKE :ORG.NAME", String.format("%%%s%%", pageIn.get("name")), String.format("%%%s%%", pageIn.get("name")))
+				.addWhere(ValidateUtil.isValid(pageIn.get("orgName")), "ORG.NAME LIKE ORG.NAME1", String.format("%%%s%%", pageIn.get("orgName")))
+				.addWhere(ValidateUtil.isValid(pageIn.get("type")), "USER.TYPE = :USER.TYPE", pageIn.get("type", Integer.class))
+				.addWhere("USER.STATE != 0")
 				.addOrder("USER.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(), "registTime", DateUtil.FORMAT_DATE_TIME, "lastLoginTime", DateUtil.FORMAT_DATE_TIME);
@@ -45,24 +45,24 @@ public class UserDaoImpl extends RBaseDaoImpl<User> implements UserDao {
 
 	@Override
 	public User getUser(String loginName) {
-		String sql = "SELECT * FROM SYS_USER WHERE LOGIN_NAME = ? AND STATE = 1";
+		String sql = "SELECT * FROM SYS_USER WHERE LOGIN_NAME = :LOGIN_NAME AND STATE = 1";
 		return getEntity(sql, new Object[] { loginName });
 	}
 
 	@Override
 	public boolean existLoginName(String loginName, Integer excludeId) {
 		if (excludeId == null) {
-			String sql = "SELECT COUNT(*) AS NUM FROM SYS_USER WHERE LOGIN_NAME = ? AND STATE = 1";
+			String sql = "SELECT COUNT(*) AS NUM FROM SYS_USER WHERE LOGIN_NAME = :LOGIN_NAME AND STATE = 1";
 			return getCount(sql, new Object[] { loginName}) > 0;
 		}
 		
-		String sql = "SELECT COUNT(*) AS NUM FROM SYS_USER WHERE LOGIN_NAME = ? AND STATE = 1 AND ID != ?";
+		String sql = "SELECT COUNT(*) AS NUM FROM SYS_USER WHERE LOGIN_NAME = :LOGIN_NAME AND STATE = 1 AND ID != ?";
 		return getCount(sql, new Object[] { loginName, excludeId }) > 0;
 	}
 
 	@Override
 	public List<User> getList(Integer orgId) {
-		String sql = "SELECT * FROM SYS_USER WHERE ORG_ID = ? AND STATE = 1";
+		String sql = "SELECT * FROM SYS_USER WHERE ORG_ID = :ORG_ID AND STATE = 1";
 		return getList(sql, new Object[] { orgId });
 	}
 

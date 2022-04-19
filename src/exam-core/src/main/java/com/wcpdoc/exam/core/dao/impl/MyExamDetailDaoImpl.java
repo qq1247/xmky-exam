@@ -26,7 +26,7 @@ public class MyExamDetailDaoImpl extends RBaseDaoImpl<MyExamDetail> implements M
 
 	@Override
 	public List<MyExamDetail> getList(Integer examId, Integer userId) {
-		String sql = "SELECT * FROM EXM_MY_EXAM_DETAIL WHERE EXAM_ID = ? AND USER_ID = ?";
+		String sql = "SELECT * FROM EXM_MY_EXAM_DETAIL WHERE EXAM_ID = :EXAM_ID AND USER_ID = :USER_ID";
 		return getList(sql, new Object[] { examId, userId }, MyExamDetail.class);
 	}
 
@@ -39,19 +39,19 @@ public class MyExamDetailDaoImpl extends RBaseDaoImpl<MyExamDetail> implements M
 				+ "FROM EXM_MY_EXAM_DETAIL MY_EXAM_DETAIL "
 				+ "LEFT JOIN EXM_QUESTION QUESTION ON MY_EXAM_DETAIL.QUESTION_ID = QUESTION.ID "
 				+ "LEFT JOIN SYS_USER MARK_USER ON MY_EXAM_DETAIL.MARK_USER_ID = MARK_USER.ID "
-				+" WHERE MY_EXAM_DETAIL.EXAM_ID = ? AND MY_EXAM_DETAIL.USER_ID = ? ";
+				+" WHERE MY_EXAM_DETAIL.EXAM_ID = :MY_EXAM_DETAIL.EXAM_ID AND MY_EXAM_DETAIL.USER_ID = :MY_EXAM_DETAIL.USER_ID";
 		return getMapList(sql, new Object[] { examId, userId });
 	}
 
 	@Override
 	public MyExamDetail getEntity(Integer examId, Integer userId, Integer questionId) {
-		String sql = "SELECT * FROM EXM_MY_EXAM_DETAIL WHERE EXAM_ID = ? AND USER_ID = ? AND QUESTION_ID = ?";
+		String sql = "SELECT * FROM EXM_MY_EXAM_DETAIL WHERE EXAM_ID = :EXAM_ID AND USER_ID = :USER_ID AND QUESTION_ID = :QUESTION_ID";
 		return getEntity(sql, new Object[] { examId, userId, questionId });
 	}
 
 	@Override
 	public void del(Integer examId, Integer userId) {
-		String sql = "DELETE FROM EXM_MY_EXAM_DETAIL WHERE EXAM_ID = ? AND USER_ID = ?";
+		String sql = "DELETE FROM EXM_MY_EXAM_DETAIL WHERE EXAM_ID = :EXAM_ID AND USER_ID = :USER_ID";
 		update(sql, new Object[] { examId, userId });
 	}
 }

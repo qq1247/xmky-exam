@@ -34,15 +34,15 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 				+ "INNER JOIN EXM_PAPER PAPER ON EXAM.PAPER_ID = PAPER.ID "
 				+ "INNER JOIN SYS_USER USER ON MY_MARK.MARK_USER_ID = USER.ID";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examName")), "EXAM.NAME LIKE ?", "%" + pageIn.get("examName") + "%")
-				.addWhere(pageIn.get("curUserId", Integer.class) != null, "MY_MARK.MARK_USER_ID =  ?", pageIn.get("curUserId", Integer.class))
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examName")), "EXAM.NAME LIKE :EXAM.NAME", "%" + pageIn.get("examName") + "%")
+				.addWhere(pageIn.get("curUserId", Integer.class) != null, "MY_MARK.MARK_USER_ID = :MY_MARK.MARK_USER_ID", pageIn.get("curUserId", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("startTime")) && ValidateUtil.isValid(pageIn.get("endTime")), 
-						"((EXAM.MARK_START_TIME <= ? AND ? >= EXAM.MARK_END_TIME) OR (EXAM.MARK_START_TIME <= ? AND ? >= EXAM.MARK_END_TIME) OR (EXAM.MARK_START_TIME >= ? AND EXAM.MARK_END_TIME >= ?))",
+						"((EXAM.MARK_START_TIME <= :EXAM.MARK_START_TIME AND :EXAM.MARK_END_TIME >= EXAM.MARK_END_TIME) OR (EXAM.MARK_START_TIME <= :EXAM.MARK_START_TIME AND :EXAM.MARK_END_TIME >= EXAM.MARK_END_TIME) OR (EXAM.MARK_START_TIME >= :EXAM.MARK_START_TIME AND EXAM.MARK_END_TIME >= :EXAM.MARK_END_TIME))",
 						pageIn.get("startTime"), pageIn.get("startTime"),
 						pageIn.get("endTime"), pageIn.get("endTime"),
 						pageIn.get("startTime"), pageIn.get("endTime"))
-				.addWhere("PAPER.STATE = ?", 1)
-				.addWhere("EXAM.STATE = ?", 1)
+				.addWhere("PAPER.STATE = :PAPER.STATE", 1)
+				.addWhere("EXAM.STATE = :EXAM.STATE", 1)
 				.addOrder("MY_MARK.ID", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(), 
@@ -57,7 +57,7 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 
 	@Override
 	public List<MyMark> getList(Integer examId) {
-		String sql = "SELECT * FROM EXM_MY_MARK WHERE EXAM_ID = ?";
+		String sql = "SELECT * FROM EXM_MY_MARK WHERE EXAM_ID = :EXAM_ID";
 		return getList(sql, new Object[] { examId }, MyMark.class);
 	}
 }

@@ -33,8 +33,8 @@ public class PaperTypeDaoImpl extends RBaseDaoImpl<PaperType> implements PaperTy
 				+ "FROM EXM_PAPER_TYPE PAPER_TYPE "
 				+ "INNER JOIN SYS_USER USER ON PAPER_TYPE.CREATE_USER_ID = USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "PAPER_TYPE.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
-				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "PAPER_TYPE.READ_USER_IDS LIKE ?", String.format("%%%s%%", pageIn.get("curUserId", Integer.class)))
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "PAPER_TYPE.NAME LIKE :PAPER_TYPE.NAME", String.format("%%%s%%", pageIn.get("name")))
+				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "PAPER_TYPE.READ_USER_IDS LIKE :PAPER_TYPE.READ_USER_IDS", String.format("%%%s%%", pageIn.get("curUserId", Integer.class)))
 				.addWhere("PAPER_TYPE.STATE = 1")
 				.addOrder("PAPER_TYPE.UPDATE_TIME", Order.DESC);
 		return getListpage(sqlUtil, pageIn);
@@ -42,7 +42,7 @@ public class PaperTypeDaoImpl extends RBaseDaoImpl<PaperType> implements PaperTy
 
 	@Override
 	public List<PaperType> getList(Integer parentId) {
-		String sql = "SELECT * FROM EXM_PAPER_TYPE WHERE STATE = 1 AND PARENT_ID = ?";
+		String sql = "SELECT * FROM EXM_PAPER_TYPE WHERE STATE = 1 AND PARENT_ID = :PARENT_ID";
 		return getList(sql, new Object[] { parentId });
 	}
 }

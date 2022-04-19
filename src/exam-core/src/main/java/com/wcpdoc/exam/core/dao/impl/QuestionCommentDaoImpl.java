@@ -31,9 +31,9 @@ public class QuestionCommentDaoImpl extends RBaseDaoImpl<QuestionComment> implem
 				+ "FROM EXM_QUESTION_COMMENT QUESTION_COMMENT "
 				+ "LEFT JOIN SYS_USER USER ON USER.ID = QUESTION_COMMENT.CREATE_USER_ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("content")), "QUESTION_COMMENT.CONTENT LIKE ?", "%" + pageIn.get("content") + "%")
-				.addWhere(pageIn.get("questionId", Integer.class) != null, "QUESTION_COMMENT.QUESTION_ID = ?", pageIn.get("questionId", Integer.class))
-				.addWhere(pageIn.get("parentId", Integer.class) != null, "QUESTION_COMMENT.PARENT_ID = ?", pageIn.get("parentId", Integer.class))
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("content")), "QUESTION_COMMENT.CONTENT LIKE :QUESTION_COMMENT.CONTENT", "%" + pageIn.get("content") + "%")
+				.addWhere(pageIn.get("questionId", Integer.class) != null, "QUESTION_COMMENT.QUESTION_ID = :QUESTION_COMMENT.QUESTION_ID", pageIn.get("questionId", Integer.class))
+				.addWhere(pageIn.get("parentId", Integer.class) != null, "QUESTION_COMMENT.PARENT_ID = :QUESTION_COMMENT.PARENT_ID", pageIn.get("parentId", Integer.class))
 				.addWhere(pageIn.get("parentId", Integer.class) == null, "QUESTION_COMMENT.PARENT_ID = 0" )
 				.addWhere("QUESTION_COMMENT.STATE = 1")
 				.addOrder("QUESTION_COMMENT.CREATE_TIME", Order.DESC);
@@ -48,7 +48,7 @@ public class QuestionCommentDaoImpl extends RBaseDaoImpl<QuestionComment> implem
 				   + "(SELECT USER.NAME FROM SYS_USER USER WHERE USER.ID = PARENT_QUESTION_COMMENT.CREATE_USER_ID) AS CREATE_USER_NAME, "
 				   + "PARENT_QUESTION_COMMENT.CREATE_TIME AS CREATE_TIME "
 				   + "FROM EXM_QUESTION_COMMENT PARENT_QUESTION_COMMENT WHERE "
-				   + "PARENT_QUESTION_COMMENT.PARENT_ID = ? AND PARENT_QUESTION_COMMENT.STATE = 1 ";
+				   + "PARENT_QUESTION_COMMENT.PARENT_ID = :PARENT_QUESTION_COMMENT.PARENT_ID AND PARENT_QUESTION_COMMENT.STATE = 1 ";
 		return getMapList(sql, new Object[] { parentId });
 	}	
 }

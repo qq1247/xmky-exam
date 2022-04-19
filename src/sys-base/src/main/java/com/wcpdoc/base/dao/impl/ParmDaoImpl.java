@@ -27,7 +27,7 @@ public class ParmDaoImpl extends RBaseDaoImpl<Parm> implements ParmDao {
 		String sql = "SELECT * "
 				+ "FROM SYS_PARM PARM";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(pageIn.get("orgName") != null, "PARM.ORG_NAME LIKE ?", "%" + pageIn.get("orgName") + "%")
+		sqlUtil.addWhere(pageIn.get("orgName") != null, "PARM.ORG_NAME LIKE :PARM.ORG_NAME", "%" + pageIn.get("orgName") + "%")
 			   .addOrder("PARM.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(), "UPDATE_TIME", DateUtil.FORMAT_DATE_TIME);

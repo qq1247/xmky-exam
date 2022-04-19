@@ -42,18 +42,18 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 				+ "LEFT JOIN SYS_USER MARK_USER ON MY_EXAM.MARK_USER_ID = MARK_USER.ID ";// 阅卷用户不一定有
 		
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examName")), "EXAM.NAME LIKE ?", "%" + pageIn.get("examName") + "%")
-				.addWhere(pageIn.get("curUserId", Integer.class) != null, "MY_EXAM.USER_ID =  ?", pageIn.get("curUserId", Integer.class))
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examName")), "EXAM.NAME LIKE :EXAM.NAME", "%" + pageIn.get("examName") + "%")
+				.addWhere(pageIn.get("curUserId", Integer.class) != null, "MY_EXAM.USER_ID = :MY_EXAM.USER_ID", pageIn.get("curUserId", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("startTime")) && ValidateUtil.isValid(pageIn.get("endTime")), 
-						"((EXAM.START_TIME <= ? AND ? >= EXAM.END_TIME) OR (EXAM.START_TIME <= ? AND ? >= EXAM.END_TIME) OR (EXAM.START_TIME >= ? AND EXAM.END_TIME >= ?))", 
+						"((EXAM.START_TIME <= :EXAM.START_TIME AND :EXAM.END_TIME >= EXAM.END_TIME) OR (EXAM.START_TIME <= :EXAM.START_TIME AND :EXAM.END_TIME >= EXAM.END_TIME) OR (EXAM.START_TIME >= :EXAM.START_TIME AND EXAM.END_TIME >= :EXAM.END_TIME))", 
 						pageIn.get("startTime"), pageIn.get("startTime"),
 						pageIn.get("endTime"), pageIn.get("endTime"),
 						pageIn.get("startTime"), pageIn.get("endTime")
 						)
-				.addWhere("PAPER.STATE = ?", 1)
-				.addWhere("EXAM.STATE = ?", 1)
-//				.addWhere("PAPER.STATE = ?", 1)//删除了试卷也能查看
-//				.addWhere("USER.STATE = ?", 1)
+				.addWhere("PAPER.STATE = 1")
+				.addWhere("EXAM.STATE = 1")
+//				.addWhere("PAPER.STATE = 1")//删除了试卷也能查看
+//				.addWhere("USER.STATE = 1")
 				.addOrder("EXAM.START_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(), 
@@ -68,25 +68,25 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 
 	@Override
 	public void del(Integer roomId, Integer userId) {
-		String sql = "DELETE FROM EXM_MY_EXAM WHERE EXAM_ID = ? AND USER_ID = ?";
+		String sql = "DELETE FROM EXM_MY_EXAM WHERE EXAM_ID = :EXAM_ID AND USER_ID = :USER_ID";
 		update(sql, new Object[]{roomId, userId});
 	}
 
 	@Override
 	public List<MyExam> getList(Integer examId) {
-		String sql = "SELECT * FROM EXM_MY_EXAM WHERE EXAM_ID = ?";
+		String sql = "SELECT * FROM EXM_MY_EXAM WHERE EXAM_ID = :EXAM_ID";
 		return getList(sql, new Object[] { examId }, MyExam.class);
 	}
 
 	@Override
 	public MyExam getEntity(Integer examId, Integer userId) {
-		String sql = "SELECT * FROM EXM_MY_EXAM WHERE EXAM_ID = ? AND USER_ID = ? ";
+		String sql = "SELECT * FROM EXM_MY_EXAM WHERE EXAM_ID = :EXAM_ID AND USER_ID = :USER_ID";
 		return getEntity(sql, new Object[] { examId, userId });
 	}
 	
 	@Override
 	public List<MyExam> kalendar(Integer userId, Date startTime, Date endTime) {
-		String sql = "SELECT * FROM EXM_MY_EXAM WHERE USER_ID = ? AND ANSWER_TIME >= ? AND ANSWER_TIME <= ? ";
+		String sql = "SELECT * FROM EXM_MY_EXAM WHERE USER_ID = :USER_ID AND ANSWER_TIME >= :ANSWER_TIME AND ANSWER_TIME <= :ANSWER_TIME";
  		return getList(sql, new Object[] { userId, startTime, endTime });
 	}
 
@@ -97,7 +97,7 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 				+ "INNER JOIN EXM_EXAM EXAM ON MY_EXAM.EXAM_ID = EXAM.ID "
 				+ "INNER JOIN SYS_USER USER ON MY_EXAM.USER_ID = USER.ID";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(pageIn.get("examId", Integer.class) != null, "EXAM.ID = ?", pageIn.get("examId", Integer.class))
+		sqlUtil.addWhere(pageIn.get("examId", Integer.class) != null, "EXAM.ID = :EXAM.ID", pageIn.get("examId", Integer.class))
 				.addOrder("MY_EXAM.TOTAL_SCORE", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		return pageOut;
@@ -108,7 +108,7 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 		String sql = "SELECT USER.ID, USER.NAME AS NAME, ORG.NAME AS ORG_NAME "
 				+ "FROM SYS_USER USER "
 				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
-				+ "WHERE EXISTS (SELECT 1 FROM EXM_MY_EXAM Z WHERE Z.EXAM_ID = ? AND Z.USER_ID = USER.ID) "//回显的情况下，用户状态!=1的也查询
+				+ "WHERE EXISTS (SELECT 1 FROM EXM_MY_EXAM Z WHERE Z.EXAM_ID = :Z.EXAM_ID AND Z.USER_ID = USER.ID) "//回显的情况下，用户状态!=1的也查询
 				+ "ORDER BY USER.UPDATE_TIME DESC ";
 		return getMapList(sql, new Object[]{examId});
 	}

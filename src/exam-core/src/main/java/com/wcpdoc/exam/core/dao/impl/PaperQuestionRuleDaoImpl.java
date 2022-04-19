@@ -34,10 +34,10 @@ public class PaperQuestionRuleDaoImpl extends RBaseDaoImpl<PaperQuestionRule> im
 	public List<PaperQuestionRule> getChapterList(Integer paperId, Integer paperQuestionId) {
 		String sql = "SELECT *  FROM EXM_PAPER_QUESTION_RULE PAPER_QUESTION_RULE ";
 		if (!ValidateUtil.isValid(paperQuestionId)) {
-			sql += "WHERE PAPER_QUESTION_RULE.PAPER_ID = ? ORDER BY NO ASC ";
+			sql += "WHERE PAPER_QUESTION_RULE.PAPER_ID = :PAPER_QUESTION_RULE.PAPER_ID ORDER BY NO ASC ";
 			return getList(sql, new Object[]{ paperId });
 		}
-		sql += "WHERE PAPER_QUESTION_RULE.PAPER_ID = ? AND PAPER_QUESTION_RULE.PAPER_QUESTION_ID = ? ORDER BY NO ASC ";
+		sql += "WHERE PAPER_QUESTION_RULE.PAPER_ID = :PAPER_QUESTION_RULE.PAPER_ID AND PAPER_QUESTION_RULE.PAPER_QUESTION_ID = :PAPER_QUESTION_RULE.PAPER_QUESTION_ID ORDER BY NO ASC ";
 		return getList(sql, new Object[]{ paperId, paperQuestionId });
 	}
 	
@@ -45,7 +45,7 @@ public class PaperQuestionRuleDaoImpl extends RBaseDaoImpl<PaperQuestionRule> im
 	public List<Question> getQuestionList(Integer questionTypeId) {
 		String sql = "SELECT QUESTION.ID, QUESTION.TYPE, QUESTION.DIFFICULTY, QUESTION.AI "
 				+ "FROM EXM_QUESTION QUESTION "
-				+ "WHERE QUESTION.QUESTION_TYPE_ID = ? AND QUESTION.STATE = 1 ";
+				+ "WHERE QUESTION.QUESTION_TYPE_ID = :QUESTION.QUESTION_TYPE_ID AND QUESTION.STATE = 1 ";
 		List<Map<String, Object>> questionMapList = getMapList(sql, new Object[] { questionTypeId });
 		List<Question> questionList = new ArrayList<Question>();
 		for(Map<String, Object> questionMap : questionMapList){

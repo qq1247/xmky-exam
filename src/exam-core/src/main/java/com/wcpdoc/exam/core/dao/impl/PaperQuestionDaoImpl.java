@@ -28,40 +28,40 @@ public class PaperQuestionDaoImpl extends RBaseDaoImpl<PaperQuestion> implements
 	public List<PaperQuestion> getQuestionList(Integer parentId, Integer examId, Integer userId) {
 		String sql = "SELECT * FROM EXM_PAPER_QUESTION ";
 		if (examId != null) {
-			sql += "WHERE PARENT_ID = ? AND EXAM_ID = ? AND USER_ID = ? AND TYPE != 1 ORDER BY NO ASC";
+			sql += "WHERE PARENT_ID = :PARENT_ID AND EXAM_ID = :EXAM_ID AND USER_ID = :USER_ID AND TYPE != 1 ORDER BY NO ASC";
 			return getList(sql, new Object[]{parentId, examId, userId}, PaperQuestion.class);
 		}
-		sql += "WHERE PARENT_ID = ? AND TYPE != 1 ORDER BY NO ASC";
+		sql += "WHERE PARENT_ID = :PARENT_ID AND TYPE != 1 ORDER BY NO ASC";
 		return getList(sql, new Object[]{parentId}, PaperQuestion.class);
 	}
 
 	@Override
 	public List<PaperQuestion> getList(Integer paperId) {
-		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = ?";
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = :PAPER_ID";
 		return getList(sql, new Object[]{paperId}, PaperQuestion.class);
 	}
 	
 	@Override
 	public List<PaperQuestion> getChapterList(Integer paperId) {
-		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = ? AND TYPE = 1 ORDER BY NO ASC";
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = :PAPER_ID AND TYPE = 1 ORDER BY NO ASC";
 		return getList(sql, new Object[]{paperId}, PaperQuestion.class);
 	}
 
 	@Override
 	public PaperQuestion getEntity(Integer paperId, Integer questionId) {
-		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = ? AND QUESTION_ID = ?";
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = :PAPER_ID AND QUESTION_ID = :QUESTION_ID";
 		return getEntity(sql, new Object[]{paperId, questionId}, PaperQuestion.class);
 	}
 	
 	@Override
 	public PaperQuestion getEntity(Integer examId, Integer paperId, Integer questionId, Integer userId) {
-		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE EXAM_ID = ? AND PAPER_ID = ? AND QUESTION_ID = ? AND USER_ID = ?";
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE EXAM_ID = :EXAM_ID AND PAPER_ID = :PAPER_ID AND QUESTION_ID = :QUESTION_ID AND USER_ID = :USER_ID";
 		return getEntity(sql, new Object[]{examId, paperId, questionId, userId}, PaperQuestion.class);
 	}
 	
 	@Override
 	public void del(Integer examId, Integer userId) {
-		String sql = "DELETE FROM EXM_PAPER_QUESTION WHERE TYPE != 1 AND EXAM_ID = ? AND USER_ID = ? ";
+		String sql = "DELETE FROM EXM_PAPER_QUESTION WHERE TYPE != 1 AND EXAM_ID = :EXAM_ID AND USER_ID = :USER_ID ";
 		update(sql, new Object[] { examId, userId });
 	}
 
@@ -70,7 +70,7 @@ public class PaperQuestionDaoImpl extends RBaseDaoImpl<PaperQuestion> implements
 		String sql = "SELECT QUESTION.* " //ID, QUESTION.TYPE, QUESTION.DIFFICULTY, QUESTION.TITLE, QUESTION.ANALYSIS, QUESTION.AI, QUESTION.AI_OPTIONS, QUESTION.SCORE
 				+ "FROM EXM_PAPER_QUESTION PAPER_QUESTION "
 				+ "INNER JOIN EXM_QUESTION QUESTION ON PAPER_QUESTION.QUESTION_ID = QUESTION.ID "
-				+ "WHERE PAPER_QUESTION.TYPE != 1 AND PAPER_QUESTION.EXAM_ID = ? AND PAPER_QUESTION.PAPER_ID = ? ";
+				+ "WHERE PAPER_QUESTION.TYPE != 1 AND PAPER_QUESTION.EXAM_ID = :PAPER_QUESTION.EXAM_ID AND PAPER_QUESTION.PAPER_ID = :PAPER_QUESTION.PAPER_ID";
 		return getList(sql, new Object[]{ examId, paperId }, Question.class);
 	}
 	
@@ -78,13 +78,13 @@ public class PaperQuestionDaoImpl extends RBaseDaoImpl<PaperQuestion> implements
 	public List<PaperQuestion> getPaperQuestionList(Integer examId, Integer paperId) {
 		String sql = "SELECT PAPER_QUESTION.* "
 				+ "FROM EXM_PAPER_QUESTION PAPER_QUESTION "
-				+ "WHERE PAPER_QUESTION.TYPE != 1 AND PAPER_QUESTION.EXAM_ID = ? AND PAPER_QUESTION.PAPER_ID = ? ";
+				+ "WHERE PAPER_QUESTION.TYPE != 1 AND PAPER_QUESTION.EXAM_ID = :PAPER_QUESTION.EXAM_ID AND PAPER_QUESTION.PAPER_ID = :PAPER_QUESTION.PAPER_ID";
 		return getList(sql, new Object[]{ examId, paperId }, PaperQuestion.class);
 	}
 
 	@Override
 	public List<PaperQuestion> getPaperQuestionList(Integer questionId) {
-		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE QUESTION_ID = ?";
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE QUESTION_ID = :QUESTION_ID";
 		return getList(sql, new Object[]{ questionId }, PaperQuestion.class);
 	}
 }
