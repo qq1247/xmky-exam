@@ -10,6 +10,14 @@ import java.util.regex.Pattern;
 
 import com.wcpdoc.core.exception.MyException;
 
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SelectExpressionItem;
+import net.sf.jsqlparser.statement.select.SelectItem;
+
 /**
  * sql工具类
  * 
@@ -18,14 +26,20 @@ import com.wcpdoc.core.exception.MyException;
 public class SqlUtil {
 	public static final Pattern NAMED_PARM_PATTERN = Pattern.compile(":[A-Za-z0-9_.]+");
 	
-	private StringBuilder from = null;
+	private StringBuilder from = new StringBuilder();
 	private StringBuilder where = new StringBuilder();
 	private StringBuilder order = new StringBuilder();
 	private List<Object> fromParmList = new ArrayList<>();
 	private List<Object> whereParmList = new ArrayList<>();
+	
+	private static final SelectExpressionItem COLUMN = new SelectExpressionItem(new Column("COUNT(*)"));// 全局唯一
+	private static final List<SelectItem> COLUMN_LIST = new ArrayList<>();
+	static {
+		COLUMN_LIST.add(COLUMN);
+	}
 
 	public SqlUtil(String from) {
-		this.from = new StringBuilder(from);
+		this.from.append(from);
 	}
 	
 	/**
@@ -145,8 +159,17 @@ public class SqlUtil {
 	 */
 	public String getCountSql() {
 		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT COUNT(*) FROM ( ").append(from).append(where).append(" ) C");
-		return sql.toString();
+		sql.append(from).append(where);
+		
+		Select select;
+		try {
+			select = (Select) CCJSqlParserUtil.parse(sql.toString());
+		} catch (JSQLParserException e) {
+			throw new MyException(e);
+		}
+		PlainSelect plainSelect = (PlainSelect) select.getSelectBody();
+		plainSelect.setSelectItems(COLUMN_LIST);
+		return select.toString();
 	}
 
 	/**

@@ -486,18 +486,18 @@ public class ApiExamController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2022年4月17日下午6:52:08
 	 * @param id 考试ID
-	 * @param timeState 时间状态：1：考试开始时间；2：考试结束时间；3：阅卷开始时间；4：阅卷结束时间
+	 * @param timeType 时间类型：1：考试开始时间；2：考试结束时间；3：阅卷开始时间；4：阅卷结束时间
 	 * @param minute 分钟数
 	 * @return PageResult
 	 */
 	@RequestMapping("/time")
 	@ResponseBody
-	public PageResult time(Integer id, Integer timeState, Integer minute) {
+	public PageResult time(Integer id, Integer timeType, Integer minute) {
 		try {
 			if (!AutoMarkCache.tryWriteLock(id, 2000)) {
 				throw new MyException("尝试加写锁失败");
 			}
-			examService.timeUpdate(id, timeState, minute);
+			examService.timeUpdate(id, timeType, minute);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("变更考试时间错误：{}", e.getMessage());
