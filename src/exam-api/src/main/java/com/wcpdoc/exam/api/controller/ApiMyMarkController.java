@@ -25,6 +25,7 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.exam.core.cache.AutoMarkCache;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyMark;
@@ -96,6 +97,9 @@ public class ApiMyMarkController extends BaseController {
 	@ResponseBody
 	public PageResult score(Integer examId, Integer userId, Integer questionId, BigDecimal score) {
 		try {
+			if (!AutoMarkCache.tryReadLock(examId, 2000)) {
+				throw new MyException("尝试加读锁失败");
+			}
 			myMarkService.scoreUpdate(examId, userId, questionId, score);
 			return PageResult.ok();
 		} catch (MyException e) {
@@ -104,11 +108,13 @@ public class ApiMyMarkController extends BaseController {
 		} catch (Exception e) {
 			log.error("阅卷错误：", e);
 			return PageResult.err();
+		} finally {
+			AutoMarkCache.releaseReadLock(examId);
 		}
 	}
 	
 	/**
-	 * 阅卷
+	 * 交卷
 	 * 
 	 * v1.0 zhanghc 2017年6月26日下午12:30:20
 	 * @param examId
@@ -118,6 +124,9 @@ public class ApiMyMarkController extends BaseController {
 	@ResponseBody
 	public PageResult finish(Integer examId, Integer userId) {
 		try {
+			if (!AutoMarkCache.tryReadLock(examId, 2000)) {
+				throw new MyException("尝试加读锁失败");
+			}
 			myMarkService.finish(examId, userId);
 			return PageResult.ok();
 		} catch (MyException e) {
@@ -126,6 +135,8 @@ public class ApiMyMarkController extends BaseController {
 		} catch (Exception e) {
 			log.error("完成阅卷错误：", e);
 			return PageResult.err();
+		} finally {
+			AutoMarkCache.releaseReadLock(examId);
 		}
 	}
 	

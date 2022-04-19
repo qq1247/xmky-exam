@@ -63,7 +63,7 @@ public class PageIn {
 	}
 
 	public PageIn setPageSize(int pageSize) {
-		this.pageSize = pageSize == 1000 ? 1000 : pageSize > 100 ? 100 : pageSize;
+		this.pageSize = pageSize > 100 ? 100 : pageSize;
 		return this;
 	}
 
