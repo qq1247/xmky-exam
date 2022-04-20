@@ -52,16 +52,13 @@ public class OrgXlsxDataListener extends AnalysisEventListener<OrgXlsx> {
      */
     @Override
     public void doAfterAllAnalysed(AnalysisContext context) {
-    	list.forEach(orgXlsx->{
-    		if (!ValidateUtil.isValid(orgXlsx.getName()) || !ValidateUtil.isValid(orgXlsx.getParentName()) || !ValidateUtil.isValid(orgXlsx.getNo())) {
-				return;
-			}
-    		Org orgOld = orgService.getOrg(orgXlsx.getName());
-    		Org parentOrg = orgService.getOrg(orgXlsx.getParentName());
+        for(OrgXlsx orgXlsxs : list){
+    		Org orgOld = orgService.getOrg(orgXlsxs.getName());
+    		Org parentOrg = orgService.getOrg(orgXlsxs.getParentName());
 
     		if(parentOrg != null && orgOld == null){
     			Org org = new Org();
-    			org.setName(orgXlsx.getName());
+    			org.setName(orgXlsxs.getName());
     			
     			//获取父id
     			org.setParentId(parentOrg.getId());
@@ -69,23 +66,23 @@ public class OrgXlsxDataListener extends AnalysisEventListener<OrgXlsx> {
     			org.setUpdateUserId(1);
     			org.setUpdateTime(new Date());
     			org.setState(1);
-    			org.setNo((int)Math.ceil(orgXlsx.getNo())); //(int)Math.ceil(Double.valueOf(map.get("no").toString()))
+    			org.setNo((int)Math.ceil(orgXlsxs.getNo())); //(int)Math.ceil(Double.valueOf(map.get("no").toString()))
     			orgService.add(org);
     			
     			// 更新父子关系
     			org.setParentIds(parentOrg.getParentIds() + org.getId() + "_");
     			org.setLevel(org.getParentIds().split("_").length - 1);
     			orgService.update(org);
-    			return;
+    			continue;
     		}
 
     		if(parentOrg != null && orgOld != null){
     			if (orgOld.getParentId().intValue() == parentOrg.getId().intValue()) {
-    				orgOld.setNo((int)Math.ceil(orgXlsx.getNo())); //(int)Math.ceil(Double.valueOf(map.get("no").toString()))
+    				orgOld.setNo((int)Math.ceil(orgXlsxs.getNo())); //(int)Math.ceil(Double.valueOf(map.get("no").toString()))
     				orgOld.setUpdateUserId(1);
     				orgOld.setUpdateTime(new Date());
     				orgService.update(orgOld);
-    				return;
+    				continue;
     			}
     			
     			List<Org> sonOrg = orgService.getList(orgOld.getId());
@@ -100,74 +97,11 @@ public class OrgXlsxDataListener extends AnalysisEventListener<OrgXlsx> {
     			orgOld.setParentId(parentOrg.getId());
     			orgOld.setParentIds(parentOrg.getParentIds() + orgOld.getId() + "_");
     			orgOld.setLevel(orgOld.getParentIds().split("_").length - 1);
-    			orgOld.setNo(orgXlsx.getNo());
+    			orgOld.setNo(orgXlsxs.getNo());
     			orgOld.setUpdateUserId(1);
     			orgOld.setUpdateTime(new Date());
     			orgService.update(orgOld);
-    			return;
     		}
-
-    		if (parentOrg == null && orgOld == null) {
-    			return;
-    		}
-    	});
-//    	
-//        for(OrgXlsx orgXlsxs : list){
-//        	System.err.println(i++);
-//    		Org orgOld = orgService.getOrg(orgXlsxs.getName());
-//    		Org parentOrg = orgService.getOrg(orgXlsxs.getParentName());
-//
-//    		if(parentOrg != null && orgOld == null){
-//    			Org org = new Org();
-//    			org.setName(orgXlsxs.getName());
-//    			
-//    			//获取父id
-//    			org.setParentId(parentOrg.getId());
-//    			
-//    			org.setUpdateUserId(1);
-//    			org.setUpdateTime(new Date());
-//    			org.setState(1);
-//    			org.setNo((int)Math.ceil(orgXlsxs.getNo())); //(int)Math.ceil(Double.valueOf(map.get("no").toString()))
-//    			orgService.add(org);
-//    			
-//    			// 更新父子关系
-//    			org.setParentIds(parentOrg.getParentIds() + org.getId() + "_");
-//    			org.setLevel(org.getParentIds().split("_").length - 1);
-//    			orgService.update(org);
-//    			return;
-//    		}
-//
-//    		if(parentOrg != null && orgOld != null){
-//    			if (orgOld.getParentId().intValue() == parentOrg.getId().intValue()) {
-//    				orgOld.setNo((int)Math.ceil(orgXlsxs.getNo())); //(int)Math.ceil(Double.valueOf(map.get("no").toString()))
-//    				orgOld.setUpdateUserId(1);
-//    				orgOld.setUpdateTime(new Date());
-//    				orgService.update(orgOld);
-//    				return;
-//    			}
-//    			
-//    			List<Org> sonOrg = orgService.getList(orgOld.getId());
-//    			if (sonOrg != null) {
-//    				throw new MyException("此组织机构下有附属机构不能被移动");
-//    			}
-//
-//    			if (orgOld.getParentIds().contains(parentOrg.getParentIds())) {
-//    				throw new MyException("父组织机构不能移动到子组织机构下");
-//    			}
-//    			
-//    			orgOld.setParentId(parentOrg.getId());
-//    			orgOld.setParentIds(parentOrg.getParentIds() + orgOld.getId() + "_");
-//    			orgOld.setLevel(orgOld.getParentIds().split("_").length - 1);
-//    			orgOld.setNo(orgXlsxs.getNo());
-//    			orgOld.setUpdateUserId(1);
-//    			orgOld.setUpdateTime(new Date());
-//    			orgService.update(orgOld);
-//    			return;
-//    		}
-//
-//    		if (parentOrg == null && orgOld == null) {
-//    			return;
-//    		}
-//        }
+        }
     }
 }

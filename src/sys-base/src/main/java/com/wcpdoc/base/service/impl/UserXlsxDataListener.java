@@ -56,23 +56,20 @@ public class UserXlsxDataListener extends AnalysisEventListener<UserXlsx> {
      */
     @Override
     public void doAfterAllAnalysed(AnalysisContext context) {
-    	list.forEach(userXlsx->{
-    		if (!ValidateUtil.isValid(userXlsx.getOrgName()) || !ValidateUtil.isValid(userXlsx.getLoginName()) || !ValidateUtil.isValid(userXlsx.getName())) {
-				return;
-			}
-    		Org org = orgService.getOrg(userXlsx.getOrgName());
-    		User user = userService.getUser(userXlsx.getLoginName());
+        for(UserXlsx userXlsxs : list){
+    		Org org = orgService.getOrg(userXlsxs.getOrgName());
+    		User user = userService.getUser(userXlsxs.getLoginName());
     		if (user == null) {
     			Date date = new Date();
     			User entity = new User();
-    			entity.setName(userXlsx.getName());
-    			entity.setLoginName(userXlsx.getLoginName());
-    			entity.setPwd(EncryptUtil.md52Base64(userXlsx.getLoginName() + "111111"));
-    			if (ValidateUtil.isValid(userXlsx.getEmail())) {
-    				entity.setEmail(userXlsx.getEmail());
+    			entity.setName(userXlsxs.getName());
+    			entity.setLoginName(userXlsxs.getLoginName());
+    			entity.setPwd(EncryptUtil.md52Base64(userXlsxs.getLoginName() + "111111"));
+    			if (ValidateUtil.isValid(userXlsxs.getEmail())) {
+    				entity.setEmail(userXlsxs.getEmail());
     			}
-    			if (ValidateUtil.isValid(userXlsx.getPhone())) {
-    				entity.setPhone(userXlsx.getPhone());
+    			if (ValidateUtil.isValid(userXlsxs.getPhone())) {
+    				entity.setPhone(userXlsxs.getPhone());
     			}
     			entity.setRegistTime(date);
     			entity.setOrgId(org.getId());
@@ -82,19 +79,19 @@ public class UserXlsxDataListener extends AnalysisEventListener<UserXlsx> {
     			entity.setUpdateUserId(1);	
     			entity.setState(1);
     			userService.add(entity);
-    			return;
+    			continue;
     		}
     		if (user != null && org.getId() != user.getOrgId()) {
     			Date date = new Date();
     			User entity = new User();
-    			entity.setName(userXlsx.getName());
-    			entity.setLoginName(userXlsx.getLoginName());
-    			entity.setPwd(EncryptUtil.md52Base64(userXlsx.getLoginName() + "111111"));
-    			if (ValidateUtil.isValid(userXlsx.getEmail())) {
-    				entity.setEmail(userXlsx.getEmail());
+    			entity.setName(userXlsxs.getName());
+    			entity.setLoginName(userXlsxs.getLoginName());
+    			entity.setPwd(EncryptUtil.md52Base64(userXlsxs.getLoginName() + "111111"));
+    			if (ValidateUtil.isValid(userXlsxs.getEmail())) {
+    				entity.setEmail(userXlsxs.getEmail());
     			}
-    			if (ValidateUtil.isValid(userXlsx.getPhone())) {
-    				entity.setPhone(userXlsx.getPhone());
+    			if (ValidateUtil.isValid(userXlsxs.getPhone())) {
+    				entity.setPhone(userXlsxs.getPhone());
     			}
     			entity.setRegistTime(date);
     			entity.setOrgId(org.getId());
@@ -102,84 +99,21 @@ public class UserXlsxDataListener extends AnalysisEventListener<UserXlsx> {
     			entity.setUpdateUserId(1);	
     			entity.setState(1);
     			userService.add(entity);
-    			return;
+    			continue;
     		}
     		if (user != null && org.getId() == user.getOrgId()) {
-    			user.setName(userXlsx.getName());
-    			if (ValidateUtil.isValid(userXlsx.getEmail())) {
-    				user.setEmail(userXlsx.getEmail());
+    			user.setName(userXlsxs.getName());
+    			if (ValidateUtil.isValid(userXlsxs.getEmail())) {
+    				user.setEmail(userXlsxs.getEmail());
     			}
-    			if (ValidateUtil.isValid(userXlsx.getPhone())) {
-    				user.setPhone(userXlsx.getPhone());
+    			if (ValidateUtil.isValid(userXlsxs.getPhone())) {
+    				user.setPhone(userXlsxs.getPhone());
     			}
-    			user.setName(userXlsx.getName());
+    			user.setName(userXlsxs.getName());
     			user.setUpdateTime(new Date());
     			user.setUpdateUserId(1);
     			userService.update(user);
-    			return;
     		}
-    	});
-//            
-//        for(UserXlsx userXlsxs : list){
-//        	System.err.println(i++);
-//    		Org org = orgService.getOrg(userXlsxs.getOrgName());
-//    		User user = userService.getUser(userXlsxs.getLoginName());
-//    		if (user == null) {
-//    			Date date = new Date();
-//    			User entity = new User();
-//    			entity.setName(userXlsxs.getName());
-//    			entity.setLoginName(userXlsxs.getLoginName());
-//    			entity.setPwd(EncryptUtil.md52Base64(userXlsxs.getLoginName() + "111111"));
-//    			if (ValidateUtil.isValid(userXlsxs.getEmail())) {
-//    				entity.setEmail(userXlsxs.getEmail());
-//    			}
-//    			if (ValidateUtil.isValid(userXlsxs.getPhone())) {
-//    				entity.setPhone(userXlsxs.getPhone());
-//    			}
-//    			entity.setRegistTime(date);
-//    			entity.setOrgId(org.getId());
-//    			entity.setRoles("user");
-//    			entity.setType(1);
-//    			entity.setUpdateTime(date);
-//    			entity.setUpdateUserId(1);	
-//    			entity.setState(1);
-//    			userService.add(entity);
-//    			return;
-//    		}
-//    		if (user != null && org.getId() != user.getOrgId()) {
-//    			Date date = new Date();
-//    			User entity = new User();
-//    			entity.setName(userXlsxs.getName());
-//    			entity.setLoginName(userXlsxs.getLoginName());
-//    			entity.setPwd(EncryptUtil.md52Base64(userXlsxs.getLoginName() + "111111"));
-//    			if (ValidateUtil.isValid(userXlsxs.getEmail())) {
-//    				entity.setEmail(userXlsxs.getEmail());
-//    			}
-//    			if (ValidateUtil.isValid(userXlsxs.getPhone())) {
-//    				entity.setPhone(userXlsxs.getPhone());
-//    			}
-//    			entity.setRegistTime(date);
-//    			entity.setOrgId(org.getId());
-//    			entity.setUpdateTime(date);
-//    			entity.setUpdateUserId(1);	
-//    			entity.setState(1);
-//    			userService.add(entity);
-//    			return;
-//    		}
-//    		if (user != null && org.getId() == user.getOrgId()) {
-//    			user.setName(userXlsxs.getName());
-//    			if (ValidateUtil.isValid(userXlsxs.getEmail())) {
-//    				user.setEmail(userXlsxs.getEmail());
-//    			}
-//    			if (ValidateUtil.isValid(userXlsxs.getPhone())) {
-//    				user.setPhone(userXlsxs.getPhone());
-//    			}
-//    			user.setName(userXlsxs.getName());
-//    			user.setUpdateTime(new Date());
-//    			user.setUpdateUserId(1);
-//    			userService.update(user);
-//    			return;
-//    		}
-//        }
+        }
     }
 }
