@@ -25,7 +25,7 @@ public class PaperRemarkDaoImpl extends RBaseDaoImpl<PaperRemark> implements Pap
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT * FROM EXM_PAPER_REMARK PAPER_REMARK ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("id").toString()), "PAPER_REMARK.ID = :PAPER_REMARK.ID", pageIn.get("id").toString());
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("id").toString()), "PAPER_REMARK.ID = :ID", pageIn.get("id").toString());
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		return pageOut;
 	}

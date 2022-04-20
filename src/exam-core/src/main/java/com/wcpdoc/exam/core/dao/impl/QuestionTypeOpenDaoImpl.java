@@ -44,11 +44,11 @@ public class QuestionTypeOpenDaoImpl extends RBaseDaoImpl<QuestionTypeOpen> impl
 				+ "FROM EXM_QUESTION_TYPE_OPEN QUESTION_TYPE_OPEN "
 				+ "LEFT JOIN EXM_QUESTION_TYPE QUESTION_TYPE ON QUESTION_TYPE_OPEN.QUESTION_TYPE_ID = QUESTION_TYPE.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(pageIn.get("questionTypeId", Integer.class) != null , "QUESTION_TYPE_OPEN.QUESTION_TYPE_ID = :QUESTION_TYPE_OPEN.QUESTION_TYPE_ID", pageIn.get("questionTypeId", Integer.class))
-			   .addWhere(pageIn.get("state") != null, "QUESTION_TYPE_OPEN.STATE = :QUESTION_TYPE_OPEN.STATE", pageIn.get("state", Integer.class))
-			   .addWhere(pageIn.get("curUserId", Integer.class)!= null , "QUESTION_TYPE_OPEN.UPDATE_USER_ID = :QUESTION_TYPE_OPEN.UPDATE_USER_ID", pageIn.get("curUserId", Integer.class))
+		sqlUtil.addWhere(pageIn.get("questionTypeId", Integer.class) != null , "QUESTION_TYPE_OPEN.QUESTION_TYPE_ID = :QUESTION_TYPE_ID", pageIn.get("questionTypeId", Integer.class))
+			   .addWhere(pageIn.get("state") != null, "QUESTION_TYPE_OPEN.STATE = :STATE", pageIn.get("state", Integer.class))
+			   .addWhere(pageIn.get("curUserId", Integer.class)!= null , "QUESTION_TYPE_OPEN.UPDATE_USER_ID = :UPDATE_USER_ID", pageIn.get("curUserId", Integer.class))
 			   .addWhere(ValidateUtil.isValid(pageIn.get("startTime")) && ValidateUtil.isValid(pageIn.get("endTime")), 
-						"((QUESTION_TYPE_OPEN.START_TIME <= :QUESTION_TYPE_OPEN.START_TIME AND :QUESTION_TYPE_OPEN.END_TIME >= QUESTION_TYPE_OPEN.END_TIME) OR (QUESTION_TYPE_OPEN.START_TIME <= :QUESTION_TYPE_OPEN.START_TIME AND :QUESTION_TYPE_OPEN.END_TIME >= QUESTION_TYPE_OPEN.END_TIME) OR (QUESTION_TYPE_OPEN.START_TIME >= :QUESTION_TYPE_OPEN.START_TIME AND QUESTION_TYPE_OPEN.END_TIME >= :QUESTION_TYPE_OPEN.END_TIME))", 
+						"((QUESTION_TYPE_OPEN.START_TIME <= :START_TIME1 AND :END_TIME1 >= QUESTION_TYPE_OPEN.END_TIME) OR (QUESTION_TYPE_OPEN.START_TIME <= :START_TIME2 AND :END_TIME2 >= QUESTION_TYPE_OPEN.END_TIME) OR (QUESTION_TYPE_OPEN.START_TIME >= :START_TIME3 AND QUESTION_TYPE_OPEN.END_TIME >= :END_TIME3))", 
 						pageIn.get("startTime"), pageIn.get("startTime"),
 						pageIn.get("endTime"), pageIn.get("endTime"),
 						pageIn.get("startTime"), pageIn.get("endTime")
@@ -60,10 +60,10 @@ public class QuestionTypeOpenDaoImpl extends RBaseDaoImpl<QuestionTypeOpen> impl
 		      StringBuilder partSql = new StringBuilder();
 		      List<Object> params = new ArrayList<>();
 		      partSql.append("(");
-		      partSql.append("QUESTION_TYPE_OPEN.USER_IDS LIKE :QUESTION_TYPE_OPEN.USER_IDS");
+		      partSql.append("QUESTION_TYPE_OPEN.USER_IDS LIKE :USER_IDS");
 		      params.add("%," + user.getId() + ",%");
 		      
-		      partSql.append(" OR QUESTION_TYPE_OPEN.ORG_IDS LIKE :QUESTION_TYPE_OPEN.ORG_IDS");
+		      partSql.append(" OR QUESTION_TYPE_OPEN.ORG_IDS LIKE :ORG_IDS");
 		      params.add("%," + user.getOrgId() + ",%");
 		      
 		      partSql.append(" OR (QUESTION_TYPE_OPEN.USER_IDS IS NULL AND QUESTION_TYPE_OPEN.ORG_IDS IS NULL) ");

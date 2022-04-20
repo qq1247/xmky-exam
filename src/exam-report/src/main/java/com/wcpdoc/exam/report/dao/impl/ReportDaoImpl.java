@@ -35,7 +35,7 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 				+ "FROM EXM_MY_EXAM MY_EXAM "
 				+ "INNER JOIN SYS_USER AS USER ON MY_EXAM.USER_ID = USER.ID "
 				+ "LEFT JOIN SYS_ORG AS ORG ON USER.ORG_ID = ORG.ID "
-				+ "WHERE MY_EXAM.STATE != 0 AND MY_EXAM.USER_ID = :MY_EXAM.USER_ID";
+				+ "WHERE MY_EXAM.STATE != 0 AND MY_EXAM.USER_ID = :USER_ID";
  		return getMapList(sql, new Object[] { userId });
 	}
 
@@ -44,7 +44,7 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 		String sql = "SELECT COUNT(MY_EXAM.ID) "
 				+ "FROM EXM_MY_EXAM MY_EXAM "
 				+ "INNER JOIN EXM_EXAM AS EXAM ON MY_EXAM.EXAM_ID = EXAM.ID "
-				+ "WHERE MY_EXAM.STATE = 1 AND EXAM.START_TIME < NOW() AND MY_EXAM.USER_ID = :MY_EXAM.USER_ID";
+				+ "WHERE MY_EXAM.STATE = 1 AND EXAM.START_TIME < NOW() AND MY_EXAM.USER_ID = :USER_ID";
  		return getCount(sql, new Object[] { userId });
 	}
 	
@@ -55,7 +55,7 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 				+ "FROM EXM_EXAM EXAM "
 				+ "INNER JOIN SYS_USER AS USER ON EXAM.CREATE_USER_ID = USER.ID "
 				+ "LEFT JOIN SYS_ORG AS ORG ON USER.ORG_ID = ORG.ID "
-				+ "WHERE EXAM.STATE != 0 AND EXAM.CREATE_USER_ID = :EXAM.CREATE_USER_ID";
+				+ "WHERE EXAM.STATE != 0 AND EXAM.CREATE_USER_ID = :CREATE_USER_ID";
 		return getMapList(sql, new Object[] { userId });
 	}
 
@@ -63,7 +63,7 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 	public List<Map<String, Object>> homeSubAdminPaper(Integer userId) {
 		String sql = "SELECT COUNT(PAPER.ID) AS PAPER_NUM "
 				+ "FROM EXM_PAPER PAPER "
-				+ "WHERE PAPER.STATE != 0 AND PAPER.CREATE_USER_ID = :PAPER.CREATE_USER_ID";
+				+ "WHERE PAPER.STATE != 0 AND PAPER.CREATE_USER_ID = :CREATE_USER_ID";
 		return getMapList(sql, new Object[] { userId });
 	}
 
@@ -71,7 +71,7 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 	public List<Map<String, Object>> homeSubAdminQuestion(Integer userId) {
 		String sql = "SELECT COUNT(QUESTION.ID) AS QUESTION_NUM "
 				+ "FROM EXM_QUESTION QUESTION "
-				+ "WHERE QUESTION.STATE != 0 AND QUESTION.CREATE_USER_ID = :QUESTION.CREATE_USER_ID";
+				+ "WHERE QUESTION.STATE != 0 AND QUESTION.CREATE_USER_ID = :CREATE_USER_ID";
 		return getMapList(sql, new Object[] { userId });
 	}
 
@@ -79,7 +79,7 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 	public List<Map<String, Object>> homeSubAdminMark(Integer userId) {
 		String sql = "SELECT COUNT(MARK.ID) AS MARK_NUM "
 				+ "FROM EXM_MY_MARK MARK "
-				+ "WHERE MARK.UPDATE_USER_ID = :MARK.UPDATE_USER_ID";
+				+ "WHERE MARK.UPDATE_USER_ID = :UPDATE_USER_ID";
 		return getMapList(sql, new Object[] { userId });
 	}
 	
@@ -110,7 +110,7 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 		String sql = "SELECT SUM( QUESTION.TYPE = 1 ) AS TYPE1, SUM( QUESTION.TYPE = 2 ) AS TYPE2, SUM( QUESTION.TYPE = 3 ) AS TYPE3, "
 				+ "SUM( QUESTION.TYPE = 4 ) AS TYPE4, SUM( QUESTION.TYPE = 5 ) AS TYPE5 FROM EXM_QUESTION QUESTION "
 				+ "WHERE QUESTION.STATE != 0 AND EXISTS ( SELECT 1 FROM EXM_PAPER_QUESTION PAPER_QUESTION WHERE PAPER_QUESTION.TYPE = 2 "
-				+ "AND PAPER_QUESTION.PAPER_ID = :PAPER_QUESTION.PAPER_ID AND PAPER_QUESTION.QUESTION_ID = QUESTION.ID) ";
+				+ "AND PAPER_QUESTION.PAPER_ID = :PAPER_ID AND PAPER_QUESTION.QUESTION_ID = QUESTION.ID) ";
 		return getMapList(sql, new Object[] { paperId });
 	}
 	
@@ -126,7 +126,7 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 				+ "LEFT JOIN SYS_ORG AS ORG ON USER.ORG_ID = ORG.ID ";
 		
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examId")), "MY_EXAM.EXAM_ID = :MY_EXAM.EXAM_ID", pageIn.get("examId"))
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examId")), "MY_EXAM.EXAM_ID = :EXAM_ID", pageIn.get("examId"))
 				.addOrder("MY_EXAM.NO", Order.ASC)
 				.addOrder("MY_EXAM.ANSWER_END_TIME", Order.DESC);
 		return getListpage(sqlUtil, pageIn);
@@ -156,7 +156,7 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 				+ "MIN( MY_EXAM.ANSWER_END_TIME ) AS MIN_EXAM FROM EXM_MY_EXAM MY_EXAM "
 				+ "INNER JOIN EXM_EXAM ON EXM_EXAM.ID = MY_EXAM.EXAM_ID "
 				+ "INNER JOIN EXM_PAPER ON EXM_PAPER.ID = EXM_EXAM.PAPER_ID "
-				+ "WHERE MY_EXAM.EXAM_ID = :MY_EXAM.EXAM_ID";
+				+ "WHERE MY_EXAM.EXAM_ID = :EXAM_ID";
  		return getMapList(sql, new Object[] { examId });
 	}
 }

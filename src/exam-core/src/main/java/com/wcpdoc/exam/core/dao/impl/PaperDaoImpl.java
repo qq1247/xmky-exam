@@ -36,12 +36,12 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 				+ "FROM EXM_PAPER PAPER "
 				+ "LEFT JOIN EXM_PAPER_TYPE PAPER_TYPE ON PAPER.PAPER_TYPE_ID = PAPER_TYPE.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("paperTypeId")), "PAPER.PAPER_TYPE_ID = :PAPER.PAPER_TYPE_ID", pageIn.get("paperTypeId"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "PAPER.NAME LIKE :PAPER.NAME", "%" + pageIn.get("name") + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "PAPER_TYPE.READ_USER_IDS LIKE :PAPER_TYPE.READ_USER_IDS", String.format("%%,%s,%%", pageIn.get("curUserId", Integer.class)))// 只看自己的
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("paperTypeId")), "PAPER.PAPER_TYPE_ID = :PAPER_TYPE_ID", pageIn.get("paperTypeId"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "PAPER.NAME LIKE :NAME", "%" + pageIn.get("name") + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "PAPER_TYPE.READ_USER_IDS LIKE :READ_USER_IDS", String.format("%%,%s,%%", pageIn.get("curUserId", Integer.class)))// 只看自己的
 				.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "PAPER.STATE IN (1,2)")
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && "0".equals(pageIn.get("state")), "PAPER.STATE IN (1,2)")
-				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "PAPER.STATE = :PAPER.STATE", pageIn.get("state"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "PAPER.STATE = :STATE", pageIn.get("state"))
 				.addOrder("PAPER.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		return pageOut;
@@ -51,7 +51,7 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 	public List<Question> getQuestionList(Integer id) {
 		String sql = "SELECT QUESTION.* "
 				+ "FROM EXM_QUESTION QUESTION "
-				+ "WHERE EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = :Z.PAPER_ID AND Z.TYPE = 2 AND Z.QUESTION_ID = QUESTION.ID)";// AND QUESTION.STATE = 1 如果删除试题，试卷关联的试题也能看
+				+ "WHERE EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = :PAPER_ID AND Z.TYPE = 2 AND Z.QUESTION_ID = QUESTION.ID)";// AND QUESTION.STATE = 1 如果删除试题，试卷关联的试题也能看
 		return getList(sql, new Object[] { id }, Question.class);
 	}
 	
@@ -59,7 +59,7 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 	public List<Question> getQuestionList(Integer id, Integer examId) {
 		String sql = "SELECT QUESTION.* "
 				+ "FROM EXM_QUESTION QUESTION "
-				+ "WHERE EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.EXAM_ID = :Z.EXAM_ID AND Z.PAPER_ID = :Z.PAPER_ID AND Z.TYPE = 3 AND Z.QUESTION_ID = QUESTION.ID)";// AND QUESTION.STATE = 1 如果删除试题，试卷关联的试题也能看
+				+ "WHERE EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.EXAM_ID = :EXAM_ID AND Z.PAPER_ID = :PAPER_ID AND Z.TYPE = 3 AND Z.QUESTION_ID = QUESTION.ID)";// AND QUESTION.STATE = 1 如果删除试题，试卷关联的试题也能看
 		return getList(sql, new Object[] { examId, id }, Question.class);
 	}
 
@@ -67,7 +67,7 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 	public List<PaperQuestion> getPaperQuestionList(Integer id) {
 		String sql = "SELECT PAPER_QUESTION.* "
 				+ "FROM EXM_PAPER_QUESTION PAPER_QUESTION "
-				+ "WHERE PAPER_QUESTION.PAPER_ID = :PAPER_QUESTION.PAPER_ID AND PAPER_QUESTION.TYPE = 2";
+				+ "WHERE PAPER_QUESTION.PAPER_ID = :PAPER_ID AND PAPER_QUESTION.TYPE = 2";
 		return getList(sql, new Object[]{id}, PaperQuestion.class);
 	}
 	

@@ -29,7 +29,7 @@ public class CronDaoImpl extends RBaseDaoImpl<Cron> implements CronDao {
 				+ "FROM SYS_CRON CRON "
 				+ "LEFT JOIN SYS_USER USER ON CRON.UPDATE_USER_ID = USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "CRON.NAME LIKE :CRON.NAME", "%" + pageIn.get("name") + "%")
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "CRON.NAME LIKE :NAME", "%" + pageIn.get("name") + "%")
 				.addOrder("CRON.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(), "UPDATE_TIME", DateUtil.FORMAT_DATE_TIME);
