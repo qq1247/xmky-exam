@@ -584,104 +584,80 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	
 	@Override
 	public void scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores, Integer[] aiOptions) {
-//		//校验数据有效性
-//		if(!ValidateUtil.isValid(id)) {
-//			throw new MyException("参数错误：id");
-//		}
-//		if(!ValidateUtil.isValid(questionId)) {
-//			throw new MyException("参数错误：questionId");
-//		}
-//		if(!ValidateUtil.isValid(score)) {
-//			throw new MyException("参数错误：score");
-//		}
-//		
-//		Question question = questionService.getEntity(questionId);
-//		List<PaperQuestionAnswer> answerList = paperQuestionAnswerService.getList(id, questionId);
-//		if (question.getAi() == 1 && (question.getType() == 3 || question.getType() == 5)) {// 试题为智能阅卷，并且是填空或问答时有效
-//			if(!ValidateUtil.isValid(subScores)) {
-//				throw new MyException("参数错误：subScores");
-//			}
-//			
-//			BigDecimalUtil bigDecimalUtil = BigDecimalUtil.newInstance(0);
-//			for (BigDecimal subScore : subScores) {
-//				bigDecimalUtil.add(subScore);
-//			}
-//			if (score.doubleValue() != bigDecimalUtil.getResult().doubleValue()) {
-//				throw new MyException("参数错误：subScores总分和score不匹配");
-//			}
-//			
-//			if (subScores.length != answerList.size()) {
-//				throw new MyException("参数错误：subScores个数不匹配");
-//			}
-//		}
-//		
-//		PaperQuestion paperQuestion = paperQuestionService.getEntity(id, questionId);
-//		if (paperQuestion == null) {
-//			throw new MyException("参数错误：questionId");
-//		}
-//		
-//		Paper paper = getEntity(id);
-//		if (paper.getState() == 0) {
-//			throw new MyException("试卷已删除");
-//		}
-//		if (paper.getState() == 1) {
-//			throw new MyException("试卷已发布");
-//		}
-//		if(paper.getState() == 3){
-//			throw new MyException("已归档");
-//		}
-//		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-//		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
-//			throw new MyException("无操作权限");
-//		}
-//		
-//		// 设置分数
-//		PaperQuestion pq = paperQuestionService.getEntity(id, questionId);
-//		
-//		// 设置分数选项
-//		String aiOptionStr = aiOptions == null ? "" : StringUtil.join(aiOptions);
-//		if (question.getType() == 2) {// 分数选项：1：漏选得分；2：答案无顺序；3：大小写不敏感；
-//			if (aiOptionStr.contains("1")) {
-//				pq.setAiOptions("1");
-//			}
-//		} else if (question.getType() == 3) {
-//			if (aiOptionStr.contains("2") && aiOptionStr.contains("3")) {
-//				pq.setAiOptions("2,3");
-//			} else if (aiOptionStr.contains("2")) {
-//				pq.setAiOptions("2");
-//			} else if (aiOptionStr.contains("3")) {
-//				pq.setAiOptions("3");
-//			}  
-//		} else if (question.getType() == 5 && question.getAi() == 1) {
-//			if (aiOptionStr.contains("3")) {
-//				pq.setAiOptions("3");
-//			}
-//		}
-//		
-//		pq.setScore(score);
-//		paperQuestionService.update(pq);
-//		
-////		if (question.getAi() == 1 && (question.getType() == 3 || question.getType() == 5)) {// 试题为智能阅卷，并且是填空或问答时更新子分数
-////			for (int i = 0; i < subScores.length; i++) {
-////				PaperQuestionAnswer answer = answerList.get(i);
-////				answer.setScore(subScores[i]);
-////				paperQuestionAnswerService.update(answer);
-////			}
-////		}
-//		if (question.getAi() == 1 && (question.getType() == 2 || question.getType() == 3 || question.getType() == 5 )) {
-//			for (int i = 0; i < subScores.length; i++) {
-//				PaperQuestionAnswer answer = answerList.get(i);
-//				answer.setScore(subScores[i]);
-//				paperQuestionAnswerService.update(answer);
-//			}
-//		}
-//		if (question.getAi() == 1 && (question.getType() == 1 || question.getType() == 4)) {
-//			for (int i = 0; i < subScores.length; i++) {
-//				PaperQuestionAnswer answer = answerList.get(i);
-//				answer.setScore(score);
-//				paperQuestionAnswerService.update(answer);
-//			}
-//		}
+		// 校验数据有效性
+		if (id == null) {
+			throw new MyException("参数错误：id");
+		}
+		if (score == null) {
+			throw new MyException("参数错误：score");
+		}
+		Paper paper = getEntity(id);
+		if (paper.getState() == 0) {
+			throw new MyException("试卷已删除");
+		}
+		if (paper.getState() == 1) {
+			throw new MyException("试卷已发布");
+		}
+		if (paper.getState() == 3) {
+			throw new MyException("试卷已归档");
+		}
+
+		// 更新试卷分数
+		String aiOptionsTemp = ValidateUtil.isValid(aiOptions) ? StringUtil.join(aiOptions) : "";
+		
+		//设置分数
+		Question question = questionService.getEntity(questionId);
+		PaperQuestion pq = paperQuestionService.getEntity(id, questionId);
+		if (question.getType() == 2 && aiOptionsTemp.contains("1")) {//智能选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；)
+			// pq.setAiOptions("1");// 默认就是不需要设置
+		} else if (question.getType() == 3 && question.getAi() == 1 ) {
+			if (aiOptionsTemp.contains("2") && aiOptionsTemp.contains("3")) {
+				pq.setAiOptions("2,3");
+			} else if (aiOptionsTemp.contains("2")) {
+				pq.setAiOptions("2");
+			} else if (aiOptionsTemp.contains("2")) {
+				pq.setAiOptions("3");
+			}
+		} else if (question.getType() == 5 && question.getAi() == 1) {
+			if (aiOptionsTemp.contains("3")) {
+				pq.setAiOptions("3");
+			}
+		}
+		pq.setScore(score);
+		paperQuestionService.update(pq);
+			
+		// 更新答案分数
+		List<PaperQuestionAnswer> answerList = paperQuestionAnswerService.getList(pq.getPaperId(), pq.getQuestionId());
+		if (question.getType() == 1 || question.getType() == 4) { //单选 判断
+			for(PaperQuestionAnswer paperQuestionAnswer : answerList){
+				paperQuestionAnswer.setScore(score);
+				paperQuestionAnswerService.update(paperQuestionAnswer);
+			}
+		} else if (question.getType() == 2) {// 多选
+			if (aiOptionsTemp.contains("1")) {
+				for (PaperQuestionAnswer answer : answerList) {// 只有一个
+					answer.setScore(subScores[0]);//页面设置的值
+					paperQuestionAnswerService.update(answer);
+				}
+			} else {
+				for (PaperQuestionAnswer answer : answerList) {
+					answer.setScore(BigDecimalUtil.newInstance(score).div(2, 3).getResult());// 分数的一半
+					paperQuestionAnswerService.update(answer);
+				}
+			}
+		} else if ((question.getType() == 3 && question.getAi() == 1) 
+				|| (question.getType() == 5 && question.getAi() == 1)) { // 智能填空 智能问答
+			BigDecimal scoreSum = new BigDecimal(0);
+			for (int i = 0; i < subScores.length; i++) {
+				scoreSum.add(subScores[i]);
+				PaperQuestionAnswer answer = answerList.get(i);
+				answer.setScore(subScores[i]);
+				paperQuestionAnswerService.update(answer);
+			}
+			if (scoreSum.compareTo(score) != 0) {
+				throw new MyException("分值错误");
+			}
+		}
 	}
 
 	@Override
