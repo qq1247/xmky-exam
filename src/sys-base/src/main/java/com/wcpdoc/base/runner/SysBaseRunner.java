@@ -42,6 +42,10 @@ public class SysBaseRunner implements ApplicationRunner {
 			parm.setPwdType(2);
 			parm.setPwdValue("111111");
 			SpringUtil.getBean(ParmService.class).add(parm);
+		} else {
+			parm.setFileUploadDir(parm.getFileUploadDir().replace("\\", File.separator).replace("/", File.separator));
+			parm.setDbBakDir(parm.getDbBakDir().replace("\\", File.separator).replace("/", File.separator));
+			SpringUtil.getBean(ParmService.class).update(parm);
 		}
 		
 		// 缓存系统参数
