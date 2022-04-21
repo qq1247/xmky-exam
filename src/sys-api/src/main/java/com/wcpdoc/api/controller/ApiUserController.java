@@ -340,6 +340,24 @@ public class ApiUserController extends BaseController {
 	}
 
 	/**
+	 * 冻结账户  v1.0 chenyun 2022年04月21日下午3:36:55
+	 * 
+	 * @param userId
+	 * @return pageOut
+	 */
+	@RequestMapping("/frozen")
+	@ResponseBody
+	public PageResult frozen(Integer[] ids) {
+		try {
+			userService.frozen(ids);
+			return PageResult.ok();
+		} catch (Exception e) {
+			log.error("冻结账户错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
 	 * 导入用户表
 	 * 
 	 * v1.0 chenyun 2021年3月4日下午5:41:02

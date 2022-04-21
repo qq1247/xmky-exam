@@ -101,4 +101,12 @@ public interface UserService extends BaseService<User> {
 	 * @return List<User>
 	 */
 	List<User> getList(Integer[] ids);
+	
+	/**
+	 * 冻结账户
+	 * 
+	 * v1.0 chenyun 2022年04月21日下午18:48:00
+	 * @param ids void
+	 */
+	void frozen(Integer[] ids);
 }

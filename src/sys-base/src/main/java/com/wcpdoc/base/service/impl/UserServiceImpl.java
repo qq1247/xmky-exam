@@ -16,6 +16,7 @@ import com.wcpdoc.base.service.UserExService;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.service.OnlineUserService;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.EncryptUtil;
 import com.wcpdoc.core.util.StringUtil;
@@ -34,6 +35,8 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	private UserExService userExService;
 	@Resource
 	private ParmService parmService;
+	@Resource
+	private OnlineUserService onlineUserService;
 	
 	@Override
 	@Resource(name = "userDaoImpl")
@@ -163,5 +166,19 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	@Override
 	public List<User> getList(Integer[] ids) {
 		return userDao.getList(ids);
+	}
+
+	@Override
+	public void frozen(Integer[] ids) {
+		for (Integer id : ids) {
+			User user = userDao.getEntity(id);
+			if (user == null) {
+				throw new MyException("参数错误：ids");
+			}
+			user.setState(2);
+			userDao.update(user);
+			
+			onlineUserService.out(id);
+		}
 	}
 }
