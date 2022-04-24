@@ -188,6 +188,9 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		if (myExam == null) {
 			throw new MyException("未参与考试");
 		}
+		if (myExam.getState() == 3) {
+			throw new MyException("考试已交卷");
+		}
 		Exam exam = examService.getEntity(examId);
 		if (exam.getState() == 0) {
 			throw new MyException("考试已删除");
