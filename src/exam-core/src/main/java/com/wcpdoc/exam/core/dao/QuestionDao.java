@@ -20,4 +20,12 @@ public interface QuestionDao extends BaseDao<Question>{
 	 * @return List<Question>
 	 */
 	List<Question> getList(Integer questionTypeId);
+	
+	/**
+	 * 物理删除试题
+	 * 
+	 * v1.0 chenyun 2022年4月22日上午11:22:25
+	 * @return List<Question>
+	 */
+	List<Question> delQuestionList();
 }
