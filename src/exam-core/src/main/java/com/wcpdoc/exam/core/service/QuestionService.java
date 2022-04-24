@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.core.service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.Question;
@@ -86,4 +87,12 @@ public interface QuestionService extends BaseService<Question>{
 	 * @param id void
 	 */
 	void publish(Integer questionType, Integer[] ids) throws Exception;
+	
+	/**
+	 * 物理删除试题
+	 * 
+	 * v1.0 chenyun 2022年4月22日上午11:22:25
+	 * @return List<Integer>
+	 */
+	List<Question> delQuestionList();
 }
