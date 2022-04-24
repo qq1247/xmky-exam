@@ -139,6 +139,9 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 
 		// 标记为考试中，记录答题时间
 		MyExam myExam = getEntity(examId, userId);
+		if (myExam.getState() == 3) {
+			throw new MyException("考试已交卷");
+		}
 		myExam.setState(2);
 		if (!ValidateUtil.isValid(myExam.getAnswerStartTime())) {
 			myExam.setAnswerStartTime(new Date());
