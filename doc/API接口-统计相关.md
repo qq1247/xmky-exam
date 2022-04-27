@@ -81,6 +81,7 @@ http请求头需添加Authorization字段，
 | -------- | ----------- | ---------- | ---- |
 | examId | Integer | 考试ID | 是   |
 | questionId | Integer | 试题ID | 否 |
+| state | Integer | 是否正确【1：正确；2：错误 试题ID不为空时有效】 | 否 |
 | curPage   | Integer | 当前第几页 | 否   |
 | pageSize  | Integer | 每页多少条 | 否   |
 
