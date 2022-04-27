@@ -127,11 +127,16 @@ public abstract class RBaseDaoImpl<T> implements RBaseDao<T> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public /* final */ PageOut getListpage(SqlUtil sqlUtil, PageIn pageIn) {
+		for(String a : pageIn.getWhere()) {//pageIn.addWhere
+			sqlUtil.addWhere(a);
+		}
+		
 		// 查询总记录数
 		Query<Map<String, Object>> query = getCurSession().createSQLQuery(sqlUtil.getCountSql());
 		List<Object> parmList = new ArrayList<>();
 		parmList.addAll(sqlUtil.getFromParmList());
 		parmList.addAll(sqlUtil.getWhereParmList());
+		parmList.addAll(pageIn.getWhereParmList());
 		Object[] parms = parmList.toArray(new Object[parmList.size()]);
 		List<String> namedParmList = SqlUtil.parseNamedParm(sqlUtil.getSql(), parms);
 		for (int i = 0; i < parms.length; i++) {
@@ -141,7 +146,7 @@ public abstract class RBaseDaoImpl<T> implements RBaseDao<T> {
 		if (total == 0) {
 			return new PageOut(new ArrayList<Map<String,Object>>(), 0);// 如果总数为0，就不用在查询分页数据了
 		}
-				
+		
 		// 查询列表
 		query = getCurSession().createSQLQuery(sqlUtil.getSql());
 		for (int i = 0; i < parms.length; i++) {

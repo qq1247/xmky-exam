@@ -1,6 +1,9 @@
 package com.wcpdoc.core.entity;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletRequest;
@@ -16,7 +19,9 @@ public class PageIn {
 
 	private ServletRequest request;
 	private Map<String, Object> params;
-
+	private List<String> where = new ArrayList<String>();
+	private List<Object> whereParmList = new ArrayList<>();
+	
 	public PageIn() {
 	}
 
@@ -34,6 +39,31 @@ public class PageIn {
 		return this;
 	}
 
+	public PageIn addWhere(String condition) {
+		//where.append(where.length() == 0 ? " WHERE " : " AND ").append(condition);
+		where.add(condition);
+		return this;
+	}
+
+	public PageIn addWhere(String condition, Object... parms) {
+		// 添加where条件
+		addWhere(condition);
+		
+		// 添加where参数
+		Collections.addAll(whereParmList, parms);
+//		for (int i = 0; i < parms.length; i++) {
+//			whereParmList.add(new WhereParm(namedParmList.get(i), parms[i]));
+//		}
+		return this;
+	}
+
+	public PageIn addWhere(boolean result, String condition, Object... parms) {
+		if (result) {
+			addWhere(condition, parms);
+		}
+		return this;
+	}
+	
 	public String get(String key) {
 		return get(key, String.class);
 	}
@@ -67,4 +97,11 @@ public class PageIn {
 		return this;
 	}
 
+	public List<Object> getWhereParmList() {
+		return whereParmList;
+	}
+	
+	public List<String> getWhere() {
+		return where;
+	}
 }
