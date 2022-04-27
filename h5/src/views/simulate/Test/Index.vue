@@ -1,18 +1,20 @@
 <template>
   <div class="container">
-    <TestRouter
-      :questionIds="questionIds"
-      :routerIndex="routerIndex"
-      @toHref="toHref"
-    ></TestRouter>
-    <TestQuestion
-      ref="testQuestion"
-      :commentState="commentState"
-      :questionDetail="questionDetail"
-      @randomTest="randomTest"
-      @prevQuestion="prevQuestion"
-      @nextQuestion="nextQuestion"
-    ></TestQuestion>
+    <div class="content">
+      <TestRouter
+        :questionIds="questionIds"
+        :routerIndex="routerIndex"
+        @toHref="toHref"
+      ></TestRouter>
+      <TestQuestion
+        ref="testQuestion"
+        :commentState="commentState"
+        :questionDetail="questionDetail"
+        @randomTest="randomTest"
+        @prevQuestion="prevQuestion"
+        @nextQuestion="nextQuestion"
+      ></TestQuestion>
+    </div>
   </div>
 </template>
 
@@ -147,30 +149,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.container {
-  width: 1200px;
-  margin: -20px auto 0;
-}
-.question-details {
-  background: #fff;
-  padding: 20px 30px;
-  position: relative;
-  flex: 1;
-  .question-detail {
-    padding: 0;
-  }
-  .question-pages {
-    position: absolute;
-    top: 20px;
-    right: 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-}
-.question-comments {
-  background: #f2f2f5;
-  margin-top: 20px;
-  padding: 20px;
-}
+@import 'assets/style/exam.scss';
 </style>

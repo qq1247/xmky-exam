@@ -295,12 +295,12 @@ export default {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #44cede;
+  background: #0094e5;
 }
 .is-today,
 .is-selected {
   .day-mark {
-    background: #fff;
+    background: #ffd70e;
   }
 }
 .plan {

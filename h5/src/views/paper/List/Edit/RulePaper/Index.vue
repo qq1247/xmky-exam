@@ -76,18 +76,21 @@ export default {
 .content {
   display: flex;
   width: 100%;
-  height: calc(100vh - 50px);
+  height: calc(100vh - 120px);
   margin: 0 auto;
 }
 .paper-handler {
   width: 500px;
   background: #fff;
   position: relative;
+  border-radius: 8px;
 }
 
 .paper-content {
   background: #fff;
-  width: calc(100% - 500px);
+  width: calc(100% - 490px);
+  margin-left: 10px;
+  border-radius: 8px;
   overflow: scroll;
 }
 </style>

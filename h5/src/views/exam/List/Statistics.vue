@@ -60,23 +60,23 @@
         >
         </el-tab-pane>
       </el-tabs>
-      <template v-if="tabIndex === '0'">
+      <div v-show="tabIndex === '0'">
         <el-table :data="rankingList" style="width: 100%">
-          <el-table-column label="排名" width="180">
+          <el-table-column label="排名" width="100">
             <template slot-scope="scope">
               <span>{{ scope.row.myExamNo || '--' }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="userName" label="姓名" width="180">
+          <el-table-column prop="userName" label="姓名" width="100">
           </el-table-column>
-          <el-table-column prop="orgName" label="组织机构" width="180">
+          <el-table-column prop="orgName" label="组织机构" width="100">
           </el-table-column>
-          <el-table-column label="考试状态" width="180">
+          <el-table-column label="考试状态" width="100">
             <template slot-scope="scope">
               <span>{{ scope.row.myExamState | examState }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="阅卷状态" width="180">
+          <el-table-column label="阅卷状态" width="100">
             <template slot-scope="scope">
               <span>{{ scope.row.myExamMarkState | markState }}</span>
             </template>
@@ -117,10 +117,99 @@
               }}</span>
             </template>
           </el-table-column>
+          <el-table-column>
+            <template slot-scope="scope">
+              <el-button type="text" @click="viewPaper(scope.row.userId)"
+                >查看试卷</el-button
+              >
+            </template>
+          </el-table-column>
         </el-table>
-      </template>
-      <template v-if="tabIndex === '1'">
-        <el-table :data="errorList" style="width: 100%">
+      </div>
+      <div v-show="tabIndex === '1'">
+        <el-table
+          :data="errorList"
+          style="width: 100%"
+          row-key="questionId"
+          @expand-change="expandChange"
+          :expand-row-keys="expandRowList"
+        >
+          <el-table-column type="expand">
+            <template slot-scope="props">
+              <div style="padding: 5px 30px 10px 50px">
+                <el-table :data="props.row.children" style="width: 100%">
+                  <el-table-column label="排名" width="100">
+                    <template slot-scope="scope">
+                      <span>{{ scope.row.myExamNo || '--' }}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column prop="userName" label="姓名" width="100">
+                  </el-table-column>
+                  <el-table-column prop="orgName" label="组织机构" width="100">
+                  </el-table-column>
+                  <el-table-column label="考试状态" width="100">
+                    <template slot-scope="scope">
+                      <span>{{ scope.row.myExamState | examState }}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="阅卷状态" width="100">
+                    <template slot-scope="scope">
+                      <span>{{ scope.row.myExamMarkState | markState }}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="及格状态">
+                    <template slot-scope="scope">
+                      <span
+                        :style="{
+                          color:
+                            scope.row.myExamAnswerState === 2 ? 'red' : 'black',
+                        }"
+                        >{{ scope.row.myExamAnswerState | passState }}</span
+                      >
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="分数">
+                    <template slot-scope="scope">
+                      <span
+                        >{{ scope.row.myExamScore }}&nbsp;/&nbsp;{{
+                          scope.row.paperTotalScore
+                        }}</span
+                      >
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="答题用时">
+                    <template slot-scope="scope">
+                      <span>{{
+                        timeRange(
+                          scope.row.myExamStartTime,
+                          scope.row.myExamEndTime
+                        )
+                      }}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="阅卷用时">
+                    <template slot-scope="scope">
+                      <span>{{
+                        timeRange(
+                          scope.row.myExamMarkStartTime,
+                          scope.row.myExamMarkEndTime
+                        )
+                      }}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column>
+                    <template slot-scope="scope">
+                      <el-button
+                        type="text"
+                        @click="viewPaper(scope.row.userId)"
+                        >查看试卷</el-button
+                      >
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </div>
+            </template>
+          </el-table-column>
           <el-table-column prop="questionId" label="编号" width="100">
           </el-table-column>
           <el-table-column label="题干">
@@ -138,7 +227,7 @@
             </template>
           </el-table-column>
         </el-table>
-      </template>
+      </div>
       <el-pagination
         background
         layout="prev, pager, next"
@@ -159,18 +248,17 @@ import * as echarts from 'echarts'
 import { getExamStatis, getRanking, getQuestionError } from 'api/report'
 import { getOneDict } from '@/utils/getDict'
 import * as dayjs from 'dayjs'
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
-dayjs.extend(isSameOrBefore)
 export default {
   data() {
     return {
       id: null,
+      total: 0,
       curPage: 1,
       pageSize: 10,
-      total: 0,
       statisInfo: {},
-      rankingList: [],
       errorList: [],
+      rankingList: [],
+      expandRowList: [],
       tabs: [
         {
           name: '用户排名',
@@ -206,6 +294,7 @@ export default {
   },
   async mounted() {
     this.id = this.$route.params.id
+    this.paperId = this.$route.params.examTypeId
     if (Number(this.id)) {
       await this.getExamStatis(this.id)
       this.getRanking(this.id)
@@ -315,6 +404,44 @@ export default {
       this.tabIndex === '0'
         ? this.getRanking(this.id)
         : this.getQuestionError(this.id)
+    },
+    // 预览试卷
+    viewPaper(userId) {
+      this.$router.push({
+        name: 'MyExamDetail',
+        params: {
+          userId,
+          examId: this.id,
+          paperId: this.paperId,
+          examEndTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+          showType: 1,
+          preview: true,
+        },
+      })
+    },
+    // 获取展开行信息
+    async expandChange(row) {
+      const currentId = this.expandRowList[0] ? this.expandRowList[0] : ''
+      console.log(this.expandRowList[0])
+
+      if (currentId === row.questionId) {
+        return
+      }
+
+      const index = this.errorList.findIndex(
+        (item) => row.questionId === item.questionId
+      )
+
+      const res = await getRanking({
+        examId: this.id,
+        questionId: row.questionId,
+        curPage: this.curPage,
+        pageSize: this.pageSize,
+      })
+
+      this.expandRowList = [row.questionId]
+
+      this.$set(this.errorList[index], 'children', res.data.list)
     },
   },
 }

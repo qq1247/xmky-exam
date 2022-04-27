@@ -7,7 +7,7 @@
       @click="updateType(btn.type)"
       v-for="btn in typeButtons"
     >
-      <i :class="btn.icon"></i>
+      <img :src="btn.icon" alt="" />
       {{ btn.name }}
       <i class="common common-subscript sub-script"></i>
     </div>
@@ -35,27 +35,27 @@ export default {
         {
           type: 1,
           name: '单选题',
-          icon: 'common common-radio',
+          icon: require('../../assets/img/question/question-radio.png'),
         },
         {
           type: 2,
           name: '多选题',
-          icon: 'common common-checkbox',
+          icon: require('../../assets/img/question/question-check.png'),
         },
         {
           type: 3,
           name: '填空题',
-          icon: 'common common-cloze',
+          icon: require('../../assets/img/question/question-cloze.png'),
         },
         {
           type: 4,
           name: '判断题',
-          icon: 'common common-judge',
+          icon: require('../../assets/img/question/question-judge.png'),
         },
         {
           type: 5,
           name: '问答题',
-          icon: 'common common-ask',
+          icon: require('../../assets/img/question/question-ask.png'),
         },
       ],
       handlerButtons: [
@@ -186,7 +186,7 @@ export default {
   z-index: 100;
   font-weight: 600;
   padding-left: 30px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   &::before {
     content: '';
     display: inline-block;
@@ -211,6 +211,10 @@ export default {
   user-select: none;
   border-radius: 3px;
   border: 1px solid #eeeeff;
+  img {
+    margin-right: 10px;
+    margin-left: 13px;
+  }
   &:nth-of-type(2) {
     margin-top: 50px;
   }

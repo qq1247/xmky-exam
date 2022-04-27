@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <!-- 考生信息 -->
-    <el-scrollbar wrap-style="overflow-x:hidden;" class="content-left">
+    <div class="content-left">
       <div class="user-info">
         <el-avatar
           :size="64"
@@ -85,7 +85,7 @@
           </el-progress>
         </div>
       </div>
-    </el-scrollbar>
+    </div>
 
     <!-- 内容 -->
     <div class="content-center">
@@ -106,9 +106,9 @@
           class="children-content"
           v-for="(item, indexQuestion) in questionList"
           :key="item.id"
-          style="border-bottom: 1px solid #f3f3f3"
+          :style="{ display: routerQuestionId === item.id ? 'block' : 'none' }"
         >
-          <template v-if="routerQuestionId === item.id">
+          <div v-if="routerQuestionId === item.id">
             <div class="question-title">
               <div>{{ indexQuestion + 1 }}、</div>
               <div v-html="`${item.title}`"></div>
@@ -223,7 +223,7 @@
                 </el-col>
               </el-row>
             </div>
-          </template>
+          </div>
         </div>
 
         <!-- 答题卡 -->
@@ -584,17 +584,32 @@ export default {
 @import 'assets/style/exam.scss';
 /deep/ .el-select {
   width: 80%;
-  margin-top: 20px;
 }
 
-.content-left {
-  top: 70px;
-  left: calc(100% / 2 - 570px);
+.el-avatar {
+  margin-bottom: 16px;
+}
+
+.user-intro {
+  margin-bottom: 8px;
+  border-radius: 8px;
+}
+
+.user-handler {
+  border-radius: 8px;
+}
+
+.content-center {
+  .children-content {
+    border-bottom: none;
+  }
 }
 
 .mark-router {
   display: flex;
-  margin: 20px 0;
+  margin: 16px 16px 0;
+  padding: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .router-content {

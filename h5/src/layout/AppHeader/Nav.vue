@@ -1,23 +1,21 @@
-<!--
- * @Description: Logo
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-08-09 17:59:47
- * @LastEditors: Che
- * @LastEditTime: 2022-01-07 15:51:13
--->
 <template>
   <div class="header-nav">
-    <router-link to="/" class="logo">
+    <router-link to="/" class="nav-logo">
       <el-image :src="orgLogo" lazy>
         <i slot="placeholder" class="common common-more-row"></i>
         <i slot="error" class="common common-perfect"></i>
       </el-image>
+      <div class="org-name">{{ $store.getters.orgName }}</div>
     </router-link>
     <div class="nav">
       <router-link
-        :class="['nav-item', index == 0 ? 'nav-item-active' : '']"
+        :class="[
+          'nav-item',
+          ($route.path === '/home' && index == 0) ||
+          ($route.path !== '/home' && index == 1)
+            ? 'nav-item-active'
+            : '',
+        ]"
         v-for="(item, index) in navInfo[$store.getters.onlyRole[0]]"
         :key="item.path"
         :to="{ name: item.path }"
@@ -31,7 +29,7 @@
 export default {
   data() {
     return {
-      orgLogo: `/api/login/logo` || require('../../assets/img/logo.png'),
+      orgLogo: '/api/login/logo',
       navInfo: {
         user: [
           {
@@ -74,30 +72,37 @@ export default {
   display: flex;
   align-items: center;
 }
-.logo {
-  width: 50px;
-  height: 50px;
+.nav-logo {
+  height: 64px;
+  display: flex;
+  align-items: center;
   /deep/ .el-image {
     height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     .el-image__inner {
-      width: 40px;
-      height: 40px;
+      width: 32px;
+      height: 32px;
     }
   }
   .common-perfect {
     font-size: 40px;
     color: #0095e5;
   }
+  .org-name {
+    font-size: 18px;
+    font-weight: 600;
+    margin-left: 16px;
+  }
 }
 .nav {
   display: flex;
+  margin-left: 80px;
   .nav-item {
-    height: 50px;
-    line-height: 50px;
-    margin: 0 20px;
+    height: 64px;
+    line-height: 64px;
+    margin: 0 35px;
     position: relative;
     border-bottom: 2px solid #fff;
     &:hover {

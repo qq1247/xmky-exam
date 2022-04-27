@@ -1,30 +1,21 @@
-<!--
- * @Description:
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-08-09 14:25:53
- * @LastEditors: Che
- * @LastEditTime: 2022-01-21 15:48:49
--->
 <template>
   <div class="app-container">
-    <app-header v-if="layout"></app-header>
-    <app-main :height="layout"></app-main>
-    <!-- <app-footer></app-footer> -->
+    <app-header v-if="$route.path !== '/login'"></app-header>
+    <sub-header v-if="layout"></sub-header>
+    <app-main></app-main>
   </div>
 </template>
 
 <script>
 import AppHeader from './AppHeader/Index.vue'
+import SubHeader from './SubHeader/Index.vue'
 import AppMain from './AppMain/Index.vue'
-import AppFooter from './AppFooter.vue'
 export default {
-  name: 'LayOut',
+  name: 'Layout',
   components: {
     AppHeader,
+    SubHeader,
     AppMain,
-    AppFooter,
   },
   data() {
     return {
@@ -40,8 +31,6 @@ export default {
       },
     },
   },
-  mounted() {},
-  methods: {},
 }
 </script>
 
@@ -50,8 +39,7 @@ export default {
 .app-container {
   position: relative;
   width: 100%;
-  min-height: 100vh;
-  height: 100%;
+  height: 100vh;
   background: $--background-color-base;
   color: $--color-text-regular;
   display: flex;

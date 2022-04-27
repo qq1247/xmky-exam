@@ -1,51 +1,39 @@
-<!--
- * @Description:
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-08-09 18:01:26
- * @LastEditors: Che
- * @LastEditTime: 2022-01-13 10:53:37
--->
 <template>
-  <header class="app-header">
-    <Back></Back>
-    <Content></Content>
-    <Info></Info>
-  </header>
+  <div class="header">
+    <div class="header-container">
+      <Nav></Nav>
+      <Info></Info>
+    </div>
+  </div>
 </template>
 
 <script>
-import Back from './Back.vue'
-import Content from './Content.vue'
+import Nav from './Nav.vue'
 import Info from './Info.vue'
 export default {
-  name: 'AppHeader',
+  name: 'Header',
   components: {
-    Back,
-    Content,
+    Nav,
     Info,
   },
   data() {
     return {}
   },
-  mounted() {},
-  methods: {},
 }
 </script>
 
-<style lang="scss">
-.app-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50px;
-  z-index: 2000;
+<style lang="scss" scoped>
+.header {
+  width: 100%;
+  height: 64px;
+  background: #fff;
+}
+.header-container {
+  width: 1200px;
+  margin: 0 auto;
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  background: #fff;
-  border-bottom: 1px solid #ebeef5;
 }
 </style>

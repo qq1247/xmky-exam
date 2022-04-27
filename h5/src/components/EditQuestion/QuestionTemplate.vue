@@ -24,7 +24,7 @@
         <i class="common common-word-template"></i>
         <p>下载试题模板</p>
       </div>
-      <div class="template-item" @click="questionExport">
+      <div class="template-item" @click="$emit('questionExport')">
         <i class="common common-word-template"></i>
         <p>导出试题模板</p>
       </div>
@@ -128,10 +128,6 @@ export default {
       } else {
         this.$message.error(res.msg)
       }
-    },
-    // 导出试题
-    questionExport() {
-      this.$message('暂未开放！')
     },
     // 获取进度
     async getProgress(id) {

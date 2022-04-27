@@ -53,7 +53,7 @@ export default {
   z-index: 100;
   font-weight: 600;
   padding: 0 20px;
-  box-shadow: 0 3px 13px -3px rgba(0, 0, 0, 0.15);
+  border-radius: 8px 8px 0 0;
   /deep/ .el-tabs__nav-wrap::after {
     background-color: #fff;
   }

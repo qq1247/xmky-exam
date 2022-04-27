@@ -18,7 +18,12 @@
         <div class="chapter-description" v-html="chapter.description"></div>
       </div>
 
-      <div class="children-content">
+      <div
+        :class="[
+          'children-content',
+          questionList[index].type === 5 ? 'ask-content' : '',
+        ]"
+      >
         <div class="question-title" v-if="questionList[index].type !== 3">
           <div>{{ index + 1 }}、</div>
           <div v-html="`${questionList[index].title}`"></div>
@@ -219,6 +224,6 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 20px 0;
+  padding: 16px;
 }
 </style>

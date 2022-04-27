@@ -98,7 +98,7 @@
           <span data-title="统计" @click="statistics(data)">
             <i class="common common-statistics"></i>
           </span>
-          <span>
+          <span class="last-span">
             <i class="common common-more-row"></i>
             <div class="handler-more">
               <div class="more-item" @click="onLine(data)">
@@ -239,5 +239,5 @@ export default {
 </script>
 vue
 <style lang="scss" scoped>
-@import '../../assets/style/list-card.scss';
+@import 'assets/style/list-card.scss';
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <el-scrollbar wrap-style="overflow-x:hidden;" class="content-left">
+  <div class="content-left">
     <div class="user-info">
       <el-avatar
         :size="64"
@@ -13,21 +13,24 @@
         }}
       </div>
     </div>
-    <div class="exam-head">
-      <span>答题卡</span>
-    </div>
-    <div class="router-content" style="margin-top: 10px">
-      <div class="router-link">
-        <a
-          :class="['router-index', routerIndex === item ? 'router-active' : '']"
-          v-for="(item, index) in questionIds"
-          :key="item.id"
-          @click="$emit('toHref', item)"
-          >{{ index + 1 }}</a
-        >
+    <div class="exam-head">答题卡</div>
+    <el-scrollbar wrap-style="overflow-x:hidden;">
+      <div class="router-content" style="margin-top: 10px">
+        <div class="router-link">
+          <a
+            :class="[
+              'router-index',
+              routerIndex === item ? 'router-active' : '',
+            ]"
+            v-for="(item, index) in questionIds"
+            :key="item.id"
+            @click="$emit('toHref', item)"
+            >{{ index + 1 }}</a
+          >
+        </div>
       </div>
-    </div>
-  </el-scrollbar>
+    </el-scrollbar>
+  </div>
 </template>
 
 <script>
@@ -54,5 +57,9 @@ export default {
   border-top: 10px solid #f7f8f9;
   font-size: 14px;
   position: relative;
+}
+
+.el-scrollbar {
+  border-radius: 0 0 8px 8px;
 }
 </style>

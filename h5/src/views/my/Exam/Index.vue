@@ -90,25 +90,40 @@ export default {
       paperShowType,
       examStartTime,
       examEndTime,
+      examMarkState,
+      examMarkEndTime,
     }) {
       const _examStartTime = new Date(examStartTime).getTime()
       const _examEndTime = new Date(examEndTime).getTime()
+      const _examMarkEndTime = new Date(examMarkEndTime).getTime()
       const now = new Date().getTime()
       if (now < _examStartTime) {
-        this.$message.warning('考试未开始，请等待...')
+        this.$message.warning('考试暂未开始！')
         return
       }
 
-      this.$router.push({
-        name: 'MyExamDetail',
-        params: {
-          examId,
-          paperId,
-          examEndTime,
-          showType: paperShowType,
-          preview: _examStartTime < now && now > _examEndTime,
-        },
-      })
+      if (now < _examMarkEndTime) {
+        this.$message.warning('阅卷暂未结束！')
+        return
+      }
+
+      // 考试时间内和阅卷结束后的逻辑
+      if (
+        (_examStartTime < now && now < _examEndTime) ||
+        (now > _examMarkEndTime && examMarkState === 3)
+      ) {
+        this.$router.push({
+          name: 'MyExamDetail',
+          params: {
+            examId,
+            paperId,
+            userId: null,
+            examEndTime,
+            showType: paperShowType,
+            preview: !(_examStartTime < now && now < _examEndTime),
+          },
+        })
+      }
     },
     // 分页切换
     pageChange(val) {

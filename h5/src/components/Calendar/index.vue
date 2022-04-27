@@ -1,19 +1,19 @@
 <template>
   <div class="el-calendar">
     <div class="el-calendar__header">
-      <div class="el-calendar__title">
+      <!-- <div class="el-calendar__title">
         {{ i18nDate }}
-      </div>
+      </div> -->
       <div class="el-calendar__button-group" v-if="validatedRange.length === 0">
         <i
           title="上个月"
-          class="el-icon-d-arrow-left"
+          class="el-icon-arrow-left"
           @click="selectDate('prev-month')"
         ></i>
-        <i title="今天" class="el-icon-link" @click="selectDate('today')"></i>
+        <div>{{ i18nDate }}</div>
         <i
           title="下个月"
-          class="el-icon-d-arrow-right"
+          class="el-icon-arrow-right"
           @click="selectDate('next-month')"
         ></i>
       </div>
@@ -300,6 +300,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.el-calendar__button-group {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
 .el-icon-d-arrow-left,
 .el-icon-d-arrow-right {
   padding: 3px;

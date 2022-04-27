@@ -63,15 +63,6 @@
           value-format="yyyy-MM-dd HH:mm:ss"
         ></el-date-picker>
       </el-form-item>
-      <!-- <el-form-item label="成绩公开">
-          <el-checkbox v-model="examForm.scoreState">是</el-checkbox>
-        </el-form-item>
-        <el-form-item label="排名公开">
-          <el-checkbox v-model="examForm.rankState">是</el-checkbox>
-        </el-form-item>
-        <el-form-item label="考试方式">
-          <el-checkbox v-model="examForm.loginType">免登录</el-checkbox>
-        </el-form-item> -->
       <el-form-item>
         <el-button @click="addOrEdit" type="primary">{{
           id ? '修改' : '添加'

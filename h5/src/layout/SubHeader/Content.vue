@@ -83,20 +83,14 @@ export default {
 
 <style lang="scss" scoped>
 .header-content {
-  position: absolute;
-  width: 60%;
-  height: 50px;
-  top: 0;
-  left: 15%;
-  right: 15%;
-  bottom: 0;
+  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 /deep/ .el-tabs {
-  height: 50px;
+  height: 40px;
 }
 /deep/ .el-tabs__header {
   margin: 0;
@@ -106,7 +100,7 @@ export default {
 }
 
 /deep/ .el-tabs__item {
-  height: 48px;
-  line-height: 50px;
+  height: 38px;
+  line-height: 40px;
 }
 </style>

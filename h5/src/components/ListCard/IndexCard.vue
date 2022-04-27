@@ -158,5 +158,5 @@ export default {
 </script>
 vue
 <style lang="scss" scoped>
-@import '../../assets/style/list-card.scss';
+@import 'assets/style/list-card.scss';
 </style>

@@ -8,7 +8,7 @@
  * @LastEditTime: 2022-01-18 16:20:53
 -->
 <template>
-  <el-scrollbar wrap-style="overflow-x:hidden;" class="content-left">
+  <div class="content-left">
     <div class="user-info">
       <el-avatar
         :size="64"
@@ -22,45 +22,35 @@
         }}
       </div>
     </div>
-    <div class="exam-head">
-      <span>答题卡</span>
-    </div>
-    <div
-      class="router-content"
-      v-for="(item, index) in paperQuestion"
-      :key="index"
-      :style="{
-        marginBottom: index + 1 === paperQuestion.length ? '50px' : '0',
-      }"
-    >
-      <div class="router-title" v-if="item.questionList">
-        第{{ $tools.intToChinese(index + 1) }}章（共{{
-          item.questionList.length
-        }}题，合计{{ computeChapterScore(item.questionList) }}分）
+    <div class="exam-head">答题卡</div>
+    <el-scrollbar wrap-style="overflow-x:hidden;">
+      <div
+        class="router-content"
+        v-for="(item, index) in paperQuestion"
+        :key="index"
+      >
+        <div class="router-title" v-if="item.questionList">
+          第{{ $tools.intToChinese(index + 1) }}章（共{{
+            item.questionList.length
+          }}题，合计{{ computeChapterScore(item.questionList) }}分）
+        </div>
+        <div class="router-link" v-if="item.questionList">
+          <a
+            :class="[
+              'router-index',
+              child.submit ? 'router-submit' : '',
+              child.sign ? 'router-sign' : '',
+              routerIndex === child.id ? 'router-active' : '',
+            ]"
+            @click="toHref(child.id)"
+            @dblclick="sign(child.id)"
+            v-for="(child, index) in item.questionList"
+            :key="child.id"
+            >{{ index + 1 }}</a
+          >
+        </div>
       </div>
-      <div class="router-link" v-if="item.questionList">
-        <a
-          :class="[
-            'router-index',
-            child.submit ? 'router-submit' : '',
-            child.sign ? 'router-sign' : '',
-            routerIndex === child.id ? 'router-active' : '',
-          ]"
-          @click="toHref(child.id)"
-          @dblclick="sign(child.id)"
-          v-for="(child, index) in item.questionList"
-          :key="child.id"
-          >{{ index + 1 }}</a
-        >
-      </div>
-    </div>
-    <div class="exam-footer" v-if="!preview">
-      <div class="exam-time">
-        剩余：<CountDown :time="systemTime" @finish="forceExamEnd"></CountDown>
-      </div>
-      <div class="exam-finish" @click="examEnd">提交</div>
-    </div>
-    <!-- <template v-if="Number(showType) === 3">
+      <!-- <template v-if="Number(showType) === 3">
         <div class="question-router">
           <a
             :class="[
@@ -77,7 +67,14 @@
           >
         </div>
       </template> -->
-  </el-scrollbar>
+    </el-scrollbar>
+    <div class="exam-footer" v-if="!preview">
+      <div class="exam-btn">
+        剩余：<CountDown :time="systemTime" @finish="forceExamEnd"></CountDown>
+      </div>
+      <div class="exam-btn exam-finish" @click="examEnd">提交</div>
+    </div>
+  </div>
 </template>
 
 <script>

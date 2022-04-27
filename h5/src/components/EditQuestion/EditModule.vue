@@ -694,7 +694,7 @@ export default {
 
       status
         ? ((params.questionTypeId = this.questionTypeId),
-          (params.state = this.publish ? 1 : 2))
+          (params.state = this.publish ? 1 : this.editForm.state))
         : ((params.id = this.editForm.id), (params.state = this.editForm.state))
 
       // 选项值(单选、多选)

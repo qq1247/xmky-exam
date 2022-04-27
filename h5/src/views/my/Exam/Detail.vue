@@ -1,13 +1,26 @@
 <template>
   <div class="container">
-    <!-- 内容 -->
     <div class="content">
+      <!-- 导航 -->
+      <question-router
+        v-if="paperQuestion.length"
+        :preview="preview"
+        :system-time="systemTime"
+        :router-index="routerIndex"
+        :paperQuestion="paperQuestion"
+        @sign="sign"
+        @toHref="toHref"
+        @examEnd="examEnd"
+        @forceExamEnd="forceExamEnd"
+      ></question-router>
+      <!-- 试题 -->
       <div class="content-center">
         <div class="paper-title">{{ paper.name }}</div>
 
         <page-show
           v-if="showType === 1 && Object.keys(myExamDetailCache).length"
           :preview="preview"
+          :scoreState="scoreState"
           :paperQuestion="paperQuestion"
           :myExamDetailCache="myExamDetailCache"
           @updateAnswer="updateAnswer"
@@ -24,25 +37,19 @@
           @nextQuestion="nextQuestion"
         ></question-show>
       </div>
-
-      <question-router
-        v-if="paperQuestion.length"
-        :preview="preview"
-        :system-time="systemTime"
-        :router-index="routerIndex"
-        :paperQuestion="paperQuestion"
-        @sign="sign"
-        @toHref="toHref"
-        @examEnd="examEnd"
-        @forceExamEnd="forceExamEnd"
-      ></question-router>
     </div>
   </div>
 </template>
 <script>
 import { loginSysTime } from 'api/common'
 import { paperGet, paperQuestionList } from 'api/paper'
-import { myExamAnswerList, myExamAnswer, myExamFinish } from 'api/my'
+import {
+  myExamAnswer,
+  myExamFinish,
+  myExamAnswerList,
+  myMarkAnswerList,
+} from 'api/my'
+import { examGet } from 'api/exam'
 import PageShow from 'components/PaperContent/PageShow.vue'
 import QuestionShow from 'components/PaperContent/QuestionShow.vue'
 import QuestionRouter from 'components/PaperContent/QuestionRouter.vue'
@@ -57,6 +64,7 @@ export default {
       id: 0,
       examId: null,
       paperId: null,
+      userId: null,
       paperName: '',
       showType: 1,
       preview: false,
@@ -71,11 +79,13 @@ export default {
       examEndTime: '',
       systemTime: 0,
       routerIndex: 0,
+      scoreState: false,
     }
   },
   created() {
-    const { examId, paperId, preview, examEndTime, showType } =
+    const { examId, paperId, userId, preview, examEndTime, showType } =
       this.$route.params
+    this.userId = userId
     this.examId = examId
     this.paperId = paperId
     this.preview = JSON.parse(preview)
@@ -84,16 +94,14 @@ export default {
     this.init()
   },
   methods: {
-    // 返回
-    goBack() {
-      this.$router.back()
-    },
     // 初始化
     async init() {
       await this.setTime()
       await this.queryPaper()
       await this.queryPaperInfo()
       await this.queryAnswerInfo()
+      const res = await examGet({ id: this.examId })
+      this.scoreState = res.data.scoreState === 1
     },
     // 校准时间差
     async setTime() {
@@ -124,9 +132,17 @@ export default {
     // 查询我的答案信息
     async queryAnswerInfo() {
       try {
-        const res = await myExamAnswerList({
-          examId: this.examId,
-        })
+        let res
+        if (this.userId) {
+          res = await myMarkAnswerList({
+            examId: this.examId,
+            userId: this.userId,
+          })
+        } else {
+          res = await myExamAnswerList({
+            examId: this.examId,
+          })
+        }
 
         let paperQuestion = this.paperQuestion.reduce((acc, cur) => {
           acc.push(...cur.questionList)

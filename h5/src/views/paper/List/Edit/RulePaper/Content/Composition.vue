@@ -358,7 +358,7 @@
             </el-form-item> -->
           </div>
           <el-form-item v-if="settingForm.type === 3">
-            <el-checkbox-group v-model="settingForm.scoreOptions">
+            <el-checkbox-group v-model="settingForm.aiOptions">
               <el-tooltip
                 class="item"
                 content="默认答案有顺序"
@@ -378,7 +378,7 @@
             </el-checkbox-group>
           </el-form-item>
           <el-form-item v-if="settingForm.type === 5">
-            <el-checkbox-group v-model="settingForm.scoreOptions">
+            <el-checkbox-group v-model="settingForm.aiOptions">
               <el-tooltip
                 class="item"
                 content="大小写不敏感"
@@ -421,7 +421,7 @@
           ></el-input-number>
         </el-form-item>
         <el-form-item label="选项设置">
-          <el-checkbox-group v-model="batchForm.scoreOptions">
+          <el-checkbox-group v-model="batchForm.aiOptions">
             <el-tooltip
               class="item"
               content="默认题目分数的一半"
@@ -451,7 +451,7 @@
         <el-form-item
           label="漏选得分"
           prop="multipScore"
-          v-if="batchForm.scoreOptions.includes(1)"
+          v-if="batchForm.aiOptions.includes(1)"
         >
           <el-input-number
             :max="100"
@@ -513,7 +513,7 @@ export default {
     const validateMultipScore = (rule, value, callback) => {
       if (
         this.settingForm.ai === 2 ||
-        this.settingForm.scoreOptions.length === 0
+        this.settingForm.aiOptions.length === 0
       ) {
         this.settingForm.multipScore = ''
         return callback()
@@ -548,7 +548,7 @@ export default {
         type: 1,
         score: 1,
         answers: [],
-        scoreOptions: [],
+        aiOptions: [],
         multipScore: '',
         rules: {
           score: [{ required: true, message: '请输入分值', trigger: 'change' }],
@@ -560,7 +560,7 @@ export default {
         show: false,
         id: null,
         score: '',
-        scoreOptions: [],
+        aiOptions: [],
         multipScore: '',
         rules: {
           score: [
@@ -702,10 +702,10 @@ export default {
       this.settingForm.type = data.type
       this.settingForm.ai = data.ai
       this.settingForm.score = data.score
-      this.settingForm.scoreOptions = data.scoreOptions ? data.scoreOptions : []
+      this.settingForm.aiOptions = data.aiOptions ? data.aiOptions : []
       this.settingForm.answers = data.answers
       this.settingForm.multipScore =
-        data.type === 2 && data.ai === 1 && data.scoreOptions
+        data.type === 2 && data.ai === 1 && data.aiOptions
           ? data.answers[0].score
           : ''
       this.settingForm.show = true
@@ -741,7 +741,7 @@ export default {
           score: this.settingForm.score,
           subScores:
             this.settingForm.type === 2
-              ? this.settingForm.scoreOptions.length === 0
+              ? this.settingForm.aiOptions.length === 0
                 ? []
                 : paperQuestionAnswerScore
               : paperQuestionAnswerScore,
@@ -751,7 +751,7 @@ export default {
           [2, 3, 5].includes(this.settingForm.type) &&
           this.settingForm.ai === 1
         ) {
-          params = { ...params, scoreOptions: this.settingForm.scoreOptions }
+          params = { ...params, aiOptions: this.settingForm.aiOptions }
         }
 
         const updateScore = await paperScoreUpdate(params)
@@ -768,10 +768,10 @@ export default {
       const res = await paperUpdateBatchScore({
         chapterId: this.batchForm.id,
         score: this.batchForm.score,
-        subScores: this.batchForm.scoreOptions.includes(1)
+        subScores: this.batchForm.aiOptions.includes(1)
           ? this.batchForm.multipScore
           : null,
-        scoreOptions: this.batchForm.scoreOptions,
+        aiOptions: this.batchForm.aiOptions,
       })
       if (res?.code === 200) {
         this.$message.success('编辑成功！')

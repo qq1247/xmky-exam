@@ -164,8 +164,6 @@
       </el-radio-group>
 
       <!-- 问答 -->
-      <template v-if="questionDetail.type === 5"> </template>
-
       <template v-if="questionDetail.type === 5">
         <template v-if="questionDetail.ai === 1">
           <div
@@ -295,6 +293,7 @@ export default {
       return (index) => {
         // 单选
         if (this.questionDetail.type === 1) {
+          console.log(this.questionDetail.selected)
           // 选择完毕且与正确答案不匹配
           if (
             this.questionDetail.selected === String.fromCharCode(65 + index) &&
@@ -533,9 +532,7 @@ export default {
   height: 400px;
 }
 .test-handler {
-  padding: 10px;
-  border-top: 10px solid #f7f8f9;
-  border-bottom: 10px solid #f7f8f9;
+  padding: 16px;
 }
 .question-analysis {
   display: flex;

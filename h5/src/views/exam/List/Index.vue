@@ -125,7 +125,7 @@ export default {
       })
     },
     // 考试发布
-    publish({ id, state }) {
+    publish({ id }) {
       this.$tools.switchTab('ExamListSetting', {
         id,
         examTypeId: this.$route.params.id,

@@ -1,12 +1,3 @@
-<!--
- * @Description: 管理员
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-12-13 13:58:51
- * @LastEditors: Che
- * @LastEditTime: 2022-01-12 18:13:47
--->
 <template>
   <div class="home-content">
     <div class="home-params">

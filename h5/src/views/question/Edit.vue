@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div>
     <!-- 搜索 -->
     <el-form
       :inline="true"
@@ -358,16 +358,12 @@ export default {
 </script>
 <style lang="scss" scoped>
 .form-inline {
-  height: 60px;
-  padding: 10px 20px 10px 70px;
-  position: fixed;
-  top: 50px;
-  left: 0;
-  right: 0;
+  padding: 16px;
   background: #fff;
-  z-index: 1500;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px 8px 0 0;
   .el-form-item {
-    width: 140px;
+    width: 168px;
     margin-bottom: 0;
   }
 }
@@ -375,25 +371,29 @@ export default {
 .content {
   display: flex;
   width: 100%;
-  height: calc(100vh - 70px);
-  padding: 45px 0 0;
+  height: calc(100vh - 200px);
   margin: 0 auto;
 }
 
 .content-left {
-  width: 145px;
+  width: 136px;
   background: #fff;
   position: relative;
+  border-bottom-left-radius: 8px;
 }
 
 .content-center {
   flex: 1;
+  background: #fff;
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .content-right {
-  width: 500px;
+  width: 400px;
   background: #fff;
   padding: 10px 20px 0 0;
+  border-bottom-right-radius: 8px;
   .top {
     background: #fff;
     width: 100%;
@@ -406,7 +406,7 @@ export default {
     z-index: 100;
     font-weight: 600;
     padding-left: 30px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     &::before {
       content: '';
       display: inline-block;

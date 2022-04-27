@@ -95,7 +95,7 @@
         border-radius: 3px;
         font-size: 12px;
         position: absolute;
-        left: 390px;
+        left: 340px;
         top: 85%;
         transform: translateY(-50%);
         opacity: 0;
@@ -129,7 +129,7 @@
           border-color: transparent #4a5766 transparent transparent;
         }
       }
-      &:last-child {
+      &.last-span {
         position: initial;
         &::after,
         &::before {
@@ -137,7 +137,7 @@
         }
         &:hover {
           .handler-more {
-            left: 380px;
+            left: 330px;
             opacity: 1;
           }
         }

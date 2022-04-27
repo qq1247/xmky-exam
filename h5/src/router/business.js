@@ -240,7 +240,7 @@ export default [
         hidden: true,
       },
       {
-        path: 'detail/:examId/:paperId/:examEndTime/:showType/:preview',
+        path: 'detail/:examId/:paperId/:examEndTime/:showType/:preview/:userId?',
         component: () => import('views/my/Exam/Detail.vue'),
         name: 'MyExamDetail',
         meta: {
@@ -333,15 +333,28 @@ export default [
   },
   {
     path: '/quick',
-    component: () => import('@/views/quick/Index.vue'),
+    component: Layout,
+    redirect: '/quick/index',
     name: 'Quick',
     meta: {
-      title: '模拟练习',
+      title: '快捷考试',
       icon: 'common common-quick',
       layout: 'subAdmin',
       roles: ['subAdmin'],
       hidden: true,
     },
+    children: [
+      {
+        path: 'index',
+        name: 'QuickIndex',
+        component: () => import('@/views/quick/Index.vue'),
+        hidden: true,
+        meta: {
+          title: '快捷考试',
+          layout: 'subAdmin',
+        },
+      },
+    ],
   },
   { path: '*', redirect: '/404', hidden: true },
 ]

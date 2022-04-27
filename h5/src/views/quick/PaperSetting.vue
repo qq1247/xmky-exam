@@ -283,7 +283,7 @@ export default {
     },
     // 组卷方式
     setPaperType(index) {
-      if( this.paperForm.state === 1)  return
+      if (this.paperForm.state === 1) return
       if (index == 1) {
         this.paperForm.genType = 0
         this.$message('暂未开放！', 'warning')
@@ -417,8 +417,8 @@ export default {
 .footer {
   position: fixed;
   bottom: 0;
-  width: calc(100% - 201px);
-  right: 0;
+  width: 1200px;
+  left: calc((100% - 1200px) / 2);
   background: rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(13px);
   display: flex;
