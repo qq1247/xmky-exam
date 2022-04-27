@@ -34,11 +34,11 @@
         >{{ data.state == 1 ? '发布' : '草稿' }}</el-tag
       >
 
-      <template v-if="data.scoreOptions">
+      <template v-if="data.aiOptions">
         <el-tag
           size="small"
           type="info"
-          v-for="item in data.scoreOptions"
+          v-for="item in data.aiOptions"
           :key="item"
           >{{ getValue(item) }}</el-tag
         >

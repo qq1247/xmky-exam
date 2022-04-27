@@ -25,7 +25,7 @@ public class PaperQuestionAnswerDaoImpl extends RBaseDaoImpl<PaperQuestionAnswer
 
 	@Override
 	public List<PaperQuestionAnswer> getList(Integer paperId, Integer questionId) {
-		String sql = "SELECT * FROM EXM_PAPER_QUESTION_ANSWER WHERE PAPER_ID = ? AND QUESTION_ID = ?";
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION_ANSWER WHERE PAPER_ID = :PAPER_ID AND QUESTION_ID = :QUESTION_ID";
 		return getList(sql, new Object[] { paperId, questionId }, PaperQuestionAnswer.class);
 	}
 }

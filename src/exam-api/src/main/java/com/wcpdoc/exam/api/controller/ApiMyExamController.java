@@ -23,6 +23,7 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.ValidateUtil;
+import com.wcpdoc.exam.core.cache.AutoMarkCache;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
@@ -125,6 +126,9 @@ public class ApiMyExamController extends BaseController{
 	@ResponseBody
 	public PageResult answer(Integer examId, Integer questionId, String[] answers, Integer answerFileId) {
 		try {
+			if (!AutoMarkCache.tryReadLock(examId, 2000)) {
+				throw new MyException("尝试加读锁失败");
+			}
 			myExamService.answerUpdate(examId, getCurUser().getId(), questionId, answers, answerFileId);
 			return PageResult.ok();
 		} catch (MyException e) {
@@ -133,6 +137,8 @@ public class ApiMyExamController extends BaseController{
 		} catch (Exception e) {
 			log.error("更新答案错误：", e);
 			return PageResult.err();
+		} finally {
+			AutoMarkCache.releaseReadLock(examId);
 		}
 	}
 	
@@ -147,6 +153,9 @@ public class ApiMyExamController extends BaseController{
 	@ResponseBody
 	public PageResult finish(Integer examId) {
 		try {
+			if (!AutoMarkCache.tryReadLock(examId, 2000)) {
+				throw new MyException("尝试加读锁失败");
+			}
 			myExamService.finish(examId, getCurUser().getId());
 			return PageResult.ok();
 		} catch (MyException e) {
@@ -155,6 +164,8 @@ public class ApiMyExamController extends BaseController{
 		} catch (Exception e) {
 			log.error("完成交卷错误：", e);
 			return PageResult.err();
+		} finally {
+			AutoMarkCache.releaseReadLock(examId);
 		}
 	}
 	

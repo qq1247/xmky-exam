@@ -32,15 +32,15 @@ public class BulletinDaoImpl extends RBaseDaoImpl<Bulletin> implements BulletinD
 				+ "FROM EXM_BULLETIN BULLETIN "
 				+ "LEFT JOIN SYS_USER USER ON BULLETIN.UPDATE_USER_ID = USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("title")), "BULLETIN.TITLE LIKE ?", "%" + pageIn.get("title") + "%")
-		.addWhere(ValidateUtil.isValid(pageIn.get("showType")), "BULLETIN.SHOW_TYPE = ?", pageIn.get("showType", Integer.class))
-			   .addWhere(pageIn.get("curUserId", Integer.class) == 1, "BULLETIN.UPDATE_USER_ID = ?", pageIn.get("curUserId", Integer.class))// 如果是管理员，查询所有的
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("title")), "BULLETIN.TITLE LIKE :TITLE", "%" + pageIn.get("title") + "%")
+		.addWhere(ValidateUtil.isValid(pageIn.get("showType")), "BULLETIN.SHOW_TYPE = :SHOW_TYPE", pageIn.get("showType", Integer.class))
+			   .addWhere(pageIn.get("curUserId", Integer.class) == 1, "BULLETIN.UPDATE_USER_ID = :UPDATE_USER_ID1", pageIn.get("curUserId", Integer.class))// 如果是管理员，查询所有的
 			   .addWhere(pageIn.get("curUserId", Integer.class) != 1,
-				   	"(BULLETIN.READ_USER_IDS IS NULL OR BULLETIN.READ_USER_IDS LIKE ? ) AND BULLETIN.START_TIME <= ? AND ? <= BULLETIN.END_TIME AND BULLETIN.STATE = 1", 
+				   	"(BULLETIN.READ_USER_IDS IS NULL OR BULLETIN.READ_USER_IDS LIKE :READ_USER_IDS) AND BULLETIN.START_TIME <= :START_TIME AND :END_TIME <= BULLETIN.END_TIME AND BULLETIN.STATE = 1", 
 				   	"%" + pageIn.get("curUserId", Integer.class) + "%", new Date(), new Date())// 如果不是管理员，查询自己有权限查看的，并且在有效时间内，并且是已发布的
 			   .addWhere(!ValidateUtil.isValid(pageIn.get("state")), "BULLETIN.STATE IN (1,2)")
 			   .addWhere(ValidateUtil.isValid(pageIn.get("state")) && "0".equals(pageIn.get("state")), "BULLETIN.STATE IN (1,2)")
-			   .addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "BULLETIN.STATE = ?", pageIn.get("state"))
+			   .addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "BULLETIN.STATE = :STATE", pageIn.get("state"))
 			   .addOrder("BULLETIN.SHOW_TYPE", Order.DESC)
 			   .addOrder("BULLETIN.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
@@ -55,8 +55,8 @@ public class BulletinDaoImpl extends RBaseDaoImpl<Bulletin> implements BulletinD
 		String sql = "SELECT USER.ID, USER.NAME AS NAME "
 				+ "FROM SYS_USER USER ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "(USER.NAME LIKE ? )", "%" + pageIn.get("name") + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.get("id")), "EXISTS (SELECT 1 FROM EXM_BULLETIN Z WHERE Z.ID = ? AND Z.READ_USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.get("id"))
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "(USER.NAME LIKE :NAME)", "%" + pageIn.get("name") + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.get("id")), "EXISTS (SELECT 1 FROM EXM_BULLETIN Z WHERE Z.ID = :ID AND Z.READ_USER_IDS LIKE CONCAT('%,', USER.ID, ',%'))", pageIn.get("id"))
 				.addWhere("USER.STATE = 1")
 				.addOrder("USER.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
@@ -68,8 +68,8 @@ public class BulletinDaoImpl extends RBaseDaoImpl<Bulletin> implements BulletinD
 		String sql = "SELECT ORG.ID, ORG.NAME AS NAME "
 				+ "FROM SYS_ORG ORG ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "(ORG.NAME LIKE ? )", "%" + pageIn.get("name") + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.get("id")), "EXISTS (SELECT 1 FROM EXM_BULLETIN Z WHERE Z.ID = ? AND Z.READ_ORG_IDS LIKE CONCAT('%,', ORG.ID, ',%'))", pageIn.get("id"))
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "(ORG.NAME LIKE :NAME)", "%" + pageIn.get("name") + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.get("id")), "EXISTS (SELECT 1 FROM EXM_BULLETIN Z WHERE Z.ID = :ID AND Z.READ_ORG_IDS LIKE CONCAT('%,', ORG.ID, ',%'))", pageIn.get("id"))
 				.addWhere("ORG.STATE = 1")
 				.addOrder("ORG.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);

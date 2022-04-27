@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -205,5 +206,48 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 	public Integer getFileId(String uuid) {
 		String fileId = FileIdCache.getFileId(uuid);
 		return Integer.parseInt(fileId);
+	}
+
+	@Override
+	public Integer copyFile(Integer id) {
+		// 校验数据有效性
+		if (id == null) {
+			throw new MyException("参数错误：id");
+		}
+		File fileOld = fileDao.getEntity(id);
+		if (fileOld == null) {
+			throw new MyException("参数错误：id");
+		}
+		
+		File fileNew = new File();
+		try {
+			BeanUtils.copyProperties(fileNew, fileOld);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw new MyException("拷贝附件错误");
+		}
+		String baseDir = getFileUploadDir();
+		java.io.File tempFile = new java.io.File(String.format("%s%s", baseDir, fileOld.getPath()));
+		String fileId = IdUtil.getInstance().nextId() + "";
+		String timeStr = DateUtil.formatDateTime(new Date());
+		String ymdPath = String.format("%s%s%s%s%s%s", java.io.File.separator, timeStr.substring(0, 4), java.io.File.separator, 
+				timeStr.substring(5, 7), java.io.File.separator, timeStr.substring(8, 10));
+		fileNew.setState(1);
+		fileNew.setPath(String.format("%s%s%s", ymdPath, java.io.File.separator, fileId));
+		fileNew.setIp(request.getRemoteHost());
+		fileNew.setUpdateUserId(getCurUser().getId());
+		fileNew.setUpdateTime(new Date());
+		fileDao.add(fileNew);
+		
+		// 复制文件
+		java.io.File destDir = new java.io.File(String.format("%s%s",  baseDir, fileNew.getPath()));
+		try {
+			FileUtils.copyFile(tempFile, destDir);
+		} catch (Exception e) {
+			log.error("拷贝附件失败：{} 到 {}", tempFile.getAbsolutePath(), destDir.getAbsolutePath());
+			throw new MyException("拷贝附件失败");
+		}
+		
+		return fileNew.getId();
 	}
 }

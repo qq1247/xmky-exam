@@ -484,6 +484,18 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		entity.setCreateUserId(getCurUser().getId());
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
+		//修改标题图片
+		List<Integer> fileIdList = html2FileIds(entity.getTitle());
+		for (Integer fileId : fileIdList) {
+			Integer copyFileId = fileService.copyFile(fileId);
+			entity.setTitle(entity.getTitle().replace("/api/file/download?id="+fileId, "/api/file/download?id="+copyFileId));
+		}
+		//修改解释图片
+		fileIdList = html2FileIds(entity.getAnalysis());
+		for (Integer fileId : fileIdList) {
+			Integer copyFileId = fileService.copyFile(fileId);
+			entity.setAnalysis(entity.getAnalysis().replace("/api/file/download?id="+fileId, "/api/file/download?id="+copyFileId));
+		}
 		questionDao.add(entity);
 		
 		List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
@@ -491,6 +503,12 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			QuestionAnswer questionAnswerNew = new QuestionAnswer();
 			BeanUtils.copyProperties(questionAnswerNew, questionAnswer);
 			questionAnswerNew.setQuestionId(entity.getId());
+			//修改答案图片
+			fileIdList = html2FileIds(questionAnswer.getAnswer());
+			for (Integer fileId : fileIdList) {
+				Integer copyFileId = fileService.copyFile(fileId);
+				questionAnswer.setAnswer(questionAnswer.getAnswer().replace("/api/file/download?id="+fileId, "/api/file/download?id="+copyFileId));
+			}
 			questionAnswerService.add(questionAnswerNew);
 		}
 		
@@ -499,6 +517,12 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			QuestionOption questionOptionNew = new QuestionOption();
 			BeanUtils.copyProperties(questionOptionNew, questionOption);
 			questionOptionNew.setQuestionId(entity.getId());
+			//修改选项图片
+			fileIdList = html2FileIds(questionOption.getOptions());
+			for (Integer fileId : fileIdList) {
+				Integer copyFileId = fileService.copyFile(fileId);
+				questionOption.setOptions(questionOption.getOptions().replace("/api/file/download?id="+fileId, "/api/file/download?id="+copyFileId));
+			}
 			questionOptionService.add(questionOptionNew);
 		}
 	}
@@ -729,5 +753,10 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				}
 			}
 		}
+	}
+
+	@Override
+	public List<Question> delQuestionList() {
+		return questionDao.delQuestionList();
 	}
 }

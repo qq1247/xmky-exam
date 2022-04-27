@@ -117,4 +117,15 @@ public interface ExamService extends BaseService<Exam>{
 	 * @param content void
 	 */
 	void mail(Exam exam, Integer notifyType, String content);
+
+	/**
+	 * 变更考试时间
+	 * 
+	 * v1.0 zhanghc 2022年4月17日下午6:52:08
+	 * @param id 考试ID
+	 * @param timeType 时间类型：1：考试开始时间；2：考试结束时间；3：阅卷开始时间；4：阅卷结束时间
+	 * @param minute 分钟数
+	 * @return PageResult
+	 */
+	void timeUpdate(Integer id, Integer timeType, Integer minute);
 }

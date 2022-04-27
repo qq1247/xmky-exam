@@ -100,25 +100,23 @@ public abstract class RBaseDaoImpl<T> implements RBaseDao<T> {
 	}
 	
 	@Override
-	public /*final*/ int update(String sql, Object... params) {
+	public /*final*/ int update(String sql, Object... parms) {
+		List<String> namedParmList = SqlUtil.parseNamedParm(sql, parms);
 		@SuppressWarnings("unchecked")
-		Query<T> query = getCurSession().createSQLQuery(toHibernateSql(sql));
-		for(int i = 0; i < params.length; i++) {
-			query.setParameter(i, params[i]);
+		Query<T> query = getCurSession().createSQLQuery(sql);
+		for(int i = 0; i < parms.length; i++) {
+			query.setParameter(namedParmList.get(i), parms[i]);
 		}
-		
 		return query.executeUpdate();
 	}
 
 	@Override
-	public /*final*/ int getCount(String sql, Object... params) {
-		sql = toHibernateSql(sql);
+	public /*final*/ int getCount(String sql, Object... parms) {
+		List<String> namedParmList = SqlUtil.parseNamedParm(sql, parms);
 		@SuppressWarnings("unchecked")
 		Query<BigInteger> query = getCurSession().createSQLQuery(sql);
-		if (params != null) {
-			for (int i = 0; i < params.length; i++) {
-				query.setParameter(i, params[i]);
-			}
+		for(int i = 0; i < parms.length; i++) {
+			query.setParameter(namedParmList.get(i), parms[i]);
 		}
 		return query.uniqueResult().intValue();
 	}
@@ -129,61 +127,56 @@ public abstract class RBaseDaoImpl<T> implements RBaseDao<T> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public /* final */ PageOut getListpage(SqlUtil sqlUtil, PageIn pageIn) {
+		for(String a : pageIn.getWhere()) {//pageIn.addWhere
+			sqlUtil.addWhere(a);
+		}
+		
 		// 查询总记录数
-		String sql = toHibernateSql(sqlUtil.getCountSql());
-		Query<Map<String, Object>> query = getCurSession().createSQLQuery(sql);
-		for (int i = 0; i < sqlUtil.getWhereParams().size(); i++) {
-			query.setParameter(i, sqlUtil.getWhereParams().get(i));
+		Query<Map<String, Object>> query = getCurSession().createSQLQuery(sqlUtil.getCountSql());
+		List<Object> parmList = new ArrayList<>();
+		parmList.addAll(sqlUtil.getFromParmList());
+		parmList.addAll(sqlUtil.getWhereParmList());
+		parmList.addAll(pageIn.getWhereParmList());
+		Object[] parms = parmList.toArray(new Object[parmList.size()]);
+		List<String> namedParmList = SqlUtil.parseNamedParm(sqlUtil.getSql(), parms);
+		for (int i = 0; i < parms.length; i++) {
+			query.setParameter(namedParmList.get(i), parms[i]);
 		}
 		int total = ((BigInteger) query.uniqueResult()).intValue();
 		if (total == 0) {
 			return new PageOut(new ArrayList<Map<String,Object>>(), 0);// 如果总数为0，就不用在查询分页数据了
 		}
-				
+		
 		// 查询列表
-		sql = toHibernateSql(sqlUtil.getSql());
-		query = getCurSession().createSQLQuery(sql);
-		for (int i = 0; i < sqlUtil.getWhereParams().size(); i++) {
-			query.setParameter(i, sqlUtil.getWhereParams().get(i));
+		query = getCurSession().createSQLQuery(sqlUtil.getSql());
+		for (int i = 0; i < parms.length; i++) {
+			query.setParameter(namedParmList.get(i), parms[i]);
 		}
 		query.setFirstResult((pageIn.getCurPage() - 1) * pageIn.getPageSize());
 		query.setMaxResults(pageIn.getPageSize());
 		query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
 		List<Map<String, Object>> result = query.list();
-		for (Map<String, Object> map : result) {// 大写转小写，下划线后一位转大写。
-			Set<String> keySet = new HashSet<>(map.keySet());
-			for (String key : keySet) {
-				map.put(CaseUtils.toCamelCase(key, false, new char[] { '_' }), map.remove(key));
-			}
-		}
-
+		
 		// 封装结果
-		return new PageOut(result, total);
+		return new PageOut(toCamelCase(result), total);
+	}
+
+	@Override
+	public /*final*/ List<Map<String, Object>> getMapList(String sql, Object[] parms) {
+		List<String> namedParmList = SqlUtil.parseNamedParm(sql, parms);
+		@SuppressWarnings("unchecked")
+		Query<Map<String, Object>> query = getCurSession().createSQLQuery(sql);
+		for(int i = 0; i < parms.length; i++) {
+			query.setParameter(namedParmList.get(i), parms[i]);
+		}
+		query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+		List<Map<String, Object>> result = query.list();
+		return toCamelCase(result);
 	}
 	
 	@Override
 	public /*final*/ List<Map<String, Object>> getMapList(String sql) {
 		return getMapList(sql, new Object[0]);
-	}
-
-	@Override
-	public /*final*/ List<Map<String, Object>> getMapList(String sql, Object[] params) {
-		sql = toHibernateSql(sql);
-		@SuppressWarnings("unchecked")
-		Query<Map<String, Object>> query = getCurSession().createSQLQuery(sql);
-		query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
-		for (int i = 0; i < params.length; i++) {
-			query.setParameter(i, params[i]);
-		}
-		
-		List<Map<String, Object>> result = query.list();
-		for (Map<String, Object> map : result) {// 大写转小写，下划线后一位转大写。
-			Set<String> keySet = new HashSet<>(map.keySet());
-			for (String key : keySet) {
-				map.put(CaseUtils.toCamelCase(key, false, new char[] { '_' }), map.remove(key));
-			}
-		}
-		return result;
 	}
 	
 	@Override
@@ -197,17 +190,17 @@ public abstract class RBaseDaoImpl<T> implements RBaseDao<T> {
 	}
 
 	@Override
-	public /*final*/ List<T> getList(String sql, Object[] params) {
-		return getList(sql, params, clazz);
+	public /*final*/ List<T> getList(String sql, Object[] parms) {
+		return getList(sql, parms, clazz);
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public /*final*/ <E> List<E> getList(String sql, Object[] params, Class<E> clazz) {
-		sql = toHibernateSql(sql);
+	public /*final*/ <E> List<E> getList(String sql, Object[] parms, Class<E> clazz) {
+		List<String> namedParmList = SqlUtil.parseNamedParm(sql, parms);
 		Query<T> query = getCurSession().createSQLQuery(sql);
-		for (int i = 0; i < params.length; i++) {
-			query.setParameter(i, params[i]);
+		for (int i = 0; i < parms.length; i++) {
+			query.setParameter(namedParmList.get(i), parms[i]);
 		}
 
 		query.unwrap(NativeQuery.class).addEntity(clazz);
@@ -215,17 +208,17 @@ public abstract class RBaseDaoImpl<T> implements RBaseDao<T> {
 	}
 
 	@Override
-	public /*final*/ T getEntity(String sql, Object[] params) {
-		return getEntity(sql, params, clazz);
+	public /*final*/ T getEntity(String sql, Object[] parms) {
+		return getEntity(sql, parms, clazz);
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public /*final*/ <E> E getEntity(String sql, Object[] params, Class<E> clazz) {
-		sql = toHibernateSql(sql);
+	public /*final*/ <E> E getEntity(String sql, Object[] parms, Class<E> clazz) {
+		List<String> namedParmList = SqlUtil.parseNamedParm(sql, parms);
 		Query<T> query = getCurSession().createSQLQuery(sql);
-		for (int i = 0; i < params.length; i++) {
-			query.setParameter(i, params[i]);
+		for (int i = 0; i < parms.length; i++) {
+			query.setParameter(namedParmList.get(i), parms[i]);
 		}
 
 		query.unwrap(NativeQuery.class).addEntity(clazz);
@@ -247,16 +240,20 @@ public abstract class RBaseDaoImpl<T> implements RBaseDao<T> {
 		getCurSession().evict(obj);
 	}
 	
-	private String toHibernateSql(String sql) {
-		StringBuilder _sql = new StringBuilder();
-		int pos = 0;
-		for (int i = 0; i < sql.length(); i++) {
-			char c = sql.charAt(i);
-			_sql.append(c);
-			if ('?' == c) {
-				_sql.append(pos++);
+	/**
+	 * 数据结果转为驼峰样式
+	 * 大写转小写，下划线后一位转大写
+	 * 
+	 * v1.0 zhanghc 2022年4月11日下午2:54:25
+	 * @param result void
+	 */
+	private List<Map<String, Object>> toCamelCase(List<Map<String, Object>> result) {
+		for (Map<String, Object> map : result) {
+			Set<String> keySet = new HashSet<>(map.keySet());
+			for (String key : keySet) {
+				map.put(CaseUtils.toCamelCase(key, false, new char[] { '_' }), map.remove(key));
 			}
 		}
-		return _sql.toString();
+		return result;
 	}
 }

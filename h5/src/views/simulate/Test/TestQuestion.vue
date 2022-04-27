@@ -529,7 +529,8 @@ export default {
   padding: 0;
 }
 .children-content {
-  height: 400px;
+  min-height: 400px;
+  height: auto;
 }
 .test-handler {
   padding: 16px;

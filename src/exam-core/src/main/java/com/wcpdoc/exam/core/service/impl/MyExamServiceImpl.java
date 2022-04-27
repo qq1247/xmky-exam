@@ -23,10 +23,14 @@ import com.wcpdoc.exam.core.dao.MyExamDao;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyExamDetail;
+import com.wcpdoc.exam.core.entity.Paper;
+import com.wcpdoc.exam.core.entity.PaperQuestion;
+import com.wcpdoc.exam.core.entity.PaperQuestionAnswer;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
 import com.wcpdoc.exam.core.service.MyExamService;
+import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.file.service.FileService;
 
@@ -48,6 +52,8 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	private MyExamDetailService myExamDetailService;
 	@Resource
 	private FileService fileService;
+	@Resource
+	private PaperService paperService;
 
 	@Override
 	@Resource(name = "myExamDaoImpl")
@@ -133,6 +139,9 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 
 		// 标记为考试中，记录答题时间
 		MyExam myExam = getEntity(examId, userId);
+		if (myExam.getState() == 3) {
+			throw new MyException("考试已交卷");
+		}
 		myExam.setState(2);
 		if (!ValidateUtil.isValid(myExam.getAnswerStartTime())) {
 			myExam.setAnswerStartTime(new Date());
@@ -179,6 +188,9 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		if (myExam == null) {
 			throw new MyException("未参与考试");
 		}
+		if (myExam.getState() == 3) {
+			throw new MyException("考试已交卷");
+		}
 		Exam exam = examService.getEntity(examId);
 		if (exam.getState() == 0) {
 			throw new MyException("考试已删除");
@@ -194,6 +206,24 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 			throw new MyException("考试已结束");
 		}
 	
+		// 阅卷
+		Paper paper = paperService.getEntity(exam.getPaperId());// 试卷信息
+		Map<Integer, Question> questionCache = myExamDetailService.getQuestionCache(exam, paper);// 试题缓存信息
+		Map<Integer, List<PaperQuestionAnswer>> questionAnswerListCache = paper.getGenType() == 1 
+				? myExamDetailService.questionAnswerListCache(exam.getPaperId(), questionCache.values()) 
+				: myExamDetailService.questionRandAnswerListCache(exam.getId(), exam.getPaperId(), questionCache.values());//试题答案缓存信息
+		Map<Integer, PaperQuestion> questionOptionCache = paper.getGenType() == 1 
+				? myExamDetailService.questionOptionCache(exam.getPaperId())
+				: myExamDetailService.questionRandOptionCache(exam.getId(), exam.getPaperId());//试题选项缓存信息
+		if (paper.getMarkType() == 1) {
+			for (Question question : questionCache.values()) {
+				if (question.getAi() == 2) {
+					throw new MyException(String.format("检测到主观试题，编号为【%s】", question.getId()));
+				}
+			}
+		}
+		myExamDetailService.markerUser(exam, paper, questionCache, questionAnswerListCache, questionOptionCache, myExam);
+		
 		// 标记为已交卷，记录最后交卷时间
 		myExam.setState(3);
 		myExam.setAnswerEndTime(new Date());

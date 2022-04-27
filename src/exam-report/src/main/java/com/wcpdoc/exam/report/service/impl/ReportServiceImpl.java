@@ -80,6 +80,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 	public Map<String, Object> homeUser() {
 		Map<String, Object> result = new HashMap<String, Object>();
 		List<Map<String, Object>> homeUserList = reportDao.homeUser(getCurUser().getId());
+		
 		Map<String, Object> homeUserMap = homeUserList.get(0);
 		Map<String, Object> data = new HashMap<String, Object>();
 		data.put("id", homeUserMap.get("userId"));
@@ -92,16 +93,47 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		data.put("name", homeUserMap.get("orgName"));
 		result.put("org", data);
 		data = new HashMap<String, Object>();
-		data.put("num", homeUserMap.get("examNum"));
-		data.put("missNum", reportDao.homeUserMissNum(getCurUser().getId())); //缺考题统计错误，时间没到的状态也是1，单独查询   homeUserMap.get("missNum")
-		data.put("succNum", homeUserMap.get("succNum"));
-		data.put("top", homeUserMap.get("top"));
+		data.put("num", homeUserList.size());
+		data.put("missNum", 0);//缺考题统计错误，时间没到的状态也是1，单独查询   homeUserMap.get("missNum")
+		data.put("succNum", 0);
+		data.put("top", 999999999);
+		
+		for (Map<String, Object> homeUser : homeUserList ) {
+			if (homeUser.get("myExamState").toString().equals("1") && DateUtil.getDateTime(homeUser.get("examStartTime").toString()).getTime() < System.currentTimeMillis()) { //一共缺考
+				data.put("missNum", Integer.valueOf(data.get("missNum").toString()) + 1);
+			}
+			
+			if (homeUser.get("myExamAnswerState") != null &&  homeUser.get("myExamAnswerState").toString().equals("1")) { //一共及格
+				data.put("succNum", Integer.valueOf(data.get("succNum").toString()) + 1);
+			}
+			
+			if (homeUser.get("examRankState").toString().equals("1") && homeUser.get("myExamNo") != null) { //最高排名
+				data.put("top", Math.min(Double.valueOf(homeUser.get("myExamNo").toString()), Double.valueOf(data.get("top").toString())));
+			}
+		}
+		if (data.get("top").equals(999999999)) {
+			data.put("top", 0);
+		}
 		result.put("exam", data);
+		
 		data = new HashMap<String, Object>();
-		data.put("avg", homeUserMap.get("avg") == null ? 0 : String.format("%.2f", homeUserMap.get("avg")).toString());
-		data.put("min", homeUserMap.get("min") == null ? 0 : homeUserMap.get("min"));
-		data.put("max", homeUserMap.get("max") == null ? 0 : homeUserMap.get("max"));
-		data.put("sd", homeUserMap.get("sd") == null ? 0 : String.format("%.2f", homeUserMap.get("sd")).toString()); //标准差
+		data.put("avg", 0);//平均值
+		data.put("min", 999999999);//最低成绩
+		data.put("max", 0);//最高成绩
+		data.put("sd", 0); //标准差 homeUserMap.get("sd") == null ? 0 : String.format("%.2f", homeUserMap.get("sd")).toString()
+		
+		for (Map<String, Object> homeUser : homeUserList ) {
+			if (!homeUser.get("examScoreState").toString().equals("1") || homeUser.get("myExamTotalScore") == null) {
+				continue;
+			}
+			
+			data.put("min", Math.min(Double.valueOf(homeUser.get("myExamTotalScore").toString()), Double.valueOf(data.get("min").toString())));
+			data.put("max", Math.max(Double.valueOf(homeUser.get("myExamTotalScore").toString()), Double.valueOf(data.get("max").toString())));
+			data.put("avg", BigDecimalUtil.newInstance(data.get("avg")).add(homeUser.get("myExamTotalScore")).getResult());
+		}
+		if (data.get("min").equals(999999999)) {
+			data.put("min", 0);
+		}
 		result.put("score", data);
 		return result;
 	}

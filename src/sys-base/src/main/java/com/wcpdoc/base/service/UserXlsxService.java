@@ -1,10 +1,7 @@
 package com.wcpdoc.base.service;
 
-import java.util.List;
-
 import org.springframework.web.multipart.MultipartFile;
 
-import com.wcpdoc.base.entity.UserXlsx;
 import com.wcpdoc.core.service.BaseService;
 
 /**
@@ -22,11 +19,12 @@ public interface UserXlsxService extends BaseService<Object> {
 	void inputUserXlsx(MultipartFile file);
 	
 	/**
-	 * 导出用户表
+	 * 导出用户
 	 * 
-	 * v1.0 chenyun 2021年3月4日下午5:29:49 void
+	 * v1.0 chenyun 2022年04月13日上午10:38:37
+	 * @param ids
 	 */
-	List<UserXlsx> exportUserXlsx(String ids);
+	void export(Integer[] ids);
 	
 	/**
 	 * 导出模板

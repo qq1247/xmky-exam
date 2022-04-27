@@ -28,8 +28,8 @@ public class OrgDaoImpl extends RBaseDaoImpl<Org> implements OrgDao {
 				+ "FROM SYS_ORG ORG "
 				+ "LEFT JOIN SYS_ORG PARENT_ORG ON ORG.PARENT_ID = PARENT_ORG.ID";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("parentId")), "ORG.PARENT_ID = ?", pageIn.get("parentId"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "ORG.NAME LIKE ?", String.format("%%%s%%", pageIn.get("name")))
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("parentId")), "ORG.PARENT_ID = :PARENT_ID", pageIn.get("parentId"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "ORG.NAME LIKE :NAME", String.format("%%%s%%", pageIn.get("name")))
 				.addWhere("ORG.STATE = 1")
 				.addOrder("ORG.NO", Order.ASC);
 		return getListpage(sqlUtil, pageIn);
@@ -49,41 +49,41 @@ public class OrgDaoImpl extends RBaseDaoImpl<Org> implements OrgDao {
 	
 	@Override
 	public List<Org> getList(Integer parentId) {
-		String sql = "SELECT * FROM SYS_ORG WHERE PARENT_ID = ? AND STATE = 1 ";
+		String sql = "SELECT * FROM SYS_ORG WHERE PARENT_ID = :PARENT_ID AND STATE = 1 ";
 		return getList(sql, new Object[] { parentId });
 	}
 
 	@Override
 	public boolean existName(String name, Integer excludeId) {
 		if (excludeId == null) {
-			String sql = "SELECT COUNT(*) AS NUM FROM SYS_ORG WHERE NAME = ? AND STATE = 1";
+			String sql = "SELECT COUNT(*) AS NUM FROM SYS_ORG WHERE NAME = :NAME AND STATE = 1";
 			return getCount(sql, new Object[] { name }) > 0;
 		}
 
-		String sql = "SELECT COUNT(*) AS NUM FROM SYS_ORG WHERE NAME = ? AND STATE = 1 AND ID != ?";
+		String sql = "SELECT COUNT(*) AS NUM FROM SYS_ORG WHERE NAME = :NAME AND STATE = 1 AND ID != :ID";
 		return getCount(sql, new Object[] { name, excludeId }) > 0;
 	}
 
 	@Override
 	public boolean existCode(String code, Integer excludeId) {
 		if (excludeId == null) {
-			String sql = "SELECT COUNT(*) AS NUM FROM SYS_ORG WHERE CODE = ? AND CODE != '' AND CODE IS NOT NULL AND STATE = 1";
+			String sql = "SELECT COUNT(*) AS NUM FROM SYS_ORG WHERE CODE = :CODE AND CODE != '' AND CODE IS NOT NULL AND STATE = 1";
 			return getCount(sql, new Object[] { code }) > 0;
 		}
 
-		String sql = "SELECT COUNT(*) AS NUM FROM SYS_ORG WHERE CODE = ? AND CODE != '' AND CODE IS NOT NULL AND STATE = 1 AND ID != ?";
+		String sql = "SELECT COUNT(*) AS NUM FROM SYS_ORG WHERE CODE = :CODE AND CODE != '' AND CODE IS NOT NULL AND STATE = 1 AND ID != :ID";
 		return getCount(sql, new Object[] { code, excludeId }) > 0;
 	}
 
 	@Override
 	public Org getOrg(String name) {
-		String sql = "SELECT * FROM SYS_ORG WHERE NAME = ? AND STATE = 1";
+		String sql = "SELECT * FROM SYS_ORG WHERE NAME = :NAME AND STATE = 1";
 		return getEntity(sql, new Object[] { name });
 	}
 
 	@Override
 	public Org getOrg(String name, String code) {
-		String sql = "SELECT * FROM SYS_ORG WHERE NAME = ? AND CODE = ? AND STATE = 1";
+		String sql = "SELECT * FROM SYS_ORG WHERE NAME = :NAME AND CODE = :CODE AND STATE = 1";
 		return getEntity(sql, new Object[] { name, code });
 	}
 }

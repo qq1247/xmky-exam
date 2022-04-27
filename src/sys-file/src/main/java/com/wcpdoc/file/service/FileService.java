@@ -78,4 +78,13 @@ public interface FileService extends BaseService<File> {
 	 * @return String
 	 */
 	String getFileUploadDir();
+	
+	/**
+	 * 拷贝附件
+	 * 
+	 * v1.0 chenyun 2022年4月22日下午1:41:50
+	 * @param id
+	 * @return Integer
+	 */
+	Integer copyFile(Integer id);
 }

@@ -198,7 +198,7 @@ public class ServerParmServiceImpl implements ServerPramService {
 				File.separator, 
 				File.separator, 
 				File.separator,// linux下\\不识别
-				System.getProperty("sun.arch.data.model"),
+				System.getProperty("sun.arch.data.model").equals("32") ? "86" : System.getProperty("sun.arch.data.model"),// xp系统显示的是32
 				File.separator, 
 				System.getProperty("os.name").toLowerCase().startsWith("windows")  
 						? (("x64".equals(System.getProperty("os.arch")) || "amd64".equals(System.getProperty("os.arch")))

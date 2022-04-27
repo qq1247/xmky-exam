@@ -26,9 +26,9 @@ public class DictDaoImpl extends RBaseDaoImpl<Dict> implements DictDao {
 		String sql = "SELECT DICT.ID, DICT.DICT_INDEX, DICT.DICT_KEY, DICT.DICT_VALUE, DICT.NO "
 				+ "FROM SYS_DICT DICT ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("dictIndex")), "DICT.DICT_INDEX LIKE ?", "%" + pageIn.get("dictIndex") + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.get("dictKey")), "DICT.DICT_KEY LIKE ?", "%" + pageIn.get("dictKey") + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.get("dictValue")), "DICT.DICT_VALUE LIKE ?", "%" + pageIn.get("dictValue") + "%")
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("dictIndex")), "DICT.DICT_INDEX LIKE :DICT_INDEX", "%" + pageIn.get("dictIndex") + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.get("dictKey")), "DICT.DICT_KEY LIKE :DICT_KEY", "%" + pageIn.get("dictKey") + "%")
+				.addWhere(ValidateUtil.isValid(pageIn.get("dictValue")), "DICT.DICT_VALUE LIKE :DICT_VALUE", "%" + pageIn.get("dictValue") + "%")
 				.addOrder("DICT.DICT_INDEX", Order.ASC)
 				.addOrder("DICT.NO", Order.ASC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
