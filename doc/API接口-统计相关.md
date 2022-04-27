@@ -80,6 +80,7 @@ http请求头需添加Authorization字段，
 | 请求参数| 类型        | 描述       | 必填 |
 | -------- | ----------- | ---------- | ---- |
 | examId | Integer | 考试ID | 是   |
+| questionId | Integer | 试题ID | 否 |
 | curPage   | Integer | 当前第几页 | 否   |
 | pageSize  | Integer | 每页多少条 | 否   |
 
