@@ -56,7 +56,7 @@ public class UserDaoImpl extends RBaseDaoImpl<User> implements UserDao {
 			return getCount(sql, new Object[] { loginName}) > 0;
 		}
 		
-		String sql = "SELECT COUNT(*) AS NUM FROM SYS_USER WHERE LOGIN_NAME = :LOGIN_NAME AND STATE = 1 AND ID != ?";
+		String sql = "SELECT COUNT(*) AS NUM FROM SYS_USER WHERE LOGIN_NAME = :LOGIN_NAME AND STATE = 1 AND ID != :ID";
 		return getCount(sql, new Object[] { loginName, excludeId }) > 0;
 	}
 
