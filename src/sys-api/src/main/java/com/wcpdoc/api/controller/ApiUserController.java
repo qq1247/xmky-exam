@@ -31,6 +31,7 @@ import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.OnlineUserService;
 import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
+import com.wcpdoc.file.service.FileService;
 
 /**
  * 用户控制层
@@ -50,6 +51,8 @@ public class ApiUserController extends BaseController {
 	private UserXlsxService userXlsxService;
 	@Resource
 	private OnlineUserService onlineUserService;
+	@Resource
+	private FileService fileService;
 
 	/**
 	 * 用户列表
@@ -126,6 +129,9 @@ public class ApiUserController extends BaseController {
 			user.setUpdateTime(curTime);
 			user.setUpdateUserId(getCurUser().getId());
 			user.setState(1);
+			if(ValidateUtil.isValid(user.getHeadFileId())){
+				fileService.doUpload(user.getHeadFileId());
+			}
 			userService.add(user);
 
 			// 设置密码
@@ -176,9 +182,13 @@ public class ApiUserController extends BaseController {
 			entity.setUpdateTime(new Date());
 			entity.setUpdateUserId(getCurUser().getId());
 			entity.setEmail(user.getEmail());
+			if((!ValidateUtil.isValid(entity.getHeadFileId()) && ValidateUtil.isValid(user.getHeadFileId())) 
+					|| (ValidateUtil.isValid(user.getHeadFileId()) && user.getHeadFileId().intValue() != entity.getHeadFileId().intValue())){
+				fileService.doUpload(user.getHeadFileId());
+			}
 			entity.setHeadFileId(user.getHeadFileId());
 			userService.update(entity);
-
+			
 			// 更新密码
 			Map<String, Object> data = new HashMap<String, Object>();
 			if (changeLoginName) {
