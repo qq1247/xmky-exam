@@ -171,6 +171,9 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			exam.setMarkState(3);
 			examService.update(exam);
 			log.info("客观题阅卷完成：标记考试为已阅卷，结束");
+			
+			// 清除阅卷监听
+			AutoMarkCache.del(exam.getId());
 			return;
 		}
 		
