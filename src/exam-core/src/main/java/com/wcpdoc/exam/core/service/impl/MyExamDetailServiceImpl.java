@@ -27,6 +27,7 @@ import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.BigDecimalUtil;
 import com.wcpdoc.core.util.ValidateUtil;
+import com.wcpdoc.exam.core.cache.AutoMarkCache;
 import com.wcpdoc.exam.core.dao.MyExamDetailDao;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
@@ -155,6 +156,8 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		log.info("客观题阅卷开始：【{}-{}】", exam.getId(), exam.getName());
 		for (MyExam myExam : myExamList) {
 			if(myExam.getState() == 3){
+				User user = userService.getEntity(myExam.getUserId());
+				log.info("客观题阅卷开始：【{}-{}】，【{}-{}】已阅卷，得{}分", exam.getId(), exam.getName(), user.getId(), user.getName(), myExam.getTotalScore());
 				continue;
 			}
 			markerUser(exam, paper, questionCache, questionAnswerListCache, questionOptionCache, myExam);
@@ -176,6 +179,9 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 			exam.setMarkState(2);
 			examService.update(exam);
 			log.info("客观题阅卷完成：标记考试为阅卷中，等待人工阅卷");
+			
+			// 加入完成阅卷监听，保证自动考试完成，才能进行自动阅卷完成
+			AutoMarkCache.put(examId, exam);
 		}
 	}
 
@@ -282,6 +288,9 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		exam.setMarkState(3);
 		examService.update(exam);
 		log.info("主观题阅卷结束：标记考试为已阅卷，结束");
+		
+		// 清除阅卷监听
+		AutoMarkCache.del(exam.getId());
 	}
 
 	/**

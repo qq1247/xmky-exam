@@ -71,8 +71,8 @@ public class ExamCoreRunner implements ApplicationRunner {
 								log.info("自动阅卷错误：【{}-{}】尝试加写锁失败，耗时10秒，等待下一次运行", unMarkExam.getId(), unMarkExam.getName());
 								continue;
 							}
-						} catch (Exception e1) {
-							log.error("自动阅卷错误：【{}-{}】尝试加写锁失败，强制被中断，等待下一次运行，{}", unMarkExam.getId(), unMarkExam.getName(), e1.getMessage());
+						} catch (Exception e) {
+							log.error("自动阅卷错误：【{}-{}】尝试加写锁失败，强制被中断，等待下一次运行，{}", unMarkExam.getId(), unMarkExam.getName(), e.getMessage());
 							continue;
 						}
 						
@@ -89,10 +89,6 @@ public class ExamCoreRunner implements ApplicationRunner {
 								myExamDetailService.doExam(unMarkExam.getId());
 							} else if (unMarkExam.getMarkState() == 2){
 								myExamDetailService.doMark(unMarkExam.getId());
-							}
-							
-							if (unMarkExam.getMarkState() == 3) {
-								AutoMarkCache.del(unMarkExam.getId());// 不要放finally，主观试卷第一次阅客观题，第二次完成最终阅卷
 							}
 						} catch (MyException e) {// 一个有问题，不影响其他任务执行
 							log.error("自动阅卷错误：{}", e.getMessage());
