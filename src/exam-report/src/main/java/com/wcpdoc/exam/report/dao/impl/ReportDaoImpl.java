@@ -57,27 +57,27 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 	}
 
 	@Override
-	public List<Map<String, Object>> homeSubAdminPaper(Integer userId) {
+	public Integer homeSubAdminPaper(Integer userId) {
 		String sql = "SELECT COUNT(PAPER.ID) AS PAPER_NUM "
 				+ "FROM EXM_PAPER PAPER "
 				+ "WHERE PAPER.STATE != 0 AND PAPER.CREATE_USER_ID = :CREATE_USER_ID";
-		return getMapList(sql, new Object[] { userId });
+		return getCount(sql, new Object[] { userId });
 	}
 
 	@Override
-	public List<Map<String, Object>> homeSubAdminQuestion(Integer userId) {
+	public Integer homeSubAdminQuestion(Integer userId) {
 		String sql = "SELECT COUNT(QUESTION.ID) AS QUESTION_NUM "
 				+ "FROM EXM_QUESTION QUESTION "
 				+ "WHERE QUESTION.STATE != 0 AND QUESTION.CREATE_USER_ID = :CREATE_USER_ID";
-		return getMapList(sql, new Object[] { userId });
+		return getCount(sql, new Object[] { userId });
 	}
 
 	@Override
-	public List<Map<String, Object>> homeSubAdminMark(Integer userId) {
-		String sql = "SELECT COUNT(MARK.ID) AS MARK_NUM "
-				+ "FROM EXM_MY_MARK MARK "
-				+ "WHERE MARK.UPDATE_USER_ID = :UPDATE_USER_ID";
-		return getMapList(sql, new Object[] { userId });
+	public Integer homeSubAdminMark(Integer userId) {
+		String sql = "SELECT COUNT(MARK.ID) "
+				+ " FROM EXM_MY_MARK MARK INNER JOIN EXM_EXAM EXAM ON MARK.EXAM_ID = EXAM.ID "
+				+ " WHERE EXAM.MARK_STATE != 3 AND MARK.UPDATE_USER_ID = :UPDATE_USER_ID";
+		return getCount(sql, new Object[] { userId });
 	}
 	
 	@Override
@@ -124,9 +124,12 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 				+ "LEFT JOIN SYS_ORG AS ORG ON USER.ORG_ID = ORG.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examId")), "MY_EXAM.EXAM_ID = :EXAM_ID", pageIn.get("examId"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("questionId")), "EXISTS ( SELECT 1 FROM EXM_MY_EXAM_DETAIL MY_EXAM_DETAIL WHERE MY_EXAM_DETAIL.EXAM_ID = MY_EXAM.EXAM_ID "
-						+ "AND MY_EXAM_DETAIL.QUESTION_ID = :QUESTION_ID AND MY_EXAM_DETAIL.USER_ID = MY_EXAM.USER_ID AND MY_EXAM_DETAIL.QUESTION_SCORE != MY_EXAM_DETAIL.SCORE )", 
-						pageIn.get("questionId") )
+				.addWhere(ValidateUtil.isValid(pageIn.get("questionId")) && ValidateUtil.isValid(pageIn.get("questionId")), "EXISTS ( SELECT 1 FROM EXM_MY_EXAM_DETAIL MY_EXAM_DETAIL "
+						+ "WHERE MY_EXAM_DETAIL.EXAM_ID = MY_EXAM.EXAM_ID AND MY_EXAM_DETAIL.QUESTION_ID = :QUESTION_ID AND MY_EXAM_DETAIL.USER_ID = MY_EXAM.USER_ID "
+						+ "AND MY_EXAM_DETAIL.QUESTION_SCORE != MY_EXAM_DETAIL.SCORE )", pageIn.get("questionId"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("questionId")) && !ValidateUtil.isValid(pageIn.get("questionId")), "EXISTS ( SELECT 1 FROM EXM_MY_EXAM_DETAIL MY_EXAM_DETAIL "
+						+ "WHERE MY_EXAM_DETAIL.EXAM_ID = MY_EXAM.EXAM_ID AND MY_EXAM_DETAIL.QUESTION_ID = :QUESTION_ID AND MY_EXAM_DETAIL.USER_ID = MY_EXAM.USER_ID "
+						+ "AND MY_EXAM_DETAIL.QUESTION_SCORE = MY_EXAM_DETAIL.SCORE )", pageIn.get("questionId"))
 				.addOrder("MY_EXAM.NO", Order.ASC)
 				.addOrder("MY_EXAM.ANSWER_END_TIME", Order.DESC);
 		return getListpage(sqlUtil, pageIn);

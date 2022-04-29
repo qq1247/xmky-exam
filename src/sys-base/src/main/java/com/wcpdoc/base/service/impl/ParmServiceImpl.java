@@ -64,7 +64,8 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 
 		// 发送邮件
 		try {
-			notifyService.pushEmail(parm.getEmailUserName(), parm.getEmailUserName(), "邮箱配置", "邮箱配置成功！");
+			notifyService.pushEmail(parm.getEmailUserName(), parm.getEmailUserName(),
+					parm.getOrgName() == null ? "在线考试邮箱配置" : String.format("%s 在线考试邮箱配置", parm.getOrgName()) , "邮箱配置成功！");
 		} catch (NotifyException e) {
 			throw new MyException(e.getMessage());
 		}
