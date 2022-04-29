@@ -88,9 +88,9 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 	}
 	
 	@Override
-	public List<Map<String, Object>> homeAdminBulletin() {
-		String sql = "SELECT COUNT(BULLETIN.ID) AS BULLETIN_NUM FROM EXM_BULLETIN BULLETIN WHERE BULLETIN.STATE != 0 AND BULLETIN.UPDATE_USER_ID = 1 ";
-		return getMapList(sql, new Object[0]);
+	public Integer homeAdminBulletin() {
+		String sql = "SELECT COUNT(BULLETIN.ID) FROM EXM_BULLETIN BULLETIN WHERE BULLETIN.STATE != 0 AND BULLETIN.UPDATE_USER_ID = 1 ";
+		return getCount(sql, new Object[0]);
 	}
 	
 	@Override

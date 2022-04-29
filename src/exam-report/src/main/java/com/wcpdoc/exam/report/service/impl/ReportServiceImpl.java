@@ -183,8 +183,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		data.put("num", userMap.get(0).get("subadminNum"));
 		result.put("subAdmin", data);
 		data = new HashMap<String, Object>();
-		List<Map<String, Object>> bulletinMap = reportDao.homeAdminBulletin();
-		data.put("num", bulletinMap.get(0).get("bulletinNum"));
+		data.put("num", reportDao.homeAdminBulletin());
 		result.put("bulletin", data);
 		data = new HashMap<String, Object>();
 		data.put("num", reportExService.OnlineNum());
