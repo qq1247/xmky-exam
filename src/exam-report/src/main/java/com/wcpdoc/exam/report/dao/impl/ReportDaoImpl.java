@@ -124,9 +124,12 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 				+ "LEFT JOIN SYS_ORG AS ORG ON USER.ORG_ID = ORG.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examId")), "MY_EXAM.EXAM_ID = :EXAM_ID", pageIn.get("examId"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("questionId")), "EXISTS ( SELECT 1 FROM EXM_MY_EXAM_DETAIL MY_EXAM_DETAIL WHERE MY_EXAM_DETAIL.EXAM_ID = MY_EXAM.EXAM_ID "
-						+ "AND MY_EXAM_DETAIL.QUESTION_ID = :QUESTION_ID AND MY_EXAM_DETAIL.USER_ID = MY_EXAM.USER_ID AND MY_EXAM_DETAIL.QUESTION_SCORE != MY_EXAM_DETAIL.SCORE )", 
-						pageIn.get("questionId") )
+				.addWhere(ValidateUtil.isValid(pageIn.get("questionId")) && ValidateUtil.isValid(pageIn.get("questionId")), "EXISTS ( SELECT 1 FROM EXM_MY_EXAM_DETAIL MY_EXAM_DETAIL "
+						+ "WHERE MY_EXAM_DETAIL.EXAM_ID = MY_EXAM.EXAM_ID AND MY_EXAM_DETAIL.QUESTION_ID = :QUESTION_ID AND MY_EXAM_DETAIL.USER_ID = MY_EXAM.USER_ID "
+						+ "AND MY_EXAM_DETAIL.QUESTION_SCORE != MY_EXAM_DETAIL.SCORE )", pageIn.get("questionId"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("questionId")) && !ValidateUtil.isValid(pageIn.get("questionId")), "EXISTS ( SELECT 1 FROM EXM_MY_EXAM_DETAIL MY_EXAM_DETAIL "
+						+ "WHERE MY_EXAM_DETAIL.EXAM_ID = MY_EXAM.EXAM_ID AND MY_EXAM_DETAIL.QUESTION_ID = :QUESTION_ID AND MY_EXAM_DETAIL.USER_ID = MY_EXAM.USER_ID "
+						+ "AND MY_EXAM_DETAIL.QUESTION_SCORE = MY_EXAM_DETAIL.SCORE )", pageIn.get("questionId"))
 				.addOrder("MY_EXAM.NO", Order.ASC)
 				.addOrder("MY_EXAM.ANSWER_END_TIME", Order.DESC);
 		return getListpage(sqlUtil, pageIn);

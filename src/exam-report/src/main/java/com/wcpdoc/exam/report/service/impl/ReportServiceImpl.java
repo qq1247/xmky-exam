@@ -408,6 +408,9 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		if (!ValidateUtil.isValid(pageIn.get("examId"))) {
 			throw new MyException("参数错误：examId");
 		}
+		if (ValidateUtil.isValid(pageIn.get("questionId")) && ValidateUtil.isValid(pageIn.get("state"))) {//试题id不为空，默认查询错误人员
+			pageIn.addAttr("state", 2);
+		}
 		Exam exam = examService.getEntity(examId);
 		ExamType examType = examTypeService.getEntity(exam.getExamTypeId());
 		if (examType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
