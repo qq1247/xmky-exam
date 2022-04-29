@@ -106,25 +106,25 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		
 		if (exam.getState() == 0) {
 			log.error("客观题阅卷异常：【{}-{}】已删除", exam.getId(), exam.getName());
-			throw new MyException("已删除");
+			throw new MyException(String.format("【%s-%s】已删除", exam.getId(), exam.getName()));
 		}
 		if (exam.getState() == 2) {
 			log.error("客观题阅卷异常：【{}-{}】未发布", exam.getId(), exam.getName());
-			throw new MyException("未发布");
+			throw new MyException(String.format("【%s-%s】未发布", exam.getId(), exam.getName()));
 		}
 		if (exam.getState() == 3) {
 			log.error("客观题阅卷异常：【{}-{}】已归档", exam.getId(), exam.getName());
-			throw new MyException("已归档");
+			throw new MyException(String.format("【%s-%s】已归档", exam.getId(), exam.getName()));
 		}
 		if (exam.getMarkState() != 1) {
 			log.error("客观题阅卷异常：【{}-{}】已阅卷", exam.getId(), exam.getName());
-			throw new MyException("已阅卷");
+			throw new MyException(String.format("【%s-%s】已阅卷", exam.getId(), exam.getName()));
 		}
 		
 		long curTime = System.currentTimeMillis();
 		if (exam.getEndTime().getTime() > curTime){
 			log.error("客观题阅卷异常：【{}-{}】考试未结束", exam.getId(), exam.getName());
-			throw new MyException("考试未结束");
+			throw new MyException(String.format("【%s-%s】考试未结束", exam.getId(), exam.getName()));
 		}
 		
 		// 延时2秒后开始（答题时预留了1秒网络延时，这里在延时1秒，保证都是答题完成后的结果）
@@ -196,33 +196,33 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		
 		if (exam.getState() == 0) {
 			log.error("主观题阅卷异常：【{}-{}】已删除", exam.getId(), exam.getName());
-			throw new MyException("已删除");
+			throw new MyException(String.format("【%s-%s】已删除", exam.getId(), exam.getName()));
 		}
 		if (exam.getState() == 2) {
 			log.error("主观题阅卷异常：【{}-{}】未发布", exam.getId(), exam.getName());
-			throw new MyException("未发布");
+			throw new MyException(String.format("【%s-%s】未发布", exam.getId(), exam.getName()));
 		}
 		if (exam.getState() == 3) {
 			log.error("主观题阅卷异常：【{}-{}】已归档", exam.getId(), exam.getName());
-			throw new MyException("已归档");
+			throw new MyException(String.format("【%s-%s】已归档", exam.getId(), exam.getName()));
 		}
 		if (exam.getMarkState() == 1) {// 客观题阅卷没阅完
 			log.error("主观题阅卷异常：【{}-{}】智能题未阅卷", exam.getId(), exam.getName());
-			throw new MyException("智能题未阅卷");
+			throw new MyException(String.format("【%s-%s】智能题未阅卷", exam.getId(), exam.getName()));
 		}
 		if (exam.getMarkState() == 3) {
 			log.error("主观题阅卷异常：【{}-{}】已阅卷", exam.getId(), exam.getName());
-			throw new MyException("已阅卷");
+			throw new MyException(String.format("【%s-%s】已阅卷", exam.getId(), exam.getName()));
 		}
 		
 		long curTime = System.currentTimeMillis();
 		if (exam.getEndTime().getTime() > curTime) {
 			log.error("主观题阅卷异常：【{}-{}】考试未结束", exam.getId(), exam.getName());
-			throw new MyException("考试未结束");
+			throw new MyException(String.format("【%s-%s】考试未结束", exam.getId(), exam.getName()));
 		}
 		if (exam.getMarkEndTime().getTime() > curTime) {
 			log.error("主观题阅卷异常：【{}-{}】阅卷未结束", exam.getId(), exam.getName());
-			throw new MyException("阅卷未结束");
+			throw new MyException(String.format("【%s-%s】阅卷未结束", exam.getId(), exam.getName()));
 		}
 		
 		// 延时2秒在主观题阅卷（阅卷时预留了1秒网络延时，这里在延时1秒，保证都是人工阅卷完成后的结果）
