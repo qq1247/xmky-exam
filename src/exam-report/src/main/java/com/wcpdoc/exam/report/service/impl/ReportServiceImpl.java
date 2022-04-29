@@ -157,16 +157,13 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		data.put("num", examMap.get("examNum"));
 		result.put("exam", data);
 		data = new HashMap<String, Object>();
-		List<Map<String, Object>> paperMap = reportDao.homeSubAdminPaper(getCurUser().getId());
-		data.put("num", paperMap.get(0).get("paperNum"));
+		data.put("num", reportDao.homeSubAdminPaper(getCurUser().getId()));
 		result.put("paper", data);
 		data = new HashMap<String, Object>();
-		List<Map<String, Object>> questionMap = reportDao.homeSubAdminQuestion(getCurUser().getId());
-		data.put("num", questionMap.get(0).get("questionNum"));
+		data.put("num", reportDao.homeSubAdminQuestion(getCurUser().getId()));
 		result.put("question", data);
 		data = new HashMap<String, Object>();
-		List<Map<String, Object>> markMap = reportDao.homeSubAdminMark(getCurUser().getId());
-		data.put("num", markMap.get(0).get("markNum"));
+		data.put("num", reportDao.homeSubAdminMark(getCurUser().getId()));
 		result.put("myMark", data);
 		return result;
 	}
