@@ -78,9 +78,9 @@ public interface ReportDao extends RBaseDao<Object> {
 	 * 首页admin
 	 * 
 	 * v1.0 chenyun 2021年12月10日下午1:37:38
-	 * @return Map<String,Object>
+	 * @return Integer
 	 */
-	List<Map<String, Object>> homeAdminBulletin();
+	Integer homeAdminBulletin();
 	
 	/**
 	 * 试题统计
