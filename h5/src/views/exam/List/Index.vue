@@ -36,6 +36,7 @@
             @publish="publish"
             @ranking="ranking"
             @message="message"
+            @exports="exports"
             @anonymous="anonymous"
             @statistics="statistics"
           ></ListCard>
@@ -170,6 +171,14 @@ export default {
         id,
         examTypeId: this.$route.params.id,
         tab: '7',
+      })
+    },
+    // 试卷导出
+    exports({ id }) {
+      this.$tools.switchTab('ExamListSetting', {
+        id,
+        examTypeId: this.$route.params.id,
+        tab: '8',
       })
     },
     // 考试用户

@@ -116,6 +116,9 @@
               <div class="more-item" @click="message(data)">
                 <i class="common common-messages"></i>邮件通知
               </div>
+              <div class="more-item" @click="exports(data)">
+                <i class="common common-template-down"></i>试卷导出
+              </div>
             </div>
           </span>
         </template>
@@ -233,6 +236,10 @@ export default {
     // 通知
     message(data) {
       this.$emit('message', data)
+    },
+    // 试卷导出
+    exports(data) {
+      this.$emit('exports', data)
     },
   },
 }

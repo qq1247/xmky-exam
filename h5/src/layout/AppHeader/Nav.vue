@@ -9,18 +9,11 @@
     </router-link>
     <div class="nav">
       <router-link
-        :class="[
-          'nav-item',
-          ($route.path === '/home' && index == 0) ||
-          ($route.path !== '/home' && index == 1)
-            ? 'nav-item-active'
-            : '',
-        ]"
-        v-for="(item, index) in navInfo[$store.getters.onlyRole[0]]"
-        :key="item.path"
-        :to="{ name: item.path }"
-        >{{ item.name }}</router-link
+        :class="['nav-item', $route.path === '/home' ? 'nav-item-active' : '']"
+        to="/"
       >
+        首页
+      </router-link>
     </div>
   </div>
 </template>

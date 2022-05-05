@@ -27,13 +27,22 @@
       </div>
       <div class="user-intro">
         <div class="intro-item">
-          <div class="item-title"><span>得分</span></div>
+          <img
+            class="item-icon"
+            src="~@/assets/img/mark/mark-score.png"
+            alt=""
+          />
           <div class="item-num">
             {{ userInfo.totalScore === null ? '--' : userInfo.totalScore }}
           </div>
+          <div class="item-title">得分</div>
         </div>
         <div class="intro-item">
-          <div class="item-title"><span>答题用时</span></div>
+          <img
+            class="item-icon"
+            src="~@/assets/img/mark/mark-time.png"
+            alt=""
+          />
           <div class="item-num">
             {{
               $tools.computeMinute(
@@ -42,9 +51,14 @@
               )
             }}
           </div>
+          <div class="item-title">答题用时</div>
         </div>
         <div class="intro-item">
-          <div class="item-title"><span>成绩</span></div>
+          <img
+            class="item-icon"
+            src="~@/assets/img/mark/mark-pass.png"
+            alt=""
+          />
           <div class="item-num">
             {{
               userInfo.totalScore === null
@@ -56,32 +70,42 @@
                   )
             }}
           </div>
+          <div class="item-title">成绩</div>
         </div>
         <div class="intro-item">
-          <div class="item-title"><span>阅卷用时</span></div>
+          <img
+            class="item-icon"
+            src="~@/assets/img/mark/mark-answer-time.png"
+            alt=""
+          />
           <div class="item-num">
             {{
               $tools.computeMinute(userInfo.markStartTime, userInfo.markEndTime)
             }}
           </div>
+          <div class="item-title">阅卷用时</div>
         </div>
       </div>
       <div class="user-handler" v-if="!preview">
-        <el-row>
-          <el-col :span="14">只看未阅：</el-col>
-          <el-col :span="10">
-            <el-switch
-              v-model="isFilter"
-              active-color="#0094e5"
-              inactive-color="#dcdfe6"
-              @change="filterUserList"
-            >
-            </el-switch>
-          </el-col>
-        </el-row>
-        <div>当前进度：{{ markEndNum }}/{{ userList.length }}</div>
-        <div class="">
-          <el-progress :percentage="percentage" :color="customColors">
+        <div class="handler-title">
+          只看未阅：<el-switch
+            v-model="isFilter"
+            active-color="#0094e5"
+            inactive-color="#dcdfe6"
+            @change="filterUserList"
+          >
+          </el-switch>
+        </div>
+        <div class="handler-content">
+          <div class="percentage-bg">
+            <div class="percentage-content">
+              <p style="color: #8b989d">当前进度</p>
+              <p style="color: #0094e5; font-size: 18px">
+                {{ markEndNum }}&nbsp;/&nbsp;{{ userList.length }}
+              </p>
+            </div>
+          </div>
+          <el-progress type="circle" :percentage="percentage" color="#0094e5">
           </el-progress>
         </div>
       </div>
@@ -89,17 +113,17 @@
 
     <!-- 内容 -->
     <div class="content-center">
-      <div class="paper-title">{{ paper.name }}</div>
+      <!-- <div class="paper-title">{{ paper.name }}</div> -->
 
       <template v-if="questionList.length">
         <!-- 章节 -->
-        <div class="chapter">
+        <!-- <div class="chapter">
           <div class="chapter-item">
             <div class="item-title">{{ chapter.name }}</div>
             <div></div>
           </div>
           <div class="chapter-description" v-html="chapter.description"></div>
-        </div>
+        </div> -->
 
         <!-- 试题 -->
         <div
@@ -108,45 +132,66 @@
           :key="item.id"
           :style="{ display: routerQuestionId === item.id ? 'block' : 'none' }"
         >
-          <div v-if="routerQuestionId === item.id">
-            <div class="question-title">
+          <template v-if="routerQuestionId === item.id">
+            <div class="question-title tag">
               <div>{{ indexQuestion + 1 }}、</div>
               <div v-html="`${item.title}`"></div>
             </div>
 
+            <div class="user-answer tag">
+              <template
+                v-if="item.type === 3 && myExamDetailCache[routerQuestionId]"
+              >
+                <div
+                  v-for="(answer, indexCache) in myExamDetailCache[
+                    routerQuestionId
+                  ].answers"
+                  :key="answer.id"
+                  class="answers-item"
+                >
+                  <span>{{
+                    `填空${$tools.intToChinese(indexCache + 1)}、${answer}`
+                  }}</span>
+                </div>
+              </template>
+              <div
+                v-if="item.type === 5 && myExamDetailCache[routerQuestionId]"
+                v-html="`${myExamDetailCache[routerQuestionId].answers}`"
+              ></div>
+            </div>
+
+            <div class="user-plate tag">
+              <span>本题得</span>
+              <span v-if="preview">&nbsp;{{ item.scorePlate }}&nbsp;</span>
+              <el-input
+                v-if="!preview"
+                class="score-input"
+                v-model.number="item.scorePlate"
+                @change="scoreChange"
+                @input="(e) => computeScore(e, indexQuestion, item.score)"
+              ></el-input>
+              <span>分</span>
+              <span style="color: #0094e5"
+                >（本题满分：{{ item.score }}分）</span
+              >
+            </div>
+
             <div class="children-analysis">
-              <el-row :gutter="10">
-                <template v-if="item.type === 3">
-                  <el-col :span="2.5">【答案】：</el-col>
-                  <el-col :span="21">
-                    <div
-                      v-for="(answer, indexAnswers) in item.answers"
-                      :key="answer.id"
-                      class="answers-item"
-                    >
-                      <span>{{
-                        `填空${$tools.intToChinese(indexAnswers + 1)}、`
-                      }}</span>
-                      <span
-                        class="answers-tag"
-                        v-for="(ans, indexAnswer) in answer.answer"
-                        :key="indexAnswer"
-                        >{{ ans }}</span
-                      >
-                    </div>
-                  </el-col>
-                </template>
-                <template v-if="item.type === 5">
-                  <el-col :span="2.5"> 【答案】： </el-col>
-                  <el-col :span="21">
-                    <template v-if="item.ai === 1">
+              <div class="analysis-title">
+                <div>查看解析</div>
+              </div>
+              <div class="analysis-content">
+                <el-row :gutter="10">
+                  <template v-if="item.type === 3">
+                    <el-col :span="2.5">答案：</el-col>
+                    <el-col :span="21">
                       <div
                         v-for="(answer, indexAnswers) in item.answers"
                         :key="answer.id"
                         class="answers-item"
                       >
                         <span>{{
-                          `关键词${$tools.intToChinese(indexAnswers + 1)}、`
+                          `填空${$tools.intToChinese(indexAnswers + 1)}、`
                         }}</span>
                         <span
                           class="answers-tag"
@@ -155,103 +200,79 @@
                           >{{ ans }}</span
                         >
                       </div>
-                    </template>
-                    <div
-                      v-if="item.ai === 2"
-                      v-html="`${item.answers[0].answer}`"
-                    ></div>
-                  </el-col>
-                </template>
-              </el-row>
-              <el-row :gutter="10">
-                <el-col :span="2.5"> 【解析】： </el-col>
-                <el-col :span="21">
-                  <div v-html="`${item.analysis}`"></div>
-                </el-col>
-              </el-row>
-            </div>
-
-            <div class="user-answer">
-              <el-row :gutter="10" style="margin-bottom: 10px">
-                <el-col :span="2.5">【用户答案】</el-col>
-                <el-col :span="21">
-                  <template
-                    v-if="
-                      item.type === 3 && myExamDetailCache[routerQuestionId]
-                    "
-                  >
-                    <div
-                      v-for="(answer, indexCache) in myExamDetailCache[
-                        routerQuestionId
-                      ].answers"
-                      :key="answer.id"
-                      class="answers-item"
-                    >
-                      <span>{{
-                        `填空${$tools.intToChinese(indexCache + 1)}、${answer}`
-                      }}</span>
-                    </div>
+                    </el-col>
                   </template>
-                  <div
-                    v-if="
-                      item.type === 5 && myExamDetailCache[routerQuestionId]
-                    "
-                    v-html="`${myExamDetailCache[routerQuestionId].answers}`"
-                  ></div>
-                </el-col>
-              </el-row>
+                  <template v-if="item.type === 5">
+                    <el-col :span="2.5">答案： </el-col>
+                    <el-col :span="21">
+                      <template v-if="item.ai === 1">
+                        <div
+                          v-for="(answer, indexAnswers) in item.answers"
+                          :key="answer.id"
+                          class="answers-item"
+                        >
+                          <span>{{
+                            `关键词${$tools.intToChinese(indexAnswers + 1)}、`
+                          }}</span>
+                          <span
+                            class="answers-tag"
+                            v-for="(ans, indexAnswer) in answer.answer"
+                            :key="indexAnswer"
+                            >{{ ans }}</span
+                          >
+                        </div>
+                      </template>
+                      <div
+                        v-if="item.ai === 2"
+                        v-html="`${item.answers[0].answer}`"
+                      ></div>
+                    </el-col>
+                  </template>
+                </el-row>
+                <el-row :gutter="10">
+                  <el-col :span="2.5">解析： </el-col>
+                  <el-col :span="21">
+                    <div v-html="`${item.analysis}`"></div>
+                  </el-col>
+                </el-row>
+              </div>
             </div>
-
-            <div class="user-plate">
-              <el-row :gutter="10">
-                <el-col :span="2.5" style="letter-spacing: 9px">
-                  【得分】
-                </el-col>
-                <el-col :span="21">
-                  <span style="margin-right: 15px" v-if="preview">{{
-                    item.scorePlate
-                  }}</span>
-                  <div v-if="!preview">
-                    <el-input
-                      class="score-input"
-                      v-model.number="item.scorePlate"
-                      @change="scoreChange"
-                      @input="(e) => computeScore(e, indexQuestion, item.score)"
-                    ></el-input>
-                    <span>（本题满分：{{ item.score }}）</span>
-                  </div>
-                </el-col>
-              </el-row>
-            </div>
-          </div>
+          </template>
         </div>
 
         <!-- 答题卡 -->
-        <div class="mark-router">
-          <div class="router-content">
-            <p class="router-title">答题卡</p>
-            <div>
-              <a
-                :class="[
-                  'router-index',
-                  routerQuestionId === item.id ? 'router-active' : '',
-                ]"
-                v-for="(item, indexRoute) in questionList"
-                :key="item.id"
-                @click="routerQuestionId = item.id"
-                >{{ indexRoute + 1 }}</a
-              >
-            </div>
+        <div class="router-content">
+          <div class="router-title">
+            <div class="router-mark">正确题</div>
+            <div class="router-mark">未批阅</div>
+            <div class="router-mark">当前题</div>
+            <div class="router-mark">错误题</div>
           </div>
-          <ScorePlate
-            v-if="!preview"
-            ref="scorePlate"
-            :data="questionDetail"
-            @selectScore="selectScore"
-            @nextQuestion="nextQuestion"
-            @nextPaper="nextPaper"
-          ></ScorePlate>
+          <div class="router-list">
+            <a
+              :class="[
+                'router-index',
+                item.scorePlate > 0 ? 'router-success' : 'router-error',
+                routerQuestionId === item.id ? 'router-active' : '',
+              ]"
+              v-for="(item, indexRoute) in questionList"
+              :key="item.id"
+              @click="routerQuestionId = item.id"
+              >{{ indexRoute + 1 }}</a
+            >
+          </div>
         </div>
+
+        <ScorePlate
+          v-if="!preview"
+          v-el-drag-dialog
+          ref="scorePlate"
+          :score="questionDetail.score"
+          :data="questionDetail"
+          @selectScore="selectScore"
+          @nextQuestion="nextQuestion"
+          @nextPaper="nextPaper"
+        ></ScorePlate>
       </template>
       <el-empty v-else description="暂无试卷"></el-empty>
     </div>
@@ -266,6 +287,7 @@ import {
   myMarkScore,
   myMarkFinish,
 } from 'api/my'
+import elDragDialog from '@/directive/el-drag-dialog'
 import ScorePlate from 'components/ScorePlate.vue'
 import ClozeTitle from '@/components/ClozeTitle.vue'
 export default {
@@ -273,6 +295,7 @@ export default {
     ScorePlate,
     ClozeTitle,
   },
+  directives: { elDragDialog },
   data() {
     return {
       questionDetail: {},
@@ -290,15 +313,10 @@ export default {
       myExamDetailCache: {},
       paper: {},
       preview: false,
-      customColors: [
-        { color: '#f56c6c', percentage: 20 },
-        { color: '#e6a23c', percentage: 40 },
-        { color: '#5cb87a', percentage: 60 },
-        { color: '#1989fa', percentage: 80 },
-        { color: '#6f7ad3', percentage: 100 },
-      ],
+      dialogPlateVisible: false,
       percentage: 0,
       markEndNum: 0,
+      score: 0,
     }
   },
   watch: {
@@ -315,6 +333,7 @@ export default {
     this.examId = examId
     this.paperId = paperId
     this.preview = JSON.parse(preview)
+    this.dialogPlateVisible = !this.preview
     this.userId = Number(userId)
     this.init()
   },
@@ -590,9 +609,9 @@ export default {
   margin-bottom: 16px;
 }
 
-.user-intro {
-  margin-bottom: 8px;
-  border-radius: 8px;
+.user-info {
+  margin-bottom: 0;
+  border-radius: 8px 8px 0 0;
 }
 
 .user-handler {
@@ -600,42 +619,108 @@ export default {
 }
 
 .content-center {
+  background: transparent;
   .children-content {
     border-bottom: none;
+    position: relative;
+    padding: 0;
+    margin: 0;
+  }
+  .children-analysis {
+    margin-top: 16px;
+    line-height: initial;
+    background: #fff;
+    border-radius: 8px;
+    padding: 0;
+  }
+  .analysis-title {
+    width: 100%;
+    height: 35px;
+    padding: 5px 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    div {
+      width: 66px;
+      height: 24px;
+      line-height: 24px;
+      text-align: center;
+      background: #e3f4fc;
+      border-radius: 2px;
+      color: #0094e5;
+    }
+  }
+
+  .analysis-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
   }
 }
 
-.mark-router {
-  display: flex;
-  margin: 16px 16px 0;
-  padding: 16px;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+.tag {
+  background: #fff;
+  &::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-width: 16px;
+    border-color: #2f7ffb transparent transparent #2f7ffb;
+    border-style: solid;
+    font-size: 12px;
+    z-index: 1;
+  }
+  &::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 3px;
+    font-size: 12px;
+    color: #fff;
+    z-index: 2;
+  }
 }
 
-.router-content {
-  display: flex;
-  flex-direction: column;
-  border-radius: 5px;
-  width: 210px;
-  margin: 0 50px 0 0;
-  padding: 0 13px;
-  border: 1px solid #d9d9d9;
+.question-title {
+  padding: 30px 20px;
+  position: relative;
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
+  &::after {
+    content: '题';
+    top: -10px;
+  }
 }
 
 .user-answer {
   background: #404b65;
-  padding: 10px 20px;
+  padding: 30px 20px;
   color: #fff;
-  line-height: 30px;
+  min-height: 60px;
+  position: relative;
+  &::before {
+    border-color: #03cbc0 transparent transparent #03cbc0;
+  }
+  &::after {
+    content: '答';
+  }
 }
 
 .user-plate {
-  padding: 0 20px;
-  line-height: 50px;
+  padding: 30px 20px;
+  position: relative;
+  border-radius: 0 0 8px 8px;
+  &::before {
+    border-color: #f89124 transparent transparent #f89124;
+  }
+  &::after {
+    content: '分';
+  }
 }
 
 .score-input {
-  width: 100px;
+  width: 50px;
   /deep/ & .el-input__inner {
     width: 100%;
     background-color: transparent;
@@ -644,5 +729,74 @@ export default {
     border-radius: 0;
     height: 20px;
   }
+}
+
+.router-content {
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  background: #fff;
+  margin: 16px 0 0;
+  .router-title {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 12px 16px;
+    font-weight: normal;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    line-height: initial;
+  }
+  .router-list {
+    padding: 16px;
+  }
+}
+
+.router-mark {
+  margin-left: 45px;
+  color: #8b989d;
+  font-size: 12px;
+  position: relative;
+  &::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 1px;
+    left: -20px;
+    width: 14px;
+    height: 14px;
+    background: #5fb878;
+  }
+  &:nth-child(2)::before {
+    background: #e3f4fc;
+  }
+  &:nth-child(3)::before {
+    background: #ff8e19;
+  }
+  &:nth-child(4)::before {
+    background: #ff5722;
+  }
+}
+.router-content {
+  .router-success {
+    background: #5fb878;
+    color: #fff;
+  }
+  .router-error {
+    background: #ff5722;
+    color: #fff;
+  }
+  a:hover,
+  .router-active {
+    background: #ff8e19;
+    color: #fff;
+  }
+}
+
+/deep/ .el-dialog {
+  box-shadow: 0 0 16px -3px rgba(0, 0, 0, 0.15) !important;
+}
+
+/deep/ .el-dialog__body {
+  padding: 0;
 }
 </style>

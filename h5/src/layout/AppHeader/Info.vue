@@ -2,9 +2,11 @@
   <div class="header-info">
     <el-avatar
       :size="32"
+      v-if="$store.getters.userAvatar"
       :src="`/api/file/download?id=${Number($store.getters.userAvatar)}`"
       ><i class="common common-wo"></i
     ></el-avatar>
+    <el-avatar :size="32" v-else><i class="common common-wo"></i></el-avatar>
     <el-dropdown @command="handleCommand">
       <span class="el-dropdown-link">
         {{ level[onlyRole[0]]

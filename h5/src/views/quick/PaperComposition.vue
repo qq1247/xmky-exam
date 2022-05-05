@@ -96,7 +96,7 @@ export default {
 
 /deep/ .top {
   position: absolute;
-  width: calc(100% - 700px);
+  width: calc(100% - 1040px);
 }
 
 .footer {

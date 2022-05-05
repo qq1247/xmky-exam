@@ -1,41 +1,46 @@
 <template>
   <div class="home-content">
-    <!-- <Upload
-      type="word"
-      ref="templateUpload"
-      @success="templateSuccess"
-      @remove="templateRemove"
-    >
-    </Upload> -->
     <div class="home-left">
       <el-card class="box-card" shadow="never">
         <div slot="header">考试概览</div>
         <template v-if="onlyRole[0] === 'user'">
           <div class="data-content" v-if="userInfo.exam">
-            <div class="data-item">
-              <span>一共缺考：</span>{{ userInfo.exam.missNum }}次
+            <div class="data-item" @click="$router.push({ name: 'MyExam' })">
+              <div class="item-icon exam-bg">
+                <img src="../../assets/img/index/index-exam.png" alt="" />
+              </div>
+              <div class="item-info">
+                <span class="info-num">{{ userInfo.exam.missNum }}</span>
+                <span class="info-intro">一共缺考（场）</span>
+              </div>
+            </div>
+            <div class="data-item" @click="$router.push({ name: 'MyExam' })">
+              <div class="item-icon paper-bg">
+                <img src="../../assets/img/index/index-paper.png" alt="" />
+              </div>
+              <div class="item-info">
+                <span class="info-num">{{ userInfo.exam.num }}</span>
+                <span class="info-intro">参加考试（场）</span>
+              </div>
             </div>
             <div class="data-item">
-              <span>参加考试：</span>{{ userInfo.exam.num }}场
+              <div class="item-icon question-bg">
+                <img src="../../assets/img/index/index-question.png" alt="" />
+              </div>
+              <div class="item-info">
+                <span class="info-num">{{ userInfo.exam.succNum }}</span>
+                <span class="info-intro">一共及格（次）</span>
+              </div>
             </div>
             <div class="data-item">
-              <span>一共及格：</span>{{ userInfo.exam.succNum }}次
+              <div class="item-icon mark-bg">
+                <img src="../../assets/img/index/index-mark.png" alt="" />
+              </div>
+              <div class="item-info">
+                <span class="info-num">{{ userInfo.exam.top }}</span>
+                <span class="info-intro">最高排名（名）</span>
+              </div>
             </div>
-            <div class="data-item">
-              <span>最高排名：</span>{{ userInfo.exam.top }}名
-            </div>
-          </div>
-          <div class="data-content" v-if="userInfo.score">
-            <div class="data-item">
-              <span>平均成绩：</span>{{ userInfo.score.avg }}分
-            </div>
-            <div class="data-item">
-              <span>最低成绩：</span>{{ userInfo.score.min }}分
-            </div>
-            <div class="data-item">
-              <span>最高成绩：</span>{{ userInfo.score.max }}分
-            </div>
-            <!-- <p><span>标准差：</span>{{ userInfo.score.sd }}</p> -->
           </div>
         </template>
         <template v-if="onlyRole[0] === 'subAdmin'">
@@ -75,7 +80,7 @@
                 <span class="info-intro">创建试题（题）</span>
               </div>
             </div>
-            <div class="data-item">
+            <div class="data-item" @click="$router.push({ name: 'MyMark' })">
               <div class="item-icon mark-bg">
                 <img src="../../assets/img/index/index-mark.png" alt="" />
               </div>
@@ -87,7 +92,7 @@
           </div>
         </template>
       </el-card>
-      <el-card class="box-card" shadow="never">
+      <el-card class="box-card calendar-exam-mark" shadow="never">
         <div slot="header">
           {{ onlyRole.includes('user') ? '待考列表' : '待阅列表' }}
         </div>
@@ -228,7 +233,7 @@
               </template>
               <el-empty
                 v-else
-                :image="require('../../assets/img/index/mark-null.png')"
+                :image="require('assets/img/index/mark-null.png')"
                 description="暂无待阅"
               ></el-empty>
             </template>
@@ -237,10 +242,10 @@
       </el-card>
     </div>
     <div class="home-right">
-      <!-- 快捷导航 -->
+      <!-- 功能列表 -->
       <el-card class="box-card" shadow="never">
         <div slot="header">
-          <span>快捷导航</span>
+          <span>功能列表</span>
         </div>
         <div style="margin-bottom: 24px">
           <el-link
@@ -260,31 +265,29 @@
         </div>
       </el-card>
       <!-- 最新公告 -->
-      <el-card class="box-card" shadow="never">
+      <el-card class="box-card notice-box" shadow="never">
         <div slot="header">
           <span>最新公告</span>
         </div>
         <template v-if="bulletinList.length">
-          <div class="info-list">
-            <div
-              class="info-item"
-              v-for="item in bulletinList"
-              :key="item.id"
-              @click="getBulletin(item)"
-            >
-              <div class="item-left ellipsis">{{ item.title }}</div>
-              <div class="item-right">{{ item.endTime }}</div>
-            </div>
+          <div
+            class="info-item"
+            v-for="item in bulletinList"
+            :key="item.id"
+            @click="getBulletin(item)"
+          >
+            <div class="item-left ellipsis">{{ item.title }}</div>
+            <div class="item-right">{{ item.endTime }}</div>
           </div>
         </template>
         <el-empty
           v-else
-          :image="require('../../assets/img/index/notice-null.png')"
+          :image="require('assets/img/index/notice-null.png')"
           description="暂无公告"
         ></el-empty>
       </el-card>
       <!-- 服务支持 -->
-      <el-card class="box-card" shadow="never">
+      <el-card class="box-card service-box" shadow="never">
         <div slot="header">
           <span>服务支持</span>
         </div>
@@ -318,10 +321,9 @@
 
 <script>
 import Upload from 'components/Upload'
-var mammoth = require('mammoth')
 import { mapGetters } from 'vuex'
 import { getInfo, setInfo } from '@/utils/storage'
-import { getUserInfo, getSubAdminInfo, getAdminInfo } from 'api/report'
+import { getUserInfo, getSubAdminInfo } from 'api/report'
 import Calendar from 'components/Calendar/index'
 import { myExamListPage, myMarkListPage } from 'api/my'
 import { bulletinListPage } from 'api/base'
@@ -370,7 +372,6 @@ export default {
         const userInfo = newValue[0]
         if (userInfo === 'user') this.getUserInfo()
         if (userInfo === 'subAdmin') this.getSubAdminInfo()
-        if (userInfo === 'admin') this.getAdminInfo()
         this.setNavBar(userInfo)
         this.getBulletinList()
         this.getQuestionTypeOpenList()
@@ -378,35 +379,7 @@ export default {
       },
     },
   },
-  mounted() {
-    window.addEventListener('scroll', this.handleScrollStart)
-  },
   methods: {
-    /* handleScrollStart() {
-      this.timer = setInterval(() => {
-        this.number += 1
-        this.handleScrollEnd()
-      }, 1000)
-      this.isTipVisible = false
-    },
-    handleScrollEnd() {
-      console.log(this.number)
-      this.isTipVisible = true
-      clearInterval(this.timer)
-    }, */
-    // 上传试题模板成功
-    templateSuccess(res, file, fileList) {
-      const reader = new FileReader()
-      let arrayBuffer
-      reader.onload = function (evt) {
-        arrayBuffer = evt.target.result
-      }
-      reader.readAsArrayBuffer(file.raw)
-      mammoth.convertToHtml({ arrayBuffer }).then((res) => {
-        console.log(res)
-      })
-    },
-    templateRemove() {},
     setNavBar(userInfo) {
       if (userInfo === 'subAdmin') {
         this.navList = [
@@ -468,10 +441,6 @@ export default {
       const userInfo = await getSubAdminInfo()
       this.userInfo = userInfo.data
       this.setUserInfo()
-    },
-    async getAdminInfo() {
-      const userInfo = await getAdminInfo()
-      this.userInfo = userInfo.data
     },
     setUserInfo() {
       const userInfo = getInfo()
@@ -655,26 +624,33 @@ export default {
 
 <style lang="scss" scoped>
 .home-content {
+  height: 100%;
   display: flex;
   flex-direction: row;
 }
 .home-left {
+  height: 100%;
   flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 .home-right {
   width: 289px;
-  margin-left: 15px;
-}
-.calendar-list {
+  height: 100%;
   display: flex;
+  flex-direction: column;
+  margin-left: 15px;
 }
 .home-calendar {
   width: 300px;
+  height: auto;
   border-right: 1px solid rgba(#000, 0.1);
+  overflow-y: scroll;
 }
 .home-list {
   flex: 1;
   margin: 0 10px;
+  overflow-y: scroll;
 }
 
 // 卡片
@@ -687,6 +663,8 @@ export default {
     padding: 0 0 0 32px;
     height: 40px;
     line-height: 40px;
+    font-size: 16px;
+    font-weight: 600;
     &::after {
       content: '';
       display: block;
@@ -701,6 +679,31 @@ export default {
   /deep/.el-card__body {
     padding: 0;
   }
+}
+
+.calendar-exam-mark {
+  flex: 1;
+  margin-bottom: 0;
+  /deep/ .el-card__body {
+    height: calc(100% - 40px);
+  }
+}
+
+.calendar-list {
+  display: flex;
+  height: 100%;
+}
+
+.notice-box {
+  flex: 1;
+  overflow-y: scroll;
+  .info-item {
+    padding: 0 16px;
+  }
+}
+
+.service-box {
+  margin-bottom: 0;
 }
 
 .data-content {

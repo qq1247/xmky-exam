@@ -2,12 +2,72 @@
   <div class="home-content">
     <div class="home-params">
       <el-card class="box-card" shadow="never">
+        <div slot="header">考试概览</div>
+        <div
+          class="data-content"
+          v-if="
+            userInfo.bulletin &&
+            userInfo.onlineUser &&
+            userInfo.subAdmin &&
+            userInfo.user
+          "
+        >
+          <div class="data-item" @click="$router.push({ name: 'User' })">
+            <div class="item-icon exam-bg">
+              <img src="../../assets/img/index/index-exam.png" alt="" />
+            </div>
+            <div class="item-info">
+              <span class="info-num">{{ userInfo.user.num }}</span>
+              <span class="info-intro">创建用户（名）</span>
+            </div>
+          </div>
+          <div class="data-item" @click="$router.push({ name: 'User' })">
+            <div class="item-icon paper-bg">
+              <img src="../../assets/img/index/index-paper.png" alt="" />
+            </div>
+            <div class="item-info">
+              <span class="info-num">{{ userInfo.onlineUser.num }}</span>
+              <span class="info-intro">在线用户（名）</span>
+            </div>
+          </div>
+          <div class="data-item" @click="$router.push({ name: 'Bulletin' })">
+            <div class="item-icon question-bg">
+              <img src="../../assets/img/index/index-question.png" alt="" />
+            </div>
+            <div class="item-info">
+              <span class="info-num">{{ userInfo.bulletin.num }}</span>
+              <span class="info-intro">创建公告（条）</span>
+            </div>
+          </div>
+          <div class="data-item" @click="$router.push({ name: 'User' })">
+            <div class="item-icon mark-bg">
+              <img src="../../assets/img/index/index-mark.png" alt="" />
+            </div>
+            <div class="item-info">
+              <span class="info-num">{{ userInfo.subAdmin.num }}</span>
+              <span class="info-intro">创建子管理（名）</span>
+            </div>
+          </div>
+        </div>
+      </el-card>
+      <el-card class="box-card" shadow="never">
         <div slot="header">
           <span>慢接口日志</span>
         </div>
-        <div class="server-log" v-for="(log, index) in serverLog" :key="index">
-          {{ log }}
-        </div>
+        <template v-if="serverLog.length">
+          <div
+            class="server-log"
+            v-for="(log, index) in serverLog"
+            :key="index"
+          >
+            {{ log }}
+          </div>
+        </template>
+        <el-empty
+          v-else
+          :image="require('assets/img/index/notice-null.png')"
+          description="暂无异常"
+        ></el-empty>
       </el-card>
 
       <div class="table">
@@ -50,10 +110,10 @@
       ></el-pagination>
     </div>
     <div class="home-info">
-      <!-- 快捷导航 -->
+      <!-- 功能列表 -->
       <el-card class="box-card" shadow="never">
         <div slot="header">
-          <span>快捷导航</span>
+          <span>功能列表</span>
         </div>
         <el-link
           class="quick-nav"
@@ -75,7 +135,7 @@
         >
           <span class="item-name">{{ param.name }}:</span>
           <div class="item-value" v-if="Array.isArray(param.value)">
-            <span v-for="item in param.value" :key="item">
+            <span v-for="(item, index) in param.value" :key="index">
               {{ item }} <br />
             </span>
           </div>
@@ -83,22 +143,24 @@
         </div>
       </el-card>
       <!-- 服务支持 -->
-      <el-card class="box-card" shadow="never">
+      <!-- 服务支持 -->
+      <el-card class="box-card service-box" shadow="never">
         <div slot="header">
           <span>服务支持</span>
         </div>
-        <p style="line-height: 30px">技术支持：在线考试</p>
-        <p style="line-height: 30px">
-          在线服务：<a
-            target="_blank"
-            href="https://jq.qq.com/?_wv=1027&k=GXh1hHSy"
-          >
-            <img
-              src="https://img.shields.io/badge/qq-811189776-blue"
-              alt="811189776"
-            />
-          </a>
-        </p>
+        <div class="service">
+          <p class="service-item">技术支持：在线考试</p>
+          <p class="service-item">
+            在线服务：<a
+              class="service-qq"
+              target="_blank"
+              href="https://jq.qq.com/?_wv=1027&k=GXh1hHSy"
+            >
+              <div class="qq-title">QQ</div>
+              <div class="qq-number">811189776</div>
+            </a>
+          </p>
+        </div>
       </el-card>
     </div>
   </div>
@@ -107,7 +169,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { userOut, userListPage } from 'api/user'
-import { getServerParam, getServerLog } from 'api/report'
+import { getServerParam, getServerLog, getAdminInfo } from 'api/report'
 export default {
   data() {
     return {
@@ -122,12 +184,14 @@ export default {
         list: [], // 列表数据
         navList: [],
       },
+      userInfo: {},
     }
   },
   computed: {
     ...mapGetters(['permission_routes', 'onlyRole']),
   },
   mounted() {
+    this.getAdminInfo()
     this.setNavBar()
     this.getServerParam()
     this.query()
@@ -138,6 +202,10 @@ export default {
       this.navList = this.permission_routes.filter(
         (item) => item?.meta?.layout === this.onlyRole[0]
       )
+    },
+    async getAdminInfo() {
+      const userInfo = await getAdminInfo()
+      this.userInfo = userInfo.data
     },
     async getServerLog() {
       const serverLog = await getServerLog()
@@ -183,11 +251,75 @@ export default {
 
 .home-params {
   flex: 1;
-  background: #fff;
   margin: 0 10px;
 }
 .home-info {
   width: 30%;
+}
+
+.data-content {
+  display: flex;
+  padding: 24px;
+}
+
+.data-item {
+  width: 25%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  .item-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 16px;
+    transition: all 0.15s ease;
+    img {
+      width: 24px;
+      height: 24px;
+      transition: all 0.3s ease-in-out;
+    }
+  }
+  .item-info {
+    display: flex;
+    flex-direction: column;
+    .info-num {
+      font-size: 28px;
+      font-weight: 600;
+      color: #0c2e41;
+    }
+    .info-intro {
+      font-size: 12px;
+      color: #537384;
+    }
+  }
+  &:hover {
+    .item-icon {
+      border-radius: 8px;
+      box-shadow: 0 0 8px -3px rgba(#000, 0.13);
+      img {
+        transform: scale(1.15);
+      }
+    }
+  }
+}
+
+.exam-bg {
+  background: rgba(#09c8bd, 0.1);
+}
+
+.paper-bg {
+  background: rgba(#fb901b, 0.1);
+}
+
+.question-bg {
+  background: rgba(#0094e5, 0.1);
+}
+
+.mark-bg {
+  background: rgba(#eb5b5b, 0.1);
 }
 
 .box-card {
@@ -255,5 +387,38 @@ export default {
 
 .quick-nav {
   margin: 10px;
+}
+
+.service {
+  padding: 16px;
+}
+
+.service-item {
+  display: flex;
+  align-items: center;
+  line-height: 30px;
+}
+.service-qq {
+  display: flex;
+  .qq-title {
+    width: 31px;
+    height: 20px;
+    line-height: 20px;
+    color: #fff;
+    text-align: center;
+    font-size: 12px;
+    background: #0874ae;
+    border-radius: 4px 0px 0px 4px;
+  }
+  .qq-number {
+    width: 73px;
+    height: 20px;
+    line-height: 20px;
+    color: #fff;
+    text-align: center;
+    font-size: 12px;
+    background: #0094e5;
+    border-radius: 0px 4px 4px 0px;
+  }
 }
 </style>

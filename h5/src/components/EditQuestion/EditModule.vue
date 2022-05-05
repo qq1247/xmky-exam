@@ -56,14 +56,14 @@
           @click="addOption(editForm.options.length, '')"
           class="option-btn"
           type="primary"
-          >+添加选项</el-button
+          >+&nbsp;添加选项</el-button
         >
         <el-button
           :disabled="editForm.options.length <= 2"
           @click="delOption"
           class="option-btn"
-          type="primary"
-          >-删除选项</el-button
+          type="danger"
+          >-&nbsp;删除选项</el-button
         >
       </el-form-item>
     </div>
@@ -212,6 +212,7 @@
                 >填空{{ $tools.intToChinese(index + 1) }}</span
               >
               <el-select
+                class="custom-select"
                 remote
                 multiple
                 clearable
@@ -280,6 +281,7 @@
                 >关键词{{ $tools.intToChinese(index + 1) }}</span
               >
               <el-select
+                class="custom-select"
                 remote
                 multiple
                 clearable
@@ -310,14 +312,14 @@
           class="option-btn"
           style="margin-left: 65px"
           type="primary"
-          >+添加关键词</el-button
+          >+&nbsp;添加关键词</el-button
         >
         <el-button
           :disabled="editForm.answers.length <= 1"
           @click="delFillBlanks"
           class="option-btn"
-          type="primary"
-          >-删除关键词</el-button
+          type="danger"
+          >-&nbsp;删除关键词</el-button
         >
       </el-card>
     </el-form-item>
@@ -847,9 +849,14 @@ export default {
   font-size: 12px;
 }
 
+.custom-select {
+  width: 120px;
+}
+
 /deep/.el-select__tags .el-tag {
   width: fit-content;
   height: auto;
+  border-radius: 5px;
 }
 /deep/.el-select__tags-text {
   display: inline;

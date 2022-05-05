@@ -407,7 +407,7 @@ export default {
     },
     // 预览试卷
     viewPaper(userId) {
-      this.$router.push({
+      let routes = this.$router.resolve({
         name: 'MyExamDetail',
         params: {
           userId,
@@ -418,6 +418,7 @@ export default {
           preview: true,
         },
       })
+      window.open(routes.href, '_blank')
     },
     // 获取展开行信息
     async expandChange(row) {

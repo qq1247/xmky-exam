@@ -1,12 +1,3 @@
-<!--
- * @Description: 设置
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-12-16 16:01:13
- * @LastEditors: Che
- * @LastEditTime: 2022-01-06 17:31:54
--->
 <template>
   <el-row class="container">
     <template v-if="examUserList.length > 0">

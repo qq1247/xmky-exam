@@ -34,11 +34,14 @@
     font-weight: 600;
   }
 }
+
 .user-intro {
   display: flex;
   flex-wrap: wrap;
   background: #fff;
   padding: 20px 10px;
+  margin-bottom: 8px;
+  border-radius: 0 0 8px 8px;
   border-bottom: 1px solid #ebeef5;
   .intro-item {
     width: 50%;
@@ -46,17 +49,13 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-bottom: 10px;
-    .item-title {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: #0094e5;
-      color: #fff;
-      font-size: 12px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    &:nth-of-type(3),
+    &:nth-of-type(4) {
+      margin-top: 24px;
+    }
+    .item-icon {
+      width: 40px;
+      height: 40px;
       span {
         width: 24px;
         height: 30px;
@@ -67,16 +66,52 @@
     }
     .item-num {
       font-size: 14px;
-      margin-top: 10px;
+      margin: 8px 0 4px 0;
+      color: #606f74;
+    }
+    .item-title {
+      font-size: 12px;
+      color: #8b989d;
     }
   }
 }
+
 .user-handler {
   width: 100%;
-  padding: 10px;
-  line-height: 40px;
   background: #fff;
+  .handler-title {
+    padding: 20px 0;
+    text-align: center;
+    color: #8b989d;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  .handler-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px 0;
+    position: relative;
+  }
+  .percentage-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    .percentage-content {
+      display: inline-block;
+      width: 80px;
+      text-align: center;
+      background: #fff;
+    }
+  }
 }
+
 .exam-head {
   width: 100%;
   font-size: 16px;
@@ -106,10 +141,12 @@
     margin-left: 12px;
   }
 }
+
 .el-scrollbar {
   background: #fff;
   flex: 1;
 }
+
 .router-content {
   margin: 0 20px;
   .router-title {
@@ -303,6 +340,8 @@
     }
     .question-title {
       padding: 16px;
+      line-height: 25px;
+      min-height: 25px;
       background-color: #fafcff;
       border-bottom: 1px solid rgba(0, 0, 0, 0.15);
       border-radius: 8px 8px 0 0;
@@ -320,7 +359,7 @@
   }
   /deep/ .option-item .el-radio__input,
   /deep/ .option-item .el-checkbox__input {
-    padding-top: 7px;
+    padding-top: 8px;
   }
   /deep/ .el-radio__input.is-checked .el-radio__inner {
     border-color: #0094e5;
@@ -432,6 +471,10 @@
 /deep/ .el-collapse-item__content {
   padding: 10px;
   font-size: 14px;
+}
+
+/deep/ .el-textarea__inner {
+  height: 140px;
 }
 
 /deep/.el-textarea.is-disabled .el-textarea__inner,

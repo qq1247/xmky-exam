@@ -14,15 +14,15 @@
     ref="paramForm"
     label-width="100px"
   >
-    <el-form-item label="用户名" prop="emailUserName">
+    <el-form-item label="账号" prop="emailUserName">
       <el-input
-        placeholder="请输入用户名"
+        placeholder="请输入账号"
         v-model="paramForm.emailUserName"
       ></el-input>
     </el-form-item>
-    <el-form-item label="密码" prop="emailPwd">
+    <el-form-item label="授权码" prop="emailPwd">
       <el-input
-        placeholder="请输入密码"
+        placeholder="请输入授权码"
         v-model="paramForm.emailPwd"
       ></el-input>
     </el-form-item>

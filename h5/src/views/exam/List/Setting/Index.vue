@@ -39,6 +39,7 @@ import Anonymous from './Anonymous.vue'
 import Ranking from './Ranking.vue'
 import Score from './Score.vue'
 import Message from './Message.vue'
+import Exports from './Exports.vue'
 export default {
   data() {
     return {
@@ -53,7 +54,16 @@ export default {
           index: '1',
         },
       ],
-      viewList: [Setting, Publish, Delete, Anonymous, Ranking, Score, Message],
+      viewList: [
+        Setting,
+        Publish,
+        Delete,
+        Anonymous,
+        Ranking,
+        Score,
+        Message,
+        Exports,
+      ],
       currentView: null,
     }
   },
@@ -122,6 +132,14 @@ export default {
           contentIntro:
             '1.下发邮件给考试用户、阅卷用户，2.【】内的文字带有特殊含义，发送邮件时会自动替换，如【姓名】替换为张三',
           index: '7',
+        },
+        {
+          name: '试卷导出',
+          intro: '试卷导出',
+          icon: 'common common-template-down',
+          contentName: '试卷导出',
+          contentIntro: '选择不同考试人员，导出其试卷',
+          index: '8',
         },
       ]
     }

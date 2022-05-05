@@ -1,75 +1,57 @@
-<!--
- * @Description: 设置
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-12-16 16:01:13
- * @LastEditors: Che
- * @LastEditTime: 2022-01-21 17:02:16
--->
 <template>
-  <div class="container">
-    <el-form
-      :model="examForm"
-      :rules="examForm.rules"
-      ref="examForm"
-      label-width="100px"
-    >
-      <el-form-item label="考试名称" prop="name">
-        <el-input
-          placeholder="请输入试卷名称"
-          v-model="examForm.name"
-        ></el-input>
-      </el-form-item>
-      <el-form-item label="选择试卷" prop="selectPaperId">
-        <CustomSelect
-          ref="paperSelect"
-          placeholder="请选择试卷"
-          :multiple="false"
-          :value="examForm.selectPaperId"
-          :total="examForm.total"
-          @input="searchPaper"
-          @change="selectPaper"
-          @currentChange="getMorePaper"
-          @visibleChange="getPaperList"
-        >
-          <el-option
-            v-for="item in examForm.paperList"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id"
-          ></el-option>
-        </CustomSelect>
-      </el-form-item>
-      <el-form-item label="考试时间" prop="examTime">
-        <el-date-picker
-          v-model="examForm.examTime"
-          type="datetimerange"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          value-format="yyyy-MM-dd HH:mm:ss"
-        ></el-date-picker>
-      </el-form-item>
-      <el-form-item
-        label="阅卷时间"
-        prop="markTime"
-        v-if="examForm.showMarkTime"
+  <el-form
+    :model="examForm"
+    :rules="examForm.rules"
+    ref="examForm"
+    label-width="100px"
+  >
+    <el-form-item label="考试名称" prop="name">
+      <el-input placeholder="请输入试卷名称" v-model="examForm.name"></el-input>
+    </el-form-item>
+    <el-form-item label="选择试卷" prop="selectPaperId">
+      <CustomSelect
+        ref="paperSelect"
+        placeholder="请选择试卷"
+        :multiple="false"
+        :value="examForm.selectPaperId"
+        :total="examForm.total"
+        @input="searchPaper"
+        @change="selectPaper"
+        @currentChange="getMorePaper"
+        @visibleChange="getPaperList"
       >
-        <el-date-picker
-          v-model="examForm.markTime"
-          type="datetimerange"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          value-format="yyyy-MM-dd HH:mm:ss"
-        ></el-date-picker>
-      </el-form-item>
-      <el-form-item>
-        <el-button @click="addOrEdit" type="primary">{{
-          id ? '修改' : '添加'
-        }}</el-button>
-      </el-form-item>
-    </el-form>
-  </div>
+        <el-option
+          v-for="item in examForm.paperList"
+          :key="item.id"
+          :label="item.name"
+          :value="item.id"
+        ></el-option>
+      </CustomSelect>
+    </el-form-item>
+    <el-form-item label="考试时间" prop="examTime">
+      <el-date-picker
+        v-model="examForm.examTime"
+        type="datetimerange"
+        start-placeholder="开始日期"
+        end-placeholder="结束日期"
+        value-format="yyyy-MM-dd HH:mm:ss"
+      ></el-date-picker>
+    </el-form-item>
+    <el-form-item label="阅卷时间" prop="markTime" v-if="examForm.showMarkTime">
+      <el-date-picker
+        v-model="examForm.markTime"
+        type="datetimerange"
+        start-placeholder="开始日期"
+        end-placeholder="结束日期"
+        value-format="yyyy-MM-dd HH:mm:ss"
+      ></el-date-picker>
+    </el-form-item>
+    <el-form-item>
+      <el-button @click="addOrEdit" type="primary">{{
+        id ? '修改' : '添加'
+      }}</el-button>
+    </el-form-item>
+  </el-form>
 </template>
 
 <script>

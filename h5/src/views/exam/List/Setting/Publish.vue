@@ -1,12 +1,3 @@
-<!--
- * @Description: 发布
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-12-16 16:01:13
- * @LastEditors: Che
- * @LastEditTime: 2022-01-05 13:14:16
--->
 <template>
   <el-button @click="publish" type="primary"> 发布 </el-button>
 </template>

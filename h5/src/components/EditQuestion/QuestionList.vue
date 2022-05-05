@@ -408,4 +408,9 @@ export default {
     padding: 5px 10px;
   }
 }
+
+/deep/ .el-radio__input .el-radio__inner,
+/deep/ .el-checkbox__input .el-checkbox__inner {
+  margin-top: 8px;
+}
 </style>

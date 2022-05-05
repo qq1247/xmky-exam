@@ -1,12 +1,3 @@
-<!--
- * @Description: 删除
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-12-21 10:11:03
- * @LastEditors: Che
- * @LastEditTime: 2022-01-05 13:27:21
--->
 <template>
   <el-button @click="del" type="danger">删除</el-button>
 </template>
