@@ -1,12 +1,3 @@
-/*
- * @Description:
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-07-27 17:31:01
- * @LastEditors: Che
- * @LastEditTime: 2022-01-20 12:22:19
- */
 const os = require('os')
 const path = require('path')
 const fs = require('fs')
@@ -16,15 +7,15 @@ const CompressionWebpackPlugin = require('compression-webpack-plugin')
 // resolve absolute paths
 const resolve = (dir) => path.join(__dirname, dir)
 
-//copy dir
+// copy dir
 const copy = (src, dst) => {
   fs.readdir(src, function (err, paths) {
     if (err) {
       throw err
     }
     paths.forEach(function (path) {
-      let _src = `${src}/${path}`
-      let _dst = `${dst}/${path}`
+      const _src = `${src}/${path}`
+      const _dst = `${dst}/${path}`
       let readable
       let writable
       stat(_src, function (err, st) {
@@ -33,8 +24,8 @@ const copy = (src, dst) => {
         }
 
         if (st.isFile()) {
-          readable = fs.createReadStream(_src) //创建读取流
-          writable = fs.createWriteStream(_dst) //创建写入流
+          readable = fs.createReadStream(_src) // 创建读取流
+          writable = fs.createWriteStream(_dst) // 创建写入流
           readable.pipe(writable)
         } else if (st.isDirectory()) {
           exists(_src, _dst, copy)

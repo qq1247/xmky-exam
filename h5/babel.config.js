@@ -1,12 +1,3 @@
-/*
- * @Description:
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-05-24 15:45:08
- * @LastEditors: Che
- * @LastEditTime: 2021-08-30 03:00:04
- */
 module.exports = {
   presets: [
     // https://github.com/vuejs/vue-cli/tree/master/packages/@vue/babel-preset-app

@@ -1,14 +1,18 @@
 module.exports = {
   root: true,
+  parserOptions: {
+    parser: 'babel-eslint',
+    sourceType: 'module',
+  },
   env: {
     browser: true,
     node: true,
     es6: true,
   },
-  extends: ['plugin:vue/essential', '@vue/prettier'],
-  parserOptions: {
-    parser: 'babel-eslint',
-  },
+  extends: ['plugin:vue/recommended', 'eslint:recommended'],
+
+  // add your custom rules here
+  //it is base on https://github.com/vuejs/eslint-config-vue
   rules: {
     'vue/max-attributes-per-line': [
       2,
@@ -20,12 +24,10 @@ module.exports = {
         },
       },
     ],
-    'vue/no-v-html': 0,
-    'vue/no-unused-components': 2,
-    'vue/no-unused-vars': 2,
-    'vue/singleline-html-element-content-newline': 0,
-    'vue/multiline-html-element-content-newline': 0,
-    'vue/name-property-casing': [2, 'PascalCase'],
+    'vue/singleline-html-element-content-newline': 'off',
+    'vue/multiline-html-element-content-newline': 'off',
+    'vue/name-property-casing': ['error', 'PascalCase'],
+    'vue/no-v-html': 'off',
     'accessor-pairs': 2,
     'arrow-spacing': [
       2,
@@ -61,7 +63,7 @@ module.exports = {
     curly: [2, 'multi-line'],
     'dot-location': [2, 'property'],
     'eol-last': 2,
-    eqeqeq: [2, 'always', { null: 'ignore' }],
+    eqeqeq: ['error', 'always', { null: 'ignore' }],
     'generator-star-spacing': [
       2,
       {
@@ -100,10 +102,9 @@ module.exports = {
       },
     ],
     'new-parens': 2,
-    'no-unused-vars': 2,
     'no-array-constructor': 2,
     'no-caller': 2,
-    'no-console': process.env.NODE_ENV === 'production' ? 1 : 0,
+    'no-console': 'off',
     'no-class-assign': 2,
     'no-cond-assign': 2,
     'no-const-assign': 2,
@@ -130,7 +131,6 @@ module.exports = {
     'no-irregular-whitespace': 2,
     'no-iterator': 2,
     'no-label-var': 2,
-    'no-async-promise-executor': 0,
     'no-labels': [
       2,
       {
@@ -140,7 +140,7 @@ module.exports = {
     ],
     'no-lone-blocks': 2,
     'no-mixed-spaces-and-tabs': 2,
-    'no-multi-spaces': 1,
+    'no-multi-spaces': 2,
     'no-multi-str': 2,
     'no-multiple-empty-lines': [
       2,
@@ -183,13 +183,19 @@ module.exports = {
     ],
     'no-unreachable': 2,
     'no-unsafe-finally': 2,
+    'no-unused-vars': [
+      2,
+      {
+        vars: 'all',
+        args: 'none',
+      },
+    ],
     'no-useless-call': 2,
     'no-useless-computed-key': 2,
     'no-useless-constructor': 2,
     'no-useless-escape': 0,
     'no-whitespace-before-property': 2,
     'no-with': 2,
-    'no-debugger': process.env.NODE_ENV === 'production' ? 1 : 0,
     'one-var': [
       2,
       {
@@ -220,7 +226,7 @@ module.exports = {
       2,
       {
         before: false,
-        after: false,
+        after: true,
       },
     ],
     'space-before-blocks': [2, 'always'],
@@ -249,13 +255,14 @@ module.exports = {
         ],
       },
     ],
-    'template-curly-spacing': [2, 'always'],
+    'template-curly-spacing': [2, 'never'],
     'use-isnan': 2,
     'valid-typeof': 2,
     'wrap-iife': [2, 'any'],
     'yield-star-spacing': [2, 'both'],
     yoda: [2, 'never'],
     'prefer-const': 2,
+    'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
     'object-curly-spacing': [
       2,
       'always',
@@ -264,6 +271,5 @@ module.exports = {
       },
     ],
     'array-bracket-spacing': [2, 'never'],
-    'prefer-promise-reject-errors': [2, { allowEmptyReject: true }],
   },
 }
