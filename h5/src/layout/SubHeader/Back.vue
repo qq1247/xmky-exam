@@ -1,21 +1,13 @@
-<!--
- * @Description: 返回
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-12-14 09:40:24
- * @LastEditors: Che
- * @LastEditTime: 2022-01-19 15:45:46
--->
 <template>
   <el-breadcrumb class="app-breadcrumb" separator="/">
     <transition-group name="breadcrumb">
       <el-breadcrumb-item v-for="(item, index) in levelList" :key="item.path">
         <span
-          v-if="item.redirect === 'noRedirect' || index == levelList.length - 1"
+          v-if="
+            item.redirect === 'noRedirect' || index === levelList.length - 1
+          "
           class="no-redirect"
-          >{{ item.meta.title }}</span
-        >
+        >{{ item.meta.title }}</span>
         <a v-else @click.prevent="handleLink(item)">{{ item.meta.title }}</a>
       </el-breadcrumb-item>
     </transition-group>
@@ -26,13 +18,13 @@
 export default {
   data() {
     return {
-      levelList: null,
+      levelList: null
     }
   },
   watch: {
     $route(route) {
       this.getBreadcrumb()
-    },
+    }
   },
   created() {
     this.getBreadcrumb()
@@ -46,13 +38,13 @@ export default {
 
       if (!this.isHome(first)) {
         matched = [
-          { path: '/', redirect: '/home', meta: { title: '首页' } },
+          { path: '/', redirect: '/home', meta: { title: '首页' }}
         ].concat(matched)
       }
 
       this.levelList = matched.filter((item) => item.meta && item.meta.title)
     },
-    //是否首页
+    // 是否首页
     isHome(route) {
       const name = route && route.name
       if (!name) {
@@ -66,8 +58,8 @@ export default {
         return
       }
       this.$router.back()
-    },
-  },
+    }
+  }
 }
 </script>
 

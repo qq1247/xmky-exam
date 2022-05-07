@@ -1,64 +1,48 @@
-<!--
- * @Description: 设置
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-12-16 16:01:13
- * @LastEditors: Che
- * @LastEditTime: 2022-01-10 16:08:31
--->
 <template>
   <el-form
+    ref="paperForm"
     :model="paperForm"
     :rules="paperForm.rules"
-    ref="paperForm"
     label-width="100px"
   >
     <el-form-item label="组卷方式">
       <div class="exam-type">
         <div
-          :class="[
-            'type-item',
-            paperForm.genType == index ? 'type-item-active' : '',
-            id ? 'type-item-disabled' : '',
-          ]"
           v-for="(item, index) in paperForm.genTypes"
           :key="item.content"
+          :class="[
+            'type-item',
+            paperForm.genType === index ? 'type-item-active' : '',
+            id ? 'type-item-disabled' : '',
+          ]"
           @click="setPaperType(index)"
         >
-          <i :class="['common', `${item.icon}`]"></i>
-          <i
-            class="common common-selected"
-            v-if="paperForm.genType == index"
-          ></i>
+          <i :class="['common', `${item.icon}`]" />
+          <i v-if="paperForm.genType == index" class="common common-selected" />
           {{ item.content }}
         </div>
       </div>
     </el-form-item>
     <el-form-item label="阅卷方式" prop="markType">
       <el-radio
-        :disabled="id ? true : false"
-        @change="selectMarkType"
         v-for="item in paperForm.markTypeList"
         :key="item.value"
         v-model="paperForm.markType"
+        :disabled="id ? true : false"
         :label="item.value"
-        >{{ item.name }}</el-radio
-      >
+        @change="selectMarkType"
+      >{{ item.name }}</el-radio>
     </el-form-item>
     <el-form-item label="试卷名称" prop="name">
-      <el-input
-        placeholder="请输入试卷名称"
-        v-model="paperForm.name"
-      ></el-input>
+      <el-input v-model="paperForm.name" placeholder="请输入试卷名称" />
     </el-form-item>
     <el-form-item label="及格（%）" prop="passScore">
       <el-input
+        v-model="paperForm.passScore"
         type="number"
         min="1"
         max="100"
         placeholder="请输入及格分数占总分百分比"
-        v-model="paperForm.passScore"
       >
         <span slot="append">%</span>
       </el-input>
@@ -69,8 +53,7 @@
         :key="item.value"
         v-model="paperForm.showType"
         :label="item.value"
-        >{{ item.name }}</el-radio
-      >
+      >{{ item.name }}</el-radio>
     </el-form-item>
     <!-- <el-form-item label="考前阅读">
               <TinymceEditor
@@ -86,7 +69,7 @@
                 v-model="paperForm.readNum"
               ></el-input>
             </el-form-item> -->
-    <!-- <template v-if="paperForm.tabActive == '2'">
+    <!-- <template v-if="paperForm.tabActive === '2'">
             <el-form-item label="防作弊">
               <el-checkbox-group v-model="paperForm.options">
                 <el-checkbox
@@ -105,7 +88,7 @@
               </el-input>
             </el-form-item>
           </template>
-          <div v-if="paperForm.tabActive == '3'">
+          <div v-if="paperForm.tabActive === '3'">
             <el-form-item label="成绩评语">
               <el-checkbox v-model="paperForm.paperRemarkShow">开启</el-checkbox>
               <template v-if="paperForm.paperRemarkShow">
@@ -143,12 +126,12 @@
 
 <script>
 import { paperEdit, paperAdd, paperGet } from 'api/paper'
-import TinymceEditor from 'components/TinymceEditor/Index.vue'
+// import TinymceEditor from 'components/TinymceEditor/Index.vue'
 import dayjs from 'dayjs'
 
 export default {
   components: {
-    TinymceEditor,
+    // TinymceEditor
   },
   data() {
     const validatePercentage = (rule, value, callback) => {
@@ -175,16 +158,16 @@ export default {
         showTypes: [
           {
             name: '整张',
-            value: '1',
+            value: '1'
           },
           {
             name: '单题',
-            value: '3',
-          },
+            value: '3'
+          }
         ],
         paperAntiCheat: [
           '试题乱序',
-          '选项乱序',
+          '选项乱序'
           /* "禁用右键",
           "禁用复制",
           "最小化" */
@@ -195,19 +178,19 @@ export default {
         paperRemark: [
           {
             score: '',
-            remark: '',
-          },
+            remark: ''
+          }
         ],
         tabActive: '0',
         paperTabs: [
           {
             title: '基础信息',
-            name: '0',
+            name: '0'
           },
           {
             title: '组卷方式',
-            name: '1',
-          },
+            name: '1'
+          }
           /* {
             title: '防作弊',
             name: '2',
@@ -221,37 +204,37 @@ export default {
         genTypes: [
           {
             icon: 'common-person',
-            content: '人工组卷',
+            content: '人工组卷'
           },
           {
             icon: 'common-random',
-            content: '随机组卷',
-          },
+            content: '随机组卷'
+          }
         ],
         markType: 1,
         markTypeList: [
           {
             name: '智能阅卷',
-            value: 1,
+            value: 1
           },
           {
             name: '人工阅卷',
-            value: 2,
-          },
+            value: 2
+          }
         ],
         rules: {
           name: [
-            { required: true, message: '请填写试卷名称', trigger: 'blur' },
+            { required: true, message: '请填写试卷名称', trigger: 'blur' }
           ],
           passScore: [
             {
               required: true,
               trigger: 'blur',
-              validator: validatePercentage,
-            },
-          ],
-        },
-      },
+              validator: validatePercentage
+            }
+          ]
+        }
+      }
     }
   },
   async mounted() {
@@ -279,7 +262,7 @@ export default {
         this.$message.error('试卷名称不能为空')
         return
       }
-      this.$refs['paperForm'].validate(async (valid) => {
+      this.$refs['paperForm'].validate(async(valid) => {
         if (!valid) {
           return
         }
@@ -290,14 +273,14 @@ export default {
           name: this.paperForm.name,
           passScore: this.paperForm.passScore,
           showType: Number(this.paperForm.showType),
-          markType: this.paperForm.markType,
+          markType: this.paperForm.markType
         }
 
         const res = this.id
           ? await paperEdit({ ...params, id: this.id })
           : await paperAdd(params)
 
-        if (res?.code == 200) {
+        if (res?.code === 200) {
           this.$message.success(!this.id ? '添加成功！' : '修改成功！')
           this.$router.back()
         } else {
@@ -307,7 +290,7 @@ export default {
     },
     // tab切换
     paperNext() {
-      this.$refs['paperForm'].validate(async (valid) => {
+      this.$refs['paperForm'].validate(async(valid) => {
         if (!valid) {
           return
         }
@@ -338,14 +321,14 @@ export default {
     remarkAdd() {
       this.paperForm.paperRemark.push({
         score: '',
-        remark: '',
+        remark: ''
       })
     },
     // 删除评语
     remarkDel() {
       this.paperForm.paperRemark.pop()
-    },
-  },
+    }
+  }
 }
 </script>
 

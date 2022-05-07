@@ -3,30 +3,29 @@
     <div class="total-score">总分：{{ totalScore }}</div>
     <template v-if="paperQuestion.length > 0">
       <div
-        class="router-content"
         v-for="(item, index) in paperQuestion"
         :key="index"
+        class="router-content"
       >
-        <div class="router-title" v-if="item.questionList">
+        <div v-if="item.questionList" class="router-title">
           第{{ $tools.intToChinese(index + 1) }}章（共{{
             item.questionList.length
           }}题，合计{{ computeChapterScore(item.questionList) }}分）
         </div>
-        <div class="router-link" v-if="item.questionList">
+        <div v-if="item.questionList" class="router-link">
           <a
+            v-for="(question, indexQuestion) in item.questionList"
+            :key="question.id"
             :class="[
               'router-index',
-              routerIndex === child.id ? 'router-active' : '',
+              routerIndex === question.id ? 'router-active' : '',
             ]"
-            @click="toHref(child.id)"
-            v-for="(child, index) in item.questionList"
-            :key="child.id"
-            >{{ index + 1 }}</a
-          >
+            @click="toHref(question.id)"
+          >{{ indexQuestion + 1 }}</a>
         </div>
       </div>
     </template>
-    <el-empty v-else description="暂无试题导航"> </el-empty>
+    <el-empty v-else description="暂无试题导航" />
   </div>
 </template>
 
@@ -39,12 +38,12 @@ export default {
   data() {
     return {
       routerIndex: '',
-      paperQuestion: [],
+      paperQuestion: []
     }
   },
   computed: {
     totalScore() {
-      if (this.paperQuestion.length == 0) {
+      if (this.paperQuestion.length === 0) {
         return 0
       }
 
@@ -58,7 +57,7 @@ export default {
       }, 0)
 
       return totalScore
-    },
+    }
   },
   created() {
     this.query()
@@ -68,7 +67,7 @@ export default {
     async query() {
       try {
         const res = await paperQuestionList({
-          id: this.$route.params.id || getQuick().id,
+          id: this.$route.params.id || getQuick().id
         })
         res.data.map((item) => {
           item.chapter.show = true
@@ -91,8 +90,8 @@ export default {
       document
         .querySelector(`#p-${id}`)
         .scrollIntoView({ block: 'end', inline: 'nearest' })
-    },
-  },
+    }
+  }
 }
 </script>
 

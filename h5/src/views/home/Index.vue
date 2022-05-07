@@ -1,7 +1,7 @@
 <template>
   <div class="container">
-    <UserContent v-if="onlyRole[0] != 'admin'"></UserContent>
-    <AdminContent v-else></AdminContent>
+    <UserContent v-if="onlyRole[0] != 'admin'" />
+    <AdminContent v-else />
   </div>
 </template>
 
@@ -12,14 +12,14 @@ import AdminContent from './AdminContent.vue'
 export default {
   components: {
     UserContent,
-    AdminContent,
+    AdminContent
   },
   data() {
     return {}
   },
   computed: {
-    ...mapGetters(['onlyRole']),
-  },
+    ...mapGetters(['onlyRole'])
+  }
 }
 </script>
 <style lang="scss" scoped>

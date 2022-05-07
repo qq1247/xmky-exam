@@ -1,12 +1,12 @@
 <template>
   <el-form
+    ref="examForm"
     :model="examForm"
     :rules="examForm.rules"
-    ref="examForm"
     label-width="100px"
   >
     <el-form-item label="考试名称" prop="name">
-      <el-input placeholder="请输入试卷名称" v-model="examForm.name"></el-input>
+      <el-input v-model="examForm.name" placeholder="请输入试卷名称" />
     </el-form-item>
     <el-form-item label="考试时间" prop="examTime">
       <el-date-picker
@@ -15,21 +15,21 @@
         start-placeholder="开始日期"
         end-placeholder="结束日期"
         value-format="yyyy-MM-dd HH:mm:ss"
-      ></el-date-picker>
+      />
     </el-form-item>
-    <el-form-item label="阅卷时间" prop="markTime" v-if="examForm.showMarkTime">
+    <el-form-item v-if="examForm.showMarkTime" label="阅卷时间" prop="markTime">
       <el-date-picker
         v-model="examForm.markTime"
         type="datetimerange"
         start-placeholder="开始日期"
         end-placeholder="结束日期"
         value-format="yyyy-MM-dd HH:mm:ss"
-      ></el-date-picker>
+      />
     </el-form-item>
 
     <div class="footer">
-      <el-button @click="$emit('prev', '1')" type="primary">上一步</el-button>
-      <el-button @click="next" type="primary">下一步</el-button>
+      <el-button type="primary" @click="$emit('prev', '1')">上一步</el-button>
+      <el-button type="primary" @click="next">下一步</el-button>
     </div>
   </el-form>
 </template>
@@ -40,7 +40,7 @@ import {
   examTypeListPage,
   examAdd,
   examGet,
-  examEdit,
+  examEdit
 } from 'api/exam'
 import { getQuick, setQuick } from '@/utils/storage'
 import * as dayjs from 'dayjs'
@@ -49,7 +49,7 @@ dayjs.extend(isSameOrBefore)
 export default {
   data() {
     const validateExamTime = (rule, value, callback) => {
-      if (value.length == 0) {
+      if (value.length === 0) {
         return callback(new Error('请选择考试时间'))
       }
       if (dayjs(value[1]).isSameOrBefore(dayjs())) {
@@ -59,7 +59,7 @@ export default {
     }
 
     const validateMarkTime = (rule, value, callback) => {
-      if (value.length == 0) {
+      if (value.length === 0) {
         return callback(new Error('请选择阅卷时间'))
       }
       if (
@@ -83,27 +83,27 @@ export default {
         examRadios: [
           {
             name: '按题阅卷',
-            value: 0,
+            value: 0
           },
           {
             name: '按人阅卷',
-            value: 1,
-          },
+            value: 1
+          }
         ],
         rules: {
           name: [
-            { required: true, message: '请填写试卷名称', trigger: 'blur' },
+            { required: true, message: '请填写试卷名称', trigger: 'blur' }
           ],
           examTime: [{ required: true, validator: validateExamTime }],
-          markTime: [{ required: true, validator: validateMarkTime }],
-        },
-      },
+          markTime: [{ required: true, validator: validateMarkTime }]
+        }
+      }
     }
   },
   async created() {
     const quickInfo = getQuick()
     if (!Object.keys(quickInfo).length || !quickInfo) return false
-    this.examForm.showMarkTime = quickInfo.markType === 1 ? false : true
+    this.examForm.showMarkTime = quickInfo.markType !== 1
     if (quickInfo.examId) {
       const {
         data: {
@@ -114,14 +114,14 @@ export default {
           endTime,
           markStartTime,
           markEndTime,
-          paperMarkType,
-        },
+          paperMarkType
+        }
       } = await examGet({ id: quickInfo.examId })
       this.$nextTick(() => {
         this.examForm.name = name
         this.examForm.paperName = paperName
         this.examForm.examTime = [startTime, endTime]
-        this.examForm.showMarkTime = paperMarkType === 1 ? false : true
+        this.examForm.showMarkTime = paperMarkType !== 1
         const quickInfo = getQuick()
         quickInfo.markType = paperMarkType
         setQuick(quickInfo)
@@ -130,7 +130,7 @@ export default {
         if (markStartTime || markEndTime) {
           this.examForm.markTime = [
             markStartTime || `${_markStartTime}`,
-            markEndTime || `${_markEndTime}`,
+            markEndTime || `${_markEndTime}`
           ]
         }
 
@@ -139,19 +139,19 @@ export default {
             currentLabel: paperName,
             currentValue: paperId,
             label: paperName,
-            value: paperId,
+            value: paperId
           })
       })
     } else {
       const examTypeList = await examTypeListPage({
         name: '我的考试',
         curPage: 1,
-        pageSize: 5,
+        pageSize: 5
       })
 
       if (!examTypeList.data.list.length) {
         const res = await examTypeAdd({
-          name: '我的考试',
+          name: '我的考试'
         })
         if (res?.code === 200) {
           this.examTypeId = res.data
@@ -179,7 +179,7 @@ export default {
     },
     // 下一步
     next() {
-      this.$refs['examForm'].validate(async (valid) => {
+      this.$refs['examForm'].validate(async(valid) => {
         if (!valid) {
           return
         }
@@ -189,22 +189,22 @@ export default {
           startTime: this.examForm.examTime[0],
           endTime: this.examForm.examTime[1],
           paperId: getQuick().id,
-          examTypeId: this.examTypeId,
+          examTypeId: this.examTypeId
         }
 
         if (this.examForm.markTime.length) {
           params = {
             markStartTime: this.examForm.markTime[0],
             markEndTime: this.examForm.markTime[1],
-            ...params,
+            ...params
           }
         }
 
         const res = getQuick().examId
           ? await examEdit({
-              ...params,
-              id: getQuick().examId,
-            })
+            ...params,
+            id: getQuick().examId
+          })
           : await examAdd(params)
         const examId = res.data || getQuick()?.examId
         this.setQuickInfo(examId)
@@ -220,11 +220,11 @@ export default {
       quickInfo = {
         ...quickInfo,
         examId,
-        examName: this.examForm.name,
+        examName: this.examForm.name
       }
       setQuick(quickInfo)
-    },
-  },
+    }
+  }
 }
 </script>
 

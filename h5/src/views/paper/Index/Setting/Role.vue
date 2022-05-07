@@ -1,15 +1,5 @@
-<!--
- * @Description: 权限
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-12-16 16:05:04
- * @LastEditors: Che
- * @LastEditTime: 2022-01-06 14:28:20
--->
-
 <template>
-  <el-form :model="roleForm" ref="roleForm" label-width="100px">
+  <el-form ref="roleForm" :model="roleForm" label-width="100px">
     <el-form-item label="共享给" prop="readRoleUser">
       <CustomSelect
         ref="readSelect"
@@ -26,11 +16,11 @@
           :key="item.id"
           :label="item.name"
           :value="item.id"
-        ></el-option>
+        />
       </CustomSelect>
     </el-form-item>
     <el-form-item>
-      <el-button @click="editRoleUsers" type="primary">共享</el-button>
+      <el-button type="primary" @click="editRoleUsers">共享</el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -42,7 +32,7 @@ import CustomSelect from 'components/CustomSelect.vue'
 
 export default {
   components: {
-    CustomSelect,
+    CustomSelect
   },
   data() {
     return {
@@ -55,8 +45,8 @@ export default {
         total: 0,
         readRoleUser: [],
         writeRoleUser: [],
-        roleUserList: [],
-      },
+        roleUserList: []
+      }
     }
   },
   async mounted() {
@@ -79,19 +69,19 @@ export default {
       const roleUserList = await userListPage({
         name,
         curPage,
-        pageSize: this.pageSize,
+        pageSize: this.pageSize
       })
 
-      if (this.$store.getters.userId == 1) {
+      if (this.$store.getters.userId === 1) {
         roleUserList.data.list.unshift({
           id: 1,
-          name: '管理员',
+          name: '管理员'
         })
       }
 
       this.roleForm.roleUserList = roleUserList.data.list
       this.roleForm.total =
-        this.$store.getters.userId == 1
+        this.$store.getters.userId === 1
           ? roleUserList.data.total + 1
           : roleUserList.data.total
     },
@@ -124,7 +114,7 @@ export default {
             currentLabel: names[index],
             currentValue: cur,
             label: names[index],
-            value: cur,
+            value: cur
           })
           return acc
         },
@@ -137,15 +127,15 @@ export default {
       const res = await paperTypeAuth({
         id: this.id,
         readUserIds: this.roleForm.readRoleUser.join(','),
-        writeUserIds: this.roleForm.writeRoleUser.join(','),
+        writeUserIds: this.roleForm.writeRoleUser.join(',')
       })
-      if (res?.code == 200) {
+      if (res?.code === 200) {
         this.$message.success('权限编辑成功！')
         this.$router.back()
       } else {
         this.$message.error('权限编辑失败！')
       }
-    },
-  },
+    }
+  }
 }
 </script>

@@ -12,40 +12,39 @@
         <div class="chapter">
           <div class="chapter-item">
             <el-input
+              v-model="item.chapter.name"
               class="chapter-name"
               placeholder="请输入章节名称（最多16个字符）"
-              v-model="item.chapter.name"
               maxlength="16"
               @blur="
                 (e) =>
                   editorListener('chapterName', e.target.value, item.chapter)
               "
-            ></el-input>
+            />
             <div class="chapter-handler">
               <el-button
-                @click="chapterDel(item.chapter)"
                 class="btn"
                 icon="common common-delete"
                 round
                 size="mini"
-                >删除章节</el-button
-              >
+                @click="chapterDel(item.chapter)"
+              >删除章节</el-button>
             </div>
           </div>
           <TinymceEditor
+            id="chapterDesc"
             class="chapter-description"
             placeholder="请输入章节描述"
             :value="item.chapter.description"
             @editorListener="
               (id, value) => editorListener(id, value, item.chapter)
             "
-            id="chapterDesc"
-          ></TinymceEditor>
+          />
         </div>
         <el-form
+          :ref="`ruleForm${index}`"
           class="box-card"
           :model="paperQuestionRules[index]"
-          :ref="`ruleForm${index}`"
           size="small"
         >
           <div v-for="(rule, ruleIndex) in item.rule" :key="rule.id">
@@ -58,7 +57,7 @@
                   <CustomSelect
                     :ref="`questionSelect${index}${ruleIndex}`"
                     :total="total"
-                    :isAuto="false"
+                    :is-auto="false"
                     :multiple="false"
                     placeholder="试题分类"
                     :value="rule.questionTypeId"
@@ -68,11 +67,11 @@
                     @visibleChange="getQuestionType"
                   >
                     <el-option
-                      v-for="item in questionTypes"
-                      :key="item.id"
-                      :label="item.name"
-                      :value="item.id"
-                    ></el-option>
+                      v-for="type in questionTypes"
+                      :key="type.id"
+                      :label="type.name"
+                      :value="type.id"
+                    />
                   </CustomSelect>
                 </el-form-item>
               </el-col>
@@ -81,13 +80,13 @@
                   :prop="`rule.${ruleIndex}.type`"
                   :rules="rules.type"
                 >
-                  <el-select clearable placeholder="类型" v-model="rule.type">
+                  <el-select v-model="rule.type" clearable placeholder="类型">
                     <el-option
+                      v-for="dict in typeDictList"
                       :key="parseInt(dict.dictKey)"
                       :label="dict.dictValue"
                       :value="parseInt(dict.dictKey)"
-                      v-for="dict in typeDictList"
-                    ></el-option>
+                    />
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -97,40 +96,40 @@
                   :rules="rules.difficulty"
                 >
                   <el-select
+                    v-model="rule.difficulty"
                     multiple
                     clearable
                     collapse-tags
                     placeholder="难度"
-                    v-model="rule.difficulty"
                   >
                     <el-option
+                      v-for="dict in difficultyDictList"
                       :key="parseInt(dict.dictKey)"
                       :label="dict.dictValue"
                       :value="parseInt(dict.dictKey)"
-                      v-for="dict in difficultyDictList"
-                    ></el-option>
+                    />
                   </el-select>
                 </el-form-item>
               </el-col>
               <el-col
+                v-if="markType === 1 && [3, 5].includes(rule.type)"
                 :span="4"
                 :offset="1"
-                v-if="markType === 1 && [3, 5].includes(rule.type)"
               >
                 <el-form-item :prop="`rule.${ruleIndex}.ai`" :rules="rules.ai">
                   <el-select
+                    v-model="rule.ai"
                     multiple
                     clearable
                     collapse-tags
                     placeholder="是否智能"
-                    v-model="rule.ai"
                   >
                     <el-option
+                      v-for="dict in aiList"
                       :key="parseInt(dict.dictKey)"
                       :label="dict.dictValue"
                       :value="parseInt(dict.dictKey)"
-                      v-for="dict in aiList"
-                    ></el-option>
+                    />
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -141,28 +140,26 @@
                     :rules="rules.totalNumber"
                   >
                     添加：<el-input
-                      class="rule-input"
                       v-model="rule.totalNumber"
-                    ></el-input
-                    >道题，&nbsp;&nbsp;
+                      class="rule-input"
+                    />道题，&nbsp;&nbsp;
                   </el-form-item>
                   <el-form-item
                     :prop="`rule.${ruleIndex}.score`"
                     :rules="rules.score"
                   >
                     每题&nbsp;&nbsp;<el-input
-                      class="rule-input"
                       v-model="rule.score"
-                    ></el-input
-                    >分
+                      class="rule-input"
+                    />分
                   </el-form-item>
                 </div>
               </el-col>
             </el-row>
             <el-form-item
+              v-if="rule.ai.includes(1) && [3, 5].includes(rule.type)"
               label="分数选项："
               label-width="85px"
-              v-if="rule.ai.includes(1) && [3, 5].includes(rule.type)"
             >
               <el-checkbox-group v-model="rule.aiOptions">
                 <el-tooltip
@@ -190,29 +187,26 @@
           size="mini"
           type="primary"
           class="rule-btn"
-          @click="addQuestionRule(index)"
           :disabled="item.rule.length >= 10"
-          >+添加规则</el-button
-        >
+          @click="addQuestionRule(index)"
+        >+添加规则</el-button>
         <el-button
           size="mini"
           type="danger"
           class="rule-btn"
-          @click="delQuestionRule(index)"
           :disabled="item.rule.length <= 1"
-          >-删除规则</el-button
-        >
+          @click="delQuestionRule(index)"
+        >-删除规则</el-button>
         <el-button
           style="display: block"
           type="primary"
           @click="updateQuestionRule(index)"
-          >更新规则</el-button
-        >
+        >更新规则</el-button>
       </div>
     </div>
 
     <div class="handler-btn" @click="paperChapterAdd">
-      <i class="common common-random"></i>
+      <i class="common common-random" />
       <span>随机组合章节</span>
     </div>
   </div>
@@ -224,7 +218,7 @@ import {
   paperChapterEdit,
   paperChapterDel,
   paperQuestionRuleUpdate,
-  paperQuestionRuleList,
+  paperQuestionRuleList
 } from 'api/paper'
 import { questionTypeListPage } from 'api/question'
 import { getOneDict } from '@/utils/getDict'
@@ -234,7 +228,7 @@ import { getQuick } from '@/utils/storage'
 export default {
   components: {
     TinymceEditor,
-    CustomSelect,
+    CustomSelect
   },
   data() {
     return {
@@ -247,8 +241,8 @@ export default {
         {
           dictValue: '智能',
           no: 1,
-          dictKey: '1',
-        },
+          dictKey: '1'
+        }
         /* {
           dictValue: '非智能',
           no: 2,
@@ -264,14 +258,14 @@ export default {
         description: '章节描述',
         rules: {
           name: [
-            { required: true, message: '请输入章节名称', trigger: 'blur' },
-          ],
-        },
+            { required: true, message: '请输入章节名称', trigger: 'blur' }
+          ]
+        }
       },
       paperQuestionRules: [],
       rules: {
         questionTypeId: [
-          { required: true, message: '请选择试题分类', trigger: 'change' },
+          { required: true, message: '请选择试题分类', trigger: 'change' }
         ],
         type: [{ required: true, message: '请选择类型', trigger: 'change' }],
         difficulty: [
@@ -279,32 +273,32 @@ export default {
             required: true,
             message: '请选择类型',
             trigger: 'change',
-            type: 'array',
-          },
+            type: 'array'
+          }
         ],
         ai: [
           {
             required: true,
             message: '请选择是否智能',
             trigger: 'change',
-            type: 'array',
-          },
+            type: 'array'
+          }
         ],
         totalNumber: [
           {
             required: true,
             message: '请填写题目数',
-            trigger: 'blur',
-          },
+            trigger: 'blur'
+          }
         ],
         score: [
           {
             required: true,
             message: '请填写题目分数',
-            trigger: 'blur',
-          },
-        ],
-      },
+            trigger: 'blur'
+          }
+        ]
+      }
     }
   },
   async created() {
@@ -328,7 +322,7 @@ export default {
     // 查询组卷规则
     async query() {
       const res = await paperQuestionRuleList({
-        paperId: this.paperId,
+        paperId: this.paperId
       })
 
       this.paperQuestionRules = res.data
@@ -339,7 +333,7 @@ export default {
         name: this.chapterForm.name,
         description: this.chapterForm.description,
         paperId: this.paperId,
-        type: 1,
+        type: 1
       })
       this.refreshData(res, '添加章节')
     },
@@ -355,7 +349,7 @@ export default {
       }
       paperChapterEdit({
         chapterId: chapter.id,
-        ...chapterInfo,
+        ...chapterInfo
       })
     },
     // 删除章节
@@ -363,9 +357,9 @@ export default {
       this.$confirm(`删除章节将删除章节内的试题，是否删除？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
-        .then(async () => {
+        .then(async() => {
           const res = await paperChapterDel({ chapterId: id })
           this.refreshData(res, '删除章节')
         })
@@ -385,7 +379,7 @@ export default {
         ai: [],
         aiOptions: [],
         totalNumber: '',
-        score: '',
+        score: ''
       })
     },
     // 删除自由组卷规则
@@ -398,7 +392,7 @@ export default {
         this.$message.warning('规则不能为空')
         return
       }
-      this.$refs[`ruleForm${index}`][0].validate(async (valid) => {
+      this.$refs[`ruleForm${index}`][0].validate(async(valid) => {
         if (!valid) {
           return
         }
@@ -428,17 +422,17 @@ export default {
             scores: [],
             difficultys: [],
             aiOptions: [],
-            questionTypeIds: [],
+            questionTypeIds: []
           }
         )
 
         const res = await paperQuestionRuleUpdate({
           paperId: this.paperId,
           chapterId: this.paperQuestionRules[index].chapter.id,
-          ...ruleParam,
+          ...ruleParam
         })
 
-        if (res?.code == 200) {
+        if (res?.code === 200) {
           this.$message.success('更新成功！')
           this.query()
           this.showSelectContent()
@@ -452,7 +446,7 @@ export default {
       const typeList = await questionTypeListPage({
         name,
         curPage,
-        pageSize: 5,
+        pageSize: 5
       })
       this.questionTypes = typeList.data.list
       this.total = typeList.data.total
@@ -481,7 +475,7 @@ export default {
                 currentLabel: rule.questionTypeName,
                 currentValue: rule.questionTypeId,
                 label: rule.questionTypeName,
-                value: rule.questionTypeId,
+                value: rule.questionTypeId
               })
               this.$refs[`questionSelect${index}${ruleIndex}`][0].$refs[
                 'elSelect'
@@ -496,8 +490,8 @@ export default {
       res?.code === 200
         ? (this.$message(`${title}成功！`), this.query())
         : this.$message.error(`${title}失败！`)
-    },
-  },
+    }
+  }
 }
 </script>
 

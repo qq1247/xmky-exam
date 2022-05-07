@@ -1,27 +1,27 @@
 <template>
   <div class="container">
-    <div class="content" v-if="hashChildren">
-      <el-form :inline="true" :model="queryForm" ref="queryForm">
+    <template v-if="hashChildren">
+      <el-form ref="queryForm" :inline="true" :model="queryForm">
         <el-row>
           <el-col :span="17">
             <el-form-item label prop="name">
               <el-input
-                @focus="queryForm.queryShow = true"
-                placeholder="请输入名称"
                 v-model="queryForm.name"
-              ></el-input>
+                placeholder="请输入名称"
+                @focus="queryForm.queryShow = true"
+              />
             </el-form-item>
             <el-button
-              @click="query"
               class="query-search"
               icon="el-icon-search"
               type="primary"
+              @click="query"
               >查询</el-button
             >
           </el-col>
-          <el-col :span="7"></el-col>
+          <el-col :span="7" />
         </el-row>
-        <div v-if="queryForm.queryShow"></div>
+        <div v-if="queryForm.queryShow" />
       </el-form>
       <div class="table">
         <el-table
@@ -49,20 +49,20 @@
           <el-table-column label="操作" width="300">
             <template slot-scope="scope">
               <el-tooltip placement="top" content="添加">
-                <i class="common common-add" @click="add(scope.row.id)"></i>
+                <i class="common common-add" @click="add(scope.row.id)" />
               </el-tooltip>
               <el-tooltip placement="top" content="修改">
-                <i class="common common-edit" @click="edit(scope.row.id)"></i>
+                <i class="common common-edit" @click="edit(scope.row.id)" />
               </el-tooltip>
               <el-tooltip placement="top" content="删除">
-                <i class="common common-delete" @click="del(scope.row.id)"></i>
+                <i class="common common-delete" @click="del(scope.row.id)" />
               </el-tooltip>
             </template>
           </el-table-column>
         </el-table>
       </div>
-    </div>
-    <router-view v-else></router-view>
+    </template>
+    <router-view v-else />
   </div>
 </template>
 
@@ -88,7 +88,7 @@ export default {
   },
   computed: {
     hashChildren() {
-      return this.$route.matched.length > 2 ? false : true
+      return !(this.$route.matched.length > 2)
     },
   },
   created() {
@@ -98,7 +98,7 @@ export default {
     // 查询
     async query() {
       const {
-        data: { list, total },
+        data: { list },
       } = await orgListPage({
         parentId: this.queryForm.parentId,
         name: this.queryForm.name,
@@ -119,7 +119,7 @@ export default {
       for (let i = 0; i < list.length; i++) {
         if (
           treeMap[list[i][parentField]] &&
-          list[i]['id'] != list[i][parentField]
+          list[i]['id'] !== list[i][parentField]
         ) {
           if (!treeMap[list[i][parentField]]['children']) {
             treeMap[list[i][parentField]]['children'] = []
@@ -163,13 +163,6 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.container {
-  display: flex;
-  align-items: center;
-  .content {
-    width: 1200px;
-  }
-}
 .query-search {
   width: 150px;
   height: 40px;

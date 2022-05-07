@@ -1,17 +1,6 @@
-<!--
- * @Description: 删除
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-12-21 10:11:03
- * @LastEditors: Che
- * @LastEditTime: 2022-01-14 17:11:54
--->
 <template>
-  <div class="container">
-    <div class="form-footer">
-      <el-button @click="initPwd" type="primary">重置</el-button>
-    </div>
+  <div class="form-footer">
+    <el-button type="primary" @click="initPwd">重置</el-button>
   </div>
 </template>
 
@@ -20,7 +9,7 @@ import { userPwdInit } from 'api/user'
 export default {
   data() {
     return {
-      id: null,
+      id: null
     }
   },
   mounted() {
@@ -30,23 +19,23 @@ export default {
     // 重置密码
     async initPwd() {
       const res = await userPwdInit({
-        id: this.id,
+        id: this.id
       })
 
-      if (res.code != 200) {
+      if (res.code !== 200) {
         this.$message.error(res.msg)
         return
       }
 
       if (res.data.initPwd) {
         this.$alert('当前密码：' + res.data.initPwd, '提示', {
-          confirmButtonText: '确定',
+          confirmButtonText: '确定'
         }).then((res) => {
           this.$router.back()
         })
       }
-    },
-  },
+    }
+  }
 }
 </script>
 

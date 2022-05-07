@@ -2,18 +2,18 @@
   <div class="container">
     <div class="content">
       <TestRouter
-        :questionIds="questionIds"
-        :routerIndex="routerIndex"
+        :question-ids="questionIds"
+        :router-index="routerIndex"
         @toHref="toHref"
-      ></TestRouter>
+      />
       <TestQuestion
         ref="testQuestion"
-        :commentState="commentState"
-        :questionDetail="questionDetail"
+        :comment-state="commentState"
+        :question-detail="questionDetail"
         @randomTest="randomTest"
         @prevQuestion="prevQuestion"
         @nextQuestion="nextQuestion"
-      ></TestQuestion>
+      />
     </div>
   </div>
 </template>
@@ -21,14 +21,14 @@
 <script>
 import {
   questionTypeOpenQuestionIds,
-  questionTypeOpenQuestionGet,
+  questionTypeOpenQuestionGet
 } from 'api/question'
 import TestRouter from './TestRouter.vue'
 import TestQuestion from './TestQuestion.vue'
 export default {
   components: {
     TestRouter,
-    TestQuestion,
+    TestQuestion
   },
   data() {
     return {
@@ -40,7 +40,7 @@ export default {
       commentState: 0,
       currentIndex: 0,
       routerIndex: null,
-      questionTypeId: null,
+      questionTypeId: null
     }
   },
   created() {
@@ -53,7 +53,7 @@ export default {
     // 获取试题列表
     async query() {
       const { data } = await questionTypeOpenQuestionIds({
-        questionTypeId: this.questionTypeId,
+        questionTypeId: this.questionTypeId
       })
       this.questionIds = data
       this.initQuestionIds = data
@@ -86,13 +86,13 @@ export default {
       this.questionList[index] = this.questionDetail = {
         ...questionDetail,
         selected,
-        finish: false,
+        finish: false
       }
     },
     // 获取试题信息
     async getQuestionDetail(questionId) {
       const res = await questionTypeOpenQuestionGet({ questionId })
-      if (res?.code != 200) {
+      if (res?.code !== 200) {
         this.$message.error('获取详情失败！请重试')
         return
       }
@@ -143,8 +143,8 @@ export default {
         this.$refs.testQuestion.commentList = []
         this.$refs.testQuestion.getQuestionComment()
       }
-    },
-  },
+    }
+  }
 }
 </script>
 

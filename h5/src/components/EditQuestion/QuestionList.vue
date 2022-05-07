@@ -4,35 +4,23 @@
     <div class="top">
       <div class="top-title">试题列表</div>
       <div class="top-handler">
-        <!-- 分页 -->
-        <el-pagination
-          background
-          layout="prev, pager, next"
-          prev-text="上一页"
-          next-text="下一页"
-          hide-on-single-page
-          :total="list.total"
-          :page-size="list.pageSize"
-          :current-page="list.curPage"
-          @current-change="pageChange"
-        ></el-pagination>
         <!-- 编辑、预览模式 -->
         <div class="type">
           <div
             class="type-item"
             :class="!preview ? 'edit-active' : ''"
-            @click="setType(false)"
             title="编辑模式"
+            @click="setType(false)"
           >
-            <img src="@/assets/img/question/question-edit.png" alt="" />
+            <img src="@/assets/img/question/question-edit.png" alt="">
           </div>
           <div
             class="type-item"
             :class="preview ? 'view-active' : ''"
-            @click="setType(true)"
             title="预览模式"
+            @click="setType(true)"
           >
-            <img src="@/assets/img/question/question-view.png" alt="" />
+            <img src="@/assets/img/question/question-view.png" alt="">
           </div>
         </div>
       </div>
@@ -40,18 +28,18 @@
     <template v-if="list.questionList.length > 0">
       <template v-if="!preview">
         <el-card
-          :class="[
-            'center-card',
-            question.id == id ? 'center-card-active' : '',
-          ]"
-          shadow="hover"
           v-for="question in list.questionList"
           :key="question.id"
+          :class="[
+            'center-card',
+            question.id === id ? 'center-card-active' : '',
+          ]"
+          shadow="hover"
           @click.native="showDetails(question.id)"
         >
           <div class="center-card-top">
             <span>{{ question.id }}、</span>
-            <div v-html="`${question.title}`"></div>
+            <div class="render-title" v-html="`${question.title}`" />
           </div>
           <!-- 编辑模式 -->
           <div class="center-card-bottom">
@@ -68,20 +56,21 @@
                 ['', '智能', '非智能'][question.ai]
               }}</el-tag>
 
-              <el-tag effect="plain" size="mini" type="danger"
-                >{{ question.score }}分</el-tag
-              >
+              <el-tag
+                effect="plain"
+                size="mini"
+                type="danger"
+              >{{ question.score }}分</el-tag>
 
               <el-tag effect="plain" size="mini">{{
                 question.createUserName
               }}</el-tag>
 
               <el-tag
-                :type="question.state == 1 ? 'info' : 'danger'"
+                :type="question.state === 1 ? 'info' : 'danger'"
                 effect="plain"
                 size="mini"
-                >{{ question.state == 1 ? '发布' : '草稿' }}</el-tag
-              >
+              >{{ question.state === 1 ? '发布' : '草稿' }}</el-tag>
             </div>
             <div class="card-bottom-right">
               <el-button
@@ -90,16 +79,14 @@
                 type="primary"
                 icon="el-icon-document"
                 @click.stop="questionEdit(question.id, question.type)"
-                >修改</el-button
-              >
+              >修改</el-button>
               <el-button
                 class="btn"
                 size="mini"
                 type="primary"
                 icon="el-icon-document-copy"
                 @click.stop="copy(question.id)"
-                >复制</el-button
-              >
+              >复制</el-button>
               <template v-if="question.state !== 0">
                 <el-button
                   class="btn"
@@ -107,8 +94,7 @@
                   type="danger"
                   icon="el-icon-delete"
                   @click.stop="del(question.id)"
-                  >删除</el-button
-                >
+                >删除</el-button>
               </template>
               <template v-if="question.state === 2">
                 <el-button
@@ -119,8 +105,7 @@
                   type="primary"
                   icon="el-icon-share"
                   @click.stop="publish(question.id, question.state)"
-                  >发布</el-button
-                >
+                >发布</el-button>
               </template>
             </div>
           </div>
@@ -128,79 +113,98 @@
       </template>
       <div v-else>
         <div
-          :id="`p-${child.id}`"
-          :class="['children-content', child.type === 5 ? 'ask-content' : '']"
-          v-for="(child, index) in list.questionList"
-          :key="child.id"
+          v-for="(question, indexQuestion) in list.questionList"
+          :id="`p-${question.id}`"
+          :key="question.id"
+          :class="[
+            'question-content',
+            question.type === 5 ? 'ask-content' : '',
+          ]"
         >
           <div class="question-title">
-            <span>{{ index + 1 }}、</span>
-            <div v-html="`${child.title}`"></div>
+            <span>{{ indexQuestion + 1 }}、</span>
+            <div v-html="`${question.title}`" />
           </div>
 
           <!-- 单选 -->
-          <template v-if="child.type === 1">
-            <el-radio-group class="children-option" v-model="child.answers">
+          <template v-if="question.type === 1">
+            <el-radio-group v-model="question.answers" class="children-option">
               <el-radio
+                v-for="(option, indexOption) in question.options"
+                :key="indexOption"
                 class="option-item"
-                :key="index"
                 :label="String.fromCharCode(65 + index)"
-                v-for="(option, index) in child.options"
               >
                 <div
                   class="flex-items-center"
                   v-html="`${String.fromCharCode(65 + index)}、${option}`"
-                ></div>
+                />
               </el-radio>
             </el-radio-group>
           </template>
 
           <!-- 多选 -->
-          <template v-if="child.type === 2">
-            <el-checkbox-group class="children-option" v-model="child.answers">
+          <template v-if="question.type === 2">
+            <el-checkbox-group
+              v-model="question.answers"
+              class="children-option"
+            >
               <el-checkbox
+                v-for="(option, indexOption) in question.options"
+                :key="indexOption"
                 class="option-item"
-                :key="index"
                 :label="String.fromCharCode(65 + index)"
-                v-for="(option, index) in child.options"
               >
                 <div
                   class="flex-items-center"
                   v-html="`${String.fromCharCode(65 + index)}、${option}`"
-                ></div>
+                />
               </el-checkbox>
             </el-checkbox-group>
           </template>
 
           <!-- 判断 -->
-          <template v-if="child.type === 4">
-            <el-radio-group class="children-option" v-model="child.answer">
+          <template v-if="question.type === 4">
+            <el-radio-group v-model="question.answer" class="children-option">
               <el-radio
+                v-for="(option, indexOption) in ['对', '错']"
+                :key="indexOption"
                 class="option-item"
-                :key="index"
                 :label="option"
-                v-for="(option, index) in ['对', '错']"
-                >{{ option }}</el-radio
-              >
+              >{{ option }}</el-radio>
             </el-radio-group>
           </template>
 
           <!-- 问答 -->
-          <template v-if="child.type === 5">
+          <template v-if="question.type === 5">
             <el-input
+              v-model="question.answer"
               :rows="2"
               class="question-text"
               placeholder="请输入内容"
               type="textarea"
-              v-model="child.answer"
-            ></el-input>
+            />
           </template>
         </div>
       </div>
     </template>
     <el-empty v-else description="暂无试题">
-      <img slot="image" src="@/assets/img/data-null.png" alt="" />
+      <img slot="image" src="@/assets/img/data-null.png" alt="">
     </el-empty>
+    <div class="footer">
+      <!-- 分页 -->
+      <el-pagination
+        background
+        layout="prev, pager, next"
+        prev-text="上一页"
+        next-text="下一页"
+        hide-on-single-page
+        :total="list.total"
+        :page-size="list.pageSize"
+        :current-page="list.curPage"
+        @current-change="pageChange"
+      />
+    </div>
   </div>
 </template>
 
@@ -208,22 +212,6 @@
 import { getOneDict } from '@/utils/getDict'
 export default {
   components: {},
-  props: {
-    list: {
-      type: Object,
-      default: () => {},
-    },
-    id: {
-      type: Number,
-      default: null,
-    },
-  },
-  data() {
-    return {
-      preview: false,
-      checkBoxOption: [],
-    }
-  },
   filters: {
     typeName(data) {
       return getOneDict('QUESTION_TYPE').find(
@@ -234,7 +222,23 @@ export default {
       return getOneDict('QUESTION_DIFFICULTY').find(
         (item) => Number(item.dictKey) === data
       ).dictValue
+    }
+  },
+  props: {
+    list: {
+      type: Object,
+      default: () => {}
     },
+    id: {
+      type: Number,
+      default: null
+    }
+  },
+  data() {
+    return {
+      preview: false,
+      checkBoxOption: []
+    }
   },
   methods: {
     setType(e) {
@@ -257,15 +261,15 @@ export default {
     },
     publish(id, state) {
       this.$emit('publish', id, state)
-    },
-  },
+    }
+  }
 }
 </script>
 
 <style lang="scss" scoped>
 @import 'assets/style/exam.scss';
 
-.children-content {
+.question-content {
   &:first-child {
     padding-top: 50px;
   }
@@ -373,6 +377,12 @@ export default {
   font-size: 14px;
   text-align: left;
   display: flex;
+  .render-title {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
   p {
     margin: 0;
     padding: 0;
@@ -412,5 +422,20 @@ export default {
 /deep/ .el-radio__input .el-radio__inner,
 /deep/ .el-checkbox__input .el-checkbox__inner {
   margin-top: 8px;
+}
+
+.footer {
+  background: #fff;
+  width: 100%;
+  height: 40px;
+  color: #333;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding-left: 16px;
+  display: flex;
+  align-items: center;
 }
 </style>

@@ -1,142 +1,172 @@
 <template>
   <div class="container">
     <template v-if="hashChildren">
-      <div class="content">
-        <el-form :inline="true" :model="queryForm" ref="queryForm">
-          <el-row>
-            <el-col :span="17">
-              <el-form-item label prop="name">
-                <el-input
-                  @focus="queryForm.queryShow = true"
-                  placeholder="请输入名称"
-                  v-model="queryForm.name"
-                ></el-input>
-              </el-form-item>
+      <el-form ref="queryForm" :inline="true" :model="queryForm">
+        <el-row>
+          <el-col :span="16">
+            <el-form-item label prop="name">
+              <el-input
+                v-model="queryForm.name"
+                placeholder="请输入名称"
+                @focus="queryForm.queryShow = true"
+              />
+            </el-form-item>
+            <el-button
+              class="query-search"
+              icon="el-icon-search"
+              type="primary"
+              @click="query"
+              >查询</el-button
+            >
+          </el-col>
+          <el-col :span="6">
+            <el-form-item>
               <el-button
-                @click="query"
-                class="query-search"
-                icon="el-icon-search"
+                icon="el-icon-tickets"
+                size="mini"
                 type="primary"
-                >查询</el-button
+                @click="userTemplate()"
+                >下载模板</el-button
               >
-            </el-col>
-            <el-col :span="7">
-              <el-form-item style="float: right">
+            </el-form-item>
+            <el-form-item>
+              <el-upload
+                :limit="1"
+                name="files"
+                list-type="text"
+                :headers="headers"
+                action="/api/file/upload"
+                :file-list="queryForm.fileList"
+                :on-success="uploadSuccess"
+              >
                 <el-button
-                  @click="add"
-                  icon="el-icon-circle-plus-outline"
+                  icon="el-icon-upload2"
                   size="mini"
                   type="primary"
-                  >添加</el-button
+                  @click="() => userImport"
+                  >导入</el-button
                 >
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <div v-if="queryForm.queryShow">
-            <el-form-item label prop="orgName">
-              <el-input
-                placeholder="请输入机构名称"
-                v-model="queryForm.orgName"
-              ></el-input>
+              </el-upload>
             </el-form-item>
-          </div>
-        </el-form>
-        <div class="table">
-          <el-table :data="listpage.list" style="width: 100%">
-            <el-table-column label="姓名">
-              <template slot-scope="scope">
-                <span style="margin-left: 10px">{{ scope.row.name }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="登录账号">
-              <template slot-scope="scope">
-                <span style="margin-left: 10px">{{ scope.row.loginName }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="所属机构">
-              <template slot-scope="scope">
-                <span style="margin-left: 10px">{{ scope.row.orgName }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="子管理员权限">
-              <template slot-scope="scope">
-                <el-switch
-                  active-color="#13ce66"
-                  :active-value="2"
-                  inactive-color="#ff4949"
-                  :inactive-value="1"
-                  v-model="scope.row.type"
-                  @change="setSubAdmin($event, scope.row.id)"
-                ></el-switch>
-              </template>
-            </el-table-column>
-            <el-table-column label="权限描述" width="240px">
-              <template slot-scope="scope">
-                <span style="margin-left: 10px">{{
-                  scope.row.roles.includes('subAdmin')
-                    ? '答题 | 出题 | 组织考试 | 阅卷 | 统计'
-                    : '答题'
-                }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="操作" width="300">
-              <template slot-scope="scope">
-                <el-tooltip placement="top" content="修改">
-                  <i class="common common-edit" @click="edit(scope.row.id)"></i>
-                </el-tooltip>
-                <el-tooltip placement="top" content="删除">
-                  <i
-                    class="common common-delete"
-                    @click="del(scope.row.id)"
-                  ></i>
-                </el-tooltip>
-                <el-tooltip placement="top" content="重置密码">
-                  <i
-                    class="common common-pwd-reset"
-                    @click="initPwd(scope.row.id)"
-                  ></i>
-                </el-tooltip>
-                <el-tooltip
-                  placement="top"
-                  content="强制下线"
-                  v-if="scope.row.online"
-                >
-                  <i
-                    class="common common-off-line"
-                    @click="offLine(scope.row.id)"
-                  ></i>
-                </el-tooltip>
-              </template>
-            </el-table-column>
-          </el-table>
+          </el-col>
+          <el-col :span="2">
+            <el-form-item style="float: right">
+              <el-button
+                icon="el-icon-circle-plus-outline"
+                size="mini"
+                type="primary"
+                @click="add"
+                >添加</el-button
+              >
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <div v-if="queryForm.queryShow">
+          <el-form-item label prop="orgName">
+            <el-input
+              v-model="queryForm.orgName"
+              placeholder="请输入机构名称"
+            />
+          </el-form-item>
         </div>
-        <el-pagination
-          :current-page="listpage.curPage"
-          :page-size="listpage.pageSize"
-          :total="listpage.total"
-          @current-change="pageChange"
-          background
-          hide-on-single-page
-          layout="prev, pager, next"
-          next-text="下一页"
-          prev-text="上一页"
-        ></el-pagination>
+      </el-form>
+      <div class="table">
+        <el-table :data="listpage.list" style="width: 100%">
+          <el-table-column label="姓名">
+            <template slot-scope="scope">
+              <span style="margin-left: 10px">{{ scope.row.name }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="登录账号">
+            <template slot-scope="scope">
+              <span style="margin-left: 10px">{{ scope.row.loginName }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="所属机构">
+            <template slot-scope="scope">
+              <span style="margin-left: 10px">{{ scope.row.orgName }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="子管理员权限">
+            <template slot-scope="scope">
+              <el-switch
+                v-model="scope.row.type"
+                active-color="#13ce66"
+                :active-value="2"
+                inactive-color="#ff4949"
+                :inactive-value="1"
+                @change="setSubAdmin($event, scope.row.id)"
+              />
+            </template>
+          </el-table-column>
+          <el-table-column label="权限描述" width="240px">
+            <template slot-scope="scope">
+              <span style="margin-left: 10px">{{
+                scope.row.roles.includes('subAdmin')
+                  ? '答题 | 出题 | 组织考试 | 阅卷 | 统计'
+                  : '答题'
+              }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="300">
+            <template slot-scope="scope">
+              <el-tooltip placement="top" content="修改">
+                <i class="common common-edit" @click="edit(scope.row.id)" />
+              </el-tooltip>
+              <el-tooltip placement="top" content="删除">
+                <i class="common common-delete" @click="del(scope.row.id)" />
+              </el-tooltip>
+              <el-tooltip placement="top" content="重置密码">
+                <i
+                  class="common common-pwd-reset"
+                  @click="initPwd(scope.row.id)"
+                />
+              </el-tooltip>
+              <el-tooltip
+                v-if="scope.row.online"
+                placement="top"
+                content="强制下线"
+              >
+                <i
+                  class="common common-off-line"
+                  @click="offLine(scope.row.id)"
+                />
+              </el-tooltip>
+            </template>
+          </el-table-column>
+        </el-table>
       </div>
+      <el-pagination
+        :current-page="listpage.curPage"
+        :page-size="listpage.pageSize"
+        :total="listpage.total"
+        background
+        hide-on-single-page
+        layout="prev, pager, next"
+        next-text="下一页"
+        prev-text="上一页"
+        @current-change="pageChange"
+      />
     </template>
-    <router-view v-else></router-view>
+    <router-view v-else />
   </div>
 </template>
 
 <script>
-import { userOut, userRole, userListPage } from 'api/user'
-import CustomSelect from 'components/CustomSelect.vue'
+import {
+  userOut,
+  userRole,
+  userImport,
+  userListPage,
+  userTemplate,
+} from 'api/user'
 
 export default {
-  components: {
-    CustomSelect,
-  },
   data() {
     return {
+      headers: {
+        Authorization: this.$store.getters.token,
+      },
       listpage: {
         // 列表数据
         total: 0, // 总条数
@@ -149,12 +179,13 @@ export default {
         name: null,
         orgName: null,
         queryShow: false,
+        fileList: [],
       },
     }
   },
   computed: {
     hashChildren() {
-      return this.$route.matched.length > 2 ? false : true
+      return !(this.$route.matched.length > 2)
     },
   },
   created() {
@@ -219,17 +250,34 @@ export default {
     pageChange(val) {
       this.query(val)
     },
+    // 用户模板
+    async userTemplate() {
+      const template = await userTemplate({}, 'blob')
+      const blob = new Blob([template], { type: 'application/msword' })
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = '用户模板.xlsx'
+      a.click()
+      window.URL.revokeObjectURL(url)
+    },
+    // 上传成功
+    uploadSuccess(response, file, fileList) {
+      this.userImport(response.data.fileIds)
+    },
+    // 用户导入
+    async userImport(fileId) {
+      const res = await userImport({
+        fileId,
+      })
+      if (res.data?.code === 200) {
+        this.query()
+      }
+    },
   },
 }
 </script>
 <style lang="scss" scoped>
-.container {
-  display: flex;
-  align-items: center;
-  .content {
-    width: 1200px;
-  }
-}
 .query-search {
   width: 150px;
   height: 40px;

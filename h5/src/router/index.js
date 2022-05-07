@@ -1,12 +1,3 @@
-/*
- * @Description: 路由配置
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-11-22 09:46:17
- * @LastEditors: Che
- * @LastEditTime: 2022-01-13 10:53:54
- */
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import constantRoutes from './constant'

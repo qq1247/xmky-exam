@@ -6,23 +6,25 @@
         <div>
           <el-form-item>
             <el-input
-              placeholder="请输入名称"
               v-model="queryForm.name"
+              placeholder="请输入名称"
               class="query-input"
-            ></el-input>
+            />
           </el-form-item>
         </div>
         <el-form-item>
-          <el-button @click="search" icon="el-icon-search" type="primary"
-            >查询</el-button
-          >
+          <el-button
+            icon="el-icon-search"
+            type="primary"
+            @click="search"
+          >查询</el-button>
         </el-form-item>
       </el-form>
 
       <!-- 内容 -->
       <div class="content">
         <div class="exam-list">
-          <AddCard add-title="添加考试" @addCard="add"></AddCard>
+          <AddCard add-title="添加考试" @addCard="add" />
           <ListCard
             v-for="(item, index) in examList"
             :key="index"
@@ -39,7 +41,7 @@
             @exports="exports"
             @anonymous="anonymous"
             @statistics="statistics"
-          ></ListCard>
+          />
         </div>
         <!-- 分页 -->
         <el-pagination
@@ -52,10 +54,10 @@
           :page-size="pageSize"
           :current-page="curPage"
           @current-change="pageChange"
-        ></el-pagination>
+        />
       </div>
     </template>
-    <router-view v-else></router-view>
+    <router-view v-else />
   </div>
 </template>
 
@@ -67,7 +69,7 @@ import AddCard from 'components/ListCard/AddCard.vue'
 export default {
   components: {
     AddCard,
-    ListCard,
+    ListCard
   },
   data() {
     return {
@@ -77,15 +79,15 @@ export default {
       queryForm: {
         name: '',
         examTypeId: 0,
-        examTypeName: '',
+        examTypeName: ''
       },
-      examList: [],
+      examList: []
     }
   },
   computed: {
     hashChildren() {
-      return this.$route.matched.length > 2 ? false : true
-    },
+      return !(this.$route.matched.length > 2)
+    }
   },
   mounted() {
     this.queryForm.examTypeId = this.$route.params.id
@@ -98,7 +100,7 @@ export default {
         examTypeId: this.queryForm.examTypeId,
         name: this.queryForm.name,
         curPage: this.curPage,
-        pageSize: this.pageSize,
+        pageSize: this.pageSize
       })
       this.examList = examList.data.list
       this.total = examList.data.total
@@ -114,7 +116,7 @@ export default {
       this.$tools.switchTab('ExamListSetting', {
         id: 0,
         examTypeId: this.$route.params.id,
-        tab: '1',
+        tab: '1'
       })
     },
     // 编辑分类
@@ -122,7 +124,7 @@ export default {
       this.$tools.switchTab('ExamListSetting', {
         id,
         examTypeId: this.$route.params.id,
-        tab: '1',
+        tab: '1'
       })
     },
     // 考试发布
@@ -130,7 +132,7 @@ export default {
       this.$tools.switchTab('ExamListSetting', {
         id,
         examTypeId: this.$route.params.id,
-        tab: '2',
+        tab: '2'
       })
     },
     // 删除分类
@@ -138,7 +140,7 @@ export default {
       this.$tools.switchTab('ExamListSetting', {
         id,
         examTypeId: this.$route.params.id,
-        tab: '3',
+        tab: '3'
       })
     },
     // 匿名阅卷
@@ -146,7 +148,7 @@ export default {
       this.$tools.switchTab('ExamListSetting', {
         id,
         examTypeId: this.$route.params.id,
-        tab: '4',
+        tab: '4'
       })
     },
     // 排名公开
@@ -154,7 +156,7 @@ export default {
       this.$tools.switchTab('ExamListSetting', {
         id,
         examTypeId: this.$route.params.id,
-        tab: '5',
+        tab: '5'
       })
     },
     // 成绩公开
@@ -162,7 +164,7 @@ export default {
       this.$tools.switchTab('ExamListSetting', {
         id,
         examTypeId: this.$route.params.id,
-        tab: '6',
+        tab: '6'
       })
     },
     // 邮箱通知
@@ -170,7 +172,7 @@ export default {
       this.$tools.switchTab('ExamListSetting', {
         id,
         examTypeId: this.$route.params.id,
-        tab: '7',
+        tab: '7'
       })
     },
     // 试卷导出
@@ -178,36 +180,36 @@ export default {
       this.$tools.switchTab('ExamListSetting', {
         id,
         examTypeId: this.$route.params.id,
-        tab: '8',
+        tab: '8'
       })
     },
     // 考试用户
     read({ id }) {
       this.$tools.switchTab('ExamListMarkSetting', {
         id,
-        examTypeId: this.$route.params.id,
+        examTypeId: this.$route.params.id
       })
     },
     // 在线用户
     onLine({ id }) {
       this.$tools.switchTab('ExamListLine', {
         id,
-        examTypeId: this.$route.params.id,
+        examTypeId: this.$route.params.id
       })
     },
     // 统计
     statistics({ id }) {
       this.$tools.switchTab('ExamListStatistics', {
         id,
-        examTypeId: this.$route.params.id,
+        examTypeId: this.$route.params.id
       })
     },
     // 切换分页
     pageChange(val) {
       val && (this.curPage = val)
       this.query()
-    },
-  },
+    }
+  }
 }
 </script>
 

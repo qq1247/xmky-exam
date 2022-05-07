@@ -1,12 +1,3 @@
-/*
- * @Description: 获取数据字典
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-11-15 11:29:43
- * @LastEditors: Che
- * @LastEditTime: 2021-12-27 10:26:33
- */
 import { dictListPage } from 'api/base'
 import { getDict, setDict } from './storage'
 

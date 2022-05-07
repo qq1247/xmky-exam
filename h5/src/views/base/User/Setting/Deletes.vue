@@ -1,17 +1,6 @@
-<!--
- * @Description: 删除
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-12-21 10:11:03
- * @LastEditors: Che
- * @LastEditTime: 2022-01-14 17:12:01
--->
 <template>
-  <div class="container">
-    <div class="form-footer">
-      <el-button @click="del" type="danger">删除</el-button>
-    </div>
+  <div class="form-footer">
+    <el-button type="danger" @click="del">删除</el-button>
   </div>
 </template>
 
@@ -20,7 +9,7 @@ import { userDel } from 'api/user'
 export default {
   data() {
     return {
-      id: null,
+      id: null
     }
   },
   mounted() {
@@ -33,18 +22,18 @@ export default {
       this.$confirm('确定要删除？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
-      }).then(async () => {
+        type: 'warning'
+      }).then(async() => {
         const res = await userDel({ id: this.id })
-        if (res.code != 200) {
+        if (res.code !== 200) {
           this.$message.error(res.msg)
         }
         this.$router.back()
         this.$message.success('删除成功！')
         this.$router.back()
       })
-    },
-  },
+    }
+  }
 }
 </script>
 

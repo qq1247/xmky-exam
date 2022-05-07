@@ -1,16 +1,7 @@
-<!--
- * @Description: 封装上传组件
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-08-18 16:50:04
- * @LastEditors: Che
- * @LastEditTime: 2022-01-13 14:51:53
--->
 <template>
   <el-upload
-    name="files"
     ref="upload"
+    name="files"
     :multiple="true"
     :headers="headers"
     :file-list="files"
@@ -24,13 +15,14 @@
     :on-success="success"
     :before-upload="beforeUpload"
   >
-    <el-button type="primary" v-if="type !== 'image'"
-      ><i class="common common-line-upload"></i>&nbsp;&nbsp;点击上传</el-button
-    >
-    <i class="el-icon-plus" v-else></i>
+    <el-button
+      v-if="type !== 'image'"
+      type="primary"
+    ><i class="common common-line-upload" />&nbsp;&nbsp;点击上传</el-button>
+    <i v-else class="el-icon-plus" />
     <div slot="tip" class="upload-tip">
       可以上传{{ limit ? limit : 'N' }}个{{
-        type === '*' ? '任意' : this.type
+        type === '*' ? '任意' : type
       }}文件，且不超过{{ size }}M
     </div>
   </el-upload>
@@ -42,35 +34,35 @@ export default {
   props: {
     type: {
       type: String,
-      default: '*',
+      default: '*'
     },
     limit: {
       type: [Number, String],
-      default: 1,
+      default: 1
     },
     files: {
       type: Array,
-      default: () => [],
+      default: () => []
     },
     size: {
       type: [String, Number],
-      default: 20,
-    },
+      default: 20
+    }
   },
   data() {
     return {
       headers: {
-        Authorization: this.$store.getters.token,
+        Authorization: this.$store.getters.token
       },
       fileList: this.files,
       totalSize: 0,
       types: {
         '*': {
-          accept: '*',
+          accept: '*'
         },
         image: {
           accept: 'image/*',
-          suffix: ['jpeg', 'jpg', 'png', 'gif'],
+          suffix: ['jpeg', 'jpg', 'png', 'gif']
         },
         audio: {
           accept: 'audio/*',
@@ -94,29 +86,29 @@ export default {
             'ts',
             'tp',
             'vob',
-            'swf',
-          ],
+            'swf'
+          ]
         },
         video: {
           accept: 'video/*',
-          suffix: ['mp3', 'wma', 'amr', 'mp4', 'flac', 'aac', 'ape', 'ogg'],
+          suffix: ['mp3', 'wma', 'amr', 'mp4', 'flac', 'aac', 'ape', 'ogg']
         },
         word: {
           accept:
             '.docx, .doc, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-          suffix: ['docx', 'doc'],
+          suffix: ['docx', 'doc']
         },
         excel: {
           accept:
             '.xlsx, .xls, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          suffix: ['xlsx', 'xls'],
+          suffix: ['xlsx', 'xls']
         },
         ppt: {
           accept:
             '.pptx, .ppt, application/vnd.openxmlformats-officedocument.presentationml.presentation',
-          suffix: ['pptx', 'ppt'],
-        },
-      },
+          suffix: ['pptx', 'ppt']
+        }
+      }
     }
   },
   methods: {
@@ -160,8 +152,8 @@ export default {
       this.totalSize = this.fileList.reduce((acc, cur) => {
         return acc + cur.size
       }, 0)
-    },
-  },
+    }
+  }
 }
 </script>
 

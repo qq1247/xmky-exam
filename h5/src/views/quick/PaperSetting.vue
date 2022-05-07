@@ -1,8 +1,8 @@
 <template>
   <el-form
+    ref="paperForm"
     :model="paperForm"
     :rules="paperForm.rules"
-    ref="paperForm"
     label-width="100px"
   >
     <el-form-item label="选择模式">
@@ -12,14 +12,13 @@
         v-model="paperForm.paperType"
         :label="item.value"
         @change="selectPaperType"
-        >{{ item.name }}</el-radio
-      >
+      >{{ item.name }}</el-radio>
     </el-form-item>
     <el-form-item
-      label="选择试卷"
-      prop="selectPaperId"
       v-if="!paperForm.paperType"
       key="paperType"
+      label="选择试卷"
+      prop="selectPaperId"
     >
       <CustomSelect
         ref="paperSelect"
@@ -37,54 +36,50 @@
           :key="item.id"
           :label="item.name"
           :value="item.id"
-        ></el-option>
+        />
       </CustomSelect>
     </el-form-item>
     <template v-if="paperForm.paperType">
       <el-form-item label="组卷方式">
         <div class="exam-type">
           <div
+            v-for="(item, index) in paperForm.genTypes"
+            :key="item.content"
             :class="
-              paperForm.genType == index
+              paperForm.genType === index
                 ? 'type-item type-item-active'
                 : 'type-item '
             "
-            v-for="(item, index) in paperForm.genTypes"
-            :key="item.content"
             @click="setPaperType(index)"
           >
-            <i :class="['common', `${item.icon}`]"></i>
+            <i :class="['common', `${item.icon}`]" />
             <i
+              v-if="paperForm.genType === index"
               class="common common-selected"
-              v-if="paperForm.genType == index"
-            ></i>
+            />
             {{ item.content }}
           </div>
         </div>
       </el-form-item>
       <el-form-item label="阅卷方式" prop="markType">
         <el-radio
-          :disabled="paperForm.state === 1 ? true : false"
           v-for="item in paperForm.markTypeList"
           :key="item.value"
           v-model="paperForm.markType"
+          :disabled="paperForm.state === 1 ? true : false"
           :label="item.value"
-          >{{ item.name }}</el-radio
-        >
+        >{{ item.name }}</el-radio>
       </el-form-item>
       <el-form-item label="试卷名称" prop="name">
-        <el-input
-          placeholder="请输入试卷名称"
-          v-model="paperForm.name"
-        ></el-input>
+        <el-input v-model="paperForm.name" placeholder="请输入试卷名称" />
       </el-form-item>
       <el-form-item label="及格（%）" prop="passScore">
         <el-input
+          v-model="paperForm.passScore"
           type="number"
           min="1"
           max="100"
           placeholder="请输入及格分数占总分百分比"
-          v-model="paperForm.passScore"
         >
           <span slot="append">%</span>
         </el-input>
@@ -95,12 +90,11 @@
           :key="item.value"
           v-model="paperForm.showType"
           :label="item.value"
-          >{{ item.name }}</el-radio
-        >
+        >{{ item.name }}</el-radio>
       </el-form-item>
     </template>
     <div class="footer">
-      <el-button @click="next" type="primary">下一步</el-button>
+      <el-button type="primary" @click="next">下一步</el-button>
     </div>
   </el-form>
 </template>
@@ -112,7 +106,7 @@ import {
   paperTypeListPage,
   paperGet,
   paperAdd,
-  paperEdit,
+  paperEdit
 } from 'api/paper'
 import { getQuick, setQuick } from '@/utils/storage'
 import CustomSelect from 'components/CustomSelect.vue'
@@ -140,12 +134,12 @@ export default {
         paperTypeList: [
           {
             name: '选择试卷',
-            value: 0,
+            value: 0
           },
           {
             name: '创建试卷',
-            value: 1,
-          },
+            value: 1
+          }
         ],
         selectPaperId: null,
         pageSize: 5,
@@ -159,12 +153,12 @@ export default {
         showTypes: [
           {
             name: '整张',
-            value: '1',
+            value: '1'
           },
           {
             name: '单题',
-            value: '3',
-          },
+            value: '3'
+          }
         ],
         paperAntiCheat: ['试题乱序', '选项乱序'],
         options: [],
@@ -173,58 +167,58 @@ export default {
         paperRemark: [
           {
             score: '',
-            remark: '',
-          },
+            remark: ''
+          }
         ],
         paperTabs: [
           {
             title: '基础信息',
-            name: '0',
+            name: '0'
           },
           {
             title: '组卷方式',
-            name: '1',
-          },
+            name: '1'
+          }
         ],
         genType: 0,
         genTypes: [
           {
             icon: 'common-person',
-            content: '人工组卷',
+            content: '人工组卷'
           },
           {
             icon: 'common-random',
-            content: '随机组卷',
-          },
+            content: '随机组卷'
+          }
         ],
         markType: 1,
         markTypeList: [
           {
             name: '智能阅卷',
-            value: 1,
+            value: 1
           },
           {
             name: '人工阅卷',
-            value: 2,
-          },
+            value: 2
+          }
         ],
         paperTypeItem: {},
         rules: {
           selectPaperId: [
-            { required: true, message: '请选择试卷', trigger: 'change' },
+            { required: true, message: '请选择试卷', trigger: 'change' }
           ],
           name: [
-            { required: true, message: '请填写试卷名称', trigger: 'blur' },
+            { required: true, message: '请填写试卷名称', trigger: 'blur' }
           ],
           passScore: [
             {
               required: true,
               trigger: 'blur',
-              validator: validatePercentage,
-            },
-          ],
-        },
-      },
+              validator: validatePercentage
+            }
+          ]
+        }
+      }
     }
   },
   async created() {
@@ -255,7 +249,7 @@ export default {
             currentLabel: quickInfo.name,
             currentValue: quickInfo.id,
             label: quickInfo.name,
-            value: quickInfo.id,
+            value: quickInfo.id
           })
       })
     }
@@ -269,11 +263,11 @@ export default {
         const paperTypeList = await paperTypeListPage({
           name: '我的试卷',
           curPage: 1,
-          pageSize: this.paperForm.pageSize,
+          pageSize: this.paperForm.pageSize
         })
         if (!paperTypeList?.data?.list.length) {
           const res = await paperTypeAdd({
-            name: '我的试卷',
+            name: '我的试卷'
           })
           res?.code === 200 && (this.paperForm.paperTypeId = res.data)
         } else {
@@ -284,7 +278,7 @@ export default {
     // 组卷方式
     setPaperType(index) {
       if (this.paperForm.state === 1) return
-      if (index == 1) {
+      if (index === 1) {
         this.paperForm.genType = 0
         this.$message('暂未开放！', 'warning')
         return
@@ -297,7 +291,7 @@ export default {
         name,
         state: 1,
         curPage,
-        pageSize: this.paperForm.pageSize,
+        pageSize: this.paperForm.pageSize
       })
       this.paperForm.paperList = paperList.data.list
       this.paperForm.total = paperList.data.total
@@ -316,7 +310,7 @@ export default {
     },
     // 下一步
     next() {
-      this.$refs['paperForm'].validate(async (valid) => {
+      this.$refs['paperForm'].validate(async(valid) => {
         if (!valid) {
           return
         }
@@ -327,7 +321,7 @@ export default {
             name: this.paperForm.name,
             passScore: this.paperForm.passScore,
             showType: Number(this.paperForm.showType),
-            markType: this.paperForm.markType,
+            markType: this.paperForm.markType
           }
 
           if (getQuick().paperType && getQuick()?.state === 1) {
@@ -354,10 +348,10 @@ export default {
       const { data } = await paperGet({ id: this.paperForm.paperId })
       setQuick({
         ...data,
-        paperType: this.paperForm.paperType,
+        paperType: this.paperForm.paperType
       })
-    },
-  },
+    }
+  }
 }
 </script>
 

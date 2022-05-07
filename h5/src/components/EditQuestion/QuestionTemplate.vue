@@ -1,31 +1,21 @@
-<!--
- * @Description: 试题模板下载、试题上传解析、试题导出
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-12-28 14:46:05
- * @LastEditors: Che
- * @LastEditTime: 2022-01-18 10:57:38
--->
 <template>
   <div class="template-content">
-    <el-form :model="handlerForm" ref="handlerForm">
+    <el-form ref="handlerForm" :model="handlerForm">
       <Upload
-        type="word"
         ref="templateUpload"
+        type="word"
         @success="templateSuccess"
         @remove="templateRemove"
-      >
-      </Upload>
+      />
     </el-form>
     <div class="tips">按照试题模板格式填写并上传</div>
     <div class="handler-template">
       <div class="template-item" @click="questionTemplate">
-        <i class="common common-word-template"></i>
+        <i class="common common-word-template" />
         <p>下载试题模板</p>
       </div>
       <div class="template-item" @click="$emit('questionExport')">
-        <i class="common common-word-template"></i>
+        <i class="common common-word-template" />
         <p>导出试题模板</p>
       </div>
       <div
@@ -33,7 +23,7 @@
         class="template-item template-item-active"
         @click="showTemplate"
       >
-        <i class="common common-view-list"></i>
+        <i class="common common-view-list" />
         <p>返回试题列表</p>
       </div>
     </div>
@@ -46,22 +36,22 @@ import {
   questionImport,
   questionTypeAdd,
   questionTemplate,
-  questionTypeListPage,
+  questionTypeListPage
 } from 'api/question'
 import { progressBarGet } from 'api/common'
 export default {
   components: {
-    Upload,
+    Upload
   },
   props: {
     back: {
       type: Boolean,
-      default: true,
+      default: true
     },
     questionTypeId: {
       type: Number,
-      default: null,
-    },
+      default: null
+    }
   },
   data() {
     return {
@@ -69,8 +59,8 @@ export default {
       handlerForm: {
         fileShow: false,
         questionDocIds: [],
-        isAnalysis: false,
-      },
+        isAnalysis: false
+      }
     }
   },
   methods: {
@@ -82,7 +72,7 @@ export default {
       const typeList = await questionTypeListPage({
         name,
         curPage,
-        pageSize: 5,
+        pageSize: 5
       })
       return typeList.data.list
     },
@@ -107,18 +97,18 @@ export default {
           return
         }
         const createQuestionType = await questionTypeAdd({
-          name: '我的试题',
+          name: '我的试题'
         })
         this.questionTypeId = createQuestionType.data
       }
       const res = await questionImport({
         fileId: this.handlerForm.questionDocIds[0].response.data.fileIds,
         questionTypeId: this.questionTypeId,
-        state: 1,
+        state: 1
       }).catch(() => {
         this.handlerForm.isAnalysis = false
       })
-      if (res?.code == 200) {
+      if (res?.code === 200) {
         await this.getProgress(res.data)
         if (this.percentage === 100) {
           this.$message.success('解析成功！')
@@ -135,7 +125,7 @@ export default {
         .delay()
         .then(() => {
           return progressBarGet({
-            id,
+            id
           })
         })
         .catch((err) => {
@@ -146,7 +136,7 @@ export default {
         lock: true,
         text: `试题解析进度：${percentage?.data?.percent || 10}%`,
         spinner: 'el-icon-loading',
-        background: 'rgba(255, 255, 255, 0.88)',
+        background: 'rgba(255, 255, 255, 0.88)'
       })
 
       if (percentage.code !== 200 || !percentage?.data?.percent) {
@@ -178,8 +168,8 @@ export default {
     // 删除试题模板
     templateRemove(file, fileList) {
       this.handlerForm.questionDocIds = []
-    },
-  },
+    }
+  }
 }
 </script>
 

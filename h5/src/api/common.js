@@ -1,12 +1,3 @@
-/*
- * @Description: 公共API
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-08-11 13:25:40
- * @LastEditors: Che
- * @LastEditTime: 2022-01-13 11:11:54
- */
 import request from './request'
 
 /**

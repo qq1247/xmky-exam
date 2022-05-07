@@ -4,8 +4,7 @@
     :active-value="1"
     :inactive-value="2"
     @change="ranking"
-  >
-  </el-switch>
+  />
 </template>
 
 <script>
@@ -15,7 +14,7 @@ export default {
   data() {
     return {
       id: null,
-      state: 2,
+      state: 2
     }
   },
   async mounted() {
@@ -26,13 +25,13 @@ export default {
   methods: {
     async ranking() {
       const res = await examRank({ id: this.id, state: this.state })
-      if (res?.code == 200) {
+      if (res?.code === 200) {
         this.$message.success('排名公开设置成功！')
         this.$router.back()
       } else {
         this.$message.error(res.msg || '排名公开设置失败！')
       }
-    },
-  },
+    }
+  }
 }
 </script>

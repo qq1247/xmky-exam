@@ -1,9 +1,9 @@
 <template>
-  <div class="container setting-container">
+  <div class="setting-container">
     <el-tabs v-model="tabIndex" tab-position="right">
-      <el-tab-pane :key="item.index" v-for="item in tab" :name="item.index">
-        <div class="pane-label" slot="label">
-          <i :class="item.icon"></i>
+      <el-tab-pane v-for="item in tab" :key="item.index" :name="item.index">
+        <div slot="label" class="pane-label">
+          <i :class="item.icon" />
           <div>
             <div class="label-name">{{ item.name }}</div>
             <div class="label-intro">{{ item.intro }}</div>
@@ -18,14 +18,13 @@
           <div class="header-intro">
             {{ contentIntro
             }}<router-link
-              :to="{ name: contentUrl }"
               v-if="contentUrl"
+              :to="{ name: contentUrl }"
               class="header-url"
-              >去设置</router-link
-            >
+            >去设置</router-link>
           </div>
         </div>
-        <component :is="currentView"></component>
+        <component :is="currentView" />
       </el-card>
     </div>
   </div>
@@ -47,14 +46,14 @@ export default {
           contentName: '试卷信息',
           contentIntro:
             '阅卷方式选择人工阅卷，发布时检测到所有试题为智能题，则自动变更为智能阅卷。',
-          index: '1',
-        },
+          index: '1'
+        }
       ],
       contentName: '',
       contentIntro: '',
       contentUrl: '',
       viewList: [Setting, Copy, Publish, Delete],
-      currentView: null,
+      currentView: null
     }
   },
   computed: {
@@ -67,8 +66,8 @@ export default {
         this.contentName = this.tab[Number(val) - 1].contentName
         this.contentIntro = this.tab[Number(val) - 1].contentIntro
         this.contentUrl = this.tab[Number(val) - 1].contentUrl || ''
-      },
-    },
+      }
+    }
   },
   created() {
     if (Number(this.$route.params.id)) {
@@ -80,7 +79,7 @@ export default {
           icon: 'common common-copy',
           contentName: '复制',
           contentIntro: '复制当前试卷为新试卷（草稿状态）',
-          index: '2',
+          index: '2'
         },
         {
           name: '发布',
@@ -88,7 +87,7 @@ export default {
           icon: 'common common-publish',
           contentName: '发布',
           contentIntro: '发布后，可被共享权限的用户使用',
-          index: '3',
+          index: '3'
         },
         {
           name: '删除',
@@ -96,15 +95,15 @@ export default {
           icon: 'common common-delete',
           contentName: '删除',
           contentIntro: '不影响关联的试题、考试等，可以正常显示和使用',
-          index: '4',
-        },
+          index: '4'
+        }
       ]
     }
     this.currentView = this.viewList[Number(this.tabIndex) - 1]
     this.contentName = this.tab[Number(this.tabIndex) - 1].contentName
     this.contentIntro = this.tab[Number(this.tabIndex) - 1].contentIntro
     this.contentUrl = this.tab[Number(this.tabIndex) - 1].contentUrl || ''
-  },
+  }
 }
 </script>
 

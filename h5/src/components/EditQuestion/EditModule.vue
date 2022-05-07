@@ -1,7 +1,7 @@
 <template>
   <el-form
-    size="mini"
     ref="editForm"
+    size="mini"
     class="edit-form"
     label-width="80px"
     :model="editForm"
@@ -9,25 +9,25 @@
   >
     <el-form-item label="难度" prop="difficulty">
       <el-select
+        v-model="editForm.difficulty"
         clearable
         placeholder="请选择难度"
-        v-model="editForm.difficulty"
       >
         <el-option
+          v-for="dict in editForm.difficultyList"
           :key="parseInt(dict.dictKey)"
           :label="dict.dictValue"
           :value="parseInt(dict.dictKey)"
-          v-for="dict in editForm.difficultyList"
-        ></el-option>
+        />
       </el-select>
     </el-form-item>
 
     <el-form-item label="题干" prop="title">
       <TinymceEditor
+        id="title"
         :value="editForm.title"
         @editorListener="editorListener"
-        id="title"
-      ></TinymceEditor>
+      />
     </el-form-item>
 
     <div v-if="editForm.type === 3" class="cloze-tip">
@@ -47,24 +47,22 @@
           :id="'option' + option.lab"
           :value="option.value"
           @editorListener="editorListener"
-        ></TinymceEditor>
+        />
       </el-form-item>
       <!-- 选项按钮 -->
       <el-form-item>
         <el-button
           :disabled="editForm.options.length >= 7"
-          @click="addOption(editForm.options.length, '')"
           class="option-btn"
           type="primary"
-          >+&nbsp;添加选项</el-button
-        >
+          @click="addOption(editForm.options.length, '')"
+        >+&nbsp;添加选项</el-button>
         <el-button
           :disabled="editForm.options.length <= 2"
-          @click="delOption"
           class="option-btn"
           type="danger"
-          >-&nbsp;删除选项</el-button
-        >
+          @click="delOption"
+        >-&nbsp;删除选项</el-button>
       </el-form-item>
     </div>
 
@@ -74,12 +72,12 @@
         <div v-if="[3, 5].includes(editForm.type)">
           <el-form-item label="智能阅卷" prop="ai">
             <el-switch
+              v-model="editForm.ai"
               active-color="#0094e5"
               :active-value="1"
               inactive-color="#ff4949"
               :inactive-value="2"
-              v-model="editForm.ai"
-            ></el-switch>
+            />
           </el-form-item>
         </div>
       </el-col>
@@ -128,19 +126,19 @@
       <el-col :span="12">
         <el-form-item label="分值" prop="score">
           <el-input-number
+            v-model.number="editForm.score"
             :max="100"
             :min="1"
             :step="1"
             controls-position="right"
-            v-model.number="editForm.score"
-          ></el-input-number>
+          />
         </el-form-item>
       </el-col>
-      <el-col :span="12" v-if="editForm.type === 2">
+      <el-col v-if="editForm.type === 2" :span="12">
         <el-form-item prop="multipScore">
           <div class="lose">
             漏选得
-            <el-input size="mini" v-model="editForm.multipScore"> </el-input>分
+            <el-input v-model="editForm.multipScore" size="mini" />分
           </div>
         </el-form-item>
       </el-col>
@@ -150,68 +148,66 @@
     <el-form-item label="状态">
       <el-radio-group v-model="editForm.state">
         <el-radio
+          v-for="state in editForm.states"
           :key="state.value"
           :label="state.value"
-          v-for="state in editForm.states"
-          >{{ state.lab }}</el-radio
-        >
+        >{{ state.lab }}</el-radio>
       </el-radio-group>
     </el-form-item>
 
     <!-- 答案 -->
     <el-form-item
-      label="答案"
-      prop="answer"
       v-if="editForm.type === 1"
       key="answerRadio"
+      label="答案"
+      prop="answer"
     >
       <el-radio-group v-model="editForm.answer">
         <el-radio
+          v-for="answer in editForm.answers"
           :key="answer.lab"
           :label="answer.lab"
-          v-for="answer in editForm.answers"
-          >{{ answer.lab }}</el-radio
-        >
+        >{{ answer.lab }}</el-radio>
       </el-radio-group>
     </el-form-item>
 
     <el-form-item
-      label="答案"
-      prop="answerMultip"
       v-if="editForm.type === 2"
       key="answerCheckbox"
+      label="答案"
+      prop="answerMultip"
     >
       <el-checkbox-group v-model="editForm.answerMultip">
         <el-checkbox
+          v-for="answer in editForm.answers"
           :key="answer.lab"
           :label="answer.lab"
-          v-for="answer in editForm.answers"
-          >{{ answer.lab }}</el-checkbox
-        >
+        >{{ answer.lab }}</el-checkbox>
       </el-checkbox-group>
     </el-form-item>
 
-    <el-form-item label="答案" v-if="editForm.type === 3" key="answerCloze">
+    <el-form-item v-if="editForm.type === 3" key="answerCloze" label="答案">
       <el-card class="el-card" shadow="never">
         <el-alert
           :closable="false"
           title="单个填空有多个同义词，可添加多个标签。如：人民、公民、群众"
           type="success"
-        ></el-alert>
+        />
         <el-row
-          :gutter="10"
           v-for="(answer, index) in editForm.answers"
           :key="index"
+          :gutter="10"
         >
           <el-col :span="16">
             <el-form-item
               :prop="`answers.${index}.value`"
               :rules="editForm.rules.answerMultip"
             >
-              <span style="margin: 0 10px; color: #838ee9; font-size: 12px"
-                >填空{{ $tools.intToChinese(index + 1) }}</span
-              >
+              <span
+                style="margin: 0 10px; color: #838ee9; font-size: 12px"
+              >填空{{ $tools.intToChinese(index + 1) }}</span>
               <el-select
+                v-model="answer.value"
                 class="custom-select"
                 remote
                 multiple
@@ -219,10 +215,8 @@
                 filterable
                 allow-create
                 default-first-option
-                v-model="answer.value"
                 placeholder="请填写答案"
-              >
-              </el-select>
+              />
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -241,46 +235,46 @@
     </el-form-item>
 
     <el-form-item
-      label="答案"
-      prop="answer"
       v-if="editForm.type === 4"
       key="answerJudge"
+      label="答案"
+      prop="answer"
     >
       <el-radio-group v-model="editForm.answer">
         <el-radio
+          v-for="answer in editForm.judgeAnswers"
           :key="answer.lab"
           :label="answer.lab"
-          v-for="answer in editForm.judgeAnswers"
-          >{{ answer.lab }}</el-radio
-        >
+        >{{ answer.lab }}</el-radio>
       </el-radio-group>
     </el-form-item>
 
     <el-form-item
-      label="答案"
       v-if="editForm.type === 5 && editForm.ai === 1"
       key="answerAskAI"
+      label="答案"
     >
       <el-card class="el-card" shadow="never">
         <el-alert
           :closable="false"
           title="单个关键词有多个同义词，可添加多个标签。如：人民、公民、群众"
           type="success"
-        ></el-alert>
+        />
         <el-row
-          :gutter="10"
           v-for="(answer, index) in editForm.answers"
           :key="index"
+          :gutter="10"
         >
           <el-col :span="16">
             <el-form-item
               :prop="`answers.${index}.value`"
               :rules="editForm.rules.answerMultip"
             >
-              <span style="margin: 0 10px; color: #838ee9; font-size: 12px"
-                >关键词{{ $tools.intToChinese(index + 1) }}</span
-              >
+              <span
+                style="margin: 0 10px; color: #838ee9; font-size: 12px"
+              >关键词{{ $tools.intToChinese(index + 1) }}</span>
               <el-select
+                v-model="answer.value"
                 class="custom-select"
                 remote
                 multiple
@@ -288,10 +282,8 @@
                 filterable
                 allow-create
                 default-first-option
-                v-model="answer.value"
                 placeholder="请填写答案"
-              >
-              </el-select>
+              />
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -308,59 +300,55 @@
         </el-row>
         <el-button
           :disabled="editForm.answers.length >= 7"
-          @click="addFillBlanks(editForm.answers.length, '')"
           class="option-btn"
           style="margin-left: 65px"
           type="primary"
-          >+&nbsp;添加关键词</el-button
-        >
+          @click="addFillBlanks(editForm.answers.length, '')"
+        >+&nbsp;添加关键词</el-button>
         <el-button
           :disabled="editForm.answers.length <= 1"
-          @click="delFillBlanks"
           class="option-btn"
           type="danger"
-          >-&nbsp;删除关键词</el-button
-        >
+          @click="delFillBlanks"
+        >-&nbsp;删除关键词</el-button>
       </el-card>
     </el-form-item>
 
     <el-form-item
-      label="答案"
-      prop="answer"
       v-if="editForm.type === 5 && editForm.ai === 2"
       key="answerAsk"
+      label="答案"
+      prop="answer"
     >
       <TinymceEditor
         v-if="editForm.ai === 2"
+        id="answer"
         :value="editForm.answer"
         @editorListener="editorListener"
-        id="answer"
-      ></TinymceEditor>
+      />
     </el-form-item>
 
     <el-form-item label="解析" prop="analysis">
       <TinymceEditor
+        id="analysis"
         :value="editForm.analysis"
         @editorListener="editorListener"
-        id="analysis"
-      ></TinymceEditor>
+      />
     </el-form-item>
 
     <el-form-item>
       <el-button
-        @click="add()"
-        style="width: 164px; height: 40px"
-        type="primary"
         v-if="!questionId"
-        >添加</el-button
-      >
-      <el-button
-        @click="edit()"
         style="width: 164px; height: 40px"
         type="primary"
+        @click="add()"
+      >添加</el-button>
+      <el-button
         v-if="questionId"
-        >修改</el-button
-      >
+        style="width: 164px; height: 40px"
+        type="primary"
+        @click="edit()"
+      >修改</el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -371,25 +359,25 @@ import { getOneDict } from '@/utils/getDict'
 import { questionGet } from 'api/question'
 export default {
   components: {
-    TinymceEditor,
+    TinymceEditor
   },
   props: {
     questionType: {
       type: Number,
-      default: 1,
+      default: 1
     },
     questionTypeId: {
       type: Number,
-      default: null,
+      default: null
     },
     questionId: {
       type: Number,
-      default: null,
+      default: null
     },
     publish: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
   data() {
     const validateAiScore = (rule, value, callback) => {
@@ -438,12 +426,12 @@ export default {
         options: [
           {
             lab: 'A',
-            value: '',
+            value: ''
           },
           {
             lab: 'B',
-            value: '',
-          },
+            value: ''
+          }
         ], // 选项
         answer: '', // 答案
         answerMultip: [],
@@ -451,34 +439,34 @@ export default {
           {
             lab: 'A',
             value: [],
-            score: '',
+            score: ''
           },
           {
             lab: 'B',
             value: [],
-            score: '',
-          },
+            score: ''
+          }
         ],
         states: [
           {
             lab: '发布',
-            value: 1,
+            value: 1
           },
           {
             lab: '草稿',
-            value: 2,
-          },
+            value: 2
+          }
         ],
         // 答案
         judgeAnswers: [
           {
             lab: '对',
-            value: '',
+            value: ''
           },
           {
             lab: '错',
-            value: '',
-          },
+            value: ''
+          }
         ],
         analysis: '', // 解析
         score: 1, // 分值
@@ -487,29 +475,29 @@ export default {
         rules: {
           title: [{ required: true, message: '请输入题干', trigger: 'blur' }],
           option: [
-            { required: true, message: '请输入选项内容', trigger: 'change' },
+            { required: true, message: '请输入选项内容', trigger: 'change' }
           ],
           answer: [
             {
               required: true,
               message: '请选择或者输入答案',
-              trigger: 'blur',
-            },
+              trigger: 'blur'
+            }
           ],
           answerMultip: [
             {
               type: 'array',
               required: true,
               message: '请选择或者输入答案',
-              trigger: 'blur',
-            },
+              trigger: 'blur'
+            }
           ],
           aiScore: [{ validator: validateAiScore }],
           multipScore: [
-            { required: true, trigger: 'blur', validator: validateMultipScore },
-          ],
-        },
-      },
+            { required: true, trigger: 'blur', validator: validateMultipScore }
+          ]
+        }
+      }
     }
   },
   watch: {
@@ -518,20 +506,20 @@ export default {
       this.resetData()
       this.editForm.options.length = 2
       this.editForm.answers =
-        this.editForm.type == 3
+        this.editForm.type === 3
           ? []
           : [
-              {
-                lab: 'A',
-                value: [],
-                score: '',
-              },
-              {
-                lab: 'B',
-                value: [],
-                score: '',
-              },
-            ]
+            {
+              lab: 'A',
+              value: [],
+              score: ''
+            },
+            {
+              lab: 'B',
+              value: [],
+              score: ''
+            }
+          ]
     },
     questionId(n) {
       if (n) {
@@ -545,8 +533,8 @@ export default {
         if (this.editForm.type === 2) {
           this.editForm.multipScore = newValue / 2
         }
-      },
-    },
+      }
+    }
   },
   created() {
     this.editForm.difficultyList = getOneDict('QUESTION_DIFFICULTY')
@@ -562,7 +550,7 @@ export default {
       this.editForm[id] = value
 
       if (this.editForm.type === 3 && id === 'title') {
-        let underlineNum = value.match(/[_]{5,}/g)
+        const underlineNum = value.match(/[_]{5,}/g)
 
         // 下划线不存在，则答案选项置空
         if (!underlineNum) {
@@ -581,7 +569,7 @@ export default {
             this.editForm.answers.push({
               lab,
               value: [],
-              score: '',
+              score: ''
             })
           }
         }
@@ -606,12 +594,12 @@ export default {
     },
     // 添加填空
     addFillBlanks(index, value) {
-      let lab = this.$tools.intToChinese(index)
+      const lab = this.$tools.intToChinese(index)
 
       this.editForm.answers.push({
         lab: lab,
         value: !value ? '' : value.answer,
-        score: !value ? '' : value.score,
+        score: !value ? '' : value.score
       })
     },
     // 删除填空
@@ -621,7 +609,7 @@ export default {
     // 获取试题编辑详情
     async getQuestionDetail(id) {
       const res = await questionGet({ id })
-      if (res?.code != 200) {
+      if (res?.code !== 200) {
         this.$message.error('查询失败！')
         return
       }
@@ -678,7 +666,7 @@ export default {
         })
       }
 
-      if (res.data.ai == 1 && res.data.type === 5) {
+      if (res.data.ai === 1 && res.data.type === 5) {
         this.editForm.answer = ''
       }
     },
@@ -691,12 +679,12 @@ export default {
         analysis: this.editForm.analysis,
         score: this.editForm.score,
         ai: this.editForm.ai,
-        state: this.editForm.state,
+        state: this.editForm.state
       }
 
       status
         ? ((params.questionTypeId = this.questionTypeId),
-          (params.state = this.publish ? 1 : this.editForm.state))
+        (params.state = this.publish ? 1 : this.editForm.state))
         : ((params.id = this.editForm.id), (params.state = this.editForm.state))
 
       // 选项值(单选、多选)
@@ -739,20 +727,16 @@ export default {
       }
 
       // 分值选项对应的分值（多选）
-      if (params.type == 2) {
+      if (params.type === 2) {
         params.answerScores = this.editForm.multipScore
       }
 
       // 分值选项对应的分值（填空、问答）
       if ([3, 5].includes(params.type) && params.ai === 1) {
         params.answerScores = this.editForm.answers.reduce((acc, cur) => {
-          acc.push(params.ai == 1 ? cur.score : params.score)
+          acc.push(params.ai === 1 ? cur.score : params.score)
           return acc
         }, [])
-        const sum = params.answerScores.reduce(
-          (acc, cur) => acc + Number(cur),
-          0
-        )
       }
 
       return params
@@ -762,7 +746,7 @@ export default {
       const params = this.compositionParam(true)
       if (!params) return
 
-      this.$refs['editForm'].validate(async (valid) => {
+      this.$refs['editForm'].validate(async(valid) => {
         if (!valid) {
           return false
         }
@@ -781,9 +765,9 @@ export default {
         this.$confirm('确定要修改？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          type: 'warning',
+          type: 'warning'
         })
-          .then(async () => {
+          .then(async() => {
             this.$emit('edit', params)
           })
           .catch((err) => {
@@ -794,8 +778,8 @@ export default {
     // 还原表单数据
     resetData() {
       this.$refs['editForm'].resetFields()
-    },
-  },
+    }
+  }
 }
 </script>
 

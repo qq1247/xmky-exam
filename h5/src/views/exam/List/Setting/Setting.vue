@@ -1,12 +1,12 @@
 <template>
   <el-form
+    ref="examForm"
     :model="examForm"
     :rules="examForm.rules"
-    ref="examForm"
     label-width="100px"
   >
     <el-form-item label="考试名称" prop="name">
-      <el-input placeholder="请输入试卷名称" v-model="examForm.name"></el-input>
+      <el-input v-model="examForm.name" placeholder="请输入试卷名称" />
     </el-form-item>
     <el-form-item label="选择试卷" prop="selectPaperId">
       <CustomSelect
@@ -25,7 +25,7 @@
           :key="item.id"
           :label="item.name"
           :value="item.id"
-        ></el-option>
+        />
       </CustomSelect>
     </el-form-item>
     <el-form-item label="考试时间" prop="examTime">
@@ -35,19 +35,19 @@
         start-placeholder="开始日期"
         end-placeholder="结束日期"
         value-format="yyyy-MM-dd HH:mm:ss"
-      ></el-date-picker>
+      />
     </el-form-item>
-    <el-form-item label="阅卷时间" prop="markTime" v-if="examForm.showMarkTime">
+    <el-form-item v-if="examForm.showMarkTime" label="阅卷时间" prop="markTime">
       <el-date-picker
         v-model="examForm.markTime"
         type="datetimerange"
         start-placeholder="开始日期"
         end-placeholder="结束日期"
         value-format="yyyy-MM-dd HH:mm:ss"
-      ></el-date-picker>
+      />
     </el-form-item>
     <el-form-item>
-      <el-button @click="addOrEdit" type="primary">{{
+      <el-button type="primary" @click="addOrEdit">{{
         id ? '修改' : '添加'
       }}</el-button>
     </el-form-item>
@@ -63,11 +63,11 @@ import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 dayjs.extend(isSameOrBefore)
 export default {
   components: {
-    CustomSelect,
+    CustomSelect
   },
   data() {
     const validateExamTime = (rule, value, callback) => {
-      if (value.length == 0) {
+      if (value.length === 0) {
         return callback(new Error('请选择考试时间'))
       }
       if (dayjs(value[1]).isSameOrBefore(dayjs())) {
@@ -77,7 +77,7 @@ export default {
     }
 
     const validateMarkTime = (rule, value, callback) => {
-      if (value.length == 0) {
+      if (value.length === 0) {
         return callback(new Error('请选择阅卷时间'))
       }
       if (
@@ -103,24 +103,24 @@ export default {
         examRadios: [
           {
             name: '按题阅卷',
-            value: 0,
+            value: 0
           },
           {
             name: '按人阅卷',
-            value: 1,
-          },
+            value: 1
+          }
         ],
         rules: {
           name: [
-            { required: true, message: '请填写试卷名称', trigger: 'blur' },
+            { required: true, message: '请填写试卷名称', trigger: 'blur' }
           ],
           selectPaperId: [
-            { required: true, message: '请选择试卷', trigger: 'blur' },
+            { required: true, message: '请选择试卷', trigger: 'blur' }
           ],
           examTime: [{ required: true, validator: validateExamTime }],
-          markTime: [{ required: true, validator: validateMarkTime }],
-        },
-      },
+          markTime: [{ required: true, validator: validateMarkTime }]
+        }
+      }
     }
   },
   async mounted() {
@@ -136,21 +136,21 @@ export default {
           endTime,
           markStartTime,
           markEndTime,
-          paperMarkType,
-        },
+          paperMarkType
+        }
       } = await examGet({ id: this.id })
       this.$nextTick(() => {
         this.examForm.name = name
         this.examForm.selectPaperId = paperId
         this.examForm.paperName = paperName
         this.examForm.examTime = [startTime, endTime]
-        this.examForm.showMarkTime = paperMarkType === 1 ? false : true
+        this.examForm.showMarkTime = paperMarkType !== 1
         const _markStartTime = this.getHour(2, endTime)
         const _markEndTime = this.getHour(1, _markStartTime)
         if (markStartTime || markEndTime) {
           this.examForm.markTime = [
             markStartTime || `${_markStartTime}`,
-            markEndTime || `${_markEndTime}`,
+            markEndTime || `${_markEndTime}`
           ]
         }
 
@@ -159,7 +159,7 @@ export default {
             currentLabel: paperName,
             currentValue: paperId,
             label: paperName,
-            value: paperId,
+            value: paperId
           })
       })
     } else {
@@ -186,7 +186,7 @@ export default {
         name,
         state: 1,
         curPage,
-        pageSize: 5,
+        pageSize: 5
       })
       this.examForm.paperList = paperList.data.list
       this.examForm.total = paperList.data.total
@@ -205,11 +205,11 @@ export default {
       const selectPaper = this.examForm.paperList.filter(
         (item) => item.id === e
       )
-      this.examForm.showMarkTime = selectPaper[0].markType === 1 ? false : true
+      this.examForm.showMarkTime = selectPaper[0].markType !== 1
     },
     // 添加试卷信息
     addOrEdit() {
-      this.$refs['examForm'].validate(async (valid) => {
+      this.$refs['examForm'].validate(async(valid) => {
         if (!valid) {
           return
         }
@@ -219,32 +219,32 @@ export default {
           startTime: this.examForm.examTime[0],
           endTime: this.examForm.examTime[1],
           paperId: this.examForm.selectPaperId,
-          examTypeId: this.examTypeId,
+          examTypeId: this.examTypeId
         }
 
         if (this.examForm.markTime.length) {
           params = {
             markStartTime: this.examForm.markTime[0],
             markEndTime: this.examForm.markTime[1],
-            ...params,
+            ...params
           }
         }
 
         const res = this.id
           ? await examEdit({
-              ...params,
-              id: this.id,
-            })
+            ...params,
+            id: this.id
+          })
           : await examAdd(params)
 
-        if (res?.code == 200) {
+        if (res?.code === 200) {
           this.$message.success(!this.id ? '添加成功！' : '修改成功！')
           this.$router.back()
         } else {
           this.$message.error(!this.id ? '添加失败！' : '修改失败！')
         }
       })
-    },
-  },
+    }
+  }
 }
 </script>

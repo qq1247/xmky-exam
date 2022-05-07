@@ -7,16 +7,16 @@
   >
     <el-form-item label="考试用户" prop="examUser">
       <el-select
+        v-model="examForm.examUser"
         clearable
         placeholder="请选择考试用户"
-        v-model="examForm.examUser"
       >
         <el-option
+          v-for="user in examForm.examUserList"
           :key="user.id"
           :label="user.name"
           :value="user.id"
-          v-for="user in examForm.examUserList"
-        ></el-option>
+        />
       </el-select>
     </el-form-item>
     <el-form-item>
@@ -43,19 +43,19 @@ export default {
         paperQuestion: [],
         rules: {
           examUser: [
-            { required: true, message: '请选择考试用户', trigger: 'change' },
-          ],
-        },
-      },
+            { required: true, message: '请选择考试用户', trigger: 'change' }
+          ]
+        }
+      }
     }
   },
   async mounted() {
     this.id = this.$route.params.id
     if (Number(this.id)) {
       const {
-        data: { paperId, paperName },
+        data: { paperId, paperName }
       } = await examGet({
-        id: this.id,
+        id: this.id
       })
       this.examForm.paperId = paperId
       this.examForm.paperName = paperName
@@ -76,21 +76,21 @@ export default {
       const res = await paperQuestionList({
         id: this.examForm.paperId,
         examId: this.id,
-        userId: this.examForm.examUser,
+        userId: this.examForm.examUser
       })
       this.examForm.paperQuestion = [...res.data]
     },
     // 组合导出的docx-html
     async compositionHtml() {
-      let paperName = this.examForm.paperName
-      let paperDetail = this.examForm.paperQuestion
+      const paperName = this.examForm.paperName
+      const paperDetail = this.examForm.paperQuestion
       let stringHtml = `<p style="text-align: center;font-size: 20px;font-weight: 600;">${paperName}</p>`
 
       for (let i = 0; i < paperDetail.length; i++) {
         stringHtml += `<br/><p>${paperDetail[i].chapter.name}</p><p>${paperDetail[i].chapter.description}</p><br/>`
 
         for (let j = 0; j < paperDetail[i].questionList.length; j++) {
-          let title = paperDetail[i].questionList[j].title.replace(
+          const title = paperDetail[i].questionList[j].title.replace(
             />/,
             `><span>${j + 1}、</span>`
           )
@@ -105,7 +105,7 @@ export default {
           if (paperDetail[i].questionList[j].type === 4) {
             const options = ['对', '错']
             for (let index = 0; index < options.length; index++) {
-              let option = `<p>&nbsp;&nbsp;<span>${String.fromCharCode(
+              const option = `<p>&nbsp;&nbsp;<span>${String.fromCharCode(
                 65 + index
               )}、</span><span>${options[index]}</span></p>`
               stringHtml += option
@@ -116,7 +116,7 @@ export default {
               index < paperDetail[i].questionList[j].options.length;
               index++
             ) {
-              let option = paperDetail[i].questionList[j].options[
+              const option = paperDetail[i].questionList[j].options[
                 index
               ].replace(
                 />/,
@@ -132,11 +132,11 @@ export default {
     },
     // 替换docx-html中的图片
     async convertImagesToBase64(stringHtml) {
-      let parser = new DOMParser()
-      let doc = parser.parseFromString(stringHtml, 'text/html')
-      let regularImages = doc.querySelectorAll('img')
-      let canvas = document.createElement('canvas')
-      let ctx = canvas.getContext('2d')
+      const parser = new DOMParser()
+      const doc = parser.parseFromString(stringHtml, 'text/html')
+      const regularImages = doc.querySelectorAll('img')
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
       for (let index = 0; index < regularImages.length; index++) {
         const imgElement = regularImages[index]
         ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -152,7 +152,7 @@ export default {
     // 异步获取图片
     loadImg(canvas, ctx, imgElement) {
       return new Promise((resolve, reject) => {
-        let img = new Image()
+        const img = new Image()
         img.src = imgElement.src
         img.setAttribute('crossOrigin', 'Anonymous')
         img.onload = () => {
@@ -165,17 +165,17 @@ export default {
     },
     // 导出试题
     async exportsPaper() {
-      this.$refs['examForm'].validate(async (valid) => {
+      this.$refs['examForm'].validate(async(valid) => {
         if (!valid) {
           return false
         }
         await this.queryPaper()
-        let stringHtml = await this.compositionHtml()
-        let docxHtml = await this.convertImagesToBase64(stringHtml)
-        let converted = htmlDocx.asBlob(docxHtml, { orientation: 'portrait' })
+        const stringHtml = await this.compositionHtml()
+        const docxHtml = await this.convertImagesToBase64(stringHtml)
+        const converted = htmlDocx.asBlob(docxHtml, { orientation: 'portrait' })
         saveAs(converted, 'paper.docx')
       })
-    },
-  },
+    }
+  }
 }
 </script>

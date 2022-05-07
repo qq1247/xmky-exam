@@ -1,21 +1,13 @@
-<!--
- * @Description: 
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-09-16 13:27:05
- * @LastEditors: Che
- * @LastEditTime: 2022-01-18 16:20:53
--->
 <template>
   <div class="content-left">
     <div class="user-info">
       <el-avatar
-        :size="64"
         v-if="$store.getters.userAvatar"
+        :size="64"
         :src="`/api/file/download?id=${Number($store.getters.userAvatar)}`"
-        ><i class="common common-wo"></i
-      ></el-avatar>
+      ><i
+        class="common common-wo"
+      /></el-avatar>
       <div class="user-name">
         {{ $store.getters.name || '***' }}&nbsp;/&nbsp;{{
           $store.getters.orgName || '***'
@@ -25,29 +17,28 @@
     <div class="exam-head">答题卡</div>
     <el-scrollbar wrap-style="overflow-x:hidden;">
       <div
-        class="router-content"
         v-for="(item, index) in paperQuestion"
         :key="index"
+        class="router-content"
       >
-        <div class="router-title" v-if="item.questionList">
+        <div v-if="item.questionList" class="router-title">
           第{{ $tools.intToChinese(index + 1) }}章（共{{
             item.questionList.length
           }}题，合计{{ computeChapterScore(item.questionList) }}分）
         </div>
-        <div class="router-link" v-if="item.questionList">
+        <div v-if="item.questionList" class="router-link">
           <a
+            v-for="(question, indexQuestion) in item.questionList"
+            :key="question.id"
             :class="[
               'router-index',
-              child.submit ? 'router-submit' : '',
-              child.sign ? 'router-sign' : '',
-              routerIndex === child.id ? 'router-active' : '',
+              question.submit ? 'router-submit' : '',
+              question.sign ? 'router-sign' : '',
+              routerIndex === question.id ? 'router-active' : '',
             ]"
-            @click="toHref(child.id)"
-            @dblclick="sign(child.id)"
-            v-for="(child, index) in item.questionList"
-            :key="child.id"
-            >{{ index + 1 }}</a
-          >
+            @click="toHref(question.id)"
+            @dblclick="sign(question.id)"
+          >{{ indexQuestion + 1 }}</a>
         </div>
       </div>
       <!-- <template v-if="Number(showType) === 3">
@@ -68,9 +59,9 @@
         </div>
       </template> -->
     </el-scrollbar>
-    <div class="exam-footer" v-if="!preview">
+    <div v-if="!preview" class="exam-footer">
       <div class="exam-btn">
-        剩余：<CountDown :time="systemTime" @finish="forceExamEnd"></CountDown>
+        剩余：<CountDown :time="systemTime" @finish="forceExamEnd" />
       </div>
       <div class="exam-btn exam-finish" @click="examEnd">提交</div>
     </div>
@@ -80,30 +71,30 @@
 <script>
 import CountDown from 'components/CountDown.vue'
 export default {
+  components: {
+    CountDown
+  },
   props: {
     preview: {
       type: Boolean,
-      default: false,
+      default: false
     },
     paperQuestion: {
       type: Array,
-      default: () => [],
+      default: () => []
     },
     systemTime: {
       type: Number,
-      default: 0,
+      default: 0
     },
     routerIndex: {
       type: [String, Number],
-      default: '',
-    },
-  },
-  components: {
-    CountDown,
+      default: ''
+    }
   },
   data() {
     return {
-      userInfo: {},
+      userInfo: {}
     }
   },
   methods: {
@@ -125,8 +116,8 @@ export default {
     },
     sign(index) {
       this.$emit('sign', index)
-    },
-  },
+    }
+  }
 }
 </script>
 

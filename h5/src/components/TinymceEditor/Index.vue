@@ -1,24 +1,14 @@
-<!--
- * @Description: tinymce富文本
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-12-16 15:16:59
- * @LastEditors: Che
- * @LastEditTime: 2022-01-17 09:31:05
--->
 <template>
   <div class="tinymce-box">
     <editor
+      v-model="myValue"
       :init="init"
       class="tinymce-content"
-      v-model="myValue"
       :disabled="disabled"
       :placeholder="placeholder"
       @input="editorListener($event)"
-    >
-    </editor>
-    <tinymce-image ref="customImage"></tinymce-image>
+    />
+    <tinymce-image ref="customImage" />
   </div>
 </template>
 
@@ -37,47 +27,47 @@ import 'tinymce/plugins/table'
 import 'tinymce/plugins/imagetools'
 import 'tinymce/plugins/uploadImg'
 export default {
+  name: 'Tinymce',
   components: {
     Editor,
-    TinymceImage,
+    TinymceImage
   },
-  name: 'Tinymce',
   props: {
     placeholder: {
       type: String,
-      default: '',
+      default: ''
     },
     // 默认的富文本内容
     value: {
       type: String,
-      default: '',
+      default: ''
     },
     // 基本路径，默认为空根目录，如果你的项目发布后的地址为目录形式，
     // 即abc.com/tinymce，baseUrl需要配置成tinymce，不然发布后资源会找不到
     baseUrl: {
       type: String,
-      default: window.location.origin ? window.location.origin : '',
+      default: window.location.origin ? window.location.origin : ''
     },
     // 禁用
     disabled: {
       type: Boolean,
-      default: false,
+      default: false
     },
     plugins: {
       type: [String, Array],
-      default: 'uploadImg table imagetools',
+      default: 'uploadImg table imagetools'
       // 'link lists image code table wordcount media preview fullscreen help',
     },
     toolbar: {
       type: [String, Array],
       default:
-        'uploadImg | bold italic underline strikethrough |  alignleft aligncenter alignright alignjustify | forecolor backcolor table | fontsizeselect | formatselect',
+        'uploadImg | bold italic underline strikethrough |  alignleft aligncenter alignright alignjustify | forecolor backcolor table | fontsizeselect | formatselect'
       // 'bold italic underline strikethrough | fontsizeselect | formatselect | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent blockquote | undo redo | link unlink code lists table image media | removeformat | fullscreen preview',
     },
     id: {
       type: String,
-      default: 'editorId',
-    },
+      default: 'editorId'
+    }
   },
   data() {
     return {
@@ -96,7 +86,7 @@ export default {
         toolbar: this.toolbar, // （自定义工具栏）
         statusbar: false, // 底部的状态栏
         menubar: '', // （1级菜单）最上方的菜单
-        branding: false, // （隐藏右下角技术支持）水印“Powered by TinyMCE”
+        branding: false // （隐藏右下角技术支持）水印“Powered by TinyMCE”
         // 此处为图片上传处理函数，这个直接用了base64的图片形式上传图片，
         // 如需ajax上传可参考https://www.tiny.cloud/docs/configure/file-image-upload/#images_upload_handler
         /* images_upload_handler: (blobInfo, success, failure) => {
@@ -105,11 +95,8 @@ export default {
           success(img)
         }, */
       },
-      myValue: this.value,
+      myValue: this.value
     }
-  },
-  mounted() {
-    tinymce.init({})
   },
   watch: {
     value(newValue) {
@@ -117,13 +104,16 @@ export default {
     },
     myValue(newValue) {
       this.$emit('input', newValue)
-    },
+    }
+  },
+  mounted() {
+    tinymce.init({})
   },
   methods: {
     editorListener($event) {
       this.$emit('editorListener', this.id, $event)
-    },
-  },
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>

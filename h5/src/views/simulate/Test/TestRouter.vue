@@ -2,11 +2,10 @@
   <div class="content-left">
     <div class="user-info">
       <el-avatar
-        :size="64"
         v-if="$store.getters.userAvatar"
+        :size="64"
         :src="`/api/file/download?id=${Number($store.getters.userAvatar)}`"
-        ><i class="common common-wo"></i
-      ></el-avatar>
+      ><i class="common common-wo" /></el-avatar>
       <div class="user-name">
         {{ $store.getters.name || '***' }}&nbsp;/&nbsp;{{
           $store.getters.orgName || '***'
@@ -18,15 +17,14 @@
       <div class="router-content" style="margin-top: 10px">
         <div class="router-link">
           <a
+            v-for="(item, index) in questionIds"
+            :key="item.id"
             :class="[
               'router-index',
               routerIndex === item ? 'router-active' : '',
             ]"
-            v-for="(item, index) in questionIds"
-            :key="item.id"
             @click="$emit('toHref', item)"
-            >{{ index + 1 }}</a
-          >
+          >{{ index + 1 }}</a>
         </div>
       </div>
     </el-scrollbar>
@@ -38,16 +36,16 @@ export default {
   props: {
     questionIds: {
       type: Array,
-      default: () => [],
+      default: () => []
     },
     routerIndex: {
       type: [String, Number],
-      default: '',
-    },
+      default: ''
+    }
   },
   data() {
     return {}
-  },
+  }
 }
 </script>
 

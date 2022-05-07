@@ -1,15 +1,15 @@
 <template>
   <el-row class="container">
     <template v-if="examUserList.length > 0">
-      <el-col :span="6" v-for="item in examUserList" :key="item.userId">
+      <el-col v-for="item in examUserList" :key="item.userId" :span="6">
         <div :class="['line-user', item.online ? 'line' : '']">
-          <i class="common common-onLine"></i>
+          <i class="common common-onLine" />
           <span class="line-name">{{ item.userName }}</span>
           <span class="line-time">{{ item.onlineTime }}</span>
         </div>
       </el-col>
     </template>
-    <el-empty v-else description="暂无在线用户"> </el-empty>
+    <el-empty v-else description="暂无在线用户" />
   </el-row>
 </template>
 
@@ -21,17 +21,21 @@ export default {
     return {
       id: null,
       timeLine: null,
-      examUserList: [],
+      examUserList: []
     }
   },
   async mounted() {
     this.id = this.$route.params.id
     if (Number(this.id)) {
       const {
-        data: { state },
+        data: { state }
       } = await examGet({ id: this.id })
       this.onLine({ id: this.id, state })
     }
+  },
+  beforeDestroy() {
+    clearInterval(this.timeLine)
+    this.timeLine = null
   },
   methods: {
     async onLine({ id, state }) {
@@ -42,16 +46,12 @@ export default {
 
       const resList = await onlineUser({ id })
       resList?.code === 200 && (this.examUserList = resList.data.list)
-      this.timeLine = setInterval(async () => {
+      this.timeLine = setInterval(async() => {
         const timeUserList = await onlineUser({ id })
         resList?.code === 200 && (this.examUserList = timeUserList.data.list)
       }, 30 * 1000)
-    },
-  },
-  beforeDestroy() {
-    clearInterval(this.timeLine)
-    this.timeLine = null
-  },
+    }
+  }
 }
 </script>
 

@@ -1,12 +1,3 @@
-/*
- * @Description: store getters
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-08-11 11:33:30
- * @LastEditors: Che
- * @LastEditTime: 2022-01-13 10:54:11
- */
 const getters = {
   name: (state) => state.user.name,
   token: (state) => state.user.token,
@@ -15,6 +6,6 @@ const getters = {
   onlyRole: (state) => state.user.onlyRole,
   orgName: (state) => state.user.orgName,
   userAvatar: (state) => state.user.userAvatar,
-  permission_routes: (state) => state.permission.routes,
+  permission_routes: (state) => state.permission.routes
 }
 export default getters

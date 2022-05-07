@@ -1,17 +1,6 @@
-<!--
- * @Description: 
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2022-01-10 13:18:52
- * @LastEditors: Che
- * @LastEditTime: 2022-01-10 13:39:30
--->
 <template>
-  <div class="container">
-    <div class="form-footer">
-      <el-button @click="startTask" type="primary">启动</el-button>
-    </div>
+  <div class="form-footer">
+    <el-button type="primary" @click="startTask">启动</el-button>
   </div>
 </template>
 
@@ -21,7 +10,7 @@ import { cronStartTask } from 'api/base'
 export default {
   data() {
     return {
-      id: null,
+      id: null
     }
   },
   mounted() {
@@ -31,14 +20,14 @@ export default {
     // 启动任务
     async startTask() {
       const res = await cronStartTask({ id: this.id })
-      if (res?.code != 200) {
+      if (res?.code !== 200) {
         this.$message.error(res.msg)
         return
       }
 
       this.$message.success('启动成功')
-    },
-  },
+    }
+  }
 }
 </script>
 

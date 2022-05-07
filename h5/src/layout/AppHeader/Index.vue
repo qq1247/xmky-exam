@@ -1,8 +1,8 @@
 <template>
   <div class="header">
     <div class="header-container">
-      <Nav></Nav>
-      <Info></Info>
+      <Nav />
+      <Info />
     </div>
   </div>
 </template>
@@ -14,11 +14,11 @@ export default {
   name: 'Header',
   components: {
     Nav,
-    Info,
+    Info
   },
   data() {
     return {}
-  },
+  }
 }
 </script>
 

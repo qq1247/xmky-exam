@@ -52,7 +52,7 @@ const formateTime = (time) => {
   return {
     hours,
     minutes,
-    seconds,
+    seconds
   }
 }
 
@@ -82,20 +82,20 @@ const intToChinese = (value) => {
     '十',
     '百',
     '千',
-    '亿',
+    '亿'
   ]
   const num = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九']
   return str.replace(/([1-9]|0+)/g, ($, $1, idx, full) => {
     let pos = 0
     if ($1[0] !== '0') {
       pos = len - idx
-      if (idx == 0 && $1[0] == 1 && digits[len - idx] == '十') {
+      if (idx === 0 && $1[0] === 1 && digits[len - idx] === '十') {
         return digits[len - idx]
       }
       return num[$1[0]] + digits[len - idx]
     } else {
-      let left = len - idx
-      let right = len - idx + $1.length
+      const left = len - idx
+      const right = len - idx + $1.length
       if (Math.floor(right / 4) - Math.floor(left / 4) > 0) {
         pos = left - (left % 4)
       }
@@ -142,5 +142,5 @@ export {
   formateTime,
   intToChinese,
   getQueryParam,
-  computeMinute,
+  computeMinute
 }

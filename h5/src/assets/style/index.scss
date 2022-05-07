@@ -3,6 +3,13 @@
 @import './transition.scss';
 @import './element-ui.scss';
 
+@font-face {
+  font-family: 'PingFang SC';
+  src: url('../font/PingFangSC.ttf'); //你的资源目录
+  font-weight: normal;
+  font-style: normal;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -10,8 +17,8 @@
 html,
 body {
   height: 100%;
-  font: 14px/1.5 Open Sans, -apple-system, BlinkMacSystemFont, Helvetica Neue,
-    Helvetica, Segoe UI, Arial, Roboto, PingFang SC, miui, Hiragino Sans GB,
+  font: 14px/1.5 PingFang SC, Open Sans, -apple-system, BlinkMacSystemFont,
+    Helvetica Neue, Helvetica, Segoe UI, Arial, Roboto, miui, Hiragino Sans GB,
     Microsoft Yahei, sans-serif;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;

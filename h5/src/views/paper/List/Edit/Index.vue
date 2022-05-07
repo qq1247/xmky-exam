@@ -1,7 +1,7 @@
 <template>
   <div class="container">
-    <RulePaper v-if="genType === 1"></RulePaper>
-    <RandomPaper v-if="genType === 2"></RandomPaper>
+    <RulePaper v-if="genType === 1" />
+    <RandomPaper v-if="genType === 2" />
   </div>
 </template>
 <script>
@@ -10,16 +10,16 @@ import RandomPaper from './RandomPaper.vue'
 export default {
   components: {
     RulePaper,
-    RandomPaper,
+    RandomPaper
   },
   data() {
     return {
-      genType: 0,
+      genType: 0
     }
   },
   async created() {
     this.genType = Number(this.$route.params.genType)
-  },
+  }
 }
 </script>
 

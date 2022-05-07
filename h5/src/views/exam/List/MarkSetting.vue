@@ -1,23 +1,22 @@
 <template>
   <el-card style="width: 1200px; margin: 0 auto" shadow="never">
-    <el-form :model="examForm" ref="userForm" label-width="100px">
-      <el-form-item label="阅卷方式" v-if="examForm.paperMarkType === 2">
+    <el-form ref="userForm" :model="examForm" label-width="100px">
+      <el-form-item v-if="examForm.paperMarkType === 2" label="阅卷方式">
         <el-radio
           v-for="(item, index) in examForm.examRadios"
           :key="item.value"
           v-model="examForm.examRadio"
           :label="item.value"
           :disabled="index === 0"
-          @change="selectPaperType"
           prop="examRadio"
-          >{{ item.name }}</el-radio
-        >
+          @change="selectPaperType"
+        >{{ item.name }}</el-radio>
       </el-form-item>
       <el-row v-for="(item, index) in examForm.examRemarks" :key="item.id">
         <el-col :span="12">
           <el-form-item
+            v-if="examForm.examRadio === 1"
             label="考试用户"
-            v-if="examForm.examRadio == 1"
             :prop="`examRemarks.${index}.examUser`"
             :rules="[
               {
@@ -42,11 +41,11 @@
               "
             >
               <el-option
-                v-for="item in examForm.examUsers"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-              ></el-option>
+                v-for="user in examForm.examUsers"
+                :key="user.id"
+                :label="user.name"
+                :value="user.id"
+              />
             </CustomSelect>
           </el-form-item>
         </el-col>
@@ -76,17 +75,17 @@
               "
             >
               <el-option
-                v-for="item in examForm.examUsers"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-              ></el-option>
+                v-for="markUser in examForm.examUsers"
+                :key="markUser.id"
+                :label="markUser.name"
+                :value="markUser.id"
+              />
             </CustomSelect>
           </el-form-item>
         </el-col>
 
         <el-col :span="12">
-          <el-form-item label="题号" v-if="examForm.examRadio == 0">
+          <el-form-item v-if="examForm.examRadio === 0" label="题号">
             <CustomSelect
               placeholder="请选择题号"
               :value="examForm.examRemarks[index].examQuestionNum"
@@ -97,31 +96,29 @@
               @currentChange="getMoreQuestionNum"
             >
               <el-option
-                v-for="item in examForm.examQuestionNums"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-              ></el-option>
+                v-for="num in examForm.examQuestionNums"
+                :key="num.id"
+                :label="num.name"
+                :value="num.id"
+              />
             </CustomSelect>
           </el-form-item>
         </el-col>
       </el-row>
-      <div class="remark-buttons" v-if="examForm.paperMarkType === 2">
+      <div v-if="examForm.paperMarkType === 2" class="remark-buttons">
         <el-form-item>
           <el-button
-            @click="remarkAdd"
             type="primary"
             size="mini"
             icon="el-icon-plus"
-            >添加</el-button
-          >
+            @click="remarkAdd"
+          >添加</el-button>
           <el-button
             v-if="examForm.examRemarks.length > 1"
-            @click="remarkDel"
             size="mini"
             icon="el-icon-minus"
-            >删除</el-button
-          >
+            @click="remarkDel"
+          >删除</el-button>
         </el-form-item>
       </div>
       <el-form-item>
@@ -139,7 +136,7 @@ import CustomSelect from 'components/CustomSelect.vue'
 
 export default {
   components: {
-    CustomSelect,
+    CustomSelect
   },
   data() {
     return {
@@ -155,28 +152,28 @@ export default {
         examRadios: [
           {
             name: '按题阅卷',
-            value: 0,
+            value: 0
           },
           {
             name: '按人阅卷',
-            value: 1,
-          },
+            value: 1
+          }
         ],
         examQuestionNums: [],
         examRemarks: [],
         examUser: [],
         examUsers: [],
-        examUserList: [],
-      },
+        examUserList: []
+      }
     }
   },
   async mounted() {
     this.id = this.$route.params.id
     if (Number(this.id)) {
       const {
-        data: { paperId, endTime, paperMarkType, state },
+        data: { paperId, paperMarkType, state }
       } = await examGet({
-        id: this.id,
+        id: this.id
       })
       this.state = state
       this.examForm.paperId = paperId
@@ -190,7 +187,7 @@ export default {
         this.examForm.examRemarks.push({
           examCheckPerson: '',
           examQuestionNum: [],
-          examUser: [],
+          examUser: []
         })
       }
 
@@ -201,7 +198,7 @@ export default {
             this.examForm.examRemarks.push({
               examCheckPerson: item.markUserId,
               examUser: item.examUserList.map((user) => user.id),
-              examQuestionNum: [],
+              examQuestionNum: []
             })
           })
         }
@@ -212,7 +209,7 @@ export default {
               currentLabel: cur.name,
               currentValue: cur.id,
               label: cur.name,
-              value: cur.id,
+              value: cur.id
             })
             return acc
           }, [])
@@ -229,7 +226,7 @@ export default {
               currentLabel: item.markUserName,
               currentValue: item.markUserId,
               label: item.markUserName,
-              value: item.markUserId,
+              value: item.markUserId
             })
         })
       })
@@ -241,7 +238,7 @@ export default {
       this.examForm.examRemarks.push({
         examCheckPerson: '',
         examQuestionNum: [],
-        examUser: [],
+        examUser: []
       })
     },
     // 删除评语
@@ -254,7 +251,7 @@ export default {
     },
     // 获取用户
     async getUserList(type = 1, curPage = 1, name = '') {
-      let params = { name, curPage, pageSize: this.examForm.pageSize }
+      const params = { name, curPage, pageSize: this.examForm.pageSize }
       const examUsers = await userListPage(
         type === 1 ? params : { type: 2, ...params }
       )
@@ -290,8 +287,9 @@ export default {
         if (index !== indexMark) {
           this.examForm.examRemarks[index].examUser.map((user) => {
             const indexUser = item.examUser.indexOf(user)
-            if (indexUser !== -1)
+            if (indexUser !== -1) {
               this.examForm.examRemarks[indexMark].examUser.splice(indexUser, 1)
+            }
           })
         }
       })
@@ -302,7 +300,7 @@ export default {
       const params = {
         paperId: this.examForm.paperId,
         curPage,
-        pageSize: this.examForm.pageSize,
+        pageSize: this.examForm.pageSize
       }
       !id ? params : (params.id = Number(id))
       const questionNumList = await questionListPage(params)
@@ -323,7 +321,7 @@ export default {
     },
     // 编辑阅卷
     editExamRead() {
-      this.$refs['userForm'].validate(async (valid) => {
+      this.$refs['userForm'].validate(async(valid) => {
         if (!valid) {
           return
         }
@@ -334,7 +332,7 @@ export default {
           return acc
         }, [])
 
-        if (this.examForm.examRadio == 0) {
+        if (this.examForm.examRadio === 0) {
           dynamic = this.examForm.examRemarks.reduce((acc, cur) => {
             acc.push(cur.examQuestionNum.join(','))
             return acc
@@ -348,23 +346,23 @@ export default {
 
         const params = {
           id: this.id,
-          markUserIds,
+          markUserIds
         }
 
-        this.examForm.examRadio == 0
+        this.examForm.examRadio === 0
           ? (params.questionIds = dynamic)
           : (params.examUserIds = dynamic)
 
         const res = await examUpdateMarkSet(params)
 
-        if (res?.code == 200) {
+        if (res?.code === 200) {
           this.$message.success('设置成功！')
           this.$router.back()
         } else {
           this.$message.error('设置失败！')
         }
       })
-    },
-  },
+    }
+  }
 }
 </script>

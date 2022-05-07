@@ -2,79 +2,72 @@
   <div>
     <!-- 搜索 -->
     <el-form
+      id="question_driver_query"
       :inline="true"
       :model="queryForm"
       class="form-inline"
-      id="question_driver_query"
     >
       <el-row type="flex" justify="space-between">
         <el-col :span="22">
           <el-form-item label>
-            <el-input
-              placeholder="请输入编号"
-              v-model="queryForm.id"
-            ></el-input>
+            <el-input v-model="queryForm.id" placeholder="请输入编号" />
           </el-form-item>
           <el-form-item label>
-            <el-input
-              placeholder="请输入题干"
-              v-model="queryForm.title"
-            ></el-input>
+            <el-input v-model="queryForm.title" placeholder="请输入题干" />
           </el-form-item>
           <el-form-item label>
             <el-select
+              v-model="queryForm.type"
               clearable
               placeholder="请选择类型"
-              v-model="queryForm.type"
             >
               <el-option
+                v-for="dict in queryForm.typeList"
                 :key="parseInt(dict.dictKey)"
                 :label="dict.dictValue"
                 :value="parseInt(dict.dictKey)"
-                v-for="dict in queryForm.typeList"
-              ></el-option>
+              />
             </el-select>
           </el-form-item>
           <el-form-item label>
             <el-select
+              v-model="queryForm.difficulty"
               clearable
               placeholder="请选择难度"
-              v-model="queryForm.difficulty"
             >
               <el-option
+                v-for="dict in queryForm.difficultyList"
                 :key="parseInt(dict.dictKey)"
                 :label="dict.dictValue"
                 :value="parseInt(dict.dictKey)"
-                v-for="dict in queryForm.difficultyList"
-              ></el-option>
+              />
             </el-select>
           </el-form-item>
           <el-form-item label>
             <el-select
+              v-model="queryForm.state"
               clearable
               placeholder="请选择状态"
-              v-model="queryForm.state"
             >
               <el-option
+                v-for="state in queryForm.stateList"
                 :key="parseInt(state.key)"
                 :label="state.value"
                 :value="parseInt(state.key)"
-                v-for="state in queryForm.stateList"
-              ></el-option>
+              />
             </el-select>
           </el-form-item>
           <el-form-item label>
-            <el-input
-              placeholder="分值等于"
-              v-model="queryForm.score"
-            ></el-input>
+            <el-input v-model="queryForm.score" placeholder="分值等于" />
           </el-form-item>
         </el-col>
         <el-col :span="2">
           <el-form-item>
-            <el-button @click="search" icon="el-icon-search" type="primary"
-              >查询</el-button
-            >
+            <el-button
+              icon="el-icon-search"
+              type="primary"
+              @click="search"
+            >查询</el-button>
           </el-form-item>
         </el-col>
       </el-row>
@@ -87,7 +80,7 @@
           ref="questionType"
           @updateType="updateType"
           @showTemplate="showTemplate"
-        ></QuestionType>
+        />
       </el-scrollbar>
       <el-scrollbar wrap-style="overflow-x:hidden;" class="content-center">
         <template v-if="questionTemplate">
@@ -96,22 +89,22 @@
           </div>
           <QuestionTemplate
             ref="questionTemplate"
-            :questionTypeId="questionTypeId"
+            :question-type-id="questionTypeId"
             @showTemplate="showTemplate"
-          ></QuestionTemplate>
+          />
         </template>
         <QuestionList
           v-else
+          :id="questionId"
           ref="questionList"
           :list="list"
-          :id="questionId"
           @del="del"
           @copy="copy"
           @publish="publish"
           @pageChange="pageChange"
           @showDetails="showDetails"
           @questionEdit="questionEdit"
-        ></QuestionList>
+        />
       </el-scrollbar>
       <el-scrollbar wrap-style="overflow-x:hidden;" class="content-right">
         <!-- 试题参数详情 -->
@@ -119,7 +112,7 @@
           v-show="detailStatus"
           :data="questionDetail"
           :comment="false"
-        ></QuestionDetail>
+        />
 
         <!-- 编辑试题 -->
         <div v-show="!detailStatus">
@@ -128,12 +121,12 @@
             key="editModule"
             ref="editModule"
             style="padding-top: 50px"
-            :questionId="questionId"
-            :questionType="questionType"
-            :questionTypeId="questionTypeId"
+            :question-id="questionId"
+            :question-type="questionType"
+            :question-type-id="questionTypeId"
             @add="add"
             @edit="edit"
-          ></EditModule>
+          />
         </div>
       </el-scrollbar>
     </div>
@@ -148,7 +141,7 @@ import {
   questionCopy,
   questionDel,
   questionEdit,
-  questionPublish,
+  questionPublish
 } from 'api/question'
 import QuestionType from '@/components/EditQuestion/QuestionType.vue'
 import QuestionList from '@/components/EditQuestion/QuestionList.vue'
@@ -161,13 +154,13 @@ export default {
     QuestionList,
     EditModule,
     QuestionDetail,
-    QuestionTemplate,
+    QuestionTemplate
   },
   data() {
     return {
       questionTypeId: null, // 试题分类id
-      questionId: null, //试题id
-      questionType: 1, //试题类型
+      questionId: null, // 试题id
+      questionType: 1, // 试题类型
       detailStatus: false,
       questionDetail: {},
       questionTemplate: false,
@@ -175,8 +168,8 @@ export default {
         // 列表数据
         total: 0, // 总条数
         curPage: 1, // 当前第几页
-        pageSize: 6, // 每页多少条
-        questionList: [], // 列表数据
+        pageSize: 5, // 每页多少条
+        questionList: [] // 列表数据
       },
       queryForm: {
         id: '', // 主键
@@ -185,26 +178,26 @@ export default {
         title: '', // 标题
         type: null, // 类型
         difficulty: null, // 难度
-        state: '', //状态
+        state: '', // 状态
         score: '', // 得分等于
         questionTypeName: '', // 试题分类name
         difficultyList: [], // 难度列表
         stateList: [
           {
             key: '0',
-            value: '回收站',
+            value: '回收站'
           },
           {
             key: '1',
-            value: '发布',
+            value: '发布'
           },
           {
             key: '2',
-            value: '草稿',
-          },
-        ], //状态列表
-        typeList: [], // 类型列表
-      },
+            value: '草稿'
+          }
+        ], // 状态列表
+        typeList: [] // 类型列表
+      }
     }
   },
   created() {
@@ -217,7 +210,7 @@ export default {
     // 查询
     async query() {
       const {
-        data: { list, total },
+        data: { list, total }
       } = await questionListPage({
         id: this.queryForm.id,
         type: this.queryForm.type,
@@ -228,7 +221,7 @@ export default {
         questionTypeId: this.questionTypeId,
         questionTypeName: this.queryForm.questionTypeName,
         curPage: this.list.curPage,
-        pageSize: this.list.pageSize,
+        pageSize: this.list.pageSize
       })
       this.list.total = total
       this.list.questionList = list
@@ -276,7 +269,7 @@ export default {
     async showDetails(id) {
       this.detailStatus = true
       const res = await questionGet({ id })
-      if (res?.code != 200) {
+      if (res?.code !== 200) {
         this.$message.error('获取详情失败！请重试')
         this.questionDetail = {}
         return
@@ -293,7 +286,7 @@ export default {
     },
     // 复制试题
     async copy(id) {
-      if (this.queryForm.edit == 'false') {
+      if (this.queryForm.edit === 'false') {
         this.$message.warning('暂无此项权限！')
         return
       }
@@ -302,7 +295,7 @@ export default {
     },
     // 删除试题
     del(id) {
-      if (this.queryForm.edit == 'false') {
+      if (this.queryForm.edit === 'false') {
         this.$message.warning('暂无此项权限！')
         return
       }
@@ -313,26 +306,26 @@ export default {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning',
-          dangerouslyUseHTMLString: true,
+          dangerouslyUseHTMLString: true
         }
-      ).then(async () => {
+      ).then(async() => {
         const res = await questionDel({ ids: [`${id}`] })
         this.resetQuery(res, '删除')
       })
     },
     // 发布试题
     async publish(id, state) {
-      if (this.queryForm.edit == 'false') {
+      if (this.queryForm.edit === 'false') {
         this.$message.warning('暂无此项权限！')
         return false
       }
 
-      if (state == 1) {
+      if (state === 1) {
         this.$message.warning('试题已经发布！')
         return
       }
       const res = await questionPublish({
-        ids: [`${id}`],
+        ids: [`${id}`]
       })
       this.resetQuery(res, '发布试题')
     },
@@ -352,8 +345,8 @@ export default {
       } else {
         this.$message.error(res.msg || `${msg}失败！`)
       }
-    },
-  },
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>
@@ -387,6 +380,7 @@ export default {
   background: #fff;
   border-left: 1px solid rgba(0, 0, 0, 0.1);
   border-right: 1px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 40px;
 }
 
 .content-right {

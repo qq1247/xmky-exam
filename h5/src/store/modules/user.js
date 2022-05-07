@@ -1,12 +1,3 @@
-/*
- * @Description:
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-08-11 11:33:30
- * @LastEditors: Che
- * @LastEditTime: 2022-01-13 10:54:30
- */
 import { login, loginOrgName } from 'api/common'
 import {
   getInfo,
@@ -139,7 +130,6 @@ const actions = {
     const token = role + '-token'
 
     commit('SET_TOKEN', token)
-    setToken(token)
 
     const { roles } = await dispatch('getInfo')
 

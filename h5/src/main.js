@@ -1,12 +1,3 @@
-/*
- * @Description: exam
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-07-27 17:31:01
- * @LastEditors: Che
- * @LastEditTime: 2022-01-13 10:46:03
- */
 import Vue from 'vue'
 
 import 'normalize.css/normalize.css'

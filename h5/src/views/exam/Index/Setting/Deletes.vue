@@ -1,14 +1,5 @@
-<!--
- * @Description: 删除
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-12-21 10:11:03
- * @LastEditors: Che
- * @LastEditTime: 2022-01-05 11:09:06
--->
 <template>
-  <el-button @click="del" type="danger">删除</el-button>
+  <el-button type="danger" @click="del">删除</el-button>
 </template>
 
 <script>
@@ -17,7 +8,7 @@ import { examTypeDel } from 'api/exam'
 export default {
   data() {
     return {
-      id: null,
+      id: null
     }
   },
   mounted() {
@@ -29,11 +20,11 @@ export default {
       this.$confirm(`确认删除吗？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
-        .then(async () => {
+        .then(async() => {
           const res = await examTypeDel({ id: this.id })
-          if (res?.code == 200) {
+          if (res?.code === 200) {
             this.$message.success('删除成功！')
             this.$router.back()
           } else {
@@ -43,7 +34,7 @@ export default {
         .catch((err) => {
           console.log(err)
         })
-    },
-  },
+    }
+  }
 }
 </script>

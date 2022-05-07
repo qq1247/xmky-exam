@@ -7,18 +7,18 @@
         <div
           class="type-item"
           :class="!preview ? 'edit-active' : ''"
-          @click="setType(false)"
           title="编辑模式"
+          @click="setType(false)"
         >
-          <img src="@/assets/img/question/question-edit.png" alt="" />
+          <img src="@/assets/img/question/question-edit.png" alt="">
         </div>
         <div
           class="type-item"
           :class="preview ? 'view-active' : ''"
-          @click="setType(true)"
           title="预览模式"
+          @click="setType(true)"
         >
-          <img src="@/assets/img/question/question-view.png" alt="" />
+          <img src="@/assets/img/question/question-view.png" alt="">
         </div>
       </div>
     </div>
@@ -30,30 +30,27 @@ export default {
   props: {
     paperName: {
       type: String,
-      default: '',
-    },
+      default: ''
+    }
   },
   data() {
     return {
-      preview: false,
+      preview: false
     }
   },
   methods: {
     setType(e) {
       this.preview = e
-      this.$parent.preview = e
-      if (this.$parent.tabIndex === '3') {
-        this.$parent.$refs.questionRouter.routerIndex = ''
-      }
-    },
-  },
+      this.$parent.$parent.preview = e
+    }
+  }
 }
 </script>
 
 <style lang="scss" scoped>
 .top {
   background: #fff;
-  width: calc(100% - 838px);
+  width: calc(1200px - 500px);
   height: 40px;
   color: #333;
   position: fixed;

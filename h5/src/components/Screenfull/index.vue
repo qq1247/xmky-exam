@@ -6,7 +6,7 @@
         isFullscreen ? 'common-fullscreen-exit' : 'common-fullscreen',
       ]"
       @click="click"
-    ></i>
+    />
   </div>
 </template>
 
@@ -17,7 +17,7 @@ export default {
   name: 'Screenfull',
   data() {
     return {
-      isFullscreen: false,
+      isFullscreen: false
     }
   },
   mounted() {
@@ -31,7 +31,7 @@ export default {
       if (!screenfull.enabled) {
         this.$message({
           message: 'you browser can not work',
-          type: 'warning',
+          type: 'warning'
         })
         return false
       }
@@ -49,8 +49,8 @@ export default {
       if (screenfull.enabled) {
         screenfull.off('change', this.change)
       }
-    },
-  },
+    }
+  }
 }
 </script>
 

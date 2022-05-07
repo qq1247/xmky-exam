@@ -1,36 +1,19 @@
-<!--
- * @Description: 设置
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-12-16 16:01:13
- * @LastEditors: Che
- * @LastEditTime: 2022-01-05 15:50:34
--->
 <template>
-  <div class="container">
-    <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
-      <el-form-item label="名称" label-width="120px" prop="name">
-        <el-input placeholder="请输入名称" v-model="editForm.name"></el-input>
-      </el-form-item>
-      <el-form-item label="实现类" label-width="120px" prop="jobClass">
-        <el-input
-          placeholder="请输入实现类"
-          v-model="editForm.jobClass"
-        ></el-input>
-      </el-form-item>
-      <el-form-item label="cron表达式" label-width="120px" prop="cron">
-        <el-input
-          placeholder="请输入cron表达式"
-          v-model="editForm.cron"
-        ></el-input>
-      </el-form-item>
-    </el-form>
-    <div class="form-footer">
-      <el-button @click="add" type="primary" v-if="!id">添加</el-button>
-      <el-button @click="edit" type="primary" v-if="id">修改</el-button>
-    </div>
-  </div>
+  <el-form ref="editForm" :model="editForm" :rules="editForm.rules">
+    <el-form-item label="名称" label-width="120px" prop="name">
+      <el-input v-model="editForm.name" placeholder="请输入名称" />
+    </el-form-item>
+    <el-form-item label="实现类" label-width="120px" prop="jobClass">
+      <el-input v-model="editForm.jobClass" placeholder="请输入实现类" />
+    </el-form-item>
+    <el-form-item label="cron表达式" label-width="120px" prop="cron">
+      <el-input v-model="editForm.cron" placeholder="请输入cron表达式" />
+    </el-form-item>
+    <el-form-item>
+      <el-button v-if="!id" type="primary" @click="add">添加</el-button>
+      <el-button v-if="id" type="primary" @click="edit">修改</el-button>
+    </el-form-item>
+  </el-form>
 </template>
 
 <script>
@@ -51,11 +34,11 @@ export default {
           // 校验
           name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
           jobClass: [
-            { required: true, message: '请输入实现类', trigger: 'blur' },
+            { required: true, message: '请输入实现类', trigger: 'blur' }
           ],
-          cron: [{ required: true, message: '请输入表达式', trigger: 'blur' }],
-        },
-      },
+          cron: [{ required: true, message: '请输入表达式', trigger: 'blur' }]
+        }
+      }
     }
   },
   async mounted() {
@@ -72,16 +55,16 @@ export default {
   },
   methods: {
     add() {
-      this.$refs['editForm'].validate(async (valid) => {
+      this.$refs['editForm'].validate(async(valid) => {
         if (!valid) {
           return false
         }
         const { code, msg } = await cronAdd({
           name: this.editForm.name,
           jobClass: this.editForm.jobClass,
-          cron: this.editForm.cron,
+          cron: this.editForm.cron
         })
-        if (code != 200) {
+        if (code !== 200) {
           this.$message.error(msg)
           return
         }
@@ -90,7 +73,7 @@ export default {
       })
     },
     edit() {
-      this.$refs['editForm'].validate(async (valid) => {
+      this.$refs['editForm'].validate(async(valid) => {
         if (!valid) {
           return false
         }
@@ -99,17 +82,17 @@ export default {
           id: this.id,
           name: this.editForm.name,
           jobClass: this.editForm.jobClass,
-          cron: this.editForm.cron,
+          cron: this.editForm.cron
         })
-        if (code != 200) {
+        if (code !== 200) {
           this.$message.error(msg)
           return
         }
 
         this.$router.back()
       })
-    },
-  },
+    }
+  }
 }
 </script>
 

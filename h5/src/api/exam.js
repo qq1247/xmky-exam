@@ -1,12 +1,3 @@
-/*
- * @Description: 考试API
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-08-11 16:28:25
- * @LastEditors: Che
- * @LastEditTime: 2022-01-13 11:12:00
- */
 import request from './request'
 
 /**

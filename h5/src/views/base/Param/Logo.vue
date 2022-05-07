@@ -1,32 +1,23 @@
-<!--
- * @Description: 
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-11-12 11:00:07
- * @LastEditors: Che
- * @LastEditTime: 2022-01-13 14:52:46
--->
 <template>
-  <el-form :model="paramForm" label-width="100px" ref="paramForm">
+  <el-form ref="paramForm" :model="paramForm" label-width="100px">
     <el-form-item label="单位名称" prop="orgName">
       <el-input
-        placeholder="请输入单位名称"
         v-model="paramForm.orgName"
-      ></el-input>
+        placeholder="请输入单位名称"
+      />
     </el-form-item>
     <el-form-item label="单位商标" prop="orgLogo">
       <Upload
         ref="logoUpload"
         type="image"
         :files="paramForm.orgLogo"
+        size="1"
         @success="logoSuccess"
         @remove="logoRemove"
-        size="1"
       />
     </el-form-item>
     <el-form-item>
-      <el-button @click="setting" type="primary">设置</el-button>
+      <el-button type="primary" @click="setting">设置</el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -41,8 +32,8 @@ export default {
     return {
       paramForm: {
         orgLogo: [],
-        orgName: '',
-      },
+        orgName: ''
+      }
     }
   },
   created() {
@@ -54,12 +45,12 @@ export default {
       const { data } = await parmGet()
       this.paramForm.orgName = data.orgName
       this.paramForm.orgLogo.push({
-        url: `/api/file/download?id=${Number(data.orgLogo)}`,
+        url: `/api/file/download?id=${Number(data.orgLogo)}`
       })
     },
     // 设置
     setting() {
-      this.$refs['paramForm'].validate(async (valid) => {
+      this.$refs['paramForm'].validate(async(valid) => {
         if (!valid) {
           return false
         }
@@ -71,7 +62,7 @@ export default {
                 ? this.paramForm.orgLogo[0].response.data.fileIds
                 : this.$tools.getQueryParam(this.paramForm.orgLogo[0].url, 'id')
               : null,
-          orgName: this.paramForm.orgName,
+          orgName: this.paramForm.orgName
         }
 
         const { code, msg } = await parmLogo(params)
@@ -79,13 +70,13 @@ export default {
         if (code === 200) {
           this.$message({
             message: '设置成功',
-            duration: 1000,
+            duration: 1000
           })
           this.$store.dispatch('setting/changeSetting', {
             key: 'orgName',
-            value: this.paramForm.orgName,
+            value: this.paramForm.orgName
           })
-          let loginInfo = getSetting()
+          const loginInfo = getSetting()
           loginInfo.orgName = this.paramForm.orgName
           setSetting(loginInfo)
         } else {
@@ -107,7 +98,7 @@ export default {
     // 删除logo
     logoRemove(file, fileList) {
       this.paramForm.orgLogo = fileList
-    },
-  },
+    }
+  }
 }
 </script>

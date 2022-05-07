@@ -2,26 +2,26 @@
   <div class="content">
     <div class="paper-handler">
       <el-scrollbar wrap-style="overflow-x:hidden;" style="height: 100%">
-        <Nav @tab="(e) => (tabIndex = e)"></Nav>
-        <QuestionDrag v-if="tabIndex === '1'" ref="questionDrag"></QuestionDrag>
-        <QuestionAdd v-if="tabIndex === '2'"></QuestionAdd>
-        <QuestionTemplate v-if="tabIndex === '3'"></QuestionTemplate>
+        <Nav @tab="(e) => (tabIndex = e)" />
+        <QuestionDrag v-if="tabIndex === '1'" ref="questionDrag" />
+        <QuestionAdd v-if="tabIndex === '2'" />
+        <QuestionTemplate v-if="tabIndex === '3'" />
         <QuestionRouter
           v-if="tabIndex === '4'"
           ref="questionRouter"
-        ></QuestionRouter>
+        />
       </el-scrollbar>
     </div>
 
-    <div class="paper-content">
-      <Header ref="paperHeader" :paperName="paperName"></Header>
+    <el-scrollbar wrap-style="overflow-x:hidden;" class="paper-content">
+      <Header ref="paperHeader" :paper-name="paperName" />
       <Composition
         v-if="!preview"
-        :paperState="paperState"
         ref="paperComposition"
-      ></Composition>
-      <Preview v-if="preview" ref="paperPreview"></Preview>
-    </div>
+        :paper-state="paperState"
+      />
+      <Preview v-if="preview" ref="paperPreview" />
+    </el-scrollbar>
   </div>
 </template>
 <script>
@@ -44,7 +44,7 @@ export default {
     QuestionAdd,
     QuestionDrag,
     QuestionRouter,
-    QuestionTemplate,
+    QuestionTemplate
   },
   data() {
     return {
@@ -54,7 +54,7 @@ export default {
       paperState: 2,
       paperTypeId: 0,
       markType: 1,
-      paperName: '',
+      paperName: ''
     }
   },
   async created() {
@@ -65,7 +65,7 @@ export default {
       this.paperState = res.data.state
       this.markType = res.data.markType
     }
-  },
+  }
 }
 </script>
 
@@ -91,6 +91,5 @@ export default {
   width: calc(100% - 490px);
   margin-left: 10px;
   border-radius: 8px;
-  overflow: scroll;
 }
 </style>

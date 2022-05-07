@@ -1,15 +1,5 @@
-<!--
- * @Description: 权限
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-12-16 16:05:04
- * @LastEditors: Che
- * @LastEditTime: 2022-01-05 10:03:18
--->
-
 <template>
-  <el-form :model="roleForm" ref="roleForm" label-width="100px">
+  <el-form ref="roleForm" :model="roleForm" label-width="100px">
     <el-form-item label="操作用户" prop="writeRoleUser">
       <CustomSelect
         ref="writeSelect"
@@ -26,11 +16,11 @@
           :key="item.id"
           :label="item.name"
           :value="item.id"
-        ></el-option>
+        />
       </CustomSelect>
     </el-form-item>
     <el-form-item>
-      <el-button @click="editRoleUsers" type="primary">编辑</el-button>
+      <el-button type="primary" @click="editRoleUsers">编辑</el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -42,7 +32,7 @@ import CustomSelect from 'components/CustomSelect.vue'
 
 export default {
   components: {
-    CustomSelect,
+    CustomSelect
   },
   data() {
     return {
@@ -50,8 +40,8 @@ export default {
       userList: [],
       roleForm: {
         total: 0,
-        writeRoleUser: [],
-      },
+        writeRoleUser: []
+      }
     }
   },
   async mounted() {
@@ -75,19 +65,19 @@ export default {
         name,
         curPage,
         type: 2,
-        pageSize: 5,
+        pageSize: 5
       })
 
-      if (this.$store.getters.userId == 1) {
+      if (this.$store.getters.userId === 1) {
         userList.data.list.unshift({
           id: 1,
-          name: '管理员',
+          name: '管理员'
         })
       }
 
       this.userList = userList.data.list
       this.roleForm.total =
-        this.$store.getters.userId == 1
+        this.$store.getters.userId === 1
           ? userList.data.total + 1
           : userList.data.total
     },
@@ -116,7 +106,7 @@ export default {
             currentLabel: names[index],
             currentValue: cur,
             label: names[index],
-            value: cur,
+            value: cur
           })
           return acc
         },
@@ -128,15 +118,15 @@ export default {
     async editRoleUsers() {
       const res = await questionTypeAuth({
         id: this.id,
-        writeUserIds: this.roleForm.writeRoleUser.join(','),
+        writeUserIds: this.roleForm.writeRoleUser.join(',')
       })
-      if (res?.code == 200) {
+      if (res?.code === 200) {
         this.$message.success('权限编辑成功！')
         this.$router.back()
       } else {
         this.$message.error('权限编辑失败！')
       }
-    },
-  },
+    }
+  }
 }
 </script>

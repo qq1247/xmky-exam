@@ -1,12 +1,3 @@
-<!--
- * @Description: 业务卡片
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-10-13 14:52:40
- * @LastEditors: Che
- * @LastEditTime: 2022-01-13 10:49:25
--->
 <template>
   <div class="exam-item">
     <div class="exam-content">
@@ -25,47 +16,47 @@
         </div>
       </template>
       <!-- 使用权限 -->
-      <div class="content-info ellipsis" v-if="name == 'paper'">
+      <div v-if="name === 'paper'" class="content-info ellipsis">
         <span>共享权限：{{ data.readUserNames.join(',') || '暂无' }}</span>
       </div>
 
       <div class="handler">
         <!-- 修改 -->
         <span data-title="修改" @click="edit(data)">
-          <i class="common common-edit"></i>
+          <i class="common common-edit" />
         </span>
         <!-- 删除 -->
         <span data-title="删除" @click="del(data)">
-          <i class="common common-delete"></i>
+          <i class="common common-delete" />
         </span>
         <!-- 操作权限 -->
         <span
+          v-if="['question'].includes(name)"
           data-title="操作权限"
           @click="role(data)"
-          v-if="['question'].includes(name)"
         >
-          <i class="common common-role"></i>
+          <i class="common common-role" />
         </span>
         <!-- 共享权限 -->
         <span
+          v-if="['paper'].includes(name)"
           data-title="共享权限"
           @click="role(data)"
-          v-if="['paper'].includes(name)"
         >
-          <i class="common common-role"></i>
+          <i class="common common-role" />
         </span>
-        <template v-if="name == 'question'">
+        <template v-if="name === 'question'">
           <!-- 移动 -->
           <span data-title="移动" @click="move(data)">
-            <i class="common common-move"></i>
+            <i class="common common-move" />
           </span>
           <!-- 开放 -->
           <span data-title="模拟练习" @click="open(data)">
-            <i class="common common-share"></i>
+            <i class="common common-share" />
           </span>
           <!-- 统计 -->
           <span data-title="试题统计" @click="statistics(data)">
-            <i class="common common-statistics"></i>
+            <i class="common common-statistics" />
           </span>
         </template>
         <!-- 详情 | 列表 -->
@@ -74,7 +65,7 @@
           :data-title="detailTitles[name]"
           @click="detail(data)"
         >
-          <i class="common common-list-row"></i>
+          <i class="common common-list-row" />
         </span>
       </div>
     </div>
@@ -86,20 +77,20 @@ export default {
   props: {
     data: {
       type: Object,
-      default: () => {},
+      default: () => {}
     },
     name: {
       type: String,
-      default: '',
-    },
+      default: ''
+    }
   },
   data() {
     return {
       detailTitles: {
         question: '试题列表',
         paper: '试卷列表',
-        exam: '考试列表',
-      },
+        exam: '考试列表'
+      }
     }
   },
   methods: {
@@ -107,7 +98,7 @@ export default {
     isRole(data) {
       // 是否是创建者
       const isCreateUser =
-        data.createUserId && this.$store.getters.userId != data.createUserId
+        data.createUserId && this.$store.getters.userId !== data.createUserId
       // 是否是分类
       const isParentClassify = ['question', 'paper', 'exam'].includes(this.name)
 
@@ -152,8 +143,8 @@ export default {
     },
     statistics(data) {
       this.$emit('statistics', data)
-    },
-  },
+    }
+  }
 }
 </script>
 vue

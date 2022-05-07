@@ -1,14 +1,5 @@
-<!--
- * @Description:
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-09-10 10:14:03
- * @LastEditors: Che
- * @LastEditTime: 2022-01-18 10:03:23
--->
 <template>
-  <div class="detail-more" v-if="Object.keys(data).length">
+  <div v-if="Object.keys(data).length" class="detail-more">
     <!-- 类型，难度，其他选项，智能，分数 -->
     <div class="detail-tags">
       <el-tag class="center-tag-danger" size="mini" type="danger">{{
@@ -23,25 +14,25 @@
         ['', '智能', '非智能'][data.ai]
       }}</el-tag>
 
-      <el-tag effect="plain" size="mini" type="danger"
-        >{{ data.score }}分</el-tag
-      >
-
       <el-tag
-        :type="data.state == 1 ? 'info' : 'danger'"
         effect="plain"
         size="mini"
-        >{{ data.state == 1 ? '发布' : '草稿' }}</el-tag
-      >
+        type="danger"
+      >{{ data.score }}分</el-tag>
+
+      <el-tag
+        :type="data.state === 1 ? 'info' : 'danger'"
+        effect="plain"
+        size="mini"
+      >{{ data.state === 1 ? '发布' : '草稿' }}</el-tag>
 
       <template v-if="data.aiOptions">
         <el-tag
-          size="small"
-          type="info"
           v-for="item in data.aiOptions"
           :key="item"
-          >{{ getValue(item) }}</el-tag
-        >
+          size="small"
+          type="info"
+        >{{ getValue(item) }}</el-tag>
       </template>
     </div>
     <!-- 答案 -->
@@ -49,7 +40,7 @@
       <template v-if="[1, 4].includes(data.type)">
         <el-col :span="1.5">【答案】</el-col>
         <el-col :span="20">
-          <div v-html="`${data.answers[0].answer}`"></div>
+          <div v-html="`${data.answers[0].answer}`" />
         </el-col>
       </template>
 
@@ -92,14 +83,13 @@
             >
               <span>{{ `关键词${$tools.intToChinese(index + 1)}、` }}</span>
               <span
+                v-for="(ans, indexAnswer) in answer.answer"
+                :key="indexAnswer"
                 class="answers-tag"
-                v-for="(ans, index) in answer.answer"
-                :key="index"
-                >{{ ans }}</span
-              >
+              >{{ ans }}</span>
             </div>
           </template>
-          <div v-if="data.ai === 2" v-html="`${data.answers[0].answer}`"></div>
+          <div v-if="data.ai === 2" v-html="`${data.answers[0].answer}`" />
         </el-col>
       </template>
     </el-row>
@@ -107,7 +97,7 @@
     <el-row :gutter="10">
       <el-col :span="1.5"> 【解析】</el-col>
       <el-col :span="20">
-        <div v-html="`${data.analysis}`"></div>
+        <div v-html="`${data.analysis}`" />
       </el-col>
     </el-row>
   </div>
@@ -116,32 +106,6 @@
 <script>
 import { getOneDict } from '@/utils/getDict'
 export default {
-  props: {
-    data: {
-      type: Object,
-      default: () => {},
-    },
-  },
-  data() {
-    return {
-      otherOptions: [
-        {
-          dictKey: '1',
-          dictValue: '漏选得分',
-        },
-        {
-          dictKey: '2',
-          dictValue: '答案无顺序',
-        },
-        {
-          dictKey: '3',
-          dictValue: '大小写不敏感',
-        },
-      ],
-      typeList: [],
-      difficultyList: [],
-    }
-  },
   filters: {
     type(data) {
       return getOneDict('QUESTION_TYPE').find(
@@ -152,7 +116,33 @@ export default {
       return getOneDict('QUESTION_DIFFICULTY').find(
         (item) => Number(item.dictKey) === data
       ).dictValue
-    },
+    }
+  },
+  props: {
+    data: {
+      type: Object,
+      default: () => {}
+    }
+  },
+  data() {
+    return {
+      otherOptions: [
+        {
+          dictKey: '1',
+          dictValue: '漏选得分'
+        },
+        {
+          dictKey: '2',
+          dictValue: '答案无顺序'
+        },
+        {
+          dictKey: '3',
+          dictValue: '大小写不敏感'
+        }
+      ],
+      typeList: [],
+      difficultyList: []
+    }
   },
   created() {
     this.typeList = getOneDict('QUESTION_TYPE')
@@ -164,8 +154,8 @@ export default {
         (item) => Number(item.dictKey) === Number(type)
       )
       return value.dictValue
-    },
-  },
+    }
+  }
 }
 </script>
 

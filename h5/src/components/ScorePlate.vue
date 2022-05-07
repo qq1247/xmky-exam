@@ -8,32 +8,33 @@
         <div class="step-content">
           <div class="step-body">
             <span
-              :class="[
-                'step-item',
-                selectHalfScore == index ? 'select-step' : '',
-              ]"
               v-for="(item, index) in halfScores"
               :key="item"
+              :class="[
+                'step-item',
+                selectHalfScore === index ? 'select-step' : '',
+              ]"
               @click="halfScoreHandler(index)"
-              >{{ item }}</span
-            >
+            >{{ item }}</span>
           </div>
           <div class="step-body">
             <span
-              :class="['step-item', selectScore == index ? 'select-step' : '']"
               v-for="(item, index) in scores"
               :key="item"
+              :class="['step-item', selectScore === index ? 'select-step' : '']"
               @click="scoreHandler(index)"
-              >{{ item }}</span
-            >
+            >{{ item }}</span>
           </div>
         </div>
       </div>
       <!-- 上下一题，上下一卷，结束阅卷操作 -->
       <div class="plate-footer">
         <div class="footer-left">
-          <el-switch v-model="markType" active-text="自动" inactive-text="人工">
-          </el-switch>
+          <el-switch
+            v-model="markType"
+            active-text="自动"
+            inactive-text="人工"
+          />
         </div>
         <div class="footer-right">
           <div v-if="markType">
@@ -41,17 +42,16 @@
               v-model="isNextQuestion"
               active-text="下一题"
               inactive-text="同题"
-            >
-            </el-switch>
+            />
           </div>
           <div v-else>
             <el-button type="primary" size="small" @click="nextQuestion">
               下一题
-              <i class="el-icon-arrow-right el-icon--right"></i>
+              <i class="el-icon-arrow-right el-icon--right" />
             </el-button>
             <el-button type="primary" size="small" @click="nextPaper">
               下一卷
-              <i class="el-icon-d-arrow-right el-icon--right"></i>
+              <i class="el-icon-d-arrow-right el-icon--right" />
             </el-button>
           </div>
         </div>
@@ -65,12 +65,22 @@ export default {
   props: {
     data: {
       type: Object,
-      default: {},
+      default: () => {}
     },
     score: {
       type: Number,
-      default: null,
-    },
+      default: null
+    }
+  },
+  data() {
+    return {
+      scores: [],
+      halfScores: [],
+      selectScore: null,
+      selectHalfScore: null,
+      markType: true,
+      isNextQuestion: true
+    }
   },
   watch: {
     score: {
@@ -87,17 +97,7 @@ export default {
             this.halfScores.push(0.5 + index)
           }
         }
-      },
-    },
-  },
-  data() {
-    return {
-      scores: [],
-      halfScores: [],
-      selectScore: null,
-      selectHalfScore: null,
-      markType: true,
-      isNextQuestion: true,
+      }
     }
   },
   methods: {
@@ -116,8 +116,8 @@ export default {
     },
     nextPaper() {
       this.$emit('nextPaper')
-    },
-  },
+    }
+  }
 }
 </script>
 

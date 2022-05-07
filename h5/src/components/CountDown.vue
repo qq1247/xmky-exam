@@ -7,23 +7,17 @@ export default {
   props: {
     time: {
       type: [Number, String],
-      default: 0,
+      default: 0
     },
     autoStart: {
       type: Boolean,
-      default: true,
-    },
+      default: true
+    }
   },
   data() {
     return {
-      remain: 0,
+      remain: 0
     }
-  },
-  watch: {
-    time: {
-      immediate: true,
-      handler: 'reset',
-    },
   },
   computed: {
     timeData() {
@@ -32,7 +26,13 @@ export default {
 
     formattedTime() {
       return this.parseFormat(this.timeData)
-    },
+    }
+  },
+  watch: {
+    time: {
+      immediate: true,
+      handler: 'reset'
+    }
   },
   beforeDestroy() {
     this.pause()
@@ -105,7 +105,7 @@ export default {
         hours,
         minutes,
         seconds,
-        milliseconds,
+        milliseconds
       }
     },
     parseFormat(timeData) {
@@ -118,8 +118,8 @@ export default {
       } else {
         return `${hours}:${minutes}:${seconds}`
       }
-    },
-  },
+    }
+  }
 }
 </script>
 

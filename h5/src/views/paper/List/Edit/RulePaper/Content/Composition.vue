@@ -1,248 +1,234 @@
 <template>
-  <div class="center-drag">
+  <div class="content-center center-drag">
     <Draggable
-      tag="div"
-      v-model="paperQuestion"
-      group="paperParent"
-      chosenClass="drag-question-active"
-      animation="300"
       v-if="paperQuestion.length"
+      v-model="paperQuestion"
+      tag="div"
+      group="paperParent"
+      chosen-class="drag-question-active"
+      animation="300"
       @update="chapterMove"
     >
       <div
-        class="drag-item drag-content drag-parent"
         v-for="(item, index) in paperQuestion"
         :key="index"
+        class="drag-item"
       >
         <div class="chapter">
-          <div class="chapter-item">
+          <div class="chapter-name">
             <el-input
-              class="chapter-name"
-              placeholder="请输入章节名称（最多16个字符）"
               v-model="item.chapter.name"
+              class="chapter-name-input"
+              placeholder="请输入章节名称（最多16个字符）"
               maxlength="16"
               @blur="
                 (e) =>
                   editorListener('chapterName', e.target.value, item.chapter)
               "
-            ></el-input>
-            <!-- <div class="item-title">{{ item.chapter.name }}</div> -->
-            <div class="chapter-handler">
-              <el-button
-                @click="chapterDel(item.chapter)"
-                class="btn"
-                icon="common common-delete"
-                round
-                size="mini"
-                >删除</el-button
-              >
-              <el-button
-                @click="chapterClear(item.chapter, index)"
-                class="btn"
-                icon="common common-clear"
-                round
-                size="mini"
-                >清空试题</el-button
-              >
-              <el-button
-                @click="batchSetting(item.chapter, index)"
-                class="btn"
-                icon="common common-setting"
-                round
-                size="mini"
-                >批量设置</el-button
-              >
-              <el-button
-                @click="chapterFold(index)"
-                class="btn"
-                icon="common common-fold"
-                round
-                size="mini"
-                >折叠</el-button
-              >
+            />
+            <div>
+              <el-tooltip content="删除" effect="dark" placement="top">
+                <el-button
+                  icon="common common-delete"
+                  size="mini"
+                  circle
+                  @click="chapterDel(item.chapter)"
+                />
+              </el-tooltip>
+              <el-tooltip content="清空试题" effect="dark" placement="top">
+                <el-button
+                  icon="common common-clear"
+                  size="mini"
+                  circle
+                  @click="chapterClear(item.chapter, index)"
+                />
+              </el-tooltip>
+              <el-tooltip content="批量设置" effect="dark" placement="top">
+                <el-button
+                  icon="common common-setting"
+                  size="mini"
+                  circle
+                  @click="batchSetting(item.chapter, index)"
+                />
+              </el-tooltip>
+              <el-tooltip content="折叠" effect="dark" placement="top">
+                <el-button
+                  icon="common common-fold"
+                  size="mini"
+                  circle
+                  @click="chapterFold(index)"
+                />
+              </el-tooltip>
             </div>
           </div>
           <TinymceEditor
+            id="chapterDesc"
             class="chapter-description"
             placeholder="请输入章节描述"
             :value="item.chapter.description"
             @editorListener="
               (id, value) => editorListener(id, value, item.chapter)
             "
-            id="chapterDesc"
-          ></TinymceEditor>
+          />
         </div>
 
         <Draggable
-          tag="div"
           v-if="item.chapter.show"
-          :class="[
-            'drag-content',
-            item.questionList.length != 0 ? 'drag-children' : '',
-          ]"
           v-model="item.questionList"
+          tag="div"
           group="paper"
-          chosenClass="drag-question-active"
+          chosen-class="drag-question-active"
           animation="300"
           :data-id="item.chapter.id"
           @end="questionMove"
         >
           <template v-if="item.questionList.length > 0">
             <div
-              class="children-content"
-              v-for="(child, index) in item.questionList"
-              :key="child.id"
-              :id="`p-${child.id}`"
+              v-for="(question, indexQuestion) in item.questionList"
+              :id="`p-${question.id}`"
+              :key="question.id"
+              class="question-content"
             >
-              <div class="item-title">
-                <span>{{ index + 1 }}、</span>
-                <div v-html="`${child.title}`"></div>
+              <div class="question-title">
+                <span>{{ indexQuestion + 1 }}、</span>
+                <div v-html="`${question.title}`" />
               </div>
               <!-- 单选 -->
-              <template v-if="child.type === 1">
-                <el-radio-group class="children-option" v-model="child.answers">
+              <template v-if="question.type === 1">
+                <el-radio-group
+                  v-model="question.answers"
+                  class="children-option"
+                >
                   <el-radio
+                    v-for="(option, indexOption) in question.options"
+                    :key="indexOption"
                     class="option-item"
                     disabled
-                    :key="index"
                     :label="String.fromCharCode(65 + index)"
-                    v-for="(option, index) in child.options"
                   >
                     <div
                       class="flex-items-center"
                       v-html="`${String.fromCharCode(65 + index)}、${option}`"
-                    ></div>
+                    />
                   </el-radio>
                 </el-radio-group>
               </template>
 
               <!-- 多选 -->
-              <template v-if="child.type === 2">
+              <template v-if="question.type === 2">
                 <el-checkbox-group
+                  v-model="question.answers"
                   class="children-option"
-                  v-model="child.answers"
                 >
                   <el-checkbox
+                    v-for="(option, indexOption) in question.options"
+                    :key="indexOption"
                     class="option-item"
                     disabled
-                    :key="index"
                     :label="String.fromCharCode(65 + index)"
-                    v-for="(option, index) in child.options"
                   >
                     <div
                       class="flex-items-center"
                       v-html="`${String.fromCharCode(65 + index)}、${option}`"
-                    ></div>
+                    />
                   </el-checkbox>
                 </el-checkbox-group>
               </template>
 
-              <!-- 填空 -->
-              <!-- <template v-if="child.type === 3">
-                      <div
-                        class="option-item-text"
-                        :key="index"
-                        v-for="(option, index) in child.answers"
-                      ></div>
-                    </template> -->
-
               <!-- 判断 -->
-              <template v-if="child.type === 4">
-                <el-radio-group class="children-option" v-model="child.answer">
+              <template v-if="question.type === 4">
+                <el-radio-group
+                  v-model="question.answer"
+                  class="children-option"
+                >
                   <el-radio
+                    v-for="(option, indexOption) in ['对', '错']"
+                    :key="indexOption"
                     class="option-item"
                     disabled
-                    :key="index"
                     :label="option"
-                    v-for="(option, index) in ['对', '错']"
-                    >{{ option }}</el-radio
-                  >
+                  >{{ option }}</el-radio>
                 </el-radio-group>
               </template>
 
-              <!-- 问答 -->
-              <!-- <template v-if="child.type === 5">
-                      <div class="option-item-text">{{ child.answer }}</div>
-                    </template> -->
-
-              <div class="children-analysis">
+              <!-- 解析 -->
+              <div v-if="question.analysisShow" class="children-analysis">
                 <el-row :gutter="10">
-                  <template v-if="[1, 4].includes(child.type)">
+                  <template v-if="[1, 4].includes(question.type)">
                     <el-col :span="2.5"> 【答案】： </el-col>
                     <el-col :span="21">
                       <div
-                        v-if="child.answers && child.answers.length > 0"
-                        v-html="`${child.answers[0].answer}`"
-                      ></div>
+                        v-if="question.answers && question.answers.length > 0"
+                        v-html="`${question.answers[0].answer}`"
+                      />
                     </el-col>
                   </template>
-                  <template v-if="child.type === 2">
+                  <template v-if="question.type === 2">
                     <el-col :span="2.5"> 【答案】： </el-col>
                     <el-col :span="21">
-                      <div v-if="child.answers && child.answers.length > 0">
+                      <div
+                        v-if="question.answers && question.answers.length > 0"
+                      >
                         <span
-                          v-for="answer in child.answers"
+                          v-for="answer in question.answers"
                           :key="answer.id"
-                          >{{ answer.answer.join('，') }}</span
-                        >
+                        >{{ answer.answer.join('，') }}</span>
                       </div>
                     </el-col>
                   </template>
-                  <template v-if="child.type === 3">
+                  <template v-if="question.type === 3">
                     <el-col :span="2.5">【答案】：</el-col>
                     <el-col :span="21">
                       <div
-                        v-for="(answer, index) in child.answers"
+                        v-for="(answer, indexAnswer) in question.answers"
                         :key="answer.id"
                         class="answers-item"
                       >
                         <span>{{
-                          `填空${$tools.intToChinese(index + 1)}、`
+                          `填空${$tools.intToChinese(indexAnswer + 1)}、`
                         }}</span>
                         <span
+                          v-for="(ans, indexAns) in answer.answer"
+                          :key="indexAns"
                           class="answers-tag"
-                          v-for="(ans, index) in answer.answer"
-                          :key="index"
-                          >{{ ans }}</span
-                        >
+                        >{{ ans }}</span>
                       </div>
                     </el-col>
                   </template>
-                  <template v-if="child.type === 5">
+                  <template v-if="question.type === 5">
                     <el-col :span="2.5"> 【答案】： </el-col>
                     <el-col :span="21">
-                      <template v-if="child.ai === 1">
+                      <template v-if="question.ai === 1">
                         <div
-                          v-for="(answer, index) in child.answers"
+                          v-for="(answer, indexAnswer) in question.answers"
                           :key="answer.id"
                           class="answers-item"
                         >
                           <span>{{
-                            `关键词${$tools.intToChinese(index + 1)}、`
+                            `关键词${$tools.intToChinese(indexAnswer + 1)}、`
                           }}</span>
                           <span
+                            v-for="(ans, indexAns) in answer.answer"
+                            :key="indexAns"
                             class="answers-tag"
-                            v-for="(ans, index) in answer.answer"
-                            :key="index"
-                            >{{ ans }}</span
-                          >
+                          >{{ ans }}</span>
                         </div>
                       </template>
                       <div
                         v-if="
-                          child.ai === 2 &&
-                          child.answers &&
-                          child.answers.length > 0
+                          question.ai === 2 &&
+                            question.answers &&
+                            question.answers.length > 0
                         "
-                        v-html="`${child.answers[0].answer}`"
-                      ></div>
+                        v-html="`${question.answers[0].answer}`"
+                      />
                     </el-col>
                   </template>
                 </el-row>
                 <el-row :gutter="10">
                   <el-col :span="2.5"> 【解析】： </el-col>
                   <el-col :span="21">
-                    <div v-html="`${child.analysis}`"></div>
+                    <div v-html="`${question.analysis}`" />
                   </el-col>
                 </el-row>
               </div>
@@ -250,51 +236,58 @@
               <div class="children-footer">
                 <div class="children-tags">
                   <el-tag effect="dark" size="mini" type="warning">
-                    {{ child.type | typeName }}
+                    {{ question.type | typeName }}
                   </el-tag>
                   <el-tag effect="plain" size="mini" type="danger">
-                    {{ child.difficulty | difficultyName }}
+                    {{ question.difficulty | difficultyName }}
                   </el-tag>
-                  <el-tag effect="plain" size="mini" type="warning"
-                    >{{ child.score }}分</el-tag
-                  >
+                  <el-tag
+                    effect="plain"
+                    size="mini"
+                    type="warning"
+                  >{{ question.score }}分</el-tag>
                 </div>
-                <div class="children-buts">
+                <div>
                   <el-button
-                    @click="setting(child)"
+                    class="btn"
+                    icon="el-icon-view"
+                    round
+                    size="mini"
+                    @click="question.analysisShow = !question.analysisShow"
+                  >查看解析</el-button>
+                  <el-button
                     class="btn"
                     icon="el-icon-setting"
                     round
                     size="mini"
-                    >设置</el-button
-                  >
+                    @click="setting(child)"
+                  >设置</el-button>
                   <el-button
-                    @click="del(child.id)"
                     class="btn"
                     icon="el-icon-delete"
                     round
                     size="mini"
-                    >删除</el-button
-                  >
+                    @click="del(question.id)"
+                  >删除</el-button>
                 </div>
               </div>
             </div>
           </template>
           <el-empty v-else description="拖拽题目到此处">
             <template slot="image">
-              <i class="common common-drag" style="font-size: 35px"></i>
+              <i class="common common-drag" style="font-size: 35px" />
             </template>
           </el-empty>
         </Draggable>
       </div>
     </Draggable>
 
-    <div class="add-chapter" @click="paperChapterAdd" v-if="paperState === 2">
-      <i class="common common-click"></i>
+    <div v-if="paperState === 2" class="add-chapter" @click="paperChapterAdd">
+      <i class="common common-click" />
       <span>点击添加章节</span>
     </div>
 
-    <el-empty v-if="!paperQuestion.length" description="暂无试卷"> </el-empty>
+    <el-empty v-if="!paperQuestion.length" description="暂无试卷" />
 
     <el-dialog
       :visible.sync="settingForm.show"
@@ -305,33 +298,33 @@
       @close="resetData('settingForm')"
     >
       <el-form
+        ref="settingForm"
         :model="settingForm"
         :rules="settingForm.rules"
-        ref="settingForm"
         label-width="70px"
       >
         <el-form-item label="分值" prop="score">
           <el-input-number
+            v-model.number="settingForm.score"
             :max="100"
             :min="1"
             :step="1"
             controls-position="right"
-            v-model.number="settingForm.score"
             mini
-          ></el-input-number>
+          />
         </el-form-item>
 
         <template v-if="settingForm.ai === 1">
           <template v-if="settingForm.type === 3 || settingForm.type === 5">
             <el-form-item
-              v-for="(answer, index) in settingForm.answers"
-              :key="index"
+              v-for="(answer, indexAnswer) in settingForm.answers"
+              :key="indexAnswer"
               :label="
                 settingForm.type === 3
-                  ? `填空${$tools.intToChinese(index + 1)}`
-                  : `关键词${$tools.intToChinese(index + 1)}`
+                  ? `填空${$tools.intToChinese(indexAnswer + 1)}`
+                  : `关键词${$tools.intToChinese(indexAnswer + 1)}`
               "
-              :prop="`answers.${index}.score`"
+              :prop="`answers.${indexAnswer}.score`"
               :rules="settingForm.rules.aiScore"
               :show-message="settingForm.ai === 1 ? true : false"
             >
@@ -343,13 +336,11 @@
         </template>
 
         <template v-if="settingForm.ai === 1">
-          <div class="setting-checkbox" v-if="settingForm.type === 2">
+          <div v-if="settingForm.type === 2" class="setting-checkbox">
             漏选得<el-input
               v-if="settingForm.ai === 1"
               v-model="settingForm.multipScore"
-            >
-            </el-input
-            >分
+            />分
             <!-- <el-form-item
               prop="multipScore"
               class="ai-score"
@@ -391,8 +382,8 @@
           </el-form-item>
         </template>
       </el-form>
-      <div class="dialog-footer" slot="footer">
-        <el-button @click="setScore" type="primary">设置</el-button>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="setScore">设置</el-button>
         <el-button @click="settingForm.show = false">取消</el-button>
       </div>
     </el-dialog>
@@ -406,19 +397,19 @@
       @close="resetData('batchForm')"
     >
       <el-form
+        ref="batchForm"
         :model="batchForm"
         :rules="batchForm.rules"
-        ref="batchForm"
         label-width="80px"
       >
         <el-form-item label="每题得分" prop="score">
           <el-input-number
+            v-model.number="batchForm.score"
             :max="100"
             :min="1"
             :step="1"
             controls-position="right"
-            v-model.number="batchForm.score"
-          ></el-input-number>
+          />
         </el-form-item>
         <el-form-item label="选项设置">
           <el-checkbox-group v-model="batchForm.aiOptions">
@@ -449,21 +440,21 @@
           </el-checkbox-group>
         </el-form-item>
         <el-form-item
+          v-if="batchForm.aiOptions.includes(1)"
           label="漏选得分"
           prop="multipScore"
-          v-if="batchForm.aiOptions.includes(1)"
         >
           <el-input-number
+            v-model.number="batchForm.multipScore"
             :max="100"
             :min="1"
             :step="1"
             controls-position="right"
-            v-model.number="batchForm.multipScore"
-          ></el-input-number>
+          />
         </el-form-item>
       </el-form>
-      <div class="dialog-footer" slot="footer">
-        <el-button @click="setBatchScore" type="primary">设置</el-button>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="setBatchScore">设置</el-button>
         <el-button @click="batchForm.show = false">取消</el-button>
       </div>
     </el-dialog>
@@ -484,17 +475,29 @@ import {
   paperScoreUpdate,
   paperChapterMove,
   paperQuestionMove,
-  paperUpdateBatchScore,
+  paperUpdateBatchScore
 } from 'api/paper'
 import TinymceEditor from 'components/TinymceEditor/Index.vue'
 import Draggable from 'vuedraggable'
 export default {
   components: { TinymceEditor, Draggable },
+  filters: {
+    typeName(data) {
+      return getOneDict('QUESTION_TYPE').find(
+        (item) => Number(item.dictKey) === data
+      ).dictValue
+    },
+    difficultyName(data) {
+      return getOneDict('QUESTION_DIFFICULTY').find(
+        (item) => Number(item.dictKey) === data
+      ).dictValue
+    }
+  },
   props: {
     paperState: {
       type: Number,
-      default: 2,
-    },
+      default: 2
+    }
   },
   data() {
     const validateAiScore = (rule, value, callback) => {
@@ -538,9 +541,9 @@ export default {
         description: '章节描述',
         rules: {
           name: [
-            { required: true, message: '请输入章节名称', trigger: 'blur' },
-          ],
-        },
+            { required: true, message: '请输入章节名称', trigger: 'blur' }
+          ]
+        }
       },
       settingForm: {
         show: false,
@@ -553,8 +556,8 @@ export default {
         rules: {
           score: [{ required: true, message: '请输入分值', trigger: 'change' }],
           aiScore: [{ validator: validateAiScore }],
-          multipScore: [{ validator: validateMultipScore }],
-        },
+          multipScore: [{ validator: validateMultipScore }]
+        }
       },
       batchForm: {
         show: false,
@@ -564,23 +567,11 @@ export default {
         multipScore: '',
         rules: {
           score: [
-            { required: true, message: '请设置每题得分', trigger: 'change' },
-          ],
-        },
-      },
+            { required: true, message: '请设置每题得分', trigger: 'change' }
+          ]
+        }
+      }
     }
-  },
-  filters: {
-    typeName(data) {
-      return getOneDict('QUESTION_TYPE').find(
-        (item) => Number(item.dictKey) === data
-      ).dictValue
-    },
-    difficultyName(data) {
-      return getOneDict('QUESTION_DIFFICULTY').find(
-        (item) => Number(item.dictKey) === data
-      ).dictValue
-    },
   },
   async created() {
     this.paperId = this.$route.params.id || getQuick().id
@@ -594,10 +585,13 @@ export default {
     async query() {
       try {
         const res = await paperQuestionList({
-          id: this.paperId,
+          id: this.paperId
         })
         res.data.map((item) => {
           item.chapter.show = true
+          item.questionList.map((question) => {
+            question.analysisShow = false
+          })
         })
         this.paperQuestion = [...res.data]
       } catch (error) {
@@ -610,12 +604,12 @@ export default {
         name: this.chapterForm.name,
         description: this.chapterForm.description,
         paperId: this.paperId,
-        type: 1,
+        type: 1
       })
       this.refreshData(res, '添加章节')
     },
     // 编辑章节
-    editorListener: _.debounce(function (id, value, chapter) {
+    editorListener: _.debounce(function(id, value, chapter) {
       const chapterInfo = {}
       if (id === 'chapterName') {
         chapterInfo.name = value
@@ -626,7 +620,7 @@ export default {
       }
       paperChapterEdit({
         chapterId: chapter.id,
-        ...chapterInfo,
+        ...chapterInfo
       })
     }, 300),
     // 删除章节
@@ -634,9 +628,9 @@ export default {
       this.$confirm(`删除章节将删除章节内的试题，是否删除？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
-        .then(async () => {
+        .then(async() => {
           const res = await paperChapterDel({ chapterId: id })
           this.refreshData(res, '删除章节')
         })
@@ -656,16 +650,16 @@ export default {
     },
     // 清空试卷试题
     async chapterClear({ id }, index) {
-      if (this.paperQuestion[index].questionList.length == 0) {
+      if (this.paperQuestion[index].questionList.length === 0) {
         this.$message.warning('试题已清空，请重新添加试题！')
         return
       }
       this.$confirm(`确认清空章节下的所有试题吗？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
-        .then(async () => {
+        .then(async() => {
           const res = await paperQuestionClear({ chapterId: id })
           this.refreshData(res, '清空试题')
         })
@@ -678,9 +672,9 @@ export default {
       this.$confirm(`确认删除该试题吗？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
-        .then(async () => {
+        .then(async() => {
           const res = await paperQuestionDel({ id: this.paperId, questionId })
           this.refreshData(res, '删除试题')
         })
@@ -692,8 +686,8 @@ export default {
     refreshData(res, title) {
       res?.code === 200
         ? (this.$message(`${title}成功！`),
-          this.query(),
-          this.$parent.$refs.questionDrag.queryQuestion())
+        this.query(),
+        this.$parent.$refs.questionDrag.queryQuestion())
         : this.$message.error(`${title}失败！`)
     },
     // 设置分数
@@ -730,7 +724,7 @@ export default {
         }
       }
 
-      this.$refs['settingForm'].validate(async (valid) => {
+      this.$refs['settingForm'].validate(async(valid) => {
         if (!valid) {
           return false
         }
@@ -744,7 +738,7 @@ export default {
               ? this.settingForm.aiOptions.length === 0
                 ? []
                 : paperQuestionAnswerScore
-              : paperQuestionAnswerScore,
+              : paperQuestionAnswerScore
         }
 
         if (
@@ -771,7 +765,7 @@ export default {
         subScores: this.batchForm.aiOptions.includes(1)
           ? this.batchForm.multipScore
           : null,
-        aiOptions: this.batchForm.aiOptions,
+        aiOptions: this.batchForm.aiOptions
       })
       if (res?.code === 200) {
         this.$message.success('编辑成功！')
@@ -785,7 +779,7 @@ export default {
       const targetId = this.paperQuestion[oldIndex].chapter.id
       const res = await paperChapterMove({
         sourceId,
-        targetId,
+        targetId
       })
 
       if (res?.code === 200) {
@@ -802,7 +796,7 @@ export default {
       const res = await paperQuestionMove({
         id: this.paperId,
         sourceId,
-        targetId,
+        targetId
       })
 
       if (res?.code === 200) {
@@ -812,181 +806,45 @@ export default {
     // 筛选数据
     filterQuestion(chapterId) {
       const list = this.paperQuestion.filter(
-        (item) => item.chapter.id == chapterId
+        (item) => item.chapter.id === chapterId
       )
       return list[0].questionList
     },
     // 重置数据
     resetData(name) {
       this.$refs[name].resetFields()
-    },
-  },
+    }
+  }
 }
 </script>
 
 <style lang="scss" scoped>
-.drag-content {
-  width: 100%;
-  border: 1px solid #d8d8d8;
-  border-radius: 5px;
-}
-
-.drag-active {
-  transform: scale(0.98);
-  border: 1px solid #0094e5;
-  border-radius: 5px;
-  border-bottom: 1px solid #0094e5 !important;
-  transition: all 0.15s ease-in-out;
-}
-
+@import 'assets/style/exam.scss';
 .drag-question-active {
   border: 1px solid #0094e5 !important;
   box-shadow: 0 0 16px 2px rgba(0, 148, 229, 0.15);
   transition: all 0.15s ease-in-out;
 }
 
-.paper-content {
-  background: #fff;
-  width: calc(100% - 500px);
-  overflow: scroll;
-  .center-drag {
-    width: 100%;
-    padding: 10px;
-    padding-top: 50px;
-    .drag-item {
-      cursor: move;
-      margin-bottom: 10px;
-      border-radius: 5px;
-    }
+.center-drag {
+  width: 100%;
+  padding-top: 50px;
+  .drag-item {
+    cursor: move;
   }
-  .center-preview {
-    width: 100%;
-    padding: 50px 10px 10px;
-    .chapter {
-      line-height: 40px;
-    }
-    .drag-content {
-      border: none;
-    }
-  }
-  .chapter {
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-    .chapter-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      .chapter-name {
-        flex: 1;
-        margin-right: 20px;
-        /deep/ .el-input__inner {
-          border: 1px solid #fff;
-          padding: 0 10px;
-        }
-        /deep/ .el-input__inner:hover,
-        /deep/ .el-input__inner:focus {
-          border: 1px solid #c0c4cc;
-        }
-      }
-      /deep/.el-button {
-        opacity: 0;
-        .common {
-          font-size: 12px;
-          margin-right: 5px;
-        }
-      }
-      &:hover {
-        .el-button {
-          opacity: 1;
-        }
-      }
-    }
-  }
-  .drag-parent {
-    padding: 10px;
-  }
-  .drag-children {
-    border: none;
-  }
-  .paper-title {
+}
+
+.chapter-name-input {
+  flex: 1;
+  /deep/ .el-input__inner {
+    width: 400px;
+    border: 1px solid transparent;
     font-size: 16px;
-    color: #333;
-    padding: 20px 0 10px 10px;
-  }
-  .paper-intro {
-    font-size: 12px;
-    color: #666;
-    padding: 0 10px 15px;
-    border-bottom: 1px solid #d8d8d8;
-  }
-  .children-content {
-    border-left: 1px solid #f3f3f3;
-    border-right: 1px solid #f3f3f3;
-    font-size: 14px;
-    box-sizing: border-box;
-    &:not(:last-child) {
-      border-bottom: none;
+    font-weight: 600;
+    &:hover,
+    &:focus {
+      border-color: #c0c4cc;
     }
-    .item-title {
-      background: #e5f4fc;
-    }
-  }
-  .children-option {
-    padding: 10px 0 0 25px;
-  }
-  .option-item,
-  .flex-items-center {
-    display: flex;
-    justify-items: center;
-    line-height: 30px;
-    /deep/ .el-radio__input,
-    /deep/ .el-checkbox__input {
-      padding-top: 9px;
-    }
-  }
-  .option-item-text {
-    border-bottom: 1px solid #d8d8d8;
-    padding: 20px 10px 5px;
-    color: #333;
-    margin: 0 25px 0;
-  }
-  .children-analysis {
-    line-height: 30px;
-    padding-left: 20px;
-    margin: 15px 0;
-    font-size: 13px;
-    color: #666;
-  }
-  .answers-item {
-    width: 100%;
-    span {
-      width: 100%;
-      display: inline;
-      word-wrap: break-word;
-      word-break: normal;
-    }
-    .answers-tag {
-      background: #cdd2f6;
-      color: #fff;
-      padding: 3px 10px;
-      border-radius: 3px;
-      &:not(:last-child) {
-        margin-right: 10px;
-      }
-    }
-  }
-  .el-tag {
-    margin-right: 6px;
-  }
-  .children-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-  }
-  .btn {
-    padding: 5px 10px;
   }
 }
 
@@ -1003,36 +861,6 @@ export default {
     font-size: 25px;
     margin-right: 10px;
   }
-}
-
-.item-title {
-  font-size: 14px;
-  text-align: left;
-  line-height: 50px;
-  display: flex;
-  padding-left: 7px;
-  p {
-    margin: 0;
-    padding: 0;
-  }
-}
-
-.pagination {
-  font-weight: 400;
-  text-align: center;
-}
-
-.el-radio,
-.el-checkbox {
-  margin-right: 10px;
-}
-
-.box-card-no-border {
-  border: none;
-}
-
-/deep/ .el-card__body {
-  padding: 5px;
 }
 
 .setting-checkbox {

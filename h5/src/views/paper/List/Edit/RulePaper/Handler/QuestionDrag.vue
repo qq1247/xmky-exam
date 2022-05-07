@@ -5,32 +5,32 @@
         <el-col :span="12">
           <el-form-item>
             <el-select
+              v-model="queryForm.type"
               clearable
               placeholder="请选择类型"
-              v-model="queryForm.type"
             >
               <el-option
+                v-for="dict in queryForm.typeDictList"
                 :key="parseInt(dict.dictKey)"
                 :label="dict.dictValue"
                 :value="parseInt(dict.dictKey)"
-                v-for="dict in queryForm.typeDictList"
-              ></el-option>
+              />
             </el-select>
           </el-form-item>
         </el-col>
         <el-col :span="12">
           <el-form-item>
             <el-select
+              v-model="queryForm.difficulty"
               clearable
               placeholder="请选择难度"
-              v-model="queryForm.difficulty"
             >
               <el-option
+                v-for="dict in queryForm.difficultyDictList"
                 :key="parseInt(dict.dictKey)"
                 :label="dict.dictValue"
                 :value="parseInt(dict.dictKey)"
-                v-for="dict in queryForm.difficultyDictList"
-              ></el-option>
+              />
             </el-select>
           </el-form-item>
         </el-col>
@@ -39,17 +39,17 @@
         <el-col :span="12">
           <el-form-item>
             <el-input
-              placeholder="请查询试题分类"
               v-model="queryForm.questionTypeName"
-            ></el-input>
+              placeholder="请查询试题分类"
+            />
           </el-form-item>
         </el-col>
         <el-col :span="12">
           <el-form-item>
             <el-input
-              placeholder="请输入题干"
               v-model="queryForm.title"
-            ></el-input>
+              placeholder="请输入题干"
+            />
           </el-form-item>
         </el-col>
       </el-row>
@@ -57,26 +57,27 @@
         <el-col :span="12">
           <el-form-item>
             <el-input
-              placeholder="请输入分值"
               v-model="queryForm.score"
-            ></el-input>
+              placeholder="请输入分值"
+            />
           </el-form-item>
         </el-col>
         <el-col :span="12">
           <el-form-item>
             <el-input
-              placeholder="请输入编号"
               v-model="queryForm.id"
-            ></el-input>
+              placeholder="请输入编号"
+            />
           </el-form-item>
         </el-col>
       </el-row>
       <el-row :gutter="20">
         <el-col :span="12">
           <el-form-item>
-            <el-button type="primary" @click="randomQueryQuestion()"
-              >随机查询</el-button
-            >
+            <el-button
+              type="primary"
+              @click="randomQueryQuestion()"
+            >随机查询</el-button>
           </el-form-item>
         </el-col>
         <el-col :span="12">
@@ -88,25 +89,25 @@
     </el-form>
     <div class="drags">
       <Draggable
+        v-model="paperList"
         tag="div"
         class="drag-content"
-        v-model="paperList"
         :sort="false"
         :group="{ name: 'paper', put: false }"
-        chosenClass="drag-active"
+        chosen-class="drag-active"
         animation="300"
         @end="sourceEnd"
       >
         <transition-group>
           <div
-            class="drag-item"
             v-for="item in paperList"
-            :key="item.id"
             :id="item.id"
+            :key="item.id"
+            class="drag-item"
           >
             <div class="item-title">
               <span>{{ item.id }}、</span>
-              <div v-html="`${item.title}`"></div>
+              <div class="render-title" v-html="`${item.title}`" />
             </div>
             <el-tag effect="dark" size="mini" type="primary">
               {{ item.type | typeName }}
@@ -114,17 +115,18 @@
             <el-tag effect="plain" size="mini" type="danger">
               {{ item.difficulty | difficultyName }}
             </el-tag>
-            <el-tag effect="plain" size="mini" type="warning"
-              >{{ item.score }}分</el-tag
-            >
+            <el-tag
+              effect="plain"
+              size="mini"
+              type="warning"
+            >{{ item.score }}分</el-tag>
             <el-tag effect="plain" size="mini" type="info">
               {{ item.createUserName }}
             </el-tag>
           </div>
         </transition-group>
       </Draggable>
-      <el-empty v-if="!paperList.length" description="暂无此类型题目">
-      </el-empty>
+      <el-empty v-if="!paperList.length" description="暂无此类型题目" />
     </div>
     <el-pagination
       background
@@ -134,7 +136,7 @@
       :page-size="pageSize"
       :current-page="curPage"
       @current-change="pageChange"
-    ></el-pagination>
+    />
   </div>
 </template>
 
@@ -146,7 +148,19 @@ import { questionListPage } from 'api/question'
 import Draggable from 'vuedraggable'
 export default {
   components: {
-    Draggable,
+    Draggable
+  },
+  filters: {
+    typeName(data) {
+      return getOneDict('QUESTION_TYPE').find(
+        (item) => Number(item.dictKey) === data
+      ).dictValue
+    },
+    difficultyName(data) {
+      return getOneDict('QUESTION_DIFFICULTY').find(
+        (item) => Number(item.dictKey) === data
+      ).dictValue
+    }
   },
   data() {
     return {
@@ -164,27 +178,15 @@ export default {
         questionTypeName: '', // 试题分类name
         questionTypeId: 1, // 试题分类id
         difficultyDictList: [], // 难度列表
-        typeDictList: [], // 类型列表
-      },
+        typeDictList: [] // 类型列表
+      }
     }
-  },
-  filters: {
-    typeName(data) {
-      return getOneDict('QUESTION_TYPE').find(
-        (item) => Number(item.dictKey) === data
-      ).dictValue
-    },
-    difficultyName(data) {
-      return getOneDict('QUESTION_DIFFICULTY').find(
-        (item) => Number(item.dictKey) === data
-      ).dictValue
-    },
   },
   async created() {
     this.queryForm.typeDictList = getOneDict('QUESTION_TYPE')
     this.queryForm.difficultyDictList = getOneDict('QUESTION_DIFFICULTY')
     const res = await paperGet({
-      id: this.$route.params.id || getQuick().id,
+      id: this.$route.params.id || getQuick().id
     })
     this.markType = res.data.markType
     this.queryQuestion()
@@ -204,7 +206,7 @@ export default {
         scoreEnd: this.queryForm.score,
         exPaperId: this.$route.params.id || getQuick().id,
         curPage: this.curPage,
-        pageSize: this.pageSize,
+        pageSize: this.pageSize
       })
       res?.code === 200
         ? ((this.paperList = res.data.list), (this.total = res.data.total))
@@ -230,7 +232,7 @@ export default {
         state: 1,
         rand: 'rand',
         curPage: 1,
-        pageSize: this.pageSize,
+        pageSize: this.pageSize
       })
       res?.code === 200
         ? (this.paperList = res.data.list)
@@ -242,7 +244,7 @@ export default {
       const questionIds = Number(item.id)
       const res = await paperQuestionAdd({
         chapterId,
-        questionIds,
+        questionIds
       })
       if (res?.code !== 200) return false
       if (!this.paperList.length) {
@@ -253,8 +255,8 @@ export default {
     pageChange(val = 1) {
       this.curPage = val
       this.queryQuestion(val)
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -290,6 +292,11 @@ export default {
     line-height: 30px;
     display: flex;
     padding-left: 7px;
+    .render-title {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
     p {
       margin: 0;
       padding: 0;

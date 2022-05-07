@@ -1,12 +1,3 @@
-<!--
- * @Description: tinymce 图片上传
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-12-23 14:22:22
- * @LastEditors: Che
- * @LastEditTime: 2022-01-11 14:25:07
--->
 <template>
   <div class="upload-container">
     <el-dialog
@@ -29,7 +20,7 @@
         action="/api/file/upload"
         list-type="picture-card"
       >
-        <i slot="default" class="el-icon-plus"></i>
+        <i slot="default" class="el-icon-plus" />
       </el-upload>
       <el-image-viewer
         v-if="showViewer"
@@ -51,23 +42,23 @@ import ElImageViewer from 'element-ui/packages/image/src/image-viewer'
 export default {
   name: 'EditorImageUpload',
   components: {
-    ElImageViewer,
+    ElImageViewer
   },
   props: {
     panelShow: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
   data() {
     return {
       headers: {
-        Authorization: store.getters.token,
+        Authorization: store.getters.token
       },
       listObj: {},
       fileList: [],
       showViewer: false,
-      url: '',
+      url: ''
     }
   },
   methods: {
@@ -121,12 +112,12 @@ export default {
       return new Promise((resolve, reject) => {
         const img = new Image()
         img.src = _URL.createObjectURL(file)
-        img.onload = function () {
+        img.onload = function() {
           _self.listObj[fileName] = {
             hasSuccess: false,
             uid: file.uid,
             width: img.width,
-            height: img.height,
+            height: img.height
           }
         }
         resolve(true)
@@ -146,8 +137,8 @@ export default {
       this.listObj = {}
       this.fileList = []
       this.$emit('hidePanel', false)
-    },
-  },
+    }
+  }
 }
 </script>
 

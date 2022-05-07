@@ -1,31 +1,31 @@
 <template>
   <div class="content-center">
     <!--  -->
-    <div class="children-content" v-if="!isRecite">
+    <div v-if="!isRecite" class="question-content">
       <!-- 标题 -->
-      <div class="question-title" v-if="questionDetail.type !== 3">
+      <div v-if="questionDetail.type !== 3" class="question-title">
         <div>{{ questionDetail.id }}、</div>
-        <div v-html="`${questionDetail.title}`"></div>
+        <div v-html="`${questionDetail.title}`" />
       </div>
 
-      <div class="question-title" v-else>
+      <div v-else class="question-title">
         <span>{{ questionDetail.id }}、</span>
-        <ClozeTitle :detail="questionDetail"></ClozeTitle>
+        <ClozeTitle :detail="questionDetail" />
       </div>
 
       <!-- 单选 -->
       <el-radio-group
-        class="children-option"
         v-if="questionDetail.type === 1"
-        @change="checkAnswer"
         v-model="questionDetail.selected"
+        class="children-option"
+        @change="checkAnswer"
       >
         <el-radio
+          v-for="(option, index) in questionDetail.options"
+          :key="index"
           class="option-item"
           :disabled="questionDetail.finish ? true : false"
           :label="String.fromCharCode(65 + index)"
-          v-for="(option, index) in questionDetail.options"
-          :key="index"
         >
           <div
             :style="{
@@ -33,23 +33,23 @@
             }"
             class="flex-items-center"
             v-html="`${String.fromCharCode(65 + index)}、${option}`"
-          ></div>
+          />
         </el-radio>
       </el-radio-group>
 
       <!-- 多选 -->
       <el-checkbox-group
-        class="children-option"
         v-if="questionDetail.type === 2"
-        @change="checkAnswer"
         v-model="questionDetail.selected"
+        class="children-option"
+        @change="checkAnswer"
       >
         <el-checkbox
+          v-for="(option, index) in questionDetail.options"
           :key="index"
           class="option-item"
           :label="String.fromCharCode(65 + index)"
           :disabled="questionDetail.finish ? true : false"
-          v-for="(option, index) in questionDetail.options"
         >
           <div
             :style="{
@@ -57,110 +57,107 @@
             }"
             class="flex-items-center"
             v-html="`${String.fromCharCode(65 + index)}、${option}`"
-          ></div>
+          />
         </el-checkbox>
       </el-checkbox-group>
 
       <!-- 判断 -->
       <el-radio-group
-        class="children-option"
         v-if="questionDetail.type === 4"
-        @change="checkAnswer"
         v-model="questionDetail.selected"
+        class="children-option"
+        @change="checkAnswer"
       >
         <el-radio
+          v-for="(option, index) in ['对', '错']"
           :key="index"
           :label="option"
           class="option-item"
-          v-for="(option, index) in ['对', '错']"
           :disabled="questionDetail.finish ? true : false"
-          ><span
-            :style="{
-              color: questionDetail.finish ? optionColor(option) : '',
-            }"
-            >{{ option }}</span
-          ></el-radio
-        >
+        ><span
+          :style="{
+            color: questionDetail.finish ? optionColor(option) : '',
+          }"
+        >{{ option }}</span></el-radio>
       </el-radio-group>
 
       <!-- 问答 -->
       <template v-if="questionDetail.type === 5">
         <el-input
+          v-model="questionDetail.selected"
           :rows="2"
           type="textarea"
           class="question-text"
           placeholder="请输入内容"
-          v-model="questionDetail.selected"
-        ></el-input>
+        />
       </template>
     </div>
 
-    <div class="children-content" v-else>
+    <div v-else class="question-content">
       <!-- 标题 -->
-      <div class="question-title" v-if="questionDetail.type !== 3">
+      <div v-if="questionDetail.type !== 3" class="question-title">
         <div>{{ questionDetail.id }}、</div>
-        <div v-html="`${questionDetail.title}`"></div>
+        <div v-html="`${questionDetail.title}`" />
       </div>
 
-      <div class="question-title" v-else>
+      <div v-else class="question-title">
         <span>{{ questionDetail.id }}、</span>
-        <ClozeTitle :detail="questionDetail" recite></ClozeTitle>
+        <ClozeTitle :detail="questionDetail" recite />
       </div>
 
       <!-- 单选 -->
       <el-radio-group
-        class="children-option"
         v-if="questionDetail.type === 1"
         v-model="questionDetail.answers[0].answer"
+        class="children-option"
       >
         <el-radio
+          v-for="(option, index) in questionDetail.options"
+          :key="index"
           class="option-item"
           :disabled="isRecite"
           :label="String.fromCharCode(65 + index)"
-          v-for="(option, index) in questionDetail.options"
-          :key="index"
         >
           <div
             class="flex-items-center"
             v-html="`${String.fromCharCode(65 + index)}、${option}`"
-          ></div>
+          />
         </el-radio>
       </el-radio-group>
 
       <!-- 多选 -->
       <el-checkbox-group
-        class="children-option"
         v-if="questionDetail.type === 2"
         v-model="questionDetail.answers[0].answer"
+        class="children-option"
       >
         <el-checkbox
+          v-for="(option, index) in questionDetail.options"
           :key="index"
           class="option-item"
           :label="String.fromCharCode(65 + index)"
           :disabled="isRecite"
-          v-for="(option, index) in questionDetail.options"
         >
           <div
             class="flex-items-center"
             v-html="`${String.fromCharCode(65 + index)}、${option}`"
-          ></div>
+          />
         </el-checkbox>
       </el-checkbox-group>
 
       <!-- 判断 -->
       <el-radio-group
-        class="children-option"
         v-if="questionDetail.type === 4"
         v-model="questionDetail.answers[0].answer"
+        class="children-option"
       >
         <el-radio
+          v-for="(option, index) in ['对', '错']"
           :key="index"
           :label="option"
           class="option-item"
-          v-for="(option, index) in ['对', '错']"
           :disabled="isRecite"
-          >{{ option }}</el-radio
-        >
+        >{{ option }}</el-radio>
       </el-radio-group>
 
       <!-- 问答 -->
@@ -175,18 +172,17 @@
               `关键词${$tools.intToChinese(indexAnswers + 1)}、`
             }}</span>
             <span
-              class="answers-tag"
               v-for="(ans, indexAnswer) in answer.answer"
               :key="indexAnswer"
-              >{{ ans }}</span
-            >
+              class="answers-tag"
+            >{{ ans }}</span>
           </div>
         </template>
         <div
-          style="padding: 10px"
           v-if="questionDetail.ai === 2"
+          style="padding: 10px"
           v-html="`${questionDetail.answers[0].answer}`"
-        ></div>
+        />
       </template>
     </div>
 
@@ -198,59 +194,61 @@
             type="primary"
             icon="el-icon-arrow-left"
             @click="prevQuestion"
-            >上一题</el-button
-          >
-          <el-button size="small" type="primary" @click="nextQuestion"
-            >下一题<i class="el-icon-arrow-right el-icon--right"></i
-          ></el-button>
+          >上一题</el-button>
+          <el-button
+            size="small"
+            type="primary"
+            @click="nextQuestion"
+          >下一题<i class="el-icon-arrow-right el-icon--right" /></el-button>
         </el-button-group>
       </el-col>
-      <el-col :span="7"
-        ><el-checkbox v-model="isRecite"
-          ><div class="flex-items-center">背题模式</div>
-        </el-checkbox>
-        <el-checkbox v-model="isRandom" @change="(e) => $emit('randomTest', e)"
-          ><div class="flex-items-center">随机模拟</div></el-checkbox
-        ></el-col
-      >
-      <el-col :span="5" :offset="7"
-        ><el-button-group>
-          <el-button
-            size="small"
-            type="primary"
-            icon="el-icon-chat-line-round"
-            @click="analysisDetail = !analysisDetail"
-            >{{ analysisDetail ? '收起' : '显示' }}解析</el-button
-          >
-          <el-button
-            size="small"
-            type="primary"
-            icon="el-icon-chat-dot-round"
-            @click="showComment"
-            >{{ commentDetail ? '收起' : '显示' }}评论</el-button
-          >
-        </el-button-group></el-col
-      >
+      <el-col
+        :span="7"
+      ><el-checkbox
+         v-model="isRecite"
+       ><div class="flex-items-center">背题模式</div>
+       </el-checkbox>
+        <el-checkbox
+          v-model="isRandom"
+          @change="(e) => $emit('randomTest', e)"
+        ><div class="flex-items-center">随机模拟</div></el-checkbox></el-col>
+      <el-col
+        :span="5"
+        :offset="7"
+      ><el-button-group>
+        <el-button
+          size="small"
+          type="primary"
+          icon="el-icon-chat-line-round"
+          @click="analysisDetail = !analysisDetail"
+        >{{ analysisDetail ? '收起' : '显示' }}解析</el-button>
+        <el-button
+          size="small"
+          type="primary"
+          icon="el-icon-chat-dot-round"
+          @click="showComment"
+        >{{ commentDetail ? '收起' : '显示' }}评论</el-button>
+      </el-button-group></el-col>
     </el-row>
 
     <div v-if="analysisDetail" class="question-analysis">
-      【解析】：<span v-html="questionDetail.analysis"></span>
+      【解析】：<span v-html="questionDetail.analysis" />
     </div>
 
     <CommentText
       v-if="commentDetail && commentState === 2"
-      @comment="commentReply"
       :key="questionDetail.id"
-    ></CommentText>
+      @comment="commentReply"
+    />
     <div class="question-comments">
       <QuestionComment
-        :list="commentList"
         v-if="commentDetail && commentList.length && commentState !== 0"
-        :commentState="commentState"
+        :list="commentList"
+        :comment-state="commentState"
         @showMore="showMore"
         @childrenComment="commentReply"
         @getChildrenComment="getChildrenComment"
-      ></QuestionComment>
+      />
     </div>
   </div>
 </template>
@@ -264,17 +262,17 @@ export default {
   components: {
     ClozeTitle,
     CommentText,
-    QuestionComment,
+    QuestionComment
   },
   props: {
     questionDetail: {
       type: Object,
-      default: () => {},
+      default: () => {}
     },
     commentState: {
       type: Number,
-      default: 0,
-    },
+      default: 0
+    }
   },
   data() {
     return {
@@ -285,7 +283,7 @@ export default {
       isRecite: false,
       isRandom: false,
       commentDetail: false,
-      analysisDetail: false,
+      analysisDetail: false
     }
   },
   computed: {
@@ -352,7 +350,7 @@ export default {
           }
         }
       }
-    },
+    }
   },
   methods: {
     // 校验答案
@@ -389,7 +387,7 @@ export default {
           const _flag = this.questionDetail.selected.every((item) =>
             answers.includes(item)
           )
-          flag = _flag ? true : false
+          flag = !!_flag
           this.questionDetail.finish = true
         }
       }
@@ -414,7 +412,7 @@ export default {
         questionId: this.questionDetail.id,
         curPage: this.curPage,
         pageSize: this.pageSize,
-        parentId: id || null,
+        parentId: id || null
       })
       const totalPage =
         commentList.data.total % this.pageSize === 0
@@ -427,7 +425,7 @@ export default {
           content: cur.content,
           time: cur.createTime,
           name: cur.createUserName || '匿名用户',
-          avatar: cur.createUserHeadFileId,
+          avatar: cur.createUserHeadFileId
         }
         acc.push(id ? params : { ...params, replay: false, children: [] })
         return acc
@@ -446,7 +444,7 @@ export default {
       if (!moreComment.length) {
         this.$message({
           message: '没有更多了',
-          duration: 1000,
+          duration: 1000
         })
         return
       }
@@ -455,7 +453,7 @@ export default {
           this.$set(this.commentList[index], 'totalPage', totalPage)
           this.commentList[index].children = [
             ...this.commentList[index].children,
-            ...moreComment,
+            ...moreComment
           ]
           return true
         }
@@ -472,7 +470,7 @@ export default {
         questionId: this.questionDetail.id,
         content: text,
         anonymity: anonymity ? 0 : 1,
-        parentId: id || null,
+        parentId: id || null
       })
 
       if (res?.code === 200) {
@@ -496,7 +494,7 @@ export default {
         this.$set(this.commentList[index], 'totalPage', totalPage)
         this.commentList[index].children = [
           ...this.commentList[index].children,
-          ...moreComment,
+          ...moreComment
         ]
       } else {
         // 一级回复查看更多
@@ -517,8 +515,8 @@ export default {
         this.commentList = []
         this.getQuestionComment()
       }
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -528,7 +526,7 @@ export default {
   margin-left: 220px;
   padding: 0;
 }
-.children-content {
+.question-content {
   min-height: 400px;
   height: auto;
 }

@@ -7,18 +7,17 @@
       active-text="阅卷用户"
       inactive-text="考试用户"
       @change="changeType"
-    >
-    </el-switch>
+    />
     <TinymceEditor
       id="emailExam"
       :value="content"
       class="email-content"
       placeholder="邮件主体"
       @editorListener="editorListener"
-    ></TinymceEditor>
+    />
     <div>
-      <el-button @click="message(false)" type="primary">通知</el-button>
-      <el-button @click="message(true)" type="primary">通知测试</el-button>
+      <el-button type="primary" @click="message(false)">通知</el-button>
+      <el-button type="primary" @click="message(true)">通知测试</el-button>
     </div>
   </div>
 </template>
@@ -28,7 +27,7 @@ import { examEmail, examGet } from 'api/exam'
 import TinymceEditor from 'components/TinymceEditor/Index.vue'
 export default {
   components: {
-    TinymceEditor,
+    TinymceEditor
   },
   data() {
     return {
@@ -50,7 +49,7 @@ export default {
       </div>`,
       examContent: '',
       markContent: '',
-      paperMarkType: 1,
+      paperMarkType: 1
     }
   },
   async mounted() {
@@ -98,16 +97,16 @@ export default {
       const res = await examEmail({
         id: this.id,
         notifyType,
-        content: this.content,
+        content: this.content
       })
-      if (res?.code == 200) {
+      if (res?.code === 200) {
         this.$message.success(flag ? '测试通过！' : '邮件通知成功！')
         this.$router.back()
       } else {
         this.$message.error(res.msg || flag ? '测试失败！' : '邮件通知失败！')
       }
-    },
-  },
+    }
+  }
 }
 </script>
 

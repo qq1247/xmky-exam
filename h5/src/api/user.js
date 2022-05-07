@@ -1,12 +1,3 @@
-/*
- * @Description: 用户API
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-08-11 16:28:34
- * @LastEditors: Che
- * @LastEditTime: 2021-11-05 10:32:30
- */
 import request from './request'
 
 /**
@@ -72,3 +63,20 @@ export const userRole = (params) => request('user/role', params)
  * @return {*}
  */
 export const userOut = (params) => request('user/out', params)
+
+/**
+ * @name: userTemplate
+ * @description: 用户模板
+ * @param {*}
+ * @return {*}
+ */
+export const userTemplate = (params, type) =>
+  request('user/template', params, undefined, type)
+
+/**
+ * @name: userImport
+ * @description: 用户导入
+ * @param {*}
+ * @return {*}
+ */
+export const userImport = (params) => request('user/import', params)

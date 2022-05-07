@@ -4,11 +4,12 @@
     <div class="content-left">
       <div class="user-info">
         <el-avatar
-          :size="64"
           v-if="userInfo.userHeadFileId"
+          :size="64"
           :src="`/api/file/download?id=${Number(userInfo.userHeadFileId)}`"
-          ><i class="common common-wo"></i
-        ></el-avatar>
+        ><i
+          class="common common-wo"
+        /></el-avatar>
         <el-select v-model="userId" placeholder="请选择" @change="changeUser">
           <el-option
             v-for="(item, index) in userList"
@@ -31,7 +32,7 @@
             class="item-icon"
             src="~@/assets/img/mark/mark-score.png"
             alt=""
-          />
+          >
           <div class="item-num">
             {{ userInfo.totalScore === null ? '--' : userInfo.totalScore }}
           </div>
@@ -42,7 +43,7 @@
             class="item-icon"
             src="~@/assets/img/mark/mark-time.png"
             alt=""
-          />
+          >
           <div class="item-num">
             {{
               $tools.computeMinute(
@@ -58,16 +59,16 @@
             class="item-icon"
             src="~@/assets/img/mark/mark-pass.png"
             alt=""
-          />
+          >
           <div class="item-num">
             {{
               userInfo.totalScore === null
                 ? '--'
                 : computePass(
-                    userInfo.totalScore,
-                    userInfo.paperTotalScore,
-                    userInfo.paperPassScore
-                  )
+                  userInfo.totalScore,
+                  userInfo.paperTotalScore,
+                  userInfo.paperPassScore
+                )
             }}
           </div>
           <div class="item-title">成绩</div>
@@ -77,7 +78,7 @@
             class="item-icon"
             src="~@/assets/img/mark/mark-answer-time.png"
             alt=""
-          />
+          >
           <div class="item-num">
             {{
               $tools.computeMinute(userInfo.markStartTime, userInfo.markEndTime)
@@ -86,15 +87,14 @@
           <div class="item-title">阅卷用时</div>
         </div>
       </div>
-      <div class="user-handler" v-if="!preview">
+      <div v-if="!preview" class="user-handler">
         <div class="handler-title">
           只看未阅：<el-switch
             v-model="isFilter"
             active-color="#0094e5"
             inactive-color="#dcdfe6"
             @change="filterUserList"
-          >
-          </el-switch>
+          />
         </div>
         <div class="handler-content">
           <div class="percentage-bg">
@@ -105,8 +105,7 @@
               </p>
             </div>
           </div>
-          <el-progress type="circle" :percentage="percentage" color="#0094e5">
-          </el-progress>
+          <el-progress type="circle" :percentage="percentage" color="#0094e5" />
         </div>
       </div>
     </div>
@@ -118,24 +117,21 @@
       <template v-if="questionList.length">
         <!-- 章节 -->
         <!-- <div class="chapter">
-          <div class="chapter-item">
-            <div class="item-title">{{ chapter.name }}</div>
-            <div></div>
-          </div>
+          <div class="item-title">{{ chapter.name }}</div>
           <div class="chapter-description" v-html="chapter.description"></div>
         </div> -->
 
         <!-- 试题 -->
         <div
-          class="children-content"
           v-for="(item, indexQuestion) in questionList"
           :key="item.id"
+          class="question-content"
           :style="{ display: routerQuestionId === item.id ? 'block' : 'none' }"
         >
           <template v-if="routerQuestionId === item.id">
             <div class="question-title tag">
               <div>{{ indexQuestion + 1 }}、</div>
-              <div v-html="`${item.title}`"></div>
+              <div v-html="`${item.title}`" />
             </div>
 
             <div class="user-answer tag">
@@ -157,7 +153,7 @@
               <div
                 v-if="item.type === 5 && myExamDetailCache[routerQuestionId]"
                 v-html="`${myExamDetailCache[routerQuestionId].answers}`"
-              ></div>
+              />
             </div>
 
             <div class="user-plate tag">
@@ -165,15 +161,15 @@
               <span v-if="preview">&nbsp;{{ item.scorePlate }}&nbsp;</span>
               <el-input
                 v-if="!preview"
-                class="score-input"
                 v-model.number="item.scorePlate"
+                class="score-input"
                 @change="scoreChange"
                 @input="(e) => computeScore(e, indexQuestion, item.score)"
-              ></el-input>
+              />
               <span>分</span>
-              <span style="color: #0094e5"
-                >（本题满分：{{ item.score }}分）</span
-              >
+              <span
+                style="color: #0094e5"
+              >（本题满分：{{ item.score }}分）</span>
             </div>
 
             <div class="children-analysis">
@@ -194,11 +190,10 @@
                           `填空${$tools.intToChinese(indexAnswers + 1)}、`
                         }}</span>
                         <span
-                          class="answers-tag"
                           v-for="(ans, indexAnswer) in answer.answer"
                           :key="indexAnswer"
-                          >{{ ans }}</span
-                        >
+                          class="answers-tag"
+                        >{{ ans }}</span>
                       </div>
                     </el-col>
                   </template>
@@ -215,24 +210,23 @@
                             `关键词${$tools.intToChinese(indexAnswers + 1)}、`
                           }}</span>
                           <span
-                            class="answers-tag"
                             v-for="(ans, indexAnswer) in answer.answer"
                             :key="indexAnswer"
-                            >{{ ans }}</span
-                          >
+                            class="answers-tag"
+                          >{{ ans }}</span>
                         </div>
                       </template>
                       <div
                         v-if="item.ai === 2"
                         v-html="`${item.answers[0].answer}`"
-                      ></div>
+                      />
                     </el-col>
                   </template>
                 </el-row>
                 <el-row :gutter="10">
                   <el-col :span="2.5">解析： </el-col>
                   <el-col :span="21">
-                    <div v-html="`${item.analysis}`"></div>
+                    <div v-html="`${item.analysis}`" />
                   </el-col>
                 </el-row>
               </div>
@@ -250,31 +244,30 @@
           </div>
           <div class="router-list">
             <a
+              v-for="(item, indexRoute) in questionList"
+              :key="item.id"
               :class="[
                 'router-index',
                 item.scorePlate > 0 ? 'router-success' : 'router-error',
                 routerQuestionId === item.id ? 'router-active' : '',
               ]"
-              v-for="(item, indexRoute) in questionList"
-              :key="item.id"
               @click="routerQuestionId = item.id"
-              >{{ indexRoute + 1 }}</a
-            >
+            >{{ indexRoute + 1 }}</a>
           </div>
         </div>
 
         <ScorePlate
           v-if="!preview"
-          v-el-drag-dialog
           ref="scorePlate"
+          v-el-drag-dialog
           :score="questionDetail.score"
           :data="questionDetail"
           @selectScore="selectScore"
           @nextQuestion="nextQuestion"
           @nextPaper="nextPaper"
-        ></ScorePlate>
+        />
       </template>
-      <el-empty v-else description="暂无试卷"></el-empty>
+      <el-empty v-else description="暂无试卷" />
     </div>
   </div>
 </template>
@@ -285,15 +278,13 @@ import {
   myMarkUserList,
   myMarkAnswerList,
   myMarkScore,
-  myMarkFinish,
+  myMarkFinish
 } from 'api/my'
 import elDragDialog from '@/directive/el-drag-dialog'
 import ScorePlate from 'components/ScorePlate.vue'
-import ClozeTitle from '@/components/ClozeTitle.vue'
 export default {
   components: {
-    ScorePlate,
-    ClozeTitle,
+    ScorePlate
   },
   directives: { elDragDialog },
   data() {
@@ -316,7 +307,7 @@ export default {
       dialogPlateVisible: false,
       percentage: 0,
       markEndNum: 0,
-      score: 0,
+      score: 0
     }
   },
   watch: {
@@ -325,8 +316,8 @@ export default {
       immediate: true,
       handler(n) {
         this.questionList.length && this.getQuestion(n)
-      },
-    },
+      }
+    }
   },
   created() {
     const { examId, paperId, preview, userId } = this.$route.params
@@ -356,30 +347,26 @@ export default {
     },
     // 查询试卷
     async queryPaper() {
-      try {
-        const res = await paperGet({
-          id: this.paperId,
-        })
-        this.paper = res.data
-      } catch (error) {}
+      const res = await paperGet({
+        id: this.paperId
+      })
+      this.paper = res.data
     },
     // 查询试卷信息
     async queryPaperInfo() {
-      try {
-        const res = await paperQuestionList({
-          id: this.paperId,
-          examId: this.examId,
-          userId: this.userId,
-        })
-        this.paperQuestion = res.data
-        this.questionList = res.data.reduce((acc, cur) => {
-          const filterQuestion = cur.questionList.filter(
-            (question) => question.ai === 2
-          )
-          acc.push(...filterQuestion)
-          return acc
-        }, [])
-      } catch (error) {}
+      const res = await paperQuestionList({
+        id: this.paperId,
+        examId: this.examId,
+        userId: this.userId
+      })
+      this.paperQuestion = res.data
+      this.questionList = res.data.reduce((acc, cur) => {
+        const filterQuestion = cur.questionList.filter(
+          (question) => question.ai === 2
+        )
+        acc.push(...filterQuestion)
+        return acc
+      }, [])
     },
     // 获取当前试题
     getQuestion(routerQuestionId) {
@@ -407,7 +394,7 @@ export default {
     // 查询所有考生信息
     async queryExamineeInfo() {
       const userList = await myMarkUserList({
-        examId: Number(this.examId),
+        examId: Number(this.examId)
       })
       this.allUserList = userList.data.filter((user) => user.state !== 1)
       this.userList = userList.data.filter((user) => user.state !== 1)
@@ -418,7 +405,7 @@ export default {
     async queryOneExamineeInfo() {
       const userInfo = await myMarkUser({
         examId: Number(this.examId),
-        userId: this.userId,
+        userId: this.userId
       })
       this.userInfo = userInfo.data
       this.routerQuestionId = userInfo.data.id
@@ -452,7 +439,7 @@ export default {
       try {
         const res = await myMarkAnswerList({
           examId: this.examId,
-          userId: this.userId,
+          userId: this.userId
         })
 
         // 组合试卷答案信息
@@ -503,10 +490,12 @@ export default {
       const source = this.questionList[indexActivate]
       this.$set(this.questionList[indexActivate], 'scorePlate', Number(e))
 
-      if (Number(e) < 0)
+      if (Number(e) < 0) {
         this.$set(this.questionList[indexActivate], 'scorePlate', 0)
-      if (Number(e) > source.score)
+      }
+      if (Number(e) > source.score) {
         this.$set(this.questionList[indexActivate], 'scorePlate', source.score)
+      }
       this.$forceUpdate()
     },
     // 打分
@@ -519,7 +508,7 @@ export default {
         examId: this.examId,
         questionId: source.id,
         userId: this.userId,
-        score: source.scorePlate || 0,
+        score: source.scorePlate || 0
       })
 
       if (res?.code === 200) {
@@ -587,7 +576,7 @@ export default {
       this.updatePercentage()
       await myMarkFinish({
         examId: this.examId,
-        userId: this.userId,
+        userId: this.userId
       })
     },
     // 计算分数通过否
@@ -595,8 +584,8 @@ export default {
       const isPass =
         ((totalScore / paperTotalScore) * 100).toFixed() >= paperPassScore
       return isPass ? '通过' : '未通过'
-    },
-  },
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>
@@ -620,7 +609,7 @@ export default {
 
 .content-center {
   background: transparent;
-  .children-content {
+  .question-content {
     border-bottom: none;
     position: relative;
     padding: 0;
@@ -689,7 +678,6 @@ export default {
   overflow: hidden;
   &::after {
     content: '题';
-    top: -10px;
   }
 }
 

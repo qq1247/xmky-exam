@@ -1,8 +1,8 @@
 <template>
   <div class="handler-content">
     <el-form
-      size="small"
       ref="questionForm"
+      size="small"
       :model="questionForm"
       :rules="questionForm.rules"
       label-width="80px"
@@ -23,42 +23,48 @@
             :key="item.id"
             :label="item.name"
             :value="item.id"
-          ></el-option>
+          />
         </CustomSelect>
       </el-form-item>
       <el-form-item label="选择类型">
         <div class="types">
           <div
+            v-for="btn in typeButtons"
+            :key="btn.type"
             :class="[
               'type-btn',
               questionForm.questionType === btn.type ? 'type-btn-active' : '',
             ]"
-            :key="btn.type"
             @click="selectType(btn.type)"
-            v-for="btn in typeButtons"
           >
-            <i :class="btn.icon"></i>
+            <i :class="btn.icon" />
             {{ btn.name }}
-            <i class="common common-subscript sub-script"></i>
+            <i class="common common-subscript sub-script" />
           </div>
         </div>
       </el-form-item>
     </el-form>
     <EditModule
       ref="editModule"
-      publish
-      @add="add"
       key="editModule"
-      :questionType="questionForm.questionType"
-      :questionTypeId="questionForm.questionTypeId"
-    ></EditModule>
+      publish
+      :question-type="questionForm.questionType"
+      :question-type-id="questionForm.questionTypeId"
+      @add="add"
+    />
   </div>
 </template>
 
 <script>
 import CustomSelect from 'components/CustomSelect.vue'
 import EditModule from 'components/EditQuestion/EditModule.vue'
-import { questionTypeListPage, questionAdd } from 'api/question'
+import {
+  questionTypeListPage,
+  questionAdd,
+  questionImport,
+  questionTemplate
+} from 'api/question'
+import { progressBarGet } from 'api/common'
 export default {
   components: { CustomSelect, EditModule },
   data() {
@@ -71,38 +77,38 @@ export default {
         questionType: 1,
         rules: {
           questionTypeId: [
-            { required: true, message: '请选择试题分类', trigger: 'blur' },
-          ],
-        },
+            { required: true, message: '请选择试题分类', trigger: 'blur' }
+          ]
+        }
       },
       typeButtons: [
         // 左侧按钮组1
         {
           type: 1,
           name: '单选题',
-          icon: 'common common-radio',
+          icon: 'common common-radio'
         },
         {
           type: 2,
           name: '多选题',
-          icon: 'common common-checkbox',
+          icon: 'common common-checkbox'
         },
         {
           type: 3,
           name: '填空题',
-          icon: 'common common-cloze',
+          icon: 'common common-cloze'
         },
         {
           type: 4,
           name: '判断题',
-          icon: 'common common-judge',
+          icon: 'common common-judge'
         },
         {
           type: 5,
           name: '问答题',
-          icon: 'common common-ask',
-        },
-      ],
+          icon: 'common common-ask'
+        }
+      ]
     }
   },
   methods: {
@@ -115,7 +121,7 @@ export default {
       const typeList = await questionTypeListPage({
         name,
         curPage,
-        pageSize: 5,
+        pageSize: 5
       })
       this.questionForm.questionTypes = typeList.data.list
       this.questionForm.total = typeList.data.total
@@ -145,7 +151,7 @@ export default {
     },
     // 解析试题
     async questionImport() {
-      this.$refs['questionForm'].validate(async (valid) => {
+      this.$refs['questionForm'].validate(async(valid) => {
         if (!valid) {
           this.templateClear('templateUpload')
           return false
@@ -159,11 +165,11 @@ export default {
         const res = await questionImport({
           fileId: this.questionDocIds[0].response.data.fileIds,
           questionTypeId: this.questionForm.questionTypeId,
-          state: 1,
+          state: 1
         }).catch(() => {
           this.isAnalysis = false
         })
-        if (res?.code == 200) {
+        if (res?.code === 200) {
           await this.getProgress(res.data)
           if (this.percentage === 100) {
             this.$message.success('解析成功！')
@@ -185,7 +191,7 @@ export default {
         .delay()
         .then(() => {
           return progressBarGet({
-            id,
+            id
           })
         })
         .catch((err) => {
@@ -196,7 +202,7 @@ export default {
         lock: true,
         text: `试题解析进度：${percentage?.data?.percent || 10}%`,
         spinner: 'el-icon-loading',
-        background: 'rgba(255, 255, 255, 0.88)',
+        background: 'rgba(255, 255, 255, 0.88)'
       })
 
       if (percentage.code !== 200 || !percentage?.data?.percent) {
@@ -231,7 +237,7 @@ export default {
     },
     // 添加试题
     add(params) {
-      this.$refs['questionForm'].validate(async (valid) => {
+      this.$refs['questionForm'].validate(async(valid) => {
         if (!valid) {
           return false
         }
@@ -242,8 +248,8 @@ export default {
           this.$message.success('添加失败！')
         }
       })
-    },
-  },
+    }
+  }
 }
 </script>
 

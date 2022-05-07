@@ -1,12 +1,3 @@
-/*
- * @Description:
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-08-11 13:23:33
- * @LastEditors: Che
- * @LastEditTime: 2022-01-13 10:55:40
- */
 const InfoKey = 'Login-Info'
 const SettingKey = 'Setting-Info'
 const DictKey = 'Dict-Info'

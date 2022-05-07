@@ -14,13 +14,13 @@ const message = (msg) => {
     Notification({
       title: '提示',
       message: msg,
-      type: 'warning',
+      type: 'warning'
     })
   } else {
     Message({
       message: msg,
       duration: 1500,
-      type: 'warning',
+      type: 'warning'
     })
   }
 }
@@ -32,8 +32,8 @@ const toLogin = () => {
   router.replace({
     path: '/login',
     query: {
-      redirect: '/',
-    },
+      redirect: '/'
+    }
   })
 }
 
@@ -69,7 +69,7 @@ const instance = axios.create({
     process.env.NODE_ENV === 'development'
       ? process.env.VUE_APP_BASE_URL
       : window.domain.url,
-  timeout: 6 * 1000,
+  timeout: 6 * 1000
 })
 
 /**
@@ -92,14 +92,14 @@ instance.interceptors.response.use(
     const {
       data: { code, msg },
       headers,
-      config,
+      config
     } = res
     headers?.authorization &&
       store.commit('user/SET_TOKEN', headers.authorization)
-    if (config.responseType == 'blob') {
+    if (config.responseType === 'blob') {
       return Promise.resolve(res.data)
     } else {
-      if (code == 200) {
+      if (code === 200) {
         return Promise.resolve(res.data)
       } else {
         errorHandle(code, msg)

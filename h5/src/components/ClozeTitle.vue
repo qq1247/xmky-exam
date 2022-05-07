@@ -1,36 +1,27 @@
-<!--
- * @Description: 填空title
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-10-11 15:50:45
- * @LastEditors: Che
- * @LastEditTime: 2021-11-03 09:43:01
--->
 <script>
 export default {
   functional: true,
   props: {
     title: {
       type: String,
-      default: '',
+      default: ''
     },
     questionId: {
       type: Number,
-      default: 0,
+      default: 0
     },
     preview: {
       type: Boolean,
-      default: false,
+      default: false
     },
     paperQuestion: {
       type: Array,
-      default: () => [],
+      default: () => []
     },
     myExamDetailCache: {
       type: Object,
-      default: () => {},
-    },
+      default: () => {}
+    }
   },
   data() {
     return {}
@@ -38,35 +29,35 @@ export default {
   render(h, context) {
     const {
       props,
-      parent: { updateAnswer },
+      parent: { updateAnswer }
     } = context
     let title = props.title
-    let questionId = props.questionId
-    let underlineList = title.match(/[_]{5,}/g)
+    const questionId = props.questionId
+    const underlineList = title.match(/[_]{5,}/g)
     underlineList.map((underline, index) => {
       const titleStart = title.substring(0, title.indexOf(underline))
       const titleEnd = title.substring(
         title.indexOf(underline) + underline.length
       )
       // questionId 存在则为整卷方式，否则为单题方式
-      const inputHtml = `<el-input class="cloze-input" @change='updateAnswer(${questionId})' :disabled='${props.preview}' v-model='myExamDetailCache[${questionId}].answers[${index}]'></el-input>`
+      const inputHtml = `<el-input class="cloze-input" @change='updateAnswer(${questionId})' :disabled='${props.preview}' v-model='myExamDetailCache[${questionId}].answers[${index}]'></el-input>`
       title = `${titleStart}${inputHtml}${titleEnd}`
     })
-    let titleTemplate = {
+    const titleTemplate = {
       template: title,
       data() {
         return props
-      },
+      }
     }
     if (!props.preview) {
       Object.assign(titleTemplate, {
         methods: {
-          updateAnswer,
-        },
+          updateAnswer
+        }
       })
     }
     return h(titleTemplate)
-  },
+  }
 }
 </script>
 

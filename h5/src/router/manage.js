@@ -1,12 +1,3 @@
-/*
- * @Description: 管理路由
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-12-29 09:57:44
- * @LastEditors: Che
- * @LastEditTime: 2022-01-06 17:13:23
- */
 import Layout from '@/layout/Index.vue'
 export default [
   {

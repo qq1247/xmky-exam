@@ -1,64 +1,62 @@
-<!--
- * @Description: 业务卡片
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-10-13 14:52:40
- * @LastEditors: Che
- * @LastEditTime: 2022-01-13 10:49:33
--->
 <template>
   <div class="exam-item">
     <div class="exam-content">
       <!-- 标题 -->
       <div class="title ellipsis">{{ data.name || data.examName }}</div>
-      <template v-if="name == 'paperList'">
+      <template v-if="name === 'paperList'">
         <el-row :gutter="20" class="content-info">
-          <el-col :span="12" class="info-left"
-            >及格：{{ (data.passScore * data.totalScore) / 100 }}</el-col
-          >
-          <el-col :span="12" class="info-right"
-            >满分：{{ data.totalScore }}</el-col
-          >
+          <el-col
+            :span="12"
+            class="info-left"
+          >及格：{{ (data.passScore * data.totalScore) / 100 }}</el-col>
+          <el-col
+            :span="12"
+            class="info-right"
+          >满分：{{ data.totalScore }}</el-col>
         </el-row>
         <el-row :gutter="20" class="content-info">
-          <el-col :span="12" class="info-left"
-            >组卷方式：{{ data.genType | genType }}</el-col
-          >
-          <el-col :span="12" class="info-right"
-            >展示方式：{{ data.showType | showType }}</el-col
-          >
+          <el-col
+            :span="12"
+            class="info-left"
+          >组卷方式：{{ data.genType | genType }}</el-col>
+          <el-col
+            :span="12"
+            class="info-right"
+          >展示方式：{{ data.showType | showType }}</el-col>
         </el-row>
         <el-row class="content-info">
-          <el-col :span="24" class="info-right"
-            >阅卷方式：{{ data.markType | markType }}</el-col
-          >
+          <el-col
+            :span="24"
+            class="info-right"
+          >阅卷方式：{{ data.markType | markType }}</el-col>
         </el-row>
       </template>
-      <template v-if="name == 'examList'">
+      <template v-if="name === 'examList'">
         <el-row :gutter="20" class="content-info">
-          <el-col :span="12" class="info-left"
-            >及格：{{
-              ((data.paperPassScore / 100) * data.paperTotalScore).toFixed(2)
-            }}</el-col
-          >
-          <el-col :span="12" class="info-right"
-            >满分：{{ data.paperTotalScore }}</el-col
-          >
+          <el-col
+            :span="12"
+            class="info-left"
+          >及格：{{
+            ((data.paperPassScore / 100) * data.paperTotalScore).toFixed(2)
+          }}</el-col>
+          <el-col
+            :span="12"
+            class="info-right"
+          >满分：{{ data.paperTotalScore }}</el-col>
         </el-row>
         <el-row class="content-info">
-          <el-col class="info-left"
-            >考试时间：{{ data.startTime }}（{{
-              $tools.computeMinute(data.startTime, data.endTime)
-            }}）</el-col
-          >
+          <el-col
+            class="info-left"
+          >考试时间：{{ data.startTime }}（{{
+            $tools.computeMinute(data.startTime, data.endTime)
+          }}）</el-col>
         </el-row>
         <el-row class="content-info">
-          <el-col class="info-left"
-            >阅卷时间：{{ data.markStartTime }}（{{
-              $tools.computeMinute(data.markStartTime, data.markEndTime)
-            }}）</el-col
-          >
+          <el-col
+            class="info-left"
+          >阅卷时间：{{ data.markStartTime }}（{{
+            $tools.computeMinute(data.markStartTime, data.markEndTime)
+          }}）</el-col>
         </el-row>
       </template>
       <el-row class="content-info">
@@ -67,19 +65,19 @@
       <div class="handler">
         <!-- 编辑 -->
         <span data-title="编辑" @click="edit(data)">
-          <i class="common common-edit"></i>
+          <i class="common common-edit" />
         </span>
         <!-- 删除 -->
         <span data-title="删除" @click="del(data)">
-          <i class="common common-delete"></i>
+          <i class="common common-delete" />
         </span>
         <!-- 发布 -->
         <span data-title="发布" @click="publish(data)">
-          <i class="common common-publish"></i>
+          <i class="common common-publish" />
         </span>
-        <template v-if="name == 'paperList'">
+        <template v-if="name === 'paperList'">
           <span data-title="复制" @click="copy(data)">
-            <i class="common common-copy"></i>
+            <i class="common common-copy" />
           </span>
           <!-- <span
           data-title="归档"
@@ -88,36 +86,36 @@
           <i class="common common-archive"></i>
         </span> -->
           <span data-title="开始组卷" @click="composition(data)">
-            <i class="common common-composition"></i>
+            <i class="common common-composition" />
           </span>
         </template>
-        <template v-if="name == 'examList'">
+        <template v-if="name === 'examList'">
           <span data-title="考试用户" @click="read(data)">
-            <i class="common common-setting"></i>
+            <i class="common common-setting" />
           </span>
           <span data-title="统计" @click="statistics(data)">
-            <i class="common common-statistics"></i>
+            <i class="common common-statistics" />
           </span>
           <span class="last-span">
-            <i class="common common-more-row"></i>
+            <i class="common common-more-row" />
             <div class="handler-more">
               <div class="more-item" @click="onLine(data)">
-                <i class="common common-onLine"></i>在线用户
+                <i class="common common-onLine" />在线用户
               </div>
               <div class="more-item" @click="anonymous(data)">
-                <i class="common common-anonymous"></i>匿名阅卷
+                <i class="common common-anonymous" />匿名阅卷
               </div>
               <div class="more-item" @click="ranking(data)">
-                <i class="common common-ranking"></i>排名公开
+                <i class="common common-ranking" />排名公开
               </div>
               <div class="more-item" @click="score(data)">
-                <i class="common common-score"></i>成绩公开
+                <i class="common common-score" />成绩公开
               </div>
               <div class="more-item" @click="message(data)">
-                <i class="common common-messages"></i>邮件通知
+                <i class="common common-messages" />邮件通知
               </div>
               <div class="more-item" @click="exports(data)">
-                <i class="common common-template-down"></i>试卷导出
+                <i class="common common-template-down" />试卷导出
               </div>
             </div>
           </span>
@@ -130,19 +128,6 @@
 <script>
 import { getOneDict } from '@/utils/getDict'
 export default {
-  props: {
-    data: {
-      type: Object,
-      default: () => {},
-    },
-    name: {
-      type: String,
-      default: '',
-    },
-  },
-  data() {
-    return {}
-  },
   filters: {
     genType(data) {
       return getOneDict('PAPER_GEN_TYPE').find(
@@ -163,14 +148,27 @@ export default {
       return getOneDict('EXAM_STATE').find(
         (item) => Number(item.dictKey) === data
       ).dictValue
+    }
+  },
+  props: {
+    data: {
+      type: Object,
+      default: () => {}
     },
+    name: {
+      type: String,
+      default: ''
+    }
+  },
+  data() {
+    return {}
   },
   create() {},
   methods: {
     // 是否有权限（只有创建者才有权限）
     isRole(data) {
       // 是否已经发布
-      const isPublish = data.state == 1
+      const isPublish = data.state === 1
 
       const now = new Date().getTime()
       const startTime = new Date(data.startTime).getTime()
@@ -240,8 +238,8 @@ export default {
     // 试卷导出
     exports(data) {
       this.$emit('exports', data)
-    },
-  },
+    }
+  }
 }
 </script>
 vue

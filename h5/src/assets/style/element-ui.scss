@@ -38,3 +38,21 @@
   padding: 0 10px !important;
   line-height: 26px;
 }
+
+.el-radio__input.is-checked .el-radio__inner {
+  border-color: #0094e5 !important;
+  background: #fff !important;
+}
+
+.el-radio__inner::after {
+  width: 6px !important;
+  height: 6px !important;
+  background-color: #0094e5 !important;
+}
+
+.el-radio__input.is-disabled.is-checked .el-radio__inner {
+  background-color: #fff !important;
+  &::after {
+    background-color: #0094e5 !important;
+  }
+}

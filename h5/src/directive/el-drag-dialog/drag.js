@@ -4,7 +4,7 @@ export default {
     dialogHeaderEl.style.cssText += ';cursor:move;'
 
     // 获取原有属性 ie dom元素.currentStyle 火狐谷歌 window.getComputedStyle(dom元素, null);
-    const getStyle = (function () {
+    const getStyle = (function() {
       if (window.document.currentStyle) {
         return (dom, attr) => dom.currentStyle[attr]
       } else {
@@ -41,7 +41,7 @@ export default {
         styT = +styT.replace(/\px/g, '')
       }
 
-      document.onmousemove = function (e) {
+      document.onmousemove = function(e) {
         // 通过事件委托，计算移动的距离
         let left = e.clientX - disX
         let top = e.clientY - disY
@@ -66,10 +66,10 @@ export default {
         vnode.child.$emit('dragDialog')
       }
 
-      document.onmouseup = function (e) {
+      document.onmouseup = function(e) {
         document.onmousemove = null
         document.onmouseup = null
       }
     }
-  },
+  }
 }

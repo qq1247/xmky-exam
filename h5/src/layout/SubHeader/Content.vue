@@ -1,22 +1,12 @@
-<!--
- * @Description: 导航
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-12-14 09:40:45
- * @LastEditors: Che
- * @LastEditTime: 2022-01-19 17:43:05
--->
 <template>
   <div class="header-content">
-    <el-tabs v-model="tabIndex" v-if="tab.length" @tab-click="changeTab">
+    <el-tabs v-if="tab.length" v-model="tabIndex" @tab-click="changeTab">
       <el-tab-pane
-        :key="item.name"
         v-for="item in tab"
+        :key="item.name"
         :label="item.meta.title"
         :name="item.name"
-      >
-      </el-tab-pane>
+      />
     </el-tabs>
     <div v-else>{{ contentName }}</div>
   </div>
@@ -29,11 +19,11 @@ export default {
     return {
       tab: [],
       contentName: '',
-      tabIndex: '',
+      tabIndex: ''
     }
   },
   computed: {
-    ...mapGetters(['permission_routes', 'onlyRole']),
+    ...mapGetters(['permission_routes', 'onlyRole'])
   },
   watch: {
     $route: {
@@ -42,8 +32,8 @@ export default {
       handler(e) {
         this.tabIndex = String(this.$route.name)
         this.getTabInfo(e)
-      },
-    },
+      }
+    }
   },
   methods: {
     // 获取路由信息
@@ -74,10 +64,10 @@ export default {
     changeTab() {
       this.$router.replace({
         name: `${this.tabIndex}`,
-        params: this.$route.params,
+        params: this.$route.params
       })
-    },
-  },
+    }
+  }
 }
 </script>
 

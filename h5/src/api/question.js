@@ -1,12 +1,3 @@
-/*
- * @Description: 试题API
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-08-11 16:28:12
- * @LastEditors: Che
- * @LastEditTime: 2021-09-29 11:16:22
- */
 import request from './request'
 
 export const questionListPage = (params) => request('question/listpage', params)

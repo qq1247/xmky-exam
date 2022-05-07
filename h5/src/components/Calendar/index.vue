@@ -4,40 +4,40 @@
       <!-- <div class="el-calendar__title">
         {{ i18nDate }}
       </div> -->
-      <div class="el-calendar__button-group" v-if="validatedRange.length === 0">
+      <div v-if="validatedRange.length === 0" class="el-calendar__button-group">
         <i
           title="上个月"
           class="el-icon-arrow-left"
           @click="selectDate('prev-month')"
-        ></i>
-        <div>{{ i18nDate }}</div>
+        />
+        <div class="el-calendar-time">{{ i18nDate }}</div>
         <i
           title="下个月"
           class="el-icon-arrow-right"
           @click="selectDate('next-month')"
-        ></i>
+        />
       </div>
     </div>
     <div
-      class="el-calendar__body"
       v-if="validatedRange.length === 0"
       key="no-range"
+      class="el-calendar__body"
     >
       <date-table
         :date="date"
         :selected-day="realSelectedDay"
         :first-day-of-week="realFirstDayOfWeek"
+        :time-popovers="timePopovers"
         @pick="pickDay"
-        :timePopovers="timePopovers"
       />
     </div>
-    <div v-else class="el-calendar__body" key="has-range">
+    <div v-else key="has-range" class="el-calendar__body">
       <date-table
-        v-for="(range, index) in validatedRange"
+        v-for="(validRange, index) in validatedRange"
         :key="index"
-        :date="range[0]"
+        :date="validRange[0]"
         :selected-day="realSelectedDay"
-        :range="range"
+        :range="validRange"
         :hide-header="index !== 0"
         :first-day-of-week="realFirstDayOfWeek"
         @pick="pickDay"
@@ -49,8 +49,6 @@
 <script>
 import Locale from 'element-ui/src/mixins/locale'
 import fecha from 'element-ui/src/utils/date'
-import ElButton from 'element-ui/packages/button'
-import ElButtonGroup from 'element-ui/packages/button-group'
 import DateTable from './date-table'
 import { validateRangeInOneMonth } from 'element-ui/src/utils/date-util'
 
@@ -62,25 +60,27 @@ const weekDays = [
   'Wednesday',
   'Thursday',
   'Friday',
-  'Saturday',
+  'Saturday'
 ]
 const oneDay = 86400000
 
 export default {
   name: 'ElCalendar',
 
-  mixins: [Locale],
-
   components: {
-    DateTable,
-    ElButton,
-    ElButtonGroup,
+    DateTable
   },
 
+  mixins: [Locale],
+
   props: {
-    value: [Date, String, Number],
+    value: {
+      type: [Date, String, Number],
+      default: ''
+    },
     range: {
       type: Array,
+      default: () => [],
       validator(range) {
         if (Array.isArray(range)) {
           return (
@@ -95,74 +95,29 @@ export default {
         } else {
           return true
         }
-      },
+      }
     },
     firstDayOfWeek: {
       type: Number,
-      default: 1,
+      default: 1
     },
     timePopovers: {
       type: Object,
-      default: {},
-    },
+      default: () => {}
+    }
   },
 
   provide() {
     return {
-      elCalendar: this,
+      elCalendar: this
     }
   },
 
-  methods: {
-    pickDay(day) {
-      this.realSelectedDay = day
-    },
-
-    selectDate(type) {
-      if (validTypes.indexOf(type) === -1) {
-        throw new Error(`invalid type ${type}`)
-      }
-      let day = ''
-      if (type === 'prev-month') {
-        day = `${this.prevMonthDatePrefix}-01`
-      } else if (type === 'next-month') {
-        day = `${this.nextMonthDatePrefix}-01`
-      } else {
-        day = this.formatedToday
-      }
-
-      if (day === this.formatedDate) return
-      this.pickDay(day)
-      this.$emit('selectDate', day)
-    },
-
-    toDate(val) {
-      if (!val) {
-        throw new Error('invalid val')
-      }
-      return val instanceof Date ? val : new Date(val)
-    },
-
-    rangeValidator(date, isStart) {
-      const firstDayOfWeek = this.realFirstDayOfWeek
-      const expected = isStart
-        ? firstDayOfWeek
-        : firstDayOfWeek === 0
-        ? 6
-        : firstDayOfWeek - 1
-      const message = `${isStart ? 'start' : 'end'} of range should be ${
-        weekDays[expected]
-      }.`
-      if (date.getDay() !== expected) {
-        console.warn(
-          '[ElementCalendar]',
-          message,
-          'Invalid range will be ignored.'
-        )
-        return false
-      }
-      return true
-    },
+  data() {
+    return {
+      selectedDay: '',
+      now: new Date()
+    }
   },
 
   computed: {
@@ -210,7 +165,7 @@ export default {
         this.selectedDay = val
         const date = new Date(val)
         this.$emit('input', date)
-      },
+      }
     },
 
     date() {
@@ -287,15 +242,60 @@ export default {
         return 0
       }
       return Math.floor(this.firstDayOfWeek)
-    },
-  },
-
-  data() {
-    return {
-      selectedDay: '',
-      now: new Date(),
     }
   },
+
+  methods: {
+    pickDay(day) {
+      this.realSelectedDay = day
+    },
+
+    selectDate(type) {
+      if (validTypes.indexOf(type) === -1) {
+        throw new Error(`invalid type ${type}`)
+      }
+      let day = ''
+      if (type === 'prev-month') {
+        day = `${this.prevMonthDatePrefix}-01`
+      } else if (type === 'next-month') {
+        day = `${this.nextMonthDatePrefix}-01`
+      } else {
+        day = this.formatedToday
+      }
+
+      if (day === this.formatedDate) return
+      this.pickDay(day)
+      this.$emit('selectDate', day)
+    },
+
+    toDate(val) {
+      if (!val) {
+        throw new Error('invalid val')
+      }
+      return val instanceof Date ? val : new Date(val)
+    },
+
+    rangeValidator(date, isStart) {
+      const firstDayOfWeek = this.realFirstDayOfWeek
+      const expected = isStart
+        ? firstDayOfWeek
+        : firstDayOfWeek === 0
+          ? 6
+          : firstDayOfWeek - 1
+      const message = `${isStart ? 'start' : 'end'} of range should be ${
+        weekDays[expected]
+      }.`
+      if (date.getDay() !== expected) {
+        console.warn(
+          '[ElementCalendar]',
+          message,
+          'Invalid range will be ignored.'
+        )
+        return false
+      }
+      return true
+    }
+  }
 }
 </script>
 
@@ -305,17 +305,15 @@ export default {
   display: flex;
   justify-content: space-around;
   align-items: center;
-}
-.el-icon-d-arrow-left,
-.el-icon-d-arrow-right {
-  padding: 3px;
-  border: 1px solid #ececec;
-  border-radius: 3px;
-  cursor: pointer;
-}
-
-.el-icon-link {
-  margin: 0 10px;
-  cursor: pointer;
+  i {
+    font-size: 14px;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.5);
+  }
+  .el-calendar-time {
+    color: rgba(0, 0, 0, 0.85);
+    font-weight: 500;
+    font-size: 16px;
+  }
 }
 </style>

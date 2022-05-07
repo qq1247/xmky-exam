@@ -4,19 +4,19 @@
       <div slot="header">
         <span>智能试题</span>
       </div>
-      <div id="questionAi"></div>
+      <div id="questionAi" />
     </el-card>
     <el-card class="box-card" shadow="never">
       <div slot="header">
         <span>试题难度</span>
       </div>
-      <div id="questionDifficulty"></div>
+      <div id="questionDifficulty" />
     </el-card>
     <el-card class="box-card" shadow="never">
       <div slot="header">
         <span>试题类型</span>
       </div>
-      <div id="questionType"></div>
+      <div id="questionType" />
     </el-card>
   </div>
 </template>
@@ -32,7 +32,7 @@ export default {
       statisInfo: {},
       aiNames: [],
       difficultyNames: [],
-      typeNames: [],
+      typeNames: []
     }
   },
   async mounted() {
@@ -50,21 +50,21 @@ export default {
   methods: {
     async getQuestionStatis() {
       const res = await getQuestionStatis({
-        questionTypeId: this.id,
+        questionTypeId: this.id
       })
       this.statisInfo = res.data
     },
     // chart共用
     chartDom(id, data) {
-      let chartDom = document.getElementById(id)
-      let myChart = echarts.init(chartDom)
-      let option = {
+      const chartDom = document.getElementById(id)
+      const myChart = echarts.init(chartDom)
+      const option = {
         tooltip: {
-          trigger: 'item',
+          trigger: 'item'
         },
         legend: {
           top: '5%',
-          left: 'center',
+          left: 'center'
         },
         series: [
           {
@@ -75,24 +75,24 @@ export default {
             itemStyle: {
               borderRadius: 10,
               borderColor: '#fff',
-              borderWidth: 2,
+              borderWidth: 2
             },
             label: {
               show: false,
-              position: 'center',
+              position: 'center'
             },
             emphasis: {
               label: {
                 show: true,
-                fontSize: '14',
-              },
+                fontSize: '14'
+              }
             },
             labelLine: {
-              show: false,
+              show: false
             },
-            data,
-          },
-        ],
+            data
+          }
+        ]
       }
       option && myChart.setOption(option)
     },
@@ -110,8 +110,8 @@ export default {
       this.chartDom('questionAi', this.statisInfo.aiList)
       this.chartDom('questionDifficulty', this.statisInfo.difficultyList)
       this.chartDom('questionType', this.statisInfo.typeList)
-    },
-  },
+    }
+  }
 }
 </script>
 

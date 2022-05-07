@@ -1,17 +1,8 @@
-<!--
- * @Description: 移动题库
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-12-16 16:08:50
- * @LastEditors: Che
- * @LastEditTime: 2022-01-05 10:03:04
--->
 <template>
   <el-form
+    ref="moveForm"
     :model="examForm"
     :rules="examForm.rules"
-    ref="moveForm"
     label-width="100px"
   >
     <el-form-item label="移动到" prop="questionType">
@@ -30,11 +21,11 @@
           :key="item.id"
           :label="item.name"
           :value="item.id"
-        ></el-option>
+        />
       </CustomSelect>
     </el-form-item>
     <el-form-item>
-      <el-button @click="questionMove" type="primary">编辑</el-button>
+      <el-button type="primary" @click="questionMove">编辑</el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -45,7 +36,7 @@ import CustomSelect from 'components/CustomSelect.vue'
 
 export default {
   components: {
-    CustomSelect,
+    CustomSelect
   },
   data() {
     return {
@@ -57,10 +48,10 @@ export default {
         questionTypes: [],
         rules: {
           questionType: [
-            { required: true, message: '请选择试题分类', trigger: 'blur' },
-          ],
-        },
-      },
+            { required: true, message: '请选择试题分类', trigger: 'blur' }
+          ]
+        }
+      }
     }
   },
   async mounted() {
@@ -72,7 +63,7 @@ export default {
       const typeList = await questionTypeListPage({
         name,
         curPage,
-        pageSize: 5,
+        pageSize: 5
       })
       this.examForm.questionTypes = typeList.data.list
       this.examForm.total = typeList.data.total
@@ -98,15 +89,15 @@ export default {
 
       const res = await questionTypeMove({
         sourceId: this.id,
-        targetId: this.examForm.questionType,
+        targetId: this.examForm.questionType
       })
-      if (res?.code == 200) {
+      if (res?.code === 200) {
         this.$message.success('移动成功！')
         this.$router.back()
       } else {
         this.$message.error('移动失败！')
       }
-    },
-  },
+    }
+  }
 }
 </script>

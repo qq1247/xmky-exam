@@ -1,27 +1,15 @@
-<!--
- * @Description: 设置
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-12-16 16:01:13
- * @LastEditors: Che
- * @LastEditTime: 2022-01-05 11:08:59
--->
 <template>
   <el-form
+    ref="examForm"
     :model="examForm"
     :rules="examForm.rules"
-    ref="examForm"
     label-width="100px"
   >
     <el-form-item label="名称" prop="examName">
-      <el-input
-        placeholder="请输入分类名称"
-        v-model="examForm.examName"
-      ></el-input>
+      <el-input v-model="examForm.examName" placeholder="请输入分类名称" />
     </el-form-item>
     <el-form-item>
-      <el-button @click="addOrEdit" type="primary">{{
+      <el-button type="primary" @click="addOrEdit">{{
         id ? '修改' : '添加'
       }}</el-button>
     </el-form-item>
@@ -40,10 +28,10 @@ export default {
         examName: '',
         rules: {
           examName: [
-            { required: true, message: '请输入分类名称', trigger: 'blur' },
-          ],
-        },
-      },
+            { required: true, message: '请输入分类名称', trigger: 'blur' }
+          ]
+        }
+      }
     }
   },
   async mounted() {
@@ -58,7 +46,7 @@ export default {
   methods: {
     // 添加 || 修改分类名称
     addOrEdit() {
-      this.$refs['examForm'].validate(async (valid) => {
+      this.$refs['examForm'].validate(async(valid) => {
         if (!valid) {
           return
         }
@@ -68,22 +56,22 @@ export default {
         if (this.examForm.edit) {
           res = await examTypeEdit({
             id: this.id,
-            name: this.examForm.examName,
+            name: this.examForm.examName
           })
         } else {
           res = await examTypeAdd({
-            name: this.examForm.examName,
+            name: this.examForm.examName
           })
         }
 
-        if (res?.code == 200) {
+        if (res?.code === 200) {
           this.$message.success(!this.id ? '添加成功！' : '修改成功！')
           this.$router.back()
         } else {
           this.$message.error(!this.id ? '添加失败！' : '修改失败！')
         }
       })
-    },
-  },
+    }
+  }
 }
 </script>

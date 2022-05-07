@@ -1,26 +1,17 @@
-<!--
- * @Description: 模拟列表
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-12-22 16:57:28
- * @LastEditors: Che
- * @LastEditTime: 2021-12-22 17:21:28
--->
 <template>
   <div class="container">
-    <div class="info-list" v-if="questionTypeOpenList.length">
+    <div v-if="questionTypeOpenList.length" class="info-list">
       <div
-        class="info-item"
-        :key="item.id"
         v-for="item in questionTypeOpenList"
+        :key="item.id"
+        class="info-item"
         @click="goTest(item)"
       >
         <div class="item-left">{{ item.questionTypeName }}</div>
         <div class="item-right">{{ item.startTime }} - {{ item.endTime }}</div>
       </div>
     </div>
-    <el-empty v-else description="暂无模拟试卷"></el-empty>
+    <el-empty v-else description="暂无模拟试卷" />
   </div>
 </template>
 
@@ -29,7 +20,7 @@ import { questionTypeOpenListPage } from 'api/question'
 export default {
   data() {
     return {
-      questionTypeOpenList: [],
+      questionTypeOpenList: []
     }
   },
   mounted() {
@@ -41,7 +32,7 @@ export default {
       const res = await questionTypeOpenListPage({
         state: 1,
         pageSize: 10,
-        curPage: 1,
+        curPage: 1
       })
       res?.code === 200 && (this.questionTypeOpenList = res.data.list)
     },
@@ -58,11 +49,11 @@ export default {
         name: 'SimulateTest',
         params: {
           questionTypeId,
-          commentState,
-        },
+          commentState
+        }
       })
-    },
-  },
+    }
+  }
 }
 </script>
 

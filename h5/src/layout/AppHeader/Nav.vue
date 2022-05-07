@@ -2,8 +2,8 @@
   <div class="header-nav">
     <router-link to="/" class="nav-logo">
       <el-image :src="orgLogo" lazy>
-        <i slot="placeholder" class="common common-more-row"></i>
-        <i slot="error" class="common common-perfect"></i>
+        <i slot="placeholder" class="common common-more-row" />
+        <i slot="error" class="common common-perfect" />
       </el-image>
       <div class="org-name">{{ $store.getters.orgName }}</div>
     </router-link>
@@ -27,36 +27,36 @@ export default {
         user: [
           {
             name: '首页',
-            path: 'Home',
+            path: 'Home'
           },
           {
             name: '考试',
-            path: 'MyExam',
-          },
+            path: 'MyExam'
+          }
         ],
         subAdmin: [
           {
             name: '首页',
-            path: 'Home',
+            path: 'Home'
           },
           {
             name: '考试',
-            path: 'Question',
-          },
+            path: 'Question'
+          }
         ],
         admin: [
           {
             name: '首页',
-            path: 'Home',
+            path: 'Home'
           },
           {
             name: '基础管理',
-            path: 'User',
-          },
-        ],
-      },
+            path: 'User'
+          }
+        ]
+      }
     }
-  },
+  }
 }
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-  <el-form :model="examForm" ref="userForm" label-width="100px">
+  <el-form ref="userForm" :model="examForm" label-width="100px">
     <el-form-item label="阅卷方式">
       <el-radio
         v-for="(item, index) in examForm.examRadios"
@@ -7,10 +7,9 @@
         v-model="examForm.examRadio"
         :label="item.value"
         :disabled="index === 0"
-        @change="selectPaperType"
         prop="examRadio"
-        >{{ item.name }}</el-radio
-      >
+        @change="selectPaperType"
+      >{{ item.name }}</el-radio>
     </el-form-item>
     <el-row v-for="(item, index) in examForm.examRemarks" :key="item.id">
       <el-col :span="12">
@@ -40,11 +39,11 @@
             "
           >
             <el-option
-              v-for="item in examForm.examUsers"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            ></el-option>
+              v-for="user in examForm.examUsers"
+              :key="user.id"
+              :label="user.name"
+              :value="user.id"
+            />
           </CustomSelect>
         </el-form-item>
       </el-col>
@@ -74,17 +73,17 @@
             "
           >
             <el-option
-              v-for="item in examForm.examUsers"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            ></el-option>
+              v-for="markUser in examForm.examUsers"
+              :key="markUser.id"
+              :label="markUser.name"
+              :value="markUser.id"
+            />
           </CustomSelect>
         </el-form-item>
       </el-col>
 
       <el-col :span="12">
-        <el-form-item label="题号" v-if="examForm.examRadio == 0">
+        <el-form-item v-if="examForm.examRadio === 0" label="题号">
           <CustomSelect
             placeholder="请选择题号"
             :value="examForm.examRemarks[index].examQuestionNum"
@@ -95,36 +94,34 @@
             @currentChange="getMoreQuestionNum"
           >
             <el-option
-              v-for="item in examForm.examQuestionNums"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            ></el-option>
+              v-for="num in examForm.examQuestionNums"
+              :key="num.id"
+              :label="num.name"
+              :value="num.id"
+            />
           </CustomSelect>
         </el-form-item>
       </el-col>
     </el-row>
-    <div class="remark-buttons" v-if="examForm.paperMarkType === 2">
+    <div v-if="examForm.paperMarkType === 2" class="remark-buttons">
       <el-form-item>
         <el-button
-          @click="remarkAdd"
           type="primary"
           size="mini"
           icon="el-icon-plus"
-          >添加</el-button
-        >
+          @click="remarkAdd"
+        >添加</el-button>
         <el-button
           v-if="examForm.examRemarks.length > 1"
-          @click="remarkDel"
           size="mini"
           icon="el-icon-minus"
-          >删除</el-button
-        >
+          @click="remarkDel"
+        >删除</el-button>
       </el-form-item>
     </div>
     <div class="footer">
-      <el-button @click="$emit('prev', '3')" type="primary">上一步</el-button>
-      <el-button @click="next" type="primary">下一步</el-button>
+      <el-button type="primary" @click="$emit('prev', '3')">上一步</el-button>
+      <el-button type="primary" @click="next">下一步</el-button>
     </div>
   </el-form>
 </template>
@@ -136,7 +133,7 @@ import { userListPage } from 'api/user'
 import CustomSelect from 'components/CustomSelect.vue'
 export default {
   components: {
-    CustomSelect,
+    CustomSelect
   },
   data() {
     return {
@@ -151,25 +148,25 @@ export default {
         examRadios: [
           {
             name: '按题阅卷',
-            value: 0,
+            value: 0
           },
           {
             name: '按人阅卷',
-            value: 1,
-          },
+            value: 1
+          }
         ],
         examQuestionNums: [],
         examRemarks: [
           {
             examCheckPerson: '',
             examQuestionNum: [],
-            examUser: [],
-          },
+            examUser: []
+          }
         ],
         examUser: [],
         examUsers: [],
-        examUserList: [],
-      },
+        examUserList: []
+      }
     }
   },
   async created() {
@@ -186,7 +183,7 @@ export default {
         this.examForm.examRemarks.push({
           examCheckPerson: '',
           examQuestionNum: [],
-          examUser: [],
+          examUser: []
         })
       }
 
@@ -197,7 +194,7 @@ export default {
             this.examForm.examRemarks.push({
               examCheckPerson: item.markUserId,
               examUser: item.examUserList.map((user) => user.id),
-              examQuestionNum: [],
+              examQuestionNum: []
             })
           })
         }
@@ -208,7 +205,7 @@ export default {
               currentLabel: cur.name,
               currentValue: cur.id,
               label: cur.name,
-              value: cur.id,
+              value: cur.id
             })
             return acc
           }, [])
@@ -225,11 +222,14 @@ export default {
               currentLabel: item.markUserName,
               currentValue: item.markUserId,
               label: item.markUserName,
-              value: item.markUserId,
+              value: item.markUserId
             })
         })
       })
     }
+  },
+  activated() {
+    this.examForm.paperMarkType = getQuick().markType
   },
   methods: {
     // 添加评语
@@ -237,7 +237,7 @@ export default {
       this.examForm.examRemarks.push({
         examCheckPerson: '',
         examQuestionNum: [],
-        examUser: [],
+        examUser: []
       })
     },
     // 删除评语
@@ -250,7 +250,7 @@ export default {
     },
     // 获取用户
     async getUserList(type = 1, curPage = 1, name = '') {
-      let params = { name, curPage, pageSize: this.examForm.pageSize }
+      const params = { name, curPage, pageSize: this.examForm.pageSize }
       const examUsers = await userListPage(
         type === 1 ? params : { type: 2, ...params }
       )
@@ -286,15 +286,16 @@ export default {
         if (index !== indexe) {
           this.examForm.examRemarks[index].examUser.map((user) => {
             const indexa = item.examUser.indexOf(user)
-            if (indexa !== -1)
+            if (indexa !== -1) {
               this.examForm.examRemarks[indexe].examUser.splice(indexa, 1)
+            }
           })
         }
       })
     },
     // 下一步
     next() {
-      this.$refs['userForm'].validate(async (valid) => {
+      this.$refs['userForm'].validate(async(valid) => {
         if (!valid) {
           return
         }
@@ -305,7 +306,7 @@ export default {
           return acc
         }, [])
 
-        if (this.examForm.examRadio == 0) {
+        if (this.examForm.examRadio === 0) {
           dynamic = this.examForm.examRemarks.reduce((acc, cur) => {
             acc.push(cur.examQuestionNum.join(','))
             return acc
@@ -319,10 +320,10 @@ export default {
 
         const params = {
           id: getQuick().examId,
-          markUserIds,
+          markUserIds
         }
 
-        this.examForm.examRadio == 0
+        this.examForm.examRadio === 0
           ? (params.questionIds = dynamic)
           : (params.examUserIds = dynamic)
 
@@ -336,7 +337,7 @@ export default {
           }, [])
           acc.push({
             examUserList,
-            markUserName: cur.markUserName,
+            markUserName: cur.markUserName
           })
           return acc
         }, [])
@@ -349,14 +350,11 @@ export default {
       let quickInfo = getQuick() || {}
       quickInfo = {
         ...quickInfo,
-        userList,
+        userList
       }
       setQuick(quickInfo)
-    },
-  },
-  activated() {
-    this.examForm.paperMarkType = getQuick().markType
-  },
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>

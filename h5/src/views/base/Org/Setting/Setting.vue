@@ -1,38 +1,27 @@
-<!--
- * @Description: 设置
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-12-16 16:01:13
- * @LastEditors: Che
- * @LastEditTime: 2022-01-06 14:01:19
--->
 <template>
-  <div class="container">
-    <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
-      <el-form-item label="所属机构" label-width="120px">
-        <el-input disabled placeholder v-model="editForm.parentName"></el-input>
-      </el-form-item>
-      <el-form-item label="名称" label-width="120px" prop="name">
-        <el-input placeholder="请输入名称" v-model="editForm.name"></el-input>
-      </el-form-item>
-      <el-form-item label="排序" label-width="120px" prop="no">
-        <el-input-number
-          :max="100"
-          :min="1"
-          v-model.number="editForm.no"
-        ></el-input-number>
-      </el-form-item>
-    </el-form>
-    <div class="form-footer">
-      <el-button @click="add" type="primary" v-if="editForm.parentId"
-        >添加</el-button
-      >
-      <el-button @click="edit" type="primary" v-if="!editForm.parentId"
-        >修改</el-button
-      >
-    </div>
-  </div>
+  <el-form ref="editForm" :model="editForm" :rules="editForm.rules">
+    <el-form-item label="所属机构" label-width="120px">
+      <el-input v-model="editForm.parentName" disabled placeholder />
+    </el-form-item>
+    <el-form-item label="名称" label-width="120px" prop="name">
+      <el-input v-model="editForm.name" placeholder="请输入名称" />
+    </el-form-item>
+    <el-form-item label="排序" label-width="120px" prop="no">
+      <el-input-number v-model.number="editForm.no" :max="100" :min="1" />
+    </el-form-item>
+    <el-form-item>
+      <el-button
+        v-if="editForm.parentId"
+        type="primary"
+        @click="add"
+      >添加</el-button>
+      <el-button
+        v-if="!editForm.parentId"
+        type="primary"
+        @click="edit"
+      >修改</el-button>
+    </el-form-item>
+  </el-form>
 </template>
 
 <script>
@@ -52,9 +41,9 @@ export default {
         rules: {
           // 校验
           name: [{ required: true, message: '请输入名称', trigger: 'change' }],
-          no: [{ required: true, message: '请输入排序', trigger: 'change' }],
-        },
-      },
+          no: [{ required: true, message: '请输入排序', trigger: 'change' }]
+        }
+      }
     }
   },
   async mounted() {
@@ -65,7 +54,7 @@ export default {
       this.editForm.name = res.data.name
       this.editForm.parentName = res.data.parentName
       this.editForm.no = res.data.no
-      if (res.code != 200) {
+      if (res.code !== 200) {
         this.$message.error(res.msg)
         return
       }
@@ -74,7 +63,7 @@ export default {
   methods: {
     // 添加 || 修改分类名称
     add() {
-      this.$refs['editForm'].validate(async (valid) => {
+      this.$refs['editForm'].validate(async(valid) => {
         if (!valid) {
           return false
         }
@@ -82,10 +71,10 @@ export default {
         const { code, msg } = await orgAdd({
           name: this.editForm.name,
           parentId: this.editForm.parentId,
-          no: this.editForm.no,
+          no: this.editForm.no
         })
 
-        if (code != 200) {
+        if (code !== 200) {
           this.$message.error(msg)
           return
         }
@@ -95,7 +84,7 @@ export default {
     },
     // 修改
     edit() {
-      this.$refs['editForm'].validate(async (valid) => {
+      this.$refs['editForm'].validate(async(valid) => {
         if (!valid) {
           return false
         }
@@ -103,18 +92,18 @@ export default {
         const { code, msg } = await orgEdit({
           id: this.id,
           name: this.editForm.name,
-          no: this.editForm.no,
+          no: this.editForm.no
         })
 
-        if (code != 200) {
+        if (code !== 200) {
           this.$message.error(msg)
           return
         }
 
         this.$router.back()
       })
-    },
-  },
+    }
+  }
 }
 </script>
 

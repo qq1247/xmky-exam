@@ -1,12 +1,3 @@
-<!--
- * @Description: App
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-07-22 18:05:35
- * @LastEditors: Che
- * @LastEditTime: 2022-01-21 17:51:11
--->
 <template>
   <div id="app">
     <router-view />
@@ -20,7 +11,7 @@ export default {
   data() {
     return {
       timer: null,
-      timerNum: 1,
+      timerNum: 1
     }
   },
   watch: {
@@ -33,13 +24,16 @@ export default {
         } else {
           this.setSysTime()
         }
-      },
-    },
+      }
+    }
+  },
+  beforeDestroy() {
+    this.clearTime()
   },
   methods: {
     interval(func, wait) {
       const _this = this
-      let interv = function () {
+      const interv = function() {
         func.call(_this || null)
         this.timer = setTimeout(interv, wait)
       }
@@ -47,7 +41,7 @@ export default {
     },
 
     setSysTime() {
-      this.interval(function () {
+      this.interval(function() {
         if (this.timerNum % 30 === 0) {
           loginSysTime({}).then((res) => {})
         }
@@ -59,11 +53,8 @@ export default {
       clearTimeout(this.timer)
       this.timer = null
       this.timerNum = 1
-    },
-  },
-  beforeDestroy() {
-    this.clearTime()
-  },
+    }
+  }
 }
 </script>
 

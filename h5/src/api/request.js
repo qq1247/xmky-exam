@@ -1,12 +1,3 @@
-/*
- * @Description: request封装
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-07-30 13:36:21
- * @LastEditors: Che
- * @LastEditTime: 2022-01-13 11:11:47
- */
 import http from '@/utils/http'
 import qs from 'qs'
 
@@ -27,7 +18,7 @@ const request = (
     url: url,
     method: 'post',
     data:
-      headers == 'application/x-www-form-urlencoded'
+      headers === 'application/x-www-form-urlencoded'
         ? qs.stringify(params, { arrayFormat: 'repeat' })
         : params,
     responseType: responseType,

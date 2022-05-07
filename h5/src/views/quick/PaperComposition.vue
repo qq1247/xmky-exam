@@ -1,9 +1,9 @@
 <template>
   <div>
-    <RulePaper ref="rulePaper"></RulePaper>
+    <RulePaper ref="rulePaper" />
     <div class="footer">
-      <el-button @click="$emit('prev', '1')" type="primary">上一步</el-button>
-      <el-button @click="next" type="primary">下一步</el-button>
+      <el-button type="primary" @click="$emit('prev', '1')">上一步</el-button>
+      <el-button type="primary" @click="next">下一步</el-button>
     </div>
   </div>
 </template>
@@ -13,7 +13,7 @@ import { paperPublish, paperGet } from 'api/paper'
 import { getQuick, setQuick } from '@/utils/storage'
 export default {
   components: {
-    RulePaper,
+    RulePaper
   },
   data() {
     return {}
@@ -21,7 +21,7 @@ export default {
   methods: {
     // 试卷总分
     totalScore(paperQuestion) {
-      if (paperQuestion.length == 0) {
+      if (paperQuestion.length === 0) {
         return 0
       }
 
@@ -47,9 +47,9 @@ export default {
         this.$confirm('提交组卷并发布，且不可修改！', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          type: 'warning',
+          type: 'warning'
         })
-          .then(async () => {
+          .then(async() => {
             const res = await paperPublish({ id: getQuick().id })
             if (res?.code === 200) {
               const paperInfo = await paperGet({ id: getQuick().id })
@@ -70,8 +70,8 @@ export default {
       } else {
         this.$message.warning('试卷不能为空！')
       }
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -96,7 +96,7 @@ export default {
 
 /deep/ .top {
   position: absolute;
-  width: calc(100% - 1040px);
+  width: calc(1200px - 700px);
 }
 
 .footer {

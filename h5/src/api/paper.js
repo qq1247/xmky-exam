@@ -1,13 +1,3 @@
-/*
- * @Description: 试卷API
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-08-11 16:27:54
- * @LastEditors: Che
- * @LastEditTime: 2022-01-20 14:01:16
- */
-
 import request from './request'
 
 export const paperListPage = (params) => request('paper/listpage', params)

@@ -3,55 +3,53 @@
     <template v-if="paperQuestion.length">
       <div v-for="(item, index) in paperQuestion" :key="index">
         <div class="chapter">
-          <div class="chapter-item">
-            <div class="item-title">{{ item.chapter.name }}</div>
-          </div>
-          <div
-            class="chapter-description"
-            v-html="item.chapter.description"
-          ></div>
+          <div class="chapter-name">{{ item.chapter.name }}</div>
+          <div class="chapter-description" v-html="item.chapter.description" />
         </div>
 
         <template v-if="item.questionList.length > 0">
           <div
-            :id="`p-${child.id}`"
-            :class="['children-content', child.type === 5 ? 'ask-content' : '']"
-            v-for="(child, index) in item.questionList"
-            :key="child.id"
+            v-for="(question, indexQuestion) in item.questionList"
+            :id="`p-${question.id}`"
+            :key="question.id"
+            :class="[
+              'question-content',
+              question.type === 5 ? 'ask-content' : '',
+            ]"
           >
-            <div class="question-title" v-if="child.type !== 3">
-              <div>{{ index + 1 }}、</div>
-              <div v-html="`${child.title}`"></div>
+            <div v-if="question.type !== 3" class="question-title">
+              <div>{{ indexQuestion + 1 }}、</div>
+              <div v-html="`${question.title}`" />
             </div>
 
             <div
+              v-if="question.type === 3 && myExamDetailCache[question.id]"
               class="question-title"
-              v-if="child.type === 3 && myExamDetailCache[child.id]"
             >
               <span>{{ index + 1 }}、</span>
               <ClozeTitle
-                :title="child.title"
-                :questionId="child.id"
+                :title="question.title"
+                :question-id="question.id"
                 :preview="preview"
-                :paperQuestion="paperQuestion"
-                :myExamDetailCache="myExamDetailCache"
-              ></ClozeTitle>
+                :paper-question="paperQuestion"
+                :my-exam-detail-cache="myExamDetailCache"
+              />
             </div>
 
             <!-- 单选 -->
-            <template v-if="child.type === 1">
+            <template v-if="question.type === 1">
               <el-radio-group
-                @change="updateAnswer(child.id)"
+                v-if="myExamDetailCache[question.id]"
+                v-model="myExamDetailCache[question.id].answers[0]"
                 class="children-option"
-                v-if="myExamDetailCache[child.id]"
-                v-model="myExamDetailCache[child.id].answers[0]"
+                @change="updateAnswer(question.id)"
               >
                 <el-radio
-                  :key="index"
+                  v-for="(option, indexOption) in question.options"
+                  :key="indexOption"
                   :disabled="preview"
                   :label="String.fromCharCode(65 + index)"
                   class="option-item"
-                  v-for="(option, index) in child.options"
                 >
                   <div
                     :style="{
@@ -59,25 +57,25 @@
                     }"
                     class="flex-items-center"
                     v-html="`${String.fromCharCode(65 + index)}、${option}`"
-                  ></div>
+                  />
                 </el-radio>
               </el-radio-group>
             </template>
 
             <!-- 多选 -->
-            <template v-if="child.type === 2">
+            <template v-if="question.type === 2">
               <el-checkbox-group
-                @change="updateAnswer(child.id)"
+                v-if="myExamDetailCache[question.id]"
+                v-model="myExamDetailCache[question.id].answers"
                 class="children-option"
-                v-if="myExamDetailCache[child.id]"
-                v-model="myExamDetailCache[child.id].answers"
+                @change="updateAnswer(question.id)"
               >
                 <el-checkbox
-                  :key="index"
+                  v-for="(option, indexOption) in question.options"
+                  :key="indexOption"
                   :label="String.fromCharCode(65 + index)"
                   class="option-item"
                   :disabled="preview"
-                  v-for="(option, index) in child.options"
                 >
                   <div
                     :style="{
@@ -85,20 +83,20 @@
                     }"
                     class="flex-items-center"
                     v-html="`${String.fromCharCode(65 + index)}、${option}`"
-                  ></div>
+                  />
                 </el-checkbox>
               </el-checkbox-group>
             </template>
 
             <!-- 填空 -->
-            <template v-if="child.type === 3 && scoreState">
+            <template v-if="question.type === 3 && scoreState">
               <div class="children-analysis">
                 <span class="analysis-tip">查看解析</span>
                 <div class="analysis-content">
                   <div>答案：</div>
                   <div>
                     <div
-                      v-for="(answer, indexAnswers) in child.answers"
+                      v-for="(answer, indexAnswers) in question.answers"
                       :key="answer.id"
                       class="answers-item"
                     >
@@ -106,64 +104,61 @@
                         `填空${$tools.intToChinese(indexAnswers + 1)}、`
                       }}</span>
                       <span
-                        class="answers-tag"
                         v-for="(ans, indexAnswer) in answer.answer"
                         :key="indexAnswer"
-                        >{{ ans }}</span
-                      >
+                        class="answers-tag"
+                      >{{ ans }}</span>
                     </div>
                   </div>
                 </div>
                 <div class="analysis-content">
                   <div>解析：</div>
-                  <div v-html="child.analysis"></div>
+                  <div v-html="question.analysis" />
                 </div>
               </div>
             </template>
 
             <!-- 判断 -->
-            <template v-if="child.type === 4">
+            <template v-if="question.type === 4">
               <el-radio-group
-                @change="updateAnswer(child.id)"
+                v-if="myExamDetailCache[question.id]"
+                v-model="myExamDetailCache[question.id].answers[0]"
                 class="children-option"
-                v-if="myExamDetailCache[child.id]"
-                v-model="myExamDetailCache[child.id].answers[0]"
+                @change="updateAnswer(question.id)"
               >
                 <el-radio
-                  :key="index"
+                  v-for="(option, indexOption) in ['对', '错']"
+                  :key="indexOption"
                   :label="option"
                   class="option-item"
-                  v-for="(option, index) in ['对', '错']"
                   :disabled="preview"
-                  ><span
-                    :style="{
-                      color: scoreState ? optionColor(index, child) : '',
-                    }"
-                    >{{ option }}</span
-                  ></el-radio
-                >
+                ><span
+                  :style="{
+                    color: scoreState ? optionColor(index, child) : '',
+                  }"
+                >{{ option }}</span></el-radio>
               </el-radio-group>
             </template>
 
             <!-- 问答 -->
-            <template v-if="child.type === 5">
+            <template v-if="question.type === 5">
               <el-input
+                v-if="myExamDetailCache[question.id]"
+                v-model="myExamDetailCache[question.id].answers[0]"
                 :rows="2"
                 class="question-text"
-                @change="updateAnswer(child.id)"
                 placeholder="请输入内容"
                 type="textarea"
-                v-if="myExamDetailCache[child.id]"
                 :disabled="preview"
-                v-model="myExamDetailCache[child.id].answers[0]"
-              ></el-input>
-              <div class="children-analysis" v-if="scoreState">
+                @change="updateAnswer(question.id)"
+              />
+              <div v-if="scoreState" class="children-analysis">
                 <span class="analysis-tip">查看解析</span>
                 <div class="analysis-content">
                   <span>答案：</span>
-                  <div v-if="child.ai === 1">
+                  <div v-if="question.ai === 1">
                     <div
-                      v-for="(answer, indexAnswers) in child.answers"
+                      v-for="(answer, indexAnswers) in question.answers"
                       :key="answer.id"
                       class="answers-item"
                     >
@@ -171,30 +166,29 @@
                         `关键词${$tools.intToChinese(indexAnswers + 1)}、`
                       }}</span>
                       <span
-                        class="answers-tag"
                         v-for="(ans, indexAnswer) in answer.answer"
                         :key="indexAnswer"
-                        >{{ ans }}</span
-                      >
+                        class="answers-tag"
+                      >{{ ans }}</span>
                     </div>
                   </div>
                   <div
-                    v-if="child.ai === 2"
-                    v-html="`${child.answers[0].answer}`"
-                  ></div>
+                    v-if="question.ai === 2"
+                    v-html="`${question.answers[0].answer}`"
+                  />
                 </div>
                 <div class="analysis-content">
                   <div>解析：</div>
-                  <div v-html="child.analysis"></div>
+                  <div v-html="question.analysis" />
                 </div>
               </div>
             </template>
           </div>
         </template>
-        <el-empty v-else description="暂无试题"> </el-empty>
+        <el-empty v-else description="暂无试题" />
       </div>
     </template>
-    <el-empty v-else description="暂无试卷"> </el-empty>
+    <el-empty v-else description="暂无试卷" />
   </div>
 </template>
 
@@ -202,25 +196,25 @@
 import ClozeTitle from '../ClozeTitle.vue'
 export default {
   components: {
-    ClozeTitle,
+    ClozeTitle
   },
   props: {
     preview: {
       type: Boolean,
-      default: false,
+      default: false
     },
     scoreState: {
       type: Boolean,
-      default: false,
+      default: false
     },
     paperQuestion: {
       type: Array,
-      default: () => [],
+      default: () => []
     },
     myExamDetailCache: {
       type: Object,
-      default: () => {},
-    },
+      default: () => {}
+    }
   },
   computed: {
     optionColor(index, item) {
@@ -262,13 +256,13 @@ export default {
           }
         }
       }
-    },
+    }
   },
   methods: {
     updateAnswer(childId) {
       this.$emit('updateAnswer', childId)
-    },
-  },
+    }
+  }
 }
 </script>
 

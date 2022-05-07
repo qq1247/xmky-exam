@@ -1,51 +1,42 @@
-<!--
- * @Description: 
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-11-12 10:59:48
- * @LastEditors: Che
- * @LastEditTime: 2021-11-12 17:05:58
--->
 <template>
   <el-form
+    ref="paramForm"
     :model="paramForm"
     :rules="paramForm.rules"
-    ref="paramForm"
     label-width="100px"
   >
     <el-form-item label="账号" prop="emailUserName">
       <el-input
-        placeholder="请输入账号"
         v-model="paramForm.emailUserName"
-      ></el-input>
+        placeholder="请输入账号"
+      />
     </el-form-item>
     <el-form-item label="授权码" prop="emailPwd">
       <el-input
-        placeholder="请输入授权码"
         v-model="paramForm.emailPwd"
-      ></el-input>
+        placeholder="请输入授权码"
+      />
     </el-form-item>
     <el-form-item label="主机" prop="emailHost">
       <el-input
-        placeholder="请输入主机"
         v-model="paramForm.emailHost"
-      ></el-input>
+        placeholder="请输入主机"
+      />
     </el-form-item>
     <el-form-item label="协议" prop="emailProtocol">
       <el-input
-        placeholder="请输入协议"
         v-model="paramForm.emailProtocol"
-      ></el-input>
+        placeholder="请输入协议"
+      />
     </el-form-item>
     <el-form-item label="编码" prop="emailEncode">
       <el-input
-        placeholder="请输入编码"
         v-model="paramForm.emailEncode"
-      ></el-input>
+        placeholder="请输入编码"
+      />
     </el-form-item>
     <el-form-item>
-      <el-button @click="setting" type="primary">设置</el-button>
+      <el-button type="primary" @click="setting">设置</el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -63,22 +54,22 @@ export default {
         emailProtocol: '',
         rules: {
           emailPwd: [
-            { required: true, message: '请输入密码', trigger: 'blur' },
+            { required: true, message: '请输入密码', trigger: 'blur' }
           ],
           emailHost: [
-            { required: true, message: '请输入主机', trigger: 'blur' },
+            { required: true, message: '请输入主机', trigger: 'blur' }
           ],
           emailEncode: [
-            { required: true, message: '请输入编码', trigger: 'blur' },
+            { required: true, message: '请输入编码', trigger: 'blur' }
           ],
           emailUserName: [
-            { required: true, message: '请输入用户名', trigger: 'blur' },
+            { required: true, message: '请输入用户名', trigger: 'blur' }
           ],
           emailProtocol: [
-            { required: true, message: '请输入协议', trigger: 'blur' },
-          ],
-        },
-      },
+            { required: true, message: '请输入协议', trigger: 'blur' }
+          ]
+        }
+      }
     }
   },
   created() {
@@ -95,7 +86,7 @@ export default {
     },
     // 设置
     setting() {
-      this.$refs['paramForm'].validate(async (valid) => {
+      this.$refs['paramForm'].validate(async(valid) => {
         if (!valid) {
           return false
         }
@@ -105,7 +96,7 @@ export default {
           host: this.paramForm.emailHost,
           encode: this.paramForm.emailEncode,
           userName: this.paramForm.emailUserName,
-          protocol: this.paramForm.emailProtocol,
+          protocol: this.paramForm.emailProtocol
         }
 
         const { code, msg } = await parmEmail(params)
@@ -113,14 +104,14 @@ export default {
         if (code === 200) {
           this.$message({
             message: '设置成功',
-            duration: 1000,
+            duration: 1000
           })
           await this.$parent.init()
         } else {
           this.$message.error(msg)
         }
       })
-    },
-  },
+    }
+  }
 }
 </script>

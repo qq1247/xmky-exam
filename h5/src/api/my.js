@@ -1,12 +1,3 @@
-/*
- * @Description: 我的API
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-08-11 17:06:11
- * @LastEditors: Che
- * @LastEditTime: 2021-12-03 14:06:45
- */
 import request from './request'
 
 export const myExamListPage = (params) => request('myExam/listpage', params)

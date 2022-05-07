@@ -1,9 +1,9 @@
 <template>
-  <div class="container setting-container">
+  <div class="setting-container">
     <el-tabs v-model="tabIndex" tab-position="right">
-      <el-tab-pane :key="item.index" v-for="item in tab" :name="item.index">
-        <div class="pane-label" slot="label">
-          <i :class="item.icon"></i>
+      <el-tab-pane v-for="item in tab" :key="item.index" :name="item.index">
+        <div slot="label" class="pane-label">
+          <i :class="item.icon" />
           <div>
             <div class="label-name">{{ item.name }}</div>
             <div class="label-intro">{{ item.intro }}</div>
@@ -18,14 +18,13 @@
           <div class="header-intro">
             {{ contentIntro }}
             <router-link
-              :to="{ name: contentUrl }"
               v-if="contentUrl"
+              :to="{ name: contentUrl }"
               class="header-url"
-              >去设置</router-link
-            >
+            >去设置</router-link>
           </div>
         </div>
-        <component :is="currentView"></component>
+        <component :is="currentView" />
       </el-card>
     </div>
   </div>
@@ -47,14 +46,14 @@ export default {
           contentName: '试题分类信息',
           contentIntro:
             '为试题创建一个分类。建议：按类型分开存放，方便管理维护',
-          index: '1',
-        },
+          index: '1'
+        }
       ],
       contentName: '',
       contentIntro: '',
       contentUrl: '',
       viewList: [Setting, Role, Move, Delete],
-      currentView: null,
+      currentView: null
     }
   },
   computed: {
@@ -67,8 +66,8 @@ export default {
         this.contentName = this.tab[Number(val) - 1].contentName
         this.contentIntro = this.tab[Number(val) - 1].contentIntro
         this.contentUrl = this.tab[Number(val) - 1].contentUrl || ''
-      },
-    },
+      }
+    }
   },
   created() {
     if (Number(this.$route.params.id)) {
@@ -81,7 +80,7 @@ export default {
           contentName: '操作权限',
           contentIntro:
             '允许其他子管理员协助添加试题。建议：题量大的情况下，添加一个子管理员来协助添加试题，自己做最后的审核（发布）。',
-          index: '2',
+          index: '2'
         },
         {
           name: '移动试题',
@@ -89,7 +88,7 @@ export default {
           icon: 'common common-move',
           contentName: '移动试题',
           contentIntro: '移动试题到新分类下',
-          index: '3',
+          index: '3'
         },
         {
           name: '删除',
@@ -97,15 +96,15 @@ export default {
           icon: 'common common-delete',
           contentName: '删除',
           contentIntro: '该分类下有试题，则不允许删除',
-          index: '4',
-        },
+          index: '4'
+        }
       ]
     }
     this.currentView = this.viewList[Number(this.tabIndex) - 1]
     this.contentName = this.tab[Number(this.tabIndex) - 1].contentName
     this.contentIntro = this.tab[Number(this.tabIndex) - 1].contentIntro
     this.contentUrl = this.tab[Number(this.tabIndex) - 1].contentUrl || ''
-  },
+  }
 }
 </script>
 

@@ -1,28 +1,20 @@
-<!--
- * @Description: 
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-09-18 16:54:54
- * @LastEditors: Che
- * @LastEditTime: 2021-09-28 12:52:43
--->
 <template>
   <div :class="['comment-content', showTriangle ? 'comment-triangle' : '']">
     <el-input
+      v-model="commentText"
       class="comment-text"
       type="textarea"
       :rows="2"
       resize="none"
       placeholder="您的评论..."
-      v-model="commentText"
-    >
-    </el-input>
+    />
     <div class="comment-btns">
       <el-checkbox v-model="anonymity">匿名</el-checkbox>
-      <el-button type="warning" class="comment-btn" @click="comment"
-        >评论</el-button
-      >
+      <el-button
+        type="warning"
+        class="comment-btn"
+        @click="comment"
+      >评论</el-button>
     </div>
   </div>
 </template>
@@ -32,13 +24,13 @@ export default {
   props: {
     showTriangle: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
   data() {
     return {
       commentText: '',
-      anonymity: false,
+      anonymity: false
     }
   },
   methods: {
@@ -46,8 +38,8 @@ export default {
       this.$emit('comment', this.commentText, this.anonymity)
       this.commentText = ''
       this.anonymity = false
-    },
-  },
+    }
+  }
 }
 </script>
 

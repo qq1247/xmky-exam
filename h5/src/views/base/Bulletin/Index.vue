@@ -1,37 +1,35 @@
 <template>
   <div class="container">
-    <div class="content" v-if="hashChildren">
-      <el-form :inline="true" :model="queryForm" ref="queryForm">
+    <template v-if="hashChildren">
+      <el-form ref="queryForm" :inline="true" :model="queryForm">
         <el-row>
           <el-col :span="17">
             <el-form-item label prop="name">
               <el-input
-                @focus="queryForm.queryShow = true"
-                placeholder="请输入标题"
                 v-model="queryForm.title"
-              ></el-input>
+                placeholder="请输入标题"
+                @focus="queryForm.queryShow = true"
+              />
             </el-form-item>
             <el-button
-              @click="query"
               class="query-search"
               icon="el-icon-search"
               type="primary"
-              >查询</el-button
-            >
+              @click="query"
+            >查询</el-button>
           </el-col>
           <el-col :span="7">
             <el-form-item style="float: right">
               <el-button
-                @click="add"
                 icon="el-icon-circle-plus-outline"
                 size="mini"
                 type="primary"
-                >添加</el-button
-              >
+                @click="add"
+              >添加</el-button>
             </el-form-item>
           </el-col>
         </el-row>
-        <div v-if="queryForm.queryShow"></div>
+        <div v-if="queryForm.queryShow" />
       </el-form>
       <div class="table">
         <el-table :data="listpage.list" style="width: 100%">
@@ -57,10 +55,10 @@
           <el-table-column label="操作" width="300">
             <template slot-scope="scope">
               <el-tooltip placement="top" content="修改">
-                <i class="common common-edit" @click="edit(scope.row.id)"></i>
+                <i class="common common-edit" @click="edit(scope.row.id)" />
               </el-tooltip>
               <el-tooltip placement="top" content="删除">
-                <i class="common common-delete" @click="del(scope.row.id)"></i>
+                <i class="common common-delete" @click="del(scope.row.id)" />
               </el-tooltip>
             </template>
           </el-table-column>
@@ -70,15 +68,15 @@
         :current-page="listpage.curPage"
         :page-size="listpage.pageSize"
         :total="listpage.total"
-        @current-change="pageChange"
         background
         hide-on-single-page
         layout="prev, pager, next"
         next-text="下一页"
         prev-text="上一页"
-      ></el-pagination>
-    </div>
-    <router-view v-else></router-view>
+        @current-change="pageChange"
+      />
+    </template>
+    <router-view v-else />
   </div>
 </template>
 
@@ -93,19 +91,19 @@ export default {
         total: 0, // 总条数
         curPage: 1, // 当前第几页
         pageSize: 10, // 每页多少条
-        list: [], // 列表数据
+        list: [] // 列表数据
       },
       // 查询表单
       queryForm: {
         title: null,
-        queryShow: false,
-      },
+        queryShow: false
+      }
     }
   },
   computed: {
     hashChildren() {
-      return this.$route.matched.length > 2 ? false : true
-    },
+      return !(this.$route.matched.length > 2)
+    }
   },
   created() {
     this.init()
@@ -116,11 +114,11 @@ export default {
       this.queryForm.queryShow = false
 
       const {
-        data: { list, total },
+        data: { list, total }
       } = await bulletinListPage({
         title: this.queryForm.title,
         curPage: curPage,
-        pageSize: this.listpage.pageSize,
+        pageSize: this.listpage.pageSize
       })
       this.listpage.total = total
       this.listpage.list = list
@@ -134,38 +132,31 @@ export default {
     add() {
       this.$tools.switchTab('BulletinIndexSetting', {
         id: 0,
-        tab: '1',
+        tab: '1'
       })
     },
     // 修改
     edit(id) {
       this.$tools.switchTab('BulletinIndexSetting', {
         id,
-        tab: '1',
+        tab: '1'
       })
     },
     // 删除
     del(id) {
       this.$tools.switchTab('BulletinIndexSetting', {
         id,
-        tab: '2',
+        tab: '2'
       })
     },
     // 分页切换
     pageChange(val) {
       this.query(val)
-    },
-  },
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>
-.container {
-  display: flex;
-  align-items: center;
-  .content {
-    width: 1200px;
-  }
-}
 .query-search {
   width: 150px;
   height: 40px;

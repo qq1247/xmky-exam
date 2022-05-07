@@ -1,10 +1,9 @@
 <template>
   <header class="sub-header">
     <div class="sub-content">
-      <Back></Back>
-      <Content></Content>
-      <div style="width: 20%"></div>
-      <!-- <Info></Info> -->
+      <Back />
+      <Content />
+      <div style="width: 20%" />
     </div>
   </header>
 </template>
@@ -12,19 +11,17 @@
 <script>
 import Back from './Back.vue'
 import Content from './Content.vue'
-// import Info from './Info.vue'
 export default {
   name: 'AppHeader',
   components: {
     Back,
-    Content,
-    // Info,
+    Content
   },
   data() {
     return {}
   },
   mounted() {},
-  methods: {},
+  methods: {}
 }
 </script>
 

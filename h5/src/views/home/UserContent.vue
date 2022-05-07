@@ -4,10 +4,10 @@
       <el-card class="box-card" shadow="never">
         <div slot="header">考试概览</div>
         <template v-if="onlyRole[0] === 'user'">
-          <div class="data-content" v-if="userInfo.exam">
+          <div v-if="userInfo.exam" class="data-content">
             <div class="data-item" @click="$router.push({ name: 'MyExam' })">
               <div class="item-icon exam-bg">
-                <img src="../../assets/img/index/index-exam.png" alt="" />
+                <img src="../../assets/img/index/index-exam.png" alt="">
               </div>
               <div class="item-info">
                 <span class="info-num">{{ userInfo.exam.missNum }}</span>
@@ -16,7 +16,7 @@
             </div>
             <div class="data-item" @click="$router.push({ name: 'MyExam' })">
               <div class="item-icon paper-bg">
-                <img src="../../assets/img/index/index-paper.png" alt="" />
+                <img src="../../assets/img/index/index-paper.png" alt="">
               </div>
               <div class="item-info">
                 <span class="info-num">{{ userInfo.exam.num }}</span>
@@ -25,7 +25,7 @@
             </div>
             <div class="data-item">
               <div class="item-icon question-bg">
-                <img src="../../assets/img/index/index-question.png" alt="" />
+                <img src="../../assets/img/index/index-question.png" alt="">
               </div>
               <div class="item-info">
                 <span class="info-num">{{ userInfo.exam.succNum }}</span>
@@ -34,7 +34,7 @@
             </div>
             <div class="data-item">
               <div class="item-icon mark-bg">
-                <img src="../../assets/img/index/index-mark.png" alt="" />
+                <img src="../../assets/img/index/index-mark.png" alt="">
               </div>
               <div class="item-info">
                 <span class="info-num">{{ userInfo.exam.top }}</span>
@@ -45,17 +45,17 @@
         </template>
         <template v-if="onlyRole[0] === 'subAdmin'">
           <div
-            class="data-content"
             v-if="
               userInfo.exam &&
-              userInfo.paper &&
-              userInfo.question &&
-              userInfo.myMark
+                userInfo.paper &&
+                userInfo.question &&
+                userInfo.myMark
             "
+            class="data-content"
           >
             <div class="data-item" @click="$router.push({ name: 'Exam' })">
               <div class="item-icon exam-bg">
-                <img src="../../assets/img/index/index-exam.png" alt="" />
+                <img src="../../assets/img/index/index-exam.png" alt="">
               </div>
               <div class="item-info">
                 <span class="info-num">{{ userInfo.exam.num }}</span>
@@ -64,7 +64,7 @@
             </div>
             <div class="data-item" @click="$router.push({ name: 'Paper' })">
               <div class="item-icon paper-bg">
-                <img src="../../assets/img/index/index-paper.png" alt="" />
+                <img src="../../assets/img/index/index-paper.png" alt="">
               </div>
               <div class="item-info">
                 <span class="info-num">{{ userInfo.paper.num }}</span>
@@ -73,7 +73,7 @@
             </div>
             <div class="data-item" @click="$router.push({ name: 'Question' })">
               <div class="item-icon question-bg">
-                <img src="../../assets/img/index/index-question.png" alt="" />
+                <img src="../../assets/img/index/index-question.png" alt="">
               </div>
               <div class="item-info">
                 <span class="info-num">{{ userInfo.question.num }}</span>
@@ -82,7 +82,7 @@
             </div>
             <div class="data-item" @click="$router.push({ name: 'MyMark' })">
               <div class="item-icon mark-bg">
-                <img src="../../assets/img/index/index-mark.png" alt="" />
+                <img src="../../assets/img/index/index-mark.png" alt="">
               </div>
               <div class="item-info">
                 <span class="info-num">{{ userInfo.myMark.num }}</span>
@@ -97,31 +97,33 @@
           {{ onlyRole.includes('user') ? '待考列表' : '待阅列表' }}
         </div>
         <div class="calendar-list">
-          <div class="home-calendar">
-            <Calendar
-              v-model="now"
-              :timePopovers="timePopovers"
-              @selectDate="selectDate"
-            ></Calendar>
-          </div>
-          <div class="home-list">
+          <el-scrollbar wrap-style="overflow-x:hidden;" class="home-calendar">
+            <div>
+              <Calendar
+                v-model="now"
+                :time-popovers="timePopovers"
+                @selectDate="selectDate"
+              />
+            </div>
+          </el-scrollbar>
+          <el-scrollbar wrap-style="overflow-x:hidden;" class="home-list">
             <!-- 普通用户 -->
             <template v-if="onlyRole.includes('user')">
               <!-- 待考列表 -->
               <template v-if="examList.length">
                 <div
+                  v-for="item in examList"
+                  :key="item.id"
                   class="info-item today-item"
                   :style="{
                     display: isExam(item.state) ? 'flex' : 'none',
                   }"
-                  :key="item.id"
-                  v-for="item in examList"
                 >
                   <template v-if="isExam(item.state)">
                     <img
                       src="../../assets/img/index/wait-mark.png"
                       class="today-icon"
-                    />
+                    >
                     <div class="item-center">
                       <div class="info-item ellipsis">{{ item.examName }}</div>
                       <div class="info-item">
@@ -145,23 +147,23 @@
                       <img
                         src="../../assets/img/index/index-view.png"
                         alt=""
-                      />开始考试
+                      >开始考试
                     </div>
                   </template>
                 </div>
               </template>
-              <el-empty v-else description="暂无待考"></el-empty>
+              <el-empty v-else description="暂无待考" />
 
               <!-- 模拟练习 -->
               <div
-                class="info-item today-item"
-                :key="item.id"
                 v-for="item in questionTypeOpenList"
+                :key="item.id"
+                class="info-item today-item"
               >
                 <img
                   src="../../assets/img/index/wait-mark.png"
                   class="today-icon"
-                />
+                >
                 <div class="item-center">
                   <div class="info-item ellipsis">
                     {{ item.questionTypeName }}
@@ -176,7 +178,7 @@
                   <img
                     src="../../assets/img/index/index-view.png"
                     alt=""
-                  />模拟练习
+                  >模拟练习
                 </div>
               </div>
             </template>
@@ -184,6 +186,8 @@
             <template v-if="onlyRole.includes('subAdmin')">
               <template v-if="markList.length">
                 <div
+                  v-for="item in markList"
+                  :key="item.id"
                   class="info-item today-item"
                   :style="{
                     display: isMark(
@@ -193,8 +197,6 @@
                       ? 'flex'
                       : 'none',
                   }"
-                  :key="item.id"
-                  v-for="item in markList"
                 >
                   <template
                     v-if="isMark(item.examMarkStartTime, item.examMarkEndTime)"
@@ -202,7 +204,7 @@
                     <img
                       src="../../assets/img/index/wait-mark.png"
                       class="today-icon"
-                    />
+                    >
                     <div class="item-center">
                       <div class="info-item ellipsis">{{ item.examName }}</div>
                       <div class="info-item">
@@ -226,7 +228,7 @@
                       <img
                         src="../../assets/img/index/index-view.png"
                         alt=""
-                      />开始阅卷
+                      >开始阅卷
                     </div>
                   </template>
                 </div>
@@ -235,9 +237,9 @@
                 v-else
                 :image="require('assets/img/index/mark-null.png')"
                 description="暂无待阅"
-              ></el-empty>
+              />
             </template>
-          </div>
+          </el-scrollbar>
         </div>
       </el-card>
     </div>
@@ -249,15 +251,15 @@
         </div>
         <div style="margin-bottom: 24px">
           <el-link
-            class="quick-nav"
             v-for="nav in navList"
             :key="nav.path"
+            class="quick-nav"
             :underline="false"
             @click="$router.push(nav.path)"
           >
             <div class="nav-item">
               <div class="nav-img" :style="{ background: nav.background }">
-                <img :src="nav.icon" alt="" />
+                <img :src="nav.icon" alt="">
               </div>
               <span class="nav-title">{{ nav.title }}</span>
             </div>
@@ -269,22 +271,24 @@
         <div slot="header">
           <span>最新公告</span>
         </div>
-        <template v-if="bulletinList.length">
-          <div
-            class="info-item"
-            v-for="item in bulletinList"
-            :key="item.id"
-            @click="getBulletin(item)"
-          >
-            <div class="item-left ellipsis">{{ item.title }}</div>
-            <div class="item-right">{{ item.endTime }}</div>
-          </div>
-        </template>
-        <el-empty
-          v-else
-          :image="require('assets/img/index/notice-null.png')"
-          description="暂无公告"
-        ></el-empty>
+        <el-scrollbar wrap-style="overflow-x:hidden;" class="home-calendar">
+          <template v-if="bulletinList.length">
+            <div
+              v-for="item in bulletinList"
+              :key="item.id"
+              class="notice-item"
+              @click="getBulletin(item)"
+            >
+              <div class="item-left ellipsis">{{ item.title }}</div>
+              <div class="item-right">{{ item.endTime }}</div>
+            </div>
+          </template>
+          <el-empty
+            v-else
+            :image="require('assets/img/index/notice-null.png')"
+            description="暂无公告"
+          />
+        </el-scrollbar>
       </el-card>
       <!-- 服务支持 -->
       <el-card class="box-card service-box" shadow="never">
@@ -292,9 +296,9 @@
           <span>服务支持</span>
         </div>
         <div class="service">
-          <p class="service-item">技术支持：在线考试</p>
+          <p class="service-item"><span>技术支持：</span>在线考试</p>
           <p class="service-item">
-            在线服务：<a
+            <span>在线服务：</span><a
               class="service-qq"
               target="_blank"
               href="https://jq.qq.com/?_wv=1027&k=GXh1hHSy"
@@ -313,14 +317,13 @@
     >
       <div class="bulletin-wrap">
         <div class="bulletin-title">{{ bulletinDetail.startTime }}</div>
-        <div class="bulletin-content" v-html="bulletinDetail.content"></div>
+        <div class="bulletin-content" v-html="bulletinDetail.content" />
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import Upload from 'components/Upload'
 import { mapGetters } from 'vuex'
 import { getInfo, setInfo } from '@/utils/storage'
 import { getUserInfo, getSubAdminInfo } from 'api/report'
@@ -331,8 +334,7 @@ import { questionTypeOpenListPage } from 'api/question'
 import * as dayjs from 'dayjs'
 export default {
   components: {
-    Upload,
-    Calendar,
+    Calendar
   },
   data() {
     return {
@@ -347,7 +349,7 @@ export default {
       bulletinDetail: {},
       userInfo: {},
       timer: null,
-      number: 0,
+      number: 0
     }
   },
   computed: {
@@ -363,7 +365,7 @@ export default {
       return (markState) => {
         return markState !== 3
       }
-    },
+    }
   },
   watch: {
     '$store.getters.onlyRole': {
@@ -376,8 +378,8 @@ export default {
         this.getBulletinList()
         this.getQuestionTypeOpenList()
         await this.renderCalendar()
-      },
-    },
+      }
+    }
   },
   methods: {
     setNavBar(userInfo) {
@@ -387,32 +389,32 @@ export default {
             path: '/question',
             background: '#0094E5',
             icon: require('../../assets/img/index/question-manage.png'),
-            title: '试题管理',
+            title: '试题管理'
           },
           {
             path: '/paper',
             background: '#FB901B',
             icon: require('../../assets/img/index/paper-manage.png'),
-            title: '试卷管理',
+            title: '试卷管理'
           },
           {
             path: '/exam',
             background: '#09C8BD',
             icon: require('../../assets/img/index/exam-manage.png'),
-            title: '考试管理',
+            title: '考试管理'
           },
           {
             path: '/myMark',
             background: '#EB5B5B',
             icon: require('../../assets/img/index/mark-manage.png'),
-            title: '阅卷管理',
+            title: '阅卷管理'
           },
           {
             path: '/quick',
             background: '#6B77F9',
             icon: require('../../assets/img/index/index-quick.png'),
-            title: '快捷考试',
-          },
+            title: '快捷考试'
+          }
         ]
       }
       if (userInfo === 'user') {
@@ -421,14 +423,14 @@ export default {
             path: '/myExam',
             background: '#0094E5',
             icon: require('../../assets/img/index/question-manage.png'),
-            title: '考试管理',
+            title: '考试管理'
           },
           {
             path: '/simulate',
             background: '#FB901B',
             icon: require('../../assets/img/index/paper-manage.png'),
-            title: '模拟练习',
-          },
+            title: '模拟练习'
+          }
         ]
       }
     },
@@ -444,23 +446,24 @@ export default {
     },
     setUserInfo() {
       const userInfo = getInfo()
-      userInfo.orgName = this.userInfo.org.name
       userInfo.userAvatar = this.userInfo.user.headFileId
       setInfo(userInfo)
-      this.$store.commit('user/SET_ORG_NAME', this.userInfo.org.name)
       this.$store.commit('user/SET_USER_AVATAR', this.userInfo.user.headFileId)
     },
     // 获取公告列表
     async getBulletinList() {
       const {
-        data: { list },
+        data: { list }
       } = await bulletinListPage({
         curPage: 1,
-        pageSize: 100,
+        pageSize: 100
       })
-      this.bulletinList = list.filter(
-        (item) => item.showType === 2 || item.showType === 1
-      )
+      this.bulletinList = list.filter((item) => {
+        if (item.showType === 2 || item.showType === 1) {
+          item.endTime = dayjs(item.endTime).format('YYYY-MM-DD')
+          return item
+        }
+      })
     },
     // 获取考试列表和阅卷列表
     async getExamAndMark(time = undefined) {
@@ -473,7 +476,7 @@ export default {
           curPage: 1,
           pageSize: 10,
           startTime: `${startDate} 00:00:00`,
-          endTime: `${endDate} 23:59:59`,
+          endTime: `${endDate} 23:59:59`
         })
       }
       if (this.onlyRole.includes('subAdmin')) {
@@ -481,7 +484,7 @@ export default {
           curPage: 1,
           pageSize: 10,
           startTime: `${startDate} 00:00:00`,
-          endTime: `${endDate} 23:59:59`,
+          endTime: `${endDate} 23:59:59`
         })
       }
       if (dayjs(time).month() === dayjs().month()) {
@@ -490,7 +493,7 @@ export default {
       }
       return {
         examList: (examList && examList?.data?.list) || [],
-        markList: (markList && markList?.data?.list) || [],
+        markList: (markList && markList?.data?.list) || []
       }
     },
     // 获取选择月份的时间
@@ -508,7 +511,7 @@ export default {
         return
       }
 
-      let examPopovers = examList.reduce((acc, exam) => {
+      const examPopovers = examList.reduce((acc, exam) => {
         const examTime = dayjs(exam.examStartTime).format('YYYY-MM-DD')
         if (!acc[examTime]) {
           acc[examTime] = {}
@@ -518,7 +521,7 @@ export default {
         acc[examTime]['exam'].push({
           startTime: exam.examStartTime,
           endTime: exam.examEndTime,
-          state: exam.state,
+          state: exam.state
         })
         return acc
       }, {})
@@ -536,7 +539,7 @@ export default {
         acc[markTime]['mark'].push({
           startTime: mark.examMarkStartTime,
           endTime: mark.examMarkEndTime,
-          state: mark.examMarkState,
+          state: mark.examMarkState
         })
         return acc
       }, examPopovers)
@@ -557,7 +560,7 @@ export default {
         pageSize: 10,
         curPage: 1,
         startTime: `${startDate} 00:00:00`,
-        endTime: `${endDate} 23:59:59`,
+        endTime: `${endDate} 23:59:59`
       })
 
       if (res?.code !== 200) return
@@ -573,8 +576,8 @@ export default {
         name: 'SimulateTest',
         params: {
           questionTypeId,
-          commentState,
-        },
+          commentState
+        }
       })
     },
     // 我的考试操作
@@ -595,8 +598,8 @@ export default {
           examEndTime,
           userId: null,
           showType: paperShowType,
-          preview: _examStartTime < now && now > _examEndTime,
-        },
+          preview: _examStartTime < now && now > _examEndTime
+        }
       })
     },
     // 我的阅卷操作
@@ -614,11 +617,11 @@ export default {
         params: {
           examId,
           paperId,
-          preview: _markStartTime < now && now > _markEndTime,
-        },
+          preview: _markStartTime < now && now > _markEndTime
+        }
       })
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -645,12 +648,9 @@ export default {
   width: 300px;
   height: auto;
   border-right: 1px solid rgba(#000, 0.1);
-  overflow-y: scroll;
 }
 .home-list {
   flex: 1;
-  margin: 0 10px;
-  overflow-y: scroll;
 }
 
 // 卡片
@@ -664,7 +664,6 @@ export default {
     height: 40px;
     line-height: 40px;
     font-size: 16px;
-    font-weight: 600;
     &::after {
       content: '';
       display: block;
@@ -696,9 +695,34 @@ export default {
 
 .notice-box {
   flex: 1;
-  overflow-y: scroll;
-  .info-item {
-    padding: 0 16px;
+}
+
+.notice-item {
+  line-height: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px 0 32px;
+  position: relative;
+  margin-top: 8px;
+  cursor: pointer;
+  &::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 14px;
+    left: 16px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #8f9ca3;
+  }
+  .item-left {
+    color: #0c2e41;
+  }
+  .item-right {
+    font-size: 12px;
+    color: #8f9ca3;
   }
 }
 
@@ -736,7 +760,7 @@ export default {
     flex-direction: column;
     .info-num {
       font-size: 28px;
-      font-weight: 600;
+      font-weight: 500;
       color: #0c2e41;
     }
     .info-intro {
@@ -772,6 +796,10 @@ export default {
 }
 
 // 日历
+/deep/ .el-calendar__header {
+  border-bottom: none;
+}
+
 /deep/.el-calendar__body {
   padding: 10px;
 }
@@ -783,6 +811,7 @@ export default {
       width: 40px;
       height: 40px;
       line-height: 40px;
+      color: rgba(0, 0, 0, 0.45);
     }
   }
   tr {
@@ -828,25 +857,24 @@ export default {
 
 .info-item {
   line-height: 45px;
-  font-size: 13px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #e6ebf5;
-  color: #333;
+  color: #0c2e41;
   padding: 0 5px;
   cursor: pointer;
-  &:hover {
-    color: #0094e5;
-  }
   .item-left {
     flex: 1;
   }
   .item-time {
     flex: 1;
+    font-size: 12px;
+    color: #537384;
   }
   .item-score,
   .item-pass {
+    font-size: 12px;
+    color: #537384;
     margin-right: 30px;
   }
   .item-btn {
@@ -859,6 +887,7 @@ export default {
     padding: 0 10px;
     border-radius: 5px;
     background: rgba(#0094e5, 0.1);
+    color: #0094e5;
     img {
       margin-right: 5px;
     }
@@ -910,7 +939,6 @@ export default {
   .bulletin-title {
     width: 100%;
     text-align: right;
-    font-size: 14px;
     color: #666;
     margin-bottom: 15px;
   }
@@ -956,6 +984,9 @@ export default {
   display: flex;
   align-items: center;
   line-height: 30px;
+  span {
+    color: #537384;
+  }
 }
 .service-qq {
   display: flex;

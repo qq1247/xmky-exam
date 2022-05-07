@@ -1,13 +1,3 @@
-/*
- * @Description: 基础API
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-08-11 17:02:08
- * @LastEditors: Che
- * @LastEditTime: 2021-11-17 11:15:52
- */
-
 import request from './request'
 
 export const dictGet = (params) => request('dict/get', params)
@@ -31,6 +21,9 @@ export const orgEdit = (params) => request('org/edit', params)
 export const orgDel = (params) => request('org/del', params)
 export const orgTreeList = (params) => request('org/treeList', params)
 export const orgListPage = (params) => request('org/listpage', params)
+export const orgTemplate = (params, type) =>
+  request('org/template', params, undefined, type)
+export const orgImport = (params) => request('org/import', params)
 
 export const parmGet = (params) => request('parm/get', params)
 export const parmEmail = (params) => request('parm/email', params)

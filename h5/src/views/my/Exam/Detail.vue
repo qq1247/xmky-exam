@@ -7,12 +7,12 @@
         :preview="preview"
         :system-time="systemTime"
         :router-index="routerIndex"
-        :paperQuestion="paperQuestion"
+        :paper-question="paperQuestion"
         @sign="sign"
         @toHref="toHref"
         @examEnd="examEnd"
         @forceExamEnd="forceExamEnd"
-      ></question-router>
+      />
       <!-- 试题 -->
       <div class="content-center">
         <div class="paper-title">{{ paper.name }}</div>
@@ -20,22 +20,22 @@
         <page-show
           v-if="showType === 1 && Object.keys(myExamDetailCache).length"
           :preview="preview"
-          :scoreState="scoreState"
-          :paperQuestion="paperQuestion"
-          :myExamDetailCache="myExamDetailCache"
+          :score-state="scoreState"
+          :paper-question="paperQuestion"
+          :my-exam-detail-cache="myExamDetailCache"
           @updateAnswer="updateAnswer"
-        ></page-show>
+        />
 
         <question-show
           v-if="showType === 3 && Object.keys(myExamDetailCache).length"
           :preview="preview"
           :router-index="routerIndex"
-          :paperQuestion="paperQuestion"
-          :myExamDetailCache="myExamDetailCache"
+          :paper-question="paperQuestion"
+          :my-exam-detail-cache="myExamDetailCache"
           @updateAnswer="updateAnswer"
           @prevQuestion="prevQuestion"
           @nextQuestion="nextQuestion"
-        ></question-show>
+        />
       </div>
     </div>
   </div>
@@ -47,7 +47,7 @@ import {
   myExamAnswer,
   myExamFinish,
   myExamAnswerList,
-  myMarkAnswerList,
+  myMarkAnswerList
 } from 'api/my'
 import { examGet } from 'api/exam'
 import PageShow from 'components/PaperContent/PageShow.vue'
@@ -57,7 +57,7 @@ export default {
   components: {
     PageShow,
     QuestionShow,
-    QuestionRouter,
+    QuestionRouter
   },
   data() {
     return {
@@ -79,7 +79,7 @@ export default {
       examEndTime: '',
       systemTime: 0,
       routerIndex: 0,
-      scoreState: false,
+      scoreState: false
     }
   },
   created() {
@@ -112,22 +112,18 @@ export default {
     },
     // 查询试卷
     async queryPaper() {
-      try {
-        const res = await paperGet({
-          id: this.paperId,
-        })
-        this.paper = { ...res.data }
-      } catch (error) {}
+      const res = await paperGet({
+        id: this.paperId
+      })
+      this.paper = { ...res.data }
     },
     // 查询试卷信息
     async queryPaperInfo() {
-      try {
-        const res = await paperQuestionList({
-          id: this.paperId,
-          examId: this.examId,
-        })
-        this.paperQuestion = res.data
-      } catch (error) {}
+      const res = await paperQuestionList({
+        id: this.paperId,
+        examId: this.examId
+      })
+      this.paperQuestion = res.data
     },
     // 查询我的答案信息
     async queryAnswerInfo() {
@@ -136,15 +132,15 @@ export default {
         if (this.userId) {
           res = await myMarkAnswerList({
             examId: this.examId,
-            userId: this.userId,
+            userId: this.userId
           })
         } else {
           res = await myExamAnswerList({
-            examId: this.examId,
+            examId: this.examId
           })
         }
 
-        let paperQuestion = this.paperQuestion.reduce((acc, cur) => {
+        const paperQuestion = this.paperQuestion.reduce((acc, cur) => {
           acc.push(...cur.questionList)
           return acc
         }, [])
@@ -202,7 +198,7 @@ export default {
         examId: this.examId,
         questionId,
         myExamDetailId: this.myExamDetailCache[questionId].myExamDetailId,
-        answers: this.myExamDetailCache[questionId].answers,
+        answers: this.myExamDetailCache[questionId].answers
       })
 
       res?.code === 200 && this.isEmpty(questionId)
@@ -234,13 +230,13 @@ export default {
       this.$confirm('确认要提交试卷吗', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
-      }).then(async () => {
+        type: 'warning'
+      }).then(async() => {
         const res = await myExamFinish({ examId: this.examId })
         res?.code === 200
           ? this.$router.replace({
-              name: 'Home',
-            })
+            name: 'Home'
+          })
           : this.$message.warning('请重新提交试卷！')
       })
     },
@@ -249,10 +245,10 @@ export default {
       this.$alert('考试时间到，已强制交卷！', {
         confirmButtonText: '确定',
         type: 'info',
-        showClose: false,
-      }).then(async () => {
+        showClose: false
+      }).then(async() => {
         this.$router.replace({
-          name: 'Home',
+          name: 'Home'
         })
       })
     },
@@ -289,8 +285,8 @@ export default {
     // 下一题
     nextQuestion(index) {
       this.routerIndex = index
-    },
-  },
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>

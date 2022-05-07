@@ -1,14 +1,14 @@
 <template>
-  <div class="container setting-container">
+  <div class="setting-container">
     <el-tabs v-model="tabIndex" tab-position="right">
       <el-tab-pane
         v-for="item in tab"
-        :name="item.index"
         :key="item.index"
+        :name="item.index"
         :disabled="item.index !== tabIndex"
       >
-        <div class="pane-label" slot="label">
-          <i :class="item.icon"></i>
+        <div slot="label" class="pane-label">
+          <i :class="item.icon" />
           <div>
             <div class="label-name">{{ item.name }}</div>
             <div class="label-intro">{{ item.intro }}</div>
@@ -21,7 +21,7 @@
         :is="viewList[Number(tabIndex) - 1]"
         @prev="(e) => (tabIndex = e)"
         @next="(e) => (tabIndex = e)"
-      ></component>
+      />
     </div>
   </div>
 </template>
@@ -42,47 +42,50 @@ export default {
           name: '设置试卷',
           intro: '添加/修改',
           icon: 'common common-classify',
-          index: '1',
+          index: '1'
         },
         {
           name: '快速组卷',
           intro: '添加/修改',
           icon: 'common common-classify',
-          index: '2',
+          index: '2'
         },
         {
           name: '设置考试',
           intro: '添加/修改',
           icon: 'common common-exam',
-          index: '3',
+          index: '3'
         },
         {
           name: '设置人员',
           intro: '添加/修改',
           icon: 'common common-role',
-          index: '4',
+          index: '4'
         },
         {
           name: '发布试卷',
           intro: '添加/修改',
           icon: 'common common-publish',
-          index: '5',
-        },
+          index: '5'
+        }
       ],
       viewList: [
         PaperSetting,
         PaperComposition,
         ExamSetting,
         MarkSetting,
-        ExamPublish,
+        ExamPublish
       ],
-      tabIndex: '1',
+      tabIndex: '1'
     }
   },
   computed: {
-    ...mapGetters(['name']),
+    ...mapGetters(['name'])
   },
   created() {
+    removeQuick()
+  },
+  destroyed() {
     removeQuick()
   },
   methods: {
@@ -90,9 +93,9 @@ export default {
       this.$confirm(`确认退出登录吗？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
-        .then(async () => {
+        .then(async() => {
           this.$store.dispatch('user/resetToken').then(() => {
             this.$message('登出成功！')
             this.$router.push('/')
@@ -101,11 +104,8 @@ export default {
         .catch((err) => {
           console.log(err)
         })
-    },
-  },
-  destroyed() {
-    removeQuick()
-  },
+    }
+  }
 }
 </script>
 
@@ -113,6 +113,7 @@ export default {
 .setting-container {
   flex-direction: row;
   background: #fff;
+  padding-top: 0;
 }
 
 /deep/ .el-tabs {
@@ -190,6 +191,5 @@ export default {
 .setting-right {
   flex: 1;
   margin-left: 201px;
-  padding-right: 20px;
 }
 </style>

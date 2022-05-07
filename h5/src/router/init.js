@@ -1,13 +1,3 @@
-/*
- * @Description: 初始化路由
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-08-12 10:17:05
- * @LastEditors: Che
- * @LastEditTime: 2022-01-13 10:53:59
- */
-
 import router from './index'
 import store from '@/store/index'
 import constantRoutes from './constant'
@@ -28,7 +18,7 @@ router.beforeEach(async (to, from, next) => {
 
   const hasToken = getInfo().accessToken
 
-  let link = document.querySelector("link[rel*='icon']")
+  const link = document.querySelector("link[rel*='icon']")
   link.href = `/api/login/logo?icon=true`
 
   if (hasToken) {

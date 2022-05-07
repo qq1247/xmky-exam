@@ -1,18 +1,9 @@
-<!--
- * @Description: 开放题库
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-12-16 16:07:54
- * @LastEditors: Che
- * @LastEditTime: 2022-01-06 14:46:02
--->
 <template>
   <div class="container">
     <el-form
+      ref="openForm"
       :model="openForm"
       :rules="openForm.rules"
-      ref="openForm"
       label-width="100px"
     >
       <el-tabs v-model="openForm.tabActive">
@@ -21,8 +12,8 @@
           :key="item.name"
           :label="item.title"
           :name="item.name"
-        ></el-tab-pane>
-        <template v-if="openForm.tabActive == '0'">
+        />
+        <template v-if="openForm.tabActive === '0'">
           <el-table :data="openForm.openHistoryList" style="width: 100%">
             <el-table-column type="expand">
               <template slot-scope="props">
@@ -57,21 +48,18 @@
                 </el-form>
               </template>
             </el-table-column>
-            <el-table-column label="开始时间" prop="startTime">
-            </el-table-column>
-            <el-table-column label="结束时间" prop="endTime"> </el-table-column>
+            <el-table-column label="开始时间" prop="startTime" />
+            <el-table-column label="结束时间" prop="endTime" />
             <el-table-column label="操作">
               <template slot-scope="scope">
                 <el-button
-                  @click.native.prevent="delHistory(scope.row.id)"
                   type="text"
                   size="small"
                   :disabled="scope.row.state === 2"
+                  @click.native.prevent="delHistory(scope.row.id)"
                 >
                   作废
-                </el-button></template
-              ></el-table-column
-            >
+                </el-button></template></el-table-column>
           </el-table>
           <!-- 分页 -->
           <el-pagination
@@ -85,9 +73,9 @@
             :page-size="openForm.pageSize"
             :current-page="openForm.curPage"
             @current-change="openPageChange"
-          ></el-pagination>
+          />
         </template>
-        <template v-if="openForm.tabActive == '1'">
+        <template v-if="openForm.tabActive === '1'">
           <el-form-item label="开放时间" prop="openTime">
             <el-date-picker
               v-model="openForm.openTime"
@@ -95,7 +83,7 @@
               start-placeholder="开始日期"
               end-placeholder="结束日期"
               value-format="yyyy-MM-dd HH:mm:ss"
-            ></el-date-picker>
+            />
           </el-form-item>
           <el-form-item label="开放用户" prop="openUser">
             <CustomSelect
@@ -113,7 +101,7 @@
                 :key="item.id"
                 :label="item.name"
                 :value="item.id"
-              ></el-option>
+              />
             </CustomSelect>
           </el-form-item>
           <el-form-item label="开放机构" prop="openOrg">
@@ -147,18 +135,17 @@
               :key="item.value"
               v-model="openForm.openReview"
               :label="item.value"
-              @change="selectReviewType"
               prop="openReview"
-              >{{ item.name }}</el-radio
-            >
+              @change="selectReviewType"
+            >{{ item.name }}</el-radio>
           </el-form-item>
         </template>
       </el-tabs>
       <el-form-item>
         <el-button
-          @click="addOpen"
+          v-if="openForm.tabActive === '1'"
           type="primary"
-          v-if="openForm.tabActive == '1'"
+          @click="addOpen"
         >
           添加
         </el-button>
@@ -171,7 +158,7 @@
 import {
   questionTypeOpenListPage,
   questionTypeOpenAdd,
-  questionTypeOpenDel,
+  questionTypeOpenDel
 } from 'api/question'
 import { orgListPage } from 'api/base'
 import { userListPage } from 'api/user'
@@ -179,7 +166,7 @@ import CustomSelect from 'components/CustomSelect.vue'
 
 export default {
   components: {
-    CustomSelect,
+    CustomSelect
   },
   data() {
     return {
@@ -200,35 +187,35 @@ export default {
         openReviewList: [
           {
             name: '不显示',
-            value: 0,
+            value: 0
           },
           {
             name: '只读',
-            value: 1,
+            value: 1
           },
           {
             name: '可编辑',
-            value: 2,
-          },
+            value: 2
+          }
         ],
         tabActive: '0',
         openTabs: [
           {
             title: '历史记录',
-            name: '0',
+            name: '0'
           },
           {
             title: '新增记录',
-            name: '1',
-          },
+            name: '1'
+          }
         ],
         openHistoryList: [],
         rules: {
           openTime: [
-            { required: true, message: '请选择开放时间', trigger: 'change' },
-          ],
-        },
-      },
+            { required: true, message: '请选择开放时间', trigger: 'change' }
+          ]
+        }
+      }
     }
   },
   async mounted() {
@@ -241,19 +228,19 @@ export default {
       const userList = await userListPage({
         name,
         curPage,
-        pageSize: 5,
+        pageSize: 5
       })
 
-      if (this.$store.getters.userId == 1) {
+      if (this.$store.getters.userId === 1) {
         userList.data.list.unshift({
           id: 1,
-          name: '管理员',
+          name: '管理员'
         })
       }
 
       this.userList = userList.data.list
       this.openForm.total =
-        this.$store.getters.userId == 1
+        this.$store.getters.userId === 1
           ? userList.data.total + 1
           : userList.data.total
     },
@@ -271,7 +258,7 @@ export default {
         questionTypeId: this.id,
         curPage: this.openForm.curPage,
         pageSize: this.openForm.pageSize,
-        list: '1',
+        list: '1'
       })
       this.openForm.openHistoryList = openHistoryList.data.list
       this.openForm.pageTotal = openHistoryList.data.total
@@ -286,7 +273,7 @@ export default {
       const orgList = await orgListPage({
         name,
         curPage,
-        pageSize: this.pageSize,
+        pageSize: this.pageSize
       })
 
       this.openForm.openOrgList = orgList.data.list
@@ -310,7 +297,7 @@ export default {
     },
     // 添加开放记录
     async addOpen() {
-      this.$refs['openForm'].validate(async (valid) => {
+      this.$refs['openForm'].validate(async(valid) => {
         if (!valid) {
           return
         }
@@ -321,7 +308,7 @@ export default {
           endTime: this.openForm.openTime[1],
           userIds: this.openForm.openUser.join(','),
           orgIds: this.openForm.openOrg.join(','),
-          commentState: this.openForm.openReview,
+          commentState: this.openForm.openReview
         })
 
         if (res?.code === 200) {
@@ -338,8 +325,8 @@ export default {
       this.$confirm('确定要删除？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
-      }).then(async () => {
+        type: 'warning'
+      }).then(async() => {
         const res = await questionTypeOpenDel({ id })
         res?.code && ((this.openForm.curPage = 1), this.getOpenHistory())
       })
@@ -365,15 +352,15 @@ export default {
             currentLabel: names[index],
             currentValue: cur,
             label: names[index],
-            value: cur,
+            value: cur
           })
           return acc
         },
         { roleIds: [], roleNames: [] }
       )
       return roles
-    },
-  },
+    }
+  }
 }
 </script>
 

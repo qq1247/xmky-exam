@@ -1,17 +1,6 @@
-<!--
- * @Description: 
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2022-01-10 13:19:31
- * @LastEditors: Che
- * @LastEditTime: 2022-01-10 13:39:53
--->
 <template>
-  <div class="container">
-    <div class="form-footer">
-      <el-button @click="onceTask" type="primary">运行</el-button>
-    </div>
+  <div class="form-footer">
+    <el-button type="primary" @click="onceTask">运行</el-button>
   </div>
 </template>
 
@@ -21,7 +10,7 @@ import { cronrunOnceTask } from 'api/base'
 export default {
   data() {
     return {
-      id: null,
+      id: null
     }
   },
   mounted() {
@@ -31,14 +20,14 @@ export default {
     // 运行一次
     async onceTask() {
       const res = await cronrunOnceTask({ id: this.id })
-      if (res?.code != 200) {
+      if (res?.code !== 200) {
         this.$message.error(res.msg)
         return
       }
 
       this.$message.success('运行成功')
-    },
-  },
+    }
+  }
 }
 </script>
 

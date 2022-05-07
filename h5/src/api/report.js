@@ -1,12 +1,3 @@
-/*
- * @Description: 统计API
- * @Version: 1.0
- * @Company:
- * @Author: Che
- * @Date: 2021-12-15 18:13:11
- * @LastEditors: Che
- * @LastEditTime: 2021-12-16 16:12:52
- */
 import request from './request'
 
 /**

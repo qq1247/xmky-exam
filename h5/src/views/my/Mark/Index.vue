@@ -6,16 +6,18 @@
         <div>
           <el-form-item>
             <el-input
-              placeholder="请输入考试名称"
               v-model="queryForm.examName"
+              placeholder="请输入考试名称"
               class="query-input"
-            ></el-input>
+            />
           </el-form-item>
         </div>
         <el-form-item>
-          <el-button @click="search" icon="el-icon-search" type="primary"
-            >查询</el-button
-          >
+          <el-button
+            icon="el-icon-search"
+            type="primary"
+            @click="search"
+          >查询</el-button>
         </el-form-item>
       </el-form>
       <!-- 内容 -->
@@ -29,10 +31,10 @@
               name="myMarkList"
               @mark="markHandler"
               @markUser="markUserHandler"
-            ></MyCard>
+            />
           </div>
         </template>
-        <el-empty v-else description="暂无信息"> </el-empty>
+        <el-empty v-else description="暂无信息" />
         <el-pagination
           background
           layout="prev, pager, next"
@@ -43,11 +45,11 @@
           :page-size="pageSize"
           :current-page="1"
           @current-change="pageChange"
-        ></el-pagination>
+        />
       </div>
     </template>
 
-    <router-view v-else></router-view>
+    <router-view v-else />
   </div>
 </template>
 
@@ -56,7 +58,7 @@ import { myMarkListPage } from 'api/my'
 import MyCard from 'components/ListCard/MyCard.vue'
 export default {
   components: {
-    MyCard,
+    MyCard
   },
   data() {
     return {
@@ -64,15 +66,15 @@ export default {
       curPage: 1,
       total: 0,
       queryForm: {
-        examName: '',
+        examName: ''
       },
-      myMarkList: [],
+      myMarkList: []
     }
   },
   computed: {
     hashChildren() {
-      return this.$route.matched.length > 2 ? false : true
-    },
+      return !(this.$route.matched.length > 2)
+    }
   },
   mounted() {
     this.query()
@@ -83,7 +85,7 @@ export default {
       const myMarkList = await myMarkListPage({
         examName: this.queryForm.examName,
         curPage: this.curPage,
-        pageSize: this.pageSize,
+        pageSize: this.pageSize
       })
 
       this.myMarkList = myMarkList.data?.list || []
@@ -108,8 +110,8 @@ export default {
         params: {
           examId,
           paperId,
-          preview: _markStartTime < now && now > _markEndTime,
-        },
+          preview: _markStartTime < now && now > _markEndTime
+        }
       })
     },
     // 考生列表
@@ -122,16 +124,16 @@ export default {
         params: {
           examId,
           paperId,
-          preview: _markStartTime < now && now > _markEndTime,
-        },
+          preview: _markStartTime < now && now > _markEndTime
+        }
       })
     },
     // 分页切换
     pageChange(val) {
       this.curPage = val
       this.query()
-    },
-  },
+    }
+  }
 }
 </script>
 

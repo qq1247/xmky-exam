@@ -2,12 +2,11 @@
   <div class="nav-bar">
     <el-tabs v-model="tabIndex" @tab-click="$emit('tab', tabIndex)">
       <el-tab-pane
-        :key="item.name"
         v-for="item in tab"
+        :key="item.name"
         :label="item.label"
         :name="item.name"
-      >
-      </el-tab-pane>
+      />
     </el-tabs>
   </div>
 </template>
@@ -20,23 +19,23 @@ export default {
       tab: [
         {
           label: '拖拽试题',
-          name: '1',
+          name: '1'
         },
         {
           label: '添加试题',
-          name: '2',
+          name: '2'
         },
         {
           label: '批量操作',
-          name: '3',
+          name: '3'
         },
         {
           label: '答题卡',
-          name: '4',
-        },
-      ],
+          name: '4'
+        }
+      ]
     }
-  },
+  }
 }
 </script>
 

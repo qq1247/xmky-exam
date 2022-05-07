@@ -33,19 +33,18 @@
       </div>
     </div>
     <div
-      class="quick-info"
       v-for="(user, index) in quickInfo.userList"
       :key="index"
+      class="quick-info"
     >
       <div class="info-name">考试 / 阅卷：</div>
       <div class="info-content">
-        <span>{{ user.examUserList.join(',') }}</span
-        ><span v-if="user.markUserName">/ {{ user.markUserName }}</span>
+        <span>{{ user.examUserList.join(',') }}</span><span v-if="user.markUserName">/ {{ user.markUserName }}</span>
       </div>
     </div>
     <div class="footer">
-      <el-button @click="$emit('prev', '4')" type="primary">上一步</el-button>
-      <el-button @click="publish" type="primary">发布</el-button>
+      <el-button type="primary" @click="$emit('prev', '4')">上一步</el-button>
+      <el-button type="primary" @click="publish">发布</el-button>
     </div>
   </div>
 </template>
@@ -56,7 +55,7 @@ import { examPublish } from 'api/exam'
 export default {
   data() {
     return {
-      quickInfo: {},
+      quickInfo: {}
     }
   },
   created() {
@@ -65,14 +64,14 @@ export default {
   methods: {
     async publish() {
       const res = await examPublish({ id: this.quickInfo.examId })
-      if (res?.code == 200) {
+      if (res?.code === 200) {
         this.$message.success('考试发布成功！')
         this.$router.push('/')
       } else {
         this.$message.error('请重新发布考试！')
       }
-    },
-  },
+    }
+  }
 }
 </script>
 

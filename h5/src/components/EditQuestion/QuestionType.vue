@@ -2,23 +2,23 @@
   <div>
     <div class="top">添加题型</div>
     <div
-      :class="['type-btn', questionType === btn.type ? 'type-btn-active' : '']"
-      :key="btn.type"
-      @click="updateType(btn.type)"
       v-for="btn in typeButtons"
+      :key="btn.type"
+      :class="['type-btn', questionType === btn.type ? 'type-btn-active' : '']"
+      @click="updateType(btn.type)"
     >
-      <img :src="btn.icon" alt="" />
+      <img :src="btn.icon" alt="">
       {{ btn.name }}
-      <i class="common common-subscript sub-script"></i>
+      <i class="common common-subscript sub-script" />
     </div>
-    <div class="divider"></div>
+    <div class="divider" />
     <div
-      class="handler-btn"
-      :key="`handler${handler.type}`"
-      @click="otherHandler(handler.type)"
       v-for="handler in handlerButtons"
+      :key="`handler${handler.type}`"
+      class="handler-btn"
+      @click="otherHandler(handler.type)"
     >
-      <i :class="handler.icon"></i>
+      <i :class="handler.icon" />
       {{ handler.name }}
     </div>
   </div>
@@ -35,47 +35,47 @@ export default {
         {
           type: 1,
           name: '单选题',
-          icon: require('../../assets/img/question/question-radio.png'),
+          icon: require('../../assets/img/question/question-radio.png')
         },
         {
           type: 2,
           name: '多选题',
-          icon: require('../../assets/img/question/question-check.png'),
+          icon: require('../../assets/img/question/question-check.png')
         },
         {
           type: 3,
           name: '填空题',
-          icon: require('../../assets/img/question/question-cloze.png'),
+          icon: require('../../assets/img/question/question-cloze.png')
         },
         {
           type: 4,
           name: '判断题',
-          icon: require('../../assets/img/question/question-judge.png'),
+          icon: require('../../assets/img/question/question-judge.png')
         },
         {
           type: 5,
           name: '问答题',
-          icon: require('../../assets/img/question/question-ask.png'),
-        },
+          icon: require('../../assets/img/question/question-ask.png')
+        }
       ],
       handlerButtons: [
         // 左侧按钮组2
         {
           type: 1,
           name: '导入导出',
-          icon: 'common common-template-down',
+          icon: 'common common-template-down'
         },
         {
           type: 2,
           name: '一键发布',
-          icon: 'common common-publish',
+          icon: 'common common-publish'
         },
         {
           type: 3,
           name: '一键删除',
-          icon: 'common common-delete',
-        },
-      ],
+          icon: 'common common-delete'
+        }
+      ]
     }
   },
   mounted() {},
@@ -111,16 +111,16 @@ export default {
       this.$confirm('确定要发布？', '提示', {
         distinguishCancelAndClose: true,
         confirmButtonText: '全部发布',
-        cancelButtonText: '当页发布',
+        cancelButtonText: '当页发布'
       })
-        .then(async () => {
+        .then(async() => {
           await questionPublish({
-            questionTypeId: parentData.questionTypeId,
+            questionTypeId: parentData.questionTypeId
           })
           this.$message.success('全部发布成功！')
           this.$emit('showTemplate', false)
         })
-        .catch(async (action) => {
+        .catch(async(action) => {
           if (action === 'cancel') {
             const ids = parentData.list.questionList.reduce((acc, cur) => {
               cur.state === 2 && acc.push(cur.id)
@@ -128,7 +128,7 @@ export default {
             }, [])
             if (!ids.length) return false
             await questionPublish({
-              ids,
+              ids
             })
             this.$message.success('当页发布成功！')
             this.$emit('showTemplate', false)
@@ -144,17 +144,17 @@ export default {
           distinguishCancelAndClose: true,
           confirmButtonText: '全部删除',
           cancelButtonText: '当页删除',
-          dangerouslyUseHTMLString: true,
+          dangerouslyUseHTMLString: true
         }
       )
-        .then(async () => {
+        .then(async() => {
           await questionDel({
-            questionTypeId: parentData.questionTypeId,
+            questionTypeId: parentData.questionTypeId
           })
           this.$message.success('删除成功！')
           this.$emit('showTemplate', false)
         })
-        .catch(async (action) => {
+        .catch(async(action) => {
           if (action === 'cancel') {
             const ids = parentData.list.questionList.reduce((acc, cur) => {
               acc.push(cur.id)
@@ -162,14 +162,14 @@ export default {
             }, [])
             if (!ids.length) return false
             await questionDel({
-              ids,
+              ids
             })
             this.$message.success('删除成功！')
             this.$emit('showTemplate', false)
           }
         })
-    },
-  },
+    }
+  }
 }
 </script>
 

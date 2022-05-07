@@ -1,8 +1,8 @@
 <template>
   <div class="app-container">
-    <app-header v-if="$route.path !== '/login'"></app-header>
-    <sub-header v-if="layout"></sub-header>
-    <app-main></app-main>
+    <app-header v-if="$route.path !== '/login'" />
+    <sub-header v-if="layout" />
+    <app-main />
   </div>
 </template>
 
@@ -15,11 +15,11 @@ export default {
   components: {
     AppHeader,
     SubHeader,
-    AppMain,
+    AppMain
   },
   data() {
     return {
-      layout: true,
+      layout: true
     }
   },
   watch: {
@@ -28,9 +28,9 @@ export default {
       deep: true,
       handler(e) {
         this.layout = e.meta?.layout
-      },
-    },
-  },
+      }
+    }
+  }
 }
 </script>
 

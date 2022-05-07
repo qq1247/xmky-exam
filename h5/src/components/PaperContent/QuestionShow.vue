@@ -1,62 +1,50 @@
-<!--
- * @Description: 
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-09-16 09:46:28
- * @LastEditors: Che
- * @LastEditTime: 2021-11-02 16:34:09
--->
 <template>
   <div>
     <template v-if="paperQuestion.length">
       <div class="chapter">
-        <div class="chapter-item">
-          <div class="item-title">{{ chapter.name }}</div>
-          <div></div>
-        </div>
-        <div class="chapter-description" v-html="chapter.description"></div>
+        <div class="chapter-name">{{ chapter.name }}</div>
+        <div class="chapter-description" v-html="chapter.description" />
       </div>
 
       <div
         :class="[
-          'children-content',
+          'question-content',
           questionList[index].type === 5 ? 'ask-content' : '',
         ]"
       >
-        <div class="question-title" v-if="questionList[index].type !== 3">
+        <div v-if="questionList[index].type !== 3" class="question-title">
           <div>{{ index + 1 }}、</div>
-          <div v-html="`${questionList[index].title}`"></div>
+          <div v-html="`${questionList[index].title}`" />
         </div>
-        <div class="question-title" v-else>
+        <div v-else class="question-title">
           <span>{{ index + 1 }}、</span>
           <ClozeTitle
             :title="questionList[index].title"
             :preview="preview"
-            :paperQuestion="paperQuestion"
-            :myExamDetailCache="myExamDetailCache"
-            :questionId="routerIndex"
-          ></ClozeTitle>
+            :paper-question="paperQuestion"
+            :my-exam-detail-cache="myExamDetailCache"
+            :question-id="routerIndex"
+          />
         </div>
         <!-- 单选 -->
         <template v-if="questionList[index].type === 1">
           <el-radio-group
-            @change="updateAnswer(questionList[index].id)"
-            class="children-option"
             v-if="myExamDetailCache[questionList[index].id]"
             v-model="myExamDetailCache[questionList[index].id].answers[0]"
+            class="children-option"
+            @change="updateAnswer(questionList[index].id)"
           >
             <el-radio
-              :key="index"
+              v-for="(option, indexOption) in questionList[index].options"
+              :key="indexOption"
               :disabled="preview === 'true' ? true : false"
               :label="String.fromCharCode(65 + index)"
               class="option-item"
-              v-for="(option, index) in questionList[index].options"
             >
               <div
                 class="flex-items-center"
                 v-html="`${String.fromCharCode(65 + index)}、${option}`"
-              ></div>
+              />
             </el-radio>
           </el-radio-group>
         </template>
@@ -64,22 +52,22 @@
         <!-- 多选 -->
         <template v-if="questionList[index].type === 2">
           <el-checkbox-group
-            @change="updateAnswer(questionList[index].id)"
-            class="children-option"
             v-if="myExamDetailCache[questionList[index].id]"
             v-model="myExamDetailCache[questionList[index].id].answers"
+            class="children-option"
+            @change="updateAnswer(questionList[index].id)"
           >
             <el-checkbox
-              :key="index"
+              v-for="(option, indexOption) in questionList[index].options"
+              :key="indexOption"
               :label="String.fromCharCode(65 + index)"
               class="option-item"
               :disabled="preview === 'true' ? true : false"
-              v-for="(option, index) in questionList[index].options"
             >
               <div
                 class="flex-items-center"
                 v-html="`${String.fromCharCode(65 + index)}、${option}`"
-              ></div>
+              />
             </el-checkbox>
           </el-checkbox-group>
         </template>
@@ -87,34 +75,33 @@
         <!-- 判断 -->
         <template v-if="questionList[index].type === 4">
           <el-radio-group
-            @change="updateAnswer(questionList[index].id)"
-            class="children-option"
             v-if="myExamDetailCache[questionList[index].id]"
             v-model="myExamDetailCache[questionList[index].id].answers[0]"
+            class="children-option"
+            @change="updateAnswer(questionList[index].id)"
           >
             <el-radio
-              :key="index"
+              v-for="(option, indexOption) in ['对', '错']"
+              :key="indexOption"
               :label="option"
               class="option-item"
-              v-for="(option, index) in ['对', '错']"
               :disabled="preview === 'true' ? true : false"
-              >{{ option }}</el-radio
-            >
+            >{{ option }}</el-radio>
           </el-radio-group>
         </template>
 
         <!-- 问答 -->
         <template v-if="questionList[index].type === 5">
           <el-input
+            v-if="myExamDetailCache[questionList[index].id]"
+            v-model="myExamDetailCache[questionList[index].id].answers[0]"
             :rows="2"
             class="question-text"
-            @change="updateAnswer(questionList[index].id)"
             placeholder="请输入内容"
             type="textarea"
-            v-if="myExamDetailCache[questionList[index].id]"
             :disabled="preview === 'true' ? true : false"
-            v-model="myExamDetailCache[questionList[index].id].answers[0]"
-          ></el-input>
+            @change="updateAnswer(questionList[index].id)"
+          />
         </template>
       </div>
 
@@ -123,7 +110,7 @@
         <el-button @click="nextQuestion">下一题</el-button>
       </div>
     </template>
-    <el-empty v-else description="暂无试卷"> </el-empty>
+    <el-empty v-else description="暂无试卷" />
   </div>
 </template>
 
@@ -131,31 +118,31 @@
 import ClozeTitle from '../ClozeTitle.vue'
 export default {
   components: {
-    ClozeTitle,
+    ClozeTitle
   },
   props: {
     preview: {
       type: Boolean,
-      default: false,
+      default: false
     },
     paperQuestion: {
       type: Array,
-      default: () => [],
+      default: () => []
     },
     myExamDetailCache: {
       type: Object,
-      default: () => {},
+      default: () => {}
     },
     routerIndex: {
       type: Number,
-      default: 0,
-    },
+      default: 0
+    }
   },
   data() {
     return {
       chapter: {},
       questionList: [],
-      index: 0,
+      index: 0
     }
   },
   watch: {
@@ -164,8 +151,8 @@ export default {
       immediate: true,
       handler(n) {
         this.questionList.length && this.getQuestion(n)
-      },
-    },
+      }
+    }
   },
   mounted() {
     this.getQuestion()
@@ -213,8 +200,8 @@ export default {
       }
       this.index += 1
       this.$emit('nextQuestion', this.questionList[this.index].id)
-    },
-  },
+    }
+  }
 }
 </script>
 

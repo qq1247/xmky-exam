@@ -7,30 +7,45 @@ import {
   getPrevMonthLastDays,
   getMonthDays,
   getI18nSettings,
-  validateRangeInOneMonth,
+  validateRangeInOneMonth
 } from 'element-ui/src/utils/date-util'
 import ElPopover from 'element-ui/packages/popover'
 
 export default {
+  components: { ElPopover },
   props: {
-    selectedDay: String, // format date yyyy-MM-dd
+    selectedDay: {
+      type: String,
+      default: ''
+    },
     range: {
       type: Array,
+      default: () => [],
       validator(val) {
         if (!(val && val.length)) return true
         const [start, end] = val
         return validateRangeInOneMonth(start, end)
-      },
+      }
     },
-    date: Date,
-    hideHeader: Boolean,
-    firstDayOfWeek: Number,
-    timePopovers: Object,
+    date: {
+      type: Date,
+      default: ''
+    },
+    hideHeader: {
+      type: Boolean,
+      default: false
+    },
+    firstDayOfWeek: {
+      type: Number,
+      default: null
+    },
+    timePopovers: {
+      type: Object,
+      default: () => {}
+    }
   },
 
   inject: ['elCalendar'],
-
-  components: { ElPopover },
 
   computed: {
     WEEK_DAYS() {
@@ -72,13 +87,13 @@ export default {
           end.getDate() - start.getDate() + 1
         ).map((_, index) => ({
           text: start.getDate() + index,
-          type: 'current',
+          type: 'current'
         }))
         let remaining = currentMonthRange.length % 7
         remaining = remaining === 0 ? 0 : 7 - remaining
         const nextMonthRange = rangeArr(remaining).map((_, index) => ({
           text: index + 1,
-          type: 'next',
+          type: 'next'
         }))
         days = currentMonthRange.concat(nextMonthRange)
       } else {
@@ -90,16 +105,16 @@ export default {
         const offset = (7 + firstDay - firstDayOfWeek) % 7
         const prevMonthDays = getPrevMonthLastDays(date, offset).map((day) => ({
           text: day,
-          type: 'prev',
+          type: 'prev'
         }))
         const currentMonthDays = getMonthDays(date).map((day) => ({
           text: day,
-          type: 'current',
+          type: 'current'
         }))
         days = [...prevMonthDays, ...currentMonthDays]
         const nextMonthDays = rangeArr(42 - days.length).map((_, index) => ({
           text: index + 1,
-          type: 'next',
+          type: 'next'
         }))
         days = days.concat(nextMonthDays)
       }
@@ -115,7 +130,7 @@ export default {
       } else {
         return WEEK_DAYS.slice(start).concat(WEEK_DAYS.slice(0, start))
       }
-    },
+    }
   },
 
   methods: {
@@ -155,7 +170,7 @@ export default {
     },
 
     getPopoverData({ text, type }) {
-      let status = ['prev', 'current', 'next']
+      const status = ['prev', 'current', 'next']
       const year = new Date(this.date).getFullYear()
       const month = (new Date(this.date).getMonth() + status.indexOf(type))
         .toString()
@@ -180,7 +195,7 @@ export default {
       const data = {
         isSelected: this.selectedDay === day,
         type: `${type}-month`,
-        day,
+        day
       }
       return render({ date, data })
     },
@@ -195,7 +210,7 @@ export default {
       return getOneDict('MY_EXAM_MARK_STATE').find(
         (item) => Number(item.dictKey) === data
       ).dictValue
-    },
+    }
   },
 
   render() {
@@ -208,16 +223,16 @@ export default {
     )
 
     const plan = (data, type) => (
-      <div class="plan">
+      <div class='plan'>
         <div>{type === 1 ? '考试：' : '阅卷：'}</div>
-        <div class="plan-table">
-          <div class="plan-table-th">
+        <div class='plan-table'>
+          <div class='plan-table-th'>
             <span>开始时间</span>
             <span>结束时间</span>
             <span>状态</span>
           </div>
           {data.map((item) => (
-            <div class="plan-table-td">
+            <div class='plan-table-td'>
               <span>{item.startTime}</span>
               <span>{item.endTime}</span>
               <span>
@@ -235,10 +250,10 @@ export default {
       <table
         class={{
           'el-calendar-table': true,
-          'is-range': this.isInRange,
+          'is-range': this.isInRange
         }}
-        cellspacing="0"
-        cellpadding="0"
+        cellspacing='0'
+        cellpadding='0'
       >
         {thead}
         <tbody>
@@ -247,7 +262,7 @@ export default {
               class={{
                 'el-calendar-table__row': true,
                 'el-calendar-table__row--hide-border':
-                  index === 0 && this.hideHeader,
+                  index === 0 && this.hideHeader
               }}
               key={index}
             >
@@ -258,23 +273,23 @@ export default {
                   onClick={this.pickDay.bind(this, cell)}
                 >
                   {Object.keys(this.getPopoverData(cell)).length > 0 ? (
-                    <el-popover placement="bottom" trigger="hover">
+                    <el-popover placement='bottom' trigger='hover'>
                       {this.getPopoverData(cell)?.exam &&
                         plan(this.getPopoverData(cell).exam, 1)}
                       {this.getPopoverData(cell)?.mark &&
                         plan(this.getPopoverData(cell).mark, 2)}
-                      <div class="el-calendar-day" slot="reference">
+                      <div class='el-calendar-day' slot='reference'>
                         {this.cellRenderProxy(cell)}
                         {this.getPopoverData(cell)?.exam ||
                         this.getPopoverData(cell)?.mark ? (
-                          <span class="day-mark"></span>
-                        ) : (
-                          ''
-                        )}
+                            <span class='day-mark'></span>
+                          ) : (
+                            ''
+                          )}
                       </div>
                     </el-popover>
                   ) : (
-                    <span class="el-calendar-day">
+                    <span class='el-calendar-day'>
                       {this.cellRenderProxy(cell)}
                     </span>
                   )}
@@ -285,7 +300,7 @@ export default {
         </tbody>
       </table>
     )
-  },
+  }
 }
 </script>
 

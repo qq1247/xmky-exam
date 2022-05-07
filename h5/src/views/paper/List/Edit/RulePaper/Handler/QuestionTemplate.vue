@@ -1,8 +1,8 @@
 <template>
   <div class="handler-content">
     <el-form
-      size="small"
       ref="questionForm"
+      size="small"
       :model="questionForm"
       :rules="questionForm.rules"
       label-width="80px"
@@ -23,15 +23,15 @@
             :key="item.id"
             :label="item.name"
             :value="item.id"
-          ></el-option>
+          />
         </CustomSelect>
       </el-form-item>
     </el-form>
     <QuestionTemplate
       :back="false"
-      :questionTypeId="questionForm.questionTypeId"
+      :question-type-id="questionForm.questionTypeId"
       @questionExport="questionExport"
-    ></QuestionTemplate>
+    />
   </div>
 </template>
 
@@ -44,7 +44,7 @@ import { questionTypeListPage } from 'api/question'
 export default {
   components: {
     CustomSelect,
-    QuestionTemplate,
+    QuestionTemplate
   },
   props: {},
   data() {
@@ -55,10 +55,10 @@ export default {
         questionType: 1,
         rules: {
           questionTypeId: [
-            { required: true, message: '请选择试题分类', trigger: 'blur' },
-          ],
-        },
-      },
+            { required: true, message: '请选择试题分类', trigger: 'blur' }
+          ]
+        }
+      }
     }
   },
   methods: {
@@ -67,7 +67,7 @@ export default {
       const typeList = await questionTypeListPage({
         name,
         curPage,
-        pageSize: 5,
+        pageSize: 5
       })
       this.questionForm.questionTypes = typeList.data.list
       this.questionForm.total = typeList.data.total
@@ -86,8 +86,8 @@ export default {
     },
     // 组合导出的docx-html
     async compositionHtml() {
-      let paperName = this.$parent.$parent.paperName
-      let paperDetail =
+      const paperName = this.$parent.$parent.paperName
+      const paperDetail =
         this.$parent.$parent.$refs['paperComposition'].paperQuestion
       let stringHtml = `<p style="text-align: center;font-size: 20px;font-weight: 600;">${paperName}</p>`
 
@@ -95,7 +95,7 @@ export default {
         stringHtml += `<br/><p>${paperDetail[i].chapter.name}</p><p>${paperDetail[i].chapter.description}</p><br/>`
 
         for (let j = 0; j < paperDetail[i].questionList.length; j++) {
-          let title = paperDetail[i].questionList[j].title.replace(
+          const title = paperDetail[i].questionList[j].title.replace(
             />/,
             `><span>${j + 1}、</span>`
           )
@@ -110,7 +110,7 @@ export default {
           if (paperDetail[i].questionList[j].type === 4) {
             const options = ['对', '错']
             for (let index = 0; index < options.length; index++) {
-              let option = `<p>&nbsp;&nbsp;<span>${String.fromCharCode(
+              const option = `<p>&nbsp;&nbsp;<span>${String.fromCharCode(
                 65 + index
               )}、</span><span>${options[index]}</span></p>`
               stringHtml += option
@@ -121,7 +121,7 @@ export default {
               index < paperDetail[i].questionList[j].options.length;
               index++
             ) {
-              let option = paperDetail[i].questionList[j].options[
+              const option = paperDetail[i].questionList[j].options[
                 index
               ].replace(
                 />/,
@@ -137,11 +137,11 @@ export default {
     },
     // 替换docx-html中的图片
     async convertImagesToBase64(stringHtml) {
-      let parser = new DOMParser()
-      let doc = parser.parseFromString(stringHtml, 'text/html')
-      let regularImages = doc.querySelectorAll('img')
-      let canvas = document.createElement('canvas')
-      let ctx = canvas.getContext('2d')
+      const parser = new DOMParser()
+      const doc = parser.parseFromString(stringHtml, 'text/html')
+      const regularImages = doc.querySelectorAll('img')
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
       for (let index = 0; index < regularImages.length; index++) {
         const imgElement = regularImages[index]
         ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -156,7 +156,7 @@ export default {
     },
     loadImg(canvas, ctx, imgElement) {
       return new Promise((resolve, reject) => {
-        let img = new Image()
+        const img = new Image()
         img.src = imgElement.src
         img.setAttribute('crossOrigin', 'Anonymous')
         img.onload = () => {
@@ -169,12 +169,12 @@ export default {
     },
     // 导出试题
     async questionExport() {
-      let stringHtml = await this.compositionHtml()
-      let docxHtml = await this.convertImagesToBase64(stringHtml)
-      let converted = htmlDocx.asBlob(docxHtml, { orientation: 'portrait' })
+      const stringHtml = await this.compositionHtml()
+      const docxHtml = await this.convertImagesToBase64(stringHtml)
+      const converted = htmlDocx.asBlob(docxHtml, { orientation: 'portrait' })
       saveAs(converted, 'paper.docx')
-    },
-  },
+    }
+  }
 }
 </script>
 

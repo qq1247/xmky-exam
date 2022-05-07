@@ -13,14 +13,14 @@ export default {
     return {
       navs: [],
       layout: '',
-      active: '',
+      active: ''
     }
   },
   computed: {
     key() {
       return this.$route.path
-    },
-  },
+    }
+  }
 }
 </script>
 

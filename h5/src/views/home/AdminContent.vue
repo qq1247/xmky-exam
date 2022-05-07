@@ -4,17 +4,17 @@
       <el-card class="box-card" shadow="never">
         <div slot="header">考试概览</div>
         <div
-          class="data-content"
           v-if="
             userInfo.bulletin &&
-            userInfo.onlineUser &&
-            userInfo.subAdmin &&
-            userInfo.user
+              userInfo.onlineUser &&
+              userInfo.subAdmin &&
+              userInfo.user
           "
+          class="data-content"
         >
           <div class="data-item" @click="$router.push({ name: 'User' })">
             <div class="item-icon exam-bg">
-              <img src="../../assets/img/index/index-exam.png" alt="" />
+              <img src="../../assets/img/index/index-exam.png" alt="">
             </div>
             <div class="item-info">
               <span class="info-num">{{ userInfo.user.num }}</span>
@@ -23,7 +23,7 @@
           </div>
           <div class="data-item" @click="$router.push({ name: 'User' })">
             <div class="item-icon paper-bg">
-              <img src="../../assets/img/index/index-paper.png" alt="" />
+              <img src="../../assets/img/index/index-paper.png" alt="">
             </div>
             <div class="item-info">
               <span class="info-num">{{ userInfo.onlineUser.num }}</span>
@@ -32,7 +32,7 @@
           </div>
           <div class="data-item" @click="$router.push({ name: 'Bulletin' })">
             <div class="item-icon question-bg">
-              <img src="../../assets/img/index/index-question.png" alt="" />
+              <img src="../../assets/img/index/index-question.png" alt="">
             </div>
             <div class="item-info">
               <span class="info-num">{{ userInfo.bulletin.num }}</span>
@@ -41,7 +41,7 @@
           </div>
           <div class="data-item" @click="$router.push({ name: 'User' })">
             <div class="item-icon mark-bg">
-              <img src="../../assets/img/index/index-mark.png" alt="" />
+              <img src="../../assets/img/index/index-mark.png" alt="">
             </div>
             <div class="item-info">
               <span class="info-num">{{ userInfo.subAdmin.num }}</span>
@@ -56,9 +56,9 @@
         </div>
         <template v-if="serverLog.length">
           <div
-            class="server-log"
             v-for="(log, index) in serverLog"
             :key="index"
+            class="server-log"
           >
             {{ log }}
           </div>
@@ -67,7 +67,7 @@
           v-else
           :image="require('assets/img/index/notice-null.png')"
           description="暂无异常"
-        ></el-empty>
+        />
       </el-card>
 
       <div class="table">
@@ -90,8 +90,7 @@
                 v-if="scope.row.online"
                 style="cursor: pointer"
                 @click="offLine(scope.row.id)"
-                >强制下线</span
-              >
+              >强制下线</span>
               <span v-else>离线</span>
             </template>
           </el-table-column>
@@ -101,13 +100,13 @@
         :current-page="listpage.curPage"
         :page-size="listpage.pageSize"
         :total="listpage.total"
-        @current-change="pageChange"
         background
         hide-on-single-page
         layout="prev, pager, next"
         next-text="下一页"
         prev-text="上一页"
-      ></el-pagination>
+        @current-change="pageChange"
+      />
     </div>
     <div class="home-info">
       <!-- 功能列表 -->
@@ -116,12 +115,11 @@
           <span>功能列表</span>
         </div>
         <el-link
-          class="quick-nav"
           v-for="nav in navList"
           :key="nav.path"
+          class="quick-nav"
           @click="$router.push(nav.path)"
-          >{{ nav.meta.title }}</el-link
-        >
+        >{{ nav.meta.title }}</el-link>
       </el-card>
       <!-- 系统参数 -->
       <el-card class="box-card" shadow="never">
@@ -129,17 +127,17 @@
           <span>服务器参数</span>
         </div>
         <div
-          class="params-item"
           v-for="param in serverParams"
           :key="param.name"
+          class="params-item"
         >
           <span class="item-name">{{ param.name }}:</span>
-          <div class="item-value" v-if="Array.isArray(param.value)">
+          <div v-if="Array.isArray(param.value)" class="item-value">
             <span v-for="(item, index) in param.value" :key="index">
-              {{ item }} <br />
+              {{ item }} <br>
             </span>
           </div>
-          <span class="item-value" v-else>{{ param.value }}</span>
+          <span v-else class="item-value">{{ param.value }}</span>
         </div>
       </el-card>
       <!-- 服务支持 -->
@@ -182,13 +180,13 @@ export default {
         curPage: 1, // 当前第几页
         pageSize: 10, // 每页多少条
         list: [], // 列表数据
-        navList: [],
+        navList: []
       },
-      userInfo: {},
+      userInfo: {}
     }
   },
   computed: {
-    ...mapGetters(['permission_routes', 'onlyRole']),
+    ...mapGetters(['permission_routes', 'onlyRole'])
   },
   mounted() {
     this.getAdminInfo()
@@ -218,12 +216,12 @@ export default {
     // 查询用户信息
     async query(curPage = 1) {
       const {
-        data: { list, total },
+        data: { list, total }
       } = await userListPage({
         orgName: '',
         name: '',
         curPage: curPage,
-        pageSize: this.listpage.pageSize,
+        pageSize: this.listpage.pageSize
       })
       this.listpage.total = total
       this.listpage.list = list
@@ -238,8 +236,8 @@ export default {
     // 分页查询用户信息
     pageChange(val) {
       this.query(val)
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -397,6 +395,9 @@ export default {
   display: flex;
   align-items: center;
   line-height: 30px;
+  span {
+    color: #537384;
+  }
 }
 .service-qq {
   display: flex;

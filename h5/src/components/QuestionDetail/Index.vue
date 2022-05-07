@@ -1,16 +1,7 @@
-<!--
- * @Description: 
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-09-10 10:12:59
- * @LastEditors: Che
- * @LastEditTime: 2022-01-13 10:50:41
--->
 <template>
   <div class="question-detail">
-    <DetailMain v-if="comment" :data="data"></DetailMain>
-    <DetailMore :data="data"></DetailMore>
+    <DetailMain v-if="comment" :data="data" />
+    <DetailMore :data="data" />
   </div>
 </template>
 
@@ -20,22 +11,22 @@ import DetailMain from './DetailMain.vue'
 export default {
   components: {
     DetailMain,
-    DetailMore,
+    DetailMore
   },
   props: {
     data: {
       type: Object,
-      default: () => {},
+      default: () => {}
     },
     comment: {
       type: Boolean,
-      default: true,
-    },
+      default: true
+    }
   },
   data() {
     return {}
   },
-  methods: {},
+  methods: {}
 }
 </script>
 

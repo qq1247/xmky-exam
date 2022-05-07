@@ -1,43 +1,22 @@
-<!--
- * @Description: 设置
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-12-16 16:01:13
- * @LastEditors: Che
- * @LastEditTime: 2022-01-05 15:40:19
--->
 <template>
-  <div class="container">
-    <el-form :model="editForm" :rules="editForm.rules" ref="editForm">
-      <el-form-item label="索引" label-width="120px" prop="dictIndex">
-        <el-input
-          placeholder="请输入索引"
-          v-model="editForm.dictIndex"
-        ></el-input>
-      </el-form-item>
-      <el-form-item label="键" label-width="120px" prop="dictKey">
-        <el-input placeholder="请输入键" v-model="editForm.dictKey"></el-input>
-      </el-form-item>
-      <el-form-item label="值" label-width="120px" prop="dictValue">
-        <el-input
-          placeholder="请输入值"
-          v-model="editForm.dictValue"
-        ></el-input>
-      </el-form-item>
-      <el-form-item label="排序" label-width="120px" prop="no">
-        <el-input-number
-          :max="100"
-          :min="1"
-          v-model.number="editForm.no"
-        ></el-input-number>
-      </el-form-item>
-    </el-form>
-    <div class="form-footer">
-      <el-button @click="add" type="primary" v-if="!id">添加</el-button>
-      <el-button @click="edit" type="primary" v-if="id">修改</el-button>
-    </div>
-  </div>
+  <el-form ref="editForm" :model="editForm" :rules="editForm.rules">
+    <el-form-item label="索引" label-width="120px" prop="dictIndex">
+      <el-input v-model="editForm.dictIndex" placeholder="请输入索引" />
+    </el-form-item>
+    <el-form-item label="键" label-width="120px" prop="dictKey">
+      <el-input v-model="editForm.dictKey" placeholder="请输入键" />
+    </el-form-item>
+    <el-form-item label="值" label-width="120px" prop="dictValue">
+      <el-input v-model="editForm.dictValue" placeholder="请输入值" />
+    </el-form-item>
+    <el-form-item label="排序" label-width="120px" prop="no">
+      <el-input-number v-model.number="editForm.no" :max="100" :min="1" />
+    </el-form-item>
+    <el-form-item>
+      <el-button v-if="!id" type="primary" @click="add">添加</el-button>
+      <el-button v-if="id" type="primary" @click="edit">修改</el-button>
+    </el-form-item>
+  </el-form>
 </template>
 
 <script>
@@ -56,15 +35,15 @@ export default {
         rules: {
           // 校验
           dictIndex: [
-            { required: true, message: '请输入排序', trigger: 'blur' },
+            { required: true, message: '请输入排序', trigger: 'blur' }
           ],
           dictKey: [{ required: true, message: '请输入排序', trigger: 'blur' }],
           dictValue: [
-            { required: true, message: '请输入排序', trigger: 'blur' },
+            { required: true, message: '请输入排序', trigger: 'blur' }
           ],
-          no: [{ required: true, message: '请输入排序', trigger: 'blur' }],
-        },
-      },
+          no: [{ required: true, message: '请输入排序', trigger: 'blur' }]
+        }
+      }
     }
   },
   async mounted() {
@@ -83,7 +62,7 @@ export default {
   methods: {
     // 添加
     add() {
-      this.$refs['editForm'].validate(async (valid) => {
+      this.$refs['editForm'].validate(async(valid) => {
         if (!valid) {
           return false
         }
@@ -92,9 +71,9 @@ export default {
           dictIndex: this.editForm.dictIndex,
           dictKey: this.editForm.dictKey,
           dictValue: this.editForm.dictValue,
-          no: this.editForm.no,
+          no: this.editForm.no
         })
-        if (code != 200) {
+        if (code !== 200) {
           this.$message.error(msg)
           return
         }
@@ -104,7 +83,7 @@ export default {
     },
     // 修改
     edit() {
-      this.$refs['editForm'].validate(async (valid) => {
+      this.$refs['editForm'].validate(async(valid) => {
         if (!valid) {
           return false
         }
@@ -114,17 +93,17 @@ export default {
           dictIndex: this.editForm.dictIndex,
           dictKey: this.editForm.dictKey,
           dictValue: this.editForm.dictValue,
-          no: this.editForm.no,
+          no: this.editForm.no
         })
-        if (code != 200) {
+        if (code !== 200) {
           this.$message.error(msg)
           return
         }
 
         this.$router.back()
       })
-    },
-  },
+    }
+  }
 }
 </script>
 

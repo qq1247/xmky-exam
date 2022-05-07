@@ -1,50 +1,40 @@
-<!--
- * @Description: 业务卡片
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-10-13 14:52:40
- * @LastEditors: Che
- * @LastEditTime: 2022-01-12 18:16:22
--->
 <template>
   <div class="exam-item">
     <div class="exam-content">
       <!-- 考试，阅卷 标签 -->
       <div class="tag-group">
         <el-tag
+          v-if="name === 'myExamList'"
           size="mini"
-          v-if="name == 'myExamList'"
-          :type="data.state == 3 ? '' : 'danger'"
-          >{{ data.state | examStateName }}</el-tag
-        >
+          :type="data.state === 3 ? '' : 'danger'"
+        >{{ data.state | examStateName }}</el-tag>
         <el-tag
+          v-if="name === 'myMarkList'"
           size="mini"
-          v-if="name == 'myMarkList'"
-          :type="data.examMarkState == 3 ? '' : 'danger'"
-          >{{ data.examMarkState | markStateName }}</el-tag
-        >
+          :type="data.examMarkState === 3 ? '' : 'danger'"
+        >{{ data.examMarkState | markStateName }}</el-tag>
       </div>
       <!-- 标题 -->
       <div class="title ellipsis">{{ data.name || data.examName }}</div>
       <el-row>
-        <el-col class="content-info"
-          >考试开始：{{ data.examStartTime }}（{{
-            $tools.computeMinute(data.examStartTime, data.examEndTime)
-          }}）</el-col
-        >
-        <el-col class="content-info" v-if="name === 'myMarkList'"
-          >阅卷开始：{{ data.examMarkStartTime }}（{{
-            $tools.computeMinute(data.examMarkStartTime, data.examMarkEndTime)
-          }}）</el-col
-        >
+        <el-col
+          class="content-info"
+        >考试开始：{{ data.examStartTime }}（{{
+          $tools.computeMinute(data.examStartTime, data.examEndTime)
+        }}）</el-col>
+        <el-col
+          v-if="name === 'myMarkList'"
+          class="content-info"
+        >阅卷开始：{{ data.examMarkStartTime }}（{{
+          $tools.computeMinute(data.examMarkStartTime, data.examMarkEndTime)
+        }}）</el-col>
         <el-col>
           <el-row v-if="name === 'myExamList'" class="content-info">
-            <el-col :span="8"
-              >答题：{{
-                $tools.computeMinute(data.answerStartTime, data.answerEndTime)
-              }}</el-col
-            >
+            <el-col
+              :span="8"
+            >答题：{{
+              $tools.computeMinute(data.answerStartTime, data.answerEndTime)
+            }}</el-col>
             <el-col
               :span="8"
               :style="{
@@ -57,35 +47,31 @@
                     ? 'red'
                     : '',
               }"
-              >分数：{{ data.totalScore !== null ? data.totalScore : '-' }} /
-              {{ data.paperTotalScore }}</el-col
-            >
-            <el-col :span="8" v-if="name === 'myExamList'"
-              >排名：{{ data.no === null ? '-' : data.no }} /
-              {{ data.userNum === null ? '-' : data.userNum }}</el-col
-            >
+            >分数：{{ data.totalScore !== null ? data.totalScore : '-' }} /
+              {{ data.paperTotalScore }}</el-col>
+            <el-col
+              v-if="name === 'myExamList'"
+              :span="8"
+            >排名：{{ data.no === null ? '-' : data.no }} /
+              {{ data.userNum === null ? '-' : data.userNum }}</el-col>
           </el-row>
         </el-col>
         <template v-if="name === 'myMarkList'">
-          <el-col class="content-info"
-            >分数：{{
-              ((data.paperPassScore / 100) * data.paperTotalScore).toFixed()
-            }}
-            / {{ data.paperTotalScore }}</el-col
-          >
+          <el-col
+            class="content-info"
+          >分数：{{
+            ((data.paperPassScore / 100) * data.paperTotalScore).toFixed()
+          }}
+            / {{ data.paperTotalScore }}</el-col>
         </template>
       </el-row>
-      <CountDown
-        class="count-down"
-        v-if="remainTime > 0"
-        :time="remainTime"
-      ></CountDown>
+      <CountDown v-if="remainTime > 0" class="count-down" :time="remainTime" />
 
       <div class="handler">
         <!-- 我的考试 -->
         <template v-if="name === 'myExamList'">
           <span :data-title="data.state | examStateName" @click="exam(data)">
-            <i :class="['common', stateIcon[data.state]]"></i>
+            <i :class="['common', stateIcon[data.state]]" />
           </span>
         </template>
         <!-- 我的阅卷 -->
@@ -94,10 +80,10 @@
             :data-title="data.examMarkState | markStateName"
             @click="mark(data)"
           >
-            <i :class="['common', markStateIcon[data.examMarkState]]"></i>
+            <i :class="['common', markStateIcon[data.examMarkState]]" />
           </span>
           <span data-title="考生列表" @click="markUser(data)">
-            <i class="common common-user"></i>
+            <i class="common common-user" />
           </span>
         </template>
       </div>
@@ -110,33 +96,7 @@ import CountDown from '../CountDown.vue'
 import { getOneDict } from '@/utils/getDict'
 export default {
   components: {
-    CountDown,
-  },
-  props: {
-    data: {
-      type: Object,
-      default: () => {},
-    },
-    name: {
-      type: String,
-      default: '',
-    },
-  },
-  data() {
-    return {
-      markStateIcon: ['', 'common-wait', 'common-marking', 'common-mark'],
-      stateIcon: ['', 'common-wait', 'common-examing', 'common-exam'],
-    }
-  },
-  computed: {
-    remainTime() {
-      const startTime =
-        this.name === 'myExamList'
-          ? this.data.examStartTime
-          : this.data.markStartTime
-      const diffTime = new Date(startTime).getTime() - new Date().getTime()
-      return diffTime
-    },
+    CountDown
   },
   filters: {
     examStateName(data) {
@@ -148,7 +108,33 @@ export default {
       return getOneDict('MY_EXAM_MARK_STATE').find(
         (item) => Number(item.dictKey) === data
       ).dictValue
+    }
+  },
+  props: {
+    data: {
+      type: Object,
+      default: () => {}
     },
+    name: {
+      type: String,
+      default: ''
+    }
+  },
+  data() {
+    return {
+      markStateIcon: ['', 'common-wait', 'common-marking', 'common-mark'],
+      stateIcon: ['', 'common-wait', 'common-examing', 'common-exam']
+    }
+  },
+  computed: {
+    remainTime() {
+      const startTime =
+        this.name === 'myExamList'
+          ? this.data.examStartTime
+          : this.data.markStartTime
+      const diffTime = new Date(startTime).getTime() - new Date().getTime()
+      return diffTime
+    }
   },
   methods: {
     // 开始考试
@@ -162,8 +148,8 @@ export default {
     // 考生列表
     markUser(data) {
       this.$emit('markUser', data)
-    },
-  },
+    }
+  }
 }
 </script>
 vue

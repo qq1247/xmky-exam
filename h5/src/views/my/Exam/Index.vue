@@ -5,16 +5,18 @@
       <div>
         <el-form-item>
           <el-input
-            placeholder="请输入考试名称"
             v-model="queryForm.examName"
+            placeholder="请输入考试名称"
             class="query-input"
-          ></el-input>
+          />
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button @click="search" icon="el-icon-search" type="primary"
-          >查询</el-button
-        >
+        <el-button
+          icon="el-icon-search"
+          type="primary"
+          @click="search"
+        >查询</el-button>
       </el-form-item>
     </el-form>
     <!-- 内容 -->
@@ -27,10 +29,10 @@
             :data="item"
             name="myExamList"
             @exam="examHandler"
-          ></MyCard>
+          />
         </div>
       </template>
-      <el-empty v-else description="暂无信息"> </el-empty>
+      <el-empty v-else description="暂无信息" />
       <el-pagination
         background
         layout="prev, pager, next"
@@ -41,7 +43,7 @@
         :page-size="pageSize"
         :current-page="1"
         @current-change="pageChange"
-      ></el-pagination>
+      />
     </div>
   </div>
 </template>
@@ -51,7 +53,7 @@ import { myExamListPage } from 'api/my'
 import MyCard from 'components/ListCard/MyCard.vue'
 export default {
   components: {
-    MyCard,
+    MyCard
   },
   data() {
     return {
@@ -59,9 +61,9 @@ export default {
       curPage: 1,
       total: 0,
       queryForm: {
-        examName: '',
+        examName: ''
       },
-      myExamList: [],
+      myExamList: []
     }
   },
   mounted() {
@@ -73,7 +75,7 @@ export default {
       const myExamList = await myExamListPage({
         examName: this.queryForm.examName,
         curPage: this.curPage,
-        pageSize: this.pageSize,
+        pageSize: this.pageSize
       })
 
       this.myExamList = myExamList.data?.list || []
@@ -91,7 +93,7 @@ export default {
       examStartTime,
       examEndTime,
       examMarkState,
-      examMarkEndTime,
+      examMarkEndTime
     }) {
       const _examStartTime = new Date(examStartTime).getTime()
       const _examEndTime = new Date(examEndTime).getTime()
@@ -120,8 +122,8 @@ export default {
             userId: null,
             examEndTime,
             showType: paperShowType,
-            preview: !(_examStartTime < now && now < _examEndTime),
-          },
+            preview: !(_examStartTime < now && now < _examEndTime)
+          }
         })
       }
     },
@@ -129,8 +131,8 @@ export default {
     pageChange(val) {
       this.curPage = val
       this.query()
-    },
-  },
+    }
+  }
 }
 </script>
 

@@ -1,21 +1,20 @@
 <template>
   <div class="container">
-    <el-form :inline="true" :model="queryForm" ref="queryForm">
+    <el-form ref="queryForm" :inline="true" :model="queryForm">
       <el-row>
         <el-col>
           <el-form-item label prop="name">
             <el-input
-              placeholder="请输入名称"
               v-model="queryForm.name"
-            ></el-input>
+              placeholder="请输入名称"
+            />
           </el-form-item>
           <el-button
-            @click="query"
             class="query-search"
             icon="el-icon-search"
             type="primary"
-            >查询</el-button
-          >
+            @click="query"
+          >查询</el-button>
         </el-col>
       </el-row>
     </el-form>
@@ -40,8 +39,7 @@
                     ? '#FF5722'
                     : '#5FB878',
               }"
-              >{{ scope.row.totalScore || '--' }}</span
-            >
+            >{{ scope.row.totalScore || '--' }}</span>
           </template>
         </el-table-column>
         <el-table-column label="答题用时">
@@ -81,8 +79,7 @@
               size="small"
               :disabled="scope.row.state === 1 ? true : false"
               @click="goMark(scope.row.userId)"
-              >阅卷</el-button
-            >
+            >阅卷</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -95,6 +92,18 @@ import { myMarkUserList } from 'api/my'
 import { getOneDict } from '@/utils/getDict'
 export default {
   components: {},
+  filters: {
+    stateName(data) {
+      return getOneDict('MY_EXAM_STATE').find(
+        (item) => Number(item.dictKey) === data
+      ).dictValue
+    },
+    markStateName(data) {
+      return getOneDict('MY_EXAM_MARK_STATE').find(
+        (item) => Number(item.dictKey) === data
+      ).dictValue
+    }
+  },
   props: {},
   data() {
     return {
@@ -106,21 +115,9 @@ export default {
       pageSize: 10, // 每页多少条
       userList: [], // 列表数据
       queryForm: {
-        name: null,
-      },
+        name: null
+      }
     }
-  },
-  filters: {
-    stateName(data) {
-      return getOneDict('MY_EXAM_STATE').find(
-        (item) => Number(item.dictKey) === data
-      ).dictValue
-    },
-    markStateName(data) {
-      return getOneDict('MY_EXAM_MARK_STATE').find(
-        (item) => Number(item.dictKey) === data
-      ).dictValue
-    },
   },
   mounted() {
     const { examId, paperId, preview } = this.$route.params
@@ -134,7 +131,7 @@ export default {
     async query() {
       const { data } = await await myMarkUserList({
         userName: this.queryForm.name,
-        examId: this.examId,
+        examId: this.examId
       })
       this.userList = data
     },
@@ -146,11 +143,11 @@ export default {
           examId: this.examId,
           paperId: this.paperId,
           preview: this.preview,
-          userId,
-        },
+          userId
+        }
       })
-    },
-  },
+    }
+  }
 }
 </script>
 

@@ -1,39 +1,41 @@
 <template>
   <div class="container">
     <el-form
+      ref="ruleForm"
       :model="ruleForm"
       status-icon
       :rules="rules"
-      ref="ruleForm"
       class="login-wrap"
     >
       <div class="login-title">欢迎登录</div>
       <el-form-item prop="account">
         <template slot="label">
-          <i class="common common-wo"></i>
+          <i class="common common-wo" />
         </template>
         <el-input
+          v-model="ruleForm.account"
           type="text"
           placeholder="请输入账号"
-          v-model="ruleForm.account"
           autocomplete="off"
-        ></el-input>
+        />
       </el-form-item>
       <el-form-item prop="password">
         <template slot="label">
-          <i class="common common-lock"></i>
+          <i class="common common-lock" />
         </template>
         <el-input
+          v-model="ruleForm.password"
           type="password"
           placeholder="请输入密码"
-          v-model="ruleForm.password"
           autocomplete="off"
-        ></el-input>
+        />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" class="login-btn" @click="login('ruleForm')"
-          >登录</el-button
-        >
+        <el-button
+          type="primary"
+          class="login-btn"
+          @click="login('ruleForm')"
+        >登录</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -45,29 +47,29 @@ export default {
     return {
       ruleForm: {
         account: '',
-        password: '',
+        password: ''
       },
       rules: {
         account: [{ required: true, message: '账号不能为空', trigger: 'blur' }],
         password: [
-          { required: true, message: '密码不能为空', trigger: 'blur' },
-        ],
-      },
+          { required: true, message: '密码不能为空', trigger: 'blur' }
+        ]
+      }
     }
   },
   methods: {
     // 登录
     login(formName) {
-      this.$refs[formName].validate(async (valid) => {
+      this.$refs[formName].validate(async(valid) => {
         if (valid) {
           this.$store
             .dispatch('user/login', {
               username: this.ruleForm.account,
-              password: this.ruleForm.password,
+              password: this.ruleForm.password
             })
             .then(() => {
               this.$router.replace({
-                path: '/',
+                path: '/'
               })
               this.$message('登录成功！')
             })
@@ -76,8 +78,8 @@ export default {
           return false
         }
       })
-    },
-  },
+    }
+  }
 }
 </script>
 

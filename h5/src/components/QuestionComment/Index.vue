@@ -1,59 +1,48 @@
-<!--
- * @Description: 
- * @Version: 1.0
- * @Company: 
- * @Author: Che
- * @Date: 2021-09-18 15:44:29
- * @LastEditors: Che
- * @LastEditTime: 2021-09-29 17:01:17
--->
 <template>
   <div>
     <div
-      class="comment-item"
       v-for="(comment, index) in list"
       :key="comment.id"
+      class="comment-item"
     >
       <el-avatar
         :size="40"
         shape="square"
         :src="`/api/file/download?id=${Number(comment.avatar)}`"
-        ><i class="common common-wo"></i
-      ></el-avatar>
+      ><i
+        class="common common-wo"
+      /></el-avatar>
       <div class="item-content">
         <div class="content-info">
-          <span class="info-name">{{ comment.name }}：</span
-          >{{ comment.content }}
+          <span class="info-name">{{ comment.name }}：</span>{{ comment.content }}
         </div>
         <div class="content-handler">
-          <span>{{ comment.time }}</span
-          ><span
-            class="comment"
+          <span>{{ comment.time }}</span><span
             v-if="comment.children && commentState === 2"
+            class="comment"
             @click.stop="showComment(index)"
-            >回复</span
-          >
+          >回复</span>
         </div>
         <CommentText
-          showTriangle
           v-if="comment.comment"
+          show-triangle
           @comment="childrenComment(arguments, comment.id)"
-        ></CommentText>
+        />
         <div
-          class="content-more"
           v-if="comment.children && !comment.children.length"
+          class="content-more"
           @click="getChildrenComment(comment.id)"
         >
           点击查看更多回复！
         </div>
         <div
-          :class="comment.children ? 'children-content' : ''"
           v-if="comment.children && comment.children.length"
+          :class="comment.children ? 'question-content' : ''"
         >
           <comment-item
             :list="comment.children"
             @showMore="showMore(comment.id, index)"
-          ></comment-item>
+          />
         </div>
       </div>
     </div>
@@ -66,17 +55,17 @@ import CommentText from './CommentText.vue'
 export default {
   name: 'CommentItem',
   components: {
-    CommentText,
+    CommentText
   },
   props: {
     list: {
       type: Array,
-      default: () => [],
+      default: () => []
     },
     commentState: {
       type: Number,
-      default: 0,
-    },
+      default: 0
+    }
   },
   data() {
     return {}
@@ -95,8 +84,8 @@ export default {
     },
     showMore(id, index) {
       this.$emit('showMore', id, index)
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -139,7 +128,7 @@ export default {
       color: #eb7350;
       font-size: 13px;
     }
-    .children-content {
+    .question-content {
       padding: 5px 10px;
       margin-top: 10px;
       background: #eaeaec;
