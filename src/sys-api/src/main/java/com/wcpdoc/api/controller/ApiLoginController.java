@@ -136,30 +136,30 @@ public class ApiLoginController extends BaseController {
 	}
 	
 	/**
-	 * 获取单位名称
+	 * 获取企业名称
 	 * 
 	 * v1.0 chenyun 2021-10-08 16:05:35
 	 * @return void
 	 */
-	@RequestMapping("/orgName")
+	@RequestMapping("/entName")
 	@ResponseBody
 	public PageResult orgName() {
 		try {
 			Parm parm = ParmCache.get();
-			return PageResultEx.ok().data(parm == null ? null : parm.getOrgName());
+			return PageResultEx.ok().data(parm == null ? "" : parm.getOrgName());
 		} catch (Exception e) {
 			log.error("获取单位名称错误：", e);
 			return PageResult.err().msg(e.getMessage());
 		}
 	}
 	/**
-	 * 获取logo
+	 * 获取企业logo
 	 * 
 	 * v1.0 chenyun 2021-10-08 16:05:35
 	 * @param ico 是否ico图片
 	 * @return void
 	 */
-	@RequestMapping("/logo")
+	@RequestMapping("/entLogo")
 	@ResponseBody
 	public void logo(Boolean ico) {
 		try {

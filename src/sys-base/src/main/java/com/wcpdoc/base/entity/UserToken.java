@@ -10,8 +10,6 @@ public class UserToken {
 	private Integer userId;
 	private String userName;
 	private String[] roles;
-	private String entName;
-	private Integer entLogoFileId;
 
 	public String getAccessToken() {
 		return accessToken;
@@ -44,21 +42,4 @@ public class UserToken {
 	public void setRoles(String[] roles) {
 		this.roles = roles;
 	}
-
-	public String getEntName() {
-		return entName;
-	}
-
-	public void setEntName(String entName) {
-		this.entName = entName;
-	}
-
-	public Integer getEntLogoFileId() {
-		return entLogoFileId;
-	}
-
-	public void setEntLogoFileId(Integer entLogoFileId) {
-		this.entLogoFileId = entLogoFileId;
-	}
-
 }

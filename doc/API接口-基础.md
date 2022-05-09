@@ -57,7 +57,7 @@ http请求头需添加Authorization字段，
 |msg     | String  | 响应消息 |
 |data     | Date  | 服务器时间（前端每隔30秒同步一次，保证跟时间相关的业务功能正常） |
 
-### 商标：login/logo
+### 企业logo：login/entLogo
 | 请求参数     |  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
 | ico| Boolean| 转ico | 否 |
@@ -66,7 +66,7 @@ http请求头需添加Authorization字段，
 | --------   | -----   | -----  |
 |     | Binary  | 二进制流 |
 
-### 单位名称：login/orgName
+### 企业名称：login/entName
 | 响应参数  |  类型   |  描述  |
 | --------   | -----   | -----  |
 |code     | Integer  | 响应码 |
