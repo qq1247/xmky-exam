@@ -8,7 +8,7 @@ export default [
     meta: {
       title: '用户管理',
       icon: 'common common-wo',
-      layout: 'admin',
+      layout: 'admin'
     },
     children: [
       {
@@ -18,7 +18,7 @@ export default [
         meta: {
           title: '用户信息',
           icon: 'common common-wo',
-          layout: 'admin',
+          layout: 'admin'
         },
         children: [
           {
@@ -28,14 +28,14 @@ export default [
             meta: {
               title: '用户设置',
               icon: 'common common-setting',
-              layout: 'admin',
+              layout: 'admin'
             },
-            hidden: true,
-          },
+            hidden: true
+          }
         ],
-        hidden: true,
-      },
-    ],
+        hidden: true
+      }
+    ]
   },
   {
     path: '/org',
@@ -45,7 +45,7 @@ export default [
     meta: {
       title: '组织机构',
       icon: 'common common-org',
-      layout: 'admin',
+      layout: 'admin'
     },
     children: [
       {
@@ -55,7 +55,7 @@ export default [
         meta: {
           title: '组织机构',
           icon: 'common common-org',
-          layout: 'admin',
+          layout: 'admin'
         },
         children: [
           {
@@ -65,14 +65,14 @@ export default [
             meta: {
               title: '机构设置',
               icon: 'common common-setting',
-              layout: 'admin',
+              layout: 'admin'
             },
-            hidden: true,
-          },
+            hidden: true
+          }
         ],
-        hidden: true,
-      },
-    ],
+        hidden: true
+      }
+    ]
   },
   {
     path: '/bulletin',
@@ -82,7 +82,7 @@ export default [
     meta: {
       layout: 'admin',
       title: '公告管理',
-      icon: 'common common-notice',
+      icon: 'common common-notice'
     },
     children: [
       {
@@ -92,7 +92,7 @@ export default [
         meta: {
           layout: 'admin',
           title: '公告管理',
-          icon: 'common common-notice',
+          icon: 'common common-notice'
         },
         children: [
           {
@@ -102,14 +102,14 @@ export default [
             meta: {
               layout: 'admin',
               title: '公告设置',
-              icon: 'common common-setting',
+              icon: 'common common-setting'
             },
-            hidden: true,
-          },
+            hidden: true
+          }
         ],
-        hidden: true,
-      },
-    ],
+        hidden: true
+      }
+    ]
   },
   {
     path: '/dict',
@@ -119,7 +119,7 @@ export default [
     meta: {
       layout: 'admin',
       title: '数据字典',
-      icon: 'common common-data-library',
+      icon: 'common common-data-library'
     },
     children: [
       {
@@ -129,7 +129,7 @@ export default [
         meta: {
           layout: 'admin',
           title: '数据字典',
-          icon: 'common common--data-library',
+          icon: 'common common--data-library'
         },
         children: [
           {
@@ -139,14 +139,14 @@ export default [
             meta: {
               layout: 'admin',
               title: '数据字典设置',
-              icon: 'common common-setting',
+              icon: 'common common-setting'
             },
-            hidden: true,
-          },
+            hidden: true
+          }
         ],
-        hidden: true,
-      },
-    ],
+        hidden: true
+      }
+    ]
   },
   {
     path: '/cron',
@@ -156,7 +156,7 @@ export default [
     meta: {
       layout: 'admin',
       title: '定时任务',
-      icon: 'common common-time',
+      icon: 'common common-time'
     },
     children: [
       {
@@ -166,7 +166,7 @@ export default [
         meta: {
           layout: 'admin',
           title: '定时任务',
-          icon: 'common common-time',
+          icon: 'common common-time'
         },
         children: [
           {
@@ -176,14 +176,14 @@ export default [
             meta: {
               layout: 'admin',
               title: '定时任务设置',
-              icon: 'common common-setting',
+              icon: 'common common-setting'
             },
-            hidden: true,
-          },
+            hidden: true
+          }
         ],
-        hidden: true,
-      },
-    ],
+        hidden: true
+      }
+    ]
   },
   {
     path: '/param',
@@ -193,7 +193,7 @@ export default [
     meta: {
       layout: 'admin',
       title: '系统参数',
-      icon: 'common common-setting',
+      icon: 'common common-setting'
     },
     children: [
       {
@@ -203,11 +203,11 @@ export default [
         meta: {
           layout: 'admin',
           title: '参数设置',
-          icon: 'common common-setting',
+          icon: 'common common-setting'
         },
-        hidden: true,
-      },
-    ],
+        hidden: true
+      }
+    ]
   },
   {
     path: '/sensitive',
@@ -217,7 +217,7 @@ export default [
     meta: {
       layout: 'admin',
       title: '敏感词',
-      icon: 'common common-sensitive',
+      icon: 'common common-sensitive'
     },
     children: [
       {
@@ -227,11 +227,11 @@ export default [
         meta: {
           layout: 'admin',
           title: '敏感词设置',
-          icon: 'common common-sensitive',
+          icon: 'common common-sensitive'
         },
-        hidden: true,
-      },
-    ],
+        hidden: true
+      }
+    ]
   },
-  { path: '*', redirect: '/404', hidden: true },
+  { path: '*', redirect: '/404', hidden: true }
 ]

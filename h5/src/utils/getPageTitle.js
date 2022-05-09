@@ -1,5 +1,5 @@
 import store from '@/store/index'
-const title = store.state.setting.orgName || '在线考试'
+const title = store.state.setting.entName || '在线考试'
 
 /**
  * @name: getPageTitle

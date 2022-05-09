@@ -53,7 +53,6 @@ export default {
             const res = await paperPublish({ id: getQuick().id })
             if (res?.code === 200) {
               const paperInfo = await paperGet({ id: getQuick().id })
-              console.log(paperInfo)
               const quickInfo = getQuick()
               quickInfo.markType = paperInfo.data.markType
               quickInfo.state = paperInfo.data.state

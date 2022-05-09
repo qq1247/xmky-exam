@@ -309,7 +309,6 @@
     padding: 16px;
     margin: 0 16px;
     position: relative;
-    transition: all 0.3s ease;
     .question-title {
       display: flex;
       line-height: 22px;
@@ -322,12 +321,6 @@
         border-radius: 0;
         background-color: transparent;
         border-bottom: 1px solid #666;
-      }
-    }
-    &:hover {
-      padding: 16px 16px 50px;
-      .children-footer {
-        opacity: 1;
       }
     }
   }

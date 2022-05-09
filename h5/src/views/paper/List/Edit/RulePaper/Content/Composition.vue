@@ -104,11 +104,13 @@
                     :key="indexOption"
                     class="option-item"
                     disabled
-                    :label="String.fromCharCode(65 + index)"
+                    :label="String.fromCharCode(65 + indexOption)"
                   >
                     <div
                       class="flex-items-center"
-                      v-html="`${String.fromCharCode(65 + index)}、${option}`"
+                      v-html="
+                        `${String.fromCharCode(65 + indexOption)}、${option}`
+                      "
                     />
                   </el-radio>
                 </el-radio-group>
@@ -125,11 +127,13 @@
                     :key="indexOption"
                     class="option-item"
                     disabled
-                    :label="String.fromCharCode(65 + index)"
+                    :label="String.fromCharCode(65 + indexOption)"
                   >
                     <div
                       class="flex-items-center"
-                      v-html="`${String.fromCharCode(65 + index)}、${option}`"
+                      v-html="
+                        `${String.fromCharCode(65 + indexOption)}、${option}`
+                      "
                     />
                   </el-checkbox>
                 </el-checkbox-group>
@@ -870,6 +874,17 @@ export default {
   /deep/ .el-input {
     width: 80px;
     margin: 0 10px;
+  }
+}
+
+.question-content {
+  &:hover {
+    transition: all 0.2s ease;
+    padding: 16px 16px 50px;
+    .children-footer {
+      transition: all 0.2s 0.1s ease-in-out;
+      opacity: 1;
+    }
   }
 }
 

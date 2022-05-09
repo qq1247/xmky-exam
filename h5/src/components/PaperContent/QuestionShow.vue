@@ -38,12 +38,12 @@
               v-for="(option, indexOption) in questionList[index].options"
               :key="indexOption"
               :disabled="preview === 'true' ? true : false"
-              :label="String.fromCharCode(65 + index)"
+              :label="String.fromCharCode(65 + indexOption)"
               class="option-item"
             >
               <div
                 class="flex-items-center"
-                v-html="`${String.fromCharCode(65 + index)}、${option}`"
+                v-html="`${String.fromCharCode(65 + indexOption)}、${option}`"
               />
             </el-radio>
           </el-radio-group>
@@ -60,13 +60,13 @@
             <el-checkbox
               v-for="(option, indexOption) in questionList[index].options"
               :key="indexOption"
-              :label="String.fromCharCode(65 + index)"
+              :label="String.fromCharCode(65 + indexOption)"
               class="option-item"
               :disabled="preview === 'true' ? true : false"
             >
               <div
                 class="flex-items-center"
-                v-html="`${String.fromCharCode(65 + index)}、${option}`"
+                v-html="`${String.fromCharCode(65 + indexOption)}、${option}`"
               />
             </el-checkbox>
           </el-checkbox-group>

@@ -1,8 +1,7 @@
 import { getSetting } from '@/utils/storage'
 
 const state = {
-  lineTime: 0,
-  orgName: getSetting().orgName,
+  entName: getSetting().entName
 }
 
 const mutations = {
@@ -10,7 +9,7 @@ const mutations = {
     if (Object.prototype.hasOwnProperty.call(state, key)) {
       state[key] = value
     }
-  },
+  }
 }
 
 const actions = {
@@ -19,12 +18,12 @@ const actions = {
       commit('CHANGE_SETTING', data)
       resolve()
     })
-  },
+  }
 }
 
 export default {
   namespaced: true,
   state,
   mutations,
-  actions,
+  actions
 }

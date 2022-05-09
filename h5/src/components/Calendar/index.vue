@@ -10,7 +10,7 @@
           class="el-icon-arrow-left"
           @click="selectDate('prev-month')"
         />
-        <div class="el-calendar-time">{{ i18nDate }}</div>
+        <div>{{ i18nDate }}</div>
         <i
           title="下个月"
           class="el-icon-arrow-right"
@@ -80,7 +80,6 @@ export default {
     },
     range: {
       type: Array,
-      default: () => [],
       validator(range) {
         if (Array.isArray(range)) {
           return (
@@ -305,15 +304,17 @@ export default {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  i {
-    font-size: 14px;
-    font-weight: bold;
-    color: rgba(0, 0, 0, 0.5);
-  }
-  .el-calendar-time {
-    color: rgba(0, 0, 0, 0.85);
-    font-weight: 500;
-    font-size: 16px;
-  }
+}
+.el-icon-d-arrow-left,
+.el-icon-d-arrow-right {
+  padding: 3px;
+  border: 1px solid #ececec;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.el-icon-link {
+  margin: 0 10px;
+  cursor: pointer;
 }
 </style>

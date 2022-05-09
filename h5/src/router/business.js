@@ -9,7 +9,7 @@ export default [
       title: '试题管理',
       icon: 'common common-question-manage',
       layout: 'subAdmin',
-      roles: ['subAdmin'],
+      roles: ['subAdmin']
     },
     children: [
       {
@@ -18,7 +18,7 @@ export default [
         component: () => import('@/views/question/Index.vue'),
         meta: {
           title: '试题分类',
-          layout: 'subAdmin',
+          layout: 'subAdmin'
         },
         children: [
           {
@@ -27,8 +27,8 @@ export default [
             component: () => import('@/views/question/Setting/Index.vue'),
             meta: {
               title: '试题设置',
-              layout: 'subAdmin',
-            },
+              layout: 'subAdmin'
+            }
           },
           {
             path: 'edit/:id',
@@ -36,8 +36,8 @@ export default [
             component: () => import('@/views/question/Edit.vue'),
             meta: {
               title: '试题列表',
-              layout: 'subAdmin',
-            },
+              layout: 'subAdmin'
+            }
           },
           {
             path: 'open/:id',
@@ -45,8 +45,8 @@ export default [
             component: () => import('@/views/question/Open.vue'),
             meta: {
               title: '模拟练习',
-              layout: 'subAdmin',
-            },
+              layout: 'subAdmin'
+            }
           },
           {
             path: 'statistics/:id',
@@ -54,12 +54,12 @@ export default [
             component: () => import('@/views/question/Statistics.vue'),
             meta: {
               title: '试题统计',
-              layout: 'subAdmin',
-            },
-          },
-        ],
-      },
-    ],
+              layout: 'subAdmin'
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     path: '/paper',
@@ -70,7 +70,7 @@ export default [
       title: '试卷管理',
       icon: 'common common-paper-manage',
       layout: 'subAdmin',
-      roles: ['subAdmin'],
+      roles: ['subAdmin']
     },
     children: [
       {
@@ -79,7 +79,7 @@ export default [
         component: () => import('@/views/paper/Index/Index.vue'),
         meta: {
           title: '试卷分类',
-          layout: 'subAdmin',
+          layout: 'subAdmin'
         },
         children: [
           {
@@ -88,10 +88,10 @@ export default [
             component: () => import('@/views/paper/Index/Setting/Index.vue'),
             meta: {
               title: '试卷设置',
-              layout: 'subAdmin',
-            },
-          },
-        ],
+              layout: 'subAdmin'
+            }
+          }
+        ]
       },
       {
         path: 'list/:id?',
@@ -100,7 +100,7 @@ export default [
         hidden: true,
         meta: {
           title: '试卷列表',
-          layout: 'subAdmin',
+          layout: 'subAdmin'
         },
         children: [
           {
@@ -109,8 +109,8 @@ export default [
             component: () => import('@/views/paper/List/Setting/Index.vue'),
             meta: {
               title: '列表设置',
-              layout: 'subAdmin',
-            },
+              layout: 'subAdmin'
+            }
           },
           {
             path: '/paper/list/edit/:id/:paperTypeId/:genType/:tab?',
@@ -118,12 +118,12 @@ export default [
             component: () => import('@/views/paper/List/Edit/Index.vue'),
             meta: {
               title: '组合试卷',
-              layout: 'subAdmin',
-            },
-          },
-        ],
-      },
-    ],
+              layout: 'subAdmin'
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     path: '/exam',
@@ -134,7 +134,7 @@ export default [
       title: '考试管理',
       icon: 'common common-exam-manage',
       layout: 'subAdmin',
-      roles: ['subAdmin'],
+      roles: ['subAdmin']
     },
     children: [
       {
@@ -143,7 +143,7 @@ export default [
         component: () => import('@/views/exam/Index/Index.vue'),
         meta: {
           title: '考试分类',
-          layout: 'subAdmin',
+          layout: 'subAdmin'
         },
         children: [
           {
@@ -152,10 +152,10 @@ export default [
             component: () => import('@/views/exam/Index/Setting/Index.vue'),
             meta: {
               title: '考试设置',
-              layout: 'subAdmin',
-            },
-          },
-        ],
+              layout: 'subAdmin'
+            }
+          }
+        ]
       },
       {
         path: 'list/:id',
@@ -164,7 +164,7 @@ export default [
         hidden: true,
         meta: {
           title: '考试列表',
-          layout: 'subAdmin',
+          layout: 'subAdmin'
         },
         children: [
           {
@@ -173,8 +173,8 @@ export default [
             component: () => import('@/views/exam/List/Setting/Index.vue'),
             meta: {
               title: '列表设置',
-              layout: 'subAdmin',
-            },
+              layout: 'subAdmin'
+            }
           },
           {
             path: '/exam/list/markSetting/:id/:examTypeId',
@@ -182,8 +182,8 @@ export default [
             component: () => import('@/views/exam/List/MarkSetting.vue'),
             meta: {
               title: '考试用户',
-              layout: 'subAdmin',
-            },
+              layout: 'subAdmin'
+            }
           },
           {
             path: '/exam/list/line/:id/:examTypeId',
@@ -191,8 +191,8 @@ export default [
             component: () => import('@/views/exam/List/OnLine.vue'),
             meta: {
               title: '在线用户',
-              layout: 'subAdmin',
-            },
+              layout: 'subAdmin'
+            }
           },
           {
             path: '/exam/list/statistics/:id/:examTypeId',
@@ -200,12 +200,12 @@ export default [
             component: () => import('@/views/exam/List/Statistics.vue'),
             meta: {
               title: '考试统计',
-              layout: 'subAdmin',
-            },
-          },
-        ],
-      },
-    ],
+              layout: 'subAdmin'
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     path: '/myExam',
@@ -216,7 +216,7 @@ export default [
       title: '考试管理',
       layout: 'user',
       icon: 'common common-question-manage',
-      roles: ['user', 'subAdmin'],
+      roles: ['user', 'subAdmin']
     },
     children: [
       {
@@ -226,20 +226,20 @@ export default [
         meta: {
           title: '我的考试',
           icon: 'common common-exam',
-          layout: 'user',
+          layout: 'user'
         },
-        hidden: true,
+        hidden: true
       },
       {
         path: 'detail/:examId/:paperId/:examEndTime/:showType/:preview/:userId?',
         component: () => import('views/my/Exam/Detail.vue'),
         name: 'MyExamDetail',
         meta: {
-          layout: 'common',
+          layout: 'common'
         },
-        hidden: true,
-      },
-    ],
+        hidden: true
+      }
+    ]
   },
   {
     path: '/myMark',
@@ -250,7 +250,7 @@ export default [
       title: '阅卷管理',
       layout: 'subAdmin',
       icon: 'common common-mark-paper',
-      roles: ['user', 'subAdmin'],
+      roles: ['user', 'subAdmin']
     },
     children: [
       {
@@ -260,7 +260,7 @@ export default [
         meta: {
           title: '阅卷分类',
           icon: 'common common-exam',
-          layout: 'subAdmin',
+          layout: 'subAdmin'
         },
         children: [
           {
@@ -269,9 +269,9 @@ export default [
             name: 'MyMarkIndexUser',
             meta: {
               title: '考生列表',
-              layout: 'subAdmin',
+              layout: 'subAdmin'
             },
-            hidden: true,
+            hidden: true
           },
           {
             path: 'detail/:examId/:paperId/:preview/:userId?',
@@ -279,14 +279,14 @@ export default [
             name: 'MyMarkIndexDetail',
             meta: {
               title: '阅卷',
-              layout: 'subAdmin',
+              layout: 'subAdmin'
             },
-            hidden: true,
-          },
+            hidden: true
+          }
         ],
-        hidden: true,
-      },
-    ],
+        hidden: true
+      }
+    ]
   },
   {
     path: '/simulate',
@@ -297,7 +297,7 @@ export default [
       title: '模拟练习',
       icon: 'common common-simulate',
       layout: 'user',
-      roles: ['user'],
+      roles: ['user']
     },
     children: [
       {
@@ -307,8 +307,8 @@ export default [
         hidden: true,
         meta: {
           title: '模拟试题',
-          layout: 'user',
-        },
+          layout: 'user'
+        }
       },
       {
         path: 'test/:questionTypeId/:commentState?',
@@ -317,10 +317,10 @@ export default [
         hidden: true,
         meta: {
           title: '背题 | 模拟测试',
-          layout: 'user',
-        },
-      },
-    ],
+          layout: 'user'
+        }
+      }
+    ]
   },
   {
     path: '/quick',
@@ -332,7 +332,7 @@ export default [
       icon: 'common common-quick',
       layout: 'subAdmin',
       roles: ['subAdmin'],
-      hidden: true,
+      hidden: true
     },
     children: [
       {
@@ -342,10 +342,10 @@ export default [
         hidden: true,
         meta: {
           title: '快捷考试',
-          layout: 'subAdmin',
-        },
-      },
-    ],
+          layout: 'subAdmin'
+        }
+      }
+    ]
   },
-  { path: '*', redirect: '/404', hidden: true },
+  { path: '*', redirect: '/404', hidden: true }
 ]

@@ -1,12 +1,9 @@
 <template>
   <el-form ref="paramForm" :model="paramForm" label-width="100px">
-    <el-form-item label="单位名称" prop="orgName">
-      <el-input
-        v-model="paramForm.orgName"
-        placeholder="请输入单位名称"
-      />
+    <el-form-item label="名称" prop="orgName">
+      <el-input v-model="paramForm.orgName" placeholder="请输入单位名称" />
     </el-form-item>
-    <el-form-item label="单位商标" prop="orgLogo">
+    <el-form-item label="logo" prop="orgLogo">
       <Upload
         ref="logoUpload"
         type="image"
@@ -25,7 +22,6 @@
 <script>
 import Upload from 'components/Upload'
 import { parmGet, parmLogo } from 'api/base'
-import { getSetting, setSetting } from '@/utils/storage'
 export default {
   components: { Upload },
   data() {
@@ -72,13 +68,6 @@ export default {
             message: '设置成功',
             duration: 1000
           })
-          this.$store.dispatch('setting/changeSetting', {
-            key: 'orgName',
-            value: this.paramForm.orgName
-          })
-          const loginInfo = getSetting()
-          loginInfo.orgName = this.paramForm.orgName
-          setSetting(loginInfo)
         } else {
           this.$message.error(msg)
         }

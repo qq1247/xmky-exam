@@ -163,6 +163,15 @@ export default {
     cursor: pointer;
   }
 }
+
+/deep/ .el-avatar {
+  background: #fff;
+  border: 1px solid rgba(#000, 0.1);
+  .common {
+    color: rgba(#000, 0.3);
+  }
+}
+
 .el-dropdown-link {
   cursor: pointer;
   margin: 0 35px 0 10px;

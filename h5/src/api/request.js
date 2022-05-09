@@ -23,9 +23,9 @@ const request = (
         : params,
     responseType: responseType,
     headers: {
-      'Content-Type': headers,
+      'Content-Type': headers
     },
-    timeout: timeout,
+    timeout: timeout
   })
 
 export default request

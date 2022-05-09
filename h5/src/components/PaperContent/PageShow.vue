@@ -48,7 +48,7 @@
                   v-for="(option, indexOption) in question.options"
                   :key="indexOption"
                   :disabled="preview"
-                  :label="String.fromCharCode(65 + index)"
+                  :label="String.fromCharCode(65 + indexOption)"
                   class="option-item"
                 >
                   <div
@@ -56,7 +56,9 @@
                       color: scoreState ? optionColor(index, child) : '',
                     }"
                     class="flex-items-center"
-                    v-html="`${String.fromCharCode(65 + index)}、${option}`"
+                    v-html="
+                      `${String.fromCharCode(65 + indexOption)}、${option}`
+                    "
                   />
                 </el-radio>
               </el-radio-group>
@@ -73,7 +75,7 @@
                 <el-checkbox
                   v-for="(option, indexOption) in question.options"
                   :key="indexOption"
-                  :label="String.fromCharCode(65 + index)"
+                  :label="String.fromCharCode(65 + indexOption)"
                   class="option-item"
                   :disabled="preview"
                 >
@@ -82,7 +84,9 @@
                       color: scoreState ? optionColor(index, child) : '',
                     }"
                     class="flex-items-center"
-                    v-html="`${String.fromCharCode(65 + index)}、${option}`"
+                    v-html="
+                      `${String.fromCharCode(65 + indexOption)}、${option}`
+                    "
                   />
                 </el-checkbox>
               </el-checkbox-group>

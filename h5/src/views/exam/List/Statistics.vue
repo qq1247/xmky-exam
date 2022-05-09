@@ -403,7 +403,6 @@ export default {
     // 获取展开行信息
     async expandChange(row) {
       const currentId = this.expandRowList[0] ? this.expandRowList[0] : ''
-      console.log(this.expandRowList[0])
 
       if (currentId === row.questionId) {
         return

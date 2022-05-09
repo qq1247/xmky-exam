@@ -25,12 +25,12 @@ export const loginPwd = (params) => request('login/pwd', params)
 export const loginSysTime = (params) => request('login/sysTime', params)
 
 /**
- * @name: loginOrgName
- * @description: 获取orgName
+ * @name: loginEntName
+ * @description: 获取企业name
  * @param {*}
  * @return {*}
  */
-export const loginOrgName = (params) => request('login/orgName', params)
+export const loginEntName = (params) => request('login/entName', params)
 
 /**
  * @name: fileUpload

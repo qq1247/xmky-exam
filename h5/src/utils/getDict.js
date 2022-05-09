@@ -7,12 +7,12 @@ import { getDict, setDict } from './storage'
  * @param {*}
  * @return {*}
  */
-const getDictList = async () => {
+const getDictList = async() => {
   const {
-    data: { list: dictList },
+    data: { list: dictList }
   } = await dictListPage({
     curPage: 1,
-    pageSize: 100,
+    pageSize: 100
   })
   setDict(dictList)
 }

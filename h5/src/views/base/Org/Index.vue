@@ -3,7 +3,7 @@
     <template v-if="hashChildren">
       <el-form ref="queryForm" :inline="true" :model="queryForm">
         <el-row>
-          <el-col :span="17">
+          <el-col :span="20">
             <el-form-item label prop="name">
               <el-input
                 v-model="queryForm.name"
@@ -16,10 +16,36 @@
               icon="el-icon-search"
               type="primary"
               @click="query"
-              >查询</el-button
-            >
+            >查询</el-button>
           </el-col>
-          <el-col :span="7" />
+          <el-col :span="4">
+            <el-form-item>
+              <el-button
+                icon="el-icon-tickets"
+                size="mini"
+                type="primary"
+                @click="orgTemplate()"
+              >下载模板</el-button>
+            </el-form-item>
+            <el-form-item>
+              <el-upload
+                :limit="1"
+                name="files"
+                list-type="text"
+                :headers="headers"
+                action="/api/file/upload"
+                :file-list="queryForm.fileList"
+                :on-success="uploadSuccess"
+              >
+                <el-button
+                  icon="el-icon-upload2"
+                  size="mini"
+                  type="primary"
+                  @click="() => orgImport"
+                >导入</el-button>
+              </el-upload>
+            </el-form-item>
+          </el-col>
         </el-row>
         <div v-if="queryForm.queryShow" />
       </el-form>
@@ -67,7 +93,7 @@
 </template>
 
 <script>
-import { orgListPage } from 'api/base'
+import { orgListPage, orgTemplate, orgImport } from 'api/base'
 
 export default {
   data() {
@@ -77,19 +103,19 @@ export default {
         total: 0, // 总条数
         curPage: 1, // 当前第几页
         pageSize: 100, // 每页多少条
-        list: [], // 列表数据
+        list: [] // 列表数据
       },
       // 查询表单
       queryForm: {
         name: null,
-        parentId: null,
-      },
+        parentId: null
+      }
     }
   },
   computed: {
     hashChildren() {
       return !(this.$route.matched.length > 2)
-    },
+    }
   },
   created() {
     this.init()
@@ -98,12 +124,12 @@ export default {
     // 查询
     async query() {
       const {
-        data: { list },
+        data: { list }
       } = await orgListPage({
         parentId: this.queryForm.parentId,
         name: this.queryForm.name,
         curPage: this.listpage.curPage,
-        pageSize: this.listpage.pageSize,
+        pageSize: this.listpage.pageSize
       })
 
       const treeList = []
@@ -142,24 +168,48 @@ export default {
       this.$tools.switchTab('OrgIndexSetting', {
         id: 0,
         tab: '1',
-        parentId: id,
+        parentId: id
       })
     },
     // 修改
     edit(id) {
       this.$tools.switchTab('OrgIndexSetting', {
         id,
-        tab: '1',
+        tab: '1'
       })
     },
     // 删除
     del(id) {
       this.$tools.switchTab('OrgIndexSetting', {
         id,
-        tab: '2',
+        tab: '2'
       })
     },
-  },
+    // 组织机构模板
+    async orgTemplate() {
+      const template = await orgTemplate({}, 'blob')
+      const blob = new Blob([template], { type: 'application/msword' })
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = '组织模板.xlsx'
+      a.click()
+      window.URL.revokeObjectURL(url)
+    },
+    // 上传成功
+    uploadSuccess(response, file, fileList) {
+      this.orgImport(response.data.fileIds)
+    },
+    // 组织机构导入
+    async orgImport(fileId) {
+      const res = await orgImport({
+        fileId
+      })
+      if (res.data?.code === 200) {
+        this.query()
+      }
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>

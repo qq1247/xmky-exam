@@ -1,11 +1,11 @@
-import { login, loginOrgName } from 'api/common'
+import { login, loginEntName } from 'api/common'
 import {
   getInfo,
   setInfo,
   removeInfo,
   setSetting,
   getDict,
-  removeDict,
+  removeDict
 } from '@/utils/storage'
 import { getDictList } from '@/utils/getDict'
 import router, { resetRouter } from '@/router/index'
@@ -16,8 +16,7 @@ const state = {
   userId: getInfo().userId,
   roles: getInfo().roles,
   onlyRole: getInfo().onlyRole,
-  orgName: getInfo().orgName,
-  userAvatar: getInfo().userAvatar,
+  userAvatar: getInfo().userAvatar
 }
 
 const mutations = {
@@ -36,12 +35,12 @@ const mutations = {
   SET_ONLY_ROLE: (state, onlyRole) => {
     state.onlyRole = onlyRole
   },
-  SET_ORG_NAME: (state, orgName) => {
-    state.orgName = orgName
+  SET_ENT_NAME: (state, entName) => {
+    state.entName = entName
   },
   SET_USER_AVATAR: (state, userAvatar) => {
     state.userAvatar = userAvatar
-  },
+  }
 }
 
 const actions = {
@@ -56,7 +55,7 @@ const actions = {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
       login({ loginName: username.trim(), pwd: password })
-        .then(async (res) => {
+        .then(async(res) => {
           const { data } = res
           const role = data.roles.includes('subAdmin')
             ? ['subAdmin']
@@ -66,19 +65,18 @@ const actions = {
           commit('SET_USER_NAME', data.userName)
           commit('SET_USER_ID', data.userId)
           commit('SET_ONLY_ROLE', role)
-          commit('SET_ORG_NAME', null)
           commit('SET_USER_AVATAR', null)
-          const { data: orgName } = await loginOrgName()
+          const { data: entName } = await loginEntName()
           commit(
             'setting/CHANGE_SETTING',
             {
-              key: 'orgName',
-              value: orgName,
+              key: 'entName',
+              value: entName
             },
             { root: true }
           )
           setInfo({ onlyRole: role, orgName: null, userAvatar: null, ...data })
-          setSetting({ orgName })
+          setSetting({ entName })
           if (!getDict()) {
             getDictList()
           }
@@ -107,7 +105,7 @@ const actions = {
         'setting/CHANGE_SETTING',
         {
           key: 'tabIndex',
-          value: '1',
+          value: '1'
         },
         { root: true }
       )
@@ -137,16 +135,16 @@ const actions = {
 
     // generate accessible routes map based on roles
     const accessRoutes = await dispatch('permission/generateRoutes', roles, {
-      root: true,
+      root: true
     })
     // dynamically add accessible routes
     router.addRoutes(accessRoutes)
-  },
+  }
 }
 
 export default {
   namespaced: true,
   state,
   mutations,
-  actions,
+  actions
 }

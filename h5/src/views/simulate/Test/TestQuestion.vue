@@ -199,7 +199,9 @@
             size="small"
             type="primary"
             @click="nextQuestion"
-          >下一题<i class="el-icon-arrow-right el-icon--right" /></el-button>
+          >下一题<i
+            class="el-icon-arrow-right el-icon--right"
+          /></el-button>
         </el-button-group>
       </el-col>
       <el-col
@@ -291,7 +293,6 @@ export default {
       return (index) => {
         // 单选
         if (this.questionDetail.type === 1) {
-          console.log(this.questionDetail.selected)
           // 选择完毕且与正确答案不匹配
           if (
             this.questionDetail.selected === String.fromCharCode(65 + index) &&

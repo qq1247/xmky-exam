@@ -9,16 +9,16 @@ const resolve = (dir) => path.join(__dirname, dir)
 
 // copy dir
 const copy = (src, dst) => {
-  fs.readdir(src, function (err, paths) {
+  fs.readdir(src, function(err, paths) {
     if (err) {
       throw err
     }
-    paths.forEach(function (path) {
+    paths.forEach(function(path) {
       const _src = `${src}/${path}`
       const _dst = `${dst}/${path}`
       let readable
       let writable
-      stat(_src, function (err, st) {
+      stat(_src, function(err, st) {
         if (err) {
           throw err
         }
@@ -37,11 +37,11 @@ const copy = (src, dst) => {
 
 // isDir
 const exists = (src, dst, callback) => {
-  fs.exists(dst, function (exists) {
+  fs.exists(dst, function(exists) {
     if (exists) {
       callback(src, dst)
     } else {
-      fs.mkdir(dst, function () {
+      fs.mkdir(dst, function() {
         callback(src, dst)
       })
     }
@@ -89,8 +89,8 @@ module.exports = {
         assets: resolve('src/assets'),
         api: resolve('src/api'),
         views: resolve('src/views'),
-        components: resolve('src/components'),
-      },
+        components: resolve('src/components')
+      }
     },
     plugins: [
       new CompressionWebpackPlugin({
@@ -100,9 +100,9 @@ module.exports = {
         test: /\.js$|\.json$|\.css/,
         threshold: 102400, // compression size
         minRatio: 0.8, // compression ratio
-        deleteOriginalAssets: false, // Deleting source Files
-      }),
-    ],
+        deleteOriginalAssets: false // Deleting source Files
+      })
+    ]
   },
   chainWebpack(config) {
     // it can improve the speed of the first screen, it is recommended to turn on preload
@@ -112,8 +112,8 @@ module.exports = {
         // to ignore runtime.js
         // https://github.com/vuejs/vue-cli/blob/dev/packages/@vue/cli-service/lib/config/app.js#L171
         fileBlacklist: [/\.map$/, /hot-update\.js$/, /runtime\..*\.js$/],
-        include: 'initial',
-      },
+        include: 'initial'
+      }
     ])
 
     // when there are many pages, it will cause too many meaningless requests
@@ -126,8 +126,8 @@ module.exports = {
         .use('script-ext-html-webpack-plugin', [
           {
             // `runtime` must same as runtimeChunk name. default is `runtime`
-            inline: /runtime\..*\.js$/,
-          },
+            inline: /runtime\..*\.js$/
+          }
         ])
         .end()
 
@@ -138,21 +138,21 @@ module.exports = {
             name: 'chunk-libs',
             test: /[\\/]node_modules[\\/]/,
             priority: 10,
-            chunks: 'initial', // only package third parties that are initially dependent
+            chunks: 'initial' // only package third parties that are initially dependent
           },
           elementUI: {
             name: 'chunk-elementUI', // split elementUI into a single package
             priority: 20, // the weight needs to be larger than libs and app or it will be packaged into libs or app
-            test: /[\\/]node_modules[\\/]_?element-ui(.*)/, // in order to adapt to cnpm
+            test: /[\\/]node_modules[\\/]_?element-ui(.*)/ // in order to adapt to cnpm
           },
           commons: {
             name: 'chunk-commons',
             test: resolve('src/components'), // can customize your rules
             minChunks: 3, //  minimum common number
             priority: 5,
-            reuseExistingChunk: true,
-          },
-        },
+            reuseExistingChunk: true
+          }
+        }
       })
       // https:// webpack.js.org/configuration/optimization/#optimizationruntimechunk
       config.optimization.runtimeChunk('single')
@@ -171,9 +171,9 @@ module.exports = {
         // ws: true, // proxy websocket
         // pathRewrite
         pathRewrite: {
-          '^/api': '',
-        },
-      },
-    },
-  },
+          '^/api': ''
+        }
+      }
+    }
+  }
 }

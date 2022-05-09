@@ -133,11 +133,11 @@
                 v-for="(option, indexOption) in question.options"
                 :key="indexOption"
                 class="option-item"
-                :label="String.fromCharCode(65 + index)"
+                :label="String.fromCharCode(65 + indexOption)"
               >
                 <div
                   class="flex-items-center"
-                  v-html="`${String.fromCharCode(65 + index)}、${option}`"
+                  v-html="`${String.fromCharCode(65 + indexOption)}、${option}`"
                 />
               </el-radio>
             </el-radio-group>
@@ -153,11 +153,11 @@
                 v-for="(option, indexOption) in question.options"
                 :key="indexOption"
                 class="option-item"
-                :label="String.fromCharCode(65 + index)"
+                :label="String.fromCharCode(65 + indexOption)"
               >
                 <div
                   class="flex-items-center"
-                  v-html="`${String.fromCharCode(65 + index)}、${option}`"
+                  v-html="`${String.fromCharCode(65 + indexOption)}、${option}`"
                 />
               </el-checkbox>
             </el-checkbox-group>
@@ -417,11 +417,6 @@ export default {
   .btn {
     padding: 5px 10px;
   }
-}
-
-/deep/ .el-radio__input .el-radio__inner,
-/deep/ .el-checkbox__input .el-checkbox__inner {
-  margin-top: 8px;
 }
 
 .footer {

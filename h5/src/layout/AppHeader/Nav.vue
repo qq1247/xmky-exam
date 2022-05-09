@@ -5,7 +5,7 @@
         <i slot="placeholder" class="common common-more-row" />
         <i slot="error" class="common common-perfect" />
       </el-image>
-      <div class="org-name">{{ $store.getters.orgName }}</div>
+      <div class="org-name">{{ $store.getters.entName }}</div>
     </router-link>
     <div class="nav">
       <router-link
@@ -22,39 +22,7 @@
 export default {
   data() {
     return {
-      orgLogo: '/api/login/logo',
-      navInfo: {
-        user: [
-          {
-            name: '首页',
-            path: 'Home'
-          },
-          {
-            name: '考试',
-            path: 'MyExam'
-          }
-        ],
-        subAdmin: [
-          {
-            name: '首页',
-            path: 'Home'
-          },
-          {
-            name: '考试',
-            path: 'Question'
-          }
-        ],
-        admin: [
-          {
-            name: '首页',
-            path: 'Home'
-          },
-          {
-            name: '基础管理',
-            path: 'User'
-          }
-        ]
-      }
+      orgLogo: '/api/login/entLogo'
     }
   }
 }
