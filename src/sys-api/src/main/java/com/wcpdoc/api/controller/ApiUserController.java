@@ -11,9 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.wcpdoc.base.entity.Org;
 import com.wcpdoc.base.entity.User;
@@ -368,17 +366,17 @@ public class ApiUserController extends BaseController {
 	}
 	
 	/**
-	 * 导入用户表
+	 * 导入用户
 	 * 
 	 * v1.0 chenyun 2021年3月4日下午5:41:02
 	 * 
 	 * @return PageResult
 	 */
-	@RequestMapping("/input")
+	@RequestMapping("/import")
 	@ResponseBody
-	public PageResult input(@RequestParam("file") MultipartFile file) {
+	public PageResult xlsImport(Integer fileId) {
 		try {
-			userXlsxService.inputUserXlsx(file);
+			userXlsxService.xlsImport(fileId);
 			return PageResultEx.ok();
 		} catch (Exception e) {
 			log.error("用户列表错误：", e);

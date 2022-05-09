@@ -10,9 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.wcpdoc.base.entity.Org;
 import com.wcpdoc.base.service.OrgService;
@@ -204,11 +202,11 @@ public class ApiOrgController extends BaseController {
 	 * v1.0 chenyun 2021年3月4日下午5:41:02
 	 * @return PageResult
 	 */
-	@RequestMapping("/input")
+	@RequestMapping("/import")
 	@ResponseBody
-	public PageResult input(@RequestParam("file") MultipartFile file) {
+	public PageResult xlsImport(Integer fileId) {
 		try {
-			orgXlsxService.inputOrgXlsx(file);
+			orgXlsxService.xlsImport(fileId);
 			return PageResultEx.ok();
 		} catch (Exception e) {
 			log.error("组织机构列表错误：", e);
