@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.wcpdoc.base.entity.Org;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.OrgService;
+import com.wcpdoc.base.service.UserExService;
 import com.wcpdoc.base.service.UserService;
-import com.wcpdoc.base.service.UserXlsxService;
 import com.wcpdoc.core.constant.ConstantManager;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.OnlineUser;
@@ -44,9 +44,9 @@ public class ApiUserController extends BaseController {
 	@Resource
 	private UserService userService;
 	@Resource
-	private OrgService orgService;
+	private UserExService userExService;
 	@Resource
-	private UserXlsxService userXlsxService;
+	private OrgService orgService;
 	@Resource
 	private OnlineUserService onlineUserService;
 	@Resource
@@ -376,7 +376,7 @@ public class ApiUserController extends BaseController {
 	@ResponseBody
 	public PageResult xlsImport(Integer fileId) {
 		try {
-			userXlsxService.xlsImport(fileId);
+			userExService.xlsImport(fileId);
 			return PageResultEx.ok();
 		} catch (Exception e) {
 			log.error("用户列表错误：", e);
@@ -395,7 +395,7 @@ public class ApiUserController extends BaseController {
 	@ResponseBody
 	public void export(Integer[] ids) {
 		try {
-	        userXlsxService.export(ids);
+//	        userXlsxService.export(ids);
 		} catch (MyException e) {
 			log.error("导出用户表失败：", e.getMessage());
 		} catch (Exception e) {
@@ -414,7 +414,7 @@ public class ApiUserController extends BaseController {
 	@ResponseBody
 	public void template() {
 		try {
-			userXlsxService.templateUserXlsx();
+			fileService.exportTemplate("用户.xlsx");
 		} catch (Exception e) {
 			log.error("用户导出模板下载附件失败：", e);
 		}

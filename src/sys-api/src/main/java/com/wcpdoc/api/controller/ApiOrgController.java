@@ -13,14 +13,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wcpdoc.base.entity.Org;
+import com.wcpdoc.base.service.OrgExService;
 import com.wcpdoc.base.service.OrgService;
-import com.wcpdoc.base.service.OrgXlsxService;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.ValidateUtil;
+import com.wcpdoc.file.service.FileService;
 
 /**
  * 组织机构控制层
@@ -35,7 +36,9 @@ public class ApiOrgController extends BaseController {
 	@Resource
 	private OrgService orgService;
 	@Resource
-	private OrgXlsxService orgXlsxService;
+	private OrgExService orgExService;
+	@Resource
+	private FileService fileService;
 
 	/**
 	 * 组织机构列表
@@ -197,7 +200,7 @@ public class ApiOrgController extends BaseController {
 	}
 	
 	/**
-	 * 导入组织机构表
+	 * 导入组织机构
 	 * 
 	 * v1.0 chenyun 2021年3月4日下午5:41:02
 	 * @return PageResult
@@ -206,7 +209,7 @@ public class ApiOrgController extends BaseController {
 	@ResponseBody
 	public PageResult xlsImport(Integer fileId) {
 		try {
-			orgXlsxService.xlsImport(fileId);
+			orgExService.xlsImport(fileId);
 			return PageResultEx.ok();
 		} catch (Exception e) {
 			log.error("组织机构列表错误：", e);
@@ -224,7 +227,7 @@ public class ApiOrgController extends BaseController {
 	@ResponseBody
 	public void export(Integer[] ids) {
 		try {
-			orgXlsxService.export(ids);
+//			orgXlsxService.export(ids);
 		} catch (MyException e) {
 			log.error("导出组织机构表失败：", e.getMessage());
 		} catch (Exception e) {
@@ -242,7 +245,7 @@ public class ApiOrgController extends BaseController {
 	@ResponseBody
 	public void template() {
 		try {
-			orgXlsxService.templateOrgXlsx();
+			fileService.exportTemplate("机构.xlsx");
 		} catch (Exception e) {
 			log.error("组织机构导出模板下载附件失败：", e);
 		}

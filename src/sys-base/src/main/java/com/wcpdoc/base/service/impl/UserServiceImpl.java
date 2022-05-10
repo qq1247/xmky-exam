@@ -181,4 +181,9 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 			onlineUserService.out(id);
 		}
 	}
+
+	@Override
+	public List<User> getList() {
+		return userDao.getList();
+	}
 }

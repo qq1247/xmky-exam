@@ -49,4 +49,12 @@ public interface UserDao extends RBaseDao<User> {
 	 * @return List<User>
 	 */
 	List<User> getList(Integer[] ids);
+
+	/**
+	 * 获取用户列表
+	 * 
+	 * v1.0 zhanghc 2022年5月10日下午4:55:22
+	 * @return List<User>
+	 */
+	List<User> getList();
 }

@@ -165,10 +165,12 @@ public class User implements LoginUser {
 		this.email = email;
 	}
 
+	/** 1：用户；2：子管理员 */
 	public Integer getType() {
 		return type;
 	}
 
+	/** 1：用户；2：子管理员 */
 	public void setType(Integer type) {
 		this.type = type;
 	}

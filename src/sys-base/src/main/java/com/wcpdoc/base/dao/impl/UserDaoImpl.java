@@ -45,24 +45,24 @@ public class UserDaoImpl extends RBaseDaoImpl<User> implements UserDao {
 
 	@Override
 	public User getUser(String loginName) {
-		String sql = "SELECT * FROM SYS_USER WHERE LOGIN_NAME = :LOGIN_NAME AND STATE = 1";
+		String sql = "SELECT * FROM SYS_USER WHERE LOGIN_NAME = :LOGIN_NAME AND STATE != 0";
 		return getEntity(sql, new Object[] { loginName });
 	}
 
 	@Override
 	public boolean existLoginName(String loginName, Integer excludeId) {
 		if (excludeId == null) {
-			String sql = "SELECT COUNT(*) AS NUM FROM SYS_USER WHERE LOGIN_NAME = :LOGIN_NAME AND STATE = 1";
+			String sql = "SELECT COUNT(*) AS NUM FROM SYS_USER WHERE LOGIN_NAME = :LOGIN_NAME AND STATE != 0";
 			return getCount(sql, new Object[] { loginName}) > 0;
 		}
 		
-		String sql = "SELECT COUNT(*) AS NUM FROM SYS_USER WHERE LOGIN_NAME = :LOGIN_NAME AND STATE = 1 AND ID != :ID";
+		String sql = "SELECT COUNT(*) AS NUM FROM SYS_USER WHERE LOGIN_NAME = :LOGIN_NAME AND STATE != 0 AND ID != :ID";
 		return getCount(sql, new Object[] { loginName, excludeId }) > 0;
 	}
 
 	@Override
 	public List<User> getList(Integer orgId) {
-		String sql = "SELECT * FROM SYS_USER WHERE ORG_ID = :ORG_ID AND STATE = 1";
+		String sql = "SELECT * FROM SYS_USER WHERE ORG_ID = :ORG_ID AND STATE != 0";
 		return getList(sql, new Object[] { orgId });
 	}
 
@@ -74,5 +74,11 @@ public class UserDaoImpl extends RBaseDaoImpl<User> implements UserDao {
 		query.setParameterList("IDS", ids);
 		query.unwrap(NativeQuery.class).addEntity(clazz);
 		return query.list();
+	}
+
+	@Override
+	public List<User> getList() {
+		String sql = "SELECT * FROM SYS_USER WHERE STATE != 0";
+		return getList(sql);
 	}
 }

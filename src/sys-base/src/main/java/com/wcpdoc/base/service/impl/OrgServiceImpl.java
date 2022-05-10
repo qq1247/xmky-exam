@@ -88,11 +88,6 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getTreeList() {
-		return orgDao.getTreeList();
-	}
-
-	@Override
 	public void doMove(Integer sourceId, Integer targetId) {
 		// 校验数据有效性
 		if (sourceId == null) {
@@ -216,5 +211,10 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 		update(org);
 		
 		return org.getId();
+	}
+
+	@Override
+	public List<Org> getList() {
+		return orgDao.getList();
 	}
 }

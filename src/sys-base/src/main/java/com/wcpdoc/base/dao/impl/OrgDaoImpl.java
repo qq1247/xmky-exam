@@ -1,7 +1,6 @@
 package com.wcpdoc.base.dao.impl;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
@@ -11,8 +10,8 @@ import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.util.SqlUtil;
-import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.core.util.SqlUtil.Order;
+import com.wcpdoc.core.util.ValidateUtil;
 
 /**
  * 组织机构数据访问层实现
@@ -33,12 +32,6 @@ public class OrgDaoImpl extends RBaseDaoImpl<Org> implements OrgDao {
 				.addWhere("ORG.STATE = 1")
 				.addOrder("ORG.NO", Order.ASC);
 		return getListpage(sqlUtil, pageIn);
-	}
-
-	@Override
-	public List<Map<String, Object>> getTreeList() {
-		String sql = "SELECT T.ID, T.NAME, T.PARENT_ID, T.PARENT_IDS FROM SYS_ORG T WHERE T.STATE = 1 ORDER BY T.NO ASC";
-		return getMapList(sql);
 	}
 
 	@Override

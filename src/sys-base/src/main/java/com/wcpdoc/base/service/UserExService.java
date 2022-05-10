@@ -37,4 +37,10 @@ public interface UserExService {
 	 */
 	void refreshToken(User user, String token);
 
+	/**
+	 * 导入用户表
+	 * 
+	 * v1.0 chenyun 2021年3月4日下午5:29:49 void
+	 */
+	void xlsImport(Integer fileId);
 }

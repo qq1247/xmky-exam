@@ -1,7 +1,6 @@
 package com.wcpdoc.base.dao;
 
 import java.util.List;
-import java.util.Map;
 
 import com.wcpdoc.base.entity.Org;
 import com.wcpdoc.core.dao.RBaseDao;
@@ -12,15 +11,6 @@ import com.wcpdoc.core.dao.RBaseDao;
  * v1.0 zhanghc 2016-5-8上午11:00:00
  */
 public interface OrgDao extends RBaseDao<Org> {
-
-	/**
-	 * 获取组织机构树 
-	 * 
-	 * v1.0 zhanghc 2016-5-8上午11:00:00
-	 * 
-	 * @return List<Map<String,Object>>
-	 */
-	List<Map<String, Object>> getTreeList();
 
 	/**
 	 * 获取组织机构 列表

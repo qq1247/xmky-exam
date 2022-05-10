@@ -27,4 +27,12 @@ public interface OrgExService {
 	 * void
 	 */
 	void addAndUpdate(Org org, String phone, String pwd);
+
+	/**
+	 * 导入组织架构
+	 * 
+	 * v1.0 zhanghc 2022年5月10日上午11:17:52
+	 * @param fileId void
+	 */
+	void xlsImport(Integer fileId);
 }

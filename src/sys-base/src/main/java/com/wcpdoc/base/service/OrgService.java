@@ -34,15 +34,6 @@ public interface OrgService extends BaseService<Org> {
 	 * void
 	 */
 	void delAndUpdate(Integer id);
-
-	/**
-	 * 获取组织机构树 
-	 * 
-	 * v1.0 zhanghc 2016-5-8上午11:00:00
-	 * 
-	 * @return List<Map<String,Object>>
-	 */
-	List<Map<String, Object>> getTreeList();
 	
 	/**
 	 * 移动组织机构 
@@ -111,4 +102,12 @@ public interface OrgService extends BaseService<Org> {
 	 * @return Integer
 	 */
 	Integer syncOrg(String orgName, String orgCode);
+
+	/**
+	 * 获取机构列表
+	 * 
+	 * v1.0 zhanghc 2022年5月10日上午11:32:07
+	 * @return List<Org>
+	 */
+	List<Org> getList();
 }
