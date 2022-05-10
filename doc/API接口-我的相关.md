@@ -29,6 +29,7 @@ http请求头需添加Authorization字段，
 ### 我的考试列表：myExam/listpage
 | 请求参数| 类型        | 描述       | 必填 |
 | -------- | ----------- | ---------- | ---- |
+| examId | Integer | 考试ID（查分数用）   | 否   |
 | examName | String (32) | 考试名称   | 否   |
 | startTime | Date | 考试开始时间   | 否   |
 | endTime | Date | 考试结束时间  | 否   |

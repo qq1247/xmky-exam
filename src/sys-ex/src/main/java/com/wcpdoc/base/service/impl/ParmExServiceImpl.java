@@ -11,7 +11,9 @@ import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.file.service.FileService;
 import com.wcpdoc.notify.exception.EmailException;
+import com.wcpdoc.notify.exception.NotifyException;
 import com.wcpdoc.notify.service.EmailService;
+import com.wcpdoc.notify.service.NotifyService;
 
 /**
  * 参数扩展服务层实现
@@ -22,6 +24,8 @@ import com.wcpdoc.notify.service.EmailService;
 public class ParmExServiceImpl extends BaseServiceImp<Parm> implements ParmExService {
 	@Resource
 	private EmailService emailService;
+	@Resource
+	private NotifyService notifyService;
 	@Resource
 	private FileService fileService;
 	
@@ -51,5 +55,14 @@ public class ParmExServiceImpl extends BaseServiceImp<Parm> implements ParmExSer
 	@Override
 	public void doUpload(Parm parm) {
 		fileService.doUpload(parm.getOrgLogo());
+	}
+
+	@Override
+	public void pushEmail(String from, String to, String title, String content) {
+		try {
+			notifyService.pushEmail(from, to, title, content);
+		} catch (NotifyException e) {
+			throw new MyException(e.getMessage());
+		}
 	}
 }

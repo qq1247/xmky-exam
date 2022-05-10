@@ -18,12 +18,6 @@
 			<artifactId>sys-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- 集成推送 -->
-		<dependency>
-			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>sys-notify</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		<!-- 集成系统缓存 -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
@@ -45,11 +39,5 @@
 				</exclusion>
 				</exclusions>
 		</dependency>
-		<!-- easyexcel 依赖 -->
-		<dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>easyexcel</artifactId>
-            <version>3.0.5</version>
-        </dependency>
 	</dependencies>
 </project>

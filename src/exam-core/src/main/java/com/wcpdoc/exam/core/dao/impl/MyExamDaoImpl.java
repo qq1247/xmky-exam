@@ -42,7 +42,8 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 				+ "LEFT JOIN SYS_USER MARK_USER ON MY_EXAM.MARK_USER_ID = MARK_USER.ID ";// 阅卷用户不一定有
 		
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examName")), "EXAM.NAME LIKE :NAME", "%" + pageIn.get("examName") + "%")
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examId")), "EXAM.ID = :EXAM_ID", pageIn.get("examId"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("examName")), "EXAM.NAME LIKE :NAME", "%" + pageIn.get("examName") + "%")
 				.addWhere(pageIn.get("curUserId", Integer.class) != null, "MY_EXAM.USER_ID = :USER_ID", pageIn.get("curUserId", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("startTime")) && ValidateUtil.isValid(pageIn.get("endTime")), 
 						"((EXAM.START_TIME <= :START_TIME1 AND :END_TIME1 >= EXAM.END_TIME) OR (EXAM.START_TIME <= :START_TIME2 AND :END_TIME2 >= EXAM.END_TIME) OR (EXAM.START_TIME >= :START_TIME3 AND EXAM.END_TIME >= :END_TIME3))", 

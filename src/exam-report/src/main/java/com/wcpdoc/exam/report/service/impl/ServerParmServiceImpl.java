@@ -91,7 +91,7 @@ public class ServerParmServiceImpl implements ServerPramService {
 				values.add(CpuPerc.format(cpuPercs[i].getCombined()));
 				
 			}
-			data.put("value", values);
+			data.put("value", values.toString());
 			result.add(data);
 			
 			// 获取内存信息

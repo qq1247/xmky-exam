@@ -35,4 +35,16 @@ public interface ParmExService extends BaseService<Parm> {
 	 * @param parm void
 	 */
 	void doUpload(Parm parm);
+
+	/**
+	 * 推送邮件
+	 * 
+	 * v1.0 zhanghc 2022年5月9日下午1:22:15
+	 * @param userName
+	 * @param to
+	 * @param title
+	 * @param content 
+	 * void
+	 */
+	void pushEmail(String from, String to, String title, String content);
 }

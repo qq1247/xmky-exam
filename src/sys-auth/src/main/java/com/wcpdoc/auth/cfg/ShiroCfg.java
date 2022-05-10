@@ -49,15 +49,19 @@ public class ShiroCfg {
 		jwtFilterMap.put("jwt", new JWTFilter());
 		shiroFilterFactory.setFilters(jwtFilterMap);
 
+		// 匿名请求
 		Map<String, String> filterChainMap = new LinkedHashMap<>();
 		filterChainMap.put("/api/file/download", "anon");
 		filterChainMap.put("/api/file/getId", "anon");
-		filterChainMap.put("/api/login/**", "anon");// /api/login开头的可以匿名访问
+		filterChainMap.put("/api/login/**", "anon");
+		
+		// 公用请求
 		filterChainMap.put("/api/dict/listpage", "jwt,anyRolesEx[admin,subAdmin,user]");
 		filterChainMap.put("/api/user/listpage", "jwt,anyRolesEx[admin,subAdmin]");
 		filterChainMap.put("/api/org/listpage", "jwt,anyRolesEx[admin,subAdmin]");
 		filterChainMap.put("/api/bulletin/listpage", "jwt,anyRolesEx[admin,subAdmin,user]");
 		filterChainMap.put("/api/paper/get", "jwt,anyRolesEx[subAdmin,user]");
+		filterChainMap.put("/api/exam/get", "jwt,anyRolesEx[subAdmin,user]");
 		filterChainMap.put("/api/paper/paperQuestionList", "jwt,anyRolesEx[subAdmin,user]");
 		filterChainMap.put("/api/report/home/user", "jwt,anyRolesEx[user]");
 		
@@ -82,9 +86,11 @@ public class ShiroCfg {
 		filterChainMap.put("/api/question/**", "jwt,anyRolesEx[subAdmin]");
 		filterChainMap.put("/api/questionType/**", "jwt,anyRolesEx[subAdmin]");
 		
-		filterChainMap.put("/api/**", "jwt");// 普通用户jwt过滤器
 		
-		filterChainMap.put("/**", "anon");// 静态资源不拦截
+		filterChainMap.put("/api/**", "jwt");
+		
+		// 静态资源
+		filterChainMap.put("/**", "anon");
 		shiroFilterFactory.setFilterChainDefinitionMap(filterChainMap);
 		return shiroFilterFactory;
 	}
