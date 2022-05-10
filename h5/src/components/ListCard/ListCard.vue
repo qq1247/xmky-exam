@@ -117,6 +117,9 @@
               <div class="more-item" @click="exports(data)">
                 <i class="common common-template-down" />试卷导出
               </div>
+              <div class="more-item" @click="setTime(data)">
+                <i class="common common-time" />变更时间
+              </div>
             </div>
           </span>
         </template>
@@ -238,6 +241,10 @@ export default {
     // 试卷导出
     exports(data) {
       this.$emit('exports', data)
+    },
+    // 变更时间
+    setTime(data) {
+      this.$emit('set-time', data)
     }
   }
 }

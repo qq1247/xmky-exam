@@ -238,6 +238,15 @@ export default [
           layout: 'common'
         },
         hidden: true
+      },
+      {
+        path: 'result/:examId/:scoreState',
+        component: () => import('views/my/Exam/Result.vue'),
+        name: 'MyExamResult',
+        meta: {
+          layout: 'common'
+        },
+        hidden: true
       }
     ]
   },

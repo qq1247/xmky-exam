@@ -39,6 +39,7 @@
             @ranking="ranking"
             @message="message"
             @exports="exports"
+            @set-time="setTime"
             @anonymous="anonymous"
             @statistics="statistics"
           />
@@ -181,6 +182,14 @@ export default {
         id,
         examTypeId: this.$route.params.id,
         tab: '8'
+      })
+    },
+    // 变更时间
+    setTime({ id }) {
+      this.$tools.switchTab('ExamListSetting', {
+        id,
+        examTypeId: this.$route.params.id,
+        tab: '9'
       })
     },
     // 考试用户

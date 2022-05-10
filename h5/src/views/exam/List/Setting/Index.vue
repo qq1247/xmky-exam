@@ -39,6 +39,7 @@ import Ranking from './Ranking.vue'
 import Score from './Score.vue'
 import Message from './Message.vue'
 import Exports from './Exports.vue'
+import SetTime from './SetTime.vue'
 export default {
   data() {
     return {
@@ -61,7 +62,8 @@ export default {
         Ranking,
         Score,
         Message,
-        Exports
+        Exports,
+        SetTime
       ],
       currentView: null
     }
@@ -139,6 +141,14 @@ export default {
           contentName: '试卷导出',
           contentIntro: '选择不同考试人员，导出其试卷',
           index: '8'
+        },
+        {
+          name: '变更时间',
+          intro: '变更时间',
+          icon: 'common common-template-down',
+          contentName: '变更时间',
+          contentIntro: '变更考试的开始结束时间',
+          index: '9'
         }
       ]
     }

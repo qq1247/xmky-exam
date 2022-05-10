@@ -15,7 +15,7 @@
       />
       <!-- 试题 -->
       <div class="content-center">
-        <div class="paper-title">{{ paper.name }}</div>
+        <div class="paper-title">{{ examName }}</div>
 
         <page-show
           v-if="showType === 1 && Object.keys(myExamDetailCache).length"
@@ -42,7 +42,7 @@
 </template>
 <script>
 import { loginSysTime } from 'api/common'
-import { paperGet, paperQuestionList } from 'api/paper'
+import { paperQuestionList } from 'api/paper'
 import {
   myExamAnswer,
   myExamFinish,
@@ -63,9 +63,9 @@ export default {
     return {
       id: 0,
       examId: null,
+      examName: '',
       paperId: null,
       userId: null,
-      paperName: '',
       showType: 1,
       preview: false,
       pageSize: 10,
@@ -75,7 +75,6 @@ export default {
       paperQuestion: [],
       myExamDetailCache: {},
       selectOption: '',
-      paper: {},
       examEndTime: '',
       systemTime: 0,
       routerIndex: 0,
@@ -97,10 +96,10 @@ export default {
     // 初始化
     async init() {
       await this.setTime()
-      await this.queryPaper()
       await this.queryPaperInfo()
       await this.queryAnswerInfo()
       const res = await examGet({ id: this.examId })
+      this.examName = res.data.name
       this.scoreState = res.data.scoreState === 1
     },
     // 校准时间差
@@ -109,13 +108,6 @@ export default {
       const times = new Date(systemTime.data) - new Date()
       this.systemTime =
         new Date(this.examEndTime).getTime() - (new Date().getTime() + times)
-    },
-    // 查询试卷
-    async queryPaper() {
-      const res = await paperGet({
-        id: this.paperId
-      })
-      this.paper = { ...res.data }
     },
     // 查询试卷信息
     async queryPaperInfo() {
@@ -235,7 +227,11 @@ export default {
         const res = await myExamFinish({ examId: this.examId })
         res?.code === 200
           ? this.$router.replace({
-            name: 'Home'
+            name: 'MyExamResult',
+            params: {
+              examId: this.examId,
+              scoreState: this.scoreState
+            }
           })
           : this.$message.warning('请重新提交试卷！')
       })

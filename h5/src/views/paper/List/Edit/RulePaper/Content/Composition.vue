@@ -257,14 +257,16 @@
                     icon="el-icon-view"
                     round
                     size="mini"
-                    @click="question.analysisShow = !question.analysisShow"
+                    @click.native="
+                      question.analysisShow = !question.analysisShow
+                    "
                   >查看解析</el-button>
                   <el-button
                     class="btn"
                     icon="el-icon-setting"
                     round
                     size="mini"
-                    @click="setting(child)"
+                    @click="setting(question)"
                   >设置</el-button>
                   <el-button
                     class="btn"
@@ -691,7 +693,7 @@ export default {
       res?.code === 200
         ? (this.$message(`${title}成功！`),
         this.query(),
-        this.$parent.$refs.questionDrag.queryQuestion())
+        this.$parent.$parent.$refs.questionDrag.queryQuestion())
         : this.$message.error(`${title}失败！`)
     },
     // 设置分数
@@ -835,20 +837,6 @@ export default {
   padding-top: 50px;
   .drag-item {
     cursor: move;
-  }
-}
-
-.chapter-name-input {
-  flex: 1;
-  /deep/ .el-input__inner {
-    width: 400px;
-    border: 1px solid transparent;
-    font-size: 16px;
-    font-weight: 600;
-    &:hover,
-    &:focus {
-      border-color: #c0c4cc;
-    }
   }
 }
 

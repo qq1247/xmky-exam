@@ -37,7 +37,7 @@ export default {
       id: null,
       examForm: {
         paperId: 0,
-        paperName: '',
+        examName: '',
         examUser: null,
         examUserList: [],
         paperQuestion: [],
@@ -53,12 +53,12 @@ export default {
     this.id = this.$route.params.id
     if (Number(this.id)) {
       const {
-        data: { paperId, paperName }
+        data: { paperId, name }
       } = await examGet({
         id: this.id
       })
       this.examForm.paperId = paperId
-      this.examForm.paperName = paperName
+      this.examForm.examName = name
 
       const examMarkUser = await examMarkUserList({ id: this.id })
 
@@ -82,9 +82,8 @@ export default {
     },
     // 组合导出的docx-html
     async compositionHtml() {
-      const paperName = this.examForm.paperName
       const paperDetail = this.examForm.paperQuestion
-      let stringHtml = `<p style="text-align: center;font-size: 20px;font-weight: 600;">${paperName}</p>`
+      let stringHtml = `<p style="text-align: center;font-size: 20px;font-weight: 600;">${this.examForm.examName}</p>`
 
       for (let i = 0; i < paperDetail.length; i++) {
         stringHtml += `<br/><p>${paperDetail[i].chapter.name}</p><p>${paperDetail[i].chapter.description}</p><br/>`

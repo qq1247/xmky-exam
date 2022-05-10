@@ -1,5 +1,5 @@
 <template>
-  <div class="setting-container">
+  <div class="container setting-container">
     <el-tabs v-model="tabIndex" tab-position="right">
       <el-tab-pane
         v-for="item in tab"

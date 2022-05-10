@@ -176,3 +176,11 @@ export const examScore = (params) => request('exam/score', params)
  * @return {*}
  */
 export const examEmail = (params) => request('exam/mail', params)
+
+/**
+ * @name: examTime
+ * @description: 变更时间
+ * @param {*}
+ * @return {*}
+ */
+export const examTime = (params) => request('exam/time', params)
