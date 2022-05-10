@@ -1,10 +1,16 @@
 <template>
   <div class="container">
-    <div v-if="countDown" ref="countDown">
-      {{ countDown }}
-    </div>
-    <div v-else class="exam-result">
-      本场考试得分：<span v-if="scoreState">{{ score }}</span>
+    <div class="result-content">
+      <div v-if="countDown" ref="countDown">
+        {{ countDown }}
+      </div>
+      <div v-else class="exam-result">
+        本场考试得分：{{ scoreState ? score : '**' }}
+        <div v-if="!scoreState" class="exam-tip">此次考试暂未公开成绩</div>
+        <el-button type="primary" @click="$router.replace({ name: 'Home' })"
+          >返回首页</el-button
+        >
+      </div>
     </div>
   </div>
 </template>
@@ -44,7 +50,7 @@ export default {
         })
 
       if (!this.countDown) {
-        this.score = scoreData.data?.list[0]?.totalScore || '--'
+        this.score = scoreData.data?.list[0]?.totalScore || '请稍后查询'
         return
       } else {
         this.getResult()
@@ -55,25 +61,39 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.container {
+.result-content {
+  height: 100%;
   background: #fff;
+  display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 8px;
   .count-down {
     font-size: 100px;
     color: rgb(18, 240, 118);
   }
   .animate {
-    animation: countDown 1s ease-in;
+    animation: countDown 1s ease-in-out;
   }
   .exam-result {
     font-size: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .exam-tip {
+    font-size: 14px;
+    margin-top: 10px;
+    color: #ff8e19;
+  }
+  .el-button {
+    margin-top: 10px;
   }
 }
 @keyframes countDown {
   from {
     opacity: 1;
-    transform: scale(2);
+    transform: scale(3);
   }
   to {
     opacity: 0;

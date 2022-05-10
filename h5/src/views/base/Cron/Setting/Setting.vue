@@ -1,12 +1,17 @@
 <template>
-  <el-form ref="editForm" :model="editForm" :rules="editForm.rules">
-    <el-form-item label="名称" label-width="120px" prop="name">
+  <el-form
+    ref="editForm"
+    :model="editForm"
+    :rules="editForm.rules"
+    label-width="100px"
+  >
+    <el-form-item label="名称" prop="name">
       <el-input v-model="editForm.name" placeholder="请输入名称" />
     </el-form-item>
-    <el-form-item label="实现类" label-width="120px" prop="jobClass">
+    <el-form-item label="实现类" prop="jobClass">
       <el-input v-model="editForm.jobClass" placeholder="请输入实现类" />
     </el-form-item>
-    <el-form-item label="cron表达式" label-width="120px" prop="cron">
+    <el-form-item label="cron表达式" prop="cron">
       <el-input v-model="editForm.cron" placeholder="请输入cron表达式" />
     </el-form-item>
     <el-form-item>
@@ -34,11 +39,11 @@ export default {
           // 校验
           name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
           jobClass: [
-            { required: true, message: '请输入实现类', trigger: 'blur' }
+            { required: true, message: '请输入实现类', trigger: 'blur' },
           ],
-          cron: [{ required: true, message: '请输入表达式', trigger: 'blur' }]
-        }
-      }
+          cron: [{ required: true, message: '请输入表达式', trigger: 'blur' }],
+        },
+      },
     }
   },
   async mounted() {
@@ -55,14 +60,14 @@ export default {
   },
   methods: {
     add() {
-      this.$refs['editForm'].validate(async(valid) => {
+      this.$refs['editForm'].validate(async (valid) => {
         if (!valid) {
           return false
         }
         const { code, msg } = await cronAdd({
           name: this.editForm.name,
           jobClass: this.editForm.jobClass,
-          cron: this.editForm.cron
+          cron: this.editForm.cron,
         })
         if (code !== 200) {
           this.$message.error(msg)
@@ -73,7 +78,7 @@ export default {
       })
     },
     edit() {
-      this.$refs['editForm'].validate(async(valid) => {
+      this.$refs['editForm'].validate(async (valid) => {
         if (!valid) {
           return false
         }
@@ -82,7 +87,7 @@ export default {
           id: this.id,
           name: this.editForm.name,
           jobClass: this.editForm.jobClass,
-          cron: this.editForm.cron
+          cron: this.editForm.cron,
         })
         if (code !== 200) {
           this.$message.error(msg)
@@ -91,8 +96,8 @@ export default {
 
         this.$router.back()
       })
-    }
-  }
+    },
+  },
 }
 </script>
 
