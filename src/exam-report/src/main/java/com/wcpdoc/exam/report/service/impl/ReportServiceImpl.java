@@ -80,6 +80,9 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 	public Map<String, Object> homeUser() {
 		Map<String, Object> result = new HashMap<String, Object>();
 		List<Map<String, Object>> homeUserList = reportDao.homeUser(getCurUser().getId());
+		if (!ValidateUtil.isValid(homeUserList)) {
+			return new HashMap<>();
+		}
 		
 		Map<String, Object> homeUserMap = homeUserList.get(0);
 		Map<String, Object> data = new HashMap<String, Object>();
