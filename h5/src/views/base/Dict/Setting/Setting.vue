@@ -1,15 +1,20 @@
 <template>
-  <el-form ref="editForm" :model="editForm" :rules="editForm.rules">
-    <el-form-item label="索引" label-width="120px" prop="dictIndex">
+  <el-form
+    ref="editForm"
+    :model="editForm"
+    :rules="editForm.rules"
+    label-width="100px"
+  >
+    <el-form-item label="索引" prop="dictIndex">
       <el-input v-model="editForm.dictIndex" placeholder="请输入索引" />
     </el-form-item>
-    <el-form-item label="键" label-width="120px" prop="dictKey">
+    <el-form-item label="键" prop="dictKey">
       <el-input v-model="editForm.dictKey" placeholder="请输入键" />
     </el-form-item>
-    <el-form-item label="值" label-width="120px" prop="dictValue">
+    <el-form-item label="值" prop="dictValue">
       <el-input v-model="editForm.dictValue" placeholder="请输入值" />
     </el-form-item>
-    <el-form-item label="排序" label-width="120px" prop="no">
+    <el-form-item label="排序" prop="no">
       <el-input-number v-model.number="editForm.no" :max="100" :min="1" />
     </el-form-item>
     <el-form-item>
@@ -35,15 +40,15 @@ export default {
         rules: {
           // 校验
           dictIndex: [
-            { required: true, message: '请输入排序', trigger: 'blur' }
+            { required: true, message: '请输入排序', trigger: 'blur' },
           ],
           dictKey: [{ required: true, message: '请输入排序', trigger: 'blur' }],
           dictValue: [
-            { required: true, message: '请输入排序', trigger: 'blur' }
+            { required: true, message: '请输入排序', trigger: 'blur' },
           ],
-          no: [{ required: true, message: '请输入排序', trigger: 'blur' }]
-        }
-      }
+          no: [{ required: true, message: '请输入排序', trigger: 'blur' }],
+        },
+      },
     }
   },
   async mounted() {
@@ -62,7 +67,7 @@ export default {
   methods: {
     // 添加
     add() {
-      this.$refs['editForm'].validate(async(valid) => {
+      this.$refs['editForm'].validate(async (valid) => {
         if (!valid) {
           return false
         }
@@ -71,7 +76,7 @@ export default {
           dictIndex: this.editForm.dictIndex,
           dictKey: this.editForm.dictKey,
           dictValue: this.editForm.dictValue,
-          no: this.editForm.no
+          no: this.editForm.no,
         })
         if (code !== 200) {
           this.$message.error(msg)
@@ -83,7 +88,7 @@ export default {
     },
     // 修改
     edit() {
-      this.$refs['editForm'].validate(async(valid) => {
+      this.$refs['editForm'].validate(async (valid) => {
         if (!valid) {
           return false
         }
@@ -93,7 +98,7 @@ export default {
           dictIndex: this.editForm.dictIndex,
           dictKey: this.editForm.dictKey,
           dictValue: this.editForm.dictValue,
-          no: this.editForm.no
+          no: this.editForm.no,
         })
         if (code !== 200) {
           this.$message.error(msg)
@@ -102,8 +107,8 @@ export default {
 
         this.$router.back()
       })
-    }
-  }
+    },
+  },
 }
 </script>
 

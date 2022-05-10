@@ -1,8 +1,8 @@
 <template>
   <div class="container">
     <div class="param-title">敏感词设置</div>
-    <el-form ref="sensitiveForm" :model="sensitiveForm">
-      <el-form-item label="黑名单" label-width="150px" prop="orgName">
+    <el-form ref="sensitiveForm" :model="sensitiveForm" label-width="150px">
+      <el-form-item label="黑名单" prop="orgName">
         <el-select
           v-model="sensitiveForm.blackList"
           remote
@@ -15,7 +15,7 @@
           @change="selectChange($event, 'blackList')"
         />
       </el-form-item>
-      <el-form-item label="白名单" label-width="150px" prop="orgName">
+      <el-form-item label="白名单" prop="orgName">
         <el-select
           v-model="sensitiveForm.whiteList"
           remote
@@ -28,7 +28,7 @@
           @change="selectChange($event, 'whiteList')"
         />
       </el-form-item>
-      <el-form-item label-width="150px">
+      <el-form-item>
         <el-button type="primary" @click="setting">设置</el-button>
       </el-form-item>
     </el-form>
@@ -43,8 +43,8 @@ export default {
       sensitiveForm: {
         id: null,
         blackList: [],
-        whiteList: []
-      }
+        whiteList: [],
+      },
     }
   },
   mounted() {
@@ -67,7 +67,7 @@ export default {
       const res = await sensitiveEdit({
         id: this.sensitiveForm.id,
         blackList: [this.sensitiveForm.blackList.join('\n')],
-        whiteList: [this.sensitiveForm.whiteList.join('\n')]
+        whiteList: [this.sensitiveForm.whiteList.join('\n')],
       })
       res?.code === 200 &&
         (this.$message.success('设置成功！'), this.getWordList())
@@ -75,8 +75,8 @@ export default {
     selectChange(event, name) {
       const filterArray = event.filter((item) => item.trim())
       this.sensitiveForm[name] = filterArray
-    }
-  }
+    },
+  },
 }
 </script>
 

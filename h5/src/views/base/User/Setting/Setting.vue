@@ -3,7 +3,7 @@
     ref="editForm"
     :model="editForm"
     :rules="editForm.rules"
-    label-width="120px"
+    label-width="100px"
   >
     <el-form-item label="所属机构" prop="orgId">
       <CustomSelect
@@ -62,7 +62,7 @@ import Upload from '@/components/Upload.vue'
 export default {
   components: {
     Upload,
-    CustomSelect
+    CustomSelect,
   },
   data() {
     const validateEmail = (rule, value, callback) => {
@@ -91,17 +91,17 @@ export default {
           total: 0,
           curPage: 1,
           pageSize: 5,
-          list: []
+          list: [],
         },
         rules: {
           // 校验
           loginName: [
-            { required: true, message: '请输入登录账号', trigger: 'blur' }
+            { required: true, message: '请输入登录账号', trigger: 'blur' },
           ],
           name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
-          email: [{ required: false, validator: validateEmail }]
-        }
-      }
+          email: [{ required: false, validator: validateEmail }],
+        },
+      },
     }
   },
   async mounted() {
@@ -124,12 +124,12 @@ export default {
           currentLabel: res.data.orgName,
           currentValue: res.data.orgId,
           label: res.data.orgName,
-          value: res.data.orgId
+          value: res.data.orgId,
         })
         this.editForm.email = res.data.email || ''
         if (res.data.headFileId) {
           this.editForm.avatar.push({
-            url: `/api/file/download?id=${Number(res.data.headFileId)}`
+            url: `/api/file/download?id=${Number(res.data.headFileId)}`,
           })
         }
       })
@@ -138,7 +138,7 @@ export default {
   methods: {
     // 添加机构
     add() {
-      this.$refs['editForm'].validate(async(valid) => {
+      this.$refs['editForm'].validate(async (valid) => {
         if (!valid) {
           return false
         }
@@ -154,7 +154,7 @@ export default {
                 ? this.editForm.avatar[0].response.data.fileIds
                 : this.$tools.getQueryParam(this.editForm.avatar[0].url, 'id')
               : null,
-          email: this.editForm.email
+          email: this.editForm.email,
         })
 
         if (res.code !== 200) {
@@ -163,13 +163,13 @@ export default {
         }
         this.$router.back()
         this.$alert(res.data.initPwd, '重置密码', {
-          confirmButtonText: '确定'
+          confirmButtonText: '确定',
         })
       })
     },
     // 修改
     edit() {
-      this.$refs['editForm'].validate(async(valid) => {
+      this.$refs['editForm'].validate(async (valid) => {
         if (!valid) {
           return false
         }
@@ -185,7 +185,7 @@ export default {
                 ? this.editForm.avatar[0].response.data.fileIds
                 : this.$tools.getQueryParam(this.editForm.avatar[0].url, 'id')
               : null,
-          email: this.editForm.email
+          email: this.editForm.email,
         })
 
         if (res.code !== 200) {
@@ -201,7 +201,7 @@ export default {
       const orgList = await orgListPage({
         name,
         curPage,
-        pageSize: this.editForm.orgListpage.pageSize
+        pageSize: this.editForm.orgListpage.pageSize,
       })
       this.editForm.orgListpage.list = orgList.data.list
       this.editForm.orgListpage.total = orgList.data.total
@@ -225,8 +225,8 @@ export default {
     // 删除头像
     avatarRemove(file, fileList) {
       this.editForm.avatar = fileList
-    }
-  }
+    },
+  },
 }
 </script>
 
