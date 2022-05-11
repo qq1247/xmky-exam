@@ -80,6 +80,7 @@ export default {
     },
     range: {
       type: Array,
+      default: () => [new Date(), new Date()],
       validator(range) {
         if (Array.isArray(range)) {
           return (

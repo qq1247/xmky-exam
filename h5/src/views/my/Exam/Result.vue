@@ -7,9 +7,10 @@
       <div v-else class="exam-result">
         本场考试得分：{{ scoreState ? score : '**' }}
         <div v-if="!scoreState" class="exam-tip">此次考试暂未公开成绩</div>
-        <el-button type="primary" @click="$router.replace({ name: 'Home' })"
-          >返回首页</el-button
-        >
+        <el-button
+          type="primary"
+          @click="$router.replace({ name: 'Home' })"
+        >返回首页</el-button>
       </div>
     </div>
   </div>
@@ -23,7 +24,7 @@ export default {
       score: 0,
       countDown: 5,
       examId: null,
-      scoreState: true,
+      scoreState: true
     }
   },
   async mounted() {
@@ -42,7 +43,7 @@ export default {
           this.countDown--
           this.$refs.countDown.className = 'count-down'
           return myExamListPage({
-            examId: this.examId,
+            examId: this.examId
           })
         })
         .catch((err) => {
@@ -55,8 +56,8 @@ export default {
       } else {
         this.getResult()
       }
-    },
-  },
+    }
+  }
 }
 </script>
 

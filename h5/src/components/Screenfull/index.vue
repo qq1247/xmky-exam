@@ -59,7 +59,7 @@ export default {
   font-size: 19px;
   cursor: pointer;
   &:hover {
-    color: #0095e5;
+    color: #0094e5;
   }
 }
 </style>

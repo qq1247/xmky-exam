@@ -48,11 +48,11 @@
                 question.type | typeName
               }}</el-tag>
 
-              <el-tag class="center-tag-purple" effect="plain" size="mini">{{
+              <el-tag effect="plain" size="mini" type="primary">{{
                 question.difficulty | difficultyName
               }}</el-tag>
 
-              <el-tag effect="plain" size="mini" type="warning">{{
+              <el-tag effect="plain" size="mini" type="success">{{
                 ['', '智能', '非智能'][question.ai]
               }}</el-tag>
 
@@ -62,12 +62,12 @@
                 type="danger"
               >{{ question.score }}分</el-tag>
 
-              <el-tag effect="plain" size="mini">{{
+              <el-tag effect="plain" size="mini" type="info">{{
                 question.createUserName
               }}</el-tag>
 
               <el-tag
-                :type="question.state === 1 ? 'info' : 'danger'"
+                :type="question.state === 1 ? 'info' : 'primary'"
                 effect="plain"
                 size="mini"
               >{{ question.state === 1 ? '发布' : '草稿' }}</el-tag>
@@ -77,23 +77,29 @@
                 class="btn"
                 size="mini"
                 type="primary"
-                icon="el-icon-document"
                 @click.stop="questionEdit(question.id, question.type)"
+              ><img
+                src="@/assets/img/question/question-update.png"
+                alt=""
               >修改</el-button>
               <el-button
                 class="btn"
                 size="mini"
                 type="primary"
-                icon="el-icon-document-copy"
                 @click.stop="copy(question.id)"
+              ><img
+                src="@/assets/img/question/question-copy.png"
+                alt=""
               >复制</el-button>
               <template v-if="question.state !== 0">
                 <el-button
                   class="btn"
                   size="mini"
                   type="danger"
-                  icon="el-icon-delete"
                   @click.stop="del(question.id)"
+                ><img
+                  src="@/assets/img/question/question-delete.png"
+                  alt=""
                 >删除</el-button>
               </template>
               <template v-if="question.state === 2">
@@ -302,7 +308,7 @@ export default {
     left: -10px;
     width: 2px;
     height: 14px;
-    background: #0095e5;
+    background: #0094e5;
   }
   .top-title {
     flex: 1;
@@ -335,14 +341,14 @@ export default {
     }
   }
   .edit-active {
-    background: #0095e5;
+    background: #0094e5;
     color: #fff;
     img {
       content: url('~@/assets/img/question/question-edit-active.png');
     }
   }
   .view-active {
-    background: #0095e5;
+    background: #0094e5;
     color: #fff;
     img {
       content: url('~@/assets/img/question/question-view-active.png');
@@ -359,7 +365,8 @@ export default {
     padding: 10px 15px;
   }
   &:hover {
-    border: 1px solid #0095e5;
+    border: 1px solid #0094e5;
+    background: rgba(#0094e5, 0.06%);
     .card-bottom-right {
       display: block;
     }
@@ -370,7 +377,7 @@ export default {
 }
 
 .center-card-active {
-  border: 1px solid #0095e5;
+  border: 1px solid #0094e5;
 }
 
 .center-card-top {
@@ -415,7 +422,11 @@ export default {
     display: none;
   }
   .btn {
-    padding: 5px 10px;
+    padding: 3px 8px;
+    img {
+      margin-right: 4px;
+      vertical-align: -1px;
+    }
   }
 }
 

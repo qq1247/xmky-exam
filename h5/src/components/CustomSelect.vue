@@ -15,8 +15,8 @@
       placeholder="请输入候选词"
       prefix-icon="el-icon-search"
       @input="input"
-    ></el-input>
-    <slot></slot>
+    />
+    <slot />
     <div class="select-pager">
       <button
         :class="['page-pre', currentPage == 1 ? 'disabled' : '']"
@@ -40,31 +40,31 @@ export default {
   props: {
     isAuto: {
       type: Boolean,
-      default: false,
+      default: false
     },
     value: {
       type: [Boolean, String, Number, Array],
-      default: '',
+      default: ''
     },
     multiple: {
       type: Boolean,
-      default: true,
+      default: true
     },
     placeholder: {
       type: String,
-      default: '请选择...',
+      default: '请选择...'
     },
     total: {
       type: Number,
-      default: 0,
-    },
+      default: 0
+    }
   },
   data() {
     return {
       pageSize: 5,
       totalPage: 1,
       currentPage: 1,
-      selectInput: '',
+      selectInput: ''
     }
   },
   watch: {
@@ -76,8 +76,8 @@ export default {
           newValue % this.pageSize === 0
             ? newValue / this.pageSize
             : Math.ceil(newValue / this.pageSize)
-      },
-    },
+      }
+    }
   },
   created() {},
   methods: {
@@ -105,8 +105,8 @@ export default {
       }
       this.selectInput = ''
       this.currentPage = 1
-    },
-  },
+    }
+  }
 }
 </script>
 

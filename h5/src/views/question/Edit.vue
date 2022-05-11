@@ -409,7 +409,7 @@ export default {
       left: -10px;
       width: 2px;
       height: 14px;
-      background: #0095e5;
+      background: #0094e5;
     }
   }
 }

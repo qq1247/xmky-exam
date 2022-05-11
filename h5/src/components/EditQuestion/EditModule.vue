@@ -53,16 +53,22 @@
       <el-form-item>
         <el-button
           :disabled="editForm.options.length >= 7"
-          class="option-btn"
+          class="option-btn option-btn-primary"
           type="primary"
           @click="addOption(editForm.options.length, '')"
-        >+&nbsp;添加选项</el-button>
+        ><img
+          src="@/assets/img/question/question-plus.png"
+          alt=""
+        >新增选项</el-button>
         <el-button
           :disabled="editForm.options.length <= 2"
-          class="option-btn"
+          class="option-btn option-btn-danger"
           type="danger"
           @click="delOption"
-        >-&nbsp;删除选项</el-button>
+        ><img
+          src="@/assets/img/question/question-minus.png"
+          alt=""
+        >删除选项</el-button>
       </el-form-item>
     </div>
 
@@ -300,17 +306,23 @@
         </el-row>
         <el-button
           :disabled="editForm.answers.length >= 7"
-          class="option-btn"
+          class="option-btn option-btn-primary"
           style="margin-left: 65px"
           type="primary"
           @click="addFillBlanks(editForm.answers.length, '')"
-        >+&nbsp;添加关键词</el-button>
+        ><img
+          src="@/assets/img/question/question-plus.png"
+          alt=""
+        >添加关键词</el-button>
         <el-button
           :disabled="editForm.answers.length <= 1"
-          class="option-btn"
+          class="option-btn option-btn-danger"
           type="danger"
           @click="delFillBlanks"
-        >-&nbsp;删除关键词</el-button>
+        ><img
+          src="@/assets/img/question/question-minus.png"
+          alt=""
+        >删除关键词</el-button>
       </el-card>
     </el-form-item>
 
@@ -785,8 +797,22 @@ export default {
 
 <style lang="scss" scoped>
 .option-btn {
-  padding: 0 10px;
-  height: 25px;
+  border: none;
+  padding: 8px;
+  img {
+    vertical-align: -3px;
+    margin-right: 4px;
+  }
+}
+
+.option-btn-primary {
+  background: rgba(#0094e5, 0.1);
+  color: #0094e5;
+}
+
+.option-btn-danger {
+  background: rgba(#eb5b5b, 0.1);
+  color: #eb5b5b;
 }
 
 /deep/ .el-card__body {
@@ -813,7 +839,7 @@ export default {
 
 .el-alert--success.is-light {
   background-color: #ecf7fd;
-  color: #0095e5;
+  color: #0094e5;
   margin-bottom: 10px;
 }
 
@@ -823,11 +849,11 @@ export default {
 
 /deep/ .el-alert__title {
   font-size: 12px;
-  color: #0095e5;
+  color: #0094e5;
 }
 
 .cloze-tip {
-  color: #0095e5;
+  color: #0094e5;
   padding-left: 80px;
   margin-bottom: 10px;
   font-size: 12px;

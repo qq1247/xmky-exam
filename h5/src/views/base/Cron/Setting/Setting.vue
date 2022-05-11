@@ -39,11 +39,11 @@ export default {
           // 校验
           name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
           jobClass: [
-            { required: true, message: '请输入实现类', trigger: 'blur' },
+            { required: true, message: '请输入实现类', trigger: 'blur' }
           ],
-          cron: [{ required: true, message: '请输入表达式', trigger: 'blur' }],
-        },
-      },
+          cron: [{ required: true, message: '请输入表达式', trigger: 'blur' }]
+        }
+      }
     }
   },
   async mounted() {
@@ -60,14 +60,14 @@ export default {
   },
   methods: {
     add() {
-      this.$refs['editForm'].validate(async (valid) => {
+      this.$refs['editForm'].validate(async(valid) => {
         if (!valid) {
           return false
         }
         const { code, msg } = await cronAdd({
           name: this.editForm.name,
           jobClass: this.editForm.jobClass,
-          cron: this.editForm.cron,
+          cron: this.editForm.cron
         })
         if (code !== 200) {
           this.$message.error(msg)
@@ -78,7 +78,7 @@ export default {
       })
     },
     edit() {
-      this.$refs['editForm'].validate(async (valid) => {
+      this.$refs['editForm'].validate(async(valid) => {
         if (!valid) {
           return false
         }
@@ -87,7 +87,7 @@ export default {
           id: this.id,
           name: this.editForm.name,
           jobClass: this.editForm.jobClass,
-          cron: this.editForm.cron,
+          cron: this.editForm.cron
         })
         if (code !== 200) {
           this.$message.error(msg)
@@ -96,8 +96,8 @@ export default {
 
         this.$router.back()
       })
-    },
-  },
+    }
+  }
 }
 </script>
 

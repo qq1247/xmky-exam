@@ -43,8 +43,8 @@ export default {
       sensitiveForm: {
         id: null,
         blackList: [],
-        whiteList: [],
-      },
+        whiteList: []
+      }
     }
   },
   mounted() {
@@ -67,7 +67,7 @@ export default {
       const res = await sensitiveEdit({
         id: this.sensitiveForm.id,
         blackList: [this.sensitiveForm.blackList.join('\n')],
-        whiteList: [this.sensitiveForm.whiteList.join('\n')],
+        whiteList: [this.sensitiveForm.whiteList.join('\n')]
       })
       res?.code === 200 &&
         (this.$message.success('设置成功！'), this.getWordList())
@@ -75,8 +75,8 @@ export default {
     selectChange(event, name) {
       const filterArray = event.filter((item) => item.trim())
       this.sensitiveForm[name] = filterArray
-    },
-  },
+    }
+  }
 }
 </script>
 

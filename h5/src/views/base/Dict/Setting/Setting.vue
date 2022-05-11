@@ -40,15 +40,15 @@ export default {
         rules: {
           // 校验
           dictIndex: [
-            { required: true, message: '请输入排序', trigger: 'blur' },
+            { required: true, message: '请输入排序', trigger: 'blur' }
           ],
           dictKey: [{ required: true, message: '请输入排序', trigger: 'blur' }],
           dictValue: [
-            { required: true, message: '请输入排序', trigger: 'blur' },
+            { required: true, message: '请输入排序', trigger: 'blur' }
           ],
-          no: [{ required: true, message: '请输入排序', trigger: 'blur' }],
-        },
-      },
+          no: [{ required: true, message: '请输入排序', trigger: 'blur' }]
+        }
+      }
     }
   },
   async mounted() {
@@ -67,7 +67,7 @@ export default {
   methods: {
     // 添加
     add() {
-      this.$refs['editForm'].validate(async (valid) => {
+      this.$refs['editForm'].validate(async(valid) => {
         if (!valid) {
           return false
         }
@@ -76,7 +76,7 @@ export default {
           dictIndex: this.editForm.dictIndex,
           dictKey: this.editForm.dictKey,
           dictValue: this.editForm.dictValue,
-          no: this.editForm.no,
+          no: this.editForm.no
         })
         if (code !== 200) {
           this.$message.error(msg)
@@ -88,7 +88,7 @@ export default {
     },
     // 修改
     edit() {
-      this.$refs['editForm'].validate(async (valid) => {
+      this.$refs['editForm'].validate(async(valid) => {
         if (!valid) {
           return false
         }
@@ -98,7 +98,7 @@ export default {
           dictIndex: this.editForm.dictIndex,
           dictKey: this.editForm.dictKey,
           dictValue: this.editForm.dictValue,
-          no: this.editForm.no,
+          no: this.editForm.no
         })
         if (code !== 200) {
           this.$message.error(msg)
@@ -107,8 +107,8 @@ export default {
 
         this.$router.back()
       })
-    },
-  },
+    }
+  }
 }
 </script>
 

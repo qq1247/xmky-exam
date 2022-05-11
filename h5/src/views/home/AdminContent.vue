@@ -1,6 +1,6 @@
 <template>
   <div class="home-content">
-    <div class="home-params">
+    <div class="home-left">
       <el-card class="box-card" shadow="never">
         <div slot="header">考试概览</div>
         <div
@@ -51,9 +51,7 @@
         </div>
       </el-card>
       <el-card class="box-card" shadow="never">
-        <div slot="header">
-          <span>慢接口日志</span>
-        </div>
+        <div slot="header">慢接口日志</div>
         <template v-if="serverLog.length">
           <div
             v-for="(log, index) in serverLog"
@@ -69,87 +67,106 @@
           description="暂无异常"
         />
       </el-card>
-
-      <div class="table">
-        <el-table :data="listpage.list" stripe style="width: 100%">
-          <el-table-column label="姓名">
-            <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.name }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="最后在线时间">
-            <template slot-scope="scope">
-              <span style="margin-left: 10px">{{
-                scope.row.lastLoginTime
-              }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" width="300">
-            <template slot-scope="scope">
-              <span
-                v-if="scope.row.online"
-                style="cursor: pointer"
-                @click="offLine(scope.row.id)"
-              >强制下线</span>
-              <span v-else>离线</span>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-      <el-pagination
-        :current-page="listpage.curPage"
-        :page-size="listpage.pageSize"
-        :total="listpage.total"
-        background
-        hide-on-single-page
-        layout="prev, pager, next"
-        next-text="下一页"
-        prev-text="上一页"
-        @current-change="pageChange"
-      />
+      <el-card
+        class="box-card box-flex"
+        style="margin-bottom: 0"
+        shadow="never"
+      >
+        <div slot="header">用户信息</div>
+        <el-scrollbar wrap-style="overflow-x:hidden;" style="height: 100%">
+          <div class="table" max-height="100">
+            <el-table :data="listpage.list" stripe>
+              <el-table-column label="姓名" fixed>
+                <template slot-scope="scope">
+                  <span style="margin-left: 10px">{{ scope.row.name }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="最后在线时间">
+                <template slot-scope="scope">
+                  <span style="margin-left: 10px">{{
+                    scope.row.lastLoginTime
+                  }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="操作" width="300">
+                <template slot-scope="scope">
+                  <span
+                    v-if="scope.row.online"
+                    style="cursor: pointer"
+                    @click="offLine(scope.row.id)"
+                  >强制下线</span>
+                  <span v-else>离线</span>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+          <el-pagination
+            :current-page="listpage.curPage"
+            :page-size="listpage.pageSize"
+            :total="listpage.total"
+            background
+            hide-on-single-page
+            layout="prev, pager, next"
+            next-text="下一页"
+            prev-text="上一页"
+            @current-change="pageChange"
+          />
+        </el-scrollbar>
+      </el-card>
     </div>
-    <div class="home-info">
+    <div class="home-right">
       <!-- 功能列表 -->
       <el-card class="box-card" shadow="never">
         <div slot="header">
           <span>功能列表</span>
         </div>
-        <el-link
-          v-for="nav in navList"
-          :key="nav.path"
-          class="quick-nav"
-          @click="$router.push(nav.path)"
-        >{{ nav.meta.title }}</el-link>
+        <div style="margin-bottom: 24px">
+          <el-link
+            v-for="nav in navList"
+            :key="nav.path"
+            class="quick-nav"
+            :underline="false"
+            @click="$router.push(nav.path)"
+          >
+            <div class="nav-item">
+              <div class="nav-img" :style="{ background: nav.background }">
+                <img :src="nav.icon" alt="">
+              </div>
+              <span class="nav-title">{{ nav.title }}</span>
+            </div>
+          </el-link>
+        </div>
       </el-card>
       <!-- 系统参数 -->
-      <el-card class="box-card" shadow="never">
+      <el-card class="box-card box-flex" shadow="never">
         <div slot="header">
           <span>服务器参数</span>
         </div>
-        <div
-          v-for="param in serverParams"
-          :key="param.name"
-          class="params-item"
-        >
-          <span class="item-name">{{ param.name }}:</span>
-          <div v-if="Array.isArray(param.value)" class="item-value">
-            <span v-for="(item, index) in param.value" :key="index">
-              {{ item }} <br>
-            </span>
+        <el-scrollbar wrap-style="overflow-x:hidden;" style="height: 100%">
+          <div
+            v-for="param in serverParams"
+            :key="param.name"
+            class="params-item"
+          >
+            <span class="item-name">{{ param.name }}:</span>
+            <div v-if="Array.isArray(param.value)" class="item-value">
+              <span v-for="(item, index) in param.value" :key="index">
+                {{ item }} <br>
+              </span>
+            </div>
+            <span v-else class="item-value">{{ param.value }}</span>
           </div>
-          <span v-else class="item-value">{{ param.value }}</span>
-        </div>
+        </el-scrollbar>
       </el-card>
-      <!-- 服务支持 -->
       <!-- 服务支持 -->
       <el-card class="box-card service-box" shadow="never">
         <div slot="header">
           <span>服务支持</span>
         </div>
         <div class="service">
-          <p class="service-item">技术支持：在线考试</p>
+          <p class="service-item"><span>技术支持：</span>在线考试</p>
           <p class="service-item">
-            在线服务：<a
+            <span>在线服务：</span><a
               class="service-qq"
               target="_blank"
               href="https://jq.qq.com/?_wv=1027&k=GXh1hHSy"
@@ -171,7 +188,50 @@ import { getServerParam, getServerLog, getAdminInfo } from 'api/report'
 export default {
   data() {
     return {
-      navList: [],
+      navList: [
+        {
+          path: '/user',
+          background: '#0094E5',
+          icon: require('../../assets/img/index/paper-manage.png'),
+          title: '用户管理'
+        },
+        {
+          path: '/org',
+          background: '#FB901B',
+          icon: require('../../assets/img/index/paper-manage.png'),
+          title: '组织机构'
+        },
+        {
+          path: '/bulletin',
+          background: '#09C8BD',
+          icon: require('../../assets/img/index/exam-manage.png'),
+          title: '公告管理'
+        },
+        {
+          path: '/dict',
+          background: '#EB5B5B',
+          icon: require('../../assets/img/index/mark-manage.png'),
+          title: '数据字典'
+        },
+        {
+          path: '/cron',
+          background: '#6B77F9',
+          icon: require('../../assets/img/index/mark-manage.png'),
+          title: '定时任务'
+        },
+        {
+          path: '/param',
+          background: '#FB901B',
+          icon: require('../../assets/img/index/question-manage.png'),
+          title: '系统参数'
+        },
+        {
+          path: '/sensitive',
+          background: '#09C8BD',
+          icon: require('../../assets/img/index/exam-manage.png'),
+          title: '敏感词'
+        }
+      ],
       serverParams: [],
       serverLog: [],
       listpage: {
@@ -190,17 +250,11 @@ export default {
   },
   mounted() {
     this.getAdminInfo()
-    this.setNavBar()
     this.getServerParam()
     this.query()
     this.getServerLog()
   },
   methods: {
-    setNavBar() {
-      this.navList = this.permission_routes.filter(
-        (item) => item?.meta?.layout === this.onlyRole[0]
-      )
-    },
     async getAdminInfo() {
       const userInfo = await getAdminInfo()
       this.userInfo = userInfo.data
@@ -243,16 +297,31 @@ export default {
 
 <style lang="scss" scoped>
 .home-content {
-  margin: 20px 0;
+  height: 100%;
   display: flex;
+  flex-direction: row;
 }
 
-.home-params {
+.home-left {
+  height: 100%;
   flex: 1;
-  margin: 0 10px;
+  display: flex;
+  flex-direction: column;
 }
-.home-info {
-  width: 30%;
+.home-right {
+  width: 289px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-left: 15px;
+}
+
+.box-flex {
+  flex: 1;
+  margin-bottom: 0;
+  /deep/ .el-card__body {
+    height: calc(100% - 40px);
+  }
 }
 
 .data-content {
@@ -321,24 +390,28 @@ export default {
 }
 
 .box-card {
-  width: 100%;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+  border: none;
+  border-radius: 8px;
   /deep/ .el-card__header {
     position: relative;
-    padding: 10px 10px 10px 20px;
+    padding: 0 0 0 32px;
+    height: 40px;
+    line-height: 40px;
+    font-size: 16px;
     &::after {
       content: '';
       display: block;
       position: absolute;
-      top: 14px;
-      left: 10px;
-      width: 3px;
-      height: 14px;
+      top: 12px;
+      left: 16px;
+      width: 4px;
+      height: 16px;
       background: #0094e5;
     }
   }
   /deep/.el-card__body {
-    padding: 10px 10px 0;
+    padding: 0;
   }
 }
 
@@ -384,7 +457,31 @@ export default {
 }
 
 .quick-nav {
-  margin: 10px;
+  width: 33.33%;
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 24px;
+  }
+  .nav-img {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+  }
+  .nav-title {
+    font-size: 12px;
+    color: #537384;
+    margin-top: 8px;
+  }
+}
+
+.service-box {
+  margin-bottom: 0;
 }
 
 .service {

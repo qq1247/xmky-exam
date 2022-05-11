@@ -112,7 +112,7 @@
             border-bottom: none;
           }
           &:hover {
-            background: #0095e5;
+            background: #0094e5;
             color: #fff;
           }
         }
@@ -153,7 +153,7 @@
         width: 70px;
         height: 30px;
         line-height: 30px;
-        background: #0095e5;
+        background: #0094e5;
         color: #fff;
         border-radius: 3px;
         font-size: 13px;
@@ -169,12 +169,12 @@
         transform: translateX(-50%);
         border-width: 0 5px 10px 5px;
         border-style: solid;
-        border-color: transparent transparent #0095e5;
+        border-color: transparent transparent #0094e5;
         opacity: 0;
       }
       &:hover {
-        border: 1px solid #0095e5;
-        background: #0095e5;
+        border: 1px solid #0094e5;
+        background: #0094e5;
         color: #fff;
         &::after {
           opacity: 1;
@@ -207,10 +207,10 @@
     transition: all 0.3s ease-in-out;
   }
   &:hover {
-    color: #0095e5;
+    color: #0094e5;
     .common-plus {
-      border: 1px solid #0095e5;
-      background: #0095e5;
+      border: 1px solid #0094e5;
+      background: #0094e5;
       color: #fff;
     }
   }

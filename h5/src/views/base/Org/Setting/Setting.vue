@@ -15,12 +15,16 @@
       <el-input-number v-model.number="editForm.no" :max="100" :min="1" />
     </el-form-item>
     <el-form-item>
-      <el-button v-if="editForm.parentId" type="primary" @click="add"
-        >添加</el-button
-      >
-      <el-button v-if="!editForm.parentId" type="primary" @click="edit"
-        >修改</el-button
-      >
+      <el-button
+        v-if="editForm.parentId"
+        type="primary"
+        @click="add"
+      >添加</el-button>
+      <el-button
+        v-if="!editForm.parentId"
+        type="primary"
+        @click="edit"
+      >修改</el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -42,9 +46,9 @@ export default {
         rules: {
           // 校验
           name: [{ required: true, message: '请输入名称', trigger: 'change' }],
-          no: [{ required: true, message: '请输入排序', trigger: 'change' }],
-        },
-      },
+          no: [{ required: true, message: '请输入排序', trigger: 'change' }]
+        }
+      }
     }
   },
   async mounted() {
@@ -64,7 +68,7 @@ export default {
   methods: {
     // 添加 || 修改分类名称
     add() {
-      this.$refs['editForm'].validate(async (valid) => {
+      this.$refs['editForm'].validate(async(valid) => {
         if (!valid) {
           return false
         }
@@ -72,7 +76,7 @@ export default {
         const { code, msg } = await orgAdd({
           name: this.editForm.name,
           parentId: this.editForm.parentId,
-          no: this.editForm.no,
+          no: this.editForm.no
         })
 
         if (code !== 200) {
@@ -85,7 +89,7 @@ export default {
     },
     // 修改
     edit() {
-      this.$refs['editForm'].validate(async (valid) => {
+      this.$refs['editForm'].validate(async(valid) => {
         if (!valid) {
           return false
         }
@@ -93,7 +97,7 @@ export default {
         const { code, msg } = await orgEdit({
           id: this.id,
           name: this.editForm.name,
-          no: this.editForm.no,
+          no: this.editForm.no
         })
 
         if (code !== 200) {
@@ -103,8 +107,8 @@ export default {
 
         this.$router.back()
       })
-    },
-  },
+    }
+  }
 }
 </script>
 

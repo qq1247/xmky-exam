@@ -195,7 +195,7 @@ export default {
     left: -10px;
     width: 2px;
     height: 14px;
-    background: #0095e5;
+    background: #0094e5;
   }
 }
 .type-btn {
@@ -219,7 +219,7 @@ export default {
     margin-top: 50px;
   }
   &:hover {
-    border: 1px solid #0095e5;
+    border: 1px solid #0094e5;
   }
   i {
     font-size: 16px;
@@ -230,21 +230,21 @@ export default {
       line-height: 22px;
       text-align: center;
       margin: 0 10px;
-      color: #0095e5;
+      color: #0094e5;
     }
     &:last-child {
       font-size: 22px;
       position: absolute;
       bottom: -11px;
       right: -1px;
-      color: #0095e5;
+      color: #0094e5;
       display: none;
     }
   }
 }
 .type-btn-active {
-  border: 1px solid #0095e5;
-  color: #0095e5;
+  border: 1px solid #0094e5;
+  color: #0094e5;
   i:last-child {
     display: block;
   }
@@ -268,7 +268,7 @@ export default {
   user-select: none;
   border-radius: 3px;
   &:hover {
-    background: #0095e5;
+    background: #0094e5;
     color: #ffff;
   }
   i {

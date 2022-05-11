@@ -145,7 +145,6 @@ export default {
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = '试题模板.docx'
       a.click()
       window.URL.revokeObjectURL(url)
     },
@@ -276,7 +275,7 @@ export default {
   border-radius: 3px;
   border: 1px solid #eeeeff;
   &:hover {
-    border: 1px solid #0095e5;
+    border: 1px solid #0094e5;
   }
   i {
     font-size: 16px;
@@ -287,21 +286,21 @@ export default {
       line-height: 22px;
       text-align: center;
       margin: 0 10px;
-      color: #0095e5;
+      color: #0094e5;
     }
     &:last-child {
       font-size: 22px;
       position: absolute;
       bottom: -11px;
       right: -1px;
-      color: #0095e5;
+      color: #0094e5;
       display: none;
     }
   }
 }
 .type-btn-active {
-  border: 1px solid #0095e5;
-  color: #0095e5;
+  border: 1px solid #0094e5;
+  color: #0094e5;
   i:last-child {
     display: block;
   }
@@ -328,14 +327,14 @@ export default {
   transition: all 0.3s ease-in-out;
   &:hover {
     box-shadow: 0 30px 13px -20px rgba(0, 0, 0, 0.06);
-    color: #0095e5;
-    border: 1px solid #0095e5;
+    color: #0094e5;
+    border: 1px solid #0094e5;
   }
 }
 .template-item-active {
   box-shadow: 0 30px 13px -20px rgba(0, 0, 0, 0.06);
-  color: #0095e5;
-  border: 1px solid #0095e5;
+  color: #0094e5;
+  border: 1px solid #0094e5;
 }
 
 .wrap-title {

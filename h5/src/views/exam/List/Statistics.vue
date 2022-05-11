@@ -463,7 +463,7 @@ export default {
       left: 10px;
       width: 4px;
       height: 20px;
-      background: #0095e5;
+      background: #0094e5;
     }
   }
   /deep/.el-card__body {

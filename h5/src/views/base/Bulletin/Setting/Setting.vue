@@ -49,8 +49,7 @@
         :key="item.value"
         v-model="editForm.showType"
         :label="item.value"
-        >{{ item.name }}</el-radio
-      >
+      >{{ item.name }}</el-radio>
     </el-form-item>
     <el-form-item>
       <el-button v-if="!id" type="primary" @click="add">添加</el-button>
@@ -71,7 +70,7 @@ dayjs.extend(isSameOrBefore)
 export default {
   components: {
     TinymceEditor,
-    CustomSelect,
+    CustomSelect
   },
   data() {
     const validateShowTime = (rule, value, callback) => {
@@ -95,12 +94,12 @@ export default {
         showTypeList: [
           {
             name: '正常',
-            value: 1,
+            value: 1
           },
           {
             name: '置顶',
-            value: 2,
-          },
+            value: 2
+          }
         ],
         show: false, // 是否显示页面
         examUsers: [],
@@ -110,12 +109,12 @@ export default {
         // 校验
         rules: {
           title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
-          showTime: [{ required: true, validator: validateShowTime }],
-        },
+          showTime: [{ required: true, validator: validateShowTime }]
+        }
       },
       headers: {
-        Authorization: this.$store.getters.token,
-      },
+        Authorization: this.$store.getters.token
+      }
     }
   },
   async mounted() {
@@ -135,7 +134,7 @@ export default {
         this.editForm.showType = res.data.showType
         this.editForm.showTime = [
           `${res.data.startTime}`,
-          `${res.data.endTime}`,
+          `${res.data.endTime}`
         ]
         if (res.data.readUserNames !== '') {
           const { roleIds: readIds, roleNames: readNames } =
@@ -147,7 +146,7 @@ export default {
         }
         if (res.data.imgFileId !== '') {
           this.editForm.imgFileId.push({
-            url: `/api/file/download?id=${Number(res.data.imgFileId)}`,
+            url: `/api/file/download?id=${Number(res.data.imgFileId)}`
           })
         }
       })
@@ -163,7 +162,7 @@ export default {
       const examUsers = await userListPage({
         name,
         curPage,
-        pageSize: this.editForm.pageSize,
+        pageSize: this.editForm.pageSize
       })
 
       this.editForm.examUsers = examUsers.data.list
@@ -183,7 +182,7 @@ export default {
     },
     // 添加机构
     add() {
-      this.$refs['editForm'].validate(async (valid) => {
+      this.$refs['editForm'].validate(async(valid) => {
         if (!valid) {
           return false
         }
@@ -198,7 +197,7 @@ export default {
           imgFileId:
             this.editForm.showType === 3 && this.editForm.imgFileId.length > 0
               ? this.editForm.imgFileId[0].response.data.fileIds
-              : null,
+              : null
         })
 
         if (res.code !== 200) {
@@ -211,7 +210,7 @@ export default {
     },
     // 修改
     edit() {
-      this.$refs['editForm'].validate(async (valid) => {
+      this.$refs['editForm'].validate(async(valid) => {
         if (!valid) {
           return false
         }
@@ -223,15 +222,15 @@ export default {
               ? this.editForm.imgFileId[0]?.response
                 ? this.editForm.imgFileId[0].response.data.fileIds
                 : this.$tools.getQueryParam(
-                    this.editForm.imgFileId[0].url,
-                    'id'
-                  )
+                  this.editForm.imgFileId[0].url,
+                  'id'
+                )
               : null,
           content: this.editForm.content,
           readUserIds: this.editForm.examUser,
           showType: this.editForm.showType,
           startTime: this.editForm.showTime[0],
-          endTime: this.editForm.showTime[1],
+          endTime: this.editForm.showTime[1]
         })
 
         if (res.code !== 200) {
@@ -255,15 +254,15 @@ export default {
             currentLabel: names[index],
             currentValue: cur,
             label: names[index],
-            value: cur,
+            value: cur
           })
           return acc
         },
         { roleIds: [], roleNames: [] }
       )
       return roles
-    },
-  },
+    }
+  }
 }
 </script>
 

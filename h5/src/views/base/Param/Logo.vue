@@ -4,14 +4,18 @@
       <el-input v-model="paramForm.orgName" placeholder="请输入单位名称" />
     </el-form-item>
     <el-form-item label="logo" prop="orgLogo">
-      <Upload
-        ref="logoUpload"
-        type="image"
-        :files="paramForm.orgLogo"
-        size="1"
-        @success="logoSuccess"
-        @remove="logoRemove"
-      />
+      <el-upload
+        class="avatar-uploader"
+        name="files"
+        :headers="headers"
+        :show-file-list="false"
+        action="/api/file/upload"
+        :on-success="logoSuccess"
+        :before-upload="beforeLogoUpload"
+      >
+        <img v-if="paramForm.orgLogo" :src="paramForm.orgLogo" class="avatar">
+        <i v-else class="el-icon-plus avatar-uploader-icon" />
+      </el-upload>
     </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="setting">设置</el-button>
@@ -20,14 +24,15 @@
 </template>
 
 <script>
-import Upload from 'components/Upload'
 import { parmGet, parmLogo } from 'api/base'
 export default {
-  components: { Upload },
   data() {
     return {
+      headers: {
+        Authorization: this.$store.getters.token
+      },
       paramForm: {
-        orgLogo: [],
+        orgLogo: '',
         orgName: ''
       }
     }
@@ -40,9 +45,7 @@ export default {
     async init() {
       const { data } = await parmGet()
       this.paramForm.orgName = data.orgName
-      this.paramForm.orgLogo.push({
-        url: `/api/file/download?id=${Number(data.orgLogo)}`
-      })
+      this.paramForm.orgLogo = `/api/file/download?id=${Number(data.orgLogo)}`
     },
     // 设置
     setting() {
@@ -53,11 +56,7 @@ export default {
 
         const params = {
           orgLogo:
-            this.paramForm.orgLogo.length > 0
-              ? this.paramForm.orgLogo[0]?.response
-                ? this.paramForm.orgLogo[0].response.data.fileIds
-                : this.$tools.getQueryParam(this.paramForm.orgLogo[0].url, 'id')
-              : null,
+            this.$tools.getQueryParam(this.paramForm.orgLogo, 'id') || null,
           orgName: this.paramForm.orgName
         }
 
@@ -73,21 +72,51 @@ export default {
         }
       })
     },
-    // 上传logo成功
-    logoSuccess(res, file, fileList) {
-      this.paramForm.orgLogo = fileList
+    logoSuccess(res, file) {
+      this.paramForm.orgLogo = `/api/file/download?id=${Number(
+        res.data.fileIds
+      )}`
     },
-    // 上传logo失败
-    logoClear(ref) {
-      if (this.paramForm.orgLogo.length > 0) {
-        this.$refs[ref].clear()
-        this.$set(this.paramForm, 'orgLogo', [])
+    beforeLogoUpload(file) {
+      const isJPG = file.type === 'image/jpeg'
+      const isLt1M = file.size / 1024 / 1024 < 1
+
+      if (!isJPG) {
+        this.$message.error('上传头像图片只能是 JPG 格式!')
       }
-    },
-    // 删除logo
-    logoRemove(file, fileList) {
-      this.paramForm.orgLogo = fileList
+      if (!isLt1M) {
+        this.$message.error('上传头像图片大小不能超过 1MB!')
+      }
+      return isJPG && isLt1M
     }
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.avatar-uploader {
+  /deep/.el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    &:hover {
+      border-color: #409eff;
+    }
+    .avatar-uploader-icon {
+      font-size: 28px;
+      color: #8c939d;
+      width: 178px;
+      height: 178px;
+      line-height: 178px;
+      text-align: center;
+    }
+    .avatar {
+      width: 178px;
+      height: 178px;
+      display: block;
+    }
+  }
+}
+</style>

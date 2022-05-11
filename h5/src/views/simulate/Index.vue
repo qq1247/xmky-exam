@@ -79,7 +79,7 @@ export default {
     padding: 0 5px;
     cursor: pointer;
     &:hover {
-      color: #0095e5;
+      color: #0094e5;
     }
     &:last-child {
       border-bottom: none;

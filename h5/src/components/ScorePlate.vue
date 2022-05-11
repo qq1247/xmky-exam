@@ -145,7 +145,7 @@ export default {
     width: 2px;
     height: 20px;
     position: absolute;
-    background: #0095e5;
+    background: #0094e5;
     top: 15px;
     left: 0;
   }

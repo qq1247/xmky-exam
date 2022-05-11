@@ -49,7 +49,7 @@ export default {
   }
   .common-perfect {
     font-size: 40px;
-    color: #0095e5;
+    color: #0094e5;
   }
   .org-name {
     font-size: 18px;
@@ -68,12 +68,12 @@ export default {
     border-bottom: 2px solid #fff;
     &:hover {
       transition: all 0.3s ease-in-out;
-      border-bottom: 2px solid #0095e5;
+      border-bottom: 2px solid #0094e5;
     }
   }
 
   .nav-item-active {
-    border-bottom: 2px solid #0095e5;
+    border-bottom: 2px solid #0094e5;
   }
 }
 </style>

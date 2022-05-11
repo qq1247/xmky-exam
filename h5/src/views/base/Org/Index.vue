@@ -16,8 +16,7 @@
               icon="el-icon-search"
               type="primary"
               @click="query"
-              >查询</el-button
-            >
+            >查询</el-button>
           </el-col>
           <el-col :span="4">
             <el-form-item>
@@ -26,8 +25,7 @@
                 size="mini"
                 type="primary"
                 @click="orgTemplate()"
-                >下载模板</el-button
-              >
+              >下载模板</el-button>
             </el-form-item>
             <el-form-item>
               <el-upload
@@ -44,8 +42,7 @@
                   size="mini"
                   type="primary"
                   @click="() => orgImport"
-                  >导入</el-button
-                >
+                >导入</el-button>
               </el-upload>
             </el-form-item>
           </el-col>
@@ -102,26 +99,26 @@ export default {
   data() {
     return {
       headers: {
-        Authorization: this.$store.getters.token,
+        Authorization: this.$store.getters.token
       },
       // 列表数据
       listpage: {
         total: 0, // 总条数
         curPage: 1, // 当前第几页
         pageSize: 100, // 每页多少条
-        list: [], // 列表数据
+        list: [] // 列表数据
       },
       // 查询表单
       queryForm: {
         name: null,
-        parentId: null,
-      },
+        parentId: null
+      }
     }
   },
   computed: {
     hashChildren() {
       return !(this.$route.matched.length > 2)
-    },
+    }
   },
   created() {
     this.init()
@@ -130,12 +127,12 @@ export default {
     // 查询
     async query() {
       const {
-        data: { list },
+        data: { list }
       } = await orgListPage({
         parentId: this.queryForm.parentId,
         name: this.queryForm.name,
         curPage: this.listpage.curPage,
-        pageSize: this.listpage.pageSize,
+        pageSize: this.listpage.pageSize
       })
 
       const treeList = []
@@ -174,37 +171,38 @@ export default {
       this.$tools.switchTab('OrgIndexSetting', {
         id: 0,
         tab: '1',
-        parentId: id,
+        parentId: id
       })
     },
     // 修改
     edit(id) {
       this.$tools.switchTab('OrgIndexSetting', {
         id,
-        tab: '1',
+        tab: '1'
       })
     },
     // 删除
     del(id) {
       this.$tools.switchTab('OrgIndexSetting', {
         id,
-        tab: '2',
+        tab: '2'
       })
     },
     // 组织机构模板
     async orgTemplate() {
       const template = await orgTemplate({}, 'blob')
-      const blob = new Blob([template], { type: 'application/msword' })
+      const blob = new Blob([template], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      })
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = '组织模板.xlsx'
       a.click()
       window.URL.revokeObjectURL(url)
     },
     // 上传成功
     uploadSuccess(response, file, fileList) {
-      if (this.listpage.list[0].children.length > 1) {
+      if (this.listpage.list[0]?.children?.length > 1) {
         this.$message.warning('请校对上传数据！')
         return false
       } else {
@@ -214,14 +212,14 @@ export default {
     // 组织机构导入
     async orgImport(fileId) {
       const res = await orgImport({
-        fileId,
+        fileId
       })
       if (res.code === 200) {
         this.$message.success('导入组织机构成功！')
         this.query()
       }
-    },
-  },
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>

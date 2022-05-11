@@ -69,7 +69,7 @@ export default {
     left: -10px;
     width: 2px;
     height: 14px;
-    background: #0095e5;
+    background: #0094e5;
   }
   .top-title {
     flex: 1;
@@ -101,14 +101,14 @@ export default {
     }
   }
   .edit-active {
-    background: #0095e5;
+    background: #0094e5;
     color: #fff;
     img {
       content: url('~@/assets/img/question/question-edit-active.png');
     }
   }
   .view-active {
-    background: #0095e5;
+    background: #0094e5;
     color: #fff;
     img {
       content: url('~@/assets/img/question/question-view-active.png');
