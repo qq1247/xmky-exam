@@ -1,11 +1,6 @@
 <template>
-  <el-form
-    ref="examForm"
-    :model="examForm"
-    :rules="examForm.rules"
-    label-width="100px"
-  >
-    <el-form-item label="时间选项" prop="timeType">
+  <el-form inline ref="examForm" :model="examForm" :rules="examForm.rules">
+    <el-form-item prop="timeType">
       <el-select
         v-model="examForm.timeType"
         clearable
@@ -19,7 +14,7 @@
         />
       </el-select>
     </el-form-item>
-    <el-form-item label="操作选项" prop="timeHandler">
+    <el-form-item prop="timeHandler">
       <el-select
         v-model="examForm.timeHandler"
         clearable
@@ -33,8 +28,15 @@
         />
       </el-select>
     </el-form-item>
-    <el-form-item label="分钟数值" prop="timeSecond">
-      <el-input v-model="examForm.timeSecond" placeholder="请输入分钟数值" />
+    <el-form-item prop="timeSecond">
+      <div class="time-second">
+        <el-input
+          type="number"
+          v-model.number="examForm.timeSecond"
+          placeholder="请输入分钟数"
+        />
+        <div style="width: 80px">&nbsp;&nbsp;分钟</div>
+      </div>
     </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="setTime">设置</el-button>
@@ -54,39 +56,43 @@ export default {
         timeTypes: [
           {
             key: 1,
-            value: '考试开始时间'
+            value: '考试开始时间',
           },
           {
             key: 2,
-            value: '考试结束时间'
+            value: '考试结束时间',
           },
           {
             key: 3,
-            value: '阅卷开始时间'
+            value: '阅卷开始时间',
           },
           {
             key: 4,
-            value: '阅卷结束时间'
-          }
+            value: '阅卷结束时间',
+          },
         ],
         timeHandler: 1,
         timeHandlers: [
           {
             key: 1,
-            value: '提前'
+            value: '提前',
           },
           {
             key: 2,
-            value: '延后'
-          }
+            value: '延后',
+          },
         ],
         timeSecond: '',
         rules: {
           timeSecond: [
-            { required: true, message: '请填写时间数值', trigger: 'blur' }
-          ]
-        }
-      }
+            {
+              required: true,
+              message: '请填写时间数值',
+              trigger: 'blur',
+            },
+          ],
+        },
+      },
     }
   },
   async mounted() {
@@ -95,7 +101,7 @@ export default {
   methods: {
     // 变更时间
     async setTime() {
-      this.$refs['examForm'].validate(async(valid) => {
+      this.$refs['examForm'].validate(async (valid) => {
         if (!valid) {
           return
         }
@@ -107,7 +113,7 @@ export default {
         const res = await examTime({
           id: this.id,
           timeType: this.examForm.timeType,
-          minute
+          minute,
         })
 
         if (res?.code === 200) {
@@ -117,7 +123,14 @@ export default {
           this.$message.error('设置失败！')
         }
       })
-    }
-  }
+    },
+  },
 }
 </script>
+
+<style lang="scss" scoped>
+.time-second {
+  display: flex;
+  align-items: center;
+}
+</style>
