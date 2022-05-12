@@ -53,7 +53,10 @@
                 >
                   <div
                     :style="{
-                      color: scoreState ? optionColor(index, child) : '',
+                      color:
+                        preview && scoreState
+                          ? optionColor(indexOption, question)
+                          : '',
                     }"
                     class="flex-items-center"
                     v-html="
@@ -81,7 +84,10 @@
                 >
                   <div
                     :style="{
-                      color: scoreState ? optionColor(index, child) : '',
+                      color:
+                        preview && scoreState
+                          ? optionColor(indexOption, question)
+                          : '',
                     }"
                     class="flex-items-center"
                     v-html="
@@ -93,7 +99,7 @@
             </template>
 
             <!-- 填空 -->
-            <template v-if="question.type === 3 && scoreState">
+            <template v-if="question.type === 3 && preview && scoreState">
               <div class="children-analysis">
                 <span class="analysis-tip">查看解析</span>
                 <div class="analysis-content">
@@ -111,7 +117,8 @@
                         v-for="(ans, indexAnswer) in answer.answer"
                         :key="indexAnswer"
                         class="answers-tag"
-                      >{{ ans }}</span>
+                        >{{ ans }}</span
+                      >
                     </div>
                   </div>
                 </div>
@@ -136,11 +143,16 @@
                   :label="option"
                   class="option-item"
                   :disabled="preview"
-                ><span
-                  :style="{
-                    color: scoreState ? optionColor(index, child) : '',
-                  }"
-                >{{ option }}</span></el-radio>
+                  ><span
+                    :style="{
+                      color:
+                        preview && scoreState
+                          ? optionColor(indexOption, question)
+                          : '',
+                    }"
+                    >{{ option }}</span
+                  ></el-radio
+                >
               </el-radio-group>
             </template>
 
@@ -156,7 +168,7 @@
                 :disabled="preview"
                 @change="updateAnswer(question.id)"
               />
-              <div v-if="scoreState" class="children-analysis">
+              <div v-if="preview && scoreState" class="children-analysis">
                 <span class="analysis-tip">查看解析</span>
                 <div class="analysis-content">
                   <span>答案：</span>
@@ -173,7 +185,8 @@
                         v-for="(ans, indexAnswer) in answer.answer"
                         :key="indexAnswer"
                         class="answers-tag"
-                      >{{ ans }}</span>
+                        >{{ ans }}</span
+                      >
                     </div>
                   </div>
                   <div
@@ -200,25 +213,25 @@
 import ClozeTitle from '../ClozeTitle.vue'
 export default {
   components: {
-    ClozeTitle
+    ClozeTitle,
   },
   props: {
     preview: {
       type: Boolean,
-      default: false
+      default: false,
     },
     scoreState: {
       type: Boolean,
-      default: false
+      default: false,
     },
     paperQuestion: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     myExamDetailCache: {
       type: Object,
-      default: () => {}
-    }
+      default: () => {},
+    },
   },
   computed: {
     optionColor(index, item) {
@@ -260,13 +273,13 @@ export default {
           }
         }
       }
-    }
+    },
   },
   methods: {
     updateAnswer(childId) {
       this.$emit('updateAnswer', childId)
-    }
-  }
+    },
+  },
 }
 </script>
 
