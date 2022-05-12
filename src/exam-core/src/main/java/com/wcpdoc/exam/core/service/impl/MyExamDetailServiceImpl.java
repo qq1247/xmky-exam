@@ -100,8 +100,15 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 	
 	@Override
 	public void doExam(Integer examId) {
-		// 校验数据有效性
+		// 延时2秒后开始（答题时预留了1秒网络延时，这里在延时1秒，保证都是答题完成后的结果）
 		Exam exam = examService.getEntity(examId);
+		try {
+			TimeUnit.SECONDS.sleep(2);// 变更考试时间为当前时间时，自动阅卷概率性校验为考试未结束（数据库时间四舍五入后比当前时间大。例：传入值：2022-05-12 23:59:59,999999，保存为 2022-05-13 00:00:00）
+		} catch (InterruptedException e) {// 所以优先执行延时
+			log.error("客观题阅卷异常：【{}-{}】延时执行异常", exam.getId(), exam.getName());
+		}
+		
+		// 校验数据有效性
 		log.info("客观题阅卷校验：【{}-{}】", exam.getId(), exam.getName());
 		
 		if (exam.getState() == 0) {
@@ -125,13 +132,6 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		if (exam.getEndTime().getTime() > curTime){
 			log.error("客观题阅卷异常：【{}-{}】考试未结束", exam.getId(), exam.getName());
 			throw new MyException(String.format("【%s-%s】考试未结束", exam.getId(), exam.getName()));
-		}
-		
-		// 延时2秒后开始（答题时预留了1秒网络延时，这里在延时1秒，保证都是答题完成后的结果）
-		try {
-			TimeUnit.SECONDS.sleep(2);
-		} catch (InterruptedException e) {
-			log.error("客观题阅卷异常：【{}-{}】延时执行异常", exam.getId(), exam.getName());
 		}
 		
 		Paper paper = paperService.getEntity(exam.getPaperId());// 试卷信息
