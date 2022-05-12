@@ -678,11 +678,13 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		
 		List<Integer> userList = new ArrayList<Integer>();
 		content = content.replace("【考试名称】", exam.getName())
-				.replace("【考试开始时间】", DateUtil.formatDateTime(exam.getMarkStartTime()))
-				.replace("【考试结束时间】", DateUtil.formatDateTime(exam.getMarkEndTime()))
-				.replace("【阅卷开始时间】", DateUtil.formatDateTime(exam.getStartTime()))
-				.replace("【阅卷结束时间】", DateUtil.formatDateTime(exam.getEndTime()));
-		content = StringEscapeUtils.unescapeXml(content);;// 转义 &lt;为 <  &gt; 为 > 
+				.replace("【考试开始时间】", DateUtil.formatDateTime(exam.getStartTime()))
+				.replace("【考试结束时间】", DateUtil.formatDateTime(exam.getEndTime()));
+		if (exam.getMarkStartTime() != null) {
+			content = content.replace("【阅卷开始时间】", DateUtil.formatDateTime(exam.getMarkStartTime()))
+			.replace("【阅卷结束时间】", DateUtil.formatDateTime(exam.getMarkEndTime()));
+		}
+		content = StringEscapeUtils.unescapeXml(content);
 		if (notifyType == 1) {
 			List<MyExam> myExamList = myExamService.getList(exam.getId());// 所有考试人员
 			for(MyExam myExam : myExamList){
@@ -729,7 +731,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if (!ValidateUtil.isValid(id)) {
 			throw new MyException("参数错误:id");
 		}
-		if (timeType != 1 && timeType != 2 && timeType != 3 && timeType != 4) {
+		if (!(timeType >= 1 && timeType <= 4)) {
 			throw new MyException("参数错误:timeType");
 		}
 		if (!ValidateUtil.isValid(minute)) {
@@ -738,44 +740,44 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		
 		Exam exam = getEntity(id);
 		Date curTime = new Date();
-		if (timeType == 1) {
+		if (timeType == 1) {//时间状态：1：考试开始时间；2：考试结束时间；3：阅卷开始时间；4：阅卷结束时间
 			if (exam.getStartTime().getTime() < curTime.getTime()) {
 				throw new MyException("考试已开始");
 			}
 			Date newStartTime = DateUtil.getNextMinute(exam.getStartTime(), minute);
-			if (newStartTime.getTime() > exam.getEndTime().getTime()) {
-				throw new MyException("minute范围超出上限");
+			if (exam.getEndTime().getTime() < newStartTime.getTime()) {
+				throw new MyException("超过考试结束时间");
 			}
-			if (exam.getMarkState() != 1) {
+			if (exam.getMarkState() != 1) {// 未阅卷就可以
 				throw new MyException("已阅卷");
 			}
 		}
-		if (timeType == 2) {
+		if (timeType == 2) {// 不限制考试结束时间必须大于考试开始时间，是因为可以设置一个很大的值，可以立马结束考试。不需要算还需要设置几分钟才能提前结束考试。
 			if (exam.getEndTime().getTime() < curTime.getTime()) {
-				throw new MyException("参数错误：考试已结束");
+				throw new MyException("考试已结束");
 			}
 			if (ValidateUtil.isValid(exam.getMarkStartTime())) {// 需要人工阅卷
 				Date newEndTime = DateUtil.getNextMinute(exam.getEndTime(), minute);
-				if (newEndTime.getTime() > exam.getMarkStartTime().getTime()) {
-					throw new MyException("minute范围超出上限");
+				if (exam.getMarkStartTime().getTime() < newEndTime.getTime()) {
+					throw new MyException("超过阅卷开始时间");
 				}
 			}
 			if (exam.getMarkState() != 1) {
 				throw new MyException("已阅卷");
 			}
 		}
-		if (timeType == 3) {//时间状态：1：考试开始时间；2：考试结束时间；3：阅卷开始时间；4：阅卷结束时间
+		if (timeType == 3) {
 			if (exam.getMarkStartTime().getTime() < curTime.getTime()) {
 				throw new MyException("阅卷已开始");
 			}
 			if (!ValidateUtil.isValid(exam.getMarkStartTime())) {
-				throw new MyException("参数错误：无需阅卷");
+				throw new MyException("无需阅卷");
 			}
 			Date newMarkStartTime = DateUtil.getNextMinute(exam.getMarkStartTime(), minute);
-			if (newMarkStartTime.getTime() > exam.getMarkEndTime().getTime()) {
-				throw new MyException("minute范围超出上限");
+			if (exam.getMarkEndTime().getTime() < newMarkStartTime.getTime()) {
+				throw new MyException("超过阅卷结束时间");
 			}
-			if (exam.getMarkState() == 3) {
+			if (exam.getMarkState() == 3) {// 未阅卷或阅卷中都可以
 				throw new MyException("已阅卷");
 			}
 		}
@@ -794,16 +796,22 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		// 变更考试时间
 		if (timeType == 1) {
 			Date newStartTime = DateUtil.getNextMinute(exam.getStartTime(), minute);
-			exam.setStartTime(newStartTime.getTime() > curTime.getTime() ? newStartTime : curTime);
+			exam.setStartTime(newStartTime.getTime() < curTime.getTime() ? curTime : newStartTime);
 		} else if (timeType == 2) {
-			Date newEndTime = DateUtil.getNextMinute(exam.getEndTime(), minute);
-			exam.setEndTime(newEndTime.getTime() > exam.getStartTime().getTime() ? newEndTime : exam.getStartTime());
+			Date newEndTime = DateUtil.getNextMinute(exam.getEndTime(), minute);// 考试时间8点-10点，当前时间9点
+			exam.setEndTime(newEndTime.getTime() < curTime.getTime() // 调整时间小于9点
+					? curTime // 结束时间改为9点
+					: (newEndTime.getTime() < exam.getStartTime().getTime() ? exam.getStartTime() : newEndTime));// 调整时间小于8点，改为8点。否则变更后的时间
 		} else if (timeType == 3) {
 			Date newMarkStartTime = DateUtil.getNextMinute(exam.getMarkStartTime(), minute);
-			exam.setMarkStartTime(newMarkStartTime.getTime() > exam.getEndTime().getTime() ? newMarkStartTime : exam.getEndTime());
+			exam.setMarkStartTime(newMarkStartTime.getTime() < curTime.getTime()
+					? curTime
+					: (newMarkStartTime.getTime() < exam.getEndTime().getTime() ? exam.getEndTime() : newMarkStartTime));
 		} else if (timeType == 4) {
 			Date newMarkEndTime = DateUtil.getNextMinute(exam.getMarkEndTime(), minute);
-			exam.setMarkEndTime(newMarkEndTime.getTime() > exam.getMarkStartTime().getTime() ? newMarkEndTime : exam.getMarkStartTime());
+			exam.setMarkEndTime(newMarkEndTime.getTime() < curTime.getTime()
+					? curTime
+					: (newMarkEndTime.getTime() < exam.getMarkStartTime().getTime() ? exam.getMarkStartTime() : newMarkEndTime));
 		}
 		exam.setUpdateTime(curTime);
 		exam.setUpdateUserId(getCurUser().getId());
