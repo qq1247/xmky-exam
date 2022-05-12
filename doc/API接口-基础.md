@@ -73,7 +73,7 @@ http请求头需添加Authorization字段，
 |msg     | String  | 响应消息 |
 |data     | String| 单位名称 |
 
-### 组织机构列表：org/listpage
+### 机构列表：org/listpage
 | 请求参数     |  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
 | name| String(16) | 名称   |   否     |
@@ -93,14 +93,14 @@ http请求头需添加Authorization字段，
 |data.list[].parentName | String  | 父名称 |
 |data.list[].no | Integer  | 排序 |
 
-### 组织机构添加：org/add
+### 机构添加：org/add
 | 请求参数     |  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
 |name      | String (16)  | 名称   |   是     |
 |parentId      | Integer  | 父ID   |   否     |
 |no    | Integer     |   排序   |   是   |
 
-### 组织机构修改：org/edit
+### 机构修改：org/edit
 | 请求参数     |  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
 |id| Integer  | 主键   |   是     |
@@ -108,12 +108,12 @@ http请求头需添加Authorization字段，
 |parentId      | Integer  | 父ID   |   否     |
 |no    | Integer     |   排序   |   是   |
 
-### 组织机构删除：org/del
+### 机构删除：org/del
 | 请求参数     |  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
 |id    | Integer     |   主键   |   是   |
 
-### 组织机构获取：org/get
+### 机构获取：org/get
 | 请求参数     |  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
 |id    | Integer     |   主键   |   是   |
@@ -128,25 +128,15 @@ http请求头需添加Authorization字段，
 |data.parentName   | String  | 父名称 |
 |data.no   | Integer  | 排序 |
 
-### 组织机构移动：暂未开放
-### 组织机构模板：org/template
+### 机构模板：org/template
 | 响应参数|  类型   |  描述  |
 | --------   | -----   | -----  |
 |	| Binary| 二进制流|
 
-### 组织机构导入：org/input
+### 机构导入：org/import
 | 请求参数     |  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
 | file    | File  |  附件   |  是  |
-
-### 组织机构导出：org/export
-| 请求参数     |  类型   |  描述  |  必填 |
-| --------   | -----   | -----  | ---- |
-| ids    | Integer[]  |  组织机构id |  是  |
-
-| 响应参数|  类型   |  描述  |
-| --------   | -----   | -----  |
-|	| Binary| 二进制流|
 
 ### 用户列表：user/listpage
 | 请求参数     |  类型   |  描述  |  必填 |
@@ -266,19 +256,10 @@ http请求头需添加Authorization字段，
 | --------   | -----   | -----  |
 |	| Binary| 二进制流|
 
-### 用户导入：user/input
+### 用户导入：user/import
 | 请求参数     |  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
 | file    | File  |  附件   |  是  |
-
-### 用户导出：user/export
-| 请求参数     |  类型   |  描述  |  必填 |
-| --------   | -----   | -----  | ---- |
-| ids    | Integer[]  |  用户id |  是  |
-
-| 响应参数|  类型   |  描述  |
-| --------   | -----   | -----  |
-|	| Binary| 二进制流|
 
 ### 数据字典列表：dict/listpage
 | 请求参数|  类型   |  描述  |  必填 |
