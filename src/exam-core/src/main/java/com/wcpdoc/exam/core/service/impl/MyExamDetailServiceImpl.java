@@ -190,8 +190,15 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 
 	@Override
 	public void doMark(Integer examId) {
-		// 校验数据有效性
+		// 延时2秒在主观题阅卷（阅卷时预留了1秒网络延时，这里在延时1秒，保证都是人工阅卷完成后的结果）
 		Exam exam = examService.getEntity(examId);
+		try {
+			TimeUnit.SECONDS.sleep(2);// 请参考doExam()说明
+		} catch (InterruptedException e) {
+			log.error("主观题阅卷异常：【{}-{}】延时执行异常", exam.getId(), exam.getName());
+		}
+		
+		// 校验数据有效性
 		log.info("主观题阅卷校验：【{}-{}】", exam.getId(), exam.getName());
 		
 		if (exam.getState() == 0) {
@@ -223,13 +230,6 @@ public class MyExamDetailServiceImpl extends BaseServiceImp<MyExamDetail> implem
 		if (exam.getMarkEndTime().getTime() > curTime) {
 			log.error("主观题阅卷异常：【{}-{}】阅卷未结束", exam.getId(), exam.getName());
 			throw new MyException(String.format("【%s-%s】阅卷未结束", exam.getId(), exam.getName()));
-		}
-		
-		// 延时2秒在主观题阅卷（阅卷时预留了1秒网络延时，这里在延时1秒，保证都是人工阅卷完成后的结果）
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			log.error("主观题阅卷异常：【{}-{}】延时执行异常", exam.getId(), exam.getName());
 		}
 		
 		// 获取考试用户列表

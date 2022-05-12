@@ -177,6 +177,7 @@ public class ApiExamController extends BaseController {
 					.addAttr("scoreState", exam.getScoreState())
 					.addAttr("rankState", exam.getRankState())
 					.addAttr("anonState", exam.getAnonState())
+					.addAttr("markState", exam.getMarkState())
 					;
 		} catch (MyException e) {
 			log.error("获取考试错误：{}", e.getMessage());
