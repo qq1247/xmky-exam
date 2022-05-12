@@ -47,9 +47,11 @@
       />
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="addOrEdit">{{
-        id ? '修改' : '添加'
-      }}</el-button>
+      <el-button
+        type="primary"
+        :disabled="id ? true : false"
+        @click="addOrEdit"
+      >{{ id ? '修改' : '添加' }}</el-button>
     </el-form-item>
   </el-form>
 </template>

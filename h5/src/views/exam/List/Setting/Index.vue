@@ -145,9 +145,9 @@ export default {
         {
           name: '变更时间',
           intro: '变更时间',
-          icon: 'common common-template-down',
+          icon: 'common common-time',
           contentName: '变更时间',
-          contentIntro: '变更考试的开始结束时间',
+          contentIntro: '允许提前延后考试时间和阅卷时间',
           index: '9'
         }
       ]

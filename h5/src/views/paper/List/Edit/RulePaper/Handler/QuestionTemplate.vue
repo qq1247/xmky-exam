@@ -89,30 +89,47 @@ export default {
       const paperName = this.$parent.$parent.paperName
       const paperDetail =
         this.$parent.$parent.$refs['paperComposition'].paperQuestion
-      let stringHtml = `<p style="text-align: center;font-size: 20px;font-weight: 600;">${paperName}</p>`
+
+      // 试卷标题
+      let stringHtml = `<p style="text-align: center;font-size: 22px;font-weight: 600;">${paperName}</p>`
 
       for (let i = 0; i < paperDetail.length; i++) {
-        stringHtml += `<br/><p>${paperDetail[i].chapter.name}</p><p>${paperDetail[i].chapter.description}</p><br/>`
+        // 试卷章节、章节描述
+        stringHtml += `
+          <p
+            style="
+              width: 100%;
+              background-color: #fafcff;
+              font-size: 16px;
+              font-weight: 600;
+              color: #0c2e41;
+              padding: 16px;
+              border-top: 1px solid #f0f0f0;
+              border-bottom: 1px solid #f0f0f0;
+            "
+          >
+            ${paperDetail[i].chapter.name}
+          </p>
+          <p style="font-size: 14px; color: #557587; padding: 8px 16px 8px 32px">
+            ${paperDetail[i].chapter.description}
+          </p>
+        `
 
         for (let j = 0; j < paperDetail[i].questionList.length; j++) {
           const title = paperDetail[i].questionList[j].title.replace(
             />/,
-            `><span>${j + 1}、</span>`
+            `style="word-wrap: break-word;font-weight: 600;color: #0c2e41;" >${
+              j + 1
+            }、`
           )
           stringHtml += title
-          if (
-            !paperDetail[i].questionList[j].options.length &&
-            paperDetail[i].questionList[j].type !== 4
-          ) {
-            continue
-          }
 
           if (paperDetail[i].questionList[j].type === 4) {
             const options = ['对', '错']
             for (let index = 0; index < options.length; index++) {
-              const option = `<p>&nbsp;&nbsp;<span>${String.fromCharCode(
+              const option = `<p style="color: #557587;line-height:1;">&nbsp;&nbsp;<input type="radio">${String.fromCharCode(
                 65 + index
-              )}、</span><span>${options[index]}</span></p>`
+              )}、${options[index]}</p>`
               stringHtml += option
             }
           } else {
@@ -125,7 +142,11 @@ export default {
                 index
               ].replace(
                 />/,
-                `>&nbsp;&nbsp;<span>${String.fromCharCode(65 + index)}、</span>`
+                `style="color: #557587;line-height:1;" >&nbsp;&nbsp;<input type="${
+                  paperDetail[i].questionList[j].type === 1
+                    ? 'radio'
+                    : 'checkbox'
+                }">${String.fromCharCode(65 + index)}、`
               )
               stringHtml += option
             }
@@ -172,7 +193,7 @@ export default {
       const stringHtml = await this.compositionHtml()
       const docxHtml = await this.convertImagesToBase64(stringHtml)
       const converted = htmlDocx.asBlob(docxHtml, { orientation: 'portrait' })
-      saveAs(converted, 'paper.docx')
+      saveAs(converted, `${this.$parent.$parent.paperName}.docx`)
     }
   }
 }

@@ -117,8 +117,7 @@
                         v-for="(ans, indexAnswer) in answer.answer"
                         :key="indexAnswer"
                         class="answers-tag"
-                        >{{ ans }}</span
-                      >
+                      >{{ ans }}</span>
                     </div>
                   </div>
                 </div>
@@ -143,16 +142,14 @@
                   :label="option"
                   class="option-item"
                   :disabled="preview"
-                  ><span
-                    :style="{
-                      color:
-                        preview && scoreState
-                          ? optionColor(indexOption, question)
-                          : '',
-                    }"
-                    >{{ option }}</span
-                  ></el-radio
-                >
+                ><span
+                  :style="{
+                    color:
+                      preview && scoreState
+                        ? optionColor(indexOption, question)
+                        : '',
+                  }"
+                >{{ option }}</span></el-radio>
               </el-radio-group>
             </template>
 
@@ -185,8 +182,7 @@
                         v-for="(ans, indexAnswer) in answer.answer"
                         :key="indexAnswer"
                         class="answers-tag"
-                        >{{ ans }}</span
-                      >
+                      >{{ ans }}</span>
                     </div>
                   </div>
                   <div
@@ -213,25 +209,25 @@
 import ClozeTitle from '../ClozeTitle.vue'
 export default {
   components: {
-    ClozeTitle,
+    ClozeTitle
   },
   props: {
     preview: {
       type: Boolean,
-      default: false,
+      default: false
     },
     scoreState: {
       type: Boolean,
-      default: false,
+      default: false
     },
     paperQuestion: {
       type: Array,
-      default: () => [],
+      default: () => []
     },
     myExamDetailCache: {
       type: Object,
-      default: () => {},
-    },
+      default: () => {}
+    }
   },
   computed: {
     optionColor(index, item) {
@@ -273,13 +269,13 @@ export default {
           }
         }
       }
-    },
+    }
   },
   methods: {
     updateAnswer(childId) {
       this.$emit('updateAnswer', childId)
-    },
-  },
+    }
+  }
 }
 </script>
 
