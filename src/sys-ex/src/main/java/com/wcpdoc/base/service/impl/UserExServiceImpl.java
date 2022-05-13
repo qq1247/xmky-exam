@@ -110,7 +110,8 @@ public class UserExServiceImpl extends BaseServiceImp<Object> implements UserExS
 		EasyExcel.read(fileEx.getFile(), UserRowData.class, new PageReadListener<UserRowData>(userRowList -> {
 			for (UserRowData userRowData : userRowList) {
 				if (!ValidateUtil.isValid(userRowData.getName())) {
-					throw new MyException(String.format("姓名为必填项"));
+					continue;// 添加后删除，excel还是能解析到。处理方式为姓名为空，直接处理下一行
+//					throw new MyException(String.format("姓名为必填项"));
 				}
 				if (!ValidateUtil.isValid(userRowData.getLoginName())) {
 					throw new MyException(String.format("登录账号为必填项"));
@@ -126,6 +127,9 @@ public class UserExServiceImpl extends BaseServiceImp<Object> implements UserExS
 			// 如果存在则更新
 			Date curTime = new Date();
 			for (UserRowData userRowData : userRowList) {
+				if (!ValidateUtil.isValid(userRowData.getName())) {
+					continue;
+				}
 				User user = userCache.get(userRowData.getLoginName());
 				if (user != null) {
 					user.setName(userRowData.getName());
