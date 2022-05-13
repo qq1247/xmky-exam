@@ -82,7 +82,8 @@ public class OrgExServiceImpl extends BaseServiceImp<Object> implements OrgExSer
 			Set<String> orgNameCache = new HashSet<>();
 			for (OrgRowData orgRowData : orgRowList) {
 				if (!ValidateUtil.isValid(orgRowData.getName())) {
-					throw new MyException(String.format("机构名称为必填项"));
+					continue;// 添加行保存删除行，读取的时候会读到空行
+					//throw new MyException(String.format("机构名称为必填项"));
 				}
 				
 				if (orgNameCache.contains(orgRowData.getName())) {
@@ -91,6 +92,9 @@ public class OrgExServiceImpl extends BaseServiceImp<Object> implements OrgExSer
 				orgNameCache.add(orgRowData.getName());
 			}
 			for (OrgRowData orgRowData : orgRowList) {
+				if (!ValidateUtil.isValid(orgRowData.getName())) {
+					continue;
+				}
 				if (!ValidateUtil.isValid(orgRowData.getParentName())) {// 一级机构忽略
 					continue;
 				}

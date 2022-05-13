@@ -626,6 +626,7 @@ http请求头需添加Authorization字段，
 | data.scoreState    | Integer     | 成绩状态 |
 | data.rankState    | Integer     | 排名状态 |
 | data.anonState    | Integer     | 匿名阅卷状态 |
+| data.markState    | Integer     | 阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；） |
 
 ### 考试发布：exam/publish
 | 请求参数| 类型    | 描述 | 必填 |
