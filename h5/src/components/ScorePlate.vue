@@ -1,6 +1,20 @@
 <template>
-  <div class="score-plate">
-    <div class="plate-header">打分板</div>
+  <div :class="['score-plate', minimize ? 'plate-minimize' : '']">
+    <div class="plate-header">
+      <div class="plate-title">打分板</div>
+      <i
+        v-if="minimize"
+        title="边缘拖拽，点击展开"
+        class="common common-score-plate"
+        @click="minimize = !minimize"
+      ></i>
+      <i
+        v-else
+        title="最小化"
+        class="common common-minimize"
+        @click="minimize = !minimize"
+      ></i>
+    </div>
     <!-- 打分间隔和分值 -->
     <div class="plate-body">
       <div class="plate-step">
@@ -15,7 +29,8 @@
                 selectHalfScore === index ? 'select-step' : '',
               ]"
               @click="halfScoreHandler(index)"
-            >{{ item }}</span>
+              >{{ item }}</span
+            >
           </div>
           <div class="step-body">
             <span
@@ -23,7 +38,8 @@
               :key="item"
               :class="['step-item', selectScore === index ? 'select-step' : '']"
               @click="scoreHandler(index)"
-            >{{ item }}</span>
+              >{{ item }}</span
+            >
           </div>
         </div>
       </div>
@@ -65,12 +81,12 @@ export default {
   props: {
     data: {
       type: Object,
-      default: () => {}
+      default: () => {},
     },
     score: {
       type: Number,
-      default: null
-    }
+      default: null,
+    },
   },
   data() {
     return {
@@ -79,7 +95,8 @@ export default {
       selectScore: null,
       selectHalfScore: null,
       markType: true,
-      isNextQuestion: true
+      isNextQuestion: true,
+      minimize: false,
     }
   },
   watch: {
@@ -97,8 +114,8 @@ export default {
             this.halfScores.push(0.5 + index)
           }
         }
-      }
-    }
+      },
+    },
   },
   methods: {
     scoreHandler(index) {
@@ -116,8 +133,8 @@ export default {
     },
     nextPaper() {
       this.$emit('nextPaper')
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -134,8 +151,35 @@ export default {
   height: auto;
   min-height: 150px;
   box-shadow: 0 0 16px -3px rgba(0, 0, 0, 0.15);
+  transition: all 0.1s linear;
+  user-select: none;
+}
+
+.plate-minimize {
+  width: 50px;
+  height: 50px;
+  min-height: 50px;
+  border-radius: 50%;
+  padding: 0;
+  .plate-header {
+    width: 50px;
+    height: 50px;
+    padding-left: 0;
+    &::after {
+      display: none;
+    }
+    .plate-title {
+      display: none;
+    }
+  }
+  .plate-body {
+    display: none;
+  }
 }
 .plate-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-size: 16px;
   padding-left: 10px;
   position: relative;
@@ -148,6 +192,16 @@ export default {
     background: #0094e5;
     top: 15px;
     left: 0;
+  }
+  .common {
+    position: absolute;
+    right: 12px;
+    z-index: 100;
+    font-size: 24px;
+    color: #eb5b5b;
+    line-height: 24px;
+    text-align: center;
+    cursor: pointer;
   }
 }
 .plate-body {

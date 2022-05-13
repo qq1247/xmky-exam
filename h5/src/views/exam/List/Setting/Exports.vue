@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import { myMarkAnswerList } from 'api/my'
 import { paperQuestionList } from 'api/paper'
 import { examGet, examMarkUserList } from 'api/exam'
 import htmlDocx from 'html-docx-js/dist/html-docx'
@@ -39,26 +40,29 @@ export default {
         paperId: 0,
         examName: '',
         examUser: null,
+        paperAnswer: [],
         examUserList: [],
         paperQuestion: [],
+        markState: 1,
         rules: {
           examUser: [
-            { required: true, message: '请选择考试用户', trigger: 'change' }
-          ]
-        }
-      }
+            { required: true, message: '请选择考试用户', trigger: 'change' },
+          ],
+        },
+      },
     }
   },
   async mounted() {
     this.id = this.$route.params.id
     if (Number(this.id)) {
       const {
-        data: { paperId, name }
+        data: { paperId, name, markState },
       } = await examGet({
-        id: this.id
+        id: this.id,
       })
       this.examForm.paperId = paperId
       this.examForm.examName = name
+      this.examForm.markState = markState
 
       const examMarkUser = await examMarkUserList({ id: this.id })
 
@@ -72,41 +76,129 @@ export default {
   },
   methods: {
     // 查询试卷信息
-    async queryPaper() {
-      const res = await paperQuestionList({
+    async queryPaperInfo() {
+      const paperQuestion = await paperQuestionList({
         id: this.examForm.paperId,
         examId: this.id,
-        userId: this.examForm.examUser
+        userId: this.examForm.examUser,
       })
-      this.examForm.paperQuestion = [...res.data]
+
+      const paperAnswer = await myMarkAnswerList({
+        examId: this.id,
+        userId: this.examForm.examUser,
+      })
+
+      this.examForm.paperQuestion = [...paperQuestion.data]
+      this.examForm.paperAnswer = [...paperAnswer.data]
     },
     // 组合导出的docx-html
     async compositionHtml() {
       const paperDetail = this.examForm.paperQuestion
-      let stringHtml = `<p style="text-align: center;font-size: 20px;font-weight: 600;">${this.examForm.examName}</p>`
-
+      // 用户信息
+      let userInfo = this.examForm.examUserList.find(
+        (user) => (user.id = this.examForm.examUser)
+      )
+      // 总成绩
+      let totalScore = this.examForm.paperAnswer.reduce(
+        (acc, cur) => (acc += cur.score),
+        0
+      )
+      // 试题名称
+      let stringHtml = `<p style="text-align: center;font-size: 22px;font-weight: 600;">${this.examForm.examName}</p>`
+      // 姓名、分数
+      stringHtml += `<p style="color: #0094e5;">姓名：${userInfo.name}</p>`
+      stringHtml += `<p style="color: #eb5b5b;">分数：${totalScore}</p>`
       for (let i = 0; i < paperDetail.length; i++) {
-        stringHtml += `<br/><p>${paperDetail[i].chapter.name}</p><p>${paperDetail[i].chapter.description}</p><br/>`
+        // 章节和章节描述
+        stringHtml += `
+          <br/><p
+            style="
+              width: 100%;
+              background-color: #fafcff;
+              font-size: 16px;
+              font-weight: 600;
+              color: #0c2e41;
+              padding: 16px;
+              border-top: 1px solid #f0f0f0;
+              border-bottom: 1px solid #f0f0f0;
+            "
+          >
+            ${paperDetail[i].chapter.name}
+          </p>
+          <p style="font-size: 14px; color: #557587; padding: 8px 16px 8px 32px">
+            ${paperDetail[i].chapter.description}
+          </p>
+        `
 
         for (let j = 0; j < paperDetail[i].questionList.length; j++) {
-          const title = paperDetail[i].questionList[j].title.replace(
-            />/,
-            `><span>${j + 1}、</span>`
-          )
-          stringHtml += title
-          if (
-            !paperDetail[i].questionList[j].options.length &&
-            paperDetail[i].questionList[j].type !== 4
-          ) {
-            continue
-          }
+          // 匹配用户自己作答的答案
+          const { answers: selfAnswer, score: selfScore } =
+            this.examForm.paperAnswer.find(
+              (answer) =>
+                answer.questionId === paperDetail[i].questionList[j].id
+            )
 
+          // 匹配正确答案
+          const modelAnswer = paperDetail[i].questionList[j].answers[0].answer
+
+          // 试题标题
+          let title
+          if (paperDetail[i].questionList[j].type === 3) {
+            title = paperDetail[i].questionList[j].title.replace(
+              />/,
+              `style="word-wrap: break-word;font-weight: 600;color: #0c2e41;" >${
+                j + 1
+              }、`
+            )
+
+            const underlineList = title.match(/[_]{5,}/g)
+            underlineList.map((underline, index) => {
+              const titleStart = title.substring(0, title.indexOf(underline))
+              const titleEnd = title.substring(
+                title.indexOf(underline) + underline.length
+              )
+              console.log(modelAnswer.join(''))
+              const modelCheck = modelAnswer
+                .join('')
+                .includes(selfAnswer[index])
+
+              let inputHtml = selfAnswer[index]
+                ? `<span style="text-decoration: underline;">${
+                    selfAnswer[index]
+                  }</span>&nbsp;（${modelCheck ? '√' : '×'}）`
+                : `${underline}&nbsp;（×）`
+              title = `${titleStart}${inputHtml}${titleEnd}`
+            })
+          } else {
+            title = paperDetail[i].questionList[j].title.replace(
+              />/,
+              `style="word-wrap: break-word;font-weight: 600;color: #0c2e41;" >${
+                j + 1
+              }、`
+            )
+          }
+          title = title.replace(/<\/p>$/, `<span>（${selfScore}分）</span></p>`)
+          stringHtml += title
+
+          // 单选、多选、判断的选项
           if (paperDetail[i].questionList[j].type === 4) {
             const options = ['对', '错']
             for (let index = 0; index < options.length; index++) {
-              const option = `<p>&nbsp;&nbsp;<span>${String.fromCharCode(
+              const check = selfAnswer.includes(options[index])
+              const inputHtml = check
+                ? `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAMAAAAolt3jAAAAAXNSR0IArs4c6QAAADZQTFRFAAAAAJLnAJPjAJPmAJTlBpbmAJTlAJXmG6DpAJTlEJvmbMLwdsXwx+j5z+v68vr++Pz+////814pEwAAAAl0Uk5TABVTgs/x8vL9ACNG/wAAAFpJREFUCNddz0EOwCAIBECoUKyKuv//bK3pRfY2CYGFiIiTmEli2rm0+hhe9drKHTs9L7P+WlamVIHZSmkTqInEgfasNMCFbADlYwGGnbzjcFgVDoUaseTxwgsL8Ads4klplQAAAABJRU5ErkJggg=="/>`
+                : `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOBAMAAADtZjDiAAAAAXNSR0IArs4c6QAAACdQTFRFAAAAi4uLq6uruLi4ubm5v7+/vb29xsbG2tra8PDw8vLy+/v7////iJ7dHAAAAAh0Uk5TAAtDdr7q7P0ioTVoAAAARElEQVQI12NgYDRJcxZgYGBQ7dw9I4iBganqzJkzyxUYRNcA6VOBDBZnQKCZwRNMT2HIBtPb4DRMHKYOpg9mDsxcqD0ARIszq8RDun8AAAAASUVORK5CYII=" />`
+              let option = `<p style="color: #557587;line-height:1;">&nbsp;&nbsp;${inputHtml}&nbsp;${String.fromCharCode(
                 65 + index
-              )}、</span><span>${options[index]}</span></p>`
+              )}、${options[index]}</p>`
+
+              const modelCheck = modelAnswer.includes(options[index])
+
+              option = option.replace(
+                /<\/p>$/,
+                `&nbsp;&nbsp;<span>${modelCheck ? '√' : '×'}</span></p>`
+              )
+
               stringHtml += option
             }
           } else {
@@ -115,14 +207,47 @@ export default {
               index < paperDetail[i].questionList[j].options.length;
               index++
             ) {
-              const option = paperDetail[i].questionList[j].options[
+              const check = selfAnswer.includes(String.fromCharCode(65 + index))
+              let inputHtml
+
+              if (paperDetail[i].questionList[j].type === 1) {
+                inputHtml = check
+                  ? `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAMAAAAolt3jAAAAAXNSR0IArs4c6QAAADZQTFRFAAAAAJLnAJPjAJPmAJTlBpbmAJTlAJXmG6DpAJTlEJvmbMLwdsXwx+j5z+v68vr++Pz+////814pEwAAAAl0Uk5TABVTgs/x8vL9ACNG/wAAAFpJREFUCNddz0EOwCAIBECoUKyKuv//bK3pRfY2CYGFiIiTmEli2rm0+hhe9drKHTs9L7P+WlamVIHZSmkTqInEgfasNMCFbADlYwGGnbzjcFgVDoUaseTxwgsL8Ads4klplQAAAABJRU5ErkJggg=="/>`
+                  : `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOBAMAAADtZjDiAAAAAXNSR0IArs4c6QAAACdQTFRFAAAAi4uLq6uruLi4ubm5v7+/vb29xsbG2tra8PDw8vLy+/v7////iJ7dHAAAAAh0Uk5TAAtDdr7q7P0ioTVoAAAARElEQVQI12NgYDRJcxZgYGBQ7dw9I4iBganqzJkzyxUYRNcA6VOBDBZnQKCZwRNMT2HIBtPb4DRMHKYOpg9mDsxcqD0ARIszq8RDun8AAAAASUVORK5CYII=" />`
+              }
+
+              if (paperDetail[i].questionList[j].type === 2) {
+                inputHtml = check
+                  ? `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAMAAAAolt3jAAAAAXNSR0IArs4c6QAAAEVQTFRFAAAAAJ3rAJfnAJTnAJjkAJnrAJXmAJTlAJbmAJXmAJPlAJTmAJTmAJTlAJTlAJPlAJTlAJTmAJTlAJTmAJTlAJTlAJTlfh9LYgAAABZ0Uk5TAA0gKy8yPFhae4elrLPg4+fq9fz9/p5+sxYAAABQSURBVAjXZY85EoAwDANlc5orEAf//6kUZJwEtttCGgkAcYYAQNQyKgAlc5TAVsFF70b32fUw27rgOi1rf5ZsHIerrorx1/zqZwYk1SPbCw/NHgusTJbBIwAAAABJRU5ErkJggg=="/>`
+                  : `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOBAMAAADtZjDiAAAAAXNSR0IArs4c6QAAABhQTFRFAAAAZmZmd3d3sLCwwsLCxsbG+vr6////YxzpbQAAAAV0Uk5TAAUPZ/v+OmdKAAAALklEQVQI12NgEFJSUlJkYGB2DQ0NDTFgEEkvLy8vc2RQLQeBILJpmDkwc6H2AAAJISBHCX2J9QAAAABJRU5ErkJggg==" />`
+              }
+
+              let option = paperDetail[i].questionList[j].options[
                 index
               ].replace(
                 />/,
-                `>&nbsp;&nbsp;<span>${String.fromCharCode(65 + index)}、</span>`
+                `style="color: #557587;line-height:1;" >&nbsp;&nbsp;${inputHtml}&nbsp;${String.fromCharCode(
+                  65 + index
+                )}、`
+              )
+
+              const modelCheck = modelAnswer.includes(
+                String.fromCharCode(65 + index)
+              )
+
+              option = option.replace(
+                /<\/p>$/,
+                `&nbsp;&nbsp;<span>${modelCheck ? '√' : '×'}</span></p>`
               )
               stringHtml += option
             }
+          }
+
+          // 问答答案
+          if (paperDetail[i].questionList[j].type === 5) {
+            stringHtml += `<p style="color: #557587;">&nbsp;&nbsp;${
+              selfAnswer[0] || ''
+            }</p>`
           }
         }
       }
@@ -138,6 +263,7 @@ export default {
       const ctx = canvas.getContext('2d')
       for (let index = 0; index < regularImages.length; index++) {
         const imgElement = regularImages[index]
+        if (imgElement.src.includes('data:image')) continue
         ctx.clearRect(0, 0, canvas.width, canvas.height)
         canvas.width = imgElement.width
         canvas.height = imgElement.height
@@ -164,17 +290,23 @@ export default {
     },
     // 导出试题
     async exportsPaper() {
-      this.$refs['examForm'].validate(async(valid) => {
+      this.$refs['examForm'].validate(async (valid) => {
         if (!valid) {
           return false
         }
-        await this.queryPaper()
+
+        if (this.examForm.markState !== 3) {
+          this.$message.warning('阅卷尚未结束，请等待！')
+          return false
+        }
+
+        await this.queryPaperInfo()
         const stringHtml = await this.compositionHtml()
         const docxHtml = await this.convertImagesToBase64(stringHtml)
         const converted = htmlDocx.asBlob(docxHtml, { orientation: 'portrait' })
-        saveAs(converted, 'paper.docx')
+        saveAs(converted, `${this.examForm.examName}.docx`)
       })
-    }
-  }
+    },
+  },
 }
 </script>
