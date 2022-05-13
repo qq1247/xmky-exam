@@ -41,10 +41,11 @@
 bs架构：jdk8、mysql5.7、springboot2x、elementUI2x
 
 ## 技术交流
-
 软件bug：可直接提Issues或提qq群（811189776），按严重程度决定修复版本的时间<br/>
 通用需求：可以影响版本走向，按排版进度加入到之后的某个版本<br/>
 定制需求：收费服务，商业合作qq（3532748782）<br/>
+开源不易：如果觉得本软件帮助了您，帮忙在gitee/github点赞<br/>
+欢迎加入：鼓励贡献代码，鼓励二次开发<br/>
 ![输入图片说明](img/9.png)
 <a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=Vqhsz3XUUg-SS4m8LM0mrL3WcnKrL9xo&jump_from=webapi"><img border="0" src="//pub.idqqimg.com/wpa/images/group.png" alt="在线考试技术交流群" title="在线考试技术交流群"></a>
 
