@@ -111,7 +111,7 @@
             <template v-if="onlyRole.includes('user')">
               <el-empty
                 v-if="
-                  !examList.some((exam) => exam.state !== 3) &&
+                  !examList.some((exam) => exam.examMarkState !== 3) &&
                     !questionTypeOpenList.length
                 "
                 :image="require('assets/img/index/mark-null.png')"
@@ -124,10 +124,10 @@
                   :key="item.id"
                   class="info-item today-item"
                   :style="{
-                    display: isExam(item.state) ? 'flex' : 'none',
+                    display: isExam(item.examMarkState) ? 'flex' : 'none',
                   }"
                 >
-                  <template v-if="isExam(item.state)">
+                  <template v-if="isExam(item.examMarkState)">
                     <img
                       src="../../assets/img/index/wait-exam.png"
                       class="today-icon"
@@ -361,9 +361,9 @@ export default {
   computed: {
     ...mapGetters(['permission_routes', 'roles', 'onlyRole']),
     // 是否展示考试
-    isExam(state) {
-      return (state) => {
-        return state !== 3
+    isExam(examMarkState) {
+      return (examMarkState) => {
+        return examMarkState !== 3
       }
     },
     // 是否展示阅卷
