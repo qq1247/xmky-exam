@@ -47,7 +47,7 @@ import {
   myExamAnswer,
   myExamFinish,
   myExamAnswerList,
-  myMarkAnswerList,
+  myMarkAnswerList
 } from 'api/my'
 import { examGet } from 'api/exam'
 import PageShow from 'components/PaperContent/PageShow.vue'
@@ -57,7 +57,7 @@ export default {
   components: {
     PageShow,
     QuestionShow,
-    QuestionRouter,
+    QuestionRouter
   },
   data() {
     return {
@@ -79,15 +79,14 @@ export default {
       systemTime: 0,
       routerIndex: 0,
       scoreState: false,
-      markType: 1,
+      markType: 1
     }
   },
   created() {
-    const { examId, paperId, userId, preview, examEndTime, showType } =
+    const { examId, userId, preview, examEndTime, showType } =
       this.$route.params
     this.userId = userId
     this.examId = examId
-    this.paperId = paperId
     this.preview = JSON.parse(preview)
     this.examEndTime = examEndTime
     this.showType = Number(showType)
@@ -97,12 +96,13 @@ export default {
     // 初始化
     async init() {
       await this.setTime()
-      await this.queryPaper()
-      await this.queryPaperInfo()
-      await this.queryAnswerInfo()
       const res = await examGet({ id: this.examId })
       this.examName = res.data.name
       this.scoreState = res.data.scoreState === 1
+      this.paperId = res.data.paperId
+      await this.queryPaper()
+      await this.queryPaperInfo()
+      await this.queryAnswerInfo()
     },
     // 校准时间差
     async setTime() {
@@ -114,7 +114,7 @@ export default {
     // 查询试卷
     async queryPaper() {
       const res = await paperGet({
-        id: this.paperId,
+        id: this.paperId
       })
       this.markType = res.data.markType
     },
@@ -123,6 +123,7 @@ export default {
       const res = await paperQuestionList({
         id: this.paperId,
         examId: this.examId,
+        userId: this.userId
       })
       this.paperQuestion = res.data
     },
@@ -133,11 +134,11 @@ export default {
         if (this.userId) {
           res = await myMarkAnswerList({
             examId: this.examId,
-            userId: this.userId,
+            userId: this.userId
           })
         } else {
           res = await myExamAnswerList({
-            examId: this.examId,
+            examId: this.examId
           })
         }
 
@@ -199,7 +200,7 @@ export default {
         examId: this.examId,
         questionId,
         myExamDetailId: this.myExamDetailCache[questionId].myExamDetailId,
-        answers: this.myExamDetailCache[questionId].answers,
+        answers: this.myExamDetailCache[questionId].answers
       })
 
       res?.code === 200 && this.isEmpty(questionId)
@@ -231,8 +232,8 @@ export default {
       this.$confirm('确认要提交试卷吗', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
-      }).then(async () => {
+        type: 'warning'
+      }).then(async() => {
         this.examFinish()
       })
     },
@@ -241,11 +242,11 @@ export default {
       this.$alert('考试时间到，已强制交卷！', {
         confirmButtonText: '确定',
         type: 'info',
-        showClose: false,
-      }).then(async () => {
+        showClose: false
+      }).then(async() => {
         this.examFinish()
         this.$router.replace({
-          name: 'Home',
+          name: 'Home'
         })
       })
     },
@@ -255,15 +256,15 @@ export default {
       res?.code === 200
         ? this.markType === 1
           ? this.$router.replace({
-              name: 'MyExamResult',
-              params: {
-                examId: this.examId,
-                scoreState: this.scoreState,
-              },
-            })
+            name: 'MyExamResult',
+            params: {
+              examId: this.examId,
+              scoreState: this.scoreState
+            }
+          })
           : this.$router.replace({
-              name: 'Home',
-            })
+            name: 'Home'
+          })
         : this.$message.warning('请重新提交试卷！')
     },
     // 定位锚点
@@ -299,8 +300,8 @@ export default {
     // 下一题
     nextQuestion(index) {
       this.routerIndex = index
-    },
-  },
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>
