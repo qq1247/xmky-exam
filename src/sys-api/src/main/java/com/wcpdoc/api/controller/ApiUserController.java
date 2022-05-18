@@ -260,6 +260,7 @@ public class ApiUserController extends BaseController {
 				.addAttr("state", entity.getState())
 				.addAttr("email", entity.getEmail())
 				.addAttr("headFileId", entity.getHeadFileId())
+				.addAttr("state", entity.getState())
 				;
 			
 			if (!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
@@ -355,9 +356,9 @@ public class ApiUserController extends BaseController {
 	 */
 	@RequestMapping("/frozen")
 	@ResponseBody
-	public PageResult frozen(Integer[] ids) {
+	public PageResult frozen(Integer id) {
 		try {
-			userService.frozen(ids);
+			userService.frozen(id);
 			return PageResult.ok();
 		} catch (Exception e) {
 			log.error("冻结账户错误：", e);

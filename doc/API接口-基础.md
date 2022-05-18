@@ -161,6 +161,7 @@ http请求头需添加Authorization字段，
 |data.list[].orgName | String  | 组织机构名称 |
 |data.list[].headFileId | Integer  | 头像ID |
 |data.list[].email | String  | 邮箱 |
+|data.list[].state | Integer  | 状态（1：正常；2：冻结；） |
 |data.list[].registTime | Date | 注册时间（admin可见） |
 |data.list[].lastLoginTime | Date  | 最后登陆时间（admin可见） |
 |data.list[].roles[] | String  | 角色（admin可见） |
@@ -219,6 +220,7 @@ http请求头需添加Authorization字段，
 |data.orgName   | String  | 组织机构名称 |
 |data.email   | String  | 邮箱 |
 |data.headFileId   | String  | 头像ID |
+|data.state   | String  | 状态 |
 |data.roles | String[]  | 角色（admin可见） |
 |data.state   | Integer  | 状态（0：删除；1：正常；） |
 |data.registTime     | Date  | 注册时间（admin可见） |
@@ -249,7 +251,7 @@ http请求头需添加Authorization字段，
 ### 用户冻结：user/frozen
 | 请求参数|  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
-|ids    | Integer[]  |   主键   |   是   |
+|id    | Integer  |   用户ID，如果正常则变更为冻结；如果冻结则变更为正常   |   是   |
 
 ### 用户模板：user/template
 | 响应参数|  类型   |  描述  |

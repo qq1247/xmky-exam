@@ -108,7 +108,7 @@ public interface UserService extends BaseService<User> {
 	 * v1.0 chenyun 2022年04月21日下午18:48:00
 	 * @param ids void
 	 */
-	void frozen(Integer[] ids);
+	void frozen(Integer id);
 
 	/**
 	 * 获取用户列表
