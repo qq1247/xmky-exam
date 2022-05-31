@@ -231,7 +231,7 @@ export default [
         hidden: true
       },
       {
-        path: 'detail/:examId/:paperId/:examEndTime/:showType/:preview/:userId?',
+        path: 'detail/:examId/:examEndTime/:showType/:preview/:userId?',
         component: () => import('views/my/Exam/Detail.vue'),
         name: 'MyExamDetail',
         meta: {

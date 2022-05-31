@@ -141,10 +141,12 @@ public class User implements LoginUser {
 		this.orgId = orgId;
 	}
 
+	/** 状态（0：删除；1：正常；2：冻结；） */
 	public Integer getState() {
 		return state;
 	}
 
+	/** 状态（0：删除；1：正常；2：冻结；） */
 	public void setState(Integer state) {
 		this.state = state;
 	}

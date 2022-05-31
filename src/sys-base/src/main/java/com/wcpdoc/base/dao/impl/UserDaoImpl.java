@@ -28,7 +28,7 @@ public class UserDaoImpl extends RBaseDaoImpl<User> implements UserDao {
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT USER.ID, USER.NAME, USER.TYPE, USER.LOGIN_NAME, USER.ORG_ID, ORG.NAME AS ORG_NAME, "
-				+ "USER.REGIST_TIME, USER.LAST_LOGIN_TIME, USER.ROLES "
+				+ "USER.REGIST_TIME, USER.LAST_LOGIN_TIME, USER.ROLES, USER.STATE "
 				+ "FROM SYS_USER USER " 
 				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID ";
 				

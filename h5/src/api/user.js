@@ -80,3 +80,11 @@ export const userTemplate = (params, type) =>
  * @return {*}
  */
 export const userImport = (params) => request('user/import', params)
+
+/**
+ * @name: userFrozen
+ * @description: 用户冻结
+ * @param {*}
+ * @return {*}
+ */
+export const userFrozen = (params) => request('user/frozen', params)

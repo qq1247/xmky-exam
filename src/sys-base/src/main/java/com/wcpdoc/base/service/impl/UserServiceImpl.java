@@ -130,16 +130,18 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	}
 	
 	@Override
-	public void frozen(Integer[] ids) {
-		for (Integer id : ids) {
-			User user = getEntity(id);
-			if (user == null) {
-				throw new MyException("参数错误：ids");
-			}
-			user.setState(2);
-			userDao.update(user);
-			
-			onlineUserService.out(id);
+	public void frozen(Integer id) {
+		// 校验数据有效性
+		User user = getEntity(id);
+		if (user.getState() != 1 && user.getState() != 2) {
+			throw new MyException("参数错误：id");
 		}
+		
+		// 冻结用户
+		user.setState(user.getState() == 1 ? 2 : 1);
+		userDao.update(user);
+		
+		// 用户下线
+		onlineUserService.out(id);
 	}
 }

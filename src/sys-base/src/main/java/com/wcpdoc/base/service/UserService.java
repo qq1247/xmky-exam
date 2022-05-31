@@ -82,18 +82,18 @@ public interface UserService extends BaseService<User> {
 	List<User> getList(Integer[] ids);
 	
 	/**
+	 * 冻结账户
+	 * 
+	 * v1.0 chenyun 2022年04月21日下午18:48:00
+	 * @param ids void
+	 */
+	void frozen(Integer id);
+
+	/**
 	 * 获取用户列表
 	 * 
 	 * v1.0 zhanghc 2022年5月10日下午4:54:44
 	 * @return List<User>
 	 */
 	List<User> getList();
-	
-	/**
-	 * 冻结账户
-	 * 
-	 * v1.0 chenyun 2022年04月21日下午18:48:00
-	 * @param ids void
-	 */
-	void frozen(Integer[] ids);
 }

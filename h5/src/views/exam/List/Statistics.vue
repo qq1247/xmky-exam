@@ -274,7 +274,6 @@ export default {
   },
   async mounted() {
     this.id = this.$route.params.id
-    this.paperId = this.$route.params.examTypeId
     if (Number(this.id)) {
       await this.getExamStatis(this.id)
       this.getRanking(this.id)
@@ -392,7 +391,6 @@ export default {
         params: {
           userId,
           examId: this.id,
-          paperId: this.paperId,
           examEndTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
           showType: 1,
           preview: true
