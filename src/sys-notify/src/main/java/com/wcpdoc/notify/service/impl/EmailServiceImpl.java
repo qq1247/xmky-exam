@@ -28,26 +28,20 @@ public class EmailServiceImpl implements EmailService {
 	private EmailExService emailExService;
 
 	@Override
-	public JavaMailSender init() throws EmailException {
-		log.info("初始化邮件服务开始");
-		Email email = emailExService.getEmail();
-		JavaMailSenderImpl javaMailSenderImpl = new JavaMailSenderImpl();
-		javaMailSenderImpl.setHost(email.getHost());
-		javaMailSenderImpl.setUsername(email.getUserName());
-		javaMailSenderImpl.setPassword(email.getPwd());
-		javaMailSenderImpl.setProtocol(email.getProtocol());
-		javaMailSenderImpl.setDefaultEncoding(email.getEncode());
-		javaMailSender = javaMailSenderImpl;
-		log.info("初始化邮件服务成功：{},{},{},{}", email.getHost(), email.getUserName(), email.getProtocol(), email.getEncode());
-		return javaMailSender;
-	}
-
-	@Override
 	public JavaMailSender getJavaMailSender() throws EmailException {
 		if (javaMailSender == null) {
 			synchronized (EmailServiceImpl.class) {
 				if (javaMailSender == null) {
-					javaMailSender = init();
+					log.info("初始化邮件服务开始");
+					Email email = emailExService.getEmail();
+					JavaMailSenderImpl javaMailSenderImpl = new JavaMailSenderImpl();
+					javaMailSenderImpl.setHost(email.getHost());
+					javaMailSenderImpl.setUsername(email.getUserName());
+					javaMailSenderImpl.setPassword(email.getPwd());
+					javaMailSenderImpl.setProtocol(email.getProtocol());
+					javaMailSenderImpl.setDefaultEncoding(email.getEncode());
+					javaMailSender = javaMailSenderImpl;
+					log.info("初始化邮件服务成功：{},{},{},{}", email.getHost(), email.getUserName(), email.getProtocol(), email.getEncode());
 				}
 			}
 		}

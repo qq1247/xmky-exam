@@ -80,7 +80,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 			throw new MyException("参数错误：score");
 		}
 		
-		MyExamDetail myExamDetail = myExamDetailService.getEntity(examId, userId, questionId);
+		MyExamDetail myExamDetail = myExamDetailService.getMyExamDetail(examId, userId, questionId);
 		if (myExamDetail == null) {
 			throw new MyException("未参与考试");
 		}
@@ -128,7 +128,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		if (paper.getGenType() == 1) {
 			paperQuestion = paperQuestionService.getEntity(exam.getPaperId(), questionId);
 		} else {
-			paperQuestion = paperQuestionService.getEntity(exam.getId(), exam.getPaperId(), questionId, userId);
+			paperQuestion = paperQuestionService.getEntity(exam.getId(), userId, questionId);
 		}
 		if (BigDecimalUtil.newInstance(score).sub(paperQuestion.getScore()).getResult().doubleValue() > 0) {
 			throw new MyException("最大分值：" + paperQuestion.getScore());
@@ -195,7 +195,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		}
 		
 		// 如果还有未阅卷的题，不交卷
-		List<MyExamDetail> userAnswerList = myExamDetailService.getUserAnswerList(examId, userId);
+		List<MyExamDetail> userAnswerList = myExamDetailService.getList(examId, userId);
 		BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
 		User examUser = userService.getEntity(userId);
 		User markUser = userService.getEntity(getCurUser().getId());

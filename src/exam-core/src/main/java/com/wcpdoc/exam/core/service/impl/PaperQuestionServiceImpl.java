@@ -10,7 +10,6 @@ import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.dao.PaperQuestionDao;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
-import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.service.PaperQuestionService;
 
 /**
@@ -30,18 +29,13 @@ public class PaperQuestionServiceImpl extends BaseServiceImp<PaperQuestion> impl
 	}
 
 	@Override
-	public List<PaperQuestion> getQuestionList(Integer parentId, Integer examId, Integer userId) {
-		return paperQuestionDao.getQuestionList(parentId, examId, userId);
-	}
-
-	@Override
-	public List<PaperQuestion> getList(Integer paperId) {
-		return paperQuestionDao.getList(paperId);
-	}
-
-	@Override
 	public List<PaperQuestion> getChapterList(Integer paperId) {
 		return paperQuestionDao.getChapterList(paperId);
+	}
+
+	@Override
+	public List<PaperQuestion> getChapterDetailList(Integer chapterId) {
+		return paperQuestionDao.getChapterDetailList(chapterId);
 	}
 
 	@Override
@@ -50,27 +44,17 @@ public class PaperQuestionServiceImpl extends BaseServiceImp<PaperQuestion> impl
 	}
 
 	@Override
-	public PaperQuestion getEntity(Integer examId, Integer paperId, Integer questionId, Integer userId) {
-		return paperQuestionDao.getEntity(examId, paperId, questionId, userId);
-	}
-	
-	@Override
-	public void del(Integer examId, Integer userId) {
-		paperQuestionDao.del(examId, userId);
+	public List<PaperQuestion> getList(Integer examId, Integer userId) {
+		return paperQuestionDao.getList(examId, userId);
 	}
 
 	@Override
-	public List<Question> getQuestionRandList(Integer examId, Integer paperId) {
-		return paperQuestionDao.getQuestionRandList(examId, paperId);
-	}
-	
-	@Override
-	public List<PaperQuestion> getPaperQuestionList(Integer examId, Integer paperId) {
-		return paperQuestionDao.getPaperQuestionList(examId, paperId);
+	public PaperQuestion getEntity(Integer id, Integer userId, Integer questionId) {
+		return paperQuestionDao.getEntity(id, userId, questionId);
 	}
 
 	@Override
-	public List<PaperQuestion> getPaperQuestionList(Integer questionId) {
-		return paperQuestionDao.getPaperQuestionList(questionId);
+	public List<PaperQuestion> getList2(Integer questionId) {
+		return paperQuestionDao.getList(questionId);
 	}
 }

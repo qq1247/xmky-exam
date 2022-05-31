@@ -25,7 +25,7 @@ public class QuestionAnswerDaoImpl extends RBaseDaoImpl<QuestionAnswer> implemen
 
 	@Override
 	public List<QuestionAnswer> getList(Integer questionId) {
-		String sql = "SELECT * FROM EXM_QUESTION_ANSWER WHERE QUESTION_ID = :QUESTION_ID";
+		String sql = "SELECT * FROM EXM_QUESTION_ANSWER WHERE QUESTION_ID = :QUESTION_ID ORDER BY NO ASC";
 		return getList(sql, new Object[] { questionId }, QuestionAnswer.class);
 	}
 

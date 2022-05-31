@@ -37,9 +37,9 @@ import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
-import com.wcpdoc.exam.core.entity.QuestionEx;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.entity.QuestionType;
+import com.wcpdoc.exam.core.entity.ex.MyQuestion;
 import com.wcpdoc.exam.core.service.PaperQuestionService;
 import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.QuestionAnswerService;
@@ -108,6 +108,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			questionAnswer.setAnswer(answers[0]);
 			questionAnswer.setScore(question.getScore());
 			questionAnswer.setQuestionId(question.getId());
+			questionAnswer.setQuestionType(question.getType());
+			questionAnswer.setQuestionAi(question.getAi());
 			questionAnswer.setNo(1);
 			questionAnswerService.add(questionAnswer);
 		} else if (question.getType() == 2) {
@@ -150,7 +152,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 
 		for (Integer fileId : fileIdList) {
-			fileService.doUpload(fileId);
+			fileService.upload(fileId);
 		}
 	}
 
@@ -168,7 +170,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (entity.getState() == 0) {
 			throw new MyException("已删除");
 		}
-		List<PaperQuestion> paperQuestionList = paperQuestionService.getPaperQuestionList(question.getId());//判断是否被试卷引用
+		List<PaperQuestion> paperQuestionList = paperQuestionService.getList2(question.getId());//判断是否被试卷引用
 		if (ValidateUtil.isValid(paperQuestionList)) {
 			Paper paper = paperService.getEntity(paperQuestionList.get(0).getPaperId());
 			throw new MyException(String.format("该题已被【%s】试卷引用", paper.getName()));
@@ -208,6 +210,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			questionAnswer.setScore(question.getScore());
 			questionAnswer.setQuestionId(question.getId());
 			questionAnswer.setNo(1);
+			questionAnswer.setQuestionType(question.getType());
+			questionAnswer.setQuestionAi(question.getAi());
 			questionAnswerService.add(questionAnswer);
 		} else if (question.getType() == 2) {
 			QuestionAnswer questionAnswer = new QuestionAnswer();
@@ -216,6 +220,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			questionAnswer.setScore(answerScores[0]);
 			questionAnswer.setQuestionId(question.getId());
 			questionAnswer.setNo(1);
+			questionAnswer.setQuestionType(question.getType());
+			questionAnswer.setQuestionAi(question.getAi());
 			questionAnswerService.add(questionAnswer);
 		} else if (question.getType() == 3 || question.getType() == 5) {
 			for(int i = 0; i < answers.length; i++ ){
@@ -224,6 +230,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				questionAnswer.setScore(question.getAi() == 1 ? answerScores[i] : BigDecimal.ZERO);
 				questionAnswer.setQuestionId(question.getId());
 				questionAnswer.setNo(i + 1);
+				questionAnswer.setQuestionType(question.getType());
+				questionAnswer.setQuestionAi(question.getAi());
 				questionAnswerService.add(questionAnswer);
 			}
 		}
@@ -254,7 +262,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 
 		for (Integer fileId : fileIdList) {
-			fileService.doUpload(fileId);
+			fileService.upload(fileId);
 		}
 	}
 
@@ -369,7 +377,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		// 解析文件
 		ProgressBarCache.setProgressBar(processBarId, 3.0, 10.0, "解析开始", HttpStatus.OK.value());// 主要时间消耗在docx4j解析，进度条只能假模拟
 		WordServer wordServer = new WordServerImpl();
-		List<QuestionEx> questionExList = null;
+		List<MyQuestion> questionExList = null;
 		try (InputStream inputStream = new FileInputStream(fileEx.getFile())) {
 			questionExList = wordServer.handle(inputStream, ParmCache.get().getFileUploadDir());  //questionExList = wordServer.handle(inputStream, fileUploadDir);
 		} catch (IOException e) {
@@ -389,15 +397,15 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			question.setState(state);// 页面添加决定是否发布
 			question.setQuestionTypeId(questionTypeId);
 			
-			String[] answers = new String[questionExList.get(j).getQuestionAnswerList().size()];
-			BigDecimal[] answerScores = new BigDecimal[questionExList.get(j).getQuestionAnswerList().size()];
+			String[] answers = new String[questionExList.get(j).getAnswerList().size()];
+			BigDecimal[] answerScores = new BigDecimal[questionExList.get(j).getAnswerList().size()];
 			BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
-			for (int i = 0; i < questionExList.get(j).getQuestionAnswerList().size(); i++) {
-				answers[i] = questionExList.get(j).getQuestionAnswerList().get(i).getAnswer();
+			for (int i = 0; i < questionExList.get(j).getAnswerList().size(); i++) {
+				answers[i] = questionExList.get(j).getAnswerList().get(i).getAnswer();
 				if (question.getType() == 3 || (question.getType() == 5 && question.getAi() == 1)) {
 					answers[i] = StringUtil.join(answers[i].split(" "), '\n');
 				}
-				answerScores[i] = questionExList.get(j).getQuestionAnswerList().get(i).getScore();
+				answerScores[i] = questionExList.get(j).getAnswerList().get(i).getScore();
 				totalScore.add(answerScores[i]);
 			}
 			if (question.getType() == 1 || question.getType() == 4 
@@ -405,13 +413,13 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				answerScores = null;//添加试题严格校验后，不允许传入错误数据
 			}
 			if (question.getType() == 2) {// 多选特殊处理下，答案拆分
-				answers = questionExList.get(j).getQuestionAnswerList().get(0).getAnswer().split("");
-				answerScores = new BigDecimal[]{questionExList.get(j).getQuestionAnswerList().get(0).getScore()};
+				answers = questionExList.get(j).getAnswerList().get(0).getAnswer().split("");
+				answerScores = new BigDecimal[]{questionExList.get(j).getAnswerList().get(0).getScore()};
 			}
 			
-			String [] options = new String[questionExList.get(j).getQuestionOptionList().size()];
-			for (int i = 0; i < questionExList.get(j).getQuestionOptionList().size(); i++) {
-				options[i] = questionExList.get(j).getQuestionOptionList().get(i).getOptions();
+			String [] options = new String[questionExList.get(j).getOptionList().size()];
+			for (int i = 0; i < questionExList.get(j).getOptionList().size(); i++) {
+				options[i] = questionExList.get(j).getOptionList().get(i).getOptions();
 			}
 			
 			if (question.getType() == 3 || (question.getType() == 5 && question.getAi() == 1)) {
@@ -756,7 +764,12 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public List<Question> delQuestionList() {
-		return questionDao.delQuestionList();
+	public List<Question> getListByDel() {
+		return questionDao.getListByDel();
+	}
+
+	@Override
+	public List<Question> getList(Integer questionTypeId) {
+		return questionDao.getList(questionTypeId);
 	}
 }

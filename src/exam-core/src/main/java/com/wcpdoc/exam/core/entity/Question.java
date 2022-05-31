@@ -13,6 +13,7 @@ import javax.persistence.Table;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.wcpdoc.core.util.ValidateUtil;
 
 /**
  * 试题实体
@@ -173,5 +174,18 @@ public class Question {
 	/** 智能阅卷：1：是；2：否； */
 	public void setAi(Integer ai) {
 		this.ai = ai;
+	}
+
+	public Integer[] getAiOptionArr() {
+		if (!ValidateUtil.isValid(aiOptions)) {
+			return new Integer[0];
+		}
+		
+		String[] aiOptionStrArr = aiOptions.split(",");// 接口层面需要返回数字类型
+		Integer[] aiOptionArr = new Integer[aiOptionStrArr.length];
+		for (int i = 0; i < aiOptionStrArr.length; i++) {
+			aiOptionArr[i] = Integer.parseInt(aiOptionStrArr[i]);
+		}
+		return aiOptionArr;
 	}
 }

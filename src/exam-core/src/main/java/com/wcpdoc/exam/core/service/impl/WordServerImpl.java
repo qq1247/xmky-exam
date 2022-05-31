@@ -31,9 +31,9 @@ import com.wcpdoc.core.util.BigDecimalUtil;
 import com.wcpdoc.core.util.SpringUtil;
 import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
-import com.wcpdoc.exam.core.entity.QuestionAnswer;
-import com.wcpdoc.exam.core.entity.QuestionEx;
+import com.wcpdoc.exam.core.entity.PaperQuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
+import com.wcpdoc.exam.core.entity.ex.MyQuestion;
 import com.wcpdoc.exam.core.service.WordServer;
 import com.wcpdoc.file.service.FileService;
 
@@ -100,11 +100,11 @@ public class WordServerImpl extends WordServer {
 		// 解析出每道题，供业务层使用
 		log.debug("word解析试题：试题内容解析成java对象开始", endTime - startTime);
 		startTime = System.currentTimeMillis();
-		List<QuestionEx> questionList = new ArrayList<>();// 解析成试题对象的列表
+		List<MyQuestion> questionList = new ArrayList<>();// 解析成试题对象的列表
 		for (List<Node> _singleQuestion : singleQuestionList) {
-			QuestionEx questionEx = null;
-			questionEx = parseQuestion(_singleQuestion);
-			questionList.add(questionEx);
+			MyQuestion MyQuestion = null;
+			MyQuestion = parseQuestion(_singleQuestion);
+			questionList.add(MyQuestion);
 		}
 		endTime = System.currentTimeMillis();
 		log.debug("word解析试题：试题内容解析成java对象结束，用时{}毫秒", endTime - startTime);
@@ -132,7 +132,7 @@ public class WordServerImpl extends WordServer {
 				if (imgFile.exists()) {
 					MultipartFile multipartFile = fileToMultipartFile(imgFile);
 					FileService fileService = SpringUtil.getBean(FileService.class);
-					String fileId = fileService.doTempUpload(new MultipartFile[]{multipartFile}, allowTypes, null);
+					String fileId = fileService.tempUpload(new MultipartFile[]{multipartFile}, allowTypes, null);
 					imgElement.attr("src", String.format("/api/file/download?id=%s", fileId));
 				}
 			}
@@ -175,9 +175,9 @@ public class WordServerImpl extends WordServer {
 	 * 重新实现，结构化，增强可读性
 	 * 
 	 * @param singleQuestion
-	 * @return QuestionEx
+	 * @return MyQuestion
 	 */
-	private QuestionEx parseQuestion(List<Node> singleQuestion) {
+	private MyQuestion parseQuestion(List<Node> singleQuestion) {
 		/**
 		 * word转html后代码
 		 * <p class="a DocDefaults "><span class="a0 " style="">【单选】【极易】我是一道单选题的</span></p> 
@@ -271,7 +271,7 @@ public class WordServerImpl extends WordServer {
 			throw new MyException(String.format("解析选项错误：%s】", StringUtil.delHTMLTag(singleQuestion.toString())));
 		}
 		AI ai = parseAi(aiRows);
-		List<QuestionAnswer> questionAnswerList = parseAnswer(answerRows, type, ai);
+		List<PaperQuestionAnswer> questionAnswerList = parseAnswer(answerRows, type, ai);
 		String analysis = parseAnalysis(analysisRows);
 		
 		// 逻辑错误校验
@@ -298,58 +298,58 @@ public class WordServerImpl extends WordServer {
 		}
 		
 		// 转换成需要的试题对象
-		QuestionEx questionEx = new QuestionEx();
-		questionEx.getQuestion().setType(type);// 类型
-		questionEx.getQuestion().setDifficulty(difficulty);// 难度
-		questionEx.getQuestion().setTitle(title);// 题干
+		MyQuestion myQuestion = new MyQuestion();
+		myQuestion.getQuestion().setType(type);// 类型
+		myQuestion.getQuestion().setDifficulty(difficulty);// 难度
+		myQuestion.getQuestion().setTitle(title);// 题干
 		if (type == 1 || type == 2) {// 选项
 			for (int i = 0; i < questionOptionList.size(); i++) {
 				QuestionOption questionOption = questionOptionList.get(i);
 				questionOption.setNo(i + 1);
 			}
-			questionEx.setQuestionOptionList(questionOptionList);
+			myQuestion.setOptionList(questionOptionList);
 		}
 		
 		if (type == 1 || type == 2 || type == 4) {// 总分数
-			questionEx.getQuestion().setScore(new BigDecimal(questionAnswerList.get(0).getScore().toString()));// 只看第一行
+			myQuestion.getQuestion().setScore(new BigDecimal(questionAnswerList.get(0).getScore().toString()));// 只看第一行
 		} else if (type == 3 || (type == 5 && ai.getAi() == 1)) {// 如果是填空或问答智能阅卷，每项分加一起就是总分
 			BigDecimalUtil bigDecimalUtil = BigDecimalUtil.newInstance(0);
-			for (QuestionAnswer questionAnswer : questionAnswerList) {
+			for (PaperQuestionAnswer questionAnswer : questionAnswerList) {
 				bigDecimalUtil.add(questionAnswer.getScore());
 			}
-			questionEx.getQuestion().setScore(bigDecimalUtil.getResult());
+			myQuestion.getQuestion().setScore(bigDecimalUtil.getResult());
 		} else if (type == 5 && ai.getAi() == 2) {// 如果是问答非智能阅卷，分值从智能阅卷行问答分值取
-			questionEx.getQuestion().setScore(new BigDecimal(ai.getQaScore().toString()));
+			myQuestion.getQuestion().setScore(new BigDecimal(ai.getQaScore().toString()));
 		}
 
 		if (type == 1 || type == 4) {// 答案和分数
-			QuestionAnswer questionAnswer = new QuestionAnswer();
+			PaperQuestionAnswer questionAnswer = new PaperQuestionAnswer();
 			questionAnswer.setAnswer(questionAnswerList.get(0).getAnswer());
 			questionAnswer.setScore(new BigDecimal(questionAnswerList.get(0).getScore().toString()));// 和分值一样
-			questionEx.getQuestionAnswerList().add(questionAnswer);
+			myQuestion.getAnswerList().add(questionAnswer);
 		} else if (type == 3 || (type == 5 && ai.getAi() == 1)) {
-			for (QuestionAnswer questionAnswer : questionAnswerList) {
-				questionEx.getQuestionAnswerList().add(questionAnswer);
+			for (PaperQuestionAnswer questionAnswer : questionAnswerList) {
+				myQuestion.getAnswerList().add(questionAnswer);
 			}
 		} else if (type == 2) {
-			QuestionAnswer questionAnswer = new QuestionAnswer();
+			PaperQuestionAnswer questionAnswer = new PaperQuestionAnswer();
 			questionAnswer.setAnswer(questionAnswerList.get(0).getAnswer());
 			questionAnswer.setScore(new BigDecimal(ai.getMissScore().toString()));//从漏选分值取
-			questionEx.getQuestionAnswerList().add(questionAnswer);
+			myQuestion.getAnswerList().add(questionAnswer);
 		} else if (type == 5 && ai.getAi() == 2) {
-			QuestionAnswer questionAnswer = new QuestionAnswer();
+			PaperQuestionAnswer questionAnswer = new PaperQuestionAnswer();
 			questionAnswer.setAnswer(questionAnswerList.get(0).getAnswer());
 			questionAnswer.setScore(new BigDecimal(ai.getQaScore().toString()));//从问答分值取
-			questionEx.getQuestionAnswerList().add(questionAnswer);
+			myQuestion.getAnswerList().add(questionAnswer);
 		}
 		
-		questionEx.getQuestion().setAi(ai.getAi());
+		myQuestion.getQuestion().setAi(ai.getAi());
 		if (ai.getAi() == 1) {// 如果智能阅卷是开启的
 			if (type == 1 || type == 4) {// 单选、判断不需要
 				
 			} else if (type == 2) {// 多选 1：漏选得分；
 				if (ai.getAiOptions().toString().contains("1")) {
-					questionEx.getQuestion().setAiOptions("1");
+					myQuestion.getQuestion().setAiOptions("1");
 				}
 			} else if (type == 3) {// 填空问答 2：答案无顺序；3：大小写不敏感；
 				String sos = "";
@@ -360,15 +360,15 @@ public class WordServerImpl extends WordServer {
 				if (ai.getAiOptions().toString().contains("3")) {
 					sos += sos.isEmpty() ? "3" : ",3";
 				}
-				questionEx.getQuestion().setAiOptions(sos);
+				myQuestion.getQuestion().setAiOptions(sos);
 			} else if (type == 5) {// 问答 3：大小写不敏感；
 				if (ai.getAiOptions().toString().contains("3")) {
-					questionEx.getQuestion().setAiOptions("3");
+					myQuestion.getQuestion().setAiOptions("3");
 				}
 			}
 		}
-		questionEx.getQuestion().setAnalysis(analysis);
-		return questionEx;
+		myQuestion.getQuestion().setAnalysis(analysis);
+		return myQuestion;
 	}
 	
 	private String parseAnalysis(List<Node> analysisRows) {
@@ -413,8 +413,8 @@ public class WordServerImpl extends WordServer {
 		return ai;
 	}
 
-	private List<QuestionAnswer> parseAnswer(List<Node> answerNodeList, int type, AI ai) {
-		List<QuestionAnswer> answerScoreList = new ArrayList<>();// 解析答案和分值，如果是填空或问答，答案可能是多行
+	private List<PaperQuestionAnswer> parseAnswer(List<Node> answerNodeList, int type, AI ai) {
+		List<PaperQuestionAnswer> answerScoreList = new ArrayList<>();// 解析答案和分值，如果是填空或问答，答案可能是多行
 		if (type == 1 || type == 2 || type == 3 || type == 4 || (type == 5 && ai.getAi() == 1)) {
 			for (Node answerNode : answerNodeList) {
 				String answerTxt = Jsoup.clean(answerNode.outerHtml(), Whitelist.none()); // 【答案：B】【分值：2】 
@@ -426,7 +426,7 @@ public class WordServerImpl extends WordServer {
 				} catch (NumberFormatException e) {
 					throw new MyException(String.format("不能从试题找到【分值】：%s】", StringUtil.delHTMLTag(answerNodeList.toString())));
 				}
-				QuestionAnswer questionAnswer = new QuestionAnswer();
+				PaperQuestionAnswer questionAnswer = new PaperQuestionAnswer();
 				questionAnswer.setAnswer(answer);// 多选按逗号分隔
 				questionAnswer.setScore(new BigDecimal(score.toString()));
 				answerScoreList.add(questionAnswer);
@@ -443,7 +443,7 @@ public class WordServerImpl extends WordServer {
 			}
 			answerTxt = answerTxt.substring(0, lastIndex) + answerTxt.substring(lastIndex + 1, answerTxt.length());
 			
-			QuestionAnswer questionAnswer = new QuestionAnswer();
+			PaperQuestionAnswer questionAnswer = new PaperQuestionAnswer();
 			questionAnswer.setAnswer(answerTxt);
 			questionAnswer.setScore(null);// 分值在智能阅卷行
 			answerScoreList.add(questionAnswer);

@@ -2,7 +2,6 @@ package com.wcpdoc.api.controller;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -81,7 +80,7 @@ public class ApiUserController extends BaseController {
 					map.put("onlineTime", DateUtil.formatDateTime(onlineUser.getUpdateTime()));
 				}
 				
-				if (!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {//只有管理员显示以下字段
+				if (!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {// 不是管理员移除以下字段
 					map.remove("registTime");
 					map.remove("lastLoginTime");
 					map.remove("roles");
@@ -128,12 +127,12 @@ public class ApiUserController extends BaseController {
 			user.setUpdateUserId(getCurUser().getId());
 			user.setState(1);
 			if(ValidateUtil.isValid(user.getHeadFileId())){
-				fileService.doUpload(user.getHeadFileId());
+				fileService.upload(user.getHeadFileId());
 			}
 			userService.add(user);
 
 			// 设置密码
-			String initPwd = userService.doPwdUpdate(user.getId());
+			String initPwd = userService.pwdUpdate(user.getId());
 			Map<String, Object> data = new HashMap<String, Object>();
 			data.put("initPwd", initPwd);
 			return PageResultEx.ok().data(data);
@@ -182,7 +181,7 @@ public class ApiUserController extends BaseController {
 			entity.setEmail(user.getEmail());
 			if((!ValidateUtil.isValid(entity.getHeadFileId()) && ValidateUtil.isValid(user.getHeadFileId())) 
 					|| (ValidateUtil.isValid(user.getHeadFileId()) && user.getHeadFileId().intValue() != entity.getHeadFileId().intValue())){
-				fileService.doUpload(user.getHeadFileId());
+				fileService.upload(user.getHeadFileId());
 			}
 			entity.setHeadFileId(user.getHeadFileId());
 			userService.update(entity);
@@ -190,7 +189,7 @@ public class ApiUserController extends BaseController {
 			// 更新密码
 			Map<String, Object> data = new HashMap<String, Object>();
 			if (changeLoginName) {
-				String initPwd = userService.doPwdUpdate(user.getId());
+				String initPwd = userService.pwdUpdate(user.getId());
 				data.put("initPwd", initPwd);
 			}
 
@@ -268,8 +267,8 @@ public class ApiUserController extends BaseController {
 			
 			pageResult.addAttr("registTime", DateUtil.formatDateTime(entity.getRegistTime()))
 				.addAttr("lastLoginTime", entity.getLastLoginTime() == null ? null : DateUtil.formatDateTime(entity.getLastLoginTime()))
-				.addAttr("roles", (ValidateUtil.isValid(entity.getRoles()) && entity.getRoles().contains("subAdmin"))
-						? new String[] { "subAdmin" } : new String[] { "user" });
+				.addAttr("roles", (ValidateUtil.isValid(entity.getRoles()) && entity.getRoles().contains(ConstantManager.SUB_ADMIN_LOGIN_NAME))
+						? new String[] { ConstantManager.SUB_ADMIN_LOGIN_NAME } : new String[] { "user" });
 			return pageResult;
 		} catch (MyException e) {
 			log.error("获取用户错误：{}", e.getMessage());
@@ -292,7 +291,7 @@ public class ApiUserController extends BaseController {
 	@ResponseBody
 	public PageResult pwdInit(Integer id) {
 		try {
-			String pwdInit = userService.doPwdUpdate(id);
+			String pwdInit = userService.pwdUpdate(id);
 			Map<String, Object> data = new HashMap<String, Object>();
 			data.put("initPwd", pwdInit);
 			return PageResultEx.ok().data(data);
@@ -385,25 +384,6 @@ public class ApiUserController extends BaseController {
 	}
 
 	/**
-	 * 导出用户表
-	 * 
-	 * v1.0 chenyun 2021年3月4日下午5:41:02
-	 * 
-	 * @return PageResult
-	 */
-	@RequestMapping("/export")
-	@ResponseBody
-	public void export(Integer[] ids) {
-		try {
-//	        userXlsxService.export(ids);
-		} catch (MyException e) {
-			log.error("导出用户表失败：", e.getMessage());
-		} catch (Exception e) {
-			log.error("导出用户表失败：", e);
-		}
-	}
-	
-	/**
 	 * 导出模板
 	 * 
 	 * v1.0 chenyun 2021年3月4日下午5:41:02
@@ -417,27 +397,6 @@ public class ApiUserController extends BaseController {
 			fileService.exportTemplate("用户.xlsx");
 		} catch (Exception e) {
 			log.error("用户导出模板下载附件失败：", e);
-		}
-	}
-
-	/**
-	 * 组织机构用户同步 
-	 * v1.0 zhanghc 2016年8月27日上午11:36:55
-	 * 
-	 * @return pageOut
-	 */
-	@RequestMapping("/syncUser")
-	@ResponseBody
-	public PageResult syncUser(String orgName, String orgCode, List<User> user) {
-		// org [name, code]
-		// user [name, loginName, email, phone, pwd ]
-		try {
-			Integer orgId = orgService.syncOrg(orgName, orgCode);
-			userService.syncUser(user, orgId);
-			return PageResult.ok();
-		} catch (Exception e) {
-			log.error("组织机构用户同步错误：", e);
-			return PageResult.err();
 		}
 	}
 }

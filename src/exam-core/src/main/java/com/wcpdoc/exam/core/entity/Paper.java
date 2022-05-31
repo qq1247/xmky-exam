@@ -171,10 +171,12 @@ public class Paper {
 		this.minimizeNum = minimizeNum;
 	}
 
+	/** 选项（1：试题乱序；2：选项乱序；3：禁用右键；4：禁止复制；5：最小化警告） */
 	public String getOptions() {
 		return options;
 	}
 
+	/** 选项（1：试题乱序；2：选项乱序；3：禁用右键；4：禁止复制；5：最小化警告） */
 	public void setOptions(String options) {
 		this.options = options;
 	}

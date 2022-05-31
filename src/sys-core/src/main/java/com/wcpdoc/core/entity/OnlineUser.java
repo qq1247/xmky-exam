@@ -26,6 +26,13 @@ public class OnlineUser implements Serializable {
 		this.updateTime = new Date();
 	}
 	
+	public OnlineUser(Integer id, String loginName, String ip, Date updateTime) {
+		this.id = id;
+		this.loginName = loginName;
+		this.ip = ip;
+		this.updateTime = updateTime;
+	}
+	
 	/**
 	 * 获取在线状态
 	 * 正常情况下，前端每隔30秒会请求一次服务器，如果半分钟内没有接受到请求，表示离线
@@ -38,13 +45,6 @@ public class OnlineUser implements Serializable {
 			return false;
 		}
 		return System.currentTimeMillis() - updateTime.getTime() < 35000;
-	}
-
-	public OnlineUser(Integer id, String loginName, String ip, Date updateTime) {
-		this.id = id;
-		this.loginName = loginName;
-		this.ip = ip;
-		this.updateTime = updateTime;
 	}
 
 	public Integer getId() {
@@ -78,5 +78,4 @@ public class OnlineUser implements Serializable {
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
 	}
-
 }

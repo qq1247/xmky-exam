@@ -45,7 +45,7 @@ public class BulletinServiceImpl extends BaseServiceImp<Bulletin> implements Bul
 		bulletin.setUpdateUserId(getCurUser().getId());
 		bulletinDao.add(bulletin);
 		if (ValidateUtil.isValid(bulletin.getImgFileId())) {
-			fileService.doUpload(Integer.parseInt(bulletin.getImgFileId()));
+			fileService.upload(Integer.parseInt(bulletin.getImgFileId()));
 		}
 	}
 
@@ -68,7 +68,7 @@ public class BulletinServiceImpl extends BaseServiceImp<Bulletin> implements Bul
 		entity.setUpdateUserId(getCurUser().getId());
 		bulletinDao.update(entity);
 		if (ValidateUtil.isValid(bulletin.getImgFileId()) && !bulletin.getImgFileId().equals(oldImgFileId) ) {
-			fileService.doUpload(Integer.parseInt(bulletin.getImgFileId()));
+			fileService.upload(Integer.parseInt(bulletin.getImgFileId()));
 		}
 	}
 	

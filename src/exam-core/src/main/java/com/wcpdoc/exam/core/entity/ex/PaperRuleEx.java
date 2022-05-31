@@ -1,11 +1,11 @@
-package com.wcpdoc.exam.core.entity;
+package com.wcpdoc.exam.core.entity.ex;
 
 /**
- * 随机试题扩展
+ * 试卷规则扩展
  * 
  * v1.0 chenyun 2022年3月8日上午10:55:29
  */
-public class PaperQuestionRuleEx {
+public class PaperRuleEx {
 	private Integer type;
 	private Integer difficulty;
 	private Integer ai;
@@ -26,7 +26,7 @@ public class PaperQuestionRuleEx {
 	public Integer getAi() {
 		return ai;
 	}
-	public PaperQuestionRuleEx(Integer type, Integer difficulty, Integer ai) {
+	public PaperRuleEx(Integer type, Integer difficulty, Integer ai) {
 		this.type = type;
 		this.difficulty = difficulty;
 		this.ai = ai;
@@ -48,7 +48,7 @@ public class PaperQuestionRuleEx {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PaperQuestionRuleEx other = (PaperQuestionRuleEx) obj;
+		PaperRuleEx other = (PaperRuleEx) obj;
 		if (ai == null) {
 			if (other.ai != null)
 				return false;

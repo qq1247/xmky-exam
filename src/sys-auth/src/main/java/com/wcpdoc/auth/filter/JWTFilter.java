@@ -147,7 +147,7 @@ public class JWTFilter extends BasicHttpAuthenticationFilter {
 		} catch (InterruptedException e) {
 			throw new AuthenticationException(String.format("用户【%s】挂起异常", oldLoginName));
 		} finally {
-			TokenCache.releaseLock(tokenKey);
+			TokenCache.releaseWriteLock(tokenKey);
 		}
 	}
 

@@ -23,7 +23,6 @@ import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.IdUtil;
 import com.wcpdoc.core.util.ValidateUtil;
-import com.wcpdoc.file.cache.FileIdCache;
 import com.wcpdoc.file.dao.FileDao;
 import com.wcpdoc.file.entity.File;
 import com.wcpdoc.file.entity.FileEx;
@@ -50,7 +49,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 	}
 
 	@Override
-	public String doTempUpload(MultipartFile[] files, String[] allowTypes, String uuId) {
+	public String tempUpload(MultipartFile[] files, String[] allowTypes, String uuid) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(files)) {
 			throw new MyException("参数错误：files");
@@ -100,7 +99,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 			file.setState(0);
 			file.setUpdateUserId(getCurUser().getId());
 			file.setUpdateTime(new Date());
-			fileDao.add(file);
+			add(file);
 
 			if (fileIds.length() > 0) {
 				fileIds.append(",");
@@ -109,24 +108,16 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 			
 		}
 		
-		if (ValidateUtil.isValid(uuId)){  //试题FileId校验
-			if (!ValidateUtil.isValid(FileIdCache.getFileId(uuId))) {
-				FileIdCache.setFileId(uuId, fileIds.toString());
-			}else{
-				throw new MyException("上传失败");
-			}
-		}
-		
 		return fileIds.toString();
 	}
 
 	@Override
-	public void doUpload(Integer id) {
+	public void upload(Integer id) {
 		// 校验数据有效性
 		if (id == null) {
 			throw new MyException("参数错误：id");
 		}
-		File file = fileDao.getEntity(id);
+		File file = getEntity(id);
 		if (file.getState() == 1) {
 			return;
 		}
@@ -196,16 +187,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 	@Override
 	public String getFileUploadDir() {
 		java.io.File dbBakDir = new java.io.File(fileExService.getFileUploadDir());
-		if (!dbBakDir.isAbsolute()) {
-			dbBakDir = new java.io.File(String.format("%s%s%s", System.getProperty("user.dir"), java.io.File.separator, fileExService.getFileUploadDir()));// 如果是相对路径，备份路径为当前war包启动路径+配置文件子目录
-		}
 		return dbBakDir.getAbsolutePath();
-	}
-
-	@Override
-	public Integer getFileId(String uuid) {
-		String fileId = FileIdCache.getFileId(uuid);
-		return Integer.parseInt(fileId);
 	}
 
 	@Override
@@ -219,6 +201,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 			throw new MyException("参数错误：id");
 		}
 		
+		// 保存记录
 		File fileNew = new File();
 		try {
 			BeanUtils.copyProperties(fileNew, fileOld);
@@ -237,7 +220,7 @@ public class FileServiceImpl extends BaseServiceImp<File> implements FileService
 		fileNew.setIp(request.getRemoteHost());
 		fileNew.setUpdateUserId(getCurUser().getId());
 		fileNew.setUpdateTime(new Date());
-		fileDao.add(fileNew);
+		add(fileNew);
 		
 		// 复制文件
 		java.io.File destDir = new java.io.File(String.format("%s%s",  baseDir, fileNew.getPath()));

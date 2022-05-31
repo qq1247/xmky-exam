@@ -1,6 +1,10 @@
 package com.wcpdoc.exam.api.controller;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -18,7 +22,12 @@ import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
+import com.wcpdoc.exam.core.entity.PaperQuestionAnswer;
 import com.wcpdoc.exam.core.entity.PaperRemark;
+import com.wcpdoc.exam.core.entity.QuestionOption;
+import com.wcpdoc.exam.core.entity.ex.Chapter;
+import com.wcpdoc.exam.core.entity.ex.MyPaper;
+import com.wcpdoc.exam.core.entity.ex.MyQuestion;
 import com.wcpdoc.exam.core.service.PaperService;
 /**
  * 试卷控制层
@@ -303,18 +312,30 @@ public class ApiPaperController extends BaseController {
 	}
 	
 	/**
-	 * 试卷试题列表
-	 * 拥有读写权限才显示答案字段
+	 * 试卷详细
 	 * 
-	 * v1.0 chenyun 2021年3月31日下午4:21:20
+	 * v1.0 zhanghc 2022年5月18日下午1:21:07
 	 * @param id
 	 * @return PageResult
 	 */
-	@RequestMapping("/paperQuestionList")
+	@RequestMapping("/detail")
 	@ResponseBody
-	public PageResult paperQuestionList(Integer id, Integer examId, Integer userId) {
+	public PageResult detail(Integer id) {
 		try {
-			return PageResultEx.ok().data(paperService.paperQuestionList(id, examId, userId));
+			MyPaper myPaper = paperService.getMyPaper(id);
+			return PageResultEx.ok().data(detailHandle(myPaper));
+		} catch (Exception e) {
+			log.error("试题列表错误：", e);
+			return PageResult.err();
+		}
+	}
+
+	@RequestMapping("/detailOfRandom")
+	@ResponseBody
+	public PageResult detailOfRandom(Integer examId, Integer userId) {
+		try {
+			MyPaper myPaper = paperService.getMyPaper(examId, userId);
+			return PageResultEx.ok().data(detailHandle(myPaper));
 		} catch (Exception e) {
 			log.error("试题列表错误：", e);
 			return PageResult.err();
@@ -484,5 +505,77 @@ public class ApiPaperController extends BaseController {
 			log.error("更新总分数错误：", e);
 			return PageResult.err();
 		}
+	}
+	
+	/**
+	 * 反作弊
+	 * 
+	 * v1.0 zhanghc 2022年5月18日上午10:45:21
+	 * @param id
+	 * @param options 1：试题乱序；2：选项乱序；3：禁用右键；4：禁止复制；5：最小化警告
+	 * @return PageResult
+	 */
+	@RequestMapping("/sxe")
+	@ResponseBody
+	public PageResult sxe(Integer id, Integer[] options) {
+		try {
+			paperService.sxe(id, options);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("发布错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("发布错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private List<Map<String, Object>> detailHandle(MyPaper myPaper) {
+		List<Map<String, Object>> resultList = new ArrayList<>();
+		for (Chapter chapter : myPaper.getChapterList()) {
+			Map<String, Object> singleResult = new HashMap<>();
+			Map<Object, Object> chapterMap = new HashMap<>();
+			chapterMap.put("id", chapter.getChapter().getId());
+			chapterMap.put("name", chapter.getChapter().getName());
+			chapterMap.put("description", chapter.getChapter().getDescription());
+			singleResult.put("chapter", chapterMap);
+			
+			List<Map<String, Object>> questionsListMap = new ArrayList<>();
+			for (MyQuestion myQuestion : chapter.getMyQuestionList()) {
+				Map<String, Object> questionMap = new HashMap<>();
+				questionMap.put("id", myQuestion.getQuestion().getId());
+				questionMap.put("type", myQuestion.getQuestion().getType());
+				questionMap.put("difficulty", myQuestion.getQuestion().getDifficulty());
+				questionMap.put("title", myQuestion.getQuestion().getTitle());
+				questionMap.put("ai", myQuestion.getQuestion().getAi());
+				questionMap.put("analysis", myQuestion.getQuestion().getAnalysis());
+				questionMap.put("score", myQuestion.getAttr().getScore());// 分数从试卷中取
+				questionMap.put("aiOptions", myQuestion.getAttr().getAiOptionArr());// 分数选项从试卷中取
+				questionMap.put("options", new ArrayList<Map<String, Object>>());
+				
+				for (QuestionOption questionOption : myQuestion.getOptionList()) {
+					Map<String, Object> option = new HashMap<>();
+					option.put("option", questionOption.getOptions());
+					option.put("no", questionOption.getNo());
+					((List<Map<String, Object>>)questionMap.get("options")).add(option);
+				}
+				
+				questionMap.put("answers", new ArrayList<Map<String, Object>>());
+				for (PaperQuestionAnswer answer : myQuestion.getAnswerList()) {
+					Map<String, Object> answerMap = new HashMap<String, Object>();
+					answerMap.put("score", answer.getScore());
+					answerMap.put("answer", answer.getAnswerArr());
+					((List<Map<String, Object>>)questionMap.get("answers")).add(answerMap);
+				}
+				
+				questionsListMap.add(questionMap);
+			}
+			
+			singleResult.put("questionList", questionsListMap);
+			resultList.add(singleResult);
+		}
+		
+		return resultList;
 	}
 }

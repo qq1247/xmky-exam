@@ -76,20 +76,6 @@ public class TokenCache extends BaseEhCache {
 	}
 	
 	/**
-	 * 加读锁
-	 * 
-	 * v1.0 zhanghc 2021年7月14日下午2:17:54
-	 * @param key
-	 * @param milliSeconds void
-	 * @return 
-	 * @throws InterruptedException 
-	 */
-	public static boolean tryReadLock(Object key, long milliSeconds) throws InterruptedException {
-		net.sf.ehcache.Cache nativeCache = getNativeCache(CACHE_NAME);
-		return nativeCache.tryReadLockOnKey(key, milliSeconds);
-	}
-	
-	/**
 	 * 加写锁
 	 * 
 	 * v1.0 zhanghc 2021年7月14日下午2:17:54
@@ -112,7 +98,7 @@ public class TokenCache extends BaseEhCache {
 	 * @return
 	 * @throws InterruptedException boolean
 	 */
-	public static void releaseLock(Object key) {
+	public static void releaseWriteLock(Object key) {
 		net.sf.ehcache.Cache nativeCache = getNativeCache(CACHE_NAME);
 		nativeCache.releaseWriteLockOnKey(key);
 	}

@@ -7,8 +7,6 @@ import org.springframework.stereotype.Repository;
 import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
-import com.wcpdoc.core.util.SqlUtil;
-import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.QuestionOptionDao;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 
@@ -22,12 +20,7 @@ public class QuestionOptionDaoImpl extends RBaseDaoImpl<QuestionOption> implemen
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT * "
-				+ "FROM EXM_QUESTION_OPTION QUESTION_OPTION ";
-		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("id").toString()), "QUESTION_OPTION.ID = :ID", pageIn.get("id").toString());
-		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		return pageOut;
+		return null;
 	}
 
 	@Override

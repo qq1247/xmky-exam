@@ -14,6 +14,7 @@ import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.ParmService;
 import com.wcpdoc.base.service.UserExService;
 import com.wcpdoc.base.service.UserService;
+import com.wcpdoc.core.constant.ConstantManager;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.OnlineUserService;
@@ -55,50 +56,20 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	}
 
 	@Override
-	public String doPwdUpdate(Integer id) {
+	public String pwdUpdate(Integer id) {
 		// 校验数据有效性
 		if (id == null) {
 			throw new MyException("参数错误：id");
 		}
 		
-		//获取默认密码类型
+		// 修改密码
 		Parm parm = ParmCache.get();
-		String newPwd = null;
-		if (parm.getPwdType() == 1) {
-			newPwd = StringUtil.getRandomStr(8);
-		}else {
-			newPwd = parm.getPwdValue();
-		}
-		if (!ValidateUtil.isValid(newPwd)) {
-			throw new MyException("参数错误：newPwd");
-		}
-
-		// 初始化密码
+		String newPwd = parm.getPwdType() == 1 ? StringUtil.getRandomStr(8) : parm.getPwdValue();
+		
 		User user = getEntity(id);
 		user.setPwd(getEncryptPwd(user.getLoginName(), newPwd));
 		update(user);
-		
 		return newPwd;
-	}
-
-	@Override
-	public void pwdUpdate(String oldPwd, String newPwd) {
-		// 校验数据有效性
-		if (!ValidateUtil.isValid(oldPwd)) {
-			throw new MyException("参数错误：oldPwd");
-		}
-		if (!ValidateUtil.isValid(newPwd)) {
-			throw new MyException("参数错误：newPwd");
-		}
-		User user = getEntity(getCurUser().getId());
-		String oldEncryptPwd = getEncryptPwd(user.getLoginName(), oldPwd);
-		if (!user.getPwd().equals(oldEncryptPwd)) {
-			throw new MyException("原始密码错误");
-		}
-
-		// 修改密码
-		user.setPwd(getEncryptPwd(user.getLoginName(), newPwd));
-		update(user);
 	}
 
 	@Override
@@ -129,38 +100,23 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		if(user == null){
 			throw new MyException("参数错误：id");
 		}
-		
 		if (!ValidateUtil.isValid(roles) && roles.length != 1) {
-			throw new MyException("参数错误：role");
+			throw new MyException("参数错误：roles");
 		}
 		
-		// 更新角色
+		// 修改角色
 		user.setRoles("user");
 		user.setType(1);
-		if ("subAdmin".equals(roles[0])) {
-			user.setRoles(String.format("subAdmin,%s", user.getRoles()));
+		if (ConstantManager.SUB_ADMIN_LOGIN_NAME.equals(roles[0])) {
+			user.setRoles(String.format("%s,%s", ConstantManager.SUB_ADMIN_LOGIN_NAME, user.getRoles()));
 			user.setType(2);
 		}
 		user.setUpdateTime(new Date());
 		user.setUpdateUserId(getCurUser().getId());
 		userDao.update(user);
 
-		// 授权立即生效
+		// 扩展处理
 		userExService.roleUpdate(user.getId());
-	}
-
-	@Override
-	public void syncUser(List<User> user, Integer orgId) {
-		Date date = new Date();
-		for(User entity : user){
-			entity.setPwd(getEncryptPwd(entity.getLoginName(), entity.getPwd()));
-			entity.setRegistTime(date);
-			entity.setOrgId(orgId);
-			entity.setUpdateUserId(getCurUser().getId());
-			entity.setUpdateTime(date);
-			entity.setState(1);
-			userDao.add(entity);
-		}
 	}
 
 	@Override
@@ -169,9 +125,14 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	}
 
 	@Override
+	public List<User> getList() {
+		return userDao.getList();
+	}
+	
+	@Override
 	public void frozen(Integer[] ids) {
 		for (Integer id : ids) {
-			User user = userDao.getEntity(id);
+			User user = getEntity(id);
 			if (user == null) {
 				throw new MyException("参数错误：ids");
 			}
@@ -180,10 +141,5 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 			
 			onlineUserService.out(id);
 		}
-	}
-
-	@Override
-	public List<User> getList() {
-		return userDao.getList();
 	}
 }

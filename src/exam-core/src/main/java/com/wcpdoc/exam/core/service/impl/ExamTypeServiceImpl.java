@@ -103,4 +103,9 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 		// 删除试题分类扩展
 		examTypeExService.delAndUpdate(examType);
 	}
+
+	@Override
+	public boolean hasAuth(ExamType examType, Integer userId) {
+		return examType.getCreateUserId().intValue() == userId.intValue();
+	}
 }

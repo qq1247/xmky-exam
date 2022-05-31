@@ -69,7 +69,7 @@ public class UserDaoImpl extends RBaseDaoImpl<User> implements UserDao {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<User> getList(Integer[] ids) {
-		String sql = "SELECT * FROM SYS_USER WHERE ID IN (:IDS)";
+		String sql = "SELECT * FROM SYS_USER WHERE ID IN (:IDS) AND STATE != 0";
 		Query<User> query = getCurSession().createSQLQuery(sql);
 		query.setParameterList("IDS", ids);
 		query.unwrap(NativeQuery.class).addEntity(clazz);

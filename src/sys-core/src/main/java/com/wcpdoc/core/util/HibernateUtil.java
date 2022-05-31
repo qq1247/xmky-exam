@@ -36,29 +36,4 @@ public class HibernateUtil {
 			}
 		}
 	}
-
-	/**
-	 * 格式化数据字典
-	 * 
-	 * v1.0 zhanghc 2017年7月5日下午11:57:29
-	 * 
-	 * @param list
-	 * @param dictMap {0:删除, 1:启用, 2:禁用}
-	 * @param params {"字典项", "list[i].field", "字典项", "list[i].field"... ...} void
-	 */
-	public static void formatDict(List<Map<String, Object>> list, Map<String, String> dictMap, String... params) {
-		for (Map<String, Object> map : list) {
-			for (int i = 0; i < params.length; i++) {
-				String paramIndex = params[i];
-				String paramValue = params[++i];
-				if (map.get(paramValue) == null) {
-					continue;
-				}
-				String key = map.get(paramValue).toString();
-				String indexKey = paramIndex + "_" + key;
-				String value = dictMap.get(indexKey);
-				map.put(params[i] + "Name", value);
-			}
-		}
-	}
 }

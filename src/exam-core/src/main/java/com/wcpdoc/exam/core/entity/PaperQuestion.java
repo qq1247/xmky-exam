@@ -13,6 +13,7 @@ import javax.persistence.Table;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 
 /**
  * 试卷试题实体
@@ -163,13 +164,6 @@ public class PaperQuestion {
 	public void setAiOptions(String aiOptions) {
 		this.aiOptions = aiOptions;
 	}
-	public Integer getPaperQuestionRuleId() {
-		return paperQuestionRuleId;
-	}
-
-	public void setPaperQuestionRuleId(Integer paperQuestionRuleId) {
-		this.paperQuestionRuleId = paperQuestionRuleId;
-	}
 
 	public Integer getExamId() {
 		return examId;
@@ -185,5 +179,18 @@ public class PaperQuestion {
 
 	public void setUserId(Integer userId) {
 		this.userId = userId;
+	}
+
+	public Integer[] getAiOptionArr() {
+		if (!ValidateUtil.isValid(aiOptions)) {
+			return new Integer[0];
+		}
+
+		String[] aiOptionStrArr = aiOptions.split(",");
+		Integer[] aiOptionArr = new Integer[aiOptionStrArr.length];
+		for (int i = 0; i < aiOptionStrArr.length; i++) {
+			aiOptionArr[i] = Integer.parseInt(aiOptionStrArr[i]);
+		}
+		return aiOptionArr;
 	}
 }

@@ -12,7 +12,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
- * 组织机构实体
+ * 机构实体
  * 
  * v1.0 zhanghc 2016-5-8上午11:00:00
  */

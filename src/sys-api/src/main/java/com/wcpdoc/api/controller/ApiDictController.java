@@ -60,7 +60,7 @@ public class ApiDictController extends BaseController {
 	@ResponseBody
 	public PageResult add(Dict dict) {
 		try {
-			dictService.addAndUpdate(dict);
+			dictService.add(dict);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加数据字典错误：{}", e.getMessage());
@@ -83,7 +83,12 @@ public class ApiDictController extends BaseController {
 	@ResponseBody
 	public PageResult edit(Dict dict) {
 		try {
-			dictService.updateAndUpdate(dict);
+			Dict entity = dictService.getEntity(dict.getId());
+			entity.setDictIndex(dict.getDictIndex());
+			entity.setDictKey(dict.getDictKey());
+			entity.setDictValue(dict.getDictValue());
+			entity.setNo(dict.getNo());
+			dictService.update(entity);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改数据字典错误：{}", e.getMessage());
@@ -106,7 +111,7 @@ public class ApiDictController extends BaseController {
 	@ResponseBody
 	public PageResult del(Integer id) {
 		try {
-			dictService.delAndUpdate(id);
+			dictService.del(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("删除数据字典错误：{}", e.getMessage());

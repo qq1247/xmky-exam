@@ -2,13 +2,13 @@ package com.wcpdoc.exam.core.service;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.PaperRemark;
 import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.entity.ex.MyPaper;
 
 /**
  * 试卷服务层接口
@@ -110,34 +110,6 @@ public interface PaperService extends BaseService<Paper> {
 	void questionMove(Integer id, Integer sourceId, Integer targetId);
 	
 	/**
-	 * 获取试题列表（固定试卷）
-	 * 
-	 * v1.0 zhanghc 2017年6月19日下午4:53:21
-	 * @param id
-	 * @return List<Question>
-	 */
-	List<Question> getQuestionList(Integer id);
-	
-	/**
-	 * 获取试题列表（随机试卷）
-	 * 
-	 * v1.0 zhanghc 2022年3月31日上午11:17:58
-	 * @param id
-	 * @param examId
-	 * @return List<Question>
-	 */
-	List<Question> getQuestionList(Integer id, Integer examId);
-	
-	/**
-	 * 获取试题列表
-	 * 
-	 * v1.0 zhanghc 2017年6月19日下午4:53:21
-	 * @param id
-	 * @return List<PaperQuestion>
-	 */
-	List<PaperQuestion> getPaperQuestionList(Integer id);
-	
-	/**
 	 * 完成添加试题
 	 * 
 	 * v1.0 zhanghc 2017年5月27日下午3:32:43
@@ -208,17 +180,6 @@ public interface PaperService extends BaseService<Paper> {
 	void move(Integer sourceId, Integer targetId);
 	
 	/**
-	 * 试卷试题列表
-	 * 
-	 * v1.0 chenyun 2021年8月20日上午9:38:23
-	 * @param id
-	 * @param examId
-	 * @param userId
-	 * @return List<Map<String,Object>>
-	 */
-	List<Map<String, Object>> paperQuestionList(Integer id, Integer examId, Integer userId);
-	
-	/**
 	 * 发布
 	 * 
 	 * v1.0 chenyun 2021年8月23日上午11:06:26
@@ -235,4 +196,50 @@ public interface PaperService extends BaseService<Paper> {
 	 */
 	void totalScoreUpdate(Integer id);
 
+	/**
+	 * 反作弊
+	 * 
+	 * v1.0 zhanghc 2022年5月18日上午10:45:21
+	 * @param id
+	 * @param options 1：试题乱序；2：选项乱序；3：禁用右键；4：禁止复制；5：最小化警告
+	 * @return PageResult
+	 */
+	void sxe(Integer id, Integer[] options);
+	
+	/**
+	 * 获取我的试卷
+	 * 
+	 * v1.0 zhanghc 2022年5月20日下午3:04:01
+	 * @return MyPaper
+	 */
+	MyPaper getMyPaper(Integer id);
+	
+	/**
+	 * 获取我的试卷
+	 * 
+	 * v1.0 zhanghc 2022年5月20日下午3:06:04
+	 * @param examId
+	 * @param userId
+	 * @return MyPaper
+	 */
+	MyPaper getMyPaper(Integer examId, Integer userId);
+
+	/**
+	 * 获取试题列表
+	 * 
+	 * v1.0 zhanghc 2022年5月24日下午4:25:06
+	 * @param id
+	 * @return List<Question>
+	 */
+	List<Question> getQuestionList(Integer id);
+
+	/**
+	 * 获取试题列表
+	 * 
+	 * v1.0 zhanghc 2022年5月24日下午4:25:35
+	 * @param examId
+	 * @param userId
+	 * @return List<Question>
+	 */
+	List<Question> getQuestionList(Integer examId, Integer userId);
 }

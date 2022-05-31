@@ -30,10 +30,10 @@
 			<version>27.0-jre</version>
 		</dependency>
 
-		<!-- 集成系统基础 -->
+		<!-- 集成系统核心 -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>sys-base</artifactId>
+			<artifactId>sys-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

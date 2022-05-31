@@ -52,16 +52,16 @@ public interface ExamService extends BaseService<Exam>{
 	 * @return PageOut
 	 */
 	List<Map<String, Object>> getExamUserList(Integer id);
-
+	
 	/**
-	 * 分配试卷
+	 * 获取考试用户列表
 	 * 
-	 * v1.0 zhanghc 2017年6月19日下午3:10:24
+	 * v1.0 zhanghc 2021年6月25日下午2:49:33
 	 * @param id
-	 * @param userIds
-	 * void
+	 * @param markUserId
+	 * @return List<Map<String,Object>>
 	 */
-	void assignPaper(Integer id, String[] examUserIds, Integer[] markUserIds);
+	List<Map<String, Object>> getExamUserList(Integer id, Integer markUserId);
 
 	/**
 	 * 获取考试列表
@@ -79,34 +79,6 @@ public interface ExamService extends BaseService<Exam>{
 	 * @return List<Exam>
 	 */
 	List<Exam> getList();
-	
-	/**
-	 * 获取阅卷考试用户列表
-	 * 
-	 * v1.0 zhanghc 2021年6月25日下午2:49:33
-	 * @param id
-	 * @param markUserId
-	 * @return List<Map<String,Object>>
-	 */
-	List<Map<String, Object>> getMarkExamUserList(Integer id, Integer markUserId);
-
-	/**
-	 * 获取阅卷试题列表
-	 * 
-	 * v1.0 zhanghc 2021年6月25日下午2:50:02
-	 * @param id
-	 * @param markUserId
-	 * @return List<Map<String,Object>>
-	 */
-	List<Map<String, Object>> getMarkQuestionList(Integer id, Integer markUserId);
-
-	/**
-	 * 获取未阅卷的考试列表
-	 * 
-	 * v1.0 zhanghc 2022年2月24日上午11:43:34
-	 * @return List<Exam>
-	 */
-	List<Exam> getUnMarkList(); 
 	
 	/**
 	 * 考试邮件通知
@@ -128,4 +100,15 @@ public interface ExamService extends BaseService<Exam>{
 	 * @return PageResult
 	 */
 	void timeUpdate(Integer id, Integer timeType, Integer minute);
+
+	/**
+	 * 添加用户
+	 * 
+	 * v1.0 zhanghc 2017年6月19日下午3:10:24
+	 * @param id
+	 * @param examUserIds 考试用户IDS
+	 * @param markUserIds 阅卷用户IDS
+	 * void
+	 */
+	void userAdd(Integer id, String[] examUserIds, Integer[] markUserIds);
 }

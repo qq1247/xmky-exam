@@ -1,10 +1,7 @@
 package com.wcpdoc.exam.core.service;
 
 import java.util.List;
-import java.util.Map;
 
-import com.wcpdoc.core.entity.PageIn;
-import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.MyExam;
 /**
@@ -13,16 +10,6 @@ import com.wcpdoc.exam.core.entity.MyExam;
  * v1.0 zhanghc 2017-06-19 16:28:29
  */
 public interface MyExamService extends BaseService<MyExam>{
-
-	/**
-	 * 删除实体
-	 * 
-	 * v1.0 zhanghc 2017年6月26日下午2:09:55
-	 * @param examId
-	 * @param id
-	 * void
-	 */
-	void del(Integer examId, Integer id);
 
 	/**
 	 * 获取我的考试列表
@@ -42,23 +29,6 @@ public interface MyExamService extends BaseService<MyExam>{
 	 * @return MyExam
 	 */
 	MyExam getEntity(Integer examId, Integer userId);
-
-	/**
-	 * 考试时间表
-	 * 
-	 * v1.0 chenyun 2021年3月23日上午11:05:51
-	 * @return List<Map<String, Object>>
-	 */
-	List<Map<String, Object>> kalendar(Integer year, Integer month);
-	
-	/**
-	 * 成绩排名
-	 * 
-	 * v1.0 chenyun 2021年3月23日下午3:14:01
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	PageOut getRankingPage(PageIn pageIn);
 	
 	/**
 	 * 更新答案
@@ -89,13 +59,22 @@ public interface MyExamService extends BaseService<MyExam>{
 	 * void
 	 */
 	void finish(Integer examId, Integer userId);
+	
+	/**
+	 * 完成阅卷
+	 * 
+	 * v1.0 zhanghc 2020年10月13日下午1:13:52
+	 * @param examId
+	 * void
+	 */
+	void doExam(Integer examId);
 
 	/**
-	 * 获取用户列表
+	 * 完成阅卷
 	 * 
-	 * v1.0 zhanghc 2021年10月28日下午1:56:08
+	 * v1.0 zhanghc 2020年10月13日下午1:13:52
 	 * @param examId
-	 * @return List<Map<String,Object>>
+	 * void
 	 */
-	List<Map<String, Object>> getUserList(Integer examId);
+	void doMark(Integer examId);
 }

@@ -15,8 +15,8 @@ import com.wcpdoc.core.util.SqlUtil.Order;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.PaperDao;
 import com.wcpdoc.exam.core.entity.Paper;
-import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.entity.QuestionOption;
 
 /**
  * 试卷数据访问层实现
@@ -43,37 +43,60 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && "0".equals(pageIn.get("state")), "PAPER.STATE IN (1,2)")
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "PAPER.STATE = :STATE", pageIn.get("state"))
 				.addOrder("PAPER.UPDATE_TIME", Order.DESC);
-		PageOut pageOut = getListpage(sqlUtil, pageIn);
-		return pageOut;
+		return getListpage(sqlUtil, pageIn);
+	}
+
+	@Override
+	public List<Paper> getList(Integer paperTypeId) {
+		String sql = "SELECT * FROM EXM_PAPER WHERE STATE != 0 AND PAPER_TYPE_ID = :PAPER_TYPE_ID";
+		return getList(sql, new Object[] { paperTypeId }, Paper.class);
 	}
 
 	@Override
 	public List<Question> getQuestionList(Integer id) {
 		String sql = "SELECT QUESTION.* "
 				+ "FROM EXM_QUESTION QUESTION "
-				+ "WHERE EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = :PAPER_ID AND Z.TYPE = 2 AND Z.QUESTION_ID = QUESTION.ID)";// AND QUESTION.STATE = 1 如果删除试题，试卷关联的试题也能看
+				+ "WHERE EXISTS (SELECT 1 "
+				+ "				FROM EXM_PAPER_QUESTION Z "
+				+ "				WHERE Z.PAPER_ID = :PAPER_ID "
+				+ "					AND Z.QUESTION_ID = QUESTION.ID)";// AND QUESTION.STATE = 1 如果删除试题，试卷关联的试题也能看
 		return getList(sql, new Object[] { id }, Question.class);
 	}
 	
 	@Override
-	public List<Question> getQuestionList(Integer id, Integer examId) {
+	public List<Question> getQuestionList(Integer examId, Integer userId) {
 		String sql = "SELECT QUESTION.* "
 				+ "FROM EXM_QUESTION QUESTION "
-				+ "WHERE EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.EXAM_ID = :EXAM_ID AND Z.PAPER_ID = :PAPER_ID AND Z.TYPE = 3 AND Z.QUESTION_ID = QUESTION.ID)";// AND QUESTION.STATE = 1 如果删除试题，试卷关联的试题也能看
-		return getList(sql, new Object[] { examId, id }, Question.class);
+				+ "WHERE EXISTS (SELECT 1 "
+				+ "				FROM EXM_PAPER_QUESTION Z "
+				+ "				WHERE Z.EXAM_ID = :EXAM_ID "
+				+ "					AND Z.USER_ID = :USER_ID "
+				+ "					AND Z.QUESTION_ID = QUESTION.ID)";// AND QUESTION.STATE = 1 如果删除试题，试卷关联的试题也能看
+		return getList(sql, new Object[] { examId, userId }, Question.class);
 	}
 
 	@Override
-	public List<PaperQuestion> getPaperQuestionList(Integer id) {
-		String sql = "SELECT PAPER_QUESTION.* "
-				+ "FROM EXM_PAPER_QUESTION PAPER_QUESTION "
-				+ "WHERE PAPER_QUESTION.PAPER_ID = :PAPER_ID AND PAPER_QUESTION.TYPE = 2";
-		return getList(sql, new Object[]{id}, PaperQuestion.class);
+	public List<QuestionOption> getQuestionOptionList(Integer id) {
+		String sql = "SELECT QUESTION_OPTION.* "
+				+ "FROM EXM_QUESTION_OPTION QUESTION_OPTION "
+				+ "WHERE EXISTS (SELECT 1 "
+				+ "				FROM EXM_PAPER_QUESTION Z "
+				+ "				WHERE Z.PAPER_ID = :PAPER_ID "
+				+ "					AND Z.QUESTION_ID = QUESTION_OPTION.QUESTION_ID)"
+				+ "ORDER BY QUESTION_OPTION.NO ASC";
+		return getList(sql, new Object[] { id }, QuestionOption.class);
 	}
-	
+
 	@Override
-	public List<Paper> getList(Integer paperTypeId) {
-		String sql = "SELECT * FROM EXM_PAPER WHERE STATE != 0 AND PAPER_TYPE_ID = :PAPER_TYPE_ID";
-		return getList(sql, new Object[] { paperTypeId }, Paper.class);
+	public List<QuestionOption> getQuestionOptionList(Integer examId, Integer userId) {
+		String sql = "SELECT QUESTION_OPTION.* "
+				+ "FROM EXM_QUESTION_OPTION QUESTION_OPTION "
+				+ "WHERE EXISTS (SELECT 1 "
+				+ "				FROM EXM_PAPER_QUESTION Z "
+				+ "				WHERE Z.EXAM_ID = :EXAM_ID "
+				+ "					AND Z.USER_ID = :USER_ID "
+				+ "					AND Z.QUESTION_ID = QUESTION_OPTION.QUESTION_ID)"
+				+ "ORDER BY QUESTION_OPTION.NO ASC";
+		return getList(sql, new Object[] { examId, userId }, QuestionOption.class);
 	}
 }

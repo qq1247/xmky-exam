@@ -26,7 +26,7 @@ import com.wcpdoc.file.entity.FileEx;
 import com.wcpdoc.file.service.FileService;
 
 /**
- * 组织机构扩展服务层实现
+ * 机构扩展服务层实现
  * 
  * v1.0 zhanghc 2016-5-8上午11:00:00
  */
@@ -45,11 +45,6 @@ public class OrgExServiceImpl extends BaseServiceImp<Object> implements OrgExSer
 		if (ValidateUtil.isValid(userList)) {
 			throw new MyException("该机构下有用户，不允许删除");
 		}
-	}
-
-	@Override
-	public void addAndUpdate(Org org, String phone, String pwd) {
-		
 	}
 
 	@Override

@@ -89,10 +89,19 @@ public interface QuestionService extends BaseService<Question>{
 	void publish(Integer questionType, Integer[] ids) throws Exception;
 	
 	/**
-	 * 物理删除试题
+	 * 获取试题列表（已删除）
 	 * 
 	 * v1.0 chenyun 2022年4月22日上午11:22:25
 	 * @return List<Integer>
 	 */
-	List<Question> delQuestionList();
+	List<Question> getListByDel();
+
+	/**
+	 * 获取试题列表
+	 * 
+	 * v1.0 zhanghc 2022年5月23日下午1:39:14
+	 * @param questionTypeId
+	 * @return List<Question>
+	 */
+	List<Question> getList(Integer questionTypeId);
 }

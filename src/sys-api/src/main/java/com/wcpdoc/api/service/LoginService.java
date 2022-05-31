@@ -1,8 +1,8 @@
-package com.wcpdoc.base.service;
+package com.wcpdoc.api.service;
 
 import javax.security.auth.login.LoginException;
 
-import com.wcpdoc.base.entity.UserToken;
+import com.wcpdoc.api.entity.UserToken;
 import com.wcpdoc.core.service.BaseService;
 /**
  * 登陆服务层接口

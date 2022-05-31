@@ -9,9 +9,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import com.wcpdoc.core.exception.MyException;
-import com.wcpdoc.core.util.ValidateUtil;
-
 /**
  * 试题答案实体
  * 
@@ -30,54 +27,76 @@ public class QuestionAnswer {
 	private BigDecimal score;
 	@Column(name = "QUESTION_ID")
 	private Integer questionId;
+	@Column(name = "QUESTION_TYPE")
+	private Integer questionType;
+	@Column(name = "QUESTION_AI")
+	private Integer questionAi;
 	@Column(name = "NO")
 	private Integer no;
-	
+
 	public Integer getId() {
 		return id;
 	}
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
+
 	public String getAnswer() {
 		return answer;
 	}
+
 	public void setAnswer(String answer) {
 		this.answer = answer;
 	}
+
 	public BigDecimal getScore() {
 		return score;
 	}
+
 	public void setScore(BigDecimal score) {
 		this.score = score;
 	}
+
 	public Integer getQuestionId() {
 		return questionId;
 	}
+
 	public void setQuestionId(Integer questionId) {
 		this.questionId = questionId;
 	}
+
 	public Integer getNo() {
 		return no;
 	}
+
 	public void setNo(Integer no) {
 		this.no = no;
 	}
-	
-	public String[] getAnswers(Integer type, Integer ai, String answer) {
-		if (!ValidateUtil.isValid(answer)) {
-			return new String[0];
-		}
 
-		if (type == 1 || type == 4 || (ai == 2 && type == 5)) {
-			return new String[] { answer };
-		}
-		if (type == 2) {
-			return answer.split(",");
-		}
-		if (type == 3 || (ai == 1 && type == 5)) {
+	public Integer getQuestionType() {
+		return questionType;
+	}
+
+	public void setQuestionType(Integer questionType) {
+		this.questionType = questionType;
+	}
+
+	public Integer getQuestionAi() {
+		return questionAi;
+	}
+
+	public void setQuestionAi(Integer questionAi) {
+		this.questionAi = questionAi;
+	}
+	
+	public Object getAnswerArr() {
+		if (questionType == 3 || (questionType == 5 && questionAi == 1)) {
 			return answer.split("\n");
 		}
-		throw new MyException("解析错误");
+		if (questionType == 2) {
+			return answer.split(",");
+		}
+		return new String[] { answer };
 	}
 }

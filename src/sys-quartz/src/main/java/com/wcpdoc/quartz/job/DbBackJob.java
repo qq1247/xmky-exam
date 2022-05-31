@@ -31,7 +31,6 @@ import com.wcpdoc.quartz.service.CronExService;
  */
 public class DbBackJob implements Job {
 	private static final Logger log = LoggerFactory.getLogger(DbBackJob.class);
-	private static final String DB_BAK_DIR = SpringUtil.getBean(CronExService.class).getDbBakDir();//SpringUtil.getBean(Environment.class).getProperty("db.bak.dir");
 	private static final String DB_URL = SpringUtil.getBean(Environment.class).getProperty("spring.datasource.url");
 	private static final String DB_USERNAME = SpringUtil.getBean(Environment.class).getProperty("spring.datasource.username");
 	private static final String DB_PASSWORD = SpringUtil.getBean(Environment.class).getProperty("spring.datasource.password");
@@ -40,10 +39,7 @@ public class DbBackJob implements Job {
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		// 备份数据库
 		log.info("数据库备份开始：");
-		File dbBakDir = new File(DB_BAK_DIR);
-		if (!dbBakDir.isAbsolute()) {
-			dbBakDir = new File(String.format("%s%s%s", System.getProperty("user.dir"), File.separator, DB_BAK_DIR));// 如果是相对路径，备份路径为当前war包启动路径+配置文件子目录
-		}
+		File dbBakDir = new File(SpringUtil.getBean(CronExService.class).getDbBakDir());
 		dbBakDir.mkdirs();
 		log.info("数据库备份目录：{}", dbBakDir.getAbsolutePath());
 

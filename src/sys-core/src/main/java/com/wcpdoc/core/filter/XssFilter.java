@@ -37,22 +37,25 @@ public class XssFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
  		HttpServletRequest httpServletRequest = (HttpServletRequest) request;
- 		if (!(httpServletRequest.getRequestURI().equals("/api/question/add") || httpServletRequest.getRequestURI().equals("/api/question/edit")
- 		  || httpServletRequest.getRequestURI().equals("/api/bulletin/add") || httpServletRequest.getRequestURI().equals("/api/bulletin/edit")
- 		 || httpServletRequest.getRequestURI().equals("/api/paper/chapterAdd") || httpServletRequest.getRequestURI().equals("/api/paper/chapterEdit")
- 		 ) && httpServletRequest.getRequestURI().startsWith("/api/") ) {
- 			if (log.isDebugEnabled()) {
- 				log.debug("Xss过滤前：【{}】【{}】", httpServletRequest.getRequestURI(), JSONObject.toJSONString(httpServletRequest.getParameterMap()));
- 			}
- 			XssHttpServletRequestWrapper xssHttpServletRequestWrapper = new XssHttpServletRequestWrapper(httpServletRequest);
- 			chain.doFilter(xssHttpServletRequestWrapper, response);
- 			if (log.isDebugEnabled()) {
- 				log.debug("Xss过滤后：【{}】【{}】", xssHttpServletRequestWrapper.getRequestURI(), JSONObject.toJSONString(xssHttpServletRequestWrapper.getParameterMap()));
- 			}
+ 		if (httpServletRequest.getRequestURI().equals("/api/question/add") 
+ 				|| httpServletRequest.getRequestURI().equals("/api/question/edit")
+ 				|| httpServletRequest.getRequestURI().equals("/api/bulletin/add") 
+ 				|| httpServletRequest.getRequestURI().equals("/api/bulletin/edit")
+ 				|| httpServletRequest.getRequestURI().equals("/api/paper/chapterAdd") 
+ 				|| httpServletRequest.getRequestURI().equals("/api/paper/chapterEdit")
+ 				|| httpServletRequest.getRequestURI().startsWith("/doc")) {
+ 			chain.doFilter(httpServletRequest, response);
  			return;
  		}
  		
- 		chain.doFilter(httpServletRequest, response);
+		if (log.isDebugEnabled()) {
+			log.debug("Xss过滤前：【{}】【{}】", httpServletRequest.getRequestURI(), JSONObject.toJSONString(httpServletRequest.getParameterMap()));
+		}
+		XssHttpServletRequestWrapper xssHttpServletRequestWrapper = new XssHttpServletRequestWrapper(httpServletRequest);
+		chain.doFilter(xssHttpServletRequestWrapper, response);
+		if (log.isDebugEnabled()) {
+			log.debug("Xss过滤后：【{}】【{}】", xssHttpServletRequestWrapper.getRequestURI(), JSONObject.toJSONString(xssHttpServletRequestWrapper.getParameterMap()));
+		}
 	}
 	
 	@Override

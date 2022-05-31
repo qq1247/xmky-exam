@@ -1,22 +1,28 @@
-package com.wcpdoc.base.service.impl;
+package com.wcpdoc.api.service.impl;
 
 import java.util.Date;
 
 import javax.annotation.Resource;
 import javax.security.auth.login.LoginException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.api.entity.UserToken;
+import com.wcpdoc.api.service.LoginService;
+import com.wcpdoc.auth.cache.TokenCache;
+import com.wcpdoc.auth.util.JwtUtil;
 import com.wcpdoc.base.entity.User;
-import com.wcpdoc.base.entity.UserToken;
-import com.wcpdoc.base.service.LoginService;
-import com.wcpdoc.base.service.ParmService;
 import com.wcpdoc.base.service.UserExService;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.entity.LoginUser;
+import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.OnlineUserService;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
+import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 
 /**
@@ -26,14 +32,19 @@ import com.wcpdoc.core.util.ValidateUtil;
  */
 @Service
 public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginService {
+	private static final Logger log = LoggerFactory.getLogger(LoginServiceImpl.class);
+	
 	@Resource
 	private UserService userService;
 	@Resource
 	private UserExService userExService;
 	@Resource
 	private OnlineUserService onlineUserService;
-	@Resource
-	private ParmService parmService;
+	
+	@Value("${spring.profiles.active}")
+	private String active;
+	@Value("${token.expireMinute}")
+	private Integer tokenExpireMinute;
 	
 	@Override
 	public void setDao(BaseDao<Object> dao) {
@@ -55,9 +66,21 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 			throw new LoginException("用户名或密码错误");
 		}
 		
-		// 生成令牌信息（登陆由shiro接收令牌控制）
-		String accessToken = userExService.generateToken(user);
-		userExService.refreshToken(user, accessToken);
+		// 生成令牌（登陆由shiro接收令牌控制）
+		Date curTime = new Date();
+		Long tokenId = curTime.getTime();
+		Date expTime = DateUtil.getNextMinute(new Date(), tokenExpireMinute);
+		String accessToken = JwtUtil.getInstance()
+				.createToken(tokenId.toString(), active, expTime)
+				.addAttr("userId", user.getId())
+				.addAttr("loginName", user.getLoginName())
+				.build();
+		if (log.isDebugEnabled()) {
+			log.debug("shiro权限：用户【{}】登陆，旧令牌创建时间【{}】，当前令牌创建时间【{}】", 
+					user.getLoginName(), null, DateUtil.formatDateTime(new Date(tokenId)));
+		}
+		
+		TokenCache.put(user.getId(), accessToken);// 缓存刷新令牌（用于续租登陆）
 		
 		//更新用户登录时间
 		user.setLastLoginTime(new Date());
@@ -86,6 +109,21 @@ public class LoginServiceImpl extends BaseServiceImp<Object> implements LoginSer
 	
 	@Override
 	public void pwdUpdate(String oldPwd, String newPwd) {
-		userService.pwdUpdate(oldPwd, newPwd);
+		// 校验数据有效性
+		if (!ValidateUtil.isValid(oldPwd)) {
+			throw new MyException("参数错误：oldPwd");
+		}
+		if (!ValidateUtil.isValid(newPwd)) {
+			throw new MyException("参数错误：newPwd");
+		}
+		User user = userService.getEntity(getCurUser().getId());
+		String oldEncryptPwd = userService.getEncryptPwd(user.getLoginName(), oldPwd);
+		if (!user.getPwd().equals(oldEncryptPwd)) {
+			throw new MyException("原始密码错误");
+		}
+
+		// 修改密码
+		user.setPwd(userService.getEncryptPwd(user.getLoginName(), newPwd));
+		userService.update(user);
 	}
 }

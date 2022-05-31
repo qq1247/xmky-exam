@@ -59,13 +59,13 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 	
 	@Override
 	public List<Exam> getList(Integer examTypeId) {
-		String sql = "SELECT * FROM EXM_EXAM WHERE STATE !=0 AND EXAM_TYPE_ID = :EXAM_TYPE_ID";
+		String sql = "SELECT * FROM EXM_EXAM WHERE STATE != 0 AND EXAM_TYPE_ID = :EXAM_TYPE_ID";
 		return getList(sql, new Object[]{examTypeId}, Exam.class);
 	}
 	
 	@Override
 	public List<Exam> getList() {
-		String sql = "SELECT * FROM EXM_EXAM WHERE STATE !=0 ";
+		String sql = "SELECT * FROM EXM_EXAM WHERE STATE != 0";
 		return getList(sql, new Object[]{}, Exam.class);
 	}
 	
@@ -74,33 +74,25 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 		String sql = "SELECT USER.ID, USER.NAME AS NAME, ORG.NAME AS ORG_NAME "
 				+ "FROM SYS_USER USER "
 				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
-				+ "WHERE EXISTS (SELECT 1 FROM EXM_MY_EXAM Z WHERE Z.EXAM_ID = :ID AND USER.ID = Z.USER_ID) "
+				+ "WHERE EXISTS (SELECT 1 "
+				+ "				FROM EXM_MY_EXAM Z "
+				+ "				WHERE Z.EXAM_ID = :EXAM_ID "
+				+ "				AND USER.ID = Z.USER_ID) "
 				+ "ORDER BY USER.UPDATE_TIME DESC ";//USER.STATE = 1 用户被删除也应该显示
-		return getMapList(sql, new Object[]{id});
+		return getMapList(sql, new Object[] { id });
 	}
 
 	@Override
-	public List<Map<String, Object>> getMarkExamUserList(Integer id, Integer markUserId) {
+	public List<Map<String, Object>> getExamUserList(Integer id, Integer markUserId) {
 		String sql = "SELECT USER.ID, USER.NAME AS NAME, ORG.NAME AS ORG_NAME "
 				+ "FROM SYS_USER USER "
 				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
-				+ "WHERE EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.EXAM_ID = :EXAM_ID AND Z.MARK_USER_ID = :MARK_USER_ID AND Z.EXAM_USER_IDS LIKE CONCAT( '%,' , USER.ID , ',%' )) "//回显的情况下，用户状态!=1的也查询
+				+ "WHERE EXISTS (SELECT 1 "
+				+ "				FROM EXM_MY_MARK Z "
+				+ "				WHERE Z.EXAM_ID = :EXAM_ID "
+				+ "					AND Z.MARK_USER_ID = :MARK_USER_ID "
+				+ "					AND Z.EXAM_USER_IDS LIKE CONCAT( '%,' , USER.ID , ',%' )) "//回显的情况下，用户状态!=1的也查询
 				+ "ORDER BY USER.UPDATE_TIME DESC ";
 		return getMapList(sql, new Object[]{id, markUserId});
-	}
-
-	@Override
-	public List<Map<String, Object>> getMarkQuestionList(Integer id, Integer markUserId) {
-		String sql = "SELECT QUESTION.ID, QUESTION.TITLE "
-				+ "FROM EXM_QUESTION QUESTION "
-				+ "WHERE EXISTS (SELECT 1 FROM EXM_MY_MARK Z WHERE Z.EXAM_ID = :EXAM_ID AND Z.MARK_USER_ID = :MARK_USER_ID AND Z.QUESTION_IDS LIKE CONCAT( '%,' , QUESTION.ID , ',%' )) "//回显的情况下，试题状态!=1的也查询
-				+ "ORDER BY QUESTION.UPDATE_TIME DESC ";
-		return getMapList(sql, new Object[]{id, markUserId});
-	}
-
-	@Override
-	public List<Exam> getUnMarkList() {
-		String sql = "SELECT * FROM EXM_EXAM WHERE STATE = 1 AND MARK_STATE IN (1,2)";
-		return getList(sql);
 	}
 }

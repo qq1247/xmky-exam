@@ -1,8 +1,5 @@
 package com.wcpdoc.base.service.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -32,51 +29,7 @@ public class DictServiceImpl extends BaseServiceImp<Dict> implements DictService
 	}
 
 	@Override
-	public List<Dict> getList() {
-		return dictDao.getList();
-	}
-
-	@Override
-	public void addAndUpdate(Dict dict) {
-		// 添加数据字典
-		add(dict);
-	}
-
-	@Override
-	public void updateAndUpdate(Dict dict) {
-		// 修改数据字典
-		Dict entity = getEntity(dict.getId());
-		entity.setDictIndex(dict.getDictIndex());
-		entity.setDictKey(dict.getDictKey());
-		entity.setDictValue(dict.getDictValue());
-		entity.setNo(dict.getNo());
-		update(entity);
-	}
-
-	@Override
-	public void delAndUpdate(Integer id) {
-		// 删除数据字典
-		del(id);
-	}
-
-	@Override
 	public List<Dict> getList(String index) {
-		List<Dict> dictList = dictDao.getList();
-		List<Dict> targetDictList = new ArrayList<>();
-		for (Dict dict : dictList) {
-			if (!dict.getDictIndex().equals(index)) {
-				continue;
-			}
-			targetDictList.add(dict);
-		}
-		
-		Collections.sort(targetDictList, new Comparator<Dict>() {
-			@Override
-			public int compare(Dict o1, Dict o2) {
-				return o1.getNo() - o2.getNo();
-			}
-			
-		});
-		return targetDictList;
+		return dictDao.getListByIndex(index);
 	}
 }

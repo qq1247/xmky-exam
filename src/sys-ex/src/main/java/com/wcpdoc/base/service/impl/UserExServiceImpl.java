@@ -7,16 +7,11 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.read.listener.PageReadListener;
-import com.wcpdoc.auth.cache.TokenCache;
 import com.wcpdoc.auth.realm.JWTRealm;
-import com.wcpdoc.auth.util.JwtUtil;
 import com.wcpdoc.base.entity.Org;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.entity.UserRowData;
@@ -26,7 +21,6 @@ import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
-import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.file.entity.FileEx;
 import com.wcpdoc.file.service.FileService;
@@ -38,12 +32,6 @@ import com.wcpdoc.file.service.FileService;
  */
 @Service
 public class UserExServiceImpl extends BaseServiceImp<Object> implements UserExService {
-	private static final Logger log = LoggerFactory.getLogger(UserExServiceImpl.class);
-	@Value("${spring.profiles.active}")
-	private String active;
-	@Value("${token.expireMinute}")
-	private Integer tokenExpireMinute;
-
 	@Resource
 	private JWTRealm jwtRealm;
 	@Resource
@@ -55,30 +43,7 @@ public class UserExServiceImpl extends BaseServiceImp<Object> implements UserExS
 
 	@Override
 	public void roleUpdate(Integer userId) {
-		jwtRealm.clearAuth(userId);// 重新授权
-	}
-
-	@Override
-	public String generateToken(User user) {
-		Date curTime = new Date();
-		Long tokenId = curTime.getTime();
-		Date expTime = DateUtil.getNextMinute(new Date(), tokenExpireMinute);
-		String token = JwtUtil.getInstance()
-				.createToken(tokenId.toString(), active, expTime)
-				.addAttr("userId", user.getId())
-				.addAttr("loginName", user.getLoginName())
-				.build();
-		if (log.isDebugEnabled()) {
-			log.debug("shiro权限：用户【{}】登陆，旧令牌创建时间【{}】，当前令牌创建时间【{}】", 
-					user.getLoginName(), null, DateUtil.formatDateTime(new Date(tokenId)));
-		}
-		
-		return token;
-	}
-
-	@Override
-	public void refreshToken(User user, String token) {
-		TokenCache.put(user.getId(), token);// 缓存刷新令牌（用于续租登陆）
+		jwtRealm.clearAuth(userId);// 清除授权
 	}
 
 	/**

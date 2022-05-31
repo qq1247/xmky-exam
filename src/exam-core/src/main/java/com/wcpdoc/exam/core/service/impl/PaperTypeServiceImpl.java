@@ -23,7 +23,7 @@ import com.wcpdoc.file.service.FileService;
  * v1.0 zhanghc 2017-05-25 16:34:59
  */
 @Service
-public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements PaperTypeService{
+public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements PaperTypeService {
 	@Resource
 	private PaperTypeDao paperTypeDao;
 	@Resource

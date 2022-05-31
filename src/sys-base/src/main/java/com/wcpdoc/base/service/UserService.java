@@ -23,7 +23,7 @@ public interface UserService extends BaseService<User> {
 	User getUser(String loginName);
 
 	/**
-	 * 完成修改密码
+	 * 修改密码
 	 * 
 	 * v1.0 zhanghc 2017年7月14日下午3:09:25
 	 * 
@@ -31,19 +31,16 @@ public interface UserService extends BaseService<User> {
 	 * @param newPwd
 	 * String
 	 */
-	String doPwdUpdate(Integer id);
-
+	String pwdUpdate(Integer id);
+	
 	/**
-	 * 完成修改密码
+	 * 修改角色
 	 * 
-	 * v1.0 zhanghc 2017年7月14日下午4:41:55
-	 * 
+	 * v1.0 chenyun 2021年3月16日下午5:22:45
 	 * @param id
-	 * @param oldPwd
-	 * @param newPwd
-	 * void
+	 * @param roles void
 	 */
-	void pwdUpdate(String oldPwd, String newPwd);
+	void roleUpdate(Integer id, String[] roles);
 
 	/**
 	 * 获取加密后的密码
@@ -76,24 +73,6 @@ public interface UserService extends BaseService<User> {
 	List<User> getList(Integer orgId);
 
 	/**
-	 * 修改角色
-	 * 
-	 * v1.0 chenyun 2021年3月16日下午5:22:45
-	 * @param id
-	 * @param roles void
-	 */
-	void roleUpdate(Integer id, String[] roles);
-	
-	/**
-	 * 同步用户
-	 * 
-	 * v1.0 chenyun 2021年3月26日下午3:50:32
-	 * @param user
-	 * @param orgId
-	 */
-	void syncUser(List<User> user, Integer orgId);
-
-	/**
 	 * 获取用户列表
 	 * 
 	 * v1.0 zhanghc 2021年11月5日上午10:38:37
@@ -103,18 +82,18 @@ public interface UserService extends BaseService<User> {
 	List<User> getList(Integer[] ids);
 	
 	/**
-	 * 冻结账户
-	 * 
-	 * v1.0 chenyun 2022年04月21日下午18:48:00
-	 * @param ids void
-	 */
-	void frozen(Integer[] ids);
-
-	/**
 	 * 获取用户列表
 	 * 
 	 * v1.0 zhanghc 2022年5月10日下午4:54:44
 	 * @return List<User>
 	 */
 	List<User> getList();
+	
+	/**
+	 * 冻结账户
+	 * 
+	 * v1.0 chenyun 2022年04月21日下午18:48:00
+	 * @param ids void
+	 */
+	void frozen(Integer[] ids);
 }

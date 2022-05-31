@@ -26,13 +26,11 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
 		<!-- 集成模板引擎 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-freemarker</artifactId>
 		</dependency>
-
 		<!-- 集成数据库 -->
 		<dependency>
 			<groupId>mysql</groupId>
@@ -54,13 +52,11 @@
 			<artifactId>jsqlparser</artifactId>
 			<version>4.3</version>
 		</dependency>
-
 		<!-- 集成日志 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-log4j2</artifactId>
 		</dependency>
-
 		<!-- 集成apache公共组件 -->
 		<dependency>
 			<groupId>commons-codec</groupId>
@@ -100,5 +96,11 @@
 			<artifactId>fastjson</artifactId>
 			<version>1.2.62</version>
 		</dependency>
+		<!-- 集成excel解析 -->
+		<dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>easyexcel</artifactId>
+            <version>3.0.5</version>
+        </dependency>
 	</dependencies>
 </project>

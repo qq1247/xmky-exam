@@ -7,7 +7,7 @@ import com.alibaba.excel.annotation.write.style.ColumnWidth;
 import com.wcpdoc.core.util.TreeUtil.Tree;
 
 /**
- * 组织机构行数据
+ * 机构行数据
  * 
  * v1.0 chenyun 2021年3月4日下午5:25:13
  */

@@ -33,6 +33,14 @@ public class PaperQuestionAnswer {
 	private Integer paperQuestionId;
 	@Column(name = "NO")
 	private Integer no;
+	@Column(name = "EXAM_ID")
+	private Integer examId;
+	@Column(name = "USER_ID")
+	private Integer userId;
+	@Column(name = "QUESTION_TYPE")
+	private Integer questionType;
+	@Column(name = "QUESTION_AI")
+	private Integer questionAi;
 
 	public Integer getId() {
 		return id;
@@ -88,5 +96,47 @@ public class PaperQuestionAnswer {
 
 	public void setPaperId(Integer paperId) {
 		this.paperId = paperId;
+	}
+
+	public Integer getExamId() {
+		return examId;
+	}
+
+	public void setExamId(Integer examId) {
+		this.examId = examId;
+	}
+
+	public Integer getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Integer userId) {
+		this.userId = userId;
+	}
+
+	public Integer getQuestionType() {
+		return questionType;
+	}
+
+	public void setQuestionType(Integer questionType) {
+		this.questionType = questionType;
+	}
+
+	public Integer getQuestionAi() {
+		return questionAi;
+	}
+
+	public void setQuestionAi(Integer questionAi) {
+		this.questionAi = questionAi;
+	}
+
+	public Object getAnswerArr() {
+		if (questionType == 3 || (questionType == 5 && questionAi == 1)) {
+			return answer.split("\n");
+		}
+		if (questionType == 2) {
+			return answer.split(",");
+		}
+		return new String[] { answer };
 	}
 }

@@ -141,8 +141,7 @@ http请求头需添加Authorization字段，
 ### 用户列表：user/listpage
 | 请求参数     |  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
-| name | String(16) | 名称或组织架构  |   否     |
-| orgName| String(16) | 组织机构名称   |   否     |
+| name | String(16) | 名称或机构  |   否     |
 | type| Integer  | 类型|   否     |
 | curPage | Integer | 当前第几页  |   否     |
 | pageSize | Integer  | 每页多少条   |   否     |
@@ -157,8 +156,8 @@ http请求头需添加Authorization字段，
 |data.list[].name | String  | 名称 |
 |data.list[].type | Integer  | 类型 |
 |data.list[].loginName | String  | 登陆名称 |
-|data.list[].orgId | Integer  | 组织机构ID |
-|data.list[].orgName | String  | 组织机构名称 |
+|data.list[].orgId | Integer  | 机构ID |
+|data.list[].orgName | String  | 机构名称 |
 |data.list[].headFileId | Integer  | 头像ID |
 |data.list[].email | String  | 邮箱 |
 |data.list[].registTime | Date | 注册时间（admin可见） |
@@ -174,7 +173,7 @@ http请求头需添加Authorization字段，
 |loginName      | String (16)  | 登陆账号   |   是     |
 |headFileId      | Integer  | 头像ID   |   否     |
 |email      | String (64)  | 邮箱   |   否     |
-|orgId      | Integer  | 组织机构ID   |   是     |
+|orgId      | Integer  | 机构ID   |   是     |
 
 | 响应参数 |  类型   |  描述  |
 | --------   | -----   | -----  |
@@ -190,7 +189,7 @@ http请求头需添加Authorization字段，
 |loginName      | String (16)  | 登陆账号   |   是     |
 |headFileId      | Integer  | 头像ID   |   否     |
 |email      | String (64)  | 邮箱   |   否     |
-|orgId      | Integer  | 组织机构ID   |   是     |
+|orgId      | Integer  | 机构ID   |   是     |
 
 | 响应参数 |  类型   |  描述  |
 | --------   | -----   | -----  |
@@ -215,8 +214,8 @@ http请求头需添加Authorization字段，
 |data.id| Integer  | 主键 |
 |data.name     | String  | 名称 |
 |data.loginName     | String  | 登陆账号 |
-|data.orgId     | Integer  | 组织机构ID |
-|data.orgName   | String  | 组织机构名称 |
+|data.orgId     | Integer  | 机构ID |
+|data.orgName   | String  | 机构名称 |
 |data.email   | String  | 邮箱 |
 |data.headFileId   | String  | 头像ID |
 |data.roles | String[]  | 角色（admin可见） |

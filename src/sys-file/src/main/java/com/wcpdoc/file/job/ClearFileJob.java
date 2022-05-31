@@ -33,8 +33,7 @@ public class ClearFileJob implements Job {
 			log.info("清理临时附件：{}不存在", dirFile.getAbsolutePath());
 			return;
 		}
-		List<java.io.File> fileList = (List<java.io.File>) FileUtils.listFilesAndDirs(dirFile, TrueFileFilter.INSTANCE,
-				TrueFileFilter.INSTANCE);
+		List<java.io.File> fileList = (List<java.io.File>) FileUtils.listFilesAndDirs(dirFile, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
 		Date beforTime = DateUtil.getNextDay(new Date(), -7);
 
 		for (int i = 0; i < fileList.size() - 1; i++) {

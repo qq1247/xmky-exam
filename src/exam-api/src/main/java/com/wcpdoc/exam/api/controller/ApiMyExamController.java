@@ -96,10 +96,11 @@ public class ApiMyExamController extends BaseController{
 		try {
 			List<Map<String, Object>> answerList = myExamDetailService.getAnswerList(examId, getCurUser().getId());
 			for (Map<String, Object> map : answerList) {
-				map.put("answers", new QuestionAnswer().getAnswers(
-						(Integer)map.get("questionType"), 
-						(Integer)map.get("questionAi"), 
-						(String)map.remove("answer")));
+				QuestionAnswer answer = new QuestionAnswer();
+				answer.setQuestionType((Integer)map.get("questionType"));
+				answer.setQuestionAi((Integer)map.get("questionAi"));
+				answer.setAnswer((String)map.remove("answer"));
+				map.put("answers", answer.getAnswerArr());
 			}
 			
 			return PageResultEx.ok().data(answerList);
@@ -166,28 +167,6 @@ public class ApiMyExamController extends BaseController{
 			return PageResult.err();
 		} finally {
 			AutoMarkCache.releaseReadLock(examId);
-		}
-	}
-	
-	/**
-	 * 考试排行
-	 * 
-	 * v1.0 chenyun 2021年3月23日下午4:07:48
-	 * @param year
-	 * @param month
-	 * @return PageResult
-	 */
-	@RequestMapping("/rankingPage")
-	@ResponseBody
-	public PageResult rankingPage() {
-		try {
-			return PageResultEx.ok().data(myExamService.getRankingPage(new PageIn(request)));
-		} catch (MyException e) {
-			log.error("考试时间表错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("考试时间表错误：", e);
-			return PageResult.err();
 		}
 	}
 	

@@ -35,7 +35,7 @@
 			<artifactId>shiro-ehcache</artifactId>
 			<version>1.6.0</version>
 		</dependency>
-		<!-- 集成第三方授权令牌 -->
+		<!-- 集成授权令牌 -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt</artifactId>

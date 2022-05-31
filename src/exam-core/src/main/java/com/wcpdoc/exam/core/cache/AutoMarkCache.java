@@ -88,9 +88,11 @@ public class AutoMarkCache extends BaseEhCache {
 		net.sf.ehcache.Cache nativeCache = (net.sf.ehcache.Cache) cache.getNativeCache();
 		nativeCache.removeAll();
 		
-		List<Exam> examList = SpringUtil.getBean(ExamService.class).getUnMarkList();
+		List<Exam> examList = SpringUtil.getBean(ExamService.class).getList();
 		for (Exam exam : examList) {
-			cache.put(exam.getId(), exam);
+			if (exam.getState() == 1 && exam.getMarkState() < 3) {// 已发布并且（未阅卷和阅卷中）
+				cache.put(exam.getId(), exam);
+			}
 		}
 	}
 	

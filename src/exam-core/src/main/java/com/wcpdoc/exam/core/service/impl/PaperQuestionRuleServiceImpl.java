@@ -1,18 +1,14 @@
 package com.wcpdoc.exam.core.service.impl;
 
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.core.dao.BaseDao;
@@ -24,9 +20,7 @@ import com.wcpdoc.exam.core.dao.PaperQuestionRuleDao;
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.PaperQuestionRule;
-import com.wcpdoc.exam.core.entity.PaperQuestionRuleEx;
 import com.wcpdoc.exam.core.entity.PaperType;
-import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.service.PaperQuestionRuleService;
 import com.wcpdoc.exam.core.service.PaperQuestionService;
@@ -54,6 +48,8 @@ public class PaperQuestionRuleServiceImpl extends BaseServiceImp<PaperQuestionRu
 	private QuestionService questionService;
 	@Resource
 	private PaperQuestionService paperQuestionService;
+	@Resource
+	private PaperQuestionRuleService paperQuestionRuleService;
 	
 	@Override
 	@Resource(name = "paperQuestionRuleDaoImpl")
@@ -78,7 +74,7 @@ public class PaperQuestionRuleServiceImpl extends BaseServiceImp<PaperQuestionRu
 			singleResult.put("chapter", chapterMap);
 			// 章节规则
 			List<Map<String, Object>> ruleMap = new ArrayList<>();
-			List<PaperQuestionRule> paperQuestionRuleList = getChapterList(chapter.getPaperId(), chapter.getId());
+			List<PaperQuestionRule> paperQuestionRuleList = paperQuestionRuleService.getList(chapter.getId());
 			for (PaperQuestionRule paperQuestionRule : paperQuestionRuleList) {
 				Map<String, Object> paperQuestionRuleMap = new HashMap<>();
 				paperQuestionRuleMap.put("id", paperQuestionRule.getId());
@@ -191,7 +187,7 @@ public class PaperQuestionRuleServiceImpl extends BaseServiceImp<PaperQuestionRu
 		}
 		
 		//删除
-		List<PaperQuestionRule> chapterList = paperQuestionRuleDao.getChapterList(paperId, chapterId);
+		List<PaperQuestionRule> chapterList = paperQuestionRuleDao.getList(chapterId);
 		for(PaperQuestionRule paperQuestionRule : chapterList){
 			del(paperQuestionRule.getId());
 		}
@@ -218,102 +214,7 @@ public class PaperQuestionRuleServiceImpl extends BaseServiceImp<PaperQuestionRu
 	}
 	
 	@Override
-	public List<PaperQuestionRule> getChapterList(Integer paperId, Integer paperQuestionId) {
-		return paperQuestionRuleDao.getChapterList(paperId, paperQuestionId);
-	}
-
-	@Override
-	public List<Question> getQuestionList(Integer questionTypeId) {
-		return paperQuestionRuleDao.getQuestionList(questionTypeId);
-	}
-
-	@Override
-	public List<PaperQuestionRuleEx> questionListCache(Integer questionTypeId) {
-		List<Question> questionList = getQuestionList(questionTypeId);
-		Map<PaperQuestionRuleEx, Integer> ruleExNumCache = new HashMap<>();
-		for (Question question : questionList) {
-			PaperQuestionRuleEx paperQuestionRuleEx = new PaperQuestionRuleEx(question.getType(), question.getDifficulty(), question.getAi());
-			if (ruleExNumCache.get(paperQuestionRuleEx) == null) {
-				ruleExNumCache.put(paperQuestionRuleEx, 1);
-			} else {
-				ruleExNumCache.put(paperQuestionRuleEx, ruleExNumCache.get(paperQuestionRuleEx) + 1); // 
-			}
-		}
-		
-		List<PaperQuestionRuleEx> paperQuestionRuleExList = new ArrayList<>();
-		for (PaperQuestionRuleEx paperQuestionRuleEx : ruleExNumCache.keySet()) {
-			PaperQuestionRuleEx newPaperQuestionRuleEx = new PaperQuestionRuleEx(paperQuestionRuleEx.getType(), paperQuestionRuleEx.getDifficulty(), paperQuestionRuleEx.getAi());
-			try {
-				BeanUtils.copyProperties(paperQuestionRuleEx, newPaperQuestionRuleEx);
-			} catch (IllegalAccessException | InvocationTargetException e) {
-				throw new MyException(e.getMessage());
-			}
-			newPaperQuestionRuleEx.setNum(ruleExNumCache.get(paperQuestionRuleEx));
-			paperQuestionRuleExList.add(newPaperQuestionRuleEx);
-		}
-		return paperQuestionRuleExList;
-	}
-	
-	@Override
-	public void publishCheck(Paper paper){
-		Map<Integer, List<Question>> questionListCache = new HashMap<>();// 试题分类下所有的试题条件
-		List<PaperQuestionRule> paperRuleList = getChapterList(paper.getId(), null);// 随机章节规则
-		Set<Integer> questionTypeIdSet = new HashSet<>();
-		for (PaperQuestionRule rule : paperRuleList) {
-			if (questionTypeIdSet.contains(rule.getQuestionTypeId())) {
-				continue;
-			}
-			questionTypeIdSet.add(rule.getQuestionTypeId());
-			List<Question> questionList =  getQuestionList(rule.getQuestionTypeId());
-			questionListCache.put(rule.getQuestionTypeId(), questionList);
-		}
-	
-		Map<PaperQuestionRuleEx, Integer> ruleExNumCache = new HashMap<>();
-		for (Integer questionTypeId : questionListCache.keySet()) {
-			for (Question question : questionListCache.get(questionTypeId)) {
-				PaperQuestionRuleEx paperQuestionRuleEx = new PaperQuestionRuleEx(question.getType(), question.getDifficulty(), question.getAi());
-				if (ruleExNumCache.get(paperQuestionRuleEx) == null) {
-					ruleExNumCache.put(paperQuestionRuleEx, 1);
-				} else {
-					ruleExNumCache.put(paperQuestionRuleEx, ruleExNumCache.get(paperQuestionRuleEx) + 1); // 
-				}
-			}
-		}
-		
-		for (PaperQuestionRule paperRule : paperRuleList) {
-			Integer paperRuleNum = paperRule.getNum();
-			Set<PaperQuestionRuleEx> keySet = ruleExNumCache.keySet();
-			for(PaperQuestionRuleEx paperQuestionRuleEx : keySet){
-				if (paperRule.getType() == paperQuestionRuleEx.getType() 
-						&& paperRule.getDifficultys().contains(paperQuestionRuleEx.getDifficulty().toString()) 
-						&& paperRule.getAis().contains(paperQuestionRuleEx.getAi().toString()) ) { //如果包含
-					paperRuleNum = paperRuleNum - ruleExNumCache.get(paperQuestionRuleEx);
-					if (paperRuleNum <= 0) {
-						break;
-					}
-				}
-			}
-			
-			if (paperRuleNum > 0) {
-				PaperQuestion paperQuestion = paperQuestionService.getEntity(paperRule.getPaperQuestionId());
-				throw new MyException(String.format("【%s】章节下第【%s】个规则题数不足【%s】道", paperQuestion.getName(), paperRule.getNo(), paperRule.getNum()));
-			}
-			
-//			for (Integer difficulty : paperRule.getDifficultyArr()) {
-//				for (Integer ai : paperRule.getAiArr()) {
-//					PaperQuestionRuleEx paperRuleEx = new PaperQuestionRuleEx(paperRule.getType(), difficulty, ai);
-//					if (ruleExNumCache.get(paperRuleEx) == null) {
-//						PaperQuestion paperQuestion = paperQuestionService.getEntity(paperRule.getPaperQuestionId());
-//						throw new MyException(String.format("【%s】章节下第【%s】个规则题数不足%s道", paperQuestion.getName(), paperRule.getNo(), paperRule.getNum()));
-//					}
-//					
-//					Integer num = ruleExNumCache.put(paperRuleEx, ruleExNumCache.get(paperRuleEx) - paperRule.getNum());
-//					if (num < 0) {
-//						PaperQuestion paperQuestion = paperQuestionService.getEntity(paperRule.getPaperQuestionId());
-//						throw new MyException(String.format("【%s】章节下第【%s】个规则题数不足%s道", paperQuestion.getName(), paperRule.getNo(), paperRule.getNum()));
-//					}
-//				}
-//			}
-		}
+	public List<PaperQuestionRule> getList(Integer chapterId) {
+		return paperQuestionRuleDao.getList(chapterId);
 	}
 }

@@ -1,7 +1,5 @@
 package com.wcpdoc.api.controller;
 
-import java.util.Date;
-
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
@@ -16,7 +14,6 @@ import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
-import com.wcpdoc.core.util.ValidateUtil;
 /**
  * 参数控制层
  * 
@@ -31,7 +28,7 @@ public class ApiParmController extends BaseController {
 	private ParmService parmService;
 	
 	/**
-	 * 自定义logo、单位名称
+	 * 修改logo
 	 * 
 	 * v1.0 chenyun 2021-03-04 15:02:18
 	 * @return pageOut
@@ -40,7 +37,7 @@ public class ApiParmController extends BaseController {
 	@ResponseBody
 	public PageResult logo(Parm parm) {
 		try {
-			parmService.editLogo(parm);
+			parmService.logoUpdate(parm);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改参数错误：{}", e.getMessage());
@@ -52,7 +49,7 @@ public class ApiParmController extends BaseController {
 	}
 	
 	/**
-	 * 系统参数邮件
+	 * 修改邮件
 	 * 
 	 * v1.0 wjj 2021年11月8日下午1:25:33
 	 * 
@@ -63,31 +60,7 @@ public class ApiParmController extends BaseController {
 	@ResponseBody
 	public PageResult email(String host, String userName, String pwd, String protocol, String encode) {
 		try {
-			if (!ValidateUtil.isValid(host)) {
-				return PageResult.err().msg("参数错误：host");
-			}
-			if (!ValidateUtil.isValid(userName)) {
-				return PageResult.err().msg("参数错误：userName");
-			}
-			if (!ValidateUtil.isValid(pwd)) {
-				return PageResult.err().msg("参数错误：pwd");
-			}
-			if (!ValidateUtil.isValid(protocol)) {
-				return PageResult.err().msg("参数错误：protocol");
-			}
-			if (!ValidateUtil.isValid(encode)) {
-				return PageResult.err().msg("参数错误：encode");
-			}
-			
-			Parm entity = parmService.getEntity(1);
-			entity.setEmailHost(host);
-			entity.setEmailUserName(userName);
-			entity.setEmailPwd(pwd);
-			entity.setEmailProtocol(protocol);
-			entity.setEmailEncode(encode);
-			entity.setUpdateTime(new Date());
-			entity.setUpdateUserId(getCurUser().getId());
-			parmService.updateAndUpdate(entity);
+			parmService.emailUpdate(host, userName, pwd, protocol, encode);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加邮件错误：{}", e.getMessage());
@@ -99,7 +72,7 @@ public class ApiParmController extends BaseController {
 	}
 
 	/**
-	 * 系统参数上传附件目录
+	 * 修改上传目录
 	 * 
 	 * v1.0 chenyun 2021-11-12 10:34:15
 	 * 
@@ -110,7 +83,7 @@ public class ApiParmController extends BaseController {
 	@ResponseBody
 	public PageResult file(String uploadDir) {
 		try {
-			parmService.file(uploadDir);
+			parmService.fileUpdate(uploadDir);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("上传附件目录错误：{}", e.getMessage());
@@ -122,7 +95,7 @@ public class ApiParmController extends BaseController {
 	}
 
 	/**
-	 * 系统参数数据库备份目录
+	 * 修改DB目录
 	 * 
 	 * v1.0 chenyun 2021-11-12 10:34:15
 	 * 
@@ -133,7 +106,7 @@ public class ApiParmController extends BaseController {
 	@ResponseBody
 	public PageResult db(String bakDir) {
 		try {
-			parmService.db(bakDir);
+			parmService.dbUpdate(bakDir);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("数据库备份目录错误：{}", e.getMessage());
@@ -145,7 +118,7 @@ public class ApiParmController extends BaseController {
 	}
 	
 	/**
-	 * 系统参数密码初始化
+	 * 修改默认密码
 	 * 
 	 * v1.0 chenyun 2021-11-12 10:08:32
 	 * 
@@ -157,7 +130,7 @@ public class ApiParmController extends BaseController {
 	@ResponseBody
 	public PageResult pwd(Integer type, String value) {
 		try {
-			parmService.pwd(type, value);
+			parmService.pwdUpdate(type, value);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("设置参数密码初始化错误：{}", e.getMessage());

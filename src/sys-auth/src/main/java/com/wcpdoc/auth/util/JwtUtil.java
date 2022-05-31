@@ -131,7 +131,7 @@ public class JwtUtil {
 			return new JwtResult(HttpStatus.UNAUTHORIZED.value(), "令牌过期", e.getClaims());
 		} catch (SignatureException e) {
 			log.info("解析令牌错误：{}", "签名错误");
-			return new JwtResult(HttpStatus.INTERNAL_SERVER_ERROR.value(), "令牌过期", null);
+			return new JwtResult(HttpStatus.INTERNAL_SERVER_ERROR.value(), "签名错误", null);
 		} catch (Exception e) {
 			log.error("解析令牌错误：{}", e.getMessage());
 			return new JwtResult(HttpStatus.INTERNAL_SERVER_ERROR.value(), "未知错误", null);

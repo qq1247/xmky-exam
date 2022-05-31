@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.OnlineUser;
@@ -271,7 +272,7 @@ public class ApiExamController extends BaseController {
 			if (paper.getMarkType() == 1) {// 如果是智能阅卷
 				List<Map<String, Object>> result = new ArrayList<>();
 				Map<String, Object> map = new HashMap<>();
-				map.put("examUserList", myExamService.getUserList(id));
+				map.put("examUserList", examService.getExamUserList(id));
 				result.add(map);
 				return PageResultEx.ok().data(result);
 			}
@@ -280,15 +281,11 @@ public class ApiExamController extends BaseController {
 			List<Map<String, Object>> result = new ArrayList<>();
 			for (MyMark myMark : myMarkList) {
 				Map<String, Object> map = new HashMap<>();
-				map.put("markUserId", userService.getEntity(myMark.getMarkUserId()).getId());
-				map.put("markUserName", userService.getEntity(myMark.getMarkUserId()).getName());
+				User markUser = userService.getEntity(myMark.getMarkUserId());
+				map.put("markUserId", markUser.getId());
+				map.put("markUserName", markUser.getName());
 				if (ValidateUtil.isValid(myMark.getExamUserIds())) {
-					map.put("examUserList",
-							examService.getMarkExamUserList(myMark.getExamId(), myMark.getMarkUserId()));
-				}
-				if (ValidateUtil.isValid(myMark.getQuestionIds())) {
-					map.put("questionList",
-							examService.getMarkQuestionList(myMark.getExamId(), myMark.getMarkUserId()));
+					map.put("examUserList", examService.getExamUserList(id, myMark.getMarkUserId()));
 				}
 				result.add(map);
 			}
@@ -311,9 +308,9 @@ public class ApiExamController extends BaseController {
 	 */
 	@RequestMapping("/updateMarkSet")
 	@ResponseBody
-	public PageResult updateMarkSet(Integer id, String[] examUserIds, Integer[] markUserIds) {
+	public PageResult userAdd(Integer id, String[] examUserIds, Integer[] markUserIds) {
 		try {
-			examService.assignPaper(id, examUserIds, markUserIds);
+			examService.userAdd(id, examUserIds, markUserIds);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("更新考试阅卷用户错误：{}", e.getMessage());

@@ -18,7 +18,7 @@ import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
 import com.wcpdoc.exam.core.entity.Exam;
-import com.wcpdoc.exam.core.service.MyExamDetailService;
+import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.notify.exception.NotifyException;
 import com.wcpdoc.notify.service.NotifyService;
 
@@ -32,7 +32,7 @@ public class ExamCoreRunner implements ApplicationRunner {
 	private static final Logger log = LoggerFactory.getLogger(ExamCoreRunner.class);
 	
 	@Resource
-	private MyExamDetailService myExamDetailService;
+	private MyExamService myExamService;
 	@Resource
 	private NotifyService notifyService;
 
@@ -86,9 +86,9 @@ public class ExamCoreRunner implements ApplicationRunner {
 						
 						try {
 							if (unMarkExam.getMarkState() == 1) {
-								myExamDetailService.doExam(unMarkExam.getId());
+								myExamService.doExam(unMarkExam.getId());
 							} else if (unMarkExam.getMarkState() == 2){
-								myExamDetailService.doMark(unMarkExam.getId());
+								myExamService.doMark(unMarkExam.getId());
 							}
 						} catch (MyException e) {// 一个有问题，不影响其他任务执行
 							log.error("自动阅卷错误：{}", e.getMessage());

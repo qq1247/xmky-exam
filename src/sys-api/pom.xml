@@ -30,5 +30,11 @@
 			<artifactId>sys-wordFilter</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- 集成系统权限 -->
+		<dependency>
+			<groupId>com.wcpdoc.exam</groupId>
+			<artifactId>sys-auth</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>

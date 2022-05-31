@@ -1,20 +1,19 @@
 package com.wcpdoc.base.service;
 
 import java.util.List;
-import java.util.Map;
 
 import com.wcpdoc.base.entity.Org;
 import com.wcpdoc.core.service.BaseService;
 
 /**
- * 组织机构服务层接口
+ * 机构服务层接口
  * 
  * v1.0 zhanghc 2016-5-8上午11:00:00
  */
 public interface OrgService extends BaseService<Org> {
 
 	/**
-	 * 添加组织机构 
+	 * 添加机构 
 	 * 
 	 * v1.0 zhanghc 2016-5-8上午11:00:00
 	 * 
@@ -26,7 +25,7 @@ public interface OrgService extends BaseService<Org> {
 	void addAndUpdate(Org org);
 
 	/**
-	 * 删除组织机构 
+	 * 删除机构 
 	 * 
 	 * v1.0 zhanghc 2016-5-8上午11:00:00
 	 * 
@@ -36,7 +35,7 @@ public interface OrgService extends BaseService<Org> {
 	void delAndUpdate(Integer id);
 	
 	/**
-	 * 移动组织机构 
+	 * 移动机构 
 	 * 
 	 * v1.0 zhanghc 2016-5-8上午11:00:00
 	 * 
@@ -66,7 +65,7 @@ public interface OrgService extends BaseService<Org> {
 	boolean existCode(Org org);
 	
 	/**
-	 * 获取组织机构列表
+	 * 获取机构列表
 	 * 
 	 * v1.0 chenyun 2021年3月5日上午10:41:51
 	 * @return Org
@@ -74,7 +73,7 @@ public interface OrgService extends BaseService<Org> {
 	Org getOrg(String name);
 	
 	/**
-	 * 获取组织机构列表
+	 * 获取机构列表
 	 * 
 	 * v1.0 zhanghc 2020-06-10 12:40:00
 	 * 
@@ -84,25 +83,6 @@ public interface OrgService extends BaseService<Org> {
 	 */
 	List<Org> getList(Integer parentId);
 	
-	/**
-	 * 获取住址机构
-	 * 
-	 * v1.0 chenyun 2021年3月8日下午1:24:31
-	 * @param id
-	 * @return Map<String,Object>
-	 */
-	Map<String, Object> getOrg(Integer id);
-	
-	/**
-	 * 同步组织机构
-	 * 
-	 * v1.0 chenyun 2021年3月26日下午3:49:33
-	 * @param orgName
-	 * @param orgCode
-	 * @return Integer
-	 */
-	Integer syncOrg(String orgName, String orgCode);
-
 	/**
 	 * 获取机构列表
 	 * 

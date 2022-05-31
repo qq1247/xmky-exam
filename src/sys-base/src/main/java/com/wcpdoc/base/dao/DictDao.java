@@ -19,5 +19,5 @@ public interface DictDao extends RBaseDao<Dict> {
 	 * 
 	 * @return List<Dict>
 	 */
-	List<Dict> getList();
+	List<Dict> getListByIndex(String index);
 }

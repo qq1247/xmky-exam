@@ -1,8 +1,6 @@
 package com.wcpdoc.api.controller;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -24,7 +22,7 @@ import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.file.service.FileService;
 
 /**
- * 组织机构控制层
+ * 机构控制层
  * 
  * v1.0 zhanghc 2016-5-8上午11:00:00
  */
@@ -41,7 +39,7 @@ public class ApiOrgController extends BaseController {
 	private FileService fileService;
 
 	/**
-	 * 组织机构列表
+	 * 机构列表
 	 * 
 	 * v1.0 zhanghc 2016-5-8上午11:00:00
 	 * 
@@ -54,13 +52,13 @@ public class ApiOrgController extends BaseController {
 		try {
 			return PageResultEx.ok().data(orgService.getListpage(new PageIn(request)));
 		} catch (Exception e) {
-			log.error("组织机构列表错误：", e);
+			log.error("机构列表错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 添加组织机构
+	 * 添加机构
 	 * 
 	 * v1.0 zhanghc 2016-5-8上午11:00:00
 	 * 
@@ -72,19 +70,18 @@ public class ApiOrgController extends BaseController {
 	public PageResult add(Org org, String phone) {
 		try {
 			orgService.addAndUpdate(org);
-			Map<String, Object> data = new HashMap<String, Object>();
-			return PageResultEx.ok().data(data);
+			return PageResultEx.ok();
 		} catch (MyException e) {
-			log.error("添加组织机构错误：{}", e.getMessage());
+			log.error("添加机构错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("添加组织机构错误：", e);
+			log.error("添加机构错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 修改组织机构
+	 * 修改机构
 	 * 
 	 * v1.0 zhanghc 2016-5-8上午11:00:00
 	 * 
@@ -106,7 +103,7 @@ public class ApiOrgController extends BaseController {
 				throw new MyException("编码已存在");
 			}
 
-			// 修改组织机构
+			// 修改机构
 			Org entity = orgService.getEntity(org.getId());
 			entity.setName(org.getName());
 			entity.setUpdateTime(new Date());
@@ -116,16 +113,16 @@ public class ApiOrgController extends BaseController {
 			orgService.update(entity);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("修改组织机构错误：{}", e.getMessage());
+			log.error("修改机构错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("修改组织机构错误：", e);
+			log.error("修改机构错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 删除组织机构
+	 * 删除机构
 	 * 
 	 * v1.0 zhanghc 2016-5-8上午11:00:00
 	 * 
@@ -139,16 +136,16 @@ public class ApiOrgController extends BaseController {
 			orgService.delAndUpdate(id);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("删除组织机构错误：{}", e.getMessage());
+			log.error("删除机构错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("删除组织机构错误：", e);
+			log.error("删除机构错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 获取组织机构
+	 * 获取机构
 	 * 
 	 * v1.0 zhanghc 2016-5-8上午11:00:00
 	 * 
@@ -167,16 +164,16 @@ public class ApiOrgController extends BaseController {
 					.addAttr("parentName", (org.getParentId() == null || org.getParentId() == 0) ? null : orgService.getEntity(org.getParentId()).getName())
 					.addAttr("no", org.getNo());
 		} catch (MyException e) {
-			log.error("获取组织机构错误：{}", e.getMessage());
+			log.error("获取机构错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("获取组织机构错误：", e);
+			log.error("获取机构错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 移动组织机构
+	 * 移动机构
 	 * 
 	 * v1.0 zhanghc 2016-5-8上午11:00:00
 	 * 
@@ -191,16 +188,16 @@ public class ApiOrgController extends BaseController {
 			orgService.doMove(sourceId, targetId);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("移动组织机构错误：{}", e.getMessage());
+			log.error("移动机构错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("移动组织机构错误：", e);
+			log.error("移动机构错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 导入组织机构
+	 * 导入机构
 	 * 
 	 * v1.0 chenyun 2021年3月4日下午5:41:02
 	 * @return PageResult
@@ -212,26 +209,8 @@ public class ApiOrgController extends BaseController {
 			orgExService.xlsImport(fileId);
 			return PageResultEx.ok();
 		} catch (Exception e) {
-			log.error("组织机构列表错误：", e);
+			log.error("机构列表错误：", e);
 			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 导出组织机构表
-	 * 
-	 * v1.0 chenyun 2021年3月4日下午5:41:02
-	 * @return PageResult
-	 */
-	@RequestMapping("/export")
-	@ResponseBody
-	public void export(Integer[] ids) {
-		try {
-//			orgXlsxService.export(ids);
-		} catch (MyException e) {
-			log.error("导出组织机构表失败：", e.getMessage());
-		} catch (Exception e) {
-			log.error("导出组织机构表失败：", e);
 		}
 	}
 	
@@ -247,7 +226,7 @@ public class ApiOrgController extends BaseController {
 		try {
 			fileService.exportTemplate("机构.xlsx");
 		} catch (Exception e) {
-			log.error("组织机构导出模板下载附件失败：", e);
+			log.error("导出模板错误：", e);
 		}
 	}
 }

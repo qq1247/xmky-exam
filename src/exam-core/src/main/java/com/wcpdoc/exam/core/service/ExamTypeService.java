@@ -32,4 +32,14 @@ public interface ExamTypeService extends BaseService<ExamType> {
 	 * void
 	 */
 	void delAndUpdate(Integer id);
+	
+	/**
+	 * 是否有权限
+	 * 
+	 * v1.0 zhanghc 2021年11月5日下午5:50:58
+	 * @param examType
+	 * @param userId
+	 * @return boolean
+	 */
+	boolean hasAuth(ExamType examType, Integer userId);
 }

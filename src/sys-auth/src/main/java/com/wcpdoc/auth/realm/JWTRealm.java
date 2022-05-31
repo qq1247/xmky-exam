@@ -84,7 +84,6 @@ public class JWTRealm extends AuthorizingRealm {
 	 */
 	@Override
 	public boolean hasRole(PrincipalCollection principal, String roleIdentifier) {
-		//AuthorizationInfo info = this.getAuthorizationInfo(principal);
         return super.hasRole(principal, roleIdentifier);
 	}
 	
@@ -93,7 +92,6 @@ public class JWTRealm extends AuthorizingRealm {
 	 */
 	@Override
     public  boolean isPermitted(PrincipalCollection principal, String permission) {
-        //AuthorizationInfo info = this.getAuthorizationInfo(principal);
         return super.isPermitted(principal, permission);
     }
 	

@@ -1,4 +1,4 @@
-package com.wcpdoc.base.entity;
+package com.wcpdoc.api.entity;
 
 /**
  * 用户令牌

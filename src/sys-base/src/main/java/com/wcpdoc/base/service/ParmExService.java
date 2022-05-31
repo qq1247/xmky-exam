@@ -9,15 +9,6 @@ import com.wcpdoc.core.service.BaseService;
  * v1.0 chenyun 2021-03-04 15:02:18
  */
 public interface ParmExService extends BaseService<Parm> {
-	
-	/**
-	 * 添加参数
-	 * 
-	 * v1.0 zhanghc 2021年3月5日上午11:27:20
-	 * @param parm void
-	 * @throws EmailException 
-	 */
-	void addAndUpdate(Parm parm);
 
 	/**
 	 * 修改参数
@@ -26,15 +17,15 @@ public interface ParmExService extends BaseService<Parm> {
 	 * @param parm 
 	 * @throws EmailException 
 	 */
-	void updateAndUpdate(Parm parm);
+	void emailUpdate(Parm parm);
 	
 	/**
-	 * 保存图片
+	 * 修改logo
 	 * 
 	 * v1.0 chenyun 2021年11月15日下午4:30:11
 	 * @param parm void
 	 */
-	void doUpload(Parm parm);
+	void logoUpdate(Parm parm);
 
 	/**
 	 * 推送邮件

@@ -1,7 +1,5 @@
 package com.wcpdoc.base.service;
 
-import com.wcpdoc.base.entity.User;
-
 /**
  * 用户扩展服务层接口
  * 
@@ -17,25 +15,6 @@ public interface UserExService {
 	 * void
 	 */
 	void roleUpdate(Integer userId);
-
-	/**
-	 * 生成令牌
-	 * 
-	 * v1.0 zhanghc 2021年10月18日上午10:16:02
-	 * @param user
-	 * @return String
-	 */
-	String generateToken(User user);
-	
-	/**
-	 * 刷新令牌
-	 * 
-	 * v1.0 zhanghc 2021年10月18日上午10:16:02
-	 * @param user
-	 * @param token
-	 * void
-	 */
-	void refreshToken(User user, String token);
 
 	/**
 	 * 导入用户表

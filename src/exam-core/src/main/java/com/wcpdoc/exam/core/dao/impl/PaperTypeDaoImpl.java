@@ -1,7 +1,5 @@
 package com.wcpdoc.exam.core.dao.impl;
 
-import java.util.List;
-
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Repository;
@@ -38,11 +36,5 @@ public class PaperTypeDaoImpl extends RBaseDaoImpl<PaperType> implements PaperTy
 				.addWhere("PAPER_TYPE.STATE = 1")
 				.addOrder("PAPER_TYPE.UPDATE_TIME", Order.DESC);
 		return getListpage(sqlUtil, pageIn);
-	}
-
-	@Override
-	public List<PaperType> getList(Integer parentId) {
-		String sql = "SELECT * FROM EXM_PAPER_TYPE WHERE STATE = 1 AND PARENT_ID = :PARENT_ID";
-		return getList(sql, new Object[] { parentId });
 	}
 }

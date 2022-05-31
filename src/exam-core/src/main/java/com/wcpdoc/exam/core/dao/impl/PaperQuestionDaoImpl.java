@@ -9,7 +9,6 @@ import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.exam.core.dao.PaperQuestionDao;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
-import com.wcpdoc.exam.core.entity.Question;
 
 /**
  * 试卷试题数据访问层实现
@@ -23,28 +22,17 @@ public class PaperQuestionDaoImpl extends RBaseDaoImpl<PaperQuestion> implements
 	public PageOut getListpage(PageIn pageIn) {
 		return null;
 	}
-
-	@Override
-	public List<PaperQuestion> getQuestionList(Integer parentId, Integer examId, Integer userId) {
-		String sql = "SELECT * FROM EXM_PAPER_QUESTION ";
-		if (examId != null) {
-			sql += "WHERE PARENT_ID = :PARENT_ID AND EXAM_ID = :EXAM_ID AND USER_ID = :USER_ID AND TYPE != 1 ORDER BY NO ASC";
-			return getList(sql, new Object[]{parentId, examId, userId}, PaperQuestion.class);
-		}
-		sql += "WHERE PARENT_ID = :PARENT_ID AND TYPE != 1 ORDER BY NO ASC";
-		return getList(sql, new Object[]{parentId}, PaperQuestion.class);
-	}
-
-	@Override
-	public List<PaperQuestion> getList(Integer paperId) {
-		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = :PAPER_ID";
-		return getList(sql, new Object[]{paperId}, PaperQuestion.class);
-	}
 	
 	@Override
 	public List<PaperQuestion> getChapterList(Integer paperId) {
 		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = :PAPER_ID AND TYPE = 1 ORDER BY NO ASC";
-		return getList(sql, new Object[]{paperId}, PaperQuestion.class);
+		return getList(sql, new Object[] { paperId }, PaperQuestion.class);
+	}
+
+	@Override
+	public List<PaperQuestion> getChapterDetailList(Integer chapterId) {
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PARENT_ID = :PARENT_ID ORDER BY NO ASC";
+		return getList(sql, new Object[] { chapterId }, PaperQuestion.class);
 	}
 
 	@Override
@@ -54,37 +42,26 @@ public class PaperQuestionDaoImpl extends RBaseDaoImpl<PaperQuestion> implements
 	}
 	
 	@Override
-	public PaperQuestion getEntity(Integer examId, Integer paperId, Integer questionId, Integer userId) {
-		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE EXAM_ID = :EXAM_ID AND PAPER_ID = :PAPER_ID AND QUESTION_ID = :QUESTION_ID AND USER_ID = :USER_ID";
-		return getEntity(sql, new Object[]{examId, paperId, questionId, userId}, PaperQuestion.class);
+	public PaperQuestion getEntity(Integer examId, Integer userId, Integer questionId) {
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE EXAM_ID = :EXAM_ID AND USER_ID = :USER_ID AND QUESTION_ID = :QUESTION_ID";
+		return getEntity(sql, new Object[]{examId, userId, questionId}, PaperQuestion.class);
 	}
 	
 	@Override
-	public void del(Integer examId, Integer userId) {
-		String sql = "DELETE FROM EXM_PAPER_QUESTION WHERE TYPE != 1 AND EXAM_ID = :EXAM_ID AND USER_ID = :USER_ID ";
-		update(sql, new Object[] { examId, userId });
-	}
-
-	@Override
-	public List<Question> getQuestionRandList(Integer examId, Integer paperId) {
-		String sql = "SELECT QUESTION.* " //ID, QUESTION.TYPE, QUESTION.DIFFICULTY, QUESTION.TITLE, QUESTION.ANALYSIS, QUESTION.AI, QUESTION.AI_OPTIONS, QUESTION.SCORE
-				+ "FROM EXM_PAPER_QUESTION PAPER_QUESTION "
-				+ "INNER JOIN EXM_QUESTION QUESTION ON PAPER_QUESTION.QUESTION_ID = QUESTION.ID "
-				+ "WHERE PAPER_QUESTION.TYPE != 1 AND PAPER_QUESTION.EXAM_ID = :EXAM_ID AND PAPER_QUESTION.PAPER_ID = :PAPER_ID";
-		return getList(sql, new Object[]{ examId, paperId }, Question.class);
+	public List<PaperQuestion> getList(Integer paperId) {
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE PAPER_ID = :PAPER_ID";
+		return getList(sql, new Object[] { paperId });
 	}
 	
 	@Override
-	public List<PaperQuestion> getPaperQuestionList(Integer examId, Integer paperId) {
-		String sql = "SELECT PAPER_QUESTION.* "
-				+ "FROM EXM_PAPER_QUESTION PAPER_QUESTION "
-				+ "WHERE PAPER_QUESTION.TYPE != 1 AND PAPER_QUESTION.EXAM_ID = :EXAM_ID AND PAPER_QUESTION.PAPER_ID = :PAPER_ID";
-		return getList(sql, new Object[]{ examId, paperId }, PaperQuestion.class);
+	public List<PaperQuestion> getList(Integer examId, Integer userId) {
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE EXAM_ID = :EXAM_ID AND USER_ID = :USER_ID";
+		return getList(sql, new Object[] { examId, userId });
 	}
 
 	@Override
-	public List<PaperQuestion> getPaperQuestionList(Integer questionId) {
+	public List<PaperQuestion> getList2(Integer questionId) {
 		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE QUESTION_ID = :QUESTION_ID";
-		return getList(sql, new Object[]{ questionId }, PaperQuestion.class);
+		return getList(sql, new Object[] { questionId }, PaperQuestion.class);
 	}
 }

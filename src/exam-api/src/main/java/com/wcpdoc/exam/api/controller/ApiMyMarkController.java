@@ -172,26 +172,26 @@ public class ApiMyMarkController extends BaseController {
 			Paper paper = paperService.getEntity(exam.getPaperId());
 			for (User user : userList) {
 				MyExam myExam = myExamService.getEntity(examId, user.getId());
-				Map<String, Object> sigleResult = new HashMap<>();
-				sigleResult.put("userId", user.getId());
-				sigleResult.put("userName", exam.getAnonState() == 1 ? user.getName() : null);//  如果是匿名阅卷，不显示名称等
-				sigleResult.put("userHeadFileId", exam.getAnonState() == 1 ? user.getHeadFileId() : null);
+				Map<String, Object> singleResult = new HashMap<>();
+				singleResult.put("userId", user.getId());
+				singleResult.put("userName", exam.getAnonState() == 1 ? user.getName() : null);//  如果是匿名阅卷，不显示名称等
+				singleResult.put("userHeadFileId", exam.getAnonState() == 1 ? user.getHeadFileId() : null);
 				if (orgCache.get(user.getOrgId()) == null) {
 					orgCache.put(user.getOrgId(), orgService.getEntity(user.getOrgId()));
 				}
-				sigleResult.put("orgId", user.getOrgId());
-				sigleResult.put("orgName", exam.getAnonState() == 1 ? orgCache.get(user.getOrgId()).getName() : null);
-				sigleResult.put("answerStartTime", myExam.getAnswerStartTime() == null ? null : DateUtil.formatDateTime(myExam.getAnswerStartTime()));
-				sigleResult.put("answerEndTime", myExam.getAnswerEndTime() == null ? null : DateUtil.formatDateTime(myExam.getAnswerEndTime()));
-				sigleResult.put("markStartTime", myExam.getMarkStartTime() == null ? null : DateUtil.formatDateTime(myExam.getMarkStartTime()));
-				sigleResult.put("markEndTime", myExam.getMarkEndTime() == null ? null : DateUtil.formatDateTime(myExam.getMarkEndTime()));
-				sigleResult.put("state", myExam.getState());
-				sigleResult.put("markState", myExam.getMarkState());
-				sigleResult.put("answerState", exam.getScoreState() == 1 ? myExam.getAnswerState() : null);
-				sigleResult.put("totalScore", exam.getScoreState() == 1 ? myExam.getTotalScore() : null);// 成绩不公开则不显示
-				sigleResult.put("paperTotalScore", paper.getTotalScore());
-				sigleResult.put("paperPassScore", paper.getPassScore());
-				result.add(sigleResult);
+				singleResult.put("orgId", user.getOrgId());
+				singleResult.put("orgName", exam.getAnonState() == 1 ? orgCache.get(user.getOrgId()).getName() : null);
+				singleResult.put("answerStartTime", myExam.getAnswerStartTime() == null ? null : DateUtil.formatDateTime(myExam.getAnswerStartTime()));
+				singleResult.put("answerEndTime", myExam.getAnswerEndTime() == null ? null : DateUtil.formatDateTime(myExam.getAnswerEndTime()));
+				singleResult.put("markStartTime", myExam.getMarkStartTime() == null ? null : DateUtil.formatDateTime(myExam.getMarkStartTime()));
+				singleResult.put("markEndTime", myExam.getMarkEndTime() == null ? null : DateUtil.formatDateTime(myExam.getMarkEndTime()));
+				singleResult.put("state", myExam.getState());
+				singleResult.put("markState", myExam.getMarkState());
+				singleResult.put("answerState", exam.getScoreState() == 1 ? myExam.getAnswerState() : null);
+				singleResult.put("totalScore", exam.getScoreState() == 1 ? myExam.getTotalScore() : null);// 成绩不公开则不显示
+				singleResult.put("paperTotalScore", paper.getTotalScore());
+				singleResult.put("paperPassScore", paper.getPassScore());
+				result.add(singleResult);
 			}
 			
 			return PageResultEx.ok().data(result);
@@ -274,14 +274,14 @@ public class ApiMyMarkController extends BaseController {
 	@RequestMapping("/answerList")
 	@ResponseBody
 	public PageResult answerList(Integer userId, Integer examId) {
-		try {
+		try {//TODO 添加权限校验
 			List<Map<String, Object>> list = myExamDetailService.getAnswerList(examId, userId);
 			for (Map<String, Object> map : list) {
-				map.put("answers", new QuestionAnswer().getAnswers(
-						(Integer)map.remove("questionType"), 
-						(Integer)map.remove("questionAi"), 
-						(String)map.remove("answer")
-						)); 
+				QuestionAnswer answer = new QuestionAnswer();
+				answer.setQuestionType((Integer)map.remove("questionType"));
+				answer.setQuestionAi((Integer)map.remove("questionAi"));
+				answer.setAnswer((String)map.remove("answer"));
+				map.put("answers", answer.getAnswerArr()); 
 			}
 			
 			return PageResultEx.ok().data(list);

@@ -27,13 +27,6 @@ public class QuestionOptionServiceImpl extends BaseServiceImp<QuestionOption> im
 	public void setDao(BaseDao<QuestionOption> dao) {
 		super.dao = dao;
 	}
-	
-	@Override
-	public void delAndUpdate(Integer id) {
-		// 校验数据有效性
-		QuestionOption entity = getEntity(id);
-		del(entity);
-	}
 
 	@Override
 	public List<QuestionOption> getList(Integer questionId) {

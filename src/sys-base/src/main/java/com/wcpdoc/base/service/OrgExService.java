@@ -3,14 +3,14 @@ package com.wcpdoc.base.service;
 import com.wcpdoc.base.entity.Org;
 
 /**
- * 组织机构扩展服务层接口
+ * 机构扩展服务层接口
  * 
  * v1.0 zhanghc 2016-5-8上午11:00:00
  */
 public interface OrgExService {
 
 	/**
-	 * 删除关联引用 
+	 * 删除机构
 	 * v1.0 zhanghc 2016-5-8上午11:00:00
 	 * 
 	 * @param org
@@ -19,20 +19,11 @@ public interface OrgExService {
 	void delAndUpdate(Org org);
 
 	/**
-	 * 添加用户 
-	 * v1.0 chenyun 2020-6-3 13:20:53
-	 * 
-	 * @param phone
-	 * @param pwd
-	 * void
-	 */
-	void addAndUpdate(Org org, String phone, String pwd);
-
-	/**
-	 * 导入组织架构
+	 * 导入机构（涉及到附件，不能直接用orgService）
 	 * 
 	 * v1.0 zhanghc 2022年5月10日上午11:17:52
-	 * @param fileId void
+	 * @param fileId 
+	 * void
 	 */
 	void xlsImport(Integer fileId);
 }

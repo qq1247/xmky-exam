@@ -1,3 +1,33 @@
+/*
+ * Copyright (c) 2002, 2018, Oracle and/or its affiliates. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, version 2.0, as published by the
+ * Free Software Foundation.
+ *
+ * This program is also distributed with certain software (including but not
+ * limited to OpenSSL) that is licensed under separate terms, as designated in a
+ * particular file or component or in included license documentation. The
+ * authors of MySQL hereby grant you an additional permission to link the
+ * program and your derivative works with the separately licensed software that
+ * they have included with MySQL.
+ *
+ * Without limiting anything contained in the foregoing, this file, which is
+ * part of MySQL Connector/J, is also subject to the Universal FOSS Exception,
+ * version 1.0, a copy of which can be found at
+ * http://oss.oracle.com/licenses/universal-foss-exception.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License, version 2.0,
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA
+ */
+
+
 package com.mysql.cj.jdbc.exceptions;
 
 import java.sql.SQLDataException;
@@ -19,6 +49,9 @@ import com.mysql.cj.protocol.PacketReceivedTimeHolder;
 import com.mysql.cj.protocol.PacketSentTimeHolder;
 import com.mysql.cj.util.Util;
 
+/**
+ * SQLError is a utility class that maps MySQL error codes to SQL error codes as is required by the JDBC spec.
+ */
 public class SQLError {
 	private static final Logger log = LoggerFactory.getLogger(SQLError.class);
     /*
@@ -70,6 +103,18 @@ public class SQLError {
         return createSQLException(message, sqlState, vendorErrorCode, isTransient, null, interceptor);
     }
 
+    /**
+     * 重写异常，方便排错
+     * 
+     * v1.0 zhanghc 2022年5月25日下午6:24:39
+     * @param message
+     * @param sqlState
+     * @param vendorErrorCode
+     * @param isTransient
+     * @param cause
+     * @param interceptor
+     * @return SQLException
+     */
     public static SQLException createSQLException(String message, String sqlState, int vendorErrorCode, boolean isTransient, Throwable cause,
             ExceptionInterceptor interceptor) {
         try {
@@ -77,18 +122,24 @@ public class SQLError {
 
             if (sqlState != null) {
             	if (sqlState.startsWith("28")) {
-            		if (message.contains("Access denied for user 'root'@'localhost' (using password: YES)")) {
-            			log.error("数据库账号密码错误");
-					} else {
-						log.error("数据库连接失败");
+            		if (message.contains("using password")) {
+            			log.error(String.format("数据库连接失败：账号密码错误（%s）", message));
+            			log.error("程序退出");
+            			System.exit(0);
 					}
-                	System.exit(0);
-                } else if (sqlState.startsWith("08")) {
+            		
+            		log.error(String.format("数据库连接失败：未知错误（%s）", message));
+        			log.error("程序退出");
+        			System.exit(0);
+                }
+                	
+                if (sqlState.startsWith("08")) {
                     if (isTransient) {
                         sqlEx = new SQLTransientConnectionException(message, sqlState, vendorErrorCode);
                     } else {
                         sqlEx = new SQLNonTransientConnectionException(message, sqlState, vendorErrorCode);
                     }
+                    
                 } else if (sqlState.startsWith("22")) {
                     sqlEx = new SQLDataException(message, sqlState, vendorErrorCode);
 
@@ -147,8 +198,26 @@ public class SQLError {
         return runThroughExceptionInterceptor(interceptor, exToReturn);
     }
 
+    /**
+     * 重写异常，方便排错
+     * 
+     * v1.0 zhanghc 2022年5月25日下午6:13:38
+     * @param message
+     * @param underlyingException
+     * @param interceptor
+     * @return SQLException
+     */
     public static SQLException createCommunicationsException(String message, Throwable underlyingException, ExceptionInterceptor interceptor) {
+    	if ("CN".equals(Locale.getDefault().getCountry())) {
+    		if (message.contains("Communications link failure") || message.contains("Connection refused: connect")) {
+    			log.error(String.format("数据库连接失败：请检查连接地址和端口号（%s）", message));
+    			log.error("程序退出");
+    			System.exit(0);
+    		}
+    	}
+    	
         SQLException exToReturn = null;
+        
         exToReturn = new CommunicationsException(message, underlyingException);
 
         if (underlyingException != null) {
@@ -158,18 +227,6 @@ public class SQLError {
                 // we're not going to muck with that here, since it's an error condition anyway!
             }
         }
-        
-        System.out.println(message);
-        
-        Locale locale = Locale.getDefault();
-        if (message.contains("Communications link failure")  &&  "CN".equals(locale.getCountry())) {
-        	log.error("数据库服务连接失败,请检查连接地址和端口是非正确");
-        	System.exit(0);
-		}
-        if (message.contains("Connection refused: connect")  &&  "CN".equals(locale.getCountry())) {
-        	log.error("数据库服务连接失败,请检查连接地址和端口是非正确");
-        	System.exit(0);
-		}
         
         return runThroughExceptionInterceptor(interceptor, exToReturn);
     }

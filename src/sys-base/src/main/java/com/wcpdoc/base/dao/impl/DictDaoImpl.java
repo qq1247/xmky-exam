@@ -36,8 +36,8 @@ public class DictDaoImpl extends RBaseDaoImpl<Dict> implements DictDao {
 	}
 
 	@Override
-	public List<Dict> getList() {
-		String sql = "SELECT * FROM SYS_DICT";
-		return getList(sql);
+	public List<Dict> getListByIndex(String index) {
+		String sql = "SELECT * FROM SYS_DICT WHERE INDEX = :INDEX ORDER BY NO ASC";
+		return getList(sql, new Object[] { index });
 	}
 }

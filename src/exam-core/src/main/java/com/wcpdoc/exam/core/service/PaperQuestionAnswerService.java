@@ -10,22 +10,33 @@ import com.wcpdoc.exam.core.entity.PaperQuestionAnswer;
  * v1.0 chenyun 2021-07-20 18:14:32
  */
 public interface PaperQuestionAnswerService extends BaseService<PaperQuestionAnswer>{
+
+	/**
+	 * 获取试卷答案
+	 * 
+	 * v1.0 zhanghc 2022年5月20日下午1:52:51
+	 * @param paperId
+	 * @return List<PaperQuestionAnswer>
+	 */
+	List<PaperQuestionAnswer> getList(Integer paperId);
 	
 	/**
-	 * 获取试卷试题答案列表
+	 * 获取试卷答案
 	 * 
-	 * v1.0 chenyun 2021年7月23日上午11:27:30
+	 * v1.0 zhanghc 2022年5月20日下午1:52:51
+	 * @param paperId
+	 * @return List<PaperQuestionAnswer>
+	 */
+	List<PaperQuestionAnswer> getList(Integer examId, Integer userId);
+	
+	/**
+	 * 获取试卷答案
+	 * 
+	 * v1.0 zhanghc 2022年5月22日下午3:56:18
 	 * @param paperId
 	 * @param questionId
 	 * @return List<PaperQuestionAnswer>
 	 */
-	List<PaperQuestionAnswer> getList(Integer paperId, Integer questionId);
-	
-	/**
-	 * 删除试卷试题答案
-	 * 
-	 * v1.0 chenyun 2021年7月21日下午7:08:30
-	 * @param id void
-	 */
-	void updateAndDel(Integer id);
+	List<PaperQuestionAnswer> getListForSingleQuestion(Integer paperId, Integer questionId);
+
 }

@@ -62,7 +62,8 @@ public class ShiroCfg {
 		filterChainMap.put("/api/bulletin/listpage", "jwt,anyRolesEx[admin,subAdmin,user]");
 		filterChainMap.put("/api/paper/get", "jwt,anyRolesEx[subAdmin,user]");
 		filterChainMap.put("/api/exam/get", "jwt,anyRolesEx[subAdmin,user]");
-		filterChainMap.put("/api/paper/paperQuestionList", "jwt,anyRolesEx[subAdmin,user]");
+		filterChainMap.put("/api/paper/detail", "jwt,anyRolesEx[subAdmin,user]");
+		filterChainMap.put("/api/paper/detailOfRandom", "jwt,anyRolesEx[subAdmin,user]");
 		filterChainMap.put("/api/report/home/user", "jwt,anyRolesEx[user]");
 		
 		//管理员请求

@@ -36,24 +36,6 @@ public class ApiFileController extends BaseController {
 	private FileService fileService;
 
 	/**
-	 * 附件列表
-	 * 
-	 * v1.0 zhanghc 2016-11-16下午10:13:48
-	 * 
-	 * @return pageOut
-	 */
-//	@RequestMapping("/listpage") // 业务上不需要
-//	@ResponseBody
-//	public PageResult listpage() {
-//		try {
-//			return PageResultEx.ok().data(fileService.getListpage(new PageIn(request)));
-//		} catch (Exception e) {
-//			log.error("附件列表错误：", e);
-//			return PageResult.err();
-//		}
-//	}
-
-	/**
 	 * 完成临时上传附件
 	 * 
 	 * v1.0 zhanghc 2017年3月6日下午11:51:18
@@ -66,7 +48,7 @@ public class ApiFileController extends BaseController {
 	public PageResult upload(@RequestParam("files") MultipartFile[] files, String uuid) {
 		try {
 			String[] allowTypes = { "jpg", "jpeg", "gif", "png", "zip", "rar", "doc", "xls", "docx", "xlsx", "mp4" };
-			String fileIds = fileService.doTempUpload(files, allowTypes, uuid);
+			String fileIds = fileService.tempUpload(files, allowTypes, uuid);
 			Map<String, Object> data = new HashMap<String, Object>();
 			data.put("fileIds", fileIds);
 			return PageResultEx.ok().data(data);
@@ -106,55 +88,6 @@ public class ApiFileController extends BaseController {
 			log.error("完成下载附件失败：", e.getMessage());
 		} catch (Exception e) {
 			log.error("完成下载附件失败：", e);
-		}
-	}
-
-	/**
-	 * 完成删除附件<br/>
-	 * 只负责逻辑删除，具体的由定时任务处理。<br/>
-	 * 
-	 * v1.0 zhanghc 2016-11-16下午10:13:48
-	 * 
-	 * @param id
-	 * @return PageResult
-	 */
-//	@RequestMapping("/del")
-//	@ResponseBody
-//	public PageResult del(Integer id) {
-//		try {
-//			File file = fileService.getEntity(id);
-//			file.setState(0);
-//			fileService.update(file);
-//			return PageResult.ok();
-//		} catch (MyException e) {
-//			log.error("完成删除附件错误：{}", e.getMessage());
-//			return PageResult.err().msg(e.getMessage());
-//		} catch (Exception e) {
-//			log.error("完成删除附件错误：", e);
-//			return PageResult.err();
-//		}
-//	}
-	
-	/**
-	 * 获取附件id
-	 * 
-	 * v1.0 zhanghc 2021年5月27日下午4:27:54
-	 * @param id
-	 * @return PageResult
-	 */
-	@RequestMapping("/id")
-	@ResponseBody
-	public PageResult id(String uuid) {
-		try {
-			Integer fileId = fileService.getFileId(uuid);
-			return PageResultEx.ok()
-					.addAttr("id", fileId);
-		} catch (MyException e) {
-			log.error("获取附件id错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("获取附件id错误：", e);
-			return PageResult.err();
 		}
 	}
 }

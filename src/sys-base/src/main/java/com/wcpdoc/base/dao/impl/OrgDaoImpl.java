@@ -14,7 +14,7 @@ import com.wcpdoc.core.util.SqlUtil.Order;
 import com.wcpdoc.core.util.ValidateUtil;
 
 /**
- * 组织机构数据访问层实现
+ * 机构数据访问层实现
  * 
  * v1.0 zhanghc 2016-5-8上午11:00:00
  */
@@ -72,11 +72,5 @@ public class OrgDaoImpl extends RBaseDaoImpl<Org> implements OrgDao {
 	public Org getOrg(String name) {
 		String sql = "SELECT * FROM SYS_ORG WHERE NAME = :NAME AND STATE = 1";
 		return getEntity(sql, new Object[] { name });
-	}
-
-	@Override
-	public Org getOrg(String name, String code) {
-		String sql = "SELECT * FROM SYS_ORG WHERE NAME = :NAME AND CODE = :CODE AND STATE = 1";
-		return getEntity(sql, new Object[] { name, code });
 	}
 }

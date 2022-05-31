@@ -21,6 +21,16 @@ public interface ExamDao extends BaseDao<Exam>{
 	 * @return PageOut
 	 */
 	List<Map<String, Object>> getExamUserList(Integer id);
+	
+	/**
+	 * 阅卷考试用户列表
+	 * 
+	 * v1.0 zhanghc 2021年6月25日下午2:51:40
+	 * @param id
+	 * @param markUserId
+	 * @return List<Map<String,Object>>
+	 */
+	List<Map<String, Object>> getExamUserList(Integer id, Integer markUserId);
 
 	/**
 	 * 获取考试分类列表
@@ -39,31 +49,4 @@ public interface ExamDao extends BaseDao<Exam>{
 	 */
 	List<Exam> getList();
 	
-	/**
-	 * 阅卷考试用户列表
-	 * 
-	 * v1.0 zhanghc 2021年6月25日下午2:51:40
-	 * @param id
-	 * @param markUserId
-	 * @return List<Map<String,Object>>
-	 */
-	List<Map<String, Object>> getMarkExamUserList(Integer id, Integer markUserId);
-
-	/**
-	 * 阅卷试题列表
-	 * 
-	 * v1.0 zhanghc 2021年6月25日下午2:51:50
-	 * @param id
-	 * @param markUserId
-	 * @return List<Map<String,Object>>
-	 */
-	List<Map<String, Object>> getMarkQuestionList(Integer id, Integer markUserId);
-
-	/**
-	 * 获取未阅卷的考试
-	 * 
-	 * v1.0 zhanghc 2022年2月24日上午11:44:21
-	 * @return List<Exam>
-	 */
-	List<Exam> getUnMarkList(); 
 }

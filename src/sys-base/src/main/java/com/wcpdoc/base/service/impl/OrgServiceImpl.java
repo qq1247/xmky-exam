@@ -1,9 +1,7 @@
 package com.wcpdoc.base.service.impl;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -19,7 +17,7 @@ import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.ValidateUtil;
 
 /**
- * 组织机构服务层实现
+ * 机构服务层实现
  * 
  * v1.0 zhanghc 2016-5-8上午11:00:00
  */
@@ -45,7 +43,6 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 		if (org.getParentId() == null || org.getParentId() == 0) {
 			throw new MyException("参数错误：parentId");
 		}
-		
 		if (existName(org)) {
 			throw new MyException("名称已存在");
 		}
@@ -53,7 +50,7 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 			throw new MyException("编码已存在");
 		}
 		
-		// 添加组织机构
+		// 添加机构
 		org.setUpdateUserId(getCurUser().getId());
 		org.setUpdateTime(new Date());
 		org.setState(1);
@@ -69,15 +66,15 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 	@Override
 	public void delAndUpdate(Integer id) {
 		// 校验数据有效性
-		if (id == 1) { //不包括根组织机构
+		if (id == 1) { //不包括根机构
 			return;
 		}
 		List<Org> orgList = orgDao.getList(id);
 		if (ValidateUtil.isValid(orgList)) {
-			throw new MyException("请先删除子组织机构");
+			throw new MyException("请先删除子机构");
 		}
 		
-		// 删除组织机构
+		// 删除机构
 		Org org = getEntity(id);
 		orgExService.delAndUpdate(org);
 		
@@ -97,17 +94,17 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 			throw new MyException("参数错误：targetId");
 		}
 		if (sourceId == targetId) {
-			throw new MyException("源组织机构和目标组织机构一致");
+			throw new MyException("源机构和目标机构一致");
 		}
 
 		Org source = getEntity(sourceId);
 		Org target = getEntity(targetId);
 		
 		if (target.getParentIds().contains(source.getParentIds())) {
-			throw new MyException("父组织机构不能移动到子组织机构下");
+			throw new MyException("父机构不能移动到子机构下");
 		}
 
-		// 移动组织机构
+		// 移动机构
 		source.setParentId(target.getId());
 		source.setParentIds(String.format("%s%s_", target.getParentIds(), source.getId()));
 		source.setLevel(source.getParentIds().split("_").length - 1);
@@ -165,52 +162,6 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 	@Override
 	public List<Org> getList(Integer parentId) {
 		return orgDao.getList(parentId);
-	}
-
-	@Override
-	public Map<String, Object> getOrg(Integer id) {
-		Map<String, Object> map = new HashMap<String, Object>();
-		Org entity = orgDao.getEntity(id);
-		Org parentEntity = orgDao.getEntity(entity.getParentId());
-		map.put("name", entity.getName());
-		map.put("parentId", entity.getParentId());
-		map.put("parentName", parentEntity.getName());
-		map.put("sort", entity.getNo());
-		return map;
-	}
-
-	@Override
-	public Integer syncOrg(String orgName, String orgCode) {
-		// 校验数据有效性
-		if (!ValidateUtil.isValid(orgName)) {
-			throw new MyException("参数错误：orgName");
-		}
-		if (!ValidateUtil.isValid(orgCode)) {
-			throw new MyException("参数错误：orgCode");
-		}
-		
-		Org org = orgDao.getOrg(orgName, orgCode);
-		if(org != null){
-			return org.getId();
-		}
-		
-		org = new Org();
-		org.setName(orgName);
-		org.setCode(orgCode);
-		org.setParentId(1);
-		org.setUpdateUserId(getCurUser().getId());
-		org.setUpdateTime(new Date());
-		org.setState(1);
-		org.setNo(1);
-		orgDao.add(org);
-		
-		// 更新父子关系
-		Org parentOrg = orgDao.getEntity(org.getParentId());
-		org.setParentIds(parentOrg.getParentIds() + org.getId() + "_");
-		org.setLevel(org.getParentIds().split("_").length - 1);
-		update(org);
-		
-		return org.getId();
 	}
 
 	@Override

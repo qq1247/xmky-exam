@@ -6,10 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
 
 import com.wcpdoc.base.entity.Parm;
-import com.wcpdoc.base.service.ParmService;
 import com.wcpdoc.cache.BaseEhCache;
 import com.wcpdoc.core.exception.MyException;
-import com.wcpdoc.core.util.SpringUtil;
 
 /**
  * 系统参数缓存
@@ -24,7 +22,8 @@ public class ParmCache extends BaseEhCache {
 	/**
 	 * 刷新缓存
 	 * 
-	 * v1.0 chenyun 2021年11月12日下午1:25:29 void
+	 * v1.0 chenyun 2021年11月12日下午1:25:29 
+	 * void
 	 */
 	public static void flushCache(Parm parm) {
 		Cache cache = getCache(CACHE_NAME);
@@ -36,17 +35,6 @@ public class ParmCache extends BaseEhCache {
 			throw new MyException("刷新缓存异常：参数拷贝失败");
 		}
 		cache.put(PARM_KEY, source);
-	}
-	
-	/**
-	 * 重新加载缓存
-	 * 
-	 * v1.0 zhanghc 2022年2月24日上午10:47:16
-	 * void
-	 */
-	public static void reloadCache() {
-		Parm parm = SpringUtil.getBean(ParmService.class).getEntity(1);
-		flushCache(parm);
 	}
 
 	/**

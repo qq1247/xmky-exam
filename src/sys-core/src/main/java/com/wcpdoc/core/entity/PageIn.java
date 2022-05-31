@@ -40,7 +40,6 @@ public class PageIn {
 	}
 
 	public PageIn addWhere(String condition) {
-		//where.append(where.length() == 0 ? " WHERE " : " AND ").append(condition);
 		where.add(condition);
 		return this;
 	}
@@ -51,9 +50,6 @@ public class PageIn {
 		
 		// 添加where参数
 		Collections.addAll(whereParmList, parms);
-//		for (int i = 0; i < parms.length; i++) {
-//			whereParmList.add(new WhereParm(namedParmList.get(i), parms[i]));
-//		}
 		return this;
 	}
 
@@ -65,7 +61,7 @@ public class PageIn {
 	}
 	
 	public String get(String key) {
-		return get(key, String.class);
+		return get(key, Object.class).toString();
 	}
 
 	@SuppressWarnings("unchecked")

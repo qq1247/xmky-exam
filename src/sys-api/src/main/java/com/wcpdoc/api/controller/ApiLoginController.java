@@ -18,11 +18,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.api.entity.UserToken;
+import com.wcpdoc.api.service.LoginService;
 import com.wcpdoc.base.cache.ParmCache;
 import com.wcpdoc.base.entity.Parm;
-import com.wcpdoc.base.entity.UserToken;
-import com.wcpdoc.base.service.LoginService;
-import com.wcpdoc.base.service.ParmService;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
@@ -44,8 +43,6 @@ public class ApiLoginController extends BaseController {
 	
 	@Resource
 	private LoginService loginService;
-	@Resource
-	private ParmService parmService;
 	@Resource
 	private FileService fileService;
 	

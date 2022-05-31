@@ -20,7 +20,7 @@ import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionTypeOpen;
-import com.wcpdoc.exam.core.service.PaperQuestionRuleService;
+import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeOpenService;
 
 /**
@@ -36,7 +36,7 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	@Resource
 	private QuestionTypeOpenService questionTypeOpenService;
 	@Resource
-	private PaperQuestionRuleService paperQuestionRuleService;
+	private QuestionService questionService;
 	
 	/**
 	 * 试题分类开放列表
@@ -191,7 +191,7 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	public PageResult questionIds(Integer questionTypeId) {
 		try {
 			List<Integer> questionIds = new ArrayList<>();
-			List<Question> questionList = paperQuestionRuleService.getQuestionList(questionTypeId);
+			List<Question> questionList = questionService.getList(questionTypeId);
 			for (Question question : questionList) {
 				questionIds.add(question.getId());
 			}

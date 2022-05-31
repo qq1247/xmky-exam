@@ -64,7 +64,7 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 	}
 
 	@Override
-	public List<Question> delQuestionList() {
+	public List<Question> getListByDel() {
 		String sql = "SELECT QUESTION.* FROM EXM_QUESTION QUESTION WHERE QUESTION.STATE = 0 AND NOT EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.QUESTION_ID = QUESTION.ID)";
 		return getList(sql, new Object[] {});
 	}
