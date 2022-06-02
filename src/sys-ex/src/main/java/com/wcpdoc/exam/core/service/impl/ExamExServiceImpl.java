@@ -363,7 +363,7 @@ public class ExamExServiceImpl extends BaseServiceImp<Exam> implements ExamExSer
 					myExamDetailService.del(myExamDetail.getId());
 				}
 				
-				MyExam myExamDel = myExamService.getEntity(exam.getId(), myExam.getUserId());
+				MyExam myExamDel = myExamService.getMyExam(exam.getId(), myExam.getUserId());
 				myExamService.del(myExamDel.getId());
 			}
 		}

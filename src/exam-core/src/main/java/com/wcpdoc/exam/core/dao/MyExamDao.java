@@ -13,13 +13,22 @@ import com.wcpdoc.exam.core.entity.MyExam;
 public interface MyExamDao extends BaseDao<MyExam>{
 
 	/**
-	 * 获取我的考试
+	 * 获取我的考试列表
 	 * 
 	 * v1.0 zhanghc 2020年9月30日上午11:00:50
 	 * @param examId
 	 * @return List<MyExam>
 	 */
 	List<MyExam> getList(Integer examId);
+	
+	/**
+	 * 获取我的考试列表
+	 * 
+	 * v1.0 zhanghc 2022年6月2日上午9:51:25
+	 * @param userId
+	 * @return List<MyExam>
+	 */
+	List<MyExam> getListForUser(Integer userId);
 
 	/**
 	 * 获取我的考试列表
@@ -29,5 +38,7 @@ public interface MyExamDao extends BaseDao<MyExam>{
 	 * @param userId
 	 * @return MyExam
 	 */
-	MyExam getEntity(Integer examId, Integer userId);
+	MyExam getMyExam(Integer examId, Integer userId);
+
+	
 }

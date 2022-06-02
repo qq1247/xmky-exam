@@ -70,9 +70,14 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 		String sql = "SELECT * FROM EXM_MY_EXAM WHERE EXAM_ID = :EXAM_ID";
 		return getList(sql, new Object[] { examId }, MyExam.class);
 	}
+	@Override
+	public List<MyExam> getListForUser(Integer userId) {
+		String sql = "SELECT * FROM EXM_MY_EXAM WHERE USER_ID = :USER_ID";
+		return getList(sql, new Object[] { userId }, MyExam.class);
+	}
 
 	@Override
-	public MyExam getEntity(Integer examId, Integer userId) {
+	public MyExam getMyExam(Integer examId, Integer userId) {
 		String sql = "SELECT * FROM EXM_MY_EXAM WHERE EXAM_ID = :EXAM_ID AND USER_ID = :USER_ID";
 		return getEntity(sql, new Object[] { examId, userId });
 	}

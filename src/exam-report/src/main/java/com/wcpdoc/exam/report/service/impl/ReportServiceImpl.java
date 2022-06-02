@@ -16,7 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
 import com.wcpdoc.base.entity.Dict;
+import com.wcpdoc.base.entity.Org;
+import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.DictService;
+import com.wcpdoc.base.service.OrgService;
+import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
@@ -68,72 +72,74 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 	private DictService dictService;
 	@Resource
 	private QuestionService questionService;
+	@Resource
+	private UserService userService;
+	@Resource
+	private OrgService orgService;
 	
 	@Override
 	public void setDao(BaseDao<Object> dao) {}
 	
 	@Override
 	public Map<String, Object> homeUser() {
-		Map<String, Object> result = new HashMap<String, Object>();
-		List<Map<String, Object>> homeUserList = reportDao.homeUser(getCurUser().getId());
-		if (!ValidateUtil.isValid(homeUserList)) {
-			return new HashMap<>();
+		// 获取原始数据
+		User user = userService.getEntity(getCurUser().getId());
+		Org org = orgService.getEntity(user.getOrgId());
+		List<MyExam> myExamList = myExamService.getListForUser(getCurUser().getId());
+		List<Exam> examList = examService.getList();
+		Map<Integer, Exam> examCache = new HashMap<>();
+		for (Exam exam : examList) {
+			examCache.put(exam.getId(), exam);
 		}
 		
-		Map<String, Object> homeUserMap = homeUserList.get(0);
-		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("id", homeUserMap.get("userId"));
-		data.put("name", homeUserMap.get("userName"));
-		data.put("headFileId", homeUserMap.get("userHeadFileId"));
-		data.put("type", homeUserMap.get("type"));
-		result.put("user", data);
-		data = new HashMap<String, Object>();
-		data.put("id", homeUserMap.get("orgId"));
-		data.put("name", homeUserMap.get("orgName"));
-		result.put("org", data);
-		data = new HashMap<String, Object>();
-		data.put("num", homeUserList.size());
-		data.put("missNum", 0);//缺考题统计错误，时间没到的状态也是1，单独查询   homeUserMap.get("missNum")
-		data.put("succNum", 0);
-		data.put("top", 999999999);
-		
-		for (Map<String, Object> homeUser : homeUserList ) {
-			if (homeUser.get("myExamState").toString().equals("1") && DateUtil.getDateTime(homeUser.get("examStartTime").toString()).getTime() < System.currentTimeMillis()) { //一共缺考
-				data.put("missNum", Integer.valueOf(data.get("missNum").toString()) + 1);
-			}
-			
-			if (homeUser.get("myExamAnswerState") != null &&  homeUser.get("myExamAnswerState").toString().equals("1")) { //一共及格
-				data.put("succNum", Integer.valueOf(data.get("succNum").toString()) + 1);
-			}
-			
-			if (homeUser.get("examRankState").toString().equals("1") && homeUser.get("myExamNo") != null) { //最高排名
-				data.put("top", Math.min(Double.valueOf(homeUser.get("myExamNo").toString()), Double.valueOf(data.get("top").toString())));
-			}
-		}
-		if (data.get("top").equals(999999999)) {
-			data.put("top", 0);
-		}
-		result.put("exam", data);
-		
-		data = new HashMap<String, Object>();
-		data.put("avg", 0);//平均值
-		data.put("min", 999999999);//最低成绩
-		data.put("max", 0);//最高成绩
-		data.put("sd", 0); //标准差 homeUserMap.get("sd") == null ? 0 : String.format("%.2f", homeUserMap.get("sd")).toString()
-		
-		for (Map<String, Object> homeUser : homeUserList ) {
-			if (!homeUser.get("examScoreState").toString().equals("1") || homeUser.get("myExamTotalScore") == null) {
+		// 统计结果
+		int num = myExamList.size(), missNum = 0, succNum = 0, top = 9999, total = 0;
+		double min = 9999, max = 0;
+		BigDecimal sum = BigDecimal.ZERO;
+		for (MyExam myExam : myExamList) {
+			if (myExam.getMarkState() != 3) {// 未阅卷不统计
 				continue;
 			}
 			
-			data.put("min", Math.min(Double.valueOf(homeUser.get("myExamTotalScore").toString()), Double.valueOf(data.get("min").toString())));
-			data.put("max", Math.max(Double.valueOf(homeUser.get("myExamTotalScore").toString()), Double.valueOf(data.get("max").toString())));
-			data.put("avg", BigDecimalUtil.newInstance(data.get("avg")).add(homeUser.get("myExamTotalScore")).getResult());
+			Exam curExam = examCache.get(myExam.getExamId());
+			missNum += (myExam.getState() == 1) ? 1 : 0;// 未考试加一
+			succNum += (curExam.getScoreState() == 1 && myExam.getAnswerState() == 1) ? 1 : 0;//考试及格加一
+			top = (curExam.getRankState() == 1) ? Math.min(myExam.getNo(), top) : top;// 有更靠前的名次则替换
+			min = (curExam.getScoreState() == 1) ? Math.min(myExam.getTotalScore().doubleValue(), min) : min;
+			max = (curExam.getScoreState() == 1) ? Math.max(myExam.getTotalScore().doubleValue(), max) : max;
+			sum = (curExam.getScoreState() == 1) ? BigDecimalUtil.newInstance(sum).add(myExam.getTotalScore()).getResult() : sum;
+			total++;
 		}
-		if (data.get("min").equals(999999999)) {
-			data.put("min", 0);
-		}
-		result.put("score", data);
+		top = top == 9999 ? 0 : top;// 没有参加过考试，排名为0  
+		min = min == 9999 ? 0 : top;// 没有参加过考试，最低分为0
+		
+		// 拼接成接口的格式
+		Map<String, Object> result = new HashMap<String, Object>();
+		
+		Map<String, Object> userResult = new HashMap<String, Object>();
+		userResult.put("id", user.getId());
+		userResult.put("name", user.getName());
+		userResult.put("headFileId", user.getHeadFileId());
+		userResult.put("type", user.getType());
+		result.put("user", userResult);
+		
+		Map<String, Object> orgResult = new HashMap<String, Object>();
+		orgResult.put("id", org.getId());
+		orgResult.put("name", org.getName());
+		result.put("org", orgResult);
+		
+		Map<String, Object> examResult = new HashMap<String, Object>();
+		examResult.put("num", num);
+		examResult.put("missNum", missNum);
+		examResult.put("succNum", succNum);
+		examResult.put("top", top);
+		result.put("exam", examResult);
+		
+		Map<String, Object> scoreResult = new HashMap<String, Object>();
+		scoreResult.put("avg", BigDecimalUtil.newInstance(sum).div(total, 2));
+		scoreResult.put("min", min);
+		scoreResult.put("max", max);
+		result.put("score", scoreResult);
 		return result;
 	}
 

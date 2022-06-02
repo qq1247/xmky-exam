@@ -87,8 +87,13 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	}
 	
 	@Override
-	public MyExam getEntity(Integer examId, Integer userId) {
-		return myExamDao.getEntity(examId, userId);
+	public List<MyExam> getListForUser(Integer userId) {
+		return myExamDao.getListForUser(userId);
+	}
+	
+	@Override
+	public MyExam getMyExam(Integer examId, Integer userId) {
+		return myExamDao.getMyExam(examId, userId);
 	}
 
 	@Override
@@ -127,7 +132,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		if (curTime - exam.getEndTime().getTime() > 1000) {// 预留1秒网络延时
 			throw new MyException("考试已结束");
 		}
-		MyExam myExam = getEntity(examId, userId);
+		MyExam myExam = getMyExam(examId, userId);
 		if (myExam.getState() == 3) {
 			throw new MyException("考试已交卷");
 		}
@@ -175,7 +180,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		if (!ValidateUtil.isValid(userId)) {
 			throw new MyException("参数错误：userId");
 		}
-		MyExam myExam = getEntity(examId, userId);
+		MyExam myExam = getMyExam(examId, userId);
 		if (myExam == null) {
 			throw new MyException("未参与考试");
 		}
@@ -751,4 +756,5 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 			}
 		}
 	}
+
 }

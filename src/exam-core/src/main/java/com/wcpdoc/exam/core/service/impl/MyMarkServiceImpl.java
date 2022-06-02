@@ -105,7 +105,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 			throw new MyException("阅卷已结束");
 		}
 		
-		MyExam myExam = myExamService.getEntity(examId, userId);
+		MyExam myExam = myExamService.getMyExam(examId, userId);
 		if (myExam.getState() == 1) {
 			throw new MyException("用户未考试");
 		}
@@ -162,7 +162,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 			throw new MyException("参数错误：userId");
 		}
 		
-		MyExam myExam = myExamService.getEntity(examId, userId);
+		MyExam myExam = myExamService.getMyExam(examId, userId);
 		if (myExam == null) {
 			throw new MyException("未参与考试");
 		}

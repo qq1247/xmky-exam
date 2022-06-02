@@ -171,7 +171,7 @@ public class ApiMyMarkController extends BaseController {
 			Exam exam = examService.getEntity(examId);
 			Paper paper = paperService.getEntity(exam.getPaperId());
 			for (User user : userList) {
-				MyExam myExam = myExamService.getEntity(examId, user.getId());
+				MyExam myExam = myExamService.getMyExam(examId, user.getId());
 				Map<String, Object> singleResult = new HashMap<>();
 				singleResult.put("userId", user.getId());
 				singleResult.put("userName", exam.getAnonState() == 1 ? user.getName() : null);//  如果是匿名阅卷，不显示名称等
@@ -233,7 +233,7 @@ public class ApiMyMarkController extends BaseController {
 			}
 			
 			// 获取考试用户信息
-			MyExam myExam = myExamService.getEntity(examId, userId);
+			MyExam myExam = myExamService.getMyExam(examId, userId);
 			User user = userService.getEntity(userId);
 			Org org = orgService.getEntity(user.getOrgId());
 			Exam exam = examService.getEntity(examId);

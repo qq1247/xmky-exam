@@ -23,12 +23,21 @@ public interface MyExamService extends BaseService<MyExam>{
 	/**
 	 * 获取我的考试列表
 	 * 
+	 * v1.0 zhanghc 2022年6月2日上午9:50:13
+	 * @param userId
+	 * @return List<MyExam>
+	 */
+	List<MyExam> getListForUser(Integer userId);
+	
+	/**
+	 * 获取我的考试列表
+	 * 
 	 * v1.0 chenyun 2021年7月30日下午3:49:53
 	 * @param examId
 	 * @param userId
 	 * @return MyExam
 	 */
-	MyExam getEntity(Integer examId, Integer userId);
+	MyExam getMyExam(Integer examId, Integer userId);
 	
 	/**
 	 * 更新答案
@@ -77,4 +86,5 @@ public interface MyExamService extends BaseService<MyExam>{
 	 * void
 	 */
 	void doMark(Integer examId);
+
 }
