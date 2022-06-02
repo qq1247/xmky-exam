@@ -81,15 +81,6 @@ public interface ReportDao extends RBaseDao<Object> {
 	 * @return Integer
 	 */
 	Integer homeAdminBulletin();
-	
-	/**
-	 * 试题统计
-	 * 
-	 * v1.0 chenyun 2021年12月15日下午4:16:58
-	 * @param questionTypeId
-	 * @return List<Map<String, Object>>
-	 */
-	List<Map<String, Object>> questionStatis(Integer questionTypeId);
 
 	/**
 	 * 考试统计-试题类型列表

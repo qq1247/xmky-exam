@@ -421,11 +421,11 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			}
 		}
 		if (timeType == 3) {
-			if (exam.getMarkStartTime().getTime() < curTime.getTime()) {
-				throw new MyException("阅卷已开始");
-			}
 			if (!ValidateUtil.isValid(exam.getMarkStartTime())) {
 				throw new MyException("无需阅卷");
+			}
+			if (exam.getMarkStartTime().getTime() < curTime.getTime()) {
+				throw new MyException("阅卷已开始");
 			}
 			Date newMarkStartTime = DateUtil.getNextMinute(exam.getMarkStartTime(), minute);
 			if (exam.getMarkEndTime().getTime() < newMarkStartTime.getTime()) {
@@ -436,11 +436,11 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			}
 		}
 		if (timeType == 4) {
-			if (exam.getMarkEndTime().getTime() < curTime.getTime()) {
-				throw new MyException("阅卷已结束");
-			}
 			if (!ValidateUtil.isValid(exam.getMarkEndTime())) {
 				throw new MyException("无需阅卷");
+			}
+			if (exam.getMarkEndTime().getTime() < curTime.getTime()) {
+				throw new MyException("阅卷已结束");
 			}
 			if (exam.getMarkState() == 3) {
 				throw new MyException("已阅卷");
@@ -494,9 +494,9 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		userAddValid(exam, paper, examUserIds, markUserIds);
 		
 		// 添加用户
-		if (paper.getMarkType() == 1) {
+		if (paper.getGenType() == 1) {
 			examExService.userAdd(exam, examUserIds, markUserIds);
-		} else if (paper.getMarkType() == 2) {
+		} else if (paper.getGenType() == 2) {
 			examExService.userAddForRand(exam, examUserIds, markUserIds);
 		}
 	}
@@ -508,9 +508,9 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if (exam.getState() == 0) {
 			throw new MyException("考试已删除");
 		}
-		if (exam.getState() == 2) {
-			throw new MyException("考试未发布");
-		}
+		//if (exam.getState() == 2) {// 未发布也可以加用户
+		//	throw new MyException("考试未发布");
+		//}
 		if (exam.getState() == 3) {
 			throw new MyException("考试已归档");
 		}

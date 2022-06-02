@@ -265,7 +265,9 @@ http请求头需添加Authorization字段，
 | data.list[].type             | Integer | 类型         |
 | data.list[].difficulty       | Integer | 难度         |
 | data.list[].title            | String  | 题干         |
-| data.list[].options            | String[]  | 选项（type=1,2时有效）         |
+| data.list[].options[]            | Object[]  | 选项数组（type=1,2时有效） |
+| data.list[].options[].no          | String  | 排序 |
+| data.list[].options[].option          | String  | 选项 |
 | data.list[].ai            | Integer  | 智能阅卷        |
 | data.list[].state            | Integer | 状态         |
 | data.list[].analysis            | String | 解析         |
@@ -319,7 +321,7 @@ http请求头需添加Authorization字段，
 | data.type           | Integer         | 类型（1：单选；2：多选；3：填空；4：判断；5：问答 |
 | data.difficulty     | Integer         | 难度（1：极易；2：简单；3：适中；4：困难；5：极难 ） | 
 | data.title          | Text | 题干 |
-| data.options[]      | String[]        | 选项，type为1,2时有效，len &lt;= 7  |
+| data.options[]      | String[]        | 选项，type为1,2时有效，len <= 7  |
 | data.ai| Integer    | 智能阅卷（1：是；2：否；）  | 
 | data.analysis       | Text    | 解析  | 
 | data.questionTypeId | Integer         | 试题分类ID      |
@@ -470,12 +472,10 @@ http请求头需添加Authorization字段，
 | sourceId | Integer | 源试题ID | 是   |
 | targetId | Integer | 目标试题ID | 是   |
 
-### 试卷试题列表：paper/paperQuestionList
+### 试卷试题列表：paper/myPaper
 | 请求参数| 类型    | 描述   | 必填 |
 | ---- | ------- | ------ | ---- |
 | id   | Integer | 试卷id | 是   |
-| examId  | Integer | 试题id | 否  |
-| userId  | Integer | 人员id | 否   |
 
 | 响应参数|  类型   |  描述  |
 | --------   | -----   | -----  |
@@ -493,11 +493,23 @@ http请求头需添加Authorization字段，
 |data.list[].questionList[].ai  | Integer  | 是否智能阅卷|
 |data.list[].questionList[].analysis  | String  | 试题解析 |
 |data.list[].questionList[].score  | Double  | 试题分数 |
-|data.list[].questionList[].aiOptions  | String  | 试题分数选项，参考question/add |
-|data.list[].questionList[].options[]  | String[]  | 试题选项，参考question/add |
+|data.list[].questionList[].aiOptions  | String  | 试题分数选项，参考question/add 
+|data.list[].questionList[].options[]  | Object[]  | 试题选项数组 |
+|data.list[].questionList[].options[].no  | String  | 试题选项顺序 |
+|data.list[].questionList[].options[].option  | String | 试题选项 |
 |data.list[].questionList[].answers[]  | Object[]  | 试题答案，参考question/add |
 |data.list[].questionList[].answers[].score  | Double  | 试题分数，参考question/add |
 |data.list[].questionList[].answers[].answer  | String | 试题答案，参考question/add |
+
+
+### 试卷试题列表：paper/myPaperOfRand
+| 请求参数| 类型    | 描述   | 必填 |
+| ---- | ------- | ------ | ---- |
+| examId  | Integer | 试题id | 是  |
+| userId  | Integer | 人员id | 是   |
+
+| 响应参数|  类型   |  描述  |
+|同paper/myPaper     |   |  |
 
 ### 试卷试题添加：paper/questionAdd
 | 请求参数| 类型      | 描述   | 必填 |
@@ -545,6 +557,12 @@ http请求头需添加Authorization字段，
 | 请求参数| 类型    | 描述   | 必填 |
 | ---- | ------- | ------ | ---- |
 | id   | Integer | 试卷id | 是   |
+
+### 试卷防作弊：paper/sxe
+| 请求参数| 类型    | 描述   | 必填 |
+| ---- | ------- | ------ | ---- |
+| id   | Integer | 试卷id | 是   |
+| options| Integer[] | 防作弊选项（1：试题乱序；2：选项乱序；） | 是   |
 
 ### 考试列表：exam/listpage
 | 请求参数| 类型        | 描述       | 必填 |
@@ -653,7 +671,7 @@ http请求头需添加Authorization字段，
 | data[].examUserList[].name | String  | 考试用户名称 |
 | data[].examUserList[].orgName | String  | 考试用户组织机构 |
 
-### 考试阅卷设置：exam/updateMarkSet
+### 考试添加用户：exam/userAdd
 | 请求参数| 类型      | 描述        | 必填 |
 | ----------- | --------- | ----------- | ---- |
 | id          | Integer   | 主键        | 是   |

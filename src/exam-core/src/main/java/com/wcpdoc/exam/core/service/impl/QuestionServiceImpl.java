@@ -118,6 +118,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			questionAnswer.setAnswer(StringUtil.join(answers));
 			questionAnswer.setScore(answerScores[0]);
 			questionAnswer.setQuestionId(question.getId());
+			questionAnswer.setQuestionType(question.getType());
+			questionAnswer.setQuestionAi(question.getAi());
 			questionAnswer.setNo(1);
 			questionAnswerService.add(questionAnswer);
 		} else if (question.getType() == 3 || question.getType() == 5) {
@@ -126,6 +128,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				questionAnswer.setAnswer(answers[i]);
 				questionAnswer.setScore(question.getAi() == 1 ? answerScores[i] : BigDecimal.ZERO);
 				questionAnswer.setQuestionId(question.getId());
+				questionAnswer.setQuestionType(question.getType());
+				questionAnswer.setQuestionAi(question.getAi());
 				questionAnswer.setNo(i + 1);
 				questionAnswerService.add(questionAnswer);
 			}

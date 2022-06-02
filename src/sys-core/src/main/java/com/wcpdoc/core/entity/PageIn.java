@@ -61,7 +61,7 @@ public class PageIn {
 	}
 	
 	public String get(String key) {
-		return get(key, Object.class).toString();
+		return get(key, String.class);
 	}
 
 	@SuppressWarnings("unchecked")

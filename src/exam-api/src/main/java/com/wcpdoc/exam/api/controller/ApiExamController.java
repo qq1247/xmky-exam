@@ -306,7 +306,7 @@ public class ApiExamController extends BaseController {
 	 * @param markUserIds
 	 * @return PageResult
 	 */
-	@RequestMapping("/updateMarkSet")
+	@RequestMapping("/userAdd")
 	@ResponseBody
 	public PageResult userAdd(Integer id, String[] examUserIds, Integer[] markUserIds) {
 		try {

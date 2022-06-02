@@ -84,9 +84,12 @@ public class ApiQuestionController extends BaseController {
 				result.put("options", new String[0]);
 				if (type == 1 || type == 2) {// 如果是单选或多选，添加选项字段
 					List<QuestionOption> questionOptionList = questionOptionService.getList(id);
-					String[] options = new String[questionOptionList.size()];
-					for (int i = 0; i < questionOptionList.size(); i++) {
-						options[i] = questionOptionList.get(i).getOptions();
+					List<Map<String, Object>> options = new ArrayList<>();
+					for (QuestionOption questionOption : questionOptionList) {
+						Map<String, Object> map = new HashMap<>();
+						map.put("no", (char)(questionOption.getNo() + 64));
+						map.put("option", questionOption.getOptions());
+						options.add(map);
 					}
 					result.put("options", options);
 				}

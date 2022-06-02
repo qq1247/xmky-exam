@@ -9,6 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.wcpdoc.core.util.ValidateUtil;
+
 /**
  * 试题答案实体
  * 
@@ -90,7 +92,11 @@ public class QuestionAnswer {
 		this.questionAi = questionAi;
 	}
 	
-	public Object getAnswerArr() {
+	public String[] getAnswerArr() {
+		if (!ValidateUtil.isValid(answer)) {
+			return new String[0];
+		}
+		
 		if (questionType == 3 || (questionType == 5 && questionAi == 1)) {
 			return answer.split("\n");
 		}

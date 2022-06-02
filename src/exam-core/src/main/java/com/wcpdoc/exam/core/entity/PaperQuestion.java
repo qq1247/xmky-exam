@@ -52,8 +52,6 @@ public class PaperQuestion {
 	private String aiOptions;
 	@Column(name = "NO")
 	private Integer no;
-	@Column(name = "PAPER_QUESTION_RULE_ID")
-	private Integer paperQuestionRuleId;
 	@Column(name = "EXAM_ID")
 	private Integer examId;
 	@Column(name = "USER_ID")

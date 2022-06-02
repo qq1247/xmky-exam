@@ -213,7 +213,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		log.info("用户交卷开始：【{}-{}】【1-管理员 阅 {}-{}】开始", exam.getId(), exam.getName(), user.getId(), user.getName());
 		MyPaper userPaper = paper.getGenType() == 1 
 				? paperService.getMyPaper(paper.getId()) 
-				: paperService.getMyPaper(examId, myExam.getUserId());
+				: paperService.getMyPaperOfRand(examId, myExam.getUserId());
 		List<MyExamDetail> userAnswerList = myExamDetailService.getList(examId, myExam.getUserId());
 		Map<Integer, MyExamDetail> userAnswerCache = new HashMap<>();
 		for (MyExamDetail userAnswer : userAnswerList) {
@@ -282,7 +282,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		Paper paper = paperService.getEntity(exam.getPaperId());
 		MyPaper userPaper = paper.getGenType() == 1 ? paperService.getMyPaper(paper.getId()) : null;// 人工组卷每个人是一样的
 		for (MyExam myExam : myExamList) {
-			userPaper = paper.getGenType() == 2 ? paperService.getMyPaper(examId, myExam.getUserId()) : userPaper;// 随机组卷每个人是不一样的
+			userPaper = paper.getGenType() == 2 ? paperService.getMyPaperOfRand(examId, myExam.getUserId()) : userPaper;// 随机组卷每个人是不一样的
 			List<MyExamDetail> userAnswerList = myExamDetailService.getList(examId, myExam.getUserId());
 			
 			// 开始阅卷

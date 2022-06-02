@@ -12,7 +12,6 @@ import javax.annotation.Resource;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
@@ -31,11 +30,13 @@ import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamType;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.Paper;
+import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.ExamTypeService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.PaperService;
+import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 import com.wcpdoc.exam.report.dao.ReportDao;
 import com.wcpdoc.exam.report.service.ReportExService;
@@ -53,12 +54,6 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 	private ReportDao reportDao;
 	@Resource
 	private ReportExService reportExService;
-	@Value("${spring.datasource.url}")
-	private String url;
-	@Value("${spring.datasource.username}")
-	private String username;
-	@Value("${spring.datasource.password}")
-	private String password;
 	@Resource
 	private QuestionTypeService questionTypeService;
 	@Resource
@@ -71,6 +66,8 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 	private ExamTypeService examTypeService;
 	@Resource
 	private DictService dictService;
+	@Resource
+	private QuestionService questionService;
 	
 	@Override
 	public void setDao(BaseDao<Object> dao) {}
@@ -228,44 +225,63 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 			throw new MyException("参数错误：questionTypeId");
 		}
 		QuestionType questionType = questionTypeService.getEntity(questionTypeId);
-		if (questionType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
+		if (!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
 			throw new MyException("权限不足");
 		}
 		
-		Map<String, Object> result = new HashMap<String, Object>();
-		
-		List<Map<String, Object>> questionStatis = reportDao.questionStatis(questionTypeId);
-		Map<String, Object> questionStatisMap = questionStatis.get(0);
-		Map<String, Object> map;
-		
-		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();//类型列表
-		for(int i = 1; i <= 5 ; i++ ){
-			map = new HashMap<>();
-			map.put("name", i);
-			map.put("value", questionStatisMap.get("type"+i) == null ? 0 : questionStatisMap.get("type"+i));
-			list.add(map);
+		// 统计数据
+		List<Question> questionList = questionService.getList(questionTypeId);
+		Map<Integer, Integer> typeStatis = new HashMap<>();
+		Map<Integer, Integer> difficultyStatis = new HashMap<>();
+		Map<Integer, Integer> aiStatis = new HashMap<>();
+		for (Question question : questionList) {
+			if (typeStatis.get(question.getType()) == null) {
+				typeStatis.put(question.getType(), 0);
+			}
+			typeStatis.put(question.getType(), typeStatis.get(question.getType()) + 1);
+			
+			if (difficultyStatis.get(question.getDifficulty()) == null) {
+				difficultyStatis.put(question.getDifficulty(), 0);
+			}
+			difficultyStatis.put(question.getDifficulty(), difficultyStatis.get(question.getDifficulty()) + 1);
+			
+			if (aiStatis.get(question.getAi()) == null) {
+				aiStatis.put(question.getAi(), 0);
+			}
+			aiStatis.put(question.getAi(), aiStatis.get(question.getAi()) + 1);
 		}
-		result.put("typeList", list);
 		
-		list = new ArrayList<Map<String, Object>>(); //难度列表
-		for(int i = 1; i <= 5 ; i++ ){
-			map = new HashMap<>();
-			map.put("name", i);
-			map.put("value", questionStatisMap.get("difficulty"+i) == null ? 0 : questionStatisMap.get("difficulty"+i));
-			list.add(map);
+		// 组合成接口需要的格式
+		Map<String, Object> result = new HashMap<>();
+		List<Dict> typeDictList = dictService.getList("QUESTION_TYPE");
+		List<Map<String, Object>> typeList = new ArrayList<Map<String, Object>>();//类型列表
+		for (Dict typeDict : typeDictList) {
+			Map<String, Object> typeResult = new HashMap<>();
+			typeResult.put("name", typeDict.getDictKey());
+			typeResult.put("value", typeStatis.get(Integer.parseInt(typeDict.getDictKey())) == null ? 0 : typeStatis.get(Integer.parseInt(typeDict.getDictKey())));
+			typeList.add(typeResult);
 		}
-		result.put("difficultyList", list);
+		result.put("typeList", typeList);
 		
-		list = new ArrayList<Map<String, Object>>(); //智能列表
-		map = new HashMap<>();
-		map.put("name", 1);
-		map.put("value", questionStatisMap.get("ai1") == null ? 0 : questionStatisMap.get("ai1"));
-		list.add(map);
-		map = new HashMap<>();
-		map.put("name", 2);
-		map.put("value", questionStatisMap.get("ai2") == null ? 0 : questionStatisMap.get("ai2"));
-		list.add(map);
-		result.put("aiList", list);
+		List<Dict> difficultyDictList = dictService.getList("QUESTION_DIFFICULTY");
+		List<Map<String, Object>> difficultyList = new ArrayList<Map<String, Object>>();//类型列表
+		for (Dict difficultyDict : difficultyDictList) {
+			Map<String, Object> difficultyResult = new HashMap<>();
+			difficultyResult.put("name", difficultyDict.getDictKey());
+			difficultyResult.put("value", typeStatis.get(Integer.parseInt(difficultyDict.getDictKey())) == null ? 0 : typeStatis.get(Integer.parseInt(difficultyDict.getDictKey())));
+			difficultyList.add(difficultyResult);
+		}
+		result.put("difficultyList", difficultyList);
+		
+		List<Map<String, Object>> aiList = new ArrayList<Map<String, Object>>(); //智能列表
+		for (int i = 1; i <= 2; i++) {
+			Map<String, Object> aiResult = new HashMap<>();
+			aiResult.put("name", i);
+			aiResult.put("value", aiStatis.get(i) == null ? 0 : aiStatis.get(i));
+			aiList.add(aiResult);
+		}
+		result.put("aiList", aiList);
+		
 		return result;
 	}	
 	

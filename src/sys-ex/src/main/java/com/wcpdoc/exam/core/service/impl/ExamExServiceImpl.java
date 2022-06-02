@@ -305,12 +305,28 @@ public class ExamExServiceImpl extends BaseServiceImp<Exam> implements ExamExSer
 		if (ValidateUtil.isValid(markUserIds) && markUserIds.length == 1) {// 如果只有一组并且按逗号分割，会自动解析为数组
 			examUserIds[0] = StringUtil.join(examUserIds);
 		}
-		List<MyExam> newMyExamList = userAddSyn(exam, examUserIds);
+		Set<Integer> userSet = userAddSyn(exam, examUserIds);
 		
 		// 添加用户试卷
-		MyPaper myPaper = paperService.getMyPaper(exam.getId());
-		for (MyExam myExam : newMyExamList) {
-			generateUserPaper(exam, myExam.getUserId(), myPaper);
+		MyPaper myPaper = paperService.getMyPaper(exam.getPaperId());
+		for (Integer userId : userSet) {
+			generateUserPaper(exam, userId, myPaper);
+		}
+		
+		// 添加阅卷用户
+		List<MyMark> myMarkList = myMarkService.getList(exam.getId());// 获取我的考试列表
+		for (MyMark myMark : myMarkList) {
+			myMarkService.del(myMark.getId());
+		}
+		
+		for (int i = 0; i < markUserIds.length; i++) {
+			MyMark myMark = new MyMark();
+			myMark.setMarkUserId(markUserIds[i]);
+			myMark.setExamUserIds(String.format(",%s,", examUserIds[i]));
+			myMark.setUpdateUserId(getCurUser().getId());
+			myMark.setUpdateTime(new Date());
+			myMark.setExamId(exam.getId());
+			myMarkService.add(myMark);
 		}
 	}
 
@@ -320,9 +336,9 @@ public class ExamExServiceImpl extends BaseServiceImp<Exam> implements ExamExSer
 	 * v1.0 zhanghc 2022年5月31日上午11:18:42
 	 * @param exam
 	 * @param examUserIds
-	 * @return List<MyExam> 需要添加的用户试卷
+	 * @return Set<Integer> 需要添加的用户试卷
 	 */
-	private List<MyExam> userAddSyn(Exam exam, String[] examUserIds) {
+	private Set<Integer> userAddSyn(Exam exam, String[] examUserIds) {
 		/**
 		 * 页面：1,2,3
 		 * 数据库：2,3,4
@@ -339,6 +355,7 @@ public class ExamExServiceImpl extends BaseServiceImp<Exam> implements ExamExSer
 		while (myExamListIterator.hasNext()) {
 			MyExam myExam = myExamListIterator.next();
 			if (examUserIdSet.contains(myExam.getUserId())) {
+				examUserIdSet.remove(myExam.getUserId());
 				myExamListIterator.remove();
 			} else {
 				List<MyExamDetail> myExamDetailList = myExamDetailService.getList(exam.getId(), myExam.getUserId());
@@ -350,7 +367,7 @@ public class ExamExServiceImpl extends BaseServiceImp<Exam> implements ExamExSer
 				myExamService.del(myExamDel.getId());
 			}
 		}
-		return myExamList;
+		return examUserIdSet;
 	}
 
 	@Override
@@ -366,10 +383,10 @@ public class ExamExServiceImpl extends BaseServiceImp<Exam> implements ExamExSer
 			examUserIds[0] = StringUtil.join(examUserIds);
 		}
 		
-		List<MyExam> newMyExamList = userAddSyn(exam, examUserIds);
-		for (MyExam myExam : newMyExamList) {
-			MyPaper myPaper = generatePaperForRand(exam, ruleCache, questionListCache, myExam.getUserId());
-			generateUserPaper(exam, myExam.getUserId(), myPaper);
+		Set<Integer> userSet = userAddSyn(exam, examUserIds);
+		for (Integer userId : userSet) {
+			MyPaper myPaper = generatePaperForRand(exam, ruleCache, questionListCache, userId);
+			generateUserPaper(exam, userId, myPaper);
 		}
 	}
 }

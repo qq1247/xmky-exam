@@ -37,13 +37,13 @@ http请求头需添加Authorization字段，
 | msg                         | String  | 响应消息  |
 | data.typeList[]               | Object[]   | 类型列表   |
 | data.typeList[].name        | String | 类型名称  |
-| data.typeList[].value       | String  | 类型值  |
+| data.typeList[].value       | Integer  | 类型值  |
 | data.difficultyList[]               | Object[]   | 难度列表   |
 | data.difficultyList[].name        | String | 难度名称  |
-| data.difficultyList[].value       | String  | 难度值  |
+| data.difficultyList[].value       | Integer  | 难度值  |
 | data.aiList[]               | Object[]   | 智能列表   |
 | data.aiList[].name        | String | 智能名称  |
-| data.aiList[].value       | String  | 智能值  |
+| data.aiList[].value       | Integer  | 智能值  |
 
 ### 考试统计：report/exam/statis
 | 请求参数| 类型    | 描述       | 必填 |

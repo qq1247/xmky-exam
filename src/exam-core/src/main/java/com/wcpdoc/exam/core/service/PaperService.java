@@ -222,7 +222,7 @@ public interface PaperService extends BaseService<Paper> {
 	 * @param userId
 	 * @return MyPaper
 	 */
-	MyPaper getMyPaper(Integer examId, Integer userId);
+	MyPaper getMyPaperOfRand(Integer examId, Integer userId);
 
 	/**
 	 * 获取试题列表

@@ -1157,7 +1157,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 	
 	@Override
-	public MyPaper getMyPaper(Integer examId, Integer userId) {
+	public MyPaper getMyPaperOfRand(Integer examId, Integer userId) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(examId)) {
 			throw new MyException("参数错误：id");
@@ -1173,7 +1173,31 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		Map<Integer, Question> questionCache = getQuestionCache(examId, userId);
 		Map<Integer, List<QuestionOption>> questionOptionCache = getQuestionOptionCache(examId, userId);
 		Map<Integer, List<PaperQuestionAnswer>> paperQuestionAnswerCache = getPaperQuestionAnswerCache(examId, userId);
-		return generateMyPaper(paper, chapterList, questionCache, questionOptionCache, paperQuestionAnswerCache);
+		return generateMyPaperOfRand(exam, paper, userId, chapterList, questionCache, questionOptionCache, paperQuestionAnswerCache);
+	}
+
+	private MyPaper generateMyPaperOfRand(Exam exam, Paper paper, Integer userId, List<PaperQuestion> chapterList,
+			Map<Integer, Question> questionCache, Map<Integer, List<QuestionOption>> questionOptionCache,
+			Map<Integer, List<PaperQuestionAnswer>> paperQuestionAnswerCache) {
+		MyPaper myPaper = new MyPaper();
+		myPaper.setPaper(paper);
+		List<PaperQuestion> chapterDetailList = paperQuestionService.getList(exam.getId(), userId);// 这里找到是所有的，包含章节
+		for (PaperQuestion chapter : chapterList) {
+			Chapter _chapter = new Chapter(chapter);
+			myPaper.getChapterList().add(_chapter);
+			for (PaperQuestion questionAttr : chapterDetailList) {
+				if (questionAttr.getParentId().intValue() != chapter.getId().intValue()) {// 过滤掉非当前章节的
+					continue;
+				}
+				MyQuestion myQuestion = new MyQuestion(
+						questionCache.get(questionAttr.getQuestionId()), 
+						questionOptionCache.get(questionAttr.getQuestionId()),
+						paperQuestionAnswerCache.get(questionAttr.getQuestionId()),
+						questionAttr );
+				_chapter.getMyQuestionList().add(myQuestion);
+			}
+		}
+		return myPaper;
 	}
 
 	private MyPaper generateMyPaper(Paper paper, List<PaperQuestion> chapterList, Map<Integer, Question> questionCache,

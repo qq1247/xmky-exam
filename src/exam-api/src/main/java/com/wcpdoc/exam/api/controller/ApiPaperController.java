@@ -2,6 +2,7 @@ package com.wcpdoc.exam.api.controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.PaperQuestionAnswer;
@@ -318,9 +320,9 @@ public class ApiPaperController extends BaseController {
 	 * @param id
 	 * @return PageResult
 	 */
-	@RequestMapping("/detail")
+	@RequestMapping("/myPaper")
 	@ResponseBody
-	public PageResult detail(Integer id) {
+	public PageResult myPaper(Integer id) {
 		try {
 			MyPaper myPaper = paperService.getMyPaper(id);
 			return PageResultEx.ok().data(detailHandle(myPaper));
@@ -330,11 +332,11 @@ public class ApiPaperController extends BaseController {
 		}
 	}
 
-	@RequestMapping("/detailOfRandom")
+	@RequestMapping("/myPaperOfRand")
 	@ResponseBody
 	public PageResult detailOfRandom(Integer examId, Integer userId) {
 		try {
-			MyPaper myPaper = paperService.getMyPaper(examId, userId);
+			MyPaper myPaper = paperService.getMyPaperOfRand(examId, userId);
 			return PageResultEx.ok().data(detailHandle(myPaper));
 		} catch (Exception e) {
 			log.error("试题列表错误：", e);
@@ -542,6 +544,10 @@ public class ApiPaperController extends BaseController {
 			singleResult.put("chapter", chapterMap);
 			
 			List<Map<String, Object>> questionsListMap = new ArrayList<>();
+			if (ValidateUtil.isValid(myPaper.getPaper().getOptions()) && myPaper.getPaper().getOptions().contains("1")) {
+				Collections.shuffle(chapter.getMyQuestionList());
+			}
+			
 			for (MyQuestion myQuestion : chapter.getMyQuestionList()) {
 				Map<String, Object> questionMap = new HashMap<>();
 				questionMap.put("id", myQuestion.getQuestion().getId());
@@ -554,11 +560,16 @@ public class ApiPaperController extends BaseController {
 				questionMap.put("aiOptions", myQuestion.getAttr().getAiOptionArr());// 分数选项从试卷中取
 				questionMap.put("options", new ArrayList<Map<String, Object>>());
 				
-				for (QuestionOption questionOption : myQuestion.getOptionList()) {
-					Map<String, Object> option = new HashMap<>();
-					option.put("option", questionOption.getOptions());
-					option.put("no", questionOption.getNo());
-					((List<Map<String, Object>>)questionMap.get("options")).add(option);
+				if (myQuestion.getQuestion().getType() == 1 || myQuestion.getQuestion().getType() == 2) {
+					if (ValidateUtil.isValid(myPaper.getPaper().getOptions()) && myPaper.getPaper().getOptions().contains("2")) {
+						Collections.shuffle(myQuestion.getOptionList());
+					}
+					for (QuestionOption questionOption : myQuestion.getOptionList()) {
+						Map<String, Object> option = new HashMap<>();
+						option.put("option", questionOption.getOptions());
+						option.put("no", (char)(questionOption.getNo() + 64));
+						((List<Map<String, Object>>)questionMap.get("options")).add(option);
+					}
 				}
 				
 				questionMap.put("answers", new ArrayList<Map<String, Object>>());
