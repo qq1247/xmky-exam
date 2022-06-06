@@ -40,4 +40,10 @@ public class PaperQuestionAnswerDaoImpl extends RBaseDaoImpl<PaperQuestionAnswer
 		String sql = "SELECT * FROM EXM_PAPER_QUESTION_ANSWER WHERE PAPER_ID = :PAPER_ID AND QUESTION_ID = :QUESTION_ID ORDER BY NO ASC";
 		return getList(sql, new Object[] { paperId, questionId }, PaperQuestionAnswer.class);
 	}
+
+	@Override
+	public List<PaperQuestionAnswer> getListByChapter(Integer chapterId) {
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION_ANSWER WHERE PAPER_QUESTION_ID = :PAPER_QUESTION_ID ORDER BY NO ASC";
+		return getList(sql, new Object[] { chapterId }, PaperQuestionAnswer.class);
+	}
 }

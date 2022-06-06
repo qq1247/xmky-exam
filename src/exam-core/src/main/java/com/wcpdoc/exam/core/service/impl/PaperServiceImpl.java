@@ -216,22 +216,22 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 					paperQuestionService.add(copyPaperQuestion);
 					copyPaperQuestion.setParentSub(String.format("%s%s_", copyChapter.getParentSub(), copyPaperQuestion.getId()));
 					paperQuestionService.update(copyPaperQuestion);
+				}
 
-					List<PaperQuestionAnswer> answerList = paperQuestionAnswerService.getList(id);// 复制答案
-					for (PaperQuestionAnswer answer : answerList) {
-						PaperQuestionAnswer copyAnswer = new PaperQuestionAnswer();
-						try {
-							BeanUtils.copyProperties(copyAnswer, answer);
-						} catch (Exception e) {
-							throw new MyException(e.getMessage());
-						}
-						copyAnswer.setPaperQuestionId(copyChapter.getId());
-						copyAnswer.setPaperId(copyPaper.getId());
-						paperQuestionAnswerService.add(copyAnswer);
+				List<PaperQuestionAnswer> answerList = paperQuestionAnswerService.getListByChapter(chapter.getId());// 复制答案
+				for (PaperQuestionAnswer answer : answerList) {
+					PaperQuestionAnswer copyAnswer = new PaperQuestionAnswer();
+					try {
+						BeanUtils.copyProperties(copyAnswer, answer);
+					} catch (Exception e) {
+						throw new MyException(e.getMessage());
 					}
+					copyAnswer.setPaperQuestionId(copyChapter.getId());
+					copyAnswer.setPaperId(copyPaper.getId());
+					paperQuestionAnswerService.add(copyAnswer);
 				}
 			} else {// 随机组卷
-				List<PaperQuestionRule> ruleList = paperQuestionRuleService.getList(chapter.getId());
+				List<PaperQuestionRule> ruleList = paperQuestionRuleService.getList(chapter.getId());// 复制规则
 				for(PaperQuestionRule paperQuestionRule : ruleList){
 					PaperQuestionRule copyPaperQuestionRule = new PaperQuestionRule();
 					try {
@@ -634,7 +634,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		paperQuestionService.update(pq);
 			
 		// 更新答案分数
-		List<PaperQuestionAnswer> answerList = paperQuestionAnswerService.getListForSingleQuestion(pq.getPaperId(), pq.getQuestionId());
+		List<PaperQuestionAnswer> answerList = paperQuestionAnswerService.getListBySingleQuestion(pq.getPaperId(), pq.getQuestionId());
 		if (question.getType() == 1 || question.getType() == 4) { //单选 判断
 			for(PaperQuestionAnswer paperQuestionAnswer : answerList){
 				paperQuestionAnswer.setScore(score);
@@ -656,7 +656,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 				|| (question.getType() == 5 && question.getAi() == 1)) { // 智能填空 智能问答
 			BigDecimal scoreSum = new BigDecimal(0);
 			for (int i = 0; i < subScores.length; i++) {
-				scoreSum.add(subScores[i]);
+				scoreSum = scoreSum.add(subScores[i]);
 				PaperQuestionAnswer answer = answerList.get(i);
 				answer.setScore(subScores[i]);
 				paperQuestionAnswerService.update(answer);
@@ -710,7 +710,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		}
 		
 		// 删除答案
-		List<PaperQuestionAnswer> answerList = paperQuestionAnswerService.getListForSingleQuestion(id, questionId);
+		List<PaperQuestionAnswer> answerList = paperQuestionAnswerService.getListBySingleQuestion(id, questionId);
 		for(PaperQuestionAnswer answer : answerList){
 			paperQuestionAnswerService.del(answer.getId());
 		}
@@ -754,7 +754,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		// 清空试题
 		List<PaperQuestion> chapterDetailList = paperQuestionService.getChapterDetailList(chapterId);
 		for (PaperQuestion chapterDetail : chapterDetailList) {
-			List<PaperQuestionAnswer> answerList = paperQuestionAnswerService.getListForSingleQuestion(chapterDetail.getPaperId(), chapterDetail.getQuestionId());// 删除答案
+			List<PaperQuestionAnswer> answerList = paperQuestionAnswerService.getListBySingleQuestion(chapterDetail.getPaperId(), chapterDetail.getQuestionId());// 删除答案
 			for(PaperQuestionAnswer answer : answerList){
 				paperQuestionAnswerService.del(answer.getId());
 			}
@@ -812,7 +812,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			paperQuestionService.update(chapterDetai);
 			
 			// 更新答案分数
-			List<PaperQuestionAnswer> answerList = paperQuestionAnswerService.getListForSingleQuestion(chapterDetai.getPaperId(), chapterDetai.getQuestionId());
+			List<PaperQuestionAnswer> answerList = paperQuestionAnswerService.getListBySingleQuestion(chapterDetai.getPaperId(), chapterDetai.getQuestionId());
 			if (question.getType() == 1 || question.getType() == 4) { //单选 判断
 				for(PaperQuestionAnswer paperQuestionAnswer : answerList){
 					paperQuestionAnswer.setScore(score);

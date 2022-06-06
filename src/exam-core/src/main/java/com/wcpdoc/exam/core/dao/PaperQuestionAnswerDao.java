@@ -39,4 +39,13 @@ public interface PaperQuestionAnswerDao extends BaseDao<PaperQuestionAnswer>{
 	 * @return List<PaperQuestionAnswer>
 	 */
 	List<PaperQuestionAnswer> getListForSingleQuestion(Integer paperId, Integer questionId);
+
+	/**
+	 * 获取试卷答案列表
+	 * 
+	 * v1.0 zhanghc 2022年6月6日下午4:14:37
+	 * @param chapterId
+	 * @return List<PaperQuestionAnswer>
+	 */
+	List<PaperQuestionAnswer> getListByChapter(Integer chapterId);
 }

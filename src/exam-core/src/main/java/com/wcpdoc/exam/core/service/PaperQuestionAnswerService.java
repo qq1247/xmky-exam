@@ -37,6 +37,15 @@ public interface PaperQuestionAnswerService extends BaseService<PaperQuestionAns
 	 * @param questionId
 	 * @return List<PaperQuestionAnswer>
 	 */
-	List<PaperQuestionAnswer> getListForSingleQuestion(Integer paperId, Integer questionId);
+	List<PaperQuestionAnswer> getListBySingleQuestion(Integer paperId, Integer questionId);
+
+	/**
+	 * 获取试卷答案
+	 * 
+	 * v1.0 zhanghc 2022年6月6日下午4:13:50
+	 * @param chapterId
+	 * @return List<PaperQuestionAnswer>
+	 */
+	List<PaperQuestionAnswer> getListByChapter(Integer chapterId);
 
 }

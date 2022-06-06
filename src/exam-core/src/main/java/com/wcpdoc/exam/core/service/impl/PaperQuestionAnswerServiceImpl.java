@@ -40,7 +40,13 @@ public class PaperQuestionAnswerServiceImpl extends BaseServiceImp<PaperQuestion
 	}
 
 	@Override
-	public List<PaperQuestionAnswer> getListForSingleQuestion(Integer paperId, Integer questionId) {
+	public List<PaperQuestionAnswer> getListBySingleQuestion(Integer paperId, Integer questionId) {
 		return paperQuestionAnswerDao.getListForSingleQuestion(paperId, questionId);
+	}
+
+
+	@Override
+	public List<PaperQuestionAnswer> getListByChapter(Integer chapterId) {
+		return paperQuestionAnswerDao.getListByChapter(chapterId);
 	}
 }

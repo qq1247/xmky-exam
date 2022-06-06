@@ -319,14 +319,16 @@ public class ExamExServiceImpl extends BaseServiceImp<Exam> implements ExamExSer
 			myMarkService.del(myMark.getId());
 		}
 		
-		for (int i = 0; i < markUserIds.length; i++) {
-			MyMark myMark = new MyMark();
-			myMark.setMarkUserId(markUserIds[i]);
-			myMark.setExamUserIds(String.format(",%s,", examUserIds[i]));
-			myMark.setUpdateUserId(getCurUser().getId());
-			myMark.setUpdateTime(new Date());
-			myMark.setExamId(exam.getId());
-			myMarkService.add(myMark);
+		if (myPaper.getPaper().getMarkType() == 2) {
+			for (int i = 0; i < markUserIds.length; i++) {
+				MyMark myMark = new MyMark();
+				myMark.setMarkUserId(markUserIds[i]);
+				myMark.setExamUserIds(String.format(",%s,", examUserIds[i]));
+				myMark.setUpdateUserId(getCurUser().getId());
+				myMark.setUpdateTime(new Date());
+				myMark.setExamId(exam.getId());
+				myMarkService.add(myMark);
+			}
 		}
 	}
 
