@@ -638,11 +638,6 @@ export default {
         return
       }
 
-      if (now < _examMarkEndTime) {
-        this.$message.warning('阅卷暂未结束！')
-        return
-      }
-
       // 考试时间内和阅卷结束后的逻辑
       if (
         (_examStartTime < now && now < _examEndTime) ||
@@ -690,12 +685,14 @@ export default {
   display: flex;
   flex-direction: row;
 }
+
 .home-left {
   height: 100%;
   flex: 1;
   display: flex;
   flex-direction: column;
 }
+
 .home-right {
   width: 289px;
   height: 100%;
@@ -703,11 +700,13 @@ export default {
   flex-direction: column;
   margin-left: 15px;
 }
+
 .home-calendar {
   width: 300px;
   height: auto;
   border-right: 1px solid rgba(#000, 0.1);
 }
+
 .home-list {
   flex: 1;
 }
@@ -717,12 +716,14 @@ export default {
   margin-bottom: 16px;
   border: none;
   border-radius: 8px;
+
   /deep/ .el-card__header {
     position: relative;
     padding: 0 0 0 32px;
     height: 40px;
     line-height: 40px;
     font-size: 16px;
+
     &::after {
       content: '';
       display: block;
@@ -734,6 +735,7 @@ export default {
       background: #0094e5;
     }
   }
+
   /deep/.el-card__body {
     padding: 0;
   }
@@ -742,6 +744,7 @@ export default {
 .box-flex {
   flex: 1;
   margin-bottom: 0;
+
   /deep/ .el-card__body {
     height: calc(100% - 40px);
   }
@@ -765,6 +768,7 @@ export default {
   position: relative;
   margin-top: 8px;
   cursor: pointer;
+
   &::before {
     content: '';
     display: block;
@@ -776,13 +780,16 @@ export default {
     border-radius: 50%;
     background: #8f9ca3;
   }
+
   .item-left {
     color: #0c2e41;
   }
+
   .item-right {
     font-size: 12px;
     color: #8f9ca3;
   }
+
   &:hover {
     &::before {
       background: #0094e5;
@@ -805,6 +812,7 @@ export default {
   justify-content: center;
   align-items: center;
   cursor: pointer;
+
   .item-icon {
     width: 48px;
     height: 48px;
@@ -813,29 +821,35 @@ export default {
     align-items: center;
     margin-right: 16px;
     transition: all 0.15s ease;
+
     img {
       width: 24px;
       height: 24px;
       transition: all 0.3s ease-in-out;
     }
   }
+
   .item-info {
     display: flex;
     flex-direction: column;
+
     .info-num {
       font-size: 28px;
       font-weight: 500;
       color: #0c2e41;
     }
+
     .info-intro {
       font-size: 12px;
       color: #537384;
     }
   }
+
   &:hover {
     .item-icon {
       border-radius: 8px;
       box-shadow: 0 0 8px -3px rgba(#000, 0.13);
+
       img {
         transform: scale(1.15);
       }
@@ -878,30 +892,37 @@ export default {
       color: rgba(0, 0, 0, 0.45);
     }
   }
+
   tr {
     &:first-child {
       td {
         border: 1px solid #fff;
       }
     }
+
     td {
       margin-top: 10px;
+
       &.is-today {
         background: #0094e5;
         color: #fff;
         border-radius: 5px;
       }
+
       &.is-selected {
         background: #0094e5;
         border-radius: 5px;
         color: #fff;
       }
+
       border: 1px solid #fff;
+
       &:first-child {
         border: 1px solid #fff;
       }
     }
   }
+
   .el-calendar-day {
     height: 40px;
     display: flex;
@@ -910,6 +931,7 @@ export default {
     align-items: center;
     padding: 0;
     border-radius: 5px;
+
     &:hover {
       background: #fff;
       border: 1px solid #0094e5;
@@ -927,20 +949,24 @@ export default {
   color: #0c2e41;
   padding: 0 5px;
   cursor: pointer;
+
   .item-left {
     flex: 1;
   }
+
   .item-time {
     flex: 1;
     font-size: 12px;
     color: #537384;
   }
+
   .item-score,
   .item-pass {
     font-size: 12px;
     color: #537384;
     margin-right: 30px;
   }
+
   .item-btn {
     display: flex;
     justify-content: center;
@@ -952,12 +978,15 @@ export default {
     border-radius: 5px;
     background: rgba(#0094e5, 0.1);
     color: #0094e5;
+
     img {
       margin-right: 5px;
     }
+
     &:hover {
       background: #0094e5;
       color: #fff;
+
       img {
         content: url('~@/assets/img/index/index-view-active.png');
       }
@@ -969,15 +998,18 @@ export default {
   display: flex;
   align-items: center;
   padding: 10px;
+
   .today-icon {
     width: 64px;
     height: 64px;
   }
+
   .item-center {
     flex: 1;
     display: flex;
     flex-direction: column;
     padding: 0 20px;
+
     .info-item {
       line-height: 30px;
       border: none;
@@ -991,6 +1023,7 @@ export default {
 
 /deep/ .el-dialog__header {
   border-bottom: 1px solid #c2c2c2;
+
   .el-dialog__title {
     font-size: 16px;
   }
@@ -1000,12 +1033,14 @@ export default {
   display: flex;
   flex-direction: column;
   padding: 0 20px;
+
   .bulletin-title {
     width: 100%;
     text-align: right;
     color: #666;
     margin-bottom: 15px;
   }
+
   .bulletin-content {
     text-indent: 2em;
   }
@@ -1018,6 +1053,7 @@ export default {
 
 .quick-nav {
   width: 33.33%;
+
   .nav-item {
     display: flex;
     flex-direction: column;
@@ -1025,6 +1061,7 @@ export default {
     align-items: center;
     margin-top: 24px;
   }
+
   .nav-img {
     width: 40px;
     height: 40px;
@@ -1033,6 +1070,7 @@ export default {
     align-items: center;
     border-radius: 8px;
   }
+
   .nav-title {
     font-size: 12px;
     color: #537384;
@@ -1048,12 +1086,15 @@ export default {
   display: flex;
   align-items: center;
   line-height: 30px;
+
   span {
     color: #537384;
   }
 }
+
 .service-qq {
   display: flex;
+
   .qq-title {
     width: 31px;
     height: 20px;
@@ -1064,6 +1105,7 @@ export default {
     background: #0874ae;
     border-radius: 4px 0px 0px 4px;
   }
+
   .qq-number {
     width: 73px;
     height: 20px;

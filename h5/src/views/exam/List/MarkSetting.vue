@@ -10,7 +10,8 @@
           :disabled="index === 0"
           prop="examRadio"
           @change="selectPaperType"
-        >{{ item.name }}</el-radio>
+        >{{ item.name }}
+        </el-radio>
       </el-form-item>
       <el-row v-for="(item, index) in examForm.examRemarks" :key="item.id">
         <el-col :span="12">
@@ -118,7 +119,8 @@
             size="mini"
             icon="el-icon-minus"
             @click="remarkDel"
-          >删除</el-button>
+          >删除
+          </el-button>
         </el-form-item>
       </div>
       <el-form-item>
@@ -161,7 +163,6 @@ export default {
         ],
         examQuestionNums: [],
         examRemarks: [],
-        examUser: '',
         examUsers: [],
         examUserList: []
       }
@@ -185,7 +186,7 @@ export default {
       this.examForm.examRemarks = []
       for (let index = 0; index < num; index++) {
         this.examForm.examRemarks.push({
-          examCheckPerson: '',
+          examCheckPerson: null,
           examQuestionNum: [],
           examUser: []
         })
@@ -233,10 +234,10 @@ export default {
     }
   },
   methods: {
-    // 添加评语
+    // 添加
     remarkAdd() {
       this.examForm.examRemarks.push({
-        examCheckPerson: '',
+        examCheckPerson: null,
         examQuestionNum: [],
         examUser: []
       })

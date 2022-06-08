@@ -84,9 +84,7 @@
       </el-scrollbar>
       <el-scrollbar wrap-style="overflow-x:hidden;" class="content-center">
         <template v-if="questionTemplate">
-          <div class="top">
-            <div class="top-title">试题模板操作</div>
-          </div>
+          <div class="top">试题模板操作</div>
           <QuestionTemplate
             ref="questionTemplate"
             :question-type-id="questionTypeId"
@@ -388,29 +386,30 @@ export default {
   background: #fff;
   padding: 10px 20px 0 0;
   border-bottom-right-radius: 8px;
-  .top {
-    background: #fff;
-    width: 100%;
-    height: 40px;
-    line-height: 40px;
-    color: #333;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 100;
-    font-weight: 600;
-    padding-left: 30px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    &::before {
-      content: '';
-      display: inline-block;
-      position: relative;
-      top: 2px;
-      left: -10px;
-      width: 2px;
-      height: 14px;
-      background: #0094e5;
-    }
+}
+
+.top {
+  background: #fff;
+  width: 100%;
+  height: 40px;
+  line-height: 40px;
+  color: #333;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  font-weight: 600;
+  padding-left: 30px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  &::before {
+    content: '';
+    display: inline-block;
+    position: relative;
+    top: 2px;
+    left: -10px;
+    width: 2px;
+    height: 14px;
+    background: #0094e5;
   }
 }
 </style>

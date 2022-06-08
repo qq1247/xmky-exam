@@ -4,7 +4,7 @@ export default {
   props: {
     detail: {
       type: Object,
-      default: () => {}
+      default: () => { }
     },
     recite: {
       type: Boolean,
@@ -39,6 +39,20 @@ export default {
 <style lang="scss">
 .cloze-input {
   width: fit-content !important;
-  min-width: 100px !important;
+
+  .el-input__inner {
+    height: 24px;
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+    border-bottom: 1px solid #0c2e41;
+  }
+
+  &.is-disabled .el-input__inner {
+    background-color: transparent;
+    border-color: #0c2e41;
+    color: #0c2e41;
+    cursor: default;
+  }
 }
 </style>

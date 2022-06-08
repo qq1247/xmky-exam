@@ -106,11 +106,6 @@ export default {
         return
       }
 
-      if (now < _examMarkEndTime) {
-        this.$message.warning('阅卷暂未结束！')
-        return
-      }
-
       // 考试时间内和阅卷结束后的逻辑
       if (
         (_examStartTime < now && now < _examEndTime) ||

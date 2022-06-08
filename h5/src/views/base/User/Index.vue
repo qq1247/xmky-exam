@@ -29,6 +29,7 @@
             </el-form-item>
             <el-form-item>
               <el-upload
+                ref="uploadTemplate"
                 :limit="1"
                 name="files"
                 list-type="text"
@@ -294,6 +295,7 @@ export default {
       const res = await userImport({
         fileId
       })
+      this.$refs.uploadTemplate.clearFiles()
       if (res.code === 200) {
         this.$message.success('导入用户成功！')
         this.query()
