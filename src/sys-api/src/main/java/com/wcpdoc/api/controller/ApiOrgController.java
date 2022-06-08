@@ -208,6 +208,9 @@ public class ApiOrgController extends BaseController {
 		try {
 			orgExService.xlsImport(fileId);
 			return PageResultEx.ok();
+		} catch (MyException e) {
+			log.error("机构列表错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("机构列表错误：", e);
 			return PageResult.err();
