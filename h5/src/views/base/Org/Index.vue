@@ -29,6 +29,7 @@
             </el-form-item>
             <el-form-item>
               <el-upload
+                ref="uploadTemplate"
                 :limit="1"
                 name="files"
                 list-type="text"
@@ -111,7 +112,8 @@ export default {
       // 查询表单
       queryForm: {
         name: null,
-        parentId: null
+        parentId: null,
+        fileList: []
       }
     }
   },
@@ -203,7 +205,8 @@ export default {
     // 上传成功
     uploadSuccess(response, file, fileList) {
       if (this.listpage.list[0]?.children?.length > 1) {
-        this.$message.warning('请校对上传数据！')
+        this.$message.warning('机构已存在，不可导入!')
+        this.$refs.uploadTemplate.clearFiles()
         return false
       } else {
         this.orgImport(response.data.fileIds)
@@ -214,6 +217,7 @@ export default {
       const res = await orgImport({
         fileId
       })
+      this.$refs.uploadTemplate.clearFiles()
       if (res.code === 200) {
         this.$message.success('导入组织机构成功！')
         this.query()
@@ -228,10 +232,12 @@ export default {
   height: 40px;
   border-radius: 5px;
 }
+
 .el-input {
   width: 300px;
   float: left;
 }
+
 .el-input-number {
   float: left;
 }
@@ -250,22 +256,26 @@ export default {
   text-align: center;
   height: 55px;
 }
+
 /deep/ .el-table td {
   color: #8392a6;
   font-size: 12px;
   text-align: center;
   border-bottom: 1px solid #ddd;
 }
+
 .common {
   padding: 0 10px;
   color: #0096e7;
   font-size: 18px;
 }
+
 /deep/ .el-input__inner:focus {
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
     0 0 8px rgba(102, 175, 233, 0.6);
   border: 1px solid #f2f4f5;
 }
+
 .common-arrow-down {
   margin-left: 10px;
   color: #999;

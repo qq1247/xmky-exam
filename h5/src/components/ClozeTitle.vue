@@ -16,11 +16,11 @@ export default {
     },
     questionDetail: {
       type: Object,
-      default: () => {}
+      default: () => { }
     },
     myExamDetailCache: {
       type: Object,
-      default: () => {}
+      default: () => { }
     }
   },
   render(h, context) {
@@ -36,26 +36,28 @@ export default {
       const titleEnd = title.substring(
         title.indexOf(underline) + underline.length
       )
-      let isTrue
-      const selfAnswer =
-        props.myExamDetailCache[props.questionId].answers[index]
-      const trueAnswer = props.questionDetail.answers[index].answer
 
-      if (selfAnswer) {
-        isTrue = trueAnswer.some((answer) => selfAnswer.includes(answer))
+      let inputHtml
+      if (props.preview) {
+        let isTrue
+        const selfAnswer =
+          props.myExamDetailCache[props.questionId].answers[index]
+        const trueAnswer = props.questionDetail.answers[index].answer
+
+        if (selfAnswer) {
+          isTrue = trueAnswer.some((answer) => selfAnswer.includes(answer))
+        } else {
+          isTrue = false
+        }
+
+        inputHtml = `<span class="cloze-input-preview" style="color: ${isTrue ? '#00b050' : '#ff5722'};border-color: ${isTrue ? '#00b050' : '#ff5722'}; ">${props.myExamDetailCache[questionId].answers[index] || ''}</span><span v-if="${props.preview
+        }" class="cloze-answer">（${props.questionDetail.answers[
+          index
+        ].answer.join(',')}）</span>`
       } else {
-        isTrue = false
+        inputHtml = `<el-input class="cloze-input" @change='updateAnswer(${questionId})' :disabled='${props.preview}' v-model='myExamDetailCache[${questionId}].answers[${index}]'></el-input>`
       }
-
-      const elInput = isTrue
-        ? `<el-input class="cloze-input cloze-success" @change='updateAnswer(${questionId})' :disabled='${props.preview}' v-model='myExamDetailCache[${questionId}].answers[${index}]'></el-input>`
-        : `<el-input class="cloze-input cloze-error" @change='updateAnswer(${questionId})' :disabled='${props.preview}' v-model='myExamDetailCache[${questionId}].answers[${index}]'></el-input>`
-      const showAnswer = `<span v-if="${
-        props.preview
-      }" class="cloze-answer">（${props.questionDetail.answers[
-        index
-      ].answer.join(',')}）</span>`
-      title = `${titleStart}${elInput}${showAnswer}${titleEnd}`
+      title = `${titleStart}${inputHtml}${titleEnd}`
     })
     const titleTemplate = {
       template: title,
@@ -78,6 +80,7 @@ export default {
 <style lang="scss">
 .cloze-input {
   width: fit-content !important;
+
   .el-input__inner {
     height: 24px;
     border: none;
@@ -85,6 +88,7 @@ export default {
     background-color: transparent;
     border-bottom: 1px solid #0c2e41;
   }
+
   &.is-disabled .el-input__inner {
     background-color: transparent;
     border-color: #0c2e41;
@@ -92,22 +96,15 @@ export default {
     cursor: default;
   }
 }
-.cloze-success {
-  &.is-disabled .el-input__inner {
-    background-color: transparent;
-    border-color: #00b050;
-    color: #00b050;
-    cursor: default;
-  }
+
+.cloze-input-preview {
+  display: inline-block;
+  line-height: 16px;
+  padding: 0 30px;
+  color: #0c2e41;
+  border-bottom: 1px solid #0c2e41;
 }
-.cloze-error {
-  &.is-disabled .el-input__inner {
-    background-color: transparent;
-    border-color: #ff5722;
-    color: #ff5722;
-    cursor: default;
-  }
-}
+
 .cloze-answer {
   color: #00b050;
 }

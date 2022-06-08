@@ -78,10 +78,12 @@
                 size="mini"
                 type="primary"
                 @click.stop="questionEdit(question.id, question.type)"
-              ><img
-                src="@/assets/img/question/question-update.png"
-                alt=""
-              >修改</el-button>
+              >
+                <img
+                  src="@/assets/img/question/question-update.png"
+                  alt=""
+                >修改
+              </el-button>
               <el-button
                 class="btn"
                 size="mini"
@@ -281,7 +283,7 @@ export default {
 
 .question-content {
   &:first-child {
-    padding-top: 50px;
+    margin-top: 50px;
   }
 }
 
@@ -304,6 +306,7 @@ export default {
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: space-between;
+
   &::before {
     content: '';
     display: inline-block;
@@ -314,10 +317,12 @@ export default {
     height: 14px;
     background: #0094e5;
   }
+
   .top-title {
     flex: 1;
     line-height: 40px;
   }
+
   .top-handler {
     display: flex;
     align-items: center;
@@ -331,29 +336,36 @@ export default {
   border: 1px solid #eee;
   border-radius: 4px;
   margin-right: 16px;
+
   .type-item {
     width: 20px;
     height: 20px;
     line-height: 20px;
     text-align: center;
     cursor: pointer;
+
     &:first-child {
       border-radius: 2px 0 0 2px;
     }
+
     &:last-child {
       border-radius: 0 2px 2px 0;
     }
   }
+
   .edit-active {
     background: #0094e5;
     color: #fff;
+
     img {
       content: url('~@/assets/img/question/question-edit-active.png');
     }
   }
+
   .view-active {
     background: #0094e5;
     color: #fff;
+
     img {
       content: url('~@/assets/img/question/question-view-active.png');
     }
@@ -365,16 +377,20 @@ export default {
   margin: 0 10px 10px 10px;
   display: flex;
   flex-direction: column;
+
   /deep/ .el-card__body {
     padding: 10px 15px;
   }
+
   &:hover {
     border: 1px solid #0094e5;
     background: rgba(#0094e5, 0.06%);
+
     .card-bottom-right {
       display: block;
     }
   }
+
   &:nth-of-type(2) {
     margin-top: 50px;
   }
@@ -388,12 +404,14 @@ export default {
   font-size: 14px;
   text-align: left;
   display: flex;
+
   .render-title {
     flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+
   p {
     margin: 0;
     padding: 0;
@@ -406,9 +424,11 @@ export default {
   align-items: center;
   height: 30px;
   margin: 10px 0 -5px;
+
   .el-tag {
     margin-right: 8px;
   }
+
   .center-tag-danger {
     background-color: #feeddc;
     border-color: #fddbb9;
@@ -416,17 +436,21 @@ export default {
     height: 20px;
     line-height: 18px;
   }
+
   .center-tag-purple {
     border-color: #daddf9;
     color: #838eea;
     height: 20px;
     line-height: 18px;
   }
+
   .card-bottom-right {
     display: none;
   }
+
   .btn {
     padding: 3px 8px;
+
     img {
       margin-right: 4px;
       vertical-align: -1px;
