@@ -140,7 +140,7 @@ public class ApiLoginController extends BaseController {
 	 */
 	@RequestMapping("/entName")
 	@ResponseBody
-	public PageResult orgName() {
+	public PageResult entName() {
 		try {
 			Parm parm = ParmCache.get();
 			return PageResultEx.ok().data(parm == null ? "" : parm.getOrgName());
@@ -158,7 +158,7 @@ public class ApiLoginController extends BaseController {
 	 */
 	@RequestMapping("/entLogo")
 	@ResponseBody
-	public void logo(Boolean ico) {
+	public void entLogo(Boolean ico) {
 		try {
 			File logo = new File("./config/logo.png");
 			String fileName = "logo"; 

@@ -19,7 +19,7 @@ router.beforeEach(async(to, from, next) => {
   const hasToken = getInfo().accessToken
 
   const link = document.querySelector("link[rel*='icon']")
-  link.href = `/api/login/logo?icon=true`
+  link.href = `/api/login/entLogo?icon=true`
 
   if (hasToken) {
     if (store.state.permission.routes.length > constantRoutes.length) {
