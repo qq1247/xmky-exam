@@ -14,7 +14,7 @@ export default {
   data() {
     return {
       id: null,
-      state: 2,
+      state: 2
     }
   },
   async mounted() {
@@ -26,7 +26,7 @@ export default {
     async userFrozen() {
       const res = await userFrozen({ id: this.id })
       res.code === 200 && this.$router.back()
-    },
-  },
+    }
+  }
 }
 </script>

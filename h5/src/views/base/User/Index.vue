@@ -16,8 +16,7 @@
               icon="el-icon-search"
               type="primary"
               @click="query"
-              >查询</el-button
-            >
+            >查询</el-button>
           </el-col>
           <el-col :span="6">
             <el-form-item>
@@ -26,8 +25,7 @@
                 size="mini"
                 type="primary"
                 @click="userTemplate()"
-                >下载模板</el-button
-              >
+              >下载模板</el-button>
             </el-form-item>
             <el-form-item>
               <el-upload
@@ -44,8 +42,7 @@
                   size="mini"
                   type="primary"
                   @click="() => userImport"
-                  >导入</el-button
-                >
+                >导入</el-button>
               </el-upload>
             </el-form-item>
           </el-col>
@@ -56,8 +53,7 @@
                 size="mini"
                 type="primary"
                 @click="add"
-                >添加</el-button
-              >
+              >添加</el-button>
             </el-form-item>
           </el-col>
         </el-row>
@@ -169,35 +165,35 @@ import {
   userRole,
   userImport,
   userListPage,
-  userTemplate,
+  userTemplate
 } from 'api/user'
 
 export default {
   data() {
     return {
       headers: {
-        Authorization: this.$store.getters.token,
+        Authorization: this.$store.getters.token
       },
       listpage: {
         // 列表数据
         total: 0, // 总条数
         curPage: 1, // 当前第几页
         pageSize: 10, // 每页多少条
-        list: [], // 列表数据
+        list: [] // 列表数据
       },
       queryForm: {
         // 查询表单
         name: null,
         orgName: null,
         queryShow: false,
-        fileList: [],
-      },
+        fileList: []
+      }
     }
   },
   computed: {
     hashChildren() {
       return !(this.$route.matched.length > 2)
-    },
+    }
   },
   created() {
     this.query()
@@ -208,12 +204,12 @@ export default {
       this.queryForm.queryShow = false
 
       const {
-        data: { list, total },
+        data: { list, total }
       } = await userListPage({
         orgName: this.queryForm.orgName,
         name: this.queryForm.name,
         curPage: curPage,
-        pageSize: this.listpage.pageSize,
+        pageSize: this.listpage.pageSize
       })
       this.listpage.total = total
       this.listpage.list = list
@@ -236,35 +232,35 @@ export default {
     add() {
       this.$tools.switchTab('UserIndexSetting', {
         id: 0,
-        tab: '1',
+        tab: '1'
       })
     },
     // 修改
     edit(id) {
       this.$tools.switchTab('UserIndexSetting', {
         id,
-        tab: '1',
+        tab: '1'
       })
     },
     // 重置密码
     async initPwd(id) {
       this.$tools.switchTab('UserIndexSetting', {
         id,
-        tab: '2',
+        tab: '2'
       })
     },
     // 删除
     del(id) {
       this.$tools.switchTab('UserIndexSetting', {
         id,
-        tab: '3',
+        tab: '3'
       })
     },
     // 冻结用户
     userFrozen(id) {
       this.$tools.switchTab('UserIndexSetting', {
         id,
-        tab: '4',
+        tab: '4'
       })
     },
     // 强制下线
@@ -281,7 +277,7 @@ export default {
     async userTemplate() {
       const template = await userTemplate({}, 'blob')
       const blob = new Blob([template], {
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       })
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -296,14 +292,14 @@ export default {
     // 用户导入
     async userImport(fileId) {
       const res = await userImport({
-        fileId,
+        fileId
       })
       if (res.code === 200) {
         this.$message.success('导入用户成功！')
         this.query()
       }
-    },
-  },
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>

@@ -42,7 +42,7 @@
 </template>
 <script>
 import { loginSysTime } from 'api/common'
-import { paperQuestionList, paperGet } from 'api/paper'
+import { paperQuestions, paperRandomQuestions, paperGet } from 'api/paper'
 import {
   myExamAnswer,
   myExamFinish,
@@ -117,14 +117,22 @@ export default {
         id: this.paperId
       })
       this.markType = res.data.markType
+      this.genType = res.data.genType
     },
     // 查询试卷信息
     async queryPaperInfo() {
-      const res = await paperQuestionList({
-        id: this.paperId,
-        examId: this.examId,
-        userId: this.userId
-      })
+      let res
+      if (this.genType === 1) {
+        res = await paperQuestions({
+          id: this.paperId
+        })
+      } else {
+        res = await paperRandomQuestions({
+          examId: this.examId,
+          userId: this.userId || this.$store.getters.userId
+        })
+      }
+
       this.paperQuestion = res.data
     },
     // 查询我的答案信息

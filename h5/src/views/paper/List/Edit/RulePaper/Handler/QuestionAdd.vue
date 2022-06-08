@@ -254,7 +254,7 @@ export default {
 
 <style lang="scss" scoped>
 .handler-content {
-  padding: 50px 20px 10px;
+  padding: 50px 10px 10px;
 }
 
 .types {
@@ -262,9 +262,9 @@ export default {
   flex-wrap: wrap;
 }
 .type-btn {
-  width: 110px;
+  width: 90px;
   height: 40px;
-  margin: 7px 1%;
+  margin: 7px 5px 0 0;
   line-height: 40px;
   position: relative;
   cursor: pointer;
@@ -285,7 +285,7 @@ export default {
       height: 22px;
       line-height: 22px;
       text-align: center;
-      margin: 0 10px;
+      margin: 0 5px;
       color: #0094e5;
     }
     &:last-child {

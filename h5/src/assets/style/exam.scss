@@ -329,13 +329,6 @@
       word-wrap: break-word;
       font-weight: 600;
       color: #0c2e41;
-      /deep/ .el-input__inner {
-        height: 24px;
-        border: none;
-        border-radius: 0;
-        background-color: transparent;
-        border-bottom: 1px solid #666;
-      }
     }
   }
   .ask-content {
@@ -477,8 +470,7 @@
   height: 140px;
 }
 
-/deep/.el-textarea.is-disabled .el-textarea__inner,
-/deep/.el-input.is-disabled .el-input__inner {
+/deep/.el-textarea.is-disabled .el-textarea__inner {
   background-color: #fff;
   border-color: #0094e5;
   color: #000;

@@ -7,13 +7,13 @@
         title="边缘拖拽，点击展开"
         class="common common-score-plate"
         @click="minimize = !minimize"
-      ></i>
+      />
       <i
         v-else
         title="最小化"
         class="common common-minimize"
         @click="minimize = !minimize"
-      ></i>
+      />
     </div>
     <!-- 打分间隔和分值 -->
     <div class="plate-body">
@@ -29,8 +29,7 @@
                 selectHalfScore === index ? 'select-step' : '',
               ]"
               @click="halfScoreHandler(index)"
-              >{{ item }}</span
-            >
+            >{{ item }}</span>
           </div>
           <div class="step-body">
             <span
@@ -38,8 +37,7 @@
               :key="item"
               :class="['step-item', selectScore === index ? 'select-step' : '']"
               @click="scoreHandler(index)"
-              >{{ item }}</span
-            >
+            >{{ item }}</span>
           </div>
         </div>
       </div>
@@ -81,12 +79,12 @@ export default {
   props: {
     data: {
       type: Object,
-      default: () => {},
+      default: () => {}
     },
     score: {
       type: Number,
-      default: null,
-    },
+      default: null
+    }
   },
   data() {
     return {
@@ -96,7 +94,7 @@ export default {
       selectHalfScore: null,
       markType: true,
       isNextQuestion: true,
-      minimize: false,
+      minimize: false
     }
   },
   watch: {
@@ -114,8 +112,8 @@ export default {
             this.halfScores.push(0.5 + index)
           }
         }
-      },
-    },
+      }
+    }
   },
   methods: {
     scoreHandler(index) {
@@ -133,8 +131,8 @@ export default {
     },
     nextPaper() {
       this.$emit('nextPaper')
-    },
-  },
+    }
+  }
 }
 </script>
 

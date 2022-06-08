@@ -127,7 +127,7 @@
 </template>
 
 <script>
-import { examMarkUserList, examUpdateMarkSet } from 'api/exam'
+import { examMarkUserList, examUserAdd } from 'api/exam'
 import { getQuick, setQuick } from '@/utils/storage'
 import { userListPage } from 'api/user'
 import CustomSelect from 'components/CustomSelect.vue'
@@ -327,7 +327,7 @@ export default {
           ? (params.questionIds = dynamic)
           : (params.examUserIds = dynamic)
 
-        await examUpdateMarkSet(params)
+        await examUserAdd(params)
 
         const examMarkUser = await examMarkUserList({ id: getQuick().examId })
         const userList = examMarkUser.data.reduce((acc, cur) => {

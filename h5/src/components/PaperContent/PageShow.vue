@@ -28,10 +28,10 @@
             >
               <span>{{ index + 1 }}、</span>
               <ClozeTitle
+                :preview="preview"
                 :title="question.title"
                 :question-id="question.id"
-                :preview="preview"
-                :paper-question="paperQuestion"
+                :question-detail="question"
                 :my-exam-detail-cache="myExamDetailCache"
               />
             </div>
@@ -48,7 +48,7 @@
                   v-for="(option, indexOption) in question.options"
                   :key="indexOption"
                   :disabled="preview"
-                  :label="String.fromCharCode(65 + indexOption)"
+                  :label="String(option.no)"
                   class="option-item"
                 >
                   <div
@@ -60,7 +60,9 @@
                     }"
                     class="flex-items-center"
                     v-html="
-                      `${String.fromCharCode(65 + indexOption)}、${option}`
+                      `${String.fromCharCode(65 + indexOption)}、${
+                        option.option
+                      }`
                     "
                   />
                 </el-radio>
@@ -78,7 +80,7 @@
                 <el-checkbox
                   v-for="(option, indexOption) in question.options"
                   :key="indexOption"
-                  :label="String.fromCharCode(65 + indexOption)"
+                  :label="String(option.no)"
                   class="option-item"
                   :disabled="preview"
                 >
@@ -91,41 +93,13 @@
                     }"
                     class="flex-items-center"
                     v-html="
-                      `${String.fromCharCode(65 + indexOption)}、${option}`
+                      `${String.fromCharCode(65 + indexOption)}、${
+                        option.option
+                      }`
                     "
                   />
                 </el-checkbox>
               </el-checkbox-group>
-            </template>
-
-            <!-- 填空 -->
-            <template v-if="question.type === 3 && preview && scoreState">
-              <div class="children-analysis">
-                <span class="analysis-tip">查看解析</span>
-                <div class="analysis-content">
-                  <div>答案：</div>
-                  <div>
-                    <div
-                      v-for="(answer, indexAnswers) in question.answers"
-                      :key="answer.id"
-                      class="answers-item"
-                    >
-                      <span>{{
-                        `填空${$tools.intToChinese(indexAnswers + 1)}、`
-                      }}</span>
-                      <span
-                        v-for="(ans, indexAnswer) in answer.answer"
-                        :key="indexAnswer"
-                        class="answers-tag"
-                      >{{ ans }}</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="analysis-content">
-                  <div>解析：</div>
-                  <div v-html="question.analysis" />
-                </div>
-              </div>
             </template>
 
             <!-- 判断 -->

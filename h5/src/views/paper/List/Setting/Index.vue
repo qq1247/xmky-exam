@@ -34,6 +34,7 @@
 import Setting from './Setting.vue'
 import Copy from './Copy.vue'
 import Publish from './Publish.vue'
+import Order from './Order.vue'
 import Delete from './Deletes.vue'
 export default {
   data() {
@@ -52,7 +53,7 @@ export default {
       contentName: '',
       contentIntro: '',
       contentUrl: '',
-      viewList: [Setting, Copy, Publish, Delete],
+      viewList: [Setting, Copy, Publish, Order, Delete],
       currentView: null
     }
   },
@@ -90,12 +91,20 @@ export default {
           index: '3'
         },
         {
+          name: '乱序',
+          intro: '试题、选项乱序',
+          icon: 'common common-reset-order',
+          contentName: '乱序',
+          contentIntro: '试题乱序和试题选项乱序',
+          index: '4'
+        },
+        {
           name: '删除',
           intro: '删除试卷',
           icon: 'common common-delete',
           contentName: '删除',
           contentIntro: '不影响关联的试题、考试等，可以正常显示和使用',
-          index: '4'
+          index: '5'
         }
       ]
     }

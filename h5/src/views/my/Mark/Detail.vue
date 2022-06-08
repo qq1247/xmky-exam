@@ -272,7 +272,7 @@
   </div>
 </template>
 <script>
-import { paperGet, paperQuestionList } from 'api/paper'
+import { paperGet, paperQuestions, paperRandomQuestions } from 'api/paper'
 import {
   myMarkUser,
   myMarkUserList,
@@ -354,11 +354,17 @@ export default {
     },
     // 查询试卷信息
     async queryPaperInfo() {
-      const res = await paperQuestionList({
-        id: this.paperId,
-        examId: this.examId,
-        userId: this.userId
-      })
+      let res
+      if (this.paper.genType === 1) {
+        res = await paperQuestions({
+          id: this.paperId
+        })
+      } else {
+        res = await paperRandomQuestions({
+          examId: this.examId,
+          userId: this.userId
+        })
+      }
       this.paperQuestion = res.data
       this.questionList = res.data.reduce((acc, cur) => {
         const filterQuestion = cur.questionList.filter(

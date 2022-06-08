@@ -41,13 +41,12 @@ export const examEdit = (params) => request('exam/edit', params)
 export const examDel = (params) => request('exam/del', params)
 
 /**
- * @name: examUpdateMarkSet
+ * @name: examUserAdd
  * @description: 更新阅卷用户
  * @param {*}
  * @return {*}
  */
-export const examUpdateMarkSet = (params) =>
-  request('exam/updateMarkSet', params)
+export const examUserAdd = (params) => request('exam/userAdd', params)
 
 /**
  * @name: examMarkUserList

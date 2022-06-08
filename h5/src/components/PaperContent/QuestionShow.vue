@@ -19,13 +19,14 @@
         <div v-else class="question-title">
           <span>{{ index + 1 }}、</span>
           <ClozeTitle
-            :title="questionList[index].title"
             :preview="preview"
-            :paper-question="paperQuestion"
-            :my-exam-detail-cache="myExamDetailCache"
             :question-id="routerIndex"
+            :question-detail="question"
+            :title="questionList[index].title"
+            :my-exam-detail-cache="myExamDetailCache"
           />
         </div>
+
         <!-- 单选 -->
         <template v-if="questionList[index].type === 1">
           <el-radio-group
@@ -38,12 +39,14 @@
               v-for="(option, indexOption) in questionList[index].options"
               :key="indexOption"
               :disabled="preview === 'true' ? true : false"
-              :label="String.fromCharCode(65 + indexOption)"
+              :label="String(option.on)"
               class="option-item"
             >
               <div
                 class="flex-items-center"
-                v-html="`${String.fromCharCode(65 + indexOption)}、${option}`"
+                v-html="
+                  `${String.fromCharCode(65 + indexOption)}、${option.option}`
+                "
               />
             </el-radio>
           </el-radio-group>
@@ -60,13 +63,15 @@
             <el-checkbox
               v-for="(option, indexOption) in questionList[index].options"
               :key="indexOption"
-              :label="String.fromCharCode(65 + indexOption)"
+              :label="String(option.on)"
               class="option-item"
               :disabled="preview === 'true' ? true : false"
             >
               <div
                 class="flex-items-center"
-                v-html="`${String.fromCharCode(65 + indexOption)}、${option}`"
+                v-html="
+                  `${String.fromCharCode(65 + indexOption)}、${option.option}`
+                "
               />
             </el-checkbox>
           </el-checkbox-group>

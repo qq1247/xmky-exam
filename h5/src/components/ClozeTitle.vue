@@ -14,17 +14,14 @@ export default {
       type: Boolean,
       default: false
     },
-    paperQuestion: {
-      type: Array,
-      default: () => []
+    questionDetail: {
+      type: Object,
+      default: () => {}
     },
     myExamDetailCache: {
       type: Object,
       default: () => {}
     }
-  },
-  data() {
-    return {}
   },
   render(h, context) {
     const {
@@ -39,9 +36,26 @@ export default {
       const titleEnd = title.substring(
         title.indexOf(underline) + underline.length
       )
-      // questionId 存在则为整卷方式，否则为单题方式
-      const inputHtml = `<el-input class="cloze-input" @change='updateAnswer(${questionId})' :disabled='${props.preview}' v-model='myExamDetailCache[${questionId}].answers[${index}]'></el-input>`
-      title = `${titleStart}${inputHtml}${titleEnd}`
+      let isTrue
+      const selfAnswer =
+        props.myExamDetailCache[props.questionId].answers[index]
+      const trueAnswer = props.questionDetail.answers[index].answer
+
+      if (selfAnswer) {
+        isTrue = trueAnswer.some((answer) => selfAnswer.includes(answer))
+      } else {
+        isTrue = false
+      }
+
+      const elInput = isTrue
+        ? `<el-input class="cloze-input cloze-success" @change='updateAnswer(${questionId})' :disabled='${props.preview}' v-model='myExamDetailCache[${questionId}].answers[${index}]'></el-input>`
+        : `<el-input class="cloze-input cloze-error" @change='updateAnswer(${questionId})' :disabled='${props.preview}' v-model='myExamDetailCache[${questionId}].answers[${index}]'></el-input>`
+      const showAnswer = `<span v-if="${
+        props.preview
+      }" class="cloze-answer">（${props.questionDetail.answers[
+        index
+      ].answer.join(',')}）</span>`
+      title = `${titleStart}${elInput}${showAnswer}${titleEnd}`
     })
     const titleTemplate = {
       template: title,
@@ -64,6 +78,37 @@ export default {
 <style lang="scss">
 .cloze-input {
   width: fit-content !important;
-  min-width: 100px !important;
+  .el-input__inner {
+    height: 24px;
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+    border-bottom: 1px solid #0c2e41;
+  }
+  &.is-disabled .el-input__inner {
+    background-color: transparent;
+    border-color: #0c2e41;
+    color: #0c2e41;
+    cursor: default;
+  }
+}
+.cloze-success {
+  &.is-disabled .el-input__inner {
+    background-color: transparent;
+    border-color: #00b050;
+    color: #00b050;
+    cursor: default;
+  }
+}
+.cloze-error {
+  &.is-disabled .el-input__inner {
+    background-color: transparent;
+    border-color: #ff5722;
+    color: #ff5722;
+    cursor: default;
+  }
+}
+.cloze-answer {
+  color: #00b050;
 }
 </style>

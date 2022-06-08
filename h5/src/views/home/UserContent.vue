@@ -109,25 +109,27 @@
           <el-scrollbar wrap-style="overflow-x:hidden;" class="home-list">
             <!-- 普通用户 -->
             <template v-if="onlyRole.includes('user')">
-              <el-empty
+              <template
                 v-if="
-                  !examList.some((exam) => exam.examMarkState !== 3) &&
-                    !questionTypeOpenList.length
+                  examList.some(
+                    (exam) =>
+                      (exam.state === 1 && exam.markState !== 3) ||
+                      exam.state == 2
+                  ) && questionTypeOpenList.length
                 "
-                :image="require('assets/img/index/mark-null.png')"
-                description="暂无待考"
-              />
-              <template v-else>
+              >
                 <!-- 待考列表 -->
                 <div
                   v-for="item in examList"
                   :key="item.id"
                   class="info-item today-item"
                   :style="{
-                    display: isExam(item.examMarkState) ? 'flex' : 'none',
+                    display: isExam(item.state, item.markState)
+                      ? 'flex'
+                      : 'none',
                   }"
                 >
-                  <template v-if="isExam(item.examMarkState)">
+                  <template v-if="isExam(item.state, item.markState)">
                     <img
                       src="../../assets/img/index/wait-exam.png"
                       class="today-icon"
@@ -188,6 +190,11 @@
                   </div>
                 </div>
               </template>
+              <el-empty
+                v-else
+                :image="require('assets/img/index/mark-null.png')"
+                description="暂无待考"
+              />
             </template>
             <!-- 子管理员 -->
             <template v-if="onlyRole.includes('subAdmin')">
@@ -361,9 +368,9 @@ export default {
   computed: {
     ...mapGetters(['permission_routes', 'roles', 'onlyRole']),
     // 是否展示考试
-    isExam(examMarkState) {
-      return (examMarkState) => {
-        return examMarkState !== 3
+    isExam(state, markState) {
+      return (state, markState) => {
+        return (state === 1 && markState !== 3) || state === 2
       }
     },
     // 是否展示阅卷
@@ -612,26 +619,47 @@ export default {
       })
     },
     // 我的考试操作
-    goExam({ examId, paperId, paperShowType, examStartTime, examEndTime }) {
+    goExam({
+      examId,
+      paperId,
+      paperShowType,
+      examStartTime,
+      examEndTime,
+      examMarkState,
+      examMarkEndTime,
+      state
+    }) {
       const _examStartTime = new Date(examStartTime).getTime()
       const _examEndTime = new Date(examEndTime).getTime()
+      const _examMarkEndTime = new Date(examMarkEndTime).getTime()
       const now = new Date().getTime()
       if (now < _examStartTime) {
-        this.$message.warning('考试未开始，请等待...')
+        this.$message.warning('考试暂未开始！')
         return
       }
 
-      this.$router.push({
-        name: 'MyExamDetail',
-        params: {
-          examId,
-          paperId,
-          examEndTime,
-          userId: null,
-          showType: paperShowType,
-          preview: _examStartTime < now && now > _examEndTime
-        }
-      })
+      if (now < _examMarkEndTime) {
+        this.$message.warning('阅卷暂未结束！')
+        return
+      }
+
+      // 考试时间内和阅卷结束后的逻辑
+      if (
+        (_examStartTime < now && now < _examEndTime) ||
+        (now > _examMarkEndTime && examMarkState === 3)
+      ) {
+        this.$router.push({
+          name: 'MyExamDetail',
+          params: {
+            examId,
+            paperId,
+            examEndTime,
+            showType: paperShowType,
+            preview: state === 3,
+            userId: null
+          }
+        })
+      }
     },
     // 我的阅卷操作
     goMark({ examId, paperId, examMarkStartTime, examMarkEndTime }) {

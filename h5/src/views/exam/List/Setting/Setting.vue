@@ -47,11 +47,9 @@
       />
     </el-form-item>
     <el-form-item>
-      <el-button
-        type="primary"
-        :disabled="id ? true : false"
-        @click="addOrEdit"
-      >{{ id ? '修改' : '添加' }}</el-button>
+      <el-button type="primary" :disabled="examForm.state" @click="addOrEdit">{{
+        id ? '修改' : '添加'
+      }}</el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -95,7 +93,8 @@ export default {
       examTypeId: null,
       examForm: {
         name: '',
-        paperId: 0,
+        paperId: null,
+        state: false,
         selectPaperId: null,
         showMarkTime: false,
         paperList: [],
@@ -138,7 +137,8 @@ export default {
           endTime,
           markStartTime,
           markEndTime,
-          paperMarkType
+          paperMarkType,
+          state
         }
       } = await examGet({ id: this.id })
       this.$nextTick(() => {
@@ -147,6 +147,7 @@ export default {
         this.examForm.paperName = paperName
         this.examForm.examTime = [startTime, endTime]
         this.examForm.showMarkTime = paperMarkType !== 1
+        this.examForm.state = state === 1
         const _markStartTime = this.getHour(2, endTime)
         const _markEndTime = this.getHour(1, _markStartTime)
         if (markStartTime || markEndTime) {

@@ -12,6 +12,7 @@ export default {
     return {
       timer: null,
       timerNum: 1,
+      sInput: ''
     }
   },
   watch: {
@@ -24,8 +25,8 @@ export default {
         } else {
           this.setSysTime()
         }
-      },
-    },
+      }
+    }
   },
   beforeDestroy() {
     this.clearTime()
@@ -33,7 +34,7 @@ export default {
   methods: {
     interval(func, wait) {
       const _this = this
-      const interv = function () {
+      const interv = function() {
         func.call(_this || null)
         this.timer = setTimeout(interv, wait)
       }
@@ -41,7 +42,7 @@ export default {
     },
 
     setSysTime() {
-      this.interval(function () {
+      this.interval(function() {
         if (this.timerNum % 30 === 0) {
           loginSysTime({}).then((res) => {})
         }
@@ -53,13 +54,13 @@ export default {
       clearTimeout(this.timer)
       this.timer = null
       this.timerNum = 1
-    },
-  },
+    }
+  }
 }
 </script>
 
 <style lang="scss">
-@import url('//at.alicdn.com/t/font_840312_ul1ysuclm2k.css');
+@import url('//at.alicdn.com/t/font_840312_u38xia6b7g.css');
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

@@ -3,9 +3,13 @@
     <template v-if="hashChildren">
       <el-form ref="queryForm" :inline="true" :model="queryForm">
         <el-row>
-          <el-col :span="17">
+          <el-col :span="20">
             <el-form-item label prop="name">
-              <el-input v-model="queryForm.name" placeholder="请输入名称" />
+              <el-input
+                v-model="queryForm.name"
+                placeholder="请输入名称"
+                @focus="queryForm.queryShow = true"
+              />
             </el-form-item>
             <el-button
               class="query-search"
@@ -14,97 +18,100 @@
               @click="query"
             >查询</el-button>
           </el-col>
-          <el-col :span="7">
-            <el-form-item style="float: right">
+          <el-col :span="4">
+            <el-form-item>
               <el-button
-                icon="el-icon-circle-plus-outline"
+                icon="el-icon-tickets"
                 size="mini"
                 type="primary"
-                @click="add"
-              >添加</el-button>
+                @click="orgTemplate()"
+              >下载模板</el-button>
+            </el-form-item>
+            <el-form-item>
+              <el-upload
+                :limit="1"
+                name="files"
+                list-type="text"
+                :headers="headers"
+                action="/api/file/upload"
+                :file-list="queryForm.fileList"
+                :on-success="uploadSuccess"
+              >
+                <el-button
+                  icon="el-icon-upload2"
+                  size="mini"
+                  type="primary"
+                  @click="() => orgImport"
+                >导入</el-button>
+              </el-upload>
             </el-form-item>
           </el-col>
         </el-row>
         <div v-if="queryForm.queryShow" />
       </el-form>
       <div class="table">
-        <el-table :data="listpage.list" style="width: 100%">
-          <el-table-column label="名称" width="120px">
+        <el-table
+          :data="listpage.list"
+          :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
+          default-expand-all
+          row-key="id"
+          style="width: 100%"
+        >
+          <el-table-column label="名称">
             <template slot-scope="scope">
               <span style="margin-left: 10px">{{ scope.row.name }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="状态" width="70px">
+          <el-table-column label="所属机构">
             <template slot-scope="scope">
-              <span style="margin-left: 10px">{{ scope.row.stateName }}</span>
+              <span style="margin-left: 10px">{{ scope.row.parentName }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="最近三次触发时间">
+          <el-table-column label="排序">
             <template slot-scope="scope">
-              <span v-for="item in scope.row.triggerTimes" :key="item">
-                <el-tag v-if="item" effect="plain" style="margin-bottom: 3px">{{
-                  item
-                }}</el-tag>
-              </span>
+              <span style="margin-left: 10px">{{ scope.row.no }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="操作">
+          <el-table-column label="操作" width="300">
             <template slot-scope="scope">
+              <el-tooltip placement="top" content="添加">
+                <i class="common common-add" @click="add(scope.row.id)" />
+              </el-tooltip>
               <el-tooltip placement="top" content="修改">
                 <i class="common common-edit" @click="edit(scope.row.id)" />
               </el-tooltip>
               <el-tooltip placement="top" content="删除">
                 <i class="common common-delete" @click="del(scope.row.id)" />
               </el-tooltip>
-              <el-tooltip placement="top" content="启动任务">
-                <i
-                  class="common common-start"
-                  @click="startTask(scope.row.id)"
-                />
-              </el-tooltip>
-              <el-tooltip placement="top" content="停止任务">
-                <i class="common common-end" @click="stopTask(scope.row.id)" />
-              </el-tooltip>
-              <el-tooltip placement="top" content="运行一次">
-                <i class="common common-once" @click="onceTask(scope.row.id)" />
-              </el-tooltip>
             </template>
           </el-table-column>
         </el-table>
       </div>
-      <el-pagination
-        :current-page="listpage.curPage"
-        :page-size="listpage.pageSize"
-        :total="listpage.total"
-        background
-        hide-on-single-page
-        layout="prev, pager, next"
-        next-text="下一页"
-        prev-text="上一页"
-        @current-change="pageChange"
-      />
     </template>
     <router-view v-else />
   </div>
 </template>
 
 <script>
-import { cronListPage } from 'api/base'
+import { orgListPage, orgTemplate, orgImport } from 'api/base'
 
 export default {
   data() {
     return {
+      headers: {
+        Authorization: this.$store.getters.token
+      },
+      // 列表数据
       listpage: {
-        // 列表数据
         total: 0, // 总条数
         curPage: 1, // 当前第几页
-        pageSize: 10, // 每页多少条
-        pageSizes: [10, 20, 50], // 每页多少条
+        pageSize: 100, // 每页多少条
         list: [] // 列表数据
       },
+      // 查询表单
       queryForm: {
-        // 查询表单
-        name: null
+        name: null,
+        parentId: null
       }
     }
   },
@@ -114,66 +121,103 @@ export default {
     }
   },
   created() {
-    this.query()
+    this.init()
   },
   methods: {
     // 查询
-    async query(curPage = 1) {
+    async query() {
       const {
-        data: { list, total }
-      } = await cronListPage({
+        data: { list }
+      } = await orgListPage({
+        parentId: this.queryForm.parentId,
         name: this.queryForm.name,
-        curPage: curPage,
+        curPage: this.listpage.curPage,
         pageSize: this.listpage.pageSize
       })
-      this.listpage.total = total
-      this.listpage.list = list
+
+      const treeList = []
+      const treeMap = {}
+      const idFiled = 'id'
+      const parentField = 'parentId'
+
+      for (let i = 0; i < list.length; i++) {
+        list[i]['id'] = list[i][idFiled]
+        treeMap[list[i]['id']] = list[i]
+      }
+
+      for (let i = 0; i < list.length; i++) {
+        if (
+          treeMap[list[i][parentField]] &&
+          list[i]['id'] !== list[i][parentField]
+        ) {
+          if (!treeMap[list[i][parentField]]['children']) {
+            treeMap[list[i][parentField]]['children'] = []
+          }
+          treeMap[list[i][parentField]]['children'].push(list[i])
+        } else {
+          treeList.push(list[i])
+        }
+      }
+
+      this.listpage.list = treeList
     },
+    // 初始化
+    async init() {
+      await this.query()
+    },
+
     // 添加
-    add() {
-      this.$tools.switchTab('CronIndexSetting', {
+    add(id) {
+      this.$tools.switchTab('OrgIndexSetting', {
         id: 0,
-        tab: '1'
+        tab: '1',
+        parentId: id
       })
     },
     // 修改
     edit(id) {
-      this.$tools.switchTab('CronIndexSetting', {
+      this.$tools.switchTab('OrgIndexSetting', {
         id,
         tab: '1'
       })
     },
-    // 启动任务
-    startTask(id) {
-      this.$tools.switchTab('CronIndexSetting', {
+    // 删除
+    del(id) {
+      this.$tools.switchTab('OrgIndexSetting', {
         id,
         tab: '2'
       })
     },
-    // 停止任务
-    stopTask(id) {
-      this.$tools.switchTab('CronIndexSetting', {
-        id,
-        tab: '3'
+    // 组织机构模板
+    async orgTemplate() {
+      const template = await orgTemplate({}, 'blob')
+      const blob = new Blob([template], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       })
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.click()
+      window.URL.revokeObjectURL(url)
     },
-    // 运行一次
-    onceTask(id) {
-      this.$tools.switchTab('CronIndexSetting', {
-        id,
-        tab: '4'
+    // 上传成功
+    uploadSuccess(response, file, fileList) {
+      if (this.listpage.list[0]?.children?.length > 1) {
+        this.$message.warning('请校对上传数据！')
+        return false
+      } else {
+        this.orgImport(response.data.fileIds)
+      }
+    },
+    // 组织机构导入
+    async orgImport(fileId) {
+      const res = await orgImport({
+        fileId
       })
-    },
-    // 删除
-    del(id) {
-      this.$tools.switchTab('CronIndexSetting', {
-        id,
-        tab: '5'
-      })
-    },
-    // 分页切换
-    pageChange(val) {
-      this.query(val)
+      if (res.code === 200) {
+        this.$message.success('导入组织机构成功！')
+        this.query()
+      }
     }
   }
 }
@@ -195,6 +239,11 @@ export default {
 .el-dialog__title {
   float: left;
 }
+
+/deep/ .el-upload-list {
+  display: none;
+}
+
 /deep/ .el-table th {
   background-color: #d3dce6;
   color: #475669;
@@ -211,11 +260,6 @@ export default {
   padding: 0 10px;
   color: #0096e7;
   font-size: 18px;
-}
-.el-link {
-  padding-right: 20px;
-  color: #8392a6;
-  font-size: 12px;
 }
 /deep/ .el-input__inner:focus {
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),

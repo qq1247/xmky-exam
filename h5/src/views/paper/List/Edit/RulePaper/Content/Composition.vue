@@ -104,12 +104,14 @@
                     :key="indexOption"
                     class="option-item"
                     disabled
-                    :label="String.fromCharCode(65 + indexOption)"
+                    :label="String(option.no)"
                   >
                     <div
                       class="flex-items-center"
                       v-html="
-                        `${String.fromCharCode(65 + indexOption)}、${option}`
+                        `${String.fromCharCode(65 + indexOption)}、${
+                          option.option
+                        }`
                       "
                     />
                   </el-radio>
@@ -127,12 +129,14 @@
                     :key="indexOption"
                     class="option-item"
                     disabled
-                    :label="String.fromCharCode(65 + indexOption)"
+                    :label="String(option.no)"
                   >
                     <div
                       class="flex-items-center"
                       v-html="
-                        `${String.fromCharCode(65 + indexOption)}、${option}`
+                        `${String.fromCharCode(65 + indexOption)}、${
+                          option.option
+                        }`
                       "
                     />
                   </el-checkbox>
@@ -472,7 +476,7 @@ import _ from 'lodash'
 import { getOneDict } from '@/utils/getDict'
 import { getQuick } from '@/utils/storage'
 import {
-  paperQuestionList,
+  paperQuestions,
   paperChapterAdd,
   paperChapterEdit,
   paperChapterDel,
@@ -590,7 +594,7 @@ export default {
     // 查询试卷信息
     async query() {
       try {
-        const res = await paperQuestionList({
+        const res = await paperQuestions({
           id: this.paperId
         })
         res.data.map((item) => {

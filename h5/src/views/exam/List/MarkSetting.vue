@@ -129,7 +129,7 @@
 </template>
 
 <script>
-import { examGet, examMarkUserList, examUpdateMarkSet } from 'api/exam'
+import { examGet, examMarkUserList, examUserAdd } from 'api/exam'
 import { userListPage } from 'api/user'
 import { questionListPage } from 'api/question'
 import CustomSelect from 'components/CustomSelect.vue'
@@ -161,7 +161,7 @@ export default {
         ],
         examQuestionNums: [],
         examRemarks: [],
-        examUser: [],
+        examUser: '',
         examUsers: [],
         examUserList: []
       }
@@ -353,7 +353,7 @@ export default {
           ? (params.questionIds = dynamic)
           : (params.examUserIds = dynamic)
 
-        const res = await examUpdateMarkSet(params)
+        const res = await examUserAdd(params)
 
         if (res?.code === 200) {
           this.$message.success('设置成功！')

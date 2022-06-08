@@ -32,12 +32,14 @@
                   v-for="(option, indexOption) in question.options"
                   :key="indexOption"
                   class="option-item"
-                  :label="String.fromCharCode(65 + indexOption)"
+                  :label="String(option.no)"
                 >
                   <div
                     class="flex-items-center"
                     v-html="
-                      `${String.fromCharCode(65 + indexOption)}、${option}`
+                      `${String.fromCharCode(65 + indexOption)}、${
+                        option.option
+                      }`
                     "
                   />
                 </el-radio>
@@ -54,12 +56,14 @@
                   v-for="(option, indexOption) in question.options"
                   :key="indexOption"
                   class="option-item"
-                  :label="String.fromCharCode(65 + indexOption)"
+                  :label="String(option.no)"
                 >
                   <div
                     class="flex-items-center"
                     v-html="
-                      `${String.fromCharCode(65 + indexOption)}、${option}`
+                      `${String.fromCharCode(65 + indexOption)}、${
+                        option.option
+                      }`
                     "
                   />
                 </el-checkbox>
@@ -98,23 +102,39 @@
 </template>
 
 <script>
-import { paperQuestionList } from 'api/paper'
+import { paperQuestions, paperRandomQuestions, paperGet } from 'api/paper'
 import { getQuick } from '@/utils/storage'
 export default {
   data() {
-    return { paperQuestion: [], paperName: '' }
+    return { paperQuestion: [], paperName: '', genType: 1, paperId: null }
   },
   async created() {
     this.paperId = this.$route.params.id || getQuick().id
+    await this.queryPaper()
     this.query()
   },
   methods: {
+    // 查询试卷
+    async queryPaper() {
+      const res = await paperGet({
+        id: this.paperId
+      })
+      this.genType = res.data.genType
+    },
     // 查询试卷信息
     async query() {
       try {
-        const res = await paperQuestionList({
-          id: this.paperId
-        })
+        let res
+        if (this.genType === 1) {
+          res = await paperQuestions({
+            id: this.paperId
+          })
+        } else {
+          res = await paperRandomQuestions({
+            examId: this.examId,
+            userId: this.userId
+          })
+        }
         res.data.map((item) => {
           item.chapter.show = true
         })

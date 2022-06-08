@@ -160,6 +160,10 @@ export default {
         this.examTypeId = examTypeList.data.list[0].id
       }
 
+      const quickInfo = getQuick()
+      quickInfo.examTypeId = this.examTypeId
+      setQuick(quickInfo)
+
       const examStartTime = this.getHour(2)
       const examEndTime = this.getHour(1, examStartTime)
       const markStartTime = this.getHour(2, examEndTime)
@@ -189,7 +193,7 @@ export default {
           startTime: this.examForm.examTime[0],
           endTime: this.examForm.examTime[1],
           paperId: getQuick().id,
-          examTypeId: this.examTypeId
+          examTypeId: this.examTypeId || getQuick().examTypeId
         }
 
         if (this.examForm.markTime.length) {

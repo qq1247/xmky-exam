@@ -87,13 +87,6 @@ export default {
         statusbar: false, // 底部的状态栏
         menubar: '', // （1级菜单）最上方的菜单
         branding: false // （隐藏右下角技术支持）水印“Powered by TinyMCE”
-        // 此处为图片上传处理函数，这个直接用了base64的图片形式上传图片，
-        // 如需ajax上传可参考https://www.tiny.cloud/docs/configure/file-image-upload/#images_upload_handler
-        /* images_upload_handler: (blobInfo, success, failure) => {
-          console.log(blobInfo)
-          const img = 'data:image/jpeg;base64,' + blobInfo.base64()
-          success(img)
-        }, */
       },
       myValue: this.value
     }

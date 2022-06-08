@@ -6,10 +6,7 @@
         <QuestionDrag v-if="tabIndex === '1'" ref="questionDrag" />
         <QuestionAdd v-if="tabIndex === '2'" />
         <QuestionTemplate v-if="tabIndex === '3'" />
-        <QuestionRouter
-          v-if="tabIndex === '4'"
-          ref="questionRouter"
-        />
+        <QuestionRouter v-if="tabIndex === '4'" ref="questionRouter" />
       </el-scrollbar>
     </div>
 
@@ -80,7 +77,7 @@ export default {
   margin: 0 auto;
 }
 .paper-handler {
-  width: 500px;
+  width: 400px;
   background: #fff;
   position: relative;
   border-radius: 8px;
@@ -88,7 +85,7 @@ export default {
 
 .paper-content {
   background: #fff;
-  width: calc(100% - 490px);
+  width: calc(100% - 400px);
   margin-left: 10px;
   border-radius: 8px;
 }

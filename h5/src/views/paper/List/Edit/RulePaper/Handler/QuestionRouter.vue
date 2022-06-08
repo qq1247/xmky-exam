@@ -31,7 +31,7 @@
 
 <script>
 import { getQuick } from '@/utils/storage'
-import { paperQuestionList } from 'api/paper'
+import { paperQuestions } from 'api/paper'
 export default {
   components: {},
   props: {},
@@ -66,7 +66,7 @@ export default {
     // 查询试卷信息
     async query() {
       try {
-        const res = await paperQuestionList({
+        const res = await paperQuestions({
           id: this.$route.params.id || getQuick().id
         })
         res.data.map((item) => {
@@ -116,7 +116,7 @@ export default {
 }
 
 .router-content {
-  margin: 0 20px;
+  margin: 0 10px;
   .router-title {
     line-height: 40px;
     font-size: 13px;
@@ -138,7 +138,7 @@ export default {
     text-decoration: none;
     cursor: pointer;
     user-select: none;
-    &:nth-child(12n) {
+    &:nth-child(10n) {
       margin-right: 0;
     }
   }

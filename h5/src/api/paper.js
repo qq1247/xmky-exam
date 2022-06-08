@@ -12,8 +12,10 @@ export const paperChapterAdd = (params) => request('paper/chapterAdd', params)
 export const paperChapterEdit = (params) => request('paper/chapterEdit', params)
 export const paperChapterDel = (params) => request('paper/chapterDel', params)
 
-export const paperQuestionList = (params) =>
-  request('paper/paperQuestionList', params)
+export const paperSxe = (params) => request('paper/sxe', params)
+export const paperQuestions = (params) => request('paper/myPaper', params)
+export const paperRandomQuestions = (params) =>
+  request('paper/myPaperOfRand', params)
 export const paperQuestionAdd = (params) => request('paper/questionAdd', params)
 export const paperQuestionDel = (params) => request('paper/questionDel', params)
 export const paperQuestionClear = (params) =>

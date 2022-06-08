@@ -1,22 +1,8 @@
 <template>
-  <el-form
-    ref="examForm"
-    :model="examForm"
-    :rules="examForm.rules"
-    label-width="100px"
-  >
+  <el-form ref="examForm" :model="examForm" :rules="examForm.rules" label-width="100px">
     <el-form-item label="考试用户" prop="examUser">
-      <el-select
-        v-model="examForm.examUser"
-        clearable
-        placeholder="请选择考试用户"
-      >
-        <el-option
-          v-for="user in examForm.examUserList"
-          :key="user.id"
-          :label="user.name"
-          :value="user.id"
-        />
+      <el-select v-model="examForm.examUser" clearable placeholder="请选择考试用户">
+        <el-option v-for="user in examForm.examUserList" :key="user.id" :label="user.name" :value="user.id" />
       </el-select>
     </el-form-item>
     <el-form-item>
@@ -27,7 +13,7 @@
 
 <script>
 import { myMarkAnswerList } from 'api/my'
-import { paperQuestionList } from 'api/paper'
+import { paperGet, paperQuestions, paperRandomQuestions } from 'api/paper'
 import { examGet, examMarkUserList } from 'api/exam'
 import htmlDocx from 'html-docx-js/dist/html-docx'
 import saveAs from 'file-saver'
@@ -36,6 +22,7 @@ export default {
   data() {
     return {
       id: null,
+      genType: 1,
       examForm: {
         paperId: 0,
         examName: '',
@@ -46,19 +33,19 @@ export default {
         markState: 1,
         rules: {
           examUser: [
-            { required: true, message: '请选择考试用户', trigger: 'change' },
-          ],
-        },
-      },
+            { required: true, message: '请选择考试用户', trigger: 'change' }
+          ]
+        }
+      }
     }
   },
   async mounted() {
     this.id = this.$route.params.id
     if (Number(this.id)) {
       const {
-        data: { paperId, name, markState },
+        data: { paperId, name, markState }
       } = await examGet({
-        id: this.id,
+        id: this.id
       })
       this.examForm.paperId = paperId
       this.examForm.examName = name
@@ -75,17 +62,30 @@ export default {
     }
   },
   methods: {
+    // 查询试卷
+    async queryPaper() {
+      const res = await paperGet({
+        id: this.examForm.paperId
+      })
+      this.genType = res.data.genType
+    },
     // 查询试卷信息
     async queryPaperInfo() {
-      const paperQuestion = await paperQuestionList({
-        id: this.examForm.paperId,
-        examId: this.id,
-        userId: this.examForm.examUser,
-      })
+      let paperQuestion
+      if (this.genType === 1) {
+        paperQuestion = await paperQuestions({
+          id: this.examForm.paperId
+        })
+      } else {
+        paperQuestion = await paperRandomQuestions({
+          examId: this.id,
+          userId: this.examForm.examUser
+        })
+      }
 
       const paperAnswer = await myMarkAnswerList({
         examId: this.id,
-        userId: this.examForm.examUser,
+        userId: this.examForm.examUser
       })
 
       this.examForm.paperQuestion = [...paperQuestion.data]
@@ -95,11 +95,11 @@ export default {
     async compositionHtml() {
       const paperDetail = this.examForm.paperQuestion
       // 用户信息
-      let userInfo = this.examForm.examUserList.find(
+      const userInfo = this.examForm.examUserList.find(
         (user) => (user.id = this.examForm.examUser)
       )
       // 总成绩
-      let totalScore = this.examForm.paperAnswer.reduce(
+      const totalScore = this.examForm.paperAnswer.reduce(
         (acc, cur) => (acc += cur.score),
         0
       )
@@ -146,8 +146,7 @@ export default {
           if (paperDetail[i].questionList[j].type === 3) {
             title = paperDetail[i].questionList[j].title.replace(
               />/,
-              `style="word-wrap: break-word;font-weight: 600;color: #0c2e41;" >${
-                j + 1
+              `style="word-wrap: break-word;font-weight: 600;color: #0c2e41;" >${j + 1
               }、`
             )
 
@@ -157,23 +156,26 @@ export default {
               const titleEnd = title.substring(
                 title.indexOf(underline) + underline.length
               )
-              console.log(modelAnswer.join(''))
-              const modelCheck = modelAnswer
-                .join('')
-                .includes(selfAnswer[index])
 
-              let inputHtml = selfAnswer[index]
-                ? `<span style="text-decoration: underline;">${
-                    selfAnswer[index]
-                  }</span>&nbsp;（${modelCheck ? '√' : '×'}）`
+              let modelCheck
+              if (selfAnswer.length) {
+                modelCheck = modelAnswer.some((model) =>
+                  selfAnswer[index].includes(model)
+                )
+              } else {
+                modelCheck = false
+              }
+
+              const inputHtml = selfAnswer[index]
+                ? `<span style="text-decoration: underline; padding: 0 10px;">&nbsp;&nbsp;${selfAnswer[index]
+                }&nbsp;&nbsp;</span>&nbsp;（${modelCheck ? '√' : '×'}）`
                 : `${underline}&nbsp;（×）`
               title = `${titleStart}${inputHtml}${titleEnd}`
             })
           } else {
             title = paperDetail[i].questionList[j].title.replace(
               />/,
-              `style="word-wrap: break-word;font-weight: 600;color: #0c2e41;" >${
-                j + 1
+              `style="word-wrap: break-word;font-weight: 600;color: #0c2e41;" >${j + 1
               }、`
             )
           }
@@ -224,7 +226,7 @@ export default {
 
               let option = paperDetail[i].questionList[j].options[
                 index
-              ].replace(
+              ].option.replace(
                 />/,
                 `style="color: #557587;line-height:1;" >&nbsp;&nbsp;${inputHtml}&nbsp;${String.fromCharCode(
                   65 + index
@@ -245,8 +247,7 @@ export default {
 
           // 问答答案
           if (paperDetail[i].questionList[j].type === 5) {
-            stringHtml += `<p style="color: #557587;">&nbsp;&nbsp;${
-              selfAnswer[0] || ''
+            stringHtml += `<p style="color: #557587;">&nbsp;&nbsp;${selfAnswer[0] || ''
             }</p>`
           }
         }
@@ -290,7 +291,7 @@ export default {
     },
     // 导出试题
     async exportsPaper() {
-      this.$refs['examForm'].validate(async (valid) => {
+      this.$refs['examForm'].validate(async(valid) => {
         if (!valid) {
           return false
         }
@@ -299,14 +300,14 @@ export default {
           this.$message.warning('阅卷尚未结束，请等待！')
           return false
         }
-
+        await this.queryPaper()
         await this.queryPaperInfo()
         const stringHtml = await this.compositionHtml()
         const docxHtml = await this.convertImagesToBase64(stringHtml)
         const converted = htmlDocx.asBlob(docxHtml, { orientation: 'portrait' })
         saveAs(converted, `${this.examForm.examName}.docx`)
       })
-    },
-  },
+    }
+  }
 }
 </script>

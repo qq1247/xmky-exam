@@ -139,11 +139,13 @@
                 v-for="(option, indexOption) in question.options"
                 :key="indexOption"
                 class="option-item"
-                :label="String.fromCharCode(65 + indexOption)"
+                :label="String(option.no)"
               >
                 <div
                   class="flex-items-center"
-                  v-html="`${String.fromCharCode(65 + indexOption)}、${option}`"
+                  v-html="
+                    `${String.fromCharCode(65 + indexOption)}、${option.option}`
+                  "
                 />
               </el-radio>
             </el-radio-group>
@@ -159,11 +161,13 @@
                 v-for="(option, indexOption) in question.options"
                 :key="indexOption"
                 class="option-item"
-                :label="String.fromCharCode(65 + indexOption)"
+                :label="String(option.no)"
               >
                 <div
                   class="flex-items-center"
-                  v-html="`${String.fromCharCode(65 + indexOption)}、${option}`"
+                  v-html="
+                    `${String.fromCharCode(65 + indexOption)}、${option.option}`
+                  "
                 />
               </el-checkbox>
             </el-checkbox-group>

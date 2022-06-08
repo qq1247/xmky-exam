@@ -50,7 +50,7 @@ export default {
 <style lang="scss" scoped>
 .top {
   background: #fff;
-  width: calc(1200px - 500px);
+  width: calc(1200px - 410px);
   height: 40px;
   color: #333;
   position: fixed;

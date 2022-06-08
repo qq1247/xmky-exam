@@ -149,7 +149,7 @@ export default {
 
 /deep/ .el-tabs__header {
   background: #fff;
-  width: 200px;
+  width: 120px;
 }
 
 /deep/ .el-tabs__nav-wrap::after {
@@ -190,6 +190,6 @@ export default {
 
 .setting-right {
   flex: 1;
-  margin-left: 201px;
+  margin-left: 121px;
 }
 </style>

@@ -100,7 +100,6 @@ export default {
       this.curPage = 1
       this.query()
     },
-
     // 添加分类
     add() {
       this.$tools.switchTab('PaperListSetting', {
@@ -119,15 +118,6 @@ export default {
         tab: '1'
       })
     },
-    // 考试发布
-    publish({ id, genType }) {
-      this.$tools.switchTab('PaperListSetting', {
-        id,
-        paperTypeId: this.$route.params.id,
-        genType,
-        tab: '3'
-      })
-    },
     // 复制分类
     copy({ id, genType }) {
       this.$tools.switchTab('PaperListSetting', {
@@ -137,13 +127,31 @@ export default {
         tab: '2'
       })
     },
+    // 考试发布
+    publish({ id, genType }) {
+      this.$tools.switchTab('PaperListSetting', {
+        id,
+        paperTypeId: this.$route.params.id,
+        genType,
+        tab: '3'
+      })
+    },
+    // 乱序
+    order({ id, genType }) {
+      this.$tools.switchTab('PaperListSetting', {
+        id,
+        paperTypeId: this.$route.params.id,
+        genType,
+        tab: '4'
+      })
+    },
     // 删除分类
     del({ id, genType }) {
       this.$tools.switchTab('PaperListSetting', {
         id,
         paperTypeId: this.$route.params.id,
         genType,
-        tab: '4'
+        tab: '5'
       })
     },
     // 组合试卷

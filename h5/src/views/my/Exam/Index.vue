@@ -93,7 +93,9 @@ export default {
       examStartTime,
       examEndTime,
       examMarkState,
-      examMarkEndTime
+      examMarkEndTime,
+      state,
+      markState
     }) {
       const _examStartTime = new Date(examStartTime).getTime()
       const _examEndTime = new Date(examEndTime).getTime()
@@ -119,10 +121,10 @@ export default {
           params: {
             examId,
             paperId,
-            userId: null,
             examEndTime,
             showType: paperShowType,
-            preview: !(_examStartTime < now && now < _examEndTime)
+            preview: state === 3 || (state === 1 && markState === 3),
+            userId: null
           }
         })
       }

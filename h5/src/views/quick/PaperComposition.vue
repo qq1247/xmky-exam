@@ -89,13 +89,13 @@ export default {
 
 .paper-content {
   background: #fff;
-  width: calc(100% - 500px);
+  width: calc(100% - 400px);
   overflow: scroll;
 }
 
 /deep/ .top {
   position: absolute;
-  width: calc(1200px - 700px);
+  width: calc(1200px - 520px);
 }
 
 .footer {
