@@ -115,7 +115,7 @@
                     (exam) =>
                       (exam.state === 1 && exam.markState !== 3) ||
                       exam.state == 2
-                  ) && questionTypeOpenList.length
+                  ) || questionTypeOpenList.length
                 "
               >
                 <!-- 待考列表 -->
@@ -370,7 +370,7 @@ export default {
     // 是否展示考试
     isExam(state, markState) {
       return (state, markState) => {
-        return (state === 1 && markState !== 3) || state === 2
+        return (state === 1 && markState !== 3) || state === 2 // 用户未考试并且已阅卷，或用户已交卷，则不显示
       }
     },
     // 是否展示阅卷

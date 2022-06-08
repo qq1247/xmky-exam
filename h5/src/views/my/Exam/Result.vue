@@ -51,7 +51,7 @@ export default {
         })
 
       if (!this.countDown) {
-        this.score = scoreData.data?.list[0]?.totalScore || '请稍后查询'
+        this.score = scoreData.data?.list[0]?.totalScore !== null ? scoreData.data?.list[0]?.totalScore : '请稍后查询'
         return
       } else {
         this.getResult()
