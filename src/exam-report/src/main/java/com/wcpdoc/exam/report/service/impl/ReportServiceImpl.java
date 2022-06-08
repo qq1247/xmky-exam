@@ -136,7 +136,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		result.put("exam", examResult);
 		
 		Map<String, Object> scoreResult = new HashMap<String, Object>();
-		scoreResult.put("avg", BigDecimalUtil.newInstance(sum).div(total, 2));
+		scoreResult.put("avg", total == 0 ? 0 : BigDecimalUtil.newInstance(sum).div(total, 2));
 		scoreResult.put("min", min);
 		scoreResult.put("max", max);
 		result.put("score", scoreResult);
