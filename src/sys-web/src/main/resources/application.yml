@@ -12,7 +12,7 @@ spring:
       prefix: /WEB-INF/jsp/
       suffix: .jsp
   resources:
-    static-locations: file:./h5
+    static-locations: pc:./h5/;mobile:./m/
   profiles:
     active: dev
   servlet:
