@@ -133,40 +133,30 @@
                 v-if="myExamDetailCache[question.id]"
                 v-model="myExamDetailCache[question.id].answers[0]"
                 :rows="2"
-                class="question-text"
-                placeholder="请输入内容"
                 type="textarea"
                 :disabled="preview"
+                class="question-text"
+                placeholder="请输入内容"
                 @change="updateAnswer(question.id)"
               />
               <div v-if="preview && scoreState" class="children-analysis">
-                <span class="analysis-tip">查看解析</span>
                 <div class="analysis-content">
                   <span>答案：</span>
                   <div v-if="question.ai === 1">
-                    <div
-                      v-for="(answer, indexAnswers) in question.answers"
-                      :key="answer.id"
-                      class="answers-item"
-                    >
-                      <span>{{
-                        `关键词${$tools.intToChinese(indexAnswers + 1)}、`
-                      }}</span>
+                    <div class="cloze-answers">
                       <span
-                        v-for="(ans, indexAnswer) in answer.answer"
-                        :key="indexAnswer"
-                        class="answers-tag"
-                      >{{ ans }}</span>
+                        v-for="answer in question.answers"
+                        :key="answer.id"
+                        class="answers-items"
+                      >
+                        {{ answer.answer.join(' | ') }}
+                      </span>
                     </div>
                   </div>
                   <div
                     v-if="question.ai === 2"
                     v-html="`${question.answers[0].answer}`"
                   />
-                </div>
-                <div class="analysis-content">
-                  <div>解析：</div>
-                  <div v-html="question.analysis" />
                 </div>
               </div>
             </template>
@@ -248,6 +238,9 @@ export default {
   methods: {
     updateAnswer(childId) {
       this.$emit('updateAnswer', childId)
+    },
+    isShowAnalysis(index, indexQuestion) {
+      this.$emit('isShowAnalysis', { index, indexQuestion })
     }
   }
 }

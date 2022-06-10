@@ -385,6 +385,14 @@
   .analysis-content {
     display: flex;
   }
+  .cloze-answers {
+    display: flex;
+    .answers-items {
+      border-bottom: 1px solid #404b65;
+      padding: 0 20px;
+      margin-right: 20px;
+    }
+  }
   .answers-item {
     width: 100%;
     span {

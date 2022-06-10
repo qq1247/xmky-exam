@@ -30,6 +30,7 @@
             @del="del"
             @edit="edit"
             @copy="copy"
+            @cheat="cheat"
             @publish="publish"
             @composition="composition"
           />
@@ -136,8 +137,8 @@ export default {
         tab: '3'
       })
     },
-    // 乱序
-    order({ id, genType }) {
+    // 防作弊
+    cheat({ id, genType }) {
       this.$tools.switchTab('PaperListSetting', {
         id,
         paperTypeId: this.$route.params.id,

@@ -91,11 +91,11 @@ export default {
           index: '3'
         },
         {
-          name: '乱序',
-          intro: '试题、选项乱序',
+          name: '防作弊',
+          intro: '试题乱序、选项乱序',
           icon: 'common common-reset-order',
-          contentName: '乱序',
-          contentIntro: '试题乱序和试题选项乱序',
+          contentName: '防作弊',
+          contentIntro: '试题乱序、选项乱序',
           index: '4'
         },
         {

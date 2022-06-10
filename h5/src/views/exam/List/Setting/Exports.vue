@@ -1,8 +1,22 @@
 <template>
-  <el-form ref="examForm" :model="examForm" :rules="examForm.rules" label-width="100px">
+  <el-form
+    ref="examForm"
+    :model="examForm"
+    :rules="examForm.rules"
+    label-width="100px"
+  >
     <el-form-item label="考试用户" prop="examUser">
-      <el-select v-model="examForm.examUser" clearable placeholder="请选择考试用户">
-        <el-option v-for="user in examForm.examUserList" :key="user.id" :label="user.name" :value="user.id" />
+      <el-select
+        v-model="examForm.examUser"
+        clearable
+        placeholder="请选择考试用户"
+      >
+        <el-option
+          v-for="user in examForm.examUserList"
+          :key="`${user.name}-${user.id}`"
+          :label="user.name"
+          :value="user.id"
+        />
       </el-select>
     </el-form-item>
     <el-form-item>
@@ -146,7 +160,8 @@ export default {
           if (paperDetail[i].questionList[j].type === 3) {
             title = paperDetail[i].questionList[j].title.replace(
               />/,
-              `style="word-wrap: break-word;font-weight: 600;color: #0c2e41;" >${j + 1
+              `style="word-wrap: break-word;font-weight: 600;color: #0c2e41;" >${
+                j + 1
               }、`
             )
 
@@ -167,7 +182,8 @@ export default {
               }
 
               const inputHtml = selfAnswer[index]
-                ? `<span style="text-decoration: underline; padding: 0 10px;">&nbsp;&nbsp;${selfAnswer[index]
+                ? `<span style="text-decoration: underline; padding: 0 10px;">&nbsp;&nbsp;${
+                  selfAnswer[index]
                 }&nbsp;&nbsp;</span>&nbsp;（${modelCheck ? '√' : '×'}）`
                 : `${underline}&nbsp;（×）`
               title = `${titleStart}${inputHtml}${titleEnd}`
@@ -175,7 +191,8 @@ export default {
           } else {
             title = paperDetail[i].questionList[j].title.replace(
               />/,
-              `style="word-wrap: break-word;font-weight: 600;color: #0c2e41;" >${j + 1
+              `style="word-wrap: break-word;font-weight: 600;color: #0c2e41;" >${
+                j + 1
               }、`
             )
           }
@@ -247,7 +264,8 @@ export default {
 
           // 问答答案
           if (paperDetail[i].questionList[j].type === 5) {
-            stringHtml += `<p style="color: #557587;">&nbsp;&nbsp;${selfAnswer[0] || ''
+            stringHtml += `<p style="color: #557587;">&nbsp;&nbsp;${
+              selfAnswer[0] || ''
             }</p>`
           }
         }

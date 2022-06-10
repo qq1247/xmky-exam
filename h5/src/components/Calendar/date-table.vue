@@ -233,8 +233,8 @@ export default {
           </div>
           {data.map((item) => (
             <div class='plan-table-td'>
-              <span>{item.startTime}</span>
-              <span>{item.endTime}</span>
+              <span>{item.startTime.slice(11)}</span>
+              <span>{item.endTime.slice(11)}</span>
               <span>
                 {type === 1
                   ? this.stateName(item.state)

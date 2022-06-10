@@ -261,7 +261,7 @@
                     icon="el-icon-view"
                     round
                     size="mini"
-                    @click.native="
+                    @click.native.stop="
                       question.analysisShow = !question.analysisShow
                     "
                   >查看解析</el-button>

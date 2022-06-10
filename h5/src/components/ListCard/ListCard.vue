@@ -79,12 +79,9 @@
           <span data-title="复制" @click="copy(data)">
             <i class="common common-copy" />
           </span>
-          <!-- <span
-          data-title="归档"
-          @click="archive(data)"
-        >
-          <i class="common common-archive"></i>
-        </span> -->
+          <span data-title="防作弊" @click="cheat(data)">
+            <i class="common common-reset-order" />
+          </span>
           <span data-title="开始组卷" @click="composition(data)">
             <i class="common common-composition" />
           </span>
@@ -211,10 +208,15 @@ export default {
     publish(data) {
       this.$emit('publish', data)
     },
+    // 防作弊
+    cheat(data) {
+      this.$emit('cheat', data)
+    },
     // 统计
     statistics(data) {
       this.$emit('statistics', data)
     },
+    // 在线
     onLine(data) {
       this.$emit('onLine', data)
     },

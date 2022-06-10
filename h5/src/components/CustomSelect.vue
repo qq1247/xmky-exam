@@ -43,7 +43,7 @@ export default {
       default: false
     },
     value: {
-      type: [Boolean, String, Number, Array],
+      type: [String, Number, Array],
       default: ''
     },
     multiple: {

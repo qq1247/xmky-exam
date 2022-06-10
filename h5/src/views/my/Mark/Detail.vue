@@ -130,31 +130,27 @@
         >
           <template v-if="routerQuestionId === item.id">
             <div class="question-title tag">
-              <div>{{ indexQuestion + 1 }}、</div>
-              <div v-html="`${item.title}`" />
+              <template v-if="item.type === 5">
+                <div>{{ indexQuestion + 1 }}、</div>
+                <div v-html="`${item.title}`" />
+              </template>
+              <template v-if="item.type === 3">
+                <div>{{ indexQuestion + 1 }}、</div>
+                <ClozeTitle
+                  :disabled="true"
+                  :title="item.title"
+                  :question-id="item.id"
+                  :question-detail="item"
+                  :my-exam-detail-cache="myExamDetailCache"
+                />
+              </template>
             </div>
 
-            <div class="user-answer tag">
-              <template
-                v-if="item.type === 3 && myExamDetailCache[routerQuestionId]"
-              >
-                <div
-                  v-for="(answer, indexCache) in myExamDetailCache[
-                    routerQuestionId
-                  ].answers"
-                  :key="answer.id"
-                  class="answers-item"
-                >
-                  <span>{{
-                    `填空${$tools.intToChinese(indexCache + 1)}、${answer}`
-                  }}</span>
-                </div>
-              </template>
-              <div
-                v-if="item.type === 5 && myExamDetailCache[routerQuestionId]"
-                v-html="`${myExamDetailCache[routerQuestionId].answers}`"
-              />
-            </div>
+            <div
+              v-if="item.type === 5 && myExamDetailCache[routerQuestionId]"
+              class="user-answer tag"
+              v-html="`${myExamDetailCache[routerQuestionId].answers}`"
+            />
 
             <div class="user-plate tag">
               <span>本题得</span>
@@ -181,45 +177,21 @@
                   <template v-if="item.type === 3">
                     <el-col :span="2.5">答案：</el-col>
                     <el-col :span="21">
-                      <div
-                        v-for="(answer, indexAnswers) in item.answers"
-                        :key="answer.id"
-                        class="answers-item"
-                      >
-                        <span>{{
-                          `填空${$tools.intToChinese(indexAnswers + 1)}、`
-                        }}</span>
+                      <div class="cloze-answers">
                         <span
-                          v-for="(ans, indexAnswer) in answer.answer"
-                          :key="indexAnswer"
-                          class="answers-tag"
-                        >{{ ans }}</span>
+                          v-for="answer in item.answers"
+                          :key="answer.id"
+                          class="answers-items"
+                        >
+                          {{ answer.answer.join(' | ') }}
+                        </span>
                       </div>
                     </el-col>
                   </template>
                   <template v-if="item.type === 5">
                     <el-col :span="2.5">答案： </el-col>
                     <el-col :span="21">
-                      <template v-if="item.ai === 1">
-                        <div
-                          v-for="(answer, indexAnswers) in item.answers"
-                          :key="answer.id"
-                          class="answers-item"
-                        >
-                          <span>{{
-                            `关键词${$tools.intToChinese(indexAnswers + 1)}、`
-                          }}</span>
-                          <span
-                            v-for="(ans, indexAnswer) in answer.answer"
-                            :key="indexAnswer"
-                            class="answers-tag"
-                          >{{ ans }}</span>
-                        </div>
-                      </template>
-                      <div
-                        v-if="item.ai === 2"
-                        v-html="`${item.answers[0].answer}`"
-                      />
+                      <div v-html="`${item.answers[0].answer}`" />
                     </el-col>
                   </template>
                 </el-row>
@@ -273,6 +245,7 @@
 </template>
 <script>
 import { paperGet, paperQuestions, paperRandomQuestions } from 'api/paper'
+import ClozeTitle from '@/components/ClozeTitle.vue'
 import {
   myMarkUser,
   myMarkUserList,
@@ -284,6 +257,7 @@ import elDragDialog from '@/directive/el-drag-dialog'
 import ScorePlate from 'components/ScorePlate.vue'
 export default {
   components: {
+    ClozeTitle,
     ScorePlate
   },
   directives: { elDragDialog },

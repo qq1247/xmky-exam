@@ -24,6 +24,7 @@
           :paper-question="paperQuestion"
           :my-exam-detail-cache="myExamDetailCache"
           @updateAnswer="updateAnswer"
+          @isShowAnalysis="isShowAnalysis"
         />
 
         <question-show
@@ -308,6 +309,21 @@ export default {
     // 下一题
     nextQuestion(index) {
       this.routerIndex = index
+    },
+    isShowAnalysis(e) {
+      console.log(e)
+      const { index, indexQuestion } = e
+      console.log(
+        this.paperQuestion[index].questionList[indexQuestion].showAnalysis
+      )
+      const showAnalysis =
+        this.paperQuestion[index].questionList[indexQuestion].showAnalysis
+      this.$set(
+        this.paperQuestion[index].questionList[indexQuestion],
+        'showAnalysis',
+        !showAnalysis
+      )
+      this.$forceUpdate()
     }
   }
 }

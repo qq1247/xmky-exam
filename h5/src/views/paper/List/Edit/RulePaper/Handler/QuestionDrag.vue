@@ -46,28 +46,19 @@
         </el-col>
         <el-col :span="12">
           <el-form-item>
-            <el-input
-              v-model="queryForm.title"
-              placeholder="请输入题干"
-            />
+            <el-input v-model="queryForm.title" placeholder="请输入题干" />
           </el-form-item>
         </el-col>
       </el-row>
       <el-row :gutter="20">
         <el-col :span="12">
           <el-form-item>
-            <el-input
-              v-model="queryForm.score"
-              placeholder="请输入分值"
-            />
+            <el-input v-model="queryForm.score" placeholder="请输入分值" />
           </el-form-item>
         </el-col>
         <el-col :span="12">
           <el-form-item>
-            <el-input
-              v-model="queryForm.id"
-              placeholder="请输入编号"
-            />
+            <el-input v-model="queryForm.id" placeholder="请输入编号" />
           </el-form-item>
         </el-col>
       </el-row>
@@ -208,9 +199,15 @@ export default {
         curPage: this.curPage,
         pageSize: this.pageSize
       })
-      res?.code === 200
-        ? ((this.paperList = res.data.list), (this.total = res.data.total))
-        : this.$message.error('请刷新重新获取试题！')
+      if (res?.code === 200) {
+        this.total = res.data.total
+        this.paperList = res.data.list
+        this.paperList.map((item) => {
+          item.analysisShow = false
+        })
+      } else {
+        this.$message.error('请刷新重新获取试题！')
+      }
     },
     // 条件查询
     search() {

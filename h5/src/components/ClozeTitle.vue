@@ -16,11 +16,15 @@ export default {
     },
     questionDetail: {
       type: Object,
-      default: () => { }
+      default: () => {}
     },
     myExamDetailCache: {
       type: Object,
-      default: () => { }
+      default: () => {}
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   render(h, context) {
@@ -50,12 +54,17 @@ export default {
           isTrue = false
         }
 
-        inputHtml = `<span class="cloze-input-preview" style="color: ${isTrue ? '#00b050' : '#ff5722'};border-color: ${isTrue ? '#00b050' : '#ff5722'}; ">${props.myExamDetailCache[questionId].answers[index] || ''}</span><span v-if="${props.preview
+        inputHtml = `<span class="cloze-input-preview" style="color: ${
+          isTrue ? '#00b050' : '#ff5722'
+        };border-color: ${isTrue ? '#00b050' : '#ff5722'}; ">${
+          props.myExamDetailCache[questionId].answers[index] || ''
+        }</span><span v-if="${
+          props.preview
         }" class="cloze-answer">（${props.questionDetail.answers[
           index
         ].answer.join(',')}）</span>`
       } else {
-        inputHtml = `<el-input class="cloze-input" @change='updateAnswer(${questionId})' :disabled='${props.preview}' v-model='myExamDetailCache[${questionId}].answers[${index}]'></el-input>`
+        inputHtml = `<el-input class="cloze-input" @change='updateAnswer(${questionId})' :disabled='${props.disabled}' v-model='myExamDetailCache[${questionId}].answers[${index}]'></el-input>`
       }
       title = `${titleStart}${inputHtml}${titleEnd}`
     })
