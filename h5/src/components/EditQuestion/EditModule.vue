@@ -393,6 +393,9 @@ export default {
   },
   data() {
     const validateAiScore = (rule, value, callback) => {
+      if (this.editForm.ai === 2) {
+        return callback()
+      }
       if (value === '') {
         return callback(new Error('请填写分数'))
       }
