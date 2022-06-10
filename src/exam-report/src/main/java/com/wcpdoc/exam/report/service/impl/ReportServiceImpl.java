@@ -97,17 +97,17 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		double min = 9999, max = 0;
 		BigDecimal sum = BigDecimal.ZERO;
 		for (MyExam myExam : myExamList) {
-			if (myExam.getMarkState() != 3) {// 未阅卷不统计
+			Exam curExam = examCache.get(myExam.getExamId());
+			if (curExam.getMarkState() != 3) {// 整场考试未阅卷不统计（比如没有排名）
 				continue;
 			}
 			
-			Exam curExam = examCache.get(myExam.getExamId());
 			missNum += (myExam.getState() == 1) ? 1 : 0;// 未考试加一
 			succNum += (curExam.getScoreState() == 1 && myExam.getAnswerState() == 1) ? 1 : 0;//考试及格加一
 			top = (curExam.getRankState() == 1) ? Math.min(myExam.getNo(), top) : top;// 有更靠前的名次则替换
-			min = (curExam.getScoreState() == 1) ? Math.min(myExam.getTotalScore().doubleValue(), min) : min;
-			max = (curExam.getScoreState() == 1) ? Math.max(myExam.getTotalScore().doubleValue(), max) : max;
-			sum = (curExam.getScoreState() == 1) ? BigDecimalUtil.newInstance(sum).add(myExam.getTotalScore()).getResult() : sum;
+			min = (curExam.getScoreState() == 1) ? Math.min(myExam.getTotalScore().doubleValue(), min) : min;// 最低分
+			max = (curExam.getScoreState() == 1) ? Math.max(myExam.getTotalScore().doubleValue(), max) : max;// 最高分
+			sum = (curExam.getScoreState() == 1) ? BigDecimalUtil.newInstance(sum).add(myExam.getTotalScore()).getResult() : sum;// 累加分
 			total++;
 		}
 		top = top == 9999 ? 0 : top;// 没有参加过考试，排名为0  
@@ -387,7 +387,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		result.put("typeList", typeResultList);
 		
 		// 统计分数段占比
-		double scoreGrade = BigDecimalUtil.newInstance(paper.getTotalScore()).div(10, 3).getResult().doubleValue();// 分数保留两位小数，十等分后需要保留3位小数
+		double scoreGrade = BigDecimalUtil.newInstance(paper.getTotalScore()).div(10, 2).getResult().doubleValue();// 分数保留两位小数
 		List<Map<String, Object>> scoreGradeResultList = new ArrayList<Map<String, Object>>();
 		for (int i = 0; i < 10; i++) {
 			Map<String, Object> map = new HashMap<>();
