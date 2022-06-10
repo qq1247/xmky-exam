@@ -25,6 +25,7 @@ import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyExamDetail;
 import com.wcpdoc.exam.core.entity.MyMark;
+import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.PaperQuestionAnswer;
 import com.wcpdoc.exam.core.entity.PaperQuestionRule;
@@ -85,7 +86,7 @@ public class ExamExServiceImpl extends BaseServiceImp<Exam> implements ExamExSer
 			return;// 先发布后添加用户，是没有数据的
 		}
 		
-		MyPaper myPaper = paperService.getMyPaper(exam.getId());
+		MyPaper myPaper = paperService.getMyPaper(exam.getPaperId());
 		for (MyMark myMark : myMarkList) {
 			Integer[] examUserIdArr = myMark.getExamUserIdArr();
 			for(Integer userId : examUserIdArr) {
@@ -300,26 +301,37 @@ public class ExamExServiceImpl extends BaseServiceImp<Exam> implements ExamExSer
 	}
 
 	@Override
-	public void userAdd(Exam exam, String[] examUserIds, Integer[] markUserIds) {
-		// 同步考试用户
-		if (ValidateUtil.isValid(markUserIds) && markUserIds.length == 1) {// 如果只有一组并且按逗号分割，会自动解析为数组
-			examUserIds[0] = StringUtil.join(examUserIds);
+	public void userAdd(Exam exam, Paper paper, String[] examUserIds, Integer[] markUserIds) {
+		// 添加阅卷用户
+		userAddMarkUser(exam, paper, examUserIds, markUserIds);
+				
+		// 添加考试用户、生成用户试卷
+		if (exam.getState() != 1) {// 未发布，不生成用户试卷，因为试卷可能变更，导致用户A和用户B试卷不一致
+			return;
 		}
-		Set<Integer> userSet = userAddSyn(exam, examUserIds);
 		
-		// 添加用户试卷
+		Set<Integer> userSet = userAddSyn(exam, examUserIds);
 		MyPaper myPaper = paperService.getMyPaper(exam.getPaperId());
 		for (Integer userId : userSet) {
 			generateUserPaper(exam, userId, myPaper);
 		}
-		
-		// 添加阅卷用户
+	}
+
+	private void userAddMarkUser(Exam exam, Paper paper, String[] examUserIds, Integer[] markUserIds) {
 		List<MyMark> myMarkList = myMarkService.getList(exam.getId());// 获取我的考试列表
 		for (MyMark myMark : myMarkList) {
 			myMarkService.del(myMark.getId());
 		}
 		
-		if (myPaper.getPaper().getMarkType() == 2) {
+		if (paper.getMarkType() == 1) {
+			MyMark myMark = new MyMark();
+			myMark.setMarkUserId(null);
+			myMark.setExamUserIds(String.format(",%s,", StringUtil.join(examUserIds)));
+			myMark.setUpdateUserId(getCurUser().getId());
+			myMark.setUpdateTime(new Date());
+			myMark.setExamId(exam.getId());
+			myMarkService.add(myMark);
+		} else if (paper.getMarkType() == 2) {
 			for (int i = 0; i < markUserIds.length; i++) {
 				MyMark myMark = new MyMark();
 				myMark.setMarkUserId(markUserIds[i]);
@@ -373,22 +385,70 @@ public class ExamExServiceImpl extends BaseServiceImp<Exam> implements ExamExSer
 	}
 
 	@Override
-	public void userAddForRand(Exam exam, String[] examUserIds, Integer[] markUserIds) {
+	public void userAddForRand(Exam exam, Paper paper, String[] examUserIds) {
 		// 校验数据有效性
 		List<PaperQuestion> chapterList = paperQuestionService.getChapterList(exam.getPaperId());
 		Map<Integer, List<PaperQuestionRule>> ruleCache = getRuleCache(chapterList);
 		Map<Integer, List<Question>> questionListCache = getQuestionListCache(ruleCache);
 		publishForRandValid(chapterList, ruleCache, questionListCache);
 		
-		// 同步考试用户
-		if (ValidateUtil.isValid(markUserIds) && markUserIds.length == 1) {// 如果只有一组并且按逗号分割，会自动解析为数组
-			examUserIds[0] = StringUtil.join(examUserIds);
+		// 添加阅卷用户
+		userAddMarkUser(exam, paper, examUserIds, null);
+		
+		// 添加考试用户，生成用户试卷
+		if (exam.getState() != 1) {// 未发布，不生成用户试卷，因为随机规则可能会变更
+			return;
 		}
 		
-		Set<Integer> userSet = userAddSyn(exam, examUserIds);
+		Set<Integer> userSet = userAddSynForRand(exam, examUserIds);
 		for (Integer userId : userSet) {
 			MyPaper myPaper = generatePaperForRand(exam, ruleCache, questionListCache, userId);
 			generateUserPaper(exam, userId, myPaper);
 		}
+	}
+
+	private Set<Integer> userAddSynForRand(Exam exam, String[] examUserIds) {
+		/**
+		 * 页面：1,2,3
+		 * 数据库：2,3,4
+		 * 1添加；4删除；2,3不动
+		 */
+		List<MyExam> myExamList = myExamService.getList(exam.getId());
+		ListIterator<MyExam> myExamListIterator = myExamList.listIterator();// 当前考试的人员
+		Set<Integer> examUserIdSet = new HashSet<>();
+		for (String userIds : examUserIds) {
+			for (String userId : userIds.split(",")) {
+				examUserIdSet.add(Integer.parseInt(userId));
+			}
+		}
+		while (myExamListIterator.hasNext()) {
+			MyExam myExam = myExamListIterator.next();
+			if (examUserIdSet.contains(myExam.getUserId())) {
+				examUserIdSet.remove(myExam.getUserId());
+				myExamListIterator.remove();
+			} else {
+				{// 删除用户，用户答案
+					List<MyExamDetail> myExamDetailList = myExamDetailService.getList(exam.getId(), myExam.getUserId());
+					for (MyExamDetail myExamDetail : myExamDetailList) {
+						myExamDetailService.del(myExamDetail.getId());
+					}
+					
+					MyExam myExamDel = myExamService.getMyExam(exam.getId(), myExam.getUserId());
+					myExamService.del(myExamDel.getId());
+				}
+				
+				{// 删除用户试卷
+					List<PaperQuestionAnswer> answerList = paperQuestionAnswerService.getList(myExam.getExamId(), myExam.getUserId());
+					for (PaperQuestionAnswer answer : answerList) {
+						paperQuestionAnswerService.del(answer.getId());
+					}
+					List<PaperQuestion> paperQuestionList = paperQuestionService.getList(myExam.getExamId(), myExam.getUserId());
+					for (PaperQuestion paperQuestion : paperQuestionList) {
+						paperQuestionService.del(paperQuestion.getId());
+					}
+				}
+			}
+		}
+		return examUserIdSet;
 	}
 }

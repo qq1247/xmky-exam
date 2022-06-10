@@ -648,7 +648,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 				}
 			} else {
 				for (PaperQuestionAnswer answer : answerList) {
-					answer.setScore(BigDecimalUtil.newInstance(score).div(2, 3).getResult());// 分数的一半
+					answer.setScore(BigDecimalUtil.newInstance(score).div(2, 2).getResult());// 分数的一半
 					paperQuestionAnswerService.update(answer);
 				}
 			}
@@ -826,13 +826,13 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 					}
 				} else {
 					for (PaperQuestionAnswer answer : answerList) {
-						answer.setScore(BigDecimalUtil.newInstance(score).div(2, 3).getResult());// 分数的一半
+						answer.setScore(BigDecimalUtil.newInstance(score).div(2, 2).getResult());// 分数的一半
 						paperQuestionAnswerService.update(answer);
 					}
 				}
 			} else if ((question.getType() == 3 && question.getAi() == 1) 
 					|| (question.getType() == 5 && question.getAi() == 1)) { // 智能填空 智能问答
-				BigDecimal singleScore = BigDecimalUtil.newInstance(score).div(answerList.size(), 3).getResult();
+				BigDecimal singleScore = BigDecimalUtil.newInstance(score).div(answerList.size(), 2).getResult();
 				for (int i = 0; i < answerList.size() - 1; i++) {
 					PaperQuestionAnswer answer = answerList.get(i);
 					answer.setScore(singleScore);

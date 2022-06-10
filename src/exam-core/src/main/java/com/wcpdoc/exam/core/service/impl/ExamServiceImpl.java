@@ -20,6 +20,7 @@ import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
 import com.wcpdoc.exam.core.dao.ExamDao;
@@ -263,9 +264,9 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		update(exam);
 		
 		// 发布扩展
-		if (paper.getMarkType() == 1) {
+		if (paper.getGenType() == 1) {
 			examExService.publish(exam);
-		} else if (paper.getMarkType() == 2) {
+		} else if (paper.getGenType() == 2) {
 			examExService.publishForRand(exam);
 		}
 		
@@ -489,15 +490,18 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	@Override
 	public void userAdd(Integer id, String[] examUserIds, Integer[] markUserIds) {
 		// 校验数据有效性
+		if (ValidateUtil.isValid(markUserIds) && markUserIds.length == 1) {// examUserIds=1,2&markUserIds=1，examUserIds会解析为数组，特殊处理一下
+			examUserIds = new String[] { StringUtil.join(examUserIds) };
+		}
 		Exam exam = getEntity(id);
 		Paper paper = paperService.getEntity(exam.getPaperId());
 		userAddValid(exam, paper, examUserIds, markUserIds);
 		
 		// 添加用户
 		if (paper.getGenType() == 1) {
-			examExService.userAdd(exam, examUserIds, markUserIds);
+			examExService.userAdd(exam, paper, examUserIds, markUserIds);
 		} else if (paper.getGenType() == 2) {
-			examExService.userAddForRand(exam, examUserIds, markUserIds);
+			examExService.userAddForRand(exam, paper, examUserIds);
 		}
 	}
 
@@ -532,7 +536,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 				throw new MyException("参数错误：markUserIds");
 			}
 			
-			if (markUserIds.length != 1 && examUserIds.length != markUserIds.length) {
+			if (examUserIds.length != markUserIds.length) {
 				throw new MyException("参数错误：markUserIds和examUserIds数量不等");
 			} 
 		}

@@ -54,15 +54,6 @@ public interface PaperQuestionDao extends BaseDao<PaperQuestion>{
 	 * 获取试卷试题列表
 	 * 
 	 * v1.0 chenyun 2022年2月15日上午9:56:07
-	 * @param paperId 
-	 * void
-	 */
-	List<PaperQuestion> getList(Integer paperId);
-	
-	/**
-	 * 获取试卷试题列表
-	 * 
-	 * v1.0 chenyun 2022年2月15日上午9:56:07
 	 * @param examId
 	 * @param userId 
 	 * void
@@ -76,5 +67,5 @@ public interface PaperQuestionDao extends BaseDao<PaperQuestion>{
 	 * @param questionId
 	 * @return List<PaperQuestion>
 	 */
-	List<PaperQuestion> getList2(Integer questionId);
+	List<PaperQuestion> getList(Integer questionId);
 }

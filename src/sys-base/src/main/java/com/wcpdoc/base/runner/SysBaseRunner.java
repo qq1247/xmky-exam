@@ -41,6 +41,7 @@ public class SysBaseRunner implements ApplicationRunner {
 			parm.setDbBakDir(String.format("bak%sdb", File.separator));
 			parm.setPwdType(2);
 			parm.setPwdValue("111111");
+			parm.setOrgName("小猫考试");
 			SpringUtil.getBean(ParmService.class).add(parm);// 邮件服务在第一次使用的时候初始化，这里不处理
 		} else {
 			parm.setFileUploadDir(parm.getFileUploadDir().replace("\\", File.separator).replace("/", File.separator));

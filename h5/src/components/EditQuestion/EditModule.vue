@@ -396,7 +396,6 @@ export default {
       if (this.editForm.ai === 2) {
         return callback()
       }
-
       if (value === '') {
         return callback(new Error('请填写分数'))
       }
