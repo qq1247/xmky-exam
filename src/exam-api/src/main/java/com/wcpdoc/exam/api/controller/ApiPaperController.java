@@ -334,7 +334,7 @@ public class ApiPaperController extends BaseController {
 
 	@RequestMapping("/myPaperOfRand")
 	@ResponseBody
-	public PageResult detailOfRandom(Integer examId, Integer userId) {
+	public PageResult myPaperOfRand(Integer examId, Integer userId) {
 		try {
 			MyPaper myPaper = paperService.getMyPaperOfRand(examId, userId);
 			return PageResultEx.ok().data(detailHandle(myPaper));

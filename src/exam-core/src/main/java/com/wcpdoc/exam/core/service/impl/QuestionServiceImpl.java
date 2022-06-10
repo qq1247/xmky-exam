@@ -174,7 +174,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (entity.getState() == 0) {
 			throw new MyException("已删除");
 		}
-		List<PaperQuestion> paperQuestionList = paperQuestionService.getList2(question.getId());//判断是否被试卷引用
+		List<PaperQuestion> paperQuestionList = paperQuestionService.getList(question.getId());//判断是否被试卷引用
 		if (ValidateUtil.isValid(paperQuestionList)) {
 			Paper paper = paperService.getEntity(paperQuestionList.get(0).getPaperId());
 			throw new MyException(String.format("该题已被【%s】试卷引用", paper.getName()));
@@ -683,8 +683,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 					if (aiOptions.length > 2) {
 						throw new MyException("参数错误：scoreOption");
 					}
-					for (Integer scoreOption : aiOptions) {
-						if (scoreOption != 2 && scoreOption != 3) {//分值选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；)
+					for (Integer aiOption : aiOptions) {
+						if (aiOption != 2 && aiOption != 3) {//分值选项（2：答案无顺序；3：大小写不敏感；)
 							throw new MyException("参数错误：scoreOption");
 						}
 					}

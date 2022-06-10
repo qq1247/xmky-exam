@@ -67,5 +67,5 @@ public interface PaperQuestionService extends BaseService<PaperQuestion>{
 	 * @param questionId
 	 * @return List<PaperQuestion>
 	 */
-	List<PaperQuestion> getList2(Integer questionId);
+	List<PaperQuestion> getList(Integer questionId);
 }
