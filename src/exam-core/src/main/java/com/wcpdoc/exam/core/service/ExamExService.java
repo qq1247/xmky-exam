@@ -2,6 +2,7 @@ package com.wcpdoc.exam.core.service;
 
 import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.Exam;
+import com.wcpdoc.exam.core.entity.Paper;
 /**
  * 考试服务层接口
  * 
@@ -29,18 +30,19 @@ public interface ExamExService extends BaseService<Exam>{
 	 * 
 	 * v1.0 zhanghc 2022年5月31日上午9:47:52
 	 * @param exam
+	 * @param paper 
 	 * @param examUserIds
 	 * @param markUserIds void
 	 */
-	void userAdd(Exam exam, String[] examUserIds, Integer[] markUserIds);
+	void userAdd(Exam exam, Paper paper, String[] examUserIds, Integer[] markUserIds);
 
 	/**
 	 * 添加用户
 	 * 
 	 * v1.0 zhanghc 2022年5月31日上午9:51:53
 	 * @param exam
+	 * @param paper 
 	 * @param examUserIds
-	 * @param markUserIds void
 	 */
-	void userAddForRand(Exam exam, String[] examUserIds, Integer[] markUserIds);
+	void userAddForRand(Exam exam, Paper paper, String[] examUserIds);
 }

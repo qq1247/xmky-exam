@@ -288,12 +288,10 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		MyPaper userPaper = paper.getGenType() == 1 ? paperService.getMyPaper(paper.getId()) : null;// 人工组卷每个人是一样的
 		for (MyExam myExam : myExamList) {
 			userPaper = paper.getGenType() == 2 ? paperService.getMyPaperOfRand(examId, myExam.getUserId()) : userPaper;// 随机组卷每个人是不一样的
-			List<MyExamDetail> userAnswerList = myExamDetailService.getList(examId, myExam.getUserId());
 			
 			// 开始阅卷
-			doExamHandle(exam, myExam, userPaper, userAnswerList);
+			doExamHandle(exam, myExam, userPaper);
 		}
-		
 		
 		// 更新用户排名
 		doExamRank(paper, myExamList);
@@ -353,7 +351,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		}
 	}
 	
-	private void doExamHandle(Exam exam, MyExam myExam, MyPaper userPaper, List<MyExamDetail> userAnswerList) {
+	private void doExamHandle(Exam exam, MyExam myExam, MyPaper userPaper) {
 		User user = userService.getEntity(myExam.getUserId());
 		if(myExam.getState() == 3){// 已交卷不处理（已阅卷）
 			log.info("客观题阅卷进行：【{}-{}】，【{}-{}】已阅卷，得{}分", exam.getId(), exam.getName(), user.getId(), user.getName(), myExam.getTotalScore());
@@ -374,13 +372,14 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		
 		BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
 		Map<Integer, MyExamDetail> userAnswerCache = new HashMap<>();
+		List<MyExamDetail> userAnswerList = myExamDetailService.getList(exam.getId(), myExam.getUserId());
 		for (MyExamDetail userAnswer : userAnswerList) {
 			userAnswerCache.put(userAnswer.getQuestionId(), userAnswer);// 缓存答案数据，用于和标准答案对比得分
 		}
 		for (Chapter chapter : userPaper.getChapterList()) {
 			for (MyQuestion myquestion : chapter.getMyQuestionList()) {// 获取章节下所有试题
 				MyExamDetail userAnswer = userAnswerCache.get(myquestion.getQuestion().getId());// 获取用户答案
-				if (myExam.getState() == 1) {// 如果未考试，标记用户当前题为0分。
+				if (myExam.getState() == 1) {// 如果未考试，标记用户当前题为0分（阅卷时需要所有题都有分数才能进行）
 					userAnswer.setMarkTime(new Date());
 					userAnswer.setMarkUserId(1);
 					userAnswer.setScore(BigDecimal.ZERO);
