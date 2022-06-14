@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.core.service.impl;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -710,6 +711,36 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	 * @param userAnswer 
 	 * void
 	 */
+	
+	public static void main(String[] args) {
+		Question question = new Question();
+		question.setAi(1);
+		
+		PaperQuestion questionOption = new PaperQuestion();
+		questionOption.setAiOptions("2,3");
+		
+		List<PaperQuestionAnswer> questionAnswerList = new ArrayList<>();
+		PaperQuestionAnswer paperQuestionAnswer = new PaperQuestionAnswer();
+		paperQuestionAnswer.setAnswer("奖学金");
+		paperQuestionAnswer.setScore(new BigDecimal("1"));
+		questionAnswerList.add(paperQuestionAnswer);
+		
+		paperQuestionAnswer = new PaperQuestionAnswer();
+		paperQuestionAnswer.setAnswer("贷学金");
+		paperQuestionAnswer.setScore(new BigDecimal("1"));
+		questionAnswerList.add(paperQuestionAnswer);
+
+		paperQuestionAnswer = new PaperQuestionAnswer();
+		paperQuestionAnswer.setAnswer("助学金");
+		paperQuestionAnswer.setScore(new BigDecimal("1"));
+		questionAnswerList.add(paperQuestionAnswer);
+		
+		MyExamDetail userAnswer = new MyExamDetail();
+		userAnswer.setAnswer("助学金\n奖学金");
+		
+		new MyExamServiceImpl().fillBlankHandle(question, questionOption, questionAnswerList, userAnswer);
+		System.err.println(userAnswer.getScore());
+	}
 	private void fillBlankHandle(Question question, PaperQuestion questionOption, 
 			List<PaperQuestionAnswer> questionAnswerList, MyExamDetail userAnswer) {
 		if (question.getAi() == 2) {// 试题类型为人工阅卷，不处理

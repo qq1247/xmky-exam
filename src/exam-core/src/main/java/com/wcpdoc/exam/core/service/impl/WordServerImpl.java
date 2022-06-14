@@ -378,8 +378,8 @@ public class WordServerImpl extends WordServer {
 	private AI parseAi(List<Node> aiRows) {
 		String aiTxt = Jsoup.clean(aiRows.get(0).outerHtml(), Whitelist.none()).trim();
 		int lxdfIndex = aiTxt.indexOf("【漏选得分：");//临时变量可以用汉字首字母
-		int dayxxIndex = aiTxt.indexOf("【答案无顺序：");
-		int dxxmgIndex = aiTxt.indexOf("【大小写不敏感：");
+		int dayxxIndex = aiTxt.indexOf("【答案有顺序：");
+		int dxxmgIndex = aiTxt.indexOf("【大小写敏感：");
 		int lxfzIndex = aiTxt.indexOf("【漏选分值：");
 		int wdIndex = aiTxt.indexOf("【问答分值：");
 		
@@ -388,10 +388,10 @@ public class WordServerImpl extends WordServer {
 		if (lxdfIndex != -1 && aiTxt.substring(lxdfIndex + 6, lxdfIndex + 6 + 1).equals("是")) {
 			ai.getAiOptions().add(1);
 		}
-		if (dayxxIndex != -1 && aiTxt.substring(dayxxIndex + 7, dayxxIndex + 7 + 1).equals("是")) {
+		if (dayxxIndex != -1 && aiTxt.substring(dayxxIndex + 7, dayxxIndex + 7 + 1).equals("否")) {//智能选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；)
 			ai.getAiOptions().add(2);
 		}
-		if (dxxmgIndex != -1 && aiTxt.substring(dxxmgIndex + 8, dxxmgIndex + 8 + 1).equals("是")) {
+		if (dxxmgIndex != -1 && aiTxt.substring(dxxmgIndex + 7, dxxmgIndex + 7 + 1).equals("否")) {
 			ai.getAiOptions().add(3);
 		}
 		if (lxfzIndex != -1) {
