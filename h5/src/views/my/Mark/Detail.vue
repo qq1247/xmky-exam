@@ -7,8 +7,7 @@
           v-if="userInfo.userHeadFileId"
           :size="64"
           :src="`/api/file/download?id=${Number(userInfo.userHeadFileId)}`"
-        ><i
-          class="common common-wo"
+          ><i class="common common-wo"
         /></el-avatar>
         <el-select v-model="userId" placeholder="请选择" @change="changeUser">
           <el-option
@@ -32,7 +31,7 @@
             class="item-icon"
             src="~@/assets/img/mark/mark-score.png"
             alt=""
-          >
+          />
           <div class="item-num">
             {{ userInfo.totalScore === null ? '--' : userInfo.totalScore }}
           </div>
@@ -43,7 +42,7 @@
             class="item-icon"
             src="~@/assets/img/mark/mark-time.png"
             alt=""
-          >
+          />
           <div class="item-num">
             {{
               $tools.computeMinute(
@@ -59,16 +58,16 @@
             class="item-icon"
             src="~@/assets/img/mark/mark-pass.png"
             alt=""
-          >
+          />
           <div class="item-num">
             {{
               userInfo.totalScore === null
                 ? '--'
                 : computePass(
-                  userInfo.totalScore,
-                  userInfo.paperTotalScore,
-                  userInfo.paperPassScore
-                )
+                    userInfo.totalScore,
+                    userInfo.paperTotalScore,
+                    userInfo.paperPassScore
+                  )
             }}
           </div>
           <div class="item-title">成绩</div>
@@ -78,7 +77,7 @@
             class="item-icon"
             src="~@/assets/img/mark/mark-answer-time.png"
             alt=""
-          >
+          />
           <div class="item-num">
             {{
               $tools.computeMinute(userInfo.markStartTime, userInfo.markEndTime)
@@ -112,15 +111,7 @@
 
     <!-- 内容 -->
     <div class="content-center">
-      <!-- <div class="paper-title">{{ paper.name }}</div> -->
-
       <template v-if="questionList.length">
-        <!-- 章节 -->
-        <!-- <div class="chapter">
-          <div class="item-title">{{ chapter.name }}</div>
-          <div class="chapter-description" v-html="chapter.description"></div>
-        </div> -->
-
         <!-- 试题 -->
         <div
           v-for="(item, indexQuestion) in questionList"
@@ -146,10 +137,14 @@
               </template>
             </div>
 
-            <div
-              v-if="item.type === 5 && myExamDetailCache[routerQuestionId]"
+            <el-input
+              disabled
+              resize="none"
+              type="textarea"
+              :autosize="true"
               class="user-answer tag"
-              v-html="`${myExamDetailCache[routerQuestionId].answers}`"
+              v-model="myExamDetailCache[routerQuestionId].answers[0]"
+              v-if="item.type === 5 && myExamDetailCache[routerQuestionId]"
             />
 
             <div class="user-plate tag">
@@ -163,9 +158,9 @@
                 @input="(e) => computeScore(e, indexQuestion, item.score)"
               />
               <span>分</span>
-              <span
-                style="color: #0094e5"
-              >（本题满分：{{ item.score }}分）</span>
+              <span style="color: #0094e5"
+                >（本题满分：{{ item.score }}分）</span
+              >
             </div>
 
             <div class="children-analysis">
@@ -224,7 +219,8 @@
                 routerQuestionId === item.id ? 'router-active' : '',
               ]"
               @click="routerQuestionId = item.id"
-            >{{ indexRoute + 1 }}</a>
+              >{{ indexRoute + 1 }}</a
+            >
           </div>
         </div>
 
@@ -234,9 +230,9 @@
           v-el-drag-dialog
           :score="questionDetail.score"
           :data="questionDetail"
+          @nextPaper="nextPaper"
           @selectScore="selectScore"
           @nextQuestion="nextQuestion"
-          @nextPaper="nextPaper"
         />
       </template>
       <el-empty v-else description="暂无试卷" />
@@ -251,14 +247,14 @@ import {
   myMarkUserList,
   myMarkAnswerList,
   myMarkScore,
-  myMarkFinish
+  myMarkFinish,
 } from 'api/my'
 import elDragDialog from '@/directive/el-drag-dialog'
 import ScorePlate from 'components/ScorePlate.vue'
 export default {
   components: {
     ClozeTitle,
-    ScorePlate
+    ScorePlate,
   },
   directives: { elDragDialog },
   data() {
@@ -281,7 +277,7 @@ export default {
       dialogPlateVisible: false,
       percentage: 0,
       markEndNum: 0,
-      score: 0
+      score: 0,
     }
   },
   watch: {
@@ -290,8 +286,8 @@ export default {
       immediate: true,
       handler(n) {
         this.questionList.length && this.getQuestion(n)
-      }
-    }
+      },
+    },
   },
   created() {
     const { examId, paperId, preview, userId } = this.$route.params
@@ -322,7 +318,7 @@ export default {
     // 查询试卷
     async queryPaper() {
       const res = await paperGet({
-        id: this.paperId
+        id: this.paperId,
       })
       this.paper = res.data
     },
@@ -331,12 +327,12 @@ export default {
       let res
       if (this.paper.genType === 1) {
         res = await paperQuestions({
-          id: this.paperId
+          id: this.paperId,
         })
       } else {
         res = await paperRandomQuestions({
           examId: this.examId,
-          userId: this.userId
+          userId: this.userId,
         })
       }
       this.paperQuestion = res.data
@@ -374,7 +370,7 @@ export default {
     // 查询所有考生信息
     async queryExamineeInfo() {
       const userList = await myMarkUserList({
-        examId: Number(this.examId)
+        examId: Number(this.examId),
       })
       this.allUserList = userList.data.filter((user) => user.state !== 1)
       this.userList = userList.data.filter((user) => user.state !== 1)
@@ -385,7 +381,7 @@ export default {
     async queryOneExamineeInfo() {
       const userInfo = await myMarkUser({
         examId: Number(this.examId),
-        userId: this.userId
+        userId: this.userId,
       })
       this.userInfo = userInfo.data
       this.routerQuestionId = userInfo.data.id
@@ -395,8 +391,10 @@ export default {
       this.userId = userId
       this.queryOneExamineeInfo()
       this.queryAnswerInfo()
-      this.$refs.scorePlate.createScores(0.5)
-      this.$refs.scorePlate.step = ''
+      if (!this.preview) {
+        this.$refs.scorePlate.createScores(0.5)
+        this.$refs.scorePlate.step = ''
+      }
     },
     // 未阅考生列表
     filterUserList(e) {
@@ -419,7 +417,7 @@ export default {
       try {
         const res = await myMarkAnswerList({
           examId: this.examId,
-          userId: this.userId
+          userId: this.userId,
         })
 
         // 组合试卷答案信息
@@ -488,7 +486,7 @@ export default {
         examId: this.examId,
         questionId: source.id,
         userId: this.userId,
-        score: source.scorePlate || 0
+        score: source.scorePlate || 0,
       })
 
       if (res?.code === 200) {
@@ -556,7 +554,7 @@ export default {
       this.updatePercentage()
       await myMarkFinish({
         examId: this.examId,
-        userId: this.userId
+        userId: this.userId,
       })
     },
     // 计算分数通过否
@@ -564,8 +562,8 @@ export default {
       const isPass =
         ((totalScore / paperTotalScore) * 100).toFixed() >= paperPassScore
       return isPass ? '通过' : '未通过'
-    }
-  }
+    },
+  },
 }
 </script>
 <style lang="scss" scoped>
@@ -766,5 +764,10 @@ export default {
 
 /deep/ .el-dialog__body {
   padding: 0;
+}
+
+/deep/ .el-textarea.is-disabled .el-textarea__inner {
+  background-color: transparent;
+  color: #fff;
 }
 </style>

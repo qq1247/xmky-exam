@@ -146,11 +146,13 @@ export default {
 
         for (let j = 0; j < paperDetail[i].questionList.length; j++) {
           // 匹配用户自己作答的答案
-          const { answers: selfAnswer, score: selfScore } =
-            this.examForm.paperAnswer.find(
-              (answer) =>
-                answer.questionId === paperDetail[i].questionList[j].id
-            )
+          const {
+            answers: selfAnswer,
+            score: selfScore,
+            questionScore,
+          } = this.examForm.paperAnswer.find(
+            (answer) => answer.questionId === paperDetail[i].questionList[j].id
+          )
 
           // 匹配正确答案
           const modelAnswer = paperDetail[i].questionList[j].answers[0].answer
@@ -172,23 +174,16 @@ export default {
                 title.indexOf(underline) + underline.length
               )
 
-              let modelCheck
-              if (selfAnswer.length) {
-                modelCheck = modelAnswer.some((model) => {
-                  if (selfAnswer[index]) {
-                    selfAnswer[index].includes(model)
-                  }
-                })
-              } else {
-                modelCheck = false
-              }
-
               const inputHtml = selfAnswer[index]
-                ? `<span style="text-decoration: underline; padding: 0 10px;">&nbsp;&nbsp;${
-                    selfAnswer[index]
-                  }&nbsp;&nbsp;</span>&nbsp;（${modelCheck ? '√' : '×'}）`
-                : `${underline}&nbsp;（×）`
+                ? `<span style="text-decoration: underline; padding: 0 10px;">&nbsp;&nbsp;${selfAnswer[index]}&nbsp;&nbsp;</span>&nbsp;`
+                : `${underline}`
               title = `${titleStart}${inputHtml}${titleEnd}`
+              title = title.replace(
+                /<\/p>$/,
+                `<span>（${
+                  selfScore === questionScore ? '√' : '×'
+                }）&nbsp;&nbsp;</span></p>`
+              )
             })
           } else {
             title = paperDetail[i].questionList[j].title.replace(

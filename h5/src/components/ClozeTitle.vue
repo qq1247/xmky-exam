@@ -4,33 +4,33 @@ export default {
   props: {
     title: {
       type: String,
-      default: ''
+      default: '',
     },
     questionId: {
       type: Number,
-      default: 0
+      default: 0,
     },
     preview: {
       type: Boolean,
-      default: false
+      default: false,
     },
     questionDetail: {
       type: Object,
-      default: () => {}
+      default: () => {},
     },
     myExamDetailCache: {
       type: Object,
-      default: () => {}
+      default: () => {},
     },
     disabled: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   render(h, context) {
     const {
       props,
-      parent: { updateAnswer }
+      parent: { updateAnswer },
     } = context
     let title = props.title
     const questionId = props.questionId
@@ -43,20 +43,12 @@ export default {
 
       let inputHtml
       if (props.preview) {
-        let isTrue
-        const selfAnswer =
-          props.myExamDetailCache[props.questionId].answers[index]
-        const trueAnswer = props.questionDetail.answers[index].answer
-
-        if (selfAnswer) {
-          isTrue = trueAnswer.some((answer) => selfAnswer.includes(answer))
-        } else {
-          isTrue = false
-        }
+        const { score, questionScore } =
+          props.myExamDetailCache[props.questionId]
 
         inputHtml = `<span class="cloze-input-preview" style="color: ${
-          isTrue ? '#00b050' : '#ff5722'
-        };border-color: ${isTrue ? '#00b050' : '#ff5722'}; ">${
+          score === questionScore ? '#00b050' : '#ff5722'
+        };border-color: ${score === questionScore ? '#00b050' : '#ff5722'}; ">${
           props.myExamDetailCache[questionId].answers[index] || ''
         }</span><span v-if="${
           props.preview
@@ -72,17 +64,17 @@ export default {
       template: title,
       data() {
         return props
-      }
+      },
     }
     if (!props.preview) {
       Object.assign(titleTemplate, {
         methods: {
-          updateAnswer
-        }
+          updateAnswer,
+        },
       })
     }
     return h(titleTemplate)
-  }
+  },
 }
 </script>
 

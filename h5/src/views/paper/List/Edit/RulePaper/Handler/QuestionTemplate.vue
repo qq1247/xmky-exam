@@ -1,6 +1,12 @@
 <template>
   <div class="handler-content">
-    <el-form ref="questionForm" size="small" :model="questionForm" :rules="questionForm.rules" label-width="80px">
+    <el-form
+      ref="questionForm"
+      size="small"
+      :model="questionForm"
+      :rules="questionForm.rules"
+      label-width="80px"
+    >
       <el-form-item label="试题分类" prop="questionTypeId">
         <CustomSelect
           :multiple="false"
@@ -12,11 +18,20 @@
           @currentChange="getMoreQuestionType"
           @visibleChange="getQuestionType"
         >
-          <el-option v-for="item in questionForm.questionTypes" :key="item.id" :label="item.name" :value="item.id" />
+          <el-option
+            v-for="item in questionForm.questionTypes"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          />
         </CustomSelect>
       </el-form-item>
     </el-form>
-    <QuestionTemplate :back="false" :question-type-id="questionForm.questionTypeId" @questionExport="questionExport" />
+    <QuestionTemplate
+      :back="false"
+      :question-type-id="questionForm.questionTypeId"
+      @questionExport="questionExport"
+    />
   </div>
 </template>
 
@@ -29,7 +44,7 @@ import { questionTypeListPage } from 'api/question'
 export default {
   components: {
     CustomSelect,
-    QuestionTemplate
+    QuestionTemplate,
   },
   props: {},
   data() {
@@ -40,10 +55,10 @@ export default {
         questionType: 1,
         rules: {
           questionTypeId: [
-            { required: true, message: '请选择试题分类', trigger: 'blur' }
-          ]
-        }
-      }
+            { required: true, message: '请选择试题分类', trigger: 'blur' },
+          ],
+        },
+      },
     }
   },
   methods: {
@@ -52,7 +67,7 @@ export default {
       const typeList = await questionTypeListPage({
         name,
         curPage,
-        pageSize: 5
+        pageSize: 5,
       })
       this.questionForm.questionTypes = typeList.data.list
       this.questionForm.total = typeList.data.total
@@ -103,14 +118,15 @@ export default {
         for (let j = 0; j < paperDetail[i].questionList.length; j++) {
           const title = paperDetail[i].questionList[j].title.replace(
             />/,
-            `style="word-wrap: break-word;font-weight: 600;color: #0c2e41;" >${j + 1
+            `style="word-wrap: break-word;font-weight: 600;color: #0c2e41;" >${
+              j + 1
             }、`
           )
           stringHtml += title
           if (paperDetail[i].questionList[j].type === 4) {
             const options = ['对', '错']
             for (let index = 0; index < options.length; index++) {
-              const option = `<p style="color: #557587;line-height:1;">&nbsp;&nbsp;<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOBAMAAADtZjDiAAAAAXNSR0IArs4c6QAAACdQTFRFAAAAi4uLq6uruLi4ubm5v7+/vb29xsbG2tra8PDw8vLy+/v7////iJ7dHAAAAAh0Uk5TAAtDdr7q7P0ioTVoAAAARElEQVQI12NgYDRJcxZgYGBQ7dw9I4iBganqzJkzyxUYRNcA6VOBDBZnQKCZwRNMT2HIBtPb4DRMHKYOpg9mDsxcqD0ARIszq8RDun8AAAAASUVORK5CYII=" />${String.fromCharCode(
+              const option = `<p style="color: #557587;line-height:1;">&nbsp;&nbsp;${String.fromCharCode(
                 65 + index
               )}、${options[index]}</p>`
               stringHtml += option
@@ -121,22 +137,13 @@ export default {
               index < paperDetail[i].questionList[j].options.length;
               index++
             ) {
-              let inputHtml
-              if (paperDetail[i].questionList[j].type === 1) {
-                inputHtml = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOBAMAAADtZjDiAAAAAXNSR0IArs4c6QAAACdQTFRFAAAAi4uLq6uruLi4ubm5v7+/vb29xsbG2tra8PDw8vLy+/v7////iJ7dHAAAAAh0Uk5TAAtDdr7q7P0ioTVoAAAARElEQVQI12NgYDRJcxZgYGBQ7dw9I4iBganqzJkzyxUYRNcA6VOBDBZnQKCZwRNMT2HIBtPb4DRMHKYOpg9mDsxcqD0ARIszq8RDun8AAAAASUVORK5CYII=" />`
-              }
-
-              if (paperDetail[i].questionList[j].type === 2) {
-                inputHtml = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOBAMAAADtZjDiAAAAAXNSR0IArs4c6QAAABhQTFRFAAAAZmZmd3d3sLCwwsLCxsbG+vr6////YxzpbQAAAAV0Uk5TAAUPZ/v+OmdKAAAALklEQVQI12NgEFJSUlJkYGB2DQ0NDTFgEEkvLy8vc2RQLQeBILJpmDkwc6H2AAAJISBHCX2J9QAAAABJRU5ErkJggg==" />`
-              }
-
-              console.log(inputHtml)
-
               const option = paperDetail[i].questionList[j].options[
                 index
               ].option.replace(
                 />/,
-                `style="color: #557587;line-height:1;" >&nbsp;&nbsp;${inputHtml}&nbsp;${String.fromCharCode(65 + index)}、`
+                `style="color: #557587;line-height:1;" >&nbsp;&nbsp;${String.fromCharCode(
+                  65 + index
+                )}、`
               )
               stringHtml += option
             }
@@ -184,8 +191,8 @@ export default {
       const docxHtml = await this.convertImagesToBase64(stringHtml)
       const converted = htmlDocx.asBlob(docxHtml, { orientation: 'portrait' })
       saveAs(converted, `${this.$parent.$parent.paperName}.docx`)
-    }
-  }
+    },
+  },
 }
 </script>
 
