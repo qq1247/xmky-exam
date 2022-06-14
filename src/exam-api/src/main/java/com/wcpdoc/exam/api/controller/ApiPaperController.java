@@ -147,7 +147,8 @@ public class ApiPaperController extends BaseController {
 					.addAttr("markType", paper.getMarkType())
 					.addAttr("showType", paper.getShowType())
 					.addAttr("state", paper.getState())
-					.addAttr("paperTypeId", paper.getPaperTypeId());
+					.addAttr("paperTypeId", paper.getPaperTypeId())
+					.addAttr("options", ValidateUtil.isValid(paper.getOptions()) ? paper.getOptions().split(",") : new String[0]);
 		} catch (MyException e) {
 			log.error("获取试卷错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

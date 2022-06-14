@@ -57,6 +57,12 @@ public class QuestionTypeOpenServiceImpl extends BaseServiceImp<QuestionTypeOpen
 			throw new MyException("该时间段已存在，请重新选择时间段");
 		}
 		
+		List<Question> questionList = questionService.getList(questionTypeOpen.getQuestionTypeId());
+		if (!ValidateUtil.isValid(questionList)) {
+			throw new MyException("请先添加试题");
+		}
+		
+		// 添加记录
 		if (ValidateUtil.isValid(questionTypeOpen.getUserIds())) {
 			questionTypeOpen.setUserIds(","+questionTypeOpen.getUserIds()+","+getCurUser().getId()+",");
 		}else{
