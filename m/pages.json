@@ -1,0 +1,84 @@
+{
+	"easycom": {
+		"^u-(.*)": "uview-ui/components/u-$1/u-$1.vue"
+	},
+	"pages": [{
+		"path": "pages/index/index",
+		"style": {
+			"navigationStyle": "custom"
+		}
+	}, {
+		"path": "pages/login/login",
+		"style": {
+			"navigationStyle": "custom"
+		}
+	}, {
+		"path": "pages/mine/mine",
+		"style": {
+			"navigationStyle": "custom"
+		}
+	}, {
+		"path": "pages/exam/exam",
+		"style": {
+			"navigationStyle": "custom"
+		}
+	}, {
+		"path": "pages/setting/setting",
+		"style": {
+			"navigationStyle": "custom"
+		}
+	}, {
+		"path": "pages/updatePwd/updatePwd",
+		"style": {
+			"navigationStyle": "custom"
+		}
+	}, {
+		"path": "pages/examResult/examResult",
+		"style": {
+			"navigationStyle": "custom"
+		}
+	}, {
+		"path": "pages/test/test",
+		"style": {
+			"navigationStyle": "custom"
+		}
+	}, {
+		"path": "pages/testList/testList",
+		"style": {
+			"navigationStyle": "custom"
+		}
+	}, {
+		"path": "pages/bulletinDetail/bulletinDetail",
+		"style": {
+			"navigationStyle": "custom"
+		}
+	}, {
+		"path": "pages/examList/examList",
+		"style": {
+			"navigationStyle": "custom"
+		}
+	}],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#fff",
+		"backgroundColor": "#F8F8F8"
+	},
+	"tabBar": {
+		"color": "#929292",
+		"selectedColor": "#0094e5",
+		"borderStyle": "white",
+		"backgroundColor": "#ffffff",
+		"list": [{
+			"pagePath": "pages/index/index",
+			"iconPath": "static/tabBar/home.png",
+			"selectedIconPath": "static/tabBar/home-active.png",
+			"text": "首页"
+		}, {
+			"pagePath": "pages/mine/mine",
+			"iconPath": "static/tabBar/mine.png",
+			"selectedIconPath": "static/tabBar/mine-active.png",
+			"text": "我的"
+		}]
+	}
+}

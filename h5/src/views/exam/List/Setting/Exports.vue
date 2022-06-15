@@ -15,7 +15,7 @@
           v-for="user in examForm.examUserList"
           :key="`${user.name}-${user.id}`"
           :label="user.name"
-          :value="user.id"
+          :value="String(user.id)"
         />
       </el-select>
     </el-form-item>
@@ -27,8 +27,8 @@
 
 <script>
 import { myMarkAnswerList } from 'api/my'
-import { paperGet, paperQuestions, paperRandomQuestions } from 'api/paper'
 import { examGet, examMarkUserList } from 'api/exam'
+import { paperGet, paperQuestions, paperRandomQuestions } from 'api/paper'
 import htmlDocx from 'html-docx-js/dist/html-docx'
 import saveAs from 'file-saver'
 
@@ -40,7 +40,7 @@ export default {
       examForm: {
         paperId: 0,
         examName: '',
-        examUser: null,
+        examUser: '',
         paperAnswer: [],
         examUserList: [],
         paperQuestion: [],
@@ -107,11 +107,14 @@ export default {
     },
     // 组合导出的docx-html
     async compositionHtml() {
+      await this.queryPaper()
+      await this.queryPaperInfo()
       const paperDetail = this.examForm.paperQuestion
       // 用户信息
       const userInfo = this.examForm.examUserList.find(
-        (user) => (user.id = this.examForm.examUser)
+        (user) => (user.id = Number(this.examForm.examUser))
       )
+
       // 总成绩
       const totalScore = this.examForm.paperAnswer.reduce(
         (acc, cur) => (acc += cur.score),
@@ -178,12 +181,6 @@ export default {
                 ? `<span style="text-decoration: underline; padding: 0 10px;">&nbsp;&nbsp;${selfAnswer[index]}&nbsp;&nbsp;</span>&nbsp;`
                 : `${underline}`
               title = `${titleStart}${inputHtml}${titleEnd}`
-              title = title.replace(
-                /<\/p>$/,
-                `<span>（${
-                  selfScore === questionScore ? '√' : '×'
-                }）&nbsp;&nbsp;</span></p>`
-              )
             })
           } else {
             title = paperDetail[i].questionList[j].title.replace(
@@ -193,7 +190,21 @@ export default {
               }、`
             )
           }
-          title = title.replace(/<\/p>$/, `<span>（${selfScore}分）</span></p>`)
+
+          if (paperDetail[i].questionList[j].type === 3) {
+            title = title.replace(
+              /<\/p>$/,
+              `<span>（${selfScore}分）&nbsp;&nbsp;</span><span>（${
+                selfScore === questionScore ? '√' : '×'
+              }）</span></p>`
+            )
+          } else {
+            title = title.replace(
+              /<\/p>$/,
+              `<span>（${selfScore}分）</span></p>`
+            )
+          }
+
           stringHtml += title
 
           // 单选、多选、判断的选项
@@ -261,9 +272,16 @@ export default {
 
           // 问答答案
           if (paperDetail[i].questionList[j].type === 5) {
-            stringHtml += `<p style="color: #557587;">&nbsp;&nbsp;${
-              selfAnswer[0] || ''
-            }</p>`
+            if (selfAnswer.length) {
+              const selfAnswers = selfAnswer[0].split('\n')
+              selfAnswers.map((item) => {
+                stringHtml += `<p style="color: #557587;">${item}</p>`
+              })
+            } else {
+              stringHtml += `<p style="color: #557587;">&nbsp;&nbsp;${
+                selfAnswer[0] || ''
+              }</p>`
+            }
           }
         }
       }
@@ -315,8 +333,6 @@ export default {
           this.$message.warning('阅卷尚未结束，请等待！')
           return false
         }
-        await this.queryPaper()
-        await this.queryPaperInfo()
         const stringHtml = await this.compositionHtml()
         const docxHtml = await this.convertImagesToBase64(stringHtml)
         const converted = htmlDocx.asBlob(docxHtml, { orientation: 'portrait' })
