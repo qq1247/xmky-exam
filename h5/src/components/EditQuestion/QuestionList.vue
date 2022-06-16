@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- top -->
-    <div class="top">
+    <div v-if="showPotic" class="top">
       <div class="top-title">试题列表</div>
       <div class="top-handler">
         <!-- 编辑、预览模式 -->
@@ -125,10 +125,15 @@
           :id="`p-${question.id}`"
           :key="question.id"
           :class="[
-            'question-content',
+            showErr ? 'question-content remove-top' : 'question-content',
             question.type === 5 ? 'ask-content' : '',
           ]"
         >
+          <!-- 错误提示 -->
+          <template v-if="showErr && question.errs.length != 0">
+            <div class="err-msg">{{ question.errs }}</div>
+          </template>
+          <!-- 题目 -->
           <div class="question-title">
             <span>{{ indexQuestion + 1 }}、</span>
             <div v-html="`${question.title}`" />
@@ -141,12 +146,12 @@
                 v-for="(option, indexOption) in question.options"
                 :key="indexOption"
                 class="option-item"
-                :label="String(option.no)"
+                :label="showErr ? option[0] : String(option.no)"
               >
                 <div
                   class="flex-items-center"
                   v-html="
-                    `${String.fromCharCode(65 + indexOption)}、${option.option}`
+                    `${String.fromCharCode(65 + indexOption)}、${showErr ? option : option.option}`
                   "
                 />
               </el-radio>
@@ -163,12 +168,12 @@
                 v-for="(option, indexOption) in question.options"
                 :key="indexOption"
                 class="option-item"
-                :label="String(option.no)"
+                :label="showErr ? option[0] : String(option.no)"
               >
                 <div
                   class="flex-items-center"
                   v-html="
-                    `${String.fromCharCode(65 + indexOption)}、${option.option}`
+                    `${String.fromCharCode(65 + indexOption)}、${showErr ? option : option.option}`
                   "
                 />
               </el-checkbox>
@@ -177,7 +182,7 @@
 
           <!-- 判断 -->
           <template v-if="question.type === 4">
-            <el-radio-group v-model="question.answer" class="children-option">
+            <el-radio-group v-model="question.answers" class="children-option">
               <el-radio
                 v-for="(option, indexOption) in ['对', '错']"
                 :key="indexOption"
@@ -190,7 +195,7 @@
           <!-- 问答 -->
           <template v-if="question.type === 5">
             <el-input
-              v-model="question.answer"
+              v-model="question.answers"
               :rows="2"
               class="question-text"
               placeholder="请输入内容"
@@ -203,7 +208,7 @@
     <el-empty v-else description="暂无试题">
       <img slot="image" src="@/assets/img/data-null.png" alt="">
     </el-empty>
-    <div class="footer">
+    <div v-if="showPotic" class="footer">
       <!-- 分页 -->
       <el-pagination
         background
@@ -244,11 +249,23 @@ export default {
     id: {
       type: Number,
       default: null
+    },
+    preview: {
+      type: Boolean,
+      default: false
+    },
+    showPotic: {
+      type: Boolean,
+      default: true
+    },
+    showErr: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
     return {
-      preview: false,
+      // preview: false,
       checkBoxOption: []
     }
   },
@@ -284,6 +301,11 @@ export default {
 .question-content {
   &:first-child {
     margin-top: 50px;
+  }
+}
+.remove-top {
+  &:first-child {
+    margin-top: 0;
   }
 }
 
@@ -456,6 +478,14 @@ export default {
       vertical-align: -1px;
     }
   }
+}
+.err-msg {
+  background-color: #f00;
+  line-height: 22px;
+  word-wrap: break-word;
+  font-weight: 600;
+  color: #fff;
+  text-indent: 2em;
 }
 
 .footer {

@@ -84,9 +84,8 @@
       </el-scrollbar>
       <el-scrollbar wrap-style="overflow-x:hidden;" class="content-center">
         <template v-if="questionTemplate">
-          <div class="top">试题模板操作</div>
-          <QuestionTemplate
-            ref="questionTemplate"
+          <QuestionBatchInput
+            ref="QuestionBatchInput"
             :question-type-id="questionTypeId"
             @showTemplate="showTemplate"
           />
@@ -104,7 +103,7 @@
           @questionEdit="questionEdit"
         />
       </el-scrollbar>
-      <el-scrollbar wrap-style="overflow-x:hidden;" class="content-right">
+      <el-scrollbar v-if="showSet" wrap-style="overflow-x:hidden;" class="content-right">
         <!-- 试题参数详情 -->
         <QuestionDetail
           v-show="detailStatus"
@@ -145,14 +144,14 @@ import QuestionType from '@/components/EditQuestion/QuestionType.vue'
 import QuestionList from '@/components/EditQuestion/QuestionList.vue'
 import EditModule from 'components/EditQuestion/EditModule.vue'
 import QuestionDetail from 'components/QuestionDetail/Index.vue'
-import QuestionTemplate from '@/components/EditQuestion/QuestionTemplate.vue'
+import QuestionBatchInput from '@/components/EditQuestion/QuestionBatchInput.vue'
 export default {
   components: {
     QuestionType,
     QuestionList,
     EditModule,
     QuestionDetail,
-    QuestionTemplate
+    QuestionBatchInput
   },
   data() {
     return {
@@ -162,6 +161,7 @@ export default {
       detailStatus: false,
       questionDetail: {},
       questionTemplate: false,
+      showSet: true,
       list: {
         // 列表数据
         total: 0, // 总条数
@@ -236,6 +236,8 @@ export default {
     },
     // 更新类型
     updateType(value) {
+      this.questionTemplate = false
+      this.showSet = true
       this.detailStatus = false
       this.questionType = value
       this.questionId = null
@@ -329,6 +331,11 @@ export default {
     },
     // 显示试题操作模板
     showTemplate(e) {
+      if (e) {
+        this.showSet = false
+      } else {
+        this.showSet = true
+      }
       this.questionTemplate = e
       this.search()
     },

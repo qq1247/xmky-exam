@@ -64,17 +64,17 @@ export default {
           type: 1,
           name: '导入导出',
           icon: 'common common-template-down'
-        },
-        {
-          type: 2,
-          name: '一键发布',
-          icon: 'common common-publish'
-        },
-        {
-          type: 3,
-          name: '一键删除',
-          icon: 'common common-delete'
         }
+        // {
+        //   type: 2,
+        //   name: '一键发布',
+        //   icon: 'common common-publish'
+        // },
+        // {
+        //   type: 3,
+        //   name: '一键删除',
+        //   icon: 'common common-delete'
+        // }
       ]
     }
   },
@@ -87,10 +87,12 @@ export default {
     },
     // 操作函数
     otherHandler(type) {
+      this.questionType = null
       const parentData = this.$parent.$parent.$data
       switch (type) {
         case 1:
-          this.$emit('showTemplate', true)
+          this.$router.push({ name: 'QuestionBatchInput' })
+          // this.$emit('showTemplate', true)
           break
         case 2:
           if (!['', '2'].includes(parentData.queryForm.state)) {

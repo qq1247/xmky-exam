@@ -17,7 +17,7 @@ export const cronListPage = (params) => request('cron/listpage', params)
 
 export const orgGet = (params) => request('org/get', params)
 export const orgAdd = (params) => request('org/add', params)
-export const orgEdit = (params) => request('org/edit', params)
+export const orgEdit = (params) => request('org', params)
 export const orgDel = (params) => request('org/del', params)
 export const orgTreeList = (params) => request('org/treeList', params)
 export const orgListPage = (params) => request('org/listpage', params)
