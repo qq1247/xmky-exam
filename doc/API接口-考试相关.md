@@ -428,6 +428,7 @@ http请求头需添加Authorization字段，
 | data.showType  | Integer| 展示方式 |
 | data.state  | Integer| 状态 |
 | data.paperTypeId  | Integer| 试卷分类ID |
+| data.options  | Integer[] | 防作弊选项选项（1：试题乱序；2：选项乱序；） |
 
 ### 试卷拷贝：paper/copy
 | 请求参数| 类型    | 描述 | 必填 |
