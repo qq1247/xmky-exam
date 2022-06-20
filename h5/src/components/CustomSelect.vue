@@ -9,6 +9,9 @@
     @change="change"
     @visible-change="visibleChange"
   >
+    <div class="select-func">
+      <slot name="func" />
+    </div>
     <el-input
       v-model="selectInput"
       class="select-input"
@@ -32,6 +35,19 @@
         下一页
       </button>
     </div>
+    <div slot="empty">
+      <div class="select-func">
+        <slot name="func" />
+      </div>
+      <el-input
+        v-model="selectInput"
+        class="select-input"
+        placeholder="请输入候选词"
+        prefix-icon="el-icon-search"
+        @input="input"
+      />
+      <div class="dropdown-empty">无数据</div>
+    </div>
   </el-select>
 </template>
 
@@ -43,7 +59,7 @@ export default {
       default: false
     },
     value: {
-      type: [String, Number, Array],
+      type: [Boolean, String, Number, Array],
       default: ''
     },
     multiple: {
@@ -111,8 +127,27 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.dropdown-empty {
+    padding: 10px 0;
+    margin: 0;
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+}
+/deep/ .el-button--text{
+  color: gray
+}
+/deep/ .el-button--text:hover {
+  color: #0094e5
+}
 /deep/.el-select-dropdown__list {
   padding-bottom: 35px;
+  padding-top: 35px;
+}
+.select-func {
+  padding: 0 5px;
+  font-size: 14px;
+  line-height: 35px;
 }
 .select-input {
   padding: 0 5px;
@@ -165,5 +200,10 @@ export default {
     border-top: 1px solid #dcdfe6;
     border-bottom: 1px solid #dcdfe6;
   }
+}
+</style>
+<style>
+.el-select-dropdown__wrap {
+  max-height: 330px
 }
 </style>

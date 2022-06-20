@@ -11,10 +11,16 @@
         @currentChange="getMoreUser"
         @visibleChange="getUserList"
       >
+        <template v-slot:func>
+          <div class="select-func-container">
+            <el-button type="text" icon="el-icon-check" @click="selectAll">全选</el-button>
+            <el-button type="text" icon="el-icon-close" @click="clearSelect">清空</el-button>
+          </div>
+        </template>
         <el-option
           v-for="item in userList"
           :key="item.id"
-          :label="item.name"
+          :label="item.customName"
           :value="item.id"
         />
       </CustomSelect>
@@ -58,6 +64,18 @@ export default {
       )
     })
   },
+
+  updated() {
+    const roteUsersList = document.getElementsByClassName('el-select__tags-text')
+    for (let i = 0; i < this.roleForm.writeRoleUser.length; i++) {
+      try {
+        roteUsersList[i].innerHTML = roteUsersList[i].innerHTML.split('--')[0]
+      } catch (e) {
+        console.log(e)
+      }
+    }
+  },
+
   methods: {
     // 获取用户
     async getUserList(curPage = 1, name = '') {
@@ -67,14 +85,15 @@ export default {
         type: 2,
         pageSize: 5
       })
-
+      userList.data.list.forEach(item => {
+        item.customName = `${item.name}--${item.orgName}`
+      })
       if (this.$store.getters.userId === 1) {
         userList.data.list.unshift({
           id: 1,
           name: '管理员'
         })
       }
-
       this.userList = userList.data.list
       this.roleForm.total =
         this.$store.getters.userId === 1
@@ -126,7 +145,28 @@ export default {
       } else {
         this.$message.error('权限编辑失败！')
       }
+    },
+    // 全选
+    selectAll() {
+      let writeRoleUser = this.roleForm.writeRoleUser
+      this.userList.forEach(item => {
+        writeRoleUser.push(item.id)
+      })
+      writeRoleUser = new Set(writeRoleUser)
+      this.roleForm.writeRoleUser = Array.from(writeRoleUser)
+    },
+    // 清空选项
+    clearSelect() {
+      this.roleForm.writeRoleUser = []
     }
   }
 }
 </script>
+<style lang="scss" scoped>
+.select-func-container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  border-bottom: 1px solid #dcdfe6;
+}
+</style>
