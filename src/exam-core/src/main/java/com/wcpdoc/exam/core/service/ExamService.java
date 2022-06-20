@@ -16,9 +16,10 @@ public interface ExamService extends BaseService<Exam>{
 	 * 添加考试
 	 * 
 	 * v1.0 chenyun 2021年8月25日下午5:58:55
-	 * @param exam void
+	 * @param exam 
+	 * void
 	 */
-	Integer addAndUpdate(Exam exam);
+	void addAndUpdate(Exam exam);
 	
 	/**
 	 * 修改考试
@@ -111,4 +112,14 @@ public interface ExamService extends BaseService<Exam>{
 	 * void
 	 */
 	void userAdd(Integer id, String[] examUserIds, Integer[] markUserIds);
+	
+	/**
+	 * 是否有写权限（只能操作自己创建的分类）
+	 * 
+	 * v1.0 zhanghc 2022年6月17日上午11:19:58
+	 * @param exam
+	 * @param userId 
+	 * @return boolean
+	 */
+	boolean hasWriteAuth(Exam exam);
 }

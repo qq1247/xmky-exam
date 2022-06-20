@@ -144,7 +144,7 @@ public class PaperQuestionRuleServiceImpl extends BaseServiceImp<PaperQuestionRu
 		
 		for (int i = 0; i < questionTypeIds.length; i++) {// 试题分类校验
 			QuestionType questionType = questionTypeService.getEntity(questionTypeIds[i]);
-			if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
+			if(!questionTypeService.hasWriteAuth(questionType)) {
 				throw new MyException("无操作权限");
 			}
 		}

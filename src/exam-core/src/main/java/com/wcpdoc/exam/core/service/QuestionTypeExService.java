@@ -17,6 +17,15 @@ public interface QuestionTypeExService{
 	 * void
 	 */
 	void delAndUpdate(QuestionType questionType);
+
+	/**
+	 * 移动
+	 * 
+	 * v1.0 zhanghc 2022年6月16日下午4:44:00
+	 * @param sourceId
+	 * @param targetId void
+	 */
+	void move(Integer sourceId, Integer targetId);
 	
 }
 

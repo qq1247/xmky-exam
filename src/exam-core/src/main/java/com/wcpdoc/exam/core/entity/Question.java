@@ -57,6 +57,8 @@ public class Question {
 	private Integer ai;
 	@Column(name = "AI_OPTIONS")
 	private String aiOptions;
+	@Column(name = "WRITE_USER_IDS")
+	private String writeUserIds;
 
 	public Integer getId() {
 		return id;
@@ -176,11 +178,19 @@ public class Question {
 		this.ai = ai;
 	}
 
+	public String getWriteUserIds() {
+		return writeUserIds;
+	}
+
+	public void setWriteUserIds(String writeUserIds) {
+		this.writeUserIds = writeUserIds;
+	}
+
 	public Integer[] getAiOptionArr() {
 		if (!ValidateUtil.isValid(aiOptions)) {
 			return new Integer[0];
 		}
-		
+
 		String[] aiOptionStrArr = aiOptions.split(",");// 接口层面需要返回数字类型
 		Integer[] aiOptionArr = new Integer[aiOptionStrArr.length];
 		for (int i = 0; i < aiOptionStrArr.length; i++) {

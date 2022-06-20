@@ -125,7 +125,7 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	}
 
 	@Override
-	public boolean hasWriteAuth(QuestionType questionType, Integer userId) {
-		return questionType.getWriteUserIds().contains(String.format(",%s,", userId));
+	public boolean hasWriteAuth(QuestionType questionType) {
+		return questionType.getWriteUserIds().contains(String.format(",%s,", getCurUser().getId()));
 	}
 }

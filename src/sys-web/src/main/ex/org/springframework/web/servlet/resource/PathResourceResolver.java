@@ -169,10 +169,12 @@ public class PathResourceResolver extends AbstractResourceResolver {
 	private Resource getResource(String resourcePath, @Nullable HttpServletRequest request,
 			List<? extends Resource> locations) {
 		try {
-			List<Resource> myLocations = new ArrayList<>();
-			Device device = deviceResolver.resolveDevice(request);
-			myLocations.add(new FileUrlResource(LOCATIONS_CACHE.get(device.isNormal() ? "pc" : "mobile")));
-			locations = myLocations;
+			if (!request.getRequestURI().startsWith("/script/markdown")) {
+				List<Resource> myLocations = new ArrayList<>();
+				Device device = deviceResolver.resolveDevice(request);
+				myLocations.add(new FileUrlResource(LOCATIONS_CACHE.get(device.isNormal() ? "pc" : "mobile")));
+				locations = myLocations;
+			}
 		} catch (MalformedURLException e) {
 			logger.error("获取设备类型错误：", e);
 		}

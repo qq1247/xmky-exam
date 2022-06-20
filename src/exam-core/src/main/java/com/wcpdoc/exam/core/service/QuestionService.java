@@ -61,16 +61,6 @@ public interface QuestionService extends BaseService<Question>{
 	void wordImp(Integer fileId, Integer questionTypeId, String processBarId, Integer state);
 	
 	/**
-	 * 合并
-	 * 
-	 * v1.0 chenyun 2021年3月2日下午1:25:51
-	 * @param sourceId 试题分类源ID
-	 * @param targetId 试题分类目标ID
-	 * void
-	 */
-	void move(Integer sourceId, Integer targetId);
-	
-	/**
 	 * 拷贝
 	 * 
 	 * v1.0 chenyun 2021年8月19日下午2:32:57

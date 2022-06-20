@@ -68,13 +68,16 @@ public class ApiPaperController extends BaseController {
 	 * 添加试卷
 	 * 
 	 * zhanghc 2018年10月21日上午8:16:06
+	 * @param paper
+	 * @param paperRemark
 	 * @return pageOut
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
 	public PageResult add(Paper paper, PaperRemark paperRemark) {
 		try {
-			return PageResultEx.ok().data(paperService.addAndUpdate(paper, paperRemark));
+			paperService.addAndUpdate(paper, paperRemark);
+			return PageResultEx.ok().data(paper.getId());
 		} catch (MyException e) {
 			log.error("添加试卷错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -533,6 +536,29 @@ public class ApiPaperController extends BaseController {
 		}
 	}
 	
+	/**
+	 * 操作权限
+	 * 
+	 * v1.0 zhanghc 2017年6月16日下午5:02:45
+	 * @param id
+	 * @param readUserIds
+	 * @return PageResult
+	 */
+	@RequestMapping("/auth")
+	@ResponseBody
+	public PageResult auth(Integer id, Integer[] readUserIds) {
+		try {
+			paperService.auth(id, readUserIds);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("添加组用户错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("添加组用户错误：", e);
+			return PageResult.err();
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
 	private List<Map<String, Object>> detailHandle(MyPaper myPaper) {
 		List<Map<String, Object>> resultList = new ArrayList<>();
@@ -589,5 +615,28 @@ public class ApiPaperController extends BaseController {
 		}
 		
 		return resultList;
+	}
+	
+	/**
+	 * 移动
+	 * 
+	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * @param id
+	 * @param paperTypeId
+	 * @return PageResult
+	 */
+	@RequestMapping("/move")
+	@ResponseBody
+	public PageResult move(Integer id, Integer paperTypeId) {
+		try {
+			paperService.move(id, paperTypeId);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("合并试题错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		}  catch (Exception e) {
+			log.error("合并试题错误：", e);
+			return PageResult.err();
+		}
 	}
 }

@@ -41,5 +41,5 @@ public interface ExamTypeService extends BaseService<ExamType> {
 	 * @param userId
 	 * @return boolean
 	 */
-	boolean hasAuth(ExamType examType, Integer userId);
+	boolean hasWriteAuth(ExamType examType);
 }
