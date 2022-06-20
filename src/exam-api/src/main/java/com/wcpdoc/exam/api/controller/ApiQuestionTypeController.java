@@ -175,10 +175,11 @@ public class ApiQuestionTypeController extends BaseController {
 				writeUserIdSet.add(Integer.parseInt(writeUserId));
 			}
 			
-			Integer[] writeUserIds = writeUserIdSet.toArray(new Integer[0]);
-			List<User> writeUserList = userService.getList(writeUserIds);
+			List<User> writeUserList = userService.getList(writeUserIdSet.toArray(new Integer[0]));
+			Integer[] writeUserIds = new Integer[writeUserList.size()];
 			String[] writeUserNames = new String[writeUserList.size()];
 			for (int i = 0; i < writeUserList.size(); i++) {
+				writeUserIds[i] = writeUserList.get(i).getId();
 				writeUserNames[i] = writeUserList.get(i).getName();
 			}
 			
@@ -200,7 +201,7 @@ public class ApiQuestionTypeController extends BaseController {
 	}
 	
 	/**
-	 * 添加组用户
+	 * 授权
 	 * 
 	 * v1.0 chenyun 2021年3月2日上午10:18:26
 	 * @param id	

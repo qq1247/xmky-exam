@@ -115,13 +115,16 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 			entity.setWriteUserIds(String.format(",%s,", entity.getCreateUserId()));// 如果没有，默认就是创建人（查询的时候方便）
 		} else {
 			entity.setWriteUserIds(String.format(",%s,", StringUtil.join(writeUserIds)));
-			if (!entity.getWriteUserIds().contains(String.format(",%s,", entity.getCreateUserId()))) {// 如果页面没有选择创建人，添加创建人
+			if (!entity.getWriteUserIds().contains(String.format(",%s,", entity.getCreateUserId()))) {// 如果页面没有选择创建人，追加创建人
 				entity.setWriteUserIds(String.format("%s%s,", entity.getWriteUserIds(), entity.getCreateUserId()));
 			}
 		}
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
 		update(entity);
+		
+		// 更新权限扩展
+		questionTypeExService.auth(entity);
 	}
 
 	@Override

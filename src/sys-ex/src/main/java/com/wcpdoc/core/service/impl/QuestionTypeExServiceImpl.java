@@ -34,7 +34,7 @@ public class QuestionTypeExServiceImpl extends BaseServiceImp<QuestionType> impl
 		PageIn pageIn = new PageIn().setPageSize(1).addAttr("questionTypeId", questionType.getId().toString());
 		int questionNum = questionService.getListpage(pageIn).getTotal();
 		if (questionNum > 0) {
-			throw new MyException("该分类下有试题，不允许删除");
+			throw new MyException("请先删除该分类下试题");
 		}
 	}
 
@@ -67,12 +67,24 @@ public class QuestionTypeExServiceImpl extends BaseServiceImp<QuestionType> impl
 		List<Question> questionList = questionService.getList(sourceId);
 		for (Question question : questionList) {
 			question.setQuestionTypeId(targetId);
+			question.setWriteUserIds(target.getWriteUserIds());
 			question.setUpdateTime(new Date());
 			question.setUpdateUserId(getCurUser().getId());
 			questionService.update(question);
 		}
 	}
 
+	@Override
+	public void auth(QuestionType questionType) {
+		List<Question> questionList = questionService.getList(questionType.getId());
+		for (Question question : questionList) {
+			question.setWriteUserIds(questionType.getWriteUserIds());
+			question.setUpdateTime(new Date());
+			question.setUpdateUserId(getCurUser().getId());
+			questionService.update(question);
+		}
+	}
+	
 	@Override
 	public void setDao(BaseDao<QuestionType> dao) {
 		
