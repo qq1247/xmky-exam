@@ -466,12 +466,12 @@ http请求头需添加Authorization字段，
 | targetId | Integer | 目标章节ID | 是   |
 
 ### 试题移动：paper/questionMove
-###### 只支持同章节下试题移动
+###### 支持跨章节移动
 | 请求参数| 类型    | 描述       | 必填 |
 | --------------- | ------- | ---------- | ---- |
 | id | Integer | 主键【试卷】 | 是   |
-| sourceId | Integer | 源试题ID | 是   |
-| targetId | Integer | 目标试题ID | 是   |
+| sourceQuestionId | Integer | 源试题ID | 是   |
+| targetQuestionId | Integer | 目标试题ID | 是   |
 
 ### 试卷试题列表：paper/myPaper
 | 请求参数| 类型    | 描述   | 必填 |
@@ -517,6 +517,7 @@ http请求头需添加Authorization字段，
 | ----------- | --------- | ------ | ---- |
 | chapterId   | Integer   | 章节id | 是   |
 | questionIds | Integer[] | 试题id | 是   |
+| no | Integer | 插入位置，从1开始 | 是   |
 
 ### 试卷试题删除：paper/questionDel
 | 请求参数| 类型    | 描述       | 必填 |

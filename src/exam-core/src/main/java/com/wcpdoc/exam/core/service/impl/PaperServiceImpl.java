@@ -435,23 +435,23 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 	
 	@Override
-	public void questionMove(Integer id, Integer sourceId, Integer targetId) {
+	public void questionMove(Integer id, Integer sourceQuestionId, Integer targetQuestionId) {
 		//校验数据有效性
 		if (!ValidateUtil.isValid(id)) {
 			throw new MyException("参数错误：id");
 		}
-		if (!ValidateUtil.isValid(sourceId)) {
+		if (!ValidateUtil.isValid(sourceQuestionId)) {
 			throw new MyException("参数错误：sourceId");
 		}
-		if (!ValidateUtil.isValid(targetId)) {
+		if (!ValidateUtil.isValid(targetQuestionId)) {
 			throw new MyException("参数错误：targetId");
 		}
-		PaperQuestion source = paperQuestionService.getEntity(id, sourceId);
-		PaperQuestion target = paperQuestionService.getEntity(id, targetId);
-		if (source.getType() == 1) {
+		PaperQuestion source = paperQuestionService.getEntity(id, sourceQuestionId);
+		PaperQuestion target = paperQuestionService.getEntity(id, targetQuestionId);
+		if (source.getType() != 2) {// 只有固定试题才可以移动
 			throw new MyException("参数错误：sourceId");
 		}
-		if (target.getType() == 1) {
+		if (target.getType() != 2) {
 			throw new MyException("参数错误：targetId");
 		}
 		//if (source.getPaperId().intValue() != target.getPaperId().intValue()) {// 如果修改的不是同一张试卷
@@ -476,6 +476,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		source.setUpdateUserId(getCurUser().getId());
 		source.setUpdateTime(new Date());
 		source.setNo(target.getNo());
+		
 		target.setUpdateUserId(getCurUser().getId());
 		target.setUpdateTime(new Date());
 		target.setNo(sourceNo);
@@ -495,7 +496,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 	
 	@Override
-	public void questionAdd(Integer chapterId, Integer[] questionIds) {
+	public void questionAdd(Integer chapterId, Integer[] questionIds, Integer no) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(chapterId)) {
 			throw new MyException("参数错误：chapterId");
@@ -538,6 +539,10 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			}
 		}
 		
+		if (no > curChapterDetailList.size() + 1) {
+			throw new MyException(String.format("参数错误：no范围为[1-%s]", curChapterDetailList.size() + 1));
+		}
+		
 		List<Question> unAddQuestionList = new ArrayList<>();
 		for (Integer questionId : questionIds) {
 			Question question = questionService.getEntity(questionId);
@@ -551,18 +556,17 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		}
 		
 		// 添加试题
-		int maxNo = curChapterDetailList.size();// 试题最大序号
 		for (Question question : unAddQuestionList) {
 			PaperQuestion pq = new PaperQuestion();
-			pq.setUpdateTime(new Date());
-			pq.setUpdateUserId(getCurUser().getId());
-			pq.setPaperId(_chapter.getPaperId());
-			pq.setParentId(chapterId);
-			pq.setQuestionId(question.getId());
-			pq.setType(2);
-			pq.setNo(++maxNo);
+			// pq.setNo(++maxNo);
 			pq.setScore(question.getScore());
 			pq.setAiOptions(question.getAiOptions());
+			pq.setType(2);
+			pq.setQuestionId(question.getId());
+			pq.setParentId(chapterId);
+			pq.setPaperId(_chapter.getPaperId());
+			pq.setUpdateTime(new Date());
+			pq.setUpdateUserId(getCurUser().getId());
 			paperQuestionService.add(pq);
 			
 			pq.setParentSub(String.format("%s%s_", _chapter.getParentSub(), pq.getId()));
@@ -570,7 +574,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			
 			//添加试题答案
 			List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
-			for(QuestionAnswer questionAnswer : questionAnswerList){
+			for(QuestionAnswer questionAnswer : questionAnswerList) {
 				PaperQuestionAnswer paperQuestionAnswer = new PaperQuestionAnswer();
 				try {
 					BeanUtils.copyProperties(paperQuestionAnswer, questionAnswer);
@@ -581,6 +585,15 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 				paperQuestionAnswer.setPaperId(_chapter.getPaperId());
 				paperQuestionAnswerService.add(paperQuestionAnswer);
 			}
+			
+			curChapterDetailList.add(no++ - 1, pq);// list从0开始计数
+		}
+		
+		// 当前章节下试题重新排序
+		int curNo = 1;
+		for (PaperQuestion pq : curChapterDetailList) {
+			pq.setNo(curNo++);
+			paperQuestionService.update(pq);
 		}
 	}
 	

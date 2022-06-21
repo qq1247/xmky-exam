@@ -103,15 +103,15 @@ public interface PaperService extends BaseService<Paper> {
 	void chapterMove(Integer sourceId, Integer targetId);
 	
 	/**
-	 * 移动章节
+	 * 移动试题
 	 * 
 	 * v1.0 chenyun 2021年7月9日下午3:22:49
 	 * @param id
-	 * @param sourceId 源试题ID
-	 * @param targetId 目标试题ID
+	 * @param sourceQuestionId 源试题ID
+	 * @param targetQuestionId 目标试题ID
 	 * void
 	 */
-	void questionMove(Integer id, Integer sourceId, Integer targetId);
+	void questionMove(Integer id, Integer sourceQuestionId, Integer targetQuestionId);
 	
 	/**
 	 * 完成添加试题
@@ -119,9 +119,10 @@ public interface PaperService extends BaseService<Paper> {
 	 * v1.0 zhanghc 2017年5月27日下午3:32:43
 	 * @param chapterId
 	 * @param questionIds
+	 * @param no
 	 * void
 	 */
-	void questionAdd(Integer chapterId, Integer[] questionIds);
+	void questionAdd(Integer chapterId, Integer[] questionIds, Integer no);
 	
 	/**
 	 * 设置分数

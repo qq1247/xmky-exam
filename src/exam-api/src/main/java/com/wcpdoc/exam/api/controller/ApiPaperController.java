@@ -294,25 +294,24 @@ public class ApiPaperController extends BaseController {
 	
 	/**
 	 * 移动试题
-	 * 只支持同章节下试题移动
 	 * 
 	 * v1.0 zhanghc 2018年10月21日上午10:46:54
 	 * @param id
-	 * @param sourceId 源试题ID
-	 * @param targetId 目标试题ID
+	 * @param sourceQuestionId 源试题ID
+	 * @param targetQuestionId 目标试题ID
 	 * @return PageResult
 	 */
 	@RequestMapping("/questionMove")
 	@ResponseBody
-	public PageResult questionMove(Integer id, Integer sourceId, Integer targetId) {
+	public PageResult questionMove(Integer id, Integer sourceQuestionId, Integer targetQuestionId) {
 		try {
-			paperService.questionMove(id, sourceId, targetId);
+			paperService.questionMove(id, sourceQuestionId, targetQuestionId);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("试题移动错误：{}", e.getMessage());
+			log.error("移动试题错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("试题移动错误：", e);
+			log.error("移动试题错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -354,13 +353,14 @@ public class ApiPaperController extends BaseController {
 	 * v1.0 zhanghc 2018年10月21日上午8:17:26
 	 * @param chapterId
 	 * @param questionIds
+	 * @param no
 	 * @return PageResult
 	 */
 	@RequestMapping("/questionAdd")
 	@ResponseBody
-	public PageResult questionAdd(Integer chapterId, Integer[] questionIds) {
+	public PageResult questionAdd(Integer chapterId, Integer[] questionIds, Integer no) {
 		try {
-			paperService.questionAdd(chapterId, questionIds);
+			paperService.questionAdd(chapterId, questionIds, no);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加试题错误：{}", e.getMessage());
