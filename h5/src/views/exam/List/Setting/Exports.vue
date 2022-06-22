@@ -41,25 +41,26 @@ export default {
         paperId: 0,
         examName: '',
         examUser: '',
+        examUserName: '',
         paperAnswer: [],
         examUserList: [],
         paperQuestion: [],
         markState: 1,
         rules: {
           examUser: [
-            { required: true, message: '请选择考试用户', trigger: 'change' },
-          ],
-        },
-      },
+            { required: true, message: '请选择考试用户', trigger: 'change' }
+          ]
+        }
+      }
     }
   },
   async mounted() {
     this.id = this.$route.params.id
     if (Number(this.id)) {
       const {
-        data: { paperId, name, markState },
+        data: { paperId, name, markState }
       } = await examGet({
-        id: this.id,
+        id: this.id
       })
       this.examForm.paperId = paperId
       this.examForm.examName = name
@@ -79,7 +80,7 @@ export default {
     // 查询试卷
     async queryPaper() {
       const res = await paperGet({
-        id: this.examForm.paperId,
+        id: this.examForm.paperId
       })
       this.genType = res.data.genType
     },
@@ -88,18 +89,18 @@ export default {
       let paperQuestion
       if (this.genType === 1) {
         paperQuestion = await paperQuestions({
-          id: this.examForm.paperId,
+          id: this.examForm.paperId
         })
       } else {
         paperQuestion = await paperRandomQuestions({
           examId: this.id,
-          userId: this.examForm.examUser,
+          userId: this.examForm.examUser
         })
       }
 
       const paperAnswer = await myMarkAnswerList({
         examId: this.id,
-        userId: this.examForm.examUser,
+        userId: this.examForm.examUser
       })
 
       this.examForm.paperQuestion = [...paperQuestion.data]
@@ -111,10 +112,10 @@ export default {
       await this.queryPaperInfo()
       const paperDetail = this.examForm.paperQuestion
       // 用户信息
-      const userInfo = this.examForm.examUserList.find(
-        (user) => (user.id = Number(this.examForm.examUser))
-      )
-
+      // const userInfo = this.examForm.examUserList.find(
+      //   (user) => (user.id = Number(this.examForm.examUser))
+      // )
+      this.getUserNameByUserId(this.examForm.examUser)
       // 总成绩
       const totalScore = this.examForm.paperAnswer.reduce(
         (acc, cur) => (acc += cur.score),
@@ -123,7 +124,7 @@ export default {
       // 试题名称
       let stringHtml = `<p style="text-align: center;font-size: 22px;font-weight: 600;">${this.examForm.examName}</p>`
       // 姓名、分数
-      stringHtml += `<p style="color: #0094e5;">姓名：${userInfo.name}</p>`
+      stringHtml += `<p style="color: #0094e5;">姓名：${this.examForm.examUserName}</p>`
       stringHtml += `<p style="color: #eb5b5b;">分数：${totalScore}</p>`
       for (let i = 0; i < paperDetail.length; i++) {
         // 章节和章节描述
@@ -152,7 +153,7 @@ export default {
           const {
             answers: selfAnswer,
             score: selfScore,
-            questionScore,
+            questionScore
           } = this.examForm.paperAnswer.find(
             (answer) => answer.questionId === paperDetail[i].questionList[j].id
           )
@@ -324,7 +325,7 @@ export default {
     },
     // 导出试题
     async exportsPaper() {
-      this.$refs['examForm'].validate(async (valid) => {
+      this.$refs['examForm'].validate(async(valid) => {
         if (!valid) {
           return false
         }
@@ -336,9 +337,18 @@ export default {
         const stringHtml = await this.compositionHtml()
         const docxHtml = await this.convertImagesToBase64(stringHtml)
         const converted = htmlDocx.asBlob(docxHtml, { orientation: 'portrait' })
-        saveAs(converted, `${this.examForm.examName}.docx`)
+        this.getUserNameByUserId(this.examForm.examUser)
+        saveAs(converted, `${this.examForm.examName}-${this.examForm.examUserName}.docx`)
       })
     },
-  },
+    // 根据id获取用户名称
+    getUserNameByUserId(id) {
+      this.examForm.examUserList.forEach(item => {
+        if (item.id === parseInt(id)) {
+          this.examForm.examUserName = item.name
+        }
+      })
+    }
+  }
 }
 </script>
