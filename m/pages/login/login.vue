@@ -3,7 +3,7 @@
 
 		<u-navbar :left-icon-size="0" :placeholder="true" :border-bottom="false"></u-navbar>
 
-		<image src="/static/logo.png" class="logo"></image>
+		<image :src="logoImg" class="logo"></image>
 
 		<view class="box">
 			<view class="input_box">
@@ -21,16 +21,21 @@
 
 <script>
 	import {
-		login
+		login,
+		getLogoImg
 	} from '@/api/common.js'
 	export default {
 		data() {
 			return {
-				account: 'test',
-				password: '111111',
+				account: '', // test
+				password: '', // 111111
 				agreementStatus: false,
-				sendCodeState: true
+				sendCodeState: true,
+				logoImg: '/api/login/entLogo'
 			};
+		},
+		mounted() {
+			// this.getLogoImg()
 		},
 		methods: {
 			//登录

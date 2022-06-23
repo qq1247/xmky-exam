@@ -154,5 +154,8 @@
 	background: #fff;
 	border-radius: 10rpx;
 	width: 720rpx;
+	/deep/ .u-cell__body {
+		padding: 30rpx;
+	}
 }
 </style>
