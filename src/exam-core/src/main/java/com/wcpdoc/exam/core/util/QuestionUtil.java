@@ -5,7 +5,7 @@ import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 
 /**
- * 试题工具栏
+ * 试题工具类
  * 
  * v1.0 zhanghc 2022年5月20日上午9:20:36
  */

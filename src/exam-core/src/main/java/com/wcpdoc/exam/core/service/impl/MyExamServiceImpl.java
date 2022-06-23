@@ -218,8 +218,8 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		User user = userService.getEntity(myExam.getUserId());
 		log.info("用户交卷开始：【{}-{}】【1-管理员 阅 {}-{}】开始", exam.getId(), exam.getName(), user.getId(), user.getName());
 		MyPaper userPaper = paper.getGenType() == 1 
-				? paperService.getMyPaper(paper.getId()) 
-				: paperService.getMyPaperOfRand(examId, myExam.getUserId());
+				? paperService.getPaper(paper.getId()) 
+				: paperService.getPaperOfRand(examId, myExam.getUserId());
 		List<MyExamDetail> userAnswerList = myExamDetailService.getList(examId, myExam.getUserId());
 		Map<Integer, MyExamDetail> userAnswerCache = new HashMap<>();
 		for (MyExamDetail userAnswer : userAnswerList) {
@@ -250,22 +250,22 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 			}
 		}
 		
-		if (userPaper.getPaper().getMarkType() == 1) {// 如果是客观题试卷，直接出成绩
+		if (paper.getMarkType() == 1) {// 如果是客观题试卷，直接出成绩
 			myExam.setMarkUserId(1);// 阅卷人为admin
 			myExam.setMarkEndTime(new Date());// 记录阅卷结束时间
 			myExam.setMarkState(3);// 标记为阅卷结束
 			myExam.setTotalScore(totalScore.getResult());// 记录成绩 
-			BigDecimal passScore = BigDecimalUtil.newInstance(userPaper.getPaper().getTotalScore())
-					.mul(userPaper.getPaper().getPassScore()).div(100, 2).getResult();
+			BigDecimal passScore = BigDecimalUtil.newInstance(paper.getTotalScore())
+					.mul(paper.getPassScore()).div(100, 2).getResult();
 			myExam.setAnswerState(BigDecimalUtil.newInstance(totalScore.getResult()).sub(passScore).getResult().doubleValue() >= 0 ? 1 : 2);// 标记及格状态
 			
 			update(myExam);
 		} 
 		
-		if (userPaper.getPaper().getMarkType() == 1) {
+		if (paper.getMarkType() == 1) {
 			log.info("用户交卷完成：【{}-{}】【1-管理员 阅 {}-{}】完成阅卷，得{}分，{}", exam.getId(), exam.getName(), user.getId(), user.getName(), 
 					totalScore.getResult(), myExam.getAnswerState() == 1 ? "及格" : "不及格");
-		} else if (userPaper.getPaper().getMarkType() == 2) {// 如果是主观题试卷，等待人工阅卷
+		} else if (paper.getMarkType() == 2) {// 如果是主观题试卷，等待人工阅卷
 			log.info("用户交卷完成：【{}-{}】【1-管理员 阅 {}-{}】完成阅卷，客观题部分得{}分", exam.getId(), exam.getName(), user.getId(), user.getName(), 
 					totalScore.getResult());
 		}
@@ -286,12 +286,12 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		
 		// 获取用户试卷、标准答案
 		Paper paper = paperService.getEntity(exam.getPaperId());
-		MyPaper userPaper = paper.getGenType() == 1 ? paperService.getMyPaper(paper.getId()) : null;// 人工组卷每个人是一样的
+		MyPaper userPaper = paper.getGenType() == 1 ? paperService.getPaper(paper.getId()) : null;// 人工组卷每个人是一样的
 		for (MyExam myExam : myExamList) {
-			userPaper = paper.getGenType() == 2 ? paperService.getMyPaperOfRand(examId, myExam.getUserId()) : userPaper;// 随机组卷每个人是不一样的
+			userPaper = paper.getGenType() == 2 ? paperService.getPaperOfRand(examId, myExam.getUserId()) : userPaper;// 随机组卷每个人是不一样的
 			
 			// 开始阅卷
-			doExamHandle(exam, myExam, userPaper);
+			doExamHandle(exam, myExam, paper, userPaper);
 		}
 		
 		// 更新用户排名
@@ -352,7 +352,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		}
 	}
 	
-	private void doExamHandle(Exam exam, MyExam myExam, MyPaper userPaper) {
+	private void doExamHandle(Exam exam, MyExam myExam, Paper paper, MyPaper userPaper) {
 		User user = userService.getEntity(myExam.getUserId());
 		if(myExam.getState() == 3){// 已交卷不处理（已阅卷）
 			log.info("客观题阅卷进行：【{}-{}】，【{}-{}】已阅卷，得{}分", exam.getId(), exam.getName(), user.getId(), user.getName(), myExam.getTotalScore());
@@ -367,7 +367,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 			log.info("客观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】未交卷，标记为已交卷", exam.getId(), exam.getName(), user.getId(), user.getName());
 		}
 		
-		if (userPaper.getPaper().getMarkType() == 1 || myExam.getState() == 1) {// 如果是智能阅卷或未考试，记录阅卷开始时间；
+		if (paper.getMarkType() == 1 || myExam.getState() == 1) {// 如果是智能阅卷或未考试，记录阅卷开始时间；
 			myExam.setMarkStartTime(new Date());
 		}
 		
@@ -409,18 +409,18 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 			}
 		}
 		
-		if (userPaper.getPaper().getMarkType() == 1 || myExam.getState() == 1) {// 如果是智能阅卷或未考试，直接出成绩
+		if (paper.getMarkType() == 1 || myExam.getState() == 1) {// 如果是智能阅卷或未考试，直接出成绩
 			myExam.setMarkUserId(1);// 阅卷人为admin
 			myExam.setMarkEndTime(new Date());// 记录阅卷结束时间
 			myExam.setMarkState(3);// 标记为阅卷结束
 			myExam.setTotalScore(totalScore.getResult());// 记录成绩 
-			BigDecimal passScore = BigDecimalUtil.newInstance(userPaper.getPaper().getTotalScore())
-					.mul(userPaper.getPaper().getPassScore()).div(100, 2).getResult();
+			BigDecimal passScore = BigDecimalUtil.newInstance(paper.getTotalScore())
+					.mul(paper.getPassScore()).div(100, 2).getResult();
 			myExam.setAnswerState(BigDecimalUtil.newInstance(totalScore.getResult()).sub(passScore).getResult().doubleValue() >= 0 ? 1 : 2);// 标记及格状态
 			myExamService.update(myExam);
 		}
 		
-		if (userPaper.getPaper().getMarkType() == 1) {
+		if (paper.getMarkType() == 1) {
 			log.info("客观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】完成阅卷，得{}分，{}", exam.getId(), exam.getName(), user.getId(), user.getName(), 
 					totalScore.getResult(), myExam.getAnswerState() == 1 ? "及格" : "不及格");
 		} else {

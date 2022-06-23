@@ -207,22 +207,22 @@ public interface PaperService extends BaseService<Paper> {
 	void sxe(Integer id, Integer[] options);
 	
 	/**
-	 * 获取我的试卷
+	 * 获取试卷
 	 * 
 	 * v1.0 zhanghc 2022年5月20日下午3:04:01
 	 * @return MyPaper
 	 */
-	MyPaper getMyPaper(Integer id);
+	MyPaper getPaper(Integer id);
 	
 	/**
-	 * 获取我的试卷
+	 * 获取试卷
 	 * 
 	 * v1.0 zhanghc 2022年5月20日下午3:06:04
 	 * @param examId
 	 * @param userId
 	 * @return MyPaper
 	 */
-	MyPaper getMyPaperOfRand(Integer examId, Integer userId);
+	MyPaper getPaperOfRand(Integer examId, Integer userId);
 
 	/**
 	 * 获取试题列表

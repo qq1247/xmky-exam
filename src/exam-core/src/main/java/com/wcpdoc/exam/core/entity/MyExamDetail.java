@@ -13,6 +13,7 @@ import javax.persistence.Table;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.wcpdoc.core.util.ValidateUtil;
 
 /**
  * 我的考试详细实体
@@ -52,7 +53,11 @@ public class MyExamDetail {
 	private BigDecimal questionScore;
 	@Column(name = "ANSWER_FILE_ID")
 	private Integer answerFileId;
-	
+	@Column(name = "QUESTION_NO")
+	private Integer questionNo;
+	@Column(name = "OPTION_NO")
+	private String optionNo;
+
 	public Integer getId() {
 		return id;
 	}
@@ -147,5 +152,34 @@ public class MyExamDetail {
 
 	public void setAnswerFileId(Integer answerFileId) {
 		this.answerFileId = answerFileId;
+	}
+
+	public Integer getQuestionNo() {
+		return questionNo;
+	}
+
+	public void setQuestionNo(Integer questionNo) {
+		this.questionNo = questionNo;
+	}
+
+	public String getOptionNo() {
+		return optionNo;
+	}
+	
+	public Integer[] getOptionNoArr() {
+		if (!ValidateUtil.isValid(optionNo)) {
+			return new Integer[0];
+		}
+		
+		String[] optionNoStrArr = optionNo.split(",");// 接口层面需要返回数字类型
+		Integer[] optionNoArr = new Integer[optionNoStrArr.length];
+		for (int i = 0; i < optionNoStrArr.length; i++) {
+			optionNoArr[i] = Integer.parseInt(optionNoStrArr[i]);
+		}
+		return optionNoArr;
+	}
+
+	public void setOptionNo(String optionNo) {
+		this.optionNo = optionNo;
 	}
 }

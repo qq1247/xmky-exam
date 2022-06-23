@@ -13,6 +13,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.core.dao.BaseDao;
@@ -45,6 +46,7 @@ import com.wcpdoc.exam.core.service.PaperQuestionService;
 import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionService;
+import com.wcpdoc.exam.core.util.PaperUtil;
 
 /**
  * 考试服务层实现
@@ -79,23 +81,23 @@ public class ExamExServiceImpl extends BaseServiceImp<Exam> implements ExamExSer
 	}
 
 	@Override
-	public void publish(Exam exam) {
+	public void publish(Exam exam, Paper paper) {
 		// 生成用户试卷
 		List<MyMark> myMarkList = myMarkService.getList(exam.getId());
 		if (!ValidateUtil.isValid(myMarkList)) {
 			return;// 先发布后添加用户，是没有数据的
 		}
 		
-		MyPaper myPaper = paperService.getMyPaper(exam.getPaperId());
+		MyPaper myPaper = paperService.getPaper(exam.getPaperId());
 		for (MyMark myMark : myMarkList) {
 			Integer[] examUserIdArr = myMark.getExamUserIdArr();
 			for(Integer userId : examUserIdArr) {
-				generateUserPaper(exam, userId, myPaper);
+				generateUserPaper(exam, userId, paper, myPaper);
 			}
 		}
 	}
 	
-	private void generateUserPaper(Exam exam, Integer userId, MyPaper myPaper) {
+	private void generateUserPaper(Exam exam, Integer userId, Paper paper, MyPaper myPaper) {
 		MyExam myExam = new MyExam();
 		myExam.setExamId(exam.getId());
 		myExam.setUserId(userId);
@@ -106,20 +108,42 @@ public class ExamExServiceImpl extends BaseServiceImp<Exam> implements ExamExSer
 		myExamService.add(myExam);// 添加我的考试
 		
 		for (Chapter chapter : myPaper.getChapterList()) {
-			for (MyQuestion myQuestion : chapter.getMyQuestionList()) {
+			Integer[] shuffleNums = shuffleNums(1, chapter.getMyQuestionList().size());
+			for (int i = 0; i < chapter.getMyQuestionList().size(); i++) {
+				MyQuestion myQuestion = chapter.getMyQuestionList().get(i);
 				MyExamDetail myExamDetail = new MyExamDetail();
 				myExamDetail.setMyExamId(myExam.getId());
 				myExamDetail.setExamId(myExam.getExamId());
 				myExamDetail.setUserId(myExam.getUserId());
 				myExamDetail.setQuestionId(myQuestion.getQuestion().getId());
 				myExamDetail.setQuestionScore(myQuestion.getAttr().getScore());// 用组卷时设置的分数
+				
+				if (paper.getGenType() == 1) {// 人工试卷
+					if (PaperUtil.hasQuestionRand(paper)) {// 试题乱序
+						myExamDetail.setQuestionNo(shuffleNums[i]);
+					}
+					if (PaperUtil.hasOptionRand(paper)) {// 选项乱序
+						shuffleNums = shuffleNums(1, myQuestion.getOptionList().size());
+						myExamDetail.setOptionNo(StringUtil.join(shuffleNums));
+					}
+				}
 				myExamDetailService.add(myExamDetail);// 添加我的考试详细
 			}
 		}
 	}
 
+	private Integer[] shuffleNums(int start, int end) {
+		Integer[] shuffleNums = new Integer[end - start];
+		for (int i = 0; i < shuffleNums.length; i++) {
+			shuffleNums[i] = start + i;
+		}
+		
+		ArrayUtils.shuffle(shuffleNums);
+		return shuffleNums;
+	}
+
 	@Override
-	public void publishForRand(Exam exam) {
+	public void publishOfRand(Exam exam, Paper paper) {
 		// 校验数据有效性
 		List<PaperQuestion> chapterList = paperQuestionService.getChapterList(exam.getPaperId());
 		Map<Integer, List<PaperQuestionRule>> ruleCache = getRuleCache(chapterList);
@@ -132,7 +156,7 @@ public class ExamExServiceImpl extends BaseServiceImp<Exam> implements ExamExSer
 			for (Integer userId : myMark.getExamUserIdArr()) {
 				// 生成用户试卷
 				MyPaper myPaper = generatePaperForRand(exam, ruleCache, questionListCache, userId);
-				generateUserPaper(exam, userId, myPaper);
+				generateUserPaper(exam, userId, paper, myPaper);
 			}
 		}
 	}
@@ -221,7 +245,7 @@ public class ExamExServiceImpl extends BaseServiceImp<Exam> implements ExamExSer
 	/**
 	 * 获取子分数列表<br/>
 	 * 1分 拆分成2份，结果：0.5、0.5<br/>
-	 * 1分 拆分成3份，结果：0.3、0.3、0.4<br/>
+	 * 1分 拆分成3份，结果：0.33、0.33、0.34<br/>
 	 * 
 	 * v1.0 zhanghc 2022年5月30日下午4:46:25
 	 * @param score
@@ -311,9 +335,9 @@ public class ExamExServiceImpl extends BaseServiceImp<Exam> implements ExamExSer
 		}
 		
 		Set<Integer> userSet = userAddSyn(exam, examUserIds);
-		MyPaper myPaper = paperService.getMyPaper(exam.getPaperId());
+		MyPaper myPaper = paperService.getPaper(exam.getPaperId());
 		for (Integer userId : userSet) {
-			generateUserPaper(exam, userId, myPaper);
+			generateUserPaper(exam, userId, paper, myPaper);
 		}
 	}
 
@@ -385,7 +409,7 @@ public class ExamExServiceImpl extends BaseServiceImp<Exam> implements ExamExSer
 	}
 
 	@Override
-	public void userAddForRand(Exam exam, Paper paper, String[] examUserIds) {
+	public void userAddOfRand(Exam exam, Paper paper, String[] examUserIds) {
 		// 校验数据有效性
 		List<PaperQuestion> chapterList = paperQuestionService.getChapterList(exam.getPaperId());
 		Map<Integer, List<PaperQuestionRule>> ruleCache = getRuleCache(chapterList);
@@ -403,7 +427,7 @@ public class ExamExServiceImpl extends BaseServiceImp<Exam> implements ExamExSer
 		Set<Integer> userSet = userAddSynForRand(exam, examUserIds);
 		for (Integer userId : userSet) {
 			MyPaper myPaper = generatePaperForRand(exam, ruleCache, questionListCache, userId);
-			generateUserPaper(exam, userId, myPaper);
+			generateUserPaper(exam, userId, paper, myPaper);
 		}
 	}
 

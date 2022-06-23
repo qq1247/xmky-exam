@@ -1,11 +1,8 @@
 package com.wcpdoc.exam.core.service.impl;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -18,7 +15,6 @@ import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.PaperQuestionRuleDao;
 import com.wcpdoc.exam.core.entity.Paper;
-import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.PaperQuestionRule;
 import com.wcpdoc.exam.core.entity.PaperType;
 import com.wcpdoc.exam.core.entity.QuestionType;
@@ -58,56 +54,7 @@ public class PaperQuestionRuleServiceImpl extends BaseServiceImp<PaperQuestionRu
 	}
 
 	@Override
-	public List<Map<String, Object>> chapterAndRuleList(Integer paperId) {
-		// 校验数据有效性
-		if (!ValidateUtil.isValid(paperId)) {
-			throw new MyException("参数错误：paperId");
-		}
-		List<Map<String, Object>> resultList = new ArrayList<>();
-		List<PaperQuestion> chapterList = paperQuestionService.getChapterList(paperId);
-		for (PaperQuestion chapter : chapterList) {
-			Map<String, Object> singleResult = new HashMap<String, Object>();// 章节
-			Map<String, Object> chapterMap = new HashMap<String, Object>();
-			chapterMap.put("id", chapter.getId());
-			chapterMap.put("name", chapter.getName());
-			chapterMap.put("description", chapter.getDescription());
-			singleResult.put("chapter", chapterMap);
-			// 章节规则
-			List<Map<String, Object>> ruleMap = new ArrayList<>();
-			List<PaperQuestionRule> paperQuestionRuleList = paperQuestionRuleService.getList(chapter.getId());
-			for (PaperQuestionRule paperQuestionRule : paperQuestionRuleList) {
-				Map<String, Object> paperQuestionRuleMap = new HashMap<>();
-				paperQuestionRuleMap.put("id", paperQuestionRule.getId());
-				paperQuestionRuleMap.put("paperId", paperQuestionRule.getPaperId());
-				paperQuestionRuleMap.put("questionTypeId", paperQuestionRule.getQuestionTypeId());
-				paperQuestionRuleMap.put("questionTypeName", questionTypeService.getEntity(paperQuestionRule.getQuestionTypeId()).getName());
-				paperQuestionRuleMap.put("type", paperQuestionRule.getType());
-				paperQuestionRuleMap.put("difficulty", paperQuestionRule.getDifficultyArr());
-				paperQuestionRuleMap.put("ai", paperQuestionRule.getAiArr());
-				Integer[] aiOptions = null;
-				if (ValidateUtil.isValid(paperQuestionRule.getAiOptions())) {
-					String[] split = paperQuestionRule.getAiOptions().split(",");
-					aiOptions = new Integer[split.length];
-					for(int i = 0; i < split.length; i++ ){
-						aiOptions[i] = Integer.parseInt(split[i]);
-					}
-				} else {
-					aiOptions = new Integer[0];
-				}
-				paperQuestionRuleMap.put("aiOptions", aiOptions);
-				paperQuestionRuleMap.put("totalNumber", paperQuestionRule.getNum());
-				paperQuestionRuleMap.put("score", paperQuestionRule.getScore());
-				ruleMap.add(paperQuestionRuleMap);
-			}
-			
-			singleResult.put("rule", ruleMap);
-			resultList.add(singleResult);
-		}
-		return resultList;
-	}
-
-	@Override
-	public void update(Integer paperId, Integer chapterId, Integer[] questionTypeIds, Integer[] types, String[] difficultys, String[] ais, String[] aiOptions, Integer[] nums, BigDecimal[] scores) {
+	public void paperRuleUpdate(Integer paperId, Integer chapterId, Integer[] questionTypeIds, Integer[] types, String[] difficultys, String[] ais, String[] aiOptions, Integer[] nums, BigDecimal[] scores) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(paperId)) {
 			throw new MyException("参数错误：paperId");

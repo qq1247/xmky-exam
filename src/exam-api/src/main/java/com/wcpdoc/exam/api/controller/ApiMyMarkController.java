@@ -2,12 +2,15 @@ package com.wcpdoc.exam.api.controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -25,17 +28,25 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
+import com.wcpdoc.exam.core.entity.MyExamDetail;
 import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.Paper;
+import com.wcpdoc.exam.core.entity.PaperQuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
+import com.wcpdoc.exam.core.entity.QuestionOption;
+import com.wcpdoc.exam.core.entity.ex.Chapter;
+import com.wcpdoc.exam.core.entity.ex.MyPaper;
+import com.wcpdoc.exam.core.entity.ex.MyQuestion;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
 import com.wcpdoc.exam.core.service.PaperService;
+import com.wcpdoc.exam.core.util.PaperUtil;
 
 /**
  * 我的阅卷控制层
@@ -83,6 +94,155 @@ public class ApiMyMarkController extends BaseController {
 		}
 	}
 	
+	/**
+	 * 试卷信息
+	 * 
+	 * v1.0 zhanghc 2022年5月18日下午1:21:07
+	 * @param examId
+	 * @param userId
+	 * @return PageResult
+	 */
+	@SuppressWarnings("unchecked")
+	@RequestMapping("/paper")
+	@ResponseBody
+	public PageResult paper(Integer examId, Integer userId) {
+		try {
+			// 校验数据有效性
+			if (!ValidateUtil.isValid(examId)) {
+				throw new MyException("参数错误：examId");
+			}
+			List<MyMark> myMarkList = myMarkService.getList(examId);
+			boolean readAuth = false;
+			for (MyMark myMark : myMarkList) {
+				if (myMark.getMarkUserId().intValue() == getCurUser().getId().intValue()) {// 参加了当前阅卷
+					for (Integer _userId : myMark.getExamUserIdArr()) {
+						if (_userId.intValue() == userId.intValue()) {// 有当前考试用户的阅卷权限
+							readAuth = true;
+							break;
+						}
+					}
+					break;
+				}
+			}
+			if (!readAuth) {
+				throw new MyException("无查阅权限");
+			}
+			Exam exam = examService.getEntity(examId);
+			Paper paper = paperService.getEntity(exam.getPaperId());
+			
+			// 生成试卷数据
+			MyPaper myPaper = null;
+			if (paper.getGenType() == 1) {// 固定试卷
+				myPaper = paperService.getPaper(exam.getPaperId());
+				if (PaperUtil.hasQuestionRand(paper) || PaperUtil.hasOptionRand(paper)) {
+					List<MyExamDetail> myExamDetailList = myExamDetailService.getList(examId, userId);
+					paperRandHandle(paper, myPaper, myExamDetailList);
+				}
+			} else if (paper.getGenType() == 2) {// 随机试卷
+				myPaper = paperService.getPaperOfRand(exam.getId(), userId);
+			}
+			
+			List<Map<String, Object>> resultList = new ArrayList<>();
+			for (Chapter chapter : myPaper.getChapterList()) {
+				Map<String, Object> singleResult = new HashMap<>();
+				Map<Object, Object> chapterMap = new HashMap<>();
+				chapterMap.put("id", chapter.getChapter().getId());
+				chapterMap.put("name", chapter.getChapter().getName());
+				chapterMap.put("description", chapter.getChapter().getDescription());
+				singleResult.put("chapter", chapterMap);
+				
+				List<Map<String, Object>> questionsListMap = new ArrayList<>();
+				for (MyQuestion myQuestion : chapter.getMyQuestionList()) {
+					Map<String, Object> questionMap = new HashMap<>();
+					questionMap.put("id", myQuestion.getQuestion().getId());
+					questionMap.put("type", myQuestion.getQuestion().getType());
+					questionMap.put("difficulty", myQuestion.getQuestion().getDifficulty());
+					questionMap.put("title", myQuestion.getQuestion().getTitle());
+					questionMap.put("ai", myQuestion.getQuestion().getAi());
+					questionMap.put("analysis", myQuestion.getQuestion().getAnalysis());
+					questionMap.put("score", myQuestion.getAttr().getScore());// 分数从试卷中取
+					questionMap.put("aiOptions", myQuestion.getAttr().getAiOptionArr());// 分数选项从试卷中取
+					questionMap.put("options", new ArrayList<Map<String, Object>>());
+					
+					if (myQuestion.getQuestion().getType() == 1 || myQuestion.getQuestion().getType() == 2) {
+						for (QuestionOption questionOption : myQuestion.getOptionList()) {
+							Map<String, Object> option = new HashMap<>();
+							option.put("option", questionOption.getOptions());
+							option.put("no", (char)(questionOption.getNo() + 64));
+							((List<Map<String, Object>>)questionMap.get("options")).add(option);
+						}
+					}
+					
+					questionMap.put("answers", new ArrayList<Map<String, Object>>());
+					for (PaperQuestionAnswer answer : myQuestion.getAnswerList()) {
+						Map<String, Object> answerMap = new HashMap<String, Object>();
+						answerMap.put("score", answer.getScore());
+						answerMap.put("answer", answer.getAnswerArr());
+						((List<Map<String, Object>>)questionMap.get("answers")).add(answerMap);
+					}
+					
+					questionsListMap.add(questionMap);
+				}
+				
+				singleResult.put("questionList", questionsListMap);
+				resultList.add(singleResult);
+			}
+			
+			return PageResultEx.ok().data(resultList);
+		} catch (MyException e) {
+			log.error("试卷信息错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("试卷信息错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 固定试卷乱序处理
+	 * 
+	 * v1.0 zhanghc 2022年6月23日下午1:55:31
+	 * @param paper 
+	 * @param myPaper
+	 * @param myExamDetailList 
+	 * void
+	 */
+	private void paperRandHandle(Paper paper, MyPaper myPaper, List<MyExamDetail> myExamDetailList) {
+		Map<Integer, MyExamDetail> myExamDetailCache = new HashMap<>();
+		for (MyExamDetail myExamDetail : myExamDetailList) {
+			myExamDetailCache.put(myExamDetail.getQuestionId(), myExamDetail);
+		}
+		
+		for (Chapter chapter : myPaper.getChapterList()) {
+			List<MyQuestion> myQuestionList = chapter.getMyQuestionList();
+			if (PaperUtil.hasQuestionRand(paper)) {
+				Collections.sort(myQuestionList, new Comparator<MyQuestion>() {
+					@Override
+					public int compare(MyQuestion o1, MyQuestion o2) {
+						return myExamDetailCache.get(o1.getQuestion()).getQuestionNo() - myExamDetailCache.get(o2.getQuestion()).getQuestionNo();
+					}
+				});
+			}
+			if (PaperUtil.hasOptionRand(paper)) {
+				for (MyQuestion myquestion : myQuestionList) {
+					if (!(myquestion.getQuestion().getType() == 1 || myquestion.getQuestion().getType() == 2)) {
+						continue;
+					}
+					
+					Integer[] optionNoArr = myExamDetailCache.get(myquestion.getQuestion()).getOptionNoArr();
+					ArrayUtils.shuffle(optionNoArr);
+					List<QuestionOption> optionList = myquestion.getOptionList();
+					Collections.sort(optionList, new Comparator<QuestionOption>() {
+						@Override
+						public int compare(QuestionOption o1, QuestionOption o2) {
+							return optionNoArr[o1.getNo() - 1] - optionNoArr[o2.getNo() - 1];
+						}
+					});
+				}
+			}
+		}
+	}
+
 	/**
 	 * 阅卷
 	 * 
@@ -267,14 +427,36 @@ public class ApiMyMarkController extends BaseController {
 	 * 阅卷考试答案列表
 	 * 
 	 * v1.0 chenyun 2021年7月29日下午6:04:37
-	 * @param userId
 	 * @param examId
+	 * @param userId
 	 * @return PageResult
 	 */
 	@RequestMapping("/answerList")
 	@ResponseBody
-	public PageResult answerList(Integer userId, Integer examId) {
-		try {//TODO 添加权限校验
+	public PageResult answerList(Integer examId, Integer userId) {
+		try {
+			// 校验数据有效性
+			if (!ValidateUtil.isValid(examId)) {
+				throw new MyException("参数错误：examId");
+			}
+			List<MyMark> myMarkList = myMarkService.getList(examId);
+			boolean readAuth = false;
+			for (MyMark myMark : myMarkList) {
+				if (myMark.getMarkUserId().intValue() == getCurUser().getId().intValue()) {// 参加了当前阅卷
+					for (Integer _userId : myMark.getExamUserIdArr()) {
+						if (_userId.intValue() == userId.intValue()) {// 有当前考试用户的阅卷权限
+							readAuth = true;
+							break;
+						}
+					}
+					break;
+				}
+			}
+			if (!readAuth) {
+				throw new MyException("无查阅权限");
+			}
+			
+			// 返回考试答案
 			List<Map<String, Object>> list = myExamDetailService.getAnswerList(examId, userId);
 			for (Map<String, Object> map : list) {
 				QuestionAnswer answer = new QuestionAnswer();

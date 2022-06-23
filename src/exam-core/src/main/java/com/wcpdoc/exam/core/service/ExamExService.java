@@ -13,17 +13,21 @@ public interface ExamExService extends BaseService<Exam>{
 	 * 发布
 	 * 
 	 * v1.0 zhanghc 2022年5月30日上午11:28:02
-	 * @param exam void
+	 * @param exam 
+	 * @param paper 
+	 * void
 	 */
-	void publish(Exam exam);
+	void publish(Exam exam, Paper paper);
 
 	/**
 	 * 发布
 	 * 
 	 * v1.0 zhanghc 2022年5月30日上午11:28:08
-	 * @param exam void
+	 * @param exam 
+	 * @param paper 
+	 * void
 	 */
-	void publishForRand(Exam exam);
+	void publishOfRand(Exam exam, Paper paper);
 
 	/**
 	 * 添加用户
@@ -44,5 +48,5 @@ public interface ExamExService extends BaseService<Exam>{
 	 * @param paper 
 	 * @param examUserIds
 	 */
-	void userAddForRand(Exam exam, Paper paper, String[] examUserIds);
+	void userAddOfRand(Exam exam, Paper paper, String[] examUserIds);
 }

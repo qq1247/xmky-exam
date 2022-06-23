@@ -253,7 +253,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	@Override
 	public void publish(Integer id) {
 		// 校验数据有效性
-		Exam exam = examDao.getEntity(id);
+		Exam exam = getEntity(id);
 		Paper paper = paperService.getEntity(exam.getPaperId());
 		publishValid(exam, paper);
 		
@@ -265,9 +265,9 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		
 		// 发布扩展
 		if (paper.getGenType() == 1) {
-			examExService.publish(exam);
+			examExService.publish(exam, paper);
 		} else if (paper.getGenType() == 2) {
-			examExService.publishForRand(exam);
+			examExService.publishOfRand(exam, paper);
 		}
 		
 		// 标记为需要监听的考试（考试结束自动阅卷）
@@ -501,7 +501,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if (paper.getGenType() == 1) {
 			examExService.userAdd(exam, paper, examUserIds, markUserIds);
 		} else if (paper.getGenType() == 2) {
-			examExService.userAddForRand(exam, paper, examUserIds);
+			examExService.userAddOfRand(exam, paper, examUserIds);
 		}
 	}
 

@@ -49,13 +49,13 @@ public class PaperQuestionDaoImpl extends RBaseDaoImpl<PaperQuestion> implements
 	
 	@Override
 	public List<PaperQuestion> getList(Integer examId, Integer userId) {
-		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE EXAM_ID = :EXAM_ID AND USER_ID = :USER_ID";
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE EXAM_ID = :EXAM_ID AND USER_ID = :USER_ID ORDER BY NO ASC";
 		return getList(sql, new Object[] { examId, userId });
 	}
 
 	@Override
 	public List<PaperQuestion> getList(Integer questionId) {
-		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE QUESTION_ID = :QUESTION_ID";
+		String sql = "SELECT * FROM EXM_PAPER_QUESTION WHERE QUESTION_ID = :QUESTION_ID ORDER BY NO ASC";
 		return getList(sql, new Object[] { questionId }, PaperQuestion.class);
 	}
 }

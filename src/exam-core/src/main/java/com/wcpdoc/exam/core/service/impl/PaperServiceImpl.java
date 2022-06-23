@@ -1127,6 +1127,9 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if(paper.getState() == 3){
 			throw new MyException("已归档");
 		}
+		if (paper.getGenType() == 2) {
+			throw new MyException("随机试卷无效");
+		}
 		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
 		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
@@ -1137,7 +1140,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 
 	@Override
-	public MyPaper getMyPaper(Integer id) {
+	public MyPaper getPaper(Integer id) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(id)) {
 			throw new MyException("参数错误：id");
@@ -1153,11 +1156,11 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		Map<Integer, List<QuestionOption>> questionOptionCache = getQuestionOptionCache(id);
 		Map<Integer, List<PaperQuestionAnswer>> paperQuestionAnswerCache = getPaperQuestionAnswerCache(id);
 		
-		return generateMyPaper(paper, chapterList, questionCache, questionOptionCache, paperQuestionAnswerCache);
+		return generatePaper(paper, chapterList, questionCache, questionOptionCache, paperQuestionAnswerCache);
 	}
 	
 	@Override
-	public MyPaper getMyPaperOfRand(Integer examId, Integer userId) {
+	public MyPaper getPaperOfRand(Integer examId, Integer userId) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(examId)) {
 			throw new MyException("参数错误：id");
@@ -1173,14 +1176,13 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		Map<Integer, Question> questionCache = getQuestionCache(examId, userId);
 		Map<Integer, List<QuestionOption>> questionOptionCache = getQuestionOptionCache(examId, userId);
 		Map<Integer, List<PaperQuestionAnswer>> paperQuestionAnswerCache = getPaperQuestionAnswerCache(examId, userId);
-		return generateMyPaperOfRand(exam, paper, userId, chapterList, questionCache, questionOptionCache, paperQuestionAnswerCache);
+		return generatePaperOfRand(exam, paper, userId, chapterList, questionCache, questionOptionCache, paperQuestionAnswerCache);
 	}
 
-	private MyPaper generateMyPaperOfRand(Exam exam, Paper paper, Integer userId, List<PaperQuestion> chapterList,
+	private MyPaper generatePaperOfRand(Exam exam, Paper paper, Integer userId, List<PaperQuestion> chapterList,
 			Map<Integer, Question> questionCache, Map<Integer, List<QuestionOption>> questionOptionCache,
 			Map<Integer, List<PaperQuestionAnswer>> paperQuestionAnswerCache) {
 		MyPaper myPaper = new MyPaper();
-		myPaper.setPaper(paper);
 		List<PaperQuestion> chapterDetailList = paperQuestionService.getList(exam.getId(), userId);// 这里找到是所有的，包含章节
 		for (PaperQuestion chapter : chapterList) {
 			Chapter _chapter = new Chapter(chapter);
@@ -1200,11 +1202,10 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		return myPaper;
 	}
 
-	private MyPaper generateMyPaper(Paper paper, List<PaperQuestion> chapterList, Map<Integer, Question> questionCache,
+	private MyPaper generatePaper(Paper paper, List<PaperQuestion> chapterList, Map<Integer, Question> questionCache,
 			Map<Integer, List<QuestionOption>> questionOptionCache,
 			Map<Integer, List<PaperQuestionAnswer>> paperQuestionAnswerCache) {
 		MyPaper myPaper = new MyPaper();
-		myPaper.setPaper(paper);
 		for (PaperQuestion chapter : chapterList) {
 			Chapter _chapter = new Chapter(chapter);
 			myPaper.getChapterList().add(_chapter);
