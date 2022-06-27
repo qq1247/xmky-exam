@@ -14,9 +14,21 @@
 					<!-- 答题模式 -->
 					<view class="question-content" v-if="!isRecite">
 						<!-- 标题 -->
-						<view class="question-title">
+						<view v-if="question.type !== 3" class="question-title">
 							<view>{{ index + 1 }}、</view>
 							<div v-html="question.title"></div>
+						</view>
+						<view v-else class="question-gap-title">
+							<span>{{ index + 1 }}、</span>
+							<view v-for="(item, index) in question.titleList" :key="item + index" style="display: inline;">
+							  <span>{{ item }}</span>
+							  <div v-if="question.titleList[question.titleList.length - 1] != item" class="input-box">
+								<label :ref="`label-${index}`" class="label"></label>
+								<u--input border="bottom" :disabled='question.finish'
+									:placeholder="`填空${index+1}`" @blur='(e)=>checkAnswer(e,question.type)'
+									v-model='question.selected[index]'></u--input>
+							  </div>
+							</view>
 						</view>
 
 						<!-- 单选 -->
@@ -50,13 +62,13 @@
 						</view>
 
 						<!-- 填空 -->
-						<view class="question-option" v-if="question.type === 3">
+						<!-- <view class="question-option" v-if="question.type === 3">
 							<view v-for="(option, indexOption) in question.answers" :key="indexOption">
 								<u--input border="bottom" :disabled='question.finish'
 									:placeholder="`填空${indexOption+1}`" @blur='(e)=>checkAnswer(e,question.type)'
 									v-model='question.selected[indexOption]'></u--input>
 							</view>
-						</view>
+						</view> -->
 
 						<!-- 判断 -->
 						<view class="question-option" v-if="question.type === 4">
@@ -84,9 +96,19 @@
 					<!-- 背題模式 -->
 					<view class="question-content" v-else>
 						<!-- 标题 -->
-						<view class="question-title">
+						<view class="question-title" v-if="question.type !== 3">
 							<view>{{ index + 1 }}、</view>
 							<div v-html="question.title"></div>
+						</view>
+						
+						<view v-else class="question-gap-title">
+							<span>{{ index + 1 }}、</span>
+							<view v-for="(item, index) in question.titleList" :key="item + index" style="display: inline;">
+							  <span>{{ item }}</span>
+							  <div v-if="question.titleList[question.titleList.length - 1] != item" class="answer">
+									<span >{{question.answers[index].answer.join()}}</span>
+							  </div>
+							</view>
 						</view>
 
 						<!-- 单选 -->
@@ -118,12 +140,12 @@
 						</view>
 						
 						<!-- 填空 -->
-						<view class="question-option" v-if="question.type === 3">
+						<!-- <view class="question-option" v-if="question.type === 3">
 							<view v-for="(option, indexOption) in question.answers" :key="indexOption">
 								<u--input border="bottom" disabled style="backgroundColor: #fff"
 									v-model='option.answer.join(",")'></u--input>
 							</view>
-						</view>
+						</view> -->
 
 						<!-- 判断 -->
 						<view class="question-option" v-if="question.type === 4">
@@ -363,7 +385,20 @@
 					uni.$u.toast('获取详情失败！请重试')
 					return
 				}
+				// 填空题处理
+				if (res.data.type === 3 ){
+					res.data.titleList = this.splitTxtForSpaces(this.getTxtForHtml(res.data.title), /_{5,}/)
+				}
 				return res.data
+			},
+			
+			// html中提取文本
+			getTxtForHtml(html) {
+				return html.replace(/<.*?>/g, "");
+			},
+			// 将文本按照分割符分割成列表
+			splitTxtForSpaces(txtStr, decollator) {
+				return txtStr.split(decollator);
 			},
 
 			// 页面左右滑动
@@ -437,7 +472,7 @@
 				// 填空
 				if (questionDetail.type === 3) {
 					// 智能
-					if (question.ai === 1) {
+					if (questionDetail.ai === 1) {
 						flag = questionDetail.answers.some((question, index) => {
 							question.answer.join(',').includes(questionDetail.selected[index])
 						})
@@ -483,5 +518,62 @@
 
 	/deep/ uni-checkbox .uni-checkbox-input.uni-checkbox-input-disabled:before {
 		color: #007aff;
+	}
+	.question-gap-title {
+		padding: 11px 16px;
+		line-height: 30px;
+		font-weight: 600;
+		color: #0c2e41;
+	}
+	.input-box {
+	  display: inline-flex;
+	  align-items: center;
+	  box-sizing: border-box;
+	  position: relative;
+	  height: 36rpx;
+	  top: 10rpx;
+	  min-width: 200rpx;
+	  border-bottom: 1rpx solid #000;
+	  font-family: Arial, "microsoft yahei";
+	  font-size: 28rpx;
+	}
+	/deep/ .u-input {
+	  height: 100%;
+	  width: 100%;
+	  position: absolute;
+	  outline: 0;
+	  border: 0;
+	  margin: 0;
+	  padding: 0 !important;
+	}
+	/deep/ .u-input__content {
+	  box-sizing: border-box;
+	  display: inline-flex;
+	  align-items: end;
+	  justify-content: center;
+	  font-size: inherit;
+	  font-family: inherit;
+	  line-height: normal;
+	  height: 100%;
+	  border: 0;
+	  width: 100%;
+	  padding: 0 12rpx;
+	}
+	/deep/ .uni-input-wrapper {
+		text-align: center;
+	}
+	.label {
+	  display: inline-block;
+	  font-size: inherit;
+	  height: inherit;
+	  line-height: inherit;
+	  visibility: hidden;
+	  font-family: inherit;
+	}
+	.answer {
+		display: inline-block;
+		border-bottom: 0.5px solid #000;
+		padding: 0 20px;
+		color: rgb(48, 49, 51);
 	}
 </style>
