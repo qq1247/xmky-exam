@@ -206,6 +206,8 @@ export default {
         this.$message.error('提交答案失败，请联系管理员！')
         return
       }
+      console.log("问题id： ", questionId)
+      console.log("题目的信息： ", this.myExamDetailCache[questionId])
       const res = await myExamAnswer({
         examId: this.examId,
         questionId,

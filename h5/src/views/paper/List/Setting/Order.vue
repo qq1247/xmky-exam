@@ -15,7 +15,7 @@
       />
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="order"> 开启 </el-button>
+      <el-button type="primary" @click="order" :disabled="genType == 2"> 开启 </el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -31,10 +31,12 @@ export default {
         optionOrder: 1,
         questionOrder: 1,
       },
+      genType: ''
     }
   },
   async mounted() {
     this.paperForm.id = this.$route.params.id
+    this.genType = this.$route.params.genType
     const res = await paperGet({ id: this.paperForm.id })
     this.paperForm.optionOrder = res.data.options.includes('1') ? 2 : 1
     this.paperForm.questionOrder = res.data.options.includes('2') ? 2 : 1
