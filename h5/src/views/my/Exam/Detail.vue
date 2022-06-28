@@ -43,7 +43,8 @@
 </template>
 <script>
 import { loginSysTime } from 'api/common'
-import { paperQuestions, paperRandomQuestions, paperGet } from 'api/paper'
+import { paperRandomQuestions, paperGet } from 'api/paper'
+import { myExamPaper } from 'api/my'
 import {
   myExamAnswer,
   myExamFinish,
@@ -124,8 +125,8 @@ export default {
     async queryPaperInfo() {
       let res
       if (this.genType === 1) {
-        res = await paperQuestions({
-          id: this.paperId
+        res = await myExamPaper({
+          examId: this.examId
         })
       } else {
         res = await paperRandomQuestions({

@@ -518,58 +518,7 @@
 
 	/deep/ uni-checkbox .uni-checkbox-input.uni-checkbox-input-disabled:before {
 		color: #007aff;
-	}
-	.question-gap-title {
-		padding: 11px 16px;
-		line-height: 30px;
-		font-weight: 600;
-		color: #0c2e41;
-	}
-	.input-box {
-	  display: inline-flex;
-	  align-items: center;
-	  box-sizing: border-box;
-	  position: relative;
-	  height: 36rpx;
-	  top: 10rpx;
-	  min-width: 200rpx;
-	  border-bottom: 1rpx solid #000;
-	  font-family: Arial, "microsoft yahei";
-	  font-size: 28rpx;
-	}
-	/deep/ .u-input {
-	  height: 100%;
-	  width: 100%;
-	  position: absolute;
-	  outline: 0;
-	  border: 0;
-	  margin: 0;
-	  padding: 0 !important;
-	}
-	/deep/ .u-input__content {
-	  box-sizing: border-box;
-	  display: inline-flex;
-	  align-items: end;
-	  justify-content: center;
-	  font-size: inherit;
-	  font-family: inherit;
-	  line-height: normal;
-	  height: 100%;
-	  border: 0;
-	  width: 100%;
-	  padding: 0 12rpx;
-	}
-	/deep/ .uni-input-wrapper {
-		text-align: center;
-	}
-	.label {
-	  display: inline-block;
-	  font-size: inherit;
-	  height: inherit;
-	  line-height: inherit;
-	  visibility: hidden;
-	  font-family: inherit;
-	}
+	}	
 	.answer {
 		display: inline-block;
 		border-bottom: 0.5px solid #000;

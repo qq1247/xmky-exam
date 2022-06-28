@@ -240,7 +240,8 @@
   </div>
 </template>
 <script>
-import { paperGet, paperQuestions, paperRandomQuestions } from 'api/paper'
+import { paperGet, paperRandomQuestions } from 'api/paper'
+import { myMarkPaper } from 'api/my'
 import ClozeTitle from '@/components/ClozeTitle.vue'
 import {
   myMarkUser,
@@ -326,8 +327,9 @@ export default {
     async queryPaperInfo() {
       let res
       if (this.paper.genType === 1) {
-        res = await paperQuestions({
-          id: this.paperId,
+        res = await myMarkPaper({
+          examId: this.examId,
+          userId: this.userId
         })
       } else {
         res = await paperRandomQuestions({
