@@ -322,7 +322,7 @@ export default {
     // 查询组卷规则
     async query() {
       const res = await paperQuestionRuleList({
-        paperId: this.paperId
+        id: this.paperId
       })
 
       this.paperQuestionRules = res.data

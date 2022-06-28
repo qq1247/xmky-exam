@@ -13,7 +13,7 @@ export const paperChapterEdit = (params) => request('paper/chapterEdit', params)
 export const paperChapterDel = (params) => request('paper/chapterDel', params)
 
 export const paperSxe = (params) => request('paper/sxe', params)
-export const paperQuestions = (params) => request('paper/myPaper', params)
+export const paperQuestions = (params) => request('paper/paper', params)
 export const paperRandomQuestions = (params) =>
   request('paper/myPaperOfRand', params)
 export const paperQuestionAdd = (params) => request('paper/questionAdd', params)
@@ -45,6 +45,6 @@ export const paperTypeMove = (params) => request('paperType/move', params)
 export const paperTypeAuth = (params) => request('paperType/auth', params)
 
 export const paperQuestionRuleUpdate = (params) =>
-  request('paperQuestionRule/update', params)
+  request('paper/paperRuleUpdate', params)
 export const paperQuestionRuleList = (params) =>
-  request('paperQuestionRule/chapterAndRuleList', params)
+  request('paper/paperRlue', params)

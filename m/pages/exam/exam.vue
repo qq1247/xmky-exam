@@ -14,9 +14,21 @@
 				<scroll-view scroll-top="0" scroll-y="true" :style="{width:'100%',height:height+'px'}">
 					<view class="question-content">
 						<!-- 标题 -->
-						<view class="question-title">
+						<view class="question-title" v-if="question.type !== 3">
 							<view>{{ index + 1 }}、</view>
 							<div v-html="question.title"></div>
+						</view>
+						<view class="question-gap-title" v-else>
+							<span>{{ index + 1 }}、</span>
+							<view v-for="(item, index) in question.titleList" :key="item + index" style="display: inline;">
+							  <span>{{ item }}</span>
+							  <div v-if="question.titleList[question.titleList.length - 1] != item" class="input-box">
+								<label :ref="`label-${index}`" class="label"></label>
+								<u--input border="bottom" :disabled='preview'
+									:placeholder="`填空${index+1}`" @blur='(e)=>updateAnswer(e,question.id,3)'
+									v-model='myExamDetailCache[question.id].answers[index]'></u--input>
+							  </div>
+							</view>
 						</view>
 
 						<!-- 单选 -->
@@ -48,13 +60,13 @@
 						</view>
 
 						<!-- 填空 -->
-						<view class="question-option" v-if="question.type === 3">
+						<!-- <view class="question-option" v-if="question.type === 3">
 							<view v-for="(option, indexOption) in question.answers" :key="indexOption">
 								<u--input class="cloze-input" border="bottom" :disabled='preview' :placeholder="`填空${indexOption+1}`"
 									@blur='(e)=>updateAnswer(e,question.id,3)'
 									v-model='myExamDetailCache[question.id].answers[indexOption]'></u--input>
 							</view>
-						</view>
+						</view> -->
 
 						<!-- 判断 -->
 						<view class="question-option" v-if="question.type === 4">
@@ -220,11 +232,25 @@
 						userId: uni.getStorageSync('userInfo').userId,
 					})
 				}
-				
+				// res.data.questionList
+				res.data.forEach(item => {
+					item.questionList.forEach(questItem => {
+						questItem.titleList = this.splitTxtForSpaces(this.getTxtForHtml(questItem.title), /_{5,}/)
+					})
+				})
 				this.questionList = res.data.reduce((acc, cur) => {
 					acc.push(...cur.questionList)
 					return acc
 				}, [])
+			},
+			
+			// html中提取文本
+			getTxtForHtml(html) {
+				return html.replace(/<.*?>/g, "");
+			},
+			// 将文本按照分割符分割成列表
+			splitTxtForSpaces(txtStr, decollator) {
+				return txtStr.split(decollator);
 			},
 
 			// 查询试卷
@@ -241,7 +267,7 @@
 				let res = await myExamAnswerList({
 					examId: this.examId
 				})
-
+				console.log(11111111111, res.data)
 				// 组合试卷答案信息
 				this.myExamDetailCache = res.data.reduce((acc, cur, index) => {
 					if (
@@ -373,4 +399,3 @@
 <style lang="scss" scoped>
 	@import '@/common/css/exam.scss'
 </style>
--->
