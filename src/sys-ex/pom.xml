@@ -47,6 +47,12 @@
             <groupId>com.alibaba</groupId>
             <artifactId>easyexcel</artifactId>
             <version>3.0.5</version>
+            <exclusions>
+            	<exclusion>
+					<groupId>org.ehcache</groupId>
+            		<artifactId>ehcache</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
 	</dependencies>
 </project>
