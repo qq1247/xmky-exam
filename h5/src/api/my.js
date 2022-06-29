@@ -1,7 +1,7 @@
 import request from './request'
 
 export const myExamListPage = (params) => request('myExam/listpage', params)
-export const myExamAnswerList = (params) => request('myExam/paper', params)
+export const myExamAnswerList = (params) => request('myExam/answerList', params)
 export const myExamAnswer = (params) => request('myExam/answer', params)
 export const myExamFinish = (params) => request('myExam/finish', params)
 export const myExamPaper = (params) => request('myExam/paper', params)

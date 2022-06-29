@@ -1,7 +1,6 @@
 package com.wcpdoc.exam.core.service.impl;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -713,33 +712,37 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	 */
 	
 	public static void main(String[] args) {
-		Question question = new Question();
-		question.setAi(1);
+		String[] answers = new String[] {null, "", null, ""};
+		String join = StringUtil.join(answers, '\n');
+		System.err.println(join);
 		
-		PaperQuestion questionOption = new PaperQuestion();
-		questionOption.setAiOptions("2,3");
-		
-		List<PaperQuestionAnswer> questionAnswerList = new ArrayList<>();
-		PaperQuestionAnswer paperQuestionAnswer = new PaperQuestionAnswer();
-		paperQuestionAnswer.setAnswer("奖学金");
-		paperQuestionAnswer.setScore(new BigDecimal("1"));
-		questionAnswerList.add(paperQuestionAnswer);
-		
-		paperQuestionAnswer = new PaperQuestionAnswer();
-		paperQuestionAnswer.setAnswer("贷学金");
-		paperQuestionAnswer.setScore(new BigDecimal("1"));
-		questionAnswerList.add(paperQuestionAnswer);
-
-		paperQuestionAnswer = new PaperQuestionAnswer();
-		paperQuestionAnswer.setAnswer("助学金");
-		paperQuestionAnswer.setScore(new BigDecimal("1"));
-		questionAnswerList.add(paperQuestionAnswer);
-		
-		MyExamDetail userAnswer = new MyExamDetail();
-		userAnswer.setAnswer("助学金\n奖学金");
-		
-		new MyExamServiceImpl().fillBlankHandle(question, questionOption, questionAnswerList, userAnswer);
-		System.err.println(userAnswer.getScore());
+//		Question question = new Question();
+//		question.setAi(1);
+//		
+//		PaperQuestion questionOption = new PaperQuestion();
+//		questionOption.setAiOptions("2,3");
+//		
+//		List<PaperQuestionAnswer> questionAnswerList = new ArrayList<>();
+//		PaperQuestionAnswer paperQuestionAnswer = new PaperQuestionAnswer();
+//		paperQuestionAnswer.setAnswer("奖学金");
+//		paperQuestionAnswer.setScore(new BigDecimal("1"));
+//		questionAnswerList.add(paperQuestionAnswer);
+//		
+//		paperQuestionAnswer = new PaperQuestionAnswer();
+//		paperQuestionAnswer.setAnswer("贷学金");
+//		paperQuestionAnswer.setScore(new BigDecimal("1"));
+//		questionAnswerList.add(paperQuestionAnswer);
+//
+//		paperQuestionAnswer = new PaperQuestionAnswer();
+//		paperQuestionAnswer.setAnswer("助学金");
+//		paperQuestionAnswer.setScore(new BigDecimal("1"));
+//		questionAnswerList.add(paperQuestionAnswer);
+//		
+//		MyExamDetail userAnswer = new MyExamDetail();
+//		userAnswer.setAnswer("助学金\n奖学金");
+//		
+//		new MyExamServiceImpl().fillBlankHandle(question, questionOption, questionAnswerList, userAnswer);
+//		System.err.println(userAnswer.getScore());
 	}
 	private void fillBlankHandle(Question question, PaperQuestion questionOption, 
 			List<PaperQuestionAnswer> questionAnswerList, MyExamDetail userAnswer) {

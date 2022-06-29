@@ -234,11 +234,12 @@ public class StringUtil {
 		
 		StringBuilder sb = new StringBuilder();
 		for (Object str : strArr) {
-			if (sb.length() > 0) {
-				sb.append(separator);
-			}
-			sb.append(str);
+//			if (sb.length() > 0) {// bug：数组第一个是空字符串，会导致添加不上分隔符
+//				sb.append(separator);
+//			}
+			sb.append(str).append(separator);
 		}
+		sb.setLength(sb.length() - 1);
 		return sb.toString();
 	}
 
