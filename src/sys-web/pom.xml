@@ -96,25 +96,25 @@
 		<resources>
 			<resource>
 				<directory></directory><!-- 从根目录开始 -->
-				<includes><!-- 打包文件 -->
-					<include>dll/**</include>
+				<includes>
+					<include>dll/**</include><!-- 查找dll文件夹 -->
 					<include>config/**</include>
 				</includes>
 				<excludes>
-					<exclude>config/jwtSecret.txt</exclude>
+					<exclude>config/jwtSecret.txt</exclude><!-- 排除秘钥文件 -->
 				</excludes>
 				<targetPath>${project.build.directory}</targetPath><!-- 放入war包的同级目录 -->
 			</resource>
 			<resource>
 				<directory>src/main/resources</directory><!-- 从src/main/resources目录开始 -->
-				<includes><!-- 打包文件 -->
-					<include>application.yml</include>
+				<includes>
+					<include>application.yml</include><!-- 查找application.yml文件 -->
 				</includes>
 				<targetPath>${project.build.directory}/config</targetPath><!--放入war包的同级目录的config目录 -->
 			</resource>
 			<resource>
 				<directory>src/main/resources</directory><!-- 从src/main/resources目录开始 -->
-				<targetPath></targetPath><!-- 放入classes目录下 -->
+				<targetPath>${project.build.outputDirectory}</targetPath><!-- 放入classes目录下 -->
 			</resource>
 		</resources>
 	</build>
