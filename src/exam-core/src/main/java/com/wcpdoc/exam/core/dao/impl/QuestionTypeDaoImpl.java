@@ -32,7 +32,7 @@ public class QuestionTypeDaoImpl extends RBaseDaoImpl<QuestionType> implements Q
 				+ "INNER JOIN SYS_USER USER ON QUESTION_TYPE.CREATE_USER_ID = USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "QUESTION_TYPE.NAME LIKE :NAME", String.format("%%%s%%", pageIn.get("name")))
-				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "QUESTION_TYPE.WRITE_USER_IDS LIKE :WRITE_USER_IDS", String.format("%%%s%%", pageIn.get("curUserId", Integer.class)))
+				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "QUESTION_TYPE.WRITE_USER_IDS LIKE :WRITE_USER_IDS", String.format("%%,%s,%%", pageIn.get("curUserId", Integer.class)))
 				.addWhere("QUESTION_TYPE.STATE = 1")
 				.addOrder("QUESTION_TYPE.UPDATE_TIME", Order.DESC);
 		return getListpage(sqlUtil, pageIn);
