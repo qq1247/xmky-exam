@@ -108,6 +108,10 @@ public class ExamExServiceImpl extends BaseServiceImp<Exam> implements ExamExSer
 		myExamService.add(myExam);// 添加我的考试
 		
 		for (Chapter chapter : myPaper.getChapterList()) {
+			if (!ValidateUtil.isValid(chapter.getMyQuestionList())) {
+				continue;// 章节下无题
+			}
+			
 			Integer[] shuffleNums = shuffleNums(1, chapter.getMyQuestionList().size());
 			for (int i = 0; i < chapter.getMyQuestionList().size(); i++) {
 				MyQuestion myQuestion = chapter.getMyQuestionList().get(i);
@@ -123,8 +127,10 @@ public class ExamExServiceImpl extends BaseServiceImp<Exam> implements ExamExSer
 						myExamDetail.setQuestionNo(shuffleNums[i]);
 					}
 					if (PaperUtil.hasOptionRand(paper)) {// 选项乱序
-						shuffleNums = shuffleNums(1, myQuestion.getOptionList().size());
-						myExamDetail.setOptionNo(StringUtil.join(shuffleNums));
+						if (myQuestion.getQuestion().getType() == 1 || myQuestion.getQuestion().getType() == 2) {
+							shuffleNums = shuffleNums(1, myQuestion.getOptionList().size());
+							myExamDetail.setOptionNo(StringUtil.join(shuffleNums));
+						}
 					}
 				}
 				myExamDetailService.add(myExamDetail);// 添加我的考试详细
@@ -133,7 +139,7 @@ public class ExamExServiceImpl extends BaseServiceImp<Exam> implements ExamExSer
 	}
 
 	private Integer[] shuffleNums(int start, int end) {
-		Integer[] shuffleNums = new Integer[end - start];
+		Integer[] shuffleNums = new Integer[end - start + 1];
 		for (int i = 0; i < shuffleNums.length; i++) {
 			shuffleNums[i] = start + i;
 		}

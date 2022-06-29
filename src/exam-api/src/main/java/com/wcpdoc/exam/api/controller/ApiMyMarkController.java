@@ -10,7 +10,6 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -219,7 +218,7 @@ public class ApiMyMarkController extends BaseController {
 				Collections.sort(myQuestionList, new Comparator<MyQuestion>() {
 					@Override
 					public int compare(MyQuestion o1, MyQuestion o2) {
-						return myExamDetailCache.get(o1.getQuestion()).getQuestionNo() - myExamDetailCache.get(o2.getQuestion()).getQuestionNo();
+						return myExamDetailCache.get(o1.getQuestion().getId()).getQuestionNo() - myExamDetailCache.get(o2.getQuestion().getId()).getQuestionNo();
 					}
 				});
 			}
@@ -229,8 +228,7 @@ public class ApiMyMarkController extends BaseController {
 						continue;
 					}
 					
-					Integer[] optionNoArr = myExamDetailCache.get(myquestion.getQuestion()).getOptionNoArr();
-					ArrayUtils.shuffle(optionNoArr);
+					Integer[] optionNoArr = myExamDetailCache.get(myquestion.getQuestion().getId()).getOptionNoArr();
 					List<QuestionOption> optionList = myquestion.getOptionList();
 					Collections.sort(optionList, new Comparator<QuestionOption>() {
 						@Override
@@ -439,21 +437,24 @@ public class ApiMyMarkController extends BaseController {
 			if (!ValidateUtil.isValid(examId)) {
 				throw new MyException("参数错误：examId");
 			}
-			List<MyMark> myMarkList = myMarkService.getList(examId);
-			boolean readAuth = false;
-			for (MyMark myMark : myMarkList) {
-				if (myMark.getMarkUserId().intValue() == getCurUser().getId().intValue()) {// 参加了当前阅卷
-					for (Integer _userId : myMark.getExamUserIdArr()) {
-						if (_userId.intValue() == userId.intValue()) {// 有当前考试用户的阅卷权限
-							readAuth = true;
-							break;
+			Exam exam = examService.getEntity(examId);
+			if (exam.getCreateUserId().intValue() != getCurUser().getId().intValue()) {// 如果不是自己创建的考试，权限校验
+				List<MyMark> myMarkList = myMarkService.getList(examId);
+				boolean readAuth = false;
+				for (MyMark myMark : myMarkList) {
+					if (myMark.getMarkUserId().intValue() == getCurUser().getId().intValue()) {// 参加了当前阅卷
+						for (Integer _userId : myMark.getExamUserIdArr()) {
+							if (_userId.intValue() == userId.intValue()) {// 有当前考试用户的阅卷权限
+								readAuth = true;
+								break;
+							}
 						}
+						break;
 					}
-					break;
 				}
-			}
-			if (!readAuth) {
-				throw new MyException("无查阅权限");
+				if (!readAuth) {
+					throw new MyException("无查阅权限");
+				}
 			}
 			
 			// 返回考试答案

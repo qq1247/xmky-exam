@@ -9,7 +9,6 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -229,7 +228,7 @@ public class ApiMyExamController extends BaseController{
 				Collections.sort(myQuestionList, new Comparator<MyQuestion>() {
 					@Override
 					public int compare(MyQuestion o1, MyQuestion o2) {
-						return myExamDetailCache.get(o1.getQuestion()).getQuestionNo() - myExamDetailCache.get(o2.getQuestion()).getQuestionNo();
+						return myExamDetailCache.get(o1.getQuestion().getId()).getQuestionNo() - myExamDetailCache.get(o2.getQuestion().getId()).getQuestionNo();
 					}
 				});
 			}
@@ -239,8 +238,7 @@ public class ApiMyExamController extends BaseController{
 						continue;
 					}
 					
-					Integer[] optionNoArr = myExamDetailCache.get(myquestion.getQuestion()).getOptionNoArr();
-					ArrayUtils.shuffle(optionNoArr);
+					Integer[] optionNoArr = myExamDetailCache.get(myquestion.getQuestion().getId()).getOptionNoArr();
 					List<QuestionOption> optionList = myquestion.getOptionList();
 					Collections.sort(optionList, new Comparator<QuestionOption>() {
 						@Override
