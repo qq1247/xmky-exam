@@ -124,6 +124,7 @@
       layout="prev, pager, next"
       hide-on-single-page
       :total="total"
+      :pager-count="5"
       :page-size="pageSize"
       :current-page="curPage"
       @current-change="pageChange"
@@ -254,6 +255,12 @@ export default {
       this.queryQuestion(val)
     }
   }
+}
+// 解决火狐浏览器拖拽弹出新窗口
+document.body.ondrop = function (event) {
+  // 阻止默认动作的发生，还需要阻止事件冒泡
+  event.preventDefault();
+  event.stopPropagation();
 }
 </script>
 

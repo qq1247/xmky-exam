@@ -26,7 +26,7 @@
               v-if="question.type === 3 && myExamDetailCache[question.id]"
               class="question-title"
             >
-              <span>{{ index + 1 }}、</span>
+              <span>{{ indexQuestion + 1 }}、</span>
               <ClozeTitle
                 :preview="preview"
                 :title="question.title"

@@ -267,7 +267,6 @@
 				let res = await myExamAnswerList({
 					examId: this.examId
 				})
-				console.log(11111111111, res.data)
 				// 组合试卷答案信息
 				this.myExamDetailCache = res.data.reduce((acc, cur, index) => {
 					if (
