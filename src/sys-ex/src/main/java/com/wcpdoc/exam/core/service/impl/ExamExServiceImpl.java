@@ -128,8 +128,7 @@ public class ExamExServiceImpl extends BaseServiceImp<Exam> implements ExamExSer
 					}
 					if (PaperUtil.hasOptionRand(paper)) {// 选项乱序
 						if (myQuestion.getQuestion().getType() == 1 || myQuestion.getQuestion().getType() == 2) {
-							shuffleNums = shuffleNums(1, myQuestion.getOptionList().size());
-							myExamDetail.setOptionNo(StringUtil.join(shuffleNums));
+							myExamDetail.setOptionNo(StringUtil.join(shuffleNums(1, myQuestion.getOptionList().size())));
 						}
 					}
 				}
