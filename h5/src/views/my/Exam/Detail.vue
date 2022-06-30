@@ -44,7 +44,7 @@
 <script>
 import { loginSysTime } from 'api/common'
 import { paperGet } from 'api/paper'
-import { myExamPaper } from 'api/my'
+import { myMarkPaper } from 'api/my'
 import {
   myExamAnswer,
   myExamFinish,
@@ -123,8 +123,9 @@ export default {
     },
     // 查询试卷信息
     async queryPaperInfo() {
-      const res = await myExamPaper({
-        examId: this.examId
+      const res = await myMarkPaper({
+        examId: this.examId,
+        userId: this.userId
       })
       this.paperQuestion = res.data
     },
