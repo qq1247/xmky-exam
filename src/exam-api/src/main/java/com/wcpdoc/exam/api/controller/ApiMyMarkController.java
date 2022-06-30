@@ -110,23 +110,29 @@ public class ApiMyMarkController extends BaseController {
 			if (!ValidateUtil.isValid(examId)) {
 				throw new MyException("参数错误：examId");
 			}
-			List<MyMark> myMarkList = myMarkService.getList(examId);
-			boolean readAuth = false;
-			for (MyMark myMark : myMarkList) {
-				if (myMark.getMarkUserId().intValue() == getCurUser().getId().intValue()) {// 参加了当前阅卷
-					for (Integer _userId : myMark.getExamUserIdArr()) {
-						if (_userId.intValue() == userId.intValue()) {// 有当前考试用户的阅卷权限
-							readAuth = true;
-							break;
+			if (!ValidateUtil.isValid(userId)) {
+				throw new MyException("参数错误：userId");
+			}
+			
+			Exam exam = examService.getEntity(examId);
+			if (exam.getCreateUserId().intValue() != getCurUser().getId().intValue()) {// 如果不是考试创建用户，校验是否有阅卷权限
+				boolean readAuth = false;
+				List<MyMark> myMarkList = myMarkService.getList(examId);
+				for (MyMark myMark : myMarkList) {
+					if (myMark.getMarkUserId().intValue() == getCurUser().getId().intValue()) {// 参加了当前阅卷
+						for (Integer _userId : myMark.getExamUserIdArr()) {
+							if (_userId.intValue() == userId.intValue()) {// 有当前考试用户的阅卷权限
+								readAuth = true;
+								break;
+							}
 						}
+						break;
 					}
-					break;
+				}
+				if (!readAuth) {
+					throw new MyException("无查阅权限");
 				}
 			}
-			if (!readAuth) {
-				throw new MyException("无查阅权限");
-			}
-			Exam exam = examService.getEntity(examId);
 			Paper paper = paperService.getEntity(exam.getPaperId());
 			
 			// 生成试卷数据
