@@ -13,3 +13,6 @@ export const bulletinListPage = (params, config = {custom: { auth: true }}) => h
 
 // 获取系统时间
 export const loginSysTime = (params, config = {custom: { auth: true }}) => http.post('login/sysTime', params, config)
+
+// 获取系统名称
+export const getSysName = () => http.post('login/entName')

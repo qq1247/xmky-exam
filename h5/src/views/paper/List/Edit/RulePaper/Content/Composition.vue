@@ -476,7 +476,7 @@ import _ from 'lodash'
 import { getOneDict } from '@/utils/getDict'
 import { getQuick } from '@/utils/storage'
 import {
-  paperQuestions,
+  paperPaper,
   paperChapterAdd,
   paperChapterEdit,
   paperChapterDel,
@@ -594,7 +594,7 @@ export default {
     // 查询试卷信息
     async query() {
       try {
-        const res = await paperQuestions({
+        const res = await paperPaper({
           id: this.paperId
         })
         res.data.map((item) => {

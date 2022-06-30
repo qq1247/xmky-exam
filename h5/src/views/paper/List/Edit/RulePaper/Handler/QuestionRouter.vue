@@ -31,7 +31,7 @@
 
 <script>
 import { getQuick } from '@/utils/storage'
-import { paperQuestions } from 'api/paper'
+import { paperPaper } from 'api/paper'
 export default {
   components: {},
   props: {},
@@ -66,7 +66,7 @@ export default {
     // 查询试卷信息
     async query() {
       try {
-        const res = await paperQuestions({
+        const res = await paperPaper({
           id: this.$route.params.id || getQuick().id
         })
         res.data.map((item) => {

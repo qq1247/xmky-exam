@@ -22,8 +22,11 @@
 <script>
 	import {
 		login,
-		getLogoImg
+		getSysName
 	} from '@/api/common.js'
+	import {
+		setTitle
+	} from '@/common/setTitle'
 	export default {
 		data() {
 			return {
@@ -35,7 +38,7 @@
 			};
 		},
 		mounted() {
-			// this.getLogoImg()
+			this.getSysName()
 		},
 		methods: {
 			//登录
@@ -51,6 +54,12 @@
 							url:'/pages/mine/mine'
 						})
 					}, 300);
+				})
+			},
+			getSysName() {
+				getSysName().then(res => {
+					getApp().globalData.entName = res.data
+					setTitle(res.data)
 				})
 			}
 		}

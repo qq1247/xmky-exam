@@ -102,7 +102,7 @@
 </template>
 
 <script>
-import { paperQuestions, paperRandomQuestions, paperGet } from 'api/paper'
+import { paperPaper, paperRandomQuestions, paperGet } from 'api/paper'
 import { getQuick } from '@/utils/storage'
 export default {
   data() {
@@ -126,7 +126,7 @@ export default {
       try {
         let res
         if (this.genType === 1) {
-          res = await paperQuestions({
+          res = await paperPaper({
             id: this.paperId
           })
         } else {

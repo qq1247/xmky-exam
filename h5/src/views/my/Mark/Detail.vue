@@ -240,7 +240,7 @@
   </div>
 </template>
 <script>
-import { paperGet, paperRandomQuestions } from 'api/paper'
+import { paperGet } from 'api/paper'
 import { myMarkPaper } from 'api/my'
 import ClozeTitle from '@/components/ClozeTitle.vue'
 import {
@@ -325,18 +325,10 @@ export default {
     },
     // 查询试卷信息
     async queryPaperInfo() {
-      let res
-      if (this.paper.genType === 1) {
-        res = await myMarkPaper({
-          examId: this.examId,
-          userId: this.userId
-        })
-      } else {
-        res = await paperRandomQuestions({
-          examId: this.examId,
-          userId: this.userId,
-        })
-      }
+      const res = await myMarkPaper({
+        examId: this.examId,
+        userId: this.userId
+      })
       this.paperQuestion = res.data
       this.questionList = res.data.reduce((acc, cur) => {
         const filterQuestion = cur.questionList.filter(

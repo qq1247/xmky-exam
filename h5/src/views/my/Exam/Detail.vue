@@ -43,7 +43,7 @@
 </template>
 <script>
 import { loginSysTime } from 'api/common'
-import { paperRandomQuestions, paperGet } from 'api/paper'
+import { paperGet } from 'api/paper'
 import { myExamPaper } from 'api/my'
 import {
   myExamAnswer,
@@ -123,18 +123,9 @@ export default {
     },
     // 查询试卷信息
     async queryPaperInfo() {
-      let res
-      if (this.genType === 1) {
-        res = await myExamPaper({
-          examId: this.examId
-        })
-      } else {
-        res = await paperRandomQuestions({
-          examId: this.examId,
-          userId: this.userId || this.$store.getters.userId
-        })
-      }
-
+      const res = await myExamPaper({
+        examId: this.examId
+      })
       this.paperQuestion = res.data
     },
     // 查询我的答案信息
@@ -206,8 +197,6 @@ export default {
         this.$message.error('提交答案失败，请联系管理员！')
         return
       }
-      console.log("问题id： ", questionId)
-      console.log("题目的信息： ", this.myExamDetailCache[questionId])
       const res = await myExamAnswer({
         examId: this.examId,
         questionId,

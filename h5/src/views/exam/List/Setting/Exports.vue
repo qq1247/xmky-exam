@@ -26,9 +26,9 @@
 </template>
 
 <script>
-import { myMarkAnswerList } from 'api/my'
+import { myMarkPaper, myMarkAnswerList } from 'api/my'
 import { examGet, examMarkUserList } from 'api/exam'
-import { paperGet, paperQuestions, paperRandomQuestions } from 'api/paper'
+import { paperGet } from 'api/paper'
 import htmlDocx from 'html-docx-js/dist/html-docx'
 import saveAs from 'file-saver'
 
@@ -86,18 +86,16 @@ export default {
     },
     // 查询试卷信息
     async queryPaperInfo() {
-      let paperQuestion
-      if (this.genType === 1) {
-        paperQuestion = await paperQuestions({
-          id: this.examForm.paperId
-        })
-      } else {
-        paperQuestion = await paperRandomQuestions({
-          examId: this.id,
-          userId: this.examForm.examUser
-        })
-      }
-
+      let paperQuestion = await myMarkPaper({
+        examId: this.id,
+        userId: this.examForm.examUser
+      })
+      // } else {
+      //   paperQuestion = await paperRandomQuestions({
+      //     examId: this.id,
+      //     userId: this.examForm.examUser
+      //   })
+      // }
       const paperAnswer = await myMarkAnswerList({
         examId: this.id,
         userId: this.examForm.examUser

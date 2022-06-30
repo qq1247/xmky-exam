@@ -65,21 +65,21 @@
         "router" : {
             "mode" : "history"
         },
-				"devServer": {
-						"port": 10086,
-						"disableHostCheck": true,
-						"proxy": {
-							"/api": {
-								"target": "http://192.168.110.100:8000/api",
-								"changeOrigin": true,
-								"secure": false,
-								"pathRewrite": {
-									"^/api": ""
-								}
-							}
-						}
-					}
+        "devServer" : {
+            "port" : 9001,
+            "disableHostCheck" : true,
+            "proxy" : {
+                "/api" : {
+                    "target" : "http://192.168.110.100:8000/api",
+                    "changeOrigin" : true,
+                    "secure" : false,
+                    "pathRewrite" : {
+                        "^/api" : ""
+                    }
+                }
+            },
+            "https" : false
+        },
+        "template" : ""
     }
 }
-
-
