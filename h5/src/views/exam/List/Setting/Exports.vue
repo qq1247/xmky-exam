@@ -86,16 +86,10 @@ export default {
     },
     // 查询试卷信息
     async queryPaperInfo() {
-      let paperQuestion = await myMarkPaper({
+      const paperQuestion = await myMarkPaper({
         examId: this.id,
         userId: this.examForm.examUser
       })
-      // } else {
-      //   paperQuestion = await paperRandomQuestions({
-      //     examId: this.id,
-      //     userId: this.examForm.examUser
-      //   })
-      // }
       const paperAnswer = await myMarkAnswerList({
         examId: this.id,
         userId: this.examForm.examUser
