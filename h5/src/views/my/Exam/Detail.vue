@@ -44,7 +44,7 @@
 <script>
 import { loginSysTime } from 'api/common'
 import { paperGet } from 'api/paper'
-import { myMarkPaper } from 'api/my'
+import { myMarkPaper, myExamPaper } from 'api/my'
 import {
   myExamAnswer,
   myExamFinish,
@@ -123,10 +123,19 @@ export default {
     },
     // 查询试卷信息
     async queryPaperInfo() {
-      const res = await myMarkPaper({
-        examId: this.examId,
-        userId: this.userId
-      })
+      let res
+      console.log(this.userId)
+      if (this.$store.state.user.onlyRole[0] === 'user') {
+        res = await myExamPaper({
+          examId: this.examId
+        })
+      } else {
+        res = await myMarkPaper({
+          examId: this.examId,
+          userId: this.userId
+        })
+      }
+      
       this.paperQuestion = res.data
     },
     // 查询我的答案信息
