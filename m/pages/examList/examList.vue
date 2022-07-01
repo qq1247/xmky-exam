@@ -22,6 +22,9 @@
 	import {
 		myExamListPage
 	} from '@/api/mine.js'
+	import {
+		setTitle
+	} from '@/common/setTitle'
 	export default {
 		data() {
 			return {
@@ -30,6 +33,9 @@
 		},
 		onShow() {
 			this.getExamList()
+		},
+		mounted() {
+			setTitle(getApp().globalData.entName)
 		},
 		methods: {
 			// 获取考试列表

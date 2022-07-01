@@ -14,6 +14,9 @@
 	import {
 		bulletinListPage
 	} from '@/api/common.js'
+	import {
+		setTitle
+	} from '@/common/setTitle'
 	export default {
 		data() {
 			return {
@@ -23,6 +26,9 @@
 		onLoad(options) {
 			const index = Number(options.index)
 			this.getBulletinList(index)
+		},
+		mounted() {
+			setTitle(getApp().globalData.entName)
 		},
 		methods: {
 			// 获取公告列表

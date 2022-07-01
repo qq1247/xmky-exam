@@ -15,6 +15,9 @@
 
 <script>
 	import { loginPwd } from '@/api/common.js'
+	import {
+		setTitle
+	} from '@/common/setTitle'
 	export default {
 		data() {
 			return {
@@ -22,6 +25,11 @@
 				newPwd: ''
 			};
 		},
+		
+		mounted() {
+			setTitle(getApp().globalData.entName)
+		},
+		
 		methods: {
 			async updatePwd() {
 				if(this.oldPwd === '' || this.newPwd === '') {

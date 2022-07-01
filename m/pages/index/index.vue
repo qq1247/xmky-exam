@@ -58,6 +58,9 @@
 		myExamListPage,
 		questionTypeOpenListPage
 	} from '@/api/mine.js'
+	import {
+		setTitle
+	} from '@/common/setTitle'
 	import dayjs from 'dayjs'
 	export default {
 		data() {
@@ -71,6 +74,9 @@
 			this.getExamList()
 			this.getBulletinList()
 			this.getQuestionTypeOpenList()
+		},
+		mounted() {
+			setTitle(getApp().globalData.entName)
 		},
 		methods: {
 			// 获取公告列表

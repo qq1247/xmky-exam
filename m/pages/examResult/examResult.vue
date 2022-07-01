@@ -25,6 +25,9 @@
 	import {
 		delay
 	} from '@/common/utils.js'
+	import {
+		setTitle
+	} from '@/common/setTitle'
 	export default {
 		data() {
 			return {
@@ -42,6 +45,9 @@
 			this.examId = examId
 			this.scoreState = scoreState
 			this.getResult()
+		},
+		mounted() {
+			setTitle(getApp().globalData.entName)
 		},
 		methods: {
 			// 获取答案

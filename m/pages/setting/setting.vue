@@ -12,11 +12,17 @@
 </template>
 
 <script>
+	import {
+		setTitle
+	} from '@/common/setTitle'
 	export default {
 		data() {
 			return {
 				
 			};
+		},
+		mounted() {
+			setTitle(getApp().globalData.entName)
 		},
 		methods: {
 			loginOut() {

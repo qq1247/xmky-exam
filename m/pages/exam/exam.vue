@@ -151,6 +151,9 @@
 		paperQuestions,
 		paperRandomQuestions
 	} from '@/api/paper.js'
+	import {
+		setTitle
+	} from '@/common/setTitle'
 	import Cloze from '@/components/cloze/cloze.vue'
 	import Vue from 'vue'
 	export default {
@@ -195,6 +198,9 @@
 			this.preview = preview
 			this.examEndTime = examEndTime
 			this.init()
+		},
+		mounted() {
+			setTitle(getApp().globalData.entName)
 		},
 		methods: {
 			// 初始化

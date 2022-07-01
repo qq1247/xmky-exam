@@ -222,6 +222,9 @@
 		questionTypeOpenQuestionIds,
 		questionTypeOpenQuestionGet
 	} from '@/api/question.js'
+	import {
+		setTitle
+	} from '@/common/setTitle'
 	export default {
 		data() {
 			return {
@@ -241,7 +244,7 @@
 				isRecite: false,
 				routerShow: false,
 			};
-		},
+		},	
 		computed: {
 			errorNum() {
 				return this.questionList.filter(question => question.correct !== undefined && !question.correct).length
@@ -330,6 +333,12 @@
 			this.questionTypeId = questionTypeId
 			this.commentState = commentState
 			this.query()
+		},
+		mounted() {
+			setTitle(getApp().globalData.entName)
+		},
+		mounted() {
+			setTitle(getApp().globalData.entName)
 		},
 		methods: {
 			// 切换模拟类型

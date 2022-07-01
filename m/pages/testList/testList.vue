@@ -22,15 +22,24 @@
 	import {
 		questionTypeOpenListPage
 	} from '@/api/mine.js'
+	import {
+		setTitle
+	} from '@/common/setTitle'
 	export default {
 		data() {
 			return {
 				questionTypeOpenList: []
 			};
 		},
+		
 		onShow() {
 			this.getQuestionTypeOpenList()
 		},
+		
+		mounted() {
+			setTitle(getApp().globalData.entName)
+		},
+		
 		methods: {
 			async getQuestionTypeOpenList() {
 				const res = await questionTypeOpenListPage({

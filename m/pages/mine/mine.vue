@@ -50,6 +50,9 @@
 	import {
 		getUserInfo
 	} from '@/api/mine.js'
+	import {
+		setTitle
+	} from '@/common/setTitle'
 	export default {
 		data() {
 			return {
@@ -60,6 +63,9 @@
 		},
 		onShow() {
 			this.getUserInfo()
+		},
+		mounted() {
+			setTitle(getApp().globalData.entName)
 		},
 		methods: {
 			async getUserInfo() {
