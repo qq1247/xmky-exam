@@ -8,6 +8,8 @@ import java.util.Map;
 
 import javax.servlet.ServletRequest;
 
+import com.wcpdoc.core.util.ValidateUtil;
+
 /**
  * 页面输入
  * 
@@ -26,8 +28,8 @@ public class PageIn {
 	}
 
 	public PageIn(ServletRequest request) {
-		this.curPage = request.getParameter("curPage") == null ? this.curPage : Integer.parseInt(request.getParameter("curPage"));
-		this.pageSize = request.getParameter("pageSize") == null ? this.pageSize : Integer.parseInt(request.getParameter("pageSize"));
+		this.curPage = !ValidateUtil.isValid(request.getParameter("curPage")) ? this.curPage : Integer.parseInt(request.getParameter("curPage"));
+		this.pageSize = !ValidateUtil.isValid(request.getParameter("pageSize")) ? this.pageSize : Integer.parseInt(request.getParameter("pageSize"));
 		this.request = request;
 	}
 
