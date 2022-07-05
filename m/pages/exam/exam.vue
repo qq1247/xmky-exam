@@ -107,7 +107,7 @@
 					<u-icon name="arrow-right" size="12px"></u-icon>
 				</view>
 			</view>
-			<view class="right">
+			<view class="right" v-if="!preview">
 				<view class="btn finish-exam" @click="showFinish = !showFinish">
 					交卷
 				</view>
@@ -148,8 +148,7 @@
 	} from '@/api/mine.js'
 	import {
 		paperGet,
-		paperQuestions,
-		paperRandomQuestions
+		myExamPaper,
 	} from '@/api/paper.js'
 	import {
 		setTitle
@@ -227,21 +226,26 @@
 
 			// 查询试卷信息
 			async queryPaperInfo() {
-				let res
-				if (this.genType === 1) {
-					res = await paperQuestions({
-						id: this.paperId,
-					})
-				} else {
-					res = await paperRandomQuestions({
-						examId: this.examId,
-						userId: uni.getStorageSync('userInfo').userId,
-					})
-				}
-				// res.data.questionList
+				let res = await myExamPaper({
+					examId: this.paperId,
+				})
+
 				res.data.forEach(item => {
 					item.questionList.forEach(questItem => {
 						questItem.titleList = this.splitTxtForSpaces(this.getTxtForHtml(questItem.title), /_{5,}/)
+						if (questItem.type === 1 || questItem.type === 2) {
+							questItem.options = questItem.options.sort((a, b) => {
+								a = a.no
+								b = b.no
+								if (a < b){
+									return -1
+								} else if (a > b) {
+									return 1
+								} else {
+									return 0
+								}
+							})
+						}
 					})
 				})
 				this.questionList = res.data.reduce((acc, cur) => {
@@ -289,7 +293,6 @@
 
 			// 更新答案
 			async updateAnswer(optionValue, questionId, questionType) {
-
 				if (this.preview) {
 					return
 				}
@@ -320,7 +323,9 @@
 						return false
 					}
 				}
-				this.nextQuestion()
+				if (questionType == 1 || questionType == 4) {
+					this.nextQuestion()
+				}
 			},
 
 			// 页面左右滑动

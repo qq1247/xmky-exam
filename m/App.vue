@@ -3,6 +3,7 @@
 		globalData: {
 			//#ifdef H5
 			// baseUrl: (process.env.NODE_ENV === 'development' ? '/api' : 'http://47.92.221.134:8080/api'),
+			// baseUrl: 'http://192.168.110.100:8000/api',
 			baseUrl: '/api',
 			entName: ''
 			//#endif

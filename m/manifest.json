@@ -70,7 +70,7 @@
             "disableHostCheck" : true,
             "proxy" : {
                 "/api" : {
-                    "target" : "http://192.168.110.100:8000/api",
+                    "target" : "http://192.168.110.100:8001/api",
                     "changeOrigin" : true,
                     "secure" : false,
                     "pathRewrite" : {

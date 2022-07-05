@@ -1,7 +1,7 @@
 <template>
 	<view class="container">
 
-		<u-navbar :left-icon-size="0" :placeholder="true" :border-bottom="false"></u-navbar>
+		<u-navbar :left-icon-size="0" :placeholder="true" :border-bottom="false" :title="entName"></u-navbar>
 
 		<image :src="logoImg" class="logo"></image>
 
@@ -34,11 +34,12 @@
 				password: '', // 111111
 				agreementStatus: false,
 				sendCodeState: true,
-				logoImg: '/api/login/entLogo'
+				logoImg: '/api/login/entLogo',
+				entName: ''
 			};
 		},
-		mounted() {
-			this.getSysName()
+		async mounted() {
+			await this.getSysName()
 		},
 		methods: {
 			//登录
@@ -59,6 +60,8 @@
 			getSysName() {
 				getSysName().then(res => {
 					getApp().globalData.entName = res.data
+					this.entName = res.data
+					console.log(getApp().globalData.entName)
 					setTitle(res.data)
 				})
 			}
