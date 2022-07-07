@@ -3,6 +3,7 @@ package com.wcpdoc.exam.api.controller;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
 import com.wcpdoc.exam.core.entity.Exam;
@@ -269,6 +271,13 @@ public class ApiMyExamController extends BaseController{
 				answer.setQuestionAi((Integer)map.get("questionAi"));
 				answer.setAnswer((String)map.remove("answer"));
 				map.put("answers", answer.getAnswerArr());
+				
+				if (map.get("answerTime") != null) {
+					map.put("answerTime", DateUtil.formatDateTime((Date)map.get("answerTime")));
+				}
+				if (map.get("markTime") != null) {
+					map.put("markTime", DateUtil.formatDateTime((Date)map.get("markTime")));
+				}
 			}
 			
 			return PageResultEx.ok().data(answerList);
