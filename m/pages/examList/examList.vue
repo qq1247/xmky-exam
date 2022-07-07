@@ -52,6 +52,8 @@
 			goExam({
 				examId,
 				paperId,
+				state,
+				markState,
 				paperShowType,
 				examStartTime,
 				examEndTime,
@@ -77,12 +79,14 @@
 					(_examStartTime < now && now < _examEndTime) ||
 					(now > _examMarkEndTime && examMarkState === 3)
 				) {
-
+					
 					const params = {
 						examId,
 						paperId,
 						examEndTime,
-						preview: !(_examStartTime < now && now < _examEndTime)
+						preview: !(_examStartTime < now && now < _examEndTime),
+						state,
+						markState
 					}
 
 					uni.navigateTo({

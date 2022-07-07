@@ -3,7 +3,7 @@
 		<u-navbar :title="examName" autoBack :placeholder="true" :border-bottom="false">
 		</u-navbar>
 
-		<view class="fixed-header" v-if="!preview">
+		<view class="fixed-header" v-if="state != 3 && markState != 3">
 			<u-count-down :time="systemTime" format="DD:HH:mm:ss" autoStart @finish="finishExam">
 			</u-count-down>
 		</view>
@@ -24,7 +24,7 @@
 							  <span>{{ item }}</span>
 							  <div v-if="question.titleList[question.titleList.length - 1] != item" class="input-box">
 								<label :ref="`label-${index}`" class="label"></label>
-								<u--input border="bottom" :disabled='preview'
+								<u--input border="bottom" :disabled='((state == 1 && markState == 3)||state==3)'
 									:placeholder="`填空${index+1}`" @blur='(e)=>updateAnswer(e,question.id,3)'
 									v-model='myExamDetailCache[question.id].answers[index]'></u--input>
 							  </div>
@@ -37,7 +37,7 @@
 								<label class="option-item" v-for="(option, indexOption) in question.options"
 									:key="indexOption">
 									<radio :value="option.no" color="#0094e5"
-										style="transform:scale(0.7)" :disabled="preview"
+										style="transform:scale(0.7)" :disabled="((state == 1 && markState == 3)||state==3)"
 										:checked="myExamDetailCache[question.id].answers.includes(String.fromCharCode(65 + indexOption))" />
 									<div class="option-text"
 										v-html="`${String.fromCharCode(65 + indexOption)}、${option.option}`" />
@@ -51,7 +51,7 @@
 								<label class="option-item" v-for="(option, indexOption) in question.options"
 									:key="indexOption">
 									<checkbox :value="option.no" color="#0094e5"
-										style="transform:scale(0.7)" :disabled="preview"
+										style="transform:scale(0.7)" :disabled="((state == 1 && markState == 3)||state==3)"
 										:checked="myExamDetailCache[question.id].answers.includes(option.no)" />
 									<div class="option-text"
 										v-html="`${String.fromCharCode(65 + indexOption)}、${option.option}`" />
@@ -62,7 +62,7 @@
 						<!-- 填空 -->
 						<!-- <view class="question-option" v-if="question.type === 3">
 							<view v-for="(option, indexOption) in question.answers" :key="indexOption">
-								<u--input class="cloze-input" border="bottom" :disabled='preview' :placeholder="`填空${indexOption+1}`"
+								<u--input class="cloze-input" border="bottom" :disabled='state != 3 && markState != 3' :placeholder="`填空${indexOption+1}`"
 									@blur='(e)=>updateAnswer(e,question.id,3)'
 									v-model='myExamDetailCache[question.id].answers[indexOption]'></u--input>
 							</view>
@@ -74,7 +74,7 @@
 								<label class="option-item" v-for="(option, indexOption) in ['对','错']"
 									:key="indexOption">
 									<radio :value="String.fromCharCode(65 + indexOption)" color="#0094e5"
-										style="transform:scale(0.7)" :disabled="preview"
+										style="transform:scale(0.7)" :disabled="((state == 1 && markState == 3)||state==3)"
 										:checked="myExamDetailCache[question.id].answers.includes(String.fromCharCode(65 + indexOption))" />
 									<div class="option-text"
 										v-html="`${String.fromCharCode(65 + indexOption)}、${option}`" />
@@ -84,7 +84,7 @@
 
 						<!-- 阅读 -->
 						<view class="question-textarea" v-if="question.type === 5">
-							<u--textarea v-model="myExamDetailCache[question.id].answers[0]" placeholder="请输入答案" :disabled="preview"
+							<u--textarea v-model="myExamDetailCache[question.id].answers[0]" placeholder="请输入答案" :disabled="((state == 1 && markState == 3)||state==3)"
 								@blur="(e)=> updateAnswer(e,question.id,question.type)"></u--textarea>
 						</view>
 
@@ -94,7 +94,7 @@
 		</swiper>
 
 		<view class="footer">
-			<view class="left">
+			<view class="left" :style="{width: state != 3 && markState != 3 ? '60%': '100%'}">
 				<view class="btn" @click="prevQuestion">
 					<u-icon name="arrow-left" size="12px"></u-icon>
 					<text>上一题</text>
@@ -107,7 +107,7 @@
 					<u-icon name="arrow-right" size="12px"></u-icon>
 				</view>
 			</view>
-			<view class="right" v-if="!preview">
+			<view class="right" v-if="state != 3 && markState != 3">
 				<view class="btn finish-exam" @click="showFinish = !showFinish">
 					交卷
 				</view>
@@ -171,6 +171,8 @@
 				examEndTime: '',
 				examId: null,
 				preview: false,
+				state: '',
+				markState: '',
 				scoreState: true,
 				questionList: [],
 				myExamDetailCache: {},
@@ -191,11 +193,15 @@
 			const {
 				examId,
 				preview,
-				examEndTime
+				examEndTime,
+				state,
+				markState
 			} = JSON.parse(options.params)
 			this.examId = examId
 			this.preview = preview
 			this.examEndTime = examEndTime
+			this.state = state
+			this.markState = markState
 			this.init()
 		},
 		mounted() {
@@ -227,7 +233,7 @@
 			// 查询试卷信息
 			async queryPaperInfo() {
 				let res = await myExamPaper({
-					examId: this.paperId,
+					examId: this.examId,
 				})
 
 				res.data.forEach(item => {

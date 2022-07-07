@@ -162,7 +162,9 @@
 				examId,
 				paperId,
 				examStartTime,
-				examEndTime
+				examEndTime,
+				state,
+				markState
 			}) {
 				const _examStartTime = new Date(examStartTime).getTime()
 				const _examEndTime = new Date(examEndTime).getTime()
@@ -177,6 +179,8 @@
 					paperId,
 					examEndTime,
 					preview: _examStartTime < now && now > _examEndTime,
+					state,
+					markState
 				}
 
 				uni.navigateTo({
