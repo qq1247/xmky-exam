@@ -49,6 +49,7 @@ import org.springframework.web.util.UrlPathHelper;
 import com.wcpdoc.core.util.SpringUtil;
 
 
+
 /**
  * A simple {@code ResourceResolver} that tries to find a resource under the given
  * locations matching to the request path.
