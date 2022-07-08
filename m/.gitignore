@@ -31,3 +31,4 @@ package-lock.json
 *.ntvs*
 *.njsproj
 .hbuilderx
+*.bak
