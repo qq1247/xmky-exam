@@ -40,7 +40,6 @@
 		},
 		async mounted() {
 			await this.getSysName()
-			 document.activeElement.scrollIntoViewIfNeeded()
 		},
 		methods: {
 			//登录

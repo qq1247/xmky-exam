@@ -1,6 +1,6 @@
 {
     "name" : "exam-app",
-    "appid" : "__UNI__AEDA4CD",
+    "appid" : "__UNI__4C0C1B5",
     "description" : "",
     "versionName" : "1.0.0",
     "versionCode" : "100",
@@ -63,7 +63,8 @@
     "vueVersion" : "2",
     "h5" : {
         "router" : {
-            "mode" : "history"
+            "mode" : "hash",
+            "base" : "./"
         },
         "devServer" : {
             "port" : 9001,
@@ -80,6 +81,6 @@
             },
             "https" : false
         },
-        "template" : ""
+        "template" : "template.h5.html"
     }
 }
