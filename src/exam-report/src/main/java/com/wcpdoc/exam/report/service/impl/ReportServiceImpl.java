@@ -231,7 +231,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 			throw new MyException("参数错误：questionTypeId");
 		}
 		QuestionType questionType = questionTypeService.getEntity(questionTypeId);
-		if (!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
+		if (!questionTypeService.hasWriteAuth(questionType)) {
 			throw new MyException("权限不足");
 		}
 		

@@ -22,15 +22,17 @@ public interface PaperService extends BaseService<Paper> {
 	 * 
 	 * v1.0 chenyun 2021年8月19日下午5:03:26
 	 * @param paper
-	 * @param paperRemark void
+	 * @param paperRemark 
+	 * void
 	 */
-	Integer addAndUpdate(Paper paper, PaperRemark paperRemark);
+	void addAndUpdate(Paper paper, PaperRemark paperRemark);
 	
 	/**
 	 * 修改试卷
 	 * 
 	 * v1.0 chenyun 2021年8月25日下午5:35:05
-	 * @param paper void
+	 * @param paper 
+	 * void
 	 */
 	void updateAndUpdate(Paper paper);
 	
@@ -38,7 +40,8 @@ public interface PaperService extends BaseService<Paper> {
 	 * 删除试卷
 	 * 
 	 * v1.0 chenyun 2021年8月25日下午5:35:00
-	 * @param id void
+	 * @param id 
+	 * void
 	 */
 	void delAndUpdate(Integer id);
 	
@@ -46,7 +49,8 @@ public interface PaperService extends BaseService<Paper> {
 	 * 拷贝
 	 * 
 	 * v1.0 chenyun 2021年8月19日下午5:09:55
-	 * @param id void
+	 * @param id 
+	 * void
 	 */
 	void copy(Integer id);
 	
@@ -99,15 +103,15 @@ public interface PaperService extends BaseService<Paper> {
 	void chapterMove(Integer sourceId, Integer targetId);
 	
 	/**
-	 * 移动章节
+	 * 移动试题
 	 * 
 	 * v1.0 chenyun 2021年7月9日下午3:22:49
 	 * @param id
-	 * @param sourceId 源试题ID
-	 * @param targetId 目标试题ID
+	 * @param sourceQuestionId 源试题ID
+	 * @param targetQuestionId 目标试题ID
 	 * void
 	 */
-	void questionMove(Integer id, Integer sourceId, Integer targetId);
+	void questionMove(Integer id, Integer sourceQuestionId, Integer targetQuestionId);
 	
 	/**
 	 * 完成添加试题
@@ -115,9 +119,10 @@ public interface PaperService extends BaseService<Paper> {
 	 * v1.0 zhanghc 2017年5月27日下午3:32:43
 	 * @param chapterId
 	 * @param questionIds
+	 * @param no
 	 * void
 	 */
-	void questionAdd(Integer chapterId, Integer[] questionIds);
+	void questionAdd(Integer chapterId, Integer[] questionIds, Integer no);
 	
 	/**
 	 * 设置分数
@@ -177,7 +182,7 @@ public interface PaperService extends BaseService<Paper> {
 	 * @param sourceId
 	 * @param targetId void
 	 */
-	void move(Integer sourceId, Integer targetId);
+	void move(Integer id, Integer paperTypeId);
 	
 	/**
 	 * 发布
@@ -205,6 +210,16 @@ public interface PaperService extends BaseService<Paper> {
 	 * @return PageResult
 	 */
 	void sxe(Integer id, Integer[] options);
+	
+	/**
+	 * 授权
+	 * 
+	 * v1.0 zhanghc 2020年9月8日上午10:06:53
+	 * @param id
+	 * @param readUserIds
+	 * void
+	 */
+	void auth(Integer id, Integer[] readUserIds);
 	
 	/**
 	 * 获取试卷
@@ -242,4 +257,22 @@ public interface PaperService extends BaseService<Paper> {
 	 * @return List<Question>
 	 */
 	List<Question> getQuestionList(Integer examId, Integer userId);
+	
+	/**
+	 * 是否有读权限
+	 * 
+	 * v1.0 zhanghc 2021年11月5日下午5:50:58
+	 * @param paper
+	 * @return boolean
+	 */
+	boolean hasReadAuth(Paper paper);
+
+	/**
+	 * 是否有写权限（只能操作自己创建的分类）
+	 * 
+	 * v1.0 zhanghc 2022年6月17日上午11:19:58
+	 * @param paper
+	 * @return boolean
+	 */
+	boolean hasWriteAuth(Paper paper);
 }

@@ -107,27 +107,35 @@ public class PaperTypeServiceImpl extends BaseServiceImp<PaperType> implements P
 	@Override
 	public void auth(Integer id, Integer[] readUserIds) {
 		// 校验数据有效性
-		PaperType entity = getEntity(id);
-		if(entity.getCreateUserId().intValue() != getCurUser().getId().intValue()){
+		PaperType paperType = getEntity(id);
+		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()){
 			throw new MyException("无操作权限");
 		}
 		
 		// 更新权限
 		if (!ValidateUtil.isValid(readUserIds)) {
-			entity.setReadUserIds(String.format(",%s,", entity.getCreateUserId()));// 如果没有，默认就是创建人（查询的时候方便）
+			paperType.setReadUserIds(String.format(",%s,", paperType.getCreateUserId()));// 如果没有，默认就是创建人（查询的时候方便）
 		} else {
-			entity.setReadUserIds(String.format(",%s,", StringUtil.join(readUserIds)));
-			if (!entity.getReadUserIds().contains(String.format(",%s,", entity.getCreateUserId()))) {// 如果页面没有选择创建人，添加创建人
-				entity.setReadUserIds(String.format("%s,%s", entity.getReadUserIds(), entity.getCreateUserId()));
+			paperType.setReadUserIds(String.format(",%s,", StringUtil.join(readUserIds)));
+			if (!paperType.getReadUserIds().contains(String.format(",%s,", paperType.getCreateUserId()))) {// 如果页面没有选择创建人，添加创建人
+				paperType.setReadUserIds(String.format("%s,%s", paperType.getReadUserIds(), paperType.getCreateUserId()));
 			}
 		}
-		entity.setUpdateTime(new Date());
-		entity.setUpdateUserId(getCurUser().getId());
-		update(entity);
+		paperType.setUpdateTime(new Date());
+		paperType.setUpdateUserId(getCurUser().getId());
+		update(paperType);
+		
+		// 更新权限扩展
+		paperTypeExService.auth(paperType, readUserIds);
 	}
 
 	@Override
-	public boolean hasReadAuth(PaperType paperType, Integer userId) {
-		return paperType.getReadUserIds().contains(String.format(",%s,", userId));
+	public boolean hasReadAuth(PaperType paperType) {
+		return paperType.getReadUserIds().contains(String.format(",%s,", getCurUser().getId()));
+	}
+
+	@Override
+	public boolean hasWriteAuth(PaperType paperType) {
+		return paperType.getCreateUserId().intValue() == getCurUser().getId().intValue();
 	}
 }

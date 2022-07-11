@@ -83,7 +83,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	@Override
 	public void addAndUpdate(Question question, Integer[] aiOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
 		// 校验数据有效性
-		addAndUpdateValid(question, aiOptions, options, answers, answerScores);
+		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
+		addAndUpdateValid(question, aiOptions, options, answers, answerScores, questionType);
 		
 		// 添加试题
 		question.setCreateTime(new Date());
@@ -100,6 +101,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		} else if (question.getType() == 3 || question.getType() == 5 ) {
 			question.setAiOptions(ValidateUtil.isValid(aiOptions) ? StringUtil.join(aiOptions) : null);
 		}
+		question.setWriteUserIds(questionType.getWriteUserIds());
 		add(question);
 
 		//添加答案
@@ -180,7 +182,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			throw new MyException(String.format("该题已被【%s】试卷引用", paper.getName()));
 		}
 		
-		addAndUpdateValid(question, aiOptions, options, answers, answerScores);
+		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
+		addAndUpdateValid(question, aiOptions, options, answers, answerScores, questionType);
 
 		// 修改试题
 		entity.setTitle(question.getTitle());
@@ -191,6 +194,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		entity.setAnalysis(question.getAnalysis());
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
+		// entity.setWriteUserIds(null);// 不能修改
 		
 		if (entity.getType() == 1 || entity.getType() == 4 ) {
 			entity.setAi(1);
@@ -282,7 +286,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		List<Question> questionList = new ArrayList<>();
 		if (ValidateUtil.isValid(questionTypeId)) {// 如果是按类型删除
 			QuestionType questionType = questionTypeService.getEntity(questionTypeId);
-			if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
+			if(!questionTypeService.hasWriteAuth(questionType)) {
 				throw new MyException("无操作权限");
 			}
 			questionList = questionDao.getList(questionTypeId);
@@ -302,7 +306,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 					questionTypeCache.put(questionType.getId(), questionType);
 				}
 				
-				if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
+				if(!questionTypeService.hasWriteAuth(questionType)) {
 					throw new MyException("无操作权限");
 				}
 				questionList.add(question);
@@ -363,7 +367,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	@Override
 	public void wordImp(Integer fileId, Integer questionTypeId, String processBarId, Integer state) {
 		// 校验数据有效性
-		if(!questionTypeService.hasWriteAuth(questionTypeService.getEntity(questionTypeId), getCurUser().getId())) {
+		QuestionType questionType = questionTypeService.getEntity(questionTypeId);
+		if(!questionTypeService.hasWriteAuth(questionType)) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -447,74 +452,39 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void move(Integer sourceId, Integer targetId) {
-		// 校验数据有效性
-		if (sourceId == null) {
-			throw new MyException("参数错误：sourceId");
-		}
-		if(targetId == null){
-			throw new MyException("参数错误：targetId");
-		}
-		QuestionType source = questionTypeService.getEntity(sourceId);
-		if (source.getState() == 0 ){
-			throw new MyException("该分类已删除");
-		}
-		QuestionType target = questionTypeService.getEntity(targetId);
-		if (target.getState() == 0) {
-			throw new MyException("该分类已删除");
-		}
-		
-		if (source.getCreateUserId().intValue() != getCurUser().getId().intValue()) {// 只能移动自己的分类
-			throw new MyException("无操作权限");
-		}
-		if (!target.getWriteUserIds().contains(String.format(",%s,", getCurUser().getId()))) {// 只能移动到自己的分类或有组权限的分类
-			throw new MyException("无操作权限");
-		}
-		
-		// 移动
-		List<Question> questionList = questionDao.getList(sourceId);
-		for (Question question : questionList) {
-			question.setQuestionTypeId(targetId);
-			question.setUpdateTime(new Date());
-			question.setUpdateUserId(getCurUser().getId());
-			questionDao.update(question);
-		}
-	}
-
-	@Override
 	public void copy(Integer id) throws Exception{
-		Question question = questionDao.getEntity(id);
-		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-		if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
+		Question questionOfDB = questionDao.getEntity(id);
+		QuestionType questionType = questionTypeService.getEntity(questionOfDB.getQuestionTypeId());
+		if(!questionTypeService.hasWriteAuth(questionType)) {
 			throw new MyException("无操作权限");
 		}
 		
-		Question entity = new Question();
-		BeanUtils.copyProperties(entity, question);
-		entity.setState(2);
-		entity.setCreateTime(new Date());
-		entity.setCreateUserId(getCurUser().getId());
-		entity.setUpdateTime(new Date());
-		entity.setUpdateUserId(getCurUser().getId());
+		Question questionOfCopy = new Question();
+		BeanUtils.copyProperties(questionOfCopy, questionOfDB);
+		questionOfCopy.setState(2);// 拷贝的默认为草稿
+		questionOfCopy.setCreateTime(new Date());
+		questionOfCopy.setCreateUserId(getCurUser().getId());
+		questionOfCopy.setUpdateTime(new Date());
+		questionOfCopy.setUpdateUserId(getCurUser().getId());
 		//修改标题图片
-		List<Integer> fileIdList = html2FileIds(entity.getTitle());
+		List<Integer> fileIdList = html2FileIds(questionOfCopy.getTitle());
 		for (Integer fileId : fileIdList) {
 			Integer copyFileId = fileService.copyFile(fileId);
-			entity.setTitle(entity.getTitle().replace("/api/file/download?id="+fileId, "/api/file/download?id="+copyFileId));
+			questionOfCopy.setTitle(questionOfCopy.getTitle().replace("/api/file/download?id="+fileId, "/api/file/download?id="+copyFileId));
 		}
 		//修改解释图片
-		fileIdList = html2FileIds(entity.getAnalysis());
+		fileIdList = html2FileIds(questionOfCopy.getAnalysis());
 		for (Integer fileId : fileIdList) {
 			Integer copyFileId = fileService.copyFile(fileId);
-			entity.setAnalysis(entity.getAnalysis().replace("/api/file/download?id="+fileId, "/api/file/download?id="+copyFileId));
+			questionOfCopy.setAnalysis(questionOfCopy.getAnalysis().replace("/api/file/download?id="+fileId, "/api/file/download?id="+copyFileId));
 		}
-		questionDao.add(entity);
+		add(questionOfCopy);
 		
-		List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
+		List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(questionOfDB.getId());
 		for(QuestionAnswer questionAnswer : questionAnswerList){
 			QuestionAnswer questionAnswerNew = new QuestionAnswer();
 			BeanUtils.copyProperties(questionAnswerNew, questionAnswer);
-			questionAnswerNew.setQuestionId(entity.getId());
+			questionAnswerNew.setQuestionId(questionOfCopy.getId());
 			//修改答案图片
 			fileIdList = html2FileIds(questionAnswer.getAnswer());
 			for (Integer fileId : fileIdList) {
@@ -524,11 +494,11 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			questionAnswerService.add(questionAnswerNew);
 		}
 		
-		List<QuestionOption> questionOptionList = questionOptionService.getList(question.getId());
+		List<QuestionOption> questionOptionList = questionOptionService.getList(questionOfDB.getId());
 		for (QuestionOption questionOption : questionOptionList) {
 			QuestionOption questionOptionNew = new QuestionOption();
 			BeanUtils.copyProperties(questionOptionNew, questionOption);
-			questionOptionNew.setQuestionId(entity.getId());
+			questionOptionNew.setQuestionId(questionOfCopy.getId());
 			//修改选项图片
 			fileIdList = html2FileIds(questionOption.getOptions());
 			for (Integer fileId : fileIdList) {
@@ -552,7 +522,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		List<Question> questionList = new ArrayList<>();
 		if (ValidateUtil.isValid(questionTypeId)) {// 如果是按类型删除
 			QuestionType questionType = questionTypeService.getEntity(questionTypeId);
-			if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
+			if(!questionTypeService.hasWriteAuth(questionType)) {
 				throw new MyException("无操作权限");
 			}
 			questionList = questionDao.getList(questionTypeId);
@@ -575,7 +545,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 					questionTypeCache.put(questionType.getId(), questionType);
 				}
 				
-				if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
+				if(!questionTypeService.hasWriteAuth(questionType)) {
 					throw new MyException("无操作权限");
 				}
 				questionList.add(question);
@@ -591,7 +561,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 	}
 	
-	private void addAndUpdateValid(Question question, Integer[] aiOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
+	private void addAndUpdateValid(Question question, Integer[] aiOptions, String[] options, String[] answers, BigDecimal[] answerScores, QuestionType questionType) {
 		if (!ValidateUtil.isValid(question.getType())) {
 			throw new MyException("参数错误：type");
 		}
@@ -605,8 +575,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			throw new MyException("参数错误：answers");
 		}
 		
-		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-		if(!questionTypeService.hasWriteAuth(questionType, getCurUser().getId())) {
+		if(!questionTypeService.hasWriteAuth(questionType)) {
 			throw new MyException("无操作权限");
 		}
 		

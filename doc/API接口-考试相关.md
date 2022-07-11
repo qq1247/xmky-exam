@@ -375,13 +375,13 @@ http请求头需添加Authorization字段，
 | data.list[].id            | Integer | 主键    |
 | data.list[].name          | String  | 名称   |
 | data.list[].state         | Integer | 状态   |
-| data.list[].stateName     | String  | 状态名称 |
 | data.list[].passScore     | Double  | 及格分数（百分比） |
 | data.list[].totalScore    | Double  | 总分数 |
 | data.list[].paperTypeId   | Integer | 试卷分类id  |
 | data.list[].markType      | Integer | 阅卷方式（1：智能阅卷；2：人工阅卷；） |
 | data.list[].showType      | Integer | 展示方式（1：整卷展示；2：章节显示；3：单题展示；） |
 | data.list[].genType       | Integer | 组卷方式（1：人工组卷；2：随机组卷） |
+| data.list[].type       | Integer | 类型（1：试卷分类；2：试卷） |
 
 ### 试卷添加：paper/add
 | 请求参数             | 类型          | 描述   | 必填 |
@@ -466,12 +466,12 @@ http请求头需添加Authorization字段，
 | targetId | Integer | 目标章节ID | 是   |
 
 ### 试题移动：paper/questionMove
-###### 只支持同章节下试题移动
+###### 支持跨章节移动
 | 请求参数| 类型    | 描述       | 必填 |
 | --------------- | ------- | ---------- | ---- |
 | id | Integer | 主键【试卷】 | 是   |
-| sourceId | Integer | 源试题ID | 是   |
-| targetId | Integer | 目标试题ID | 是   |
+| sourceQuestionId | Integer | 源试题ID | 是   |
+| targetQuestionId | Integer | 目标试题ID | 是   |
 
 ### 试卷试题列表：paper/myPaper
 | 请求参数| 类型    | 描述   | 必填 |
@@ -517,6 +517,7 @@ http请求头需添加Authorization字段，
 | ----------- | --------- | ------ | ---- |
 | chapterId   | Integer   | 章节id | 是   |
 | questionIds | Integer[] | 试题id | 是   |
+| no | Integer | 插入位置，从1开始 | 是   |
 
 ### 试卷试题删除：paper/questionDel
 | 请求参数| 类型    | 描述       | 必填 |
@@ -590,8 +591,11 @@ http请求头需添加Authorization字段，
 | data.list[].paperMarkType  | Integer |  试卷阅卷类型   |
 | data.list[].paperId| Integer| 试卷Id    |
 | data.list[].paperName|String| 试卷名称    |
+| data.list[].paperGenType|Integer| 试卷生成类型    |
 | data.list[].paperTotalScore| Double| 试卷总分    |
 | data.list[].paperPassScore| Double  | 试卷及格分数   |
+| data.list[].examTypeId| Integer  | 考试分类ID   |
+| data.list[].type| Integer  | 类型：1：考试分类；2：考试   |
 
 ### 考试添加：exam/add
 | 请求参数| 类型        | 描述                         		| 必填 |

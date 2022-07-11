@@ -214,7 +214,7 @@ public class ApiQuestionController extends BaseController {
 			}
 			
 			QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-			boolean writeAuth = questionTypeService.hasWriteAuth(questionType, getCurUser().getId());		
+			boolean writeAuth = questionTypeService.hasWriteAuth(questionType);		
 			
 			List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
 			List<Map<String, Object>> answerList = new ArrayList<Map<String, Object>>();

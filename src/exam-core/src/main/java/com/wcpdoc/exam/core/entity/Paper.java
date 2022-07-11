@@ -62,6 +62,8 @@ public class Paper {
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "UPDATE_TIME")
 	private Date updateTime;
+	@Column(name = "READ_USER_IDS")
+	private String readUserIds;
 
 	public Integer getShowType() {
 		return showType;
@@ -197,14 +199,21 @@ public class Paper {
 		this.createTime = createTime;
 	}
 
-	/** 1：智能阅卷；2：人工阅卷；*/
+	/** 1：智能阅卷；2：人工阅卷； */
 	public Integer getMarkType() {
 		return markType;
 	}
 
-	/** 1：智能阅卷；2：人工阅卷；*/
+	/** 1：智能阅卷；2：人工阅卷； */
 	public void setMarkType(Integer markType) {
 		this.markType = markType;
 	}
 
+	public String getReadUserIds() {
+		return readUserIds;
+	}
+
+	public void setReadUserIds(String readUserIds) {
+		this.readUserIds = readUserIds;
+	}
 }
