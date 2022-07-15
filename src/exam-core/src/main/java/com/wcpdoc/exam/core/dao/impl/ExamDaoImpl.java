@@ -75,9 +75,12 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 				+ "FROM SYS_USER USER "
 				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID "
 				+ "WHERE EXISTS (SELECT 1 "
-				+ "				FROM EXM_MY_EXAM Z "
+//				+ "				FROM EXM_MY_EXAM Z "
+//				+ "				WHERE Z.EXAM_ID = :EXAM_ID "
+//				+ "				AND USER.ID = Z.USER_ID) "
+				+ "				FROM EXM_MY_MARK Z "// 不要从我的考试取，如果未发布，里面是空的
 				+ "				WHERE Z.EXAM_ID = :EXAM_ID "
-				+ "				AND USER.ID = Z.USER_ID) "
+				+ "				AND Z.EXAM_USER_IDS LIKE CONCAT('%,', USER.ID, ',%')) "
 				+ "ORDER BY USER.UPDATE_TIME DESC ";//USER.STATE = 1 用户被删除也应该显示
 		return getMapList(sql, new Object[] { id });
 	}
