@@ -721,6 +721,9 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		// 同章节下试题重新排序
 		int maxNo = 1;
 		for (PaperQuestion curChapterDetail : curChapterDetailList) {
+			if (curChapterDetail == curPaperQuestion) {
+				continue;// 删除的忽略
+			}
 			curChapterDetail.setNo(maxNo++);
 			paperQuestionService.update(curChapterDetail);
 		}
