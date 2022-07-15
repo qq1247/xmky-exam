@@ -23,7 +23,6 @@
             <p><span>平均分：</span>{{ statisInfo.score.avg }}</p>
             <p><span>最高分：</span>{{ statisInfo.score.max }}</p>
             <p><span>最低分：</span>{{ statisInfo.score.min }}</p>
-            <p><span>标准差：</span>{{ statisInfo.score.sd }}</p>
           </template>
         </div>
       </el-card>
