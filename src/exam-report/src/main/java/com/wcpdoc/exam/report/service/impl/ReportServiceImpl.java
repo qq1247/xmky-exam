@@ -98,6 +98,10 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		BigDecimal sum = BigDecimal.ZERO;
 		for (MyExam myExam : myExamList) {
 			Exam curExam = examCache.get(myExam.getExamId());
+			if (curExam == null) {
+				continue;// 考试已删除
+			}
+			
 			if (curExam.getMarkState() != 3) {// 整场考试未阅卷不统计（比如没有排名）
 				continue;
 			}
