@@ -24,7 +24,6 @@ export default {
     return {
       id: null,
       examForm: {
-        edit: false,
         examName: '',
         rules: {
           examName: [
@@ -53,7 +52,7 @@ export default {
 
         let res
 
-        if (this.examForm.edit) {
+        if (this.id) {
           res = await examTypeEdit({
             id: this.id,
             name: this.examForm.examName
