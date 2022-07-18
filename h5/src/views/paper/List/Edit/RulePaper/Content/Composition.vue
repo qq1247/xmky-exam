@@ -317,8 +317,8 @@
           <el-input-number
             v-model.number="settingForm.score"
             :max="100"
-            :min="1"
-            :step="1"
+            :min="0.5"
+            :step="0.5"
             controls-position="right"
             mini
           />
@@ -416,8 +416,8 @@
           <el-input-number
             v-model.number="batchForm.score"
             :max="100"
-            :min="1"
-            :step="1"
+            :min="0.5"
+            :step="0.5"
             controls-position="right"
           />
         </el-form-item>
