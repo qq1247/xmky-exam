@@ -13,6 +13,7 @@ import com.wcpdoc.core.util.SqlUtil;
 import com.wcpdoc.core.util.SqlUtil.Order;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.MyExamDao;
+import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
 
 /**
@@ -80,5 +81,14 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 	public MyExam getMyExam(Integer examId, Integer userId) {
 		String sql = "SELECT * FROM EXM_MY_EXAM WHERE EXAM_ID = :EXAM_ID AND USER_ID = :USER_ID";
 		return getEntity(sql, new Object[] { examId, userId });
+	}
+
+	@Override
+	public List<Exam> getExamList(Integer userId) {
+		String sql = "SELECT EXAM.* "
+				+ "FROM EXM_EXAM EXAM "
+				+ "WHERE EXAM.STATE != 0 "
+				+ "	AND EXISTS (SELECT 1 FROM EXM_MY_EXAM Z WHERE Z.USER_ID = :USER_ID AND EXAM.ID = Z.EXAM_ID) ";
+		return getList(sql, new Object[] { userId }, Exam.class);
 	}
 }

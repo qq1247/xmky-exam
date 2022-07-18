@@ -50,25 +50,6 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 				+ "WHERE MY_EXAM.STATE = 1 AND EXAM.START_TIME < NOW() AND MY_EXAM.USER_ID = :USER_ID";
  		return getCount(sql, new Object[] { userId });
 	}
-	
-	@Override
-	public List<Map<String, Object>> homeSubAdminExam(Integer userId) {
-		String sql = "SELECT USER.ID AS USER_ID, USER.NAME AS USER_NAME, USER.HEAD_FILE_ID AS USER_HEAD_FILE_ID, USER.ORG_ID AS ORG_ID ,ORG.NAME AS ORG_NAME, "
-				+ "USER.TYPE AS TYPE, COUNT(EXAM.ID) AS EXAM_NUM "
-				+ "FROM EXM_EXAM EXAM "
-				+ "INNER JOIN SYS_USER AS USER ON EXAM.CREATE_USER_ID = USER.ID "
-				+ "LEFT JOIN SYS_ORG AS ORG ON USER.ORG_ID = ORG.ID "
-				+ "WHERE EXAM.STATE != 0 AND EXAM.CREATE_USER_ID = :CREATE_USER_ID";
-		return getMapList(sql, new Object[] { userId });
-	}
-
-	@Override
-	public Integer homeSubAdminPaper(Integer userId) {
-		String sql = "SELECT COUNT(PAPER.ID) AS PAPER_NUM "
-				+ "FROM EXM_PAPER PAPER "
-				+ "WHERE PAPER.STATE != 0 AND PAPER.CREATE_USER_ID = :CREATE_USER_ID";
-		return getCount(sql, new Object[] { userId });
-	}
 
 	@Override
 	public Integer homeSubAdminQuestion(Integer userId) {

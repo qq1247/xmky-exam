@@ -242,4 +242,12 @@ public interface PaperService extends BaseService<Paper> {
 	 * @return List<Question>
 	 */
 	List<Question> getQuestionList(Integer examId, Integer userId);
+
+	/**
+	 * 获取试卷列表
+	 * 
+	 * v1.0 zhanghc 2022年7月18日下午3:03:54
+	 * @return List<Paper>
+	 */
+	List<Paper> getList();
 }

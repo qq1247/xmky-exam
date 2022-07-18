@@ -3,6 +3,7 @@ package com.wcpdoc.exam.core.service;
 import java.util.List;
 
 import com.wcpdoc.core.service.BaseService;
+import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
 /**
  * 我的考试服务层接口
@@ -86,5 +87,14 @@ public interface MyExamService extends BaseService<MyExam>{
 	 * void
 	 */
 	void doMark(Integer examId);
+
+	/**
+	 * 获取考试列表
+	 * 
+	 * v1.0 zhanghc 2022年7月18日下午2:33:58
+	 * @param userId
+	 * @return List<Exam>
+	 */
+	List<Exam> getExamList(Integer userId);
 
 }

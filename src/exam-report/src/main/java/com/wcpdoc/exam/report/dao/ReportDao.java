@@ -37,23 +37,6 @@ public interface ReportDao extends RBaseDao<Object> {
 	 * 
 	 * v1.0 chenyun 2021年12月10日下午1:37:38
 	 * @param userId
-	 * @return Map<String,Object>
-	 */
-	List<Map<String, Object>> homeSubAdminExam(Integer userId);
-	
-	/**
-	 * 首页subAdmin
-	 * 
-	 * v1.0 chenyun 2021年12月10日下午1:37:38
-	 * @param userId
-	 * @return Integer
-	 */
-	Integer homeSubAdminPaper(Integer userId);
-	/**
-	 * 首页subAdmin
-	 * 
-	 * v1.0 chenyun 2021年12月10日下午1:37:38
-	 * @param userId
 	 * @return Integer
 	 */
 	Integer homeSubAdminQuestion(Integer userId);

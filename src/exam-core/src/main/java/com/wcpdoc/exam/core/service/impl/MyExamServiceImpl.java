@@ -790,4 +790,9 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		}
 	}
 
+	@Override
+	public List<Exam> getExamList(Integer userId) {
+		return myExamDao.getExamList(userId);
+	}
+
 }

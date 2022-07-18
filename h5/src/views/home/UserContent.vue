@@ -86,7 +86,7 @@
               </div>
               <div class="item-info">
                 <span class="info-num">{{ userInfo.myMark.num }}</span>
-                <span class="info-intro">待阅试卷（张）</span>
+                <span class="info-intro">待阅试卷（场）</span>
               </div>
             </div>
           </div>

@@ -226,4 +226,9 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 				markUser.getId(), markUser.getName(), examUser.getId(), examUser.getName(), 
 				myExam.getTotalScore(), myExam.getAnswerState() == 1 ? "及格" : "不及格");
 	}
+
+	@Override
+	public List<MyMark> getListForMarUser(Integer markUserId) {
+		return myMarkDao.getListForMarUser(markUserId);
+	}
 }

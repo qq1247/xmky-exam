@@ -20,4 +20,13 @@ public interface MyMarkDao extends BaseDao<MyMark>{
 	 * @return List<MyMark>
 	 */
 	List<MyMark> getList(Integer examId);
+
+	/**
+	 * 获取我的阅卷列表
+	 * 
+	 * v1.0 zhanghc 2022年7月18日下午3:40:17
+	 * @param markUserId
+	 * @return List<MyMark>
+	 */
+	List<MyMark> getListForMarUser(Integer markUserId);
 }

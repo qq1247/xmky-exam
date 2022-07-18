@@ -1310,4 +1310,8 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		return paperDao.getQuestionList(examId, userId);
 	}
 
+	@Override
+	public List<Paper> getList() {
+		return paperDao.getList();
+	}
 }
