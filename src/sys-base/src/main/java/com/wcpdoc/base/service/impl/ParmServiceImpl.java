@@ -69,11 +69,21 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		entity.setUpdateUserId(getCurUser().getId());
 		update(entity);
 		
-		// 扩展处理
-		parmExService.emailUpdate(entity);// 配置不成功，数据回滚，不刷入缓存
-		
 		// 更新缓存
 		ParmCache.flushCache(entity);
+		
+		// 扩展处理
+		try {
+			parmExService.emailUpdate(entity);
+		} catch (Exception e) {// 配置不成功，数据回滚，不刷入缓存
+			entity.setEmailHost(null);
+			entity.setEmailUserName(null);
+			entity.setEmailPwd(null);
+			entity.setEmailProtocol(null);
+			entity.setEmailEncode(null);
+			ParmCache.flushCache(entity);
+			throw new MyException(e.getMessage());
+		}
 	}
 
 	@Override

@@ -17,7 +17,7 @@ public interface ParmExService extends BaseService<Parm> {
 	 * @param parm 
 	 * @throws EmailException 
 	 */
-	void emailUpdate(Parm parm);
+	void emailUpdate(Parm parm) throws Exception;
 	
 	/**
 	 * 修改logo

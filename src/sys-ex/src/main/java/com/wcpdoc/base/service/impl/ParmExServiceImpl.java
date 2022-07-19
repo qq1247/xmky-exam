@@ -7,10 +7,8 @@ import org.springframework.stereotype.Service;
 import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.base.service.ParmExService;
 import com.wcpdoc.core.dao.BaseDao;
-import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.file.service.FileService;
-import com.wcpdoc.notify.exception.NotifyException;
 import com.wcpdoc.notify.service.EmailService;
 import com.wcpdoc.notify.service.NotifyService;
 
@@ -34,16 +32,12 @@ public class ParmExServiceImpl extends BaseServiceImp<Parm> implements ParmExSer
 	}
 
 	@Override
-	public void emailUpdate(Parm parm) {
-		try {
-			notifyService.pushEmail(
-					parm.getEmailUserName(), 
-					parm.getEmailUserName(), 
-					parm.getOrgName() == null ? "在线考试邮箱配置" : String.format("%s 在线考试邮箱配置", parm.getOrgName()) , 
-							"邮箱配置成功！");
-		} catch (NotifyException e) {
-			throw new MyException(e.getMessage());
-		}
+	public void emailUpdate(Parm parm) throws Exception {// 改成编译时异常，必须处理
+		notifyService.pushEmail(
+				parm.getEmailUserName(), 
+				parm.getEmailUserName(), 
+				parm.getOrgName() == null ? "在线考试邮箱配置" : String.format("%s 在线考试邮箱配置", parm.getOrgName()) , 
+						"邮箱配置成功！");
 	}
 	
 	@Override
