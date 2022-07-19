@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.core.service.impl;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -712,37 +713,37 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	 */
 	
 	public static void main(String[] args) {
-		String[] answers = new String[] {null, "", null, ""};
-		String join = StringUtil.join(answers, '\n');
-		System.err.println(join);
+//		String[] answers = new String[] {null, "", null, ""};
+//		String join = StringUtil.join(answers, '\n');
+//		System.err.println(join);
 		
-//		Question question = new Question();
-//		question.setAi(1);
-//		
-//		PaperQuestion questionOption = new PaperQuestion();
-//		questionOption.setAiOptions("2,3");
-//		
-//		List<PaperQuestionAnswer> questionAnswerList = new ArrayList<>();
-//		PaperQuestionAnswer paperQuestionAnswer = new PaperQuestionAnswer();
-//		paperQuestionAnswer.setAnswer("奖学金");
-//		paperQuestionAnswer.setScore(new BigDecimal("1"));
-//		questionAnswerList.add(paperQuestionAnswer);
-//		
-//		paperQuestionAnswer = new PaperQuestionAnswer();
-//		paperQuestionAnswer.setAnswer("贷学金");
-//		paperQuestionAnswer.setScore(new BigDecimal("1"));
-//		questionAnswerList.add(paperQuestionAnswer);
-//
-//		paperQuestionAnswer = new PaperQuestionAnswer();
-//		paperQuestionAnswer.setAnswer("助学金");
-//		paperQuestionAnswer.setScore(new BigDecimal("1"));
-//		questionAnswerList.add(paperQuestionAnswer);
-//		
-//		MyExamDetail userAnswer = new MyExamDetail();
-//		userAnswer.setAnswer("助学金\n奖学金");
-//		
-//		new MyExamServiceImpl().fillBlankHandle(question, questionOption, questionAnswerList, userAnswer);
-//		System.err.println(userAnswer.getScore());
+		Question question = new Question();
+		question.setAi(1);
+		
+		PaperQuestion questionOption = new PaperQuestion();
+		questionOption.setAiOptions("2,3");
+		
+		List<PaperQuestionAnswer> questionAnswerList = new ArrayList<>();
+		PaperQuestionAnswer paperQuestionAnswer = new PaperQuestionAnswer();
+		paperQuestionAnswer.setAnswer("奖学金");
+		paperQuestionAnswer.setScore(new BigDecimal("1"));
+		questionAnswerList.add(paperQuestionAnswer);
+		
+		paperQuestionAnswer = new PaperQuestionAnswer();
+		paperQuestionAnswer.setAnswer("助学金");
+		paperQuestionAnswer.setScore(new BigDecimal("1"));
+		questionAnswerList.add(paperQuestionAnswer);
+		
+		paperQuestionAnswer = new PaperQuestionAnswer();
+		paperQuestionAnswer.setAnswer("贷学金");
+		paperQuestionAnswer.setScore(new BigDecimal("1"));
+		questionAnswerList.add(paperQuestionAnswer);
+		
+		MyExamDetail userAnswer = new MyExamDetail();
+		userAnswer.setAnswer("助学金\n奖学金\n奖学金");
+		
+		new MyExamServiceImpl().fillBlankHandle(question, questionOption, questionAnswerList, userAnswer);
+		System.err.println(userAnswer.getScore());
 	}
 	private void fillBlankHandle(Question question, PaperQuestion questionOption, 
 			List<PaperQuestionAnswer> questionAnswerList, MyExamDetail userAnswer) {
@@ -766,8 +767,9 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		String[] userAnswers = dxxbmg
 				? userAnswer.getAnswer().toLowerCase().split("\n")
 				: userAnswer.getAnswer().split("\n");// 获取用户答案（多空就是多个答案）
-		for (int i = 0; i < userAnswers.length; i++) {// 循环用户每一项答案
-			for (int j = 0; j < questionAnswerList.size(); j++) {// 循环每一项试题关键词
+		Set<Integer> useAnswers = new HashSet<>();// bug：考试答题-》填空题（3个空）-》属性为客观题、填空允许乱序-》一个正确答案分别填到三个空上-》当前题满分
+		for (int i = 0; i < userAnswers.length; i++) {// 循环用户每一项答案（[培训  审查]）
+			for (int j = 0; j < questionAnswerList.size(); j++) {// 循环每一项试题关键词（[[保密审查,保密调查], [培训  审查]]）
 				PaperQuestionAnswer questionAnswer = questionAnswerList.get(j);
 				String[] synonyms = dxxbmg 
 						? questionAnswer.getAnswer().toLowerCase().split("\n") 
@@ -778,13 +780,20 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 						continue;
 					}
 				}
+				if (useAnswers.contains(j)) {
+					continue;
+				}
 				
-				for (String synonym : synonyms) {// 循环每一项同义词
+				for (String synonym : synonyms) {// 循环每一项同义词（保密审查  保密调查）
 					if (userAnswers[i].contains(synonym)) {// 如果用户某一空答案，匹配某一项关键词的同义词
 						userAnswer.setScore(BigDecimalUtil.newInstance(userAnswer.getScore())
 								.add(questionAnswer.getScore()).getResult());// 累计该关键词的分数
+						useAnswers.add(j);
 						break;// 匹配到一个同义词就结束；返回大循环继续对比其他关键词
 					}
+				}
+				if (useAnswers.contains(j)) {
+					break;// 处理下一个用户答案（作用于上一个for循环，用户答案匹配某个标准答案，就不在循环其他标准答案）
 				}
 			}
 		}
