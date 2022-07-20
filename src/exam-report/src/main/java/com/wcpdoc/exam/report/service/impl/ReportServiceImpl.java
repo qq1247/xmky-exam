@@ -201,7 +201,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		}
 		
 		{
-			List<MyMark> myMarkList = myMarkService.getListForMarUser(getCurUser().getId());
+			List<MyMark> myMarkList = myMarkService.getListForMarkUser(getCurUser().getId());
 			Map<Integer, Exam> examCache = new HashMap<>();
 			for (Exam exam : examList) {
 				examCache.put(exam.getId(), exam);

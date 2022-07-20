@@ -228,7 +228,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 	}
 
 	@Override
-	public List<MyMark> getListForMarUser(Integer markUserId) {
-		return myMarkDao.getListForMarUser(markUserId);
+	public List<MyMark> getListForMarkUser(Integer markUserId) {
+		return myMarkDao.getListForMarkUser(markUserId);
 	}
 }

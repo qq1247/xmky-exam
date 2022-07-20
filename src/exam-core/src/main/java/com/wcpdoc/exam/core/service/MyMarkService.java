@@ -28,7 +28,7 @@ public interface MyMarkService extends BaseService<MyMark>{
 	 * @param markUserId
 	 * @return List<MyMark>
 	 */
-	List<MyMark> getListForMarUser(Integer markUserId);
+	List<MyMark> getListForMarkUser(Integer markUserId);
 	
 	/**
 	 * 阅卷

@@ -62,7 +62,7 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 	}
 
 	@Override
-	public List<MyMark> getListForMarUser(Integer markUserId) {
+	public List<MyMark> getListForMarkUser(Integer markUserId) {
 		String sql = "SELECT * FROM EXM_MY_MARK WHERE MARK_USER_ID = :MARK_USER_ID";
 		return getList(sql, new Object[] { markUserId });
 	}

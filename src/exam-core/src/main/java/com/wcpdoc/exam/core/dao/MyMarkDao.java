@@ -28,5 +28,5 @@ public interface MyMarkDao extends BaseDao<MyMark>{
 	 * @param markUserId
 	 * @return List<MyMark>
 	 */
-	List<MyMark> getListForMarUser(Integer markUserId);
+	List<MyMark> getListForMarkUser(Integer markUserId);
 }
