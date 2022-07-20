@@ -367,7 +367,9 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		// 获取考试、试卷、人员成绩信息
 		Paper paper = paperService.getEntity(exam.getPaperId());
 		List<MyExam> myExamList = myExamService.getList(examId);
-//		List<Question> questionList = paperService.getQuestionList(exam.getPaperId());
+		List<Question> questionList = paper.getGenType() == 1 
+				? paperService.getQuestionList(exam.getPaperId())
+				: new ArrayList<>();
 		
 		// 统计考试基础信息
 		Map<String, Object> result = new HashMap<String, Object>();
@@ -430,10 +432,10 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 			typeResultList.add(map);
 		}
 		
-//		for (Question question : questionList) {
-//			Map<String, Object> map = typeCache.get(question.getType().toString());
-//			map.put("value", (int)map.get("value") + 1);// 按分类累加
-//		}
+		for (Question question : questionList) {
+			Map<String, Object> map = typeCache.get(question.getType().toString());
+			map.put("value", (int)map.get("value") + 1);// 按分类累加
+		}
 		
 		for (Map<String, Object> typeResult : typeResultList) {
 			typeResult.remove("key");// 接口没有这个字段，移除掉
