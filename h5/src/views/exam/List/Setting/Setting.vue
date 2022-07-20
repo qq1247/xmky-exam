@@ -113,7 +113,7 @@ export default {
         ],
         rules: {
           name: [
-            { required: true, message: '请填写试卷名称', trigger: 'blur' }
+            { required: true, message: '请填写考试名称', trigger: 'blur' }
           ],
           selectPaperId: [
             { required: true, message: '请选择试卷', trigger: 'blur' }
