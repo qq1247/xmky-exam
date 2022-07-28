@@ -39,13 +39,13 @@
               v-for="(option, indexOption) in questionList[index].options"
               :key="indexOption"
               :disabled="preview === 'true' ? true : false"
-              :label="String(option.on)"
+              :label="option.no"
               class="option-item"
             >
               <div
                 class="flex-items-center"
                 v-html="
-                  `${String.fromCharCode(65 + indexOption)}、${option.option}`
+                  `${option.no}、${option.option}`
                 "
               />
             </el-radio>
@@ -63,14 +63,14 @@
             <el-checkbox
               v-for="(option, indexOption) in questionList[index].options"
               :key="indexOption"
-              :label="String(option.on)"
+              :label="option.no"
               class="option-item"
               :disabled="preview === 'true' ? true : false"
             >
               <div
                 class="flex-items-center"
                 v-html="
-                  `${String.fromCharCode(65 + indexOption)}、${option.option}`
+                  `${option.no}、${option.option}`
                 "
               />
             </el-checkbox>
