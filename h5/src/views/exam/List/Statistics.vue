@@ -404,7 +404,6 @@ export default {
       if (currentId === row.questionId) {
         return
       }
-
       const index = this.errorList.findIndex(
         (item) => row.questionId === item.questionId
       )
@@ -417,8 +416,8 @@ export default {
       })
 
       this.expandRowList = [row.questionId]
-
-      this.$set(this.errorList[index], 'children', res.data.list)
+      this.errorList[index]['children'] = res.data.list
+      // this.$set(this.errorList[index], 'children', res.data.list)
     }
   }
 }

@@ -26,6 +26,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    scoreState: {
+      type: Boolean,
+      default: false,
+    }
   },
   render(h, context) {
     const {
@@ -42,7 +46,7 @@ export default {
       )
 
       let inputHtml
-      if (props.preview) {
+      if (props.preview && props.scoreState) {
         const { score, questionScore } =
           props.myExamDetailCache[props.questionId]
 
@@ -56,7 +60,7 @@ export default {
           index
         ].answer.join(',')}）</span>`
       } else {
-        inputHtml = `<el-input class="cloze-input" @change='updateAnswer(${questionId})' :disabled='${props.disabled}' v-model='myExamDetailCache[${questionId}].answers[${index}]'></el-input>`
+        inputHtml = `<el-input class="cloze-input" @change='updateAnswer(${questionId})' :disabled='${props.preview}' v-model='myExamDetailCache[${questionId}].answers[${index}]'></el-input>`
       }
       title = `${titleStart}${inputHtml}${titleEnd}`
     })

@@ -32,6 +32,7 @@
                 :title="question.title"
                 :question-id="question.id"
                 :question-detail="question"
+                :scoreState="scoreState"
                 :my-exam-detail-cache="myExamDetailCache"
               />
             </div>
