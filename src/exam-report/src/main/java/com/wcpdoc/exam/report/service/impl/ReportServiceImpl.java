@@ -215,7 +215,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 				//if (curExam.getState() != 1) {// 考试未发布
 				//	continue;
 				//}
-				if (curExam.getMarkState() == 2) {// 阅卷中（整场考试未阅卷结束就加一）
+				if (ValidateUtil.isValid(curExam.getMarkStartTime()) && curExam.getMarkState() != 3) {// 有阅卷时间就是主观试卷（和试卷中取状态效果一样）
 					markNum++;
 				}
 			}
