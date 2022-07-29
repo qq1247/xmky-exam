@@ -61,7 +61,7 @@
                     }"
                     class="flex-items-center"
                     v-html="
-                      `${option.no}、${
+                      `${String.fromCharCode(65 + indexOption)}、${
                         option.option
                       }`
                     "
@@ -94,7 +94,7 @@
                     }"
                     class="flex-items-center"
                     v-html="
-                      `${option.no}、${
+                      `${String.fromCharCode(65 + indexOption)}、${
                         option.option
                       }`
                     "

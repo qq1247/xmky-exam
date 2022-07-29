@@ -45,7 +45,7 @@
               <div
                 class="flex-items-center"
                 v-html="
-                  `${option.no}、${option.option}`
+                  `${String.fromCharCode(65 + indexOption)}、${option.option}`
                 "
               />
             </el-radio>
@@ -70,7 +70,7 @@
               <div
                 class="flex-items-center"
                 v-html="
-                  `${option.no}、${option.option}`
+                  `${String.fromCharCode(65 + indexOption)}、${option.option}`
                 "
               />
             </el-checkbox>
