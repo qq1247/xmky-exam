@@ -23,7 +23,6 @@
             <p><span>平均分：</span>{{ statisInfo.score.avg }}</p>
             <p><span>最高分：</span>{{ statisInfo.score.max }}</p>
             <p><span>最低分：</span>{{ statisInfo.score.min }}</p>
-            <p><span>标准差：</span>{{ statisInfo.score.sd }}</p>
           </template>
         </div>
       </el-card>
@@ -405,7 +404,6 @@ export default {
       if (currentId === row.questionId) {
         return
       }
-
       const index = this.errorList.findIndex(
         (item) => row.questionId === item.questionId
       )
@@ -418,8 +416,8 @@ export default {
       })
 
       this.expandRowList = [row.questionId]
-
-      this.$set(this.errorList[index], 'children', res.data.list)
+      this.errorList[index]['children'] = res.data.list
+      // this.$set(this.errorList[index], 'children', res.data.list)
     }
   }
 }

@@ -282,6 +282,7 @@ export default {
       })
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
+      a.download = '用户模板.xlsx'
       a.href = url
       a.click()
       window.URL.revokeObjectURL(url)

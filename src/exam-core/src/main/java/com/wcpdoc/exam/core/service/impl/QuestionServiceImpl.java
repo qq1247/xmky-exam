@@ -574,6 +574,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (!ValidateUtil.isValid(answers)) {
 			throw new MyException("参数错误：answers");
 		}
+		if (!ValidateUtil.isValid(question.getScore())) {
+			throw new MyException("参数错误：score");
+		}
 		
 		if(!questionTypeService.hasWriteAuth(questionType)) {
 			throw new MyException("无操作权限");

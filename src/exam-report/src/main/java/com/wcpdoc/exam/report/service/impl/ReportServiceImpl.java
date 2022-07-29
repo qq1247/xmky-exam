@@ -33,12 +33,14 @@ import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamType;
 import com.wcpdoc.exam.core.entity.MyExam;
+import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.ExamTypeService;
 import com.wcpdoc.exam.core.service.MyExamService;
+import com.wcpdoc.exam.core.service.MyMarkService;
 import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
@@ -67,6 +69,8 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 	@Resource
 	private MyExamService myExamService;
 	@Resource
+	private MyMarkService myMarkService;
+	@Resource
 	private ExamTypeService examTypeService;
 	@Resource
 	private DictService dictService;
@@ -83,10 +87,10 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 	@Override
 	public Map<String, Object> homeUser() {
 		// 获取原始数据
-		User user = userService.getEntity(getCurUser().getId());
-		Org org = orgService.getEntity(user.getOrgId());
-		List<MyExam> myExamList = myExamService.getListForUser(getCurUser().getId());
-		List<Exam> examList = examService.getList();
+		User user = userService.getEntity(getCurUser().getId());// 用户信息
+		Org org = orgService.getEntity(user.getOrgId());// 机构信息
+		List<MyExam> myExamList = myExamService.getListForUser(getCurUser().getId());// 我的考试信息
+		List<Exam> examList = myExamService.getExamList(getCurUser().getId());// 考试信息
 		Map<Integer, Exam> examCache = new HashMap<>();
 		for (Exam exam : examList) {
 			examCache.put(exam.getId(), exam);
@@ -98,6 +102,10 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		BigDecimal sum = BigDecimal.ZERO;
 		for (MyExam myExam : myExamList) {
 			Exam curExam = examCache.get(myExam.getExamId());
+			if (curExam == null) {// 考试已删除
+				continue;
+			}
+			
 			if (curExam.getMarkState() != 3) {// 整场考试未阅卷不统计（比如没有排名）
 				continue;
 			}
@@ -115,7 +123,6 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		
 		// 拼接成接口的格式
 		Map<String, Object> result = new HashMap<String, Object>();
-		
 		Map<String, Object> userResult = new HashMap<String, Object>();
 		userResult.put("id", user.getId());
 		userResult.put("name", user.getName());
@@ -146,30 +153,77 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 	@Override
 	public Map<String, Object> homeSubAdmin() {
 		Map<String, Object> result = new HashMap<String, Object>();
-		List<Map<String, Object>> homeSubAdminExam = reportDao.homeSubAdminExam(getCurUser().getId());
-		Map<String, Object> examMap = homeSubAdminExam.get(0);
+		User user = userService.getEntity(getCurUser().getId());// 用户信息
+		Org org = orgService.getEntity(user.getOrgId());// 机构信息
+		List<Exam> examList = examService.getList();// 考试信息
+		
 		Map<String, Object> data = new HashMap<String, Object>();
-		data.put("id", examMap.get("userId"));
-		data.put("name", examMap.get("userName"));
-		data.put("headFileId", examMap.get("userHeadFileId"));
-		data.put("type", examMap.get("type"));
+		data.put("id", user.getId());
+		data.put("name", user.getName());
+		data.put("headFileId", user.getHeadFileId());
+		data.put("type", user.getType());
 		result.put("user", data);
+		
 		data = new HashMap<String, Object>();
-		data.put("id", examMap.get("orgId"));
-		data.put("name", examMap.get("orgName"));
+		data.put("id", org.getId());
+		data.put("name", org.getName());
 		result.put("org", data);
-		data = new HashMap<String, Object>();
-		data.put("num", examMap.get("examNum"));
-		result.put("exam", data);
-		data = new HashMap<String, Object>();
-		data.put("num", reportDao.homeSubAdminPaper(getCurUser().getId()));
-		result.put("paper", data);
-		data = new HashMap<String, Object>();
-		data.put("num", reportDao.homeSubAdminQuestion(getCurUser().getId()));
-		result.put("question", data);
-		data = new HashMap<String, Object>();
-		data.put("num", reportDao.homeSubAdminMark(getCurUser().getId()));
-		result.put("myMark", data);
+		
+		{
+			int examNum = 0;
+			for (Exam exam : examList) {
+				if (exam.getCreateUserId().intValue() == getCurUser().getId().intValue()) {
+					examNum++;
+				}
+			}
+			data = new HashMap<String, Object>();
+			data.put("num", examNum);
+			result.put("exam", data);
+		}
+		
+		{
+			List<Paper> paperList = paperService.getList();
+			int paperNum = 0;
+			for (Paper paper : paperList) {
+				if (paper.getCreateUserId().intValue() == getCurUser().getId().intValue()) {
+					paperNum++;
+				}
+			}
+			data = new HashMap<String, Object>();
+			data.put("num", paperNum);
+			result.put("paper", data);
+		}
+		
+		{
+			data = new HashMap<String, Object>();
+			data.put("num", reportDao.homeSubAdminQuestion(getCurUser().getId()));
+			result.put("question", data);
+		}
+		
+		{
+			List<MyMark> myMarkList = myMarkService.getListForMarkUser(getCurUser().getId());
+			Map<Integer, Exam> examCache = new HashMap<>();
+			for (Exam exam : examList) {
+				examCache.put(exam.getId(), exam);
+			}
+			int markNum = 0;
+			for (MyMark myMark : myMarkList) {
+				Exam curExam = examCache.get(myMark.getExamId());
+				if (curExam == null) {// 考试已删除
+					continue;
+				}
+				//if (curExam.getState() != 1) {// 考试未发布
+				//	continue;
+				//}
+				if (ValidateUtil.isValid(curExam.getMarkStartTime()) && curExam.getMarkState() != 3) {// 有阅卷时间就是主观试卷（和试卷中取状态效果一样）
+					markNum++;
+				}
+			}
+			
+			data = new HashMap<String, Object>();
+			data.put("num", markNum);
+			result.put("myMark", data);
+		}
 		return result;
 	}
 	
@@ -313,7 +367,9 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		// 获取考试、试卷、人员成绩信息
 		Paper paper = paperService.getEntity(exam.getPaperId());
 		List<MyExam> myExamList = myExamService.getList(examId);
-//		List<Question> questionList = paperService.getQuestionList(exam.getPaperId());
+		List<Question> questionList = paper.getGenType() == 1 
+				? paperService.getQuestionList(exam.getPaperId())
+				: new ArrayList<>();
 		
 		// 统计考试基础信息
 		Map<String, Object> result = new HashMap<String, Object>();
@@ -376,10 +432,10 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 			typeResultList.add(map);
 		}
 		
-//		for (Question question : questionList) {
-//			Map<String, Object> map = typeCache.get(question.getType().toString());
-//			map.put("value", (int)map.get("value") + 1);// 按分类累加
-//		}
+		for (Question question : questionList) {
+			Map<String, Object> map = typeCache.get(question.getType().toString());
+			map.put("value", (int)map.get("value") + 1);// 按分类累加
+		}
 		
 		for (Map<String, Object> typeResult : typeResultList) {
 			typeResult.remove("key");// 接口没有这个字段，移除掉

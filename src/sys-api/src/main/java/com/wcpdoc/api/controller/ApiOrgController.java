@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.base.cache.UserCache;
 import com.wcpdoc.base.entity.Org;
 import com.wcpdoc.base.service.OrgExService;
 import com.wcpdoc.base.service.OrgService;
@@ -69,6 +70,7 @@ public class ApiOrgController extends BaseController {
 	@ResponseBody
 	public PageResult add(Org org, String phone) {
 		try {
+			UserCache.tryWriteLock("orgAdd", 5000);
 			orgService.addAndUpdate(org);
 			return PageResultEx.ok();
 		} catch (MyException e) {
@@ -77,6 +79,8 @@ public class ApiOrgController extends BaseController {
 		} catch (Exception e) {
 			log.error("添加机构错误：", e);
 			return PageResult.err();
+		} finally {
+			UserCache.releaseWriteLock("orgAdd");
 		}
 	}
 

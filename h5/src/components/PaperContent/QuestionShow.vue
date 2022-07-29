@@ -39,7 +39,7 @@
               v-for="(option, indexOption) in questionList[index].options"
               :key="indexOption"
               :disabled="preview === 'true' ? true : false"
-              :label="String(option.on)"
+              :label="option.no"
               class="option-item"
             >
               <div
@@ -63,7 +63,7 @@
             <el-checkbox
               v-for="(option, indexOption) in questionList[index].options"
               :key="indexOption"
-              :label="String(option.on)"
+              :label="option.no"
               class="option-item"
               :disabled="preview === 'true' ? true : false"
             >

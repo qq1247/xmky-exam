@@ -688,6 +688,8 @@ export default {
     border-bottom: 1px solid #333;
     border-radius: 0;
     height: 20px;
+    padding: 0px;
+    text-align: center;
   }
 }
 

@@ -492,6 +492,10 @@ export default {
           option: [
             { required: true, message: '请输入选项内容', trigger: 'change' }
           ],
+          score: {
+            required: true,
+            message: '请输入分值',
+          },
           answer: [
             {
               required: true,

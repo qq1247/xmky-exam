@@ -117,4 +117,10 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 				+ "ORDER BY QUESTION_OPTION.NO ASC";
 		return getList(sql, new Object[] { examId, userId }, QuestionOption.class);
 	}
+
+	@Override
+	public List<Paper> getList() {
+		String sql = "SELECT * FROM EXM_PAPER WHERE STATE != 0";
+		return getList(sql, Paper.class);
+	}
 }

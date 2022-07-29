@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.wcpdoc.base.cache.UserCache;
 import com.wcpdoc.base.entity.Org;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.OrgService;
@@ -107,6 +108,7 @@ public class ApiUserController extends BaseController {
 	@ResponseBody
 	public PageResult add(User user) {
 		try {
+			UserCache.tryWriteLock("userAdd", 5000);
 			// 校验数据有效性
 			if (!ValidateUtil.isValid(user.getLoginName())) {
 				throw new MyException("参数错误：loginName");
@@ -142,6 +144,8 @@ public class ApiUserController extends BaseController {
 		} catch (Exception e) {
 			log.error("添加用户错误：", e);
 			return PageResult.err();
+		} finally {
+			UserCache.releaseWriteLock("userAdd");
 		}
 	}
 

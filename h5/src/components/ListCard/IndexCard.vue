@@ -52,7 +52,7 @@
           </span>
           <!-- 开放 -->
           <span data-title="模拟练习" @click="open(data)">
-            <i class="common common-share" />
+            <i class="common common-simulate" />
           </span>
           <!-- 统计 -->
           <span data-title="试题统计" @click="statistics(data)">

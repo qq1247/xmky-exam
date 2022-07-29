@@ -593,6 +593,8 @@ export default {
   /deep/ .el-input__inner {
     border: none;
     border-bottom: 1px solid #dcdfe6;
+    padding: 0px;
+    text-align: center;
   }
 }
 

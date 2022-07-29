@@ -109,7 +109,7 @@
                 <i class="common common-score" />成绩公开
               </div>
               <div class="more-item" @click="message(data)">
-                <i class="common common-messages" />邮件通知
+                <i class="common common-email" />邮件通知
               </div>
               <div class="more-item" @click="exports(data)">
                 <i class="common common-template-down" />试卷导出
@@ -168,18 +168,18 @@ export default {
     // 是否有权限（只有创建者才有权限）
     isRole(data) {
       // 是否已经发布
-      const isPublish = data.state === 1
+      // const isPublish = data.state === 1
 
-      const now = new Date().getTime()
-      const startTime = new Date(data.startTime).getTime()
-      const endTime = new Date(data.endTime).getTime()
-      // 是否在考试时间段内
-      const examTimeRange = now > startTime && now < endTime
+      // const now = new Date().getTime()
+      // const startTime = new Date(data.startTime).getTime()
+      // const endTime = new Date(data.endTime).getTime()
+      // // 是否在考试时间段内
+      // const examTimeRange = now > startTime && now < endTime
 
-      if (this.name === 'examList' && isPublish && examTimeRange) {
-        this.$message.warning('暂无此项权限！')
-        return true
-      }
+      // if (this.name === 'examList' && isPublish && examTimeRange) {
+      //   this.$message.warning('暂无此项权限！')
+      //   return true
+      // }
       return false
     },
     // 编辑

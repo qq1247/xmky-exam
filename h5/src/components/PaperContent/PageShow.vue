@@ -32,6 +32,7 @@
                 :title="question.title"
                 :question-id="question.id"
                 :question-detail="question"
+                :scoreState="scoreState"
                 :my-exam-detail-cache="myExamDetailCache"
               />
             </div>
@@ -197,23 +198,25 @@ export default {
     optionColor(index, item) {
       return (index, item) => {
         // 单选，多选
+        console.log(index, '=====', item)
         if ([1, 2].includes(item.type)) {
           // 选择完毕且与正确答案不匹配
           if (
             this.myExamDetailCache[item.id].answers.includes(
-              String.fromCharCode(65 + index)
+              item.options[index].no
             ) &&
-            !item.answers[0].answer.includes(String.fromCharCode(65 + index))
+            !item.answers[0].answer.includes(item.options[index].no)
           ) {
             return '#FF5722'
           }
 
           // 正确答案
           if (
-            item.answers[0].answer.includes(String.fromCharCode(65 + index))
+            item.answers[0].answer.includes(item.options[index].no)
           ) {
             return '#00B050'
           }
+          // if (this.myExamDetailCache[item.id].answers != item.answers[0].answer)
         }
 
         // 判断

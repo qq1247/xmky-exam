@@ -3,6 +3,7 @@ package com.wcpdoc.exam.core.dao;
 import java.util.List;
 
 import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
 
 /**
@@ -40,5 +41,13 @@ public interface MyExamDao extends BaseDao<MyExam>{
 	 */
 	MyExam getMyExam(Integer examId, Integer userId);
 
+	/**
+	 * 获取考试列表
+	 * 
+	 * v1.0 zhanghc 2022年7月18日下午2:34:40
+	 * @param userId
+	 * @return List<Exam>
+	 */
+	List<Exam> getExamList(Integer userId);
 	
 }

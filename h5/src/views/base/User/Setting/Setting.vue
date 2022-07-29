@@ -163,7 +163,7 @@ export default {
           return
         }
         this.$router.back()
-        this.$alert(res.data.initPwd, '重置密码', {
+        this.$alert(res.data.initPwd, '当前密码', {
           confirmButtonText: '确定'
         })
       })
