@@ -2,6 +2,7 @@
   <el-select
     ref="elSelect"
     clearable
+    size="small"
     :value="value"
     :multiple="multiple"
     :placeholder="placeholder"

@@ -1,8 +1,12 @@
 <template>
   <div class="batch-input-container">
     <div class="left">
+      <div class="btn-box">
+        <el-button plain @click="btnHandler('back')" size="mini" >返回</el-button>
+      </div>
+
       <mavon-editor
-        style="height: 100%"
+        class="qestion-box"
         :value="msg"
         :toolbars-flag="false"
         :short-cut="false"
@@ -12,12 +16,23 @@
     </div>
     <div class="right">
       <!-- 操作按钮与提示 -->
-      <div class="btn-tip">
-        <div class="tip">
+      <div class="top-box">
+        <div>
+          <span>{{`检查区【共${totalTopicCount}题，`}}</span>
+          <span class="success-color">正确：{{totalTopicCount - errTopicCount}}题，</span>
+          <span class="err-color">错误：{{errTopicCount}}题】</span>
+        </div>
+
+        <div>
+          <el-button type="danger" size="mini" @click="btnHandler('location')" plain>定位错误</el-button>
+          <el-button type="primary" size="mini" @click="btnHandler('export')">导入</el-button>
+        </div>
+        
+        <!-- <div class="tip">
           <span>解析出{{ totalTopicCount }}题</span>
           <span>其中有{{ errTopicCount }}题格式错误</span>
-        </div>
-        <div class="btn-box">
+        </div> -->
+        <!-- <div class="btn-box">
           <div
             v-for="handler in handlerButtons"
             :key="`handler${handler.type}`"
@@ -27,7 +42,7 @@
             <i :class="handler.icon" />
             {{ handler.name }}
           </div>
-        </div>
+        </div> -->
       </div>
       <div class="content-center qestion-box">
         <QuestionList
@@ -51,6 +66,10 @@ export default {
     questionTypeId: {
       type: Number,
       default: null
+    },
+    isBack: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
@@ -67,19 +86,6 @@ export default {
       errTopicCount: 0, // 错误的题目数量
       parsingMsg: '', // 解析的题目
       msg: '', // markdrow输入的内容
-      handlerButtons: [
-        // 左侧按钮组2
-        {
-          type: 1,
-          name: '导入',
-          icon: 'common common-template-down'
-        },
-        {
-          type: 2,
-          name: '返回',
-          icon: 'common common-quick'
-        }
-      ],
       errTopicArr: [] // 接口上传题目报错后存储的错误
     }
   },
@@ -220,6 +226,7 @@ export default {
               singleQuestion.aiOptions = []
             }
           } else {
+            ele = ele.replace(/,/g, '')
             singleQuestion.answers += `${ele}|`
           }
         }
@@ -406,10 +413,17 @@ export default {
       }
     },
 
-    // 点击右侧按钮触发的事件
-    otherHandler(type) {
-      switch (type) {
-        case 1:
+    // 点击按钮触发的事件
+    btnHandler(type) {
+      if (type === 'back') {
+        if (this.isBack) {
+          this.$router.back()
+        } else {
+          this.$parent.activeIndex = 0
+        }
+      } else if (type === 'export') {
+        // if (this.isBack) {
+          
           if (this.errTopicCount === 0) {
             this.uploadTopics()
             this.$message.success('导入成功')
@@ -418,16 +432,25 @@ export default {
             } else {
               this.$emit('showTemplate', false)
             }
+            if (!this.isBack) {
+              this.$parent.createdType = 0
+            }
             // this.$emit("showTemplate", false)
           } else {
             this.$message.warning('请先解决完错误')
           }
-          break
-        case 2:
-          this.$router.back()
-          break
-        default:
-          break
+        // } 
+        // else {
+        //   this.$parent.createdType = 0
+        // }
+      } else {
+        // 定位错误
+        let errTitles = this.list.questionList.filter(item => {
+          return item.errs.length >= 1
+        })
+        let scrollContainer = document.getElementsByClassName('qestion-box')[1]
+        let eleOffSetTop = document.getElementById(`p-${errTitles[0].id}`).offsetTop - 130
+        scrollContainer.scrollTop = eleOffSetTop
       }
     },
 
@@ -450,78 +473,46 @@ export default {
 <style lang="scss" scoped>
 .batch-input-container {
   width: 100%;
-  height: 100%;
+  height: calc(100% - 38px);
   padding: 20px 20px;
   display: flex;
   .left {
     width: 40%;
     height: 100%;
-    overflow: scroll;
     background-color: #fff;
+    .qestion-box {
+      height: calc(100% - 38px);
+      overflow: scroll;
+      border: 1px solid #D4D4D4;
+      margin: 10px 0;
+      // background: #fff;
+    }
   }
   .right {
     width: 60%;
     height: 100%;
-    border-left: 1px solid gray;
     background-color: #fff;
-    .btn-tip {
+    .top-box {
       display: flex;
-      flex-direction: column;
-      margin: 0 15px;
-      .tip {
-        display: inline-flex;
-        align-content: flex-end;
-        font-weight: 600;
-        span {
-          margin-right: 20px;
-          &:nth-child(1) {
-            font-size: 18px;
-          }
-          &:nth-child(2) {
-            color: #f56c6c;
-            font-size: 14px;
-          }
-        }
+      justify-content: space-between;
+      color: #202E36;
+      font-weight: 600;
+      .success-color {
+        color: #6DB39B
       }
-      .btn-box {
-        display: flex;
-        flex-direction: row;
-        margin-right: 5px;
-        .handler-btn {
-          width: 100px;
-          background: #eee;
-          margin: 7px 10px 7px 0;
-          text-align: center;
-          line-height: 25px;
-          cursor: pointer;
-          font-size: 14px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          user-select: none;
-          border-radius: 3px;
-          &:hover {
-            background: #0094e5;
-            color: #ffff;
-          }
-          i {
-            width: 16px;
-            height: 16px;
-            line-height: 16px;
-            text-align: center;
-            font-size: 16px;
-            display: block;
-            margin-right: 10px;
-          }
-        }
+      .err-color {
+        color: #F3A0A4
       }
     }
     .qestion-box {
-      height: calc(100% - 60px);
+      height: calc(100% - 38px);
       overflow: scroll;
+      border: 1px solid #D4D4D4;
+      margin: 10px 0;
       // background: #fff;
     }
     .err-msg {
+      padding: 10px;
       background-color: #f00;
       color: #fff;
       font-weight: 900;

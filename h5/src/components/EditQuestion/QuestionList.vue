@@ -131,7 +131,10 @@
         >
           <!-- 错误提示 -->
           <template v-if="showErr && question.errs.length != 0">
-            <div class="err-msg">{{ question.errs }}</div>
+            <div class="err-msg">
+              <i class="el-icon-warning err-icon"></i>
+              <span class="err-tip">{{ question.errs }}</span>
+            </div>
           </template>
           <!-- 题目 -->
           <div class="question-title">
@@ -485,6 +488,11 @@ export default {
   word-wrap: break-word;
   font-weight: 600;
   color: #fff;
+  padding: 0 10px;
+  border-radius: 5px;
+}
+.err-tip {
+  display: inline-block;
   text-indent: 2em;
 }
 

@@ -291,7 +291,9 @@
           font-weight: 600;
           &:hover,
           &:focus {
-            border-color: #c0c4cc;
+            border-bottom: 1px solid #c0c4cc;
+            border-radius: 0;
+            // border-color: #c0c4cc;
           }
         }
       }

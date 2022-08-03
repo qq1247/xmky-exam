@@ -117,6 +117,8 @@
           row-key="questionId"
           :expand-row-keys="expandRowList"
           @expand-change="expandChange"
+          :lazy="true"
+          :tree-props="{children: 'children', hasChildren: true}">
         >
           <el-table-column type="expand">
             <template slot-scope="props">
@@ -414,10 +416,11 @@ export default {
         curPage: this.curPage,
         pageSize: this.pageSize
       })
-
+      res.data.list.map(item => {
+        item.questionId = row.questionId
+      })
       this.expandRowList = [row.questionId]
       this.errorList[index]['children'] = res.data.list
-      // this.$set(this.errorList[index], 'children', res.data.list)
     }
   }
 }
