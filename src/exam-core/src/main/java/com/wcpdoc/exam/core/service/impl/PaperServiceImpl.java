@@ -85,11 +85,14 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 	
 	@Override
-	public Integer addAndUpdate(Paper paper, PaperRemark paperRemark) {// paperRemark暂时不用保留
+	public void addAndUpdate(Paper paper, PaperRemark paperRemark) {// paperRemark暂时不用保留
 		// 校验数据有效性
-		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
-			throw new MyException("无操作权限");
+		PaperType paperType = null;
+		if (ValidateUtil.isValid(paper.getPaperTypeId())) {// 添加时选择了分类
+			paperType = paperTypeService.getEntity(paper.getPaperTypeId());
+			if(!paperTypeService.hasWriteAuth(paperType)) {
+				throw new MyException("无操作权限");
+			}
 		}
 		
 		// 添加试卷
@@ -100,9 +103,10 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		paper.setUpdateTime(curTime);
 		paper.setTotalScore(BigDecimal.ZERO);// 默认总分数为0
 		paper.setState(2);// 默认为草稿
+		paper.setReadUserIds(ValidateUtil.isValid(paper.getPaperTypeId())// 如果选择了分类
+				? paperType.getReadUserIds()// 读权限继承至分类权限
+				: String.format(",%s,", getCurUser().getId()));// 否则读权限默认是自己
 		add(paper);
-		
-		return paper.getId();//快速创建考试需要用id查找信息
 	}
 	
 	@Override
@@ -121,14 +125,13 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if (entity.getState() == 3) {
 			throw new MyException("已归档");
 		}
-		PaperType paperType = paperTypeService.getEntity(entity.getPaperTypeId());
-		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
+		if(!hasWriteAuth(paper)) {
 			throw new MyException("无操作权限");
 		}
 		
-		List<Exam> examList = examService.getList(); //是否被考试引用
+		List<Exam> examList = examService.getList(); // 是否被考试引用
 		if (ValidateUtil.isValid(examList)) {
-			for(Exam exam : examList){
+			for(Exam exam : examList) {
 				if (exam.getPaperId().intValue() ==  paper.getId().intValue()) {
 					throw new MyException(String.format("该试卷已被【%s】考试引用", exam.getName()));
 				}
@@ -143,6 +146,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		entity.setPassScore(paper.getPassScore());
 		entity.setUpdateUserId(getCurUser().getId());
 		entity.setUpdateTime(new Date());
+		// paper.setReadUserIds(null);// 不修改权限
 		update(entity);
 	}
 	
@@ -153,8 +157,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if(paper.getState() == 0) {
 			throw new MyException("已删除");
 		}
-		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
+		if(!hasWriteAuth(paper)) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -169,8 +172,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	public void copy(Integer id) {
 		// 校验数据有效性
 		Paper paper = paperDao.getEntity(id);
-		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
+		if(!hasReadAuth(paper)) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -263,8 +265,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if(paper.getState() == 3){
 			throw new MyException("已归档");
 		}
-		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
+		if(!hasWriteAuth(paper)) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -294,8 +295,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if(paper.getState() == 3){
 			throw new MyException("已归档");
 		}
-		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
+		if(!hasWriteAuth(paper)) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -334,8 +334,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if(paper.getState() == 3){
 			throw new MyException("已归档");
 		}
-		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
+		if(!hasWriteAuth(paper)) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -367,8 +366,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if(paper.getState() == 3){
 			throw new MyException("已归档");
 		}
-		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
+		if(!hasWriteAuth(paper)) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -388,8 +386,6 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		
 		// 删除章节
 		paperQuestionService.del(chapterId);
-		
-		
 	}
 	
 	@Override
@@ -422,8 +418,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if(paper.getState() == 3){
 			throw new MyException("已归档");
 		}
-		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
+		if(!hasWriteAuth(paper)) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -440,23 +435,23 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 	
 	@Override
-	public void questionMove(Integer id, Integer sourceId, Integer targetId) {
+	public void questionMove(Integer id, Integer sourceQuestionId, Integer targetQuestionId) {
 		//校验数据有效性
 		if (!ValidateUtil.isValid(id)) {
 			throw new MyException("参数错误：id");
 		}
-		if (!ValidateUtil.isValid(sourceId)) {
+		if (!ValidateUtil.isValid(sourceQuestionId)) {
 			throw new MyException("参数错误：sourceId");
 		}
-		if (!ValidateUtil.isValid(targetId)) {
+		if (!ValidateUtil.isValid(targetQuestionId)) {
 			throw new MyException("参数错误：targetId");
 		}
-		PaperQuestion source = paperQuestionService.getEntity(id, sourceId);
-		PaperQuestion target = paperQuestionService.getEntity(id, targetId);
-		if (source.getType() == 1) {
+		PaperQuestion source = paperQuestionService.getEntity(id, sourceQuestionId);
+		PaperQuestion target = paperQuestionService.getEntity(id, targetQuestionId);
+		if (source.getType() != 2) {// 只有固定试题才可以移动
 			throw new MyException("参数错误：sourceId");
 		}
-		if (target.getType() == 1) {
+		if (target.getType() != 2) {
 			throw new MyException("参数错误：targetId");
 		}
 		//if (source.getPaperId().intValue() != target.getPaperId().intValue()) {// 如果修改的不是同一张试卷
@@ -472,8 +467,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if(paper.getState() == 3){
 			throw new MyException("已归档");
 		}
-		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
+		if(!hasWriteAuth(paper)) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -482,6 +476,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		source.setUpdateUserId(getCurUser().getId());
 		source.setUpdateTime(new Date());
 		source.setNo(target.getNo());
+		
 		target.setUpdateUserId(getCurUser().getId());
 		target.setUpdateTime(new Date());
 		target.setNo(sourceNo);
@@ -501,7 +496,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 	
 	@Override
-	public void questionAdd(Integer chapterId, Integer[] questionIds) {
+	public void questionAdd(Integer chapterId, Integer[] questionIds, Integer no) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(chapterId)) {
 			throw new MyException("参数错误：chapterId");
@@ -524,8 +519,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if (paper.getState() == 3) {
 			throw new MyException("已归档");
 		}
-		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
+		if(!hasWriteAuth(paper)) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -545,6 +539,10 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			}
 		}
 		
+		if (no > curChapterDetailList.size() + 1) {
+			throw new MyException(String.format("参数错误：no范围为[1-%s]", curChapterDetailList.size() + 1));
+		}
+		
 		List<Question> unAddQuestionList = new ArrayList<>();
 		for (Integer questionId : questionIds) {
 			Question question = questionService.getEntity(questionId);
@@ -558,18 +556,17 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		}
 		
 		// 添加试题
-		int maxNo = curChapterDetailList.size();// 试题最大序号
 		for (Question question : unAddQuestionList) {
 			PaperQuestion pq = new PaperQuestion();
-			pq.setUpdateTime(new Date());
-			pq.setUpdateUserId(getCurUser().getId());
-			pq.setPaperId(_chapter.getPaperId());
-			pq.setParentId(chapterId);
-			pq.setQuestionId(question.getId());
-			pq.setType(2);
-			pq.setNo(++maxNo);
+			// pq.setNo(++maxNo);
 			pq.setScore(question.getScore());
 			pq.setAiOptions(question.getAiOptions());
+			pq.setType(2);
+			pq.setQuestionId(question.getId());
+			pq.setParentId(chapterId);
+			pq.setPaperId(_chapter.getPaperId());
+			pq.setUpdateTime(new Date());
+			pq.setUpdateUserId(getCurUser().getId());
 			paperQuestionService.add(pq);
 			
 			pq.setParentSub(String.format("%s%s_", _chapter.getParentSub(), pq.getId()));
@@ -577,7 +574,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 			
 			//添加试题答案
 			List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
-			for(QuestionAnswer questionAnswer : questionAnswerList){
+			for(QuestionAnswer questionAnswer : questionAnswerList) {
 				PaperQuestionAnswer paperQuestionAnswer = new PaperQuestionAnswer();
 				try {
 					BeanUtils.copyProperties(paperQuestionAnswer, questionAnswer);
@@ -588,6 +585,15 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 				paperQuestionAnswer.setPaperId(_chapter.getPaperId());
 				paperQuestionAnswerService.add(paperQuestionAnswer);
 			}
+			
+			curChapterDetailList.add(no++ - 1, pq);// list从0开始计数
+		}
+		
+		// 当前章节下试题重新排序
+		int curNo = 1;
+		for (PaperQuestion pq : curChapterDetailList) {
+			pq.setNo(curNo++);
+			paperQuestionService.update(pq);
 		}
 	}
 	
@@ -609,6 +615,9 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		}
 		if (paper.getState() == 3) {
 			throw new MyException("试卷已归档");
+		}
+		if(!hasWriteAuth(paper)) {
+			throw new MyException("无操作权限");
 		}
 
 		//设置分数
@@ -687,8 +696,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if(paper.getState() == 3){
 			throw new MyException("试卷已归档");
 		}
-		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
+		if(!hasWriteAuth(paper)) {
 			throw new MyException("无操作权限");
 		}
 		PaperQuestion curPaperQuestion = null;
@@ -749,8 +757,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if(paper.getState() == 3){
 			throw new MyException("已归档");
 		}
-		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
+		if(!hasWriteAuth(paper)) {
 			throw new MyException("无操作权限");
 		}
 
@@ -789,6 +796,9 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		}
 		if (paper.getState() == 3) {
 			throw new MyException("试卷已归档");
+		}
+		if(!hasWriteAuth(paper)) {
+			throw new MyException("无操作权限");
 		}
 
 		// 更新试卷分数
@@ -849,36 +859,37 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 
 	@Override
-	public void move(Integer sourceId, Integer targetId) {
+	public void move(Integer id, Integer paperTypeId) {
 		// 校验数据有效性
-		if (sourceId == null) {
-			throw new MyException("参数错误：sourceId");
+		if (id == null) {
+			throw new MyException("参数错误：id");
 		}
-		if(targetId == null){
-			throw new MyException("参数错误：targetId");
+		if(paperTypeId == null){
+			throw new MyException("参数错误：paperTypeId");
 		}
-		PaperType source = paperTypeService.getEntity(sourceId);
-		if (source.getState() == 0 ){
+		Paper paper = getEntity(id);
+		if (paper.getState() == 0 ){
+			throw new MyException("该试卷已删除");
+		}
+		PaperType paperType = paperTypeService.getEntity(paperTypeId);
+		if (paperType.getState() == 0) {
 			throw new MyException("该分类已删除");
 		}
-		PaperType target = paperTypeService.getEntity(targetId);
-		if (target.getState() == 0) {
-			throw new MyException("该分类已删除");
-		}
-		
-		if (source.getCreateUserId().intValue() != getCurUser().getId().intValue()) {// 只能移动自己的分类
+		if (!hasWriteAuth(paper)) {// 只能移动自己的分类
 			throw new MyException("无操作权限");
 		}
-		//if (!target.getWriteUserIds().contains(String.format(",%s,", getCurUser().getId()))) {// 只能移动到自己的分类或有组权限的分类
-		//	throw new MyException("无操作权限");
-		//}
+		if (!paperTypeService.hasWriteAuth(paperType)) {// 只能移动自己的分类
+			throw new MyException("无操作权限");
+		}
 		
 		// 移动
-		List<Paper> list = paperDao.getList(sourceId);
-		for (Paper paper : list) {
-			paper.setPaperTypeId(targetId);
-			update(paper);
+		if (!ValidateUtil.isValid(paperTypeId)) { // 如果是移出分类（无分类）
+			paper.setPaperTypeId(null);
+		} else {// 如果是切换分类
+			paper.setPaperTypeId(paperTypeId);
+			paper.setReadUserIds(paperType.getReadUserIds());// 读权限继承于分类
 		}
+		update(paper);
 	}
 
 	@Override
@@ -984,8 +995,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if (paper.getState() == 3) {
 			throw new MyException("已归档");
 		}
-		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
+		if(!hasWriteAuth(paper)) {
 			throw new MyException("无操作权限");
 		}
 		if (paper.getGenType() == 1) {//1：人工组卷；2：随机组卷 
@@ -1096,8 +1106,7 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		if(paper.getState() == 3){
 			throw new MyException("已归档");
 		}
-		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
+		if(!hasWriteAuth(paper)) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -1140,6 +1149,32 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 		
 		// 更新反作弊
 		paper.setOptions(ValidateUtil.isValid(options) ? StringUtil.join(options) : null);
+	}
+	
+	@Override
+	public void auth(Integer id, Integer[] readUserIds) {
+		// 校验数据有效性
+		Paper paper = getEntity(id);
+		if (ValidateUtil.isValid(paper.getPaperTypeId())) {
+			PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
+			throw new MyException(String.format("权限继承于【%s】，不可更改", paperType.getName()));
+		}
+		if(!hasWriteAuth(paper)){
+			throw new MyException("无操作权限");
+		}
+		
+		// 更新权限
+		if (!ValidateUtil.isValid(readUserIds)) {
+			paper.setReadUserIds(String.format(",%s,", paper.getCreateUserId()));// 如果没有，默认就是创建人（查询的时候方便）
+		} else {
+			paper.setReadUserIds(String.format(",%s,", StringUtil.join(readUserIds)));
+			if (!paper.getReadUserIds().contains(String.format(",%s,", paper.getCreateUserId()))) {// 如果页面没有选择创建人，添加创建人
+				paper.setReadUserIds(String.format("%s,%s", paper.getReadUserIds(), paper.getCreateUserId()));
+			}
+		}
+		paper.setUpdateTime(new Date());
+		paper.setUpdateUserId(getCurUser().getId());
+		update(paper);
 	}
 
 	@Override
@@ -1288,16 +1323,16 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	
 	private Map<Integer, List<PaperQuestionAnswer>> getPaperQuestionAnswerCache(Integer examId, Integer userId) {
 		List<PaperQuestionAnswer> paperQuestionAnswerList = paperQuestionAnswerService.getList(examId, userId);
-		Map<Integer, List<PaperQuestionAnswer>> paperQuestionAnswerCache = new HashMap<>();
+		Map<Integer, List<PaperQuestionAnswer>> answerCache = new HashMap<>();
 		for (PaperQuestionAnswer paperQuestionAnswer : paperQuestionAnswerList) {
-			if (paperQuestionAnswerCache.get(paperQuestionAnswer.getQuestionId()) == null) {
-				paperQuestionAnswerCache.put(paperQuestionAnswer.getQuestionId(), new ArrayList<>());
+			if (answerCache.get(paperQuestionAnswer.getQuestionId()) == null) {
+				answerCache.put(paperQuestionAnswer.getQuestionId(), new ArrayList<>());
 			}
 			
-			paperQuestionAnswerCache.get(paperQuestionAnswer.getQuestionId()).add(paperQuestionAnswer);
+			answerCache.get(paperQuestionAnswer.getQuestionId()).add(paperQuestionAnswer);
 		}
 		
-		return paperQuestionAnswerCache;
+		return answerCache;
 	}
 
 	@Override
@@ -1311,6 +1346,14 @@ public class PaperServiceImpl extends BaseServiceImp<Paper> implements PaperServ
 	}
 
 	@Override
+	public boolean hasReadAuth(Paper paper) {
+		return paper.getReadUserIds().contains(String.format(",%s,", getCurUser().getId()));
+	}
+	
+	@Override
+	public boolean hasWriteAuth(Paper paper) {
+		return paper.getCreateUserId().intValue() == getCurUser().getId().intValue();
+	}
 	public List<Paper> getList() {
 		return paperDao.getList();
 	}

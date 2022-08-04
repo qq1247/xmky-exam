@@ -21,6 +21,7 @@
     "html-docx-js": "^0.3.1",
     "lodash": "^4.17.21",
     "mammoth": "^1.4.21",
+    "mavon-editor": "^2.10.4",
     "normalize.css": "^8.0.1",
     "nprogress": "^0.2.0",
     "qs": "^6.10.1",

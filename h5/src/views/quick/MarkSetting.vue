@@ -1,16 +1,5 @@
 <template>
-  <el-form ref="userForm" :model="examForm" label-width="100px">
-    <el-form-item label="阅卷方式">
-      <el-radio
-        v-for="(item, index) in examForm.examRadios"
-        :key="item.value"
-        v-model="examForm.examRadio"
-        :label="item.value"
-        :disabled="index === 0"
-        prop="examRadio"
-        @change="selectPaperType"
-      >{{ item.name }}</el-radio>
-    </el-form-item>
+  <el-form ref="userForm" :model="examForm" label-width="100px" class="mark-setting-box">
     <el-row v-for="(item, index) in examForm.examRemarks" :key="item.id">
       <el-col :span="12">
         <el-form-item
@@ -110,18 +99,17 @@
           size="mini"
           icon="el-icon-plus"
           @click="remarkAdd"
+          plain
         >添加</el-button>
         <el-button
           v-if="examForm.examRemarks.length > 1"
           size="mini"
           icon="el-icon-minus"
           @click="remarkDel"
+          type="danger"
+          plain
         >删除</el-button>
       </el-form-item>
-    </div>
-    <div class="footer">
-      <el-button type="primary" @click="$emit('prev', '3')">上一步</el-button>
-      <el-button type="primary" @click="next">下一步</el-button>
     </div>
   </el-form>
 </template>
@@ -140,25 +128,14 @@ export default {
       examForm: {
         name: '',
         paperId: 0,
-        paperMarkType: 1,
+        paperMarkType: 2,
         total: 0,
         curPage: 1,
         pageSize: 5,
-        examRadio: 1,
-        examRadios: [
-          {
-            name: '按题阅卷',
-            value: 0
-          },
-          {
-            name: '按人阅卷',
-            value: 1
-          }
-        ],
         examQuestionNums: [],
         examRemarks: [
           {
-            examCheckPerson: '',
+            examCheckPerson: [],
             examQuestionNum: [],
             examUser: []
           }
@@ -181,7 +158,7 @@ export default {
       this.examForm.examRemarks = []
       for (let index = 0; index < num; index++) {
         this.examForm.examRemarks.push({
-          examCheckPerson: '',
+          examCheckPerson: [],
           examQuestionNum: [],
           examUser: []
         })
@@ -199,32 +176,32 @@ export default {
           })
         }
 
-        examMarkUser.data.map((item, index) => {
-          const cachedOptions = item.examUserList.reduce((acc, cur) => {
-            acc.push({
-              currentLabel: cur.name,
-              currentValue: cur.id,
-              label: cur.name,
-              value: cur.id
-            })
-            return acc
-          }, [])
+        // examMarkUser.data.map((item, index) => {
+        //   const cachedOptions = item.examUserList.reduce((acc, cur) => {
+        //     acc.push({
+        //       currentLabel: cur.name,
+        //       currentValue: cur.id,
+        //       label: cur.name,
+        //       value: cur.id
+        //     })
+        //     return acc
+        //   }, [])
 
-          this.$refs['markExamUserSelect'] &&
-            this.$refs['markExamUserSelect'][index].$refs[
-              'elSelect'
-            ].cachedOptions.push(...cachedOptions)
+        //   this.$refs['markExamUserSelect'] &&
+        //     this.$refs['markExamUserSelect'][index].$refs[
+        //       'elSelect'
+        //     ].cachedOptions.push(...cachedOptions)
 
-          this.$refs['markUserSelect'] &&
-            this.$refs['markUserSelect'][index].$refs[
-              'elSelect'
-            ].cachedOptions.push({
-              currentLabel: item.markUserName,
-              currentValue: item.markUserId,
-              label: item.markUserName,
-              value: item.markUserId
-            })
-        })
+        //   this.$refs['markUserSelect'] &&
+        //     this.$refs['markUserSelect'][index].$refs[
+        //       'elSelect'
+        //     ].cachedOptions.push({
+        //       currentLabel: item.markUserName,
+        //       currentValue: item.markUserId,
+        //       label: item.markUserName,
+        //       value: item.markUserId
+        //     })
+        // })
       })
     }
   },
@@ -235,7 +212,7 @@ export default {
     // 添加评语
     remarkAdd() {
       this.examForm.examRemarks.push({
-        examCheckPerson: '',
+        examCheckPerson: [],
         examQuestionNum: [],
         examUser: []
       })
@@ -243,10 +220,6 @@ export default {
     // 删除评语
     remarkDel() {
       this.examForm.examRemarks.pop()
-    },
-    // 选择阅卷方式
-    selectPaperType(e) {
-      this.examForm.examRadio = e
     },
     // 获取用户
     async getUserList(type = 1, curPage = 1, name = '') {
@@ -268,7 +241,7 @@ export default {
     },
     // 选择阅卷用户
     selectPerson(e, index) {
-      this.examForm.examRemarks[index].examCheckPerson = e
+      this.examForm.examRemarks[index].examCheckPerson = e || []
       this.examForm.examRemarks.map((item, indexe) => {
         if (
           index !== indexe &&
@@ -342,7 +315,7 @@ export default {
           return acc
         }, [])
         await this.setQuickInfo(userList)
-        this.$emit('next', '5')
+        this.$parent.activeIndex ++ 
       })
     },
     // 设置quickInfo
@@ -358,15 +331,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.footer {
-  position: fixed;
-  bottom: 0;
-  width: calc(100% - 201px);
-  right: 0;
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(13px);
-  display: flex;
-  padding: 10px 10px 10px 30px;
-  box-shadow: 1px -3px 13px -6px rgba(#000000, 0.15);
+.mark-setting-box {
+  padding: 15px 150px;
 }
 </style>

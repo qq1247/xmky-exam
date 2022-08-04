@@ -143,10 +143,11 @@ public class ApiBulletinController extends BaseController {
 					readUserIdSet.add(Integer.parseInt(readUserId));
 				}
 				
-				readUserIds = readUserIdSet.toArray(new Integer[0]);
-				List<User> readUserList = userService.getList(readUserIds);
+				List<User> readUserList = userService.getList(readUserIdSet.toArray(new Integer[0]));
+				readUserIds = new Integer[readUserList.size()];
 				readUserNames = new String[readUserList.size()];
 				for (int i = 0; i < readUserList.size(); i++) {
+					readUserIds[i] = readUserList.get(i).getId();
 					readUserNames[i] = readUserList.get(i).getName();
 				}
 			}

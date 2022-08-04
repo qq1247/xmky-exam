@@ -5,6 +5,10 @@ import 'assets/style/element-variables.scss'
 import ElementUI from 'element-ui'
 Vue.use(ElementUI)
 
+import mavonEditor from 'mavon-editor'
+import 'mavon-editor/dist/css/index.css'
+Vue.use(mavonEditor)
+
 import 'assets/style/index.scss'
 
 import * as tools from '@/utils/tools.js'

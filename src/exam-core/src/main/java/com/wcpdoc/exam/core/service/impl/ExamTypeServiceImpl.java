@@ -105,7 +105,7 @@ public class ExamTypeServiceImpl extends BaseServiceImp<ExamType> implements Exa
 	}
 
 	@Override
-	public boolean hasAuth(ExamType examType, Integer userId) {
-		return examType.getCreateUserId().intValue() == userId.intValue();
+	public boolean hasWriteAuth(ExamType examType) {
+		return examType.getCreateUserId().intValue() == getCurUser().getId().intValue();
 	}
 }

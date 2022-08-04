@@ -25,6 +25,7 @@ import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.service.QuestionService;
+import com.wcpdoc.exam.core.service.QuestionTypeExService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 
 /**
@@ -39,6 +40,8 @@ public class ApiQuestionTypeController extends BaseController {
 	
 	@Resource
 	private QuestionTypeService questionTypeService;
+	@Resource
+	private QuestionTypeExService questionTypeExService;
 	@Resource
 	private QuestionService questionService;
 	@Resource
@@ -72,10 +75,11 @@ public class ApiQuestionTypeController extends BaseController {
 					writeUserIdSet.add(Integer.parseInt(id));
 				}
 				
-				Integer[] writeUserIds = writeUserIdSet.toArray(new Integer[0]);
-				List<User> writeUserList = userService.getList(writeUserIds);
+				List<User> writeUserList = userService.getList(writeUserIdSet.toArray(new Integer[0]));
+				Integer[] writeUserIds = new Integer[writeUserList.size()];
 				String[] writeUserNames = new String[writeUserList.size()];
 				for (int i = 0; i < writeUserList.size(); i++) {
+					writeUserIds[i]= writeUserList.get(i).getId();
 					writeUserNames[i] = writeUserList.get(i).getName();
 				}
 				result.put("writeUserIds", writeUserIds);
@@ -171,10 +175,11 @@ public class ApiQuestionTypeController extends BaseController {
 				writeUserIdSet.add(Integer.parseInt(writeUserId));
 			}
 			
-			Integer[] writeUserIds = writeUserIdSet.toArray(new Integer[0]);
-			List<User> writeUserList = userService.getList(writeUserIds);
+			List<User> writeUserList = userService.getList(writeUserIdSet.toArray(new Integer[0]));
+			Integer[] writeUserIds = new Integer[writeUserList.size()];
 			String[] writeUserNames = new String[writeUserList.size()];
 			for (int i = 0; i < writeUserList.size(); i++) {
+				writeUserIds[i] = writeUserList.get(i).getId();
 				writeUserNames[i] = writeUserList.get(i).getName();
 			}
 			
@@ -196,7 +201,7 @@ public class ApiQuestionTypeController extends BaseController {
 	}
 	
 	/**
-	 * 添加组用户
+	 * 授权
 	 * 
 	 * v1.0 chenyun 2021年3月2日上午10:18:26
 	 * @param id	
@@ -229,7 +234,7 @@ public class ApiQuestionTypeController extends BaseController {
 	@ResponseBody
 	public PageResult move(Integer sourceId, Integer targetId) {
 		try {
-			questionService.move(sourceId, targetId);
+			questionTypeExService.move(sourceId, targetId);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("合并试题错误：{}", e.getMessage());

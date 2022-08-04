@@ -29,7 +29,6 @@ import com.wcpdoc.exam.core.entity.ExamType;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.Paper;
-import com.wcpdoc.exam.core.entity.PaperType;
 import com.wcpdoc.exam.core.service.ExamExService;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.ExamTypeService;
@@ -39,7 +38,6 @@ import com.wcpdoc.exam.core.service.PaperQuestionAnswerService;
 import com.wcpdoc.exam.core.service.PaperQuestionRuleService;
 import com.wcpdoc.exam.core.service.PaperQuestionService;
 import com.wcpdoc.exam.core.service.PaperService;
-import com.wcpdoc.exam.core.service.PaperTypeService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.notify.service.NotifyService;
 
@@ -56,8 +54,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	private PaperService paperService;
 	@Resource
 	private QuestionService questionService;
-	@Resource
-	private PaperTypeService paperTypeService;
 	@Resource
 	private ExamTypeService examTypeService;
 	@Resource
@@ -84,7 +80,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	@Override
-	public Integer addAndUpdate(Exam exam) {
+	public void addAndUpdate(Exam exam) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(exam.getName())) {
 			throw new MyException("参数错误：name");
@@ -99,7 +95,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			throw new MyException("参数错误：endTime");
 		}
 		// if (exam.getStartTime().getTime() <= new Date().getTime()) {
-		// 	throw new MyException("考试开始时间必须大于当前时间");// 页面上选的当前时间，添加时就过期了
+		// 	throw new MyException("考试开始时间必须大于当前时间");// 页面上选的当前时间，添加时就过期了，体验差
 		// }
 		if (exam.getEndTime().getTime() <= new Date().getTime()) {
 			throw new MyException("考试结束时间必须大于当前时间");
@@ -112,13 +108,15 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if (paper.getState() != 1) {
 			throw new MyException("试卷未发布");
 		}
-		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if (!paperTypeService.hasReadAuth(paperType, getCurUser().getId())) {
+		if (!paperService.hasReadAuth(paper)) {
 			throw new MyException("无操作权限");
 		}
-		ExamType examType = examTypeService.getEntity(exam.getExamTypeId());
-		if (!examTypeService.hasAuth(examType, getCurUser().getId())) {
-			throw new MyException("无操作权限");
+		ExamType examType = null;
+		if (ValidateUtil.isValid(exam.getExamTypeId())) {// 添加时选择了分类
+			examType = examTypeService.getEntity(exam.getExamTypeId());
+			if (!examTypeService.hasWriteAuth(examType)) {
+				throw new MyException("无操作权限");
+			}
 		}
 		
 		if (paper.getMarkType() == 2) {// 如果是自动阅卷类型，没有阅卷开始时间和阅卷结束时间
@@ -149,7 +147,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		exam.setRankState(2);
 		exam.setAnonState(2);
 		add(exam);
-		return exam.getId(); //快速创建考试需要用id查找信息
 	}
 	
 	@Override
@@ -181,12 +178,10 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if (paper.getState() != 1) {
 			throw new MyException("试卷未发布");
 		}
-		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if (!paperTypeService.hasReadAuth(paperType, getCurUser().getId())) {
+		if (!paperService.hasReadAuth(paper)) {
 			throw new MyException("无操作权限");
 		}
-		ExamType examType = examTypeService.getEntity(exam.getExamTypeId());
-		if (!examTypeService.hasAuth(examType, getCurUser().getId())) {
+		if (!hasWriteAuth(exam)) {
 			throw new MyException("无操作权限");
 		}
 		if (paper.getMarkType() == 2) {// 如果是自动阅卷类型，没有阅卷开始时间和阅卷结束时间
@@ -236,10 +231,9 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	
 	@Override
 	public void delAndUpdate(Integer id) {
-		// 校验数据有效性（只要有权限就删，不管是否考试中）
-		Exam exam = examDao.getEntity(id);
-		ExamType examType = examTypeService.getEntity(exam.getExamTypeId());
-		if(!examTypeService.hasAuth(examType, getCurUser().getId())) {
+		// 校验数据有效性（只要有权限就删，不管是否考试中，如创建了一个超长的结束时间）
+		Exam exam = getEntity(id);
+		if(!hasWriteAuth(exam)) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -293,12 +287,10 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if (exam.getStartTime().getTime() >= exam.getEndTime().getTime()) {
 			throw new MyException("考试结束时间必须大于考试开始时间");
 		}
-		PaperType paperType = paperTypeService.getEntity(paper.getPaperTypeId());
-		if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
+		if(!paperService.hasReadAuth(paper)) {
 			throw new MyException("无操作权限");
 		}
-		ExamType examType = examTypeService.getEntity(exam.getExamTypeId());
-		if(!examTypeService.hasAuth(examType, getCurUser().getId())) {
+		if(!hasWriteAuth(exam)) {
 			throw new MyException("无操作权限");
 		}
 		if (paper.getMarkType() == 2) {// 如果是自动阅卷类型，没有阅卷开始时间和阅卷结束时间
@@ -392,8 +384,11 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		if (!ValidateUtil.isValid(minute)) {
 			throw new MyException("参数错误:minute");
 		}
-		
 		Exam exam = getEntity(id);
+		if(!hasWriteAuth(exam)) {
+			throw new MyException("无操作权限");
+		}
+		
 		Date curTime = new Date();
 		if (timeType == 1) {//时间状态：1：考试开始时间；2：考试结束时间；3：阅卷开始时间；4：阅卷结束时间
 			if (exam.getStartTime().getTime() < curTime.getTime()) {
@@ -526,8 +521,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		//if(paperType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
 		//	throw new MyException("无操作权限");// 已发布就不在校验
 		//}
-		ExamType examType = examTypeService.getEntity(exam.getExamTypeId());
-		if(!examTypeService.hasAuth(examType, getCurUser().getId())) {
+		if(!hasWriteAuth(exam)) {
 			throw new MyException("无操作权限");
 		}
 		
@@ -556,5 +550,10 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 				throw new MyException("阅卷用户重复");
 			}
 		}
+	}
+	
+	@Override
+	public boolean hasWriteAuth(Exam exam) {
+		return exam.getCreateUserId().intValue() == getCurUser().getId().intValue();
 	}
 }

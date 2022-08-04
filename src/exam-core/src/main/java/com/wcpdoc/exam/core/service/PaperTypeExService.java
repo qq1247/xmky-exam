@@ -17,6 +17,15 @@ public interface PaperTypeExService{
 	 * void
 	 */
 	void delAndUpdate(PaperType paperType);
+
+	/**
+	 * 
+	 * 
+	 * v1.0 zhanghc 2022年6月17日下午2:55:43
+	 * @param paperType
+	 * @param readUserIds void
+	 */
+	void auth(PaperType paperType, Integer[] readUserIds);
 	
 }
 

@@ -45,12 +45,20 @@ public interface PaperTypeService extends BaseService<PaperType> {
 	void auth(Integer id, Integer[] readUserIds);
 
 	/**
-	 * 是否有权限
+	 * 是否有读权限
 	 * 
 	 * v1.0 zhanghc 2021年11月5日下午5:50:58
 	 * @param paperType
-	 * @param userId
 	 * @return boolean
 	 */
-	boolean hasReadAuth(PaperType paperType, Integer userId);
+	boolean hasReadAuth(PaperType paperType);
+
+	/**
+	 * 是否有写权限（只能操作自己创建的分类）
+	 * 
+	 * v1.0 zhanghc 2022年6月17日上午11:19:58
+	 * @param paperType
+	 * @return boolean
+	 */
+	boolean hasWriteAuth(PaperType paperType);
 }

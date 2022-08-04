@@ -102,7 +102,7 @@
 </template>
 
 <script>
-import { paperPaper, paperRandomQuestions, paperGet } from 'api/paper'
+import { paperPaper, paperGet } from 'api/paper'
 import { getQuick } from '@/utils/storage'
 export default {
   data() {

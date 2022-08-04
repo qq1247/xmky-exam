@@ -77,13 +77,16 @@ public class ApiPaperController extends BaseController {
 	 * 添加试卷
 	 * 
 	 * zhanghc 2018年10月21日上午8:16:06
+	 * @param paper
+	 * @param paperRemark
 	 * @return pageOut
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
 	public PageResult add(Paper paper, PaperRemark paperRemark) {
 		try {
-			return PageResultEx.ok().data(paperService.addAndUpdate(paper, paperRemark));
+			paperService.addAndUpdate(paper, paperRemark);
+			return PageResultEx.ok().data(paper.getId());
 		} catch (MyException e) {
 			log.error("添加试卷错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
@@ -300,25 +303,24 @@ public class ApiPaperController extends BaseController {
 	
 	/**
 	 * 移动试题
-	 * 只支持同章节下试题移动
 	 * 
 	 * v1.0 zhanghc 2018年10月21日上午10:46:54
 	 * @param id
-	 * @param sourceId 源试题ID
-	 * @param targetId 目标试题ID
+	 * @param sourceQuestionId 源试题ID
+	 * @param targetQuestionId 目标试题ID
 	 * @return PageResult
 	 */
 	@RequestMapping("/questionMove")
 	@ResponseBody
-	public PageResult questionMove(Integer id, Integer sourceId, Integer targetId) {
+	public PageResult questionMove(Integer id, Integer sourceQuestionId, Integer targetQuestionId) {
 		try {
-			paperService.questionMove(id, sourceId, targetId);
+			paperService.questionMove(id, sourceQuestionId, targetQuestionId);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("试题移动错误：{}", e.getMessage());
+			log.error("移动试题错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("试题移动错误：", e);
+			log.error("移动试题错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -491,13 +493,14 @@ public class ApiPaperController extends BaseController {
 	 * v1.0 zhanghc 2018年10月21日上午8:17:26
 	 * @param chapterId
 	 * @param questionIds
+	 * @param no
 	 * @return PageResult
 	 */
 	@RequestMapping("/questionAdd")
 	@ResponseBody
-	public PageResult questionAdd(Integer chapterId, Integer[] questionIds) {
+	public PageResult questionAdd(Integer chapterId, Integer[] questionIds, Integer no) {
 		try {
-			paperService.questionAdd(chapterId, questionIds);
+			paperService.questionAdd(chapterId, questionIds, no);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加试题错误：{}", e.getMessage());
@@ -669,6 +672,52 @@ public class ApiPaperController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("发布错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 操作权限
+	 * 
+	 * v1.0 zhanghc 2017年6月16日下午5:02:45
+	 * @param id
+	 * @param readUserIds
+	 * @return PageResult
+	 */
+	@RequestMapping("/auth")
+	@ResponseBody
+	public PageResult auth(Integer id, Integer[] readUserIds) {
+		try {
+			paperService.auth(id, readUserIds);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("添加组用户错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("添加组用户错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 移动
+	 * 
+	 * v1.0 zhanghc 2017-05-07 14:56:29
+	 * @param id
+	 * @param paperTypeId
+	 * @return PageResult
+	 */
+	@RequestMapping("/move")
+	@ResponseBody
+	public PageResult move(Integer id, Integer paperTypeId) {
+		try {
+			paperService.move(id, paperTypeId);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("合并试题错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		}  catch (Exception e) {
+			log.error("合并试题错误：", e);
 			return PageResult.err();
 		}
 	}

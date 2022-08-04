@@ -72,10 +72,11 @@ public class ApiPaperTypeController extends BaseController {
 					readUserIdSet.add(Integer.parseInt(id));
 				}
 				
-				Integer[] readUserIds = readUserIdSet.toArray(new Integer[0]);
-				List<User> readUserList = userService.getList(readUserIds);
+				List<User> readUserList = userService.getList(readUserIdSet.toArray(new Integer[0]));
+				Integer[] readUserIds = new Integer[readUserList.size()];
 				String[] readUserNames = new String[readUserList.size()];
 				for (int i = 0; i < readUserList.size(); i++) {
+					readUserIds[i] = readUserList.get(i).getId();
 					readUserNames[i] = readUserList.get(i).getName();
 				}
 				result.put("readUserIds", readUserIds);
@@ -171,10 +172,11 @@ public class ApiPaperTypeController extends BaseController {
 				readUserIdSet.add(Integer.parseInt(readUserId));
 			}
 			
-			Integer[] readUserIds = readUserIdSet.toArray(new Integer[0]);
-			List<User> readUserList = userService.getList(readUserIds);
+			List<User> readUserList = userService.getList(readUserIdSet.toArray(new Integer[0]));
+			Integer[] readUserIds = new Integer[readUserList.size()];
 			String[] readUserNames = new String[readUserList.size()];
 			for (int i = 0; i < readUserList.size(); i++) {
+				readUserIds[i] = readUserList.get(i).getId();
 				readUserNames[i] = readUserList.get(i).getName();
 			}
 			
@@ -196,7 +198,7 @@ public class ApiPaperTypeController extends BaseController {
 	}
 	
 	/**
-	 * 添加组用户
+	 * 权限
 	 * 
 	 * v1.0 zhanghc 2017年6月16日下午5:02:45
 	 * @param id
@@ -214,28 +216,6 @@ public class ApiPaperTypeController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("添加组用户错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 试题分类合并
-	 * 
-	 * v1.0 zhanghc 2017-05-07 14:56:29
-	 * @param id
-	 * @return pageOut
-	 */
-	@RequestMapping("/move")
-	@ResponseBody
-	public PageResult move(Integer sourceId, Integer targetId) {
-		try {
-			paperService.move(sourceId, targetId);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("合并试题错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		}  catch (Exception e) {
-			log.error("合并试题错误：", e);
 			return PageResult.err();
 		}
 	}

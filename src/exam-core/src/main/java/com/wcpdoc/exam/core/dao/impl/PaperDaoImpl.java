@@ -1,6 +1,7 @@
 package com.wcpdoc.exam.core.dao.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -30,22 +31,39 @@ public class PaperDaoImpl extends RBaseDaoImpl<Paper> implements PaperDao {
 	
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT PAPER.ID, PAPER.NAME, PAPER.STATE, "
-				+ "PAPER.PASS_SCORE, PAPER.TOTAL_SCORE, PAPER.PAPER_TYPE_ID, PAPER_TYPE.NAME AS PAPER_TYPE_NAME, "
-				+ "PAPER.MARK_TYPE, PAPER.SHOW_TYPE, PAPER.GEN_TYPE "
-				+ "FROM EXM_PAPER PAPER "
-				+ "LEFT JOIN EXM_PAPER_TYPE PAPER_TYPE ON PAPER.PAPER_TYPE_ID = PAPER_TYPE.ID ";
+		String sql = "SELECT * "
+				+ "FROM (SELECT PAPER_TYPE.ID, PAPER_TYPE.NAME, PAPER_TYPE.STATE, NULL AS PASS_SCORE, NULL AS TOTAL_SCORE, NULL AS PAPER_TYPE_ID, "// PAPER_TYPE_ID==null，有分类ID查询时只显示试卷
+				+ "		NULL AS MARK_TYPE, NULL AS SHOW_TYPE, NULL AS GEN_TYPE, PAPER_TYPE.READ_USER_IDS, PAPER_TYPE.UPDATE_TIME, 1 AS TYPE "
+				+ "		FROM EXM_PAPER_TYPE PAPER_TYPE "
+				+ "		WHERE PAPER_TYPE.READ_USER_IDS LIKE :READ_USER_IDS "// 查找当前用户有权限的分类
+				+ "		UNION ALL "// 试卷分类和无分类的试卷合并显示默认展示在第一层，用于增加用户体验
+				+ "		SELECT PAPER.ID, PAPER.NAME, PAPER.STATE, PAPER.PASS_SCORE, PAPER.TOTAL_SCORE, PAPER.PAPER_TYPE_ID, "
+				+ "		PAPER.MARK_TYPE, PAPER.SHOW_TYPE, PAPER.GEN_TYPE, PAPER.READ_USER_IDS, PAPER.UPDATE_TIME, 2 AS TYPE "
+				+ "		FROM EXM_PAPER PAPER "
+				+ "		WHERE PAPER.READ_USER_IDS LIKE :READ_USER_IDS2 AND PAPER.PAPER_TYPE_ID IS NULL"// 查找当前用户有权限并且无分类的试卷（READ_USER_IDS2 参数不能重复）
+				+ ") A";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("paperTypeId")), "PAPER.PAPER_TYPE_ID = :PAPER_TYPE_ID", pageIn.get("paperTypeId"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "PAPER.NAME LIKE :NAME", "%" + pageIn.get("name") + "%")
-				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "PAPER_TYPE.READ_USER_IDS LIKE :READ_USER_IDS", String.format("%%,%s,%%", pageIn.get("curUserId", Integer.class)))// 只看自己的
-				.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "PAPER.STATE IN (1,2)")
-				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && "0".equals(pageIn.get("state")), "PAPER.STATE IN (1,2)")
-				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "PAPER.STATE = :STATE", pageIn.get("state"))
-				.addOrder("PAPER.UPDATE_TIME", Order.DESC);
-		return getListpage(sqlUtil, pageIn);
+		sqlUtil.addFromParm(String.format("%%,%s,%%", pageIn.get("curUserId", Integer.class)))
+				.addFromParm(String.format("%%,%s,%%", pageIn.get("curUserId", Integer.class)))
+				.addWhere(ValidateUtil.isValid(pageIn.get("paperTypeId")), "A.PAPER_TYPE_ID = :PAPER_TYPE_ID", pageIn.get("paperTypeId"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "A.NAME LIKE :NAME", String.format("%%%s%%", pageIn.get("name")))
+				.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "A.STATE IN (1,2)")// 默认查询草稿和已发布
+				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && "0".equals(pageIn.get("state")), "A.STATE IN (1,2)")// 如果传入0，会导致查询到已删除的
+				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "A.STATE = :STATE", pageIn.get("state"))
+				.addOrder("A.UPDATE_TIME", Order.DESC);
+		PageOut pageOut = getListpage(sqlUtil, pageIn);
+		for (Map<String, Object> result : pageOut.getList()) {
+			result.remove("readUserIds");// 剔除非接口字段
+			result.remove("updateTime");
+		}
+		return pageOut;
 	}
 
+	public static void main(String[] args) {
+		String format = String.format("%%,%s,%%", new Integer(1));
+		System.err.println(format);
+	}
+	
 	@Override
 	public List<Paper> getList(Integer paperTypeId) {
 		String sql = "SELECT * FROM EXM_PAPER WHERE STATE != 0 AND PAPER_TYPE_ID = :PAPER_TYPE_ID";

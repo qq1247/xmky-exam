@@ -279,6 +279,7 @@ document.body.ondrop = function (event) {
   .drag-content {
     width: 100%;
     border: 1px solid #d8d8d8;
+    overflow: hidden;
     border-radius: 5px;
   }
   .drag-item {
@@ -294,7 +295,8 @@ document.body.ondrop = function (event) {
     font-size: 14px;
     text-align: left;
     line-height: 30px;
-    display: flex;
+    display: inline-flex;
+
     padding-left: 7px;
     .render-title {
       overflow: hidden;
