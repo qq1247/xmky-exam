@@ -60,7 +60,6 @@ export default {
 </script>
 
 <style lang="scss">
-// @import url('//at.alicdn.com/t/font_840312_u38xia6b7g.css');
 @import 'assets/style/iconfont.css';
 #app {
   -webkit-font-smoothing: antialiased;

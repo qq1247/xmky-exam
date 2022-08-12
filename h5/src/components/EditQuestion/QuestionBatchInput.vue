@@ -2,7 +2,7 @@
   <div class="batch-input-container">
     <div class="left">
       <div class="btn-box">
-        <el-button plain @click="btnHandler('back')" size="mini" >返回</el-button>
+        <el-button plain @click="preStep()" size="mini" >返回</el-button>
       </div>
 
       <mavon-editor
@@ -11,38 +11,21 @@
         :toolbars-flag="false"
         :short-cut="false"
         :subfield="false"
-        @change="msgChange"
+        @change="parseTxt"
       />
     </div>
     <div class="right">
       <!-- 操作按钮与提示 -->
       <div class="top-box">
         <div>
-          <span>{{`检查区【共${totalTopicCount}题，`}}</span>
-          <span class="success-color">正确：{{totalTopicCount - errTopicCount}}题，</span>
-          <span class="err-color">错误：{{errTopicCount}}题】</span>
+          <span>{{`检查区【共${total}题，`}}</span>
+          <span class="err-color">错误：{{errNum}}题】</span>
         </div>
 
         <div>
-          <el-button type="danger" size="mini" @click="btnHandler('location')" plain>定位错误</el-button>
-          <el-button type="primary" size="mini" @click="btnHandler('export')">导入</el-button>
+          <!-- <el-button type="danger" size="mini" @click="btnHandler('location')" plain>定位错误</el-button> -->
+          <el-button type="primary" size="mini" @click="txtImport('export')">导入</el-button>
         </div>
-        
-        <!-- <div class="tip">
-          <span>解析出{{ totalTopicCount }}题</span>
-          <span>其中有{{ errTopicCount }}题格式错误</span>
-        </div> -->
-        <!-- <div class="btn-box">
-          <div
-            v-for="handler in handlerButtons"
-            :key="`handler${handler.type}`"
-            class="handler-btn"
-            @click="otherHandler(handler.type)"
-          >
-            <i :class="handler.icon" />
-            {{ handler.name }}
-          </div>
-        </div> -->
       </div>
       <div class="content-center qestion-box">
         <QuestionList
@@ -82,388 +65,232 @@ export default {
         pageSize: 5, // 每页多少条
         questionList: [] // 列表数据
       },
-      totalTopicCount: 0, // 题目总数量
-      errTopicCount: 0, // 错误的题目数量
+      total: 0, // 题目总数量
+      errNum: 0, // 错误的题目数量
       parsingMsg: '', // 解析的题目
       msg: '', // markdrow输入的内容
       errTopicArr: [] // 接口上传题目报错后存储的错误
     }
   },
   methods: {
-    // 文本解析
-    textParsing() {
-      // 按换行符将文本分割为行列表
-      this.getMsgListByLineBreak()
-      // 通过/^\d[.。、]/获取到单道题目放在问题列表中
-      const questionLists = this.getQuestionList()
+    parseTxt(txt) {
+      // 拆分文本，每个文本为一道题
+      let questionTxtArr = this.splitTxt2QuestionTxt(txt)
 
-      this.parseQuestionList(questionLists)
-      this.list.questionList = this.topicArr
-    },
-
-    getMsgListByLineBreak() {
-      this.parsingMsg = this.msg.split(/\n/).reverse()
-    },
-
-    // 获取问题列表
-    getQuestionList() {
-      const questionList = []
-      let tempList = []
-      for (const str of this.parsingMsg) {
-        tempList.push(str)
-        if (/^\d[.。、]/.test(str)) {
-          questionList.push(tempList)
-          tempList = []
-        }
+      // 文本解析为试题可读字段
+      let questionList = []
+      for (let i in questionTxtArr) {
+        let question = this.parseQuestion(questionTxtArr[i], i)
+        questionList.push(question)
+        console.log(question)
       }
-      return questionList.reverse()
-    },
 
-    parseQuestionList(qusetionList) {
-      // 临时存储数据的列表
-      for (let i = 0; i < qusetionList.length; i++) {
-        this.addTopic(i)
-        this.parseQuestion(i, qusetionList[i])
-      }
+      this.list.questionList = questionList
     },
-
-    parseQuestion(index, singleQuestion) {
-      let tempArr = []
-      for (let qusetionStr of singleQuestion) {
-        tempArr.push(qusetionStr)
-        if (/^\[解析\]/.test(qusetionStr)) {
-          this.topicArr[index].analysis = tempArr.reverse().join()
-          tempArr = []
-        } else if (/^\[[^解析]/.test(qusetionStr)) {
-          this.topicArr[index].answer = tempArr.reverse().join()
-          tempArr = []
-        } else if (/^[a-zA-Z][.。、]/.test(qusetionStr)) {
-          // 选项
-          if (tempArr.length > 1) {
-            qusetionStr = tempArr.reverse().join('')
-          }
-          this.topicArr[index].options.push(qusetionStr)
-          this.topicArr[index].options.sort()
-          tempArr = []
-        } else if (/^\d[.。、]/.test(qusetionStr)) {
-          // 题干
-          this.topicArr[index].title = tempArr.reverse().join().slice(2)
-          this.parseSingleQuestion(this.topicArr[index])
-          tempArr = []
-        }
-      }
-    },
-
-    // 添加试题对象
-    addTopic(i) {
-      const topic = {
-        title: '', // 题干
-        options: [], // 选项
-        answers: '', // 答案
-        analysis: '', // 解析
-        score: 1, // 分数
-        answerScores: [],
-        ai: 2,
-        aiOptions: [],
-        state: 1,
-        difficulty: 3, // 难易程度 1.极易 2.简单 3.适中 4.困难 5.极难
-        questionTypeId: this.questionTypeId, // 试题分类ID
-        type: '', // 试题类型 1.单选 2.多选 3.填空 4.判断 5.问答
-        errs: [], // 错误
-        id: parseFloat(i) + 1 // 题目序号
-      }
-      this.topicArr.push(topic)
-    },
-
-    // 单个问题的解析
-    parseSingleQuestion(question) {
-      const tempScore = this.parseAnswer(question)
-      this.topicClassification(question)
-      this.parseScore(tempScore, question)
-      this.examPublicErr(question)
-      this.exemChoiceErrs(question)
-      this.examGapFillingErr(question)
-      this.questionCountErrAndTotal(question)
-    },
-
-    // 解析答案
-    parseAnswer(singleQuestion) {
-      const tempScore = []
-      if (singleQuestion.answer) {
-        const tempAnswer = singleQuestion.answer.replace(/\]/g, '').split('[').reverse()
-        tempAnswer.pop()
-        for (let ele of tempAnswer) {
-          ele = ele.trim()
-          if (/[极易|简单|适中|困难|极难]/.test(ele)) {
-            singleQuestion.difficulty =
-              ele === '极易'
-                ? 1
-                : ele === '简单'
-                  ? 2
-                  : ele === '困难'
-                    ? 4
-                    : ele === '极难'
-                      ? 5
-                      : 3
-          } else if (/^\d+分$/.test(ele)) {
-            tempScore.push(ele.replace('分', ''))
-          } else if (/^[对|错]$/.test(ele)) {
-            singleQuestion.answers = ele
-          } else if (/^答案无顺序$/.test(ele)) {
-            singleQuestion.ai = 1
-            singleQuestion.aiOptions.push(2)
-          } else if (/^答案有顺序$/.test(ele)) {
-            singleQuestion.ai = 1
-            if (singleQuestion.aiOptions.length === 0) {
-              singleQuestion.aiOptions = []
-            }
-          } else if (/^大小写不敏感$/.test(ele)) {
-            singleQuestion.ai = 1
-            singleQuestion.aiOptions.push(3)
-          } else if (/^大小写敏感$/.test(ele)) {
-            singleQuestion.ai = 1
-            if (singleQuestion.aiOptions.length === 0) {
-              singleQuestion.aiOptions = []
-            }
-          } else {
-            ele = ele.replace(/,/g, '')
-            singleQuestion.answers += `${ele}|`
+    // 拆分文本，每段为一道试题
+    splitTxt2QuestionTxt(txt) {
+      let singleQuestion = [] // 单题
+      let questionList = [] // 存放单题列表
+      for (let curRowTxt of txt.split(/\n/)) { // 文本按回车分割
+        if (/^\d[.。、]/.test(curRowTxt)) {// 如果已数字开头，后跟.。、号开头
+          if (singleQuestion.length > 0) {
+            questionList.push(singleQuestion)// 解析为一道题
+            singleQuestion = []
           }
         }
-        singleQuestion.answers = singleQuestion.answers.replace(/\|$/, '').split('|')
-        if (singleQuestion.answers.length === 1) {
-          singleQuestion.answers = singleQuestion.answers[0]
+
+        singleQuestion.push(curRowTxt)// 当前行文本存入单题
+      }
+      questionList.push(singleQuestion) // 最后一行处理
+
+      return questionList
+    },
+    parseQuestion(questionTxtArr) {
+      // 拆分字段并校验格式
+      let optionIndexArr = [], answerIndex = -1, analysisIndex = -1
+      for (let i in questionTxtArr) {
+        if (/^\[解析\]/.test(questionTxtArr[i])) { // 已[解析]开头
+          analysisIndex = parseInt(i)
+        } else if (/^\[(?!解析)/.test(questionTxtArr[i])) {// 已[号开头，并且不包含解析
+          answerIndex = parseInt(i)
+        } else if (/^[A-Za-z][.。、]?/.test(questionTxtArr[i])) {// 已abcdefg中的一个开头，后面跟.。、或没有
+            optionIndexArr.push(parseInt(i))
         }
       }
-      return tempScore
-    },
-
-    // 题型归类
-    topicClassification(singleQuestion) {
-      if (singleQuestion.title.indexOf('_____') > -1) {
-        if (singleQuestion.answers) {
-          singleQuestion.ai = 1
+      if (answerIndex === -1) {
+        return {title : questionTxtArr.join('<br/>'), errs : '缺少答案'}
+      }
+      if (optionIndexArr.length > 0) {// 如果存在（单多选）选项，并且选项在答案之后
+        for (let optionIndex of optionIndexArr) {
+          if (optionIndex >= answerIndex) {
+            return {title : questionTxtArr.join('<br/>'), errs : '选项 和 答案 顺序错误'}
+          }
         }
-        singleQuestion.type = 3
-      } else if (singleQuestion.answers === '对' || singleQuestion.answers === '错') {
-        singleQuestion.type = 4
-        singleQuestion.ai = 1
-      } else if (singleQuestion.options.length > 0) {
-        // 选择题
-        singleQuestion.ai = 1
-        if (singleQuestion.answers.length > 1) {
-          singleQuestion.type = 2
-          singleQuestion.answers = singleQuestion.answers.split('')
+      }
+      if (analysisIndex !== -1 && answerIndex > analysisIndex) {// 如果存在解析，并且答案在解析之后
+        return {title : questionTxtArr.join('<br/>'), errs : '答案 和 解析 顺序错误'}
+      }
+
+
+      let type = 5; // 试题类型
+      let title = questionTxtArr.slice(0, optionIndexArr.length > 0 ? optionIndexArr[0] : answerIndex).join("<br/>").replace(/^\d[.。、]?/, '') // 题干（换行转br标签）
+      if (optionIndexArr.length > 0) {// 如果有选项
+        type = /^\[[A-Ga-g]{2,}\]/.test(questionTxtArr[answerIndex]) ? 2 : 1 // 找到大于一个答案就是多选，否则单选（格式不对可能没有答案，后面处理）
+      } else if (/_{5,}/.test(title)) { // 如果题干有连续大于等于五个的下划线，类型为填空
+        type = 3
+      } else if (/^\[[对错是否√×]\]/.test(questionTxtArr[answerIndex])) {// 答案行包含对错是否√×，类型为判断
+        type = 4
+      }
+
+      let answerEndIndex = analysisIndex !== -1 ? analysisIndex : questionTxtArr.length // 有解析截取到解析，否则剩余内容都是
+      let answerGroup = questionTxtArr.slice(answerIndex, answerEndIndex).join('<br/>').match(/\[(.+?)\]/g) // 按中括号拆分出答案、分数、阅卷选项
+      let scoreArr = [], answerArr = [], markTypeArr = [], subjective = false
+      for (let answer of answerGroup) {
+        answer = answer.substring(1, answer.length - 1)
+        if (/^\d+分$/.test(answer)) {
+          scoreArr.push(parseInt(answer.replace('分', '')))
+        } else if (/^答案无顺序$/.test(answer)) {
+          markTypeArr.push(2)
+        } else if (/^大小写不敏感$/.test(answer)) {
+          markTypeArr.push(3)
+        }  else if (/^主观题$/.test(answer)) {
+          subjective = true
         } else {
-          singleQuestion.type = 1
+          answerArr.push(answer) // 剩下都归答案
         }
-      } else {
-        singleQuestion.type = 5
       }
-    },
 
-    // 检查填空题目错误
-    examGapFillingErr(singleQuestion) {
-      if (singleQuestion.type === 3) {
-        const kongCount = singleQuestion.title.match(/_____/g).length
-        let answerCount = 0
-        if (kongCount === 1 && Array.isArray(singleQuestion.answers)) {
-          singleQuestion.errs.push('答案多于填空数量')
-        } else if (kongCount > 1) {
-          // 填空数量大于1的时候，答案是列表就表示一个元素一个答案
-          // 否则就用空格将答案拆分成列表
-          if (!Array.isArray(singleQuestion.answers) && singleQuestion.answers) {
-            singleQuestion.answers = singleQuestion.answers.split(' ')
-          }
-          if (Array.isArray(singleQuestion.answers)) {
-            singleQuestion.answers.reverse()
-          }
-          answerCount = singleQuestion.answers.length
-          if (answerCount !== kongCount) {
-            singleQuestion.errs.push('填空数量和答案数量不一致')
+
+      let options = [], fillBlanksCount = 0
+      if (type === 1 || type === 2) {// 如果是单多选
+        if (type === 2 && scoreArr.length > 1) {// 如果是多选并且有第二个分数
+          if (scoreArr[0] <= scoreArr[1]) {
+            return {title : questionTxtArr.join('<br/>'), errs : '漏选分值不能大于总分'}
           }
         }
-      }
-    },
-    // 检查选择题是否有错误
-    exemChoiceErrs(singleQuestion) {
-      const optionRange = []
-      singleQuestion.options.forEach((item) => {
-        optionRange.push(item[0])
-      })
-      if (singleQuestion.type === 1) {
-        if (singleQuestion.options.length < 2) {
-          singleQuestion.errs.push('选项最少包含两项')
+        if (optionIndexArr.length < 2) {
+          return {title : questionTxtArr.join('<br/>'), errs : '最少2个选项'}
         }
-        if (!this.judgeSeries(singleQuestion.options)) {
-          singleQuestion.errs.push('选项不连续')
+        if (optionIndexArr.length > 7) {
+          return {title : questionTxtArr.join('<br/>'), errs : '最多7个选项'}
         }
-        if (!optionRange.includes(singleQuestion.answers)) {
-          singleQuestion.errs.push('答案与选项不匹配')
-        }
-      }
-      if (singleQuestion.type === 2) {
-        if (!this.judgeSeries(singleQuestion.options)) {
-          singleQuestion.errs.push('选项不连续')
-        }
-        // if (singleQuestion.options.length < 3) {
-        //   singleQuestion.errs.push('选项最少包含三项')
-        // }
-        if (
-          !singleQuestion.answers.every((item) => {
-            return optionRange.includes(item)
-          })
-        ) {
-          singleQuestion.errs.push('答案与选项不匹配')
-        }
-      }
-    },
-
-    examPublicErr(singleQuestion) {
-      if (!singleQuestion.answers) {
-        singleQuestion.errs.push('缺少答案')
-      }
-    },
-
-    // 分数解析
-    parseScore(scoreArr, singleQuestion) {
-      if (scoreArr.length >= 1) {
-        if (singleQuestion.type === 2) {
-          scoreArr.sort((a, b) => {
-            return b - a
-          })
-          if (singleQuestion.length === 2) {
-            singleQuestion.answerScores = parseFloat(scoreArr[1])
-            singleQuestion.score = parseFloat(scoreArr[0])
-          } else {
-            singleQuestion.score = parseFloat(singleQuestion.score[0])
-            singleQuestion.answerScores = parseFloat(scoreArr[0]) / 2
-          }
-        } else if (singleQuestion.type === 3) {
-          const count = singleQuestion.title.match(/_____/g).length
-          if (count === 1) {
-            singleQuestion.score = parseFloat(scoreArr[0])
-          } else {
-            singleQuestion.score = parseFloat(scoreArr[0])
-            singleQuestion.answerScores = new Array(count).fill(
-              parseFloat(scoreArr[0]) / count
-            )
-          }
-        } else {
-          singleQuestion.score = parseFloat(scoreArr[0])
-        }
-      } else {
-        if (singleQuestion.type === 3) {
-          const count = singleQuestion.title.match(/_____/g).length
-          if (count === 1) {
-            singleQuestion.score = 1
-            singleQuestion.answerScores = 1
-          } else {
-            singleQuestion.score = count
-            singleQuestion.answerScores = new Array(count).fill(1)
-          }
-        } else {
-          singleQuestion.score = 1
-        }
-      }
-    },
-
-    // 问题数量统计
-    questionCountErrAndTotal(singleQuestion) {
-      // 统计总题数量
-      this.totalTopicCount++
-      // 统计错误题数量
-      if (singleQuestion.errs.length > 0) {
-        this.errTopicCount++
-      }
-    },
-
-    initData() {
-      this.topicArr = []
-      this.totalTopicCount = 0
-      this.errTopicCount = 0
-    },
-
-    msgChange(value, render) {
-      this.msg = value
-      // 内容变化后重新添加
-      this.initData()
-      this.textParsing()
-    },
-
-    // 判断选择题选项是否是连续的
-    judgeSeries(data) {
-      let lcontinuity = 0 // 连贯的计数
-      for (let i = 1; i < data.length; i++) {
-        if (
-          data[i].slice(0, 1).toUpperCase().charCodeAt() -
-            data[i - 1].slice(0, 1).toUpperCase().charCodeAt() ===
-            1 ||
-          data[i].slice(0, 1).toUpperCase().charCodeAt() -
-            data[i - 1].slice(0, 1).toUpperCase().charCodeAt() ===
-            -1
-        ) {
-          lcontinuity += 1
-        }
-      }
-      if (lcontinuity > data.length - 2) {
-        return true
-      } else {
-        return false
-      }
-    },
-
-    // 点击按钮触发的事件
-    btnHandler(type) {
-      if (type === 'back') {
-        if (this.isBack) {
-          this.$router.back()
-        } else {
-          this.$parent.activeIndex = 0
-        }
-      } else if (type === 'export') {
-        // if (this.isBack) {
+        for (let i = 0; i < optionIndexArr.length - 1; i++) {
+          let optionContent = questionTxtArr.slice(optionIndexArr[i], optionIndexArr[i + 1]).join("<br/>") // 回车行转br标签
+          let optionIndex = optionContent.substring(0, 1).toUpperCase().charCodeAt() - 65 
+          optionContent = optionContent.replace(/^[A-Za-z][.。、]?/, '')
+          options.push(optionContent)
           
-          if (this.errTopicCount === 0) {
-            this.uploadTopics()
-            this.$message.success('导入成功')
-            if (this.errTopicArr.length > 0) {
-              this.$emit('showTemplate', true)
-            } else {
-              this.$emit('showTemplate', false)
-            }
-            if (!this.isBack) {
-              this.$parent.createdType = 0
-            }
-            // this.$emit("showTemplate", false)
-          } else {
-            this.$message.warning('请先解决完错误')
+          if (i !== optionIndex) {
+            return {title : questionTxtArr.join('<br/>'), errs : '选项顺序错误'}
           }
-        // } 
-        // else {
-        //   this.$parent.createdType = 0
-        // }
+        }
+        let optionContent = questionTxtArr.slice(optionIndexArr[optionIndexArr.length - 1], answerIndex).join("<br/>") // 最后一个选项从当前行到答案行之间的都是
+        let optionIndex = optionContent.substring(0, 1).toUpperCase().charCodeAt() - 65
+        optionContent = optionContent.replace(/^[A-Za-z][.。、]?/, '')
+        options.push(optionContent)
+        if (optionIndexArr.length - 1 !== optionIndex) {
+          return {title : questionTxtArr.join('<br/>'), errs : '选项顺序错误'}
+        }
+
+        if (!/^\[[A-Ga-g]+\]/.test(questionTxtArr[answerIndex])) {// 如果答案不是abcdefg中的一个或多个
+          return {title : questionTxtArr.join('<br/>'), errs : '答案超出范围'}
+        }
+      } else if (type === 3) {
+        fillBlanksCount = title.match(/_{5,}/g).length
+        if (answerArr.length === 1) {// 一个中括号内空格分开的词，对应题干的空。
+          let answerCount = answerArr[0].split(/ +/).length//  + 1-n个空格
+          if (fillBlanksCount !== answerCount) {
+            return {title : questionTxtArr.join('<br/>'), errs : '填空数量和答案数量不相等'}
+          }
+        } else if (fillBlanksCount !== answerArr.length){// 如果填空有多个备选答案，一个中括号表示一个填空，一个填空内空格分开的词，表示该空的备选答案
+          return {title : questionTxtArr.join('<br/>'), errs : '填空数量和答案数量不相等'}
+        }
+      } 
+
+
+      // 拼装试题
+      let analysis = analysisIndex === -1 ? '' : questionTxtArr.slice(analysisIndex, questionTxtArr.length - 1).join("<br/>").replace(/^\[解析]/, '')
+      let markType = (type === 5 || (type === 3 && subjective)) ? 2 : 1  // 如果是问答题或（填空带主观题）设置为主观题，剩下是客观题
+      let score = 1, answerScores = []
+      if (type === 1) {// 单选
+        score = scoreArr.length > 0 ? scoreArr[0] : 1 // 如果有则使用，没有默认为1分
+        answerArr.length = 1 // 去除多余答案
+      } else if (type === 4) {
+        score = scoreArr.length > 0 ? scoreArr[0] : 1 // 如果有则使用，没有默认为1分
+        answerArr.length = 1 // 去除多余答案
+        answerArr[0] = answerArr[0].replace(/^[是√]/, '对').replace(/[否×]/, '错') 
+      } else if (type === 5) {// 问答
+        score = scoreArr.length > 0 ? scoreArr[0] : 1 // 如果有则使用，没有默认为1分
+        answerArr.length = 1 // 去除多余答案
+        answerArr[0] = answerArr[0].replace(/<br\/>/g, '\n')
+      } else if (type === 2) {// 多选
+        score = scoreArr.length > 0 ? scoreArr[0] : 1
+        answerScores.push(scoreArr.length > 1 ? scoreArr[1] : score / 2) // 如果有第二个分数则使用，没有默认为总分一半
+        if (answerArr.length > 2) {
+          answerArr.length = 2
+        }
+        answerArr = answerArr[0].split("") // 答案拆分，满足接口
+      } else if (type === 3) {// 填空
+        score = 0;
+        for (let i = 0; i < fillBlanksCount; i++) {
+          answerScores.push(scoreArr[i] ? scoreArr[i] : 1)
+          score += answerScores[i]
+        }
+        if (fillBlanksCount > 1 && answerArr.length === 1) {
+          answerArr = answerArr[0].split(/ +/) // 如果多个空一个答案则进行拆分，满足接口需求
+        }
+        if (markType === 2) {
+          markTypeArr = [] // 主观题没有阅卷选项
+          answerScores = [] // 主观题没有子分数
+        }
+      }
+
+      let question = {
+        type, 
+        title,
+        options,
+        answers : type === 5 ? answerArr[0] : answerArr,
+        score,
+        answerScores,
+        analysis,
+        markType,
+        markTypeOptions: markTypeArr,
+        state: 1,
+        questionTypeId: this.questionTypeId,
+        errs: [],
+      }
+
+      return question
+    },
+    preStep() {
+      if (this.isBack) {
+        this.$router.back()
       } else {
-        // 定位错误
-        let errTitles = this.list.questionList.filter(item => {
-          return item.errs.length >= 1
-        })
-        let scrollContainer = document.getElementsByClassName('qestion-box')[1]
-        let eleOffSetTop = document.getElementById(`p-${errTitles[0].id}`).offsetTop - 130
-        scrollContainer.scrollTop = eleOffSetTop
+        this.$parent.activeIndex = 0
       }
     },
+    async txtImport() {
+      if (this.errNum > 0) {
+        this.$message.warning('错误格式' + this.errNum + '处，请处理')
+        return
+      }
 
-    // 上传题目
-    async uploadTopics() {
-      for (const upTopic of this.topicArr) {
-        upTopic.options.forEach((item, index, arr) => {
-          arr[index] = item.slice(2)
+      for (let question of this.list.questionList) {
+        await questionAdd(question).catch((err) => {
+          console.error(err)
         })
-        await questionAdd(upTopic).catch((err) => {
-          console.log(err)
-          this.errTopicArr.push(upTopic)
-        })
+      }
+    }
+  }, 
+  watch: {
+    'list.questionList': {
+      handler() {
+        this.errNum = 0, this.total = this.list.questionList.length
+        for (let question of this.list.questionList) {
+          if (question.errs.length > 0) {
+            this.errNum++
+          }
+        }
       }
     }
   }
