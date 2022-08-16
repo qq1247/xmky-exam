@@ -335,7 +335,7 @@
   }
   .ask-content {
     padding: 0;
-    border: 1px solid rgba(0, 0, 0, 0.15);
+    // border: 1px solid rgba(0, 0, 0, 0.15);
     border-radius: 4px;
     margin: 16px;
     &:last-child {
@@ -343,8 +343,8 @@
     }
     .question-title {
       padding: 16px;
-      background-color: #fafcff;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+      //background-color: #fafcff;
+      // border-bottom: 1px solid rgba(0, 0, 0, 0.15);
       border-radius: 8px 8px 0 0;
     }
   }

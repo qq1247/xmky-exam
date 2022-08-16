@@ -206,7 +206,7 @@
                   <template v-if="question.type === 5">
                     <el-col :span="2.5"> 【答案】： </el-col>
                     <el-col :span="21">
-                      <template v-if="question.ai === 1">
+                      <template v-if="question.markType === 1">
                         <div
                           v-for="(answer, indexAnswer) in question.answers"
                           :key="answer.id"
@@ -224,7 +224,7 @@
                       </template>
                       <div
                         v-if="
-                          question.ai === 2 &&
+                          question.markType === 2 &&
                             question.answers &&
                             question.answers.length > 0
                         "
@@ -245,9 +245,6 @@
                 <div class="children-tags">
                   <el-tag effect="dark" size="mini" type="warning">
                     {{ question.type | typeName }}
-                  </el-tag>
-                  <el-tag effect="plain" size="mini" type="danger">
-                    {{ question.difficulty | difficultyName }}
                   </el-tag>
                   <el-tag
                     effect="plain"
@@ -324,7 +321,7 @@
           />
         </el-form-item>
 
-        <template v-if="settingForm.ai === 1">
+        <template v-if="settingForm.markType === 1">
           <template v-if="settingForm.type === 3 || settingForm.type === 5">
             <el-form-item
               v-for="(answer, indexAnswer) in settingForm.answers"
@@ -335,31 +332,31 @@
                   : `关键词${$tools.intToChinese(indexAnswer + 1)}`
               "
               :prop="`answers.${indexAnswer}.score`"
-              :rules="settingForm.rules.aiScore"
-              :show-message="settingForm.ai === 1 ? true : false"
+              :rules="settingForm.rules.markTypeScore"
+              :show-message="settingForm.markType === 1 ? true : false"
             >
-              <el-input v-if="settingForm.ai === 1" v-model="answer.score">
+              <el-input v-if="settingForm.markType === 1" v-model="answer.score">
                 <template slot="append">分</template>
               </el-input>
             </el-form-item>
           </template>
         </template>
 
-        <template v-if="settingForm.ai === 1">
+        <template v-if="settingForm.markType === 1">
           <div v-if="settingForm.type === 2" class="setting-checkbox">
             漏选得<el-input
-              v-if="settingForm.ai === 1"
+              v-if="settingForm.markType === 1"
               v-model="settingForm.multipScore"
             />分
             <!-- <el-form-item
               prop="multipScore"
               class="ai-score"
-              :show-message="settingForm.ai === 1 ? true : false"
+              :show-message="settingForm.markType === 1 ? true : false"
             >
             </el-form-item> -->
           </div>
           <el-form-item v-if="settingForm.type === 3">
-            <el-checkbox-group v-model="settingForm.aiOptions">
+            <el-checkbox-group v-model="settingForm.markOptions">
               <el-tooltip
                 class="item"
                 content="默认答案有顺序"
@@ -379,7 +376,7 @@
             </el-checkbox-group>
           </el-form-item>
           <el-form-item v-if="settingForm.type === 5">
-            <el-checkbox-group v-model="settingForm.aiOptions">
+            <el-checkbox-group v-model="settingForm.markOptions">
               <el-tooltip
                 class="item"
                 content="大小写不敏感"
@@ -422,7 +419,7 @@
           />
         </el-form-item>
         <el-form-item label="选项设置">
-          <el-checkbox-group v-model="batchForm.aiOptions">
+          <el-checkbox-group v-model="batchForm.markOptions">
             <el-tooltip
               class="item"
               content="默认题目分数的一半"
@@ -450,7 +447,7 @@
           </el-checkbox-group>
         </el-form-item>
         <el-form-item
-          v-if="batchForm.aiOptions.includes(1)"
+          v-if="batchForm.markOptions.includes(1)"
           label="漏选得分"
           prop="multipScore"
         >
@@ -497,11 +494,6 @@ export default {
         (item) => Number(item.dictKey) === data
       ).dictValue
     },
-    difficultyName(data) {
-      return getOneDict('QUESTION_DIFFICULTY').find(
-        (item) => Number(item.dictKey) === data
-      ).dictValue
-    }
   },
   props: {
     paperState: {
@@ -511,7 +503,7 @@ export default {
   },
   data() {
     const validateAiScore = (rule, value, callback) => {
-      if (this.settingForm.ai === 2) {
+      if (this.settingForm.markType === 2) {
         return callback()
       }
       if (value === '') {
@@ -525,8 +517,8 @@ export default {
 
     const validateMultipScore = (rule, value, callback) => {
       if (
-        this.settingForm.ai === 2 ||
-        this.settingForm.aiOptions.length === 0
+        this.settingForm.markType === 2 ||
+        this.settingForm.markOptions.length === 0
       ) {
         this.settingForm.multipScore = ''
         return callback()
@@ -561,11 +553,11 @@ export default {
         type: 1,
         score: 1,
         answers: [],
-        aiOptions: [],
+        markOptions: [],
         multipScore: '',
         rules: {
           score: [{ required: true, message: '请输入分值', trigger: 'change' }],
-          aiScore: [{ validator: validateAiScore }],
+          markTypeScore: [{ validator: validateAiScore }],
           multipScore: [{ validator: validateMultipScore }]
         }
       },
@@ -573,7 +565,7 @@ export default {
         show: false,
         id: null,
         score: '',
-        aiOptions: [],
+        markOptions: [],
         multipScore: '',
         rules: {
           score: [
@@ -704,12 +696,12 @@ export default {
     setting(data) {
       this.settingForm.questionId = data.id
       this.settingForm.type = data.type
-      this.settingForm.ai = data.ai
+      this.settingForm.markType = data.markType
       this.settingForm.score = data.score
-      this.settingForm.aiOptions = data.aiOptions ? data.aiOptions : []
+      this.settingForm.markOptions = data.markOptions ? data.markOptions : []
       this.settingForm.answers = data.answers
       this.settingForm.multipScore =
-        data.type === 2 && data.ai === 1 && data.aiOptions
+        data.type === 2 && data.markType === 1 && data.markOptions
           ? data.answers[0].score
           : ''
       this.settingForm.show = true
@@ -717,7 +709,7 @@ export default {
     // 设置分数
     setScore() {
       let paperQuestionAnswerScore = []
-      if (this.settingForm.ai === 1) {
+      if (this.settingForm.markType === 1) {
         if (this.settingForm.type === 2) {
           paperQuestionAnswerScore = this.settingForm.answers.reduce((acc) => {
             acc.push(this.settingForm.multipScore)
@@ -745,7 +737,7 @@ export default {
           score: this.settingForm.score,
           subScores:
             this.settingForm.type === 2
-              ? this.settingForm.aiOptions.length === 0
+              ? this.settingForm.markOptions.length === 0
                 ? []
                 : paperQuestionAnswerScore
               : paperQuestionAnswerScore
@@ -753,9 +745,9 @@ export default {
 
         if (
           [2, 3, 5].includes(this.settingForm.type) &&
-          this.settingForm.ai === 1
+          this.settingForm.markType === 1
         ) {
-          params = { ...params, aiOptions: this.settingForm.aiOptions }
+          params = { ...params, markOptions: this.settingForm.markOptions }
         }
 
         const updateScore = await paperScoreUpdate(params)
@@ -772,10 +764,10 @@ export default {
       const res = await paperUpdateBatchScore({
         chapterId: this.batchForm.id,
         score: this.batchForm.score,
-        subScores: this.batchForm.aiOptions.includes(1)
+        subScores: this.batchForm.markOptions.includes(1)
           ? this.batchForm.multipScore
           : null,
-        aiOptions: this.batchForm.aiOptions
+        markOptions: this.batchForm.markOptions
       })
       if (res?.code === 200) {
         this.$message.success('编辑成功！')

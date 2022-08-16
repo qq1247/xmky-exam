@@ -8,12 +8,6 @@
     </el-card>
     <el-card class="box-card" shadow="never">
       <div slot="header">
-        <span>试题难度</span>
-      </div>
-      <div id="questionDifficulty" />
-    </el-card>
-    <el-card class="box-card" shadow="never">
-      <div slot="header">
         <span>试题类型</span>
       </div>
       <div id="questionType" />
@@ -30,16 +24,12 @@ export default {
   data() {
     return {
       statisInfo: {},
-      aiNames: [],
-      difficultyNames: [],
+      markTypeNames: [],
       typeNames: []
     }
   },
   async mounted() {
-    this.aiNames = getOneDict('PAPER_MARK_TYPE').map((item) => item.dictValue)
-    this.difficultyNames = getOneDict('QUESTION_DIFFICULTY').map(
-      (item) => item.dictValue
-    )
+    this.markTypeNames = getOneDict('PAPER_MARK_TYPE').map((item) => item.dictValue)
     this.typeNames = getOneDict('QUESTION_TYPE').map((item) => item.dictValue)
     this.id = this.$route.params.id
     if (this.id) {
@@ -98,17 +88,13 @@ export default {
     },
     // 渲染饼图
     renderChart() {
-      this.statisInfo.aiList.map((ai) => {
-        ai.name = this.aiNames[ai.name - 1]
-      })
-      this.statisInfo.difficultyList.map((difficulty) => {
-        difficulty.name = this.difficultyNames[difficulty.name - 1]
+      this.statisInfo.markTypeList.map((ai) => {
+        markType.name = this.markTypeNames[ai.name - 1]
       })
       this.statisInfo.typeList.map((type) => {
         type.name = this.typeNames[type.name - 1]
       })
-      this.chartDom('questionAi', this.statisInfo.aiList)
-      this.chartDom('questionDifficulty', this.statisInfo.difficultyList)
+      this.chartDom('questionAi', this.statisInfo.markTypeList)
       this.chartDom('questionType', this.statisInfo.typeList)
     }
   }
@@ -148,7 +134,6 @@ export default {
 }
 
 #questionAi,
-#questionDifficulty,
 #questionType {
   width: 400px;
   height: 400px;

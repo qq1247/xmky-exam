@@ -7,21 +7,6 @@
     :model="editForm"
     :rules="editForm.rules"
   >
-    <el-form-item label="难度" prop="difficulty">
-      <el-select
-        v-model="editForm.difficulty"
-        clearable
-        placeholder="请选择难度"
-      >
-        <el-option
-          v-for="dict in editForm.difficultyList"
-          :key="parseInt(dict.dictKey)"
-          :label="dict.dictValue"
-          :value="parseInt(dict.dictKey)"
-        />
-      </el-select>
-    </el-form-item>
-
     <el-form-item label="题干" prop="title">
       <TinymceEditor
         id="title"
@@ -72,13 +57,13 @@
       </el-form-item>
     </div>
 
-    <!-- AI，答案选项 -->
+    <!-- markType，答案选项 -->
     <el-row>
       <el-col :span="2.5">
         <div v-if="[3, 5].includes(editForm.type)">
           <el-form-item label="智能阅卷" prop="ai">
             <el-switch
-              v-model="editForm.ai"
+              v-model="editForm.markType"
               active-color="#0094e5"
               :active-value="1"
               inactive-color="#ff4949"
@@ -88,9 +73,9 @@
         </div>
       </el-col>
       <el-col :span="18">
-        <div v-if="editForm.ai === 1 && editForm.type === 3">
-          <el-form-item prop="aiOptions">
-            <el-checkbox-group v-model="editForm.aiOptions">
+        <div v-if="editForm.markType === 1 && editForm.type === 3">
+          <el-form-item prop="markOptions">
+            <el-checkbox-group v-model="editForm.markOptions">
               <el-tooltip
                 class="item"
                 content="默认答案有顺序"
@@ -110,9 +95,9 @@
             </el-checkbox-group>
           </el-form-item>
         </div>
-        <div v-if="editForm.ai === 1 && editForm.type === 5">
-          <el-form-item prop="aiOptions">
-            <el-checkbox-group v-model="editForm.aiOptions">
+        <div v-if="editForm.markType === 1 && editForm.type === 5">
+          <el-form-item prop="markOptions">
+            <el-checkbox-group v-model="editForm.markOptions">
               <el-tooltip
                 class="item"
                 content="大小写不敏感"
@@ -228,10 +213,10 @@
           <el-col :span="8">
             <el-form-item
               :prop="`answers.${index}.score`"
-              :rules="editForm.rules.aiScore"
-              :show-message="editForm.ai === 1 ? true : false"
+              :rules="editForm.rules.markTypeScore"
+              :show-message="editForm.markType === 1 ? true : false"
             >
-              <el-input v-if="editForm.ai === 1" v-model="answer.score">
+              <el-input v-if="editForm.markType === 1" v-model="answer.score">
                 <div slot="append">分</div>
               </el-input>
             </el-form-item>
@@ -256,7 +241,7 @@
     </el-form-item>
 
     <el-form-item
-      v-if="editForm.type === 5 && editForm.ai === 1"
+      v-if="editForm.type === 5 && editForm.markType === 1"
       key="answerAskAI"
       label="答案"
     >
@@ -295,10 +280,10 @@
           <el-col :span="8">
             <el-form-item
               :prop="`answers.${index}.score`"
-              :rules="editForm.rules.aiScore"
-              :show-message="editForm.ai === 1 ? true : false"
+              :rules="editForm.rules.markTypeScore"
+              :show-message="editForm.markType === 1 ? true : false"
             >
-              <el-input v-if="editForm.ai === 1" v-model="answer.score">
+              <el-input v-if="editForm.markType === 1" v-model="answer.score">
                 <div slot="append">分</div>
               </el-input>
             </el-form-item>
@@ -327,13 +312,13 @@
     </el-form-item>
 
     <el-form-item
-      v-if="editForm.type === 5 && editForm.ai === 2"
+      v-if="editForm.type === 5 && editForm.markType === 2"
       key="answerAsk"
       label="答案"
       prop="answer"
     >
       <TinymceEditor
-        v-if="editForm.ai === 2"
+        v-if="editForm.markType === 2"
         id="answer"
         :value="editForm.answer"
         @editorListener="editorListener"
@@ -393,7 +378,7 @@ export default {
   },
   data() {
     const validateAiScore = (rule, value, callback) => {
-      if (this.editForm.ai === 2) {
+      if (this.editForm.markType === 2) {
         return callback()
       }
       if (value === '') {
@@ -405,11 +390,11 @@ export default {
         0
       )
 
-      if (this.editForm.ai === 1 && this.editForm.score < allScore) {
+      if (this.editForm.markType === 1 && this.editForm.score < allScore) {
         return callback(new Error(`答案总分值大于${this.editForm.score}`))
       }
 
-      if (this.editForm.ai === 1 && this.editForm.score > allScore) {
+      if (this.editForm.markType === 1 && this.editForm.score > allScore) {
         return callback(new Error(`答案总分值小于${this.editForm.score}`))
       }
 
@@ -433,10 +418,8 @@ export default {
         // 修改表单
         id: null, // 主键
         type: 1, // 类型
-        difficulty: 1, // 难度
-        difficultyList: [],
         title: '', // 标题
-        ai: 1, // AI阅卷
+        markType: 1, // 智能阅卷
         state: 1,
         options: [
           {
@@ -486,7 +469,7 @@ export default {
         analysis: '', // 解析
         score: 1, // 分值
         multipScore: 0.5,
-        aiOptions: [],
+        markOptions: [],
         rules: {
           title: [{ required: true, message: '请输入题干', trigger: 'blur' }],
           option: [
@@ -511,7 +494,7 @@ export default {
               trigger: 'blur'
             }
           ],
-          aiScore: [{ validator: validateAiScore }],
+          markTypeScore: [{ validator: validateAiScore }],
           multipScore: [
             { required: true, trigger: 'blur', validator: validateMultipScore }
           ]
@@ -556,7 +539,6 @@ export default {
     }
   },
   created() {
-    this.editForm.difficultyList = getOneDict('QUESTION_DIFFICULTY')
   },
   methods: {
     // 编辑器监听事件
@@ -635,12 +617,11 @@ export default {
 
       this.editForm.id = res.data.id
       this.editForm.type = res.data.type
-      this.editForm.difficulty = res.data.difficulty
       this.editForm.title = res.data.title
       this.editForm.answer = res.data.answers[0].answer[0]
       this.editForm.analysis = res.data.analysis
       this.editForm.score = res.data.score
-      this.editForm.ai = res.data.ai
+      this.editForm.markType = res.data.markType
       this.editForm.state = res.data.state
 
       if (this.editForm.type === 1) {
@@ -659,7 +640,7 @@ export default {
         for (let i = 0; i < res.data.options.length; i++) {
           this.addOption(i, res.data.options[i])
         }
-        this.editForm.aiOptions = res.data.aiOptions
+        this.editForm.markOptions = res.data.markOptions
         this.editForm.answerMultip = res.data.answers.reduce((acc, cur) => {
           acc.push(...cur.answer)
           return acc
@@ -667,13 +648,13 @@ export default {
         this.editForm.multipScore = res.data.answers[0].score
       }
 
-      if (this.editForm.type === 5 && this.editForm.ai === 2) {
+      if (this.editForm.type === 5 && this.editForm.markType === 2) {
         this.editForm.answers = [] // 重置答案列表
       }
 
       if (
         this.editForm.type === 3 ||
-        (this.editForm.type === 5 && this.editForm.ai === 1)
+        (this.editForm.type === 5 && this.editForm.markType === 1)
       ) {
         this.$nextTick(() => {
           const answers = res.data.answers
@@ -681,11 +662,11 @@ export default {
           for (let i = 0; i < answers.length; i++) {
             this.addFillBlanks(i, answers[i])
           }
-          this.editForm.aiOptions = res.data.aiOptions
+          this.editForm.markOptions = res.data.markOptions
         })
       }
 
-      if (res.data.ai === 1 && res.data.type === 5) {
+      if (res.data.markType === 1 && res.data.type === 5) {
         this.editForm.answer = ''
       }
     },
@@ -693,11 +674,10 @@ export default {
     compositionParam(status) {
       const params = {
         type: this.editForm.type,
-        difficulty: this.editForm.difficulty,
         title: this.editForm.title,
         analysis: this.editForm.analysis,
         score: this.editForm.score,
-        ai: this.editForm.ai,
+        markType: this.editForm.markType,
         state: this.editForm.state
       }
 
@@ -716,18 +696,18 @@ export default {
 
       // 分值选项（多选【漏选得分】）
       if (params.type === 2) {
-        params.aiOptions = [1]
+        params.markOptions = [1]
       }
 
       // 分值选项 ( 填空【漏答得分、大小写不敏感】  问答【大小写不敏感】)
-      if ([3, 5].includes(params.type) && params.ai === 1) {
-        params.aiOptions = this.editForm.aiOptions.reduce((acc, cur) => {
+      if ([3, 5].includes(params.type) && params.markType === 1) {
+        params.markOptions = this.editForm.markOptions.reduce((acc, cur) => {
           acc.push(cur)
           return acc
         }, [])
       }
 
-      // 答案（单选、判断、问答【非智能 ai=2】）
+      // 答案（单选、判断、问答【非智能 markType=2】）
       if ([1, 4, 5].includes(params.type)) {
         params.answers = this.editForm.answer
       }
@@ -737,8 +717,8 @@ export default {
         params.answers = this.editForm.answerMultip
       }
 
-      // 答案（填空、问答【智能 ai=1】）
-      if (params.type === 3 || (params.ai === 1 && params.type === 5)) {
+      // 答案（填空、问答【智能 markType=1】）
+      if (params.type === 3 || (params.markType === 1 && params.type === 5)) {
         params.answers = this.editForm.answers.reduce((acc, cur) => {
           acc.push(cur.value.join('\n'))
           return acc
@@ -751,9 +731,9 @@ export default {
       }
 
       // 分值选项对应的分值（填空、问答）
-      if ([3, 5].includes(params.type) && params.ai === 1) {
+      if ([3, 5].includes(params.type) && params.markType === 1) {
         params.answerScores = this.editForm.answers.reduce((acc, cur) => {
-          acc.push(params.ai === 1 ? cur.score : params.score)
+          acc.push(params.markType === 1 ? cur.score : params.score)
           return acc
         }, [])
       }

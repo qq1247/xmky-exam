@@ -90,42 +90,21 @@
                   </el-select>
                 </el-form-item>
               </el-col>
-              <el-col :span="4" :offset="1">
-                <el-form-item
-                  :prop="`rule.${ruleIndex}.difficulty`"
-                  :rules="rules.difficulty"
-                >
-                  <el-select
-                    v-model="rule.difficulty"
-                    multiple
-                    clearable
-                    collapse-tags
-                    placeholder="难度"
-                  >
-                    <el-option
-                      v-for="dict in difficultyDictList"
-                      :key="parseInt(dict.dictKey)"
-                      :label="dict.dictValue"
-                      :value="parseInt(dict.dictKey)"
-                    />
-                  </el-select>
-                </el-form-item>
-              </el-col>
               <el-col
                 v-if="markType === 1 && [3, 5].includes(rule.type)"
                 :span="4"
                 :offset="1"
               >
-                <el-form-item :prop="`rule.${ruleIndex}.ai`" :rules="rules.ai">
+                <el-form-item :prop="`rule.${ruleIndex}.markType`" :rules="rules.markType">
                   <el-select
-                    v-model="rule.ai"
+                    v-model="rule.markType"
                     multiple
                     clearable
                     collapse-tags
                     placeholder="是否智能"
                   >
                     <el-option
-                      v-for="dict in aiList"
+                      v-for="dict in markTypeList"
                       :key="parseInt(dict.dictKey)"
                       :label="dict.dictValue"
                       :value="parseInt(dict.dictKey)"
@@ -157,11 +136,11 @@
               </el-col>
             </el-row>
             <el-form-item
-              v-if="rule.ai.includes(1) && [3, 5].includes(rule.type)"
+              v-if="rule.markType.includes(1) && [3, 5].includes(rule.type)"
               label="分数选项："
               label-width="85px"
             >
-              <el-checkbox-group v-model="rule.aiOptions">
+              <el-checkbox-group v-model="rule.markOptions">
                 <el-tooltip
                   v-if="rule.type === 3"
                   class="item"
@@ -237,7 +216,7 @@ export default {
       markType: 1,
       paperName: '',
       total: 1,
-      aiList: [
+      markTypeList: [
         {
           dictValue: '智能',
           no: 1,
@@ -251,7 +230,6 @@ export default {
       ],
       typeDictList: [],
       questionTypes: [],
-      difficultyDictList: [],
       chapterForm: {
         id: 0,
         name: '章节名称',
@@ -268,15 +246,7 @@ export default {
           { required: true, message: '请选择试题分类', trigger: 'change' }
         ],
         type: [{ required: true, message: '请选择类型', trigger: 'change' }],
-        difficulty: [
-          {
-            required: true,
-            message: '请选择类型',
-            trigger: 'change',
-            type: 'array'
-          }
-        ],
-        ai: [
+        markType: [
           {
             required: true,
             message: '请选择是否智能',
@@ -316,7 +286,6 @@ export default {
   methods: {
     async init() {
       this.typeDictList = getOneDict('QUESTION_TYPE')
-      this.difficultyDictList = getOneDict('QUESTION_DIFFICULTY')
       await this.query()
     },
     // 查询组卷规则
@@ -375,9 +344,8 @@ export default {
         questionTypeId: null,
         questionTypeName: '',
         type: 1,
-        difficulty: [],
-        ai: [],
-        aiOptions: [],
+        markType: [],
+        markOptions: [],
         totalNumber: '',
         score: ''
       })
@@ -400,14 +368,13 @@ export default {
           (acc, cur) => {
             /* ;[3, 5].includes(cur.type)
               ? this.markType === 1
-                ? acc.ais.push('1')
-                : acc.ais.push(cur.ai.join(','))
-              : acc.ais.push('1') */
-            acc.ais.push('1')
+                ? acc.markTypes.push('1')
+                : acc.markTypes.push(cur.markType.join(','))
+              : acc.markTypes.push('1') */
+            acc.markTypes.push('1')
             ;[3, 5].includes(cur.type)
-              ? acc.aiOptions.push(cur.aiOptions.join(','))
-              : acc.aiOptions.push(cur.type === 2 ? '1' : '')
-            acc.difficultys.push(cur.difficulty.join(','))
+              ? acc.markOptions.push(cur.markOptions.join(','))
+              : acc.markOptions.push(cur.type === 2 ? '1' : '')
             acc.nums.push(cur.totalNumber)
             acc.types.push(cur.type)
             acc.scores.push(cur.score)
@@ -416,12 +383,11 @@ export default {
             return acc
           },
           {
-            ais: [],
+            markTypes: [],
             nums: [],
             types: [],
             scores: [],
-            difficultys: [],
-            aiOptions: [],
+            markOptions: [],
             questionTypeIds: []
           }
         )

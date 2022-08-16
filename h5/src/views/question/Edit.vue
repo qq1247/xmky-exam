@@ -31,20 +31,6 @@
           </el-form-item>
           <el-form-item label>
             <el-select
-              v-model="queryForm.difficulty"
-              clearable
-              placeholder="请选择难度"
-            >
-              <el-option
-                v-for="dict in queryForm.difficultyList"
-                :key="parseInt(dict.dictKey)"
-                :label="dict.dictValue"
-                :value="parseInt(dict.dictKey)"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item label>
-            <el-select
               v-model="queryForm.state"
               clearable
               placeholder="请选择状态"
@@ -175,11 +161,9 @@ export default {
         edit: false, // 编辑权限
         title: '', // 标题
         type: null, // 类型
-        difficulty: null, // 难度
         state: '', // 状态
         score: '', // 得分等于
         questionTypeName: '', // 试题分类name
-        difficultyList: [], // 难度列表
         stateList: [
           {
             key: '0',
@@ -201,7 +185,6 @@ export default {
   created() {
     this.questionTypeId = Number(this.$route.params.id)
     this.queryForm.typeList = getOneDict('QUESTION_TYPE')
-    this.queryForm.difficultyList = getOneDict('QUESTION_DIFFICULTY')
     this.search()
   },
   methods: {
@@ -215,7 +198,6 @@ export default {
         state: this.queryForm.state,
         title: this.queryForm.title,
         score: this.queryForm.score,
-        difficulty: this.queryForm.difficulty,
         questionTypeId: this.questionTypeId,
         questionTypeName: this.queryForm.questionTypeName,
         curPage: this.list.curPage,

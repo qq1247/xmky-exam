@@ -62,19 +62,19 @@ export default {
         // 左侧按钮组2
         {
           type: 1,
-          name: '导入导出',
+          name: '文本导入',
           icon: 'common common-template-down'
+        },
+        {
+          type: 2,
+          name: '一键发布',
+          icon: 'common common-publish'
+        },
+        {
+          type: 3,
+          name: '一键删除',
+          icon: 'common common-delete'
         }
-        // {
-        //   type: 2,
-        //   name: '一键发布',
-        //   icon: 'common common-publish'
-        // },
-        // {
-        //   type: 3,
-        //   name: '一键删除',
-        //   icon: 'common common-delete'
-        // }
       ]
     }
   },

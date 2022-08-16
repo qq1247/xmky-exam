@@ -162,7 +162,7 @@
 
       <!-- 问答 -->
       <template v-if="questionDetail.type === 5">
-        <template v-if="questionDetail.ai === 1">
+        <template v-if="questionDetail.markType === 1">
           <div
             v-for="(answer, indexAnswers) in questionDetail.answers"
             :key="answer.id"
@@ -179,7 +179,7 @@
           </div>
         </template>
         <div
-          v-if="questionDetail.ai === 2"
+          v-if="questionDetail.markType === 2"
           style="padding: 10px"
           v-html="`${questionDetail.answers[0].answer}`"
         />

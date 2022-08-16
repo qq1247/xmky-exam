@@ -48,12 +48,8 @@
                 question.type | typeName
               }}</el-tag>
 
-              <el-tag effect="plain" size="mini" type="primary">{{
-                question.difficulty | difficultyName
-              }}</el-tag>
-
               <el-tag effect="plain" size="mini" type="success">{{
-                ['', '智能', '非智能'][question.ai]
+                ['', '智能', '非智能'][question.markType]
               }}</el-tag>
 
               <el-tag
@@ -137,10 +133,19 @@
             </div>
           </template>
           <!-- 题目 -->
-          <div class="question-title">
+          <div v-if="question.type !== 3" class="question-title">
             <span>{{ indexQuestion + 1 }}、</span>
             <div v-html="`${question.title}`" />
           </div>
+          <ClozeTitle 
+            v-else
+            :title="question.title"
+            :answers="question.answers"
+            :id="question.id"
+            :err="false"
+            :preview="false"
+          />
+          
 
           <!-- 单选 -->
           <template v-if="question.type === 1">
@@ -149,12 +154,12 @@
                 v-for="(option, indexOption) in question.options"
                 :key="indexOption"
                 class="option-item"
-                :label="showErr ? option[0] : String(option.no)"
+                :label="String(option.no)"
               >
                 <div
                   class="flex-items-center"
                   v-html="
-                    `${String.fromCharCode(65 + indexOption)}、${showErr ? option : option.option}`
+                    `${String.fromCharCode(65 + indexOption)}、${option.option}`
                   "
                 />
               </el-radio>
@@ -171,12 +176,12 @@
                 v-for="(option, indexOption) in question.options"
                 :key="indexOption"
                 class="option-item"
-                :label="showErr ? option[0] : String(option.no)"
+                :label="String(option.no)"
               >
                 <div
                   class="flex-items-center"
                   v-html="
-                    `${String.fromCharCode(65 + indexOption)}、${showErr ? option : option.option}`
+                    `${String.fromCharCode(65 + indexOption)}、${option.option}`
                   "
                 />
               </el-checkbox>
@@ -201,8 +206,9 @@
               v-model="question.answers"
               :rows="2"
               class="question-text"
-              placeholder="请输入内容"
+              placeholder="请输入答案"
               type="textarea"
+              :autosize="true"
             />
           </template>
         </div>
@@ -230,16 +236,14 @@
 
 <script>
 import { getOneDict } from '@/utils/getDict'
+import ClozeTitle from '../ClozeTitle.vue'
 export default {
-  components: {},
+  components: {
+    ClozeTitle
+  },
   filters: {
     typeName(data) {
       return getOneDict('QUESTION_TYPE').find(
-        (item) => Number(item.dictKey) === data
-      ).dictValue
-    },
-    difficultyName(data) {
-      return getOneDict('QUESTION_DIFFICULTY').find(
         (item) => Number(item.dictKey) === data
       ).dictValue
     }
@@ -293,6 +297,9 @@ export default {
     },
     publish(id, state) {
       this.$emit('publish', id, state)
+    },
+    updateAnswer(id) {
+      
     }
   }
 }

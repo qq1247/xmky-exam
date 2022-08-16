@@ -332,7 +332,7 @@ export default {
       this.paperQuestion = res.data
       this.questionList = res.data.reduce((acc, cur) => {
         const filterQuestion = cur.questionList.filter(
-          (question) => question.ai === 2
+          (question) => question.markType === 2
         )
         acc.push(...filterQuestion)
         return acc

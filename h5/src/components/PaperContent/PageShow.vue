@@ -143,7 +143,7 @@
               <div v-if="preview && scoreState" class="children-analysis">
                 <div class="analysis-content">
                   <span>答案：</span>
-                  <div v-if="question.ai === 1">
+                  <div v-if="question.markType === 1">
                     <div class="cloze-answers">
                       <span
                         v-for="answer in question.answers"
@@ -155,7 +155,7 @@
                     </div>
                   </div>
                   <div
-                    v-if="question.ai === 2"
+                    v-if="question.markType === 2"
                     v-html="`${question.answers[0].answer}`"
                   />
                 </div>

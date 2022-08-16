@@ -18,22 +18,6 @@
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :span="12">
-          <el-form-item>
-            <el-select
-              v-model="queryForm.difficulty"
-              clearable
-              placeholder="请选择难度"
-            >
-              <el-option
-                v-for="dict in queryForm.difficultyDictList"
-                :key="parseInt(dict.dictKey)"
-                :label="dict.dictValue"
-                :value="parseInt(dict.dictKey)"
-              />
-            </el-select>
-          </el-form-item>
-        </el-col>
       </el-row>
       <el-row :gutter="20">
         <el-col :span="12">
@@ -103,9 +87,6 @@
             <el-tag effect="dark" size="mini" type="primary">
               {{ item.type | typeName }}
             </el-tag>
-            <el-tag effect="plain" size="mini" type="danger">
-              {{ item.difficulty | difficultyName }}
-            </el-tag>
             <el-tag
               effect="plain"
               size="mini"
@@ -148,11 +129,6 @@ export default {
         (item) => Number(item.dictKey) === data
       ).dictValue
     },
-    difficultyName(data) {
-      return getOneDict('QUESTION_DIFFICULTY').find(
-        (item) => Number(item.dictKey) === data
-      ).dictValue
-    }
   },
   data() {
     return {
@@ -165,18 +141,15 @@ export default {
         id: '', // 编号
         title: '', // 题干
         type: null, // 类型
-        difficulty: null, // 难度
         score: '', // 分数
         questionTypeName: '', // 试题分类name
         questionTypeId: 1, // 试题分类id
-        difficultyDictList: [], // 难度列表
         typeDictList: [] // 类型列表
       }
     }
   },
   async created() {
     this.queryForm.typeDictList = getOneDict('QUESTION_TYPE')
-    this.queryForm.difficultyDictList = getOneDict('QUESTION_DIFFICULTY')
     const res = await paperGet({
       id: this.$route.params.id || getQuick().id
     })
@@ -188,12 +161,11 @@ export default {
     async queryQuestion() {
       const res = await questionListPage({
         id: this.queryForm.id,
-        ai: this.markType === 1 ? 1 : '',
+        markType: this.markType === 1 ? 1 : '',
         state: 1,
         type: this.queryForm.type,
         title: this.queryForm.title,
         questionTypeName: this.queryForm.questionTypeName,
-        difficulty: this.queryForm.difficulty,
         scoreStart: this.queryForm.score,
         scoreEnd: this.queryForm.score,
         exPaperId: this.$route.params.id || getQuick().id,
@@ -219,11 +191,10 @@ export default {
     async randomQueryQuestion() {
       const res = await questionListPage({
         id: this.queryForm.id,
-        ai: this.markType === 1 ? 1 : '',
+        markType: this.markType === 1 ? 1 : '',
         type: this.queryForm.type,
         title: this.queryForm.title,
         questionTypeName: this.queryForm.questionTypeName,
-        difficulty: this.queryForm.difficulty,
         scoreStart: this.queryForm.score,
         scoreEnd: this.queryForm.score,
         exPaperId: this.$route.params.id || getQuick().id,

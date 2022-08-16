@@ -1,17 +1,13 @@
 <template>
   <div v-if="Object.keys(data).length" class="detail-more">
-    <!-- 类型，难度，其他选项，智能，分数 -->
+    <!-- 类型，其他选项，智能，分数 -->
     <div class="detail-tags">
       <el-tag class="center-tag-danger" size="mini" type="danger">{{
         data.type | type
       }}</el-tag>
 
-      <el-tag class="center-tag-purple" effect="plain" size="mini">{{
-        data.difficulty | difficulty
-      }}</el-tag>
-
       <el-tag effect="plain" size="mini" type="warning">{{
-        ['', '智能', '非智能'][data.ai]
+        ['', '智能', '非智能'][data.markType]
       }}</el-tag>
 
       <el-tag
@@ -26,9 +22,9 @@
         size="mini"
       >{{ data.state === 1 ? '发布' : '草稿' }}</el-tag>
 
-      <template v-if="data.aiOptions">
+      <template v-if="data.markOptions">
         <el-tag
-          v-for="item in data.aiOptions"
+          v-for="item in data.markOptions"
           :key="item"
           size="small"
           type="info"
@@ -75,7 +71,7 @@
       <template v-if="data.type === 5">
         <el-col :span="1.5"> 【答案】</el-col>
         <el-col :span="20">
-          <template v-if="data.ai === 1">
+          <template v-if="data.markType === 1">
             <div
               v-for="(answer, index) in data.answers"
               :key="answer.id"
@@ -89,7 +85,7 @@
               >{{ ans }}</span>
             </div>
           </template>
-          <div v-if="data.ai === 2" v-html="`${data.answers[0].answer}`" />
+          <div v-if="data.markType === 2" v-html="`${data.answers[0].answer}`" />
         </el-col>
       </template>
     </el-row>
@@ -109,11 +105,6 @@ export default {
   filters: {
     type(data) {
       return getOneDict('QUESTION_TYPE').find(
-        (item) => Number(item.dictKey) === data
-      ).dictValue
-    },
-    difficulty(data) {
-      return getOneDict('QUESTION_DIFFICULTY').find(
         (item) => Number(item.dictKey) === data
       ).dictValue
     }
@@ -140,13 +131,11 @@ export default {
           dictValue: '大小写不敏感'
         }
       ],
-      typeList: [],
-      difficultyList: []
+      typeList: []
     }
   },
   created() {
     this.typeList = getOneDict('QUESTION_TYPE')
-    this.difficultyList = getOneDict('QUESTION_DIFFICULTY')
   },
   methods: {
     getValue(type) {

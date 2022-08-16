@@ -6,66 +6,61 @@ export default {
       type: String,
       default: '',
     },
-    questionId: {
+    answers: {
+      type: Array,
+      default: [],
+    },
+    id: {
       type: Number,
       default: 0,
+    },
+    err: {
+      type: Boolean,
+      default: false,
     },
     preview: {
       type: Boolean,
       default: false,
     },
-    questionDetail: {
-      type: Object,
-      default: () => {},
-    },
-    myExamDetailCache: {
-      type: Object,
-      default: () => {},
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    scoreState: {
-      type: Boolean,
-      default: false,
-    }
   },
-  render(h, context) {
-    const {
-      props,
-      parent: { updateAnswer },
-    } = context
+  render(h, {props, parent: { updateAnswer }}) {
     let title = props.title
-    const questionId = props.questionId
-    const underlineList = title.match(/[_]{5,}/g)
-    underlineList.map((underline, index) => {
-      const titleStart = title.substring(0, title.indexOf(underline))
+    let id = props.id
+
+    title.match(/[_]{5,}/g).forEach((fillBlanks, index) => {
+      const titleStart = title.substring(0, title.indexOf(fillBlanks))
       const titleEnd = title.substring(
-        title.indexOf(underline) + underline.length
+        title.indexOf(fillBlanks) + fillBlanks.length
       )
 
-      let inputHtml
+      let html
       if (props.preview && props.scoreState) {
         const { score, questionScore } =
-          props.myExamDetailCache[props.questionId]
+          props.myExamDetailCache[props.id]
 
-        inputHtml = `<span class="cloze-input-preview" style="color: ${
+        html = `<span class="cloze-input-preview" style="color: ${
           score === questionScore ? '#00b050' : '#ff5722'
         };border-color: ${score === questionScore ? '#00b050' : '#ff5722'}; ">${
-          props.myExamDetailCache[questionId].answers[index] || ''
+          props.myExamDetailCache[id].answers[index] || ''
         }</span><span v-if="${
           props.preview
         }" class="cloze-answer">（${props.questionDetail.answers[
           index
         ].answer.join(',')}）</span>`
       } else {
-        inputHtml = `<el-input class="cloze-input" @change='updateAnswer(${questionId})' :disabled='${props.preview}' v-model='myExamDetailCache[${questionId}].answers[${index}]'></el-input>`
+        html = `
+        <el-input class="cloze-input" 
+          @change='updateAnswer(${id})' 
+          :disabled='${props.preview}' 
+          v-model='answers[${index}]'
+          v-bind:style="{ width: ${fillBlanks.length * 18} + 'px' }"
+          >
+        </el-input>`
       }
-      title = `${titleStart}${inputHtml}${titleEnd}`
+      title = `${titleStart}${html}${titleEnd}`
     })
     const titleTemplate = {
-      template: title,
+      template: `<div>${title}</div>`, // 最外出需要包裹一层（控制台报没有根节点）
       data() {
         return props
       },
@@ -84,8 +79,6 @@ export default {
 
 <style lang="scss">
 .cloze-input {
-  width: fit-content !important;
-
   .el-input__inner {
     height: 24px;
     border: none;

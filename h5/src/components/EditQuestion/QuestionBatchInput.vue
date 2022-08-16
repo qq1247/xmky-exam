@@ -3,11 +3,12 @@
     <div class="left">
       <div class="btn-box">
         <el-button plain @click="preStep()" size="mini" >返回</el-button>
+        <el-button plain @click="showEg()" size="mini" >示例</el-button>
       </div>
 
       <mavon-editor
         class="qestion-box"
-        :value="msg"
+        :value="questionTxt"
         :toolbars-flag="false"
         :short-cut="false"
         :subfield="false"
@@ -22,9 +23,12 @@
           <span class="err-color">错误：{{errNum}}题】</span>
         </div>
 
-        <div>
-          <!-- <el-button type="danger" size="mini" @click="btnHandler('location')" plain>定位错误</el-button> -->
-          <el-button type="primary" size="mini" @click="txtImport('export')">导入</el-button>
+        <div v-if="process === 0">
+          <el-button type="danger" size="mini" @click="locationErr()" plain>定位错误</el-button>
+          <el-button type="primary" size="mini" @click="txtImport()">导入</el-button>
+        </div>
+        <div v-else style="width: 200px">
+            <el-progress :percentage="process"></el-progress>
         </div>
       </div>
       <div class="content-center qestion-box">
@@ -43,6 +47,7 @@
 <script>
 import { questionAdd } from 'api/question'
 import QuestionList from './QuestionList.vue'
+
 export default {
   components: { QuestionList },
   props: {
@@ -57,35 +62,104 @@ export default {
   },
   data() {
     return {
-      topicArr: [],
+      questionTxt: '',
+      process: 0, //进度条
+      questionList: [], // 试题列表（接口格式）
       list: {
         // 列表数据
         total: 0, // 总条数
         curPage: 1, // 当前第几页
         pageSize: 5, // 每页多少条
-        questionList: [] // 列表数据
+        questionList: [] // 列表数据（显示格式）
       },
       total: 0, // 题目总数量
       errNum: 0, // 错误的题目数量
-      parsingMsg: '', // 解析的题目
-      msg: '', // markdrow输入的内容
-      errTopicArr: [] // 接口上传题目报错后存储的错误
+      eg: false, // 示例
+      egBak: '',
+      egTxt: `1.这是一道单选题的题干，简单写法
+A.单选题的A选项
+B。单选题的B选项
+C、单选题的C选项
+D单选题的D选项
+[B]
+
+1.这是一道单选题的题干，
+可换行，可选写法
+A.单选题的A选项，
+可换行
+B。单选题的B选项
+C、单选题的C选项
+D单选题的D选项
+[AB][3分][1分]
+[解析]中括号内【字母】表示答案，一个答案表示单选题，一个以上答案表示多选题
+中括号内【数字分】表示该题分数，第一项为该题分数，不填默认1分，第二项为漏选分数，多选题有效，不填默认为总分一半
+
+3、这是一道填空题_____，_____，简单写法
+[北京 上海][主观题]
+
+3、这是一道填空题________，________，可选写法
+[山西 山西省 晋][老婆 媳妇 内人][2分][2分][答案无顺序][大小写不敏感]
+[解析]连续五个或五个以上的下划线，表示一个填空
+中括号内【主观题】表示这道题需要人工阅卷，[答案无顺序][大小写不敏感]无效
+中括号内【答案无顺序】【大小写不敏感】，表示智能阅卷时判分规则，默认答案有顺序，大小写敏感
+中括号内【数字分】表示该题分数，一个空对应一个分数，不填或少填，对应的空默认为1分
+中括号内【文字】表示答案，n个填空就有n个答案，用空格分割表示。如：[北京 上海]
+中括号内【文字】表示答案，如果填空有多个备选答案，则用多组答案表示，一组答案表示对应填空的答案，一个答案内用空格分割表示多个备选答案。如：[山西 山西省 晋][老婆 媳妇 内人]
+
+4、这是一道判断题的题干，简单写法
+[对]
+
+4、这是一道判断题的题干，可选写法
+[√][2分]
+[解析]中括号内【文字】表示答案，可填“对错√×是否”
+中括号内【数字分】表示该题分数，不填默认1分
+
+5、这是一道问答题的题干，简单写法
+[我是问答题的答案]
+
+5、这是一道问答题的题干，可选写法
+[我是问答题的答案，
+可换行
+换行][10分]
+[解析]中括号内【文字】表示答案
+中括号内【数字分】表示该题分数，不填默认1分
+默认为主观题，需要人工阅卷
+      `,
     }
   },
   methods: {
     parseTxt(txt) {
       // 拆分文本，每个文本为一道题
+      this.questionTxt = txt // 用于切换到示例 
       let questionTxtArr = this.splitTxt2QuestionTxt(txt)
 
       // 文本解析为试题可读字段
-      let questionList = []
+      this.questionList.splice(0)
+      this.list.questionList.splice(0)
       for (let i in questionTxtArr) {
-        let question = this.parseQuestion(questionTxtArr[i], i)
-        questionList.push(question)
-        console.log(question)
-      }
+        let question = this.parseQuestion(questionTxtArr[i])
+        question.id = parseInt(i) // 用于错题定位
+        if (question.errs && question.errs.length > 0) {
+          question.title = question.txt
+        }
+        this.questionList.push(question)
 
-      this.list.questionList = questionList
+        let _question = JSON.parse(JSON.stringify(question)) // 组装成组件需要的格式
+        if (_question.type === 1) {
+          _question.answers = _question.answers[0]
+          for (let i = 0; i < _question.options.length; i++) {
+            _question.options[i] = {'no' : String.fromCharCode(65 + i), option : _question.options[i]}
+          }
+        } else if (_question.type === 2) {
+          for (let i = 0; i < _question.options.length; i++) {
+            _question.options[i] = {'no' : String.fromCharCode(65 + i), option : _question.options[i]}
+          }
+        } else if (_question.type === 4) {
+          _question.answers = _question.answers[0]
+        }
+         this.list.questionList.push(_question)
+
+      }
     },
     // 拆分文本，每段为一道试题
     splitTxt2QuestionTxt(txt) {
@@ -118,17 +192,17 @@ export default {
         }
       }
       if (answerIndex === -1) {
-        return {title : questionTxtArr.join('<br/>'), errs : '缺少答案'}
+        return {txt : questionTxtArr.join('<br/>'), errs : '缺少答案'}
       }
       if (optionIndexArr.length > 0) {// 如果存在（单多选）选项，并且选项在答案之后
         for (let optionIndex of optionIndexArr) {
           if (optionIndex >= answerIndex) {
-            return {title : questionTxtArr.join('<br/>'), errs : '选项 和 答案 顺序错误'}
+            return {txt : questionTxtArr.join('<br/>'), errs : '选项 和 答案 顺序错误'}
           }
         }
       }
       if (analysisIndex !== -1 && answerIndex > analysisIndex) {// 如果存在解析，并且答案在解析之后
-        return {title : questionTxtArr.join('<br/>'), errs : '答案 和 解析 顺序错误'}
+        return {txt : questionTxtArr.join('<br/>'), errs : '答案 和 解析 顺序错误'}
       }
 
 
@@ -165,14 +239,14 @@ export default {
       if (type === 1 || type === 2) {// 如果是单多选
         if (type === 2 && scoreArr.length > 1) {// 如果是多选并且有第二个分数
           if (scoreArr[0] <= scoreArr[1]) {
-            return {title : questionTxtArr.join('<br/>'), errs : '漏选分值不能大于总分'}
+            return {txt : questionTxtArr.join('<br/>'), errs : '漏选分值不能大于总分'}
           }
         }
         if (optionIndexArr.length < 2) {
-          return {title : questionTxtArr.join('<br/>'), errs : '最少2个选项'}
+          return {txt : questionTxtArr.join('<br/>'), errs : '最少2个选项'}
         }
         if (optionIndexArr.length > 7) {
-          return {title : questionTxtArr.join('<br/>'), errs : '最多7个选项'}
+          return {txt : questionTxtArr.join('<br/>'), errs : '最多7个选项'}
         }
         for (let i = 0; i < optionIndexArr.length - 1; i++) {
           let optionContent = questionTxtArr.slice(optionIndexArr[i], optionIndexArr[i + 1]).join("<br/>") // 回车行转br标签
@@ -181,7 +255,7 @@ export default {
           options.push(optionContent)
           
           if (i !== optionIndex) {
-            return {title : questionTxtArr.join('<br/>'), errs : '选项顺序错误'}
+            return {txt : questionTxtArr.join('<br/>'), errs : '选项顺序错误'}
           }
         }
         let optionContent = questionTxtArr.slice(optionIndexArr[optionIndexArr.length - 1], answerIndex).join("<br/>") // 最后一个选项从当前行到答案行之间的都是
@@ -189,21 +263,21 @@ export default {
         optionContent = optionContent.replace(/^[A-Za-z][.。、]?/, '')
         options.push(optionContent)
         if (optionIndexArr.length - 1 !== optionIndex) {
-          return {title : questionTxtArr.join('<br/>'), errs : '选项顺序错误'}
+          return {txt : questionTxtArr.join('<br/>'), errs : '选项顺序错误'}
         }
 
         if (!/^\[[A-Ga-g]+\]/.test(questionTxtArr[answerIndex])) {// 如果答案不是abcdefg中的一个或多个
-          return {title : questionTxtArr.join('<br/>'), errs : '答案超出范围'}
+          return {txt : questionTxtArr.join('<br/>'), errs : '答案超出范围'}
         }
       } else if (type === 3) {
         fillBlanksCount = title.match(/_{5,}/g).length
         if (answerArr.length === 1) {// 一个中括号内空格分开的词，对应题干的空。
           let answerCount = answerArr[0].split(/ +/).length//  + 1-n个空格
           if (fillBlanksCount !== answerCount) {
-            return {title : questionTxtArr.join('<br/>'), errs : '填空数量和答案数量不相等'}
+            return {txt : questionTxtArr.join('<br/>'), errs : '填空数量和答案数量不相等'}
           }
         } else if (fillBlanksCount !== answerArr.length){// 如果填空有多个备选答案，一个中括号表示一个填空，一个填空内空格分开的词，表示该空的备选答案
-          return {title : questionTxtArr.join('<br/>'), errs : '填空数量和答案数量不相等'}
+          return {txt : questionTxtArr.join('<br/>'), errs : '填空数量和答案数量不相等'}
         }
       } 
 
@@ -257,6 +331,7 @@ export default {
         markTypeOptions: markTypeArr,
         state: 1,
         questionTypeId: this.questionTypeId,
+        txt: questionTxtArr.join('\n'), // 保留原始文本，用于上传失败二次处理
         errs: [],
       }
 
@@ -269,16 +344,50 @@ export default {
         this.$parent.activeIndex = 0
       }
     },
+    // 文本导入
     async txtImport() {
-      if (this.errNum > 0) {
-        this.$message.warning('错误格式' + this.errNum + '处，请处理')
-        return
+      // if (this.errNum > 0) {
+      //   this.$message.warning('错误格式' + this.errNum + '处，请处理')
+      //   return
+      // }
+
+      let errTxt = ''
+      for (let i in this.questionList) {
+        await questionAdd(this.questionList[i]).catch((err) => {
+          errTxt += this.questionList[i].txt + '\n'
+        })
+        this.process = Math.round(i  / this.questionList.length * 100 )
       }
 
-      for (let question of this.list.questionList) {
-        await questionAdd(question).catch((err) => {
-          console.error(err)
-        })
+      this.process = 0 // 上传完成恢复进度条
+
+      if (errTxt.length > 0) {
+        errTxt = '以下为错误试题文本，请联系管理员处理：\n' + errTxt
+        this.questionTxt = errTxt.replace(/<br\/>/gm, '\n') // 正确的删除，展示错误的
+      } else {
+        this.questionTxt = '添加成功，请继续添加或返回'
+      }
+    }, 
+    // 定位错误
+    locationErr() {
+      for (let i in this.list.questionList) {
+        if (this.list.questionList[i].errs.length > 0) {
+          let scrollContainer = document.getElementsByClassName('qestion-box')[1]
+          let eleOffSetTop = document.getElementById('p-' + i).offsetTop - 130
+          scrollContainer.scrollTop = eleOffSetTop
+        }
+      }
+      
+    },
+    // 显示示例
+    showEg() {
+      if (!this.eg) {
+        this.eg = true
+        this.egBak = this.questionTxt
+        this.questionTxt = this.egTxt
+      } else {
+        this.eg = false
+        this.questionTxt = this.egBak
       }
     }
   }, 
@@ -307,12 +416,18 @@ export default {
     width: 40%;
     height: 100%;
     background-color: #fff;
+    .btn-box {
+      padding: 4px;
+    }
     .qestion-box {
       height: calc(100% - 38px);
       overflow: scroll;
       border: 1px solid #D4D4D4;
       margin: 10px 0;
       // background: #fff;
+    }
+    ::-webkit-scrollbar {
+      display: block;
     }
   }
   .right {
@@ -324,6 +439,7 @@ export default {
       justify-content: space-between;
       color: #202E36;
       font-weight: 600;
+      padding: 4px;
       .success-color {
         color: #6DB39B
       }
