@@ -84,12 +84,12 @@ export default {
           }
         ]
       }
-      option && myChart.setOption(option)
+      option && myChart.setOption(option) 
     },
     // 渲染饼图
     renderChart() {
-      this.statisInfo.markTypeList.map((ai) => {
-        markType.name = this.markTypeNames[ai.name - 1]
+      this.statisInfo.markTypeList.map((markType) => {
+        markType.name = this.markTypeNames[markType.name - 1]
       })
       this.statisInfo.typeList.map((type) => {
         type.name = this.typeNames[type.name - 1]
