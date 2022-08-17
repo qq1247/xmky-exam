@@ -41,23 +41,23 @@ export default [
           },
           {
             path: 'editor/:id',
-            name: 'QuestionBatchInput',
+            name: 'QuestionIndexTxtImport',
             component: () => import('@/views/question/Editor.vue'),
             meta: {
-              title: '编辑试题',
+              title: '文本导入',
               layout: 'subAdmin'
             }
           },
-          {
-            path: 'open/:id',
-            name: 'QuestionIndexOpen',
-            component: () => import('@/views/question/Open.vue'),
-            hidden: true,
-            meta: {
-              title: '模拟练习',
-              layout: 'subAdmin'
-            }
-          },
+          // {
+          //   path: 'open/:id',
+          //   name: 'QuestionIndexOpen',
+          //   component: () => import('@/views/question/Open.vue'),
+          //   hidden: true,
+          //   meta: {
+          //     title: '模拟练习',
+          //     layout: 'subAdmin'
+          //   }
+          // },
           {
             path: 'statistics/:id',
             name: 'QuestionIndexStatistics',

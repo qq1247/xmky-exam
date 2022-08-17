@@ -37,6 +37,7 @@
             @move="move"
             @detail="goDetail"
             @statistics="statistics"
+            @txtImport="txtImport"
           />
         </div>
         <!-- 分页 -->
@@ -156,6 +157,12 @@ export default {
     // 统计
     statistics({ id }) {
       this.$tools.switchTab('QuestionIndexStatistics', {
+        id
+      })
+    },
+    // 文本导入
+    txtImport({ id }) {
+      this.$tools.switchTab('QuestionIndexTxtImport', {
         id
       })
     },

@@ -12,7 +12,7 @@
         </div>
       </div>
       <PaperSetting v-if="activeIndex == 0" @switchTab="switchTab"></PaperSetting>
-      <QuestionBatchInput v-if="activeIndex == 1 && createdType == 1" :isBack="false" ref="QuestionBatchInput"/>
+      <QuestionTxtImport v-if="activeIndex == 1 && createdType == 1" :isBack="false" ref="QuestionTxtImport"/>
       <ExamSetting v-if="activeIndex == 2" style="height: calc(100vh - 220px);" ref="ExamSetting"/>
       <MarkSetting v-if="activeIndex == 3" style="height: calc(100vh - 220px);" ref="MarkSetting"/>
       <ExamPublish v-if="activeIndex == 4" style="height: calc(100vh - 220px);" ref="ExamPublish"/>
@@ -57,7 +57,7 @@ import { mapGetters } from 'vuex'
 import { removeQuick, getQuick, setQuick } from '@/utils/storage'
 import PaperSetting from './PaperSetting.vue'
 import PaperComposition from './PaperComposition.vue'
-import QuestionBatchInput from '@/components/EditQuestion/QuestionBatchInput.vue'
+import QuestionTxtImport from '@/components/EditQuestion/QuestionTxtImport.vue'
 import ExamSetting from './ExamSetting.vue'
 import ExamPublish from './ExamPublish.vue'
 import MarkSetting from './MarkSetting.vue'
@@ -78,7 +78,7 @@ export default {
     CustomSelect,
     PaperSetting,
     PaperComposition,
-    QuestionBatchInput,
+    QuestionTxtImport,
     ExamSetting,
     ExamPublish,
     MarkSetting

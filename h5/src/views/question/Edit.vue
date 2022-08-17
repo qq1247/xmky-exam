@@ -70,8 +70,8 @@
       </el-scrollbar>
       <el-scrollbar wrap-style="overflow-x:hidden;" class="content-center">
         <template v-if="questionTemplate">
-          <QuestionBatchInput
-            ref="QuestionBatchInput"
+          <QuestionTxtImport
+            ref="QuestionTxtImport"
             :question-type-id="questionTypeId"
             @showTemplate="showTemplate"
           />
@@ -130,14 +130,14 @@ import QuestionType from '@/components/EditQuestion/QuestionType.vue'
 import QuestionList from '@/components/EditQuestion/QuestionList.vue'
 import EditModule from 'components/EditQuestion/EditModule.vue'
 import QuestionDetail from 'components/QuestionDetail/Index.vue'
-import QuestionBatchInput from '@/components/EditQuestion/QuestionBatchInput.vue'
+import QuestionTxtImport from '@/components/EditQuestion/QuestionTxtImport.vue'
 export default {
   components: {
     QuestionType,
     QuestionList,
     EditModule,
     QuestionDetail,
-    QuestionBatchInput
+    QuestionTxtImport
   },
   data() {
     return {

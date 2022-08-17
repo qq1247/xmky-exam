@@ -50,23 +50,34 @@
           <span data-title="移动" @click="move(data)">
             <i class="common common-move" />
           </span>
-          <!-- 开放 -->
-          <span data-title="模拟练习" @click="open(data)">
-            <i class="common common-simulate" />
+          <span data-title="试题列表" @click="move(data)">
+            <i class="common common-list-row" />
           </span>
+          <!-- 开放 -->
+          <!-- <span data-title="模拟练习" @click="open(data)">
+            <i class="common common-simulate" />
+          </span> -->
           <!-- 统计 -->
-          <span data-title="试题统计" @click="statistics(data)">
-            <i class="common common-statistics" />
+          <span class="last-span">
+            <i class="common common-more-row" />
+            <div class="handler-more">
+              <div class="more-item" @click="txtImport(data)">
+                <i class="common common-template-down" />文本导入
+              </div>
+              <div class="more-item" @click="statistics(data)">
+                <i class="common common-statistics" />试题统计
+              </div>
+            </div>
           </span>
         </template>
         <!-- 详情 | 列表 -->
-        <span
+        <!-- <span
           v-if="detailTitles[name]"
           :data-title="detailTitles[name]"
           @click="detail(data)"
         >
           <i class="common common-list-row" />
-        </span>
+        </span> -->
       </div>
     </div>
   </div>
@@ -87,7 +98,6 @@ export default {
   data() {
     return {
       detailTitles: {
-        question: '试题列表',
         paper: '试卷列表',
         exam: '考试列表'
       }
@@ -141,8 +151,13 @@ export default {
     detail(data) {
       this.$emit('detail', data)
     },
+    // 试题统计
     statistics(data) {
       this.$emit('statistics', data)
+    },
+    // 文本导入
+    txtImport(data) {
+      this.$emit('txtImport', data)
     }
   }
 }

@@ -1,16 +1,16 @@
 <template>
   <div class="content">
-    <QuestionBatchInput
-      ref="QuestionBatchInput"
+    <QuestionTxtImport
+      ref="QuestionTxtImport"
       :question-type-id="questionTypeId"
     />
   </div>
 </template>
 <script>
-import QuestionBatchInput from '@/components/EditQuestion/QuestionBatchInput.vue'
+import QuestionTxtImport from '@/components/EditQuestion/QuestionTxtImport.vue'
 export default {
   components: {
-    QuestionBatchInput
+    QuestionTxtImport
   },
   data() {
     return {

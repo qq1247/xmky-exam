@@ -91,7 +91,9 @@ export default {
       const parentData = this.$parent.$parent.$data
       switch (type) {
         case 1:
-          this.$router.push({ name: 'QuestionBatchInput' })
+          this.$tools.switchTab('QuestionIndexTxtImport', {
+            id : parentData.questionTypeId
+          })
           // this.$emit('showTemplate', true)
           break
         case 2:
