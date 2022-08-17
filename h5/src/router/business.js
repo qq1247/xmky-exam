@@ -6,7 +6,7 @@ export default [
     redirect: '/question/index',
     name: 'Question',
     meta: {
-      title: '试题管理',
+      title: '题库管理',
       icon: 'common common-question-manage',
       layout: 'subAdmin',
       roles: ['subAdmin']
@@ -17,7 +17,7 @@ export default [
         name: 'QuestionIndex',
         component: () => import('@/views/question/Index.vue'),
         meta: {
-          title: '试题分类',
+          title: '题库',
           layout: 'subAdmin'
         },
         children: [

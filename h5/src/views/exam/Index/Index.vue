@@ -107,7 +107,7 @@ export default {
       this.curPage = 1
       this.query()
     },
-    // 添加试题分类
+    // 添加题库
     add() {
       this.$tools.switchTab('ExamIndexSetting', {
         id: 0,

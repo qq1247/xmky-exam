@@ -26,7 +26,7 @@
       </CustomSelect>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="editRoleUsers">编辑</el-button>
+      <el-button type="primary" @click="editRoleUsers">保存</el-button>
     </el-form-item>
   </el-form>
 </template>

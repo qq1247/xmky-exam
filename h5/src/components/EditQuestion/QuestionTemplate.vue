@@ -67,7 +67,7 @@ export default {
     showTemplate() {
       this.$emit('showTemplate', false)
     },
-    // 获取试题分类
+    // 获取题库
     async getQuestionType(curPage = 1, name = '') {
       const typeList = await questionTypeListPage({
         name,
@@ -91,7 +91,7 @@ export default {
       if (!this.questionTypeId) {
         const questionTypeList = await this.getQuestionType()
         if (questionTypeList.length) {
-          this.$message.warning('请选择试题分类')
+          this.$message.warning('请选择题库')
           this.templateClear('templateUpload')
           return
         }

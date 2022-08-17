@@ -24,7 +24,7 @@
           <el-form-item>
             <el-input
               v-model="queryForm.questionTypeName"
-              placeholder="请查询试题分类"
+              placeholder="请查询题库"
             />
           </el-form-item>
         </el-col>
@@ -142,8 +142,8 @@ export default {
         title: '', // 题干
         type: null, // 类型
         score: '', // 分数
-        questionTypeName: '', // 试题分类name
-        questionTypeId: 1, // 试题分类id
+        questionTypeName: '', // 题库name
+        questionTypeId: 1, // 题库id
         typeDictList: [] // 类型列表
       }
     }

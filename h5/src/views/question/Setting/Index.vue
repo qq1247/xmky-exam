@@ -40,12 +40,12 @@ export default {
     return {
       tab: [
         {
-          name: '试题分类信息',
+          name: '题库',
           intro: '添加/修改',
           icon: 'common common-edit',
-          contentName: '试题分类信息',
+          contentName: '题库',
           contentIntro:
-            '为试题创建一个分类。建议：按类型分开存放，方便管理维护',
+            '给一组试题起一个名称，可用于组卷时按题库抽题等',
           index: '1'
         }
       ],
@@ -74,28 +74,28 @@ export default {
       this.tab = [
         ...this.tab,
         {
-          name: '操作权限',
-          intro: '允许其他子管理员协助添加试题',
+          name: '权限',
+          intro: '协助添加试题',
           icon: 'common common-role',
-          contentName: '操作权限',
+          contentName: '权限',
           contentIntro:
-            '允许其他子管理员协助添加试题。建议：题量大的情况下，添加一个子管理员来协助添加试题，自己做最后的审核（发布）。',
+            '协助添加试题',
           index: '2'
         },
         {
-          name: '移动试题',
-          intro: '移动试题到新分类下 ',
+          name: '合并',
+          intro: '合并题库 ',
           icon: 'common common-move',
-          contentName: '移动试题',
-          contentIntro: '移动试题到新分类下',
+          contentName: '合并',
+          contentIntro: '合并题库',
           index: '3'
         },
         {
           name: '删除',
-          intro: '删除分类',
+          intro: '删除题库',
           icon: 'common common-delete',
           contentName: '删除',
-          contentIntro: '该分类下有试题，则不允许删除',
+          contentIntro: '该题库下有试题，则不允许删除',
           index: '4'
         }
       ]

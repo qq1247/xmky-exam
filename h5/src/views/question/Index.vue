@@ -24,7 +24,7 @@
       <!-- 内容 -->
       <div class="content">
         <div class="exam-list">
-          <AddCard add-title="添加试题分类" @addCard="add" />
+          <AddCard add-title="添加题库" @addCard="add" />
           <IndexCard
             v-for="(item, index) in typeList"
             :key="index"
@@ -114,7 +114,7 @@ export default {
       this.curPage = 1
       this.query()
     },
-    // 添加试题分类
+    // 添加题库
     add() {
       this.$tools.switchTab('QuestionIndexSetting', {
         id: 0,
@@ -141,7 +141,7 @@ export default {
         tab: '2'
       })
     },
-    // 移动试题
+    // 合并试题
     move({ id }) {
       this.$tools.switchTab('QuestionIndexSetting', {
         id,

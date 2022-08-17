@@ -59,7 +59,7 @@
                     :total="total"
                     :is-auto="false"
                     :multiple="false"
-                    placeholder="试题分类"
+                    placeholder="题库"
                     :value="rule.questionTypeId"
                     @input="searchQuestionType"
                     @change="(e) => selectQuestionType(e, index, ruleIndex)"
@@ -243,7 +243,7 @@ export default {
       paperQuestionRules: [],
       rules: {
         questionTypeId: [
-          { required: true, message: '请选择试题分类', trigger: 'change' }
+          { required: true, message: '请选择题库', trigger: 'change' }
         ],
         type: [{ required: true, message: '请选择类型', trigger: 'change' }],
         markType: [
@@ -407,7 +407,7 @@ export default {
         }
       })
     },
-    // 获取试题分类
+    // 获取题库
     async getQuestionType(curPage = 1, name = '') {
       const typeList = await questionTypeListPage({
         name,
@@ -417,15 +417,15 @@ export default {
       this.questionTypes = typeList.data.list
       this.total = typeList.data.total
     },
-    // 根据name 查询试题分类
+    // 根据name 查询题库
     searchQuestionType(name) {
       this.getQuestionType(1, name)
     },
-    // 获取更多试题分类
+    // 获取更多题库
     getMoreQuestionType(curPage, name) {
       this.getQuestionType(curPage, name)
     },
-    // 选择试题分类
+    // 选择题库
     selectQuestionType(e, index, ruleIndex) {
       this.paperQuestionRules[index].rule[ruleIndex].questionTypeId = e
     },

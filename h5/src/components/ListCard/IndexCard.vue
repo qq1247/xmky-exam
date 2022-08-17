@@ -46,8 +46,8 @@
           <i class="common common-role" />
         </span>
         <template v-if="name === 'question'">
-          <!-- 移动 -->
-          <span data-title="移动" @click="move(data)">
+          <!-- 合并 -->
+          <span data-title="合并" @click="move(data)">
             <i class="common common-move" />
           </span>
           <span data-title="试题列表" @click="move(data)">
@@ -142,7 +142,7 @@ export default {
     recycle(data) {
       this.$emit('recycle', data)
     },
-    // 移动
+    // 合并
     move(data) {
       if (this.isRole(data)) return
       this.$emit('move', data)

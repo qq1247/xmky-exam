@@ -6,7 +6,7 @@
     label-width="100px"
   >
     <el-form-item label="名称" prop="examName">
-      <el-input v-model="examForm.examName" placeholder="请输入分类名称" />
+      <el-input v-model="examForm.examName" placeholder="请输入题库名称" />
     </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="addOrEdit">{{
@@ -30,7 +30,7 @@ export default {
         examName: '',
         rules: {
           examName: [
-            { required: true, message: '请输入分类名称', trigger: 'blur' }
+            { required: true, message: '请输入题库名称', trigger: 'blur' }
           ]
         }
       }

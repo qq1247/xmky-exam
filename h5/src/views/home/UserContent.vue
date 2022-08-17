@@ -402,7 +402,7 @@ export default {
             path: '/question',
             background: '#0094E5',
             icon: require('../../assets/img/index/question-manage.png'),
-            title: '试题管理'
+            title: '题库管理'
           },
           {
             path: '/paper',

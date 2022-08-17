@@ -141,7 +141,7 @@ export default {
   },
   data() {
     return {
-      questionTypeId: null, // 试题分类id
+      questionTypeId: null, // 题库id
       questionId: null, // 试题id
       questionType: 1, // 试题类型
       detailStatus: false,
@@ -163,7 +163,7 @@ export default {
         type: null, // 类型
         state: '', // 状态
         score: '', // 得分等于
-        questionTypeName: '', // 试题分类name
+        questionTypeName: '', // 题库name
         stateList: [
           {
             key: '0',

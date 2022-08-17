@@ -7,10 +7,10 @@
       :rules="questionForm.rules"
       label-width="80px"
     >
-      <el-form-item label="试题分类" prop="questionTypeId">
+      <el-form-item label="题库" prop="questionTypeId">
         <CustomSelect
           :multiple="false"
-          placeholder="请选择试题分类"
+          placeholder="请选择题库"
           :value="questionForm.questionTypeId"
           :total="questionForm.total"
           @change="selectQuestionType"
@@ -77,7 +77,7 @@ export default {
         questionType: 1,
         rules: {
           questionTypeId: [
-            { required: true, message: '请选择试题分类', trigger: 'blur' }
+            { required: true, message: '请选择题库', trigger: 'blur' }
           ]
         }
       },
@@ -116,7 +116,7 @@ export default {
     selectType(e) {
       this.questionForm.questionType = e
     },
-    // 获取试题分类
+    // 获取题库
     async getQuestionType(curPage = 1, name = '') {
       const typeList = await questionTypeListPage({
         name,
@@ -126,15 +126,15 @@ export default {
       this.questionForm.questionTypes = typeList.data.list
       this.questionForm.total = typeList.data.total
     },
-    // 根据name 查询试题分类
+    // 根据name 查询题库
     searchQuestionType(name) {
       this.getQuestionType(1, name)
     },
-    // 获取更多试题分类
+    // 获取更多题库
     getMoreQuestionType(curPage, name) {
       this.getQuestionType(curPage, name)
     },
-    // 选择试题分类
+    // 选择题库
     selectQuestionType(questionTypeId) {
       this.$set(this.questionForm, 'questionTypeId', questionTypeId)
     },

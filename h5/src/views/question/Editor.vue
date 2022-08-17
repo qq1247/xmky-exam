@@ -14,7 +14,7 @@ export default {
   },
   data() {
     return {
-      questionTypeId: null // 试题分类id
+      questionTypeId: null // 题库id
     }
   },
   created() {
