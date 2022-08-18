@@ -309,8 +309,12 @@ D多选题的D选项
           answerScores.push(scoreArr[i] ? scoreArr[i] : 1)
           score += answerScores[i]
         }
-        if (fillBlanksCount > 1 && answerArr.length === 1) {
-          answerArr = answerArr[0].split(/ +/) // 如果多个空一个答案则进行拆分，满足接口需求
+        if (fillBlanksCount > 1 && answerArr.length === 1) {// 如果答案是写在一块按空格分割的，则进行拆分，满足接口需求
+          answerArr = answerArr[0].split(/ +/) 
+        } else {// 如果答案分开写，一个答案按回车分割备选答案，满足接口需求
+          answerArr = answerArr.map(answer => {
+            return answer.split(/ +/).join('\n')
+          })
         }
         if (markType === 2) {
           markTypeArr = [] // 主观题没有阅卷选项
@@ -345,10 +349,10 @@ D多选题的D选项
     },
     // 文本导入
     async txtImport() {
-      // if (this.errNum > 0) {
-      //   this.$message.warning('错误格式' + this.errNum + '处，请处理')
-      //   return
-      // }
+      if (this.errNum > 0) {
+        this.$message.warning('错误格式' + this.errNum + '处，请处理')
+        return
+      }
 
       let errTxt = ''
       for (let i in this.questionList) {

@@ -16,7 +16,7 @@
     </el-form-item>
 
     <div v-if="editForm.type === 3" class="cloze-tip">
-      五个下划线（_____ ）表示一个填空
+      五个或五个以上下划线（_____ ）表示一个填空
     </div>
 
     <!-- 判断，多选的选项 -->
@@ -61,13 +61,15 @@
     <el-row>
       <el-col :span="2.5">
         <div v-if="[3, 5].includes(editForm.type)">
-          <el-form-item label="智能阅卷" prop="ai">
+          <el-form-item label="阅卷类型" prop="ai">
             <el-switch
               v-model="editForm.markType"
               active-color="#0094e5"
               :active-value="1"
+              active-text="客观题"
               inactive-color="#ff4949"
               :inactive-value="2"
+              inactive-text="主观题"
             />
           </el-form-item>
         </div>
@@ -75,7 +77,7 @@
       <el-col :span="18">
         <div v-if="editForm.markType === 1 && editForm.type === 3">
           <el-form-item prop="markOptions">
-            <el-checkbox-group v-model="editForm.markOptions">
+            <el-checkbox-group v-model="editForm.markOptions" style="width:300px">
               <el-tooltip
                 class="item"
                 content="默认答案有顺序"
@@ -181,7 +183,7 @@
       <el-card class="el-card" shadow="never">
         <el-alert
           :closable="false"
-          title="单个填空有多个同义词，可添加多个标签。如：人民、公民、群众"
+          title="单填有多个备选答案，用多个标签分开。如：老婆、媳妇"
           type="success"
         />
         <el-row
@@ -248,7 +250,7 @@
       <el-card class="el-card" shadow="never">
         <el-alert
           :closable="false"
-          title="单个关键词有多个同义词，可添加多个标签。如：人民、公民、群众"
+          title="单个关键词有多个备选答案，用多个标签分开。如：老婆、媳妇"
           type="success"
         />
         <el-row
