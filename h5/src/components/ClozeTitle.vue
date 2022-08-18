@@ -2,7 +2,11 @@
 export default {
   functional: true,
   props: {
-    title: {
+    no: {// 题号
+      type: String, 
+      default: '',
+    },
+    title: {// 题干
       type: String,
       default: '',
     },
@@ -60,7 +64,7 @@ export default {
       title = `${titleStart}${html}${titleEnd}`
     })
     const titleTemplate = {
-      template: `<div>${title}</div>`, // 最外出需要包裹一层（控制台报没有根节点）
+      template: `<div class='question-title'>${props.no ? props.no  + '、' : ''}${title}</div>`, // 最外出需要包裹一层（控制台报没有根节点）
       data() {
         return props
       },

@@ -80,7 +80,8 @@
           v-else
           :id="questionId"
           ref="questionList"
-          :list="list"
+          :list="questionViewList"
+          :preview="false"
           @del="del"
           @copy="copy"
           @publish="publish"
@@ -248,15 +249,16 @@ export default {
       }
     },
     // 获取试题详情
-    async showDetails(id) {
-      this.detailStatus = true
-      const res = await questionGet({ id })
-      if (res?.code !== 200) {
-        this.$message.error('获取详情失败！请重试')
-        this.questionDetail = {}
-        return
-      }
-      this.questionDetail = res.data
+    async showDetails(id, type) {
+      // this.detailStatus = true
+      // const res = await questionGet({ id })
+      // if (res?.code !== 200) {
+      //   this.$message.error('获取详情失败！请重试')
+      //   this.questionDetail = {}
+      //   return
+      // }
+      // this.questionDetail = res.data
+      // this.questionEdit(id, type)
     },
     // 编辑试题
     questionEdit({ id, type }) {
@@ -331,6 +333,36 @@ export default {
         this.$message.success(`${msg}成功！`)
       } else {
         this.$message.error(res.msg || `${msg}失败！`)
+      }
+    }
+  },
+  computed: {
+    questionViewList: function () {
+      /**
+       * answers: [{score: 1, answer: ["B"]}]  单选
+       * answers: [{score: 1, answer: ["A", "B"]}] 多选
+       * answers: [{score: 0, answer: ["北京"]}, {score: 0, answer: ["上海"]}] 填空
+       * answers: [{score: 2, answer: ["山西 山西省 晋"]}, {score: 2, answer: ["老婆 媳妇 内人"]}] 填空
+       * answers: [{score: 1, answer: ["对"]}] 判断
+       * [{score: 0, answer: ["我是问答题的答案"]}] 问答
+       */
+      let _questionList = JSON.parse(JSON.stringify(this.list.questionList)).map(question => {//answers: [{score: 1, answer: ["B"]}] => answers: B
+        if (question.type === 1 || question.type === 4 || (question.type === 5 && question.markType === 2)) {
+          question.answers = question.answers[0].answer[0]
+        } else if (question.type === 2) {
+          question.answers = question.answers[0].answer
+        } else if (question.type === 3 || (question.type === 5 && question.markType === 1)) {
+            question.answers = question.answers.map(answer => {
+            return answer.answer[0]
+          })
+        }
+        return question
+      });
+      return {
+        total: this.list.total,
+        pageSize: this.list.pageSize,
+        curPage: this.list.curPage,
+        questionList : _questionList
       }
     }
   }

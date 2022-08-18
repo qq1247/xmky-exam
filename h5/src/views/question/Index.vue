@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <template v-if="hashChildren">
+    <template v-if="hasChildren">
       <!-- 搜索 -->
       <el-form :inline="true" :model="queryForm" class="form-inline search">
         <div>
@@ -80,7 +80,7 @@ export default {
     }
   },
   computed: {
-    hashChildren() {
+    hasChildren() {
       return !(this.$route.matched.length > 2)
     }
   },

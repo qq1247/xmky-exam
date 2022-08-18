@@ -56,7 +56,7 @@ export default {
       default: null
     },
     isBack: {
-      type: Boolean,
+      type: Boolean, 
       default: true
     }
   },
@@ -83,13 +83,12 @@ C、单选题的C选项
 D单选题的D选项
 [B]
 
-1.这是一道单选题的题干，
+1.这是一道多选题的题干，
 可换行，可选写法
-A.单选题的A选项，
-可换行
-B。单选题的B选项
-C、单选题的C选项
-D单选题的D选项
+A.多选题的A选项，
+B。多选题的B选项
+C、多选题的C选项
+D多选题的D选项
 [AB][3分][1分]
 [解析]中括号内【字母】表示答案，一个答案表示单选题，一个以上答案表示多选题
 中括号内【数字分】表示该题分数，第一项为该题分数，不填默认1分，第二项为漏选分数，多选题有效，不填默认为总分一半
@@ -144,7 +143,8 @@ D单选题的D选项
         }
         this.questionList.push(question)
 
-        let _question = JSON.parse(JSON.stringify(question)) // 组装成组件需要的格式
+        // 组装成组件需要的格式
+        let _question = JSON.parse(JSON.stringify(question)) 
         if (_question.type === 1) {
           _question.answers = _question.answers[0]
           for (let i = 0; i < _question.options.length; i++) {
@@ -157,8 +157,7 @@ D单选题的D选项
         } else if (_question.type === 4) {
           _question.answers = _question.answers[0]
         }
-         this.list.questionList.push(_question)
-
+        this.list.questionList.push(_question)
       }
     },
     // 拆分文本，每段为一道试题

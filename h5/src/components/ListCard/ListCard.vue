@@ -165,7 +165,7 @@ export default {
   },
   create() {},
   methods: {
-    // 是否有权限（只有创建者才有权限）
+    // 是否有权限（只有创建用户才有权限）
     isRole(data) {
       // 是否已经发布
       // const isPublish = data.state === 1

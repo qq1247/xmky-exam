@@ -6,9 +6,9 @@
         {{ data.name || data.examName }}
       </div>
       <template v-if="name === 'question'">
-        <!-- 创建者 -->
+        <!-- 创建用户 -->
         <div class="content-info ellipsis">
-          创建者：{{ data.createUserName || data.userName }}
+          创建用户：{{ data.createUserName || data.userName }}
         </div>
         <!-- 编辑权限 -->
         <div class="content-info ellipsis">
@@ -50,7 +50,7 @@
           <span data-title="合并" @click="move(data)">
             <i class="common common-move" />
           </span>
-          <span data-title="试题列表" @click="move(data)">
+          <span data-title="试题列表" @click="detail(data)">
             <i class="common common-list-row" />
           </span>
           <!-- 开放 -->
@@ -104,9 +104,9 @@ export default {
     }
   },
   methods: {
-    // 是否有权限（只有创建者才有权限）
+    // 是否有权限（只有创建用户才有权限）
     isRole(data) {
-      // 是否是创建者
+      // 是否是创建用户
       const isCreateUser =
         data.createUserId && this.$store.getters.userId !== data.createUserId
       // 是否是分类

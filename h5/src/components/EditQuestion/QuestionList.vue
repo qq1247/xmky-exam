@@ -35,7 +35,7 @@
             question.id === id ? 'center-card-active' : '',
           ]"
           shadow="hover"
-          @click.native="showDetails(question.id)"
+          @click.native="showDetails(question.id, question.type)"
         >
           <div class="center-card-top">
             <span>{{ question.id }}、</span>
@@ -49,7 +49,7 @@
               }}</el-tag>
 
               <el-tag effect="plain" size="mini" type="success">{{
-                ['', '智能', '非智能'][question.markType]
+                ['', '客观题', '主观题'][question.markType]
               }}</el-tag>
 
               <el-tag
@@ -139,11 +139,12 @@
           </div>
           <ClozeTitle 
             v-else
+            :no="indexQuestion + 1"
             :title="question.title"
             :answers="question.answers"
             :id="question.id"
             :err="false"
-            :preview="false"
+            :preview="true"
           />
           
 
