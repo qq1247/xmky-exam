@@ -66,7 +66,7 @@
                 :type="question.state === 1 ? 'info' : 'primary'"
                 effect="plain"
                 size="mini"
-              >{{ question.state === 1 ? '发布' : '草稿' }}</el-tag>
+              >{{['回收站', '发布', '草稿'][question.state]}}</el-tag>
             </div>
             <div class="card-bottom-right">
               <el-button

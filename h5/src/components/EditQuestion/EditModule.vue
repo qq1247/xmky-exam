@@ -508,7 +508,8 @@ export default {
     questionType(n) {
       this.editForm.type = n
       this.resetData()
-      this.editForm.options.length = 2
+      this.editForm.markOptions = []
+      this.editForm.options.splice(2)
       this.editForm.answers =
         this.editForm.type === 3
           ? []
