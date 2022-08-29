@@ -10,7 +10,7 @@
     </div>
 
     <el-scrollbar wrap-style="overflow-x:hidden;" class="paper-content">
-      <Header ref="paperHeader" :paper-name="paperName" />
+      <!-- <Header ref="paperHeader" :paper-name="paperName" /> -->
       <Composition
         v-if="!preview"
         ref="paperComposition"
@@ -22,7 +22,7 @@
   </div>
 </template>
 <script>
-import Header from '@/views/paper/List/Edit/RulePaper/Content/Header.vue'
+// import Header from '@/views/paper/List/Edit/RulePaper/Content/Header.vue'
 import Preview from '@/views/paper/List/Edit/RulePaper/Content/Preview.vue'
 import Composition from '@/views/paper/List/Edit/RulePaper/Content/Composition.vue'
 import QuestionDrag from '@/views/paper/List/Edit/RulePaper/Handler/QuestionDrag.vue'
@@ -30,7 +30,7 @@ import { paperGet } from 'api/paper'
 import { getQuick } from '@/utils/storage'
 export default {
   components: {
-    Header,
+    // Header,
     Preview,
     Composition,
     QuestionDrag

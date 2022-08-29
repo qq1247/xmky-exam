@@ -71,75 +71,75 @@ export default [
       }
     ]
   },
+  // {
+  //   name: 'Paper',
+  //   path: '/paper',
+  //   component: Layout,
+  //   redirect: '/paper/index',
+  //   meta: {
+  //     title: '试卷管理',
+  //     icon: 'common common-paper-manage',
+  //     layout: 'subAdmin',
+  //     roles: ['subAdmin']
+  //   },
+  //   children: [
+  //     {
+  //       name: 'PaperIndex',
+  //       path: 'index',
+  //       component: () => import('@/views/paper/Index/Index.vue'),
+  //       meta: {
+  //         title: '试卷分类',
+  //         layout: 'subAdmin'
+  //       },
+  //       children: [
+  //         {
+  //           path: 'setting/:id/:tab?',
+  //           name: 'PaperIndexSetting',
+  //           component: () => import('@/views/paper/Index/Setting/Index.vue'),
+  //           meta: {
+  //             title: '试卷设置',
+  //             layout: 'subAdmin'
+  //           }
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       path: 'list/:id?',
+  //       name: 'PaperList',
+  //       component: () => import('@/views/paper/List/Index.vue'),
+  //       hidden: true,
+  //       meta: {
+  //         title: '试卷列表',
+  //         layout: 'subAdmin'
+  //       },
+  //       children: [
+  //         {
+  //           path: '/paper/list/setting/:id/:paperTypeId/:genType/:tab?',
+  //           name: 'PaperListSetting',
+  //           component: () => import('@/views/paper/List/Setting/Index.vue'),
+  //           meta: {
+  //             title: '列表设置',
+  //             layout: 'subAdmin'
+  //           }
+  //         },
+  //         {
+  //           path: '/paper/list/edit/:id/:paperTypeId/:genType/:tab?',
+  //           name: 'PaperListEdit',
+  //           component: () => import('@/views/paper/List/Edit/Index.vue'),
+  //           meta: {
+  //             title: '组合试卷',
+  //             layout: 'subAdmin'
+  //           }
+  //         }
+  //       ]
+  //     }
+  //   ]
+  // },
   {
-    path: '/paper',
-    component: Layout,
-    redirect: '/paper/index',
-    name: 'Paper',
-    meta: {
-      title: '试卷管理',
-      icon: 'common common-paper-manage',
-      layout: 'subAdmin',
-      roles: ['subAdmin']
-    },
-    children: [
-      {
-        path: 'index',
-        name: 'PaperIndex',
-        component: () => import('@/views/paper/Index/Index.vue'),
-        meta: {
-          title: '试卷分类',
-          layout: 'subAdmin'
-        },
-        children: [
-          {
-            path: 'setting/:id/:tab?',
-            name: 'PaperIndexSetting',
-            component: () => import('@/views/paper/Index/Setting/Index.vue'),
-            meta: {
-              title: '试卷设置',
-              layout: 'subAdmin'
-            }
-          }
-        ]
-      },
-      {
-        path: 'list/:id?',
-        name: 'PaperList',
-        component: () => import('@/views/paper/List/Index.vue'),
-        hidden: true,
-        meta: {
-          title: '试卷列表',
-          layout: 'subAdmin'
-        },
-        children: [
-          {
-            path: '/paper/list/setting/:id/:paperTypeId/:genType/:tab?',
-            name: 'PaperListSetting',
-            component: () => import('@/views/paper/List/Setting/Index.vue'),
-            meta: {
-              title: '列表设置',
-              layout: 'subAdmin'
-            }
-          },
-          {
-            path: '/paper/list/edit/:id/:paperTypeId/:genType/:tab?',
-            name: 'PaperListEdit',
-            component: () => import('@/views/paper/List/Edit/Index.vue'),
-            meta: {
-              title: '组合试卷',
-              layout: 'subAdmin'
-            }
-          }
-        ]
-      }
-    ]
-  },
-  {
+    name: 'Exam',
     path: '/exam',
     component: Layout,
     redirect: '/exam/index',
-    name: 'Exam',
     meta: {
       title: '考试管理',
       icon: 'common common-exam-manage',
@@ -148,29 +148,29 @@ export default [
     },
     children: [
       {
-        path: 'index',
-        name: 'ExamIndex',
-        component: () => import('@/views/exam/Index/Index.vue'),
+        path: '/exam/nav',
+        name: 'ExamNav',
+        component: () => import('@/views/exam/Nav/Index.vue'),
         meta: {
-          title: '考试分类',
+          title: '考试导航',
           layout: 'subAdmin'
         },
         children: [
           {
-            path: 'setting/:id/:tab?',
-            name: 'ExamIndexSetting',
-            component: () => import('@/views/exam/Index/Setting/Index.vue'),
+            path: 'setting',
+            name: 'ExamNavSetting',
+            component: () => import('@/views/exam/Nav/PaperSetting.vue'),
             meta: {
-              title: '考试设置',
+              title: '试卷设置',
               layout: 'subAdmin'
             }
           }
         ]
       },
       {
-        path: 'list/:id',
-        name: 'ExamList',
-        component: () => import('@/views/exam/List/Index.vue'),
+        path: 'index',
+        name: 'ExamIndex',
+        component: () => import('@/views/exam/Index.vue'),
         hidden: true,
         meta: {
           title: '考试列表',
@@ -180,7 +180,7 @@ export default [
           {
             path: '/exam/list/setting/:id/:examTypeId/:tab?',
             name: 'ExamListSetting',
-            component: () => import('@/views/exam/List/Setting/Index.vue'),
+            component: () => import('@/views/exam/Setting/Index.vue'),
             meta: {
               title: '列表设置',
               layout: 'subAdmin'
@@ -189,7 +189,7 @@ export default [
           {
             path: '/exam/list/markSetting/:id/:examTypeId',
             name: 'ExamListMarkSetting',
-            component: () => import('@/views/exam/List/MarkSetting.vue'),
+            component: () => import('@/views/exam/MarkSetting.vue'),
             meta: {
               title: '考试用户',
               layout: 'subAdmin'
@@ -198,7 +198,7 @@ export default [
           {
             path: '/exam/list/line/:id/:examTypeId',
             name: 'ExamListLine',
-            component: () => import('@/views/exam/List/OnLine.vue'),
+            component: () => import('@/views/exam/OnLine.vue'),
             meta: {
               title: '在线用户',
               layout: 'subAdmin'
@@ -207,7 +207,7 @@ export default [
           {
             path: '/exam/list/statistics/:id/:examTypeId',
             name: 'ExamListStatistics',
-            component: () => import('@/views/exam/List/Statistics.vue'),
+            component: () => import('@/views/exam/Statistics.vue'),
             meta: {
               title: '考试统计',
               layout: 'subAdmin'

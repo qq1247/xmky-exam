@@ -1,31 +1,28 @@
 <template>
   <div class="paper-router">
-    <div class="total-score">总分：{{ totalScore }}</div>
-    <template v-if="paperQuestion.length > 0">
-      <div
-        v-for="(item, index) in paperQuestion"
-        :key="index"
-        class="router-content"
-      >
-        <div v-if="item.questionList" class="router-title">
-          第{{ $tools.intToChinese(index + 1) }}章（共{{
-            item.questionList.length
-          }}题，合计{{ computeChapterScore(item.questionList) }}分）
-        </div>
-        <div v-if="item.questionList" class="router-link">
-          <a
-            v-for="(question, indexQuestion) in item.questionList"
-            :key="question.id"
-            :class="[
-              'router-index',
-              routerIndex === question.id ? 'router-active' : '',
-            ]"
-            @click="toHref(question.id)"
-          >{{ indexQuestion + 1 }}</a>
-        </div>
+    <div class="total-score">总分：{{ totalScore }}</div>的点点滴滴多多多多多多多多
+    <div
+      v-for="(item, index) in paperQuestion"
+      :key="index"
+      class="router-content"
+    >
+      <div v-if="item.questionList" class="router-title">
+        第{{ $tools.intToChinese(index + 1) }}章（共{{
+          item.questionList.length
+        }}题，合计{{ computeChapterScore(item.questionList) }}分）
       </div>
-    </template>
-    <el-empty v-else description="暂无试题导航" />
+      <div v-if="item.questionList" class="router-link">
+        <a
+          v-for="(question, indexQuestion) in item.questionList"
+          :key="question.id"
+          :class="[
+            'router-index',
+            routerIndex === question.id ? 'router-active' : '',
+          ]"
+          @click="toHref(question.id)"
+        >{{ indexQuestion + 1 }}</a>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -97,6 +94,7 @@ export default {
 
 <style lang="scss" scoped>
 .paper-router {
+  width: 500px;
   background: #fff;
   position: relative;
   padding-top: 80px;

@@ -34,7 +34,7 @@ export default {
   align-items: center;
 }
 .nav-logo {
-  height: 64px;
+  height: 45px;
   display: flex;
   align-items: center;
   /deep/ .el-image {
@@ -61,8 +61,8 @@ export default {
   display: flex;
   margin-left: 80px;
   .nav-item {
-    height: 64px;
-    line-height: 64px;
+    height: 45px;
+    line-height: 45px;
     margin: 0 35px;
     position: relative;
     border-bottom: 2px solid #fff;

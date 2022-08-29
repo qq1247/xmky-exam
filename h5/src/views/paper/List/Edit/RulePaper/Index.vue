@@ -10,7 +10,7 @@
       </el-scrollbar>
     </div>
 
-    <el-scrollbar wrap-style="overflow-x:hidden;" class="paper-content">
+    <!-- <el-scrollbar wrap-style="overflow-x:hidden;" class="paper-content">
       <Header ref="paperHeader" :paper-name="paperName" />
       <Composition
         v-if="!preview"
@@ -18,12 +18,12 @@
         :paper-state="paperState"
       />
       <Preview v-if="preview" ref="paperPreview" />
-    </el-scrollbar>
+    </el-scrollbar> -->
   </div>
 </template>
 <script>
 import Nav from './Handler/Nav.vue'
-import Header from './Content/Header.vue'
+// import Header from './Content/Header.vue'
 import Preview from './Content/Preview.vue'
 import Composition from './Content/Composition.vue'
 import QuestionAdd from './Handler/QuestionAdd.vue'

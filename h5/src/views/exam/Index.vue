@@ -114,10 +114,7 @@ export default {
 
     // 添加
     add() {
-      this.$tools.switchTab('ExamListSetting', {
-        id: 0,
-        examTypeId: this.$route.params.id,
-        tab: '1'
+      this.$tools.switchTab('ExamNav', {
       })
     },
     // 编辑分类

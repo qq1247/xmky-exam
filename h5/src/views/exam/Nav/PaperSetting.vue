@@ -21,19 +21,19 @@ export default {
     return {
       examContent: [
         {
-          imgSrc: require('../../assets/img/mark/mark-time.png'),
+          imgSrc: require('@/assets/img/mark/mark-time.png'),
           title: '空白试卷',
-          desc: '创建一张空白试卷',
+          desc: '从零开始创建一张试卷',
         },
         {
-          imgSrc: require('../../assets/img/mark/mark-time.png'),
-          title: '文本导入试卷',
-          desc: '文本导入一张试卷，即时编辑预览',
+          imgSrc: require('@/assets/img/mark/mark-time.png'),
+          title: '快速生成试卷',
+          desc: '即时编辑试题，快速导入',
         },
         {
-          imgSrc: require('../../assets/img/mark/mark-time.png'),
-          title: '随机',
-          desc: '人工录入，创建一张试卷',
+          imgSrc: require('@/assets/img/mark/mark-time.png'),
+          title: '随机试卷',
+          desc: '配置抽题规则，每个人试卷不一样',
         },
       ],
     }

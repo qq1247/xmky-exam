@@ -404,12 +404,12 @@ export default {
             icon: require('../../assets/img/index/question-manage.png'),
             title: '题库管理'
           },
-          {
-            path: '/paper',
-            background: '#FB901B',
-            icon: require('../../assets/img/index/paper-manage.png'),
-            title: '试卷管理'
-          },
+          // {
+          //   path: '/paper',
+          //   background: '#FB901B',
+          //   icon: require('../../assets/img/index/paper-manage.png'),
+          //   title: '试卷管理'
+          // },
           {
             path: '/exam',
             background: '#09C8BD',

@@ -1,291 +1,146 @@
 <template>
   <div class="content-center center-drag">
     <Draggable
-      v-if="paperQuestion.length"
-      v-model="paperQuestion"
+      v-model="questionList"
       tag="div"
-      group="paperParent"
+      group="questionGroup"
       chosen-class="drag-question-active"
       animation="300"
-      @update="chapterMove"
     >
+      <!-- @update="chapterMove" -->
       <div
-        v-for="(item, index) in paperQuestion"
-        :key="index"
-        class="drag-item"
+        v-for="(question, index) in questionList"
+        :id="`p-${question.id}`"
+        :key="question.id"
+        class="question-content"
       >
-        <div class="chapter">
+        <!-- <div class="chapter">
           <div class="chapter-name">
             <el-input
               v-model="item.chapter.name"
-              class="chapter-name-input"
-              placeholder="请输入章节名称（最多16个字符）"
+              class="chapter"
+              placeholder="请输入章节名称"
               maxlength="16"
-              @blur="
-                (e) =>
-                  editorListener('chapterName', e.target.value, item.chapter)
-              "
             />
-            <div>
-              <el-tooltip content="删除" effect="dark" placement="top">
-                <el-button
-                  icon="common common-delete"
-                  size="mini"
-                  circle
-                  @click="chapterDel(item.chapter)"
-                />
-              </el-tooltip>
-              <el-tooltip content="清空试题" effect="dark" placement="top">
-                <el-button
-                  icon="common common-clear"
-                  size="mini"
-                  circle
-                  @click="chapterClear(item.chapter, index)"
-                />
-              </el-tooltip>
-              <el-tooltip content="批量设置" effect="dark" placement="top">
-                <el-button
-                  icon="common common-setting"
-                  size="mini"
-                  circle
-                  @click="batchSetting(item.chapter, index)"
-                />
-              </el-tooltip>
-              <el-tooltip content="折叠" effect="dark" placement="top">
-                <el-button
-                  icon="common common-fold"
-                  size="mini"
-                  circle
-                  @click="chapterFold(index)"
-                />
-              </el-tooltip>
-            </div>
           </div>
-          <TinymceEditor
-            id="chapterDesc"
-            class="chapter-description"
-            placeholder="请输入章节描述"
-            :value="item.chapter.description"
-            @editorListener="
-              (id, value) => editorListener(id, value, item.chapter)
-            "
+          <el-input
+              v-model="item.chapter.description"
+              :rows="2"
+              class="chapter"
+              placeholder="请输入描述"
+              type="textarea"
+              :autosize="true"
+            />
+        </div> -->
+        <!-- 题目 -->
+          <div v-if="question.type !== 3" class="question-title">
+            <span>{{ index + 1 }}、</span>
+            <div v-html="`${question.title}`" />
+          </div>
+          <ClozeTitle 
+            v-else
+            :no="index + 1 + ''"
+            :title="question.title"
+            :answers="question.answers"
+            :id="question.id"
+            :err="false"
+            :preview="true"
           />
-        </div>
-
-        <Draggable
-          v-if="item.chapter.show"
-          v-model="item.questionList"
-          tag="div"
-          group="paper"
-          chosen-class="drag-question-active"
-          animation="300"
-          :data-id="item.chapter.id"
-          @end="questionMove"
-        >
-          <template v-if="item.questionList.length > 0">
-            <div
-              v-for="(question, indexQuestion) in item.questionList"
-              :id="`p-${question.id}`"
-              :key="question.id"
-              class="question-content"
-            >
-              <div class="question-title">
-                <span>{{ indexQuestion + 1 }}、</span>
-                <div v-html="`${question.title}`" />
-              </div>
-              <!-- 单选 -->
-              <template v-if="question.type === 1">
-                <el-radio-group
-                  v-model="question.answers"
-                  class="children-option"
-                >
-                  <el-radio
-                    v-for="(option, indexOption) in question.options"
-                    :key="indexOption"
-                    class="option-item"
-                    disabled
-                    :label="String(option.no)"
-                  >
-                    <div
-                      class="flex-items-center"
-                      v-html="
-                        `${String.fromCharCode(65 + indexOption)}、${
-                          option.option
-                        }`
-                      "
-                    />
-                  </el-radio>
-                </el-radio-group>
-              </template>
-
-              <!-- 多选 -->
-              <template v-if="question.type === 2">
-                <el-checkbox-group
-                  v-model="question.answers"
-                  class="children-option"
-                >
-                  <el-checkbox
-                    v-for="(option, indexOption) in question.options"
-                    :key="indexOption"
-                    class="option-item"
-                    disabled
-                    :label="String(option.no)"
-                  >
-                    <div
-                      class="flex-items-center"
-                      v-html="
-                        `${String.fromCharCode(65 + indexOption)}、${
-                          option.option
-                        }`
-                      "
-                    />
-                  </el-checkbox>
-                </el-checkbox-group>
-              </template>
-
-              <!-- 判断 -->
-              <template v-if="question.type === 4">
-                <el-radio-group
-                  v-model="question.answer"
-                  class="children-option"
-                >
-                  <el-radio
-                    v-for="(option, indexOption) in ['对', '错']"
-                    :key="indexOption"
-                    class="option-item"
-                    disabled
-                    :label="option"
-                  >{{ option }}</el-radio>
-                </el-radio-group>
-              </template>
-
-              <!-- 解析 -->
-              <div v-if="question.analysisShow" class="children-analysis">
-                <el-row :gutter="10">
-                  <template v-if="[1, 4].includes(question.type)">
-                    <el-col :span="2.5"> 【答案】： </el-col>
-                    <el-col :span="21">
-                      <div
-                        v-if="question.answers && question.answers.length > 0"
-                        v-html="`${question.answers[0].answer}`"
-                      />
-                    </el-col>
-                  </template>
-                  <template v-if="question.type === 2">
-                    <el-col :span="2.5"> 【答案】： </el-col>
-                    <el-col :span="21">
-                      <div
-                        v-if="question.answers && question.answers.length > 0"
-                      >
-                        <span
-                          v-for="answer in question.answers"
-                          :key="answer.id"
-                        >{{ answer.answer.join('，') }}</span>
-                      </div>
-                    </el-col>
-                  </template>
-                  <template v-if="question.type === 3">
-                    <el-col :span="2.5">【答案】：</el-col>
-                    <el-col :span="21">
-                      <div
-                        v-for="(answer, indexAnswer) in question.answers"
-                        :key="answer.id"
-                        class="answers-item"
-                      >
-                        <span>{{
-                          `填空${$tools.intToChinese(indexAnswer + 1)}、`
-                        }}</span>
-                        <span
-                          v-for="(ans, indexAns) in answer.answer"
-                          :key="indexAns"
-                          class="answers-tag"
-                        >{{ ans }}</span>
-                      </div>
-                    </el-col>
-                  </template>
-                  <template v-if="question.type === 5">
-                    <el-col :span="2.5"> 【答案】： </el-col>
-                    <el-col :span="21">
-                      <template v-if="question.markType === 1">
-                        <div
-                          v-for="(answer, indexAnswer) in question.answers"
-                          :key="answer.id"
-                          class="answers-item"
-                        >
-                          <span>{{
-                            `关键词${$tools.intToChinese(indexAnswer + 1)}、`
-                          }}</span>
-                          <span
-                            v-for="(ans, indexAns) in answer.answer"
-                            :key="indexAns"
-                            class="answers-tag"
-                          >{{ ans }}</span>
-                        </div>
-                      </template>
-                      <div
-                        v-if="
-                          question.markType === 2 &&
-                            question.answers &&
-                            question.answers.length > 0
-                        "
-                        v-html="`${question.answers[0].answer}`"
-                      />
-                    </el-col>
-                  </template>
-                </el-row>
-                <el-row :gutter="10">
-                  <el-col :span="2.5"> 【解析】： </el-col>
-                  <el-col :span="21">
-                    <div v-html="`${question.analysis}`" />
-                  </el-col>
-                </el-row>
-              </div>
-
-              <div class="children-footer">
-                <div class="children-tags">
-                  <el-tag effect="dark" size="mini" type="warning">
-                    {{ question.type | typeName }}
-                  </el-tag>
-                  <el-tag
-                    effect="plain"
-                    size="mini"
-                    type="warning"
-                  >{{ question.score }}分</el-tag>
-                </div>
-                <div>
-                  <el-button
-                    class="btn"
-                    icon="el-icon-view"
-                    round
-                    size="mini"
-                    @click.native.stop="
-                      question.analysisShow = !question.analysisShow
-                    "
-                  >查看解析</el-button>
-                  <el-button
-                    class="btn"
-                    icon="el-icon-setting"
-                    round
-                    size="mini"
-                    @click="setting(question)"
-                  >设置</el-button>
-                  <el-button
-                    class="btn"
-                    icon="el-icon-delete"
-                    round
-                    size="mini"
-                    @click="del(question.id)"
-                  >删除</el-button>
-                </div>
-              </div>
-            </div>
+          <!-- 单选 -->
+          <template v-if="question.type === 1">
+            <el-radio-group v-model="question.answers" class="children-option">
+              <el-radio
+                v-for="(option, indexOption) in question.options"
+                :key="indexOption"
+                class="option-item"
+                :label="String(option.no)"
+              >
+                <div
+                  class="flex-items-center"
+                  v-html="
+                    `${String.fromCharCode(65 + indexOption)}、${option.option}`
+                  "
+                />
+              </el-radio>
+            </el-radio-group>
           </template>
-          <el-empty v-else description="拖拽题目到此处">
-            <template slot="image">
-              <i class="common common-drag" style="font-size: 35px" />
-            </template>
-          </el-empty>
-        </Draggable>
+          <!-- 多选 -->
+          <template v-if="question.type === 2">
+            <el-checkbox-group
+              v-model="question.answers"
+              class="children-option"
+            >
+              <el-checkbox
+                v-for="(option, indexOption) in question.options"
+                :key="indexOption"
+                class="option-item"
+                :label="String(option.no)"
+              >
+                <div
+                  class="flex-items-center"
+                  v-html="
+                    `${String.fromCharCode(65 + indexOption)}、${option.option}`
+                  "
+                />
+              </el-checkbox>
+            </el-checkbox-group>
+          </template>
+          <!-- 判断 -->
+          <template v-if="question.type === 4">
+            <el-radio-group v-model="question.answers" class="children-option">
+              <el-radio
+                v-for="(option, indexOption) in ['对', '错']"
+                :key="indexOption"
+                class="option-item"
+                :label="option"
+              >{{ option }}</el-radio>
+            </el-radio-group>
+          </template>
+          <!-- 问答 -->
+          <template v-if="question.type === 5">
+            <el-input
+              v-model="question.answers"
+              :rows="2"
+              class="question-text"
+              placeholder="请输入答案"
+              type="textarea"
+              :autosize="true"
+            />
+          </template>
+          <div class="children-footer">
+            <div v-if="question.analysisState" v-html="`解析：${question.analysis}`" ></div>
+            <div class="lose">
+              本题
+              <el-input v-model="question.score" size="mini" />分
+            </div>
+            <div class="lose" v-if="question.type === 2">
+              ，漏选得
+              <el-input v-model="question.answerScores" size="mini" />分
+            </div>
+            <div>
+              <el-button
+                class="btn"
+                icon="el-icon-view"
+                round
+                size="mini"
+                @click.native.stop="
+                  question.analysisShow = !question.analysisShow
+                "
+              >查看解析</el-button>
+              <el-button
+                class="btn"
+                icon="el-icon-delete"
+                round
+                size="mini"
+                @click="del(question.id)"
+              >删除</el-button>
+            </div>
+        </div>
+      <!-- <el-empty v-else description="拖拽题目到此处">
+          <template slot="image">
+            <i class="common common-drag" style="font-size: 35px" />
+          </template>
+        </el-empty> -->
       </div>
     </Draggable>
 
@@ -294,7 +149,7 @@
       <span>点击添加章节</span>
     </div> -->
 
-    <el-empty v-if="!paperQuestion.length" description="暂无试卷" />
+    <el-empty v-if="!paperQuestion.length" description="请添加试题" />
 
     <el-dialog
       :visible.sync="settingForm.show"
@@ -472,33 +327,17 @@
 import _ from 'lodash'
 import { getOneDict } from '@/utils/getDict'
 import { getQuick } from '@/utils/storage'
-import {
-  paperPaper,
-  paperChapterAdd,
-  paperChapterEdit,
-  paperChapterDel,
-  paperQuestionClear,
-  paperQuestionDel,
-  paperScoreUpdate,
-  paperChapterMove,
-  paperQuestionMove,
-  paperUpdateBatchScore
-} from 'api/paper'
-import TinymceEditor from 'components/TinymceEditor/Index.vue'
 import Draggable from 'vuedraggable'
+import ClozeTitle from '@/components/ClozeTitle.vue'
 export default {
-  components: { TinymceEditor, Draggable },
-  filters: {
-    typeName(data) {
-      return getOneDict('QUESTION_TYPE').find(
-        (item) => Number(item.dictKey) === data
-      ).dictValue
-    },
+  components: {
+    Draggable,
+    ClozeTitle
   },
   props: {
-    paperState: {
-      type: Number,
-      default: 2
+    questionList: {
+      type: Array,
+      default: []
     }
   },
   data() {
@@ -577,29 +416,8 @@ export default {
   },
   async created() {
     this.paperId = this.$route.params.id || getQuick().id
-    this.query()
-  },
-  activated() {
-    this.query()
   },
   methods: {
-    // 查询试卷信息
-    async query() {
-      try {
-        const res = await paperPaper({
-          id: this.paperId
-        })
-        res.data.map((item) => {
-          item.chapter.show = true
-          item.questionList.map((question) => {
-            question.analysisShow = false
-          })
-        })
-        this.paperQuestion = [...res.data]
-      } catch (error) {
-        this.$message.error(error.msg)
-      }
-    },
     // 添加章节
     async paperChapterAdd() {
       const res = await paperChapterAdd({
@@ -688,7 +506,6 @@ export default {
     refreshData(res, title) {
       res?.code === 200
         ? (this.$message(`${title}成功！`),
-        this.query(),
         this.$parent.$parent.$refs.questionDrag.queryQuestion())
         : this.$message.error(`${title}失败！`)
     },
@@ -755,7 +572,6 @@ export default {
         if (updateScore?.code === 200) {
           this.$message.success('编辑成功！')
           this.settingForm.show = false
-          this.query()
         }
       })
     },
@@ -772,37 +588,6 @@ export default {
       if (res?.code === 200) {
         this.$message.success('编辑成功！')
         this.batchForm.show = false
-        this.query()
-      }
-    },
-    // 章节移动
-    async chapterMove({ newIndex, oldIndex }) {
-      const sourceId = this.paperQuestion[newIndex].chapter.id
-      const targetId = this.paperQuestion[oldIndex].chapter.id
-      const res = await paperChapterMove({
-        sourceId,
-        targetId
-      })
-
-      if (res?.code === 200) {
-        this.query()
-      }
-    },
-    // 试题移动
-    async questionMove({ to, from, newIndex, oldIndex }) {
-      const toChapterId = to.dataset.id
-      const sourceQuestion = this.filterQuestion(toChapterId)
-      const sourceId = sourceQuestion[newIndex].id
-      const targetId = sourceQuestion[oldIndex].id
-
-      const res = await paperQuestionMove({
-        id: this.paperId,
-        sourceId,
-        targetId
-      })
-
-      if (res?.code === 200) {
-        this.query()
       }
     },
     // 筛选数据
@@ -830,7 +615,7 @@ export default {
 
 .center-drag {
   width: calc(1200px - 410px);
-  padding-top: 50px;
+  padding-top: 80px;
   .drag-item {
     cursor: move;
   }
@@ -862,6 +647,7 @@ export default {
 }
 
 .question-content {
+  cursor: pointer;
   &:hover {
     transition: all 0.2s ease;
     padding: 16px 16px 50px;
@@ -875,5 +661,23 @@ export default {
 /deep/.tinymce-box .tinymce-content {
   line-height: 30px;
   border: 1px solid #fff;
+}
+
+.lose {
+  display: flex;
+  align-items: flex-end;
+  height: 30px;
+  /deep/ .el-input {
+    width: 40px;
+  }
+  /deep/ .el-input__inner {
+    border: none;
+    border-bottom: 1px solid #dcdfe6;
+    text-align: center;
+    padding: 0 7px;
+    height: 20px;
+    line-height: 20px;
+    border-radius: 0;
+  }
 }
 </style>

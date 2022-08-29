@@ -344,7 +344,8 @@ D多选题的D选项
       if (this.isBack) {
         this.$router.back()
       } else {
-        this.$parent.activeIndex = 0
+        this.$parent.activeIndex = 1
+        this.$parent.createdType = 0
       }
     },
     // 文本导入
