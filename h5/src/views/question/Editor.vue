@@ -7,7 +7,7 @@
   </div>
 </template>
 <script>
-import QuestionTxtImport from '@/components/EditQuestion/QuestionTxtImport.vue'
+import QuestionTxtImport from '@/components/Question/QuestionTxtImport.vue'
 export default {
   components: {
     QuestionTxtImport

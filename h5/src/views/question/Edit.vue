@@ -80,7 +80,7 @@
           v-else
           :id="questionId"
           ref="questionList"
-          :list="questionViewList"
+          :list="list"
           :preview="false"
           @del="del"
           @copy="copy"
@@ -127,11 +127,11 @@ import {
   questionEdit,
   questionPublish
 } from 'api/question'
-import QuestionType from '@/components/EditQuestion/QuestionType.vue'
-import QuestionList from '@/components/EditQuestion/QuestionList.vue'
-import EditModule from 'components/EditQuestion/EditModule.vue'
+import QuestionType from '@/components/Question/QuestionType.vue'
+import QuestionList from '@/components/Question/QuestionList.vue'
+import EditModule from 'components/Question/EditModule.vue'
 import QuestionDetail from 'components/QuestionDetail/Index.vue'
-import QuestionTxtImport from '@/components/EditQuestion/QuestionTxtImport.vue'
+import QuestionTxtImport from '@/components/Question/QuestionTxtImport.vue'
 export default {
   components: {
     QuestionType,

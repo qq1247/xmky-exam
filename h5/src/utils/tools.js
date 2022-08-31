@@ -1,4 +1,5 @@
 import router from '@/router/index'
+import { getOneDict } from '@/utils/getDict'
 
 const resetData = (el, name) => {
   const $data = el.$data[name]
@@ -135,6 +136,19 @@ const computeMinute = (startTime, endTime) => {
   return `${minutes}分钟`
 }
 
+/**
+ * 获取字典值
+ * 
+ * @param {*} index 索引
+ * @param {*} key 键
+ * @returns 值
+ */
+const getDictValue = (index, key) => {
+  return getOneDict(index).find(
+    (item) => item.dictKey == key
+  )?.dictValue
+}
+
 export {
   delay,
   switchTab,
@@ -142,5 +156,6 @@ export {
   formateTime,
   intToChinese,
   getQueryParam,
-  computeMinute
+  computeMinute,
+  getDictValue
 }

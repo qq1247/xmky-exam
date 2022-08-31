@@ -37,7 +37,7 @@
 
 <script>
 import CustomSelect from 'components/CustomSelect.vue'
-import QuestionTemplate from '@/components/EditQuestion/QuestionTemplate.vue'
+import QuestionTemplate from '@/components/Question/QuestionTemplate.vue'
 import htmlDocx from 'html-docx-js/dist/html-docx'
 import saveAs from 'file-saver'
 import { questionTypeListPage } from 'api/question'

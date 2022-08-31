@@ -57,7 +57,7 @@
 
 <script>
 import CustomSelect from 'components/CustomSelect.vue'
-import EditModule from 'components/EditQuestion/EditModule.vue'
+import EditModule from 'components/Question/EditModule.vue'
 import {
   questionTypeListPage,
   questionAdd,
