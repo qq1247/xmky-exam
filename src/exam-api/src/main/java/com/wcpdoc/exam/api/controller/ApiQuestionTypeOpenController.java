@@ -24,7 +24,7 @@ import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeOpenService;
 
 /**
- * 试题分类开放控制层
+ * 题库开放控制层
  * 
  * v1.0 chenyun 2021-03-02 13:43:21
  */

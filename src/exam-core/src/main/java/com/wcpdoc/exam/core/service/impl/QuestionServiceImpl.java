@@ -33,15 +33,12 @@ import com.wcpdoc.core.util.BigDecimalUtil;
 import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.QuestionDao;
-import com.wcpdoc.exam.core.entity.Paper;
-import com.wcpdoc.exam.core.entity.PaperQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.entity.ex.MyQuestion;
-import com.wcpdoc.exam.core.service.PaperQuestionService;
-import com.wcpdoc.exam.core.service.PaperService;
+import com.wcpdoc.exam.core.service.ExamQuestionService;
 import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
@@ -70,9 +67,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	@Resource
 	private QuestionAnswerService questionAnswerService;
 	@Resource
-	private PaperQuestionService paperQuestionService;
-	@Resource
-	private PaperService paperService;
+	private ExamQuestionService examQuestionService;
 	
 	@Override
 	@Resource(name = "questionDaoImpl")
@@ -81,27 +76,24 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void addAndUpdate(Question question, Integer[] aiOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
+	public void addAndUpdate(Question question, Integer[] markOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
 		// 校验数据有效性
 		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-		addAndUpdateValid(question, aiOptions, options, answers, answerScores, questionType);
+		addAndUpdateValid(question, markOptions, options, answers, answerScores, questionType);
 		
 		// 添加试题
-		question.setCreateTime(new Date());
-		question.setCreateUserId(getCurUser().getId());
 		question.setUpdateTime(new Date());
 		question.setUpdateUserId(getCurUser().getId());
 		//question.setState(2);// 通过页面去控制添加的是草稿还是发布
 		if (question.getType() == 1 || question.getType() == 4 ) {
-			question.setAi(1);
-			question.setAiOptions(null);
+			question.setMarkType(1);
+			question.setMarkOptions(null);
 		} else if (question.getType() == 2) {
-			question.setAi(1);
-			question.setAiOptions("1");//多选的漏选得分必填。漏选分值页面控制
+			question.setMarkType(1);
+			question.setMarkOptions("1");//多选的漏选得分必填。漏选分值页面控制
 		} else if (question.getType() == 3 || question.getType() == 5 ) {
-			question.setAiOptions(ValidateUtil.isValid(aiOptions) ? StringUtil.join(aiOptions) : null);
+			question.setMarkOptions(ValidateUtil.isValid(markOptions) ? StringUtil.join(markOptions) : null);
 		}
-		question.setWriteUserIds(questionType.getWriteUserIds());
 		add(question);
 
 		//添加答案
@@ -110,8 +102,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			questionAnswer.setAnswer(answers[0]);
 			questionAnswer.setScore(question.getScore());
 			questionAnswer.setQuestionId(question.getId());
-			questionAnswer.setQuestionType(question.getType());
-			questionAnswer.setQuestionAi(question.getAi());
 			questionAnswer.setNo(1);
 			questionAnswerService.add(questionAnswer);
 		} else if (question.getType() == 2) {
@@ -120,18 +110,14 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			questionAnswer.setAnswer(StringUtil.join(answers));
 			questionAnswer.setScore(answerScores[0]);
 			questionAnswer.setQuestionId(question.getId());
-			questionAnswer.setQuestionType(question.getType());
-			questionAnswer.setQuestionAi(question.getAi());
 			questionAnswer.setNo(1);
 			questionAnswerService.add(questionAnswer);
 		} else if (question.getType() == 3 || question.getType() == 5) {
 			for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();
 				questionAnswer.setAnswer(answers[i]);
-				questionAnswer.setScore(question.getAi() == 1 ? answerScores[i] : BigDecimal.ZERO);
+				questionAnswer.setScore(question.getMarkType() == 1 ? answerScores[i] : BigDecimal.ZERO);
 				questionAnswer.setQuestionId(question.getId());
-				questionAnswer.setQuestionType(question.getType());
-				questionAnswer.setQuestionAi(question.getAi());
 				questionAnswer.setNo(i + 1);
 				questionAnswerService.add(questionAnswer);
 			}
@@ -163,7 +149,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void updateAndUpdate(Question question, Integer[] aiOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
+	public void updateAndUpdate(Question question, Integer[] markOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
 		// 校验数据有效性
 		Question entity = getEntity(question.getId());
 		question.setQuestionTypeId(entity.getQuestionTypeId());//校验用
@@ -176,19 +162,19 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (entity.getState() == 0) {
 			throw new MyException("已删除");
 		}
-		List<PaperQuestion> paperQuestionList = paperQuestionService.getList(question.getId());//判断是否被试卷引用
-		if (ValidateUtil.isValid(paperQuestionList)) {
-			Paper paper = paperService.getEntity(paperQuestionList.get(0).getPaperId());
-			throw new MyException(String.format("该题已被【%s】试卷引用", paper.getName()));
-		}
+		
+//		List<ExamQuestion> paperQuestionList = examQuestionService.getList(question.getId());//判断是否被试卷引用  
+//		if (ValidateUtil.isValid(paperQuestionList)) {
+//			Exam exam = examService.getEntity(paperQuestionList.get(0).getPaperId());
+//			throw new MyException(String.format("该题已被【%s】试卷引用", paper.getName()));
+//		}
 		
 		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-		addAndUpdateValid(question, aiOptions, options, answers, answerScores, questionType);
+		addAndUpdateValid(question, markOptions, options, answers, answerScores, questionType);
 
 		// 修改试题
 		entity.setTitle(question.getTitle());
-		entity.setDifficulty(question.getDifficulty());
-		entity.setAi(question.getAi());
+		entity.setMarkType(question.getMarkType());
 		entity.setScore(question.getScore());
 		entity.setState(question.getState());
 		entity.setAnalysis(question.getAnalysis());
@@ -197,13 +183,13 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		// entity.setWriteUserIds(null);// 不能修改
 		
 		if (entity.getType() == 1 || entity.getType() == 4 ) {
-			entity.setAi(1);
-			entity.setAiOptions(null);
+			entity.setMarkType(1);
+			entity.setMarkOptions(null);
 		} else if (question.getType() == 2) {
-			entity.setAi(1);
-			entity.setAiOptions("1");//多选的漏选得分必填。漏选分值页面控制
+			entity.setMarkType(1);
+			entity.setMarkOptions("1");//多选的漏选得分必填。漏选分值页面控制
 		} else if (question.getType() == 3 || question.getType() == 5 ) {
-			entity.setAiOptions(ValidateUtil.isValid(aiOptions) ? StringUtil.join(aiOptions) : null);
+			entity.setMarkOptions(ValidateUtil.isValid(markOptions) ? StringUtil.join(markOptions) : null);
 		}
 		update(entity);
 
@@ -218,8 +204,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			questionAnswer.setScore(question.getScore());
 			questionAnswer.setQuestionId(question.getId());
 			questionAnswer.setNo(1);
-			questionAnswer.setQuestionType(question.getType());
-			questionAnswer.setQuestionAi(question.getAi());
 			questionAnswerService.add(questionAnswer);
 		} else if (question.getType() == 2) {
 			QuestionAnswer questionAnswer = new QuestionAnswer();
@@ -228,18 +212,14 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			questionAnswer.setScore(answerScores[0]);
 			questionAnswer.setQuestionId(question.getId());
 			questionAnswer.setNo(1);
-			questionAnswer.setQuestionType(question.getType());
-			questionAnswer.setQuestionAi(question.getAi());
 			questionAnswerService.add(questionAnswer);
 		} else if (question.getType() == 3 || question.getType() == 5) {
 			for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();
 				questionAnswer.setAnswer(answers[i]);
-				questionAnswer.setScore(question.getAi() == 1 ? answerScores[i] : BigDecimal.ZERO);
+				questionAnswer.setScore(question.getMarkType() == 1 ? answerScores[i] : BigDecimal.ZERO);
 				questionAnswer.setQuestionId(question.getId());
 				questionAnswer.setNo(i + 1);
-				questionAnswer.setQuestionType(question.getType());
-				questionAnswer.setQuestionAi(question.getAi());
 				questionAnswerService.add(questionAnswer);
 			}
 		}
@@ -285,10 +265,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 		List<Question> questionList = new ArrayList<>();
 		if (ValidateUtil.isValid(questionTypeId)) {// 如果是按类型删除
-			QuestionType questionType = questionTypeService.getEntity(questionTypeId);
-			if(!questionTypeService.hasWriteAuth(questionType)) {
-				throw new MyException("无操作权限");
-			}
 			questionList = questionDao.getList(questionTypeId);
 		}
 		
@@ -304,10 +280,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				if (questionType == null) {
 					questionType = questionTypeService.getEntity(question.getQuestionTypeId());
 					questionTypeCache.put(questionType.getId(), questionType);
-				}
-				
-				if(!questionTypeService.hasWriteAuth(questionType)) {
-					throw new MyException("无操作权限");
 				}
 				questionList.add(question);
 			}
@@ -367,11 +339,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	@Override
 	public void wordImp(Integer fileId, Integer questionTypeId, String processBarId, Integer state) {
 		// 校验数据有效性
-		QuestionType questionType = questionTypeService.getEntity(questionTypeId);
-		if(!questionTypeService.hasWriteAuth(questionType)) {
-			throw new MyException("无操作权限");
-		}
-		
 		if (fileId == null) {
 			throw new MyException("参数错误：fileId");
 		}
@@ -399,8 +366,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		ProgressBarCache.setProgressBar(processBarId, 8.0, 10.0, "保存开始", HttpStatus.OK.value());
 		for (int  j = 0; j < questionExList.size(); j++) { //QuestionEx questionEx : questionExList
 			Question question = questionExList.get(j).getQuestion();
-			question.setCreateTime(new Date());
-			question.setCreateUserId(getCurUser().getId());
 			question.setUpdateTime(new Date());
 			question.setUpdateUserId(getCurUser().getId());
 			question.setState(state);// 页面添加决定是否发布
@@ -411,14 +376,14 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
 			for (int i = 0; i < questionExList.get(j).getAnswerList().size(); i++) {
 				answers[i] = questionExList.get(j).getAnswerList().get(i).getAnswer();
-				if (question.getType() == 3 || (question.getType() == 5 && question.getAi() == 1)) {
+				if (question.getType() == 3 || (question.getType() == 5 && question.getMarkType() == 1)) {
 					answers[i] = StringUtil.join(answers[i].split(" "), '\n');
 				}
 				answerScores[i] = questionExList.get(j).getAnswerList().get(i).getScore();
 				totalScore.add(answerScores[i]);
 			}
 			if (question.getType() == 1 || question.getType() == 4 
-					|| (question.getType() == 5 && question.getAi() == 2) || (question.getType() == 3 && question.getAi() == 2)) {
+					|| (question.getType() == 5 && question.getMarkType() == 2) || (question.getType() == 3 && question.getMarkType() == 2)) {
 				answerScores = null;//添加试题严格校验后，不允许传入错误数据
 			}
 			if (question.getType() == 2) {// 多选特殊处理下，答案拆分
@@ -431,22 +396,22 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				options[i] = questionExList.get(j).getOptionList().get(i).getOptions();
 			}
 			
-			if (question.getType() == 3 || (question.getType() == 5 && question.getAi() == 1)) {
+			if (question.getType() == 3 || (question.getType() == 5 && question.getMarkType() == 1)) {
 				question.setScore(totalScore.getResult());
 			}
 			
-			Integer[] aiOptions = null;//new Integer[split.length];
-			if (ValidateUtil.isValid(question.getAiOptions())) {
-				String[] split = question.getAiOptions().split(",");
-				aiOptions = new Integer[split.length];
+			Integer[] markOptions = null;//new Integer[split.length];
+			if (ValidateUtil.isValid(question.getMarkOptions())) {
+				String[] split = question.getMarkOptions().split(",");
+				markOptions = new Integer[split.length];
 				for(int i = 0; i < split.length; i++ ){
-					aiOptions[i] = Integer.parseInt(split[i]);
+					markOptions[i] = Integer.parseInt(split[i]);
 				}
 			} else {
-				aiOptions = new Integer[0];
+				markOptions = new Integer[0];
 			}
 			
-			addAndUpdate(question, aiOptions, options, answers, answerScores);
+			addAndUpdate(question, markOptions, options, answers, answerScores);
 		}
 		
 	}
@@ -454,16 +419,10 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	@Override
 	public void copy(Integer id) throws Exception{
 		Question questionOfDB = questionDao.getEntity(id);
-		QuestionType questionType = questionTypeService.getEntity(questionOfDB.getQuestionTypeId());
-		if(!questionTypeService.hasWriteAuth(questionType)) {
-			throw new MyException("无操作权限");
-		}
 		
 		Question questionOfCopy = new Question();
 		BeanUtils.copyProperties(questionOfCopy, questionOfDB);
 		questionOfCopy.setState(2);// 拷贝的默认为草稿
-		questionOfCopy.setCreateTime(new Date());
-		questionOfCopy.setCreateUserId(getCurUser().getId());
 		questionOfCopy.setUpdateTime(new Date());
 		questionOfCopy.setUpdateUserId(getCurUser().getId());
 		//修改标题图片
@@ -521,10 +480,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 		List<Question> questionList = new ArrayList<>();
 		if (ValidateUtil.isValid(questionTypeId)) {// 如果是按类型删除
-			QuestionType questionType = questionTypeService.getEntity(questionTypeId);
-			if(!questionTypeService.hasWriteAuth(questionType)) {
-				throw new MyException("无操作权限");
-			}
 			questionList = questionDao.getList(questionTypeId);
 		}
 		
@@ -545,9 +500,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 					questionTypeCache.put(questionType.getId(), questionType);
 				}
 				
-				if(!questionTypeService.hasWriteAuth(questionType)) {
-					throw new MyException("无操作权限");
-				}
 				questionList.add(question);
 			}
 		}
@@ -561,12 +513,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 	}
 	
-	private void addAndUpdateValid(Question question, Integer[] aiOptions, String[] options, String[] answers, BigDecimal[] answerScores, QuestionType questionType) {
+	private void addAndUpdateValid(Question question, Integer[] markOptions, String[] options, String[] answers, BigDecimal[] answerScores, QuestionType questionType) {
 		if (!ValidateUtil.isValid(question.getType())) {
 			throw new MyException("参数错误：type");
-		}
-		if (!ValidateUtil.isValid(question.getDifficulty())) {
-			throw new MyException("参数错误：difficulty");
 		}
 		if (!ValidateUtil.isValid(question.getTitle())) {
 			throw new MyException("参数错误：title");
@@ -578,10 +527,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			throw new MyException("参数错误：score");
 		}
 		
-		if(!questionTypeService.hasWriteAuth(questionType)) {
-			throw new MyException("无操作权限");
-		}
-		
+		System.err.println(question.getTitle());
 		if (question.getType() == 1) {// 如果是单选
 			if (!ValidateUtil.isValid(options)) {
 				throw new MyException("参数错误：options");
@@ -599,8 +545,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			if (options.length < answerIndex + 1) {// 总共四个选项，答案是E就是有问题的
 				throw new MyException("选项和答案不匹配");
 			}
-			if (ValidateUtil.isValid(aiOptions)) {
-				throw new MyException("参数错误：aiOptions");
+			if (ValidateUtil.isValid(markOptions)) {
+				throw new MyException("参数错误：markOptions");
 			}
 			if (ValidateUtil.isValid(answerScores)) {
 				throw new MyException("参数错误：answerScores");
@@ -631,8 +577,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				throw new MyException("漏选分数大于试题分数");
 			}
 			
-			if (ValidateUtil.isValid(aiOptions) && aiOptions[0] != 1) {
-				throw new MyException("参数错误：aiOptions");
+			if (ValidateUtil.isValid(markOptions) && markOptions[0] != 1) {
+				throw new MyException("参数错误：markOptions");
 			}
 		} else if (question.getType() == 3) {
 			Matcher matcher = Pattern.compile("[_]{5,}").matcher(question.getTitle());
@@ -650,13 +596,13 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				throw new MyException("填空和答案数量不匹配");
 			}
 				
-			if (question.getAi() == 1) {
-				if (ValidateUtil.isValid(aiOptions)) {
-					if (aiOptions.length > 2) {
+			if (question.getMarkType() == 1) {
+				if (ValidateUtil.isValid(markOptions)) {
+					if (markOptions.length > 2) {
 						throw new MyException("参数错误：scoreOption");
 					}
-					for (Integer aiOption : aiOptions) {
-						if (aiOption != 2 && aiOption != 3) {//分值选项（2：答案无顺序；3：大小写不敏感；)
+					for (Integer markOption : markOptions) {
+						if (markOption != 2 && markOption != 3) {//分值选项（2：答案无顺序；3：大小写不敏感；)
 							throw new MyException("参数错误：scoreOption");
 						}
 					}
@@ -677,8 +623,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 					throw new MyException("单项分值合计和总分数不匹配");
 				}
 			} 
-			if (question.getAi() == 2) {
-				if (ValidateUtil.isValid(aiOptions)) {
+			if (question.getMarkType() == 2) {
+				if (ValidateUtil.isValid(markOptions)) {
 					throw new MyException("参数错误：scoreOption");
 				}
 				if (ValidateUtil.isValid(answerScores)) {
@@ -694,19 +640,19 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				throw new MyException("参数错误：answers");
 			}
 			
-			if (ValidateUtil.isValid(aiOptions)) {
+			if (ValidateUtil.isValid(markOptions)) {
 				throw new MyException("参数错误：aiOptions");
 			}
 			if (ValidateUtil.isValid(answerScores)) {
 				throw new MyException("参数错误：answerScores");
 			}
 		} else if (question.getType() == 5) {
-			if (question.getAi() == 1) {
-				if (ValidateUtil.isValid(aiOptions)) {
-					if (aiOptions.length != 1) {
+			if (question.getMarkType() == 1) {
+				if (ValidateUtil.isValid(markOptions)) {
+					if (markOptions.length != 1) {
 						throw new MyException("参数错误：scoreOption");
 					}
-					for (Integer scoreOption : aiOptions) {
+					for (Integer scoreOption : markOptions) {
 						if (scoreOption != 3) {//分值选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；)
 							throw new MyException("参数错误：scoreOption");
 						}
@@ -728,8 +674,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 					throw new MyException("单项分值合计和总分数不匹配");
 				}
 			} 
-			if (question.getAi() == 2) {
-				if (ValidateUtil.isValid(aiOptions)) {
+			if (question.getMarkType() == 2) {
+				if (ValidateUtil.isValid(markOptions)) {
 					throw new MyException("参数错误：scoreOption");
 				}
 				if (ValidateUtil.isValid(answerScores)) {

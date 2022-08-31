@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.alibaba.fastjson.JSON;
 import com.wcpdoc.base.cache.ParmCache;
 import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.base.entity.User;
@@ -31,22 +33,21 @@ import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
 import com.wcpdoc.exam.core.entity.Exam;
+import com.wcpdoc.exam.core.entity.ExamQuestionNo;
 import com.wcpdoc.exam.core.entity.MyExam;
-import com.wcpdoc.exam.core.entity.MyExamDetail;
 import com.wcpdoc.exam.core.entity.MyMark;
-import com.wcpdoc.exam.core.entity.Paper;
-import com.wcpdoc.exam.core.entity.PaperQuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.entity.ex.Chapter;
-import com.wcpdoc.exam.core.entity.ex.MyPaper;
+import com.wcpdoc.exam.core.entity.ex.ExamAnswerEx;
+import com.wcpdoc.exam.core.entity.ex.MyExamChapter;
 import com.wcpdoc.exam.core.entity.ex.MyQuestion;
+import com.wcpdoc.exam.core.service.ExamQuestionNoService;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
-import com.wcpdoc.exam.core.service.PaperService;
-import com.wcpdoc.exam.core.util.PaperUtil;
+import com.wcpdoc.exam.core.util.ExamUtil;
 import com.wcpdoc.notify.exception.NotifyException;
 import com.wcpdoc.notify.service.NotifyService;
 
@@ -67,13 +68,13 @@ public class ApiMyExamController extends BaseController{
 	@Resource
 	private MyExamDetailService myExamDetailService;
 	@Resource
+	private ExamQuestionNoService examQuestionNoService;
+	@Resource
 	private UserService userService;
 	@Resource
 	private NotifyService notifyService;
 	@Resource
 	private ParmService parmService;
-	@Resource
-	private PaperService paperService;
 	@Resource
 	private ExamService examService;
 	
@@ -138,19 +139,16 @@ public class ApiMyExamController extends BaseController{
 				throw new MyException("无查阅权限");
 			}
 			Exam exam = examService.getEntity(examId);
-			Paper paper = paperService.getEntity(exam.getPaperId());
-			
 			
 			// 生成试卷数据
-			MyPaper myPaper = null;
-			if (paper.getGenType() == 1) {// 固定试卷
-				myPaper = paperService.getPaper(exam.getPaperId());
-				if (PaperUtil.hasQuestionRand(paper) || PaperUtil.hasOptionRand(paper)) {
-					List<MyExamDetail> myExamDetailList = myExamDetailService.getList(examId, getCurUser().getId());
-					paperRandHandle(paper, myPaper, myExamDetailList);
+			MyExamChapter myPaper = null;
+			if (exam.getGenType() == 1) {// 固定试卷
+				myPaper = examService.getExamChapter(exam.getId());
+				if (ExamUtil.hasQuestionRand(exam) || ExamUtil.hasOptionRand(exam)) {
+					paperRandHandle(exam, myPaper, examQuestionNoService.getEntity(examId, getCurUser().getId()));
 				}
-			} else if (paper.getGenType() == 2) {// 随机试卷
-				myPaper = paperService.getPaperOfRand(exam.getId(), getCurUser().getId());
+			} else if (exam.getGenType() == 2) {// 随机试卷
+				myPaper = examService.getPaperOfRand(exam.getId(), getCurUser().getId());
 			}
 			
 			List<Map<String, Object>> resultList = new ArrayList<>();
@@ -158,8 +156,8 @@ public class ApiMyExamController extends BaseController{
 				Map<String, Object> singleResult = new HashMap<>();
 				Map<Object, Object> chapterMap = new HashMap<>();
 				chapterMap.put("id", chapter.getChapter().getId());
-				chapterMap.put("name", chapter.getChapter().getName());
-				chapterMap.put("description", chapter.getChapter().getDescription());
+				chapterMap.put("chapterName", chapter.getChapter().getChapterName());
+				chapterMap.put("chapterTxt", chapter.getChapter().getChapterTxt());
 				singleResult.put("chapter", chapterMap);
 				
 				List<Map<String, Object>> questionsListMap = new ArrayList<>();
@@ -167,12 +165,11 @@ public class ApiMyExamController extends BaseController{
 					Map<String, Object> questionMap = new HashMap<>();
 					questionMap.put("id", myQuestion.getQuestion().getId());
 					questionMap.put("type", myQuestion.getQuestion().getType());
-					questionMap.put("difficulty", myQuestion.getQuestion().getDifficulty());
 					questionMap.put("title", myQuestion.getQuestion().getTitle());
-					questionMap.put("ai", myQuestion.getQuestion().getAi());
+					questionMap.put("markType", myQuestion.getQuestion().getMarkType());
 					questionMap.put("analysis", myQuestion.getQuestion().getAnalysis());
 					questionMap.put("score", myQuestion.getAttr().getScore());// 分数从试卷中取
-					questionMap.put("aiOptions", myQuestion.getAttr().getAiOptionArr());// 分数选项从试卷中取
+					questionMap.put("markOptions", myQuestion.getAttr().getMarkOptionArr());// 分数选项从试卷中取
 					questionMap.put("options", new ArrayList<Map<String, Object>>());
 					
 					if (myQuestion.getQuestion().getType() == 1 || myQuestion.getQuestion().getType() == 2) {
@@ -185,10 +182,10 @@ public class ApiMyExamController extends BaseController{
 					}
 					
 					questionMap.put("answers", new ArrayList<Map<String, Object>>());
-					for (PaperQuestionAnswer answer : myQuestion.getAnswerList()) {
+					for (ExamAnswerEx answer : myQuestion.getAnswerList()) {
 						Map<String, Object> answerMap = new HashMap<String, Object>();
 						answerMap.put("score", answer.getScore());
-						answerMap.put("answer", answer.getAnswerArr());
+						answerMap.put("answer", answer.getAnswerArr(myQuestion.getQuestion().getType(), myQuestion.getQuestion().getMarkType()));
 						((List<Map<String, Object>>)questionMap.get("answers")).add(answerMap);
 					}
 					
@@ -213,34 +210,42 @@ public class ApiMyExamController extends BaseController{
 	 * 固定试卷乱序处理
 	 * 
 	 * v1.0 zhanghc 2022年6月23日下午1:55:31
-	 * @param paper 
+	 * @param exam
 	 * @param myPaper
 	 * @param myExamDetailList 
 	 * void
 	 */
-	private void paperRandHandle(Paper paper, MyPaper myPaper, List<MyExamDetail> myExamDetailList) {
-		Map<Integer, MyExamDetail> myExamDetailCache = new HashMap<>();
-		for (MyExamDetail myExamDetail : myExamDetailList) {
-			myExamDetailCache.put(myExamDetail.getQuestionId(), myExamDetail);
-		}
-		
+	private void paperRandHandle(Exam exam, MyExamChapter myPaper, ExamQuestionNo examQuestionNo) {
 		for (Chapter chapter : myPaper.getChapterList()) {
-			List<MyQuestion> myQuestionList = chapter.getMyQuestionList();
-			if (PaperUtil.hasQuestionRand(paper)) {
-				Collections.sort(myQuestionList, new Comparator<MyQuestion>() {
-					@Override
-					public int compare(MyQuestion o1, MyQuestion o2) {
-						return myExamDetailCache.get(o1.getQuestion().getId()).getQuestionNo() - myExamDetailCache.get(o2.getQuestion().getId()).getQuestionNo();
-					}
-				});
+			Map<Integer, MyQuestion> myQuestionCache = new HashMap<>();
+			for (MyQuestion myQuestion : chapter.getMyQuestionList()) {
+				myQuestionCache.put(myQuestion.getQuestion().getId(), myQuestion); //乱序前试卷
 			}
-			if (PaperUtil.hasOptionRand(paper)) {
-				for (MyQuestion myquestion : myQuestionList) {
+			
+			//乱序
+			@SuppressWarnings("unchecked")
+			LinkedHashMap<Integer, String> examQuestionNoMap = JSON.parseObject(examQuestionNo.getNo(), LinkedHashMap.class);
+			if (ExamUtil.hasQuestionRand(exam)) {//试题乱序
+				List<MyQuestion> myQuestionList = new ArrayList<MyQuestion>();
+				for(Integer questionId : examQuestionNoMap.keySet()){
+					myQuestionList.add(myQuestionCache.get(questionId));
+				}
+				
+				chapter.setMyQuestionList(myQuestionList);
+			}
+			
+			if (ExamUtil.hasOptionRand(exam)) {
+				for (MyQuestion myquestion : chapter.getMyQuestionList()) {
 					if (!(myquestion.getQuestion().getType() == 1 || myquestion.getQuestion().getType() == 2)) {
 						continue;
 					}
 					
-					Integer[] optionNoArr = myExamDetailCache.get(myquestion.getQuestion().getId()).getOptionNoArr();
+					String[] optionNoStrArr = examQuestionNoMap.get(myquestion.getQuestion().getId()).split(",");
+					Integer[] optionNoArr = new Integer[optionNoStrArr.length];
+					for (int i = 0; i < optionNoStrArr.length; i++) {
+						optionNoArr[i] = Integer.parseInt(optionNoStrArr[i]);
+					}
+					
 					List<QuestionOption> optionList = myquestion.getOptionList();
 					Collections.sort(optionList, new Comparator<QuestionOption>() {
 						@Override
@@ -267,10 +272,8 @@ public class ApiMyExamController extends BaseController{
 			List<Map<String, Object>> answerList = myExamDetailService.getAnswerList(examId, getCurUser().getId());
 			for (Map<String, Object> map : answerList) {
 				QuestionAnswer answer = new QuestionAnswer();
-				answer.setQuestionType((Integer)map.get("questionType"));
-				answer.setQuestionAi((Integer)map.get("questionAi"));
 				answer.setAnswer((String)map.remove("answer"));
-				map.put("answers", answer.getAnswerArr());
+				map.put("answers", answer.getAnswerArr((Integer)map.get("questionType"), (Integer)map.get("questionMarkType")));
 				
 				if (map.get("answerTime") != null) {
 					map.put("answerTime", DateUtil.formatDateTime((Date)map.get("answerTime")));

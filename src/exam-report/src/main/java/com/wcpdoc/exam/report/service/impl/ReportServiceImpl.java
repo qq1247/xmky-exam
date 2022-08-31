@@ -31,17 +31,12 @@ import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Exam;
-import com.wcpdoc.exam.core.entity.ExamType;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyMark;
-import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.entity.Question;
-import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.service.ExamService;
-import com.wcpdoc.exam.core.service.ExamTypeService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
-import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 import com.wcpdoc.exam.report.dao.ReportDao;
@@ -65,13 +60,9 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 	@Resource
 	private ExamService examService;
 	@Resource
-	private PaperService paperService;
-	@Resource
 	private MyExamService myExamService;
 	@Resource
 	private MyMarkService myMarkService;
-	@Resource
-	private ExamTypeService examTypeService;
 	@Resource
 	private DictService dictService;
 	@Resource
@@ -172,7 +163,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		{
 			int examNum = 0;
 			for (Exam exam : examList) {
-				if (exam.getCreateUserId().intValue() == getCurUser().getId().intValue()) {
+				if (exam.getUpdateUserId().intValue() == getCurUser().getId().intValue()) {
 					examNum++;
 				}
 			}
@@ -181,18 +172,18 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 			result.put("exam", data);
 		}
 		
-		{
-			List<Paper> paperList = paperService.getList();
-			int paperNum = 0;
-			for (Paper paper : paperList) {
-				if (paper.getCreateUserId().intValue() == getCurUser().getId().intValue()) {
-					paperNum++;
-				}
-			}
-			data = new HashMap<String, Object>();
-			data.put("num", paperNum);
-			result.put("paper", data);
-		}
+//		{
+//			List<Paper> paperList = paperService.getList();
+//			int paperNum = 0;
+//			for (Paper paper : paperList) {
+//				if (paper.getCreateUserId().intValue() == getCurUser().getId().intValue()) {
+//					paperNum++;
+//				}
+//			}
+//			data = new HashMap<String, Object>();
+//			data.put("num", paperNum);
+//			result.put("paper", data);
+//		}
 		
 		{
 			data = new HashMap<String, Object>();
@@ -284,31 +275,20 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		if (!ValidateUtil.isValid(questionTypeId)) {
 			throw new MyException("参数错误：questionTypeId");
 		}
-		QuestionType questionType = questionTypeService.getEntity(questionTypeId);
-		if (!questionTypeService.hasWriteAuth(questionType)) {
-			throw new MyException("权限不足");
-		}
 		
 		// 统计数据
 		List<Question> questionList = questionService.getList(questionTypeId);
 		Map<Integer, Integer> typeStatis = new HashMap<>();
-		Map<Integer, Integer> difficultyStatis = new HashMap<>();
-		Map<Integer, Integer> aiStatis = new HashMap<>();
+		Map<Integer, Integer> markTypeStatis = new HashMap<>();
 		for (Question question : questionList) {
 			if (typeStatis.get(question.getType()) == null) {
 				typeStatis.put(question.getType(), 0);
 			}
 			typeStatis.put(question.getType(), typeStatis.get(question.getType()) + 1);
-			
-			if (difficultyStatis.get(question.getDifficulty()) == null) {
-				difficultyStatis.put(question.getDifficulty(), 0);
+			if (markTypeStatis.get(question.getMarkType()) == null) {
+				markTypeStatis.put(question.getMarkType(), 0);
 			}
-			difficultyStatis.put(question.getDifficulty(), difficultyStatis.get(question.getDifficulty()) + 1);
-			
-			if (aiStatis.get(question.getAi()) == null) {
-				aiStatis.put(question.getAi(), 0);
-			}
-			aiStatis.put(question.getAi(), aiStatis.get(question.getAi()) + 1);
+			markTypeStatis.put(question.getMarkType(), markTypeStatis.get(question.getMarkType()) + 1);
 		}
 		
 		// 组合成接口需要的格式
@@ -323,24 +303,14 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		}
 		result.put("typeList", typeList);
 		
-		List<Dict> difficultyDictList = dictService.getList("QUESTION_DIFFICULTY");
-		List<Map<String, Object>> difficultyList = new ArrayList<Map<String, Object>>();//类型列表
-		for (Dict difficultyDict : difficultyDictList) {
-			Map<String, Object> difficultyResult = new HashMap<>();
-			difficultyResult.put("name", difficultyDict.getDictKey());
-			difficultyResult.put("value", typeStatis.get(Integer.parseInt(difficultyDict.getDictKey())) == null ? 0 : typeStatis.get(Integer.parseInt(difficultyDict.getDictKey())));
-			difficultyList.add(difficultyResult);
-		}
-		result.put("difficultyList", difficultyList);
-		
-		List<Map<String, Object>> aiList = new ArrayList<Map<String, Object>>(); //智能列表
+		List<Map<String, Object>> markTypeList = new ArrayList<Map<String, Object>>(); //智能列表
 		for (int i = 1; i <= 2; i++) {
-			Map<String, Object> aiResult = new HashMap<>();
-			aiResult.put("name", i);
-			aiResult.put("value", aiStatis.get(i) == null ? 0 : aiStatis.get(i));
-			aiList.add(aiResult);
+			Map<String, Object> markResult = new HashMap<>();
+			markResult.put("name", i);
+			markResult.put("value", markTypeStatis.get(i) == null ? 0 : markTypeStatis.get(i));
+			markTypeList.add(markResult);
 		}
-		result.put("aiList", aiList);
+		result.put("markTypeList", markTypeList);
 		
 		return result;
 	}	
@@ -352,10 +322,8 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 			throw new MyException("参数错误：examId");
 		}
 		Exam exam = examService.getEntity(examId);
-		ExamType examType = examTypeService.getEntity(exam.getExamTypeId());
-		if (examType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
-			throw new MyException("权限不足");
-		}
+		
+//		ExamType
 		
 		if (exam.getEndTime().getTime() >= System.currentTimeMillis()) {
 			throw new MyException("考试时间未结束");
@@ -365,10 +333,9 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		}
 		
 		// 获取考试、试卷、人员成绩信息
-		Paper paper = paperService.getEntity(exam.getPaperId());
 		List<MyExam> myExamList = myExamService.getList(examId);
-		List<Question> questionList = paper.getGenType() == 1 
-				? paperService.getQuestionList(exam.getPaperId())
+		List<Question> questionList = exam.getGenType() == 1 
+				? examService.getQuestionList(exam.getId())
 				: new ArrayList<>();
 		
 		// 统计考试基础信息
@@ -394,9 +361,9 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		
 		// 统计考试合计信息
 		Map<String, Object> scoreResult = new HashMap<String, Object>();
-		scoreResult.put("total", paper.getTotalScore());// 考试总分
+		scoreResult.put("total", exam.getTotalScore());// 考试总分 
 		scoreResult.put("avg", 0.0);// 平均分
-		scoreResult.put("min", paper.getTotalScore().doubleValue());// 默认最低分是0.0  最低分就会一直是0.0
+		scoreResult.put("min", exam.getTotalScore().doubleValue());// 默认最低分是0.0  最低分就会一直是0.0 
 		scoreResult.put("max", 0.0);// 最高分
 		
 		for (MyExam myExam : myExamList) {
@@ -409,7 +376,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 			scoreResult.put("avg", BigDecimalUtil.newInstance(scoreResult.get("avg")).add(  myExam.getTotalScore()).getResult().doubleValue());
 		}
 		
-		if (paper.getTotalScore().compareTo(new BigDecimal(scoreResult.get("min").toString())) == 0) { //最小值和总分一样 默认赋值0.0
+		if (exam.getTotalScore().compareTo(new BigDecimal(scoreResult.get("min").toString())) == 0) { //最小值和总分一样 默认赋值0.0
 			scoreResult.put("min",0.0);
 		}
 		
@@ -443,7 +410,7 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		result.put("typeList", typeResultList);
 		
 		// 统计分数段占比
-		double scoreGrade = BigDecimalUtil.newInstance(paper.getTotalScore()).div(10, 2).getResult().doubleValue();// 分数保留两位小数
+		double scoreGrade = BigDecimalUtil.newInstance(exam.getTotalScore()).div(10, 2).getResult().doubleValue();// 分数保留两位小数
 		List<Map<String, Object>> scoreGradeResultList = new ArrayList<Map<String, Object>>();
 		for (int i = 0; i < 10; i++) {
 			Map<String, Object> map = new HashMap<>();
@@ -484,16 +451,13 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 			pageIn.addAttr("state", 2);
 		}
 		Exam exam = examService.getEntity(examId);
-		ExamType examType = examTypeService.getEntity(exam.getExamTypeId());
-		if (examType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
-			throw new MyException("权限不足");
-		}
+		
+//		ExamType
 		
 		if (exam.getMarkEndTime() != null && exam.getMarkEndTime().getTime() >= System.currentTimeMillis()) {
 			throw new MyException("阅卷时间未结束");
 		}
 		
-		Paper paper = paperService.getEntity(exam.getPaperId());
 		PageOut pageOut = reportDao.myExamListpage(pageIn);
 		for(Map<String, Object> map : pageOut.getList()){
 			map.put("myExamStartTime", map.get("myExamStartTime") == null ? null : DateUtil.formatDateTime(DateUtil.getDateTime(map.get("myExamStartTime").toString())));
@@ -501,8 +465,8 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 			map.put("myExamMarkStartTime", map.get("myExamMarkStartTime") == null ? null : DateUtil.formatDateTime(DateUtil.getDateTime(map.get("myExamMarkStartTime").toString())));
 			map.put("myExamMarkEndTime", map.get("myExamMarkEndTime") == null ? null : DateUtil.formatDateTime(DateUtil.getDateTime(map.get("myExamMarkEndTime").toString())));
 			
-			map.put("paperTotalScore", paper.getTotalScore());
-			map.put("paperPassScore", paper.getPassScore());
+			map.put("examTotalScore", exam.getTotalScore());
+			map.put("examPassScore", exam.getPassScore());
 		}
 		return pageOut;
 	}
@@ -515,10 +479,9 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 			throw new MyException("参数错误：examId");
 		}
 		Exam exam = examService.getEntity(examId);
-		ExamType examType = examTypeService.getEntity(exam.getExamTypeId());
-		if (examType.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
-			throw new MyException("权限不足");
-		}
+		
+//		ExamType
+		
 		if (exam.getMarkEndTime() != null && exam.getMarkEndTime().getTime() >= System.currentTimeMillis()) {
 			throw new MyException("阅卷时间未结束");
 		}

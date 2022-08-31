@@ -29,13 +29,9 @@ public class QuestionAnswer {
 	private BigDecimal score;
 	@Column(name = "QUESTION_ID")
 	private Integer questionId;
-	@Column(name = "QUESTION_TYPE")
-	private Integer questionType;
-	@Column(name = "QUESTION_AI")
-	private Integer questionAi;
 	@Column(name = "NO")
 	private Integer no;
-
+	
 	public Integer getId() {
 		return id;
 	}
@@ -75,29 +71,13 @@ public class QuestionAnswer {
 	public void setNo(Integer no) {
 		this.no = no;
 	}
-
-	public Integer getQuestionType() {
-		return questionType;
-	}
-
-	public void setQuestionType(Integer questionType) {
-		this.questionType = questionType;
-	}
-
-	public Integer getQuestionAi() {
-		return questionAi;
-	}
-
-	public void setQuestionAi(Integer questionAi) {
-		this.questionAi = questionAi;
-	}
 	
-	public String[] getAnswerArr() {
+	public String[] getAnswerArr(Integer questionType, Integer questionMarkType) {
 		if (!ValidateUtil.isValid(answer)) {
 			return new String[0];
 		}
 		
-		if (questionType == 3 || (questionType == 5 && questionAi == 1)) {
+		if (questionType == 3 || (questionType == 5 && questionMarkType == 1)) {
 			return answer.split("\n");
 		}
 		if (questionType == 2) {

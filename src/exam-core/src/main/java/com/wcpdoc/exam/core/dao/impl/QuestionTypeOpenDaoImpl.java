@@ -22,7 +22,7 @@ import com.wcpdoc.exam.core.dao.QuestionTypeOpenDao;
 import com.wcpdoc.exam.core.entity.QuestionTypeOpen;
 
 /**
- * 试题分类开放数据访问层实现
+ * 题库开放数据访问层实现
  * 
  * v1.0 chenyun 2021-03-02 13:43:21
  */

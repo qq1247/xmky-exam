@@ -7,7 +7,7 @@ import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.QuestionTypeOpen;
 
 /**
- * 试题分类开放服务层接口
+ * 题库开放服务层接口
  * 
  * v1.0 chenyun 2021-03-02 13:43:21
  */

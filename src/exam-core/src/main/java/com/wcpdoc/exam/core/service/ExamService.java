@@ -1,10 +1,13 @@
 package com.wcpdoc.exam.core.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
 import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.Exam;
+import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.entity.ex.MyExamChapter;
 /**
  * 考试服务层接口
  * 
@@ -114,12 +117,62 @@ public interface ExamService extends BaseService<Exam>{
 	void userAdd(Integer id, String[] examUserIds, Integer[] markUserIds);
 	
 	/**
-	 * 是否有写权限（只能操作自己创建的分类）
+	 * 获取考试
 	 * 
-	 * v1.0 zhanghc 2022年6月17日上午11:19:58
-	 * @param exam
-	 * @param userId 
-	 * @return boolean
+	 * v1.0 zhanghc 2022年5月20日下午3:04:01
+	 * @return MyExamChapter
 	 */
-	boolean hasWriteAuth(Exam exam);
+	MyExamChapter getExamChapter(Integer id);
+	
+	/**
+	 * 获取试卷
+	 * 
+	 * v1.0 zhanghc 2022年5月20日下午3:06:04
+	 * @param examId
+	 * @param userId
+	 * @return MyExamChapter
+	 */
+	MyExamChapter getPaperOfRand(Integer examId, Integer userId);
+	
+	/**
+	 * 获取试题列表
+	 * 
+	 * v1.0 zhanghc 2022年5月24日下午4:25:06
+	 * @param id
+	 * @return List<Question>
+	 */
+	List<Question> getQuestionList(Integer id);
+	
+	/**
+	 * 完成批量更新分数
+	 * 
+	 * v1.0 zhanghc 2017年6月9日下午4:21:52
+	 * @param chapterId
+	 * @param score
+	 * @param subScores
+	 * @param markOptions void
+	 */
+	void batchScoreUpdate(Integer chapterId, BigDecimal score, BigDecimal subScores, Integer[] markOptions);
+	
+	/**
+	 * 设置分数
+	 * 
+	 * v1.0 zhanghc 2018年10月21日下午3:10:37
+	 * @param id
+	 * @param questionId
+	 * @param score
+	 * @param subScores 试题为智能阅卷，并且是填空或问答是有效
+	 * void
+	 */
+	void scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores, Integer[] markOptions);
+	
+	/**
+	 * 反作弊
+	 * 
+	 * v1.0 zhanghc 2022年5月18日上午10:45:21
+	 * @param id
+	 * @param options 1：试题乱序；2：选项乱序；3：禁用右键；4：禁止复制；5：最小化警告
+	 * @return PageResult
+	 */
+	void sxe(Integer id, Integer[] options);
 }

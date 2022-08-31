@@ -33,7 +33,6 @@ import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
-import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
@@ -94,11 +93,11 @@ public class ApiQuestionController extends BaseController {
 					result.put("options", options);
 				}
 				
-				if (result.get("aiOptions") != null) {// 前后端分离下，接口定义只有数组形式
-					String[] _aiOptions = result.get("aiOptions").toString().split(",");
-					Integer[] aiOptions = new Integer[_aiOptions.length]; 
+				if (result.get("markOptions") != null) {// 前后端分离下，接口定义只有数组形式
+					String[] _aiOptions = result.get("markOptions").toString().split(",");
+					Integer[] markOptions = new Integer[_aiOptions.length]; 
 					for (int i = 0; i < _aiOptions.length; i++) {
-						aiOptions[i] = Integer.parseInt(_aiOptions[i]);
+						markOptions[i] = Integer.parseInt(_aiOptions[i]);
 					}
 				}
 				
@@ -106,7 +105,7 @@ public class ApiQuestionController extends BaseController {
 				List<Map<String, Object>> answerList = new ArrayList<Map<String, Object>>();
 				for(QuestionAnswer answer : questionAnswerList){
 					Map<String, Object> map = new HashMap<String, Object>();
-					map.put("answer", answer.getAnswerArr());
+					map.put("answer", answer.getAnswerArr((Integer)result.get("type"), (Integer)result.get("markType")));
 					map.put("score", answer.getScore());
 					answerList.add(map);
 				}
@@ -124,7 +123,7 @@ public class ApiQuestionController extends BaseController {
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @param question
-	 * @param aiOptions 分数选项
+	 * @param markOptions 分数选项
 	 * @param options 选项（单选多选时有效）
 	 * @param answers 答案
 	 * @param answerScores 答案分数（填空或智能问答有多项）
@@ -132,9 +131,9 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	public PageResult add(Question question, Integer[] aiOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
+	public PageResult add(Question question, Integer[] markOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
 		try {
-			questionService.addAndUpdate(question, aiOptions, options, answers, answerScores);
+			questionService.addAndUpdate(question, markOptions, options, answers, answerScores);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加试题错误：{}", e.getMessage());
@@ -156,9 +155,9 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/edit")
 	@ResponseBody
-	public PageResult edit(Question question, Integer[] aiOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
+	public PageResult edit(Question question, Integer[] markOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
 		try {
-			questionService.updateAndUpdate(question, aiOptions, options, answers, answerScores);
+			questionService.updateAndUpdate(question, markOptions, options, answers, answerScores);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改试题错误：{}", e.getMessage());
@@ -213,43 +212,39 @@ public class ApiQuestionController extends BaseController {
 				}
 			}
 			
-			QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-			boolean writeAuth = questionTypeService.hasWriteAuth(questionType);		
-			
 			List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
 			List<Map<String, Object>> answerList = new ArrayList<Map<String, Object>>();
 			for(QuestionAnswer answer : questionAnswerList){
 				Map<String, Object> map = new HashMap<String, Object>();
-				map.put("answer", answer.getAnswerArr());
+				map.put("answer", answer.getAnswerArr(question.getType(), question.getMarkType()));
 				map.put("score", answer.getScore());
 				answerList.add(map);
 			}
 			
-			Integer[] aiOptions = null;//new Integer[split.length];
-			if (ValidateUtil.isValid(question.getAiOptions())) {
-				String[] split = question.getAiOptions().split(",");
-				aiOptions = new Integer[split.length];
+			Integer[] markOptions = null;//new Integer[split.length];
+			if (ValidateUtil.isValid(question.getMarkOptions())) {
+				String[] split = question.getMarkOptions().split(",");
+				markOptions = new Integer[split.length];
 				for(int i = 0; i < split.length; i++ ){
-					aiOptions[i] = Integer.parseInt(split[i]);
+					markOptions[i] = Integer.parseInt(split[i]);
 				}
 			} else {
-				aiOptions = new Integer[0];
+				markOptions = new Integer[0];
 			}
 			
 			PageResultEx pageResult = PageResultEx.ok()
 					.addAttr("id", question.getId())
 					.addAttr("type", question.getType())
-					.addAttr("difficulty", question.getDifficulty())
 					.addAttr("title", question.getTitle())
 					.addAttr("options", optionList.toArray(new String[optionList.size()]))
-					.addAttr("ai", question.getAi())
+					.addAttr("markType", question.getMarkType())
 					.addAttr("analysis", question.getAnalysis())
 					.addAttr("questionTypeId", question.getQuestionTypeId())
 					.addAttr("score", question.getScore())
-					.addAttr("aiOptions", aiOptions)
-					.addAttr("answers", (writeAuth) ? answerList : new String[0])
+					.addAttr("markOptions", markOptions)
+					.addAttr("answers", answerList)
 					.addAttr("state", question.getState())
-					.addAttr("createUserName", userService.getEntity(question.getCreateUserId()).getName());
+					.addAttr("updateUserName", userService.getEntity(question.getUpdateUserId()).getName());
 			return pageResult;
 		} catch (MyException e) {
 			log.error("获取试题错误：{}", e.getMessage());

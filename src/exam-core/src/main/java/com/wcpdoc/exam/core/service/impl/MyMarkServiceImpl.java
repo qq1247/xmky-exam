@@ -19,16 +19,15 @@ import com.wcpdoc.core.util.BigDecimalUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.MyMarkDao;
 import com.wcpdoc.exam.core.entity.Exam;
+import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyExamDetail;
 import com.wcpdoc.exam.core.entity.MyMark;
-import com.wcpdoc.exam.core.entity.Paper;
-import com.wcpdoc.exam.core.entity.PaperQuestion;
+import com.wcpdoc.exam.core.service.ExamQuestionService;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
-import com.wcpdoc.exam.core.service.PaperQuestionService;
 
 /**
  * 我的阅卷服务层实现
@@ -43,13 +42,11 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 	@Resource
 	private MyExamService myExamService;
 	@Resource
-	private PaperQuestionService paperQuestionService;
+	private ExamQuestionService examQuestionService;
 	@Resource
 	private ExamService examService;
 	@Resource
 	private MyExamDetailService myExamDetailService;
-	@Resource
-	private PaperServiceImpl paperServiceImpl;
 	@Resource
 	private UserService userService;
 	
@@ -123,15 +120,14 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 			throw new MyException("未参与阅卷");
 		}
 
-		Paper paper = paperServiceImpl.getEntity(exam.getPaperId());
-		PaperQuestion paperQuestion;
-		if (paper.getGenType() == 1) {
-			paperQuestion = paperQuestionService.getEntity(exam.getPaperId(), questionId);
+		ExamQuestion examQuestion;
+		if (exam.getGenType() == 1) {
+			examQuestion = examQuestionService.getEntity(exam.getId(), questionId);
 		} else {
-			paperQuestion = paperQuestionService.getEntity(exam.getId(), userId, questionId);
+			examQuestion = examQuestionService.getEntity(exam.getId(), userId, questionId);
 		}
-		if (BigDecimalUtil.newInstance(score).sub(paperQuestion.getScore()).getResult().doubleValue() > 0) {
-			throw new MyException("最大分值：" + paperQuestion.getScore());
+		if (BigDecimalUtil.newInstance(score).sub(examQuestion.getScore()).getResult().doubleValue() > 0) {
+			throw new MyException("最大分值：" + examQuestion.getScore());
 		}
 
 		// 更新阅卷分数
@@ -214,8 +210,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		myExam.setTotalScore(totalScore.getResult());
 		myExam.setMarkState(3);
 		
-		Paper paper = paperServiceImpl.getEntity(exam.getPaperId());
-		BigDecimal passScore = BigDecimalUtil.newInstance(paper.getTotalScore()).mul(paper.getPassScore()).div(100, 2).getResult();
+		BigDecimal passScore = BigDecimalUtil.newInstance(exam.getTotalScore()).mul(exam.getPassScore()).div(100, 2).getResult();
 		if (BigDecimalUtil.newInstance(totalScore.getResult()).sub(passScore).getResult().doubleValue() >= 0) {
 			myExam.setAnswerState(1);
 		} else {

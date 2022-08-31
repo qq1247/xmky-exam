@@ -3,7 +3,7 @@ package com.wcpdoc.exam.core.service;
 import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.QuestionType;
 /**
- * 试题分类服务层接口
+ * 题库服务层接口
  * 
  * v1.0 zhanghc 2016-5-24下午14:54:09
  */
@@ -44,13 +44,4 @@ public interface QuestionTypeService extends BaseService<QuestionType> {
 	 * void
 	 */
 	void auth(Integer id, Integer[] writeUserIds);
-
-	/**
-	 * 拥有写权限
-	 * 
-	 * v1.0 zhanghc 2021年7月1日下午2:13:57
-	 * @param questionType
-	 * @return boolean
-	 */
-	boolean hasWriteAuth(QuestionType questionType);
 }

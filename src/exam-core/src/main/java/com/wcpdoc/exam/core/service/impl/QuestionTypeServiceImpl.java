@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
-import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.QuestionTypeDao;
 import com.wcpdoc.exam.core.entity.QuestionType;
@@ -17,7 +16,7 @@ import com.wcpdoc.exam.core.service.QuestionTypeExService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 import com.wcpdoc.file.service.FileService;
 /**
- * 试题分类服务层实现
+ * 题库服务层实现
  * 
  * v1.0 zhanghc 2016-5-24下午14:54:09
  */
@@ -48,9 +47,6 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		//} // 不同的子管理员添加可以重复
 		
 		// 添加试题分类
-		questionType.setWriteUserIds(String.format(",%s,", getCurUser().getId()));
-		questionType.setCreateUserId(getCurUser().getId());
-		questionType.setCreateTime(new Date());
 		questionType.setUpdateTime(new Date());
 		questionType.setUpdateUserId(getCurUser().getId());
 		questionType.setState(1);
@@ -67,9 +63,6 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 			throw new MyException("参数错误：name");
 		}
 		QuestionType entity = getEntity(questionType.getId());
-		if (entity.getCreateUserId() != getCurUser().getId()) {
-			throw new MyException("无操作权限");
-		}
 		
 		//保存图片
 		//if (entity.getImgFileId().intValue() != questionType.getImgFileId().intValue()) {
@@ -88,9 +81,6 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	public void delAndUpdate(Integer id) {
 		// 校验数据有效性
 		QuestionType questionType = getEntity(id);
-		if (questionType.getCreateUserId() != getCurUser().getId()) {
-			throw new MyException("无操作权限");
-		}
 		
 		// 删除试题分类
 		questionType.setState(0);
@@ -106,29 +96,21 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	public void auth(Integer id, Integer[] writeUserIds) {
 		// 校验数据有效性
 		QuestionType entity = getEntity(id);
-		if(entity.getCreateUserId().intValue() != getCurUser().getId().intValue()){
-			throw new MyException("无操作权限");
-		}
 		
 		// 更新权限
-		if (!ValidateUtil.isValid(writeUserIds)) {
-			entity.setWriteUserIds(String.format(",%s,", entity.getCreateUserId()));// 如果没有，默认就是创建人（查询的时候方便）
-		} else {
-			entity.setWriteUserIds(String.format(",%s,", StringUtil.join(writeUserIds)));
-			if (!entity.getWriteUserIds().contains(String.format(",%s,", entity.getCreateUserId()))) {// 如果页面没有选择创建人，追加创建人
-				entity.setWriteUserIds(String.format("%s%s,", entity.getWriteUserIds(), entity.getCreateUserId()));
-			}
-		}
+//		if (!ValidateUtil.isValid(writeUserIds)) {
+//			entity.setWriteUserIds(String.format(",%s,", entity.getCreateUserId()));// 如果没有，默认就是创建人（查询的时候方便）
+//		} else {
+//			entity.setWriteUserIds(String.format(",%s,", StringUtil.join(writeUserIds)));
+//			if (!entity.getWriteUserIds().contains(String.format(",%s,", entity.getCreateUserId()))) {// 如果页面没有选择创建人，追加创建人
+//				entity.setWriteUserIds(String.format("%s%s,", entity.getWriteUserIds(), entity.getCreateUserId()));
+//			}
+//		}
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
 		update(entity);
 		
 		// 更新权限扩展
 		questionTypeExService.auth(entity);
-	}
-
-	@Override
-	public boolean hasWriteAuth(QuestionType questionType) {
-		return questionType.getWriteUserIds().contains(String.format(",%s,", getCurUser().getId()));
 	}
 }

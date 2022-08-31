@@ -15,7 +15,7 @@ import com.wcpdoc.exam.core.dao.QuestionTypeDao;
 import com.wcpdoc.exam.core.entity.QuestionType;
 
 /**
- * 试题分类数据访问层实现
+ * 题库数据访问层实现
  * 
  * v1.0 zhanghc 2016-5-24下午14:54:09
  */

@@ -30,20 +30,17 @@ import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
 import com.wcpdoc.exam.core.dao.MyExamDao;
 import com.wcpdoc.exam.core.entity.Exam;
+import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyExamDetail;
-import com.wcpdoc.exam.core.entity.Paper;
-import com.wcpdoc.exam.core.entity.PaperQuestion;
-import com.wcpdoc.exam.core.entity.PaperQuestionAnswer;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.ex.Chapter;
-import com.wcpdoc.exam.core.entity.ex.MyPaper;
+import com.wcpdoc.exam.core.entity.ex.ExamAnswerEx;
+import com.wcpdoc.exam.core.entity.ex.MyExamChapter;
 import com.wcpdoc.exam.core.entity.ex.MyQuestion;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamDetailService;
 import com.wcpdoc.exam.core.service.MyExamService;
-import com.wcpdoc.exam.core.service.PaperQuestionAnswerService;
-import com.wcpdoc.exam.core.service.PaperService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 import com.wcpdoc.file.service.FileService;
@@ -68,13 +65,9 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	@Resource
 	private FileService fileService;
 	@Resource
-	private PaperService paperService;
-	@Resource
 	private MyExamService myExamService;
 	@Resource
 	private UserService userService;
-	@Resource
-	private PaperQuestionAnswerService paperQuestionAnswerService;
 
 	@Override
 	@Resource(name = "myExamDaoImpl")
@@ -204,8 +197,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		}
 		
 		// 交卷
-		Paper paper = paperService.getEntity(exam.getPaperId());
-		if (paper.getMarkType() == 1) {// 如果是客观题试卷，记录阅卷开始时间
+		if (exam.getMarkType() == 1) {// 如果是客观题试卷，记录阅卷开始时间
 			myExam.setMarkStartTime(new Date());// 主观题阅卷开始时间，由阅卷用户给某试卷第一次打分时生成
 		}
 		myExam.setState(3);// 标记为交卷
@@ -217,9 +209,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	
 		User user = userService.getEntity(myExam.getUserId());
 		log.info("用户交卷开始：【{}-{}】【1-管理员 阅 {}-{}】开始", exam.getId(), exam.getName(), user.getId(), user.getName());
-		MyPaper userPaper = paper.getGenType() == 1 
-				? paperService.getPaper(paper.getId()) 
-				: paperService.getPaperOfRand(examId, myExam.getUserId());
+		MyExamChapter userPaper = exam.getGenType() == 1 ? examService.getExamChapter(exam.getId()) : examService.getPaperOfRand(examId, myExam.getUserId());
 		List<MyExamDetail> userAnswerList = myExamDetailService.getList(examId, myExam.getUserId());
 		Map<Integer, MyExamDetail> userAnswerCache = new HashMap<>();
 		for (MyExamDetail userAnswer : userAnswerList) {
@@ -228,7 +218,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
 		for (Chapter chapter : userPaper.getChapterList()) {
 			for (MyQuestion myquestion : chapter.getMyQuestionList()) {// 获取章节下所有试题
-				if (!QuestionUtil.hasAi(myquestion.getQuestion())) {// 如果是主观题，等待人工阅卷
+				if (!QuestionUtil.hasMarkType(myquestion.getQuestion())) {// 如果是主观题，等待人工阅卷
 					continue;
 				}
 				
@@ -250,22 +240,22 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 			}
 		}
 		
-		if (paper.getMarkType() == 1) {// 如果是客观题试卷，直接出成绩
+		if (exam.getMarkType() == 1) {// 如果是客观题试卷，直接出成绩
 			myExam.setMarkUserId(1);// 阅卷人为admin
 			myExam.setMarkEndTime(new Date());// 记录阅卷结束时间
 			myExam.setMarkState(3);// 标记为阅卷结束
 			myExam.setTotalScore(totalScore.getResult());// 记录成绩 
-			BigDecimal passScore = BigDecimalUtil.newInstance(paper.getTotalScore())
-					.mul(paper.getPassScore()).div(100, 2).getResult();
+			BigDecimal passScore = BigDecimalUtil.newInstance(exam.getTotalScore())
+					.mul(exam.getPassScore()).div(100, 2).getResult();
 			myExam.setAnswerState(BigDecimalUtil.newInstance(totalScore.getResult()).sub(passScore).getResult().doubleValue() >= 0 ? 1 : 2);// 标记及格状态
 			
 			update(myExam);
 		} 
 		
-		if (paper.getMarkType() == 1) {
+		if (exam.getMarkType() == 1) {
 			log.info("用户交卷完成：【{}-{}】【1-管理员 阅 {}-{}】完成阅卷，得{}分，{}", exam.getId(), exam.getName(), user.getId(), user.getName(), 
 					totalScore.getResult(), myExam.getAnswerState() == 1 ? "及格" : "不及格");
-		} else if (paper.getMarkType() == 2) {// 如果是主观题试卷，等待人工阅卷
+		} else if (exam.getMarkType() == 2) {// 如果是主观题试卷，等待人工阅卷
 			log.info("用户交卷完成：【{}-{}】【1-管理员 阅 {}-{}】完成阅卷，客观题部分得{}分", exam.getId(), exam.getName(), user.getId(), user.getName(), 
 					totalScore.getResult());
 		}
@@ -285,30 +275,29 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		List<MyExam> myExamList = myExamService.getList(examId);
 		
 		// 获取用户试卷、标准答案
-		Paper paper = paperService.getEntity(exam.getPaperId());
-		MyPaper userPaper = paper.getGenType() == 1 ? paperService.getPaper(paper.getId()) : null;// 人工组卷每个人是一样的
+		MyExamChapter userPaper; // exam.getGenType() == 1 ? paperService.getPaper(paper.getId()) : null;// 人工组卷每个人是一样的
 		for (MyExam myExam : myExamList) {
-			userPaper = paper.getGenType() == 2 ? paperService.getPaperOfRand(examId, myExam.getUserId()) : userPaper;// 随机组卷每个人是不一样的
+			userPaper = null; // exam.getGenType() == 2 ? paperService.getPaperOfRand(examId, myExam.getUserId()) : userPaper;// 随机组卷每个人是不一样的
 			
 			// 开始阅卷
-			doExamHandle(exam, myExam, paper, userPaper);
+			doExamHandle(exam, myExam, userPaper);
 		}
 		
 		// 更新用户排名
-		doExamRank(paper, myExamList);
+		doExamRank(exam, myExamList);
 		
 		// 完成考试
-		doExamFinish(exam, paper);
+		doExamFinish(exam);
 	}
 
-	private void doExamFinish(Exam exam, Paper paper) {
-		if (paper.getMarkType() == 1) {
+	private void doExamFinish(Exam exam) {
+		if (exam.getMarkType() == 1) {
 			exam.setMarkState(3);// 标记考试为已阅卷
 			examService.update(exam);
 			log.info("客观题阅卷完成：标记考试为已阅卷，结束");
 			
 			AutoMarkCache.del(exam.getId());// 不在runner类删除是因为，如果是主观题试卷，缓存需要重新放入一份
-		} else if (paper.getMarkType() == 2) {
+		} else if (exam.getMarkType() == 2) {
 			exam.setMarkState(2);// 标记考试为阅卷中，等待人工阅卷。（人工阅卷校时先校验状态是否变更为2，保证顺序执行）
 			examService.update(exam);
 			log.info("客观题阅卷完成：标记考试为阅卷中，等待人工阅卷");
@@ -352,7 +341,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		}
 	}
 	
-	private void doExamHandle(Exam exam, MyExam myExam, Paper paper, MyPaper userPaper) {
+	private void doExamHandle(Exam exam, MyExam myExam, MyExamChapter userPaper) {
 		User user = userService.getEntity(myExam.getUserId());
 		if(myExam.getState() == 3){// 已交卷不处理（已阅卷）
 			log.info("客观题阅卷进行：【{}-{}】，【{}-{}】已阅卷，得{}分", exam.getId(), exam.getName(), user.getId(), user.getName(), myExam.getTotalScore());
@@ -367,7 +356,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 			log.info("客观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】未交卷，标记为已交卷", exam.getId(), exam.getName(), user.getId(), user.getName());
 		}
 		
-		if (paper.getMarkType() == 1 || myExam.getState() == 1) {// 如果是智能阅卷或未考试，记录阅卷开始时间；
+		if (exam.getMarkType() == 1 || myExam.getState() == 1) {// 如果是智能阅卷或未考试，记录阅卷开始时间；
 			myExam.setMarkStartTime(new Date());
 		}
 		
@@ -388,7 +377,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 					continue;
 				}
 				
-				if (!QuestionUtil.hasAi(myquestion.getQuestion())) {// 如果是主观题，等待人工阅卷
+				if (!QuestionUtil.hasMarkType(myquestion.getQuestion())) {// 如果是主观题，等待人工阅卷
 					continue;
 				}
 				
@@ -409,18 +398,18 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 			}
 		}
 		
-		if (paper.getMarkType() == 1 || myExam.getState() == 1) {// 如果是智能阅卷或未考试，直接出成绩
+		if (exam.getMarkType() == 1 || myExam.getState() == 1) {// 如果是智能阅卷或未考试，直接出成绩
 			myExam.setMarkUserId(1);// 阅卷人为admin
 			myExam.setMarkEndTime(new Date());// 记录阅卷结束时间
 			myExam.setMarkState(3);// 标记为阅卷结束
 			myExam.setTotalScore(totalScore.getResult());// 记录成绩 
-			BigDecimal passScore = BigDecimalUtil.newInstance(paper.getTotalScore())
-					.mul(paper.getPassScore()).div(100, 2).getResult();
+			BigDecimal passScore = BigDecimalUtil.newInstance(exam.getTotalScore())
+					.mul(exam.getPassScore()).div(100, 2).getResult();
 			myExam.setAnswerState(BigDecimalUtil.newInstance(totalScore.getResult()).sub(passScore).getResult().doubleValue() >= 0 ? 1 : 2);// 标记及格状态
 			myExamService.update(myExam);
 		}
 		
-		if (paper.getMarkType() == 1) {
+		if (exam.getMarkType() == 1) {
 			log.info("客观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】完成阅卷，得{}分，{}", exam.getId(), exam.getName(), user.getId(), user.getName(), 
 					totalScore.getResult(), myExam.getAnswerState() == 1 ? "及格" : "不及格");
 		} else {
@@ -440,11 +429,10 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		
 		// 获取考试用户列表
 		log.info("主观题阅卷开始：【{}-{}】", exam.getId(), exam.getName());
-		Paper paper = paperService.getEntity(exam.getPaperId());// 试卷信息
 		List<MyExam> myExamList = myExamService.getList(examId);// 考试用户列表
 		for (MyExam myExam : myExamList) {
 			List<MyExamDetail> userAnswerList = myExamDetailService.getList(myExam.getExamId(), myExam.getUserId());// 用户答案
-			doMarkHandle(exam, myExam, paper, userAnswerList);
+			doMarkHandle(exam, myExam, userAnswerList);
 		}
 		
 		// 更新用户排名
@@ -497,7 +485,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		}
 	}
 	
-	private void doMarkHandle(Exam exam, MyExam myExam, Paper paper, List<MyExamDetail> userAnswerList) {
+	private void doMarkHandle(Exam exam, MyExam myExam, List<MyExamDetail> userAnswerList) {
 		User examUser = userService.getEntity(myExam.getUserId());
 		if (myExam.getMarkState() == 3) {//已阅卷的不处理（没考试的人考试时间结束已阅卷；人工阅卷在阅卷时间结束之前已经部分试卷阅完）
 			User markUser = userService.getEntity(myExam.getMarkUserId());
@@ -532,7 +520,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		}
 		
 		myExam.setTotalScore(totalScore.getResult());// 记录成绩 
-		BigDecimal passScore = BigDecimalUtil.newInstance(paper.getTotalScore()).mul(paper.getPassScore()).div(100, 2).getResult();
+		BigDecimal passScore = BigDecimalUtil.newInstance(exam.getTotalScore()).mul(exam.getPassScore()).div(100, 2).getResult();
 		myExam.setAnswerState(BigDecimalUtil.newInstance(totalScore.getResult()).sub(passScore).getResult().doubleValue() >= 0 ? 1 : 2);// 标记及格状态
 		myExam.setMarkState(3);// 标记为阅卷结束
 		myExam.setMarkEndTime(new Date());// 标记阅卷结束时间
@@ -574,8 +562,8 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	 * v1.0 zhanghc 2022年1月26日下午1:55:49
 	 * @param myExamList void
 	 */
-	private void doExamRank(Paper paper, List<MyExam> myExamList) {
-		if (paper.getMarkType() != 1) {// 主观题试卷需要人工阅卷后才能排序
+	private void doExamRank(Exam exam, List<MyExam> myExamList) {
+		if (exam.getMarkType() != 1) {// 主观题试卷需要人工阅卷后才能排序
 			return;
 		}
 		
@@ -602,14 +590,14 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	 * 
 	 * v1.0 chenyun 2021年7月21日下午2:09:40
 	 * @param question 试题
-	 * @param questionOption 试题选项
-	 * @param questionAnswerList 试题答案
+	 * @param examQuestion 试题选项
+	 * @param examAnswerList 考试试题
 	 * @param userAnswer 用户答案
 	 * void
 	 */
-	private void qAHandle(Question question, PaperQuestion questionOption, 
-			List<PaperQuestionAnswer> questionAnswerList, MyExamDetail userAnswer) {
-		if (question.getAi() == 2) {// 试题类型为人工阅卷，不处理
+	private void qAHandle(Question question, ExamQuestion examQuestion, 
+			List<ExamAnswerEx> examAnswerList, MyExamDetail userAnswer) {
+		if (question.getMarkType() == 2) {// 试题类型为人工阅卷，不处理
 			return;
 		}
 		
@@ -618,18 +606,18 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 			return;
 		}
 		
-		boolean dxxbmg = QuestionUtil.dxxbmg(questionOption);// 大小写不敏感
+		boolean dxxbmg = QuestionUtil.dxxbmg(examQuestion);// 大小写不敏感
 		String _userAnswer = dxxbmg
 				? userAnswer.getAnswer().toLowerCase()
 				: userAnswer.getAnswer();// 获取用户答案
-		for (PaperQuestionAnswer questionAnswer : questionAnswerList) {// 获取试题某一项关键词
+		for (ExamAnswerEx examAnswer : examAnswerList) {// 获取试题某一项关键词
 			String[] _questionAnswers = dxxbmg 
-					? questionAnswer.getAnswer().toLowerCase().split("\n") 
-					: questionAnswer.getAnswer().split("\n");// 获取关键词的所有同义词
+					? examAnswer.getAnswer().toLowerCase().split("\n") 
+					: examAnswer.getAnswer().split("\n");// 获取关键词的所有同义词
 			for (String _questionAnswer : _questionAnswers) {// 用户答案和同义词对比
 				if (_userAnswer.contains(_questionAnswer)) {// 如果找到（对比条件不要反，用户答案是大段文字）
 					userAnswer.setScore(BigDecimalUtil.newInstance(userAnswer.getScore())
-							.add(questionAnswer.getScore()).getResult());// 累计该关键词的分数
+							.add(examAnswer.getScore()).getResult());// 累计该关键词的分数
 					break;// 匹配到一个同义词就结束；返回大循环继续对比其他关键词
 				}
 			}
@@ -641,14 +629,14 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	 * 
 	 * v1.0 zhanghc 2020年10月13日下午8:06:10
 	 * @param question
-	 * @param questionOption
-	 * @param questionAnswerList 
+	 * @param examQuestion
+	 * @param examAnswerList 
 	 * @param userAnswer 
 	 * void
 	 */
-	private void singleChoiceHandle(Question question, PaperQuestion questionOption, 
-			List<PaperQuestionAnswer> questionAnswerList, MyExamDetail userAnswer) {
-		if (question.getAi() == 2) {// 试题类型为人工阅卷，不处理
+	private void singleChoiceHandle(Question question, ExamQuestion examQuestion, 
+			List<ExamAnswerEx> examAnswerList, MyExamDetail userAnswer) {
+		if (question.getMarkType() == 2) {// 试题类型为人工阅卷，不处理
 			return;
 		}
 		
@@ -657,9 +645,9 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 			return;
 		}
 		
-		for (PaperQuestionAnswer questionAnswer : questionAnswerList) {// 就一个答案，可以不循环
-			if (questionAnswer.getAnswer().equals(userAnswer.getAnswer())) {
-				userAnswer.setScore(questionAnswer.getScore());
+		for (ExamAnswerEx examAnswer : examAnswerList) {// 就一个答案，可以不循环
+			if (examAnswer.getAnswer().equals(userAnswer.getAnswer())) {
+				userAnswer.setScore(examAnswer.getScore());
 			}
 		}
 	}
@@ -673,9 +661,9 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	 * @param userAnswer 
 	 * void
 	 */
-	private void multipleChoiceHandle(Question question, PaperQuestion questionOption, 
-			List<PaperQuestionAnswer> questionAnswerList, MyExamDetail userAnswer) {
-		if (question.getAi() == 2) {// 试题类型为人工阅卷，不处理
+	private void multipleChoiceHandle(Question question, ExamQuestion examQuestion, 
+			List<ExamAnswerEx> examAnswerList, MyExamDetail userAnswer) {
+		if (question.getMarkType() == 2) {// 试题类型为人工阅卷，不处理
 			return;
 		}
 		
@@ -686,17 +674,17 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		
 		Set<String> userAnswerSet = new HashSet<String>(Arrays.asList(userAnswer.getAnswer().split(",")));// 获取用户答案
 		Set<String> questionAnswerSet = new HashSet<String>();// 获取试题答案
-		for(PaperQuestionAnswer questionAnswer : questionAnswerList){
-			String[] questionAnswerSplit = questionAnswer.getAnswer().split(",");
+		for(ExamAnswerEx examAnswer : examAnswerList){
+			String[] questionAnswerSplit = examAnswer.getAnswer().split(",");
 			for (int i = 0; i < questionAnswerSplit.length; i++) {
 				questionAnswerSet.add(questionAnswerSplit[i]);
 			}
 		}
 		
 		if (questionAnswerSet.size() == userAnswerSet.size() && questionAnswerSet.containsAll(userAnswerSet)) {// 如果完全正确，得满分
-			userAnswer.setScore(questionOption.getScore());
-		} else if (QuestionUtil.lxdf(questionOption) && questionAnswerSet.containsAll(userAnswerSet)) {// 如果勾选了漏选得分，得漏选的分
-			userAnswer.setScore(questionAnswerList.get(0).getScore());
+			userAnswer.setScore(examQuestion.getScore());
+		} else if (QuestionUtil.lxdf(examQuestion) && questionAnswerSet.containsAll(userAnswerSet)) {// 如果勾选了漏选得分，得漏选的分
+			userAnswer.setScore(examAnswerList.get(0).getScore());
 		} else {// 如果不对得0分
 			userAnswer.setScore(BigDecimal.ZERO);
 		}
@@ -718,36 +706,36 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 //		System.err.println(join);
 		
 		Question question = new Question();
-		question.setAi(1);
+		question.setMarkType(1);
 		
-		PaperQuestion questionOption = new PaperQuestion();
-		questionOption.setAiOptions("2,3");
+		ExamQuestion examQuestion = new ExamQuestion();
+		examQuestion.setMarkOptions("2,3");
 		
-		List<PaperQuestionAnswer> questionAnswerList = new ArrayList<>();
-		PaperQuestionAnswer paperQuestionAnswer = new PaperQuestionAnswer();
-		paperQuestionAnswer.setAnswer("奖学金");
-		paperQuestionAnswer.setScore(new BigDecimal("1"));
-		questionAnswerList.add(paperQuestionAnswer);
+		List<ExamAnswerEx> examAnswerList = new ArrayList<>();
+		ExamAnswerEx examAnswer = new ExamAnswerEx();
+		examAnswer.setAnswer("奖学金");
+		examAnswer.setScore(new BigDecimal("1"));
+		examAnswerList.add(examAnswer);
 		
-		paperQuestionAnswer = new PaperQuestionAnswer();
-		paperQuestionAnswer.setAnswer("助学金");
-		paperQuestionAnswer.setScore(new BigDecimal("1"));
-		questionAnswerList.add(paperQuestionAnswer);
+		examAnswer = new ExamAnswerEx();
+		examAnswer.setAnswer("助学金");
+		examAnswer.setScore(new BigDecimal("1"));
+		examAnswerList.add(examAnswer);
 		
-		paperQuestionAnswer = new PaperQuestionAnswer();
-		paperQuestionAnswer.setAnswer("贷学金");
-		paperQuestionAnswer.setScore(new BigDecimal("1"));
-		questionAnswerList.add(paperQuestionAnswer);
+		examAnswer = new ExamAnswerEx();
+		examAnswer.setAnswer("贷学金");
+		examAnswer.setScore(new BigDecimal("1"));
+		examAnswerList.add(examAnswer);
 		
 		MyExamDetail userAnswer = new MyExamDetail();
 		userAnswer.setAnswer("助学金\n奖学金\n奖学金");
 		
-		new MyExamServiceImpl().fillBlankHandle(question, questionOption, questionAnswerList, userAnswer);
+		new MyExamServiceImpl().fillBlankHandle(question, examQuestion, examAnswerList, userAnswer);
 		System.err.println(userAnswer.getScore());
 	}
-	private void fillBlankHandle(Question question, PaperQuestion questionOption, 
-			List<PaperQuestionAnswer> questionAnswerList, MyExamDetail userAnswer) {
-		if (question.getAi() == 2) {// 试题类型为人工阅卷，不处理
+	private void fillBlankHandle(Question question, ExamQuestion examQuestion, 
+			List<ExamAnswerEx> examAnswerList, MyExamDetail userAnswer) {
+		if (question.getMarkType() == 2) {// 试题类型为人工阅卷，不处理
 			return;
 		}
 		
@@ -763,19 +751,19 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		 * 用户答案：培训  审查
 		 * 匹配结果：【培训】得分；【审查】不得分
 		 */
-		boolean dxxbmg = QuestionUtil.dxxbmg(questionOption);// 大小写不敏感
+		boolean dxxbmg = QuestionUtil.dxxbmg(examQuestion);// 大小写不敏感
 		String[] userAnswers = dxxbmg
 				? userAnswer.getAnswer().toLowerCase().split("\n")
 				: userAnswer.getAnswer().split("\n");// 获取用户答案（多空就是多个答案）
 		Set<Integer> useAnswers = new HashSet<>();// bug：考试答题-》填空题（3个空）-》属性为客观题、填空允许乱序-》一个正确答案分别填到三个空上-》当前题满分
 		for (int i = 0; i < userAnswers.length; i++) {// 循环用户每一项答案（[培训  审查]）
-			for (int j = 0; j < questionAnswerList.size(); j++) {// 循环每一项试题关键词（[[保密审查,保密调查], [培训  审查]]）
-				PaperQuestionAnswer questionAnswer = questionAnswerList.get(j);
+			for (int j = 0; j < examAnswerList.size(); j++) {// 循环每一项试题关键词（[[保密审查,保密调查], [培训  审查]]）
+				ExamAnswerEx examAnswer = examAnswerList.get(j);
 				String[] synonyms = dxxbmg 
-						? questionAnswer.getAnswer().toLowerCase().split("\n") 
-						: questionAnswer.getAnswer().split("\n");// 获取关键词的所有同义词
+						? examAnswer.getAnswer().toLowerCase().split("\n") 
+						: examAnswer.getAnswer().split("\n");// 获取关键词的所有同义词
 						
-				if (!QuestionUtil.dawsx(questionOption)) {// 如果勾选了答案前后有顺序，则对应位置对比
+				if (!QuestionUtil.dawsx(examQuestion)) {// 如果勾选了答案前后有顺序，则对应位置对比
 					if (i != j) {// 不是对应位置，返回继续查找
 						continue;
 					}
@@ -787,7 +775,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 				for (String synonym : synonyms) {// 循环每一项同义词（保密审查  保密调查）
 					if (userAnswers[i].contains(synonym)) {// 如果用户某一空答案，匹配某一项关键词的同义词
 						userAnswer.setScore(BigDecimalUtil.newInstance(userAnswer.getScore())
-								.add(questionAnswer.getScore()).getResult());// 累计该关键词的分数
+								.add(examAnswer.getScore()).getResult());// 累计该关键词的分数
 						useAnswers.add(j);
 						break;// 匹配到一个同义词就结束；返回大循环继续对比其他关键词
 					}

@@ -7,7 +7,7 @@ import com.wcpdoc.core.dao.RBaseDao;
 import com.wcpdoc.exam.core.entity.QuestionTypeOpen;
 
 /**
- * 试题分类开放数据访问层接口
+ * 题库开放数据访问层接口
  * 
  * v1.0 chenyun 2021-03-02 13:43:21
  */
