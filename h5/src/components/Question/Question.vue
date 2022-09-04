@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 试题简单样式 -->
-    <el-card v-if="showType === 'simple'" :class="'center-card'" shadow="hover">
+    <el-card v-if="showMode === 'simple'" :class="'center-card'" shadow="hover">
       <div class="center-card-top">
         <span>{{ no }}、</span>
         <div class="render-title" v-html="`${question.title}`" />
@@ -30,7 +30,7 @@
       </div>
     </el-card>
     <!-- 试题详细样式 -->
-    <div v-else-if="showType === 'detail'" class="question-content">
+    <div v-else-if="showMode === 'detail'" class="question-content">
       <slot name="top"></slot>
       <!-- 题干 -->
       <QuestionTitle
@@ -121,9 +121,9 @@ export default {
       type: Object,
       default: () => {},
     },
-    showType: {
+    showMode: {
       type: String,
-      default: 'simple'
+      default: 'detail'
     }
   },
   data() {
@@ -241,6 +241,9 @@ export default {
     padding: 10px 15px;
   }
 
+  &:first-child {
+    margin: 10px
+  }
   &:hover {
     border: 1px solid #0094e5;
     background: rgba(#0094e5, 0.06%);
@@ -250,10 +253,6 @@ export default {
       position: absolute;
       right: 20px;
     }
-  }
-
-  &:nth-of-type(2) {
-    margin-top: 50px;
   }
 }
 

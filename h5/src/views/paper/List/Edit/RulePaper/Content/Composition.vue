@@ -61,7 +61,7 @@
               </el-tooltip>
             </div>
           </div>
-          <TinymceEditor
+          <Editor
             id="chapterDesc"
             class="chapter-description"
             placeholder="请输入章节描述"
@@ -484,10 +484,10 @@ import {
   paperQuestionMove,
   paperUpdateBatchScore
 } from 'api/paper'
-import TinymceEditor from 'components/TinymceEditor/Index.vue'
+import Editor from 'components/Editor/Index.vue'
 import Draggable from 'vuedraggable'
 export default {
-  components: { TinymceEditor, Draggable },
+  components: { Editor, Draggable },
   filters: {
     typeName(data) {
       return getOneDict('QUESTION_TYPE').find(

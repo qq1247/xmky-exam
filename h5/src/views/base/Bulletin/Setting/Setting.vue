@@ -9,7 +9,7 @@
       <el-input v-model="editForm.title" placeholder="请输入标题" />
     </el-form-item>
     <el-form-item label="内容" prop="content">
-      <TinymceEditor
+      <Editor
         id="content"
         :value="editForm.content"
         @editorListener="editorListener"
@@ -61,7 +61,7 @@
 <script>
 import { bulletinAdd, bulletinEdit, bulletinGet } from 'api/base'
 import { userListPage } from 'api/user'
-import TinymceEditor from 'components/TinymceEditor/Index.vue'
+import Editor from 'components/Editor/Index.vue'
 import CustomSelect from 'components/CustomSelect.vue'
 
 import * as dayjs from 'dayjs'
@@ -69,7 +69,7 @@ import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 dayjs.extend(isSameOrBefore)
 export default {
   components: {
-    TinymceEditor,
+    Editor,
     CustomSelect
   },
   data() {

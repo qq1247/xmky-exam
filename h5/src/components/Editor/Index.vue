@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import TinymceImage from './TinymceImage'
+import TinymceImage from './Image'
 // 文档 http://tinymce.ax-z.cn/
 // 引入组件
 import tinymce from 'tinymce/tinymce' // tinymce默认hidden，不引入不显示

@@ -56,11 +56,11 @@
       >{{ item.name }}</el-radio>
     </el-form-item>
     <!-- <el-form-item label="考前阅读">
-              <TinymceEditor
+              <Editor
                 :value="paperForm.readRemark"
                 @editorListener="readRemark"
                 id="readRemark"
-              ></TinymceEditor>
+              ></Editor>
             </el-form-item>
             <el-form-item label="阅读时长">
               <el-input
@@ -126,12 +126,12 @@
 
 <script>
 import { paperEdit, paperAdd, paperGet } from 'api/paper'
-// import TinymceEditor from 'components/TinymceEditor/Index.vue'
+// import Editor from 'components/Editor/Index.vue'
 import dayjs from 'dayjs'
 
 export default {
   components: {
-    // TinymceEditor
+    // Editor
   },
   data() {
     const validatePercentage = (rule, value, callback) => {

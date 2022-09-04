@@ -35,7 +35,7 @@
             @role="role"
             @open="open"
             @move="move"
-            @detail="goDetail"
+            @detail="questionList"
             @statistics="statistics"
             @txtImport="txtImport"
           />
@@ -128,10 +128,10 @@ export default {
         tab: '1'
       })
     },
-    // 试题详情
-    goDetail({ id }) {
-      this.$tools.switchTab('QuestionIndexEdit', {
-        id
+    // 试题列表
+    questionList({ id }) {
+      this.$tools.switchTab('QuestionIndexList', {
+        questionTypeId : id
       })
     },
     // 权限人员信息

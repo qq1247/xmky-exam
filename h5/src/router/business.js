@@ -22,7 +22,7 @@ export default [
         },
         children: [
           {
-            path: 'setting/:id/:tab?',
+            path: 'setting/:questionTypeId/:tab?',
             name: 'QuestionIndexSetting',
             component: () => import('@/views/question/Setting/Index.vue'),
             meta: {
@@ -31,16 +31,16 @@ export default [
             }
           },
           {
-            path: 'edit/:id',
-            name: 'QuestionIndexEdit',
-            component: () => import('@/views/question/Edit.vue'),
+            path: 'list/:questionTypeId',
+            name: 'QuestionIndexList',
+            component: () => import('@/views/question/List.vue'),
             meta: {
               title: '试题列表',
               layout: 'subAdmin'
             }
           },
           {
-            path: 'editor/:id',
+            path: 'editor/:questionTypeId',
             name: 'QuestionIndexTxtImport',
             component: () => import('@/views/question/Editor.vue'),
             meta: {
@@ -59,7 +59,7 @@ export default [
           //   }
           // },
           {
-            path: 'statistics/:id',
+            path: 'statistics/:questionTypeId',
             name: 'QuestionIndexStatistics',
             component: () => import('@/views/question/Statistics.vue'),
             meta: {

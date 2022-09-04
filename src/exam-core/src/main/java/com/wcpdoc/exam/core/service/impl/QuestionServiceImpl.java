@@ -627,9 +627,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				if (ValidateUtil.isValid(markOptions)) {
 					throw new MyException("参数错误：scoreOption");
 				}
-				if (ValidateUtil.isValid(answerScores)) {
-					throw new MyException("参数错误：answerScores");
-				}
+				//if (ValidateUtil.isValid(answerScores)) {
+				//	throw new MyException("参数错误：answerScores");
+				//} // 主观填空允许有子分数
 			}
 		} else if (question.getType() == 4) {
 			if (answers.length != 1) {

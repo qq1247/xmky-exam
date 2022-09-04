@@ -1,16 +1,6 @@
 import router from '@/router/index'
 import { getOneDict } from '@/utils/getDict'
 
-const resetData = (el, name) => {
-  const $data = el.$data[name]
-  const data = el.$options.data()[name]
-  for (const attrName in $data) {
-    if (attrName !== 'rules') {
-      $data[attrName] = data[attrName]
-    }
-  }
-}
-
 /**
  * @name: delay
  * @description: 异步倒计时
@@ -137,6 +127,17 @@ const computeMinute = (startTime, endTime) => {
 }
 
 /**
+ * 获取字典数组
+ * 
+ * @param {*} index 索引
+ * @param {*} key 键
+ * @returns 值数组
+ */
+const getDicts = (index) => {
+  return getOneDict(index)
+}
+
+/**
  * 获取字典值
  * 
  * @param {*} index 索引
@@ -152,10 +153,10 @@ const getDictValue = (index, key) => {
 export {
   delay,
   switchTab,
-  resetData,
   formateTime,
   intToChinese,
   getQueryParam,
   computeMinute,
+  getDicts,
   getDictValue
 }

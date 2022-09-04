@@ -31,7 +31,7 @@
               >删除章节</el-button>
             </div>
           </div>
-          <TinymceEditor
+          <Editor
             id="chapterDesc"
             class="chapter-description"
             placeholder="请输入章节描述"
@@ -201,12 +201,12 @@ import {
 } from 'api/paper'
 import { questionTypeListPage } from 'api/question'
 import { getOneDict } from '@/utils/getDict'
-import TinymceEditor from 'components/TinymceEditor/Index.vue'
+import Editor from 'components/Editor/Index.vue'
 import CustomSelect from 'components/CustomSelect.vue'
 import { getQuick } from '@/utils/storage'
 export default {
   components: {
-    TinymceEditor,
+    Editor,
     CustomSelect
   },
   data() {

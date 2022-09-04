@@ -8,7 +8,7 @@
       inactive-text="考试用户"
       @change="changeType"
     />
-    <TinymceEditor
+    <Editor
       id="emailExam"
       :value="content"
       class="email-content"
@@ -24,10 +24,10 @@
 
 <script>
 import { examEmail, examGet } from 'api/exam'
-import TinymceEditor from 'components/TinymceEditor/Index.vue'
+import Editor from 'components/Editor/Index.vue'
 export default {
   components: {
-    TinymceEditor
+    Editor
   },
   data() {
     return {

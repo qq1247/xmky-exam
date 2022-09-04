@@ -1663,7 +1663,7 @@ body.tox-dialog__disable-scroll {
   overflow: hidden;
 }
 .tox .tox-editor-header {
-  z-index: 1;
+  z-index: 9999;
 }
 .tox:not(.tox-tinymce-inline) .tox-editor-header {
   box-shadow: none;

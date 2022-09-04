@@ -6,12 +6,8 @@ export default {
       type: Number,
       default: 0,
     },
-    no: {// 类型
-      type: [Number, String], 
-      default: 0,
-    },
     no: {// 题号
-      type: String, 
+      type: [Number, String],
       default: '',
     },
     title: {// 题干

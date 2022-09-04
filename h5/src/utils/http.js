@@ -91,11 +91,10 @@ instance.interceptors.response.use(
   (res) => {
     const {
       data: { code, msg },
-      headers,
       config
     } = res
-    headers?.authorization &&
-      store.commit('user/SET_TOKEN', headers.authorization)
+    config.headers?.Authorization &&
+      store.commit('user/SET_TOKEN', config.headers.Authorization)
     if (config.responseType === 'blob') {
       return Promise.resolve(res.data)
     } else {

@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import TinymceUpload from '@/components/TinymceEditor/TinymceImage' // 引入自己的自定义插件
+import TinymceUpload from '@/components/Editor/Image' // 引入自己的自定义插件
 ;(function () {
   'use strict'
 
