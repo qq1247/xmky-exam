@@ -1,5 +1,6 @@
 package com.wcpdoc.exam.api.controller;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -29,13 +30,9 @@ import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyMark;
-import com.wcpdoc.exam.core.entity.Paper;
 import com.wcpdoc.exam.core.service.ExamService;
-import com.wcpdoc.exam.core.service.ExamTypeService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
-import com.wcpdoc.exam.core.service.PaperService;
-import com.wcpdoc.exam.core.service.PaperTypeService;
 
 /**
  * 考试控制层
@@ -49,12 +46,6 @@ public class ApiExamController extends BaseController {
 
 	@Resource
 	private ExamService examService;
-	@Resource
-	private PaperTypeService paperTypeService;
-	@Resource
-	private PaperService paperService;
-	@Resource
-	private ExamTypeService examTypeService;
 	@Resource
 	private MyMarkService myMarkService;
 	@Resource
@@ -162,7 +153,6 @@ public class ApiExamController extends BaseController {
 	public PageResult get(Integer id) {
 		try {
 			Exam exam = examService.getEntity(id);
-			Paper paper = paperService.getEntity(exam.getPaperId());
 			return PageResultEx.ok()
 					.addAttr("id", exam.getId())
 					.addAttr("name", exam.getName())
@@ -170,11 +160,7 @@ public class ApiExamController extends BaseController {
 					.addAttr("endTime", DateUtil.formatDateTime(exam.getEndTime()))
 					.addAttr("markStartTime", exam.getMarkStartTime() == null ? null : DateUtil.formatDateTime(exam.getMarkStartTime()))
 					.addAttr("markEndTime", exam.getMarkEndTime() == null ? null : DateUtil.formatDateTime(exam.getMarkEndTime()))
-					.addAttr("paperId", exam.getPaperId())
-					.addAttr("paperName", paper.getName())
-					.addAttr("paperMarkType", paper.getMarkType())
-					.addAttr("examTypeId", exam.getExamTypeId())
-					.addAttr("examTypeName", examTypeService.getEntity(exam.getExamTypeId()).getName())
+					.addAttr("examMarkType", exam.getMarkType())
 					.addAttr("state", exam.getState())
 					.addAttr("scoreState", exam.getScoreState())
 					.addAttr("rankState", exam.getRankState())
@@ -269,8 +255,7 @@ public class ApiExamController extends BaseController {
 	public PageResult markUserList(Integer id) {
 		try {
 			Exam exam = examService.getEntity(id);
-			Paper paper = paperService.getEntity(exam.getPaperId());
-			if (paper.getMarkType() == 1) {// 如果是智能阅卷
+			if (exam.getMarkType() == 1) {// 如果是智能阅卷
 				List<Map<String, Object>> result = new ArrayList<>();
 				Map<String, Object> map = new HashMap<>();
 				map.put("examUserList", examService.getExamUserList(id));
@@ -550,6 +535,80 @@ public class ApiExamController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("考试邮件通知错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 设置分数
+	 * 
+	 * v1.0 zhanghc 2018年10月21日上午10:46:54
+	 * @param id
+	 * @param questionId
+	 * @param score
+	 * @param subScores 试题为智能阅卷，并且是填空或问答时有效
+	 * @param aiOptions 
+	 * @return PageResult
+	 */
+	@RequestMapping("/scoreUpdate")
+	@ResponseBody
+	public PageResult scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores, Integer[] markOptions) {
+		try {
+			examService.scoreUpdate(id, questionId, score, subScores, markOptions);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("设置分数错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("设置分数错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 批量设置分数
+	 * 
+	 * v1.0 zhanghc 2018年10月21日上午10:46:54
+	 * @param chapterId
+	 * @param score
+	 * @param subScores
+	 * @param aiOptions
+	 * @return PageResult
+	 */
+	@RequestMapping("/updateBatchScore")
+	@ResponseBody
+	public PageResult updateBatchScore(Integer chapterId, BigDecimal score, BigDecimal subScores, Integer[] markOptions) {
+		try {
+			examService.batchScoreUpdate(chapterId, score, subScores, markOptions);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("设置分数错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("设置分数错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 反作弊
+	 * 
+	 * v1.0 zhanghc 2022年5月18日上午10:45:21
+	 * @param id
+	 * @param options 1：试题乱序；2：选项乱序；3：禁用右键；4：禁止复制；5：最小化警告
+	 * @return PageResult
+	 */
+	@RequestMapping("/sxe")
+	@ResponseBody
+	public PageResult sxe(Integer id, Integer[] options) {
+		try {
+			examService.sxe(id, options);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("发布错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("发布错误：", e);
 			return PageResult.err();
 		}
 	}

@@ -16,46 +16,42 @@ import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 
 /**
- * 试卷试题实体
+ * 考试试题实体
  * 
  * v1.0 zhanghc 2017-05-26 14:23:38
  */
 @Entity
-@Table(name = "EXM_PAPER_QUESTION")
-public class PaperQuestion {
+@Table(name = "EXM_EXAM_QUESTION")
+public class ExamQuestion {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID")
 	private Integer id;
-	@Column(name = "NAME")
-	private String name;
-	@Column(name = "DESCRIPTION")
-	private String description;
-	@Column(name = "PARENT_ID")
-	private Integer parentId;
-	@Column(name = "PARENT_SUB")
-	private String parentSub;
+	@Column(name = "CHAPTER_NAME")
+	private String chapterName;
+	@Column(name = "CHAPTER_TXT")
+	private String chapterTxt;
+	@Column(name = "TYPE")
+	private Integer type;
+	@Column(name = "SCORE")
+	private BigDecimal score;
+	@Column(name = "SCORES")
+	private String scores;
+	@Column(name = "MARK_OPTIONS")
+	private String markOptions;
+	@Column(name = "QUESTION_ID")
+	private Integer questionId;
+	@Column(name = "EXAM_ID")
+	private Integer examId;
+	@Column(name = "USER_ID")
+	private Integer userId;
+	@Column(name = "NO")
+	private Integer no;
 	@Column(name = "UPDATE_USER_ID")
 	private Integer updateUserId;
 	@Column(name = "UPDATE_TIME")
 	@DateTimeFormat(pattern = DateUtil.FORMAT_DATE_TIME)
 	private Date updateTime;
-	@Column(name = "PAPER_ID")
-	private Integer paperId;
-	@Column(name = "QUESTION_ID")
-	private Integer questionId;
-	@Column(name = "TYPE")
-	private Integer type;
-	@Column(name = "SCORE")
-	private BigDecimal score;
-	@Column(name = "AI_OPTIONS")
-	private String aiOptions;
-	@Column(name = "NO")
-	private Integer no;
-	@Column(name = "EXAM_ID")
-	private Integer examId;
-	@Column(name = "USER_ID")
-	private Integer userId;
 	
 	public Integer getId() {
 		return id;
@@ -65,36 +61,28 @@ public class PaperQuestion {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public String getChapterName() {
+		return chapterName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setChapterName(String chapterName) {
+		this.chapterName = chapterName;
 	}
 
-	public String getDescription() {
-		return description;
+	public String getChapterTxt() {
+		return chapterTxt;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setChapterTxt(String chapterTxt) {
+		this.chapterTxt = chapterTxt;
 	}
 
-	public Integer getParentId() {
-		return parentId;
+	public String getScores() {
+		return scores;
 	}
 
-	public void setParentId(Integer parentId) {
-		this.parentId = parentId;
-	}
-
-	public String getParentSub() {
-		return parentSub;
-	}
-
-	public void setParentSub(String parentSub) {
-		this.parentSub = parentSub;
+	public void setScores(String scores) {
+		this.scores = scores;
 	}
 
 	public Integer getUpdateUserId() {
@@ -111,14 +99,6 @@ public class PaperQuestion {
 
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
-	}
-
-	public Integer getPaperId() {
-		return paperId;
-	}
-
-	public void setPaperId(Integer paperId) {
-		this.paperId = paperId;
 	}
 
 	public Integer getQuestionId() {
@@ -155,12 +135,12 @@ public class PaperQuestion {
 		this.score = score;
 	}
 
-	public String getAiOptions() {
-		return aiOptions;
+	public String getMarkOptions() {
+		return markOptions;
 	}
 
-	public void setAiOptions(String aiOptions) {
-		this.aiOptions = aiOptions;
+	public void setMarkOptions(String markOptions) {
+		this.markOptions = markOptions;
 	}
 
 	public Integer getExamId() {
@@ -179,16 +159,16 @@ public class PaperQuestion {
 		this.userId = userId;
 	}
 
-	public Integer[] getAiOptionArr() {
-		if (!ValidateUtil.isValid(aiOptions)) {
+	public Integer[] getMarkOptionArr() {
+		if (!ValidateUtil.isValid(markOptions)) {
 			return new Integer[0];
 		}
 
-		String[] aiOptionStrArr = aiOptions.split(",");
-		Integer[] aiOptionArr = new Integer[aiOptionStrArr.length];
-		for (int i = 0; i < aiOptionStrArr.length; i++) {
-			aiOptionArr[i] = Integer.parseInt(aiOptionStrArr[i]);
+		String[] markOptionStrArr = markOptions.split(",");
+		Integer[] markOptionArr = new Integer[markOptionStrArr.length];
+		for (int i = 0; i < markOptionStrArr.length; i++) {
+			markOptionArr[i] = Integer.parseInt(markOptionStrArr[i]);
 		}
-		return aiOptionArr;
+		return markOptionArr;
 	}
 }

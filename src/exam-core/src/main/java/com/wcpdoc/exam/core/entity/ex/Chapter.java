@@ -3,7 +3,7 @@ package com.wcpdoc.exam.core.entity.ex;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.wcpdoc.exam.core.entity.PaperQuestion;
+import com.wcpdoc.exam.core.entity.ExamQuestion;
 
 /**
  * 章节实体扩展
@@ -11,21 +11,21 @@ import com.wcpdoc.exam.core.entity.PaperQuestion;
  * v1.0 zhanghc 2017-05-07 14:56:29
  */
 public class Chapter {
-	private PaperQuestion chapter;
+	private ExamQuestion chapter;
 	private List<MyQuestion> myQuestionList = new ArrayList<>();
 
 	public Chapter() {
 	}
 
-	public Chapter(PaperQuestion chapter) {
+	public Chapter(ExamQuestion chapter) {
 		this.chapter = chapter;
 	}
 
-	public PaperQuestion getChapter() {
+	public ExamQuestion getChapter() {
 		return chapter;
 	}
 
-	public void setChapter(PaperQuestion chapter) {
+	public void setChapter(ExamQuestion chapter) {
 		this.chapter = chapter;
 	}
 

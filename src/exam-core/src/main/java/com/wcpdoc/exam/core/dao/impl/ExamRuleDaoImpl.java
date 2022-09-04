@@ -7,8 +7,8 @@ import org.springframework.stereotype.Repository;
 import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
-import com.wcpdoc.exam.core.dao.PaperQuestionRuleDao;
-import com.wcpdoc.exam.core.entity.PaperQuestionRule;
+import com.wcpdoc.exam.core.dao.ExamRuleDao;
+import com.wcpdoc.exam.core.entity.ExamRule;
 
 /**
  * 随机章节数据访问层实现
@@ -16,7 +16,7 @@ import com.wcpdoc.exam.core.entity.PaperQuestionRule;
  * v1.0 chenyun 2022年2月11日 10:51:12
  */
 @Repository
-public class PaperQuestionRuleDaoImpl extends RBaseDaoImpl<PaperQuestionRule> implements PaperQuestionRuleDao {
+public class ExamRuleDaoImpl extends RBaseDaoImpl<ExamRule> implements ExamRuleDao {
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
@@ -24,10 +24,10 @@ public class PaperQuestionRuleDaoImpl extends RBaseDaoImpl<PaperQuestionRule> im
 	}
 	
 	@Override
-	public List<PaperQuestionRule> getList(Integer chapterId) {
+	public List<ExamRule> getList(Integer chapterId) {
 		String sql = "SELECT * "
-				+ "FROM EXM_PAPER_QUESTION_RULE "
-				+ "WHERE PAPER_QUESTION_ID = :PAPER_QUESTION_ID "
+				+ "FROM EXM_EXAM_RULE "
+				+ "WHERE EXAM_QUESTION_ID = :EXAM_QUESTION_ID "
 				+ "ORDER BY NO ASC ";
 		return getList(sql, new Object[]{ chapterId });
 	}

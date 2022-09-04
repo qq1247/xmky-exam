@@ -245,9 +245,8 @@ http请求头需添加Authorization字段，
 | id             | Integer | 编号（主键）      | 否   |
 | title          | String  | 题干         | 否   |
 | type           | Integer | 类型         | 否   |
-| difficulty     | Integer | 难度         | 否   |
 | score     | Double  | 分值     | 否   |
-| ai		 | Integer | 智能阅卷（1：是；2：否） | 否   |
+| markType		 | Integer | 阅卷类型（1：客观题；2：主观题） | 否   |
 | paperId      | Integer | 试卷ID   | 否   |
 | exPaperId      | Integer | 排除试卷ID（用于组卷时过滤掉已添加过的试题）   | 否   |
 | state | Integer | 状态（0：删除；1：发布；2：草稿）；默认查询1,2；参数为0则查询最近7天已删除的试题 | 否   |
@@ -263,17 +262,16 @@ http请求头需添加Authorization字段，
 | data.list[]                  | Object[]   | 分页列表     |
 | data.list[].id               | Integer | 主键         |
 | data.list[].type             | Integer | 类型         |
-| data.list[].difficulty       | Integer | 难度         |
 | data.list[].title            | String  | 题干         |
 | data.list[].options[]            | Object[]  | 选项数组（type=1,2时有效） |
 | data.list[].options[].no          | String  | 排序 |
 | data.list[].options[].option          | String  | 选项 |
-| data.list[].ai            | Integer  | 智能阅卷        |
+| data.list[].markType         | Integer  | 阅卷类型        |
 | data.list[].state            | Integer | 状态         |
 | data.list[].analysis            | String | 解析         |
 | data.list[].questionTypeId   | Integer | 试题分类ID   |
 | data.list[].score            | Double  | 分值         |
-| data.list[].aiOptions     | Integer[]  | 分值选项     |
+| data.list[].markOptions     | Integer[]  | 分值选项     |
 | data.list[].createUserName     | String  | 创建人     |
 | data.list[].answers[]      | Object[]   | 答案数组   |
 | data.list[].answers[].answer      | String   | 答案   |
@@ -283,15 +281,14 @@ http请求头需添加Authorization字段，
 | 请求参数| 类型  | 描述    | 必填 |
 | ------ | ----- | ------- | ---- |
 | type           | Integer         | 类型（1：单选；2：多选；3：填空；4：判断；5：问答 | 是   |
-| difficulty     | Integer         | 难度（1：极易；2：简单；3：适中；4：困难；5：极难 ） | 是   |
 | title          | Text | 题干 | 是   |
 | options[]      | String[]        | 选项，type为1,2时有效，len &lt;= 7  | 否   |
-| ai| Integer    | 智能阅卷（1：是；2：否；）  | 是   |
+| markType| Integer    | 阅卷类型（1：客观题；2：主观题）  | 是   |
 | analysis       | Text    | 解析  | 是   |
 | state | Integer         | 状态（1：发布；2：草稿）  | 是   |
 | questionTypeId | Integer         | 试题分类ID      | 是   |
 | score          | Double          | 分数   | 是   |
-| aiOptions[] | Integer[] | 分数选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；）|否|
+| markOptions[] | Integer[] | 分数选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；）|否|
 | answers[]      | String[]	   | 答案（如果是填空或智能问答，会有多个答案）  | 是   |
 | answerScores[] | Double[] | 答案分值（如果是填空或智能问答，表示每空分值；如果是多选，表示漏选分值）  | 是   |
 
@@ -319,14 +316,13 @@ http请求头需添加Authorization字段，
 | msg                 | String  | 响应消息   |
 | data.id           | Integer         | 主键 |
 | data.type           | Integer         | 类型（1：单选；2：多选；3：填空；4：判断；5：问答 |
-| data.difficulty     | Integer         | 难度（1：极易；2：简单；3：适中；4：困难；5：极难 ） | 
 | data.title          | Text | 题干 |
 | data.options[]      | String[]        | 选项，type为1,2时有效，len <= 7  |
-| data.ai| Integer    | 智能阅卷（1：是；2：否；）  | 
+| data.markType  | Integer    |  阅卷类型（1：客观题；2：主观题）  | 
 | data.analysis       | Text    | 解析  | 
 | data.questionTypeId | Integer         | 试题分类ID      |
 | data.score          | Double          | 分数   | 是
-| data.aiOptions[] | Integer[] | 分数选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；）|
+| data.markOptions[] | Integer[] | 分数选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；）|
 | data.state| Integer | 状态（0：删除；1：发布；2：草稿）|
 | data.answers[]      | Object[]   | 答案数组   |
 | data.answers[].answer      | String   | 答案   |
@@ -489,12 +485,11 @@ http请求头需添加Authorization字段，
 |data.list[].chapter.description  | String  | 章节描述 |
 |data.list[].questionList[].id  | Integer  | 试题id |
 |data.list[].questionList[].type  | Integer  | 试题类型，参考question/add |
-|data.list[].questionList[].difficulty  | Integer  | 试题难度，难易度参考question/add|
 |data.list[].questionList[].title  | String  | 试题标题 |
-|data.list[].questionList[].ai  | Integer  | 是否智能阅卷|
+|data.list[].questionList[].markType  | Integer  | 阅卷类型|
 |data.list[].questionList[].analysis  | String  | 试题解析 |
 |data.list[].questionList[].score  | Double  | 试题分数 |
-|data.list[].questionList[].aiOptions  | String  | 试题分数选项，参考question/add 
+|data.list[].questionList[].markOptions  | String  | 试题分数选项，参考question/add 
 |data.list[].questionList[].options[]  | Object[]  | 试题选项数组 |
 |data.list[].questionList[].options[].no  | String  | 试题选项顺序 |
 |data.list[].questionList[].options[].option  | String | 试题选项 |
@@ -537,7 +532,7 @@ http请求头需添加Authorization字段，
 | questionId| Integer  | 试题ID       | 是   |
 | score | Double  | 分数 | 是 |
 | subScores| Double  | 每空分数（试题为智能阅卷，并且是填空或问答时有效） | 是   |
-| aiOptions    | Integer[] | 分数选项     | 否  |
+| markOptions    | Integer[] | 分数选项     | 否  |
 
 ### 试卷批量设置分数：paper/updateBatchScore
 | 请求参数| 类型      | 描述       | 必填 |
@@ -545,7 +540,7 @@ http请求头需添加Authorization字段，
 | chapterId | Integer   | 章节id | 是   |
 | score | Double   | 分数 | 是   |
 | subScores| Double  | 漏选得分  | 否   |
-| aiOptions    | Integer[] | 分数选项   | 是   |
+| markOptions    | Integer[] | 分数选项   | 是   |
 
 ### 试卷发布：paper/publish
 | 请求参数| 类型    | 描述   | 必填 |
@@ -767,9 +762,8 @@ http请求头需添加Authorization字段，
 | chapterId | Integer       | 章节ID   | 是   |
 | questionTypeIds  | Integer[] | 试题分类ID  | 是   |
 | types |Integer[] | 选择类型 | 是   |
-| difficultys | String[]   | 难易程度 | 是  |
-| ais | String[]   | 智能阅卷 |  是  |
-| aiOptions | String[]   | 分数选择项 | 否 |
+| markTypes | String[]   | 智能阅卷 |  是  |
+| markOptions | String[]   | 分数选择项 | 否 |
 | nums | Integer[] | 题数 | 是  |
 | scores | Double[]  | 分数 | 是  |
 
@@ -789,8 +783,7 @@ http请求头需添加Authorization字段，
 |data.list[].rule[].paperId  | Integer  | 试卷ID |
 |data.list[].rule[].questionTypeId  | Integer  | 试题分类ID |
 |data.list[].rule[].type  | Integer  | 选择类型 |
-|data.list[].rule[].difficultys  | String[]  | 难易程度 |
-|data.list[].rule[].ais  | String[]  | 智能阅卷 |
-|data.list[].rule[].aiOptions |  String[]  | 分数选择项 |
+|data.list[].rule[].markTypes  | String[]  | 智能阅卷 |
+|data.list[].rule[].markOptions |  String[]  | 分数选择项 |
 |data.list[].rule[].num  | Integer  | 题数 |
 |data.list[].rule[].score  | Double  | 分数 |

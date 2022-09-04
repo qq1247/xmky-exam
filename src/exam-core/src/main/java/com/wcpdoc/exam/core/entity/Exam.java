@@ -1,5 +1,6 @@
 package com.wcpdoc.exam.core.entity;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -27,6 +28,8 @@ public class Exam {
 	private Integer id;
 	@Column(name = "NAME")
 	private String name;
+	@Column(name = "TIME_TYPE")
+	private Integer timeType;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "START_TIME")
@@ -43,37 +46,39 @@ public class Exam {
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "MARK_END_TIME")
 	private Date markEndTime;
+	@Column(name = "MARK_STATE")
+	private Integer markState;
 	@Column(name = "SCORE_STATE")
 	private Integer scoreState;
 	@Column(name = "RANK_STATE")
 	private Integer rankState;
+	@Column(name = "ANON_STATE")
+	private Integer anonState;
 	@Column(name = "LOGIN_TYPE")
 	private Integer loginType;
-	@Column(name = "DESCRIPTION")
-	private String description;
+	@Column(name = "PASS_SCORE")
+	private BigDecimal passScore;
+	@Column(name = "TOTAL_SCORE")
+	private BigDecimal totalScore;
+	@Column(name = "MARK_TYPE")
+	private Integer markType;
+	@Column(name = "SHOW_TYPE")
+	private Integer showType;
+	@Column(name = "GEN_TYPE")
+	private Integer genType;
+	@Column(name = "SXES")
+	private String sxes;
+	@Column(name = "MINIMIZE_NUM")
+	private Integer minimizeNum;
+	@Column(name = "STATE")
+	private Integer state;
 	@Column(name = "UPDATE_USER_ID")
 	private Integer updateUserId;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "UPDATE_TIME")
 	private Date updateTime;
-	@Column(name = "CREATE_USER_ID")
-	private Integer createUserId;
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	@Column(name = "CREATE_TIME")
-	private Date createTime;
-	@Column(name = "STATE")
-	private Integer state;
-	@Column(name = "PAPER_ID")
-	private Integer paperId;
-	@Column(name = "EXAM_TYPE_ID")
-	private Integer examTypeId;
-	@Column(name = "MARK_STATE")
-	private Integer markState;
-	@Column(name = "ANON_STATE")
-	private Integer anonState;
-
+	
 	public Integer getId() {
 		return id;
 	}
@@ -150,14 +155,6 @@ public class Exam {
 		this.loginType = loginType;
 	}
 
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
 	public Integer getUpdateUserId() {
 		return updateUserId;
 	}
@@ -184,38 +181,6 @@ public class Exam {
 		this.state = state;
 	}
 
-	public Integer getPaperId() {
-		return paperId;
-	}
-
-	public void setPaperId(Integer paperId) {
-		this.paperId = paperId;
-	}
-
-	public Integer getExamTypeId() {
-		return examTypeId;
-	}
-
-	public void setExamTypeId(Integer examTypeId) {
-		this.examTypeId = examTypeId;
-	}
-
-	public Integer getCreateUserId() {
-		return createUserId;
-	}
-
-	public void setCreateUserId(Integer createUserId) {
-		this.createUserId = createUserId;
-	}
-
-	public Date getCreateTime() {
-		return createTime;
-	}
-
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
-
 	/** 1：未阅卷；2：阅卷中；3：已阅卷； */
 	public Integer getMarkState() {
 		return markState;
@@ -234,5 +199,75 @@ public class Exam {
 	/** 1：公开；2：不公开 */
 	public void setAnonState(Integer anonState) {
 		this.anonState = anonState;
+	}
+	
+	public Integer getShowType() {
+		return showType;
+	}
+
+	public void setShowType(Integer showType) {
+		this.showType = showType;
+	}
+
+	/** 1：人工组卷；2：随机组卷 */
+	public Integer getGenType() {
+		return genType;
+	}
+
+	/** 1：人工组卷；2：随机组卷 */
+	public void setGenType(Integer genType) {
+		this.genType = genType;
+	}
+
+	public BigDecimal getTotalScore() {
+		return totalScore;
+	}
+
+	public void setTotalScore(BigDecimal totalScore) {
+		this.totalScore = totalScore;
+	}
+
+	public BigDecimal getPassScore() {
+		return passScore;
+	}
+
+	public void setPassScore(BigDecimal passScore) {
+		this.passScore = passScore;
+	}
+
+	public Integer getMinimizeNum() {
+		return minimizeNum;
+	}
+
+	public void setMinimizeNum(Integer minimizeNum) {
+		this.minimizeNum = minimizeNum;
+	}
+
+	/** 1：智能阅卷；2：人工阅卷； */
+	public Integer getMarkType() {
+		return markType;
+	}
+
+	/** 1：智能阅卷；2：人工阅卷； */
+	public void setMarkType(Integer markType) {
+		this.markType = markType;
+	}
+
+	public Integer getTimeType() {
+		return timeType;
+	}
+
+	public void setTimeType(Integer timeType) {
+		this.timeType = timeType;
+	}
+
+	/** 选项（1：试题乱序；2：选项乱序；3：禁用右键；4：禁止复制；5：最小化警告） */
+	public String getSxes() {
+		return sxes;
+	}
+
+	/** 选项（1：试题乱序；2：选项乱序；3：禁用右键；4：禁止复制；5：最小化警告） */
+	public void setSxes(String sxes) {
+		this.sxes = sxes;
 	}
 }

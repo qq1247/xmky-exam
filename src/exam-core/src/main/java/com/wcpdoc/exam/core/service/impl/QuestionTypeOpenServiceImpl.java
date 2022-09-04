@@ -28,7 +28,7 @@ import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeOpenService;
 
 /**
- * 试题分类开放服务层实现
+ * 题库开放服务层实现
  * 
  * v1.0 chenyun 2021-03-02 13:43:21
  */
@@ -127,7 +127,7 @@ public class QuestionTypeOpenServiceImpl extends BaseServiceImp<QuestionTypeOpen
 				map.put("questionId", questionAnswer.getQuestionId());
 				questionAnswerSplitList.add(map);
 			}
-		} else if (question.getType() == 5 && question.getAi() == 1) {
+		} else if (question.getType() == 5 && question.getMarkType() == 1) {
 			for(QuestionAnswer questionAnswer : questionAnswerList){					
 				Map<String, Object> map = new HashMap<String, Object>();
 				String[] split = questionAnswer.getAnswer().split("\n");
@@ -148,28 +148,27 @@ public class QuestionTypeOpenServiceImpl extends BaseServiceImp<QuestionTypeOpen
 			}
 		}
 		
-		Integer[] aiOptions = null;//new Integer[split.length];
-		if (ValidateUtil.isValid(question.getAiOptions())) {
-			String[] split = question.getAiOptions().split(",");
-			aiOptions = new Integer[split.length];
+		Integer[] markOptions = null;//new Integer[split.length];
+		if (ValidateUtil.isValid(question.getMarkOptions())) {
+			String[] split = question.getMarkOptions().split(",");
+			markOptions = new Integer[split.length];
 			for(int i = 0; i < split.length; i++ ){
-				aiOptions[i] = Integer.parseInt(split[i]);
+				markOptions[i] = Integer.parseInt(split[i]);
 			}
 		} else {
-			aiOptions = new Integer[0];
+			markOptions = new Integer[0];
 		}
 		
 		PageResultEx pageResult = PageResultEx.ok()
 				.addAttr("id", question.getId())
 				.addAttr("type", question.getType())
-				.addAttr("ai", question.getAi())
-				.addAttr("difficulty", question.getDifficulty())
+				.addAttr("ai", question.getMarkType())
 				.addAttr("title", question.getTitle())
 				.addAttr("analysis", question.getAnalysis())
 				.addAttr("state", question.getState())
 				.addAttr("questionTypeId", question.getQuestionTypeId())
 				.addAttr("score", question.getScore())
-				.addAttr("aiOptions", aiOptions)
+				.addAttr("markOptions", markOptions)
 				.addAttr("options", optionList.toArray(new String[optionList.size()]))
 				.addAttr("answers", questionAnswerSplitList);
 		return pageResult;

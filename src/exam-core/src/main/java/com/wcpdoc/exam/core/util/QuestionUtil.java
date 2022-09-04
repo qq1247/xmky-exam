@@ -1,7 +1,7 @@
 package com.wcpdoc.exam.core.util;
 
 import com.wcpdoc.core.util.ValidateUtil;
-import com.wcpdoc.exam.core.entity.PaperQuestion;
+import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 
 /**
@@ -17,8 +17,8 @@ public class QuestionUtil {
 	 * @param question
 	 * @return boolean
 	 */
-	public static boolean hasAi(Question question) {
-		return question.getAi() == 1;
+	public static boolean hasMarkType(Question question) {
+		return question.getMarkType() == 1;
 	}
 	
 	/**
@@ -80,35 +80,35 @@ public class QuestionUtil {
 	 * 3：大小写不敏感（默认大小写敏感）；
 	 * 
 	 * v1.0 zhanghc 2018年11月14日下午11:07:02
-	 * @param paperQuestionEx
+	 * @param examQuestionEx
 	 * @return boolean
 	 */
-	public static boolean dxxbmg(PaperQuestion paperQuestion) {
-		return ValidateUtil.isValid(paperQuestion.getAiOptions()) 
-				&& paperQuestion.getAiOptions().contains("3");
+	public static boolean dxxbmg(ExamQuestion examQuestion) {
+		return ValidateUtil.isValid(examQuestion.getMarkOptions()) 
+				&& examQuestion.getMarkOptions().contains("3");
 	}
 	
 	/**
 	 * 1：漏选得分（默认全对得分）
 	 * 
 	 * v1.0 zhanghc 2018年11月14日下午11:07:10
-	 * @param paperQuestionEx
+	 * @param examQuestionEx
 	 * @return boolean
 	 */
-	public static boolean lxdf(PaperQuestion paperQuestion) {
-		return ValidateUtil.isValid(paperQuestion.getAiOptions()) 
-				&& paperQuestion.getAiOptions().contains("1");
+	public static boolean lxdf(ExamQuestion examQuestion) {
+		return ValidateUtil.isValid(examQuestion.getMarkOptions()) 
+				&& examQuestion.getMarkOptions().contains("1");
 	}
 
 	/**
 	 * 2：答案无顺序（默认答案有前后顺序）
 	 * 
 	 * v1.0 zhanghc 2018年11月14日下午11:06:24
-	 * @param paperQuestionEx
+	 * @param examQuestionEx
 	 * @return boolean
 	 */
-	public static boolean dawsx(PaperQuestion paperQuestion) {
-		return ValidateUtil.isValid(paperQuestion.getAiOptions()) 
-				&& paperQuestion.getAiOptions().contains("2");
+	public static boolean dawsx(ExamQuestion examQuestion) {
+		return ValidateUtil.isValid(examQuestion.getMarkOptions()) 
+				&& examQuestion.getMarkOptions().contains("2");
 	}
 }

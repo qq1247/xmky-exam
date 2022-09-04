@@ -1,14 +1,13 @@
 package com.wcpdoc.exam.core.entity.ex;
 
 /**
- * 试卷规则扩展
+ * 考试规则扩展
  * 
  * v1.0 chenyun 2022年3月8日上午10:55:29
  */
-public class PaperRuleEx {
+public class ExamRuleEx {
 	private Integer type;
-	private Integer difficulty;
-	private Integer ai;
+	private Integer markType;
 	private Integer num;
 	
 	public Integer getNum() {
@@ -20,23 +19,18 @@ public class PaperRuleEx {
 	public Integer getType() {
 		return type;
 	}
-	public Integer getDifficulty() {
-		return difficulty;
+	public Integer getMarkType() {
+		return markType;
 	}
-	public Integer getAi() {
-		return ai;
-	}
-	public PaperRuleEx(Integer type, Integer difficulty, Integer ai) {
+	public ExamRuleEx(Integer type, Integer markType) {
 		this.type = type;
-		this.difficulty = difficulty;
-		this.ai = ai;
+		this.markType = markType;
 	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((ai == null) ? 0 : ai.hashCode());
-		result = prime * result + ((difficulty == null) ? 0 : difficulty.hashCode());
+		result = prime * result + ((markType == null) ? 0 : markType.hashCode());
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		return result;
 	}
@@ -48,16 +42,11 @@ public class PaperRuleEx {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PaperRuleEx other = (PaperRuleEx) obj;
-		if (ai == null) {
-			if (other.ai != null)
+		ExamRuleEx other = (ExamRuleEx) obj;
+		if (markType == null) {
+			if (other.markType != null)
 				return false;
-		} else if (!ai.equals(other.ai))
-			return false;
-		if (difficulty == null) {
-			if (other.difficulty != null)
-				return false;
-		} else if (!difficulty.equals(other.difficulty))
+		} else if (!markType.equals(other.markType))
 			return false;
 		if (type == null) {
 			if (other.type != null)

@@ -15,13 +15,13 @@ import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
- * 随机章节
+ * 考试随机规则
  * 
  * v1.0 chenyun 2022年2月11日 09:48:21
  */
 @Entity
-@Table(name = "EXM_PAPER_QUESTION_RULE")
-public class PaperQuestionRule {
+@Table(name = "EXM_EXAM_RULE")
+public class ExamRule {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID")
@@ -32,24 +32,20 @@ public class PaperQuestionRule {
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "UPDATE_TIME")
 	private Date updateTime;
-	@Column(name = "PAPER_ID")
-	private Integer paperId;
+	@Column(name = "EXAM_ID")
+	private Integer examId;
 	@Column(name = "QUESTION_TYPE_ID")
 	private Integer questionTypeId;
 	@Column(name = "TYPE")
 	private Integer type;
-	@Column(name = "DIFFICULTYS")
-	private String difficultys;
-	@Column(name = "AIS")
-	private String ais;
-	@Column(name = "AI_OPTIONS")
-	private String aiOptions;
+	@Column(name = "MARK_TYPE")
+	private String markTypes;
+	@Column(name = "MARK_OPTIONS")
+	private String markOptions;
 	@Column(name = "NUM")
 	private Integer num;
 	@Column(name = "SCORE")
 	private BigDecimal score;
-	@Column(name = "PAPER_QUESTION_ID")
-	private Integer paperQuestionId;
 	@Column(name = "NO")
 	private Integer no;
 	
@@ -71,11 +67,11 @@ public class PaperQuestionRule {
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
 	}
-	public Integer getPaperId() {
-		return paperId;
+	public Integer getExamId() {
+		return examId;
 	}
-	public void setPaperId(Integer paperId) {
-		this.paperId = paperId;
+	public void setExamId(Integer examId) {
+		this.examId = examId;
 	}
 	public Integer getQuestionTypeId() {
 		return questionTypeId;
@@ -89,11 +85,11 @@ public class PaperQuestionRule {
 	public void setType(Integer type) {
 		this.type = type;
 	}
-	public String getAiOptions() {
-		return aiOptions;
+	public String getMarkOptions() {
+		return markOptions;
 	}
-	public void setAiOptions(String aiOptions) {
-		this.aiOptions = aiOptions;
+	public void setMarkOptions(String markOptions) {
+		this.markOptions = markOptions;
 	}
 	public Integer getNum() {
 		return num;
@@ -113,38 +109,18 @@ public class PaperQuestionRule {
 	public void setNo(Integer no) {
 		this.no = no;
 	}
-	public Integer getPaperQuestionId() {
-		return paperQuestionId;
+	public String getMarkTypes() {
+		return markTypes;
 	}
-	public void setPaperQuestionId(Integer paperQuestionId) {
-		this.paperQuestionId = paperQuestionId;
+	public void setMarkTypes(String markTypes) {
+		this.markTypes = markTypes;
 	}
-	public String getDifficultys() {
-		return difficultys;
-	}
-	public Integer[] getDifficultyArr() {
-		String[] split = difficultys.split(",");
-		Integer[] difficultysInteger = new Integer[split.length];
+	public Integer[] getMarkTypeArr() {
+		String[] split = markTypes.split(",");
+		Integer[] markTypeInteger = new Integer[split.length];
 		for(int i = 0; i < split.length; i++){
-			difficultysInteger[i] = Integer.valueOf(split[i]);
+			markTypeInteger[i] = Integer.valueOf(split[i]);
 		}
-		return difficultysInteger;
-	}
-	public void setDifficultys(String difficultys) {
-		this.difficultys = difficultys;
-	}
-	public String getAis() {
-		return ais;
-	}
-	public Integer[] getAiArr() {
-		String[] split = ais.split(",");
-		Integer[] aisInteger = new Integer[split.length];
-		for(int i = 0; i < split.length; i++){
-			aisInteger[i] = Integer.valueOf(split[i]);
-		}
-		return aisInteger;
-	}
-	public void setAis(String ais) {
-		this.ais = ais;
+		return markTypeInteger;
 	}
 }

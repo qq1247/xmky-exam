@@ -14,7 +14,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
- * 试题分类开放实体
+ * 题库开放实体
  * 
  * v1.0 chenyun 2021-03-02 13:43:21
  */

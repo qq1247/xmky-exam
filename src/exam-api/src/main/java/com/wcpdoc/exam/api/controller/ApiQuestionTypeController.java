@@ -29,7 +29,7 @@ import com.wcpdoc.exam.core.service.QuestionTypeExService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 
 /**
- * 试题分类控制层
+ * 题库控制层
  * 
  * v1.0 zhanghc 2016-5-24下午14:54:09
  */
@@ -167,30 +167,30 @@ public class ApiQuestionTypeController extends BaseController {
 		try {
 			QuestionType entity = questionTypeService.getEntity(id);
 			
-			Set<Integer> writeUserIdSet = new HashSet<>();
-			for (String writeUserId : entity.getWriteUserIds().split(",")) {
-				if (!ValidateUtil.isValid(writeUserId)) {// ,2,3,23, 有空值
-					continue;
-				}
-				writeUserIdSet.add(Integer.parseInt(writeUserId));
-			}
-			
-			List<User> writeUserList = userService.getList(writeUserIdSet.toArray(new Integer[0]));
-			Integer[] writeUserIds = new Integer[writeUserList.size()];
-			String[] writeUserNames = new String[writeUserList.size()];
-			for (int i = 0; i < writeUserList.size(); i++) {
-				writeUserIds[i] = writeUserList.get(i).getId();
-				writeUserNames[i] = writeUserList.get(i).getName();
-			}
+//			Set<Integer> writeUserIdSet = new HashSet<>();
+//			for (String writeUserId : entity.getWriteUserIds().split(",")) {
+//				if (!ValidateUtil.isValid(writeUserId)) {// ,2,3,23, 有空值
+//					continue;
+//				}
+//				writeUserIdSet.add(Integer.parseInt(writeUserId));
+//			}
+//			
+//			List<User> writeUserList = userService.getList(writeUserIdSet.toArray(new Integer[0]));
+//			Integer[] writeUserIds = new Integer[writeUserList.size()];
+//			String[] writeUserNames = new String[writeUserList.size()];
+//			for (int i = 0; i < writeUserList.size(); i++) {
+//				writeUserIds[i] = writeUserList.get(i).getId();
+//				writeUserNames[i] = writeUserList.get(i).getName();
+//			}
 			
 			return PageResultEx.ok()
 					.addAttr("id", entity.getId())
 					.addAttr("name", entity.getName())
-					.addAttr("createUserId", entity.getCreateUserId())
-					.addAttr("createUserName", userService.getEntity(entity.getCreateUserId()).getName())
-					.addAttr("createTime", DateUtil.formatDateTime(entity.getCreateTime()))
-					.addAttr("writeUserIds", writeUserIds)
-					.addAttr("writeUserNames", writeUserNames);
+					.addAttr("updateUserId", entity.getUpdateUserId())
+					.addAttr("updateUserName", userService.getEntity(entity.getUpdateUserId()).getName())
+					.addAttr("updateTime", DateUtil.formatDateTime(entity.getUpdateTime()));
+//					.addAttr("writeUserIds", writeUserIds)
+//					.addAttr("writeUserNames", writeUserNames);
 		} catch (MyException e) {
 			log.error("获取试题分类错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

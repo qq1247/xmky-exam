@@ -56,18 +56,14 @@ public class QuestionTypeExServiceImpl extends BaseServiceImp<QuestionType> impl
 			throw new MyException(String.format("【%s】已删除", target.getName()));
 		}
 		
-		if (source.getCreateUserId().intValue() != getCurUser().getId().intValue()) {
+		if (source.getUpdateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");// 只能移动自己创建的试题分类
-		}
-		if (!questionTypeService.hasWriteAuth(target)) {
-			throw new MyException("无操作权限");// 自己有目标分类的写入权限
 		}
 		
 		// 移动
 		List<Question> questionList = questionService.getList(sourceId);
 		for (Question question : questionList) {
 			question.setQuestionTypeId(targetId);
-			question.setWriteUserIds(target.getWriteUserIds());
 			question.setUpdateTime(new Date());
 			question.setUpdateUserId(getCurUser().getId());
 			questionService.update(question);
@@ -78,7 +74,6 @@ public class QuestionTypeExServiceImpl extends BaseServiceImp<QuestionType> impl
 	public void auth(QuestionType questionType) {
 		List<Question> questionList = questionService.getList(questionType.getId());
 		for (Question question : questionList) {
-			question.setWriteUserIds(questionType.getWriteUserIds());
 			question.setUpdateTime(new Date());
 			question.setUpdateUserId(getCurUser().getId());
 			questionService.update(question);

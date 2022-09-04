@@ -69,10 +69,10 @@ public interface ReportDao extends RBaseDao<Object> {
 	 * 考试统计-试题类型列表
 	 * 
 	 * v1.0 chenyun 2021年12月16日上午9:38:30
-	 * @param paperId
+	 * @param examId
 	 * @return List<Map<String,Object>>
 	 */
-	List<Map<String, Object>> examStatisType(Integer paperId);
+	List<Map<String, Object>> examStatisType(Integer examId);
 	
 	/**
 	 * 我的考试列表

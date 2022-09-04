@@ -30,9 +30,9 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT QUESTION.ID, QUESTION.TYPE, QUESTION.DIFFICULTY, QUESTION.TITLE, "
-				+ "QUESTION.STATE, QUESTION.AI, QUESTION.QUESTION_TYPE_ID, QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME, "
-				+ "QUESTION.SCORE, QUESTION.AI_OPTIONS, QUESTION.ANALYSIS, CREATE_USER.NAME AS CREATE_USER_NAME "
+		String sql = "SELECT QUESTION.ID, QUESTION.TYPE, QUESTION.TITLE, "
+				+ "QUESTION.STATE, QUESTION.MARK_TYPE, QUESTION.QUESTION_TYPE_ID, QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME, "
+				+ "QUESTION.SCORE, QUESTION.MARK_OPTIONS, QUESTION.ANALYSIS, CREATE_USER.NAME AS CREATE_USER_NAME "
 				+ "FROM EXM_QUESTION QUESTION "
 				+ "LEFT JOIN EXM_QUESTION_TYPE QUESTION_TYPE ON QUESTION.QUESTION_TYPE_ID = QUESTION_TYPE.ID "
 				+ "LEFT JOIN SYS_USER CREATE_USER ON QUESTION.CREATE_USER_ID = CREATE_USER.ID ";
@@ -42,11 +42,10 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 				.addWhere(ValidateUtil.isValid(pageIn.get("id")), "QUESTION.ID = :ID", pageIn.get("id"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("title")), "QUESTION.TITLE LIKE :TITLE", String.format("%%%s%%", pageIn.get("title")))
 				.addWhere(ValidateUtil.isValid(pageIn.get("type")), "QUESTION.TYPE = :TYPE", pageIn.get("type"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("difficulty")), "QUESTION.DIFFICULTY = :DIFFICULTY", pageIn.get("difficulty"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("score")), "QUESTION.SCORE = :SCORE", pageIn.get("score"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("ai")), "QUESTION.AI = :AI", pageIn.get("ai"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("paperId", Integer.class)), "EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = :PAPER_ID AND Z.QUESTION_ID = QUESTION.ID)", pageIn.get("paperId", Integer.class))
-                .addWhere(ValidateUtil.isValid(pageIn.get("exPaperId")), "NOT EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.PAPER_ID = :PAPER_ID AND Z.QUESTION_ID = QUESTION.ID)", pageIn.get("exPaperId"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("markType")), "QUESTION.MARK_TYPE = :MARK_TYPE", pageIn.get("markType"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("examId", Integer.class)), "EXISTS (SELECT 1 FROM EXM_EXAM_QUESTION Z WHERE Z.EXAM_ID = :EXAM_ID AND Z.QUESTION_ID = QUESTION.ID)", pageIn.get("examId", Integer.class))
+                .addWhere(ValidateUtil.isValid(pageIn.get("exExamId")), "NOT EXISTS (SELECT 1 FROM EXM_EXAM_QUESTION Z WHERE Z.EXAM_ID = :EXAM_ID AND Z.QUESTION_ID = QUESTION.ID)", pageIn.get("exExamId"))
 				.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "QUESTION.STATE IN (1,2)")// 默认查询发布和草稿状态
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && "0".equals(pageIn.get("state")), "QUESTION.STATE = 0 AND QUESTION.UPDATE_TIME > :UPDATE_TIME", DateUtil.getNextDay(new Date(), -7))// 查询已删除并且最近7天的试题（回收站使用）
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "QUESTION.STATE = :STATE", pageIn.get("state"))// 默认查询发布和草稿状态
@@ -65,7 +64,7 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 
 	@Override
 	public List<Question> getListByDel() {
-		String sql = "SELECT QUESTION.* FROM EXM_QUESTION QUESTION WHERE QUESTION.STATE = 0 AND NOT EXISTS (SELECT 1 FROM EXM_PAPER_QUESTION Z WHERE Z.QUESTION_ID = QUESTION.ID)";
+		String sql = "SELECT QUESTION.* FROM EXM_QUESTION QUESTION WHERE QUESTION.STATE = 0 AND NOT EXISTS (SELECT 1 FROM EXM_EXAM_QUESTION Z WHERE Z.QUESTION_ID = QUESTION.ID)";
 		return getList(sql, new Object[] {});
 	}
 }

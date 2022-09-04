@@ -29,20 +29,12 @@ public class Question {
 	private Integer id;
 	@Column(name = "TYPE")
 	private Integer type;
-	@Column(name = "DIFFICULTY")
-	private Integer difficulty;
 	@Column(name = "TITLE")
 	private String title;
 	@Column(name = "ANALYSIS")
 	private String analysis;
 	@Column(name = "STATE")
 	private Integer state;
-	@Column(name = "CREATE_USER_ID")
-	private Integer createUserId;
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	@Column(name = "CREATE_TIME")
-	private Date createTime;
 	@Column(name = "UPDATE_USER_ID")
 	private Integer updateUserId;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -53,12 +45,10 @@ public class Question {
 	private Integer questionTypeId;
 	@Column(name = "SCORE")
 	private BigDecimal score;
-	@Column(name = "AI")
-	private Integer ai;
-	@Column(name = "AI_OPTIONS")
-	private String aiOptions;
-	@Column(name = "WRITE_USER_IDS")
-	private String writeUserIds;
+	@Column(name = "MARK_TYPE")
+	private Integer markType;
+	@Column(name = "MARK_OPTIONS")
+	private String markOptions;
 
 	public Integer getId() {
 		return id;
@@ -76,14 +66,6 @@ public class Question {
 	/** 1：单选；2：多选；3：填空；4：判断；5：问答 */
 	public void setType(Integer type) {
 		this.type = type;
-	}
-
-	public Integer getDifficulty() {
-		return difficulty;
-	}
-
-	public void setDifficulty(Integer difficulty) {
-		this.difficulty = difficulty;
 	}
 
 	public String getTitle() {
@@ -144,58 +126,33 @@ public class Question {
 		this.score = score;
 	}
 
-	public String getAiOptions() {
-		return aiOptions;
+	/** 阅卷类型（1：客观题；2：主观题）  */
+	public Integer getMarkType() {
+		return markType;
 	}
 
-	public void setAiOptions(String aiOptions) {
-		this.aiOptions = aiOptions;
+	public void setMarkType(Integer markType) {
+		this.markType = markType;
 	}
 
-	public Integer getCreateUserId() {
-		return createUserId;
+	public String getMarkOptions() {
+		return markOptions;
 	}
 
-	public void setCreateUserId(Integer createUserId) {
-		this.createUserId = createUserId;
+	public void setMarkOptions(String markOptions) {
+		this.markOptions = markOptions;
 	}
 
-	public Date getCreateTime() {
-		return createTime;
-	}
-
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
-
-	/** 智能阅卷：1：是；2：否； */
-	public Integer getAi() {
-		return ai;
-	}
-
-	/** 智能阅卷：1：是；2：否； */
-	public void setAi(Integer ai) {
-		this.ai = ai;
-	}
-
-	public String getWriteUserIds() {
-		return writeUserIds;
-	}
-
-	public void setWriteUserIds(String writeUserIds) {
-		this.writeUserIds = writeUserIds;
-	}
-
-	public Integer[] getAiOptionArr() {
-		if (!ValidateUtil.isValid(aiOptions)) {
+	public Integer[] getMarkOptionArr() {
+		if (!ValidateUtil.isValid(markOptions)) {
 			return new Integer[0];
 		}
 
-		String[] aiOptionStrArr = aiOptions.split(",");// 接口层面需要返回数字类型
-		Integer[] aiOptionArr = new Integer[aiOptionStrArr.length];
-		for (int i = 0; i < aiOptionStrArr.length; i++) {
-			aiOptionArr[i] = Integer.parseInt(aiOptionStrArr[i]);
+		String[] markOptionStrArr = markOptions.split(",");// 接口层面需要返回数字类型
+		Integer[] markOptionArr = new Integer[markOptionStrArr.length];
+		for (int i = 0; i < markOptionStrArr.length; i++) {
+			markOptionArr[i] = Integer.parseInt(markOptionStrArr[i]);
 		}
-		return aiOptionArr;
+		return markOptionArr;
 	}
 }

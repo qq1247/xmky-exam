@@ -14,7 +14,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
- * 试题分类实体
+ * 题库实体
  * 
  * v1.0 zhanghc 2016-5-24下午14:54:09
  */
@@ -29,12 +29,6 @@ public class QuestionType {
 	private String name;
 	@Column(name = "IMG_FILE_ID")
 	private Integer imgFileId;
-	@Column(name = "CREATE_USER_ID")
-	private Integer createUserId;
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	@Column(name = "CREATE_TIME")
-	private Date createTime;
 	@Column(name = "UPDATE_USER_ID")
 	private Integer updateUserId;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -43,8 +37,6 @@ public class QuestionType {
 	private Date updateTime;
 	@Column(name = "STATE")
 	private Integer state;
-	@Column(name = "WRITE_USER_IDS")
-	private String writeUserIds;
 
 	public Integer getId() {
 		return id;
@@ -70,22 +62,6 @@ public class QuestionType {
 		this.imgFileId = imgFileId;
 	}
 
-	public Integer getCreateUserId() {
-		return createUserId;
-	}
-
-	public void setCreateUserId(Integer createUserId) {
-		this.createUserId = createUserId;
-	}
-
-	public Date getCreateTime() {
-		return createTime;
-	}
-
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
-
 	public Integer getUpdateUserId() {
 		return updateUserId;
 	}
@@ -108,13 +84,5 @@ public class QuestionType {
 
 	public void setState(Integer state) {
 		this.state = state;
-	}
-
-	public String getWriteUserIds() {
-		return writeUserIds;
-	}
-
-	public void setWriteUserIds(String writeUserIds) {
-		this.writeUserIds = writeUserIds;
 	}
 }

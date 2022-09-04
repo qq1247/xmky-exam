@@ -5,6 +5,8 @@ import java.util.Map;
 
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.exam.core.entity.Exam;
+import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.entity.QuestionOption;
 
 /**
  * 考试数据访问层接口
@@ -49,4 +51,60 @@ public interface ExamDao extends BaseDao<Exam>{
 	 */
 	List<Exam> getList();
 	
+	/**
+	 * 获取试题列表
+	 * 
+	 * v1.0 zhanghc 2017年6月6日上午9:18:38
+	 * @param id
+	 * @return
+	 * List<Question>
+	 */
+	List<Question> getQuestionList(Integer id);
+	
+	/**
+	 * 获取试题列表
+	 * 
+	 * v1.0 zhanghc 2022年5月24日下午4:25:35
+	 * @param examId
+	 * @param userId
+	 * @return List<Question>
+	 */
+	List<Question> getQuestionList(Integer examId, Integer userId);
+	
+	/**
+	 * 获取试题选项列表
+	 * 
+	 * v1.0 zhanghc 2022年5月20日下午1:32:45
+	 * @param id
+	 * @return List<QuestionOption>
+	 */
+	List<QuestionOption> getQuestionOptionList(Integer id);
+	
+	/**
+	 * 获取试题选项列表
+	 * 
+	 * v1.0 zhanghc 2022年5月20日下午1:32:45
+	 * @param id
+	 * @return List<QuestionOption>
+	 */
+	List<QuestionOption> getQuestionOptionList(Integer examId, Integer userId);
+	
+	/**
+	 * 获取试题答案分值列表
+	 * 
+	 * v1.0 chenyun 2022年5月20日下午1:32:45
+	 * @param id
+	 * @return List<Map<String, Object>>
+	 */
+	List<Map<String, Object>> getExamAnswerList(Integer id);
+	
+	/**
+	 * 获取试题答案分值列表
+	 * 
+	 * v1.0 chenyun 2022年5月20日下午1:32:45
+	 * @param examId
+	 * @param userId
+	 * @return List<Map<String, Object>>
+	 */
+	List<Map<String, Object>> getExamAnswerList(Integer examId, Integer userId);
 }

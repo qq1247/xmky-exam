@@ -8,7 +8,7 @@ import java.util.List;
  * 
  * v1.0 zhanghc 2017-05-07 14:56:29
  */
-public class MyPaper {
+public class MyExamChapter {
 	private List<Chapter> chapterList = new ArrayList<>();
 
 	public List<Chapter> getChapterList() {
