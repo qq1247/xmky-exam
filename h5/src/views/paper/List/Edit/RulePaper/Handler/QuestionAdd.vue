@@ -59,7 +59,7 @@
 import CustomSelect from 'components/CustomSelect.vue'
 import EditModule from 'components/Question/EditModule.vue'
 import {
-  questionTypeListPage,
+  questionTypeListpage,
   questionAdd,
   questionImport,
   questionTemplate
@@ -118,7 +118,7 @@ export default {
     },
     // 获取题库
     async getQuestionType(curPage = 1, name = '') {
-      const typeList = await questionTypeListPage({
+      const typeList = await questionTypeListpage({
         name,
         curPage,
         pageSize: 5

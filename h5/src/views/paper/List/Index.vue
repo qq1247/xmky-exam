@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import { paperListPage } from 'api/paper'
+import { paperListpage } from 'api/paper'
 import ListCard from 'components/ListCard/ListCard.vue'
 import AddCard from 'components/ListCard/AddCard.vue'
 
@@ -87,7 +87,7 @@ export default {
   methods: {
     // 查询
     async query() {
-      const paperList = await paperListPage({
+      const paperList = await paperListpage({
         paperTypeId: this.queryForm.paperTypeId,
         name: this.queryForm.name,
         curPage: this.curPage,

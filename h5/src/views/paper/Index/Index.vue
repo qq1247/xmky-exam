@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import { paperTypeListPage, paperTypeAdd } from 'api/paper'
+import { paperTypeListpage, paperTypeAdd } from 'api/paper'
 import IndexCard from 'components/ListCard/IndexCard.vue'
 import AddCard from 'components/ListCard/AddCard.vue'
 
@@ -85,7 +85,7 @@ export default {
   methods: {
     // 查询分类信息
     async query() {
-      const typeList = await paperTypeListPage({
+      const typeList = await paperTypeListpage({
         name: this.queryForm.queryName,
         curPage: this.curPage,
         pageSize: this.pageSize

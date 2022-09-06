@@ -6,13 +6,10 @@
         {{ data.name || data.examName }}
       </div>
       <template v-if="name === 'question'">
-        <!-- 创建用户 -->
         <div class="content-info ellipsis">
-          创建用户：{{ data.createUserName || data.userName }}
         </div>
-        <!-- 编辑权限 -->
         <div class="content-info ellipsis">
-          <span>操作权限：{{ data.writeUserNames.join(',') || '暂无' }}</span>
+          <span>试题数量：{{ data.questionNum }}</span>
         </div>
       </template>
       <!-- 使用权限 -->

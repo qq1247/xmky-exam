@@ -156,12 +156,12 @@
 
 <script>
 import {
-  questionTypeOpenListPage,
+  questionTypeOpenListpage,
   questionTypeOpenAdd,
   questionTypeOpenDel
 } from 'api/question'
-import { orgListPage } from 'api/base'
-import { userListPage } from 'api/user'
+import { orgListpage } from 'api/base'
+import { userListpage } from 'api/user'
 import CustomSelect from 'components/CustomSelect.vue'
 
 export default {
@@ -225,7 +225,7 @@ export default {
   methods: {
     // 获取用户
     async getUserList(curPage = 1, name = '') {
-      const userList = await userListPage({
+      const userList = await userListpage({
         name,
         curPage,
         pageSize: 5
@@ -254,7 +254,7 @@ export default {
     },
     // 获取开放历史记录
     async getOpenHistory() {
-      const openHistoryList = await questionTypeOpenListPage({
+      const openHistoryList = await questionTypeOpenListpage({
         questionTypeId: this.id,
         curPage: this.openForm.curPage,
         pageSize: this.openForm.pageSize,
@@ -270,7 +270,7 @@ export default {
     },
     // 获取机构
     async getOrgList(curPage = 1, name = '') {
-      const orgList = await orgListPage({
+      const orgList = await orgListpage({
         name,
         curPage,
         pageSize: this.pageSize

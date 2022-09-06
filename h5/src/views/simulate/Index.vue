@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { questionTypeOpenListPage } from 'api/question'
+import { questionTypeOpenListpage } from 'api/question'
 export default {
   data() {
     return {
@@ -29,7 +29,7 @@ export default {
   methods: {
     // 获取开放题库
     async getQuestionTypeOpenList() {
-      const res = await questionTypeOpenListPage({
+      const res = await questionTypeOpenListpage({
         state: 1,
         pageSize: 10,
         curPage: 1

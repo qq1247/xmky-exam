@@ -1,12 +1,12 @@
 import request from './request'
 
 /**
- * @name: userListPage
+ * @name: userListpage
  * @description: 用户列表信息
  * @param {*}
  * @return {*}
  */
-export const userListPage = (params) => request('user/listpage', params)
+export const userListpage = (params) => request('user/listpage', params)
 
 /**
  * @name: userGet

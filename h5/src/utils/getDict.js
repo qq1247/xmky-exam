@@ -1,4 +1,4 @@
-import { dictListPage } from 'api/base'
+import { dictListpage } from 'api/base'
 import { getDict, setDict } from './storage'
 
 /**
@@ -10,7 +10,7 @@ import { getDict, setDict } from './storage'
 const getDictList = async() => {
   const {
     data: { list: dictList }
-  } = await dictListPage({
+  } = await dictListpage({
     curPage: 1,
     pageSize: 100
   })

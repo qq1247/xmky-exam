@@ -9,11 +9,12 @@
   >
     <!-- 选择类型区域（单选、多选、填空、判断、问答） -->
     <el-form-item label="类型">
-      <el-radio-group v-model="editForm.type" size="small">
+      <el-radio-group v-model="editForm.type" size="small" >
         <el-radio-button
           v-for="dict in $tools.getDicts('QUESTION_TYPE')"
           :key="`type${dict.dictKey}`"
           :label="Number(dict.dictKey)"
+          :disabled="(id && editForm.type == dict.dictKey) ? true : false"
         >{{ dict.dictValue }}</el-radio-button>
       </el-radio-group>
     </el-form-item>
@@ -264,13 +265,13 @@
     <!-- 添加修改按钮区域 -->
     <el-form-item>
       <el-button
-        v-if="!editForm.id"
+        v-if="!id"
         style="width: 164px; height: 40px"
         type="primary"
         @click="add()"
       >添加</el-button>
       <el-button
-        v-if="editForm.id"
+        v-if="id"
         style="width: 164px; height: 40px"
         type="primary"
         @click="edit()"
@@ -286,10 +287,15 @@ export default {
   components: {
     Editor
   },
+  props: {
+    id : {
+      type: Number,
+      default: null,
+    }
+  },
   data() {
     return {
       editForm: {
-        id: null,
         type: 1, // 类型
         title: '', // 题干
         options: [], // 选项
@@ -373,16 +379,45 @@ export default {
     }
   },
   watch: {
-    // id(n) {
-    //   if (n) {
-    //     this.getQuestionDetail(n)
-    //   }
-    // },
+    // 如果有id，则查询并回显数据
+    'id': {
+      deep: true,
+      immediate: true,
+      async handler(id, id2) {
+        if (!id) {
+          return
+        }
+
+        const res = await questionGet({ id })
+        if (res?.code !== 200) {
+          this.$message.error(res.msg)
+          return
+        }
+
+        this.editForm.type = res.data.type
+        this.$nextTick(function () {
+          this.editForm.title = res.data.title
+          this.$nextTick(function () {
+            this.editForm.markType = res.data.markType
+            this.$nextTick(function () {
+              this.editForm.score = res.data.score
+              this.$nextTick(function () {
+                this.editForm.answerScores = res.data.answerScores
+                
+                this.editForm.markOptions = res.data.markOptions
+                this.editForm.answers = res.data.answers
+                this.editForm.options = res.data.options;
+                this.editForm.analysis = res.data.analysis
+              })
+            })
+          })
+        })
+      }
+    },
     // 如果是主观题，清除阅卷选项
     // 如果是客观问答题，添加一个关键词、分数
     'editForm.markType': {
       deep: true,
-      immediate: true,
       handler(n) {
         this.$refs['editForm']?.clearValidate(); // 切换阅卷类型时，清空校验。如主观问答没填答案，切换到客观问答时，保留了校验文字
 
@@ -404,7 +439,6 @@ export default {
     // 如果是切换类型，初始化数据，清除校验（显示了多余的校验文字）
     'editForm.type': {
       deep: true,
-      immediate: true,
       handler(n) {
         this.$refs['editForm']?.clearValidate(); // 第一次还没有生成clearValidate方法，用?处理一下
 
@@ -438,7 +472,6 @@ export default {
     // 如果是填空题干，更新答案
     'editForm.title': {
       deep: true,
-      immediate: true,
       handler(n) {
         if (this.editForm.type !== 3) {
           return;
@@ -460,7 +493,6 @@ export default {
     // 如果是多选题，默认漏选分值为分数一半
     'editForm.score': {
       deep: true,
-      immediate: true,
       handler(n) {
         if (this.editForm.type === 2) {
           this.editForm.answerScores.splice(0, 1, n / 2)
@@ -470,7 +502,6 @@ export default {
     // 如果是填空题，分数为各子项的分数总和
     'editForm.answerScores': {
       deep: true,
-      immediate: true,
       handler(n) {
         if (this.editForm.type === 3 || (this.editForm.type === 5 && this.editForm.markType === 1)) {
           this.editForm.score = this.editForm.answerScores.reduce((pre, cur) => Number(pre) + Number(cur))
@@ -506,69 +537,6 @@ export default {
       this.editForm.answers.pop()
       this.editForm.answerScores.pop()
     },
-    // 获取试题编辑详情
-    async getQuestionDetail(id) {
-      const res = await questionGet({ id })
-      if (res?.code !== 200) {
-        this.$message.error('查询失败！')
-        return
-      }
-
-      this.editForm.id = res.data.id
-      this.editForm.type = res.data.type
-      this.editForm.title = res.data.title
-      this.editForm.answer = res.data.answers[0].answer[0]
-      this.editForm.analysis = res.data.analysis
-      this.editForm.score = res.data.score
-      this.editForm.markType = res.data.markType
-      this.editForm.state = res.data.state
-
-      if (this.editForm.type === 1) {
-        this.editForm.options = [] // 重置选项
-        this.editForm.answers = [] // 重置答案列表
-        for (let i = 0; i < res.data.options.length; i++) {
-          this.addOption(i, res.data.options[i])
-        }
-      }
-
-      if (this.editForm.type === 2) {
-        this.editForm.answerMultip = []
-        this.editForm.multipScore = ''
-        this.editForm.options = [] // 重置选项
-        this.editForm.answers = [] // 重置答案列表
-        for (let i = 0; i < res.data.options.length; i++) {
-          this.addOption(i, res.data.options[i])
-        }
-        this.editForm.markOptions = res.data.markOptions
-        this.editForm.answerMultip = res.data.answers.reduce((acc, cur) => {
-          acc.push(...cur.answer)
-          return acc
-        }, [])
-        this.editForm.multipScore = res.data.answers[0].score
-      }
-
-      if (this.editForm.type === 5 && this.editForm.markType === 2) {
-        this.editForm.answers = [] // 重置答案列表
-      }
-
-      if (
-        this.editForm.type === 3 ||
-        (this.editForm.type === 5 && this.editForm.markType === 1)
-      ) {
-        this.$nextTick(() => {
-          const answers = res.data.answers
-          this.editForm.answers = [] // 重置答案列表
-          for (let i = 0; i < answers.length; i++) {
-            this.addFillBlanks(i, answers[i])
-          }
-          this.editForm.markOptions = res.data.markOptions
-        })
-      }
-
-      if (res.data.markType === 1 && res.data.type === 5) {
-        this.editForm.answer = ''
-      }
-    },
     // 添加试题
     add() {
       this.$refs['editForm'].validate(async(valid) => {
@@ -584,27 +552,26 @@ export default {
           })
         }
 
-        console.log(params)
         this.$emit('add', params)
       })
     },
     // 修改试题
     edit() {
-      this.$refs['editForm'].validate((valid) => {
+      this.$refs['editForm'].validate(async(valid) => {
         if (!valid) {
           return false
         }
-        this.$confirm('确定要修改？', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        })
-        .then(async() => {
-          this.$emit('edit', ...this.editForm)
-        })
-        .catch((err) => {
-          this.$message.success(err)
-        })
+
+        let params = JSON.parse(JSON.stringify(this.editForm)) // 深度拷贝，不要改变子属性
+        params.id = this.id
+        Reflect.deleteProperty(params, 'rules')
+        if (params.type === 3 || (params.type === 5 && params.markType === 1)) {// 如果是填空或主观问答
+          params.answers.map((item, index, self) => {// 答案处理成接口各式
+            return self[index] = item.join('\n')
+          })
+        }
+
+        this.$emit('edit', params)
       })
     },
   }

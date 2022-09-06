@@ -89,7 +89,7 @@
 </template>
 
 <script>
-import { dictListPage } from 'api/base'
+import { dictListpage } from 'api/base'
 
 export default {
   data() {
@@ -129,7 +129,7 @@ export default {
       this.queryForm.queryShow = false
       const {
         data: { list, total }
-      } = await dictListPage({
+      } = await dictListpage({
         dictIndex: this.queryForm.dictIndex,
         dictKey: this.queryForm.dictKey,
         dictValue: this.queryForm.dictValue,

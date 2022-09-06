@@ -94,7 +94,7 @@
 </template>
 
 <script>
-import { orgListPage, orgTemplate, orgImport } from 'api/base'
+import { orgListpage, orgTemplate, orgImport } from 'api/base'
 
 export default {
   data() {
@@ -130,7 +130,7 @@ export default {
     async query() {
       const {
         data: { list }
-      } = await orgListPage({
+      } = await orgListpage({
         parentId: this.queryForm.parentId,
         name: this.queryForm.name,
         curPage: this.listpage.curPage,

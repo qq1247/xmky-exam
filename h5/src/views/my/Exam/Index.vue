@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { myExamListPage } from 'api/my'
+import { myExamListpage } from 'api/my'
 import MyCard from 'components/ListCard/MyCard.vue'
 export default {
   components: {
@@ -72,7 +72,7 @@ export default {
   methods: {
     // 我的考试列表
     async query() {
-      const myExamList = await myExamListPage({
+      const myExamList = await myExamListpage({
         examName: this.queryForm.examName,
         curPage: this.curPage,
         pageSize: this.pageSize

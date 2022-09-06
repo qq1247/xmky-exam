@@ -63,7 +63,7 @@
 </template>
 
 <script>
-import { examListPage } from 'api/exam'
+import { examListpage } from 'api/exam'
 
 import ListCard from 'components/ListCard/ListCard.vue'
 import AddCard from 'components/ListCard/AddCard.vue'
@@ -97,7 +97,7 @@ export default {
   methods: {
     // 查询
     async query() {
-      const examList = await examListPage({
+      const examList = await examListpage({
         examTypeId: this.queryForm.examTypeId,
         name: this.queryForm.name,
         curPage: this.curPage,

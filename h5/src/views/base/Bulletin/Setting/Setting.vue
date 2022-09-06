@@ -60,7 +60,7 @@
 
 <script>
 import { bulletinAdd, bulletinEdit, bulletinGet } from 'api/base'
-import { userListPage } from 'api/user'
+import { userListpage } from 'api/user'
 import Editor from 'components/Editor/Index.vue'
 import CustomSelect from 'components/CustomSelect.vue'
 
@@ -159,7 +159,7 @@ export default {
     },
     // 获取用户
     async getUserList(curPage = 1, name = '') {
-      const examUsers = await userListPage({
+      const examUsers = await userListpage({
         name,
         curPage,
         pageSize: this.editForm.pageSize

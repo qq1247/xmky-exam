@@ -2,27 +2,32 @@
   <div class="content">
     <!-- 试题列表区域 -->
     <el-scrollbar wrap-style="overflow-x:hidden;" class="content-center">
-      <div v-for="(question, index) in list.questionList" :key="question.id">
+      <div v-for="(question) in list" :key="question.id" class="question">
         <Question
           :question="question"
-          :no="index + 1"
-          :showMode="showMode"
-        ></Question>
+          :no="question.id"
+          :showMode="switchMode"
+        />
+        <div class="question-slot">
+          <slot name="question-btn" :question="question"></slot>
+        </div>
       </div>
-      <el-empty v-if="list.questionList.length === 0" description="暂无试题">
-      <img slot="image" src="@/assets/img/data-null.png" alt="" />
-    </el-empty>
+      <el-empty v-if="list.length === 0" description="暂无试题">
+        <img slot="image" src="@/assets/img/data-null.png" alt="" />
+      </el-empty>
     </el-scrollbar>
+
     <!-- 切换样式按钮区域 -->
-    <div class="content-right">
-      <div :class="['btn', showMode==='simple' ? 'btn-active' : '']" @click="showMode='simple'">
+    <div class="content-center-right">
+      <div :class="['btn', switchMode==='simple' ? 'btn-active' : '']" @click="switchMode='simple'">
         <i class="el-icon-s-unfold"></i>
       </div>
-      <div :class="['btn', showMode==='detail' ? 'btn-active' : '']" @click="showMode='detail'">
+      <div :class="['btn', switchMode==='detail' ? 'btn-active' : '']" @click="switchMode='detail'">
         <i class="el-icon-menu"></i>
       </div>
     </div>
-    <!-- 插槽，放自定义信息 -->
+
+    <!-- 存放自定义信息插槽，如分页 -->
     <slot name="content-bottom"></slot>
   </div>
 </template>
@@ -35,8 +40,8 @@ export default {
   },
   props: {
     list: {
-      type: Object,
-      default: () => {},
+      type: Array,
+      default: [],
     },
     showMode: {
       type: String,
@@ -45,11 +50,8 @@ export default {
   },
   data() {
     return {
-
+      switchMode : this.showMode
     }
-  },
-  methods: {
-
   },
 }
 </script>
@@ -68,7 +70,7 @@ export default {
   padding-bottom: 40px;
   overflow: hidden;
 }
-.content-right {
+.content-center-right {
   padding: 10px 10px 10px 0px;
   display: flex;
   flex-direction: column;
@@ -90,6 +92,27 @@ export default {
     background: #0094e5;
     border: 0;
     color: #fff;
+  }
+}
+.question {
+  position: relative;
+  &:hover {
+    .center-card {
+      border: 1px solid #0094e5;
+      background: rgba(#0094e5, 0.06%);
+    }
+    .question-slot {
+      display: block;
+    }
+  }
+}
+.question-slot {
+  position: absolute;
+  right: 20px;
+  bottom: 10px;
+  display: none;
+  /deep/ .el-button--mini {
+    padding: 3px 8px;
   }
 }
 </style>

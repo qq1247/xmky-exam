@@ -256,7 +256,7 @@
 </template>
 
 <script>
-import { questionCommentAdd, questionCommentListPage } from 'api/question'
+import { questionCommentAdd, questionCommentListpage } from 'api/question'
 import ClozeTitle from './ClozeTitle.vue'
 import QuestionComment from 'components/QuestionComment/Index.vue'
 import CommentText from 'components/QuestionComment/CommentText.vue'
@@ -409,7 +409,7 @@ export default {
     },
     // 获取试题评论
     async questionComment(id) {
-      const commentList = await questionCommentListPage({
+      const commentList = await questionCommentListpage({
         questionId: this.questionDetail.id,
         curPage: this.curPage,
         pageSize: this.pageSize,

@@ -108,7 +108,7 @@
 import Composition from './Composition.vue'
 import QuestionList from './QuestionList.vue'
 import { getQuick } from '@/utils/storage'
-import { questionListPage } from 'api/question'
+import { questionListpage } from 'api/question'
 export default {
   components: {
     // Preview,
@@ -128,7 +128,7 @@ export default {
     }
   },
   async created() {
-    // const res = await questionListPage({}) 
+    // const res = await questionListpage({}) 
     // if (res?.code === 200) {
     //   this.questionList = res.data.list
     // } else {

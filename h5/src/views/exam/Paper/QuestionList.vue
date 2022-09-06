@@ -124,7 +124,7 @@
 import { getQuick } from '@/utils/storage'
 import { getOneDict } from '@/utils/getDict'
 import { paperQuestionAdd, paperGet } from 'api/paper'
-import { questionListPage } from 'api/question'
+import { questionListpage } from 'api/question'
 import Draggable from 'vuedraggable'
 export default {
   components: {
@@ -162,7 +162,7 @@ export default {
   methods: {
     // 查询试题
     async queryQuestion() {
-      const res = await questionListPage({
+      const res = await questionListpage({
         id: this.queryForm.id,
         markType: this.markType === 1 ? 1 : '',
         state: 1,

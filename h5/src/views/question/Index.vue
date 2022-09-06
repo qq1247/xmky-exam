@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import { questionTypeListPage, questionTypeAdd } from 'api/question'
+import { questionTypeListpage, questionTypeAdd } from 'api/question'
 import AddCard from 'components/ListCard/AddCard.vue'
 import IndexCard from '@/components/ListCard/IndexCard.vue'
 export default {
@@ -88,9 +88,9 @@ export default {
     this.query()
   },
   methods: {
-    // 查询分类数据
+    // 查询题库数据
     async query() {
-      const typeList = await questionTypeListPage({
+      const typeList = await questionTypeListpage({
         name: this.queryForm.queryName,
         curPage: this.curPage,
         pageSize: this.pageSize
@@ -98,7 +98,7 @@ export default {
 
       if (!typeList.data.list.length) {
         const res = await questionTypeAdd({
-          name: '我的试题'
+          name: '我的题库'
         })
 
         if (res?.code === 200) {
@@ -121,7 +121,7 @@ export default {
         tab: '1'
       })
     },
-    // 编辑分类
+    // 编辑题库
     edit({ id }) {
       this.$tools.switchTab('QuestionIndexSetting', {
         id,
@@ -166,7 +166,7 @@ export default {
         id
       })
     },
-    // 删除分类
+    // 删除题库
     del({ id }) {
       this.$tools.switchTab('QuestionIndexSetting', {
         id,

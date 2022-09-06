@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { myExamListPage } from '@/api/my'
+import { myExamListpage } from '@/api/my'
 export default {
   data() {
     return {
@@ -39,7 +39,7 @@ export default {
         .then(() => {
           this.countDown--
           this.$refs.countDown.className = 'count-down'
-          return myExamListPage({
+          return myExamListpage({
             examId: this.examId
           })
         })

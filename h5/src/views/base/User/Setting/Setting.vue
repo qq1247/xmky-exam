@@ -60,7 +60,7 @@
 
 <script>
 import { userAdd, userEdit, userGet } from 'api/user'
-import { orgListPage } from 'api/base'
+import { orgListpage } from 'api/base'
 import CustomSelect from 'components/CustomSelect.vue'
 export default {
   components: {
@@ -195,7 +195,7 @@ export default {
     },
     // 获取机构列表
     async getOrgList(curPage = 1, name = '') {
-      const orgList = await orgListPage({
+      const orgList = await orgListpage({
         name,
         curPage,
         pageSize: this.editForm.orgListpage.pageSize

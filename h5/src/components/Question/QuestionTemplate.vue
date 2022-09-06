@@ -36,7 +36,7 @@ import {
   questionImport,
   questionTypeAdd,
   questionTemplate,
-  questionTypeListPage
+  questionTypeListpage
 } from 'api/question'
 import { progressBarGet } from 'api/common'
 export default {
@@ -69,7 +69,7 @@ export default {
     },
     // 获取题库
     async getQuestionType(curPage = 1, name = '') {
-      const typeList = await questionTypeListPage({
+      const typeList = await questionTypeListpage({
         name,
         curPage,
         pageSize: 5
@@ -96,7 +96,7 @@ export default {
           return
         }
         const createQuestionType = await questionTypeAdd({
-          name: '我的试题'
+          name: '我的题库'
         })
         this.questionTypeId = createQuestionType.data
       }

@@ -1,6 +1,6 @@
 import request from './request'
 
-export const paperListPage = (params) => request('paper/listpage', params)
+export const paperListpage = (params) => request('paper/listpage', params)
 export const paperAdd = (params) => request('paper/add', params)
 export const paperEdit = (params) => request('paper/edit', params)
 export const paperDel = (params) => request('paper/del', params)
@@ -32,7 +32,7 @@ export const paperBatchScoreUpdate = (params) =>
   request('paper/batchScoreUpdate', params)
 export const paperTotalScoreUpdate = (params) =>
   request('paper/totalScoreUpdate', params)
-export const paperTypeListPage = (params) =>
+export const paperTypeListpage = (params) =>
   request('paperType/listpage', params)
 
 export const paperTypeAdd = (params) => request('paperType/add', params)

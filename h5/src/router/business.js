@@ -26,7 +26,7 @@ export default [
             name: 'QuestionIndexSetting',
             component: () => import('@/views/question/Setting/Index.vue'),
             meta: {
-              title: '试题设置',
+              title: '题库设置',
               layout: 'subAdmin'
             }
           },

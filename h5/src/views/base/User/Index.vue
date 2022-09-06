@@ -165,7 +165,7 @@ import {
   userOut,
   userRole,
   userImport,
-  userListPage,
+  userListpage,
   userTemplate
 } from 'api/user'
 
@@ -206,7 +206,7 @@ export default {
 
       const {
         data: { list, total }
-      } = await userListPage({
+      } = await userListpage({
         orgName: this.queryForm.orgName,
         name: this.queryForm.name,
         curPage: curPage,

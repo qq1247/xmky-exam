@@ -1,108 +1,119 @@
 <template>
-  <div>
-    <!-- 试题简单样式 -->
-    <el-card v-if="showMode === 'simple'" :class="'center-card'" shadow="hover">
-      <div class="center-card-top">
-        <span>{{ no }}、</span>
-        <div class="render-title" v-html="`${question.title}`" />
-      </div>
-      <div class="center-card-bottom">
-        <div class="card-bottom-left">
-          <el-tag class="center-tag-danger" size="mini" type="danger">
-            {{ $tools.getDictValue('QUESTION_TYPE', question.type)}}
-          </el-tag>
-          <el-tag effect="plain" size="mini" type="success">
-            {{ $tools.getDictValue('PAPER_MARK_TYPE', question.markType) }}
-          </el-tag>
-          <el-tag
-            :type="question.state === 1 ? 'info' : 'primary'"
-            effect="plain"
-            size="mini">
-            {{ $tools.getDictValue('STATE', question.state) }}
-          </el-tag>
-          <el-tag effect="plain" size="mini" type="danger">
-            {{ question.score }}分
-          </el-tag>
-        </div>
-        <div class="card-bottom-right">
-          <slot name="right"></slot>
-        </div>
-      </div>
-    </el-card>
-    <!-- 试题详细样式 -->
-    <div v-else-if="showMode === 'detail'" class="question-content">
-      <slot name="top"></slot>
-      <!-- 题干 -->
-      <QuestionTitle
-        :id="question.id"
-        :type="question.type"
-        :no="no"
-        :title="question.title"
-        :answers="question.answers"
-        :readOnly="true"
-      />
-      <!-- 单选题选项 -->
-      <el-radio-group 
-        v-if="question.type === 1" 
-        v-model="question.answers[0]" 
-        class="children-option">
-        <el-radio
-          v-for="(option, indexOption) in question.options"
-          :key="indexOption"
-          class="option-item"
-          :label="String(option.no)"
-        >
-          <div
-            class="flex-items-center"
-            v-html="
-              `${String.fromCharCode(65 + indexOption)}、${option.option}`
-            "
-          />
-        </el-radio>
-      </el-radio-group>
-      <!-- 多选题选项 -->
-      <el-checkbox-group 
-        v-else-if="question.type === 2" 
-        v-model="question.answers" 
-        class="children-option">
-        <el-checkbox
-          v-for="(option, indexOption) in question.options"
-          :key="indexOption"
-          class="option-item"
-          :label="String(option.no)"
-        >
-          <div
-            class="flex-items-center"
-            v-html="`${String.fromCharCode(65 + indexOption)}、${option.option}`"
-          />
-        </el-checkbox>
-      </el-checkbox-group>
-      <!-- 填空题（题干区域） -->
-      <!-- 判断题选项 -->
-      <el-radio-group 
-        v-else-if="question.type === 4" 
-        v-model="question.answers[0]" 
-        class="children-option">
-        <el-radio
-          v-for="(option, indexOption) in ['对', '错']"
-          :key="indexOption"
-          class="option-item-inline"
-          :label="option"
-          >{{ option }}</el-radio
-        >
-      </el-radio-group>
-      <!-- 问答题答案 -->
-      <el-input
-        v-else-if="question.type === 5"
-        v-model="question.answers[0].answer[0]"
-        :rows="2"
-        class="ask-content"
-        placeholder="请输入答案"
-        type="textarea"
-        :autosize="true"
-      />
-      <slot name="bottom"></slot>
+  <!-- 试题简单样式 -->
+  <el-card v-if="showMode === 'simple'" :class="'center-card'" shadow="hover">
+    <div class="center-card-top">
+      <span>{{ no }}、</span>
+      <div class="render-title" v-html="`${question.title}`" />
     </div>
+    <div class="center-card-bottom">
+      <div class="card-bottom-left">
+        <el-tag class="center-tag-danger" size="mini" type="danger">
+          {{ $tools.getDictValue('QUESTION_TYPE', question.type) }}
+        </el-tag>
+        <el-tag effect="plain" size="mini" type="success">
+          {{ $tools.getDictValue('PAPER_MARK_TYPE', question.markType) }}
+        </el-tag>
+        <el-tag
+          :type="question.state === 1 ? 'info' : 'primary'"
+          effect="plain"
+          size="mini"
+        >
+          {{ $tools.getDictValue('STATE', question.state) }}
+        </el-tag>
+        <el-tag effect="plain" size="mini" type="danger">
+          {{ question.score }}分
+        </el-tag>
+      </div>
+    </div>
+  </el-card>
+  <!-- 试题详细样式 -->
+  <div v-else-if="showMode === 'detail'" class="question-content">
+    <slot name="top"></slot>
+    <!-- 题干 -->
+    <QuestionTitle
+      :id="question.id"
+      :type="question.type"
+      :no="no"
+      :title="question.title"
+      :answers="question.answers"
+      :readOnly="true"
+    />
+    <!-- 单选题选项 -->
+    <el-radio-group
+      v-if="question.type === 1"
+      v-model="question.answers[0]"
+      class="children-option"
+      :disabled="true"
+    >
+      <el-radio
+        v-for="(option, index) in question.options"
+        :key="`option${optionLabs[index]}`"
+        class="option-item"
+        :label="`${optionLabs[index]}`"
+      >
+        <div
+          class="flex-items-center"
+          v-html="`${optionLabs[index]}、${option}`"
+        />
+      </el-radio>
+    </el-radio-group>
+    <!-- 多选题选项 -->
+    <el-checkbox-group
+      v-else-if="question.type === 2"
+      v-model="question.answers"
+      class="children-option"
+      :disabled="true"
+    >
+      <el-checkbox
+        v-for="(option, index) in question.options"
+        :key="`option${optionLabs[index]}`"
+        class="option-item"
+        :label="`${optionLabs[index]}`"
+      >
+        <div
+          class="flex-items-center"
+          v-html="`${optionLabs[index]}、${option}`"
+        />
+      </el-checkbox>
+    </el-checkbox-group>
+    <!-- 填空题（题干区域） -->
+    <!-- 判断题选项 -->
+    <el-radio-group
+      v-else-if="question.type === 4"
+      v-model="question.answers[0]"
+      class="children-option"
+      :disabled="true"
+    >
+      <el-radio
+        v-for="(option, index) in ['对', '错']"
+        :key="index"
+        class="option-item-inline"
+        :label="option"
+        >{{ option }}</el-radio
+      >
+    </el-radio-group>
+    <!-- 问答题答案 -->
+    <el-input
+      v-else-if="question.type === 5 && question.markType === 2"
+      v-model="question.answers[0]"
+      :rows="2"
+      class="ask-content"
+      placeholder="请输入答案"
+      type="textarea"
+      :autosize="true"
+      :disabled="true"
+    />
+    <el-input
+      v-else-if="question.type === 5 && question.markType === 1"
+      :value="qaAnswer"
+      :rows="2"
+      class="ask-content"
+      placeholder="请输入答案"
+      type="textarea"
+      :autosize="true"
+      :disabled="true"
+    />
+    <slot name="bottom"></slot>
   </div>
 </template>
 
@@ -113,26 +124,46 @@ export default {
     QuestionTitle,
   },
   props: {
-    no : {
+    no: {// 显示排序序号
       type: [String, Number],
-      default: 0
+      default: 0,
     },
-    question: {
+    question: { // 试题对象
       type: Object,
       default: () => {},
     },
-    showMode: {
+    showMode: {// 显示样式
       type: String,
-      default: 'detail'
-    }
+      default: 'detail',
+    },
   },
   data() {
     return {
+      optionLabs: ['A','B','C','D','E','F','G'],
+      judgeLabs: ['对','错']
+    }
+  },
+  computed: {
+    qaAnswer: function() {
+      if (this.question.type === 5 && this.question.markType === 1) {// 如果是客观问答，格式化答案
+        let answer = ''
+        this.question.answers.forEach((cur, index) => {
+          answer += `关键词${index + 1}：`
+          cur.forEach(cur => {
+            answer += cur + " "
+          });
+          if (index < this.question.answers.length - 1) {
+            answer += '\n'
+          }
+        });
+        return answer
+      }
 
+      return null
     }
   },
   methods: {
-    
+
   },
 }
 </script>
@@ -242,18 +273,12 @@ export default {
   }
 
   &:first-child {
-    margin: 10px
+    margin: 10px;
   }
-  &:hover {
-    border: 1px solid #0094e5;
-    background: rgba(#0094e5, 0.06%);
-
-    .card-bottom-right {
-      display: block;
-      position: absolute;
-      right: 20px;
-    }
-  }
+  // &:hover {
+  //   border: 1px solid #0094e5;
+  //   background: rgba(#0094e5, 0.06%);
+  // }
 }
 
 .center-card-active {
@@ -302,10 +327,6 @@ export default {
     color: #838eea;
     height: 20px;
     line-height: 18px;
-  }
-
-  .card-bottom-right {
-    display: none;
   }
 
   .btn {

@@ -1,12 +1,12 @@
 import request from './request'
 
 /**
- * @name: examListPage
+ * @name: examListpage
  * @description: 考试列表信息
  * @param {*}
  * @return {*}
  */
-export const examListPage = (params) => request('exam/listpage', params)
+export const examListpage = (params) => request('exam/listpage', params)
 
 /**
  * @name: examGet
@@ -73,12 +73,12 @@ export const examQuestionList = (params) => request('exam/questionList', params)
 export const examPublish = (params) => request('exam/publish', params)
 
 /**
- * @name: examTypeListPage
+ * @name: examTypeListpage
  * @description: 考试类型列表
  * @param {*}
  * @return {*}
  */
-export const examTypeListPage = (params) => request('examType/listpage', params)
+export const examTypeListpage = (params) => request('examType/listpage', params)
 
 /**
  * @name: examTypeAdd

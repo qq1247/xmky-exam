@@ -341,9 +341,9 @@ import { mapGetters } from 'vuex'
 import { getInfo, setInfo } from '@/utils/storage'
 import { getUserInfo, getSubAdminInfo } from 'api/report'
 import Calendar from 'components/Calendar/index'
-import { myExamListPage, myMarkListPage } from 'api/my'
-import { bulletinListPage } from 'api/base'
-import { questionTypeOpenListPage } from 'api/question'
+import { myExamListpage, myMarkListpage } from 'api/my'
+import { bulletinListpage } from 'api/base'
+import { questionTypeOpenListpage } from 'api/question'
 import * as dayjs from 'dayjs'
 export default {
   components: {
@@ -492,7 +492,7 @@ export default {
     async getBulletinList() {
       const {
         data: { list }
-      } = await bulletinListPage({
+      } = await bulletinListpage({
         curPage: 1,
         pageSize: 100
       })
@@ -510,7 +510,7 @@ export default {
       const endDate = dayjs(time).date(days).format('YYYY-MM-DD')
       let examList, markList
       if (this.onlyRole.includes('user')) {
-        examList = await myExamListPage({
+        examList = await myExamListpage({
           curPage: 1,
           pageSize: 10,
           startTime: `${startDate} 00:00:00`,
@@ -518,7 +518,7 @@ export default {
         })
       }
       if (this.onlyRole.includes('subAdmin')) {
-        markList = await myMarkListPage({
+        markList = await myMarkListpage({
           curPage: 1,
           pageSize: 10,
           startTime: `${startDate} 00:00:00`,
@@ -593,7 +593,7 @@ export default {
       const days = dayjs().daysInMonth()
       const startDate = dayjs().date(1).format('YYYY-MM-DD')
       const endDate = dayjs().date(days).format('YYYY-MM-DD')
-      const res = await questionTypeOpenListPage({
+      const res = await questionTypeOpenListpage({
         state: 1,
         pageSize: 10,
         curPage: 1,

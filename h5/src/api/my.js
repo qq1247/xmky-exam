@@ -1,13 +1,13 @@
 import request from './request'
 
-export const myExamListPage = (params) => request('myExam/listpage', params)
+export const myExamListpage = (params) => request('myExam/listpage', params)
 export const myExamAnswerList = (params) => request('myExam/answerList', params)
 export const myExamAnswer = (params) => request('myExam/answer', params)
 export const myExamFinish = (params) => request('myExam/finish', params)
 export const myExamPaper = (params) => request('myExam/paper', params)
 
-export const myMarkListPage = (params) => request('myMark/listpage', params)
-export const myMarkExamListPage = (params) =>
+export const myMarkListpage = (params) => request('myMark/listpage', params)
+export const myMarkExamListpage = (params) =>
   request('myMark/examListpage', params)
 export const myMarkScore = (params) => request('myMark/score', params)
 export const myMarkFinish = (params) => request('myMark/finish', params)

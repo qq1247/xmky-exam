@@ -40,7 +40,7 @@ import CustomSelect from 'components/CustomSelect.vue'
 import QuestionTemplate from '@/components/Question/QuestionTemplate.vue'
 import htmlDocx from 'html-docx-js/dist/html-docx'
 import saveAs from 'file-saver'
-import { questionTypeListPage } from 'api/question'
+import { questionTypeListpage } from 'api/question'
 export default {
   components: {
     CustomSelect,
@@ -64,7 +64,7 @@ export default {
   methods: {
     // 获取题库
     async getQuestionType(curPage = 1, name = '') {
-      const typeList = await questionTypeListPage({
+      const typeList = await questionTypeListpage({
         name,
         curPage,
         pageSize: 5,

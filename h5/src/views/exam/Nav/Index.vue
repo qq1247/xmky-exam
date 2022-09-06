@@ -69,9 +69,9 @@ import CustomSelect from 'components/CustomSelect.vue'
 // import { questionTypeAdd } from 'api/question'
 import dayjs from 'dayjs'
 // import {
-//   paperListPage,
+//   paperListpage,
 //   paperTypeAdd,
-//   paperTypeListPage,
+//   paperTypeListpage,
 //   paperGet,
 //   paperAdd,
 //   paperEdit
@@ -135,7 +135,7 @@ export default {
 
     // 获取试卷列表
     async getPaperList(curPage = 1, name = '') {
-      // const paperList = await paperListPage({
+      // const paperList = await paperListpage({
       //   name,
       //   state: 1,
       //   curPage,

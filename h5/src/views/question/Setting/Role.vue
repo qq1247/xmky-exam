@@ -33,7 +33,7 @@
 
 <script>
 import { questionTypeAuth, questionTypeGet } from 'api/question'
-import { userListPage } from 'api/user'
+import { userListpage } from 'api/user'
 import CustomSelect from 'components/CustomSelect.vue'
 
 export default {
@@ -79,7 +79,7 @@ export default {
   methods: {
     // 获取用户
     async getUserList(curPage = 1, name = '') {
-      const userList = await userListPage({
+      const userList = await userListpage({
         name,
         curPage,
         type: 2,

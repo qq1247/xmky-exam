@@ -1,4 +1,4 @@
-package com.wcpdoc.core.service.impl;
+package com.wcpdoc.exam.core.service.impl;
 
 import java.util.Date;
 import java.util.List;
@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.service.QuestionService;
@@ -48,12 +49,12 @@ public class QuestionTypeExServiceImpl extends BaseServiceImp<QuestionType> impl
 			throw new MyException("参数错误：targetId");
 		}
 		QuestionType source = questionTypeService.getEntity(sourceId);
-		if (source.getState() == 0 ){
-			throw new MyException(String.format("【%s】已删除", source.getName()));
+		if (source == null){
+			throw new MyException(String.format("sourceId不存在"));
 		}
 		QuestionType target = questionTypeService.getEntity(targetId);
-		if (target.getState() == 0) {
-			throw new MyException(String.format("【%s】已删除", target.getName()));
+		if (target == null) {
+			throw new MyException(String.format("targetId不存在"));
 		}
 		
 		if (source.getUpdateUserId().intValue() != getCurUser().getId().intValue()) {
@@ -64,8 +65,8 @@ public class QuestionTypeExServiceImpl extends BaseServiceImp<QuestionType> impl
 		List<Question> questionList = questionService.getList(sourceId);
 		for (Question question : questionList) {
 			question.setQuestionTypeId(targetId);
-			question.setUpdateTime(new Date());
-			question.setUpdateUserId(getCurUser().getId());
+			//question.setUpdateTime(new Date());
+			//question.setUpdateUserId(getCurUser().getId()); // 保留移动前的
 			questionService.update(question);
 		}
 	}

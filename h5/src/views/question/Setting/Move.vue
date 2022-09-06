@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { questionTypeMove, questionTypeListPage } from 'api/question'
+import { questionTypeMove, questionTypeListpage } from 'api/question'
 import CustomSelect from 'components/CustomSelect.vue'
 
 export default {
@@ -60,7 +60,7 @@ export default {
   methods: {
     // 获取题库
     async getQuestionType(curPage = 1, name = '') {
-      const typeList = await questionTypeListPage({
+      const typeList = await questionTypeListpage({
         name,
         curPage,
         pageSize: 5

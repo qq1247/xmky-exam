@@ -199,7 +199,7 @@ import {
   paperQuestionRuleUpdate,
   paperQuestionRuleList
 } from 'api/paper'
-import { questionTypeListPage } from 'api/question'
+import { questionTypeListpage } from 'api/question'
 import { getOneDict } from '@/utils/getDict'
 import Editor from 'components/Editor/Index.vue'
 import CustomSelect from 'components/CustomSelect.vue'
@@ -409,7 +409,7 @@ export default {
     },
     // 获取题库
     async getQuestionType(curPage = 1, name = '') {
-      const typeList = await questionTypeListPage({
+      const typeList = await questionTypeListpage({
         name,
         curPage,
         pageSize: 5

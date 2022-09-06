@@ -117,7 +117,7 @@
 <script>
 import { examMarkUserList, examUserAdd } from 'api/exam'
 import { getQuick, setQuick } from '@/utils/storage'
-import { userListPage } from 'api/user'
+import { userListpage } from 'api/user'
 import CustomSelect from 'components/CustomSelect.vue'
 export default {
   components: {
@@ -224,7 +224,7 @@ export default {
     // 获取用户
     async getUserList(type = 1, curPage = 1, name = '') {
       const params = { name, curPage, pageSize: this.examForm.pageSize }
-      const examUsers = await userListPage(
+      const examUsers = await userListpage(
         type === 1 ? params : { type: 2, ...params }
       )
 

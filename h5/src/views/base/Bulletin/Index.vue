@@ -81,7 +81,7 @@
 </template>
 
 <script>
-import { bulletinListPage } from 'api/base'
+import { bulletinListpage } from 'api/base'
 
 export default {
   data() {
@@ -115,7 +115,7 @@ export default {
 
       const {
         data: { list, total }
-      } = await bulletinListPage({
+      } = await bulletinListpage({
         title: this.queryForm.title,
         curPage: curPage,
         pageSize: this.listpage.pageSize

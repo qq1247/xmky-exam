@@ -4,23 +4,23 @@ export default {
   props: {
     id: {// 主键
       type: Number,
-      default: 0,
+      default: null,
+    },
+    type: {// 类型
+      type: Number,
+      default: null,
     },
     no: {// 题号
       type: [Number, String],
-      default: '',
+      default: null,
     },
     title: {// 题干
       type: String,
-      default: '',
+      default: null,
     },
     answers: {// 答案
       type: Array,
       default: [],
-    },
-    readOnly: {// 只读
-      type: Boolean,
-      default: false,
     },
   },
   render(h, {props}) {
@@ -29,9 +29,9 @@ export default {
       title.match(/[_]{5,}/g).forEach((value, index) => {
         title = title.replace(value, `
           <el-input class="cloze-input" 
-            :disabled='${props.readOnly}' 
-            v-model='${props.answers[index]}'
-            v-bind:style="{ width: ${value.length * 18} + 'px' }"
+            value='${props.answers[index].join(" ")}'
+            :style="{ width: ${value.length * 18} + 'px' }"
+            :disabled='true' 
             >
           </el-input>
         `)

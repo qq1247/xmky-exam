@@ -56,7 +56,7 @@
 
 <script>
 import { examAdd, examEdit, examGet } from 'api/exam'
-import { paperListPage } from 'api/paper'
+import { paperListpage } from 'api/paper'
 import * as dayjs from 'dayjs'
 import CustomSelect from 'components/CustomSelect.vue'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
@@ -185,7 +185,7 @@ export default {
     },
     // 获取试卷列表
     async getPaperList(curPage = 1, name = '') {
-      const paperList = await paperListPage({
+      const paperList = await paperListpage({
         name,
         state: 1,
         curPage,

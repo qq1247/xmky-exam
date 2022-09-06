@@ -183,7 +183,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { userOut, userListPage } from 'api/user'
+import { userOut, userListpage } from 'api/user'
 import { getServerParam, getServerLog, getAdminInfo } from 'api/report'
 export default {
   data() {
@@ -271,7 +271,7 @@ export default {
     async query(curPage = 1) {
       const {
         data: { list, total }
-      } = await userListPage({
+      } = await userListpage({
         orgName: '',
         name: '',
         curPage: curPage,

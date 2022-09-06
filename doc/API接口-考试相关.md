@@ -261,21 +261,17 @@ http请求头需添加Authorization字段，
 | data.total                   | Integer | 总行数       |
 | data.list[]                  | Object[]   | 分页列表     |
 | data.list[].id               | Integer | 主键         |
-| data.list[].type             | Integer | 类型         |
+| data.list[].type             | Integer | 类型（1：单选；2：多选；3：填空；4：判断；5：问答 | 
 | data.list[].title            | String  | 题干         |
-| data.list[].options[]            | Object[]  | 选项数组（type=1,2时有效） |
-| data.list[].options[].no          | String  | 排序 |
-| data.list[].options[].option          | String  | 选项 |
+| data.list[].options[]        | Object[]  | 选项数组（type=1,2时有效） |
 | data.list[].markType         | Integer  | 阅卷类型        |
 | data.list[].state            | Integer | 状态         |
-| data.list[].analysis            | String | 解析         |
+| data.list[].analysis         | String | 解析         |
 | data.list[].questionTypeId   | Integer | 试题分类ID   |
 | data.list[].score            | Double  | 分值         |
-| data.list[].markOptions     | Integer[]  | 分值选项     |
-| data.list[].createUserName     | String  | 创建人     |
-| data.list[].answers[]      | Object[]   | 答案数组   |
-| data.list[].answers[].answer      | String   | 答案   |
-| data.list[].answers[].score     | Double    | 得分   |
+| data.list[].markOptions      | Integer[]  | 分值选项     |
+| data.list[].answers[]        | String[]   | 答案（单选、判断、主观问答第一项有效；多选第一项有效；填空为每空答案，客观问答为每个关键词答案） |
+| data.list[].answerScores[]   | Double[] | 子分数（单选、判断、主观问答无效；多选为漏选分值；填空为每空分值，客观问答为每个关键词分值）   |
 
 ### 试题添加：question/add
 | 请求参数| 类型  | 描述    | 必填 |

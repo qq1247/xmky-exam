@@ -333,22 +333,15 @@
       font-weight: 600;
       color: #0c2e41;
     }
-  }
-  .ask-content {
-    //padding: 16px;
-    // border: 1px solid rgba(0, 0, 0, 0.15);
-    border-radius: 4px;
-    //margin: 16px;
-    //&:last-child {
-    //  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
-    //}
-    //.question-title {
-      //padding: 16px;
-      //background-color: #fafcff;
-      // border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+    .ask-content {
+      border-radius: 4px;
       border-radius: 8px 8px 0 0;
-    //}
+      /deep/ .el-textarea__inner {
+        color: #557587;
+      }
+    }
   }
+ 
   .children-option {
     padding: 10px 0 0 25px;
     /deep/ .is-checked {
@@ -509,22 +502,10 @@
   cursor: default;
 }
 
-/deep/.el-checkbox__input.is-disabled.is-checked + span.el-checkbox__label,
-/deep/.el-radio__input.is-disabled.is-checked + span.el-radio__label {
-  color: #0094e5;
-  cursor: default;
-}
-
 /deep/.el-checkbox__input.is-disabled.is-checked .el-checkbox__inner,
 /deep/.el-radio__input.is-disabled.is-checked .el-radio__inner {
   background-color: #0094e5;
   border-color: #0094e5;
-}
-
-/deep/.el-checkbox__input.is-disabled + span.el-checkbox__label,
-/deep/.el-radio__input.is-disabled + span.el-radio__label {
-  color: #000;
-  cursor: default;
 }
 
 /deep/.el-checkbox__input.is-disabled .el-checkbox__inner,

@@ -56,3 +56,12 @@
     background-color: #0094e5 !important;
   }
 }
+.el-checkbox__input.is-disabled + span.el-checkbox__label,
+.el-radio__input.is-disabled + span.el-radio__label {
+  color: #557587 !important;
+}
+
+.el-checkbox__input.is-disabled.is-checked + span.el-checkbox__label,
+.el-radio__input.is-disabled.is-checked + span.el-radio__label {
+  color: #0094e5 !important;
+}

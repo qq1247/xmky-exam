@@ -132,8 +132,8 @@
 
 <script>
 import { examGet, examMarkUserList, examUserAdd } from 'api/exam'
-import { userListPage } from 'api/user'
-import { questionListPage } from 'api/question'
+import { userListpage } from 'api/user'
+import { questionListpage } from 'api/question'
 import CustomSelect from 'components/CustomSelect.vue'
 
 export default {
@@ -253,7 +253,7 @@ export default {
     // 获取用户
     async getUserList(type = 1, curPage = 1, name = '') {
       const params = { name, curPage, pageSize: this.examForm.pageSize }
-      const examUsers = await userListPage(
+      const examUsers = await userListpage(
         type === 1 ? params : { type: 2, ...params }
       )
 
@@ -304,7 +304,7 @@ export default {
         pageSize: this.examForm.pageSize
       }
       !id ? params : (params.id = Number(id))
-      const questionNumList = await questionListPage(params)
+      const questionNumList = await questionListpage(params)
       this.examForm.examQuestionNums = questionNumList.data.list
       this.examForm.total = questionNumList.data.total
     },

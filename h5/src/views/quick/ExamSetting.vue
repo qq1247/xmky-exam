@@ -123,7 +123,7 @@
 <script>
 import {
   examTypeAdd,
-  examTypeListPage,
+  examTypeListpage,
   examAdd,
   examGet,
   examEdit,
@@ -274,7 +274,7 @@ export default {
         }
       })
     } else {
-      const examTypeList = await examTypeListPage({
+      const examTypeList = await examTypeListpage({
         name: '我的考试',
         curPage: 1,
         pageSize: 5
