@@ -32,10 +32,9 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT QUESTION.ID, QUESTION.TYPE, QUESTION.TITLE, "
 				+ "QUESTION.STATE, QUESTION.MARK_TYPE, QUESTION.QUESTION_TYPE_ID, QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME, "
-				+ "QUESTION.SCORE, QUESTION.MARK_OPTIONS, QUESTION.ANALYSIS, CREATE_USER.NAME AS CREATE_USER_NAME "
+				+ "QUESTION.SCORE, QUESTION.MARK_OPTIONS, QUESTION.ANALYSIS "
 				+ "FROM EXM_QUESTION QUESTION "
-				+ "LEFT JOIN EXM_QUESTION_TYPE QUESTION_TYPE ON QUESTION.QUESTION_TYPE_ID = QUESTION_TYPE.ID "
-				+ "LEFT JOIN SYS_USER CREATE_USER ON QUESTION.CREATE_USER_ID = CREATE_USER.ID ";
+				+ "LEFT JOIN EXM_QUESTION_TYPE QUESTION_TYPE ON QUESTION.QUESTION_TYPE_ID = QUESTION_TYPE.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("questionTypeId")), "QUESTION.QUESTION_TYPE_ID = :QUESTION_TYPE_ID", pageIn.get("questionTypeId"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("questionTypeName")), "QUESTION_TYPE.NAME LIKE :NAME", String.format("%%%s%%", pageIn.get("questionTypeName")))
@@ -49,7 +48,7 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 				.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "QUESTION.STATE IN (1,2)")// 默认查询发布和草稿状态
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && "0".equals(pageIn.get("state")), "QUESTION.STATE = 0 AND QUESTION.UPDATE_TIME > :UPDATE_TIME", DateUtil.getNextDay(new Date(), -7))// 查询已删除并且最近7天的试题（回收站使用）
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "QUESTION.STATE = :STATE", pageIn.get("state"))// 默认查询发布和草稿状态
-				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "QUESTION_TYPE.WRITE_USER_IDS LIKE :WRITE_USER_IDS", String.format("%%,%s,%%", pageIn.get("curUserId", Integer.class)))// 只看自己的
+				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "QUESTION_TYPE.UPDATE_USER_ID = :UPDATE_USER_ID", pageIn.get("curUserId", Integer.class))// 只看自己的
 				.addOrder(!ValidateUtil.isValid(pageIn.get("rand")), "QUESTION.UPDATE_TIME", Order.DESC)
 				.addOrder(ValidateUtil.isValid(pageIn.get("rand")), "Rand()", Order.NULL);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);

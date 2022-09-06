@@ -38,8 +38,8 @@ import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.entity.ex.MyQuestion;
-import com.wcpdoc.exam.core.service.ExamQuestionService;
 import com.wcpdoc.exam.core.service.QuestionAnswerService;
+import com.wcpdoc.exam.core.service.QuestionExService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
@@ -57,6 +57,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	@Resource
 	private QuestionDao questionDao;
 	@Resource
+	private QuestionExService questionExService;
+	@Resource
 	private QuestionTypeService questionTypeService;
 	@Resource
 	private FileService fileService;
@@ -66,8 +68,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	private QuestionOptionService questionOptionService;
 	@Resource
 	private QuestionAnswerService questionAnswerService;
-	@Resource
-	private ExamQuestionService examQuestionService;
 	
 	@Override
 	@Resource(name = "questionDaoImpl")
@@ -84,68 +84,18 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		// 添加试题
 		question.setUpdateTime(new Date());
 		question.setUpdateUserId(getCurUser().getId());
-		//question.setState(2);// 通过页面去控制添加的是草稿还是发布
-		if (question.getType() == 1 || question.getType() == 4 ) {
-			question.setMarkType(1);
-			question.setMarkOptions(null);
-		} else if (question.getType() == 2) {
-			question.setMarkType(1);
-			question.setMarkOptions("1");//多选的漏选得分必填。漏选分值页面控制
-		} else if (question.getType() == 3 || question.getType() == 5 ) {
-			question.setMarkOptions(ValidateUtil.isValid(markOptions) ? StringUtil.join(markOptions) : null);
-		}
+		question.setState(1);
+		question.setMarkOptions(ValidateUtil.isValid(markOptions) ? StringUtil.join(markOptions) : null);
 		add(question);
 
 		//添加答案
-		if (question.getType() == 1 || question.getType() == 4 ) {
-			QuestionAnswer questionAnswer = new QuestionAnswer();
-			questionAnswer.setAnswer(answers[0]);
-			questionAnswer.setScore(question.getScore());
-			questionAnswer.setQuestionId(question.getId());
-			questionAnswer.setNo(1);
-			questionAnswerService.add(questionAnswer);
-		} else if (question.getType() == 2) {
-			QuestionAnswer questionAnswer = new QuestionAnswer();
-			Arrays.sort(answers);// 页面前选b在选a，传值为ba，处理一下
-			questionAnswer.setAnswer(StringUtil.join(answers));
-			questionAnswer.setScore(answerScores[0]);
-			questionAnswer.setQuestionId(question.getId());
-			questionAnswer.setNo(1);
-			questionAnswerService.add(questionAnswer);
-		} else if (question.getType() == 3 || question.getType() == 5) {
-			for(int i = 0; i < answers.length; i++ ){
-				QuestionAnswer questionAnswer = new QuestionAnswer();
-				questionAnswer.setAnswer(answers[i]);
-				questionAnswer.setScore(question.getMarkType() == 1 ? answerScores[i] : BigDecimal.ZERO);
-				questionAnswer.setQuestionId(question.getId());
-				questionAnswer.setNo(i + 1);
-				questionAnswerService.add(questionAnswer);
-			}
-		}
+		addQuestionAnswer(question, answers, answerScores);
 		
 		// 添加选项
-		if (question.getType() == 1 || question.getType() == 2) {
-			for (int i = 0; i < options.length; i++) {
-				QuestionOption questionOption = new QuestionOption();
-				questionOption.setQuestionId(question.getId());
-				questionOption.setOptions(options[i]);
-				questionOption.setNo(i + 1);
-				questionOptionService.add(questionOption);
-			}
-		}
+		addQuestionOption(question, options);
 
 		// 保存附件
-		List<Integer> fileIdList = html2FileIds(question.getTitle());
-		fileIdList.addAll(html2FileIds(question.getAnalysis()));
-		if (question.getType() == 1 || question.getType() == 2) {
-			for (int i = 0; i < options.length; i++) {
-				fileIdList.addAll(html2FileIds(options[i]));
-			}
-		}
-
-		for (Integer fileId : fileIdList) {
-			fileService.upload(fileId);
-		}
+		addQuestionFile(question, options);
 	}
 
 	@Override
@@ -156,19 +106,11 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		if (entity.getType() != question.getType()) {
 			throw new MyException("参数错误：type");
 		}
-//		if (entity.getState() == 1) {// 未被引用可以修改
-//			throw new MyException("试题已发布");
-//		}
 		if (entity.getState() == 0) {
 			throw new MyException("已删除");
 		}
 		
-//		List<ExamQuestion> paperQuestionList = examQuestionService.getList(question.getId());//判断是否被试卷引用  
-//		if (ValidateUtil.isValid(paperQuestionList)) {
-//			Exam exam = examService.getEntity(paperQuestionList.get(0).getPaperId());
-//			throw new MyException(String.format("该题已被【%s】试卷引用", paper.getName()));
-//		}
-		
+		questionExService.updateAndUpdate(question);
 		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
 		addAndUpdateValid(question, markOptions, options, answers, answerScores, questionType);
 
@@ -176,82 +118,22 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		entity.setTitle(question.getTitle());
 		entity.setMarkType(question.getMarkType());
 		entity.setScore(question.getScore());
-		entity.setState(question.getState());
+//		entity.setState(question.getState());
 		entity.setAnalysis(question.getAnalysis());
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
 		// entity.setWriteUserIds(null);// 不能修改
-		
-		if (entity.getType() == 1 || entity.getType() == 4 ) {
-			entity.setMarkType(1);
-			entity.setMarkOptions(null);
-		} else if (question.getType() == 2) {
-			entity.setMarkType(1);
-			entity.setMarkOptions("1");//多选的漏选得分必填。漏选分值页面控制
-		} else if (question.getType() == 3 || question.getType() == 5 ) {
-			entity.setMarkOptions(ValidateUtil.isValid(markOptions) ? StringUtil.join(markOptions) : null);
-		}
+		entity.setMarkOptions(ValidateUtil.isValid(markOptions) ? StringUtil.join(markOptions) : null);
 		update(entity);
 
 		// 修改答案
-		List<QuestionAnswer> list = questionAnswerService.getList(entity.getId());
-		for(QuestionAnswer questionAnswer : list){
-			questionAnswerService.del(questionAnswer.getId());
-		}
-		if (question.getType() == 1 || question.getType() == 4 ) {
-			QuestionAnswer questionAnswer = new QuestionAnswer();
-			questionAnswer.setAnswer(answers[0]);
-			questionAnswer.setScore(question.getScore());
-			questionAnswer.setQuestionId(question.getId());
-			questionAnswer.setNo(1);
-			questionAnswerService.add(questionAnswer);
-		} else if (question.getType() == 2) {
-			QuestionAnswer questionAnswer = new QuestionAnswer();
-			Arrays.sort(answers);// 页面前选b在选a，传值为ba，处理一下
-			questionAnswer.setAnswer(StringUtil.join(answers));
-			questionAnswer.setScore(answerScores[0]);
-			questionAnswer.setQuestionId(question.getId());
-			questionAnswer.setNo(1);
-			questionAnswerService.add(questionAnswer);
-		} else if (question.getType() == 3 || question.getType() == 5) {
-			for(int i = 0; i < answers.length; i++ ){
-				QuestionAnswer questionAnswer = new QuestionAnswer();
-				questionAnswer.setAnswer(answers[i]);
-				questionAnswer.setScore(question.getMarkType() == 1 ? answerScores[i] : BigDecimal.ZERO);
-				questionAnswer.setQuestionId(question.getId());
-				questionAnswer.setNo(i + 1);
-				questionAnswerService.add(questionAnswer);
-			}
-		}
+		addQuestionAnswer(question, answers, answerScores);
 		
 		// 修改选项
-		if (question.getType() == 1 || question.getType() == 2) {
-			List<QuestionOption> questionOptionList = questionOptionService.getList(entity.getId());
-			for (QuestionOption questionOption : questionOptionList) {
-				questionOptionService.del(questionOption.getId());
-			}
-
-			for (int i = 0; i < options.length; i++) {
-				QuestionOption questionOption = new QuestionOption();
-				questionOption.setQuestionId(entity.getId());
-				questionOption.setOptions(options[i]);
-				questionOption.setNo(i + 1);
-				questionOptionService.add(questionOption);
-			}
-		}
+		addQuestionOption(question, options);
 
 		// 保存附件
-		List<Integer> fileIdList = html2FileIds(question.getTitle());
-		fileIdList.addAll(html2FileIds(question.getAnalysis()));
-		if (question.getType() == 1 || question.getType() == 2) {
-			for (int i = 0; i < options.length; i++) {
-				fileIdList.addAll(html2FileIds(options[i]));
-			}
-		}
-
-		for (Integer fileId : fileIdList) {
-			fileService.upload(fileId);
-		}
+		addQuestionFile(question, options);
 	}
 
 	@Override
@@ -527,8 +409,13 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			throw new MyException("参数错误：score");
 		}
 		
-		System.err.println(question.getTitle());
 		if (question.getType() == 1) {// 如果是单选
+			if (question.getMarkType() != 1) {
+				throw new MyException("参数错误：markType");
+			}
+			if (ValidateUtil.isValid(markOptions)) {
+				throw new MyException("参数错误：markOptions");
+			}
 			if (!ValidateUtil.isValid(options)) {
 				throw new MyException("参数错误：options");
 			}
@@ -545,13 +432,16 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			if (options.length < answerIndex + 1) {// 总共四个选项，答案是E就是有问题的
 				throw new MyException("选项和答案不匹配");
 			}
-			if (ValidateUtil.isValid(markOptions)) {
-				throw new MyException("参数错误：markOptions");
-			}
 			if (ValidateUtil.isValid(answerScores)) {
 				throw new MyException("参数错误：answerScores");
 			}
 		} else if (question.getType() == 2) {// 如果是多选
+			if (question.getMarkType() != 1) {
+				throw new MyException("参数错误：markType");
+			}
+			if (ValidateUtil.isValid(markOptions)) {
+				throw new MyException("参数错误：markOptions");
+			}
 			if (!ValidateUtil.isValid(options)) {
 				throw new MyException("参数错误：options");
 			}
@@ -576,11 +466,13 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			if (BigDecimalUtil.newInstance(question.getScore()).sub(answerScores[0]).getResult().doubleValue() <= 0) {
 				throw new MyException("漏选分数大于试题分数");
 			}
-			
-			if (ValidateUtil.isValid(markOptions) && markOptions[0] != 1) {
-				throw new MyException("参数错误：markOptions");
-			}
 		} else if (question.getType() == 3) {
+			if (question.getMarkType() != 1 && question.getMarkType() != 2) {
+				throw new MyException("参数错误：markType");
+			}
+			if (ValidateUtil.isValid(options)) {
+				throw new MyException("参数错误：options");
+			}
 			Matcher matcher = Pattern.compile("[_]{5,}").matcher(question.getTitle());
 			int fillBlankNum = 0;
 			while(matcher.find()) {
@@ -632,6 +524,15 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				//} // 主观填空允许有子分数
 			}
 		} else if (question.getType() == 4) {
+			if (question.getMarkType() != 1) {
+				throw new MyException("参数错误：markType");
+			}
+			if (ValidateUtil.isValid(markOptions)) {
+				throw new MyException("参数错误：markOptions");
+			}
+			if (ValidateUtil.isValid(options)) {
+				throw new MyException("参数错误：options");
+			}
 			if (answers.length != 1) {
 				throw new MyException("参数错误：answers");
 			}
@@ -640,13 +541,16 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				throw new MyException("参数错误：answers");
 			}
 			
-			if (ValidateUtil.isValid(markOptions)) {
-				throw new MyException("参数错误：aiOptions");
-			}
 			if (ValidateUtil.isValid(answerScores)) {
 				throw new MyException("参数错误：answerScores");
 			}
 		} else if (question.getType() == 5) {
+			if (question.getMarkType() != 1 && question.getMarkType() != 2) {
+				throw new MyException("参数错误：markType");
+			}
+			if (ValidateUtil.isValid(options)) {
+				throw new MyException("参数错误：options");
+			}
 			if (question.getMarkType() == 1) {
 				if (ValidateUtil.isValid(markOptions)) {
 					if (markOptions.length != 1) {
@@ -684,7 +588,70 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			}
 		}
 	}
+	
+	private void addQuestionAnswer(Question question, String[] answers, BigDecimal[] answerScores) {
+		List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
+		for(QuestionAnswer questionAnswer : questionAnswerList){
+			questionAnswerService.del(questionAnswer.getId());
+		}
+		
+		if (question.getType() == 1 || question.getType() == 4 || (question.getType() == 5 && question.getMarkType() == 2)) {
+			QuestionAnswer questionAnswer = new QuestionAnswer();
+			questionAnswer.setAnswer(answers[0]);
+			questionAnswer.setScore(null);
+			questionAnswer.setQuestionId(question.getId());
+			questionAnswer.setNo(1);
+			questionAnswerService.add(questionAnswer);
+		} else if (question.getType() == 2) {
+			QuestionAnswer questionAnswer = new QuestionAnswer();
+			Arrays.sort(answers);// 页面前选b在选a，传值为ba，处理一下
+			questionAnswer.setAnswer(StringUtil.join(answers));
+			questionAnswer.setScore(answerScores[0]);
+			questionAnswer.setQuestionId(question.getId());
+			questionAnswer.setNo(1);
+			questionAnswerService.add(questionAnswer);
+		} else if (question.getType() == 3 || (question.getType() == 5 && question.getMarkType() == 1)) {
+			for(int i = 0; i < answers.length; i++ ){
+				QuestionAnswer questionAnswer = new QuestionAnswer();
+				questionAnswer.setAnswer(answers[i]);
+				questionAnswer.setScore(answerScores[i]);
+				questionAnswer.setQuestionId(question.getId());
+				questionAnswer.setNo(i + 1);
+				questionAnswerService.add(questionAnswer);
+			}
+		}
+	}
+	
+	private void addQuestionOption(Question question, String[] options) {
+		List<QuestionOption> questionOptionList = questionOptionService.getList(question.getId());
+		for (QuestionOption questionOption : questionOptionList) {
+			questionOptionService.del(questionOption.getId());
+		}
+		if (question.getType() == 1 || question.getType() == 2) {
+			for (int i = 0; i < options.length; i++) {
+				QuestionOption questionOption = new QuestionOption();
+				questionOption.setQuestionId(question.getId());
+				questionOption.setOptions(options[i]);
+				questionOption.setNo(i + 1);
+				questionOptionService.add(questionOption);
+			}
+		}
+	}
 
+	private void addQuestionFile(Question question, String[] options) {
+		List<Integer> fileIdList = html2FileIds(question.getTitle());
+		fileIdList.addAll(html2FileIds(question.getAnalysis()));
+		if (question.getType() == 1 || question.getType() == 2) {
+			for (int i = 0; i < options.length; i++) {
+				fileIdList.addAll(html2FileIds(options[i]));
+			}
+		}
+
+		for (Integer fileId : fileIdList) {
+			fileService.upload(fileId);
+		}
+	}
+	
 	@Override
 	public List<Question> getListByDel() {
 		return questionDao.getListByDel();

@@ -26,14 +26,12 @@ public class QuestionTypeDaoImpl extends RBaseDaoImpl<QuestionType> implements Q
 	
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT QUESTION_TYPE.ID, QUESTION_TYPE.NAME, QUESTION_TYPE.WRITE_USER_IDS, "
-				+ "QUESTION_TYPE.CREATE_USER_ID, USER.NAME AS CREATE_USER_NAME "
-				+ "FROM EXM_QUESTION_TYPE QUESTION_TYPE "
-				+ "INNER JOIN SYS_USER USER ON QUESTION_TYPE.CREATE_USER_ID = USER.ID ";
+		String sql = "SELECT QUESTION_TYPE.ID, QUESTION_TYPE.NAME, "
+				+ "(SELECT COUNT(*) FROM EXM_QUESTION Z WHERE Z.QUESTION_TYPE_ID = QUESTION_TYPE.ID) AS QUESTION_NUM "
+				+ "FROM EXM_QUESTION_TYPE QUESTION_TYPE ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "QUESTION_TYPE.NAME LIKE :NAME", String.format("%%%s%%", pageIn.get("name")))
-				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "QUESTION_TYPE.WRITE_USER_IDS LIKE :WRITE_USER_IDS", String.format("%%,%s,%%", pageIn.get("curUserId", Integer.class)))
-				.addWhere("QUESTION_TYPE.STATE = 1")
+				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "QUESTION_TYPE.UPDATE_USER_ID = :UPDATE_USER_IDS", pageIn.get("curUserId", Integer.class))
 				.addOrder("QUESTION_TYPE.UPDATE_TIME", Order.DESC);
 		return getListpage(sqlUtil, pageIn);
 	}

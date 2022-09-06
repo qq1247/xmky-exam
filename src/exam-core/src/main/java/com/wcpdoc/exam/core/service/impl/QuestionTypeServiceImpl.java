@@ -49,7 +49,6 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		// 添加试题分类
 		questionType.setUpdateTime(new Date());
 		questionType.setUpdateUserId(getCurUser().getId());
-		questionType.setState(1);
 		add(questionType);
 		
 		//保存图片
@@ -79,14 +78,9 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	
 	@Override
 	public void delAndUpdate(Integer id) {
-		// 校验数据有效性
-		QuestionType questionType = getEntity(id);
-		
 		// 删除试题分类
-		questionType.setState(0);
-		questionType.setUpdateTime(new Date());
-		questionType.setUpdateUserId(getCurUser().getId());
-		update(questionType);
+		QuestionType questionType = getEntity(id);
+		del(questionType.getId());
 		
 		// 删除试题分类扩展
 		questionTypeExService.delAndUpdate(questionType);

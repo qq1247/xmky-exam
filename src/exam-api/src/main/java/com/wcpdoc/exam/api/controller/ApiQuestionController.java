@@ -2,7 +2,7 @@ package com.wcpdoc.exam.api.controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -29,7 +29,6 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.SpringUtil;
-import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
@@ -79,16 +78,13 @@ public class ApiQuestionController extends BaseController {
 			for (Map<String, Object> result : resultList) {
 				Integer id = (Integer) result.get("id");
 				Integer type = (Integer) result.get("type");
+				Integer markType = (Integer) result.get("markType");
 				
-				result.put("options", new String[0]);
 				if (type == 1 || type == 2) {// 如果是单选或多选，添加选项字段
 					List<QuestionOption> questionOptionList = questionOptionService.getList(id);
-					List<Map<String, Object>> options = new ArrayList<>();
+					List<String> options = new ArrayList<>();
 					for (QuestionOption questionOption : questionOptionList) {
-						Map<String, Object> map = new HashMap<>();
-						map.put("no", (char)(questionOption.getNo() + 64));
-						map.put("option", questionOption.getOptions());
-						options.add(map);
+						options.add(questionOption.getOptions());
 					}
 					result.put("options", options);
 				}
@@ -102,14 +98,21 @@ public class ApiQuestionController extends BaseController {
 				}
 				
 				List<QuestionAnswer> questionAnswerList = questionAnswerService.getList((Integer)result.get("id"));
-				List<Map<String, Object>> answerList = new ArrayList<Map<String, Object>>();
+				List<Object> answers = new ArrayList<>();
+				List<BigDecimal> answerScores = new ArrayList<>();
 				for(QuestionAnswer answer : questionAnswerList){
-					Map<String, Object> map = new HashMap<String, Object>();
-					map.put("answer", answer.getAnswerArr((Integer)result.get("type"), (Integer)result.get("markType")));
-					map.put("score", answer.getScore());
-					answerList.add(map);
+					if (type == 1 || type == 4 || (type == 5 && markType == 2)) {
+						answers.add(answer.getAnswer());
+					} else if (type == 2) {
+						Collections.addAll(answers, answer.getAnswer().split(","));
+						answerScores.add(answer.getScore());
+					} else if (type == 3 || (type == 5 && markType == 1)) {
+						answers.add(answer.getAnswer().split("\n"));
+						answerScores.add(answer.getScore());
+					}
 				}
-				result.put("answers", answerList);
+				result.put("answers", answers);
+				result.put("answerScores", answerScores);
 			}
 			return PageResultEx.ok().data(pageout);
 		} catch (Exception e) {
@@ -204,47 +207,42 @@ public class ApiQuestionController extends BaseController {
 	public PageResult get(Integer id) {
 		try {
 			Question question = questionService.getEntity(id);
-			List<String> optionList = new ArrayList<>();
-			if (question.getType() == 1 || question.getType() == 2) {// 如果是单选或多选
-				List<QuestionOption> questionOptionList = questionOptionService.getList(question.getId());
+			List<String> options = new ArrayList<>();
+			if (question.getType() == 1 || question.getType() == 2) {// 如果是单选或多选，添加选项字段
+				List<QuestionOption> questionOptionList = questionOptionService.getList(id);
 				for (QuestionOption questionOption : questionOptionList) {
-					optionList.add(questionOption.getOptions());
+					options.add(questionOption.getOptions());
 				}
 			}
 			
 			List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
-			List<Map<String, Object>> answerList = new ArrayList<Map<String, Object>>();
+			List<Object> answers = new ArrayList<>();
+			List<BigDecimal> answerScores = new ArrayList<>();
 			for(QuestionAnswer answer : questionAnswerList){
-				Map<String, Object> map = new HashMap<String, Object>();
-				map.put("answer", answer.getAnswerArr(question.getType(), question.getMarkType()));
-				map.put("score", answer.getScore());
-				answerList.add(map);
-			}
-			
-			Integer[] markOptions = null;//new Integer[split.length];
-			if (ValidateUtil.isValid(question.getMarkOptions())) {
-				String[] split = question.getMarkOptions().split(",");
-				markOptions = new Integer[split.length];
-				for(int i = 0; i < split.length; i++ ){
-					markOptions[i] = Integer.parseInt(split[i]);
+				if (question.getType() == 1 || question.getType() == 4 || (question.getType() == 5 && question.getMarkType() == 2)) {
+					answers.add(answer.getAnswer());
+				} else if (question.getType() == 2) {
+					Collections.addAll(answers, answer.getAnswer().split(","));
+					answerScores.add(answer.getScore());
+				} else if (question.getType() == 3 || (question.getType() == 5 && question.getMarkType() == 1)) {
+					answers.add(answer.getAnswer().split("\n"));
+					answerScores.add(answer.getScore());
 				}
-			} else {
-				markOptions = new Integer[0];
 			}
 			
 			PageResultEx pageResult = PageResultEx.ok()
 					.addAttr("id", question.getId())
 					.addAttr("type", question.getType())
 					.addAttr("title", question.getTitle())
-					.addAttr("options", optionList.toArray(new String[optionList.size()]))
+					.addAttr("options", options)
 					.addAttr("markType", question.getMarkType())
 					.addAttr("analysis", question.getAnalysis())
 					.addAttr("questionTypeId", question.getQuestionTypeId())
 					.addAttr("score", question.getScore())
-					.addAttr("markOptions", markOptions)
-					.addAttr("answers", answerList)
-					.addAttr("state", question.getState())
-					.addAttr("updateUserName", userService.getEntity(question.getUpdateUserId()).getName());
+					.addAttr("markOptions", question.getMarkOptionArr())
+					.addAttr("answers", answers)
+					.addAttr("answerScores", answerScores)
+					.addAttr("state", question.getState());
 			return pageResult;
 		} catch (MyException e) {
 			log.error("获取试题错误：{}", e.getMessage());

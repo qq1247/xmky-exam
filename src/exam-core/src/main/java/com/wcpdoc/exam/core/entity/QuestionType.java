@@ -35,8 +35,6 @@ public class QuestionType {
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "UPDATE_TIME")
 	private Date updateTime;
-	@Column(name = "STATE")
-	private Integer state;
 
 	public Integer getId() {
 		return id;
@@ -76,13 +74,5 @@ public class QuestionType {
 
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
-	}
-
-	public Integer getState() {
-		return state;
-	}
-
-	public void setState(Integer state) {
-		this.state = state;
 	}
 }

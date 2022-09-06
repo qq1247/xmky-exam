@@ -13,7 +13,7 @@ import com.wcpdoc.exam.core.entity.Question;
 public interface QuestionService extends BaseService<Question>{
 
 	/**
-	 *  添加试题
+	 *  添加
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @param question
@@ -26,7 +26,7 @@ public interface QuestionService extends BaseService<Question>{
 	void addAndUpdate(Question question, Integer[] markOptions, String[] options, String[] answers, BigDecimal[] answerScores);
 
 	/**
-	 * 完成试题修改
+	 * 修改
 	 * 
 	 * v1.0 zhanghc 2018年10月12日下午7:30:02
 	 * @param question
@@ -39,7 +39,7 @@ public interface QuestionService extends BaseService<Question>{
 	void updateAndUpdate(Question question, Integer[] markOptions, String[] options, String[] answers, BigDecimal[] answerScores);
 	
 	/**
-	 * 删除试题
+	 * 删除
 	 * 
 	 * v1.0 chenyun 2021年8月25日下午5:28:51
 	 * @param questionTypeId 
@@ -49,7 +49,7 @@ public interface QuestionService extends BaseService<Question>{
 	void delAndUpdate(Integer questionTypeId, Integer[] ids);
 	
 	/**
-	 * 完成导入试题
+	 * 导入
 	 * 
 	 * v1.0 zhanghc 2019年8月10日下午5:12:53
 	 * @param fileId
