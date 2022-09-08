@@ -2,25 +2,36 @@
   <div class="content">
     <!-- 答题卡 -->
     <div class="paper-router">
-      <el-divider >答题卡</el-divider>
-      <div class="router-content">
+      <el-divider>答题卡</el-divider>
+      <!-- <div class="router-content">
         <div class="router-link">
-          <a 
-          v-for="(question, index) in questionList"
-          :key="index"
-          class="router-index router-active" 
-          @click="toHref(question.id)"
+          <a
+            v-for="(question, index) in questionList"
+            :key="index"
+            class="router-index router-active"
+            @click="toHref(question.id)"
           >
-          {{index + 1}}
+            {{ index + 1 }}
           </a>
         </div>
-      </div>
-      <!-- <div
-        v-for="(item, index) in paperQuestion"
-        :key="index"
-        class="router-content"
-      >
-        <div v-if="item.questionList" class="router-title">
+      </div> -->
+      <div class="router-content">
+        <div
+          v-for="(item, index) in questionList"
+          :key="index"
+          style="display: inline-block"
+        >
+          <div v-if="item.id == 0" class="router-title">
+            第{{ $tools.intToChinese(index + 1) }}章（共{{
+              questionList.length
+            }}题，合计{{ item.score }}分）
+          </div>
+          <div v-else>
+            <a :class="['router-index']" @click="toHref(item.id)">{{
+              index + 1
+            }}</a>
+          </div>
+          <!-- <div v-if="item.questionList" class="router-title">
           第{{ $tools.intToChinese(index + 1) }}章（共{{
             item.questionList.length
           }}题，合计{{ computeChapterScore(item.questionList) }}分）
@@ -34,22 +45,42 @@
               routerIndex === question.id ? 'router-active' : '',
             ]"
             @click="toHref(question.id)"
-          >{{ indexQuestion + 1 }}</a>
+            >{{ indexQuestion + 1 }}</a
+          >
+        </div> -->
         </div>
-      </div> -->
-    </div> 
+      </div>
+    </div>
 
     <!-- 试卷 -->
     <el-scrollbar wrap-style="overflow-x:hidden;" class="paper-content">
       <div class="top">
         <div class="top-title">
-          <el-input v-model="paperName" placeholder="请输入试卷名称" maxlength="32"></el-input>
+          <el-input
+            v-model="paperName"
+            placeholder="请输入试卷名称"
+            maxlength="32"
+          ></el-input>
         </div>
-        <div class="top-handler"> 
-          <el-button icon="el-icon-zoom-in" size="mini" round @click="drawer=true">选择题库</el-button>
-          <el-button icon="el-icon-edit-outline" size="mini" round @click="toEditor">导入试题</el-button>
+        <div class="top-handler">
+          <el-button
+            icon="el-icon-zoom-in"
+            size="mini"
+            round
+            @click="drawer = true"
+            >选择题库</el-button
+          >
+          <el-button
+            icon="el-icon-edit-outline"
+            size="mini"
+            round
+            @click="toEditor"
+            >导入试题</el-button
+          >
           <el-button icon="el-icon-plus" size="mini" round>添加章节</el-button>
-          <el-button icon="el-icon-delete" size="mini" round>清空试题</el-button>
+          <el-button icon="el-icon-delete" size="mini" round
+            >清空试题</el-button
+          >
         </div>
       </div>
       <Draggable
@@ -58,9 +89,7 @@
         group="questionGroup"
         animation="300"
       >
-        <QuestionList :list="questionList">
-          
-        </QuestionList>
+        <QuestionList :list="questionList"> </QuestionList>
       </Draggable>
     </el-scrollbar>
 
@@ -72,11 +101,8 @@
       size="500px"
       :modal-append-to-body="false"
       :modal="false"
-      >
-      <QuestionList 
-        @addQuestion="addQuestion"
-        @toHref="toHref"
-      />
+    >
+      <QuestionList @addQuestion="addQuestion" @toHref="toHref" />
     </el-drawer>
   </div>
 </template>
@@ -96,12 +122,14 @@ export default {
     return {
       paperName: '点击这里输入试卷名称',
       showQuestionList: false, // 显示题库
-      questionList: []
+      questionList: [],
     }
   },
   async created() {
-    const res = await questionListpage({}) 
+    const res = await questionListpage({})
     if (res?.code === 200) {
+      res.data.list.splice(0, 0, { id: 0 })
+      res.data.list.splice(5, 0, { id: 0 })
       this.questionList = res.data.list
     } else {
       this.$message.error('请刷新重新获取试题！')
@@ -109,20 +137,30 @@ export default {
   },
   computed: {
     questionViewList: function () {
-      let _questionList = JSON.parse(JSON.stringify(this.questionList)).map(question => {//answers: [{score: 1, answer: ["B"]}] => answers: B
-        if (question.type === 1 || question.type === 4 || (question.type === 5 && question.markType === 2)) {
-          question.answers = question.answers[0].answer[0]
-        } else if (question.type === 2) {
-          question.answers = question.answers[0].answer
-        } else if (question.type === 3 || (question.type === 5 && question.markType === 1)) {
-            question.answers = question.answers.map(answer => {
-            return answer.answer[0]
-          })
+      let _questionList = JSON.parse(JSON.stringify(this.questionList)).map(
+        (question) => {
+          //answers: [{score: 1, answer: ["B"]}] => answers: B
+          if (
+            question.type === 1 ||
+            question.type === 4 ||
+            (question.type === 5 && question.markType === 2)
+          ) {
+            question.answers = question.answers[0].answer[0]
+          } else if (question.type === 2) {
+            question.answers = question.answers[0].answer
+          } else if (
+            question.type === 3 ||
+            (question.type === 5 && question.markType === 1)
+          ) {
+            question.answers = question.answers.map((answer) => {
+              return answer.answer[0]
+            })
+          }
+          return question
         }
-        return question
-      });
+      )
       return _questionList
-    }
+    },
   },
   methods: {
     toEditor() {
@@ -133,9 +171,11 @@ export default {
     },
     // 跳转到对应的试题
     toHref(index) {
-      document.querySelector(`#p-${index}`).scrollIntoView({ block: 'end', inline: 'nearest' })
-    }
-  }
+      document
+        .querySelector(`#p-${index}`)
+        .scrollIntoView({ block: 'end', inline: 'nearest' })
+    },
+  },
 }
 </script>
 
@@ -145,6 +185,9 @@ export default {
   background: #fff;
   position: relative;
   padding: 15px;
+  /deep/ .el-divider__text.is-center {
+    color: #596a76;
+  }
   .total-score {
     background: #0094e5;
     width: 100%;
@@ -175,7 +218,7 @@ export default {
     color: #41baff;
     line-height: 28px;
     font-weight: 600;
-    background: #E3F4FE;
+    background: #e3f4fe;
     text-align: center;
     display: inline-block;
     margin-bottom: 10px;
@@ -190,8 +233,9 @@ export default {
     }
   }
 
-  .router-active, a:hover {
-    background: #0094E4;
+  .router-active,
+  a:hover {
+    background: #0094e4;
     // border: 1px solid #7fc2f6;
     color: #fff;
   }
@@ -222,7 +266,7 @@ export default {
     padding: 0 20px;
     border-radius: 8px 8px 0 0;
     border-bottom: 1px solid #eee;
-    &::before{
+    &::before {
       content: '';
       display: inline-block;
       position: relative;
@@ -268,7 +312,6 @@ export default {
       font-weight: bold;
     }
   }
-  
 }
 /deep/ .el-drawer__header {
   margin-bottom: 0px;

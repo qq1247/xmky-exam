@@ -55,7 +55,7 @@ const actions = {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
       login({ loginName: username.trim(), pwd: password })
-        .then(async(res) => {
+        .then(async (res) => {
           const { data } = res
           const role = data.roles.includes('subAdmin')
             ? ['subAdmin']

@@ -28,6 +28,7 @@
   padding: 24px 24px 12px;
   margin-bottom: 8px;
   border-radius: 8px;
+
   .user-name {
     text-align: center;
     margin-top: 16px;
@@ -43,19 +44,23 @@
   margin-bottom: 8px;
   border-radius: 0 0 8px 8px;
   border-bottom: 1px solid #ebeef5;
+
   .intro-item {
     width: 50%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
     &:nth-of-type(3),
     &:nth-of-type(4) {
       margin-top: 24px;
     }
+
     .item-icon {
       width: 40px;
       height: 40px;
+
       span {
         width: 24px;
         height: 30px;
@@ -64,11 +69,13 @@
         align-items: center;
       }
     }
+
     .item-num {
       font-size: 14px;
       margin: 8px 0 4px 0;
       color: #606f74;
     }
+
     .item-title {
       font-size: 12px;
       color: #8b989d;
@@ -79,12 +86,14 @@
 .user-handler {
   width: 100%;
   background: #fff;
+
   .handler-title {
     padding: 20px 0;
     text-align: center;
     color: #8b989d;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   }
+
   .handler-content {
     display: flex;
     justify-content: center;
@@ -92,6 +101,7 @@
     padding: 16px 0;
     position: relative;
   }
+
   .percentage-bg {
     position: absolute;
     top: 0;
@@ -103,6 +113,7 @@
     justify-content: center;
     align-items: center;
     z-index: 10;
+
     .percentage-content {
       display: inline-block;
       width: 80px;
@@ -123,6 +134,7 @@
   border-radius: 8px 8px 0 0;
   display: flex;
   align-items: center;
+
   &::before,
   &::after {
     content: '';
@@ -134,9 +146,11 @@
     border-style: solid;
     border-width: 1px 0 0;
   }
+
   &::before {
     margin-right: 12px;
   }
+
   &::after {
     margin-left: 12px;
   }
@@ -149,6 +163,7 @@
 
 .router-content {
   margin: 0 20px;
+
   .router-title {
     line-height: 40px;
     font-size: 13px;
@@ -162,7 +177,8 @@
     height: 28px;
     color: #0094e5;
     line-height: 28px;
-    background: rgba(#0094e5, 0.1);
+    // background: rgba(#0094e5, 0.1);
+    background: #E1F5FB;
     border: none;
     text-align: center;
     display: inline-block;
@@ -172,6 +188,7 @@
     text-decoration: none;
     cursor: pointer;
     user-select: none;
+
     &:nth-child(5n) {
       margin-right: 0;
     }
@@ -184,7 +201,7 @@
 
   .router-active,
   a:hover {
-    background: #0094e5;
+    background: #0095E3;
     color: #fff;
   }
 
@@ -208,6 +225,7 @@
   flex-direction: column;
   padding: 16px 16px 0;
   border-radius: 0 0 8px 8px;
+
   .exam-btn {
     display: flex;
     justify-content: center;
@@ -222,6 +240,7 @@
     border-radius: 4px;
     margin-bottom: 16px;
   }
+
   .exam-finish {
     background: #0094e5;
     color: #fff;
@@ -235,12 +254,15 @@
   width: 960px;
   height: auto;
   border-radius: 8px;
+
   .center-drag {
     width: 100%;
+
     .drag-item {
       margin-bottom: 10px;
     }
   }
+
   .paper-title {
     font-size: 22px;
     color: #0c2e41;
@@ -248,15 +270,18 @@
     text-align: center;
     padding: 16px 0;
   }
+
   .paper-intro {
     font-size: 12px;
     color: #666;
     padding: 0 10px 15px;
     border-bottom: 1px solid #d8d8d8;
   }
+
   .chapter {
     display: flex;
     flex-direction: column;
+
     .chapter-name {
       width: 100%;
       line-height: 48px;
@@ -271,6 +296,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+
       &::after {
         content: '';
         display: block;
@@ -281,14 +307,17 @@
         width: 3px;
         background-color: #0094e5;
       }
+
       .chapter-name-input {
         flex: 1;
         margin-right: 20px;
+
         /deep/ .el-input__inner {
           max-width: 400px;
           border: 1px solid transparent;
           font-size: 16px;
           font-weight: 600;
+
           &:hover,
           &:focus {
             border-bottom: 1px solid #c0c4cc;
@@ -298,26 +327,32 @@
         }
       }
     }
+
     /deep/.el-button {
       opacity: 0;
+
       .common {
         font-size: 14px;
       }
     }
+
     &:hover {
       .el-button {
         opacity: 1;
       }
     }
+
     .chapter-description {
       font-size: 14px;
       color: #557587;
       padding: 8px 16px 8px 32px;
     }
   }
+
   .item-title {
     line-height: 40px;
   }
+
   .question-content {
     font-size: 14px;
     box-sizing: border-box;
@@ -325,6 +360,7 @@
     padding: 16px;
     margin: 0 16px;
     position: relative;
+
     .question-title {
       width: 650px;
       display: flex;
@@ -333,65 +369,77 @@
       font-weight: 600;
       color: #0c2e41;
     }
+
     .ask-content {
       border-radius: 4px;
       border-radius: 8px 8px 0 0;
+
       /deep/ .el-textarea__inner {
         color: #557587;
       }
     }
   }
- 
+
   .children-option {
     padding: 10px 0 0 25px;
     // /deep/ .is-checked {
     //   font-weight: bold;
     // }
   }
+
   .option-item {
     display: flex;
     justify-items: center;
     line-height: 30px;
     color: #557587;
+
     /deep/ .el-radio__input,
     /deep/ .el-checkbox__input {
       padding-top: 8px;
     }
   }
+
   .flex-items-center {
     display: flex;
     justify-items: center;
     line-height: 30px;
+
     /deep/ .el-radio__input,
     /deep/ .el-checkbox__input {
       padding-top: 8px;
     }
   }
+
   .option-item-inline {
     display: inline-flex;
     justify-items: center;
     line-height: 30px;
     color: #557587;
+
     /deep/ .el-radio__input,
     /deep/ .el-checkbox__input {
       padding-top: 8px;
     }
   }
+
   /deep/ .el-textarea__inner {
     border: none;
   }
+
   .option-item-text {
     border-bottom: 1px solid #d8d8d8;
     padding: 20px 10px 5px;
     color: #333;
     margin: 0 25px 0;
   }
+
   .children-analysis {
     line-height: 30px;
     padding: 16px;
     font-size: 13px;
     color: #666;
   }
+
   .analysis-tip {
     background: rgba(#0094e5, 0.1);
     padding: 6px 8px;
@@ -399,38 +447,47 @@
     color: #0094e5;
     border-radius: 2px;
   }
+
   .analysis-content {
     display: flex;
   }
+
   .cloze-answers {
     display: flex;
+
     .answers-items {
       border-bottom: 1px solid #404b65;
       padding: 0 20px;
       margin-right: 20px;
     }
   }
+
   .answers-item {
     width: 100%;
+
     span {
       width: 100%;
       display: inline;
       word-wrap: break-word;
       word-break: normal;
     }
+
     .answers-tag {
       color: #0094e5;
       border: 1px solid #0094e5;
       padding: 4px 16px;
       border-radius: 2px;
+
       &:not(:last-child) {
         margin-right: 10px;
       }
     }
   }
+
   .el-tag {
     margin-right: 6px;
   }
+
   .children-footer {
     width: 100%;
     height: 50px;
@@ -446,6 +503,7 @@
     padding: 0 16px;
     opacity: 0;
   }
+
   .btn {
     padding: 5px 10px;
   }
