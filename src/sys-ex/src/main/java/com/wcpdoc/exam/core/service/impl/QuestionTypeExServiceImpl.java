@@ -48,18 +48,23 @@ public class QuestionTypeExServiceImpl extends BaseServiceImp<QuestionType> impl
 		if(targetId == null){
 			throw new MyException("参数错误：targetId");
 		}
+		
 		QuestionType source = questionTypeService.getEntity(sourceId);
 		if (source == null){
-			throw new MyException(String.format("sourceId不存在"));
+			throw new MyException(String.format("参数错误：sourceId"));
 		}
 		QuestionType target = questionTypeService.getEntity(targetId);
 		if (target == null) {
-			throw new MyException(String.format("targetId不存在"));
+			throw new MyException(String.format("参数错误：targetId"));
 		}
 		
 		if (source.getUpdateUserId().intValue() != getCurUser().getId().intValue()) {
-			throw new MyException("无操作权限");// 只能移动自己创建的试题分类
+			throw new MyException("无操作权限");
 		}
+		if (target.getUpdateUserId().intValue() != getCurUser().getId().intValue()) {
+			throw new MyException("无操作权限");
+		}
+		
 		
 		// 移动
 		List<Question> questionList = questionService.getList(sourceId);

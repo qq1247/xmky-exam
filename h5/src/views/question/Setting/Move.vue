@@ -1,23 +1,23 @@
 <template>
   <el-form
-    ref="moveForm"
-    :model="examForm"
-    :rules="examForm.rules"
+    ref="editForm"
+    :model="editForm"
+    :rules="editForm.rules"
     label-width="100px"
   >
     <el-form-item label="合并到" prop="questionType">
       <CustomSelect
         :multiple="false"
         placeholder="请选择题库"
-        :value="examForm.questionType"
-        :total="examForm.total"
+        :value="editForm.questionType"
+        :total="editForm.total"
         @change="selectQuestionType"
         @input="searchQuestionType"
         @currentChange="getMoreQuestionType"
         @visibleChange="getQuestionType"
       >
         <el-option
-          v-for="item in examForm.questionTypes"
+          v-for="item in editForm.questionTypes"
           :key="item.id"
           :label="item.name"
           :value="item.id"
@@ -25,7 +25,7 @@
       </CustomSelect>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="questionMove">编辑</el-button>
+      <el-button type="primary" @click="questionMove">确定</el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -40,8 +40,8 @@ export default {
   },
   data() {
     return {
-      id: null,
-      examForm: {
+      id: null, // 当前题库ID
+      editForm: {
         total: 1,
         curPage: 1,
         questionType: null,
@@ -65,8 +65,11 @@ export default {
         curPage,
         pageSize: 5
       })
-      this.examForm.questionTypes = typeList.data.list
-      this.examForm.total = typeList.data.total
+      let self = this
+      this.editForm.questionTypes = typeList.data.list.filter(item => {// 不显示自己
+        return item.id !== self.id;
+      });
+      this.editForm.total = typeList.data.total
     },
     // 根据name 查询题库
     searchQuestionType(name) {
@@ -78,25 +81,23 @@ export default {
     },
     // 选择题库
     selectQuestionType(e) {
-      this.examForm.questionType = e
+      this.editForm.questionType = e
     },
     // 合并题库
-    async questionMove() {
-      if (!this.examForm.questionType) {
-        this.$message.warning('请选择题库')
-        return
-      }
+    questionMove() {
+      this.$refs['editForm'].validate(async (valid) => {
+        if (!valid) {
+          return
+        }
 
-      const res = await questionTypeMove({
-        sourceId: this.id,
-        targetId: this.examForm.questionType
+        questionTypeMove({
+          sourceId: this.id,
+          targetId: this.editForm.questionType
+        }).then(() => {
+          this.$message.success('合并成功！')
+        })
       })
-      if (res?.code === 200) {
-        this.$message.success('合并成功！')
-        this.$router.back()
-      } else {
-        this.$message.error('合并失败！')
-      }
+
     }
   }
 }

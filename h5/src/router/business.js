@@ -40,24 +40,14 @@ export default [
             }
           },
           {
-            path: 'editor/:questionTypeId',
+            path: 'txtImport/:questionTypeId',
             name: 'QuestionIndexTxtImport',
-            component: () => import('@/views/question/Editor.vue'),
+            component: () => import('@/views/question/txtImport.vue'),
             meta: {
               title: '文本导入',
               layout: 'subAdmin'
             }
           },
-          // {
-          //   path: 'open/:id',
-          //   name: 'QuestionIndexOpen',
-          //   component: () => import('@/views/question/Open.vue'),
-          //   hidden: true,
-          //   meta: {
-          //     title: '模拟练习',
-          //     layout: 'subAdmin'
-          //   }
-          // },
           {
             path: 'statistics/:questionTypeId',
             name: 'QuestionIndexStatistics',
@@ -71,70 +61,6 @@ export default [
       }
     ]
   },
-  // {
-  //   name: 'Paper',
-  //   path: '/paper',
-  //   component: Layout,
-  //   redirect: '/paper/index',
-  //   meta: {
-  //     title: '试卷管理',
-  //     icon: 'common common-paper-manage',
-  //     layout: 'subAdmin',
-  //     roles: ['subAdmin']
-  //   },
-  //   children: [
-  //     {
-  //       name: 'PaperIndex',
-  //       path: 'index',
-  //       component: () => import('@/views/paper/Index/Index.vue'),
-  //       meta: {
-  //         title: '试卷分类',
-  //         layout: 'subAdmin'
-  //       },
-  //       children: [
-  //         {
-  //           path: 'setting/:id/:tab?',
-  //           name: 'PaperIndexSetting',
-  //           component: () => import('@/views/paper/Index/Setting/Index.vue'),
-  //           meta: {
-  //             title: '试卷设置',
-  //             layout: 'subAdmin'
-  //           }
-  //         }
-  //       ]
-  //     },
-  //     {
-  //       path: 'list/:id?',
-  //       name: 'PaperList',
-  //       component: () => import('@/views/paper/List/Index.vue'),
-  //       hidden: true,
-  //       meta: {
-  //         title: '试卷列表',
-  //         layout: 'subAdmin'
-  //       },
-  //       children: [
-  //         {
-  //           path: '/paper/list/setting/:id/:paperTypeId/:genType/:tab?',
-  //           name: 'PaperListSetting',
-  //           component: () => import('@/views/paper/List/Setting/Index.vue'),
-  //           meta: {
-  //             title: '列表设置',
-  //             layout: 'subAdmin'
-  //           }
-  //         },
-  //         {
-  //           path: '/paper/list/edit/:id/:paperTypeId/:genType/:tab?',
-  //           name: 'PaperListEdit',
-  //           component: () => import('@/views/paper/List/Edit/Index.vue'),
-  //           meta: {
-  //             title: '组合试卷',
-  //             layout: 'subAdmin'
-  //           }
-  //         }
-  //       ]
-  //     }
-  //   ]
-  // },
   {
     name: 'Exam',
     path: '/exam',

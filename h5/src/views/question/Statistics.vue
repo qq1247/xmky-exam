@@ -2,9 +2,9 @@
   <div class="chart-info">
     <el-card class="box-card" shadow="never">
       <div slot="header">
-        <span>智能试题</span>
+        <span>阅卷类型</span>
       </div>
-      <div id="questionAi" />
+      <div id="questionMarkType" />
     </el-card>
     <el-card class="box-card" shadow="never">
       <div slot="header">
@@ -31,8 +31,8 @@ export default {
   async mounted() {
     this.markTypeNames = getOneDict('PAPER_MARK_TYPE').map((item) => item.dictValue)
     this.typeNames = getOneDict('QUESTION_TYPE').map((item) => item.dictValue)
-    this.id = this.$route.params.id
-    if (this.id) {
+    this.questionTypeId = this.$route.params.questionTypeId
+    if (this.questionTypeId) {
       await this.getQuestionStatis()
       this.renderChart()
     }
@@ -40,7 +40,7 @@ export default {
   methods: {
     async getQuestionStatis() {
       const res = await getQuestionStatis({
-        questionTypeId: this.id
+        questionTypeId: this.questionTypeId
       })
       this.statisInfo = res.data
     },
@@ -94,7 +94,7 @@ export default {
       this.statisInfo.typeList.map((type) => {
         type.name = this.typeNames[type.name - 1]
       })
-      this.chartDom('questionAi', this.statisInfo.markTypeList)
+      this.chartDom('questionMarkType', this.statisInfo.markTypeList)
       this.chartDom('questionType', this.statisInfo.typeList)
     }
   }
@@ -133,7 +133,7 @@ export default {
   }
 }
 
-#questionAi,
+#questionMarkType,
 #questionType {
   width: 400px;
   height: 400px;

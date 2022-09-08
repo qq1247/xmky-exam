@@ -296,7 +296,7 @@ export default {
   data() {
     return {
       editForm: {
-        type: 1, // 类型
+        type: null, // 类型
         title: '', // 题干
         options: [], // 选项
         markType: 1, // 阅卷类型（1：客观题；2：主观题）
@@ -377,6 +377,11 @@ export default {
       optionLabs: ['A','B','C','D','E','F','G'],
       judgeLabs: ['对','错']
     }
+  },
+  mounted() {
+    this.editForm.type = 1
+  },
+  created: {
   },
   watch: {
     // 如果有id，则查询并回显数据

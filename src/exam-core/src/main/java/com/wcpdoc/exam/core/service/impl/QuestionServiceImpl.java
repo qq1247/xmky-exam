@@ -304,7 +304,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		
 		Question questionOfCopy = new Question();
 		BeanUtils.copyProperties(questionOfCopy, questionOfDB);
-		questionOfCopy.setState(2);// 拷贝的默认为草稿
+		//questionOfCopy.setState(2);
 		questionOfCopy.setUpdateTime(new Date());
 		questionOfCopy.setUpdateUserId(getCurUser().getId());
 		//修改标题图片

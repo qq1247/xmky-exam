@@ -19,7 +19,7 @@
       <!-- 操作按钮与提示 -->
       <div class="top-box">
         <div>
-          <span>{{`检查区【共${total}题，`}}</span>
+          <span>{{`检查区【共${questionList.length}题，`}}</span>
           <span class="err-color">错误：{{errNum}}题】</span>
         </div>
 
@@ -32,13 +32,8 @@
         </div>
       </div>
       <div class="content-center qestion-box">
-        <QuestionList
-          ref="questionList"
-          :list="list"
-          :preview="true"
-          :show-potic="false"
-          :show-err="true"
-        />
+        <QuestionList :list="questionList">
+        </QuestionList>
       </div>
     </div>
   </div>
@@ -65,15 +60,6 @@ export default {
       questionTxt: '',
       process: 0, //进度条
       questionList: [], // 试题列表（接口格式）
-      list: {
-        // 列表数据
-        total: 0, // 总条数
-        curPage: 1, // 当前第几页
-        pageSize: 5, // 每页多少条
-        questionList: [] // 列表数据（显示格式）
-      },
-      total: 0, // 题目总数量
-      errNum: 0, // 错误的题目数量
       eg: false, // 示例
       egBak: '',
       egTxt: `1.这是一道单选题的题干，简单写法
@@ -134,30 +120,13 @@ D多选题的D选项
 
       // 文本解析为试题可读字段
       this.questionList.splice(0)
-      this.list.questionList.splice(0)
       for (let i in questionTxtArr) {
         let question = this.parseQuestion(questionTxtArr[i])
-        question.id = parseInt(i) // 用于错题定位
+        question.id = parseInt(i) + 1 // 用于错题定位
         if (question.errs && question.errs.length > 0) {
           question.title = question.txt
         }
         this.questionList.push(question)
-
-        // 组装成组件需要的格式
-        let _question = JSON.parse(JSON.stringify(question)) 
-        if (_question.type === 1) {
-          _question.answers = _question.answers[0]
-          for (let i = 0; i < _question.options.length; i++) {
-            _question.options[i] = {'no' : String.fromCharCode(65 + i), option : _question.options[i]}
-          }
-        } else if (_question.type === 2) {
-          for (let i = 0; i < _question.options.length; i++) {
-            _question.options[i] = {'no' : String.fromCharCode(65 + i), option : _question.options[i]}
-          }
-        } else if (_question.type === 4) {
-          _question.answers = _question.answers[0]
-        }
-        this.list.questionList.push(_question)
       }
     },
     // 拆分文本，每段为一道试题
@@ -217,15 +186,15 @@ D多选题的D选项
 
       let answerEndIndex = analysisIndex !== -1 ? analysisIndex : questionTxtArr.length // 有解析截取到解析，否则剩余内容都是
       let answerGroup = questionTxtArr.slice(answerIndex, answerEndIndex).join('<br/>').match(/\[(.+?)\]/g) // 按中括号拆分出答案、分数、阅卷选项
-      let scoreArr = [], answerArr = [], markTypeArr = [], subjective = false
+      let scoreArr = [], answerArr = [], markTypeOptions = [], subjective = false
       for (let answer of answerGroup) {
         answer = answer.substring(1, answer.length - 1)
         if (/^\d+分$/.test(answer)) {
           scoreArr.push(parseInt(answer.replace('分', '')))
         } else if (/^答案无顺序$/.test(answer)) {
-          markTypeArr.push(2)
+          markTypeOptions.push(2)
         } else if (/^大小写不敏感$/.test(answer)) {
-          markTypeArr.push(3)
+          markTypeOptions.push(3)
         }  else if (/^主观题$/.test(answer)) {
           subjective = true
         } else {
@@ -288,21 +257,22 @@ D多选题的D选项
       if (type === 1) {// 单选
         score = scoreArr.length > 0 ? scoreArr[0] : 1 // 如果有则使用，没有默认为1分
         answerArr.length = 1 // 去除多余答案
+        markTypeOptions = []
       } else if (type === 4) {
         score = scoreArr.length > 0 ? scoreArr[0] : 1 // 如果有则使用，没有默认为1分
         answerArr.length = 1 // 去除多余答案
         answerArr[0] = answerArr[0].replace(/^[是√]/, '对').replace(/[否×]/, '错') 
+        markTypeOptions = []
       } else if (type === 5) {// 问答
         score = scoreArr.length > 0 ? scoreArr[0] : 1 // 如果有则使用，没有默认为1分
         answerArr.length = 1 // 去除多余答案
         answerArr[0] = answerArr[0].replace(/<br\/>/g, '\n')
+        markTypeOptions = []
       } else if (type === 2) {// 多选
         score = scoreArr.length > 0 ? scoreArr[0] : 1
         answerScores.push(scoreArr.length > 1 ? scoreArr[1] : score / 2) // 如果有第二个分数则使用，没有默认为总分一半
-        if (answerArr.length > 2) {
-          answerArr.length = 2
-        }
         answerArr = answerArr[0].split("") // 答案拆分，满足接口
+        markTypeOptions = []
       } else if (type === 3) {// 填空
         score = 0;
         for (let i = 0; i < fillBlanksCount; i++) {
@@ -310,15 +280,16 @@ D多选题的D选项
           score += answerScores[i]
         }
         if (fillBlanksCount > 1 && answerArr.length === 1) {// 如果答案是写在一块按空格分割的，则进行拆分，满足接口需求
-          answerArr = answerArr[0].split(/ +/) 
+          answerArr = answerArr[0].split(/ +/).map(answer => {
+            return [answer]
+          })
         } else {// 如果答案分开写，一个答案按回车分割备选答案，满足接口需求
           answerArr = answerArr.map(answer => {
-            return answer.split(/ +/).join('\n')
+            return answer.split(/ +/)
           })
         }
         if (markType === 2) {
-          markTypeArr = [] // 主观题没有阅卷选项
-          answerScores = [] // 主观题没有子分数
+          markTypeOptions = [] // 主观题没有阅卷选项
         }
       }
 
@@ -326,12 +297,12 @@ D多选题的D选项
         type, 
         title,
         options,
-        answers : type === 5 ? answerArr[0] : answerArr,
+        answers : answerArr,
         score,
         answerScores,
         analysis,
         markType,
-        markTypeOptions: markTypeArr,
+        markTypeOptions,
         state: 1,
         questionTypeId: this.questionTypeId,
         txt: questionTxtArr.join('\n'), // 保留原始文本，用于上传失败二次处理
@@ -351,13 +322,20 @@ D多选题的D选项
     // 文本导入
     async txtImport() {
       if (this.errNum > 0) {
-        this.$message.warning('错误格式' + this.errNum + '处，请处理')
+        this.$message.warning('试题错误格式' + this.errNum + '处，请处理')
         return
       }
 
       let errTxt = ''
       for (let i in this.questionList) {
-        await questionAdd(this.questionList[i]).catch((err) => {
+        let question = this.questionList[i]
+        if (question.type === 3) {// 如果是hi填空题，处理下答案格式，符合接口
+          question = JSON.parse(JSON.stringify(question))
+          question.answers = question.answers.map(answer => {
+            return answer.join("\n")
+          })
+        }
+        await questionAdd(question).catch((err) => {
           errTxt += this.questionList[i].txt + '\n'
         })
         this.process = Math.round(i  / this.questionList.length * 100 )
@@ -374,8 +352,8 @@ D多选题的D选项
     }, 
     // 定位错误
     locationErr() {
-      for (let i in this.list.questionList) {
-        if (this.list.questionList[i].errs.length > 0) {
+      for (let i in this.questionList) {
+        if (this.questionList[i].errs.length > 0) {
           let scrollContainer = document.getElementsByClassName('qestion-box')[1]
           let eleOffSetTop = document.getElementById('p-' + i).offsetTop - 130
           scrollContainer.scrollTop = eleOffSetTop
@@ -394,17 +372,16 @@ D多选题的D选项
         this.questionTxt = this.egBak
       }
     }
-  }, 
-  watch: {
-    'list.questionList': {
-      handler() {
-        this.errNum = 0, this.total = this.list.questionList.length
-        for (let question of this.list.questionList) {
-          if (question.errs.length > 0) {
-            this.errNum++
-          }
+  },
+  computed: {
+    errNum: function () {
+      let errNum = 0
+      for (let question of this.questionList) {
+        if (question.errs.length > 0) {
+          errNum++
         }
       }
+      return errNum
     }
   }
 }

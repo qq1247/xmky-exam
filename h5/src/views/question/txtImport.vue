@@ -18,7 +18,7 @@ export default {
     }
   },
   created() {
-    this.questionTypeId = Number(this.$route.params.id)
+    this.questionTypeId = Number(this.$route.params.questionTypeId)
   },
   methods: {}
 }

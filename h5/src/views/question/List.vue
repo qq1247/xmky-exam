@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- 查询条件 -->
+    <!-- 试题查询 -->
     <el-form :inline="true" :model="queryForm" class="form-inline">
       <el-row type="flex" justify="space-between">
         <el-col :span="22">
@@ -31,7 +31,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label>
-            <el-button icon="el-icon-search" type="primary" @click="query">查询</el-button>
+            <el-button icon="el-icon-search" type="primary" @click="query(1)">查询</el-button>
           </el-form-item>
         </el-col>
         <el-col :span="2">
@@ -71,6 +71,21 @@
             <img src="@/assets/img/question/question-delete.png" alt="" />删除
           </el-button>
         </template>
+        <template #question-bottom>
+          <div class="footer">
+            <el-pagination
+              background
+              layout="prev, pager, next"
+              prev-text="上一页"
+              next-text="下一页"
+              hide-on-single-page
+              :total="queryList.total"
+              :page-size="queryList.pageSize"
+              :current-page="queryList.curPage"
+              @current-change="query"
+            />
+          </div>
+        </template>
       </QuestionList>
     </div>
 
@@ -95,7 +110,6 @@ import {
   questionCopy,
   questionDel,
   questionEdit,
-  questionPublish,
 } from 'api/question'
 import QuestionList from '@/components/Question/QuestionList.vue'
 import QuestionEdit from '@/components/Question/QuestionEdit.vue'
@@ -129,10 +143,15 @@ export default {
     this.query()
   },
   methods: {
-    // 查询
-    async query() {
+    // 试题查询
+    async query(curPage) {
+      if (curPage) {
+        this.queryList.curPage = curPage
+      }
+      
       let {data: { list, total }} = await questionListpage({
         ...this.queryForm,
+        questionTypeId: this.questionTypeId,
         curPage: this.queryList.curPage, 
         pageSize: this.queryList.pageSize
       })
@@ -140,48 +159,43 @@ export default {
       this.queryList.total = total
       this.queryList.list = list
     },
-    // 分页查询
-    pageChange(val = 1) {
-      this.queryList.curPage = val
-      this.query()
-    },
-    // 添加试题
-    toAdd(id) {
+    // 试题添加
+    toAdd() {
       this.showEditForm = true
     },
-    // 添加试题
-    async add(params) {
+    add(params) {
       params.questionTypeId = this.questionTypeId
-      const res = await questionAdd(params)
-      this.$message.success(res.msg)
-
-      this.queryList.curPage = 1
-      this.query()
+      questionAdd(params).then((res) => {
+        this.$message.success('添加成功')
+        this.query(1)
+      })
     },
-    // 修改试题
+    // 试题修改
     toEdit(id) {
       this.showEditForm = true
       this.id = id
     },
-    // 修改试题
-    async edit(params) {
-      const res = await questionEdit(params)
-      this.$message.success(res.msg)
+    edit(params) {
+      questionEdit(params).then(() => {
+        this.$message.success('修改成功')
+        this.query(1)
+      })
+    },
+    // 试题复制
+    copy(id) {
+      questionCopy({ id }).then(() => {
+        this.$message.success('复制成功')
+        this.query()
+      })
+      
+    },
+    // 试题删除
+    del(id) {
+      questionDel({ ids: [`${id}`] }).then(() => {
+        this.$message.success('删除成功')
+        this.query()
+      })
 
-      this.queryList.curPage = 1
-      this.query()
-    },
-    // 复制试题
-    async copy(id) {
-      await questionCopy({ id })
-    },
-    // 删除试题
-    async del(id) {
-      await questionDel({ ids: [`${id}`] })
-    },
-    // 发布试题
-    async publish(id, state) {
-      await questionPublish({ids: [`${id}`]})
     },
   },
 }
@@ -211,5 +225,20 @@ export default {
   border-left: 1px solid rgba(0, 0, 0, 0.1);
   // border-right: 1px solid rgba(0, 0, 0, 0.1);
   padding-bottom: 40px;
+}
+
+.footer {
+  background: #fff;
+  width: 100%;
+  height: 40px;
+  color: #333;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding-left: 16px;
+  display: flex;
+  align-items: center;
 }
 </style>

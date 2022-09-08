@@ -1,44 +1,66 @@
 <template>
   <div class="container">
     <template v-if="hasChildren">
-      <!-- 搜索 -->
+      <!-- 题库查询 -->
       <el-form :inline="true" :model="queryForm" class="form-inline search">
         <div>
           <el-form-item>
             <el-input
-              v-model="queryForm.queryName"
-              placeholder="请输入名称"
+              v-model="queryForm.name"
+              placeholder="请输入题库名称"
               class="query-input"
             />
           </el-form-item>
         </div>
         <el-form-item>
-          <el-button
-            icon="el-icon-search"
-            type="primary"
-            @click="search"
-          >查询</el-button>
+          <el-button icon="el-icon-search" type="primary" @click="query">查询</el-button>
         </el-form-item>
       </el-form>
 
-      <!-- 内容 -->
+      <!-- 题库列表 -->
       <div class="content">
         <div class="exam-list">
           <AddCard add-title="添加题库" @addCard="add" />
-          <IndexCard
-            v-for="(item, index) in typeList"
-            :key="index"
-            :data="item"
-            name="question"
-            @del="del"
-            @edit="edit"
-            @role="role"
-            @open="open"
-            @move="move"
-            @detail="questionList"
-            @statistics="statistics"
-            @txtImport="txtImport"
-          />
+          <div
+            v-for="(questionType, index) in queryList.list"
+            :key="`questionType${index}`"
+            class="exam-item"
+          >
+            <div class="exam-content">
+              <div class="title ellipsis">
+                {{ questionType.name }}
+              </div>
+              <div class="content-info ellipsis"></div>
+              <div class="content-info ellipsis">
+                <span>试题数量：{{ questionType.questionNum }}</span>
+              </div>
+              <div class="handler">
+                <span data-title="修改" @click="edit(questionType.id)">
+                  <i class="common common-edit" />
+                </span>
+                <span data-title="删除" @click="del(questionType.id)">
+                  <i class="common common-delete" />
+                </span>
+                <span data-title="合并" @click="move(questionType.id)">
+                  <i class="common common-move" />
+                </span>
+                <span data-title="试题列表" @click="questionList(questionType.id)">
+                  <i class="common common-list-row" />
+                </span>
+                <span data-title="文本导入" @click="txtImport(questionType.id)">
+                  <i class="common common-template-down" />
+                </span>
+                <span class="last-span">
+                  <i class="common common-more-row" />
+                  <div class="handler-more">
+                    <div class="more-item" @click="statistics(questionType.id)">
+                      <i class="common common-statistics" />试题统计
+                    </div>
+                  </div>
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
         <!-- 分页 -->
         <el-pagination
@@ -47,14 +69,13 @@
           prev-text="上一页"
           next-text="下一页"
           hide-on-single-page
-          :total="total"
-          :page-size="pageSize"
-          :current-page="curPage"
-          @current-change="pageChange"
+          :total="queryList.total"
+          :page-size="queryList.pageSize"
+          :current-page="queryList.curPage"
+          @current-change="query()"
         />
       </div>
     </template>
-
     <router-view v-else />
   </div>
 </template>
@@ -62,123 +83,108 @@
 <script>
 import { questionTypeListpage, questionTypeAdd } from 'api/question'
 import AddCard from 'components/ListCard/AddCard.vue'
-import IndexCard from '@/components/ListCard/IndexCard.vue'
 export default {
   components: {
     AddCard,
-    IndexCard
   },
   data() {
     return {
-      pageSize: 5,
-      total: 1,
-      curPage: 1,
       queryForm: {
-        queryName: ''
+        name: null, // 题库名称
       },
-      typeList: []
+      queryList: {
+        curPage: 1, // 当前第几页
+        pageSize: 5, // 每页多少条
+        total: 0, // 总条数
+        list: [], // 数据列表
+      },
     }
   },
   computed: {
     hasChildren() {
       return !(this.$route.matched.length > 2)
-    }
+    },
   },
   mounted() {
     this.query()
   },
   methods: {
-    // 查询题库数据
-    async query() {
-      const typeList = await questionTypeListpage({
-        name: this.queryForm.queryName,
-        curPage: this.curPage,
-        pageSize: this.pageSize
-      })
-
-      if (!typeList.data.list.length) {
-        const res = await questionTypeAdd({
-          name: '我的题库'
-        })
-
-        if (res?.code === 200) {
-          this.query()
-        }
+    // 题库查询
+    async query(curPage) {
+      // 题库查询
+      if (curPage) {
+        this.queryList.curPage = curPage
       }
 
-      this.typeList = typeList.data.list
-      this.total = typeList.data.total
+      let {data: { list, total }} = await questionTypeListpage({
+        ...this.queryForm,
+        curPage: this.queryList.curPage,
+        pageSize: this.queryList.pageSize,
+      })
+
+      this.queryList.total = total
+      this.queryList.list = list
+
+        // 如果是第一次访问，自动添加一个默认题库
+      if (!list.length) {
+        let res = await questionTypeAdd({
+          name: '我的题库',
+        })
+
+        this.query()
+      }
     },
-    // 搜索
-    search() {
-      this.curPage = 1
-      this.query()
-    },
-    // 添加题库
+    // 题库添加
     add() {
       this.$tools.switchTab('QuestionIndexSetting', {
-        id: 0,
-        tab: '1'
+        questionTypeId: 0,
+        tab: '1',
       })
     },
-    // 编辑题库
-    edit({ id }) {
+    // 题库修改
+    edit(id) {
+      console.log({
+        questionTypeId: id,
+        tab: '1',
+      })
       this.$tools.switchTab('QuestionIndexSetting', {
-        id,
-        tab: '1'
+        questionTypeId: id,
+        tab: '1',
       })
     },
     // 试题列表
-    questionList({ id }) {
+    questionList(id) {
       this.$tools.switchTab('QuestionIndexList', {
-        questionTypeId : id
-      })
-    },
-    // 权限人员信息
-    role({ id }) {
-      this.$tools.switchTab('QuestionIndexSetting', {
-        id,
-        tab: '2'
+        questionTypeId: id,
       })
     },
     // 合并试题
-    move({ id }) {
+    move(id) {
       this.$tools.switchTab('QuestionIndexSetting', {
-        id,
-        tab: '3'
+        questionTypeId: id,
+        tab: '2',
       })
     },
-    // 试题开放
-    open({ id }) {
-      this.$tools.switchTab('QuestionIndexOpen', {
-        id
-      })
-    },
-    // 统计
-    statistics({ id }) {
-      this.$tools.switchTab('QuestionIndexStatistics', {
-        id
-      })
-    },
-    // 文本导入
-    txtImport({ id }) {
+    // 题库导入
+    txtImport(id) {
       this.$tools.switchTab('QuestionIndexTxtImport', {
-        id
+        questionTypeId: id,
       })
     },
-    // 删除题库
-    del({ id }) {
+    // 题库删除
+    del(id) {
       this.$tools.switchTab('QuestionIndexSetting', {
-        id,
-        tab: '4'
+        questionTypeId: id,
+        tab: '3',
       })
     },
-    // 分页切换
-    pageChange(val) {
-      val && (this.curPage = val)
-      this.query()
-    }
-  }
+    // 题库统计
+    statistics(id) {
+      this.$tools.switchTab('QuestionIndexStatistics', {
+        questionTypeId: id
+      })
+    },
+  },
 }
 </script>
 

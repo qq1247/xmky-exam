@@ -344,9 +344,9 @@
  
   .children-option {
     padding: 10px 0 0 25px;
-    /deep/ .is-checked {
-      font-weight: bold;
-    }
+    // /deep/ .is-checked {
+    //   font-weight: bold;
+    // }
   }
   .option-item {
     display: flex;

@@ -15,6 +15,8 @@
       <el-empty v-if="list.length === 0" description="暂无试题">
         <img slot="image" src="@/assets/img/data-null.png" alt="" />
       </el-empty>
+      <!-- 试题底部插槽，可用于放分页等信息 -->
+      <slot name="question-bottom"></slot>
     </el-scrollbar>
 
     <!-- 切换样式按钮区域 -->
@@ -26,9 +28,6 @@
         <i class="el-icon-menu"></i>
       </div>
     </div>
-
-    <!-- 存放自定义信息插槽，如分页 -->
-    <slot name="content-bottom"></slot>
   </div>
 </template>
 
