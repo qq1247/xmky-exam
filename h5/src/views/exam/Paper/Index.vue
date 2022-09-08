@@ -1,5 +1,6 @@
 <template>
   <div class="content">
+    <!-- 答题卡 -->
     <div class="paper-router">
       <el-divider >答题卡</el-divider>
       <div class="router-content">
@@ -38,59 +39,35 @@
       </div> -->
     </div> 
 
+    <!-- 试卷 -->
     <el-scrollbar wrap-style="overflow-x:hidden;" class="paper-content">
       <div class="top">
         <div class="top-title">
           <el-input v-model="paperName" placeholder="请输入试卷名称" maxlength="32"></el-input>
         </div>
         <div class="top-handler"> 
-          <!-- 编辑、预览模式 -->
-          <el-tooltip class="item" effect="dark" content="选择题库" placement="top">
-            <el-button icon="el-icon-zoom-in" size="mini" round @click="drawer=true">选择题库</el-button>
-          </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="即时编辑试题，快速导入" placement="top">
-            <el-button icon="el-icon-edit-outline" size="mini" round @click="toEditor">导入试题</el-button>
-          </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="添加章节" placement="top">
-            <el-button icon="el-icon-plus" size="mini" round>添加章节</el-button>
-          </el-tooltip>
-          <el-tooltip class="item" effect="dark" content="清空试题" placement="top">
-            <el-button icon="el-icon-delete" size="mini" round>清空试题</el-button>
-          </el-tooltip>
-          <!-- <el-button icon="el-icon-edit" size="mini" round></el-button>
-          <el-button icon="el-icon-edit" size="mini" round>添加章节</el-button>
-          <el-button icon="el-icon-edit" size="mini" round>清空试题</el-button> -->
-          <!-- <div class="type">
-            <div
-              class="type-item"
-              :class="!preview ? 'edit-active' : ''"
-              title="编辑模式"
-              @click="setType(false)"
-            >
-              <img src="@/assets/img/question/question-edit.png" alt="">
-            </div>
-            <div
-              class="type-item"
-              :class="preview ? 'view-active' : ''"
-              title="预览模式"
-              @click="setType(true)"
-            >
-              <img src="@/assets/img/question/question-view.png" alt="">
-            </div>
-          </div> -->
+          <el-button icon="el-icon-zoom-in" size="mini" round @click="drawer=true">选择题库</el-button>
+          <el-button icon="el-icon-edit-outline" size="mini" round @click="toEditor">导入试题</el-button>
+          <el-button icon="el-icon-plus" size="mini" round>添加章节</el-button>
+          <el-button icon="el-icon-delete" size="mini" round>清空试题</el-button>
         </div>
       </div>
-      <Composition
-        v-if="!preview"
-        ref="paperComposition"
-        :questionList="questionViewList"
-      />
-      <Preview v-if="preview" ref="paperPreview" />
-      <slot></slot>
+      <Draggable
+        v-model="questionList"
+        tag="div"
+        group="questionGroup"
+        animation="300"
+      >
+        <QuestionList :list="questionList">
+          
+        </QuestionList>
+      </Draggable>
     </el-scrollbar>
+
+    <!-- 题库 -->
     <el-drawer
       title="题库"
-      :visible.sync="drawer"
+      :visible.sync="showQuestionList"
       direction="rtl"
       size="500px"
       :modal-append-to-body="false"
@@ -104,36 +81,31 @@
   </div>
 </template>
 <script>
-// import Preview from '@/views/paper/List/Edit/RulePaper/Content/Preview.vue'
 import Composition from './Composition.vue'
-import QuestionList from './QuestionList.vue'
+import QuestionList from '@/components/Question/QuestionList.vue'
+import Draggable from 'vuedraggable'
 import { getQuick } from '@/utils/storage'
 import { questionListpage } from 'api/question'
 export default {
   components: {
-    // Preview,
     Composition,
-    QuestionList
+    QuestionList,
+    Draggable,
   },
   data() {
     return {
-      preview: false,
-      paperId: 0,
-      paperState: 2,
-      paperTypeId: 0,
-      markType: 1,
-      paperName: '这里是试卷名称',
-      drawer: false, // 抽题默认不显示
+      paperName: '点击这里输入试卷名称',
+      showQuestionList: false, // 显示题库
       questionList: []
     }
   },
   async created() {
-    // const res = await questionListpage({}) 
-    // if (res?.code === 200) {
-    //   this.questionList = res.data.list
-    // } else {
-    //   this.$message.error('请刷新重新获取试题！')
-    // }
+    const res = await questionListpage({}) 
+    if (res?.code === 200) {
+      this.questionList = res.data.list
+    } else {
+      this.$message.error('请刷新重新获取试题！')
+    }
   },
   computed: {
     questionViewList: function () {
@@ -297,41 +269,6 @@ export default {
     }
   }
   
-}
-.type {
-  display: flex;
-  justify-content: flex-end;
-  background: #fff;
-  border: 1px solid #eee;
-  border-radius: 4px;
-  margin-right: 16px;
-  .type-item {
-    width: 20px;
-    height: 20px;
-    line-height: 20px;
-    text-align: center;
-    cursor: pointer;
-    &:first-child {
-      border-radius: 2px 0 0 2px;
-    }
-    &:last-child {
-      border-radius: 0 2px 2px 0;
-    }
-  }
-  .edit-active {
-    background: #0094e5;
-    color: #fff;
-    img {
-      content: url('~@/assets/img/question/question-edit-active.png');
-    }
-  }
-  .view-active {
-    background: #0094e5;
-    color: #fff;
-    img {
-      content: url('~@/assets/img/question/question-view-active.png');
-    }
-  }
 }
 /deep/ .el-drawer__header {
   margin-bottom: 0px;

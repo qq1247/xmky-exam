@@ -6,7 +6,6 @@ export default [
     redirect: '/question/index',
     name: 'Question',
     meta: {
-      title: '题库管理',
       icon: 'common common-question-manage',
       layout: 'subAdmin',
       roles: ['subAdmin']
@@ -67,7 +66,6 @@ export default [
     component: Layout,
     redirect: '/exam/index',
     meta: {
-      title: '考试管理',
       icon: 'common common-exam-manage',
       layout: 'subAdmin',
       roles: ['subAdmin']
@@ -149,7 +147,6 @@ export default [
     redirect: '/myExam/index',
     name: 'MyExam',
     meta: {
-      title: '考试管理',
       layout: 'user',
       icon: 'common common-question-manage',
       roles: ['user', 'subAdmin']
@@ -192,7 +189,6 @@ export default [
     redirect: '/myMark/index',
     name: 'MyMark',
     meta: {
-      title: '阅卷管理',
       layout: 'subAdmin',
       icon: 'common common-mark-paper',
       roles: ['user', 'subAdmin']
@@ -239,7 +235,6 @@ export default [
     redirect: '/simulate/index',
     name: 'Simulate',
     meta: {
-      title: '模拟练习',
       icon: 'common common-simulate',
       layout: 'user',
       roles: ['user']
@@ -273,7 +268,6 @@ export default [
     redirect: '/quick/index',
     name: 'Quick',
     meta: {
-      title: '快捷考试',
       icon: 'common common-quick',
       layout: 'subAdmin',
       roles: ['subAdmin'],

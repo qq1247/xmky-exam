@@ -11,23 +11,20 @@
           {{ item }}
         </div>
       </div>
-      <PaperSetting v-if="activeIndex == 0" @switchTab="switchTab"></PaperSetting>
+      <PaperSetting v-if="activeIndex === 0" @switchTab="switchTab"></PaperSetting>
       <QuestionTxtImport v-if="activeIndex === 1 && createdType === 1" :isBack="false" ref="QuestionTxtImport"/>
       <ExamSetting v-if="activeIndex === 2" style="height: calc(100vh - 220px);" ref="ExamSetting"/>
       <MarkSetting v-if="activeIndex === 3" style="height: calc(100vh - 220px);" ref="MarkSetting"/>
       <ExamPublish v-if="activeIndex === 4" style="height: calc(100vh - 220px);" ref="ExamPublish"/>
     </div>
 
-    <Paper 
-      v-if="activeIndex == 1 && createdType === 0" 
-      @toEditor="toEditor"
-      ref="Paper">
-    </Paper>
+    <Paper v-if="activeIndex == 1 && createdType === 0"  @toEditor="toEditor" ref="Paper"></Paper>
 
     <div v-if="activeIndex !=0 && createdType === 0" class="paper-footer" :style="{marginTop: activeIndex == 1 ? '-47px' : '-67px'}">
       <el-button type="primary" @click="back" size="small">上一步</el-button>
       <el-button type="primary" @click="next" size="small">{{activeIndex == 4 ? '完成' : '下一步'}}</el-button>
     </div>
+    
     <div class="exam-bottom" v-if="activeIndex == 0">
       <el-form ref="paperForm" :model="paperForm" :rules="paperForm.rules" label-width="140px" label-position="left">
         <el-form-item label="从考试中选择" prop="selectPaperId">
