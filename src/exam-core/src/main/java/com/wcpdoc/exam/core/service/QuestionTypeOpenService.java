@@ -14,7 +14,7 @@ import com.wcpdoc.exam.core.entity.QuestionTypeOpen;
 public interface QuestionTypeOpenService extends BaseService<QuestionTypeOpen> {
 	
 	/**
-	 * 添加试题分类开放
+	 * 添加题库开放
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
 	 * 
@@ -24,7 +24,7 @@ public interface QuestionTypeOpenService extends BaseService<QuestionTypeOpen> {
 	void addAndUpdate(QuestionTypeOpen questionTypeOpen);
 	
 	/**
-	 * 删除试题分类开放
+	 * 删除题库开放
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
 	 * 

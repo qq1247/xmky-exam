@@ -14,7 +14,6 @@ import com.wcpdoc.exam.core.dao.QuestionTypeDao;
 import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.service.QuestionTypeExService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
-import com.wcpdoc.file.service.FileService;
 /**
  * 题库服务层实现
  * 
@@ -26,9 +25,6 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 	private QuestionTypeDao questionTypeDao;
 	@Resource
 	private QuestionTypeExService questionTypeExService;
-	@Resource
-	private FileService fileService;
-	
 
 	@Override
 	@Resource(name = "questionTypeDaoImpl")
@@ -46,13 +42,10 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 		//	throw new MyException("名称已存在");
 		//} // 不同的子管理员添加可以重复
 		
-		// 添加试题分类
+		// 添加题库
 		questionType.setUpdateTime(new Date());
 		questionType.setUpdateUserId(getCurUser().getId());
 		add(questionType);
-		
-		//保存图片
-		//fileService.doUpload(imgId);
 	}
 
 	@Override
@@ -62,49 +55,32 @@ public class QuestionTypeServiceImpl extends BaseServiceImp<QuestionType> implem
 			throw new MyException("参数错误：name");
 		}
 		QuestionType entity = getEntity(questionType.getId());
+		if (entity.getUpdateUserId().intValue() != getCurUser().getId()) {
+			throw new MyException("无操作权限");
+		}
 		
-		//保存图片
-		//if (entity.getImgFileId().intValue() != questionType.getImgFileId().intValue()) {
-		//	fileService.doUpload(imgId);
-		//}
-		
-		// 保存试题分类
+		// 保存题库
 		entity.setName(questionType.getName());
-		entity.setImgFileId(questionType.getImgFileId());
 		entity.setUpdateTime(new Date());
-		entity.setUpdateUserId(getCurUser().getId());
 		update(entity);
 	}
 	
 	@Override
 	public void delAndUpdate(Integer id) {
-		// 删除试题分类
-		QuestionType questionType = getEntity(id);
-		del(questionType.getId());
+		//校验数据有效性
+		QuestionType entity = getEntity(id);
+		if (entity.getUpdateUserId().intValue() != getCurUser().getId()) {
+			throw new MyException("无操作权限");
+		}
+		// 删除题库
+		del(entity.getId());
 		
-		// 删除试题分类扩展
-		questionTypeExService.delAndUpdate(questionType);
+		// 删除题库扩展
+		questionTypeExService.delAndUpdate(entity);
 	}
 
 	@Override
-	public void auth(Integer id, Integer[] writeUserIds) {
-		// 校验数据有效性
-		QuestionType entity = getEntity(id);
-		
-		// 更新权限
-//		if (!ValidateUtil.isValid(writeUserIds)) {
-//			entity.setWriteUserIds(String.format(",%s,", entity.getCreateUserId()));// 如果没有，默认就是创建人（查询的时候方便）
-//		} else {
-//			entity.setWriteUserIds(String.format(",%s,", StringUtil.join(writeUserIds)));
-//			if (!entity.getWriteUserIds().contains(String.format(",%s,", entity.getCreateUserId()))) {// 如果页面没有选择创建人，追加创建人
-//				entity.setWriteUserIds(String.format("%s%s,", entity.getWriteUserIds(), entity.getCreateUserId()));
-//			}
-//		}
-		entity.setUpdateTime(new Date());
-		entity.setUpdateUserId(getCurUser().getId());
-		update(entity);
-		
-		// 更新权限扩展
-		questionTypeExService.auth(entity);
+	public void move(Integer sourceId, Integer targetId) {
+		questionTypeExService.move(sourceId, targetId);
 	}
 }

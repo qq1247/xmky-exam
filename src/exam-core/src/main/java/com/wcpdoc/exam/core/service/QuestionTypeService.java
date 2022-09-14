@@ -10,7 +10,7 @@ import com.wcpdoc.exam.core.entity.QuestionType;
 public interface QuestionTypeService extends BaseService<QuestionType> {
 	
 	/**
-	 * 添加试题分类
+	 * 题库添加
 	 * 
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * @param questionType
@@ -19,7 +19,7 @@ public interface QuestionTypeService extends BaseService<QuestionType> {
 	void addAndUpdate(QuestionType questionType);
 
 	/**
-	 * 修改试题
+	 * 题库修改
 	 * 
 	 * v1.0 chenyun 2021年3月18日上午10:20:28
 	 * @param questionType
@@ -28,7 +28,7 @@ public interface QuestionTypeService extends BaseService<QuestionType> {
 	void editAndUpdate(QuestionType questionType);
 	
 	/**
-	 * 删除试题分类
+	 * 题库删除
 	 * v1.0 zhanghc 2016-5-24下午14:54:09
 	 * @param id
 	 * void
@@ -36,12 +36,12 @@ public interface QuestionTypeService extends BaseService<QuestionType> {
 	void delAndUpdate(Integer id);
 
 	/**
-	 * 授权
+	 * 题库合并
 	 * 
-	 * v1.0 zhanghc 2020年9月8日上午10:06:53
-	 * @param id
-	 * @param writeUserIds
-	 * void
+	 * v1.0 zhanghc 2022年6月16日下午4:44:00
+	 * @param sourceId
+	 * @param targetId void
 	 */
-	void auth(Integer id, Integer[] writeUserIds);
+	void move(Integer sourceId, Integer targetId);
+
 }

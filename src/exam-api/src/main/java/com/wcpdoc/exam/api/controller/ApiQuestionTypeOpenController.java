@@ -39,7 +39,7 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	private QuestionService questionService;
 	
 	/**
-	 * 试题分类开放列表
+	 * 题库开放列表
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
 	 * @return pageOut
@@ -56,7 +56,7 @@ public class ApiQuestionTypeOpenController extends BaseController {
 			}
 			return PageResultEx.ok().data(questionTypeOpenService.getListpage(pageIn));
 		} catch (Exception e) {
-			log.error("试题分类开放列表错误：", e);
+			log.error("题库开放列表错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -76,13 +76,13 @@ public class ApiQuestionTypeOpenController extends BaseController {
 			.addAttr("open", "open");
 			return PageResultEx.ok().data(questionTypeOpenService.questionListpage(pageIn));
 		} catch (Exception e) {
-			log.error("试题分类开放列表错误：", e);
+			log.error("题库开放列表错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 完成添加试题分类开放
+	 * 完成添加题库开放
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
 	 * @return pageOut
@@ -94,16 +94,16 @@ public class ApiQuestionTypeOpenController extends BaseController {
 			questionTypeOpenService.addAndUpdate(questionTypeOpen);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("完成添加试题分类开放错误：{}", e.getMessage());
+			log.error("完成添加题库开放错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("完成添加试题分类开放错误：", e);
+			log.error("完成添加题库开放错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 完成修改试题分类开放
+	 * 完成修改题库开放
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
 	 * @return pageOut
@@ -128,16 +128,16 @@ public class ApiQuestionTypeOpenController extends BaseController {
 			questionTypeOpenService.update(entity);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("完成修改试题分类开放错误：{}", e.getMessage());
+			log.error("完成修改题库开放错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("完成修改试题分类开放错误：", e);
+			log.error("完成修改题库开放错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 完成删除试题分类开放
+	 * 完成删除题库开放
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
 	 * @return pageOut
@@ -149,10 +149,10 @@ public class ApiQuestionTypeOpenController extends BaseController {
 			questionTypeOpenService.delAndUpdate(id);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("完成删除试题分类开放错误：{}", e.getMessage());
+			log.error("完成删除题库开放错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("完成删除试题分类开放错误：", e);
+			log.error("完成删除题库开放错误：", e);
 			return PageResult.err();
 		}
 	}

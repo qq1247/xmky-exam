@@ -26,14 +26,5 @@ public interface QuestionTypeExService{
 	 * @param targetId void
 	 */
 	void move(Integer sourceId, Integer targetId);
-
-	/**
-	 * 授权
-	 * 
-	 * v1.0 zhanghc 2022年6月20日上午11:30:09
-	 * @param questionType void
-	 */
-	void auth(QuestionType questionType);
-	
 }
 

@@ -27,8 +27,6 @@ public class QuestionType {
 	private Integer id;
 	@Column(name = "NAME")
 	private String name;
-	@Column(name = "IMG_FILE_ID")
-	private Integer imgFileId;
 	@Column(name = "UPDATE_USER_ID")
 	private Integer updateUserId;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -50,14 +48,6 @@ public class QuestionType {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public Integer getImgFileId() {
-		return imgFileId;
-	}
-
-	public void setImgFileId(Integer imgFileId) {
-		this.imgFileId = imgFileId;
 	}
 
 	public Integer getUpdateUserId() {

@@ -270,7 +270,7 @@ public class ExamExServiceImpl extends BaseServiceImp<Exam> implements ExamExSer
 	}
 
 	private Map<Integer, List<Question>> getQuestionListCache(Map<Integer, List<ExamRule>> ruleCache) {
-		Map<Integer, List<Question>> questionListCache = new HashMap<>();// 按 试题分类 分组的试题
+		Map<Integer, List<Question>> questionListCache = new HashMap<>();// 按 题库 分组的试题
 		for (List<ExamRule> ruleList : ruleCache.values()) {
 			for (ExamRule rule : ruleList) {
 				if (questionListCache.get(rule.getQuestionTypeId()) != null) {

@@ -1,6 +1,5 @@
 package com.wcpdoc.exam.core.service.impl;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -18,7 +17,7 @@ import com.wcpdoc.exam.core.service.QuestionTypeExService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 
 /**
- * 试题分类扩展服务层实现
+ * 题库扩展服务层实现
  * 
  * v1.0 zhanghc 2017-05-07 14:56:29
  */
@@ -35,7 +34,7 @@ public class QuestionTypeExServiceImpl extends BaseServiceImp<QuestionType> impl
 		PageIn pageIn = new PageIn().setPageSize(1).addAttr("questionTypeId", questionType.getId().toString());
 		int questionNum = questionService.getListpage(pageIn).getTotal();
 		if (questionNum > 0) {
-			throw new MyException("请先删除该分类下试题");
+			throw new MyException("该题库有试题，不允许删除");
 		}
 	}
 
@@ -66,22 +65,12 @@ public class QuestionTypeExServiceImpl extends BaseServiceImp<QuestionType> impl
 		}
 		
 		
-		// 移动
+		// 合并
 		List<Question> questionList = questionService.getList(sourceId);
 		for (Question question : questionList) {
 			question.setQuestionTypeId(targetId);
 			//question.setUpdateTime(new Date());
 			//question.setUpdateUserId(getCurUser().getId()); // 保留移动前的
-			questionService.update(question);
-		}
-	}
-
-	@Override
-	public void auth(QuestionType questionType) {
-		List<Question> questionList = questionService.getList(questionType.getId());
-		for (Question question : questionList) {
-			question.setUpdateTime(new Date());
-			question.setUpdateUserId(getCurUser().getId());
 			questionService.update(question);
 		}
 	}
