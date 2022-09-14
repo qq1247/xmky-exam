@@ -1,0 +1,461 @@
+<template>
+  <div class="content">
+    <!-- 答题卡 -->
+    <div class="paper-router">
+      <el-divider>答题卡</el-divider>
+      <div class="router-content">
+        <Draggable
+          v-model="paperQuestion"
+          tag="div"
+          group="questionGroup"
+          chosen-class="drag-question-active"
+          animation="300"
+        >
+          <div
+            v-for="(item, index) in paperQuestion"
+            :key="index"
+            :style="{'display': item.type === 1 ? 'block' : 'inline-block'}"
+          >
+            <div v-if="item.type === 1" class="router-title">
+              {{item.chapterName}}
+            </div>
+            <div v-else>
+              <a :class="['router-index']" @click="toHref(item)">{{
+                index + 1
+              }}</a>
+            </div>
+          </div>
+        </Draggable>
+      </div>
+    </div>
+    <!-- 试卷 -->
+    <el-scrollbar wrap-style="overflow-x:hidden;" class="paper-content">
+      <div class="top">
+        <div class="top-title">
+          <el-input
+            :value="paperName"
+            @input="updatePaperName"
+            placeholder="请输入试卷名称"
+            maxlength="32"
+          ></el-input>
+        </div>
+        <div class="top-handler">
+          <el-button
+            icon="el-icon-zoom-in"
+            size="mini"
+            round
+            @click="toAdd"
+            >题库选择</el-button
+          >
+          <el-button
+            icon="el-icon-edit-outline"
+            size="mini"
+            round
+            @click="toEditor"
+            >试题导入</el-button
+          >
+          <el-button icon="el-icon-plus" size="mini" @click="addChapter" round>章节添加</el-button>
+          <el-button icon="el-icon-delete" size="mini" round @click="questionClear">试卷重置</el-button>
+        </div>
+      </div>
+      <div class="content-center"
+        v-for="(p, index) of paperQuestion"
+        :key="`paperQuestion${index}`"
+      >
+        <div v-if="p.type === 1" class="chapter">
+          <el-input
+            v-model="p.chapterName"
+            placeholder="请输入章节名称"
+            maxlength="16"
+          />
+          <el-input
+              v-model="p.chapterTxt"
+              :rows="2"
+              placeholder="请输入描述"
+              type="textarea"
+              :autosize="true"
+            />
+        </div>
+        <Question
+          v-else-if="p.type === 2"
+          :question="p.question"
+          :no="index + 1"
+        />
+      </div>
+    </el-scrollbar>
+
+    <!-- 题库 -->
+    <el-drawer
+      title="题库"
+      :visible.sync="showQuestionList"
+      direction="rtl"
+      size="700px"
+      :modal-append-to-body="false"
+      :modal="false"
+    >
+      <!-- 试题查询 -->
+      <el-form :inline="true" :model="queryForm" class="form-inline" size="small">
+        <el-row type="flex" justify="space-between">
+          <el-col :span="22">
+            <el-form-item label>
+              <el-input v-model="queryForm.questionTypeName" placeholder="题库名称" />
+            </el-form-item>
+            <el-form-item label>
+              <el-input v-model="queryForm.id" placeholder="编号" />
+            </el-form-item>
+            <el-form-item label>
+              <el-input v-model="queryForm.title" placeholder="题干" />
+            </el-form-item>
+            <el-form-item label>
+              <el-select v-model="queryForm.type" clearable placeholder="类型">
+                <el-option
+                  v-for="dict in $tools.getDicts('QUESTION_TYPE')"
+                  :key="parseInt(dict.dictKey)"
+                  :label="dict.dictValue"
+                  :value="parseInt(dict.dictKey)"
+                />
+              </el-select>
+            </el-form-item>
+            <el-form-item label>
+              <el-select v-model="queryForm.markType" clearable placeholder="阅卷类型">
+                <el-option
+                  v-for="dict in $tools.getDicts('PAPER_MARK_TYPE')"
+                  :key="parseInt(dict.dictKey)"
+                  :label="dict.dictValue"
+                  :value="parseInt(dict.dictKey)"
+                />
+              </el-select>
+            </el-form-item>
+            <el-form-item label>
+              <el-dropdown split-button type="primary" @click="query(1)" size="small" @command="queryCmd">
+                查询
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item command="randAdd">随机添加10道</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+
+      <!-- 试题列表 -->
+      <div class="content">
+        <QuestionList :list="queryList.list" :showMode="'simple'">
+          <template #question-btn="{ question }">
+            <el-button
+              class="btn"
+              size="mini"
+              type="primary"
+              icon="el-icon-back"
+              @click="questionImport(question)"
+            >
+              导入
+            </el-button>
+          </template>
+          <template #question-bottom>
+            <div class="footer">
+              <el-pagination
+                background
+                layout="prev, pager, next"
+                prev-text="上一页"
+                next-text="下一页"
+                hide-on-single-page
+                :total="queryList.total"
+                :page-size="queryList.pageSize"
+                :current-page="queryList.curPage"
+                @current-change="query"
+              />
+            </div>
+          </template>
+        </QuestionList>
+      </div>
+    </el-drawer>
+  </div>
+</template>
+<script>
+import Draggable from 'vuedraggable'
+import Question from '@/components/Question/Question.vue'
+import { questionListpage } from 'api/question'
+import QuestionList from '@/components/Question/QuestionList.vue'
+import { mapMutations } from 'vuex'
+import { mapState } from 'vuex'
+export default {
+  components: {
+    Draggable,
+    Question,
+    QuestionList,
+  },
+  data() {
+    return {
+      showQuestionList: false, // 显示题库
+      queryForm: {
+        questionTypeName: null, // 题库
+        id: null, // 主键
+        title: null, // 标题
+        type: null, // 试题类型
+        markType: null, // 阅卷类型
+      },
+      queryList: {
+        curPage: 1, // 当前第几页
+        pageSize: 5, // 每页多少条
+        total: 0, // 总条数
+        list: [], // 数据列表
+      },
+      
+    }
+  },
+  computed: mapState('exam', {
+    paperQuestion: state => state.paperQuestion,
+    paperName: state => state.paperName,
+  }),
+  methods: {
+    ...mapMutations('exam', [
+      'updatePaperName',
+      'addChapter',
+      'addQuestion',
+    ]),
+    toEditor() {
+      this.$emit('toEditor')
+    },
+    // 跳转到对应的试题
+    toHref(index) {
+      document
+        .querySelector(`#p-${index}`)
+        .scrollIntoView({ block: 'end', inline: 'nearest' })
+    },
+    // 
+    toAdd() {
+      this.showQuestionList = true
+      this.query(1)
+    },
+    // 试题查询
+    async query(curPage) {
+      if (curPage) {
+        this.queryList.curPage = curPage
+      }
+
+      let exIds = []
+      this.paperQuestion.forEach(paper => {
+        if (paper.type === 2) {
+          exIds.push(paper.question.id)
+        }
+      });
+      
+      let {data: { list, total }} = await questionListpage({
+        ...this.queryForm,
+        exIds: exIds.join(),
+        curPage: this.queryList.curPage, 
+        pageSize: this.queryList.pageSize
+      })
+
+      this.queryList.total = total
+      this.queryList.list = list
+    },
+    // 查询命令
+    async queryCmd(cmd) {
+      if (cmd === 'randAdd') {
+        let exIds = []
+        this.paperQuestion.forEach(paper => {
+          if (paper.type === 2) {
+            exIds.push(paper.question.id)
+          }
+        });
+        
+        let {data: { list, total }} = await questionListpage({
+          ...this.queryForm,
+          exIds: exIds.join(),
+          rand: true,
+          curPage: 1, 
+          pageSize: 10
+        })
+
+        list.forEach(question => {
+          this.addQuestion(question)
+        })
+
+        this.query(1)
+      }
+    },
+    questionImport(question) {
+      this.addQuestion(question)
+
+      this.queryList.list = this.queryList.list.filter(cur => cur != question) // 添加过的从当前列表删除
+      if (!this.queryList.list.length) {// 如果当前页都删完了
+          this.query(1)// 重新查询
+      }
+
+    },
+    // 重置试卷
+    questionClear() {
+      this.paperQuestion.splice(0)
+    }
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+.paper-router {
+  width: 240px;
+  background: #fff;
+  position: relative;
+  padding: 15px;
+  /deep/ .el-divider__text.is-center {
+    color: #596a76;
+  }
+  .total-score {
+    background: #0094e5;
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    font-size: 16px;
+    color: #fff;
+    text-align: center;
+    position: absolute;
+    top: 40px;
+    left: 0;
+    z-index: 100;
+  }
+}
+.router-content {
+  padding: 10px;
+  .router-title {
+    line-height: 40px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0c2e41;
+  }
+
+  .router-index {
+    position: relative;
+    width: 28px;
+    height: 28px;
+    color: #41baff;
+    line-height: 28px;
+    font-weight: 600;
+    background: #e3f4fe;
+    text-align: center;
+    display: inline-block;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    border-radius: 3px;
+    text-decoration: none;
+    border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
+    &:nth-child(10n) {
+      margin-right: 0;
+    }
+  }
+
+  .router-active,
+  a:hover {
+    background: #0094e4;
+    // border: 1px solid #7fc2f6;
+    color: #fff;
+  }
+}
+.content {
+  display: flex;
+  width: 100%;
+  height: calc(100vh - 240px);
+  margin: 0 auto;
+}
+.paper-handler {
+  width: 400px;
+  background: #fff;
+  position: relative;
+  border-radius: 8px;
+  .paper-title {
+    line-height: 40px;
+    background: #fff;
+    width: 100%;
+    height: 40px;
+    font-size: 16px;
+    color: #333;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    font-weight: 600;
+    padding: 0 20px;
+    border-radius: 8px 8px 0 0;
+    border-bottom: 1px solid #eee;
+    &::before {
+      content: '';
+      display: inline-block;
+      position: relative;
+      top: 5px;
+      left: -10px;
+      width: 2px;
+      height: 20px;
+      background: #0094e5;
+    }
+  }
+}
+
+.top {
+  background: #fff;
+  width: calc(1200px - 410px);
+  height: 80px;
+  padding: 30px 10px 10px 10px;
+  color: #333;
+  z-index: 100;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  border-radius: 8px 8px 0 0;
+  .top-handler {
+    display: none;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    /deep/ .el-button {
+      padding: 5px 10px;
+    }
+  }
+  .top-title {
+    flex: 1;
+    text-align: center;
+    font-size: 20px;
+    vertical-align: middle;
+    /deep/ .el-input__inner {
+      text-align: center;
+      border: 0;
+      font-size: 20px;
+      font-weight: bold;
+    }
+  }
+}
+/deep/ .el-drawer__header {
+  margin-bottom: 0px;
+}
+.handler-content {
+  padding: 10px 10px 10px;
+}
+.chapter {
+  padding: 15px 0px 0px 17px;
+  /deep/ .el-input__inner {
+    border: none;
+    font-size: 18px;
+  }
+  /deep/ .el-textarea__inner {
+    border: none;
+    color: #557587;
+  }
+}
+</style>
+<style lang="scss">
+.paper-content {
+  background: #fff;
+  width: calc(100% - 400px);
+  margin-left: 10px;
+  border-radius: 8px;
+  &:hover {
+    .top {
+      .top-handler {
+        display: inline-block;
+      }
+    }
+  }
+}
+</style>

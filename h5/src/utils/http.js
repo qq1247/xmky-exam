@@ -6,6 +6,10 @@ import axios from 'axios'
 import router from '@/router'
 import store from '@/store'
 import { Message, Notification } from 'element-ui'
+import {
+  getInfo,
+  setInfo
+} from '@/utils/storage'
 /**
  * 提示函数
  */
@@ -93,7 +97,11 @@ instance.interceptors.response.use(
       data: { code, msg },
       config
     } = res
-
+    if (res.headers.authorization) {
+      let userInfo = getInfo()
+      userInfo.accessToken = res.headers.authorization
+      setInfo(userInfo)
+    }
     res.headers?.authorization &&
       store.commit('user/SET_TOKEN', res.headers.authorization)
     if (config.responseType === 'blob') {

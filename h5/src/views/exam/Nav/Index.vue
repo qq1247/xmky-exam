@@ -1,5 +1,5 @@
 <template>
-  <div class="container" ref="Exam">
+  <div class="container">
     <div :class="['exam-top', activeIndex == 1 && createdType == 1 ? 'exam-top-height': '']">
       <div class="exam-nav-box">
         <div
@@ -12,7 +12,14 @@
         </div>
       </div>
       <PaperSetting v-if="activeIndex === 0" @switchTab="switchTab"></PaperSetting>
-      <QuestionTxtImport v-if="activeIndex === 1 && createdType === 1" :isBack="false" ref="QuestionTxtImport"/>
+      <QuestionTxtImport v-if="activeIndex === 1 && createdType === 1" :isBack="false" ref="QuestionTxtImport">
+        <template #leftOpt>
+          <el-button plain @click="preStep()" size="mini" >返回</el-button>
+        </template>
+        <template #rightOpt="{ errNum, questionList }" >
+          <el-button type="primary" size="mini" @click="txtImport(errNum, questionList)">导入</el-button>
+        </template>
+      </QuestionTxtImport>
       <ExamSetting v-if="activeIndex === 2" style="height: calc(100vh - 220px);" ref="ExamSetting"/>
       <MarkSetting v-if="activeIndex === 3" style="height: calc(100vh - 220px);" ref="MarkSetting"/>
       <ExamPublish v-if="activeIndex === 4" style="height: calc(100vh - 220px);" ref="ExamPublish"/>
@@ -57,14 +64,15 @@
 import { mapGetters } from 'vuex'
 import { removeQuick, getQuick, setQuick } from '@/utils/storage'
 import PaperSetting from './PaperSetting.vue'
-import Paper from '../Paper/Index.vue'
+import Paper from './Paper.vue'
 import QuestionTxtImport from '@/components/Question/QuestionTxtImport.vue'
-// import ExamSetting from './ExamSetting.vue'
+import ExamSetting from './ExamSetting.vue'
 // import ExamPublish from './ExamPublish.vue'
 // import MarkSetting from './MarkSetting.vue'
 import CustomSelect from 'components/CustomSelect.vue'
 // import { questionTypeAdd } from 'api/question'
 import dayjs from 'dayjs'
+import { mapMutations } from 'vuex'
 // import {
 //   paperListpage,
 //   paperTypeAdd,
@@ -80,7 +88,7 @@ export default {
     PaperSetting,
     Paper,
     QuestionTxtImport,
-    // ExamSetting,
+    ExamSetting,
     // ExamPublish,
     // MarkSetting
   },
@@ -111,19 +119,17 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['name'])
-  },
-  created() {
-    removeQuick()
-  },
-  destroyed() {
-    removeQuick()
   },
   mounted() {
-    this.paperForm.name = dayjs().format('YYYY-MM-DD')
-    this.getPaperList()
   },
   methods: {
+    ...mapMutations('exam', [
+      'addQuestion',
+    ]),
+    preStep() {
+      this.activeIndex = 1
+      this.createdType = 0
+    },
      // 切换标签
     switchTab(index, createdType) {
       this.createdType = createdType
@@ -197,7 +203,20 @@ export default {
     toEditor() {
       this.activeIndex = 1
       this.createdType = 1
-    }
+    },
+    // 文本导入
+    async txtImport(errNum, questionList) {
+      if (errNum > 0) {
+        this.$message.warning('试题错误格式' + errNum + '处，请处理')
+        return
+      }
+
+      questionList.forEach(question => {
+        this.addQuestion(question)
+      });
+
+      this.$message.info('导入成功')
+    }, 
   }
 }
 </script>

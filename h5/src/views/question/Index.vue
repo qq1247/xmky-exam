@@ -13,7 +13,7 @@
           </el-form-item>
         </div>
         <el-form-item>
-          <el-button icon="el-icon-search" type="primary" @click="query">查询</el-button>
+          <el-button icon="el-icon-search" type="primary" @click="query(1)">查询</el-button>
         </el-form-item>
       </el-form>
 
@@ -44,11 +44,11 @@
                 <span data-title="合并" @click="move(questionType.id)">
                   <i class="common common-move" />
                 </span>
-                <span data-title="试题列表" @click="questionList(questionType.id)">
-                  <i class="common common-list-row" />
-                </span>
                 <span data-title="文本导入" @click="txtImport(questionType.id)">
                   <i class="common common-template-down" />
+                </span>
+                <span data-title="试题列表" @click="questionList(questionType.id)">
+                  <i class="common common-list-row" />
                 </span>
                 <span class="last-span">
                   <i class="common common-more-row" />
@@ -143,10 +143,6 @@ export default {
     },
     // 题库修改
     edit(id) {
-      console.log({
-        questionTypeId: id,
-        tab: '1',
-      })
       this.$tools.switchTab('QuestionIndexSetting', {
         questionTypeId: id,
         tab: '1',

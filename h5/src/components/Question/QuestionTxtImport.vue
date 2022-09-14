@@ -2,7 +2,7 @@
   <div class="batch-input-container">
     <div class="left">
       <div class="btn-box">
-        <el-button plain @click="preStep()" size="mini" >返回</el-button>
+        <slot name="leftOpt"></slot>
         <el-button plain @click="showEg()" size="mini" >示例</el-button>
       </div>
 
@@ -22,13 +22,9 @@
           <span>{{`检查区【共${questionList.length}题，`}}</span>
           <span class="err-color">错误：{{errNum}}题】</span>
         </div>
-
-        <div v-if="process === 0">
+        <div>
           <el-button type="danger" size="mini" @click="locationErr()" plain>定位错误</el-button>
-          <el-button type="primary" size="mini" @click="txtImport()">导入</el-button>
-        </div>
-        <div v-else style="width: 200px">
-            <el-progress :percentage="process"></el-progress>
+          <slot name="rightOpt" :errNum="errNum" :questionList="questionList"></slot>
         </div>
       </div>
       <div class="content-center qestion-box">
@@ -40,7 +36,6 @@
 </template>
 
 <script>
-import { questionAdd } from 'api/question'
 import QuestionList from './QuestionList.vue'
 
 export default {
@@ -50,15 +45,10 @@ export default {
       type: Number,
       default: null
     },
-    isBack: {
-      type: Boolean, 
-      default: true
-    }
   },
   data() {
     return {
       questionTxt: '',
-      process: 0, //进度条
       questionList: [], // 试题列表（接口格式）
       eg: false, // 示例
       egBak: '',
@@ -311,45 +301,6 @@ D多选题的D选项
 
       return question
     },
-    preStep() {
-      if (this.isBack) {
-        this.$router.back()
-      } else {
-        this.$parent.activeIndex = 1
-        this.$parent.createdType = 0
-      }
-    },
-    // 文本导入
-    async txtImport() {
-      if (this.errNum > 0) {
-        this.$message.warning('试题错误格式' + this.errNum + '处，请处理')
-        return
-      }
-
-      let errTxt = ''
-      for (let i in this.questionList) {
-        let question = this.questionList[i]
-        if (question.type === 3) {// 如果是hi填空题，处理下答案格式，符合接口
-          question = JSON.parse(JSON.stringify(question))
-          question.answers = question.answers.map(answer => {
-            return answer.join("\n")
-          })
-        }
-        await questionAdd(question).catch((err) => {
-          errTxt += this.questionList[i].txt + '\n'
-        })
-        this.process = Math.round(i  / this.questionList.length * 100 )
-      }
-
-      this.process = 0 // 上传完成恢复进度条
-
-      if (errTxt.length > 0) {
-        errTxt = '以下为错误试题文本，请联系管理员处理：\n' + errTxt
-        this.questionTxt = errTxt.replace(/<br\/>/gm, '\n') // 正确的删除，展示错误的
-      } else {
-        this.questionTxt = '添加成功，请继续添加或返回'
-      }
-    }, 
     // 定位错误
     locationErr() {
       for (let i in this.questionList) {

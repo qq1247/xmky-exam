@@ -198,7 +198,6 @@ export default {
     optionColor(index, item) {
       return (index, item) => {
         // 单选，多选
-        console.log(index, '=====', item)
         if ([1, 2].includes(item.type)) {
           // 选择完毕且与正确答案不匹配
           if (
