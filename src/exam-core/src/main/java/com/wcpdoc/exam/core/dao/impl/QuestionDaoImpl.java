@@ -43,11 +43,10 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 				.addWhere(ValidateUtil.isValid(pageIn.get("type")), "QUESTION.TYPE = :TYPE", pageIn.get("type"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("score")), "QUESTION.SCORE = :SCORE", pageIn.get("score"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("markType")), "QUESTION.MARK_TYPE = :MARK_TYPE", pageIn.get("markType"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("examId", Integer.class)), "EXISTS (SELECT 1 FROM EXM_EXAM_QUESTION Z WHERE Z.EXAM_ID = :EXAM_ID AND Z.QUESTION_ID = QUESTION.ID)", pageIn.get("examId", Integer.class))
                 .addWhere(ValidateUtil.isValid(pageIn.get("exIds")), "QUESTION.ID NOT IN ("+pageIn.get("exIds")+")")
-				.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "QUESTION.STATE IN (1,2)")// 默认查询发布和草稿状态
+				.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "QUESTION.STATE = 1")// 默认查询发布和草稿状态
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && "0".equals(pageIn.get("state")), "QUESTION.STATE = 0 AND QUESTION.UPDATE_TIME > :UPDATE_TIME", DateUtil.getNextDay(new Date(), -7))// 查询已删除并且最近7天的试题（回收站使用）
-				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "QUESTION.STATE = :STATE", pageIn.get("state"))// 默认查询发布和草稿状态
+				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "QUESTION.STATE = :STATE", pageIn.get("state"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "QUESTION_TYPE.UPDATE_USER_ID = :UPDATE_USER_ID", pageIn.get("curUserId", Integer.class))// 只看自己的
 				.addOrder(!ValidateUtil.isValid(pageIn.get("rand")), "QUESTION.UPDATE_TIME", Order.DESC)
 				.addOrder(ValidateUtil.isValid(pageIn.get("rand")), "Rand()", Order.NULL);
@@ -57,7 +56,7 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 
 	@Override
 	public List<Question> getList(Integer questionTypeId) {
-		String sql = "SELECT * FROM EXM_QUESTION WHERE STATE IN (1, 2) AND QUESTION_TYPE_ID = :QUESTION_TYPE_ID";
+		String sql = "SELECT * FROM EXM_QUESTION WHERE STATE = 1 AND QUESTION_TYPE_ID = :QUESTION_TYPE_ID";
 		return getList(sql, new Object[] { questionTypeId });
 	}
 

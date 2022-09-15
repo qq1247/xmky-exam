@@ -14,7 +14,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
@@ -24,11 +23,11 @@ import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
+import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
-import com.wcpdoc.file.service.FileService;
 
 /**
  * 试题控制层
@@ -48,10 +47,6 @@ public class ApiQuestionController extends BaseController {
 	private QuestionOptionService questionOptionService;
 	@Resource
 	private QuestionAnswerService questionAnswerService;
-	@Resource
-	private FileService fileService;
-	@Resource
-	private UserService userService;
 	
 	/**
 	 * 试题列表 
@@ -72,6 +67,15 @@ public class ApiQuestionController extends BaseController {
 				Integer type = (Integer) result.get("type");
 				Integer markType = (Integer) result.get("markType");
 				
+				if (result.get("markOptions") != null) {// 前后端分离下，接口定义只有数组形式
+					String[] _markOptions = result.get("markOptions").toString().split(",");
+					Integer[] markOptions = new Integer[_markOptions.length]; 
+					for (int i = 0; i < _markOptions.length; i++) {
+						markOptions[i] = Integer.parseInt(_markOptions[i]);
+					}
+					result.put("markOptions", markOptions);
+				}
+				
 				if (type == 1 || type == 2) {// 如果是单选或多选，添加选项字段
 					List<QuestionOption> questionOptionList = questionOptionService.getList(id);
 					List<String> options = new ArrayList<>();
@@ -81,15 +85,7 @@ public class ApiQuestionController extends BaseController {
 					result.put("options", options);
 				}
 				
-				if (result.get("markOptions") != null) {// 前后端分离下，接口定义只有数组形式
-					String[] _aiOptions = result.get("markOptions").toString().split(",");
-					Integer[] markOptions = new Integer[_aiOptions.length]; 
-					for (int i = 0; i < _aiOptions.length; i++) {
-						markOptions[i] = Integer.parseInt(_aiOptions[i]);
-					}
-				}
-				
-				List<QuestionAnswer> questionAnswerList = questionAnswerService.getList((Integer)result.get("id"));
+				List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(id);
 				List<Object> answers = new ArrayList<>();
 				List<BigDecimal> answerScores = new ArrayList<>();
 				for(QuestionAnswer answer : questionAnswerList){
@@ -187,7 +183,6 @@ public class ApiQuestionController extends BaseController {
 	
 	/**
 	 * 试题获取
-	 * 拥有读写权限才显示答案字段
 	 * 
 	 * v1.0 zhanghc 2021年7月1日下午2:18:05
 	 * @param id
@@ -197,7 +192,14 @@ public class ApiQuestionController extends BaseController {
 	@ResponseBody
 	public PageResult get(Integer id) {
 		try {
+			// 校验数据有效性
 			Question question = questionService.getEntity(id);
+			QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
+			if (questionType.getUpdateUserId().intValue() != getCurUser().getId().intValue()) {
+				throw new MyException("无操作权限");
+			}
+			
+			// 试题获取
 			List<String> options = new ArrayList<>();
 			if (question.getType() == 1 || question.getType() == 2) {// 如果是单选或多选，添加选项字段
 				List<QuestionOption> questionOptionList = questionOptionService.getList(id);
