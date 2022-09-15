@@ -1,5 +1,7 @@
 package com.wcpdoc.exam.api.controller;
 
+import java.util.Date;
+
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
@@ -15,6 +17,7 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 
@@ -61,7 +64,19 @@ public class ApiQuestionTypeController extends BaseController {
 	@ResponseBody
 	public PageResult add(QuestionType questionType) {
 		try {
-			questionTypeService.addAndUpdate(questionType);
+			//校验数据有效性
+			if (!ValidateUtil.isValid(questionType.getName())) {
+				throw new MyException("参数错误：name");
+			}
+			//if (existName(questionType)) {
+			//	throw new MyException("名称已存在");
+			//} // 不同的子管理员添加可以重复
+			
+			// 添加题库
+			questionType.setUpdateTime(new Date());
+			questionType.setUpdateUserId(getCurUser().getId());
+			questionTypeService.add(questionType);
+			
 			return PageResultEx.ok().data(questionType.getId());
 		} catch (MyException e) {
 			log.error("题库添加错误：{}", e.getMessage());
@@ -78,11 +93,24 @@ public class ApiQuestionTypeController extends BaseController {
 	 * 
 	 * @return pageOut
 	 */
-	@RequestMapping("/edit")
+	@RequestMapping("/update")
 	@ResponseBody
-	public PageResult edit(QuestionType questionType) {
+	public PageResult update(QuestionType questionType) {
 		try {
-			questionTypeService.editAndUpdate(questionType);
+			//校验数据有效性
+			if(!ValidateUtil.isValid(questionType.getName())) {
+				throw new MyException("参数错误：name");
+			}
+			QuestionType entity = questionTypeService.getEntity(questionType.getId());
+			if (entity.getUpdateUserId().intValue() != getCurUser().getId()) {
+				throw new MyException("无操作权限");
+			}
+			
+			// 保存题库
+			entity.setName(questionType.getName());
+			entity.setUpdateTime(new Date());
+			update(entity);
+			
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("题库修改错误：{}", e.getMessage());
@@ -103,7 +131,7 @@ public class ApiQuestionTypeController extends BaseController {
 	@ResponseBody
 	public PageResult del(Integer id) {
 		try {
-			questionTypeService.delAndUpdate(id);
+			questionTypeService.delEx(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("题库删除错误：{}", e.getMessage());
@@ -125,6 +153,9 @@ public class ApiQuestionTypeController extends BaseController {
 	public PageResult get(Integer id) {
 		try {
 			QuestionType entity = questionTypeService.getEntity(id);
+			if (entity.getUpdateUserId().intValue() != getCurUser().getId()) {
+				throw new MyException("无操作权限");
+			}
 			return PageResultEx.ok()
 					.addAttr("id", entity.getId())
 					.addAttr("name", entity.getName())
@@ -156,6 +187,28 @@ public class ApiQuestionTypeController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		}  catch (Exception e) {
 			log.error("题库合并错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 清空题库
+	 * 
+	 * v1.0 zhanghc 2022年9月15日上午9:28:44
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/clear")
+	@ResponseBody
+	public PageResult clear(Integer id) {
+		try {
+			questionTypeService.clear(id);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("题库删除错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("题库删除错误：", e);
 			return PageResult.err();
 		}
 	}

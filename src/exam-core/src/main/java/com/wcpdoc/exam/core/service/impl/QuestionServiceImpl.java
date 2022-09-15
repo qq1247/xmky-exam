@@ -1,8 +1,5 @@
 package com.wcpdoc.exam.core.service.impl;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,12 +17,8 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.base.cache.ParmCache;
-import com.wcpdoc.base.cache.ProgressBarCache;
-import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
@@ -37,14 +30,11 @@ import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.entity.QuestionType;
-import com.wcpdoc.exam.core.entity.ex.MyQuestion;
 import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionExService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
-import com.wcpdoc.exam.core.service.WordServer;
-import com.wcpdoc.file.entity.FileEx;
 import com.wcpdoc.file.service.FileService;
 
 /**
@@ -63,8 +53,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	@Resource
 	private FileService fileService;
 	@Resource
-	private UserService userService;
-	@Resource
 	private QuestionOptionService questionOptionService;
 	@Resource
 	private QuestionAnswerService questionAnswerService;
@@ -76,8 +64,11 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void addAndUpdate(Question question, Integer[] markOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
+	public void addEx(Question question, Integer[] markOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
 		// 校验数据有效性
+		if (!ValidateUtil.isValid(question.getQuestionTypeId())) {
+			throw new MyException("参数错误：questionTypeId");
+		}
 		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
 		addAndUpdateValid(question, markOptions, options, answers, answerScores, questionType);
 		
@@ -99,20 +90,19 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void updateAndUpdate(Question question, Integer[] markOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
+	public void updateEx(Question question, Integer[] markOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
 		// 校验数据有效性
 		Question entity = getEntity(question.getId());
-		question.setQuestionTypeId(entity.getQuestionTypeId());//校验用
 		if (entity.getType() != question.getType()) {
 			throw new MyException("参数错误：type");
 		}
 		if (entity.getState() == 0) {
-			throw new MyException("已删除");
+			throw new MyException("参数错误：id");
 		}
+		QuestionType questionType = questionTypeService.getEntity(entity.getQuestionTypeId());
+		addAndUpdateValid(question, markOptions, options, answers, answerScores, questionType);
 		
 		questionExService.updateAndUpdate(question);
-		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-		addAndUpdateValid(question, markOptions, options, answers, answerScores, questionType);
 
 		// 修改试题
 		entity.setTitle(question.getTitle());
@@ -122,7 +112,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		entity.setAnalysis(question.getAnalysis());
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
-		// entity.setWriteUserIds(null);// 不能修改
 		entity.setMarkOptions(ValidateUtil.isValid(markOptions) ? StringUtil.join(markOptions) : null);
 		update(entity);
 
@@ -137,38 +126,33 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void delAndUpdate(Integer questionTypeId, Integer[] ids) {
+	public void delEx(Integer[] ids) {
 		// 校验数据有效性
-		if (!ValidateUtil.isValid(questionTypeId) && !ValidateUtil.isValid(ids)) {// 不能同时无效
-			throw new MyException("参数错误：questionTypeId");
-		}
-		if (ValidateUtil.isValid(questionTypeId) && ValidateUtil.isValid(ids)) {// 不能同时有效
-			throw new MyException("参数错误：questionTypeId");
+		if (!ValidateUtil.isValid(ids)) {
+			throw new MyException("参数错误：ids");
 		}
 		List<Question> questionList = new ArrayList<>();
-		if (ValidateUtil.isValid(questionTypeId)) {// 如果是按类型删除
-			questionList = questionDao.getList(questionTypeId);
-		}
-		
-		if (ValidateUtil.isValid(ids)) {// 如果是按ID删除
-			Map<Integer, QuestionType> questionTypeCache = new HashMap<>();
-			for (Integer id : ids) {
-				Question question = getEntity(id);
-				if (question.getState() == 0) {
-					throw new MyException(String.format("试题已删除：%s", id));
-				}
-				
-				QuestionType questionType = questionTypeCache.get(question.getQuestionTypeId());
-				if (questionType == null) {
-					questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-					questionTypeCache.put(questionType.getId(), questionType);
-				}
-				questionList.add(question);
+		Map<Integer, QuestionType> questionTypeCache = new HashMap<>();
+		for (Integer id : ids) {
+			Question question = getEntity(id);
+			if (question.getState() == 0) {
+				continue;
 			}
+			
+			QuestionType questionType = questionTypeCache.get(question.getQuestionTypeId());
+			if (questionType == null) {
+				questionType = questionTypeService.getEntity(question.getQuestionTypeId());
+				questionTypeCache.put(questionType.getId(), questionType);
+			}
+			if (questionType.getUpdateUserId().intValue() != getCurUser().getId().intValue()) {
+				throw new MyException("无操作权限");
+			}
+			
+			questionList.add(question);
 		}
 		
 		// 删除试题
-		for (Question question : questionList) {// 逻辑删除
+		for (Question question : questionList) {
 			question.setState(0);
 			question.setUpdateTime(new Date());
 			question.setUpdateUserId(getCurUser().getId());
@@ -207,7 +191,6 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			}
 
 			String[] params = url.split("\\?")[1].split("&");
-			;
 			for (String param : params) {
 				String[] kv = param.split("=");
 				if (kv[0].equals("id")) {
@@ -219,114 +202,38 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void wordImp(Integer fileId, Integer questionTypeId, String processBarId, Integer state) {
-		// 校验数据有效性
-		if (fileId == null) {
-			throw new MyException("参数错误：fileId");
-		}
-		if (questionTypeId == null) {
-			throw new MyException("参数错误：questionTypeId");
-		}
-		FileEx fileEx = fileService.getFileEx(fileId);
-		if (!"docx".equals(fileEx.getEntity().getExtName())) {
-			throw new MyException("允许的上传类型为：docx");
-		}
-
-		// 解析文件
-		ProgressBarCache.setProgressBar(processBarId, 3.0, 10.0, "解析开始", HttpStatus.OK.value());// 主要时间消耗在docx4j解析，进度条只能假模拟
-		WordServer wordServer = new WordServerImpl();
-		List<MyQuestion> questionExList = null;
-		try (InputStream inputStream = new FileInputStream(fileEx.getFile())) {
-			questionExList = wordServer.handle(inputStream, ParmCache.get().getFileUploadDir());  //questionExList = wordServer.handle(inputStream, fileUploadDir);
-		} catch (IOException e) {
-			throw new MyException("读取word时异常");
-		} catch (Exception e) {
-			throw e;
-		}
-
-		// 添加试题
-		ProgressBarCache.setProgressBar(processBarId, 8.0, 10.0, "保存开始", HttpStatus.OK.value());
-		for (int  j = 0; j < questionExList.size(); j++) { //QuestionEx questionEx : questionExList
-			Question question = questionExList.get(j).getQuestion();
-			question.setUpdateTime(new Date());
-			question.setUpdateUserId(getCurUser().getId());
-			question.setState(state);// 页面添加决定是否发布
-			question.setQuestionTypeId(questionTypeId);
-			
-			String[] answers = new String[questionExList.get(j).getAnswerList().size()];
-			BigDecimal[] answerScores = new BigDecimal[questionExList.get(j).getAnswerList().size()];
-			BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
-			for (int i = 0; i < questionExList.get(j).getAnswerList().size(); i++) {
-				answers[i] = questionExList.get(j).getAnswerList().get(i).getAnswer();
-				if (question.getType() == 3 || (question.getType() == 5 && question.getMarkType() == 1)) {
-					answers[i] = StringUtil.join(answers[i].split(" "), '\n');
-				}
-				answerScores[i] = questionExList.get(j).getAnswerList().get(i).getScore();
-				totalScore.add(answerScores[i]);
-			}
-			if (question.getType() == 1 || question.getType() == 4 
-					|| (question.getType() == 5 && question.getMarkType() == 2) || (question.getType() == 3 && question.getMarkType() == 2)) {
-				answerScores = null;//添加试题严格校验后，不允许传入错误数据
-			}
-			if (question.getType() == 2) {// 多选特殊处理下，答案拆分
-				answers = questionExList.get(j).getAnswerList().get(0).getAnswer().split("");
-				answerScores = new BigDecimal[]{questionExList.get(j).getAnswerList().get(0).getScore()};
-			}
-			
-			String [] options = new String[questionExList.get(j).getOptionList().size()];
-			for (int i = 0; i < questionExList.get(j).getOptionList().size(); i++) {
-				options[i] = questionExList.get(j).getOptionList().get(i).getOptions();
-			}
-			
-			if (question.getType() == 3 || (question.getType() == 5 && question.getMarkType() == 1)) {
-				question.setScore(totalScore.getResult());
-			}
-			
-			Integer[] markOptions = null;//new Integer[split.length];
-			if (ValidateUtil.isValid(question.getMarkOptions())) {
-				String[] split = question.getMarkOptions().split(",");
-				markOptions = new Integer[split.length];
-				for(int i = 0; i < split.length; i++ ){
-					markOptions[i] = Integer.parseInt(split[i]);
-				}
-			} else {
-				markOptions = new Integer[0];
-			}
-			
-			addAndUpdate(question, markOptions, options, answers, answerScores);
-		}
-		
-	}
-
-	@Override
 	public void copy(Integer id) throws Exception{
-		Question questionOfDB = questionDao.getEntity(id);
+		// 校验数据有效性
+		Question question = getEntity(id);
+		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
+		if (questionType.getUpdateUserId().intValue() != getCurUser().getId().intValue()) {
+			throw new MyException("无操作权限");
+		}
 		
-		Question questionOfCopy = new Question();
-		BeanUtils.copyProperties(questionOfCopy, questionOfDB);
+		// 复制试题
+		Question questionNew = new Question();
+		BeanUtils.copyProperties(questionNew, question);
 		//questionOfCopy.setState(2);
-		questionOfCopy.setUpdateTime(new Date());
-		questionOfCopy.setUpdateUserId(getCurUser().getId());
-		//修改标题图片
-		List<Integer> fileIdList = html2FileIds(questionOfCopy.getTitle());
+		questionNew.setUpdateTime(new Date());
+		questionNew.setUpdateUserId(getCurUser().getId());
+		List<Integer> fileIdList = html2FileIds(questionNew.getTitle());
 		for (Integer fileId : fileIdList) {
 			Integer copyFileId = fileService.copyFile(fileId);
-			questionOfCopy.setTitle(questionOfCopy.getTitle().replace("/api/file/download?id="+fileId, "/api/file/download?id="+copyFileId));
+			questionNew.setTitle(questionNew.getTitle().replace("/api/file/download?id="+fileId, "/api/file/download?id="+copyFileId));
 		}
-		//修改解释图片
-		fileIdList = html2FileIds(questionOfCopy.getAnalysis());
+		fileIdList = html2FileIds(questionNew.getAnalysis());
 		for (Integer fileId : fileIdList) {
 			Integer copyFileId = fileService.copyFile(fileId);
-			questionOfCopy.setAnalysis(questionOfCopy.getAnalysis().replace("/api/file/download?id="+fileId, "/api/file/download?id="+copyFileId));
+			questionNew.setAnalysis(questionNew.getAnalysis().replace("/api/file/download?id="+fileId, "/api/file/download?id="+copyFileId));
 		}
-		add(questionOfCopy);
+		add(questionNew);
 		
-		List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(questionOfDB.getId());
+		// 复制答案
+		List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
 		for(QuestionAnswer questionAnswer : questionAnswerList){
 			QuestionAnswer questionAnswerNew = new QuestionAnswer();
 			BeanUtils.copyProperties(questionAnswerNew, questionAnswer);
-			questionAnswerNew.setQuestionId(questionOfCopy.getId());
-			//修改答案图片
+			questionAnswerNew.setQuestionId(questionNew.getId());
 			fileIdList = html2FileIds(questionAnswer.getAnswer());
 			for (Integer fileId : fileIdList) {
 				Integer copyFileId = fileService.copyFile(fileId);
@@ -335,12 +242,12 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			questionAnswerService.add(questionAnswerNew);
 		}
 		
-		List<QuestionOption> questionOptionList = questionOptionService.getList(questionOfDB.getId());
+		// 复制选项
+		List<QuestionOption> questionOptionList = questionOptionService.getList(question.getId());
 		for (QuestionOption questionOption : questionOptionList) {
 			QuestionOption questionOptionNew = new QuestionOption();
 			BeanUtils.copyProperties(questionOptionNew, questionOption);
-			questionOptionNew.setQuestionId(questionOfCopy.getId());
-			//修改选项图片
+			questionOptionNew.setQuestionId(questionNew.getId());
 			fileIdList = html2FileIds(questionOption.getOptions());
 			for (Integer fileId : fileIdList) {
 				Integer copyFileId = fileService.copyFile(fileId);
@@ -350,52 +257,11 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 	}
 	
-
-	@Override
-	public void publish(Integer questionTypeId, Integer[] ids) throws Exception {
-		// 校验数据有效性
-		if (!ValidateUtil.isValid(questionTypeId) && !ValidateUtil.isValid(ids)) {// 不能同时无效
-			throw new MyException("参数错误：questionTypeId");
-		}
-		if (ValidateUtil.isValid(questionTypeId) && ValidateUtil.isValid(ids)) {// 不能同时有效
-			throw new MyException("参数错误：questionTypeId");
-		}
-		List<Question> questionList = new ArrayList<>();
-		if (ValidateUtil.isValid(questionTypeId)) {// 如果是按类型删除
-			questionList = questionDao.getList(questionTypeId);
-		}
-		
-		if (ValidateUtil.isValid(ids)) {// 如果是按ID删除
-			Map<Integer, QuestionType> questionTypeCache = new HashMap<>();
-			for (Integer id : ids) {
-				Question question = getEntity(id);
-				if (question.getState() == 0) {
-					throw new MyException(String.format("试题已删除：%s", id));
-				}
-				if (question.getState() == 1) {
-					throw new MyException(String.format("试题已发布：%s", id));
-				}
-				
-				QuestionType questionType = questionTypeCache.get(question.getQuestionTypeId());
-				if (questionType == null) {
-					questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-					questionTypeCache.put(questionType.getId(), questionType);
-				}
-				
-				questionList.add(question);
-			}
-		}
-		
-		// 删除试题
-		for (Question question : questionList) {// 逻辑删除
-			question.setState(1);
-			question.setUpdateTime(new Date());
-			question.setUpdateUserId(getCurUser().getId());
-			update(question);
-		}
-	}
-	
 	private void addAndUpdateValid(Question question, Integer[] markOptions, String[] options, String[] answers, BigDecimal[] answerScores, QuestionType questionType) {
+		if (questionType.getUpdateUserId().intValue() != getCurUser().getId().intValue()) {
+			throw new MyException("无操作权限");
+		}
+		
 		if (!ValidateUtil.isValid(question.getType())) {
 			throw new MyException("参数错误：type");
 		}

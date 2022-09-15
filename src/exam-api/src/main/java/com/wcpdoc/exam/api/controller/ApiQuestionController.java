@@ -5,30 +5,22 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.wcpdoc.base.cache.ProgressBarCache;
 import com.wcpdoc.base.service.UserService;
-import com.wcpdoc.core.context.UserContext;
 import com.wcpdoc.core.controller.BaseController;
-import com.wcpdoc.core.entity.LoginUser;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
-import com.wcpdoc.core.util.SpringUtil;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
@@ -122,11 +114,11 @@ public class ApiQuestionController extends BaseController {
 	}
 	
 	/**
-	 *  添加试题
+	 * 试题添加
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @param question
-	 * @param markOptions 分数选项
+	 * @param markOptions 阅卷选项
 	 * @param options 选项（单选多选时有效）
 	 * @param answers 答案
 	 * @param answerScores 答案分数（填空或智能问答有多项）
@@ -136,19 +128,19 @@ public class ApiQuestionController extends BaseController {
 	@ResponseBody
 	public PageResult add(Question question, Integer[] markOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
 		try {
-			questionService.addAndUpdate(question, markOptions, options, answers, answerScores);
+			questionService.addEx(question, markOptions, options, answers, answerScores);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("添加试题错误：{}", e.getMessage());
+			log.error("试题添加错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		}  catch (Exception e) {
-			log.error("添加试题错误：", e);
+			log.error("试题添加错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 修改试题
+	 * 试题修改
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @param question
@@ -156,46 +148,45 @@ public class ApiQuestionController extends BaseController {
 	 * @param options
 	 * @return PageResult
 	 */
-	@RequestMapping("/edit")
+	@RequestMapping("/update")
 	@ResponseBody
-	public PageResult edit(Question question, Integer[] markOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
+	public PageResult update(Question question, Integer[] markOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
 		try {
-			questionService.updateAndUpdate(question, markOptions, options, answers, answerScores);
+			questionService.updateEx(question, markOptions, options, answers, answerScores);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("修改试题错误：{}", e.getMessage());
+			log.error("试题修改错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		}  catch (Exception e) {
-			log.error("修改试题错误：", e);
+			log.error("试题修改错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 删除试题
+	 * 试题删除
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
-	 * @param questionTypeId
 	 * @param ids
 	 * @return pageOut
 	 */
 	@RequestMapping("/del")
 	@ResponseBody
-	public PageResult del(Integer questionTypeId, Integer[] ids) {
+	public PageResult del(Integer[] ids) {
 		try {
-			questionService.delAndUpdate(questionTypeId, ids);
+			questionService.delEx(ids);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("删除试题错误：{}", e.getMessage());
+			log.error("试题删除错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		}  catch (Exception e) {
-			log.error("删除试题错误：", e);
+			log.error("试题删除错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 获取试题
+	 * 试题获取
 	 * 拥有读写权限才显示答案字段
 	 * 
 	 * v1.0 zhanghc 2021年7月1日下午2:18:05
@@ -245,16 +236,16 @@ public class ApiQuestionController extends BaseController {
 					.addAttr("state", question.getState());
 			return pageResult;
 		} catch (MyException e) {
-			log.error("获取试题错误：{}", e.getMessage());
+			log.error("试题获取错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		}  catch (Exception e) {
-			log.error("获取试题错误：", e);
+			log.error("试题获取错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 拷贝试题
+	 * 试题复制
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @param id
@@ -267,99 +258,11 @@ public class ApiQuestionController extends BaseController {
 			questionService.copy(id);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("复制试题错误：{}", e.getMessage());
+			log.error("试题复制错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		}  catch (Exception e) {
-			log.error("复制试题错误：", e);
+			log.error("试题复制错误：", e);
 			return PageResult.err();
 		}
 	}
-	
-	/**
-	 * word试题导入
-	 * 
-	 * v1.0 zhanghc 2019年8月10日下午5:12:53
-	 * @param file
-	 * @param questionTypeId
-	 * @return PageResult
-	 */
-	@RequestMapping("/wordImp")
-	@ResponseBody
-	public PageResult wordImp(Integer fileId, Integer questionTypeId, Integer state) {
-		try {
-			ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-			RequestContextHolder.setRequestAttributes(requestAttributes, true);// 子线程共享请求属性
-			
-			String processBarId = UUID.randomUUID().toString().replaceAll("-", "");
-			ProgressBarCache.setProgressBar(processBarId, 0.0, 10.0, "开始解析", HttpStatus.OK.value());// 初始化进度条
-
-			LoginUser loginUser = getCurUser();
-			new Thread(new Runnable() {
-				public void run() {
-					UserContext.set(loginUser);// 子线程不走springboot拦截器，人工模拟拦截器，线程上绑定当前登录信息
-					try {
-						SpringUtil.getBean(QuestionService.class).wordImp(fileId, questionTypeId, processBarId, state);
-						ProgressBarCache.setProgressBar(processBarId, 10.0, 10.0, "保存完成", HttpStatus.OK.value());// 放在业务层最后一行，进度已经100%，数据还没有完全插入，这时查询数据库时为空
-					} catch (MyException e) {
-						ProgressBarCache.setProgressBar(processBarId, 10.0, 10.0, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
-						log.error("word试题导入错误：{}", e.getMessage());
-						UserContext.remove();
-					} catch (Exception e) {
-						ProgressBarCache.setProgressBar(processBarId, 10.0, 10.0, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
-						log.error("word试题导入错误：", e);
-						UserContext.remove();
-					}
-				}
-			}).start();
-
-			return PageResultEx.ok().data(processBarId);
-		} catch (MyException e) {
-			log.error("导入试题错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("导入试题错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * word模板导出
-	 * 
-	 * v1.0 zhanghc 2019年8月14日下午5:33:20 
-	 * void
-	 */
-	@RequestMapping(value = "/wordTemplateExport")
-	public void wordTemplateExport() {
-		try {
-			fileService.exportTemplate("试题模板.docx");
-		} catch (MyException e) {
-			log.error("下载模板失败：{}", e.getMessage());
-		} catch (Exception e) {
-			log.error("下载模板失败：", e);
-		}
-	}
-	
-	/**
-	 * 发布
-	 * 
-	 * v1.0 zhanghc 2018年11月24日上午9:13:22
-	 * @param questionTypeId
-	 * @param ids
-	 * @return PageResult
-	 */
-	@RequestMapping("/publish")
-	@ResponseBody
-	public PageResult publish(Integer questionTypeId, Integer[] ids) {
-		try {
-			questionService.publish(questionTypeId, ids);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("发布错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("发布错误：", e);
-			return PageResult.err();
-		}
-	}
-	
 }
