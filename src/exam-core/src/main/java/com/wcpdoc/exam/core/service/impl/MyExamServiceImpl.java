@@ -32,15 +32,14 @@ import com.wcpdoc.exam.core.dao.MyExamDao;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.MyExam;
-import com.wcpdoc.exam.core.entity.MyExamDetail;
+import com.wcpdoc.exam.core.entity.MyQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.ex.Chapter;
 import com.wcpdoc.exam.core.entity.ex.ExamAnswerEx;
 import com.wcpdoc.exam.core.entity.ex.MyExamChapter;
-import com.wcpdoc.exam.core.entity.ex.MyQuestion;
 import com.wcpdoc.exam.core.service.ExamService;
-import com.wcpdoc.exam.core.service.MyExamDetailService;
 import com.wcpdoc.exam.core.service.MyExamService;
+import com.wcpdoc.exam.core.service.MyQuestionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.util.QuestionUtil;
 import com.wcpdoc.file.service.FileService;
@@ -61,7 +60,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	@Resource
 	private ExamService examService;
 	@Resource
-	private MyExamDetailService myExamDetailService;
+	private MyQuestionService myQuestionService;
 	@Resource
 	private FileService fileService;
 	@Resource
@@ -107,8 +106,8 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		// throw new MyException("参数错误：answer");
 		// }//如是多选取消勾选则为空
 
-		MyExamDetail myExamDetail = myExamDetailService.getMyExamDetail(examId, userId, questionId);
-		if (myExamDetail == null) {
+		MyQuestion myQuestion = myQuestionService.getMyQuestion(examId, userId, questionId);
+		if (myQuestion == null) {
 			throw new MyException("未参与考试");
 		}
 
@@ -131,33 +130,24 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 			throw new MyException("考试已交卷");
 		}
 
-		// 标记为考试中，记录答题时间
+		// 标记为考试中
 		myExam.setState(2);
-		if (!ValidateUtil.isValid(myExam.getAnswerStartTime())) {
-			myExam.setAnswerStartTime(new Date());
-			myExam.setAnswerEndTime(new Date());// 如果只答一道题，这里不加，结束时间就是空
-		} else {
-			myExam.setAnswerEndTime(new Date());
-		}
 		update(myExam);
 		
 		// 保存答案
 		Question question = questionService.getEntity(questionId);
 		if (!ValidateUtil.isValid(answers)) {
-			myExamDetail.setAnswer(null);
-		} else if (question.getType() == 1 || question.getType() == 4 || question.getType() == 5) {
-			myExamDetail.setAnswer(answers[0]);
-		} else if (question.getType() == 2) {
+			myQuestion.setAnswer(null);
+		} else if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasTrueFalse(question) || QuestionUtil.hasQA(question)) {
+			myQuestion.setAnswer(answers[0]);
+		} else if (QuestionUtil.hasMultipleChoice(question)) {
 			Arrays.sort(answers);// 页面先选d在选c，值为db，这里重新排序一下
-			myExamDetail.setAnswer(StringUtil.join(answers));
-		} else if (question.getType() == 3) {
-			myExamDetail.setAnswer(StringUtil.join(answers, '\n'));
+			myQuestion.setAnswer(StringUtil.join(answers));
+		} else if (QuestionUtil.hasFillBlank(question)) {
+			myQuestion.setAnswer(StringUtil.join(answers, '\n'));
 		}
-		if (ValidateUtil.isValid(answerFileId)) {
-			myExamDetail.setAnswerFileId(answerFileId);
-		}
-		myExamDetail.setAnswerTime(new Date());
-		myExamDetailService.update(myExamDetail);
+		myQuestion.setAnswerTime(new Date());
+		myQuestionService.update(myQuestion);
 		
 		// 保存附件
 		if (ValidateUtil.isValid(answerFileId)) {
@@ -167,98 +157,90 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 
 	@Override
 	public void finish(Integer examId, Integer userId) {
-		// 校验数据有效性
-		if (!ValidateUtil.isValid(examId)) {
-			throw new MyException("参数错误：examId");
-		}
-		if (!ValidateUtil.isValid(userId)) {
-			throw new MyException("参数错误：userId");
-		}
-		MyExam myExam = getMyExam(examId, userId);
-		if (myExam == null) {
-			throw new MyException("未参与考试");
-		}
-		if (myExam.getState() == 3) {
-			throw new MyException("考试已交卷");
-		}
-		Exam exam = examService.getEntity(examId);
-		if (exam.getState() == 0) {
-			throw new MyException("考试已删除");
-		}
-		if (exam.getState() == 2) {
-			throw new MyException("考试未发布");
-		}
-		long curTime = System.currentTimeMillis();
-		if (exam.getStartTime().getTime() > curTime) {
-			throw new MyException("考试未开始");
-		}
-		if (curTime - exam.getEndTime().getTime() > 1000) {// 预留1秒网络延时
-			throw new MyException("考试已结束");
-		}
-		
-		// 交卷
-		if (exam.getMarkType() == 1) {// 如果是客观题试卷，记录阅卷开始时间
-			myExam.setMarkStartTime(new Date());// 主观题阅卷开始时间，由阅卷用户给某试卷第一次打分时生成
-		}
-		myExam.setState(3);// 标记为交卷
-		if (myExam.getAnswerStartTime() == null) {// 一道题也没答，直接交卷
-			myExam.setAnswerStartTime(new Date());
-		}
-		myExam.setAnswerEndTime(new Date());// 最后交卷时间就是答题结束时间
-		update(myExam);
-	
-		User user = userService.getEntity(myExam.getUserId());
-		log.info("用户交卷开始：【{}-{}】【1-管理员 阅 {}-{}】开始", exam.getId(), exam.getName(), user.getId(), user.getName());
-		MyExamChapter userPaper = exam.getGenType() == 1 ? examService.getExamChapter(exam.getId()) : examService.getPaperOfRand(examId, myExam.getUserId());
-		List<MyExamDetail> userAnswerList = myExamDetailService.getList(examId, myExam.getUserId());
-		Map<Integer, MyExamDetail> userAnswerCache = new HashMap<>();
-		for (MyExamDetail userAnswer : userAnswerList) {
-			userAnswerCache.put(userAnswer.getQuestionId(), userAnswer);// 缓存答案数据，用于和标准答案对比得分
-		}
-		BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
-		for (Chapter chapter : userPaper.getChapterList()) {
-			for (MyQuestion myquestion : chapter.getMyQuestionList()) {// 获取章节下所有试题
-				if (!QuestionUtil.hasMarkType(myquestion.getQuestion())) {// 如果是主观题，等待人工阅卷
-					continue;
-				}
-				
-				MyExamDetail userAnswer = userAnswerCache.get(myquestion.getQuestion().getId());// 获取用户答案
-				if (QuestionUtil.hasQA(myquestion.getQuestion())) { 
-					qAHandle(myquestion.getQuestion(), myquestion.getAttr(), myquestion.getAnswerList(), userAnswer);// 问答处理
-				} else if (QuestionUtil.hasSingleChoice(myquestion.getQuestion()) || QuestionUtil.hasTrueFalse(myquestion.getQuestion())) {
-					singleChoiceHandle(myquestion.getQuestion(), myquestion.getAttr(), myquestion.getAnswerList(), userAnswer);// 单选判断处理
-				} else if (QuestionUtil.hasMultipleChoice(myquestion.getQuestion())) { 
-					multipleChoiceHandle(myquestion.getQuestion(), myquestion.getAttr(), myquestion.getAnswerList(), userAnswer);// 多选处理
-				} else if (QuestionUtil.hasFillBlank(myquestion.getQuestion())) { 
-					fillBlankHandle(myquestion.getQuestion(), myquestion.getAttr(), myquestion.getAnswerList(), userAnswer);// 填空处理
-				}
-				
-				totalScore.add(userAnswer.getScore());// 累加当前分数到总分数
-				userAnswer.setMarkTime(new Date());
-				userAnswer.setMarkUserId(1);
-				myExamDetailService.update(userAnswer);// 更新每道题的分数（没作答也都标记为0分。影响的地方为人工阅卷时，所有题都有分数，才允许阅卷完成。）
-			}
-		}
-		
-		if (exam.getMarkType() == 1) {// 如果是客观题试卷，直接出成绩
-			myExam.setMarkUserId(1);// 阅卷人为admin
-			myExam.setMarkEndTime(new Date());// 记录阅卷结束时间
-			myExam.setMarkState(3);// 标记为阅卷结束
-			myExam.setTotalScore(totalScore.getResult());// 记录成绩 
-			BigDecimal passScore = BigDecimalUtil.newInstance(exam.getTotalScore())
-					.mul(exam.getPassScore()).div(100, 2).getResult();
-			myExam.setAnswerState(BigDecimalUtil.newInstance(totalScore.getResult()).sub(passScore).getResult().doubleValue() >= 0 ? 1 : 2);// 标记及格状态
-			
-			update(myExam);
-		} 
-		
-		if (exam.getMarkType() == 1) {
-			log.info("用户交卷完成：【{}-{}】【1-管理员 阅 {}-{}】完成阅卷，得{}分，{}", exam.getId(), exam.getName(), user.getId(), user.getName(), 
-					totalScore.getResult(), myExam.getAnswerState() == 1 ? "及格" : "不及格");
-		} else if (exam.getMarkType() == 2) {// 如果是主观题试卷，等待人工阅卷
-			log.info("用户交卷完成：【{}-{}】【1-管理员 阅 {}-{}】完成阅卷，客观题部分得{}分", exam.getId(), exam.getName(), user.getId(), user.getName(), 
-					totalScore.getResult());
-		}
+//		// 校验数据有效性
+//		if (!ValidateUtil.isValid(examId)) {
+//			throw new MyException("参数错误：examId");
+//		}
+//		if (!ValidateUtil.isValid(userId)) {
+//			throw new MyException("参数错误：userId");
+//		}
+//		MyExam myExam = getMyExam(examId, userId);
+//		if (myExam == null) {
+//			throw new MyException("未参与考试");
+//		}
+//		if (myExam.getState() == 3) {
+//			throw new MyException("考试已交卷");
+//		}
+//		Exam exam = examService.getEntity(examId);
+//		if (exam.getState() == 0) {
+//			throw new MyException("考试已删除");
+//		}
+//		if (exam.getState() == 2) {
+//			throw new MyException("考试未发布");
+//		}
+//		long curTime = System.currentTimeMillis();
+//		if (exam.getStartTime().getTime() > curTime) {
+//			throw new MyException("考试未开始");
+//		}
+//		if (curTime - exam.getEndTime().getTime() > 1000) {// 预留1秒网络延时
+//			throw new MyException("考试已结束");
+//		}
+//		
+//		// 交卷
+//		myExam.setState(3);// 标记为交卷
+//		update(myExam);
+//	
+//		User user = userService.getEntity(myExam.getUserId());
+//		log.info("用户交卷开始：【{}-{}】【1-管理员 阅 {}-{}】开始", exam.getId(), exam.getName(), user.getId(), user.getName());
+//		MyExamChapter userPaper = exam.getGenType() == 1 ? examService.getExamChapter(exam.getId()) : examService.getPaperOfRand(examId, myExam.getUserId());
+//		List<MyQuestion> userAnswerList = myQuestionService.getList(examId, myExam.getUserId());
+//		Map<Integer, MyQuestion> userAnswerCache = new HashMap<>();
+//		for (MyQuestion userAnswer : userAnswerList) {
+//			userAnswerCache.put(userAnswer.getQuestionId(), userAnswer);// 缓存答案数据，用于和标准答案对比得分
+//		}
+//		BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
+//		for (Chapter chapter : userPaper.getChapterList()) {
+//			for (MyQuestion myquestion : chapter.getMyQuestionList()) {// 获取章节下所有试题
+//				if (!QuestionUtil.hasObjective(myquestion.getQuestion())) {// 如果是主观题，等待人工阅卷
+//					continue;
+//				}
+//				
+//				MyQuestion userAnswer = userAnswerCache.get(myquestion.getQuestion().getId());// 获取用户答案
+//				if (QuestionUtil.hasQA(myquestion.getQuestion())) { 
+//					qAHandle(myquestion.getQuestion(), myquestion.getAttr(), myquestion.getAnswerList(), userAnswer);// 问答处理
+//				} else if (QuestionUtil.hasSingleChoice(myquestion.getQuestion()) || QuestionUtil.hasTrueFalse(myquestion.getQuestion())) {
+//					singleChoiceHandle(myquestion.getQuestion(), myquestion.getAttr(), myquestion.getAnswerList(), userAnswer);// 单选判断处理
+//				} else if (QuestionUtil.hasMultipleChoice(myquestion.getQuestion())) { 
+//					multipleChoiceHandle(myquestion.getQuestion(), myquestion.getAttr(), myquestion.getAnswerList(), userAnswer);// 多选处理
+//				} else if (QuestionUtil.hasFillBlank(myquestion.getQuestion())) { 
+//					fillBlankHandle(myquestion.getQuestion(), myquestion.getAttr(), myquestion.getAnswerList(), userAnswer);// 填空处理
+//				}
+//				
+//				totalScore.add(userAnswer.getScore());// 累加当前分数到总分数
+//				userAnswer.setMarkTime(new Date());
+//				userAnswer.setMarkUserId(1);
+//				myQuestionService.update(userAnswer);// 更新每道题的分数（没作答也都标记为0分。影响的地方为人工阅卷时，所有题都有分数，才允许阅卷完成。）
+//			}
+//		}
+//		
+//		if (exam.getMarkType() == 1) {// 如果是客观题试卷，直接出成绩
+//			myExam.setMarkUserId(1);// 阅卷人为admin
+//			myExam.setMarkState(3);// 标记为阅卷结束
+//			myExam.setTotalScore(totalScore.getResult());// 记录成绩 
+//			BigDecimal passScore = BigDecimalUtil.newInstance(exam.getTotalScore())
+//					.mul(exam.getPassScore()).div(100, 2).getResult();
+//			myExam.setAnswerState(BigDecimalUtil.newInstance(totalScore.getResult()).sub(passScore).getResult().doubleValue() >= 0 ? 1 : 2);// 标记及格状态
+//			
+//			update(myExam);
+//		} 
+//		
+//		if (exam.getMarkType() == 1) {
+//			log.info("用户交卷完成：【{}-{}】【1-管理员 阅 {}-{}】完成阅卷，得{}分，{}", exam.getId(), exam.getName(), user.getId(), user.getName(), 
+//					totalScore.getResult(), myExam.getAnswerState() == 1 ? "及格" : "不及格");
+//		} else if (exam.getMarkType() == 2) {// 如果是主观题试卷，等待人工阅卷
+//			log.info("用户交卷完成：【{}-{}】【1-管理员 阅 {}-{}】完成阅卷，客观题部分得{}分", exam.getId(), exam.getName(), user.getId(), user.getName(), 
+//					totalScore.getResult());
+//		}
 	}
 	
 	@Override
@@ -342,80 +324,75 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	}
 	
 	private void doExamHandle(Exam exam, MyExam myExam, MyExamChapter userPaper) {
-		User user = userService.getEntity(myExam.getUserId());
-		if(myExam.getState() == 3){// 已交卷不处理（已阅卷）
-			log.info("客观题阅卷进行：【{}-{}】，【{}-{}】已阅卷，得{}分", exam.getId(), exam.getName(), user.getId(), user.getName(), myExam.getTotalScore());
-			return;
-		}
-		
-		log.info("客观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】开始", exam.getId(), exam.getName(), user.getId(), user.getName());
-		if (myExam.getState() == 1) {// 如果未考试，状态还是未考试
-			log.info("客观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】未考试", exam.getId(), exam.getName(), user.getId(), user.getName());
-		} else if (myExam.getState() == 2) {// 如果是考试中，标记为交卷
-			myExam.setState(3);
-			log.info("客观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】未交卷，标记为已交卷", exam.getId(), exam.getName(), user.getId(), user.getName());
-		}
-		
-		if (exam.getMarkType() == 1 || myExam.getState() == 1) {// 如果是智能阅卷或未考试，记录阅卷开始时间；
-			myExam.setMarkStartTime(new Date());
-		}
-		
-		BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
-		Map<Integer, MyExamDetail> userAnswerCache = new HashMap<>();
-		List<MyExamDetail> userAnswerList = myExamDetailService.getList(exam.getId(), myExam.getUserId());
-		for (MyExamDetail userAnswer : userAnswerList) {
-			userAnswerCache.put(userAnswer.getQuestionId(), userAnswer);// 缓存答案数据，用于和标准答案对比得分
-		}
-		for (Chapter chapter : userPaper.getChapterList()) {
-			for (MyQuestion myquestion : chapter.getMyQuestionList()) {// 获取章节下所有试题
-				MyExamDetail userAnswer = userAnswerCache.get(myquestion.getQuestion().getId());// 获取用户答案
-				if (myExam.getState() == 1) {// 如果未考试，标记用户当前题为0分（阅卷时需要所有题都有分数才能进行）
-					userAnswer.setMarkTime(new Date());
-					userAnswer.setMarkUserId(1);
-					userAnswer.setScore(BigDecimal.ZERO);
-					myExamDetailService.update(userAnswer);
-					continue;
-				}
-				
-				if (!QuestionUtil.hasMarkType(myquestion.getQuestion())) {// 如果是主观题，等待人工阅卷
-					continue;
-				}
-				
-				if (QuestionUtil.hasQA(myquestion.getQuestion())) { 
-					qAHandle(myquestion.getQuestion(), myquestion.getAttr(), myquestion.getAnswerList(), userAnswer);// 问答处理
-				} else if (QuestionUtil.hasSingleChoice(myquestion.getQuestion()) || QuestionUtil.hasTrueFalse(myquestion.getQuestion())) {
-					singleChoiceHandle(myquestion.getQuestion(), myquestion.getAttr(), myquestion.getAnswerList(), userAnswer);// 单选判断处理
-				} else if (QuestionUtil.hasMultipleChoice(myquestion.getQuestion())) { 
-					multipleChoiceHandle(myquestion.getQuestion(), myquestion.getAttr(), myquestion.getAnswerList(), userAnswer);// 多选处理
-				} else if (QuestionUtil.hasFillBlank(myquestion.getQuestion())) { 
-					fillBlankHandle(myquestion.getQuestion(), myquestion.getAttr(), myquestion.getAnswerList(), userAnswer);// 填空处理
-				}
-				
-				totalScore.add(userAnswer.getScore());// 累加当前分数到总分数
-				userAnswer.setMarkTime(new Date());
-				userAnswer.setMarkUserId(1);
-				myExamDetailService.update(userAnswer);// 更新每道题的分数（没作答也都标记为0分。影响的地方为人工阅卷时，所有题都有分数，才允许阅卷完成。）
-			}
-		}
-		
-		if (exam.getMarkType() == 1 || myExam.getState() == 1) {// 如果是智能阅卷或未考试，直接出成绩
-			myExam.setMarkUserId(1);// 阅卷人为admin
-			myExam.setMarkEndTime(new Date());// 记录阅卷结束时间
-			myExam.setMarkState(3);// 标记为阅卷结束
-			myExam.setTotalScore(totalScore.getResult());// 记录成绩 
-			BigDecimal passScore = BigDecimalUtil.newInstance(exam.getTotalScore())
-					.mul(exam.getPassScore()).div(100, 2).getResult();
-			myExam.setAnswerState(BigDecimalUtil.newInstance(totalScore.getResult()).sub(passScore).getResult().doubleValue() >= 0 ? 1 : 2);// 标记及格状态
-			myExamService.update(myExam);
-		}
-		
-		if (exam.getMarkType() == 1) {
-			log.info("客观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】完成阅卷，得{}分，{}", exam.getId(), exam.getName(), user.getId(), user.getName(), 
-					totalScore.getResult(), myExam.getAnswerState() == 1 ? "及格" : "不及格");
-		} else {
-			log.info("客观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】完成阅卷，客观题部分得{}分", exam.getId(), exam.getName(), user.getId(), user.getName(), 
-					totalScore.getResult());
-		}
+//		User user = userService.getEntity(myExam.getUserId());
+//		if(myExam.getState() == 3){// 已交卷不处理（已阅卷）
+//			log.info("客观题阅卷进行：【{}-{}】，【{}-{}】已阅卷，得{}分", exam.getId(), exam.getName(), user.getId(), user.getName(), myExam.getTotalScore());
+//			return;
+//		}
+//		
+//		log.info("客观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】开始", exam.getId(), exam.getName(), user.getId(), user.getName());
+//		if (myExam.getState() == 1) {// 如果未考试，状态还是未考试
+//			log.info("客观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】未考试", exam.getId(), exam.getName(), user.getId(), user.getName());
+//		} else if (myExam.getState() == 2) {// 如果是考试中，标记为交卷
+//			myExam.setState(3);
+//			log.info("客观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】未交卷，标记为已交卷", exam.getId(), exam.getName(), user.getId(), user.getName());
+//		}
+//		
+//		BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
+//		Map<Integer, MyQuestion> userAnswerCache = new HashMap<>();
+//		List<MyQuestion> userAnswerList = myQuestionService.getList(exam.getId(), myExam.getUserId());
+//		for (MyQuestion userAnswer : userAnswerList) {
+//			userAnswerCache.put(userAnswer.getQuestionId(), userAnswer);// 缓存答案数据，用于和标准答案对比得分
+//		}
+//		for (Chapter chapter : userPaper.getChapterList()) {
+//			for (MyQuestion myquestion : chapter.getMyQuestionList()) {// 获取章节下所有试题
+//				MyQuestion userAnswer = userAnswerCache.get(myquestion.getQuestion().getId());// 获取用户答案
+//				if (myExam.getState() == 1) {// 如果未考试，标记用户当前题为0分（阅卷时需要所有题都有分数才能进行）
+//					userAnswer.setMarkTime(new Date());
+//					userAnswer.setMarkUserId(1);
+//					userAnswer.setScore(BigDecimal.ZERO);
+//					myQuestionService.update(userAnswer);
+//					continue;
+//				}
+//				
+//				if (!QuestionUtil.hasObjective(myquestion.getQuestion())) {// 如果是主观题，等待人工阅卷
+//					continue;
+//				}
+//				
+//				if (QuestionUtil.hasQA(myquestion.getQuestion())) { 
+//					qAHandle(myquestion.getQuestion(), myquestion.getAttr(), myquestion.getAnswerList(), userAnswer);// 问答处理
+//				} else if (QuestionUtil.hasSingleChoice(myquestion.getQuestion()) || QuestionUtil.hasTrueFalse(myquestion.getQuestion())) {
+//					singleChoiceHandle(myquestion.getQuestion(), myquestion.getAttr(), myquestion.getAnswerList(), userAnswer);// 单选判断处理
+//				} else if (QuestionUtil.hasMultipleChoice(myquestion.getQuestion())) { 
+//					multipleChoiceHandle(myquestion.getQuestion(), myquestion.getAttr(), myquestion.getAnswerList(), userAnswer);// 多选处理
+//				} else if (QuestionUtil.hasFillBlank(myquestion.getQuestion())) { 
+//					fillBlankHandle(myquestion.getQuestion(), myquestion.getAttr(), myquestion.getAnswerList(), userAnswer);// 填空处理
+//				}
+//				
+//				totalScore.add(userAnswer.getScore());// 累加当前分数到总分数
+//				userAnswer.setMarkTime(new Date());
+//				userAnswer.setMarkUserId(1);
+//				myQuestionService.update(userAnswer);// 更新每道题的分数（没作答也都标记为0分。影响的地方为人工阅卷时，所有题都有分数，才允许阅卷完成。）
+//			}
+//		}
+//		
+//		if (exam.getMarkType() == 1 || myExam.getState() == 1) {// 如果是智能阅卷或未考试，直接出成绩
+//			myExam.setMarkUserId(1);// 阅卷人为admin
+//			myExam.setMarkState(3);// 标记为阅卷结束
+//			myExam.setTotalScore(totalScore.getResult());// 记录成绩 
+//			BigDecimal passScore = BigDecimalUtil.newInstance(exam.getTotalScore())
+//					.mul(exam.getPassScore()).div(100, 2).getResult();
+//			myExam.setAnswerState(BigDecimalUtil.newInstance(totalScore.getResult()).sub(passScore).getResult().doubleValue() >= 0 ? 1 : 2);// 标记及格状态
+//			myExamService.update(myExam);
+//		}
+//		
+//		if (exam.getMarkType() == 1) {
+//			log.info("客观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】完成阅卷，得{}分，{}", exam.getId(), exam.getName(), user.getId(), user.getName(), 
+//					totalScore.getResult(), myExam.getAnswerState() == 1 ? "及格" : "不及格");
+//		} else {
+//			log.info("客观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】完成阅卷，客观题部分得{}分", exam.getId(), exam.getName(), user.getId(), user.getName(), 
+//					totalScore.getResult());
+//		}
 	}
 
 	@Override
@@ -431,7 +408,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		log.info("主观题阅卷开始：【{}-{}】", exam.getId(), exam.getName());
 		List<MyExam> myExamList = myExamService.getList(examId);// 考试用户列表
 		for (MyExam myExam : myExamList) {
-			List<MyExamDetail> userAnswerList = myExamDetailService.getList(myExam.getExamId(), myExam.getUserId());// 用户答案
+			List<MyQuestion> userAnswerList = myQuestionService.getList(myExam.getExamId(), myExam.getUserId());// 用户答案
 			doMarkHandle(exam, myExam, userAnswerList);
 		}
 		
@@ -485,7 +462,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		}
 	}
 	
-	private void doMarkHandle(Exam exam, MyExam myExam, List<MyExamDetail> userAnswerList) {
+	private void doMarkHandle(Exam exam, MyExam myExam, List<MyQuestion> userAnswerList) {
 		User examUser = userService.getEntity(myExam.getUserId());
 		if (myExam.getMarkState() == 3) {//已阅卷的不处理（没考试的人考试时间结束已阅卷；人工阅卷在阅卷时间结束之前已经部分试卷阅完）
 			User markUser = userService.getEntity(myExam.getMarkUserId());
@@ -497,7 +474,6 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		// 开始补全未处理的阅卷数据，并合计成绩
 		if (myExam.getMarkState() == 1) {// 试卷无人阅卷
 			myExam.setMarkUserId(1);//记录阅卷人为admin
-			myExam.setMarkStartTime(new Date());// 阅卷时间为当前时间
 			log.info("主观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】，无人阅卷", exam.getId(), exam.getName(), examUser.getId(), examUser.getName());
 		} else if (myExam.getMarkState() == 2) {// 试卷部分阅完
 			User markUser = userService.getEntity(myExam.getMarkUserId());
@@ -507,12 +483,12 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		
 		
 		BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
-		for (MyExamDetail userAnswer : userAnswerList) {
+		for (MyQuestion userAnswer : userAnswerList) {
 			if (userAnswer.getScore() == null) {//当阅卷人没有阅卷或部分未阅卷时，阅卷时间到。
 				userAnswer.setScore(BigDecimal.ZERO);// 标记该题为0分
 				userAnswer.setMarkUserId(1);// 阅卷人admin
 				userAnswer.setMarkTime(new Date());// 阅卷时间为当前时间
-				myExamDetailService.update(userAnswer);
+				myQuestionService.update(userAnswer);
 				continue;
 			}
 			
@@ -523,7 +499,6 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		BigDecimal passScore = BigDecimalUtil.newInstance(exam.getTotalScore()).mul(exam.getPassScore()).div(100, 2).getResult();
 		myExam.setAnswerState(BigDecimalUtil.newInstance(totalScore.getResult()).sub(passScore).getResult().doubleValue() >= 0 ? 1 : 2);// 标记及格状态
 		myExam.setMarkState(3);// 标记为阅卷结束
-		myExam.setMarkEndTime(new Date());// 标记阅卷结束时间
 		myExamService.update(myExam);
 		log.info("主观题阅卷进行：【{}-{}】【1-管理员 阅 {}-{}】，得{}分，{}", exam.getId(), exam.getName(), examUser.getId(), examUser.getName(), 
 				totalScore.getResult(), myExam.getAnswerState() == 1 ? "及格" : "不及格");
@@ -533,11 +508,6 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		Collections.sort(myExamList, new Comparator<MyExam>() {
 			@Override
 			public int compare(MyExam o1, MyExam o2) {
-				if (o2.getTotalScore().compareTo(o1.getTotalScore()) == 0 // 分数相等
-						&& o1.getAnswerEndTime() != null && o2.getAnswerEndTime() != null) {// 按答题时间排序
-					return Integer.parseInt(String.valueOf(o1.getAnswerEndTime().getTime() - o2.getAnswerEndTime().getTime())); 
-				}
-				
 				return o2.getTotalScore().compareTo(o1.getTotalScore());
 			}
 		});
@@ -570,11 +540,6 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		Collections.sort(myExamList, new Comparator<MyExam>() {
 			@Override
 			public int compare(MyExam o1, MyExam o2) {
-				if (o2.getTotalScore().compareTo(o1.getTotalScore()) == 0 // 分数相等
-						&& o1.getAnswerEndTime() != null && o2.getAnswerEndTime() != null) {// 按答题时间排序
-					return Integer.parseInt(String.valueOf(o1.getAnswerEndTime().getTime() - o2.getAnswerEndTime().getTime())); 
-				}
-				
 				return o2.getTotalScore().compareTo(o1.getTotalScore());
 			}
 		});
@@ -596,8 +561,8 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	 * void
 	 */
 	private void qAHandle(Question question, ExamQuestion examQuestion, 
-			List<ExamAnswerEx> examAnswerList, MyExamDetail userAnswer) {
-		if (question.getMarkType() == 2) {// 试题类型为人工阅卷，不处理
+			List<ExamAnswerEx> examAnswerList, MyQuestion userAnswer) {
+		if (QuestionUtil.hasObjective(question)) {// 试题类型为人工阅卷，不处理
 			return;
 		}
 		
@@ -635,8 +600,8 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	 * void
 	 */
 	private void singleChoiceHandle(Question question, ExamQuestion examQuestion, 
-			List<ExamAnswerEx> examAnswerList, MyExamDetail userAnswer) {
-		if (question.getMarkType() == 2) {// 试题类型为人工阅卷，不处理
+			List<ExamAnswerEx> examAnswerList, MyQuestion userAnswer) {
+		if (QuestionUtil.hasObjective(question)) {// 试题类型为人工阅卷，不处理
 			return;
 		}
 		
@@ -662,8 +627,8 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	 * void
 	 */
 	private void multipleChoiceHandle(Question question, ExamQuestion examQuestion, 
-			List<ExamAnswerEx> examAnswerList, MyExamDetail userAnswer) {
-		if (question.getMarkType() == 2) {// 试题类型为人工阅卷，不处理
+			List<ExamAnswerEx> examAnswerList, MyQuestion userAnswer) {
+		if (QuestionUtil.hasObjective(question)) {// 试题类型为人工阅卷，不处理
 			return;
 		}
 		
@@ -727,15 +692,15 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		examAnswer.setScore(new BigDecimal("1"));
 		examAnswerList.add(examAnswer);
 		
-		MyExamDetail userAnswer = new MyExamDetail();
+		MyQuestion userAnswer = new MyQuestion();
 		userAnswer.setAnswer("助学金\n奖学金\n奖学金");
 		
 		new MyExamServiceImpl().fillBlankHandle(question, examQuestion, examAnswerList, userAnswer);
 		System.err.println(userAnswer.getScore());
 	}
 	private void fillBlankHandle(Question question, ExamQuestion examQuestion, 
-			List<ExamAnswerEx> examAnswerList, MyExamDetail userAnswer) {
-		if (question.getMarkType() == 2) {// 试题类型为人工阅卷，不处理
+			List<ExamAnswerEx> examAnswerList, MyQuestion userAnswer) {
+		if (QuestionUtil.hasObjective(question)) {// 试题类型为人工阅卷，不处理
 			return;
 		}
 		

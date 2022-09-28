@@ -34,7 +34,7 @@ public class QuestionCommentServiceImpl extends BaseServiceImp<QuestionComment> 
 	}
 
 	@Override
-	public void addAndUpdate(QuestionComment questionComment, Integer anonymity) {
+	public void addEx(QuestionComment questionComment, Integer anonymity) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(questionComment.getContent())) {
 			throw new MyException("参数错误：content");
@@ -72,7 +72,7 @@ public class QuestionCommentServiceImpl extends BaseServiceImp<QuestionComment> 
 	}
 
 	@Override
-	public void delAndUpdate(Integer id) {
+	public void delEx(Integer id) {
 		// 校验数据有效性
 		List<Map<String, Object>> list = questionCommentDao.getList(id);
 		if (list.size() > 0) {

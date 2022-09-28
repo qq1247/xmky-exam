@@ -46,7 +46,7 @@ public interface MyExamService extends BaseService<MyExam>{
 	 * v1.0 chenyun 2021年8月24日上午9:55:53
 	 * 
 	 * v1.1 zhanghc 2021-10-19
-	 * 由原参数myExamDetailId改成examId questionId userId，从接口层面保证字段的好理解
+	 * 由原参数myQuestionId改成examId questionId userId，从接口层面保证字段的好理解
 	 * 
 	 * @param examId
 	 * @param questionId 

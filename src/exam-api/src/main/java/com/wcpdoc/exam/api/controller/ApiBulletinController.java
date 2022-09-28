@@ -68,7 +68,7 @@ public class ApiBulletinController extends BaseController {
 	@ResponseBody
 	public PageResult add(Bulletin bulletin) {
 		try {
-			bulletinService.addAndUpdate(bulletin);
+			bulletinService.addEx(bulletin);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加公告错误：{}", e.getMessage());
@@ -89,7 +89,7 @@ public class ApiBulletinController extends BaseController {
 	@ResponseBody
 	public PageResult edit(Bulletin bulletin) {
 		try {
-			bulletinService.updateAndUpdate(bulletin);
+			bulletinService.updateEx(bulletin);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改公告错误：{}", e.getMessage());
@@ -110,7 +110,7 @@ public class ApiBulletinController extends BaseController {
 	@ResponseBody
 	public PageResult del(Integer id) {
 		try {
-			bulletinService.delAndUpdate(id);
+			bulletinService.delEx(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("删除公告错误：{}", e.getMessage());

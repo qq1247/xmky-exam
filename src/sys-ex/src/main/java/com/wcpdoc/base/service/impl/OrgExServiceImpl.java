@@ -40,7 +40,7 @@ public class OrgExServiceImpl extends BaseServiceImp<Object> implements OrgExSer
 	private FileService fileService;
 
 	@Override
-	public void delAndUpdate(Org org) {
+	public void delEx(Org org) {
 		List<User> userList = userService.getList(org.getId());
 		if (ValidateUtil.isValid(userList)) {
 			throw new MyException("该机构下有用户，不允许删除");
@@ -117,7 +117,7 @@ public class OrgExServiceImpl extends BaseServiceImp<Object> implements OrgExSer
 			curOrg.setName(orgRowData.getName());
 			curOrg.setParentId(parentOrg.getId());
 			curOrg.setNo(no++);
-			orgService.addAndUpdate(curOrg);
+			orgService.addEx(curOrg);
 			
 			if (ValidateUtil.isValid(orgRowData.getChildren())) {// 有子节点则遍历保存
 				saveOrg(orgRowData.getChildren(), curOrg);

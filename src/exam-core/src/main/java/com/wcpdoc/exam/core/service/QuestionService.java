@@ -56,7 +56,7 @@ public interface QuestionService extends BaseService<Question>{
 	void copy(Integer id) throws Exception;
 	
 	/**
-	 * 获取试题列表（已删除）
+	 * 获取试题列表
 	 * 
 	 * v1.0 chenyun 2022年4月22日上午11:22:25
 	 * @return List<Integer>

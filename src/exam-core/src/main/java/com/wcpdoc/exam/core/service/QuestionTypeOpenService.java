@@ -21,7 +21,7 @@ public interface QuestionTypeOpenService extends BaseService<QuestionTypeOpen> {
 	 * @param id
 	 * void
 	 */
-	void addAndUpdate(QuestionTypeOpen questionTypeOpen);
+	void addEx(QuestionTypeOpen questionTypeOpen);
 	
 	/**
 	 * 删除题库开放
@@ -31,7 +31,7 @@ public interface QuestionTypeOpenService extends BaseService<QuestionTypeOpen> {
 	 * @param id
 	 * void
 	 */
-	void delAndUpdate(Integer id);
+	void delEx(Integer id);
 	
 	/**
 	 * 试题开放列表

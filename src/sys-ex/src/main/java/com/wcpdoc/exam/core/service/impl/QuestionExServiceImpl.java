@@ -34,7 +34,7 @@ public class QuestionExServiceImpl extends BaseServiceImp<Question> implements Q
 	}
 
 	@Override
-	public void updateAndUpdate(Question question) {
+	public void updateEx(Question question) {
 		List<ExamQuestion> examQuestionList = examQuestionService.getList(question.getId());
 		if (ValidateUtil.isValid(examQuestionList)) {
 			Exam exam = examService.getEntity(examQuestionList.get(0).getExamId());

@@ -30,24 +30,10 @@ public class MyExam {
 	private Integer examId;
 	@Column(name = "USER_ID")
 	private Integer userId;
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	@Column(name = "ANSWER_START_TIME")
-	private Date answerStartTime;
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	@Column(name = "ANSWER_END_TIME")
-	private Date answerEndTime;
 	@Column(name = "MARK_USER_ID")
 	private Integer markUserId;
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	@Column(name = "MARK_START_TIME")
-	private Date markStartTime;
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	@Column(name = "MARK_END_TIME")
-	private Date markEndTime;
+	@Column(name = "OBJECTIVE_SCORE")
+	private BigDecimal objectiveScore;
 	@Column(name = "TOTAL_SCORE")
 	private BigDecimal totalScore;
 	@Column(name = "STATE")
@@ -89,20 +75,20 @@ public class MyExam {
 		this.userId = userId;
 	}
 
-	public Date getAnswerStartTime() {
-		return answerStartTime;
-	}
-
-	public void setAnswerStartTime(Date answerStartTime) {
-		this.answerStartTime = answerStartTime;
-	}
-
 	public Integer getMarkUserId() {
 		return markUserId;
 	}
 
 	public void setMarkUserId(Integer markUserId) {
 		this.markUserId = markUserId;
+	}
+
+	public BigDecimal getObjectiveScore() {
+		return objectiveScore;
+	}
+
+	public void setObjectiveScore(BigDecimal objectiveScore) {
+		this.objectiveScore = objectiveScore;
 	}
 
 	public BigDecimal getTotalScore() {
@@ -113,32 +99,26 @@ public class MyExam {
 		this.totalScore = totalScore;
 	}
 
-	/** 1：未考试；2：考试中；3：已交卷；4：强制交卷； */
 	public Integer getState() {
 		return state;
 	}
 
-	/** 1：未考试；2：考试中；3：已交卷；4：强制交卷； */
 	public void setState(Integer state) {
 		this.state = state;
 	}
 
-	/** 1：未阅卷；2：阅卷中；3：已阅卷； */
 	public Integer getMarkState() {
 		return markState;
 	}
 
-	/** 1：未阅卷；2：阅卷中；3：已阅卷； */
 	public void setMarkState(Integer markState) {
 		this.markState = markState;
 	}
 
-	/** 1：及格；2：不及格 */
 	public Integer getAnswerState() {
 		return answerState;
 	}
 
-	/** 1：及格；2：不及格 */
 	public void setAnswerState(Integer answerState) {
 		this.answerState = answerState;
 	}
@@ -159,30 +139,6 @@ public class MyExam {
 		this.updateTime = updateTime;
 	}
 
-	public Date getAnswerEndTime() {
-		return answerEndTime;
-	}
-
-	public void setAnswerEndTime(Date answerEndTime) {
-		this.answerEndTime = answerEndTime;
-	}
-
-	public Date getMarkStartTime() {
-		return markStartTime;
-	}
-
-	public void setMarkStartTime(Date markStartTime) {
-		this.markStartTime = markStartTime;
-	}
-
-	public Date getMarkEndTime() {
-		return markEndTime;
-	}
-
-	public void setMarkEndTime(Date markEndTime) {
-		this.markEndTime = markEndTime;
-	}
-
 	public Integer getNo() {
 		return no;
 	}
@@ -190,4 +146,5 @@ public class MyExam {
 	public void setNo(Integer no) {
 		this.no = no;
 	}
+
 }

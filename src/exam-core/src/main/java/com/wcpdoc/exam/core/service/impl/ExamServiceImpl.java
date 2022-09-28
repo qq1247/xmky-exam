@@ -2,6 +2,7 @@ package com.wcpdoc.exam.core.service.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,6 +12,8 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.stereotype.Service;
 
@@ -29,20 +32,29 @@ import com.wcpdoc.exam.core.cache.AutoMarkCache;
 import com.wcpdoc.exam.core.dao.ExamDao;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamQuestion;
+import com.wcpdoc.exam.core.entity.ExamRule;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyMark;
+import com.wcpdoc.exam.core.entity.MyQuestion;
 import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
-import com.wcpdoc.exam.core.entity.ex.Chapter;
-import com.wcpdoc.exam.core.entity.ex.ExamAnswerEx;
-import com.wcpdoc.exam.core.entity.ex.MyExamChapter;
-import com.wcpdoc.exam.core.entity.ex.MyQuestion;
+import com.wcpdoc.exam.core.entity.ex.ExamInfo;
+import com.wcpdoc.exam.core.entity.ex.ExamQuestionEx;
+import com.wcpdoc.exam.core.entity.ex.ExamUser;
+import com.wcpdoc.exam.core.entity.ex.QuestionEx;
 import com.wcpdoc.exam.core.service.ExamExService;
 import com.wcpdoc.exam.core.service.ExamQuestionService;
+import com.wcpdoc.exam.core.service.ExamRuleService;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
+import com.wcpdoc.exam.core.service.MyQuestionService;
+import com.wcpdoc.exam.core.service.QuestionAnswerService;
+import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
+import com.wcpdoc.exam.core.util.ExamUtil;
+import com.wcpdoc.exam.core.util.QuestionUtil;
 import com.wcpdoc.notify.service.NotifyService;
 
 /**
@@ -68,6 +80,14 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	private MyMarkService myMarkService;
 	@Resource
 	private MyExamService myExamService;
+	@Resource
+	private MyQuestionService myQuestionService;
+	@Resource
+	private QuestionAnswerService questionAnswerService;
+	@Resource
+	private ExamRuleService examRuleService;
+	@Resource
+	private QuestionOptionService questionOptionService;
 	
 	@Override
 	@Resource(name = "examDaoImpl")
@@ -76,131 +96,50 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 
 	@Override
-	public void addAndUpdate(Exam exam) {
-		// 校验数据有效性
-		if (!ValidateUtil.isValid(exam.getName())) {
-			throw new MyException("参数错误：name");
-		}
-		if (exam.getTimeType() == 1 && !ValidateUtil.isValid(exam.getStartTime())) {
-			throw new MyException("参数错误：startTime");
-		}
-		if (exam.getTimeType() == 1 && !ValidateUtil.isValid(exam.getEndTime())) {
-			throw new MyException("参数错误：endTime");
-		}
-		// if (exam.getStartTime().getTime() <= new Date().getTime()) {
-		// 	throw new MyException("考试开始时间必须大于当前时间");// 页面上选的当前时间，添加时就过期了，体验差
-		// }
-		if (exam.getTimeType() == 1 && exam.getEndTime().getTime() <= new Date().getTime()) {
-			throw new MyException("考试结束时间必须大于当前时间");
-		}
-		if (exam.getTimeType() == 1 && exam.getStartTime().getTime() >= exam.getEndTime().getTime()) {
-			throw new MyException("考试结束时间必须大于考试开始时间");
-		}
-		if (exam.getState() != 1) {
-			throw new MyException("试卷未发布");
-		}
+	public void addEx(ExamInfo examInfo) {
+		/**
+		 *  如果是人工组卷且从题库选择的试题，重新查一遍数据库，不要依赖前端，用于检测包含主观题等
+		 *  如果是随机组卷，返回需要的题库，用于随机抽题等
+		 */
+		Map<Integer, List<Question>> questionListCache = addHandle(examInfo);
 		
-		if (exam.getTimeType() == 1 && exam.getMarkType() == 2) {// 如果是自动阅卷类型，没有阅卷开始时间和阅卷结束时间
-			if (!ValidateUtil.isValid(exam.getMarkStartTime())) {
-				throw new MyException("参数错误：markStartTime");
-			}
-			if (!ValidateUtil.isValid(exam.getMarkEndTime())) {
-				throw new MyException("参数错误：markEndTime");
-			}
-			if (exam.getMarkStartTime().getTime() <= exam.getEndTime().getTime()) {
-				throw new MyException("阅卷开始时间必须大于考试结束时间");
-			}
-			if (exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()) {
-				throw new MyException("阅卷结束时间必须大于阅卷开始时间");
-			}
-		}
+		/**
+		 * 校验数据有效性，数据结构如下：
+		 * 
+		 * {
+		 * "exam":{"name":"期末考试","markType":1,"genType":1,"totalScore":100},
+		 * "examQuestions": [
+		 *    {"type":1,"chapterName":"单选题","chapterTxt":"每题2分，一共10题20分"},
+		 *    {"type":2,"socre":2,"scores":1,"question":{"id":2,"title":"这是一道多选题"}}
+		 *  ],
+		 * "examUsers": [
+		 *    {"examUserIds":[1,2],"markUserId":5},
+		 *    {"examUserIds":[3,4],"markUserId":5}
+		 *  ],
+		 *  "examRules": [
+		 *    {"questionTypeId":2,"type":2,"markTypes":1,"markOptions":[2,3],"num":10,"score":2},
+		 *  ]
+		 * }
+		 */
+		addExValid(examInfo, questionListCache);
 
-		// 添加考试
-		exam.setUpdateUserId(getCurUser().getId());
-		exam.setUpdateTime(new Date());
-		exam.setState(2);// 草稿
-		exam.setMarkState(1);// 标记为未阅卷（考试时间结束，定时任务自动阅卷，标记为已阅）
-		exam.setMarkStartTime(exam.getMarkType() == 1 ? null : exam.getMarkStartTime());
-		exam.setMarkEndTime(exam.getMarkType() == 1 ? null : exam.getMarkEndTime());
-		exam.setScoreState(2);
-		exam.setRankState(2);
-		exam.setAnonState(2);
-		add(exam);
+		// 添加考试信息
+		addExExam(examInfo);
+		
+		// 保存试卷信息
+		addExPaper(examInfo, questionListCache);
+		
+		// 分配试卷到用户
+		addExUser(examInfo, questionListCache);
 	}
 	
 	@Override
-	public void updateAndUpdate(Exam exam) {
-		//校验数据有效性
-		if (!ValidateUtil.isValid(exam.getName())) {
-			throw new MyException("参数错误：name");
-		}
-		if (exam.getTimeType() == 1 && !ValidateUtil.isValid(exam.getStartTime())) {
-			throw new MyException("参数错误：startTime");
-		}
-		if (exam.getTimeType() == 1 && !ValidateUtil.isValid(exam.getEndTime())) {
-			throw new MyException("参数错误：endTime");
-		}
-//		if (exam.getStartTime().getTime() <= new Date().getTime()) {
-//			throw new MyException("考试开始时间必须大于当前时间");
-//		}
-		if (exam.getTimeType() == 1 && exam.getEndTime().getTime() <= new Date().getTime()) {
-			throw new MyException("考试结束时间必须大于当前时间");
-		}
-		if (exam.getTimeType() == 1 && exam.getStartTime().getTime() >= exam.getEndTime().getTime()) {
-			throw new MyException("考试结束时间必须大于考试开始时间");
-		}
-
-		if (exam.getState() != 1) {
-			throw new MyException("试卷未发布");
-		}
-		if (exam.getTimeType() == 1 && exam.getMarkType() == 2) {// 如果是自动阅卷类型，没有阅卷开始时间和阅卷结束时间
-			if (!ValidateUtil.isValid(exam.getMarkStartTime())) {
-				throw new MyException("参数错误：markStartTime");
-			}
-			if (!ValidateUtil.isValid(exam.getMarkEndTime())) {
-				throw new MyException("参数错误：markEndTime");
-			}
-			if (exam.getMarkStartTime().getTime() <= exam.getEndTime().getTime()) {
-				throw new MyException("阅卷开始时间必须大于考试结束时间");
-			}
-			if (exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()) {
-				throw new MyException("阅卷结束时间必须大于阅卷开始时间");
-			}
-		}
-		
-		Exam entity = getEntity(exam.getId());
-		if(entity.getState() == 0) {
-			throw new MyException("已删除");
-		}
-		if(entity.getState() == 1) {
-			throw new MyException("已发布");
-		}
-		if(entity.getState() == 3) {
-			throw new MyException("已归档");
-		}
-		
-		// 修改考试
-		entity.setName(exam.getName());
-		entity.setStartTime(exam.getStartTime());
-		entity.setEndTime(exam.getEndTime());
-		entity.setMarkStartTime(exam.getMarkType() == 1 ? null : exam.getMarkStartTime());
-		entity.setMarkEndTime(exam.getMarkType() == 1 ? null : exam.getMarkEndTime());
-		//exam.setMarkState(1);// 不处理
-		//entity.setScoreState(exam.getScoreState());
-		//entity.setRankState(exam.getRankState());
-		//entity.setLoginType(exam.getLoginType());
-		//entity.setDescription(exam.getDescription());
-		entity.setUpdateTime(new Date());
-		entity.setUpdateUserId(getCurUser().getId());
-		//entity.setState(null);
-		//exam.setExamTypeId(null);// 分类不变
-		update(entity);
-	}
-	
-	@Override
-	public void delAndUpdate(Integer id) {
+	public void delEx(Integer id) {
 		// 校验数据有效性（只要有权限就删，不管是否考试中，如创建了一个超长的结束时间）
 		Exam exam = getEntity(id);
+		if (exam.getUpdateUserId().intValue() != getCurUser().getId().intValue()) {
+			throw new MyException("无操作权限");
+		}
 		
 		// 删除考试
 		exam.setState(0);
@@ -211,59 +150,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	
 	@Override
 	public void publish(Integer id) {
-		// 校验数据有效性
-		Exam exam = getEntity(id);
-		publishValid(exam);
 		
-		// 发布考试
-		exam.setState(1);
-		exam.setUpdateUserId(getCurUser().getId());
-		exam.setUpdateTime(new Date());
-		update(exam);
-		
-		// 发布扩展
-		if (exam.getGenType() == 1) {
-			examExService.publish(exam);
-		} else if (exam.getGenType() == 2) {
-			examExService.publishOfRand(exam);
-		}
-		
-		// 标记为需要监听的考试（考试结束自动阅卷）
-		AutoMarkCache.put(exam.getId(), exam);
-	}
-
-	private void publishValid(Exam exam) {
-		if(exam.getState() == 0) {
-			throw new MyException("考试已删除");
-		}
-		if(exam.getState() == 1) {
-			throw new MyException("考试已发布");
-		}
-		if(exam.getState() == 3) {
-			throw new MyException("考试已归档");
-		}
-//		if (exam.getStartTime().getTime() <= new Date().getTime()) {
-//			throw new MyException("考试开始时间必须大于当前时间");
-//		}
-		if (exam.getTimeType() == 1 && exam.getEndTime().getTime() <= new Date().getTime()) {
-			throw new MyException("考试结束时间必须大于当前时间");
-		}
-		if (exam.getTimeType() == 1 && exam.getStartTime().getTime() >= exam.getEndTime().getTime()) {
-			throw new MyException("考试结束时间必须大于考试开始时间");
-		}
-		if (exam.getTimeType() == 1 && exam.getMarkType() == 2) {// 如果是自动阅卷类型，没有阅卷开始时间和阅卷结束时间
-			if (exam.getMarkStartTime().getTime() <= exam.getEndTime().getTime()) {
-				throw new MyException("阅卷开始时间必须大于考试结束时间");
-			}
-			if (exam.getMarkStartTime().getTime() >= exam.getMarkEndTime().getTime()) {
-				throw new MyException("阅卷结束时间必须大于阅卷开始时间");
-			}
-		}
-	}
-	
-	@Override
-	public List<Exam> getList(Integer examTypeId) {
-		return examDao.getList(examTypeId);
 	}
 
 	@Override
@@ -440,7 +327,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		AutoMarkCache.put(exam.getId(), exam);
 	}
 	
-
 	@Override
 	public List<Map<String, Object>> getExamUserList(Integer id) {
 		return examDao.getExamUserList(id);
@@ -450,414 +336,491 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	public List<Map<String, Object>> getExamUserList(Integer id, Integer markUserId) {
 		return examDao.getExamUserList(id, markUserId);
 	}
+	
+	private void addExExam(ExamInfo examInfo) {
+		Exam exam = examInfo.getExam();
+		exam.setMarkState(1);// 标记为未阅卷（考试时间结束，定时任务自动阅卷，标记为已阅）
+		exam.setUpdateUserId(getCurUser().getId());
+		exam.setUpdateTime(new Date());
+		add(exam);
+	}
+	
+	private void addExPaper(ExamInfo examInfo, Map<Integer, List<Question>> questionListCache) {
+		// 如果是人工试卷，保存试卷模板
+		if (examInfo.getExam().getGenType() == 1) {
+			for (int i = 0; i < examInfo.getExamQuestions().length; i++) {
+				ExamQuestionEx examQuestion = examInfo.getExamQuestions()[i];
+				if (ExamUtil.hasQuestion(examQuestion)) {
+					QuestionEx questionEx = examQuestion.getQuestionEx();
+					if (!ValidateUtil.isValid(questionEx.getId())) {// 如果是从页面导入的新题，先保存
+						questionService.addEx(questionEx, questionEx.getMarkOptionArr(), questionEx.getOptions(), questionEx.getAnswers(), questionEx.getAnswerScores());
+					}
+					examQuestion.setQuestionId(questionEx.getId());
+				}
+				examQuestion.setExamId(examInfo.getExam().getId());
+				examQuestion.setNo(i + 1);
+				examQuestion.setUpdateUserId(getCurUser().getId());
+				examQuestion.setUpdateTime(new Date());
+				examQuestionService.add(examQuestion);
+			}
+		}
+		// 如果是随机试卷，保存抽题规则
+		else if (examInfo.getExam().getGenType() == 2) {
+			for (ExamRule examRule : examInfo.getExamRules()) {
+				examRuleService.add(examRule);
+			}
+		}
+	}
+	
+	private void addExUser(ExamInfo examInfo, Map<Integer, List<Question>> questionListCache) {
+		// 获取用户列表
+		Map<Integer, List<QuestionOption>> questionOptionCache = new HashMap<>();
+		for (ExamUser examUser : examInfo.getExamUsers()) {
+			for (Integer examUserId : examUser.getExamUserIds()) {
+				// 生成我的考试信息
+				MyExam myExam = new MyExam();
+				myExam.setExamId(examInfo.getExam().getId());
+				myExam.setUserId(examUserId);
+				myExam.setMarkUserId(examUser.getMarkUserId());
+				myExam.setState(1);// 未考试
+				myExam.setMarkState(1);// 未阅卷
+				myExam.setUpdateTime(new Date());
+				myExam.setUpdateUserId(getCurUser().getId());
+				myExamService.add(myExam);
+				
+				// 如果是人工组卷，直接生成我的试卷
+				if (examInfo.getExam().getGenType() == 1) {
+					List<MyQuestion> myQuestionList = new ArrayList<>();
+					List<MyQuestion> subMyQuestionList = new ArrayList<>();
+					for (int i = 0; i < examInfo.getExamQuestions().length; i++) {
+						ExamQuestionEx examQuestion = examInfo.getExamQuestions()[i];
+						MyQuestion myQuestion = new MyQuestion();
+						try {
+							BeanUtils.copyProperties(myQuestion, examQuestion);// 复制试卷到用户试卷
+						} catch (Exception e) {
+							throw new MyException("复制属性失败");
+						}
+						myQuestion.setUserId(examUserId);
+						
+						if (ExamUtil.hasQuestionRand(examInfo.getExam())) {// 如果是试题乱序（章节不能乱序，试题不能跨章节乱序）
+							if (ExamUtil.hasQuestion(myQuestion)) {// 1章节；2试题；3试题；4试题；5章节；6试题；7试题；8：试题 
+								subMyQuestionList.add(myQuestion); // 2试题；3试题；4试题；
+							} else if (ExamUtil.hasChapter(myQuestion) || i >= myQuestionList.size() - 1) {// 5章节；
+								Collections.shuffle(subMyQuestionList);// 3试题；2试题；4试题；
+								Integer maxNo = myQuestion.getNo();// 5章节
+								for (MyQuestion subMyQuestion : subMyQuestionList) {
+									subMyQuestion.setNo(maxNo--);
+									myQuestionService.update(subMyQuestion);// 1章节；4试题；2试题；3试题；
+								}
+							}
+						}
+						if (ExamUtil.hasOptionRand(examInfo.getExam())) {// 如果是选项乱序
+							List<QuestionOption> questionOptionList = questionOptionCache.get(myQuestion.getQuestionId());// A,B,C,D
+							if (questionOptionList == null) {
+								questionOptionList = questionOptionService.getList(myQuestion.getQuestionId());
+								questionOptionCache.put(myQuestion.getQuestionId(), questionOptionList);
+							}
+							myQuestion.setOptionNo(StringUtil.join(shuffleNums(1, questionOptionList.size())));// D,B,A,C
+						}
+						myQuestionService.add(myQuestion);
+					}
+				} 
+				// 如果是随机组卷，按抽题规则生成我的试卷
+				else if (examInfo.getExam().getGenType() == 2) {
+					Set<Question> questionOfUsed = new HashSet<>();
+					int no = 1;
+					for (int i = 0; i < examInfo.getExamRules().length; i++) {
+						ExamRule examRule = examInfo.getExamRules()[i];
+						List<Question> questionList = questionListCache.get(examRule.getQuestionTypeId());
+						Collections.shuffle(questionList);// 从当前规则中随机抽题（乱序模拟随机）
+						for(Question question : questionList) {
+							if (questionOfUsed.contains(question)) {// 已经使用过的试题就不能在用，继续找下一个
+								continue;
+							}
+							if (examRule.getType() != question.getType() // 当前试题不符合当前抽题规则，继续找下一个
+									|| examRule.getMarkType() != question.getMarkType()) {
+								continue;
+							}
+							
+							ExamQuestion examQuestion = new ExamQuestion();
+							examQuestion.setType(2);
+							examQuestion.setScore(examRule.getScore());
+							addExUserScores(examQuestion, examRule, question);
+							examQuestion.setMarkOptions(examRule.getMarkOptions());
+							examQuestion.setExamId(examRule.getExamId());
+							examQuestion.setQuestionId(question.getId());
+							examQuestion.setNo(no++);
+							examQuestion.setUpdateTime(new Date());
+							examQuestion.setUpdateUserId(getCurUser().getId());
+							examQuestionService.add(examQuestion);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private void addExValid(ExamInfo examInfo, Map<Integer, List<Question>> questionListCache) {
+		// 校验考试信息
+		addValidExam(examInfo);
+		// 校验试卷信息
+		addValidPaper(examInfo, questionListCache);
+		// 校验考试用户信息
+		addValidExamUser(examInfo);
+	}
+
+	private void addValidExamUser(ExamInfo examInfo) {
+		ExamUser[] examUsers = examInfo.getExamUsers();
+		Set<Integer> examUserIdCache = new HashSet<>();
+		Set<Integer> markUserIdCache = new HashSet<>();
+		for (ExamUser examUser : examUsers) {
+			if (examInfo.getExam().getMarkType() == 1 && ValidateUtil.isValid(examUser.getMarkUserId())) {// 如果自动阅卷，不需要阅卷用户
+				throw new MyException("参数错误：examUserList.markUserId");
+			}
+			if (examInfo.getExam().getMarkType() == 2 && ValidateUtil.isValid(examUser.getMarkUserId())) {// 如果人工阅卷，需要阅卷用户
+				throw new MyException("参数错误：examUserList.markUserId");
+			}
+			if (!ValidateUtil.isValid(examUser.getExamUserIds())) {
+				throw new MyException("参数错误：examUserList.examUserIds");
+			}
+			
+			for (Integer examUserId : examUser.getExamUserIds()) {
+				if (examUserIdCache.contains(examUserId)) {
+					throw new MyException("参数错误：examUserList.examUserIds重复");
+				}
+				examUserIdCache.add(examUserId);
+			}
+			
+			if (ValidateUtil.isValid(examUser.getMarkUserId())) {
+				if (markUserIdCache.contains(examUser.getMarkUserId())) {
+					throw new MyException("参数错误：examUserList.markUserId重复");
+				}
+				markUserIdCache.add(examUser.getMarkUserId());
+			}
+		}
+	}
+
+	private void addValidPaper(ExamInfo examInfo, Map<Integer, List<Question>> questionListCache) {
+		if (examInfo.getExam().getGenType() == 1) {
+			for (ExamQuestionEx examQuestion : examInfo.getExamQuestions()) {
+				if (examQuestion.getType() != 1 && examQuestion.getType() != 2) {
+					throw new MyException("参数错误：examQuestion.type");
+				}
+				if (examQuestion.getType() == 1) {
+					if (!ValidateUtil.isValid(examQuestion.getChapterName())) {
+						throw new MyException("参数错误：examQuestion.chapterName");
+					}
+					if (ValidateUtil.isValid(examQuestion.getScore())) {
+						throw new MyException("参数错误：examQuestion.score");
+					}
+					if (ValidateUtil.isValid(examQuestion.getScores())) {
+						throw new MyException("参数错误：examQuestion.scores");
+					}
+					if (ValidateUtil.isValid(examQuestion.getMarkOptions())) {
+						throw new MyException("参数错误：examQuestion.markOptions");
+					}
+					if (examQuestion.getQuestionEx() != null) {
+						throw new MyException("参数错误：examQuestion.question");
+					}
+				}
+				if (examQuestion.getType() == 2) {
+					if (ValidateUtil.isValid(examQuestion.getChapterName())) {
+						throw new MyException("参数错误：examQuestion.chapterName");
+					}
+					if (ValidateUtil.isValid(examQuestion.getChapterTxt())) {
+						throw new MyException("参数错误：examQuestion.chapterTxt");
+					}
+					
+					if (!ValidateUtil.isValid(examQuestion.getScore())) {
+						throw new MyException("参数错误：examQuestion.score");
+					}
+					if (!ValidateUtil.isValid(examQuestion.getScores())) {
+						throw new MyException("参数错误：examQuestion.scores");
+					}
+					if (examQuestion.getQuestionEx() == null) {
+						throw new MyException("参数错误：examQuestion.question");
+					}
+				}
+			}
+		}
+		
+		if (examInfo.getExam().getGenType() == 2) {
+			Set<Question> questionOfUsed = new HashSet<>();// 已使用过的试题
+			for (int i = 0; i < examInfo.getExamRules().length; i++) {
+				ExamRule examRule = examInfo.getExamRules()[i];
+				if (!ValidateUtil.isValid(examRule.getQuestionTypeId())) {
+					throw new MyException("参数错误：examRule.questionTypeId");
+				}
+				if (!ValidateUtil.isValid(examRule.getType())) {
+					throw new MyException("参数错误：examRule.type");
+				}
+				if (!ValidateUtil.isValid(examRule.getMarkType())) {
+					throw new MyException("参数错误：examRule.markType");
+				}
+				if (!ValidateUtil.isValid(examRule.getNum())) {
+					throw new MyException("参数错误：examRule.num");
+				}
+				if (!ValidateUtil.isValid(examRule.getScore())) {
+					throw new MyException("参数错误：examRule.score");
+				}
+				
+				if ((examRule.getType() == 1 || examRule.getType() == 2 || examRule.getType() == 4)) {// 单选多选判断不能是主观题
+					if (examRule.getMarkType() == 2) {
+						throw new MyException("参数错误：examRule.MarkType");
+					}
+				}
+				if (examRule.getType() == 2) {
+					if (!ValidateUtil.isValid(examRule.getScores())) {// 如果是多选，必须有子分数（漏选分值）
+						throw new MyException("参数错误：examRule.scores");
+					}
+					if (examRule.getScore().doubleValue() < examRule.getScores().doubleValue()) {// 子分数不能大于分数
+						throw new MyException("参数错误：examRule.scores");
+					}
+				}
+				if (examRule.getType() != 2 && ValidateUtil.isValid(examRule.getScores())) {// 如果是单选判断不能有子分数，填空问答平均分配分数
+					throw new MyException("参数错误：examRule.scores");
+				}
+				
+				
+				int validQuestionNum = 0;// 符合当前抽题规则的有效题数
+				for (Question question : questionListCache.get(examRule.getQuestionTypeId())) {
+					if (questionOfUsed.contains(question)) {// 已经使用过的试题就不能在用，继续找下一个
+						continue;
+					}
+					if (validQuestionNum >= examRule.getNum()) {// 当前题库已满足当前抽题规则，不在继续验证
+						break;
+					}
+					
+					if (examRule.getType() == question.getType() // 当前试题满足抽题规则
+							&& examRule.getMarkType() == question.getMarkType()) {
+						questionOfUsed.add(question);// 加入已使用过的试题
+						validQuestionNum++; // 有效题数加一
+					}
+				}
+				
+				if (validQuestionNum < examRule.getNum()) {
+					throw new MyException(String.format("第【%s】个规则题数不足，请修改", i + 1));
+				}
+			}
+		}
+	}
+
+	private void addValidExam(ExamInfo examInfo) {
+		Exam exam = examInfo.getExam();
+		if (!ValidateUtil.isValid(exam.getName())) {
+			throw new MyException("参数错误：exam.name");
+		}
+		if (exam.getScoreState() != 1 && exam.getScoreState() != 2) {
+			throw new MyException("参数错误：exam.scoreState");
+		}
+		if (exam.getRankState() != 1 && exam.getRankState() != 2) {
+			throw new MyException("参数错误：exam.rankState");
+		}
+		if (exam.getAnonState() != 1 && exam.getAnonState() != 2) {
+			throw new MyException("参数错误：exam.anonState");
+		}
+		if (exam.getPassScore().doubleValue() < 0 || exam.getPassScore().doubleValue() > 100) {
+			throw new MyException("参数错误：exam.passScore");
+		}
+		if (exam.getShowType() != 1 && exam.getShowType() != 3) {
+			throw new MyException("参数错误：exam.showType");
+		}
+		if (exam.getState() != 1 && exam.getState() != 2) {
+			throw new MyException("参数错误：exam.state");
+		}
+		
+		if (exam.getGenType() != 1 && exam.getGenType() != 2) {
+			throw new MyException("参数错误：exam.genType");
+		}
+		BigDecimal paperTotalScore = BigDecimal.ZERO;// 试卷总分
+		boolean containObjectiveQuesiton = false;// 包含主观试题
+		if (exam.getGenType() == 1) {
+			if (!ValidateUtil.isValid(examInfo.getExamQuestions())) {
+				throw new MyException("参数错误：examQuestions");
+			}
+			for (ExamQuestionEx examQuestion : examInfo.getExamQuestions()) {
+				if (ExamUtil.hasQuestion(examQuestion)) {
+					paperTotalScore = BigDecimalUtil.newInstance(paperTotalScore).add(examQuestion.getScore()).getResult();// 单题分数从组卷后定制的分数中取
+					if (QuestionUtil.hasObjective(examQuestion.getQuestionEx())) {
+						containObjectiveQuesiton = true;
+					}
+				}
+			}
+		}
+		if (exam.getGenType() == 2) {
+			if (!ValidateUtil.isValid(examInfo.getExamRules())) {
+				throw new MyException("参数错误：examRules");
+			}
+			for (ExamRule examRule : examInfo.getExamRules()) {
+				paperTotalScore = BigDecimalUtil.newInstance(examRule.getScore()).mul(examRule.getNum()).add(paperTotalScore).getResult();// 单题分数*数量累加到总分
+				if (examRule.getMarkType() == 2) {
+					containObjectiveQuesiton = true;
+				}
+			}
+		}
+		
+		if (containObjectiveQuesiton && exam.getMarkType() != 2) {
+			throw new MyException("参数错误：exam.markType");
+		}
+		if (!containObjectiveQuesiton && exam.getMarkType() != 1) {
+			throw new MyException("参数错误：exam.markType");
+		}
+		if (!ValidateUtil.isValid(exam.getTotalScore()) //总分无效
+				|| exam.getTotalScore().doubleValue() <= 0 //总分小于0
+				|| exam.getTotalScore().doubleValue() != paperTotalScore.doubleValue()) {//总分和卷面分数不相等
+			throw new MyException("参数错误：exam.totalScore");
+		}
+		if (exam.getTimeType() != 1 && exam.getTimeType() != 2) {
+			throw new MyException("参数错误：exam.timeType");
+		}
+		if (exam.getTimeType() == 1) {// 如果是限时，考试时间不能缺失
+			if (!ValidateUtil.isValid(exam.getStartTime())) {
+				throw new MyException("参数错误：exam.startTime");
+			}
+			if (!ValidateUtil.isValid(exam.getEndTime())) {
+				throw new MyException("参数错误：exam.endTime");
+			}
+			if (containObjectiveQuesiton) {// 如果包含主观题，阅卷时间不能缺失
+				if (!ValidateUtil.isValid(exam.getMarkStartTime())) {
+					throw new MyException("参数错误：exam.markStartTime");
+				}
+				if (!ValidateUtil.isValid(exam.getMarkEndTime())) {
+					throw new MyException("参数错误：exam.markEndTime");
+				}
+			} else {
+				if (ValidateUtil.isValid(exam.getMarkStartTime())) {
+					throw new MyException("参数错误：exam.markStartTime");
+				}
+				if (ValidateUtil.isValid(exam.getMarkEndTime())) {
+					throw new MyException("参数错误：exam.markEndTime");
+				}
+			}
+		}
+		if (exam.getTimeType() == 2) {// 如果是不限时，考试时间和阅卷时间无效
+			if (ValidateUtil.isValid(exam.getStartTime())) {
+				throw new MyException("参数错误：exam.startTime");
+			}
+			if (ValidateUtil.isValid(exam.getEndTime())) {
+				throw new MyException("参数错误：exam.endTime");
+			}
+			if (ValidateUtil.isValid(exam.getMarkStartTime())) {
+				throw new MyException("参数错误：exam.markStartTime");
+			}
+			if (ValidateUtil.isValid(exam.getMarkEndTime())) {
+				throw new MyException("参数错误：exam.markEndTime");
+			}
+		}
+		if (ValidateUtil.isValid(exam.getEndTime())) {
+			if (exam.getEndTime().getTime() <= System.currentTimeMillis()) {
+				throw new MyException("参数错误：exam.endTime");
+			}
+		}
+		if (ValidateUtil.isValid(exam.getStartTime()) && ValidateUtil.isValid(exam.getEndTime())) {
+			if (exam.getStartTime().getTime() <= exam.getEndTime().getTime()) {
+				throw new MyException("参数错误：exam.endTime");
+			}
+		}
+		if (ValidateUtil.isValid(exam.getMarkStartTime()) && ValidateUtil.isValid(exam.getMarkEndTime())) {
+			if (exam.getMarkStartTime().getTime() <= exam.getMarkEndTime().getTime()) {
+				throw new MyException("参数错误：exam.markEndTime");
+			}
+		}
+		if (ValidateUtil.isValid(exam.getEndTime()) && ValidateUtil.isValid(exam.getMarkStartTime())) {
+			if (exam.getEndTime().getTime() <= exam.getMarkStartTime().getTime()) {
+				throw new MyException("参数错误：exam.markStartTime");
+			}
+		}
+	}
+
+	private Map<Integer, List<Question>> addHandle(ExamInfo examInfo) {
+		Map<Integer, List<Question>> questionListCache = new HashMap<>();// 题库缓存
+		if (ValidateUtil.isValid(examInfo.getExamQuestions())) {
+			for (ExamQuestionEx examQuestion : examInfo.getExamQuestions()) {
+				if (ExamUtil.hasQuestion(examQuestion) 
+						&& ValidateUtil.isValid(examQuestion.getQuestionEx().getId())) {
+					Question questionOfDB = questionService.getEntity(examQuestion.getQuestionEx().getId());
+					try {
+						BeanUtils.copyProperties(examQuestion.getQuestionEx(), questionOfDB);
+					} catch (Exception e) {
+						throw new MyException("拷贝数据失败");
+					}
+				}
+			}
+		} else if (ValidateUtil.isValid(examInfo.getExamRules())) {
+			for (int i = 0; i < examInfo.getExamRules().length; i++) {
+				ExamRule examRule = examInfo.getExamRules()[i];
+				if (!ValidateUtil.isValid(questionListCache.get(examRule.getQuestionTypeId()))) {
+					List<Question> questionList = questionService.getList(examRule.getQuestionTypeId());
+					questionListCache.put(examRule.getQuestionTypeId(), questionList);
+				}
+			}
+		}
+		return questionListCache;
+	}
+
+	/**
+	 * 设置分数
+	 * 
+	 * 如果抽题不设置分数，使用题库默认的分数，会导致总分不确定
+	 * 如果抽题设置分数，主观题答案数量不一样，没法按答案分配分数
+	 * 所以规则为当题分数，平均分配到每个答案
+	 * 
+	 * v1.0 zhanghc 2022年9月28日下午1:39:17
+	 * @param examQuestion
+	 * @param examRule
+	 * @param question void
+	 */
+	private void addExUserScores(ExamQuestion examQuestion, ExamRule examRule, Question question) {
+		// 如果是多选，使用抽题规则的漏选分数
+		if (QuestionUtil.hasMultipleChoice(question)) {
+			examQuestion.setScores(examRule.getScores().toString());
+		} 
+		// 如果是客观填空问答，把分数平均分配到子分数
+		else if ((QuestionUtil.hasFillBlank(question) || QuestionUtil.hasQA(question))
+				&& QuestionUtil.hasSubjective(question)) {
+			List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
+			List<BigDecimal> scoreList = splitScore(examRule.getScore(), questionAnswerList.size());
+			examQuestion.setScores(scoreList.toString().substring(1, scoreList.size() - 1).replaceAll(" ", ""));
+		}
+	}
+
+	/**
+	 * 拆分分数<br/>
+	 * 1分 拆分成2份，结果：0.5、0.5<br/>
+	 * 1分 拆分成3份，结果：0.33、0.33、0.34<br/>
+	 * 
+	 * v1.0 zhanghc 2022年5月30日下午4:46:25
+	 * @param score
+	 * @param num
+	 * @return List<BigDecimal>
+	 */
+	private List<BigDecimal> splitScore(BigDecimal score, int num) {
+		List<BigDecimal> singleScoreList = new ArrayList<>();
+		BigDecimal singleScore = BigDecimalUtil.newInstance(score).div(num, 2).getResult();
+		for (int j = 0; j < num - 1; j++) {
+			singleScoreList.add(singleScore);
+		}
+		singleScoreList.add(BigDecimalUtil.newInstance(singleScore).mul(num - 1).sub(score).mul(-1).getResult());
+		return singleScoreList;
+	}
+	
+	private Integer[] shuffleNums(int start, int end) {
+		Integer[] shuffleNums = new Integer[end - start + 1];
+		for (int i = 0; i < shuffleNums.length; i++) {
+			shuffleNums[i] = start + i;
+		}
+		
+		ArrayUtils.shuffle(shuffleNums);
+		return shuffleNums;
+	}
 
 	@Override
 	public void userAdd(Integer id, String[] examUserIds, Integer[] markUserIds) {
-		// 校验数据有效性
-		if (ValidateUtil.isValid(markUserIds) && markUserIds.length == 1) {// examUserIds=1,2&markUserIds=1，examUserIds会解析为数组，特殊处理一下
-			examUserIds = new String[] { StringUtil.join(examUserIds) };
-		}
-		Exam exam = getEntity(id);
-		userAddValid(exam, examUserIds, markUserIds);
 		
-		// 添加用户
-		if (exam.getGenType() == 1) {
-			examExService.userAdd(exam, examUserIds, markUserIds);
-		} else if (exam.getGenType() == 2) {
-			examExService.userAddOfRand(exam, examUserIds);
-		}
 	}
 
-	private void userAddValid(Exam exam, String[] examUserIds, Integer[] markUserIds) {
-		if (examUserIds == null) {
-			throw new MyException("参数错误：examUserIds");
-		}
-		if (exam.getState() == 0) {
-			throw new MyException("考试已删除");
-		}
-		//if (exam.getState() == 2) {// 未发布也可以加用户
-		//	throw new MyException("考试未发布");
-		//}
-		if (exam.getState() == 3) {
-			throw new MyException("考试已归档");
-		}
-		if (exam.getEndTime().getTime() < System.currentTimeMillis()) {
-			throw new MyException("考试已结束");
-		}
-		
-		if (exam.getMarkType() == 2) {// 如果主观题试卷，有阅卷用户
-			if (markUserIds == null) {
-				throw new MyException("参数错误：markUserIds");
-			}
-			
-			if (examUserIds.length != markUserIds.length) {
-				throw new MyException("参数错误：markUserIds和examUserIds数量不等");
-			} 
-		}
-		
-		Set<Integer> examUserIdSet = new HashSet<>();
-		for (String userIds : examUserIds) {
-			for (String userId : userIds.split(",")) {
-				int _userId = Integer.parseInt(userId);
-				if (examUserIdSet.contains(_userId)) {
-					throw new MyException("考试用户重复");
-				}
-			}
-		}
-		Set<Integer> markUserIdSet = new HashSet<>();
-		for (Integer userId : markUserIdSet) {
-			if (markUserIdSet.contains(userId)) {
-				throw new MyException("阅卷用户重复");
-			}
-		}
-	}
-	
 	@Override
-	public MyExamChapter getExamChapter(Integer id) {
-		// 校验数据有效性
-		if (!ValidateUtil.isValid(id)) {
-			throw new MyException("参数错误：id");
-		}
-		Exam exam = getEntity(id);
-		if (exam.getGenType() != 1) {
-			throw new MyException("参数错误：id");
-		}
-		
-		// 组合成需要的格式
-		List<ExamQuestion> chapterList = examQuestionService.getChapterList(id);
-		Map<Integer, Question> questionCache = getQuestionCache(id);
-		Map<Integer, List<QuestionOption>> questionOptionCache = getQuestionOptionCache(id);
-		Map<Integer, List<ExamAnswerEx>> examAnswerCache = getExamAnswerExCache(id);
-		
-		return generatePaper(exam, chapterList, questionCache, questionOptionCache, examAnswerCache);
-	}
-	
-	private Map<Integer, Question> getQuestionCache(Integer id) {
-		List<Question> questionList = examDao.getQuestionList(id);
-		Map<Integer, Question> questionCache = new HashMap<>();
-		for (Question question : questionList) {
-			questionCache.put(question.getId(), question);
-		}
-		return questionCache;
-	}
-	
-	private Map<Integer, List<QuestionOption>> getQuestionOptionCache(Integer id) {
-		List<QuestionOption> questionOptionList = examDao.getQuestionOptionList(id);
-		Map<Integer, List<QuestionOption>> questionOptionCache = new HashMap<>();
-		for (QuestionOption questionOption : questionOptionList) {
-			if (questionOptionCache.get(questionOption.getQuestionId()) == null) {
-				questionOptionCache.put(questionOption.getQuestionId(), new ArrayList<>());
-			}
-			
-			questionOptionCache.get(questionOption.getQuestionId()).add(questionOption);
-		}
-		
-		return questionOptionCache;
-	}
-	
-	private Map<Integer, List<ExamAnswerEx>> getExamAnswerExCache(Integer id) {//考试试题答案   分数来自考试试题  答案来自试题答案
-		List<Map<String, Object>> examAnswerList = examDao.getExamAnswerList(id);
-		Map<Integer, List<ExamAnswerEx>> examAnswerCache = new HashMap<>();
-		for (Map<String, Object> examAnswerMap : examAnswerList) {
-			int questionId = Integer.parseInt(examAnswerMap.get("questionId").toString());
-			if (examAnswerCache.get(questionId) == null) {
-				examAnswerCache.put(questionId, new ArrayList<>());
-			}
-			
-			String[] split = examAnswerMap.get("scores").toString().split(",");
-			ExamAnswerEx examAnswerEx = new ExamAnswerEx();
-			examAnswerEx.setAnswer(examAnswerMap.get("answer").toString());
-			examAnswerEx.setScore(new BigDecimal(split[Integer.parseInt(examAnswerMap.get("no").toString()) - 1]));
-			examAnswerCache.get(questionId).add(examAnswerEx);
-		}
-		
-		return examAnswerCache;
-	}
-	
-	private MyExamChapter generatePaper(Exam exam, List<ExamQuestion> chapterList, Map<Integer, Question> questionCache,
-			Map<Integer, List<QuestionOption>> questionOptionCache,
-			Map<Integer, List<ExamAnswerEx>> examAnswerCache) {
-		MyExamChapter myExamChapter = new MyExamChapter();
-		for (ExamQuestion chapter : chapterList) {
-			Chapter _chapter = new Chapter(chapter);
-			myExamChapter.getChapterList().add(_chapter);
-			List<ExamQuestion> chapterDetailList = examQuestionService.getChapterDetailList(exam.getId(), chapter.getNo());
-			for (ExamQuestion questionAttr : chapterDetailList) {
-				if (questionAttr.getType() == 1) {//从章节到下一个章节之间
-					break;
-				}
-				
-				MyQuestion myQuestion = new MyQuestion(
-						questionCache.get(questionAttr.getQuestionId()), 
-						questionOptionCache.get(questionAttr.getQuestionId()),
-						examAnswerCache.get(questionAttr.getQuestionId()),
-						questionAttr );
-				_chapter.getMyQuestionList().add(myQuestion);
-			}
-		}
-		return myExamChapter;
-	}
-	
-	@Override
-	public MyExamChapter getPaperOfRand(Integer examId, Integer userId) {
-		// 校验数据有效性
-		if (!ValidateUtil.isValid(examId)) {
-			throw new MyException("参数错误：id");
-		}
-		Exam exam = examDao.getEntity(examId);
-		if (exam.getGenType() != 2) {
-			throw new MyException("参数错误：examId");
-		}
-		
-		// 组合成需要的格式
-		List<ExamQuestion> chapterList = examQuestionService.getChapterList(exam.getId());
-		Map<Integer, Question> questionCache = getQuestionCache(examId, userId);
-		Map<Integer, List<QuestionOption>> questionOptionCache = getQuestionOptionCache(examId, userId);
-		Map<Integer, List<ExamAnswerEx>> examAnswerCache = getExamAnswerExCache(examId, userId);
-		return generatePaperOfRand(exam, userId, chapterList, questionCache, questionOptionCache, examAnswerCache);
-	}
-	
-	private Map<Integer, Question> getQuestionCache(Integer examId, Integer userId) {
-		List<Question> questionList = examDao.getQuestionList(examId, userId);
-		Map<Integer, Question> questionCache = new HashMap<>();
-		for (Question question : questionList) {
-			questionCache.put(question.getId(), question);
-		}
-		return questionCache;
-	}
-	
-	private Map<Integer, List<QuestionOption>> getQuestionOptionCache(Integer examId, Integer userId) {
-		List<QuestionOption> questionOptionList = examDao.getQuestionOptionList(examId, userId);
-		Map<Integer, List<QuestionOption>> questionOptionCache = new HashMap<>();
-		for (QuestionOption questionOption : questionOptionList) {
-			if (questionOptionCache.get(questionOption.getQuestionId()) == null) {
-				questionOptionCache.put(questionOption.getQuestionId(), new ArrayList<>());
-			}
-			
-			questionOptionCache.get(questionOption.getQuestionId()).add(questionOption);
-		}
-		
-		return questionOptionCache;
-	}
-	
-	private Map<Integer, List<ExamAnswerEx>> getExamAnswerExCache(Integer examId, Integer userId) {
-		List<Map<String, Object>> examAnswerList = examDao.getExamAnswerList(examId, userId);
-		Map<Integer, List<ExamAnswerEx>> examAnswerCache = new HashMap<>();
-		for (Map<String, Object> examAnswerMap : examAnswerList) {
-			int questionId = Integer.parseInt(examAnswerMap.get("questionId").toString());
-			if (examAnswerCache.get(questionId) == null) {
-				examAnswerCache.put(questionId, new ArrayList<>());
-			}
-			
-			String[] split = examAnswerMap.get("scores").toString().split(",");
-			ExamAnswerEx examAnswerEx = new ExamAnswerEx();
-			examAnswerEx.setAnswer(examAnswerMap.get("answer").toString());
-			examAnswerEx.setScore(new BigDecimal(split[Integer.parseInt(examAnswerMap.get("no").toString()) - 1]));
-			examAnswerCache.get(questionId).add(examAnswerEx);
-		}
-		
-		return examAnswerCache;
-	}
-	
-	private MyExamChapter generatePaperOfRand(Exam exam, Integer userId, List<ExamQuestion> chapterList,
-			Map<Integer, Question> questionCache, Map<Integer, List<QuestionOption>> questionOptionCache,
-			Map<Integer, List<ExamAnswerEx>> examAnswerCache) {
-		MyExamChapter myExamChapter = new MyExamChapter();
-		List<ExamQuestion> chapterDetailList = examQuestionService.getList(exam.getId(), userId);// 这里找到是所有的，包含章节
-		for (ExamQuestion chapter : chapterList) {
-			Chapter _chapter = new Chapter(chapter);
-			myExamChapter.getChapterList().add(_chapter);
-			for (ExamQuestion questionAttr : chapterDetailList) {
-				if (questionAttr.getType().intValue() == 1) {// 过滤掉非当前章节的
-					continue;
-				}
-				MyQuestion myQuestion = new MyQuestion(
-						questionCache.get(questionAttr.getQuestionId()), 
-						questionOptionCache.get(questionAttr.getQuestionId()),
-						examAnswerCache.get(questionAttr.getQuestionId()),
-						questionAttr );
-				_chapter.getMyQuestionList().add(myQuestion);
-			}
-		}
-		return myExamChapter;
-	}
-	
-	@Override
-	public List<Question> getQuestionList(Integer id) {
-		return examDao.getQuestionList(id);
-	}
-	
-	@Override
-	public void scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores, Integer[] markOptions) {
-		// 校验数据有效性
-		if (id == null) {
-			throw new MyException("参数错误：id");
-		}
-		if (score == null) {
-			throw new MyException("参数错误：score");
-		}
-		Exam exam = getEntity(id);
-		if (exam.getState() == 0) {
-			throw new MyException("试卷已删除");
-		}
-		if (exam.getState() == 1) {
-			throw new MyException("试卷已发布");
-		}
-		if (exam.getState() == 3) {
-			throw new MyException("试卷已归档");
-		}
-
-		//设置分数
-		String markOptionsTemp = ValidateUtil.isValid(markOptions) ? StringUtil.join(markOptions) : "";
-		Question question = questionService.getEntity(questionId);
-		ExamQuestion eq = examQuestionService.getEntity(id, questionId);
-		if (question.getType() == 2 && markOptionsTemp.contains("1")) {//智能选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；)
-			// pq.setMarkOptions("1");// 默认就是不需要设置
-		} else if (question.getType() == 3 && question.getMarkType() == 1 ) {
-			if (markOptionsTemp.contains("2") && markOptionsTemp.contains("3")) {
-				eq.setMarkOptions("2,3");
-			} else if (markOptionsTemp.contains("2")) {
-				eq.setMarkOptions("2");
-			} else if (markOptionsTemp.contains("2")) {
-				eq.setMarkOptions("3");
-			}
-		} else if (question.getType() == 5 && question.getMarkType() == 1) {
-			if (markOptionsTemp.contains("3")) {
-				eq.setMarkOptions("3");
-			}
-		}
-		eq.setScore(score);
-		
-		//设置子分数
-		if (question.getType() == 1 || question.getType() == 4) { //单选 判断
-				eq.setScores("0");
-		} else if (question.getType() == 2) {// 多选
-			if (markOptionsTemp.contains("1")) {
-				eq.setScores(subScores[0].toString());
-			} else {
-				eq.setScores(BigDecimalUtil.newInstance(score).div(2, 2).getResult().toString());
-			}
-		} else if ((question.getType() == 3 && question.getMarkType() == 1) 
-				|| (question.getType() == 5 && question.getMarkType() == 1)) { // 智能填空 智能问答
-			BigDecimal scoreSum = new BigDecimal(0);
-			String scores = "0";
-			for (int i = 0; i < subScores.length; i++) {
-				scoreSum = scoreSum.add(subScores[i]);
-				if (i == 0) {
-					scores = subScores[i].toString();
-				}
-				scores = String.format("%s,%s", scores, subScores[i]);
-				
-			}
-			if (scoreSum.compareTo(score) != 0) {
-				throw new MyException("分值错误");
-			}
-			eq.setScores(scores);
-		}
-		
-		examQuestionService.update(eq);
-	}
-	
-	@Override
-	public void batchScoreUpdate(Integer id, BigDecimal score, BigDecimal subScores, Integer[] markOptions) {
-		// 校验数据有效性
-		if (id == null) {
-			throw new MyException("参数错误：id");
-		}
-		if (score == null) {
-			throw new MyException("参数错误：score");
-		}
-		ExamQuestion entity = examQuestionService.getEntity(id);//章节
-		Exam exam = getEntity(entity.getExamId());
-		if (exam.getState() == 0) {
-			throw new MyException("试卷已删除");
-		}
-		if (exam.getState() == 1) {
-			throw new MyException("试卷已发布");
-		}
-		if (exam.getState() == 3) {
-			throw new MyException("试卷已归档");
-		}
-
-		// 更新试卷分数
-		String markOptionsTemp = ValidateUtil.isValid(markOptions) ? StringUtil.join(markOptions) : "";
-		List<ExamQuestion> chapterDetailList = examQuestionService.getChapterDetailList(exam.getId(), entity.getNo());
-		for(ExamQuestion chapterDetai : chapterDetailList){
-			if (chapterDetai.getType() == 1) {//从章节到下一个章节
-				break;
-			}
-			
-			Question question = questionService.getEntity(chapterDetai.getQuestionId());
-			if (question.getType() == 2 && markOptionsTemp.contains("1")) {//智能选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；)
-				// pq.setMarkOptions("1");// 默认就是不需要设置
-			} else if (question.getType() == 3 && question.getMarkType() == 1 ) {
-				if (markOptionsTemp.contains("2") && markOptionsTemp.contains("3")) {
-					chapterDetai.setMarkOptions("2,3");
-				} else if (markOptionsTemp.contains("2")) {
-					chapterDetai.setMarkOptions("2");
-				} else if (markOptionsTemp.contains("2")) {
-					chapterDetai.setMarkOptions("3");
-				}
-			} else if (question.getType() == 5 && question.getMarkType() == 1) {
-				if (markOptionsTemp.contains("3")) {
-					chapterDetai.setMarkOptions("3");
-				}
-			}
-			chapterDetai.setScore(score);
-			
-			//设置子分数
-			if (question.getType() == 1 || question.getType() == 4) { //单选 判断
-				chapterDetai.setScores("0");
-			} else if (question.getType() == 2) {// 多选
-				if (markOptionsTemp.contains("1")) {
-					chapterDetai.setScores(subScores.toString());
-				} else {
-					chapterDetai.setScores(BigDecimalUtil.newInstance(score).div(2, 2).getResult().toString());
-				}
-			} else if ((question.getType() == 3 && question.getMarkType() == 1) 
-					|| (question.getType() == 5 && question.getMarkType() == 1)) { // 智能填空 智能问答
-				String[] answerScores = chapterDetai.getScores().split(",");
-				
-				String scores = "0";
-				BigDecimal singleScore = BigDecimalUtil.newInstance(score).div(new BigDecimal(answerScores.length), 2).getResult();
-				for (int i = 0; i < answerScores.length - 1 ; i++) {
-					if (i == 0) {
-						scores = singleScore.toString();
-					}
-					scores = String.format("%s,%s", scores, singleScore);
-				}
-				BigDecimal result = BigDecimalUtil.newInstance(singleScore).mul(answerScores.length - 1).sub(score).mul(-1).getResult();
-				if (answerScores.length > 1) {
-					scores = String.format("%s,%s", scores, result);
-				} else if (answerScores.length == 1) {
-					scores = result.toString();
-				}
-				
-				chapterDetai.setScores(scores);
-			}
-			
-			examQuestionService.update(chapterDetai);
-		}	
-	}
-	
-	@Override
-	public void sxe(Integer id, Integer[] options) {
-		// 校验数据有效性
-		Exam exam = getEntity(id);
-		if(exam.getState() == 0) {
-			throw new MyException("已删除");
-		}
-		if (exam.getState() == 1) {
-			throw new MyException("已发布");
-		}
-		if(exam.getState() == 3){
-			throw new MyException("已归档");
-		}
-		if (exam.getGenType() == 2) {
-			throw new MyException("随机考试无效");
-		}
-		
-		// 更新反作弊
-		exam.setSxes(ValidateUtil.isValid(options) ? StringUtil.join(options) : null);
+	public List<Question> getPaper(Integer id) {
+		return null;
 	}
 }

@@ -8,14 +8,6 @@ import com.wcpdoc.exam.core.entity.Exam;
  * v1.0 zhanghc 2017-06-11 09:13:23
  */
 public interface ExamExService extends BaseService<Exam>{
-	/**
-	 * 发布
-	 * 
-	 * v1.0 zhanghc 2022年5月30日上午11:28:02
-	 * @param exam 
-	 * void
-	 */
-	void publish(Exam exam);
 
 	/**
 	 * 发布

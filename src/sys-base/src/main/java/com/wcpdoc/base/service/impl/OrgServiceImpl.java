@@ -35,7 +35,7 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 	}
 
 	@Override
-	public void addAndUpdate(Org org) {
+	public void addEx(Org org) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(org.getName())) {
 			throw new MyException("参数错误：name");
@@ -64,7 +64,7 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 	}
 
 	@Override
-	public void delAndUpdate(Integer id) {
+	public void delEx(Integer id) {
 		// 校验数据有效性
 		if (id == 1) { //不包括根机构
 			return;
@@ -76,7 +76,7 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 		
 		// 删除机构
 		Org org = getEntity(id);
-		orgExService.delAndUpdate(org);
+		orgExService.delEx(org);
 		
 		org.setState(0);
 		org.setUpdateTime(new Date());

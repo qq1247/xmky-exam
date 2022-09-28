@@ -91,7 +91,7 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	@ResponseBody
 	public PageResult add(QuestionTypeOpen questionTypeOpen) {
 		try {
-			questionTypeOpenService.addAndUpdate(questionTypeOpen);
+			questionTypeOpenService.addEx(questionTypeOpen);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成添加题库开放错误：{}", e.getMessage());
@@ -146,7 +146,7 @@ public class ApiQuestionTypeOpenController extends BaseController {
 	@ResponseBody
 	public PageResult del(Integer id) {
 		try {
-			questionTypeOpenService.delAndUpdate(id);
+			questionTypeOpenService.delEx(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("完成删除题库开放错误：{}", e.getMessage());

@@ -17,7 +17,7 @@ public interface SensitiveService extends BaseService<Sensitive> {
 	 * @param sensitive
 	 * @return void
 	 */
-	void updateAndUpdate(Sensitive sensitive);
+	void updateEx(Sensitive sensitive);
 	
 	/**
 	 * 屏蔽敏感词

@@ -16,6 +16,6 @@ public interface QuestionExService extends BaseService<Question> {
 	 * v1.0 zhanghc 2022年9月6日上午9:49:47
 	 * @param question void
 	 */
-	void updateAndUpdate(Question question);
+	void updateEx(Question question);
 
 }

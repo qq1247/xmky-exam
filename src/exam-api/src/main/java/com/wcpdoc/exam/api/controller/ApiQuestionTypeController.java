@@ -153,7 +153,7 @@ public class ApiQuestionTypeController extends BaseController {
 	public PageResult get(Integer id) {
 		try {
 			QuestionType entity = questionTypeService.getEntity(id);
-			if (entity.getUpdateUserId().intValue() != getCurUser().getId()) {
+			if (entity.getUpdateUserId().intValue() != getCurUser().getId().intValue()) {
 				throw new MyException("无操作权限");
 			}
 			return PageResultEx.ok()
@@ -192,7 +192,7 @@ public class ApiQuestionTypeController extends BaseController {
 	}
 	
 	/**
-	 * 清空题库
+	 * 题库清空
 	 * 
 	 * v1.0 zhanghc 2022年9月15日上午9:28:44
 	 * @param id
@@ -205,10 +205,10 @@ public class ApiQuestionTypeController extends BaseController {
 			questionTypeService.clear(id);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("题库删除错误：{}", e.getMessage());
+			log.error("题库清空错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("题库删除错误：", e);
+			log.error("题库清空错误：", e);
 			return PageResult.err();
 		}
 	}

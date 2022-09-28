@@ -28,6 +28,7 @@ import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
+import com.wcpdoc.exam.core.util.QuestionUtil;
 
 /**
  * 试题控制层
@@ -201,7 +202,7 @@ public class ApiQuestionController extends BaseController {
 			
 			// 试题获取
 			List<String> options = new ArrayList<>();
-			if (question.getType() == 1 || question.getType() == 2) {// 如果是单选或多选，添加选项字段
+			if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasMultipleChoice(question)) {// 如果是单选或多选，添加选项字段
 				List<QuestionOption> questionOptionList = questionOptionService.getList(id);
 				for (QuestionOption questionOption : questionOptionList) {
 					options.add(questionOption.getOptions());
@@ -212,12 +213,12 @@ public class ApiQuestionController extends BaseController {
 			List<Object> answers = new ArrayList<>();
 			List<BigDecimal> answerScores = new ArrayList<>();
 			for(QuestionAnswer answer : questionAnswerList){
-				if (question.getType() == 1 || question.getType() == 4 || (question.getType() == 5 && question.getMarkType() == 2)) {
+				if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasTrueFalse(question) || (QuestionUtil.hasQA(question) && QuestionUtil.hasObjective(question))) {
 					answers.add(answer.getAnswer());
-				} else if (question.getType() == 2) {
+				} else if (QuestionUtil.hasMultipleChoice(question)) {
 					Collections.addAll(answers, answer.getAnswer().split(","));
 					answerScores.add(answer.getScore());
-				} else if (question.getType() == 3 || (question.getType() == 5 && question.getMarkType() == 1)) {
+				} else if (QuestionUtil.hasFillBlank(question) || (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question))) {
 					answers.add(answer.getAnswer().split("\n"));
 					answerScores.add(answer.getScore());
 				}

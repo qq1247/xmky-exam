@@ -1,6 +1,5 @@
 package com.wcpdoc.exam.api.controller;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,6 +11,7 @@ import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -30,6 +30,7 @@ import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyMark;
+import com.wcpdoc.exam.core.entity.ex.ExamInfo;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
@@ -76,7 +77,7 @@ public class ApiExamController extends BaseController {
 	}
 
 	/**
-	 * 完成添加考试
+	 * 考试添加
 	 * 
 	 * v1.0 zhanghc 2018年10月25日下午9:23:06
 	 * 
@@ -84,37 +85,15 @@ public class ApiExamController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	public PageResult add(Exam exam) {
+	public PageResult add(@RequestBody ExamInfo examInfo) {
 		try {
-			examService.addAndUpdate(exam);
-			return PageResultEx.ok().data(exam.getId());
+			examService.addEx(examInfo);
+			return PageResultEx.ok();
 		} catch (MyException e) {
 			log.error("完成添加考试错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("完成添加考试错误：", e);
-			return PageResult.err();
-		}
-	}
-
-	/**
-	 * 完成修改考试
-	 * 
-	 * v1.0 zhanghc 2018年10月25日下午9:23:06
-	 * 
-	 * @return pageOut
-	 */
-	@RequestMapping("/edit")
-	@ResponseBody
-	public PageResult edit(Exam exam) {
-		try {
-			examService.updateAndUpdate(exam);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("修改考试错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("修改考试错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -130,7 +109,7 @@ public class ApiExamController extends BaseController {
 	@ResponseBody
 	public PageResult del(Integer id) {
 		try {
-			examService.delAndUpdate(id);
+			examService.delEx(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("删除考试错误：{}", e.getMessage());
@@ -535,80 +514,6 @@ public class ApiExamController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("考试邮件通知错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 设置分数
-	 * 
-	 * v1.0 zhanghc 2018年10月21日上午10:46:54
-	 * @param id
-	 * @param questionId
-	 * @param score
-	 * @param subScores 试题为智能阅卷，并且是填空或问答时有效
-	 * @param aiOptions 
-	 * @return PageResult
-	 */
-	@RequestMapping("/scoreUpdate")
-	@ResponseBody
-	public PageResult scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores, Integer[] markOptions) {
-		try {
-			examService.scoreUpdate(id, questionId, score, subScores, markOptions);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("设置分数错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("设置分数错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 批量设置分数
-	 * 
-	 * v1.0 zhanghc 2018年10月21日上午10:46:54
-	 * @param chapterId
-	 * @param score
-	 * @param subScores
-	 * @param aiOptions
-	 * @return PageResult
-	 */
-	@RequestMapping("/updateBatchScore")
-	@ResponseBody
-	public PageResult updateBatchScore(Integer chapterId, BigDecimal score, BigDecimal subScores, Integer[] markOptions) {
-		try {
-			examService.batchScoreUpdate(chapterId, score, subScores, markOptions);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("设置分数错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("设置分数错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 反作弊
-	 * 
-	 * v1.0 zhanghc 2022年5月18日上午10:45:21
-	 * @param id
-	 * @param options 1：试题乱序；2：选项乱序；3：禁用右键；4：禁止复制；5：最小化警告
-	 * @return PageResult
-	 */
-	@RequestMapping("/sxe")
-	@ResponseBody
-	public PageResult sxe(Integer id, Integer[] options) {
-		try {
-			examService.sxe(id, options);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("发布错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("发布错误：", e);
 			return PageResult.err();
 		}
 	}

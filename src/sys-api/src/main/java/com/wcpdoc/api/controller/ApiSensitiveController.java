@@ -38,7 +38,7 @@ public class ApiSensitiveController extends BaseController {
 	@ResponseBody
 	public PageResult edit(Sensitive sensitive) {
 		try {
-			sensitiveService.updateAndUpdate(sensitive);
+			sensitiveService.updateEx(sensitive);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改敏感词错误：{}", e.getMessage());

@@ -71,12 +71,6 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 	}
 	
 	@Override
-	public List<Exam> getList(Integer examTypeId) {
-		String sql = "SELECT * FROM EXM_EXAM WHERE STATE != 0 AND EXAM_TYPE_ID = :EXAM_TYPE_ID";
-		return getList(sql, new Object[]{examTypeId}, Exam.class);
-	}
-	
-	@Override
 	public List<Exam> getList() {
 		String sql = "SELECT * FROM EXM_EXAM WHERE STATE != 0";
 		return getList(sql, new Object[]{}, Exam.class);

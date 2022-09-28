@@ -71,7 +71,7 @@ public class ApiOrgController extends BaseController {
 	public PageResult add(Org org, String phone) {
 		try {
 			UserCache.tryWriteLock("orgAdd", 5000);
-			orgService.addAndUpdate(org);
+			orgService.addEx(org);
 			return PageResultEx.ok();
 		} catch (MyException e) {
 			log.error("添加机构错误：{}", e.getMessage());
@@ -137,7 +137,7 @@ public class ApiOrgController extends BaseController {
 	@ResponseBody
 	public PageResult del(Integer id) {
 		try {
-			orgService.delAndUpdate(id);
+			orgService.delEx(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("删除机构错误：{}", e.getMessage());

@@ -71,7 +71,7 @@ public class ApiQuestionCommentController extends BaseController {
 	@ResponseBody
 	public PageResult add(QuestionComment questionComment, Integer anonymity) {
 		try {
-			questionCommentService.addAndUpdate(questionComment, anonymity);
+			questionCommentService.addEx(questionComment, anonymity);
 			Map<String, Object> data = new HashMap<String, Object>();
 			return PageResultEx.ok().data(data);
 		} catch (MyException e) {
@@ -95,7 +95,7 @@ public class ApiQuestionCommentController extends BaseController {
 	@ResponseBody
 	public PageResult del(Integer id) {
 		try {
-			//questionCommentService.delAndUpdate(id);
+			//questionCommentService.delEx(id);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("删除试题评论错误：{}", e.getMessage());

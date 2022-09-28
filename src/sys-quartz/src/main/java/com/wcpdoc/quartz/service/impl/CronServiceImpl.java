@@ -36,7 +36,7 @@ public class CronServiceImpl extends BaseServiceImp<Cron> implements CronService
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void updateAndUpdate(Cron cron) {
+	public void updateEx(Cron cron) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(cron.getJobClass())) {
 			throw new MyException("参数错误：jobClass");
@@ -73,7 +73,7 @@ public class CronServiceImpl extends BaseServiceImp<Cron> implements CronService
 	}
 
 	@Override
-	public void delAndUpdate(Integer id) {
+	public void delEx(Integer id) {
 		// 删除作业
 		try {
 			QuartzUtil.deleteJob(id);

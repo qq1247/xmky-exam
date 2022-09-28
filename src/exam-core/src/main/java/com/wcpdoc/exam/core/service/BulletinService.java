@@ -18,7 +18,7 @@ public interface BulletinService extends BaseService<Bulletin> {
 	 * v1.0 chenyun 2021年9月9日下午1:27:47
 	 * @param bulletin void
 	 */
-	void addAndUpdate(Bulletin bulletin);
+	void addEx(Bulletin bulletin);
 	
 	/**
 	 * 修改公告
@@ -26,7 +26,7 @@ public interface BulletinService extends BaseService<Bulletin> {
 	 * v1.0 chenyun 2021年9月9日下午1:27:47
 	 * @param bulletin void
 	 */
-	void updateAndUpdate(Bulletin bulletin);
+	void updateEx(Bulletin bulletin);
 	
 	/**
 	 * 删除公告
@@ -36,7 +36,7 @@ public interface BulletinService extends BaseService<Bulletin> {
 	 * @param id
 	 * void
 	 */
-	void delAndUpdate(Integer id);
+	void delEx(Integer id);
 	
 	/**
 	 * 添加权限

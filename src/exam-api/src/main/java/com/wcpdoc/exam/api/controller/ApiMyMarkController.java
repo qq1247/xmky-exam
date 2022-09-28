@@ -2,10 +2,7 @@ package com.wcpdoc.exam.api.controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +14,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.alibaba.fastjson.JSON;
 import com.wcpdoc.base.entity.Org;
 import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.OrgService;
@@ -28,25 +24,17 @@ import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
-import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
 import com.wcpdoc.exam.core.entity.Exam;
-import com.wcpdoc.exam.core.entity.ex.ExamAnswerEx;
-import com.wcpdoc.exam.core.entity.ExamQuestionNo;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
-import com.wcpdoc.exam.core.entity.QuestionOption;
-import com.wcpdoc.exam.core.entity.ex.Chapter;
-import com.wcpdoc.exam.core.entity.ex.MyExamChapter;
-import com.wcpdoc.exam.core.entity.ex.MyQuestion;
 import com.wcpdoc.exam.core.service.ExamQuestionNoService;
 import com.wcpdoc.exam.core.service.ExamService;
-import com.wcpdoc.exam.core.service.MyExamDetailService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
-import com.wcpdoc.exam.core.util.ExamUtil;
+import com.wcpdoc.exam.core.service.MyQuestionService;
 
 /**
  * 我的阅卷控制层
@@ -65,7 +53,7 @@ public class ApiMyMarkController extends BaseController {
 	@Resource
 	private MyMarkService myMarkService;
 	@Resource
-	private MyExamDetailService myExamDetailService;
+	private MyQuestionService myQuestionService;
 	@Resource
 	private UserService userService;
 	@Resource
@@ -94,164 +82,6 @@ public class ApiMyMarkController extends BaseController {
 		}
 	}
 	
-	/**
-	 * 试卷信息
-	 * 
-	 * v1.0 zhanghc 2022年5月18日下午1:21:07
-	 * @param examId
-	 * @param userId
-	 * @return PageResult
-	 */
-	@SuppressWarnings("unchecked")
-	@RequestMapping("/paper")
-	@ResponseBody
-	public PageResult paper(Integer examId, Integer userId) {
-		try {
-			// 校验数据有效性
-			if (!ValidateUtil.isValid(examId)) {
-				throw new MyException("参数错误：examId");
-			}
-			if (!ValidateUtil.isValid(userId)) {
-				throw new MyException("参数错误：userId");
-			}
-			
-			Exam exam = examService.getEntity(examId);
-			if (exam.getUpdateUserId().intValue() != getCurUser().getId().intValue()) {// 如果不是考试创建用户，校验是否有阅卷权限
-				boolean readAuth = false;
-				List<MyMark> myMarkList = myMarkService.getList(examId);
-				for (MyMark myMark : myMarkList) {
-					if (myMark.getMarkUserId().intValue() == getCurUser().getId().intValue()) {// 参加了当前阅卷
-						for (Integer _userId : myMark.getExamUserIdArr()) {
-							if (_userId.intValue() == userId.intValue()) {// 有当前考试用户的阅卷权限
-								readAuth = true;
-								break;
-							}
-						}
-						break;
-					}
-				}
-				if (!readAuth) {
-					throw new MyException("无查阅权限");
-				}
-			}
-			
-			// 生成试卷数据
-			MyExamChapter myExamChapter = null;
-			if (exam.getGenType() == 1) {// 固定试卷
-				myExamChapter = examService.getExamChapter(exam.getId());
-				if (ExamUtil.hasQuestionRand(exam) || ExamUtil.hasOptionRand(exam)) {
-					paperRandHandle(exam, myExamChapter, examQuestionNoService.getEntity(examId, getCurUser().getId()));
-				}
-			} else if (exam.getGenType() == 2) {// 随机试卷
-				myExamChapter = examService.getPaperOfRand(exam.getId(), userId);
-			}
-			
-			List<Map<String, Object>> resultList = new ArrayList<>();
-			for (Chapter chapter : myExamChapter.getChapterList()) {
-				Map<String, Object> singleResult = new HashMap<>();
-				Map<Object, Object> chapterMap = new HashMap<>();
-				chapterMap.put("id", chapter.getChapter().getId());
-				chapterMap.put("chapterName", chapter.getChapter().getChapterName());
-				chapterMap.put("chapterTxt", chapter.getChapter().getChapterTxt());
-				singleResult.put("chapter", chapterMap);
-				
-				List<Map<String, Object>> questionsListMap = new ArrayList<>();
-				for (MyQuestion myQuestion : chapter.getMyQuestionList()) {
-					Map<String, Object> questionMap = new HashMap<>();
-					questionMap.put("id", myQuestion.getQuestion().getId());
-					questionMap.put("type", myQuestion.getQuestion().getType());
-					questionMap.put("title", myQuestion.getQuestion().getTitle());
-					questionMap.put("markType", myQuestion.getQuestion().getMarkType());
-					questionMap.put("analysis", myQuestion.getQuestion().getAnalysis());
-					questionMap.put("score", myQuestion.getAttr().getScore());// 分数从试卷中取
-					questionMap.put("markOptions", myQuestion.getAttr().getMarkOptionArr());// 分数选项从试卷中取
-					questionMap.put("options", new ArrayList<Map<String, Object>>());
-					
-					if (myQuestion.getQuestion().getType() == 1 || myQuestion.getQuestion().getType() == 2) {
-						for (QuestionOption questionOption : myQuestion.getOptionList()) {
-							Map<String, Object> option = new HashMap<>();
-							option.put("option", questionOption.getOptions());
-							option.put("no", (char)(questionOption.getNo() + 64));
-							((List<Map<String, Object>>)questionMap.get("options")).add(option);
-						}
-					}
-					
-					questionMap.put("answers", new ArrayList<Map<String, Object>>());
-					for (ExamAnswerEx answer : myQuestion.getAnswerList()) {
-						Map<String, Object> answerMap = new HashMap<String, Object>();
-						answerMap.put("score", answer.getScore());
-						answerMap.put("answer", answer.getAnswerArr(myQuestion.getQuestion().getType(), myQuestion.getQuestion().getMarkType()));
-						((List<Map<String, Object>>)questionMap.get("answers")).add(answerMap);
-					}
-					
-					questionsListMap.add(questionMap);
-				}
-				
-				singleResult.put("questionList", questionsListMap);
-				resultList.add(singleResult);
-			}
-			
-			return PageResultEx.ok().data(resultList);
-		} catch (MyException e) {
-			log.error("试卷信息错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("试卷信息错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 固定试卷乱序处理
-	 * 
-	 * v1.0 zhanghc 2022年6月23日下午1:55:31
-	 * @param exam 
-	 * @param myPaper
-	 * @param myExamDetailList 
-	 * void
-	 */
-	private void paperRandHandle(Exam exam, MyExamChapter myPaper, ExamQuestionNo examQuestionNo) {
-		for (Chapter chapter : myPaper.getChapterList()) {
-			Map<Integer, MyQuestion> myQuestionCache = new HashMap<>();
-			for (MyQuestion myQuestion : chapter.getMyQuestionList()) {
-				myQuestionCache.put(myQuestion.getQuestion().getId(), myQuestion); //乱序前试卷
-			}
-			
-			//乱序
-			@SuppressWarnings("unchecked")
-			LinkedHashMap<Integer, String> examQuestionNoMap = JSON.parseObject(examQuestionNo.getNo(), LinkedHashMap.class);
-			if (ExamUtil.hasQuestionRand(exam)) {//试题乱序
-				List<MyQuestion> myQuestionList = new ArrayList<MyQuestion>();
-				for(Integer questionId : examQuestionNoMap.keySet()){
-					myQuestionList.add(myQuestionCache.get(questionId));
-				}
-				
-				chapter.setMyQuestionList(myQuestionList);
-			}
-			
-			if (ExamUtil.hasOptionRand(exam)) {
-				for (MyQuestion myquestion : chapter.getMyQuestionList()) {
-					if (!(myquestion.getQuestion().getType() == 1 || myquestion.getQuestion().getType() == 2)) {
-						continue;
-					}
-					
-					String[] optionNoStrArr = examQuestionNoMap.get(myquestion.getQuestion().getId()).split(",");
-					Integer[] optionNoArr = new Integer[optionNoStrArr.length];
-					for (int i = 0; i < optionNoStrArr.length; i++) {
-						optionNoArr[i] = Integer.parseInt(optionNoStrArr[i]);
-					}
-					
-					List<QuestionOption> optionList = myquestion.getOptionList();
-					Collections.sort(optionList, new Comparator<QuestionOption>() {
-						@Override
-						public int compare(QuestionOption o1, QuestionOption o2) {
-							return optionNoArr[o1.getNo() - 1] - optionNoArr[o2.getNo() - 1];
-						}
-					});
-				}
-			}
-		}
-	}
 
 	/**
 	 * 阅卷
@@ -350,10 +180,6 @@ public class ApiMyMarkController extends BaseController {
 				}
 				singleResult.put("orgId", user.getOrgId());
 				singleResult.put("orgName", exam.getAnonState() == 1 ? orgCache.get(user.getOrgId()).getName() : null);
-				singleResult.put("answerStartTime", myExam.getAnswerStartTime() == null ? null : DateUtil.formatDateTime(myExam.getAnswerStartTime()));
-				singleResult.put("answerEndTime", myExam.getAnswerEndTime() == null ? null : DateUtil.formatDateTime(myExam.getAnswerEndTime()));
-				singleResult.put("markStartTime", myExam.getMarkStartTime() == null ? null : DateUtil.formatDateTime(myExam.getMarkStartTime()));
-				singleResult.put("markEndTime", myExam.getMarkEndTime() == null ? null : DateUtil.formatDateTime(myExam.getMarkEndTime()));
 				singleResult.put("state", myExam.getState());
 				singleResult.put("markState", myExam.getMarkState());
 				singleResult.put("answerState", exam.getScoreState() == 1 ? myExam.getAnswerState() : null);
@@ -412,10 +238,6 @@ public class ApiMyMarkController extends BaseController {
 					.addAttr("userHeadFileId", exam.getAnonState() == 1 ? user.getHeadFileId() : null)
 					.addAttr("org", user.getOrgId())
 					.addAttr("orgName", exam.getAnonState() == 1 ? org.getName() : null)
-					.addAttr("answerStartTime", myExam.getAnswerStartTime() == null ? null : DateUtil.formatDateTime(myExam.getAnswerStartTime()))
-					.addAttr("answerEndTime", myExam.getAnswerEndTime() == null ? null : DateUtil.formatDateTime(myExam.getAnswerEndTime()))
-					.addAttr("markStartTime", myExam.getMarkStartTime() == null ? null : DateUtil.formatDateTime(myExam.getMarkStartTime()))
-					.addAttr("markEndTime", myExam.getMarkEndTime() == null ? null : DateUtil.formatDateTime(myExam.getMarkEndTime()))
 					.addAttr("state", myExam.getState())
 					.addAttr("markState", myExam.getMarkState())
 					.addAttr("answerState", exam.getScoreState() == 1 ? myExam.getAnswerState() : null)
@@ -468,7 +290,7 @@ public class ApiMyMarkController extends BaseController {
 			}
 			
 			// 返回考试答案
-			List<Map<String, Object>> list = myExamDetailService.getAnswerList(examId, userId);
+			List<Map<String, Object>> list = myQuestionService.getAnswerList(examId, userId);
 			for (Map<String, Object> map : list) {
 				QuestionAnswer answer = new QuestionAnswer();
 				answer.setAnswer((String)map.remove("answer"));

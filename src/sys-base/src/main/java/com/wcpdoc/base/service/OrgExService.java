@@ -16,7 +16,7 @@ public interface OrgExService {
 	 * @param org
 	 * void
 	 */
-	void delAndUpdate(Org org);
+	void delEx(Org org);
 
 	/**
 	 * 导入机构（涉及到附件，不能直接用orgService）

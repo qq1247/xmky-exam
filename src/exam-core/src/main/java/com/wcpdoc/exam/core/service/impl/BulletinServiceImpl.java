@@ -36,7 +36,7 @@ public class BulletinServiceImpl extends BaseServiceImp<Bulletin> implements Bul
 	
 
 	@Override
-	public void addAndUpdate(Bulletin bulletin) {
+	public void addEx(Bulletin bulletin) {
 		if (ValidateUtil.isValid(bulletin.getReadUserIds())) {
 			bulletin.setReadUserIds(","+bulletin.getReadUserIds()+",");
 		}
@@ -50,7 +50,7 @@ public class BulletinServiceImpl extends BaseServiceImp<Bulletin> implements Bul
 	}
 
 	@Override
-	public void updateAndUpdate(Bulletin bulletin) {
+	public void updateEx(Bulletin bulletin) {
 		Bulletin entity = bulletinDao.getEntity(bulletin.getId());
 		String oldImgFileId = entity.getImgFileId();
 		entity.setTitle(bulletin.getTitle());
@@ -73,7 +73,7 @@ public class BulletinServiceImpl extends BaseServiceImp<Bulletin> implements Bul
 	}
 	
 	@Override
-	public void delAndUpdate(Integer id) {
+	public void delEx(Integer id) {
 		// 校验数据有效性
 		Bulletin entity = getEntity(id);
 		entity.setState(0);

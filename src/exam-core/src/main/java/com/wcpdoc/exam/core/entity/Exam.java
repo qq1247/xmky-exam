@@ -68,8 +68,6 @@ public class Exam {
 	private Integer genType;
 	@Column(name = "SXES")
 	private String sxes;
-	@Column(name = "MINIMIZE_NUM")
-	private Integer minimizeNum;
 	@Column(name = "STATE")
 	private Integer state;
 	@Column(name = "UPDATE_USER_ID")
@@ -171,12 +169,12 @@ public class Exam {
 		this.updateTime = updateTime;
 	}
 
-	/** 0：删除；1：发布；2：草稿；3：归档 */
+	/** 0：删除；1：发布；2：暂停；3：归档 */
 	public Integer getState() {
 		return state;
 	}
 
-	/** 0：删除；1：发布；2：草稿；3：归档 */
+	/** 0：删除；1：发布；2：暂停；3：归档 */
 	public void setState(Integer state) {
 		this.state = state;
 	}
@@ -235,28 +233,22 @@ public class Exam {
 		this.passScore = passScore;
 	}
 
-	public Integer getMinimizeNum() {
-		return minimizeNum;
-	}
-
-	public void setMinimizeNum(Integer minimizeNum) {
-		this.minimizeNum = minimizeNum;
-	}
-
-	/** 1：智能阅卷；2：人工阅卷； */
+	/** 1：自动阅卷；2：人工阅卷； */
 	public Integer getMarkType() {
 		return markType;
 	}
 
-	/** 1：智能阅卷；2：人工阅卷； */
+	/** 1：自动阅卷；2：人工阅卷； */
 	public void setMarkType(Integer markType) {
 		this.markType = markType;
 	}
 
+	/** 1：限时；2：不限时 */
 	public Integer getTimeType() {
 		return timeType;
 	}
-
+	
+	/** 1：限时；2：不限时 */
 	public void setTimeType(Integer timeType) {
 		this.timeType = timeType;
 	}

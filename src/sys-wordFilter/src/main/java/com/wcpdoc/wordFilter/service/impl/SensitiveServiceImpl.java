@@ -57,7 +57,7 @@ public class SensitiveServiceImpl extends BaseServiceImp<Sensitive> implements S
 	}
     
 	@Override
-	public void updateAndUpdate(Sensitive sensitive) {
+	public void updateEx(Sensitive sensitive) {
 		if (!ValidateUtil.isValid(sensitive.getBlackList())) {
 			sensitive.setBlackList(null);
 		}

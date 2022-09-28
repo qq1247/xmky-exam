@@ -33,15 +33,6 @@ public interface ExamDao extends BaseDao<Exam>{
 	 * @return List<Map<String,Object>>
 	 */
 	List<Map<String, Object>> getExamUserList(Integer id, Integer markUserId);
-
-	/**
-	 * 获取考试分类列表
-	 * 
-	 * v1.0 zhanghc 2017年8月6日下午10:03:54
-	 * @param examTypeId
-	 * @return List<Exam>
-	 */
-	List<Exam> getList(Integer examTypeId);
 	
 	/**
 	 * 获取考试分类列表

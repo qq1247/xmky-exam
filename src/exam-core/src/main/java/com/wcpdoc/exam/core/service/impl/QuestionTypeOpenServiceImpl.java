@@ -26,6 +26,7 @@ import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeOpenService;
+import com.wcpdoc.exam.core.util.QuestionUtil;
 
 /**
  * 题库开放服务层实现
@@ -50,7 +51,7 @@ public class QuestionTypeOpenServiceImpl extends BaseServiceImp<QuestionTypeOpen
 	}
 	
 	@Override
-	public void addAndUpdate(QuestionTypeOpen questionTypeOpen) {
+	public void addEx(QuestionTypeOpen questionTypeOpen) {
 		// 校验数据有效性
 		List<QuestionTypeOpen> list = questionTypeOpenDao.getList(questionTypeOpen.getStartTime(), questionTypeOpen.getEndTime(), questionTypeOpen.getQuestionTypeId());
 		if (list.size() != 0) {
@@ -80,7 +81,7 @@ public class QuestionTypeOpenServiceImpl extends BaseServiceImp<QuestionTypeOpen
 	}
 	
 	@Override
-	public void delAndUpdate(Integer id) {
+	public void delEx(Integer id) {
 		// 校验数据有效性
 		QuestionTypeOpen entity = getEntity(id);
 		entity.setState(2);
@@ -98,7 +99,7 @@ public class QuestionTypeOpenServiceImpl extends BaseServiceImp<QuestionTypeOpen
 	public PageResultEx get(Integer questionId) {
 		Question question = questionService.getEntity(questionId);
 		List<String> optionList = new ArrayList<>();
-		if (question.getType() == 1 || question.getType() == 2) {
+		if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasMultipleChoice(question)) {
 			List<QuestionOption> questionOptionList = questionOptionService.getList(question.getId());
 			for (QuestionOption questionOption : questionOptionList) {
 				optionList.add(questionOption.getOptions());
@@ -107,7 +108,7 @@ public class QuestionTypeOpenServiceImpl extends BaseServiceImp<QuestionTypeOpen
 		
 		List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
 		List<Map<String, Object>> questionAnswerSplitList = new ArrayList<Map<String, Object>>();
-		if (question.getType() == 2) {
+		if (QuestionUtil.hasMultipleChoice(question)) {
 			for(QuestionAnswer questionAnswer : questionAnswerList){
 				Map<String, Object> map = new HashMap<String, Object>();
 				String[] split = questionAnswer.getAnswer().split(",");
@@ -117,7 +118,7 @@ public class QuestionTypeOpenServiceImpl extends BaseServiceImp<QuestionTypeOpen
 				map.put("questionId", questionAnswer.getQuestionId());
 				questionAnswerSplitList.add(map);
 			}
-		} else if  (question.getType() == 3) {
+		} else if  (QuestionUtil.hasFillBlank(question)) {
 			for(QuestionAnswer questionAnswer : questionAnswerList){
 				Map<String, Object> map = new HashMap<String, Object>();
 				String[] split = questionAnswer.getAnswer().split("\n");
@@ -127,7 +128,7 @@ public class QuestionTypeOpenServiceImpl extends BaseServiceImp<QuestionTypeOpen
 				map.put("questionId", questionAnswer.getQuestionId());
 				questionAnswerSplitList.add(map);
 			}
-		} else if (question.getType() == 5 && question.getMarkType() == 1) {
+		} else if (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question)) {
 			for(QuestionAnswer questionAnswer : questionAnswerList){					
 				Map<String, Object> map = new HashMap<String, Object>();
 				String[] split = questionAnswer.getAnswer().split("\n");

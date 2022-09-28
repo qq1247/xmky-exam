@@ -102,12 +102,12 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 				+ "LEFT JOIN SYS_ORG AS ORG ON USER.ORG_ID = ORG.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examId")), "MY_EXAM.EXAM_ID = :EXAM_ID", pageIn.get("examId"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("questionId")) && ValidateUtil.isValid(pageIn.get("questionId")), "EXISTS ( SELECT 1 FROM EXM_MY_EXAM_DETAIL MY_EXAM_DETAIL "
-						+ "WHERE MY_EXAM_DETAIL.EXAM_ID = MY_EXAM.EXAM_ID AND MY_EXAM_DETAIL.QUESTION_ID = :QUESTION_ID AND MY_EXAM_DETAIL.USER_ID = MY_EXAM.USER_ID "
-						+ "AND MY_EXAM_DETAIL.QUESTION_SCORE != MY_EXAM_DETAIL.SCORE )", pageIn.get("questionId"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("questionId")) && !ValidateUtil.isValid(pageIn.get("questionId")), "EXISTS ( SELECT 1 FROM EXM_MY_EXAM_DETAIL MY_EXAM_DETAIL "
-						+ "WHERE MY_EXAM_DETAIL.EXAM_ID = MY_EXAM.EXAM_ID AND MY_EXAM_DETAIL.QUESTION_ID = :QUESTION_ID AND MY_EXAM_DETAIL.USER_ID = MY_EXAM.USER_ID "
-						+ "AND MY_EXAM_DETAIL.QUESTION_SCORE = MY_EXAM_DETAIL.SCORE )", pageIn.get("questionId"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("questionId")) && ValidateUtil.isValid(pageIn.get("questionId")), "EXISTS ( SELECT 1 FROM EXM_MY_QUESTION MY_QUESTION "
+						+ "WHERE MY_QUESTION.EXAM_ID = MY_EXAM.EXAM_ID AND MY_QUESTION.QUESTION_ID = :QUESTION_ID AND MY_QUESTION.USER_ID = MY_EXAM.USER_ID "
+						+ "AND MY_QUESTION.QUESTION_SCORE != MY_QUESTION.SCORE )", pageIn.get("questionId"))
+				.addWhere(ValidateUtil.isValid(pageIn.get("questionId")) && !ValidateUtil.isValid(pageIn.get("questionId")), "EXISTS ( SELECT 1 FROM EXM_MY_QUESTION MY_QUESTION "
+						+ "WHERE MY_QUESTION.EXAM_ID = MY_EXAM.EXAM_ID AND MY_QUESTION.QUESTION_ID = :QUESTION_ID AND MY_QUESTION.USER_ID = MY_EXAM.USER_ID "
+						+ "AND MY_QUESTION.QUESTION_SCORE = MY_QUESTION.SCORE )", pageIn.get("questionId"))
 				.addOrder("MY_EXAM.NO", Order.ASC)
 				.addOrder("MY_EXAM.ANSWER_END_TIME", Order.DESC);
 		return getListpage(sqlUtil, pageIn);
@@ -116,16 +116,16 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 	@Override
 	public PageOut questionListpage(PageIn pageIn) {
 		String sql = "SELECT QUESTION.ID AS QUESTION_ID, QUESTION.TITLE AS QUESTION_TITLE, "
-				+ "	MY_EXAM_DETAIL.USER_NUM, MY_EXAM_DETAIL.SUCC_USER_NUM "
+				+ "	MY_QUESTION.USER_NUM, MY_QUESTION.SUCC_USER_NUM "
 				+ "FROM (SELECT MAX(QUESTION_ID) AS QUESTION_ID, COUNT(USER_ID) AS USER_NUM, SUM( SCORE = QUESTION_SCORE ) AS SUCC_USER_NUM "
-				+ "			FROM EXM_MY_EXAM_DETAIL "
+				+ "			FROM EXM_MY_QUESTION "
 				+ "			WHERE EXAM_ID = :EXAM_ID"
-				+ "			GROUP BY QUESTION_ID) MY_EXAM_DETAIL "
-				+ "INNER JOIN EXM_QUESTION QUESTION ON MY_EXAM_DETAIL.QUESTION_ID = QUESTION.ID  ";
+				+ "			GROUP BY QUESTION_ID) MY_QUESTION "
+				+ "INNER JOIN EXM_QUESTION QUESTION ON MY_QUESTION.QUESTION_ID = QUESTION.ID  ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil//.addWhere(ValidateUtil.isValid(pageIn.get("examId")), "", pageIn.get("examId"))
 				.addFromParm(pageIn.get("examId"))
-				.addOrder("MY_EXAM_DETAIL.SUCC_USER_NUM", Order.DESC);
+				.addOrder("MY_QUESTION.SUCC_USER_NUM", Order.DESC);
 		return getListpage(sqlUtil, pageIn);
 	}
 	

@@ -29,7 +29,7 @@ public interface QuestionTypeService extends BaseService<QuestionType> {
 	void move(Integer sourceId, Integer targetId);
 
 	/**
-	 * 清空题库
+	 * 题库清空
 	 * 
 	 * v1.0 zhanghc 2022年9月15日上午9:28:44
 	 * @param id

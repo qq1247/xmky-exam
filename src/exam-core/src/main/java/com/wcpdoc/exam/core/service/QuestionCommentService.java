@@ -20,7 +20,7 @@ public interface QuestionCommentService extends BaseService<QuestionComment> {
 	 * @param questionComment
 	 * @param anonymity void
 	 */
-	void addAndUpdate(QuestionComment questionComment, Integer anonymity);
+	void addEx(QuestionComment questionComment, Integer anonymity);
 
 	/**
 	 * 删除试题评论 
@@ -28,7 +28,7 @@ public interface QuestionCommentService extends BaseService<QuestionComment> {
 	 * v1.0 chenyun 2021年8月31日上午9:54:28
 	 * @param id void
 	 */
-	void delAndUpdate(Integer id);
+	void delEx(Integer id);
 	
 	/**
 	 * 获取试题评论列表

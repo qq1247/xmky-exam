@@ -1,13 +1,12 @@
 package com.wcpdoc.exam.core.service;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
 import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.Question;
-import com.wcpdoc.exam.core.entity.ex.MyExamChapter;
+import com.wcpdoc.exam.core.entity.ex.ExamInfo;
 /**
  * 考试服务层接口
  * 
@@ -16,32 +15,24 @@ import com.wcpdoc.exam.core.entity.ex.MyExamChapter;
 public interface ExamService extends BaseService<Exam>{
 	
 	/**
-	 * 添加考试
+	 * 考试添加
 	 * 
 	 * v1.0 chenyun 2021年8月25日下午5:58:55
-	 * @param exam 
+	 * @param examInfo 
 	 * void
 	 */
-	void addAndUpdate(Exam exam);
+	void addEx(ExamInfo examInfo);
 	
 	/**
-	 * 修改考试
-	 * 
-	 * v1.0 chenyun 2021年8月25日下午6:01:30
-	 * @param exam void
-	 */
-	void updateAndUpdate(Exam exam);
-	
-	/**
-	 * 删除考试
+	 * 考试删除
 	 * 
 	 * v1.0 chenyun 2021年8月25日下午6:03:33
 	 * @param id void
 	 */
-	void delAndUpdate(Integer id);
+	void delEx(Integer id);
 	
 	/**
-	 * 复制
+	 * 考试发布
 	 * 
 	 * v1.0 chenyun 2021年8月25日下午6:06:54
 	 * @param id void
@@ -66,15 +57,6 @@ public interface ExamService extends BaseService<Exam>{
 	 * @return List<Map<String,Object>>
 	 */
 	List<Map<String, Object>> getExamUserList(Integer id, Integer markUserId);
-
-	/**
-	 * 获取考试列表
-	 * 
-	 * v1.0 zhanghc 2017年8月6日下午10:03:09
-	 * @param examTypeId
-	 * @return List<Exam>
-	 */
-	List<Exam> getList(Integer examTypeId);
 	
 	/**
 	 * 获取考试列表
@@ -85,7 +67,7 @@ public interface ExamService extends BaseService<Exam>{
 	List<Exam> getList();
 	
 	/**
-	 * 考试邮件通知
+	 * 考试邮件
 	 * 
 	 * v1.0 chenyun 2022年3月28日下午2:24:28
 	 * @param exam
@@ -95,7 +77,7 @@ public interface ExamService extends BaseService<Exam>{
 	void mail(Exam exam, Integer notifyType, String content);
 
 	/**
-	 * 变更考试时间
+	 * 考试时间变更
 	 * 
 	 * v1.0 zhanghc 2022年4月17日下午6:52:08
 	 * @param id 考试ID
@@ -117,62 +99,11 @@ public interface ExamService extends BaseService<Exam>{
 	void userAdd(Integer id, String[] examUserIds, Integer[] markUserIds);
 	
 	/**
-	 * 获取考试
-	 * 
-	 * v1.0 zhanghc 2022年5月20日下午3:04:01
-	 * @return MyExamChapter
-	 */
-	MyExamChapter getExamChapter(Integer id);
-	
-	/**
 	 * 获取试卷
-	 * 
-	 * v1.0 zhanghc 2022年5月20日下午3:06:04
-	 * @param examId
-	 * @param userId
-	 * @return MyExamChapter
-	 */
-	MyExamChapter getPaperOfRand(Integer examId, Integer userId);
-	
-	/**
-	 * 获取试题列表
 	 * 
 	 * v1.0 zhanghc 2022年5月24日下午4:25:06
 	 * @param id
 	 * @return List<Question>
 	 */
-	List<Question> getQuestionList(Integer id);
-	
-	/**
-	 * 完成批量更新分数
-	 * 
-	 * v1.0 zhanghc 2017年6月9日下午4:21:52
-	 * @param chapterId
-	 * @param score
-	 * @param subScores
-	 * @param markOptions void
-	 */
-	void batchScoreUpdate(Integer chapterId, BigDecimal score, BigDecimal subScores, Integer[] markOptions);
-	
-	/**
-	 * 设置分数
-	 * 
-	 * v1.0 zhanghc 2018年10月21日下午3:10:37
-	 * @param id
-	 * @param questionId
-	 * @param score
-	 * @param subScores 试题为智能阅卷，并且是填空或问答是有效
-	 * void
-	 */
-	void scoreUpdate(Integer id, Integer questionId, BigDecimal score, BigDecimal[] subScores, Integer[] markOptions);
-	
-	/**
-	 * 反作弊
-	 * 
-	 * v1.0 zhanghc 2022年5月18日上午10:45:21
-	 * @param id
-	 * @param options 1：试题乱序；2：选项乱序；3：禁用右键；4：禁止复制；5：最小化警告
-	 * @return PageResult
-	 */
-	void sxe(Integer id, Integer[] options);
+	List<Question> getPaper(Integer id);
 }

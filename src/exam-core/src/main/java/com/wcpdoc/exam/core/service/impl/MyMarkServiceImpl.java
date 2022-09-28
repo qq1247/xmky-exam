@@ -21,11 +21,11 @@ import com.wcpdoc.exam.core.dao.MyMarkDao;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.MyExam;
-import com.wcpdoc.exam.core.entity.MyExamDetail;
+import com.wcpdoc.exam.core.entity.MyQuestion;
 import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.service.ExamQuestionService;
 import com.wcpdoc.exam.core.service.ExamService;
-import com.wcpdoc.exam.core.service.MyExamDetailService;
+import com.wcpdoc.exam.core.service.MyQuestionService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
 
@@ -46,7 +46,7 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 	@Resource
 	private ExamService examService;
 	@Resource
-	private MyExamDetailService myExamDetailService;
+	private MyQuestionService myQuestionService;
 	@Resource
 	private UserService userService;
 	
@@ -77,8 +77,8 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 			throw new MyException("参数错误：score");
 		}
 		
-		MyExamDetail myExamDetail = myExamDetailService.getMyExamDetail(examId, userId, questionId);
-		if (myExamDetail == null) {
+		MyQuestion myQuestion = myQuestionService.getMyQuestion(examId, userId, questionId);
+		if (myQuestion == null) {
 			throw new MyException("未参与考试");
 		}
 		Exam exam = examService.getEntity(examId);
@@ -131,19 +131,13 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		}
 
 		// 更新阅卷分数
-		myExamDetail.setScore(score);
-		myExamDetail.setMarkUserId(getCurUser().getId());
-		myExamDetail.setMarkTime(new Date());
-		myExamDetailService.update(myExamDetail);
+		myQuestion.setScore(score);
+		myQuestion.setMarkUserId(getCurUser().getId());
+		myQuestion.setMarkTime(new Date());
+		myQuestionService.update(myQuestion);
 		
 		// 标记为阅卷中，记录阅卷时间
 		myExam.setMarkState(2); // 只要打分就标记为阅卷中，可能的问题为前端调用了交卷方法，然后调用该方法时，交卷方法调用失败。这个给分了，阅卷时间到，发现交卷就不在处理，导致结果错误
-		if (!ValidateUtil.isValid(myExam.getMarkStartTime())) {
-			myExam.setMarkStartTime(new Date());
-			myExam.setMarkEndTime(new Date());//如果只阅一道题，就没有结束时间。
-		} else {
-			myExam.setMarkEndTime(new Date());
-		}
 		myExam.setMarkUserId(getCurUser().getId());// 一张试卷可能多个人阅卷（按题阅卷），更新成最后一个人。
 		myExamService.update(myExam);
 	}
@@ -191,11 +185,11 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		}
 		
 		// 如果还有未阅卷的题，不交卷
-		List<MyExamDetail> userAnswerList = myExamDetailService.getList(examId, userId);
+		List<MyQuestion> userAnswerList = myQuestionService.getList(examId, userId);
 		BigDecimalUtil totalScore = BigDecimalUtil.newInstance(0);
 		User examUser = userService.getEntity(userId);
 		User markUser = userService.getEntity(getCurUser().getId());
-		for (MyExamDetail userAnswer : userAnswerList) {
+		for (MyQuestion userAnswer : userAnswerList) {
 			if (userAnswer.getScore() == null) {// 如果按题阅卷或多人阅一张试卷，交卷时应该等待所有题都阅卷。阅卷时间到也会做最终的处理。
 				log.info("主观题交卷：【{}-{}】【{}-{} 阅 {}-{}】，编号为{}的试题未阅卷，等待完成", exam.getId(), exam.getName(), 
 						markUser.getId(), markUser.getName(), examUser.getId(), examUser.getName(), userAnswer.getQuestionId());
@@ -206,7 +200,6 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		
 		// 标记为已阅，记录阅卷人，统计总分数，标记是否及格
 		myExam.setMarkUserId(getCurUser().getId());
-		myExam.setMarkEndTime(new Date());
 		myExam.setTotalScore(totalScore.getResult());
 		myExam.setMarkState(3);
 		

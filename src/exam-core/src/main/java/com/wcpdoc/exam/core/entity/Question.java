@@ -31,24 +31,24 @@ public class Question {
 	private Integer type;
 	@Column(name = "TITLE")
 	private String title;
+	@Column(name = "MARK_TYPE")
+	private Integer markType;
+	@Column(name = "MARK_OPTIONS")
+	private String markOptions;
 	@Column(name = "ANALYSIS")
 	private String analysis;
+	@Column(name = "SCORE")
+	private BigDecimal score;
 	@Column(name = "STATE")
 	private Integer state;
+	@Column(name = "QUESTION_TYPE_ID")
+	private Integer questionTypeId;
 	@Column(name = "UPDATE_USER_ID")
 	private Integer updateUserId;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "UPDATE_TIME")
 	private Date updateTime;
-	@Column(name = "QUESTION_TYPE_ID")
-	private Integer questionTypeId;
-	@Column(name = "SCORE")
-	private BigDecimal score;
-	@Column(name = "MARK_TYPE")
-	private Integer markType;
-	@Column(name = "MARK_OPTIONS")
-	private String markOptions;
 
 	public Integer getId() {
 		return id;
