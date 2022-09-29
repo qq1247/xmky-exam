@@ -12,7 +12,7 @@
         </div>
       </div>
       <PaperSetting v-if="activeIndex === 0" @switchTab="switchTab"></PaperSetting>
-      <QuestionTxtImport v-if="activeIndex === 1 && createdType === 1" :isBack="false" ref="QuestionTxtImport">
+      <QuestionTxtImport v-if="activeIndex === 1 && createdType === 1">
         <template #leftOpt>
           <el-button plain @click="preStep()" size="mini" >返回</el-button>
         </template>
@@ -216,6 +216,7 @@ export default {
       });
 
       this.$message.info('导入成功')
+      this.preStep();
     }, 
   }
 }

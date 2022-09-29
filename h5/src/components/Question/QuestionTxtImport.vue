@@ -307,8 +307,7 @@ D多选题的D选项
         // if (this.questionList[i].errs.length > 0) {
         if (this.errNum > 0) {
           let scrollContainer = document.getElementsByClassName('question-box')[1]
-          let eleOffSetTop = document.getElementsByClassName('el-alert')[0]
-          console.log(eleOffSetTop)
+          let eleOffSetTop = document.getElementsByClassName('el-alert')[0].parentElement.parentElement.offsetTop
           scrollContainer.scrollTop = eleOffSetTop
         }
          

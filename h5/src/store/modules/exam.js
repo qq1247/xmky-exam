@@ -1,6 +1,6 @@
 const state = {
   paperName: '点击这里输入试卷名称',
-  paperQuestion: [],
+  examQuestions: [],
   exam: {
     name: '',
     examTime: [new Date(), new Date()],// 考试时间
@@ -19,14 +19,14 @@ const mutations = {
     state.paperName = paperName
   },
   addChapter: (state, chapter) => {
-    state.paperQuestion.push({
+    state.examQuestions.push({
       type: 1,
       chapterName: chapter.name,
       chapterTxt: chapter.txt,
     })
   },
   addQuestion(state, question) {
-    state.paperQuestion.push({
+    state.examQuestions.push({
       type: 2,
       score: question.score,
       answerScores: question.answerScores,

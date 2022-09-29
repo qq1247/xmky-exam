@@ -5,14 +5,14 @@
       <el-divider>答题卡</el-divider>
       <div class="router-content">
         <Draggable
-          v-model="paperQuestion"
+          v-model="examQuestions"
           tag="div"
           group="questionGroup"
           chosen-class="drag-question-active"
           animation="300"
         >
           <div
-            v-for="(item, index) in paperQuestion"
+            v-for="(item, index) in examQuestions"
             :key="index"
             :style="{'display': item.type === 1 ? 'block' : 'inline-block'}"
           >
@@ -29,7 +29,7 @@
       </div>
     </div>
     <!-- 试卷 -->
-    <el-scrollbar wrap-style="overflow-x:hidden;" class="paper-content">
+    <el-scrollbar class="paper-content">
       <div class="top">
         <div class="top-title">
           <el-input
@@ -52,24 +52,24 @@
             size="mini"
             round
             @click="toEditor"
-            >试题导入</el-button
+            >文本导入</el-button
           >
-          <el-button icon="el-icon-plus" size="mini" @click="addChapter" round>章节添加</el-button>
+          <el-button icon="el-icon-plus" size="mini" @click="_addChapter" round>章节添加</el-button>
           <el-button icon="el-icon-delete" size="mini" round @click="questionClear">试卷重置</el-button>
         </div>
       </div>
       <div class="content-center"
-        v-for="(p, index) of paperQuestion"
-        :key="`paperQuestion${index}`"
+        v-for="(examQuestion, index) of examQuestions"
+        :key="`examQuestions${index}`"
       >
-        <div v-if="p.type === 1" class="chapter">
+        <div v-if="examQuestion.type === 1" class="chapter">
           <el-input
-            v-model="p.chapterName"
-            placeholder="请输入章节名称"
+            v-model="examQuestion.chapterName"
+            placeholder="请输入名称"
             maxlength="16"
           />
           <el-input
-              v-model="p.chapterTxt"
+              v-model="examQuestion.chapterTxt"
               :rows="2"
               placeholder="请输入描述"
               type="textarea"
@@ -77,10 +77,45 @@
             />
         </div>
         <Question
-          v-else-if="p.type === 2"
-          :question="p.question"
+          v-else-if="examQuestion.type === 2"
+          :question="examQuestion.question"
           :no="index + 1"
-        />
+        >
+          <template #bottom>
+            <div class="question-opt">
+              <template v-if="examQuestion.question.type === 1 || examQuestion.question.type === 2 
+                  || examQuestion.question.type === 4 || (examQuestion.question.type === 5 && examQuestion.question.markType === 2)">
+                本题
+                <el-input 
+                  :value='examQuestion.question.score' 
+                  class="cloze-input1"
+                  >
+                </el-input>分
+              </template>
+              <template v-if="examQuestion.question.type === 2">
+                ，漏选
+                <el-input
+                  :value='examQuestion.question.answerScores[0]' 
+                  class="cloze-input1"
+                  >
+                </el-input>分
+              </template>
+              <template v-if="examQuestion.question.type === 3 || (examQuestion.question.type === 5 && examQuestion.question.markType === 1)">
+                <div style="display: inline;"
+                    v-for="(answerScore, index) of examQuestion.question.answerScores"
+                    :key="`answerScores${index}`"
+                  > 
+                    第{{$tools.intToChinese(index + 1)}}空
+                    <el-input
+                      :value='answerScore' 
+                      class="cloze-input1"
+                      >
+                    </el-input>分，
+                </div>
+              </template>
+            </div>
+          </template>
+        </Question>
       </div>
     </el-scrollbar>
 
@@ -178,7 +213,6 @@ import Question from '@/components/Question/Question.vue'
 import { questionListpage } from 'api/question'
 import QuestionList from '@/components/Question/QuestionList.vue'
 import { mapMutations } from 'vuex'
-import { mapState } from 'vuex'
 export default {
   components: {
     Draggable,
@@ -204,10 +238,24 @@ export default {
       
     }
   },
-  computed: mapState('exam', {
-    paperQuestion: state => state.paperQuestion,
-    paperName: state => state.paperName,
-  }),
+  computed: {
+    examQuestions: {
+      get: function () {
+        return this.$store.state.exam.examQuestions
+      },
+      set: function (newValue) {
+        this.$store.state.exam.examQuestions = newValue
+      }
+    },
+    paperName: {
+      get: function () {
+        return this.$store.state.exam.paperName
+      },
+      set: function (newValue) {
+        this.$store.state.exam.paperName = newValue
+      }
+    },
+  },
   methods: {
     ...mapMutations('exam', [
       'updatePaperName',
@@ -216,6 +264,9 @@ export default {
     ]),
     toEditor() {
       this.$emit('toEditor')
+    },
+    _addChapter() {
+      this.addChapter({'name':'', 'txt':''})
     },
     // 跳转到对应的试题
     toHref(index) {
@@ -235,8 +286,8 @@ export default {
       }
 
       let exIds = []
-      this.paperQuestion.forEach(paper => {
-        if (paper.type === 2) {
+      this.examQuestions.forEach(examQuestions => {
+        if (examQuestions.type === 2) {
           exIds.push(paper.question.id)
         }
       });
@@ -255,9 +306,9 @@ export default {
     async queryCmd(cmd) {
       if (cmd === 'randAdd') {
         let exIds = []
-        this.paperQuestion.forEach(paper => {
-          if (paper.type === 2) {
-            exIds.push(paper.question.id)
+        this.examQuestions.forEach(examQuestion => {
+          if (examQuestion.type === 2) {
+            exIds.push(examQuestion.question.id)
           }
         });
         
@@ -287,13 +338,40 @@ export default {
     },
     // 重置试卷
     questionClear() {
-      this.paperQuestion.splice(0)
+      this.examQuestions.splice(0)
     }
   },
 }
 </script>
 
 <style lang="scss" scoped>
+.content-center :hover{
+  padding-bottom: 0px;
+  .question-opt {
+    display: block;
+  }
+}
+.question-opt {
+  display: none;
+  .cloze-input1 {
+    display: inline;
+    /deep/ .el-input__inner {
+      height: 24px;
+      width: 50px;
+      border: none;
+      border-radius: 0;
+      background-color: transparent;
+      border-bottom: 1px solid #0c2e41;
+    }
+
+    &.is-disabled .el-input__inner {
+      background-color: transparent;
+      border-color: #0c2e41;
+      color: #0c2e41;
+      cursor: default;
+    }
+  }
+}
 .paper-router {
   width: 240px;
   background: #fff;

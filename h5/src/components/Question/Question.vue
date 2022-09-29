@@ -29,7 +29,7 @@
   <!-- 试题详细样式 -->
   <div v-else-if="showMode === 'detail'" class="question-content">
     <el-alert 
-      v-if="question.errs.length > 0" 
+      v-if="question.errs && question.errs.length > 0" 
       :title="question.errs" 
       type="error" 
       effect="dark" 
@@ -41,6 +41,7 @@
       :type="question.type"
       :no="no"
       :title="question.title"
+      :score="question.score"
       :answers="question.answers"
       :readOnly="true"
     />

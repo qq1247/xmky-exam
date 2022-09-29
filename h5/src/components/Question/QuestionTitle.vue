@@ -18,6 +18,10 @@ export default {
       type: String,
       default: null,
     },
+    score: {// 分数
+      type: Number,
+      default: null,
+    },
     answers: {// 答案
       type: Array,
       default: [],
@@ -40,7 +44,7 @@ export default {
     let template = `
       <div class='question-title'>
         <span>${props.no}、</span>
-        <div>${title}</div>
+        <div>${title}</div>（${props.score}分）
       </div>`
     return h({
       template
