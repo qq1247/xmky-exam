@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <QuestionTxtImport
-      ref="QuestionTxtImport"
+      ref="questionTxtImport"
       :question-type-id="questionTypeId"
     >
       <template #leftOpt>
@@ -46,7 +46,7 @@ export default {
       let errTxt = ''
       for (let i in questionList) {
         let question = questionList[i]
-        if (question.type === 3) {// 如果是hi填空题，处理下答案格式，符合接口
+        if (question.type === 3) {// 如果是填空题，处理下答案格式，符合接口
           question = JSON.parse(JSON.stringify(question))
           question.answers = question.answers.map(answer => {
             return answer.join("\n")
@@ -66,8 +66,7 @@ export default {
       } else {
         errTxt = '添加成功，请继续添加或返回'
       }
-
-      this.$message.warning(errTxt)
+      this.$refs.questionTxtImport.questionTxt = errTxt
     }, 
   }
 }

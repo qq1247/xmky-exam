@@ -34,6 +34,7 @@
 import Edit from './Edit.vue'
 import Move from './Move.vue'
 import Del from './Del.vue'
+import Clear from './Clear.vue'
 export default {
   data() {
     return {
@@ -50,7 +51,7 @@ export default {
       contentName: '',
       contentIntro: '',
       contentUrl: '',
-      viewList: [Edit, Move, Del],
+      viewList: [Edit, Move, Clear, Del],
       currentView: null
     }
   },
@@ -80,13 +81,21 @@ export default {
           index: '2'
         },
         {
+          name: '清空',
+          intro: '清空题库',
+          icon: 'common common-delete',
+          contentName: '清空',
+          contentIntro: '清空题库',
+          index: '3'
+        },
+        {
           name: '删除',
           intro: '删除题库',
           icon: 'common common-delete',
           contentName: '删除',
           contentIntro: '该题库下有试题，则不允许删除',
-          index: '3'
-        }
+          index: '4'
+        },
       ]
     }
     this.currentView = this.viewList[Number(this.tabIndex) - 1]

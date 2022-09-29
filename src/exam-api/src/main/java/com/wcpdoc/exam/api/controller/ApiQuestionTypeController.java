@@ -109,7 +109,7 @@ public class ApiQuestionTypeController extends BaseController {
 			// 保存题库
 			entity.setName(questionType.getName());
 			entity.setUpdateTime(new Date());
-			update(entity);
+			questionTypeService.update(entity);
 			
 			return PageResult.ok();
 		} catch (MyException e) {

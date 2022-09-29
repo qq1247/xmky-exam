@@ -51,7 +51,7 @@ public class MyQuestion {
 	private String optionNo;
 	@DateTimeFormat(pattern = DateUtil.FORMAT_DATE_TIME)
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	@Column(name = "UPDATE_TIME")
+	@Column(name = "ANSWER_TIME")
 	private Date answerTime;
 	@Column(name = "ANSWER")
 	private String answer;

@@ -422,12 +422,6 @@ export default {
             icon: require('../../assets/img/index/mark-manage.png'),
             title: '阅卷管理'
           },
-          {
-            path: '/quick',
-            background: '#6B77F9',
-            icon: require('../../assets/img/index/index-quick.png'),
-            title: '快捷考试'
-          }
         ]
       }
       if (userInfo === 'user') {

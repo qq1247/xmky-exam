@@ -7,7 +7,7 @@
       </div>
 
       <mavon-editor
-        class="qestion-box"
+        class="question-box"
         :value="questionTxt"
         :toolbars-flag="false"
         :short-cut="false"
@@ -27,7 +27,7 @@
           <slot name="rightOpt" :errNum="errNum" :questionList="questionList"></slot>
         </div>
       </div>
-      <div class="content-center qestion-box">
+      <div class="content-center question-box">
         <QuestionList :list="questionList">
         </QuestionList>
       </div>
@@ -303,13 +303,17 @@ D多选题的D选项
     },
     // 定位错误
     locationErr() {
-      for (let i in this.questionList) {
-        if (this.questionList[i].errs.length > 0) {
-          let scrollContainer = document.getElementsByClassName('qestion-box')[1]
-          let eleOffSetTop = document.getElementById('p-' + i).offsetTop - 130
+      // for (let i in this.questionList) {
+        // if (this.questionList[i].errs.length > 0) {
+        if (this.errNum > 0) {
+          let scrollContainer = document.getElementsByClassName('question-box')[1]
+          let eleOffSetTop = document.getElementsByClassName('el-alert')[0]
+          console.log(eleOffSetTop)
           scrollContainer.scrollTop = eleOffSetTop
         }
-      }
+         
+        // }
+      // }
       
     },
     // 显示示例
@@ -351,7 +355,7 @@ D多选题的D选项
     .btn-box {
       padding: 4px;
     }
-    .qestion-box {
+    .question-box {
       height: calc(100% - 38px);
       overflow: scroll;
       border: 1px solid #D4D4D4;
@@ -379,7 +383,7 @@ D多选题的D选项
         color: #F3A0A4
       }
     }
-    .qestion-box {
+    .question-box {
       height: calc(100% - 38px);
       overflow: scroll;
       border: 1px solid #D4D4D4;

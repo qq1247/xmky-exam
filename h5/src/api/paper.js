@@ -2,7 +2,7 @@ import request from './request'
 
 export const paperListpage = (params) => request('paper/listpage', params)
 export const paperAdd = (params) => request('paper/add', params)
-export const paperEdit = (params) => request('paper/edit', params)
+export const paperEdit = (params) => request('paper/update', params)
 export const paperDel = (params) => request('paper/del', params)
 export const paperGet = (params) => request('paper/get', params)
 export const paperCopy = (params) => request('paper/copy', params)
@@ -36,7 +36,7 @@ export const paperTypeListpage = (params) =>
   request('paperType/listpage', params)
 
 export const paperTypeAdd = (params) => request('paperType/add', params)
-export const paperTypeEdit = (params) => request('paperType/edit', params)
+export const paperTypeEdit = (params) => request('paperType/update', params)
 export const paperTypeDel = (params) => request('paperType/del', params)
 export const paperTypeGet = (params) => request('paperType/get', params)
 export const paperTypeMove = (params) => request('paperType/move', params)

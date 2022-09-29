@@ -56,6 +56,9 @@
                     <div class="more-item" @click="statistics(questionType.id)">
                       <i class="common common-statistics" />试题统计
                     </div>
+                    <div class="more-item" @click="clear(questionType.id)">
+                      <i class="common common-delete" />试题清空
+                    </div>
                   </div>
                 </span>
               </div>
@@ -167,11 +170,18 @@ export default {
         questionTypeId: id,
       })
     },
+    // 题库清空
+    clear(id) {
+      this.$tools.switchTab('QuestionIndexSetting', {
+        questionTypeId: id,
+        tab: '3',
+      })
+    },
     // 题库删除
     del(id) {
       this.$tools.switchTab('QuestionIndexSetting', {
         questionTypeId: id,
-        tab: '3',
+        tab: '4',
       })
     },
     // 题库统计

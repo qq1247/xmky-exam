@@ -8,11 +8,11 @@ import { questionTypeDel } from 'api/question'
 export default {
   data() {
     return {
-      id: null
+      id: null,
     }
   },
   mounted() {
-    this.id = this.$route.params.id
+    this.id = this.$route.params.questionTypeId
   },
   methods: {
     del() {
@@ -20,7 +20,7 @@ export default {
         this.$message.success('删除成功')
         this.$tools.switchTab('QuestionIndex')
       })
-    }
-  }
+    },
+  },
 }
 </script>

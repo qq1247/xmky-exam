@@ -30,7 +30,7 @@ export const examAdd = (params) => request('exam/add', params)
  * @param {*}
  * @return {*}
  */
-export const examEdit = (params) => request('exam/edit', params)
+export const examEdit = (params) => request('exam/update', params)
 
 /**
  * @name: examDel
@@ -94,7 +94,7 @@ export const examTypeAdd = (params) => request('examType/add', params)
  * @param {*}
  * @return {*}
  */
-export const examTypeEdit = (params) => request('examType/edit', params)
+export const examTypeEdit = (params) => request('examType/update', params)
 
 /**
  * @name: examTypeDel

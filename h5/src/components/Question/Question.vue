@@ -28,7 +28,13 @@
   </el-card>
   <!-- 试题详细样式 -->
   <div v-else-if="showMode === 'detail'" class="question-content">
-    <slot name="top"></slot>
+    <el-alert 
+      v-if="question.errs.length > 0" 
+      :title="question.errs" 
+      type="error" 
+      effect="dark" 
+      :closable="false"
+      style="margin-bottom: 10px;padding: 4px 16px;"></el-alert>
     <!-- 题干 -->
     <QuestionTitle
       :id="question.id"

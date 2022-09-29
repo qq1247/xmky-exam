@@ -30,7 +30,7 @@ export const userAdd = (params) => request('user/add', params)
  * @param {*}
  * @return {*}
  */
-export const userEdit = (params) => request('user/edit', params)
+export const userEdit = (params) => request('user/update', params)
 
 /**
  * @name: userDel

@@ -262,29 +262,5 @@ export default [
       }
     ]
   },
-  {
-    path: '/quick',
-    component: Layout,
-    redirect: '/quick/index',
-    name: 'Quick',
-    meta: {
-      icon: 'common common-quick',
-      layout: 'subAdmin',
-      roles: ['subAdmin'],
-      hidden: true
-    },
-    children: [
-      {
-        path: 'index',
-        name: 'QuickIndex',
-        component: () => import('@/views/quick/Index.vue'),
-        hidden: true,
-        meta: {
-          title: '快捷考试',
-          layout: 'subAdmin'
-        }
-      }
-    ]
-  },
   { path: '*', redirect: '/404', hidden: true }
 ]

@@ -124,13 +124,6 @@ export default {
         tab: '1'
       })
     },
-    // 权限人员信息
-    role({ id }) {
-      this.$tools.switchTab('PaperIndexSetting', {
-        id,
-        tab: '2'
-      })
-    },
     // 删除分类
     del({ id }) {
       this.$tools.switchTab('PaperIndexSetting', {

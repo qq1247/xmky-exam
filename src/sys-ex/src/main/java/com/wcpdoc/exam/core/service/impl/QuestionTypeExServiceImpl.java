@@ -33,6 +33,7 @@ public class QuestionTypeExServiceImpl extends BaseServiceImp<QuestionType> impl
 	
 	@Override
 	public void setDao(BaseDao<QuestionType> dao) {
+		
 	}
 
 	@Override
@@ -86,7 +87,7 @@ public class QuestionTypeExServiceImpl extends BaseServiceImp<QuestionType> impl
 		if (!ValidateUtil.isValid(id)) {
 			throw new MyException("参数错误：id");
 		}
-		QuestionType entity = getEntity(id);
+		QuestionType entity = questionTypeService.getEntity(id);
 		if (entity.getUpdateUserId().intValue() != getCurUser().getId()) {
 			throw new MyException("无操作权限");
 		}

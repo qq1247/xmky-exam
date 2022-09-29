@@ -22,7 +22,7 @@ public class QuestionUtil {
 	 * @return boolean
 	 */
 	public static boolean hasObjective(Question question) {
-		return (QuestionUtil.hasObjective(question) && (QuestionUtil.hasFillBlank(question) || QuestionUtil.hasQA(question)));
+		return (question.getMarkType() == 2 && (question.getType() == 3 || question.getType() == 5));
 	}
 	
 	/**
@@ -44,7 +44,7 @@ public class QuestionUtil {
 	 * @return boolean
 	 */
 	public static boolean hasSingleChoice(Question question) {
-		return QuestionUtil.hasSingleChoice(question);
+		return question.getType() == 1;
 	}
 	
 	/**
@@ -55,7 +55,7 @@ public class QuestionUtil {
 	 * @return boolean
 	 */
 	public static boolean hasMultipleChoice(Question question) {
-		return QuestionUtil.hasMultipleChoice(question);
+		return question.getType() == 2;
 	}
 	
 	/**
@@ -66,7 +66,7 @@ public class QuestionUtil {
 	 * @return boolean
 	 */
 	public static boolean hasFillBlank(Question question) {
-		return QuestionUtil.hasFillBlank(question);
+		return question.getType() == 3;
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class QuestionUtil {
 	 * @return boolean
 	 */
 	public static boolean hasTrueFalse(Question question) {
-		return QuestionUtil.hasTrueFalse(question);
+		return question.getType() == 4;
 	}
 
 	/**
@@ -88,7 +88,7 @@ public class QuestionUtil {
 	 * @return boolean
 	 */
 	public static boolean hasQA(Question question) {
-		return QuestionUtil.hasQA(question);
+		return question.getType() == 5;
 	}
 
 	/**

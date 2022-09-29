@@ -43,7 +43,6 @@ import com.wcpdoc.exam.core.entity.ex.ExamInfo;
 import com.wcpdoc.exam.core.entity.ex.ExamQuestionEx;
 import com.wcpdoc.exam.core.entity.ex.ExamUser;
 import com.wcpdoc.exam.core.entity.ex.QuestionEx;
-import com.wcpdoc.exam.core.service.ExamExService;
 import com.wcpdoc.exam.core.service.ExamQuestionService;
 import com.wcpdoc.exam.core.service.ExamRuleService;
 import com.wcpdoc.exam.core.service.ExamService;
@@ -74,8 +73,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	private ExamQuestionService examQuestionService;
 	@Resource
 	private NotifyService notifyService;
-	@Resource
-	private ExamExService examExService;
 	@Resource
 	private MyMarkService myMarkService;
 	@Resource

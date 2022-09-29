@@ -3,7 +3,7 @@ import request from './request'
 export const questionListpage = (params) => request('question/listpage', params)
 export const questionGet = (params) => request('question/get', params)
 export const questionAdd = (params) => request('question/add', params)
-export const questionEdit = (params) => request('question/edit', params)
+export const questionEdit = (params) => request('question/update', params)
 export const questionDel = (params) => request('question/del', params)
 export const questionCopy = (params) => request('question/copy', params)
 export const questionPublish = (params) => request('question/publish', params)
@@ -15,11 +15,11 @@ export const questionTypeListpage = (params) =>
   request('questionType/listpage', params)
 
 export const questionTypeAdd = (params) => request('questionType/add', params)
-export const questionTypeEdit = (params) => request('questionType/edit', params)
+export const questionTypeEdit = (params) => request('questionType/update', params)
 export const questionTypeDel = (params) => request('questionType/del', params)
 export const questionTypeGet = (params) => request('questionType/get', params)
 export const questionTypeMove = (params) => request('questionType/move', params)
-export const questionTypeAuth = (params) => request('questionType/auth', params)
+export const questionTypeClear = (params) => request('questionType/clear', params)
 
 export const questionTypeOpenListpage = (params) =>
   request('questionTypeOpen/listpage', params)
