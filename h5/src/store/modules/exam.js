@@ -28,10 +28,6 @@ const mutations = {
   addQuestion(state, question) {
     state.examQuestions.push({
       type: 2,
-      score: question.score,
-      answerScores: question.answerScores,
-      markOptions: question.markOptions,
-      questionId: question.id,
       question
     })
   },

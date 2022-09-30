@@ -107,7 +107,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		 * "exam":{"name":"期末考试","markType":1,"genType":1,"totalScore":100},
 		 * "examQuestions": [
 		 *    {"type":1,"chapterName":"单选题","chapterTxt":"每题2分，一共10题20分"},
-		 *    {"type":2,"socre":2,"scores":1,"question":{"id":2,"title":"这是一道多选题"}}
+		 *    {"type":2,"question":{"id":2,"title":"这是一道多选题"}}
 		 *  ],
 		 * "examUsers": [
 		 *    {"examUserIds":[1,2],"markUserId":5},

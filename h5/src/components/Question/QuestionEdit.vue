@@ -504,7 +504,7 @@ export default {
         }
       }
     },
-    // 如果是填空题，分数为各子项的分数总和
+    // 如果是填空题或客观问答题，分数为各子项的分数总和
     'editForm.answerScores': {
       deep: true,
       handler(n) {

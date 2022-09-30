@@ -12,16 +12,16 @@
           animation="300"
         >
           <div
-            v-for="(item, index) in examQuestions"
-            :key="index"
-            :style="{'display': item.type === 1 ? 'block' : 'inline-block'}"
+            v-for="(examQuestion, index) in examQuestions"
+            :key="`examQuestions${index}`"
+            :style="{'display': examQuestion.type === 1 ? 'block' : 'inline-block'}"
           >
-            <div v-if="item.type === 1" class="router-title">
-              {{item.chapterName}}
+            <div v-if="examQuestion.type === 1" class="router-title">
+              {{examQuestion.chapterName}}
             </div>
             <div v-else>
-              <a :class="['router-index']" @click="toHref(item)">{{
-                index + 1
+              <a :class="['router-index']" @click="toHref(examQuestion)">{{
+                examQuestion.question.no
               }}</a>
             </div>
           </div>
@@ -79,44 +79,45 @@
         <Question
           v-else-if="examQuestion.type === 2"
           :question="examQuestion.question"
-          :no="index + 1"
+          :no="examQuestion.question.no"
         >
           <template #bottom>
             <div class="question-opt">
               <template v-if="examQuestion.question.type === 1 || examQuestion.question.type === 2 
                   || examQuestion.question.type === 4 || (examQuestion.question.type === 5 && examQuestion.question.markType === 2)">
                 本题
-                <el-input 
-                  :value='examQuestion.question.score' 
-                  class="cloze-input1"
-                  >
-                </el-input>分
+                <el-input-number 
+                  v-model="examQuestion.question.score" 
+                  :min="0.5" :max="20" 
+                  size="small"
+                ></el-input-number>分
               </template>
               <template v-if="examQuestion.question.type === 2">
                 ，漏选
-                <el-input
-                  :value='examQuestion.question.answerScores[0]' 
-                  class="cloze-input1"
-                  >
-                </el-input>分
+                <el-input-number 
+                   v-model='examQuestion.question.answerScores[0]' 
+                  :min="0.5" :max="20" 
+                  size="small"
+                ></el-input-number>分
               </template>
               <template v-if="examQuestion.question.type === 3 || (examQuestion.question.type === 5 && examQuestion.question.markType === 1)">
                 <div style="display: inline;"
-                    v-for="(answerScore, index) of examQuestion.question.answerScores"
-                    :key="`answerScores${index}`"
+                    v-for="(answerScore, index1) of examQuestion.question.answerScores"
+                    :key="`answerScores${index1}`"
                   > 
-                    第{{$tools.intToChinese(index + 1)}}空
-                    <el-input
-                      :value='answerScore' 
-                      class="cloze-input1"
-                      >
-                    </el-input>分，
+                    第{{$tools.intToChinese(index1 + 1)}}{{examQuestion.question.type === 3 ? '空' : '关键词'}}
+                    <el-input-number 
+                      v-model='examQuestion.question.answerScores[index1]' 
+                      :min="0.5" :max="20" 
+                      size="small"
+                    ></el-input-number>分，
                 </div>
               </template>
             </div>
           </template>
         </Question>
       </div>
+      <div style="height:50px"></div>
     </el-scrollbar>
 
     <!-- 题库 -->
@@ -256,6 +257,47 @@ export default {
       }
     },
   },
+  watch: {
+    // 如果是填空题或客观问答题，分数为各子项的分数总和
+    'examQuestions': {
+      deep: true,
+      handler(n) {
+        let no = 1, totalScore = 0;
+        this.examQuestions.forEach((examQuestion, index) => {
+          if (examQuestion.type === 2) {// 如果是试题
+            if (!examQuestion.question.score) { // 如果分数被删掉则初始化一个，分数范围通过组件限制了
+              console.error(examQuestion.question.score)
+              examQuestion.question.score = 1
+              this.$set(this.examQuestions, index, examQuestion)
+              console.error(examQuestion.question.score)
+            }
+
+            examQuestion.question.answerScores.forEach((answerScore, index1) => {
+              if (!answerScore) {
+                this.examQuestions[index].question.answerScore[index1] = 1
+              }
+            })
+
+            if (examQuestion.question.type === 2) {// 多选题漏选超出范围，恢复为分数一半
+              if (examQuestion.question.score <= examQuestion.question.answerScores[0]) {
+                this.examQuestions[index].question.answerScores[0] = examQuestion.question.score / 2
+              }
+            }
+
+            if (examQuestion.question.type === 3 // 填空或客观问答题，分数为子分数累加
+              || (examQuestion.question.type === 5 && examQuestion.question.markType === 1)) {
+                this.examQuestions[index].question.score = this.examQuestions[index].question.answerScores
+                    .reduce((pre, cur) => pre + cur)
+            }
+
+            this.examQuestions[index].question.no = no++ // 页面显示序号，排除章节
+            totalScore += this.examQuestions[index].question.score
+          }
+        })
+        console.log(totalScore)
+      }
+    },
+  },
   methods: {
     ...mapMutations('exam', [
       'updatePaperName',
@@ -270,9 +312,7 @@ export default {
     },
     // 跳转到对应的试题
     toHref(index) {
-      document
-        .querySelector(`#p-${index}`)
-        .scrollIntoView({ block: 'end', inline: 'nearest' })
+      document.querySelector(`#p-${index}`).scrollIntoView({ block: 'end', inline: 'nearest' })
     },
     // 
     toAdd() {
@@ -352,24 +392,23 @@ export default {
   }
 }
 .question-opt {
+  color: #557587;
+  height: 32px;
+  margin-top: 10px;
   display: none;
-  .cloze-input1 {
-    display: inline;
-    /deep/ .el-input__inner {
-      height: 24px;
-      width: 50px;
-      border: none;
-      border-radius: 0;
-      background-color: transparent;
-      border-bottom: 1px solid #0c2e41;
-    }
-
-    &.is-disabled .el-input__inner {
-      background-color: transparent;
-      border-color: #0c2e41;
-      color: #0c2e41;
-      cursor: default;
-    }
+  /deep/ .el-input-number--small .el-input-number__increase, /deep/ .el-input-number--small .el-input-number__decrease{
+    display: none;
+    width: 50px;
+  }
+  /deep/ .el-input--small .el-input__inner {
+    border: none;
+    border-radius: 0;
+    border-bottom: 1px solid #557587;
+  }
+  /deep/ .el-input--small .el-input__inner {
+    width: 50px;
+    padding-left: 0;
+    padding-right: 0;
   }
 }
 .paper-router {
@@ -536,4 +575,6 @@ export default {
     }
   }
 }
+
+
 </style>
