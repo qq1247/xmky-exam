@@ -37,7 +37,7 @@
             @input="updatePaperName"
             placeholder="请输入试卷名称"
             maxlength="32"
-          ></el-input>
+          ></el-input> {{totalScore}}分
         </div>
         <div class="top-handler">
           <el-button
@@ -90,6 +90,7 @@
                   v-model="examQuestion.question.score" 
                   :min="0.5" :max="20" 
                   size="small"
+                  @input="updateScore(index)"
                 ></el-input-number>分
               </template>
               <template v-if="examQuestion.question.type === 2">
@@ -98,6 +99,7 @@
                    v-model='examQuestion.question.answerScores[0]' 
                   :min="0.5" :max="20" 
                   size="small"
+                  @input="updateScore(index)"
                 ></el-input-number>分
               </template>
               <template v-if="examQuestion.question.type === 3 || (examQuestion.question.type === 5 && examQuestion.question.markType === 1)">
@@ -110,6 +112,7 @@
                       v-model='examQuestion.question.answerScores[index1]' 
                       :min="0.5" :max="20" 
                       size="small"
+                      @input="updateScore(index)"
                     ></el-input-number>分，
                 </div>
               </template>
@@ -222,6 +225,7 @@ export default {
   },
   data() {
     return {
+      totalScore: 0, //总分数
       showQuestionList: false, // 显示题库
       queryForm: {
         questionTypeName: null, // 题库
@@ -262,39 +266,7 @@ export default {
     'examQuestions': {
       deep: true,
       handler(n) {
-        let no = 1, totalScore = 0;
-        this.examQuestions.forEach((examQuestion, index) => {
-          if (examQuestion.type === 2) {// 如果是试题
-            if (!examQuestion.question.score) { // 如果分数被删掉则初始化一个，分数范围通过组件限制了
-              console.error(examQuestion.question.score)
-              examQuestion.question.score = 1
-              this.$set(this.examQuestions, index, examQuestion)
-              console.error(examQuestion.question.score)
-            }
-
-            examQuestion.question.answerScores.forEach((answerScore, index1) => {
-              if (!answerScore) {
-                this.examQuestions[index].question.answerScore[index1] = 1
-              }
-            })
-
-            if (examQuestion.question.type === 2) {// 多选题漏选超出范围，恢复为分数一半
-              if (examQuestion.question.score <= examQuestion.question.answerScores[0]) {
-                this.examQuestions[index].question.answerScores[0] = examQuestion.question.score / 2
-              }
-            }
-
-            if (examQuestion.question.type === 3 // 填空或客观问答题，分数为子分数累加
-              || (examQuestion.question.type === 5 && examQuestion.question.markType === 1)) {
-                this.examQuestions[index].question.score = this.examQuestions[index].question.answerScores
-                    .reduce((pre, cur) => pre + cur)
-            }
-
-            this.examQuestions[index].question.no = no++ // 页面显示序号，排除章节
-            totalScore += this.examQuestions[index].question.score
-          }
-        })
-        console.log(totalScore)
+        
       }
     },
   },
@@ -379,6 +351,43 @@ export default {
     // 重置试卷
     questionClear() {
       this.examQuestions.splice(0)
+    },
+    // 更新分数
+    updateScore(index) {
+      console.log(index)
+      let no = 1
+      this.totalScore = 0
+      let examQuestion = this.examQuestions[index]
+      if (examQuestion.type === 2) {// 如果是试题
+        if (!examQuestion.question.score) { // 分数没有初始化成1（分数范围通过组件限制了，这里不用管）
+          examQuestion.question.score = 1
+        }
+
+        examQuestion.question.answerScores.forEach((answerScore, index1) => {// 子分数没有初始化成1
+          if (!answerScore) {
+            this.$set(examQuestion.question.answerScores, index1, 1)
+          }
+        })
+
+        if (examQuestion.question.type === 2) {// 多选题漏选超出范围，恢复为分数一半
+          if (examQuestion.question.score <= examQuestion.question.answerScores[0]) {
+            console.log('da:',examQuestion.question, examQuestion.question.answerScores,"&&&", examQuestion.question.score / 2)
+            this.$set(examQuestion.question.answerScores, 0, examQuestion.question.score / 2)
+            console.log(111111111111,examQuestion.question.answerScores)
+          }
+        }
+
+        if (examQuestion.question.type === 3 // 填空或客观问答题，分数为子分数累加
+          || (examQuestion.question.type === 5 && examQuestion.question.markType === 1)) {
+            examQuestion.question.score = examQuestion.question.answerScores.reduce((pre, cur) => pre + cur)
+        }
+
+        examQuestion.question.no = no++ // 页面显示序号，排除章节
+        this.totalScore += examQuestion.question.score
+
+        this.$set(this.examQuestions, index, examQuestion)
+        // this.examQuestions[index] = examQuestion
+      }
     }
   },
 }
