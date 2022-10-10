@@ -37,7 +37,6 @@
       style="margin-bottom: 10px;padding: 4px 16px;"></el-alert>
     <!-- 题干 -->
     <QuestionTitle
-      :id="question.id"
       :type="question.type"
       :no="no"
       :title="question.title"

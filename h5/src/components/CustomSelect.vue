@@ -57,31 +57,31 @@ export default {
   props: {
     isAuto: {
       type: Boolean,
-      default: false
+      default: false,
     },
     value: {
       type: [Boolean, String, Number, Array],
-      default: ''
+      default: '',
     },
     multiple: {
       type: Boolean,
-      default: true
+      default: true,
     },
     placeholder: {
       type: String,
-      default: '请选择...'
+      default: '请选择...',
     },
     total: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
   },
   data() {
     return {
       pageSize: 5,
       totalPage: 1,
       currentPage: 1,
-      selectInput: ''
+      selectInput: '',
     }
   },
   watch: {
@@ -93,8 +93,8 @@ export default {
           newValue % this.pageSize === 0
             ? newValue / this.pageSize
             : Math.ceil(newValue / this.pageSize)
-      }
-    }
+      },
+    },
   },
   created() {},
   methods: {
@@ -122,24 +122,24 @@ export default {
       }
       this.selectInput = ''
       this.currentPage = 1
-    }
-  }
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
 .dropdown-empty {
-    padding: 10px 0;
-    margin: 0;
-    text-align: center;
-    color: #999;
-    font-size: 14px;
+  padding: 10px 0;
+  margin: 0;
+  text-align: center;
+  color: #999;
+  font-size: 14px;
 }
-/deep/ .el-button--text{
-  color: gray
+/deep/ .el-button--text {
+  color: gray;
 }
 /deep/ .el-button--text:hover {
-  color: #0094e5
+  color: #0094e5;
 }
 /deep/.el-select-dropdown__list {
   padding-bottom: 35px;
@@ -205,6 +205,6 @@ export default {
 </style>
 <style>
 .el-select-dropdown__wrap {
-  max-height: 330px
+  max-height: 330px;
 }
 </style>

@@ -1,12 +1,14 @@
 const state = {
   paperName: '点击这里输入试卷名称',
   examQuestions: [],
+  examUsers: [{"examUserIds":[],"markUserId": 1}],
   exam: {
     name: '',
-    examTime: [new Date(), new Date()],// 考试时间
-    examMarkTime: [new Date(), new Date()],// 阅卷时间
+    timeType: 1,// 试卷类型
+    examTimes: [new Date(), new Date()],// 考试时间
+    markTimes: [new Date(), new Date()],// 阅卷时间
     passScore: 60, // 及格%
-    options: [], // 防作弊
+    sxes: [], // 防作弊
     showType: 1, // 展示方式
     anonState: 2, // 匿名阅卷
     scoreState: 2, // 成绩公开
@@ -15,21 +17,30 @@ const state = {
 }
 
 const mutations = {
-  updatePaperName(state, paperName) {
+  paperNameUpdate(state, paperName) {
     state.paperName = paperName
   },
-  addChapter: (state, chapter) => {
+  chapterAdd: (state, chapter) => {
     state.examQuestions.push({
       type: 1,
       chapterName: chapter.name,
       chapterTxt: chapter.txt,
     })
   },
-  addQuestion(state, question) {
+  questionAdd(state, question) { 
     state.examQuestions.push({
       type: 2,
       question
     })
+  },
+  questionSort(state) {
+    let no = 1
+    state.examQuestions = state.examQuestions.map((examQuestion, index) => {
+      if (examQuestion.type === 2) {
+        examQuestion.question.no = no++ // 直接改变值，Draggable下v-model检测不到变化
+      }
+      return examQuestion
+    });
   },
 }
 

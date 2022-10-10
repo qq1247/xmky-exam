@@ -2,10 +2,6 @@
 export default {
   functional: true,
   props: {
-    id: {// 主键
-      type: Number,
-      default: null,
-    },
     type: {// 类型
       type: Number,
       default: null,
@@ -42,7 +38,7 @@ export default {
       })
     }
     let template = `
-      <div class='question-title'>
+      <div class='question-title' id='question-${props.no}'>
         <span>${props.no}、</span>
         <div>${title}</div>（${props.score}分）
       </div>`

@@ -112,7 +112,6 @@ D多选题的D选项
       this.questionList.splice(0)
       for (let i in questionTxtArr) {
         let question = this.parseQuestion(questionTxtArr[i])
-        question.id = parseInt(i) + 1 // 用于错题定位
         if (question.errs && question.errs.length > 0) {
           question.title = question.txt
         }

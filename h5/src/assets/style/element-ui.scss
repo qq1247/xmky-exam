@@ -65,3 +65,6 @@
 .el-radio__input.is-disabled.is-checked + span.el-radio__label {
   color: #0094e5 !important;
 }
+/deep/ .el-textarea__inner {
+  resize: none;
+}

@@ -60,7 +60,7 @@
       :key="question.id"
       shadow="hover"
       class="center-card"
-      @click.native="addQuestion(question)"
+      @click.native="questionAdd(question)"
     >
       <!-- :class="[
         'center-card',
@@ -197,14 +197,14 @@ export default {
       this.queryQuestion(val)
     },
     // 添加试题
-    addQuestion(question) {
+    questionAdd(question) {
       this.questionList.some((item, i)=>{
         if(item.id === question.id){
           this.questionList.splice(i, 1)
           return true
         }
       })
-      this.$emit('addQuestion', question)
+      this.$emit('questionAdd', question)
       this.$emit('toHref', question.id)
     }
   }

@@ -10,6 +10,7 @@
           group="questionGroup"
           chosen-class="drag-question-active"
           animation="300"
+          @end="dragEnd()"
         >
           <div
             v-for="(examQuestion, index) in examQuestions"
@@ -20,9 +21,9 @@
               {{examQuestion.chapterName}}
             </div>
             <div v-else>
-              <a :class="['router-index']" @click="toHref(examQuestion)">{{
-                examQuestion.question.no
-              }}</a>
+              <a :class="['router-index']" @click="toHref(examQuestion.question.no)">
+                {{examQuestion.question.no}}
+              </a>
             </div>
           </div>
         </Draggable>
@@ -33,11 +34,16 @@
       <div class="top">
         <div class="top-title">
           <el-input
-            :value="paperName"
-            @input="updatePaperName"
-            placeholder="请输入试卷名称"
-            maxlength="32"
-          ></el-input> {{totalScore}}分
+          :value="paperName"
+          @input="paperNameUpdate"
+          placeholder="请输入试卷名称"
+          maxlength="32"
+          ></el-input>
+          <div class="top-score">
+            {{totalScore}}分
+            <i class="common common-fenshudixian fenshudixian"></i>
+          </div>
+          
         </div>
         <div class="top-handler">
           <el-button
@@ -54,7 +60,7 @@
             @click="toEditor"
             >文本导入</el-button
           >
-          <el-button icon="el-icon-plus" size="mini" @click="_addChapter" round>章节添加</el-button>
+          <el-button icon="el-icon-plus" size="mini" @click="_chapterAdd" round>章节添加</el-button>
           <el-button icon="el-icon-delete" size="mini" round @click="questionClear">试卷重置</el-button>
         </div>
       </div>
@@ -69,12 +75,24 @@
             maxlength="16"
           />
           <el-input
-              v-model="examQuestion.chapterTxt"
-              :rows="2"
-              placeholder="请输入描述"
-              type="textarea"
-              :autosize="true"
-            />
+            v-model="examQuestion.chapterTxt"
+            :rows="2"
+            placeholder="请输入描述"
+            type="textarea"
+            :autosize="true"
+            maxlength="64"
+          />
+          <div class="question-opt">
+            <el-button
+              class="btn"
+              style="float:right; padding: 5px 10px; margin-right: 20px;"
+              icon="el-icon-close"
+              round
+              size="mini"
+              type="danger"
+              @click="questionDel(index)"
+            >删除</el-button>
+          </div>
         </div>
         <Question
           v-else-if="examQuestion.type === 2"
@@ -90,7 +108,7 @@
                   v-model="examQuestion.question.score" 
                   :min="0.5" :max="20" 
                   size="small"
-                  @input="updateScore(index)"
+                  @input="scoreUpdate(index)"
                 ></el-input-number>分
               </template>
               <template v-if="examQuestion.question.type === 2">
@@ -99,7 +117,7 @@
                    v-model='examQuestion.question.answerScores[0]' 
                   :min="0.5" :max="20" 
                   size="small"
-                  @input="updateScore(index)"
+                  @input="scoreUpdate(index)"
                 ></el-input-number>分
               </template>
               <template v-if="examQuestion.question.type === 3 || (examQuestion.question.type === 5 && examQuestion.question.markType === 1)">
@@ -110,12 +128,21 @@
                     第{{$tools.intToChinese(index1 + 1)}}{{examQuestion.question.type === 3 ? '空' : '关键词'}}
                     <el-input-number 
                       v-model='examQuestion.question.answerScores[index1]' 
-                      :min="0.5" :max="20" 
+                      :min="0.5" :max="10" 
                       size="small"
-                      @input="updateScore(index)"
+                      @input="scoreUpdate(index)"
                     ></el-input-number>分，
                 </div>
               </template>
+              <el-button
+                class="btn"
+                style="float: right;"
+                icon="el-icon-close"
+                round
+                size="mini"
+                type="danger"
+                @click="questionDel(index)"
+              >删除</el-button>
             </div>
           </template>
         </Question>
@@ -225,7 +252,6 @@ export default {
   },
   data() {
     return {
-      totalScore: 0, //总分数
       showQuestionList: false, // 显示题库
       queryForm: {
         questionTypeName: null, // 题库
@@ -260,31 +286,35 @@ export default {
         this.$store.state.exam.paperName = newValue
       }
     },
-  },
-  watch: {
-    // 如果是填空题或客观问答题，分数为各子项的分数总和
-    'examQuestions': {
-      deep: true,
-      handler(n) {
-        
-      }
-    },
+    totalScore: function() {
+      let totalScore = 0
+      this.examQuestions.forEach(examQuestion => {
+        totalScore += examQuestion.type === 1 ? 0 : examQuestion.question.score
+      });
+      return totalScore
+    }
   },
   methods: {
     ...mapMutations('exam', [
-      'updatePaperName',
-      'addChapter',
-      'addQuestion',
+      'paperNameUpdate',
+      'chapterAdd',
+      'questionAdd',
+      'questionSort',
     ]),
     toEditor() {
       this.$emit('toEditor')
     },
-    _addChapter() {
-      this.addChapter({'name':'', 'txt':''})
+    _chapterAdd() {
+      this.chapterAdd({'name':'点击这里输入章节名称', 'txt':''})
+      this.questionSort()
+      this.$nextTick(function() {//等待dom变化后在滚动
+        let contentCenters = document.getElementsByClassName('content-center')// 滚动到底部
+        contentCenters[contentCenters.length - 1].scrollIntoView(false)
+      })
     },
     // 跳转到对应的试题
     toHref(index) {
-      document.querySelector(`#p-${index}`).scrollIntoView({ block: 'end', inline: 'nearest' })
+      document.getElementById(`question-${index}`).parentElement.parentElement.scrollIntoView()
     },
     // 
     toAdd() {
@@ -299,8 +329,8 @@ export default {
 
       let exIds = []
       this.examQuestions.forEach(examQuestions => {
-        if (examQuestions.type === 2) {
-          exIds.push(paper.question.id)
+        if (examQuestions.type === 2 && examQuestions.question.id) {
+          exIds.push(examQuestions.question.id)
         }
       });
       
@@ -333,61 +363,65 @@ export default {
         })
 
         list.forEach(question => {
-          this.addQuestion(question)
+          this.questionAdd(question)
         })
 
         this.query(1)
       }
     },
+    // 试题导入
     questionImport(question) {
-      this.addQuestion(question)
+      this.questionAdd(question)
+      this.questionSort()
 
       this.queryList.list = this.queryList.list.filter(cur => cur != question) // 添加过的从当前列表删除
       if (!this.queryList.list.length) {// 如果当前页都删完了
           this.query(1)// 重新查询
       }
-
     },
-    // 重置试卷
+    // 试卷删除
+    questionDel(index) {
+      console.log(index)
+      this.examQuestions.splice(index, 1)
+      this.questionSort()
+    },
+    // 试卷重置
     questionClear() {
       this.examQuestions.splice(0)
     },
-    // 更新分数
-    updateScore(index) {
-      console.log(index)
-      let no = 1
-      this.totalScore = 0
-      let examQuestion = this.examQuestions[index]
-      if (examQuestion.type === 2) {// 如果是试题
-        if (!examQuestion.question.score) { // 分数没有初始化成1（分数范围通过组件限制了，这里不用管）
-          examQuestion.question.score = 1
-        }
-
-        examQuestion.question.answerScores.forEach((answerScore, index1) => {// 子分数没有初始化成1
-          if (!answerScore) {
-            this.$set(examQuestion.question.answerScores, index1, 1)
+    // 分数更新
+    scoreUpdate(index) {
+      this.$nextTick(function () {// el-input-number 同时也在改变值，冲突了
+        let question = this.examQuestions[index].question
+        if (this.examQuestions[index].type === 2) {// 如果是试题
+          if (!question.score) { // 分数没有初始化成1（分数范围通过组件限制了，这里不用管）
+            question.score = 1
           }
-        })
 
-        if (examQuestion.question.type === 2) {// 多选题漏选超出范围，恢复为分数一半
-          if (examQuestion.question.score <= examQuestion.question.answerScores[0]) {
-            console.log('da:',examQuestion.question, examQuestion.question.answerScores,"&&&", examQuestion.question.score / 2)
-            this.$set(examQuestion.question.answerScores, 0, examQuestion.question.score / 2)
-            console.log(111111111111,examQuestion.question.answerScores)
+          question.answerScores.forEach((answerScore, index1) => {// 子分数没有初始化成1
+            if (!answerScore) {
+              this.$set(question.answerScores, index1, 1)
+            }
+          })
+
+          if (question.type === 2) {// 多选题漏选超出范围，恢复为分数一半
+            if (question.score <= question.answerScores[0]) {
+              this.$set(question.answerScores, 0, question.score / 2)
+            }
+          }
+
+          if (question.type === 3 // 填空或客观问答题，分数为子分数累加
+            || (question.type === 5 && question.markType === 1)) {
+              question.score = question.answerScores.reduce((pre, cur) => pre + cur)
           }
         }
-
-        if (examQuestion.question.type === 3 // 填空或客观问答题，分数为子分数累加
-          || (examQuestion.question.type === 5 && examQuestion.question.markType === 1)) {
-            examQuestion.question.score = examQuestion.question.answerScores.reduce((pre, cur) => pre + cur)
-        }
-
-        examQuestion.question.no = no++ // 页面显示序号，排除章节
-        this.totalScore += examQuestion.question.score
-
-        this.$set(this.examQuestions, index, examQuestion)
-        // this.examQuestions[index] = examQuestion
-      }
+      })
+    },
+    // 排序结束
+    dragEnd() {
+      this.$nextTick(function() {
+        this.questionSort()
+      })
     }
   },
 }
@@ -400,11 +434,20 @@ export default {
     display: block;
   }
 }
+.btn:hover {
+  padding-bottom: 5px;
+} 
 .question-opt {
   color: #557587;
   height: 32px;
   margin-top: 10px;
   display: none;
+  /deep/ .el-input {
+    width: 50px;
+  }
+  /deep/ .el-input-number--small {
+    width: 50px;
+  }
   /deep/ .el-input-number--small .el-input-number__increase, /deep/ .el-input-number--small .el-input-number__decrease{
     display: none;
     width: 50px;
@@ -538,12 +581,30 @@ export default {
     /deep/ .el-button {
       padding: 5px 10px;
     }
+    z-index: 1;// 滚动试题时不能点击
   }
   .top-title {
     flex: 1;
     text-align: center;
     font-size: 20px;
     vertical-align: middle;
+    .top-score {
+      position: relative;
+      display: flex;
+      float: right;
+      font-size: 20px;
+      flex-direction: column;
+      top: -26px;
+      right: 28px;
+      z-index: 1;
+      color: #FF5722;
+    }
+    .fenshudixian {
+      font-size: 53px;
+      margin-top: -25px;
+      margin-right: -4px;
+    }
+    
     /deep/ .el-input__inner {
       text-align: center;
       border: 0;

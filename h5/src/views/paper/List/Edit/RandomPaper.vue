@@ -167,7 +167,7 @@
           type="primary"
           class="rule-btn"
           :disabled="item.rule.length >= 10"
-          @click="addQuestionRule(index)"
+          @click="questionAddRule(index)"
         >+添加规则</el-button>
         <el-button
           size="mini"
@@ -337,7 +337,7 @@ export default {
         })
     },
     // 添加组卷规则
-    addQuestionRule(index) {
+    questionAddRule(index) {
       this.paperQuestionRules[index].rule.push({
         id: null,
         paperId: 2,

@@ -61,14 +61,12 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import { removeQuick, getQuick, setQuick } from '@/utils/storage'
 import PaperSetting from './PaperSetting.vue'
 import Paper from './Paper.vue'
 import QuestionTxtImport from '@/components/Question/QuestionTxtImport.vue'
 import ExamSetting from './ExamSetting.vue'
 // import ExamPublish from './ExamPublish.vue'
-// import MarkSetting from './MarkSetting.vue'
+import MarkSetting from './MarkSetting.vue'
 import CustomSelect from 'components/CustomSelect.vue'
 // import { questionTypeAdd } from 'api/question'
 import dayjs from 'dayjs'
@@ -90,7 +88,7 @@ export default {
     QuestionTxtImport,
     ExamSetting,
     // ExamPublish,
-    // MarkSetting
+    MarkSetting
   },
   data() {
     return {
@@ -124,7 +122,8 @@ export default {
   },
   methods: {
     ...mapMutations('exam', [
-      'addQuestion',
+      'questionAdd',
+      'questionSort',
     ]),
     preStep() {
       this.activeIndex = 1
@@ -205,15 +204,17 @@ export default {
       this.createdType = 1
     },
     // 文本导入
-    async txtImport(errNum, questionList) {
+    async txtImport(errNum, questionList) { 
       if (errNum > 0) {
         this.$message.warning('试题错误格式' + errNum + '处，请处理')
         return
       }
 
       questionList.forEach(question => {
-        this.addQuestion(question)
+        this.questionAdd(question)
       });
+
+      this.questionSort()
 
       this.$message.info('导入成功')
       this.preStep();
