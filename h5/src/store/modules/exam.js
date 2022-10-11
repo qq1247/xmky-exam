@@ -1,10 +1,9 @@
 const state = {
   paperName: '点击这里输入试卷名称',
   examQuestions: [],
-  examUsers: [{"examUserIds":[],"markUserId": 1}],
   exam: {
     name: '',
-    timeType: 1,// 试卷类型
+    timeType: 2,// 试卷类型
     examTimes: [new Date(), new Date()],// 考试时间
     markTimes: [new Date(), new Date()],// 阅卷时间
     passScore: 60, // 及格%
@@ -13,6 +12,7 @@ const state = {
     anonState: 2, // 匿名阅卷
     scoreState: 2, // 成绩公开
     rankState: 2, // 排名公开
+    examUsers: [{ "examUserIds": [], "markUserId": null }],  //考生用户 | 阅卷用户
   }
 }
 
@@ -27,7 +27,7 @@ const mutations = {
       chapterTxt: chapter.txt,
     })
   },
-  questionAdd(state, question) { 
+  questionAdd(state, question) {
     state.examQuestions.push({
       type: 2,
       question
