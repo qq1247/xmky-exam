@@ -13,6 +13,8 @@ import javax.persistence.Table;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.wcpdoc.core.util.StringUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 
 /**
  * 考试实体
@@ -254,12 +256,26 @@ public class Exam {
 	}
 
 	/** 选项（1：试题乱序；2：选项乱序；3：禁用右键；4：禁止复制；5：最小化警告） */
-	public String getSxes() {
-		return sxes;
+	public Integer[] getSxes() {
+		if (!ValidateUtil.isValid(sxes)) {
+			return new Integer[0];
+		}
+	
+		String[] markOptionStrArr = sxes.split(",");
+		Integer[] markOptionArr = new Integer[markOptionStrArr.length];
+		for (int i = 0; i < markOptionStrArr.length; i++) {
+			markOptionArr[i] = Integer.parseInt(markOptionStrArr[i]);
+		}
+		return markOptionArr;
 	}
 
 	/** 选项（1：试题乱序；2：选项乱序；3：禁用右键；4：禁止复制；5：最小化警告） */
-	public void setSxes(String sxes) {
-		this.sxes = sxes;
+	public void setSxes(Integer[] sxes) {
+		if (!ValidateUtil.isValid(sxes)) {
+			this.sxes = null;
+			return;
+		}
+		
+		this.sxes = StringUtil.join(sxes);
 	}
 }

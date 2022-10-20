@@ -14,6 +14,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.core.util.StringUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 
 /**
  * 我的试题实体
@@ -47,8 +49,8 @@ public class MyQuestion {
 	private Integer userId;
 	@Column(name = "NO")
 	private Integer no;
-	@Column(name = "OPTION_NO")
-	private String optionNo;
+	@Column(name = "OPTIONS_NO")
+	private String optionsNo;
 	@DateTimeFormat(pattern = DateUtil.FORMAT_DATE_TIME)
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "ANSWER_TIME")
@@ -158,14 +160,28 @@ public class MyQuestion {
 		this.no = no;
 	}
 
-	public String getOptionNo() {
-		return optionNo;
+	public Integer[] getOptionsNo() {
+		if (!ValidateUtil.isValid(optionsNo)) {
+			return new Integer[0];
+		}
+	
+		String[] markOptionStrArr = optionsNo.split(",");
+		Integer[] markOptionArr = new Integer[markOptionStrArr.length];
+		for (int i = 0; i < markOptionStrArr.length; i++) {
+			markOptionArr[i] = Integer.parseInt(markOptionStrArr[i]);
+		}
+		return markOptionArr;
 	}
 
-	public void setOptionNo(String optionNo) {
-		this.optionNo = optionNo;
+	public void setOptionsNo(Integer[] optionsNo) {
+		if (!ValidateUtil.isValid(optionsNo)) {
+			this.optionsNo = null;
+			return;
+		}
+		
+		this.optionsNo = StringUtil.join(optionsNo);
 	}
-
+	
 	public Date getAnswerTime() {
 		return answerTime;
 	}

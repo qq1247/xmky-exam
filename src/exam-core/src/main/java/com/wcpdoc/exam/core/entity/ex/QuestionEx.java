@@ -10,7 +10,6 @@ import com.wcpdoc.exam.core.entity.Question;
  * v1.0 zhanghc 2022年9月15日下午1:11:08
  */
 public class QuestionEx extends Question {
-	// private Integer[] markOptions;// 使用Question.markOptions
 	private String[] options;
 	private String[] answers;
 	private BigDecimal[] answerScores;
@@ -38,5 +37,4 @@ public class QuestionEx extends Question {
 	public void setAnswerScores(BigDecimal[] answerScores) {
 		this.answerScores = answerScores;
 	}
-
 }

@@ -8,13 +8,14 @@ import com.wcpdoc.exam.core.entity.ExamQuestion;
  * v1.0 zhanghc 2022年9月15日下午1:11:08
  */
 public class ExamQuestionEx extends ExamQuestion {
-	private QuestionEx questionEx;
+	private QuestionEx question;
 
-	public QuestionEx getQuestionEx() {
-		return questionEx;
+	public QuestionEx getQuestion() {
+		return question;
 	}
 
-	public void setQuestionEx(QuestionEx questionEx) {
-		this.questionEx = questionEx;
+	public void setQuestion(QuestionEx question) {
+		this.question = question;
 	}
+
 }

@@ -15,7 +15,7 @@
     "dayjs": "^1.10.7",
     "docx": "^7.3.0",
     "echarts": "^5.2.2",
-    "element-ui": "^2.15.6",
+    "element-ui": "^2.15.8",
     "file-saver": "^2.0.5",
     "global": "^4.4.0",
     "html-docx-js": "^0.3.1",

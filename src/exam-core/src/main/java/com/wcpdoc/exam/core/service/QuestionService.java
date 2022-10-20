@@ -17,26 +17,24 @@ public interface QuestionService extends BaseService<Question>{
 	 * 
 	 * v1.0 zhanghc 2017-05-07 14:56:29
 	 * @param question
-	 * @param markOptions 阅卷选项
 	 * @param options 选项（单选多选时有效）
 	 * @param answers 答案
 	 * @param answerScores 答案分数（填空或智能问答有多项）
 	 * @return PageResult
 	 */
-	void addEx(Question question, Integer[] markOptions, String[] options, String[] answers, BigDecimal[] answerScores);
+	void addEx(Question question, String[] options, String[] answers, BigDecimal[] answerScores);
 
 	/**
 	 * 试题修改
 	 * 
 	 * v1.0 zhanghc 2018年10月12日下午7:30:02
 	 * @param question
-	 * @param markOptions 阅卷选项
 	 * @param options 选项（单选多选时有效）
 	 * @param answers 答案
 	 * @param answerScores 答案分数（填空或智能问答有多项）
 	 * @return PageResult
 	 */
-	void updateEx(Question question, Integer[] markOptions, String[] options, String[] answers, BigDecimal[] answerScores);
+	void updateEx(Question question, String[] options, String[] answers, BigDecimal[] answerScores);
 	
 	/**
 	 * 试题删除

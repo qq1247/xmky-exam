@@ -100,7 +100,7 @@ public class QuestionUtil {
 	 */
 	public static boolean dxxbmg(ExamQuestion examQuestion) {
 		return ValidateUtil.isValid(examQuestion.getMarkOptions()) 
-				&& examQuestion.getMarkOptions().contains("3");
+				&& examQuestion.getMarkOptions().toString().contains("3");
 	}
 	
 	/**
@@ -112,7 +112,7 @@ public class QuestionUtil {
 	 */
 	public static boolean lxdf(ExamQuestion examQuestion) {
 		return ValidateUtil.isValid(examQuestion.getMarkOptions()) 
-				&& examQuestion.getMarkOptions().contains("1");
+				&& examQuestion.getMarkOptions().toString().contains("1");
 	}
 
 	/**
@@ -124,7 +124,7 @@ public class QuestionUtil {
 	 */
 	public static boolean dawsx(ExamQuestion examQuestion) {
 		return ValidateUtil.isValid(examQuestion.getMarkOptions()) 
-				&& examQuestion.getMarkOptions().contains("2");
+				&& examQuestion.getMarkOptions().toString().contains("2");
 	}
 	
 	/**

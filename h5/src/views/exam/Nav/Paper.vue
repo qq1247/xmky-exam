@@ -5,16 +5,16 @@
       <el-divider>答题卡</el-divider>
       <div class="router-content">
         <Draggable
-          v-model="examQuestions"
+          v-model="examInfo.examQuestions"
           tag="div"
           group="questionGroup"
           chosen-class="drag-question-active"
           animation="300"
-          @end="dragEnd()"
+          @change="questionSort"
         >
           <div
-            v-for="(examQuestion, index) in examQuestions"
-            :key="`examQuestions${index}`"
+            v-for="(examQuestion, index) in examInfo.examQuestions"
+            :key="index"
             :style="{'display': examQuestion.type === 1 ? 'block' : 'inline-block'}"
           >
             <div v-if="examQuestion.type === 1" class="router-title">
@@ -22,7 +22,7 @@
             </div>
             <div v-else>
               <a :class="['router-index']" @click="toHref(examQuestion.question.no)">
-                {{examQuestion.question.no}}
+                {{examQuestion.question.no}} 
               </a>
             </div>
           </div>
@@ -34,8 +34,8 @@
       <div class="top">
         <div class="top-title">
           <el-input
-          :value="paperName"
-          @input="paperNameUpdate"
+          :value="examInfo.exam.paperName"
+          @input="value => paperNameUpdate(value)"
           placeholder="请输入试卷名称"
           maxlength="32"
           ></el-input>
@@ -43,7 +43,6 @@
             {{totalScore}}分
             <i class="common common-fenshudixian fenshudixian"></i>
           </div>
-          
         </div>
         <div class="top-handler">
           <el-button
@@ -61,21 +60,23 @@
             >文本导入</el-button
           >
           <el-button icon="el-icon-plus" size="mini" @click="_chapterAdd" round>章节添加</el-button>
-          <el-button icon="el-icon-delete" size="mini" round @click="questionClear">试卷重置</el-button>
+          <el-button icon="el-icon-delete" size="mini" round @click="paperClear">试卷重置</el-button>
         </div>
       </div>
       <div class="content-center"
-        v-for="(examQuestion, index) of examQuestions"
-        :key="`examQuestions${index}`"
+        v-for="(examQuestion, index) of examInfo.examQuestions"
+        :key="index"
       >
         <div v-if="examQuestion.type === 1" class="chapter">
           <el-input
-            v-model="examQuestion.chapterName"
+            :value="examQuestion.chapterName"
+            @input="(value) => chapterNameUpdate({ index, value})"
             placeholder="请输入名称"
             maxlength="16"
           />
           <el-input
-            v-model="examQuestion.chapterTxt"
+            :value="examQuestion.chapterTxt"
+            @input="(value) => chapterTxtUpdate({ index, value})"
             :rows="2"
             placeholder="请输入描述"
             type="textarea"
@@ -90,7 +91,7 @@
               round
               size="mini"
               type="danger"
-              @click="questionDel(index)"
+              @click="chapterDel(index)"
             >删除</el-button>
           </div>
         </div>
@@ -105,19 +106,19 @@
                   || examQuestion.question.type === 4 || (examQuestion.question.type === 5 && examQuestion.question.markType === 2)">
                 本题
                 <el-input-number 
-                  v-model="examQuestion.question.score" 
+                  :value="examQuestion.question.score"
                   :min="0.5" :max="20" 
                   size="small"
-                  @input="scoreUpdate(index)"
+                  @change="(value) => _questionScoreUpdate(index, value)"
                 ></el-input-number>分
               </template>
               <template v-if="examQuestion.question.type === 2">
                 ，漏选
                 <el-input-number 
-                   v-model='examQuestion.question.answerScores[0]' 
-                  :min="0.5" :max="20" 
+                  :value="examQuestion.question.answerScores[0]"
+                  :min="0" :max="20" 
                   size="small"
-                  @input="scoreUpdate(index)"
+                  @change="(value) => _questionAnswerScoreUpdate(index, 0, value)"
                 ></el-input-number>分
               </template>
               <template v-if="examQuestion.question.type === 3 || (examQuestion.question.type === 5 && examQuestion.question.markType === 1)">
@@ -127,10 +128,10 @@
                   > 
                     第{{$tools.intToChinese(index1 + 1)}}{{examQuestion.question.type === 3 ? '空' : '关键词'}}
                     <el-input-number 
-                      v-model='examQuestion.question.answerScores[index1]' 
+                      :value="examQuestion.question.answerScores[index1]"
                       :min="0.5" :max="10" 
                       size="small"
-                      @input="scoreUpdate(index)"
+                      @change="(value) => _questionAnswerScoreUpdate(index, index1, value)"
                     ></el-input-number>分，
                 </div>
               </template>
@@ -243,6 +244,8 @@ import Draggable from 'vuedraggable'
 import Question from '@/components/Question/Question.vue'
 import { questionListpage } from 'api/question'
 import QuestionList from '@/components/Question/QuestionList.vue'
+import { mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 import { mapMutations } from 'vuex'
 export default {
   components: {
@@ -270,43 +273,33 @@ export default {
     }
   },
   computed: {
-    examQuestions: {
-      get: function () {
-        return this.$store.state.exam.examQuestions
-      },
-      set: function (newValue) {
-        this.$store.state.exam.examQuestions = newValue
-      }
-    },
-    paperName: {
-      get: function () {
-        return this.$store.state.exam.paperName
-      },
-      set: function (newValue) {
-        this.$store.state.exam.paperName = newValue
-      }
-    },
-    totalScore: function() {
-      let totalScore = 0
-      this.examQuestions.forEach(examQuestion => {
-        totalScore += examQuestion.type === 1 ? 0 : examQuestion.question.score
-      });
-      return totalScore
-    }
+    ...mapState('exam', [
+      'examInfo',
+    ]),
+    ...mapGetters('exam',[
+      'totalScore',
+    ])
   },
   methods: {
     ...mapMutations('exam', [
       'paperNameUpdate',
+      'paperClear',
+      'chapterNameUpdate',
+      'chapterTxtUpdate',
       'chapterAdd',
+      'chapterDel',
       'questionAdd',
+      'questionDel',
       'questionSort',
+      'questionScoreUpdate',
+      'questionAnswerScoreUpdate',
     ]),
     toEditor() {
       this.$emit('toEditor')
     },
+    // 章节添加
     _chapterAdd() {
       this.chapterAdd({'name':'点击这里输入章节名称', 'txt':''})
-      this.questionSort()
       this.$nextTick(function() {//等待dom变化后在滚动
         let contentCenters = document.getElementsByClassName('content-center')// 滚动到底部
         contentCenters[contentCenters.length - 1].scrollIntoView(false)
@@ -327,16 +320,16 @@ export default {
         this.queryList.curPage = curPage
       }
 
-      let exIds = []
-      this.examQuestions.forEach(examQuestions => {
-        if (examQuestions.type === 2 && examQuestions.question.id) {
-          exIds.push(examQuestions.question.id)
+      let exQuestionIds = []
+      this.examInfo.examQuestions.forEach(examQuestion => {
+        if (examQuestion.type === 2 && examQuestion.question.id) {
+          exQuestionIds.push(examQuestion.question.id)
         }
       });
       
       let {data: { list, total }} = await questionListpage({
         ...this.queryForm,
-        exIds: exIds.join(),
+        exIds: exQuestionIds.join(),
         curPage: this.queryList.curPage, 
         pageSize: this.queryList.pageSize
       })
@@ -346,28 +339,28 @@ export default {
     },
     // 查询命令
     async queryCmd(cmd) {
-      if (cmd === 'randAdd') {
-        let exIds = []
-        this.examQuestions.forEach(examQuestion => {
-          if (examQuestion.type === 2) {
-            exIds.push(examQuestion.question.id)
-          }
-        });
+      // if (cmd === 'randAdd') {
+      //   let exQuestionIds = []
+      //   this.examQuestions.forEach(examQuestion => {
+      //     if (examQuestion.type === 2) {
+      //       exQuestionIds.push(examQuestion.question.id)
+      //     }
+      //   });
         
-        let {data: { list, total }} = await questionListpage({
-          ...this.queryForm,
-          exIds: exIds.join(),
-          rand: true,
-          curPage: 1, 
-          pageSize: 10
-        })
+      //   let {data: { list, total }} = await questionListpage({
+      //     ...this.queryForm,
+      //     exQuestionIds: exQuestionIds.join(),
+      //     rand: true,
+      //     curPage: 1, 
+      //     pageSize: 10
+      //   })
 
-        list.forEach(question => {
-          this.questionAdd(question)
-        })
+      //   list.forEach(question => {
+      //     this.questionAdd(question)
+      //   })
 
-        this.query(1)
-      }
+      //   this.query(1)
+      // }
     },
     // 试题导入
     questionImport(question) {
@@ -379,49 +372,45 @@ export default {
           this.query(1)// 重新查询
       }
     },
-    // 试卷删除
-    questionDel(index) {
-      console.log(index)
-      this.examQuestions.splice(index, 1)
-      this.questionSort()
-    },
-    // 试卷重置
-    questionClear() {
-      this.examQuestions.splice(0)
-    },
-    // 分数更新
-    scoreUpdate(index) {
-      this.$nextTick(function () {// el-input-number 同时也在改变值，冲突了
-        let question = this.examQuestions[index].question
-        if (this.examQuestions[index].type === 2) {// 如果是试题
-          if (!question.score) { // 分数没有初始化成1（分数范围通过组件限制了，这里不用管）
-            question.score = 1
-          }
+    // 试题分数更新
+    async _questionScoreUpdate(index, value) {
+      let that = this
+      that.questionScoreUpdate({index, value})
+      if (!value) {
+        value = 1
+        await that.$nextTick()
+        that.questionScoreUpdate({index, value})
+      }
 
-          question.answerScores.forEach((answerScore, index1) => {// 子分数没有初始化成1
-            if (!answerScore) {
-              this.$set(question.answerScores, index1, 1)
-            }
-          })
-
-          if (question.type === 2) {// 多选题漏选超出范围，恢复为分数一半
-            if (question.score <= question.answerScores[0]) {
-              this.$set(question.answerScores, 0, question.score / 2)
-            }
-          }
-
-          if (question.type === 3 // 填空或客观问答题，分数为子分数累加
-            || (question.type === 5 && question.markType === 1)) {
-              question.score = question.answerScores.reduce((pre, cur) => pre + cur)
-          }
+      let question = that.examInfo.examQuestions[index].question
+      if (question.type === 2) {// 多选题漏选超出范围，恢复为分数一半
+        if (question.score <= question.answerScores[0]) {
+          that.questionAnswerScoreUpdate({index, answerIndex : 0, value : value / 2})
         }
-      })
+      }
     },
-    // 排序结束
-    dragEnd() {
-      this.$nextTick(function() {
-        this.questionSort()
-      })
+    // 试题子分数修改
+    async _questionAnswerScoreUpdate(index, answerIndex, value) {
+      let that = this
+      that.questionAnswerScoreUpdate({index, answerIndex, value})
+      if (!value) {
+        value = 1
+        await that.$nextTick()
+        that.questionAnswerScoreUpdate({index, answerIndex, value})
+      }
+
+      let question = that.examInfo.examQuestions[index].question
+      if (question.type === 2) {// 多选题漏选超出范围，恢复为分数一半
+        if (question.score <= question.answerScores[0]) {// bug：分数2，漏选分数1。漏输入2，恢复成1，漏输入2，不变更
+          await that.$nextTick() // questionAnswerScoreUpdate同时调用两次，最后一次生效，第二次因为模型还是原值，不触发dom更新
+          that.questionAnswerScoreUpdate({index, answerIndex : 0, value : question.score / 2})// 加nextTick处理
+        }
+      } else if (question.type === 3 // 填空或客观问答题，分数为子分数累加
+        || (question.type === 5 && question.markType === 1)) {
+        that.questionScoreUpdate({
+          index, 
+          value: question.answerScores.reduce((pre, cur) => pre + cur)})
+      }
     }
   },
 }

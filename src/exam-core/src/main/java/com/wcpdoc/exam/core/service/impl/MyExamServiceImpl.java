@@ -671,7 +671,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		question.setMarkType(1);
 		
 		ExamQuestion examQuestion = new ExamQuestion();
-		examQuestion.setMarkOptions("2,3");
+		examQuestion.setMarkOptions(new Integer[]{2,3});
 		
 		List<ExamAnswerEx> examAnswerList = new ArrayList<>();
 		ExamAnswerEx examAnswer = new ExamAnswerEx();

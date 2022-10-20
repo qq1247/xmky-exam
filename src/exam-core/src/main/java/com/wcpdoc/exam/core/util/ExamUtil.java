@@ -19,7 +19,7 @@ public class ExamUtil {
 	 * @return boolean
 	 */
 	public static boolean hasQuestionRand(Exam exam) {
-		return ValidateUtil.isValid(exam.getSxes()) && exam.getSxes().contains("1");
+		return ValidateUtil.isValid(exam.getSxes()) && exam.getSxes().toString().contains("1");
 	}
 	
 	/**
@@ -30,7 +30,7 @@ public class ExamUtil {
 	 * @return boolean
 	 */
 	public static boolean hasOptionRand(Exam exam) {
-		return ValidateUtil.isValid(exam.getSxes()) && exam.getSxes().contains("2");
+		return ValidateUtil.isValid(exam.getSxes()) && exam.getSxes().toString().contains("2");
 	}
 	
 	/**

@@ -70,7 +70,7 @@ export const examQuestionList = (params) => request('exam/questionList', params)
  * @param {*}
  * @return {*}
  */
-export const examPublish = (params) => request('exam/publish', params)
+export const examPublish = (params) => request('exam/publish', params, 6000, 'json', 'application/json')
 
 /**
  * @name: examTypeListpage

@@ -15,15 +15,6 @@ import com.wcpdoc.exam.core.entity.ex.ExamInfo;
 public interface ExamService extends BaseService<Exam>{
 	
 	/**
-	 * 考试添加
-	 * 
-	 * v1.0 chenyun 2021年8月25日下午5:58:55
-	 * @param examInfo 
-	 * void
-	 */
-	void addEx(ExamInfo examInfo);
-	
-	/**
 	 * 考试删除
 	 * 
 	 * v1.0 chenyun 2021年8月25日下午6:03:33
@@ -37,7 +28,7 @@ public interface ExamService extends BaseService<Exam>{
 	 * v1.0 chenyun 2021年8月25日下午6:06:54
 	 * @param id void
 	 */
-	void publish(Integer id);
+	void publish(ExamInfo examInfo);
 	
 	/**
 	 * 获取考试用户列表 

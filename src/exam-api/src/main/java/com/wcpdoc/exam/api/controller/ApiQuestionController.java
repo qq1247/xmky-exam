@@ -123,9 +123,9 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	public PageResult add(Question question, Integer[] markOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
+	public PageResult add(Question question, String[] options, String[] answers, BigDecimal[] answerScores) {
 		try {
-			questionService.addEx(question, markOptions, options, answers, answerScores);
+			questionService.addEx(question, options, answers, answerScores);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("试题添加错误：{}", e.getMessage());
@@ -147,9 +147,9 @@ public class ApiQuestionController extends BaseController {
 	 */
 	@RequestMapping("/update")
 	@ResponseBody
-	public PageResult update(Question question, Integer[] markOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
+	public PageResult update(Question question, String[] options, String[] answers, BigDecimal[] answerScores) {
 		try {
-			questionService.updateEx(question, markOptions, options, answers, answerScores);
+			questionService.updateEx(question, options, answers, answerScores);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("试题修改错误：{}", e.getMessage());
@@ -233,7 +233,7 @@ public class ApiQuestionController extends BaseController {
 					.addAttr("analysis", question.getAnalysis())
 					.addAttr("questionTypeId", question.getQuestionTypeId())
 					.addAttr("score", question.getScore())
-					.addAttr("markOptions", question.getMarkOptionArr())
+					.addAttr("markOptions", question.getMarkOptions())
 					.addAttr("answers", answers)
 					.addAttr("answerScores", answerScores)
 					.addAttr("state", question.getState());

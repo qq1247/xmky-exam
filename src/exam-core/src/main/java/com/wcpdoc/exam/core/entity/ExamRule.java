@@ -13,6 +13,8 @@ import javax.persistence.Table;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.wcpdoc.core.util.StringUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 
 /**
  * 考试规则
@@ -83,12 +85,28 @@ public class ExamRule {
 		this.markType = markType;
 	}
 
-	public String getMarkOptions() {
-		return markOptions;
+	/** 阅卷选项（2：答案无顺序；3：大小写不敏感；) */
+	public Integer[] getMarkOptions() {
+		if (!ValidateUtil.isValid(markOptions)) {
+			return new Integer[0];
+		}
+	
+		String[] markOptionStrArr = markOptions.split(",");
+		Integer[] markOptionArr = new Integer[markOptionStrArr.length];
+		for (int i = 0; i < markOptionStrArr.length; i++) {
+			markOptionArr[i] = Integer.parseInt(markOptionStrArr[i]);
+		}
+		return markOptionArr;
 	}
 
-	public void setMarkOptions(String markOptions) {
-		this.markOptions = markOptions;
+	/** 阅卷选项（2：答案无顺序；3：大小写不敏感；) */
+	public void setMarkOptions(Integer[] markOptions) {
+		if (!ValidateUtil.isValid(markOptions)) {
+			this.markOptions = null;
+			return;
+		}
+		
+		this.markOptions = StringUtil.join(markOptions);
 	}
 
 	public Integer getNum() {

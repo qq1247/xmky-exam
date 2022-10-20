@@ -77,19 +77,20 @@ public class ApiExamController extends BaseController {
 	}
 
 	/**
-	 * 考试添加
+	 * 发布
 	 * 
-	 * v1.0 zhanghc 2018年10月25日下午9:23:06
+	 * v1.0 zhanghc 2018年11月24日上午9:13:22
 	 * 
-	 * @return pageOut
+	 * @param id
+	 * @return PageResult
 	 */
-	@RequestMapping("/add")
+	@RequestMapping("/publish")
 	@ResponseBody
-	public PageResult add(@RequestBody ExamInfo examInfo) {
+	public PageResult publish(@RequestBody ExamInfo examInfo) {
 		try {
-			examService.addEx(examInfo);
+			examService.publish(examInfo);
 			return PageResultEx.ok();
-		} catch (MyException e) {
+		} catch (MyException e) {e.printStackTrace();
 			log.error("完成添加考试错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
@@ -151,29 +152,6 @@ public class ApiExamController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("获取考试错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 发布
-	 * 
-	 * v1.0 zhanghc 2018年11月24日上午9:13:22
-	 * 
-	 * @param id
-	 * @return PageResult
-	 */
-	@RequestMapping("/publish")
-	@ResponseBody
-	public PageResult publish(Integer id) {
-		try {
-			examService.publish(id);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("发布错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("发布错误：", e);
 			return PageResult.err();
 		}
 	}

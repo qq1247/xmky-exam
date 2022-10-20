@@ -63,19 +63,18 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void addEx(Question question, Integer[] markOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
+	public void addEx(Question question, String[] options, String[] answers, BigDecimal[] answerScores) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(question.getQuestionTypeId())) {
 			throw new MyException("参数错误：questionTypeId");
 		}
 		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-		addExValid(question, markOptions, options, answers, answerScores, questionType);
+		addExValid(question, options, answers, answerScores, questionType);
 		
 		// 添加试题
 		question.setUpdateTime(new Date());
 		question.setUpdateUserId(getCurUser().getId());
 		question.setState(1);
-		question.setMarkOptions(ValidateUtil.isValid(markOptions) ? StringUtil.join(markOptions) : null);
 		add(question);
 
 		//添加答案
@@ -89,7 +88,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void updateEx(Question question, Integer[] markOptions, String[] options, String[] answers, BigDecimal[] answerScores) {
+	public void updateEx(Question question, String[] options, String[] answers, BigDecimal[] answerScores) {
 		// 校验数据有效性
 		Question entity = getEntity(question.getId());
 		if (entity.getType() != question.getType()) {
@@ -99,7 +98,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			throw new MyException("参数错误：id");
 		}
 		QuestionType questionType = questionTypeService.getEntity(entity.getQuestionTypeId());
-		addExValid(question, markOptions, options, answers, answerScores, questionType);
+		addExValid(question, options, answers, answerScores, questionType);
 		
 		questionExService.updateEx(question);
 
@@ -108,10 +107,10 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		entity.setMarkType(question.getMarkType());
 		entity.setScore(question.getScore());
 //		entity.setState(question.getState());
+		entity.setMarkOptions(question.getMarkOptions());
 		entity.setAnalysis(question.getAnalysis());
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
-		entity.setMarkOptions(ValidateUtil.isValid(markOptions) ? StringUtil.join(markOptions) : null);
 		update(entity);
 
 		// 修改答案
@@ -256,7 +255,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 	}
 	
-	private void addExValid(Question question, Integer[] markOptions, String[] options, String[] answers, BigDecimal[] answerScores, QuestionType questionType) {
+	private void addExValid(Question question, String[] options, String[] answers, BigDecimal[] answerScores, QuestionType questionType) {
 		if (questionType.getUpdateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
 		}
@@ -278,7 +277,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			if (question.getMarkType() != 1) {
 				throw new MyException("参数错误：markType");
 			}
-			if (ValidateUtil.isValid(markOptions)) {
+			if (ValidateUtil.isValid(question.getMarkOptions())) {
 				throw new MyException("参数错误：markOptions");
 			}
 			if (!ValidateUtil.isValid(options)) {
@@ -304,7 +303,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			if (question.getMarkType() != 1) {
 				throw new MyException("参数错误：markType");
 			}
-			if (ValidateUtil.isValid(markOptions)) {
+			if (ValidateUtil.isValid(question.getMarkOptions())) {
 				throw new MyException("参数错误：markOptions");
 			}
 			if (!ValidateUtil.isValid(options)) {
@@ -350,11 +349,11 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			}
 				
 			if (QuestionUtil.hasSubjective(question)) {
-				if (ValidateUtil.isValid(markOptions)) {
-					if (markOptions.length > 2) {
+				if (ValidateUtil.isValid(question.getMarkOptions())) {
+					if (question.getMarkOptions().length > 2) {
 						throw new MyException("参数错误：scoreOption");
 					}
-					for (Integer markOption : markOptions) {
+					for (Integer markOption : question.getMarkOptions()) {
 						if (markOption != 2 && markOption != 3) {//分值选项（2：答案无顺序；3：大小写不敏感；)
 							throw new MyException("参数错误：scoreOption");
 						}
@@ -377,7 +376,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				}
 			} 
 			if (QuestionUtil.hasObjective(question)) {
-				if (ValidateUtil.isValid(markOptions)) {
+				if (ValidateUtil.isValid(question.getMarkOptions())) {
 					throw new MyException("参数错误：scoreOption");
 				}
 				//if (ValidateUtil.isValid(answerScores)) {
@@ -388,7 +387,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			if (question.getMarkType() != 1) {
 				throw new MyException("参数错误：markType");
 			}
-			if (ValidateUtil.isValid(markOptions)) {
+			if (ValidateUtil.isValid(question.getMarkOptions())) {
 				throw new MyException("参数错误：markOptions");
 			}
 			if (ValidateUtil.isValid(options)) {
@@ -413,11 +412,11 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				throw new MyException("参数错误：options");
 			}
 			if (QuestionUtil.hasSubjective(question)) {
-				if (ValidateUtil.isValid(markOptions)) {
-					if (markOptions.length != 1) {
+				if (ValidateUtil.isValid(question.getMarkOptions())) {
+					if (question.getMarkOptions().length != 1) {
 						throw new MyException("参数错误：scoreOption");
 					}
-					for (Integer scoreOption : markOptions) {
+					for (Integer scoreOption : question.getMarkOptions()) {
 						if (scoreOption != 3) {//分值选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；)
 							throw new MyException("参数错误：scoreOption");
 						}
@@ -440,7 +439,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				}
 			} 
 			if (QuestionUtil.hasObjective(question)) {
-				if (ValidateUtil.isValid(markOptions)) {
+				if (ValidateUtil.isValid(question.getMarkOptions())) {
 					throw new MyException("参数错误：scoreOption");
 				}
 				if (ValidateUtil.isValid(answerScores)) {

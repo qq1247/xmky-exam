@@ -1,7 +1,18 @@
 <template>
   <div class="content">
     <div class="top">
-      <div class="top-title">{{ paperName }}</div>
+      <div class="top-title">
+        <el-input
+        :value="examInfo.exam.paperName"
+        @input="value => paperNameUpdate(value)"
+        placeholder="请输入试卷名称"
+        maxlength="32"
+        ></el-input>
+        <div class="top-score">
+          {{totalScore}}分
+          <i class="common common-fenshudixian fenshudixian"></i>
+        </div>
+      </div>
     </div>
     <div class="paper-content">
       <div
@@ -211,64 +222,6 @@ export default {
   },
   data() {
     return {
-      paperId: 0,
-      paperTypeId: 0,
-      markType: 1,
-      paperName: '',
-      total: 1,
-      markTypeList: [
-        {
-          dictValue: '智能',
-          no: 1,
-          dictKey: '1'
-        }
-        /* {
-          dictValue: '非智能',
-          no: 2,
-          dictKey: '2',
-        }, */
-      ],
-      typeDictList: [],
-      questionTypes: [],
-      chapterForm: {
-        id: 0,
-        name: '章节名称',
-        description: '章节描述',
-        rules: {
-          name: [
-            { required: true, message: '请输入章节名称', trigger: 'blur' }
-          ]
-        }
-      },
-      paperQuestionRules: [],
-      rules: {
-        questionTypeId: [
-          { required: true, message: '请选择题库', trigger: 'change' }
-        ],
-        type: [{ required: true, message: '请选择类型', trigger: 'change' }],
-        markType: [
-          {
-            required: true,
-            message: '请选择是否智能',
-            trigger: 'change',
-            type: 'array'
-          }
-        ],
-        totalNumber: [
-          {
-            required: true,
-            message: '请填写题目数',
-            trigger: 'blur'
-          }
-        ],
-        score: [
-          {
-            required: true,
-            message: '请填写题目分数',
-            trigger: 'blur'
-          }
-        ]
-      }
     }
   },
   async created() {

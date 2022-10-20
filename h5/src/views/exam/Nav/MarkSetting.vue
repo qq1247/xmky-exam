@@ -1,93 +1,107 @@
 <template>
   <el-form
-    ref="userForm"
-    :model="exam"
+    ref="editForm"
+    :model="examInfo"
+    :rules="editForm.rules"
     label-width="100px"
     class="mark-setting-box"
   >
-    <el-row v-for="(item, index) in exam.examUsers" :key="item.id">
+    <el-row v-for="(examUser, index) in examInfo.examUsers" :key="index">
       <el-col :span="12">
+        <!-- 
+          prop写法：源码片段
+          function getPropByPath(obj, path, strict) {// obj=model="examInfo"  path=prop="`examUsers.${index}.examUserIds`"
+            var tempObj = obj;
+            path = path.replace(/\[(\w+)\]/g, '.$1');
+            path = path.replace(/^\./, '');
+
+            var keyArr = path.split('.');
+            var i = 0;
+            for (var len = keyArr.length; i < len - 1; ++i) {
+              if (!tempObj && !strict) break;
+              var key = keyArr[i];
+              if (key in tempObj) {
+                tempObj = tempObj[key];// 按.分割，一层一层找有没有属性
+              } else {
+                if (strict) {
+                  throw new Error('please transfer a valid prop path to form item!');// 报错提示
+                }
+                break;
+              }
+            }
+            return {
+              o: tempObj,
+              k: keyArr[i],
+              v: tempObj ? tempObj[keyArr[i]] : null
+            };
+          };
+        -->
         <el-form-item
           label="考试用户"
           :prop="`examUsers.${index}.examUserIds`"
-          :rules="[
-            {
-              type: 'array',
-              required: true,
-              message: '请选择考试用户',
-              trigger: 'change'
-            },
-          ]"
+          :rules="editForm.rules.examUserIds"
         >
           <CustomSelect
-            ref="markExamUserSelect"
-            placeholder="请选择考试用户"
-            :value="item.examUserIds"
-            :total="total"
-            @input="(keyword) => getUserList(1, 1, keyword)"
-            @change="selectExamUser($event, index)"
-            @currentChange="(curPage, keyword) => getMoreUser(1, curPage, keyword)"
-            @visibleChange="(curPage, keyword) => getUserList(1, curPage, keyword)"
+            :value="examUser.examUserIds"
+            url="user/listpage"
+            :params="{}"
+            optionLabel="name"
+            optionValue="id"
+            searchParmName="name"
+            :multiple="true"
+            @change="_examUserUpdate(index, $event)"
           >
-            <el-option
-              v-for="user in examUserList"
-              :key="user.id"
-              :label="user.name"
-              :value="user.id"
-            />
+            <template #customText="{ item }">
+              <span style="float: left">{{ item.name }}</span>
+              <span style="float: right; color: #8492a6; font-size: 13px">{{
+                item.orgName
+              }}</span>
+            </template>
           </CustomSelect>
         </el-form-item>
       </el-col>
-
       <el-col :span="12">
         <el-form-item
-          v-if="exam.timeType === 2"
+          v-if="markQuestions.length > 0"
           label="阅卷用户"
           :prop="`examUsers.${index}.markUserId`"
-          :rules="[
-            { required: true, message: '请选择用户', trigger: 'change' },
-          ]"
+          :rules="editForm.rules.markUserId"
         >
           <CustomSelect
-            ref="markUserSelect"
-            :multiple="false"
-            placeholder="请选择用户"
-            :value="item.markUserId"
-            :total="total"
-            @input="(keyword) => getUserList(2, 1, keyword)"
-            @change="selectPerson($event, index)"
-            @currentChange="
-              (curPage, keyword) => getMoreUser(2, curPage, keyword)
-            "
-            @visibleChange="
-              (curPage, keyword) => getUserList(2, curPage, keyword)
-            "
+            :value="examUser.markUserId"
+            url="user/listpage"
+            :params="{ type: 2 }"
+            optionLabel="name"
+            optionValue="id"
+            searchParmName="name"
+            @change="_markUserUpdate(index, $event)"
           >
-            <el-option
-              v-for="markUser in examUserList"
-              :key="markUser.id"
-              :label="markUser.name"
-              :value="markUser.id"
-            />
+            <template #customText="{ item }">
+              <span style="float: left">{{ item.name }}</span>
+              <span style="float: right; color: #8492a6; font-size: 13px">{{
+                item.orgName
+              }}</span>
+            </template>
           </CustomSelect>
         </el-form-item>
       </el-col>
     </el-row>
-    <div v-if="exam.timeType === 2" class="remark-buttons">
+    <div v-if="markQuestions.length > 0" class="remark-buttons">
+      <!-- 有主观题，可添加多个阅卷用户 -->
       <el-form-item>
         <el-button
           type="primary"
           size="mini"
           icon="el-icon-plus"
-          @click="remarkAdd"
+          @click="userGroupAdd"
           plain
           >添加</el-button
         >
         <el-button
-          v-if="exam.examUsers.length > 1"
+          v-if="this.examInfo.examUsers.length > 1"
           size="mini"
           icon="el-icon-minus"
-          @click="remarkDel"
+          @click="userGroupDel"
           type="danger"
           plain
           >删除</el-button
@@ -98,101 +112,109 @@
 </template>
 
 <script>
-import { userListpage } from 'api/user'
 import CustomSelect from 'components/CustomSelect.vue'
+import { mapState } from 'vuex'
+import { mapGetters } from 'vuex'
+import { mapMutations } from 'vuex'
 export default {
   components: {
     CustomSelect,
   },
   data() {
     return {
-      total: 0,
-      curPage: 1,
-      pageSize: 5,
-      examUserList: [],
+      editForm: {
+        rules: {
+          // 校验规则
+          examUserIds: [{
+            trigger: 'change',
+            validator: (rule, value, callback) => {
+              if (!value) {
+                return callback(new Error('请选择用户'))
+              }
+              if (!value instanceof Array) {
+                return callback(new Error('请选择用户'))
+              }
+              if (value.length === 0) {
+                return callback(new Error('请选择用户'))
+              }
+              return callback()
+            },},
+          ],
+          markUserId: [{
+            trigger: 'change',
+            validator: (rule, value, callback) => {
+              if (!value) {
+                return callback(new Error('请选择用户'))
+              }
+              return callback()
+            },
+          },],
+        },
+      },
+    }
+  },
+  mounted: function () {
+    if (!this.examInfo.examUsers.length) {
+      this.userGroupAdd()
     }
   },
   computed: {
-    examUsers: {
-      get: function () {
-        return this.$store.state.exam.examUsers
-      },
-      set: function (newValue) {
-        this.$store.state.exam.examUsers = newValue
-      }
-    },
-    exam: {
-      get: function () {
-        return this.$store.state.exam.exam
-      },
-      set: function (newValue) {
-        this.$store.state.exam.exam = newValue
-      }
-    },
-  },
-  async created() {
-    // this.getUserList()
-    // this.getUserList(2)
+    ...mapState('exam', ['examInfo']),
+    ...mapGetters('exam', ['totalScore', 'markQuestions']),
   },
   methods: {
-    // 获取用户
-    async getUserList(type = 1, curPage = 1, name = '') {
-      const params = { name, curPage, pageSize: this.pageSize }
-      const examUsersRep = await userListpage(
-        type === 1 ? params : { type: 2, ...params }
-      )
-
-      this.examUserList = examUsersRep.data.list
-      this.total = examUsersRep.data.total
-    },
-    // 获取更多用户
-    getMoreUser(type, curPage, name) {
-      this.getUserList(type, curPage, name)
-    },
-    // 选择阅卷用户
-    selectPerson(e, index) {
-      this.exam.examUsers[index].markUserId = e || []
-      this.exam.examUsers.map((item, indexe) => {
-        if (
-          index !== indexe &&
-          this.exam.examUsers[index].markUserId ===
-            item.markUserId
-        ) {
-          this.exam.examUsers[indexe].markUserId = null
-        }
-      })
-    },
-    // 选择阅卷考生
-    selectExamUser(e, index) {
-      this.exam.examUsers[index].examUserIds = e
-      this.exam.examUsers.map((item, indexe) => {
-        if (index !== indexe) {
-          this.exam.examUsers[index].examUserIds.map((user) => {
-            const indexa = item.examUserIds.indexOf(user)
-            if (indexa !== -1) {
-              this.exam.examUsers[indexe].examUserIds.splice(indexa, 1)
+    ...mapMutations('exam', [
+      'userGroupAdd',
+      'userGroupDel',
+      'examUsersUpdate',
+      'markUserUpdate',
+    ]),
+    /** 
+     * 考试用户修改
+     * 同一个用户在多行只能有一个
+     * 如果当前选中行的值，在其他行存在，则其他行删除值
+     */
+    async _examUserUpdate(index, value) {
+      this.examUsersUpdate({ index, value })
+      let cur = this.examInfo.examUsers[index].examUserIds
+      this.examInfo.examUsers.map((examUser, index1) => {
+        if (index !== index1) {
+          let other = [...examUser.examUserIds]
+          cur.map(examUserId => {
+            let index2 = other.indexOf(examUserId)
+            if (index2 !== -1) {
+              other.splice(index2, 1)
+              this.examUsersUpdate({ index: index1, value: other })
             }
           })
         }
       })
     },
+    // 选择阅卷用户
+    _markUserUpdate(index, value) {
+      if (!value) {// bug：点击清空按钮时，回调该方法，value=""，导致页面显示ture
+        value = null
+      }
+      this.markUserUpdate({ index, value })
+      let cur = this.examInfo.examUsers[index].markUserId
+      this.examInfo.examUsers.map((examUser, index1) => {
+        if (index !== index1) {
+          let other = examUser.markUserId
+          if (cur == other) {
+            this.markUserUpdate({ index: index1, value: null })
+          }
+        }
+      })
+    },
     // 下一步
     next() {
-      this.$refs['userForm'].validate((valid) => {
-        console.log(valid)
+      this.$refs['editForm'].validate((valid) => {
         if (!valid) {
           return
         }
         this.$parent.activeIndex++
       })
     },
-    remarkAdd() {
-      this.exam.examUsers.push({ "examUserIds": [], "markUserId": null })
-    },
-
-    remarkDel() {
-      this.exam.examUsers.pop()
-    }
   },
 }
 </script>

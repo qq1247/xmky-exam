@@ -1,42 +1,60 @@
 <template>
   <el-select
-    ref="elSelect"
-    clearable
-    size="small"
-    :value="value"
+    ref="select"
+    v-model="myValue"
     :multiple="multiple"
-    :placeholder="placeholder"
-    :style="{ width: isAuto ? 'auto' : '100%' }"
-    @change="change"
-    @visible-change="visibleChange"
+    @visible-change="
+      (visible) => {
+        if (visible) {
+          this.query()
+        }
+      }
+    "
+    @change="value => this.$emit('change', value)"
+    @clear="clear"
+    clearable
+    style="width: 100%"
+    size="mini"
   >
-    <div class="select-func">
-      <slot name="func" />
-    </div>
+    <!-- <div class="toolbar">
+      <div class="toolbar-tag">
+        <i class="xm-iconfont xm-icon-quanxuan"></i><span>全选</span>
+      </div>
+      <div class="toolbar-tag">
+        <i class="xm-iconfont xm-icon-qingkong"></i><span>清空</span>
+      </div>
+    </div> -->
     <el-input
-      v-model="selectInput"
-      class="select-input"
-      placeholder="请输入候选词"
+      v-model="searchText"
+      class="search-box"
+      placeholder="请输入检索内容"
       prefix-icon="el-icon-search"
-      @input="input"
+      @input="query"
     />
-    <slot />
-    <div class="select-pager">
-      <button
-        :class="['page-pre', currentPage == 1 ? 'disabled' : '']"
-        @click="currentChange(0)"
-      >
-        上一页
-      </button>
-      <div class="page-content">{{ currentPage }} / {{ totalPage }}</div>
-      <button
-        :class="['page-next', currentPage == totalPage ? 'disabled' : '']"
-        @click="currentChange(1)"
-      >
-        下一页
-      </button>
-    </div>
-    <div slot="empty">
+    <el-option
+      v-for="item in list"
+      :key="item[optionValue]"
+      :label="item[optionLabel]"
+      :value="item[optionValue]"
+    >
+      <slot name="customText" :item="item"></slot>
+    </el-option>
+    <el-pagination
+      :page-size="pageSize"
+      :current-page="curPage"
+      :total="total"
+      @current-change="
+        (val) => {
+          this.curPage = val
+          this.query()
+        }
+      "
+      layout="prev, pager, next"
+      background
+    >
+    </el-pagination>
+
+    <!-- <div slot="empty">
       <div class="select-func">
         <slot name="func" />
       </div>
@@ -48,163 +66,116 @@
         @input="input"
       />
       <div class="dropdown-empty">无数据</div>
-    </div>
+    </div> -->
   </el-select>
 </template>
 
 <script>
+import request from '../api/request'
 export default {
   props: {
-    isAuto: {
-      type: Boolean,
-      default: false,
-    },
     value: {
       type: [Boolean, String, Number, Array],
       default: '',
     },
     multiple: {
       type: Boolean,
-      default: true,
+      default: false,
     },
-    placeholder: {
-      type: String,
-      default: '请选择...',
+    optionLabel: {
+      type: [String, Number],
+      default: '',
     },
-    total: {
-      type: Number,
-      default: 0,
+    optionValue: {
+      type: [String, Number],
+      default: '',
+    },
+    url: {
+      type: [String],
+      default: '',
+    },
+    params: {
+      type: [Object],
+      default: function () {
+        return {}
+      },
+    },
+    searchParmName: {
+      type: [String],
+      default: '',
     },
   },
   data() {
     return {
-      pageSize: 5,
-      totalPage: 1,
-      currentPage: 1,
-      selectInput: '',
+      curPage: 1,
+      pageSize: 3,
+      searchText: '',
+      total: 0,
+      list: [],
+      myValue: '',
     }
   },
+  mounted: function () {
+    let _params = {
+      curPage: 1,
+      pageSize: 100,
+      ...this.params,
+    }
+    if (this.value instanceof Array) {
+      _params.ids = this.value.join(',')
+    } else {
+      _params.ids = this.value
+    }
+
+    let _this = this
+    let _value = _this.value
+    request(this.url, _params).then((res) => {
+      res.data.list.forEach((item) => {// 第一次显示，把id显示成名称
+        _this.$refs.select.cachedOptions.push({
+          currentLabel: item[_this.optionLabel],
+          currentValue: item[_this.optionValue],
+          label: item[_this.optionLabel],
+          value: item[_this.optionValue],
+        })
+      })
+      _this.myValue = _value
+    })
+  },
   watch: {
-    total: {
-      deep: true,
-      immediate: true,
-      handler(newValue) {
-        this.totalPage =
-          newValue % this.pageSize === 0
-            ? newValue / this.pageSize
-            : Math.ceil(newValue / this.pageSize)
-      },
+    value(val) {
+      this.myValue = val
     },
   },
-  created() {},
   methods: {
-    input(e) {
-      this.currentPage = 1
-      this.$emit('input', e)
+    async clear() {
+      console.log(this.myValue)
     },
-    currentChange(e) {
-      const preStatus = e === 0 && this.currentPage === 1
-      const nextStatus = e === 1 && this.currentPage === this.totalPage
-      if (preStatus || nextStatus) {
-        return false
+    query() {
+      let _params = {
+        curPage: this.curPage,
+        pageSize: this.pageSize,
+        searchParmName: this.searchParmName,
+        ...this.params,
       }
-      const currentPage =
-        e === 0 ? (this.currentPage -= 1) : (this.currentPage += 1)
-      this.$emit('currentChange', currentPage, this.selectInput)
-    },
-    change(e) {
-      this.$emit('change', e)
-    },
-    visibleChange(e) {
-      if (e) {
-        this.$emit('visibleChange')
-        return false
-      }
-      this.selectInput = ''
-      this.currentPage = 1
+      _params[this.searchParmName] = this.searchText
+
+      request(this.url, _params).then((res) => {
+        this.list = res.data.list
+        this.total = res.data.total
+      })
     },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.dropdown-empty {
-  padding: 10px 0;
-  margin: 0;
-  text-align: center;
-  color: #999;
-  font-size: 14px;
-}
-/deep/ .el-button--text {
-  color: gray;
-}
-/deep/ .el-button--text:hover {
-  color: #0094e5;
-}
-/deep/.el-select-dropdown__list {
-  padding-bottom: 35px;
-  padding-top: 35px;
-}
-.select-func {
-  padding: 0 5px;
-  font-size: 14px;
-  line-height: 35px;
-}
-.select-input {
-  padding: 0 5px;
-  /deep/.el-input__inner {
-    border: none;
-    border-bottom: 1px solid #dcdfe6;
-    border-radius: 0;
+.search-box {
+  /deep/ .el-input__inner {
+    border-width: 0px 0px 1px 0px;
+    border-radius: 0px;
   }
-}
-.select-pager {
-  width: 100%;
-  background: #fff;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 5px 0;
-  .page-pre,
-  .page-next {
-    width: 30%;
-    line-height: 30px;
-    text-align: center;
-    cursor: pointer;
-    font-size: 13px;
-    border: 1px solid #dcdfe6;
-    background: #fff;
-    &:hover {
-      border: 1px solid #0094e5;
-      color: #0094e5;
-    }
+  /deep/ .el-input__inner:focus {
+    border-color: #c0c4cc;
   }
-  .page-pre {
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
-  }
-  .page-next {
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
-  }
-  .disabled {
-    cursor: not-allowed;
-    &:hover {
-      border: 1px solid #dcdfe6;
-      color: #999;
-    }
-  }
-  .page-content {
-    flex: 1;
-    line-height: 32px;
-    text-align: center;
-    border-top: 1px solid #dcdfe6;
-    border-bottom: 1px solid #dcdfe6;
-  }
-}
-</style>
-<style>
-.el-select-dropdown__wrap {
-  max-height: 330px;
 }
 </style>

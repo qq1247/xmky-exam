@@ -9,7 +9,7 @@
           @click="activeIndex == index ? switchTab(index) : ''"
         >
           {{ item }}
-        </div>
+        </div> 
       </div>
       <PaperSetting v-if="activeIndex === 0" @switchTab="switchTab"></PaperSetting>
       <QuestionTxtImport v-if="activeIndex === 1 && createdType === 1">
@@ -20,6 +20,7 @@
           <el-button type="primary" size="mini" @click="txtImport(errNum, questionList)">导入</el-button>
         </template>
       </QuestionTxtImport>
+      <PaperRule v-if="activeIndex === 1 && createdType === 2" style="height: calc(100vh - 220px);" ref="PaperRule"/>
       <ExamSetting v-if="activeIndex === 2" style="height: calc(100vh - 220px);" ref="ExamSetting"/>
       <MarkSetting v-if="activeIndex === 3" style="height: calc(100vh - 220px);" ref="MarkSetting"/>
       <ExamPublish v-if="activeIndex === 4" style="height: calc(100vh - 220px);" ref="ExamPublish"/>
@@ -29,7 +30,7 @@
 
     <div v-if="activeIndex !=0 && createdType === 0" class="paper-footer" :style="{marginTop: activeIndex == 1 ? '-47px' : '-67px'}">
       <el-button type="primary" @click="back" size="small">上一步</el-button>
-      <el-button type="primary" @click="next" size="small">{{activeIndex == 4 ? '完成' : '下一步'}}</el-button>
+      <el-button type="primary" @click="next" size="small">{{activeIndex == 4 ? '发布' : '下一步'}}</el-button>
     </div>
     
     <div class="exam-bottom" v-if="activeIndex == 0">
@@ -65,20 +66,11 @@ import PaperSetting from './PaperSetting.vue'
 import Paper from './Paper.vue'
 import QuestionTxtImport from '@/components/Question/QuestionTxtImport.vue'
 import ExamSetting from './ExamSetting.vue'
-// import ExamPublish from './ExamPublish.vue'
+import ExamPublish from './ExamPublish.vue'
 import MarkSetting from './MarkSetting.vue'
+import PaperRule from './PaperRule.vue'
 import CustomSelect from 'components/CustomSelect.vue'
-// import { questionTypeAdd } from 'api/question'
-import dayjs from 'dayjs'
 import { mapMutations } from 'vuex'
-// import {
-//   paperListpage,
-//   paperTypeAdd,
-//   paperTypeListpage,
-//   paperGet,
-//   paperAdd,
-//   paperEdit
-// } from 'api/paper'
 
 export default {
   components: {
@@ -87,8 +79,9 @@ export default {
     Paper,
     QuestionTxtImport,
     ExamSetting,
-    // ExamPublish,
-    MarkSetting
+    ExamPublish,
+    MarkSetting,
+    PaperRule,
   },
   data() {
     return {
@@ -191,14 +184,7 @@ export default {
         this.activeIndex++
       }
     },
-    // 设置quickInfo
-    async setQuickInfo(paperType) {
-      const { data } = await paperGet({ id: this.paperForm.paperId })
-      setQuick({
-        ...data,
-        paperType: paperType
-      })
-    },
+    // 编辑页面
     toEditor() {
       this.activeIndex = 1
       this.createdType = 1

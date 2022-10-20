@@ -14,6 +14,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.core.util.StringUtil;
+import com.wcpdoc.core.util.ValidateUtil;
 
 /**
  * 考试试题实体
@@ -45,8 +47,8 @@ public class ExamQuestion {
 	private Integer questionId;
 	@Column(name = "NO")
 	private Integer no;
-	@Column(name = "OPTION_NO")
-	private String optionNo;
+	@Column(name = "OPTIONS_NO")
+	private String optionsNo;
 	@Column(name = "UPDATE_USER_ID")
 	private Integer updateUserId;
 	@DateTimeFormat(pattern = DateUtil.FORMAT_DATE_TIME)
@@ -94,20 +96,50 @@ public class ExamQuestion {
 		this.score = score;
 	}
 
-	public String getScores() {
-		return scores;
+	public BigDecimal[] getScores() {
+		if (!ValidateUtil.isValid(scores)) {
+			return new BigDecimal[0];
+		}
+	
+		String[] scoreStrArr = scores.split(",");
+		BigDecimal[] scoreArr = new BigDecimal[scoreStrArr.length];
+		for (int i = 0; i < scoreStrArr.length; i++) {
+			scoreArr[i] = new BigDecimal(scoreStrArr[i]);
+		}
+		return scoreArr;
 	}
 
-	public void setScores(String scores) {
-		this.scores = scores;
+	public void setScores(BigDecimal[] scores) {
+		if (!ValidateUtil.isValid(scores)) {
+			this.scores = null;
+			return;
+		}
+		
+		this.scores = StringUtil.join(scores);
 	}
 
-	public String getMarkOptions() {
-		return markOptions;
+	/** 阅卷选项（2：答案无顺序；3：大小写不敏感；) */
+	public Integer[] getMarkOptions() {
+		if (!ValidateUtil.isValid(markOptions)) {
+			return new Integer[0];
+		}
+	
+		String[] markOptionStrArr = markOptions.split(",");
+		Integer[] markOptionArr = new Integer[markOptionStrArr.length];
+		for (int i = 0; i < markOptionStrArr.length; i++) {
+			markOptionArr[i] = Integer.parseInt(markOptionStrArr[i]);
+		}
+		return markOptionArr;
 	}
 
-	public void setMarkOptions(String markOptions) {
-		this.markOptions = markOptions;
+	/** 阅卷选项（2：答案无顺序；3：大小写不敏感；) */
+	public void setMarkOptions(Integer[] markOptions) {
+		if (!ValidateUtil.isValid(markOptions)) {
+			this.markOptions = null;
+			return;
+		}
+		
+		this.markOptions = StringUtil.join(markOptions);
 	}
 
 	public Integer getExamId() {
@@ -134,12 +166,26 @@ public class ExamQuestion {
 		this.no = no;
 	}
 
-	public String getOptionNo() {
-		return optionNo;
+	public Integer[] getOptionsNo() {
+		if (!ValidateUtil.isValid(optionsNo)) {
+			return new Integer[0];
+		}
+	
+		String[] markOptionStrArr = optionsNo.split(",");
+		Integer[] markOptionArr = new Integer[markOptionStrArr.length];
+		for (int i = 0; i < markOptionStrArr.length; i++) {
+			markOptionArr[i] = Integer.parseInt(markOptionStrArr[i]);
+		}
+		return markOptionArr;
 	}
 
-	public void setOptionNo(String optionNo) {
-		this.optionNo = optionNo;
+	public void setOptionsNo(Integer[] optionsNo) {
+		if (!ValidateUtil.isValid(optionsNo)) {
+			this.optionsNo = null;
+			return;
+		}
+		
+		this.optionsNo = StringUtil.join(optionsNo);
 	}
 
 	public Integer getUpdateUserId() {
