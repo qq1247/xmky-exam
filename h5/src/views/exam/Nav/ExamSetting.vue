@@ -57,7 +57,7 @@
           :step="10"
           ></el-input-number> / {{totalScore}}分
       </el-form-item>
-      <el-form-item label="防作弊：" prop="sxes">
+      <el-form-item v-if="genType === 1" label="防作弊：" prop="sxes">
         <el-checkbox-group v-model="sxes">
           <el-checkbox
             :label="1"
@@ -80,7 +80,7 @@
             >{{ dict.dictValue }}</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="匿名阅卷：" prop="anonState">
+      <el-form-item v-if="genType === 1" label="匿名阅卷：" prop="anonState">
         <el-checkbox
           v-model="anonState"
           :true-label="1"
@@ -165,6 +165,11 @@ export default {
       'totalScore', 
       'markQuestions', 
     ]),
+    genType: {
+      get () {
+        return this.examInfo.exam.genType
+      },
+    },
     name: {
       get () {
         return this.examInfo.exam.name
@@ -247,6 +252,11 @@ export default {
     },
   },
   mounted: function () {
+    if (this.genType === 2) {
+      console.log('mounted：随机组卷，去掉防作弊')
+      this.sxes = []
+    }
+
     if (!this.name) {
       this.name = '考试-' + dayjs().add(1, 'day').format('YYYYMMDD')
     }

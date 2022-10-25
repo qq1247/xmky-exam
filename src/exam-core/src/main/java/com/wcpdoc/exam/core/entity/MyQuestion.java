@@ -112,20 +112,50 @@ public class MyQuestion {
 		this.score = score;
 	}
 
-	public String getScores() {
-		return scores;
+	public BigDecimal[] getScores() {
+		if (!ValidateUtil.isValid(scores)) {
+			return new BigDecimal[0];
+		}
+	
+		String[] scoresStrArr = scores.split(",");
+		BigDecimal[] scoresArr = new BigDecimal[scoresStrArr.length];
+		for (int i = 0; i < scoresStrArr.length; i++) {
+			scoresArr[i] = new BigDecimal(scoresStrArr[i]);
+		}
+		return scoresArr;
 	}
 
-	public void setScores(String scores) {
-		this.scores = scores;
+	public void setScores(BigDecimal[] scores) {
+		if (!ValidateUtil.isValid(scores)) {
+			this.scores = null;
+			return;
+		}
+		
+		this.scores = StringUtil.join(scores);
 	}
 
-	public String getMarkOptions() {
-		return markOptions;
+	/** 阅卷选项（2：答案无顺序；3：大小写不敏感；) */
+	public Integer[] getMarkOptions() {
+		if (!ValidateUtil.isValid(markOptions)) {
+			return new Integer[0];
+		}
+	
+		String[] markOptionStrArr = markOptions.split(",");
+		Integer[] markOptionArr = new Integer[markOptionStrArr.length];
+		for (int i = 0; i < markOptionStrArr.length; i++) {
+			markOptionArr[i] = Integer.parseInt(markOptionStrArr[i]);
+		}
+		return markOptionArr;
 	}
 
-	public void setMarkOptions(String markOptions) {
-		this.markOptions = markOptions;
+	/** 阅卷选项（2：答案无顺序；3：大小写不敏感；) */
+	public void setMarkOptions(Integer[] markOptions) {
+		if (!ValidateUtil.isValid(markOptions)) {
+			this.markOptions = null;
+			return;
+		}
+		
+		this.markOptions = StringUtil.join(markOptions);
 	}
 
 	public Integer getExamId() {

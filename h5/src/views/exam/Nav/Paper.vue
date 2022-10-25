@@ -34,11 +34,11 @@
       <div class="top">
         <div class="top-title">
           <el-input
-          :value="examInfo.exam.paperName"
-          @input="value => paperNameUpdate(value)"
-          placeholder="请输入试卷名称"
-          maxlength="32"
-          ></el-input>
+            :value="examInfo.exam.paperName"
+            @input="value => paperNameUpdate(value)"
+            placeholder="请输入试卷名称"
+            maxlength="16"
+            ></el-input>
           <div class="top-score">
             {{totalScore}}分
             <i class="common common-fenshudixian fenshudixian"></i>
@@ -81,7 +81,7 @@
             placeholder="请输入描述"
             type="textarea"
             :autosize="true"
-            maxlength="64"
+            maxlength="128"
           />
           <div class="question-opt">
             <el-button
@@ -280,6 +280,10 @@ export default {
       'totalScore',
     ])
   },
+  mounted() {
+    console.log('设置组卷类型为人工')
+    this.genTypeUpdate(1) 
+  },
   methods: {
     ...mapMutations('exam', [
       'paperNameUpdate',
@@ -293,6 +297,7 @@ export default {
       'questionSort',
       'questionScoreUpdate',
       'questionAnswerScoreUpdate',
+      'genTypeUpdate',
     ]),
     toEditor() {
       this.$emit('toEditor')

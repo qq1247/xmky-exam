@@ -430,6 +430,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	private void publishUser(ExamInfo examInfo, Map<Integer, List<Question>> questionListCache) {
 		// 获取用户列表
 		Map<Integer, List<QuestionOption>> questionOptionCache = new HashMap<>();
+		Map<Integer, List<QuestionAnswer>> questionAnswerCache = new HashMap<>();
 		for (ExamUser examUser : examInfo.getExamUsers()) {
 			for (Integer examUserId : examUser.getExamUserIds()) {
 				// 生成我的考试信息
@@ -496,17 +497,40 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 								continue;
 							}
 							
-							ExamQuestion examQuestion = new ExamQuestion();
-							examQuestion.setType(2);
-							examQuestion.setScore(examRule.getScore());
-							addExUserScores(examQuestion, examRule, question);
-							examQuestion.setMarkOptions(examRule.getMarkOptions());
-							examQuestion.setExamId(examRule.getExamId());
-							examQuestion.setQuestionId(question.getId());
-							examQuestion.setNo(no++);
-							examQuestion.setUpdateTime(new Date());
-							examQuestion.setUpdateUserId(getCurUser().getId());
-							examQuestionService.add(examQuestion);
+							MyQuestion myQuestion = new MyQuestion();
+							myQuestion.setChapterName(examRule.getChapterName());
+							myQuestion.setChapterTxt(examRule.getChapterTxt());
+							myQuestion.setType(examRule.getType());
+							myQuestion.setScore(examRule.getScore());
+							myQuestion.setMarkOptions(examRule.getMarkOptions());
+							myQuestion.setExamId(examRule.getExamId());
+							myQuestion.setQuestionId(question.getId());
+							myQuestion.setUserId(examUserId);
+							myQuestion.setExamId(examInfo.getExam().getId());
+							myQuestion.setNo(no++); // 试题乱序无效，因为本身就是随机的
+							
+//							if (ExamUtil.hasOptionRand(examInfo.getExam())) {// 如果是选项乱序
+//								if (questionOptionCache.get(myQuestion.getQuestionId()) == null) {
+//									questionOptionCache.put(myQuestion.getQuestionId(), questionOptionService.getList(myQuestion.getQuestionId()));
+//								}
+//								List<QuestionOption> questionOptionList = questionOptionCache.get(myQuestion.getQuestionId());// A,B,C,D
+//								myQuestion.setOptionsNo(shuffleNums(1, questionOptionList.size()));// D,B,A,C
+//							}
+							
+							if (QuestionUtil.hasMultipleChoice(question)) {// 如果是多选，使用抽题规则的漏选分数
+								myQuestion.setScores(examRule.getScores());
+							} else if ((QuestionUtil.hasFillBlank(question) || QuestionUtil.hasQA(question)) // 如果是客观填空问答，把分数平均分配到子分数
+									&& QuestionUtil.hasSubjective(question)) {// 如果抽题不设置分数，使用题库默认的分数，会导致总分不确定
+								if (questionAnswerCache.get(myQuestion.getQuestionId()) == null) {// 如果抽题设置分数，主观题答案数量不一样，没法按答案分配分数
+									questionAnswerCache.put(myQuestion.getQuestionId(), questionAnswerService.getList(myQuestion.getQuestionId()));
+								}
+								List<QuestionAnswer> questionAnswerList = questionAnswerCache.get(myQuestion.getQuestionId());// 所以规则为当题分数，平均分配到每个答案
+								myQuestion.setScores(splitScore(examRule.getScore(), questionAnswerList.size()));
+							}
+							
+							myQuestion.setUpdateTime(new Date());
+							myQuestion.setUpdateUserId(getCurUser().getId());
+							myQuestionService.add(myQuestion);
 						}
 					}
 				}
@@ -573,9 +597,9 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					throw new MyException("参数错误：examQuestion.type");
 				}
 				if (examQuestion.getType() == 1) {// 如果是章节
-					if (!ValidateUtil.isValid(examQuestion.getChapterName())) {
-						throw new MyException("参数错误：examQuestion.chapterName");
-					}
+					//if (!ValidateUtil.isValid(examQuestion.getChapterName())) { // 没有也行
+					//	throw new MyException("参数错误：examQuestion.chapterName");
+					//}
 					if (ValidateUtil.isValid(examQuestion.getScore())) {
 						throw new MyException("参数错误：examQuestion.score");
 					}
@@ -643,66 +667,145 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		}
 		
 		if (examInfo.getExam().getGenType() == 2) {
+			if (!ValidateUtil.isValid(examInfo.getExamRules())) {
+				throw new MyException("参数错误：examRules");
+			}
+			
 			Set<Question> questionOfUsed = new HashSet<>();// 已使用过的试题
+			int ruleNo = 0; // 用于过滤章节后，题数不足时，提示那个规则无效
 			for (int i = 0; i < examInfo.getExamRules().length; i++) {
 				ExamRule examRule = examInfo.getExamRules()[i];
-				if (!ValidateUtil.isValid(examRule.getQuestionTypeId())) {
-					throw new MyException("参数错误：examRule.questionTypeId");
-				}
-				if (!ValidateUtil.isValid(examRule.getType())) {
+				if (!ValidateUtil.isValid(examRule.getType())
+						|| (examRule.getType() != 1 && examRule.getType() != 2)) {
 					throw new MyException("参数错误：examRule.type");
 				}
-				if (!ValidateUtil.isValid(examRule.getMarkType())) {
-					throw new MyException("参数错误：examRule.markType");
-				}
-				if (!ValidateUtil.isValid(examRule.getNum())) {
-					throw new MyException("参数错误：examRule.num");
-				}
-				if (!ValidateUtil.isValid(examRule.getScore())) {
-					throw new MyException("参数错误：examRule.score");
-				}
-				
-				if ((examRule.getType() == 1 || examRule.getType() == 2 || examRule.getType() == 4)) {// 单选多选判断不能是主观题
-					if (examRule.getMarkType() == 2) {
-						throw new MyException("参数错误：examRule.MarkType");
+				if (examRule.getType() == 1) {// 如果是章节
+					//if (!ValidateUtil.isValid(examRule.getChapterName())) { // 没有也行
+					//	throw new MyException("参数错误：examRule.chapterName");
+					//}
+					if (ValidateUtil.isValid(examRule.getQuestionTypeId())) {
+						throw new MyException("参数错误：examRule.questionTypeId");
 					}
-				}
-				if (examRule.getType() == 2) {
-					if (!ValidateUtil.isValid(examRule.getScores())) {// 如果是多选，必须有子分数（漏选分值）
+					if (ValidateUtil.isValid(examRule.getQuestionType())) {
+						throw new MyException("参数错误：examRule.questionType");
+					}
+					if (ValidateUtil.isValid(examRule.getMarkType())) {
+						throw new MyException("参数错误：examRule.markType");
+					}
+					if (ValidateUtil.isValid(examRule.getMarkOptions())) {
+						throw new MyException("参数错误：examRule.markOptions");
+					}
+					if (ValidateUtil.isValid(examRule.getNum())) {
+						throw new MyException("参数错误：examRule.num");
+					}
+					if (ValidateUtil.isValid(examRule.getScore())) {
+						throw new MyException("参数错误：examRule.score");
+					}
+					if (ValidateUtil.isValid(examRule.getScores())) {
 						throw new MyException("参数错误：examRule.scores");
 					}
-					if (examRule.getScore().doubleValue() < examRule.getScores().doubleValue()) {// 子分数不能大于分数
-						throw new MyException("参数错误：examRule.scores");
-					}
-				}
-				if (examRule.getType() != 2 && ValidateUtil.isValid(examRule.getScores())) {// 如果是单选判断不能有子分数，填空问答平均分配分数
-					throw new MyException("参数错误：examRule.scores");
 				}
 				
-				
-				int validQuestionNum = 0;// 符合当前抽题规则的有效题数
-				for (Question question : questionListCache.get(examRule.getQuestionTypeId())) {
-					if (questionOfUsed.contains(question)) {// 已经使用过的试题就不能在用，继续找下一个
-						continue;
+				if (examRule.getType() == 2) {// 如果是规则
+					if (ValidateUtil.isValid(examRule.getChapterName())) {
+						throw new MyException("参数错误：examQuestion.chapterName");
 					}
-					if (validQuestionNum >= examRule.getNum()) {// 当前题库已满足当前抽题规则，不在继续验证
-						break;
+					if (ValidateUtil.isValid(examRule.getChapterTxt())) {
+						throw new MyException("参数错误：examQuestion.chapterTxt");
 					}
 					
-					if (examRule.getType() == question.getType() // 当前试题满足抽题规则
-							&& examRule.getMarkType() == question.getMarkType()) {
-						questionOfUsed.add(question);// 加入已使用过的试题
-						validQuestionNum++; // 有效题数加一
+					
+					if (!ValidateUtil.isValid(examRule.getQuestionTypeId())) {
+						throw new MyException("参数错误：examRule.questionTypeId");
 					}
-				}
-				
-				if (validQuestionNum < examRule.getNum()) {
-					throw new MyException(String.format("第【%s】个规则题数不足，请修改", i + 1));
+					if (!ValidateUtil.isValid(examRule.getQuestionType()) 
+							|| examRule.getQuestionType() < 1 || examRule.getQuestionType() > 5) {
+						throw new MyException("参数错误：examRule.questionType");
+					}
+					if (!ValidateUtil.isValid(examRule.getMarkType())
+							|| (examRule.getMarkType() != 1 && examRule.getMarkType() != 2)) {
+						throw new MyException("参数错误：examRule.markType");
+					}
+					if (!ValidateUtil.isValid(examRule.getNum())) {
+						throw new MyException("参数错误：examRule.num");
+					}
+					if (examRule.getNum() <= 0 || examRule.getNum() > 100) {
+						throw new MyException("参数错误：examRule.num");
+					}
+					
+					if (!ValidateUtil.isValid(examRule.getScore())) {
+						throw new MyException("参数错误：examRule.score");
+					}
+					if (examRule.getScore().doubleValue() <= 0 || examRule.getScore().doubleValue() > 20) {
+						throw new MyException("参数错误：examRule.score");
+					}
+					
+					if (examRule.getMarkType() == 1 // 如果是客观填空或客观问答，才有阅卷选项
+						&& (examRule.getQuestionType() == 3 || examRule.getQuestionType() == 5)) {
+						if (ValidateUtil.isValid(examRule.getMarkOptions())) {
+							for (Integer markOption : examRule.getMarkOptions()) {
+								if (markOption != 2 && markOption != 3) {
+									throw new MyException("参数错误：examRule.markOptions");
+								}
+							}
+						}
+					} else { // 否则不能有阅卷选项
+						if (ValidateUtil.isValid(examRule.getMarkOptions())) {
+							throw new MyException("参数错误：examRule.markOptions");
+						}
+					}
+					
+					if ((examRule.getQuestionType() == 1 // 单选多选判断不能是主观题
+							|| examRule.getQuestionType() == 2 || examRule.getQuestionType() == 4)) {
+						if (examRule.getMarkType() == 2) {
+							throw new MyException("参数错误：examRule.MarkType");
+						}
+					}
+					if (examRule.getQuestionType() == 2) {// 如果是多选，必须有子分数（漏选分值）
+						if (!ValidateUtil.isValid(examRule.getScores())) {
+							throw new MyException("参数错误：examRule.scores");
+						}
+						if (examRule.getScores().length != 1) {
+							throw new MyException("参数错误：examRule.scores");
+						}
+						if (examRule.getScore().doubleValue() <= examRule.getScores()[0].doubleValue()) {// 漏选分数不能大于分数
+							throw new MyException("参数错误：examRule.scores");
+						}
+					}
+					if (examRule.getQuestionType() != 2) {// 如果是单选判断不能有子分数，填空问答平均分配分数
+						if (ValidateUtil.isValid(examRule.getScores())) {
+							throw new MyException("参数错误：examRule.scores");
+						}
+					}
+					
+					if (examRule.getType() == 2) {
+						ruleNo++;
+					}
+					int validQuestionNum = 0;// 符合当前抽题规则的有效题数
+					for (Question question : questionListCache.get(examRule.getQuestionTypeId())) {
+						if (questionOfUsed.contains(question)) {// 已经使用过的试题就不能在用，继续找下一个
+							continue;
+						}
+						if (validQuestionNum >= examRule.getNum()) {// 当前题库已满足当前抽题规则，不在继续验证
+							break;
+						}
+						
+						if (examRule.getQuestionType() == question.getType() // 当前试题满足抽题规则
+								&& examRule.getMarkType() == question.getMarkType()) {
+							questionOfUsed.add(question);// 加入已使用过的试题
+							validQuestionNum++; // 有效题数加一
+						}
+					}
+					
+					if (validQuestionNum < examRule.getNum()) {
+						throw new MyException(String.format("第【%s】个规则题数不足%s，请修改", ruleNo, examRule.getNum()));
+					}
 				}
 			}
 		}
 	}
 
+	
 	private void addValidExam(ExamInfo examInfo) {
 		Exam exam = examInfo.getExam();
 		if (!ValidateUtil.isValid(exam.getName())) {
@@ -730,9 +833,11 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					throw new MyException("参数错误：examRules");
 				}
 				for (ExamRule examRule : examInfo.getExamRules()) {
-					paperTotalScore = BigDecimalUtil.newInstance(examRule.getScore()).mul(examRule.getNum()).add(paperTotalScore).getResult();// 单题分数*数量累加到总分
-					if (examRule.getMarkType() == 2) {
-						containObjectiveQuesiton = true;
+					if (examRule.getType() == 2) {
+						paperTotalScore = BigDecimalUtil.newInstance(examRule.getScore()).mul(examRule.getNum()).add(paperTotalScore).getResult();// 单题分数*数量累加到总分
+						if (examRule.getMarkType() == 2) {
+							containObjectiveQuesiton = true;
+						}
 					}
 				}
 			}
@@ -874,31 +979,6 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			}
 		}
 		return questionListCache;
-	}
-
-	/**
-	 * 设置分数
-	 * 
-	 * 如果抽题不设置分数，使用题库默认的分数，会导致总分不确定
-	 * 如果抽题设置分数，主观题答案数量不一样，没法按答案分配分数
-	 * 所以规则为当题分数，平均分配到每个答案
-	 * 
-	 * v1.0 zhanghc 2022年9月28日下午1:39:17
-	 * @param examQuestion
-	 * @param examRule
-	 * @param question void
-	 */
-	private void addExUserScores(ExamQuestion examQuestion, ExamRule examRule, Question question) {
-		// 如果是多选，使用抽题规则的漏选分数
-		if (QuestionUtil.hasMultipleChoice(question)) {
-			examQuestion.setScores(new BigDecimal[] { examRule.getScores() });
-		} 
-		// 如果是客观填空问答，把分数平均分配到子分数
-		else if ((QuestionUtil.hasFillBlank(question) || QuestionUtil.hasQA(question))
-				&& QuestionUtil.hasSubjective(question)) {
-			List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
-			examQuestion.setScores(splitScore(examRule.getScore(), questionAnswerList.size()));
-		}
 	}
 
 	/**

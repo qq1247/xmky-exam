@@ -28,10 +28,16 @@ public class ExamRule {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID")
 	private Integer id;
-	@Column(name = "QUESTION_TYPE_ID")
-	private Integer questionTypeId;
+	@Column(name = "CHAPTER_NAME")
+	private String chapterName;
+	@Column(name = "CHAPTER_TXT")
+	private String chapterTxt;
 	@Column(name = "TYPE")
 	private Integer type;
+	@Column(name = "QUESTION_TYPE_ID")
+	private Integer questionTypeId;
+	@Column(name = "QUESTION_TYPE")
+	private Integer questionType;
 	@Column(name = "MARK_TYPE")
 	private Integer markType;
 	@Column(name = "MARK_OPTIONS")
@@ -41,7 +47,7 @@ public class ExamRule {
 	@Column(name = "SCORE")
 	private BigDecimal score;
 	@Column(name = "SCORES")
-	private BigDecimal scores;
+	private String scores;
 	@Column(name = "EXAM_ID")
 	private Integer examId;
 	@Column(name = "NO")
@@ -69,10 +75,12 @@ public class ExamRule {
 		this.questionTypeId = questionTypeId;
 	}
 
+	/** 类型 （1：章节；2：试题） */
 	public Integer getType() {
 		return type;
 	}
 
+	/** 类型 （1：章节；2：试题） */
 	public void setType(Integer type) {
 		this.type = type;
 	}
@@ -125,12 +133,26 @@ public class ExamRule {
 		this.score = score;
 	}
 
-	public BigDecimal getScores() {
-		return scores;
+	public BigDecimal[] getScores() {
+		if (!ValidateUtil.isValid(scores)) {
+			return new BigDecimal[0];
+		}
+	
+		String[] scoresStrArr = scores.split(",");
+		BigDecimal[] scoresArr = new BigDecimal[scoresStrArr.length];
+		for (int i = 0; i < scoresStrArr.length; i++) {
+			scoresArr[i] = new BigDecimal(scoresStrArr[i]);
+		}
+		return scoresArr;
 	}
 
-	public void setScores(BigDecimal scores) {
-		this.scores = scores;
+	public void setScores(BigDecimal[] scores) {
+		if (!ValidateUtil.isValid(scores)) {
+			this.scores = null;
+			return;
+		}
+		
+		this.scores = StringUtil.join(scores);
 	}
 
 	public Integer getExamId() {
@@ -163,6 +185,30 @@ public class ExamRule {
 
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
+	}
+
+	public String getChapterName() {
+		return chapterName;
+	}
+
+	public void setChapterName(String chapterName) {
+		this.chapterName = chapterName;
+	}
+
+	public String getChapterTxt() {
+		return chapterTxt;
+	}
+
+	public void setChapterTxt(String chapterTxt) {
+		this.chapterTxt = chapterTxt;
+	}
+
+	public Integer getQuestionType() {
+		return questionType;
+	}
+
+	public void setQuestionType(Integer questionType) {
+		this.questionType = questionType;
 	}
 
 }

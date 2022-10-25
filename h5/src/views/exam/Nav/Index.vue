@@ -20,20 +20,20 @@
           <el-button type="primary" size="mini" @click="txtImport(errNum, questionList)">导入</el-button>
         </template>
       </QuestionTxtImport>
-      <PaperRule v-if="activeIndex === 1 && createdType === 2" style="height: calc(100vh - 220px);" ref="PaperRule"/>
       <ExamSetting v-if="activeIndex === 2" style="height: calc(100vh - 220px);" ref="ExamSetting"/>
       <MarkSetting v-if="activeIndex === 3" style="height: calc(100vh - 220px);" ref="MarkSetting"/>
       <ExamPublish v-if="activeIndex === 4" style="height: calc(100vh - 220px);" ref="ExamPublish"/>
     </div>
 
     <Paper v-if="activeIndex == 1 && createdType === 0"  @toEditor="toEditor" ref="Paper"></Paper>
+    <PaperRule v-if="activeIndex === 1 && createdType === 2" ref="PaperRule"></PaperRule>
 
-    <div v-if="activeIndex !=0 && createdType === 0" class="paper-footer" :style="{marginTop: activeIndex == 1 ? '-47px' : '-67px'}">
+    <div v-if="activeIndex !=0 && createdType !== 1" class="paper-footer" :style="{marginTop: activeIndex == 1 ? '-47px' : '-67px'}">
       <el-button type="primary" @click="back" size="small">上一步</el-button>
       <el-button type="primary" @click="next" size="small">{{activeIndex == 4 ? '发布' : '下一步'}}</el-button>
     </div>
     
-    <div class="exam-bottom" v-if="activeIndex == 0">
+    <!-- <div class="exam-bottom" v-if="activeIndex == 0">
       <el-form ref="paperForm" :model="paperForm" :rules="paperForm.rules" label-width="140px" label-position="left">
         <el-form-item label="从考试中选择" prop="selectPaperId">
           <CustomSelect
@@ -57,7 +57,7 @@
           </CustomSelect>
         </el-form-item>
       </el-form>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -86,27 +86,8 @@ export default {
   data() {
     return {
       activeIndex: 0,
+      createdType: 0,
       navList: ['1.选择试卷', '2.添加试题', '3.配置规则', '4.添加用户', '5.发布考试'],
-      paperForm: {
-        paperType: 1,
-        paperTypeId: null,
-        paperList: [],
-        selectPaperId: null,
-        passScore: 60,
-        showType: 1,
-        pageSize: 5,
-        total: 1,
-        name: '',
-        state: 2,
-        genType: 0,
-        markType: 1,
-        rules: {
-          selectPaperId: [
-            { required: true, message: '请选择试卷', trigger: 'change' }
-          ]
-        }
-      },
-      createdType: 0
     }
   },
   computed: {
@@ -128,51 +109,15 @@ export default {
       this.activeIndex = index
     },
 
-    // 获取试卷列表
-    async getPaperList(curPage = 1, name = '') {
-      // const paperList = await paperListpage({
-      //   name,
-      //   state: 1,
-      //   curPage,
-      //   pageSize: 5
-      // })
-      // this.paperForm.paperList = paperList.data.list
-      // this.paperForm.total = paperList.data.total
-    },
-    // 获取更多试卷列表
-    getMorePaper(curPage, name) {
-      this.getPaperList(curPage, name)
-    },
-    // 根据name 查询试卷
-    searchPaper(name) {
-      this.getPaperList(1, name)
-    },
-    // 选择试卷
-    selectPaper(paperId) {
-      if (paperId) {
-        this.activeIndex = 2
-        this.paperForm.selectPaperId = paperId
-        let quickInfo = this.paperForm.paperList.filter(item => {
-          return item.id == paperId
-        })
-        setQuick(quickInfo[0])
-      } else {
-        this.paperForm.selectPaperId = null
-      }  
-    },
     //上一步 
     back() {
-      if (this.activeIndex == 2 && this.paperForm.selectPaperId) {
-        this.activeIndex = 0
-        this.paperForm.selectPaperId = null
-        removeQuick()
-      } else {
-        this.activeIndex--
-      }
+      this.activeIndex--
     },
     //下一步
     next() {
-      if (this.activeIndex == 2) {
+      if (this.activeIndex === 1 && this.createdType === 2) {
+        this.$refs['PaperRule'].next()
+      } else if (this.activeIndex == 2) {
         this.$refs['ExamSetting'].next()
       }
       else if (this.activeIndex == 3) {

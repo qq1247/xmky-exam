@@ -67,7 +67,7 @@
     </div>
     <div class="quick-info">
       <div class="info-name">试题数量：</div>
-      <div class="info-content">共{{examInfo.examQuestions.length}}道题，其中主观题{{markQuestions.length}}道</div>
+      <div class="info-content">共{{questionNum}}道题，其中主观题{{markQuestions.length}}道</div>
     </div>
   </div>
 </template>
@@ -94,13 +94,13 @@ export default {
       'markQuestions',
       'examUserNum',
       'markUserNum',
+      'questionNum',
     ])
   },
   methods: {
     async publish() {
       let examInfo = _.cloneDeep(this.examInfo)
       examInfo.exam.state = 1
-      examInfo.exam.genType = 1
       examInfo.exam.markType = this.markType
       examInfo.exam.totalScore = this.totalScore
       if (examInfo.exam.timeType === 1) {
@@ -122,6 +122,12 @@ export default {
       });
 
       const res = await examPublish(JSON.stringify(examInfo))
+      if (res?.code === 200) {
+        this.$message.success('发布成功！')
+        this.$router.push('/')
+      } else {
+        this.$message.error(res.msg)
+      }
     },
     formartDateTime(date) {
       if (!date) {

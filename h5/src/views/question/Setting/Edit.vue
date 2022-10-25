@@ -6,7 +6,7 @@
     label-width="100px"
   >
     <el-form-item label="名称" prop="name">
-      <el-input v-model="editForm.name" placeholder="请输入名称" />
+      <el-input v-model="editForm.name" placeholder="请输入名称" maxlength="8"/>
     </el-form-item>
     <el-form-item>
       <el-button v-if="!id" type="primary" @click="add">添加</el-button>

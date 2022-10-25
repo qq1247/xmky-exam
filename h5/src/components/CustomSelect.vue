@@ -11,7 +11,6 @@
       }
     "
     @change="value => this.$emit('change', value)"
-    @clear="clear"
     clearable
     style="width: 100%"
     size="mini"
@@ -108,7 +107,7 @@ export default {
   data() {
     return {
       curPage: 1,
-      pageSize: 3,
+      pageSize: 10,
       searchText: '',
       total: 0,
       list: [],
@@ -147,9 +146,6 @@ export default {
     },
   },
   methods: {
-    async clear() {
-      console.log(this.myValue)
-    },
     query() {
       let _params = {
         curPage: this.curPage,
