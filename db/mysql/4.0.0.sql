@@ -134,7 +134,7 @@ create table EXM_EXAM
    PASS_SCORE           decimal(5,2) comment '及格分数（%）',
    TOTAL_SCORE          decimal(5,2) comment '总分数',
    MARK_TYPE            int comment '阅卷方式（1：智能阅卷；2：人工阅卷；）数据字典：PAPER_MARK_TYPE',
-   SHOW_TYPE            int comment '展示方式（1：整卷展示；2：章节显示；3：单题展示；）数据字典：PAPER_SHOW_TYPE',
+   SHOW_TYPE            int comment '展示方式（1：整卷展示；3：单题展示；）数据字典：PAPER_SHOW_TYPE',
    GEN_TYPE             int comment '组卷方式（1：人工组卷；2：随机组卷）',
    SXES                 varchar(32) comment '反作弊（1：试题乱序；2：选项乱序；3：禁用右键；4：禁止复制；5：最小化警告）',
    MINIMIZE_NUM         int comment '最小化警告次数（SXES=5有效）',

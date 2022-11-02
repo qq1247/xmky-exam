@@ -25,24 +25,46 @@
       <div class="content">
         <div class="exam-list">
           <AddCard add-title="添加考试" @addCard="add" />
-          <ListCard
-            v-for="(item, index) in examList"
+          <div
+            v-for="(exam, index) in examList"
             :key="index"
-            :data="item"
-            name="examList"
-            @del="del"
-            @edit="edit"
-            @read="read"
-            @score="score"
-            @onLine="onLine"
-            @publish="publish"
-            @ranking="ranking"
-            @message="message"
-            @exports="exports"
-            @set-time="setTime"
-            @anonymous="anonymous"
-            @statistics="statistics"
-          />
+            class="exam-item"
+          >
+            <div class="exam-content">
+              <div class="title ellipsis">
+                {{ exam.name }}
+              </div>
+              <div class="content-info ellipsis"></div>
+              <div class="content-info ellipsis">
+                <span>开始时间：{{ exam.startTime }}</span>
+              </div>
+              <div class="handler">
+                <span data-title="修改" @click="edit(exam.id)">
+                  <i class="common common-edit" />
+                </span>
+                <span data-title="删除" @click="del(exam.id)">
+                  <i class="common common-delete" />
+                </span>
+                <span data-title="时间变更" @click="timeUpdate(exam.id)">
+                  <i class="common common-time" />
+                </span>
+                <span data-title="邮件通知" @click="email(exam.id)">
+                  <i class="el-icon-message" />
+                </span>
+                <span data-title="试题统计" @click="statistics(exam.id)">
+                  <i class="common common-statistics" />
+                </span>
+                <!-- <span class="last-span">
+                  <i class="common common-more-row" />
+                  <div class="handler-more">
+                    <div class="more-item" @click="exports(exam.id)">
+                      <i class="common common-statistics" />导出
+                    </div>
+                  </div>
+                </span> -->
+              </div>
+            </div>
+          </div>
         </div>
         <!-- 分页 -->
         <el-pagination
@@ -112,102 +134,64 @@ export default {
       this.query()
     },
 
-    // 添加
+    // 考试添加
     add() {
       this.$tools.switchTab('ExamNav', {
+        id: 0,
       })
     },
-    // 编辑分类
-    edit({ id }) {
-      this.$tools.switchTab('ExamListSetting', {
+    // 考试修改
+    edit(id) {
+      this.$tools.switchTab('ExamNav', {
         id,
-        examTypeId: this.$route.params.id,
-        tab: '1'
       })
     },
-    // 考试发布
-    publish({ id }) {
+    // 考试删除
+    del(id) {
       this.$tools.switchTab('ExamListSetting', {
         id,
-        examTypeId: this.$route.params.id,
         tab: '2'
       })
     },
-    // 删除分类
-    del({ id }) {
+    // 邮件通知
+    email(id) {
       this.$tools.switchTab('ExamListSetting', {
         id,
-        examTypeId: this.$route.params.id,
         tab: '3'
       })
     },
-    // 匿名阅卷
-    anonymous({ id }) {
+    // 试卷导出
+    exports(id) {
       this.$tools.switchTab('ExamListSetting', {
         id,
-        examTypeId: this.$route.params.id,
         tab: '4'
       })
     },
-    // 排名公开
-    ranking({ id }) {
+    // 时间变更
+    timeUpdate(id) {
       this.$tools.switchTab('ExamListSetting', {
         id,
-        examTypeId: this.$route.params.id,
-        tab: '5'
+        tab: '1'
       })
     },
-    // 成绩公开
-    score({ id }) {
-      this.$tools.switchTab('ExamListSetting', {
-        id,
-        examTypeId: this.$route.params.id,
-        tab: '6'
-      })
-    },
-    // 邮箱通知
-    message({ id }) {
-      this.$tools.switchTab('ExamListSetting', {
-        id,
-        examTypeId: this.$route.params.id,
-        tab: '7'
-      })
-    },
-    // 试卷导出
-    exports({ id }) {
-      this.$tools.switchTab('ExamListSetting', {
-        id,
-        examTypeId: this.$route.params.id,
-        tab: '8'
-      })
-    },
-    // 变更时间
-    setTime({ id }) {
-      this.$tools.switchTab('ExamListSetting', {
-        id,
-        examTypeId: this.$route.params.id,
-        tab: '9'
-      })
-    },
-    // 考试用户
-    read({ id }) {
-      this.$tools.switchTab('ExamListMarkSetting', {
-        id,
-        examTypeId: this.$route.params.id
-      })
-    },
-    // 在线用户
-    onLine({ id }) {
-      this.$tools.switchTab('ExamListLine', {
-        id,
-        examTypeId: this.$route.params.id
-      })
-    },
+    // // 考试用户
+    // read({ id }) {
+    //   this.$tools.switchTab('ExamListMarkSetting', {
+    //     id,
+    //     examTypeId: this.$route.params.id
+    //   })
+    // },
+    // // 在线用户
+    // onLine({ id }) {
+    //   this.$tools.switchTab('ExamListLine', {
+    //     id,
+    //     examTypeId: this.$route.params.id
+    //   })
+    // },
     // 统计
-    statistics({ id }) {
+    statistics(id) {
       this.$tools.switchTab('ExamListStatistics', {
         id,
-        examTypeId: this.$route.params.id
       })
     },
     // 切换分页

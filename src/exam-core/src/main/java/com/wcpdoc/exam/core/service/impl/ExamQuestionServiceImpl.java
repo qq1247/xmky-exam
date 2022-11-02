@@ -29,32 +29,7 @@ public class ExamQuestionServiceImpl extends BaseServiceImp<ExamQuestion> implem
 	}
 
 	@Override
-	public List<ExamQuestion> getChapterList(Integer examId) {
-		return examQuestionDao.getChapterList(examId);
-	}
-
-	@Override
-	public List<ExamQuestion> getChapterDetailList(Integer examId, Integer no) {
-		return examQuestionDao.getChapterDetailList(examId, no);
-	}
-
-	@Override
-	public ExamQuestion getEntity(Integer examId, Integer questionId) {
-		return examQuestionDao.getEntity(examId, questionId);
-	}
-
-	@Override
-	public List<ExamQuestion> getList(Integer examId, Integer userId) {
-		return examQuestionDao.getList(examId, userId);
-	}
-
-	@Override
-	public ExamQuestion getEntity(Integer id, Integer userId, Integer questionId) {
-		return examQuestionDao.getEntity(id, userId, questionId);
-	}
-
-	@Override
-	public List<ExamQuestion> getList(Integer questionId) {
-		return examQuestionDao.getList(questionId);
+	public List<ExamQuestion> getList(Integer examId) {
+		return examQuestionDao.getList(examId);
 	}
 }

@@ -31,9 +31,11 @@ import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Exam;
+import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.service.ExamQuestionService;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
@@ -71,6 +73,8 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 	private UserService userService;
 	@Resource
 	private OrgService orgService;
+	@Resource
+	private ExamQuestionService examQuestionService;
 	
 	@Override
 	public void setDao(BaseDao<Object> dao) {}
@@ -316,127 +320,128 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 	}	
 	
 	@Override
-	public Map<String, Object> examStatis(Integer examId) {return null;
-//		//校验数据有效性
-//		if (!ValidateUtil.isValid(examId)) {
-//			throw new MyException("参数错误：examId");
-//		}
-//		Exam exam = examService.getEntity(examId);
-//		
-////		ExamType
-//		
-//		if (exam.getEndTime().getTime() >= System.currentTimeMillis()) {
-//			throw new MyException("考试时间未结束");
-//		}
-//		if (exam.getMarkEndTime() != null && exam.getMarkEndTime().getTime() >= System.currentTimeMillis()) {
-//			throw new MyException("阅卷时间未结束");
-//		}
-//		
-//		// 获取考试、试卷、人员成绩信息
-//		List<MyExam> myExamList = myExamService.getList(examId);
-//		List<Question> questionList = exam.getGenType() == 1 
-//				? examService.getQuestionList(exam.getId())
-//				: new ArrayList<>();
-//		
-//		// 统计考试基础信息
-//		Map<String, Object> result = new HashMap<String, Object>();
-//		Map<String, Object> examResult = new HashMap<String, Object>();
-//		examResult.put("name", exam.getName());// 考试名称
-//		examResult.put("startTime", DateUtil.formatDateTime(exam.getStartTime()));// 考试开始时间
-//		examResult.put("endTime", DateUtil.formatDateTime(exam.getEndTime()));// 考试结束时间
-//		examResult.put("markStartTime", exam.getMarkStartTime() == null ? null : DateUtil.formatDateTime(exam.getMarkStartTime()));// 阅卷开始时间
-//		examResult.put("markEndTime", exam.getMarkEndTime() == null ? null : DateUtil.formatDateTime(exam.getMarkEndTime()));// 阅卷结束时间
-//		examResult.put("userNum", myExamList.size());// 考试人数
-//		examResult.put("missUserNum", 0);// 未考试人数
-//		examResult.put("succUserNum", 0);// 及格人数
-//		for (MyExam myExam : myExamList) {
-//			if (myExam.getState() == 1) {
-//				examResult.put("missUserNum", (Integer)examResult.get("missUserNum") + 1);
-//			}
-//			if (myExam.getAnswerState() == 1) {
-//				examResult.put("succUserNum", (Integer)examResult.get("succUserNum") + 1);
-//			}
-//		}
-//		result.put("exam", examResult);// 考试基础信息
-//		
-//		// 统计考试合计信息
-//		Map<String, Object> scoreResult = new HashMap<String, Object>();
-//		scoreResult.put("total", exam.getTotalScore());// 考试总分 
-//		scoreResult.put("avg", 0.0);// 平均分
-//		scoreResult.put("min", exam.getTotalScore().doubleValue());// 默认最低分是0.0  最低分就会一直是0.0 
-//		scoreResult.put("max", 0.0);// 最高分
-//		
-//		for (MyExam myExam : myExamList) {
-//			if (myExam.getState() == 1) {// 排除掉未考试的
-//				continue;
-//			}
-//			
-//			scoreResult.put("min", Math.min(myExam.getTotalScore().doubleValue(), (double)scoreResult.get("min")));
-//			scoreResult.put("max", Math.max(myExam.getTotalScore().doubleValue(), (double)scoreResult.get("max")));
-//			scoreResult.put("avg", BigDecimalUtil.newInstance(scoreResult.get("avg")).add(  myExam.getTotalScore()).getResult().doubleValue());
-//		}
-//		
-//		if (exam.getTotalScore().compareTo(new BigDecimal(scoreResult.get("min").toString())) == 0) { //最小值和总分一样 默认赋值0.0
-//			scoreResult.put("min",0.0);
-//		}
-//		
-//		if (myExamList.size() != 0) {// 被除数不能为0
-//			scoreResult.put("avg", BigDecimalUtil.newInstance(scoreResult.get("avg")).div(myExamList.size(), 2).getResult().doubleValue());
-//		}
-//		result.put("score", scoreResult);
-//		
-//		// 统计试题类型占比
-//		List<Dict> dictList = dictService.getList("QUESTION_TYPE");
-//		List<Map<String, Object>> typeResultList = new ArrayList<Map<String, Object>>();
-//		Map<String, Map<String, Object>> typeCache = new HashMap<>();
-//		for (Dict dict : dictList) {
-//			Map<String, Object> map = new HashMap<>();
-//			map.put("key", dict.getDictKey());// 试题类型关键词
-//			map.put("name", dict.getDictValue());// 试题类型名称
-//			map.put("value", 0);// 试题类型总数
-//			
-//			typeCache.put(dict.getDictKey(), map);
-//			typeResultList.add(map);
-//		}
-//		
-//		for (Question question : questionList) {
-//			Map<String, Object> map = typeCache.get(question.getType().toString());
-//			map.put("value", (int)map.get("value") + 1);// 按分类累加
-//		}
-//		
-//		for (Map<String, Object> typeResult : typeResultList) {
-//			typeResult.remove("key");// 接口没有这个字段，移除掉
-//		}
-//		result.put("typeList", typeResultList);
-//		
-//		// 统计分数段占比
-//		double scoreGrade = BigDecimalUtil.newInstance(exam.getTotalScore()).div(10, 2).getResult().doubleValue();// 分数保留两位小数
-//		List<Map<String, Object>> scoreGradeResultList = new ArrayList<Map<String, Object>>();
-//		for (int i = 0; i < 10; i++) {
-//			Map<String, Object> map = new HashMap<>();
-//			map.put("startScore", BigDecimalUtil.newInstance(scoreGrade).mul(i).getResult().doubleValue());// 分数段最小值
-//			map.put("endScore", BigDecimalUtil.newInstance(scoreGrade).mul(i + 1).getResult().doubleValue());// 分数段最大值
-//			map.put("name", map.get("endScore"));// 初始化名称   去掉 开始值     map.put("name", String.format("%s-%s", map.get("startScore"), map.get("endScore")));
-//			map.put("value", 0);// 初始化值为0
-//			
-//			scoreGradeResultList.add(map);
-//		}
-//		for (MyExam myExam : myExamList) {
-//			for (Map<String, Object> map : scoreGradeResultList) {
-//				double startScore = (double) map.get("startScore");
-//				double endScore = (double) map.get("endScore");
-//				if (myExam.getTotalScore().doubleValue() >= startScore && myExam.getTotalScore().doubleValue() < endScore) {// 不包括最大边界值，如60不属于50分数段
-//					map.put("value", (int)map.get("value") + 1);
-//				}
-//			}
-//		}
-//		for (Map<String, Object> map : scoreGradeResultList) {
-//			map.remove("startScore");// 移除非接口字段
-//			map.remove("endScore");// 移除非接口字段
-//		}
-//		
-//		result.put("scoreGradeList", scoreGradeResultList);
-//		return result;
+	public Map<String, Object> examStatis(Integer examId) {
+		//校验数据有效性
+		if (!ValidateUtil.isValid(examId)) {
+			throw new MyException("参数错误：examId");
+		}
+		Exam exam = examService.getEntity(examId);
+		if (ValidateUtil.isValid(exam.getEndTime()) && exam.getEndTime().getTime() >= System.currentTimeMillis()) {
+			throw new MyException("考试未结束");
+		}
+		if (ValidateUtil.isValid(exam.getMarkEndTime()) && exam.getMarkEndTime().getTime() >= System.currentTimeMillis()) {
+			throw new MyException("阅卷未结束");
+		}
+		
+		// 获取考试、试卷、人员成绩信息
+		List<MyExam> myExamList = myExamService.getList(examId);
+		List<Question> questionList = new ArrayList<>();
+		List<ExamQuestion> examQuestionList = examQuestionService.getList(examId);
+		if (exam.getGenType() == 1) {
+			for (ExamQuestion examQuestion : examQuestionList) {
+				questionList.add(questionService.getEntity(examQuestion.getQuestionId()));
+			}
+		}
+		
+		// 统计考试基础信息
+		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> examResult = new HashMap<String, Object>();
+		examResult.put("name", exam.getName());// 考试名称
+		examResult.put("startTime", DateUtil.formatDateTime(exam.getStartTime()));// 考试开始时间
+		examResult.put("endTime", DateUtil.formatDateTime(exam.getEndTime()));// 考试结束时间
+		examResult.put("markStartTime", exam.getMarkStartTime() == null ? null : DateUtil.formatDateTime(exam.getMarkStartTime()));// 阅卷开始时间
+		examResult.put("markEndTime", exam.getMarkEndTime() == null ? null : DateUtil.formatDateTime(exam.getMarkEndTime()));// 阅卷结束时间
+		examResult.put("userNum", myExamList.size());// 考试人数
+		examResult.put("missUserNum", 0);// 未考试人数
+		examResult.put("succUserNum", 0);// 及格人数
+		for (MyExam myExam : myExamList) {
+			if (myExam.getState() == 1) {
+				examResult.put("missUserNum", (Integer)examResult.get("missUserNum") + 1);
+			}
+			if (myExam.getAnswerState() == 1) {
+				examResult.put("succUserNum", (Integer)examResult.get("succUserNum") + 1);
+			}
+		}
+		result.put("exam", examResult);// 考试基础信息
+		
+		// 统计考试合计信息
+		Map<String, Object> scoreResult = new HashMap<String, Object>();
+		scoreResult.put("total", exam.getTotalScore());// 考试总分 
+		scoreResult.put("avg", 0.0);// 平均分
+		scoreResult.put("min", exam.getTotalScore().doubleValue());// 默认最低分是0.0  最低分就会一直是0.0 
+		scoreResult.put("max", 0.0);// 最高分
+		
+		for (MyExam myExam : myExamList) {
+			if (myExam.getState() == 1) {// 排除掉未考试的
+				continue;
+			}
+			
+			scoreResult.put("min", Math.min(myExam.getTotalScore().doubleValue(), (double)scoreResult.get("min")));
+			scoreResult.put("max", Math.max(myExam.getTotalScore().doubleValue(), (double)scoreResult.get("max")));
+			scoreResult.put("avg", BigDecimalUtil.newInstance(scoreResult.get("avg")).add(  myExam.getTotalScore()).getResult().doubleValue());
+		}
+		
+		if (exam.getTotalScore().compareTo(new BigDecimal(scoreResult.get("min").toString())) == 0) { //最小值和总分一样 默认赋值0.0
+			scoreResult.put("min",0.0);
+		}
+		
+		if (myExamList.size() != 0) {// 被除数不能为0
+			scoreResult.put("avg", BigDecimalUtil.newInstance(scoreResult.get("avg")).div(myExamList.size(), 2).getResult().doubleValue());
+		}
+		result.put("score", scoreResult);
+		
+		// 统计试题类型占比
+		List<Dict> dictList = dictService.getList("QUESTION_TYPE");
+		List<Map<String, Object>> typeResultList = new ArrayList<Map<String, Object>>();
+		Map<String, Map<String, Object>> typeCache = new HashMap<>();
+		for (Dict dict : dictList) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("key", dict.getDictKey());// 试题类型关键词
+			map.put("name", dict.getDictValue());// 试题类型名称
+			map.put("value", 0);// 试题类型总数
+			
+			typeCache.put(dict.getDictKey(), map);
+			typeResultList.add(map);
+		}
+		
+		for (Question question : questionList) {
+			Map<String, Object> map = typeCache.get(question.getType().toString());
+			map.put("value", (int)map.get("value") + 1);// 按分类累加
+		}
+		
+		for (Map<String, Object> typeResult : typeResultList) {
+			typeResult.remove("key");// 接口没有这个字段，移除掉
+		}
+		result.put("typeList", typeResultList);
+		
+		// 统计分数段占比
+		double scoreGrade = BigDecimalUtil.newInstance(exam.getTotalScore()).div(10, 2).getResult().doubleValue();// 分数保留两位小数
+		List<Map<String, Object>> scoreGradeResultList = new ArrayList<Map<String, Object>>();
+		for (int i = 0; i < 10; i++) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("startScore", BigDecimalUtil.newInstance(scoreGrade).mul(i).getResult().doubleValue());// 分数段最小值
+			map.put("endScore", BigDecimalUtil.newInstance(scoreGrade).mul(i + 1).getResult().doubleValue());// 分数段最大值
+			map.put("name", map.get("endScore"));// 初始化名称   去掉 开始值     map.put("name", String.format("%s-%s", map.get("startScore"), map.get("endScore")));
+			map.put("value", 0);// 初始化值为0
+			
+			scoreGradeResultList.add(map);
+		}
+		for (MyExam myExam : myExamList) {
+			for (Map<String, Object> map : scoreGradeResultList) {
+				double startScore = (double) map.get("startScore");
+				double endScore = (double) map.get("endScore");
+				if (myExam.getTotalScore().doubleValue() >= startScore && myExam.getTotalScore().doubleValue() < endScore) {// 不包括最大边界值，如60不属于50分数段
+					map.put("value", (int)map.get("value") + 1);
+				}
+			}
+		}
+		for (Map<String, Object> map : scoreGradeResultList) {
+			map.remove("startScore");// 移除非接口字段
+			map.remove("endScore");// 移除非接口字段
+		}
+		
+		result.put("scoreGradeList", scoreGradeResultList);
+		return result;
 	}
 	
 

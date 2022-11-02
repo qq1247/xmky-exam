@@ -14,23 +14,15 @@ export const examListpage = (params) => request('exam/listpage', params)
  * @param {*}
  * @return {*}
  */
+export const examDetail = (params) => request('exam/detail', params)
+
+/**
+ * @name: examGet
+ * @description: 查询考试信息
+ * @param {*}
+ * @return {*}
+ */
 export const examGet = (params) => request('exam/get', params)
-
-/**
- * @name: examAdd
- * @description: 添加考试信息
- * @param {*}
- * @return {*}
- */
-export const examAdd = (params) => request('exam/add', params)
-
-/**
- * @name: examEdit
- * @description: 编辑考试信息
- * @param {*}
- * @return {*}
- */
-export const examEdit = (params) => request('exam/update', params)
 
 /**
  * @name: examDel
@@ -178,7 +170,7 @@ export const examEmail = (params) => request('exam/mail', params)
 
 /**
  * @name: examTime
- * @description: 变更时间
+ * @description: 时间变更
  * @param {*}
  * @return {*}
  */

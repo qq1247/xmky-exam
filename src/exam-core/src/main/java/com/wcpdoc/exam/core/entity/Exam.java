@@ -30,6 +30,8 @@ public class Exam {
 	private Integer id;
 	@Column(name = "NAME")
 	private String name;
+	@Column(name = "PAPER_NAME")
+	private String paperName;
 	@Column(name = "TIME_TYPE")
 	private Integer timeType;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -277,5 +279,13 @@ public class Exam {
 		}
 		
 		this.sxes = StringUtil.join(sxes);
+	}
+
+	public String getPaperName() {
+		return paperName;
+	}
+
+	public void setPaperName(String paperName) {
+		this.paperName = paperName;
 	}
 }

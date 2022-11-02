@@ -313,11 +313,7 @@ export default {
       this.routerIndex = index
     },
     isShowAnalysis(e) {
-      console.log(e)
       const { index, indexQuestion } = e
-      console.log(
-        this.paperQuestion[index].questionList[indexQuestion].showAnalysis
-      )
       const showAnalysis =
         this.paperQuestion[index].questionList[indexQuestion].showAnalysis
       this.$set(

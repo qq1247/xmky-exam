@@ -24,11 +24,8 @@ public class ExamRuleDaoImpl extends RBaseDaoImpl<ExamRule> implements ExamRuleD
 	}
 	
 	@Override
-	public List<ExamRule> getList(Integer chapterId) {
-		String sql = "SELECT * "
-				+ "FROM EXM_EXAM_RULE "
-				+ "WHERE EXAM_QUESTION_ID = :EXAM_QUESTION_ID "
-				+ "ORDER BY NO ASC ";
-		return getList(sql, new Object[]{ chapterId });
+	public List<ExamRule> getList(Integer examId) {
+		String sql = "SELECT * FROM EXM_EXAM_RULE WHERE EXAM_ID = :EXAM_ID ORDER BY NO ASC ";
+		return getList(sql, new Object[] { examId });
 	}
 }

@@ -117,14 +117,13 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 	public PageOut questionListpage(PageIn pageIn) {
 		String sql = "SELECT QUESTION.ID AS QUESTION_ID, QUESTION.TITLE AS QUESTION_TITLE, "
 				+ "	MY_QUESTION.USER_NUM, MY_QUESTION.SUCC_USER_NUM "
-				+ "FROM (SELECT MAX(QUESTION_ID) AS QUESTION_ID, COUNT(USER_ID) AS USER_NUM, SUM( SCORE = QUESTION_SCORE ) AS SUCC_USER_NUM "
+				+ "FROM (SELECT QUESTION_ID, COUNT(USER_ID) AS USER_NUM, SUM( SCORE = USER_SCORE ) AS SUCC_USER_NUM "
 				+ "			FROM EXM_MY_QUESTION "
 				+ "			WHERE EXAM_ID = :EXAM_ID"
 				+ "			GROUP BY QUESTION_ID) MY_QUESTION "
 				+ "INNER JOIN EXM_QUESTION QUESTION ON MY_QUESTION.QUESTION_ID = QUESTION.ID  ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil//.addWhere(ValidateUtil.isValid(pageIn.get("examId")), "", pageIn.get("examId"))
-				.addFromParm(pageIn.get("examId"))
+		sqlUtil.addFromParm(pageIn.get("examId"))
 				.addOrder("MY_QUESTION.SUCC_USER_NUM", Order.DESC);
 		return getListpage(sqlUtil, pageIn);
 	}

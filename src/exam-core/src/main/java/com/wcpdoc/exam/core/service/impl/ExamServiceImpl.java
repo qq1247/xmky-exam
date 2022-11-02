@@ -368,6 +368,32 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 	
 	private void publishExam(ExamInfo examInfo) {
+		if (examInfo.getExam().getId() != null) {
+			Exam exam = getEntity(examInfo.getExam().getId());
+			exam.setName(examInfo.getExam().getName());
+			exam.setPaperName(examInfo.getExam().getPaperName());
+			exam.setTimeType(examInfo.getExam().getTimeType());
+			exam.setStartTime(examInfo.getExam().getStartTime());
+			exam.setEndTime(examInfo.getExam().getEndTime());
+			exam.setMarkStartTime(examInfo.getExam().getMarkStartTime());
+			exam.setMarkEndTime(examInfo.getExam().getMarkEndTime());
+			exam.setMarkType(examInfo.getExam().getMarkType());
+			exam.setScoreState(examInfo.getExam().getScoreState());
+			exam.setRankState(examInfo.getExam().getRankState());
+			exam.setAnonState(examInfo.getExam().getAnonState());
+			exam.setPassScore(examInfo.getExam().getPassScore());
+			exam.setTotalScore(examInfo.getExam().getTotalScore());
+			exam.setMarkType(examInfo.getExam().getMarkType());
+			exam.setShowType(examInfo.getExam().getShowType());
+			exam.setGenType(examInfo.getExam().getGenType());
+			exam.setSxes(examInfo.getExam().getSxes());
+			exam.setState(examInfo.getExam().getState());
+			exam.setUpdateUserId(getCurUser().getId());
+			exam.setUpdateTime(new Date());
+			update(exam);
+			return;
+		}
+		
 		Exam exam = examInfo.getExam();
 		exam.setMarkState(1);// 标记为未阅卷（考试时间结束，定时任务自动阅卷，标记为已阅）
 		exam.setUpdateUserId(getCurUser().getId());
@@ -376,6 +402,18 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 	
 	private void publishPaper(ExamInfo examInfo, Map<Integer, List<Question>> questionListCache) {
+		// 如果是修改，先删除之前的数据
+		{
+			List<ExamQuestion> examQuestionList = examQuestionService.getList(examInfo.getExam().getId());// 如果是修改，删除之前的配置
+			for (ExamQuestion examQuestion : examQuestionList) {
+				examQuestionService.del(examQuestion.getId());
+			}
+			List<ExamRule> examRuleList = examRuleService.getList(examInfo.getExam().getId());
+			for (ExamRule examRule : examRuleList) {
+				examRuleService.del(examRule.getId());
+			}
+		}
+		
 		// 如果是人工试卷，保存试卷模板
 		if (examInfo.getExam().getGenType() == 1) {
 			QuestionType questionType = null;// 如果有从页面导入的新题，保存到一个题库中，名称保持和考试名称一致
@@ -428,6 +466,16 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 	
 	private void publishUser(ExamInfo examInfo, Map<Integer, List<Question>> questionListCache) {
+		List<MyExam> myExamList = myExamService.getList(examInfo.getExam().getId());
+		for (MyExam myExam : myExamList) {
+			List<MyQuestion> myQuestionList = myQuestionService.getList(myExam.getExamId(), myExam.getUserId());
+			for (MyQuestion myQuestion : myQuestionList) {
+				myQuestionService.del(myQuestion.getId());
+			}
+			
+			myExamService.del(myExam.getId());
+		}
+		
 		// 获取用户列表
 		Map<Integer, List<QuestionOption>> questionOptionCache = new HashMap<>();
 		Map<Integer, List<QuestionAnswer>> questionAnswerCache = new HashMap<>();
@@ -540,14 +588,14 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 
 	private void publishValid(ExamInfo examInfo, Map<Integer, List<Question>> questionListCache) {
 		// 校验考试信息
-		addValidExam(examInfo);
+		publishValidExam(examInfo);
 		// 校验试卷信息
-		addValidPaper(examInfo, questionListCache);
+		publishValidPaper(examInfo, questionListCache);
 		// 校验考试用户信息
-		addValidExamUser(examInfo);
+		publishValidUser(examInfo);
 	}
 
-	private void addValidExamUser(ExamInfo examInfo) {
+	private void publishValidUser(ExamInfo examInfo) {
 		Set<Integer> examUserIdCache = new HashSet<>();
 		Set<Integer> markUserIdCache = new HashSet<>();
 		if (!ValidateUtil.isValid(examInfo.getExamUsers())) {
@@ -584,7 +632,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		}
 	}
 
-	private void addValidPaper(ExamInfo examInfo, Map<Integer, List<Question>> questionListCache) {
+	private void publishValidPaper(ExamInfo examInfo, Map<Integer, List<Question>> questionListCache) {
 		if (examInfo.getExam().getGenType() == 1) {
 			if (!ValidateUtil.isValid(examInfo.getExamQuestions())) {
 				throw new MyException("参数错误：examQuestion");
@@ -804,10 +852,22 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			}
 		}
 	}
-
 	
-	private void addValidExam(ExamInfo examInfo) {
+	private void publishValidExam(ExamInfo examInfo) {
 		Exam exam = examInfo.getExam();
+		if (ValidateUtil.isValid(exam.getId())) {
+			Exam entity = getEntity(exam.getId());
+			if (entity.getTimeType() == 1 && entity.getStartTime().getTime() <= System.currentTimeMillis()) {
+				throw new MyException("考试已开始");
+			}
+//			if (entity.getTimeType() == 1 && entity.getEndTime().getTime() <= System.currentTimeMillis()) {
+//				throw new MyException("考试已结束");
+//			}
+//			if (entity.getMarkType() == 3) {
+//				throw new MyException("已阅卷");
+//			}
+		}
+		
 		if (!ValidateUtil.isValid(exam.getName())) {
 			throw new MyException("参数错误：exam.name");
 		}

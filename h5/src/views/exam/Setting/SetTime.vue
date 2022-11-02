@@ -99,7 +99,7 @@ export default {
     this.id = this.$route.params.id
   },
   methods: {
-    // 变更时间
+    // 时间变更
     async setTime() {
       this.$refs['examForm'].validate(async(valid) => {
         if (!valid) {

@@ -111,11 +111,11 @@
               <div class="more-item" @click="message(data)">
                 <i class="common common-email" />邮件通知
               </div>
-              <div class="more-item" @click="exports(data)">
+              <!-- <div class="more-item" @click="exports(data)">
                 <i class="common common-template-down" />试卷导出
-              </div>
+              </div> -->
               <div class="more-item" @click="setTime(data)">
-                <i class="common common-time" />变更时间
+                <i class="common common-time" />时间变更
               </div>
             </div>
           </span>
@@ -244,7 +244,7 @@ export default {
     exports(data) {
       this.$emit('exports', data)
     },
-    // 变更时间
+    // 时间变更
     setTime(data) {
       this.$emit('set-time', data)
     }

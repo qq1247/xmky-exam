@@ -1,6 +1,7 @@
 const state = {
   examInfo: {
     exam: {
+      id: null,// 考试ID
       name: '',// 考试名称
       paperName: '点击这里输入试卷名称',// 试卷名称
       timeType: 1,// 试卷类型
@@ -117,6 +118,10 @@ const mutations = {
   genTypeUpdate: (state, value) => {
     state.examInfo.exam.genType = value
   }, 
+  // 考试ID修改
+ idUpdate: (state, id) => {
+    state.examInfo.exam.id = id
+  },
   // 试卷名称修改
   paperNameUpdate: (state, paperName) => {
     state.examInfo.exam.paperName = paperName
@@ -244,6 +249,10 @@ const mutations = {
   rankStateUpdate(state, rankState) {
     state.examInfo.exam.rankState = rankState
   },
+  // 状态修改
+  stateUpdate(state, _state) {
+    state.examInfo.exam.state = _state
+  },
   // 用户组添加
   userGroupAdd(state) {
     state.examInfo.examUsers.push({ examUserIds: [], markUserId: null })
@@ -298,7 +307,7 @@ const mutations = {
   examRuleScoreUpdate(state, {index, value}) {
     state.examInfo.examRules[index].score = value
   },
-  // 规则分数修改
+  // 规则子分数修改
   examRuleScoresUpdate(state, {index, value}) {
     state.examInfo.examRules[index].scores = value
   },
@@ -319,6 +328,29 @@ const mutations = {
       }
       return examQuestion
     });
+  },
+  // 初始化数据
+  init(state) {
+    state.examInfo = {
+      exam: {
+        name: '',// 考试名称
+        paperName: '点击这里输入试卷名称',// 试卷名称
+        timeType: 1,// 试卷类型
+        examTimes: [],// 考试时间
+        markTimes: [],// 阅卷时间
+        passScore: 0, // 及格%
+        sxes: [], // 防作弊
+        showType: 1, // 展示方式
+        anonState: 2, // 匿名阅卷（1：是；2：否）
+        scoreState: 2, // 成绩公开（1：是；2：否）
+        rankState: 2, // 排名公开（1：是；2：否）
+        genType: 1, // 组卷方式（1：人工组卷；2：随机组卷）
+        state: 1 // 状态（1：发布；2：暂停；）
+      },
+      examQuestions: [],// 试卷信息
+      examRules: [],// 试卷规则
+      examUsers: [],// 用户信息
+    }
   },
 }
 

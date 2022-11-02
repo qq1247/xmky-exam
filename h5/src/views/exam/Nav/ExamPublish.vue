@@ -7,6 +7,10 @@
       <div class="right-cross-line"></div>
     </div>
 
+    <div v-if="examInfo.exam.id" class="quick-info">
+      <div class="info-name" style="color:red;font-weight: 600;">修改会重新初始化用户试卷，慎用</div>
+      <div class="info-content" ></div>
+    </div>
     <div class="quick-info">
       <div class="info-name">考试名称：</div>
       <div class="info-content">{{examInfo.exam.name}}</div>
@@ -124,7 +128,10 @@ export default {
       const res = await examPublish(JSON.stringify(examInfo))
       if (res?.code === 200) {
         this.$message.success('发布成功！')
-        this.$router.push('/')
+        this.$tools.switchTab('ExamIndex', {
+          questionTypeId: 0,
+          tab: '1',
+        })
       } else {
         this.$message.error(res.msg)
       }

@@ -19,15 +19,14 @@ import com.wcpdoc.core.util.BigDecimalUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.MyMarkDao;
 import com.wcpdoc.exam.core.entity.Exam;
-import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.MyExam;
-import com.wcpdoc.exam.core.entity.MyQuestion;
 import com.wcpdoc.exam.core.entity.MyMark;
+import com.wcpdoc.exam.core.entity.MyQuestion;
 import com.wcpdoc.exam.core.service.ExamQuestionService;
 import com.wcpdoc.exam.core.service.ExamService;
-import com.wcpdoc.exam.core.service.MyQuestionService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
+import com.wcpdoc.exam.core.service.MyQuestionService;
 
 /**
  * 我的阅卷服务层实现
@@ -120,15 +119,15 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 			throw new MyException("未参与阅卷");
 		}
 
-		ExamQuestion examQuestion;
-		if (exam.getGenType() == 1) {
-			examQuestion = examQuestionService.getEntity(exam.getId(), questionId);
-		} else {
-			examQuestion = examQuestionService.getEntity(exam.getId(), userId, questionId);
-		}
-		if (BigDecimalUtil.newInstance(score).sub(examQuestion.getScore()).getResult().doubleValue() > 0) {
-			throw new MyException("最大分值：" + examQuestion.getScore());
-		}
+//		ExamQuestion examQuestion;
+//		if (exam.getGenType() == 1) {
+//			examQuestion = examQuestionService.getEntity(exam.getId(), questionId);
+//		} else {
+//			examQuestion = examQuestionService.getEntity(exam.getId(), userId, questionId);
+//		}
+//		if (BigDecimalUtil.newInstance(score).sub(examQuestion.getScore()).getResult().doubleValue() > 0) {
+//			throw new MyException("最大分值：" + examQuestion.getScore());
+//		}
 
 		// 更新阅卷分数
 		myQuestion.setScore(score);

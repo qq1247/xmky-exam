@@ -1,10 +1,13 @@
 package com.wcpdoc.exam.api.controller;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.Resource;
 
@@ -29,11 +32,23 @@ import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
 import com.wcpdoc.exam.core.entity.Exam;
+import com.wcpdoc.exam.core.entity.ExamQuestion;
+import com.wcpdoc.exam.core.entity.ExamRule;
+import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyMark;
+import com.wcpdoc.exam.core.entity.Question;
+import com.wcpdoc.exam.core.entity.QuestionAnswer;
+import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.entity.ex.ExamInfo;
+import com.wcpdoc.exam.core.service.ExamQuestionService;
+import com.wcpdoc.exam.core.service.ExamRuleService;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
+import com.wcpdoc.exam.core.service.QuestionAnswerService;
+import com.wcpdoc.exam.core.service.QuestionOptionService;
+import com.wcpdoc.exam.core.service.QuestionService;
+import com.wcpdoc.exam.core.util.QuestionUtil;
 
 /**
  * 考试控制层
@@ -55,6 +70,16 @@ public class ApiExamController extends BaseController {
 	private OnlineUserService onlineUserService;
 	@Resource
 	private MyExamService myExamService;
+	@Resource
+	private ExamQuestionService examQuestionService;
+	@Resource
+	private QuestionService questionService;
+	@Resource
+	private QuestionOptionService questionOptionService;
+	@Resource
+	private QuestionAnswerService questionAnswerService;
+	@Resource
+	private ExamRuleService examRuleService;
 
 	/**
 	 * 考试列表
@@ -97,6 +122,133 @@ public class ApiExamController extends BaseController {
 			log.error("完成添加考试错误：", e);
 			return PageResult.err();
 		}
+	}
+	
+	/**
+	 * 获取考试信息
+	 * 
+	 * v1.0 zhanghc 2022年10月25日下午3:30:55
+	 * @param id
+	 * @return PageResult
+	 */
+	@RequestMapping("/detail")
+	@ResponseBody
+	public PageResult detail(Integer id) {
+		Exam _exam = examService.getEntity(id);
+		Map<String, Object> exam = new HashMap<>();
+		exam.put("id", _exam.getId());
+		exam.put("name", _exam.getName());
+		exam.put("paperName", _exam.getPaperName());
+		exam.put("timeType", _exam.getTimeType());
+		exam.put("markType", _exam.getMarkType());
+		exam.put("startTime", DateUtil.formatDateTime(_exam.getStartTime()));
+		exam.put("endTime", DateUtil.formatDateTime(_exam.getEndTime()));
+		exam.put("markStartTime", DateUtil.formatDateTime(_exam.getMarkStartTime()));
+		exam.put("markEndTime", DateUtil.formatDateTime(_exam.getMarkEndTime()));
+		exam.put("passScore", _exam.getPassScore());
+		exam.put("sxes", _exam.getSxes());
+		exam.put("showType", _exam.getShowType());
+		exam.put("anonState", _exam.getAnonState());
+		exam.put("scoreState", _exam.getScoreState());
+		exam.put("rankState", _exam.getRankState());
+		exam.put("genType", _exam.getGenType());
+		exam.put("state", _exam.getState());
+		
+		List<Map<String, Object>> examQuestions = new ArrayList<>();
+		List<Map<String, Object>> examRules = new ArrayList<>();
+		if (_exam.getGenType() == 1) {// 人工组卷
+			List<ExamQuestion> _examQuestionList = examQuestionService.getList(id);
+			for (ExamQuestion _examQuestion : _examQuestionList) {
+				Map<String, Object> examQuestion = new HashMap<>();
+				examQuestion.put("type", _examQuestion.getType());
+				if (_examQuestion.getType() == 1) {
+					examQuestion.put("chapterName", _examQuestion.getChapterName());
+					examQuestion.put("chapterTxt", _examQuestion.getChapterTxt());
+				} else {
+					Question _question = questionService.getEntity(_examQuestion.getQuestionId());
+					List<String> _options = new ArrayList<>();
+					if (QuestionUtil.hasSingleChoice(_question) || QuestionUtil.hasMultipleChoice(_question)) {// 如果是单选或多选，添加选项字段
+						List<QuestionOption> questionOptionList = questionOptionService.getList(id);
+						for (QuestionOption questionOption : questionOptionList) {
+							_options.add(questionOption.getOptions());
+						}
+					}
+					List<QuestionAnswer> _questionAnswerList = questionAnswerService.getList(_question.getId());
+					List<Object> _answers = new ArrayList<>();
+					List<BigDecimal> _answerScores = new ArrayList<>();
+					for(QuestionAnswer answer : _questionAnswerList){
+						if (QuestionUtil.hasSingleChoice(_question) || QuestionUtil.hasTrueFalse(_question) 
+								|| (QuestionUtil.hasQA(_question) && QuestionUtil.hasObjective(_question))) {
+							_answers.add(answer.getAnswer());
+						} else if (QuestionUtil.hasMultipleChoice(_question)) {
+							Collections.addAll(_answers, answer.getAnswer().split(","));
+							_answerScores.add(answer.getScore());
+						} else if (QuestionUtil.hasFillBlank(_question) || (QuestionUtil.hasQA(_question) 
+								&& QuestionUtil.hasSubjective(_question))) {
+							_answers.add(answer.getAnswer().split("\n"));
+							_answerScores.add(answer.getScore());
+						}
+					}
+					
+					Map<String, Object> question = new HashMap<>();
+					question.put("id", _question.getId());
+					question.put("type", _question.getType());
+					question.put("title", _question.getTitle());
+					question.put("options", _options);
+					question.put("markType", _question.getMarkType());
+					question.put("analysis", _question.getAnalysis());
+					question.put("questionTypeId", _question.getQuestionTypeId());
+					question.put("score", _examQuestion.getScore());
+					question.put("markOptions", _examQuestion.getMarkOptions());
+					question.put("answers", _answers);
+					question.put("answerScores", _examQuestion.getScores());
+					question.put("state", _question.getState());
+					examQuestion.put("question", question);
+				}
+				examQuestions.add(examQuestion);
+			}
+		} else if (_exam.getGenType() == 2) {// 随机组卷
+			List<ExamRule> _examRuleList = examRuleService.getList(id);
+			for (ExamRule _examRule : _examRuleList) {
+				Map<String, Object> examRule = new HashMap<>();
+				examRule.put("type", _examRule.getType());
+				if (_examRule.getType() == 1) {
+					examRule.put("chapterName", _examRule.getChapterName());
+					examRule.put("chapterTxt", _examRule.getChapterTxt());
+				} else {
+					examRule.put("questionTypeId", _examRule.getQuestionTypeId());
+					examRule.put("questionType", _examRule.getQuestionType());
+					examRule.put("markType", _examRule.getMarkType());
+					examRule.put("markOptions", _examRule.getMarkOptions());
+					examRule.put("num", _examRule.getNum());
+					examRule.put("score", _examRule.getScore());
+					examRule.put("scores", _examRule.getQuestionType() == 2 ? _examRule.getScores() : new BigDecimal[0]);// 客观填空等不需要页面处理
+				}
+				examRules.add(examRule);
+			}
+		}
+		
+		List<MyExam> _myExamList = myExamService.getList(id);
+		Map<Integer, List<Integer>> userGroupCache = new HashMap<>();
+		for (MyExam myExam : _myExamList) {
+			if (userGroupCache.get(myExam.getMarkUserId()) == null) {
+				userGroupCache.put(myExam.getMarkUserId(), new ArrayList<>());
+			}
+			userGroupCache.get(myExam.getMarkUserId()).add(myExam.getUserId());
+		}
+		List<Map<String, Object>> examUsers = new ArrayList<>();
+		for (Entry<Integer, List<Integer>> entry : userGroupCache.entrySet()) {
+			Map<String, Object> examUser = new HashMap<>();
+			examUser.put("markUserId", entry.getKey());
+			examUser.put("examUserIds", entry.getValue());
+			examUsers.add(examUser);
+		}
+		
+		return PageResultEx.ok()
+				.addAttr("exam", exam)
+				.addAttr("examQuestions", examQuestions)
+				.addAttr("examRules", examRules)
+				.addAttr("examUsers", examUsers);
 	}
 	
 	/**
@@ -307,117 +459,6 @@ public class ApiExamController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("在线用户错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 考试成绩公开
-	 * 
-	 * v1.0 zhanghc 2022年3月25日上午10:08:41
-	 * @param state 
-	 * @return PageResult
-	 */
-	@RequestMapping("/score")
-	@ResponseBody
-	public PageResult score(Integer id, Integer state) {
-		try {
-			// 校验数据有效性
-			if (!ValidateUtil.isValid(state)) {
-				throw new MyException("参数错误:state");
-			}
-			if (state != 1 && state != 2) {
-				throw new MyException("参数错误:state");
-			}
-			
-			Exam exam = examService.getEntity(id);
-			if (exam == null) {
-				throw new MyException("参数错误:state");
-			}
-			
-			// 更新成绩状态
-			exam.setScoreState(state);
-			examService.update(exam);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("考试成绩公开错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("考试成绩公开错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 考试排名公开
-	 * 
-	 * v1.0 zhanghc 2022年3月25日上午10:08:41
-	 * @param state 
-	 * @return PageResult
-	 */
-	@RequestMapping("/rank")
-	@ResponseBody
-	public PageResult rank(Integer id, Integer state) {
-		try {
-			// 校验数据有效性
-			if (!ValidateUtil.isValid(state)) {
-				throw new MyException("参数错误:state");
-			}
-			if (state != 1 && state != 2) {
-				throw new MyException("参数错误:state");
-			}
-			
-			Exam exam = examService.getEntity(id);
-			if (exam == null) {
-				throw new MyException("参数错误:state");
-			}
-			
-			// 更新排名状态
-			exam.setRankState(state);
-			examService.update(exam);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("考试成绩公开错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("考试成绩公开错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 考试匿名阅卷
-	 * 
-	 * v1.0 zhanghc 2022年3月25日上午10:08:41
-	 * @param state 
-	 * @return PageResult
-	 */
-	@RequestMapping("/anon")
-	@ResponseBody
-	public PageResult anon(Integer id, Integer state) {
-		try {
-			// 校验数据有效性
-			if (!ValidateUtil.isValid(state)) {
-				throw new MyException("参数错误:state");
-			}
-			if (state != 1 && state != 2) {
-				throw new MyException("参数错误:state");
-			}
-			
-			Exam exam = examService.getEntity(id);
-			if (exam == null) {
-				throw new MyException("参数错误:state");
-			}
-			
-			// 更新排名状态
-			exam.setAnonState(state);
-			examService.update(exam);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("考试匿名阅卷错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("考试匿名阅卷错误：", e);
 			return PageResult.err();
 		}
 	}

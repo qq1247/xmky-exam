@@ -97,6 +97,20 @@ export default {
       state,
       markState
     }) {
+      let r = this.$router.resolve({
+          name: 'MyExamPaper',
+          params: {
+            // examId,
+            // paperId,
+            // examEndTime,
+            // showType: paperShowType,
+            // preview: state === 3 || (state === 1 && markState === 3),
+            // userId: null
+          }
+        })
+        alert(r.href)
+        window.open(r.href,'_blank')
+        return
       const _examStartTime = new Date(examStartTime).getTime()
       const _examEndTime = new Date(examEndTime).getTime()
       const _examMarkEndTime = new Date(examMarkEndTime).getTime()
@@ -111,8 +125,8 @@ export default {
         (_examStartTime < now && now < _examEndTime) ||
         (now > _examMarkEndTime && examMarkState === 3)
       ) {
-        this.$router.push({
-          name: 'MyExamDetail',
+        this.$router.resolve({
+          name: 'MyExamPaper',
           params: {
             examId,
             paperId,

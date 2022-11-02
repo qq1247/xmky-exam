@@ -1,10 +1,10 @@
 import Layout from '@/layout/Index.vue'
 export default [
   {
+    name: 'Question',
     path: '/question',
     component: Layout,
     redirect: '/question/index',
-    name: 'Question',
     meta: {
       icon: 'common common-question-manage',
       layout: 'subAdmin',
@@ -72,26 +72,6 @@ export default [
     },
     children: [
       {
-        path: '/exam/nav',
-        name: 'ExamNav',
-        component: () => import('@/views/exam/Nav/Index.vue'),
-        meta: {
-          title: '考试导航',
-          layout: 'subAdmin'
-        },
-        children: [
-          {
-            path: 'setting',
-            name: 'ExamNavSetting',
-            component: () => import('@/views/exam/Nav/PaperSetting.vue'),
-            meta: {
-              title: '试卷设置',
-              layout: 'subAdmin'
-            }
-          }
-        ]
-      },
-      {
         path: 'index',
         name: 'ExamIndex',
         component: () => import('@/views/exam/Index.vue'),
@@ -102,34 +82,43 @@ export default [
         },
         children: [
           {
-            path: '/exam/list/setting/:id/:examTypeId/:tab?',
+            path: 'nav/:id',
+            name: 'ExamNav',
+            component: () => import('@/views/exam/Nav/Index.vue'),
+            meta: {
+              title: '考试导航',
+              layout: 'subAdmin'
+            }
+          },
+          {
+            path: 'setting/:id/:tab?',
             name: 'ExamListSetting',
             component: () => import('@/views/exam/Setting/Index.vue'),
             meta: {
-              title: '列表设置',
+              title: '考试设置',
               layout: 'subAdmin'
             }
           },
+          // {
+          //   path: '/exam/list/markSetting/:id/:examTypeId',
+          //   name: 'ExamListMarkSetting',
+          //   component: () => import('@/views/exam/MarkSetting.vue'),
+          //   meta: {
+          //     title: '考试用户',
+          //     layout: 'subAdmin'
+          //   }
+          // },
+          // {
+          //   path: '/exam/list/line/:id/:examTypeId',
+          //   name: 'ExamListLine',
+          //   component: () => import('@/views/exam/OnLine.vue'),
+          //   meta: {
+          //     title: '在线用户',
+          //     layout: 'subAdmin'
+          //   }
+          // },
           {
-            path: '/exam/list/markSetting/:id/:examTypeId',
-            name: 'ExamListMarkSetting',
-            component: () => import('@/views/exam/MarkSetting.vue'),
-            meta: {
-              title: '考试用户',
-              layout: 'subAdmin'
-            }
-          },
-          {
-            path: '/exam/list/line/:id/:examTypeId',
-            name: 'ExamListLine',
-            component: () => import('@/views/exam/OnLine.vue'),
-            meta: {
-              title: '在线用户',
-              layout: 'subAdmin'
-            }
-          },
-          {
-            path: '/exam/list/statistics/:id/:examTypeId',
+            path: 'statistics/:id',
             name: 'ExamListStatistics',
             component: () => import('@/views/exam/Statistics.vue'),
             meta: {
@@ -164,9 +153,9 @@ export default [
         hidden: true
       },
       {
-        path: 'detail/:examId/:examEndTime/:showType/:preview/:userId?',
-        component: () => import('views/my/Exam/Detail.vue'),
-        name: 'MyExamDetail',
+        path: 'paper/:examId/:examEndTime/:showType/:preview/:userId?', 
+        component: () => import('views/my/Exam/Paper.vue'),
+        name: 'MyExamPaper',
         meta: {
           layout: 'common'
         },

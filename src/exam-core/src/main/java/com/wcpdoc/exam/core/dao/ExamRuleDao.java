@@ -13,11 +13,11 @@ import com.wcpdoc.exam.core.entity.ExamRule;
 public interface ExamRuleDao extends RBaseDao<ExamRule> {
 	
 	/**
-	 * 获取随机章节规则列表
+	 * 获取随机规则列表
 	 * 
 	 * v1.0 chenyun 2022年2月11日上午11:30:01
-	 * @param chapterId
+	 * @param examId
 	 * @return List<ExamRule>
 	 */
-	List<ExamRule> getList(Integer chapterId);
+	List<ExamRule> getList(Integer examId);
 }

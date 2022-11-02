@@ -71,6 +71,8 @@ import MarkSetting from './MarkSetting.vue'
 import PaperRule from './PaperRule.vue'
 import CustomSelect from 'components/CustomSelect.vue'
 import { mapMutations } from 'vuex'
+import { examDetail } from 'api/exam'
+import * as dayjs from 'dayjs'
 
 export default {
   components: {
@@ -85,6 +87,7 @@ export default {
   },
   data() {
     return {
+      id: null,
       activeIndex: 0,
       createdType: 0,
       navList: ['1.选择试卷', '2.添加试题', '3.配置规则', '4.添加用户', '5.发布考试'],
@@ -93,11 +96,110 @@ export default {
   computed: {
   },
   mounted() {
+    this.id = this.$route.params.id
+    if (this.id) {
+      examDetail({
+        id: this.id,
+      }).then(({data}) => {
+        this.init()
+        if (data.exam.genType === 1) {// 根据组卷类型自动跳到下一步
+          this.activeIndex = 1
+          this.createdType = 0
+        } else {
+          this.activeIndex = 1
+          this.createdType = 2
+        }
+
+        this.idUpdate(data.exam.id)
+        this.nameUpdate(data.exam.name)
+        this.paperNameUpdate(data.exam.paperName)
+        this.timeTypeUpdate(data.exam.timeType)
+        if (data.exam.timeType === 1) {
+          this.examTimesUpdate([dayjs(data.exam.startTime, 'YYYY-MM-DD HH:mm:ss').toDate(), dayjs(data.exam.endTime, 'YYYY-MM-DD HH:mm:ss').toDate()])
+        }
+        if (data.exam.timeType === 1 && data.exam.markType === 2) {
+          this.markTimesUpdate([dayjs(data.exam.markStartTime, 'YYYY-MM-DD HH:mm:ss').toDate(), dayjs(data.exam.markEndTime, 'YYYY-MM-DD HH:mm:ss').toDate()])
+        }
+        this.passScoreUpdate(data.exam.passScore)
+        if (data.exam.genType === 1) {
+          this.sxesUpdate(data.exam.sxes)
+        }
+        this.showTypeUpdate(data.exam.showType)
+        this.anonStateUpdate(data.exam.anonState)
+        this.scoreStateUpdate(data.exam.scoreState)
+        this.rankStateUpdate(data.exam.rankState)
+        this.genTypeUpdate(data.exam.genType)
+        this.stateUpdate(data.exam.state)
+
+        if (data.exam.genType === 1) {
+          data.examQuestions.forEach(examQuestion => {
+            if (examQuestion.type === 1) {
+              this.chapterAdd({name: examQuestion.chapterName, txt: examQuestion.chapterTxt})
+            } else {
+              this.questionAdd(examQuestion.question)
+            }
+          })
+          this.questionSort()
+        } else {
+          data.examRules.forEach((examRule, index) => {
+            if (examRule.type === 1) {
+              this.chapterAddForRule({name: examQuestion.chapterName, txt: examQuestion.chapterTxt})
+            } else {
+              this.ruleAdd()
+              this.examRuleQuestionTypeIdUpdate({index, value: examRule.questionTypeId})
+              this.examRuleQuestionTypeUpdate({index, value: examRule.questionType})
+              this.examRuleMarkTypeUpdate({index, value: examRule.markType})
+              this.examRuleMarkOptionsUpdate({index, value: examRule.markOptions})
+              this.examRuleNumUpdate({index, value: examRule.num})
+              this.examRuleScoreUpdate({index, value: examRule.score})
+              this.examRuleScoresUpdate(examRule.scores)
+              this.ruleSort()
+            }
+          })
+        }
+
+        data.examUsers.forEach((examUser, index) => {
+          this.userGroupAdd()
+          this.examUsersUpdate({index, value: examUser.examUserIds})
+          this.markUserUpdate({index, value: examUser.markUserId})
+        })
+      })
+    }
   },
   methods: {
     ...mapMutations('exam', [
+      'init',
+      'idUpdate',
       'questionAdd',
       'questionSort',
+      'nameUpdate',
+      'paperNameUpdate',
+      'timeTypeUpdate',
+      'examTimesUpdate',
+      'markTimesUpdate',
+      'passScoreUpdate',
+      'sxesUpdate',
+      'showTypeUpdate',
+      'anonStateUpdate',
+      'scoreStateUpdate',
+      'rankStateUpdate',
+      'genTypeUpdate',
+      'stateUpdate',
+      'chapterAdd',
+      'questionSort',
+      'chapterAddForRule',
+      'ruleAdd',
+      'examRuleQuestionTypeIdUpdate',
+      'examRuleQuestionTypeUpdate',
+      'examRuleNumUpdate',
+      'examRuleScoreUpdate',
+      'examRuleScoresUpdate',
+      'examRuleMarkTypeUpdate',
+      'examRuleMarkOptionsUpdate',
+      'ruleSort',
+      'userGroupAdd',
+      'examUsersUpdate',
+      'markUserUpdate',
     ]),
     preStep() {
       this.activeIndex = 1
