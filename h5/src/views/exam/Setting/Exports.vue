@@ -28,7 +28,6 @@
 <script>
 import { myMarkPaper, myMarkAnswerList } from 'api/my'
 import { examGet, examMarkUserList } from 'api/exam'
-import { paperGet } from 'api/paper'
 import htmlDocx from 'html-docx-js/dist/html-docx'
 import saveAs from 'file-saver'
 

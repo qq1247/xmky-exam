@@ -153,7 +153,7 @@ export default [
         hidden: true
       },
       {
-        path: 'paper/:examId/:examEndTime/:showType/:preview/:userId?', 
+        path: 'paper/:examId', 
         component: () => import('views/my/Exam/Paper.vue'),
         name: 'MyExamPaper',
         meta: {

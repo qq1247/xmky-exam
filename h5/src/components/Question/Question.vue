@@ -37,19 +37,18 @@
       style="margin-bottom: 10px;padding: 4px 16px;"></el-alert>
     <!-- 题干 -->
     <QuestionTitle
-      :type="question.type"
       :no="no"
-      :title="question.title"
-      :score="question.score"
-      :answers="question.answers"
-      :readOnly="true"
+      :question="question"
+      :preview="preview"
+      @change="(answers) => {question.answers = answers; $emit('updateAnswer', question)}"
     />
     <!-- 单选题选项 -->
     <el-radio-group
       v-if="question.type === 1"
       v-model="question.answers[0]"
       class="children-option"
-      :disabled="true"
+      @change="$emit('updateAnswer', question)"
+      :disabled="preview"
     >
       <el-radio
         v-for="(option, index) in question.options"
@@ -68,7 +67,8 @@
       v-else-if="question.type === 2"
       v-model="question.answers"
       class="children-option"
-      :disabled="true"
+      @change="$emit('updateAnswer', question)"
+      :disabled="preview"
     >
       <el-checkbox
         v-for="(option, index) in question.options"
@@ -88,7 +88,8 @@
       v-else-if="question.type === 4"
       v-model="question.answers[0]"
       class="children-option"
-      :disabled="true"
+      @change="$emit('updateAnswer', question)"
+      :disabled="preview"
     >
       <el-radio
         v-for="(option, index) in ['对', '错']"
@@ -107,7 +108,8 @@
       placeholder="请输入答案"
       type="textarea"
       :autosize="true"
-      :disabled="true"
+      @change="$emit('updateAnswer', question)"
+      :disabled="preview"
     />
     <el-input
       v-else-if="question.type === 5 && question.markType === 1"
@@ -117,7 +119,8 @@
       placeholder="请输入答案"
       type="textarea"
       :autosize="true"
-      :disabled="true"
+      @change="$emit('updateAnswer', question)"
+      :disabled="preview"
     />
     <slot name="bottom"></slot>
   </div>
@@ -142,6 +145,10 @@ export default {
       type: String,
       default: 'detail',
     },
+    preview: {// 预览
+      type: Boolean,
+      default: true
+    }
   },
   data() {
     return {

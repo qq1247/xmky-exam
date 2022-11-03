@@ -210,8 +210,14 @@ public class StringUtil {
 		}
 
 		StringBuilder sb = new StringBuilder();
+		boolean first = true;
 		for (Object str : strArr) {
-			if (sb.length() > 0) {
+//			if (sb.length() > 0) {// bug：如果第一个值为空字符串，会不执行
+//				sb.append(separator);
+//			}
+			if (first) {
+				first = false;
+			} else {
 				sb.append(separator);
 			}
 			sb.append(str);

@@ -424,7 +424,7 @@ export default {
             path: '/myExam',
             background: '#0094E5',
             icon: require('../../assets/img/index/question-manage.png'),
-            title: '考试管理'
+            title: '我的管理'
           },
           {
             path: '/simulate',

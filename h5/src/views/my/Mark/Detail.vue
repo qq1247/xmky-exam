@@ -240,7 +240,6 @@
   </div>
 </template>
 <script>
-import { paperGet } from 'api/paper'
 import { myMarkPaper } from 'api/my'
 import ClozeTitle from '@/components/ClozeTitle.vue'
 import {

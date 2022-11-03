@@ -32,6 +32,22 @@ public class MyExam {
 	private Integer userId;
 	@Column(name = "MARK_USER_ID")
 	private Integer markUserId;
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@Column(name = "ANSWER_START_TIME")
+	private Date answerStartTime;
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@Column(name = "ANSWER_END_TIME")
+	private Date answerEndTime;
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@Column(name = "MARK_START_TIME")
+	private Date markStartTime;
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@Column(name = "MARK_END_TIME")
+	private Date markEndTime;
 	@Column(name = "OBJECTIVE_SCORE")
 	private BigDecimal objectiveScore;
 	@Column(name = "TOTAL_SCORE")
@@ -99,26 +115,32 @@ public class MyExam {
 		this.totalScore = totalScore;
 	}
 
+	/** 状态（1：未考试；2：考试中；3：已交卷；） */
 	public Integer getState() {
 		return state;
 	}
 
+	/** 状态（1：未考试；2：考试中；3：已交卷；） */
 	public void setState(Integer state) {
 		this.state = state;
 	}
 
+	/** 阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；） */
 	public Integer getMarkState() {
 		return markState;
 	}
 
+	/** 阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；） */
 	public void setMarkState(Integer markState) {
 		this.markState = markState;
 	}
 
+	/** 答题状态（1：及格；2：不及格） */
 	public Integer getAnswerState() {
 		return answerState;
 	}
 
+	/** 答题状态（1：及格；2：不及格） */
 	public void setAnswerState(Integer answerState) {
 		this.answerState = answerState;
 	}
@@ -145,6 +167,38 @@ public class MyExam {
 
 	public void setNo(Integer no) {
 		this.no = no;
+	}
+
+	public Date getAnswerStartTime() {
+		return answerStartTime;
+	}
+
+	public void setAnswerStartTime(Date answerStartTime) {
+		this.answerStartTime = answerStartTime;
+	}
+
+	public Date getAnswerEndTime() {
+		return answerEndTime;
+	}
+
+	public void setAnswerEndTime(Date answerEndTime) {
+		this.answerEndTime = answerEndTime;
+	}
+
+	public Date getMarkStartTime() {
+		return markStartTime;
+	}
+
+	public void setMarkStartTime(Date markStartTime) {
+		this.markStartTime = markStartTime;
+	}
+
+	public Date getMarkEndTime() {
+		return markEndTime;
+	}
+
+	public void setMarkEndTime(Date markEndTime) {
+		this.markEndTime = markEndTime;
 	}
 
 }

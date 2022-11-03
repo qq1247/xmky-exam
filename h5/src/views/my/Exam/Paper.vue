@@ -5,16 +5,16 @@
       <el-divider>答题卡</el-divider>
       <div class="router-content">
         <div
-          v-for="(examQuestion, index) in examInfo.examQuestions"
+          v-for="(myQuestion, index) in myQuestions"
           :key="index"
-          :style="{'display': examQuestion.type === 1 ? 'block' : 'inline-block'}"
+          :style="{'display': myQuestion.type === 1 ? 'block' : 'inline-block'}"
         >
-          <div v-if="examQuestion.type === 1" class="router-title">
-            {{examQuestion.chapterName}}
+          <div v-if="myQuestion.type === 1" class="router-title">
+            {{myQuestion.chapterName}}
           </div>
           <div v-else>
-            <a :class="['router-index']" @click="toHref(examQuestion.question.no)">
-              {{examQuestion.question.no}} 
+            <a :class="['router-index']" @click="toHref(myQuestion.question.no)">
+              {{myQuestion.question.no}} 
             </a>
           </div>
         </div>
@@ -22,18 +22,27 @@
     </div>
     <!-- 试卷 -->
     <el-scrollbar class="paper-content">
+      <div class="top">
+        <div class="top-title">
+          <span>{{exam.paperName}}</span>
+          <div class="top-score">
+            {{myExam.totalScore}}分
+            <i class="common common-fenshudixian fenshudixian"></i>
+          </div>
+        </div>
+      </div>
       <div class="content-center"
-        v-for="(examQuestion, index) of examInfo.examQuestions"
+        v-for="(myQuestion, index) of myQuestions"
         :key="index"
       >
-        <div v-if="examQuestion.type === 1" class="chapter">
+        <div v-if="myQuestion.type === 1" class="chapter">
           <el-input
-            :value="examQuestion.chapterName"
+            :value="myQuestion.chapterName"
             placeholder=""
             maxlength="16"
           />
           <el-input
-            :value="examQuestion.chapterTxt"
+            :value="myQuestion.chapterTxt"
             :rows="2"
             placeholder=""
             type="textarea"
@@ -42,9 +51,11 @@
           />
         </div>
         <Question
-          v-else-if="examQuestion.type === 2"
-          :question="examQuestion.question"
-          :no="examQuestion.question.no"
+          v-else-if="myQuestion.type === 2"
+          :question="myQuestion.question"
+          :no="myQuestion.question.no"
+          :preview="preview"
+          @updateAnswer="updateAnswer"
         >
         </Question>
       </div>
@@ -54,31 +65,71 @@
 </template>
 <script>
 import Question from '@/components/Question/Question.vue'
+import { myExamGet, myExamPaper, myExamAnswer } from 'api/my' 
+import { examGet } from 'api/exam' 
 export default {
   components: {
     Question,
   },
   data() {
     return {
-      examInfo: {}
+      exam: {},
+      myExam: {},
+      myQuestions: [],
+      preview: true,
     }
   },
   computed: {
   },
   mounted() {
-    
+    examGet({
+      id: this.$route.params.examId
+    }).then(({data}) => {
+      this.exam = data
+    })
+
+    myExamGet({
+      examId: this.$route.params.examId
+    }).then(({data}) => {
+      this.myExam = data
+
+      if (this.myExam.state === 3 // 不用计算方法是因为Question组件需要先确定值
+        || (this.myExam.state === 1 && this.myExam.markState === 3)) {
+        this.preview = true 
+      } else {
+        this.preview = false
+      }
+    })
+
+    myExamPaper({
+      examId: this.$route.params.examId
+    }).then(({data}) => {
+      this.myQuestions = data
+
+      let no = 1
+      this.myQuestions.forEach((myQuestion) => {
+        if (myQuestion.type === 2) {
+          myQuestion.question.no = no++
+        }
+      });
+    })
   },
   methods: {
+    async updateAnswer(question) {
+      const res = await myExamAnswer({
+        examId: this.exam.id,
+        questionId: question.id,
+        answers: question.answers
+      })
+    }
   },
 }
 </script>
 
 <style lang="scss" scoped>
 .content-center :hover{
-  padding-bottom: 0px;
-  .question-opt {
-    display: block;
-  }
+  padding-top: 20px;
+  padding-bottom: auto;
 }
 .btn:hover {
   padding-bottom: 5px;

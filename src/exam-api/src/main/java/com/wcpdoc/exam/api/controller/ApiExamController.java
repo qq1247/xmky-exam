@@ -288,17 +288,23 @@ public class ApiExamController extends BaseController {
 			return PageResultEx.ok()
 					.addAttr("id", exam.getId())
 					.addAttr("name", exam.getName())
-					.addAttr("startTime", DateUtil.formatDateTime(exam.getStartTime()))
-					.addAttr("endTime", DateUtil.formatDateTime(exam.getEndTime()))
-					.addAttr("markStartTime", exam.getMarkStartTime() == null ? null : DateUtil.formatDateTime(exam.getMarkStartTime()))
-					.addAttr("markEndTime", exam.getMarkEndTime() == null ? null : DateUtil.formatDateTime(exam.getMarkEndTime()))
-					.addAttr("examMarkType", exam.getMarkType())
-					.addAttr("state", exam.getState())
+					.addAttr("paperName", exam.getPaperName())
+					.addAttr("timeType", exam.getTimeType())
+					.addAttr("startTime", ValidateUtil.isValid(exam.getStartTime()) ? DateUtil.formatDateTime(exam.getStartTime()) : null)
+					.addAttr("endTime", ValidateUtil.isValid(exam.getEndTime()) ? DateUtil.formatDateTime(exam.getEndTime()) : null)
+					.addAttr("markStartTime", ValidateUtil.isValid(exam.getMarkStartTime()) ? DateUtil.formatDateTime(exam.getMarkStartTime()) : null)
+					.addAttr("markEndTime", ValidateUtil.isValid(exam.getMarkEndTime()) ? DateUtil.formatDateTime(exam.getMarkEndTime()) : null)
+					.addAttr("markState", exam.getMarkState())
 					.addAttr("scoreState", exam.getScoreState())
 					.addAttr("rankState", exam.getRankState())
 					.addAttr("anonState", exam.getAnonState())
-					.addAttr("markState", exam.getMarkState())
-					;
+					.addAttr("passScore", exam.getPassScore())
+					.addAttr("totalScore", exam.getTotalScore())
+					.addAttr("markType", exam.getMarkType())
+					.addAttr("showType", exam.getShowType())
+					.addAttr("genType", exam.getGenType())
+					.addAttr("sxes", exam.getSxes())
+					.addAttr("state", exam.getState());
 		} catch (MyException e) {
 			log.error("获取考试错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

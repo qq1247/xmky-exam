@@ -43,7 +43,6 @@
 </template>
 <script>
 import { loginSysTime } from 'api/common'
-import { paperGet } from 'api/paper'
 import { myMarkPaper, myExamPaper } from 'api/my'
 import {
   myExamAnswer,

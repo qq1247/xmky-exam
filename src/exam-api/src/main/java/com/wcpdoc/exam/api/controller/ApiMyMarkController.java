@@ -30,7 +30,6 @@ import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
-import com.wcpdoc.exam.core.service.ExamQuestionNoService;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
@@ -58,8 +57,6 @@ public class ApiMyMarkController extends BaseController {
 	private UserService userService;
 	@Resource
 	private OrgService orgService;
-	@Resource
-	private ExamQuestionNoService examQuestionNoService;
 	
 	/**
 	 * 我的阅卷列表

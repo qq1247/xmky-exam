@@ -52,10 +52,9 @@ public interface MyExamService extends BaseService<MyExam>{
 	 * @param questionId 
 	 * @param userId 
 	 * @param answers
-	 * @param answerFileId
 	 * void
 	 */
-	void answerUpdate(Integer examId, Integer userId, Integer questionId, String[] answers, Integer answerFileId);
+	void answerUpdate(Integer examId, Integer userId, Integer questionId, String[] answers);
 	
 	/**
 	 * 完成交卷

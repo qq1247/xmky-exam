@@ -87,7 +87,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	}
 
 	@Override
-	public void answerUpdate(Integer examId, Integer userId, Integer questionId, String[] answers, Integer answerFileId) {
+	public void answerUpdate(Integer examId, Integer userId, Integer questionId, String[] answers) {
 		// 校验数据有效性
 		if (examId == null) {
 			throw new MyException("参数错误：examId");
@@ -145,11 +145,6 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		}
 		myQuestion.setAnswerTime(new Date());
 		myQuestionService.update(myQuestion);
-		
-		// 保存附件
-		if (ValidateUtil.isValid(answerFileId)) {
-			fileService.upload(answerFileId);
-		}
 	}
 
 	@Override
