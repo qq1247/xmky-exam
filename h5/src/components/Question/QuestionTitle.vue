@@ -11,7 +11,7 @@
         v-else
         :key="index"
         class="cloze-input"
-        v-model="answers[title.index]"
+        :value="answers[title.index]"
         :style="{ width: title.value.length * 18 + 'px' }"
         @change="$emit('change', answers)"
         :disabled="preview"

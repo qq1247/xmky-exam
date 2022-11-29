@@ -35,29 +35,14 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT EXAM.* "
 				+ "FROM EXM_EXAM EXAM ";
-//				+ "(SELECT EXAM_TYPE.ID, EXAM_TYPE.NAME, NULL AS START_TIME, NULL AS END_TIME, "
-//				+ "		NULL AS MARK_START_TIME, NULL AS MARK_END_TIME, EXAM_TYPE.STATE, NULL AS MARK_TYPE, NULL AS GEN_TYPE, "
-//				+ "		NULL AS TOTAL_SCORE, NULL AS PASS_SCORE, NULL AS EXAM_TYPE_ID, EXAM_TYPE.UPDATE_TIME, 1 AS TYPE "// TYPE_ID==null，有分类ID查询时只显示考试
-//				+ "		FROM EXM_EXAM_TYPE EXAM_TYPE "
-//				+ "		WHERE EXAM_TYPE.CREATE_USER_ID = :CREATE_USER_ID "// 查找当前用户创建的分类
-//				+ "		UNION ALL "// 考试分类和无分类的考试合并显示默认展示在第一层，用于增加用户体验
-//				+ "		SELECT EXAM.ID, EXAM.NAME, EXAM.START_TIME, EXAM.END_TIME, "
-//				+ "		EXAM.MARK_START_TIME, EXAM.MARK_END_TIME, EXAM.STATE, EXAM.MARK_TYPE, "// MARK_TYPE 修改时使用
-//				+ "		EXAM.GEN_TYPE , "// EXAM_GEN_TYPE，导出试卷使用
-//				+ "		EXAM.TOTAL_SCORE AS TOTAL_SCORE, EXAM.PASS_SCORE AS PASS_SCORE, EXAM.EXAM_TYPE_ID, EXAM.UPDATE_TIME, 2 AS TYPE "
-//				+ "		FROM EXM_EXAM EXAM "
-//				+ "		WHERE EXAM.CREATE_USER_ID = :CREATE_USER_ID2 AND EXAM.EXAM_TYPE_ID IS NULL "// 查找当前用户创建的试卷（CREATE_USER_ID2参数不能重复）
-//				+ ") A";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-//		.addFromParm(pageIn.get("curUserId", Integer.class))
-//				.addFromParm(pageIn.get("curUserId", Integer.class))
 		sqlUtil
-//				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "EXAM.UPDATE_USER_ID = :UPDATE_USER_ID", pageIn.get("curUserId", Integer.class))
-				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "EXAM.NAME LIKE :NAME", String.format("%%%s%%", pageIn.get("name")))
-				.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "EXAM.STATE IN (1,2)")// 默认查询草稿和已发布
-				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && "0".equals(pageIn.get("state")), "EXAM.STATE IN (1,2)")// 如果传入0，会导致查询到已删除的
-				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "EXAM.STATE = :STATE", pageIn.get("state"))
-				.addOrder("EXAM.UPDATE_TIME", Order.DESC);
+//			.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "EXAM.UPDATE_USER_ID = :UPDATE_USER_ID", pageIn.get("curUserId", Integer.class))
+			.addWhere(ValidateUtil.isValid(pageIn.get("name")), "EXAM.NAME LIKE :NAME", String.format("%%%s%%", pageIn.get("name")))
+			.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "EXAM.STATE IN (1,2)")// 默认查询草稿和已发布
+			.addWhere(ValidateUtil.isValid(pageIn.get("state")) && "0".equals(pageIn.get("state")), "EXAM.STATE IN (1,2)")// 如果传入0，会导致查询到已删除的
+			.addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "EXAM.STATE = :STATE", pageIn.get("state"))
+			.addOrder("EXAM.UPDATE_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(),
 				"startTime", DateUtil.FORMAT_DATE_TIME,

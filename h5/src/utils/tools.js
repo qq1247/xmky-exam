@@ -150,6 +150,15 @@ const getDictValue = (index, key) => {
   )?.dictValue
 }
 
+let serverTime = ''
+const getServerTime = () => {
+  return serverTime
+}
+const setServerTime = (date) => {
+  serverTime = date;
+}
+
+
 export {
   delay,
   switchTab,
@@ -158,5 +167,7 @@ export {
   getQueryParam,
   computeMinute,
   getDicts,
-  getDictValue
+  getDictValue,
+  setServerTime,
+  getServerTime,
 }

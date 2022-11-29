@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.OnlineUser;
@@ -35,7 +34,6 @@ import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.ExamRule;
 import com.wcpdoc.exam.core.entity.MyExam;
-import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
@@ -178,13 +176,13 @@ public class ApiExamController extends BaseController {
 					List<BigDecimal> _answerScores = new ArrayList<>();
 					for(QuestionAnswer answer : _questionAnswerList){
 						if (QuestionUtil.hasSingleChoice(_question) || QuestionUtil.hasTrueFalse(_question) 
-								|| (QuestionUtil.hasQA(_question) && QuestionUtil.hasObjective(_question))) {
+								|| (QuestionUtil.hasQA(_question) && QuestionUtil.hasSubjective(_question))) {
 							_answers.add(answer.getAnswer());
 						} else if (QuestionUtil.hasMultipleChoice(_question)) {
 							Collections.addAll(_answers, answer.getAnswer().split(","));
 							_answerScores.add(answer.getScore());
 						} else if (QuestionUtil.hasFillBlank(_question) || (QuestionUtil.hasQA(_question) 
-								&& QuestionUtil.hasSubjective(_question))) {
+								&& QuestionUtil.hasObjective(_question))) {
 							_answers.add(answer.getAnswer().split("\n"));
 							_answerScores.add(answer.getScore());
 						}
@@ -304,95 +302,14 @@ public class ApiExamController extends BaseController {
 					.addAttr("showType", exam.getShowType())
 					.addAttr("genType", exam.getGenType())
 					.addAttr("sxes", exam.getSxes())
-					.addAttr("state", exam.getState());
+					.addAttr("state", exam.getState())
+					.addAttr("curTime", DateUtil.formatDateTime(new Date()))
+					;
 		} catch (MyException e) {
 			log.error("获取考试错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("获取考试错误：", e);
-			return PageResult.err();
-		}
-	}
-
-	/**
-	 * 归档
-	 * 
-	 * v1.0 zhanghc 2018年11月24日上午9:13:22
-	 * 
-	 * @param id
-	 * @return PageResult
-	 */
-	@RequestMapping("/archive")
-	@ResponseBody
-	public PageResult archive(Integer id) {
-		try {
-			Exam exam = examService.getEntity(id);
-			exam.setUpdateTime(new Date());
-			exam.setUpdateUserId(getCurUser().getId());
-			exam.setState(3);
-			examService.update(exam);
-			return PageResult.ok();
-		} catch (Exception e) {
-			log.error("归档错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 考试用户列表 查询当前选中的考试用户时使用
-	 * 
-	 * v1.0 zhanghc 2018年10月31日上午10:27:22
-	 * 
-	 * @param pageIn
-	 * @return PageOut
-	 */
-	// @RequestMapping("/examUserList")
-	// @ResponseBody
-	// public PageResult examUserList(Integer id) {
-	// try {
-	// return PageResultEx.ok().data(examService.getExamUserList(id));
-	// } catch (Exception e) {
-	// log.error("用户列表错误：", e);
-	// return PageResult.err();
-	// }
-	// }
-
-	/**
-	 * 阅卷用户列表 查询当前选中的考试（阅卷）用户时使用
-	 * 
-	 * v1.0 zhanghc 2018年11月24日上午9:13:22
-	 * 
-	 * @param id
-	 * @return PageResult
-	 */
-	@RequestMapping("/markUserList")
-	@ResponseBody
-	public PageResult markUserList(Integer id) {
-		try {
-			Exam exam = examService.getEntity(id);
-			if (exam.getMarkType() == 1) {// 如果是智能阅卷
-				List<Map<String, Object>> result = new ArrayList<>();
-				Map<String, Object> map = new HashMap<>();
-				map.put("examUserList", examService.getExamUserList(id));
-				result.add(map);
-				return PageResultEx.ok().data(result);
-			}
-
-			List<MyMark> myMarkList = myMarkService.getList(id);
-			List<Map<String, Object>> result = new ArrayList<>();
-			for (MyMark myMark : myMarkList) {
-				Map<String, Object> map = new HashMap<>();
-				User markUser = userService.getEntity(myMark.getMarkUserId());
-				map.put("markUserId", markUser.getId());
-				map.put("markUserName", markUser.getName());
-				if (ValidateUtil.isValid(myMark.getExamUserIds())) {
-					map.put("examUserList", examService.getExamUserList(id, myMark.getMarkUserId()));
-				}
-				result.add(map);
-			}
-			return PageResultEx.ok().data(result);
-		} catch (Exception e) {
-			log.error("阅卷用户列表错误：", e);
 			return PageResult.err();
 		}
 	}

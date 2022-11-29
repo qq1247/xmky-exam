@@ -55,8 +55,8 @@ public class MyQuestion {
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "ANSWER_TIME")
 	private Date answerTime;
-	@Column(name = "ANSWER")
-	private String answer;
+	@Column(name = "USER_ANSWER")
+	private String userAnswer;
 	@Column(name = "USER_SCORE")
 	private BigDecimal userScore;
 	@Column(name = "MARK_USER_ID")
@@ -96,10 +96,12 @@ public class MyQuestion {
 		this.chapterTxt = chapterTxt;
 	}
 
+	/** 类型 （1：章节；2：试题） */
 	public Integer getType() {
 		return type;
 	}
 
+	/** 类型 （1：章节；2：试题） */
 	public void setType(Integer type) {
 		this.type = type;
 	}
@@ -134,7 +136,7 @@ public class MyQuestion {
 		this.scores = StringUtil.join(scores);
 	}
 
-	/** 阅卷选项（2：答案无顺序；3：大小写不敏感；) */
+	/** 阅卷选项（2：答案无顺序；3：不区分大小写；) */
 	public Integer[] getMarkOptions() {
 		if (!ValidateUtil.isValid(markOptions)) {
 			return new Integer[0];
@@ -148,7 +150,7 @@ public class MyQuestion {
 		return markOptionArr;
 	}
 
-	/** 阅卷选项（2：答案无顺序；3：大小写不敏感；) */
+	/** 阅卷选项（2：答案无顺序；3：不区分大小写；) */
 	public void setMarkOptions(Integer[] markOptions) {
 		if (!ValidateUtil.isValid(markOptions)) {
 			this.markOptions = null;
@@ -220,12 +222,12 @@ public class MyQuestion {
 		this.answerTime = answerTime;
 	}
 
-	public String getAnswer() {
-		return answer;
+	public String getUserAnswer() {
+		return userAnswer;
 	}
 
-	public void setAnswer(String answer) {
-		this.answer = answer;
+	public void setUserAnswer(String userAnswer) {
+		this.userAnswer = userAnswer;
 	}
 
 	public BigDecimal getUserScore() {

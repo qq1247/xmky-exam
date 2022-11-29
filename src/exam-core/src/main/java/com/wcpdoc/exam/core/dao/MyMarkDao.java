@@ -1,32 +1,22 @@
 package com.wcpdoc.exam.core.dao;
 
-import java.util.List;
-
 import com.wcpdoc.core.dao.BaseDao;
-import com.wcpdoc.exam.core.entity.MyMark;
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
 
 /**
  * 我的阅卷数据访问层接口
  * 
  * v1.0 zhanghc 2017-06-19 16:28:29
  */
-public interface MyMarkDao extends BaseDao<MyMark>{
+public interface MyMarkDao extends BaseDao<Object>{
 
 	/**
-	 * 获取我的阅卷列表
+	 * 考试用户列表
 	 * 
-	 * v1.0 zhanghc 2020年9月30日上午11:03:04
-	 * @param examId
-	 * @return List<MyMark>
+	 * v1.0 zhanghc 2022年11月9日下午3:02:49
+	 * @param pageIn
+	 * @return PageOut
 	 */
-	List<MyMark> getList(Integer examId);
-
-	/**
-	 * 获取我的阅卷列表
-	 * 
-	 * v1.0 zhanghc 2022年7月18日下午3:40:17
-	 * @param markUserId
-	 * @return List<MyMark>
-	 */
-	List<MyMark> getListForMarkUser(Integer markUserId);
+	PageOut getUserListpage(PageIn pageIn);
 }

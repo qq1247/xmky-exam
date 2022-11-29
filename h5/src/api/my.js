@@ -14,6 +14,7 @@ export const myMarkScore = (params) => request('myMark/score', params)
 export const myMarkFinish = (params) => request('myMark/finish', params)
 
 export const myMarkAnswerList = (params) => request('myMark/answerList', params)
-export const myMarkUserList = (params) => request('myMark/userList', params)
+export const myMarkUserListpage = (params) => request('myMark/userListpage', params)
 export const myMarkUser = (params) => request('myMark/user', params)
 export const myMarkPaper = (params) => request('myMark/paper', params)
+export const myMarkGet = (params) => request('myMark/get', params)

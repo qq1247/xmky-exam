@@ -13,28 +13,51 @@
           </el-form-item>
         </div>
         <el-form-item>
-          <el-button
-            icon="el-icon-search"
-            type="primary"
-            @click="search"
-          >查询</el-button>
+          <el-button icon="el-icon-search" type="primary" @click="search">查询</el-button>
         </el-form-item>
       </el-form>
       <!-- 内容 -->
       <div class="content">
-        <template v-if="myMarkList.length > 0">
-          <div class="exam-list">
-            <MyCard
-              v-for="(item, index) in myMarkList"
-              :key="index"
-              :data="item"
-              name="myMarkList"
-              @mark="markHandler"
-              @markUser="markUserHandler"
-            />
+        <div class="exam-list">
+          <div 
+            v-for="(myMark, index) in myMarkList"
+            :key="index"
+            class="exam-item">
+            <div class="exam-content">
+              <div class="tag-group">
+                <el-tag
+                  size="mini"
+                  :type="myMark.examMarkState === 3 ? '' : 'danger'">
+                  {{ $tools.getDictValue('MARK_STATE', myMark.examMarkState) }}
+                </el-tag>
+              </div>
+              <!-- 标题 -->
+              <div class="title ellipsis">{{ myMark.examName }}</div>
+              <el-row>
+                <el-col class="content-info">
+                  阅卷时间：{{ myMark.examMarkStartTime }}（{{$tools.computeMinute(myMark.examMarkStartTime, myMark.examMarkEndTime)}}）
+                </el-col>
+                <el-col class="content-info">
+                  分数：{{myMark.examPassScore}} / {{ myMark.examTotalScore }}
+                </el-col>
+              </el-row>
+              <el-row class="content-info">
+                <el-col :span="24">
+                  <CountDown
+                    :expireTime="getTime(myMark.examMarkStartTime)"
+                    @endCallback="myMark.disabled = false"
+                    :preTxt="'距离阅卷：'"
+                  ></CountDown>
+                </el-col>
+              </el-row>
+              <div class="handler">
+                <span data-title="进入" @click="toMark(myMark)">
+                  <i :class="['common', 'common-exam']" />
+                </span>
+              </div>
+            </div>
           </div>
-        </template>
-        <el-empty v-else description="暂无信息" />
+        </div>
         <el-pagination
           background
           layout="prev, pager, next"
@@ -48,17 +71,17 @@
         />
       </div>
     </template>
-
     <router-view v-else />
   </div>
 </template>
 
 <script>
 import { myMarkListpage } from 'api/my'
-import MyCard from 'components/ListCard/MyCard.vue'
+import * as dayjs from 'dayjs'
+import CountDown from '@/components/CountDown.vue'
 export default {
   components: {
-    MyCard
+    CountDown,
   },
   data() {
     return {
@@ -66,74 +89,61 @@ export default {
       curPage: 1,
       total: 0,
       queryForm: {
-        examName: ''
+        examName: '',
       },
-      myMarkList: []
+      myMarkList: [],
     }
   },
   computed: {
     hashChildren() {
       return !(this.$route.matched.length > 2)
-    }
+    },
   },
   mounted() {
     this.query()
   },
   methods: {
+    getTime(date) {
+      return dayjs(date, 'YYYY-MM-DD HH:mm:ss').toDate()
+    },
     // 我的考试列表
     async query() {
       const myMarkList = await myMarkListpage({
         examName: this.queryForm.examName,
         curPage: this.curPage,
-        pageSize: this.pageSize
+        pageSize: this.pageSize,
       })
 
-      this.myMarkList = myMarkList.data?.list || []
-      this.total = myMarkList.data?.total || 0
+      this.myMarkList = myMarkList.data.list.map(myMark => {
+        myMark.disabled = true
+        return myMark
+      })
+      this.total = myMarkList.data.total
     },
     search() {
       this.curPage = 1
       this.query()
     },
-    // 我的阅卷操作
-    markHandler({ examId, paperId, examMarkStartTime, examMarkEndTime }) {
-      const _markStartTime = new Date(examMarkStartTime).getTime()
-      const _markEndTime = new Date(examMarkEndTime).getTime()
-      const now = new Date().getTime()
-      if (now < _markStartTime) {
+    // 去阅卷
+    toMark(myMark) {
+      if (myMark.disabled) {
         this.$message.warning('阅卷未开始，请等待...')
         return
       }
 
       this.$router.push({
-        name: 'MyMarkIndexDetail',
-        params: {
-          examId,
-          paperId,
-          preview: _markStartTime < now && now > _markEndTime
-        }
-      })
-    },
-    // 考生列表
-    markUserHandler({ examId, paperId, examMarkStartTime, examMarkEndTime }) {
-      const _markStartTime = new Date(examMarkStartTime).getTime()
-      const _markEndTime = new Date(examMarkEndTime).getTime()
-      const now = new Date().getTime()
-      this.$router.push({
         name: 'MyMarkIndexUser',
         params: {
-          examId,
-          paperId,
-          preview: _markStartTime < now && now > _markEndTime
-        }
+          examId: myMark.examId,
+        },
       })
     },
     // 分页切换
     pageChange(val) {
       this.curPage = val
       this.query()
-    }
-  }
+    },
+  },
 }
 </script>
 

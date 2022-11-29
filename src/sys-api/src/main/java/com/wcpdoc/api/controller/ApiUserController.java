@@ -248,31 +248,34 @@ public class ApiUserController extends BaseController {
 	@ResponseBody
 	public PageResult get(Integer id) {
 		try {
-			User entity = userService.getEntity(id);
+			if (!ValidateUtil.isValid(id)) {
+				id = getCurUser().getId();
+			}
+			User user = userService.getEntity(id);
 			Org org = null;
-			if (entity.getOrgId() != null) {
-				org = orgService.getEntity(entity.getOrgId());
+			if (user.getOrgId() != null) {
+				org = orgService.getEntity(user.getOrgId());
 			}
 			
 			PageResultEx pageResult = PageResultEx.ok()
-				.addAttr("id", entity.getId())
-				.addAttr("name", entity.getName())
-				.addAttr("loginName", entity.getLoginName())
-				.addAttr("orgId", entity.getOrgId())
+				.addAttr("id", user.getId())
+				.addAttr("name", user.getName())
+				.addAttr("loginName", user.getLoginName())
+				.addAttr("orgId", user.getOrgId())
 				.addAttr("orgName", org == null ? null : org.getName())
-				.addAttr("state", entity.getState())
-				.addAttr("email", entity.getEmail())
-				.addAttr("headFileId", entity.getHeadFileId())
-				.addAttr("state", entity.getState())
+				.addAttr("state", user.getState())
+				.addAttr("email", user.getEmail())
+				.addAttr("headFileId", user.getHeadFileId())
+				.addAttr("state", user.getState())
 				;
 			
 			if (!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
 				return pageResult;
 			}
 			
-			pageResult.addAttr("registTime", DateUtil.formatDateTime(entity.getRegistTime()))
-				.addAttr("lastLoginTime", entity.getLastLoginTime() == null ? null : DateUtil.formatDateTime(entity.getLastLoginTime()))
-				.addAttr("roles", (ValidateUtil.isValid(entity.getRoles()) && entity.getRoles().contains(ConstantManager.SUB_ADMIN_LOGIN_NAME))
+			pageResult.addAttr("registTime", DateUtil.formatDateTime(user.getRegistTime()))
+				.addAttr("lastLoginTime", user.getLastLoginTime() == null ? null : DateUtil.formatDateTime(user.getLastLoginTime()))
+				.addAttr("roles", (ValidateUtil.isValid(user.getRoles()) && user.getRoles().contains(ConstantManager.SUB_ADMIN_LOGIN_NAME))
 						? new String[] { ConstantManager.SUB_ADMIN_LOGIN_NAME } : new String[] { "user" });
 			return pageResult;
 		} catch (MyException e) {

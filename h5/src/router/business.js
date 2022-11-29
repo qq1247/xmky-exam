@@ -161,15 +161,6 @@ export default [
         },
         hidden: true
       },
-      {
-        path: 'result/:examId/:scoreState',
-        component: () => import('views/my/Exam/Result.vue'),
-        name: 'MyExamResult',
-        meta: {
-          layout: 'common'
-        },
-        hidden: true
-      }
     ]
   },
   {
@@ -188,25 +179,25 @@ export default [
         component: () => import('views/my/Mark/Index.vue'),
         name: 'MyMarkIndex',
         meta: {
-          title: '阅卷分类',
+          title: '',
           icon: 'common common-exam',
           layout: 'subAdmin'
         },
         children: [
           {
-            path: 'user/:examId/:paperId/:preview/:userId?',
+            path: 'user/:examId',
             component: () => import('views/my/Mark/User.vue'),
             name: 'MyMarkIndexUser',
             meta: {
-              title: '考生列表',
+              title: '阅卷列表',
               layout: 'subAdmin'
             },
             hidden: true
           },
           {
-            path: 'detail/:examId/:paperId/:preview/:userId?',
-            component: () => import('views/my/Mark/Detail.vue'),
-            name: 'MyMarkIndexDetail',
+            path: 'paper/:examId/:userId',
+            component: () => import('views/my/Mark/Paper.vue'),
+            name: 'MyMarkIndexPaper',
             meta: {
               title: '阅卷',
               layout: 'subAdmin'

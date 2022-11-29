@@ -95,14 +95,14 @@
               >
                 <el-checkbox :label="2">答案无顺序</el-checkbox>
               </el-tooltip>
-              <!-- 显示大小写敏感选项 -->
+              <!-- 显示区分大小写选项 -->
               <el-tooltip
                 class="item"
-                content="默认大小写敏感"
+                content="默认区分大小写"
                 effect="dark"
                 placement="top"
               >
-                <el-checkbox :label="3">大小写不敏感</el-checkbox>
+                <el-checkbox :label="3">不区分大小写</el-checkbox>
               </el-tooltip>
             </el-checkbox-group>
           </el-form-item>
@@ -300,7 +300,7 @@ export default {
         title: '', // 题干
         options: [], // 选项
         markType: 1, // 阅卷类型（1：客观题；2：主观题）
-        markOptions: [], // 阅卷选项（2：答案无顺序；3：大小写不敏感）
+        markOptions: [], // 阅卷选项（2：答案无顺序；3：不区分大小写）
         score: 1, // 分值，默认1分
         answerScores: [], // 答案分数
         answers: [], // 答案，统一数组格式

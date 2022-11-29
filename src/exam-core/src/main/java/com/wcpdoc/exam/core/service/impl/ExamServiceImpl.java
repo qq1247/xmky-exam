@@ -14,12 +14,8 @@ import javax.annotation.Resource;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.stereotype.Service;
 
-import com.wcpdoc.base.cache.ParmCache;
-import com.wcpdoc.base.entity.Parm;
-import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
@@ -33,7 +29,6 @@ import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.ExamRule;
 import com.wcpdoc.exam.core.entity.MyExam;
-import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.MyQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
@@ -190,75 +185,75 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 
 	@Override
 	public void mail(Exam exam, Integer notifyType, String content) {
-		Parm parm = ParmCache.get();
-		if (parm == null) {
-			throw new MyException("管理员未配置系统参数");
-		}
-		if (!ValidateUtil.isValid(parm.getEmailUserName())) {
-			throw new MyException("管理员未配置邮箱地址");
-		}
-		
-		List<Integer> userList = new ArrayList<Integer>();
-		content = content.replace("【考试名称】", exam.getName());
-		
-		if (exam.getTimeType() == 1) { //限时
-			content.replace("【考试开始时间】", DateUtil.formatDateTime(exam.getStartTime()))
-				   .replace("【考试结束时间】", DateUtil.formatDateTime(exam.getEndTime()));
-		
-			if (exam.getMarkStartTime() != null) {
-				content = content.replace("【阅卷开始时间】", DateUtil.formatDateTime(exam.getMarkStartTime()))
-				.replace("【阅卷结束时间】", DateUtil.formatDateTime(exam.getMarkEndTime()));
-			}
-		}
-		if (exam.getTimeType() == 2) { //不限时
-			content.replace("【考试开始时间】", "不限时间")
-			   .replace("【考试结束时间】", "不限时间");
-	
-			if (exam.getMarkStartTime() != null) {
-				content = content.replace("【阅卷开始时间】", "不限时间")
-				.replace("【阅卷结束时间】", "不限时间");
-			}
-		}
-		
-		content = StringEscapeUtils.unescapeXml(content);
-		if (notifyType == 1) {
-			List<MyExam> myExamList = myExamService.getList(exam.getId());// 所有考试人员
-			for(MyExam myExam : myExamList){
-				userList.add(myExam.getUserId());
-			}
-		} else if (notifyType == 2) {
-			List<MyMark> myMarkList = myMarkService.getList(exam.getId());// 所有阅卷人
-			for(MyMark myMark : myMarkList){
-				userList.add(myMark.getMarkUserId());
-			}
-		} else {
-			userList.add(getCurUser().getId());// 当前登录用户
-		}
-		
-		String newContent;
-		StringBuilder errMsg = new StringBuilder();
-		for(Integer userId : userList){
-			newContent = content;
-			User user = userService.getEntity(userId);
-			newContent = newContent.replace("【姓名】", user.getName());
-			
-			if (!ValidateUtil.isValid(user.getEmail())) {
-				errMsg.append(String.format("【%s】未填写邮箱地址", user.getName())).append("<br/>");
-				continue;
-			}
-			
-			try {
-				notifyService.pushEmail(parm.getEmailUserName(), user.getEmail(), exam.getName(), newContent);
-			} catch (MyException e) {
-				throw new MyException(e.getMessage());//发件人邮箱错误,所有邮件不能被发出
-			} catch (Exception e) {
-				errMsg.append(String.format("考试【%s】发送邮件给【%s】失败", exam.getName(), user.getName())).append("<br/>");
-			} 
-		}
-		
-		if (errMsg.length() > 0) {
-			throw new MyException(errMsg.toString());
-		}
+//		Parm parm = ParmCache.get();
+//		if (parm == null) {
+//			throw new MyException("管理员未配置系统参数");
+//		}
+//		if (!ValidateUtil.isValid(parm.getEmailUserName())) {
+//			throw new MyException("管理员未配置邮箱地址");
+//		}
+//		
+//		List<Integer> userList = new ArrayList<Integer>();
+//		content = content.replace("【考试名称】", exam.getName());
+//		
+//		if (exam.getTimeType() == 1) { //限时
+//			content.replace("【考试开始时间】", DateUtil.formatDateTime(exam.getStartTime()))
+//				   .replace("【考试结束时间】", DateUtil.formatDateTime(exam.getEndTime()));
+//		
+//			if (exam.getMarkStartTime() != null) {
+//				content = content.replace("【阅卷开始时间】", DateUtil.formatDateTime(exam.getMarkStartTime()))
+//				.replace("【阅卷结束时间】", DateUtil.formatDateTime(exam.getMarkEndTime()));
+//			}
+//		}
+//		if (exam.getTimeType() == 2) { //不限时
+//			content.replace("【考试开始时间】", "不限时间")
+//			   .replace("【考试结束时间】", "不限时间");
+//	
+//			if (exam.getMarkStartTime() != null) {
+//				content = content.replace("【阅卷开始时间】", "不限时间")
+//				.replace("【阅卷结束时间】", "不限时间");
+//			}
+//		}
+//		
+//		content = StringEscapeUtils.unescapeXml(content);
+//		if (notifyType == 1) {
+//			List<MyExam> myExamList = myExamService.getList(exam.getId());// 所有考试人员
+//			for(MyExam myExam : myExamList){
+//				userList.add(myExam.getUserId());
+//			}
+//		} else if (notifyType == 2) {
+//			List<MyMark> myMarkList = myMarkService.getList(exam.getId());// 所有阅卷人
+//			for(MyMark myMark : myMarkList){
+//				userList.add(myMark.getMarkUserId());
+//			}
+//		} else {
+//			userList.add(getCurUser().getId());// 当前登录用户
+//		}
+//		
+//		String newContent;
+//		StringBuilder errMsg = new StringBuilder();
+//		for(Integer userId : userList){
+//			newContent = content;
+//			User user = userService.getEntity(userId);
+//			newContent = newContent.replace("【姓名】", user.getName());
+//			
+//			if (!ValidateUtil.isValid(user.getEmail())) {
+//				errMsg.append(String.format("【%s】未填写邮箱地址", user.getName())).append("<br/>");
+//				continue;
+//			}
+//			
+//			try {
+//				notifyService.pushEmail(parm.getEmailUserName(), user.getEmail(), exam.getName(), newContent);
+//			} catch (MyException e) {
+//				throw new MyException(e.getMessage());//发件人邮箱错误,所有邮件不能被发出
+//			} catch (Exception e) {
+//				errMsg.append(String.format("考试【%s】发送邮件给【%s】失败", exam.getName(), user.getName())).append("<br/>");
+//			} 
+//		}
+//		
+//		if (errMsg.length() > 0) {
+//			throw new MyException(errMsg.toString());
+//		}
 	}
 
 	@Override
@@ -568,7 +563,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 							if (QuestionUtil.hasMultipleChoice(question)) {// 如果是多选，使用抽题规则的漏选分数
 								myQuestion.setScores(examRule.getScores());
 							} else if ((QuestionUtil.hasFillBlank(question) || QuestionUtil.hasQA(question)) // 如果是客观填空问答，把分数平均分配到子分数
-									&& QuestionUtil.hasSubjective(question)) {// 如果抽题不设置分数，使用题库默认的分数，会导致总分不确定
+									&& QuestionUtil.hasObjective(question)) {// 如果抽题不设置分数，使用题库默认的分数，会导致总分不确定
 								if (questionAnswerCache.get(myQuestion.getQuestionId()) == null) {// 如果抽题设置分数，主观题答案数量不一样，没法按答案分配分数
 									questionAnswerCache.put(myQuestion.getQuestionId(), questionAnswerService.getList(myQuestion.getQuestionId()));
 								}
@@ -675,7 +670,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					{
 						if (QuestionUtil.hasSingleChoice(examQuestion.getQuestion())// 单选、判断、主观问答，没有子分数
 								|| QuestionUtil.hasTrueFalse(examQuestion.getQuestion())
-								|| (QuestionUtil.hasQA(examQuestion.getQuestion()) && QuestionUtil.hasObjective(examQuestion.getQuestion()))) {
+								|| (QuestionUtil.hasQA(examQuestion.getQuestion()) && QuestionUtil.hasSubjective(examQuestion.getQuestion()))) {
 							if (ValidateUtil.isValid(examQuestion.getScores())) {
 								throw new MyException("参数错误：examQuestion.question.scores");
 							}
@@ -686,7 +681,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 							}
 						}
 						if (QuestionUtil.hasFillBlank(examQuestion.getQuestion())// 填空、客观问答，最少一个子分数
-								|| (QuestionUtil.hasQA(examQuestion.getQuestion()) && QuestionUtil.hasSubjective(examQuestion.getQuestion()))) {
+								|| (QuestionUtil.hasQA(examQuestion.getQuestion()) && QuestionUtil.hasObjective(examQuestion.getQuestion()))) {
 							if (!ValidateUtil.isValid(examQuestion.getScores()) || examQuestion.getScores().length <= 0) {
 								throw new MyException("参数错误：examQuestion.question.scores");
 							}
@@ -882,7 +877,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 				for (ExamQuestionEx examQuestion : examInfo.getExamQuestions()) {
 					if (ExamUtil.hasQuestion(examQuestion)) {
 						paperTotalScore = BigDecimalUtil.newInstance(paperTotalScore).add(examQuestion.getScore()).getResult();// 单题分数从组卷后定制的分数中取
-						if (QuestionUtil.hasObjective(examQuestion.getQuestion())) {
+						if (QuestionUtil.hasSubjective(examQuestion.getQuestion())) {
 							containObjectiveQuesiton = true;
 						}
 					}

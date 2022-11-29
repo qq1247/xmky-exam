@@ -22,24 +22,14 @@
       <el-table :data="userList" style="width: 100%">
         <el-table-column label="姓名" width="120px">
           <template slot-scope="scope">
-            <span>{{ scope.row.userName || `匿名${scope.$index + 1}` }}</span>
+            <span>{{ scope.row.userName }}-{{scope.row.orgName}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="分数">
+        <el-table-column label="客观分/总分">
           <template slot-scope="scope">
-            <span
-              :style="{
-                color:
-                  Number(
-                    (
-                      (scope.row.paperPassScore / 100) *
-                      scope.row.paperTotalScore
-                    ).toFixed(2)
-                  ) > scope.row.totalScore
-                    ? '#FF5722'
-                    : '#5FB878',
-              }"
-            >{{ scope.row.totalScore || '--' }}</span>
+            <span :style="{color: scope.row.answerState === 2 ? '#FF5722' : '#5FB878',}">
+              {{ scope.row.objectiveScore }} / {{scope.row.totalScore}}
+            </span>
           </template>
         </el-table-column>
         <el-table-column label="答题用时">
@@ -64,12 +54,12 @@
         </el-table-column>
         <el-table-column label="考试状态">
           <template slot-scope="scope">
-            <span>{{ scope.row.state | stateName }}</span>
+            <span>{{ $tools.getDictValue('EXAM_STATE', scope.row.state) }}</span>
           </template>
         </el-table-column>
         <el-table-column label="阅卷状态">
           <template slot-scope="scope">
-            <span>{{ scope.row.markState | markStateName }}</span>
+            <span>{{ $tools.getDictValue('MARK_STATE', scope.row.markState) }}</span>
           </template>
         </el-table-column>
         <el-table-column label="操作">
@@ -78,37 +68,33 @@
               :type="scope.row.state === 1 ? 'danger' : 'primary'"
               size="small"
               :disabled="scope.row.state === 1 ? true : false"
-              @click="goMark(scope.row.userId)"
+              @click="toMark(scope.row.userId)"
             >阅卷</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
+    <el-pagination
+      background
+      layout="prev, pager, next"
+      prev-text="上一页"
+      next-text="下一页"
+      hide-on-single-page
+      :total="total"
+      :page-size="pageSize"
+      :current-page="1"
+      @current-change="pageChange"
+    />
   </div>
 </template>
 
 <script>
-import { myMarkUserList } from 'api/my'
+import { myMarkUserListpage } from 'api/my'
 import { getOneDict } from '@/utils/getDict'
 export default {
-  components: {},
-  filters: {
-    stateName(data) {
-      return getOneDict('MY_EXAM_STATE').find(
-        (item) => Number(item.dictKey) === data
-      ).dictValue
-    },
-    markStateName(data) {
-      return getOneDict('MY_EXAM_MARK_STATE').find(
-        (item) => Number(item.dictKey) === data
-      ).dictValue
-    }
-  },
-  props: {},
   data() {
     return {
       examId: null,
-      paperId: null,
       preview: false,
       total: 0, // 总条数
       curPage: 1, // 当前第几页
@@ -120,29 +106,25 @@ export default {
     }
   },
   mounted() {
-    const { examId, paperId, preview } = this.$route.params
-    this.examId = examId
-    this.paperId = paperId
-    this.preview = preview
+    this.examId = this.$route.params.examId
     this.query()
   },
   methods: {
     // 查询
     async query() {
-      const { data } = await await myMarkUserList({
+      const { data } = await myMarkUserListpage({
         userName: this.queryForm.name,
         examId: this.examId
       })
-      this.userList = data
+      this.userList = data.list
+      this.total = data.total
     },
-    // 我的阅卷操作
-    goMark(userId) {
+    // 去阅卷
+    toMark(userId) {
       this.$router.push({
-        name: 'MyMarkIndexDetail',
+        name: 'MyMarkIndexPaper',
         params: {
           examId: this.examId,
-          paperId: this.paperId,
-          preview: this.preview,
           userId
         }
       })

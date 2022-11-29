@@ -6,54 +6,36 @@
 
 <script>
 import { loginSysTime } from 'api/common.js'
+import * as dayjs from 'dayjs'
 export default {
   name: 'App',
   data() {
     return {
-      timer: null,
-      timerNum: 1,
-      sInput: ''
+      times: 0, // 循环次数
+      serverTime: null, // 服务器时间
     }
   },
-  watch: {
-    '$store.getters.token': {
-      immediate: true,
-      handler(n, o) {
-        if (!n) {
-          this.clearTime()
-          return false
-        } else {
-          this.setSysTime()
-        }
-      }
-    }
-  },
-  beforeDestroy() {
-    this.clearTime()
+  mounted() {
+    this.synServerTime()
   },
   methods: {
-    interval(func, wait) {
-      const _this = this
-      const interv = function() {
-        func.call(_this || null)
-        this.timer = setTimeout(interv, wait)
+    // 每隔30秒同步一次服务器时间；30秒内使用本地浏览器计时；30秒内会有误差，但影响不大
+    async synServerTime() {
+      if (this.times <= 0) {
+        this.times = 30
+        let {data} = await loginSysTime({})
+        this.serverTime = dayjs(data, 'YYYY-MM-DD HH:mm:ss').toDate()
+        //console.log('服务器时间：', dayjs(this.serverTime).format('YYYY-MM-DD HH:mm:ss'))
+      } else {
+        this.serverTime = dayjs(this.serverTime).add(1, 'second').toDate()
+        //console.log('本地计时：', dayjs(this.serverTime).format('YYYY-MM-DD HH:mm:ss'))
       }
-      this.timer = setTimeout(interv, wait)
-    },
-
-    setSysTime() {
-      this.interval(function() {
-        if (this.timerNum % 30 === 0) {
-          loginSysTime({}).then((res) => {})
-        }
-        this.timerNum++
+      
+      this.$tools.setServerTime(this.serverTime)
+      this.times--
+      setTimeout(() => {
+        this.synServerTime()
       }, 1000)
-    },
-
-    clearTime() {
-      clearTimeout(this.timer)
-      this.timer = null
-      this.timerNum = 1
     }
   }
 }

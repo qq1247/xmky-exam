@@ -110,4 +110,15 @@ public class ValidateUtil {
 		}
 		return true;
 	}
+	
+	/**
+	 * 布尔校验
+	 * 
+	 * v1.0 zhanghc 2022年11月10日下午4:03:59
+	 * @param b
+	 * @return boolean
+	 */
+	public static boolean isValid(Boolean b) {
+		return b != null;
+	}
 }

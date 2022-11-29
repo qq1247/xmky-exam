@@ -173,12 +173,12 @@ public class Exam {
 		this.updateTime = updateTime;
 	}
 
-	/** 0：删除；1：发布；2：暂停；3：归档 */
+	/** 0：删除；1：发布；2：暂停； */
 	public Integer getState() {
 		return state;
 	}
 
-	/** 0：删除；1：发布；2：暂停；3：归档 */
+	/** 0：删除；1：发布；2：暂停；*/
 	public void setState(Integer state) {
 		this.state = state;
 	}

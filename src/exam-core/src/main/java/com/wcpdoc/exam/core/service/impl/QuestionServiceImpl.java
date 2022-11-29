@@ -348,13 +348,13 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				throw new MyException("填空和答案数量不匹配");
 			}
 				
-			if (QuestionUtil.hasSubjective(question)) {
+			if (QuestionUtil.hasObjective(question)) {
 				if (ValidateUtil.isValid(question.getMarkOptions())) {
 					if (question.getMarkOptions().length > 2) {
 						throw new MyException("参数错误：scoreOption");
 					}
 					for (Integer markOption : question.getMarkOptions()) {
-						if (markOption != 2 && markOption != 3) {//分值选项（2：答案无顺序；3：大小写不敏感；)
+						if (markOption != 2 && markOption != 3) {//分值选项（2：答案无顺序；3：不区分大小写；)
 							throw new MyException("参数错误：scoreOption");
 						}
 					}
@@ -375,7 +375,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 					throw new MyException("单项分值合计和总分数不匹配");
 				}
 			} 
-			if (QuestionUtil.hasObjective(question)) {
+			if (QuestionUtil.hasSubjective(question)) {
 				if (ValidateUtil.isValid(question.getMarkOptions())) {
 					throw new MyException("参数错误：scoreOption");
 				}
@@ -411,13 +411,13 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			if (ValidateUtil.isValid(options)) {
 				throw new MyException("参数错误：options");
 			}
-			if (QuestionUtil.hasSubjective(question)) {
+			if (QuestionUtil.hasObjective(question)) {
 				if (ValidateUtil.isValid(question.getMarkOptions())) {
 					if (question.getMarkOptions().length != 1) {
 						throw new MyException("参数错误：scoreOption");
 					}
 					for (Integer scoreOption : question.getMarkOptions()) {
-						if (scoreOption != 3) {//分值选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；)
+						if (scoreOption != 3) {//分值选项（1：漏选得分；2：答案无顺序；3：不区分大小写；)
 							throw new MyException("参数错误：scoreOption");
 						}
 					}
@@ -438,7 +438,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 					throw new MyException("单项分值合计和总分数不匹配");
 				}
 			} 
-			if (QuestionUtil.hasObjective(question)) {
+			if (QuestionUtil.hasSubjective(question)) {
 				if (ValidateUtil.isValid(question.getMarkOptions())) {
 					throw new MyException("参数错误：scoreOption");
 				}
@@ -455,7 +455,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			questionAnswerService.del(questionAnswer.getId());
 		}
 		
-		if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasTrueFalse(question) || (QuestionUtil.hasQA(question) && QuestionUtil.hasObjective(question))) {
+		if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasTrueFalse(question) || (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question))) {
 			QuestionAnswer questionAnswer = new QuestionAnswer();
 			questionAnswer.setAnswer(answers[0]);
 			questionAnswer.setScore(null);
@@ -470,7 +470,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			questionAnswer.setQuestionId(question.getId());
 			questionAnswer.setNo(1);
 			questionAnswerService.add(questionAnswer);
-		} else if (QuestionUtil.hasFillBlank(question) || (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question))) {
+		} else if (QuestionUtil.hasFillBlank(question) || (QuestionUtil.hasQA(question) && QuestionUtil.hasObjective(question))) {
 			for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();
 				questionAnswer.setAnswer(answers[i]);

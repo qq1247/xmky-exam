@@ -136,7 +136,7 @@ public class Question {
 		this.markType = markType;
 	}
 
-	/** 阅卷选项（2：答案无顺序；3：大小写不敏感；) */
+	/** 阅卷选项（2：答案无顺序；3：不区分大小写；) */
 	public Integer[] getMarkOptions() {
 		if (!ValidateUtil.isValid(markOptions)) {
 			return new Integer[0];
@@ -150,7 +150,7 @@ public class Question {
 		return markOptionArr;
 	}
 
-	/** 阅卷选项（2：答案无顺序；3：大小写不敏感；) */
+	/** 阅卷选项（2：答案无顺序；3：不区分大小写；) */
 	public void setMarkOptions(Integer[] markOptions) {
 		if (!ValidateUtil.isValid(markOptions)) {
 			this.markOptions = null;

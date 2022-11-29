@@ -45,7 +45,7 @@
     <!-- 单选题选项 -->
     <el-radio-group
       v-if="question.type === 1"
-      v-model="question.answers[0]"
+      :value="question.answers[0]"
       class="children-option"
       @change="$emit('updateAnswer', question)"
       :disabled="preview"
@@ -65,7 +65,7 @@
     <!-- 多选题选项 -->
     <el-checkbox-group
       v-else-if="question.type === 2"
-      v-model="question.answers"
+      :value="question.answers"
       class="children-option"
       @change="$emit('updateAnswer', question)"
       :disabled="preview"
@@ -86,7 +86,7 @@
     <!-- 判断题选项 -->
     <el-radio-group
       v-else-if="question.type === 4"
-      v-model="question.answers[0]"
+      :value="question.answers[0]"
       class="children-option"
       @change="$emit('updateAnswer', question)"
       :disabled="preview"
@@ -102,7 +102,7 @@
     <!-- 问答题答案 -->
     <el-input
       v-else-if="question.type === 5 && question.markType === 2"
-      v-model="question.answers[0]"
+      :value="question.answers[0]"
       :rows="2"
       class="ask-content"
       placeholder="请输入答案"

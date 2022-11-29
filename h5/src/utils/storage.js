@@ -30,8 +30,3 @@ export const setSetting = (data) => setStorage(SettingKey, data)
 export const getDict = () => getStorage(DictKey)
 export const setDict = (data) => setStorage(DictKey, data)
 export const removeDict = () => removeStorage(DictKey)
-
-// 快速考试
-export const getQuick = () => getStorage(QuickKey)
-export const setQuick = (data) => setStorage(QuickKey, data)
-export const removeQuick = () => removeStorage(QuickKey)

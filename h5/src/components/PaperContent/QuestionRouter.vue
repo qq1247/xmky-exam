@@ -61,7 +61,7 @@
     </el-scrollbar>
     <div v-if="!preview" class="exam-footer">
       <div class="exam-btn">
-        剩余：<CountDown :time="systemTime" @finish="forceExamEnd" />
+        <!-- 剩余：<CountDown :time="systemTime" @finish="forceExamEnd" /> -->
       </div>
       <div class="exam-btn exam-finish" @click="examEnd">提交</div>
     </div>
@@ -69,10 +69,8 @@
 </template>
 
 <script>
-import CountDown from 'components/CountDown.vue'
 export default {
   components: {
-    CountDown
   },
   props: {
     preview: {

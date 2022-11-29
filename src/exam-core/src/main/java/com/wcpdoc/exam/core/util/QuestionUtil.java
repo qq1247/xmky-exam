@@ -21,7 +21,7 @@ public class QuestionUtil {
 	 * @param question
 	 * @return boolean
 	 */
-	public static boolean hasObjective(Question question) {
+	public static boolean hasSubjective(Question question) {
 		return (question.getMarkType() == 2 && (question.getType() == 3 || question.getType() == 5));
 	}
 	
@@ -32,8 +32,8 @@ public class QuestionUtil {
 	 * @param question
 	 * @return boolean
 	 */
-	public static boolean hasSubjective(Question question) {
-		return !hasObjective(question);
+	public static boolean hasObjective(Question question) {
+		return !hasSubjective(question);
 	}
 	
 	/**
@@ -92,7 +92,7 @@ public class QuestionUtil {
 	}
 
 	/**
-	 * 3：大小写不敏感（默认大小写敏感）；
+	 * 3：不区分大小写（默认区分大小写）；
 	 * 
 	 * v1.0 zhanghc 2018年11月14日下午11:07:02
 	 * @param examQuestionEx

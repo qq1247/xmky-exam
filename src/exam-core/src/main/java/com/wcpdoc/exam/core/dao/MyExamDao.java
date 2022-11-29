@@ -49,5 +49,5 @@ public interface MyExamDao extends BaseDao<MyExam>{
 	 * @return List<Exam>
 	 */
 	List<Exam> getExamList(Integer userId);
-	
+
 }

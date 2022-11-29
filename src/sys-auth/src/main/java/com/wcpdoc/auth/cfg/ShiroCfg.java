@@ -55,16 +55,13 @@ public class ShiroCfg {
 		filterChainMap.put("/api/file/getId", "anon");
 		filterChainMap.put("/api/login/**", "anon");
 		
-		// 公用请求
+		// 用户请求
 		filterChainMap.put("/api/dict/listpage", "jwt,anyRolesEx[admin,subAdmin,user]");
-		filterChainMap.put("/api/user/listpage", "jwt,anyRolesEx[admin,subAdmin]");
-		filterChainMap.put("/api/org/listpage", "jwt,anyRolesEx[admin,subAdmin]");
-		filterChainMap.put("/api/bulletin/listpage", "jwt,anyRolesEx[admin,subAdmin,user]");
-		filterChainMap.put("/api/paper/get", "jwt,anyRolesEx[subAdmin,user]");
+		filterChainMap.put("/api/user/get", "jwt,anyRolesEx[admin,subAdmin]");
 		filterChainMap.put("/api/exam/get", "jwt,anyRolesEx[subAdmin,user]");
-		filterChainMap.put("/api/paper/myPaper", "jwt,anyRolesEx[subAdmin,user]");
-		filterChainMap.put("/api/paper/myPaperOfRand", "jwt,anyRolesEx[subAdmin,user]");
+		filterChainMap.put("/api/myExam/*", "jwt,anyRolesEx[subAdmin,user]");
 		filterChainMap.put("/api/report/home/user", "jwt,anyRolesEx[user]");
+		filterChainMap.put("/api/bulletin/listpage", "jwt,anyRolesEx[admin,subAdmin,user]");
 		
 		//管理员请求
 		filterChainMap.put("/api/report/home/admin", "jwt,anyRolesEx[admin]");
@@ -80,7 +77,6 @@ public class ShiroCfg {
 		filterChainMap.put("/api/report/**", "jwt,anyRolesEx[subAdmin]");
 		filterChainMap.put("/api/exam/**", "jwt,anyRolesEx[subAdmin]");
 		filterChainMap.put("/api/examType/**", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/paper/**", "jwt,anyRolesEx[subAdmin]");
 		filterChainMap.put("/api/myMark/**", "jwt,anyRolesEx[subAdmin]");
 		filterChainMap.put("/api/paperRemark/**", "jwt,anyRolesEx[subAdmin]");
 		filterChainMap.put("/api/paperType/**", "jwt,anyRolesEx[subAdmin]");

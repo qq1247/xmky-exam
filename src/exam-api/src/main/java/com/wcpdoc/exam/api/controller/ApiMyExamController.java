@@ -16,9 +16,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wcpdoc.base.cache.ParmCache;
-import com.wcpdoc.base.entity.Parm;
-import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.ParmService;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.controller.BaseController;
@@ -28,18 +25,12 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.DateUtil;
-import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
-import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.MyExam;
 import com.wcpdoc.exam.core.entity.MyQuestion;
 import com.wcpdoc.exam.core.entity.Question;
-import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
-import com.wcpdoc.exam.core.entity.ex.Chapter;
-import com.wcpdoc.exam.core.entity.ex.ExamAnswerEx;
-import com.wcpdoc.exam.core.entity.ex.MyExamChapter;
 import com.wcpdoc.exam.core.service.ExamService;
 import com.wcpdoc.exam.core.service.MyExamService;
 import com.wcpdoc.exam.core.service.MyMarkService;
@@ -47,9 +38,7 @@ import com.wcpdoc.exam.core.service.MyQuestionService;
 import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
-import com.wcpdoc.exam.core.util.ExamUtil;
 import com.wcpdoc.exam.core.util.QuestionUtil;
-import com.wcpdoc.notify.exception.NotifyException;
 import com.wcpdoc.notify.service.NotifyService;
 
 /**
@@ -97,6 +86,7 @@ public class ApiMyExamController extends BaseController{
 			pageIn.addAttr("curUserId", getCurUser().getId());
 			PageOut pageOut = myExamService.getListpage(pageIn);
 			for (Map<String, Object> map : pageOut.getList()) {
+				map.put("curTime", DateUtil.formatDateTime(new Date()));
 				if ((Integer)map.remove("examScoreState") == 2) {
 					map.put("totalScore", null);// 不显示分数
 					map.put("answerState", null);// 不显示及格状态
@@ -127,20 +117,20 @@ public class ApiMyExamController extends BaseController{
 		try {
 			MyExam myExam = myExamService.getMyExam(examId, getCurUser().getId());
 			return PageResultEx.ok()
+					.addAttr("answerStartTime", myExam.getAnswerStartTime())
+					.addAttr("answerEndTime", myExam.getAnswerEndTime())
+					.addAttr("markStartTime", myExam.getMarkStartTime())
+					.addAttr("markEndTime", myExam.getMarkEndTime())
 					.addAttr("objectiveScore", myExam.getObjectiveScore())
 					.addAttr("totalScore", myExam.getTotalScore())
 					.addAttr("state", myExam.getState())
 					.addAttr("markState", myExam.getMarkState())
-					.addAttr("answerState", myExam.getAnswerState())
-					.addAttr("answerStartTime", myExam.getAnswerStartTime())
-					.addAttr("answerEndTime", myExam.getAnswerEndTime())
-					.addAttr("markStartTime", myExam.getMarkStartTime())
-					.addAttr("markEndTime", myExam.getMarkEndTime());
+					.addAttr("answerState", myExam.getAnswerState());
 		} catch (MyException e) {
-			log.error("获取考试错误：{}", e.getMessage());
+			log.error("获取我的错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("获取考试错误：", e);
+			log.error("获取我的考试错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -188,19 +178,19 @@ public class ApiMyExamController extends BaseController{
 					List<Object> _answers = new ArrayList<>();
 					List<BigDecimal> _answerScores = new ArrayList<>();
 					if (QuestionUtil.hasSingleChoice(_question) || QuestionUtil.hasTrueFalse(_question) 
-							|| (QuestionUtil.hasQA(_question) && QuestionUtil.hasObjective(_question))) {// 单选、判断、主观问答
-						if (ValidateUtil.isValid(_myQuestion.getAnswer())) {
-							_answers.add(_myQuestion.getAnswer());
+							|| (QuestionUtil.hasQA(_question) && QuestionUtil.hasSubjective(_question))) {// 单选、判断、主观问答
+						if (ValidateUtil.isValid(_myQuestion.getUserAnswer())) {
+							_answers.add(_myQuestion.getUserAnswer());
 						}
 					} else if (QuestionUtil.hasMultipleChoice(_question)) {//多选
-						if (ValidateUtil.isValid(_myQuestion.getAnswer())) {
-							Collections.addAll(_answers, _myQuestion.getAnswer().split(","));
+						if (ValidateUtil.isValid(_myQuestion.getUserAnswer())) {
+							Collections.addAll(_answers, _myQuestion.getUserAnswer().split(","));
 						}
 						_answerScores.add(_myQuestion.getScores()[0]);// 漏选分值
 					} else if (QuestionUtil.hasFillBlank(_question) || (QuestionUtil.hasQA(_question) 
-							&& QuestionUtil.hasSubjective(_question))) {// 填空或客观问答
-						if (ValidateUtil.isValid(_myQuestion.getAnswer())) {
-							Collections.addAll(_answers, _myQuestion.getAnswer().split("\n", -1));
+							&& QuestionUtil.hasObjective(_question))) {// 填空或客观问答
+						if (ValidateUtil.isValid(_myQuestion.getUserAnswer())) {
+							Collections.addAll(_answers, _myQuestion.getUserAnswer().split("\n", -1));
 						}
 						Collections.addAll(_answerScores, _myQuestion.getScores());
 					}
@@ -274,7 +264,7 @@ public class ApiMyExamController extends BaseController{
 	@ResponseBody
 	public PageResult finish(Integer examId) {
 		try {
-			if (!AutoMarkCache.tryReadLock(examId, 2000)) {
+			if (!AutoMarkCache.tryReadLock(examId, 5000)) {
 				throw new MyException("尝试加读锁失败");
 			}
 			myExamService.finish(examId, getCurUser().getId());
@@ -287,39 +277,6 @@ public class ApiMyExamController extends BaseController{
 			return PageResult.err();
 		} finally {
 			AutoMarkCache.releaseReadLock(examId);
-		}
-	}
-	
-	/**
-	 * 邮件通知
-	 * 
-	 * v1.0 zhanghc 2018年11月24日上午9:13:22
-	 * @param id
-	 * @return PageResult
-	 */
-	@RequestMapping("/email")
-	@ResponseBody
-	public PageResult email(Integer examId) {
-		try {
-			Parm parm = ParmCache.get();
-			List<MyExam> list = myExamService.getList(examId);
-			for(MyExam myExam : list){
-				User user = userService.getEntity(myExam.getUserId());
-				if (!ValidateUtil.isValid(user.getEmail())) {
-					continue;
-				}
-				notifyService.pushEmail(parm.getEmailUserName(), user.getEmail(), "考试邮箱通知", user.getName()+"-昵称。");
-			}
-			return PageResult.ok();
-		} catch (NotifyException e) {
-			log.error("邮件通知错误：", e);
-			return PageResult.err().msg(e.getMessage());
-		} catch (MyException e) {
-			log.error("邮件通知错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("邮件通知错误：", e);
-			return PageResult.err();
 		}
 	}
 }

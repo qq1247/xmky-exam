@@ -9,18 +9,15 @@
           src="http://192.168.110.100:9000/api/login/entLogo"
           ><i class="common common-wo"
         /></el-avatar>
-        <div class="user-name">张三 / 研发部</div>
+        <div class="user-name">{{user.name}} / {{user.orgName}}</div>
         <div v-if="myExam.state === 3 || myExam.markState === 3" class="userinfo-box">
           <div class="userinfo-item">
-            <!-- <div class="userinfo-icon-backgroup" style="background-color: #FEF3E8;">
-              <i class="el-icon-edit"></i>
-            </div> -->
             <img
               class="item-icon"
               src="~@/assets/img/mark/mark-time.png"
               alt=""
             />
-            <div class="userinfo-score">59分</div>
+            <div class="userinfo-score">{{myExam.objectiveScore}}</div>
             <div>客观题</div>
           </div>
           <div class="userinfo-item">
@@ -29,7 +26,7 @@
               src="~@/assets/img/mark/mark-pass.png"
               alt=""
             />
-            <div class="userinfo-score">68分</div>
+            <div class="userinfo-score">{{myExam.totalScore}}分</div>
             <div>总分</div>
           </div>
           <div class="userinfo-item">
@@ -38,7 +35,7 @@
               src="~@/assets/img/mark/mark-score.png"
               alt=""
             />
-            <div class="userinfo-score">100分</div>
+            <div class="userinfo-score">{{exam.totalScore}}分</div>
             <div>满分</div>
           </div>
           <div class="userinfo-item">
@@ -47,7 +44,7 @@
               src="~@/assets/img/mark/mark-pass.png"
               alt=""
             />
-            <div>不及格</div>
+            <div>{{ $tools.getDictValue('ANSWER_STATE', myExam.answerState) }}</div>
             <div>成绩</div>
           </div>
           <div class="userinfo-item">
@@ -56,7 +53,7 @@
               src="~@/assets/img/mark/mark-score.png"
               alt=""
             />
-            <div class="userinfo-score">第5名</div>
+            <div class="userinfo-score">第{{myExam.no || '--'}}名</div>
             <div>考试排名</div>
           </div>
           <div class="userinfo-item">
@@ -65,7 +62,7 @@
               src="~@/assets/img/mark/mark-answer-time.png"
               alt=""
             />
-            <div>45分钟</div>
+            <div>{{$tools.computeMinute(myExam.answerStartTime, myExam.answerEndTime)}}分钟</div>
             <div>答题用时</div>
           </div>
           <div class="userinfo-item">
@@ -74,41 +71,29 @@
               src="~@/assets/img/mark/mark-time.png"
               alt=""
             />
-            <div>2分钟</div>
+            <div>{{$tools.computeMinute(myExam.markStartTime, myExam.markEndTime)}}分钟</div>
             <div>阅卷用时</div>
           </div>
         </div>
       </div>
       <div class="paper-router">
-        <el-divider>答题卡</el-divider>
-        <div class="router-content">
-          <div
-            v-for="(myQuestion, index) in myQuestions"
-            :key="index"
-            :style="{'display': myQuestion.type === 1 ? 'block' : 'inline-block'}"
-          >
-            <div v-if="myQuestion.type === 1" class="router-title">
-              {{myQuestion.chapterName}}
-            </div>
-            <div v-else>
-              <a :class="['router-index']" @click="toHref(myQuestion.question.no)">
-                {{myQuestion.question.no}}
-              </a>
-            </div>
-          </div>
-        </div>
-        <!-- 未考试未阅卷、考试中，显示倒计时 -->
-        <div v-if="(myExam.state === 1 && myExam.markState === 1) || myExam.state === 2" class="answer-card-time">
-          <CountDown
-            :expireTime="getTime(exam.endTime)"
-            @endCallback="autoFinish"
-            :preTxt="'剩余：'"
-          ></CountDown>
-        </div>
-        <!-- 已交卷或未考试时间过期，不显示交卷按钮 -->
-        <el-button
-          v-if="!((myExam.state === 1 && myExam.markState === 3) || myExam.state === 3)"
-        type="primary" style="width: 100%;" @click="finish">交卷</el-button>
+        <el-progress 
+          :percentage="50" 
+          style="width: 277px;" 
+          :format="(percentage) => '试卷批阅进度：14/53'"
+        ></el-progress>
+        <el-switch
+          style="display: block;margin-top: 15px;"
+          v-model="subjectiveQuestionShow"
+          inactive-text="全部试题显示"
+          active-text="主观试题显示">
+        </el-switch>
+        <el-switch
+          style="display: block;margin-top: 15px;"
+          v-model="allPaperShow"
+          inactive-text="未阅试卷显示"
+          active-text="全部试卷显示">
+        </el-switch>
       </div>
     </div>
     <!-- 试卷 -->
@@ -124,7 +109,7 @@
         </div>
       </div>
       <div class="content-center"
-        v-for="(myQuestion, index) of myQuestions"
+        v-for="(myQuestion, index) of myQuestionsWithFilter"
         :key="index"
       >
         <div v-if="myQuestion.type === 1" class="chapter">
@@ -143,12 +128,49 @@
           />
         </div>
         <Question
-          v-else-if="myQuestion.type === 2"
           :question="myQuestion.question"
           :no="myQuestion.question.no"
-          :preview="preview"
-          @updateAnswer="updateAnswer"
+          :preview="true"
         >
+          <template #bottom>
+            <div v-if="myQuestion.question.markType === 2" class="question-bottom" >
+              <div>
+                <span>本题得</span>
+                <el-input-number
+                  v-model="myQuestion.question.userScore"
+                  :min="0"
+                  :max="myQuestion.question.score"
+                  size="small"
+                ></el-input-number>
+                <span>分</span>
+                <span style="color: #0094e5">（满分：{{ myQuestion.question.score }}分）</span>
+                <el-button type="success" size="mini" @click="scoreUpdate(myQuestion, '')">确定</el-button>
+                <el-button type="primary" size="mini" plain @click="nextPaper(myQuestion, 'next')">下一卷<i class="el-icon-arrow-right el-icon--right"></i></el-button>
+                <el-button type="primary" size="mini" plain icon="el-icon-arrow-left" @click="scoreUpdate(myQuestion, 'pre')">上一卷</el-button>
+                <el-tooltip placement="top" effect="light">
+                  <div slot="content">
+                    答案：{{myQuestion.question.answersBak}}<br/>
+                    解析：{{myQuestion.question.analysis || '无'}}
+                  </div>
+                  <el-button type="warning" size="mini" plain>查看标准答案</el-button>
+                </el-tooltip>
+                <!-- <el-button :type="myQuestion.question.showUserAnswer?'info':'danger'" size="mini" :plain="myQuestion.question.showUserAnswer" @click="answerSwitch(myQuestion)">查看{{myQuestion.question.showUserAnswer?'标准':'用户'}}答案</el-button> -->
+              </div>
+              <div style="padding-top: 10px;">
+                <el-button type="primary" size="mini" plain style="border: 0px;" @click="myQuestion.question.userScore = 0">0</el-button>
+                <template v-if="myQuestion.question.score <= 5">
+                  <template v-for="i in Math.ceil(myQuestion.question.score)">
+                    <el-button :key="i" type="primary" size="mini" plain style="border: 0px;" @click="myQuestion.question.userScore = i - 0.5">{{i - 0.5}}</el-button>
+                    <el-button :key="i*100" type="primary" size="mini" plain style="border: 0px;" @click="myQuestion.question.userScore = i">{{i}}</el-button>
+                  </template>
+                </template>
+                <el-button 
+                  v-else 
+                  v-for="i in Math.ceil(myQuestion.question.score)"
+                  :key="i" type="primary" size="mini" plain style="border: 0px;" @click="myQuestion.question.userScore = i">{{i}}</el-button>
+              </div>
+            </div>
+          </template>
         </Question>
       </div>
       <div style="height:50px"></div>
@@ -158,104 +180,196 @@
 <script>
 import Question from '@/components/Question/Question.vue'
 import CountDown from '@/components/CountDown.vue'
-import { myExamGet, myExamPaper, myExamAnswer, myExamFinish } from 'api/my' 
+import { myMarkPaper, myMarkGet, myMarkScore, myMarkUserListpage } from 'api/my'
 import { examGet } from 'api/exam' 
 import { userGet } from 'api/user' 
-import * as dayjs from 'dayjs'
 export default {
   components: {
     Question,
-    CountDown
+    CountDown,
   },
   data() {
     return {
+      curUserId: 0,
+      subjectiveQuestionShow: true, 
+      allPaperShow: true, 
       user: {},
       exam: {},
       myExam: {},
       myQuestions: [],
+      users: [],
       preview: true,
     }
   },
   computed: {
+    myQuestionsWithFilter() {
+      return this.myQuestions.filter(myQuestion => {
+        return this.subjectiveQuestionShow ? myQuestion.type === 2 && myQuestion.question.markType === 2 : true
+      })
+    },
   },
-  mounted() {
-    userGet({
-    }).then(({data}) => {
-      this.user = data
-    })
+  async mounted() {
+    await this.initUsers()
+    this.curUserId = this.$route.params.userId;
 
     examGet({
       id: this.$route.params.examId
     }).then(({data}) => {
       this.exam = data
     })
+  },
+  watch: {
+    curUserId: function (newUserId) {
+      userGet({
+        id: newUserId
+      }).then(({data}) => {
+        this.user = data
+      })
 
-    myExamGet({
-      examId: this.$route.params.examId
-    }).then(({data}) => {
-      this.myExam = data
+      myMarkPaper({
+        examId: this.$route.params.examId,
+        userId: newUserId,
+      }).then(({data}) => {
+        this.myQuestions = data
 
-      if (this.myExam.state === 3 // 不用计算方法是因为Question组件需要先确定值
-        || (this.myExam.state === 1 && this.myExam.markState === 3)) {
-        this.preview = true 
-      } else {
-        this.preview = false
-      }
-    })
-
-    myExamPaper({
-      examId: this.$route.params.examId
-    }).then(({data}) => {
-      this.myQuestions = data
-
-      let no = 1
-      this.myQuestions.forEach((myQuestion) => {
-        if (myQuestion.type === 2) {
-          myQuestion.question.no = no++
-        }
-      });
-    })
+        let no = 1
+        this.myQuestions.forEach((myQuestion) => {
+          if (myQuestion.type === 2) {
+            myQuestion.question.no = no++
+            myQuestion.question.answersBak = myQuestion.question.answers
+            myQuestion.question.answers = myQuestion.question.userAnswers
+            myQuestion.question.showUserAnswer = true
+          }
+        });
+      })
+      
+      myMarkGet({
+        examId: this.$route.params.examId,
+        userId: newUserId,
+      }).then(({data}) => {
+        this.myExam = data
+      })
+    }
   },
   methods: {
-    getTime(date) {
-      return dayjs(date, 'YYYY-MM-DD HH:mm:ss').toDate()
-    },
-    // 答题
-    async updateAnswer(question) {
-      const res = await myExamAnswer({
-        examId: this.exam.id,
-        questionId: question.id,
-        answers: question.answers
-      })
-    },
-    // 交卷
-    async finish() {
-      await myExamFinish({ examId: this.exam.id })
-      this.$router.go(0)
-    },
-    /**
-     * 自动交卷
-     * 后端预留了一秒的延时，但网速不好的情况下，还是会提交延时，导致提示考试已结束
-     * 这里模拟一个假的就可以。后端时间到，会自动把考试中的变为已交卷
-     */ 
-    autoFinish() {
-      this.$alert('考试时间到，已自动交卷', {
-        confirmButtonText: '确定',
-        type: 'info',
-        showClose: false
-      }).then(() => {
-        this.$router.replace({
-          name: 'Home'
+    // 加载所有考试用户，用于切换下一个试卷
+    async initUsers() {
+      let curPage = 1
+      while(true) {
+        const { data } = await myMarkUserListpage({
+          examId: this.examId,
+          curPage: curPage++,
+          pageSize: 100,
         })
+        this.users.push(...data.list)
+        if (this.users.length >= data.total) {
+          break
+        }
+      }
+
+      this.users = this.users.filter(user => { // 未考试的不参与阅卷
+        return user.state === 3
       })
+    },
+    // 阅题
+    async scoreUpdate(myQuestion, param) {
+      if (myQuestion.question.userScore == null) {
+        this.$message.error("请填写分数")
+        return;
+      }
+
+      let finish = this.myQuestions.every(myQuestion => {// 所有试题是否阅完
+        if (myQuestion.type === 1) {
+          return true
+        }
+        if (myQuestion.type === 2) {
+          if (myQuestion.question.userScore != null) {
+            return true
+          }
+        }
+        
+        return false
+      })
+
+      const res = await myMarkScore({
+        examId: this.exam.id,
+        userId: this.user.id,
+        questionId: myQuestion.question.id,
+        userScore: myQuestion.question.userScore,
+        finish
+      })
+
+      this.$message('阅题成功')
+
+      if (finish) {// 全部阅完，更新页面信息
+          myMarkGet({
+            examId: this.$route.params.examId
+          }).then(({data}) => {
+            this.myExam = data
+          })
+      }
+    },
+    // 切换答案
+    // answerSwitch(myQuestion) {
+    //   if (myQuestion.question.showUserAnswer) {
+    //     myQuestion.question.answers = myQuestion.question.answersBak
+    //     myQuestion.question.showUserAnswer = false
+    //   } else {
+    //     myQuestion.question.answers = myQuestion.question.userAnswers
+    //     myQuestion.question.showUserAnswer = true
+    //   }
+    // },
+    // 上一卷
+    prePaper() {
+      let curIndex =this.users.findIndex(user => {
+        return user.userId == this.curUserId
+      })
+      if (this.users[curIndex]) {
+        this.curUserId = this.users[--curIndex].userId
+      } else {
+        this.$message.warning("已经第一卷")
+      }
+    },
+    // 下一卷
+    nextPaper() {
+      let curIndex =this.users.findIndex(user => {
+        return user.userId == this.curUserId
+      })
+      if (this.users[curIndex]) {
+        this.curUserId = this.users[++curIndex].userId
+      } else {
+        this.$message.warning("已经最后一卷")
+      }
     },
   },
 }
 </script>
-
 <style lang="scss" scoped>
+/deep/ .el-input-number--small {
+  width: 45px;
+}
+/deep/ .el-input-number--small .el-input-number__increase,
+/deep/ .el-input-number--small .el-input-number__decrease {
+  display: none;
+  width: 45px;
+}
+/deep/ .el-input--small .el-input__inner {
+  border: none;
+  border-radius: 0;
+  border-bottom: 1px solid #557587;
+}
+/deep/ .el-input--small .el-input__inner {
+  width: 45px;
+  height: 16px;
+  padding-left: 0;
+  padding-right: 0;
+}
+.question-bottom {
+  padding-top: 15px;
+}
 .content {
   padding-top: 20px;
+  flex-direction: row;
 } 
 .content-center :hover{
   padding-bottom: auto;
@@ -290,6 +404,7 @@ export default {
   }
 }
 .content-left {
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -345,13 +460,13 @@ export default {
   }
 }
 .paper-router {
-  flex: 1;
+  // flex: 1;
   width: 260px;
   background: #fff;
   position: relative;
   padding: 15px;
-  /deep/ .el-divider__text.is-center {
-    color: #596a76;
+  /deep/ .el-progress__text {
+    margin-left: 0px;
   }
   .total-score {
     background: #0094e5;
@@ -408,7 +523,7 @@ export default {
 .content {
   display: flex;
   width: 1200px;
-  height: calc(100vh - 240px);
+  height: calc(100vh - 140px);
   margin: 0 auto;
 }
 .paper-handler {
@@ -524,6 +639,7 @@ export default {
 </style>
 <style lang="scss">
 .paper-content {
+  height: 100%;
   background: #fff;
   width: calc(100% - 400px);
   margin-left: 10px;

@@ -65,7 +65,7 @@
             / {{ data.paperTotalScore }}</el-col>
         </template>
       </el-row>
-      <CountDown v-if="remainTime > 0" class="count-down" :time="remainTime" />
+      <!-- <CountDown v-if="remainTime > 0" class="count-down" :time="remainTime" /> -->
 
       <div class="handler">
         <!-- 我的考试 -->
@@ -92,23 +92,11 @@
 </template>
 
 <script>
-import CountDown from '../CountDown.vue'
 import { getOneDict } from '@/utils/getDict'
 export default {
   components: {
-    CountDown
   },
   filters: {
-    examStateName(data) {
-      return getOneDict('MY_EXAM_STATE').find(
-        (item) => Number(item.dictKey) === data
-      ).dictValue
-    },
-    markStateName(data) {
-      return getOneDict('MY_EXAM_MARK_STATE').find(
-        (item) => Number(item.dictKey) === data
-      ).dictValue
-    }
   },
   props: {
     data: {

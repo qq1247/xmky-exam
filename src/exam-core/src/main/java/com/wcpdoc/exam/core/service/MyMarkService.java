@@ -1,55 +1,36 @@
 package com.wcpdoc.exam.core.service;
 
 import java.math.BigDecimal;
-import java.util.List;
 
+import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.service.BaseService;
-import com.wcpdoc.exam.core.entity.MyMark;
 /**
  * 我的阅卷服务层接口
  * 
  * v1.0 zhanghc 2017-06-19 16:28:29
  */
-public interface MyMarkService extends BaseService<MyMark>{
+public interface MyMarkService extends BaseService<Object>{
+	/**
+	 * 阅题
+	 * 
+	 * v1.0 zhanghc 2017年6月26日下午12:30:20
+	 * @param examId 考试ID
+	 * @param userId 考试用户ID
+	 * @param questionId 试题ID
+	 * @param userScore 用户得分
+	 * @param finish 是否全部阅完。是：会合计总分
+	 * void
+	 */
+	void scoreUpdate(Integer examId, Integer userId, Integer questionId, BigDecimal userScore, Boolean finish);
 
 	/**
-	 * 获取获取阅卷列表
+	 * 考试用户列表
 	 * 
-	 * v1.0 zhanghc 2020年9月29日下午5:09:50
-	 * @param examId
-	 * @return List<MyExam>
+	 * v1.0 zhanghc 2022年11月9日下午3:01:00
+	 * @param pageIn
+	 * @return PageOut
 	 */
-	List<MyMark> getList(Integer examId);
-	
-	/**
-	 * 获取阅卷列表
-	 * 
-	 * v1.0 zhanghc 2022年7月18日下午3:26:40
-	 * @param markUserId
-	 * @return List<MyMark>
-	 */
-	List<MyMark> getListForMarkUser(Integer markUserId);
-	
-	/**
-	 * 阅卷
-	 * 
-	 * v1.0 chenyun 2021年8月24日上午9:41:53
-	 * @param examId
-	 * @param userId
-	 * @param questionId
-	 * @param score
-	 * void
-	 */
-	void scoreUpdate(Integer examId, Integer userId, Integer questionId, BigDecimal score);
-	
-	/**
-	 * 完成阅卷
-	 * 
-	 * v1.0 chenyun 2021年8月24日上午9:46:01
-	 * @param examId
-	 * @param userId
-	 * void
-	 */
-	void finish(Integer examId, Integer userId);
+	PageOut getUserListpage(PageIn pageIn);
 	
 }

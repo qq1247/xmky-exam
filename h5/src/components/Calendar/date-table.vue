@@ -200,14 +200,14 @@ export default {
       return render({ date, data })
     },
 
-    stateName(data) {
-      return getOneDict('MY_EXAM_STATE').find(
-        (item) => Number(item.dictKey) === data
-      ).dictValue
-    },
+    // stateName(data) {
+    //   return getOneDict('EXAM_STATE').find(
+    //     (item) => Number(item.dictKey) === data
+    //   ).dictValue
+    // },
 
     markStateName(data) {
-      return getOneDict('MY_EXAM_MARK_STATE').find(
+      return getOneDict('MARK_STATE').find(
         (item) => Number(item.dictKey) === data
       ).dictValue
     }

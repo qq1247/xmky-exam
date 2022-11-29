@@ -1,314 +1,42 @@
-drop table if exists EXM_QUESTION_TYPE;
-
-drop table if exists EXM_QUESTION;
-
-drop table if exists EXM_QUESTION_OPTION;
-
-drop table if exists EXM_QUESTION_ANSWER;
+drop table if exists EXM_BULLETIN;
 
 drop table if exists EXM_EXAM;
 
-drop table if exists EXM_EXAM_RULE;
-
 drop table if exists EXM_EXAM_QUESTION;
 
-drop table if exists EXM_EXAM_QUESTION_NO;
-
-drop table if exists EXM_MY_MARK;
+drop table if exists EXM_EXAM_RULE;
 
 drop table if exists EXM_MY_EXAM;
 
-drop table if exists EXM_MY_EXAM_DETAIL;
+drop table if exists EXM_MY_QUESTION;
+
+drop table if exists EXM_QUESTION;
+
+drop table if exists EXM_QUESTION_ANSWER;
 
 drop table if exists EXM_QUESTION_COMMENT;
 
+drop table if exists EXM_QUESTION_OPTION;
+
+drop table if exists EXM_QUESTION_TYPE;
+
 drop table if exists EXM_QUESTION_TYPE_OPEN;
 
-drop table if exists EXM_BULLETIN;
-
-drop table if exists SYS_ORG;
-
-drop table if exists SYS_USER;
+drop table if exists SYS_CRON;
 
 drop table if exists SYS_DICT;
 
 drop table if exists SYS_FILE;
 
-drop table if exists SYS_CRON;
+drop table if exists SYS_ORG;
 
 drop table if exists SYS_PARM;
 
 drop table if exists SYS_SENSITIVE;
 
+drop table if exists SYS_USER;
+
 drop table if exists SYS_VER;
-
-/*==============================================================*/
-/* Table: EXM_QUESTION_TYPE                                     */
-/*==============================================================*/
-create table EXM_QUESTION_TYPE
-(
-   ID                   int not null auto_increment comment '主键',
-   NAME                 varchar(32) comment '名称',
-   IMG_FILE_ID          int comment '附件ID',
-   CREATE_USER_ID       int comment '创建人',
-   CREATE_TIME          datetime comment '创建时间',
-   UPDATE_USER_ID       int comment '修改人',
-   UPDATE_TIME          datetime comment '修改时间',
-   STATE                int comment '0：删除；1：正常',
-   WRITE_USER_IDS       varchar(1024) comment '写权限',
-   primary key (ID)
-);
-
-alter table EXM_QUESTION_TYPE comment '题库';
-
-/*==============================================================*/
-/* Table: EXM_QUESTION                                          */
-/*==============================================================*/
-create table EXM_QUESTION
-(
-   ID                   int not null auto_increment comment '主键',
-   TYPE                 int comment '类型（1：单选；2：多选；3：填空；4：判断；5：问答）',
-   TITLE                text comment '题干',
-   ANALYSIS             text comment '解析',
-   SCORE                decimal(5,2) comment '默认分值',
-   MARK_TYPE            int comment ' 阅卷类型（1：客观题；2：主观题）',
-   MARK_OPTIONS         varchar(8) comment ' 阅卷选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；)',
-   WRITE_USER_IDS       varchar(1024) comment '写权限',
-   STATE                int comment '状态（0：删除；1：发布；2：草稿）',
-   QUESTION_TYPE_ID     int comment '试题分类',
-   CREATE_USER_ID       int comment '创建人',
-   CREATE_TIME          datetime comment '创建时间',
-   UPDATE_USER_ID       int comment '修改人',
-   UPDATE_TIME          datetime comment '修改时间',
-   primary key (ID)
-);
-
-alter table EXM_QUESTION comment '试题';
-
-/*==============================================================*/
-/* Table: EXM_QUESTION_OPTION                                   */
-/*==============================================================*/
-create table EXM_QUESTION_OPTION
-(
-   ID                   int not null auto_increment comment '主键',
-   OPTIONS              text comment '选项（option是关键字）',
-   NO                   int comment '排序',
-   QUESTION_ID          int not null comment '试题ID',
-   primary key (ID)
-);
-
-alter table EXM_QUESTION_OPTION comment '试题选项';
-
-/*==============================================================*/
-/* Table: EXM_QUESTION_ANSWER                                   */
-/*==============================================================*/
-create table EXM_QUESTION_ANSWER
-(
-   ID                   int not null auto_increment comment '主键',
-   ANSWER               text comment '一个答案有多个同义词用\n分隔',
-   SCORE                decimal(5,2) comment '分值',
-   QUESTION_ID          int not null comment '试题ID',
-   NO                   int comment '排序',
-   primary key (ID)
-);
-
-alter table EXM_QUESTION_ANSWER comment '试题答案';
-
-/*==============================================================*/
-/* Table: EXM_EXAM                                              */
-/*==============================================================*/
-create table EXM_EXAM
-(
-   ID                   int not null auto_increment comment '主键',
-   NAME                 varchar(32) comment '名称',
-   TIME_TYPE            int comment '时间类型（1：限时；2：不限时）',
-   START_TIME           datetime comment '考试开始',
-   END_TIME             datetime comment '考试结束',
-   MARK_START_TIME      datetime comment '阅卷开始',
-   MARK_END_TIME        datetime comment '阅卷结束',
-   MARK_STATE           int comment '阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）',
-   SCORE_STATE          int comment '成绩状态（1：公开；2：不公开）',
-   RANK_STATE           int comment '排名状态（1：公开；2：不公开）',
-   ANON_STATE           int comment '匿名阅卷状态（1：公开；2：不公开）',
-   LOGIN_TYPE           int comment '登陆方式（1：安排考试；2：免登陆考试）',
-   PASS_SCORE           decimal(5,2) comment '及格分数（%）',
-   TOTAL_SCORE          decimal(5,2) comment '总分数',
-   MARK_TYPE            int comment '阅卷方式（1：智能阅卷；2：人工阅卷；）数据字典：PAPER_MARK_TYPE',
-   SHOW_TYPE            int comment '展示方式（1：整卷展示；3：单题展示；）数据字典：PAPER_SHOW_TYPE',
-   GEN_TYPE             int comment '组卷方式（1：人工组卷；2：随机组卷）',
-   SXES                 varchar(32) comment '反作弊（1：试题乱序；2：选项乱序；3：禁用右键；4：禁止复制；5：最小化警告）',
-   MINIMIZE_NUM         int comment '最小化警告次数（SXES=5有效）',
-   STATE                int comment '状态（0：删除；1：发布；2：暂停；3：归档）',
-   UPDATE_USER_ID       int comment '修改人',
-   UPDATE_TIME          datetime comment '修改时间',
-   primary key (ID)
-);
-
-alter table EXM_EXAM comment '考试';
-
-/*==============================================================*/
-/* Table: EXM_EXAM_RULE                                         */
-/*==============================================================*/
-create table EXM_EXAM_RULE
-(
-   ID                   int not null auto_increment comment '主键',
-   QUESTION_TYPE_ID     int comment '题库ID',
-   TYPE                 int comment '类型（1：单选；2：多选；3：填空；4：判断；5：问答）',
-   MARK_TYPES           varchar(8) comment '阅卷类型（1：客观题；2：主观题）',
-   MARK_OPTIONS         varchar(8) comment '阅卷选项   （1：漏选得分；2：答案无顺序；3：大小写不敏感；）',
-   NUM                  int comment '题数',
-   SCORE                decimal(5,2) comment '分数',
-   EXAM_ID              int comment '考试ID',
-   NO                   int comment '排序',
-   UPDATE_USER_ID       int comment '修改人',
-   UPDATE_TIME          datetime comment '修改时间',
-   primary key (ID)
-);
-
-alter table EXM_EXAM_RULE comment '考试规则';
-
-/*==============================================================*/
-/* Table: EXM_EXAM_QUESTION                                     */
-/*==============================================================*/
-create table EXM_EXAM_QUESTION
-(
-   ID                   int not null auto_increment comment '主键',
-   CHAPTER_NAME         varchar(32) comment '章节名称',
-   CHAPTER_TXT          varchar(512) comment '章节描述',
-   TYPE                 int comment '类型 （1：章节；2：试题）',
-   SCORE                decimal(5,2) comment '分数',
-   SCORES               varchar(16) comment '子分数',
-   MARK_OPTIONS         varchar(8) comment '阅卷选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；)',
-   EXAM_ID              int comment '考试ID',
-   QUESTION_ID          int comment '试题ID',
-   USER_ID              int comment '用户ID（随机试卷有效）',
-   NO                   int comment '排序',
-   UPDATE_USER_ID       int comment '修改人',
-   UPDATE_TIME          datetime comment '修改时间',
-   primary key (ID)
-);
-
-alter table EXM_EXAM_QUESTION comment '考试试题';
-
-/*==============================================================*/
-/* Table: EXM_EXAM_QUESTION_NO                                  */
-/*==============================================================*/
-create table EXM_EXAM_QUESTION_NO
-(
-   ID                   int not null auto_increment comment '主键',
-   EXAM_ID              int comment '考试ID',
-   USER_ID              int comment '用户ID',
-   NO                   text comment '排序（格式：[ {questionId:options} ]）',
-   primary key (ID)
-);
-
-alter table EXM_EXAM_QUESTION_NO comment '考试试题排序';
-
-/*==============================================================*/
-/* Table: EXM_MY_MARK                                           */
-/*==============================================================*/
-create table EXM_MY_MARK
-(
-   ID                   int not null auto_increment comment '主键',
-   MARK_USER_ID         int comment '阅卷用户ID',
-   EXAM_USER_IDS        varchar(1024) comment '考试用户IDS',
-   QUESTION_IDS         varchar(1024) comment '试题IDS',
-   UPDATE_USER_ID       int comment '修改人',
-   UPDATE_TIME          datetime comment '修改时间',
-   EXAM_ID              int comment '考试ID',
-   primary key (ID)
-);
-
-alter table EXM_MY_MARK comment '我的阅卷';
-
-/*==============================================================*/
-/* Table: EXM_MY_EXAM                                           */
-/*==============================================================*/
-create table EXM_MY_EXAM
-(
-   ID                   int not null auto_increment comment '主键',
-   EXAM_ID              int comment '考试ID',
-   USER_ID              int comment '用户ID',
-   ANSWER_START_TIME    datetime comment '答题时间',
-   ANSWER_END_TIME      datetime comment '答题完成时间',
-   MARK_USER_ID         int comment '阅卷用户',
-   MARK_START_TIME      datetime comment '阅卷时间',
-   MARK_END_TIME        datetime comment '阅卷完成时间',
-   TOTAL_SCORE          decimal(5,2) comment '总分数',
-   STATE                int comment '状态（1：未考试；2：考试中；3：已交卷；4：强制交卷；）',
-   MARK_STATE           int comment '阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）',
-   ANSWER_STATE         int comment '答题状态（1：及格；2：不及格）',
-   UPDATE_USER_ID       int comment '修改人',
-   UPDATE_TIME          datetime comment '修改时间',
-   NO                   int comment '排序',
-   primary key (ID)
-);
-
-alter table EXM_MY_EXAM comment '我的考试';
-
-/*==============================================================*/
-/* Table: EXM_MY_EXAM_DETAIL                                    */
-/*==============================================================*/
-create table EXM_MY_EXAM_DETAIL
-(
-   ID                   int not null auto_increment comment '主键',
-   EXAM_ID              int comment '考试ID',
-   USER_ID              int comment '用户ID',
-   QUESTION_ID          int comment '试题ID',
-   ANSWER_TIME          datetime comment '答题时间',
-   MARK_USER_ID         int comment '阅卷用户ID',
-   MARK_TIME            datetime comment '阅卷时间',
-   ANSWER               text comment '答案',
-   SCORE                decimal(5,2) comment '得分',
-   QUESTION_SCORE       decimal(5,2) comment '试题分值',
-   ANSWER_FILE_ID       int comment '答案附件ID',
-   MY_EXAM_ID           int comment '我的考试ID',
-   primary key (ID)
-);
-
-alter table EXM_MY_EXAM_DETAIL comment '我的考试详细';
-
-/*==============================================================*/
-/* Table: EXM_QUESTION_COMMENT                                  */
-/*==============================================================*/
-create table EXM_QUESTION_COMMENT
-(
-   ID                   int not null auto_increment comment '主键',
-   QUESTION_ID          int comment '试题id',
-   CONTENT              text comment '评论内容',
-   PARENT_ID            int comment '父ID',
-   PARENT_SUB           varchar(512) comment '父子关系（格式：_父ID_子ID_子子ID_... ...）',
-   LEVEL                int comment '级别',
-   STATE                int comment '状态(0：删除；1：正常,)',
-   CREATE_USER_ID       int comment '创建人',
-   CREATE_TIME          datetime comment '创建时间',
-   UPDATE_USER_ID       int comment '修改人',
-   UPDATE_TIME          datetime comment '修改时间',
-   primary key (ID)
-);
-
-alter table EXM_QUESTION_COMMENT comment '试题评论';
-
-/*==============================================================*/
-/* Table: EXM_QUESTION_TYPE_OPEN                                */
-/*==============================================================*/
-create table EXM_QUESTION_TYPE_OPEN
-(
-   ID                   int not null auto_increment comment '主键',
-   START_TIME           datetime comment '开始时间',
-   END_TIME             datetime comment '结束时间',
-   USER_IDS             varchar(1024) comment '开放用户',
-   ORG_IDS              varchar(256) comment '开放机构',
-   UPDATE_USER_ID       int comment '修改人',
-   UPDATE_TIME          datetime comment '修改时间',
-   STATE                int comment '0：删除；1：正常',
-   QUESTION_TYPE_ID     int comment '试题分类ID',
-   COMMENT_STATE        int comment '评论状态(0：关闭；1：只读；2：可编辑,)',
-   Column_11            char(10),
-   primary key (ID)
-);
-
-alter table EXM_QUESTION_TYPE_OPEN comment '模拟练习';
 
 /*==============================================================*/
 /* Table: EXM_BULLETIN                                          */
@@ -327,7 +55,7 @@ create table EXM_BULLETIN
    NO                   int comment '排序',
    STATE                int comment '0：删除；1：发布；2：草稿',
    UPDATE_TIME          datetime comment '修改时间',
-   UPDATE_USER_ID       int comment '修改人',
+   UPDATE_USER_ID       int comment '修改用户ID',
    READ_USER_IDS        varchar(256) comment '用户读权限',
    READ_ORG_IDS         varchar(64) comment '机构读权限',
    START_TIME           datetime comment '开始时间',
@@ -338,49 +66,261 @@ create table EXM_BULLETIN
 alter table EXM_BULLETIN comment '公告';
 
 /*==============================================================*/
-/* Table: SYS_ORG                                               */
+/* Table: EXM_EXAM                                              */
 /*==============================================================*/
-create table SYS_ORG
+create table EXM_EXAM
 (
    ID                   int not null auto_increment comment '主键',
    NAME                 varchar(32) comment '名称',
-   CODE                 varchar(32) comment '编码唯一',
-   PARENT_ID            int comment '父ID',
-   PARENT_IDS           varchar(128) comment '父级IDS',
-   LEVEL                int comment '级别',
-   UPDATE_USER_ID       int comment '修改人',
+   PAPER_NAME           varchar(32) comment '试卷名称',
+   GEN_TYPE             int comment '组卷方式（1：人工组卷；2：随机组卷）',
+   MARK_TYPE            int comment '阅卷方式（1：自动阅卷；2：人工阅卷；）数据字典：PAPER_MARK_TYPE',
+   SHOW_TYPE            int comment '展示方式（1：整卷展示；3：单题展示；）数据字典：PAPER_SHOW_TYPE',
+   TIME_TYPE            int comment '时间类型（1：限时；2：不限时）',
+   START_TIME           datetime comment '考试开始',
+   END_TIME             datetime comment '考试结束',
+   MARK_START_TIME      datetime comment '阅卷开始',
+   MARK_END_TIME        datetime comment '阅卷结束',
+   MARK_STATE           int comment '阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）',
+   SCORE_STATE          int comment '成绩状态（1：公开；2：不公开）',
+   RANK_STATE           int comment '排名状态（1：公开；2：不公开）',
+   ANON_STATE           int comment '匿名阅卷状态（1：公开；2：不公开）',
+   LOGIN_TYPE           int comment '登陆方式（1：安排考试；2：免登陆考试）',
+   PASS_SCORE           decimal(5,2) comment '及格分数',
+   TOTAL_SCORE          decimal(5,2) comment '总分数',
+   SXES                 varchar(32) comment '反作弊（1：试题乱序；2：选项乱序；）',
+   STATE                int comment '状态（0：删除；1：发布；2：暂停；）',
+   UPDATE_USER_ID       int comment '修改用户ID',
    UPDATE_TIME          datetime comment '修改时间',
-   STATE                int comment '0：删除；1：正常；',
+   primary key (ID)
+);
+
+alter table EXM_EXAM comment '考试';
+
+/*==============================================================*/
+/* Table: EXM_EXAM_QUESTION                                     */
+/*==============================================================*/
+create table EXM_EXAM_QUESTION
+(
+   ID                   int not null auto_increment comment '主键',
+   CHAPTER_NAME         varchar(32) comment '章节名称',
+   CHAPTER_TXT          varchar(512) comment '章节描述',
+   TYPE                 int comment '类型 （1：章节；2：试题）',
+   SCORE                decimal(5,2) comment '分数',
+   SCORES               varchar(16) comment '子分数',
+   MARK_OPTIONS         varchar(8) comment '阅卷选项（2：答案无顺序；3：不区分大小写；)',
+   EXAM_ID              int comment '考试ID',
+   QUESTION_ID          int comment '试题ID',
+   NO                   int comment '排序',
+   OPTIONS_NO           varchar(16) comment '选项排序',
+   UPDATE_USER_ID       int comment '修改用户ID',
+   UPDATE_TIME          datetime comment '修改时间',
+   primary key (ID)
+);
+
+alter table EXM_EXAM_QUESTION comment '考试试题（固定试卷有效）';
+
+/*==============================================================*/
+/* Table: EXM_EXAM_RULE                                         */
+/*==============================================================*/
+create table EXM_EXAM_RULE
+(
+   ID                   int not null auto_increment comment '主键',
+   CHAPTER_NAME         varchar(32) comment '章节名称',
+   CHAPTER_TXT          varchar(512) comment '章节描述',
+   TYPE                 int comment '类型 （1：章节；2：试题）',
+   QUESTION_TYPE_ID     int comment '题库ID',
+   QUESTION_TYPE        int comment '类型（1：单选；2：多选；3：填空；4：判断；5：问答）',
+   MARK_TYPE            int comment '阅卷类型（1：客观题；2：主观题）',
+   MARK_OPTIONS         varchar(8) comment '阅卷选项   （2：答案无顺序；3：不区分大小写；）',
+   NUM                  int comment '题数',
+   SCORE                decimal(5,2) comment '分数',
+   SCORES               decimal(5,2) comment '子分数（多选有效；主观填空问答按空平均分配分数）',
+   EXAM_ID              int comment '考试ID',
+   NO                   int comment '排序',
+   UPDATE_USER_ID       int comment '修改用户ID',
+   UPDATE_TIME          datetime comment '修改时间',
+   primary key (ID)
+);
+
+alter table EXM_EXAM_RULE comment '考试抽题规则（随机试卷有效）';
+
+/*==============================================================*/
+/* Table: EXM_MY_EXAM                                           */
+/*==============================================================*/
+create table EXM_MY_EXAM
+(
+   ID                   int not null auto_increment comment '主键',
+   EXAM_ID              int comment '考试ID',
+   USER_ID              int comment '考试用户ID',
+   MARK_USER_ID         int comment '阅卷用户ID',
+   ANSWER_START_TIME    datetime comment '答题开始时间',
+   ANSWER_END_TIME      datetime comment '答题结束时间',
+   MARK_START_TIME      datetime comment '阅卷开始时间',
+   MARK_END_TIME        datetime comment '阅卷结束时间',
+   OBJECTIVE_SCORE      decimal(5,2) comment '客观题分数',
+   TOTAL_SCORE          decimal(5,2) comment '总分数',
+   STATE                int comment '状态（1：未考试；2：考试中；3：已交卷；）',
+   MARK_STATE           int comment '阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）',
+   ANSWER_STATE         int comment '答题状态（1：及格；2：不及格）',
+   UPDATE_USER_ID       int comment '修改用户ID',
+   UPDATE_TIME          datetime comment '修改时间',
    NO                   int comment '排序',
    primary key (ID)
 );
 
-alter table SYS_ORG comment '组织机构';
+alter table EXM_MY_EXAM comment '我的考试';
 
 /*==============================================================*/
-/* Table: SYS_USER                                              */
+/* Table: EXM_MY_QUESTION                                       */
 /*==============================================================*/
-create table SYS_USER
+create table EXM_MY_QUESTION
 (
    ID                   int not null auto_increment comment '主键',
-   NAME                 varchar(16) comment '名称',
-   LOGIN_NAME           varchar(16) comment '登陆账号',
-   EMAIL                varchar(64) comment '邮箱',
-   PHONE                varchar(11) comment '手机号',
-   PWD                  varchar(32) comment '密码',
-   HEAD_FILE_ID         int comment '头像',
-   REGIST_TIME          datetime comment '注册时间',
-   LAST_LOGIN_TIME      datetime comment '最后登陆时间',
-   ORG_ID               int comment '组织机构ID',
-   ROLES                varchar(64) comment '角色',
-   TYPE                 int comment '类型（1：用户；2：子管理员）',
-   STATE                int comment '状态（0：删除；1：正常；2：冻结；）',
-   UPDATE_USER_ID       int comment '修改人',
+   CHAPTER_NAME         varchar(32) comment '章节名称',
+   CHAPTER_TXT          varchar(512) comment '章节描述',
+   TYPE                 int comment '类型 （1：章节；2：试题）',
+   SCORE                decimal(5,2) comment '分数',
+   SCORES               varchar(16) comment '子分数',
+   MARK_OPTIONS         varchar(8) comment '阅卷选项（2：答案无顺序；3：不区分大小写；)',
+   EXAM_ID              int comment '考试ID',
+   QUESTION_ID          int comment '试题ID',
+   USER_ID              int comment '用户ID',
+   NO                   int comment '排序',
+   OPTIONS_NO           varchar(16) comment '选项排序，如：2,1,4,3',
+   ANSWER_TIME          datetime comment '答题时间',
+   USER_ANSWER          text comment '用户答案',
+   USER_SCORE           decimal(5,2) comment '用户得分',
+   MARK_USER_ID         int comment '阅卷用户ID',
+   MARK_TIME            datetime comment '阅卷时间',
+   UPDATE_USER_ID       int comment '修改用户ID',
    UPDATE_TIME          datetime comment '修改时间',
    primary key (ID)
 );
 
-alter table SYS_USER comment '用户';
+alter table EXM_MY_QUESTION comment '我的试题';
+
+/*==============================================================*/
+/* Table: EXM_QUESTION                                          */
+/*==============================================================*/
+create table EXM_QUESTION
+(
+   ID                   int not null auto_increment comment '主键',
+   TYPE                 int comment '类型（1：单选；2：多选；3：填空；4：判断；5：问答）',
+   TITLE                text comment '题干',
+   MARK_TYPE            int comment ' 阅卷类型（1：客观题；2：主观题）',
+   MARK_OPTIONS         varchar(8) comment ' 阅卷选项（2：答案无顺序；3：不区分大小写；)',
+   ANALYSIS             text comment '解析',
+   SCORE                decimal(5,2) comment '默认分值',
+   STATE                int comment '状态（0：删除；1：发布；）',
+   QUESTION_TYPE_ID     int comment '试题分类ID',
+   UPDATE_USER_ID       int comment '修改用户ID',
+   UPDATE_TIME          datetime comment '修改时间',
+   primary key (ID)
+);
+
+alter table EXM_QUESTION comment '试题';
+
+/*==============================================================*/
+/* Table: EXM_QUESTION_ANSWER                                   */
+/*==============================================================*/
+create table EXM_QUESTION_ANSWER
+(
+   ID                   int not null auto_increment comment '主键',
+   ANSWER               text comment '一个答案有多个同义词用\n分隔',
+   SCORE                decimal(5,2) comment '分值',
+   QUESTION_ID          int not null comment '试题ID',
+   NO                   int comment '排序',
+   primary key (ID)
+);
+
+alter table EXM_QUESTION_ANSWER comment '试题答案';
+
+/*==============================================================*/
+/* Table: EXM_QUESTION_COMMENT                                  */
+/*==============================================================*/
+create table EXM_QUESTION_COMMENT
+(
+   ID                   int not null auto_increment comment '主键',
+   QUESTION_ID          int comment '试题id',
+   CONTENT              text comment '评论内容',
+   PARENT_ID            int comment '父ID',
+   PARENT_SUB           varchar(512) comment '父子关系（格式：_父ID_子ID_子子ID_... ...）',
+   LEVEL                int comment '级别',
+   STATE                int comment '状态(0：删除；1：正常,)',
+   CREATE_USER_ID       int comment '创建人',
+   CREATE_TIME          datetime comment '创建时间',
+   UPDATE_USER_ID       int comment '修改用户ID',
+   UPDATE_TIME          datetime comment '修改时间',
+   primary key (ID)
+);
+
+alter table EXM_QUESTION_COMMENT comment '试题评论';
+
+/*==============================================================*/
+/* Table: EXM_QUESTION_OPTION                                   */
+/*==============================================================*/
+create table EXM_QUESTION_OPTION
+(
+   ID                   int not null auto_increment comment '主键',
+   OPTIONS              text comment '选项（option是关键字）',
+   NO                   int comment '排序',
+   QUESTION_ID          int not null comment '试题ID',
+   primary key (ID)
+);
+
+alter table EXM_QUESTION_OPTION comment '试题选项';
+
+/*==============================================================*/
+/* Table: EXM_QUESTION_TYPE                                     */
+/*==============================================================*/
+create table EXM_QUESTION_TYPE
+(
+   ID                   int not null auto_increment comment '主键',
+   NAME                 varchar(32) comment '名称',
+   UPDATE_USER_ID       int comment '修改用户ID',
+   UPDATE_TIME          datetime comment '修改时间',
+   primary key (ID)
+);
+
+alter table EXM_QUESTION_TYPE comment '题库';
+
+/*==============================================================*/
+/* Table: EXM_QUESTION_TYPE_OPEN                                */
+/*==============================================================*/
+create table EXM_QUESTION_TYPE_OPEN
+(
+   ID                   int not null auto_increment comment '主键',
+   START_TIME           datetime comment '开始时间',
+   END_TIME             datetime comment '结束时间',
+   USER_IDS             varchar(1024) comment '开放用户',
+   ORG_IDS              varchar(256) comment '开放机构',
+   UPDATE_USER_ID       int comment '修改用户ID',
+   UPDATE_TIME          datetime comment '修改时间',
+   STATE                int comment '0：删除；1：正常',
+   QUESTION_TYPE_ID     int comment '试题分类ID',
+   COMMENT_STATE        int comment '评论状态(0：关闭；1：只读；2：可编辑,)',
+   primary key (ID)
+);
+
+alter table EXM_QUESTION_TYPE_OPEN comment '模拟练习';
+
+/*==============================================================*/
+/* Table: SYS_CRON                                              */
+/*==============================================================*/
+create table SYS_CRON
+(
+   ID                   int not null auto_increment comment '主键',
+   NAME                 varchar(32) comment '名称',
+   JOB_CLASS            varchar(64) comment '实现类',
+   CRON                 varchar(64) comment 'cron表达式',
+   STATE                int comment '1：启动；2：停止；',
+   UPDATE_USER_ID       int comment '修改用户ID',
+   UPDATE_TIME          datetime comment '修改时间',
+   primary key (ID)
+);
+
+alter table SYS_CRON comment '定时任务';
 
 /*==============================================================*/
 /* Table: SYS_DICT                                              */
@@ -417,21 +357,24 @@ create table SYS_FILE
 alter table SYS_FILE comment '附件';
 
 /*==============================================================*/
-/* Table: SYS_CRON                                              */
+/* Table: SYS_ORG                                               */
 /*==============================================================*/
-create table SYS_CRON
+create table SYS_ORG
 (
    ID                   int not null auto_increment comment '主键',
    NAME                 varchar(32) comment '名称',
-   JOB_CLASS            varchar(64) comment '实现类',
-   CRON                 varchar(64) comment 'cron表达式',
-   STATE                int comment '1：启动；2：停止；',
-   UPDATE_USER_ID       int comment '修改人',
+   CODE                 varchar(32) comment '编码唯一',
+   PARENT_ID            int comment '父ID',
+   PARENT_IDS           varchar(128) comment '父级IDS',
+   LEVEL                int comment '级别',
+   UPDATE_USER_ID       int comment '修改用户ID',
    UPDATE_TIME          datetime comment '修改时间',
+   STATE                int comment '0：删除；1：正常；',
+   NO                   int comment '排序',
    primary key (ID)
 );
 
-alter table SYS_CRON comment '定时任务';
+alter table SYS_ORG comment '机构';
 
 /*==============================================================*/
 /* Table: SYS_PARM                                              */
@@ -446,7 +389,7 @@ create table SYS_PARM
    EMAIL_ENCODE         varchar(16) comment '邮件编码',
    ORG_LOGO             int comment '单位商标',
    ORG_NAME             varchar(32) comment '单位名称',
-   UPDATE_USER_ID       int comment '修改人',
+   UPDATE_USER_ID       int comment '修改用户ID',
    UPDATE_TIME          datetime comment '修改时间',
    FILE_UPLOAD_DIR      varchar(64) comment '上传目录',
    DB_BAK_DIR           varchar(64) comment '数据库备份目录',
@@ -465,12 +408,37 @@ create table SYS_SENSITIVE
    ID                   int not null auto_increment comment '主键',
    WHITE_LIST           text comment '白名单',
    BLACK_LIST           text comment '黑名单',
-   UPDATE_USER_ID       int comment '修改人',
+   UPDATE_USER_ID       int comment '修改用户ID',
    UPDATE_TIME          datetime comment '修改时间',
    primary key (ID)
 );
 
 alter table SYS_SENSITIVE comment '敏感词';
+
+/*==============================================================*/
+/* Table: SYS_USER                                              */
+/*==============================================================*/
+create table SYS_USER
+(
+   ID                   int not null auto_increment comment '主键',
+   NAME                 varchar(16) comment '名称',
+   LOGIN_NAME           varchar(16) comment '登陆账号',
+   EMAIL                varchar(64) comment '邮箱',
+   PHONE                varchar(11) comment '手机号',
+   PWD                  varchar(32) comment '密码',
+   HEAD_FILE_ID         int comment '头像',
+   REGIST_TIME          datetime comment '注册时间',
+   LAST_LOGIN_TIME      datetime comment '最后登陆时间',
+   ORG_ID               int comment '机构ID',
+   ROLES                varchar(64) comment '角色',
+   TYPE                 int comment '类型（1：用户；2：子管理员）',
+   STATE                int comment '状态（0：删除；1：正常；2：冻结；）',
+   UPDATE_USER_ID       int comment '修改用户ID',
+   UPDATE_TIME          datetime comment '修改时间',
+   primary key (ID)
+);
+
+alter table SYS_USER comment '用户';
 
 /*==============================================================*/
 /* Table: SYS_VER                                               */
@@ -487,6 +455,7 @@ create table SYS_VER
 
 alter table SYS_VER comment '版本';
 
+
 /*==============================================================*/
 /* 数据															*/
 /*==============================================================*/
@@ -495,18 +464,25 @@ INSERT INTO `SYS_ORG` VALUES (1, '组织机构', 'code', '0', '_1_', '1', '1', '
 
 INSERT INTO `SYS_USER` VALUES (1, '管理员', 'admin', null, null,'79nRuL+wDo42R5kPfXTR2A==',null, '2017-08-01 22:31:43', '2017-08-01 22:31:43', null, 'admin', '1', '1', '1', '2017-08-01 22:31:43');
 
-INSERT INTO `SYS_DICT` VALUES (1, 'STATE', '0', '回收站', 1);
+INSERT INTO `SYS_DICT` VALUES (1, 'STATE', '0', '删除', 1);
 INSERT INTO `SYS_DICT` VALUES (2, 'STATE', '1', '发布', 2);
 INSERT INTO `SYS_DICT` VALUES (3, 'STATE', '2', '暂停', 3);
+
 INSERT INTO `SYS_DICT` VALUES (4, 'STATE_YN', '1', '是', 1);
 INSERT INTO `SYS_DICT` VALUES (5, 'STATE_YN', '2', '否', 2);
-INSERT INTO `SYS_DICT` VALUES (6, 'CRON_TYPE', '1', '启动', 1);
-INSERT INTO `SYS_DICT` VALUES (7, 'CRON_TYPE', '2', '停止', 2);
+
+INSERT INTO `SYS_DICT` VALUES (6, 'STATE_SS', '1', '启动', 1);
+INSERT INTO `SYS_DICT` VALUES (7, 'STATE_SS', '2', '停止', 2);
+
+INSERT INTO `SYS_DICT` VALUES (13, 'STATE_ON', '1', '公开', 1);
+INSERT INTO `SYS_DICT` VALUES (14, 'STATE_ON', '2', '不公开', 2);
+
 INSERT INTO `SYS_DICT` VALUES (8, 'QUESTION_TYPE', '1', '单选', 1);
 INSERT INTO `SYS_DICT` VALUES (9, 'QUESTION_TYPE', '2', '多选', 2);
 INSERT INTO `SYS_DICT` VALUES (10, 'QUESTION_TYPE', '3', '填空', 3);
 INSERT INTO `SYS_DICT` VALUES (11, 'QUESTION_TYPE', '4', '判断', 4);
 INSERT INTO `SYS_DICT` VALUES (12, 'QUESTION_TYPE', '5', '问答', 5);
+
 INSERT INTO `SYS_DICT` VALUES (18, 'QUESTION_OPTIONS', '1', 'A', 1);
 INSERT INTO `SYS_DICT` VALUES (19, 'QUESTION_OPTIONS', '2', 'B', 2);
 INSERT INTO `SYS_DICT` VALUES (20, 'QUESTION_OPTIONS', '3', 'C', 3);
@@ -514,30 +490,31 @@ INSERT INTO `SYS_DICT` VALUES (21, 'QUESTION_OPTIONS', '4', 'D', 4);
 INSERT INTO `SYS_DICT` VALUES (22, 'QUESTION_OPTIONS', '5', 'E', 5);
 INSERT INTO `SYS_DICT` VALUES (23, 'QUESTION_OPTIONS', '6', 'F', 6);
 INSERT INTO `SYS_DICT` VALUES (24, 'QUESTION_OPTIONS', '7', 'G', 7);
-INSERT INTO `SYS_DICT` VALUES (25, 'MY_EXAM_STATE', '1', '未考试', 1);
-INSERT INTO `SYS_DICT` VALUES (26, 'MY_EXAM_STATE', '2', '考试中', 2);
-INSERT INTO `SYS_DICT` VALUES (27, 'MY_EXAM_STATE', '3', '已交卷', 3);
-INSERT INTO `SYS_DICT` VALUES (28, 'MY_EXAM_STATE', '4', '强制交卷', 4);
-INSERT INTO `SYS_DICT` VALUES (29, 'MY_EXAM_MARK_STATE', '1', '未阅卷', 1);
-INSERT INTO `SYS_DICT` VALUES (30, 'MY_EXAM_MARK_STATE', '2', '阅卷中', 2);
-INSERT INTO `SYS_DICT` VALUES (31, 'MY_EXAM_MARK_STATE', '3', '已阅卷', 3);
-INSERT INTO `SYS_DICT` VALUES (32, 'MY_EXAM_ANSWER_STATE', '1', '及格', 1);
-INSERT INTO `SYS_DICT` VALUES (33, 'MY_EXAM_ANSWER_STATE', '2', '不及格', 2);
-INSERT INTO `SYS_DICT` VALUES (34, 'EXAM_STATE', '0', '删除', 1);
-INSERT INTO `SYS_DICT` VALUES (35, 'EXAM_STATE', '1', '发布', 2);
-INSERT INTO `SYS_DICT` VALUES (36, 'EXAM_STATE', '2', '草稿', 3);
-INSERT INTO `SYS_DICT` VALUES (37, 'STATE_OPEN', '1', '正常', 1);
-INSERT INTO `SYS_DICT` VALUES (38, 'STATE_OPEN', '2', '作废', 2);
-INSERT INTO `SYS_DICT` VALUES (39, 'STATE_OPEN', '0', '删除', 3);
+
+INSERT INTO `SYS_DICT` VALUES (25, 'EXAM_STATE', '1', '未考试', 1);
+INSERT INTO `SYS_DICT` VALUES (26, 'EXAM_STATE', '2', '考试中', 2);
+INSERT INTO `SYS_DICT` VALUES (27, 'EXAM_STATE', '3', '已交卷', 3);
+--INSERT INTO `SYS_DICT` VALUES (28, 'EXAM_STATE', '4', '强制交卷', 4);
+
+INSERT INTO `SYS_DICT` VALUES (29, 'MARK_STATE', '1', '未阅卷', 1);
+INSERT INTO `SYS_DICT` VALUES (30, 'MARK_STATE', '2', '阅卷中', 2);
+INSERT INTO `SYS_DICT` VALUES (31, 'MARK_STATE', '3', '已阅卷', 3);
+
+INSERT INTO `SYS_DICT` VALUES (32, 'ANSWER_STATE', '1', '及格', 1);
+INSERT INTO `SYS_DICT` VALUES (33, 'ANSWER_STATE', '2', '不及格', 2);
+
 INSERT INTO `SYS_DICT` VALUES (40, 'PAPER_MARK_TYPE', '1', '客观题', 1);
 INSERT INTO `SYS_DICT` VALUES (41, 'PAPER_MARK_TYPE', '2', '主观题', 2);
+
 INSERT INTO `SYS_DICT` VALUES (42, 'PAPER_SHOW_TYPE', '1', '整卷展示', 1);
 INSERT INTO `SYS_DICT` VALUES (44, 'PAPER_SHOW_TYPE', '3', '单题展示', 3);
+
 INSERT INTO `SYS_DICT` VALUES (45, 'PAPER_GEN_TYPE', '1', '人工组卷', 1);
 INSERT INTO `SYS_DICT` VALUES (46, 'PAPER_GEN_TYPE', '2', '随机组卷', 2);
-INSERT INTO `SYS_DICT` VALUES (47, 'EXAM_STATE', '3', '归档', 4);
+
 INSERT INTO `SYS_DICT` VALUES (48, 'BULLETIN_SHOW_TYPE', '1', '正常', 1);
 INSERT INTO `SYS_DICT` VALUES (49, 'BULLETIN_SHOW_TYPE', '2', '置顶', 2);
+
 INSERT INTO `SYS_DICT` VALUES (51, 'QUESTION_MARK_OPTIONS', '2', '答案无序', 2);
 INSERT INTO `SYS_DICT` VALUES (52, 'QUESTION_MARK_OPTIONS', '3', '字母不敏感', 3);
 

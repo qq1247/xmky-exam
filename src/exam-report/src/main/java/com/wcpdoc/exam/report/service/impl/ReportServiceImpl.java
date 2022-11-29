@@ -33,7 +33,6 @@ import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.MyExam;
-import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.service.ExamQuestionService;
 import com.wcpdoc.exam.core.service.ExamService;
@@ -196,28 +195,28 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 		}
 		
 		{
-			List<MyMark> myMarkList = myMarkService.getListForMarkUser(getCurUser().getId());
-			Map<Integer, Exam> examCache = new HashMap<>();
-			for (Exam exam : examList) {
-				examCache.put(exam.getId(), exam);
-			}
-			int markNum = 0;
-			for (MyMark myMark : myMarkList) {
-				Exam curExam = examCache.get(myMark.getExamId());
-				if (curExam == null) {// 考试已删除
-					continue;
-				}
-				//if (curExam.getState() != 1) {// 考试未发布
-				//	continue;
-				//}
-				if (ValidateUtil.isValid(curExam.getMarkStartTime()) && curExam.getMarkState() != 3) {// 有阅卷时间就是主观试卷（和试卷中取状态效果一样）
-					markNum++;
-				}
-			}
-			
-			data = new HashMap<String, Object>();
-			data.put("num", markNum);
-			result.put("myMark", data);
+//			List<MyMark> myMarkList = myMarkService.getListForMarkUser(getCurUser().getId());
+//			Map<Integer, Exam> examCache = new HashMap<>();
+//			for (Exam exam : examList) {
+//				examCache.put(exam.getId(), exam);
+//			}
+//			int markNum = 0;
+//			for (MyMark myMark : myMarkList) {
+//				Exam curExam = examCache.get(myMark.getExamId());
+//				if (curExam == null) {// 考试已删除
+//					continue;
+//				}
+//				//if (curExam.getState() != 1) {// 考试未发布
+//				//	continue;
+//				//}
+//				if (ValidateUtil.isValid(curExam.getMarkStartTime()) && curExam.getMarkState() != 3) {// 有阅卷时间就是主观试卷（和试卷中取状态效果一样）
+//					markNum++;
+//				}
+//			}
+//			
+//			data = new HashMap<String, Object>();
+//			data.put("num", markNum);
+//			result.put("myMark", data);
 		}
 		return result;
 	}

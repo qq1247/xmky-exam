@@ -231,13 +231,13 @@ import { getOneDict } from '@/utils/getDict'
 import * as dayjs from 'dayjs'
 export default {
   filters: {
-    examState(data) {
-      return getOneDict('MY_EXAM_STATE').find(
-        (item) => Number(item.dictKey) === data
-      ).dictValue
-    },
+    // examState(data) {
+    //   return getOneDict('EXAM_STATE').find(
+    //     (item) => Number(item.dictKey) === data
+    //   ).dictValue
+    // },
     markState(data) {
-      return getOneDict('MY_EXAM_MARK_STATE').find(
+      return getOneDict('MARK_STATE').find(
         (item) => Number(item.dictKey) === data
       ).dictValue
     },
@@ -245,7 +245,7 @@ export default {
       if (!data) {
         return '--'
       }
-      return getOneDict('MY_EXAM_ANSWER_STATE').find(
+      return getOneDict('ANSWER_STATE').find(
         (item) => Number(item.dictKey) === data
       ).dictValue
     }

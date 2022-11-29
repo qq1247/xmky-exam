@@ -7,29 +7,70 @@
           <el-input
             v-model="queryForm.examName"
             placeholder="请输入考试名称"
-            class="query-input"
-          />
+            class="query-input"/>
         </el-form-item>
       </div>
       <el-form-item>
-        <el-button
-          icon="el-icon-search"
-          type="primary"
-          @click="search"
-        >查询</el-button>
+        <el-button icon="el-icon-search" type="primary" @click="search">查询</el-button>
       </el-form-item>
     </el-form>
     <!-- 内容 -->
     <div class="content">
       <template v-if="myExamList.length > 0">
         <div class="exam-list">
-          <MyCard
-            v-for="(item, index) in myExamList"
-            :key="index"
-            :data="item"
-            name="myExamList"
-            @exam="examHandler"
-          />
+          <div 
+            v-for="(myExam, index) in myExamList"
+            :key="index" 
+            class="exam-item">
+            <div class="exam-content">
+              <div class="tag-group">
+                <el-tag
+                  size="mini"
+                  :type="myExam.state === 3 ? '' : 'danger'"
+                  >{{ $tools.getDictValue('EXAM_STATE', myExam.state) }}</el-tag>
+              </div>
+              <!-- 标题 -->
+              <div class="title ellipsis">{{ myExam.examName }}</div>
+              <el-row>
+                <el-col class="content-info">
+                  考试时间：{{ myExam.examStartTime }}（{{$tools.computeMinute(myExam.examStartTime, myExam.examEndTime)}}）
+                </el-col>
+                <el-col>
+                  <el-row class="content-info">
+                    <el-col :span="8">
+                      答题：{{$tools.computeMinute(myExam.answerStartTime,myExam.answerEndTime)}}
+                    </el-col>
+                    <el-col
+                      :span="8"
+                      :style="{
+                        color: myExam.totalScore !== null && ((myExam.paperPassScore / 100) * myExam.paperTotalScore).toFixed() > myExam.totalScore ? 'red' : '',
+                      }"
+                      >分数：{{myExam.totalScore !== null ? myExam.totalScore : '-' }} / {{ myExam.paperTotalScore }}
+                    </el-col>
+                    <el-col :span="8">
+                      排名：{{ myExam.no === null ? '-' : myExam.no }} / {{ myExam.userNum === null ? '-' : myExam.userNum }}
+                    </el-col>
+                  </el-row>
+                </el-col>
+              </el-row>
+              <el-row class="content-info">
+                <el-col :span="24">
+                  <CountDown
+                    :expireTime="getTime(myExam.examStartTime)"
+                    @endCallback="myExam.disabled = false"
+                    :preTxt="'距离考试：'"
+                  ></CountDown>
+                </el-col>
+              </el-row>
+              <div class="handler">
+                <span
+                  :data-title="进入"
+                  @click="toExam(myExam)">
+                  <i :class="['common', 'common-exam']" />
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </template>
       <el-empty v-else description="暂无信息" />
@@ -50,10 +91,11 @@
 
 <script>
 import { myExamListpage } from 'api/my'
-import MyCard from 'components/ListCard/MyCard.vue'
+import * as dayjs from 'dayjs'
+import CountDown from '@/components/CountDown.vue'
 export default {
   components: {
-    MyCard
+    CountDown,
   },
   data() {
     return {
@@ -61,9 +103,10 @@ export default {
       curPage: 1,
       total: 0,
       queryForm: {
-        examName: ''
+        examName: '',
       },
-      myExamList: []
+      myExamList: [],
+      stateIcon: ['', 'common-wait', 'common-examing', 'common-exam'],
     }
   },
   mounted() {
@@ -75,52 +118,44 @@ export default {
       const myExamList = await myExamListpage({
         examName: this.queryForm.examName,
         curPage: this.curPage,
-        pageSize: this.pageSize
+        pageSize: this.pageSize,
       })
 
-      this.myExamList = myExamList.data?.list || []
-      this.total = myExamList.data?.total || 0
+      this.myExamList = myExamList.data.list.map(myExam => {
+        myExam.disabled = true
+        return myExam
+      })
+      
+
+      this.total = myExamList.data.total
     },
     search() {
       this.curPage = 1
       this.query()
     },
-    // 我的考试操作
-    examHandler({
-      examId,
-      examStartTime,
-      examEndTime,
-      examMarkState,
-      examMarkEndTime,
-    }) {
-      const _examStartTime = new Date(examStartTime).getTime()
-      const _examEndTime = new Date(examEndTime).getTime()
-      const _examMarkEndTime = new Date(examMarkEndTime).getTime()
-      const now = new Date().getTime()
-      if (now < _examStartTime) {
-        this.$message.warning('考试暂未开始！')
+    getTime(date) {
+      return dayjs(date, 'YYYY-MM-DD HH:mm:ss').toDate()
+    },
+    // 去考试
+    toExam(myExam) {
+      if (myExam.disabled) {
+        this.$message.warning('考试未开始，请等待...')
         return
       }
 
-      // 考试时间内和阅卷结束后的逻辑
-      if (
-        (_examStartTime < now && now < _examEndTime) ||
-        (now > _examMarkEndTime && examMarkState === 3)
-      ) {
-        this.$router.push({
-          name: 'MyExamPaper',
-          params: {
-            examId,
-          }
-        })
-      }
+      this.$router.push({
+        name: 'MyExamPaper',
+        params: {
+          examId: myExam.examId,
+        },
+      })
     },
     // 分页切换
     pageChange(val) {
       this.curPage = val
       this.query()
-    }
-  }
+    },
+  },
 }
 </script>
 

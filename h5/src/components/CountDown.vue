@@ -1,123 +1,53 @@
 <template>
-  <div>{{ formattedTime }}</div>
+  <div >
+    <span>{{preTxt}}</span>
+    <span v-if="d > 0">{{ d }}天</span>
+    <span>{{h}}小时{{m}}分{{s}}秒</span>
+  </div>
 </template>
 
 <script>
+import * as dayjs from 'dayjs'
 export default {
   props: {
-    time: {
-      type: [Number, String],
-      default: 0
+    expireTime: {
+      type: Date,
+      default: new Date()
     },
-    autoStart: {
-      type: Boolean,
-      default: true
-    }
-  },
+    preTxt: {
+      type: String,
+      default: ''
+    },
+},
   data() {
     return {
-      remain: 0
+      d:0,
+      h:0,
+      m:0,
+      s:0,
     }
   },
-  computed: {
-    timeData() {
-      return this.parseTimeData(this.remain)
-    },
-
-    formattedTime() {
-      return this.parseFormat(this.timeData)
-    }
-  },
-  watch: {
-    time: {
-      immediate: true,
-      handler: 'reset'
-    }
-  },
-  beforeDestroy() {
-    this.pause()
+  mounted() {
+    this.synTime()
   },
   methods: {
-    start() {
-      if (this.counting) {
-        return
-      }
-
-      this.counting = true
-      this.endTime = Date.now() + this.remain
-      this.tick()
-    },
-
-    pause() {
-      this.counting = false
-      clearTimeout(this._setTimeout)
-    },
-
-    reset() {
-      this.pause()
-      this.remain = +this.time
-
-      if (this.autoStart) {
-        this.start()
-      }
-    },
-
-    tick() {
-      this._setTimeout = setTimeout(() => {
-        if (!this.counting) {
+    // 同步时间
+    synTime() {
+      if (this.$tools.getServerTime()) { // f5刷新页面，导致获取不到时间 22.11.07 zhc
+        let second = (this.expireTime.getTime() - this.$tools.getServerTime().getTime()) / 1000
+        if (second <= 0) {
+          this.$emit('endCallback')
           return
         }
+        this.d = Math.floor(second / 86400)
+        this.h = Math.floor((second / 3600) % 24)
+        this.m = Math.floor((second / 60) % 60)
+        this.s = second % 60
+      }
 
-        this.setRemain(this.getRemain())
-
-        if (this.remain > 0) {
-          this.tick()
-        }
+      setTimeout(() => {
+        this.synTime()
       }, 1000)
-    },
-
-    getRemain() {
-      return Math.max(this.endTime - Date.now(), 0)
-    },
-
-    setRemain(remain) {
-      this.remain = remain
-      this.$emit('change', this.timeData)
-
-      if (remain === 0) {
-        this.pause()
-        this.$emit('finish')
-      }
-    },
-    parseTimeData(time) {
-      const SECOND = 1000
-      const MINUTE = 60 * SECOND
-      const HOUR = 60 * MINUTE
-      const DAY = 24 * HOUR
-      const days = Math.floor(time / DAY)
-      const hours = Math.floor((time % DAY) / HOUR)
-      const minutes = Math.floor((time % HOUR) / MINUTE)
-      const seconds = Math.floor((time % MINUTE) / SECOND)
-      const milliseconds = Math.floor(time % SECOND)
-
-      return {
-        days,
-        hours,
-        minutes,
-        seconds,
-        milliseconds
-      }
-    },
-    parseFormat(timeData) {
-      const days = String(timeData.days).padStart(2, '0')
-      const hours = String(timeData.hours).padStart(2, '0')
-      const minutes = String(timeData.minutes).padStart(2, '0')
-      const seconds = String(timeData.seconds).padStart(2, '0')
-      if (days) {
-        return `${days}天${hours}:${minutes}:${seconds}`
-      } else {
-        return `${hours}:${minutes}:${seconds}`
-      }
     }
   }
 }
