@@ -116,13 +116,16 @@ instance.interceptors.response.use(
       !config._retry
     ) {
       Message.error('请求超时')
+      console.error(`请求超时：${error.config.baseURL}${error.config.url}?${error.config.data}`)
       return Promise.reject(error)
     }
     if (response) {
       errorHandle(response.status, response.data.message)
+      console.error(`未知错误：${error.config.baseURL}${error.config.url}?${error.config.data}`)
       return Promise.reject(response)
     } else {
-      message('请求错误或网站服务器异常！请联系管理员')
+      message('连接服务器失败')
+      console.error(`连接服务器失败：${error.config.baseURL}${error.config.url}?${error.config.data}`)
       return Promise.reject(error)
     }
   }
