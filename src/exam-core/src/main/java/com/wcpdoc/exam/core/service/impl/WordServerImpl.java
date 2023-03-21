@@ -119,7 +119,7 @@ public class WordServerImpl extends WordServer {
 	 * void
 	 */
 	private void transformImgUrl(List<Node> nodeList) {
-		String[] allowTypes = { "jpg", "gif", "png"};
+		String[] allowTypes = { "jpg", "gif", "png", "jpeg"};
 		
 		for (Node node : nodeList) {
 			if (node instanceof TextNode) {
