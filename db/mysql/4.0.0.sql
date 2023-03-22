@@ -1,7 +1,8 @@
 /*==============================================================*/
 /* DBMS name:      MySQL 5.0                                    */
-/* Created on:     2023/2/9 10:27:49                            */
+/* Created on:     2023/3/22 14:01:15                           */
 /*==============================================================*/
+
 
 drop table if exists EXM_BULLETIN;
 
@@ -51,22 +52,13 @@ drop table if exists SYS_VER;
 create table EXM_BULLETIN
 (
    ID                   int not null auto_increment comment '主键',
-   TITLE                varchar(32) comment '标题',
-   IMG_FILE_ID          varchar(256) comment '图片',
-   VIDEO_FILE_ID        varchar(256) comment '视频',
-   CONTENT              text comment '内容',
-   IMGS_HEIGHT          int comment '图片高',
-   IMGS_WIDTH           int comment '图片宽',
-   URL                  varchar(128) comment '跳转链接',
-   SHOW_TYPE            int comment '展示类型（1：正常；2：置顶；3：轮播；）数据字典：BULLETIN_SHOW_TYPE',
-   NO                   int comment '排序',
-   STATE                int comment '状态（0：删除；1：发布；2：暂停）数据字典：STATE',
-   UPDATE_TIME          datetime comment '修改时间',
-   UPDATE_USER_ID       int comment '修改用户ID',
-   READ_USER_IDS        varchar(256) comment '用户读权限',
-   READ_ORG_IDS         varchar(64) comment '机构读权限',
    START_TIME           datetime comment '开始时间',
    END_TIME             datetime comment '结束时间',
+   TITLE                varchar(32) comment '标题',
+   CONTENT              text comment '内容',
+   STATE                int comment '状态（0：删除；1：发布；）数据字典：STATE',
+   UPDATE_TIME          datetime comment '修改时间',
+   UPDATE_USER_ID       int comment '修改用户ID',
    primary key (ID)
 );
 
@@ -88,9 +80,9 @@ create table EXM_EXAM
    MARK_START_TIME      datetime comment '阅卷开始',
    MARK_END_TIME        datetime comment '阅卷结束',
    MARK_STATE           int comment '阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）',
-   SCORE_STATE          int comment '成绩状态（1：公开；2：不公开）',
-   RANK_STATE           int comment '排名状态（1：公开；2：不公开）',
-   ANON_STATE           int comment '匿名阅卷状态（1：公开；2：不公开）',
+   SCORE_STATE          int comment '成绩查询状态（1：考试结束后；2：不公布；3：交卷后）',
+   RANK_STATE           int comment '排名状态（1：公布；2：不公布）',
+   ANON_STATE           int comment '匿名阅卷状态（1：是；2：否）',
    PASS_SCORE           decimal(5,2) comment '及格分数',
    TOTAL_SCORE          decimal(5,2) comment '总分数',
    SXES                 varchar(32) comment '反作弊（1：试题乱序；2：选项乱序；）',
@@ -413,8 +405,8 @@ create table SYS_PARM
    DB_BAK_DIR           varchar(64) comment '数据库备份目录',
    PWD_TYPE             int comment '密码类型（1：随机；2：固定）',
    PWD_VALUE            varchar(32) comment '密码初始化默认值',
-   CUSTOM_NAME         varchar(8) comment '服务名称',
-   CUSTOM_CONTENT      varchar(64) comment '服务内容',
+   CUSTOM_TITLE         varchar(16) comment '自定义标题',
+   CUSTOM_CONTENT       varchar(128) comment '自定义内容',
    UPDATE_USER_ID       int comment '修改用户ID',
    UPDATE_TIME          datetime comment '修改时间',
    primary key (ID)
@@ -571,4 +563,5 @@ INSERT INTO `SYS_VER` VALUES (22, '3.8.1', '2022-05-20 17:13:00', 'zhanghc', '')
 INSERT INTO `SYS_VER` VALUES (23, '3.8.2', '2022-06-29 10:18:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (24, '3.9.0', '2022-07-07 15:34:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (25, '3.9.1', '2022-07-29 16:47:00', 'zhanghc', '');
-INSERT INTO `SYS_VER` VALUES (26, '4.0.0', '2022-08-30 10:18:00', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (26, '3.9.2', '2023-03-21 18:51:00', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (27, '4.0.0', '2023-03-22 10:18:00', 'zhanghc', '');
