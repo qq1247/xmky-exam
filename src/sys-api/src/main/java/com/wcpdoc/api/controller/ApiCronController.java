@@ -253,6 +253,7 @@ public class ApiCronController extends BaseController {
 					.addAttr("jobClass", cron.getJobClass())
 					.addAttr("cron", cron.getCron())
 					.addAttr("triggerTimes", triggerTimes)
+					.addAttr("state", cron.getState())
 					;
 		} catch (MyException e) {
 			log.error("获取定时任务错误：{}", e.getMessage());

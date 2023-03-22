@@ -1,4 +1,4 @@
-package com.wcpdoc.wordFilter.entity;
+package com.wcpdoc.exam.core.entity;
 
 import java.util.Date;
 
@@ -14,55 +14,74 @@ import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
- * 敏感词
+ * 我的阅卷实体
  * 
- * v1.0 chenyun 2021年9月2日下午4:25:01
+ * v1.0 zhanghc 2017-06-19 16:28:29
  */
 @Entity
-@Table(name = "SYS_SENSITIVE")
-public class Sensitive {
+@Table(name = "EXM_MY_MARK")
+public class MyMark {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID")
 	private Integer id;
-	@Column(name = "WHITE_LIST")
-	private String whiteList;
-	@Column(name = "BLACK_LIST")
-	private String blackList;
+	@Column(name = "EXAM_ID")
+	private Integer examId;
+	@Column(name = "MARK_USER_ID")
+	private Integer markUserId;
+	@Column(name = "QUESTION_IDS")
+	private String questionIds;
 	@Column(name = "UPDATE_USER_ID")
 	private Integer updateUserId;
-	@Column(name = "UPDATE_TIME")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@Column(name = "UPDATE_TIME")
 	private Date updateTime;
-	
+
 	public Integer getId() {
 		return id;
 	}
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	public String getWhiteList() {
-		return whiteList;
+
+	public Integer getExamId() {
+		return examId;
 	}
-	public void setWhiteList(String whiteList) {
-		this.whiteList = whiteList;
+
+	public void setExamId(Integer examId) {
+		this.examId = examId;
 	}
-	public String getBlackList() {
-		return blackList;
+
+	public String getQuestionIds() {
+		return questionIds;
 	}
-	public void setBlackList(String blackList) {
-		this.blackList = blackList;
+
+	public void setQuestionIds(String questionIds) {
+		this.questionIds = questionIds;
 	}
+
+	public Integer getMarkUserId() {
+		return markUserId;
+	}
+
+	public void setMarkUserId(Integer markUserId) {
+		this.markUserId = markUserId;
+	}
+
 	public Integer getUpdateUserId() {
 		return updateUserId;
 	}
+
 	public void setUpdateUserId(Integer updateUserId) {
 		this.updateUserId = updateUserId;
 	}
+
 	public Date getUpdateTime() {
 		return updateTime;
 	}
+
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
 	}

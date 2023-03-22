@@ -55,9 +55,8 @@ public class JWTRealm extends AuthorizingRealm {
 		}
 
 		// 授予角色权限
-		String[] splitRoles = user.getRoles().split(",");
 		SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
-		for (String role : splitRoles) {
+		for (String role : user.getRoles()) {
 			simpleAuthorizationInfo.addRole(role);
 		}
 		
@@ -77,23 +76,6 @@ public class JWTRealm extends AuthorizingRealm {
 		
 		return new SimpleAuthenticationInfo(jwtToken, jwtToken, getName());
 	}
-	
-	/**
-	 * 是否拥有角色（重写：管理员不验证）
-	 * 
-	 */
-	@Override
-	public boolean hasRole(PrincipalCollection principal, String roleIdentifier) {
-        return super.hasRole(principal, roleIdentifier);
-	}
-	
-	/**
-	 * 是否拥有权限（重写：管理员不验证）
-	 */
-	@Override
-    public  boolean isPermitted(PrincipalCollection principal, String permission) {
-        return super.isPermitted(principal, permission);
-    }
 	
 	/**
 	 * 清除授权

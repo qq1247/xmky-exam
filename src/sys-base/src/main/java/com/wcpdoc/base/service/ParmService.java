@@ -10,7 +10,7 @@ import com.wcpdoc.core.service.BaseService;
  */
 public interface ParmService extends BaseService<Parm> {
 	/**
-	 * 修改邮件
+	 * 邮件修改
 	 * 
 	 * v1.0 zhanghc 2021年3月5日上午11:21:35
 	 * @param parm void
@@ -18,15 +18,16 @@ public interface ParmService extends BaseService<Parm> {
 	void emailUpdate(String host, String userName, String pwd, String protocol, String encode);
 	
 	/**
-	 * 修改logo
+	 * 企业修改
 	 * 
 	 * v1.0 chenyun 2021年10月8日下午2:30:00
-	 * @param parm void
+	 * @param logoFileId logo附件ID
+	 * @param name 名称
 	 */
-	void logoUpdate(Parm parm) throws Exception;
+	void entUpdate(Integer logoFileId, String name) throws Exception;
 	
 	/**
-	 * 系统参数密码初始化
+	 * 密码修改
 	 * 
 	 * v1.0 chenyun 2021年11月12日上午10:09:26
 	 * @param type 密码类型（1：随机；2：固定）
@@ -35,7 +36,7 @@ public interface ParmService extends BaseService<Parm> {
 	void pwdUpdate(Integer type, String value);
 	
 	/**
-	 * 系统参数上传附件目录
+	 * 上传目录修改
 	 * 
 	 * v1.0 chenyun 2021年11月12日上午11:15:48
 	 * @param uploadDir void
@@ -43,11 +44,20 @@ public interface ParmService extends BaseService<Parm> {
 	void fileUpdate(String uploadDir);
 	
 	/**
-	 * 系统参数数据库备份目录
+	 * DB备份目录修改
 	 * 
 	 * v1.0 chenyun 2021年11月12日上午10:34:57
 	 * @param bakDir void
 	 */
 	void dbUpdate(String bakDir);
+
+	/**
+	 * 自定义内容修改
+	 * 
+	 * v1.0 zhanghc 2023年3月10日上午9:25:18
+	 * @param name
+	 * @param content void
+	 */
+	void customUpdate(String name, String content);
 
 }

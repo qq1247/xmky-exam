@@ -260,4 +260,6 @@ public class DateUtil {
 		long randomLong = Math.round(Math.random() * (endTime.getTime() - startTime.getTime()) + startTime.getTime());
 		return new Date(randomLong);
 	}
+	public static void main(String[] args) {
+	}
 }

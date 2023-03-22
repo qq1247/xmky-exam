@@ -43,7 +43,7 @@ public class OrgExServiceImpl extends BaseServiceImp<Object> implements OrgExSer
 	public void delEx(Org org) {
 		List<User> userList = userService.getList(org.getId());
 		if (ValidateUtil.isValid(userList)) {
-			throw new MyException("该机构下有用户，不允许删除");
+			throw new MyException("当前机构下存在用户");
 		}
 	}
 

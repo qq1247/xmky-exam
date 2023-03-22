@@ -6,6 +6,7 @@ export const myExamAnswer = (params) => request('myExam/answer', params)
 export const myExamFinish = (params) => request('myExam/finish', params)
 export const myExamPaper = (params) => request('myExam/paper', params)
 export const myExamGet = (params) => request('myExam/get', params)
+export const myExamCreatePaper = (params) => request('myExam/createPaper', params)
 
 export const myMarkListpage = (params) => request('myMark/listpage', params)
 export const myMarkExamListpage = (params) =>

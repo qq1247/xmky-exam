@@ -41,7 +41,7 @@ public interface MyExamService extends BaseService<MyExam>{
 	MyExam getMyExam(Integer examId, Integer userId);
 	
 	/**
-	 * 更新答案
+	 * 答题
 	 * 
 	 * v1.0 chenyun 2021年8月24日上午9:55:53
 	 * 

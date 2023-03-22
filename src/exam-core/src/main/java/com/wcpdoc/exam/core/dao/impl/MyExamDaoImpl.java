@@ -29,29 +29,30 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 		String sql = "SELECT EXAM.ID AS EXAM_ID, EXAM.NAME AS EXAM_NAME, EXAM.START_TIME AS EXAM_START_TIME, EXAM.END_TIME AS EXAM_END_TIME, "// 考试相关字段
 				+ "EXAM.MARK_START_TIME AS EXAM_MARK_START_TIME, EXAM.MARK_END_TIME AS EXAM_MARK_END_TIME, EXAM.MARK_STATE AS EXAM_MARK_STATE, "// 考试相关字段
 				+ "EXAM.SCORE_STATE AS EXAM_SCORE_STATE, EXAM.RANK_STATE AS EXAM_RANK_STATE, EXAM.PASS_SCORE AS EXAM_PASS_SCORE, "// 考试相关字段
-				+ "EXAM.TOTAL_SCORE AS EXAM_TOTAL_SCORE, EXAM.SHOW_TYPE AS EXAM_SHOW_TYPE, "// 考试相关字段
+				+ "EXAM.TOTAL_SCORE AS EXAM_TOTAL_SCORE, "// 考试相关字段
 				+ "USER.ID AS USER_ID, USER.NAME AS USER_NAME, "// 考试用户字段
 				+ "MARK_USER.ID AS MARK_USER_ID, MARK_USER.NAME AS MARK_USER_NAME, "// 阅卷用户字段
 				+ "MY_EXAM.ANSWER_START_TIME, MY_EXAM.ANSWER_END_TIME, MY_EXAM.TOTAL_SCORE AS TOTAL_SCORE, MY_EXAM.STATE AS STATE, "// 我的考试字段
 				+ "MY_EXAM.MARK_STATE AS MARK_STATE, MY_EXAM.ANSWER_STATE AS ANSWER_STATE, MY_EXAM.NO, "// 我的考试字段
+				+ "(SELECT COUNT(1) FROM EXM_MY_EXAM A WHERE A.EXAM_ID = MY_EXAM.EXAM_ID) AS USER_NUM "// 用户数量（排名使用）
 				+ "FROM EXM_MY_EXAM MY_EXAM "
 				+ "INNER JOIN EXM_EXAM EXAM ON MY_EXAM.EXAM_ID = EXAM.ID "
 				+ "LEFT JOIN SYS_USER USER ON MY_EXAM.USER_ID = USER.ID "
 				+ "LEFT JOIN SYS_USER MARK_USER ON MY_EXAM.MARK_USER_ID = MARK_USER.ID ";
 		
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examId")), "EXAM.ID = :EXAM_ID", pageIn.get("examId"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("examName")), "EXAM.NAME LIKE :NAME", "%" + pageIn.get("examName") + "%")
-				.addWhere(pageIn.get("examUserId", Integer.class) != null, "MY_EXAM.USER_ID = :USER_ID", pageIn.get("examUserId", Integer.class))
-				.addWhere(pageIn.get("markUserId", Integer.class) != null, "MY_EXAM.MARK_USER_ID = :MARK_USER_ID", pageIn.get("markUserId", Integer.class))
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examName")), "EXAM.NAME LIKE :NAME", "%" + pageIn.get("examName") + "%")
+				.addWhere(pageIn.get("curUserId", Integer.class) != null, "MY_EXAM.USER_ID = :USER_ID", pageIn.get("curUserId", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("startTime")) && ValidateUtil.isValid(pageIn.get("endTime")), 
-						"((EXAM.START_TIME <= :START_TIME1 AND :END_TIME1 >= EXAM.END_TIME) OR (EXAM.START_TIME <= :START_TIME2 AND :END_TIME2 >= EXAM.END_TIME) OR (EXAM.START_TIME >= :START_TIME3 AND EXAM.END_TIME >= :END_TIME3))", 
-						pageIn.get("startTime"), pageIn.get("startTime"),
-						pageIn.get("endTime"), pageIn.get("endTime"),
-						pageIn.get("startTime"), pageIn.get("endTime"))
-				.addWhere("EXAM.STATE = 1")
-//				.addWhere("USER.STATE = 1")
-				.addOrder("EXAM.START_TIME", Order.DESC);
+						"(( :START_TIME1 <= EXAM.START_TIME AND EXAM.START_TIME <= :END_TIME1) "
+						+ "	OR ( :START_TIME2 <= EXAM.END_TIME AND EXAM.END_TIME <= :END_TIME2) "
+						+ "	OR ( :START_TIME3 >= EXAM.START_TIME AND EXAM.END_TIME >= :END_TIME3))", 
+						pageIn.get("startTime"), pageIn.get("endTime"),
+						pageIn.get("startTime"), pageIn.get("endTime"),
+						pageIn.get("startTime"), pageIn.get("endTime")
+						)
+				.addWhere("EXAM.STATE = 1")// 已发布（不含冻结）
+				.addOrder("EXAM.START_TIME", Order.DESC);// 按考试开始时间倒序排列
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(), 
 				"examStartTime", DateUtil.FORMAT_DATE_TIME, 

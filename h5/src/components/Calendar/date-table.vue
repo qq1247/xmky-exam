@@ -236,9 +236,6 @@ export default {
               <span>{item.startTime.slice(11)}</span>
               <span>{item.endTime.slice(11)}</span>
               <span>
-                {type === 1
-                  ? this.stateName(item.state)
-                  : this.markStateName(item.state)}
               </span>
             </div>
           ))}

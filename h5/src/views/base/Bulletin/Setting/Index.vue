@@ -40,7 +40,7 @@ export default {
           icon: 'common common-edit',
           contentName: '公告信息',
           contentIntro:
-            '阅读用户：不选择时，默认为所有人可见；公告时间：只在该时间段内显示',
+            '阅读用户',
           index: '1'
         }
       ],

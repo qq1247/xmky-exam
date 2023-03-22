@@ -66,8 +66,6 @@ public class ApiUserController extends BaseController {
 		try {
 			PageOut pageOut = userService.getListpage(new PageIn(request));
 			for (Map<String, Object> map : pageOut.getList()) {
-				map.put("roles", map.get("roles").toString().split(","));
-				
 				if (ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) { // 如果是管理员，显示在线状态和最后在线时间
 					Integer id = (Integer) map.get("id");
 					OnlineUser onlineUser = onlineUserService.getEntity(id);
@@ -114,7 +112,7 @@ public class ApiUserController extends BaseController {
 				throw new MyException("参数错误：loginName");
 			}
 			if (userService.existLoginName(user)) {
-				throw new MyException("登录名称已存在");
+				throw new MyException("登录账号已存在");
 			}
 			if (user.getOrgId() == null) {
 				user.setOrgId(1);// 如果没有默认为根节点
@@ -122,8 +120,6 @@ public class ApiUserController extends BaseController {
 
 			// 添加用户
 			Date curTime = new Date();
-			user.setRoles("user");
-			user.setType(1);
 			user.setRegistTime(curTime);
 			user.setUpdateTime(curTime);
 			user.setUpdateUserId(getCurUser().getId());
@@ -166,7 +162,7 @@ public class ApiUserController extends BaseController {
 				throw new MyException("参数错误：loginName");
 			}
 			if (userService.existLoginName(user)) {
-				throw new MyException("登录名称已存在");
+				throw new MyException("登录账号已存在");
 			}
 
 			// 修改用户
@@ -265,18 +261,7 @@ public class ApiUserController extends BaseController {
 				.addAttr("orgName", org == null ? null : org.getName())
 				.addAttr("state", user.getState())
 				.addAttr("email", user.getEmail())
-				.addAttr("headFileId", user.getHeadFileId())
-				.addAttr("state", user.getState())
-				;
-			
-			if (!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {
-				return pageResult;
-			}
-			
-			pageResult.addAttr("registTime", DateUtil.formatDateTime(user.getRegistTime()))
-				.addAttr("lastLoginTime", user.getLastLoginTime() == null ? null : DateUtil.formatDateTime(user.getLastLoginTime()))
-				.addAttr("roles", (ValidateUtil.isValid(user.getRoles()) && user.getRoles().contains(ConstantManager.SUB_ADMIN_LOGIN_NAME))
-						? new String[] { ConstantManager.SUB_ADMIN_LOGIN_NAME } : new String[] { "user" });
+				.addAttr("headFileId", user.getHeadFileId());
 			return pageResult;
 		} catch (MyException e) {
 			log.error("获取用户错误：{}", e.getMessage());

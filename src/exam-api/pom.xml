@@ -12,28 +12,16 @@
 	<description>考试API</description>
 
 	<dependencies>
-		<!-- 集成系统基础 -->
-		<dependency>
-			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>sys-base</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		<!-- 集成考试核心 -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
 			<artifactId>exam-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- 集成考试核心 -->
+		<!-- 集成考试报表 -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>
 			<artifactId>exam-report</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<!-- 集成系统通知 -->
-		<dependency>
-			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>sys-notify</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

@@ -2,8 +2,6 @@ package com.wcpdoc.core.util;
 
 import java.math.BigDecimal;
 
-import com.wcpdoc.core.exception.MyException;
-
 /**
  * 计算工具类
  * 
@@ -32,7 +30,7 @@ public class BigDecimalUtil {
 		if (!(curValue instanceof String || curValue instanceof Integer 
 				|| curValue instanceof Long || curValue instanceof Double 
 				|| curValue instanceof Float || curValue instanceof BigDecimal)) {
-			throw new MyException("参数错误：curValue");
+			throw new RuntimeException("参数错误：curValue");
 		}
 	}
 	
@@ -85,7 +83,7 @@ public class BigDecimalUtil {
 	 */
 	public BigDecimalUtil div(Object value, int scale) {
 		if (scale < 0) {
-			throw new MyException("参数错误：scale");
+			throw new RuntimeException("参数错误：scale");
 		}
 		validateValue(value);
 		result = result.divide(new BigDecimal(value.toString()), scale, BigDecimal.ROUND_HALF_UP);

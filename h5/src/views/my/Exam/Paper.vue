@@ -9,28 +9,16 @@
           src="http://192.168.110.100:9000/api/login/entLogo"
           ><i class="common common-wo"
         /></el-avatar>
-        <div class="user-name">张三 / 研发部</div>
+        <div class="user-name">{{user.name}}</div>
         <div v-if="myExam.state === 3 || myExam.markState === 3" class="userinfo-box">
-          <div class="userinfo-item">
-            <!-- <div class="userinfo-icon-backgroup" style="background-color: #FEF3E8;">
-              <i class="el-icon-edit"></i>
-            </div> -->
-            <img
-              class="item-icon"
-              src="~@/assets/img/mark/mark-time.png"
-              alt=""
-            />
-            <div class="userinfo-score">59分</div>
-            <div>客观题</div>
-          </div>
           <div class="userinfo-item">
             <img
               class="item-icon"
               src="~@/assets/img/mark/mark-pass.png"
               alt=""
             />
-            <div class="userinfo-score">68分</div>
-            <div>总分</div>
+            <div class="userinfo-score">{{myExam.totalScore}}分</div>
+            <div>得分</div>
           </div>
           <div class="userinfo-item">
             <img
@@ -38,7 +26,7 @@
               src="~@/assets/img/mark/mark-score.png"
               alt=""
             />
-            <div class="userinfo-score">100分</div>
+            <div class="userinfo-score">{{exam.totalScore}}分</div>
             <div>满分</div>
           </div>
           <div class="userinfo-item">
@@ -47,17 +35,9 @@
               src="~@/assets/img/mark/mark-pass.png"
               alt=""
             />
-            <div>不及格</div>
+            <div v-if="myExam.answerState === 1">及格</div>
+            <div v-else><span style="color: red;">不及格</span></div>
             <div>成绩</div>
-          </div>
-          <div class="userinfo-item">
-            <img
-              class="item-icon"
-              src="~@/assets/img/mark/mark-score.png"
-              alt=""
-            />
-            <div class="userinfo-score">第5名</div>
-            <div>考试排名</div>
           </div>
           <div class="userinfo-item">
             <img
@@ -65,17 +45,8 @@
               src="~@/assets/img/mark/mark-answer-time.png"
               alt=""
             />
-            <div>45分钟</div>
+            <div>0分钟</div>
             <div>答题用时</div>
-          </div>
-          <div class="userinfo-item">
-            <img
-              class="item-icon"
-              src="~@/assets/img/mark/mark-time.png"
-              alt=""
-            />
-            <div>2分钟</div>
-            <div>阅卷用时</div>
           </div>
         </div>
       </div>
@@ -97,14 +68,14 @@
             </div>
           </div>
         </div>
-        <!-- 未考试未阅卷、考试中，显示倒计时 -->
+        <!-- 未考试未阅卷、考试中，显示倒计时
         <div v-if="(myExam.state === 1 && myExam.markState === 1) || myExam.state === 2" class="answer-card-time">
           <CountDown
             :expireTime="getTime(exam.endTime)"
             @endCallback="autoFinish"
             :preTxt="'剩余：'"
           ></CountDown>
-        </div>
+        </div> -->
         <!-- 已交卷或未考试时间过期，不显示交卷按钮 -->
         <el-button
           v-if="!((myExam.state === 1 && myExam.markState === 3) || myExam.state === 3)"
@@ -147,6 +118,7 @@
           :question="myQuestion.question"
           :no="myQuestion.question.no"
           :preview="preview"
+          :showErr="true"
           @updateAnswer="updateAnswer"
         >
         </Question>

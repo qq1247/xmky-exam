@@ -63,13 +63,13 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void addEx(Question question, String[] options, String[] answers, BigDecimal[] answerScores) {
+	public void addEx(Question question, String[] options, String[] answers, BigDecimal[] scores) {
 		// 校验数据有效性
 		if (!ValidateUtil.isValid(question.getQuestionTypeId())) {
 			throw new MyException("参数错误：questionTypeId");
 		}
 		QuestionType questionType = questionTypeService.getEntity(question.getQuestionTypeId());
-		addExValid(question, options, answers, answerScores, questionType);
+		addExValid(question, options, answers, scores, questionType);
 		
 		// 添加试题
 		question.setUpdateTime(new Date());
@@ -77,8 +77,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		question.setState(1);
 		add(question);
 
-		//添加答案
-		addExQuestionAnswer(question, answers, answerScores);
+		// 添加答案
+		addExQuestionAnswer(question, answers, scores);
 		
 		// 添加选项
 		addExQuestionOption(question, options);
@@ -88,7 +88,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
-	public void updateEx(Question question, String[] options, String[] answers, BigDecimal[] answerScores) {
+	public void updateEx(Question question, String[] options, String[] answers, BigDecimal[] scores) {
 		// 校验数据有效性
 		Question entity = getEntity(question.getId());
 		if (entity.getType() != question.getType()) {
@@ -98,7 +98,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			throw new MyException("参数错误：id");
 		}
 		QuestionType questionType = questionTypeService.getEntity(entity.getQuestionTypeId());
-		addExValid(question, options, answers, answerScores, questionType);
+		addExValid(question, options, answers, scores, questionType);
 		
 		questionExService.updateEx(question);
 
@@ -114,7 +114,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		update(entity);
 
 		// 修改答案
-		addExQuestionAnswer(question, answers, answerScores);
+		addExQuestionAnswer(question, answers, scores);
 		
 		// 修改选项
 		addExQuestionOption(question, options);
@@ -255,7 +255,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 		}
 	}
 	
-	private void addExValid(Question question, String[] options, String[] answers, BigDecimal[] answerScores, QuestionType questionType) {
+	private void addExValid(Question question, String[] options, String[] answers, BigDecimal[] scores, QuestionType questionType) {
 		if (questionType.getUpdateUserId().intValue() != getCurUser().getId().intValue()) {
 			throw new MyException("无操作权限");
 		}
@@ -296,8 +296,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			if (options.length < answerIndex + 1) {// 总共四个选项，答案是E就是有问题的
 				throw new MyException("选项和答案不匹配");
 			}
-			if (ValidateUtil.isValid(answerScores)) {
-				throw new MyException("参数错误：answerScores");
+			if (ValidateUtil.isValid(scores)) {
+				throw new MyException("参数错误：scores");
 			}
 		} else if (QuestionUtil.hasMultipleChoice(question)) {// 如果是多选
 			if (question.getMarkType() != 1) {
@@ -324,10 +324,10 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 					throw new MyException("选项和答案不匹配");
 				}
 			}
-			if (answerScores.length != 1) {
-				throw new MyException("参数错误：answerScores");
+			if (scores.length != 1) {
+				throw new MyException("参数错误：scores");
 			}
-			if (BigDecimalUtil.newInstance(question.getScore()).sub(answerScores[0]).getResult().doubleValue() <= 0) {
+			if (BigDecimalUtil.newInstance(question.getScore()).sub(scores[0]).getResult().doubleValue() <= 0) {
 				throw new MyException("漏选分数大于试题分数");
 			}
 		} else if (QuestionUtil.hasFillBlank(question)) {
@@ -360,15 +360,15 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 					}
 				}
 				
-				if (!ValidateUtil.isValid(answerScores)) {
-					throw new MyException("参数错误：answerScores");
+				if (!ValidateUtil.isValid(scores)) {
+					throw new MyException("参数错误：scores");
 				}
-				if (answerScores.length != answers.length) {
+				if (scores.length != answers.length) {
 					throw new MyException("答案和分数不匹配");
 				}
 				
 				BigDecimalUtil totalScore = BigDecimalUtil.newInstance(BigDecimal.ZERO);
-				for (BigDecimal answerScore : answerScores) {
+				for (BigDecimal answerScore : scores) {
 					totalScore.add(answerScore);
 				}
 				if (totalScore.sub(question.getScore()).getResult().doubleValue() != 0) {
@@ -379,8 +379,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				if (ValidateUtil.isValid(question.getMarkOptions())) {
 					throw new MyException("参数错误：scoreOption");
 				}
-				//if (ValidateUtil.isValid(answerScores)) {
-				//	throw new MyException("参数错误：answerScores");
+				//if (ValidateUtil.isValid(scores)) {
+				//	throw new MyException("参数错误：scores");
 				//} // 主观填空允许有子分数
 			}
 		} else if (QuestionUtil.hasTrueFalse(question)) {
@@ -401,8 +401,8 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				throw new MyException("参数错误：answers");
 			}
 			
-			if (ValidateUtil.isValid(answerScores)) {
-				throw new MyException("参数错误：answerScores");
+			if (ValidateUtil.isValid(scores)) {
+				throw new MyException("参数错误：scores");
 			}
 		} else if (QuestionUtil.hasQA(question)) {
 			if (question.getMarkType() != 1 && question.getMarkType() != 2) {
@@ -423,15 +423,15 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 					}
 				}
 				
-				if (!ValidateUtil.isValid(answerScores)) {
-					throw new MyException("参数错误：answerScores");
+				if (!ValidateUtil.isValid(scores)) {
+					throw new MyException("参数错误：scores");
 				}
-				if (answerScores.length != answers.length) {
+				if (scores.length != answers.length) {
 					throw new MyException("答案和分数不匹配");
 				}
 				
 				BigDecimalUtil totalScore = BigDecimalUtil.newInstance(BigDecimal.ZERO);
-				for (BigDecimal answerScore : answerScores) {
+				for (BigDecimal answerScore : scores) {
 					totalScore.add(answerScore);
 				}
 				if (totalScore.sub(question.getScore()).getResult().doubleValue() != 0) {
@@ -442,14 +442,14 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 				if (ValidateUtil.isValid(question.getMarkOptions())) {
 					throw new MyException("参数错误：scoreOption");
 				}
-				if (ValidateUtil.isValid(answerScores)) {
-					throw new MyException("参数错误：answerScores");
+				if (ValidateUtil.isValid(scores)) {
+					throw new MyException("参数错误：scores");
 				}
 			}
 		}
 	}
 	
-	private void addExQuestionAnswer(Question question, String[] answers, BigDecimal[] answerScores) {
+	private void addExQuestionAnswer(Question question, String[] answers, BigDecimal[] scores) {
 		List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
 		for(QuestionAnswer questionAnswer : questionAnswerList){
 			questionAnswerService.del(questionAnswer.getId());
@@ -466,7 +466,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			QuestionAnswer questionAnswer = new QuestionAnswer();
 			Arrays.sort(answers);// 页面前选b在选a，传值为ba，排序后在保存
 			questionAnswer.setAnswer(StringUtil.join(answers));
-			questionAnswer.setScore(answerScores[0]);
+			questionAnswer.setScore(scores[0]);
 			questionAnswer.setQuestionId(question.getId());
 			questionAnswer.setNo(1);
 			questionAnswerService.add(questionAnswer);
@@ -474,7 +474,7 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			for(int i = 0; i < answers.length; i++ ){
 				QuestionAnswer questionAnswer = new QuestionAnswer();
 				questionAnswer.setAnswer(answers[i]);
-				questionAnswer.setScore(answerScores[i]);
+				questionAnswer.setScore(scores[i]);
 				questionAnswer.setQuestionId(question.getId());
 				questionAnswer.setNo(i + 1);
 				questionAnswerService.add(questionAnswer);

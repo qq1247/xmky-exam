@@ -52,8 +52,6 @@ public class User implements LoginUser {
 	private Date updateTime;
 	@Column(name = "ORG_ID")
 	private Integer orgId;
-	@Column(name = "ROLES")
-	private String roles;
 	@Column(name = "STATE")
 	private Integer state;
 	@Column(name = "TYPE")
@@ -149,14 +147,6 @@ public class User implements LoginUser {
 	/** 状态（0：删除；1：正常；2：冻结；） */
 	public void setState(Integer state) {
 		this.state = state;
-	}
-
-	public String getRoles() {
-		return roles;
-	}
-
-	public void setRoles(String roles) {
-		this.roles = roles;
 	}
 
 	public String getEmail() {

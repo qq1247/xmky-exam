@@ -22,7 +22,7 @@
       </QuestionTxtImport>
       <ExamSetting v-if="activeIndex === 2" style="height: calc(100vh - 220px);" ref="ExamSetting"/>
       <MarkSetting v-if="activeIndex === 3" style="height: calc(100vh - 220px);" ref="MarkSetting"/>
-      <ExamPublish v-if="activeIndex === 4" style="height: calc(100vh - 220px);" ref="ExamPublish"/>
+      <ExamPublish v-if="activeIndex === 3" style="height: calc(100vh - 220px);" ref="ExamPublish"/>
     </div>
 
     <Paper v-if="activeIndex == 1 && createdType === 0"  @toEditor="toEditor" ref="Paper"></Paper>
@@ -30,7 +30,7 @@
 
     <div v-if="activeIndex !=0 && createdType !== 1" class="paper-footer" :style="{marginTop: activeIndex == 1 ? '-47px' : '-67px'}">
       <el-button type="primary" @click="back" size="small">上一步</el-button>
-      <el-button type="primary" @click="next" size="small">{{activeIndex == 4 ? '发布' : '下一步'}}</el-button>
+      <el-button type="primary" @click="next" size="small">{{activeIndex == 3 ? '发布' : '下一步'}}</el-button>
     </div>
     
     <!-- <div class="exam-bottom" v-if="activeIndex == 0">
@@ -90,7 +90,7 @@ export default {
       id: null,
       activeIndex: 0,
       createdType: 0,
-      navList: ['1.选择试卷', '2.添加试题', '3.配置规则', '4.添加用户', '5.发布考试'],
+      navList: ['1.选择试卷', '2.添加试题', '3.配置规则', '4.发布考试'],
     }
   },
   computed: {
@@ -164,6 +164,8 @@ export default {
           this.markUserUpdate({index, value: examUser.markUserId})
         })
       })
+    } else {
+      this.init()
     }
   },
   methods: {
@@ -223,7 +225,7 @@ export default {
         this.$refs['ExamSetting'].next()
       }
       else if (this.activeIndex == 3) {
-        this.$refs['MarkSetting'].next()
+        this.$refs['ExamPublish'].publish()
       }
       else if (this.activeIndex == 4) {
         this.$refs['ExamPublish'].publish()

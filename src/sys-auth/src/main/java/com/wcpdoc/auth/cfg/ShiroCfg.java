@@ -49,45 +49,20 @@ public class ShiroCfg {
 		jwtFilterMap.put("jwt", new JWTFilter());
 		shiroFilterFactory.setFilters(jwtFilterMap);
 
-		// 匿名请求
+		// 公共请求
 		Map<String, String> filterChainMap = new LinkedHashMap<>();
-		filterChainMap.put("/api/file/download", "anon");
-		filterChainMap.put("/api/file/getId", "anon");
-		filterChainMap.put("/api/login/**", "anon");
+		filterChainMap.put("/api/login/**", "anon");// 登录相关功能免登录
+		filterChainMap.put("/api/file/download", "anon");// 下载免登录
+		filterChainMap.put("/api/dict/listpage", "jwt");// 数据字典分页列表需登录
+		filterChainMap.put("/api/bulletin/listpage", "jwt");// 公告分页列表需登录
+		filterChainMap.put("/api/user/get", "jwt");// 用户信息需登录
 		
-		// 用户请求
-		filterChainMap.put("/api/dict/listpage", "jwt,anyRolesEx[admin,subAdmin,user]");
-		filterChainMap.put("/api/user/get", "jwt,anyRolesEx[admin,subAdmin]");
-		filterChainMap.put("/api/exam/get", "jwt,anyRolesEx[subAdmin,user]");
-		filterChainMap.put("/api/myExam/*", "jwt,anyRolesEx[subAdmin,user]");
-		filterChainMap.put("/api/report/home/user", "jwt,anyRolesEx[user]");
-		filterChainMap.put("/api/bulletin/listpage", "jwt,anyRolesEx[admin,subAdmin,user]");
+		// 用户权限
+		filterChainMap.put("/api/myExam/*", "jwt,anyRolesEx[user]");// 我的考试
+		filterChainMap.put("/api/report/user/home", "jwt,anyRolesEx[user]");// 用户首页
 		
-		//管理员请求
-		filterChainMap.put("/api/report/home/admin", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/report/server/**", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/dict/**", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/cron/**", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/parm/**", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/org/**", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/user/**", "jwt,anyRolesEx[admin]");
-		filterChainMap.put("/api/sensitive/**", "jwt,anyRolesEx[admin]");
-		
-		//子管理请求
-		filterChainMap.put("/api/report/**", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/exam/**", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/examType/**", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/myMark/**", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/paperRemark/**", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/paperType/**", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/question/**", "jwt,anyRolesEx[subAdmin]");
-		filterChainMap.put("/api/questionType/**", "jwt,anyRolesEx[subAdmin]");
-		
-		
-		filterChainMap.put("/api/**", "jwt");
-		
-		// 静态资源
-		filterChainMap.put("/**", "anon");
+		// 管理员权限
+		filterChainMap.put("/api/**", "jwt,anyRolesEx[admin]");// 剩余都是
 		shiroFilterFactory.setFilterChainDefinitionMap(filterChainMap);
 		return shiroFilterFactory;
 	}

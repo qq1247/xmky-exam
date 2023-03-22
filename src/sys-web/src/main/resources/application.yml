@@ -38,8 +38,8 @@ logging:
   config: config/log4j2.xml
       
 token:
-    expireMinute: 1440
-    refreshMinute: 60
+    expireMinute: 2
+    refreshMinute: 1
     
 sys:
   ver: 3.9.1

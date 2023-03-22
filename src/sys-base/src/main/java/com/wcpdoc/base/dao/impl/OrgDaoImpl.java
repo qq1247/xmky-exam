@@ -30,7 +30,8 @@ public class OrgDaoImpl extends RBaseDaoImpl<Org> implements OrgDao {
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("parentId")), "ORG.PARENT_ID = :PARENT_ID", pageIn.get("parentId"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "ORG.NAME LIKE :NAME", String.format("%%%s%%", pageIn.get("name")))
 				.addWhere("ORG.STATE = 1")
-				.addOrder("ORG.NO", Order.ASC);
+				.addOrder("ORG.NO", Order.ASC)// no值一样，导致分页错误，添加id排序
+				.addOrder("ORG.ID", Order.ASC);
 		return getListpage(sqlUtil, pageIn);
 	}
 

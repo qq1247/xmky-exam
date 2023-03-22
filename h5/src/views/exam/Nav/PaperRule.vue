@@ -669,5 +669,8 @@ export default {
       }
     }
   }
+  .paper-content {
+    overflow: auto;
+  }
 }
 </style>

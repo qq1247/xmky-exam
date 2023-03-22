@@ -14,7 +14,6 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.exam.report.service.ReportService;
-import com.wcpdoc.exam.report.service.ServerPramService;
  
 /**
  * 成绩报表控制层
@@ -28,65 +27,43 @@ public class ApiReportController extends BaseController{
     
     @Resource
     private ReportService reportService;
-    @Resource
-    private ServerPramService serverParmService;
     
     /**
-     * 首页用户
+     * 用户首页
      * 
      * v1.0 chenyun 2021年12月10日上午10:14:34
      * @return PageResult
      */
-    @RequestMapping("/home/user")
+    @RequestMapping("/user/home")
     @ResponseBody
-    public PageResult homeUser() {
+    public PageResult userHome() {
         try {
-            return PageResultEx.ok().data(reportService.homeUser());
+            return PageResultEx.ok().data(reportService.userHome());
         } catch (MyException e) {
-            log.error("首页用户统计错误：{}", e.getMessage());
+            log.error("用户首页错误：{}", e.getMessage());
             return PageResult.err().msg(e.getMessage());
         } catch (Exception e) {
-            log.error("首页用户统计错误：", e);
+            log.error("用户首页错误：", e);
             return PageResult.err();
         }
     }
     
     /**
-     * 首页子管理
+     * 管理员首页
      * 
      * v1.0 chenyun 2021年12月10日上午10:14:34
      * @return PageResult
      */
-    @RequestMapping("/home/subAdmin")
+    @RequestMapping("/admin/home")
     @ResponseBody
-    public PageResult homeSubAdmin() {
+    public PageResult adminHome() {
         try {
-            return PageResultEx.ok().data(reportService.homeSubAdmin());
+            return PageResultEx.ok().data(reportService.adminHome());
         } catch (MyException e) {
-            log.error("首页子管理统计错误：{}", e.getMessage());
+            log.error("管理员首页错误：{}", e.getMessage());
             return PageResult.err().msg(e.getMessage());
         } catch (Exception e) {
-            log.error("首页子管理统计错误：", e);
-            return PageResult.err();
-        }
-    }
-    
-    /**
-     * 首页管理
-     * 
-     * v1.0 chenyun 2021年12月10日上午10:14:34
-     * @return PageResult
-     */
-    @RequestMapping("/home/admin")
-    @ResponseBody
-    public PageResult homeAdmin() {
-        try {
-            return PageResultEx.ok().data(reportService.homeAdmin());
-        } catch (MyException e) {
-            log.error("首页管理员统计错误：{}", e.getMessage());
-            return PageResult.err().msg(e.getMessage());
-        } catch (Exception e) {
-            log.error("首页管理员统计错误：", e);
+            log.error("管理员首页错误：", e);
             return PageResult.err();
         }
     }
@@ -101,7 +78,8 @@ public class ApiReportController extends BaseController{
     @ResponseBody
     public PageResult serverParm() {
         try {
-            return PageResultEx.ok().data(serverParmService.getList());
+        	return null;
+//            return PageResultEx.ok().data(serverParmService.getList());
         } catch (MyException e) {
             log.error("首页服务器参数统计错误：{}", e.getMessage());
             return PageResult.err().msg(e.getMessage());
@@ -156,7 +134,7 @@ public class ApiReportController extends BaseController{
      * 考试统计
      * 
      * v1.0 chenyun 2021-12-15 13:44:47
-     * @param id
+     * @param examId
      * @return PageResult
      */
     @RequestMapping("/exam/statis")
@@ -179,11 +157,11 @@ public class ApiReportController extends BaseController{
      * v1.0 chenyun 2021-12-15 13:44:47
      * @return PageResult
      */
-    @RequestMapping("/myExam/listpage")
+    @RequestMapping("/exam/rankListpage")
     @ResponseBody
-    public PageResult myExamListpage() {
-        try {
-            return PageResultEx.ok().data(reportService.myExamListpage(new PageIn(request)));
+    public PageResult examRankListpage() {
+        try {// 不校验，任何时候都能查询
+            return PageResultEx.ok().data(reportService.examRankListpage(new PageIn(request)));
         } catch (MyException e) {
             log.error("考试排名错误：{}", e.getMessage());
             return PageResult.err().msg(e.getMessage());
@@ -199,11 +177,11 @@ public class ApiReportController extends BaseController{
      * v1.0 chenyun 2021-12-15 13:44:47
      * @return PageResult
      */
-    @RequestMapping("/question/listpage")
+    @RequestMapping("/exam/questionErrList")
     @ResponseBody
-    public PageResult questionListpage() {
+    public PageResult questionErrList(Integer examId) {
         try {
-            return PageResultEx.ok().data(reportService.questionListpage(new PageIn(request)));
+            return PageResultEx.ok().data(reportService.questionErrList(examId));
         } catch (MyException e) {
             log.error("错题分析统计错误：{}", e.getMessage());
             return PageResult.err().msg(e.getMessage());

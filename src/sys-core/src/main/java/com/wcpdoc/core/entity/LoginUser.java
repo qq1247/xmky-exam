@@ -17,7 +17,7 @@ public interface LoginUser {
 	public Integer getId();
 	
 	/**
-	 * 获取登录名称
+	 * 获取登录账号
 	 * 
 	 * v1.0 zhanghc 2015-6-19下午08:30:16
 	 * @return String

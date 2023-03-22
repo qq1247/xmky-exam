@@ -19,7 +19,6 @@ import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.exam.core.entity.QuestionComment;
 import com.wcpdoc.exam.core.service.QuestionCommentService;
-import com.wcpdoc.wordFilter.service.SensitiveService;
 
 /**
  * 试题评论控制层
@@ -33,8 +32,6 @@ public class ApiQuestionCommentController extends BaseController {
 
 	@Resource
 	private QuestionCommentService questionCommentService;
-	@Resource
-	private SensitiveService sensitiveService;
 	
 	/**
 	 * 试题评论列表
@@ -50,7 +47,7 @@ public class ApiQuestionCommentController extends BaseController {
 		try {
 			PageOut listpage = questionCommentService.getListpage(new PageIn(request));
 			for(Map<String, Object> mapList : listpage.getList()){//敏感词过滤
-				mapList.put("content",sensitiveService.replace(mapList.get("content").toString()));
+				mapList.put("content", mapList.get("content").toString());
 			}
 			return PageResultEx.ok().data(listpage);
 		} catch (Exception e) {

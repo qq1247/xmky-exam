@@ -71,7 +71,7 @@ public class OrgServiceImpl extends BaseServiceImp<Org> implements OrgService {
 		}
 		List<Org> orgList = orgDao.getList(id);
 		if (ValidateUtil.isValid(orgList)) {
-			throw new MyException("请先删除子机构");
+			throw new MyException("存在子机构，不允许删除");
 		}
 		
 		// 删除机构

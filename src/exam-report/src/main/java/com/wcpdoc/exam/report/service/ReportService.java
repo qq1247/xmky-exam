@@ -14,28 +14,20 @@ import com.wcpdoc.core.entity.PageOut;
 public interface ReportService {
 
 	/**
-	 * 首页用户
+	 * 用户首页
 	 * 
 	 * v1.0 chenyun 2021年12月10日上午10:14:11
 	 * @return Map<String,Object>
 	 */
-	Map<String, Object> homeUser();
+	Map<String, Object> userHome();
 	
 	/**
-	 * 首页子管理
+	 * 管理员首页
 	 * 
 	 * v1.0 chenyun 2021年12月10日上午10:14:11
 	 * @return Map<String,Object>
 	 */
-	Map<String, Object> homeSubAdmin();
-	
-	/**
-	 * 首页管理
-	 * 
-	 * v1.0 chenyun 2021年12月10日上午10:14:11
-	 * @return Map<String,Object>
-	 */
-	Map<String, Object> homeAdmin();
+	Map<String, Object> adminHome();
 	
 	/**
 	 * 慢接口日志
@@ -50,7 +42,7 @@ public interface ReportService {
 	 * 
 	 * v1.0 chenyun 2021年12月15日下午1:47:12
 	 * @param questionTypeId
-	 * @return Map<String,Object>
+	 * @return Map<String, Object>
 	 */
 	Map<String, Object> questionStatis(Integer questionTypeId);
 	
@@ -59,7 +51,7 @@ public interface ReportService {
 	 * 
 	 * v1.0 chenyun 2021年12月15日下午1:47:12
 	 * @param examId
-	 * @return Map<String,Object>
+	 * @return Map<String, Object>
 	 */
 	Map<String, Object> examStatis(Integer examId);
 	
@@ -70,16 +62,16 @@ public interface ReportService {
 	 * @param pageIn
 	 * @return PageOut
 	 */
-	PageOut myExamListpage(PageIn pageIn);
+	PageOut examRankListpage(PageIn pageIn);
 	
 	/**
 	 * 错题分析
 	 * 
 	 * v1.0 chenyun 2021年12月16日下午1:45:11
-	 * @param pageIn
-	 * @return PageOut
+	 * @param examId
+	 * @return List<Map<String, Object>>
 	 */
-	PageOut questionListpage(PageIn pageIn);
+	List<Map<String, Object>> questionErrList(Integer examId);
 	
 	/**
 	 * 分数统计

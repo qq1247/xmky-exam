@@ -10,7 +10,7 @@ import com.wcpdoc.notify.exception.NotifyException;
 public interface NotifyService {
 	
 	/**
-	 * 发送邮件
+	 * 邮件发送
 	 * 
 	 * v1.0 zhanghc 2019年10月15日下午15:51:27
 	 * @param from 发送邮件地址
@@ -19,16 +19,16 @@ public interface NotifyService {
 	 * @param content 内容
 	 * void
 	 */
-	void pushEmail(String from, String to, String title, String content) throws NotifyException;
+	void emailPush(String from, String to, String title, String content) throws NotifyException;
 	
 	/**
-	 * 发送短信
+	 * 短信发送
 	 * 
 	 * v1.0 zhanghc 2019年10月15日下午15:51:27
 	 * @param phone 手机号
 	 * @param code 验证码
 	 * void
 	 */
-	void pushSMS(String phone, String code) throws NotifyException;
+	void SMSPush(String phone, String code) throws NotifyException;
 	
 }

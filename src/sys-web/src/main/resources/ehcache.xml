@@ -56,4 +56,9 @@
 	<cache name="AUTO_MARK_CACHE"
 		maxEntriesLocalHeap="100000">
 	</cache>
+	<!-- 试题缓存，空闲2小时后失效 -->
+	<cache name="QUESTION_CACHE"
+		maxEntriesLocalHeap="10000"
+		timeToIdleSeconds="7200">
+    </cache>
 </ehcache>

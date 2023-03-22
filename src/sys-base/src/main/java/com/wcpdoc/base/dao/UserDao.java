@@ -23,7 +23,7 @@ public interface UserDao extends RBaseDao<User> {
 	User getUser(String loginName);
 
 	/**
-	 * 登录名称是否存在
+	 * 登录账号是否存在
 	 * 
 	 * v1.0 zhanghc 2020年6月15日上午10:51:04
 	 * @param loginName

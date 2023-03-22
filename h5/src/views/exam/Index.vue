@@ -45,7 +45,7 @@
                 <span data-title="删除" @click="del(exam.id)">
                   <i class="common common-delete" />
                 </span>
-                <span data-title="时间变更" @click="timeUpdate(exam.id)">
+                <!-- <span data-title="时间变更" @click="timeUpdate(exam.id)">
                   <i class="common common-time" />
                 </span>
                 <span data-title="邮件通知" @click="email(exam.id)">
@@ -53,7 +53,7 @@
                 </span>
                 <span data-title="试题统计" @click="statistics(exam.id)">
                   <i class="common common-statistics" />
-                </span>
+                </span> -->
                 <!-- <span class="last-span">
                   <i class="common common-more-row" />
                   <div class="handler-more">
@@ -150,7 +150,7 @@ export default {
     del(id) {
       this.$tools.switchTab('ExamListSetting', {
         id,
-        tab: '2'
+        tab: '1'
       })
     },
     // 邮件通知
@@ -168,12 +168,12 @@ export default {
       })
     },
     // 时间变更
-    timeUpdate(id) {
-      this.$tools.switchTab('ExamListSetting', {
-        id,
-        tab: '1'
-      })
-    },
+    // timeUpdate(id) {
+    //   this.$tools.switchTab('ExamListSetting', {
+    //     id,
+    //     tab: '1'
+    //   })
+    // },
     // // 考试用户
     // read({ id }) {
     //   this.$tools.switchTab('ExamListMarkSetting', {

@@ -5,7 +5,7 @@
     :rules="editForm.rules"
     label-width="100px"
   >
-    <el-form-item label="所属机构" prop="orgId">
+    <!-- <el-form-item label="所属机构" prop="orgId">
       <CustomSelect
         ref="orgSelect"
         :multiple="false"
@@ -24,7 +24,7 @@
           :value="item.id"
         />
       </CustomSelect>
-    </el-form-item>
+    </el-form-item> -->
     <el-form-item label="登录账号" prop="loginName">
       <el-input
         v-model.trim="editForm.loginName"
@@ -34,10 +34,10 @@
     <el-form-item label="姓名" prop="name">
       <el-input v-model.trim="editForm.name" placeholder="请输入姓名" />
     </el-form-item>
-    <el-form-item label="邮箱" prop="email">
+    <!-- <el-form-item label="邮箱" prop="email">
       <el-input v-model.trim="editForm.email" placeholder="请输入邮箱" />
-    </el-form-item>
-    <el-form-item label="头像" prop="avatar">
+    </el-form-item> -->
+    <!-- <el-form-item label="头像" prop="avatar">
       <el-upload
         class="avatar-uploader"
         name="files"
@@ -50,7 +50,7 @@
         <img v-if="editForm.avatar" :src="editForm.avatar" class="avatar">
         <i v-else class="el-icon-plus avatar-uploader-icon" />
       </el-upload>
-    </el-form-item>
+    </el-form-item> -->
     <el-form-item>
       <el-button v-if="!id" type="primary" @click="add">添加</el-button>
       <el-button v-if="id" type="primary" @click="edit">修改</el-button>

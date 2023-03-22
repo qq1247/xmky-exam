@@ -24,7 +24,7 @@ public interface AuthUser {
 	public String getName();
 	
 	/**
-	 * 获取登录名称
+	 * 获取登录账号
 	 * 
 	 * v1.0 zhanghc 2021年3月19日下午4:49:54
 	 * @return String
@@ -37,5 +37,5 @@ public interface AuthUser {
 	 * v1.0 zhanghc 2021年3月19日下午4:49:54
 	 * @return String
 	 */
-	public String getRoles();
+	public String[] getRoles();
 }

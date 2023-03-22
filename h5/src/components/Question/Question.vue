@@ -28,24 +28,30 @@
   </el-card>
   <!-- 试题详细样式 -->
   <div v-else-if="showMode === 'detail'" class="question-content">
-    <el-alert 
-      v-if="question.errs && question.errs.length > 0" 
-      :title="question.errs" 
-      type="error" 
-      effect="dark" 
+    <el-alert
+      v-if="question.errs && question.errs.length > 0"
+      :title="question.errs"
+      type="error"
+      effect="dark"
       :closable="false"
-      style="margin-bottom: 10px;padding: 4px 16px;"></el-alert>
+      style="margin-bottom: 10px; padding: 4px 16px"
+    ></el-alert>
     <!-- 题干 -->
     <QuestionTitle
       :no="no"
       :question="question"
       :preview="preview"
-      @change="(answers) => {question.answers = answers; $emit('updateAnswer', question)}"
+      @change="
+        (answers) => {
+          question.answers = answers
+          $emit('updateAnswer', question)
+        }
+      "
     />
     <!-- 单选题选项 -->
     <el-radio-group
       v-if="question.type === 1"
-      :value="question.answers[0]"
+      v-model="question.answers[0]"
       class="children-option"
       @change="$emit('updateAnswer', question)"
       :disabled="preview"
@@ -57,6 +63,9 @@
         :label="`${optionLabs[index]}`"
       >
         <div
+          :style="{
+            color: preview && showErr ? optionColor(optionLabs[index], question) : '',
+          }"
           class="flex-items-center"
           v-html="`${optionLabs[index]}、${option}`"
         />
@@ -65,7 +74,7 @@
     <!-- 多选题选项 -->
     <el-checkbox-group
       v-else-if="question.type === 2"
-      :value="question.answers"
+      v-model="question.answers"
       class="children-option"
       @change="$emit('updateAnswer', question)"
       :disabled="preview"
@@ -77,6 +86,9 @@
         :label="`${optionLabs[index]}`"
       >
         <div
+          :style="{
+            color: preview && showErr ? optionColor(optionLabs[index], question) : '',
+          }"
           class="flex-items-center"
           v-html="`${optionLabs[index]}、${option}`"
         />
@@ -133,50 +145,90 @@ export default {
     QuestionTitle,
   },
   props: {
-    no: {// 显示排序序号
+    no: {
+      // 显示排序序号
       type: [String, Number],
       default: 0,
     },
-    question: { // 试题对象
+    question: {
+      // 试题对象
       type: Object,
       default: () => {},
     },
-    showMode: {// 显示样式
+    showMode: {
+      // 显示样式
       type: String,
       default: 'detail',
     },
-    preview: {// 预览
+    preview: {
+      // 预览
       type: Boolean,
-      default: true
+      default: true,
+    },
+    showErr: {
+      // 显示错误
+      type: Boolean,
+      default: false,
     }
   },
   data() {
     return {
-      optionLabs: ['A','B','C','D','E','F','G'],
-      judgeLabs: ['对','错']
+      optionLabs: ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+      judgeLabs: ['对', '错'],
     }
   },
   computed: {
-    qaAnswer: function() {
-      if (this.question.type === 5 && this.question.markType === 1) {// 如果是客观问答，格式化答案
+    qaAnswer: function () {
+      if (this.question.type === 5 && this.question.markType === 1) {
+        // 如果是客观问答，格式化答案
         let answer = ''
         this.question.answers.forEach((cur, index) => {
           answer += `关键词${index + 1}：`
-          cur.forEach(cur => {
-            answer += cur + " "
-          });
+          cur.forEach((cur) => {
+            answer += cur + ' '
+          })
           if (index < this.question.answers.length - 1) {
             answer += '\n'
           }
-        });
+        })
         return answer
       }
 
       return null
-    }
+    },
   },
   methods: {
+    optionColor(answer, question) {
+      // 单选，多选
+      if ([1, 2].includes(question.type)) {
+        // 选择完毕且与正确答案不匹配
+        if (question.answers.includes(answer)
+          && !question.standardAnswers.includes(answer)) {
+          return '#FF5722'
+        }
 
+        // 正确答案
+        if (question.standardAnswers.includes(answer)) {
+          return '#00B050'
+        }
+      }
+
+      // 判断
+      if (question.type === 4) {
+        // 选择完毕且与正确答案不匹配
+        if (
+          this.myExamDetailCache[question.id].answers[0] === ['对', '错'][index] &&
+          ['对', '错'][index] !== question.answers[0].answer[0]
+        ) {
+          return '#FF5722'
+        }
+
+        // 正确答案
+        if (question.answers[0].answer[0] === ['对', '错'][index]) {
+          return '#00B050'
+        }
+      }
+    },
   },
 }
 </script>
@@ -364,5 +416,4 @@ export default {
   display: inline-block;
   text-indent: 2em;
 }
-
 </style>

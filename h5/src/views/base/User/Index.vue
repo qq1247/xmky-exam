@@ -84,18 +84,6 @@
               <span style="margin-left: 10px">{{ scope.row.orgName }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="子管理员权限">
-            <template slot-scope="scope">
-              <el-switch
-                v-model="scope.row.type"
-                active-color="#13ce66"
-                :active-value="2"
-                inactive-color="#ff4949"
-                :inactive-value="1"
-                @change="setSubAdmin($event, scope.row.id, scope.$index)"
-              />
-            </template>
-          </el-table-column>
           <el-table-column label="权限描述" width="240px">
             <template slot-scope="scope">
               <span style="margin-left: 10px">{{

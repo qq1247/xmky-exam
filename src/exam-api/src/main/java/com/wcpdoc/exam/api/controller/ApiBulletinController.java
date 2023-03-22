@@ -1,8 +1,6 @@
 package com.wcpdoc.exam.api.controller;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.Date;
 
 import javax.annotation.Resource;
 
@@ -12,7 +10,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
@@ -68,7 +65,22 @@ public class ApiBulletinController extends BaseController {
 	@ResponseBody
 	public PageResult add(Bulletin bulletin) {
 		try {
-			bulletinService.addEx(bulletin);
+			// 校验数据有效性
+			if (!ValidateUtil.isValid(bulletin.getStartTime())) {
+				throw new MyException("参数错误：startTime");
+			}
+			if (!ValidateUtil.isValid(bulletin.getEndTime())) {
+				throw new MyException("参数错误：endTime");
+			}
+			if (!ValidateUtil.isValid(bulletin.getTitle())) {
+				throw new MyException("参数错误：title");
+			}
+			
+			// 添加公告
+			bulletin.setState(1);
+			bulletin.setUpdateTime(new Date());
+			bulletin.setUpdateUserId(getCurUser().getId());
+			bulletinService.add(bulletin);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("添加公告错误：{}", e.getMessage());
@@ -89,7 +101,22 @@ public class ApiBulletinController extends BaseController {
 	@ResponseBody
 	public PageResult edit(Bulletin bulletin) {
 		try {
-			bulletinService.updateEx(bulletin);
+			// 校验数据有效性
+			if (!ValidateUtil.isValid(bulletin.getStartTime())) {
+				throw new MyException("参数错误：startTime");
+			}
+			if (!ValidateUtil.isValid(bulletin.getEndTime())) {
+				throw new MyException("参数错误：endTime");
+			}
+			if (!ValidateUtil.isValid(bulletin.getTitle())) {
+				throw new MyException("参数错误：title");
+			}
+			
+			// 添加公告
+			bulletin.setState(1);
+			bulletin.setUpdateTime(new Date());
+			bulletin.setUpdateUserId(getCurUser().getId());
+			bulletinService.update(bulletin);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改公告错误：{}", e.getMessage());
@@ -110,7 +137,9 @@ public class ApiBulletinController extends BaseController {
 	@ResponseBody
 	public PageResult del(Integer id) {
 		try {
-			bulletinService.delEx(id);
+			Bulletin bulletin = bulletinService.getEntity(id);
+			bulletin.setState(0);
+			bulletinService.update(bulletin);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("删除公告错误：{}", e.getMessage());
@@ -132,60 +161,18 @@ public class ApiBulletinController extends BaseController {
 	public PageResult get(Integer id) {		
 		try {
 			Bulletin bulletin = bulletinService.getEntity(id);
-			Integer[] readUserIds = new Integer[0];
-			String[] readUserNames = new String[0];
-			if (ValidateUtil.isValid(bulletin.getReadUserIds())) {
-				Set<Integer> readUserIdSet = new HashSet<>();
-				for (String readUserId : bulletin.getReadUserIds().split(",")) {
-					if (!ValidateUtil.isValid(readUserId)) {// ,2,3,23, 有空值
-						continue;
-					}
-					readUserIdSet.add(Integer.parseInt(readUserId));
-				}
-				
-				List<User> readUserList = userService.getList(readUserIdSet.toArray(new Integer[0]));
-				readUserIds = new Integer[readUserList.size()];
-				readUserNames = new String[readUserList.size()];
-				for (int i = 0; i < readUserList.size(); i++) {
-					readUserIds[i] = readUserList.get(i).getId();
-					readUserNames[i] = readUserList.get(i).getName();
-				}
-			}
 			return PageResultEx.ok()
 					.addAttr("id", bulletin.getId())
-					.addAttr("title", bulletin.getTitle())
-					.addAttr("showType", bulletin.getShowType())
 					.addAttr("startTime", DateUtil.formatDateTime(bulletin.getStartTime()))
 					.addAttr("endTime", DateUtil.formatDateTime(bulletin.getEndTime()))
-					.addAttr("imgFileId", bulletin.getImgFileId())
-					.addAttr("content", bulletin.getContent())
-					.addAttr("state", bulletin.getState())
-					.addAttr("readUserIds", readUserIds)
-					.addAttr("readUserNames", readUserNames)
-					;
+					.addAttr("title", bulletin.getTitle())
+					.addAttr("content", bulletin.getContent());
 		} catch (MyException e) {
-			log.error("获取参数错误：{}", e.getMessage());
+			log.error("获取公告错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("获取参数错误：", e);
+			log.error("获取公告错误：", e);
 			return PageResult.err();
 		}
 	}
-	
-//	
-//	
-//	public static void main(String[] args) {
-//		String s1 = "Programming";
-//		String s2 = new String("Programming"); 
-//		String s3 = "Program";
-//		String s4 = "ming";
-//		String s5 = "Program" + "ming"; 
-//		String s6 = s3 + s4; 
-//		System.out.println(s1 == s2);   //false
-//		System.out.println(s1 == s5);   //true
-//		System.out.println(s1 == s6);   //false
-//		System.out.println(s1 == s6.intern()); //true
-//		System.out.println(s2 == s2.intern());
-//		}
-//	
 }

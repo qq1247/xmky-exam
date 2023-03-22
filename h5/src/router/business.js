@@ -117,15 +117,15 @@ export default [
           //     layout: 'subAdmin'
           //   }
           // },
-          {
-            path: 'statistics/:id',
-            name: 'ExamListStatistics',
-            component: () => import('@/views/exam/Statistics.vue'),
-            meta: {
-              title: '考试统计',
-              layout: 'subAdmin'
-            }
-          }
+          // {
+          //   path: 'statistics/:id',
+          //   name: 'ExamListStatistics',
+          //   component: () => import('@/views/exam/Statistics.vue'),
+          //   meta: {
+          //     title: '考试统计',
+          //     layout: 'subAdmin'
+          //   }
+          // }
         ]
       }
     ]

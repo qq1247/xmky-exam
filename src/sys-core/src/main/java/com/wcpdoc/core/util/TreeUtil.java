@@ -55,7 +55,6 @@ public class TreeUtil {
 //		list.add(new MyTree("测试部", "软件部"));
 //		
 //		List<Tree> tree = TreeUtil.getTree(list);
-//		System.err.println(tree);
 	}
 
 

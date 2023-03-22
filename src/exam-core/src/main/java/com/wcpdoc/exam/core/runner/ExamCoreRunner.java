@@ -113,7 +113,7 @@ public class ExamCoreRunner implements ApplicationRunner {
 						return;
 					}
 					
-					notifyService.pushEmail(parm.getEmailUserName(), parm.getEmailUserName(), "在线考试-自动阅卷失败", e.getMessage());
+					notifyService.emailPush(parm.getEmailUserName(), parm.getEmailUserName(), "在线考试-自动阅卷失败", e.getMessage());
 				} catch (NotifyException e1) {
 					log.error("自动阅卷错误：{}", e.getMessage());
 				}

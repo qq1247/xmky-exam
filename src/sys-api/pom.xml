@@ -24,12 +24,6 @@
 			<artifactId>sys-file</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- 集成敏感词 -->
-		<dependency>
-			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>sys-wordFilter</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		<!-- 集成系统权限 -->
 		<dependency>
 			<groupId>com.wcpdoc.exam</groupId>

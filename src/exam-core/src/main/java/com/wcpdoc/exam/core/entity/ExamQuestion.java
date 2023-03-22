@@ -80,10 +80,12 @@ public class ExamQuestion {
 		this.chapterTxt = chapterTxt;
 	}
 
+	/** 类型 （1：章节；2：试题） */
 	public Integer getType() {
 		return type;
 	}
 
+	/** 类型 （1：章节；2：试题） */
 	public void setType(Integer type) {
 		this.type = type;
 	}

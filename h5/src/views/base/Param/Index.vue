@@ -58,37 +58,37 @@ export default {
         {
           name: '企业信息',
           intro: '变更企业信息',
-          icon: 'common common-dingdan',
+          icon: 'common common-email',
           contentName: '企业信息',
           contentIntro: '变更企业信息',
           index: '2'
         },
-        {
-          name: '上传目录',
-          intro: '上传附件保存位置',
-          icon: 'common common-archive',
-          contentName: '上传目录',
-          contentIntro:
-            '上传附件保存位置。如果填写的是相对路径，则相对路径是启动程序目录',
-          index: '3'
-        },
-        {
-          name: '邮件设置',
-          intro: '邮件设置',
-          icon: 'common common-email',
-          contentName: '邮件设置',
-          contentIntro: '邮件设置',
-          index: '4'
-        },
-        {
-          name: '备份目录',
-          intro: '数据库备份目录',
-          icon: 'common common-box',
-          contentName: '备份目录',
-          contentIntro:
-            '数据库备份位置。如果填写的是相对路径，则相对路径是启动程序目录',
-          index: '5'
-        }
+        // {
+        //   name: '上传目录',
+        //   intro: '上传附件保存位置',
+        //   icon: 'common common-archive',
+        //   contentName: '上传目录',
+        //   contentIntro:
+        //     '上传附件保存位置。如果填写的是相对路径，则相对路径是启动程序目录',
+        //   index: '3'
+        // },
+        // {
+        //   name: '邮件设置',
+        //   intro: '邮件设置',
+        //   icon: 'common common-email',
+        //   contentName: '邮件设置',
+        //   contentIntro: '邮件设置',
+        //   index: '4'
+        // },
+        // {
+        //   name: '备份目录',
+        //   intro: '数据库备份目录',
+        //   icon: 'common common-box',
+        //   contentName: '备份目录',
+        //   contentIntro:
+        //     '数据库备份位置。如果填写的是相对路径，则相对路径是启动程序目录',
+        //   index: '5'
+        // }
       ],
       contentName: '',
       contentIntro: '',

@@ -87,20 +87,24 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 	}
 
 	@Override
-	public void logoUpdate(Parm parm) throws Exception {
-		// 更新logo
+	public void entUpdate(Integer logoFileId, String name) throws Exception {
+		// 校验数据有效性
+		//if (!ValidateUtil.isValid(logoFileId)) {// 不是每次都替换
+		//	throw new MyException("参数错误：logoFileId");
+		//}
+		if (!ValidateUtil.isValid(name)) {
+			throw new MyException("参数错误：name");
+		}
+		
+		// 更新企业信息
 		Parm entity = getEntity(1);
-		Integer orgLogo = entity.getOrgLogo();
-		entity.setOrgLogo(parm.getOrgLogo());
-		entity.setOrgName(parm.getOrgName());
+		entity.setEntName(name);
 		entity.setUpdateTime(new Date());
 		entity.setUpdateUserId(getCurUser().getId());
 		update(entity);
 		
 		// 扩展处理
-		if (parm.getOrgLogo() != null && parm.getOrgLogo() != orgLogo) {
-			parmExService.logoUpdate(parm);
-		}
+		parmExService.entUpdate(logoFileId);
 		
 		// 更新缓存
 		ParmCache.flushCache(entity);
@@ -145,8 +149,8 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		parm.setFileUploadDir(uploadDir);
 		parmDao.update(parm);
 		
-		File oldFileUploadFile = new File(String.format("%s%s%s%s%s", oldFileUploadDir, File.separator, "bak", File.separator, "file"));
-		File uploadDirFile = new File(String.format("%s%s%s", uploadDir, File.separator, "bak"));
+		File oldFileUploadFile = new File(oldFileUploadDir);
+		File uploadDirFile = new File(uploadDir);
 		try {
 			FileUtils.copyDirectoryToDirectory(oldFileUploadFile, uploadDirFile);//FileUtils.moveToDirectory();// 目录存在报错为已存在
 			FileUtils.deleteDirectory(oldFileUploadFile);
@@ -194,6 +198,26 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 				log.error("移动数据库备份目录失败：", e);
 				throw new MyException("未知异常");
 			}
+		
+		// 更新缓存
+		ParmCache.flushCache(parm);
+	}
+
+	@Override
+	public void customUpdate(String name, String content) {
+		// 校验数据有效性
+		if (!ValidateUtil.isValid(name)) {
+			throw new MyException("参数错误：name");
+		}
+		if (!ValidateUtil.isValid(content)) {
+			throw new MyException("参数错误：content");
+		}
+		
+		// 自定义内容更新
+		Parm parm = getEntity(1);
+		parm.setCustomName(name);
+		parm.setCustomContent(content);
+		update(parm);
 		
 		// 更新缓存
 		ParmCache.flushCache(parm);

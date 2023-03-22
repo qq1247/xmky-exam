@@ -128,7 +128,6 @@ public class UserExServiceImpl extends BaseServiceImp<Object> implements UserExS
 				user.setPwd(userService.getEncryptPwd(user.getLoginName(), 
 						ValidateUtil.isValid(userRowData.getPwd()) ? userRowData.getPwd() : "111111"));// 初始化密码
 				
-				user.setRoles("user");
 				user.setType(1);
 				user.setRegistTime(curTime);
 				user.setUpdateTime(curTime);

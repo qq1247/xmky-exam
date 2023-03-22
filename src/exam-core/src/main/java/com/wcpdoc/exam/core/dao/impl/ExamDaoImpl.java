@@ -33,13 +33,16 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT EXAM.* "
+		String sql = "SELECT EXAM.ID, EXAM.NAME, EXAM.START_TIME, EXAM.END_TIME, EXAM.MARK_START_TIME, EXAM.MARK_END_TIME, "
+				+ "EXAM.PASS_SCORE, EXAM.TOTAL_SCORE, EXAM.STATE, EXAM.MARK_STATE, EXAM.SCORE_STATE, EXAM.RANK_STATE, "
+				+ "EXAM.GEN_TYPE, EXAM.MARK_TYPE, EXAM.SXES, EXAM.ANON_STATE, "
+				+ "(SELECT COUNT(*) FROM EXM_MY_EXAM A WHERE A.EXAM_ID = EXAM.ID) AS USER_NUM "
 				+ "FROM EXM_EXAM EXAM ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil
-//			.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "EXAM.UPDATE_USER_ID = :UPDATE_USER_ID", pageIn.get("curUserId", Integer.class))
+			.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "EXAM.UPDATE_USER_ID = :UPDATE_USER_ID", pageIn.get("curUserId", Integer.class))
 			.addWhere(ValidateUtil.isValid(pageIn.get("name")), "EXAM.NAME LIKE :NAME", String.format("%%%s%%", pageIn.get("name")))
-			.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "EXAM.STATE IN (1,2)")// 默认查询草稿和已发布
+			.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "EXAM.STATE IN (1,2)")// 默认查询已暂停和已发布
 			.addWhere(ValidateUtil.isValid(pageIn.get("state")) && "0".equals(pageIn.get("state")), "EXAM.STATE IN (1,2)")// 如果传入0，会导致查询到已删除的
 			.addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "EXAM.STATE = :STATE", pageIn.get("state"))
 			.addOrder("EXAM.UPDATE_TIME", Order.DESC);
@@ -49,9 +52,6 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 				"endTime", DateUtil.FORMAT_DATE_TIME,
 				"markStartTime", DateUtil.FORMAT_DATE_TIME,
 				"markEndTime", DateUtil.FORMAT_DATE_TIME);
-		for (Map<String, Object> result : pageOut.getList()) {
-			result.remove("updateTime");// 剔除非接口字段
-		}
 		return pageOut;
 	}
 	

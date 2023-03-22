@@ -25,7 +25,7 @@ public class NotifyServiceImpl implements NotifyService {
 	private EmailService emailService;
 
 	@Override
-	public void pushEmail(String from, String to, String title, String content) throws NotifyException {
+	public void emailPush(String from, String to, String title, String content) throws NotifyException {
 		try {
 			log.debug("推送邮件：{}向{}发送{}", from, to, title);
 			MimeMessage mailMessage = emailService.getJavaMailSender().createMimeMessage();
@@ -50,7 +50,7 @@ public class NotifyServiceImpl implements NotifyService {
 	}
 
 	@Override
-	public void pushSMS(String phone, String code) throws NotifyException {
+	public void SMSPush(String phone, String code) throws NotifyException {
 		try {
 			//极光短信
 			//String appkey = "";

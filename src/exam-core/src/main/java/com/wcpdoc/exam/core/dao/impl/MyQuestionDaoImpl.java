@@ -26,7 +26,7 @@ public class MyQuestionDaoImpl extends RBaseDaoImpl<MyQuestion> implements MyQue
 
 	@Override
 	public List<MyQuestion> getList(Integer examId, Integer userId) {
-		String sql = "SELECT * FROM EXM_MY_QUESTION WHERE EXAM_ID = :EXAM_ID AND USER_ID = :USER_ID";
+		String sql = "SELECT * FROM EXM_MY_QUESTION WHERE EXAM_ID = :EXAM_ID AND USER_ID = :USER_ID ORDER BY NO";
 		return getList(sql, new Object[] { examId, userId }, MyQuestion.class);
 	}
 

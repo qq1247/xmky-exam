@@ -54,7 +54,7 @@ public interface UserService extends BaseService<User> {
 	String getEncryptPwd(String loginName, String pwd);
 
 	/**
-	 * 登录名称是否存在
+	 * 登录账号是否存在
 	 * 
 	 * v1.0 zhanghc 2020年6月18日上午11:35:32
 	 * @param user

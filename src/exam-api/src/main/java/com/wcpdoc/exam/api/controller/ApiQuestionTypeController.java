@@ -93,9 +93,9 @@ public class ApiQuestionTypeController extends BaseController {
 	 * 
 	 * @return pageOut
 	 */
-	@RequestMapping("/update")
+	@RequestMapping("/edit")
 	@ResponseBody
-	public PageResult update(QuestionType questionType) {
+	public PageResult edit(QuestionType questionType) {
 		try {
 			//校验数据有效性
 			if(!ValidateUtil.isValid(questionType.getName())) {

@@ -8,31 +8,31 @@
     <el-form-item label="账号" prop="emailUserName">
       <el-input
         v-model="paramForm.emailUserName"
-        placeholder="请输入账号"
+        placeholder="1247qq@163.com"
       />
     </el-form-item>
     <el-form-item label="授权码" prop="emailPwd">
       <el-input
         v-model="paramForm.emailPwd"
-        placeholder="请输入授权码"
+        placeholder="QIJAMIEGQIJAMIEG"
       />
     </el-form-item>
     <el-form-item label="主机" prop="emailHost">
       <el-input
         v-model="paramForm.emailHost"
-        placeholder="请输入主机"
+        placeholder="smtp.163.com"
       />
     </el-form-item>
     <el-form-item label="协议" prop="emailProtocol">
       <el-input
         v-model="paramForm.emailProtocol"
-        placeholder="请输入协议"
+        placeholder="smtp"
       />
     </el-form-item>
     <el-form-item label="编码" prop="emailEncode">
       <el-input
         v-model="paramForm.emailEncode"
-        placeholder="请输入编码"
+        placeholder="utf-8"
       />
     </el-form-item>
     <el-form-item>

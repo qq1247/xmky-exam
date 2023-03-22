@@ -7,15 +7,15 @@
       <div class="right-cross-line"></div>
     </div>
 
-    <div v-if="examInfo.exam.id" class="quick-info">
+    <!-- <div v-if="examInfo.exam.id" class="quick-info">
       <div class="info-name" style="color:red;font-weight: 600;">修改会重新初始化用户试卷，慎用</div>
       <div class="info-content" ></div>
-    </div>
+    </div> -->
     <div class="quick-info">
       <div class="info-name">考试名称：</div>
       <div class="info-content">{{examInfo.exam.name}}</div>
     </div>
-    <div v-if="examInfo.exam.timeType === 2" class="quick-info">
+    <!-- <div v-if="examInfo.exam.timeType === 2" class="quick-info">
       <div class="info-name">考试类型：</div>
       <div class="info-content">不限时</div>
     </div>
@@ -26,12 +26,12 @@
     <div v-if="examInfo.exam.timeType === 1 && markQuestions.length" class="quick-info">
       <div class="info-name">阅卷时间：</div>
       <div class="info-content">{{formartDateTime(examInfo.exam.markTimes[0])}} - {{formartDateTime(examInfo.exam.markTimes[1])}}</div>
-    </div>
-    <div v-if="examInfo.exam.timeType === 1 && markQuestions.length" class="quick-info">
+    </div> -->
+    <div class="quick-info">
       <div class="info-name">及格分数：</div>
       <div class="info-content">{{examInfo.exam.passScore}} / {{totalScore}}</div>
     </div>
-    <div class="quick-info quick-info-more">
+    <!-- <div class="quick-info quick-info-more">
       <div class="info-more-4-width">
         <div class="info-name">防 作 弊：</div>
         <div class="info-content">
@@ -68,10 +68,10 @@
         <div class="info-name">用户人数：</div>
         <div class="info-content">考试{{examUserNum}}人，阅卷{{markUserNum}}人</div>
       </div>
-    </div>
+    </div> -->
     <div class="quick-info">
       <div class="info-name">试题数量：</div>
-      <div class="info-content">共{{questionNum}}道题，其中主观题{{markQuestions.length}}道</div>
+      <div class="info-content">共{{questionNum}}道题</div>
     </div>
   </div>
 </template>
@@ -103,6 +103,11 @@ export default {
   },
   methods: {
     async publish() {
+      if (this.examInfo.exam.id) {
+        this.$message.error("已发布，不可修改")
+        return
+      }
+
       let examInfo = _.cloneDeep(this.examInfo)
       examInfo.exam.state = 1
       examInfo.exam.markType = this.markType

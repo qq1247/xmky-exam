@@ -8,7 +8,7 @@
         <div class="content-item">
           <template v-if="statisInfo.exam">
             <p><span>考试名称：</span>{{ statisInfo.exam.name }}</p>
-            <p><span>开始时间：</span>{{ statisInfo.exam.startTime }}</p>
+            <p><span>考试时间：</span>{{ statisInfo.exam.startTime }}</p>
             <p>
               <span>考试时长：</span>{{
                 timeRange(statisInfo.exam.startTime, statisInfo.exam.endTime)

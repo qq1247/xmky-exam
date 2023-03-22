@@ -40,19 +40,16 @@ export default {
     return {
       tab: [
         {
-          name: '时间变更',
-          intro: '时间变更',
-          icon: 'common common-time',
-          contentName: '时间变更',
-          contentIntro: '允许提前延后考试时间',
+          name: '删除',
+          intro: '删除考试',
+          icon: 'common common-delete',
+          contentName: '删除',
+          contentIntro: '不影响关联的试题、试卷等，可以正常显示和使用',
           index: '1'
         }
       ],
       viewList: [
-        SetTime,
         Delete,
-        Message,
-        Exports,
       ],
       currentView: null
     }
@@ -74,23 +71,23 @@ export default {
     if (Number(this.$route.params.id)) {
       this.tab = [
         ...this.tab,
-        {
-          name: '删除',
-          intro: '删除考试',
-          icon: 'common common-delete',
-          contentName: '删除',
-          contentIntro: '不影响关联的试题、试卷等，可以正常显示和使用',
-          index: '2'
-        },
-        {
-          name: '邮件通知',
-          intro: '邮件通知',
-          icon: 'common common-email',
-          contentName: '邮件通知',
-          contentIntro:
-            '1.下发邮件给考试用户、阅卷用户，2.【】内的文字带有特殊含义，发送邮件时会自动替换，如【姓名】替换为张三',
-          index: '3'
-        },
+        // {
+        //   name: '删除',
+        //   intro: '删除考试',
+        //   icon: 'common common-delete',
+        //   contentName: '删除',
+        //   contentIntro: '不影响关联的试题、试卷等，可以正常显示和使用',
+        //   index: '2'
+        // },
+        // {
+        //   name: '邮件通知',
+        //   intro: '邮件通知',
+        //   icon: 'common common-email',
+        //   contentName: '邮件通知',
+        //   contentIntro:
+        //     '1.下发邮件给考试用户、阅卷用户，2.【】内的文字带有特殊含义，发送邮件时会自动替换，如【姓名】替换为张三',
+        //   index: '3'
+        // },
         // {
         //   name: '试卷导出',
         //   intro: '试卷导出',

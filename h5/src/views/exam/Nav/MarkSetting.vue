@@ -125,30 +125,30 @@ export default {
       editForm: {
         rules: {
           // 校验规则
-          examUserIds: [{
-            trigger: 'change',
-            validator: (rule, value, callback) => {
-              if (!value) {
-                return callback(new Error('请选择用户'))
-              }
-              if (!value instanceof Array) {
-                return callback(new Error('请选择用户'))
-              }
-              if (value.length === 0) {
-                return callback(new Error('请选择用户'))
-              }
-              return callback()
-            },},
-          ],
-          markUserId: [{
-            trigger: 'change',
-            validator: (rule, value, callback) => {
-              if (!value) {
-                return callback(new Error('请选择用户'))
-              }
-              return callback()
-            },
-          },],
+          // examUserIds: [{
+          //   trigger: 'change',
+          //   validator: (rule, value, callback) => {
+          //     if (!value) {
+          //       return callback(new Error('请选择用户'))
+          //     }
+          //     if (!value instanceof Array) {
+          //       return callback(new Error('请选择用户'))
+          //     }
+          //     if (value.length === 0) {
+          //       return callback(new Error('请选择用户'))
+          //     }
+          //     return callback()
+          //   },},
+          // ],
+          // markUserId: [{
+          //   trigger: 'change',
+          //   validator: (rule, value, callback) => {
+          //     if (!value) {
+          //       return callback(new Error('请选择用户'))
+          //     }
+          //     return callback()
+          //   },
+          // },],
         },
       },
     }

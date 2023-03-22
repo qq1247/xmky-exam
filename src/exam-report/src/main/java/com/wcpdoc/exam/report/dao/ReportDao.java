@@ -77,20 +77,20 @@ public interface ReportDao extends RBaseDao<Object> {
 	/**
 	 * 我的考试列表
 	 * 
-	 * v1.0 chenyun 2021年12月16日上午9:38:30
+	 * v1.0 chenyun 2021年12月15日下午1:47:12
 	 * @param pageIn
 	 * @return PageOut
 	 */
-	PageOut myExamListpage(PageIn pageIn);
+	PageOut examRankListpage(PageIn pageIn);
 
 	/**
 	 * 试卷列表
 	 * 
 	 * v1.0 chenyun 2021年12月16日上午9:38:30
-	 * @param pageIn
-	 * @return PageOut
+	 * @param examId
+	 * @return List<Map<String, Object>>
 	 */
-	PageOut questionListpage(PageIn pageIn);
+	List<Map<String, Object>> questionErrList(Integer examId);
 	
 	/**
 	 * 分数统计
@@ -100,4 +100,21 @@ public interface ReportDao extends RBaseDao<Object> {
 	 * @return List<Map<String, Object>>
 	 */
 	List<Map<String, Object>> count(Integer examId);
+
+	/**
+	 * 管理员首页
+	 * 
+	 * v1.0 chenyun 2021年12月10日上午10:14:11
+	 * @return Map<String,Object>
+	 */
+	Map<String, Object> adminHome();
+	
+	/**
+	 * 用户首页
+	 * 
+	 * v1.0 zhanghc 2023年3月19日下午2:06:57
+	 * @param userId
+	 * @return Map<String,Object>
+	 */
+	Map<String, Object> userHome(Integer userId);
 }

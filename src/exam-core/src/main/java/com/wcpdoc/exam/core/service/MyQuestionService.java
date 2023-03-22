@@ -41,4 +41,6 @@ public interface MyQuestionService extends BaseService<MyQuestion>{
 	 * @return List<Map<String, Object>>
 	 */
 	List<Map<String, Object>> getAnswerList(Integer examId, Integer userId);
+
+	void createPaper(Integer examId);
 }

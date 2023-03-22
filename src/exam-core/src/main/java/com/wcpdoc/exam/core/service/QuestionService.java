@@ -19,10 +19,10 @@ public interface QuestionService extends BaseService<Question>{
 	 * @param question
 	 * @param options 选项（单选多选时有效）
 	 * @param answers 答案
-	 * @param answerScores 答案分数（填空或智能问答有多项）
+	 * @param scores 答案分数（填空或智能问答有多项）
 	 * @return PageResult
 	 */
-	void addEx(Question question, String[] options, String[] answers, BigDecimal[] answerScores);
+	void addEx(Question question, String[] options, String[] answers, BigDecimal[] scores);
 
 	/**
 	 * 试题修改
@@ -31,10 +31,10 @@ public interface QuestionService extends BaseService<Question>{
 	 * @param question
 	 * @param options 选项（单选多选时有效）
 	 * @param answers 答案
-	 * @param answerScores 答案分数（填空或智能问答有多项）
+	 * @param scores 答案分数（填空或智能问答有多项）
 	 * @return PageResult
 	 */
-	void updateEx(Question question, String[] options, String[] answers, BigDecimal[] answerScores);
+	void updateEx(Question question, String[] options, String[] answers, BigDecimal[] scores);
 	
 	/**
 	 * 试题删除

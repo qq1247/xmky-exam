@@ -15,42 +15,6 @@
         @editorListener="editorListener"
       />
     </el-form-item>
-    <el-form-item label="阅读用户" prop="examUser">
-      <CustomSelect
-        ref="readSelect"
-        placeholder="请选择用户"
-        :value="editForm.examUser"
-        :total="editForm.total"
-        @input="searchUser"
-        @change="selectExamUser"
-        @currentChange="getMoreUser"
-        @visibleChange="getUserList"
-      >
-        <el-option
-          v-for="item in editForm.examUsers"
-          :key="item.id"
-          :label="item.name"
-          :value="item.id"
-        />
-      </CustomSelect>
-    </el-form-item>
-    <el-form-item label="公告时间" prop="showTime">
-      <el-date-picker
-        v-model="editForm.showTime"
-        type="datetimerange"
-        start-placeholder="开始时间"
-        end-placeholder="结束时间"
-        value-format="yyyy-MM-dd HH:mm:ss"
-      />
-    </el-form-item>
-    <el-form-item label="展示状态" prop="showType">
-      <el-radio
-        v-for="item in editForm.showTypeList"
-        :key="item.value"
-        v-model="editForm.showType"
-        :label="item.value"
-      >{{ item.name }}</el-radio>
-    </el-form-item>
     <el-form-item>
       <el-button v-if="!id" type="primary" @click="add">添加</el-button>
       <el-button v-if="id" type="primary" @click="edit">修改</el-button>
@@ -62,7 +26,6 @@
 import { bulletinAdd, bulletinEdit, bulletinGet } from 'api/base'
 import { userListpage } from 'api/user'
 import Editor from 'components/Editor/Index.vue'
-import CustomSelect from 'components/CustomSelect.vue'
 
 import * as dayjs from 'dayjs'
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
@@ -70,7 +33,6 @@ dayjs.extend(isSameOrBefore)
 export default {
   components: {
     Editor,
-    CustomSelect
   },
   data() {
     const validateShowTime = (rule, value, callback) => {

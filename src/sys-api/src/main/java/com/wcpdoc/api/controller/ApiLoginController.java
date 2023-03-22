@@ -1,15 +1,10 @@
 package com.wcpdoc.api.controller;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Date;
 
 import javax.annotation.Resource;
-import javax.imageio.ImageIO;
 import javax.security.auth.login.LoginException;
-import javax.swing.ImageIcon;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -27,8 +22,6 @@ import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.DateUtil;
-import com.wcpdoc.core.util.ValidateUtil;
-import com.wcpdoc.file.entity.FileEx;
 import com.wcpdoc.file.service.FileService;
 
 /**
@@ -133,66 +126,62 @@ public class ApiLoginController extends BaseController {
 	}
 	
 	/**
-	 * 获取企业名称
+	 * 获取企业信息
 	 * 
 	 * v1.0 chenyun 2021-10-08 16:05:35
 	 * @return void
 	 */
-	@RequestMapping("/entName")
+	@RequestMapping("/ent")
 	@ResponseBody
-	public PageResult entName() {
+	public PageResult ent() {
 		try {
 			Parm parm = ParmCache.get();
-			return PageResultEx.ok().data(parm == null ? "" : parm.getOrgName());
+			return PageResultEx.ok()
+					.addAttr("name", parm.getEntName());
 		} catch (Exception e) {
-			log.error("获取单位名称错误：", e);
+			log.error("获取企业名称错误：", e);
 			return PageResult.err().msg(e.getMessage());
 		}
 	}
+	
+	/**
+	 * 获取服务信息
+	 * 
+	 * v1.0 zhanghc 2023年3月10日上午11:36:23
+	 * @return PageResult
+	 */
+	@RequestMapping("/custom")
+	@ResponseBody
+	public PageResult custom() {
+		try {
+			Parm parm = ParmCache.get();
+			return PageResultEx.ok()
+					.addAttr("name", parm.getCustomName())
+					.addAttr("content", parm.getCustomContent());
+		} catch (Exception e) {
+			log.error("获取服务错误：", e);
+			return PageResult.err().msg(e.getMessage());
+		}
+	}
+	
 	/**
 	 * 获取企业logo
 	 * 
 	 * v1.0 chenyun 2021-10-08 16:05:35
-	 * @param ico 是否ico图片
 	 * @return void
 	 */
-	@RequestMapping("/entLogo")
+	@RequestMapping("/logo")
 	@ResponseBody
-	public void entLogo(Boolean ico) {
+	public void logo() {
 		try {
 			File logo = new File("./config/logo.png");
-			String fileName = "logo"; 
-			String fileExName = "png"; 
-			Parm parm = ParmCache.get();
-			FileEx fileEx = null;
-			if (parm != null && ValidateUtil.isValid(parm.getOrgLogo())) {// 如果有配置，使用自定义logo
-				fileEx = fileService.getFileEx(parm.getOrgLogo());
-				logo = fileEx.getFile();
-				fileName = fileEx.getEntity().getName();
-				fileExName = fileEx.getEntity().getExtName();
-			}
-			if (ico != null && ico) {
-				response.addHeader("Content-Disposition", "attachment;filename=" + new String((logo.getName() + ".ico").getBytes("UTF-8"), "ISO-8859-1"));
-				response.setContentType("application/force-download");
-				
-				ImageIcon imageIcon = new ImageIcon(logo.getAbsolutePath());
-			    BufferedImage bufferedImage=new BufferedImage(64,64,BufferedImage.TYPE_INT_RGB);
-			    Graphics2D g=(Graphics2D)bufferedImage.getGraphics();
-			    g.setColor(Color.blue);
-			    g.drawRect(5,5,5,5);
-			    g.fillRect(5,5,5,5); 
-			    g.drawImage(imageIcon.getImage(),0,0,64,64,imageIcon.getImageObserver());
-			    ImageIO.write(bufferedImage, "png",  response.getOutputStream());
-			    return;
-			}
-			
-			response.addHeader("Content-Disposition", "attachment;filename=" + new String(String.format("%s.%s", fileName, fileExName).getBytes("UTF-8"), "ISO-8859-1"));
+			response.addHeader("Content-Disposition", "attachment;filename=" + new String("logo.png".getBytes("UTF-8"), "ISO-8859-1"));
 			response.setContentType("application/force-download");
 			FileUtils.copyFile(logo, response.getOutputStream());
 		} catch (MyException e) {
-			log.error("获取ico失败：{}", e.getMessage());
+			log.error("获取企业logo失败：{}", e.getMessage());
 		} catch (Exception e) {
-			log.error("获取ico失败：", e);
+			log.error("获取企业logo失败：", e);
 		}
 	}
 }

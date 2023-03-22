@@ -88,20 +88,20 @@ public class ApiQuestionController extends BaseController {
 				
 				List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(id);
 				List<Object> answers = new ArrayList<>();
-				List<BigDecimal> answerScores = new ArrayList<>();
+				List<BigDecimal> scores = new ArrayList<>();
 				for(QuestionAnswer answer : questionAnswerList){
 					if (type == 1 || type == 4 || (type == 5 && markType == 2)) {
 						answers.add(answer.getAnswer());
 					} else if (type == 2) {
 						Collections.addAll(answers, answer.getAnswer().split(","));
-						answerScores.add(answer.getScore());
+						scores.add(answer.getScore());
 					} else if (type == 3 || (type == 5 && markType == 1)) {
-						answers.add(answer.getAnswer().split("\n"));
-						answerScores.add(answer.getScore());
+						answers.add(answer.getAnswer());
+						scores.add(answer.getScore());
 					}
 				}
 				result.put("answers", answers);
-				result.put("answerScores", answerScores);
+				result.put("scores", scores);
 			}
 			return PageResultEx.ok().data(pageout);
 		} catch (Exception e) {
@@ -118,14 +118,14 @@ public class ApiQuestionController extends BaseController {
 	 * @param markOptions 阅卷选项
 	 * @param options 选项（单选多选时有效）
 	 * @param answers 答案
-	 * @param answerScores 答案分数（填空或智能问答有多项）
+	 * @param scores 答案分数（填空或智能问答有多项）
 	 * @return PageResult
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	public PageResult add(Question question, String[] options, String[] answers, BigDecimal[] answerScores) {
+	public PageResult add(Question question, String[] options, String[] answers, BigDecimal[] scores) {
 		try {
-			questionService.addEx(question, options, answers, answerScores);
+			questionService.addEx(question, options, answers, scores);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("试题添加错误：{}", e.getMessage());
@@ -145,11 +145,11 @@ public class ApiQuestionController extends BaseController {
 	 * @param options
 	 * @return PageResult
 	 */
-	@RequestMapping("/update")
+	@RequestMapping("/edit")
 	@ResponseBody
-	public PageResult update(Question question, String[] options, String[] answers, BigDecimal[] answerScores) {
+	public PageResult edit(Question question, String[] options, String[] answers, BigDecimal[] scores) {
 		try {
-			questionService.updateEx(question, options, answers, answerScores);
+			questionService.updateEx(question, options, answers, scores);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("试题修改错误：{}", e.getMessage());
@@ -211,16 +211,16 @@ public class ApiQuestionController extends BaseController {
 			
 			List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
 			List<Object> answers = new ArrayList<>();
-			List<BigDecimal> answerScores = new ArrayList<>();
+			List<BigDecimal> scores = new ArrayList<>();
 			for(QuestionAnswer answer : questionAnswerList){
 				if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasTrueFalse(question) || (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question))) {
 					answers.add(answer.getAnswer());
 				} else if (QuestionUtil.hasMultipleChoice(question)) {
 					Collections.addAll(answers, answer.getAnswer().split(","));
-					answerScores.add(answer.getScore());
+					scores.add(answer.getScore());
 				} else if (QuestionUtil.hasFillBlank(question) || (QuestionUtil.hasQA(question) && QuestionUtil.hasObjective(question))) {
 					answers.add(answer.getAnswer().split("\n"));
-					answerScores.add(answer.getScore());
+					scores.add(answer.getScore());
 				}
 			}
 			
@@ -235,7 +235,7 @@ public class ApiQuestionController extends BaseController {
 					.addAttr("score", question.getScore())
 					.addAttr("markOptions", question.getMarkOptions())
 					.addAttr("answers", answers)
-					.addAttr("answerScores", answerScores)
+					.addAttr("scores", scores)
 					.addAttr("state", question.getState());
 			return pageResult;
 		} catch (MyException e) {

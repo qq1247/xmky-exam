@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.annotation.Resource;
 
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.controller.BaseController;
-import com.wcpdoc.core.entity.OnlineUser;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
@@ -34,6 +32,7 @@ import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.ExamRule;
 import com.wcpdoc.exam.core.entity.MyExam;
+import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
@@ -92,7 +91,16 @@ public class ApiExamController extends BaseController {
 		try {
 			PageIn pageIn = new PageIn(request);
 			pageIn.addAttr("curUserId", getCurUser().getId());
-			return PageResultEx.ok().data(examService.getListpage(pageIn));
+			PageOut pageOut = examService.getListpage(pageIn);
+			for (Map<String, Object> map : pageOut.getList()) {
+				if (map.get("sxes") == null) {
+					map.put("sxes", new Integer[0]);
+				} else {
+					map.put("sxes", ((String)map.get("sxes")).split(","));
+				}
+			}
+			
+			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("考试列表错误：", e);
 			return PageResult.err();
@@ -103,8 +111,7 @@ public class ApiExamController extends BaseController {
 	 * 发布
 	 * 
 	 * v1.0 zhanghc 2018年11月24日上午9:13:22
-	 * 
-	 * @param id
+	 * @param examInfo
 	 * @return PageResult
 	 */
 	@RequestMapping("/publish")
@@ -129,32 +136,13 @@ public class ApiExamController extends BaseController {
 	 * @param id
 	 * @return PageResult
 	 */
-	@RequestMapping("/detail")
+	@RequestMapping("/paper")
 	@ResponseBody
-	public PageResult detail(Integer id) {
-		Exam _exam = examService.getEntity(id);
-		Map<String, Object> exam = new HashMap<>();
-		exam.put("id", _exam.getId());
-		exam.put("name", _exam.getName());
-		exam.put("paperName", _exam.getPaperName());
-		exam.put("timeType", _exam.getTimeType());
-		exam.put("markType", _exam.getMarkType());
-		exam.put("startTime", DateUtil.formatDateTime(_exam.getStartTime()));
-		exam.put("endTime", DateUtil.formatDateTime(_exam.getEndTime()));
-		exam.put("markStartTime", DateUtil.formatDateTime(_exam.getMarkStartTime()));
-		exam.put("markEndTime", DateUtil.formatDateTime(_exam.getMarkEndTime()));
-		exam.put("passScore", _exam.getPassScore());
-		exam.put("sxes", _exam.getSxes());
-		exam.put("showType", _exam.getShowType());
-		exam.put("anonState", _exam.getAnonState());
-		exam.put("scoreState", _exam.getScoreState());
-		exam.put("rankState", _exam.getRankState());
-		exam.put("genType", _exam.getGenType());
-		exam.put("state", _exam.getState());
-		
+	public PageResult paper(Integer id) {
+		Exam exam = examService.getEntity(id);
 		List<Map<String, Object>> examQuestions = new ArrayList<>();
 		List<Map<String, Object>> examRules = new ArrayList<>();
-		if (_exam.getGenType() == 1) {// 人工组卷
+		if (exam.getGenType() == 1) {// 人工组卷
 			List<ExamQuestion> _examQuestionList = examQuestionService.getList(id);
 			for (ExamQuestion _examQuestion : _examQuestionList) {
 				Map<String, Object> examQuestion = new HashMap<>();
@@ -164,48 +152,42 @@ public class ApiExamController extends BaseController {
 					examQuestion.put("chapterTxt", _examQuestion.getChapterTxt());
 				} else {
 					Question _question = questionService.getEntity(_examQuestion.getQuestionId());
+					examQuestion.put("questionId", _question.getId());
+					examQuestion.put("questionType", _question.getType());
+					examQuestion.put("markType", _question.getMarkType());
+					examQuestion.put("title", _question.getTitle());
+					examQuestion.put("markOptions", _examQuestion.getMarkOptions());
+					examQuestion.put("score", _examQuestion.getScore());
+					examQuestion.put("scores", _examQuestion.getScores());
+					examQuestion.put("analysis", _question.getAnalysis());
+					
 					List<String> _options = new ArrayList<>();
 					if (QuestionUtil.hasSingleChoice(_question) || QuestionUtil.hasMultipleChoice(_question)) {// 如果是单选或多选，添加选项字段
-						List<QuestionOption> questionOptionList = questionOptionService.getList(id);
+						List<QuestionOption> questionOptionList = questionOptionService.getList(_question.getId());
 						for (QuestionOption questionOption : questionOptionList) {
 							_options.add(questionOption.getOptions());
 						}
+						examQuestion.put("options", _options);
 					}
+					
 					List<QuestionAnswer> _questionAnswerList = questionAnswerService.getList(_question.getId());
 					List<Object> _answers = new ArrayList<>();
-					List<BigDecimal> _answerScores = new ArrayList<>();
 					for(QuestionAnswer answer : _questionAnswerList){
 						if (QuestionUtil.hasSingleChoice(_question) || QuestionUtil.hasTrueFalse(_question) 
 								|| (QuestionUtil.hasQA(_question) && QuestionUtil.hasSubjective(_question))) {
 							_answers.add(answer.getAnswer());
 						} else if (QuestionUtil.hasMultipleChoice(_question)) {
 							Collections.addAll(_answers, answer.getAnswer().split(","));
-							_answerScores.add(answer.getScore());
 						} else if (QuestionUtil.hasFillBlank(_question) || (QuestionUtil.hasQA(_question) 
 								&& QuestionUtil.hasObjective(_question))) {
-							_answers.add(answer.getAnswer().split("\n"));
-							_answerScores.add(answer.getScore());
+							_answers.add(answer.getAnswer());
 						}
 					}
-					
-					Map<String, Object> question = new HashMap<>();
-					question.put("id", _question.getId());
-					question.put("type", _question.getType());
-					question.put("title", _question.getTitle());
-					question.put("options", _options);
-					question.put("markType", _question.getMarkType());
-					question.put("analysis", _question.getAnalysis());
-					question.put("questionTypeId", _question.getQuestionTypeId());
-					question.put("score", _examQuestion.getScore());
-					question.put("markOptions", _examQuestion.getMarkOptions());
-					question.put("answers", _answers);
-					question.put("answerScores", _examQuestion.getScores());
-					question.put("state", _question.getState());
-					examQuestion.put("question", question);
+					examQuestion.put("answers", _answers);
 				}
 				examQuestions.add(examQuestion);
 			}
-		} else if (_exam.getGenType() == 2) {// 随机组卷
+		} else if (exam.getGenType() == 2) {// 随机组卷
 			List<ExamRule> _examRuleList = examRuleService.getList(id);
 			for (ExamRule _examRule : _examRuleList) {
 				Map<String, Object> examRule = new HashMap<>();
@@ -227,26 +209,37 @@ public class ApiExamController extends BaseController {
 		}
 		
 		List<MyExam> _myExamList = myExamService.getList(id);
-		Map<Integer, List<Integer>> userGroupCache = new HashMap<>();
+		List<Integer> examUserIdList = new ArrayList<>();
 		for (MyExam myExam : _myExamList) {
-			if (userGroupCache.get(myExam.getMarkUserId()) == null) {
-				userGroupCache.put(myExam.getMarkUserId(), new ArrayList<>());
-			}
-			userGroupCache.get(myExam.getMarkUserId()).add(myExam.getUserId());
+			examUserIdList.add(myExam.getUserId());
 		}
-		List<Map<String, Object>> examUsers = new ArrayList<>();
-		for (Entry<Integer, List<Integer>> entry : userGroupCache.entrySet()) {
-			Map<String, Object> examUser = new HashMap<>();
-			examUser.put("markUserId", entry.getKey());
-			examUser.put("examUserIds", entry.getValue());
-			examUsers.add(examUser);
+		
+		List<Integer> markUserIdList = new ArrayList<>();
+		List<MyMark> myMarkList = myMarkService.getList(id);
+		for (MyMark myMark : myMarkList) {
+			markUserIdList.add(myMark.getMarkUserId());
 		}
 		
 		return PageResultEx.ok()
-				.addAttr("exam", exam)
+				.addAttr("id", exam.getId())
+				.addAttr("name", exam.getName())
+				.addAttr("paperName", exam.getPaperName())
+				.addAttr("startTime", DateUtil.formatDateTime(exam.getStartTime()))
+				.addAttr("endTime", DateUtil.formatDateTime(exam.getEndTime()))
+				.addAttr("markStartTime", ValidateUtil.isValid(exam.getMarkStartTime()) ? DateUtil.formatDateTime(exam.getMarkStartTime()) : null)
+				.addAttr("markEndTime", ValidateUtil.isValid(exam.getMarkEndTime()) ? DateUtil.formatDateTime(exam.getMarkEndTime()) : null)
+				.addAttr("genType", exam.getGenType())
+				.addAttr("passScore", exam.getPassScore())
+				.addAttr("showType", exam.getShowType())
+				.addAttr("anonState", exam.getAnonState())
+				.addAttr("scoreState", exam.getScoreState())
+				.addAttr("rankState", exam.getRankState())
+				.addAttr("sxes", exam.getSxes())
+				.addAttr("state", exam.getState())
 				.addAttr("examQuestions", examQuestions)
 				.addAttr("examRules", examRules)
-				.addAttr("examUsers", examUsers);
+				.addAttr("examUserIds", examUserIdList)
+				.addAttr("markUserIds", markUserIdList);
 	}
 	
 	/**
@@ -287,7 +280,6 @@ public class ApiExamController extends BaseController {
 					.addAttr("id", exam.getId())
 					.addAttr("name", exam.getName())
 					.addAttr("paperName", exam.getPaperName())
-					.addAttr("timeType", exam.getTimeType())
 					.addAttr("startTime", ValidateUtil.isValid(exam.getStartTime()) ? DateUtil.formatDateTime(exam.getStartTime()) : null)
 					.addAttr("endTime", ValidateUtil.isValid(exam.getEndTime()) ? DateUtil.formatDateTime(exam.getEndTime()) : null)
 					.addAttr("markStartTime", ValidateUtil.isValid(exam.getMarkStartTime()) ? DateUtil.formatDateTime(exam.getMarkStartTime()) : null)
@@ -339,52 +331,52 @@ public class ApiExamController extends BaseController {
 		}
 	}
 
-	/**
-	 * 在线用户
-	 * 
-	 * v1.0 chenyun 2021年9月7日下午1:27:31
-	 * 
-	 * @param ids
-	 * @return PageResult
-	 */
-	@RequestMapping("/onlineUser")
-	@ResponseBody
-	public PageResult onlineUser(Integer id) {
-		try {
-			Exam exam = examService.getEntity(id);
-			if (exam.getStartTime().getTime() > System.currentTimeMillis()) {
-				throw new MyException("考试未开始");
-			}
-			if (exam.getEndTime().getTime() < System.currentTimeMillis()) {
-				throw new MyException("考试已结束");
-			}
-
-			List<Map<String, Object>> examUserList = examService.getExamUserList(id);
-			for (Map<String, Object> map : examUserList) {
-				map.put("userId", map.remove("id"));
-				map.put("userName", map.remove("name"));
-
-				Integer userId = (Integer) map.get("userId");
-				OnlineUser onlineUser = onlineUserService.getEntity(userId);
-				if (onlineUser == null) {
-					map.put("online", false);
-					map.put("onlineTime", null);
-					continue;
-				}
-
-				map.put("online", onlineUser.getState());
-				map.put("onlineTime", DateUtil.formatDateTime(onlineUser.getUpdateTime()));
-			}
-
-			return PageResultEx.ok().data(new PageOut(examUserList, examUserList.size()));
-		} catch (MyException e) {
-			log.error("在线用户错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("在线用户错误：", e);
-			return PageResult.err();
-		}
-	}
+//	/**
+//	 * 在线用户
+//	 * 
+//	 * v1.0 chenyun 2021年9月7日下午1:27:31
+//	 * 
+//	 * @param ids
+//	 * @return PageResult
+//	 */
+//	@RequestMapping("/onlineUser")
+//	@ResponseBody
+//	public PageResult onlineUser(Integer id) {
+//		try {
+//			Exam exam = examService.getEntity(id);
+////			if (exam.getStartTime().getTime() > System.currentTimeMillis()) {
+////				throw new MyException("考试未开始");
+////			}
+////			if (exam.getEndTime().getTime() < System.currentTimeMillis()) {
+////				throw new MyException("考试已结束");
+////			}
+//
+//			List<Map<String, Object>> examUserList = examService.getExamUserList(id);
+//			for (Map<String, Object> map : examUserList) {
+//				map.put("userId", map.remove("id"));
+//				map.put("userName", map.remove("name"));
+//
+//				Integer userId = (Integer) map.get("userId");
+//				OnlineUser onlineUser = onlineUserService.getEntity(userId);
+//				if (onlineUser == null) {
+//					map.put("online", false);
+//					map.put("onlineTime", null);
+//					continue;
+//				}
+//
+//				map.put("online", onlineUser.getState());
+//				map.put("onlineTime", DateUtil.formatDateTime(onlineUser.getUpdateTime()));
+//			}
+//
+//			return PageResultEx.ok().data(new PageOut(examUserList, examUserList.size()));
+//		} catch (MyException e) {
+//			log.error("在线用户错误：{}", e.getMessage());
+//			return PageResult.err().msg(e.getMessage());
+//		} catch (Exception e) {
+//			log.error("在线用户错误：", e);
+//			return PageResult.err();
+//		}
+//	}
 	
 	/**
 	 * 变更考试时间
@@ -399,7 +391,7 @@ public class ApiExamController extends BaseController {
 	@ResponseBody
 	public PageResult time(Integer id, Integer timeType, Integer minute) {
 		try {
-			if (!AutoMarkCache.tryWriteLock(id, 2000)) {
+			if (!AutoMarkCache.tryWriteLock(id, 20000)) {
 				throw new MyException("尝试加写锁失败");
 			}
 			examService.timeUpdate(id, timeType, minute);

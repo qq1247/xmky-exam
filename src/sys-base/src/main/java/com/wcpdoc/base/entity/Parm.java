@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 @Table(name = "SYS_PARM")
 public class Parm {
 	@Id
-	//@GeneratedValue(strategy = GenerationType.AUTO)// 清空数据库时，重启程序时需要恢复id为1的数据
+	// @GeneratedValue(strategy = GenerationType.AUTO)// 清空数据库时，重启程序时需要恢复id为1的数据
 	@Column(name = "ID")
 	private Integer id;
 	@Column(name = "EMAIL_HOST")
@@ -33,10 +33,8 @@ public class Parm {
 	private String emailPwd;
 	@Column(name = "EMAIL_PROTOCOL")
 	private String emailProtocol;
-	@Column(name = "ORG_LOGO")
-	private Integer orgLogo;
-	@Column(name = "ORG_NAME")
-	private String orgName;
+	@Column(name = "ENT_NAME")
+	private String entName;
 	@Column(name = "UPDATE_USER_ID")
 	private Integer updateUserId;
 	@Column(name = "UPDATE_TIME")
@@ -51,7 +49,11 @@ public class Parm {
 	private Integer pwdType;
 	@Column(name = "PWD_VALUE")
 	private String pwdValue;
-	
+	@Column(name = "CUSTOM_NAME")
+	private String customName;
+	@Column(name = "CUSTOM_CONTENT")
+	private String customContent;
+
 	public Integer getId() {
 		return id;
 	}
@@ -116,26 +118,18 @@ public class Parm {
 		this.emailProtocol = emailProtocol;
 	}
 
-	public Integer getOrgLogo() {
-		return orgLogo;
+	public String getEntName() {
+		return entName;
 	}
 
-	public void setOrgLogo(Integer orgLogo) {
-		this.orgLogo = orgLogo;
-	}
-
-	public String getOrgName() {
-		return orgName;
-	}
-
-	public void setOrgName(String orgName) {
-		this.orgName = orgName;
+	public void setEntName(String entName) {
+		this.entName = entName;
 	}
 
 	public String getFileUploadDir() {
 		return fileUploadDir;
 	}
-	
+
 	public void setFileUploadDir(String fileUploadDir) {
 		this.fileUploadDir = fileUploadDir;
 	}
@@ -162,5 +156,21 @@ public class Parm {
 
 	public void setPwdValue(String pwdValue) {
 		this.pwdValue = pwdValue;
+	}
+
+	public String getCustomName() {
+		return customName;
+	}
+
+	public void setCustomName(String customName) {
+		this.customName = customName;
+	}
+
+	public String getCustomContent() {
+		return customContent;
+	}
+
+	public void setCustomContent(String customContent) {
+		this.customContent = customContent;
 	}
 }

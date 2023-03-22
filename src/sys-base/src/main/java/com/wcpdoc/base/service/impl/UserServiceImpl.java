@@ -105,11 +105,10 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 		}
 		
 		// 修改角色
-		user.setRoles("user");
 		user.setType(1);
 		if (ConstantManager.SUB_ADMIN_LOGIN_NAME.equals(roles[0])) {
-			user.setRoles(String.format("%s,%s", ConstantManager.SUB_ADMIN_LOGIN_NAME, user.getRoles()));
-			user.setType(2);
+//			user.setRoles(String.format("%s,%s", ConstantManager.SUB_ADMIN_LOGIN_NAME, user.getRoles()));
+//			user.setType(2);
 		}
 		user.setUpdateTime(new Date());
 		user.setUpdateUserId(getCurUser().getId());

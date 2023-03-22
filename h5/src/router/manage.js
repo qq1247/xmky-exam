@@ -233,5 +233,108 @@ export default [
       }
     ]
   },
+  {
+    name: 'Question',
+    path: '/question',
+    component: Layout,
+    redirect: '/question/index',
+    meta: {
+      icon: 'common common-question-manage',
+      layout: 'admin',
+      roles: ['admin']
+    },
+    children: [
+      {
+        path: 'index',
+        name: 'QuestionIndex',
+        component: () => import('@/views/question/Index.vue'),
+        meta: {
+          title: '题库',
+          layout: 'admin'
+        },
+        children: [
+          {
+            path: 'setting/:questionTypeId/:tab?',
+            name: 'QuestionIndexSetting',
+            component: () => import('@/views/question/Setting/Index.vue'),
+            meta: {
+              title: '题库设置',
+              layout: 'admin'
+            }
+          },
+          {
+            path: 'list/:questionTypeId',
+            name: 'QuestionIndexList',
+            component: () => import('@/views/question/List.vue'),
+            meta: {
+              title: '试题列表',
+              layout: 'admin'
+            }
+          },
+          {
+            path: 'txtImport/:questionTypeId',
+            name: 'QuestionIndexTxtImport',
+            component: () => import('@/views/question/txtImport.vue'),
+            meta: {
+              title: '文本导入',
+              layout: 'admin'
+            }
+          },
+          {
+            path: 'statistics/:questionTypeId',
+            name: 'QuestionIndexStatistics',
+            component: () => import('@/views/question/Statistics.vue'),
+            meta: {
+              title: '试题统计',
+              layout: 'admin'
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    name: 'Exam',
+    path: '/exam',
+    component: Layout,
+    redirect: '/exam/index',
+    meta: {
+      icon: 'common common-exam-manage',
+      layout: 'admin',
+      roles: ['admin']
+    },
+    children: [
+      {
+        path: 'index',
+        name: 'ExamIndex',
+        component: () => import('@/views/exam/Index.vue'),
+        hidden: true,
+        meta: {
+          title: '考试列表',
+          layout: 'admin'
+        },
+        children: [
+          {
+            path: 'nav/:id',
+            name: 'ExamNav',
+            component: () => import('@/views/exam/Nav/Index.vue'),
+            meta: {
+              title: '考试导航',
+              layout: 'admin'
+            }
+          },
+          {
+            path: 'setting/:id/:tab?',
+            name: 'ExamListSetting',
+            component: () => import('@/views/exam/Setting/Index.vue'),
+            meta: {
+              title: '考试设置',
+              layout: 'admin'
+            }
+          },
+        ]
+      }
+    ]
+  },
   { path: '*', redirect: '/404', hidden: true }
 ]

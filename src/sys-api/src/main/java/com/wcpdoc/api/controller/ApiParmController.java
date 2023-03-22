@@ -28,16 +28,18 @@ public class ApiParmController extends BaseController {
 	private ParmService parmService;
 	
 	/**
-	 * 修改logo
+	 * 企业修改
 	 * 
 	 * v1.0 chenyun 2021-03-04 15:02:18
-	 * @return pageOut
+	 * @param logoFileId
+	 * @param name
+	 * @return PageResult
 	 */
-	@RequestMapping("/logo")
+	@RequestMapping("/ent")
 	@ResponseBody
-	public PageResult logo(Parm parm) {
+	public PageResult ent(Integer logoFileId, String name) {
 		try {
-			parmService.logoUpdate(parm);
+			parmService.entUpdate(logoFileId, name);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("修改参数错误：{}", e.getMessage());
@@ -49,7 +51,7 @@ public class ApiParmController extends BaseController {
 	}
 	
 	/**
-	 * 修改邮件
+	 * 邮件修改
 	 * 
 	 * v1.0 wjj 2021年11月8日下午1:25:33
 	 * 
@@ -72,7 +74,7 @@ public class ApiParmController extends BaseController {
 	}
 
 	/**
-	 * 修改上传目录
+	 * 上传目录修改
 	 * 
 	 * v1.0 chenyun 2021-11-12 10:34:15
 	 * 
@@ -95,7 +97,7 @@ public class ApiParmController extends BaseController {
 	}
 
 	/**
-	 * 修改DB目录
+	 * DB目录修改
 	 * 
 	 * v1.0 chenyun 2021-11-12 10:34:15
 	 * 
@@ -118,7 +120,7 @@ public class ApiParmController extends BaseController {
 	}
 	
 	/**
-	 * 修改默认密码
+	 * 默认密码修改
 	 * 
 	 * v1.0 chenyun 2021-11-12 10:08:32
 	 * 
@@ -142,6 +144,29 @@ public class ApiParmController extends BaseController {
 	}
 		
 	/**
+	 * 自定义内容修改
+	 * 
+	 * v1.0 zhanghc 2023年3月10日上午9:22:54
+	 * @param name
+	 * @param content
+	 * @return PageResult
+	 */
+	@RequestMapping("/custom")
+	@ResponseBody
+	public PageResult custom(String name, String content) {
+		try {
+			parmService.customUpdate(name, content);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("设置参数密码初始化错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("设置参数密码初始化错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
 	 *  获取参数
 	 * 
 	 * v1.0 chenyun 2021年11月12日下午3:38:42
@@ -158,12 +183,13 @@ public class ApiParmController extends BaseController {
 					.addAttr("emailPwd", parm.getEmailPwd())
 					.addAttr("emailProtocol", parm.getEmailProtocol())
 					.addAttr("emailEncode", parm.getEmailEncode())
-					.addAttr("orgLogo", parm.getOrgLogo())
-					.addAttr("orgName", parm.getOrgName())
+					.addAttr("entName", parm.getEntName())
 					.addAttr("fileUploadDir", parm.getFileUploadDir())
 					.addAttr("dbBakDir", parm.getDbBakDir())
 					.addAttr("pwdType", parm.getPwdType())
-					.addAttr("pwdValue", parm.getPwdValue());
+					.addAttr("pwdValue", parm.getPwdValue())
+					.addAttr("customName", parm.getCustomName())
+					.addAttr("customContent", parm.getCustomContent());
 		} catch (MyException e) {
 			log.error("获取参数错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

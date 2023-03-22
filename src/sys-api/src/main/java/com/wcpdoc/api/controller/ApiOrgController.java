@@ -49,7 +49,7 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/listpage")
 	@ResponseBody
-	public PageResult listpage(PageIn pageIn, Integer parentId, String name) {
+	public PageResult listpage() {
 		try {
 			return PageResultEx.ok().data(orgService.getListpage(new PageIn(request)));
 		} catch (Exception e) {

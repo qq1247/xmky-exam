@@ -32,8 +32,6 @@ public class Exam {
 	private String name;
 	@Column(name = "PAPER_NAME")
 	private String paperName;
-	@Column(name = "TIME_TYPE")
-	private Integer timeType;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@Column(name = "START_TIME")
@@ -58,8 +56,6 @@ public class Exam {
 	private Integer rankState;
 	@Column(name = "ANON_STATE")
 	private Integer anonState;
-	@Column(name = "LOGIN_TYPE")
-	private Integer loginType;
 	@Column(name = "PASS_SCORE")
 	private BigDecimal passScore;
 	@Column(name = "TOTAL_SCORE")
@@ -129,12 +125,12 @@ public class Exam {
 		this.markEndTime = markEndTime;
 	}
 
-	/** 成绩状态（1：公开；2：不公开） */
+	/** 成绩查询（1：考试结束后；2：不公布；3：交卷后） */
 	public Integer getScoreState() {
 		return scoreState;
 	}
 
-	/** 成绩状态（1：公开；2：不公开） */
+	/** 成绩查询（1：考试结束后；2：不公布；3：交卷后） */
 	public void setScoreState(Integer scoreState) {
 		this.scoreState = scoreState;
 	}
@@ -147,14 +143,6 @@ public class Exam {
 	/** 排名状态（1：公开；2：不公开） */
 	public void setRankState(Integer rankState) {
 		this.rankState = rankState;
-	}
-
-	public Integer getLoginType() {
-		return loginType;
-	}
-
-	public void setLoginType(Integer loginType) {
-		this.loginType = loginType;
 	}
 
 	public Integer getUpdateUserId() {
@@ -237,27 +225,17 @@ public class Exam {
 		this.passScore = passScore;
 	}
 
-	/** 1：自动阅卷；2：人工阅卷； */
+	/** 1：客观题；2：主观题； */
 	public Integer getMarkType() {
 		return markType;
 	}
 
-	/** 1：自动阅卷；2：人工阅卷； */
+	/** 1：客观题；2：主观题； */
 	public void setMarkType(Integer markType) {
 		this.markType = markType;
 	}
 
-	/** 1：限时；2：不限时 */
-	public Integer getTimeType() {
-		return timeType;
-	}
-	
-	/** 1：限时；2：不限时 */
-	public void setTimeType(Integer timeType) {
-		this.timeType = timeType;
-	}
-
-	/** 选项（1：试题乱序；2：选项乱序；3：禁用右键；4：禁止复制；5：最小化警告） */
+	/** 选项（1：试题乱序；2：选项乱序；） */
 	public Integer[] getSxes() {
 		if (!ValidateUtil.isValid(sxes)) {
 			return new Integer[0];
@@ -271,7 +249,7 @@ public class Exam {
 		return markOptionArr;
 	}
 
-	/** 选项（1：试题乱序；2：选项乱序；3：禁用右键；4：禁止复制；5：最小化警告） */
+	/** 选项（1：试题乱序；2：选项乱序；） */
 	public void setSxes(Integer[] sxes) {
 		if (!ValidateUtil.isValid(sxes)) {
 			this.sxes = null;

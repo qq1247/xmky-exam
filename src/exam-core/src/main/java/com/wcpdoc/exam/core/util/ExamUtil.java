@@ -1,8 +1,11 @@
 package com.wcpdoc.exam.core.util;
 
+import java.util.Arrays;
+
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamQuestion;
+import com.wcpdoc.exam.core.entity.ExamRule;
 import com.wcpdoc.exam.core.entity.MyQuestion;
 
 /**
@@ -19,7 +22,7 @@ public class ExamUtil {
 	 * @return boolean
 	 */
 	public static boolean hasQuestionRand(Exam exam) {
-		return ValidateUtil.isValid(exam.getSxes()) && exam.getSxes().toString().contains("1");
+		return ValidateUtil.isValid(exam.getSxes()) && Arrays.asList(exam.getSxes()).contains(1);
 	}
 	
 	/**
@@ -30,7 +33,7 @@ public class ExamUtil {
 	 * @return boolean
 	 */
 	public static boolean hasOptionRand(Exam exam) {
-		return ValidateUtil.isValid(exam.getSxes()) && exam.getSxes().toString().contains("2");
+		return ValidateUtil.isValid(exam.getSxes()) && Arrays.asList(exam.getSxes()).contains(2);
 	}
 	
 	/**
@@ -43,16 +46,11 @@ public class ExamUtil {
 	public static boolean hasChapter(ExamQuestion examQuestion) {
 		return examQuestion.getType() == 1;
 	}
-	
-	/**
-	 * 是否章节
-	 * 
-	 * v1.0 zhanghc 2022年9月16日上午10:49:09
-	 * @param myQuestion
-	 * @return boolean
-	 */
 	public static boolean hasChapter(MyQuestion myQuestion) {
 		return myQuestion.getType() == 1;
+	}
+	private static boolean hasChapter(ExamRule examRule) {
+		return examRule.getType() == 1;
 	}
 	
 	/**
@@ -65,14 +63,9 @@ public class ExamUtil {
 	public static boolean hasQuestion(ExamQuestion examQuestion) {
 		return !hasChapter(examQuestion);
 	}
-	
-	/**
-	 * 是否试题
-	 * 
-	 * v1.0 zhanghc 2022年9月19日下午3:05:37
-	 * @param myQuestion
-	 * @return boolean
-	 */
+	public static boolean hasQuestion(ExamRule examRule) {
+		return !hasChapter(examRule);
+	}
 	public static boolean hasQuestion(MyQuestion myQuestion) {
 		return !hasChapter(myQuestion);
 	}

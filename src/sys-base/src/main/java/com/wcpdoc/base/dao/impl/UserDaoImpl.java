@@ -28,13 +28,13 @@ public class UserDaoImpl extends RBaseDaoImpl<User> implements UserDao {
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT USER.ID, USER.NAME, USER.TYPE, USER.LOGIN_NAME, USER.ORG_ID, ORG.NAME AS ORG_NAME, "
-				+ "USER.REGIST_TIME, USER.LAST_LOGIN_TIME, USER.ROLES, USER.STATE "
+				+ "USER.REGIST_TIME, USER.LAST_LOGIN_TIME, USER.STATE "
 				+ "FROM SYS_USER USER " 
-				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID ";
+				+ "LEFT JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID ";
 				
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "(USER.NAME LIKE :NAME OR ORG.NAME LIKE :ORG_NAME)", String.format("%%%s%%", pageIn.get("name")), String.format("%%%s%%", pageIn.get("name")))
-				.addWhere(ValidateUtil.isValid(pageIn.get("orgName")), "ORG.NAME LIKE :ORG_NAME1", String.format("%%%s%%", pageIn.get("orgName")))
+				.addWhere(ValidateUtil.isValid(pageIn.get("state")), "USER.STATE = :USER_STATE", pageIn.get("state"))
 				.addWhere(ValidateUtil.isValid(pageIn.get("type")), "USER.TYPE = :TYPE", pageIn.get("type", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("ids")), "USER.ID IN ("+pageIn.get("ids")+")")
 				.addWhere("USER.STATE != 0")

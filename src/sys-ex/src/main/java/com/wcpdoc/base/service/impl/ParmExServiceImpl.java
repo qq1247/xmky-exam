@@ -1,13 +1,22 @@
 package com.wcpdoc.base.service.impl;
 
+import java.io.File;
+import java.io.IOException;
+
 import javax.annotation.Resource;
 
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.base.service.ParmExService;
 import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.impl.BaseServiceImp;
+import com.wcpdoc.core.util.ValidateUtil;
+import com.wcpdoc.file.entity.FileEx;
 import com.wcpdoc.file.service.FileService;
 import com.wcpdoc.notify.service.EmailService;
 import com.wcpdoc.notify.service.NotifyService;
@@ -19,6 +28,7 @@ import com.wcpdoc.notify.service.NotifyService;
  */
 @Service
 public class ParmExServiceImpl extends BaseServiceImp<Parm> implements ParmExService {
+	private static final Logger log = LoggerFactory.getLogger(ParmExServiceImpl.class);
 	@Resource
 	private EmailService emailService;
 	@Resource
@@ -33,16 +43,27 @@ public class ParmExServiceImpl extends BaseServiceImp<Parm> implements ParmExSer
 
 	@Override
 	public void emailUpdate(Parm parm) throws Exception {// 改成编译时异常，必须处理
-		notifyService.pushEmail(
+		notifyService.emailPush(
 				parm.getEmailUserName(), 
 				parm.getEmailUserName(), 
-				parm.getOrgName() == null ? "在线考试邮箱配置" : String.format("%s 在线考试邮箱配置", parm.getOrgName()) , 
+				parm.getEntName() == null ? "在线考试邮箱配置" : String.format("%s 在线考试邮箱配置", parm.getEntName()) , 
 						"邮箱配置成功！");
 	}
 	
 	@Override
-	public void logoUpdate(Parm parm) {
-		fileService.upload(parm.getOrgLogo());
+	public void entUpdate(Integer logoFileId) {
+		if (ValidateUtil.isValid(logoFileId)) {
+			FileEx fileEx = fileService.getFileEx(logoFileId);
+			File srcFile = fileEx.getFile();
+			File destFile = new File("./config/logo.png");
+			try {
+				FileUtils.copyFile(srcFile, destFile);
+			} catch (IOException e) {
+				log.error("拷贝文件失败：", e);
+				throw new MyException("拷贝文件失败");
+			}
+		}
+		
 	}
 
 	@Override

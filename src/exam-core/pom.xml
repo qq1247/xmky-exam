@@ -30,12 +30,6 @@
 			<artifactId>sys-notify</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- 集成系统敏感词 -->
-		<dependency>
-			<groupId>com.wcpdoc.exam</groupId>
-			<artifactId>sys-wordFilter</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		<!-- 集成文档解析 -->
 		<dependency>
 			<groupId>org.docx4j</groupId>

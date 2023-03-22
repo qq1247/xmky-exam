@@ -33,7 +33,7 @@ export const parmDb = (params) => request('parm/db', params)
 export const parmPwd = (params) => request('parm/pwd', params)
 
 export const bulletinAdd = (params) => request('bulletin/add', params)
-export const bulletinEdit = (params) => request('bulletin/update', params)
+export const bulletinEdit = (params) => request('bulletin/edit', params)
 export const bulletinDel = (params) => request('bulletin/del', params)
 export const bulletinGet = (params) => request('bulletin/get', params)
 export const bulletinListpage = (params) => request('bulletin/listpage', params)
