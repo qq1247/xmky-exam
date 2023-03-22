@@ -49,8 +49,8 @@ public class Parm {
 	private Integer pwdType;
 	@Column(name = "PWD_VALUE")
 	private String pwdValue;
-	@Column(name = "CUSTOM_NAME")
-	private String customName;
+	@Column(name = "CUSTOM_TITLE")
+	private String customTitle;
 	@Column(name = "CUSTOM_CONTENT")
 	private String customContent;
 
@@ -158,12 +158,12 @@ public class Parm {
 		this.pwdValue = pwdValue;
 	}
 
-	public String getCustomName() {
-		return customName;
+	public String getCustomTitle() {
+		return customTitle;
 	}
 
-	public void setCustomName(String customName) {
-		this.customName = customName;
+	public void setCustomTitle(String customTitle) {
+		this.customTitle = customTitle;
 	}
 
 	public String getCustomContent() {

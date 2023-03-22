@@ -14,20 +14,17 @@
 	</appenders>
 	<loggers>
 		<!-- sql日志 -->
-		<Logger name="jdbc.sqlonly" level="on"></Logger>
+		<Logger name="jdbc.sqlonly" level="off"></Logger>
 		<Logger name="jdbc.sqltiming" level="off"></Logger>
 		<Logger name="jdbc.audit" level="off"></Logger>
 		<Logger name="jdbc.resultset" level="off"></Logger>
 		<Logger name="jdbc.resultsettable" level="off"></Logger>
 		<Logger name="jdbc.connection" level="off"></Logger>
 		<!-- 打印令牌登陆、过期、刷新等日志 -->
-		<Logger name="com.wcpdoc.exam.base.service.impl.LoginServiceImpl" level="debug"></Logger>
-		<Logger name="com.wcpdoc.exam.auth.filter.JWTFilter" level="debug"></Logger>
+		<Logger name="com.wcpdoc.api.service.impl.LoginServiceImpl" level="debug"></Logger>
+		<Logger name="com.wcpdoc.auth.filter.JWTFilter" level="debug"></Logger>
 		<!-- 打印进度条 -->
-		<Logger name="com.wcpdoc.exam.base.cache.ProgressBarCache" level="info"></Logger>
-		<!-- 打印试题解析进度 -->
-		<Logger name="com.wcpdoc.exam.core.service.WordServer" level="info"></Logger>
-		<Logger name="com.wcpdoc.exam.core.service.impl.WordServerImpl" level="info"></Logger>
+		<Logger name="com.wcpdoc.base.cache.ProgressBarCache" level="info"></Logger>
 		<root level="info">
 			<appender-ref ref="rollingFile" />
 			<appender-ref ref="console" />

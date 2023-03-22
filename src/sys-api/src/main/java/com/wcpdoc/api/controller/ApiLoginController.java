@@ -156,7 +156,7 @@ public class ApiLoginController extends BaseController {
 		try {
 			Parm parm = ParmCache.get();
 			return PageResultEx.ok()
-					.addAttr("name", parm.getCustomName())
+					.addAttr("name", parm.getCustomTitle())
 					.addAttr("content", parm.getCustomContent());
 		} catch (Exception e) {
 			log.error("获取服务错误：", e);

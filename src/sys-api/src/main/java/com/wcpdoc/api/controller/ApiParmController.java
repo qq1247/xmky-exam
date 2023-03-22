@@ -188,7 +188,7 @@ public class ApiParmController extends BaseController {
 					.addAttr("dbBakDir", parm.getDbBakDir())
 					.addAttr("pwdType", parm.getPwdType())
 					.addAttr("pwdValue", parm.getPwdValue())
-					.addAttr("customName", parm.getCustomName())
+					.addAttr("customName", parm.getCustomTitle())
 					.addAttr("customContent", parm.getCustomContent());
 		} catch (MyException e) {
 			log.error("获取参数错误：{}", e.getMessage());

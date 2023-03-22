@@ -215,7 +215,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		
 		// 自定义内容更新
 		Parm parm = getEntity(1);
-		parm.setCustomName(name);
+		parm.setCustomTitle(name);
 		parm.setCustomContent(content);
 		update(parm);
 		
