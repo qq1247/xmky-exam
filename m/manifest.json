@@ -1,8 +1,8 @@
 {
-    "name" : "exam-app",
+    "name" : "xm-exam",
     "appid" : "__UNI__4C0C1B5",
     "description" : "",
-    "versionName" : "1.0.0",
+    "versionName" : "3.9.2",
     "versionCode" : "100",
     "transformPx" : false,
     "app-plus" : {
@@ -71,7 +71,7 @@
             "disableHostCheck" : true,
             "proxy" : {
                 "/api" : {
-                    "target" : "http://192.168.110.100:8001/api",
+                    "target" : "http://127.0.0.1:8000/api",
                     "changeOrigin" : true,
                     "secure" : false,
                     "pathRewrite" : {

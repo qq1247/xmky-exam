@@ -54,9 +54,13 @@ export default {
           return false
         }
 
+        let fileId = this.$tools.getQueryParam(this.paramForm.orgLogo, 'id')
+        if (fileId === '0') {// bug：后台查询id为0的附件了
+          fileId = null
+        }
         const params = {
-          orgLogo:
-            this.$tools.getQueryParam(this.paramForm.orgLogo, 'id') || null,
+          orgLogo: fileId
+             || null,
           orgName: this.paramForm.orgName
         }
 

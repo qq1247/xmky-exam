@@ -60,8 +60,8 @@
 				examMarkState,
 				examMarkEndTime
 			}) {
-				const _examStartTime = new Date(examStartTime).getTime()
-				const _examEndTime = new Date(examEndTime).getTime()
+				const _examStartTime = new Date(examStartTime.replace(/-/g, '/')).getTime() // 苹果手机中划线不识别
+				const _examEndTime = new Date(examEndTime.replace(/-/g, '/')).getTime()
 				const _examMarkEndTime = new Date(examMarkEndTime).getTime()
 				const now = new Date().getTime()
 				if (now < _examStartTime) {

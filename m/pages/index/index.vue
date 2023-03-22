@@ -100,8 +100,8 @@
 			// 获取考试列表
 			async getExamList(time = undefined) {
 				const days = dayjs(time).daysInMonth()
-				const startDate = time || dayjs().date(1).format('YYYY-MM-DD')
-				const endDate = dayjs(time).date(days).format('YYYY-MM-DD')
+				const startDate = time || dayjs().date(1).format('YYYY/MM/DD')
+				const endDate = dayjs(time).date(days).format('YYYY/MM/DD')
 				let examList = await myExamListPage({
 					curPage: 1,
 					pageSize: 10,
@@ -118,8 +118,8 @@
 			// 获取开放题库
 			async getQuestionTypeOpenList() {
 				const days = dayjs().daysInMonth()
-				const startDate = dayjs().date(1).format('YYYY-MM-DD')
-				const endDate = dayjs().date(days).format('YYYY-MM-DD')
+				const startDate = dayjs().date(1).format('YYYY/MM/DD')
+				const endDate = dayjs().date(days).format('YYYY/MM/DD')
 				const res = await questionTypeOpenListPage({
 					state: 1,
 					pageSize: 10,

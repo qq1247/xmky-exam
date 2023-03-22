@@ -48,7 +48,9 @@ public class QuestionTypeOpenDaoImpl extends RBaseDaoImpl<QuestionTypeOpen> impl
 			   .addWhere(pageIn.get("state") != null, "QUESTION_TYPE_OPEN.STATE = :QUESTION_TYPE_OPEN_STATE", pageIn.get("state", Integer.class))
 			   .addWhere(pageIn.get("curUserId", Integer.class)!= null , "QUESTION_TYPE_OPEN.UPDATE_USER_ID = :UPDATE_USER_ID", pageIn.get("curUserId", Integer.class))
 			   .addWhere(ValidateUtil.isValid(pageIn.get("startTime")) && ValidateUtil.isValid(pageIn.get("endTime")), 
-						"((QUESTION_TYPE_OPEN.START_TIME <= :START_TIME1 AND :END_TIME1 >= QUESTION_TYPE_OPEN.END_TIME) OR (QUESTION_TYPE_OPEN.START_TIME <= :START_TIME2 AND :END_TIME2 >= QUESTION_TYPE_OPEN.END_TIME) OR (QUESTION_TYPE_OPEN.START_TIME >= :START_TIME3 AND QUESTION_TYPE_OPEN.END_TIME >= :END_TIME3))", 
+						"((QUESTION_TYPE_OPEN.START_TIME <= :START_TIME1 AND :END_TIME1 <= QUESTION_TYPE_OPEN.END_TIME) "
+						+ "OR (QUESTION_TYPE_OPEN.START_TIME <= :START_TIME2 AND :END_TIME2 <= QUESTION_TYPE_OPEN.END_TIME) "
+						+ "OR (QUESTION_TYPE_OPEN.START_TIME >= :START_TIME3 AND QUESTION_TYPE_OPEN.END_TIME <= :END_TIME3))", 
 						pageIn.get("startTime"), pageIn.get("startTime"),
 						pageIn.get("endTime"), pageIn.get("endTime"),
 						pageIn.get("startTime"), pageIn.get("endTime")
@@ -80,7 +82,12 @@ public class QuestionTypeOpenDaoImpl extends RBaseDaoImpl<QuestionTypeOpen> impl
 
 	@Override
 	public List<QuestionTypeOpen> getList(Date startTime, Date endTime, Integer questionTypeId) {
-		String sql = "SELECT * FROM EXM_QUESTION_TYPE_OPEN WHERE  QUESTION_TYPE_ID = :QUESTION_TYPE_ID AND STATE = 1 AND (START_TIME <= :START_TIME1 AND END_TIME >= :END_TIME1 OR START_TIME <= :START_TIME2 AND END_TIME >= :END_TIME2) ";
-		return getList(sql, new Object[] { questionTypeId, startTime, startTime, endTime, endTime });
+		String sql = "SELECT * FROM EXM_QUESTION_TYPE_OPEN "
+				+ "WHERE  QUESTION_TYPE_ID = :QUESTION_TYPE_ID "
+				+ "AND STATE = 1 "
+				+ "AND (((START_TIME <= :START_TIME1 AND :END_TIME1 <= END_TIME) "
+						+ "OR (START_TIME <= :START_TIME2 AND :END_TIME2 <= END_TIME) "
+						+ "OR (START_TIME >= :START_TIME3 AND END_TIME <= :END_TIME3))) ";
+		return getList(sql, new Object[] { questionTypeId, startTime, startTime, endTime, endTime, startTime, endTime });
 	}
 }

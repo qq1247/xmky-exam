@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.wcpdoc.exam</groupId>
+		<artifactId>sys-parent</artifactId>
+		<version>3.9.2</version>
+	</parent>
+    <artifactId>sys-wordFilter</artifactId>
+	<name>sys-wordFilter</name>
+	<description>敏感词</description>
+
+	<dependencies>
+		<!-- 集成系统基础 -->
+		<dependency>
+			<groupId>com.wcpdoc.exam</groupId>
+			<artifactId>sys-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+    </dependencies>
+</project>

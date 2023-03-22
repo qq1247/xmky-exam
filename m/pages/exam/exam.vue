@@ -73,9 +73,9 @@
 							<radio-group @change="({detail})=> updateAnswer(detail.value,question.id,question.type)">
 								<label class="option-item" v-for="(option, indexOption) in ['对','错']"
 									:key="indexOption">
-									<radio :value="String.fromCharCode(65 + indexOption)" color="#0094e5"
+									<radio :value="option" color="#0094e5"
 										style="transform:scale(0.7)" :disabled="((state == 1 && markState == 3)||state==3)"
-										:checked="myExamDetailCache[question.id].answers.includes(String.fromCharCode(65 + indexOption))" />
+										:checked="myExamDetailCache[question.id].answers.includes(option)" />
 									<div class="option-text"
 										v-html="`${String.fromCharCode(65 + indexOption)}、${option}`" />
 								</label>
