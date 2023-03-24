@@ -90,4 +90,10 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 				+ "	AND EXISTS (SELECT 1 FROM EXM_MY_EXAM Z WHERE Z.USER_ID = :USER_ID AND EXAM.ID = Z.EXAM_ID) ";
 		return getList(sql, new Object[] { userId }, Exam.class);
 	}
+
+	@Override
+	public void clear(Integer examId) {
+		String sql = "DELETE FROM EXM_MY_EXAM WHERE EXAM_ID = :EXAM_ID";
+		update(sql, new Object[] { examId });
+	}
 }

@@ -26,9 +26,11 @@ public interface ExamService extends BaseService<Exam>{
 	 * 考试发布
 	 * 
 	 * v1.0 chenyun 2021年8月25日下午6:06:54
-	 * @param id void
+	 * @param examInfo 
+	 * @param processBarId 
+	 * void
 	 */
-	void publish(ExamInfo examInfo);
+	void publish(ExamInfo examInfo, String processBarId);
 	
 	/**
 	 * 获取考试用户列表 

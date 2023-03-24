@@ -20,4 +20,12 @@ public interface ExamRuleDao extends RBaseDao<ExamRule> {
 	 * @return List<ExamRule>
 	 */
 	List<ExamRule> getList(Integer examId);
+
+	/**
+	 * 清空试卷
+	 * 
+	 * v1.0 zhanghc 2023年3月23日上午11:05:07
+	 * @param examId void
+	 */
+	void clear(Integer examId);
 }

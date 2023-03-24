@@ -267,7 +267,7 @@ public class ApiMyExamController extends BaseController{
 	}
 	
 	/**
-	 * 交卷
+	 * 用户交卷
 	 * 
 	 * v1.0 zhanghc 2017年6月26日下午12:30:20
 	 * @param examId
@@ -277,16 +277,16 @@ public class ApiMyExamController extends BaseController{
 	@ResponseBody
 	public PageResult finish(Integer examId) {
 		try {
-			if (!AutoMarkCache.tryReadLock(examId, 5000)) {
+			if (!AutoMarkCache.tryReadLock(examId, 2000)) {
 				throw new MyException("尝试加读锁失败");
 			}
 			myExamService.finish(examId, getCurUser().getId());
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("完成交卷错误：{}", e.getMessage());
+			log.error("用户交卷错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("完成交卷错误：", e);
+			log.error("用户交卷错误：", e);
 			return PageResult.err();
 		} finally {
 			AutoMarkCache.releaseReadLock(examId);

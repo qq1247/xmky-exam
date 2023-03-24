@@ -28,4 +28,10 @@ public class ExamQuestionDaoImpl extends RBaseDaoImpl<ExamQuestion> implements E
 		String sql = "SELECT * FROM EXM_EXAM_QUESTION WHERE EXAM_ID = :EXAM_ID ORDER BY NO ASC";
 		return getList(sql, new Object[] { examId }, ExamQuestion.class);
 	}
+
+	@Override
+	public void clear(Integer examId) {
+		String sql = "DELETE FROM EXM_EXAM_QUESTION WHERE EXAM_ID = :EXAM_ID";
+		update(sql, new Object[] { examId });
+	}
 }

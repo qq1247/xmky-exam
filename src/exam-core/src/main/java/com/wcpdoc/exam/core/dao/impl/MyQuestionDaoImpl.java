@@ -1,7 +1,6 @@
 package com.wcpdoc.exam.core.dao.impl;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
@@ -37,15 +36,8 @@ public class MyQuestionDaoImpl extends RBaseDaoImpl<MyQuestion> implements MyQue
 	}
 
 	@Override
-	public List<Map<String, Object>> getAnswerList(Integer examId, Integer userId) {
-		String sql = "SELECT MY_QUESTION.QUESTION_ID, MY_QUESTION.ANSWER_TIME, "
-				+ "MY_QUESTION.ANSWER, MY_QUESTION.MARK_USER_ID, MARK_USER.NAME AS MARK_USER_NAME, "
-				+ "MY_QUESTION.MARK_TIME, MY_QUESTION.SCORE, MY_QUESTION.QUESTION_SCORE, "
-				+ "MY_QUESTION.ANSWER_FILE_ID, QUESTION.TYPE AS QUESTION_TYPE, QUESTION.MARK_TYPE AS QUESTION_MARK_TYPE "
-				+ "FROM EXM_MY_QUESTION MY_QUESTION "
-				+ "LEFT JOIN EXM_QUESTION QUESTION ON MY_QUESTION.QUESTION_ID = QUESTION.ID "
-				+ "LEFT JOIN SYS_USER MARK_USER ON MY_QUESTION.MARK_USER_ID = MARK_USER.ID "
-				+" WHERE MY_QUESTION.EXAM_ID = :EXAM_ID AND MY_QUESTION.USER_ID = :USER_ID";
-		return getMapList(sql, new Object[] { examId, userId });
+	public void clear(Integer examId) {
+		String sql = "DELETE FROM EXM_MY_QUESTION WHERE EXAM_ID = :EXAM_ID";
+		update(sql, new Object[] { examId });
 	}
 }

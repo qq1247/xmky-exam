@@ -28,4 +28,10 @@ public class ExamRuleDaoImpl extends RBaseDaoImpl<ExamRule> implements ExamRuleD
 		String sql = "SELECT * FROM EXM_EXAM_RULE WHERE EXAM_ID = :EXAM_ID ORDER BY NO ASC ";
 		return getList(sql, new Object[] { examId });
 	}
+
+	@Override
+	public void clear(Integer examId) {
+		String sql = "DELETE FROM EXM_EXAM_RULE WHERE EXAM_ID = :EXAM_ID";
+		update(sql, new Object[] { examId });
+	}
 }

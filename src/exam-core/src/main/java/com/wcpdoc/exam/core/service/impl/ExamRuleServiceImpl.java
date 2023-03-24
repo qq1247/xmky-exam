@@ -44,4 +44,9 @@ public class ExamRuleServiceImpl extends BaseServiceImp<ExamRule> implements Exa
 	public List<ExamRule> getList(Integer examId) {
 		return examRuleDao.getList(examId);
 	}
+
+	@Override
+	public void clear(Integer examId) {
+		examRuleDao.clear(examId);
+	}
 }

@@ -96,4 +96,12 @@ public interface MyExamService extends BaseService<MyExam>{
 	 */
 	List<Exam> getExamList(Integer userId);
 
+	/**
+	 * 我的考试清空
+	 * 
+	 * v1.0 zhanghc 2023年3月22日下午5:38:23
+	 * @param id void
+	 */
+	void clear(Integer examId);
+
 }

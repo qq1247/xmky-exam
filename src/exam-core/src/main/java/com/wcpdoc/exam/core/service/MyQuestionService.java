@@ -1,7 +1,6 @@
 package com.wcpdoc.exam.core.service;
 
 import java.util.List;
-import java.util.Map;
 
 import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.MyQuestion;
@@ -33,14 +32,10 @@ public interface MyQuestionService extends BaseService<MyQuestion>{
 	List<MyQuestion> getList(Integer examId, Integer userId);
 
 	/**
-	 * 获取我的试题列表
+	 * 我的试题清理
 	 * 
-	 * v1.0 zhanghc 2017年7月3日上午9:44:45
-	 * @param examId
-	 * @param userId
-	 * @return List<Map<String, Object>>
+	 * v1.0 zhanghc 2023年3月22日下午5:40:35
+	 * @param examId void
 	 */
-	List<Map<String, Object>> getAnswerList(Integer examId, Integer userId);
-
-	void createPaper(Integer examId);
+	void clear(Integer examId);
 }

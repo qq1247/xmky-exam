@@ -665,4 +665,9 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	public List<Exam> getExamList(Integer userId) {
 		return myExamDao.getExamList(userId);
 	}
+
+	@Override
+	public void clear(Integer examId) {
+		myExamDao.clear(examId);
+	}
 }

@@ -14,8 +14,10 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.wcpdoc.base.cache.ProgressBarCache;
 import com.wcpdoc.base.service.UserService;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
@@ -141,25 +143,31 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	}
 	 */
 	@Override
-	public void publish(ExamInfo examInfo) {
+	public void publish(ExamInfo examInfo, String processBarId) {
 		/**
 		 * 校验前数据处理
 		 * 1：如果是人工组卷，且从题库抽题，试题类型等重新查一遍数据库，不要依赖前端，用于检测包含主观题等
 		 * 2：如果是随机组卷，提前返回需要的题库，用于随机抽题
 		 */
+		Double processLen = (examInfo.getExamUserIds().length + 5) * 1.0;// 说明参考控制层
+		ProgressBarCache.setProgressBar(processBarId, 0.0, processLen, "校验前数据处理开始", HttpStatus.OK.value());
 		Map<Integer, List<Question>> questionListCache = publishHandle(examInfo);
+		ProgressBarCache.setProgressBar(processBarId, 1.0, processLen, "校验前数据处理完成", HttpStatus.OK.value());
 		
 		// 校验数据有效性
 		publishValid(examInfo, questionListCache);
+		ProgressBarCache.setProgressBar(processBarId, 2.0, processLen, "校验数据完成", HttpStatus.OK.value());
 
 		// 保存考试信息
 		publishExam(examInfo);
+		ProgressBarCache.setProgressBar(processBarId, 3.0, processLen, "生成考试完成", HttpStatus.OK.value());
 		
 		// 保存试卷信息
 		publishPaper(examInfo);
+		ProgressBarCache.setProgressBar(processBarId, 4.0, processLen, "生成试卷完成", HttpStatus.OK.value());
 		
 		// 分配试卷到考试用户
-		publishUser(examInfo, questionListCache);
+		publishUser(examInfo, questionListCache, processBarId);
 	}
 	
 	@Override
@@ -397,14 +405,16 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 	
 	private void publishPaper(ExamInfo examInfo) {
 		// 删除旧试卷信息（二次修改会有；试题和规则都删除一次，页面可能会切换固定试卷和随机试卷）
-		List<ExamQuestion> examQuestionList = examQuestionService.getList(examInfo.getId());
-		for (ExamQuestion examQuestion : examQuestionList) {
-			examQuestionService.del(examQuestion.getId());
-		}
-		List<ExamRule> examRuleList = examRuleService.getList(examInfo.getId());
-		for (ExamRule examRule : examRuleList) {
-			examRuleService.del(examRule.getId());
-		}
+		examQuestionService.clear(examInfo.getId());
+//		List<ExamQuestion> examQuestionList = examQuestionService.getList(examInfo.getId());
+//		for (ExamQuestion examQuestion : examQuestionList) {
+//			examQuestionService.del(examQuestion.getId());
+//		}
+		examRuleService.clear(examInfo.getId());
+//		List<ExamRule> examRuleList = examRuleService.getList(examInfo.getId());
+//		for (ExamRule examRule : examRuleList) {
+//			examRuleService.del(examRule.getId());
+//		}
 		
 		// 保存新试卷信息
 		if (examInfo.getGenType() == 1) {
@@ -456,22 +466,26 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		// 如果是随机试卷，保存抽题规则
 		else if (examInfo.getGenType() == 2) {
 			for (ExamRule examRule : examInfo.getExamRules()) {
+				examRule.setExamId(examInfo.getId());
 				examRuleService.add(examRule);
 			}
 		}
 	}
 	
-	private void publishUser(ExamInfo examInfo, Map<Integer, List<Question>> questionListCache) {
+	private void publishUser(ExamInfo examInfo, Map<Integer, List<Question>> questionListCache, String processBarId) {
 		// 删除用户试卷、协助阅卷用户
-		List<MyExam> myExamList = myExamService.getList(examInfo.getId());
-		for (MyExam myExam : myExamList) {
-			List<MyQuestion> myQuestionList = myQuestionService.getList(myExam.getExamId(), myExam.getUserId());
-			for (MyQuestion myQuestion : myQuestionList) {
-				myQuestionService.del(myQuestion.getId());
-			}
-			
-			myExamService.del(myExam.getId());
-		}
+//		List<MyExam> myExamList = myExamService.getList(examInfo.getId());// 100道题100个用户需要删除1万多次，改成sql删除
+//		for (MyExam myExam : myExamList) {
+//			List<MyQuestion> myQuestionList = myQuestionService.getList(myExam.getExamId(), myExam.getUserId());
+//			for (MyQuestion myQuestion : myQuestionList) {
+//				myQuestionService.del(myQuestion.getId());
+//			}
+//			
+//			myExamService.del(myExam.getId());
+//		}
+		myExamService.clear(examInfo.getId());
+		myQuestionService.clear(examInfo.getId());
+		
 		List<MyMark> myMarkList = myMarkService.getList(examInfo.getId());
 		for (MyMark myMark : myMarkList) {
 			myMarkService.del(myMark.getId());
@@ -480,6 +494,8 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		// 重新生成用户试卷、协助阅卷用户
 		Map<Integer, List<QuestionOption>> questionOptionCache = new HashMap<>();
 		Map<Integer, List<QuestionAnswer>> questionAnswerCache = new HashMap<>();
+		int curProgressNum = 1;// 当前保存进度
+		Double processLen = (examInfo.getExamUserIds().length + 5) * 1.0;// 说明参考控制层
 		for (Integer examUserId : examInfo.getExamUserIds()) {
 			MyExam myExam = new MyExam();// 生成我的考试信息
 			myExam.setExamId(examInfo.getId());
@@ -578,6 +594,8 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					}
 				}
 			}
+			
+			ProgressBarCache.setProgressBar(processBarId, 4.0 + curProgressNum++, processLen, "生成用户-"+examUserId+"试卷完成", HttpStatus.OK.value());
 		}
 		
 		for (Integer markUserId : examInfo.getMarkUserIds()) {

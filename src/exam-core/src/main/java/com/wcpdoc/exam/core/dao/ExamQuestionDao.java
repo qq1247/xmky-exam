@@ -20,4 +20,12 @@ public interface ExamQuestionDao extends BaseDao<ExamQuestion>{
 	 * @return List<ExamQuestion>
 	 */
 	List<ExamQuestion> getList(Integer examId);
+
+	/**
+	 * 清空试卷
+	 * 
+	 * v1.0 zhanghc 2023年3月23日上午11:03:15
+	 * @param examId void
+	 */
+	void clear(Integer examId);
 }

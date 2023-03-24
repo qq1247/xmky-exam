@@ -7,18 +7,25 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.wcpdoc.base.cache.ProgressBarCache;
 import com.wcpdoc.base.service.UserService;
+import com.wcpdoc.core.context.UserContext;
 import com.wcpdoc.core.controller.BaseController;
+import com.wcpdoc.core.entity.LoginUser;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
@@ -26,6 +33,7 @@ import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.OnlineUserService;
 import com.wcpdoc.core.util.DateUtil;
+import com.wcpdoc.core.util.SpringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
 import com.wcpdoc.exam.core.entity.Exam;
@@ -108,7 +116,7 @@ public class ApiExamController extends BaseController {
 	}
 
 	/**
-	 * 发布
+	 * 考试发布
 	 * 
 	 * v1.0 zhanghc 2018年11月24日上午9:13:22
 	 * @param examInfo
@@ -118,13 +126,36 @@ public class ApiExamController extends BaseController {
 	@ResponseBody
 	public PageResult publish(@RequestBody ExamInfo examInfo) {
 		try {
-			examService.publish(examInfo);
-			return PageResultEx.ok();
+			ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+			RequestContextHolder.setRequestAttributes(requestAttributes, true);// 子线程共享请求属性
+			
+			String processBarId = UUID.randomUUID().toString().replaceAll("-", "");
+			Double processLen = (examInfo.getExamUserIds().length + 5) * 1.0;// 校验前数据处理+1，校验数据+1，保存考试+1，保存试卷+1，在业务层完成+1（事务内完成100%可能页面没刷新到），考试用户数量+userNum
+			LoginUser loginUser = getCurUser();
+			new Thread(new Runnable() {
+				public void run() {
+					UserContext.set(loginUser);// 子线程不走springboot拦截器，人工模拟拦截器，线程上绑定当前登录信息
+					try {
+						SpringUtil.getBean(ExamService.class).publish(examInfo, processBarId);
+						ProgressBarCache.setProgressBar(processBarId, processLen, processLen, "发布成功", HttpStatus.OK.value());// 放在业务层最后一行，进度已经100%，数据还没有完全插入，这时查询数据库时为空
+					} catch (MyException e) {
+						ProgressBarCache.setProgressBar(processBarId, 99.0, 100.0, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+						log.error("发布考试错误：{}", e.getMessage());
+						UserContext.remove();
+					} catch (Exception e) {
+						ProgressBarCache.setProgressBar(processBarId, 99.0, 100.0, e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+						log.error("发布考试错误：", e);
+						UserContext.remove();
+					}
+				}
+			}).start();
+
+			return PageResultEx.ok().data(processBarId);
 		} catch (MyException e) {e.printStackTrace();
-			log.error("完成添加考试错误：{}", e.getMessage());
+			log.error("发布考试错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("完成添加考试错误：", e);
+			log.error("发布考试错误：", e);
 			return PageResult.err();
 		}
 	}
