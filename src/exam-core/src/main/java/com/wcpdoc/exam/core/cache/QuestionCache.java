@@ -97,4 +97,22 @@ public class QuestionCache extends BaseEhCache {
 		}
 		return null;
 	}
+	
+	/**
+	 * 清理缓存
+	 * 
+	 * v1.0 zhanghc 2023年3月24日上午10:32:12
+	 * @param id void
+	 */
+	public static void clear(Integer id) {
+		Cache cache = getCache(CACHE_NAME);
+		String questionKey = String.format("%s%s", QUESTION_KEY_PRE, id);
+		cache.evict(questionKey);
+		
+		String optionKey = String.format("%s%s", OPTION_KEY_PRE, id);
+		cache.evict(optionKey);
+		
+		String answerKey = String.format("%s%s", ANSWER_KEY_PRE, id);
+		cache.evict(answerKey);
+	}
 }

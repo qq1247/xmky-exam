@@ -23,6 +23,7 @@ import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.BigDecimalUtil;
 import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
+import com.wcpdoc.exam.core.cache.QuestionCache;
 import com.wcpdoc.exam.core.dao.QuestionDao;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
@@ -121,6 +122,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 
 		// 保存附件
 		addExQuestionFile(question, options);
+		
+		// 清理缓存
+		QuestionCache.clear(question.getId());
 	}
 
 	@Override
@@ -155,6 +159,9 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			question.setUpdateTime(new Date());
 			question.setUpdateUserId(getCurUser().getId());
 			update(question);
+			
+			// 清理缓存
+			QuestionCache.clear(question.getId());
 		}
 	}
 	
