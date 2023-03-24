@@ -123,6 +123,7 @@ public class ApiUserController extends BaseController {
 			user.setRegistTime(curTime);
 			user.setUpdateTime(curTime);
 			user.setUpdateUserId(getCurUser().getId());
+			user.setType(1);
 			user.setState(1);
 			if(ValidateUtil.isValid(user.getHeadFileId())){
 				fileService.upload(user.getHeadFileId());
