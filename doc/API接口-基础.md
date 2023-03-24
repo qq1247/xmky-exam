@@ -172,8 +172,6 @@ http请求头需添加Authorization字段，
 | --------   | -----   | -----  | ---- |
 |name      | String (16)  | 名称   |   是     |
 |loginName      | String (16)  | 登陆账号   |   是     |
-|headFileId      | Integer  | 头像ID   |   否     |
-|email      | String (64)  | 邮箱   |   否     |
 |orgId      | Integer  | 机构ID   |   是     |
 
 | 响应参数 |  类型   |  描述  |

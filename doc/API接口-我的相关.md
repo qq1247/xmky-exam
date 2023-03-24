@@ -66,7 +66,7 @@ http请求头需添加Authorization字段，
 | data.list[].no     | Integer | 排名（考试不显示排名返回null） |
 
 
-### 我的考试答案列表：myExam/answerList
+### 我的试卷：myExam/paper
 | 请求参数| 类型    | 描述       | 必填 |
 | ---- | ------- | ---------- | ---- |
 | examId | Integer | 考试ID | 是   |
@@ -75,23 +75,27 @@ http请求头需添加Authorization字段，
 | --------------------- | ------- | -------------------------- |
 | code                  | Integer | 响应码                     |
 | msg                   | String  | 响应消息                   |
-| data[].questionId     | Integer | 试题ID                     |
-| data[].answerTime     | Date    | 答题时间                   |
-| data[].answers        | String[]| 我的答案，参考question/add |
-| data[].markUserId     | Integer | 阅卷人ID                   |
-| data[].markUserName   | String  | 阅卷人名称                 |
-| data[].markTime       | Date    | 阅卷时间                   |
-| data[].score          | Double  | 得分                       |
-| data[].questionScore  | Double  | 试题分数                   |
-| data[].answerFileId  | Integer  | 答案附件ID    |
+| data[].type		| Integer | 类型类型 （1：章节；2：试题）  |
+| data[].chapterName    | String  | 章节名称  （type==1有效）     |
+| data[].chapterTxt     | String  | 章节描述 （type==1有效）|
+| data[].questionId     | Integer | 试题ID                 |
+| data[].questionType   | Integer  | 试题类型（1：单选；2：多选；3：填空；4：判断；5：问答）                 |
+| data[].markType       | Integer    | 阅卷方式（1：客观题；2：主观题；）  |
+| data[].title          | String  | 题干                 |
+| data[].markOptions    | Integer[]  | 阅卷选项（2：答案无顺序；3：不区分大小写；) |
+| data[].score		| Double  | 试题分数                   |
+| data[].analysis	| String  | 解析    |
+| data[].userScore	| Double  | 用户分数    |
+| data[].options	| String[]  | 单多选项    |
+| data[].userAnswers	| String[]   | 用户答案    |
+| data[].answers	| String[]  | 标准答案    |
 
-### 我的考试更新答题：myExam/answer
+### 我的答题：myExam/answer
 | 请求参数| 类型    | 描述           | 必填 |
 | -------------- | ------- | -------------- | ---- |
 | examId | Integer | 考试ID | 是   |
 | questionId     | Integer | 试题ID | 是   |
 | answers | String[]| 答案（参考question/add）      | 是   |
-| answerFileId | Integer | 答案附件ID  | 否   |
 
 ### 我的考试交卷：myExam/finish
 | 请求参数| 类型    | 描述       | 必填 |
