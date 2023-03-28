@@ -1,7 +1,5 @@
 package com.wcpdoc.exam.core.dao.impl;
 
-import java.util.Date;
-
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
@@ -31,7 +29,6 @@ public class BulletinDaoImpl extends RBaseDaoImpl<Bulletin> implements BulletinD
 				+ "LEFT JOIN SYS_USER USER ON BULLETIN.UPDATE_USER_ID = USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("title")), "BULLETIN.TITLE LIKE :TITLE", "%" + pageIn.get("title") + "%")
-				.addWhere("true".equals(pageIn.get("notice")), "BULLETIN.START_TIME <= :START_TIME1 AND :START_TIME2 <= BULLETIN.END_TIME", new Date(), new Date())
 				.addWhere("BULLETIN.STATE = 1")
 			   .addOrder("BULLETIN.START_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);

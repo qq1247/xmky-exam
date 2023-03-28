@@ -18,16 +18,13 @@ import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.OrgService;
 import com.wcpdoc.base.service.UserExService;
 import com.wcpdoc.base.service.UserService;
-import com.wcpdoc.core.constant.ConstantManager;
 import com.wcpdoc.core.controller.BaseController;
-import com.wcpdoc.core.entity.OnlineUser;
 import com.wcpdoc.core.entity.PageIn;
 import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.OnlineUserService;
-import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.file.service.FileService;
 
@@ -65,28 +62,6 @@ public class ApiUserController extends BaseController {
 	public PageResult listpage() {
 		try {
 			PageOut pageOut = userService.getListpage(new PageIn(request));
-			for (Map<String, Object> map : pageOut.getList()) {
-				if (ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) { // 如果是管理员，显示在线状态和最后在线时间
-					Integer id = (Integer) map.get("id");
-					OnlineUser onlineUser = onlineUserService.getEntity(id);
-					if (onlineUser == null) {
-						map.put("online", false);
-						map.put("onlineTime", null);
-						continue;
-					}
-
-					map.put("online", onlineUser.getState());
-					map.put("onlineTime", DateUtil.formatDateTime(onlineUser.getUpdateTime()));
-				}
-				
-				if (!ConstantManager.ADMIN_LOGIN_NAME.equals(getCurUser().getLoginName())) {// 不是管理员移除以下字段
-					map.remove("registTime");
-					map.remove("lastLoginTime");
-					map.remove("roles");
-					map.remove("online");
-					map.remove("onlineTime");
-				}
-			}
 			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("用户列表错误：", e);
@@ -260,9 +235,7 @@ public class ApiUserController extends BaseController {
 				.addAttr("loginName", user.getLoginName())
 				.addAttr("orgId", user.getOrgId())
 				.addAttr("orgName", org == null ? null : org.getName())
-				.addAttr("state", user.getState())
-				.addAttr("email", user.getEmail())
-				.addAttr("headFileId", user.getHeadFileId());
+				.addAttr("state", user.getState());
 			return pageResult;
 		} catch (MyException e) {
 			log.error("获取用户错误：{}", e.getMessage());
@@ -294,30 +267,6 @@ public class ApiUserController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
 			log.error("初始化密码错误：", e);
-			return PageResult.err();
-		}
-	}
-
-	/**
-	 * 设置角色
-	 * 
-	 * v1.0 zhanghc 2016-6-15下午17:24:19
-	 * 
-	 * @param id
-	 * @param postIds
-	 * @return PageResult
-	 */
-	@RequestMapping("/role")
-	@ResponseBody
-	public PageResult role(Integer id, String[] roles) {
-		try {
-			userService.roleUpdate(id, roles);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("设置角色错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("设置角色错误：", e);
 			return PageResult.err();
 		}
 	}

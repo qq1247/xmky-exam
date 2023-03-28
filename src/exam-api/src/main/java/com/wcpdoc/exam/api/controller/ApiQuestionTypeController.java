@@ -16,7 +16,6 @@ import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
-import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.QuestionType;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
@@ -158,8 +157,7 @@ public class ApiQuestionTypeController extends BaseController {
 			}
 			return PageResultEx.ok()
 					.addAttr("id", entity.getId())
-					.addAttr("name", entity.getName())
-					.addAttr("updateTime", DateUtil.formatDateTime(entity.getUpdateTime()));
+					.addAttr("name", entity.getName());
 		} catch (MyException e) {
 			log.error("题库获取错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());

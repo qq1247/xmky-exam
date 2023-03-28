@@ -36,6 +36,7 @@ import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.SpringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
+import com.wcpdoc.exam.core.cache.QuestionCache;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.ExamRule;
@@ -182,7 +183,7 @@ public class ApiExamController extends BaseController {
 					examQuestion.put("chapterName", _examQuestion.getChapterName());
 					examQuestion.put("chapterTxt", _examQuestion.getChapterTxt());
 				} else {
-					Question _question = questionService.getEntity(_examQuestion.getQuestionId());
+					Question _question = QuestionCache.getQuestion(_examQuestion.getQuestionId());// 已关联考试的试题不会改变，缓存起来加速查询。
 					examQuestion.put("questionId", _question.getId());
 					examQuestion.put("questionType", _question.getType());
 					examQuestion.put("markType", _question.getMarkType());
@@ -194,14 +195,14 @@ public class ApiExamController extends BaseController {
 					
 					List<String> _options = new ArrayList<>();
 					if (QuestionUtil.hasSingleChoice(_question) || QuestionUtil.hasMultipleChoice(_question)) {// 如果是单选或多选，添加选项字段
-						List<QuestionOption> questionOptionList = questionOptionService.getList(_question.getId());
+						List<QuestionOption> questionOptionList = QuestionCache.getOption(_question.getId());
 						for (QuestionOption questionOption : questionOptionList) {
 							_options.add(questionOption.getOptions());
 						}
 						examQuestion.put("options", _options);
 					}
 					
-					List<QuestionAnswer> _questionAnswerList = questionAnswerService.getList(_question.getId());
+					List<QuestionAnswer> _questionAnswerList = QuestionCache.getAnswer(_question.getId());
 					List<Object> _answers = new ArrayList<>();
 					for(QuestionAnswer answer : _questionAnswerList){
 						if (QuestionUtil.hasSingleChoice(_question) || QuestionUtil.hasTrueFalse(_question) 
@@ -255,6 +256,7 @@ public class ApiExamController extends BaseController {
 				.addAttr("id", exam.getId())
 				.addAttr("name", exam.getName())
 				.addAttr("paperName", exam.getPaperName())
+				.addAttr("markType", exam.getMarkType())// 前端考试回显的时候，根据阅卷类型来判断是否回显阅卷时间
 				.addAttr("startTime", DateUtil.formatDateTime(exam.getStartTime()))
 				.addAttr("endTime", DateUtil.formatDateTime(exam.getEndTime()))
 				.addAttr("markStartTime", ValidateUtil.isValid(exam.getMarkStartTime()) ? DateUtil.formatDateTime(exam.getMarkStartTime()) : null)

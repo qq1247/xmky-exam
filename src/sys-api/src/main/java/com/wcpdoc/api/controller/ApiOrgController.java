@@ -68,7 +68,7 @@ public class ApiOrgController extends BaseController {
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	public PageResult add(Org org, String phone) {
+	public PageResult add(Org org) {
 		try {
 			UserCache.tryWriteLock("orgAdd", 5000);
 			orgService.addEx(org);

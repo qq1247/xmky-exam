@@ -204,10 +204,10 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 	}
 
 	@Override
-	public void customUpdate(String name, String content) {
+	public void customUpdate(String title, String content) {
 		// 校验数据有效性
-		if (!ValidateUtil.isValid(name)) {
-			throw new MyException("参数错误：name");
+		if (!ValidateUtil.isValid(title)) {
+			throw new MyException("参数错误：title");
 		}
 		if (!ValidateUtil.isValid(content)) {
 			throw new MyException("参数错误：content");
@@ -215,7 +215,7 @@ public class ParmServiceImpl extends BaseServiceImp<Parm> implements ParmService
 		
 		// 自定义内容更新
 		Parm parm = getEntity(1);
-		parm.setCustomTitle(name);
+		parm.setCustomTitle(title);
 		parm.setCustomContent(content);
 		update(parm);
 		

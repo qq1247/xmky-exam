@@ -42,10 +42,10 @@ public class ApiParmController extends BaseController {
 			parmService.entUpdate(logoFileId, name);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("修改参数错误：{}", e.getMessage());
+			log.error("企业修改错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("修改参数错误：", e);
+			log.error("企业修改错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -88,10 +88,10 @@ public class ApiParmController extends BaseController {
 			parmService.fileUpdate(uploadDir);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("上传附件目录错误：{}", e.getMessage());
+			log.error("上传目录修改错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("上传附件目录错误：", e);
+			log.error("上传目录修改错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -111,10 +111,10 @@ public class ApiParmController extends BaseController {
 			parmService.dbUpdate(bakDir);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("数据库备份目录错误：{}", e.getMessage());
+			log.error("DB目录修改错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("数据库备份目录错误：", e);
+			log.error("DB目录修改错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -135,27 +135,27 @@ public class ApiParmController extends BaseController {
 			parmService.pwdUpdate(type, value);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("设置参数密码初始化错误：{}", e.getMessage());
+			log.error("默认密码修改错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("设置参数密码初始化错误：", e);
+			log.error("默认密码修改错误：", e);
 			return PageResult.err();
 		}
 	}
 		
 	/**
-	 * 自定义内容修改
+	 * 自定义信息修改
 	 * 
 	 * v1.0 zhanghc 2023年3月10日上午9:22:54
-	 * @param name
+	 * @param title
 	 * @param content
 	 * @return PageResult
 	 */
 	@RequestMapping("/custom")
 	@ResponseBody
-	public PageResult custom(String name, String content) {
+	public PageResult custom(String title, String content) {
 		try {
-			parmService.customUpdate(name, content);
+			parmService.customUpdate(title, content);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("设置参数密码初始化错误：{}", e.getMessage());
@@ -178,17 +178,12 @@ public class ApiParmController extends BaseController {
 		try {
 			Parm parm = parmService.getEntity(1);
 			return PageResultEx.ok()
-					.addAttr("emailHost", parm.getEmailHost())
-					.addAttr("emailUserName", parm.getEmailUserName())
-					.addAttr("emailPwd", parm.getEmailPwd())
-					.addAttr("emailProtocol", parm.getEmailProtocol())
-					.addAttr("emailEncode", parm.getEmailEncode())
 					.addAttr("entName", parm.getEntName())
 					.addAttr("fileUploadDir", parm.getFileUploadDir())
 					.addAttr("dbBakDir", parm.getDbBakDir())
 					.addAttr("pwdType", parm.getPwdType())
 					.addAttr("pwdValue", parm.getPwdValue())
-					.addAttr("customName", parm.getCustomTitle())
+					.addAttr("customTitle", parm.getCustomTitle())
 					.addAttr("customContent", parm.getCustomContent());
 		} catch (MyException e) {
 			log.error("获取参数错误：{}", e.getMessage());

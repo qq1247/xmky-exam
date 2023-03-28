@@ -145,7 +145,7 @@ public class ApiLoginController extends BaseController {
 	}
 	
 	/**
-	 * 获取服务信息
+	 * 获取自定义信息
 	 * 
 	 * v1.0 zhanghc 2023年3月10日上午11:36:23
 	 * @return PageResult
@@ -156,10 +156,10 @@ public class ApiLoginController extends BaseController {
 		try {
 			Parm parm = ParmCache.get();
 			return PageResultEx.ok()
-					.addAttr("name", parm.getCustomTitle())
+					.addAttr("title", parm.getCustomTitle())
 					.addAttr("content", parm.getCustomContent());
 		} catch (Exception e) {
-			log.error("获取服务错误：", e);
+			log.error("获取自定义错误：", e);
 			return PageResult.err().msg(e.getMessage());
 		}
 	}

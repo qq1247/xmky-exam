@@ -55,9 +55,9 @@ public interface ParmService extends BaseService<Parm> {
 	 * 自定义内容修改
 	 * 
 	 * v1.0 zhanghc 2023年3月10日上午9:25:18
-	 * @param name
+	 * @param title
 	 * @param content void
 	 */
-	void customUpdate(String name, String content);
+	void customUpdate(String title, String content);
 
 }
