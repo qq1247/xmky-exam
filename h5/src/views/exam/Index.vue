@@ -1,0 +1,149 @@
+<template>
+    <template v-if="$route.path === '/exam'">
+        <el-form :inline="true" :model="queryForm" size="large" class="query">
+            <el-form-item label="">
+                <el-input v-model="queryForm.name" placeholder="请输入名称" />
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="query">
+                    <Iconfont icon="icon-search" color="white">&nbsp;查询</Iconfont>
+                </el-button>
+            </el-form-item>
+            <!-- <el-form-item style="float: right;">
+                <el-button type="success" @click="$router.push('/exam/add')">
+                    <Iconfont icon="icon-plus" color="white">&nbsp;添加</Iconfont>
+                </el-button>
+            </el-form-item> -->
+        </el-form>
+        <div class="list">
+            <Gridadd name="考试添加" @click="$router.push('/exam/add')"/>
+            <Griddata 
+                v-for="exam in listpage.list" 
+                :menu="[
+                    { name: '组卷', icon: 'icon-edit', event: () => $router.push(`/exam/edit/${exam.id}`) },
+                    { name: '删除', icon: 'icon-delete', event: () => $router.push(`/exam/del/${exam.id}`) },
+                    { name: '变更时间', icon: 'icon-time', event: () => $router.push(`/exam/time/${exam.id}`) },
+                    { name: '阅卷', icon: 'icon-peixunkaoshi', event: () => $router.push(`/exam/mark/${exam.id}`) },
+                    { name: '统计', icon: 'icon-statistics', event: () => $router.push(`/exam/statis/${exam.id}`) },
+                    ]" 
+                >
+                <template #tag>
+                    <el-tag size="small">{{ dictStore.getValue("PAPER_GEN_TYPE", exam.genType) }}</el-tag>
+                    &nbsp;<el-tag size="small">{{ dictStore.getValue("MARK_STATE", exam.markState) }}</el-tag>
+                </template>
+                <template #title>
+                    {{ exam.name }}
+                </template>
+                <template #content>
+                    <div style="margin-bottom: 5px;text-align: center;">
+                        考试时间：{{ exam.startTime }} - {{ exam.endTime }}
+                    </div>
+                    <div v-if="exam.markType === 2" style="margin-bottom: 5px;text-align: center;">
+                        阅卷时间：{{ exam.markStartTime }} - {{ exam.markEndTime }}
+                    </div>
+                    <el-row style="margin-bottom: 5px;">
+                        <el-col :span="12">
+                            及格分数：{{ exam.passScore || '-' }} / {{ exam.totalScore }}
+                        </el-col>
+                        <el-col :span="12">
+                            <!-- 待批试卷：6 / 79 -->
+                            考试人数：{{ exam.userNum }}人
+                        </el-col>
+                        <!-- <el-col :span="8">
+                            协助批阅：0人
+                        </el-col> -->
+                    </el-row>
+                    <el-row>
+                        <el-col :span="10">
+                            成绩查询：{{ dictStore.getValue('SCORE_STATE', exam.scoreState) }}
+                        </el-col>
+                        <el-col :span="7">
+                            排名：{{ dictStore.getValue('STATE_ON', exam.rankState) }}
+                        </el-col>
+                        <el-col :span="7">
+                            防作弊：{{ exam.sxes.length > 0 ? '是' : '否' }}
+                        </el-col>
+                        <!-- <el-col :span="7">
+                            匿名阅卷：{{ dictStore.getValue('STATE_YN', exam.anonState) }}
+                        </el-col> -->
+                    </el-row>
+                </template>
+            </Griddata>
+        </div>
+        <el-pagination 
+            v-model:current-page="listpage.curPage"
+            v-model:page-size="listpage.pageSize" 
+            :total="listpage.total" 
+            background
+            layout="prev, pager, next" 
+            :hide-on-single-page="true" 
+            @size-change="query"
+            @current-change="query"
+            @prev-click="query"
+            @next-click="query"
+        />
+    </template>
+    <RouterView v-else></RouterView>
+</template>
+  
+<script lang="ts" setup>
+import { ref, reactive, onMounted, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router'
+import http from "@/request"
+import Griddata from '@/components/Griddata.vue';
+import Gridadd from '@/components/Gridadd.vue';
+import { useDictStore } from '@/stores/dict';
+
+//  定义变量
+const route = useRoute()
+const dictStore = useDictStore()// 字典缓存
+const queryForm = reactive({// 查询表单
+    name: '',
+})
+const listpage = reactive({// 分页列表
+    curPage: 1,
+    pageSize: 5,
+    total: 0,
+    list: [] as any[],
+})
+
+// 组件挂载完成后，执行如下方法
+onMounted(() => {
+    query()
+})
+
+// 如果是跳转到列表页，重新查询
+watch(() => route.path, (n, o) => {
+    if (n === '/exam') {
+        query()
+    }
+})
+
+// 查询
+async function query() {
+    const { data: { code, data } } = await http.post('exam/listpage', {
+        name: queryForm.name,
+        curPage: listpage.curPage,
+        pageSize: listpage.pageSize,
+    })
+
+    if (code !== 200) {
+        return
+    }
+
+    listpage.list = data.list
+    listpage.total = data.total
+}
+</script>
+
+<style lang="scss" scoped>
+.list {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    .grid {
+        height: 200px;
+    }
+}
+</style>
+  
