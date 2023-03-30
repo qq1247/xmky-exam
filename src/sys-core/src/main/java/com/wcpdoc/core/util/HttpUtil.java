@@ -148,6 +148,47 @@ public class HttpUtil {
 		}
 	}
 	
+	/**
+	 * post请求
+	 * 
+	 * v1.0 zhanghc 2019年11月4日下午7:08:39
+	 * @param url
+	 * @param params
+	 * @param charset
+	 * @return String
+	 * @throws HttpRequestException 
+	 */
+	public static final String post(String url, Map<String, Object> params, String charset, Map<String, String> heads) throws HttpRequestException {
+		try {
+			HttpPost httpPost = new HttpPost(url);
+			httpPost.setConfig(REQUEST_CONFIG);
+			List<BasicNameValuePair> paramList = new ArrayList<BasicNameValuePair>(0);
+			if (params != null) {
+				for (Map.Entry<String, Object> entry : params.entrySet()) {
+					if (entry.getValue() == null) {
+						paramList.add(new BasicNameValuePair(entry.getKey(), null));
+						continue;
+					}
+					
+					paramList.add(new BasicNameValuePair(entry.getKey(), entry.getValue().toString()));
+				}
+			}
+			if (heads != null) {
+				for (Map.Entry<String, String> entry : heads.entrySet()) {
+					httpPost.addHeader(entry.getKey(), entry.getValue());
+				}
+			}
+			UrlEncodedFormEntity entity = new UrlEncodedFormEntity(paramList, charset);
+			httpPost.setEntity(entity);
+			CloseableHttpResponse execute = HTTP_CLIENT.execute(httpPost);
+			HttpEntity httpEntity = execute.getEntity();
+			return EntityUtils.toString(httpEntity);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new HttpRequestException(e.getMessage());
+		}
+	}
+	
 	public static final String post(String url, String params, String charset) throws HttpRequestException {
 		try {
 			HttpPost httpPost = new HttpPost(url);
