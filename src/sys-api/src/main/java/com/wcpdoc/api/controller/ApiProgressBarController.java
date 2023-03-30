@@ -25,7 +25,7 @@ import com.wcpdoc.core.exception.MyException;
 @RequestMapping("/api/progressBar")
 public class ApiProgressBarController extends BaseController {
 	private static final Logger log = LoggerFactory.getLogger(ApiProgressBarController.class);
-
+	
 	/**
 	 * 获取进度条
 	 * 
@@ -39,7 +39,7 @@ public class ApiProgressBarController extends BaseController {
 		try {
 			ProgressBar progressBar = ProgressBarCache.getProgressBar(id);
 			if (progressBar == null) {
-				throw new MyException("参数错误：id");
+				throw new MyException(String.format("参数错误：id=%s", id));
 			}
 			Map<String, Object> result = new HashMap<>();
 			result.put("curNum", progressBar.getCurNum());

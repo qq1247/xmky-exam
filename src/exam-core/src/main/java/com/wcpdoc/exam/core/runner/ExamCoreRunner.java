@@ -11,15 +11,11 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-import com.wcpdoc.base.cache.ParmCache;
-import com.wcpdoc.base.entity.Parm;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.util.DateUtil;
-import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.AutoMarkCache;
 import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.service.MyExamService;
-import com.wcpdoc.notify.exception.NotifyException;
 import com.wcpdoc.notify.service.NotifyService;
 
 /**
@@ -93,11 +89,11 @@ public class ExamCoreRunner implements ApplicationRunner {
 						} catch (MyException e) {// 一个有问题，不影响其他任务执行
 							log.error("自动阅卷错误：{}", e.getMessage());
 							AutoMarkCache.del(unMarkExam.getId());// 如果已经异常，给管理员发送邮件
-							sendEmail(e);
+//							sendEmail(e);
 						} catch (Exception e) {
 							log.error("自动阅卷错误：", e);
 							AutoMarkCache.del(unMarkExam.getId());
-							sendEmail(e);
+//							sendEmail(e);
 						} finally {
 							AutoMarkCache.releaseWriteLock(unMarkExam.getId());// 释放写锁
 						}
@@ -105,19 +101,19 @@ public class ExamCoreRunner implements ApplicationRunner {
 				}
 			}
 
-			private void sendEmail(Exception e) {
-				Parm parm = ParmCache.get();
-				try {
-					if (!ValidateUtil.isValid(parm.getEmailUserName())) {
-						log.info("自动阅卷错误：没有配置管理员邮箱，不能推送异常信息");
-						return;
-					}
-					
-					notifyService.emailPush(parm.getEmailUserName(), parm.getEmailUserName(), "在线考试-自动阅卷失败", e.getMessage());
-				} catch (NotifyException e1) {
-					log.error("自动阅卷错误：{}", e.getMessage());
-				}
-			}
+//			private void sendEmail(Exception e) {
+//				Parm parm = ParmCache.get();
+//				try {
+//					if (!ValidateUtil.isValid(parm.getEmailUserName())) {
+//						log.info("自动阅卷错误：没有配置管理员邮箱，不能推送异常信息");
+//						return;
+//					}
+//					
+//					notifyService.emailPush(parm.getEmailUserName(), parm.getEmailUserName(), "在线考试-自动阅卷失败", e.getMessage());
+//				} catch (NotifyException e1) {
+//					log.error("自动阅卷错误：{}", e.getMessage());
+//				}
+//			}
 		}).start();
 	}
 }

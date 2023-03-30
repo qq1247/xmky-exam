@@ -30,7 +30,7 @@ public class UserDaoImpl extends RBaseDaoImpl<User> implements UserDao {
 		String sql = "SELECT USER.ID, USER.NAME, USER.TYPE, USER.LOGIN_NAME, USER.ORG_ID, ORG.NAME AS ORG_NAME, "
 				+ "USER.STATE "
 				+ "FROM SYS_USER USER " 
-				+ "LEFT JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID ";
+				+ "INNER JOIN SYS_ORG ORG ON USER.ORG_ID = ORG.ID ";
 				
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("name")), "(USER.NAME LIKE :NAME OR ORG.NAME LIKE :ORG_NAME)", String.format("%%%s%%", pageIn.get("name")), String.format("%%%s%%", pageIn.get("name")))

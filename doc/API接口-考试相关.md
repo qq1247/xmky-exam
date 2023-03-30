@@ -29,6 +29,7 @@ http请求头需添加Authorization字段，
 ### 试题分类列表：questionType/listpage
 | 请求参数| 类型        | 描述       | 必填 |
 | -------- | ----------- | ---------- | ---- |
+| id     | Integer | 主键       | 否   |
 | name     | String (16) | 名称       | 否   |
 | curPage  | Integer     | 当前第几页 | 否   |
 | pageSize | Integer     | 每页多少条 | 否   |
@@ -41,10 +42,7 @@ http请求头需添加Authorization字段，
 | data.list[]                | Object[]   | 分页列表 |
 | data.list[].id             | Integer | 主键     |
 | data.list[].name           | String  | 名称     |
-| data.list[].createUserId| String  | 创建用户ID   |
-| data.list[].createUserName| String  | 创建用户名称  |
-| data.list[].writeUserIds[] | Integer  | 组用户ID |
-| data.list[].writeUserNames[] | String[] | 组用户 |
+| data.list[].questionNum   | String  | 试题数量     |
 
 ### 试题分类添加：questionType/add
 | 请求参数| 类型        | 描述 | 必填 |
@@ -77,165 +75,8 @@ http请求头需添加Authorization字段，
 | ------------------- | ------- | ---------- |
 | code                | Integer | 响应码     |
 | msg                 | String  | 响应消息   |
-| data.id             | Integer | 分类id     |
-| data.name           | String  | 分类名称   |
-| data.createUserId   | Integer | 创建人ID   |
-| data.createUserName | String  | 创建人名称 |
-| data.createTime     | Date    | 创建时间   |
-| data.writeUserIds[]   | String[] | 组用户ID  |
-| data.writeUserNames[]   | String[] | 组用户名称  |
-
-### 试题分类权限：questionType/auth
-| 请求参数 | 类型    | 描述   | 必填 |
-| ------------ | ------- | ------ | ---- |
-| id           | Integer | 主键   | 是   |
-| writeUserIds | String[]  | 组用户 | 是   |
-
-### 试题分类合并：questionType/move
-| 请求参数| 类型    | 描述   | 必填 |
-| -------- | ------- | ------ | ---- |
-| sourceId | String  | 源ID   | 是   |
-| targetId | String  | 目标ID | 是   |
-
-### 试卷分类列表：paperType/listpage
-| 请求参数| 类型        | 描述       | 必填 |
-| -------- | ----------- | ---------- | ---- |
-| name     | String (16) | 名称       | 否   |
-| curPage  | Integer     | 当前第几页 | 否   |
-| pageSize | Integer     | 每页多少条 | 否   |
-
-| 响应参数| 类型    | 描述     |
-| -------------------------- | ------- | -------- |
-| code                       | Integer | 响应码   |
-| msg                        | String  | 响应消息 |
-| data.total                 | Integer | 总行数   |
-| data.list[]                | Object[]   | 分页列表 |
-| data.list[].id             | Integer | 主键     |
-| data.list[].name           | String  | 名称     |
-| data.list[].createUserId| String  | 创建用户ID   |
-| data.list[].createUserName| String  | 创建用户名称  |
-| data.list[].readUserIds[] | Integer  | 组用户ID |
-| data.list[].readUserNames[] | String[] | 组用户 |
-
-### 试卷分类添加：paperType/add
-#### 参考questionType/add
-
-### 试卷分类修改：paperType/edit
-#### 参考questionType/edit
-
-### 试卷分类删除：paperType/del
-#### 参考questionType/del
-
-### 试卷分类详情：paperType/get
-| 请求参数| 类型    | 描述 | 必填 |
-| ---- | ------- | ---- | ---- |
-| id   | Integer | 主键 | 是   |
-
-| 响应参数| 类型    | 描述       |
-| ------------------- | ------- | ---------- |
-| code                | Integer | 响应码     |
-| msg                 | String  | 响应消息   |
-| data.id             | Integer | 分类id     |
-| data.name           | String  | 分类名称   |
-| data.createUserId   | Integer | 创建人ID   |
-| data.createUserName | String  | 创建人名称 |
-| data.createTime     | Date    | 创建时间   |
-| data.readUserIds[]   | String[] | 组用户ID  |
-| data.readUserNames[]   | String[] | 组用户名称  |
-
-### 试卷分类权限：paperType/auth
-| 请求参数 | 类型    | 描述   | 必填 |
-| ------------ | ------- | ------ | ---- |
-| id           | Integer | 主键   | 是   |
-| readUserIds | String[]  | 组用户 | 是   |
-
-### 试卷分类合并：paperType/move
-#### 参考questionType/move
-
-### 考试分类列表：examType/listpage
-| 请求参数| 类型        | 描述       | 必填 |
-| -------- | ----------- | ---------- | ---- |
-| name     | String (16) | 名称       | 否   |
-| curPage  | Integer     | 当前第几页 | 否   |
-| pageSize | Integer     | 每页多少条 | 否   |
-
-| 响应参数| 类型    | 描述     |
-| -------------------------- | ------- | -------- |
-| code                       | Integer | 响应码   |
-| msg                        | String  | 响应消息 |
-| data.total                 | Integer | 总行数   |
-| data.list[]                | Object[]   | 分页列表 |
-| data.list[].id             | Integer | 主键     |
-| data.list[].name           | String  | 名称     |
-
-### 考试分类添加：examType/add
-#### 参考questionType/add
-
-### 考试分类修改：examType/edit
-#### 参考questionType/edit
-
-### 考试分类删除：examType/del
-#### 参考questionType/del
-
-### 考试分类详情：examType/get
-| 请求参数| 类型    | 描述 | 必填 |
-| ---- | ------- | ---- | ---- |
-| id   | Integer | 主键 | 是   |
-
-| 响应参数| 类型    | 描述       |
-| ------------------- | ------- | ---------- |
-| code                | Integer | 响应码     |
-| msg                 | String  | 响应消息   |
-| data.id             | Integer | 分类id     |
-| data.name           | String  | 分类名称   |
-
-### 试题分类开放列表：questionTypeOpen/listpage
-| 请求参数| 类型    | 描述       | 必填 |
-| --------- | ------- | ---------- | ---- |
-| startTime | Date    | 开始时间   | 否   |
-| endTime   | Date    | 结束时间   | 否   |
-| state   | Integer | 状态 | 否   |
-| curPage   | Integer | 当前第几页 | 否   |
-| pageSize  | Integer | 每页多少条 | 否   |
-
-| 响应参数| 类型    | 描述         |
-| --------------------- | ------- | ------------ |
-| code                  | Integer | 响应码       |
-| msg                   | String  | 响应消息     |
-| data.total            | Integer | 总行数       |
-| data.list[]           | Object[]   | 分页列表     |
-| data.list[].id        | Integer | 主键         |
-| data.list[].startTime | Date    | 开始时间         |
-| data.list[].endTime   | Date    | 结束时间     |
-| data.list[].userIds   | String  | 授权用户IDS      |
-| data.list[].userNames | String  | 授权用户名称     |
-| data.list[].orgIds    | String  | 授权组织机构IDS  |
-| data.list[].orgNames  | String  | 授权组织机构名称 |
-
-### 试题分类开放添加：questionTypeOpen/add
-| 请求参数| 类型         | 描述     | 必填 |
-| --------- | ------------ | -------- | ---- |
-| id        | Integer      | 主键     | 是   |
-| startTime | Date         | 开始时间 | 是   |
-| endTime   | Date         | 结束时间 | 是   |
-| userIds   | String(1024) | 授权用户 | 否   |
-| orgIds    | String(1024) | 授权机构 | 否   |
-
-### 试题分类开放删除：questionTypeOpen/del
-| 请求参数| 类型    | 描述 | 必填 |
-| ---- | ------- | ---- | ---- |
-| id   | Integer | 主键 | 是   |
-
-### 试题分类开放列表：questionTypeOpen/questionIds
-| 请求参数| 类型    | 描述       | 必填 |
-| --------- | ------- | ---------- | ---- |
-| questionTypeId | Integer    | 试题分类ID   | 是   |
-
-| 响应参数| 类型    | 描述         |
-| --------------------- | ------- | ------------ |
-| code                  | Integer | 响应码       |
-| msg                   | String  | 响应消息     |
-| data            | Integer[] |  试题IDS       |
+| data.id             | Integer | 试题分类id     |
+| data.name           | String  | 试题分类名称   |
 
 ### 试题列表：question/listpage
 | 请求参数| 类型    | 描述         | 必填 |

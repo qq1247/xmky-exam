@@ -385,6 +385,7 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 			
 			if (myExam.getMarkState() == 1) {// 试卷无人阅卷
 				myExam.setMarkUserId(1);// 记录阅卷人为admin
+				myExam.setMarkStartTime(new Date());
 			}
 			
 			List<MyQuestion> myQuestionList = myQuestionService.getList(examId, myExam.getUserId());
@@ -397,13 +398,16 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 					myQuestionService.update(myQuestion);
 				}
 				
-				totalScore.add(myQuestion.getScore());// 累加所有题分数到总分数
+				totalScore.add(myQuestion.getUserScore());// 累加所有题分数到总分数
 			}
 			
 			myExam.setTotalScore(totalScore.getResult());// 记录成绩 
 			BigDecimal passScore = BigDecimalUtil.newInstance(exam.getTotalScore()).mul(exam.getPassScore()).div(100, 2).getResult();
 			myExam.setAnswerState(BigDecimalUtil.newInstance(totalScore.getResult()).sub(passScore).getResult().doubleValue() >= 0 ? 1 : 2);// 标记及格状态
 			myExam.setMarkState(3);// 标记为阅卷结束
+			if (!ValidateUtil.isValid(myExam.getMarkEndTime())) {
+				myExam.setMarkEndTime(new Date());
+			}
 			myExamService.update(myExam);
 		}
 		

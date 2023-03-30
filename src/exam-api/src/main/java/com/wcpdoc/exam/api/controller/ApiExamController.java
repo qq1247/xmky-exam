@@ -131,6 +131,7 @@ public class ApiExamController extends BaseController {
 			RequestContextHolder.setRequestAttributes(requestAttributes, true);// 子线程共享请求属性
 			
 			String processBarId = UUID.randomUUID().toString().replaceAll("-", "");
+			ProgressBarCache.setProgressBar(processBarId, 0.0, 1.0, "发布开始", HttpStatus.OK.value());// 放在前面，可能的问题为下面的线程执行慢，没有进度数据，前端显示空
 			Double processLen = (examInfo.getExamUserIds().length + 5) * 1.0;// 校验前数据处理+1，校验数据+1，保存考试+1，保存试卷+1，在业务层完成+1（事务内完成100%可能页面没刷新到），考试用户数量+userNum
 			LoginUser loginUser = getCurUser();
 			new Thread(new Runnable() {
@@ -424,7 +425,7 @@ public class ApiExamController extends BaseController {
 	@ResponseBody
 	public PageResult time(Integer id, Integer timeType, Integer minute) {
 		try {
-			if (!AutoMarkCache.tryWriteLock(id, 20000)) {
+			if (!AutoMarkCache.tryWriteLock(id, 2000)) {
 				throw new MyException("尝试加写锁失败");
 			}
 			examService.timeUpdate(id, timeType, minute);

@@ -7,6 +7,7 @@ pageSize &lt;= 100
 code == 200 请求正常
 code == 500 服务器内部错误
 code == 401 无权限或登录超时
+
 | 响应参数  |  类型   |  描述  |
 | --------   | -----   | -----  |
 |code     | Integer  | 响应码 |
@@ -55,23 +56,28 @@ http请求头需添加Authorization字段，
 | --------   | -----   | -----  |
 |code     | Integer  | 响应码 |
 |msg     | String  | 响应消息 |
-|data     | Date  | 服务器时间（前端每隔30秒同步一次，保证跟时间相关的业务功能正常） |
+|data     | Date  | 服务器时间（前端每隔30秒调用一次，可用于检测用户在线状态） |
 
-### 企业logo：login/entLogo
-| 请求参数     |  类型   |  描述  |  必填 |
-| --------   | -----   | -----  | ---- |
-| ico| Boolean| 转ico | 否 |
-
-| 响应参数  |  类型   |  描述  |
-| --------   | -----   | -----  |
-|     | Binary  | 二进制流 |
-
-### 企业名称：login/entName
+### 企业信息：login/ent
 | 响应参数  |  类型   |  描述  |
 | --------   | -----   | -----  |
 |code     | Integer  | 响应码 |
 |msg     | String  | 响应消息 |
-|data     | String| 单位名称 |
+|data.name     | String| 企业名称 |
+
+### 自定义信息（首页右下角）：login/custom
+| 响应参数  |  类型   |  描述  |
+| --------   | -----   | -----  |
+|code     | Integer  | 响应码 |
+|msg     | String  | 响应消息 |
+|data.title     | String| 标题 |
+|data.content     | String| 内容 |
+
+### 企业logo：login/logo
+
+| 响应参数  |  类型   |  描述  |
+| --------   | -----   | -----  |
+|     | Binary  | 二进制流 |
 
 ### 机构列表：org/listpage
 | 请求参数     |  类型   |  描述  |  必填 |
@@ -142,7 +148,8 @@ http请求头需添加Authorization字段，
 | 请求参数     |  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
 | name | String(16) | 名称或机构  |   否     |
-| type| Integer  | 类型|   否     |
+| type| Integer  | 类型（1：正常；2：冻结；）|   否     |
+| ids | String(1024) | 用户IDS（逗号分割）  |   否     |
 | curPage | Integer | 当前第几页  |   否     |
 | pageSize | Integer  | 每页多少条   |   否     |
 
@@ -158,14 +165,7 @@ http请求头需添加Authorization字段，
 |data.list[].loginName | String  | 登陆名称 |
 |data.list[].orgId | Integer  | 机构ID |
 |data.list[].orgName | String  | 机构名称 |
-|data.list[].headFileId | Integer  | 头像ID |
-|data.list[].email | String  | 邮箱 |
 |data.list[].state | Integer  | 状态（1：正常；2：冻结；） |
-|data.list[].registTime | Date | 注册时间（admin可见） |
-|data.list[].lastLoginTime | Date  | 最后登陆时间（admin可见） |
-|data.list[].roles[] | String  | 角色（admin可见） |
-|data.list[].online| Boolean  | 是否在线（admin可见）|
-|data.list[].onlineTime| Date |最后在线时间（admin可见） |
 
 ### 用户添加：user/add
 | 请求参数     |  类型   |  描述  |  必填 |
@@ -186,15 +186,13 @@ http请求头需添加Authorization字段，
 |id      | Integer  | 主键   |   是     |
 |name      | String (16)  | 名称   |   是     |
 |loginName      | String (16)  | 登陆账号   |   是     |
-|headFileId      | Integer  | 头像ID   |   否     |
-|email      | String (64)  | 邮箱   |   否     |
 |orgId      | Integer  | 机构ID   |   是     |
 
 | 响应参数 |  类型   |  描述  |
 | --------   | -----   | -----  |
 |code     | Integer  | 响应码 |
 |msg     | String  | 响应消息 |
-|data.initPwd | String  | 初始化密码（更改loginName，此字段有效） |
+|data.initPwd | String  | 初始化密码（更改loginName时，此字段有效） |
 
 ### 用户删除：user/del
 | 请求参数     |  类型   |  描述  |  必填 |
@@ -215,13 +213,7 @@ http请求头需添加Authorization字段，
 |data.loginName     | String  | 登陆账号 |
 |data.orgId     | Integer  | 机构ID |
 |data.orgName   | String  | 机构名称 |
-|data.email   | String  | 邮箱 |
-|data.headFileId   | String  | 头像ID |
-|data.state   | String  | 状态 |
-|data.roles | String[]  | 角色（admin可见） |
-|data.state   | Integer  | 状态（0：删除；1：正常；） |
-|data.registTime     | Date  | 注册时间（admin可见） |
-|data.lastLoginTime     | Date  | 最后登陆时间（admin可见） |
+|data.state   | Integer  | 状态（1：正常；2：冻结；） |
 
 ### 用户密码初始化：user/pwdInit
 | 请求参数     |  类型   |  描述  |  必填 |
@@ -392,7 +384,7 @@ http请求头需添加Authorization字段，
 | 请求参数|  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
 |files    | File     |   附件  |   是   |
-|uuid| String|   通用唯一识别码。查阅file/getId接口了解详细  |   否   |
+|uuid| String|   唯一识别，移动端使用。查阅file/getId接口了解详细  |   否   |
 
 | 响应参数|  类型   |  描述  |
 | --------   | -----   | -----  |
@@ -438,8 +430,6 @@ http请求头需添加Authorization字段，
 | 求参数|  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
 | title  | String  | 标题   |   否     |
-| showType  | Integer  | 展示类型   |   否     |
-| state  | Integer  | 状态  |   否     |
 | curPage | Integer | 当前第几页  |   否     |
 | pageSize | Integer  | 每页多少条   |   否     |
 
@@ -452,21 +442,14 @@ http请求头需添加Authorization字段，
 |data.list[].id   | Integer  | 主键 |
 |data.list[].title | String  | 标题 |
 |data.list[].content | String  | 内容 |
-|data.list[].showType      | Integer  | 展示类型 |
 |data.list[].startTime | Date  | 开始时间 |
 |data.list[].endTime | Date  | 结束时间 |
-|data.list[].imgFileId     | String  | 图片附件ID |
-|data.list[].state | Integer  | 状态 |
-|data.list[].readUserNames | String  | 用户读权限 |
 
 ### 公告栏添加：bulletin/add
 | 请求参数|  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
 |title     | String (32)  | 标题   |   是     |
-|content      | text  | 内容   |   是     |
-|showType      | Integer  | 展示状态（1：正常；2：置顶；3：轮播；）   |   是     |
-|imgFileId     | String (256)  | 轮播图附件ID   |  否     |
-|readUserIds      | String (256)  | 用户读权限（不填表示所有人都可以读取）  |   否     |
+|content      | text  | 内容   |   是     ||
 |startTime | Date  | 开始时间 |   是     |
 |endTime | Date  | 结束时间 |   是     |
 
@@ -475,10 +458,7 @@ http请求头需添加Authorization字段，
 | --------   | -----   | -----  | ---- |
 |id| Integer    | 主键   |   是     |
 |title     | String (32)  | 标题   |   是     |
-|content      | text  | 内容   |   是     |
-|showType      | Integer  | 展示状态（1：正常；2：置顶；3：轮播；）   |   是     |
-|imgFileId     | String (256)  | 轮播图附件ID   |  否     |
-|readUserIds      | String (256)  | 用户读权限（不填表示所有人都可以读取）  |   否     |
+|content      | text  | 内容   |   是     | |
 |startTime | Date  | 开始时间 |   是     |
 |endTime | Date  | 结束时间 |   是     |
 
@@ -498,36 +478,22 @@ http请求头需添加Authorization字段，
 |msg     | String  | 响应消息 |
 |data.id   | Integer  | 主键 |
 |data.title | String  | 标题 |
-|data.state | Integer  | 状态 |
 |data.content | text  | 内容 |
-|data.showType      | Integer  | 展示类型 |
 |data.startTime | Date  | 开始时间 |
 |data.endTime | Date  | 结束时间 |
-|data.imgFileId     | String  | 图片附件ID |
-|data.readUserIds | Integer[]  | 用户读权限ID |
-|data.readUserNames | String[]  | 用户读权限名称 |
 
-### 系统参数单位名称：parm/logo
+### 系统参数企业修改：parm/ent
 | 请求参数|  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
-|orgLogo| Integer| 机构logo ID  |   否     |
-|orgName| String (64)  | 机构名称  |   否     |
+|logoFileId| Integer| 企业logo附件ID  |   否     |
+|name| String (32)  | 企业名称  |   否     |
 
-### 系统参数邮件：parm/email
-| 请求参数|  类型   |  描述  |  必填 |
-| --------   | -----   | -----  | ---- |
-|host| String（64）| 主机   |   是     |
-|userName| String (64)  | 用户名   |   是     |
-|pwd| text  | String（64）   |   是     |
-|protocol| String（16）| 协议  |   是     |
-|encode| String (16)  | 编码   |  是   |
-
-### 系统参数上传附件目录：parm/file
+### 系统参数上传目录修改：parm/file
 | 请求参数|  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
 |uploadDir| String（64）| 上传目录   |   否   |
 
-### 系统参数数据库备份目录：parm/db
+### 系统参数数据库备份目录修改：parm/db
 | 请求参数|  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
 |bakDir| String（64）| 上传目录   |   否    |
@@ -536,31 +502,21 @@ http请求头需添加Authorization字段，
 | 请求参数|  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
 |type| Integer| 密码类型（1：随机；2：固定）|   否    |
-|value| String(32)| 密码|   否    |
+|value| String(32)| 密码（type==2有效）|   否    |
+
+### 系统参数自定义信息修改（首页右下角）：parm/custom
+| 请求参数|  类型   |  描述  |  必填 |
+| --------   | -----   | -----  | ---- |
+|title| String(16)| 标题|   是    |
+|content| String(128)| 内容|   是    |
 
 ### 系统参数获取：parm/get
 | 请求参数|  类型   |  描述  |
 | --------   | -----   | -----  |
-|emailHost| String（64）| 主机   |
-|emailUserName| String (64)  | 用户名   |
-|emailPwd| text  | String（64）   |
-|emailProtocol| String（16）| 协议  |
-|emailEncode| String (16)  | 编码   |
-|orgLogo| Integer| 机构logo ID  |
-|orgName| String (64)  | 机构名称  |
+|entName| String (64)  | 机构名称  |
 |fileUploadDir| String（64）| 上传目录   |
 |dbBakDir| String（64）| 上传目录   |
 |pwdType| Integer| 密码类型   |
 |pwdValue| String（32）| 密码   |
-
-### 敏感词添加：sensitive/edit
-| 请求参数|  类型   |  描述  |  必填 |
-| --------   | -----   | -----  | ---- |
-|whiteList   | text    | 白名单 | 否  |
-|blackList   | text    | 黑名单 |  否 |
-
-### 敏感词获取：sensitive/get
-| 请求参数|  类型   |  描述  | 
-| --------   | -----   | -----  | 
-|whiteList   | text    | 白名单 |
-|blackList   | text    | 黑名单 |
+|customTitle| String（16）| 自定义标题（首页右下角）  |
+|customContent| String（128）| 自定义内容  |

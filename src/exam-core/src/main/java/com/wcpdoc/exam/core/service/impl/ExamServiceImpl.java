@@ -14,6 +14,8 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -60,6 +62,8 @@ import com.wcpdoc.notify.service.NotifyService;
  */
 @Service
 public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService {
+	private static final Logger log = LoggerFactory.getLogger(ExamServiceImpl.class);
+	
 	@Resource
 	private ExamDao examDao;
 	@Resource
@@ -159,7 +163,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		ProgressBarCache.setProgressBar(processBarId, 2.0, processLen, "校验数据完成", HttpStatus.OK.value());
 
 		// 保存考试信息
-		publishExam(examInfo);
+		Exam exam = publishExam(examInfo);
 		ProgressBarCache.setProgressBar(processBarId, 3.0, processLen, "生成考试完成", HttpStatus.OK.value());
 		
 		// 保存试卷信息
@@ -168,6 +172,13 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		
 		// 分配试卷到考试用户
 		publishUser(examInfo, questionListCache, processBarId);
+		
+		// 标记为需要监听的考试（考试结束自动阅卷）
+		AutoMarkCache.put(exam.getId(), exam);
+		log.info("考试核心加入：【{}-{}】加入监听，{}开始自动阅卷", 
+				exam.getId(), 
+				exam.getName(), // 未阅卷 取 考试结束时间；阅卷中 取 阅卷结束时间
+				exam.getMarkState() == 1 ? DateUtil.formatDateTime(exam.getEndTime()) : DateUtil.formatDateTime(exam.getMarkEndTime()));
 	}
 	
 	@Override
@@ -183,6 +194,10 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		exam.setUpdateTime(new Date());
 		exam.setUpdateUserId(getCurUser().getId());
 		update(exam);
+		
+		// 清除标记为需要监听的考试
+		AutoMarkCache.del(exam.getId());
+		log.info("考试核心清除：【{}-{}】清除监听", exam.getId(), exam.getName());
 	}
 
 	@Override
@@ -357,6 +372,10 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		
 		// 缓存放入新时间
 		AutoMarkCache.put(exam.getId(), exam);
+		log.info("考试核心更新：【{}-{}】更新监听，{}开始自动阅卷", 
+				exam.getId(), 
+				exam.getName(), // 未阅卷 取 考试结束时间；阅卷中 取 阅卷结束时间
+				exam.getMarkState() == 1 ? DateUtil.formatDateTime(exam.getEndTime()) : DateUtil.formatDateTime(exam.getMarkEndTime()));
 	}
 	
 	@Override
@@ -369,7 +388,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		return examDao.getExamUserList(id, markUserId);
 	}
 	
-	private void publishExam(ExamInfo examInfo) {
+	private Exam publishExam(ExamInfo examInfo) {
 		Exam exam = new Exam();
 		if (ValidateUtil.isValid(examInfo.getId())) {
 			exam = getEntity(examInfo.getId());
@@ -401,6 +420,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		} else {
 			update(exam);
 		}
+		return exam;
 	}
 	
 	private void publishPaper(ExamInfo examInfo) {

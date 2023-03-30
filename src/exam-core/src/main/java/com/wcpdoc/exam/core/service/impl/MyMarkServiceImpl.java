@@ -171,6 +171,9 @@ public class MyMarkServiceImpl extends BaseServiceImp<MyMark> implements MyMarkS
 		if (question.getMarkType() != 2) {
 			throw new MyException("该题为客观题");
 		}
+		if (myExam.getState() == 1) {
+			throw new MyException("未参与考试，阅卷无效");
+		}
 		
 		// 打分
 		if (!ValidateUtil.isValid(myExam.getMarkStartTime())) {

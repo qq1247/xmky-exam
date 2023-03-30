@@ -81,7 +81,7 @@ public class ApiUserController extends BaseController {
 	@ResponseBody
 	public PageResult add(User user) {
 		try {
-			UserCache.tryWriteLock("userAdd", 5000);
+			UserCache.tryWriteLock("userAdd", 2000);
 			// 校验数据有效性
 			if (!ValidateUtil.isValid(user.getLoginName())) {
 				throw new MyException("参数错误：loginName");

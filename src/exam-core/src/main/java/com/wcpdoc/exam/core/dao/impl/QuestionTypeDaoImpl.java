@@ -21,7 +21,7 @@ public class QuestionTypeDaoImpl extends RBaseDaoImpl<QuestionType> implements Q
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT QUESTION_TYPE.ID, QUESTION_TYPE.NAME, "
-				+ "(SELECT COUNT(*) FROM EXM_QUESTION Z WHERE Z.QUESTION_TYPE_ID = QUESTION_TYPE.ID) AS QUESTION_NUM "
+				+ "(SELECT COUNT(*) FROM EXM_QUESTION Z WHERE Z.QUESTION_TYPE_ID = QUESTION_TYPE.ID AND Z.STATE = 1) AS QUESTION_NUM "
 				+ "FROM EXM_QUESTION_TYPE QUESTION_TYPE ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("id", Integer.class)), "QUESTION_TYPE.ID = :ID", pageIn.get("id", Integer.class))// 组卷回显规则的时候用

@@ -37,8 +37,6 @@ public class Bulletin {
 	private String title;
 	@Column(name = "CONTENT")
 	private String content;
-	@Column(name = "READ_USER_IDS")
-	private String readUserIds;
 	@Column(name = "STATE")
 	private Integer state;
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
