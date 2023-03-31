@@ -31,8 +31,8 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT QUESTION.ID, QUESTION.TYPE, QUESTION.TITLE, "
-				+ "QUESTION.STATE, QUESTION.MARK_TYPE, QUESTION.QUESTION_TYPE_ID, QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME, "
-				+ "QUESTION.SCORE, QUESTION.MARK_OPTIONS, QUESTION.ANALYSIS "
+				+ "QUESTION.MARK_TYPE, QUESTION.STATE, QUESTION.ANALYSIS, QUESTION.QUESTION_TYPE_ID, QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME, "
+				+ "QUESTION.SCORE, QUESTION.MARK_OPTIONS "
 				+ "FROM EXM_QUESTION QUESTION "
 				+ "LEFT JOIN EXM_QUESTION_TYPE QUESTION_TYPE ON QUESTION.QUESTION_TYPE_ID = QUESTION_TYPE.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
@@ -47,7 +47,6 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 				.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "QUESTION.STATE = 1")// 默认查询发布和草稿状态
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && "0".equals(pageIn.get("state")), "QUESTION.STATE = 0 AND QUESTION.UPDATE_TIME > :UPDATE_TIME", DateUtil.getNextDay(new Date(), -7))// 查询已删除并且最近7天的试题（回收站使用）
 				.addWhere(ValidateUtil.isValid(pageIn.get("state")) && !"0".equals(pageIn.get("state")), "QUESTION.STATE = :STATE", pageIn.get("state"))
-				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "QUESTION_TYPE.UPDATE_USER_ID = :UPDATE_USER_ID", pageIn.get("curUserId", Integer.class))// 只看自己的
 				.addOrder(!ValidateUtil.isValid(pageIn.get("rand")), "QUESTION.UPDATE_TIME", Order.DESC)
 				.addOrder(ValidateUtil.isValid(pageIn.get("rand")), "Rand()", Order.NULL);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);

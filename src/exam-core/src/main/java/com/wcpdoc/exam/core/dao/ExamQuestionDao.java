@@ -28,4 +28,13 @@ public interface ExamQuestionDao extends BaseDao<ExamQuestion>{
 	 * @param examId void
 	 */
 	void clear(Integer examId);
+
+	/**
+	 * 获取试题列表
+	 * 
+	 * v1.0 zhanghc 2023年3月31日下午3:51:41
+	 * @param questionId
+	 * @return List<ExamQuestion>
+	 */
+	List<ExamQuestion> getQuestionList(Integer questionId);
 }

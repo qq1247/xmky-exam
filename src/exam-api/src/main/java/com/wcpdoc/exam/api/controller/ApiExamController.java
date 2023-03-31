@@ -3,7 +3,6 @@ package com.wcpdoc.exam.api.controller;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,7 +98,6 @@ public class ApiExamController extends BaseController {
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
-			pageIn.addAttr("curUserId", getCurUser().getId());
 			PageOut pageOut = examService.getListpage(pageIn);
 			for (Map<String, Object> map : pageOut.getList()) {
 				if (map.get("sxes") == null) {
@@ -329,7 +327,6 @@ public class ApiExamController extends BaseController {
 					.addAttr("genType", exam.getGenType())
 					.addAttr("sxes", exam.getSxes())
 					.addAttr("state", exam.getState())
-					.addAttr("curTime", DateUtil.formatDateTime(new Date()))
 					;
 		} catch (MyException e) {
 			log.error("获取考试错误：{}", e.getMessage());
@@ -340,30 +337,30 @@ public class ApiExamController extends BaseController {
 		}
 	}
 
-	/**
-	 * 更新考试阅卷用户
-	 * 
-	 * v1.0 zhanghc 2017年6月16日下午5:02:45
-	 * 
-	 * @param id
-	 * @param examUserIds
-	 * @param markUserIds
-	 * @return PageResult
-	 */
-	@RequestMapping("/userAdd")
-	@ResponseBody
-	public PageResult userAdd(Integer id, String[] examUserIds, Integer[] markUserIds) {
-		try {
-			examService.userAdd(id, examUserIds, markUserIds);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("更新考试阅卷用户错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("更新考试阅卷用户错误：", e);
-			return PageResult.err();
-		}
-	}
+//	/**
+//	 * 更新考试阅卷用户
+//	 * 
+//	 * v1.0 zhanghc 2017年6月16日下午5:02:45
+//	 * 
+//	 * @param id
+//	 * @param examUserIds
+//	 * @param markUserIds
+//	 * @return PageResult
+//	 */
+//	@RequestMapping("/userAdd")
+//	@ResponseBody
+//	public PageResult userAdd(Integer id, String[] examUserIds, Integer[] markUserIds) {
+//		try {
+//			examService.userAdd(id, examUserIds, markUserIds);
+//			return PageResult.ok();
+//		} catch (MyException e) {
+//			log.error("更新考试阅卷用户错误：{}", e.getMessage());
+//			return PageResult.err().msg(e.getMessage());
+//		} catch (Exception e) {
+//			log.error("更新考试阅卷用户错误：", e);
+//			return PageResult.err();
+//		}
+//	}
 
 //	/**
 //	 * 在线用户
@@ -441,48 +438,48 @@ public class ApiExamController extends BaseController {
 		}
 	}
 	
-	/**
-	 * 考试邮件通知
-	 * 
-	 * v1.0 chenyun 2022年3月28日下午2:23:19
-	 * @param id
-	 * @param content
-	 * @param notifyType
-	 * @return PageResult
-	 */
-	@RequestMapping("/mail")
-	@ResponseBody
-	public PageResult mail(Integer id, Integer notifyType, String content) {
-		try {
-			// 校验数据有效性
-			if (!ValidateUtil.isValid(id)) {
-				throw new MyException("参数错误:id");
-			}
-			if (!ValidateUtil.isValid(content)) {
-				throw new MyException("参数错误:content");
-			}
-			if (notifyType != 1 && notifyType != 2 && notifyType != 3) {
-				throw new MyException("参数错误:state");
-			}
-			
-			Exam exam = examService.getEntity(id);
-			if (exam == null) {
-				throw new MyException("参数错误:id");
-			}
-			if (exam.getState() != 1) {
-				throw new MyException("考试未发布");
-			}
-			if (exam.getEndTime().before(new Date()) ) {
-				throw new MyException("考试时间已结束");
-			}
-			examService.mail(exam, notifyType, content);
-			return PageResult.ok();
-		} catch (MyException e) {
-			log.error("考试邮件通知错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		} catch (Exception e) {
-			log.error("考试邮件通知错误：", e);
-			return PageResult.err();
-		}
-	}
+//	/**
+//	 * 考试邮件通知
+//	 * 
+//	 * v1.0 chenyun 2022年3月28日下午2:23:19
+//	 * @param id
+//	 * @param content
+//	 * @param notifyType
+//	 * @return PageResult
+//	 */
+//	@RequestMapping("/mail")
+//	@ResponseBody
+//	public PageResult mail(Integer id, Integer notifyType, String content) {
+//		try {
+//			// 校验数据有效性
+//			if (!ValidateUtil.isValid(id)) {
+//				throw new MyException("参数错误:id");
+//			}
+//			if (!ValidateUtil.isValid(content)) {
+//				throw new MyException("参数错误:content");
+//			}
+//			if (notifyType != 1 && notifyType != 2 && notifyType != 3) {
+//				throw new MyException("参数错误:state");
+//			}
+//			
+//			Exam exam = examService.getEntity(id);
+//			if (exam == null) {
+//				throw new MyException("参数错误:id");
+//			}
+//			if (exam.getState() != 1) {
+//				throw new MyException("考试未发布");
+//			}
+//			if (exam.getEndTime().before(new Date()) ) {
+//				throw new MyException("考试时间已结束");
+//			}
+//			examService.mail(exam, notifyType, content);
+//			return PageResult.ok();
+//		} catch (MyException e) {
+//			log.error("考试邮件通知错误：{}", e.getMessage());
+//			return PageResult.err().msg(e.getMessage());
+//		} catch (Exception e) {
+//			log.error("考试邮件通知错误：", e);
+//			return PageResult.err();
+//		}
+//	}
 }
