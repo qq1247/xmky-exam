@@ -29,7 +29,6 @@ http请求头需添加Authorization字段，
 ### 我的考试列表：myExam/listpage
 | 请求参数| 类型        | 描述       | 必填 |
 | -------- | ----------- | ---------- | ---- |
-| examId | Integer | 考试ID（查分数用）   | 否   |
 | examName | String (32) | 考试名称   | 否   |
 | startTime | Date | 考试开始时间   | 否   |
 | endTime | Date | 考试结束时间  | 否   |
@@ -46,25 +45,50 @@ http请求头需添加Authorization字段，
 | data.list[].examName        | String  | 考试名称  |
 | data.list[].examStartTime   | Date    | 考试开始时间|
 | data.list[].examEndTime     | Date    | 考试结束时间 |
-| data.list[].examMarkStartTime   | Date    | （考试的）阅卷开始时间 |
-| data.list[].examMarkEndTime     | Date    | （考试的）阅卷结束时间  |
-| data.list[].examMarkState     | Date    | （考试的 )阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；） |
-| data.list[].paperId         | Double  | 试卷ID  |
-| data.list[].paperPassScore | Double  | 试卷及格分数  |
-| data.list[].paperTotalScore | Double  | 试卷总分  |
-| data.list[].paperShowType | String  | 试卷展示类型  |
+| data.list[].examMarkStartTime   | Date    | 阅卷开始时间 |
+| data.list[].examMarkEndTime     | Date    | 阅卷结束时间  |
+| data.list[].examMarkState     | Date    | 阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；） |
+| data.list[].examTotalScore | Double  | 考试总分  |
+| data.list[].examPassScore | Double  | 考试及格分数  |
 | data.list[].userId          | Date    | 考试用户ID |
 | data.list[].userName        | Date    | 考试用户名称|
-| data.list[].answerStartTime | Date    | 答题开始时间|
-| data.list[].answerEndTime   | Date    | 答题结束时间|
 | data.list[].markUserId      | Integer | 阅卷人ID   |
 | data.list[].markUserName    | String  | 阅卷人名称  |
-| data.list[].totalScore      | Double  | 我的得分 （考试不显示成绩返回null） |
-| data.list[].state           | Integer | 考试状态（1：未考试；2：考试中；3：已交卷；4：强制交卷；） |
+| data.list[].answerStartTime | Date    | 答题开始时间|
+| data.list[].answerEndTime   | Date    | 答题结束时间|
+| data.list[].totalScore      | Double  | 我的得分 （考试成绩不显示返回null） |
+| data.list[].state           | Integer | 考试状态（1：未考试；2：考试中；3：已交卷；） |
 | data.list[].markState       | Integer | 阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；） |
-| data.list[].answerState     | Integer | 答题状态（1：及格；2：不及格） |
-| data.list[].no     | Integer | 排名（考试不显示排名返回null） |
+| data.list[].answerState     | Integer | 答题状态（1：及格；2：不及格；）（考试成绩不显示返回null） |
+| data.list[].no     | Integer | 排名（考试排名不显示返回null） |
+| data.list[].userNum     | Integer | 用户数量 |
 
+### 我的考试获取：myExam/get
+| 请求参数| 类型        | 描述       | 必填 |
+| -------- | ----------- | ---------- | ---- |
+| examId | Integer| 考试ID   | 是   |
+
+| 响应数据| 类型    | 描述 |
+| --------------------------- | ------- | ----- |
+| code                        | Integer | 响应码   |
+| msg                         | String  | 响应消息  |
+| data.examMarkState                  | Integer | 考试阅卷状态 |
+| data.examScoreState                  | Integer | 考试分数状态 |
+| data.examRankState                  | Integer | 考试排名状态 |
+| data.examStartTime                  | Integer | 考试开始时间 |
+| data.examEndTime                  | Integer | 考试结束时间 |
+| data.examPaperName                  | Integer | 考试试卷名称 |
+| data.answerStartTime                  | Integer | 按题开始时间 |
+| data.answerEndTime                  | Integer | 按题结束时间 |
+| data.markStartTime                  | Integer | 阅卷开始时间 |
+| data.markEndTime                  | Integer | 阅卷结束时间 |
+| data.objectiveScore                  | Integer | 客观题分数 |
+| data.totalScore                  | Integer | 总分（成绩状态控制是否显示） |
+| data.answerState                  | Integer | 答题状态（成绩状态控制是否显示） |
+| data.state                  | Integer | 答题状态 |
+| data.markState                  | Integer | 阅卷状态 |
+| data.no                  | Integer | 排名（排名状态控制是否显示） |
+| data.userNum                  | Integer | 用户数量 |
 
 ### 我的试卷：myExam/paper
 | 请求参数| 类型    | 描述       | 必填 |
@@ -75,11 +99,11 @@ http请求头需添加Authorization字段，
 | --------------------- | ------- | -------------------------- |
 | code                  | Integer | 响应码                     |
 | msg                   | String  | 响应消息                   |
-| data[].type		| Integer | 类型类型 （1：章节；2：试题）  |
+| data[].type		| Integer | 类型 （1：章节；2：试题）  |
 | data[].chapterName    | String  | 章节名称  （type==1有效）     |
 | data[].chapterTxt     | String  | 章节描述 （type==1有效）|
 | data[].questionId     | Integer | 试题ID                 |
-| data[].questionType   | Integer  | 试题类型（1：单选；2：多选；3：填空；4：判断；5：问答）                 |
+| data[].questionType   | Integer  | 试题类型（1：单选；2：多选；3：填空；4：判断；5：问答）|
 | data[].markType       | Integer    | 阅卷方式（1：客观题；2：主观题；）  |
 | data[].title          | String  | 题干                 |
 | data[].markOptions    | Integer[]  | 阅卷选项（2：答案无顺序；3：不区分大小写；) |
@@ -97,7 +121,7 @@ http请求头需添加Authorization字段，
 | questionId     | Integer | 试题ID | 是   |
 | answers | String[]| 答案（参考question/add）      | 是   |
 
-### 我的考试交卷：myExam/finish
+### 我的交卷：myExam/finish
 | 请求参数| 类型    | 描述       | 必填 |
 | -------- | ------- | ---------- | ---- |
 | examId | Integer | 考试ID | 是   |
@@ -110,7 +134,7 @@ http请求头需添加Authorization字段，
 | endTime | Date | 阅卷结束时间  | 否   |
 | curPage  | Integer     | 当前第几页 | 否   |
 | pageSize | Integer     | 每页多少条 | 否   |
-###### 响应数据
+
 | 响应数据| 类型    | 描述 |
 | --------------------------- | ------- | ----- |
 | code                        | Integer | 响应码   |
@@ -119,19 +143,64 @@ http请求头需添加Authorization字段，
 | data.list[]                 | arr[]   | 分页列表   |
 | data.list[].examId        | Integer | 考试Id  |
 | data.list[].examName        | String  | 考试名称  |
-| data.list[].examStartTime   | Date    | 考试开始时间|
-| data.list[].examEndTime     | Date    | 考试结束时间 |
 | data.list[].examMarkStartTime   | Date    | 阅卷开始时间 |
 | data.list[].examMarkEndTime     | Date    | 阅卷结束时间  |
-| data.list[].examMarkState     | Date    | 考试阅卷状态（考试的总阅卷状态） |
-| data.list[].paperId         | Double  | 试卷ID  |
-| data.list[].paperPassScore | Double  | 试卷通过  |
-| data.list[].paperTotalScore | Double  | 试卷总分  |
-| data.list[].paperShowType | String  | 试卷展示类型  |
-| data.list[].markUserId      | Integer | 阅卷人ID   |
-| data.list[].markUserName    | String  | 阅卷人名称  |
+| data.list[].examMarkState     | Date    | 考试阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；） |
 
-### 我的阅卷阅题：myMark/score
+### 我的阅卷用户列表：myMark/userListpage
+| 请求参数| 类型        | 描述       | 必填 |
+| -------- | ----------- | ---------- | ---- |
+| examId | Integer | 考试ID   | 否   |
+| userName | String | 用户名称   | 否   |
+| state | Date | 考试用户状态（1：未考试；2：考试中；3：已交卷；）  | 否   |
+| curPage  | Integer     | 当前第几页 | 否   |
+| pageSize | Integer     | 每页多少条 | 否   |
+
+| 响应数据| 类型    | 描述 |
+| --------------------------- | ------- | ----- |
+| code                        | Integer | 响应码   |
+| msg                         | String  | 响应消息  |
+| data.total                  | Integer | 总行数 |
+| data.list[]                 | arr[]   | 分页列表   |
+| data.list[].userId        | Integer | 用户ID  |
+| data.list[].userName        | String  | 用户名称  |
+| data.list[].orgId        | Integer | 机构ID  |
+| data.list[].orgName        | String  | 机构名称  |
+| data.list[].myExamState   | Date    | 我的考试状态（1：未考试；2：考试中；3：已交卷；）|
+| data.list[].myExamMarkState     | Date    | 我的阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）  |
+
+### 我的阅卷获取：myMark/get
+| 请求参数| 类型    | 描述           | 必填 |
+| -------------- | ------- | -------------- | ---- |
+| examId| Integer| 考试ID| 是   |
+| userId| Integer| 考试用户ID| 是   |
+
+| 响应数据| 类型    | 描述 |
+| --------------------------- | ------- | ----- |
+| code                        | Integer | 响应码   |
+| msg                         | String  | 响应消息  |
+| data.answerStartTime                  | Date | 答题开始时间 |
+| data.answerEndTime                  | Date | 答题结束时间 |
+| data.markStartTime                  | Date | 阅卷开始时间 |
+| data.markEndTime                  | Date | 阅卷结束时间 |
+| data.objectiveScore                  | Double | 客观题分数 |
+| data.totalScore                  | Double | 总分数 |
+| data.state                  | Integer | 用户考试状态 |
+| data.markState                  | Integer | 用户阅卷状态 |
+| data.answerState                  | Integer | 答题状态（1：及格；2：不及格） |
+
+### 我的阅卷试卷：myMark/paper
+| 请求参数| 类型    | 描述           | 必填 |
+| -------------- | ------- | -------------- | ---- |
+| examId| Integer| 考试ID| 是   |
+| userId| Integer| 考试用户ID| 是   |
+
+| 响应数据| 类型    | 描述 |
+| --------------------------- | ------- | ----- |
+参考myExam/paper
+
+
+### 我的阅卷打分：myMark/score
 | 请求参数| 类型    | 描述           | 必填 |
 | -------------- | ------- | -------------- | ---- |
 | examId| Integer| 考试ID| 是   |
@@ -139,80 +208,8 @@ http请求头需添加Authorization字段，
 | questionId| Integer| 试题ID| 是   |
 | score          | Double  | 得分           | 是   |
 
-### 我的阅卷交卷：myMark/finish
+### 我的阅卷阅卷：myMark/finish
 | 请求参数| 类型    | 描述       | 必填 |
 | -------- | ------- | ---------- | ---- |
 | examId| Integer | 考试ID | 是   |
 | userId| Integer | 考试用户ID | 是   |
-
-### 我的阅卷用户列表：myMark/userList
-| 请求参数| 类型    | 描述       | 必填 |
-| -------- | ------- | ---------- | ---- |
-| examId| Integer | 考试ID | 是   |
-###### 响应数据
-| 响应数据| 类型    | 描述 |
-| --------------------------- | ------- | ----- |
-| code                        | Integer | 响应码   |
-| msg                         | String  | 响应消息  |
-| data                 | arr[]   | 数组列表   |
-| data[].userId        | Integer | 用户ID  |
-| data[].userName        | String  | 用户名称（匿名阅卷时不显示）  |
-| data[].userHeadFileId        | Integer  | 用户头像（匿名阅卷时不显示）  |
-| data[].orgId   | Integer    | 机构ID|
-| data[].orgName     | String    | 机构名称（匿名阅卷时不显示） |
-| data[].answerStartTime   | Date    | 答题开始时间 |
-| data[].answerEndTime     | Date    | 答题完成时间  |
-| data[].markStartTime   | Date    | 阅卷用户开始阅卷时间 |
-| data[].markEndTime     | Date    | 阅卷用户最后阅卷时间  |
-| data[].state       | Integer | 我的考试状态（（1：未考试；2：考试中；3：已交卷；4：强制交卷；））  |
-| data[].markState       | Integer | 阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）  |
-| data[].answerState       | Integer | 答题状态（1：及格；2：不及格） （成绩不公开时不显示） |
-| data[].totalScore | Double  | 个人总分数（成绩不公开时不显示）  |
-| data[].paperTotalScore | Double  | 试卷总分数  |
-| data[].paperPassScore | Double  | 试卷通过分数  |
-
-### 我的阅卷用户：myMark/user
-| 请求参数| 类型    | 描述       | 必填 |
-| -------- | ------- | ---------- | ---- |
-| examId| Integer | 考试ID | 是   |
-| userId| Integer | 用户ID | 是   |
-###### 响应数据
-| 响应数据| 类型    | 描述 |
-| --------------------------- | ------- | ----- |
-| code                        | Integer | 响应码   |
-| msg                         | String  | 响应消息  |
-| data.userId        | Integer | 用户ID  |
-| data.userName        | String  | 用户名称（匿名阅卷时不显示）  |
-| data.userHeadFileId        | Integer  | 用户头像（匿名阅卷时不显示）  |
-| data.orgId   | Integer    | 机构ID |
-| data.orgName     | String    | 机构名称（匿名阅卷时不显示） |
-| data.answerStartTime   | Date    | 答题开始时间 |
-| data.answerEndTime     | Date    | 答题完成时间  |
-| data.markStartTime   | Date    | 阅卷用户开始阅卷时间 |
-| data.markEndTime     | Date    | 阅卷用户最后阅卷时间  |
-| data.state       | Integer | 我的考试状态（（1：未考试；2：考试中；3：已交卷；4：强制交卷；））  |
-| data.markState       | Integer | 阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）  |
-| data.answerState       | Integer | 答题状态（1：及格；2：不及格） （成绩不公开时不显示） |
-| data.totalScore | Double  | 个人总分数 （成绩不公开时不显示） |
-| data.paperTotalScore | Double  | 试卷总分数  |
-| data.paperPassScore | Double  | 试卷通过分数  |
-
-### 我的考试答案列表：myMark/answerList
-| 请求参数| 类型    | 描述       | 必填 |
-| ---- | ------- | ---------- | ---- |
-| examId | Integer | 考试ID | 是   |
-| userId | Integer | 用户ID | 是   |
-
-| 响应数据| 类型    | 描述                       |
-| --------------------- | ------- | -------------------------- |
-| code                  | Integer | 响应码                     |
-| msg                   | String  | 响应消息                   |
-| data[].questionId     | Integer | 试题ID                     |
-| data[].answerTime     | Date    | 答题时间                   |
-| data[].answers        | String[]| 我的答案，参考question/add |
-| data[].markUserId     | Integer | 阅卷人ID                   |
-| data[].markUserName   | String  | 阅卷人名称                 |
-| data[].markTime       | Date    | 阅卷时间                   |
-| data[].score          | Double  | 得分                       |
-| data[].questionScore  | Double  | 试卷分数                   |
-| data[].answerFileId  | Integer  | 答案附件ID    |

@@ -68,26 +68,26 @@ public class ApiReportController extends BaseController{
         }
     }
     
-    /**
-     * 服务器参数
-     * 
-     * v1.0 chenyun 2021年12月10日上午10:14:34
-     * @return PageResult
-     */
-    @RequestMapping("/server/parm")
-    @ResponseBody
-    public PageResult serverParm() {
-        try {
-        	return null;
-//            return PageResultEx.ok().data(serverParmService.getList());
-        } catch (MyException e) {
-            log.error("首页服务器参数统计错误：{}", e.getMessage());
-            return PageResult.err().msg(e.getMessage());
-        } catch (Exception e) {
-            log.error("首页服务器参数统计错误：", e);
-            return PageResult.err();
-        }
-    }
+//    /**
+//     * 服务器参数 // 第三方dll有bug
+//     * 
+//     * v1.0 chenyun 2021年12月10日上午10:14:34
+//     * @return PageResult
+//     */
+//    @RequestMapping("/server/parm")
+//    @ResponseBody
+//    public PageResult serverParm() {
+//        try {
+//        	return null;
+////            return PageResultEx.ok().data(serverParmService.getList());
+//        } catch (MyException e) {
+//            log.error("首页服务器参数统计错误：{}", e.getMessage());
+//            return PageResult.err().msg(e.getMessage());
+//        } catch (Exception e) {
+//            log.error("首页服务器参数统计错误：", e);
+//            return PageResult.err();
+//        }
+//    }
     
     /**
      * 慢接口日志
@@ -177,19 +177,19 @@ public class ApiReportController extends BaseController{
      * v1.0 chenyun 2021-12-15 13:44:47
      * @return PageResult
      */
-    @RequestMapping("/exam/questionErrList")
-    @ResponseBody
-    public PageResult questionErrList(Integer examId) {
-        try {
-            return PageResultEx.ok().data(reportService.questionErrList(examId));
-        } catch (MyException e) {
-            log.error("错题分析统计错误：{}", e.getMessage());
-            return PageResult.err().msg(e.getMessage());
-        } catch (Exception e) {
-            log.error("错题分析统计错误：", e);
-            return PageResult.err();
-        }
-    }
+//    @RequestMapping("/exam/questionErrList")
+//    @ResponseBody
+//    public PageResult questionErrList(Integer examId) {
+//        try {
+//            return PageResultEx.ok().data(reportService.questionErrList(examId));
+//        } catch (MyException e) {
+//            log.error("错题分析统计错误：{}", e.getMessage());
+//            return PageResult.err().msg(e.getMessage());
+//        } catch (Exception e) {
+//            log.error("错题分析统计错误：", e);
+//            return PageResult.err();
+//        }
+//    }
     
     /**
      * 分数统计

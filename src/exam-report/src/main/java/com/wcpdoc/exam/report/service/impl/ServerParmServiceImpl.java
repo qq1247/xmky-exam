@@ -1,7 +1,7 @@
 package com.wcpdoc.exam.report.service.impl;
 
 import java.io.File;
-import java.io.IOException;
+//import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.util.ArrayList;
@@ -48,8 +48,8 @@ public class ServerParmServiceImpl implements ServerPramService {
 	 */
 	static {
 		try {
-			setPath();
-			sigar = new Sigar();
+//			setPath();
+//			sigar = new Sigar();
 		} catch (Exception e) {
 			log.error("服务器参数初始化错误：", e);
 		}
@@ -172,38 +172,38 @@ public class ServerParmServiceImpl implements ServerPramService {
 		return result;
 	}
 
-	/**
-	 * 设置环境变量
-	 * 
-	 * v1.0 zhanghc 2021年12月14日上午11:56:33
-	 * @throws IOException void
-	 */
-	private static void setPath() throws IOException {
-		String path = String.format("%s%s%s", 
-				System.getProperty("java.library.path"), 
-				System.getProperty("os.name").toLowerCase().startsWith("windows") ? ";" : ":",
-				getDllFile().getParentFile().getCanonicalPath());// getCanonicalPath 返回全路径，不带.
-		System.setProperty("java.library.path", path);
-		log.info("设置环境变量：{}", path);
-	}
+//	/**
+//	 * 设置环境变量
+//	 * 
+//	 * v1.0 zhanghc 2021年12月14日上午11:56:33
+//	 * @throws IOException void
+//	 */
+//	private static void setPath() throws IOException {
+//		String path = String.format("%s%s%s", 
+//				System.getProperty("java.library.path"), 
+//				System.getProperty("os.name").toLowerCase().startsWith("windows") ? ";" : ":",
+//				getDllFile().getParentFile().getCanonicalPath());// getCanonicalPath 返回全路径，不带.
+//		System.setProperty("java.library.path", path);
+//		log.info("设置环境变量：{}", path);
+//	}
 
-	/**
-	 * 获取dll路径
-	 * 
-	 * v1.0 zhanghc 2021年12月14日上午11:56:41
-	 * @return File
-	 */
-	private static File getDllFile() {
-		return new File(String.format(".%sdll%ssigar%sx%s%s%s", 
-				File.separator, 
-				File.separator, 
-				File.separator,// linux下\\不识别
-				System.getProperty("sun.arch.data.model").equals("32") ? "86" : System.getProperty("sun.arch.data.model"),// xp系统显示的是32
-				File.separator, 
-				System.getProperty("os.name").toLowerCase().startsWith("windows")  
-						? (("x64".equals(System.getProperty("os.arch")) || "amd64".equals(System.getProperty("os.arch")))
-								? "sigar-amd64-winnt" : "sigar-x86-winnt") // win32、64位
-						: (("x64".equals(System.getProperty("os.arch")) || "amd64".equals(System.getProperty("os.arch")))
-								? "libsigar-amd64-linux" : "libsigar-x86-linux")));// linux32、64位
-	}
+//	/**
+//	 * 获取dll路径
+//	 * 
+//	 * v1.0 zhanghc 2021年12月14日上午11:56:41
+//	 * @return File
+//	 */
+//	private static File getDllFile() {
+//		return new File(String.format(".%sdll%ssigar%sx%s%s%s", 
+//				File.separator, 
+//				File.separator, 
+//				File.separator,// linux下\\不识别
+//				System.getProperty("sun.arch.data.model").equals("32") ? "86" : System.getProperty("sun.arch.data.model"),// xp系统显示的是32
+//				File.separator, 
+//				System.getProperty("os.name").toLowerCase().startsWith("windows")  
+//						? (("x64".equals(System.getProperty("os.arch")) || "amd64".equals(System.getProperty("os.arch")))
+//								? "sigar-amd64-winnt" : "sigar-x86-winnt") // win32、64位
+//						: (("x64".equals(System.getProperty("os.arch")) || "amd64".equals(System.getProperty("os.arch")))
+//								? "libsigar-amd64-linux" : "libsigar-x86-linux")));// linux32、64位
+//	}
 }

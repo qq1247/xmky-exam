@@ -272,8 +272,9 @@ public class ApiUserController extends BaseController {
 	}
 
 	/**
-	 * 强制退出登陆 v1.0 zhanghc 2016年8月27日上午11:36:55
+	 * 退出登陆 
 	 * 
+	 * v1.0 zhanghc 2016年8月27日上午11:36:55
 	 * @param userId
 	 * @return pageOut
 	 */
@@ -284,7 +285,7 @@ public class ApiUserController extends BaseController {
 			onlineUserService.out(id);
 			return PageResult.ok();
 		} catch (Exception e) {
-			log.error("强制退出登陆错误：", e);
+			log.error("退出登陆错误：", e);
 			return PageResult.err();
 		}
 	}

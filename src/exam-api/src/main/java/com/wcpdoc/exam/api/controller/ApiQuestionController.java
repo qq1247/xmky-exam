@@ -60,7 +60,6 @@ public class ApiQuestionController extends BaseController {
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
-			pageIn.addAttr("curUserId", getCurUser().getId());
 			PageOut pageout = questionService.getListpage(pageIn);
 			List<Map<String, Object>> resultList = pageout.getList();
 			for (Map<String, Object> result : resultList) {
@@ -87,7 +86,7 @@ public class ApiQuestionController extends BaseController {
 				}
 				
 				List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(id);
-				List<Object> answers = new ArrayList<>();
+				List<String> answers = new ArrayList<>();
 				List<BigDecimal> scores = new ArrayList<>();
 				for(QuestionAnswer answer : questionAnswerList){
 					if (type == 1 || type == 4 || (type == 5 && markType == 2)) {

@@ -40,7 +40,6 @@ public class ExamDaoImpl extends RBaseDaoImpl<Exam> implements ExamDao {
 				+ "FROM EXM_EXAM EXAM ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil
-			.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), "EXAM.UPDATE_USER_ID = :UPDATE_USER_ID", pageIn.get("curUserId", Integer.class))
 			.addWhere(ValidateUtil.isValid(pageIn.get("name")), "EXAM.NAME LIKE :NAME", String.format("%%%s%%", pageIn.get("name")))
 			.addWhere(!ValidateUtil.isValid(pageIn.get("state")), "EXAM.STATE IN (1,2)")// 默认查询已暂停和已发布
 			.addWhere(ValidateUtil.isValid(pageIn.get("state")) && "0".equals(pageIn.get("state")), "EXAM.STATE IN (1,2)")// 如果传入0，会导致查询到已删除的
