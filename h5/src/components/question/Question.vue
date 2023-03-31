@@ -2,7 +2,7 @@
     <!-- 列表样式 -->
     <el-card v-if="display === 'list'" class="question-list" shadow="hover">
         <div class="question-list-top">
-            <span>{{ no }}</span>
+            <span>{{ no }}、</span>
             <div class="question-list-top-title" v-html="title"></div>
         </div>
         <div class="question-list-bottom">
