@@ -148,8 +148,8 @@ http请求头需添加Authorization字段，
 | 请求参数     |  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
 | name | String(16) | 名称或机构  |   否     |
-| type| Integer  | 类型（1：正常；2：冻结；）|   否     |
-| ids | String(1024) | 用户IDS（逗号分割）  |   否     |
+| state| Integer  | 类型（1：正常；2：冻结；）|   否     |
+| ids | String(65535) | 用户IDS（逗号分割）  |   否     |
 | curPage | Integer | 当前第几页  |   否     |
 | pageSize | Integer  | 每页多少条   |   否     |
 
@@ -161,7 +161,6 @@ http请求头需添加Authorization字段，
 |data.list[]      | Object[]  | 分页列表 |
 |data.list[].id   | Integer  | 主键 |
 |data.list[].name | String  | 名称 |
-|data.list[].type | Integer  | 类型 |
 |data.list[].loginName | String  | 登陆名称 |
 |data.list[].orgId | Integer  | 机构ID |
 |data.list[].orgName | String  | 机构名称 |
@@ -172,7 +171,7 @@ http请求头需添加Authorization字段，
 | --------   | -----   | -----  | ---- |
 |name      | String (16)  | 名称   |   是     |
 |loginName      | String (16)  | 登陆账号   |   是     |
-|orgId      | Integer  | 机构ID   |   是     |
+|orgId      | Integer  | 机构ID（默认根机构）   |   否     |
 
 | 响应参数 |  类型   |  描述  |
 | --------   | -----   | -----  |
@@ -225,12 +224,6 @@ http请求头需添加Authorization字段，
 |code     | Integer  | 响应码 |
 |msg     | String  | 响应消息 |
 |data.initPwd| String  | 初始化密码|
-
-### 用户更新角色：user/role
-| 请求参数 |  类型   |  描述  |  必填 |
-| --------   | -----   | -----  | ---- |
-|id    | Integer     |   主键   |   是   |
-|roles    | String[]     |   角色  |   是   |
 
 ### 用户强制退出：user/out
 | 请求参数|  类型   |  描述  |  必填 |
@@ -327,7 +320,7 @@ http请求头需添加Authorization字段，
 |data.list[].name | String  | 名称 |
 |data.list[].jobClass | String  | 实现类 |
 |data.list[].cron | String  | cron表达式 |
-|data.list[].state | Integer | 状态 |
+|data.list[].state | Integer | 状态（1：启动；2：停止；） |
 |data.list[].triggerTimes | Date[]  | 最近几次触发时间  |
 
 ### 定时任务添加：cron/add
@@ -364,6 +357,7 @@ http请求头需添加Authorization字段，
 |data.jobClass | String  | 实现类 |
 |data.cron | String  | cron表达式|
 |data.triggerTimes | Date[]| 最近几次触发时间|
+|data.state | Integer| 状态（1：启动；2：停止；）|
 
 ### 定时任务启动：cron/startTask
 | 请求参数|  类型   |  描述  |  必填 |
@@ -485,23 +479,23 @@ http请求头需添加Authorization字段，
 ### 系统参数企业修改：parm/ent
 | 请求参数|  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
+|name| String (32)  | 企业名称  |   是     |
 |logoFileId| Integer| 企业logo附件ID  |   否     |
-|name| String (32)  | 企业名称  |   否     |
 
 ### 系统参数上传目录修改：parm/file
 | 请求参数|  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
-|uploadDir| String（64）| 上传目录   |   否   |
+|uploadDir| String（64）| 上传目录   |   是   |
 
 ### 系统参数数据库备份目录修改：parm/db
 | 请求参数|  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
-|bakDir| String（64）| 上传目录   |   否    |
+|bakDir| String（64）| 上传目录   |   是    |
 
 ### 系统参数密码初始化：parm/pwd
 | 请求参数|  类型   |  描述  |  必填 |
 | --------   | -----   | -----  | ---- |
-|type| Integer| 密码类型（1：随机；2：固定）|   否    |
+|type| Integer| 密码类型（1：随机；2：固定）|   是    |
 |value| String(32)| 密码（type==2有效）|   否    |
 
 ### 系统参数自定义信息修改（首页右下角）：parm/custom
