@@ -506,10 +506,10 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		myExamService.clear(examInfo.getId());
 		myQuestionService.clear(examInfo.getId());
 		
-		List<MyMark> myMarkList = myMarkService.getList(examInfo.getId());
-		for (MyMark myMark : myMarkList) {
-			myMarkService.del(myMark.getId());
-		}
+//		List<MyMark> myMarkList = myMarkService.getList(examInfo.getId());
+//		for (MyMark myMark : myMarkList) {
+//			myMarkService.del(myMark.getId());
+//		}
 		
 		// 重新生成用户试卷、协助阅卷用户
 		Map<Integer, List<QuestionOption>> questionOptionCache = new HashMap<>();
@@ -569,48 +569,63 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 						myQuestionService.update(myQuestion);
 					}
 				}
-			} else if (examInfo.getGenType() == 2) {// 如果是随机组卷，按抽题规则生成我的试卷
+			} else if (examInfo.getGenType() == 2) {// 如果是随机组卷，按抽题规则生成我的试卷（校验里判断过规则是否满足，不用在判断）
 				Set<Question> questionOfUsed = new HashSet<>();
 				int no = 1;
 				for (int i = 0; i < examInfo.getExamRules().length; i++) {
 					ExamRule examRule = examInfo.getExamRules()[i];
-					List<Question> questionList = questionListCache.get(examRule.getQuestionTypeId());
-					Collections.shuffle(questionList);// 从当前规则中随机抽题（乱序模拟随机）
-					for(Question question : questionList) {
-						if (questionOfUsed.contains(question)) {// 已经使用过的试题就不能在用，继续找下一个
-							continue;
-						}
-						if (examRule.getType() != question.getType() // 当前试题不符合当前抽题规则，继续找下一个
-								|| examRule.getMarkType() != question.getMarkType()) {
-							continue;
-						}
-						
+					if (examRule.getType() == 1) {// 如果是章节
 						MyQuestion myQuestion = new MyQuestion();
+						myQuestion.setType(examRule.getType());
 						myQuestion.setChapterName(examRule.getChapterName());
 						myQuestion.setChapterTxt(examRule.getChapterTxt());
-						myQuestion.setType(examRule.getType());
-						myQuestion.setScore(examRule.getScore());
-						myQuestion.setMarkOptions(examRule.getMarkOptions());
-						myQuestion.setExamId(examRule.getExamId());
-						myQuestion.setQuestionId(question.getId());
 						myQuestion.setUserId(examUserId);
 						myQuestion.setExamId(examInfo.getId());
-						myQuestion.setNo(no++); // 试题乱序无效，因为本身就是随机的
-						
-						if (QuestionUtil.hasMultipleChoice(question)) {// 如果是多选，使用抽题规则的漏选分数
-							myQuestion.setScores(examRule.getScores());
-						} else if ((QuestionUtil.hasFillBlank(question) || QuestionUtil.hasQA(question)) // 如果是客观填空问答，把分数平均分配到子分数
-								&& QuestionUtil.hasObjective(question)) {// 如果抽题不设置分数，使用题库默认的分数，会导致总分不确定
-							if (questionAnswerCache.get(myQuestion.getQuestionId()) == null) {// 如果抽题设置分数，主观题答案数量不一样，没法按答案分配分数
-								questionAnswerCache.put(myQuestion.getQuestionId(), questionAnswerService.getList(myQuestion.getQuestionId()));
-							}
-							List<QuestionAnswer> questionAnswerList = questionAnswerCache.get(myQuestion.getQuestionId());// 所以规则为当题分数，平均分配到每个答案
-							myQuestion.setScores(splitScore(examRule.getScore(), questionAnswerList.size()));
-						}
-						
-						myQuestion.setUpdateTime(new Date());
-						myQuestion.setUpdateUserId(getCurUser().getId());
+						myQuestion.setNo(no++);
 						myQuestionService.add(myQuestion);
+					} else {// 如果是规则
+						List<Question> questionList = questionListCache.get(examRule.getQuestionTypeId());
+						Collections.shuffle(questionList);// 从当前规则中随机抽题（乱序模拟随机）
+						Integer ruleRemainNum = examRule.getNum();// 该规则试题数量，找到一个数量减一
+						for(Question question : questionList) {
+							if (ruleRemainNum <= 0) {// 满足规则，处理下一个规则
+								break;
+							}
+							if (questionOfUsed.contains(question)) {// 已经使用过的试题就不能在用，继续找下一个
+								continue;
+							}
+							if (examRule.getQuestionType() != question.getType() // 当前试题不符合当前抽题规则，继续找下一个
+									|| examRule.getMarkType() != question.getMarkType()) {
+								continue;
+							}
+							
+							MyQuestion myQuestion = new MyQuestion();
+							myQuestion.setType(examRule.getType());
+							myQuestion.setScore(examRule.getScore());
+							myQuestion.setMarkOptions(examRule.getMarkOptions());
+							myQuestion.setQuestionId(question.getId());
+							myQuestion.setUserId(examUserId);
+							myQuestion.setExamId(examInfo.getId());
+							myQuestion.setNo(no++); // 试题乱序无效，因为本身就是随机的
+							
+							if (QuestionUtil.hasMultipleChoice(question)) {// 如果是多选，使用抽题规则的漏选分数
+								myQuestion.setScores(examRule.getScores());
+							} else if ((QuestionUtil.hasFillBlank(question) || QuestionUtil.hasQA(question)) // 如果是客观填空问答，把分数平均分配到子分数
+									&& QuestionUtil.hasObjective(question)) {// 如果抽题不设置分数，使用题库默认的分数，会导致总分不确定
+								if (questionAnswerCache.get(myQuestion.getQuestionId()) == null) {// 如果抽题设置分数，主观题答案数量不一样，没法按答案分配分数
+									questionAnswerCache.put(myQuestion.getQuestionId(), questionAnswerService.getList(myQuestion.getQuestionId()));
+								}
+								List<QuestionAnswer> questionAnswerList = questionAnswerCache.get(myQuestion.getQuestionId());// 所以规则为当题分数，平均分配到每个答案
+								myQuestion.setScores(splitScore(examRule.getScore(), questionAnswerList.size()));
+							}
+							
+							myQuestion.setUpdateTime(new Date());
+							myQuestion.setUpdateUserId(getCurUser().getId());
+							myQuestionService.add(myQuestion);
+							
+							questionOfUsed.add(question);
+							ruleRemainNum--;
+						}
 					}
 				}
 			}
@@ -858,9 +873,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 						}
 					}
 					
-					if (examRule.getType() == 2) {
-						ruleNo++;
-					}
+					ruleNo++;
 					int validQuestionNum = 0;// 符合当前抽题规则的有效题数
 					for (Question question : questionListCache.get(examRule.getQuestionTypeId())) {
 						if (questionOfUsed.contains(question)) {// 已经使用过的试题就不能在用，继续找下一个
@@ -878,7 +891,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					}
 					
 					if (validQuestionNum < examRule.getNum()) {
-						throw new MyException(String.format("第【%s】个规则题数不足%s，请修改", ruleNo, examRule.getNum()));
+						throw new MyException(String.format("试卷配置：第【%s】个规则题数不足%s，请修改", ruleNo, examRule.getNum()));
 					}
 				}
 			}

@@ -151,7 +151,7 @@ public class ApiExamController extends BaseController {
 			}).start();
 
 			return PageResultEx.ok().data(processBarId);
-		} catch (MyException e) {e.printStackTrace();
+		} catch (MyException e) {
 			log.error("发布考试错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
