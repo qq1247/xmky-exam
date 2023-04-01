@@ -81,6 +81,7 @@ const form = useExamStore()
 const formRules = reactive<FormRules>({// 表单校验规则
     name: [
         { required: true, message: '请输入考试名称', trigger: 'blur' },
+        { min: 1, max: 32, message: '长度介于1-32', trigger: 'blur' },
     ],
     examTimes: [{
         trigger: 'change',

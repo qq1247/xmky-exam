@@ -67,7 +67,7 @@
             </el-col>
             <el-col v-if="form.type === 2" :span="12">
                 <el-form-item label="漏选得分" prop="scores[0]">
-                    <el-input-number v-model="form.scores[0]" :min="0.5" :max="10" :step="0.5" :precision="1" controls-position="right"/>
+                    <el-input-number v-model="form.scores[0]" :min="0.5" :max="10" :step="0.5" :precision="2" controls-position="right"/>
                 </el-form-item>
             </el-col>
         </el-row>
@@ -106,10 +106,10 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <el-button :disabled="form.options.length >= 7" type="primary" @click="addKeyword" size="small" plain style="border: none; padding: 14px;">
+                <el-button :disabled="form.answers.length >= 7" type="primary" @click="addKeyword" size="small" plain style="border: none; padding: 14px;">
                     <span class="iconfont icon-plus" style="font-size: 12px;">&nbsp;添加关键词</span>
                 </el-button>
-                <el-button :disabled="form.options.length <= 2" type="danger" @click="delKeyword" size="small" plain style="border: none; padding: 14px;">
+                <el-button :disabled="form.answers.length <= 2" type="danger" @click="delKeyword" size="small" plain style="border: none; padding: 14px;">
                     <span class="iconfont icon-delete" style="font-size: 12px;">&nbsp;删除关键词</span>
                 </el-button>
             </el-card>

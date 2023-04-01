@@ -125,6 +125,7 @@ interface Title {
     font-weight: bold;
     color: var(--el-text-color-primary);
     padding-bottom: 10px;
+    word-break: break-all;
 
     .el-input {
         .el-input__wrapper {
