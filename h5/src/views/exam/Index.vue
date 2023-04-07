@@ -19,13 +19,7 @@
             <Gridadd name="考试添加" @click="$router.push('/exam/add')"/>
             <Griddata 
                 v-for="exam in listpage.list" 
-                :menu="[
-                    { name: '组卷', icon: 'icon-edit', event: () => $router.push(`/exam/edit/${exam.id}`) },
-                    { name: '删除', icon: 'icon-delete', event: () => $router.push(`/exam/del/${exam.id}`) },
-                    { name: '变更时间', icon: 'icon-time', event: () => $router.push(`/exam/time/${exam.id}`) },
-                    { name: '阅卷', icon: 'icon-peixunkaoshi', event: () => $router.push(`/exam/mark/${exam.id}`) },
-                    { name: '统计', icon: 'icon-statistics', event: () => $router.push(`/exam/statis/${exam.id}`) },
-                    ]" 
+                :menu="generateMenu(exam)" 
                 >
                 <template #tag>
                     <el-tag size="small">{{ dictStore.getValue("PAPER_GEN_TYPE", exam.genType) }}</el-tag>
@@ -93,6 +87,10 @@ import http from "@/request"
 import Griddata from '@/components/Griddata.vue';
 import Gridadd from '@/components/Gridadd.vue';
 import { useDictStore } from '@/stores/dict';
+import router from '@/router';
+import type { Menu } from '@/stores/exam';
+import dayjs from 'dayjs';
+import { ElMessage } from 'element-plus';
 
 //  定义变量
 const route = useRoute()
@@ -106,6 +104,7 @@ const listpage = reactive({// 分页列表
     total: 0,
     list: [] as any[],
 })
+const curTime = ref()// 根据时间显示不同的按钮
 
 // 组件挂载完成后，执行如下方法
 onMounted(() => {
@@ -131,8 +130,72 @@ async function query() {
         return
     }
 
+
+    let { data: { data: data2 } } = await http.post("login/sysTime", {  })
+    curTime.value = dayjs(data2, 'YYYY-MM-DD HH:mm:ss').toDate()
+
     listpage.list = data.list
     listpage.total = data.total
+}
+
+// 生成菜单
+function generateMenu(exam: any) {
+    let menu: Menu[] = [
+        { name: '组卷', icon: 'icon-edit', event: () => router.push(`/exam/edit/${exam.id}`) },
+        { name: '删除', icon: 'icon-delete', event: () => router.push(`/exam/del/${exam.id}`) },
+        { name: '变更时间', icon: 'icon-time', event: () => router.push(`/exam/time/${exam.id}`) },
+        { name: '阅卷', icon: 'icon-peixunkaoshi', event: () => router.push(`/exam/mark/${exam.id}`) },
+        { name: '统计', icon: 'icon-statistics', event: () => router.push(`/exam/statis/${exam.id}`) },
+    ]
+
+    if (exam.markState === 3) {// 阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）
+        return menu
+    }
+
+    
+    let startTime = dayjs(exam.startTime, 'YYYY-MM-DD HH:mm:ss').toDate()
+    let endTime = dayjs(exam.endTime, 'YYYY-MM-DD HH:mm:ss').toDate()
+    if (startTime.getTime() > curTime.value.getTime()) {
+        menu.push({ name: '立即开始考试', icon: 'icon-count-down', event: () => setTime(exam, 1) }) 
+        return menu
+    }
+    if (endTime.getTime() > curTime.value.getTime()) {
+        menu.push({ name: '立即完成考试', icon: 'icon-count-down', event: () => setTime(exam, 2) }) 
+        return menu
+    }
+
+    if (exam.markType === 2) {// 阅卷方式（1：客观题；2：主观题；）
+        let markStartTime = dayjs(exam.markStartTime, 'YYYY-MM-DD HH:mm:ss').toDate()
+        let markEndTime = dayjs(exam.markEndTime, 'YYYY-MM-DD HH:mm:ss').toDate()
+        if (markStartTime.getTime() > curTime.value.getTime()) {
+            menu.push({ name: '立即开始阅卷', icon: 'icon-count-down', event: () => setTime(exam, 3) }) 
+            return menu
+        }
+        if (markEndTime.getTime() > curTime.value.getTime()) {
+            menu.push({ name: '立即完成阅卷', icon: 'icon-count-down', event: () => setTime(exam, 4) }) 
+            return menu
+        }
+    }
+
+    return menu
+}
+
+// 设置考试时间
+async function setTime(exam: any, timeType: number) {
+    let { data: { code } } = await http.post("exam/time", {
+        id: exam.id,
+        timeType: timeType,
+        minute: -0x7fffffff, // int最小值
+    })
+
+    if (code !== 200) {
+        return
+    }
+    if (timeType === 2 || timeType === 4) {
+        ElMessage.success('后台正在阅卷，请稍后查询')
+    }
+
+    setTimeout(query, 2000) 
 }
 </script>
 

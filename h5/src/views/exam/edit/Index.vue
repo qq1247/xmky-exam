@@ -60,15 +60,15 @@ onMounted(async () => {
     // 如果是添加，初始化数据
     if (route.path.indexOf('/exam/add') >= 0) {
         form.id = null
-        form.name = `考试-${dayjs().add(1, 'day').format('YYYY-MM-DD')}`
-        form.paperName = `试卷-${dayjs().add(1, 'day').format('YYYY-MM-DD')}`
+        form.name = `考试-${dayjs().add(0, 'day').format('YYYY-MM-DD')}`
+        form.paperName = `试卷-${dayjs().add(0, 'day').format('YYYY-MM-DD')}`
         form.examTimes = [
-                dayjs().add(1, 'day').hour(8).minute(0).second(0).toDate(),
-                dayjs().add(1, 'day').hour(10).minute(0).second(0).toDate(),
+                dayjs().add(0, 'day').hour(8).minute(0).second(0).format('YYYY-MM-DD HH:mm:ss'),
+                dayjs().add(0, 'day').hour(10).minute(0).second(0).format('YYYY-MM-DD HH:mm:ss'),
             ]
         form.markTimes = [
-            dayjs().add(1, 'day').hour(14).minute(0).second(0).toDate(),
-            dayjs().add(1, 'day').hour(18).minute(0).second(0).toDate(),
+            dayjs().add(0, 'day').hour(14).minute(0).second(0).format('YYYY-MM-DD HH:mm:ss'),
+            dayjs().add(0, 'day').hour(18).minute(0).second(0).format('YYYY-MM-DD HH:mm:ss'),
         ]
         form.genType = 1
         form.passScore = 0
@@ -89,11 +89,11 @@ onMounted(async () => {
         form.id = data.id
         form.name = data.name
         form.paperName = data.paperName
-        form.examTimes[0] = dayjs(data.startTime, "YYYY-MM-DD HH:mm:ss").toDate()
-        form.examTimes[1] = dayjs(data.endTime, "YYYY-MM-DD HH:mm:ss").toDate()
+        form.examTimes[0] = data.startTime
+        form.examTimes[1] = data.endTime
         if (data.markType === 2) {
-            form.markTimes[0] = dayjs(data.markStartTime, "YYYY-MM-DD HH:mm:ss").toDate()
-            form.markTimes[1] = dayjs(data.markEndTime, "YYYY-MM-DD HH:mm:ss").toDate()
+            form.markTimes[0] = data.markStartTime
+            form.markTimes[1] = data.markEndTime
         }
         form.genType = data.genType
         form.passScore = data.passScore
@@ -198,10 +198,10 @@ async function publish() {
             markUserIds: form.markUserIds,
             totalScore: form.totalScore,
             markType: form.markType,
-            startTime: dayjs(form.examTimes[0]).format('YYYY-MM-DD HH:mm:ss'),
-            endTime: dayjs(form.examTimes[1]).format('YYYY-MM-DD HH:mm:ss'),
-            markStartTime: form.markType === 2 ? dayjs(form?.markTimes[0]).format('YYYY-MM-DD HH:mm:ss') : '',
-            markEndTime: form.markType === 2 ? dayjs(form?.markTimes[1]).format('YYYY-MM-DD HH:mm:ss') : '',
+            startTime: form.examTimes[0],
+            endTime: form.examTimes[1],
+            markStartTime: form.markType === 2 ? form?.markTimes[0] : '',
+            markEndTime: form.markType === 2 ? form?.markTimes[1] : '',
         }), 
         { headers: { 'Content-Type': 'application/json' }}
     )

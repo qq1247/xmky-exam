@@ -10,9 +10,9 @@
                     v-model="form.times" 
                     type="datetimerange" 
                     start-placeholder="开始时间"
-                    end-placeholder="结束时间" 
-                    :editable="false"
-                    /><!-- editable=true，如果是直接在inpu改变的值，返回的不是日期对象处理麻烦 -->
+                    end-placeholder="结束时间"
+                    value-format="YYYY-MM-DD HH:mm:ss"
+                    />
             </el-form-item>
             <el-form-item label="标题" prop="title">
                 <el-input v-model="form.title" placeholder="请输入标题"/>
@@ -57,7 +57,7 @@ const formRules = reactive<FormRules>({// 表单校验规则
             if(!value || !value[0] || !value[1]) {
                 return callback(new Error("请选择时间段"))
             }
-            if (value[0].getTime() >= value[1].getTime()) {
+            if (dayjs(value[0], 'YYYY-MM-DD HH:mm:ss').toDate() >= dayjs(value[1], 'YYYY-MM-DD HH:mm:ss').toDate()) {
                 return callback(new Error("开始时间必须小于结束时间"))
             }
             return callback()
@@ -80,8 +80,8 @@ onMounted(async () => {
     } else {
         let { data: { data } } = await http.post("bulletin/get", { id: route.params.id })
         form.id = data.id
-        form.times[0] = dayjs(data.startTime, 'YYYY-MM-DD HH:mm:ss').toDate()
-        form.times[1] = dayjs(data.endTime, 'YYYY-MM-DD HH:mm:ss').toDate()
+        form.times[0] = data.startTime
+        form.times[1] = data.endTime
         form.title = data.title
         form.content = data.content
     }
@@ -96,8 +96,8 @@ async function add() {
         }
 
         let { data: { code } } = await http.post("bulletin/add", {
-            startTime: dayjs(form.times[0]).format('YYYY-MM-DD HH:mm:ss'), 
-            endTime: dayjs(form.times[1]).format('YYYY-MM-DD HH:mm:ss'), 
+            startTime: form.times[0], 
+            endTime: form.times[1], 
             title: form.title,
             content: form.content,
         })
@@ -119,8 +119,8 @@ async function edit() {
 
         let { data: { code } } = await http.post("bulletin/edit", {
             id: form.id,
-            startTime: dayjs(form.times[0]).format('YYYY-MM-DD HH:mm:ss'), 
-            endTime: dayjs(form.times[1]).format('YYYY-MM-DD HH:mm:ss'), 
+            startTime: form.times[0], 
+            endTime: form.times[1], 
             title: form.title,
             content: form.content,
         })

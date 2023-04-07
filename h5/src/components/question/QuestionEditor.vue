@@ -145,7 +145,7 @@ function parseQuestion(questionTxt: string[]) {
         scores: [] as number[],
         analysis: '',
         markType: 0,
-        markTypeOptions: [] as number[],
+        markOptions: [] as number[],
         state: 1,
         no: 1,
         errs: '',
@@ -198,7 +198,7 @@ function parseQuestion(questionTxt: string[]) {
 
     let scores = [] as number[] // 分数组
     let answers = [] as string[] // 答案组
-    let markTypeOptions = [] as number[] // 阅卷选项组
+    let markOptions = [] as number[] // 阅卷选项组
     let subjective = false // 是否主观题
     answerGroup.forEach((answer) => {
         answer = answer.substring(1, answer.length - 1)
@@ -206,9 +206,9 @@ function parseQuestion(questionTxt: string[]) {
             let s = parseFloat(answer.replace('分', ''))
             scores.push(s > 20 ? 20 : s) // 最大20分
         } else if (/^答案无顺序$/.test(answer)) {
-            markTypeOptions.push(2)
+            markOptions.push(2)
         } else if (/^不区分大小写$/.test(answer)) {
-            markTypeOptions.push(3)
+            markOptions.push(3)
         } else if (/^主观题$/.test(answer)) {
             subjective = true
         } else {
@@ -274,6 +274,11 @@ function parseQuestion(questionTxt: string[]) {
         let matchs = title.match(/_{5,}/g)
         if (matchs) {
             fillBlanksCount = matchs.length
+            if (fillBlanksCount > 7) {
+                question.errs = `填空数量不能大于7个：${questionTxt.join('')}`
+                return question
+            }
+
             if (answers.length === 1) {// 一个中括号内空格分开的词，对应题干的空。
                 let answerCount = answers[0].split(/ +/).length//  + 1-n个空格
                 if (fillBlanksCount !== answerCount) {
@@ -295,22 +300,22 @@ function parseQuestion(questionTxt: string[]) {
         score = scores.length > 0 ? scores[0] : 1 // 如果有则使用，没有默认为1分
         answers.length = 1 // 去除多余答案
         answers[0] = answers[0].toUpperCase()
-        markTypeOptions = []
+        markOptions = []
     } else if (type === 4) {// 判断
         score = scores.length > 0 ? scores[0] : 1 // 如果有则使用，没有默认为1分
         answers.length = 1 // 去除多余答案
         answers[0] = answers[0].replace(/^[是√]/, '对').replace(/[否×]/, '错')
-        markTypeOptions = []
+        markOptions = []
     } else if (type === 5) {// 问答
         score = scores.length > 0 ? scores[0] : 1 // 如果有则使用，没有默认为1分
         answers.length = 1 // 去除多余答案
         answers[0] = answers[0].replace(/<br\/>/g, '\n')
-        markTypeOptions = []
+        markOptions = []
     } else if (type === 2) {// 多选
         score = scores.length > 0 ? scores[0] : 1
         _scores.push(scores.length > 1 ? scores[1] : score / 2) // 如果有第二个分数则使用，没有默认为总分一半
         answers = answers[0].toUpperCase().split("") // 答案拆分，满足接口
-        markTypeOptions = []
+        markOptions = []
     } else if (type === 3) {// 填空
         score = 0;
         for (let i = 0; i < fillBlanksCount; i++) {
@@ -325,7 +330,7 @@ function parseQuestion(questionTxt: string[]) {
             })
         }
         if (markType === 2) {
-            markTypeOptions = [] // 主观题没有阅卷选项
+            markOptions = [] // 主观题没有阅卷选项
         }
     }
 
@@ -337,7 +342,7 @@ function parseQuestion(questionTxt: string[]) {
     question.scores = _scores
     question.analysis = analysis
     question.markType = markType
-    question.markTypeOptions = markTypeOptions
+    question.markOptions = markOptions
     question.state = 1
     question.no = 1
     return question

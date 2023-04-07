@@ -9,9 +9,9 @@
                     v-model="form.examTimes" 
                     type="datetimerange" 
                     start-placeholder="开始时间"
-                    end-placeholder="结束时间" 
-                    :editable="false"
-                    /><!-- editable=true，如果是直接在inpu改变的值，返回的不是日期对象处理麻烦 -->
+                    end-placeholder="结束时间"
+                    value-format="YYYY-MM-DD HH:mm:ss"
+                    />
             </el-form-item>
             <el-form-item v-if="form.markType === 2" label="阅卷时间：" prop="markTimes">
                 <el-date-picker 
@@ -19,7 +19,7 @@
                     type="datetimerange" 
                     start-placeholder="开始时间"
                     end-placeholder="结束时间"
-                    :editable="false"
+                    value-format="YYYY-MM-DD HH:mm:ss"
                     >
                 </el-date-picker>
                 <el-alert :title="`需要阅卷题号：${markQuestions}`" type="warning" :closable="false"/>
@@ -29,7 +29,7 @@
                     v-model="form.passScore" 
                     controls-position="right" 
                     :min="0" 
-                    :max="form.totalScore - 1"
+                    :max="form.totalScore"
                     :step="10"
                     :precision="1"
                     />&nbsp;/ {{form.totalScore}}分
@@ -72,6 +72,8 @@ import { reactive, ref, onMounted, computed } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { useExamStore, type ExamQuestion } from '@/stores/exam';
 import { useDictStore } from '@/stores/dict';
+import dayjs from 'dayjs';
+import Decimal from 'decimal.js';
 
 // 定义变量
 defineExpose({ next });
@@ -81,15 +83,15 @@ const form = useExamStore()
 const formRules = reactive<FormRules>({// 表单校验规则
     name: [
         { required: true, message: '请输入考试名称', trigger: 'blur' },
-        { min: 1, max: 32, message: '长度介于1-32', trigger: 'blur' },
+        { min: 1, max: 16, message: '长度介于1-16', trigger: 'blur' },
     ],
     examTimes: [{
         trigger: 'change',
-        validator: (rule: any, value: Date[], callback: any) => {
+        validator: (rule: any, value: string[], callback: any) => {
             if(!value || !value[0] || !value[1]) {
                 return callback(new Error("请选择考试时间"))
             }
-            if (value[0].getTime() >= value[1].getTime()) {
+            if (dayjs(value[0], 'YYYY-MM-DD HH:mm:ss').toDate() >= dayjs(value[1], 'YYYY-MM-DD HH:mm:ss').toDate()) {
                 return callback(new Error("开始时间必须小于结束时间"))
             }
             return callback()
@@ -101,10 +103,10 @@ const formRules = reactive<FormRules>({// 表单校验规则
             if(!form.markTimes || !form.markTimes[0] || !form.markTimes[1]) {
                 return callback(new Error("请选择阅卷时间"))
             }
-            if (form.markTimes[0].getTime() >= form.markTimes[1].getTime()) {
+            if (dayjs(form.markTimes[0], 'YYYY-MM-DD HH:mm:ss').toDate() >= dayjs(form.markTimes[1], 'YYYY-MM-DD HH:mm:ss').toDate()) {
                 return callback(new Error("开始时间必须大于结束时间"))
             }
-            if (form.examTimes[1].getTime() >= form.markTimes[0].getTime()) {
+            if (dayjs(form.examTimes[1], 'YYYY-MM-DD HH:mm:ss').toDate() >= dayjs(form.markTimes[0], 'YYYY-MM-DD HH:mm:ss').toDate()) {
                 return callback(new Error("考试结束时间必须小于阅卷开始时间"))
             }
             return callback()

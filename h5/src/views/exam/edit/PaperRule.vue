@@ -123,9 +123,9 @@
                                 <el-select v-model="examRule.markOptions" clearable placeholder="阅卷选项" multiple collapse-tags>
                                     <template v-for="dict in dictStore.getList('QUESTION_MARK_OPTIONS')" :key="dict.dictKey">
                                         <el-option 
-                                            v-if="dict.dictKey === '2' || (dict.dictKey === '3' && examRule.questionType === 3)" 
+                                            v-if="dict.dictKey === '3' || (dict.dictKey === '2' && examRule.questionType === 3)" 
                                             :label="dict.dictValue" 
-                                            :value="dict.dictKey"
+                                            :value="parseInt(dict.dictKey)"
                                             />
                                     </template>
                                 </el-select>

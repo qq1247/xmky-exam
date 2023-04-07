@@ -228,6 +228,7 @@ async function examStatisQuery() {
     statis.avgScore = data.avgScore
     statis.minScore = data.minScore
     statis.maxScore = data.maxScore
+    statis.sdScore = data.sdScore
     statis.questionTypeList = data.questionTypeList
     statis.scoreGradeList = data.scoreGradeList
 }

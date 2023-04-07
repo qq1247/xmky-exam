@@ -8,15 +8,15 @@ import dayjs from 'dayjs'
 export const useExamStore = defineStore('exam', () => {
     // 定义变量
     const id = ref(null)// 考试ID
-    const name = ref(`考试-${dayjs().add(1, 'day').format('YYYY-MM-DD')}`)// 考试名称
-    const paperName = ref(`试卷-${dayjs().add(1, 'day').format('YYYY-MM-DD')}`)// 试卷名称
+    const name = ref(`考试-${dayjs().add(0, 'day').format('YYYY-MM-DD')}`)// 考试名称
+    const paperName = ref(`试卷-${dayjs().add(0, 'day').format('YYYY-MM-DD')}`)// 试卷名称
     const examTimes = ref([
-            dayjs().add(1, 'day').hour(8).minute(0).second(0).toDate(),
-            dayjs().add(1, 'day').hour(10).minute(0).second(0).toDate(),
+            dayjs().add(0, 'day').hour(8).minute(0).second(0).format('YYYY-MM-DD HH:mm:ss'),
+            dayjs().add(0, 'day').hour(10).minute(0).second(0).format('YYYY-MM-DD HH:mm:ss'),
         ])// 考试时间
     const markTimes = ref([
-            dayjs().add(1, 'day').hour(14).minute(0).second(0).toDate(),
-            dayjs().add(1, 'day').hour(18).minute(0).second(0).toDate(),
+            dayjs().add(0, 'day').hour(14).minute(0).second(0).format('YYYY-MM-DD HH:mm:ss'),
+            dayjs().add(0, 'day').hour(18).minute(0).second(0).format('YYYY-MM-DD HH:mm:ss'),
         ])// 阅卷时间
     const genType = ref(1) // 组卷方式（1：人工组卷；2：随机组卷）
     const passScore = ref(0) // 及格分数
@@ -152,4 +152,13 @@ export interface ExamRule {
     num?: number // 题数
     score?: number // 分数
     scores?: number[] // 子分数，用于表示多选漏选分值，客观填空问答每空分值
+}
+
+/**
+ * 菜单接口
+ */
+export interface Menu {
+    name: String // 名称
+    icon: String // 图标
+    event: Function // 点击后回调方法
 }

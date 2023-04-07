@@ -37,21 +37,14 @@
     </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup>import type { Menu } from '@/stores/exam';
+
 // 定义变量
 const emit = defineEmits(['callback'])
 defineProps<{
     menu: Menu[]
 }>()
 
-/**
- * 菜单接口
- */
-interface Menu {
-    name: String // 名称
-    icon: String // 图标
-    event: Function // 点击后回调方法
-}
 </script>
 <style lang="scss" scoped>
 .grid {
@@ -128,7 +121,7 @@ interface Menu {
                 bottom: -45px;
                 transform: translateX(-50%);
                 left: 50%;
-                width: 70px;
+                width: 80px;
                 height: 30px;
                 line-height: 30px;
                 background: var(--el-color-primary);

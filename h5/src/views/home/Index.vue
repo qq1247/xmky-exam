@@ -6,7 +6,7 @@
                     <span>考试概览</span>
                 </template>
                 <div class="home-left-top-content">
-                    <div v-if="userStore.roles.includes('admin')" class="home-left-top-content-item">
+                    <div v-if="userStore.roles.includes('admin')" class="home-left-top-content-item" @click="$router.push('/exam')">
                         <Iconfont icon="icon-diannao" :size="24" color="#09c8bd;" :width="48" :height="48"
                             background-color="#e5faf8" />
                         <div>
@@ -14,7 +14,7 @@
                             <div class="home-left-top-content-item-desc">创建考试（场）</div>
                         </div>
                     </div>
-                    <div v-if="userStore.roles.includes('admin')" class="home-left-top-content-item">
+                    <div v-if="userStore.roles.includes('admin')" class="home-left-top-content-item" @click="$router.push('/questionType')">
                         <Iconfont icon="icon-shiti" :size="28" color="#fb901b;" :width="48" :height="48"
                             background-color="#fff4e7" />
                         <div>
@@ -22,7 +22,7 @@
                             <div class="home-left-top-content-item-desc">创建试题（道）</div>
                         </div>
                     </div>
-                    <div v-if="userStore.roles.includes('admin')" class="home-left-top-content-item">
+                    <div v-if="userStore.roles.includes('admin')" class="home-left-top-content-item" @click="$router.push('/exam')">
                         <Iconfont icon="icon-mark-paper" :size="27" color="#0094e5;" :width="48" :height="48"
                             background-color="#e5f4fd" />
                         <div>
@@ -30,7 +30,7 @@
                             <div class="home-left-top-content-item-desc">待阅考试（场）</div>
                         </div>
                     </div>
-                    <div v-if="userStore.roles.includes('admin')" class="home-left-top-content-item">
+                    <div v-if="userStore.roles.includes('admin')" class="home-left-top-content-item" @click="$router.push('/user')">
                         <Iconfont icon="icon-ai-users" :size="29" color="#eb5b5b;" :width="48" :height="48"
                             background-color="#fdeeee" />
                         <div>
@@ -39,7 +39,7 @@
                         </div>
                     </div>
 
-                    <div v-if="userStore.roles.includes('user')" class="home-left-top-content-item">
+                    <div v-if="userStore.roles.includes('user')" class="home-left-top-content-item" @click="$router.push('/myExam')">
                         <Iconfont icon="icon-diannao" :size="24" color="#09c8bd;" :width="48" :height="48"
                             background-color="#e5faf8" />
                         <div>
@@ -47,7 +47,7 @@
                             <div class="home-left-top-content-item-desc">参与考试（场）</div>
                         </div>
                     </div>
-                    <div v-if="userStore.roles.includes('user')" class="home-left-top-content-item">
+                    <div v-if="userStore.roles.includes('user')" class="home-left-top-content-item" @click="$router.push('/myExam')">
                         <Iconfont icon="icon-shiti" :size="28" color="#fb901b;" :width="48" :height="48"
                             background-color="#fff4e7" />
                         <div>
@@ -55,7 +55,7 @@
                             <div class="home-left-top-content-item-desc">待考考试（场）</div>
                         </div>
                     </div>
-                    <div v-if="userStore.roles.includes('user')" class="home-left-top-content-item">
+                    <div v-if="userStore.roles.includes('user')" class="home-left-top-content-item" @click="$router.push('/myExam')">
                         <Iconfont icon="icon-mark-paper" :size="27" color="#0094e5;" :width="48" :height="48"
                             background-color="#e5f4fd" />
                         <div>
@@ -63,7 +63,7 @@
                             <div class="home-left-top-content-item-desc">及格次数（次）</div>
                         </div>
                     </div>
-                    <div v-if="userStore.roles.includes('user')" class="home-left-top-content-item">
+                    <div v-if="userStore.roles.includes('user')" class="home-left-top-content-item" @click="$router.push('/myExam')">
                         <Iconfont icon="icon-ai-users" :size="29" color="#eb5b5b;" :width="48" :height="48"
                             background-color="#fdeeee" />
                         <div>
@@ -113,6 +113,7 @@
                             <div>{{ myExam.examName }}</div>
                             <span>{{ myExam.examStartTime }} - {{ myExam.examEndTime }}</span>
                             <el-button v-if="myExam.state !== 3" type="primary" plain @click="toExam(myExam)">开始考试</el-button>
+                            <el-button v-else type="primary" plain @click="router.push(`/myExam/paper/${myExam.examId}`)">查阅考试</el-button>
                         </div>
                         <el-empty v-if="userStore.roles.includes('user') && myExamListpage.total === 0" description="暂无考试"/>
                     </el-scrollbar>
@@ -413,6 +414,7 @@ async function toMark(myMark: any) {
                     flex: 1;
                     display: flex;
                     justify-content: center;
+                    cursor: pointer;
 
                     .home-left-top-content-item-num {
                         font-size: 28px;

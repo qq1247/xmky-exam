@@ -106,10 +106,10 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <el-button :disabled="form.answers.length >= 7" type="primary" @click="addKeyword" size="small" plain style="border: none; padding: 14px;">
+                <el-button v-if="form.type === 5 && form.markType === 1" :disabled="form.answers.length >= 7" type="primary" @click="addKeyword" size="small" plain style="border: none; padding: 14px;">
                     <span class="iconfont icon-plus" style="font-size: 12px;">&nbsp;添加关键词</span>
                 </el-button>
-                <el-button :disabled="form.answers.length <= 2" type="danger" @click="delKeyword" size="small" plain style="border: none; padding: 14px;">
+                <el-button v-if="form.type === 5 && form.markType === 1" :disabled="form.answers.length <= 1" type="danger" @click="delKeyword" size="small" plain style="border: none; padding: 14px;">
                     <span class="iconfont icon-delete" style="font-size: 12px;">&nbsp;删除关键词</span>
                 </el-button>
             </el-card>
@@ -138,6 +138,7 @@ import { reactive, ref, onMounted, watch, nextTick, watchEffect } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import http from '@/request'
 import { useDictStore } from '@/stores/dict';
+import Decimal from 'decimal.js'
 
 // 定义变量
 const props = defineProps({
@@ -357,7 +358,7 @@ watch(() => form.score, (n, o) => {
  */
 watch(() => form.scores, (n, o) => {
     if (form.type === 3 || (form.type === 5 && form.markType === 1)) {
-        form.score = form.scores.reduce(function (total: number, cur) { return total + Number(cur) }, 0)
+        form.score = form.scores.reduce((total: number, cur) => { return new Decimal(total).add(cur as number).toNumber() }, 0)
     }
 }, {
     deep: true,

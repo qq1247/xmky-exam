@@ -173,11 +173,12 @@ const userListpage = reactive({// 用户分页列表
 
 const exam = reactive({// 考试信息
     id: 0,
-    markType: 0,
+    markType: 0,// 阅卷方式（1：客观题；2：主观题；）
     markState: 0,
     markStartTime: null,
     markEndTime: null,
     markStart: true, // 阅卷已开始（时间开始）
+    sxes: [] as number[],// 反作弊（1：试题乱序；2：选项乱序；）
 })
 const curUserId = ref() // 当前选中用户
 const paperShow = ref(false) // false：主观题显示；true：整卷显示
@@ -216,12 +217,17 @@ watch(curUserId, async () => {// 切换试卷
         return examQuestion
     })
 
-    if (!paperShow.value && curQuestionNos.value.length === 0) {
-        examQuestions.value.forEach((examQuestion : ExamQuestion) => {
-            if (examQuestion.markType === 2) {
-                curQuestionNos.value.push(examQuestion.no as number)
-            }
-        });
+    if (!paperShow.value) {
+        if (exam.markType === 2 && exam.sxes.includes(1)) {// 主观题且试题随机，每张卷子都重新获取题号（题号不一样）
+            curQuestionNos.value.length = 0
+        }
+        if (!curQuestionNos.value.length) {
+            examQuestions.value.forEach((examQuestion : ExamQuestion) => {
+                if (examQuestion.markType === 2) {
+                    curQuestionNos.value.push(examQuestion.no as number)
+                }
+            });
+        }
     }
     setTimeout(() => loading.value = false, 500)
 })
@@ -236,6 +242,8 @@ onMounted(async () => {
     exam.markState = data.markState
     exam.markStartTime = data.markStartTime
     exam.markEndTime = data.markEndTime
+    exam.markEndTime = data.markEndTime
+    exam.sxes = data.sxes
 
     if (exam.markType === 1) {// 客观试卷，不处理
         return
@@ -318,6 +326,10 @@ function paperNext() {
 // 打分
 async function score(examQuestion: ExamQuestion) {
     // 单题打分
+    if (!examQuestion.userScore) {
+        examQuestion.userScore = 0
+    }
+
     examQuestion.commit = true
     let { data: { code, data } } = await http.post("myMark/score", {
         examId: exam.id,

@@ -125,6 +125,9 @@
     <!-- 题库 -->
     <el-drawer title="题库" v-model="questionType.queryForm.show" :size="700" :with-header="false">
         <el-form :inline="true" :model="questionType.queryForm">
+            <el-form-item style="width: 150px;">
+                <el-input v-model="questionType.queryForm.questionTypeName" placeholder="请输入题库名称" />
+            </el-form-item>
             <el-form-item label="" style="width: 150px;">
                 <el-input v-model="questionType.queryForm.id" placeholder="请输入编号" />
             </el-form-item>
@@ -143,12 +146,12 @@
                         :label="dict.dictValue" :value="dict.dictKey" />
                 </el-select>
             </el-form-item>
-            <el-form-item style="width: 150px;">
+            <el-form-item style="width: 120px;">
                 <el-button type="primary" @click="questionQuery">
                     <span class="iconfont icon-search" style="font-size:14px;">&nbsp;查询</span>
                 </el-button>
             </el-form-item>
-            <el-form-item style="width: 150px;">
+            <el-form-item style="width: 100px;">
                 <el-radio-group v-model="questionType.display">
                     <el-radio-button label="paper">
                         <span class="iconfont icon-menu-s"></span>
@@ -284,6 +287,7 @@ function questionAdd(question: any) {
         answers: question.answers,
         scores: question.scores,
         options: question.options,
+        markOptions: question.markOptions,
     })
 
     // 已导入的试题，则不在题库再次显示
@@ -318,6 +322,7 @@ function txtImport(questions: any) {
             answers: question.answers,
             scores: question.scores,
             options: question.options,
+            markOptions: question.markOptions,
         })
     })
     form.noUpdate()
@@ -493,8 +498,11 @@ async function next() {
             .question-paper {
                 &:hover {
                     .question-paper-bottom-right {
-                        height: 40px;
+                        height: 80px;
                         line-height: 40px;
+                        font-size: 12px;
+                        font-weight: bold;
+                        color: var(--el-text-color-secondary);
                     }
                 }
                 .question-paper-bottom-right {

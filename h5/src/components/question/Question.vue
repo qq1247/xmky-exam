@@ -81,7 +81,7 @@
             :rows="2" 
             placeholder="请输入答案"
             type="textarea" 
-            :autosize="true" 
+            :autosize="{ minRows: 2 }" 
             @input="(value: string) => emit('change', [value])" 
             :readonly="!editable" 
             resize="none" 
@@ -249,7 +249,9 @@ function errColor(curAnswer: string) {
         align-items: flex-start;
 
         .el-checkbox {
-            height: 26px;
+            white-space: initial;
+            height: auto;
+            margin-bottom: 10px;
 
             .el-checkbox__label {
                 font-size: 13px;
@@ -264,7 +266,9 @@ function errColor(curAnswer: string) {
         align-items: flex-start;
 
         .el-radio {
-            height: 26px;
+            white-space: initial;
+            height: auto;
+            margin-bottom: 10px;
 
             .el-radio__label {
                 font-size: 13px;

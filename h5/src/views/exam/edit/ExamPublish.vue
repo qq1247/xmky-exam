@@ -5,12 +5,12 @@
             <el-form-item label="考试名称：">{{ examStore.name }}</el-form-item>
             <el-form-item label="组卷方式：">{{ dictStore.getValue('PAPER_GEN_TYPE',  examStore.genType) }}</el-form-item>
             <el-form-item label="考试时间：">
-                {{ dayjs(examStore.examTimes[0]).format('YYYY-MM-DD HH:mm:ss') }} -
-                {{ dayjs(examStore.examTimes[1]).format('YYYY-MM-DD HH:mm:ss') }}
+                {{ examStore.examTimes[0] }} -
+                {{ examStore.examTimes[1] }}
             </el-form-item>
             <el-form-item v-if="examStore.markType === 2" label="阅卷时间：">
-                {{ dayjs(examStore.markTimes[0]).format('YYYY-MM-DD HH:mm:ss') }} -
-                {{ dayjs(examStore.markTimes[1]).format('YYYY-MM-DD HH:mm:ss') }}
+                {{ examStore.markTimes[0] }} -
+                {{ examStore.markTimes[1] }}
             </el-form-item>
             <el-form-item label="及格分数：">
                 {{ examStore.passScore }} / {{ examStore.totalScore }}

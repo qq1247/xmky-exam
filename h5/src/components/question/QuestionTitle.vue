@@ -2,7 +2,7 @@
     <div :id="`question-${props.no}`" class="question-title">
         <span>{{ no ? `${no}、` : '' }}</span>
         <template v-for="(title, index) in titles">
-            <template v-if="title.type === 'txt'">{{ title.value }}</template>
+            <span v-if="title.type === 'txt'" v-html="title.value"></span>
             <el-input 
                 v-else 
                 :key="index" 
@@ -55,6 +55,9 @@ const userAnswerShow = ref(props.userAnswerShow) // 用户答案显示
 // 监听属性
 watch(() => props.userAnswerShow, () => {
     userAnswerShow.value = props.userAnswerShow
+})
+watch(() => props.userAnswers, () => {
+    userAnswers.value = props.userAnswers
 })
 
 // 监听
@@ -112,11 +115,6 @@ const titles = computed(() => {
     return titles
 })
 
-interface Title {
-    type: string
-    value?: string
-    index?: number
-}
 </script>
   
 <style lang="scss">
