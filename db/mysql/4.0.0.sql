@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      MySQL 5.0                                    */
-/* Created on:     2023/3/22 14:01:15                           */
+/* Created on:     2023/4/7 8:59:26                             */
 /*==============================================================*/
 
 
@@ -104,7 +104,7 @@ create table EXM_EXAM_QUESTION
    CHAPTER_TXT          varchar(512) comment '章节描述',
    TYPE                 int comment '类型 （1：章节；2：试题）',
    SCORE                decimal(5,2) comment '分数',
-   SCORES               varchar(16) comment '子分数',
+   SCORES               varchar(64) comment '子分数',
    MARK_OPTIONS         varchar(8) comment '阅卷选项（2：答案无顺序；3：不分大小写；)',
    EXAM_ID              int comment '考试ID',
    QUESTION_ID          int comment '试题ID',
@@ -194,7 +194,7 @@ create table EXM_MY_QUESTION
    CHAPTER_TXT          varchar(512) comment '章节描述',
    TYPE                 int comment '类型 （1：章节；2：试题）',
    SCORE                decimal(5,2) comment '分数',
-   SCORES               varchar(16) comment '子分数',
+   SCORES               varchar(64) comment '子分数',
    MARK_OPTIONS         varchar(8) comment '阅卷选项（2：答案无顺序；3：不区分大小写；)',
    EXAM_ID              int comment '考试ID',
    QUESTION_ID          int comment '试题ID',
@@ -327,7 +327,7 @@ create table SYS_CRON
    NAME                 varchar(32) comment '名称',
    JOB_CLASS            varchar(64) comment '实现类',
    CRON                 varchar(64) comment 'cron表达式',
-   STATE                int comment '1：启动；2：停止；',
+   STATE                int comment '状态（1：启动；2：停止；）',
    UPDATE_USER_ID       int comment '修改用户ID',
    UPDATE_TIME          datetime comment '修改时间',
    primary key (ID)
@@ -400,7 +400,7 @@ create table SYS_PARM
    EMAIL_PWD            varchar(64) comment '邮件密码',
    EMAIL_PROTOCOL       varchar(16) comment '邮件协议',
    EMAIL_ENCODE         varchar(16) comment '邮件编码',
-   ENT_NAME             varchar(32) comment '单位名称',
+   ENT_NAME             varchar(32) comment '企业名称',
    FILE_UPLOAD_DIR      varchar(64) comment '上传目录',
    DB_BAK_DIR           varchar(64) comment '数据库备份目录',
    PWD_TYPE             int comment '密码类型（1：随机；2：固定）',
@@ -467,6 +467,7 @@ create table SYS_VER
 );
 
 alter table SYS_VER comment '版本';
+
 
 /*==============================================================*/
 /* 数据															*/
@@ -564,7 +565,6 @@ INSERT INTO `SYS_VER` VALUES (23, '3.8.2', '2022-06-29 10:18:00', 'zhanghc', '')
 INSERT INTO `SYS_VER` VALUES (24, '3.9.0', '2022-07-07 15:34:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (25, '3.9.1', '2022-07-29 16:47:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (26, '3.9.2', '2023-03-21 18:51:00', 'zhanghc', '');
-INSERT INTO `SYS_VER` VALUES (27, '4.0.0', '2023-03-22 10:18:00', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (27, '4.0.0', '2023-04-01 14:38:00', 'zhanghc', '');
 
 ALTER TABLE `EXM_MY_QUESTION` ADD INDEX `MY_QUESTION_EUQ` ( `EXAM_ID`,`USER_ID`,`QUESTION_ID` );
-ALTER TABLE `EXM_MY_QUESTION` ADD INDEX `MY_QUESTION_EU` ( `EXAM_ID`,`USER_ID` );
