@@ -354,7 +354,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			Date newEndTime = DateUtil.getNextMinute(exam.getEndTime(), minute);// 考试时间8点-10点，当前时间9点
 			exam.setEndTime(newEndTime.getTime() < curTime.getTime() // 调整时间小于9点
 					? curTime // 结束时间改为9点
-					: (newEndTime.getTime() < exam.getStartTime().getTime() ? exam.getStartTime() : newEndTime));// 调整时间小于8点，改为8点。否则变更后的时间
+					: (newEndTime.getTime() < exam.getStartTime().getTime() ? exam.getStartTime() : newEndTime));// 调整时间小于8点，改为8点（考试开始时间）。否则变更后的时间
 		} else if (timeType == 3) {
 			Date newMarkStartTime = DateUtil.getNextMinute(exam.getMarkStartTime(), minute);
 			exam.setMarkStartTime(newMarkStartTime.getTime() < curTime.getTime()
@@ -477,7 +477,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 				examQuestion.setMarkOptions(examQuestionEx.getMarkOptions());
 				examQuestion.setExamId(examQuestionEx.getExamId());
 				examQuestion.setQuestionId(examQuestionEx.getQuestionId());
-				examQuestion.setNo(examQuestionEx.getNo());
+				examQuestion.setNo(examQuestionEx.getNo());// 上面处理了
 				examQuestion.setUpdateUserId(getCurUser().getId());
 				examQuestion.setUpdateTime(new Date());
 				examQuestionService.add(examQuestion);
@@ -485,8 +485,10 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 		}
 		// 如果是随机试卷，保存抽题规则
 		else if (examInfo.getGenType() == 2) {
-			for (ExamRule examRule : examInfo.getExamRules()) {
+			for (int i = 0; i < examInfo.getExamRules().length; i++) {
+				ExamRule examRule = examInfo.getExamRules()[i];
 				examRule.setExamId(examInfo.getId());
+				examRule.setNo(i + 1);
 				examRuleService.add(examRule);
 			}
 		}
@@ -541,7 +543,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 					myQuestion.setExamId(examQuestion.getExamId());
 					myQuestion.setQuestionId(examQuestion.getQuestionId());
 					myQuestion.setUserId(examUserId);
-					myQuestion.setNo(examQuestion.getNo());
+					myQuestion.setNo(i + 1);
 					myQuestion.setUpdateUserId(getCurUser().getId());
 					myQuestion.setUpdateTime(new Date());
 					myQuestionService.add(myQuestion);
@@ -568,6 +570,7 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 						myQuestion.setOptionsNo(shuffleNums(1, questionOptionList.size()));// D,B,A,C
 						myQuestionService.update(myQuestion);
 					}
+					
 				}
 			} else if (examInfo.getGenType() == 2) {// 如果是随机组卷，按抽题规则生成我的试卷（校验里判断过规则是否满足，不用在判断）
 				Set<Question> questionOfUsed = new HashSet<>();

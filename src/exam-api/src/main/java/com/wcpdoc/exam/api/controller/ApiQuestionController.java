@@ -74,6 +74,8 @@ public class ApiQuestionController extends BaseController {
 						markOptions[i] = Integer.parseInt(_markOptions[i]);
 					}
 					result.put("markOptions", markOptions);
+				} else {
+					result.put("markOptions", new Integer[0]);
 				}
 				
 				if (type == 1 || type == 2) {// 如果是单选或多选，添加选项字段

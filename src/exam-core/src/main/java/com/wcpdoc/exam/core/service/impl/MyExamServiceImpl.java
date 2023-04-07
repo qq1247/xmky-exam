@@ -141,13 +141,27 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 		Question question = QuestionCache.getQuestion(questionId);// 已关联考试的试题不会改变，缓存起来加速查询。
 		if (!ValidateUtil.isValid(answers)) {
 			myQuestion.setUserAnswer(null);
-		} else if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasTrueFalse(question) || QuestionUtil.hasQA(question)) {
+		} else if (QuestionUtil.hasTrueFalse(question)) {
 			myQuestion.setUserAnswer(answers[0]);
+		} else if (QuestionUtil.hasSingleChoice(question)) {
+			if (ValidateUtil.isValid(myQuestion.getOptionsNo())) {
+				myQuestion.setUserAnswer(myQuestion.getOptionsNoCacheOfAnswer().get(answers[0]));
+			} else {
+				myQuestion.setUserAnswer(answers[0]);
+			}
 		} else if (QuestionUtil.hasMultipleChoice(question)) {
+			if (ValidateUtil.isValid(myQuestion.getOptionsNo())) {
+				for (int i = 0; i < answers.length; i++) {
+					answers[i] = myQuestion.getOptionsNoCacheOfAnswer().get(answers[i]);
+				}
+			}
+			
 			Arrays.sort(answers);// 页面先选d在选c，值为db，这里重新排序一下
 			myQuestion.setUserAnswer(StringUtil.join(answers));
 		} else if (QuestionUtil.hasFillBlank(question)) {
 			myQuestion.setUserAnswer(StringUtil.join(answers, '\n'));
+		} else if (QuestionUtil.hasQA(question)) {
+			myQuestion.setUserAnswer(StringUtil.join(answers));// bug：文本包含英文逗号会分割
 		}
 		myQuestion.setAnswerTime(new Date());
 		myQuestionService.update(myQuestion);

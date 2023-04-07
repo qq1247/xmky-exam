@@ -183,9 +183,17 @@ public class ApiMyExamController extends BaseController{
 						List<String> options = new ArrayList<>();
 						if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasMultipleChoice(question)) {// 如果是单选或多选，添加选项字段
 							List<QuestionOption> questionOptionList = QuestionCache.getOption(_myQuestion.getQuestionId());
-							for (QuestionOption questionOption : questionOptionList) {
-								options.add(questionOption.getOptions());
+							if (ValidateUtil.isValid(_myQuestion.getOptionsNo())) {// 选项乱序
+								for (int optionsNo : _myQuestion.getOptionsNo()) {// 4,1,2,3
+									QuestionOption questionOption = questionOptionList.get(optionsNo - 1);// 先放第4个
+									options.add(questionOption.getOptions());
+								}
+							} else {
+								for (QuestionOption questionOption : questionOptionList) {// 常规顺序
+									options.add(questionOption.getOptions());
+								}
 							}
+							
 						}
 						myQuestion.put("options", options);
 					}
@@ -193,11 +201,23 @@ public class ApiMyExamController extends BaseController{
 					{// 用户答案
 						List<String> userAnswerList = new ArrayList<>();
 						if (ValidateUtil.isValid(_myQuestion.getUserAnswer())) {
-							if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasTrueFalse(question) 
-									|| (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question))) {// 单选、判断、问答
+							if (QuestionUtil.hasTrueFalse(question) || QuestionUtil.hasQA(question)) {// 判断、问答
 								userAnswerList.add(_myQuestion.getUserAnswer());
-							} else if (QuestionUtil.hasMultipleChoice(question)) {//多选
-								Collections.addAll(userAnswerList, _myQuestion.getUserAnswer().split(","));
+							} else if (QuestionUtil.hasSingleChoice(question)) {// 单选
+								if (ValidateUtil.isValid(_myQuestion.getOptionsNo())) {// 选项乱序：4,1,3,2 ，填写答案：B，回显：D
+									userAnswerList.add(_myQuestion.getOptionsNoCache().get(_myQuestion.getUserAnswer()));
+								} else {
+									userAnswerList.add(_myQuestion.getUserAnswer());
+								}
+							}  else if (QuestionUtil.hasMultipleChoice(question)) {//多选
+								String[] userAnswers = _myQuestion.getUserAnswer().split(",");
+								if (ValidateUtil.isValid(_myQuestion.getOptionsNo())) {
+									for (String userAnswer : userAnswers) {
+										userAnswerList.add(_myQuestion.getOptionsNoCache().get(userAnswer));
+									}
+								} else {
+									Collections.addAll(userAnswerList, userAnswers);
+								}
 							} else if (QuestionUtil.hasFillBlank(question)) {// 填空
 								Collections.addAll(userAnswerList, _myQuestion.getUserAnswer().split("\n", -1));
 							}
@@ -210,11 +230,24 @@ public class ApiMyExamController extends BaseController{
 						if (showAnswer) {
 							List<QuestionAnswer> questionAnswerList = QuestionCache.getAnswer(_myQuestion.getQuestionId());
 							for(QuestionAnswer answer : questionAnswerList){
-								if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasTrueFalse(question) 
+								if (QuestionUtil.hasTrueFalse(question) 
 										|| (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question))) {
 									answerList.add(answer.getAnswer());
+								} else if (QuestionUtil.hasSingleChoice(question)) {
+									if (ValidateUtil.isValid(_myQuestion.getOptionsNo())) {
+										answerList.add(_myQuestion.getOptionsNoCache().get(answer.getAnswer()));
+									} else {
+										answerList.add(answer.getAnswer());
+									}
 								} else if (QuestionUtil.hasMultipleChoice(question)) {
-									Collections.addAll(answerList, answer.getAnswer().split(","));
+									String[] answers = answer.getAnswer().split(",");
+									if (ValidateUtil.isValid(_myQuestion.getOptionsNo())) {
+										for (String _answer : answers) {
+											answerList.add(_myQuestion.getOptionsNoCache().get(_answer));
+										}
+									} else {
+										Collections.addAll(answerList, answers);
+									}
 								} else if (QuestionUtil.hasFillBlank(question) || (QuestionUtil.hasQA(question) 
 										&& QuestionUtil.hasObjective(question))) {
 									answerList.add(answer.getAnswer());

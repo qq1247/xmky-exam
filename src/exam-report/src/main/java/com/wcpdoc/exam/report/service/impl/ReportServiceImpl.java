@@ -217,14 +217,16 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 			int questionNum = 0;// 试题数量
 			int objectiveQuestionNum = 0;// 客观题数量
 			if (exam.getGenType() == 1) {
-				questionNum = examQuestionList.size();
+				questionNum = questionList.size();
 				for (Question question : questionList) {
 					objectiveQuestionNum += question.getMarkType() == 1 ? 1 : 0;
 				}
 			} else {
 				for (ExamRule examRule : examRuleList) {
-					questionNum += examRule.getNum();
-					objectiveQuestionNum += examRule.getMarkType() == 1 ? examRule.getNum() : 0;
+					if (examRule.getType() == 2) {
+						questionNum += examRule.getNum();
+						objectiveQuestionNum += examRule.getMarkType() == 1 ? examRule.getNum() : 0;
+					}
 				}
 			}
 			result.put("questionNum", questionNum);
@@ -240,16 +242,24 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 				
 				scoreList.add(myExam.getTotalScore().doubleValue());
 			}
-			double[] scores = new double[scoreList.size()];
-			for (int i = 0; i < scoreList.size(); i++) {
-				scores[i] = scoreList.get(i).doubleValue();
-			}
 			
-			StandardDeviation standardDeviation = new StandardDeviation(false);
-			result.put("avgScore", StatUtils.mean(scores));
-			result.put("minScore", StatUtils.min(scores));
-			result.put("maxScore", StatUtils.max(scores));
-			result.put("sdScore", standardDeviation.evaluate(scores));
+			if (!ValidateUtil.isValid(scoreList)) {
+				result.put("avgScore", 0);
+				result.put("minScore", 0);
+				result.put("maxScore", 0);
+				result.put("sdScore", 0);
+			} else {
+				double[] scores = new double[scoreList.size()];
+				for (int i = 0; i < scoreList.size(); i++) {
+					scores[i] = scoreList.get(i).doubleValue();
+				}
+				
+				StandardDeviation standardDeviation = new StandardDeviation(false);
+				result.put("avgScore", BigDecimalUtil.newInstance(StatUtils.mean(scores)).div(1, 1).getResult());
+				result.put("minScore", StatUtils.min(scores));
+				result.put("maxScore", StatUtils.max(scores));
+				result.put("sdScore", BigDecimalUtil.newInstance(standardDeviation.evaluate(scores)).div(1, 0).getResult());
+			}
 		}
 		
 		// 统计试题类型占比
@@ -285,6 +295,10 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 			int maxScore = scoreGrade * (i + 1);
 			int userNum = 0;
 			for (MyExam myExam : myExamList) {
+				if (myExam.getState() == 1) {// 排除掉未考试的
+					continue;
+				}
+				
 				if (i < 4) {
 					if (myExam.getTotalScore().doubleValue() >= minScore 
 						&& myExam.getTotalScore().doubleValue() < maxScore) {// 不包括最大边界值，如60不属于50分数段，[50-60)

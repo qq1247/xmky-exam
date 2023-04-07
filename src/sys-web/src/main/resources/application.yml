@@ -11,6 +11,8 @@ spring:
     view:
       prefix: /WEB-INF/jsp/
       suffix: .jsp
+    servlet:
+      load-on-startup: 1
   resources:
     static-locations: pc:./h5/;mobile:./m/
   profiles:
@@ -24,9 +26,6 @@ spring:
     url: jdbc:log4jdbc:mysql://127.0.0.1:3306/exam?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8&useSSL=false
     username: root
     password: root
-    hikari:
-      maximum-pool-size: 100
-      minimum-idle: 100
 
 hibernate:
   naming:

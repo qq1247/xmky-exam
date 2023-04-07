@@ -2,6 +2,8 @@ package com.wcpdoc.exam.core.entity;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -203,6 +205,22 @@ public class MyQuestion {
 			markOptionArr[i] = Integer.parseInt(markOptionStrArr[i]);
 		}
 		return markOptionArr;
+	}
+	
+	public Map<String, String> getOptionsNoCache() {// 4,1,3,2 => {D:A, A:B, C:C, B:D}
+		Map<String, String> cache = new HashMap<>();
+		for (int i = 0; i < getOptionsNo().length; i++) {
+			cache.put(String.format("%s", (char) (64 + getOptionsNo()[i])), String.format("%s", (char) (65 + i)));
+		}
+		return cache;
+	}
+	
+	public Map<String, String> getOptionsNoCacheOfAnswer() {// 4,1,3,2 => {A:D, B:A, C:C, D:B}
+		Map<String, String> cache = new HashMap<>();
+		for (int i = 0; i < getOptionsNo().length; i++) {
+			cache.put(String.format("%s", (char) (65 + i)), String.format("%s", (char) (64 + getOptionsNo()[i])));
+		}
+		return cache;
 	}
 
 	public void setOptionsNo(Integer[] optionsNo) {
