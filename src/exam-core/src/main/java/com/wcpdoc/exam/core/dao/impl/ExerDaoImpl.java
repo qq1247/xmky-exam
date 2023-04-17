@@ -1,7 +1,6 @@
 package com.wcpdoc.exam.core.dao.impl;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -16,18 +15,18 @@ import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.HibernateUtil;
 import com.wcpdoc.core.util.SqlUtil;
-import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.core.util.SqlUtil.Order;
-import com.wcpdoc.exam.core.dao.QuestionTypeOpenDao;
-import com.wcpdoc.exam.core.entity.QuestionTypeOpen;
+import com.wcpdoc.core.util.ValidateUtil;
+import com.wcpdoc.exam.core.dao.ExerDao;
+import com.wcpdoc.exam.core.entity.Exer;
 
 /**
- * 题库开放数据访问层实现
+ * 模拟练习数据访问层实现
  * 
  * v1.0 chenyun 2021-03-02 13:43:21
  */
 @Repository
-public class QuestionTypeOpenDaoImpl extends RBaseDaoImpl<QuestionTypeOpen> implements QuestionTypeOpenDao {
+public class ExerDaoImpl extends RBaseDaoImpl<Exer> implements ExerDao {
     @Resource
     private UserDao userDao;
 	
@@ -81,13 +80,8 @@ public class QuestionTypeOpenDaoImpl extends RBaseDaoImpl<QuestionTypeOpen> impl
 	}
 
 	@Override
-	public List<QuestionTypeOpen> getList(Date startTime, Date endTime, Integer questionTypeId) {
-		String sql = "SELECT * FROM EXM_QUESTION_TYPE_OPEN "
-				+ "WHERE  QUESTION_TYPE_ID = :QUESTION_TYPE_ID "
-				+ "AND STATE = 1 "
-				+ "AND (((START_TIME <= :START_TIME1 AND :END_TIME1 <= END_TIME) "
-						+ "OR (START_TIME <= :START_TIME2 AND :END_TIME2 <= END_TIME) "
-						+ "OR (START_TIME >= :START_TIME3 AND END_TIME <= :END_TIME3))) ";
-		return getList(sql, new Object[] { questionTypeId, startTime, startTime, endTime, endTime, startTime, endTime });
+	public List<Exer> getlist(Integer questionTypeId) {
+		String sql = "SELECT * FROM EXM_SIM WHERE QUESTION_TYPE_ID = :QUESTION_TYPE_ID AND STATE = 1 ";
+		return getList(sql, new Object[] { questionTypeId });
 	}
 }

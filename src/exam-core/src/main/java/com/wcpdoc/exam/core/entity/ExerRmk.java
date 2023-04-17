@@ -14,13 +14,13 @@ import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
- * 试题评论
+ * 模拟练习评论
  * 
  * v1.0 chenyun 2021年8月31日上午9:46:45
  */
 @Entity
 @Table(name = "EXM_QUESTION_COMMENT")
-public class QuestionComment {
+public class ExerRmk {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID")

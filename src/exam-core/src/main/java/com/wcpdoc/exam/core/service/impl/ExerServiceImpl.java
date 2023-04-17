@@ -1,0 +1,82 @@
+package com.wcpdoc.exam.core.service.impl;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import com.wcpdoc.core.dao.BaseDao;
+import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.service.impl.BaseServiceImp;
+import com.wcpdoc.core.util.ValidateUtil;
+import com.wcpdoc.exam.core.dao.ExerDao;
+import com.wcpdoc.exam.core.entity.Exer;
+import com.wcpdoc.exam.core.service.ExerService;
+import com.wcpdoc.exam.core.service.QuestionAnswerService;
+import com.wcpdoc.exam.core.service.QuestionOptionService;
+import com.wcpdoc.exam.core.service.QuestionService;
+
+/**
+ * 模拟练习服务层实现
+ * 
+ * v1.0 chenyun 2021-03-02 13:43:21
+ */
+@Service
+public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService {
+	@Resource
+	private ExerDao exerDao;
+	@Resource
+	private QuestionService questionService;
+	@Resource
+	private QuestionOptionService questionOptionService;
+	@Resource
+	private QuestionAnswerService questionAnswerService;
+
+	@Override
+	@Resource(name = "exerDaoImpl")
+	public void setDao(BaseDao<Exer> dao) {
+		super.dao = dao;
+	}
+
+	@Override
+	public void addEx(Exer exer) {
+		// 校验数据有效性
+		if (!ValidateUtil.isValid(exer.getName())) {
+			throw new MyException("参数错误：name");
+		}
+		if (!ValidateUtil.isValid(exer.getQuestionTypeId())) {
+			throw new MyException("参数错误：questionTypeId");
+		}
+		if (!ValidateUtil.isValid(exer.getStartTime())) {
+			throw new MyException("参数错误：startTime");
+		}
+		if (!ValidateUtil.isValid(exer.getEndTime())) {
+			throw new MyException("参数错误：endTime");
+		}
+		if (!ValidateUtil.isValid(exer.getRmkState())) {
+			throw new MyException("参数错误：rmkState");
+		}
+		
+		List<Exer> exerList = exerDao.getlist(exer.getQuestionTypeId());
+		for (Exer cur : exerList) {
+			if (exer.getStartTime().getTime() < cur.getStartTime().getTime() && cur.getStartTime().getTime() < exer.getEndTime().getTime()) {
+				throw new MyException("该时间段已存在");
+			}
+			if (exer.getStartTime().getTime() < cur.getEndTime().getTime() && cur.getEndTime().getTime() < exer.getEndTime().getTime()) {
+				throw new MyException("该时间段已存在");
+			}
+			if (exer.getStartTime().getTime() > cur.getStartTime().getTime() && cur.getEndTime().getTime() > exer.getEndTime().getTime() ) {
+				throw new MyException("该时间段已存在");
+			}
+		}
+		
+		// 添加模拟练习
+		exer.setState(1);
+		exer.setUpdateUserId(getCurUser().getId());
+		exer.setUpdateTime(new Date());
+		exerDao.add(exer);
+	}
+
+}

@@ -17,26 +17,26 @@ import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
-import com.wcpdoc.exam.core.entity.QuestionComment;
-import com.wcpdoc.exam.core.service.QuestionCommentService;
+import com.wcpdoc.exam.core.entity.ExerRmk;
+import com.wcpdoc.exam.core.service.ExerRmkService;
 
 /**
- * 试题评论控制层
+ * 模拟练习评论控制层
  * 
- * v1.0 zhanghc 2016-5-8上午11:00:00
+ * v1.0 chenyun 2021年8月31日上午9:54:28
  */
 @Controller
-@RequestMapping("/api/questionComment")
-public class ApiQuestionCommentController extends BaseController {
-	private static final Logger log = LoggerFactory.getLogger(ApiQuestionCommentController.class);
+@RequestMapping("/api/exerRmk")
+public class ApiExerRmkController extends BaseController {
+	private static final Logger log = LoggerFactory.getLogger(ApiExerRmkController.class);
 
 	@Resource
-	private QuestionCommentService questionCommentService;
-	
+	private ExerRmkService exerRmkService;
+
 	/**
-	 * 试题评论列表
+	 * 模拟练习评论列表
 	 * 
-	 * v1.0 zhanghc 2016-5-8上午11:00:00
+	 * v1.0 chenyun 2021年8月31日上午9:54:28
 	 * 
 	 * @param pageIn
 	 * @return PageOut
@@ -45,45 +45,45 @@ public class ApiQuestionCommentController extends BaseController {
 	@ResponseBody
 	public PageResult listpage() {
 		try {
-			PageOut listpage = questionCommentService.getListpage(new PageIn(request));
-			for(Map<String, Object> mapList : listpage.getList()){//敏感词过滤
+			PageOut listpage = exerRmkService.getListpage(new PageIn(request));
+			for (Map<String, Object> mapList : listpage.getList()) {// 敏感词过滤
 				mapList.put("content", mapList.get("content").toString());
 			}
 			return PageResultEx.ok().data(listpage);
 		} catch (Exception e) {
-			log.error("试题评论列表错误：", e);
+			log.error("模拟练习评论列表错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 添加试题评论
+	 * 添加模拟练习评论
 	 * 
-	 * v1.0 zhanghc 2016-5-8上午11:00:00
+	 * v1.0 chenyun 2021年8月31日上午9:54:28
 	 * 
-	 * @param questionComment
+	 * @param exerRmk
 	 * @return PageResult
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	public PageResult add(QuestionComment questionComment, Integer anonymity) {
+	public PageResult add(ExerRmk exerRmk, Integer anonymity) {
 		try {
-			questionCommentService.addEx(questionComment, anonymity);
+			exerRmkService.addEx(exerRmk, anonymity);
 			Map<String, Object> data = new HashMap<String, Object>();
 			return PageResultEx.ok().data(data);
 		} catch (MyException e) {
-			log.error("添加试题评论错误：{}", e.getMessage());
+			log.error("添加模拟练习评论错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("添加试题评论错误：", e);
+			log.error("添加模拟练习评论错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 删除试题评论
+	 * 删除模拟练习评论
 	 * 
-	 * v1.0 zhanghc 2016-5-8上午11:00:00
+	 * v1.0 chenyun 2021年8月31日上午9:54:28
 	 * 
 	 * @param id
 	 * @return PageResult
@@ -92,13 +92,13 @@ public class ApiQuestionCommentController extends BaseController {
 	@ResponseBody
 	public PageResult del(Integer id) {
 		try {
-			//questionCommentService.delEx(id);
+			// exerRmkService.delEx(id);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("删除试题评论错误：{}", e.getMessage());
+			log.error("删除模拟练习评论错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("删除试题评论错误：", e);
+			log.error("删除模拟练习评论错误：", e);
 			return PageResult.err();
 		}
 	}

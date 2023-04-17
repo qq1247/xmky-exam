@@ -54,14 +54,21 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 	}
 
 	@Override
+	public List<Integer> getIds(Integer questionTypeId) {
+		String sql = "SELECT ID FROM EXM_QUESTION WHERE STATE = 1 AND QUESTION_TYPE_ID = :QUESTION_TYPE_ID";
+		return getList(sql, new Object[] { questionTypeId }, Integer.class);
+	}
+
+	@Override
 	public List<Question> getList(Integer questionTypeId) {
 		String sql = "SELECT * FROM EXM_QUESTION WHERE STATE = 1 AND QUESTION_TYPE_ID = :QUESTION_TYPE_ID";
 		return getList(sql, new Object[] { questionTypeId });
 	}
-
+	
 	@Override
 	public List<Question> getListByDel() {
 		String sql = "SELECT QUESTION.* FROM EXM_QUESTION QUESTION WHERE QUESTION.STATE = 0 AND NOT EXISTS (SELECT 1 FROM EXM_EXAM_QUESTION Z WHERE Z.QUESTION_ID = QUESTION.ID)";
 		return getList(sql, new Object[] {});
 	}
+
 }

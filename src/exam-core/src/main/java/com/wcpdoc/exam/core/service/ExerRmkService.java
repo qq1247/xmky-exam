@@ -4,26 +4,26 @@ import java.util.List;
 import java.util.Map;
 
 import com.wcpdoc.core.service.BaseService;
-import com.wcpdoc.exam.core.entity.QuestionComment;
+import com.wcpdoc.exam.core.entity.ExerRmk;
 
 /**
- * 试题评论服务层接口
+ * 模拟练习评论服务层接口
  * 
  * v1.0 chenyun 2021年8月31日上午9:54:12
  */
-public interface QuestionCommentService extends BaseService<QuestionComment> {
+public interface ExerRmkService extends BaseService<ExerRmk> {
 
 	/**
-	 * 添加试题评论
+	 * 添加模拟练习评论
 	 * 
 	 * v1.0 chenyun 2021年8月31日下午1:55:07
-	 * @param questionComment
+	 * @param exerRmk
 	 * @param anonymity void
 	 */
-	void addEx(QuestionComment questionComment, Integer anonymity);
+	void addEx(ExerRmk exerRmk, Integer anonymity);
 
 	/**
-	 * 删除试题评论 
+	 * 删除模拟练习评论 
 	 * 
 	 * v1.0 chenyun 2021年8月31日上午9:54:28
 	 * @param id void
@@ -31,11 +31,11 @@ public interface QuestionCommentService extends BaseService<QuestionComment> {
 	void delEx(Integer id);
 	
 	/**
-	 * 获取试题评论列表
+	 * 获取模拟练习评论列表
 	 * 
 	 * v1.0 chenyun 2021年8月31日上午10:18:42
 	 * @param parentId
-	 * @return List<QuestionComment>
+	 * @return List<ExerRmk>
 	 */
 	List<Map<String, Object>> getList(Integer parentId);
 }

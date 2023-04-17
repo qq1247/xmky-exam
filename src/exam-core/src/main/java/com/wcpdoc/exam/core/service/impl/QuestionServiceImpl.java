@@ -525,6 +525,11 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 	}
 
 	@Override
+	public List<Integer> getIds(Integer questionTypeId) {
+		return questionDao.getIds(questionTypeId);
+	}
+
+	@Override
 	public List<Question> getList(Integer questionTypeId) {
 		return questionDao.getList(questionTypeId);
 	}

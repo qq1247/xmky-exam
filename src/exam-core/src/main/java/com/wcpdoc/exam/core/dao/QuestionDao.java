@@ -17,7 +17,16 @@ public interface QuestionDao extends BaseDao<Question>{
 	 * 
 	 * v1.0 zhanghc 2021年12月28日下午2:56:17
 	 * @param questionTypeId
-	 * @return List<Question>
+	 * @return List<Integer>
+	 */
+	List<Integer> getIds(Integer questionTypeId);
+	
+	/**
+	 * 获取试题列表
+	 * 
+	 * v1.0 zhanghc 2021年12月28日下午2:56:17
+	 * @param questionTypeId
+	 * @return List<Integer>
 	 */
 	List<Question> getList(Integer questionTypeId);
 	
@@ -28,4 +37,5 @@ public interface QuestionDao extends BaseDao<Question>{
 	 * @return List<Question>
 	 */
 	List<Question> getListByDel();
+
 }

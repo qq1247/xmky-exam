@@ -62,6 +62,15 @@ public interface QuestionService extends BaseService<Question>{
 	List<Question> getListByDel();
 
 	/**
+	 * 获取试题ids
+	 * 
+	 * v1.0 zhanghc 2022年5月23日下午1:39:14
+	 * @param questionTypeId
+	 * @return List<Integer>
+	 */
+	List<Integer> getIds(Integer questionTypeId);
+
+	/**
 	 * 获取试题列表
 	 * 
 	 * v1.0 zhanghc 2022年5月23日下午1:39:14

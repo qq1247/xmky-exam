@@ -13,16 +13,16 @@ import com.wcpdoc.core.util.HibernateUtil;
 import com.wcpdoc.core.util.SqlUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.core.util.SqlUtil.Order;
-import com.wcpdoc.exam.core.dao.QuestionCommentDao;
-import com.wcpdoc.exam.core.entity.QuestionComment;
+import com.wcpdoc.exam.core.dao.ExerRmkDao;
+import com.wcpdoc.exam.core.entity.ExerRmk;
 
 /**
- * 试题评论数据访问层实现
+ * 模拟练习评论数据访问层实现
  * 
  * v1.0 chenyun 2021年8月31日上午10:01:50
  */
 @Repository
-public class QuestionCommentDaoImpl extends RBaseDaoImpl<QuestionComment> implements QuestionCommentDao {
+public class ExerRmkDaoImpl extends RBaseDaoImpl<ExerRmk> implements ExerRmkDao {
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {

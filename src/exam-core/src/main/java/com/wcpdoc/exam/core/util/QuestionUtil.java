@@ -3,8 +3,6 @@ package com.wcpdoc.exam.core.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.wcpdoc.core.util.ValidateUtil;
-import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 
 /**
@@ -89,42 +87,6 @@ public class QuestionUtil {
 	 */
 	public static boolean hasQA(Question question) {
 		return question.getType() == 5;
-	}
-
-	/**
-	 * 3：不区分大小写（默认区分大小写）；
-	 * 
-	 * v1.0 zhanghc 2018年11月14日下午11:07:02
-	 * @param examQuestionEx
-	 * @return boolean
-	 */
-	public static boolean dxxbmg(ExamQuestion examQuestion) {
-		return ValidateUtil.isValid(examQuestion.getMarkOptions()) 
-				&& examQuestion.getMarkOptions().toString().contains("3");
-	}
-	
-	/**
-	 * 1：漏选得分（默认全对得分）
-	 * 
-	 * v1.0 zhanghc 2018年11月14日下午11:07:10
-	 * @param examQuestionEx
-	 * @return boolean
-	 */
-	public static boolean lxdf(ExamQuestion examQuestion) {
-		return ValidateUtil.isValid(examQuestion.getMarkOptions()) 
-				&& examQuestion.getMarkOptions().toString().contains("1");
-	}
-
-	/**
-	 * 2：答案无顺序（默认答案有前后顺序）
-	 * 
-	 * v1.0 zhanghc 2018年11月14日下午11:06:24
-	 * @param examQuestionEx
-	 * @return boolean
-	 */
-	public static boolean dawsx(ExamQuestion examQuestion) {
-		return ValidateUtil.isValid(examQuestion.getMarkOptions()) 
-				&& examQuestion.getMarkOptions().toString().contains("2");
 	}
 	
 	/**
