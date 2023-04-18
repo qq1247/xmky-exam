@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.wcpdoc.core.controller.BaseController;
 import com.wcpdoc.core.entity.PageIn;
+import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
@@ -62,12 +63,8 @@ public class ApiExerController extends BaseController {
 	public PageResult listpage() {
 		try {
 			PageIn pageIn = new PageIn(request);
-			if (pageIn.get("list") != null && pageIn.get("list").equals("1")) {
-				pageIn.addAttr("curUserId", getCurUser().getId());
-			}else{
-				pageIn.addAttr("readUserIds", getCurUser().getId());
-			}
-			return PageResultEx.ok().data(exerService.getListpage(pageIn));
+			PageOut pageOut = exerService.getListpage(pageIn);
+			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("模拟练习列表错误：", e);
 			return PageResult.err();
@@ -106,7 +103,7 @@ public class ApiExerController extends BaseController {
 	public PageResult del(Integer id) {
 		try {
 			Exer exer = exerService.getEntity(id);
-			exer.setState(2);
+			exer.setState(0);
 			exer.setUpdateTime(new Date());
 			exer.setUpdateUserId(getCurUser().getId());
 			exerService.update(exer);
@@ -141,7 +138,7 @@ public class ApiExerController extends BaseController {
 			if (!(exer.getStartTime().getTime() < curTime && curTime < exer.getEndTime().getTime())) {
 				throw new MyException("时间已过期");
 			}
-			Set<Object> userIdSet = new HashSet<>();
+			Set<Integer> userIdSet = new HashSet<>();
 			userIdSet.addAll(Arrays.asList(exer.getUserIds()));
 			if (ValidateUtil.isValid(userIdSet) && !userIdSet.contains(getCurUser().getId())) {
 				throw new MyException("无权限");
@@ -149,7 +146,7 @@ public class ApiExerController extends BaseController {
 			
 			// 试题获取
 			Map<String, Object> questionMap = new HashMap<>();
-			Question question = QuestionCache.getQuestion(questionId);// 已关联考试的试题不会改变，缓存起来加速查询。
+			Question question = QuestionCache.getQuestion(questionId);
 			questionMap.put("id", question.getId());
 			questionMap.put("type", question.getType());
 			questionMap.put("markType", question.getMarkType());
@@ -157,9 +154,9 @@ public class ApiExerController extends BaseController {
 			questionMap.put("markOptions", question.getMarkOptions());
 			questionMap.put("score", question.getScore());
 			questionMap.put("analysis", question.getAnalysis());
-			{
+			{// 试题选项
 				List<String> options = new ArrayList<>();
-				if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasMultipleChoice(question)) {// 如果是单选或多选，添加选项字段
+				if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasMultipleChoice(question)) {
 					List<QuestionOption> questionOptionList = QuestionCache.getOption(question.getId());
 					for (QuestionOption questionOption : questionOptionList) {
 						options.add(questionOption.getOptions());
@@ -167,7 +164,7 @@ public class ApiExerController extends BaseController {
 				}
 				questionMap.put("options", options);
 			}
-			{
+			{// 试题答案
 				List<String> answerList = new ArrayList<>();
 				List<QuestionAnswer> questionAnswerList = QuestionCache.getAnswer(question.getId());
 				for(QuestionAnswer answer : questionAnswerList){

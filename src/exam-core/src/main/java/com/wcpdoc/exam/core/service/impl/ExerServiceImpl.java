@@ -42,7 +42,7 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 
 	@Override
 	public void addEx(Exer exer) {
-		// 校验数据有效性
+		// 数据有效性校验
 		if (!ValidateUtil.isValid(exer.getName())) {
 			throw new MyException("参数错误：name");
 		}
@@ -72,11 +72,15 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 			}
 		}
 		
-		// 添加模拟练习
+		// 模拟练习添加
 		exer.setState(1);
 		exer.setUpdateUserId(getCurUser().getId());
 		exer.setUpdateTime(new Date());
-		exerDao.add(exer);
+		add(exer);
 	}
 
+	@Override
+	public List<Exer> getList(Integer questionTypeId) {
+		return exerDao.getlist(questionTypeId);
+	}
 }

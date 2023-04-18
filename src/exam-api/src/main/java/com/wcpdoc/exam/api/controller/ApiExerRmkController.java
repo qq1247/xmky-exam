@@ -1,5 +1,6 @@
 package com.wcpdoc.exam.api.controller;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +18,7 @@ import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.entity.ExerRmk;
 import com.wcpdoc.exam.core.service.ExerRmkService;
 
@@ -45,11 +47,21 @@ public class ApiExerRmkController extends BaseController {
 	@ResponseBody
 	public PageResult listpage() {
 		try {
-			PageOut listpage = exerRmkService.getListpage(new PageIn(request));
-			for (Map<String, Object> mapList : listpage.getList()) {// 敏感词过滤
-				mapList.put("content", mapList.get("content").toString());
+			PageOut pageOut = exerRmkService.getListpage(new PageIn(request));
+			for (Map<String, Object> map : pageOut.getList()) {
+				if (!ValidateUtil.isValid(map.get("likeUserIds").toString())) {
+					map.put("likeUserIds", new Integer[0]);
+				} else {
+					String likeUserIds = map.get("likeUserIds").toString();
+					String[] likeUserIdStrArr = likeUserIds.substring(1, likeUserIds.length() - 1).split(",");
+					Integer[] likeUserIdArr = new Integer[likeUserIdStrArr.length];
+					for (int i = 0; i < likeUserIdStrArr.length; i++) {
+						likeUserIdArr[i] = Integer.parseInt(likeUserIdStrArr[i]);
+					}
+					map.put("likeUserIds", likeUserIdArr);
+				}
 			}
-			return PageResultEx.ok().data(listpage);
+			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("模拟练习评论列表错误：", e);
 			return PageResult.err();
@@ -57,31 +69,32 @@ public class ApiExerRmkController extends BaseController {
 	}
 
 	/**
-	 * 添加模拟练习评论
+	 * 模拟练习评论添加
 	 * 
 	 * v1.0 chenyun 2021年8月31日上午9:54:28
 	 * 
 	 * @param exerRmk
+	 * @param anon 是否匿名（1：是；2：否）
 	 * @return PageResult
 	 */
 	@RequestMapping("/add")
 	@ResponseBody
-	public PageResult add(ExerRmk exerRmk, Integer anonymity) {
+	public PageResult add(ExerRmk exerRmk, Integer anon) {
 		try {
-			exerRmkService.addEx(exerRmk, anonymity);
+			exerRmkService.addEx(exerRmk, anon);
 			Map<String, Object> data = new HashMap<String, Object>();
 			return PageResultEx.ok().data(data);
 		} catch (MyException e) {
-			log.error("添加模拟练习评论错误：{}", e.getMessage());
+			log.error("模拟练习评论添加错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("添加模拟练习评论错误：", e);
+			log.error("模拟练习评论添加错误：", e);
 			return PageResult.err();
 		}
 	}
 
 	/**
-	 * 删除模拟练习评论
+	 * 模拟练习评论删除
 	 * 
 	 * v1.0 chenyun 2021年8月31日上午9:54:28
 	 * 
@@ -92,13 +105,40 @@ public class ApiExerRmkController extends BaseController {
 	@ResponseBody
 	public PageResult del(Integer id) {
 		try {
-			// exerRmkService.delEx(id);
+			// 模拟练习评论删除
+			ExerRmk exerRmk = exerRmkService.getEntity(id);
+			exerRmk.setState(0);
+			exerRmk.setUpdateTime(new Date());
+			exerRmk.setUpdateUserId(getCurUser().getId());
+			exerRmkService.update(exerRmk);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("删除模拟练习评论错误：{}", e.getMessage());
+			log.error("模拟练习评论删除错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("删除模拟练习评论错误：", e);
+			log.error("模拟练习评论删除错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 模拟练习评论点赞
+	 * 
+	 * v1.0 zhanghc 2023年4月17日下午7:52:03
+	 * @param questionId
+	 * @return PageResult
+	 */
+	@RequestMapping("/like")
+	@ResponseBody
+	public PageResult like(Integer id) {
+		try {
+			exerRmkService.like(id);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("模拟练习评论点赞错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("模拟练习评论点赞错误：", e);
 			return PageResult.err();
 		}
 	}

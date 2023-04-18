@@ -1,8 +1,5 @@
 package com.wcpdoc.exam.core.dao.impl;
 
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.stereotype.Repository;
 
 import com.wcpdoc.core.dao.impl.RBaseDaoImpl;
@@ -11,8 +8,8 @@ import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.HibernateUtil;
 import com.wcpdoc.core.util.SqlUtil;
-import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.core.util.SqlUtil.Order;
+import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.ExerRmkDao;
 import com.wcpdoc.exam.core.entity.ExerRmk;
 
@@ -26,29 +23,17 @@ public class ExerRmkDaoImpl extends RBaseDaoImpl<ExerRmk> implements ExerRmkDao 
 
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
-		String sql = "SELECT QUESTION_COMMENT.ID, QUESTION_COMMENT.CONTENT, QUESTION_COMMENT.CREATE_USER_ID, "
-				+ "USER.NAME AS CREATE_USER_NAME, USER.HEAD_FILE_ID AS CREATE_USER_HEAD_FILE_ID, QUESTION_COMMENT.CREATE_TIME "
-				+ "FROM EXM_QUESTION_COMMENT QUESTION_COMMENT "
-				+ "LEFT JOIN SYS_USER USER ON USER.ID = QUESTION_COMMENT.CREATE_USER_ID ";
+		String sql = "SELECT EXER_RMK.ID, EXER_RMK.CONTENT, EXER_RMK.LIKE_USER_IDS "// LIKE_USER_IDS用于当前用户已点赞时，选中点赞图标
+				+ "QUESTION_COMMENT.UPDATE_USER_ID, USER.NAME AS UPDATE_USER_NAME "// UPDATE_USER_ID, UPDATE_USER_NAME，页面显示是谁，没有就是匿名
+				+ "FROM EXM_EXER_RMK EXER_RMK "
+				+ "LEFT JOIN SYS_USER USER ON USER.ID = EXER_RMK.UPDATE_USER_ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("content")), "QUESTION_COMMENT.CONTENT LIKE :CONTENT", "%" + pageIn.get("content") + "%")
-				.addWhere(pageIn.get("questionId", Integer.class) != null, "QUESTION_COMMENT.QUESTION_ID = :QUESTION_ID", pageIn.get("questionId", Integer.class))
-				.addWhere(pageIn.get("parentId", Integer.class) != null, "QUESTION_COMMENT.PARENT_ID = :PARENT_ID", pageIn.get("parentId", Integer.class))
-				.addWhere(pageIn.get("parentId", Integer.class) == null, "QUESTION_COMMENT.PARENT_ID = 0" )
-				.addWhere("QUESTION_COMMENT.STATE = 1")
-				.addOrder("QUESTION_COMMENT.CREATE_TIME", Order.DESC);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("questionId", Integer.class)), "EXER_RMK.QUESTION_ID = :QUESTION_ID", pageIn.get("questionId", Integer.class))
+				.addWhere("EXER_RMK.STATE = 1")// 只看有效数据
+				.addOrder("EXER_RMK.LIKE_NUM", Order.DESC)// 按评论数倒序
+				.addOrder("EXER_RMK.UPDATE_TIME", Order.DESC);// 在按更新时间倒序
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(), "createTime", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;
 	}
-
-	@Override
-	public List<Map<String, Object>> getList(Integer parentId) {
-		String sql = "SELECT PARENT_QUESTION_COMMENT.ID, PARENT_QUESTION_COMMENT.CONTENT, PARENT_QUESTION_COMMENT.CREATE_USER_ID,"
-				   + "(SELECT USER.NAME FROM SYS_USER USER WHERE USER.ID = PARENT_QUESTION_COMMENT.CREATE_USER_ID) AS CREATE_USER_NAME, "
-				   + "PARENT_QUESTION_COMMENT.CREATE_TIME AS CREATE_TIME "
-				   + "FROM EXM_QUESTION_COMMENT PARENT_QUESTION_COMMENT WHERE "
-				   + "PARENT_QUESTION_COMMENT.PARENT_ID = :PARENT_ID AND PARENT_QUESTION_COMMENT.STATE = 1 ";
-		return getMapList(sql, new Object[] { parentId });
-	}	
 }

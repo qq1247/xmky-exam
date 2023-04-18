@@ -1,8 +1,5 @@
 package com.wcpdoc.exam.core.service;
 
-import java.util.List;
-import java.util.Map;
-
 import com.wcpdoc.core.service.BaseService;
 import com.wcpdoc.exam.core.entity.ExerRmk;
 
@@ -14,28 +11,20 @@ import com.wcpdoc.exam.core.entity.ExerRmk;
 public interface ExerRmkService extends BaseService<ExerRmk> {
 
 	/**
-	 * 添加模拟练习评论
+	 * 模拟练习评论添加
 	 * 
 	 * v1.0 chenyun 2021年8月31日下午1:55:07
 	 * @param exerRmk
-	 * @param anonymity void
+	 * @param anon 是否匿名（1：是；2：否） 
+	 * void
 	 */
-	void addEx(ExerRmk exerRmk, Integer anonymity);
+	void addEx(ExerRmk exerRmk, Integer anon);
 
 	/**
-	 * 删除模拟练习评论 
+	 * 模拟练习评论点赞
 	 * 
-	 * v1.0 chenyun 2021年8月31日上午9:54:28
+	 * v1.0 zhanghc 2023年4月17日下午7:53:32
 	 * @param id void
 	 */
-	void delEx(Integer id);
-	
-	/**
-	 * 获取模拟练习评论列表
-	 * 
-	 * v1.0 chenyun 2021年8月31日上午10:18:42
-	 * @param parentId
-	 * @return List<ExerRmk>
-	 */
-	List<Map<String, Object>> getList(Integer parentId);
+	void like(Integer id);
 }

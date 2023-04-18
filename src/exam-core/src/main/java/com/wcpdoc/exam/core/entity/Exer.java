@@ -97,7 +97,7 @@ public class Exer {
 			return new Integer[0];
 		}
 
-		String[] userIdStrArr = userIds.split(",");
+		String[] userIdStrArr = userIds.substring(1, userIds.length() - 1).split(",");
 		Integer[] userIdArr = new Integer[userIdStrArr.length];
 		for (int i = 0; i < userIdStrArr.length; i++) {
 			userIdArr[i] = Integer.parseInt(userIdStrArr[i]);
@@ -111,7 +111,7 @@ public class Exer {
 			return;
 		}
 
-		this.userIds = StringUtil.join(userIds);
+		this.userIds = String.format(",%s,", StringUtil.join(userIds));
 	}
 
 	/** 状态（0：删除；1：正常） */
