@@ -98,6 +98,7 @@ async function next() {
 <style lang="scss" scoped>
 .mark-setting {
     flex: 1;
+    overflow: visible;
     .el-alert {
         padding: 0;
         height: 24px;

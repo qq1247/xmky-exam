@@ -12,17 +12,8 @@
         @change="emit('update:modelValue', selectedValue)"
         >
 
-        <!-- 工具条 -->
-        <el-button v-if="multiple" type="info" link @click="selectAll">
-            <span class="iconfont icon-quanxuan">全选</span>
-        </el-button>
-        <el-button v-if="multiple" type="info" link @click="invertAll">
-            <span class="iconfont icon-list-row">反选</span>
-        </el-button>
-
         <!-- 搜索框 -->
         <el-input
-            v-if="multiple"
             v-model="listpage.searchParmValue" 
             @click.stop="" 
             @input="() => {listpage.curPage = 1; query()}"
@@ -32,6 +23,31 @@
                 <span class="iconfont icon-search"></span>
             </template>
         </el-input>
+
+        <div style="display: flex;justify-content: space-between;">
+            <!-- 工具条 -->
+            <div>
+                <el-button v-if="multiple" type="info" link @click="selectAll">
+                    <span class="iconfont icon-quanxuan">全选</span>
+                </el-button>
+                <el-button v-if="multiple" type="info" link @click="invertAll">
+                    <span class="iconfont icon-list-row">反选</span>
+                </el-button>
+            </div>
+            <!-- 分页条件 -->
+            <el-pagination small
+                v-model:current-page="listpage.curPage" 
+                v-model:page-size="listpage.pageSize" 
+                :total="listpage.total" 
+                background
+                layout="prev, pager, next, sizes" 
+                :page-sizes="[5, 10, 100]" 
+                @size-change="listpage.curPage = 1; query()"
+                @current-change="query"
+                @prev-click="query"
+                @next-click="query"
+            />
+        </div>
 
         <!-- 选项 -->
         <el-option v-for="option in listpage.options" 
@@ -48,20 +64,6 @@
             value="暂无数据"
             disabled>
         </el-option>
-
-        <!-- 分页条件 -->
-        <el-pagination 
-            v-model:current-page="listpage.curPage" 
-            v-model:page-size="listpage.pageSize" 
-            :total="listpage.total" 
-            background
-            layout="prev, pager, next, sizes" 
-            :page-sizes="[5, 10, 100]" 
-            @size-change="listpage.curPage = 1; query()"
-            @current-change="query"
-            @prev-click="query"
-            @next-click="query"
-        />
     </el-select>
 </template>
 
@@ -148,9 +150,7 @@ function invertAll() {
     flex: 1;
 
     .el-button {
-        padding: 10px 0px;
         margin-left: 10px;
-        padding-bottom: 0;
 
         span {
             font-size: 14px;
@@ -189,11 +189,11 @@ function invertAll() {
     }
 
     :deep(.el-select-dropdown__wrap) {
-        max-height: 460px;
+        max-height: 435px;// 当分页是100，数据超过10个的时候，显示10个半，表示下面还有数据
     }
 
     :deep(.el-pagination) {
-        margin-top: 8px;
+        margin-right: 10px;
     }
 }
 </style>
