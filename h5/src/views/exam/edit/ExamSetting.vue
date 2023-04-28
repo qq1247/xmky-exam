@@ -36,10 +36,8 @@
             </el-form-item>
             <el-form-item v-if="form.genType === 1" label="防作弊：" prop="sxes">
                 <el-checkbox-group v-model="form.sxes">
-                    <el-checkbox :label="1" key="1">试题乱序
-                    </el-checkbox>
-                    <el-checkbox :label="2" key="2">选项乱序
-                    </el-checkbox>
+                    <el-checkbox :label="1" key="1">试题乱序</el-checkbox>
+                    <el-checkbox :label="2" key="2">选项乱序</el-checkbox>
                 </el-checkbox-group>
             </el-form-item>
             <!-- <el-form-item v-if="form.genType === 1" label="匿名阅卷：" prop="anonState">
@@ -73,7 +71,6 @@ import type { FormInstance, FormRules } from 'element-plus'
 import { useExamStore, type ExamQuestion } from '@/stores/exam';
 import { useDictStore } from '@/stores/dict';
 import dayjs from 'dayjs';
-import Decimal from 'decimal.js';
 
 // 定义变量
 defineExpose({ next });

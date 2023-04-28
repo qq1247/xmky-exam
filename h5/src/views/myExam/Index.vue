@@ -125,7 +125,7 @@ async function query() {
 }
 
 // 考试进入
-async function examIn(myExam : any) {
+async function examIn(myExam: any) {
     if (myExam.state !== 3) {
         let { data: { data } } = await http.post("login/sysTime", {  })
         let curTime = dayjs(data, 'YYYY-MM-DD HH:mm:ss').toDate()

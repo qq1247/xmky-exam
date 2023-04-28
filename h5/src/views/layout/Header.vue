@@ -8,6 +8,8 @@
             <el-menu default-active="/" mode="horizontal" :router="true" class="header-top-menu">
                 <el-menu-item index="/">首页</el-menu-item>
                 <el-menu-item v-if="userStore.roles.includes('admin')" index="/questionType">题库</el-menu-item>
+                <el-menu-item v-if="userStore.roles.includes('admin')" index="/exer">练习</el-menu-item>
+                <el-menu-item v-if="userStore.roles.includes('user')" index="/myExer">练习</el-menu-item>
                 <el-menu-item v-if="userStore.roles.includes('admin')" index="/exam">考试</el-menu-item>
                 <el-sub-menu v-if="userStore.roles.includes('admin')" index="/user">
                     <template #title>用户</template>
@@ -22,7 +24,7 @@
                     <el-menu-item index="/cron">定时任务</el-menu-item>
                     <el-menu-item index="/dict">数据字典</el-menu-item>
                 </el-sub-menu>
-                <el-menu-item v-if="userStore.roles.includes('user')" index="/myExam">我的考试</el-menu-item>
+                <el-menu-item v-if="userStore.roles.includes('user')" index="/myExam">考试</el-menu-item>
             </el-menu>
             <el-dropdown @command="dropdownCmd" :teleported="false" class="header-top-username">
                 <span class="el-dropdown-link">

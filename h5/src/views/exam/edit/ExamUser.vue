@@ -5,7 +5,7 @@
                 <Select
                     v-model="form.examUserIds"
                     url="user/listpage"
-                    :params="{state: 1, type: 1}"
+                    :params="{ state: 1 }"
                     search-parm-name="name"
                     option-label="name"
                     option-value="id"
@@ -19,24 +19,6 @@
                     </template>
                 </Select>
             </el-form-item>
-            <!-- <el-form-item v-if="form.markType === 2" label="协助阅卷：" prop="markUserIds">
-                <Select
-                    v-model="form.markUserIds"
-                    url="user/listpage"
-                    :params="{state: 1, type: 2}"
-                    search-parm-name="name"
-                    option-label="name"
-                    option-value="id"
-                    :options="markUsers"
-                    :multiple="true"
-                    clearable
-                    searchPlaceholder="请输入子管理员名称进行筛选"
-                    >
-                    <template #default="{ option }">
-                        {{ option.name }} - {{option.orgName}}
-                    </template>
-                </Select>
-            </el-form-item> -->
         </el-form>
     </el-card>
 </template>
@@ -58,7 +40,6 @@ const formRules = reactive<FormRules>({// 表单校验规则
     ],
 })
 const examUsers = ref([] as any[]) // 考试用户
-const markUsers = ref([]) // 协助用户
 
 // 组件挂载完成后，执行如下方法
 onMounted(async () => {
@@ -68,6 +49,7 @@ onMounted(async () => {
         while (true) {
             let { data: { data } } = await http.post("user/listpage", { 
                 ids: form.examUserIds.join(),
+                //state: 1, 只查询1就丢了2的数据
                 curPage: curPage++,
                 pageSize: pageSize,
             })
@@ -78,12 +60,6 @@ onMounted(async () => {
             }
         }
     }
-
-
-    // if (form.markUserIds.length) {
-    //     let { data: { data } } = await http.post("user/listpage", { ids: form.markUserIds.join() })
-    //     markUsers.value = data.list
-    // }
 })
 
 // 下一步
@@ -98,6 +74,7 @@ async function next() {
 <style lang="scss" scoped>
 .mark-setting {
     flex: 1;
+    overflow: visible;
     .el-alert {
         padding: 0;
         height: 24px;

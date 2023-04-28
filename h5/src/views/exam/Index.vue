@@ -87,13 +87,13 @@ import http from "@/request"
 import Griddata from '@/components/Griddata.vue';
 import Gridadd from '@/components/Gridadd.vue';
 import { useDictStore } from '@/stores/dict';
-import router from '@/router';
 import type { Menu } from '@/stores/exam';
 import dayjs from 'dayjs';
 import { ElMessage } from 'element-plus';
 
 //  定义变量
 const route = useRoute()
+const router = useRouter()
 const dictStore = useDictStore()// 字典缓存
 const queryForm = reactive({// 查询表单
     name: '',
