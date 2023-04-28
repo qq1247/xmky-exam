@@ -16,11 +16,17 @@ public interface ExerService extends BaseService<Exer> {
 	 * 试题模拟添加
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
-	 * 
-	 * @param id
 	 * void
 	 */
-	void addEx(Exer sim);
+	void addEx(Exer exer);
+	
+	/**
+	 * 试题模拟修改
+	 * 
+	 * v1.0 chenyun 2021-03-02 13:43:21
+	 * @param exer void
+	 */
+	void updateEx(Exer exer);
 
 	/**
 	 * 模拟练习列表

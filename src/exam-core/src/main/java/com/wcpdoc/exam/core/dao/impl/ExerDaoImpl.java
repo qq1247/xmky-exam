@@ -1,5 +1,6 @@
 package com.wcpdoc.exam.core.dao.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -31,12 +32,20 @@ public class ExerDaoImpl extends RBaseDaoImpl<Exer> implements ExerDao {
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT EXER.ID AS ID, EXER.NAME, EXER.START_TIME, EXER.END_TIME, "
-				+ "QUESTION_TYPE_OPEN.RMK_STATE, EXER.USER_IDS, EXER.STATE "
+				+ "EXER.RMK_STATE, EXER.USER_IDS, "
+				+ "QUESTION_TYPE.NAME AS QUESTION_TYPE_NAME "
 				+ "FROM EXM_EXER EXER "
 				+ "LEFT JOIN EXM_QUESTION_TYPE QUESTION_TYPE ON EXER.QUESTION_TYPE_ID = QUESTION_TYPE.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("questionTypeId", Integer.class)) , "EXER.QUESTION_TYPE_ID = :QUESTION_TYPE_ID", pageIn.get("questionTypeId", Integer.class))
-			   .addOrder("EXER.START_TIME", Order.DESC);
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("questionTypeId", Integer.class)) , 
+						"EXER.QUESTION_TYPE_ID = :QUESTION_TYPE_ID", pageIn.get("questionTypeId", Integer.class))
+				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), // 查询某个用户
+						"(EXER.USER_IDS LIKE :USER_IDS OR EXER.USER_IDS IS NULL)", String.format("%%,%s,%%", pageIn.get("curUserId", Integer.class)))
+				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), // 查询某个用户有效期内的练习
+						"EXER.START_TIME <= :START_TIME AND :END_TIME <= EXER.END_TIME", new Date(), new Date())
+				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "EXER.NAME LIKE :NAME", String.format("%%%s%%", pageIn.get("name")))
+				.addWhere("EXER.STATE = 1")
+				.addOrder("EXER.START_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 				HibernateUtil.formatDate(pageOut.getList(), "startTime", DateUtil.FORMAT_DATE_TIME);
 				HibernateUtil.formatDate(pageOut.getList(), "endTime", DateUtil.FORMAT_DATE_TIME);
@@ -44,8 +53,8 @@ public class ExerDaoImpl extends RBaseDaoImpl<Exer> implements ExerDao {
 	}
 
 	@Override
-	public List<Exer> getlist(Integer questionTypeId) {
-		String sql = "SELECT * FROM EXM_SIM WHERE QUESTION_TYPE_ID = :QUESTION_TYPE_ID AND STATE = 1 ";
+	public List<Exer> getList(Integer questionTypeId) {
+		String sql = "SELECT * FROM EXM_EXER WHERE QUESTION_TYPE_ID = :QUESTION_TYPE_ID AND STATE = 1 ";
 		return getList(sql, new Object[] { questionTypeId });
 	}
 }

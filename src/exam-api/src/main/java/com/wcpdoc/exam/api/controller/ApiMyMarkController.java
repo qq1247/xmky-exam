@@ -237,34 +237,6 @@ public class ApiMyMarkController extends BaseController {
 		}
 	}
 	
-//	/**
-//	 * 分配试卷
-//	 * 
-//	 * v1.0 zhanghc 2023年2月23日下午2:31:16
-//	 * @param examId 考试ID
-//	 * @param num 分配份数
-//	 * @return PageResult
-//	 */
-//	@RequestMapping("/assign")
-//	@ResponseBody
-//	public PageResult assign(Integer examId, Integer num) {
-//		try {
-//			if (!AutoMarkCache.tryReadLock(examId, 2000)) {
-//				throw new MyException("尝试加读锁失败");
-//			}
-//			myMarkService.assign(examId, num);
-//			return PageResultEx.ok();
-//		} catch (MyException e) {
-//			log.error("分配试卷错误：{}", e.getMessage());
-//			return PageResult.err().msg(e.getMessage());
-//		} catch (Exception e) {
-//			log.error("分配试卷错误：", e);
-//			return PageResult.err();
-//		} finally {
-//			AutoMarkCache.releaseReadLock(examId);
-//		}
-//	}
-	
 	/**
 	 * 打分
 	 * 

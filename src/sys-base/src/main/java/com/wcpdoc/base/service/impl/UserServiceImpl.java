@@ -1,6 +1,5 @@
 package com.wcpdoc.base.service.impl;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -14,7 +13,6 @@ import com.wcpdoc.base.entity.User;
 import com.wcpdoc.base.service.ParmService;
 import com.wcpdoc.base.service.UserExService;
 import com.wcpdoc.base.service.UserService;
-import com.wcpdoc.core.constant.ConstantManager;
 import com.wcpdoc.core.dao.BaseDao;
 import com.wcpdoc.core.exception.MyException;
 import com.wcpdoc.core.service.OnlineUserService;
@@ -88,34 +86,6 @@ public class UserServiceImpl extends BaseServiceImp<User> implements UserService
 	@Override
 	public List<User> getList(Integer orgId) {
 		return userDao.getList(orgId);
-	}
-
-	@Override
-	public void roleUpdate(Integer id, String[] roles) {
-		// 校验数据有效性
-		if (id == null) {
-			throw new MyException("参数错误：id");
-		}
-		User user = userDao.getEntity(id);
-		if(user == null){
-			throw new MyException("参数错误：id");
-		}
-		if (!ValidateUtil.isValid(roles) && roles.length != 1) {
-			throw new MyException("参数错误：roles");
-		}
-		
-		// 修改角色
-		user.setType(1);
-		if (ConstantManager.SUB_ADMIN_LOGIN_NAME.equals(roles[0])) {
-//			user.setRoles(String.format("%s,%s", ConstantManager.SUB_ADMIN_LOGIN_NAME, user.getRoles()));
-//			user.setType(2);
-		}
-		user.setUpdateTime(new Date());
-		user.setUpdateUserId(getCurUser().getId());
-		userDao.update(user);
-
-		// 扩展处理
-		userExService.roleUpdate(user.getId());
 	}
 
 	@Override

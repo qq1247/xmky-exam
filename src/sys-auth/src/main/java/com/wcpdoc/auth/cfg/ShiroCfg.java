@@ -59,6 +59,7 @@ public class ShiroCfg {
 		
 		// 用户权限
 		filterChainMap.put("/api/myExam/*", "jwt,anyRolesEx[user]");// 我的考试
+		filterChainMap.put("/api/myExer/*", "jwt,anyRolesEx[user]");// 我的练习
 		filterChainMap.put("/api/report/user/home", "jwt,anyRolesEx[user]");// 用户首页
 		
 		// 管理员权限

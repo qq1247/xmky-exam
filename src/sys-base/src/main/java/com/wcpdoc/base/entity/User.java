@@ -54,8 +54,6 @@ public class User implements LoginUser {
 	private Integer orgId;
 	@Column(name = "STATE")
 	private Integer state;
-	@Column(name = "TYPE")
-	private Integer type;
 	@Column(name = "HEAD_FILE_ID")
 	private Integer headFileId;
 
@@ -155,16 +153,6 @@ public class User implements LoginUser {
 
 	public void setEmail(String email) {
 		this.email = email;
-	}
-
-	/** 1：用户；2：子管理员 */
-	public Integer getType() {
-		return type;
-	}
-
-	/** 1：用户；2：子管理员 */
-	public void setType(Integer type) {
-		this.type = type;
 	}
 
 	public Integer getHeadFileId() {

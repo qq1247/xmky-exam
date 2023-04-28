@@ -8,15 +8,6 @@ package com.wcpdoc.base.service;
 public interface UserExService {
 
 	/**
-	 * 修改角色
-	 * 
-	 * v1.0 zhanghc 2021年10月15日下午5:58:08
-	 * @param userId 
-	 * void
-	 */
-	void roleUpdate(Integer userId);
-
-	/**
 	 * 导入用户表
 	 * 
 	 * v1.0 chenyun 2021年3月4日下午5:29:49 void

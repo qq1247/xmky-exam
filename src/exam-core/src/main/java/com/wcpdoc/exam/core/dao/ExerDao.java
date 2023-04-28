@@ -19,5 +19,5 @@ public interface ExerDao extends RBaseDao<Exer> {
 	 * @param questionTypeId
 	 * @return List<Exer>
 	 */
-	List<Exer> getlist(Integer questionTypeId);
+	List<Exer> getList(Integer questionTypeId);
 }

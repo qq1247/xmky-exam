@@ -59,15 +59,15 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 			throw new MyException("参数错误：rmkState");
 		}
 		
-		List<Exer> exerList = exerDao.getlist(exer.getQuestionTypeId());
+		List<Exer> exerList = exerDao.getList(exer.getQuestionTypeId());
 		for (Exer cur : exerList) {
-			if (exer.getStartTime().getTime() < cur.getStartTime().getTime() && cur.getStartTime().getTime() < exer.getEndTime().getTime()) {
+			if (exer.getStartTime().getTime() <= cur.getStartTime().getTime() && cur.getStartTime().getTime() <= exer.getEndTime().getTime()) {
 				throw new MyException("该时间段已存在");
 			}
-			if (exer.getStartTime().getTime() < cur.getEndTime().getTime() && cur.getEndTime().getTime() < exer.getEndTime().getTime()) {
+			if (exer.getStartTime().getTime() <= cur.getEndTime().getTime() && cur.getEndTime().getTime() <= exer.getEndTime().getTime()) {
 				throw new MyException("该时间段已存在");
 			}
-			if (exer.getStartTime().getTime() > cur.getStartTime().getTime() && cur.getEndTime().getTime() > exer.getEndTime().getTime() ) {
+			if (exer.getStartTime().getTime() >= cur.getStartTime().getTime() && cur.getEndTime().getTime() >= exer.getEndTime().getTime() ) {
 				throw new MyException("该时间段已存在");
 			}
 		}
@@ -78,9 +78,64 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 		exer.setUpdateTime(new Date());
 		add(exer);
 	}
+	
+	@Override
+	public void updateEx(Exer exer) {
+		// 数据有效性校验
+		if (!ValidateUtil.isValid(exer.getId())) {
+			throw new MyException("参数错误：id");
+		}
+		if (!ValidateUtil.isValid(exer.getName())) {
+			throw new MyException("参数错误：name");
+		}
+		if (!ValidateUtil.isValid(exer.getQuestionTypeId())) {
+			throw new MyException("参数错误：questionTypeId");
+		}
+		if (!ValidateUtil.isValid(exer.getStartTime())) {
+			throw new MyException("参数错误：startTime");
+		}
+		if (!ValidateUtil.isValid(exer.getEndTime())) {
+			throw new MyException("参数错误：endTime");
+		}
+		if (!ValidateUtil.isValid(exer.getRmkState())) {
+			throw new MyException("参数错误：rmkState");
+		}
+		Exer entity = getEntity(exer.getId());
+		if (entity.getState() == 0) {
+			throw new MyException("已删除");
+		}
+		
+		List<Exer> exerList = exerDao.getList(exer.getQuestionTypeId());
+		for (Exer cur : exerList) {
+			if (cur.getId().intValue() == exer.getId().intValue()) {// 如果切换题库，该行无效；如果同一个题库，校验的时候排除自己。
+				continue;
+			}
+			if (exer.getStartTime().getTime() <= cur.getStartTime().getTime() && cur.getStartTime().getTime() <= exer.getEndTime().getTime()) {
+				throw new MyException("该时间段已存在");
+			}
+			if (exer.getStartTime().getTime() <= cur.getEndTime().getTime() && cur.getEndTime().getTime() <= exer.getEndTime().getTime()) {
+				throw new MyException("该时间段已存在");
+			}
+			if (exer.getStartTime().getTime() >= cur.getStartTime().getTime() && cur.getEndTime().getTime() >= exer.getEndTime().getTime() ) {
+				throw new MyException("该时间段已存在");
+			}
+		}
+		
+		// 模拟练习修改
+		entity.setName(exer.getName());
+		entity.setQuestionTypeId(exer.getQuestionTypeId());
+		entity.setStartTime(exer.getStartTime());
+		entity.setEndTime(exer.getEndTime());
+		entity.setUserIds(exer.getUserIds());
+		//entity.setState(exer.getState());
+		entity.setRmkState(exer.getRmkState());
+		entity.setUpdateUserId(getCurUser().getId());
+		entity.setUpdateTime(new Date());
+		update(entity);
+	}
 
 	@Override
 	public List<Exer> getList(Integer questionTypeId) {
-		return exerDao.getlist(questionTypeId);
+		return exerDao.getList(questionTypeId);
 	}
 }

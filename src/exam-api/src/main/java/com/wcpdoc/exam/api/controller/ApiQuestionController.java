@@ -213,13 +213,16 @@ public class ApiQuestionController extends BaseController {
 			List<QuestionAnswer> questionAnswerList = questionAnswerService.getList(question.getId());
 			List<Object> answers = new ArrayList<>();
 			List<BigDecimal> scores = new ArrayList<>();
-			for(QuestionAnswer answer : questionAnswerList){
-				if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasTrueFalse(question) || (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question))) {
+			for(QuestionAnswer answer : questionAnswerList) {
+				if (QuestionUtil.hasSingleChoice(question) 
+						|| QuestionUtil.hasTrueFalse(question) 
+						|| (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question))) {
 					answers.add(answer.getAnswer());
 				} else if (QuestionUtil.hasMultipleChoice(question)) {
 					Collections.addAll(answers, answer.getAnswer().split(","));
 					scores.add(answer.getScore());
-				} else if (QuestionUtil.hasFillBlank(question) || (QuestionUtil.hasQA(question) && QuestionUtil.hasObjective(question))) {
+				} else if (QuestionUtil.hasFillBlank(question) 
+						|| (QuestionUtil.hasQA(question) && QuestionUtil.hasObjective(question))) {
 					answers.add(answer.getAnswer().split("\n"));
 					scores.add(answer.getScore());
 				}

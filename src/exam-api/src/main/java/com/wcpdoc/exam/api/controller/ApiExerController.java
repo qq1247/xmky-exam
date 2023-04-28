@@ -1,14 +1,7 @@
 package com.wcpdoc.exam.api.controller;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -24,16 +17,11 @@ import com.wcpdoc.core.entity.PageOut;
 import com.wcpdoc.core.entity.PageResult;
 import com.wcpdoc.core.entity.PageResultEx;
 import com.wcpdoc.core.exception.MyException;
-import com.wcpdoc.core.util.ValidateUtil;
-import com.wcpdoc.exam.core.cache.QuestionCache;
+import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.exam.core.entity.Exer;
-import com.wcpdoc.exam.core.entity.Question;
-import com.wcpdoc.exam.core.entity.QuestionAnswer;
-import com.wcpdoc.exam.core.entity.QuestionOption;
 import com.wcpdoc.exam.core.service.ExerService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
-import com.wcpdoc.exam.core.util.QuestionUtil;
 
 /**
  * 模拟练习控制层
@@ -64,6 +52,15 @@ public class ApiExerController extends BaseController {
 		try {
 			PageIn pageIn = new PageIn(request);
 			PageOut pageOut = exerService.getListpage(pageIn);
+			for (Map<String, Object> map : pageOut.getList()) {
+				if (map.get("userIds") == null) {
+					map.put("userIds", new Integer[0]);
+				} else {
+					Exer exer = new Exer();
+					exer.setUserIds(map.get("userIds").toString());
+					map.put("userIds", exer.getUserIds());
+				}
+			}
 			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
 			log.error("模拟练习列表错误：", e);
@@ -82,6 +79,27 @@ public class ApiExerController extends BaseController {
 	public PageResult add(Exer exer) {
 		try {
 			exerService.addEx(exer);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("模拟练习添加错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("模拟练习添加错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 模拟练习修改
+	 * 
+	 * v1.0 chenyun 2021-03-02 13:43:21
+	 * @return pageOut
+	 */
+	@RequestMapping("/edit")
+	@ResponseBody
+	public PageResult edit(Exer exer) {
+		try {
+			exerService.updateEx(exer);
 			return PageResult.ok();
 		} catch (MyException e) {
 			log.error("模拟练习添加错误：{}", e.getMessage());
@@ -118,115 +136,31 @@ public class ApiExerController extends BaseController {
 	}
 	
 	/**
-	 * 模拟练习试题
+	 * 模拟练习获取
 	 * 
-	 * v1.0 zhanghc 2021年7月1日下午2:18:05
-	 * @param id
-	 * @param questionId
-	 * @return PageResult
+	 * v1.0 chenyun 2021-03-02 13:43:21
+	 * @return pageOut
 	 */
-	@RequestMapping("/question")
+	@RequestMapping("/get")
 	@ResponseBody
-	public PageResult question(Integer id, Integer questionId) {
+	public PageResult get(Integer id) {
 		try {
-			// 数据有效性校验
 			Exer exer = exerService.getEntity(id);
-			if (exer.getState() == 0) {
-				throw new MyException("无权限");
-			}
-			long curTime = System.currentTimeMillis();
-			if (!(exer.getStartTime().getTime() < curTime && curTime < exer.getEndTime().getTime())) {
-				throw new MyException("时间已过期");
-			}
-			Set<Integer> userIdSet = new HashSet<>();
-			userIdSet.addAll(Arrays.asList(exer.getUserIds()));
-			if (ValidateUtil.isValid(userIdSet) && !userIdSet.contains(getCurUser().getId())) {
-				throw new MyException("无权限");
-			}
-			
-			// 试题获取
-			Map<String, Object> questionMap = new HashMap<>();
-			Question question = QuestionCache.getQuestion(questionId);
-			questionMap.put("id", question.getId());
-			questionMap.put("type", question.getType());
-			questionMap.put("markType", question.getMarkType());
-			questionMap.put("title", question.getTitle());
-			questionMap.put("markOptions", question.getMarkOptions());
-			questionMap.put("score", question.getScore());
-			questionMap.put("analysis", question.getAnalysis());
-			{// 试题选项
-				List<String> options = new ArrayList<>();
-				if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasMultipleChoice(question)) {
-					List<QuestionOption> questionOptionList = QuestionCache.getOption(question.getId());
-					for (QuestionOption questionOption : questionOptionList) {
-						options.add(questionOption.getOptions());
-					}
-				}
-				questionMap.put("options", options);
-			}
-			{// 试题答案
-				List<String> answerList = new ArrayList<>();
-				List<QuestionAnswer> questionAnswerList = QuestionCache.getAnswer(question.getId());
-				for(QuestionAnswer answer : questionAnswerList){
-					if (QuestionUtil.hasTrueFalse(question) 
-							|| (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question))) {
-						answerList.add(answer.getAnswer());
-					} else if (QuestionUtil.hasSingleChoice(question)) {
-						answerList.add(answer.getAnswer());
-					} else if (QuestionUtil.hasMultipleChoice(question)) {
-						String[] answers = answer.getAnswer().split(",");
-						Collections.addAll(answerList, answers);
-					} else if (QuestionUtil.hasFillBlank(question) 
-							|| (QuestionUtil.hasQA(question) && QuestionUtil.hasObjective(question))) {
-						answerList.add(answer.getAnswer());
-					}
-				}
-				questionMap.put("answers", answerList);
-			}
-			return PageResultEx.ok().data(questionMap);
+			return PageResultEx.ok()
+					.addAttr("id", exer.getId())
+					.addAttr("name", exer.getName())
+					.addAttr("questionTypeId", exer.getQuestionTypeId())
+					.addAttr("questionTypeName", questionTypeService.getEntity(exer.getQuestionTypeId()).getName())
+					.addAttr("startTime", DateUtil.formatDateTime(exer.getStartTime()))
+					.addAttr("endTime", DateUtil.formatDateTime(exer.getEndTime()))
+					.addAttr("userIds", exer.getUserIds())
+					.addAttr("rmkState", exer.getRmkState())
+					;
 		} catch (MyException e) {
-			log.error("模拟练习试题错误：{}", e.getMessage());
+			log.error("模拟练习删除错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
-		}  catch (Exception e) {
-			log.error("模拟练习试题错误：", e);
-			return PageResult.err();
-		}
-	}
-	
-	/**
-	 * 模拟练习试题列表
-	 * 
-	 * v1.0 zhanghc 2022年3月18日上午10:32:57
-	 * @param id
-	 * @return PageResult
-	 */
-	@RequestMapping("/questionList")
-	@ResponseBody
-	public PageResult questionList(Integer id) {
-		try {
-			// 数据有效性校验
-			Exer exer = exerService.getEntity(id);
-			if (exer.getState() == 0) {
-				throw new MyException("无权限");
-			}
-			long curTime = System.currentTimeMillis();
-			if (!(exer.getStartTime().getTime() < curTime && curTime < exer.getEndTime().getTime())) {
-				throw new MyException("时间已过期");
-			}
-			Set<Object> userIdSet = new HashSet<>();
-			userIdSet.addAll(Arrays.asList(exer.getUserIds()));
-			if (ValidateUtil.isValid(userIdSet) && !userIdSet.contains(getCurUser().getId())) {
-				throw new MyException("无权限");
-			}
-			
-			// 试题列表
-			List<Integer> questionIds = questionService.getIds(exer.getQuestionTypeId());
-			return PageResultEx.ok().data(questionIds);
-		} catch (MyException e) {
-			log.error("模拟练习试题列表错误：{}", e.getMessage());
-			return PageResult.err().msg(e.getMessage());
-		}  catch (Exception e) {
-			log.error("模拟练习试题列表错误：", e);
+		} catch (Exception e) {
+			log.error("模拟练习删除错误：", e);
 			return PageResult.err();
 		}
 	}

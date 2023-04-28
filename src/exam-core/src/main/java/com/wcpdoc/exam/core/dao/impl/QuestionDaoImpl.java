@@ -1,7 +1,9 @@
 package com.wcpdoc.exam.core.dao.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -56,7 +58,12 @@ public class QuestionDaoImpl extends RBaseDaoImpl<Question> implements QuestionD
 	@Override
 	public List<Integer> getIds(Integer questionTypeId) {
 		String sql = "SELECT ID FROM EXM_QUESTION WHERE STATE = 1 AND QUESTION_TYPE_ID = :QUESTION_TYPE_ID";
-		return getList(sql, new Object[] { questionTypeId }, Integer.class);
+		List<Map<String, Object>> mapList = getMapList(sql, new Object[] { questionTypeId });
+		List<Integer> list = new ArrayList<>(mapList.size());
+		for (Map<String, Object> map : mapList) {
+			list.add((Integer)map.get("id"));
+		}
+		return list;
 	}
 
 	@Override

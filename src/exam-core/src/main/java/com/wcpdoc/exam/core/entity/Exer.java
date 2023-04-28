@@ -105,6 +105,10 @@ public class Exer {
 		return userIdArr;
 	}
 
+	public void setUserIds(String userIds) {
+		this.userIds = userIds;
+	}
+	
 	public void setUserIds(Integer[] userIds) {
 		if (!ValidateUtil.isValid(userIds)) {
 			this.userIds = null;

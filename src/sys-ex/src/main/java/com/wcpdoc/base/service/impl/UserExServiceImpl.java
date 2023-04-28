@@ -41,11 +41,6 @@ public class UserExServiceImpl extends BaseServiceImp<Object> implements UserExS
 	@Resource
 	private UserService userService;
 
-	@Override
-	public void roleUpdate(Integer userId) {
-		jwtRealm.clearAuth(userId);// 清除授权
-	}
-
 	/**
 	 * 用户导入表结构
 	 * 						用户导入
@@ -128,7 +123,6 @@ public class UserExServiceImpl extends BaseServiceImp<Object> implements UserExS
 				user.setPwd(userService.getEncryptPwd(user.getLoginName(), 
 						ValidateUtil.isValid(userRowData.getPwd()) ? userRowData.getPwd() : "111111"));// 初始化密码
 				
-				user.setType(1);
 				user.setRegistTime(curTime);
 				user.setUpdateTime(curTime);
 				user.setUpdateUserId(getCurUser().getId());

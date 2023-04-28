@@ -32,15 +32,6 @@ public interface UserService extends BaseService<User> {
 	 * String
 	 */
 	String pwdUpdate(Integer id);
-	
-	/**
-	 * 修改角色
-	 * 
-	 * v1.0 chenyun 2021年3月16日下午5:22:45
-	 * @param id
-	 * @param roles void
-	 */
-	void roleUpdate(Integer id, String[] roles);
 
 	/**
 	 * 获取加密后的密码

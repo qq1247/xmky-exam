@@ -52,13 +52,7 @@ public class ShiroServiceImpl implements ShiroService {
 				if (user.getLoginName().equals("admin")) {
 					return new String[] { "admin" };
 				} 
-				if (user.getType() == 1) {
-					return new String[] { "user" };
-				} 
-				if (user.getType() == 2) {
-					return new String[] { "subAdmin" };
-				}
-				return null;
+				return new String[] { "user" };
 			}
 		};
 	}
