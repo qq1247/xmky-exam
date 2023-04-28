@@ -8,6 +8,9 @@
         :teleported="false"
         :automatic-dropdown="true"
         :placeholder="placeholder"
+        collapse-tags
+        collapse-tags-tooltip
+        :max-collapse-tags="8"
         @visible-change="(visible: Boolean) => { if (visible) { query() } }"
         @change="emit('update:modelValue', selectedValue)"
         >
@@ -97,6 +100,9 @@ const listpage = reactive({// 分页列表
 // 监听属性
 watch(() => props.options, (n, o) => {
     listpage.options = props.options
+})
+watch(() => props.modelValue, (n, o) => {
+    selectedValue.value = props.modelValue
 })
 
 // 查询

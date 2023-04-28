@@ -1,5 +1,5 @@
 <template>
-    <template v-if="$route.path === '/questionType'">
+    <template v-if="$route.path === '/exer'">
         <el-form :inline="true" :model="queryForm" size="large" class="query">
             <el-form-item label="">
                 <el-input v-model="queryForm.name" placeholder="请输入名称" />
@@ -9,27 +9,34 @@
                     <Iconfont icon="icon-search" color="white">&nbsp;查询</Iconfont>
                 </el-button>
             </el-form-item>
-            <!-- <el-form-item style="float: right;">
-                <el-button type="success" @click="$router.push('/questionType/add')">
-                    <Iconfont icon="icon-plus" color="white">&nbsp;添加</Iconfont>
-                </el-button>
-            </el-form-item> -->
         </el-form>
         <div class="list">
-            <Gridadd name="题库添加" @click="$router.push('/questionType/add')"/>
+            <Gridadd name="练习添加" @click="$router.push('/exer/add')"/>
             <Griddata 
-                v-for="questionType in listpage.list" 
+                v-for="exer in listpage.list" 
                 :menu="[
-                    { name: '修改', icon: 'icon-edit', event: () => $router.push(`/questionType/edit/${questionType.id}`) },
-                    { name: '删除', icon: 'icon-delete', event: () => $router.push(`/questionType/del/${questionType.id}`) },
-                    { name: '试题列表', icon: 'icon-list-row', event: () => $router.push(`/questionType/question/${questionType.id}`) },
+                    { name: '修改', icon: 'icon-edit', event: () => $router.push(`/exer/edit/${exer.id}`) },
+                    { name: '删除', icon: 'icon-delete', event: () => $router.push(`/exer/del/${exer.id}`) },
                     ]" 
                 >
                 <template #title>
-                    {{ questionType.name }}
+                    {{ exer.name }}
                 </template>
                 <template #content>
-                    <div style="margin-bottom: 10px;">试题数量：{{questionType.questionNum}}道</div>
+                    <div style="margin-bottom: 5px;text-align: center;">
+                        题库名称：{{ exer.questionTypeName }}
+                    </div>
+                    <div style="margin-bottom: 5px;text-align: center;">
+                        练习时间：{{ exer.startTime }} - {{ exer.endTime }}
+                    </div>
+                    <el-row>
+                        <el-col :span="12">
+                            允许评论：{{ dictStore.getValue('STATE_YN', exer.rmkState) }}
+                        </el-col>
+                        <el-col :span="12">
+                            人数：{{ exer.userIds.length == 0 ? '全部' : exer.userIds.length }}
+                        </el-col>
+                    </el-row>
                 </template>
             </Griddata>
         </div>
@@ -53,10 +60,12 @@
 import { ref, reactive, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router'
 import http from "@/request"
+import { useDictStore } from '@/stores/dict';
 import Griddata from '@/components/Griddata.vue';
 import Gridadd from '@/components/Gridadd.vue';
 
 //  定义变量
+const dictStore = useDictStore()// 字典缓存
 const route = useRoute()
 const queryForm = reactive({// 查询表单
     name: '',
@@ -75,14 +84,14 @@ onMounted(() => {
 
 // 如果是跳转到列表页，重新查询
 watch(() => route.path, (n, o) => {
-    if (n === '/questionType') {
+    if (n === '/exer') {
         query()
     }
 })
 
 // 查询
 async function query() {
-    const { data: { code, data } } = await http.post('questionType/listpage', {
+    const { data: { code, data } } = await http.post('exer/listpage', {
         name: queryForm.name,
         curPage: listpage.curPage,
         pageSize: listpage.pageSize,
@@ -95,6 +104,7 @@ async function query() {
     listpage.list = data.list
     listpage.total = data.total
 }
+
 </script>
 
 <style lang="scss" scoped>

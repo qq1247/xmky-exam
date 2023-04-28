@@ -9,25 +9,6 @@
                     <Iconfont icon="icon-search" color="white">&nbsp;查询</Iconfont>
                 </el-button>
             </el-form-item>
-            <!-- 只有没有机构的时候才能导入，因为第二次导入不好区分上下级关系
-            <el-form-item v-if="listpage.total === 1" style="float: right;">
-                <el-button type="success" @click="download">
-                    <Iconfont icon="icon-line-dowmload" color="white">&nbsp;下载模板</Iconfont>
-                </el-button>
-                &nbsp;&nbsp;
-                <el-upload
-                    :action="`${ http.defaults.baseURL }file/upload`"
-                    :headers="{Authorization: userStore.accessToken}"
-                    name="files"
-                    :show-file-list="false"
-                    :before-upload="uploadBefore"
-                    :on-success="uploadSuccess"
-                    >
-                    <el-button type="success">
-                        <Iconfont icon="icon-line-upload" color="white">&nbsp;导入机构</Iconfont>
-                    </el-button>
-                </el-upload>
-            </el-form-item> -->
         </el-form>
         <el-table :data="listpage.list" style="width: 100%" class="table" size="large" row-key="id"
             default-expand-all>

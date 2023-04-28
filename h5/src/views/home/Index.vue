@@ -136,10 +136,10 @@
                             background-color="#6b77f9" />
                         <span>机构管理</span>
                     </div>
-                    <div v-if="userStore.roles.includes('admin')" class="home-right-menu-content-item" @click="$router.push('/parm/pwd')">
-                        <Iconfont icon="icon-setting" :size="20" color="white" :width="40" :height="40" :radius="10"
-                            background-color="#67C23A" />
-                        <span>系统配置</span>
+                    <div v-if="userStore.roles.includes('admin')" class="home-right-menu-content-item" @click="$router.push('/bulletin')">
+                        <Iconfont icon="icon-mark-paper" :size="20" color="white" :width="40" :height="40" :radius="10"
+                            background-color="#eb5b5b" />
+                        <span>公告管理</span>
                     </div>
                     <div v-if="userStore.roles.includes('admin')" class="home-right-menu-content-item" @click="$router.push('/exam')">
                         <Iconfont icon="icon-diannao" :size="20" color="white" :width="40" :height="40" :radius="10"
@@ -151,15 +151,20 @@
                             background-color="#fb901b" />
                         <span>题库管理</span>
                     </div>
-                    <div v-if="userStore.roles.includes('admin')" class="home-right-menu-content-item" @click="$router.push('/bulletin')">
-                        <Iconfont icon="icon-mark-paper" :size="22" color="white" :width="40" :height="40" :radius="10"
-                            background-color="#eb5b5b" />
-                        <span>公告管理</span>
+                    <div v-if="userStore.roles.includes('admin')" class="home-right-menu-content-item" @click="$router.push('/exer')">
+                        <Iconfont icon="icon-piyue" :size="22" color="white" :width="40" :height="40" :radius="10"
+                            background-color="#67C23A" />
+                        <span>模拟练习</span>
                     </div>
                     <div v-if="userStore.roles.includes('user')" class="home-right-menu-content-item" @click="$router.push('/myExam')">
                         <Iconfont icon="icon-diannao" :size="20" color="white" :width="40" :height="40" :radius="10"
                             background-color="#09c8bd" />
                         <span>我的考试</span>
+                    </div>
+                    <div v-if="userStore.roles.includes('user')" class="home-right-menu-content-item" @click="$router.push('/myExer')">
+                        <Iconfont icon="icon-piyue" :size="22" color="white" :width="40" :height="40" :radius="10"
+                            background-color="#67C23A" />
+                        <span>我的练习</span>
                     </div>
                 </div>
             </el-card>
@@ -308,7 +313,7 @@ function hasTask(curDate: Date) {
                 dayjs(myExam.examStartTime, 'YYYY-MM-DD HH:mm:ss').startOf('day').toDate(),// 考试开始时间的00:00:00
                 dayjs(myExam.examStartTime, 'YYYY-MM-DD HH:mm:ss').endOf('day').toDate(),// 考试开始时间的23:59:59
                 null, 
-                '[]')// 包换边界
+                '[]')// 包含边界
         })
     }
     if (userStore.roles.includes('admin')) {
@@ -317,7 +322,7 @@ function hasTask(curDate: Date) {
                 dayjs(myMark.examMarkStartTime, 'YYYY-MM-DD HH:mm:ss').startOf('day').toDate(),// 阅卷开始时间的00:00:00
                 dayjs(myMark.examMarkStartTime, 'YYYY-MM-DD HH:mm:ss').endOf('day').toDate(),// 阅卷开始时间的23:59:59
                 null, 
-                '[]')// 包换边界
+                '[]')// 包含边界
         })
     }
 }
@@ -328,7 +333,7 @@ function hasCurMonth(curDate: Date) {
         dayjs(calendar.value).startOf('month').toDate(),// 当月-01 00:00:00
         dayjs(calendar.value).endOf('month').toDate(),// 当月-31 23:59:59
         null, 
-        '[]')// 包换边界
+        '[]')// 包含边界
 }
 
 // 公告显示

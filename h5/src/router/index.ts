@@ -284,6 +284,34 @@ const router = createRouter({
                     ]
                 },
                 {
+                    path: 'exer',
+                    component: () => import('../views/exer/Index.vue'),
+                    meta: { title: '练习' },
+                    children: [
+                        {
+                            path: '',
+                            component: () => import('../views/exer/setting/Index.vue'),
+                            children: [
+                                {
+                                    path: 'add',
+                                    component: () => import('../views/exer/setting/Edit.vue'),
+                                    meta: { title: '添加' },
+                                },
+                                {
+                                    path: 'edit/:id',
+                                    component: () => import('../views/exer/setting/Edit.vue'),
+                                    meta: { title: '修改' },
+                                },
+                                {
+                                    path: 'del/:id',
+                                    component: () => import('../views/exer/setting/Del.vue'),
+                                    meta: { title: '删除' },
+                                },
+                            ]
+                        },
+                    ]
+                },
+                {
                     path: 'exam',
                     component: () => import('../views/exam/Index.vue'),
                     meta: { title: '考试' },
@@ -335,6 +363,18 @@ const router = createRouter({
                             path: 'paper/:examId',
                             component: () => import('../views/myExam/Paper.vue'),
                             meta: { title: '试卷' },
+                        },
+                    ]
+                },
+                {
+                    path: 'myExer',
+                    component: () => import('../views/myExer/Index.vue'),
+                    meta: { title: '我的练习' },
+                    children: [
+                        {
+                            path: 'paper/:exerId',
+                            component: () => import('../views/myExer/Paper.vue'),
+                            meta: { title: '试题' },
                         },
                     ]
                 },

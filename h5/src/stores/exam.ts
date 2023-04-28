@@ -115,7 +115,7 @@ if (import.meta.hot) {
 }
 
 /**
- * 试题接口
+ * 试卷接口
  */
 export interface ExamQuestion {
     type: number // 类型 （1：章节；2：试题）
@@ -130,11 +130,30 @@ export interface ExamQuestion {
     markOptions?: number[] //（2：答案无顺序；3：不区分大小写；)
     score?: number// 分数
     answers?: string[]// 答案
+    scores?: number[]// 答案分数
     userAnswers?: string[]// 用户答案
     userScore?: number// 用户分数
-    scores?: number[]// 答案分数
     analysis?: string// 解析
     commit?: boolean// 是否提交
+}
+
+/**
+ * 试题接口
+ */
+export interface Question {
+    no?: number // 序号
+    id: number// 试题编号（题库选择有；文本导入没有，后台为先保存题在使用）
+    type: number// 试题类型 （1：单选；2：多选；3：填空；4：判断；5：问答）
+    markType: number// （阅卷类型 1：客观题；2：主观题）
+    title: string// 标题
+    options: string[]// 选项
+    markOptions: number[] //（2：答案无顺序；3：不区分大小写；)
+    score: number// 分数
+    answers: string[]// 答案
+    scores: number[]// 答案分数
+    userAnswers?: string[]// 用户答案
+    userScore?: number// 用户分数
+    analysis: string// 解析
 }
 
 /**

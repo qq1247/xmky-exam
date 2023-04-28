@@ -1,5 +1,5 @@
 <template>
-    <template v-if="$route.path === '/questionType'">
+    <template v-if="$route.path === '/myExer'">
         <el-form :inline="true" :model="queryForm" size="large" class="query">
             <el-form-item label="">
                 <el-input v-model="queryForm.name" placeholder="请输入名称" />
@@ -9,27 +9,30 @@
                     <Iconfont icon="icon-search" color="white">&nbsp;查询</Iconfont>
                 </el-button>
             </el-form-item>
-            <!-- <el-form-item style="float: right;">
-                <el-button type="success" @click="$router.push('/questionType/add')">
-                    <Iconfont icon="icon-plus" color="white">&nbsp;添加</Iconfont>
-                </el-button>
-            </el-form-item> -->
         </el-form>
         <div class="list">
-            <Gridadd name="题库添加" @click="$router.push('/questionType/add')"/>
+            <Gridadd v-if="listpage.list.length === 0" name="暂无练习" icon="icon-dongjie"/>
             <Griddata 
-                v-for="questionType in listpage.list" 
+                v-for="myExer in listpage.list" 
                 :menu="[
-                    { name: '修改', icon: 'icon-edit', event: () => $router.push(`/questionType/edit/${questionType.id}`) },
-                    { name: '删除', icon: 'icon-delete', event: () => $router.push(`/questionType/del/${questionType.id}`) },
-                    { name: '试题列表', icon: 'icon-list-row', event: () => $router.push(`/questionType/question/${questionType.id}`) },
-                    ]" 
+                    { name: `去练习`, icon: `icon-peixunkaoshi`, event: () => toExer(myExer) },
+                    ]"
                 >
                 <template #title>
-                    {{ questionType.name }}
+                    {{ myExer.name }}
                 </template>
                 <template #content>
-                    <div style="margin-bottom: 10px;">试题数量：{{questionType.questionNum}}道</div>
+                    <div style="margin-bottom: 5px;text-align: center;">
+                        题库名称：{{ myExer.questionTypeName }}
+                    </div>
+                    <div style="margin-bottom: 5px;text-align: center;">
+                        练习时间：{{ myExer.startTime }} - {{ myExer.endTime }}
+                    </div>
+                    <el-row>
+                        <el-col :span="24">
+                            允许评论：{{ dictStore.getValue('STATE_YN', myExer.rmkState) }}
+                        </el-col>
+                    </el-row>
                 </template>
             </Griddata>
         </div>
@@ -50,20 +53,25 @@
 </template>
   
 <script lang="ts" setup>
-import { ref, reactive, onMounted, watch } from 'vue';
+import http from "@/request";
+import { useDictStore } from '@/stores/dict';
+import dayjs from 'dayjs';
+import { ElMessage } from "element-plus";
+import { onMounted, reactive, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router'
-import http from "@/request"
-import Griddata from '@/components/Griddata.vue';
-import Gridadd from '@/components/Gridadd.vue';
+import Griddata from "@/components/Griddata.vue";
+import Gridadd from "@/components/Gridadd.vue";
 
 //  定义变量
+const dictStore = useDictStore()// 字典缓存
 const route = useRoute()
+const router = useRouter()
 const queryForm = reactive({// 查询表单
     name: '',
 })
 const listpage = reactive({// 分页列表
     curPage: 1,
-    pageSize: 5,
+    pageSize: 6,
     total: 0,
     list: [] as any[],
 })
@@ -75,14 +83,14 @@ onMounted(() => {
 
 // 如果是跳转到列表页，重新查询
 watch(() => route.path, (n, o) => {
-    if (n === '/questionType') {
+    if (n === '/myExer') {
         query()
     }
 })
 
 // 查询
 async function query() {
-    const { data: { code, data } } = await http.post('questionType/listpage', {
+    const { data: { code, data } } = await http.post('myExer/listpage', {
         name: queryForm.name,
         curPage: listpage.curPage,
         pageSize: listpage.pageSize,
@@ -94,6 +102,25 @@ async function query() {
 
     listpage.list = data.list
     listpage.total = data.total
+}
+
+// 练习进入
+async function toExer(exer: any) {
+    let { data: { data } } = await http.post("login/sysTime", {  })
+        let curTime = dayjs(data, 'YYYY-MM-DD HH:mm:ss').toDate()
+        let exerStartTim = dayjs(exer.startTime, 'YYYY-MM-DD HH:mm:ss').toDate()
+        if (exerStartTim.getTime() > curTime.getTime()) {
+            ElMessage.error('练习未开始，请等待...')
+            return
+        }
+
+        let exerEndTime = dayjs(exer.endTime, 'YYYY-MM-DD HH:mm:ss').toDate()
+        if (curTime.getTime() > exerEndTime.getTime()) {
+            ElMessage.error('练习已结束...')
+            return
+        }
+
+        router.push(`/myExer/paper/${ exer.id }`)
 }
 </script>
 
