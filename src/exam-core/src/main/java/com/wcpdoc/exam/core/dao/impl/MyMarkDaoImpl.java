@@ -26,27 +26,28 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 	@Override
 	public PageOut getListpage(PageIn pageIn) {
 		String sql = "SELECT EXAM.ID AS EXAM_ID, EXAM.NAME AS EXAM_NAME, "// 考试相关字段
+				+ "EXAM.MARK_TYPE AS EXAM_MARK_TYPE, "// 考试相关字段
+				+ "EXAM.START_TIME AS EXAM_START_TIME, EXAM.END_TIME AS EXAM_END_TIME, "// 考试相关字段
 				+ "EXAM.MARK_START_TIME AS EXAM_MARK_START_TIME, EXAM.MARK_END_TIME AS EXAM_MARK_END_TIME, "// 考试相关字段
 				+ "EXAM.MARK_STATE AS EXAM_MARK_STATE "// 考试相关字段
 				+ "FROM EXM_EXAM EXAM ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("examName")), "EXAM.NAME LIKE :NAME", String.format("%%%s%%", pageIn.get("examName")))
-//				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), 
-//						"EXISTS (SELECT 1 FROM EXM_MY_EXAM Z WHERE Z.MARK_USER_ID = :MARK_USER_ID AND EXAM.ID = Z.EXAM_ID)", 
-//						pageIn.get("curUserId", Integer.class))
 				.addWhere(ValidateUtil.isValid(pageIn.get("startTime")) && ValidateUtil.isValid(pageIn.get("endTime")), 
-						"(( :MARK_START_TIME1 <= EXAM.MARK_START_TIME AND EXAM.MARK_START_TIME <= :MARK_END_TIME1) "
-						+ "	OR ( :MARK_START_TIME2 <= EXAM.MARK_END_TIME AND EXAM.MARK_END_TIME <= :MARK_END_TIME2) "
-						+ "	OR ( :MARK_START_TIME3 >= EXAM.MARK_START_TIME AND EXAM.MARK_END_TIME >= :MARK_END_TIME3))", 
+						"(( :MARK_START_TIME1 <= EXAM.START_TIME AND EXAM.START_TIME <= :MARK_END_TIME1) "
+						+ "	OR ( :MARK_START_TIME2 <= EXAM.END_TIME AND EXAM.END_TIME <= :MARK_END_TIME2) "
+						+ "	OR ( :MARK_START_TIME3 >= EXAM.START_TIME AND EXAM.END_TIME >= :MARK_END_TIME3))", 
 						pageIn.get("startTime"), pageIn.get("endTime"),
 						pageIn.get("startTime"), pageIn.get("endTime"),
 						pageIn.get("startTime"), pageIn.get("endTime")
 						)
-				.addWhere("EXAM.MARK_TYPE = 2")// 主观题试卷
+				.addWhere("true".equals(pageIn.get("todo")), "EXAM.MARK_STATE != 3")// 查找我的未完成的考试列表
 				.addWhere("EXAM.STATE = 1") // 已发布（不含冻结）
 				.addOrder("EXAM.MARK_START_TIME", Order.DESC);// 按阅卷开始时间倒序排列
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(), 
+				"examEndTime", DateUtil.FORMAT_DATE_TIME, 
+				"examStartTime", DateUtil.FORMAT_DATE_TIME,
 				"examMarkEndTime", DateUtil.FORMAT_DATE_TIME, 
 				"examMarkStartTime", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;

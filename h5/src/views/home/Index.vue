@@ -92,30 +92,46 @@
                             </el-button-group>
                         </template>
                         <template #date-cell="{ data }">
-                            <span>{{ hasCurMonth(data.date) ? dayjs(data.date).get('date') : ''}}</span>
-                            <div v-if="hasCurMonth(data.date) && hasTask(data.date)" class="home-left-bottom-left-calendar-task"></div>
+                            <el-popover
+                                v-if="hasCurMonth(data.date) && taskList(data.date).length"
+                                title=""
+                                :width="925"
+                                trigger="hover"
+                                >
+                                <template #reference>
+                                    <span>{{ hasCurMonth(data.date) ? dayjs(data.date).get('date') : '' }}</span>
+                                </template>
+                                <el-table :data="taskList(data.date)">
+                                    <el-table-column width="200" property="examName" label="名称" align="center"/>
+                                    <el-table-column width="175" property="examStartTime" label="开始时间" align="center"/>
+                                    <el-table-column width="175" property="examEndTime" label="结束时间" align="center"/>
+                                    <el-table-column width="175" property="examMarkStartTime" label="阅卷开始时间" align="center"/>
+                                    <el-table-column width="175" property="examMarkEndTime" label="阅卷时间" align="center"/>
+                                </el-table>
+                            </el-popover>
+                            <span v-else>{{ hasCurMonth(data.date) ? dayjs(data.date).get('date') : '' }}</span>
+                            <div v-if="hasCurMonth(data.date) && taskList(data.date).length" class="home-left-bottom-left-calendar-task"></div>
                         </template>
                     </el-calendar>
                 </el-card>
                 <el-card class="home-left-bottom-right" shadow="never">
                     <template #header>
-                        <span>{{ userStore.roles.includes('admin') ? '阅卷列表' : '考试列表'}}</span>
+                        <span>{{ userStore.roles.includes('admin') ? '待阅列表' : '待考列表'}}</span>
                     </template>
                     <el-scrollbar max-height="calc(100vh - 350px)">
-                        <div v-for="myMark in myMarkListpage.list" class="home-left-bottom-right-row">
-                            <div>{{ myMark.examName }}</div>
-                            <span>{{ myMark.examMarkStartTime }} - {{ myMark.examMarkEndTime }}</span>
-                            <el-button v-if="myMark.examMarkState === 2" type="primary" plain @click="toMark(myMark)">开始阅卷</el-button>
+                        <div v-for="myMarkOfTodo in myMarkOfTodoListpage.list" class="home-left-bottom-right-row">
+                            <div>{{ myMarkOfTodo.examName }}</div>
+                            <span>{{ myMarkOfTodo.examMarkStartTime }} - {{ myMarkOfTodo.examMarkEndTime }}</span>
+                            <el-button v-if="myMarkOfTodo.examMarkType === 2" type="primary" plain @click="toMark(myMarkOfTodo)">开始阅卷</el-button>
                         </div>
-                        <el-empty v-if="userStore.roles.includes('admin') && myMarkListpage.total === 0" description="暂无阅卷"/>
+                        <el-empty v-if="userStore.roles.includes('admin') && myMarkOfTodoListpage.total === 0" description="暂无阅卷"/>
 
-                        <div v-for="myExam in myExamListpage.list" class="home-left-bottom-right-row">
-                            <div>{{ myExam.examName }}</div>
-                            <span>{{ myExam.examStartTime }} - {{ myExam.examEndTime }}</span>
-                            <el-button v-if="myExam.state !== 3" type="primary" plain @click="toExam(myExam)">开始考试</el-button>
-                            <el-button v-else type="primary" plain @click="router.push(`/myExam/paper/${myExam.examId}`)">查阅考试</el-button>
+                        <div v-for="myExamOfTodo in myExamOfTodoListpage.list" class="home-left-bottom-right-row">
+                            <div>{{ myExamOfTodo.examName }}</div>
+                            <span>{{ myExamOfTodo.examStartTime }} - {{ myExamOfTodo.examEndTime }}</span>
+                            <el-button type="primary" plain @click="toExam(myExamOfTodo)">开始考试</el-button>
                         </div>
-                        <el-empty v-if="userStore.roles.includes('user') && myExamListpage.total === 0" description="暂无考试"/>
+                        <el-empty v-if="userStore.roles.includes('user') && myExamOfTodoListpage.total === 0" description="暂无考试"/>
                     </el-scrollbar>
                 </el-card>
             </div>
@@ -172,7 +188,7 @@
                 <template #header>
                     <span>公告列表</span>
                 </template>
-                <div v-for="bulletin in bulletinListpage.list" class="home-right-bulletin-content" @click="bulletinShwo(bulletin)">
+                <div v-for="bulletin in bulletinListpage.list" class="home-right-bulletin-content" @click="bulletinShow(bulletin)">
                     <span class="home-right-bulletin-content-name">{{ bulletin.title }}</span>
                     <span>{{ dayjs(bulletin.startTime, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD') }}</span>
                 </div>
@@ -212,13 +228,25 @@ const statis = reactive({// 首页统计
     passExamNum: 0,// 及格次数
     topRank: 0,// 最高排名
 })
-const myMarkListpage = reactive({// 我的阅卷分页列表
+const myMarkListpage = reactive({// 我的阅卷分页列表（日历使用）
     curPage: 1,
     pageSize: 100,
     total: 0,
     list: [] as any[],
 })
-const myExamListpage = reactive({// 我的考试分页列表
+const myMarkOfTodoListpage = reactive({// 我的待阅分页列表
+    curPage: 1,
+    pageSize: 100,
+    total: 0,
+    list: [] as any[],
+})
+const myExamListpage = reactive({// 我的考试分页列表（日历使用）
+    curPage: 1,
+    pageSize: 100,
+    total: 0,
+    list: [] as any[],
+})
+const myExamOfTodoListpage = reactive({// 我的待考分页列表
     curPage: 1,
     pageSize: 100,
     total: 0,
@@ -235,26 +263,6 @@ const custom = reactive({// 自定义内容
     content: '',
 })
 
-// 监听属性
-watch(() => calendar.value, async (n, o) => {
-    // 查询阅卷列表
-    if (n && o && dayjs(n).format('YYYY-MM') === dayjs(o).format('YYYY-MM')) {// 如果是同一个月份不处理
-        return
-    }
-
-    let startTime = dayjs(n).startOf('month').format('YYYY-MM-DD HH:mm:ss')
-    let endTime = dayjs(n).endOf('month').format('YYYY-MM-DD HH:mm:ss')
-    if (userStore.roles.includes('admin')) {
-        let { data: { data } } = await http.post("myMark/listpage", { startTime, endTime })
-        myMarkListpage.list = data.list 
-        myMarkListpage.total = data.total
-    } else if (userStore.roles.includes('user')) {
-        let { data: { data } } = await http.post("myExam/listpage", { startTime, endTime })
-        myExamListpage.list = data.list 
-        myExamListpage.total = data.total
-    }
-})
-
 // 组件挂载完成后，执行如下方法
 onMounted(async () => {
     if (!userStore.id) {
@@ -266,19 +274,28 @@ onMounted(async () => {
     let curTime = dayjs(data, 'YYYY-MM-DD HH:mm:ss').toDate()
     calendar.value = curTime
 
-    // 考试统计查询
+    // 考试相关查询
     if (userStore.roles.includes('admin')) {// 如果是admin登录
-        let { data: { data } } = await http.post("report/admin/home", {  })
+        let { data: { data } } = await http.post("report/admin/home", {  })// 首页统计
         statis.examNum = data.examNum
         statis.questionNum = data.questionNum
         statis.unMarkNum = data.unMarkNum
         statis.userNum = data.userNum
-    } else if (userStore.roles.includes('user')) {// 如果是用户登录
-        let { data: { data } } = await http.post("report/user/home", {  })
+
+        let { data: { data: data2 } } = await http.post("myMark/listpage", { pageSize: 100, todo: true })// 待阅列表
+        myMarkOfTodoListpage.list = data2.list 
+        myMarkOfTodoListpage.total = data2.total
+    }
+    if (userStore.roles.includes('user')) {// 如果是用户登录
+        let { data: { data } } = await http.post("report/user/home", {  })// 首页统计
         statis.examNum = data.examNum
         statis.unExamNum = data.unExamNum
         statis.passExamNum = data.passExamNum
         statis.topRank = data.topRank
+
+        let { data: { data: data2 } } = await http.post("myExam/listpage", { pageSize: 100, todo: true })// 待考列表
+        myExamOfTodoListpage.list = data2.list 
+        myExamOfTodoListpage.total = data2.total
     }
 
     // 公告查询
@@ -294,37 +311,35 @@ onMounted(async () => {
     })
     bulletinListpage.total = data2.total
 
-    // 服务信息查询
+    // 自定义信息查询
     let { data: { data:data3 } } = await http.post('login/custom', { })
     custom.title = data3.title
     custom.content = data3.content.replaceAll('\n', '<br/>')
 })
 
+// 监听属性
+watch(() => calendar.value, async (n, o) => {
+    // 查询阅卷列表
+    if (n && o && dayjs(n).format('YYYY-MM') === dayjs(o).format('YYYY-MM')) {// 如果是同一个月份不处理
+        return
+    }
+
+    let startTime = dayjs(n).startOf('month').format('YYYY-MM-DD HH:mm:ss')
+    let endTime = dayjs(n).endOf('month').format('YYYY-MM-DD HH:mm:ss')
+    if (userStore.roles.includes('admin')) {
+        let { data: { data } } = await http.post("myMark/listpage", { pageSize: 100, startTime, endTime })
+        myMarkListpage.list = data.list 
+        myMarkListpage.total = data.total
+    } else if (userStore.roles.includes('user')) {
+        let { data: { data } } = await http.post("myExam/listpage", { pageSize: 100, startTime, endTime })
+        myExamListpage.list = data.list 
+        myExamListpage.total = data.total
+    }
+})
+
 // 日历变更时间
 function calendarUpdate(curDate: string) {
     calendarRef.value.selectDate(curDate)
-}
-
-// 是否有任务
-function hasTask(curDate: Date) {
-    if (userStore.roles.includes('user')) {
-        return myExamListpage.list.some(myExam => {
-            return dayjs(curDate).isBetween(
-                dayjs(myExam.examStartTime, 'YYYY-MM-DD HH:mm:ss').startOf('day').toDate(),// 考试开始时间的00:00:00
-                dayjs(myExam.examStartTime, 'YYYY-MM-DD HH:mm:ss').endOf('day').toDate(),// 考试开始时间的23:59:59
-                null, 
-                '[]')// 包含边界
-        })
-    }
-    if (userStore.roles.includes('admin')) {
-        return myMarkListpage.list.some(myMark => {
-            return dayjs(curDate).isBetween(
-                dayjs(myMark.examMarkStartTime, 'YYYY-MM-DD HH:mm:ss').startOf('day').toDate(),// 阅卷开始时间的00:00:00
-                dayjs(myMark.examMarkStartTime, 'YYYY-MM-DD HH:mm:ss').endOf('day').toDate(),// 阅卷开始时间的23:59:59
-                null, 
-                '[]')// 包含边界
-        })
-    }
 }
 
 // 是否当月日期
@@ -336,8 +351,39 @@ function hasCurMonth(curDate: Date) {
         '[]')// 包含边界
 }
 
+/**
+ * 任务列表
+ * 
+ * v1.0 zhanghc 2023-04-30 09:26:00
+ * @param {*} curDate 指定日期
+ * @return {*} any[] 任务列表
+ */
+function taskList(curDate: Date): any[] {
+    if (userStore.roles.includes('admin')) {
+        return myMarkListpage.list.filter(myMark => {
+            return (dayjs(curDate).isBetween(
+                    dayjs(myMark.examStartTime, 'YYYY-MM-DD HH:mm:ss').startOf('day').toDate(),// 阅卷开始时间的00:00:00
+                    dayjs(myMark.examStartTime, 'YYYY-MM-DD HH:mm:ss').endOf('day').toDate(),// 阅卷开始时间的23:59:59
+                    null, 
+                    '[]'))// 包含边界
+        })
+    }
+
+    if (userStore.roles.includes('user')) {
+        return myExamListpage.list.filter(myExam => {
+            return dayjs(curDate).isBetween(
+                dayjs(myExam.examStartTime, 'YYYY-MM-DD HH:mm:ss').startOf('day').toDate(),// 阅卷开始时间的00:00:00
+                dayjs(myExam.examStartTime, 'YYYY-MM-DD HH:mm:ss').endOf('day').toDate(),// 阅卷开始时间的23:59:59
+                null, 
+                '[]')// 包含边界
+        })
+    }
+
+    return []
+}
+
 // 公告显示
-function bulletinShwo(bulletin: any) {
+function bulletinShow(bulletin: any) {
     ElMessageBox.alert(bulletin.content, bulletin.title, {
         customClass: 'el-message-box-ex',
         dangerouslyUseHTMLString: true,

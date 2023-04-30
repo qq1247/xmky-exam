@@ -51,6 +51,8 @@ public class MyExamDaoImpl extends RBaseDaoImpl<MyExam> implements MyExamDao {
 						pageIn.get("startTime"), pageIn.get("endTime"),
 						pageIn.get("startTime"), pageIn.get("endTime")
 						)
+				.addWhere("true".equals(pageIn.get("todo")), // 查找我的未完成的考试列表
+						"((MY_EXAM.STATE = 1 AND MY_EXAM.MARK_STATE != 3) OR MY_EXAM.STATE = 2)")
 				.addWhere("EXAM.STATE = 1")// 已发布（不含冻结）
 				.addOrder("EXAM.START_TIME", Order.DESC);// 按考试开始时间倒序排列
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
