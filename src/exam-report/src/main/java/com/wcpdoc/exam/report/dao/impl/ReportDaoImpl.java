@@ -144,8 +144,8 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 		String sql = "SELECT "
 				+ "(SELECT COUNT(*) FROM EXM_EXAM WHERE (STATE = 1 OR STATE = 2)) AS EXAM_NUM, "// 考试数量
 				+ "(SELECT COUNT(*) FROM EXM_QUESTION WHERE STATE = 1) AS QUESTION_NUM, "// 试题数量
-				+ "(SELECT COUNT(*) FROM EXM_EXAM WHERE MARK_STATE = 2 AND (STATE = 1 OR STATE = 2)) AS UN_MARK_NUM, "// 待阅考试数量
-				+ "(SELECT COUNT(*) FROM SYS_USER WHERE TYPE = 1 AND (STATE = 1 OR STATE = 2)) AS USER_NUM "// 用户数量
+				+ "(SELECT COUNT(*) FROM EXM_EXER WHERE STATE = 1) AS EXER_NUM, "// 练习数量
+				+ "(SELECT COUNT(*) - 1 FROM SYS_USER WHERE STATE = 1 OR STATE = 2) AS USER_NUM "// 用户数量（不包括admin)
 				+ "FROM DUAL";
 		return getMapList(sql, new Object[0]).get(0);
 	}
@@ -154,12 +154,13 @@ public class ReportDaoImpl extends RBaseDaoImpl<Object> implements ReportDao {
 	public Map<String, Object> userHome(Integer userId) {
 		String sql = "SELECT "
 				+ "COUNT(1) AS EXAM_NUM, "// 考试数量
-				+ "IFNULL(SUM(CASE WHEN (MY_EXAM.STATE = 1 AND MY_EXAM.MARK_STATE != 3) OR MY_EXAM.STATE = 2 THEN 1 ELSE 0 END), 0) AS UN_EXAM_NUM, "// 待考考试数量
+//				+ "IFNULL(SUM(CASE WHEN (MY_EXAM.STATE = 1 AND MY_EXAM.MARK_STATE != 3) OR MY_EXAM.STATE = 2 THEN 1 ELSE 0 END), 0) AS UN_EXAM_NUM, "// 待考考试数量
+				+ "(SELECT COUNT(*) FROM EXM_EXER WHERE USER_IDS LIKE :USER_ID2 OR USER_IDS IS NULL) AS EXER_NUM, "// 练习数量
 				+ "IFNULL(SUM(CASE WHEN EXAM.SCORE_STATE != 2 AND MY_EXAM.ANSWER_STATE = 1 THEN 1 ELSE 0 END), 0) AS PASS_EXAM_NUM, "// 及格次数
 				+ "IFNULL(MIN(CASE WHEN EXAM.RANK_STATE = 1 THEN MY_EXAM.NO ELSE NULL END), 0) AS TOP_RANK "// 最高排名
 				+ "FROM EXM_MY_EXAM MY_EXAM "
 				+ "INNER JOIN EXM_EXAM EXAM ON MY_EXAM.EXAM_ID = EXAM.ID "
 				+ "WHERE MY_EXAM.USER_ID = :USER_ID AND EXAM.STATE = 1";// 查询当前用户，且有效的考试
-		return getMapList(sql, new Object[]{ userId }).get(0);
+		return getMapList(sql, new Object[]{ String.format("%%,%s,%%", userId), userId }).get(0);
 	}
 }

@@ -43,7 +43,7 @@ public class MyMarkDaoImpl extends RBaseDaoImpl<MyMark> implements MyMarkDao {
 						)
 				.addWhere("true".equals(pageIn.get("todo")), "EXAM.MARK_STATE != 3")// 查找我的未完成的考试列表
 				.addWhere("EXAM.STATE = 1") // 已发布（不含冻结）
-				.addOrder("EXAM.MARK_START_TIME", Order.DESC);// 按阅卷开始时间倒序排列
+				.addOrder("EXAM.START_TIME", Order.DESC);// 按考试开始时间倒序排列
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(), 
 				"examEndTime", DateUtil.FORMAT_DATE_TIME, 

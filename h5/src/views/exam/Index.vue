@@ -193,6 +193,8 @@ async function setTime(exam: any, timeType: number) {
     }
     if (timeType === 2 || timeType === 4) {
         ElMessage.success('后台正在阅卷，请稍后查询')
+    } else {
+        ElMessage.success('设置成功')
     }
 
     setTimeout(query, 2000) 

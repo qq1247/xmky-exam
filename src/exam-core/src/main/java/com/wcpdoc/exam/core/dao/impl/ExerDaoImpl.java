@@ -39,16 +39,24 @@ public class ExerDaoImpl extends RBaseDaoImpl<Exer> implements ExerDao {
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("questionTypeId", Integer.class)) , 
 						"EXER.QUESTION_TYPE_ID = :QUESTION_TYPE_ID", pageIn.get("questionTypeId", Integer.class))
+				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "EXER.NAME LIKE :NAME", String.format("%%%s%%", pageIn.get("name")))
 				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), // 查询某个用户
 						"(EXER.USER_IDS LIKE :USER_IDS OR EXER.USER_IDS IS NULL)", String.format("%%,%s,%%", pageIn.get("curUserId", Integer.class)))
-				.addWhere(ValidateUtil.isValid(pageIn.get("curUserId", Integer.class)), // 查询某个用户有效期内的练习
+				.addWhere("true".equals(pageIn.get("todo")), // 查找我的未完成的练习列表
 						"EXER.START_TIME <= :START_TIME AND :END_TIME <= EXER.END_TIME", new Date(), new Date())
-				.addWhere(ValidateUtil.isValid(pageIn.get("name")), "EXER.NAME LIKE :NAME", String.format("%%%s%%", pageIn.get("name")))
+				.addWhere(ValidateUtil.isValid(pageIn.get("startTime")) && ValidateUtil.isValid(pageIn.get("endTime")), 
+						"(( :START_TIME1 <= EXER.START_TIME AND EXER.START_TIME <= :END_TIME1) "
+						+ "	OR ( :_START_TIME2 <= EXER.END_TIME AND EXER.END_TIME <= :END_TIME2) "
+						+ "	OR ( :START_TIME3 >= EXER.START_TIME AND EXER.END_TIME >= :END_TIME3))", 
+						pageIn.get("startTime"), pageIn.get("endTime"),
+						pageIn.get("startTime"), pageIn.get("endTime"),
+						pageIn.get("startTime"), pageIn.get("endTime")
+						)
 				.addWhere("EXER.STATE = 1")
 				.addOrder("EXER.START_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
-				HibernateUtil.formatDate(pageOut.getList(), "startTime", DateUtil.FORMAT_DATE_TIME);
-				HibernateUtil.formatDate(pageOut.getList(), "endTime", DateUtil.FORMAT_DATE_TIME);
+		HibernateUtil.formatDate(pageOut.getList(), "startTime", DateUtil.FORMAT_DATE_TIME);
+		HibernateUtil.formatDate(pageOut.getList(), "endTime", DateUtil.FORMAT_DATE_TIME);
 		return pageOut;
 	}
 
