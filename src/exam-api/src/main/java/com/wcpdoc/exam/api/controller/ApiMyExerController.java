@@ -28,9 +28,11 @@ import com.wcpdoc.core.util.DateUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.cache.QuestionCache;
 import com.wcpdoc.exam.core.entity.Exer;
+import com.wcpdoc.exam.core.entity.ExerRmk;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
+import com.wcpdoc.exam.core.service.ExerRmkService;
 import com.wcpdoc.exam.core.service.ExerService;
 import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
@@ -52,6 +54,8 @@ public class ApiMyExerController extends BaseController {
 	private QuestionService questionService;
 	@Resource
 	private QuestionTypeService questionTypeService;
+	@Resource
+	private ExerRmkService exerRmkService;
 	
 	/**
 	 * 我的练习列表
@@ -77,7 +81,7 @@ public class ApiMyExerController extends BaseController {
 	}
 	
 	/**
-	 * 模拟练习获取
+	 * 练习获取
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
 	 * @return pageOut
@@ -98,10 +102,10 @@ public class ApiMyExerController extends BaseController {
 					.addAttr("rmkState", exer.getRmkState())
 					;
 		} catch (MyException e) {
-			log.error("模拟练习删除错误：{}", e.getMessage());
+			log.error("练习删除错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("模拟练习删除错误：", e);
+			log.error("练习删除错误：", e);
 			return PageResult.err();
 		}
 	}
@@ -218,6 +222,79 @@ public class ApiMyExerController extends BaseController {
 			return PageResult.err().msg(e.getMessage());
 		}  catch (Exception e) {
 			log.error("我的练习试题列表错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 评论列表
+	 * 
+	 * v1.0 chenyun 2021年8月31日上午9:54:28
+	 * 
+	 * @param pageIn
+	 * @return PageOut
+	 */
+	@RequestMapping("/rmkListpage")
+	@ResponseBody
+	public PageResult rmkListpage() {
+		try {
+			PageOut pageOut = exerRmkService.getListpage(new PageIn(request));
+			for (Map<String, Object> map : pageOut.getList()) {
+				if (map.get("likeUserIds") != null 
+						&& map.get("likeUserIds").toString().contains(String.format(",%s,", getCurUser().getId()))) {
+					map.put("hasLike", true);
+				} else {
+					map.put("hasLike", false);
+				}
+			}
+			return PageResultEx.ok().data(pageOut);
+		} catch (Exception e) {
+			log.error("评论列表错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 评论
+	 * 
+	 * v1.0 chenyun 2021年8月31日上午9:54:28
+	 * @param exerRmk 评论
+	 * @param anon 是否匿名（true：是；false：否）
+	 * @return PageResult
+	 */
+	@RequestMapping("/rmk")
+	@ResponseBody
+	public PageResult rmk(ExerRmk exerRmk, Boolean anon) {
+		try {
+			exerRmkService.rmk(exerRmk, anon);
+			return PageResultEx.ok().addAttr("id", exerRmk.getId());
+		} catch (MyException e) {
+			log.error("评论错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("评论错误：", e);
+			return PageResult.err();
+		}
+	}
+	
+	/**
+	 * 评论点赞
+	 * 
+	 * v1.0 zhanghc 2023年4月17日下午7:52:03
+	 * @param exerRmkId 评论ID
+	 * @return PageResult
+	 */
+	@RequestMapping("/rmkLike")
+	@ResponseBody
+	public PageResult rmkLike(Integer exerRmkId) {
+		try {
+			exerRmkService.like(exerRmkId);
+			return PageResult.ok();
+		} catch (MyException e) {
+			log.error("评论点赞错误：{}", e.getMessage());
+			return PageResult.err().msg(e.getMessage());
+		} catch (Exception e) {
+			log.error("评论点赞错误：", e);
 			return PageResult.err();
 		}
 	}

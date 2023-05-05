@@ -13,13 +13,14 @@ import com.wcpdoc.core.service.impl.BaseServiceImp;
 import com.wcpdoc.core.util.ValidateUtil;
 import com.wcpdoc.exam.core.dao.ExerDao;
 import com.wcpdoc.exam.core.entity.Exer;
+import com.wcpdoc.exam.core.service.ExerRmkService;
 import com.wcpdoc.exam.core.service.ExerService;
 import com.wcpdoc.exam.core.service.QuestionAnswerService;
 import com.wcpdoc.exam.core.service.QuestionOptionService;
 import com.wcpdoc.exam.core.service.QuestionService;
 
 /**
- * 模拟练习服务层实现
+ * 练习服务层实现
  * 
  * v1.0 chenyun 2021-03-02 13:43:21
  */
@@ -33,6 +34,8 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 	private QuestionOptionService questionOptionService;
 	@Resource
 	private QuestionAnswerService questionAnswerService;
+	@Resource
+	private ExerRmkService exerRmkService;
 
 	@Override
 	@Resource(name = "exerDaoImpl")
@@ -72,7 +75,7 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 			}
 		}
 		
-		// 模拟练习添加
+		// 练习添加
 		exer.setState(1);
 		exer.setUpdateUserId(getCurUser().getId());
 		exer.setUpdateTime(new Date());
@@ -121,7 +124,7 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 			}
 		}
 		
-		// 模拟练习修改
+		// 练习修改
 		entity.setName(exer.getName());
 		entity.setQuestionTypeId(exer.getQuestionTypeId());
 		entity.setStartTime(exer.getStartTime());

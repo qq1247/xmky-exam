@@ -16,17 +16,19 @@ import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 
 /**
- * 模拟练习评论
+ * 练习评论
  * 
  * v1.0 chenyun 2021年8月31日上午9:46:45
  */
 @Entity
-@Table(name = "EXM_QUESTION_COMMENT")
+@Table(name = "EXM_EXER_RMK")
 public class ExerRmk {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "ID")
 	private Integer id;
+	@Column(name = "EXER_ID")
+	private Integer exerId;
 	@Column(name = "QUESTION_ID")
 	private Integer questionId;
 	@Column(name = "CONTENT")
@@ -122,5 +124,13 @@ public class ExerRmk {
 
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
+	}
+
+	public Integer getExerId() {
+		return exerId;
+	}
+
+	public void setExerId(Integer exerId) {
+		this.exerId = exerId;
 	}
 }

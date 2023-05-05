@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "886696",
+      "name": "点赞(1)",
+      "font_class": "dianzan1",
+      "unicode": "e60e",
+      "unicode_decimal": 58894
+    },
+    {
+      "icon_id": "886698",
+      "name": "点赞(3)",
+      "font_class": "dianzan3",
+      "unicode": "e610",
+      "unicode_decimal": 58896
+    },
+    {
       "icon_id": "598003",
       "name": "技术支持 支持 智能客服 服务",
       "font_class": "fuwuzhichi",
@@ -578,13 +592,6 @@
       "font_class": "classify",
       "unicode": "e62d",
       "unicode_decimal": 58925
-    },
-    {
-      "icon_id": "20092537",
-      "name": "赞",
-      "font_class": "good",
-      "unicode": "e624",
-      "unicode_decimal": 58916
     },
     {
       "icon_id": "15023573",

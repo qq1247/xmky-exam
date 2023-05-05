@@ -16,7 +16,7 @@ import com.wcpdoc.core.util.StringUtil;
 import com.wcpdoc.core.util.ValidateUtil;
 
 /**
- * 模拟练习实体
+ * 练习实体
  * 
  * v1.0 chenyun 2021-03-02 13:43:21
  */

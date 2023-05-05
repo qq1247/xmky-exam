@@ -25,7 +25,7 @@
                     </div>
                 </div>
                 <div class="paper-left-top-time">
-                    <CountDown :expireTime="exer.endTime" preTxt="距结束：" :remind="300" @end="exerEnd" @remind="exer.color='var(--el-color-danger)'" :color="exer.color"></CountDown>
+                    <CountDown :expireTime="exer.endTime as Date" preTxt="距结束：" :remind="300" @end="exerEnd" @remind="exer.color='var(--el-color-danger)'" :color="exer.color"></CountDown>
                 </div>
                 <el-button type="primary" plain @click="$router.go(-1)">返回</el-button>
             </el-card>
@@ -45,51 +45,65 @@
             </el-card>
         </div>
         <!-- 试卷 -->
-        <el-scrollbar class="paper-right">
-            <el-card shadow="never" >
-                <!-- 选项 -->
-                <div class="paper-right-opt">
-                    <el-button link size="small" :disabled="curQuestion.index <= 0" @click="next(false)">{{ `<<上一页` }}</el-button>
-                    <el-button link size="small" :disabled="curQuestion.index >= exer.questionIds.length - 1" @click="next(true)">{{ `下一页>>` }}</el-button>
-                    <el-checkbox v-model="exer.answerShow" label="背题" size="small"></el-checkbox>
-                    <el-checkbox v-model="exer.randShow" label="随机" size="small"></el-checkbox>
-                    <el-checkbox v-model="exer.rmkShow" label="评论" size="small"></el-checkbox>
-                </div>
-                <el-divider />
-                <!-- 试题 -->
-                <QuestionVue 
-                    v-if="curQuestion.index >= 0"
-                    :no="curQuestion.index + 1" 
-                    :type="curQuestion.question.type"
-                    :markType="curQuestion.question.markType" 
-                    :title="curQuestion.question.title" 
-                    :score="curQuestion.question.score"
-                    :answers="curQuestion.question.answers"
-                    :userScore="curQuestion.question.userScore"
-                    :userAnswers="curQuestion.question.userAnswers"
-                    :options="curQuestion.question.options"
-                    :editable="!exer.answerShow && curQuestion.question.userScore == null"
-                    @change="(answers: string[]) => {
-                        exer.lastTime = new Date() // 答题就更新时间
-                        curQuestion.question.userAnswers = answers
-                        if (curQuestion.question.type === 1 || curQuestion.question.type === 4) {// 单选或判断，选完答案，自动下一题
-                            next(true)
-                        }
-                    }"
-                    :user-answer-show="!exer.answerShow"
-                    :errShow="!exer.answerShow && curQuestion.question.userScore != null"
-                    >
-                    <template #bottom-right>
-                        <el-tooltip placement="top" effect="light" :content="answerFormat(curQuestion.question)" raw-content>
-                            <el-button type="success" size="small">标准答案</el-button>
-                        </el-tooltip>
-                    </template>
-                </QuestionVue>
-                <!-- <ul v-infinite-scroll="" class="paper-right-rmk" style="overflow: auto">
-                    <li v-for="i in count" :key="i">{{ i }}</li>
-                </ul> -->
-            </el-card>
-        </el-scrollbar>
+        <el-card shadow="never" class="paper-right">
+            <!-- 选项 -->
+            <div class="paper-right-opt">
+                <el-button link size="small" :disabled="curQuestion.index <= 0" @click="next(false)">{{ `<<上一页` }}</el-button>
+                <el-button link size="small" :disabled="curQuestion.index >= exer.questionIds.length - 1" @click="next(true)">{{ `下一页>>` }}</el-button>
+                <el-checkbox v-model="exer.answerShow" label="背题" size="small"></el-checkbox>
+                <el-checkbox v-model="exer.randShow" label="随机" size="small"></el-checkbox>
+                <el-checkbox v-model="exer.rmkShow" label="评论" size="small"></el-checkbox>
+            </div>
+            <el-divider />
+            <!-- 试题 -->
+            <QuestionVue 
+                v-if="curQuestion.index >= 0"
+                :no="curQuestion.index + 1" 
+                :type="curQuestion.question.type"
+                :markType="curQuestion.question.markType" 
+                :title="curQuestion.question.title" 
+                :score="curQuestion.question.score"
+                :answers="curQuestion.question.answers"
+                :userScore="curQuestion.question.userScore"
+                :userAnswers="curQuestion.question.userAnswers"
+                :options="curQuestion.question.options"
+                :editable="!exer.answerShow && curQuestion.question.userScore == null"
+                @change="(answers: string[]) => {
+                    exer.lastTime = new Date() // 答题就更新时间
+                    curQuestion.question.userAnswers = answers
+                    if (curQuestion.question.type === 1 || curQuestion.question.type === 4) {// 单选或判断，选完答案，自动下一题
+                        next(true)
+                    }
+                }"
+                :user-answer-show="!exer.answerShow"
+                :errShow="!exer.answerShow && curQuestion.question.userScore != null"
+                >
+                <template #bottom-right>
+                    <el-tooltip placement="top" effect="light" :content="answerFormat(curQuestion.question)" raw-content>
+                        <el-button type="success" size="small">标准答案</el-button>
+                    </el-tooltip>
+                </template>
+            </QuestionVue>
+            <!-- 评论 -->
+            <div class="paper-right-my-rmk">
+                <el-input v-model="exerRmk.content" placeholder="我是这样解题的：" :autosize="{ minRows: 1 }" type="textarea" maxlength="100" show-word-limit resize="none"/>
+                <el-checkbox v-model="exerRmk.anon" label="匿名" size="small"/>
+                <el-button type="primary" text bg size="small" @click="rmk">我来解题</el-button>
+            </div>
+            <el-divider content-position="left"></el-divider>
+            <ul v-infinite-scroll="rmkQuery" class="paper-right-rmk-list">
+                <li :id="`rmk${ rmk.id }`" v-for="rmk in rmkListpage.list" :key="rmk.id">
+                    <el-text tag="p">{{ rmk.content }}</el-text>
+                    <div>
+                        <el-text type="info" size="small">{{ rmk.updateUserName || '匿名'}} {{ rmk.updateTime }}</el-text>
+                        <span 
+                            :class="{ 'iconfont': true, 'icon-dianzan3': rmk.hasLike, 'icon-dianzan1': !rmk.hasLike, }" 
+                            @click="rmkLike(rmk.id)"
+                            >&nbsp;{{ rmk.likeNum }}</span>
+                    </div>
+                </li>
+            </ul>
+        </el-card>
     </div>
 </template>
 <script lang="ts" setup>
@@ -102,8 +116,10 @@ import { ElMessage, ElMessageBox, type Action } from 'element-plus';
 import type { Question } from '@/stores/exam';
 import dayjs from 'dayjs';
 import CountDown from '@/components/CountDown.vue';
+import { useUserStore } from '@/stores/user';
 
 // 定义变量
+const userStore = useUserStore()
 const route = useRoute()
 const router = useRouter()
 const exer = reactive({// 练习信息
@@ -126,6 +142,17 @@ const curQuestion = reactive({// 当前试题
 const user = reactive({// 用户信息
     name: '',// 姓名
     orgName: '',// 机构名称
+})
+
+const exerRmk = reactive({// 评论
+    content: '',
+    anon: false
+})
+const rmkListpage = reactive({// 评论分页列表
+    curPage: 1,
+    pageSize: 10,
+    total: 0,
+    list: [] as any[],
 })
 
 // 组件挂载完成后，执行如下方法
@@ -349,13 +376,76 @@ function exerEnd() {
         },
     })
 }
+
+// 评论
+async function rmk() {
+    if (!exerRmk.content.trim()) {
+        return
+    }
+    const { data: { code, data } } = await http.post('myExer/rmk', {
+        exerId: exer.id,
+        questionId: curQuestion.question.id,
+        content: exerRmk.content,
+        anon: exerRmk.anon,
+    })
+
+    if (code !== 200) {
+        return
+    }
+
+    rmkListpage.list.unshift({// 新添加的放在第一个，有可能按点赞排序，在后面看不到
+        id: data.id,
+        content: exerRmk.content,
+        updateTime: dayjs(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+        updateUserName: exerRmk.anon ? null : userStore.name,
+        likeNum: 0,
+        hasLike: false,
+    })
+    
+    setTimeout(() => {// 滚动到最上
+        document.getElementById(`rmk${ data.id }`)?.scrollIntoView(true)
+    }, 500);
+}
+
+// 评论查询
+async function rmkQuery() {
+    const { data: { code, data } } = await http.post('myExer/rmkListpage', {
+        questionId: curQuestion.question.id,
+        curPage: rmkListpage.curPage,
+        pageSize: rmkListpage.pageSize,
+    })
+
+    if (code !== 200) {
+        return
+    }
+
+    rmkListpage.list.push(...data.list)// 数据会重复，v-for :key="id" 过滤重复
+    rmkListpage.total = data.total
+    rmkListpage.curPage++
+}
+
+// 评论点赞
+async function rmkLike(exerRmkId: number) {
+    const { data: { code, data } } = await http.post('myExer/rmkLike', { exerRmkId })
+    if (code !== 200) {
+        return
+    }
+
+    let rmk = rmkListpage.list.filter(cur => cur.id === exerRmkId)
+    rmk[0].hasLike = !rmk[0].hasLike
+    if (rmk[0].hasLike) {
+        rmk[0].likeNum++
+    } else {
+        rmk[0].likeNum--
+    }
+}
+
 </script>
 
 <style lang="scss" scoped>
 .paper {
     flex: 1;
     display: flex;
-
     .paper-left {
         width: 240px;
         display: flex;
@@ -442,34 +532,74 @@ function exerEnd() {
         }
     }
 
+    
     :deep(.paper-right) {
         flex: 1;
-        .el-card {
-            width: 800px;
-            min-height: calc(100vh - 50px);
-            margin-left: 10px;
-            .question-paper {
-                min-height: 300px;
+        width: 800px;
+        min-height: calc(100vh - 50px);
+        margin-left: 10px;
+        .question-paper {
+            min-height: 200px;
+        }
+        .paper-right-opt {
+            display: flex;
+            align-items: center;
+            margin: 15px 15px 0px 15px;
+            padding-left: 15px;
+            .el-checkbox {
+                margin-left: 30px;
+                margin-right: 0px;
             }
-            .paper-right-opt {
+        }
+        .el-divider--horizontal {
+            width: initial;
+            margin: 5px 20px 10px 20px;
+        }
+        .paper-right-my-rmk {
+            display: flex;
+            margin: 10px 20px;
+            align-items: flex-end;
+            .el-textarea__inner {
+                box-shadow: initial;
+            }
+            .el-checkbox {
+                margin: 0px 10px;
+            }
+        }
+        .paper-right-rmk-list {
+            height: calc(100vh - 400px);
+            padding: 0;
+            margin: 0;
+            list-style: none;
+            overflow: auto;
+            li {
                 display: flex;
-                align-items: center;
-                margin: 15px 15px 0px 15px;
-                padding-left: 15px;
-                .el-checkbox {
-                    margin-left: 30px;
-                    margin-right: 0px;
+                flex-direction: column;
+                min-height: 50px;
+                background: var(--el-color-primary-light-9);
+                margin: 10px 20px;
+                padding: 10px;
+                color: var(--el-text-color-regular);
+                .el-text {
+                    margin: 0px 0px 5px 0px;
+                    align-self: initial;
                 }
-            }
-            .el-divider--horizontal {
-                width: initial;
-                margin: 5px 20px 10px 20px;
-            }
-            .paper-right-rmk {
-                height: 300px;
-                padding: 0;
-                margin: 0;
-                list-style: none;
+                div {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: baseline;
+                    font-size: 12px;
+                    .el-text {
+                        margin: 0px;
+                    }
+                    .iconfont {
+                        cursor: pointer;
+                        font-size: 14px;
+                        &:hover {
+                            color: var(--el-color-primary);
+                        }
+                    }
+                }
             }
         }
     }

@@ -316,7 +316,7 @@ onMounted(async () => {
     }
 
     // 公告查询
-    let { data: { code, data:data2 } } = await http.post('bulletin/listpage', {
+    let { data: { code, data: data2 } } = await http.post('bulletin/listpage', {
         notice: true,
         curPage: 1,
         pageSize: 10,

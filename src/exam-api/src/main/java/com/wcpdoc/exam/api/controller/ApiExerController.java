@@ -24,7 +24,7 @@ import com.wcpdoc.exam.core.service.QuestionService;
 import com.wcpdoc.exam.core.service.QuestionTypeService;
 
 /**
- * 模拟练习控制层
+ * 练习控制层
  * 
  * v1.0 chenyun 2021-03-02 13:43:21
  */
@@ -41,7 +41,7 @@ public class ApiExerController extends BaseController {
 	private QuestionTypeService questionTypeService;
 	
 	/**
-	 * 模拟练习列表
+	 * 练习列表
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
 	 * @return pageOut
@@ -63,13 +63,13 @@ public class ApiExerController extends BaseController {
 			}
 			return PageResultEx.ok().data(pageOut);
 		} catch (Exception e) {
-			log.error("模拟练习列表错误：", e);
+			log.error("练习列表错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 模拟练习添加
+	 * 练习添加
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
 	 * @return pageOut
@@ -81,16 +81,16 @@ public class ApiExerController extends BaseController {
 			exerService.addEx(exer);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("模拟练习添加错误：{}", e.getMessage());
+			log.error("练习添加错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("模拟练习添加错误：", e);
+			log.error("练习添加错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 模拟练习修改
+	 * 练习修改
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
 	 * @return pageOut
@@ -102,16 +102,16 @@ public class ApiExerController extends BaseController {
 			exerService.updateEx(exer);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("模拟练习添加错误：{}", e.getMessage());
+			log.error("练习添加错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("模拟练习添加错误：", e);
+			log.error("练习添加错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 模拟练习删除
+	 * 练习删除
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
 	 * @return pageOut
@@ -127,16 +127,16 @@ public class ApiExerController extends BaseController {
 			exerService.update(exer);
 			return PageResult.ok();
 		} catch (MyException e) {
-			log.error("模拟练习删除错误：{}", e.getMessage());
+			log.error("练习删除错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("模拟练习删除错误：", e);
+			log.error("练习删除错误：", e);
 			return PageResult.err();
 		}
 	}
 	
 	/**
-	 * 模拟练习获取
+	 * 练习获取
 	 * 
 	 * v1.0 chenyun 2021-03-02 13:43:21
 	 * @return pageOut
@@ -157,10 +157,10 @@ public class ApiExerController extends BaseController {
 					.addAttr("rmkState", exer.getRmkState())
 					;
 		} catch (MyException e) {
-			log.error("模拟练习删除错误：{}", e.getMessage());
+			log.error("练习删除错误：{}", e.getMessage());
 			return PageResult.err().msg(e.getMessage());
 		} catch (Exception e) {
-			log.error("模拟练习删除错误：", e);
+			log.error("练习删除错误：", e);
 			return PageResult.err();
 		}
 	}

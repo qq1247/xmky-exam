@@ -30,7 +30,7 @@ public class BulletinDaoImpl extends RBaseDaoImpl<Bulletin> implements BulletinD
 		SqlUtil sqlUtil = new SqlUtil(sql);
 		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("title")), "BULLETIN.TITLE LIKE :TITLE", "%" + pageIn.get("title") + "%")
 				.addWhere("BULLETIN.STATE = 1")
-			   .addOrder("BULLETIN.START_TIME", Order.DESC);
+				.addOrder("BULLETIN.START_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
 		HibernateUtil.formatDate(pageOut.getList(), 
 				"startTime", DateUtil.FORMAT_DATE_TIME,
