@@ -13,7 +13,6 @@
 	<properties>
 		<failOnMissingWebXml>false</failOnMissingWebXml>
 	</properties>
-	<packaging>war</packaging>
 
 	<dependencies>
 		<!-- 集成web容器 -->
