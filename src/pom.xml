@@ -16,6 +16,11 @@
 
 	<properties>
 		<java.version>1.8</java.version>
+		
+		<!-- 使用新版本log4j2，解决2021.12月爆发的jndi注入攻击漏洞 -->
+		<log4j2.version>2.17.1</log4j2.version>
+		<!-- oshi-core使用了新版API -->
+		<jna.version>5.12.1</jna.version>
 	</properties>
 
 	<modules>
