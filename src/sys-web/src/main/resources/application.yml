@@ -30,9 +30,9 @@ hibernate:
     physical-strategy: com.wcpdoc.core.hibernate.UpperCaseStrategy
     
 runtime:
-  timeout: 1000
-  exUrl: 
   monitor: true
+  timeout: 1000
+  exUrl: /api/report/server/parm
   
 logging:
   config: config/log4j2.xml

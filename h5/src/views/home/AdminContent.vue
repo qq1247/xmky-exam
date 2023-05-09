@@ -250,9 +250,11 @@ export default {
   },
   mounted() {
     this.getAdminInfo()
-    this.getServerParam()
     this.query()
     this.getServerLog()
+    setTimeout(() => {// 延时请求，规避cpu占用率是其他接口造成的问题
+      this.getServerParam()
+    }, 1000);
   },
   methods: {
     async getAdminInfo() {

@@ -10,10 +10,6 @@
 	<artifactId>sys-core</artifactId>
 	<name>sys-core</name>
 	<description>系统核心</description>
-	<properties>
-		<!-- 使用新版本log4j2，解决2021.12月爆发的jndi注入攻击漏洞 -->
-		<log4j2.version>2.17.1</log4j2.version>
-	</properties>
 	<dependencies>
 		<!-- 集成web应用 -->
 		<dependency>
@@ -26,6 +22,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		
 		<!-- 集成模板引擎 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
