@@ -201,4 +201,17 @@ public class MyExam {
 		this.markEndTime = markEndTime;
 	}
 
+	/**
+	 * 答题用时（毫秒）<br/>
+	 * 分数排名专用
+	 * 
+	 * v1.0 zhanghc 2023年5月10日上午9:22:57
+	 * @return Long 毫秒值
+	 */
+	public Long getAnswerMs() {
+		if (this.answerStartTime == null || this.answerEndTime == null) {
+			return Long.MAX_VALUE;
+		}
+		return this.answerEndTime.getTime() - this.answerStartTime.getTime();
+	}
 }

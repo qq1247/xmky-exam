@@ -125,7 +125,7 @@
                 <div class="home-left-bottom-right">
                     <el-card shadow="never">
                         <template #header>
-                            <span>考试列表</span>
+                            <span>考试任务</span>
                         </template>
                         <el-scrollbar max-height="calc((100vh - 380px) / 2)">
                             <div v-for="todoExam in todoExamList" class="home-left-bottom-right-row">
@@ -142,13 +142,13 @@
                     </el-card>
                     <el-card shadow="never">
                         <template #header>
-                            <span>练习列表</span>
+                            <span>练习任务</span>
                         </template>
                         <el-scrollbar max-height="calc((100vh - 380px) / 2)">
                             <div v-for="todoExer in todoExerList" class="home-left-bottom-right-row">
                                 <div>
                                     <el-text tag="b">{{ todoExer.name }}</el-text><br/>
-                                    <el-text type="info" size="small">{{ todoExer.examStarstartTimetTime }} - {{ todoExer.endTime }}</el-text>
+                                    <el-text type="info" size="small">{{ todoExer.startTime }} - {{ todoExer.endTime }}</el-text>
                                 </div>
                                 <el-button v-if="userStore.roles.includes('user')" type="primary" plain @click="toExer(todoExer)">开始练习</el-button>
                             </div>

@@ -2,13 +2,13 @@ package com.wcpdoc.exam.core.service.impl;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -464,16 +464,21 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 	}
 	
 	private void doMarkRank(List<MyExam> myExamList) {
-		Collections.sort(myExamList, new Comparator<MyExam>() {
-			@Override
-			public int compare(MyExam o1, MyExam o2) {
-				return o2.getTotalScore().compareTo(o1.getTotalScore());
-			}
-		});
+//		Collections.sort(myExamList, new Comparator<MyExam>() {
+//			@Override
+//			public int compare(MyExam o1, MyExam o2) {
+//				return o2.getTotalScore().compareTo(o1.getTotalScore());
+//			}
+//		});
 		
-		for (int i = 0; i < myExamList.size(); i++) {
-			myExamList.get(i).setNo(i + 1);
-			myExamService.update(myExamList.get(i));
+		List<MyExam> myExamWithSortList = myExamList.stream()
+				.sorted(Comparator.comparing(MyExam::getTotalScore).reversed()// 按分数排名
+							.thenComparing(Comparator.comparing(MyExam::getAnswerMs)))// 分数相同，答题时间短排在前面
+				.collect(Collectors.toList());
+		
+		for (int i = 0; i < myExamWithSortList.size(); i++) {
+			myExamWithSortList.get(i).setNo(i + 1);
+			myExamService.update(myExamWithSortList.get(i));
 		}
 	}
 	
@@ -495,16 +500,20 @@ public class MyExamServiceImpl extends BaseServiceImp<MyExam> implements MyExamS
 			return;
 		}
 		
-		Collections.sort(myExamList, new Comparator<MyExam>() {
-			@Override
-			public int compare(MyExam o1, MyExam o2) {
-				return o2.getTotalScore().compareTo(o1.getTotalScore());
-			}
-		});
+//		Collections.sort(myExamList, new Comparator<MyExam>() {
+//			@Override
+//			public int compare(MyExam o1, MyExam o2) {
+//				return o2.getTotalScore().compareTo(o1.getTotalScore());
+//			}
+//		});
+		List<MyExam> myExamWithSortList = myExamList.stream()
+				.sorted(Comparator.comparing(MyExam::getTotalScore).reversed()// 按分数排名
+							.thenComparing(Comparator.comparing(MyExam::getAnswerMs)))// 分数相同，答题时间短排在前面
+				.collect(Collectors.toList());
 		
-		for (int i = 0; i < myExamList.size(); i++) {
-			myExamList.get(i).setNo(i + 1);
-			myExamService.update(myExamList.get(i));
+		for (int i = 0; i < myExamWithSortList.size(); i++) {
+			myExamWithSortList.get(i).setNo(i + 1);
+			myExamService.update(myExamWithSortList.get(i));
 		}
 	}
 	

@@ -57,7 +57,7 @@
                         <el-table-column prop="" label="分数" align="center">
                             <template #default="scope">
                                 <span :style="{ color: scope.row.myExamAnswerState === 2 ? '#f56c6c' : '#67c23a'}">
-                                    {{ scope.row.myExamTotalScore || '-'}}
+                                    {{ scope.row.myExamTotalScore != null ? scope.row.myExamTotalScore : '-'}}
                                 </span>
                             </template>
                         </el-table-column>
