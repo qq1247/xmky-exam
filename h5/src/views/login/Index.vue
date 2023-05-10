@@ -8,7 +8,7 @@
                 <el-input v-model.trim="form.loginName" placeholder="请输入账号" />
             </el-form-item>
             <el-form-item label="" prop="pwd">
-                <el-input v-model.trim="form.pwd" placeholder="请输入密码" />
+                <el-input v-model.trim="form.pwd" type="password" show-password placeholder="请输入密码" />
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="login">登录</el-button>

@@ -14,6 +14,8 @@ drop table if exists EXM_PAPER;
 
 drop table if exists EXM_PAPER_QUESTION;
 
+drop table if exists EXM_PAPER_QUESTION_RULE;
+
 drop table if exists EXM_PAPER_QUESTION_ANSWER;
 
 drop table if exists EXM_PAPER_REMARK;
@@ -47,6 +49,7 @@ drop table if exists SYS_SENSITIVE;
 drop table if exists SYS_USER;
 
 drop table if exists SYS_VER;
+
 /*==============================================================*/
 /* Table: EXM_BULLETIN                                          */
 /*==============================================================*/
@@ -88,6 +91,7 @@ create table EXM_EXAM
    MARK_STATE           int comment '阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）',
    SCORE_STATE          int comment '成绩状态（1：公开；2：不公开）',
    RANK_STATE           int comment '排名状态（1：公开；2：不公开）',
+   ANON_STATE           int comment '匿名阅卷状态（1：公开；2：不公开）',
    LOGIN_TYPE           int comment '登陆方式（1：安排考试；2：免登陆考试）',
    DESCRIPTION          varchar(512) comment '描述',
    CREATE_USER_ID       int comment '创建人',
@@ -162,6 +166,8 @@ create table EXM_MY_EXAM_DETAIL
    SCORE                decimal(5,2) comment '得分',
    QUESTION_SCORE       decimal(5,2) comment '试题分值',
    ANSWER_FILE_ID       int comment '答案附件ID',
+   QUESTION_NO          int comment '试题顺序（固定试卷试题随机有效）',
+   OPTION_NO            varchar(16) comment '选项顺序（固定试卷选项随机有效，英文逗号分割）',
    primary key (ID)
 );
 
@@ -218,7 +224,7 @@ create table EXM_PAPER_QUESTION
 (
    ID                   int not null auto_increment comment 'id',
    NAME                 varchar(32) comment '章节名称',
-   DESCRIPTION          text comment '章节描述',
+   DESCRIPTION          varchar(512) comment '章节描述',
    PARENT_ID            int comment '父ID',
    PARENT_SUB           varchar(512) comment '父子关系（格式：_父ID_子ID_子子ID_... ...）',
    UPDATE_USER_ID       int comment '修改人',
@@ -227,12 +233,37 @@ create table EXM_PAPER_QUESTION
    QUESTION_ID          int comment '试题ID',
    TYPE                 int comment '1：章节；2：固定试题；3：随机试题',
    SCORE                decimal(5,2) comment '分数',
-   SCORE_OPTIONS        varchar(8) comment '1：漏选得分；2：答案无顺序；3：大小写不敏感；',
+   AI_OPTIONS           varchar(8) comment '智能选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；)',
    NO                   int comment '排序',
+   EXAM_ID              int comment '考试ID（随机试卷有效）',
+   USER_ID              int comment '用户ID（随机试卷有效）',
    primary key (ID)
 );
 
 alter table EXM_PAPER_QUESTION comment '试卷试题';
+
+/*==============================================================*/
+/* Table: EXM_PAPER_QUESTION_RULE                               */
+/*==============================================================*/
+create table EXM_PAPER_QUESTION_RULE
+(
+   ID                   int not null auto_increment comment 'id',
+   QUESTION_TYPE_ID     int comment '试题分类ID',
+   TYPE                 int comment '1：单选；2：多选；3：填空；4：判断；5：问答',
+   DIFFICULTYS          varchar(16) comment '1：极易；2：简单；3：适中；4：困难；5：极难',
+   AIS                  varchar(16) comment '智能阅卷',
+   AI_OPTIONS        	varchar(8) comment '1：漏选得分；2：答案无顺序；3：大小写不敏感；',
+   NUM                  int comment '题数',
+   SCORE                decimal(5,2) comment '分数',
+   PAPER_ID             int comment '试卷ID',
+   PAPER_QUESTION_ID    int comment '试卷试题ID',
+   NO                   int comment '排序',
+   UPDATE_USER_ID       int comment '修改人',
+   UPDATE_TIME          datetime comment '修改时间',
+   primary key (ID)
+);
+
+alter table EXM_PAPER_QUESTION_RULE comment '试卷试题规则';
 
 /*==============================================================*/
 /* Table: EXM_PAPER_QUESTION_ANSWER                             */
@@ -242,10 +273,14 @@ create table EXM_PAPER_QUESTION_ANSWER
    ID                   int not null auto_increment,
    ANSWER               text comment '一个答案有多个同义词用\n分隔',
    SCORE                decimal(5,2) comment '分值',
-   NO                   int comment '排序',
    PAPER_ID             int comment '试卷ID',
-   QUESTION_ID          int not null comment '试题ID',
+   EXAM_ID              int comment '考试ID（随机试卷有效）',
+   USER_ID              int comment '用户ID（随机试卷有效）',
+   QUESTION_ID          int comment '试题ID',
+   QUESTION_TYPE        int comment '试题类型',
+   QUESTION_AI          int comment '试题智能类型',
    PAPER_QUESTION_ID    int comment '试卷试题ID',
+   NO                   int comment '排序',
    primary key (ID)
 );
 
@@ -303,7 +338,7 @@ create table EXM_QUESTION
    QUESTION_TYPE_ID     int comment '试题分类',
    SCORE                decimal(5,2) comment '默认分值',
    AI                   int comment '智能阅卷（1：是；2：否；）',
-   SCORE_OPTIONS        varchar(8) comment '分值选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；)',
+   AI_OPTIONS        	varchar(8) comment '分值选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；)',
    primary key (ID)
 );
 
@@ -317,8 +352,10 @@ create table EXM_QUESTION_ANSWER
    ID                   int not null auto_increment,
    ANSWER               text comment '一个答案有多个同义词用\n分隔',
    SCORE                decimal(5,2) comment '分值',
-   NO                   int comment '排序',
    QUESTION_ID          int not null comment '试题ID',
+   QUESTION_TYPE        int comment '试题类型',
+   QUESTION_AI          int comment '试题智能类型',
+   NO                   int comment '排序',
    primary key (ID)
 );
 
@@ -519,6 +556,7 @@ create table SYS_USER
    EMAIL                varchar(64) comment '邮箱',
    PHONE                varchar(11) comment '手机号',
    PWD                  varchar(32) comment '密码',
+   HEAD_FILE_ID         int comment '头像',
    REGIST_TIME          datetime comment '注册时间',
    LAST_LOGIN_TIME      datetime comment '最后登陆时间',
    ORG_ID               int comment '组织机构ID',
@@ -531,6 +569,7 @@ create table SYS_USER
 );
 
 alter table SYS_USER comment '用户';
+
 
 /*==============================================================*/
 /* Table: SYS_VER                                               */
@@ -547,14 +586,13 @@ create table SYS_VER
 
 alter table SYS_VER comment '版本';
 
-
 /*==============================================================*/
 /* 数据															*/
 /*==============================================================*/
 
 INSERT INTO `SYS_ORG` VALUES (1, '组织机构', 'code', '0', '_1_', '1', '1', '2017-08-01 22:31:43', '1', '1');
 
-INSERT INTO `SYS_USER` VALUES (1, '管理员', 'admin', null, null,'79nRuL+wDo42R5kPfXTR2A==', '2017-08-01 22:31:43', '2017-08-01 22:31:43', null, 'admin', '1', '1', '1', '2017-08-01 22:31:43');
+INSERT INTO `SYS_USER` VALUES (1, '管理员', 'admin', null, null,'79nRuL+wDo42R5kPfXTR2A==',null, '2017-08-01 22:31:43', '2017-08-01 22:31:43', null, 'admin', '1', '1', '1', '2017-08-01 22:31:43');
 
 INSERT INTO `SYS_DICT` VALUES (1, 'STATE', '0', '删除', 1);
 INSERT INTO `SYS_DICT` VALUES (2, 'STATE', '1', '启用', 2);
@@ -605,14 +643,12 @@ INSERT INTO `SYS_DICT` VALUES (46, 'PAPER_GEN_TYPE', '2', '随机组卷', 2);
 INSERT INTO `SYS_DICT` VALUES (47, 'EXAM_STATE', '3', '归档', 4);
 INSERT INTO `SYS_DICT` VALUES (48, 'BULLETIN_SHOW_TYPE', '1', '正常', 1);
 INSERT INTO `SYS_DICT` VALUES (49, 'BULLETIN_SHOW_TYPE', '2', '置顶', 2);
-INSERT INTO `SYS_DICT` VALUES (50, 'QUESTION_SCORE_OPTIONS', '1', '漏选得分', 1);
-INSERT INTO `SYS_DICT` VALUES (51, 'QUESTION_SCORE_OPTIONS', '2', '答案无顺序', 2);
-INSERT INTO `SYS_DICT` VALUES (52, 'QUESTION_SCORE_OPTIONS', '3', '大小写不敏感', 3);
+INSERT INTO `SYS_DICT` VALUES (50, 'QUESTION_AI_OPTIONS', '1', '漏选得分', 1);
+INSERT INTO `SYS_DICT` VALUES (51, 'QUESTION_AI_OPTIONS', '2', '答案无顺序', 2);
+INSERT INTO `SYS_DICT` VALUES (52, 'QUESTION_AI_OPTIONS', '3', '大小写不敏感', 3);
 
 INSERT INTO `SYS_CRON` VALUES (1, '清理临时附件', 'com.wcpdoc.file.job.ClearFileJob', '0 0 0 1/1 * ? ', '1', '1', '2020-08-26 18:42:08');
 INSERT INTO `SYS_CRON` VALUES (2, '数据库备份', 'com.wcpdoc.quartz.job.DbBackJob', '0 0 0 1/1 * ? ', 1, 1, '2020-08-26 18:42:08');
-INSERT INTO `SYS_CRON` VALUES (3, '自动阅卷', 'com.wcpdoc.exam.core.job.AutoMarkJob', '0/1 * * * * ? *', 1, 1, '2020-08-26 18:42:08');
-INSERT INTO `SYS_CRON` VALUES (4, '自动考试', 'com.wcpdoc.exam.core.job.AutoExamJob', '0/1 * * * * ? *', 1, 1, '2020-08-26 18:42:08');
 
 INSERT INTO `SYS_VER` VALUES (1, '1.0.0', '2017-09-07 15:06:00', 'zhanghc', '初始版本');
 INSERT INTO `SYS_VER` VALUES (2, '1.1.0', '2018-11-27 22:47:00', 'zhanghc', '');
@@ -628,4 +664,18 @@ INSERT INTO `SYS_VER` VALUES (11, '3.2.0', '2020-10-31 16:43:00', 'zhanghc', '')
 INSERT INTO `SYS_VER` VALUES (12, '3.2.1', '2021-11-25 16:26:01', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (13, '3.3.0', '2020-11-30 11:11:11', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (14, '3.4.0', '2021-12-31 12:00:00', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (15, '3.5.0', '2022-01-28 15:36:51', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (16, '3.6.0', '2022-03-17 16:14:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (17, '3.4.1', '2022-03-08 13:15:00', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (18, '3.5.1', '2022-03-08 15:32:00', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (19, '3.6.1', '2022-03-23 13:52:00', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (20, '3.7.0', '2022-03-30 13:06:00', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (21, '3.8.0', '2022-05-13 16:34:00', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (22, '3.8.1', '2022-05-20 17:13:00', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (23, '3.8.2', '2022-06-29 10:18:00', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (24, '3.9.0', '2022-07-07 15:34:00', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (25, '3.9.1', '2022-07-29 16:47:00', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (26, '3.9.2', '2023-03-21 18:51:00', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (28, '3.9.3', '2023-05-08 18:13:00', 'zhanghc', '');
+
+ALTER TABLE `EXM_PAPER_QUESTION` ADD INDEX `QUESTION_ID`(`QUESTION_ID`);

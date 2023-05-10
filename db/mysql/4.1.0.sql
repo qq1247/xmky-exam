@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      MySQL 5.0                                    */
-/* Created on:     2023/5/1 16:50:38                            */
+/* Created on:     2023/5/7 15:17:59                            */
 /*==============================================================*/
 
 
@@ -150,7 +150,7 @@ create table EXM_EXER
    QUESTION_TYPE_ID     int comment '题库ID',
    START_TIME           datetime comment '开始时间',
    END_TIME             datetime comment '结束时间',
-   USER_IDS             text comment '模拟用户IDS',
+   USER_IDS             text comment '练习用户IDS',
    STATE                int comment '状态（0：删除；1：正常）',
    RMK_STATE            int comment '评论状态（1：是；2：否）',
    UPDATE_USER_ID       int comment '修改用户ID',
@@ -166,17 +166,18 @@ alter table EXM_EXER comment '模拟练习';
 create table EXM_EXER_RMK
 (
    ID                   int not null auto_increment comment '主键',
+   EXER_ID              int comment '练习ID',
    QUESTION_ID          int comment '试题ID',
-   CONTENT              varchar(128) comment '评论内容',
+   CONTENT              varchar(256) comment '评论内容',
    LIKE_USER_IDS        text comment '点赞用户IDS',
    LIKE_NUM             int comment '点赞数量',
-   STATE                int comment '状态(0：删除；1：正常,)',
+   STATE                int comment '状态（0：删除；1：正常）',
    UPDATE_USER_ID       int comment '修改用户ID',
    UPDATE_TIME          datetime comment '修改时间',
    primary key (ID)
 );
 
-alter table EXM_EXER_RMK comment '模拟练习评论';
+alter table EXM_EXER_RMK comment '练习评论';
 
 /*==============================================================*/
 /* Table: EXM_MY_EXAM                                           */
@@ -545,5 +546,6 @@ INSERT INTO `SYS_VER` VALUES (24, '3.9.0', '2022-07-07 15:34:00', 'zhanghc', '')
 INSERT INTO `SYS_VER` VALUES (25, '3.9.1', '2022-07-29 16:47:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (26, '3.9.2', '2023-03-21 18:51:00', 'zhanghc', '');
 INSERT INTO `SYS_VER` VALUES (27, '4.0.0', '2023-04-01 14:38:00', 'zhanghc', '');
+INSERT INTO `SYS_VER` VALUES (28, '4.1.0', '2023-05-05 18:00:00', 'zhanghc', '');
 
 ALTER TABLE `EXM_MY_QUESTION` ADD INDEX `MY_QUESTION_EUQ` ( `EXAM_ID`,`USER_ID`,`QUESTION_ID` );

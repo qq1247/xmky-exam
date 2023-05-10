@@ -42,7 +42,7 @@
         <el-divider />
         <div v-if="$route.path !== '/' && $route.path !== '/home'" class="header-bottom">
             <el-breadcrumb separator="/" class="header-bottom-nav">
-                <template v-for="(r, index) in $route.matched">
+                <template v-for="(r, index) in $route.matched" :key="index">
                     <el-breadcrumb-item v-if="r.meta.title">
                         <router-link v-if="index !== ($route.matched.length - 1)" :to="r.path">{{ r.meta.title }}</router-link>
                         <span v-else>{{ r.meta.title }}</span>
@@ -80,6 +80,19 @@
                 </el-tabs> -->
         </div>
     </div>
+    <el-drawer title="密码修改" v-model="form.show" :size="550" @close="form.oldPwd = ''; form.newPwd = '';">
+        <el-form ref="formRef" :model="form" :rules="formRules" label-width="100" size="large">
+            <el-form-item label="旧密码" prop="oldPwd">
+                <el-input v-model="form.oldPwd" type="password" show-password placeholder="请输入旧密码"/>
+            </el-form-item>
+            <el-form-item label="新密码" prop="newPwd">
+                <el-input v-model="form.newPwd" type="password" show-password placeholder="请输入新密码"/>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="pwdUpdate">修改</el-button>
+            </el-form-item>
+        </el-form>
+    </el-drawer>
 </template>
 
 <script lang="ts" setup>
@@ -87,6 +100,7 @@ import http from '@/request';
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user';
 import { onMounted, reactive, ref } from 'vue';
+import type { FormInstance, FormRules } from 'element-plus';
 
 // 定义变量
 const userStore = useUserStore()
@@ -94,6 +108,20 @@ const router = useRouter()
 const ent = reactive({
     logoUrl: `${ http.defaults.baseURL }login/logo`,
     name: ''
+})
+const formRef = ref<FormInstance>()// 表单引用
+const form = reactive({// 密码修改表单
+    show: false,
+    oldPwd: '',
+    newPwd: '',
+})
+const formRules = reactive<FormRules>({// 密码修改表单校验规则
+    oldPwd: [
+        { required: true, message: '请输入旧密码', trigger: 'blur' },
+    ],
+    newPwd: [
+        { required: true, message: '请输入新密码', trigger: 'blur' },
+    ],
 })
 
 // 组件挂载完成后，执行如下方法
@@ -111,6 +139,7 @@ onMounted(async () => {
 // 下拉菜单命令
 async function dropdownCmd (command: string) {
     if (command === 'pwdUpdate') {
+        form.show = true
         return
     }
 
@@ -119,6 +148,22 @@ async function dropdownCmd (command: string) {
         router.push('/login')
         return
     }
+}
+
+// 密码修改
+async function pwdUpdate() {
+    if (!formRef.value) return
+    await formRef.value.validate(async (valid, fields) => {
+        if (!valid) {
+            return
+        }
+
+        let { data: { code } } = await http.post("login/pwd", { ...form })
+
+        form.oldPwd = ''// 提交后重置表单
+        form.newPwd = ''
+        form.show = false
+    })
 }
 </script>
 

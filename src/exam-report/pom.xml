@@ -5,12 +5,12 @@
 	<parent>
 		<groupId>com.wcpdoc.exam</groupId>
 		<artifactId>sys-parent</artifactId>
-		<version>4.0.0</version>
+		<version>4.0.1</version>
 	</parent>
 	<artifactId>exam-report</artifactId>
 	<name>exam-report</name>
 	<description>考试报表</description>
-
+	
 	<dependencies>
 		<!-- 集成考试核心 -->
 		<dependency>
@@ -18,12 +18,12 @@
 			<artifactId>exam-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- 集成服务器参数 -->
 		<dependency>
-		    <groupId>org.fusesource</groupId>
-		    <artifactId>sigar</artifactId>
-		    <version>1.6.4</version>
-		</dependency> 
+			<groupId>com.github.oshi</groupId>
+			<artifactId>oshi-core</artifactId>
+			<version>6.3.2</version>
+		</dependency>
 	</dependencies>
 </project>
