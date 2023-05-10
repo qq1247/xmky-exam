@@ -38,7 +38,7 @@
                         <el-button 
                             :type="errMark(index).type" 
                             :plain="errMark(index).plain"
-                            @click="viewQuestion(index)"
+                            @click="questionView(index)"
                             >{{ index + 1 }}</el-button>
                     </template>
                 </el-scrollbar>
@@ -48,11 +48,11 @@
         <el-card shadow="never" class="paper-right">
             <!-- 选项 -->
             <div class="paper-right-opt">
-                <el-button link size="small" :disabled="curQuestion.index <= 0" @click="next(false)">{{ `<<上一页` }}</el-button>
-                <el-button link size="small" :disabled="curQuestion.index >= exer.questionIds.length - 1" @click="next(true)">{{ `下一页>>` }}</el-button>
+                <el-button link size="small" :disabled="curQuestion.index <= 0" @click="next(false)">{{ `<<上一题` }}</el-button>
+                <el-button link size="small" :disabled="curQuestion.index >= exer.questionIds.length - 1" @click="next(true)">{{ `下一题>>` }}</el-button>
                 <el-checkbox v-model="exer.answerShow" label="背题" size="small"></el-checkbox>
                 <el-checkbox v-model="exer.randShow" label="随机" size="small"></el-checkbox>
-                <el-checkbox v-model="exer.rmkShow" label="评论" size="small"></el-checkbox>
+                <el-checkbox v-if="exer.rmkState === 1" v-model="exer.rmkShow" label="评论" size="small"></el-checkbox>
             </div>
             <el-divider />
             <!-- 试题 -->
@@ -85,24 +85,29 @@
                 </template>
             </QuestionVue>
             <!-- 评论 -->
-            <div class="paper-right-my-rmk">
+            <div v-if="exer.rmkShow && exer.rmkState === 1" class="paper-right-my-rmk">
                 <el-input v-model="exerRmk.content" placeholder="我是这样解题的：" :autosize="{ minRows: 1 }" type="textarea" maxlength="100" show-word-limit resize="none"/>
                 <el-checkbox v-model="exerRmk.anon" label="匿名" size="small"/>
                 <el-button type="primary" text bg size="small" @click="rmk">我来解题</el-button>
             </div>
-            <el-divider content-position="left"></el-divider>
-            <ul v-infinite-scroll="rmkQuery" class="paper-right-rmk-list">
-                <li :id="`rmk${ rmk.id }`" v-for="rmk in rmkListpage.list" :key="rmk.id">
-                    <el-text tag="p">{{ rmk.content }}</el-text>
-                    <div>
-                        <el-text type="info" size="small">{{ rmk.updateUserName || '匿名'}} {{ rmk.updateTime }}</el-text>
-                        <span 
-                            :class="{ 'iconfont': true, 'icon-dianzan3': rmk.hasLike, 'icon-dianzan1': !rmk.hasLike, }" 
-                            @click="rmkLike(rmk.id)"
-                            >&nbsp;{{ rmk.likeNum }}</span>
-                    </div>
-                </li>
-            </ul>
+            <el-divider v-if="exer.rmkShow && exer.rmkState === 1" content-position="left"></el-divider>
+            <el-scrollbar max-height="calc(100vh - 400px)">
+                <ul v-if="exer.rmkShow && exer.rmkState === 1" class="paper-right-rmk-list">
+                    <li :id="`rmk${ rmk.id }`" v-for="rmk in rmkListpage.list" :key="rmk.id">
+                        <el-text tag="p">{{ rmk.content }}</el-text>
+                        <div>
+                            <el-text type="info" size="small">{{ rmk.updateUserName || '匿名'}} {{ rmk.updateTime }}</el-text>
+                            <span 
+                                :class="{ 'iconfont': true, 'icon-dianzan3': rmk.hasLike, 'icon-dianzan1': !rmk.hasLike, }" 
+                                @click="rmkLike(rmk.id)"
+                                >&nbsp;{{ rmk.likeNum }}</span>
+                        </div>
+                    </li>
+                    <li style="background-color: white;">
+                        <el-button v-if="((rmkListpage.total - 1) / rmkListpage.pageSize) + 1 > rmkListpage.curPage" type="" link @click="rmkQuery()">查看更多>></el-button>
+                    </li>
+                </ul>
+            </el-scrollbar>
         </el-card>
     </div>
 </template>
@@ -126,6 +131,7 @@ const exer = reactive({// 练习信息
     id: 0, // 练习ID
     startTime: null as unknown,// 开始时间
     endTime: null as unknown,// 结束时间
+    rmkState: 2,// 评论状态（1：是；2：否）
     questionIds: [] as number[], // 试题列表
     answerShow: false,// 标准答案显示
     randShow: false, // 乱序显示
@@ -150,8 +156,9 @@ const exerRmk = reactive({// 评论
 })
 const rmkListpage = reactive({// 评论分页列表
     curPage: 1,
-    pageSize: 10,
+    pageSize: 20,
     total: 0,
+    cache: [] as number[],// 存放ID，用来过滤重复数据
     list: [] as any[],
 })
 
@@ -170,6 +177,7 @@ onMounted(async () => {
     let { data: { data: data3 } } = await http.post("myExer/get", { exerId: exer.id })
     exer.startTime = dayjs(data3.startTime, 'YYYY-MM-DD HH:mm:ss').toDate()
     exer.endTime = dayjs(data3.endTime, 'YYYY-MM-DD HH:mm:ss').toDate()
+    exer.rmkState = data3.rmkState
 
     let { data: { data } } = await http.post("myExer/questionList", { exerId: exer.id })
     data.userAnswers = []
@@ -177,14 +185,15 @@ onMounted(async () => {
     exer.questionIds.push(...data)
 
     if (exer.questionIds.length) {// 显示第一个
-        viewQuestion(0)
+        questionView(0)
     }
 })
 
 // 监听属性
 watch(() => exer.randShow, async (n, o) => {// 随机和顺序，同一个索引不是同一个题
-    viewQuestion(curQuestion.index)
+    questionView(curQuestion.index)
 })
+
 
 // 计算属性
 const questionIdsOfShuffle = computed(() => {// 点随机的时候用
@@ -220,21 +229,25 @@ onUnmounted(() => {
  * @param {*} index 试题列表索引
  * @return {*}
  */
-async function viewQuestion(index: number) {
+async function questionView(index: number) {
     let questionId = exer.randShow ? questionIdsOfShuffle.value[index] : exer.questionIds[index]
     if (curQuestion.cache[questionId]) {
         curQuestion.index = index
         curQuestion.question = curQuestion.cache[questionId]
-        return
+    } else {
+        let { data: { data: data } } = await http.post("myExer/question", { exerId: exer.id, questionId })
+        data.userAnswers = [] // 接口没有
+        data.userScore = null // 接口没有
+        curQuestion.question = data
+        curQuestion.cache[questionId] = data
+    
+        curQuestion.index = index
     }
 
-    let { data: { data: data } } = await http.post("myExer/question", { exerId: exer.id, questionId })
-    data.userAnswers = [] // 接口没有
-    data.userScore = null // 接口没有
-    curQuestion.question = data
-    curQuestion.cache[questionId] = data
-
-    curQuestion.index = index
+    rmkListpage.curPage = 1
+    rmkListpage.cache = []
+    rmkListpage.list = []
+    rmkQuery()
 }
 
 /**
@@ -247,7 +260,7 @@ async function viewQuestion(index: number) {
 function next(hasNext: boolean) {
     // 数据有效性校验
     if (hasNext) {
-        if (curQuestion.index > exer.questionIds.length - 1) {
+        if (curQuestion.index >= exer.questionIds.length - 1) {
             ElMessage.success('最后一题')
             return
         }
@@ -295,9 +308,9 @@ function next(hasNext: boolean) {
 
     // 下一题
     if (hasNext) {
-        viewQuestion(curQuestion.index + 1)
+        questionView(curQuestion.index + 1)
     } else {
-        viewQuestion(curQuestion.index - 1)
+        questionView(curQuestion.index - 1)
     }
 }
 
@@ -404,7 +417,9 @@ async function rmk() {
     
     setTimeout(() => {// 滚动到最上
         document.getElementById(`rmk${ data.id }`)?.scrollIntoView(true)
-    }, 500);
+    }, 200);
+
+    exerRmk.content = ''// 评论后清空内容
 }
 
 // 评论查询
@@ -419,7 +434,14 @@ async function rmkQuery() {
         return
     }
 
-    rmkListpage.list.push(...data.list)// 数据会重复，v-for :key="id" 过滤重复
+    rmkListpage.list.push(...data.list.filter((cur: any) => {// 过滤重复数据
+        if(rmkListpage.cache.includes(cur.id)) {
+            return false
+        }
+
+        rmkListpage.cache.push(cur.id)
+        return true
+    }))
     rmkListpage.total = data.total
     rmkListpage.curPage++
 }
@@ -567,7 +589,6 @@ async function rmkLike(exerRmkId: number) {
             }
         }
         .paper-right-rmk-list {
-            height: calc(100vh - 400px);
             padding: 0;
             margin: 0;
             list-style: none;

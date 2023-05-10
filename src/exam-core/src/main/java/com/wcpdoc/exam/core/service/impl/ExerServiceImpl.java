@@ -107,6 +107,12 @@ public class ExerServiceImpl extends BaseServiceImp<Exer> implements ExerService
 		if (entity.getState() == 0) {
 			throw new MyException("已删除");
 		}
+		if (entity.getEndTime().getTime() <= System.currentTimeMillis()) {
+			throw new MyException("练习已结束");
+		}
+		if (entity.getStartTime().getTime() <= System.currentTimeMillis()) {
+			throw new MyException("练习已开始");// 考试结束放在考试开始前校验，可能的问题为考试已结束，提示的是考试已开始。
+		}
 		
 		List<Exer> exerList = exerDao.getList(exer.getQuestionTypeId());
 		for (Exer cur : exerList) {

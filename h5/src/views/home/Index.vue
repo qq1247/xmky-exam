@@ -22,7 +22,7 @@
                             <div class="home-left-top-content-item-desc">创建试题（道）</div>
                         </div>
                     </div>
-                    <div v-if="userStore.roles.includes('admin')" class="home-left-top-content-item" @click="$router.push('/exam')">
+                    <div v-if="userStore.roles.includes('admin')" class="home-left-top-content-item" @click="$router.push('/exer')">
                         <Iconfont icon="icon-mark-paper" :size="27" color="#0094e5;" :width="48" :height="48"
                             background-color="#e5f4fd" />
                         <div>
@@ -47,7 +47,7 @@
                             <div class="home-left-top-content-item-desc">参与考试（场）</div>
                         </div>
                     </div>
-                    <div v-if="userStore.roles.includes('user')" class="home-left-top-content-item" @click="$router.push('/myExam')">
+                    <div v-if="userStore.roles.includes('user')" class="home-left-top-content-item" @click="$router.push('/myExer')">
                         <Iconfont icon="icon-shiti" :size="28" color="#fb901b;" :width="48" :height="48"
                             background-color="#fff4e7" />
                         <div>
@@ -95,23 +95,25 @@
                             <el-popover
                                 v-if="hasCurMonth(data.date) && getTaskList(data.date).length"
                                 title=""
-                                :width="500"
+                                :width="580"
                                 trigger="hover"
                                 >
                                 <template #reference>
                                     <span>{{ hasCurMonth(data.date) ? dayjs(data.date).get('date') : '' }}</span>
                                 </template>
                                 <el-table :data="getTaskList(data.date)">
-                                    <el-table-column width="200" property="name" label="名称" align="center"/>
-                                    <el-table-column width="140" property="" label="考试 / 练习时间" align="center">
+                                    <el-table-column width="200" property="name" label="名称" align="">
                                         <template #default="scope">
-                                            {{ scope.row.startTime }} {{ scope.row.endTime }} 
+                                            <span v-if="scope.row.type === 1" class="iconfont icon-diannao"></span>
+                                            <span v-if="scope.row.type === 2" class="iconfont icon-piyue"></span>
+                                            {{ scope.row.name }}
                                         </template>
                                     </el-table-column>
-                                    <el-table-column width="140" property="" label="阅卷时间" align="center">
-                                        <template #default="scope">
-                                            {{ scope.row.examMarkStartTime }} {{ scope.row.examMarkEndTime }} 
-                                        </template>
+                                    <el-table-column width="180" property="" label="考试 / 练习时间" align="center">
+                                        <template #default="scope">{{ scope.row.startTime }}<br/>{{ scope.row.endTime }}</template>
+                                    </el-table-column>
+                                    <el-table-column width="180" property="" label="阅卷时间" align="center">
+                                        <template #default="scope">{{ scope.row.examMarkStartTime }}<br/>{{ scope.row.examMarkEndTime }}</template>
                                     </el-table-column>
                                 </el-table>
                             </el-popover>
@@ -120,37 +122,40 @@
                         </template>
                     </el-calendar>
                 </el-card>
-                <el-card class="home-left-bottom-right" shadow="never">
-                    <template #header>
-                        <span>{{ userStore.roles.includes('admin') ? '待阅列表' : '待考列表'}}</span>
-                    </template>
-                    <el-scrollbar max-height="calc(100vh - 350px)">
-                        <div v-for="todoTask in todoTaskList" class="home-left-bottom-right-row">
-                            <div>{{ todoTask.name }}</div>
-                            <span v-if="todoTask.type === 1 && todoTask.examMarkType === 2">{{ todoTask.examMarkStartTime }} - {{ todoTask.examMarkEndTime }}</span>
-                            <span v-else>{{ todoTask.startTime }} - {{ todoTask.endTime }}</span>
-                            <el-button 
-                                v-if="userStore.roles.includes('admin') && todoTask.type === 1 && todoTask.examMarkType === 2" 
-                                type="primary" 
-                                plain 
-                                @click="toMark(todoTask)"
-                            >开始阅卷</el-button>
-                            <el-button
-                                v-else-if="userStore.roles.includes('user') && todoTask.type === 1"
-                                type="primary" 
-                                plain 
-                                @click="toExam(todoTask)"
-                            >开始考试</el-button>
-                            <el-button 
-                                v-else-if="userStore.roles.includes('user') && todoTask.type === 2" 
-                                type="primary" 
-                                plain 
-                                @click="toExer(todoTask)"
-                            >开始练习</el-button>
-                        </div>
-                        <el-empty v-if="!todoTaskList.length" description="暂无任务"/>
-                    </el-scrollbar>
-                </el-card>
+                <div class="home-left-bottom-right">
+                    <el-card shadow="never">
+                        <template #header>
+                            <span>考试列表</span>
+                        </template>
+                        <el-scrollbar max-height="calc((100vh - 380px) / 2)">
+                            <div v-for="todoExam in todoExamList" class="home-left-bottom-right-row">
+                                <div>
+                                    <el-text tag="b">{{ todoExam.examName }}</el-text><br/>
+                                    <el-text type="info" size="small">{{ todoExam.examStartTime }} - {{ todoExam.examEndTime }}</el-text>
+                                    <el-text v-if="todoExam.examMarkType === 2" type="info" size="small"><br/>{{ todoExam.examMarkStartTime }} - {{ todoExam.examMarkEndTime }}（阅卷时间）</el-text>
+                                </div>
+                                <el-button v-if="userStore.roles.includes('admin') && todoExam.examMarkType === 2" type="primary" plain @click="toMark(todoExam)">开始阅卷</el-button>
+                                <el-button v-else-if="userStore.roles.includes('user')" type="primary" plain @click="toExam(todoExam)">开始考试</el-button>
+                            </div>
+                            <el-empty v-if="!todoExamList.length" description="暂无考试"/>
+                        </el-scrollbar>
+                    </el-card>
+                    <el-card shadow="never">
+                        <template #header>
+                            <span>练习列表</span>
+                        </template>
+                        <el-scrollbar max-height="calc((100vh - 380px) / 2)">
+                            <div v-for="todoExer in todoExerList" class="home-left-bottom-right-row">
+                                <div>
+                                    <el-text tag="b">{{ todoExer.name }}</el-text><br/>
+                                    <el-text type="info" size="small">{{ todoExer.examStarstartTimetTime }} - {{ todoExer.endTime }}</el-text>
+                                </div>
+                                <el-button v-if="userStore.roles.includes('user')" type="primary" plain @click="toExer(todoExer)">开始练习</el-button>
+                            </div>
+                            <el-empty v-if="!todoExerList.length" description="暂无练习"/>
+                        </el-scrollbar>
+                    </el-card>
+                </div>
             </div>
         </div>
         <div class="home-right">
@@ -246,7 +251,8 @@ const statis = reactive({// 首页统计
     topRank: 0,// 最高排名
 })
 const taskList = ref([] as any[])// 任务列表（日历悬浮展示）
-const todoTaskList = ref([] as any[])// 待办任务列表
+const todoExamList = ref([] as any[])// 未完成考试列表
+const todoExerList = ref([] as any[])// 未完成练习列表
 const bulletinListpage = reactive({// 公告分页列表
     curPage: 1,
     pageSize: 100,
@@ -278,19 +284,10 @@ onMounted(async () => {
         statis.userNum = data.userNum
 
         let { data: { data: data2 } } = await http.post("myMark/listpage", { pageSize: 100, todo: true })// 未完成的考试列表
-        todoTaskList.value.push(...data2.list.map((todoTask: any) => {
-            todoTask.startTime = todoTask.examStartTime// 口径统一
-            todoTask.endTime = todoTask.examEndTime
-            todoTask.name = todoTask.examName
-            todoTask.type = 1// 类型：1：考试；2：练习
-            return todoTask
-        })) 
+        todoExamList.value.push(...data2.list) 
 
         let { data: { data: data3 } } = await http.post("exer/listpage", { pageSize: 100, todo: true })// 未完成的练习列表
-        todoTaskList.value.push(...data3.list.map((todoTask: any) => {
-            todoTask.type = 2// 类型：1：考试；2：练习
-            return todoTask
-        })) 
+        todoExerList.value.push(...data3.list) 
     }
     if (userStore.roles.includes('user')) {// 如果是用户登录
         let { data: { data } } = await http.post("report/user/home", {  })// 首页统计
@@ -300,19 +297,10 @@ onMounted(async () => {
         statis.topRank = data.topRank
 
         let { data: { data: data2 } } = await http.post("myExam/listpage", { pageSize: 100, todo: true })// 未完成的考试列表
-        todoTaskList.value.push(...data2.list.map((todoTask: any) => {
-            todoTask.startTime = todoTask.examStartTime// 口径统一
-            todoTask.endTime = todoTask.examEndTime
-            todoTask.name = todoTask.examName
-            todoTask.type = 1// 类型：1：考试；2：练习
-            return todoTask
-        })) 
+        todoExamList.value.push(...data2.list) 
 
         let { data: { data: data3 } } = await http.post("myExer/listpage", { pageSize: 100, todo: true })// 未完成的练习列表
-        todoTaskList.value.push(...data3.list.map((todoTask: any) => {
-            todoTask.type = 2// 类型：1：考试；2：练习
-            return todoTask
-        })) 
+        todoExerList.value.push(...data3.list)
     }
 
     // 公告查询
@@ -593,27 +581,27 @@ async function toExer(myExer: any) {
             }
             :deep(.home-left-bottom-right) {
                 flex: 1;
+                display: flex;
+                flex-direction: column;
                 margin-left: 15px;
-                .el-card__body {
-                    padding-top: 0px;
-                    .home-left-bottom-right-row {
-                        font-size: 13px;
-                        font-weight: bold;
-                        color: var(--el-text-color-regular);
-                        border-bottom: 1px solid var(--el-border-color);
-                        padding: 20px 10px 10px 10px;
-                        position: relative;
-                        div {
-                            padding-bottom: 5px;
-                        }
-                        span {
-                            font-weight: initial; 
-                        }
-                        .el-button {
-                            position: absolute;
-                            right: 10px;
-                            bottom: 10px;
-                            border: 0px;
+                .el-card {
+                    flex: 1;
+                    .el-card__body {
+                        padding-top: 0px;
+                        .home-left-bottom-right-row {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: flex-end;
+                            border-bottom: 1px solid var(--el-border-color);
+                            padding: 20px 10px 10px 10px;
+                            div {
+                                .el-text {
+                                    font-size: 13px;
+                                }
+                            }
+                            .el-button {
+                                border: 0;
+                            }
                         }
                     }
                 }

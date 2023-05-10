@@ -73,6 +73,9 @@ public class ExerRmkServiceImpl extends BaseServiceImp<ExerRmk> implements ExerR
 		if (question.getQuestionTypeId().intValue() != exer.getQuestionTypeId().intValue()) {
 			throw new MyException("无权限");
 		}
+		if (exer.getRmkState() == 2) {
+			throw new MyException("评论已关闭");
+		}
 		
 		// 评论添加
 		exerRmk.setLikeNum(0);

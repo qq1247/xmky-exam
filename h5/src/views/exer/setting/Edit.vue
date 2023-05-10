@@ -6,7 +6,7 @@
         </template>
         <el-form ref="formRef" :model="form" :rules="formRules" label-width="100" size="large">
             <el-form-item label="名称" prop="name">
-                <el-input v-model="form.name" placeholder="请输入名称"/>
+                <el-input v-model.trim="form.name" placeholder="请输入名称"/>
             </el-form-item>
             <el-form-item label="题库" prop="questionTypeId">
                 <Select
