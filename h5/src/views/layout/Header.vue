@@ -83,10 +83,10 @@
     <el-drawer title="密码修改" v-model="form.show" :size="550" @close="form.oldPwd = ''; form.newPwd = '';">
         <el-form ref="formRef" :model="form" :rules="formRules" label-width="100" size="large">
             <el-form-item label="旧密码" prop="oldPwd">
-                <el-input v-model="form.oldPwd" type="password" show-password placeholder="请输入旧密码"/>
+                <el-input v-model.trim="form.oldPwd" type="password" show-password placeholder="请输入旧密码"/>
             </el-form-item>
             <el-form-item label="新密码" prop="newPwd">
-                <el-input v-model="form.newPwd" type="password" show-password placeholder="请输入新密码"/>
+                <el-input v-model.trim="form.newPwd" type="password" show-password placeholder="请输入新密码"/>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="pwdUpdate">修改</el-button>
@@ -100,7 +100,7 @@ import http from '@/request';
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user';
 import { onMounted, reactive, ref } from 'vue';
-import type { FormInstance, FormRules } from 'element-plus';
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus';
 
 // 定义变量
 const userStore = useUserStore()
@@ -121,6 +121,7 @@ const formRules = reactive<FormRules>({// 密码修改表单校验规则
     ],
     newPwd: [
         { required: true, message: '请输入新密码', trigger: 'blur' },
+        { min: 6, max: 20, message: '长度介于6-20', trigger: 'blur' },
     ],
 })
 
@@ -158,8 +159,12 @@ async function pwdUpdate() {
             return
         }
 
-        let { data: { code } } = await http.post("login/pwd", { ...form })
-
+        let { data: { code, msg } } = await http.post("login/pwd", { ...form })
+        if (code !== 200) {
+            return
+        }
+        
+        ElMessage.success('修改成功')
         form.oldPwd = ''// 提交后重置表单
         form.newPwd = ''
         form.show = false
