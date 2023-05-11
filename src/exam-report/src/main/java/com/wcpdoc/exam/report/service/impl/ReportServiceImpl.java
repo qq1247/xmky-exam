@@ -276,9 +276,18 @@ public class ReportServiceImpl extends BaseServiceImp<Object> implements ReportS
 			typeResultList.add(map);
 		}
 		
-		for (Question question : questionList) {
-			Map<String, Object> map = typeCache.get(question.getType().toString());
-			map.put("value", (int)map.get("value") + 1);// 按分类累加
+		if (exam.getGenType() == 1) {
+			for (Question question : questionList) {
+				Map<String, Object> map = typeCache.get(question.getType().toString());
+				map.put("value", (int)map.get("value") + 1);// 按分类累加
+			}
+		} else {
+			for (ExamRule examRule : examRuleList) {
+				if (examRule.getType() == 2) {
+					Map<String, Object> map = typeCache.get(examRule.getQuestionType().toString());
+					map.put("value", (int)map.get("value") + examRule.getNum());// 按分类累加
+				}
+			}
 		}
 		
 		for (Map<String, Object> typeResult : typeResultList) {
