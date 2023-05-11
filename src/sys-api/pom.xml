@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.wcpdoc.exam</groupId>
 		<artifactId>sys-parent</artifactId>
-		<version>4.0.1</version>
+		<version>4.1.0</version>
 	</parent>
 	<artifactId>sys-api</artifactId>
 	<name>sys-api</name>
