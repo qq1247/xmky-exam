@@ -40,7 +40,6 @@ import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.ExamRule;
 import com.wcpdoc.exam.core.entity.MyExam;
-import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
 import com.wcpdoc.exam.core.entity.QuestionOption;
@@ -245,12 +244,6 @@ public class ApiExamController extends BaseController {
 			examUserIdList.add(myExam.getUserId());
 		}
 		
-		List<Integer> markUserIdList = new ArrayList<>();
-		List<MyMark> myMarkList = myMarkService.getList(id);
-		for (MyMark myMark : myMarkList) {
-			markUserIdList.add(myMark.getMarkUserId());
-		}
-		
 		return PageResultEx.ok()
 				.addAttr("id", exam.getId())
 				.addAttr("name", exam.getName())
@@ -262,7 +255,6 @@ public class ApiExamController extends BaseController {
 				.addAttr("markEndTime", ValidateUtil.isValid(exam.getMarkEndTime()) ? DateUtil.formatDateTime(exam.getMarkEndTime()) : null)
 				.addAttr("genType", exam.getGenType())
 				.addAttr("passScore", exam.getPassScore())
-				.addAttr("showType", exam.getShowType())
 				.addAttr("anonState", exam.getAnonState())
 				.addAttr("scoreState", exam.getScoreState())
 				.addAttr("rankState", exam.getRankState())
@@ -270,8 +262,7 @@ public class ApiExamController extends BaseController {
 				.addAttr("state", exam.getState())
 				.addAttr("examQuestions", examQuestions)
 				.addAttr("examRules", examRules)
-				.addAttr("examUserIds", examUserIdList)
-				.addAttr("markUserIds", markUserIdList);
+				.addAttr("examUserIds", examUserIdList);
 	}
 	
 	/**
@@ -323,7 +314,6 @@ public class ApiExamController extends BaseController {
 					.addAttr("passScore", exam.getPassScore())
 					.addAttr("totalScore", exam.getTotalScore())
 					.addAttr("markType", exam.getMarkType())
-					.addAttr("showType", exam.getShowType())
 					.addAttr("genType", exam.getGenType())
 					.addAttr("sxes", exam.getSxes())
 					.addAttr("state", exam.getState())
@@ -337,78 +327,6 @@ public class ApiExamController extends BaseController {
 		}
 	}
 
-//	/**
-//	 * 更新考试阅卷用户
-//	 * 
-//	 * v1.0 zhanghc 2017年6月16日下午5:02:45
-//	 * 
-//	 * @param id
-//	 * @param examUserIds
-//	 * @param markUserIds
-//	 * @return PageResult
-//	 */
-//	@RequestMapping("/userAdd")
-//	@ResponseBody
-//	public PageResult userAdd(Integer id, String[] examUserIds, Integer[] markUserIds) {
-//		try {
-//			examService.userAdd(id, examUserIds, markUserIds);
-//			return PageResult.ok();
-//		} catch (MyException e) {
-//			log.error("更新考试阅卷用户错误：{}", e.getMessage());
-//			return PageResult.err().msg(e.getMessage());
-//		} catch (Exception e) {
-//			log.error("更新考试阅卷用户错误：", e);
-//			return PageResult.err();
-//		}
-//	}
-
-//	/**
-//	 * 在线用户
-//	 * 
-//	 * v1.0 chenyun 2021年9月7日下午1:27:31
-//	 * 
-//	 * @param ids
-//	 * @return PageResult
-//	 */
-//	@RequestMapping("/onlineUser")
-//	@ResponseBody
-//	public PageResult onlineUser(Integer id) {
-//		try {
-//			Exam exam = examService.getEntity(id);
-////			if (exam.getStartTime().getTime() > System.currentTimeMillis()) {
-////				throw new MyException("考试未开始");
-////			}
-////			if (exam.getEndTime().getTime() < System.currentTimeMillis()) {
-////				throw new MyException("考试已结束");
-////			}
-//
-//			List<Map<String, Object>> examUserList = examService.getExamUserList(id);
-//			for (Map<String, Object> map : examUserList) {
-//				map.put("userId", map.remove("id"));
-//				map.put("userName", map.remove("name"));
-//
-//				Integer userId = (Integer) map.get("userId");
-//				OnlineUser onlineUser = onlineUserService.getEntity(userId);
-//				if (onlineUser == null) {
-//					map.put("online", false);
-//					map.put("onlineTime", null);
-//					continue;
-//				}
-//
-//				map.put("online", onlineUser.getState());
-//				map.put("onlineTime", DateUtil.formatDateTime(onlineUser.getUpdateTime()));
-//			}
-//
-//			return PageResultEx.ok().data(new PageOut(examUserList, examUserList.size()));
-//		} catch (MyException e) {
-//			log.error("在线用户错误：{}", e.getMessage());
-//			return PageResult.err().msg(e.getMessage());
-//		} catch (Exception e) {
-//			log.error("在线用户错误：", e);
-//			return PageResult.err();
-//		}
-//	}
-	
 	/**
 	 * 变更考试时间
 	 * 
@@ -437,49 +355,4 @@ public class ApiExamController extends BaseController {
 			AutoMarkCache.releaseWriteLock(id);
 		}
 	}
-	
-//	/**
-//	 * 考试邮件通知
-//	 * 
-//	 * v1.0 chenyun 2022年3月28日下午2:23:19
-//	 * @param id
-//	 * @param content
-//	 * @param notifyType
-//	 * @return PageResult
-//	 */
-//	@RequestMapping("/mail")
-//	@ResponseBody
-//	public PageResult mail(Integer id, Integer notifyType, String content) {
-//		try {
-//			// 校验数据有效性
-//			if (!ValidateUtil.isValid(id)) {
-//				throw new MyException("参数错误:id");
-//			}
-//			if (!ValidateUtil.isValid(content)) {
-//				throw new MyException("参数错误:content");
-//			}
-//			if (notifyType != 1 && notifyType != 2 && notifyType != 3) {
-//				throw new MyException("参数错误:state");
-//			}
-//			
-//			Exam exam = examService.getEntity(id);
-//			if (exam == null) {
-//				throw new MyException("参数错误:id");
-//			}
-//			if (exam.getState() != 1) {
-//				throw new MyException("考试未发布");
-//			}
-//			if (exam.getEndTime().before(new Date()) ) {
-//				throw new MyException("考试时间已结束");
-//			}
-//			examService.mail(exam, notifyType, content);
-//			return PageResult.ok();
-//		} catch (MyException e) {
-//			log.error("考试邮件通知错误：{}", e.getMessage());
-//			return PageResult.err().msg(e.getMessage());
-//		} catch (Exception e) {
-//			log.error("考试邮件通知错误：", e);
-//			return PageResult.err();
-//		}
-//	}
 }

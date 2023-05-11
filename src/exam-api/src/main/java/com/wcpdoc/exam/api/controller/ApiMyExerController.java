@@ -98,7 +98,6 @@ public class ApiMyExerController extends BaseController {
 					.addAttr("questionTypeName", questionTypeService.getEntity(exer.getQuestionTypeId()).getName())
 					.addAttr("startTime", DateUtil.formatDateTime(exer.getStartTime()))
 					.addAttr("endTime", DateUtil.formatDateTime(exer.getEndTime()))
-					.addAttr("userIds", exer.getUserIds())
 					.addAttr("rmkState", exer.getRmkState())
 					;
 		} catch (MyException e) {
