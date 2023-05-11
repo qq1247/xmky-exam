@@ -32,6 +32,7 @@ http请求头需添加Authorization字段，
 | examName | String (32) | 考试名称   | 否   |
 | startTime | Date | 考试开始时间   | 否   |
 | endTime | Date | 考试结束时间  | 否   |
+| todo | Boolean| 未完成的考试（true有效）  | 否   |
 | curPage  | Integer     | 当前第几页 | 否   |
 | pageSize | Integer     | 每页多少条 | 否   |
 
@@ -48,12 +49,12 @@ http请求头需添加Authorization字段，
 | data.list[].examMarkStartTime   | Date    | 阅卷开始时间 |
 | data.list[].examMarkEndTime     | Date    | 阅卷结束时间  |
 | data.list[].examMarkState     | Date    | 阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；） |
+| data.list[].examScoreState     | Date    | 成绩查询状态（1：考试结束后；2：不公布；3：交卷后） |
+| data.list[].examRankState     | Date    | 排名状态（1：公布；2：不公布） |
 | data.list[].examTotalScore | Double  | 考试总分  |
 | data.list[].examPassScore | Double  | 考试及格分数  |
 | data.list[].userId          | Date    | 考试用户ID |
 | data.list[].userName        | Date    | 考试用户名称|
-| data.list[].markUserId      | Integer | 阅卷人ID   |
-| data.list[].markUserName    | String  | 阅卷人名称  |
 | data.list[].answerStartTime | Date    | 答题开始时间|
 | data.list[].answerEndTime   | Date    | 答题结束时间|
 | data.list[].totalScore      | Double  | 我的得分 （考试成绩不显示返回null） |
@@ -206,10 +207,117 @@ http请求头需添加Authorization字段，
 | examId| Integer| 考试ID| 是   |
 | userId| Integer| 考试用户ID| 是   |
 | questionId| Integer| 试题ID| 是   |
-| score          | Double  | 得分           | 是   |
+| userScore| Double  | 用户分数           | 是   |
 
 ### 我的阅卷阅卷：myMark/finish
 | 请求参数| 类型    | 描述       | 必填 |
 | -------- | ------- | ---------- | ---- |
 | examId| Integer | 考试ID | 是   |
 | userId| Integer | 考试用户ID | 是   |
+
+### 我的练习列表：myExer/listpage
+| 请求参数| 类型        | 描述       | 必填 |
+| -------- | ----------- | ---------- | ---- |
+| questionTypeId     | Integer | 题库ID       | 否   |
+| name     | String (16) | 名称       | 否   |
+| todo     | Boolean | 未完成的（true有效）      | 否   |
+| startTime     | Date | 开始时间    | 否   |
+| endTime     | Date | 结束时间    | 否   |
+| curPage  | Integer     | 当前第几页 | 否   |
+| pageSize | Integer     | 每页多少条 | 否   |
+
+| 响应参数| 类型    | 描述     |
+| -------------------------- | ------- | -------- |
+| code                       | Integer | 响应码   |
+| msg                        | String  | 响应消息 |
+| data.total                 | Integer | 总行数   |
+| data.list[]                | Object[]   | 分页列表 |
+| data.list[].id             | Integer | 主键     |
+| data.list[].name           | String  | 名称     |
+| data.list[].startTime   | Date  | 开始时间    |
+| data.list[].endTime   | Date  | 结束时间    |
+| data.list[].rmkState  | Integer  | 允许评论（1：是；2：否）    |
+
+### 我的练习获取：myExer/get
+| 请求参数| 类型        | 描述       | 必填 |
+| -------- | ----------- | ---------- | ---- |
+| exerId     | Integer | 练习ID       | 是  |
+
+| 响应参数| 类型    | 描述     |
+| -------------------------- | ------- | -------- |
+| code                       | Integer | 响应码   |
+| msg                        | String  | 响应消息 |
+| data.total                 | Integer | 总行数   |
+| data.                | Object[]   | 分页列表 |
+| data.id             | Integer | 主键     |
+| data.name           | String  | 名称     |
+| data.questionTypeId   | Integer  | 题库ID    |
+| data.questionTypeName   | String  | 题库名称    |
+| data.startTime   | Date  | 开始时间    |
+| data.endTime   | Date  | 结束时间    |
+| data.rmkState  | Integer  | 允许评论（1：是；2：否）    |
+
+### 我的练习试题：myExer/question
+| 请求参数| 类型        | 描述       | 必填 |
+| -------- | ----------- | ---------- | ---- |
+| exerId     | Integer | 练习ID       | 是  
+| questionId     | Integer | 试题ID       | 是  |
+
+| 响应参数| 类型    | 描述 | 
+| -------- | ------- | ---- |
+| code                | Integer | 响应码     |
+| msg                 | String  | 响应消息   |
+| data.id           | Integer         | 主键 |
+| data.type           | Integer         | 类型（1：单选；2：多选；3：填空；4：判断；5：问答 |
+| data.title          | Text | 题干 |
+| data.options[]      | String[]        | 选项，type为1,2时有效，len <= 7  |
+| data.markType  | Integer    |  阅卷类型（1：客观题；2：主观题）  | 
+| data.analysis       | Text    | 解析  | 
+| data.score          | Double          | 分数   | 是
+| data.markOptions[] | Integer[] | 分数选项（1：漏选得分；2：答案无顺序；3：大小写不敏感；）|
+| data.answers[]      | String[]  | 答案（如果是填空或智能问答，会有多个答案）  |
+| data.scores[]      | Double[]   | 答案分值（如果是填空或智能问答，表示每空分值；如果是多选，表示漏选分值）   |
+
+### 我的练习试题列表：myExer/questionList
+| 请求参数| 类型        | 描述       | 必填 |
+| -------- | ----------- | ---------- | ---- |
+| exerId     | Integer | 练习ID       | 是  
+
+| 响应参数| 类型    | 描述 | 
+| -------- | ------- | ---- |
+| code                | Integer | 响应码     |
+| msg                 | String  | 响应消息   |
+| data           | Integer[]         | 试题IDS |
+
+### 我的练习评论列表：myExer/rmkListpage
+| 请求参数| 类型        | 描述       | 必填 |
+| -------- | ----------- | ---------- | ---- |
+| questionId     | Integer | 试题ID       | 是  |
+
+| 响应参数| 类型    | 描述     |
+| -------------------------- | ------- | -------- |
+| code                       | Integer | 响应码   |
+| msg                        | String  | 响应消息 |
+| data.total                 | Integer | 总行数   |
+| data.list[]                | Object[]   | 分页列表 |
+| data.list[].id             | Integer | 主键     |
+| data.list[].content           | String  | 内容     |
+| data.list[].likeNum   | Integer  | 点赞数量    |
+| data.list[].likeUserIds   | Integer[]  | 点赞用户IDS  |
+| data.list[].updateUserId  | Integer  | 评论用户ID（匿名评论时为null）   |
+| data.list[].updateUserName  | String  | 评论用户名称（匿名评论时为null）    |
+| data.list[].updateTime  | Date  | 评论时间    |
+
+
+### 我的练习评论：myExer/rmk
+| 请求参数| 类型        | 描述       | 必填 |
+| -------- | ----------- | ---------- | ---- |
+| exerId     | Integer | 练习ID       | 是  |
+| questionId     | Integer | 试题ID       | 是  |
+| content     | String（100） | 内容       | 是  |
+| anon     | Integer | 匿名评论（true：是；false：否）       | 是  |
+
+### 我的练习评论点赞：myExer/rmkLike
+| 请求参数| 类型        | 描述       | 必填 |
+| -------- | ----------- | ---------- | ---- |
+| exerRmkId     | Integer | 评论ID       | 是  

@@ -32,7 +32,7 @@ http请求头需添加Authorization字段，
 | code                      | Integer | 响应码    |
 | msg                       | String  | 响应消息 |
 | data.examNum       | Integer | 考试数量 |
-| data.unExamNum       | String | 待考考试数量  |
+| data.exerNum       | String | 练习数量  |
 | data.passExamNum        | String | 及格次数  |
 | data.topRank       | Integer | 最高排名 |
 
@@ -43,7 +43,7 @@ http请求头需添加Authorization字段，
 | msg                       | String  | 响应消息 |
 | data.examNum        | Integer | 考试数量 |
 | data.questionNum        | Integer | 试题数量  |
-| data.unMarkNum  | Integer | 待阅考试数量 |
+| data.exerNum  | Integer | 练习数量 |
 | data.userNum     | Integer | 用户数量 |
 
 ### 试题统计：report/question/statis
@@ -56,11 +56,11 @@ http请求头需添加Authorization字段，
 | code                        | Integer | 响应码   |
 | msg                         | String  | 响应消息  |
 | data.typeList[]               | Object[]   | 类型列表   |
-| data.typeList[].name        | String | 类型名称  |
-| data.typeList[].value       | Integer  | 类型值  |
-| data.markTypeList[]               | Object[]   | 智能列表   |
-| data.markTypeList[].name        | String | 智能名称  |
-| data.markTypeList[].value       | Integer  | 智能值  |
+| data.typeList[].name        | String | 试题类型名称  |
+| data.typeList[].value       | Integer  | 试题类型值  |
+| data.markTypeList[]               | Object[]   | 阅卷类型   |
+| data.markTypeList[].name        | String | 阅卷类型名称  |
+| data.markTypeList[].value       | Integer  | 阅卷类型值  |
 
 ### 考试统计：report/exam/statis
 | 请求参数| 类型    | 描述       | 必填 |
@@ -71,9 +71,9 @@ http请求头需添加Authorization字段，
 | --------------------- | ------- | -------------------------- |
 | code                  | Integer | 响应码                     |
 | msg                   | String  | 响应消息                   |
-| data.exam.userNum       | Integer    | 考试人数                   |
-| data.exam.missUserNum   | Integer  | 未考试人数                      |
-| data.exam.failUserNum  | Integer  | 不及格人数|
+| data.userNum       | Integer    | 考试人数                   |
+| data.missUserNum   | Integer  | 未考试人数                      |
+| data.failUserNum  | Integer  | 不及格人数|
 | data.questionNum  | Integer  | 试题数量    |
 | data.objectiveQuestionNum  | Integer  | 客观题数量    |
 | data.avgScore | Double  | 平均分   |
@@ -104,7 +104,6 @@ http请求头需添加Authorization字段，
 | data.list[].userId        | Integer | 考试用户Id |
 | data.list[].userName        | String | 考试用户名称  |
 | data.list[].orgName        | String | 组织机构名称  |
-| data.list[].markUserName       | String | 阅卷用户名称 |
 | data.list[].myExamState        | Integer | 用户考试状态（1：未考试；2：考试中；3：已交卷；）  |
 | data.list[].myExamMarkState        | Integer | 用户阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；）  |
 | data.list[].myExamAnswerState        | Integer | 用户答题状态（1：及格；2：不及格）  |

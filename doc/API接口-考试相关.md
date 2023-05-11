@@ -195,6 +195,7 @@ http请求头需添加Authorization字段，
 | data.list[].genType|Integer| 组卷方式（1：人工组卷；2：随机组卷） |
 | data.list[].markType  | Integer | 阅卷方式（1：客观题；2：主观题；） |
 | data.list[].sxes  | Integer[] | 反作弊（1：试题乱序；2：选项乱序；） |
+| data.list[].anonState | Integer[] | 匿名阅卷（1：是；2：否） |
 | data.list[].userNum  | Integer | 用户数量 |
 
 ### 考试发布：exam/publish
@@ -275,6 +276,7 @@ http请求头需添加Authorization字段，
 | data.markEndTime   | Date        | 阅卷结束时间 |
 | data.genType       | Integer     | 组卷方式（1：人工组卷；2：随机组卷）  |
 | data.passScore    | Integer     | 及格分数 |
+| data.anonState | Integer     | 匿名阅卷状态（1：是；2：否） |
 | data.scoreState    | Integer     | 成绩查询状态（1：考试结束后；2：不公布；3：交卷后） |
 | data.rankState    | Integer     | 排名状态（1：公布；2：不公布） |
 | data.sxes    | Integer[]     | 反作弊（1：试题乱序；2：选项乱序；） |
@@ -306,6 +308,7 @@ http请求头需添加Authorization字段，
 | data.markState    | Integer     | 阅卷状态（1：未阅卷；2：阅卷中；3：已阅卷；） |
 | data.scoreState    | Integer     | 成绩查询状态（1：考试结束后；2：不公布；3：交卷后） |
 | data.rankState    | Integer     | 排名状态（1：公布；2：不公布） |
+| data.anonState    | Integer     | 匿名阅卷状态（1：是；2：否） |
 | data.passScore    | Double     | 及格分数 |
 | data.totalScore| Double| 总分数  |
 | data.markType| Integer| 阅卷方式（1：客观题；2：主观题；）  |
@@ -318,3 +321,53 @@ http请求头需添加Authorization字段，
 | id          | Integer   |  考试id     | 是   |
 | timeType     | Integer   |  状态 【1：考试开始时间；2：考试结束时间；3：阅卷开始时间；4：阅卷结束时间】  | 是   |
 | minute     | Integer   |  分钟数    | 是   |
+
+### 练习列表：exer/listpage
+| 请求参数| 类型        | 描述       | 必填 |
+| -------- | ----------- | ---------- | ---- |
+| questionTypeId     | Integer | 题库ID       | 否   |
+| name     | String (16) | 名称       | 否   |
+| todo     | Boolean | 未完成的（true有效）      | 否   |
+| startTime     | Date | 开始时间    | 否   |
+| endTime     | Date | 结束时间    | 否   |
+| curPage  | Integer     | 当前第几页 | 否   |
+| pageSize | Integer     | 每页多少条 | 否   |
+
+| 响应参数| 类型    | 描述     |
+| -------------------------- | ------- | -------- |
+| code                       | Integer | 响应码   |
+| msg                        | String  | 响应消息 |
+| data.total                 | Integer | 总行数   |
+| data.list[]                | Object[]   | 分页列表 |
+| data.list[].id             | Integer | 主键     |
+| data.list[].name           | String  | 名称     |
+| data.list[].startTime   | Date  | 开始时间    |
+| data.list[].endTime   | Date  | 结束时间    |
+| data.list[].rmkState  | Integer  | 允许评论（1：是；2：否）    |
+| data.list[].userIds  | Integer[]  | 用户IDS  |
+
+### 练习添加：exer/add
+| 请求参数| 类型      | 描述        | 必填 |
+| ----------- | --------- | ----------- | ---- |
+| name     | String   |  练习名称  |
+| questionTypeId     | Integer   |  题库ID   | 是   |
+| startTime     | Integer   |  开始时间   | 是   |
+| endTime     | Integer   |  结束时间    | 是   |
+| rmkState     | Integer   |  允许评论（1：是；2：否）    | 是   |
+| userIds     | Integer[]   |  没有默认表示所有用户    | 否   |
+
+### 练习添加：exer/add
+| 请求参数| 类型      | 描述        | 必填 |
+| ----------- | --------- | ----------- | ---- |
+| id          | Integer   |  练习ID     | 是   |
+| name     | String   |  练习名称  |
+| questionTypeId     | Integer   |  题库ID   | 是   |
+| startTime     | Integer   |  开始时间   | 是   |
+| endTime     | Integer   |  结束时间    | 是   |
+| rmkState     | Integer   |  允许评论（1：是；2：否）    | 是   |
+| userIds     | Integer[]   |  没有默认表示所有用户    | 否   |
+
+### 练习添加：exer/del
+| 请求参数| 类型      | 描述        | 必填 |
+| ----------- | --------- | ----------- | ---- |
+| id          | Integer   |  练习ID     | 是   |
