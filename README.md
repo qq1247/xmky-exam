@@ -28,8 +28,9 @@
 <a href="doc">接口文档</a>
 <a href="doc">部署文档</a>
 <a href="img/process">状态流转图</a>
-<a href="h5">前端更新</a>
+<a href="h5">PC端更新</a>
 <a href="src">后端更新</a>
+<a href="m">移动端更新</a>
 
 ## 界面预览
 <a href="img/webpage">去查看</a>
