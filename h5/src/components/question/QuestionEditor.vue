@@ -279,14 +279,23 @@ function parseQuestion(questionTxt: string[]) {
                 return question
             }
 
-            if (answers.length === 1) {// 一个中括号内空格分开的词，对应题干的空。
-                let answerCount = answers[0].split(/ +/).length//  + 1-n个空格
+            if (answers.length === 0) {// 没有答案，报错
+                question.errs = `填空没有答案：${questionTxt.join('')}`
+                return question
+            }
+            if (answers.length === 1 && fillBlanksCount === 1) {// 一个答案一个填空，不处理
+
+            } else if (answers.length === 1 && fillBlanksCount > 1) {// 一个答案，多个填空，答案按空格分隔，数量不等错误
+                let answerCount = answers[0].split(/ +/).length // 多个空格按一个算
                 if (fillBlanksCount !== answerCount) {
-                    question.errs = `填空数量和答案数量不相等：${questionTxt.join('')}`
+                    question.errs = `${ answerCount }个答案，${ fillBlanksCount }个填空：${questionTxt.join('')}`
                     return question
                 }
-            } else if (fillBlanksCount !== answers.length) {// 如果填空有多个备选答案，一个中括号表示一个填空，一个填空内空格分开的词，表示该空的备选答案
-                question.errs = `填空数量和答案数量不相等：${questionTxt.join('')}`
+            } else if (answers.length > 1 && fillBlanksCount === 1) {// 多个答案，一个填空错误；
+                question.errs = `${ answers.length }个答案，${ fillBlanksCount }个填空：${questionTxt.join('')}`
+                return question
+            } else if (answers.length !== fillBlanksCount) {// 多个答案，多个填空，数量不等错误
+                question.errs = `${ answers.length }个答案，${ fillBlanksCount }个填空：${questionTxt.join('')}`
                 return question
             }
         }
@@ -322,13 +331,15 @@ function parseQuestion(questionTxt: string[]) {
             _scores.push(scores[i] ? scores[i] : 1)
             score += _scores[i]
         }
-        if (fillBlanksCount > 1 && answers.length === 1) {// 如果答案是写在一块按空格分割的，则进行拆分，满足接口需求
+
+        if (answers.length === 1 && fillBlanksCount > 1) {// 一个答案，多个填空，答案按空格分隔
             answers = answers[0].split(/ +/)
-        } else {// 如果答案分开写，一个答案按回车分割备选答案，满足接口需求
+        } else {// 其他情况
             answers = answers.map(answer => {
                 return answer.replace(/ +/g, '\n')
             })
         }
+
         if (markType === 2) {
             markOptions = [] // 主观题没有阅卷选项
         }
