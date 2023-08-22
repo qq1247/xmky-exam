@@ -55,6 +55,7 @@ public class ShiroCfg {
 		filterChainMap.put("/api/file/download", "anon");// 下载免登录
 		filterChainMap.put("/api/dict/listpage", "jwt");// 数据字典分页列表需登录
 		filterChainMap.put("/api/bulletin/listpage", "jwt");// 公告分页列表需登录
+		filterChainMap.put("/api/bulletin/get", "jwt");// 公告详情列表需登录
 		filterChainMap.put("/api/user/get", "jwt");// 用户信息需登录
 		
 		// 用户权限

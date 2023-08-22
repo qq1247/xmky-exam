@@ -33,7 +33,6 @@ import com.wcpdoc.exam.core.entity.Exam;
 import com.wcpdoc.exam.core.entity.ExamQuestion;
 import com.wcpdoc.exam.core.entity.ExamRule;
 import com.wcpdoc.exam.core.entity.MyExam;
-import com.wcpdoc.exam.core.entity.MyMark;
 import com.wcpdoc.exam.core.entity.MyQuestion;
 import com.wcpdoc.exam.core.entity.Question;
 import com.wcpdoc.exam.core.entity.QuestionAnswer;
@@ -636,15 +635,15 @@ public class ExamServiceImpl extends BaseServiceImp<Exam> implements ExamService
 			ProgressBarCache.setProgressBar(processBarId, 4.0 + curProgressNum++, processLen, "生成用户-"+examUserId+"试卷完成", HttpStatus.OK.value());
 		}
 		
-		for (Integer markUserId : examInfo.getMarkUserIds()) {
-			MyMark myMark = new MyMark();
-			myMark.setExamId(examInfo.getId());
-			myMark.setMarkUserId(markUserId);
-			myMark.setQuestionIds(null);
-			myMark.setUpdateTime(new Date());
-			myMark.setUpdateTime(new Date());
-			myMarkService.add(myMark);
-		}
+//		for (Integer markUserId : examInfo.getMarkUserIds()) {
+//			MyMark myMark = new MyMark();
+//			myMark.setExamId(examInfo.getId());
+//			myMark.setMarkUserId(markUserId);
+//			myMark.setQuestionIds(null);
+//			myMark.setUpdateTime(new Date());
+//			myMark.setUpdateTime(new Date());
+//			myMarkService.add(myMark);
+//		}
 	}
 
 	private void publishValid(ExamInfo examInfo, Map<Integer, List<Question>> questionListCache) {

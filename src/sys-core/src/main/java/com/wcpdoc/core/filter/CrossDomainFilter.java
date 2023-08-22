@@ -26,7 +26,7 @@ public class CrossDomainFilter implements Filter {
 		if (response instanceof HttpServletResponse) {
 			httpServletResponse.setHeader("Access-Control-Allow-Origin", "*");
 			httpServletResponse.setHeader("Access-Control-Allow-Methods", "*");
-			httpServletResponse.setHeader("Access-Control-Allow-Headers", "*");
+			httpServletResponse.setHeader("Access-Control-Allow-Headers", "Authorization,content-type");
 			httpServletResponse.setHeader("Access-Control-Max-Age", "86400");
 		}
 		chain.doFilter(request, httpServletResponse);

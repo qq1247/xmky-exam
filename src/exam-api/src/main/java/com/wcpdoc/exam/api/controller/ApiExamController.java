@@ -254,6 +254,7 @@ public class ApiExamController extends BaseController {
 				.addAttr("markStartTime", ValidateUtil.isValid(exam.getMarkStartTime()) ? DateUtil.formatDateTime(exam.getMarkStartTime()) : null)
 				.addAttr("markEndTime", ValidateUtil.isValid(exam.getMarkEndTime()) ? DateUtil.formatDateTime(exam.getMarkEndTime()) : null)
 				.addAttr("genType", exam.getGenType())
+				.addAttr("showType", exam.getShowType())
 				.addAttr("passScore", exam.getPassScore())
 				.addAttr("anonState", exam.getAnonState())
 				.addAttr("scoreState", exam.getScoreState())

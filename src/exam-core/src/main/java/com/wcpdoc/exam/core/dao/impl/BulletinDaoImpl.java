@@ -28,7 +28,7 @@ public class BulletinDaoImpl extends RBaseDaoImpl<Bulletin> implements BulletinD
 				+ "FROM EXM_BULLETIN BULLETIN "
 				+ "LEFT JOIN SYS_USER USER ON BULLETIN.UPDATE_USER_ID = USER.ID ";
 		SqlUtil sqlUtil = new SqlUtil(sql);
-		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("title")), "BULLETIN.TITLE LIKE :TITLE", "%" + pageIn.get("title") + "%")
+		sqlUtil.addWhere(ValidateUtil.isValid(pageIn.get("title")), "BULLETIN.TITLE LIKE :TITLE", String.format("%%%s%%", pageIn.get("title")))
 				.addWhere("BULLETIN.STATE = 1")
 				.addOrder("BULLETIN.START_TIME", Order.DESC);
 		PageOut pageOut = getListpage(sqlUtil, pageIn);
