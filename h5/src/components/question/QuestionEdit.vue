@@ -379,7 +379,7 @@ watch(() => form.id, async (id) => {
 
     form.type = data.type
     await nextTick()
-    form.title = data.title
+    form.title = escape2Html(data.title) as string
     await nextTick()
     form.markType = data.markType
     await nextTick()
@@ -388,10 +388,33 @@ watch(() => form.id, async (id) => {
     form.scores = data.scores
     await nextTick()
     form.markOptions = data.markOptions
-    form.answers = data.answers
-    form.options = data.options;
-    form.analysis = data.analysis
+    form.answers = data.answers.map((an: string|string[]) => escape2Html(an))
+    form.options = data.options.map((op: string) => escape2Html(op))
+    form.analysis = escape2Html(data.analysis) as string
 })
+
+function escape2Html (txt: string|string[]) {
+    if (typeof txt === 'string') {
+        return txt.replaceAll('&lt;', '<')
+            .replaceAll('&gt;', '>')
+            .replaceAll('&amp;', '&')
+            .replaceAll('&quot;', '"')
+            .replaceAll('&apos;', "'")
+            .replaceAll('&ldquo;', "“")
+            .replaceAll('&rdquo;', "”")
+    }
+
+    return (txt as string[]).map((t: string) => {
+        return t.replaceAll('&lt;', '<')
+            .replaceAll('&gt;', '>')
+            .replaceAll('&amp;', '&')
+            .replaceAll('&quot;', '"')
+            .replaceAll('&apos;', "'")
+            .replaceAll('&ldquo;', "“")
+            .replaceAll('&rdquo;', "”")
+    })
+
+}
 
 // 添加选项
 function addOption() {

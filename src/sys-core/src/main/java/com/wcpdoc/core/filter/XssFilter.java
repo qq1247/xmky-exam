@@ -37,16 +37,16 @@ public class XssFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
  		HttpServletRequest httpServletRequest = (HttpServletRequest) request;
- 		if (httpServletRequest.getRequestURI().equals("/api/question/add") 
- 				|| httpServletRequest.getRequestURI().equals("/api/question/edit")
- 				|| httpServletRequest.getRequestURI().equals("/api/bulletin/add") 
- 				|| httpServletRequest.getRequestURI().equals("/api/bulletin/edit")
- 				|| httpServletRequest.getRequestURI().equals("/api/paper/chapterAdd") 
- 				|| httpServletRequest.getRequestURI().equals("/api/paper/chapterEdit")
- 				|| httpServletRequest.getRequestURI().startsWith("/doc")) {
- 			chain.doFilter(httpServletRequest, response);
- 			return;
- 		}
+// 		if (httpServletRequest.getRequestURI().equals("/api/question/add") 
+// 				|| httpServletRequest.getRequestURI().equals("/api/question/edit")
+// 				|| httpServletRequest.getRequestURI().equals("/api/bulletin/add") 
+// 				|| httpServletRequest.getRequestURI().equals("/api/bulletin/edit")
+// 				|| httpServletRequest.getRequestURI().equals("/api/paper/chapterAdd") 
+// 				|| httpServletRequest.getRequestURI().equals("/api/paper/chapterEdit")
+// 				|| httpServletRequest.getRequestURI().startsWith("/doc")) {
+// 			chain.doFilter(httpServletRequest, response);
+// 			return;
+// 		}
  		
 		if (log.isDebugEnabled()) {
 			log.debug("Xss过滤前：【{}】【{}】", httpServletRequest.getRequestURI(), JSONObject.toJSONString(httpServletRequest.getParameterMap()));
@@ -139,6 +139,6 @@ class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
 	private String cleanXSS(String valueP) {
 		//String ssString = "<alert>(123)ni你我wo(*&^%$#@!)</alert>";
-		return StringEscapeUtils.escapeHtml4(valueP);
+		return StringEscapeUtils.escapeHtml3(valueP);
 	}
 }
