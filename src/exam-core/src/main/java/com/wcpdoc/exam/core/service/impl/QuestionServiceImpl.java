@@ -462,9 +462,16 @@ public class QuestionServiceImpl extends BaseServiceImp<Question> implements Que
 			questionAnswerService.del(questionAnswer.getId());
 		}
 		
-		if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasTrueFalse(question) || (QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question))) {
+		if (QuestionUtil.hasSingleChoice(question) || QuestionUtil.hasTrueFalse(question)) {
 			QuestionAnswer questionAnswer = new QuestionAnswer();
 			questionAnswer.setAnswer(answers[0]);
+			questionAnswer.setScore(null);
+			questionAnswer.setQuestionId(question.getId());
+			questionAnswer.setNo(1);
+			questionAnswerService.add(questionAnswer);
+		} else if ((QuestionUtil.hasQA(question) && QuestionUtil.hasSubjective(question))) {// 答案有逗号，接收参数会分隔，这里合并一下
+			QuestionAnswer questionAnswer = new QuestionAnswer();
+			questionAnswer.setAnswer(StringUtil.join(answers));
 			questionAnswer.setScore(null);
 			questionAnswer.setQuestionId(question.getId());
 			questionAnswer.setNo(1);
